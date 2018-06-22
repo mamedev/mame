@@ -1371,9 +1371,10 @@
 	</software>
 
 	<software name="quizdaisk" cloneof="quizdais">
-		<description>Quiz Daisousa Sen - The Last Count Down (Korean release)</description>
-		<year>1991</year>
-		<publisher>SNK</publisher>
+		<description>Quiz Salibtamjeong - The Last Count Down (Korean release of Quiz Daisousa Sen)</description>
+		<year>1995</year>
+		<publisher>SNK / Viccom</publisher>
+		<info name="alt_title" value="퀴즈 사립탐정"/>
 		<sharedfeat name="release" value="MVS" />   <!-- Unknown if it was also released on AES -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -3290,12 +3291,13 @@
 	-->
 
 	<software name="fightfev">
-		<description>Fight Fever (set 1)</description>
+		<description>Fight Fever / Wang Jung Wang (set 1)</description>
 		<year>1994</year>
 		<publisher>Viccom</publisher>
 		<info name="serial" value="NGM-060"/>
 		<info name="release" value="19940628"/>
 		<info name="alt_title" value="ファイトフィーバー"/>
+		<!--<info name="alt_title" value="왕중왕"/>; Developed in korea, and Released too. Korean language is only active at Europe/Asia Bios.-->
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -3322,12 +3324,13 @@
 	</software>
 
 	<software name="fightfeva" cloneof="fightfev">
-		<description>Fight Fever (set 2)</description>
+		<description>Fight Fever / Wang Jung Wang (set 2)</description>
 		<year>1994</year>
 		<publisher>Viccom</publisher>
 		<info name="serial" value="NGM-060"/>
 		<info name="release" value="19940628"/>
 		<info name="alt_title" value="ファイトフィーバー"/>
+		<!--<info name="alt_title" value="왕중왕"/>; Developed in korea, and Released too. Korean language is only active at Europe/Asia Bios.-->
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -3494,6 +3497,7 @@
 		<description>Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II, set 1)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
+		<info name="alt_title" value="眞 싸울아비 투혼"/>
 		<sharedfeat name="release" value="MVS" /> <!-- Unknown if it was also released on AES -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -3535,6 +3539,7 @@
 		<description>Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II, set 2)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
+		<info name="alt_title" value="眞 싸울아비 투혼"/>
 		<sharedfeat name="release" value="MVS" /> <!-- Unknown if it was also released on AES -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -3831,7 +3836,7 @@
 	<software name="zupapa">
 		<description>Zupapa!</description>
 		<year>2001</year>
-		<publisher>SNK</publisher>
+		<publisher>Face / SNK</publisher>
 		<info name="alt_title" value="ズパパ！"/>
 		<sharedfeat name="release" value="MVS" />   <!-- MVS ONLY RELEASE -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
@@ -4178,9 +4183,10 @@
 	</software>
 
 	<software name="quizkofk" cloneof="quizkof">
-		<description>Quiz King of Fighters (Korean release)</description>
-		<year>1995</year>
-		<publisher>Saurus</publisher>
+		<description>Quiz King of Fighters (Korea)</description>
+		<year>1996</year>
+		<publisher>SNK / Saurus / Viccom</publisher>
+		<info name="alt_title" value="퀴즈 킹 오브 화이터즈"/>
 		<sharedfeat name="release" value="MVS" />   <!-- Unknown if it was also released on AES -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -5176,7 +5182,7 @@
 	The following ID's are used by Korean releases:
 
 	ID-0122 - Pae Wang Jeon Seol / Legend of a Warrior (Korean censored Samurai Shodown IV)
-	ID-0123 - Quiz Daisousa Sen - The Last Count Down (Korean release)
+	ID-0123 - Quiz Salibtamjeong - The Last Count Down (Korean release of Quiz Daisousa Sen)
 	ID-0124 - Real Bout Fatal Fury Special / Real Bout Garou Densetsu Special (Korean release)
 	ID-0134 - The Last Soldier (Korean release of The Last Blade)
 	ID-0140 - Real Bout Fatal Fury 2 - The Newcomers (Korean release)
@@ -5899,13 +5905,14 @@
 
 	<!--
 	ID-0220
-	Choutetsu Brikin'ger - Iron clad (prototype) 1996 Saurus
+	Ironclad / Choutetsu Brikin'ger (prototype) 1996 Saurus
 	-->
 
 	<software name="ironclad">
-		<description>Choutetsu Brikin'ger - Iron Clad (Prototype)</description>
+		<description>Ironclad / Choutetsu Brikin'ger (Prototype)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
+		<info name="alt_title" value="超鉄ブリキンガー"/>
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -5933,9 +5940,10 @@
 	</software>
 
 	<software name="ironclado" cloneof="ironclad">
-		<description>Choutetsu Brikin'ger - Iron Clad (Prototype, bootleg)</description>
+		<description>Ironclad / Choutetsu Brikin'ger (Prototype, bootleg)</description>
 		<year>1996</year>
 		<publisher>bootleg</publisher>
+		<info name="alt_title" value="超鉄ブリキンガー"/>
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -6048,8 +6056,9 @@
 
 	<software name="samsho4k" cloneof="samsho4">
 		<description>Pae Wang Jeon Seol / Legend of a Warrior (Korean censored Samurai Shodown IV)</description>
-		<year>1996</year>
+		<year>1996</year>   <!--4996 error at title-->
 		<publisher>SNK</publisher>
+		<info name="alt_title" value="覇王伝説"/>
 		<sharedfeat name="release" value="MVS" />   <!-- Unknown if it was also released on AES -->
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -6618,7 +6627,7 @@
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGH-2340"/>
-		<info name="release" value="19900129"/>
+		<info name="release" value="19980129"/>
 		<info name="alt_title" value="幕末浪漫 月華の剣士"/>
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
@@ -7269,12 +7278,12 @@
 	-->
 
 	<software name="lastbld2">
-		<description>The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi (NGM-2430 ~ NGH-2430)</description>
+		<description>The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi ~ Tsuki ni Saku Hana, Chiri Yuku Hana ~ (NGM-2430 ~ NGH-2430)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGM-2430 (MVS), NGH-2430 (AES)"/>
 		<info name="release" value="19981125 (MVS), 19990128 (AES)"/>
-		<info name="alt_title" value="幕末浪漫第二幕 月華の剣士"/>
+		<info name="alt_title" value="幕末浪漫第二幕 月華の剣士 ～月に咲く華，散りゆく花～"/>
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -7938,7 +7947,7 @@
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGM-2530"/>
 		<info name="release" value="19991126"/>
-		<info name="alt_title" value="餓狼"/>
+		<info name="alt_title" value="餓狼 MARK OF THE WOLVES"/>
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -7985,7 +7994,7 @@
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGM-2530 (MVS), NGH-2530 (AES)"/>
 		<info name="release" value="19991126 (MVS), 20000225 (AES)"/>
-		<info name="alt_title" value="餓狼"/>
+		<info name="alt_title" value="餓狼 MARK OF THE WOLVES"/>
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -8030,7 +8039,7 @@
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGM-2530"/>
 		<info name="release" value="19991126"/>
-		<info name="alt_title" value="餓狼"/>
+		<info name="alt_title" value="餓狼 MARK OF THE WOLVES"/>
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -8164,7 +8173,7 @@
 	-->
 
 	<software name="preisle2">
-		<description>Prehistoric Isle 2</description>
+		<description>Prehistoric Isle 2 / Genshitou 2</description>
 		<year>1999</year>
 		<publisher>Yumekobo</publisher>
 		<info name="serial" value="NGM-2550"/>
@@ -8718,7 +8727,7 @@
 	<software name="mslug4">
 		<description>Metal Slug 4 (NGM-2630)</description>
 		<year>2002</year>
-		<publisher>Mega / Playmore</publisher>
+		<publisher>Mega Enterprise / Playmore</publisher>
 		<info name="serial" value="NGM-2630"/>
 		<info name="release" value="20020327"/>
 		<info name="alt_title" value="メタルスラッグ4"/>
@@ -8759,7 +8768,7 @@
 	<software name="mslug4h" cloneof="mslug4">
 		<description>Metal Slug 4 (NGH-2630)</description>
 		<year>2002</year>
-		<publisher>Mega / Playmore</publisher>
+		<publisher>Mega Enterprise / Playmore</publisher>
 		<info name="serial" value="NGH-2630"/>
 		<info name="release" value="20020613"/>
 		<info name="alt_title" value="メタルスラッグ4"/>
@@ -8899,7 +8908,7 @@
 	-->
 
 	<software name="kof2002">
-		<description>The King of Fighters 2002 (NGM-2650 ~ NGH-2650)</description>
+		<description>The King of Fighters 2002 - Challenge to Ultimate Battle (NGM-2650 ~ NGH-2650)</description>
 		<year>2002</year>
 		<publisher>Eolith / Playmore</publisher>
 		<info name="serial" value="NGM-2650 (MVS), NGM-2650 (AES)"/>
@@ -9170,7 +9179,7 @@
 	<software name="svc">
 		<description>SNK vs. Capcom - SVC Chaos (NGM-2690 ~ NGH-2690)</description>
 		<year>2003</year>
-		<publisher>SNK Playmore</publisher>
+		<publisher>Playmore / Capcom</publisher>
 		<info name="serial" value="NGM-2690 (MVS), NGH-2690 (AES)"/>
 		<info name="release" value="20030724 (MVS), 20031113 (AES)"/>
 		<info name="alt_title" value="エス・エヌ・ケイ バーサス カプコン エスブイシー カオス"/>
@@ -9797,7 +9806,7 @@
 
 	<software name="kof97oro" cloneof="kof97">
 		<description>The King of Fighters '97 Chongchu Jianghu Plus 2003 (bootleg)</description>
-		<year>1997</year>
+		<year>2003</year>
 		<publisher>bootleg</publisher>
 		<info name="alt_title" value="The King of Fighters '97 重出江湖 Plus 2003 (bootleg)"/>
 		<sharedfeat name="release" value="MVS" />
@@ -9835,9 +9844,10 @@
 	</software>
 
 	<software name="kof97pls" cloneof="kof97">
-		<description>The King of Fighters '97 Plus (bootleg)</description>
-		<year>1997</year>
+		<description>The King of Fighters '97 Fengyun Zaiqi Plus (bootleg)</description>
+		<year>2003</year>
 		<publisher>bootleg</publisher>
+		<info name="alt_title" value="The King of Fighters '97 風雲再起 Plus (bootleg)"/>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -9868,9 +9878,10 @@
 	</software>
 
 	<software name="kog" cloneof="kof97" supported="no">
-		<description>King of Gladiator (The King of Fighters '97 bootleg)</description>
-		<year>1997</year>
+		<description>King of Gladiator / Ge Dou Zhi Wang (The King of Fighters '97 bootleg)</description>
+		<year>2005</year>
 		<publisher>bootleg</publisher>
+		<info name="alt_title" value="King of Gladiator / 格斗之王 (The King of Fighters '97 bootleg)"/>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -10051,9 +10062,10 @@
 		<!-- The King of Fighters 2001 bootlegs -->
 
 	<software name="cthd2003" cloneof="kof2001">
-		<description>Crouching Tiger Hidden Dragon 2003 (The King of Fighters 2001 bootleg)</description>
+		<description>Wo Ho Cang Long Crouching Tiger Hidden Dragon 2003 (The King of Fighters 2001 bootleg)</description>
 		<year>2003</year>
 		<publisher>bootleg</publisher>
+		<info name="alt_title" value="臥虎藏龍 Crouching Tiger Hidden Dragon 2003 (The King of Fighters 2001 bootleg)"/>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -10091,10 +10103,11 @@
 	</software>
 
 	<software name="ct2k3sp" cloneof="kof2001">
-		<description>Crouching Tiger Hidden Dragon 2003 Super Plus (The King of Fighters 2001 bootleg)</description>
+		<description>Wo Ho Cang Long Crouching Tiger Hidden Dragon 2003 Fengyun Super Plus (The King of Fighters 2001 bootleg)</description>
 		<year>2003</year>
 		<publisher>bootleg</publisher>
-		<info name="compat_note" value="Super Plus text remains on screen during gameplay" />
+		<info name="alt_title" value="臥虎藏龍 Crouching Tiger Hidden Dragon 2003 風雲 Super Plus (The King of Fighters 2001 bootleg)"/>
+		<info name="compat_note" value="Fengyun Super Plus text remains on screen during gameplay" />
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS" />
 		<part name="cart" interface="neo_cart">
@@ -10132,9 +10145,10 @@
 	</software>
 
 	<software name="ct2k3sa" cloneof="kof2001">
-		<description>Crouching Tiger Hidden Dragon 2003 Super Plus alternate (The King of Fighters 2001 bootleg)</description>
+		<description>Wo Ho Cang Long Crouching Tiger Hidden Dragon 2003 Super Plus (The King of Fighters 2001 bootleg)</description>
 		<year>2003</year>
 		<publisher>bootleg</publisher>
+		<info name="alt_title" value="臥虎藏龍 Crouching Tiger Hidden Dragon 2003 Super Plus (The King of Fighters 2001 bootleg)"/>
 		<info name="compat_note" value="Super Plus text remains on screen during gameplay" />
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS" />
@@ -10176,10 +10190,11 @@
 		<!-- Metal Slug 4 bootleg -->
 
 	<software name="ms4plus" cloneof="mslug4">
-		<description>Metal Slug 4 Plus (bootleg)</description>
+		<description>Metal Slug 4 Zengqiang Xing Plus (bootleg)</description>
 		<year>2002</year>
 		<publisher>bootleg</publisher>
-		<info name="compat_note" value="Plus text remains on screen during gameplay" />
+		<info name="alt_title" value="Metal Slug 4 增強型 Plus (bootleg)"/>
+		<info name="compat_note" value="Zengqiang Xing Plus text remains on screen during gameplay" />
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS" />
 		<part name="cart" interface="neo_cart">
@@ -10252,9 +10267,10 @@
 	</software>
 
 	<software name="kf2k2pls" cloneof="kof2002">
-		<description>The King of Fighters 2002 Plus (bootleg set 1)</description>
+		<description>The King of Fighters 2002 Fengyun Zaiqi (bootleg)</description>
 		<year>2002</year>
 		<publisher>bootleg</publisher>
+		<info name="alt_title" value="The King of Fighters 2002 風雲再起 (bootleg)"/>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -10290,9 +10306,10 @@
 	</software>
 
 	<software name="kf2k2pla" cloneof="kof2002">
-		<description>The King of Fighters 2002 Plus (bootleg set 2)</description>
+		<description>The King of Fighters 2002 Fengyun Zaiqi Plus (bootleg)</description>
 		<year>2002</year>
 		<publisher>bootleg</publisher>
+		<info name="alt_title" value="The King of Fighters 2002 風雲再起 Plus (bootleg)"/>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -10404,8 +10421,8 @@
 	</software>
 
 	<software name="kof10th" cloneof="kof2002">
-		<description>The King of Fighters 10th Anniversary (The King of Fighters 2002 bootleg)</description>
-		<year>2002</year>
+		<description>The King of Fighters 10th Anniversary All Team Battle (The King of Fighters 2002 bootleg)</description>
+		<year>2004</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
@@ -10448,7 +10465,7 @@
 
 	<software name="kf10thep" cloneof="kof2002">
 		<!-- does not behave well in multi-slot -->
-		<description>The King of Fighters 10th Anniversary Extra Plus (The King of Fighters 2002 bootleg)</description>
+		<description>The King of Fighters 10th Anniversary All Team Battle Extra Plus (The King of Fighters 2002 bootleg)</description>
 		<year>2005</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS" />
@@ -10494,7 +10511,7 @@
 	</software>
 
 	<software name="kf2k5uni" cloneof="kof2002">
-		<description>The King of Fighters 10th Anniversary 2005 Unique (The King of Fighters 2002 bootleg)</description>
+		<description>The King of Fighters 10th Anniversary 2005 Unique All Team Battle (The King of Fighters 2002 bootleg)</description>
 		<year>2004</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS" />
@@ -10959,10 +10976,10 @@
 	</software>
 
 	<software name="kf2k3pl" cloneof="kof2003">
-		<description>The King of Fighters 2004 Plus / Hero (The King of Fighters 2003 bootleg)</description>
+		<description>The King of Fighters 2004 EX Hero (The King of Fighters 2003 bootleg)</description>
 		<year>2003</year>
 		<publisher>bootleg</publisher>
-		<info name="compat_note" value="Plus text remains on screen during gameplay" />
+		<info name="compat_note" value="Hero text remains on screen during gameplay" />
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS" />
 		<part name="cart" interface="neo_cart">
@@ -10998,10 +11015,11 @@
 	</software>
 
 	<software name="kf2k3upl" cloneof="kof2003">
-		<description>The King of Fighters 2004 Ultra Plus (The King of Fighters 2003 bootleg)</description>
+		<description>The King of Fighters 2004 EX Fengyun Plus (The King of Fighters 2003 bootleg)</description>
 		<year>2003</year>
 		<publisher>bootleg</publisher>
-		<info name="compat_note" value="Ultra Plus text remains on screen during gameplay" />
+		<info name="alt_title" value="The King of Fighters 2004 EX 風雲 Plus (The King of Fighters 2003 bootleg)"/>
+		<info name="compat_note" value="Fengyun Plus text remains on screen during gameplay" />
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS" />
 		<part name="cart" interface="neo_cart">

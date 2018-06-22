@@ -179,8 +179,8 @@ void neosprite_base_device::draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline)
 {
 	int x;
 
-	uint8_t* gfx_base = m_fixed_layer_source ? m_region_fixed : m_region_fixedbios->base();
-	uint32_t addr_mask = ( m_fixed_layer_source ? m_region_fixed_size : m_region_fixedbios->bytes() ) - 1;
+	uint8_t* gfx_base = (m_fixed_layer_source || (m_region_fixedbios == nullptr)) ? m_region_fixed : m_region_fixedbios->base();
+	uint32_t addr_mask = ( (m_fixed_layer_source || (m_region_fixedbios == nullptr)) ? m_region_fixed_size : m_region_fixedbios->bytes() ) - 1;
 	uint16_t *video_data = &m_videoram_drawsource[0x7000 | (scanline >> 3)];
 	uint32_t *pixel_addr = &bitmap.pix32(scanline, NEOGEO_HBEND);
 

@@ -67,23 +67,29 @@ WRITE16_MEMBER(neogeo_rom_device::banksel_w)
 
 
 /*************************************************
- V-Liner : this is plain NeoGeo cart + RAM
+ V-Liner : this is plain NeoGeo cart + Battery-Backed RAM
  **************************************************/
 
 DEFINE_DEVICE_TYPE(NEOGEO_VLINER_CART, neogeo_vliner_cart_device, "neocart_vliner", "Neo Geo V-Liner Cart")
 
 neogeo_vliner_cart_device::neogeo_vliner_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	neogeo_rom_device(mconfig, NEOGEO_VLINER_CART, tag, owner, clock)
+	neogeo_rom_device(mconfig, NEOGEO_VLINER_CART, tag, owner, clock),
+	m_cart_nvram(*this, "cart_nvram")
 {
 }
 
 
+MACHINE_CONFIG_START(neogeo_vliner_cart_device::device_add_mconfig)
+	MCFG_NVRAM_ADD_0FILL("cart_nvram")
+MACHINE_CONFIG_END
+
 void neogeo_vliner_cart_device::device_start()
 {
-	save_item(NAME(m_cart_ram));
+	m_cart_ram = make_unique_clear<uint16_t[]>(0x1000);
+	save_pointer(NAME(m_cart_ram.get()), 0x1000);
+	m_cart_nvram->set_base((uint8_t*)m_cart_ram.get(), 0x1000*2);
 }
 
 void neogeo_vliner_cart_device::device_reset()
 {
-	memset(m_cart_ram, 0, 0x2000);
 }

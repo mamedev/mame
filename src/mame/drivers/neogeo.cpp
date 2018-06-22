@@ -1056,7 +1056,7 @@ WRITE16_MEMBER(neogeo_base_state::memcard_w)
 
 CUSTOM_INPUT_MEMBER(neogeo_base_state::get_audio_result)
 {
-	uint8_t ret = m_soundlatch2->read(m_audiocpu->space(AS_PROGRAM), 0);
+	uint8_t const ret = m_soundlatch2->read(m_audiocpu->space(AS_PROGRAM), 0);
 
 	return ret;
 }
@@ -1349,7 +1349,7 @@ void neogeo_base_state::init_sprites()
 	if (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_sprites_size() > 0)
 	{
 		m_sprgen->set_sprite_region(m_slots[m_curr_slot]->get_sprites_base(), m_slots[m_curr_slot]->get_sprites_size());
-		m_sprgen->set_fixed_regions(m_slots[m_curr_slot]->get_fixed_base(), m_slots[m_curr_slot]->get_fixed_size(), m_region_fixedbios);
+		m_sprgen->set_fixed_regions(m_slots[m_curr_slot]->get_fixed_base(), m_slots[m_curr_slot]->get_fixed_size(), (m_region_fixedbios) ? m_region_fixedbios : m_region_fixed);
 		if (!m_slots[m_curr_slot]->user_loadable())
 			m_sprgen->optimize_sprite_data();
 		else
@@ -1359,7 +1359,7 @@ void neogeo_base_state::init_sprites()
 	else
 	{
 		m_sprgen->set_sprite_region(m_region_sprites->base(), m_region_sprites->bytes());
-		m_sprgen->set_fixed_regions(m_region_fixed->base(), m_region_fixed->bytes(), m_region_fixedbios);
+		m_sprgen->set_fixed_regions(m_region_fixed->base(), m_region_fixed->bytes(), (m_region_fixedbios) ? m_region_fixedbios : m_region_fixed);
 	}
 }
 
@@ -1691,7 +1691,7 @@ void neogeo_base_state::base_main_map(address_map &map)
 	map(0x400000, 0x401fff).mirror(0x3fe000).rw(FUNC(neogeo_base_state::paletteram_r), FUNC(neogeo_base_state::paletteram_w));
 }
 
-void ngarcade_base_state::neogeo_main_map(address_map &map)
+void ngarcade_base_state::neogeo_base_main_map(address_map &map)
 {
 	base_main_map(map);
 
@@ -1703,12 +1703,16 @@ void ngarcade_base_state::neogeo_main_map(address_map &map)
 	map(0x320000, 0x320001).mirror(0x01fffe).portr("AUDIO/COIN");
 	map(0x380000, 0x380001).mirror(0x01fffe).portr("SYSTEM");
 	map(0x800000, 0x800fff).r(FUNC(ngarcade_base_state::unmapped_r)); // memory card mapped here if present
-	map(0xc00000, 0xc1ffff).mirror(0x0e0000).rom().region("mainbios", 0);
 	map(0xd00000, 0xd0ffff).mirror(0x0f0000).ram().w(FUNC(ngarcade_base_state::save_ram_w)).share("saveram");
 	map(0xe00000, 0xffffff).r(FUNC(ngarcade_base_state::unmapped_r));
 }
 
+void ngarcade_base_state::neogeo_main_map(address_map &map)
+{
+	neogeo_base_main_map(map);
 
+	map(0xc00000, 0xc1ffff).mirror(0x0e0000).rom().region("mainbios", 0);
+}
 
 READ16_MEMBER(aes_base_state::aes_in2_r)
 {
@@ -2383,8 +2387,7 @@ ROM_START( aes )
 
 	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x20000, "zoomy", 0 )
-	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
+	ROM_Y_ZOOM
 
 	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
 
@@ -5569,6 +5572,8 @@ ROM_END
  ID-0070
  . ??M-070
  NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ Originally developed and showcased at 1994 AOU Show by Face,
+ but Released and completed in SNK.
 ****************************************/
 
 ROM_START( zupapa ) /* Original Version - Encrypted GFX */ /* MVS ONLY RELEASE */
@@ -5578,8 +5583,8 @@ ROM_START( zupapa ) /* Original Version - Encrypted GFX */ /* MVS ONLY RELEASE *
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8341,8 +8346,8 @@ ROM_START( kof99 ) /* Original Version - Encrypted Code & GFX */ /* MVS VERSION 
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8375,8 +8380,8 @@ ROM_START( kof99h ) /* Original Version - Encrypted Code & GFX */ /* AES VERSION
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8412,8 +8417,8 @@ ROM_START( kof99e ) /* Original Version - Encrypted Code & GFX */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8446,8 +8451,8 @@ ROM_START( kof99k ) /* Original Version - Encrypted Code & GFX */ /* KOREAN VERS
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8479,8 +8484,8 @@ ROM_START( kof99ka ) /* Original Version - Encrypted GFX */ /* KOREAN VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8547,8 +8552,8 @@ ROM_START( ganryu ) /* Original Version - Encrypted GFX */ /* MVS ONLY RELEASE *
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8582,8 +8587,8 @@ ROM_START( garou ) /* Original Version - Encrypted GFX */ /* MVS VERSION - later
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 )   /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8617,8 +8622,8 @@ ROM_START( garouh ) /* Original Version - Encrypted GFX */ /* MVS AND AES VERSIO
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 )   /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8654,8 +8659,8 @@ ROM_START( garouha ) /* Original Version - Encrypted GFX */ /* AES VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 )   /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8719,8 +8724,8 @@ ROM_START( s1945p ) /* Original Version, Encrypted GFX Roms */ /* MVS ONLY RELEA
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8757,8 +8762,8 @@ ROM_START( preisle2 ) /* Original Version, Encrypted GFX */ /* MVS ONLY RELEASE 
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8798,8 +8803,8 @@ ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 20
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 ) /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8850,8 +8855,8 @@ ROM_START( mslug3a ) /* Original Version - Encrypted Code & GFX */ /* MVS VERSIO
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 ) /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8886,8 +8891,8 @@ ROM_START( mslug3h ) /* Original Version - Encrypted GFX */ /* revision 2000.3.1
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 ) /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8931,8 +8936,8 @@ ROM_START( kof2000 ) /* Original Version, Encrypted Code + Sound + GFX Roms */ /
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 )   /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8964,8 +8969,8 @@ ROM_START( kof2000n ) /* Original Version, Encrypted Sound + GFX Roms */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 )   /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9008,8 +9013,8 @@ ROM_START( bangbead ) /* Original Version - Encrypted GFX */ /* MVS ONLY RELEASE
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9038,8 +9043,8 @@ ROM_START( nitd ) /* Original Version - Encrypted GFX */ /* MVS ONLY RELEASE */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9070,8 +9075,8 @@ ROM_START( sengoku3 ) /* Original Version - Encrypted GFX */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9099,8 +9104,8 @@ ROM_START( sengoku3a ) /* Original Version - Encrypted GFX */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9137,8 +9142,8 @@ ROM_START( kof2001 ) /* MVS VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9171,8 +9176,8 @@ ROM_START( kof2001h ) /* AES VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9216,8 +9221,8 @@ ROM_START( mslug4 ) /* Original Version - Encrypted GFX */ /* MVS VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 )   /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9247,8 +9252,8 @@ ROM_START( mslug4h ) /* Original Version - Encrypted GFX */ /* AES VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 )   /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9286,8 +9291,8 @@ ROM_START( rotd ) /* Encrypted Set */ /* MVS VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9320,8 +9325,8 @@ ROM_START( rotdh ) /* Encrypted Set */ /* AES VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9361,8 +9366,8 @@ ROM_START( kof2002 ) /* Encrypted Set */ /* MVS AND AES VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9402,8 +9407,8 @@ ROM_START( matrim ) /* Encrypted Set */ /* MVS AND AES VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x80000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9440,8 +9445,8 @@ ROM_START( pnyaa ) /* Encrypted Set */ /* MVS ONLY RELEASE */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9465,8 +9470,8 @@ ROM_START( pnyaaa ) /* Encrypted Set */ /* MVS ONLY RELEASE */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9499,8 +9504,8 @@ ROM_START( mslug5 ) /* Encrypted Set */ /* MVS VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9533,8 +9538,8 @@ ROM_START( mslug5h ) /* Encrypted Set */ /* AES release of the game but is also 
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9574,8 +9579,8 @@ ROM_START( svc ) /* Encrypted Set */ /* MVS AND AES VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x80000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 ) /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9615,8 +9620,8 @@ ROM_START( samsho5 ) /* Encrypted Set */ /* MVS VERSION, Build Date: Tue Aug 26 
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9652,8 +9657,8 @@ ROM_START( samsho5a ) /* Encrypted Set, Alternate Set */ /* MVS VERSION, Build D
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9685,8 +9690,8 @@ ROM_START( samsho5h ) /* Encrypted Set, Alternate Set */ /* AES VERSION, Build D
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9727,8 +9732,8 @@ ROM_START( kof2003 ) /* Encrypted Code + Sound + GFX Roms */ /* MVS VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x80000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 ) /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9762,8 +9767,8 @@ ROM_START( kof2003h ) /* Encrypted Code + Sound + GFX Roms */ /* AES VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x80000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 ) /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9804,8 +9809,8 @@ ROM_START( samsh5sp ) /* Encrypted Set */ /* MVS VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9850,8 +9855,8 @@ ROM_START( samsh5sph ) /* Encrypted Set */ /* AES VERSION, 2nd bugfix release */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9884,8 +9889,8 @@ ROM_START( samsh5spho ) /* Encrypted Set */ /* AES VERSION, 1st release */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9932,8 +9937,8 @@ ROM_START( jockeygp ) /* MVS ONLY RELEASE */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -9958,8 +9963,8 @@ ROM_START( jockeygpa ) /* MVS ONLY RELEASE */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -10620,8 +10625,8 @@ ROM_START( kof10th )
 
 	ROM_Y_ZOOM
 
-	ROM_REGION( 0x40000, "cslot1:fixed", 0 ) // modified
-	ROM_FILL( 0x000000, 0x40000, 0x000000 ) // modified
+	ROM_REGION( 0x20000, "cslot1:fixed", ROMREGION_ERASE00 ) // modified
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -10750,8 +10755,8 @@ ROM_START( matrimbl )
 
 	ROM_Y_ZOOM
 
-	ROM_REGION( 0x80000, "cslot1:fixed", 0 )
-	ROM_FILL( 0x000000, 0x80000, 0x000000 )
+	ROM_REGION( 0x80000, "cslot1:fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -11556,7 +11561,7 @@ GAME( 1991, gpilotsh,   gpilots,  neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1991, gpilotsp,   gpilots,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Ghost Pilots (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, joyjoy,     neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Puzzled / Joy Joy Kid (NGM-021 ~ NGH-021)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, quizdais,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Quiz Daisousa Sen - The Last Count Down (NGM-023 ~ NGH-023)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, quizdaisk,  quizdais, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Quiz Daisousa Sen - The Last Count Down (Korean release)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, quizdaisk,  quizdais, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK / Viccom", "Quiz Salibtamjeong - The Last Count Down (Korean release of Quiz Daisousa Sen)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, lresort,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Last Resort", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, lresortp,   lresort,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Last Resort (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, eightman,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK / Pallas", "Eight Man (NGM-025 ~ NGH-025)", MACHINE_SUPPORTS_SAVE )
@@ -11619,9 +11624,9 @@ GAME( 1996, rbffspeck,  rbffspec, neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1997, kof97,      neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '97 (NGM-2320)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kof97h,     kof97,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '97 (NGH-2320)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kof97k,     kof97,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '97 (Korean release)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, kof97pls,   kof97,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters '97 Plus (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, kof97oro,   kof97,    kof97oro,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters '97 Chongchu Jianghu Plus 2003 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, kog,        kof97,    kog,       neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "King of Gladiator (The King of Fighters '97 bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protected bootleg
+GAME( 2003, kof97pls,   kof97,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters '97 Fengyun Zaiqi Plus (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, kof97oro,   kof97,    kof97oro,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters '97 Chongchu Jianghu Plus 2003 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, kog,        kof97,    kog,       neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "King of Gladiator / Ge Dou Zhi Wang (The King of Fighters '97 bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protected bootleg
 GAME( 1997, lastblad,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGM-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastbladh,  lastblad, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGH-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastsold,   lastblad, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The Last Soldier (Korean release of The Last Blade)", MACHINE_SUPPORTS_SAVE )
@@ -11636,7 +11641,7 @@ GAME( 1998, kof98a,     kof98,    kof98,     neogeo,    mvs_led_state, empty_ini
 GAME( 1998, kof98k,     kof98,    kof98,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (Korean board, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, kof98ka,    kof98,    kof98,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (Korean board, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, kof98h,     kof98,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (NGH-2420)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, lastbld2,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi (NGM-2430 ~ NGH-2430)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, lastbld2,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi ~ Tsuki ni Saku Hana, Chiri Yuku Hana ~ (NGM-2430 ~ NGH-2430)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, neocup98,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Neo-Geo Cup '98 - The Road to the Victory", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, mslugx,     neogeo,   mslugx,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug X - Super Vehicle-001 (NGM-2500 ~ NGH-2500)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, kof99,      neogeo,   kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGM-2510)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
@@ -11656,28 +11661,28 @@ GAME( 2000, mslug3h,    mslug3,   mslug3h,   neogeo,    mvs_led_state, empty_ini
 GAME( 2000, mslug3b6,   mslug3,   mslug3b6,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 6 (Metal Slug 3 bootleg)", MACHINE_SUPPORTS_SAVE ) /* real Metal Slug 6 is an Atomiswave HW game, see naomi.c ;-) */
 GAME( 2000, kof2000,    neogeo,   kof2000,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (NGM-2570 ~ NGH-2570)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 2000, kof2000n,   kof2000,  kof2000n,  neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (not encrypted)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, zupapa,     neogeo,   zupapa,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Zupapa!" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, zupapa,     neogeo,   zupapa,    neogeo,    mvs_led_state, empty_init, ROT0, "Face / SNK", "Zupapa!" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2001, sengoku3,   neogeo,   sengoku3,  neogeo,    mvs_led_state, empty_init, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001 (set 1)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2001, sengoku3a,  sengoku3, sengoku3,  neogeo,    mvs_led_state, empty_init, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001 (set 2)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2001, kof2001,    neogeo,   kof2001,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / SNK", "The King of Fighters 2001 (NGM-262?)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2001, kof2001h,   kof2001,  kof2001,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / SNK", "The King of Fighters 2001 (NGH-2621)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2003, cthd2003,   kof2001,  cthd2k3,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Crouching Tiger Hidden Dragon 2003 (The King of Fighters 2001 bootleg)", MACHINE_SUPPORTS_SAVE ) /* Protected Hack / Bootleg of kof2001 */
-GAME( 2003, ct2k3sp,    kof2001,  ct2k3sp,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Crouching Tiger Hidden Dragon 2003 Super Plus (The King of Fighters 2001 bootleg)", MACHINE_SUPPORTS_SAVE ) /* Protected Hack / Bootleg of kof2001 */
-GAME( 2003, ct2k3sa,    kof2001,  ct2k3sa,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Crouching Tiger Hidden Dragon 2003 Super Plus alternate (The King of Fighters 2001 bootleg)", MACHINE_SUPPORTS_SAVE ) /* Hack / Bootleg of kof2001 */
-GAME( 2002, kof2002,    neogeo,   kof2002,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / Playmore", "The King of Fighters 2002 (NGM-2650 ~ NGH-2650)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2002, kof2002b,   kof2002,  kof2002b,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, kf2k2pls,   kof2002,  kf2k2pls,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Plus (bootleg set 1)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2002, kf2k2pla,   kof2002,  kf2k2pls,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Plus (bootleg set 2)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2003, cthd2003,   kof2001,  cthd2k3,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Wo Ho Cang Long Crouching Tiger Hidden Dragon 2003 (The King of Fighters 2001 bootleg)", MACHINE_SUPPORTS_SAVE ) /* Protected Hack / Bootleg of kof2001 */
+GAME( 2003, ct2k3sp,    kof2001,  ct2k3sp,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Wo Ho Cang Long Crouching Tiger Hidden Dragon 2003 Fengyun Super Plus (The King of Fighters 2001 bootleg)", MACHINE_SUPPORTS_SAVE ) /* Protected Hack / Bootleg of kof2001 */
+GAME( 2003, ct2k3sa,    kof2001,  ct2k3sa,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Wo Ho Cang Long Crouching Tiger Hidden Dragon 2003 Super Plus (The King of Fighters 2001 bootleg)", MACHINE_SUPPORTS_SAVE ) /* Hack / Bootleg of kof2001 */
+GAME( 2002, kof2002,    neogeo,   kof2002,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / Playmore", "The King of Fighters 2002 - Challenge to Ultimate Battle (NGM-2650 ~ NGH-2650)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2002, kof2002b,   kof2002,  kof2002b,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 - Challenge to Ultimate Battle (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, kf2k2pls,   kof2002,  kf2k2pls,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Fengyun Zaiqi (bootleg)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2002, kf2k2pla,   kof2002,  kf2k2pls,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Fengyun Zaiqi Plus (bootleg)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2002, kf2k2mp,    kof2002,  kf2k2mp,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Magic Plus (bootleg)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2002, kf2k2mp2,   kof2002,  kf2k2mp2,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Magic Plus II (bootleg)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2002, kof10th,    kof2002,  kof10th,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 10th Anniversary (The King of Fighters 2002 bootleg)", MACHINE_SUPPORTS_SAVE ) // fake SNK copyright
-GAME( 2005, kf10thep,   kof2002,  kf10thep,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 10th Anniversary Extra Plus (The King of Fighters 2002 bootleg)", MACHINE_SUPPORTS_SAVE ) // fake SNK copyright
-GAME( 2004, kf2k5uni,   kof2002,  kf2k5uni,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 10th Anniversary 2005 Unique (The King of Fighters 2002 bootleg)", MACHINE_SUPPORTS_SAVE ) // fake SNK copyright
+GAME( 2004, kof10th,    kof2002,  kof10th,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 10th Anniversary All Team Battle (The King of Fighters 2002 bootleg)", MACHINE_SUPPORTS_SAVE ) // fake SNK copyright
+GAME( 2005, kf10thep,   kof2002,  kf10thep,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 10th Anniversary All Team Battle Extra Plus (The King of Fighters 2002 bootleg)", MACHINE_SUPPORTS_SAVE ) // fake SNK copyright
+GAME( 2004, kf2k5uni,   kof2002,  kf2k5uni,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 10th Anniversary All Team Battle 2005 Unique (The King of Fighters 2002 bootleg)", MACHINE_SUPPORTS_SAVE ) // fake SNK copyright
 GAME( 2004, kof2k4se,   kof2002,  kof2k4se,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters Special Edition 2004 (The King of Fighters 2002 bootleg)", MACHINE_SUPPORTS_SAVE ) /* Hack / Bootleg of kof2002 */
 GAME( 2003, mslug5,     neogeo,   mslug5,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK Playmore", "Metal Slug 5 (NGM-2680)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, mslug5h,    mslug5,   mslug5,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK Playmore", "Metal Slug 5 (NGH-2680)", MACHINE_SUPPORTS_SAVE ) /* Also found in later MVS carts */
 GAME( 2003, ms5plus,    mslug5,   ms5plus,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 5 Plus (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, svc,        neogeo,   svc,       neogeo,    mvs_led_state, empty_init, ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (NGM-2690 ~ NGH-2690)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, svc,        neogeo,   svc,       neogeo,    mvs_led_state, empty_init, ROT0, "Playmore / Capcom", "SNK vs. Capcom - SVC Chaos (NGM-2690 ~ NGH-2690)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, svcboot,    svc,      svcboot,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, svcplus,    svc,      svcplus,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos Plus (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, svcplusa,   svc,      svcplusa,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos Plus (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
@@ -11690,8 +11695,8 @@ GAME( 2003, kof2003,    neogeo,   kof2003,   neogeo,    mvs_led_state, empty_ini
 GAME( 2003, kof2003h,   kof2003,  kof2003h,  neogeo,    mvs_led_state, empty_init, ROT0, "SNK Playmore", "The King of Fighters 2003 (NGH-2710)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, kf2k3bl,    kof2003,  kf2k3bl,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2003 (bootleg set 1)", MACHINE_SUPPORTS_SAVE ) // zooming is wrong because its a bootleg of the pcb version on a cart (unless it was a bootleg pcb with the new bios?)
 GAME( 2003, kf2k3bla,   kof2003,  kf2k3pl,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2003 (bootleg set 2)", MACHINE_SUPPORTS_SAVE ) // zooming is wrong because its a bootleg of the pcb version on a cart
-GAME( 2003, kf2k3pl,    kof2003,  kf2k3pl,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2004 Plus / Hero (The King of Fighters 2003 bootleg)", MACHINE_SUPPORTS_SAVE ) // zooming is wrong because its a bootleg of the pcb version on a cart
-GAME( 2003, kf2k3upl,   kof2003,  kf2k3upl,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2004 Ultra Plus (The King of Fighters 2003 bootleg)", MACHINE_SUPPORTS_SAVE ) // zooming is wrong because its a bootleg of the pcb version on a cart
+GAME( 2003, kf2k3pl,    kof2003,  kf2k3pl,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2004 EX Hero (The King of Fighters 2003 bootleg)", MACHINE_SUPPORTS_SAVE ) // zooming is wrong because its a bootleg of the pcb version on a cart
+GAME( 2003, kf2k3upl,   kof2003,  kf2k3upl,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2004 EX Fengyun Plus (The King of Fighters 2003 bootleg)", MACHINE_SUPPORTS_SAVE ) // zooming is wrong because its a bootleg of the pcb version on a cart
 GAME( 2004, samsh5sp,   neogeo,   samsh5sp,  neogeo,    mvs_led_state, empty_init, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (NGM-2720)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, samsh5sph,  samsh5sp, samsh5sp,  neogeo,    mvs_led_state, empty_init, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (NGH-2720, 2nd release, less censored)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, samsh5spho, samsh5sp, samsh5sp,  neogeo,    mvs_led_state, empty_init, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (NGH-2720, 1st release, censored)", MACHINE_SUPPORTS_SAVE )
@@ -11727,7 +11732,7 @@ GAME( 1992, viewpoin,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1994, janshin,    neogeo,   neogeo_mj, neogeo_mj, mvs_led_state, empty_init, ROT0, "Aicom", "Janshin Densetsu - Quest of Jongmaster", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pulstar,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Aicom", "Pulstar", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, blazstar,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Yumekobo", "Blazing Star", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, preisle2,   neogeo,   preisle2,  neogeo,    mvs_led_state, empty_init, ROT0, "Yumekobo", "Prehistoric Isle 2" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 1999, preisle2,   neogeo,   preisle2,  neogeo,    mvs_led_state, empty_init, ROT0, "Yumekobo / Saurus / SNK", "Prehistoric Isle 2 / Genshitou 2" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 
 // Data East Corporation
 GAME( 1993, spinmast,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Data East Corporation", "Spin Master / Miracle Adventure", MACHINE_SUPPORTS_SAVE )
@@ -11767,18 +11772,18 @@ GAME( 1994, zedblade,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1999, s1945p,     neogeo,   s1945p,    neogeo,    mvs_led_state, empty_init, ROT0, "Psikyo", "Strikers 1945 Plus" , MACHINE_SUPPORTS_SAVE )   /* Encrypted GFX */
 
 // Saurus
-GAME( 1995, quizkof,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Quiz King of Fighters (SAM-080 ~ SAH-080)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, quizkofk,   quizkof,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Quiz King of Fighters (Korean release)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, quizkof,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK / Saurus", "Quiz King of Fighters (SAM-080 ~ SAH-080)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, quizkofk,   quizkof,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK / Saurus / Viccom", "Quiz King of Fighters (Korea)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, stakwin,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Stakes Winner / Stakes Winner - GI Kinzen  Seiha e no Michi", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ragnagrd,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Ragnagard / Shin-Oh-Ken", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, pgoal,      neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Pleasure Goal / Futsal - 5 on 5 Mini Soccer (NGM-219)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ironclad,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Choutetsu Brikin'ger - Iron Clad (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ironclado,  ironclad, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Choutetsu Brikin'ger - Iron Clad (prototype, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ironclad,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Ironclad / Choutetsu Brikin'ger (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ironclado,  ironclad, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Ironclad / Choutetsu Brikin'ger (prototype, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, stakwin2,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Stakes Winner 2", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, shocktro,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Shock Troopers (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, shocktroa,  shocktro, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Shock Troopers (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, shocktr2,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Shock Troopers - 2nd Squad", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, lans2004,   shocktr2, lans2004,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Lansquenet 2004 (Shock Troopers - 2nd Squad bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, lans2004,   shocktr2, lans2004,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Lansquenet 2004 (Shock Troopers - 2nd Squad bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Sunsoft
 GAME( 1995, galaxyfg,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Sunsoft", "Galaxy Fight - Universal Warriors", MACHINE_SUPPORTS_SAVE )
@@ -11803,8 +11808,8 @@ GAME( 1996, sdodgeb,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1996, twsoc96,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Tecmo", "Tecmo World Soccer '96", MACHINE_SUPPORTS_SAVE )
 
 // Viccom
-GAME( 1994, fightfev,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Viccom", "Fight Fever (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fightfeva,  fightfev, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Viccom", "Fight Fever (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fightfev,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Viccom", "Fight Fever / Wang Jung Wang (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fightfeva,  fightfev, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Viccom", "Fight Fever / Wang Jung Wang (set 2)", MACHINE_SUPPORTS_SAVE )
 
 // Video System Co.
 GAME( 1994, pspikes2,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Video System Co.", "Power Spikes II (NGM-068)", MACHINE_SUPPORTS_SAVE )
@@ -11829,9 +11834,9 @@ GAME( 2000, bangbead,   neogeo,   bangbead,  neogeo,    mvs_led_state, empty_ini
 GAME( 2000, b2b,        neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Bang Bang Busters (2010 NCI release)" , MACHINE_SUPPORTS_SAVE )
 
 // Mega Enterprise
-GAME( 2002, mslug4,     neogeo,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega / Playmore", "Metal Slug 4 (NGM-2630)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, mslug4h,    mslug4,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega / Playmore", "Metal Slug 4 (NGH-2630)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ms4plus,    mslug4,   ms4plus,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 4 Plus (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, mslug4,     neogeo,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega Enterprise / Playmore", "Metal Slug 4 (NGM-2630)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, mslug4h,    mslug4,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega Enterprise / Playmore", "Metal Slug 4 (NGH-2630)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ms4plus,    mslug4,   ms4plus,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 4 Zengqiang Xing Plus (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Evoga
 GAME( 2002, rotd,       neogeo,   rotd,      neogeo,    mvs_led_state, empty_init, ROT0, "Evoga / Playmore", "Rage of the Dragons (NGM-2640?)", MACHINE_SUPPORTS_SAVE )

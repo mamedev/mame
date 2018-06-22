@@ -81,7 +81,7 @@ void neogeo_pvc_mslug5_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
  svc
 **************************************************/
 
-DEFINE_DEVICE_TYPE(NEOGEO_PVC_SVC_CART, neogeo_pvc_svc_cart_device, "neocart_svc", "Neo Geo SNK vs Capcom PVC Cart")
+DEFINE_DEVICE_TYPE(NEOGEO_PVC_SVC_CART, neogeo_pvc_svc_cart_device, "neocart_svc", "Neo Geo SVC Chaos PVC Cart")
 
 neogeo_pvc_svc_cart_device::neogeo_pvc_svc_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_pvc_cart_device(mconfig, NEOGEO_PVC_SVC_CART, tag, owner, clock)
@@ -90,7 +90,7 @@ neogeo_pvc_svc_cart_device::neogeo_pvc_svc_cart_device(const machine_config &mco
 
 void neogeo_pvc_svc_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
-	m_pvc_prot->svc_px_decrypt(cpuregion, cpuregion_size);
+	m_pvc_prot->svc_decrypt_68k(cpuregion, cpuregion_size);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 3);
 	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, SVC_GFX_KEY);

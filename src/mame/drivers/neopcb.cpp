@@ -19,6 +19,8 @@ public:
 		, m_cmc_prot(*this, "cmc50")
 		, m_pcm2_prot(*this, "pcm2")
 		, m_pvc_prot(*this, "pvc")
+		, m_cpu_bank(*this, "cpu_bank")
+		, m_bios_bank(*this, "bios_bank")
 	{
 	}
 
@@ -29,6 +31,11 @@ public:
 	void init_kf2k3pcb();
 
 	void neopcb(machine_config &config);
+	void kf2k3pcb(machine_config &config);
+	void kf2k3pcb_map(address_map &map);
+	void neopcb_base_main_map(address_map &map);
+	void neopcb_bankedbios_map(address_map &map);
+	void neopcb_main_map(address_map &map);
 
 protected:
 	// device overrides
@@ -53,8 +60,34 @@ private:
 	required_device<cmc_prot_device> m_cmc_prot;
 	required_device<pcm2_prot_device> m_pcm2_prot;
 	required_device<pvc_prot_device> m_pvc_prot;
+
+	required_memory_bank m_cpu_bank;
+	optional_memory_bank m_bios_bank;
 };
 
+
+void neopcb_state::neopcb_base_main_map(address_map &map)
+{
+	neogeo_base_main_map(map);
+
+	map(0x000080, 0x0fffff).rom().region("maincpu", 0x000080);
+	map(0x200000, 0x2fdfff).bankr("cpu_bank");
+	map(0x2fe000, 0x2fffff).r(m_pvc_prot, FUNC(pvc_prot_device::protection_r)).w(FUNC(neopcb_state::write_bankpvc));
+}
+
+void neopcb_state::neopcb_bankedbios_map(address_map &map)
+{
+	neopcb_base_main_map(map);
+
+	map(0xc00000, 0xc1ffff).mirror(0x0e0000).bankr("bios_bank");
+}
+
+void neopcb_state::kf2k3pcb_map(address_map &map)
+{
+	neopcb_base_main_map(map);
+
+	map(0xc00000, 0xc7ffff).mirror(0x080000).rom().region("mainbios", 0);  // 512k bios
+}
 
 void neopcb_state::machine_start()
 {
@@ -67,12 +100,15 @@ void neopcb_state::neogeo_postload()
 {
 	ngarcade_base_state::neogeo_postload();
 
-	membank("cpu_bank")->set_base(m_region_maincpu->base() + m_bank_base);
+	m_cpu_bank->set_base(m_region_maincpu->base() + m_bank_base);
 }
 
 MACHINE_CONFIG_START(neopcb_state::neopcb)
 	neogeo_arcade(config);
 	neogeo_mono(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(neopcb_bankedbios_map)
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", true)
 
@@ -81,12 +117,19 @@ MACHINE_CONFIG_START(neopcb_state::neopcb)
 	MCFG_PVC_PROT_ADD("pvc")
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(neopcb_state::kf2k3pcb)
+	neopcb(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kf2k3pcb_map)
+MACHINE_CONFIG_END
+
 
 // Game specific input definitions
 
 INPUT_CHANGED_MEMBER(neopcb_state::select_bios)
 {
-	membank("bios_bank")->set_entry(newval ? 0 : 1);
+	m_bios_bank->set_entry(newval ? 0 : 1);
 }
 
 static INPUT_PORTS_START( dualbios )
@@ -125,8 +168,8 @@ ROM_START( ms5pcb ) /* Encrypted Set, JAMMA PCB */
 	ROM_LOAD32_WORD_SWAP( "268-p1r.p1", 0x000000, 0x400000, CRC(d0466792) SHA1(880819933d997fab398f91061e9dbccb959ae8a1) )
 	ROM_LOAD32_WORD_SWAP( "268-p2r.p2", 0x000002, 0x400000, CRC(fbf6b61e) SHA1(9ec743d5988b5e3183f37f8edf45c72a8c0c893e) )
 
-	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -138,8 +181,6 @@ ROM_START( ms5pcb ) /* Encrypted Set, JAMMA PCB */
 	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	ROM_LOAD( "268-m1.m1", 0x00000, 0x80000, CRC(4a5a6e0e) SHA1(df0f660f2465e1db7be5adfcaf5e88ad61a74a42) ) /* mask rom TC534000 */
 	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
-
-	/* Encrypted */
 
 	ROM_Y_ZOOM
 
@@ -165,8 +206,8 @@ ROM_START( svcpcb ) /* Encrypted Set, JAMMA PCB */
 	ROM_REGION( 0x2000000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "269-p1.p1", 0x000000, 0x2000000, CRC(432cfdfc) SHA1(19b40d32188a8bace6d2d570c6cf3d2f1e31e379) )
 
-	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x80000, 0x000000 )
+	ROM_REGION( 0x80000, "fixed", ROMREGION_ERASE00 ) /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -188,8 +229,8 @@ ROM_START( svcpcb ) /* Encrypted Set, JAMMA PCB */
 
 	ROM_REGION( 0x4000000, "sprites", 0 )
 	/* Encrypted */
-	ROM_LOAD( "269-c1.c1", 0x0000000, 0x2000000, CRC(1b608f9c) SHA1(4e70ad182da2ca18815bd3936efb04a06ebce01e) ) /* Plane 0,1 */
-	ROM_LOAD( "269-c2.c2", 0x2000000, 0x2000000, CRC(5a95f294) SHA1(6123cc7b20b494076185d27c2ffea910e124b195) ) /* Plane 0,1 */
+	ROM_LOAD( "269-c1.c1", 0x0000000, 0x2000000, CRC(1b608f9c) SHA1(4e70ad182da2ca18815bd3936efb04a06ebce01e) ) /* Plane 0,1,2,3 */
+	ROM_LOAD( "269-c2.c2", 0x2000000, 0x2000000, CRC(5a95f294) SHA1(6123cc7b20b494076185d27c2ffea910e124b195) ) /* Plane 0,1,2,3 */
 ROM_END
 
 /****************************************
@@ -204,8 +245,8 @@ ROM_START( svcpcba ) /* Encrypted Set, JAMMA PCB */
 	ROM_LOAD32_WORD_SWAP( "269-p1a.p1", 0x000000, 0x400000, CRC(38e2005e) SHA1(1b902905916a30969282f1399a756e32ff069097)  )
 	ROM_LOAD32_WORD_SWAP( "269-p2a.p2", 0x000002, 0x400000, CRC(6d13797c) SHA1(3cb71a95cea6b006b44cac0f547df88aec0007b7)  )
 
-	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x80000, 0x000000 )
+	ROM_REGION( 0x80000, "fixed", ROMREGION_ERASE00 ) /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -244,8 +285,8 @@ ROM_START( kf2k3pcb ) /* Encrypted Set, JAMMA PCB */
 	ROM_LOAD32_WORD_SWAP( "271-p2.p2", 0x000002, 0x400000, CRC(da3118c4) SHA1(582e4f44f03276adecb7b2848d3b96bf6da57f1e) )
 	ROM_LOAD16_WORD_SWAP( "271-p3.p3", 0x800000, 0x100000, CRC(5cefd0d2) SHA1(cddc3164629fed4b6f715e12b109ad35d1009355) )
 
-	ROM_REGION( 0x100000, "fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x100000, 0x000000 )
+	ROM_REGION( 0x100000, "fixed", ROMREGION_ERASE00 ) /* larger char set */
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -457,19 +498,14 @@ WRITE16_MEMBER(neopcb_state::write_bankpvc)
 	if (offset >= 0xff8)
 	{
 		m_bank_base = m_pvc_prot->get_bank_base();
-		membank("cpu_bank")->set_base(m_region_maincpu->base() + m_bank_base);
+		m_cpu_bank->set_base(m_region_maincpu->base() + m_bank_base);
 	}
 }
 
 void neopcb_state::install_common()
 {
 	// install memory bank
-	m_maincpu->space(AS_PROGRAM).install_rom(0x000080, 0x0fffff, (uint16_t *)m_region_maincpu->base() + 0x80/2);
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x2fffff, "cpu_bank");
-	membank("cpu_bank")->set_base(m_region_maincpu->base() + 0x100000);
-
-	// install protection handlers + bankswitch handler
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(pvc_prot_device::protection_r),(pvc_prot_device*)m_pvc_prot), write16_delegate(FUNC(neopcb_state::write_bankpvc),this));
+	m_cpu_bank->set_base(m_region_maincpu->base() + 0x100000);
 
 	// perform basic memory initialization that are usually done on-cart
 	m_curr_slot = 0;
@@ -482,9 +518,8 @@ void neopcb_state::install_common()
 
 void neopcb_state::install_banked_bios()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc00000, 0xc1ffff, 0x0e0000, "bios_bank");
-	membank("bios_bank")->configure_entries(0, 2, memregion("mainbios")->base(), 0x20000);
-	membank("bios_bank")->set_entry(1);
+	m_bios_bank->configure_entries(0, 2, memregion("mainbios")->base(), 0x20000);
+	m_bios_bank->set_entry(1);
 
 }
 
@@ -514,7 +549,7 @@ void neopcb_state::init_svcpcb()
 
 	m_sprgen->m_fixed_layer_bank_type = 2;
 
-	m_pvc_prot->svc_px_decrypt(cpuregion, cpuregion_size);
+	m_pvc_prot->svc_decrypt_68k(cpuregion, cpuregion_size);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 3);
 	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
 
@@ -547,12 +582,10 @@ void neopcb_state::init_kf2k3pcb()
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2003_GFX_KEY);
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 	kf2k3pcb_decrypt_s1data();
-
-	m_maincpu->space(AS_PROGRAM).install_rom(0xc00000, 0xc7ffff, 0x080000, memregion("mainbios")->base());  // 512k bios
 }
 
 
 GAME( 2003, ms5pcb,     0,        neopcb,   dualbios, neopcb_state, init_ms5pcb,   ROT0, "SNK Playmore", "Metal Slug 5 (JAMMA PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, svcpcb,     0,        neopcb,   dualbios, neopcb_state, init_svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, svcpcba,    svcpcb,   neopcb,   dualbios, neopcb_state, init_svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 2)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code */
-GAME( 2003, kf2k3pcb,   0,        neopcb,   neogeo,   neopcb_state, init_kf2k3pcb, ROT0, "SNK Playmore", "The King of Fighters 2003 (Japan, JAMMA PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, svcpcb,     0,        neopcb,   dualbios, neopcb_state, init_svcpcb,   ROT0, "Playmore / Capcom", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, NEO-MVH MV0)", MACHINE_SUPPORTS_SAVE ) // Encrypted Code
+GAME( 2003, svcpcba,    svcpcb,   neopcb,   dualbios, neopcb_state, init_svcpcb,   ROT0, "Playmore / Capcom", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, NEO-MVH MV0B)", MACHINE_SUPPORTS_SAVE ) // ^^
+GAME( 2003, kf2k3pcb,   0,        kf2k3pcb, neogeo,   neopcb_state, init_kf2k3pcb, ROT0, "SNK Playmore", "The King of Fighters 2003 (Japan, JAMMA PCB)", MACHINE_SUPPORTS_SAVE )

@@ -235,6 +235,7 @@ protected:
 	void neogeo_arcade(machine_config &config);
 	void neogeo_mono(machine_config &config);
 
+	void neogeo_base_main_map(address_map &map);
 	void neogeo_main_map(address_map &map);
 
 private:

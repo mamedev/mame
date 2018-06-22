@@ -35,11 +35,11 @@
 
 /* Stubs for various functions called by the FBA code, replace with MAME specifics later */
 
-uint8_t *NeoSpriteRAM, *NeoTextRAM;
+//uint8_t *m_ngcd_sprram, *m_ngcd_fixram;
 //uint8_t* NeoSpriteROM;
 //uint8_t* NeoTextROM;
-uint8_t* YM2610ADPCMAROM;
-uint8_t* NeoZ80ROMActive;
+//uint8_t* m_ngcd_adpcmram;
+//uint8_t* m_ngcd_z80ram;
 
 // was it actually released in eu / asia?
 #define NEOCD_REGION_ASIA 3 // IronClad runs with a darkened screen (MVS has the same issue)
@@ -48,7 +48,6 @@ uint8_t* NeoZ80ROMActive;
 #define NEOCD_REGION_JAPAN 0
 
 
-uint8_t NeoSystem = NEOCD_REGION_JAPAN;
 
 
 class ngcd_state : public aes_base_state
@@ -56,7 +55,10 @@ class ngcd_state : public aes_base_state
 public:
 	ngcd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: aes_base_state(mconfig, type, tag)
+		, m_save_ram(*this,"saveram", 16)
 		, m_tempcdc(*this,"tempcdc")
+		, m_ngcd_adpcmram(*this,"ymsnd")
+		, m_ngcd_z80ram(*this,"z80_ram")
 	{
 		NeoCDDMAAddress1 = 0;
 		NeoCDDMAAddress2 = 0;
@@ -71,13 +73,20 @@ public:
 		m_has_text_bus = true;
 		m_has_ymrom_bus = true;
 		m_has_z80_bus = true;
+		m_ngcd_region = NEOCD_REGION_JAPAN;
 	}
 
+	required_shared_ptr<uint8_t> m_save_ram;
 	optional_device<lc89510_temp_device> m_tempcdc;
 
+	std::vector<uint8_t> m_ngcd_sprram;
+	std::vector<uint8_t> m_ngcd_fixram;
+	required_region_ptr<uint8_t> m_ngcd_adpcmram;
+	required_shared_ptr<uint8_t> m_ngcd_z80ram;
 
 	void NeoCDDoDMA(address_space& curr_space);
 	void set_DMA_regs(int offset, uint16_t wordValue);
+	inline int swap_spraddr(int address);
 
 	DECLARE_READ16_MEMBER(neocd_memcard_r);
 	DECLARE_WRITE16_MEMBER(neocd_memcard_w);
@@ -107,6 +116,7 @@ public:
 	bool m_has_text_bus;
 	bool m_has_ymrom_bus;
 	bool m_has_z80_bus;
+	uint8_t m_ngcd_region;
 
 	int get_nNeoCDIRQVectorAck(void) { return nNeoCDIRQVectorAck; }
 	void set_nNeoCDIRQVectorAck(int val) { nNeoCDIRQVectorAck = val; }
@@ -129,7 +139,6 @@ public:
 
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 
-	std::unique_ptr<uint8_t[]> m_meminternal_data;
 	void neocd(machine_config &config);
 	void neocd_audio_io_map(address_map &map);
 	void neocd_audio_map(address_map &map);
@@ -156,7 +165,7 @@ protected:
 /* The NeoCD has an 8kB internal memory card, instead of memcard slots like the MVS and AES */
 READ16_MEMBER(ngcd_state::neocd_memcard_r)
 {
-	return m_meminternal_data[offset] | 0xff00;
+	return m_save_ram[offset] | 0xff00;
 }
 
 
@@ -164,7 +173,7 @@ WRITE16_MEMBER(ngcd_state::neocd_memcard_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_meminternal_data[offset] = data;
+		m_save_ram[offset] = data;
 	}
 }
 
@@ -194,7 +203,7 @@ READ16_MEMBER(ngcd_state::neocd_control_r)
 			return m_tempcdc->neocd_cdd_rx_r();
 
 		case 0x011C: // region
-			return ~((0x10 | (NeoSystem & 3)) << 8);
+			return ~((0x10 | (m_ngcd_region & 3)) << 8);
 	}
 
 
@@ -402,31 +411,27 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
  *  When the Z80 space is banked in to 0xe00000, only the low byte of each word is used
  */
 
+inline int ngcd_state::swap_spraddr(int address)
+{
+	// address is swizzled a bit due to out sprite decoding
+	return bitswap<20>(address, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0, 1);
+}
 
 READ8_MEMBER(ngcd_state::neocd_transfer_r)
 {
 	uint32_t sekAddress = 0xe00000+ (offset);
-	int address;
 	sekAddress ^= 1;
 
 	switch (nActiveTransferArea) {
 		case 0: // Sprites
-			address = (nSpriteTransferBank + (sekAddress & 0x0FFFFF));
-
-			// address is swizzled a bit due to out sprite decoding
-			if ((address&3)==0) return NeoSpriteRAM[address];
-			if ((address&3)==1) return NeoSpriteRAM[address^3];
-			if ((address&3)==2) return NeoSpriteRAM[address^3];
-			if ((address&3)==3) return NeoSpriteRAM[address];
-
-			return NeoSpriteRAM[nSpriteTransferBank + (sekAddress & 0x0FFFFF)];
+			return m_ngcd_sprram[nSpriteTransferBank + swap_spraddr(sekAddress & 0x0FFFFF)];
 		case 1:                         // ADPCM
-			return YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)];
+			return m_ngcd_adpcmram[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)];
 		case 4:                         // Z80
 			if ((sekAddress & 0xfffff) >= 0x20000) return ~0;
-			return NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1];
+			return m_ngcd_z80ram[(sekAddress & 0x1FFFF) >> 1];
 		case 5:                         // Text
-			return NeoTextRAM[(sekAddress & 0x3FFFF) >> 1];
+			return m_ngcd_fixram[(sekAddress & 0x3FFFF) >> 1];
 	}
 
 	return ~0;
@@ -441,23 +446,15 @@ WRITE8_MEMBER(ngcd_state::neocd_transfer_w)
 	if (!nTransferWriteEnable) {
 //      return;
 	}
-	int address;
 
 	sekAddress ^= 1;
 
 	switch (nActiveTransferArea) {
 		case 0:                         // Sprites
-			address = (nSpriteTransferBank + (sekAddress & 0x0FFFFF));
-
-			// address is swizzled a bit due to out sprite decoding
-			if ((address&3)==0) NeoSpriteRAM[address] = byteValue;
-			if ((address&3)==1) NeoSpriteRAM[address^3] = byteValue;
-			if ((address&3)==2) NeoSpriteRAM[address^3] = byteValue;
-			if ((address&3)==3) NeoSpriteRAM[address] = byteValue;
-
+			m_ngcd_sprram[(nSpriteTransferBank + swap_spraddr(sekAddress & 0x0FFFFF))] = byteValue;
 			break;
 		case 1:                         // ADPCM
-			YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
+			m_ngcd_adpcmram[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
 			break;
 		case 4:                         // Z80
 
@@ -467,17 +464,17 @@ WRITE8_MEMBER(ngcd_state::neocd_transfer_w)
 			// transfer area without the bus? - this should really be checked on hw
 			if (m_has_z80_bus)
 			{
-				YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
+				m_ngcd_adpcmram[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
 			}
 			else
 			{
 		//  printf("sekAddress %08x %02x\n", sekAddress, data);
 				if ((sekAddress & 0xfffff) >= 0x20000) break;
-				NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1] = byteValue;
+				m_ngcd_z80ram[(sekAddress & 0x1FFFF) >> 1] = byteValue;
 			}
 			break;
 		case 5:                         // Text
-			NeoTextRAM[(sekAddress & 0x3FFFF) >> 1] = byteValue;
+			m_ngcd_fixram[(sekAddress & 0x3FFFF) >> 1] = byteValue;
 			break;
 	}
 }
@@ -835,22 +832,21 @@ void ngcd_state::machine_start()
 	// set curr_slot to 0, so to allow checking m_slots[m_curr_slot] != nullptr
 	m_curr_slot = 0;
 
+	m_ngcd_sprram.resize(0x400000);
+	m_ngcd_fixram.resize(0x20000);
+
 	// initialize sprite to point to memory regions
-	m_sprgen->set_sprite_region(m_region_sprites->base(), m_region_sprites->bytes());
-	m_sprgen->set_fixed_regions(m_region_fixed->base(), m_region_fixed->bytes(), m_region_fixedbios);
+	m_sprgen->set_sprite_region(&m_ngcd_sprram[0], m_ngcd_sprram.size());
+	m_sprgen->set_fixed_regions(&m_ngcd_fixram[0], m_ngcd_fixram.size(), m_region_fixed);
 	m_sprgen->neogeo_set_fixed_layer_source(1);
 
 	// irq levels for NEOCD (swapped compared to MVS / AES)
 	m_vblank_level = 2;
 	m_raster_level = 1;
 
-	// initialize the memcard data structure
-	// NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same
-	m_meminternal_data = make_unique_clear<uint8_t[]>(0x2000);
-	subdevice<nvram_device>("saveram")->set_base(m_meminternal_data.get(), 0x2000);
-	save_pointer(NAME(m_meminternal_data.get()), 0x2000);
-
 	m_tempcdc->reset_cd();
+	save_item(NAME(m_ngcd_sprram));
+	save_item(NAME(m_ngcd_fixram));
 }
 
 
@@ -863,11 +859,6 @@ void ngcd_state::machine_start()
 void ngcd_state::machine_reset()
 {
 	aes_base_state::machine_reset();
-
-	NeoSpriteRAM = memregion("sprites")->base();
-	YM2610ADPCMAROM = memregion("ymsnd")->base();
-	NeoZ80ROMActive = memregion("audiocpu")->base();
-	NeoTextRAM = memregion("fixed")->base();
 
 	m_tempcdc->NeoCDCommsReset();
 
@@ -891,7 +882,7 @@ void ngcd_state::neocd_main_map(address_map &map)
 	map(0x000000, 0x1fffff).ram().region("maincpu", 0x00000);
 	map(0x000000, 0x00007f).r(FUNC(ngcd_state::banked_vectors_r)); // writes will fall through to area above
 
-	map(0x800000, 0x803fff).rw(FUNC(ngcd_state::neocd_memcard_r), FUNC(ngcd_state::neocd_memcard_w));
+	map(0x800000, 0x803fff).rw(FUNC(ngcd_state::neocd_memcard_r), FUNC(ngcd_state::neocd_memcard_w)).share("saveram");
 	map(0xc00000, 0xc7ffff).mirror(0x080000).rom().region("mainbios", 0);
 	map(0xd00000, 0xdfffff).r(FUNC(ngcd_state::unmapped_r));
 	map(0xe00000, 0xefffff).rw(FUNC(ngcd_state::neocd_transfer_r), FUNC(ngcd_state::neocd_transfer_w));
@@ -910,7 +901,7 @@ void ngcd_state::neocd_main_map(address_map &map)
 
 void ngcd_state::neocd_audio_map(address_map &map)
 {
-	map(0x0000, 0xffff).ram().region("audiocpu", 0x00000);
+	map(0x0000, 0xffff).ram().share("z80_ram");
 }
 
 
@@ -920,7 +911,7 @@ void ngcd_state::neocd_audio_io_map(address_map &map)
 	map(0x04, 0x07).mirror(0xff00).rw(m_ym, FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0x08, 0x08).mirror(0xff00).select(0x0010).w(FUNC(ngcd_state::audio_cpu_enable_nmi_w));
 	// banking reads are actually NOP on NeoCD? but some games still access them
-//  AM_RANGE(0x08, 0x0b) AM_MIRROR(0x00f0) AM_SELECT(0xff00) AM_READ(audio_cpu_bank_select_r)
+//  map(0x08, 0x0b).mirror(0x00f0).select(0xff00).r(FUNC(neogeo_base_state::audio_cpu_bank_select_r));
 	map(0x0c, 0x0c).mirror(0xff00).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
 
 	// ??
@@ -1084,17 +1075,8 @@ ROM_START( neocd )
 	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
 	/* 1MB of Sound RAM */
 
-	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
-	/* 64KB of Z80 RAM */
-
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	/* 2MB of 68K RAM */
-
-	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )
-	/* 4MB of Sprite Tile RAM */
-
-	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
-	/* 128KB of Text Tile RAM */
 
 	ROM_REGION( 0x20000, "zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
@@ -1110,17 +1092,8 @@ ROM_START( neocdz )
 	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
 	/* 1MB of Sound RAM */
 
-	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
-	/* 64KB of Z80 RAM */
-
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	/* 2MB of 68K RAM */
-
-	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )
-	/* 4MB of Sprite Tile RAM */
-
-	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
-	/* 128KB of Text Tile RAM */
 
 	ROM_REGION( 0x20000, "zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
@@ -1130,12 +1103,12 @@ ROM_END
 
 void ngcd_state::init_neocdz()
 {
-	NeoSystem = NEOCD_REGION_US;
+	m_ngcd_region = NEOCD_REGION_US;
 }
 
 void ngcd_state::init_neocdzj()
 {
-	NeoSystem = NEOCD_REGION_JAPAN;
+	m_ngcd_region = NEOCD_REGION_JAPAN;
 }
 
 
@@ -1143,4 +1116,4 @@ void ngcd_state::init_neocdzj()
 CONS( 1996, neocdz,  0,      0,      neocd,   neocd,  ngcd_state,  init_neocdz,  "SNK",  "Neo-Geo CDZ (US)",    0 ) // the CDZ is the newer model
 CONS( 1996, neocdzj, neocdz, 0,      neocd,   neocd,  ngcd_state,  init_neocdzj, "SNK",  "Neo-Geo CDZ (Japan)", 0 )
 
-CONS( 1994, neocd,   neocdz, 0,      neocd,   neocd,  ngcd_state,  empty_init,   "SNK",  "Neo-Geo CD",          MACHINE_NOT_WORKING ) // older  model, ignores disc protections?
+CONS( 1994, neocd,   neocdz, 0,      neocd,   neocd,  ngcd_state,  empty_init,   "SNK",  "Neo-Geo CD",          MACHINE_NOT_WORKING ) // older model, ignores disc protections?

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "slot.h"
+#include "machine/nvram.h"
 
 // ======================> neogeo_rom_device
 
@@ -49,11 +50,13 @@ public:
 	virtual int get_fixed_bank_type() override { return 0; }
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
-	uint16_t m_cart_ram[0x1000];
+	std::unique_ptr<uint16_t[]> m_cart_ram;
+	required_device<nvram_device> m_cart_nvram;
 };
 
 DECLARE_DEVICE_TYPE(NEOGEO_VLINER_CART, neogeo_vliner_cart_device)
