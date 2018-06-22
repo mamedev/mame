@@ -1282,9 +1282,9 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 }
 
 
-MACHINE_START_MEMBER(stv_state,stv)
+MACHINE_START_MEMBER(stv_state, stv)
 {
-	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
+	m_scsp->set_ram_base(m_sound_ram);
 
 	// save states
 //  save_pointer(NAME(m_scu_regs.get()), 0x100/4);

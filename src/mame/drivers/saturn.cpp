@@ -432,7 +432,6 @@ test1f diagnostic hacks:
 #include "machine/smpc.h"
 #include "machine/stvcd.h"
 #include "machine/saturn_cdb.h"
-#include "sound/scsp.h"
 #include "video/stvvdp1.h"
 #include "video/stvvdp2.h"
 
@@ -458,7 +457,6 @@ public:
 		, m_stvcd(*this, "stvcd")
 		, m_ctrl1(*this, "ctrl1")
 		, m_ctrl2(*this, "ctrl2")
-		, m_scsp(*this, "scsp")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
@@ -494,8 +492,6 @@ public:
 
 	required_device<saturn_control_port_device> m_ctrl1;
 	required_device<saturn_control_port_device> m_ctrl2;
-
-	required_device<scsp_device> m_scsp;
 
 	void saturn(machine_config &config);
 	void saturnjp(machine_config &config);
