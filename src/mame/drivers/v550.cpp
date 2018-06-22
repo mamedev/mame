@@ -31,7 +31,6 @@ public:
 	v550_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_brg(*this, "brg%u", 1U)
 		, m_screen(*this, "screen")
 		, m_chargen(*this, "chargen")
 	{ }
@@ -40,7 +39,6 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 private:
-	DECLARE_WRITE8_MEMBER(baud_rate_w);
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 	void pvtc_map(address_map &map);
@@ -48,17 +46,10 @@ private:
 	virtual void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device_array<com8116_device, 2> m_brg;
 	required_device<screen_device> m_screen;
 	required_region_ptr<u8> m_chargen;
 };
 
-
-WRITE8_MEMBER(v550_state::baud_rate_w)
-{
-	m_brg[offset >> 6]->write_stt(data >> 4);
-	m_brg[offset >> 6]->write_str(data & 0x0f);
-}
 
 void v550_state::mem_map(address_map &map)
 {
@@ -71,7 +62,7 @@ void v550_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("gdc", FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-	map(0x10, 0x10).select(0x40).w(FUNC(v550_state::baud_rate_w));
+	map(0x10, 0x10).w("brg1", FUNC(com8116_device::stt_str_w));
 	map(0x20, 0x23).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x30, 0x30).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x31, 0x31).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -79,6 +70,7 @@ void v550_state::io_map(address_map &map)
 	map(0x41, 0x41).rw("mpsc", FUNC(upd7201_new_device::ca_r), FUNC(upd7201_new_device::ca_w));
 	map(0x48, 0x48).rw("mpsc", FUNC(upd7201_new_device::db_r), FUNC(upd7201_new_device::db_w));
 	map(0x49, 0x49).rw("mpsc", FUNC(upd7201_new_device::cb_r), FUNC(upd7201_new_device::cb_w));
+	map(0x50, 0x50).w("brg2", FUNC(com8116_device::stt_str_w));
 	map(0x60, 0x67).rw("pvtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
 	map(0x70, 0x70).rw("pvtc", FUNC(scn2672_device::buffer_r), FUNC(scn2672_device::buffer_w));
 	map(0x71, 0x71).noprw(); // TODO: attribute buffer
