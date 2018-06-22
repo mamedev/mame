@@ -33198,8 +33198,10 @@ diner_l1                        //
 diner_l2                        //
 diner_l3                        //
 diner_l4                        //
-gs_l3                           //
-gs_l4                           //
+gs_la3                          //
+gs_lg6                          //
+gs_lu3                          //
+gs_lu4                          //
 pool_l5                         //
 pool_l6                         //
 pool_l7                         //
