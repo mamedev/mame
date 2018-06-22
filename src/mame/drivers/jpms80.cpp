@@ -67,7 +67,7 @@ public:
 protected:
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<tms9995_device> m_maincpu;
 public:
 	void init_jpms80();
 };
@@ -126,14 +126,13 @@ INPUT_PORTS_END
 void jpms80_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
-	cpu->ready_line(ASSERT_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(jpms80_state::jpms80)
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map)
+	MCFG_TMS99xx_ADD(m_maincpu, TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map)
 	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("outlatch0", LS259, 0) // I/O IC5
