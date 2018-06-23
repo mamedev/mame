@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(taitol_state, taito_l)
+void taitol_state::video_start()
 {
 	m_buff_spriteram = make_unique_clear<u8[]>(SPRITERAM_SIZE);
 	int i;
@@ -216,7 +216,7 @@ void taitol_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-uint32_t taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitol_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int dx, dy;
 
@@ -258,7 +258,7 @@ uint32_t taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 
 
 
 
-WRITE_LINE_MEMBER(taitol_state::screen_vblank_taitol)
+WRITE_LINE_MEMBER(taitol_state::screen_vblank)
 {
 	// rising edge
 	if (state)

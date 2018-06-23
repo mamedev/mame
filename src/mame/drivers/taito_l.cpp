@@ -1406,7 +1406,7 @@ static const gfx_layout bg2_layout =
 	4,
 	{ 8, 12, 0, 4 },
 	{ 3, 2, 1, 0, 19, 18, 17, 16 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,8*4) },
 	8*8*4
 };
 
@@ -1420,7 +1420,7 @@ static const gfx_layout sp2_layout =
 	4,
 	{ 8, 12, 0, 4 },
 	{ 3, 2, 1, 0, 19, 18, 17, 16, O+3, O+2, O+1, O+0, O+19, O+18, O+17, O+16 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, O2+0*32, O2+1*32, O2+2*32, O2+3*32, O2+4*32, O2+5*32, O2+6*32, O2+7*32 },
+	{ STEP8(0,8*4), STEP8(O2,8*4) },
 	8*8*4*4
 };
 #undef O
@@ -1433,7 +1433,7 @@ static const gfx_layout char_layout =
 	4,
 	{ 8, 12, 0, 4 },
 	{ 3, 2, 1, 0, 19, 18, 17, 16},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,8*4) },
 	8*8*4
 };
 
@@ -1471,17 +1471,24 @@ MACHINE_CONFIG_START(taitol_state::l_system_video)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update_taitol)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitol_state, screen_vblank_taitol))
+	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitol_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", taito_l)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(taitol_state, taito_l)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(taitol_state::l_system_pal12bit)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(taitol_state::l_system_pal15bit)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(xBGRBBBBGGGGRRRR_bit0)
 MACHINE_CONFIG_END
 
 
@@ -1514,6 +1521,7 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 
 	/* video hardware */
 	l_system_video(config);
+	l_system_pal15bit(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1534,6 +1542,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(champwr_state::champwr)
 	fhawk(config);
+	l_system_pal12bit(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1589,6 +1598,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 
 	/* video hardware */
 	l_system_video(config);
+	l_system_pal15bit(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1633,6 +1643,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::kurikint)
 
 	/* video hardware */
 	l_system_video(config);
+	l_system_pal12bit(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1657,6 +1668,7 @@ MACHINE_CONFIG_START(taitol_1cpu_state::plotting)
 
 	/* video hardware */
 	l_system_video(config);
+	l_system_pal12bit(config); // l_system_pal15bit(config); Palette Highest bits is always on
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1681,6 +1693,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taitol_1cpu_state::puzznic)
 	plotting(config);
+	//l_system_pal12bit(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1691,6 +1704,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taitol_1cpu_state::puzznici)
 	plotting(config);
+	//l_system_pal12bit(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1700,6 +1714,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(horshoes_state::horshoes)
 	plotting(config);
+	//l_system_pal12bit(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1713,6 +1728,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taitol_1cpu_state::palamed)
 	plotting(config);
+	l_system_pal15bit(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1734,6 +1750,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taitol_1cpu_state::cachat)
 	plotting(config);
+	//l_system_pal12bit(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1750,6 +1767,11 @@ MACHINE_CONFIG_START(taitol_1cpu_state::cachat)
 
 	MCFG_DEVICE_REMOVE("dswmux")
 	MCFG_DEVICE_REMOVE("inmux")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(taitol_1cpu_state::plgirls)
+	cachat(config);
+	l_system_pal15bit(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
@@ -1781,6 +1803,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
 
 	/* video hardware */
 	l_system_video(config);
+	l_system_pal12bit(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2421,10 +2444,10 @@ GAME( 1993, tubeit,    cachat,   cachat,    tubeit,    taitol_1cpu_state, empty_
 
 GAME( 199?, cubybop,   0,        cachat,    cubybop,   taitol_1cpu_state, empty_init,     ROT0,   "Hot-B Co., Ltd.", "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
 
-GAME( 1992, plgirls,   0,        cachat,    plgirls,   taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls", 0 )
-GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   taitol_1cpu_state, empty_init,     ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
+GAME( 1992, plgirls,   0,        plgirls,   plgirls,   taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls", 0 )
+GAME( 1992, lagirl,    plgirls,  plgirls,   plgirls,   taitol_1cpu_state, empty_init,     ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
 
-GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls 2", 0 )
-GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
+GAME( 1993, plgirls2,  0,        plgirls,   plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls 2", 0 )
+GAME( 1993, plgirls2b, plgirls2, plgirls,   plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
 GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, empty_init,     ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )

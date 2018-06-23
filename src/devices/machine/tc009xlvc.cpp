@@ -20,39 +20,6 @@
 DEFINE_DEVICE_TYPE(TC0091LVC, tc0091lvc_device, "tc009xlvc", "Taito TC0091LVC")
 
 
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_r)
-{
-	return m_palette_ram[offset & 0x1ff];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_w)
-{
-	m_palette_ram[offset & 0x1ff] = data;
-
-	{
-		uint8_t r,g,b,i;
-		uint16_t pal;
-
-		pal = (m_palette_ram[offset & ~1]<<0) | (m_palette_ram[offset | 1]<<8);
-
-		i = (pal & 0x7000) >> 12;
-		b = (pal & 0x0f00) >> 8;
-		g = (pal & 0x00f0) >> 4;
-		r = (pal & 0x000f) >> 0;
-
-		r <<= 1;
-		g <<= 1;
-		b <<= 1;
-
-		/* TODO: correct? */
-		b |= ((i & 4) >> 2);
-		g |= ((i & 2) >> 1);
-		r |= (i & 1);
-
-		m_gfxdecode->palette().set_pen_color(offset / 2, pal5bit(r), pal5bit(g), pal5bit(b));
-	}
-}
-
 READ8_MEMBER(tc0091lvc_device::vregs_r)
 {
 	return m_vregs[offset];
@@ -62,138 +29,102 @@ WRITE8_MEMBER(tc0091lvc_device::vregs_w)
 {
 	if((offset & 0xfc) == 0)
 	{
-		bg0_tilemap->mark_all_dirty();
-		bg1_tilemap->mark_all_dirty();
+		m_bg_tilemap[0]->mark_all_dirty();
+		m_bg_tilemap[1]->mark_all_dirty();
 	}
 
 	m_vregs[offset] = data;
 }
 
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_bitmap_r)
+WRITE8_MEMBER(tc0091lvc_device::vram_w)
 {
-	return m_bitmap_ram[offset];
-}
+	// TODO : 0x10000-0x13fff Unused?
+	if ((offset & 0xc000) == 0)
+		return;
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_bitmap_w)
-{
-	m_bitmap_ram[offset] = data;
-}
+	if((m_vram[offset] & mem_mask) == (data & mem_mask))
+		return;
 
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg1_r)
-{
-	return m_pcg1_ram[offset];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_pcg1_w)
-{
-	m_pcg1_ram[offset] = data;
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0x4000) / 32);
-	tx_tilemap->mark_all_dirty();
-}
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_r)
-{
-	return m_pcg2_ram[offset];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_w)
-{
-	m_pcg2_ram[offset] = data;
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0xc000) / 32);
-	tx_tilemap->mark_all_dirty();
-}
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_vram0_r)
-{
-	return m_vram0[offset];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_vram0_w)
-{
-	m_vram0[offset] = data;
-	bg0_tilemap->mark_tile_dirty(offset/2);
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0x8000) / 32);
-	tx_tilemap->mark_all_dirty();
-
-}
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_vram1_r)
-{
-	return m_vram1[offset];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_vram1_w)
-{
-	m_vram1[offset] = data;
-	bg1_tilemap->mark_tile_dirty(offset/2);
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0x9000) / 32);
-	tx_tilemap->mark_all_dirty();
-}
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_tvram_r)
-{
-	return m_tvram[offset];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_tvram_w)
-{
-	m_tvram[offset] = data;
-	tx_tilemap->mark_tile_dirty(offset/2);
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0xa000) / 32);
-	tx_tilemap->mark_all_dirty();
-}
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_spr_r)
-{
-	return m_sprram[offset];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_spr_w)
-{
-	m_sprram[offset] = data;
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0xb000) / 32);
-	tx_tilemap->mark_all_dirty();
+	COMBINE_DATA(&m_vram[offset]);
+	gfx(2)->mark_dirty(offset / 32);
+	switch (offset & 0xf000)
+	{
+		case 0x8000:
+		case 0x9000:
+			m_bg_tilemap[(offset >> 12) & 1]->mark_tile_dirty((offset & 0xfff) / 2);
+			break;
+		case 0xa000:
+			m_tx_tilemap->mark_tile_dirty((offset & 0xfff) / 2);
+			break;
+	}
 }
 
 void tc0091lvc_device::tc0091lvc_map8(address_map &map)
 {
-	map(0x014000, 0x017fff).rw(FUNC(tc0091lvc_device::tc0091lvc_pcg1_r), FUNC(tc0091lvc_device::tc0091lvc_pcg1_w));
-	map(0x018000, 0x018fff).rw(FUNC(tc0091lvc_device::tc0091lvc_vram0_r), FUNC(tc0091lvc_device::tc0091lvc_vram0_w));
-	map(0x019000, 0x019fff).rw(FUNC(tc0091lvc_device::tc0091lvc_vram1_r), FUNC(tc0091lvc_device::tc0091lvc_vram1_w));
-	map(0x01a000, 0x01afff).rw(FUNC(tc0091lvc_device::tc0091lvc_tvram_r), FUNC(tc0091lvc_device::tc0091lvc_tvram_w));
-	map(0x01b000, 0x01bfff).rw(FUNC(tc0091lvc_device::tc0091lvc_spr_r), FUNC(tc0091lvc_device::tc0091lvc_spr_w));
-	map(0x01c000, 0x01ffff).rw(FUNC(tc0091lvc_device::tc0091lvc_pcg2_r), FUNC(tc0091lvc_device::tc0091lvc_pcg2_w));
-	map(0x040000, 0x05ffff).rw(FUNC(tc0091lvc_device::tc0091lvc_bitmap_r), FUNC(tc0091lvc_device::tc0091lvc_bitmap_w));
-	map(0x080000, 0x0801ff).rw(FUNC(tc0091lvc_device::tc0091lvc_paletteram_r), FUNC(tc0091lvc_device::tc0091lvc_paletteram_w));
+	map(0x010000, 0x01ffff).ram().w(FUNC(tc0091lvc_device::vram_w)).share("vram");
+	map(0x040000, 0x05ffff).ram().share("bitmap_ram");
+	map(0x080000, 0x0801ff).mirror(0x00e00).ram().w("palette", FUNC(palette_device::write8)).share("palette"); // mirrored?
 }
+
+static const gfx_layout bg2_layout =
+{
+	8, 8,
+	RGN_FRAC(1,1),
+	4,
+	{ 8, 12, 0, 4 },
+	{ 3, 2, 1, 0, 19, 18, 17, 16 },
+	{ STEP8(0,8*4) },
+	8*8*4
+};
+
+
+#define O 8*8*4
+#define O2 2*O
+static const gfx_layout sp2_layout =
+{
+	16, 16,
+	RGN_FRAC(1,1),
+	4,
+	{ 8, 12, 0, 4 },
+	{ 3, 2, 1, 0, 19, 18, 17, 16, O+3, O+2, O+1, O+0, O+19, O+18, O+17, O+16 },
+	{ STEP8(0,8*4), STEP8(O2,8*4) },
+	8*8*4*4
+};
+#undef O
+#undef O2
+
+static const gfx_layout char_layout =
+{
+	8, 8,
+	0x10000 / (8 * 4), // need to specify exact number because we create dynamically
+	4,
+	{ 8, 12, 0, 4 },
+	{ 3, 2, 1, 0, 19, 18, 17, 16},
+	{ STEP8(0,8*4) },
+	8*8*4
+};
+
+static GFXDECODE_START( gfx_tc0091lvc )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, bg2_layout,  0, 16 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, sp2_layout,  0, 16 )
+	GFXDECODE_DEVICE_RAM( "vram",  0, char_layout, 0, 16 )  // Ram-based
+GFXDECODE_END
 
 tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0091LVC, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, gfx_tc0091lvc, "palette")
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, address_map_constructor(), address_map_constructor(FUNC(tc0091lvc_device::tc0091lvc_map8), this))
-	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	, m_vram(*this, "vram")
+	, m_bitmap_ram(*this, "bitmap_ram")
 {
 }
 
-TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg0_tile_info)
+template<int Offset>
+TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg_tile_info)
 {
-	int attr = m_vram0[2 * tile_index + 1];
-	int code = m_vram0[2 * tile_index]
-			| ((attr & 0x03) << 8)
-			| ((m_vregs[(attr & 0xc) >> 2]) << 10);
-//          | (state->m_horshoes_gfxbank << 12);
-
-	SET_TILE_INFO_MEMBER(0,
-			code,
-			(attr & 0xf0) >> 4,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg1_tile_info)
-{
-	int attr = m_vram1[2 * tile_index + 1];
-	int code = m_vram1[2 * tile_index]
+	int attr = m_vram[2 * tile_index + Offset + 1];
+	int code = m_vram[2 * tile_index + Offset]
 			| ((attr & 0x03) << 8)
 			| ((m_vregs[(attr & 0xc) >> 2]) << 10);
 //          | (state->m_horshoes_gfxbank << 12);
@@ -206,69 +137,46 @@ TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg1_tile_info)
 
 TILE_GET_INFO_MEMBER(tc0091lvc_device::get_tx_tile_info)
 {
-	int attr = m_tvram[2 * tile_index + 1];
-	uint16_t code = m_tvram[2 * tile_index]
+	int attr = m_vram[2 * tile_index + 0xa000 + 1];
+	int code = m_vram[2 * tile_index + 0xa000]
 			| ((attr & 0x07) << 8);
 
-	SET_TILE_INFO_MEMBER(m_gfx_index,
+	SET_TILE_INFO_MEMBER(2,
 			code,
 			(attr & 0xf0) >> 4,
 			0);
 }
 
 
-static const gfx_layout char_layout =
-{
-	8, 8,
-	0x10000 / (8 * 4), // need to specify exact number because we create dynamically
-	4,
-	{ 8, 12, 0, 4 },
-	{ 3, 2, 1, 0, 19, 18, 17, 16},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*8*4
-};
-
+MACHINE_CONFIG_START(tc0091lvc_device::device_add_mconfig)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(xBGRBBBBGGGGRRRR_bit0) /* TODO: correct? */
+MACHINE_CONFIG_END
 
 void tc0091lvc_device::device_start()
 {
-	if(!m_gfxdecode->started())
-		throw device_missing_dependencies();
+	m_vregs = make_unique_clear<uint8_t[]>(0x100);
+	m_sprram_buffer = make_unique_clear<uint8_t[]>(0x400);
 
-	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
-	memset(m_vregs, 0, ARRAY_LENGTH(m_vregs));
-	memset(m_bitmap_ram, 0, ARRAY_LENGTH(m_bitmap_ram));
-	memset(m_pcg_ram, 0, ARRAY_LENGTH(m_pcg_ram));
-	memset(m_sprram_buffer, 0, ARRAY_LENGTH(m_sprram_buffer));
-
+	std::fill_n(&m_bitmap_ram[0], m_bitmap_ram.bytes(), 0);
+	std::fill_n(&m_vram[0], m_vram.bytes(), 0);
 	// note, the way tiles are addressed suggests that 0x0000-0x3fff of this might be usable,
 	//       but we don't map it anywhere, so the first tiles are always blank at the moment.
-	m_pcg1_ram = m_pcg_ram + 0x4000;
-	m_pcg2_ram = m_pcg_ram + 0xc000;
-	m_vram0 = m_pcg_ram + 0x8000;
-	m_vram1 = m_pcg_ram + 0x9000;
-	m_tvram = m_pcg_ram + 0xa000;
-	m_sprram = m_pcg_ram + 0xb000;
 
-	tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tx_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg_tile_info<0x8000>),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg_tile_info<0x9000>),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	tx_tilemap->set_transparent_pen(0);
-	bg0_tilemap->set_transparent_pen(0);
-	bg1_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_bg_tilemap[0]->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_transparent_pen(0);
 
-	tx_tilemap->set_scrolldx(-8, -8);
-	bg0_tilemap->set_scrolldx(28, -11);
-	bg1_tilemap->set_scrolldx(38, -21);
+	m_tx_tilemap->set_scrolldx(-8, -8);
+	m_bg_tilemap[0]->set_scrolldx(28, -11);
+	m_bg_tilemap[1]->set_scrolldx(38, -21);
 
-	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
-			break;
-
-	//printf("m_gfx_index %d\n", m_gfx_index);
-
-	device_palette_interface &palette = m_gfxdecode->palette();
-	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(&palette, char_layout, (uint8_t *)m_pcg_ram, 0, palette.entries() / 16, 0));
+	save_pointer(NAME(m_vregs.get()), 0x400);
+	save_pointer(NAME(m_sprram_buffer.get()), 0x400);
 }
 
 device_memory_interface::space_config_vector tc0091lvc_device::memory_space_config() const
@@ -281,7 +189,6 @@ device_memory_interface::space_config_vector tc0091lvc_device::memory_space_conf
 
 void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t global_flip )
 {
-	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int count;
 
 	for(count=0;count<0x3e7;count+=8)
@@ -305,7 +212,7 @@ void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap
 			fy = !fy;
 		}
 
-		gfx->prio_transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,screen.priority(),(col & 0x08) ? 0xaa : 0x00,0);
+		gfx(1)->prio_transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,screen.priority(),(col & 0x08) ? 0xaa : 0x00,0);
 	}
 }
 
@@ -315,7 +222,7 @@ uint32_t tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bi
 	int x,y;
 	uint8_t global_flip;
 
-	bitmap.fill(m_gfxdecode->palette().black_pen(), cliprect);
+	bitmap.fill(palette().black_pen(), cliprect);
 
 	if((m_vregs[4] & 0x20) == 0)
 		return 0;
@@ -336,7 +243,7 @@ uint32_t tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bi
 				res_y = (global_flip) ? 256-y : y;
 
 				if(screen.visible_area().contains(res_x, res_y))
-					bitmap.pix16(res_y, res_x) = m_gfxdecode->palette().pen(m_bitmap_ram[count]);
+					bitmap.pix16(res_y, res_x) = palette().pen(m_bitmap_ram[count]);
 
 				count++;
 			}
@@ -348,39 +255,42 @@ uint32_t tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bi
 
 		machine().tilemap().set_flip_all(global_flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-		dx = m_bg0_scroll[0] | (m_bg0_scroll[1] << 8);
+		dx = m_bg_scroll[0][0] | (m_bg_scroll[0][1] << 8);
 		if (global_flip) { dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf; dx += 192; }
-		dy = m_bg0_scroll[2];
+		dy = m_bg_scroll[0][2];
 
-		bg0_tilemap->set_scrollx(0, -dx);
-		bg0_tilemap->set_scrolly(0, -dy);
+		m_bg_tilemap[0]->set_scrollx(0, -dx);
+		m_bg_tilemap[0]->set_scrolly(0, -dy);
 
-		dx = m_bg1_scroll[0] | (m_bg1_scroll[1] << 8);
+		dx = m_bg_scroll[1][0] | (m_bg_scroll[1][1] << 8);
 		if (global_flip) { dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf; dx += 192; }
-		dy = m_bg1_scroll[2];
+		dy = m_bg_scroll[1][2];
 
-		bg1_tilemap->set_scrollx(0, -dx);
-		bg1_tilemap->set_scrolly(0, -dy);
+		m_bg_tilemap[1]->set_scrollx(0, -dx);
+		m_bg_tilemap[1]->set_scrolly(0, -dy);
 
-		tx_tilemap->set_scrollx(0, (global_flip) ? -192 : 0);
+		m_tx_tilemap->set_scrollx(0, (global_flip) ? -192 : 0);
 
 		screen.priority().fill(0, cliprect);
-		bg1_tilemap->draw(screen, bitmap, cliprect, 0,0);
-		bg0_tilemap->draw(screen, bitmap, cliprect, 0,(m_vregs[4] & 0x8) ? 0 : 1);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0,0);
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0,(m_vregs[4] & 0x8) ? 0 : 1);
 		draw_sprites(screen, bitmap, cliprect, global_flip);
-		tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	}
 	return 0;
 }
 
-void tc0091lvc_device::screen_eof(void)
+WRITE_LINE_MEMBER(tc0091lvc_device::screen_vblank)
 {
-	memcpy(m_sprram_buffer,m_sprram,0x400);
-	m_bg0_scroll[0] = m_sprram_buffer[0x3f4];
-	m_bg0_scroll[1] = m_sprram_buffer[0x3f5];
-	m_bg0_scroll[2] = m_sprram_buffer[0x3f6];
+	if (state)
+	{
+		std::copy_n(&m_vram[0xb000], 0x400, &m_sprram_buffer[0]);
+		m_bg_scroll[0][0] = m_sprram_buffer[0x3f4];
+		m_bg_scroll[0][1] = m_sprram_buffer[0x3f5];
+		m_bg_scroll[0][2] = m_sprram_buffer[0x3f6];
 
-	m_bg1_scroll[0] = m_sprram_buffer[0x3fc];
-	m_bg1_scroll[1] = m_sprram_buffer[0x3fd];
-	m_bg1_scroll[2] = m_sprram_buffer[0x3fe];
+		m_bg_scroll[1][0] = m_sprram_buffer[0x3fc];
+		m_bg_scroll[1][1] = m_sprram_buffer[0x3fd];
+		m_bg_scroll[1][2] = m_sprram_buffer[0x3fe];
+	}
 }

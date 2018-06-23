@@ -14,6 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/es8712.h"
+#include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
@@ -46,8 +47,6 @@ public:
 	required_memory_bank m_mainbank;
 
 	virtual void machine_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	uint8_t m_ram_bank[4];
 	uint8_t m_rom_bank;
@@ -75,8 +74,6 @@ public:
 	DECLARE_READ8_MEMBER(irq_enable_r);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 
-	void init_lastbank();
-
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
 	void lastbank(machine_config &config);
 	void lastbank_audio_io(address_map &map);
@@ -87,29 +84,15 @@ public:
 
 void lastbank_state::machine_start()
 {
+	uint32_t max = memregion("maincpu")->bytes() / 0x2000;
+	m_mainbank->configure_entries(0, max, memregion("maincpu")->base(), 0x2000);
+
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_irq_vector));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_sound_flags));
-}
-
-uint32_t lastbank_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-
-	m_vdp->screen_update(screen, bitmap, cliprect);
-
-	return 0;
-}
-
-WRITE_LINE_MEMBER(lastbank_state::screen_vblank)
-{
-	if (state)
-	{
-		m_vdp->screen_eof();
-	}
 }
 
 READ8_MEMBER(lastbank_state::rom_bank_r)
@@ -462,38 +445,6 @@ static INPUT_PORTS_START( lastbank )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout bg2_layout =
-{
-	8, 8,
-	RGN_FRAC(1,1),
-	4,
-	{ 8, 12, 0, 4 },
-	{ 3, 2, 1, 0, 19, 18, 17, 16 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*8*4
-};
-
-#define O 8*8*4
-#define O2 2*O
-static const gfx_layout sp2_layout =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	4,
-	{ 8, 12, 0, 4 },
-	{ 3, 2, 1, 0, 19, 18, 17, 16, O+3, O+2, O+1, O+0, O+19, O+18, O+17, O+16 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, O2+0*32, O2+1*32, O2+2*32, O2+3*32, O2+4*32, O2+5*32, O2+6*32, O2+7*32 },
-	8*8*4*4
-};
-#undef O
-#undef O2
-
-
-static GFXDECODE_START( gfx_lastbank )
-	GFXDECODE_ENTRY( "gfx1",        0, bg2_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1",        0, sp2_layout, 0, 16 )
-GFXDECODE_END
-
 TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::irq_scanline)
 {
 	int scanline = param;
@@ -525,24 +476,17 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	//MCFG_MACHINE_START_OVERRIDE(lastbank_state,lastbank)
-	//MCFG_MACHINE_RESET_OVERRIDE(lastbank_state,lastbank)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lastbank_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lastbank_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastbank )
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_SCREEN_UPDATE_DEVICE("tc0091lvc", tc0091lvc_device, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0091lvc", tc0091lvc_device, screen_vblank))
+	MCFG_SCREEN_PALETTE("tc0091lvc:palette")
 
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
-	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
 
 //  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 
@@ -582,7 +526,7 @@ ROM_START( lastbank )
 	ROM_REGION( 0x40000, "audiocpu", 0 )
 	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
 
-	ROM_REGION( 0x120000, "gfx1", 0 )
+	ROM_REGION( 0x120000, "tc0091lvc", 0 )
 	ROM_LOAD( "u11",   0x000000, 0x100000, CRC(2588d82d) SHA1(426f6821862d54123e53410e2776586ddf6b21e7) )
 	ROM_LOAD( "5.u10", 0x100000, 0x020000, CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) )
 
@@ -593,10 +537,5 @@ ROM_START( lastbank )
 	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-void lastbank_state::init_lastbank()
-{
-	uint32_t max = memregion("maincpu")->bytes() / 0x2000;
-	m_mainbank->configure_entries(0, max, memregion("maincpu")->base(), 0x2000);
-}
 
-GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, init_lastbank, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )
+GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )

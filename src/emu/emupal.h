@@ -145,6 +145,8 @@
 #define PALETTE_FORMAT_RRRRGGGGBBBBRGBx raw_to_rgb_converter(2, &raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder)
 #define PALETTE_FORMAT_xRGBRRRRGGGGBBBB_bit0 raw_to_rgb_converter(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder)
 #define PALETTE_FORMAT_xRGBRRRRGGGGBBBB_bit4 raw_to_rgb_converter(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder)
+#define PALETTE_FORMAT_xBGRBBBBGGGGRRRR_bit0 raw_to_rgb_converter(2, &raw_to_rgb_converter::xBGRBBBBGGGGRRRR_bit0_decoder)
+#define PALETTE_FORMAT_xBGRBBBBGGGGRRRR_bit4 raw_to_rgb_converter(2, &raw_to_rgb_converter::xBGRBBBBGGGGRRRR_bit4_decoder)
 
 // data-inverted 5-5-5 formats
 #define PALETTE_FORMAT_xRRRRRBBBBBGGGGG_inverted raw_to_rgb_converter(2, &raw_to_rgb_converter::inverted_rgb_decoder<5,5,5, 10,0,5>)
@@ -343,6 +345,8 @@ public:
 	static rgb_t RRRRGGGGBBBBRGBx_decoder(u32 raw);  // bits 3/2/1 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit0_decoder(u32 raw);  // bits 14/13/12 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw);  // bits 14/13/12 are MSb
+	static rgb_t xBGRBBBBGGGGRRRR_bit0_decoder(u32 raw);  // bits 14/13/12 are LSb
+	static rgb_t xBGRBBBBGGGGRRRR_bit4_decoder(u32 raw);  // bits 14/13/12 are MSb
 
 
 private:
