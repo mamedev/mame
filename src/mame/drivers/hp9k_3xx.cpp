@@ -146,7 +146,7 @@ public:
 		printf(")\n");
 #endif
 	}
-	void hp9k300(machine_config &config);
+
 	void hp9k370(machine_config &config);
 	void hp9k330(machine_config &config);
 	void hp9k382(machine_config &config);
@@ -164,6 +164,10 @@ public:
 	void hp9k382_map(address_map &map);
 	void hp9k3xx_common(address_map &map);
 	void iocpu_map(address_map &map);
+
+protected:
+	void hp9k300(machine_config &config);
+
 private:
 	bool m_hil_read;
 	uint8_t m_hil_data;
