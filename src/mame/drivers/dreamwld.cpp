@@ -755,7 +755,7 @@ MACHINE_CONFIG_START(dreamwld_state::baryon)
 	MCFG_DEVICE_PROGRAM_MAP(baryon_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
-	MCFG_DEVICE_ADD("mcu", I80C52, XTAL(32'000'000)/2) /* AT89C52 or 87(C)52, unknown clock (value from docs) */
+	MCFG_DEVICE_ADD("mcu", AT89C52, XTAL(32'000'000)/2) /* AT89C52 or 87(C)52, unknown clock (value from docs) */
 	MCFG_DEVICE_DISABLE()   /* Internal ROM aren't dumped */
 
 	/* video hardware */

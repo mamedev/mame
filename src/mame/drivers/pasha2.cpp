@@ -133,7 +133,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_pasha2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<i80c52_device> m_audiocpu;
+	required_device<at89c52_device> m_audiocpu;
 	required_device_array<okim6295_device, 2> m_oki;
 	required_device<palette_device> m_palette;
 	void pasha2(machine_config &config);
@@ -403,7 +403,7 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 	MCFG_DEVICE_IO_MAP(pasha2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pasha2_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", I80C52, 12000000)     /* actually AT89C52; clock from docs */
+	MCFG_DEVICE_ADD("audiocpu", AT89C52, 12000000)     /* clock from docs */
 	/* TODO : ports are unimplemented; P0,P1,P2,P3 and Serial Port Used */
 
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
