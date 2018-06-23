@@ -1626,7 +1626,7 @@ ROM_START( bloxeedc ) /* Bloxeed (C System Version)  (c)1989 Sega / Elorg */
 ROM_END
 
 
-ROM_START( bloxeedu ) /* Bloxeed USA (C System Version)  (c)1989 Sega / Elorg */
+ROM_START( bloxeedu ) /* Bloxeed USA (C System Version)  (c)1989 Sega / Elorg - 834-7306-01 BLOXEED Rev.A */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-12997a.ic32", 0x000000, 0x020000, CRC(23655bc9) SHA1(32fc1f75a43aa49dc656d40d34ec10f3f0a2bdb3) )
 	ROM_LOAD16_BYTE( "epr-12996a.ic31", 0x000001, 0x020000, CRC(83c83f0c) SHA1(ca8e2ad7cceabd8de7a91b91cb92eafb6dd3171f) )
@@ -1662,7 +1662,7 @@ ROM_START( columnsj ) /* Columns (Jpn) (c)1990 Sega */
 ROM_END
 
 
-ROM_START( columns2 ) /* Columns II - The Voyage Through Time  (c)1990 Sega */
+ROM_START( columns2 ) /* Columns II - The Voyage Through Time  (c)1990 Sega - 834-7555-01 COLUNS 2 */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13363.ic32", 0x000000, 0x020000, CRC(c99e4ffd) SHA1(67981aa08c8a625af35dd7689011364159cf9194) )
 	ROM_LOAD16_BYTE( "epr-13362.ic31", 0x000001, 0x020000, CRC(394e2419) SHA1(d4f726b32cf301d0d52611237b83177e69bfaf71) )
