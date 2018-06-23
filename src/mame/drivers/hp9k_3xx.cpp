@@ -96,7 +96,7 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	optional_device<i8042_device> m_iocpu;
 	optional_device<hp_hil_mlc_device> m_mlc;
 	optional_device<sn76494_device> m_sound;
@@ -169,6 +169,8 @@ protected:
 	void hp9k300(machine_config &config);
 
 private:
+
+	DECLARE_WRITE_LINE_MEMBER(cpu_reset);
 
 	static constexpr uint8_t HIL_CS = 0x01;
 	static constexpr uint8_t HIL_WE = 0x02;
@@ -319,9 +321,15 @@ uint32_t hp9k3xx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 static INPUT_PORTS_START( hp9k330 )
 INPUT_PORTS_END
 
+WRITE_LINE_MEMBER(hp9k3xx_state::cpu_reset)
+{
+       m_iocpu->reset();
+}
+
 
 void hp9k3xx_state::machine_reset()
 {
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(hp9k3xx_state::cpu_reset), this));
 }
 
 WRITE_LINE_MEMBER(hp9k3xx_state::gpib_irq)
