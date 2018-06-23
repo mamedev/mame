@@ -217,7 +217,7 @@ void hp9k3xx_state::hp9k3xx_common(address_map &map)
 	map(0x00000000, 0xffffffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
 
-	map(0x00428000, 0x00428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
+	map(0x00420000, 0x00420003).mirror(0x0000fffc).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
 	map(0x00470000, 0x0047001f).mirror(0x0000ffe0).rw(FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
 	map(0x005f8000, 0x005f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
@@ -230,7 +230,7 @@ void hp9k3xx_state::hp9k310_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0).nopw();  // writes to 1fffc are the LED
 
-	map(0x428000, 0x428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
+	map(0x420000, 0x420003).mirror(0x00fffc).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
 	map(0x470000, 0x47001f).mirror(0x00ffe0).rw(FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
 	map(0x510000, 0x510003).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Alpha display"
