@@ -142,6 +142,16 @@
 #define MEGADRIVE_REG17_DMATYPE         ((m_regs[0x17]&0xc0)>>6)
 #define MEGADRIVE_REG17_UNUSED          ((m_regs[0x17]&0x3f)>>0)
 
+static constexpr uint8_t line_315_5124[8] = {
+			  26 /* VINT_HPOS */
+			, 26 /* VINT_FLAG_HPOS */
+			, 27 /* HINT_HPOS */
+			, 28 /* NMI_HPOS, not verified */
+			, 25 /* XSCROLL_HPOS */
+			, 28 /* VCOUNT_CHANGE_HPOS */
+			, 26 /* SPROVR_HPOS */
+			, 37 /* SPRCOL_BASEHPOS */
+		};
 
 #define MAX_HPOSITION 480
 
@@ -149,7 +159,7 @@
 DEFINE_DEVICE_TYPE(SEGA315_5313, sega315_5313_device, "sega315_5313", "Sega 315-5313 Megadrive VDP")
 
 sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega315_5124_device(mconfig, SEGA315_5313, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true)
+	: sega315_5124_device(mconfig, SEGA315_5313, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, false, 0, 0, true, line_315_5124)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_render_bitmap(nullptr)
 	, m_render_line(nullptr)

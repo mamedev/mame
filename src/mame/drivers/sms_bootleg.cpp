@@ -265,8 +265,8 @@ void smsbootleg_state::sms_supergame_io(address_map &map)
 	map(0x18, 0x18).w(FUNC(smsbootleg_state::port18_w));
 
 	map(0x40, 0x7f).rw(FUNC(smsbootleg_state::sms_count_r), FUNC(smsbootleg_state::sms_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 
 	map(0xdc, 0xdc).portr("IN2");
 }
