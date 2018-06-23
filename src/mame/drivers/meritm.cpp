@@ -123,7 +123,7 @@ PROGRAM#    Program Version      Program Differences
   Megatouch 5 (c)1997
   Megatouch 5 Tournament Edition (c)1997
   Megatouch 6 (c)1998
-  *Megatouch 7 Encore (c)2000
+  Megatouch 7 Encore (c)2000
 
 
 Custom Program Versions (from different Megatouch manuals):
@@ -679,7 +679,7 @@ static INPUT_PORTS_START(pitbosss)
 	PORT_INCLUDE(meritm_crt250)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "In Tac Tac Triva" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "In Tac Tac Trivia" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Categories are Lettered" )
 	PORT_DIPSETTING(    0x01, "Categories are Numbered" )
 	PORT_DIPNAME( 0x02, 0x02, "Enable Casino Games" ) PORT_DIPLOCATION("SW1:2")
@@ -824,7 +824,7 @@ static INPUT_PORTS_START(pbss330)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Clear High Score") /* In IDLE (Demo) mode */
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "In Tac Tac Triva" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "In Tac Tac Trivia" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Categories are Lettered" )
 	PORT_DIPSETTING(    0x01, "Categories are Numbered" )
 	PORT_DIPNAME( 0x02, 0x02, "Enable Casino Games" ) PORT_DIPLOCATION("SW1:2")
@@ -2335,6 +2335,25 @@ ROM_START( megat6 ) /* Dallas DS1204V security key at U5 labeled 9255-80 U5-B-RO
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
+/* Sold as a 3 program ROM + Security chip update - Header touts new Trivia Whiz and Phraze Craze */
+ROM_START( megat7e ) /* Dallas DS1204V security key at U5 labeled 9255-90 U5-B-RO1 C2000 MII */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "9255-60-01_u32-r00", 0x000000, 0x100000, CRC(3b9cecc7) SHA1(677ca2df35aeb708a0ad816e91c3e62f2cd273da) ) /* Location U32 */
+	ROM_LOAD( "qs9255-08_u36-r00",  0x100000, 0x080000, CRC(800f5a1f) SHA1(4d3ee6fb896d6452aab1f279a3ee878284bd1acc) ) /* Location U36 - Not used */
+	ROM_RELOAD(                     0x180000, 0x080000 )
+	ROM_LOAD( "qs9255-08_u37-r0",   0x200000, 0x100000, CRC(7303cc48) SHA1(17ce90272bca0a90d90af9952cee3059b4e036d0) ) /* Location U37 */
+	ROM_LOAD( "9255-90-01_u38-r00", 0x300000, 0x100000, CRC(b4f94ff9) SHA1(d74334bcd913f269a8e5744f590e8943ec0b96b6) ) /* Location U38, 10/16/2000 15:09:35 - Standard Version */
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "9255-90_u5-b-ro1_c2000_mii", 0x000000, 0x000022, BAD_DUMP CRC(c1179dbc) SHA1(739bd89bd1ec5971bf1cfb4d77bc5411f0f51a70) )
+
+	ROM_REGION( 0x1000, "user2", 0 ) // PALs
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
 void meritm_state::init_megat3te()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::ds1644_r), this), write8_delegate(FUNC(meritm_state::ds1644_w), this));
@@ -2403,3 +2422,4 @@ GAME( 1998, megat5nj,  megat5, crt260, meritm_crt260, meritm_state, empty_init, 
 GAME( 1998, megat5t,   megat5, crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch 5 Tournament Edition (9255-70-01 ROC, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, megat5tg,  megat5, crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch 5 Turnier Version (9255-70-50 ROD, Bi-Lingual GER/ENG version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, megat6,    0,      crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 6 (9255-80-01 ROA, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, megat7e,   0,      crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 7 Encore Edition (9255-90-01 RO0, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
