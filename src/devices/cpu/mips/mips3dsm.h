@@ -33,10 +33,11 @@ protected:
 	virtual uint32_t dasm_extra_base(uint32_t pc, uint32_t op, std::ostream &stream);
 	virtual uint32_t dasm_extra_special(uint32_t pc, uint32_t op, std::ostream &stream);
 	virtual uint32_t dasm_extra_regimm(uint32_t pc, uint32_t op, std::ostream &stream);
+	virtual uint32_t dasm_extra_cop2(uint32_t pc, uint32_t op, std::ostream &stream);
 	uint32_t dasm_cop0(uint32_t pc, uint32_t op, std::ostream &stream);
 	uint32_t dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream);
 	uint32_t dasm_cop1x(uint32_t pc, uint32_t op, std::ostream &stream);
-	virtual uint32_t dasm_cop2(uint32_t pc, uint32_t op, std::ostream &stream);
+	uint32_t dasm_cop2(uint32_t pc, uint32_t op, std::ostream &stream);
 	virtual uint32_t dasm_idt(uint32_t pc, uint32_t op, std::ostream &stream);
 };
 
@@ -47,11 +48,13 @@ public:
 	virtual ~ee_disassembler() = default;
 
 protected:
-	static const char *const vreg[32];
+	static const char *const vfreg[32];
+	static const char *const vireg[32];
 
 	uint32_t dasm_extra_base(uint32_t pc, uint32_t op, std::ostream &stream) override;
 	uint32_t dasm_extra_special(uint32_t pc, uint32_t op, std::ostream &stream) override;
 	uint32_t dasm_extra_regimm(uint32_t pc, uint32_t op, std::ostream &stream) override;
+	uint32_t dasm_extra_cop2(uint32_t pc, uint32_t op, std::ostream &stream) override;
 	uint32_t dasm_idt(uint32_t pc, uint32_t op, std::ostream &stream) override;
 	uint32_t dasm_mmi(uint32_t pc, uint32_t op, std::ostream &stream);
 	uint32_t dasm_mmi0(uint32_t pc, uint32_t op, std::ostream &stream);

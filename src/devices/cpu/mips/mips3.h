@@ -306,6 +306,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	void invalid_instruction(uint32_t op);
 
 private:
 	struct internal_mips3_state
@@ -457,7 +458,6 @@ private:
 
 	void generate_exception(int exception, int backup);
 	void generate_tlb_exception(int exception, offs_t address);
-	void invalid_instruction(uint32_t op);
 	void check_irqs();
 public:
 	void mips3com_update_cycle_counting();
@@ -513,6 +513,7 @@ private:
 	void handle_regimm(uint32_t op);
 	virtual void handle_extra_special(uint32_t op);
 	virtual void handle_extra_regimm(uint32_t op);
+	virtual void handle_extra_cop2(uint32_t op);
 	virtual void handle_idt(uint32_t op);
 
 	void lwl_be(uint32_t op);
@@ -747,6 +748,7 @@ protected:
 
 	void handle_extra_special(uint32_t op) override;
 	void handle_extra_regimm(uint32_t op) override;
+	void handle_extra_cop2(uint32_t op) override;
 	void handle_idt(uint32_t op) override;
 };
 
