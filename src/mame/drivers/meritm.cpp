@@ -2318,7 +2318,7 @@ ROM_START( megat6 ) /* Dallas DS1204V security key at U5 labeled 9255-80 U5-B-RO
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "9255-80-01_u32-r0",  0x000000, 0x100000, CRC(f8f7f48e) SHA1(1bebe1f8898c60b795a0f794ca9b79e03d2744e4) ) /* Location U32 */
 	ROM_LOAD( "qs9255-08_u36-r0",   0x100000, 0x080000, CRC(800f5a1f) SHA1(4d3ee6fb896d6452aab1f279a3ee878284bd1acc) ) /* Location U36 */
-	ROM_RELOAD(                     0x180000, 0x080000 )
+	ROM_RELOAD(                     0x180000, 0x080000)
 	ROM_LOAD( "qs9255-08_u37-r0",   0x200000, 0x100000, CRC(5ba01949) SHA1(1598949ea18d07bbc78af0ddd279a687173c1229) ) /* Location U37 */
 	ROM_LOAD( "9255-80-01_u38-r0a", 0x300000, 0x100000, CRC(3df6b840) SHA1(31ba1ac04eed3e76cdf637507dedcc5f7e22c919) ) /* Location U38, 08/07/1998 15:54:23 - Standard Version */
 
@@ -2339,9 +2339,10 @@ ROM_END
 ROM_START( megat7e ) /* Dallas DS1204V security key at U5 labeled 9255-90 U5-B-RO1 C2000 MII */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "9255-90-01_u32-r00", 0x000000, 0x100000, CRC(3b9cecc7) SHA1(677ca2df35aeb708a0ad816e91c3e62f2cd273da) ) /* Location U32 */
-	ROM_LOAD( "qs9255-08_u36-r0",   0x100000, 0x080000, CRC(800f5a1f) SHA1(4d3ee6fb896d6452aab1f279a3ee878284bd1acc) ) /* Location U36 - Not used */
-	ROM_RELOAD(                     0x180000, 0x080000 )
-	ROM_LOAD( "qs9255-09_u37-r00",  0x200000, 0x100000, CRC(7303cc48) SHA1(17ce90272bca0a90d90af9952cee3059b4e036d0) ) /* Location U37 */
+	ROM_LOAD( "qs9255-08_u36-r0",   0x100000, 0x080000, CRC(800f5a1f) SHA1(4d3ee6fb896d6452aab1f279a3ee878284bd1acc) ) /* Location U36 - Not used? */
+	ROM_RELOAD(                     0x180000, 0x080000)
+	ROM_LOAD( "qs9255-09_u37-r00",  0x200000, 0x080000, CRC(f6954331) SHA1(3fcfa5fef54d559e32cdecea726afce4e20b1744) ) /* Location U37 */
+	ROM_RELOAD(                     0x280000, 0x080000)
 	ROM_LOAD( "9255-90-01_u38-r00", 0x300000, 0x100000, CRC(b4f94ff9) SHA1(d74334bcd913f269a8e5744f590e8943ec0b96b6) ) /* Location U38, 10/16/2000 15:09:35 - Standard Version */
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
