@@ -123,7 +123,7 @@ PROGRAM#    Program Version      Program Differences
   Megatouch 5 (c)1997
   Megatouch 5 Tournament Edition (c)1997
   Megatouch 6 (c)1998
-  Megatouch 7 Encore (c)2000
+  Megatouch 7 Encore Edition (c)2000
 
 
 Custom Program Versions (from different Megatouch manuals):
