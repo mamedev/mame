@@ -1725,7 +1725,7 @@ ROM_START( borencha ) /* Borench  (c)1990 Sega */
 ROM_END
 
 
-ROM_START( tfrceac ) /* Thunder Force AC  (c)1990 Technosoft / Sega */
+ROM_START( tfrceac ) /* Thunder Force AC  (c)1990 Technosoft / Sega - 834-7745-02 THUNDER FORCE (EMP5032 labeled 317-0172)  */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13675.ic32", 0x000000, 0x040000, CRC(95ecf202) SHA1(92b0f351f2bee7d59873a4991615f14f1afe4da7) )
 	ROM_LOAD16_BYTE( "epr-13674.ic31", 0x000001, 0x040000, CRC(e63d7f1a) SHA1(a40d0a5a96f379a467048dc8fddd8aaaeb94da1d) )
