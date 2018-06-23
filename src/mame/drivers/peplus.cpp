@@ -13497,6 +13497,23 @@ ROM_START( pex0013ka ) /* Superboard : Keno (X000013K+XK000012) Paytable: 91-D, 
 	ROM_LOAD( "capx1267.u43", 0x0000, 0x0200, CRC(ce920b36) SHA1(1ddac0e227ac8210b314acbe92c6adb86800a45e) )
 ROM_END
 
+ROM_START( pex0827s ) /* Superboard : Red, White & Blue Slots (X000827S+XS000002) - Payout 87.48% */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xs000002.u67",   0x00000, 0x10000, CRC(f25725e8) SHA1(a7a0022162f6aa3303f072b6fab3713bdc6b57ad) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "x000827s.u66",   0x00000, 0x10000, CRC(7a0797ef) SHA1(dd881602b7495b43cac1dff3e7c95e1d55403696) ) /* Red, White & Blue - 5 Coins Max / 1 Pay Line */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2359.u77",  0x00000, 0x8000, CRC(da8d2f63) SHA1(a62e25a4df10dfb9692cf146481f30e22ad528aa) ) /* These are the WRONG CG roms for this set! However */
+	ROM_LOAD( "mgo-cg2359.u78",  0x08000, 0x8000, CRC(caaaed92) SHA1(33c92128930bc4227cb4adb006740fe4720bf422) ) /* they will show the correct graphics, but the "red" */
+	ROM_LOAD( "mbo-cg2359.u79",  0x10000, 0x8000, CRC(39dd17dc) SHA1(935df9b3c2e95fa8d76ec47800a9e39966378361) ) /* 7 will show as purple. */
+	ROM_LOAD( "mxo-cg2359.u80",  0x18000, 0x8000, CRC(60c81ed2) SHA1(97cb7cf84bcb1759548e61e0478f5e32c7694f63) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2359.u43", 0x0000, 0x0200, CRC(2cb53e71) SHA1(0fdee85068422cac889ad799d17ab97085019a65) ) /* Correct CAPX chip for CG2359 set, but both CAPX & CG set are WRONG for the slot game */
+ROM_END
+
 ROM_START( pex0838s ) /* Superboard : Five Times Pay Slots (X000835S+XS000002) - Payout 90.01% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xs000002.u67",   0x00000, 0x10000, CRC(f25725e8) SHA1(a7a0022162f6aa3303f072b6fab3713bdc6b57ad) )
@@ -13892,7 +13909,7 @@ Double Aces & Faces  ?????     99.20%
 	ROM_LOAD( "mro-cg2xxx.u77",  0x00000, 0x8000, BAD_DUMP CRC(26abb9df) SHA1(0721accc3cb65f00dc979231497edfff0b1faf80) ) /* This set requires an unknown CG graphics set for the correct banners on the MENU page */
 	ROM_LOAD( "mgo-cg2xxx.u78",  0x08000, 0x8000, BAD_DUMP CRC(409fd5f6) SHA1(fc4d5627fcc8b891939d6237851c585739d5e0b0) ) /* Most likely CG2227, CG2229 or CG2239 */
 	ROM_LOAD( "mbo-cg2xxx.u79",  0x10000, 0x8000, BAD_DUMP CRC(fe48d88e) SHA1(d9a3057a6af087e6d6014a2f80b3f022090970f4) )
-	ROM_LOAD( "mxo-cg2xxx.u80",  0x18000, 0x8000, BAD_DUMP CRC(e14bb037) SHA1(5b9c3627e9d29f2140c4bc02c29b319d251abb9f) ) /* Use these modified CG2174 set until correct graphics roms are dumped */
+	ROM_LOAD( "mxo-cg2xxx.u80",  0x18000, 0x8000, BAD_DUMP CRC(e14bb037) SHA1(5b9c3627e9d29f2140c4bc02c29b319d251abb9f) ) /* Use this modified CG2174 set until correct graphics roms are dumped */
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
@@ -14781,6 +14798,7 @@ GAMEL( 1995, pex0013k,  pex0006k, peplus,  peplus_keno,  peplus_state, init_pepl
 GAMEL( 1995, pex0013ka, pex0006k, peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000013K+XK000012) Keno",               MACHINE_NOT_WORKING, layout_pe_keno )
 
 /* Superboard : Slots machine */
+GAMEL( 1997, pex0827s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000827S+XS000002) Red, White & Blue Slots",          MACHINE_WRONG_COLORS, layout_pe_slots ) /* Wrong CG graphics and CAPX color chip */
 GAMEL( 1997, pex0838s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000838S+XS000002) Five Times Pay Slots",             0, layout_pe_slots )
 GAMEL( 1997, pex0841s,  pex0838s, peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000841S+XS000002) Five Times Pay Slots",             0, layout_pe_slots )
 GAMEL( 1997, pex0846s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000846S+XS000006) Wild Star Red White & Blue Slots", MACHINE_WRONG_COLORS, layout_pe_slots ) /* Wrong CG graphics and CAPX color chip */
