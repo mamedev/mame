@@ -843,7 +843,7 @@ ROM_START( hikcheck )
 	// ic36 unpopulated
 
 	// SOP44 sockets, no ROMs populated
-	ROM_REGION( 0x10000000, "user2", 0)
+	ROM_REGION( 0x10000000, "user2", ROMREGION_ERASE00)
 
 	// 315-5881 populated, have no 317-xxxx stamp, key is unknown.
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1" )
