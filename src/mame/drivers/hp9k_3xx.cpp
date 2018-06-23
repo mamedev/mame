@@ -60,6 +60,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/6840ptm.h"
 #include "machine/tms9914.h"
+#include "machine/msm58321.h"
 #include "sound/sn76496.h"
 #include "bus/hp_dio/hp_dio.h"
 #include "bus/hp_dio/hp98543.h"
@@ -80,6 +81,7 @@
 #define MLC_TAG "mlc"
 #define SN76494_TAG "sn76494"
 
+#define RTC_TAG "rtc"
 #define SN76494_CLOCK 333333
 
 class hp9k3xx_state : public driver_device
@@ -92,6 +94,7 @@ public:
 		m_mlc(*this, MLC_TAG),
 		m_sound(*this, SN76494_TAG),
 		m_tms9914(*this, "tms9914"),
+		m_rtc(*this, RTC_TAG),
 		m_vram16(*this, "vram16"),
 		m_vram(*this, "vram")
 	{ }
@@ -101,6 +104,7 @@ public:
 	optional_device<hp_hil_mlc_device> m_mlc;
 	optional_device<sn76494_device> m_sound;
 	optional_device<tms9914_device> m_tms9914;
+	required_device<msm58321_device> m_rtc;
 	virtual void machine_reset() override;
 
 	optional_shared_ptr<uint16_t> m_vram16;
@@ -118,7 +122,9 @@ public:
 	DECLARE_WRITE8_MEMBER(iocpu_port1_w);
 	DECLARE_WRITE8_MEMBER(iocpu_port2_w);
 	DECLARE_READ8_MEMBER(iocpu_port1_r);
+	DECLARE_READ8_MEMBER(iocpu_port2_r);
 	DECLARE_READ8_MEMBER(iocpu_test0_r);
+	DECLARE_READ8_MEMBER(iocpu_test1_r);
 
 	DECLARE_READ8_MEMBER(gpib_r);
 	DECLARE_WRITE8_MEMBER(gpib_w);
@@ -172,6 +178,11 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(cpu_reset);
 
+	DECLARE_WRITE_LINE_MEMBER(rtc_d0_w);
+	DECLARE_WRITE_LINE_MEMBER(rtc_d1_w);
+	DECLARE_WRITE_LINE_MEMBER(rtc_d2_w);
+	DECLARE_WRITE_LINE_MEMBER(rtc_d3_w);
+
 	static constexpr uint8_t HIL_CS = 0x01;
 	static constexpr uint8_t HIL_WE = 0x02;
 	static constexpr uint8_t HIL_OE = 0x04;
@@ -185,6 +196,9 @@ private:
 	uint8_t m_latch_data;
 	uint32_t m_lastpc;
 	bool gpib_irq_line;
+
+	uint8_t m_rtc_data;
+	bool m_old_latch_enable;
 };
 
 uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -217,7 +231,7 @@ void hp9k3xx_state::hp9k3xx_common(address_map &map)
 	map(0x00000000, 0xffffffff).rw(FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
 
-	map(0x00428000, 0x00428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
+	map(0x00420000, 0x00420003).mirror(0x0000fffc).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
 	map(0x00470000, 0x0047001f).mirror(0x0000ffe0).rw(FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
 	map(0x005f8000, 0x005f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
@@ -230,7 +244,7 @@ void hp9k3xx_state::hp9k310_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0).nopw();  // writes to 1fffc are the LED
 
-	map(0x428000, 0x428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
+	map(0x420000, 0x420003).mirror(0x00fffc).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
 	map(0x470000, 0x47001f).mirror(0x00ffe0).rw(FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
 	map(0x510000, 0x510003).rw(FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Alpha display"
@@ -324,12 +338,15 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER(hp9k3xx_state::cpu_reset)
 {
        m_iocpu->reset();
+       m_rtc->cs2_w(CLEAR_LINE);
 }
 
 
 void hp9k3xx_state::machine_reset()
 {
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(hp9k3xx_state::cpu_reset), this));
+	m_rtc->cs1_w(ASSERT_LINE);
+	m_rtc->cs2_w(CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(hp9k3xx_state::gpib_irq)
@@ -415,10 +432,16 @@ WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 WRITE8_MEMBER(hp9k3xx_state::iocpu_port1_w)
 {
 	m_hil_data = data;
+	m_rtc->d0_w(data & 0x01 ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->d1_w(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->d2_w(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->d3_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(hp9k3xx_state::iocpu_port2_w)
 {
+	bool latch_enable = data & LATCH_EN;
+
 	if ((data & (HIL_CS|HIL_WE)) == 0)
 		m_mlc->write(space, (m_latch_data & 0xc0) >> 6, m_hil_data, 0xff);
 
@@ -427,9 +450,14 @@ WRITE8_MEMBER(hp9k3xx_state::iocpu_port2_w)
 
 	m_hil_read = ((data & (HIL_CS|HIL_OE)) == 0);
 
-	if (!(data & LATCH_EN))
-		m_latch_data = m_hil_data;
+	m_rtc->address_write_w(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->write_w(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
 
+	if (!m_old_latch_enable && latch_enable) {
+		m_latch_data = m_hil_data;
+		m_rtc->read_w(m_latch_data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
+		m_rtc->cs2_w(m_latch_data & 0x10 ? ASSERT_LINE : CLEAR_LINE);
+	}
 	m_maincpu->set_input_line(M68K_IRQ_1, data & 0x10 ? ASSERT_LINE : CLEAR_LINE);
 
 	if (!(data & KBD_RESET)) {
@@ -439,18 +467,67 @@ WRITE8_MEMBER(hp9k3xx_state::iocpu_port2_w)
 		m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
 		m_kbd_nmi = false;
 	}
+	m_old_latch_enable = latch_enable;
 }
 
 READ8_MEMBER(hp9k3xx_state::iocpu_port1_r)
 {
 	if (m_hil_read)
 		return m_mlc->read(space, (m_latch_data & 0xc0) >> 6, 0xff);
+	if (m_latch_data & 0x20)
+		return m_rtc_data;
 	return 0xff;
+}
+
+READ8_MEMBER(hp9k3xx_state::iocpu_port2_r)
+{
+	// pull P2.5 low to indicate that a RTC is present
+	return 0xdf;
 }
 
 READ8_MEMBER(hp9k3xx_state::iocpu_test0_r)
 {
 	return !m_mlc->get_int();
+}
+
+READ8_MEMBER(hp9k3xx_state::iocpu_test1_r)
+{
+	return 0xff;
+}
+
+WRITE_LINE_MEMBER(hp9k3xx_state::rtc_d0_w)
+{
+	if (state)
+		m_rtc_data |= 1;
+	else
+		m_rtc_data &= ~1;
+
+}
+
+WRITE_LINE_MEMBER(hp9k3xx_state::rtc_d1_w)
+{
+	if (state)
+		m_rtc_data |= 2;
+	else
+		m_rtc_data &= ~2;
+}
+
+WRITE_LINE_MEMBER(hp9k3xx_state::rtc_d2_w)
+{
+	if (state)
+		m_rtc_data |= 4;
+	else
+		m_rtc_data &= ~4;
+
+}
+
+WRITE_LINE_MEMBER(hp9k3xx_state::rtc_d3_w)
+{
+	if (state)
+		m_rtc_data |= 8;
+	else
+		m_rtc_data &= ~8;
+
 }
 
 static void dio16_cards(device_slot_interface &device)
@@ -469,6 +546,8 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k300)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, hp9k3xx_state, iocpu_port2_w))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, hp9k3xx_state, iocpu_port1_r))
 	MCFG_MCS48_PORT_T0_IN_CB(READ8(*this, hp9k3xx_state, iocpu_test0_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, hp9k3xx_state, iocpu_port2_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READ8(*this, hp9k3xx_state, iocpu_test1_r))
 
 	MCFG_DEVICE_ADD(m_mlc, HP_HIL_MLC, XTAL(8'000'000))
 	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_46021a")
@@ -481,6 +560,13 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k300)
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76494_TAG, SN76494, SN76494_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, 32.768_kHz_XTAL)
+	MCFG_MSM58321_DEFAULT_24H(false)
+	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, hp9k3xx_state, rtc_d0_w))
+	MCFG_MSM58321_D1_HANDLER(WRITELINE(*this, hp9k3xx_state, rtc_d1_w))
+	MCFG_MSM58321_D2_HANDLER(WRITELINE(*this, hp9k3xx_state, rtc_d2_w))
+	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, hp9k3xx_state, rtc_d3_w))
 
 	MCFG_DEVICE_ADD(m_tms9914, TMS9914, XTAL(5000000))
 	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, hp9k3xx_state, gpib_irq));
