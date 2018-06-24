@@ -911,7 +911,7 @@ ROMs  :   (filename is PCB label, extension is PCB 'u' location)
 Filename      Label              Type                Used...        Note    C'sum
 ---------------------------------------------------------------------------------
 PCM.099       RAIDEN-X SOUND     LH538100  (SOP32)   Oki Samples      0     8539h
-FIX.613       RAIDEN-X FIX       LH532048  (SOP40)   ? (BG?)          1     182Dh
+FIX.613       RAIDEN-X FIX       LH532048  (SOP40)   Foregrounds      1     182Dh
 COPX_D3.357   RAIDEN-X 333       LH530800A (SOP32)   Protection?      2     CEE4h
 PRG.223       RAIDEN-X CHR-4A1   MX23C3210 (SOP44)   V33 program      3     F276h
 OBJ1.724      RAIDEN-X CHR1      MX23C3210 (SOP44)   Motion Objects   4     4148h
