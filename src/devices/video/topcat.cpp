@@ -11,6 +11,7 @@ DEFINE_DEVICE_TYPE(TOPCAT, topcat_device, "topcat", "HP Topcat ASIC")
 
 topcat_device::topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	m_cursor_timer(nullptr),
 	m_vram(*this, "^vram")
 {
 }
@@ -22,7 +23,7 @@ topcat_device::topcat_device(const machine_config &mconfig, const char *tag, dev
 
 void topcat_device::device_start()
 {
-	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(topcat_device::cursor_callback),this));
+	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(topcat_device::cursor_callback), this));
 	m_cursor_timer->adjust(attotime::from_hz(3));
 
 	save_item(NAME(m_vblank));
@@ -77,25 +78,24 @@ READ16_MEMBER(topcat_device::vram_r)
 WRITE16_MEMBER(topcat_device::vram_w)
 {
 	if (mem_mask & m_plane_mask)
-		modify_vram_offset(offset * 2+1, (data & m_plane_mask));
+		modify_vram_offset(offset * 2 + 1, (data & m_plane_mask));
 
 	if (mem_mask & m_plane_mask << 8)
 		modify_vram_offset(offset * 2, (data & m_plane_mask << 8));
 }
 
-void topcat_device::get_cursor_pos(int *startx, int *starty, int *endx, int *endy)
+void topcat_device::get_cursor_pos(int &startx, int &starty, int &endx, int &endy)
 {
 	if (m_cursor_state && ((m_cursor_plane_enable >> 8) & m_plane_mask)) {
-		*startx = m_cursor_x_pos;
-		*starty = m_cursor_y_pos;
-		*endx = m_cursor_x_pos + m_cursor_width;
-		*endy = m_cursor_y_pos;
-
+		startx = m_cursor_x_pos;
+		starty = m_cursor_y_pos;
+		endx = m_cursor_x_pos + m_cursor_width;
+		endy = m_cursor_y_pos;
 	} else {
-		*startx = 0;
-		*starty = 0;
-		*endx = 0;
-		*endy = 0;
+		startx = 0;
+		starty = 0;
+		endx = 0;
+		endy = 0;
 	}
 }
 
@@ -115,7 +115,7 @@ void topcat_device::update_cursor(int x, int y, uint16_t ctrl, uint8_t width)
 
 void topcat_device::execute_rule(bool src, replacement_rule_t rule, bool &dst)
 {
-	switch(rule & 0x0f) {
+	switch (rule & 0x0f) {
 	case TOPCAT_REPLACE_RULE_CLEAR:
 		dst = false;
 		break;
@@ -167,23 +167,21 @@ void topcat_device::execute_rule(bool src, replacement_rule_t rule, bool &dst)
 	}
 }
 
-void topcat_device::window_move(void)
+void topcat_device::window_move()
 {
-	int line, endline, lineincr;
-	int startcolumn, endcolumn, columnincr;
-
 	if (!((m_fb_write_enable >> 8) & m_plane_mask))
 		return;
 
 	LOG("WINDOWMOVE: %3ux%3u -> %3ux%3u / %3ux%3u rule %x\n",
-	    m_source_x_pixel,
-	    m_source_y_pixel,
-	    m_dst_x_pixel,
-	    m_dst_y_pixel,
-	    m_block_mover_pixel_width,
-	    m_block_mover_pixel_height,
-	    m_move_replacement_rule);
+		m_source_x_pixel,
+		m_source_y_pixel,
+		m_dst_x_pixel,
+		m_dst_y_pixel,
+		m_block_mover_pixel_width,
+		m_block_mover_pixel_height,
+		m_move_replacement_rule);
 
+	int line, endline, lineincr;
 	if (m_dst_y_pixel > m_source_y_pixel) {
 		/* move down */
 		line = m_block_mover_pixel_height-1;
@@ -196,6 +194,7 @@ void topcat_device::window_move(void)
 		lineincr = 1;
 	}
 
+	int startcolumn, endcolumn, columnincr;
 	if (m_dst_x_pixel > m_source_x_pixel) {
 		/* move right */
 		startcolumn = m_block_mover_pixel_width-1;
@@ -209,12 +208,10 @@ void topcat_device::window_move(void)
 
 	}
 
-	for(;line != endline; line += lineincr) {
-		for(int column = startcolumn; column != endcolumn; column += columnincr) {
-			bool src = get_vram_pixel(m_source_x_pixel + column,
-						  m_source_y_pixel + line);
-			bool dst = get_vram_pixel(m_dst_x_pixel + column,
-						  m_dst_y_pixel + line);
+	for ( ; line != endline; line += lineincr) {
+		for (int column = startcolumn; column != endcolumn; column += columnincr) {
+			bool const src = get_vram_pixel(m_source_x_pixel + column, m_source_y_pixel + line);
+			bool dst = get_vram_pixel(m_dst_x_pixel + column, m_dst_y_pixel + line);
 			execute_rule(src, (replacement_rule_t)(m_move_replacement_rule & 0x0f), dst);
 			modify_vram(m_dst_x_pixel + column, m_dst_y_pixel + line, dst);
 		}
@@ -223,12 +220,11 @@ void topcat_device::window_move(void)
 
 READ16_MEMBER(topcat_device::ctrl_r)
 {
-	uint16_t ret = 0xffff;
-
 	if (!m_read_enable)
 		return 0;
 
-	switch(offset) {
+	uint16_t ret = 0xffff;
+	switch (offset) {
 	case TOPCAT_REG_VBLANK:
 		ret = m_vblank;
 		break;
@@ -298,7 +294,6 @@ READ16_MEMBER(topcat_device::ctrl_r)
 
 WRITE16_MEMBER(topcat_device::ctrl_w)
 {
-
 	data &= mem_mask;
 
 	if (offset == TOPCAT_REG_WRITE_ENABLE_PLANE) {
@@ -314,7 +309,7 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 	if (!m_write_enable)
 		return;
 
-	switch(offset) {
+	switch (offset) {
 	case TOPCAT_REG_VBLANK:
 		m_vblank = data & 0xff;
 		break;

@@ -8872,21 +8872,21 @@ ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 20
 ROM_END
 
 /*
-	The Program roms for the set below are actually 4 ROMs contained on a recycled NeoGeo Pocket card and marked
+    The Program roms for the set below are actually 4 ROMs contained on a recycled NeoGeo Pocket card and marked
 
-	SNK48249Q
-	JAPAN9948HAK
-	T8V12A
-	(two of these)
+    SNK48249Q
+    JAPAN9948HAK
+    T8V12A
+    (two of these)
 
-	SNK48327V
-	JAPAN9948HAK
-	T8V12A
-	(two of these)
+    SNK48327V
+    JAPAN9948HAK
+    T8V12A
+    (two of these)
 
-	KOF2000 and Garou boards have been found with the same setup (data verified to match existing sets)
-	The roms were dumped via the NGPC cartridge edge connector, so the exact way they should be split into 4 is unknown.
-	As a result the ROM has been split to match the usual configuration as it likely exists like this too anyway.
+    KOF2000 and Garou boards have been found with the same setup (data verified to match existing sets)
+    The roms were dumped via the NGPC cartridge edge connector, so the exact way they should be split into 4 is unknown.
+    As a result the ROM has been split to match the usual configuration as it likely exists like this too anyway.
 */
 
 ROM_START( mslug3a ) /* Original Version - Encrypted Code & GFX */ /* MVS VERSION */

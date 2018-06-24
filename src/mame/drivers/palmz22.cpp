@@ -110,7 +110,7 @@ private:
 	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);
 	DECLARE_READ32_MEMBER(s3c2410_core_pin_r);
 	DECLARE_READ32_MEMBER(s3c2410_adc_data_r );
-	
+
 	void map(address_map &map);
 };
 

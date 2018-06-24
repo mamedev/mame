@@ -82,7 +82,7 @@ WRITE16_MEMBER(nereid_device::ctrl_w)
 		break;
 	case NEREID_STROBE:
 		LOG("NEREID: set color index %u: rgb_t(%u,%u,%u)\n",
-		    m_index, m_red, m_green, m_blue);
+			m_index, m_red, m_green, m_blue);
 		m_palette[m_index] = rgb_t(m_red, m_green, m_blue);
 		break;
 	case NEREID_PLANE_MASK:

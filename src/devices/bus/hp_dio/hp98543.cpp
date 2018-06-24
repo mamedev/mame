@@ -65,9 +65,9 @@ void dio16_98543_device::map(address_map& map)
 
 device_memory_interface::space_config_vector dio16_98543_device::memory_space_config() const
 {
-        return space_config_vector {
-                std::make_pair(0, &m_space_config)
-        };
+		return space_config_vector {
+				std::make_pair(0, &m_space_config)
+		};
 }
 
 dio16_98543_device::dio16_98543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -158,7 +158,7 @@ uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	int endx[TOPCAT_COUNT], endy[TOPCAT_COUNT];
 
 	for (int i = 0; i < TOPCAT_COUNT; i++)
-		m_topcat[i]->get_cursor_pos(&startx[i], &starty[i], &endx[i], &endy[i]);
+		m_topcat[i]->get_cursor_pos(startx[i], starty[i], endx[i], endy[i]);
 
 	for (int y = 0; y < m_v_pix; y++) {
 		uint32_t *scanline = &bitmap.pix32(y);

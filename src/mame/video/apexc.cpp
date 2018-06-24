@@ -198,10 +198,10 @@ void apexc_state::teletyper_putchar(int character)
 		}
 
 		/* print character */
-		buffer[0] = ascii_table[m_letters][character];		/* lookup ASCII equivalent in table */
-		buffer[1] = '\0';									/* terminate string */
-		draw_string(*m_bitmap, buffer, 8*m_pos, 176, 0);	/* print char */
-		m_pos++;											/* step carriage forward */
+		buffer[0] = ascii_table[m_letters][character];      /* lookup ASCII equivalent in table */
+		buffer[1] = '\0';                                   /* terminate string */
+		draw_string(*m_bitmap, buffer, 8*m_pos, 176, 0);    /* print char */
+		m_pos++;                                            /* step carriage forward */
 		break;
 	}
 }

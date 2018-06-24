@@ -45,7 +45,7 @@
         * The timed interrupt is a kludge; it is supposed to be generated internally by
           the Z180, but the cpu core doesn't support that yet.
         * Is the clock divide 3 or 4?
-		* Galaga attract mode isn't correct; referenct : https://youtu.be/OQyWaN9fTgw?t=2m33s
+        * Galaga attract mode isn't correct; referenct : https://youtu.be/OQyWaN9fTgw?t=2m33s
 
 +-------------------------------------------------------+
 |                        +-------------+                |

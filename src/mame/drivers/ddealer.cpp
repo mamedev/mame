@@ -11,7 +11,7 @@
     TODO:
     - Fix MCU simulation for credit subtractions & add coinage settings (currently set to free play for convenience);
     - Understand better the video emulation and convert it to tilemaps;
-	- 2 players mode gameplay is way too slow (protection related?)
+    - 2 players mode gameplay is way too slow (protection related?)
     - Decap + emulate MCU, required if the random number generation is going to be accurate;
 
 ==========================================================================================================
@@ -146,9 +146,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	void draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_sim);
-	
+
 	void ddealer(machine_config &config);
 	void ddealer_map(address_map &map);
 	void init_ddealer();
@@ -335,7 +335,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::mcu_sim)
 {
 	/*coin/credit simulation*/
 	/*$fe002 is used,might be for multiple coins for one credit settings.*/
-	// TODO: I'm not bothering with coin/credit settings until this actually work properly 
+	// TODO: I'm not bothering with coin/credit settings until this actually work properly
 	// (game is currently hardwired to free play)
 	m_coin_input = (~(ioport("IN0")->read()));
 
@@ -429,7 +429,7 @@ Protection handling, identical to Hacha Mecha Fighter / Thunder Dragon with diff
 WRITE16_MEMBER(ddealer_state::mcu_shared_w)
 {
 	COMBINE_DATA(&m_mcu_shared_ram[offset]);
-	
+
 	switch(offset)
 	{
 		case 0x086/2: PROT_INPUT(0x086/2,0x1234,0x100/2,0x80000); break;
@@ -500,7 +500,7 @@ void ddealer_state::ddealer_map(address_map &map)
 	map(0x091000, 0x091fff).ram().share("right_fg_vratop");
 	map(0x092000, 0x092fff).ram().share("left_fg_vrabot");
 	map(0x093000, 0x093fff).ram().share("right_fg_vrabot");
-//	map(0x094000, 0x094001).noprw(); // Set at POST via clr.w, unused afterwards
+//  map(0x094000, 0x094001).noprw(); // Set at POST via clr.w, unused afterwards
 	map(0x098000, 0x098001).w(FUNC(ddealer_state::flipscreen_w));
 	map(0x09c000, 0x09cfff).ram().w(FUNC(ddealer_state::back_vram_w)).share("back_vram"); // bg tilemap
 	map(0x0f0000, 0x0fdfff).ram().share("work_ram");
