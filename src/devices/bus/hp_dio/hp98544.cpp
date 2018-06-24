@@ -129,8 +129,7 @@ WRITE16_MEMBER(dio16_98544_device::rom_w)
 uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int startx, starty, endx, endy;
-
-	m_topcat->get_cursor_pos(&startx, &starty, &endx, &endy);
+	m_topcat->get_cursor_pos(startx, starty, endx, endy);
 
 	for (int y = 0; y < m_v_pix; y++) {
 		uint32_t *scanline = &bitmap.pix32(y);

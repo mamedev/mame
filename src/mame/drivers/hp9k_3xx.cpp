@@ -323,7 +323,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(hp9k3xx_state::cpu_reset)
 {
-       m_iocpu->reset();
+	   m_iocpu->reset();
 }
 
 

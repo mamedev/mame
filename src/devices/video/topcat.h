@@ -22,9 +22,7 @@ public:
 	void set_fb_width(int _pixels) { m_fb_width = _pixels; }
 	void set_fb_height(int _pixels) { m_fb_height = _pixels; }
 	void set_planemask(int _mask) { m_plane_mask = _mask; }
-	void get_cursor_pos(int *startx, int *starty, int *endx, int *endy);
-
-	TIMER_CALLBACK_MEMBER(cursor_callback);
+	void get_cursor_pos(int &startx, int &starty, int &endx, int &endy);
 
 	DECLARE_READ16_MEMBER(vram_r);
 	DECLARE_WRITE16_MEMBER(vram_w);
@@ -38,6 +36,8 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	TIMER_CALLBACK_MEMBER(cursor_callback);
 
 private:
 
@@ -86,7 +86,7 @@ private:
 		TOPCAT_REG_CURSOR_WIDTH=0x89,
 	};
 
-	void window_move(void);
+	void window_move();
 	void execute_rule(bool src, replacement_rule_t rule, bool &dst);
 
 	void update_cursor(int x, int y, uint16_t ctrl, uint8_t width);

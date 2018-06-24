@@ -428,19 +428,19 @@ uint32_t ee_disassembler::dasm_extra_cop2(uint32_t pc, uint32_t op, std::ostream
 		"    ", "w   ", "z   ", "zw  ", "y   ", "yw  ", "yz  ", "yzw ",
 		"x   ", "xw  ", "xz  ", "xzw ", "xy  ", "xyw ", "xyz ", "xyzw"
 	};
-    const char* dest_strings_with_comma[16] =
-    {
-        ",",  "w,",  "z,",  "zw,",  "y,",  "yw,",  "yz,",  "yzw,",
-        "x,", "xw,", "xz,", "xzw,", "xy,", "xyw,", "xyz,", "xyzw,"
-    };
-    const char* bc_strings[4] = { "x", "y", "z", "w" };
-    const char* bc_strings_with_comma[4] = { "x,", "y,", "z,", "w," };
+	const char* dest_strings_with_comma[16] =
+	{
+		",",  "w,",  "z,",  "zw,",  "y,",  "yw,",  "yz,",  "yzw,",
+		"x,", "xw,", "xz,", "xzw,", "xy,", "xyw,", "xyz,", "xyzw,"
+	};
+	const char* bc_strings[4] = { "x", "y", "z", "w" };
+	const char* bc_strings_with_comma[4] = { "x,", "y,", "z,", "w," };
 	const char* dest = dest_strings[(op >> 21) & 15];
-    const char* destc = dest_strings_with_comma[(op >> 21) & 15];
+	const char* destc = dest_strings_with_comma[(op >> 21) & 15];
 	const char* bc = bc_strings[op & 3];
 	const char* ftf = bc_strings[(op >> 23) & 3];
 	const char* fsf = bc_strings[(op >> 21) & 3];
-    const char* fsfc = bc_strings_with_comma[(op >> 21) & 3];
+	const char* fsfc = bc_strings_with_comma[(op >> 21) & 3];
 
 	switch (op & 0x3f)
 	{
@@ -790,7 +790,7 @@ uint32_t ee_disassembler::dasm_extra_base(uint32_t pc, uint32_t op, std::ostream
 	{
 		case 0x1e: util::stream_format(stream, "lq        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]); break;
 		case 0x1f: util::stream_format(stream, "sq        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]); break;
-		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);							break;
+		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);                            break;
 	}
 
 	return 0;
@@ -802,8 +802,8 @@ uint32_t ee_disassembler::dasm_extra_special(uint32_t pc, uint32_t op, std::ostr
 
 	switch (op & 63)
 	{
-		case 0x29: util::stream_format(stream, "mtsa      %s", reg[rs]);			break;
-		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);	break;
+		case 0x29: util::stream_format(stream, "mtsa      %s", reg[rs]);            break;
+		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);    break;
 	}
 	return 0;
 }
@@ -903,7 +903,7 @@ offs_t mips3_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 				case 0x3c:  util::stream_format(stream, "dsll      %s,%s,%d", reg[rd], reg[rt], shift+32);         break;
 				case 0x3e:  util::stream_format(stream, "dsrl      %s,%s,%d", reg[rd], reg[rt], shift+32);         break;
 				case 0x3f:  util::stream_format(stream, "dsra      %s,%s,%d", reg[rd], reg[rt], shift+32);         break;
-				default:    flags = dasm_extra_special(pc, op, stream);											break;
+				default:    flags = dasm_extra_special(pc, op, stream);                                         break;
 			}
 			break;
 
@@ -958,7 +958,7 @@ offs_t mips3_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 		case 0x19:  util::stream_format(stream, "daddiu    %s,%s,%s", reg[rt], reg[rs], signed_16bit(op));         break;
 		case 0x1a:  util::stream_format(stream, "ldl       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 		case 0x1b:  util::stream_format(stream, "ldr       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-		case 0x1c:  flags = dasm_idt(pc, op, stream);												break;
+		case 0x1c:  flags = dasm_idt(pc, op, stream);                                               break;
 		case 0x20:  util::stream_format(stream, "lb        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 		case 0x21:  util::stream_format(stream, "lh        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 		case 0x22:  util::stream_format(stream, "lwl       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
@@ -990,7 +990,7 @@ offs_t mips3_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 		case 0x3d:  util::stream_format(stream, "sdc1      %s,%s(%s)", cpreg[1][rt], signed_16bit(op), reg[rs]);   break;
 		case 0x3e:  util::stream_format(stream, "sdc2      %s,%s(%s)", cpreg[2][rt], signed_16bit(op), reg[rs]);   break;
 		case 0x3f:  util::stream_format(stream, "sd        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-		default:    flags = dasm_extra_base(pc, op, stream);													   break;
+		default:    flags = dasm_extra_base(pc, op, stream);                                                       break;
 	}
 	return 4 | flags | SUPPORTED;
 }

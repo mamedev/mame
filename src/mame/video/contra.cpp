@@ -161,8 +161,8 @@ void contra_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 
-	save_pointer(NAME(m_buffered_spriteram.get()), 0x800);
-	save_pointer(NAME(m_buffered_spriteram_2.get()), 0x800);
+	save_pointer(NAME(m_buffered_spriteram), 0x800);
+	save_pointer(NAME(m_buffered_spriteram_2), 0x800);
 }
 
 

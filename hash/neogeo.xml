@@ -1205,7 +1205,7 @@
 			</dataarea>
 			<dataarea name="ymsnd.deltat" size="0x80000">
 				<rom name="v21" offset="0x000000" size="0x080000" crc="7abf113d" sha1="5b2a0e70f2eaf4638b44702dacd4cb17838fb1d5" />
-			</dataarea>			
+			</dataarea>
 			<dataarea name="sprites" size="0x400000">
 				<!-- note, load32_byte -->
 				<rom loadflag="load32_byte" name="c11" offset="0x000000" size="0x080000" crc="7a5158b3" sha1="01dd241534c16e81ce1113a53495606d8f907e1e" />
@@ -1219,7 +1219,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!--
 	ID-0021
 	. NGM-021
@@ -4717,7 +4717,7 @@
 				<rom loadflag="load32_byte" name="c9.c9"   offset="0x400000" size="0x080000" crc="25621e44" sha1="3e380c1f52233dd1346c0363d920d1f96491cc45" />
 				<rom loadflag="load32_byte" name="c10.c10" offset="0x400002" size="0x080000" crc="17b2115e" sha1="8c5d1b12ac7e739a7ac1f2189a2f3ca959d06377" />
 				<rom loadflag="load32_byte" name="c11.c11" offset="0x400001" size="0x080000" crc="7d3cd161" sha1="5ac30c35e815dd2b0235394c1768e419395a1b5a" />
-				<rom loadflag="load32_byte" name="c12.c12" offset="0x400003" size="0x080000" crc="c6970ed6" sha1="e963d0a5fb718e0eec2115d63ab34a0de0523792" />		
+				<rom loadflag="load32_byte" name="c12.c12" offset="0x400003" size="0x080000" crc="c6970ed6" sha1="e963d0a5fb718e0eec2115d63ab34a0de0523792" />
 			</dataarea>
 		</part>
 	</software>
@@ -8297,7 +8297,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 <software name="mslug3a" cloneof="mslug3"> <!-- see neogeo.cpp for notes on this set -->
 		<description>Metal Slug 3 (NGM-2560, earlier)</description>
 		<year>2000</year>
@@ -8342,7 +8342,7 @@
 				<rom loadflag="load16_byte" name="256-c8.c8" offset="0x3000001" size="0x800000" crc="4d9be34c" sha1="a737bdfa2b815aea7067e7af2636e83a9409c414" />   <!-- TC5364205 -->
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="mslug3h" cloneof="mslug3">
 		<description>Metal Slug 3 (NGH-2560)</description>

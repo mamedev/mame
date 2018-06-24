@@ -42,8 +42,8 @@ void turrett_state::machine_start()
 	m_video_ram[1] = std::make_unique<uint16_t[]>(VRAM_BANK_WORDS);
 
 	// Register our state for saving
-	save_pointer(NAME(m_video_ram[0].get()), VRAM_BANK_WORDS);
-	save_pointer(NAME(m_video_ram[1].get()), VRAM_BANK_WORDS);
+	save_pointer(NAME(m_video_ram[0]), VRAM_BANK_WORDS);
+	save_pointer(NAME(m_video_ram[1]), VRAM_BANK_WORDS);
 	save_item(NAME(m_inputs_active));
 	save_item(NAME(m_last_pixel));
 	save_item(NAME(m_video_ctrl));

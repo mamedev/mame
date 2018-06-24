@@ -124,13 +124,13 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 }
 
 INPUT_CHANGED_MEMBER( headonsa_state::headonsa_coin_inserted )
-{	
+{
 	if (newval)
 	{
 		/* increment the coin counter */
 		machine().bookkeeping().coin_counter_w(0, 1);
 		machine().bookkeeping().coin_counter_w(0, 0);
-		
+
 		// hooked up to NMI instead of RESET line
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
@@ -704,7 +704,7 @@ static INPUT_PORTS_START( headonsa )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_4WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_4WAY
-	
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )
@@ -941,7 +941,7 @@ static INPUT_PORTS_START( headon2 )
 	PORT_DIPNAME(0x18, 0x18, DEF_STR( Lives ) )
 	PORT_DIPSETTING(   0x18, "4" )
 	PORT_DIPSETTING(   0x10, "5" )
-//	PORT_DIPSETTING(   0x08, "5" )
+//  PORT_DIPSETTING(   0x08, "5" )
 	PORT_DIPSETTING(   0x00, "6" )
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -972,7 +972,7 @@ static INPUT_PORTS_START( car2 )
 	PORT_START("IN1")
 	// seems to ignore lives dip-switches (hardcoded to 3 lives)
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
-	
+
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )
@@ -990,7 +990,7 @@ static INPUT_PORTS_START( headon2s )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )

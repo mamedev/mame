@@ -274,8 +274,7 @@ void tc0480scp_device::device_start()
 		m_tilemap[3][i]->set_scroll_rows(512);
 	}
 
-	m_ram.resize(TC0480SCP_RAM_SIZE / 2);
-	memset(&m_ram[0], 0, TC0480SCP_RAM_SIZE);
+	m_ram.resize(TC0480SCP_RAM_SIZE / 2, 0);
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */

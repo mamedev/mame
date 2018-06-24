@@ -527,7 +527,7 @@ void cc40_state::init_sysram(int chip, u16 size)
 	{
 		// init to largest possible
 		m_sysram[chip] = std::make_unique<u8[]>(0x2000);
-		save_pointer(NAME(m_sysram[chip].get()), 0x2000, chip);
+		save_pointer(NAME(m_sysram[chip]), 0x2000, chip);
 
 		save_item(NAME(m_sysram_size[chip]), chip);
 		save_item(NAME(m_sysram_end[chip]), chip);

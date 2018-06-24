@@ -16,7 +16,7 @@ SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
 	if (m_samples_region)
 	{
 		m_sample_buf = std::make_unique<int16_t[]>(2 * m_samples_region.bytes());
-		save_pointer(NAME(m_sample_buf.get()), 2 * m_samples_region.bytes());
+		save_pointer(NAME(m_sample_buf), 2 * m_samples_region.bytes());
 	}
 }
 

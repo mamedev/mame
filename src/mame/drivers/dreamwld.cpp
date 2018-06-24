@@ -284,9 +284,9 @@ void dreamwld_state::video_start()
 	m_spritebuf[1] = std::make_unique<uint32_t[]>(0x2000 / 4);
 	m_lineram16 = make_unique_clear<uint16_t[]>(0x400 / 2);
 
-	save_pointer(NAME(m_spritebuf[0].get()), 0x2000 / 4, 0);
-	save_pointer(NAME(m_spritebuf[1].get()), 0x2000 / 4, 1);
-	save_pointer(NAME(m_lineram16.get()), 0x400/2);
+	save_pointer(NAME(m_spritebuf[0]), 0x2000 / 4, 0);
+	save_pointer(NAME(m_spritebuf[1]), 0x2000 / 4, 1);
+	save_pointer(NAME(m_lineram16), 0x400/2);
 
 }
 

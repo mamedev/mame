@@ -283,7 +283,7 @@ void tc0100scn_device::device_start()
 	set_colbanks(0, 0, 0);  /* standard values, only Wgp & multiscreen games change them */
 									/* we call this here, so that they can be modified at video_start*/
 
-	save_pointer(NAME(m_ram.get()), TC0100SCN_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram), TC0100SCN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_dblwidth));
 	save_item(NAME(m_gfxbank));

@@ -4,7 +4,7 @@
 
     8042kbdc.cpp
 
-	8042-based keyboard/mouse controller simulation
+    8042-based keyboard/mouse controller simulation
 
 *********************************************************************/
 

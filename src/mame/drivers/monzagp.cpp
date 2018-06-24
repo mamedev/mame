@@ -156,8 +156,8 @@ void monzagp_state::machine_start()
 	m_mycar_pos = 0;
 	m_collisions_ff = 0;
 	m_collisions_clk = 0;
-	save_pointer(NAME(m_vram.get()), 0x800);
-	save_pointer(NAME(m_score_ram.get()), 0x100);
+	save_pointer(NAME(m_vram), 0x800);
+	save_pointer(NAME(m_score_ram), 0x100);
 
 	m_nvram->set_base(m_score_ram.get(), 0x100);
 

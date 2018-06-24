@@ -1772,9 +1772,9 @@ void gba_lcd_device::device_start()
 
 	save_item(NAME(m_regs));
 
-	save_pointer(NAME(m_pram.get()), 0x400 / 4);
-	save_pointer(NAME(m_vram.get()), 0x18000 / 4);
-	save_pointer(NAME(m_oam.get()), 0x400 / 4);
+	save_pointer(NAME(m_pram), 0x400 / 4);
+	save_pointer(NAME(m_vram), 0x18000 / 4);
+	save_pointer(NAME(m_oam), 0x400 / 4);
 
 	save_item(NAME(m_bg2x.status));
 	save_item(NAME(m_bg2x.update));
