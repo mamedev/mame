@@ -284,9 +284,9 @@ void dreamwld_state::video_start()
 	m_spritebuf[1] = std::make_unique<uint32_t[]>(0x2000 / 4);
 	m_lineram16 = make_unique_clear<uint16_t[]>(0x400 / 2);
 
-	save_pointer(NAME(m_spritebuf[0].get()), 0x2000 / 4, 0);
-	save_pointer(NAME(m_spritebuf[1].get()), 0x2000 / 4, 1);
-	save_pointer(NAME(m_lineram16.get()), 0x400/2);
+	save_pointer(NAME(m_spritebuf[0]), 0x2000 / 4, 0);
+	save_pointer(NAME(m_spritebuf[1]), 0x2000 / 4, 1);
+	save_pointer(NAME(m_lineram16), 0x400/2);
 
 }
 
@@ -755,7 +755,7 @@ MACHINE_CONFIG_START(dreamwld_state::baryon)
 	MCFG_DEVICE_PROGRAM_MAP(baryon_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
-	MCFG_DEVICE_ADD("mcu", I80C52, XTAL(32'000'000)/2) /* AT89C52 or 87(C)52, unknown clock (value from docs) */
+	MCFG_DEVICE_ADD("mcu", AT89C52, XTAL(32'000'000)/2) /* AT89C52 or 87(C)52, unknown clock (value from docs) */
 	MCFG_DEVICE_DISABLE()   /* Internal ROM aren't dumped */
 
 	/* video hardware */

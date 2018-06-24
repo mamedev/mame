@@ -2642,9 +2642,9 @@ void model2_state::video_start()
 	save_item(NAME(m_render_test_mode));
 	save_item(NAME(m_render_unk));
 	save_item(NAME(m_render_mode));
-	save_pointer(NAME(m_palram.get()), 0x4000/2);
-	save_pointer(NAME(m_colorxlat.get()), 0xc000/2);
-	save_pointer(NAME(m_lumaram.get()), 0x10000/2);
+	save_pointer(NAME(m_palram), 0x4000/2);
+	save_pointer(NAME(m_colorxlat), 0xc000/2);
+	save_pointer(NAME(m_lumaram), 0x10000/2);
 	save_pointer(NAME(m_gamma_table), 256);
 }
 

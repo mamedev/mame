@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "ui/ui.h"
 #include "ui/devopt.h"
+#include "romload.h"
 
 
 namespace ui {

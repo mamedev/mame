@@ -2,19 +2,19 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-	Logitech bus mouse interface emulation
+    Logitech bus mouse interface emulation
 
-	References:
-	- ec1841 technical manual
-	- https://github.com/OBattler/86Box/blob/master/src/mouse_bus.c
-	- https://communities.intel.com/docs/DOC-22714
-	- http://toastytech.com/guis/msmouse.html
+    References:
+    - ec1841 technical manual
+    - https://github.com/OBattler/86Box/blob/master/src/mouse_bus.c
+    - https://communities.intel.com/docs/DOC-22714
+    - http://toastytech.com/guis/msmouse.html
 
-	To do:
-	- selectable IRQ level
-	- Microsoft protocol
-	- ec1841.0003 clone: diag mode
-	- ec1841.0003 clone: fix detection by m86v32 driver
+    To do:
+    - selectable IRQ level
+    - Microsoft protocol
+    - ec1841.0003 clone: diag mode
+    - ec1841.0003 clone: fix detection by m86v32 driver
 
 **********************************************************************/
 

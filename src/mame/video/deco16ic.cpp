@@ -268,9 +268,9 @@ void deco16ic_device::device_start()
 
 	save_item(NAME(m_pf1_8bpp_mode));
 
-	save_pointer(NAME(m_pf1_data.get()), 0x2000 / 2);
-	save_pointer(NAME(m_pf2_data.get()), 0x2000 / 2);
-	save_pointer(NAME(m_pf12_control.get()), 0x10 / 2);
+	save_pointer(NAME(m_pf1_data), 0x2000 / 2);
+	save_pointer(NAME(m_pf2_data), 0x2000 / 2);
+	save_pointer(NAME(m_pf12_control), 0x10 / 2);
 }
 
 //-------------------------------------------------

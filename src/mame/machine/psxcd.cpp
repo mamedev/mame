@@ -87,7 +87,9 @@ DEFINE_DEVICE_TYPE(PSXCD, psxcd_device, "psx_cd", "PSX CD-ROM")
 
 psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cdrom_image_device(mconfig, PSXCD, tag, owner, clock),
-	m_irq_handler(*this)
+	m_irq_handler(*this),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
+	m_spu(*this, finder_base::DUMMY_TAG)
 {
 	set_interface("psx_cdrom");
 }
@@ -97,9 +99,6 @@ void psxcd_device::device_start()
 {
 	cdrom_image_device::device_start();
 	m_irq_handler.resolve_safe();
-
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_spu = machine().device<spu_device>("spu");
 
 	unsigned int sysclk=m_maincpu->clock()/2;
 	start_read_delay=(sysclk/60);

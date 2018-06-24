@@ -89,7 +89,7 @@ void thoop2_state::video_start()
 
 	for (int i = 0; i < 5; i++){
 		m_sprite_table[i] = std::make_unique<int[]>(512);
-		save_pointer(NAME(m_sprite_table[i].get()), 512, i);
+		save_pointer(NAME(m_sprite_table[i]), 512, i);
 	}
 
 	save_item(NAME(m_sprite_count));

@@ -87,7 +87,7 @@ void deco156_state::video_start()
 	/* and register the allocated ram so that save states still work */
 	save_item(NAME(m_pf1_rowscroll));
 	save_item(NAME(m_pf2_rowscroll));
-	save_pointer(NAME(m_spriteram.get()), 0x2000/2);
+	save_pointer(NAME(m_spriteram), 0x2000/2);
 }
 
 

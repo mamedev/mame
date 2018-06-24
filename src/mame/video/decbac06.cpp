@@ -110,9 +110,9 @@ void deco_bac06_device::device_start()
 	m_rambank = 0;
 	m_flip_screen = false;
 
-	save_pointer(NAME(m_pf_data.get()), 0x4000/2);
-	save_pointer(NAME(m_pf_rowscroll.get()), 0x2000/2);
-	save_pointer(NAME(m_pf_colscroll.get()), 0x2000/2);
+	save_pointer(NAME(m_pf_data), 0x4000/2);
+	save_pointer(NAME(m_pf_rowscroll), 0x2000/2);
+	save_pointer(NAME(m_pf_colscroll), 0x2000/2);
 	save_item(NAME(m_pf_control_0));
 	save_item(NAME(m_pf_control_1));
 	save_item(NAME(m_gfxcolmask));

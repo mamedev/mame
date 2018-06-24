@@ -40,9 +40,6 @@
 #define MCFG_HD63450_DMA_WRITE_3_CB(_devcb) \
 	devcb = &downcast<hd63450_device &>(*device).set_dma_write_3_callback(DEVCB_##_devcb);
 
-#define MCFG_HD63450_CPU(_tag) \
-	downcast<hd63450_device &>(*device).set_cpu_tag(_tag);
-
 #define MCFG_HD63450_CLOCKS(_clk1, _clk2, _clk3, _clk4) \
 	downcast<hd63450_device &>(*device).set_our_clocks(_clk1, _clk2, _clk3, _clk4);
 
@@ -52,6 +49,13 @@
 class hd63450_device : public device_t
 {
 public:
+	template <typename T>
+	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: hd63450_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+	}
+
 	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_dma_end_callback(Object &&cb) { return m_dma_end.set_callback(std::forward<Object>(cb)); }
@@ -65,7 +69,6 @@ public:
 	template <class Object> devcb_base &set_dma_write_2_callback(Object &&cb) { return m_dma_write_2.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dma_write_3_callback(Object &&cb) { return m_dma_write_3.set_callback(std::forward<Object>(cb)); }
 
-	void set_cpu_tag(const char *tag) { m_cpu_tag = tag; }
 	void set_our_clocks(const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
 	{
 		m_our_clock[0] = clk1;
@@ -132,7 +135,6 @@ private:
 	devcb_write8 m_dma_write_2;
 	devcb_write8 m_dma_write_3;
 
-	const char *m_cpu_tag;
 	attotime m_our_clock[4];
 	attotime m_burst_clock[4];
 
@@ -142,7 +144,7 @@ private:
 	int m_in_progress[4];  // if a channel is in use
 	int m_transfer_size[4];
 	int m_halted[4];  // non-zero if a channel has been halted, and can be continued later.
-	cpu_device *m_cpu;
+	required_device<cpu_device> m_cpu;
 	bool m_drq_state[4];
 
 	TIMER_CALLBACK_MEMBER(dma_transfer_timer);

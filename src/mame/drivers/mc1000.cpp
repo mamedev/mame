@@ -474,7 +474,7 @@ void mc1000_state::machine_start()
 	bankswitch();
 
 	/* register for state saving */
-	save_pointer(NAME(m_banked_ram.get()), 0xc000);
+	save_pointer(NAME(m_banked_ram), 0xc000);
 	save_item(NAME(m_rom0000));
 	save_item(NAME(m_mc6845_bank));
 	save_item(NAME(m_mc6847_bank));

@@ -56,7 +56,12 @@ MACHINE_CONFIG_END
 
 agat7video_device::agat7video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AGAT7VIDEO, tag, owner, clock),
-	m_palette(*this, "a7palette")
+	m_ram_dev(*this, finder_base::DUMMY_TAG),
+	m_palette(*this, "a7palette"),
+	m_char_region(*this, finder_base::DUMMY_TAG),
+	m_char_ptr(nullptr),
+	m_char_size(0),
+	m_start_address(0)
 {
 }
 
@@ -67,6 +72,9 @@ agat7video_device::agat7video_device(const machine_config &mconfig, const char *
 
 void agat7video_device::device_start()
 {
+	m_char_ptr = m_char_region->base();
+	m_char_size = m_char_region->bytes();
+
 //  save_item(NAME(m_video_mode));
 	save_item(NAME(m_start_address));
 }

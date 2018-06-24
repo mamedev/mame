@@ -27,6 +27,20 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	enum
+	{
+		DCR_CURSOR_FUNC_ENABLE_BIT = 4,
+		DCR_CURSOR_ENABLE_BIT = 7,
+
+		DCR_CURSOR_MODE_BIT = 8,
+		DCR_CURSOR_MODE_GLYPH = 0,
+		DCR_CURSOR_MODE_CROSSHAIR = 1,
+
+		DCR_CURSOR_SIZE_BIT = 9,
+		DCR_CURSOR_SIZE_32 = 0,
+		DCR_CURSOR_SIZE_64 = 1
+	};
+
 	struct VC2_t
 	{
 		uint16_t nRegister[0x21];
@@ -128,6 +142,7 @@ private:
 		uint32_t nPalette[0x10000];
 	};
 
+	uint32_t get_cursor_pixel(int x, int y);
 
 	// internal state
 

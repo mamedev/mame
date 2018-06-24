@@ -42,7 +42,7 @@ READ16_MEMBER(nereid_device::ctrl_r)
 {
 	LOG("NEREID ctrl_r: %02X\n", offset);
 
-	switch(offset) {
+	switch(offset & 0x7f) {
 	case NEREID_BUSY:
 		return 0;
 	case NEREID_RED_DATA:
@@ -67,7 +67,7 @@ WRITE16_MEMBER(nereid_device::ctrl_w)
 {
 	LOG("NEREID: ctrl_w %02X = %02X\n", offset, data);
 	data &= 0xff;
-	switch(offset) {
+	switch(offset & 0x7f) {
 	case NEREID_RED_DATA:
 		m_red = data;
 		break;
@@ -82,7 +82,7 @@ WRITE16_MEMBER(nereid_device::ctrl_w)
 		break;
 	case NEREID_STROBE:
 		LOG("NEREID: set color index %u: rgb_t(%u,%u,%u)\n",
-		    m_index, m_red, m_green, m_blue);
+			m_index, m_red, m_green, m_blue);
 		m_palette[m_index] = rgb_t(m_red, m_green, m_blue);
 		break;
 	case NEREID_PLANE_MASK:

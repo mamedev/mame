@@ -72,7 +72,7 @@ void harriet_state::machine_start()
 {
 	m_zpram_data = std::make_unique<u8[]>(0x800);
 	subdevice<nvram_device>("zpram")->set_base(m_zpram_data.get(), 0x800);
-	save_pointer(NAME(m_zpram_data.get()), 0x800);
+	save_pointer(NAME(m_zpram_data), 0x800);
 }
 
 void harriet_state::machine_reset()

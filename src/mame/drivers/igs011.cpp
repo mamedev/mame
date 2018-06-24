@@ -324,7 +324,7 @@ void igs011_state::video_start()
 	for (int i = 0; i < 8; i++)
 	{
 		m_layer[i] = std::make_unique<uint8_t[]>(512 * 256);
-		save_pointer(NAME(m_layer[i].get()), 512 * 256, i);
+		save_pointer(NAME(m_layer[i]), 512 * 256, i);
 	}
 
 	m_lhb2_pen_hi = 0;

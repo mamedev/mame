@@ -30,8 +30,8 @@ TODO:
  - offset background scrolling positions (i.e. monkey climbing on trees);
  - camera device (type?);
  - misc unknown input/outputs;
- 
- 
+
+
 RAM Location 9240: Controls what level you are on: 0-3 (for each scene)
 
 -------------------------------------------------------------------------

@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(calcune_state, screen_update_calcune)
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, MASTER_CLOCK_NTSC, "maincpu")
 	MCFG_SEGA315_5313_IS_PAL(false)
 	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_sndirqline_callback_genesis_z80));
 	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv6irqline_callback_genesis_68k));
@@ -275,8 +275,10 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_SEGA315_5313_ALT_TIMING(1);
 	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x0000);
 	MCFG_SEGA315_5313_PALETTE("palette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 
-	MCFG_DEVICE_ADD("gen_vdp2", SEGA315_5313, 0)
+	MCFG_DEVICE_ADD("gen_vdp2", SEGA315_5313, MASTER_CLOCK_NTSC, "maincpu")
 	MCFG_SEGA315_5313_IS_PAL(false)
 //  are these not hooked up or should they OR with the other lines?
 //  MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_sndirqline_callback_genesis_z80));
@@ -285,6 +287,8 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_SEGA315_5313_ALT_TIMING(1);
 	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x0c0);
 	MCFG_SEGA315_5313_PALETTE("palette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 
 	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer2", "gen_vdp2", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
@@ -300,11 +304,6 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	/* sound hardware - VDP */
-	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
 
 void calcune_state::init_calcune()

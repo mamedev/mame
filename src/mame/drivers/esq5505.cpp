@@ -176,6 +176,7 @@ public:
 		, m_esp(*this, "esp")
 		, m_pump(*this, "pump")
 		, m_fdc(*this, "wd1772")
+		, m_floppy_connector(*this, "wd1772:0")
 		, m_panel(*this, "panel")
 		, m_dmac(*this, "mc68450")
 		, m_mdout(*this, "mdout")
@@ -186,6 +187,7 @@ public:
 	required_device<es5510_device> m_esp;
 	required_device<esq_5505_5510_pump_device> m_pump;
 	optional_device<wd1772_device> m_fdc;
+	optional_device<floppy_connector> m_floppy_connector;
 	required_device<esqpanel_device> m_panel;
 	optional_device<hd63450_device> m_dmac;
 	required_device<midi_port_device> m_mdout;
@@ -254,7 +256,8 @@ static void ensoniq_floppies(device_slot_interface &device)
 
 IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
 {
-	switch(irqline) {
+	switch(irqline)
+	{
 	case 1:
 		return M68K_INT_ACK_AUTOVECTOR;
 	case 2:
@@ -279,8 +282,7 @@ void esq5505_state::machine_start()
 
 void esq5505_state::machine_reset()
 {
-	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : nullptr;
+	floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
 
 	// Default analog values: all values are 10 bits, left-justified within 16 bits.
 	m_analog_values[0] = 0x7fc0; // pitch mod: start in the center
@@ -293,7 +295,7 @@ void esq5505_state::machine_reset()
 	m_analog_values[7] = 0x5540; // vRef to check battery.
 
 	// on VFX, bit 0 is 1 for 'cartridge present'.
-	// on VFX-SD and later, bit 0 is 1 for floppy present, bit 1 is 1 for cartridge present
+	// on VFX-SD and later, bit 0 is2 1 for floppy present, bit 1 is 1 for cartridge present
 	if (core_stricmp(machine().system().name, "vfx") == 0)
 	{
 		// todo: handle VFX cart-in when we support cartridges
@@ -314,21 +316,29 @@ void esq5505_state::machine_reset()
 	}
 }
 
-void esq5505_state::update_irq_to_maincpu() {
+void esq5505_state::update_irq_to_maincpu()
+{
 	// printf("updating IRQ state: have OTIS=%d, DMAC=%d, DUART=%d\n", otis_irq_state, dmac_irq_state, duart_irq_state);
-	if (duart_irq_state) {
+	if (duart_irq_state)
+	{
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, duart_irq_vector);
-	} else if (dmac_irq_state) {
+	}
+	else if (dmac_irq_state)
+	{
 		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, dmac_irq_vector);
-	} else if (otis_irq_state) {
+	}
+	else if (otis_irq_state)
+	{
 		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
-	} else {
+	}
+	else
+	{
 		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
@@ -456,8 +466,7 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 
 WRITE8_MEMBER(esq5505_state::duart_output)
 {
-	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : nullptr;
+	floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
 
 	m_duart_io = data;
 
@@ -478,13 +487,18 @@ WRITE8_MEMBER(esq5505_state::duart_output)
 	    bit 7 = SACK (?)
 	*/
 
-	if (data & 0x40) {
-		if (!m_pump->get_esp_halted()) {
+	if (data & 0x40)
+	{
+		if (!m_pump->get_esp_halted())
+		{
 			logerror("ESQ5505: Asserting ESPHALT\n");
 			m_pump->set_esp_halted(true);
 		}
-	} else {
-		if (m_pump->get_esp_halted()) {
+	}
+	else
+	{
+		if (m_pump->get_esp_halted())
+		{
 			logerror("ESQ5505: Clearing ESPHALT\n");
 			m_pump->set_esp_halted(false);
 		}
@@ -663,8 +677,7 @@ MACHINE_CONFIG_START(esq5505_state::eps)
 	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 
-	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible
-	MCFG_HD63450_CPU("maincpu") // CPU - 68000
+	MCFG_DEVICE_ADD("mc68450", HD63450, "maincpu")   // MC68450 compatible
 	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
 	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
 	MCFG_HD63450_DMA_END_CB(WRITE8(*this, esq5505_state, dma_end))
@@ -977,8 +990,7 @@ void esq5505_state::init_common()
 	m_system_type = GENERIC;
 	m_duart_io = 0;
 
-	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : nullptr;
+	floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
 	if (floppy)
 	{
 		m_fdc->set_floppy(floppy);

@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-	Logitech bus mouse interface emulation
+    Logitech bus mouse interface emulation
 
 **********************************************************************/
 

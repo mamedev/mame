@@ -13,9 +13,11 @@ DEFINE_DEVICE_TYPE(ISBC_208, isbc_208_device, "isbc_208", "ISBC 208 Flexible Dis
 
 isbc_208_device::isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISBC_208, tag, owner, clock),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_dmac(*this, "dmac"),
 	m_fdc(*this, "fdc"),
-	m_out_irq_func(*this)
+	m_out_irq_func(*this),
+	m_maincpu_mem(nullptr)
 {
 }
 
@@ -65,7 +67,7 @@ WRITE_LINE_MEMBER(isbc_208_device::irq_w)
 
 WRITE_LINE_MEMBER(isbc_208_device::hreq_w)
 {
-	machine().device<cpu_device>(m_maincpu_tag)->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	/* Assert HLDA */
 	m_dmac->hack_w(state);
 }
@@ -121,7 +123,7 @@ void isbc_208_device::device_reset()
 
 void isbc_208_device::device_start()
 {
-	m_maincpu_mem = &machine().device<cpu_device>(m_maincpu_tag)->space(AS_PROGRAM);
+	m_maincpu_mem = &m_maincpu->space(AS_PROGRAM);
 	m_out_irq_func.resolve_safe();
 }
 
