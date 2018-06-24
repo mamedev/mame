@@ -156,7 +156,7 @@ public:
 protected:
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<tms9995_device> m_maincpu;
 	required_device<sn76489_device> m_psg;
 	required_device<meters_device> m_meters;
 public:
@@ -239,15 +239,14 @@ WRITE8_MEMBER(jpmmps_state::jpmmps_ic22_portc_w)
 void jpmmps_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
-	cpu->ready_line(ASSERT_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpmmps_map, jpmmps_io_map)
+	MCFG_TMS99xx_ADD(m_maincpu, TMS9995, MAIN_CLOCK, jpmmps_map, jpmmps_io_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC10
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // watchdog

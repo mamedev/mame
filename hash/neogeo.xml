@@ -1205,7 +1205,7 @@
 			</dataarea>
 			<dataarea name="ymsnd.deltat" size="0x80000">
 				<rom name="v21" offset="0x000000" size="0x080000" crc="7abf113d" sha1="5b2a0e70f2eaf4638b44702dacd4cb17838fb1d5" />
-			</dataarea>			
+			</dataarea>
 			<dataarea name="sprites" size="0x400000">
 				<!-- note, load32_byte -->
 				<rom loadflag="load32_byte" name="c11" offset="0x000000" size="0x080000" crc="7a5158b3" sha1="01dd241534c16e81ce1113a53495606d8f907e1e" />
@@ -1219,7 +1219,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!--
 	ID-0021
 	. NGM-021
@@ -4678,6 +4678,46 @@
 				<rom loadflag="load16_byte" name="088-c2.c2" offset="0x000001" size="0x200000" crc="4d865347" sha1="ad448cf96f3dce44c83412ed6878c495eb4a8a1e" />    <!-- TC5316200 -->
 				<rom loadflag="load16_byte" name="088-c3.c3" offset="0x400000" size="0x200000" crc="8fa5a9eb" sha1="7bee19d8a2bccedd8e2cf0c0e9138902b9dafc23" />    <!-- TC5316200 -->
 				<rom loadflag="load16_byte" name="088-c4.c4" offset="0x400001" size="0x200000" crc="4604f0dc" sha1="ddf5dbb5e07313998a8f695ad19354ea54585dd6" />    <!-- TC5316200 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stakwindev" cloneof="stakwin" supported="no">
+		<description>Stakes Winner / Stakes Winner - GI Kinzen  Seiha e no Michi (early development board)</description>
+		<year>1995</year>
+		<publisher>Saurus</publisher>
+		<info name="alt_title" value="ステークスウィナー"/>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_byte" name="sp1.sp1" offset="0x000001" size="0x080000" crc="96b58fa4" sha1="23c8c2a4d7a16838fb54306fb193b355edc75060" />
+				<rom loadflag="load16_byte" name="sp2.sp2" offset="0x000000" size="0x080000" crc="4e7202ee" sha1="ab10dda5594ad8a21af219c6907a9841de7384c3" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="s1.s1" crc="2193d089" sha1="1b6f57d2f4265f210194488356fc3653dfa35932" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x080000">
+				<rom offset="0x000000" size="0x080000" name="m1.m1" crc="daedbcd7" sha1="d6d0e67ff7865ff5a0262aba381468e198d50536" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x200000">
+				<rom name="v1.v1" offset="0x000000" size="0x080000" crc="ac590b85" sha1="47ff2ba9648b7145c29b534cd1f6839abb43bee2" />
+				<rom name="v2.v2" offset="0x080000" size="0x080000" crc="23ad8a91" sha1="da620c182fe9fc36421da73f2937e627d9a641bf" />
+				<rom name="v3.v3" offset="0x100000" size="0x080000" crc="e2d216b6" sha1="28b70e57a352ef6a08a5564f7756113a66e7dbb7" />
+				</dataarea>
+			<dataarea name="sprites" size="0x800000">
+				<rom loadflag="load32_byte" name="c1.c1"   offset="0x000000" size="0x080000" crc="fb2f29d3" sha1="1f4cf27d7da1262bae28a8dd88c56d8a9324e982" />
+				<rom loadflag="load32_byte" name="c2.c2"   offset="0x000002" size="0x080000" crc="6108e6db" sha1="f4cdb5df29698f1ba362a227b82d43c3baaa8948" />
+				<rom loadflag="load32_byte" name="c3.c3"   offset="0x000001" size="0x080000" crc="702a21b1" sha1="79006062b516bda35bb77c864ba9ea26135ee8ed" />
+				<rom loadflag="load32_byte" name="c4.c4"   offset="0x000003" size="0x080000" crc="3223b05f" sha1="1595f8029f71c3acd949ddd5539d62424c0b697e" />
+				<rom loadflag="load32_byte" name="c5.c5"   offset="0x200000" size="0x080000" crc="36b93e77" sha1="19431b1ad44b9418f26b94c15572d11caec0994e" />
+				<rom loadflag="load32_byte" name="c6.c6"   offset="0x200002" size="0x080000" crc="a7a104c8" sha1="421a8ef11e299b7379a8198c871c8f11ad97deb0" />
+				<rom loadflag="load32_byte" name="c7.c7"   offset="0x200001" size="0x080000" crc="f0d8b2ca" sha1="2565a44d3ee9375af595d84638c7a76f631f8f9b" />
+				<rom loadflag="load32_byte" name="c8.c8"   offset="0x200003" size="0x080000" crc="3bdd06eb" sha1="dce84eb477229dfa8233cde8b946b64db1efae1d" />
+				<rom loadflag="load32_byte" name="c9.c9"   offset="0x400000" size="0x080000" crc="25621e44" sha1="3e380c1f52233dd1346c0363d920d1f96491cc45" />
+				<rom loadflag="load32_byte" name="c10.c10" offset="0x400002" size="0x080000" crc="17b2115e" sha1="8c5d1b12ac7e739a7ac1f2189a2f3ca959d06377" />
+				<rom loadflag="load32_byte" name="c11.c11" offset="0x400001" size="0x080000" crc="7d3cd161" sha1="5ac30c35e815dd2b0235394c1768e419395a1b5a" />
+				<rom loadflag="load32_byte" name="c12.c12" offset="0x400003" size="0x080000" crc="c6970ed6" sha1="e963d0a5fb718e0eec2115d63ab34a0de0523792" />
 			</dataarea>
 		</part>
 	</software>
@@ -8257,7 +8297,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 <software name="mslug3a" cloneof="mslug3"> <!-- see neogeo.cpp for notes on this set -->
 		<description>Metal Slug 3 (NGM-2560, earlier)</description>
 		<year>2000</year>
@@ -8302,7 +8342,7 @@
 				<rom loadflag="load16_byte" name="256-c8.c8" offset="0x3000001" size="0x800000" crc="4d9be34c" sha1="a737bdfa2b815aea7067e7af2636e83a9409c414" />   <!-- TC5364205 -->
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="mslug3h" cloneof="mslug3">
 		<description>Metal Slug 3 (NGH-2560)</description>

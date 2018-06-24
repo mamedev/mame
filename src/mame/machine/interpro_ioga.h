@@ -134,8 +134,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ir6_w) { set_int_line(INT_HARD_EX, IRQ_VB, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir7_w) { set_int_line(INT_HARD_EX, IRQ_9, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir8_w) { set_int_line(INT_HARD_EX, IRQ_CBUS3, state); }
-	// FIXME: mc146818 inverts the normal irq state convention
-	DECLARE_WRITE_LINE_MEMBER(ir9_w) { set_int_line(INT_HARD_EX, IRQ_RTC, !state); }
+	DECLARE_WRITE_LINE_MEMBER(ir9_w) { set_int_line(INT_HARD_EX, IRQ_RTC, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_int_line(INT_HARD_EX, IRQ_60HZ, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir11_w) { set_int_line(INT_HARD_EX, IRQ_SERIAL, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir12_w) { set_int_line(INT_HARD_EX, IRQ_ETHERNET, state); }

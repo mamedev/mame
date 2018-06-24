@@ -27,6 +27,7 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "cdrom.h"
+#include "romload.h"
 #include "sound/cdda.h"
 
 

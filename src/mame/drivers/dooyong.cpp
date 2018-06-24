@@ -207,7 +207,7 @@ protected:
 	DECLARE_VIDEO_START(flytiger)
 	{
 		m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
-		save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
+		save_pointer(NAME(m_paletteram_flytiger), 0x1000);
 
 		m_palette_bank = 0;
 
@@ -279,7 +279,7 @@ protected:
 	DECLARE_VIDEO_START(pollux)
 	{
 		m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
-		save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
+		save_pointer(NAME(m_paletteram_flytiger), 0x1000);
 
 		m_palette_bank = 0;
 

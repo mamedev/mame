@@ -305,7 +305,7 @@ void alpha_8201_device::device_start()
 	memset(m_mcu_r, 0, sizeof(m_mcu_r));
 
 	// register for savestates
-	save_pointer(NAME(m_shared_ram.get()), 0x400);
+	save_pointer(NAME(m_shared_ram), 0x400);
 	save_item(NAME(m_bus));
 	save_item(NAME(m_mcu_address));
 	save_item(NAME(m_mcu_d));

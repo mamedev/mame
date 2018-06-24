@@ -104,7 +104,7 @@ public:
 	void mnight(machine_config &config);
 
 	void mnight_main_cpu(address_map &map);
-	
+
 	void init_mnight();
 	TILE_GET_INFO_MEMBER(mnight_get_bg_tile_info);
 	DECLARE_VIDEO_START(mnight);
@@ -123,7 +123,7 @@ public:
 	void robokid_main_cpu(address_map &map);
 
 	DECLARE_READ8_MEMBER(motion_error_verbose_r);
-	
+
 	template<int Layer> DECLARE_READ8_MEMBER(robokid_bg_videoram_r);
 	template<int Layer> DECLARE_WRITE8_MEMBER(robokid_bg_videoram_w);
 	template<int Layer> DECLARE_WRITE8_MEMBER(robokid_bg_ctrl_w);
@@ -155,14 +155,14 @@ public:
 		m_dsw_io(*this, "DIPSW%u", 1U),
 		m_pad_io(*this, "PAD%u", 1U)
 	{ }
-	
+
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_READ8_MEMBER(io_protection_r);
 	DECLARE_WRITE8_MEMBER(io_protection_w);
 
 	void omegaf(machine_config &config);
 	void omegaf_main_cpu(address_map &map);
-	
+
 	DECLARE_VIDEO_START(omegaf);
 	TILEMAP_MAPPER_MEMBER(omegaf_bg_scan);
 	uint32_t screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

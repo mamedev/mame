@@ -154,7 +154,7 @@ ioport_constructor s100_8k_sc_device::device_input_ports() const
 void s100_8k_sc_device::device_start()
 {
 	m_ram = make_unique_clear<u8[]>(0x2000);
-	save_pointer(NAME(m_ram.get()), 0x2000);
+	save_pointer(NAME(m_ram), 0x2000);
 }
 
 

@@ -152,6 +152,7 @@
 #define SCC2_TAG        "scc2"
 #define ESP_TAG         "esp"
 #define FDC_TAG         "fdc"
+#define FLOPPY_CONN_TAG "fdc:0"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define KEYBOARD_TAG    "keyboard"
@@ -165,6 +166,7 @@ public:
 		m_scc1(*this, SCC1_TAG),
 		m_scc2(*this, SCC2_TAG),
 		m_fdc(*this, FDC_TAG),
+		m_floppy_connector(*this, FLOPPY_CONN_TAG),
 		m_p_ram(*this, "p_ram"),
 		m_bw2_vram(*this, "bw2_vram")
 	{ }
@@ -173,6 +175,7 @@ public:
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
 	optional_device<n82077aa_device> m_fdc;
+	optional_device<floppy_connector> m_floppy_connector;
 	virtual void machine_reset() override;
 
 	required_shared_ptr<uint32_t> m_p_ram;
@@ -282,8 +285,9 @@ READ32_MEMBER( sun3x_state::fdc_control_r )
 	// 2 = hd
 	// 3 = dd
 
-	if(m_fdc) {
-		floppy_image_device *fdev = machine().device<floppy_connector>(":fdc:0")->get_device();
+	if (m_fdc)
+	{
+		floppy_image_device *fdev = m_floppy_connector->get_device();
 		if(fdev->exists()) {
 			uint32_t variant = fdev->get_variant();
 			switch(variant) {

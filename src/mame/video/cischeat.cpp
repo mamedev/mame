@@ -860,7 +860,7 @@ uint32_t cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind1
 	int i;
 
 	bitmap.fill(0x1000, cliprect);
-	
+
 	for (i = 7; i >= 4; i--)
 	{
 		/* bitmap, cliprect, road, min_priority, max_priority, transparency */

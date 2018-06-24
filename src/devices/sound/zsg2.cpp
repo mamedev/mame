@@ -92,8 +92,8 @@ void zsg2_device::device_start()
 	m_full_samples = make_unique_clear<int16_t[]>(m_mem_blocks * 4 + 4); // +4 is for empty block
 
 	// register for savestates
-	save_pointer(NAME(m_mem_copy.get()), m_mem_blocks / sizeof(uint32_t));
-	save_pointer(NAME(m_full_samples.get()), (m_mem_blocks * 4 + 4) / sizeof(int16_t));
+	save_pointer(NAME(m_mem_copy), m_mem_blocks / sizeof(uint32_t));
+	save_pointer(NAME(m_full_samples), (m_mem_blocks * 4 + 4) / sizeof(int16_t));
 	save_item(NAME(m_read_address));
 
 	for (int ch = 0; ch < 48; ch++)

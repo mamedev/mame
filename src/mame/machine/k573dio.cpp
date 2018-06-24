@@ -113,7 +113,7 @@ void k573dio_device::device_start()
 {
 	output_cb.resolve_safe();
 	ram = std::make_unique<uint16_t[]>(12 * 1024 * 1024 );
-	save_pointer( NAME(ram.get()), 12 * 1024 * 1024 );
+	save_pointer(NAME(ram), 12 * 1024 * 1024 );
 }
 
 void k573dio_device::device_reset()

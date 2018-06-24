@@ -273,7 +273,7 @@ void _1942p_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int code = (m_spriteram[offs] & 0x7f) + 4 * (m_spriteram[offs + 3] & 0x20)
-				    + 2 * (m_spriteram[offs] & 0x80);
+					+ 2 * (m_spriteram[offs] & 0x80);
 		int col = m_spriteram[offs + 3] & 0x0f;
 
 

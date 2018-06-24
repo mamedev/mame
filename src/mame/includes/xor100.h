@@ -34,7 +34,6 @@ public:
 	xor100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, Z80_TAG)
-		, m_dbrg(*this, COM5016_TAG)
 		, m_uart_a(*this, I8251_A_TAG)
 		, m_uart_b(*this, I8251_B_TAG)
 		, m_fdc(*this, WD1795_TAG)
@@ -52,7 +51,6 @@ public:
 	DECLARE_WRITE8_MEMBER( mmu_w );
 	DECLARE_WRITE8_MEMBER( prom_toggle_w );
 	DECLARE_READ8_MEMBER( prom_disable_r );
-	DECLARE_WRITE8_MEMBER( baud_w );
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_READ8_MEMBER( fdc_wait_r );
@@ -79,7 +77,6 @@ protected:
 	void post_load();
 
 	required_device<cpu_device> m_maincpu;
-	required_device<com8116_device> m_dbrg;
 	required_device<i8251_device> m_uart_a;
 	required_device<i8251_device> m_uart_b;
 	required_device<fd1795_device> m_fdc;

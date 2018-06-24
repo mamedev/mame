@@ -26,6 +26,7 @@
 #include "emuopts.h"
 #include "mame.h"
 #include "rendutil.h"
+#include "romload.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
 #include "luaengine.h"

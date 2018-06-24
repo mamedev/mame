@@ -117,7 +117,7 @@ gime_device::gime_device(const machine_config &mconfig, device_type type, const 
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_ram(*this, finder_base::DUMMY_TAG)
 	, m_cart_device(*this, finder_base::DUMMY_TAG)
-    , m_rom(nullptr)
+	, m_rom(nullptr)
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -130,16 +130,16 @@ gime_device::gime_device(const machine_config &mconfig, device_type type, const 
 
 void gime_device::device_start(void)
 {
-    if (!m_ram->started())
-        throw device_missing_dependencies();
+	if (!m_ram->started())
+		throw device_missing_dependencies();
 
-    if (!m_cart_device->started())
-        throw device_missing_dependencies();
+	if (!m_cart_device->started())
+		throw device_missing_dependencies();
 
-    if (!m_cpu->started())
-        throw device_missing_dependencies();
-    
-    // inherited device_start - need to do this after checking dependencies
+	if (!m_cpu->started())
+		throw device_missing_dependencies();
+
+	// inherited device_start - need to do this after checking dependencies
 	super::device_start();
 
 	// initialize variables
@@ -168,8 +168,8 @@ void gime_device::device_start(void)
 	m_read_floating_bus.resolve_safe(0);
 
 	// set up ROM/RAM pointers
-    m_rom = m_rom_region->base();
-    m_cart_rom = m_cart_device->get_cart_base();
+	m_rom = m_rom_region->base();
+	m_cart_rom = m_cart_device->get_cart_base();
 	m_cart_size = m_cart_device->get_cart_size();
 
 	// populate palettes
