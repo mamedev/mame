@@ -2296,14 +2296,10 @@ READ8_MEMBER(apple2e_state::c800_r)
 		return mig_r(offset-0x600);
 	}
 
-	if (offset == 0x7ff)
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		if (!machine().side_effects_disabled())
-		{
-			m_cnxx_slot = CNXX_UNCLAIMED;
-			update_slotrom_banks();
-		}
-
+		m_cnxx_slot = CNXX_UNCLAIMED;
+		update_slotrom_banks();
 		return 0xff;
 	}
 
@@ -2324,12 +2320,9 @@ READ8_MEMBER(apple2e_state::c800_int_r)
 
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		if (!machine().side_effects_disabled())
-		{
-			m_cnxx_slot = CNXX_UNCLAIMED;
-			m_intc8rom = false;
-			update_slotrom_banks();
-		}
+		m_cnxx_slot = CNXX_UNCLAIMED;
+		m_intc8rom = false;
+		update_slotrom_banks();
 	}
 
 	if (m_iscec)
@@ -2349,12 +2342,9 @@ READ8_MEMBER(apple2e_state::c800_b2_int_r)
 
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		if (!machine().side_effects_disabled())
-		{
-			m_cnxx_slot = CNXX_UNCLAIMED;
-			m_intc8rom = false;
-			update_slotrom_banks();
-		}
+		m_cnxx_slot = CNXX_UNCLAIMED;
+		m_intc8rom = false;
+		update_slotrom_banks();
 	}
 
 	return m_rom_ptr[0x4800 + offset];
