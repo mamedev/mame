@@ -333,8 +333,8 @@ void menu_font_ui::populate(float &customtop, float &custombottom)
 #ifdef UI_WINDOWS
 	if (m_fonts[m_actual].first != "default")
 	{
-		item_append(_("Bold"), m_bold ? "On" : "Off", m_bold ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(uintptr_t)MUI_BOLD);
-		item_append(_("Italic"), m_italic ? "On" : "Off", m_italic ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(uintptr_t)MUI_ITALIC);
+		item_append_on_off(_("Bold"), m_bold, 0, (void *)(uintptr_t)MUI_BOLD);
+		item_append_on_off(_("Italic"), m_italic, 0, (void *)(uintptr_t)MUI_ITALIC);
 	}
 #endif
 
