@@ -1052,7 +1052,7 @@ void k055673_device::device_start()
 	memset(m_kx46_regs, 0, 8);
 	memset(m_kx47_regs, 0, 32);
 
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 	save_item(NAME(m_kx46_regs));
 	save_item(NAME(m_kx47_regs));
 	save_item(NAME(m_objcha_line));
@@ -1134,7 +1134,7 @@ void k053247_device::device_start()
 
 	m_ram = make_unique_clear<uint16_t[]>(0x1000 / 2);
 
-	save_pointer(NAME(m_ram.get()), 0x1000 / 2);
+	save_pointer(NAME(m_ram), 0x1000 / 2);
 	save_item(NAME(m_kx46_regs));
 	save_item(NAME(m_kx47_regs));
 	save_item(NAME(m_objcha_line));

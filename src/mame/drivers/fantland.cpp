@@ -396,7 +396,7 @@ void fantland_state::borntofi_adpcm_int( msm5205_device *device, int voice )
 	}
 	else
 	{
-		device->data_w(rom[start / 2] >> ((start & 1) * 4));
+		device->write_data(rom[start / 2] >> ((start & 1) * 4));
 		m_adpcm_nibble[voice]++;
 	}
 }

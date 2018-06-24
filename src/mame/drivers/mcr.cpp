@@ -2964,7 +2964,7 @@ void mcr_state::init_demoderb()
 	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::demoderb_op4_w),this));
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	machine().device<cpu_device>("ssio:cpu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	m_ssio->suspend_cpu();
 }
 
 

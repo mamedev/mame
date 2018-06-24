@@ -96,6 +96,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	void pachifev(machine_config &config);
+
+private:
 	/* controls related */
 	int m_power;
 	int m_max_power;
@@ -103,17 +106,18 @@ public:
 	int m_previous_power;
 	int m_cnt;
 
+#if USE_MSM
 	uint32_t m_adpcm_pos;
 	uint8_t m_adpcm_idle;
 	uint8_t m_trigger;
 	uint8_t m_adpcm_data;
+#endif
 	DECLARE_WRITE8_MEMBER(controls_w);
 	DECLARE_READ8_MEMBER(controls_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
-	required_device<cpu_device> m_maincpu;
-	void pachifev(machine_config &config);
+	required_device<tms9995_device> m_maincpu;
 	void pachifev_cru(address_map &map);
 	void pachifev_map(address_map &map);
 };
@@ -288,11 +292,10 @@ WRITE_LINE_MEMBER(pachifev_state::pf_adpcm_int)
 
 void pachifev_state::machine_reset()
 {
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
 	// Pulling down the line on RESET configures the CPU to insert one wait
 	// state on external memory accesses
-	cpu->ready_line(CLEAR_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	m_maincpu->ready_line(CLEAR_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 
 	m_power=0;
 	m_max_power=0;

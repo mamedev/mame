@@ -22,12 +22,12 @@ public:
 		, m_palette(*this, "palette")
 		, m_cps3sound(*this, "cps3sound")
 		, m_simm{{*this, "simm1.%u", 0U},
-		         {*this, "simm2.%u", 0U},
-		         {*this, "simm3.%u", 0U},
-		         {*this, "simm4.%u", 0U},
-		         {*this, "simm5.%u", 0U},
-		         {*this, "simm6.%u", 0U},
-		         {*this, "simm7.%u", 0U}}
+				 {*this, "simm2.%u", 0U},
+				 {*this, "simm3.%u", 0U},
+				 {*this, "simm4.%u", 0U},
+				 {*this, "simm5.%u", 0U},
+				 {*this, "simm6.%u", 0U},
+				 {*this, "simm7.%u", 0U}}
 		, m_mainram(*this, "mainram")
 		, m_spriteram(*this, "spriteram")
 		, m_colourram(*this, "colourram")

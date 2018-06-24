@@ -52,8 +52,8 @@ Ver. 2.2 should exist
 class mgavegas_state : public driver_device
 {
 public:
-	mgavegas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mgavegas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ay(*this, "aysnd"),
 		m_msm(*this, "5205"),
@@ -353,7 +353,7 @@ WRITE8_MEMBER(mgavegas_state::csoki_w)
 	if (LOG_MSM5205)
 		logerror("MSM5205 write to %04X data = %02X \n",offset+0xc800,data);
 	m_msm->reset_w(data&0x10>>4);
-	m_msm->data_w(data&0x0f);
+	m_msm->write_data(data&0x0f);
 }
 
 

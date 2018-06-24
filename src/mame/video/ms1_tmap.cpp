@@ -137,7 +137,7 @@ void megasys1_tilemap_device::device_reset()
 	// TODO: might be something else (smaller VRAM size?)
 	for(int i=0;i<m_scrollram.bytes()/2;i++)
 		m_scrollram[i] = 0xffff;
-	
+
 	m_tile_bank = 0;
 }
 
@@ -236,7 +236,7 @@ TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_16x16)
 	uint16_t code = m_scrollram[tile_index/4];
 	uint16_t tile = ((code & 0xfff) + m_tile_bank) * m_16x16_scroll_factor;
 	tile+= tile_index & 3;
-	
+
 	SET_TILE_INFO_MEMBER(0, tile, code >> (16 - m_bits_per_color_code), 0);
 }
 

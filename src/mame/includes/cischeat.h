@@ -212,7 +212,7 @@ public:
 
 protected:
 	virtual void video_start() override;
-	
+
 private:
 	uint16_t m_sprite_dma_reg;
 };

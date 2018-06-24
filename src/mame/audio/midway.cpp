@@ -56,6 +56,15 @@ midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char
 
 
 //-------------------------------------------------
+//  suspend_cpu
+//-------------------------------------------------
+
+void midway_ssio_device::suspend_cpu()
+{
+	m_cpu->suspend(SUSPEND_REASON_DISABLE, 1);
+}
+
+//-------------------------------------------------
 //  read - return the status value
 //-------------------------------------------------
 

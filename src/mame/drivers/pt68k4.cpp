@@ -102,6 +102,7 @@ public:
 		, m_isa(*this, ISABUS_TAG)
 		, m_speaker(*this, SPEAKER_TAG)
 		, m_wdfdc(*this, WDFDC_TAG)
+		, m_floppy_connector(*this, WDFDC_TAG":%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(hiram_r);
@@ -138,6 +139,7 @@ private:
 	required_device<isa8_device> m_isa;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<wd1772_device> m_wdfdc;
+	optional_device_array<floppy_connector, 2> m_floppy_connector;
 
 	void irq5_update();
 
@@ -210,10 +212,8 @@ READ8_MEMBER(pt68k4_state::pia_stub_r)
 
 WRITE8_MEMBER(pt68k4_state::fdc_select_w)
 {
-	floppy_connector *con = machine().device<floppy_connector>(WDFDC_TAG":0");
-	floppy_connector *con2 = machine().device<floppy_connector>(WDFDC_TAG":1");
-	floppy_image_device *floppy = con ? con->get_device() : nullptr;
-	floppy_image_device *floppy2 = con2 ? con2->get_device() : nullptr;
+	floppy_image_device *floppy = m_floppy_connector[0] ? m_floppy_connector[0]->get_device() : nullptr;
+	floppy_image_device *floppy2 = m_floppy_connector[1] ? m_floppy_connector[1]->get_device() : nullptr;
 	int drive = data & 3;
 
 	if (drive != m_lastdrive)
@@ -350,8 +350,7 @@ void pt68k4_state::machine_reset()
 
 	if (m_wdfdc)
 	{
-		floppy_connector *con = machine().device<floppy_connector>(WDFDC_TAG":0");
-		floppy_image_device *floppy = con ? con->get_device() : nullptr;
+		floppy_image_device *floppy = m_floppy_connector[0] ? m_floppy_connector[0]->get_device() : nullptr;
 
 		m_wdfdc->set_floppy(floppy);
 		floppy->ss_w(0);
@@ -421,8 +420,8 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
 
 	MCFG_DEVICE_ADD(WDFDC_TAG, WD1772, 16_MHz_XTAL / 2)
-	MCFG_FLOPPY_DRIVE_ADD(WDFDC_TAG":0", pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WDFDC_TAG":1", pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[0], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[1], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 
 	MCFG_DEVICE_ADD(ISABUS_TAG, ISA8, 0)
 	MCFG_ISA8_CPU(M68K_TAG)

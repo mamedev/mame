@@ -71,6 +71,7 @@ DECLARE_DEVICE_TYPE(TMS9129,  tms9129_device)
 
 class tms9928a_device : public device_t,
 						public device_memory_interface,
+						public device_palette_interface,
 						public device_video_interface
 {
 public:
@@ -123,6 +124,9 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 16; }
+
 private:
 	void change_register(uint8_t reg, uint8_t val);
 	void check_interrupt();
@@ -157,7 +161,6 @@ private:
 	const bool    m_50hz;
 	const bool    m_reva;
 	const bool    m_99;
-	rgb_t   m_palette[16];
 
 	/* memory */
 	const address_space_config      m_space_config;

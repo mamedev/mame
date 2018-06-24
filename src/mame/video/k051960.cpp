@@ -205,7 +205,7 @@ void k051960_device::device_start()
 	save_item(NAME(m_readroms));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_spriterombank));
-	save_pointer(NAME(m_ram.get()), 0x400);
+	save_pointer(NAME(m_ram), 0x400);
 }
 
 //-------------------------------------------------

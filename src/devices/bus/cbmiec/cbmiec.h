@@ -93,11 +93,11 @@ public:
 	DECLARE_READ_LINE_MEMBER( reset_r ) { return get_signal(RESET); }
 
 	// writes for host (driver_device)
-	DECLARE_WRITE_LINE_MEMBER( srq_w ) { set_signal(this, SRQ, state); }
-	DECLARE_WRITE_LINE_MEMBER( atn_w ) { set_signal(this, ATN, state); }
-	DECLARE_WRITE_LINE_MEMBER( clk_w ) { set_signal(this, CLK, state); }
-	DECLARE_WRITE_LINE_MEMBER( data_w ) { set_signal(this, DATA, state); }
-	DECLARE_WRITE_LINE_MEMBER( reset_w ) { set_signal(this, RESET, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_srq_w ) { set_signal(this, SRQ, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_atn_w ) { set_signal(this, ATN, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_clk_w ) { set_signal(this, CLK, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_data_w ) { set_signal(this, DATA, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_reset_w ) { set_signal(this, RESET, state); }
 
 	// writes for peripherals (device_t)
 	void srq_w(device_t *device, int state) { set_signal(device, SRQ, state); }

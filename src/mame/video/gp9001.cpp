@@ -263,7 +263,7 @@ void gp9001vdp_device::device_start()
 
 	m_raise_irq_timer = timer_alloc(TIMER_RAISE_IRQ);
 
-	save_pointer(NAME(sp.vram16_buffer.get()), SPRITERAM_SIZE/2);
+	save_pointer(NAME(sp.vram16_buffer), SPRITERAM_SIZE/2);
 
 	save_item(NAME(gp9001_scroll_reg));
 	save_item(NAME(gp9001_voffs));

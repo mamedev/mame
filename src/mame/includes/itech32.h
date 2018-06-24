@@ -9,6 +9,7 @@
 
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/timekpr.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -31,6 +32,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ticket(*this, "ticket"),
+		m_timekeeper(*this, "m48t02"),
 		m_main_ram(*this, "main_ram", 0),
 		m_nvram(*this, "nvram", 0),
 		m_video(*this, "video", 0),
@@ -50,6 +52,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_ticket;
+	optional_device<timekeeper_device> m_timekeeper;
 
 	optional_shared_ptr<uint16_t> m_main_ram;
 	optional_shared_ptr<uint16_t> m_nvram;

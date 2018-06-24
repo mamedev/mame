@@ -2217,8 +2217,8 @@ int saturn_state::stv_vdp1_start ( void )
 	m_vdp1.user_cliprect.set(0, 512, 0, 256);
 
 	// save state
-	save_pointer(NAME(m_vdp1_regs.get()), 0x020/2);
-	save_pointer(NAME(m_vdp1_vram.get()), 0x100000/4);
+	save_pointer(NAME(m_vdp1_regs), 0x020/2);
+	save_pointer(NAME(m_vdp1_vram), 0x100000/4);
 	save_item(NAME(m_vdp1.fbcr_accessed));
 	save_item(NAME(m_vdp1.framebuffer_current_display));
 	save_item(NAME(m_vdp1.framebuffer_current_draw));

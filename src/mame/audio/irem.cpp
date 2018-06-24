@@ -227,12 +227,12 @@ WRITE8_MEMBER( irem_audio_device::m52_adpcm_w )
 {
 	if (offset & 1)
 	{
-		m_adpcm1->data_w(data);
+		m_adpcm1->write_data(data);
 	}
 	if (offset & 2)
 	{
 		if (m_adpcm2 != nullptr)
-			m_adpcm2->data_w(data);
+			m_adpcm2->write_data(data);
 	}
 }
 
@@ -241,7 +241,7 @@ WRITE8_MEMBER( irem_audio_device::m62_adpcm_w )
 {
 	msm5205_device *adpcm = (offset & 1) ? m_adpcm2.target() : m_adpcm1.target();
 	if (adpcm != nullptr)
-		adpcm->data_w(data);
+		adpcm->write_data(data);
 }
 
 

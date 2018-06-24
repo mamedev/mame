@@ -338,7 +338,7 @@ void tv912_state::machine_start()
 	save_item(NAME(m_lpt_select));
 	save_item(NAME(m_4hz_flasher));
 	save_item(NAME(m_keyboard_scan));
-	save_pointer(NAME(m_dispram.get()), 0x1000);
+	save_pointer(NAME(m_dispram), 0x1000);
 }
 
 void tv912_state::machine_reset()
