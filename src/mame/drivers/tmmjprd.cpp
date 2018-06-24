@@ -374,10 +374,10 @@ void tmmjprd_state::video_start()
 	m_tilemap_ram[3] = make_unique_clear<uint32_t[]>(0x8000);
 
 
-	save_pointer(NAME(m_tilemap_ram[0].get()), 0x8000);
-	save_pointer(NAME(m_tilemap_ram[1].get()), 0x8000);
-	save_pointer(NAME(m_tilemap_ram[2].get()), 0x8000);
-	save_pointer(NAME(m_tilemap_ram[3].get()), 0x8000);
+	save_pointer(NAME(m_tilemap_ram[0]), 0x8000);
+	save_pointer(NAME(m_tilemap_ram[1]), 0x8000);
+	save_pointer(NAME(m_tilemap_ram[2]), 0x8000);
+	save_pointer(NAME(m_tilemap_ram[3]), 0x8000);
 
 	save_item(NAME(m_old_brt1));
 	save_item(NAME(m_old_brt2));

@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_DEC8_H
+#define MAME_INCLUDES_DEC8_H
+
+#pragma once
+
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "sound/msm5205.h"
@@ -18,8 +23,8 @@ public:
 		TIMER_DEC8_M6502
 	};
 
-	dec8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dec8_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
@@ -37,7 +42,8 @@ public:
 		m_bg_data(*this, "bg_data"),
 		m_mainbank(*this, "mainbank"),
 		m_soundbank(*this, "soundbank"),
-		m_coin_port(*this, "I8751") { }
+		m_coin_port(*this, "I8751")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -215,3 +221,5 @@ private:
 	/* ports */
 	optional_ioport m_coin_port;
 };
+
+#endif // MAME_INCLUDES_DEC8_H

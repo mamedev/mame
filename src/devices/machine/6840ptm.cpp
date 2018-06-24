@@ -307,6 +307,10 @@ uint16_t ptm6840_device::compute_counter( int counter ) const
 	else
 	{
 		clk = m_external_clock[counter];
+		if (counter == 2)
+		{
+			clk /= m_t3_divisor;
+		}
 		LOG("Timer #%d external clock freq %f \n", counter + 1, clk);
 	}
 	// See how many are left

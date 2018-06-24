@@ -120,6 +120,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bios_port_7f_w);
 	DECLARE_READ8_MEMBER(vdp1_count_r);
 	DECLARE_READ8_MEMBER(sms_count_r);
+	DECLARE_WRITE8_MEMBER(sms_sn_w);
 	DECLARE_READ8_MEMBER(sms_ioport_dc_r);
 	DECLARE_READ8_MEMBER(sms_ioport_dd_r);
 	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);
@@ -320,6 +321,11 @@ READ8_MEMBER(mtech_state::sms_count_r)
 		return m_vdp->vcount_read(prg, offset);
 }
 
+WRITE8_MEMBER(mtech_state::sms_sn_w)
+{
+	address_space &prg = m_z80snd->space(AS_PROGRAM);
+	m_vdp->vdp_w(prg, 0x10 >> 1, data, 0x00ff);
+}
 
 READ8_MEMBER (mtech_state::sms_ioport_dc_r)
 {
@@ -383,7 +389,7 @@ void mtech_state::set_genz80_as_sms()
 
 	// ports
 	io.install_read_handler      (0x40, 0x41, 0, 0x3e, 0, read8_delegate(FUNC(mtech_state::sms_count_r),this));
-	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8_delegate(FUNC(sn76496_device::command_w),(sn76496_base_device *)m_snsnd));
+	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8_delegate(FUNC(mtech_state::sms_sn_w),this));
 	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::vram_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::vram_write),(sega315_5124_device *)m_vdp));
 	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::register_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::register_write),(sega315_5124_device *)m_vdp));
 

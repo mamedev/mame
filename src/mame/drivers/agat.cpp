@@ -320,11 +320,6 @@ void agat7_state::machine_start()
 	save_item(NAME(m_an2));
 	save_item(NAME(m_an3));
 	save_item(NAME(m_anykeydown));
-
-	// setup video pointers
-	m_video->m_ram_dev = machine().device<ram_device>(RAM_TAG);
-	m_video->m_char_ptr = memregion("gfx1")->base();
-	m_video->m_char_size = memregion("gfx1")->bytes();
 }
 
 void agat7_state::machine_reset()
@@ -1083,15 +1078,15 @@ static void agat7_cards(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(agat7_state::agat7)
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(14'300'000) / 14)
+	MCFG_DEVICE_ADD(m_maincpu, M6502, XTAL(14'300'000) / 14)
 	MCFG_DEVICE_PROGRAM_MAP(agat7_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", agat7_state, timer_irq, A7_VIDEO_TAG ":a7screen", 0, 1)
 
-	MCFG_DEVICE_ADD(A7_VIDEO_TAG, AGAT7VIDEO, 0)
+	MCFG_DEVICE_ADD(m_video, AGAT7VIDEO, RAM_TAG, "gfx1")
 
-	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_ADD(m_ram)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 //  MCFG_RAM_EXTRA_OPTIONS("64K,128K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
@@ -1102,14 +1097,14 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* /INH banking */
-	MCFG_DEVICE_ADD(A7_UPPERBANK_TAG, ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_ADD(m_upperbank, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
 
 	/* keyboard controller -- XXX must be replaced */
-	MCFG_DEVICE_ADD(A7_KBDC_TAG, AY3600, 0)
+	MCFG_DEVICE_ADD(m_ay3600, AY3600, 0)
 	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
 	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
 	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
@@ -1142,7 +1137,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	A2BUS_SLOT(config, "sl5", m_a2bus, agat7_cards, nullptr);
 	A2BUS_SLOT(config, "sl6", m_a2bus, agat7_cards, "a7ram");
 
-	MCFG_CASSETTE_ADD(A7_CASSETTE_TAG)
+	MCFG_CASSETTE_ADD(m_cassette)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 MACHINE_CONFIG_END
 

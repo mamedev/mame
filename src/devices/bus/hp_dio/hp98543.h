@@ -27,7 +27,9 @@ public:
 	DECLARE_READ16_MEMBER(vram_r);
 	DECLARE_WRITE16_MEMBER(vram_w);
 
-	required_device_array<topcat_device, 4> m_topcat;
+	static constexpr int TOPCAT_COUNT = 4;
+
+	required_device_array<topcat_device, TOPCAT_COUNT> m_topcat;
 	required_device<nereid_device> m_nereid;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

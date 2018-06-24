@@ -61,8 +61,8 @@
 
 
   There are 2 tilemaps:
-	A 32x32 3BPP one with tile column scroll.
-	A 32x32 1BPP one fixed.
+    A 32x32 3BPP one with tile column scroll.
+    A 32x32 1BPP one fixed.
 
   1BPP tilemap is always shown under the main tilemap (maybe some video register controls this).
 
@@ -80,18 +80,18 @@
 
   A000-A3FF - 3bpp Tile layer tile code
   A400-A7FF - ?? doesn't seem used
-  A800-A83F	- Tile column scroll on even bytes. Tile column palette on odd bytes.
+  A800-A83F - Tile column scroll on even bytes. Tile column palette on odd bytes.
   A840-A85F - 8 sprites. 4 bytes per sprite:
-				  76543210
-				0 YYYYYYYY   Y position of the sprite
-				1 yxCCCCCC   x: xflip  y: yflip C: sprite code (of a 4 sprites block)
-				2 -----PPP	 P: Palette
-				3 XXXXXXXX   X position of the sprite
+                  76543210
+                0 YYYYYYYY   Y position of the sprite
+                1 yxCCCCCC   x: xflip  y: yflip C: sprite code (of a 4 sprites block)
+                2 -----PPP   P: Palette
+                3 XXXXXXXX   X position of the sprite
   A860-A87F - Bullets. 4 bytes per bullet
-				0 --------	Unknown (X pos high byte?)
-				1 XXXXXXXX  X position of the bullet
-				2 --------  Unknown (Y pos high byte?)
-				3 YYYYYYYY  Y position of the bullet
+                0 --------  Unknown (X pos high byte?)
+                1 XXXXXXXX  X position of the bullet
+                2 --------  Unknown (Y pos high byte?)
+                3 YYYYYYYY  Y position of the bullet
 
   AC00-AFFF - 1bpp Tile layer tile code
 
@@ -110,7 +110,7 @@
 
   B800 -\-- these 2 values contain ror(Tilebank,1), ror(Tilebank,2). Sprites bank? always set to the same than Tile bank reg
   B801 -/
-  B802 -\	these 3 registers usually contain x, ror(x,1), ror(x,2) and are related to the 1bpp bitmap palette color. 2 is red, used for the "galaxian" level lines
+  B802 -\   these 3 registers usually contain x, ror(x,1), ror(x,2) and are related to the 1bpp bitmap palette color. 2 is red, used for the "galaxian" level lines
   B803 -|-- during the initial scene of the attract, when the bomb explodes, they cycle 1,2,3,3,3,3,4,5,6 to cycle several colors, yellow, blue and red
   B804 -/   in the logo screen, when it says "Fin del tiempo", the "Niemer" letters must be orange/brown, these are set to 3. Set to 7 in the survival stage (red laser)
   B805 - Always 00
@@ -233,7 +233,7 @@ uint32_t efdt_state::screen_update_efdt(screen_device &screen, bitmap_ind16 &bit
 {
 	int bank = m_vregs1[7];
 
-	if (m_vregs1[4] != 0xff)	//startup tests require tile bank 1, but 0 is set to the vregs (reset sets it to 1?)
+	if (m_vregs1[4] != 0xff)    //startup tests require tile bank 1, but 0 is set to the vregs (reset sets it to 1?)
 		bank = 1;
 
 	m_tilebank = bank << 8;
@@ -264,7 +264,7 @@ uint32_t efdt_state::screen_update_efdt(screen_device &screen, bitmap_ind16 &bit
 		uint8_t pal = *sprram++;
 		uint8_t x = *sprram++;
 
-		int xtra = code & 0xc0;	//flip
+		int xtra = code & 0xc0; //flip
 
 		if (y == 0 && x == 0/* && code == 0 && pal == 0 */)
 			continue;
@@ -340,7 +340,7 @@ void efdt_state::efdt_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 
 	map(0x8800, 0x8803).rw(FUNC(efdt_state::main_soundlatch_r), FUNC(efdt_state::main_soundlatch_w));
-//	map(0x8800, 0x8803).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));  // TODO...
+//  map(0x8800, 0x8803).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));  // TODO...
 
 	map(0x9000, 0x93ff).portr("P1");
 	map(0x9400, 0x97ff).portr("P2");
@@ -460,14 +460,14 @@ WRITE8_MEMBER(efdt_state::soundlatch_1_w)
 {
 	if (!(data == 0xfd || data == 0xf5))
 	{
-//		int a = 1;
+//      int a = 1;
 	}
 
 	if(data & 4)
 		m_soundControl &= ~2;
 
 	//if (data & 8)
-	//	m_soundControl &= ~1;
+	//  m_soundControl &= ~1;
 }
 
 READ8_MEMBER(efdt_state::soundlatch_2_r)

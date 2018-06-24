@@ -179,7 +179,6 @@ public:
 		m_crtc(*this, "crtc"),
 		m_speaker(*this, "beeper"),
 		m_uart(*this, "i8251"),
-		m_dbrg(*this, COM5016T_TAG),
 		//m_i8251_rx_timer(nullptr),
 		//m_i8251_tx_timer(nullptr),
 		//m_sync_timer(nullptr),
@@ -193,7 +192,6 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_speaker;
 	required_device<i8251_device> m_uart;
-	required_device<com8116_device> m_dbrg;
 	//required_device<> m_i8251_rx_timer;
 	//required_device<> m_i8251_tx_timer;
 	//required_device<> m_sync_timer;
@@ -240,7 +238,6 @@ public:
 	DECLARE_WRITE8_MEMBER(vgREG);
 	DECLARE_WRITE8_MEMBER(vgEX);
 	DECLARE_WRITE8_MEMBER(KBDW);
-	DECLARE_WRITE8_MEMBER(BAUD);
 	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
 	DECLARE_READ8_MEMBER(SYSTAT_A);
 	DECLARE_READ8_MEMBER(SYSTAT_B);
@@ -617,11 +614,6 @@ WRITE8_MEMBER(vk100_state::KBDW)
  * 1 1 1 0 - 33   (5068800 / 33 = 16*9600)        = 9600 baud
  * 1 1 1 1 - 16   (5068800 / 16 = 16*19800)      ~= 19200 baud
  */
-WRITE8_MEMBER(vk100_state::BAUD)
-{
-	m_dbrg->write_str(data & 0x0f);
-	m_dbrg->write_stt(data >> 4);
-}
 
 /* port 0x40-0x47: "SYSTAT A"; various status bits, poorly documented in the tech manual
  * /GO    VDM1   VDM1   VDM1   VDM1   Dip     RST7.5 GND***
@@ -752,7 +744,7 @@ void vk100_state::vk100_io(address_map &map)
 	map(0x60, 0x63).mirror(0x80).w(FUNC(vk100_state::vgREG));     //LD DU, DVM, DIR, WOPS (register file)
 	map(0x64, 0x67).mirror(0x80).w(FUNC(vk100_state::vgEX));    //EX MOV, DOT, VEC, ER
 	map(0x68, 0x68).mirror(0x83).w(FUNC(vk100_state::KBDW));   //KBDW (probably AM_MIRROR(0x03))
-	map(0x6C, 0x6C).mirror(0x83).w(FUNC(vk100_state::BAUD));   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
+	map(0x6C, 0x6C).mirror(0x83).w(COM5016T_TAG, FUNC(com8116_device::stt_str_w));   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
 	map(0x70, 0x70).mirror(0x82).w(m_uart, FUNC(i8251_device::data_w)); //LD COMD (i8251 data reg)
 	map(0x71, 0x71).mirror(0x82).w(m_uart, FUNC(i8251_device::control_w)); //LD COM (i8251 control reg)
 	//AM_RANGE (0x74, 0x74) AM_MIRROR(0x83) AM_WRITE(unknown_74)

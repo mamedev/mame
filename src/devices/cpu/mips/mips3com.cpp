@@ -325,6 +325,9 @@ uint32_t mips3_device::compute_prid_register()
 		case MIPS3_TYPE_RM7000:
 			return 0x2700;
 
+		case MIPS3_TYPE_R5900:
+			return 0x2e59;
+
 		default:
 			fatalerror("Unknown MIPS flavor specified\n");
 	}

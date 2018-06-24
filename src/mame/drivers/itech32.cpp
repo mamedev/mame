@@ -359,7 +359,6 @@ Notes:
 #include "cpu/tms32031/tms32031.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
-#include "machine/timekpr.h"
 #include "machine/watchdog.h"
 #include "sound/es5506.h"
 
@@ -1812,7 +1811,7 @@ MACHINE_CONFIG_START(itech32_state::tourny)
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_ADD("m48t02", M48T02, 0)
+	MCFG_DEVICE_ADD(m_timekeeper, M48T02, 0)
 MACHINE_CONFIG_END
 
 
@@ -4525,8 +4524,7 @@ void itech32_state::init_wcbowln()
 
 void itech32_state::install_timekeeper()
 {
-	timekeeper_device *m48t02 = machine().device<timekeeper_device>("m48t02");
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x681000, 0x6817ff, read8_delegate(FUNC(timekeeper_device::read), m48t02), write8_delegate(FUNC(timekeeper_device::write), m48t02), 0xffffffff);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x681000, 0x6817ff, read8_delegate(FUNC(timekeeper_device::read), &(*m_timekeeper)), write8_delegate(FUNC(timekeeper_device::write), &(*m_timekeeper)), 0xffffffff);
 }
 
 void itech32_state::init_wcbowlt()

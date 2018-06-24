@@ -39,30 +39,35 @@ public:
 	ec184x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-
-	DECLARE_MACHINE_RESET(ec1841);
-	void init_ec1841();
-
-	struct
-	{
-		uint8_t enable[4];
-		int boards;
-	} m_memory;
-
-	DECLARE_READ8_MEMBER(memboard_r);
-	DECLARE_WRITE8_MEMBER(memboard_w);
 	void ec1841(machine_config &config);
 	void ec1847(machine_config &config);
 	void ec1840(machine_config &config);
+
+	void init_ec1841();
+
+protected:
+	DECLARE_MACHINE_RESET(ec1841);
+	DECLARE_READ8_MEMBER(memboard_r);
+	DECLARE_WRITE8_MEMBER(memboard_w);
+
 	void ec1840_io(address_map &map);
 	void ec1840_map(address_map &map);
 	void ec1841_io(address_map &map);
 	void ec1841_map(address_map &map);
 	void ec1847_io(address_map &map);
 	void ec1847_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+
+	struct
+	{
+		uint8_t enable[4];
+		int boards;
+	} m_memory;
 };
 
 /*
@@ -101,10 +106,7 @@ READ8_MEMBER(ec184x_state::memboard_r)
 WRITE8_MEMBER(ec184x_state::memboard_w)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
-	uint8_t current;
-
-	current = m_memory.enable[offset];
+	uint8_t current = m_memory.enable[offset];
 
 	DBG_LOG(1, "ec1841_memboard", ("W (%d of %d) <- %02X (%02X)\n", offset + 1, m_memory.boards, data, current));
 
@@ -153,7 +155,6 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 void ec184x_state::init_ec1841()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
 
 	m_memory.boards = m_ram->size() / EC1841_MEMBOARD_SIZE;
 	if (m_memory.boards > 4) m_memory.boards = 4;
@@ -243,7 +244,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1840)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 
-	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_ADD(m_ram)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
@@ -269,7 +270,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1841)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 
-	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_ADD(m_ram)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 	MCFG_RAM_EXTRA_OPTIONS("512K,1024K,1576K,2048K")
 MACHINE_CONFIG_END
@@ -293,7 +294,7 @@ MACHINE_CONFIG_START(ec184x_state::ec1847)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
-	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_ADD(m_ram)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 

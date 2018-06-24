@@ -509,65 +509,65 @@ void gaplus_base_state::machine_start()
 
 void gaplus_state::machine_start()
 {
-    gaplus_base_state::machine_start();
+	gaplus_base_state::machine_start();
 
-    m_lamps.resolve();
+	m_lamps.resolve();
 }
 
 MACHINE_CONFIG_START(gaplus_base_state::gaplus_base)
-    /* basic machine hardware */
-    MCFG_DEVICE_ADD(m_maincpu, MC6809E, XTAL(24'576'000) / 16)    /* 1.536 MHz */
-    MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD(m_maincpu, MC6809E, XTAL(24'576'000) / 16)    /* 1.536 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
 
-    MCFG_DEVICE_ADD("sub", MC6809E, XTAL(24'576'000) / 16)    /* 1.536 MHz */
-    MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, XTAL(24'576'000) / 16)    /* 1.536 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
 
-    MCFG_DEVICE_ADD("sub2", MC6809E, XTAL(24'576'000) / 16)    /* 1.536 MHz */
-    MCFG_DEVICE_PROGRAM_MAP(cpu3_map)
+	MCFG_DEVICE_ADD("sub2", MC6809E, XTAL(24'576'000) / 16)    /* 1.536 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cpu3_map)
 
-    MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* a high value to ensure proper synchronization of the CPUs */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* a high value to ensure proper synchronization of the CPUs */
 
-    MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_ADD("watchdog")
 
-    MCFG_NAMCO_62XX_ADD("62xx", 24576000 / 6 / 2)  /* totally made up - TODO: fix */
-    //MCFG_NAMCO_62XX_INPUT_0_CB(IOPORT("IN0L"))
-    //MCFG_NAMCO_62XX_INPUT_1_CB(IOPORT("IN0H"))
-    //MCFG_NAMCO_62XX_INPUT_2_CB(IOPORT("IN1L"))
-    //MCFG_NAMCO_62XX_INPUT_3_CB(IOPORT("IN1H"))
-    //MCFG_NAMCO_62XX_OUTPUT_0_CB(WRITE8(*this, gaplus_base_state,out_0))
-    //MCFG_NAMCO_62XX_OUTPUT_1_CB(WRITE8(*this, gaplus_base_state,out_1))
+	MCFG_NAMCO_62XX_ADD("62xx", 24576000 / 6 / 2)  /* totally made up - TODO: fix */
+	//MCFG_NAMCO_62XX_INPUT_0_CB(IOPORT("IN0L"))
+	//MCFG_NAMCO_62XX_INPUT_1_CB(IOPORT("IN0H"))
+	//MCFG_NAMCO_62XX_INPUT_2_CB(IOPORT("IN1L"))
+	//MCFG_NAMCO_62XX_INPUT_3_CB(IOPORT("IN1H"))
+	//MCFG_NAMCO_62XX_OUTPUT_0_CB(WRITE8(*this, gaplus_base_state,out_0))
+	//MCFG_NAMCO_62XX_OUTPUT_1_CB(WRITE8(*this, gaplus_base_state,out_1))
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(60.606060)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-    MCFG_SCREEN_SIZE(36 * 8, 28 * 8)
-    MCFG_SCREEN_VISIBLE_AREA(0 * 8, 36 * 8 - 1, 0 * 8, 28 * 8 - 1)
-    MCFG_SCREEN_UPDATE_DRIVER(gaplus_base_state, screen_update)
-    MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gaplus_base_state, screen_vblank))
-    MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, gaplus_base_state, vblank_irq))
-    MCFG_SCREEN_PALETTE("palette")
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.606060)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(36 * 8, 28 * 8)
+	MCFG_SCREEN_VISIBLE_AREA(0 * 8, 36 * 8 - 1, 0 * 8, 28 * 8 - 1)
+	MCFG_SCREEN_UPDATE_DRIVER(gaplus_base_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gaplus_base_state, screen_vblank))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, gaplus_base_state, vblank_irq))
+	MCFG_SCREEN_PALETTE("palette")
 
-    MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaplus)
-    MCFG_PALETTE_ADD("palette", 64 * 4 + 64 * 8)
-    MCFG_PALETTE_INDIRECT_ENTRIES(256)
-    MCFG_PALETTE_INIT_OWNER(gaplus_base_state, gaplus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaplus)
+	MCFG_PALETTE_ADD("palette", 64 * 4 + 64 * 8)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
+	MCFG_PALETTE_INIT_OWNER(gaplus_base_state, gaplus)
 
-    /* sound hardware */
-    SPEAKER(config, "mono").front_center();
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
 
-    MCFG_DEVICE_ADD("namco", NAMCO_15XX, XTAL(24'576'000) / 1024)
-    MCFG_NAMCO_AUDIO_VOICES(8)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADD("namco", NAMCO_15XX, XTAL(24'576'000) / 1024)
+	MCFG_NAMCO_AUDIO_VOICES(8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    MCFG_DEVICE_ADD("samples", SAMPLES)
-    MCFG_SAMPLES_CHANNELS(1)
-    MCFG_SAMPLES_NAMES(gaplus_sample_names)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(gaplus_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaplus_state::gaplus)
-    gaplus_base(config);
+	gaplus_base(config);
 
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(gapluso_state::gapluso)
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
-        
+
 	MCFG_DEVICE_ADD("namcoio_2", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("DSWA_HIGH"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("DSWB_LOW"))

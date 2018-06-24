@@ -842,7 +842,7 @@ void huc6270_device::device_start()
 	m_vram = make_unique_clear<uint16_t[]>(m_vram_size/sizeof(uint16_t));
 	m_vram_mask = (m_vram_size >> 1) - 1;
 
-	save_pointer(NAME(m_vram.get()), m_vram_size/sizeof(uint16_t));
+	save_pointer(NAME(m_vram), m_vram_size/sizeof(uint16_t));
 
 	save_item(NAME(m_register_index));
 	save_item(NAME(m_mawr));

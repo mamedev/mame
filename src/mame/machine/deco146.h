@@ -28,10 +28,10 @@
 	downcast<deco_146_base_device &>(*device).set_interface_scramble(0,1,2,3,4,5,6,7,8,9);
 
 #define MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE \
-	downcast<deco_146_base_device &>(*device).set_interface_scramble(4,5,3,6,2,7,1,8,0,9 );
+	downcast<deco_146_base_device &>(*device).set_interface_scramble_interleave();
 
 #define MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR \
-	downcast<deco_146_base_device &>(*device).set_use_magic_read_address_xor(1);
+	downcast<deco_146_base_device &>(*device).set_use_magic_read_address_xor(true);
 
 
 
@@ -98,7 +98,8 @@ public:
 		m_external_addrswap[1] = a1;
 		m_external_addrswap[0] = a0;
 	}
-	void set_use_magic_read_address_xor(int use_xor) { m_magic_read_address_xor_enabled = use_xor; }
+	void set_interface_scramble_interleave() { set_interface_scramble(4, 5, 3, 6, 2, 7, 1, 8, 0, 9); }
+	void set_use_magic_read_address_xor(bool use_xor) { m_magic_read_address_xor_enabled = use_xor; }
 
 	template <class Object> devcb_base &set_soundlatch_irq_callback(Object &&cb) { return m_soundlatch_irq_cb.set_callback(std::forward<Object>(cb)); }
 
@@ -110,7 +111,7 @@ public:
 
 	uint8_t m_bankswitch_swap_read_address;
 	uint16_t m_magic_read_address_xor;
-	int m_magic_read_address_xor_enabled;
+	bool m_magic_read_address_xor_enabled;
 	uint8_t m_xor_port;
 	uint8_t m_mask_port;
 	uint8_t m_soundlatch_port;

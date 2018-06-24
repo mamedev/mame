@@ -104,6 +104,15 @@ void midway_cheap_squeak_deluxe_device::device_timer(emu_timer &timer, device_ti
 }
 
 //-------------------------------------------------
+//  suspend_cpu
+//-------------------------------------------------
+
+void midway_cheap_squeak_deluxe_device::suspend_cpu()
+{
+	m_cpu->suspend(SUSPEND_REASON_DISABLE, 1);
+}
+
+//-------------------------------------------------
 //  stat_r - return the status value
 //-------------------------------------------------
 

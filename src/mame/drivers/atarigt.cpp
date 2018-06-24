@@ -1328,7 +1328,7 @@ void atarigt_state::init_primrage()
 	m_protection_w = &atarigt_state::primrage_protection_w;
 
 	m_protdata = make_unique_clear<uint8_t[]>(0x800);
-	save_pointer(NAME(m_protdata.get()), 0x800);
+	save_pointer(NAME(m_protdata), 0x800);
 }
 
 /*************************************

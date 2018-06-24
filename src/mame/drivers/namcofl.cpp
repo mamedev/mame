@@ -795,7 +795,7 @@ ROM_END
 void namcofl_state::common_init()
 {
 	m_workram = std::make_unique<uint32_t[]>(0x100000/4);
-	save_pointer(NAME(m_workram.get()), 0x100000/4),
+	save_pointer(NAME(m_workram), 0x100000/4),
 
 	save_item(NAME(m_mcu_port6));
 	save_item(NAME(m_sprbank));

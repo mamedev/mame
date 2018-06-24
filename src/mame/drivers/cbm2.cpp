@@ -1472,20 +1472,20 @@ READ8_MEMBER( cbm2_state::sid_potx_r )
 
 	switch (m_cia_pa >> 6)
 	{
-	case 1: data = m_joy1->pot_x_r(); break;
-	case 2: data = m_joy2->pot_x_r(); break;
+	case 1: data = m_joy1->read_pot_x(); break;
+	case 2: data = m_joy2->read_pot_x(); break;
 	case 3:
 		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
 		{
-			data = 1 / (1 / m_joy1->pot_x_r() + 1 / m_joy2->pot_x_r());
+			data = 1 / (1 / m_joy1->read_pot_x() + 1 / m_joy2->read_pot_x());
 		}
 		else if (m_joy1->has_pot_x())
 		{
-			data = m_joy1->pot_x_r();
+			data = m_joy1->read_pot_x();
 		}
 		else if (m_joy2->has_pot_x())
 		{
-			data = m_joy2->pot_x_r();
+			data = m_joy2->read_pot_x();
 		}
 		break;
 	}
@@ -1499,20 +1499,20 @@ READ8_MEMBER( cbm2_state::sid_poty_r )
 
 	switch (m_cia_pa >> 6)
 	{
-	case 1: data = m_joy1->pot_y_r(); break;
-	case 2: data = m_joy2->pot_y_r(); break;
+	case 1: data = m_joy1->read_pot_y(); break;
+	case 2: data = m_joy2->read_pot_y(); break;
 	case 3:
 		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
 		{
-			data = 1 / (1 / m_joy1->pot_y_r() + 1 / m_joy2->pot_y_r());
+			data = 1 / (1 / m_joy1->read_pot_y() + 1 / m_joy2->read_pot_y());
 		}
 		else if (m_joy1->has_pot_y())
 		{
-			data = m_joy1->pot_y_r();
+			data = m_joy1->read_pot_y();
 		}
 		else if (m_joy2->has_pot_y())
 		{
-			data = m_joy2->pot_y_r();
+			data = m_joy2->read_pot_y();
 		}
 		break;
 	}
@@ -1830,8 +1830,8 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 	data &= m_user->d1_r(space, 0);
 
 	// joystick
-	data &= ~(!BIT(m_joy1->joy_r(), 5) << 6);
-	data &= ~(!BIT(m_joy2->joy_r(), 5) << 7);
+	data &= ~(!BIT(m_joy1->read_joy(), 5) << 6);
+	data &= ~(!BIT(m_joy2->read_joy(), 5) << 7);
 
 	return data;
 }
@@ -1883,8 +1883,8 @@ READ8_MEMBER( cbm2_state::cia_pb_r )
 	uint8_t data = 0;
 
 	// joystick
-	data |= m_joy1->joy_r() & 0x0f;
-	data |= (m_joy2->joy_r() & 0x0f) << 4;
+	data |= m_joy1->read_joy() & 0x0f;
+	data |= (m_joy2->read_joy() & 0x0f) << 4;
 
 	// user port
 	data &= m_user->d2_r(space, 0);

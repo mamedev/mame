@@ -139,9 +139,9 @@ public:
 	optional_device<n2a03_device> m_dev_n2a03b; /* dkong3 */
 	optional_device<latch8_device> m_dev_vp2;   /* dkong2, virtual port 2 */
 	optional_device<latch8_device> m_dev_6h;    /* dkong2 */
-	optional_device<latch8_device> m_ls175_3d;	/* dkong2b_audio */
+	optional_device<latch8_device> m_ls175_3d;  /* dkong2b_audio */
 	optional_device<discrete_device> m_discrete;
-	optional_device<m58817_device> m_m58817;	/* radarscp1 */
+	optional_device<m58817_device> m_m58817;    /* radarscp1 */
 	optional_device<watchdog_timer_device> m_watchdog;
 
 	/* memory pointers */

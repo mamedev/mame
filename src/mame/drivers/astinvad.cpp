@@ -136,7 +136,7 @@ VIDEO_START_MEMBER(astinvad_state,spaceint)
 	m_colorram = std::make_unique<uint8_t[]>(m_videoram.bytes());
 
 	save_item(NAME(m_color_latch));
-	save_pointer(NAME(m_colorram.get()), m_videoram.bytes());
+	save_pointer(NAME(m_colorram), m_videoram.bytes());
 }
 
 
