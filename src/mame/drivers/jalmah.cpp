@@ -31,7 +31,7 @@ TODO:
 - There could be timing issues caused by MCU simulation at $80004;
 - Imperfect sound banking for 1st MCU version (especially noticeable for daireika);
 - suchiesp: I need a side-by-side to understand if the PAL shuffling is correct with the OKI BGM ROM.
-- urashima: doesn't use the mega system 1 tilemap devices, MCU might actually be responsible 
+- urashima: doesn't use the mega system 1 tilemap devices, MCU might actually be responsible
   for that too (cfr. notes).
 
 Notes (1st MCU ver.):
@@ -129,7 +129,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_prirom(*this, "prirom"),
 		m_p1_key_io(*this, "P1_KEY%u", 0U),
-		m_p2_key_io(*this, "P2_KEY%u", 0U), 
+		m_p2_key_io(*this, "P2_KEY%u", 0U),
 		m_okibank(*this, "okibank"),
 		m_system_io(*this, "SYSTEM"),
 		m_dsw_io(*this, "DSW")
@@ -164,12 +164,12 @@ public:
 	void jalmahv1(machine_config &config);
 	void jalmah_map(address_map &map);
 	void jalmahv1_map(address_map &map);
-	void oki_map(address_map &map); 
+	void oki_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	
+
 	required_device<palette_device> m_palette;
 	optional_device_array<megasys1_tilemap_device, 4> m_tmap;
 
@@ -187,8 +187,8 @@ private:
 	required_ioport m_system_io;
 	required_ioport m_dsw_io;
 	uint8_t m_layer_prin[4];
-	void mcu_fetch_input_polling(required_ioport_array <3> port, uint16_t workram_offset);
-	
+	void mcu_fetch_input_polling(required_ioport_array<3> &port, uint16_t workram_offset);
+
 	uint8_t m_mcu_prg;
 	int m_respcount;
 	uint8_t m_test_mode;
@@ -196,7 +196,7 @@ private:
 	uint8_t m_oki_rom;
 	uint8_t m_oki_bank;
 	uint8_t m_oki_za;
-	
+
 	// arbitrary numbering scheme for the MCU sims
 	enum {
 		URASHIMA_MCU = 0x11,
@@ -206,7 +206,7 @@ private:
 		KAKUMEI2_MCU = 0x22,
 		SUCHIESP_MCU = 0x23
 	};
-	
+
 	// base values for the MCU code snippets (arbitrary)
 	enum {
 		SNIPPET_PALETTE1 = 0x0000,
@@ -227,7 +227,7 @@ public:
 		: jalmah_state(mconfig, type, tag),
 		  m_videoram(*this, "videoram%u", 0U),
 		  m_vreg(*this, "vreg%u", 0U),
-   	  	  m_gfxdecode(*this, "gfxdecode")
+		  m_gfxdecode(*this, "gfxdecode")
 	{}
 
 	template<int TileChip> DECLARE_READ16_MEMBER(urashima_vregs_r);
@@ -255,9 +255,9 @@ private:
 	required_shared_ptr_array<uint16_t, 2> m_videoram;
 	required_shared_ptr_array<uint16_t, 2> m_vreg;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	tilemap_t *m_layer[2];
-	
+
 	TILEMAP_MAPPER_MEMBER(range0_16x16);
 	TILEMAP_MAPPER_MEMBER(range3_8x8);
 };
@@ -300,7 +300,7 @@ TILEMAP_MAPPER_MEMBER(urashima_state::range3_8x8)
 void urashima_state::video_start()
 {
 	jalmah_state::video_start();
-	
+
 	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<0>),this),tilemap_mapper_delegate(FUNC(urashima_state::range0_16x16),this),16,16,256,32);
 	// range confirmed with title screen transition in attract mode
 	// also it's confirmed to be 64 x 64 with 2nd tier girls stripping
@@ -348,14 +348,14 @@ uint32_t jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 
 {
 	uint8_t cur_prin;
 	int layer_num;
-	
+
 	bitmap.fill(m_palette->pen(0xff), cliprect); //selectable by a ram address?
 
 	for(cur_prin=1; cur_prin<=0x8; cur_prin<<=1)
 	{
 		for(layer_num=0; layer_num<4; layer_num++)
 		{
-			if(cur_prin == m_layer_prin[layer_num]) 
+			if(cur_prin == m_layer_prin[layer_num])
 				m_tmap[layer_num]->draw(screen,bitmap,cliprect,0,0);
 		}
 	}
@@ -370,16 +370,16 @@ uint32_t urashima_state::screen_update_urashima(screen_device &screen, bitmap_in
 
 	// reset scroll latches
 	sx[0] = sx[1] = sy[0] = sy[1] = 0;
-	
+
 	clip.min_x = cliprect.min_x;
 	clip.max_x = cliprect.max_x;
-	
+
 	bitmap.fill(m_palette->pen(0x1ff), cliprect); //selectable by a ram address?
-	
+
 	for(int y = cliprect.min_y; y < cliprect.max_y+1; y++)
 	{
 		clip.min_y = clip.max_y = y;
-		
+
 		// Urashima tilemaps interrogate the video register area to make row and column scrolling
 		// for every scanline the format is:
 		// ---- ---- ---- ---- [0] unused?
@@ -391,14 +391,14 @@ uint32_t urashima_state::screen_update_urashima(screen_device &screen, bitmap_in
 		{
 			// latches fetch go in reverse order when flip screen is enabled
 			int y_base = flip_screen() ? 0x3fc-(y*4) : y*4;
-			
+
 			// is there a new latch?
 			if(m_vreg[layer_num][1+y_base] & 1)
 			{
 				sx[layer_num] = m_vreg[layer_num][2+y_base];
 				sy[layer_num] = m_vreg[layer_num][3+y_base];
 			}
-			
+
 			// set scroll values for this layer
 			m_layer[layer_num]->set_scrollx(0,sx[layer_num]);
 			m_layer[layer_num]->set_scrolly(0,sy[layer_num]);
@@ -407,7 +407,7 @@ uint32_t urashima_state::screen_update_urashima(screen_device &screen, bitmap_in
 		if(m_pri & 1)
 		{
 			m_layer[0]->draw(screen,bitmap,clip,0,0);
-			m_layer[1]->draw(screen,bitmap,clip,0,0);		
+			m_layer[1]->draw(screen,bitmap,clip,0,0);
 		}
 		else
 		{
@@ -443,7 +443,7 @@ WRITE8_MEMBER(urashima_state::urashima_bank_w)
 	{
 		m_tile_bank = (data & 0x03);
 		m_layer[0]->mark_all_dirty();
-		
+
 		if(m_tile_bank == 3)
 			popmessage("layer 0 bank == 3, contact MAMEdev");
 	}
@@ -470,7 +470,7 @@ READ16_MEMBER(urashima_state::urashima_vregs_r)
 
 template<int TileChip>
 WRITE16_MEMBER(urashima_state::urashima_vregs_w)
-{	
+{
 	COMBINE_DATA(&m_vreg[TileChip][offset]);
 }
 
@@ -503,34 +503,34 @@ Protection file start
 // TODO: urashima (at least) reads upper byte of the workram buffer, perhaps for checking previous frame input
 // TODO: RBSDTL in 1st version MCU stands for Bet/Big/Small/Double Up/Take Score/Last Chance
 //      (not hooked up cause none of the dumped games actually uses it)
-void jalmah_state::mcu_fetch_input_polling(required_ioport_array <3> port, uint16_t workram_offset)	
+void jalmah_state::mcu_fetch_input_polling(required_ioport_array<3> &port, uint16_t workram_offset)
 {
-	MCU_READ(1, 0x0001, workram_offset, 0x00);        /*FF (correct?) */
-	MCU_READ(2, 0x0400, workram_offset, 0x01);        /*A*/
-	MCU_READ(2, 0x1000, workram_offset, 0x02);        /*B*/
-	MCU_READ(2, 0x0200, workram_offset, 0x03);        /*C*/
-	MCU_READ(2, 0x0800, workram_offset, 0x04);        /*D*/
-	MCU_READ(2, 0x0004, workram_offset, 0x05);        /*E*/
-	MCU_READ(2, 0x0010, workram_offset, 0x06);        /*F*/
-	MCU_READ(2, 0x0002, workram_offset, 0x07);        /*G*/
-	MCU_READ(2, 0x0008, workram_offset, 0x08);        /*H*/
-	MCU_READ(1, 0x0400, workram_offset, 0x09);        /*I*/
-	MCU_READ(1, 0x1000, workram_offset, 0x0a);        /*J*/
-	MCU_READ(1, 0x0200, workram_offset, 0x0b);        /*K*/
-	MCU_READ(1, 0x0800, workram_offset, 0x0c);        /*L*/
-	MCU_READ(1, 0x0004, workram_offset, 0x0d);        /*M*/
-	MCU_READ(1, 0x0010, workram_offset, 0x0e);        /*N*/
-	MCU_READ(0, 0x0200, workram_offset, 0x0f);        /*RON */
-	MCU_READ(0, 0x1000, workram_offset, 0x10);        /*REACH */
-	MCU_READ(0, 0x0400, workram_offset, 0x11);        /*KAN */
-	MCU_READ(1, 0x0008, workram_offset, 0x12);        /*PON */
-	MCU_READ(1, 0x0002, workram_offset, 0x13);        /*CHI */
-	MCU_READ(0, 0x0004, workram_offset, 0x14);        /*START1 */
+	MCU_READ(1, 0x0001, workram_offset, 0x00);        // FF (correct?)
+	MCU_READ(2, 0x0400, workram_offset, 0x01);        // A
+	MCU_READ(2, 0x1000, workram_offset, 0x02);        // B
+	MCU_READ(2, 0x0200, workram_offset, 0x03);        // C
+	MCU_READ(2, 0x0800, workram_offset, 0x04);        // D
+	MCU_READ(2, 0x0004, workram_offset, 0x05);        // E
+	MCU_READ(2, 0x0010, workram_offset, 0x06);        // F
+	MCU_READ(2, 0x0002, workram_offset, 0x07);        // G
+	MCU_READ(2, 0x0008, workram_offset, 0x08);        // H
+	MCU_READ(1, 0x0400, workram_offset, 0x09);        // I
+	MCU_READ(1, 0x1000, workram_offset, 0x0a);        // J
+	MCU_READ(1, 0x0200, workram_offset, 0x0b);        // K
+	MCU_READ(1, 0x0800, workram_offset, 0x0c);        // L
+	MCU_READ(1, 0x0004, workram_offset, 0x0d);        // M
+	MCU_READ(1, 0x0010, workram_offset, 0x0e);        // N
+	MCU_READ(0, 0x0200, workram_offset, 0x0f);        // RON
+	MCU_READ(0, 0x1000, workram_offset, 0x10);        // REACH
+	MCU_READ(0, 0x0400, workram_offset, 0x11);        // KAN
+	MCU_READ(1, 0x0008, workram_offset, 0x12);        // PON
+	MCU_READ(1, 0x0002, workram_offset, 0x13);        // CHI
+	MCU_READ(0, 0x0004, workram_offset, 0x14);        // START1
 
 }
 
 void jalmah_state::daireika_mcu_run()
-{	
+{
 	if(m_test_mode)  //service_mode
 	{
 		for(int keynum = 0; keynum < 3; keynum++)
@@ -637,17 +637,17 @@ WRITE8_MEMBER(jalmah_state::okirom_w)
 
 	//memcpy(&oki[0x20000], &oki[(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000], 0x20000);
 	m_okibank->set_entry((m_oki_rom << 2) + (m_oki_bank+m_oki_za));
-	
+
 	//popmessage("PC=%06x %02x %02x %02x %08x",m_maincpu->pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
 WRITE8_MEMBER(jalmah_state::okibank_w)
-{		
+{
 	m_oki_bank = data & 3;
-		
+
 	//memcpy(&oki[0x20000], &oki[(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000], 0x20000);
-	m_okibank->set_entry((m_oki_rom << 2) + (m_oki_bank+m_oki_za)); 
-	
+	m_okibank->set_entry((m_oki_rom << 2) + (m_oki_bank+m_oki_za));
+
 	//popmessage("PC=%06x %02x %02x %02x %08x",m_maincpu->pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
@@ -1068,21 +1068,21 @@ void jalmah_state::machine_reset()
 {
 	m_pri = 0;
 	refresh_priority_system();
-	
+
 	mcu_check_test_mode();
 }
 
 void urashima_state::machine_reset()
 {
-//	m_pri = 0;
-	
+//  m_pri = 0;
+
 	// initialize tilemap vram to sane defaults (test mode cares)
 	for(int i=0;i<0x4000/2;i++)
 		m_videoram[0][i] = 0xffff;
 
 	for(int i=0;i<0x2000/2;i++)
 		m_videoram[1][i] = 0xffff;
-	
+
 	mcu_check_test_mode();
 }
 
@@ -1097,12 +1097,12 @@ MACHINE_CONFIG_START(jalmah_state::jalmah)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 0x0100)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x0200)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll3", "palette", 0x0300)
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(12000000/2,406,0,256,263,16,240) // assume same as nmk16 & mega system 1
 	MCFG_SCREEN_UPDATE_DRIVER(jalmah_state, screen_update_jalmah)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -1154,19 +1154,19 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(urashima_state::urashima)
 	jalmah(config);
-	
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(urashima_map)
-	
+
 	// Urashima seems to use an earlier version of the Jaleco tilemaps (without range etc.)
 	// and with per-scanline video registers
 	MCFG_DEVICE_REMOVE("scroll0")
 	MCFG_DEVICE_REMOVE("scroll1")
-	MCFG_DEVICE_REMOVE("scroll2")	
+	MCFG_DEVICE_REMOVE("scroll2")
 	MCFG_DEVICE_REMOVE("scroll3")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_urashima)
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(urashima_state, screen_update_urashima)
 MACHINE_CONFIG_END
@@ -1251,7 +1251,7 @@ ROM_START( daireika )
 	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
 
 	LOAD_FAKE_MCU_ROM
-	
+
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "mj3.bin", 0x40000, 0x80000, CRC(65bb350c) SHA1(e77866f2d612a0973adc616717e7c89a37d6c48e) )
 	ROM_COPY( "oki" ,    0x40000, 0x00000, 0x40000 )
@@ -1297,7 +1297,7 @@ ROM_START( mjzoomin )
 	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
 
 	LOAD_FAKE_MCU_ROM
-	
+
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "zoomin-3.bin", 0x40000, 0x80000, CRC(07d7b8cd) SHA1(e05ce80ffb945b04f93f8c49d0c840b0bff6310b) )
 	ROM_COPY( "oki" ,         0x40000, 0x00000, 0x40000 )
@@ -1316,7 +1316,7 @@ ROM_START( mjzoomin )
 
 	ROM_REGION( 0x100, "prirom", 0 ) /* Priority PROM */
 	ROM_LOAD( "mj15.bpr", 0x000, 0x100, CRC(ebac41f9) SHA1(9d1629d977849663392cbf03a3ddf76665f88608) )
-	
+
 	ROM_REGION( 0x120, "proms", 0 ) /* Misc PROMs (unknown) */
 	ROM_LOAD( "mj16.bpr", 0x000, 0x100, CRC(8d5dc1f6) SHA1(9f723e7cd44f8c09ec30b04725644346484ec753) )
 	ROM_LOAD( "mj17.bpr", 0x100, 0x020, CRC(a17c3e8a) SHA1(d7969fad7cec9c792c53aa457f4ad764a727e0a5) )
@@ -1358,7 +1358,7 @@ ROM_START( kakumei )
 
 	ROM_REGION( 0x100, "prirom", 0 ) /* Priority PROM */
 	ROM_LOAD( "mj15.bpr", 0x000, 0x100, CRC(ebac41f9) SHA1(9d1629d977849663392cbf03a3ddf76665f88608) )
-	
+
 	ROM_REGION( 0x120, "proms", 0 ) /* Misc PROMs (unknown) */
 	ROM_LOAD( "mj16.bpr", 0x000, 0x100, CRC(8d5dc1f6) SHA1(9f723e7cd44f8c09ec30b04725644346484ec753) )
 	ROM_LOAD( "mj17.bpr", 0x100, 0x020, CRC(a17c3e8a) SHA1(d7969fad7cec9c792c53aa457f4ad764a727e0a5) )
@@ -1397,7 +1397,7 @@ ROM_START( kakumei2 )
 
 	ROM_REGION( 0x100, "prirom", 0 ) /* Priority PROM */
 	ROM_LOAD( "mj15.bpr", 0x000, 0x100, CRC(ebac41f9) SHA1(9d1629d977849663392cbf03a3ddf76665f88608) )
-	
+
 	ROM_REGION( 0x120, "proms", 0 ) /* Misc PROMs (unknown) */
 	ROM_LOAD( "mj16.bpr", 0x000, 0x100, CRC(8d5dc1f6) SHA1(9f723e7cd44f8c09ec30b04725644346484ec753) )
 	ROM_LOAD( "mj17.bpr", 0x100, 0x020, CRC(a17c3e8a) SHA1(d7969fad7cec9c792c53aa457f4ad764a727e0a5) )
@@ -1487,7 +1487,7 @@ ROM_START( suchiesp )
 
 	ROM_REGION( 0x100, "prirom", 0 ) /* Priority PROM */
 	ROM_LOAD( "mj15.bpr", 0x000, 0x100, CRC(ebac41f9) SHA1(9d1629d977849663392cbf03a3ddf76665f88608) )
-	
+
 	ROM_REGION( 0x120, "proms", 0 ) /* Misc PROMs (unknown) */
 	ROM_LOAD( "mj16.bpr", 0x000, 0x100, CRC(8d5dc1f6) SHA1(9f723e7cd44f8c09ec30b04725644346484ec753) )
 	ROM_LOAD( "pr93035.17", 0x100, 0x020, CRC(ab28ae42) SHA1(e05652c4bd5db4c7d7a1bfdeb63841e8b019f24c) )
@@ -1595,7 +1595,7 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 		2nd M68k code uploaded by the MCU. (sound playback)
 		*******************************************************/
 		MCU_JMP(0x0020/2,SNIPPET_SOUND);
-		
+
 		/*******************************************************
 		3rd M68k code uploaded by the MCU.
 		see mjzoomin_mcu_w
@@ -1610,7 +1610,7 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 		MCU_JMP(0x100/2,SNIPPET_CLR_LAYER0);
 		MCU_JMP(0x108/2,SNIPPET_CLR_LAYER1);
 		MCU_JMP(0x110/2,SNIPPET_CLR_LAYER2);
-		
+
 		/* layer 3 clear function is already in 68k ROM program???*/
 		m_sharedram[0x0126/2] = 0x4ef9;
 		m_sharedram[0x0128/2] = 0x0000;
@@ -1667,7 +1667,7 @@ WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 		address.
 		******************************************************/
 		MCU_JMP(0x00c6/2,SNIPPET_PALETTE1);
-		
+
 		/*******************************************************
 		2nd M68k code uploaded by the MCU (Sound read/write)
 		(Note:copied from suchiesp,check here the sound banking)

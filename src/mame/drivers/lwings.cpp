@@ -51,7 +51,7 @@ Notes:
   which do no jive with actual emulation.  One can only assume this means
   the manual is incorrect and software was adjusted later but the game could
   use some PCB comparisons of DIP selections to be certain.
-  
+
 ***************************************************************************/
 
 #include "emu.h"

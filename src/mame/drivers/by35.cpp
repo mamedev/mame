@@ -1118,7 +1118,7 @@ MACHINE_CONFIG_START(by35_state::by35)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z_freq", by35_state, timer_z_freq, attotime::from_hz(100)) // Mains Line Frequency * 2
-	MCFG_TIMER_DRIVER_ADD(m_zero_crossing_active_timer, by35_state, timer_z_pulse)	// Active pulse length from Zero Crossing detector
+	MCFG_TIMER_DRIVER_ADD(m_zero_crossing_active_timer, by35_state, timer_z_pulse)  // Active pulse length from Zero Crossing detector
 
 	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(*this, by35_state, u11_a_r))
@@ -1131,7 +1131,7 @@ MACHINE_CONFIG_START(by35_state::by35)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d_freq", by35_state, u11_timer, attotime::from_hz(317)) // 555 timer
-	MCFG_TIMER_DRIVER_ADD(m_display_refresh_timer, by35_state, timer_d_pulse)	// 555 Active pulse length
+	MCFG_TIMER_DRIVER_ADD(m_display_refresh_timer, by35_state, timer_d_pulse)   // 555 Active pulse length
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(as2888_state::as2888_audio)

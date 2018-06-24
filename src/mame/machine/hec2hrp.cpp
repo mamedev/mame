@@ -809,12 +809,12 @@ MACHINE_CONFIG_START(hec2hrp_state::hector_audio)
 
 MACHINE_CONFIG_END
 
-/*	DISK II drive for:
-		Hector HRX
-		Hector MX40c
-		Hector MX80c
+/*  DISK II drive for:
+        Hector HRX
+        Hector MX40c
+        Hector MX80c
 
-	JJStacino  jj.stacino@aliceadsl.fr
+    JJStacino  jj.stacino@aliceadsl.fr
 
     15/02/2010 : Start of the disc2 project! JJStacino
     26/09/2010 : first sending with bug2 (the first "dir" command terminates in a crash of the Z80 disc II processor) -JJStacino
@@ -826,15 +826,15 @@ MACHINE_CONFIG_END
 /* Callback uPD request */
 
 /* How uPD765 works:
-	* First we send at uPD the string of command (p.e. 9 bytes for read starting by 0x46) on port 60h
-			between each byte, check the authorization of the uPD by reading the status register
-	* When the command is finish, the data arrive with DMA interrupt, then:
-			If read: in port 70 to retrieve the data,
-			If write: in port 70 send the data
-	* When all data had been send the uPD launch an INT
-	* The Z80 Disc2 writes in FF12 a flag
-	* if the flag is set, end of DMA function,
-	* At this point the Z80 can read the RESULT in port 61h
+    * First we send at uPD the string of command (p.e. 9 bytes for read starting by 0x46) on port 60h
+            between each byte, check the authorization of the uPD by reading the status register
+    * When the command is finish, the data arrive with DMA interrupt, then:
+            If read: in port 70 to retrieve the data,
+            If write: in port 70 send the data
+    * When all data had been send the uPD launch an INT
+    * The Z80 Disc2 writes in FF12 a flag
+    * if the flag is set, end of DMA function,
+    * At this point the Z80 can read the RESULT in port 61h
 */
 
 // Interrupt management
@@ -902,13 +902,13 @@ WRITE8_MEMBER( hec2hrp_state::disc2_io30_port_w)
 {
 }
 
-READ8_MEMBER( hec2hrp_state::disc2_io40_port_r)	/* Read data sent to Hector by Disc2 */
+READ8_MEMBER( hec2hrp_state::disc2_io40_port_r) /* Read data sent to Hector by Disc2 */
 {
 	m_hector_disc2_data_r_ready = 0x00;
 	return m_hector_disc2_data_read;
 }
 
-WRITE8_MEMBER( hec2hrp_state::disc2_io40_port_w)	/* Write data sent by Disc2 to Hector */
+WRITE8_MEMBER( hec2hrp_state::disc2_io40_port_w)    /* Write data sent by Disc2 to Hector */
 {
 	m_hector_disc2_data_write = data;
 	m_hector_disc2_data_w_ready = 0x80;

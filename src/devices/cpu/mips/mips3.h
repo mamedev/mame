@@ -312,77 +312,77 @@ private:
 	struct internal_mips3_state
 	{
 		/* core registers */
-		uint32_t		pc;
-		int				icount;
-		uint64_t		r[35];
+		uint32_t        pc;
+		int             icount;
+		uint64_t        r[35];
 
 		/* upper 64 bits of 128-bit GPRs (R5900 only) */
-		uint64_t		rh[35];
+		uint64_t        rh[35];
 
 		/* COP registers */
-		uint64_t		cpr[3][32];
-		uint64_t		ccr[3][32];
-		uint32_t		llbit;
+		uint64_t        cpr[3][32];
+		uint64_t        ccr[3][32];
+		uint32_t        llbit;
 
 		/* VU0 registers (R5900 only) */
-		float			vfr[32][4];
-		uint32_t		vcr[32];
+		float           vfr[32][4];
+		uint32_t        vcr[32];
 
-		uint32_t		mode;                       /* current global mode */
+		uint32_t        mode;                       /* current global mode */
 
 		/* parameters for subroutines */
-		uint64_t		numcycles;                  /* return value from gettotalcycles */
-		const char *	format;                     /* format string for print_debug */
-		uint32_t		arg0;                       /* print_debug argument 1 */
-		uint32_t		arg1;                       /* print_debug argument 2 */
+		uint64_t        numcycles;                  /* return value from gettotalcycles */
+		const char *    format;                     /* format string for print_debug */
+		uint32_t        arg0;                       /* print_debug argument 1 */
+		uint32_t        arg1;                       /* print_debug argument 2 */
 
-		uint64_t		count_zero_time;
-		uint32_t		compare_armed;
-		uint32_t		jmpdest;                    /* destination jump target */
+		uint64_t        count_zero_time;
+		uint32_t        compare_armed;
+		uint32_t        jmpdest;                    /* destination jump target */
 	};
 
 	address_space_config m_program_config;
-	mips3_flavor	m_flavor;
+	mips3_flavor    m_flavor;
 
 	/* core state */
 	internal_mips3_state *m_core;
 
 	/* internal stuff */
-	uint32_t      	m_ppc;
-	uint32_t      	m_nextpc;
-	uint32_t      	m_pcbase;
-	uint8_t       	m_cf[4][8];
-	bool        	m_delayslot;
-	int         	m_op;
-	int         	m_interrupt_cycles;
-	uint32_t      	m_ll_value;
-	uint64_t      	m_lld_value;
-	uint32_t      	m_badcop_value;
+	uint32_t        m_ppc;
+	uint32_t        m_nextpc;
+	uint32_t        m_pcbase;
+	uint8_t         m_cf[4][8];
+	bool            m_delayslot;
+	int             m_op;
+	int             m_interrupt_cycles;
+	uint32_t        m_ll_value;
+	uint64_t        m_lld_value;
+	uint32_t        m_badcop_value;
 
 	/* endian-dependent load/store */
 	typedef void (mips3_device::*loadstore_func)(uint32_t op);
-	loadstore_func	m_lwl;
-	loadstore_func	m_lwr;
-	loadstore_func	m_swl;
-	loadstore_func	m_swr;
-	loadstore_func	m_ldl;
-	loadstore_func	m_ldr;
-	loadstore_func	m_sdl;
-	loadstore_func	m_sdr;
+	loadstore_func  m_lwl;
+	loadstore_func  m_lwr;
+	loadstore_func  m_swl;
+	loadstore_func  m_swr;
+	loadstore_func  m_ldl;
+	loadstore_func  m_ldr;
+	loadstore_func  m_sdl;
+	loadstore_func  m_sdr;
 
-	address_space *	m_program;
+	address_space * m_program;
 	std::function<u32 (offs_t)> m_pr32;
 	std::function<const void * (offs_t)> m_prptr;
-	uint32_t		c_system_clock;
-	uint32_t		m_cpu_clock;
+	uint32_t        c_system_clock;
+	uint32_t        m_cpu_clock;
 	emu_timer *     m_compare_int_timer;
 
 	/* derived info based on flavor */
-	uint32_t		m_pfnmask;
-	uint8_t			m_tlbentries;
+	uint32_t        m_pfnmask;
+	uint8_t         m_tlbentries;
 
 	/* memory accesses */
-	bool			m_bigendian;
+	bool            m_bigendian;
 	uint32_t        m_byte_xor;
 	uint32_t        m_word_xor;
 	data_accessors  m_memory;
@@ -398,16 +398,16 @@ private:
 	uint32_t        m_fastram_select;
 	struct
 	{
-		offs_t		start;                      /* start of the RAM block */
-		offs_t		end;                        /* end of the RAM block */
-		bool		readonly;                   /* true if read-only */
-		void *		base;                       /* base in memory where the RAM lives */
-		uint8_t *	offset_base8;               /* base in memory where the RAM lives, 8-bit pointer, with the start offset pre-applied */
-		uint16_t *	offset_base16;              /* base in memory where the RAM lives, 16-bit pointer, with the start offset pre-applied  */
-		uint32_t *	offset_base32;              /* base in memory where the RAM lives, 32-bit pointer, with the start offset pre-applied  */
+		offs_t      start;                      /* start of the RAM block */
+		offs_t      end;                        /* end of the RAM block */
+		bool        readonly;                   /* true if read-only */
+		void *      base;                       /* base in memory where the RAM lives */
+		uint8_t *   offset_base8;               /* base in memory where the RAM lives, 8-bit pointer, with the start offset pre-applied */
+		uint16_t *  offset_base16;              /* base in memory where the RAM lives, 16-bit pointer, with the start offset pre-applied  */
+		uint32_t *  offset_base32;              /* base in memory where the RAM lives, 32-bit pointer, with the start offset pre-applied  */
 	}               m_fastram[MIPS3_MAX_FASTRAM];
 
-	uint32_t		m_debugger_temp;
+	uint32_t        m_debugger_temp;
 
 	/* core state */
 	drc_cache       m_cache;                    /* pointer to the DRC code cache */

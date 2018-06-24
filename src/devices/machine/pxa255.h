@@ -9,12 +9,11 @@
  *
  **************************************************************************/
 
-#ifndef DEVICES_MACHINE_PXA255
-#define DEVICES_MACHINE_PXA255
+#ifndef MAME_MACHINE_PXA255
+#define MAME_MACHINE_PXA255
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/dmadac.h"
@@ -232,4 +231,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(PXA255_PERIPHERALS, pxa255_periphs_device)
 
-#endif // DEVICES_MACHINE_PXA255
+#endif // MAME_MACHINE_PXA255

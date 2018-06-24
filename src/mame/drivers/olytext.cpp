@@ -39,18 +39,18 @@ public:
 	olytext_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-//		, m_fdd0(*this, "fdc:0"),
-//		, m_fdd1(*this, "fdc:1"),
-//		, m_rom(*this, "mainrom"),
-//		, m_lowram(*this, "lowram"),
-		{ }
+//      , m_fdd0(*this, "fdc:0"),
+//      , m_fdd1(*this, "fdc:1"),
+//      , m_rom(*this, "mainrom"),
+//      , m_lowram(*this, "lowram"),
+	{ }
 
 	void olytext(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-//	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -60,10 +60,10 @@ private:
 	void io_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-//	required_device<floppy_connector> m_fdd0;
-//	optional_device<floppy_connector> m_fdd1;
-//	required_memory_region m_rom;
-//	required_shared_ptr<u8> m_lowram;
+//  required_device<floppy_connector> m_fdd0;
+//  optional_device<floppy_connector> m_fdd1;
+//  required_memory_region m_rom;
+//  required_shared_ptr<u8> m_lowram;
 };
 
 void olytext_state::machine_reset()
@@ -122,19 +122,19 @@ void olytext_state::machine_start()
 
 void olytext_state::keyboard_put(u8 data)
 {
-//	if (data)
-//	{
-//		m_keystroke=data;
-//	}
+//  if (data)
+//  {
+//      m_keystroke=data;
+//  }
 }
 
 //WRITE8_MEMBER( olytext_state::fdcctrl_w )
 //{
-//	m_fdcctrl = data;
-//	m_romen = (m_fdcctrl & 1) ? false : true;
-//	m_fdd0->get_device()->mon_w(!(data & 2));
-//	if(m_fdd1)
-//		m_fdd1->get_device()->mon_w(!(data & 4));
+//  m_fdcctrl = data;
+//  m_romen = (m_fdcctrl & 1) ? false : true;
+//  m_fdd0->get_device()->mon_w(!(data & 2));
+//  if(m_fdd1)
+//      m_fdd1->get_device()->mon_w(!(data & 4));
 //}
 
 static void olytext_floppies(device_slot_interface &device)

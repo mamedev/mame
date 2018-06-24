@@ -527,7 +527,7 @@ void sma_prot_device::mslug3a_decrypt_68k(uint8_t* base)
 	rom = (uint16_t *)base;
 		for (int i = 0; i < 0x0c0000/2; i++)
 		   rom[i] = rom[0x5d0000/2 + bitswap<24>(i,23,22,21,20,19,18,1,16,14,7,17,5,8,4,15,6,3,2,0,13,10,12,9,11)];
-  
+
 	rom = (uint16_t *)(base + 0x100000);
 	/* swap address lines for the banked part */
 	for (int i = 0;i < 0x800000/2; i += 0x10000/2)
