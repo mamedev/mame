@@ -133,7 +133,7 @@ READ8_MEMBER(segas1x_bootleg_state::sound_command_irq_r)
 
 WRITE8_MEMBER(segas1x_bootleg_state::soundbank_msm_w)
 {
-	m_soundbank->set_entry((data & 7) ^ 6); // probably wrong
+	m_soundbank->set_entry(data & 7);
 	m_msm->reset_w(BIT(data, 3));
 }
 
@@ -368,7 +368,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_data_w)
 
 WRITE_LINE_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_callback)
 {
-	m_msm->data_w((m_sample_buffer >> 4) & 0x0f);
+	m_msm->write_data((m_sample_buffer >> 4) & 0x0f);
 
 	m_sample_buffer <<=  4;
 	m_sample_select ^=  1;
@@ -1175,7 +1175,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_data_w)
 
 WRITE_LINE_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_callback)
 {
-	m_msm->data_w(m_sample_buffer & 0x0f);
+	m_msm->write_data(m_sample_buffer & 0x0f);
 
 	m_sample_buffer >>=  4;
 	m_sample_select ^=  1;

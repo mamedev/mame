@@ -180,7 +180,6 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6801.h"
 #include "sound/ym2151.h"
-#include "sound/n63701x.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -304,7 +303,7 @@ WRITE8_MEMBER(namcos86_state::cus115_w)
 		case 1:
 		case 2:
 		case 3:
-			machine().device<namco_63701x_device>("namco2")->namco_63701x_w(space, (offset & 0x1e00) >> 9,data);
+			m_63701x->namco_63701x_w(space, (offset & 0x1e00) >> 9,data);
 			break;
 
 		case 4:

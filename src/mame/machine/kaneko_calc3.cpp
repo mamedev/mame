@@ -1224,18 +1224,7 @@ const int16_t kaneko_calc3_device::s_keydata[] = {
 
 uint8_t kaneko_calc3_device::shift_bits(uint8_t dat, int bits)
 {
-	switch (bits & 7)
-	{
-		default:
-		case 0: return bitswap<8>(dat, 7,6,5,4,3,2,1,0);
-		case 1: return bitswap<8>(dat, 6,5,4,3,2,1,0,7);
-		case 2: return bitswap<8>(dat, 5,4,3,2,1,0,7,6);
-		case 3: return bitswap<8>(dat, 4,3,2,1,0,7,6,5);
-		case 4: return bitswap<8>(dat, 3,2,1,0,7,6,5,4);
-		case 5: return bitswap<8>(dat, 2,1,0,7,6,5,4,3);
-		case 6: return bitswap<8>(dat, 1,0,7,6,5,4,3,2);
-		case 7: return bitswap<8>(dat, 0,7,6,5,4,3,2,1);
-	}
+	return (dat << (bits & 7)) | (dat >> (8 - (bits & 7)));
 }
 
 int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstoffset)
@@ -1433,7 +1422,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 						}
 					}
 
-					if(local_counter > 1)
+					if (local_counter > 1)
 					{
 						space.write_byte(dstoffset + i, dat);
 

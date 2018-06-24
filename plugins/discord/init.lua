@@ -80,7 +80,7 @@ function discord.startplugin()
 		until #res == 0 and #data > 0 or time + 1 < os.time()
 		--print(data)
 	end
-		
+
 	do
 		local stat, err = pcall(init)
 		if not stat then

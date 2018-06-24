@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK / 16) // designated as "137243-001" on parts list and "157249-120" on schematics
 	MCFG_ADC0808_IN0_CB(IOPORT("STICKY")) // pitch
 	MCFG_ADC0808_IN1_CB(IOPORT("STICKX")) // yaw
-	MCFG_ADC0808_IN2_CB(GND) // thrust (unused)
+	MCFG_ADC0808_IN2_CB(CONSTANT(0)) // thrust (unused)
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK / 8)
 	MCFG_RIOT6532_IN_PA_CB(READ8(*this, starwars_state, r6532_porta_r))
@@ -379,7 +379,7 @@ MACHINE_CONFIG_START(starwars_state::esb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(esb_main_map)
 
-	MCFG_SLAPSTIC_ADD("slapstic", 101)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 101, false)
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1"))

@@ -173,8 +173,8 @@ void tryout_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_vram_bank));
-	save_pointer(NAME(m_vram.get()), 8 * 0x800);
-	save_pointer(NAME(m_vram_gfx.get()), 0x6000);
+	save_pointer(NAME(m_vram), 8 * 0x800);
+	save_pointer(NAME(m_vram_gfx), 0x6000);
 }
 
 void tryout_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)

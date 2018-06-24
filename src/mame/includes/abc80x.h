@@ -152,6 +152,7 @@ public:
 	emu_timer *m_cassette_timer;
 	void common(machine_config &config);
 	void abc800_m1(address_map &map);
+	void abc800_io(address_map &map);
 	void abc800c_io(address_map &map);
 	void abc800m_io(address_map &map);
 	void abc800m_mem(address_map &map);

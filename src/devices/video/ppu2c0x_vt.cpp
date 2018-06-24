@@ -154,7 +154,7 @@ void ppu_vt03_device::device_start()
 	ppu2c0x_device::device_start();
 
 	m_newpal = std::make_unique<uint8_t[]>(0x100);
-	save_pointer(&m_newpal[0], "m_newpal", 0x100);
+	save_pointer(NAME(m_newpal), 0x100);
 
 	save_item(NAME(m_201x_regs));
 }

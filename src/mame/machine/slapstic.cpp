@@ -766,13 +766,6 @@ void atari_slapstic_device::device_validity_check(validity_checker &valid) const
 
 void atari_slapstic_device::slapstic_init()
 {
-	if (access_68k == -1)
-	{
-		/* see if we're 68k or 6502/6809 based */
-		device_type cputype = machine().device(":maincpu")->type();
-		access_68k = (cputype == M68000 || cputype == M68010);
-	}
-
 	/* set up the parameters */
 	slapstic = *slapstic_table[m_chipnum - 101];
 

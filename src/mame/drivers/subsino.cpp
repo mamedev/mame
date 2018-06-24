@@ -3804,7 +3804,7 @@ void subsino_state::init_stbsub()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
 	}
 }
 
@@ -3820,7 +3820,7 @@ void subsino_state::init_stisub()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
 	}
 }
 
@@ -3840,7 +3840,7 @@ void subsino_state::init_tesorone()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
 	}
 }
 
@@ -3860,7 +3860,7 @@ void subsino_state::init_tesorone230()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
 	}
 }
 
@@ -3873,7 +3873,7 @@ void subsino_state::init_mtrainnv()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
 	}
 }
 

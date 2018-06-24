@@ -170,7 +170,6 @@ void williams_state::state_save_register()
 VIDEO_START_MEMBER(williams_state,williams)
 {
 	blitter_init(m_blitter_config, nullptr);
-	create_palette_lookup();
 	state_save_register();
 }
 
@@ -178,7 +177,6 @@ VIDEO_START_MEMBER(williams_state,williams)
 VIDEO_START_MEMBER(blaster_state,blaster)
 {
 	blitter_init(m_blitter_config, memregion("proms")->base());
-	create_palette_lookup();
 	state_save_register();
 	save_item(NAME(m_blaster_color0));
 	save_item(NAME(m_blaster_video_control));
@@ -213,7 +211,7 @@ uint32_t williams_state::screen_update_williams(screen_device &screen, bitmap_rg
 
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
-		pens[x] = m_palette_lookup[m_generic_paletteram_8[x]];
+		pens[x] = m_palette->pen_color(m_paletteram[x]);
 
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -240,11 +238,11 @@ uint32_t blaster_state::screen_update_blaster(screen_device &screen, bitmap_rgb3
 
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
-		pens[x] = m_palette_lookup[m_generic_paletteram_8[x]];
+		pens[x] = m_palette->pen_color(m_paletteram[x]);
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
 	if (cliprect.min_y == screen.visible_area().min_y || !(m_blaster_video_control & 1))
-		m_blaster_color0 = m_palette_lookup[m_blaster_palette_0[0] ^ 0xff];
+		m_blaster_color0 = m_palette->pen_color(m_blaster_palette_0[0] ^ 0xff);
 
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -255,7 +253,7 @@ uint32_t blaster_state::screen_update_blaster(screen_device &screen, bitmap_rgb3
 
 		/* latch a new color0 pen? */
 		if (m_blaster_video_control & m_blaster_scanline_control[y] & 1)
-			m_blaster_color0 = m_palette_lookup[m_blaster_palette_0[y] ^ 0xff];
+			m_blaster_color0 = m_palette->pen_color(m_blaster_palette_0[y] ^ 0xff);
 
 		/* loop over columns */
 		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
@@ -315,7 +313,7 @@ uint32_t williams2_state::screen_update_williams2(screen_device &screen, bitmap_
  *
  *************************************/
 
-void williams_state::create_palette_lookup()
+PALETTE_INIT_MEMBER(williams_state,williams)
 {
 	static const int resistances_rg[3] = { 1200, 560, 330 };
 	static const int resistances_b[2]  = { 560, 330 };
@@ -331,16 +329,16 @@ void williams_state::create_palette_lookup()
 			2, resistances_b,  weights_b, 0, 0);
 
 	/* build a palette lookup */
-	m_palette_lookup = std::make_unique<rgb_t[]>(256);
 	for (i = 0; i < 256; i++)
 	{
 		int r = combine_3_weights(weights_r, BIT(i,0), BIT(i,1), BIT(i,2));
 		int g = combine_3_weights(weights_g, BIT(i,3), BIT(i,4), BIT(i,5));
 		int b = combine_2_weights(weights_b, BIT(i,6), BIT(i,7));
 
-		m_palette_lookup[i] = rgb_t(r, g, b);
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
+
 
 
 WRITE8_MEMBER(williams2_state::williams2_paletteram_w)
@@ -353,11 +351,11 @@ WRITE8_MEMBER(williams2_state::williams2_paletteram_w)
 	uint8_t entry_lo, entry_hi, i, r, g, b;
 
 	/* set the new value */
-	m_generic_paletteram_8[offset] = data;
+	m_paletteram[offset] = data;
 
 	/* pull the associated low/high bytes */
-	entry_lo = m_generic_paletteram_8[offset & ~1];
-	entry_hi = m_generic_paletteram_8[offset |  1];
+	entry_lo = m_paletteram[offset & ~1];
+	entry_hi = m_paletteram[offset |  1];
 
 	/* update the palette entry */
 	i = ztable[(entry_hi >> 4) & 15];

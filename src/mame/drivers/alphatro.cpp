@@ -73,6 +73,7 @@ public:
 		, m_cartbank(*this, "cartbank")
 		, m_monbank(*this, "monbank")
 		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_dmac(*this, "dmac")
 		, m_config(*this, "CONFIG")
 		, m_cart(*this, "cartslot")
@@ -135,6 +136,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_lowbank, m_cartbank, m_monbank;
 	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<i8257_device> m_dmac;
 	required_ioport m_config;
 	required_device<generic_slot_device> m_cart;
@@ -300,18 +302,14 @@ WRITE8_MEMBER( alphatro_state::portf0_w)
 	{
 		m_fdc->reset();
 
-		floppy_connector *con = machine().device<floppy_connector>("fdc:0");
-		floppy_image_device *floppy = con ? con->get_device() : nullptr;
-		if (floppy)
+		for (auto &con : m_floppy)
 		{
-			floppy->mon_w(0);
-			m_fdc->set_rate(250000);
-		}
-		con = machine().device<floppy_connector>("fdc:1");
-		floppy = con ? con->get_device() : nullptr;
-		if (floppy)
-		{
-			floppy->mon_w(0);
+			floppy_image_device *floppy = con->get_device();
+			if (floppy)
+			{
+				floppy->mon_w(0);
+				m_fdc->set_rate(250000);
+			}
 		}
 	}
 

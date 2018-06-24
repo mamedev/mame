@@ -1460,8 +1460,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_DEVICE_PROGRAM_MAP(driver_68k_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen, HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
-	MCFG_SLAPSTIC_ADD("slapstic", 117)
-	MCFG_SLAPSTIC_68K_ACCESS(1)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 117, true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

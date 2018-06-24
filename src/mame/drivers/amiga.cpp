@@ -1430,7 +1430,7 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, amiga_state, rs232_cts_w))
 
 	// centronics
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, amiga_state, centronics_ack_w))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amiga_state, centronics_busy_w))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, amiga_state, centronics_perror_w))

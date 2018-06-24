@@ -148,8 +148,7 @@ void foodf_state::machine_start()
 
 void foodf_state::machine_reset()
 {
-	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
-	scan_timer->adjust(m_screen->time_until_pos(0));
+	m_scan_timer->adjust(m_screen->time_until_pos(0));
 }
 
 
@@ -334,7 +333,7 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", foodf_state, scanline_update_timer)
+	MCFG_TIMER_DRIVER_ADD(m_scan_timer, foodf_state, scanline_update_timer)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_foodf)

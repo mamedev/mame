@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "machine/6850acia.h"
 #include "machine/pit8253.h"
 #include "machine/timer.h"
 #include "machine/x2212.h"
@@ -54,6 +55,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_outlatch(*this, "outlatch")
 		, m_novram(*this, "nov%u", 0U)
+		, m_acia(*this, "acia")
+		, m_audiouart(*this, "audiouart")
 		, m_generic_paletteram_8(*this, "paletteram")
 	{ }
 
@@ -101,10 +104,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nvrecall_w);
 	DECLARE_READ8_MEMBER(novram_8bit_r);
 	DECLARE_WRITE8_MEMBER(novram_8bit_w);
-	DECLARE_READ8_MEMBER(m6850_r);
-	DECLARE_WRITE8_MEMBER(m6850_w);
-	DECLARE_READ8_MEMBER(m6850_sound_r);
-	DECLARE_WRITE8_MEMBER(m6850_sound_w);
+	DECLARE_WRITE8_MEMBER(acia_w);
+	DECLARE_WRITE_LINE_MEMBER(uint_w);
+	DECLARE_WRITE_LINE_MEMBER(uint_propagate_w);
 	DECLARE_READ8_MEMBER(adc_data_r);
 	DECLARE_WRITE8_MEMBER(adc_select_w);
 	DECLARE_READ8_MEMBER(counter_state_r);
@@ -135,14 +137,11 @@ private:
 	uint32_t screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(update_analog_inputs);
 	TIMER_CALLBACK_MEMBER(irq_off);
-	TIMER_CALLBACK_MEMBER(m6850_data_ready_callback);
-	TIMER_CALLBACK_MEMBER(m6850_w_callback);
 	TIMER_CALLBACK_MEMBER(adc_finished);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_counter_0_ff);
 	void draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *sprite);
 	void poly17_init();
-	void m6850_update_io();
 	DECLARE_WRITE_LINE_MEMBER(set_counter_0_ff);
 	void update_grudge_steering();
 	void expand_roms(uint8_t cd_rom_mask);
@@ -191,18 +190,8 @@ private:
 	uint8_t m_dac_register;
 	uint8_t m_chip_select;
 
-	/* main CPU 6850 states */
-	uint8_t m_m6850_status;
-	uint8_t m_m6850_control;
-	uint8_t m_m6850_input;
-	uint8_t m_m6850_output;
-	uint8_t m_m6850_data_ready;
-
 	/* sound CPU 6850 states */
-	uint8_t m_m6850_sound_status;
-	uint8_t m_m6850_sound_control;
-	uint8_t m_m6850_sound_input;
-	uint8_t m_m6850_sound_output;
+	bool m_uint;
 
 	/* noise generator states */
 	uint32_t m_noise_position[6];
@@ -236,6 +225,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<ls259_device> m_outlatch;
 	required_device_array<x2212_device, 2> m_novram;
+	required_device<acia6850_device> m_acia;
+	required_device<acia6850_device> m_audiouart;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 };
 

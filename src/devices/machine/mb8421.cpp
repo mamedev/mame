@@ -65,7 +65,7 @@ void mb8421_device::device_start()
 	m_ram = make_unique_clear<u8[]>(0x800);
 
 	// state save
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 }
 
 void mb8421_mb8431_16_device::device_start()
@@ -75,7 +75,7 @@ void mb8421_mb8431_16_device::device_start()
 	m_ram = make_unique_clear<u16[]>(0x800);
 
 	// state save
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 }
 
 //-------------------------------------------------

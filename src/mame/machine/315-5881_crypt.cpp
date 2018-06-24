@@ -58,9 +58,9 @@ void sega_315_5881_crypt_device::device_start()
 
 	m_read.bind_relative_to(*owner());
 
-	save_pointer(NAME(buffer.get()), BUFFER_SIZE);
-	save_pointer(NAME(line_buffer.get()), LINE_SIZE);
-	save_pointer(NAME(line_buffer_prev.get()), LINE_SIZE);
+	save_pointer(NAME(buffer), BUFFER_SIZE);
+	save_pointer(NAME(line_buffer), LINE_SIZE);
+	save_pointer(NAME(line_buffer_prev), LINE_SIZE);
 	save_item(NAME(prot_cur_address));
 	save_item(NAME(subkey));
 	save_item(NAME(enc_ready));

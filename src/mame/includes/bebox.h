@@ -32,19 +32,19 @@ public:
 	};
 
 	bebox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_ppc1(*this, "ppc1"),
-			m_ppc2(*this, "ppc2"),
-			m_lsi53c810(*this, "lsi53c810"),
-			m_dma8237_1(*this, "dma8237_1"),
-			m_dma8237_2(*this, "dma8237_2"),
-			m_pic8259_1(*this, "pic8259_1"),
-			m_pic8259_2(*this, "pic8259_2"),
-			m_pit8254(*this, "pit8254"),
-			m_ram(*this, RAM_TAG),
-			m_smc37c78(*this, "smc37c78"),
-			m_flash(*this, "flash"),
-			m_pcibus(*this, "pcibus")
+		: driver_device(mconfig, type, tag)
+		, m_ppc1(*this, "ppc1")
+		, m_ppc2(*this, "ppc2")
+		, m_lsi53c810(*this, "lsi53c810")
+		, m_dma8237_1(*this, "dma8237_1")
+		, m_dma8237_2(*this, "dma8237_2")
+		, m_pic8259_1(*this, "pic8259_1")
+		, m_pic8259_2(*this, "pic8259_2")
+		, m_pit8254(*this, "pit8254")
+		, m_ram(*this, RAM_TAG)
+		, m_smc37c78(*this, "smc37c78")
+		, m_flash(*this, "flash")
+		, m_pcibus(*this, "pcibus")
 	{
 	}
 

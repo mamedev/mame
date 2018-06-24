@@ -276,7 +276,6 @@ private:
 	DECLARE_READ8_MEMBER( intc1_slave_ack_r );
 	DECLARE_WRITE_LINE_MEMBER( ctc_out1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_out2_w );
-	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
 };
 
 

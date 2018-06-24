@@ -365,6 +365,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "sound/cdda.h"
 #include "video/psx.h"
 #include "cdrom.h"
+#include "romload.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END

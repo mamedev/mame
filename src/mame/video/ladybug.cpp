@@ -105,8 +105,8 @@ void ladybug_video_device::device_start()
 	m_bg_tilemap->set_scroll_rows(32);
 	m_bg_tilemap->set_transparent_pen(0);
 
-	save_pointer(NAME(m_spr_ram.get()), 0x0400);
-	save_pointer(NAME(m_bg_ram.get()), 0x0800);
+	save_pointer(NAME(m_spr_ram), 0x0400);
+	save_pointer(NAME(m_bg_ram), 0x0800);
 }
 
 TILE_GET_INFO_MEMBER(ladybug_video_device::get_bg_tile_info)

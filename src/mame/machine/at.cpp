@@ -126,7 +126,7 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	MCFG_ISA_OUT_DRQ7_CB(WRITELINE("dma8237_2", am9517a_device, dreq3_w))
 
 	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir0_w)) MCFG_DEVCB_INVERT
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir0_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 
 	/* sound hardware */

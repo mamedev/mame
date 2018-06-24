@@ -96,6 +96,9 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_hopper(*this, "hopper")
+		, m_keyb(*this, "KEYB_%u", 0U)
+		, m_dsw(*this, "DSW%u", 1U)
+		, m_system(*this, "SYSTEM")
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
@@ -212,6 +215,9 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<ticket_dispenser_device> m_hopper;
+	optional_ioport_array<5> m_keyb;
+	optional_ioport_array<4> m_dsw;
+	optional_ioport m_system;
 	output_finder<9> m_leds;
 
 private:
@@ -825,10 +831,10 @@ WRITE8_MEMBER(subsino2_state::dsw_mask_w)
 
 READ8_MEMBER(subsino2_state::dsw_r)
 {
-	return  ( (ioport("DSW1")->read() & m_dsw_mask) ? 0x01 : 0 ) |
-			( (ioport("DSW2")->read() & m_dsw_mask) ? 0x02 : 0 ) |
-			( (ioport("DSW3")->read() & m_dsw_mask) ? 0x04 : 0 ) |
-			( (ioport("DSW4")->read() & m_dsw_mask) ? 0x08 : 0 ) ;
+	return  ( (m_dsw[0]->read() & m_dsw_mask) ? 0x01 : 0 ) |
+			( (m_dsw[1]->read() & m_dsw_mask) ? 0x02 : 0 ) |
+			( (m_dsw[2]->read() & m_dsw_mask) ? 0x04 : 0 ) |
+			( (m_dsw[3]->read() & m_dsw_mask) ? 0x08 : 0 ) ;
 }
 
 
@@ -896,18 +902,14 @@ WRITE16_MEMBER(subsino2_state::bishjan_input_w)
 
 READ16_MEMBER(subsino2_state::bishjan_input_r)
 {
-	int i;
 	uint16_t res = 0xff;
-	static const char *const port[] = { "KEYB_0", "KEYB_1", "KEYB_2", "KEYB_3", "KEYB_4" };
 
-	for (i = 0; i < 5; i++)
+	for (int i = 0; i < 5; i++)
 		if (m_bishjan_input & (1 << i))
-			res = ioport(port[i])->read();
+			res = m_keyb[i]->read();
 
 	return  (res << 8) |                    // high byte
-			ioport("SYSTEM")->read() |      // low byte
-			(machine().device<ticket_dispenser_device>("hopper")->line_r() ? 0x00 : 0x04) // bit 2: hopper sensor
-	;
+			m_system->read();       // low byte
 }
 
 WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
@@ -1587,7 +1589,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_START("SYSTEM") // IN A
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE        )   PORT_IMPULSE(1) // service mode (press twice for inputs)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,IPT_CUSTOM        )   // hopper sensor
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM        )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1       )   // stats
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2       )   // pay out? "hopper empty"
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1          )   PORT_IMPULSE(2) // coin
@@ -2382,7 +2384,7 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

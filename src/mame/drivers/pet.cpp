@@ -1230,8 +1230,8 @@ WRITE8_MEMBER( pet_state::via_pb_w )
 	*/
 
 	// IEEE-488
-	m_ieee->nrfd_w(BIT(data, 1));
-	m_ieee->atn_w(BIT(data, 2));
+	m_ieee->host_nrfd_w(BIT(data, 1));
+	m_ieee->host_atn_w(BIT(data, 2));
 
 	// cassette
 	m_cassette->write(BIT(data, 3));
@@ -1371,7 +1371,7 @@ READ8_MEMBER( pet2001b_state::pia1_pb_r )
 
 WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
 {
-	m_ieee->eoi_w(state);
+	m_ieee->host_eoi_w(state);
 
 	m_blanktv = state;
 }
@@ -1659,7 +1659,7 @@ MACHINE_RESET_MEMBER( pet_state, pet )
 
 	m_exp->reset();
 
-	m_ieee->ren_w(0);
+	m_ieee->host_ren_w(0);
 }
 
 
@@ -1819,9 +1819,9 @@ MACHINE_CONFIG_START(pet_state::pet)
 
 	MCFG_DEVICE_ADD(M6520_2_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, dio_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, dav_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, pet_state, pia2_irqa_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, pet_state, pia2_irqb_w))
 
@@ -1833,7 +1833,7 @@ MACHINE_CONFIG_START(pet_state::pet)
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL(8'000'000)/8, pet_expansion_cards, nullptr)
 	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(*this, pet_state, read), WRITE8(*this, pet_state, write))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, pet_user_port_cards, nullptr)
+	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, pet_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(*this, pet_state, user_diag_w))
 	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa0))
@@ -2283,9 +2283,9 @@ MACHINE_CONFIG_START(pet80_state::pet80)
 
 	MCFG_DEVICE_ADD(M6520_2_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, dio_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, dav_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, pet_state, pia2_irqa_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, pet_state, pia2_irqb_w))
 
@@ -2297,7 +2297,7 @@ MACHINE_CONFIG_START(pet80_state::pet80)
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL(16'000'000)/16, pet_expansion_cards, nullptr)
 	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(*this, pet_state, read), WRITE8(*this, pet_state, write))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, pet_user_port_cards, nullptr)
+	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, pet_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa0))
 	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa1))

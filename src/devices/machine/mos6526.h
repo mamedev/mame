@@ -123,10 +123,10 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	uint8_t pa_r() { return m_pa; }
-	DECLARE_READ8_MEMBER( pa_r ) { return pa_r(); }
-	uint8_t pb_r() { return m_pb; }
-	DECLARE_READ8_MEMBER( pb_r ) { return pb_r(); }
+	uint8_t read_pa() { return m_pa; }
+	DECLARE_READ8_MEMBER( pa_r ) { return m_pa; }
+	uint8_t read_pb() { return m_pb; }
+	DECLARE_READ8_MEMBER( pb_r ) { return m_pb; }
 
 	DECLARE_READ_LINE_MEMBER( sp_r ) { return m_sp; }
 	DECLARE_WRITE_LINE_MEMBER( sp_w );

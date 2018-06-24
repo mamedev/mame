@@ -185,7 +185,7 @@ protected:
 	required_device<cococart_slot_device> m_cart_device;
 	memory_bank *               m_read_banks[9];
 	memory_bank *               m_write_banks[9];
-    uint8_t *                   m_rom;
+	uint8_t *                   m_rom;
 	required_memory_region      m_rom_region;
 	uint8_t *                   m_cart_rom;
 	uint32_t                    m_cart_size;
@@ -290,8 +290,8 @@ public:
 		: gime_ntsc_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-        m_cpu.set_tag(std::forward<T>(cpu_tag));
-        m_ram.set_tag(std::forward<U>(ram_tag));
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+		m_ram.set_tag(std::forward<U>(ram_tag));
 		m_cart_device.set_tag(std::forward<V>(ext_tag));
 		m_rom_region.set_tag(std::forward<W>(region_tag));
 	}
@@ -307,8 +307,8 @@ public:
 		: gime_pal_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-        m_cpu.set_tag(std::forward<T>(cpu_tag));
-        m_ram.set_tag(std::forward<U>(ram_tag));
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+		m_ram.set_tag(std::forward<U>(ram_tag));
 		m_cart_device.set_tag(std::forward<V>(ext_tag));
 		m_rom_region.set_tag(std::forward<W>(region_tag));
 	}

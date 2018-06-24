@@ -382,7 +382,7 @@ void pgm2_state::video_start()
 
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
-	save_pointer(NAME(m_spritebufferram.get()), 0x2000 / 4);
+	save_pointer(NAME(m_spritebufferram), 0x2000 / 4);
 
 	m_sprites_mask_mask = memregion("sprites_mask")->bytes() - 1;
 	m_sprites_colour_mask = memregion("sprites_colour")->bytes() - 1;

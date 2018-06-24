@@ -1661,8 +1661,7 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, x68k_state, ppi_port_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, x68k_state, ppi_port_c_w))
 
-	MCFG_DEVICE_ADD("hd63450", HD63450, 0)
-	MCFG_HD63450_CPU("maincpu") // CPU - 68000
+	MCFG_DEVICE_ADD("hd63450", HD63450, "maincpu")
 	MCFG_HD63450_CLOCKS(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
 	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
 	MCFG_HD63450_DMA_END_CB(WRITE8(*this, x68k_state, dma_end))

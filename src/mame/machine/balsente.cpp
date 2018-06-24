@@ -72,6 +72,11 @@ void balsente_state::machine_start()
 	/* create the polynomial tables */
 	poly17_init();
 
+	m_acia->write_cts(0);
+	m_acia->write_dcd(0);
+	m_audiouart->write_cts(0);
+	m_audiouart->write_dcd(0);
+
 	save_item(NAME(m_counter_control));
 	save_item(NAME(m_counter_0_ff));
 	save_item(NAME(m_counter_0_out));
@@ -84,16 +89,7 @@ void balsente_state::machine_start()
 	save_item(NAME(m_dac_register));
 	save_item(NAME(m_chip_select));
 
-	save_item(NAME(m_m6850_status));
-	save_item(NAME(m_m6850_control));
-	save_item(NAME(m_m6850_input));
-	save_item(NAME(m_m6850_output));
-	save_item(NAME(m_m6850_data_ready));
-
-	save_item(NAME(m_m6850_sound_status));
-	save_item(NAME(m_m6850_sound_control));
-	save_item(NAME(m_m6850_sound_input));
-	save_item(NAME(m_m6850_sound_output));
+	save_item(NAME(m_uint));
 
 	save_item(NAME(m_noise_position));
 
@@ -108,7 +104,6 @@ void balsente_state::machine_start()
 
 void balsente_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int numbanks;
 
 	/* reset the manual counter 0 clock */
@@ -116,6 +111,7 @@ void balsente_state::machine_reset()
 	m_counter_0_ff = false;
 	m_counter_0_out = false;
 	m_counter_0_timer_active = false;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	/* reset the ADC states */
 	m_adc_value = 0;
@@ -127,10 +123,6 @@ void balsente_state::machine_reset()
 
 	/* reset game-specific states */
 	m_grudge_steering_result = 0;
-
-	/* reset the 6850 chips */
-	m6850_w(space, 0, 3);
-	m6850_sound_w(space, 0, 3);
 
 	/* reset the noise generator */
 	memset(m_noise_position, 0, sizeof(m_noise_position));
@@ -335,206 +327,21 @@ WRITE8_MEMBER(balsente_state::novram_8bit_w)
  *
  *************************************/
 
-void balsente_state::m6850_update_io()
+WRITE8_MEMBER(balsente_state::acia_w)
 {
-	uint8_t new_state;
-
-	/* sound -> main CPU communications */
-	if (!(m_m6850_sound_status & 0x02))
-	{
-		/* set the overrun bit if the data in the destination hasn't been read yet */
-		if (m_m6850_status & 0x01)
-			m_m6850_status |= 0x20;
-
-		/* copy the sound's output to our input */
-		m_m6850_input = m_m6850_sound_output;
-
-		/* set the receive register full bit */
-		m_m6850_status |= 0x01;
-
-		/* set the sound's trasmitter register empty bit */
-		m_m6850_sound_status |= 0x02;
-	}
-
-	/* main -> sound CPU communications */
-	if (m_m6850_data_ready)
-	{
-		/* set the overrun bit if the data in the destination hasn't been read yet */
-		if (m_m6850_sound_status & 0x01)
-			m_m6850_sound_status |= 0x20;
-
-		/* copy the main CPU's output to our input */
-		m_m6850_sound_input = m_m6850_output;
-
-		/* set the receive register full bit */
-		m_m6850_sound_status |= 0x01;
-
-		/* set the main CPU's trasmitter register empty bit */
-		m_m6850_status |= 0x02;
-		m_m6850_data_ready = 0;
-	}
-
-	/* check for reset states */
-	if ((m_m6850_control & 3) == 3)
-	{
-		m_m6850_status = 0x02;
-		m_m6850_data_ready = 0;
-	}
-	if ((m_m6850_sound_control & 3) == 3)
-		m_m6850_sound_status = 0x02;
-
-	/* check for transmit/receive IRQs on the main CPU */
-	new_state = 0;
-	if ((m_m6850_control & 0x80) && (m_m6850_status & 0x21)) new_state = 1;
-	if ((m_m6850_control & 0x60) == 0x20 && (m_m6850_status & 0x02)) new_state = 1;
-
-	/* apply the change */
-	if (new_state && !(m_m6850_status & 0x80))
-	{
-		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
-		m_m6850_status |= 0x80;
-	}
-	else if (!new_state && (m_m6850_status & 0x80))
-	{
-		m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
-		m_m6850_status &= ~0x80;
-	}
-
-	/* check for transmit/receive IRQs on the sound CPU */
-	new_state = 0;
-	if ((m_m6850_sound_control & 0x80) && (m_m6850_sound_status & 0x21)) new_state = 1;
-	if ((m_m6850_sound_control & 0x60) == 0x20 && (m_m6850_sound_status & 0x02)) new_state = 1;
-	if (!(m_counter_control & 0x20)) new_state = 0;
-
-	/* apply the change */
-	if (new_state && !(m_m6850_sound_status & 0x80))
-	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_m6850_sound_status |= 0x80;
-	}
-	else if (!new_state && (m_m6850_sound_status & 0x80))
-	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		m_m6850_sound_status &= ~0x80;
-	}
+	// Ugly workaround: suppress soft reset command in order to avert race condition
+	m_acia->write(space, offset, (BIT(offset, 0) && data == 0xe0) ? 0 : data);
 }
 
-
-
-/*************************************
- *
- *  6850 UART (main CPU)
- *
- *************************************/
-
-READ8_MEMBER(balsente_state::m6850_r)
+WRITE_LINE_MEMBER(balsente_state::uint_w)
 {
-	int result;
-
-	/* status register is at offset 0 */
-	if (offset == 0)
-	{
-		result = m_m6850_status;
-	}
-
-	/* input register is at offset 1 */
-	else
-	{
-		result = m_m6850_input;
-
-		/* clear the overrun and receive buffer full bits */
-		m_m6850_status &= ~0x21;
-		m6850_update_io();
-	}
-
-	return result;
+	m_uint = bool(state);
 }
 
-
-TIMER_CALLBACK_MEMBER(balsente_state::m6850_data_ready_callback)
+WRITE_LINE_MEMBER(balsente_state::uint_propagate_w)
 {
-	/* set the output data byte and indicate that we're ready to go */
-	m_m6850_output = param;
-	m_m6850_data_ready = 1;
-	m6850_update_io();
-}
-
-
-TIMER_CALLBACK_MEMBER(balsente_state::m6850_w_callback)
-{
-	/* indicate that the transmit buffer is no longer empty and update the I/O state */
-	m_m6850_status &= ~0x02;
-	m6850_update_io();
-
-	/* set a timer for 500usec later to actually transmit the data */
-	/* (this is very important for several games, esp Snacks'n Jaxson) */
-	machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(balsente_state::m6850_data_ready_callback),this), param);
-}
-
-
-WRITE8_MEMBER(balsente_state::m6850_w)
-{
-	/* control register is at offset 0 */
-	if (offset == 0)
-	{
-		m_m6850_control = data;
-
-		/* re-update since interrupt enables could have been modified */
-		m6850_update_io();
-	}
-
-	/* output register is at offset 1; set a timer to synchronize the CPUs */
-	else
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(balsente_state::m6850_w_callback),this), data);
-}
-
-
-
-/*************************************
- *
- *  6850 UART (sound CPU)
- *
- *************************************/
-
-READ8_MEMBER(balsente_state::m6850_sound_r)
-{
-	int result;
-
-	/* status register is at offset 0 */
-	if (offset == 0)
-	{
-		result = m_m6850_sound_status;
-	}
-
-	/* input register is at offset 1 */
-	else
-	{
-		result = m_m6850_sound_input;
-
-		/* clear the overrun and receive buffer full bits */
-		m_m6850_sound_status &= ~0x21;
-		m6850_update_io();
-	}
-
-	return result;
-}
-
-
-WRITE8_MEMBER(balsente_state::m6850_sound_w)
-{
-	/* control register is at offset 0 */
-	if (offset == 0)
-		m_m6850_sound_control = data;
-
-	/* output register is at offset 1 */
-	else
-	{
-		m_m6850_sound_output = data;
-		m_m6850_sound_status &= ~0x02;
-	}
-
-	/* re-update since interrupt enables could have been modified */
-	m6850_update_io();
+	if (state && BIT(m_counter_control, 5))
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, m_uint ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -764,8 +571,9 @@ WRITE8_MEMBER(balsente_state::counter_control_w)
 	else if (!BIT(data, 2))
 		set_counter_0_ff(1);
 
-	/* bit 5 clears the NMI interrupt; recompute the I/O state now */
-	m6850_update_io();
+	/* bit 5 clears the NMI interrupt */
+	if (BIT(diff_counter_control, 5) && !BIT(data, 5))
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

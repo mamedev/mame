@@ -1044,7 +1044,7 @@ void sms_state::machine_start()
 	if (m_mainram == nullptr)
 	{
 		m_mainram = make_unique_clear<uint8_t[]>(0x2000);
-		save_pointer(NAME(m_mainram.get()), 0x2000);
+		save_pointer(NAME(m_mainram), 0x2000);
 
 		// alibaba and blockhol are ports of games for the MSX system. The
 		// MSX bios usually initializes callback "vectors" at the top of RAM.
@@ -1395,7 +1395,7 @@ VIDEO_START_MEMBER(sms_state,gamegear)
 	save_item(NAME(m_prev_bitmap_copied));
 	save_item(NAME(m_prev_bitmap));
 	save_item(NAME(m_gg_sms_mode_bitmap));
-	save_pointer(NAME(m_line_buffer.get()), 160 * 4);
+	save_pointer(NAME(m_line_buffer), 160 * 4);
 }
 
 VIDEO_RESET_MEMBER(sms_state,gamegear)
