@@ -485,7 +485,7 @@ void dynax_state::mjangels_banked_map(address_map &map)
 void dynax_state::hanamai_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(dynax_state::dynax_extra_scrollx_w));	// screen scroll X
+	map(0x00, 0x00).w(FUNC(dynax_state::dynax_extra_scrollx_w));    // screen scroll X
 	map(0x20, 0x20).w(FUNC(dynax_state::dynax_extra_scrolly_w));    // screen scroll Y
 	map(0x41, 0x47).w("blitter", FUNC(dynax_blitter_rev2_device::regs_w));     // Blitter
 	map(0x50, 0x50).w(FUNC(dynax_state::dynax_rombank_w));          // BANK ROM Select  hnkochou only

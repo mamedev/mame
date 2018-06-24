@@ -45,7 +45,7 @@
         * The timed interrupt is a kludge; it is supposed to be generated internally by
           the Z180, but the cpu core doesn't support that yet.
         * Is the clock divide 3 or 4?
-		* Galaga attract mode isn't correct; referenct : https://youtu.be/OQyWaN9fTgw?t=2m33s
+        * Galaga attract mode isn't correct; referenct : https://youtu.be/OQyWaN9fTgw?t=2m33s
 
 +-------------------------------------------------------+
 |                        +-------------+                |
@@ -368,7 +368,7 @@ void _20pacgal_state::common_save_state()
 	m_ram_48000 = make_unique_clear<uint8_t[]>(0x2000);
 
 	save_item(NAME(m_game_selected));
-	save_pointer(NAME(m_ram_48000.get()), 0x2000);
+	save_pointer(NAME(m_ram_48000), 0x2000);
 	save_item(NAME(m_irq_mask));
 }
 

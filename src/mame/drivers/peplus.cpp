@@ -6227,7 +6227,7 @@ ROM_END
 
 ROM_START( pepp0472 ) /* Normal board : Deuces Wild Poker (PP0472) - PSR Verified */
 /*
-	 w/D     w/oD
+     w/D     w/oD
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 ------------------------------------------------------------
   ????      1    2    2   3   4  10  15  25 400 250    800

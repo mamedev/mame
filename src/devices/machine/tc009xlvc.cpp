@@ -175,8 +175,8 @@ void tc0091lvc_device::device_start()
 	m_bg_tilemap[0]->set_scrolldx(28, -11);
 	m_bg_tilemap[1]->set_scrolldx(38, -21);
 
-	save_pointer(NAME(m_vregs.get()), 0x400);
-	save_pointer(NAME(m_sprram_buffer.get()), 0x400);
+	save_pointer(NAME(m_vregs), 0x400);
+	save_pointer(NAME(m_sprram_buffer), 0x400);
 }
 
 device_memory_interface::space_config_vector tc0091lvc_device::memory_space_config() const

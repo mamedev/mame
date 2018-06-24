@@ -4,28 +4,28 @@
 
     'Nichibutsu LD' HW (c) 199? Nichibutsu
 
-	TODO:
-	- Understand how MMU works (both games jumps to invalid areas, probably 
-	  port A remaps memory for the whole space!);
-	- (if ld check patched) memory error printed by ldquiz4, most likely 
-	  related to above;
-	- Unknown LaserDisc type;
-	- Verify irq vector for vblank irq, and make it work with daisy chain;
-	- Unknown irq vector for LaserDisc strobe (ldquiz4 sets a flag at $f014, 
-	  the only place it clears it is at snippet 0x0ED6);
-	- hookup audio CPU (same as niyanpai HW?)
+    TODO:
+    - Understand how MMU works (both games jumps to invalid areas, probably
+      port A remaps memory for the whole space!);
+    - (if ld check patched) memory error printed by ldquiz4, most likely
+      related to above;
+    - Unknown LaserDisc type;
+    - Verify irq vector for vblank irq, and make it work with daisy chain;
+    - Unknown irq vector for LaserDisc strobe (ldquiz4 sets a flag at $f014,
+      the only place it clears it is at snippet 0x0ED6);
+    - hookup audio CPU (same as niyanpai HW?)
 
 =============================================================================
-	
-	1 x TMPZ84C011AF-6 main CPU
-	1 x 21.47727MHz OSC
-	1 x Z0840004PSC audio CPU
-	1 x 4.000MHz OSC
-	1 x Yamaha V9938
-	1 x uPC1352C
-	1 x Yamaha YM3812
-	2 x 8 dip switch banks
-	
+
+    1 x TMPZ84C011AF-6 main CPU
+    1 x 21.47727MHz OSC
+    1 x Z0840004PSC audio CPU
+    1 x 4.000MHz OSC
+    1 x Yamaha V9938
+    1 x uPC1352C
+    1 x Yamaha YM3812
+    2 x 8 dip switch banks
+
 ***************************************************************************/
 
 
@@ -79,13 +79,13 @@ private:
 READ8_MEMBER(nichild_state::gfx_r)
 {
 	uint32_t gfx_offset;
-	
+
 	gfx_offset  = ((offset & 0x007f) << 8);
 	gfx_offset |= ((offset & 0xff00) >> 8);
 	gfx_offset |= m_gfx_bank;
-	
+
 	//printf("%08x %02x\n",gfx_offset,m_gfx_bank);
-	
+
 	return m_gfxrom[gfx_offset];
 }
 
@@ -94,7 +94,7 @@ READ8_MEMBER(nichild_state::gfx_r)
 WRITE8_MEMBER(nichild_state::porta_w)
 {
 	printf("PORTA %02x\n",data);
-//	machine().debug_break();
+//  machine().debug_break();
 }
 
 WRITE8_MEMBER(nichild_state::portb_w)
@@ -143,7 +143,7 @@ void nichild_state::nichild_map(address_map &map)
 
 void nichild_state::nichild_io(address_map &map)
 {
-//	map.global_mask(0xff);
+//  map.global_mask(0xff);
 	map(0x60, 0x60).mirror(0xff00).w(FUNC(nichild_state::mux_w));
 	// shabdama accesses 0x70-0x73, ldquiz4 0x7c-0x7f
 	map(0x70, 0x73).mirror(0xff0c).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
@@ -234,7 +234,7 @@ MACHINE_CONFIG_START(nichild_state::nichild)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",TMPZ84C011,MAIN_CLOCK/4)
-//	MCFG_Z80_DAISY_CHAIN(daisy_chain_main)
+//  MCFG_Z80_DAISY_CHAIN(daisy_chain_main)
 	MCFG_DEVICE_PROGRAM_MAP(nichild_map)
 	MCFG_DEVICE_IO_MAP(nichild_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nichild_state,  vdp_irq)
@@ -247,8 +247,8 @@ MACHINE_CONFIG_START(nichild_state::nichild)
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", 0x40000, MAIN_CLOCK)
-//	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-//	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, nichild_state, vdp_irq))
+//  MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
+//  MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, nichild_state, vdp_irq))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
 
 	/* sound hardware */

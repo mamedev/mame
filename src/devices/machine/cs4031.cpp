@@ -147,7 +147,7 @@ MACHINE_CONFIG_START(cs4031_device::device_add_mconfig)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, cs4031_device, ctc_out2_w))
 
 	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, cs4031_device, rtc_irq_w))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("intc2", pic8259_device, ir0_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 MACHINE_CONFIG_END
 
@@ -431,11 +431,6 @@ READ8_MEMBER( cs4031_device::intc1_slave_ack_r )
 		return m_intc2->acknowledge();
 
 	return 0x00;
-}
-
-WRITE_LINE_MEMBER( cs4031_device::rtc_irq_w )
-{
-	m_intc2->ir0_w(state ? 0 : 1); // inverted?
 }
 
 WRITE_LINE_MEMBER( cs4031_device::iochck_w )

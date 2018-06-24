@@ -65,7 +65,7 @@ void taitol_state::video_start()
 	m_bg_tilemap[0]->set_scrolldx(28, -11);
 	m_bg_tilemap[1]->set_scrolldx(38, -21);
 
-	save_pointer(NAME(m_buff_spriteram.get()), SPRITERAM_SIZE);
+	save_pointer(NAME(m_buff_spriteram), SPRITERAM_SIZE);
 }
 
 

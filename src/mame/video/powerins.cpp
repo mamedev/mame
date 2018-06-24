@@ -154,8 +154,8 @@ void powerins_state::video_start()
 	m_tilemap[1]->set_transparent_pen(15);
 
 	save_item(NAME(m_tile_bank));
-	save_pointer(NAME(m_spritebuffer[0].get()), 0x1000/2);
-	save_pointer(NAME(m_spritebuffer[1].get()), 0x1000/2);
+	save_pointer(NAME(m_spritebuffer[0]), 0x1000/2);
+	save_pointer(NAME(m_spritebuffer[1]), 0x1000/2);
 }
 
 

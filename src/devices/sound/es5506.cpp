@@ -269,7 +269,7 @@ void es5506_device::device_start()
 	save_item(NAME(m_lrend));
 	save_item(NAME(m_irqv));
 
-	save_pointer(NAME(m_scratch.get()), 2 * MAX_SAMPLE_CHUNK);
+	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
 
 	for (j = 0; j < 32; j++)
 	{
@@ -401,7 +401,7 @@ void es5505_device::device_start()
 	save_item(NAME(m_lrend));
 	save_item(NAME(m_irqv));
 
-	save_pointer(NAME(m_scratch.get()), 2 * MAX_SAMPLE_CHUNK);
+	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
 
 	for (j = 0; j < 32; j++)
 	{

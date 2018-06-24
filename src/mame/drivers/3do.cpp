@@ -233,14 +233,14 @@ ROM_START(3do_pal)
 	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "panafz1", "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer" )
 	ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(2) )
-	
+
 	ROM_REGION32_BE( 0x200000, "overlay", 0 )
 	ROM_COPY( "bios", 0, 0, 0x200000 )
 ROM_END
 
 ROM_START(orbatak)
 	NTSC_BIOS
-	
+
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "orbatak", 0, SHA1(25cb3b889cf09dbe5faf2b0ca4aae5e03453da00) )
 ROM_END
@@ -260,14 +260,14 @@ ROM_END
 
 ROM_START(md23do)
 	ALG_BIOS
-	
+
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "mad dog ii", 0, SHA1(0117c1fd279f42e942648ca55fa75dd45da37a4f) )
 ROM_END
 
 ROM_START(sht3do)
 	ALG_BIOS
-	
+
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "shootout at old tucson", 0, SHA1(bd42213c6b460b5b6153a8b2b41d0a114171e86e) )
 ROM_END

@@ -313,7 +313,7 @@ READ8_MEMBER(omegaf_state::io_protection_r)
 		case 1: // dip switches
 			switch (offset)
 			{
-				case 0: 
+				case 0:
 				case 1: result = m_dsw_io[offset & 1]->read(); break;
 				case 2: result = 0x02; break;
 			}
@@ -322,7 +322,7 @@ READ8_MEMBER(omegaf_state::io_protection_r)
 		case 2: // player inputs
 			switch (offset)
 			{
-				case 0: 
+				case 0:
 				case 1: result = m_pad_io[offset & 1]->read(); break;
 				case 2: result = 0x01; break;
 			}
@@ -960,7 +960,7 @@ void omegaf_state::machine_start()
 void omegaf_state::machine_reset()
 {
 	io_protection_reset();
-	
+
 	ninjakd2_state::machine_reset();
 }
 
@@ -1085,8 +1085,8 @@ MACHINE_CONFIG_START(omegaf_state::omegaf)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
-//	MCFG_MACHINE_START_OVERRIDE(ninjakd2_state,omegaf)
-//	MCFG_MACHINE_RESET_OVERRIDE(ninjakd2_state,omegaf)
+//  MCFG_MACHINE_START_OVERRIDE(ninjakd2_state,omegaf)
+//  MCFG_MACHINE_RESET_OVERRIDE(ninjakd2_state,omegaf)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(omegaf_state,omegaf)

@@ -111,9 +111,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class intelfsh_device;
-
-
 // ======================> intelfsh_device
 
 class intelfsh_device : public device_t,

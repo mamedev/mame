@@ -31,12 +31,20 @@ const char *const mips3_disassembler::reg[32] =
 };
 #endif
 
-const char *const ee_disassembler::vreg[32] =
+const char *const ee_disassembler::vfreg[32] =
 {
-	"$vf0",  "$vf1",  "$vf2",  "$vf3",  "$vf4",  "$vf5",  "$vf6",  "$vf7",
-	"$vf8",  "$vf9",  "$vf10", "$vf11", "$vf12", "$vf13", "$vf14", "$vf15",
+	"$vf00", "$vf01", "$vf02", "$vf03", "$vf04", "$vf05", "$vf06", "$vf07",
+	"$vf08", "$vf09", "$vf10", "$vf11", "$vf12", "$vf13", "$vf14", "$vf15",
 	"$vf16", "$vf17", "$vf18", "$vf19", "$vf20", "$vf21", "$vf22", "$vf23",
 	"$vf24", "$vf25", "$vf26", "$vf27", "$vf28", "$vf29", "$vf30", "$vf31"
+};
+
+const char *const ee_disassembler::vireg[32] =
+{
+	"$vi00",  "$vi01", "$vi02", "$vi03",  "$vi04", "$vi05",    "$vi06", "$vi07",
+	"$vi08",  "$vi09", "$vi10", "$vi11",  "$vi12", "$vi13",    "$vi14", "$vi15",
+	"STATUS", "MACF",  "CLIPF", "res19",  "R",     "I",        "Q",     "res23",
+	"res24",  "res25", "TPC",   "CMSAR0", "FBRST", "VPU_STAT", "res30", "CMSAR1"
 };
 
 const char *const mips3_disassembler::cacheop[32] =
@@ -357,11 +365,17 @@ uint32_t mips3_disassembler::dasm_cop2(uint32_t pc, uint32_t op, std::ostream &s
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:  /* COP */
-			util::stream_format(stream, "cop2      $%07x", op & 0x01ffffff);
+			flags = dasm_extra_cop2(pc, op, stream);
 			break;
 		default:    util::stream_format(stream, "dc.l      $%08x [invalid]", op);                                  break;
 	}
 	return flags;
+}
+
+uint32_t mips3_disassembler::dasm_extra_cop2(uint32_t pc, uint32_t op, std::ostream &stream)
+{
+	util::stream_format(stream, "cop2      $%07x", op & 0x01ffffff);
+	return 0;
 }
 
 uint32_t mips3_disassembler::dasm_idt(uint32_t pc, uint32_t op, std::ostream &stream)
@@ -399,6 +413,145 @@ uint32_t mips3_disassembler::dasm_extra_regimm(uint32_t pc, uint32_t op, std::os
 uint32_t mips3_disassembler::dasm_extra_special(uint32_t pc, uint32_t op, std::ostream &stream)
 {
 	util::stream_format(stream, "dc.l      $%08x [invalid]", op);
+	return 0;
+}
+
+uint32_t ee_disassembler::dasm_extra_cop2(uint32_t pc, uint32_t op, std::ostream &stream)
+{
+	const int rd   = (op >>  6) & 31;
+	const int rs   = (op >> 11) & 31;
+	const int rt   = (op >> 16) & 31;
+	const int imm5 = rd; // for convenience
+	const int ext = ((op >> 4) & 0x7c) | (op & 3);
+	const char* dest_strings[16] =
+	{
+		"    ", "w   ", "z   ", "zw  ", "y   ", "yw  ", "yz  ", "yzw ",
+		"x   ", "xw  ", "xz  ", "xzw ", "xy  ", "xyw ", "xyz ", "xyzw"
+	};
+	const char* dest_strings_with_comma[16] =
+	{
+		",",  "w,",  "z,",  "zw,",  "y,",  "yw,",  "yz,",  "yzw,",
+		"x,", "xw,", "xz,", "xzw,", "xy,", "xyw,", "xyz,", "xyzw,"
+	};
+	const char* bc_strings[4] = { "x", "y", "z", "w" };
+	const char* bc_strings_with_comma[4] = { "x,", "y,", "z,", "w," };
+	const char* dest = dest_strings[(op >> 21) & 15];
+	const char* destc = dest_strings_with_comma[(op >> 21) & 15];
+	const char* bc = bc_strings[op & 3];
+	const char* ftf = bc_strings[(op >> 23) & 3];
+	const char* fsf = bc_strings[(op >> 21) & 3];
+	const char* fsfc = bc_strings_with_comma[(op >> 21) & 3];
+
+	switch (op & 0x3f)
+	{
+		case 0x00: case 0x01: case 0x02: case 0x03:
+			util::stream_format(stream, "vadd%s.%s   %s%s %s%s %s%s", bc, dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], bc); break;
+		case 0x04: case 0x05: case 0x06: case 0x07:
+			util::stream_format(stream, "vsub%s.%s   %s%s %s%s %s%s", bc, dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], bc); break;
+		case 0x08: case 0x09: case 0x0a: case 0x0b:
+			util::stream_format(stream, "vmadd%s.%s  %s%s %s%s %s%s", bc, dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], bc); break;
+		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
+			util::stream_format(stream, "vmsub%s.%s  %s%s %s%s %s%s", bc, dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], bc); break;
+		case 0x10: case 0x11: case 0x12: case 0x13:
+			util::stream_format(stream, "vmax%s.%s   %s%s %s%s %s%s", bc, dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], bc); break;
+		case 0x14: case 0x15: case 0x16: case 0x17:
+			util::stream_format(stream, "vmini%s.%s  %s%s %s%s %s%s", bc, dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], bc); break;
+		case 0x18: case 0x19: case 0x1a: case 0x1b:
+			util::stream_format(stream, "vmul%s.%s   %s%s %s%s %s%s", bc, dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], bc); break;
+		case 0x1c: util::stream_format(stream, "vmulq.%s   %s%s %s%s Q", dest, vfreg[rd], destc, vfreg[rs], destc); break;
+		case 0x1d: util::stream_format(stream, "vmaxi.%s   %s%s %s%s I", dest, vfreg[rd], destc, vfreg[rs], destc); break;
+		case 0x1e: util::stream_format(stream, "vmuli.%s   %s%s %s%s I", dest, vfreg[rd], destc, vfreg[rs], destc); break;
+		case 0x1f: util::stream_format(stream, "vminii.%s  %s%s %s%s I", dest, vfreg[rd], destc, vfreg[rs], destc); break;
+		case 0x20: util::stream_format(stream, "vaddq.%s   %s%s %s%s Q", dest, vfreg[rd], destc, vfreg[rs], destc); break;
+		case 0x21: util::stream_format(stream, "vmaddq.%s  %s%s %s%s Q", dest, vfreg[rd], destc, vfreg[rs], destc); break;
+		case 0x22: util::stream_format(stream, "vaddi.%s   %s%s %s%s I", dest, vfreg[rd], destc, vfreg[rs], destc); break;
+		case 0x23: util::stream_format(stream, "vmaddi.%s  %s%s %s%s I", dest, vfreg[rd], destc, vfreg[rs], destc); break;
+		case 0x24: util::stream_format(stream, "vsubq.%s   %s%s %s%s Q", dest, vfreg[rd], destc, vfreg[rs], destc); break;
+		case 0x25: util::stream_format(stream, "vmsubq.%s  %s%s %s%s Q", dest, vfreg[rd], destc, vfreg[rs], destc); break;
+		case 0x26: util::stream_format(stream, "vsubi.%s   %s%s %s%s I", dest, vfreg[rd], destc, vfreg[rs], destc); break;
+		case 0x27: util::stream_format(stream, "vmsubi.%s  %s%s %s%s I", dest, vfreg[rd], destc, vfreg[rs], destc); break;
+		case 0x28: util::stream_format(stream, "vadd.%s    %s%s %s%s %s%s", dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], dest); break;
+		case 0x29: util::stream_format(stream, "vmadd.%s   %s%s %s%s %s%s", dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], dest); break;
+		case 0x2a: util::stream_format(stream, "vmul.%s    %s%s %s%s %s%s", dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], dest); break;
+		case 0x2b: util::stream_format(stream, "vmax.%s    %s%s %s%s %s%s", dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], dest); break;
+		case 0x2c: util::stream_format(stream, "vsub.%s    %s%s %s%s %s%s", dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], dest); break;
+		case 0x2d: util::stream_format(stream, "vmsub.%s   %s%s %s%s %s%s", dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], dest); break;
+		case 0x2e: util::stream_format(stream, "vopmsub.xyz  %sxyz, %sxyz, %sxyz", vfreg[rd], vfreg[rs], vfreg[rt]); break;
+		case 0x2f: util::stream_format(stream, "vmini.%s   %s%s %s%s %s%s", dest, vfreg[rd], destc, vfreg[rs], destc, vfreg[rt], dest); break;
+		case 0x30: util::stream_format(stream, "viadd        %s, %s, %s", vireg[rd], vireg[rs], vireg[rt]); break;
+		case 0x31: util::stream_format(stream, "visub        %s, %s, %s", vireg[rd], vireg[rs], vireg[rt]); break;
+		case 0x32: util::stream_format(stream, "viaddi       %s, %s, $%x", vireg[rt], vireg[rs], imm5); break;
+		case 0x34: util::stream_format(stream, "viand        %s, %s, %s", vireg[rd], vireg[rs], vireg[rt]); break;
+		case 0x35: util::stream_format(stream, "vior         %s, %s, %s", vireg[rd], vireg[rs], vireg[rt]); break;
+		case 0x38: util::stream_format(stream, "vcallms      $06x", (op & 0x001fffc0) >> 3); break;
+		case 0x39: util::stream_format(stream, "vcallmsr     $vi27"); break;
+		case 0x3c: case 0x3d: case 0x3e: case 0x3f:
+			switch (ext)
+			{
+				case 0x00: case 0x01: case 0x02: case 0x03:
+					util::stream_format(stream, "vadda%s.%s  ACC%s %s%s %s%s", bc, dest, destc, vfreg[rs], destc, vfreg[rt], bc); break;
+				case 0x04: case 0x05: case 0x06: case 0x07:
+					util::stream_format(stream, "vsuba%s.%s  ACC%s %s%s %s%s", bc, dest, destc, vfreg[rs], destc, vfreg[rt], bc); break;
+				case 0x08: case 0x09: case 0x0a: case 0x0b:
+					util::stream_format(stream, "vmadda%s.%s  ACC%s %s%s %s%s", bc, dest, destc, vfreg[rs], destc, vfreg[rt], bc); break;
+				case 0x0c: case 0x0d: case 0x0e: case 0x0f:
+					util::stream_format(stream, "vmsuba%s.%s  ACC%s %s%s %s%s", bc, dest, destc, vfreg[rs], destc, vfreg[rt], bc); break;
+				case 0x10: util::stream_format(stream, "vitof0.%s  %s%s %s%s", dest, vfreg[rt], destc, vfreg[rs], dest); break;
+				case 0x11: util::stream_format(stream, "vitof4.%s  %s%s %s%s", dest, vfreg[rt], destc, vfreg[rs], dest); break;
+				case 0x12: util::stream_format(stream, "vitof12.%s %s%s %s%s", dest, vfreg[rt], destc, vfreg[rs], dest); break;
+				case 0x13: util::stream_format(stream, "vitof15.%s %s%s %s%s", dest, vfreg[rt], destc, vfreg[rs], dest); break;
+				case 0x14: util::stream_format(stream, "vftoi0.%s  %s%s %s%s", dest, vfreg[rt], destc, vfreg[rs], dest); break;
+				case 0x15: util::stream_format(stream, "vftoi4.%s  %s%s %s%s", dest, vfreg[rt], destc, vfreg[rs], dest); break;
+				case 0x16: util::stream_format(stream, "vftoi12.%s %s%s %s%s", dest, vfreg[rt], destc, vfreg[rs], dest); break;
+				case 0x17: util::stream_format(stream, "vftoi15.%s %s%s %s%s", dest, vfreg[rt], destc, vfreg[rs], dest); break;
+				case 0x18: case 0x19: case 0x1a: case 0x1b:
+					util::stream_format(stream, "vmula%s.%s   ACC%s %s%s %s%s", bc, dest, destc, vfreg[rs], destc, vfreg[rt], bc); break;
+				case 0x1c: util::stream_format(stream, "vmulaq.%s  ACC%s %s%s Q", dest, destc, vfreg[rs], destc); break;
+				case 0x1d: util::stream_format(stream, "vabs.%s    %s%s %s%s", dest, vfreg[rt], destc, vfreg[rs], dest); break;
+				case 0x1e: util::stream_format(stream, "vmulai.%s  ACC%s %s%s I", dest, destc, vfreg[rs], destc); break;
+				case 0x1f: util::stream_format(stream, "vclipw.xyz   %sxyz, %sw", vfreg[rs], vfreg[rt]); break;
+				case 0x20: util::stream_format(stream, "vaddaq.%s  ACC%s %s%s Q", dest, destc, vfreg[rs], destc); break;
+				case 0x21: util::stream_format(stream, "vmaddaq.%s ACC%s %s%s Q", dest, destc, vfreg[rs], destc); break;
+				case 0x22: util::stream_format(stream, "vaddai.%s  ACC%s %s%s I", dest, destc, vfreg[rs], destc); break;
+				case 0x23: util::stream_format(stream, "vmaddai.%s ACC%s %s%s I", dest, destc, vfreg[rs], destc); break;
+				case 0x24: util::stream_format(stream, "vsubaq.%s  ACC%s %s%s Q", dest, destc, vfreg[rs], destc); break;
+				case 0x25: util::stream_format(stream, "vmsubaq.%s ACC%s %s%s Q", dest, destc, vfreg[rs], destc); break;
+				case 0x26: util::stream_format(stream, "vsubai.%s  ACC%s %s%s I", dest, destc, vfreg[rs], destc); break;
+				case 0x27: util::stream_format(stream, "vmsubai.%s ACC%s %s%s I", dest, destc, vfreg[rs], destc); break;
+				case 0x28: util::stream_format(stream, "vadda.%s   ACC%s %s%s %s%s", dest, destc, vfreg[rs], destc, vfreg[rt], dest); break;
+				case 0x29: util::stream_format(stream, "vmadda.%s  ACC%s %s%s %s%s", dest, destc, vfreg[rs], destc, vfreg[rt], dest); break;
+				case 0x2a: util::stream_format(stream, "vmula.%s   ACC%s %s%s %s%s", dest, destc, vfreg[rs], destc, vfreg[rt], dest); break;
+				// 2b?
+				case 0x2c: util::stream_format(stream, "vsuba.%s   ACC%s %s%s %s%s", dest, destc, vfreg[rs], destc, vfreg[rt], dest); break;
+				case 0x2d: util::stream_format(stream, "vmsuba.%s  ACC%s %s%s %s%s", dest, destc, vfreg[rs], destc, vfreg[rt], dest); break;
+				case 0x2e: util::stream_format(stream, "vopmula.xyz  ACCxyz, %sxyz, %sxyz", vfreg[rs], vfreg[rt]); break;
+				case 0x2f: util::stream_format(stream, "vnop"); break;
+				case 0x30: util::stream_format(stream, "vmove.%s   %s%s %s%s", dest, vfreg[rt], destc, vfreg[rs], dest); break;
+				case 0x31: util::stream_format(stream, "vmr32.%s   %s%s %s%s", dest, vfreg[rt], destc, vfreg[rs], dest); break;
+				// 32?
+				// 33?
+				case 0x34: util::stream_format(stream, "vlqi.%s    %s%s (%s++)%s", dest, vfreg[rt], destc, vireg[rs], dest); break;
+				case 0x35: util::stream_format(stream, "vsqi.%s    %s%s (%s++)%s", dest, vfreg[rs], destc, vireg[rt], dest); break;
+				case 0x36: util::stream_format(stream, "vlqd.%s    %s%s (--%s)%s", dest, vfreg[rt], destc, vireg[rs], dest); break;
+				case 0x37: util::stream_format(stream, "vsqd.%s    %s%s (--%s)%s", dest, vfreg[rs], destc, vireg[rt], dest); break;
+				case 0x38: util::stream_format(stream, "vdiv         Q, %s%s %s%s", vfreg[rs], fsfc, vfreg[rt], ftf); break;
+				case 0x39: util::stream_format(stream, "vsqrt        Q, %s%s", vfreg[rt], ftf); break;
+				case 0x3a: util::stream_format(stream, "vrsqrt       Q, %s%s %s%s", vfreg[rs], fsfc, vfreg[rt], ftf); break;
+				case 0x3b: util::stream_format(stream, "vwaitq"); break;
+				case 0x3c: util::stream_format(stream, "vmtir.%s   %s", dest, vireg[rt]); break;
+				case 0x3d: util::stream_format(stream, "vmfir.%s   %s%s %s", dest, vfreg[rt], destc, vireg[rs]); break;
+				case 0x3e: util::stream_format(stream, "vilwr.%s   %s, (%s)%s", dest, vireg[rt], vireg[rs], dest); break;
+				case 0x3f: util::stream_format(stream, "viswr.%s   %s, (%s)%s", dest, vireg[rt], vireg[rs], dest); break;
+				case 0x40: util::stream_format(stream, "vrnext.%s  %s%s R", dest, vfreg[rt], destc); break;
+				case 0x41: util::stream_format(stream, "vrget.%s   %s%s R", dest, vfreg[rt], destc); break;
+				case 0x42: util::stream_format(stream, "vrinit       R, %s%s", vfreg[rs], fsf); break;
+				case 0x43: util::stream_format(stream, "vrxor        R, %s%s", vfreg[rs], fsf); break;
+				default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);  break;
+			}
+			break;
+		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);  break;
+	}
+
 	return 0;
 }
 
@@ -635,9 +788,9 @@ uint32_t ee_disassembler::dasm_extra_base(uint32_t pc, uint32_t op, std::ostream
 
 	switch (op >> 26)
 	{
-		case 0x1e: util::stream_format(stream, "lq     %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]); break;
-		case 0x1f: util::stream_format(stream, "sq     %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]); break;
-		default:   util::stream_format(stream, "dc.l   $%08x [invalid]", op);							break;
+		case 0x1e: util::stream_format(stream, "lq        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]); break;
+		case 0x1f: util::stream_format(stream, "sq        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]); break;
+		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);                            break;
 	}
 
 	return 0;
@@ -649,8 +802,8 @@ uint32_t ee_disassembler::dasm_extra_special(uint32_t pc, uint32_t op, std::ostr
 
 	switch (op & 63)
 	{
-		case 0x29: util::stream_format(stream, "mtsa      %s", reg[rs]);			break;
-		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);	break;
+		case 0x29: util::stream_format(stream, "mtsa      %s", reg[rs]);            break;
+		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);    break;
 	}
 	return 0;
 }
@@ -750,7 +903,7 @@ offs_t mips3_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 				case 0x3c:  util::stream_format(stream, "dsll      %s,%s,%d", reg[rd], reg[rt], shift+32);         break;
 				case 0x3e:  util::stream_format(stream, "dsrl      %s,%s,%d", reg[rd], reg[rt], shift+32);         break;
 				case 0x3f:  util::stream_format(stream, "dsra      %s,%s,%d", reg[rd], reg[rt], shift+32);         break;
-				default:    flags = dasm_extra_special(pc, op, stream);											break;
+				default:    flags = dasm_extra_special(pc, op, stream);                                         break;
 			}
 			break;
 
@@ -805,7 +958,7 @@ offs_t mips3_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 		case 0x19:  util::stream_format(stream, "daddiu    %s,%s,%s", reg[rt], reg[rs], signed_16bit(op));         break;
 		case 0x1a:  util::stream_format(stream, "ldl       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 		case 0x1b:  util::stream_format(stream, "ldr       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-		case 0x1c:  flags = dasm_idt(pc, op, stream);												break;
+		case 0x1c:  flags = dasm_idt(pc, op, stream);                                               break;
 		case 0x20:  util::stream_format(stream, "lb        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 		case 0x21:  util::stream_format(stream, "lh        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 		case 0x22:  util::stream_format(stream, "lwl       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
@@ -837,7 +990,7 @@ offs_t mips3_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 		case 0x3d:  util::stream_format(stream, "sdc1      %s,%s(%s)", cpreg[1][rt], signed_16bit(op), reg[rs]);   break;
 		case 0x3e:  util::stream_format(stream, "sdc2      %s,%s(%s)", cpreg[2][rt], signed_16bit(op), reg[rs]);   break;
 		case 0x3f:  util::stream_format(stream, "sd        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-		default:    flags = dasm_extra_base(pc, op, stream);													   break;
+		default:    flags = dasm_extra_base(pc, op, stream);                                                       break;
 	}
 	return 4 | flags | SUPPORTED;
 }

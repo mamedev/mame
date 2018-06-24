@@ -106,7 +106,7 @@ void a2bus_echoii_device::device_reset()
 /*
 WRITE_LINE_MEMBER(a2bus_echoii_device::tms_irq_callback)
 {
-	update_irq_to_maincpu();
+    update_irq_to_maincpu();
 }
 */
 

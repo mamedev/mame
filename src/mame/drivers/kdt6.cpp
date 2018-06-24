@@ -583,8 +583,8 @@ void kdt6_state::machine_start()
 		m_floppy1->get_device()->setup_led_cb(floppy_image_device::led_cb(&kdt6_state::drive1_led_cb, this));
 
 	// register for save states
-	save_pointer(NAME(m_ram.get()), 0x40000);
-	save_pointer(NAME(m_vram.get()), 0x10000);
+	save_pointer(NAME(m_ram), 0x40000);
+	save_pointer(NAME(m_vram), 0x10000);
 	save_item(NAME(m_sasi_dma));
 	save_item(NAME(m_dma_map));
 	save_item(NAME(m_status0));

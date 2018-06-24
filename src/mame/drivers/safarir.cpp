@@ -328,8 +328,8 @@ void safarir_state::machine_start()
 	m_port_last2 = 0;
 
 	/* setup for save states */
-	save_pointer(NAME(m_ram_1.get()), m_ram.bytes());
-	save_pointer(NAME(m_ram_2.get()), m_ram.bytes());
+	save_pointer(NAME(m_ram_1), m_ram.bytes());
+	save_pointer(NAME(m_ram_2), m_ram.bytes());
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_port_last));
 	save_item(NAME(m_port_last2));

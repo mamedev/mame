@@ -123,10 +123,10 @@ void suprgolf_state::video_start()
 	save_item(NAME(m_vreg_pen));
 	save_item(NAME(m_palette_switch));
 	save_item(NAME(m_bg_vreg_test));
-	save_pointer(NAME(m_paletteram.get()), 0x1000);
-	save_pointer(NAME(m_bg_vram.get()), 0x2000*0x20);
-	save_pointer(NAME(m_bg_fb.get()), 0x2000*0x20);
-	save_pointer(NAME(m_fg_fb.get()), 0x2000*0x20);
+	save_pointer(NAME(m_paletteram), 0x1000);
+	save_pointer(NAME(m_bg_vram), 0x2000*0x20);
+	save_pointer(NAME(m_bg_fb), 0x2000*0x20);
+	save_pointer(NAME(m_fg_fb), 0x2000*0x20);
 }
 
 uint32_t suprgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

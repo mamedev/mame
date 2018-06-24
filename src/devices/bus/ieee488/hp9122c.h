@@ -76,14 +76,14 @@ private:
 	constexpr static int REG_CNTL_INTSEL0 = 1 << 7;
 
 	/* Status register bits:
-	 * 	0 - Addr0
-	 * 	1 - Addr1
-	 *	2 - Addr2
-	 *	3 - Dual(H)/Single(L)
-	 *	4 - T(L)
-	 *	5 - Diskchg#
-	 *	6 - Addr3
-	 *	7 - density indicatior: H - DD, L - HD
+	 *  0 - Addr0
+	 *  1 - Addr1
+	 *  2 - Addr2
+	 *  3 - Dual(H)/Single(L)
+	 *  4 - T(L)
+	 *  5 - Diskchg#
+	 *  6 - Addr3
+	 *  7 - density indicatior: H - DD, L - HD
 	 */
 
 	constexpr static int REG_STATUS_DUAL = 1 << 3;

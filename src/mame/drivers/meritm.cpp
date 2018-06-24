@@ -1083,7 +1083,7 @@ MACHINE_START_MEMBER(meritm_state, crt260)
 	MACHINE_START_CALL_MEMBER(common);
 	save_item(NAME(m_bank));
 	save_item(NAME(m_psd_a15));
-	save_pointer(NAME(m_ram.get()), 0x8000);
+	save_pointer(NAME(m_ram), 0x8000);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_start_tick)

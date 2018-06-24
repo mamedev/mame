@@ -509,12 +509,12 @@ static INPUT_PORTS_START( moto )
 	PORT_START("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) // handle left
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  // handle right
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)	  // speed 30
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    // speed 30
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  // speed 80
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        // speed 120, 3 above bits encode 0 30 50 80 100 120 speeds
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON2)       // skip RAM test
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)        // handle full left/right
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4)	      // brake
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4)        // brake
 
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)  // coin, TODO check why it is locked

@@ -65,9 +65,9 @@ void dio16_98543_device::map(address_map& map)
 
 device_memory_interface::space_config_vector dio16_98543_device::memory_space_config() const
 {
-        return space_config_vector {
-                std::make_pair(0, &m_space_config)
-        };
+		return space_config_vector {
+				std::make_pair(0, &m_space_config)
+		};
 }
 
 dio16_98543_device::dio16_98543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -154,10 +154,24 @@ WRITE16_MEMBER(dio16_98543_device::vram_w)
 
 uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	int startx[TOPCAT_COUNT], starty[TOPCAT_COUNT];
+	int endx[TOPCAT_COUNT], endy[TOPCAT_COUNT];
+
+	for (int i = 0; i < TOPCAT_COUNT; i++)
+		m_topcat[i]->get_cursor_pos(startx[i], starty[i], endx[i], endy[i]);
+
 	for (int y = 0; y < m_v_pix; y++) {
 		uint32_t *scanline = &bitmap.pix32(y);
-		for (int x = 0; x < m_h_pix; x++)
-			*scanline++ = m_nereid->map_color(m_vram[y * m_h_pix + x]);
+
+		for (int x = 0; x < m_h_pix; x++) {
+			uint8_t tmp = m_vram[y * m_h_pix + x];
+			for (int i = 0; i < TOPCAT_COUNT; i++) {
+				if (y >= starty[i] && y <= endy[i] && x >= startx[i] && x <= endx[i]) {
+					tmp |= 1 << i;
+				}
+			}
+			*scanline++ = m_nereid->map_color(tmp);
+		}
 	}
 	return 0;
 }

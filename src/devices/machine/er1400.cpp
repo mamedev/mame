@@ -72,7 +72,7 @@ void er1400_device::device_start()
 	save_item(NAME(m_address_register));
 
 	m_data_array = std::make_unique<u16[]>(100);
-	save_pointer(m_data_array.get(), "m_data_array", 100);
+	save_pointer(NAME(m_data_array), 100);
 
 	m_data_propagation_timer = timer_alloc(PROPAGATION_TIMER);
 }

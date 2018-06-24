@@ -202,7 +202,7 @@ void ampex_state::machine_start()
 	save_item(NAME(m_attr));
 	save_item(NAME(m_attr_readback));
 	save_item(NAME(m_uart_loopback));
-	save_pointer(NAME(m_paged_ram.get()), 0x1800 * 4);
+	save_pointer(NAME(m_paged_ram), 0x1800 * 4);
 }
 
 MACHINE_CONFIG_START(ampex_state::ampex)
