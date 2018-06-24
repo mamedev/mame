@@ -549,7 +549,7 @@ void neopcb_state::init_svcpcb()
 
 	m_sprgen->m_fixed_layer_bank_type = 2;
 
-	m_pvc_prot->svc_decrypt_68k(cpuregion, cpuregion_size);
+	m_pvc_prot->svc_px_decrypt(cpuregion, cpuregion_size);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 3);
 	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
 

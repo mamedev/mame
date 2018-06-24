@@ -28,7 +28,7 @@ public:
 	std::unique_ptr<uint16_t[]> m_cart_ram;
 
 	void mslug5_decrypt_68k(uint8_t* rom, uint32_t size);
-	void svc_decrypt_68k(uint8_t* rom, uint32_t size);
+	void svc_px_decrypt(uint8_t* rom, uint32_t size);
 	void kf2k3pcb_decrypt_68k(uint8_t* rom, uint32_t size);
 	void kof2003_decrypt_68k(uint8_t* rom, uint32_t size);
 	void kof2003h_decrypt_68k(uint8_t* rom, uint32_t size);
