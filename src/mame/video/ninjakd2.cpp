@@ -117,7 +117,7 @@ void robokid_state::video_init_banked(uint32_t vram_alloc_size)
 		{
 			m_robokid_bg_videoram[i] = make_unique_clear<uint8_t[]>(vram_alloc_size);
 
-			save_pointer(NAME(m_robokid_bg_videoram[i].get()), vram_alloc_size, i);
+			save_pointer(NAME(m_robokid_bg_videoram[i]), vram_alloc_size, i);
 		}
 		m_vram_bank_mask = (vram_alloc_size >> 10) - 1;
 	}

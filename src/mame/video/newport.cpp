@@ -97,7 +97,7 @@ void newport_video_device::device_start()
 {
 	m_base = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
 
-	save_pointer(NAME(m_base.get()), (1280+64) * (1024+64));
+	save_pointer(NAME(m_base), (1280+64) * (1024+64));
 	save_item(NAME(m_VC2.nRegister));
 	save_item(NAME(m_VC2.nRAM));
 	save_item(NAME(m_VC2.nRegIdx));

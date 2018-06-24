@@ -1287,7 +1287,7 @@ MACHINE_START_MEMBER(stv_state, stv)
 	m_scsp->set_ram_base(m_sound_ram);
 
 	// save states
-//  save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+//  save_pointer(NAME(m_scu_regs), 0x100/4);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_prev_gamebank_select));
 	save_item(NAME(m_port_sel));

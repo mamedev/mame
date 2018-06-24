@@ -146,7 +146,7 @@ void tk02_device::device_start()
 	memset(m_ram.get(), 0xff, 0x800);
 
 	// register for save states
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 	save_item(NAME(m_de));
 }
 

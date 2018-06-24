@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "naomigd.h"
+#include "romload.h"
 #include "imagedev/chd_cd.h"
 
 /*

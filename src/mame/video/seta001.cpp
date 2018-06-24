@@ -75,9 +75,9 @@ void seta001_device::device_start()
 
 	save_item(NAME(m_bgflag));
 	save_item(NAME(m_spritectrl));
-	save_pointer(NAME(m_spriteylow.get()),0x300);
-	save_pointer(NAME(m_spritecodelow.get()),0x2000);
-	save_pointer(NAME(m_spritecodehigh.get()),0x2000);
+	save_pointer(NAME(m_spriteylow),0x300);
+	save_pointer(NAME(m_spritecodelow),0x2000);
+	save_pointer(NAME(m_spritecodehigh),0x2000);
 }
 
 void seta001_device::device_reset()
