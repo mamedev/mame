@@ -115,6 +115,7 @@ DEFINE_DEVICE_TYPE(R5000BE,   r5000be_device,   "r5000be",   "MIPS R5000 (big)")
 DEFINE_DEVICE_TYPE(R5000LE,   r5000le_device,   "r5000le",   "MIPS R5000 (little)")
 DEFINE_DEVICE_TYPE(VR5500BE,  vr5500be_device,  "vr5500be",  "NEC VR5500 (big)")
 DEFINE_DEVICE_TYPE(VR5500LE,  vr5500le_device,  "vr5500le",  "NEC VR5500 (little)")
+DEFINE_DEVICE_TYPE(R5900LE,   r5900le_device,   "r5900le",   "Emotion Engine Core")
 DEFINE_DEVICE_TYPE(QED5271BE, qed5271be_device, "qed5271be", "MIPS QED5271 (big)")
 DEFINE_DEVICE_TYPE(QED5271LE, qed5271le_device, "qed5271le", "MIPS QED5271 (little)")
 DEFINE_DEVICE_TYPE(RM7000BE,  rm7000be_device,  "rm7000be",  "MIPS RM7000 (big)")
@@ -334,6 +335,7 @@ void mips3_device::device_start()
 
 	/* initialize based on the config */
 	memset(m_core, 0, sizeof(internal_mips3_state));
+	m_core->vfr[0][3] = 1.0f;
 
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
@@ -986,10 +988,14 @@ bool mips3_device::memory_translate(int spacenum, int intention, offs_t &address
 	return true;
 }
 
-
 std::unique_ptr<util::disasm_interface> mips3_device::create_disassembler()
 {
 	return std::make_unique<mips3_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> r5900le_device::create_disassembler()
+{
+	return std::make_unique<ee_disassembler>();
 }
 
 
@@ -2510,43 +2516,40 @@ void mips3_device::handle_cop2(uint32_t op)
 
 	switch (RSREG)
 	{
-		case 0x00:  /* MFCz */      if (RTREG) RTVAL64 = (int32_t)get_cop2_reg(RDREG);        break;
-		case 0x01:  /* DMFCz */     if (RTREG) RTVAL64 = get_cop2_reg(RDREG);               break;
-		case 0x02:  /* CFCz */      if (RTREG) RTVAL64 = (int32_t)get_cop2_creg(RDREG);       break;
-		case 0x04:  /* MTCz */      set_cop2_reg(RDREG, RTVAL32);                           break;
-		case 0x05:  /* DMTCz */     set_cop2_reg(RDREG, RTVAL64);                           break;
-		case 0x06:  /* CTCz */      set_cop2_creg(RDREG, RTVAL32);                          break;
+		case 0x00:  /* MFCz */      if (RTREG) RTVAL64 = (int32_t)get_cop2_reg(RDREG);  break;
+		case 0x01:  /* DMFCz */     if (RTREG) RTVAL64 = get_cop2_reg(RDREG);           break;
+		case 0x02:  /* CFCz */      if (RTREG) RTVAL64 = (int32_t)get_cop2_creg(RDREG); break;
+		case 0x04:  /* MTCz */      set_cop2_reg(RDREG, RTVAL32);                       break;
+		case 0x05:  /* DMTCz */     set_cop2_reg(RDREG, RTVAL64);                       break;
+		case 0x06:  /* CTCz */      set_cop2_creg(RDREG, RTVAL32);                      break;
 		case 0x08:  /* BC */
 			switch (RTREG)
 			{
-				case 0x00:  /* BCzF */  if (!m_cf[2]) ADDPC(SIMMVAL);               break;
-				case 0x01:  /* BCzF */  if (m_cf[2]) ADDPC(SIMMVAL);                break;
-				case 0x02:  /* BCzFL */ invalid_instruction(op);                            break;
-				case 0x03:  /* BCzTL */ invalid_instruction(op);                            break;
-				default:    invalid_instruction(op);                                        break;
+				case 0x00:  /* BCzF */  if (!m_cf[2]) ADDPC(SIMMVAL);                   break;
+				case 0x01:  /* BCzF */  if (m_cf[2]) ADDPC(SIMMVAL);                    break;
+				case 0x02:  /* BCzFL */ invalid_instruction(op);                        break;
+				case 0x03:  /* BCzTL */ invalid_instruction(op);                        break;
+				default:    invalid_instruction(op);                                    break;
 			}
 			break;
-		case 0x10:
-		case 0x11:
-		case 0x12:
-		case 0x13:
-		case 0x14:
-		case 0x15:
-		case 0x16:
-		case 0x17:
-		case 0x18:
-		case 0x19:
-		case 0x1a:
-		case 0x1b:
-		case 0x1c:
-		case 0x1d:
-		case 0x1e:
-		case 0x1f:  /* COP */       invalid_instruction(op);                                break;
-		default:    invalid_instruction(op);                                                break;
+		default:    handle_extra_cop2(op); break;
 	}
 }
 
+void mips3_device::handle_extra_cop2(uint32_t op)
+{
+	invalid_instruction(op);
+}
 
+
+/***************************************************************************
+    VU0 (COP2) EXECUTION HANDLING (R5900)
+***************************************************************************/
+
+void r5900le_device::handle_extra_cop2(uint32_t op)
+{
+	invalid_instruction(op);
+}
 
 /***************************************************************************
     CORE EXECUTION LOOP
@@ -2556,21 +2559,21 @@ void mips3_device::handle_regimm(uint32_t op)
 {
 	switch (RTREG)
 	{
-		case 0x00:  /* BLTZ */      if ((int64_t)RSVAL64 < 0) ADDPC(SIMMVAL);                         break;
-		case 0x01:  /* BGEZ */      if ((int64_t)RSVAL64 >= 0) ADDPC(SIMMVAL);                        break;
-		case 0x02:  /* BLTZL */     if ((int64_t)RSVAL64 < 0) ADDPC(SIMMVAL); else m_core->pc += 4;        break;
-		case 0x03:  /* BGEZL */     if ((int64_t)RSVAL64 >= 0) ADDPC(SIMMVAL); else m_core->pc += 4;   break;
-		case 0x08:  /* TGEI */      if ((int64_t)RSVAL64 >= SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);   break;
-		case 0x09:  /* TGEIU */     if (RSVAL64 >= UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
-		case 0x0a:  /* TLTI */      if ((int64_t)RSVAL64 < SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);    break;
-		case 0x0b:  /* TLTIU */     if (RSVAL64 >= UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
-		case 0x0c:  /* TEQI */      if (RSVAL64 == UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
-		case 0x0e:  /* TNEI */      if (RSVAL64 != UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
+		case 0x00:  /* BLTZ */      if ((int64_t)RSVAL64 < 0) ADDPC(SIMMVAL);                               break;
+		case 0x01:  /* BGEZ */      if ((int64_t)RSVAL64 >= 0) ADDPC(SIMMVAL);                              break;
+		case 0x02:  /* BLTZL */     if ((int64_t)RSVAL64 < 0) ADDPC(SIMMVAL); else m_core->pc += 4;         break;
+		case 0x03:  /* BGEZL */     if ((int64_t)RSVAL64 >= 0) ADDPC(SIMMVAL); else m_core->pc += 4;        break;
+		case 0x08:  /* TGEI */      if ((int64_t)RSVAL64 >= SIMMVAL) generate_exception(EXCEPTION_TRAP, 1); break;
+		case 0x09:  /* TGEIU */     if (RSVAL64 >= UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);          break;
+		case 0x0a:  /* TLTI */      if ((int64_t)RSVAL64 < SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
+		case 0x0b:  /* TLTIU */     if (RSVAL64 >= UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);          break;
+		case 0x0c:  /* TEQI */      if (RSVAL64 == UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);          break;
+		case 0x0e:  /* TNEI */      if (RSVAL64 != UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);          break;
 		case 0x10:  /* BLTZAL */    m_core->r[31] = (int32_t)(m_core->pc + 4); if ((int64_t)RSVAL64 < 0) ADDPC(SIMMVAL);                     break;
 		case 0x11:  /* BGEZAL */    m_core->r[31] = (int32_t)(m_core->pc + 4); if ((int64_t)RSVAL64 >= 0) ADDPC(SIMMVAL);                    break;
 		case 0x12:  /* BLTZALL */   m_core->r[31] = (int32_t)(m_core->pc + 4); if ((int64_t)RSVAL64 < 0) ADDPC(SIMMVAL); else m_core->pc += 4; break;
 		case 0x13:  /* BGEZALL */   m_core->r[31] = (int32_t)(m_core->pc + 4); if ((int64_t)RSVAL64 >= 0) ADDPC(SIMMVAL); else m_core->pc += 4;    break;
-		default:    /* ??? */       invalid_instruction(op);                                        break;
+		default:    /* ??? */       handle_extra_regimm(op);                                                break;
 	}
 }
 
@@ -2683,18 +2686,18 @@ void mips3_device::handle_special(uint32_t op)
 			if (ENABLE_OVERFLOWS && RSVAL32 > ~RTVAL32) generate_exception(EXCEPTION_OVERFLOW, 1);
 			else if (RDREG) RDVAL64 = (int32_t)(RSVAL32 + RTVAL32);
 			break;
-		case 0x21:  /* ADDU */      if (RDREG) RDVAL64 = (int32_t)(RSVAL32 + RTVAL32);                break;
+		case 0x21:  /* ADDU */      if (RDREG) RDVAL64 = (int32_t)(RSVAL32 + RTVAL32);              break;
 		case 0x22:  /* SUB */
 			if (ENABLE_OVERFLOWS && RSVAL32 < RTVAL32) generate_exception(EXCEPTION_OVERFLOW, 1);
 			else if (RDREG) RDVAL64 = (int32_t)(RSVAL32 - RTVAL32);
 			break;
-		case 0x23:  /* SUBU */      if (RDREG) RDVAL64 = (int32_t)(RSVAL32 - RTVAL32);                break;
+		case 0x23:  /* SUBU */      if (RDREG) RDVAL64 = (int32_t)(RSVAL32 - RTVAL32);              break;
 		case 0x24:  /* AND */       if (RDREG) RDVAL64 = RSVAL64 & RTVAL64;                         break;
 		case 0x25:  /* OR */        if (RDREG) RDVAL64 = RSVAL64 | RTVAL64;                         break;
 		case 0x26:  /* XOR */       if (RDREG) RDVAL64 = RSVAL64 ^ RTVAL64;                         break;
 		case 0x27:  /* NOR */       if (RDREG) RDVAL64 = ~(RSVAL64 | RTVAL64);                      break;
-		case 0x2a:  /* SLT */       if (RDREG) RDVAL64 = (int64_t)RSVAL64 < (int64_t)RTVAL64;           break;
-		case 0x2b:  /* SLTU */      if (RDREG) RDVAL64 = (uint64_t)RSVAL64 < (uint64_t)RTVAL64;         break;
+		case 0x2a:  /* SLT */       if (RDREG) RDVAL64 = (int64_t)RSVAL64 < (int64_t)RTVAL64;       break;
+		case 0x2b:  /* SLTU */      if (RDREG) RDVAL64 = (uint64_t)RSVAL64 < (uint64_t)RTVAL64;     break;
 		case 0x2c:  /* DADD */
 			if (ENABLE_OVERFLOWS && RSVAL64 > ~RTVAL64) generate_exception(EXCEPTION_OVERFLOW, 1);
 			else if (RDREG) RDVAL64 = RSVAL64 + RTVAL64;
@@ -2713,12 +2716,50 @@ void mips3_device::handle_special(uint32_t op)
 		case 0x36:  /* TNE */       if (RSVAL64 != RTVAL64) generate_exception(EXCEPTION_TRAP, 1);  break;
 		case 0x38:  /* DSLL */      if (RDREG) RDVAL64 = RTVAL64 << SHIFT;                          break;
 		case 0x3a:  /* DSRL */      if (RDREG) RDVAL64 = RTVAL64 >> SHIFT;                          break;
-		case 0x3b:  /* DSRA */      if (RDREG) RDVAL64 = (int64_t)RTVAL64 >> SHIFT;                   break;
+		case 0x3b:  /* DSRA */      if (RDREG) RDVAL64 = (int64_t)RTVAL64 >> SHIFT;                 break;
 		case 0x3c:  /* DSLL32 */    if (RDREG) RDVAL64 = RTVAL64 << (SHIFT + 32);                   break;
 		case 0x3e:  /* DSRL32 */    if (RDREG) RDVAL64 = RTVAL64 >> (SHIFT + 32);                   break;
-		case 0x3f:  /* DSRA32 */    if (RDREG) RDVAL64 = (int64_t)RTVAL64 >> (SHIFT + 32);            break;
-		default:    /* ??? */       invalid_instruction(op);                                        break;
+		case 0x3f:  /* DSRA32 */    if (RDREG) RDVAL64 = (int64_t)RTVAL64 >> (SHIFT + 32);          break;
+		default:    /* ??? */       handle_extra_special(op);                                       break;
 	}
+}
+
+void mips3_device::handle_extra_special(uint32_t op)
+{
+	invalid_instruction(op);
+}
+
+void r5900le_device::handle_extra_special(uint32_t op)
+{
+	invalid_instruction(op);
+}
+
+void mips3_device::handle_extra_regimm(uint32_t op)
+{
+	invalid_instruction(op);
+}
+
+void r5900le_device::handle_extra_regimm(uint32_t op)
+{
+	invalid_instruction(op);
+}
+
+void mips3_device::handle_idt(uint32_t op)
+{
+	switch (op & 0x1f)
+	{
+		case 2: /* MUL */
+			RDVAL64 = (int32_t)((int32_t)RSVAL32 * (int32_t)RTVAL32);
+			m_core->icount -= 3;
+			break;
+		default:
+			invalid_instruction(op);
+			break;
+	}
+}
+
+void r5900le_device::handle_idt(uint32_t op)
+{
 }
 
 void mips3_device::burn_cycles(int32_t cycles)
@@ -2858,14 +2899,7 @@ void mips3_device::execute_run()
 			case 0x1a:  /* LDL */       (this->*m_ldl)(op);                                                       break;
 			case 0x1b:  /* LDR */       (this->*m_ldr)(op);                                                       break;
 			case 0x1c:  /* IDT-specific opcodes: mad/madu/mul on R4640/4650, msub on RC32364 */
-				switch (op & 0x1f)
-				{
-					case 2: /* MUL */
-						RDVAL64 = (int32_t)((int32_t)RSVAL32 * (int32_t)RTVAL32);
-						m_core->icount -= 3;
-						break;
-					default: invalid_instruction(op);
-				}
+				handle_idt(op);
 				break;
 			case 0x20:  /* LB */        if (RBYTE(SIMMVAL+RSVAL32, &temp) && RTREG) RTVAL64 = (int8_t)temp;       break;
 			case 0x21:  /* LH */        if (RHALF(SIMMVAL+RSVAL32, &temp) && RTREG) RTVAL64 = (int16_t)temp;      break;

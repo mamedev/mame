@@ -131,9 +131,9 @@ void unico_state::video_start()
 	m_scroll = make_unique_clear<uint16_t[]>(0x18 / 2);
 	m_spriteram = make_unique_clear<uint16_t[]>(0x800 / 2);
 
-	save_pointer(NAME(m_vram.get()), 0xc000/2);
-	save_pointer(NAME(m_scroll.get()), 0x18/2);
-	save_pointer(NAME(m_spriteram.get()), 0x800/2);
+	save_pointer(NAME(m_vram), 0xc000/2);
+	save_pointer(NAME(m_scroll), 0x18/2);
+	save_pointer(NAME(m_spriteram), 0x800/2);
 
 	m_tilemap[0] = &machine().tilemap().create(
 			*m_gfxdecode, tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,

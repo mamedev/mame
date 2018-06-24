@@ -379,7 +379,7 @@ MACHINE_CONFIG_START(starwars_state::esb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(esb_main_map)
 
-	MCFG_SLAPSTIC_ADD("slapstic", 101)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 101, false)
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1"))

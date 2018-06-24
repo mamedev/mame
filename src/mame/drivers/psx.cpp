@@ -37,7 +37,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),
-		m_parallel(*this, "parallel")
+		m_parallel(*this, "parallel"),
+		m_psxcd(*this, PSXCD_TAG)
 	{
 	}
 
@@ -73,6 +74,7 @@ public:
 	void subcpu_map(address_map &map);
 private:
 	required_device<psx_parallel_slot_device> m_parallel;
+	required_device<psxcd_device> m_psxcd;
 };
 
 
@@ -494,8 +496,7 @@ QUICKLOAD_LOAD_MEMBER(psx1_state, psx_exe_load)
 void psx1_state::cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 	uint8_t *psxram = (uint8_t *) p_n_psxram;
-	psxcd_device *psxcd = machine().device<psxcd_device>(PSXCD_TAG);
-	psxcd->start_dma(psxram + n_address, n_size*4);
+	m_psxcd->start_dma(psxram + n_address, n_size*4);
 }
 
 void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
@@ -552,7 +553,7 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_PSX_CD_READ_HANDLER( READ8( PSXCD_TAG, psxcd_device, read ) )
 	MCFG_PSX_CD_WRITE_HANDLER( WRITE8( PSXCD_TAG, psxcd_device, write ) )
 
-	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
+	MCFG_DEVICE_ADD(PSXCD_TAG, PSXCD, "maincpu", "spu")
 	MCFG_PSXCD_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin2))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
@@ -604,7 +605,7 @@ MACHINE_CONFIG_START(psx1_state::pse)
 	MCFG_PSX_CD_READ_HANDLER( READ8( PSXCD_TAG, psxcd_device, read ) )
 	MCFG_PSX_CD_WRITE_HANDLER( WRITE8( PSXCD_TAG, psxcd_device, write ) )
 
-	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
+	MCFG_DEVICE_ADD(PSXCD_TAG, PSXCD, "maincpu", "spu")
 	MCFG_PSXCD_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin2))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )

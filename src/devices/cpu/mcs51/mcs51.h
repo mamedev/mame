@@ -367,6 +367,8 @@ DECLARE_DEVICE_TYPE(I87C51, i87c51_device)
 DECLARE_DEVICE_TYPE(I80C32, i80c32_device)
 DECLARE_DEVICE_TYPE(I80C52, i80c52_device)
 DECLARE_DEVICE_TYPE(I87C52, i87c52_device)
+DECLARE_DEVICE_TYPE(AT89C52, at89c52_device)
+DECLARE_DEVICE_TYPE(AT89S52, at89s52_device)
 /* 4k internal perom and 128 internal ram and 2 analog comparators */
 DECLARE_DEVICE_TYPE(AT89C4051, at89c4051_device)
 
@@ -484,6 +486,20 @@ class i87c52_device : public i80c52_device
 public:
 	// construction/destruction
 	i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class at89c52_device : public i80c52_device
+{
+public:
+	// construction/destruction
+	at89c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class at89s52_device : public i80c52_device
+{
+public:
+	// construction/destruction
+	at89s52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class at89c4051_device : public i80c51_device

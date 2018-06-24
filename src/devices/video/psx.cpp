@@ -570,7 +570,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	// icky!!!
 	machine().save().save_memory( this, "globals", nullptr, 0, "m_packet", (uint8_t *)&m_packet, 1, sizeof( m_packet ) );
 
-	save_pointer(NAME(p_vram.get()), width * height );
+	save_pointer(NAME(p_vram), width * height );
 	save_item(NAME(n_gpu_buffer_offset));
 	save_item(NAME(n_vramx));
 	save_item(NAME(n_vramy));

@@ -6,8 +6,8 @@
 
     skeleton driver
 
-   Main board:
-   Capcom AMT-04054
+   Main boards:
+   Capcom AMT-04054 "YUI2"
     - Hitachi SH-4 HD6417750S at 200MHz
     - Elpida DS1232AA-75 1M x 32-bit x 4-banks (128Mbit) SDRAM
     - Altera ACEX EP1K50TC144-3 FPGA
@@ -18,6 +18,9 @@
   * - 2 x ADV7120 Video DAC
   * - Yamaha YMZ770B-F 'AMMSL' SPU
    components marked * might be not populated
+
+   Capcom AMT-02008 "YUI"
+    - FPGA is Altera FLEX 6000, other differences / details is unknown
 
    Upper boards (game specific):
 
@@ -41,22 +44,23 @@
      - Alien Danger (c) 2007
      - Chibi Maruko-chan Aim Fuji Nippon Ichi! (c) 2008
  *   - Donkey Kong Banana Kingdom (c) 2006
-     - Super Mario Fushigi No Korokoro Party 2 (c) 2005
+ !   - Super Mario Fushigi No Korokoro Party 2 (c) 2005
 
     Single player medal machines:
     Medalusion:
      - Chibi Maruko-chan's "Sugoroku Playfully Everyone" Volume (c) 2003
      - Donkey Kong: Jungle Fever (c) 2005 Capcom / Nintendo / Namco
-     - Rockman Exe The Medal Operation (c) 2005
+     - Rockman EXE The Medal Operation (c) 2005
      - Super Mario Fushigi No JanJanLand (c) 2005
 
     Medalusion 2:
-     - Doko Demo Issho Toro's Fishing (c) 2006
- *   - Pingu's Ice Block (c) 2005
-     - Shooter Village (c) 2005
-     - Won! Tertainment Happy Channel (c) 2008
+ !   - Doko Demo Issho Toro's Fishing (c) 2006
+ !   - Pingu's Ice Block (c) 2005
+     - Geki Makaimura (c) 2005
+ !   - Won! Tertainment Happy Channel (c) 2008 note: main board is different, uses Yamaha YMZ770C instead of YMZ770B
 
  * - dumped
+ ! - CF card dumped, boot roms missing
 
 ***********************************************************************************/
 

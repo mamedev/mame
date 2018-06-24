@@ -37,7 +37,7 @@ public:
 
 	/* video-related */
 	tilemap_t      *m_tilemap[2];
-	int				m_tilebank;
+	int             m_tilebank;
 
 	DECLARE_WRITE8_MEMBER(efdt_videoram_w);
 	DECLARE_WRITE8_MEMBER(efdt_vregs1_w);

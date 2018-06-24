@@ -134,7 +134,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(rtc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER( pic1_int_w ) { m_write_intr(state); }
 	DECLARE_READ8_MEMBER( pic1_slave_ack_r );
 	DECLARE_WRITE_LINE_MEMBER( ctc_out1_w );

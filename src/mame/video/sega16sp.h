@@ -196,7 +196,7 @@ protected:
 	required_region_ptr<uint16_t> m_sprite_region_ptr;
 
 	// internal state
-	uint8_t	m_addrmap[8];
+	uint8_t m_addrmap[8];
 };
 
 

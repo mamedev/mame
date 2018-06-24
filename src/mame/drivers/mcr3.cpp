@@ -1659,8 +1659,8 @@ void mcr3_state::init_turbotag()
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 88;
 
-	/* the SSIO Z80 doesn't have any program to execute */
-	machine().device<cpu_device>("csd:cpu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	/* the CSD 68k doesn't have any program to execute */
+	m_cheap_squeak_deluxe->suspend_cpu();
 
 	/* kludge for bad ROM read */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0b53, 0x0b53, read8_delegate(FUNC(mcr3_state::turbotag_kludge_r),this));

@@ -63,6 +63,8 @@ private:
 	void output_rts(int txd);
 	void output_irq(int irq);
 
+	TIMER_CALLBACK_MEMBER(delayed_output_irq);
+
 	enum
 	{
 		SR_RDRF = 0x01,

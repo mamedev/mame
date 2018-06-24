@@ -573,9 +573,9 @@ void st0016_cpu_device::st0016_save_init()
 	save_item(NAME(m_dma_offset));
 	//save_item(NAME(st0016_rom_bank));
 	save_item(NAME(st0016_vregs));
-	save_pointer(NAME(m_charram.get()), MAX_CHAR_BANK*CHAR_BANK_SIZE);
-	save_pointer(NAME(st0016_paletteram.get()), MAX_PAL_BANK*PAL_BANK_SIZE);
-	save_pointer(NAME(st0016_spriteram.get()), MAX_SPR_BANK*SPR_BANK_SIZE);
+	save_pointer(NAME(m_charram), MAX_CHAR_BANK*CHAR_BANK_SIZE);
+	save_pointer(NAME(st0016_paletteram), MAX_PAL_BANK*PAL_BANK_SIZE);
+	save_pointer(NAME(st0016_spriteram), MAX_SPR_BANK*SPR_BANK_SIZE);
 }
 
 

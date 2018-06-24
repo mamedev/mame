@@ -148,7 +148,7 @@ void m107_state::video_start()
 	save_item(NAME(m_sprite_display));
 	save_item(NAME(m_raster_irq_position));
 	save_item(NAME(m_control));
-	save_pointer(NAME(m_buffered_spriteram.get()), 0x1000/2);
+	save_pointer(NAME(m_buffered_spriteram), 0x1000/2);
 
 	for (int i = 0; i < 4; i++)
 	{

@@ -270,9 +270,9 @@ void ppu2c0x_device::device_start()
 	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_draw_phase));
 	save_item(NAME(m_tilecount));
-	save_pointer(NAME(m_spriteram.get()), SPRITERAM_SIZE);
-	save_pointer(NAME(m_colortable.get()), ARRAY_LENGTH(default_colortable));
-	save_pointer(NAME(m_colortable_mono.get()), ARRAY_LENGTH(default_colortable_mono));
+	save_pointer(NAME(m_spriteram), SPRITERAM_SIZE);
+	save_pointer(NAME(m_colortable), ARRAY_LENGTH(default_colortable));
+	save_pointer(NAME(m_colortable_mono), ARRAY_LENGTH(default_colortable_mono));
 	save_item(NAME(*m_bitmap));
 }
 

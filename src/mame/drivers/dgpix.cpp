@@ -385,7 +385,7 @@ void dgpix_state::video_start()
 {
 	m_vram = std::make_unique<uint32_t[]>(0x40000*2/4);
 
-	save_pointer(NAME(m_vram.get()), 0x40000*2/4);
+	save_pointer(NAME(m_vram), 0x40000*2/4);
 }
 
 uint32_t dgpix_state::screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

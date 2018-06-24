@@ -192,7 +192,7 @@ void mlanding_state::machine_start()
 	m_dma_bank->configure_entries(0, 2, m_dma_ram.get(), c_dma_bank_words * 2);
 
 	// Register state for saving
-	save_pointer(NAME(m_dma_ram.get()), c_dma_bank_words * 2);
+	save_pointer(NAME(m_dma_ram), c_dma_bank_words * 2);
 	save_item(NAME(m_dma_cpu_bank));
 	save_item(NAME(m_dma_busy));
 	save_item(NAME(m_dsp_hold_signal));

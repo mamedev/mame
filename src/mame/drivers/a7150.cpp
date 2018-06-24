@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
 
-	MCFG_ISBC_215_ADD("isbc_215g", 0x4a, "maincpu")
+	MCFG_DEVICE_ADD("isbc_215g", ISBC_215G, 0x4a, "maincpu")
 	MCFG_ISBC_215_IRQ(WRITELINE("pic8259", pic8259_device, ir5_w))
 
 	// KGS K7070 graphics terminal controlling ABG K7072 framebuffer

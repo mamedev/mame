@@ -308,24 +308,6 @@ READ16_MEMBER(cgc7900_state::unmapped_r)
 	return rand();
 }
 
-WRITE8_MEMBER(cgc7900_state::baud_write)
-{
-	m_dbrg->write_str(data >> 0);
-	m_dbrg->write_stt(data >> 4);
-}
-
-WRITE_LINE_MEMBER(cgc7900_state::write_rs232_clock)
-{
-	m_i8251_0->write_txc(state);
-	m_i8251_0->write_rxc(state);
-}
-
-WRITE_LINE_MEMBER(cgc7900_state::write_rs449_clock)
-{
-	m_i8251_1->write_txc(state);
-	m_i8251_1->write_rxc(state);
-}
-
 /***************************************************************************
     MEMORY MAPS
 ***************************************************************************/
@@ -376,7 +358,7 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 	map(0xff8100, 0xff8101).rw(FUNC(cgc7900_state::disk_data_r), FUNC(cgc7900_state::disk_data_w));
 	map(0xff8120, 0xff8121).rw(FUNC(cgc7900_state::disk_status_r), FUNC(cgc7900_state::disk_command_w));
 	map(0xff8140, 0xff8141).portr("BEZEL");
-	map(0xff8180, 0xff8180).w(FUNC(cgc7900_state::baud_write));
+	map(0xff8180, 0xff8180).w(K1135A_TAG, FUNC(com8116_device::stt_str_w));
 	map(0xff81c0, 0xff81ff).rw(MM58167_TAG, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	map(0xff8200, 0xff8201).w(FUNC(cgc7900_state::interrupt_mask_w));
 //  AM_RANGE(0xff8240, 0xff8241) Light Pen enable
@@ -513,8 +495,10 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, cgc7900_state, irq<0x0>))
 
 	MCFG_DEVICE_ADD(K1135A_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, cgc7900_state, write_rs232_clock))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(*this, cgc7900_state, write_rs449_clock))
+	MCFG_COM8116_FR_HANDLER(WRITELINE(INS8251_0_TAG, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(INS8251_0_TAG, i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE(INS8251_1_TAG, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(INS8251_1_TAG, i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD(INS8251_0_TAG, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))

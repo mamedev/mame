@@ -81,7 +81,7 @@ void sv806_device::device_start()
 {
 	// register for savestates
 	save_item(NAME(m_ram_enabled));
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 }
 
 

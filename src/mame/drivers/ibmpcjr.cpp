@@ -400,7 +400,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
 		m_fdc->set_floppy(nullptr);
 
 	if((pdor^m_pcjr_dor) & 0x80)
-		m_fdc->reset();
+		m_fdc->soft_reset();
 
 	if(m_pcjr_dor & 0x20) {
 		if((pdor & 0x40) && !(m_pcjr_dor & 0x40))

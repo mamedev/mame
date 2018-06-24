@@ -23,8 +23,7 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 		m_dma_write_1(*this),
 		m_dma_write_2(*this),
 		m_dma_write_3(*this),
-		m_cpu_tag(nullptr),
-		m_cpu(nullptr)
+		m_cpu(*this, finder_base::DUMMY_TAG)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -44,13 +43,6 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 
 void hd63450_device::device_start()
 {
-	// get the CPU device
-	if ((m_cpu = machine().device<cpu_device>(m_cpu_tag)) == nullptr)
-	{
-		m_cpu = owner()->subdevice<cpu_device>(m_cpu_tag);
-	}
-	assert(m_cpu != nullptr);
-
 	// resolve callbacks
 	m_dma_end.resolve();
 	m_dma_error.resolve_safe();

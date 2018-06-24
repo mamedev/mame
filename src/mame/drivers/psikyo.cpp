@@ -1471,10 +1471,37 @@ Chips:  PS2001B
 
 ***************************************************************************/
 
+ROM_START( s1945n )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_LOAD32_WORD_SWAP( "4.u46", 0x000000, 0x040000, CRC(28fb8181) SHA1(6d3cc6b6fdb0f8c0f92e69c064d62ffcffbfb031) ) // 1&0
+	ROM_LOAD32_WORD_SWAP( "5.u39", 0x000002, 0x040000, CRC(8ca05f94) SHA1(fc6256fcf6bfc6f7c42f9cdc97bc025e5785d758) ) // 3&2
+
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(e3e366bd) SHA1(1f5b5909745802e263a896265ea365df76d3eaa5) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD16_WORD_SWAP( "u20.bin",  0x000000, 0x200000, CRC(28a27fee) SHA1(913f3bc4d0c6fb6b776a020c8099bf96f16fd06f) )
+	ROM_LOAD16_WORD_SWAP( "u22.bin",  0x200000, 0x200000, CRC(ca152a32) SHA1(63efee83cb5982c77ca473288b3d1a96b89e6388) )
+	ROM_LOAD16_WORD_SWAP( "u21.bin",  0x400000, 0x200000, CRC(c5d60ea9) SHA1(e5ce90788211c856172e5323b01b2c7ab3d3fe50) )
+	ROM_LOAD16_WORD_SWAP( "u23.bin",  0x600000, 0x200000, CRC(48710332) SHA1(db38b732a09b31ce55a96ec62987baae9b7a00c1) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 0 + 1 */
+	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
+
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(fe1312c2) SHA1(8339a96a0885518d6e22cb3bdb9c2f82d011d86d) )
+
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(a44a4a9b) SHA1(5378256752d709daed0b5f4199deebbcffe84e10) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
+	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
+ROM_END
+
 ROM_START( s1945jn )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
-	ROM_LOAD32_WORD_SWAP( "1-u46.bin", 0x000000, 0x080000, CRC(45fa8086) SHA1(f1753b9420596f4b828c77e877a044ba5fb01b28) ) // 1&0
-	ROM_LOAD32_WORD_SWAP( "2-u39.bin", 0x000002, 0x080000, CRC(0152ab8c) SHA1(2aef4cb88341b35f20bb551716f1e5ac2731e9ba) ) // 3&2
+	ROM_LOAD32_WORD_SWAP( "1-u46.bin", 0x000000, 0x040000, CRC(95028132) SHA1(6ed8e53efb0511dca37c35a7da17217f5aa83734) ) // 1&0
+	ROM_LOAD32_WORD_SWAP( "2-u39.bin", 0x000002, 0x040000, CRC(3df79a16) SHA1(6184f27579d846a40313fd11b57c46ac0d02fc76) ) // 3&2
 
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(e3e366bd) SHA1(1f5b5909745802e263a896265ea365df76d3eaa5) )
@@ -1943,6 +1970,7 @@ GAME( 1994, btlkroadk, btlkroad, gunbird,  btlkroad, psikyo_state, init_gunbird,
 GAME( 1995, s1945,     0,        s1945,    s1945,    psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (World)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1995, s1945a,    s1945,    s1945,    s1945a,   psikyo_state, init_s1945a,   ROT270, "Psikyo",  "Strikers 1945 (Japan / World)",      MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
 GAME( 1995, s1945j,    s1945,    s1945,    s1945j,   psikyo_state, init_s1945j,   ROT270, "Psikyo",  "Strikers 1945 (Japan)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945n,    s1945,    s1945jn,  s1945,    psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (World, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, s1945jn,   s1945,    s1945jn,  s1945j,   psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (Japan, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, s1945k,    s1945,    s1945,    s1945j,   psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (Korea)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,  psikyo_state, init_s1945bl,  ROT270, "bootleg", "Strikers 1945 (Hong Kong, bootleg)", MACHINE_SUPPORTS_SAVE )

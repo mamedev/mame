@@ -1837,7 +1837,7 @@ void apple2gs_state::apple2gs_setup_memory()
 
 	/* allocate memory for E00000-E1FFFF */
 	m_slowmem = make_unique_clear<uint8_t[]>(128*1024);
-	save_pointer(m_slowmem.get(), "APPLE2GS_SLOWMEM", 128*1024);
+	save_pointer(m_slowmem, "APPLE2GS_SLOWMEM", 128*1024);
 
 	// install expanded memory
 	// fair warning: other code assumes banks 0 and 1 are the first 128k of the RAM device, so you must install bank 1 at 0x10000

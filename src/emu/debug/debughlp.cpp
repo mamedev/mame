@@ -136,6 +136,7 @@ static const help_item static_help_list[] =
 		"  o[ver] [<count>=1] -- single steps over <count> instructions (F10)\n"
 		"  out -- single steps until the current subroutine/exception handler is exited (Shift-F11)\n"
 		"  g[o] [<address>] -- resumes execution, sets temp breakpoint at <address> (F5)\n"
+		"  ge[x] [<exception>] -- resumes execution, setting temp breakpoint if <exception> is raised\n"
 		"  gi[nt] [<irqline>] -- resumes execution, setting temp breakpoint if <irqline> is taken (F7)\n"
 		"  gt[ime] <milliseconds> -- resumes execution until the given delay has elapsed\n"
 		"  gv[blank] -- resumes execution, setting temp breakpoint on the next VBLANK (F8)\n"
