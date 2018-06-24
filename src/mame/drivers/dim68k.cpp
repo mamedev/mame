@@ -39,6 +39,7 @@
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

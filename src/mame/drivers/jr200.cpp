@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

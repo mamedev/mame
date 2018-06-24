@@ -167,6 +167,7 @@ Notes:
 #include "includes/mw8080bw.h"
 
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

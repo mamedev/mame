@@ -476,7 +476,7 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 {
 	if (m_adpcm_data[chip] != -1)
 	{
-		device->data_w(m_adpcm_data[chip] & 0x0f);
+		device->write_data(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 		if (m_adpcm_pos[chip] == m_adpcm_end[chip])
 		{
@@ -488,7 +488,7 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 	{
 		m_adpcm_data[chip] = memregion("adpcm")->base()[m_adpcm_pos[chip]];
 		m_adpcm_pos[chip] = (m_adpcm_pos[chip] + 1) & 0x7ffff;
-		device->data_w(m_adpcm_data[chip] >> 4);
+		device->write_data(m_adpcm_data[chip] >> 4);
 	}
 }
 WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_1)

@@ -75,6 +75,7 @@
 #include "machine/timer.h"
 #include "sound/dmadac.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -41,6 +41,7 @@
 #include "cpu/powerpc/ppc.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

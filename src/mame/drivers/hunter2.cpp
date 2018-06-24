@@ -29,6 +29,7 @@
 #include "machine/nvram.h"
 #include "sound/spkrdev.h"
 #include "video/hd61830.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"

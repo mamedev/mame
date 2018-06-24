@@ -50,6 +50,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/discrete.h"  /* for 1 Bit sound*/
 #include "sound/sn76477.h"   /* for sn sound*/
+#include "emupal.h"
 
 /* Enum status for high memory bank (c000 - ffff)*/
 enum

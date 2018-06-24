@@ -119,6 +119,7 @@
 
 #include "video/dl1416.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

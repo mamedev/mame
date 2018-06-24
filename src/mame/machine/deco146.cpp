@@ -1439,7 +1439,7 @@ deco146_device::deco146_device(const machine_config &mconfig, const char *tag, d
 {
 	m_bankswitch_swap_read_address = 0x78;
 	m_magic_read_address_xor = 0x44a;
-	m_magic_read_address_xor_enabled = 0;
+	m_magic_read_address_xor_enabled = false;
 	m_xor_port = 0x2c;
 	m_mask_port = 0x36;
 	m_soundlatch_port = 0x64;

@@ -13,6 +13,7 @@
 #include "machine/upd4701.h"
 #include "sound/k054539.h"
 #include "sound/k056800.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -219,7 +220,7 @@ void ultrsprt_state::machine_start()
 
 	membank("vram")->configure_entries(0, VRAM_PAGES, m_vram.get(), VRAM_PAGE_BYTES);
 
-	save_pointer(NAME(m_vram.get()), VRAM_PAGE_BYTES * VRAM_PAGES);
+	save_pointer(NAME(m_vram), VRAM_PAGE_BYTES * VRAM_PAGES);
 	save_item(NAME(m_cpu_vram_page));
 }
 

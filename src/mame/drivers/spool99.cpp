@@ -95,6 +95,7 @@ Note
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

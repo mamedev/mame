@@ -536,6 +536,7 @@ MACHINES["PIT8253"] = true
 MACHINES["PLA"] = true
 --MACHINES["PROFILE"] = true
 --MACHINES["PROM82S129"] = true
+MACHINES["PXA255"] = true
 MACHINES["R10696"] = true
 MACHINES["R10788"] = true
 MACHINES["RA17XX"] = true
@@ -1708,6 +1709,8 @@ files {
 	MAME_DIR .. "src/mame/includes/realbrk.h",
 	MAME_DIR .. "src/mame/video/realbrk.cpp",
 	MAME_DIR .. "src/mame/drivers/royalmah.cpp",
+	MAME_DIR .. "src/mame/video/dynax_blitter_rev2.cpp",
+	MAME_DIR .. "src/mame/video/dynax_blitter_rev2.h",
 }
 
 createMAMEProjects(_target, _subtarget, "edevices")

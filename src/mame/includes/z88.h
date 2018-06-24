@@ -19,6 +19,7 @@
 #include "bus/z88/rom.h"
 #include "bus/z88/z88.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -112,9 +113,9 @@ private:
 		uint8_t page;
 	} m_bank[4];
 
-	int			m_bank_type[4];
-	uint8_t *	m_bios;
-	uint8_t *	m_ram_base;
+	int         m_bank_type[4];
+	uint8_t *   m_bios;
+	uint8_t *   m_ram_base;
 };
 
 #endif /* MAME_INCLUDES_Z88_H */

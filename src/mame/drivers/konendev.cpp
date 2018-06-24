@@ -40,6 +40,7 @@
 #include "machine/nvram.h"
 #include "sound/ymz280b.h"
 #include "video/k057714.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -1,4 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders: ElSemi, Roberto Fresca.
 
+#ifndef MAME_INCLUDES_EFDT_H
+#define MAME_INCLUDES_EFDT_H
+
+#include "emupal.h"
 
 
 class efdt_state : public driver_device
@@ -13,7 +19,7 @@ public:
 		m_videoram(*this, "videoram", 8),
 		m_vregs1(*this, "vregs1"),
 		m_vregs2(*this, "vregs2")
-		 { }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -27,11 +33,11 @@ public:
 	uint8_t m_soundlatch[4];
 	uint8_t m_soundCommand;
 	uint8_t m_soundControl;
-	
+
 
 	/* video-related */
 	tilemap_t      *m_tilemap[2];
-	int				m_tilebank;
+	int             m_tilebank;
 
 	DECLARE_WRITE8_MEMBER(efdt_videoram_w);
 	DECLARE_WRITE8_MEMBER(efdt_vregs1_w);
@@ -65,3 +71,5 @@ public:
 	void efdt_map(address_map &map);
 	void efdt_snd_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_EFDT_H

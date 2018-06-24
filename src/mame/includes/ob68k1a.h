@@ -52,7 +52,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( com8116_w );
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
 	void ob68k1a(machine_config &config);

@@ -2,23 +2,23 @@
 // copyright-holders:Carl
 #include "emu.h"
 #include "m20_8086.h"
-#include "machine/ram.h"
 
 DEFINE_DEVICE_TYPE(M20_8086, m20_8086_device, "m20_8086", "Olivetti M20 8086 Adapter")
 
 m20_8086_device::m20_8086_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M20_8086, tag, owner, clock),
 	m_8086(*this, "8086"),
-	m_maincpu(*this, ":maincpu"),
-	m_pic(*this, ":i8259"),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
+	m_pic(*this, finder_base::DUMMY_TAG),
+	m_ram(*this, finder_base::DUMMY_TAG),
 	m_8086_halt(true)
 {
 }
 
 void m20_8086_device::device_start()
 {
-	uint8_t* ram = machine().device<ram_device>("ram")->pointer();
-	m_8086->space(AS_PROGRAM).install_readwrite_bank(0x00000,  machine().device<ram_device>("ram")->size() - 0x4001, "mainram");
+	uint8_t* ram = m_ram->pointer();
+	m_8086->space(AS_PROGRAM).install_readwrite_bank(0x00000,  m_ram->size() - 0x4001, "mainram");
 	membank("highram")->set_base(ram);
 	membank("mainram")->set_base(&ram[0x4000]);
 	membank("vram")->set_base(memshare(":videoram")->ptr());

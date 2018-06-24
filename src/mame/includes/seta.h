@@ -16,6 +16,7 @@
 #include "machine/upd4992.h"
 #include "sound/x1_010.h"
 #include "video/seta001.h"
+#include "emupal.h"
 
 #define __uPD71054_TIMER    1
 

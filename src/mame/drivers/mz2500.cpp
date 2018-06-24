@@ -54,6 +54,7 @@
 #include "machine/z80pio.h"
 #include "sound/2203intf.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1775,9 +1776,9 @@ void mz2500_state::machine_start()
 	m_phone_rom = memregion("phone")->base();
 	m_iplpro_rom = memregion("iplpro")->base();
 
-	save_pointer(NAME(m_main_ram.get()), 0x80000);
-	save_pointer(NAME(m_pcg_ram.get()), 0x2000);
-	save_pointer(NAME(m_emm_ram.get()), 0x100000);
+	save_pointer(NAME(m_main_ram), 0x80000);
+	save_pointer(NAME(m_pcg_ram), 0x2000);
+	save_pointer(NAME(m_emm_ram), 0x100000);
 
 	/* TODO: gfx[4] crashes as per now */
 	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, mz2500_pcg_layout_1bpp, m_pcg_ram.get(), 0, 0x10, 0));

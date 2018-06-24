@@ -50,6 +50,7 @@ Note
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

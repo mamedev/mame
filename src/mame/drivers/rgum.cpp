@@ -19,6 +19,7 @@ The ppi at 3000-3003 seems to be a dual port communication thing with the z80.
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

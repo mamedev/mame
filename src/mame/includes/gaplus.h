@@ -3,6 +3,7 @@
 #include "sound/namco.h"
 #include "sound/samples.h"
 #include "machine/namcoio.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MAX_STARS           250
@@ -22,7 +23,7 @@ public:
 		TIMER_NAMCOIO1_RUN
 	};
 
-    gaplus_base_state(const machine_config &mconfig, device_type type, const char *tag, const char *namco56xx_tag, const char *namco58xx_tag)
+	gaplus_base_state(const machine_config &mconfig, device_type type, const char *tag, const char *namco56xx_tag, const char *namco58xx_tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
@@ -34,7 +35,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-        , m_proms_region(*this, "proms")
+		, m_proms_region(*this, "proms")
 		, m_customio_3(*this, "customio_3")
 		, m_videoram(*this, "videoram")
 		, m_spriteram(*this, "spriteram")
@@ -90,7 +91,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-    required_memory_region m_proms_region;
+	required_memory_region m_proms_region;
 
 	required_shared_ptr<uint8_t> m_customio_3;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -124,31 +125,31 @@ public:
 
 class gapluso_state : public gaplus_base_state {
 public:
-    gapluso_state(const machine_config &mconfig, device_type type, const char *tag)
-        : gaplus_base_state(mconfig, type, tag, "namcoio_1", "namcoio_2") {
-    }
+	gapluso_state(const machine_config &mconfig, device_type type, const char *tag)
+		: gaplus_base_state(mconfig, type, tag, "namcoio_1", "namcoio_2") {
+	}
 
-    void gapluso(machine_config &config);
+	void gapluso(machine_config &config);
 
 protected:
-    DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 };
 
 class gaplus_state : public gaplus_base_state {
 public:
-    gaplus_state(const machine_config &mconfig, device_type type, const char *tag)
-        : gaplus_base_state(mconfig, type, tag, "namcoio_1", "namcoio_2")
-        , m_lamps(*this, "lamp%u", 0U) 
-    {
-    }
+	gaplus_state(const machine_config &mconfig, device_type type, const char *tag)
+		: gaplus_base_state(mconfig, type, tag, "namcoio_1", "namcoio_2")
+		, m_lamps(*this, "lamp%u", 0U)
+	{
+	}
 
-    void gaplus(machine_config &config);
+	void gaplus(machine_config &config);
 
 protected:
-    virtual void machine_start() override;
+	virtual void machine_start() override;
 
-    DECLARE_WRITE8_MEMBER(out_lamps0);
-    DECLARE_WRITE8_MEMBER(out_lamps1);
+	DECLARE_WRITE8_MEMBER(out_lamps0);
+	DECLARE_WRITE8_MEMBER(out_lamps1);
 
-    output_finder<2> m_lamps;
+	output_finder<2> m_lamps;
 };

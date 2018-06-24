@@ -80,15 +80,14 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 class r2dx_v33_state : public raiden2_state
 {
 public:
-	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
-		: raiden2_state(mconfig, type, tag)
-		, m_r2dxbank(0)
-		, m_r2dxgameselect(0)
-		, m_eeprom(*this, "eeprom")
-		, m_math(*this, "math")
-		, m_okibank(*this, "okibank")
-	{
-	}
+	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag) :
+		raiden2_state(mconfig, type, tag),
+		m_r2dxbank(0),
+		m_r2dxgameselect(0),
+		m_eeprom(*this, "eeprom"),
+		m_math(*this, "math"),
+		m_okibank(*this, "okibank")
+	{ }
 
 	DECLARE_WRITE16_MEMBER(r2dx_angle_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dx_w);
@@ -144,14 +143,13 @@ private:
 
 	uint16_t m_r2dx_i_dx, m_r2dx_i_dy, m_r2dx_i_angle;
 	uint32_t m_r2dx_i_sdist;
-	uint16_t m_mcu_prog[0x800];
+	std::unique_ptr<uint16_t[]> m_mcu_prog;
 	int m_mcu_prog_offs;
 	uint16_t m_mcu_xval, m_mcu_yval;
 	uint16_t m_mcu_data[9];
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_region_ptr<uint8_t> m_math;
-
 	optional_memory_bank m_okibank;
 };
 
@@ -159,13 +157,15 @@ void r2dx_v33_state::machine_start()
 {
 	raiden2_state::machine_start();
 
+	m_mcu_prog = make_unique_clear<uint16_t[]>(0x800);
+
 	save_item(NAME(m_r2dxbank));
 	save_item(NAME(m_r2dxgameselect));
 	save_item(NAME(m_r2dx_i_dx));
 	save_item(NAME(m_r2dx_i_dy));
 	save_item(NAME(m_r2dx_i_angle));
 	save_item(NAME(m_r2dx_i_sdist));
-	save_item(NAME(m_mcu_prog));
+	save_pointer(NAME(m_mcu_prog), 0x800);
 	save_item(NAME(m_mcu_prog_offs));
 	save_item(NAME(m_mcu_xval));
 	save_item(NAME(m_mcu_yval));
@@ -306,6 +306,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_rom_bank_w)
 	//printf("rom bank %04x %04x\n", data, mem_mask);
 	m_r2dxbank = data & 0xf;
 	r2dx_setbanking();
+
 }
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_angle_w)
@@ -392,7 +393,6 @@ void r2dx_v33_state::rdx_v33_map(address_map &map)
 
 	map(0x00400, 0x00401).w(FUNC(r2dx_v33_state::r2dx_tilemapdma_w)); // tilemaps to private buffer
 	map(0x00402, 0x00403).w(FUNC(r2dx_v33_state::r2dx_paldma_w));  // palettes to private buffer
-
 
 	map(0x00404, 0x00405).w(FUNC(r2dx_v33_state::r2dx_rom_bank_w));
 	map(0x00406, 0x00407).w(FUNC(r2dx_v33_state::tile_bank_w));
@@ -725,12 +725,12 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(r2dx_v33_state,r2dx_v33)
 {
-	common_reset(0,6,2,0);
+	bank_reset(0, 6, 2, 0); // bank 1 and 2 is swapped
 }
 
 MACHINE_RESET_MEMBER(r2dx_v33_state,nzeroteam)
 {
-	common_reset(0,2,1,0);
+	bank_reset(0, 2, 1, 0);
 }
 
 void r2dx_v33_state::r2dx_oki_map(address_map &map)
@@ -755,13 +755,11 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
 	MCFG_SCREEN_SIZE(44*8, 34*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
+	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
@@ -793,13 +791,11 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
 	MCFG_SCREEN_SIZE(44*8, 34*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
+	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
@@ -835,12 +831,11 @@ void r2dx_v33_state::init_rdx_v33()
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
 	m_cur_spri = spri;
-	
-	m_mainbank[0]->configure_entries(0,  16, memregion("maincpu")->base()+0x100000, 0x010000); // 0x20000 - 0x2ffff bank for Raiden 2
-	m_mainbank[0]->configure_entries(16, 16, memregion("maincpu")->base()+0x100000, 0x010000); // 0x20000 - 0x2ffff bank for Raiden DX
-	
-	m_mainbank[1]->configure_entries(0,  2,  memregion("maincpu")->base()+0x030000, 0x200000);
 
+	m_mainbank[0]->configure_entries( 0, 16, memregion("maincpu")->base()+0x100000, 0x010000); // 0x20000 - 0x2ffff bank for Raiden 2
+	m_mainbank[0]->configure_entries(16, 16, memregion("maincpu")->base()+0x300000, 0x010000); // 0x20000 - 0x2ffff bank for Raiden DX
+	m_mainbank[1]->configure_entries( 0,  2, memregion("maincpu")->base()+0x030000, 0x200000);
+	
 	raiden2_decrypt_sprites(machine());
 
 //  sensible defaults if booting as R2
@@ -849,7 +844,6 @@ void r2dx_v33_state::init_rdx_v33()
 
 	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x40000);
 	m_okibank->set_entry(0);
-
 }
 
 void r2dx_v33_state::init_nzerotea()

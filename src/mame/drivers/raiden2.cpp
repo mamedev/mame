@@ -251,11 +251,13 @@ WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
 }
 
 
+
 void raiden2_state::combine32(uint32_t *val, int offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *dest = (uint16_t *)val + BYTE_XOR_LE(offset);
 	COMBINE_DATA(dest);
 }
+
 
 
 /* SPRITE DRAWING (move to video file) */
@@ -291,11 +293,11 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 		xflip = (source[0] >> 15) & 0x1;
 		yflip = (source[0] >> 11) & 0x1;
 
-		colr = source[0] & 0x3f;
+		colr = (source[0] & 0x3f) << 4;
 
 		pri = (source[0] >> 6) & 3;
 
-		colr |= pri << (14-4);
+		colr |= pri << 14;
 
 		ytlim += 1;
 		xtlim += 1;
@@ -330,7 +332,7 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 						m_sprite_buffer,
 						cliprect,
 						tile_number,
-						colr << 4,
+						colr,
 						yflip,xflip,
 						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y, 15);
 
@@ -339,7 +341,7 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 						m_sprite_buffer,
 						cliprect,
 						tile_number,
-						colr << 4,
+						colr,
 						yflip,xflip,
 						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y, 15);
 
@@ -348,7 +350,7 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 						m_sprite_buffer,
 						cliprect,
 						tile_number,
-						colr << 4,
+						colr,
 						yflip,xflip,
 						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200, 15);
 
@@ -357,7 +359,7 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 						m_sprite_buffer,
 						cliprect,
 						tile_number,
-						colr << 4,
+						colr,
 						yflip,xflip,
 						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200, 15);
 
@@ -519,8 +521,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 /* VIDEO START (move to video file) */
 
-
-VIDEO_START_MEMBER(raiden2_state,raiden2)
+void raiden2_state::video_start()
 {
 	m_back_data = make_unique_clear<uint16_t[]>(0x800/2);
 	m_fore_data = make_unique_clear<uint16_t[]>(0x800/2);
@@ -529,11 +530,11 @@ VIDEO_START_MEMBER(raiden2_state,raiden2)
 	m_palette_data = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_palette->basemem().set(m_palette_data.get(), 0x1000/2 * sizeof(uint16_t), 16, ENDIANNESS_LITTLE, 2);
 
-	save_pointer(NAME(m_back_data.get()), 0x800/2);
-	save_pointer(NAME(m_fore_data.get()), 0x800/2);
-	save_pointer(NAME(m_mid_data.get()), 0x800/2);
-	save_pointer(NAME(m_text_data.get()), 0x1000/2);
-	save_pointer(NAME(m_palette_data.get()), 0x1000/2);
+	save_pointer(NAME(m_back_data), 0x800/2);
+	save_pointer(NAME(m_fore_data), 0x800/2);
+	save_pointer(NAME(m_mid_data), 0x800/2);
+	save_pointer(NAME(m_text_data), 0x1000/2);
+	save_pointer(NAME(m_palette_data), 0x1000/2);
 
 	m_text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
 	m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
@@ -541,7 +542,7 @@ VIDEO_START_MEMBER(raiden2_state,raiden2)
 	m_foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
 }
 
-/* screen_update_raiden2 (move to video file) */
+/* screen_update (move to video file) */
 
 void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind16 &source, int layer)
 {
@@ -574,7 +575,7 @@ void raiden2_state::tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &
 	blend_layer(bitmap, cliprect, m_tile_buffer, 0);
 }
 
-uint32_t raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t raiden2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	if (!(m_tilemap_enable & 16)) {
@@ -640,10 +641,10 @@ static uint32_t sprcpt_data_1[0x100], sprcpt_data_2[0x40], sprcpt_data_3[6], spr
 
 void raiden2_state::sprcpt_init()
 {
-	std::fill(std::begin(sprcpt_data_1), std::end(sprcpt_data_1), 0);
-	std::fill(std::begin(sprcpt_data_2), std::end(sprcpt_data_2), 0);
-	std::fill(std::begin(sprcpt_data_3), std::end(sprcpt_data_3), 0);
-	std::fill(std::begin(sprcpt_data_4), std::end(sprcpt_data_4), 0);
+	memset(sprcpt_data_1, 0, sizeof(sprcpt_data_1));
+	memset(sprcpt_data_2, 0, sizeof(sprcpt_data_2));
+	memset(sprcpt_data_3, 0, sizeof(sprcpt_data_3));
+	memset(sprcpt_data_4, 0, sizeof(sprcpt_data_4));
 
 	sprcpt_adr = 0;
 	sprcpt_idx = 0;
@@ -735,17 +736,18 @@ WRITE16_MEMBER(raiden2_state::sprcpt_flags_2_w)
 }
 
 
-void raiden2_state::common_reset(int bgbank, int fgbank, int midbank, int txbank)
+
+void raiden2_state::bank_reset(int bg, int fg, int mid, int txt)
 {
-	m_bg_bank  = bgbank;
-	m_fg_bank  = fgbank;
-	m_mid_bank = midbank;
-	m_tx_bank  = txbank;
+	m_bg_bank  = bg;
+	m_fg_bank  = fg;
+	m_mid_bank = mid;
+	m_tx_bank  = txt;
 }
 
 MACHINE_RESET_MEMBER(raiden2_state,raiden2)
 {
-	common_reset(0,6,1,0);
+	bank_reset(0, 6, 1, 0);
 	sprcpt_init();
 
 	m_mainbank[0]->set_entry(2);
@@ -757,7 +759,7 @@ MACHINE_RESET_MEMBER(raiden2_state,raiden2)
 
 MACHINE_RESET_MEMBER(raiden2_state,raidendx)
 {
-	common_reset(0,6,1,0);
+	bank_reset(0, 6, 1, 0);
 	sprcpt_init();
 
 	m_mainbank[0]->set_entry(16);
@@ -770,7 +772,7 @@ MACHINE_RESET_MEMBER(raiden2_state,raidendx)
 
 MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
 {
-	common_reset(0,2,1,0);
+	bank_reset(0, 2, 1, 0);
 	sprcpt_init();
 
 	m_mainbank[0]->set_entry(2);
@@ -782,7 +784,7 @@ MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
 
 MACHINE_RESET_MEMBER(raiden2_state,xsedae)
 {
-	common_reset(0,2,1,0);
+	bank_reset(0, 2, 1, 0);
 	sprcpt_init();
 }
 
@@ -1376,7 +1378,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout charlayout =
+const gfx_layout raiden2_state::charlayout =
 {
 	8,8,
 	RGN_FRAC(1,1),
@@ -1388,7 +1390,7 @@ static const gfx_layout charlayout =
 };
 
 
-static const gfx_layout tilelayout =
+const gfx_layout raiden2_state::tilelayout =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -1404,7 +1406,7 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static const gfx_layout spritelayout =
+const gfx_layout raiden2_state::spritelayout =
 {
 	16, 16,
 	RGN_FRAC(1,1),
@@ -1415,10 +1417,10 @@ static const gfx_layout spritelayout =
 	16*16*4
 };
 
-GFXDECODE_START( gfx_raiden2 )
+GFXDECODE_START( raiden2_state::gfx_raiden2 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0x700, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   0x400, 48 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout, 0x000, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   0x400, 16*3 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout, 0x000, 64 ) // really 128, but using the top bits for priority
 GFXDECODE_END
 
 
@@ -1440,7 +1442,7 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4,512,0,40*8,282,0,30*8) /* hand-tuned to match ~55.47 */
-	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
+	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -1454,8 +1456,6 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
 	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
 	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
-
-	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1504,7 +1504,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 //  MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
 	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4,512,0,40*8,282,0,32*8) /* hand-tuned to match ~55.47 */
-	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
+	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -1519,8 +1519,6 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
 	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
 
-	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -1528,7 +1526,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28/* ? */, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1549,16 +1547,14 @@ MACHINE_CONFIG_START(raiden2_state::xsedae)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(28'636'363)/8) // YM2151 instead YM3812
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(28'636'363)/8)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_DEVICE_REPLACE("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
+	MCFG_DEVICE_MODIFY("seibu_sound")
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
 /* ROM LOADING */

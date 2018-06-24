@@ -267,6 +267,7 @@
 #include "sound/2203intf.h"
 #include "sound/2608intf.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -2423,10 +2424,10 @@ void pc8801_state::machine_start()
 	m_kanji_rom = memregion("kanji")->base();
 	m_cg_rom = memregion("cgrom")->base();
 
-	save_pointer(NAME(m_work_ram.get()), 0x10000);
-	save_pointer(NAME(m_hi_work_ram.get()), 0x1000);
-	save_pointer(NAME(m_ext_work_ram.get()), 0x8000*0x100);
-	save_pointer(NAME(m_gvram.get()), 0xc000);
+	save_pointer(NAME(m_work_ram), 0x10000);
+	save_pointer(NAME(m_hi_work_ram), 0x1000);
+	save_pointer(NAME(m_ext_work_ram), 0x8000*0x100);
+	save_pointer(NAME(m_gvram), 0xc000);
 }
 
 void pc8801_state::machine_reset()

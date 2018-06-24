@@ -8,6 +8,7 @@
 #include "video/k051960.h"
 #include "video/k051316.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 
 class ajax_state : public driver_device
 {

@@ -6,31 +6,29 @@
 #include "machine/gen_latch.h"
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
-
-#include <algorithm>
+#include "emupal.h"
 
 class legionna_state : public driver_device, protected seibu_sound_common
 {
 public:
 	legionna_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_spriteram(*this, "spriteram")
-		, m_swappal(*this, "swappal")
-		, m_layer_disable(0)
-		, m_back_gfx_bank(0)
-		, m_fore_gfx_bank(0)
-		, m_mid_gfx_bank(0)
-		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
-		, m_seibu_sound(*this, "seibu_sound")
-		, m_oki(*this, "oki")
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_palette(*this, "palette")
-		, m_crtc(*this, "crtc")
-		, m_raiden2cop(*this, "raiden2cop")
+		: driver_device(mconfig, type, tag),
+			m_spriteram(*this, "spriteram"),
+			m_swappal(*this, "swappal"),
+			m_layer_disable(0),
+			m_back_gfx_bank(0),
+			m_fore_gfx_bank(0),
+			m_mid_gfx_bank(0),
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu"),
+			m_seibu_sound(*this, "seibu_sound"),
+			m_oki(*this, "oki"),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette"),
+			m_crtc(*this, "crtc"),
+			m_raiden2cop(*this, "raiden2cop")
 	{
-		std::fill(std::begin(m_scrollvals), std::end(m_scrollvals), 0);
-		std::fill(std::begin(m_sprite_pri_mask), std::end(m_sprite_pri_mask), 0);
+		memset(scrollvals, 0, sizeof(uint16_t)*6);
 	}
 
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -55,7 +53,7 @@ public:
 	uint16_t m_back_gfx_bank;
 	uint16_t m_fore_gfx_bank;
 	uint16_t m_mid_gfx_bank;
-	uint16_t m_scrollvals[6];
+	uint16_t scrollvals[6];
 	DECLARE_WRITE16_MEMBER(tilemap_enable_w);
 	DECLARE_WRITE16_MEMBER(tile_scroll_w);
 	DECLARE_WRITE16_MEMBER(tile_scroll_base_w);
@@ -81,8 +79,8 @@ public:
 	void init_olysoc92();
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
-	TILE_GET_INFO_MEMBER(get_mid_tile_info_split);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info_denji);
+	TILE_GET_INFO_MEMBER(get_mid_tile_info_split);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info_denji);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
@@ -98,7 +96,7 @@ public:
 	uint32_t screen_update_grainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void descramble_legionnaire_gfx(uint8_t* src);
-	void common_video_start(bool is_seperated_lbk);
+	void common_video_start(bool split);
 	void common_video_allocate_ptr();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

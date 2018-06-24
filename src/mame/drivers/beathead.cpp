@@ -137,9 +137,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(beathead_state::scanline_callback)
 	update_interrupts();
 
 	/* set the timer for the next one */
-	timer.adjust(m_screen->time_until_pos(scanline) - m_hblank_offset, scanline);
+	m_scan_timer->adjust(m_screen->time_until_pos(scanline) - m_hblank_offset, scanline);
 }
-
 
 void beathead_state::machine_reset()
 {
@@ -152,8 +151,8 @@ void beathead_state::machine_reset()
 
 	/* compute the timing of the HBLANK interrupt and set the first timer */
 	m_hblank_offset = m_screen->scan_period() * (455 - 336 - 25) / 455;
-	timer_device *scanline_timer = machine().device<timer_device>("scan_timer");
-	scanline_timer->adjust(m_screen->time_until_pos(0) - m_hblank_offset);
+
+	m_scan_timer->adjust(m_screen->time_until_pos(0) - m_hblank_offset);
 
 	/* reset IRQs */
 	m_irq_line_state = CLEAR_LINE;
@@ -348,7 +347,7 @@ MACHINE_CONFIG_START(beathead_state::beathead)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", beathead_state, scanline_callback)
+	MCFG_TIMER_DRIVER_ADD(m_scan_timer, beathead_state, scanline_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

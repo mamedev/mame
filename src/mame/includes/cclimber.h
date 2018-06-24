@@ -4,6 +4,7 @@
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/segacrpt_device.h"
+#include "emupal.h"
 
 class cclimber_state : public driver_device
 {

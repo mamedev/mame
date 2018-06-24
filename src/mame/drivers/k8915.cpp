@@ -16,6 +16,7 @@ When it says DIAGNOSTIC RAZ P, press enter.
 #include "machine/z80sio.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 
 class k8915_state : public driver_device

@@ -62,6 +62,7 @@ JALCF1   BIN     1,048,576  02-07-99  1:11a JALCF1.BIN
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/ms1_tmap.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

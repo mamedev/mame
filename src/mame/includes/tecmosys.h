@@ -10,6 +10,7 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tecmosys_state : public driver_device

@@ -138,6 +138,7 @@ Find lamps/reels after UPD changes.
 #include "sound/upd7759.h"
 #include "sound/ym2413.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -864,7 +865,7 @@ void maygayv1_state::machine_start()
 	i82716.dram = std::make_unique<uint16_t[]>(0x80000/2);   // ???
 	i82716.line_buf = std::make_unique<uint8_t[]>(512);
 
-	save_pointer(NAME(i82716.dram.get()), 0x40000);
+	save_pointer(NAME(i82716.dram), 0x40000);
 }
 
 void maygayv1_state::machine_reset()

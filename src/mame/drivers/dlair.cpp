@@ -45,6 +45,7 @@
 #include "machine/z80sio.h"
 #include "sound/ay8910.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "render.h"
 #include "speaker.h"
 

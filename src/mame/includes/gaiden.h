@@ -12,6 +12,7 @@
 #include "sound/msm5205.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
+#include "emupal.h"
 #include "screen.h"
 
 class gaiden_state : public driver_device

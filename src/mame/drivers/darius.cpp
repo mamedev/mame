@@ -483,7 +483,7 @@ WRITE8_MEMBER(darius_state::adpcm_nmi_enable)
 
 WRITE8_MEMBER(darius_state::adpcm_data_w)
 {
-	m_msm->data_w(data);
+	m_msm->write_data(data);
 	m_msm->reset_w(!(data & 0x20));    /* my best guess, but it could be output enable as well */
 }
 

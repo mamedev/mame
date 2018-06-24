@@ -190,6 +190,7 @@ Some logic, resistors/caps/transistors, some connectors etc.
 #include "cpu/m68000/m68000.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

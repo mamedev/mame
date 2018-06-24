@@ -20,6 +20,7 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 

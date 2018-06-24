@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class blktiger_state : public driver_device
 {

@@ -67,6 +67,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -247,7 +248,7 @@ void roul_state::video_start()
 	m_videobuf = make_unique_clear<uint8_t[]>(VIDEOBUF_SIZE);
 
 	save_item(NAME(m_reg));
-	save_pointer(NAME(m_videobuf.get()), VIDEOBUF_SIZE);
+	save_pointer(NAME(m_videobuf), VIDEOBUF_SIZE);
 	save_item(NAME(m_lamp_old));
 }
 

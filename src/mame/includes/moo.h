@@ -15,6 +15,7 @@
 #include "video/k054338.h"
 #include "machine/k054321.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 
 class moo_state : public driver_device

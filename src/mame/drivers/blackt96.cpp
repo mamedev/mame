@@ -83,6 +83,7 @@ Bugs (all of these looks BTANBs):
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "video/snk68_spr.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

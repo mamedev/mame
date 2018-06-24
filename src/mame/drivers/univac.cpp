@@ -43,6 +43,7 @@ Notes:
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -222,7 +223,7 @@ void univac_state::machine_start()
 	m_p_parity.reset(new u8[parity_bytes]);
 	std::fill_n(m_p_parity.get(), parity_bytes, 0);
 
-	save_pointer(NAME(m_p_parity.get()), parity_bytes);
+	save_pointer(NAME(m_p_parity), parity_bytes);
 	save_item(NAME(m_bank_mask));
 	save_item(NAME(m_parity_check));
 	save_item(NAME(m_parity_poison));

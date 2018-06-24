@@ -2,6 +2,7 @@
 // copyright-holders:Mirko Buffoni
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class solomon_state : public driver_device
 {

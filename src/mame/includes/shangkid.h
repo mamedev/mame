@@ -2,6 +2,7 @@
 // copyright-holders:Phil Stroffolino
 
 #include "sound/ay8910.h"
+#include "emupal.h"
 
 class shangkid_state : public driver_device
 {

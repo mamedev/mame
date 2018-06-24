@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MASTER_CLOCK XTAL(12'096'000)

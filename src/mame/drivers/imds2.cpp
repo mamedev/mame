@@ -159,16 +159,16 @@ void imds2_state::ioc_io_map(address_map &map)
 	map(0xf0, 0xf8).rw(m_iocdma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 }
 
-imds2_state::imds2_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig , type , tag),
+imds2_state::imds2_state(const machine_config &mconfig, device_type type, const char *tag) :
+	driver_device(mconfig , type , tag),
 	m_ipccpu(*this , "ipccpu"),
 	m_ipcsyspic(*this , "ipcsyspic"),
 	m_ipclocpic(*this , "ipclocpic"),
-		m_ipctimer(*this , "ipctimer"),
-		m_ipcusart0(*this , "ipcusart0"),
-		m_ipcusart1(*this , "ipcusart1"),
-		m_serial0(*this , "serial0"),
-		m_serial1(*this , "serial1"),
+	m_ipctimer(*this , "ipctimer"),
+	m_ipcusart0(*this , "ipcusart0"),
+	m_ipcusart1(*this , "ipcusart1"),
+	m_serial0(*this , "serial0"),
+	m_serial1(*this , "serial1"),
 	m_ioccpu(*this , "ioccpu"),
 	m_iocdma(*this , "iocdma"),
 	m_ioccrtc(*this , "ioccrtc"),
@@ -880,7 +880,7 @@ MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, imds2_state, imds2_kb_port_t1_r))
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
-		MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+		MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 		MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, imds2_state , imds2_pio_lpt_ack_w))
 		MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, imds2_state , imds2_pio_lpt_busy_w))
 		MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, imds2_state , imds2_pio_lpt_select_w))

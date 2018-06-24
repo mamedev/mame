@@ -30,6 +30,7 @@
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/qs1000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -13,6 +13,7 @@ Floppies were 8 inch IBM format.
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "emupal.h"
 #include "screen.h"
 
 

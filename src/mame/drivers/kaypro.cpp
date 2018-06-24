@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_KAYPRO10KBD_RXD_CB(WRITELINE("sio", z80sio_device, rxb_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, syncb_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kaypro_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_CLOCK_ADD("kbdtxrxc", 4800)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio_1", z80sio_device, rxtxcb_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kaypro_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

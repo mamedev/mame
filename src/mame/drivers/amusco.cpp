@@ -80,6 +80,7 @@
 #include "machine/ticket.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -194,7 +195,7 @@ void amusco_state::video_start()
 	m_videoram = std::make_unique<uint8_t []>(videoram_size);
 	std::fill_n(m_videoram.get(), videoram_size, 0);
 
-	save_pointer(NAME(m_videoram.get()), videoram_size);
+	save_pointer(NAME(m_videoram), videoram_size);
 }
 
 void amusco_state::machine_start()

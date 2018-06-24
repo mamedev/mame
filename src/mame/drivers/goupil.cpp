@@ -33,6 +33,7 @@
 #include "video/ef9364.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 

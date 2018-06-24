@@ -324,6 +324,7 @@
 #include "sound/k056800.h"
 #include "video/voodoo.h"
 #include "video/k037122.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -1021,7 +1022,7 @@ void hornet_state::machine_start()
 
 	save_item(NAME(m_led_reg0));
 	save_item(NAME(m_led_reg1));
-	save_pointer(NAME(m_jvs_sdata.get()), 1024);
+	save_pointer(NAME(m_jvs_sdata), 1024);
 	save_item(NAME(m_jvs_sdata_ptr));
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hornet_state::sound_irq), this));

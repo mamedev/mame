@@ -127,6 +127,7 @@
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "video/hd63484.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

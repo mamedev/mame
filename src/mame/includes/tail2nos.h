@@ -9,6 +9,7 @@
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
 #include "video/k051316.h"
+#include "emupal.h"
 
 class tail2nos_state : public driver_device
 {

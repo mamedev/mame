@@ -72,6 +72,7 @@ Dumped by Uki
 #include "sound/ymz280b.h"
 #include "video/kaneko_grap2.h"
 #include "video/sknsspr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -156,8 +157,8 @@ void galpani3_state::video_start()
 
 	save_item(NAME(m_priority_buffer_scrollx));
 	save_item(NAME(m_priority_buffer_scrolly));
-	save_pointer(NAME(m_spriteram32.get()), 0x4000/4);
-	save_pointer(NAME(m_spc_regs.get()), 0x40/4);
+	save_pointer(NAME(m_spriteram32), 0x4000/4);
+	save_pointer(NAME(m_spc_regs), 0x40/4);
 }
 
 #define SPRITE_DRAW_PIXEL(_pri)                                    \
@@ -446,7 +447,7 @@ MACHINE_CONFIG_START(galpani3_state::galpani3)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
+	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
 
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)

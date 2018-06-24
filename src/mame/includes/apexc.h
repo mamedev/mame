@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "cpu/apexc/apexc.h"
 #include "machine/apexc.h"
+#include "emupal.h"
 #include "screen.h"
 
 class apexc_state : public driver_device

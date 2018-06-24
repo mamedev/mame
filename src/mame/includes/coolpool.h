@@ -17,6 +17,7 @@ public:
 		, m_tlc34076(*this, "tlc34076")
 		, m_main2dsp(*this, "main2dsp")
 		, m_dsp2main(*this, "dsp2main")
+		, m_nvram_timer(*this, "nvram_timer")
 		, m_vram_base(*this, "vram_base")
 		, m_nvram(*this, "nvram")
 		, m_dsp_rom(*this, "dspdata")
@@ -28,6 +29,8 @@ public:
 
 	required_device<generic_latch_16_device> m_main2dsp;
 	required_device<generic_latch_16_device> m_dsp2main;
+
+	required_device<timer_device> m_nvram_timer;
 
 	required_shared_ptr<uint16_t> m_vram_base;
 	required_shared_ptr<uint16_t> m_nvram;

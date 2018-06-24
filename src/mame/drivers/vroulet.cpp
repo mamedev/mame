@@ -41,6 +41,7 @@ Tomasz Slanina 20050225
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

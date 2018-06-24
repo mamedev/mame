@@ -158,6 +158,7 @@ Notes:
 #include "machine/ticket.h"
 #include "sound/x1_010.h"
 #include "video/seta001.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

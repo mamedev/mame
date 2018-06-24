@@ -6,6 +6,7 @@
 #pragma once
 
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class appoooh_state : public driver_device
 {

@@ -15,6 +15,8 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "emupal.h"
+
 #include "screen.h"
 #include "speaker.h"
 

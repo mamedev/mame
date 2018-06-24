@@ -285,31 +285,28 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		if (m_scanline == 0)
 			vrtc_end();
 
-		if ((m_status & ST_VE) && m_scanline <= (m_vrtc_scanline - SCANLINES_PER_ROW))
+		if ((m_status & ST_VE) && lc == 0 && m_scanline < m_vrtc_scanline)
 		{
-			if (lc == 0)
+			if (!m_dma_stop && m_buffer_idx < CHARACTERS_PER_ROW)
 			{
-				if (!m_dma_stop && m_buffer_idx < CHARACTERS_PER_ROW)
-				{
-					m_status |= ST_DU;
-					m_dma_stop = true;
+				m_status |= ST_DU;
+				m_dma_stop = true;
 
-					// blank screen until after VRTC
-					m_end_of_screen = true;
+				// blank screen until after VRTC
+				m_end_of_screen = true;
 
-					//LOG("I8275 y %u x %u DMA Underrun\n", y, x);
+				//LOG("I8275 y %u x %u DMA Underrun\n", y, x);
 
-					m_write_drq(0);
-				}
+				m_write_drq(0);
+			}
 
-				if (!m_dma_stop)
-				{
-					// swap line buffers
-					m_buffer_dma = !m_buffer_dma;
+			if (!m_dma_stop)
+			{
+				// swap line buffers
+				m_buffer_dma = !m_buffer_dma;
 
-					if ((m_scanline < (m_vrtc_scanline - SCANLINES_PER_ROW)))
-						dma_start();
-				}
+				if (m_scanline < (m_vrtc_scanline - SCANLINES_PER_ROW))
+					dma_start();
 			}
 		}
 

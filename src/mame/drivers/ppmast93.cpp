@@ -137,6 +137,7 @@ Dip locations added based on the notes above.
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

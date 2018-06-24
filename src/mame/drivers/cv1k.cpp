@@ -179,6 +179,7 @@ Common game codes:
 #include "sound/ymz770.h"
 #include "video/epic12.h"
 
+#include "emupal.h"
 #include "profiler.h"
 #include "screen.h"
 #include "speaker.h"

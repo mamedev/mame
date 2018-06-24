@@ -174,6 +174,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/8950intf.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"

@@ -214,6 +214,7 @@ TODO:
 #include "machine/watchdog.h"
 #include "video/kaneko_tmap.h"
 #include "video/kaneko_spr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

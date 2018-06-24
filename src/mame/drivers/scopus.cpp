@@ -26,6 +26,7 @@
 #include "machine/i8257.h"
 #include "machine/i8212.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"

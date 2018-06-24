@@ -47,6 +47,7 @@
 #include "machine/idehd.h"
 
 #include "debugger.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

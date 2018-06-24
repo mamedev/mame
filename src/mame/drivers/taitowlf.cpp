@@ -39,6 +39,7 @@ TODO:
 #if ENABLE_VGA
 #include "video/pc_vga.h"
 #endif
+#include "emupal.h"
 #include "screen.h"
 
 class taitowlf_state : public pcat_base_state

@@ -51,6 +51,7 @@ To Do:
 #include "sound/saa1099.h"
 #include "video/mc6845.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

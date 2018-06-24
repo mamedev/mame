@@ -30,6 +30,7 @@ Todo:
 #include "machine/ldv1000.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

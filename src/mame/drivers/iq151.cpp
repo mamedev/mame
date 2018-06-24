@@ -63,6 +63,7 @@ ToDo:
 #include "bus/iq151/video32.h"
 #include "bus/iq151/video64.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

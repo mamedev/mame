@@ -21,6 +21,7 @@
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -533,7 +534,7 @@ GFXDECODE_END
 void slotcarn_state::machine_start()
 {
 	m_ram_palette = std::make_unique<uint8_t[]>(RAM_PALETTE_SIZE);
-	save_pointer(NAME(m_ram_palette.get()), RAM_PALETTE_SIZE);
+	save_pointer(NAME(m_ram_palette), RAM_PALETTE_SIZE);
 }
 
 /***********************************

@@ -13,6 +13,7 @@ DEFINE_DEVICE_TYPE(ISBC_215G, isbc_215g_device, "isbc_215g", "ISBC 215G Winchest
 
 isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISBC_215G, tag, owner, clock),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_dmac(*this, "u84"),
 	m_hdd0(*this, "drive0"),
 	m_hdd1(*this, "drive1"),
@@ -399,7 +400,7 @@ void isbc_215g_device::device_reset()
 
 void isbc_215g_device::device_start()
 {
-	m_maincpu_mem = &machine().device<cpu_device>(m_maincpu_tag)->space(AS_PROGRAM);
+	m_maincpu_mem = &m_maincpu->space(AS_PROGRAM);
 	m_cyl[0] = m_cyl[1] = 0;
 	m_lba[0] = m_lba[1] = 0;
 	m_idcompare[0] = m_idcompare[1] = m_idcompare[2] = m_idcompare[3] = 0;

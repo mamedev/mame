@@ -9,6 +9,7 @@
 #include "cpu/sh/sh2.h"
 #include "sound/ymf278b.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MASTER_CLOCK 57272700   // main oscillator frequency

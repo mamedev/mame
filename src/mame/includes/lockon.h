@@ -8,6 +8,7 @@
 
 #include "machine/watchdog.h"
 #include "sound/flt_vol.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Calculated from CRT controller writes */

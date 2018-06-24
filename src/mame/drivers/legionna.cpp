@@ -243,7 +243,7 @@ void legionna_state::godzilla_map(address_map &map)
 	legionna_cop_map(map);
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x1003ff).ram();
-	map(0x100470, 0x100471).w(FUNC(legionna_state::heatbrl_setgfxbank));
+	map(0x100470, 0x100471).w(FUNC(legionna_state::denjinmk_setgfxbank));
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
 	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
@@ -1115,9 +1115,9 @@ static const gfx_layout charlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ STEP4(0,4) },
+	{ 0, 4, 8, 12 },
 	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0 },
-	{ STEP8(0,32) },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	32*8
 };
 
@@ -1151,30 +1151,40 @@ static const gfx_layout tilelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ STEP4(0,4) },
+	{ 0*4, 1*4, 2*4, 3*4 },
 	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0,
 		64*8+3, 64*8+2, 64*8+1, 64*8+0, 64*8+16+3, 64*8+16+2, 64*8+16+1, 64*8+16+0 },
-	{ STEP16(0,32) },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
 	128*8
 };
 
-// LBK uses highest half of MBK ROM area
+static const gfx_layout spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 0*4, 1*4, 2*4, 3*4 },
+	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0,
+		64*8+3, 64*8+2, 64*8+1, 64*8+0, 64*8+16+3, 64*8+16+2, 64*8+16+1, 64*8+16+0 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	128*8
+};
+
 static GFXDECODE_START( gfx_legionna )
-	GFXDECODE_ENTRY( "char", 0, charlayout,   48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,    0*16, 32 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,   16*16, 16 ) /* unused */
-	GFXDECODE_ENTRY( "sprite", 0, tilelayout, 64*16, 4*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,   32*16, 16 )
+	GFXDECODE_ENTRY( "sprite", 0, spritelayout, 1024, 4*16 )
+	GFXDECODE_ENTRY( "char", 0, charlayout,    48*16, 16 )
+	GFXDECODE_ENTRY( "bg", 0, tilelayout,       0*16, 32 )
+	GFXDECODE_ENTRY( "fg", 0, tilelayout,      32*16, 16 )
 GFXDECODE_END
 
-// LBK uses separated ROM
 static GFXDECODE_START( gfx_heatbrl )
-	GFXDECODE_ENTRY( "char", 0, charlayout,   48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,    0*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,   16*16, 16 ) /* unused */
-	GFXDECODE_ENTRY( "sprite", 0, tilelayout, 64*16, 4*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,   32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, tilelayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "sprite", 0, spritelayout,  1024, 4*16 )
+	GFXDECODE_ENTRY( "char", 0, charlayout,     48*16, 16 )
+	GFXDECODE_ENTRY( "bg", 0, tilelayout,        0*16, 16 )
+	GFXDECODE_ENTRY( "fg", 0, tilelayout,       32*16, 16 )
+	GFXDECODE_ENTRY( "mid", 0, tilelayout,      16*16, 16 )
 GFXDECODE_END
 
 /*****************************************************************************/
@@ -1182,10 +1192,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(legionna_state::legionna)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2)  /* ??? */
+	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)  /* ??? */
 	MCFG_DEVICE_PROGRAM_MAP(legionna_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
@@ -1200,7 +1211,6 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 	MCFG_SCREEN_SIZE(36*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_legionna)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", 4))/* VBL */
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
@@ -1217,11 +1227,11 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'180)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000)/20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1235,10 +1245,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(legionna_state::heatbrl)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2)  /* ??? */
+	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)  /* ??? */
 	MCFG_DEVICE_PROGRAM_MAP(heatbrl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
@@ -1253,14 +1264,12 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	MCFG_SCREEN_SIZE(36*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_heatbrl)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", 4))/* VBL */
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
-
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
@@ -1272,11 +1281,11 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'180)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000)/20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1289,10 +1298,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(legionna_state::godzilla)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20000000/2)
 	MCFG_DEVICE_PROGRAM_MAP(godzilla_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IO_MAP(godzilla_sound_io_map)
 
@@ -1307,9 +1317,8 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 //  MCFG_SCREEN_SIZE(42*8, 36*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'180)/2,455,0,320,258,0,224) // ~61 Hz, 15.734 kHz
+	MCFG_SCREEN_RAW_PARAMS(14318180/2,455,0,320,258,0,224) // ~61 Hz, 15.734 kHz
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", 4))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
@@ -1328,12 +1337,12 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'180)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000)/20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1346,10 +1355,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(legionna_state::denjinmk)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20000000/2)
 	MCFG_DEVICE_PROGRAM_MAP(denjinmk_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
@@ -1360,14 +1370,13 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(42*8, 36*8)
-	MCFG_SCREEN_REFRESH_RATE(56) // from docs, not verified
+	MCFG_SCREEN_REFRESH_RATE(56) // Value from doc, Not verified
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", 4))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_legionna)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
@@ -1382,12 +1391,12 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'180)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000)/20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1400,10 +1409,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(legionna_state::grainbow)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20000000/2)
 	MCFG_DEVICE_PROGRAM_MAP(grainbow_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
@@ -1418,7 +1428,6 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	MCFG_SCREEN_SIZE(64*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 42*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", 4))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
@@ -1436,12 +1445,12 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'180)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000)/20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1455,10 +1464,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(legionna_state::cupsoc)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2)
+	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)
 	MCFG_DEVICE_PROGRAM_MAP(cupsoc_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
@@ -1473,13 +1483,13 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	MCFG_SCREEN_SIZE(42*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", 4))/* VBL */
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
 	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
+
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_legionna)
 
@@ -1491,11 +1501,11 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'180)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000)/20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1538,18 +1548,15 @@ ROM_START( legionna )
 	ROM_REGION( 0x010000, "char", 0 )  /* FG Tiles */
 	ROM_COPY( "user1", 0x010000, 0x000000, 0x010000 )
 
-	ROM_REGION( 0x010000, "gfx5", 0 )  /* BK3 */
+	ROM_REGION( 0x010000, "fg", 0 )  /* BK3 */
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */
 
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD16_WORD_SWAP( "legionnire_obj1.u0815", 0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )   /* sprites */
 	ROM_LOAD16_WORD_SWAP( "legionnire_obj2.u0814", 0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )  /* 2 sets of tiles ('MBK','LBK') */
-	ROM_LOAD16_WORD_SWAP( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )
-
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASEFF )
-	/* Not Used */
+	ROM_REGION( 0x100000, "bg", 0 ) /* 2 sets of tiles ('MBK','LBK') */
+	ROM_LOAD16_WORD_SWAP( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )    /* 3 sets of tiles ('MBK','LBK','BK3') */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "5.u106", 0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
@@ -1580,18 +1587,15 @@ ROM_START( legionnaj )
 	ROM_REGION( 0x010000, "char", 0 )  /* FG Tiles */
 	ROM_COPY( "user1", 0x010000, 0x000000, 0x010000 )
 
-	ROM_REGION( 0x010000, "gfx5", 0 )  /* BK3 */
+	ROM_REGION( 0x010000, "fg", 0 )  /* BK3 */
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */
 
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD16_WORD_SWAP( "legionnire_obj1.u0815", 0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )   /* sprites */
 	ROM_LOAD16_WORD_SWAP( "legionnire_obj2.u0814", 0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )  /* 2 sets of tiles ('MBK','LBK') */
-	ROM_LOAD16_WORD_SWAP( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )
-
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASEFF )
-	/* Not Used */
+	ROM_REGION( 0x100000, "bg", 0 ) /* 2 sets of tiles ('MBK','LBK') */
+	ROM_LOAD16_WORD_SWAP( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )    /* 3 sets of tiles ('MBK','LBK','BK3') */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "5.u106", 0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
@@ -1622,18 +1626,15 @@ ROM_START( legionnau )
 	ROM_REGION( 0x010000, "char", 0 )  /* FG Tiles */
 	ROM_COPY( "user1", 0x010000, 0x000000, 0x010000 )
 
-	ROM_REGION( 0x010000, "gfx5", 0 )  /* BK3 */
+	ROM_REGION( 0x010000, "fg", 0 )  /* BK3 */
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */
 
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD16_WORD_SWAP( "legionnire_obj1.u0815", 0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )   /* sprites */
 	ROM_LOAD16_WORD_SWAP( "legionnire_obj2.u0814", 0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )  /* 2 sets of tiles ('MBK','LBK') */
-	ROM_LOAD16_WORD_SWAP( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )
-
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASEFF )
-	/* Not Used */
+	ROM_REGION( 0x100000, "bg", 0 ) /* 2 sets of tiles ('MBK','LBK') */
+	ROM_LOAD16_WORD_SWAP( "legionnire_back.u075", 0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )    /* 3 sets of tiles ('MBK','LBK','BK3') */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "5.u106", 0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
@@ -1665,16 +1666,13 @@ ROM_START( heatbrl )
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* MBK tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", 0 )   /* not used? */
-	ROM_COPY( "char", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
+	ROM_REGION( 0x080000, "mid", 0 )   /* LBK tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
 	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
@@ -1707,16 +1705,13 @@ ROM_START( heatbrl2 )
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* MBK tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", 0 )   /* not used? */
-	ROM_COPY( "char", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
+	ROM_REGION( 0x080000, "mid", 0 )   /* LBK tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
 	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
@@ -1754,15 +1749,13 @@ barrel1,2,3,4.BG */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* MBK tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
+	ROM_REGION( 0x080000, "mid", 0 )   /* LBK tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
 	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
@@ -1795,15 +1788,13 @@ ROM_START( heatbrlu )
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* MBK tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
+	ROM_REGION( 0x080000, "mid", 0 )   /* LBK tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
 	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
@@ -1840,16 +1831,13 @@ ROM_START( heatbrle )
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* MBK tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, "gfx4", 0 )   /* not used? */
-	ROM_COPY( "char", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
 
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
+	ROM_REGION( 0x080000, "mid", 0 )   /* LBK tiles */
 	ROM_LOAD16_WORD_SWAP( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
 
 	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
@@ -1934,12 +1922,10 @@ ROM_START( godzilla )
 	ROM_LOAD16_WORD_SWAP( "obj3.743",     0x400000, 0x100000, CRC(5af0114e) SHA1(9362de9ade6db67ab0e3a2dfea580e688bbf7729) )
 	ROM_LOAD16_WORD_SWAP( "obj4.757",     0x500000, 0x100000, CRC(7448b054) SHA1(5c08319329eb8c90b63e5393c0011bc39911ebbb) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* 2 sets of tiles ('MBK','LBK') */
+	ROM_REGION( 0x100000, "bg", 0 )   /* 2 sets of tiles ('MBK','LBK') */
 	ROM_LOAD16_WORD_SWAP( "bg1.618",      0x000000, 0x100000, CRC(78fbbb84) SHA1(b1f5d4041bb88c5b2a561949239b11c3fd7c5fbc) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x100000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x100000, "fg", 0 )   /* BK3 tiles; Second half is unused? */
 	ROM_LOAD16_WORD_SWAP( "bg2.619",      0x000000, 0x100000, CRC(8ac192a5) SHA1(54b557e81a704c70a651e6b8da70207a2a70530f) )
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* ADPCM samples */
@@ -2049,13 +2035,13 @@ ROM_START( denjinmk )
 	ROM_LOAD16_WORD_SWAP( "obj-6-7.743",     0x300000, 0x100000, CRC(e5805757) SHA1(9d392c27eef7c1fcda560dac17ba9d7ae2287ac8) ) /* 6,7 */
 	ROM_LOAD16_WORD_SWAP( "obj-8-9.757",     0x400000, 0x100000, CRC(c8f7e1c9) SHA1(a746d187b50a0ecdd5a7f687a2601e5dc8bfe272) ) /* 8,9 */
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* MBK tiles */
 	ROM_LOAD16_WORD_SWAP( "bg-1-ab.618",      0x000000, 0x100000, CRC(eaad151a) SHA1(bdd1d83ee8497efe20f21baf873e786446372bcb) )
 
-	ROM_REGION( 0x100000, "gfx4", 0 )   /* BK2(=LBK?) tiles */
+	ROM_REGION( 0x100000, "mid", 0 )  /* BK2 used; or LBK and just identification string is different? */
 	ROM_LOAD16_WORD_SWAP( "bg-2-ab.617",      0x000000, 0x100000, CRC(40938f74) SHA1(d68b0f8245a8b390ad5d4e6ebc7514a939b8ac51) )
 
-	ROM_REGION( 0x100000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x100000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "bg-3-ab.619",      0x000000, 0x100000,  CRC(de7366ee) SHA1(0c3969d15f3cd963e579d4164b6e0a6b4012c9c6) )
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* ADPCM samples */
@@ -2140,12 +2126,10 @@ ROM_START( grainbow )
 	ROM_LOAD16_WORD_SWAP( "rb-spr01.748", 0x000000, 0x100000, CRC(11a3479d) SHA1(4d2d06d62da02c6e9884735de8c319f37ca1715c) )
 	ROM_LOAD16_WORD_SWAP( "rb-spr23.756", 0x100000, 0x100000, CRC(fd08a761) SHA1(3297a2bfaabef17ed9320e24e9a4ffa2f3eb3a44) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )  /* 2 sets of tiles ('MBK','LBK') */
+	ROM_REGION( 0x100000, "bg", 0 )
 	ROM_LOAD16_WORD_SWAP( "rb-bg-01.618", 0x000000, 0x100000, CRC(6a4ca7e7) SHA1(13612d29f8f04cf62b4357b69b81240dd1eceae4) )
 
-	ROM_REGION( 0x040000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x100000, "gfx5", 0 )
+	ROM_REGION( 0x100000, "fg", 0 )
 	ROM_LOAD16_WORD_SWAP( "rb-bg-2.619",  0x000000, 0x100000, CRC(a9b5c85e) SHA1(0ae044e05730e8080d94f1f6758f8dd051b03c41) )
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
@@ -2176,12 +2160,10 @@ ROM_START( grainbowk )
 	ROM_LOAD16_WORD_SWAP( "rb-spr01.748", 0x000000, 0x100000, CRC(11a3479d) SHA1(4d2d06d62da02c6e9884735de8c319f37ca1715c) )
 	ROM_LOAD16_WORD_SWAP( "rb-spr23.756", 0x100000, 0x100000, CRC(fd08a761) SHA1(3297a2bfaabef17ed9320e24e9a4ffa2f3eb3a44) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )  /* 2 sets of tiles ('MBK','LBK') */
+	ROM_REGION( 0x100000, "bg", 0 )
 	ROM_LOAD16_WORD_SWAP( "rb-bg-01.618", 0x000000, 0x100000, CRC(6a4ca7e7) SHA1(13612d29f8f04cf62b4357b69b81240dd1eceae4) )
 
-	ROM_REGION( 0x040000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x100000, "gfx5", 0 )
+	ROM_REGION( 0x100000, "fg", 0 )
 	ROM_LOAD16_WORD_SWAP( "rb-bg-2.619",  0x000000, 0x100000, CRC(a9b5c85e) SHA1(0ae044e05730e8080d94f1f6758f8dd051b03c41) )
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
@@ -2210,16 +2192,11 @@ ROM_START( cupsoc )
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* 2 sets of tiles ('MBK','LBK') */
 	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2250,16 +2227,11 @@ ROM_START( cupsoca )
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* 2 sets of tiles ('MBK','LBK') */
 	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2290,16 +2262,11 @@ ROM_START( cupsocb )
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* 2 sets of tiles ('MBK','LBK') */
 	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2330,16 +2297,11 @@ ROM_START( cupsocs )
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* 2 sets of tiles ('MBK','LBK') */
 	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "8_7a.bin", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2372,16 +2334,11 @@ ROM_START( cupsocs2 )
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* 2 sets of tiles ('MBK','LBK') */
 	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2412,16 +2369,11 @@ ROM_START( olysoc92 )
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* 2 sets of tiles ('MBK','LBK') */
 	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2452,16 +2404,11 @@ ROM_START( olysoc92a )
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* 2 sets of tiles ('MBK','LBK') */
 	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "seibu8.7a", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2493,16 +2440,11 @@ ROM_START( olysoc92b )
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD16_WORD_SWAP( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_REGION( 0x100000, "bg", 0 )   /* 2 sets of tiles ('MBK','LBK') */
 	ROM_LOAD16_WORD_SWAP( "back-1.4y", 0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
 
-	ROM_REGION( 0x020000, "gfx4", ROMREGION_ERASEFF )   /* not used */
-
-	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_REGION( 0x080000, "fg", 0 )   /* BK3 tiles */
 	ROM_LOAD16_WORD_SWAP( "back-2.6y", 0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
-	ROM_COPY( "gfx5", 0x000000, 0x00000, 0x080000 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "8", 0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
@@ -2513,6 +2455,8 @@ ROM_START( olysoc92b )
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
+
+
 
 
 /* Does the COP or something else on the PCB provide a rom overlay for the last part of ROM?
@@ -2563,9 +2507,11 @@ void legionna_state::init_cupsoc()
 	init_cupsoc_debug();
 }
 
+
+
 void legionna_state::init_legiongfx()
 {
-	descramble_legionnaire_gfx(memregion("gfx5")->base() );
+	descramble_legionnaire_gfx(memregion("fg")->base() );
 }
 
 void legionna_state::init_godzilla()
@@ -2593,7 +2539,7 @@ GAME( 1992, heatbrle,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,
 GAME( 1993, godzilla,  0,        godzilla, godzilla, legionna_state, init_godzilla,  ROT0, "Banpresto", "Godzilla (Japan)", 0 )
 GAME( 1993, grainbow,  0,        grainbow, grainbow, legionna_state, empty_init,     ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1993, grainbowk, grainbow, grainbow, grainbow, legionna_state, empty_init,     ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1994, denjinmk,  0,        denjinmk, denjinmk, legionna_state, empty_init,     ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", 0 )
+GAME( 1993, denjinmk,  0,        denjinmk, denjinmk, legionna_state, empty_init,     ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", 0 )
 
 GAME( 1992, cupsoc,    0,        cupsoc,   cupsoc,   legionna_state, init_cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, cupsoca,   cupsoc,   cupsoc,   cupsoc,   legionna_state, init_cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

@@ -168,6 +168,7 @@ Module timer tag static_vblank_timer name m_expire.seconds
 #include "emu.h"
 #include "includes/rm380z.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

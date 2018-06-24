@@ -76,6 +76,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "sound/2203intf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -166,7 +167,7 @@ void pipeline_state::video_start()
 	m_tilemap2->set_transparent_pen(0);
 
 	save_item(NAME(m_vidctrl));
-	save_pointer(NAME(m_palram.get()), 0x1000);
+	save_pointer(NAME(m_palram), 0x1000);
 }
 
 u32 pipeline_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -31,6 +31,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

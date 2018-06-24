@@ -2,6 +2,7 @@
 // copyright-holders:Luca Elia
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class tetrisp2_state : public driver_device
 {

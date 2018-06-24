@@ -1004,7 +1004,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", stepone_isa_cards, nullptr, false)
 
 	/* Centronics */
-	MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD (m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (*this, myb3k_state, centronics_ack_w))
 	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (*this, myb3k_state, centronics_busy_w))
 	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (*this, myb3k_state, centronics_perror_w))

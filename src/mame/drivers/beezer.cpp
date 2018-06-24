@@ -34,6 +34,7 @@
 #include "sound/mm5837.h"
 #include "sound/dac76.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

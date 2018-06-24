@@ -131,6 +131,7 @@ Dumped by Chackn
 #include "machine/segacrp2_device.h"
 #include "sound/2203intf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

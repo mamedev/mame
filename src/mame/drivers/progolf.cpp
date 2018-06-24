@@ -59,6 +59,7 @@ Twenty four 8116 rams.
 #include "machine/deco222.h"
 #include "machine/decocpu6.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -125,7 +126,7 @@ void progolf_state::video_start()
 
 	save_item(NAME(m_char_pen));
 	save_item(NAME(m_char_pen_vreg));
-	save_pointer(NAME(m_fg_fb.get()), 0x2000*8);
+	save_pointer(NAME(m_fg_fb), 0x2000*8);
 	save_item(NAME(m_scrollx_hi));
 	save_item(NAME(m_scrollx_lo));
 	save_item(NAME(m_gfx_switch));

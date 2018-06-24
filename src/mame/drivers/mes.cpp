@@ -14,6 +14,7 @@ Schleicher MES
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 

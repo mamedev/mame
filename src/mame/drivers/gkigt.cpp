@@ -97,6 +97,7 @@ More chips (from eBay auction):
 #include "video/ramdac.h"
 #include "sound/ymz280b.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

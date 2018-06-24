@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
+#include "emupal.h"
+
 class taxidriv_state : public driver_device
 {
 public:

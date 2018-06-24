@@ -102,6 +102,7 @@ Lower PCB is plugged in with components facing up.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

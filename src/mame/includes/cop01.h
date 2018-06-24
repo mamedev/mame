@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/nb1412m2.h"
+#include "emupal.h"
 
 class cop01_state : public driver_device
 {

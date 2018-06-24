@@ -80,6 +80,7 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

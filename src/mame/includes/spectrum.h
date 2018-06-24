@@ -21,6 +21,7 @@
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Spectrum crystals */
@@ -117,6 +118,8 @@ public:
 	uint8_t *m_screen_location;
 
 	int m_ROMSelection;
+
+	emu_timer *m_irq_off_timer;
 
 	// Build up the screen bitmap line-by-line as the z80 uses CPU cycles.
 	// Elimiates sprite flicker on various games (E.g. Marauder and

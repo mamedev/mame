@@ -5,17 +5,22 @@
     Atari Centipede hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CENTIPED_H
+#define MAME_INCLUDES_CENTIPED_H
+
+#pragma once
 
 #include "machine/eepromser.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 class centiped_state : public driver_device
 {
 public:
-	centiped_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	centiped_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -26,7 +31,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_aysnd(*this, "aysnd") { }
+		m_aysnd(*this, "aysnd")
+	{ }
 
 	void centiped_base(machine_config &config);
 	void milliped(machine_config &config);
@@ -134,3 +140,5 @@ private:
 	void multiped_map(address_map &map);
 	void warlords_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CENTIPED_H

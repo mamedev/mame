@@ -29,6 +29,7 @@ http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System
 #include "emu.h"
 #include "cpu/m6502/m4510.h"
 #include "machine/mos6526.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"

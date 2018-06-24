@@ -29,6 +29,7 @@ PAL16R6A 11H
 #include "machine/decocrpt.h"
 #include "machine/deco102.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

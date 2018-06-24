@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="squale_cart" description="Squale cartridges">
+
+	<software name="sqintro">
+		<description>The Squale Intro</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Jean-François DEL NERO / HxC2001" />
+		<part name="cart" interface="squale_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="TheSqualeIntro.bin" size="65536" crc="18d1c188" sha1="63a1e1910967b7e083e9d2d1232445a8fd66daf3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -55,6 +55,7 @@
 #include "machine/ram.h"
 #include "sound/ay8910.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

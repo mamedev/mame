@@ -83,6 +83,7 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/i5000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -443,10 +444,10 @@ void rabbit_state::video_start()
 
 	m_blit_done_timer = timer_alloc(TIMER_BLIT_DONE);
 
-	save_pointer(NAME(m_tilemap_ram[0].get()), 0x20000/4);
-	save_pointer(NAME(m_tilemap_ram[1].get()), 0x20000/4);
-	save_pointer(NAME(m_tilemap_ram[2].get()), 0x20000/4);
-	save_pointer(NAME(m_tilemap_ram[3].get()), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[0]), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[1]), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[2]), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[3]), 0x20000/4);
 }
 
 /*

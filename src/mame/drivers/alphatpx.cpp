@@ -75,6 +75,7 @@
 #include "machine/pit8253.h"
 #include "video/tms9927.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "debugger.h"

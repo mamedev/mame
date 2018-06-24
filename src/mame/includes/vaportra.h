@@ -15,6 +15,7 @@
 #include "video/bufsprite.h"
 #include "video/deco16ic.h"
 #include "video/decmxc06.h"
+#include "emupal.h"
 
 class vaportra_state : public driver_device
 {

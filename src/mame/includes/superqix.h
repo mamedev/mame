@@ -3,6 +3,7 @@
 
 #include "sound/ay8910.h"
 #include "sound/samples.h"
+#include "emupal.h"
 
 class superqix_state_base : public driver_device
 {

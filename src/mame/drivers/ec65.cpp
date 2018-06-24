@@ -17,6 +17,7 @@ EC-65 (also known as Octopus)
 #include "machine/mos6551.h"
 #include "machine/6850acia.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define PIA6821_TAG "pia6821"

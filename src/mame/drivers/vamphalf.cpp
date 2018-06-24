@@ -67,6 +67,7 @@ TODO:
 #include "sound/okim6295.h"
 #include "sound/qs1000.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -3437,7 +3438,7 @@ void vamphalf_nvram_state::init_finalgdr()
 	m_semicom_prot_data[1] = 3;
 
 	save_item(NAME(m_finalgdr_backupram_bank));
-	save_pointer(NAME(m_finalgdr_backupram.get()), 0x80*0x100);
+	save_pointer(NAME(m_finalgdr_backupram), 0x80*0x100);
 	save_item(NAME(m_semicom_prot_idx));
 	save_item(NAME(m_semicom_prot_which));
 }
