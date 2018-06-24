@@ -2,8 +2,8 @@
 // copyright-holders:David Haywood, Luca Elia
 /* NAND Flash */
 
-#ifndef MAME_MACHINE_NANDFLASH_H
-#define MAME_MACHINE_NANDFLASH_H
+#ifndef MAME_MACHINE_PARALLEL_NANDFLASH_H
+#define MAME_MACHINE_PARALLEL_NANDFLASH_H
 
 #pragma once
 
@@ -13,17 +13,17 @@
 //**************************************************************************
 
 
-// ======================> nandflash_device
+// ======================> parallel_nandflash_device
 
-class nandflash_device : public device_t, public device_nvram_interface
+class parallel_nandflash_device : public device_t, public device_nvram_interface
 {
 public:
 	// custom initialization for default state
-	typedef device_delegate<void (nandflash_device &, void *, size_t)> init_delegate;
+	typedef device_delegate<void (parallel_nandflash_device &, void *, size_t)> init_delegate;
 
 
 	// construction/destruction
-	nandflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	parallel_nandflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_READ8_MEMBER( flash_ready_r );
 	DECLARE_READ8_MEMBER( flash_io_r );
@@ -86,6 +86,6 @@ protected:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(NANDFLASH, nandflash_device)
+DECLARE_DEVICE_TYPE(PARALLEL_NANDFLASH, parallel_nandflash_device)
 
-#endif // MAME_MACHINE_NANDFLASH_H
+#endif // MAME_MACHINE_PARALLEL_NANDFLASH_H

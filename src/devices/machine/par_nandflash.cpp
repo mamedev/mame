@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia
-/* NAND Flash Device */
+/* Parallel NAND Flash Device */
 
 /* todo: cleanup, refactor etc. */
 /* ghosteo.c is similar? */
@@ -9,21 +9,21 @@
 #include "machine/nandflash.h"
 
 
-ALLOW_SAVE_TYPE(nandflash_device::flash_state_t);
+ALLOW_SAVE_TYPE(parallel_nandflash_device::flash_state_t);
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(NANDFLASH, nandflash_device, "nandflash", "NAND Flash")
+DEFINE_DEVICE_TYPE(PARALLEL_NANDFLASH, parallel_nandflash_device, "parallel_nandflash", "Parallel NAND Flash")
 
 //-------------------------------------------------
-//  nandflash_device - constructor
+//  parallel_nandflash_device - constructor
 //-------------------------------------------------
 
-nandflash_device::nandflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NANDFLASH, tag, owner, clock)
+parallel_nandflash_device::parallel_nandflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PARALLEL_NANDFLASH, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_length(0)
 	, m_region(nullptr)
@@ -40,7 +40,7 @@ nandflash_device::nandflash_device(const machine_config &mconfig, const char *ta
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void nandflash_device::device_start()
+void parallel_nandflash_device::device_start()
 {
 	m_length = machine().root_device().memregion(tag())->bytes();
 	m_region = machine().root_device().memregion(tag())->base();
@@ -65,7 +65,7 @@ void nandflash_device::device_start()
 	save_item(NAME(m_flash_page_data));
 }
 
-void nandflash_device::device_reset()
+void parallel_nandflash_device::device_reset()
 {
 	m_flash_enab = 0;
 	flash_hard_reset();
@@ -78,21 +78,21 @@ void nandflash_device::device_reset()
 }
 
 //-------------------------------------------------
-//  nandflash_default - called to initialize NANDFLASH to
+//  nandflash_default - called to initialize PARALLEL_NANDFLASH to
 //  its default state
 //-------------------------------------------------
 
-void nandflash_device::nvram_default()
+void parallel_nandflash_device::nvram_default()
 {
 }
 
 
 //-------------------------------------------------
-//  nvram_read - called to read NANDFLASH from the
+//  nvram_read - called to read PARALLEL_NANDFLASH from the
 //  .nv file
 //-------------------------------------------------
 
-void nandflash_device::nvram_read(emu_file &file)
+void parallel_nandflash_device::nvram_read(emu_file &file)
 {
 	if (m_length % FLASH_PAGE_SIZE) return; // region size must be multiple of flash page size
 	int size = m_flash_row_num;
@@ -112,11 +112,11 @@ void nandflash_device::nvram_read(emu_file &file)
 
 
 //-------------------------------------------------
-//  nvram_write - called to write NANDFLASH to the
+//  nvram_write - called to write PARALLEL_NANDFLASH to the
 //  .nv file
 //-------------------------------------------------
 
-void nandflash_device::nvram_write(emu_file &file)
+void parallel_nandflash_device::nvram_write(emu_file &file)
 {
 	if (m_length % FLASH_PAGE_SIZE) return; // region size must be multiple of flash page size
 	int size = m_flash_row_num;
@@ -134,7 +134,7 @@ void nandflash_device::nvram_write(emu_file &file)
 	file.write(&page, 4);
 }
 
-void nandflash_device::flash_hard_reset()
+void parallel_nandflash_device::flash_hard_reset()
 {
 //  logerror("%08x FLASH: RESET\n", cpuexec_describe_context(machine));
 
@@ -154,13 +154,13 @@ void nandflash_device::flash_hard_reset()
 	m_flash_page_index = 0;
 }
 
-WRITE8_MEMBER( nandflash_device::flash_enab_w )
+WRITE8_MEMBER( parallel_nandflash_device::flash_enab_w )
 {
 	//logerror("%08x FLASH: enab = %02X\n", m_maincpu->pc(), data);
 	m_flash_enab = data;
 }
 
-void nandflash_device::flash_change_state(flash_state_t state)
+void parallel_nandflash_device::flash_change_state(flash_state_t state)
 {
 	m_flash_state = state;
 
@@ -173,7 +173,7 @@ void nandflash_device::flash_change_state(flash_state_t state)
 	//logerror("flash_change_state - FLASH: state = %s\n", m_flash_state_name[state]);
 }
 
-WRITE8_MEMBER( nandflash_device::flash_cmd_w )
+WRITE8_MEMBER( parallel_nandflash_device::flash_cmd_w )
 {
 	if (!m_flash_enab)
 		return;
@@ -272,7 +272,7 @@ WRITE8_MEMBER( nandflash_device::flash_cmd_w )
 	}
 }
 
-WRITE8_MEMBER( nandflash_device::flash_data_w )
+WRITE8_MEMBER( parallel_nandflash_device::flash_data_w )
 {
 	if (!m_flash_enab)
 		return;
@@ -282,7 +282,7 @@ WRITE8_MEMBER( nandflash_device::flash_data_w )
 	m_flash_page_addr++;
 }
 
-WRITE8_MEMBER( nandflash_device::flash_addr_w )
+WRITE8_MEMBER( parallel_nandflash_device::flash_addr_w )
 {
 	if (!m_flash_enab)
 		return;
@@ -315,7 +315,7 @@ WRITE8_MEMBER( nandflash_device::flash_addr_w )
 	}
 }
 
-READ8_MEMBER( nandflash_device::flash_io_r )
+READ8_MEMBER( parallel_nandflash_device::flash_io_r )
 {
 	uint8_t data = 0x00;
 //  uint32_t old;
@@ -374,14 +374,14 @@ READ8_MEMBER( nandflash_device::flash_io_r )
 	return data;
 }
 
-READ8_MEMBER( nandflash_device::flash_ready_r )
+READ8_MEMBER( parallel_nandflash_device::flash_ready_r )
 {
 	return 1;
 }
 
 
 
-READ8_MEMBER(nandflash_device::n3d_flash_r)
+READ8_MEMBER(parallel_nandflash_device::n3d_flash_r)
 {
 	if (m_last_flash_cmd==0x70) return 0xe0;
 
@@ -402,7 +402,7 @@ READ8_MEMBER(nandflash_device::n3d_flash_r)
 }
 
 
-WRITE8_MEMBER(nandflash_device::n3d_flash_cmd_w)
+WRITE8_MEMBER(parallel_nandflash_device::n3d_flash_cmd_w)
 {
 	logerror("n3d_flash_cmd_w %02x %02x\n", offset, data);
 	m_last_flash_cmd = data;
@@ -413,7 +413,7 @@ WRITE8_MEMBER(nandflash_device::n3d_flash_cmd_w)
 	}
 }
 
-WRITE8_MEMBER(nandflash_device::n3d_flash_addr_w)
+WRITE8_MEMBER(parallel_nandflash_device::n3d_flash_addr_w)
 {
 //  logerror("n3d_flash_addr_w %02x %02x\n", offset, data);
 

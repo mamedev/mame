@@ -2506,13 +2506,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/nandflash.h,MACHINES["NANDFLASH"] = true
+--@src/devices/machine/par_nandflash.h,MACHINES["PARALLEL_NANDFLASH"] = true
 ---------------------------------------------------
 
-if (MACHINES["NANDFLASH"]~=null) then
+if (MACHINES["PARALLEL_NANDFLASH"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/nandflash.cpp",
-		MAME_DIR .. "src/devices/machine/nandflash.h",
+		MAME_DIR .. "src/devices/machine/par_nandflash.cpp",
+		MAME_DIR .. "src/devices/machine/par_nandflash.h",
 	}
 end
 
