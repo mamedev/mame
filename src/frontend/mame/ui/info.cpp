@@ -14,6 +14,7 @@
 #include "ui/ui.h"
 
 #include "drivenum.h"
+#include "romload.h"
 #include "softlist.h"
 #include "emuopts.h"
 

@@ -15,6 +15,7 @@
 #include "pluginopts.h"
 #include "drivenum.h"
 #include "natkeyboard.h"
+#include "romload.h"
 
 #include "uiinput.h"
 #include "ui/ui.h"
