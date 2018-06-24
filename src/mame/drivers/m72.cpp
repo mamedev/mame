@@ -1897,7 +1897,9 @@ MACHINE_CONFIG_START(m72_state::m72_audio_chips)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
 
-	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO, "dac", "samples")
+	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
+	MCFG_IREM_M72_AUDIO_DAC("dac")
+	MCFG_IREM_M72_AUDIO_SAMPLE("samples")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))

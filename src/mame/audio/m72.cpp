@@ -122,11 +122,16 @@ WRITE8_MEMBER( m72_audio_device::poundfor_sample_addr_w )
 
 READ8_MEMBER( m72_audio_device::sample_r )
 {
-	return m_samples[m_sample_addr];
+	if (m_samples != nullptr)
+		return m_samples[m_sample_addr];
+	else
+		return 0;
 }
 
 WRITE8_MEMBER( m72_audio_device::sample_w )
 {
+	assert(m_dac != nullptr);
+
 	m_dac->write(data);
 	m_sample_addr = (m_sample_addr + 1) & m_samples.mask();
 }

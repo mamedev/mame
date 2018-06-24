@@ -15,16 +15,12 @@
 class m72_audio_device : public device_t
 {
 public:
-	template <typename T, typename U>
-	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&dac_tag, U &&sample_tag)
-		: m72_audio_device(mconfig, tag, owner)
-	{
-		m_dac.set_tag(std::forward<T>(dac_tag));
-		m_samples.set_tag(std::forward<U>(sample_tag));
-	}
-
 	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~m72_audio_device() {}
+
+	// configuration
+	void set_dac_tag(const char *tag) { m_dac.set_tag(tag); }
+	void set_samples_tag(const char *tag) { m_samples.set_tag(tag); }
 
 	DECLARE_READ8_MEMBER(sample_r);
 	DECLARE_WRITE8_MEMBER(sample_w);
@@ -48,5 +44,11 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(IREM_M72_AUDIO, m72_audio_device)
+
+#define MCFG_IREM_M72_AUDIO_DAC(_tag) \
+	downcast<m72_audio_device &>(*device).set_dac_tag(_tag);
+
+#define MCFG_IREM_M72_AUDIO_SAMPLE(_tag) \
+	downcast<m72_audio_device &>(*device).set_samples_tag(_tag);
 
 #endif // MAME_AUDIO_M72_H

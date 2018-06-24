@@ -243,7 +243,6 @@ MACHINE_CONFIG_START(shisen_state::shisen)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shisen)
 	MCFG_PALETTE_ADD("palette", 256)
 
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -255,7 +254,9 @@ MACHINE_CONFIG_START(shisen_state::shisen)
 	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
 	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
-	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO, "dac", "samples")
+	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
+	MCFG_IREM_M72_AUDIO_DAC("dac")
+	MCFG_IREM_M72_AUDIO_SAMPLE("samples")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))

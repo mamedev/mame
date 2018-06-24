@@ -763,7 +763,9 @@ MACHINE_CONFIG_START(m90_state::m90)
 	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
 	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
-	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO, "dac", "samples")
+	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
+	MCFG_IREM_M72_AUDIO_DAC("dac")
+	MCFG_IREM_M72_AUDIO_SAMPLE("samples")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
