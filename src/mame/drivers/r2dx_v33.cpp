@@ -119,8 +119,6 @@ public:
 	DECLARE_WRITE16_MEMBER(r2dx_paldma_w);
 	DECLARE_READ16_MEMBER(r2dx_debug_r);
 
-	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
-
 	DECLARE_MACHINE_RESET(r2dx_v33);
 	DECLARE_MACHINE_RESET(nzeroteam);
 
@@ -543,12 +541,6 @@ void r2dx_v33_state::zerotm2k_map(address_map &map)
 }
 
 
-
-INTERRUPT_GEN_MEMBER(r2dx_v33_state::rdx_v33_interrupt)
-{
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);   /* VBL */
-}
-
 static INPUT_PORTS_START( rdx_v33 )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
@@ -743,7 +735,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", V33, 32000000/2 ) // ?
 	MCFG_DEVICE_PROGRAM_MAP(rdx_v33_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", raiden2_state, raiden2_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,r2dx_v33)
 
@@ -778,7 +770,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", V33,XTAL(32'000'000)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(nzerotea_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", raiden2_state, raiden2_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,nzeroteam)
 
@@ -975,7 +967,6 @@ ROM_START( r2dx_v33_r2 )
 	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
 	ROM_LOAD32_WORD( "obj1.724", 0x000000, 0x400000, CRC(7d218985) SHA1(777241a533defcbea3d7e735f309478d260bad52) )
 	ROM_LOAD32_WORD( "obj2.725", 0x000002, 0x400000, CRC(891b24d6) SHA1(74f89b47b1ba6b84ddd96d1fae92fddad0ace342) )
-
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "pcm.099", 0x00000, 0x100000, CRC(97ca2907) SHA1(bfe8189300cf72089d0beaeab8b1a0a1a4f0a5b6) )

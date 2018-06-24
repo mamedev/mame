@@ -629,8 +629,6 @@ INTERRUPT_GEN_MEMBER(raiden2_state::raiden2_interrupt)
 }
 
 
-
-
 // Sprite encryption key upload
 
 static uint32_t sprcpt_adr, sprcpt_idx;
