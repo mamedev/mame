@@ -144,13 +144,16 @@ the wide tilemap mode)
 #include "tc0100scn.h"
 #include "screen.h"
 
+#include <algorithm>
+
 #define TC0100SCN_RAM_SIZE        0x14000   /* enough for double-width tilemaps */
 #define TC0100SCN_TOTAL_CHARS     256
 
 DEFINE_DEVICE_TYPE(TC0100SCN, tc0100scn_device, "tc0100scn", "Taito TC0100SCN")
 
-tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0100SCN, tag, owner, clock),
+tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TC0100SCN, tag, owner, clock),
+	device_gfx_interface(mconfig, *this, nullptr),
 	m_ram(nullptr),
 	m_bg_ram(nullptr),
 	m_fg_ram(nullptr),
@@ -170,7 +173,6 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	m_tx_colbank(0),
 	m_dblwidth(0),
 	m_gfxnum(0),
-	m_txnum(0),
 	m_x_offset(0),
 	m_y_offset(0),
 	m_flip_xoffs(0),
@@ -179,8 +181,7 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	m_flip_text_yoffs(0),
 	m_multiscrn_xoffs(0),
 	m_multiscrn_hack(0),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG),
-	m_palette(*this, finder_base::DUMMY_TAG)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -214,12 +215,12 @@ void tc0100scn_device::device_start()
 	/* Single width versions */
 	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[2][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[2][0] = &machine().tilemap().create(*this,        tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	/* Double width versions */
 	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[2][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap[2][1] = &machine().tilemap().create(*this,        tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	m_tilemap[0][0]->set_transparent_pen(0);
 	m_tilemap[1][0]->set_transparent_pen(0);
@@ -270,15 +271,14 @@ void tc0100scn_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(m_palette, tc0100scn_charlayout, (uint8_t *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), tc0100scn_charlayout, (uint8_t *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
 
-	gfx_element *gfx = m_gfxdecode->gfx(m_gfxnum);
-	gfx_element *txt = m_gfxdecode->gfx(m_txnum);
+	gfx_element *tgfx = m_gfxdecode->gfx(m_gfxnum);
 
-	if (gfx->granularity() == 2)    /* Yuyugogo, Yesnoj */
-		gfx->set_granularity(16);
+	if (tgfx->granularity() == 2)    /* Yuyugogo, Yesnoj */
+		tgfx->set_granularity(16);
 
-	txt->set_granularity(gfx->granularity());
+	gfx(0)->set_granularity(tgfx->granularity());
 
 	set_colbanks(0, 0, 0);  /* standard values, only Wgp & multiscreen games change them */
 									/* we call this here, so that they can be modified at video_start*/
@@ -299,8 +299,7 @@ void tc0100scn_device::device_reset()
 	m_dblwidth = 0;
 	m_gfxbank = 0; /* Mjnquest uniquely banks tiles */
 
-	for (auto & elem : m_ctrl)
-		elem = 0;
+	std::fill(std::begin(m_ctrl), std::end(m_ctrl), 0);
 }
 
 
@@ -344,7 +343,7 @@ TILE_GET_INFO_MEMBER(tc0100scn_device::get_tx_tile_info)
 {
 	int attr = m_tx_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_txnum,
+	SET_TILE_INFO_MEMBER(0,
 			attr & 0x00ff,
 			((attr & 0x3f00) >> 8) + m_tx_colbank,
 			TILE_FLIPYX((attr & 0xc000) >> 14));
@@ -427,7 +426,7 @@ void tc0100scn_device::postload()
 	set_layer_ptrs();
 	restore_scroll();
 
-	m_gfxdecode->gfx(m_txnum)->set_source((uint8_t *)m_char_ram);
+	gfx(0)->set_source((uint8_t *)m_char_ram);
 
 	m_tilemap[0][0]->mark_all_dirty();
 	m_tilemap[1][0]->mark_all_dirty();
@@ -452,7 +451,7 @@ WRITE16_MEMBER( tc0100scn_device::word_w )
 		else if (offset < 0x3000)
 			m_tilemap[2][0]->mark_tile_dirty((offset & 0x0fff));
 		else if (offset < 0x3800)
-			m_gfxdecode->gfx(m_txnum)->mark_dirty((offset - 0x3000) / 8);
+			gfx(0)->mark_dirty((offset - 0x3000) / 8);
 		else if (offset >= 0x4000 && offset < 0x6000)
 			m_tilemap[1][0]->mark_tile_dirty((offset & 0x1fff) / 2);
 	}
@@ -463,7 +462,7 @@ WRITE16_MEMBER( tc0100scn_device::word_w )
 		else if (offset >= 0x4000 && offset < 0x8000)
 			m_tilemap[1][1]->mark_tile_dirty((offset & 0x3fff) / 2);
 		else if (offset >= 0x8800 && offset < 0x9000)
-			m_gfxdecode->gfx(m_txnum)->mark_dirty((offset - 0x8800) / 8);
+			gfx(0)->mark_dirty((offset - 0x8800) / 8);
 		else if (offset >= 0x9000)
 			m_tilemap[2][1]->mark_tile_dirty((offset & 0x0fff));
 	}
@@ -522,7 +521,7 @@ WRITE16_MEMBER( tc0100scn_device::ctrl_word_w )
 				dirty_tilemaps();
 
 				/* reset the pointer to the text characters (and dirty them all) */
-				m_gfxdecode->gfx(m_txnum)->set_source((uint8_t *)m_char_ram);
+				gfx(0)->set_source((uint8_t *)m_char_ram);
 			}
 
 			break;

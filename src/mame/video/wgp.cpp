@@ -331,7 +331,6 @@ static const uint8_t ylookup[16] =
 
 void wgp_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
 {
-	uint16_t *spriteram = m_spriteram;
 	int offs, i, j, k;
 	int x, y, curx, cury;
 	int zx, zy, zoomx, zoomy, priority = 0;
@@ -343,32 +342,32 @@ void wgp_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 
 	for (offs = 0x1ff; offs >= 0; offs--)
 	{
-		code = (spriteram[0xe00 + offs]);
+		code = (m_spriteram[0xe00 + offs]);
 
 		if (code)   /* do we have an active sprite ? */
 		{
 			i = (code << 3) & 0xfff;    /* yes, so we look up its sprite entry */
 
-			x = spriteram[i];
-			y = spriteram[i + 1];
-			bigsprite = spriteram[i + 2] & 0x3fff;
+			x = m_spriteram[i];
+			y = m_spriteram[i + 1];
+			bigsprite = m_spriteram[i + 2] & 0x3fff;
 
 			/* The last five words [i + 3 through 7] must be zoom/rotation
 			   control: for time being we kludge zoom using 1 word.
 			   Timing problems are causing many glitches. */
 
-			if ((spriteram[i + 4] == 0xfff6) && (spriteram[i + 5] == 0))
+			if ((m_spriteram[i + 4] == 0xfff6) && (m_spriteram[i + 5] == 0))
 				continue;
 
-//          if (((spriteram[i + 4] != 0xf800) && (spriteram[i + 4] != 0xfff6))
-//              || ((spriteram[i + 5] != 0xf800) && (spriteram[i + 5] != 0))
-//              || spriteram[i + 7] != 0)
+//          if (((m_spriteram[i + 4] != 0xf800) && (m_spriteram[i + 4] != 0xfff6))
+//              || ((m_spriteram[i + 5] != 0xf800) && (m_spriteram[i + 5] != 0))
+//              || m_spriteram[i + 7] != 0)
 //              rotate = i << 1;
 
 			/***** Begin zoom kludge ******/
 
-			zoomx = (spriteram[i + 3] & 0x1ff) + 1;
-			zoomy = (spriteram[i + 3] & 0x1ff) + 1;
+			zoomx = (m_spriteram[i + 3] & 0x1ff) + 1;
+			zoomy = (m_spriteram[i + 3] & 0x1ff) + 1;
 
 			y -= 4;
 			// distant sprites were some 16 pixels too far down //

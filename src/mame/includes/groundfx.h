@@ -18,10 +18,11 @@ struct gfx_tempsprite
 class groundfx_state : public driver_device
 {
 public:
-	groundfx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	groundfx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
-		m_spriteram(*this,"spriteram") ,
+		m_spriteram(*this,"spriteram"),
+		m_sprmaprom(*this,"sprmaprom"),
 		m_maincpu(*this, "maincpu"),
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0480scp(*this, "tc0480scp"),
@@ -32,11 +33,13 @@ public:
 	void init_groundfx();
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
 	required_shared_ptr<uint32_t> m_ram;
 	required_shared_ptr<uint32_t> m_spriteram;
+	required_region_ptr<uint16_t> m_sprmaprom;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0100scn_device> m_tc0100scn;

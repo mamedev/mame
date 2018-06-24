@@ -5,7 +5,7 @@
 
 #pragma once
 
-class tc0480scp_device : public device_t
+class tc0480scp_device : public device_t, public device_gfx_interface
 {
 public:
 	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -13,7 +13,6 @@ public:
 	// configuration
 	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
-	void set_tx_region(int txregion) { m_txnum = txregion; }
 	void set_col_base(int col) { m_col_base = col; }
 	void set_offsets(int x_offset, int y_offset)
 	{
@@ -84,7 +83,6 @@ private:
 	int32_t            m_dblwidth;
 
 	int              m_gfxnum;
-	int              m_txnum;
 	int              m_x_offset, m_y_offset;
 	int              m_text_xoffs, m_text_yoffs;
 	int              m_flip_xoffs, m_flip_yoffs;
@@ -93,13 +91,7 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	void common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum );
-	void common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum );
-
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
 	void dirty_tilemaps();
@@ -113,9 +105,6 @@ DECLARE_DEVICE_TYPE(TC0480SCP, tc0480scp_device)
 
 #define MCFG_TC0480SCP_GFX_REGION(_region) \
 	downcast<tc0480scp_device &>(*device).set_gfx_region(_region);
-
-#define MCFG_TC0480SCP_TX_REGION(_region) \
-	downcast<tc0480scp_device &>(*device).set_tx_region(_region);
 
 #define MCFG_TC0480SCP_OFFSETS(_xoffs, _yoffs) \
 	downcast<tc0480scp_device &>(*device).set_offsets(_xoffs, _yoffs);

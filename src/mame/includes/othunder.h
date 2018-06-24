@@ -18,9 +18,12 @@
 class othunder_state : public driver_device
 {
 public:
-	othunder_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	othunder_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this,"spriteram"),
+		m_sprmaprom(*this,"sprmaprom"),
+		m_z80bank(*this,"z80bank"),
+		m_recoil_piston(*this,"Player%u_Recoil_Piston", 1U),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_eeprom(*this, "eeprom"),
@@ -62,7 +65,10 @@ private:
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_region_ptr<uint16_t> m_sprmaprom;
+	required_memory_bank m_z80bank;
 
+	output_finder<2> m_recoil_piston;
 	/* video-related */
 	struct tempsprite
 	{

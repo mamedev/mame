@@ -7,16 +7,14 @@
 
 #include "emupal.h"
 
-class tc0100scn_device : public device_t
+class tc0100scn_device : public device_t, public device_gfx_interface
 {
 public:
 	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
 	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
-	void set_tx_region(int txregion) { m_txnum = txregion; }
 	void set_multiscr_xoffs(int xoffs) { m_multiscrn_xoffs = xoffs; }
 	void set_multiscr_hack(int hack) { m_multiscrn_hack = hack; }
 	void set_offsets(int x_offset, int y_offset)
@@ -96,7 +94,6 @@ private:
 	int          m_dblwidth;
 
 	int          m_gfxnum;
-	int          m_txnum;
 	int          m_x_offset, m_y_offset;
 	int          m_flip_xoffs, m_flip_yoffs;
 	int          m_flip_text_xoffs, m_flip_text_yoffs;
@@ -104,7 +101,6 @@ private:
 	int          m_multiscrn_hack;
 
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -124,9 +120,6 @@ DECLARE_DEVICE_TYPE(TC0100SCN, tc0100scn_device)
 #define MCFG_TC0100SCN_GFX_REGION(_region) \
 	downcast<tc0100scn_device &>(*device).set_gfx_region(_region);
 
-#define MCFG_TC0100SCN_TX_REGION(_region) \
-	downcast<tc0100scn_device &>(*device).set_tx_region(_region);
-
 #define MCFG_TC0100SCN_OFFSETS(_xoffs, _yoffs) \
 	downcast<tc0100scn_device &>(*device).set_offsets(_xoffs, _yoffs);
 
@@ -144,8 +137,5 @@ DECLARE_DEVICE_TYPE(TC0100SCN, tc0100scn_device)
 
 #define MCFG_TC0100SCN_GFXDECODE(_gfxtag) \
 	downcast<tc0100scn_device &>(*device).set_gfxdecode_tag(_gfxtag);
-
-#define MCFG_TC0100SCN_PALETTE(_palette_tag) \
-	downcast<tc0100scn_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_TC0100SCN_H

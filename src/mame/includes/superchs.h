@@ -17,11 +17,12 @@ struct schs_tempsprite
 class superchs_state : public driver_device
 {
 public:
-	superchs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	superchs_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram"),
 		m_shared_ram(*this,"shared_ram"),
+		m_sprmaprom(*this,"sprmaprom"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_tc0480scp(*this, "tc0480scp"),
@@ -29,7 +30,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_volume(*this, "SOUND")
-		{ }
+	{ }
 
 	void superchs(machine_config &config);
 	void chase3(machine_config &config);
@@ -42,9 +43,9 @@ private:
 	required_shared_ptr<uint32_t> m_ram;
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr<uint32_t> m_shared_ram;
+	required_region_ptr<uint16_t> m_sprmaprom;
 
 	std::unique_ptr<schs_tempsprite[]> m_spritelist;
-	uint32_t m_mem[2];
 
 	DECLARE_READ16_MEMBER(shared_ram_r);
 	DECLARE_WRITE16_MEMBER(shared_ram_w);

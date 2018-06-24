@@ -91,17 +91,17 @@ WRITE32_MEMBER(gunbustr_state::motor_control_w)
 {
 	// Standard value poked into MSW is 0x3c00
 	// (0x2000 and zero are written at startup)
-	output().set_value("Player1_Gun_Recoil", (data & 0x1000000) ? 1 : 0);
-	output().set_value("Player2_Gun_Recoil", (data & 0x10000) ? 1 : 0);
-	output().set_value("Hit_lamp", (data & 0x40000) ? 1 : 0);
+	m_gun_recoil[0] = BIT(data, 24);
+	m_gun_recoil[1] = BIT(data, 16);
+	m_hit_ramp = BIT(data, 18);
 }
 
 
 
 READ32_MEMBER(gunbustr_state::gunbustr_gun_r)
 {
-	return ( ioport("LIGHT0_X")->read() << 24) | (ioport("LIGHT0_Y")->read() << 16) |
-			( ioport("LIGHT1_X")->read() << 8)  |  ioport("LIGHT1_Y")->read();
+	return ( m_light_x[0]->read() << 24) | (m_light_y[0]->read() << 16) |
+			( m_light_x[1]->read() << 8)  |  m_light_y[1]->read();
 }
 
 WRITE32_MEMBER(gunbustr_state::gunbustr_gun_w)
@@ -228,6 +228,12 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
+void gunbustr_state::machine_start()
+{
+	m_gun_recoil.resolve();
+	m_hit_ramp.resolve();
+}
+
 MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 
 	/* basic machine hardware */
@@ -262,7 +268,7 @@ MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 
 	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
 	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0480SCP_OFFSETS(0x20, 0x07)
 	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
@@ -295,7 +301,7 @@ ROM_START( gunbustr )
 	ROM_LOAD32_BYTE( "d27-06.bin", 0x000001, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
 	ROM_LOAD32_BYTE( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) ) /* STY, used to create big sprites on the fly */
 
 	ROM_REGION16_BE( 0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
@@ -329,7 +335,7 @@ ROM_START( gunbustru )
 	ROM_LOAD32_BYTE( "d27-06.bin", 0x000001, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
 	ROM_LOAD32_BYTE( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) ) /* STY, used to create big sprites on the fly */
 
 	ROM_REGION16_BE( 0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
@@ -363,7 +369,7 @@ ROM_START( gunbustrj )
 	ROM_LOAD32_BYTE( "d27-06.bin", 0x000001, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
 	ROM_LOAD32_BYTE( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) ) /* STY, used to create big sprites on the fly */
 
 	ROM_REGION16_BE( 0x800000, "ensoniq.0" , ROMREGION_ERASE00 )

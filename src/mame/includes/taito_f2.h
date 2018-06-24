@@ -36,76 +36,77 @@ public:
 		int primask;
 	};
 
-	taitof2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_sprite_extension(*this, "sprite_ext"),
-			m_spriteram(*this, "spriteram"),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_cchip(*this, "cchip"),
-			m_cchip_irq_clear(*this, "cchip_irq_clear"),
-			m_oki(*this, "oki"),
-			m_tc0100scn(*this, "tc0100scn"),
-			m_tc0100scn_1(*this, "tc0100scn_1"),
-			m_tc0100scn_2(*this, "tc0100scn_2"),
-			m_tc0110pcr(*this, "tc0110pcr"),
-			m_tc0360pri(*this, "tc0360pri"),
-			m_tc0280grd(*this, "tc0280grd"),
-			m_tc0430grw(*this, "tc0430grw"),
-			m_tc0480scp(*this, "tc0480scp"),
-			m_tc0220ioc(*this, "tc0220ioc"),
-			m_tc0510nio(*this, "tc0510nio"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")
-			{ }
+	taitof2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_sprite_extension(*this, "sprite_ext"),
+		m_spriteram(*this, "spriteram"),
+		m_audiobank(*this, "audiobank"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_cchip(*this, "cchip"),
+		m_cchip_irq_clear(*this, "cchip_irq_clear"),
+		m_oki(*this, "oki"),
+		m_tc0100scn(*this, "tc0100scn_%u", 1U),
+		m_tc0110pcr(*this, "tc0110pcr"),
+		m_tc0360pri(*this, "tc0360pri"),
+		m_tc0280grd(*this, "tc0280grd"),
+		m_tc0430grw(*this, "tc0430grw"),
+		m_tc0480scp(*this, "tc0480scp"),
+		m_tc0220ioc(*this, "tc0220ioc"),
+		m_tc0510nio(*this, "tc0510nio"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_sprite_extension;
 	required_shared_ptr<uint16_t> m_spriteram;
-	std::unique_ptr<uint16_t[]>        m_spriteram_buffered;
-	std::unique_ptr<uint16_t[]>        m_spriteram_delayed;
+	std::unique_ptr<uint16_t[]>   m_spriteram_buffered;
+	std::unique_ptr<uint16_t[]>   m_spriteram_delayed;
+
+	optional_memory_bank          m_audiobank;
 
 	/* video-related */
 	std::unique_ptr<struct f2_tempsprite[]> m_spritelist;
 	int             m_sprite_type;
 
-	uint16_t          m_spritebank[8];
-//  uint16_t          m_spritebank_eof[8];
-	uint16_t          m_spritebank_buffered[8];
+	uint16_t        m_spritebank[8];
+//  uint16_t        m_spritebank_eof[8];
+	uint16_t        m_spritebank_buffered[8];
 
-	int32_t           m_sprites_disabled;
-	int32_t           m_sprites_active_area;
-	int32_t           m_sprites_master_scrollx;
-	int32_t           m_sprites_master_scrolly;
+	int32_t         m_sprites_disabled;
+	int32_t         m_sprites_active_area;
+	int32_t         m_sprites_master_scrollx;
+	int32_t         m_sprites_master_scrolly;
 	/* remember flip status over frames because driftout can fail to set it */
-	int32_t           m_sprites_flipscreen;
+	int32_t         m_sprites_flipscreen;
 
 	/* On the left hand screen edge (assuming horiz screen, no
 	   screenflip: in screenflip it is the right hand edge etc.)
 	   there may be 0-3 unwanted pixels in both tilemaps *and*
 	   sprites. To erase this we use f2_hide_pixels (0 to +3). */
 
-	int32_t           m_hide_pixels;
-	int32_t           m_flip_hide_pixels; /* Different in some games */
+	int32_t         m_hide_pixels;
+	int32_t         m_flip_hide_pixels; /* Different in some games */
 
-	int32_t           m_pivot_xdisp;  /* Needed in games with a pivot layer */
-	int32_t           m_pivot_ydisp;
+	int32_t         m_pivot_xdisp;  /* Needed in games with a pivot layer */
+	int32_t         m_pivot_ydisp;
 
-	int32_t           m_game;
+	int32_t         m_game;
 
-	uint8_t           m_tilepri[6]; // todo - move into taitoic.c
-	uint8_t           m_spritepri[6]; // todo - move into taitoic.c
-	uint8_t           m_spriteblendmode; // todo - move into taitoic.c
+	uint8_t         m_tilepri[6]; // todo - move into taitoic.c
+	uint8_t         m_spritepri[6]; // todo - move into taitoic.c
+	uint8_t         m_spriteblendmode; // todo - move into taitoic.c
 
 	int             m_prepare_sprites;
 
 	/* misc */
-	int32_t           m_mjnquest_input;
+	int32_t         m_mjnquest_input;
 	int             m_last[2];
 	int             m_nibble;
-	int32_t           m_driveout_sound_latch;
-	int32_t           m_oki_bank;
-	emu_timer       *m_int6_timer;
+	int32_t         m_driveout_sound_latch;
+	int32_t         m_oki_bank;
+	emu_timer      *m_int6_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -113,9 +114,7 @@ public:
 	optional_device<taito_cchip_device> m_cchip;
 	optional_device<timer_device> m_cchip_irq_clear;
 	optional_device<okim6295_device> m_oki;
-	optional_device<tc0100scn_device> m_tc0100scn;
-	optional_device<tc0100scn_device> m_tc0100scn_1;
-	optional_device<tc0100scn_device> m_tc0100scn_2;
+	optional_device_array<tc0100scn_device, 2> m_tc0100scn;
 	optional_device<tc0110pcr_device> m_tc0110pcr;
 	optional_device<tc0360pri_device> m_tc0360pri;
 	optional_device<tc0280grd_device> m_tc0280grd;

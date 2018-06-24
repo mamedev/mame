@@ -255,8 +255,8 @@ READ32_MEMBER(undrfire_state::undrfire_lightgun_r)
 
 		case 0x00:  /* P1 */
 		{
-			x = ioport("GUNX1")->read() << 6;
-			y = ioport("GUNY1")->read() << 6;
+			x = m_gun_x[0]->read() << 6;
+			y = m_gun_y[0]->read() << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 					| ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -264,8 +264,8 @@ READ32_MEMBER(undrfire_state::undrfire_lightgun_r)
 
 		case 0x01:  /* P2 */
 		{
-			x = ioport("GUNX2")->read() << 6;
-			y = ioport("GUNY2")->read() << 6;
+			x = m_gun_x[1]->read() << 6;
+			y = m_gun_y[1]->read() << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 					| ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -310,10 +310,11 @@ WRITE32_MEMBER(undrfire_state::motor_control_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_value("P1_lamp_start", (data >> 12) & 1 ); //p1 start
-		output().set_value("P2_lamp_start", (data >> 13) & 1 ); //p2 start
-		output().set_value("P1_gun_recoil", (data >> 14) & 1 ); //p1 recoil
-		output().set_value("P2_gun_recoil", (data >> 15) & 1 ); //p2 recoil
+		for (int i = 0; i < 2; i++)
+		{
+			m_lamp_start[i] = BIT(data, 12+i); //p1/2 start
+			m_gun_recoil[i] = BIT(data, 14+i); //p1/2 recoil
+		}
 	}
 }
 
@@ -323,13 +324,10 @@ WRITE32_MEMBER(undrfire_state::cbombers_cpua_ctrl_w)
     ........ ..xxxxxx   Lamp 1-6 enables
     ........ .x......   Vibration
 */
-	output().set_value("Lamp_1", data & 1 );
-	output().set_value("Lamp_2", (data >> 1) & 1 );
-	output().set_value("Lamp_3", (data >> 2) & 1 );
-	output().set_value("Lamp_4", (data >> 3) & 1 );
-	output().set_value("Lamp_5", (data >> 4) & 1 );
-	output().set_value("Lamp_6", (data >> 5) & 1 );
-	output().set_value("Wheel_vibration", (data >> 6) & 1 );
+	for (int i = 0; i < 6; i++)
+		m_lamps[i] = BIT(data, i);
+
+	m_wheel_vibration = BIT(data, 6);
 
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -558,10 +556,29 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
+void undrfire_state::machine_start()
+{
+	save_item(NAME(m_frame_counter));
+}
+
 INTERRUPT_GEN_MEMBER(undrfire_state::undrfire_interrupt)
 {
 	m_frame_counter ^= 1;
 	device.execute().set_input_line(4, HOLD_LINE);
+}
+
+MACHINE_START_MEMBER(undrfire_state, undrfire)
+{
+	m_lamp_start.resolve();
+	m_gun_recoil.resolve();
+	machine_start();
+}
+
+MACHINE_START_MEMBER(undrfire_state, cbombers)
+{
+	m_lamps.resolve();
+	m_wheel_vibration.resolve();
+	machine_start();
 }
 
 MACHINE_CONFIG_START(undrfire_state::undrfire)
@@ -572,6 +589,8 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
 
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+
+	MCFG_MACHINE_START_OVERRIDE(undrfire_state, undrfire)
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("INPUTS0"))
@@ -600,14 +619,13 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(2)
-	MCFG_TC0100SCN_TX_REGION(3)
 	MCFG_TC0100SCN_OFFSETS(50, 8)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	MCFG_GFX_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
 	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(4)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0480SCP_OFFSETS(0x24, 0)
 	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
@@ -648,6 +666,8 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, undrfire_state, coin_word_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
 
+	MCFG_MACHINE_START_OVERRIDE(undrfire_state, cbombers)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -663,14 +683,13 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(2)
-	MCFG_TC0100SCN_TX_REGION(3)
 	MCFG_TC0100SCN_OFFSETS(50, 8)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	MCFG_GFX_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
 	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(4)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0480SCP_OFFSETS(0x24, 0)
 	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_COL_BASE(4096)
@@ -713,7 +732,7 @@ ROM_START( undrfire )
 	ROM_LOAD       ( "d67-12", 0x300000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )
 	ROM_FILL       (           0x200000, 0x100000, 0x00 )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_WORD( "d67-13", 0x00000,  0x80000,  CRC(42e7690d) SHA1(5f00f3f814653733bf9a5cb010675799de02fa76) )   /* STY, spritemap */
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )
@@ -753,7 +772,7 @@ ROM_START( undrfireu )
 	ROM_LOAD       ( "d67-12", 0x300000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )
 	ROM_FILL       (           0x200000, 0x100000, 0x00 )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_WORD( "d67-13", 0x00000,  0x80000,  CRC(42e7690d) SHA1(5f00f3f814653733bf9a5cb010675799de02fa76) )   /* STY, spritemap */
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )
@@ -792,7 +811,7 @@ ROM_START( undrfirej )
 	ROM_LOAD       ( "d67-12", 0x300000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )
 	ROM_FILL       (           0x200000, 0x100000, 0x00 )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_WORD( "d67-13", 0x00000,  0x80000,  CRC(42e7690d) SHA1(5f00f3f814653733bf9a5cb010675799de02fa76) )   /* STY, spritemap */
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )
@@ -840,11 +859,11 @@ ROM_START( cbombers )
 	ROM_LOAD       ( "d83_18.ic6",  0x300000, 0x100000, CRC(87979155) SHA1(0ffafa970f9f9c98f8938104b97e63d2b5757804) )
 	ROM_FILL       (                0x200000, 0x100000, 0x00 )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_BYTE( "d83_31.ic10", 0x000001, 0x40000, CRC(85c37961) SHA1(15ea5c4904d910575e984e146c8941dff913d45f) )
 	ROM_LOAD16_BYTE( "d83_32.ic11", 0x000000, 0x40000, CRC(b0db2559) SHA1(2bfae2dbe164b42e95d0a93fab82b7040c3fbc56) )
 
-	ROM_REGION( 0x40000, "user2", 0 )
+	ROM_REGION( 0x40000, "sprmaprom_h", 0 )
 	ROM_LOAD( "d83_30.ic9", 0x00000,  0x40000,  CRC(eb86dc67) SHA1(31c7b6f30ff912fafed4b87ce8bf603ee17d1664) )
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )
@@ -894,11 +913,11 @@ ROM_START( cbombersj )
 	ROM_LOAD       ( "d83_18.ic6",  0x300000, 0x100000, CRC(87979155) SHA1(0ffafa970f9f9c98f8938104b97e63d2b5757804) )
 	ROM_FILL       (                0x200000, 0x100000, 0x00 )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_BYTE( "d83_31.ic10", 0x000001, 0x40000, CRC(85c37961) SHA1(15ea5c4904d910575e984e146c8941dff913d45f) )
 	ROM_LOAD16_BYTE( "d83_32.ic11", 0x000000, 0x40000, CRC(b0db2559) SHA1(2bfae2dbe164b42e95d0a93fab82b7040c3fbc56) )
 
-	ROM_REGION( 0x40000, "user2", 0 )
+	ROM_REGION( 0x40000, "sprmaprom_h", 0 )
 	ROM_LOAD( "d83_30.ic9", 0x00000,  0x40000,  CRC(eb86dc67) SHA1(31c7b6f30ff912fafed4b87ce8bf603ee17d1664) )
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )
@@ -983,11 +1002,11 @@ ROM_START( cbombersp )
 	ROM_LOAD       ( "ic59_7cce.bin",  0x380000, 0x080000, CRC(ee762199) SHA1(d56e96feeedba8b77f8f18cb380d2902ca3f1e50) )
 	ROM_FILL       (                   0x280000, 0x080000, 0x00 )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_BYTE( "st8_ic2.bin", 0x000001, 0x40000, CRC(d74254d8) SHA1(f4a4f9d95f70edf74d937be067d6a9f68a955ea7) )
 	ROM_LOAD16_BYTE( "st0_ic1.bin", 0x000000, 0x40000, CRC(c414c479) SHA1(e585502fcfa6ae2a36a66927ba2c49e49317f149) )
 
-	ROM_REGION( 0x40000, "user2", 0 )
+	ROM_REGION( 0x40000, "sprmaprom_h", 0 )
 	ROM_LOAD( "st16_ic3.bin", 0x00000,  0x40000, CRC(c4ff6b2f) SHA1(65795bcb3749cce9c291204cd64fafa529317e14) )
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )

@@ -17,8 +17,8 @@
 class ninjaw_state : public driver_device
 {
 public:
-	ninjaw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ninjaw_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_tc0140syt(*this, "tc0140syt"),

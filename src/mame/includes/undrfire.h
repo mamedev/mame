@@ -24,8 +24,8 @@ public:
 		TIMER_INTERRUPT5
 	};
 
-	undrfire_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	undrfire_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_tc0100scn(*this, "tc0100scn"),
@@ -35,7 +35,16 @@ public:
 		m_shared_ram(*this, "shared_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_sprmaprom(*this, "sprmaprom"),
+		m_sprmaprom_h(*this, "sprmaprom_h"),
+		m_gun_x(*this, "GUNX%u", 1U),
+		m_gun_y(*this, "GUNY%u", 1U),
+		m_lamp_start(*this, "P%u_lamp_start", 1U),
+		m_gun_recoil(*this, "P%u_gun_recoil", 1U),
+		m_lamps(*this, "Lamp_%u", 1U),
+		m_wheel_vibration(*this, "Wheel_vibration")
+	{ }
 
 	void undrfire(machine_config &config);
 	void cbombers(machine_config &config);
@@ -44,6 +53,7 @@ public:
 	void init_cbombers();
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -63,6 +73,17 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	required_region_ptr<uint16_t> m_sprmaprom;
+	optional_region_ptr<uint8_t> m_sprmaprom_h;
+
+	optional_ioport_array<2> m_gun_x;
+	optional_ioport_array<2> m_gun_y;
+
+	output_finder<2> m_lamp_start;
+	output_finder<2> m_gun_recoil;
+	output_finder<6> m_lamps;
+	output_finder<> m_wheel_vibration;
+
 	DECLARE_WRITE8_MEMBER(coin_word_w);
 	DECLARE_READ16_MEMBER(shared_ram_r);
 	DECLARE_WRITE16_MEMBER(shared_ram_w);
@@ -71,6 +92,8 @@ private:
 	DECLARE_WRITE32_MEMBER(motor_control_w);
 	DECLARE_WRITE32_MEMBER(cbombers_cpua_ctrl_w);
 	DECLARE_READ_LINE_MEMBER(frame_counter_r);
+	DECLARE_MACHINE_START(undrfire);
+	DECLARE_MACHINE_START(cbombers);
 	uint32_t screen_update_undrfire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(undrfire_interrupt);

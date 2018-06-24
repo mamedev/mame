@@ -147,8 +147,6 @@ confirmed
 
 void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -159,20 +157,20 @@ void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind
 
 	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
-		data = spriteram[offs + 0];
+		data = m_spriteram[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;
 		y = data & 0x1ff;
 
-		data = spriteram[offs + 1];
+		data = m_spriteram[offs + 1];
 		tilenum = data & 0x7ff;     /* $80000 spritemap rom maps up to $7ff 128x128 sprites */
 
-		data = spriteram[offs + 2];
+		data = m_spriteram[offs + 2];
 		priority = (data & 0x8000) >> 15;
 		flipx = (data & 0x4000) >> 14;
 		flipy = (data & 0x2000) >> 13;  // ???
 		x = data & 0x1ff;   // correct mask?
 
-		data = spriteram[offs + 3];
+		data = m_spriteram[offs + 3];
 		color = (data & 0xff00) >> 8;
 		zoomx = (data & 0x7f);
 
@@ -201,7 +199,7 @@ void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind
 			px = flipx ?  (7 - k) : k;  /* pick tiles back to front for x and y flips */
 			py = flipy ? (15 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 3)];
+			code = m_sprmaprom[map_offset + px + (py << 3)];
 
 			if (code == 0xffff)
 				bad_chunks++;
@@ -241,8 +239,6 @@ void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind
 
 void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -253,21 +249,21 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 
 	for (offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{
-		data = spriteram[offs + 0];
+		data = m_spriteram[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;
 		y = data & 0x1ff;
 
-		data = spriteram[offs + 1];
+		data = m_spriteram[offs + 1];
 		priority = (data & 0x8000) >> 15;
 		color = (data & 0x7f80) >> 7;
 		zoomx = (data & 0x7f);
 
-		data = spriteram[offs + 2];
+		data = m_spriteram[offs + 2];
 		flipy = (data & 0x8000) >> 15;
 		flipx = (data & 0x4000) >> 14;
 		x = data & 0x1ff;
 
-		data = spriteram[offs + 3];
+		data = m_spriteram[offs + 3];
 		/* higher bits are sometimes used... e.g. sign over flashing enemy car...! */
 		tilenum = data & 0x7ff;
 
@@ -298,7 +294,7 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 				px = flipx ? (7 - k) : k;   /* pick tiles back to front for x and y flips */
 				py = flipy ? (7 - j) : j;
 
-				code = spritemap[map_offset + px + (py << 3)];
+				code = m_sprmaprom[map_offset + px + (py << 3)];
 
 				if (code == 0xffff)
 					bad_chunks++;
@@ -342,7 +338,7 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 				px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
 				py = flipy ? (7 - j) : j;
 
-				code = spritemap[map_offset + px + (py << 2)];
+				code = m_sprmaprom[map_offset + px + (py << 2)];
 
 				if (code == 0xffff) bad_chunks++;
 
@@ -385,7 +381,7 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 				px = flipx ? (1 - k) : k;   /* pick tiles back to front for x and y flips */
 				py = flipy ? (7 - j) : j;
 
-				code = spritemap[map_offset + px + (py << 1)];
+				code = m_sprmaprom[map_offset + px + (py << 1)];
 
 				if (code == 0xffff) bad_chunks ++;
 
@@ -426,8 +422,6 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 
 void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -438,21 +432,21 @@ void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16
 
 	for (offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{
-		data = spriteram[offs + 0];
+		data = m_spriteram[offs + 0];
 		zoomy = (data & 0x7e00) >> 9;
 		y = data & 0x1ff;
 
-		data = spriteram[offs + 1];
+		data = m_spriteram[offs + 1];
 		priority = (data & 0x8000) >> 15;
 		color = (data & 0x7f80) >> 7;
 		zoomx = (data & 0x3f);
 
-		data = spriteram[offs + 2];
+		data = m_spriteram[offs + 2];
 		flipy = (data & 0x8000) >> 15;
 		flipx = (data & 0x4000) >> 14;
 		x = data & 0x1ff;
 
-		data = spriteram[offs + 3];
+		data = m_spriteram[offs + 3];
 		tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
 		if (!tilenum)
@@ -480,7 +474,7 @@ void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16
 			px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
 			py = flipy ? (7 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 2)];
+			code = m_sprmaprom[map_offset + px + (py << 2)];
 
 			if (code == 0xffff)
 				bad_chunks++;
@@ -521,8 +515,6 @@ void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16
 
 void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t *spriteram = m_spriteram;
 	int offs, start_offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -542,21 +534,21 @@ void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &b
 
 	for (offs = (start_offs + 0x800 - 4); offs >= start_offs; offs -= 4)
 	{
-		data = spriteram[offs + 0];
+		data = m_spriteram[offs + 0];
 		zoomy = (data & 0x7e00) >> 9;
 		y = data & 0x1ff;
 
-		data = spriteram[offs + 1];
+		data = m_spriteram[offs + 1];
 		priority = (data & 0x8000) >> 15;
 		color = (data & 0x7f80) >> 7;
 		zoomx = (data & 0x3f);
 
-		data = spriteram[offs + 2];
+		data = m_spriteram[offs + 2];
 		flipy = (data & 0x8000) >> 15;
 		flipx = (data & 0x4000) >> 14;
 		x = data & 0x1ff;
 
-		data = spriteram[offs + 3];
+		data = m_spriteram[offs + 3];
 		tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
 		if (!tilenum)
@@ -584,7 +576,7 @@ void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &b
 			px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
 			py = flipy ? (7 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 2)];
+			code = m_sprmaprom[map_offset + px + (py << 2)];
 
 			if (code == 0xffff)
 				bad_chunks++;
@@ -625,8 +617,6 @@ void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &b
 
 void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -637,20 +627,20 @@ void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 
 	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
-		data = spriteram[offs + 0];
+		data = m_spriteram[offs + 0];
 		zoomy = (data & 0x7e00) >> 9;
 		y = data & 0x1ff;
 
-		data = spriteram[offs + 1];
+		data = m_spriteram[offs + 1];
 		priority = (data & 0x8000) >> 15;
 		flipx = (data & 0x4000) >> 14;
 		x = data & 0x1ff;   // correct mask?
 
-		data = spriteram[offs + 2];
+		data = m_spriteram[offs + 2];
 		color = (data & 0xff00) >> 8;
 		zoomx = (data & 0x3f);
 
-		data = spriteram[offs + 3];
+		data = m_spriteram[offs + 3];
 		flipy = (data & 0x8000) >> 15;  // ???
 		tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
@@ -678,7 +668,7 @@ void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 			px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
 			py = flipy ? (7 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 2)];
+			code = m_sprmaprom[map_offset + px + (py << 2)];
 
 			if (code == 0xffff)
 				bad_chunks++;
@@ -719,8 +709,6 @@ void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 
 void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -731,20 +719,20 @@ void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 
 	for (offs = 0; offs < m_spriteram.bytes() / 2 - 4; offs += 4)
 	{
-		data = spriteram[offs + 0];
+		data = m_spriteram[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;
 		y = data & 0x1ff;
 
-		data = spriteram[offs + 1];
+		data = m_spriteram[offs + 1];
 		priority = (data & 0x8000) >> 15;
 		flipx = (data & 0x4000) >> 14;
 		x = data & 0x1ff;   // correct mask?
 
-		data = spriteram[offs + 2];
+		data = m_spriteram[offs + 2];
 		color = (data & 0xff00) >> 8;
 		zoomx = (data & 0x7f);
 
-		data = spriteram[offs + 3];
+		data = m_spriteram[offs + 3];
 		flipy = (data & 0x8000) >> 15;  // ???
 		tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
@@ -772,7 +760,7 @@ void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 			px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
 			py = flipy ? (7 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 2)];
+			code = m_sprmaprom[map_offset + px + (py << 2)];
 
 			if (code == 0xffff)
 				bad_chunks++;

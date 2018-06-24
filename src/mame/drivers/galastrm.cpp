@@ -65,20 +65,13 @@ WRITE32_MEMBER(galastrm_state::galastrm_palette_w)
 		m_palette->set_pen_color(m_tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-WRITE32_MEMBER(galastrm_state::galastrm_tc0610_0_w)
+template<int RegNo>
+WRITE32_MEMBER(galastrm_state::galastrm_tc0610_w)
 {
 	if (ACCESSING_BITS_16_31)
-		m_tc0610_0_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (m_tc0610_0_addr < 8))
-		m_tc0610_ctrl_reg[0][m_tc0610_0_addr] = data;
-}
-
-WRITE32_MEMBER(galastrm_state::galastrm_tc0610_1_w)
-{
-	if (ACCESSING_BITS_16_31)
-		m_tc0610_1_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (m_tc0610_1_addr < 8))
-		m_tc0610_ctrl_reg[1][m_tc0610_1_addr] = data;
+		m_tc0610_addr[RegNo] = data >> 16;
+	if ((ACCESSING_BITS_0_15) && (m_tc0610_addr[RegNo] < 8))
+		m_tc0610_ctrl_reg[RegNo][m_tc0610_addr[RegNo]] = data;
 }
 
 
@@ -112,8 +105,8 @@ void galastrm_state::galastrm_map(address_map &map)
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
 	map(0x900000, 0x900003).w(FUNC(galastrm_state::galastrm_palette_w));                               /* TC0110PCR */
-	map(0xb00000, 0xb00003).w(FUNC(galastrm_state::galastrm_tc0610_0_w));                              /* TC0610 */
-	map(0xc00000, 0xc00003).w(FUNC(galastrm_state::galastrm_tc0610_1_w));
+	map(0xb00000, 0xb00003).w(FUNC(galastrm_state::galastrm_tc0610_w<0>));                              /* TC0610 */
+	map(0xc00000, 0xc00003).w(FUNC(galastrm_state::galastrm_tc0610_w<1>));
 	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));        /* piv tilemaps */
 	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
 }
@@ -198,6 +191,11 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
+void galastrm_state::machine_start()
+{
+	save_item(NAME(m_frame_counter));
+}
+
 /***************************************************************************/
 
 MACHINE_CONFIG_START(galastrm_state::galastrm)
@@ -236,14 +234,13 @@ MACHINE_CONFIG_START(galastrm_state::galastrm)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(0)
-	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_OFFSETS(-48, -56)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	MCFG_GFX_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
 	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(3)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0480SCP_OFFSETS(-40, -3)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 

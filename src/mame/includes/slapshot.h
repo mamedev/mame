@@ -30,8 +30,8 @@ public:
 		TIMER_SLAPSHOT_INTERRUPT6
 	};
 
-	slapshot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	slapshot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tc0140syt(*this, "tc0140syt"),
 		m_tc0480scp(*this, "tc0480scp"),
@@ -40,7 +40,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this,"spriteram"),
-		m_spriteext(*this,"spriteext") { }
+		m_spriteext(*this,"spriteext"),
+		m_z80bank(*this,"z80bank"),
+		m_system_io(*this,"SYSTEM"),
+		m_service_io(*this,"SERVICE") { }
 
 
 	void opwolf3(machine_config &config);
@@ -67,6 +70,10 @@ private:
 	required_shared_ptr<uint16_t> m_spriteext;
 	std::unique_ptr<uint16_t[]>    m_spriteram_buffered;
 	std::unique_ptr<uint16_t[]>    m_spriteram_delayed;
+
+	required_memory_bank m_z80bank;
+	required_ioport m_system_io;
+	required_ioport m_service_io;
 
 	/* video-related */
 	struct      slapshot_tempsprite *m_spritelist;

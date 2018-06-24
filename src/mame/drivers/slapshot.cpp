@@ -179,8 +179,8 @@ READ16_MEMBER(slapshot_state::service_input_r)
 	switch (offset)
 	{
 		case 0x03:
-			return ((ioport("SYSTEM")->read() & 0xef) |
-					(ioport("SERVICE")->read() & 0x10))  << 8;  /* IN3 + service switch */
+			return ((m_system_io->read() & 0xef) |
+					(m_service_io->read() & 0x10))  << 8;  /* IN3 + service switch */
 
 		default:
 			return m_tc0640fio->read(space, offset) << 8;
@@ -201,7 +201,7 @@ WRITE8_MEMBER(slapshot_state::coin_control_w)
 
 WRITE8_MEMBER(slapshot_state::sound_bankswitch_w)
 {
-	membank("z80bank")->set_entry(data & 3);
+	m_z80bank->set_entry(data & 3);
 }
 
 WRITE16_MEMBER(slapshot_state::msb_sound_w)
@@ -435,7 +435,7 @@ GFXDECODE_END
 
 void slapshot_state::machine_start()
 {
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	m_int6_timer = timer_alloc(TIMER_SLAPSHOT_INTERRUPT6);
 }
@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 
 	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
 	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0480SCP_OFFSETS(30 + 3, 9)
 	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
 	MCFG_TC0480SCP_OFFSETS_FLIP(0, 2)
@@ -545,7 +545,7 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 
 	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
 	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0480SCP_OFFSETS(30 + 3, 9)
 	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
 	MCFG_TC0480SCP_OFFSETS_FLIP(0, 2)

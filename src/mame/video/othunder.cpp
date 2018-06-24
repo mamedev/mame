@@ -66,9 +66,7 @@ spriteram is being tested, take no notice of that.]
 
 void othunder_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs)
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	uint16_t tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
-	uint16_t *spriteram16 = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -82,20 +80,20 @@ void othunder_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	for (offs = (m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
-		data = spriteram16[offs + 0];
+		data = m_spriteram[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;
 		y = data & 0x1ff;
 
-		data = spriteram16[offs + 1];
+		data = m_spriteram[offs + 1];
 		flipx = (data & 0x4000) >> 14;
 		priority = (data & 0x8000) >> 15;
 		x = data & 0x1ff;
 
-		data = spriteram16[offs + 2];
+		data = m_spriteram[offs + 2];
 		color = (data & 0xff00) >> 8;
 		zoomx = (data & 0x7f);
 
-		data = spriteram16[offs + 3];
+		data = m_spriteram[offs + 3];
 		tilenum = data & 0x1fff;    // $80000 spritemap rom maps up to $2000 64x64 sprites
 		flipy = (data & 0x8000) >> 15;
 
@@ -125,7 +123,7 @@ void othunder_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 			if (flipx)  px = 3 - k; /* pick tiles back to front for x and y flips */
 			if (flipy)  py = 7 - j;
 
-			code = spritemap[map_offset + px + (py << 2)] & tile_mask;
+			code = m_sprmaprom[map_offset + px + (py << 2)] & tile_mask;
 
 			if (code == 0xffff)
 			{

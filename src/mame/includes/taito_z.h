@@ -23,6 +23,15 @@ public:
 	taitoz_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
+		m_sprmaprom(*this, "sprmaprom"),
+		m_z80bank(*this, "z80bank"),
+		m_eepromout_io(*this, "EEPROMOUT"),
+		m_unknown_io(*this, "UNK%u", 1U),
+		m_wheel_vibration(*this, "Wheel_Vibration"),
+		m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U),
+		m_motor_direction(*this, "Motor_%u_Direction", 1U),
+		m_motor_speed(*this, "Motor_%u_Speed", 1U),
+		m_motor_debug(*this, "motor_debug"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
@@ -69,6 +78,17 @@ private:
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_region_ptr<uint16_t> m_sprmaprom;
+	optional_memory_bank m_z80bank;
+
+	optional_ioport m_eepromout_io;
+	optional_ioport_array<4> m_unknown_io;
+
+	output_finder<> m_wheel_vibration;
+	output_finder<2> m_gun_recoil;
+	output_finder<3> m_motor_direction;
+	output_finder<3> m_motor_speed;
+	output_finder<> m_motor_debug;
 
 	/* video-related */
 	int         m_sci_spriteframe;
@@ -125,6 +145,9 @@ private:
 	DECLARE_VIDEO_START(taitoz);
 	DECLARE_MACHINE_START(bshark);
 	DECLARE_MACHINE_START(chasehq);
+	DECLARE_MACHINE_START(dblaxle);
+	DECLARE_MACHINE_START(spacegun);
+	DECLARE_MACHINE_START(nightstr);
 	uint32_t screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

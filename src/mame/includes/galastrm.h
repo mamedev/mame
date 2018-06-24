@@ -50,7 +50,8 @@ public:
 	galastrm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
-		m_spriteram(*this,"spriteram") ,
+		m_spriteram(*this,"spriteram"),
+		m_sprmaprom(*this,"user1"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_tc0100scn(*this, "tc0100scn"),
@@ -63,11 +64,13 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
 	required_shared_ptr<uint32_t> m_ram;
 	required_shared_ptr<uint32_t> m_spriteram;
+	required_region_ptr<uint16_t> m_sprmaprom;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -79,9 +82,7 @@ private:
 
 	uint16_t m_frame_counter;
 	int m_tc0110pcr_addr;
-	int m_tc0610_0_addr;
-	int m_tc0610_1_addr;
-	uint32_t m_mem[2];
+	int m_tc0610_addr[2];
 	int16_t m_tc0610_ctrl_reg[2][8];
 	std::unique_ptr<gs_tempsprite[]> m_spritelist;
 	struct gs_tempsprite *m_sprite_ptr_pre;
@@ -94,8 +95,7 @@ private:
 	int m_rsyoffs;
 
 	DECLARE_WRITE32_MEMBER(galastrm_palette_w);
-	DECLARE_WRITE32_MEMBER(galastrm_tc0610_0_w);
-	DECLARE_WRITE32_MEMBER(galastrm_tc0610_1_w);
+	template<int RegNo> DECLARE_WRITE32_MEMBER(galastrm_tc0610_w);
 	DECLARE_WRITE8_MEMBER(coin_word_w);
 	uint32_t screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galastrm_interrupt);

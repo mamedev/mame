@@ -16,6 +16,10 @@ void undrfire_state::video_start()
 
 	for (i = 0; i < 16384; i++) /* Fix later - some weird colours in places */
 		m_palette->set_pen_color(i, rgb_t(0,0,0));
+
+	save_item(NAME(m_port_sel));
+	save_item(NAME(m_rotate_ctrl));
+	save_item(NAME(m_dislayer));
 }
 
 /***************************************************************
@@ -67,8 +71,6 @@ Heavy use is made of sprite zooming.
 
 void undrfire_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
-	uint32_t *spriteram32 = m_spriteram;
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -82,17 +84,17 @@ void undrfire_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 	for (offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
-		data = spriteram32[offs+0];
+		data = m_spriteram[offs+0];
 		flipx =    (data & 0x00800000) >> 23;
 		zoomx =    (data & 0x007f0000) >> 16;
 		tilenum =  (data & 0x00007fff);
 
-		data = spriteram32[offs+2];
+		data = m_spriteram[offs+2];
 		priority = (data & 0x000c0000) >> 18;
 		color =    (data & 0x0003fc00) >> 10;
 		x =        (data & 0x000003ff);
 
-		data = spriteram32[offs+3];
+		data = m_spriteram[offs+3];
 		dblsize =  (data & 0x00040000) >> 18;
 		flipy =    (data & 0x00020000) >> 17;
 		zoomy =    (data & 0x0001fc00) >> 10;
@@ -134,7 +136,7 @@ void undrfire_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 				if (flipx)  px = dimension-1-k;
 				if (flipy)  py = dimension-1-j;
 
-				code = spritemap[map_offset + px + (py<<(dblsize+1))];
+				code = m_sprmaprom[map_offset + px + (py<<(dblsize+1))];
 
 				if (code==0xffff)
 				{
@@ -210,10 +212,6 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
-	uint32_t *spriteram32 = m_spriteram;
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint8_t *spritemapHibit = (uint8_t *)memregion("user2")->base();
-
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -227,17 +225,17 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 
 	for (offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
-		data = spriteram32[offs+0];
+		data = m_spriteram[offs+0];
 		flipx =    (data & 0x00800000) >> 23;
 		zoomx =    (data & 0x007f0000) >> 16;
 		tilenum =  (data & 0x0000ffff);
 
-		data = spriteram32[offs+2];
+		data = m_spriteram[offs+2];
 		priority = (data & 0x000c0000) >> 18;
 		color =    (data & 0x0003fc00) >> 10;
 		x =        (data & 0x000003ff);
 
-		data = spriteram32[offs+3];
+		data = m_spriteram[offs+3];
 		dblsize =  (data & 0x00040000) >> 18;
 		flipy =    (data & 0x00020000) >> 17;
 		zoomy =    (data & 0x0001fc00) >> 10;
@@ -279,7 +277,7 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 			if (flipy)  py = dimension-1-j;
 
 			map_addr = map_offset + px + (py << (dblsize + 1));
-			code =  (spritemapHibit[map_addr] << 16) | spritemap[map_addr];
+			code =  (m_sprmaprom_h[map_addr] << 16) | m_sprmaprom[map_addr];
 
 			curx = x + ((k*zoomx)/dimension);
 			cury = y + ((j*zoomy)/dimension);

@@ -290,14 +290,8 @@ void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		extoffs = offs;
 		if (extoffs >= 0x8000) extoffs -= 0x4000;   /* spriteram[0x4000-7fff] has no corresponding extension area */
 
-		{
-			int i;
-
-			code = m_spriteram_buffered[(offs)/2] & 0xff;
-			i = (m_spriteext[(extoffs >> 4)] & 0xff00 );
-			code = (i | code);
-		}
-
+		code = m_spriteram_buffered[(offs)/2] & 0xff;
+		code|= (m_spriteext[(extoffs >> 4)] & 0xff00 );
 
 		if (code == 0) continue;
 
