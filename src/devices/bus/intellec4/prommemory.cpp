@@ -45,7 +45,7 @@ void imm6_26_device::device_start()
 {
 	allocate();
 
-	save_pointer(NAME(m_data.get()), 4096U);
+	save_pointer(NAME(m_data), 4096U);
 }
 
 

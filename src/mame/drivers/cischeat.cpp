@@ -155,11 +155,11 @@ To Do:
 - Use the Tilemap Manager for the road layers (when this kind of layers
   will be supported) for performance and better priority support.
   A line based zooming is additionally needed for f1gpstar.
-- Wild Pilot road needs some serious work (empty gaps, ship "floating" 
+- Wild Pilot road needs some serious work (empty gaps, ship "floating"
   in stage 6 etc.);
 - Force feedback :)
 - Major cleanups needed, especially in video file;
-- Split the non-road games into own driver, merge them with Alien Command, 
+- Split the non-road games into own driver, merge them with Alien Command,
   device-ify the sprite chip;
 
 BTANBs:
@@ -168,7 +168,7 @@ BTANBs:
   are correct in a few places (e.g. in the attract mode, where cars move
   horizontally, the wheels don't follow for this reason, I think)
   Update: this happens on real HW as well (at least for Big Run);
-- Some serious sprite popups happening in Big Run, again this happens on 
+- Some serious sprite popups happening in Big Run, again this happens on
   the reference video too so not a bug.
 
 2008-08
@@ -1958,7 +1958,7 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_DEVICE_ADD("soundcpu", M68000, 6000000)
 	MCFG_DEVICE_PROGRAM_MAP(bigrun_sound_map)
 	// timing set by the YM irqhandler
-//	MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
+//  MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -2226,7 +2226,7 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

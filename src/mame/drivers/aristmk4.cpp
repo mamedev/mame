@@ -1722,7 +1722,7 @@ void aristmk4_state::init_aristmk4()
 
 void aristmk4_state::machine_start()
 {
-	save_pointer(NAME(m_nvram.get()), 0x1000); // m_nvram
+	save_pointer(NAME(m_nvram), 0x1000); // m_nvram
 	m_credit_spend_meter.resolve();
 	m_credit_out_meter.resolve();
 	m_hopper_motor_out.resolve();

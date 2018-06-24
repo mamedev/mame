@@ -378,7 +378,7 @@ void ataxx_state::machine_start()
 	save_item(NAME(m_xrom1_addr));
 	save_item(NAME(m_xrom2_addr));
 	save_item(NAME(m_battery_ram_enable));
-	save_pointer(NAME(m_extra_tram.get()), ATAXX_EXTRA_TRAM_SIZE);
+	save_pointer(NAME(m_extra_tram), ATAXX_EXTRA_TRAM_SIZE);
 }
 
 

@@ -48,9 +48,9 @@ void lemmings_state::video_start()
 	m_sprite_triple_buffer[1] = make_unique_clear<uint16_t[]>(0x800/2);
 
 	save_item(NAME(m_bitmap0));
-	save_pointer(NAME(m_vram_buffer.get()), 2048 * 64);
-	save_pointer(NAME(m_sprite_triple_buffer[0].get()), 0x800/2, 0);
-	save_pointer(NAME(m_sprite_triple_buffer[1].get()), 0x800/2, 1);
+	save_pointer(NAME(m_vram_buffer), 2048 * 64);
+	save_pointer(NAME(m_sprite_triple_buffer[0]), 0x800/2, 0);
+	save_pointer(NAME(m_sprite_triple_buffer[1]), 0x800/2, 1);
 }
 
 WRITE_LINE_MEMBER(lemmings_state::screen_vblank_lemmings)

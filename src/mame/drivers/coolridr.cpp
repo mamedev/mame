@@ -3227,9 +3227,9 @@ void coolridr_state::machine_start()
 	decode[1].current_object = 0;
 	debug_randompal = 9;
 
-	save_pointer(NAME(m_h1_vram.get()), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pcg.get()), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pal.get()), VRAM_SIZE);
+	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
+	save_pointer(NAME(m_h1_pcg), VRAM_SIZE);
+	save_pointer(NAME(m_h1_pal), VRAM_SIZE);
 }
 
 void coolridr_state::machine_reset()

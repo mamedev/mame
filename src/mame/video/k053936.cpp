@@ -248,8 +248,8 @@ void k053936_device::device_start()
 	m_ctrl = make_unique_clear<uint16_t[]>(0x20);
 	m_linectrl = make_unique_clear<uint16_t[]>(0x4000);
 
-	save_pointer(NAME(m_ctrl.get()), 0x20);
-	save_pointer(NAME(m_linectrl.get()), 0x4000);
+	save_pointer(NAME(m_ctrl), 0x20);
+	save_pointer(NAME(m_linectrl), 0x4000);
 }
 
 //-------------------------------------------------

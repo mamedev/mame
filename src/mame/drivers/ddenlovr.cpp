@@ -624,14 +624,14 @@ VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 	save_item(NAME(m_ddenlovr_blit_pen_mask));
 	save_item(NAME(m_ddenlovr_blit_regs));
 
-	save_pointer(NAME(m_ddenlovr_pixmap[0].get()), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[1].get()), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[2].get()), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[3].get()), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[4].get()), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[5].get()), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[6].get()), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[7].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[0]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[1]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[2]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[3]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[4]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[5]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[6]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[7]), 512 * 512);
 }
 
 VIDEO_START_MEMBER(ddenlovr_state,mmpanic)

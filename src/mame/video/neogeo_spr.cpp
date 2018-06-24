@@ -43,7 +43,7 @@ void neosprite_base_device::device_start()
 	m_auto_animation_frame_counter = 0;
 
 	/* register for state saving */
-	save_pointer(NAME(m_videoram.get()), 0x8000 + 0x800);
+	save_pointer(NAME(m_videoram), 0x8000 + 0x800);
 	save_item(NAME(m_vram_offset));
 	save_item(NAME(m_vram_read_buffer));
 	save_item(NAME(m_vram_modulo));

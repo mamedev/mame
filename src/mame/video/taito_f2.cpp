@@ -68,8 +68,8 @@ void taitof2_state::taitof2_core_vh_start (int sprite_type, int hide, int flip_h
 	save_item(NAME(m_spritepri));
 	save_item(NAME(m_spriteblendmode));
 	save_item(NAME(m_prepare_sprites));
-	save_pointer(NAME(m_spriteram_delayed.get()), m_spriteram.bytes() / 2);
-	save_pointer(NAME(m_spriteram_buffered.get()), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_spriteram_delayed), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_spriteram_buffered), m_spriteram.bytes() / 2);
 }
 
 /**************************************************************************************/

@@ -256,10 +256,10 @@ void srmp5_state::machine_start()
 	save_item(NAME(m_cmd2));
 	save_item(NAME(m_cmd_stat));
 	save_item(NAME(m_chrbank));
-	save_pointer(NAME(m_tileram.get()), 0x100000/2);
-	save_pointer(NAME(m_sprram.get()), 0x80000/2);
+	save_pointer(NAME(m_tileram), 0x100000/2);
+	save_pointer(NAME(m_sprram), 0x80000/2);
 #ifdef DEBUG_CHAR
-	save_pointer(NAME(m_tileduty.get()), 0x2000);
+	save_pointer(NAME(m_tileduty), 0x2000);
 #endif
 	save_item(NAME(m_vidregs));
 }

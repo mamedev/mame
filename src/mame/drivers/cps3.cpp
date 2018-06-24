@@ -900,11 +900,11 @@ void cps3_state::video_start()
 {
 	m_ss_ram       = std::make_unique<uint32_t[]>(0x10000/4);
 	memset(m_ss_ram.get(), 0x00, 0x10000);
-	save_pointer(NAME(m_ss_ram.get()), 0x10000/4);
+	save_pointer(NAME(m_ss_ram), 0x10000/4);
 
 	m_char_ram = std::make_unique<uint32_t[]>(0x800000/4);
 	memset(m_char_ram.get(), 0x00, 0x800000);
-	save_pointer(NAME(m_char_ram.get()), 0x800000 /4);
+	save_pointer(NAME(m_char_ram), 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, cps3_tiles8x8_layout, (uint8_t *)m_ss_ram.get(), 0, m_palette->entries() / 16, 0));

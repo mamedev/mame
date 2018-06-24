@@ -518,7 +518,27 @@ ROM_END
 /*--------------------
 / The Bally Game Show 4/90
 /--------------------*/
-ROM_START(gs_l3)
+ROM_START(gs_lu4)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gshw_u26.l3", 0x4000, 0x4000, CRC(3419bfb2) SHA1(7ce294a3118d20c7cdc3d5cd946e4c43090c5151))
+	ROM_LOAD("u27-lu4.rom", 0x8000, 0x8000, CRC(ba265978) SHA1(66ac8e83e35cdfd72f1d3aa8ce6d92c2c833f304))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gshw_u4.l2", 0x10000, 0x10000, CRC(e89e0116) SHA1(e96bee143d1662d078f21531f405d838fdace693))
+	ROM_LOAD("gshw_u19.l1", 0x20000, 0x10000, CRC(8bae0813) SHA1(a2b1beca13796892d8ee1533e395cabdbbb11f88))
+	ROM_LOAD("gshw_u20.l1", 0x30000, 0x10000, CRC(75ccbdf7) SHA1(7dce8ae427a621919caad8d8b08b06bb0adad850))
+ROM_END
+
+ROM_START(gs_lu3)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gameshow_u26-lu3.rom", 0x4000, 0x4000, CRC(4fa15683) SHA1(789bac55090a54d5b5180a0ef49c3903238f407f))
+	ROM_LOAD("gameshow_u27-lu3.rom", 0x8000, 0x8000, CRC(22270bd2) SHA1(a24a5e199179fd7c7ae8cd1b24c1d21b2fadf8da))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gshw_u4.l2", 0x10000, 0x10000, CRC(e89e0116) SHA1(e96bee143d1662d078f21531f405d838fdace693))
+	ROM_LOAD("gshw_u19.l1", 0x20000, 0x10000, CRC(8bae0813) SHA1(a2b1beca13796892d8ee1533e395cabdbbb11f88))
+	ROM_LOAD("gshw_u20.l1", 0x30000, 0x10000, CRC(75ccbdf7) SHA1(7dce8ae427a621919caad8d8b08b06bb0adad850))
+ROM_END
+
+ROM_START(gs_la3)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("gshw_u26.l3", 0x4000, 0x4000, CRC(3419bfb2) SHA1(7ce294a3118d20c7cdc3d5cd946e4c43090c5151))
 	ROM_LOAD("gshw_u27.l3", 0x8000, 0x8000, CRC(4f3babb6) SHA1(87091a6786fc6817529cfed7f60396babe153d8d))
@@ -528,10 +548,10 @@ ROM_START(gs_l3)
 	ROM_LOAD("gshw_u20.l1", 0x30000, 0x10000, CRC(75ccbdf7) SHA1(7dce8ae427a621919caad8d8b08b06bb0adad850))
 ROM_END
 
-ROM_START(gs_l4)
+ROM_START(gs_lg6)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("gshw_u26.l3", 0x4000, 0x4000, CRC(3419bfb2) SHA1(7ce294a3118d20c7cdc3d5cd946e4c43090c5151))
-	ROM_LOAD("u27-lu4.rom", 0x8000, 0x8000, CRC(ba265978) SHA1(66ac8e83e35cdfd72f1d3aa8ce6d92c2c833f304))
+	ROM_LOAD("u27-lg6.bin", 0x8000, 0x8000, CRC(02c75b24) SHA1(29bc0404c8598393cb1d0f17fb157e84f3b9a794))
 	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gshw_u4.l2", 0x10000, 0x10000, CRC(e89e0116) SHA1(e96bee143d1662d078f21531f405d838fdace693))
 	ROM_LOAD("gshw_u19.l1", 0x20000, 0x10000, CRC(8bae0813) SHA1(a2b1beca13796892d8ee1533e395cabdbbb11f88))
@@ -584,6 +604,8 @@ GAME(1990,  rollr_g3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,  
 GAME(1991,  rollr_f2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (LF-2) French",                    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  rollr_f3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (LF-3) French",                    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  rollr_d2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (AD-2) Prototype",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  gs_l3,      gs_l4,      s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (L-3)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  gs_l4,      0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (L-4)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_lu4,     0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LU-4) Europe",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_lu3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LU-3) Europe",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_la3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LA-3)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_lg6,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LG-6) Germany",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Star Trax (domestic prototype)",               MACHINE_IS_SKELETON_MECHANICAL)

@@ -849,7 +849,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_2", i8251_device, write_rxd))
 
-	MCFG_DEVICE_ADD("apb", M20_8086, 0)
+	MCFG_DEVICE_ADD("apb", M20_8086, "maincpu", "i8259", RAM_TAG)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","m20")
 MACHINE_CONFIG_END

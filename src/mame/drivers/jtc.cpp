@@ -652,9 +652,9 @@ void jtces40_state::video_start()
 	/* register for state saving */
 	save_item(NAME(m_video_bank));
 	save_pointer(NAME(m_video_ram.target()), JTC_ES40_VIDEORAM_SIZE);
-	save_pointer(NAME(m_color_ram_r.get()), JTC_ES40_VIDEORAM_SIZE);
-	save_pointer(NAME(m_color_ram_g.get()), JTC_ES40_VIDEORAM_SIZE);
-	save_pointer(NAME(m_color_ram_b.get()), JTC_ES40_VIDEORAM_SIZE);
+	save_pointer(NAME(m_color_ram_r), JTC_ES40_VIDEORAM_SIZE);
+	save_pointer(NAME(m_color_ram_g), JTC_ES40_VIDEORAM_SIZE);
+	save_pointer(NAME(m_color_ram_b), JTC_ES40_VIDEORAM_SIZE);
 	save_item(NAME(m_centronics_busy));
 }
 

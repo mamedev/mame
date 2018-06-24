@@ -128,13 +128,16 @@ com5016_013_device::com5016_013_device(const machine_config &mconfig, const char
 void com8116_device::device_start()
 {
 	// resolve callbacks
-	m_fx4_handler.resolve_safe();
+	m_fx4_handler.resolve();
 	m_fr_handler.resolve_safe();
 	m_ft_handler.resolve_safe();
 
 	// allocate timers
-	m_fx4_timer = timer_alloc(TIMER_FX4);
-	m_fx4_timer->adjust(attotime::from_hz((clock() / 4) * 2), 0, attotime::from_hz((clock() / 4)) * 2);
+	if (!m_fx4_handler.isnull())
+	{
+		m_fx4_timer = timer_alloc(TIMER_FX4);
+		m_fx4_timer->adjust(attotime::from_hz((clock() / 4) * 2), 0, attotime::from_hz((clock() / 4)) * 2);
+	}
 	m_fr_timer = timer_alloc(TIMER_FR);
 	m_ft_timer = timer_alloc(TIMER_FT);
 
@@ -213,4 +216,26 @@ void com8116_device::write_stt(uint8_t data)
 	LOGMASKED(LOG_SELECTED, "Transmitter Divisor Select %01X: %u (%u Hz)\n", data & 0x0f, m_divisors[ft_divider], ft_clock);
 
 	m_ft_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(ft_clock * 2));
+}
+
+
+//-------------------------------------------------
+//  str_stt_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER(com8116_device::str_stt_w)
+{
+	write_str(data >> 4);
+	write_stt(data & 0x0f);
+}
+
+
+//-------------------------------------------------
+//  stt_str_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER(com8116_device::stt_str_w)
+{
+	write_stt(data >> 4);
+	write_str(data & 0x0f);
 }

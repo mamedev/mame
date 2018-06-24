@@ -48,10 +48,10 @@ public:
 	dynax_blitter_rev2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// static configuration
-	template<class Object> devcb_base &set_vram_out_cb(Object &&object) { return m_vram_out_cb.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_scrollx_cb(Object &&object) { return m_scrollx_cb.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_scrolly_cb(Object &&object) { return m_scrolly_cb.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_ready_cb(Object &&object) { return m_ready_cb.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_vram_out_cb(Object &&cb) { return m_vram_out_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_scrollx_cb(Object &&cb) { return m_scrollx_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_scrolly_cb(Object &&cb) { return m_scrolly_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_ready_cb(Object &&cb) { return m_ready_cb.set_callback(std::forward<Object>(cb)); }
 
 	// write handlers
 	DECLARE_WRITE8_MEMBER(pen_w);
@@ -100,7 +100,7 @@ public:
 	// construction/destruction
 	cdracula_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template<class Object> devcb_base &set_blit_dest_cb(Object &&object) { return m_blit_dest_cb.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_blit_dest_cb(Object &&cb) { return m_blit_dest_cb.set_callback(std::forward<Object>(cb)); }
 
 	// write handlers
 	DECLARE_WRITE8_MEMBER(flags_w);

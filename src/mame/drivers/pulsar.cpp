@@ -52,7 +52,6 @@ public:
 	pulsar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_brg(*this, "brg")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
@@ -62,7 +61,6 @@ public:
 	void init_pulsar();
 	DECLARE_MACHINE_RESET(pulsar);
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
-	DECLARE_WRITE8_MEMBER(baud_w);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
 	DECLARE_WRITE8_MEMBER(ppi_pb_w);
 	DECLARE_WRITE8_MEMBER(ppi_pc_w);
@@ -74,7 +72,6 @@ public:
 private:
 	floppy_image_device *m_floppy;
 	required_device<cpu_device> m_maincpu;
-	required_device<com8116_device> m_brg;
 	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -96,15 +93,9 @@ void pulsar_state::pulsar_io(address_map &map)
 	map(0xc0, 0xc3).mirror(0x0c).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0xd0, 0xd3).mirror(0x0c).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
 	map(0xe0, 0xe3).mirror(0x0c).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf0, 0xff).w(FUNC(pulsar_state::baud_w));
+	map(0xf0, 0xf0).mirror(0x0f).w("brg", FUNC(com8116_device::stt_str_w));
 }
 
-
-WRITE8_MEMBER( pulsar_state::baud_w )
-{
-	m_brg->write_str(data & 0x0f);
-	m_brg->write_stt(data >> 4);
-}
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 TIMER_CALLBACK_MEMBER( pulsar_state::pulsar_reset)

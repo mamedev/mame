@@ -229,12 +229,12 @@ void legionna_state::common_video_allocate_ptr()
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
 
-	save_pointer(NAME(m_back_data.get()), 0x800/2);
-	save_pointer(NAME(m_fore_data.get()), 0x800/2);
-	save_pointer(NAME(m_mid_data.get()), 0x800/2);
-	save_pointer(NAME(m_textram.get()), 0x1000/2);
-	save_pointer(NAME(m_scrollram16.get()), 0x60/2);
-	save_pointer(NAME(m_paletteram.get()), 0x1000/2);
+	save_pointer(NAME(m_back_data), 0x800/2);
+	save_pointer(NAME(m_fore_data), 0x800/2);
+	save_pointer(NAME(m_mid_data), 0x800/2);
+	save_pointer(NAME(m_textram), 0x1000/2);
+	save_pointer(NAME(m_scrollram16), 0x60/2);
+	save_pointer(NAME(m_paletteram), 0x1000/2);
 
 	save_item(NAME(m_back_gfx_bank));
 	save_item(NAME(m_mid_gfx_bank));
