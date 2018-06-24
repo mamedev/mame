@@ -11903,7 +11903,7 @@ void seta_state::init_downtown()
 	init_bank6502();
 
 	m_downtown_protection = make_unique_clear<uint16_t[]>(0x200/2);
-	save_pointer(NAME(m_downtown_protection.get()),0x200/2);
+	save_pointer(NAME(m_downtown_protection),0x200/2);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(FUNC(seta_state::downtown_protection_r),this), write16_delegate(FUNC(seta_state::downtown_protection_w),this));
 }
@@ -12013,8 +12013,8 @@ void seta_state::init_pairlove()
 {
 	m_pairslove_protram = make_unique_clear<uint16_t[]>(0x200/2);
 	m_pairslove_protram_old = make_unique_clear<uint16_t[]>(0x200/2);
-	save_pointer(NAME(m_pairslove_protram.get()), 0x200/2);
-	save_pointer(NAME(m_pairslove_protram_old.get()), 0x200/2);
+	save_pointer(NAME(m_pairslove_protram), 0x200/2);
+	save_pointer(NAME(m_pairslove_protram_old), 0x200/2);
 }
 
 void seta_state::init_wiggie()

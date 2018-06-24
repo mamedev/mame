@@ -652,7 +652,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	}
 
 	// save states
-//  save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+//  save_pointer(NAME(m_scu_regs), 0x100/4);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_vdp2.odd));

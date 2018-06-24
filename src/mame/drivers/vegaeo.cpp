@@ -153,7 +153,7 @@ INPUT_PORTS_END
 VIDEO_START_MEMBER(vegaeo_state,vega)
 {
 	m_vram = std::make_unique<uint8_t[]>(0x14000*2);
-	save_pointer(NAME(m_vram.get()), 0x14000*2);
+	save_pointer(NAME(m_vram), 0x14000*2);
 	save_item(NAME(m_vbuffer));
 }
 

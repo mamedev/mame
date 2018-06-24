@@ -346,8 +346,8 @@ void pasha2_state::video_start()
 	{
 		m_bitmap0[i] = make_unique_clear<uint8_t[]>(0x20000);
 		m_bitmap1[i] = make_unique_clear<uint8_t[]>(0x20000);
-		save_pointer(NAME(m_bitmap0[i].get()), 0x20000, i);
-		save_pointer(NAME(m_bitmap1[i].get()), 0x20000, i);
+		save_pointer(NAME(m_bitmap0[i]), 0x20000, i);
+		save_pointer(NAME(m_bitmap1[i]), 0x20000, i);
 	}
 }
 

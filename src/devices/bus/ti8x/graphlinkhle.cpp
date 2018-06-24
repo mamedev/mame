@@ -32,7 +32,7 @@ void graph_link_hle_device::device_start()
 {
 	m_buffer = std::make_unique<u8 []>(BUFLEN);
 
-	save_pointer(NAME(m_buffer.get()), BUFLEN);
+	save_pointer(NAME(m_buffer), BUFLEN);
 }
 
 

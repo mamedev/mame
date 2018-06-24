@@ -290,7 +290,7 @@ void gunpey_state::video_start()
 	m_vram = std::make_unique<uint8_t[]>(0x400000);
 	std::fill_n(&m_vram[0], 0x400000, 0xff);
 	m_blitter_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gunpey_state::blitter_end), this));
-	save_pointer(NAME(m_vram.get()), 0x400000);
+	save_pointer(NAME(m_vram), 0x400000);
 }
 
 uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,uint8_t scene_gradient)

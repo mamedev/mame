@@ -2318,7 +2318,7 @@ void cps_state::video_start()
 #endif
 	save_item(NAME(m_last_sprite_offset));
 
-	save_pointer(NAME(m_buffered_obj.get()), m_obj_size / 2);
+	save_pointer(NAME(m_buffered_obj), m_obj_size / 2);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
 }
@@ -2334,7 +2334,7 @@ void cps2_state::video_start()
 	memset(m_objram2, 0, m_cps2_obj_size);
 
 	save_item(NAME(m_cps2_last_sprite_offset));
-	save_pointer(NAME(m_cps2_buffered_obj.get()), m_cps2_obj_size / 2);
+	save_pointer(NAME(m_cps2_buffered_obj), m_cps2_obj_size / 2);
 	save_item(NAME(m_pri_ctrl));
 	save_item(NAME(m_objram_bank));
 }

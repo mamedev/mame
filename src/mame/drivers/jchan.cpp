@@ -273,10 +273,10 @@ void jchan_state::video_start()
 	m_spritegen[1]->skns_sprite_kludge(0,0);
 
 	save_item(NAME(m_irq_sub_enable));
-	save_pointer(NAME(m_sprite_ram32[0].get()), 0x4000/4);
-	save_pointer(NAME(m_sprite_ram32[1].get()), 0x4000/4);
-	save_pointer(NAME(m_sprite_regs32[0].get()), 0x40/4);
-	save_pointer(NAME(m_sprite_regs32[1].get()), 0x40/4);
+	save_pointer(NAME(m_sprite_ram32[0]), 0x4000/4);
+	save_pointer(NAME(m_sprite_ram32[1]), 0x4000/4);
+	save_pointer(NAME(m_sprite_regs32[0]), 0x40/4);
+	save_pointer(NAME(m_sprite_regs32[1]), 0x40/4);
 }
 
 

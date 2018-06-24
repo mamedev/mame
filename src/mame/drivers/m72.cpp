@@ -436,7 +436,7 @@ void m72_state::init_m72_8751()
 	program.install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::main_mcu_w),this));
 	membank("bank1")->configure_entry(0, m_protection_ram.get());
 
-	save_pointer(NAME(m_protection_ram.get()), 0x10000/2);
+	save_pointer(NAME(m_protection_ram), 0x10000/2);
 	save_item(NAME(m_mcu_sample_latch));
 	save_item(NAME(m_mcu_sample_addr));
 	save_item(NAME(m_mcu_snd_cmd_latch));
@@ -784,7 +784,7 @@ void m72_state::install_protection_handler(const uint8_t *code,const uint8_t *cr
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::protection_w),this));
 	membank("bank1")->configure_entry(0, m_protection_ram.get());
 
-	save_pointer(NAME(m_protection_ram.get()), 0x1000/2);
+	save_pointer(NAME(m_protection_ram), 0x1000/2);
 }
 
 void m72_state::init_bchopper()

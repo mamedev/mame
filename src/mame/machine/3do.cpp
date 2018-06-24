@@ -1116,15 +1116,11 @@ void _3do_state::m_clio_init()
 	m_clio.revision = 0x02022000 /* 0x04000000 */;
 	m_clio.unclerev = 0x03800000;
 	m_clio.expctl = 0x80;    /* ARM has the expansion bus */
-	m_dspp.N = std::make_unique<uint16_t[]>(0x800 );
-	m_dspp.EI = std::make_unique<uint16_t[]>(0x400 );
-	m_dspp.EO = std::make_unique<uint16_t[]>(0x400 );
+	m_dspp.N = make_unique_clear<uint16_t[]>(0x800);
+	m_dspp.EI = make_unique_clear<uint16_t[]>(0x400);
+	m_dspp.EO = make_unique_clear<uint16_t[]>(0x400);
 
-	memset(m_dspp.N.get(), 0, sizeof(uint16_t) * 0x400);
-	memset(m_dspp.EI.get(), 0, sizeof(uint16_t) * 0x400);
-	memset(m_dspp.EO.get(), 0, sizeof(uint16_t) * 0x400);
-
-	save_pointer(NAME(m_dspp.N.get()), 0x800);
-	save_pointer(NAME(m_dspp.EI.get()), 0x400);
-	save_pointer(NAME(m_dspp.EO.get()), 0x400);
+	save_pointer(NAME(m_dspp.N), 0x800);
+	save_pointer(NAME(m_dspp.EI), 0x400);
+	save_pointer(NAME(m_dspp.EO), 0x400);
 }

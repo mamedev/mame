@@ -82,9 +82,9 @@ void st0020_device::device_start()
 	}
 
 	// Save state
-	save_pointer(NAME(m_gfxram.get()),      4 * 0x100000/2);
-	save_pointer(NAME(m_spriteram.get()),   0x80000/2);
-	save_pointer(NAME(m_regs.get()),        0x100/2);
+	save_pointer(NAME(m_gfxram),      4 * 0x100000/2);
+	save_pointer(NAME(m_spriteram),   0x80000/2);
+	save_pointer(NAME(m_regs),        0x100/2);
 	save_item(NAME(m_gfxram_bank));
 }
 
