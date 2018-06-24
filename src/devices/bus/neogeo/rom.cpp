@@ -86,7 +86,7 @@ MACHINE_CONFIG_END
 void neogeo_vliner_cart_device::device_start()
 {
 	m_cart_ram = make_unique_clear<uint16_t[]>(0x1000);
-	save_pointer(NAME(m_cart_ram.get()), 0x1000);
+	save_pointer(NAME(m_cart_ram), 0x1000);
 	m_cart_nvram->set_base((uint8_t*)m_cart_ram.get(), 0x1000*2);
 }
 

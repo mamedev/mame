@@ -19,7 +19,7 @@ pvc_prot_device::pvc_prot_device(const machine_config &mconfig, const char *tag,
 void pvc_prot_device::device_start()
 {
 	m_cart_ram = make_unique_clear<uint16_t[]>(0x1000);
-	save_pointer(NAME(m_cart_ram.get()), 0x1000);
+	save_pointer(NAME(m_cart_ram), 0x1000);
 }
 
 void pvc_prot_device::device_reset()

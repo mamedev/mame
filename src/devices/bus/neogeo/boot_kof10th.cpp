@@ -34,8 +34,8 @@ void neogeo_kof10th_cart_device::device_start()
 	m_cart_ram = std::make_unique<uint16_t[]>(0x1000);
 	m_cart_ram2 = std::make_unique<uint16_t[]>(0x10000);
 	save_item(NAME(m_special_bank));
-	save_pointer(NAME(m_cart_ram.get()), 0x1000);
-	save_pointer(NAME(m_cart_ram2.get()), 0x10000);
+	save_pointer(NAME(m_cart_ram), 0x1000);
+	save_pointer(NAME(m_cart_ram2), 0x10000);
 }
 
 void neogeo_kof10th_cart_device::device_reset()
