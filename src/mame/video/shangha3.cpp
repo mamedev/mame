@@ -144,8 +144,8 @@ WRITE16_MEMBER(shangha3_state::blitter_go_w)
 		{
 			rectangle myclip;
 
-//			if (shangha3_ram[offs+11] || shangha3_ram[offs+12])
-//			logerror("offs %04x: sx %04x sy %04x zoom %04x %04x %04x %04x fx %d fy %d\n",offs,sx,sy,zoomx,shangha3_ram[offs+11]),shangha3_ram[offs+12],zoomy,flipx,flipy);
+//          if (shangha3_ram[offs+11] || shangha3_ram[offs+12])
+//              logerror("offs %04x: sx %04x sy %04x zoom %04x %04x %04x %04x fx %d fy %d\n",offs,sx,sy,zoomx,shangha3_ram[offs+11]),shangha3_ram[offs+12],zoomy,flipx,flipy);
 
 			myclip.set(sx, sx + sizex, sy, sy + sizey);
 			myclip &= rawbitmap.cliprect();
