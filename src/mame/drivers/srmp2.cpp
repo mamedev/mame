@@ -172,8 +172,8 @@ WRITE16_MEMBER(srmp2_state::srmp2_flags_w)
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0) );
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 4) );
-	m_adpcm_bank = ( (data & 0x20) << 11 );
-	m_color_bank = ( (data & 0x80) >> 2 );
+	m_adpcm_bank = ( (data & 0x20) >> 5 );
+	m_color_bank = ( (data & 0x80) >> 7 );
 }
 
 
@@ -196,7 +196,7 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_adpcm_bank_w)
     --xx ---- : GFX Bank
 */
 
-	m_adpcm_bank = (data & 0x0f) << 16;
+	m_adpcm_bank = (data & 0x0f);
 	m_gfx_bank = ((data >> 4) & 0x03);
 }
 
@@ -210,14 +210,14 @@ WRITE8_MEMBER(srmp2_state::adpcm_code_w)
       table and plays the ADPCM for itself.
 */
 
-	m_adpcm_sptr = (m_adpcm_rom[(m_adpcm_bank + (data << 2) + 0)] << 8);
-	m_adpcm_eptr = (m_adpcm_rom[(m_adpcm_bank + (data << 2) + 1)] << 8);
-	m_adpcm_eptr = (m_adpcm_eptr - 1) & 0x0ffff;
+	m_adpcm_sptr = (m_adpcm_rom[((m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
+	m_adpcm_eptr = (m_adpcm_rom[((m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
+	m_adpcm_eptr  = (m_adpcm_eptr - 1) & 0x0ffff;
 
-	m_adpcm_sptr += m_adpcm_bank;
-	m_adpcm_eptr += m_adpcm_bank;
+	m_adpcm_sptr += (m_adpcm_bank * 0x10000);
+	m_adpcm_eptr += (m_adpcm_bank * 0x10000);
 
-	//printf("%02x %08x %08x %08x\n",data,m_adpcm_sptr,m_adpcm_eptr,(m_adpcm_bank + (data << 2) + 0));
+	//printf("%02x %08x %08x %08x\n",data,m_adpcm_sptr,m_adpcm_eptr,((m_adpcm_bank * 0x10000) + (data << 2) + 0));
 
 	m_msm->reset_w(0);
 	m_adpcm_data = -1;
@@ -365,7 +365,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
     ---x ---- : unknown
     xxx- ---- : ADPCM ROM bank
 */
-	m_adpcm_bank = ((data & 0xe0) << 11);
+	m_adpcm_bank = ((data & 0xe0) >> 5);
 
 	m_mainbank->set_entry(data & 0x0f);
 }
@@ -459,7 +459,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_flags_w)
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0) );
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 4) );
-	m_gfx_bank = (data & 0xc0) << 7;
+	m_gfx_bank = (data >> 6) & 0x03;
 }
 
 WRITE8_MEMBER(srmp2_state::srmp3_irq_ack_w)
@@ -512,7 +512,7 @@ WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
     ---x xxxx : MAIN ROM bank
     xxx- ---- : ADPCM ROM bank
 */
-	m_adpcm_bank = ((data & 0xe0) << 11);
+	m_adpcm_bank = ((data & 0xe0) >> 5);
 
 	m_mainbank->set_entry(data & 0x1f);
 }

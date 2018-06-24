@@ -41,7 +41,7 @@ PALETTE_INIT_MEMBER(srmp2_state,srmp3)
 
 SETA001_SPRITE_GFXBANK_CB_MEMBER(srmp2_state::srmp3_gfxbank_callback)
 {
-	return (code & 0x3fff) + ((code & 0x2000) ? m_gfx_bank : 0);
+	return (code & 0x3fff) + ((code & 0x2000) ? (m_gfx_bank<<13) : 0);
 }
 
 
@@ -51,7 +51,7 @@ uint32_t srmp2_state::screen_update_srmp2(screen_device &screen, bitmap_ind16 &b
 
 	m_seta001->set_transpen(15);
 
-	m_seta001->set_colorbase(m_color_bank);
+	m_seta001->set_colorbase(m_color_bank<<5);
 
 	m_seta001->set_fg_xoffsets( 0x10, 0x10 );
 	m_seta001->set_fg_yoffsets( 0x05, 0x07 );
