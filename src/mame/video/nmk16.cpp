@@ -93,8 +93,8 @@ void nmk16_state::nmk16_video_init()
 	m_tilerambank = 0;
 	m_sprclk = 0;
 
-	save_pointer(NAME(m_spriteram_old.get()), 0x1000/2);
-	save_pointer(NAME(m_spriteram_old2.get()), 0x1000/2);
+	save_pointer(NAME(m_spriteram_old), 0x1000/2);
+	save_pointer(NAME(m_spriteram_old2), 0x1000/2);
 	save_item(NAME(m_bgbank));
 	save_item(NAME(m_mustang_bg_xscroll));
 	save_item(NAME(m_scroll[0]));
@@ -576,8 +576,8 @@ VIDEO_START_MEMBER(nmk16_state,afega)
 			8,8, 32,32);
 
 	m_tx_tilemap->set_transparent_pen(0xf);
-	save_pointer(NAME(m_spriteram_old.get()), 0x1000/2);
-	save_pointer(NAME(m_spriteram_old2.get()), 0x1000/2);
+	save_pointer(NAME(m_spriteram_old), 0x1000/2);
+	save_pointer(NAME(m_spriteram_old2), 0x1000/2);
 }
 
 
@@ -600,8 +600,8 @@ VIDEO_START_MEMBER(nmk16_state,grdnstrm)
 			8,8, 32,32);
 
 	m_tx_tilemap->set_transparent_pen(0xf);
-	save_pointer(NAME(m_spriteram_old.get()), 0x1000/2);
-	save_pointer(NAME(m_spriteram_old2.get()), 0x1000/2);
+	save_pointer(NAME(m_spriteram_old), 0x1000/2);
+	save_pointer(NAME(m_spriteram_old2), 0x1000/2);
 }
 
 
