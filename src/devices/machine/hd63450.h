@@ -126,11 +126,13 @@ private:
 	// internal state
 	hd63450_regs m_reg[4];
 	emu_timer* m_timer[4];  // for timing data reading/writing each channel
-	int m_in_progress[4];  // if a channel is in use
 	int m_transfer_size[4];
 	int m_halted[4];  // non-zero if a channel has been halted, and can be continued later.
 	required_device<cpu_device> m_cpu;
 	bool m_drq_state[4];
+
+	// tell if a channel is in use
+	bool dma_in_progress(int channel) const { return (m_reg[channel].csr & 0x08) != 0; }
 
 	TIMER_CALLBACK_MEMBER(dma_transfer_timer);
 	void dma_transfer_abort(int channel);
