@@ -159,10 +159,14 @@ WRITE16_MEMBER(hd63450_device::write)
 	case 0x00:  // CSR / CER
 		if(ACCESSING_BITS_8_15)
 		{
-			m_reg[channel].csr &= ~((data & 0xff00) >> 8);
+			// Writes to CSR clear all corresponding 1 bits except PCS and ACT
+			m_reg[channel].csr &= ~((data & 0xf600) >> 8);
 //          logerror("DMA#%i: Channel status write : %02x\n",channel,dmac.reg[channel].csr);
+
+			// Clearing ERR also resets CER (which is otherwise read-only)
+			if ((data & 0x1000) != 0)
+				m_reg[channel].cer = 0;
 		}
-		// CER is read-only, so no action needed there.
 		break;
 	case 0x02:  // DCR / OCR
 		if(ACCESSING_BITS_8_15)
