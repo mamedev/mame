@@ -17,28 +17,28 @@
 	devcb = &downcast<hd63450_device &>(*device).set_dma_error_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_0_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_read_0_callback(DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_read_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_1_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_read_1_callback(DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_read_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_2_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_read_2_callback(DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_read_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_3_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_read_3_callback(DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_read_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_0_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_write_0_callback(DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_write_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_1_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_write_1_callback(DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_write_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_2_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_write_2_callback(DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_write_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_3_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_write_3_callback(DEVCB_##_devcb);
+	devcb = &downcast<hd63450_device &>(*device).set_dma_write_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_CPU(_tag) \
 	downcast<hd63450_device &>(*device).set_cpu_tag(_tag);
@@ -56,14 +56,8 @@ public:
 
 	template <class Object> devcb_base &set_dma_end_callback(Object &&cb) { return m_dma_end.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dma_error_callback(Object &&cb) { return m_dma_error.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_read_0_callback(Object &&cb) { return m_dma_read_0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_read_1_callback(Object &&cb) { return m_dma_read_1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_read_2_callback(Object &&cb) { return m_dma_read_2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_read_3_callback(Object &&cb) { return m_dma_read_3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_write_0_callback(Object &&cb) { return m_dma_write_0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_write_1_callback(Object &&cb) { return m_dma_write_1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_write_2_callback(Object &&cb) { return m_dma_write_2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_write_3_callback(Object &&cb) { return m_dma_write_3.set_callback(std::forward<Object>(cb)); }
+	template <int Ch, class Object> devcb_base &set_dma_read_callback(Object &&cb) { return m_dma_read[Ch].set_callback(std::forward<Object>(cb)); }
+	template <int Ch, class Object> devcb_base &set_dma_write_callback(Object &&cb) { return m_dma_write[Ch].set_callback(std::forward<Object>(cb)); }
 
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { m_cpu.set_tag(std::forward<T>(cpu_tag)); }
 	void set_our_clocks(const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
@@ -123,14 +117,8 @@ private:
 
 	devcb_write8 m_dma_end;
 	devcb_write8 m_dma_error;
-	devcb_read8 m_dma_read_0;
-	devcb_read8 m_dma_read_1;
-	devcb_read8 m_dma_read_2;
-	devcb_read8 m_dma_read_3;
-	devcb_write8 m_dma_write_0;
-	devcb_write8 m_dma_write_1;
-	devcb_write8 m_dma_write_2;
-	devcb_write8 m_dma_write_3;
+	devcb_read8 m_dma_read[4];
+	devcb_write8 m_dma_write[4];
 
 	attotime m_our_clock[4];
 	attotime m_burst_clock[4];
