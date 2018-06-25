@@ -291,6 +291,15 @@ READ16_MEMBER(topcat_device::ctrl_r)
 	case TOPCAT_REG_BLOCK_MOVER_PIXEL_HEIGHT:
 		ret = m_block_mover_pixel_height;
 		break;
+	case TOPCAT_REG_CURSOR_X_POS:
+		ret = m_cursor_x_pos;
+		break;
+	case TOPCAT_REG_CURSOR_Y_POS:
+		ret = m_cursor_y_pos;
+		break;
+	case TOPCAT_REG_CURSOR_WIDTH:
+		ret = m_cursor_width;
+		break;
 	default:
 		logerror("unknown register read %02x\n", offset);
 		return space.unmap();
@@ -377,12 +386,15 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 		break;
 	case TOPCAT_REG_CURSOR_X_POS:
 		update_cursor(data, m_cursor_y_pos, m_cursor_plane_enable, m_cursor_width);
+		m_cursor_x_pos = data;
 		break;
 	case TOPCAT_REG_CURSOR_Y_POS:
 		update_cursor(m_cursor_x_pos, data, m_cursor_plane_enable, m_cursor_width);
+		m_cursor_y_pos = data;
 		break;
 	case TOPCAT_REG_CURSOR_WIDTH:
 		update_cursor(m_cursor_x_pos, m_cursor_y_pos, m_cursor_plane_enable, data);
+		m_cursor_width = data;
 		break;
 	default:
 		logerror("unknown register: %02X = %04x\n", offset, data, mem_mask);
