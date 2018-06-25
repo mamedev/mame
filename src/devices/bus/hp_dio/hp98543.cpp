@@ -29,6 +29,7 @@ MACHINE_CONFIG_START(dio16_98543_device::device_add_mconfig)
 	MCFG_SCREEN_SIZE(1024,400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(70)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dio16_98543_device, vblank_w));
 
 	MCFG_DEVICE_ADD("topcat0", TOPCAT, XTAL(35904000))
 	MCFG_TOPCAT_FB_WIDTH(1024)
@@ -152,6 +153,11 @@ WRITE16_MEMBER(dio16_98543_device::vram_w)
 		tc->vram_w(space, offset, data, mem_mask);
 }
 
+WRITE_LINE_MEMBER(dio16_98543_device::vblank_w)
+{
+	for (auto &tc: m_topcat)
+		tc->vblank_w(state);
+}
 uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int startx[TOPCAT_COUNT], starty[TOPCAT_COUNT];

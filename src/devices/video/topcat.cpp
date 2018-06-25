@@ -334,7 +334,7 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 
 	switch (offset) {
 	case TOPCAT_REG_VBLANK:
-		m_vblank = data & 0xff;
+		m_vblank = data;
 		break;
 	case TOPCAT_REG_WMOVE_ACTIVE:
 		break;
@@ -410,6 +410,13 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 	}
 }
 
+WRITE_LINE_MEMBER(topcat_device::vblank_w)
+{
+	if (state)
+		m_vblank |= (m_plane_mask << 8);
+	else
+		m_vblank &= ~(m_plane_mask << 8);
+}
 bool topcat_device::plane_enabled()
 {
 	if (!((m_display_enable_planes >> 8) & m_plane_mask))

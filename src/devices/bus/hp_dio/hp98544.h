@@ -41,6 +41,7 @@ public:
 	virtual space_config_vector memory_space_config() const override;
 private:
 
+	WRITE_LINE_MEMBER(vblank_w);
 	static constexpr int m_v_pix = 768;
 	static constexpr int m_h_pix = 1024;
 

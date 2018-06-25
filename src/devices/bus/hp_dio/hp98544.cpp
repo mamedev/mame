@@ -37,6 +37,7 @@ MACHINE_CONFIG_START(dio16_98544_device::device_add_mconfig)
 	MCFG_SCREEN_SIZE(1024,1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 	MCFG_SCREEN_REFRESH_RATE(70)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dio16_98544_device, vblank_w))
 
 	MCFG_DEVICE_ADD("topcat", TOPCAT, XTAL(35904000))
 	MCFG_TOPCAT_FB_WIDTH(1024)
@@ -126,6 +127,10 @@ WRITE16_MEMBER(dio16_98544_device::rom_w)
 {
 }
 
+WRITE_LINE_MEMBER(dio16_98544_device::vblank_w)
+{
+	m_topcat->vblank_w(state);
+}
 uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int startx, starty, endx, endy;

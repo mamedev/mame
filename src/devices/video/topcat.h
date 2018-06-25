@@ -29,6 +29,7 @@ public:
 	DECLARE_READ16_MEMBER(ctrl_r);
 	DECLARE_WRITE16_MEMBER(ctrl_w);
 
+	WRITE_LINE_MEMBER(vblank_w);
 	void topcat_mem(address_map &map);
 
 	bool plane_enabled();
@@ -112,7 +113,7 @@ private:
 		return m_vram[y * m_fb_width + x] & m_plane_mask;
 	}
 
-	uint8_t m_vblank;
+	uint16_t m_vblank;
 	uint8_t m_wmove_active;
 	uint8_t m_vert_retrace_intrq;
 	uint8_t m_wmove_intrq;
