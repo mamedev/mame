@@ -92,6 +92,10 @@ void hd63450_device::device_reset()
 		m_reg[x].csr &= 0xfe;
 		m_reg[x].cer = 0;
 		m_reg[x].gcr = 0;
+
+		m_timer[x]->adjust(attotime::never);
+		m_in_progress[x] = 0;
+		m_halted[x] = 0;
 	}
 }
 
