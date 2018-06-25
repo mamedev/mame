@@ -37,6 +37,8 @@
 #include "speaker.h"
 
 
+#define EMULATE_BLITTER 0 // FIXME: code is incomplete
+
 class tmmjprd_state : public driver_device
 {
 public:
@@ -48,6 +50,9 @@ public:
 		m_palette(*this, "palette"),
 		m_tilemap_regs(*this, "tilemap_regs.%u", 0),
 		m_spriteregs(*this, "spriteregs"),
+#if EMULATE_BLITTER
+		m_blitterregs(*this, "blitterregs"),
+#endif
 		m_spriteram(*this, "spriteram"),
 		m_gfxroms(*this, "gfx2"),
 		m_pl1(*this, "PL1.%u", 1),
@@ -69,6 +74,9 @@ private:
 
 	required_shared_ptr_array<uint32_t, 4> m_tilemap_regs;
 	required_shared_ptr<uint32_t> m_spriteregs;
+#if EMULATE_BLITTER
+	required_shared_ptr<uint32_t> m_blitterregs;
+#endif
 	required_shared_ptr<uint32_t> m_spriteram;
 
 	required_region_ptr<uint8_t> m_gfxroms;
@@ -81,7 +89,10 @@ private:
 	uint8_t m_mux_data;
 	uint8_t m_system_in;
 	double m_old_brt[2];
+#if EMULATE_BLITTER
+	tilemap_t *m_tilemap[4];
 	emu_timer *m_blit_done_timer;
+#endif
 
 	template<uint8_t Tilemap> DECLARE_WRITE32_MEMBER(tilemap_w);
 	template<uint8_t Tilemap> DECLARE_READ32_MEMBER(tilemap_r);
@@ -90,12 +101,17 @@ private:
 	template<uint8_t Number> DECLARE_WRITE32_MEMBER(brt_w);
 	DECLARE_WRITE32_MEMBER(eeprom_write);
 
+#if EMULATE_BLITTER
+	DECLARE_WRITE32_MEMBER(blitter_w);
+	void do_blit();
+#endif
+
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-#if 0
+#if EMULATE_BLITTER
 	TIMER_CALLBACK_MEMBER(blit_done);
 #endif
 
@@ -379,7 +395,7 @@ READ32_MEMBER(tmmjprd_state::randomtmmjprds)
 #define BLITCMDLOG 0
 #define BLITLOG 0
 
-#if 0
+#if EMULATE_BLITTER
 TIMER_CALLBACK_MEMBER(tmmjprd_state::blit_done)
 {
 	m_maincpu->set_input_line(3, HOLD_LINE);
@@ -429,7 +445,7 @@ void tmmjprd_state::do_blit()
 				if (!blt_amount)
 				{
 					if(BLITLOG) osd_printf_debug("end of blit list\n");
-					m_blit_done_timer->adjust(attotime::from_usec(500);
+					m_blit_done_timer->adjust(attotime::from_usec(500));
 					return;
 				}
 
@@ -493,7 +509,7 @@ WRITE32_MEMBER(tmmjprd_state::blitter_w)
 
 void tmmjprd_state::machine_start()
 {
-#if 0
+#if EMULATE_BLITTER
 	m_blit_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tmmjprd_state::blit_done), this));
 #endif
 
@@ -659,7 +675,9 @@ void tmmjprd_state::main_map(address_map &map)
 	map(0x20040c, 0x20040f).w(FUNC(tmmjprd_state::brt_w<0>));
 	map(0x200410, 0x200413).w(FUNC(tmmjprd_state::brt_w<1>));
 //  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_SHARE("viewregs7")
-//  AM_RANGE(0x200700, 0x20070f) AM_WRITE(blitter_w) AM_SHARE("blitterregs")
+#if EMULATE_BLITTER
+	map(0x200700, 0x20070f).w(FUNC(tmmjprd_state::blitter_w)).share(m_blitterregs);
+#endif
 //  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_SHARE("viewregs9") // never changes?
 	map(0x200900, 0x2009ff).rw("i5000snd", FUNC(i5000snd_device::read), FUNC(i5000snd_device::write));
 	/* hmm */
