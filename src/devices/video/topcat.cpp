@@ -12,6 +12,7 @@ DEFINE_DEVICE_TYPE(TOPCAT, topcat_device, "topcat", "HP Topcat ASIC")
 topcat_device::topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_cursor_timer(nullptr),
+	m_int_write_func(*this),
 	m_vram(*this, "^vram")
 {
 }
@@ -25,6 +26,8 @@ void topcat_device::device_start()
 {
 	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(topcat_device::cursor_callback), this));
 	m_cursor_timer->adjust(attotime::from_hz(3));
+
+	m_int_write_func.resolve_safe();
 
 	save_item(NAME(m_vblank));
 	save_item(NAME(m_wmove_active));
@@ -226,6 +229,12 @@ void topcat_device::window_move()
 	}
 }
 
+void topcat_device::update_int()
+{
+	LOG("%s: wmove %02x retrace %02x\n", __FUNCTION__, m_wmove_intrq, m_vert_retrace_intrq);
+	m_int_write_func((m_wmove_intrq || m_vert_retrace_intrq) ? ASSERT_LINE : CLEAR_LINE);
+}
+
 READ16_MEMBER(topcat_device::ctrl_r)
 {
 	if (!m_read_enable)
@@ -241,9 +250,13 @@ READ16_MEMBER(topcat_device::ctrl_r)
 		break;
 	case TOPCAT_REG_VERT_RETRACE_INTRQ:
 		ret = m_vert_retrace_intrq;
+		m_vert_retrace_intrq = 0;
+		update_int();
 		break;
 	case TOPCAT_REG_WMOVE_INTRQ:
 		ret = m_wmove_intrq;
+		m_wmove_intrq = 0;
+		update_int();
 		break;
 	case TOPCAT_REG_DISPLAY_PLANE_ENABLE:
 		ret = m_display_enable_planes;
@@ -257,13 +270,15 @@ READ16_MEMBER(topcat_device::ctrl_r)
 	case TOPCAT_REG_FB_WRITE_ENABLE:
 		ret = m_fb_write_enable;
 		break;
-	case TOPCAT_REG_UNKNOWN_4A:
+	case TOPCAT_REG_WMOVE_IE:
 		ret = m_unknown_reg4a;
 		break;
-	case TOPCAT_REG_UNKNOWN_4C:
+	case TOPCAT_REG_VBLANK_IE:
 		ret = m_unknown_reg4c;
 		break;
 	case TOPCAT_REG_START_WMOVE:
+		m_wmove_intrq = 0;
+		update_int();
 		ret = 0;
 		break;
 	case TOPCAT_REG_ENABLE_BLINK_PLANES:
@@ -339,10 +354,12 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 	case TOPCAT_REG_WMOVE_ACTIVE:
 		break;
 	case TOPCAT_REG_VERT_RETRACE_INTRQ:
-		m_vert_retrace_intrq = data;
+		m_vert_retrace_intrq = 0;
+		update_int();
 		break;
 	case TOPCAT_REG_WMOVE_INTRQ:
-		m_wmove_intrq = data;
+		m_wmove_intrq = 0;
+		update_int();
 		break;
 	case TOPCAT_REG_DISPLAY_PLANE_ENABLE:
 		m_display_enable_planes = data;
@@ -350,14 +367,22 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 	case TOPCAT_REG_FB_WRITE_ENABLE:
 		m_fb_write_enable = data;
 		break;
-	case TOPCAT_REG_UNKNOWN_4A:
+	case TOPCAT_REG_WMOVE_IE:
 		m_unknown_reg4a = data;
+		m_wmove_intrq = 0;
+		update_int();
 		break;
-	case TOPCAT_REG_UNKNOWN_4C:
+	case TOPCAT_REG_VBLANK_IE:
 		m_unknown_reg4c = data;
+		m_vert_retrace_intrq = 0;
+		update_int();
 		break;
 	case TOPCAT_REG_START_WMOVE:
 		window_move();
+		if (m_unknown_reg4a) {
+			m_wmove_intrq = m_plane_mask << 8;
+			update_int();
+		}
 		break;
 	case TOPCAT_REG_ENABLE_BLINK_PLANES:
 		m_enable_blink_planes = data;
@@ -412,11 +437,17 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 
 WRITE_LINE_MEMBER(topcat_device::vblank_w)
 {
-	if (state)
+	if (state) {
 		m_vblank |= (m_plane_mask << 8);
-	else
+		if (m_unknown_reg4c) {
+			m_vert_retrace_intrq = (m_plane_mask << 8);
+			update_int();
+		}
+	} else {
 		m_vblank &= ~(m_plane_mask << 8);
+	}
 }
+
 bool topcat_device::plane_enabled()
 {
 	if (!((m_display_enable_planes >> 8) & m_plane_mask))

@@ -14,9 +14,16 @@
 #define MCFG_TOPCAT_PLANEMASK(_mask) \
 	downcast<topcat_device &>(*device).set_planemask(_mask);
 
+#define MCFG_TOPCAT_INT_CB(_write)                               \
+	downcast<topcat_device &>(*device).set_int_write_cb(DEVCB_##_write);
+
 class topcat_device : public device_t
 {
 public:
+
+	template <class Object> devcb_base& set_int_write_cb(Object &&cb)
+	{ return m_int_write_func.set_callback(std::forward<Object>(cb)); }
+
 	topcat_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_fb_width(int _pixels) { m_fb_width = _pixels; }
@@ -33,6 +40,8 @@ public:
 	void topcat_mem(address_map &map);
 
 	bool plane_enabled();
+
+	devcb_write_line m_int_write_func;
 protected:
 	topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -71,8 +80,8 @@ private:
 		TOPCAT_REG_WRITE_ENABLE_PLANE=0x44,
 		TOPCAT_REG_READ_ENABLE_PLANE=0x46,
 		TOPCAT_REG_FB_WRITE_ENABLE=0x48,
-		TOPCAT_REG_UNKNOWN_4A=0x4a,
-		TOPCAT_REG_UNKNOWN_4C=0x4c,
+		TOPCAT_REG_WMOVE_IE=0x4a,
+		TOPCAT_REG_VBLANK_IE=0x4c,
 		TOPCAT_REG_START_WMOVE=0x4e,
 		TOPCAT_REG_ENABLE_BLINK_PLANES=0x50,
 		TOPCAT_REG_ENABLE_ALT_FRAME=0x54,
@@ -113,10 +122,11 @@ private:
 		return m_vram[y * m_fb_width + x] & m_plane_mask;
 	}
 
+	void update_int();
 	uint16_t m_vblank;
 	uint8_t m_wmove_active;
-	uint8_t m_vert_retrace_intrq;
-	uint8_t m_wmove_intrq;
+	uint16_t m_vert_retrace_intrq;
+	uint16_t m_wmove_intrq;
 	uint16_t m_display_enable_planes;
 	uint16_t m_fb_write_enable;
 	uint16_t m_enable_blink_planes;
