@@ -401,3 +401,12 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 		break;
 	}
 }
+
+bool topcat_device::plane_enabled()
+{
+	if (!((m_display_enable_planes >> 8) & m_plane_mask))
+		return false;
+	if ((m_enable_blink_planes & m_plane_mask) && !m_cursor_state)
+		return false;
+	return true;
+}

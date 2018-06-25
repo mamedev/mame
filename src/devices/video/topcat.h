@@ -31,6 +31,7 @@ public:
 
 	void topcat_mem(address_map &map);
 
+	bool plane_enabled();
 protected:
 	topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
