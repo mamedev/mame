@@ -48,6 +48,9 @@
 
 #include "emu.h"
 
+#include <cfloat>
+#include <cmath>
+
 
 // This array *must* stay in order, it's binary-searched
 const double XTAL::known_xtals[] = {
@@ -380,8 +383,9 @@ bool XTAL::validate(double base_clock)
 		if(slot > last_index)
 			slot = slot ^ (step | (step >> 1));
 		else {
-			double sfreq = known_xtals[slot];
-			if(base_clock == sfreq) {
+			const double sfreq = known_xtals[slot];
+			const double diff = std::abs((base_clock - sfreq) / base_clock);
+			if(diff <= (2 * DBL_EPSILON)) {
 				last_correct_value = base_clock;
 				return true;
 			}
