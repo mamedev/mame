@@ -69,6 +69,8 @@ private:
 		TOPCAT_REG_WRITE_ENABLE_PLANE=0x44,
 		TOPCAT_REG_READ_ENABLE_PLANE=0x46,
 		TOPCAT_REG_FB_WRITE_ENABLE=0x48,
+		TOPCAT_REG_UNKNOWN_4A=0x4a,
+		TOPCAT_REG_UNKNOWN_4C=0x4c,
 		TOPCAT_REG_START_WMOVE=0x4e,
 		TOPCAT_REG_ENABLE_BLINK_PLANES=0x50,
 		TOPCAT_REG_ENABLE_ALT_FRAME=0x54,
@@ -126,7 +128,8 @@ private:
 	uint16_t m_dst_y_pixel;
 	uint16_t m_block_mover_pixel_width;
 	uint16_t m_block_mover_pixel_height;
-
+	uint16_t m_unknown_reg4a;
+	uint16_t m_unknown_reg4c;
 	emu_timer *m_cursor_timer;
 	bool m_cursor_state;
 	uint16_t m_cursor_x_pos;

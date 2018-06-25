@@ -48,6 +48,8 @@ void topcat_device::device_start()
 	save_item(NAME(m_read_enable));
 	save_item(NAME(m_write_enable));
 	save_item(NAME(m_fb_enable));
+	save_item(NAME(m_unknown_reg4a));
+	save_item(NAME(m_unknown_reg4c));
 }
 
 //-------------------------------------------------
@@ -247,6 +249,12 @@ READ16_MEMBER(topcat_device::ctrl_r)
 	case TOPCAT_REG_FB_WRITE_ENABLE:
 		ret = m_fb_write_enable;
 		break;
+	case TOPCAT_REG_UNKNOWN_4A:
+		ret = m_unknown_reg4a;
+		break;
+	case TOPCAT_REG_UNKNOWN_4C:
+		ret = m_unknown_reg4c;
+		break;
 	case TOPCAT_REG_START_WMOVE:
 		ret = 0;
 		break;
@@ -325,7 +333,12 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 	case TOPCAT_REG_FB_WRITE_ENABLE:
 		m_fb_write_enable = data;
 		break;
-
+	case TOPCAT_REG_UNKNOWN_4A:
+		m_unknown_reg4a = data;
+		break;
+	case TOPCAT_REG_UNKNOWN_4C:
+		m_unknown_reg4c = data;
+		break;
 	case TOPCAT_REG_START_WMOVE:
 		window_move();
 		break;
