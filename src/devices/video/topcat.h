@@ -113,9 +113,7 @@ private:
 	uint8_t m_wmove_active;
 	uint8_t m_vert_retrace_intrq;
 	uint8_t m_wmove_intrq;
-	uint8_t m_display_enable_planes;
-	bool m_write_enable_plane;
-	bool m_read_enable_plane;
+	uint16_t m_display_enable_planes;
 	uint16_t m_fb_write_enable;
 	uint16_t m_enable_blink_planes;
 	uint16_t m_enable_alt_frame;

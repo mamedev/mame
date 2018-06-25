@@ -31,8 +31,6 @@ void topcat_device::device_start()
 	save_item(NAME(m_vert_retrace_intrq));
 	save_item(NAME(m_wmove_intrq));
 	save_item(NAME(m_display_enable_planes));
-	save_item(NAME(m_write_enable_plane));
-	save_item(NAME(m_read_enable_plane));
 	save_item(NAME(m_fb_write_enable));
 	save_item(NAME(m_enable_blink_planes));
 	save_item(NAME(m_enable_alt_frame));
@@ -241,10 +239,10 @@ READ16_MEMBER(topcat_device::ctrl_r)
 		ret = m_display_enable_planes;
 		break;
 	case TOPCAT_REG_WRITE_ENABLE_PLANE:
-		ret = m_write_enable_plane;
+		ret = m_write_enable ? (m_plane_mask << 8) : 0;
 		break;
 	case TOPCAT_REG_READ_ENABLE_PLANE:
-		ret = m_read_enable_plane;
+		ret = m_read_enable ? (m_plane_mask << 8) : 0;
 		break;
 	case TOPCAT_REG_FB_WRITE_ENABLE:
 		ret = m_fb_write_enable;
