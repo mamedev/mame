@@ -133,10 +133,18 @@ Notes:
 
 /******************************************************************************/
 
-WRITE16_MEMBER(lastduel_state::lastduel_sound_w)
+template<int Layer>
+WRITE16_MEMBER(lastduel_state::lastduel_vram_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(space, 0, data & 0xff);
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tilemap[Layer]->mark_tile_dirty(offset / 2);
+}
+
+template<int Layer>
+WRITE16_MEMBER(lastduel_state::madgear_vram_w)
+{
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tilemap[Layer]->mark_tile_dirty(offset & 0x7ff);
 }
 
 /******************************************************************************/
@@ -146,15 +154,17 @@ void lastduel_state::lastduel_map(address_map &map)
 	map(0x000000, 0x05ffff).rom();
 	map(0xfc0000, 0xfc0003).nopw(); /* Written rarely */
 	map(0xfc0800, 0xfc0fff).ram().share("spriteram");
-	map(0xfc4000, 0xfc4001).portr("P1_P2").w(FUNC(lastduel_state::lastduel_flip_w));
-	map(0xfc4002, 0xfc4003).portr("SYSTEM").w(FUNC(lastduel_state::lastduel_sound_w));
+	map(0xfc4000, 0xfc4001).portr("P1_P2");
+	map(0xfc4001, 0xfc4001).w(FUNC(lastduel_state::flip_w));
+	map(0xfc4002, 0xfc4003).portr("SYSTEM");
+	map(0xfc4003, 0xfc4003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xfc4004, 0xfc4005).portr("DSW1");
 	map(0xfc4006, 0xfc4007).portr("DSW2");
-	map(0xfc8000, 0xfc800f).w(FUNC(lastduel_state::lastduel_scroll_w));
-	map(0xfcc000, 0xfcdfff).ram().w(FUNC(lastduel_state::lastduel_vram_w)).share("vram");
-	map(0xfd0000, 0xfd3fff).ram().w(FUNC(lastduel_state::lastduel_scroll1_w)).share("scroll1");
-	map(0xfd4000, 0xfd7fff).ram().w(FUNC(lastduel_state::lastduel_scroll2_w)).share("scroll2");
-	map(0xfd8000, 0xfd87ff).ram().w(FUNC(lastduel_state::lastduel_palette_word_w)).share("paletteram");
+	map(0xfc8000, 0xfc800f).w(FUNC(lastduel_state::vctrl_w));
+	map(0xfcc000, 0xfcdfff).ram().w(FUNC(lastduel_state::txram_w)).share("txram");
+	map(0xfd0000, 0xfd3fff).ram().w(FUNC(lastduel_state::lastduel_vram_w<0>)).share("vram_0");
+	map(0xfd4000, 0xfd7fff).ram().w(FUNC(lastduel_state::lastduel_vram_w<1>)).share("vram_1");
+	map(0xfd8000, 0xfd87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfe0000, 0xffffff).ram();
 }
 
@@ -162,15 +172,17 @@ void lastduel_state::madgear_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0xfc1800, 0xfc1fff).ram().share("spriteram");
-	map(0xfc4000, 0xfc4001).portr("DSW1").w(FUNC(lastduel_state::lastduel_flip_w));
-	map(0xfc4002, 0xfc4003).portr("DSW2").w(FUNC(lastduel_state::lastduel_sound_w));
+	map(0xfc4000, 0xfc4001).portr("DSW1");
+	map(0xfc4001, 0xfc4001).w(FUNC(lastduel_state::flip_w));
+	map(0xfc4002, 0xfc4003).portr("DSW2");
+	map(0xfc4003, 0xfc4003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xfc4004, 0xfc4005).portr("P1_P2");
 	map(0xfc4006, 0xfc4007).portr("SYSTEM");
-	map(0xfc8000, 0xfc9fff).ram().w(FUNC(lastduel_state::lastduel_vram_w)).share("vram");
-	map(0xfcc000, 0xfcc7ff).ram().w(FUNC(lastduel_state::lastduel_palette_word_w)).share("paletteram");
-	map(0xfd0000, 0xfd000f).w(FUNC(lastduel_state::lastduel_scroll_w));
-	map(0xfd4000, 0xfd7fff).ram().w(FUNC(lastduel_state::madgear_scroll1_w)).share("scroll1");
-	map(0xfd8000, 0xfdffff).ram().w(FUNC(lastduel_state::madgear_scroll2_w)).share("scroll2");
+	map(0xfc8000, 0xfc9fff).ram().w(FUNC(lastduel_state::txram_w)).share("txram");
+	map(0xfcc000, 0xfcc7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfd0000, 0xfd000f).w(FUNC(lastduel_state::vctrl_w));
+	map(0xfd4000, 0xfd7fff).ram().w(FUNC(lastduel_state::madgear_vram_w<0>)).share("vram_0");
+	map(0xfd8000, 0xfdffff).ram().w(FUNC(lastduel_state::madgear_vram_w<1>)).share("vram_1");
 	map(0xff0000, 0xffffff).ram();
 }
 
@@ -187,13 +199,13 @@ void lastduel_state::sound_map(address_map &map)
 
 WRITE8_MEMBER(lastduel_state::mg_bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 0x01);
+	m_audiobank->set_entry(data & 0x01);
 }
 
 void lastduel_state::madgear_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xcfff).bankr("bank1");
+	map(0x8000, 0xcfff).bankr("audiobank");
 	map(0xd000, 0xd7ff).ram();
 	map(0xf000, 0xf001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf002, 0xf003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
@@ -391,10 +403,8 @@ static const gfx_layout sprite_layout =
 	RGN_FRAC(1,1),
 	4,
 	{ 16, 0, 24, 8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			512+0,512+1,512+2,512+3,512+4,512+5,512+6,512+7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(0,1), STEP8(8*4*16,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -405,8 +415,8 @@ static const gfx_layout text_layout =
 	RGN_FRAC(1,1),
 	2,
 	{ 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(0,4*2*2) },
 	16*8
 };
 
@@ -416,23 +426,8 @@ static const gfx_layout madgear_tile =
 	RGN_FRAC(1,1),
 	4,
 	{ 3*4, 2*4, 1*4, 0*4 },
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			32*16+0, 32*16+1, 32*16+2, 32*16+3, 32*16+16+0, 32*16+16+1, 32*16+16+2, 32*16+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	64*16
-};
-
-static const gfx_layout madgear_tile2 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 1*4, 0*4, 3*4, 2*4 },
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			32*16+0, 32*16+1, 32*16+2, 32*16+3, 32*16+16+0, 32*16+16+1, 32*16+16+2, 32*16+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,1), STEP4(4*4,1), STEP4(8*4*16,1), STEP4(8*4*16+4*4,1) },
+	{ STEP16(0,8*4) },
 	64*16
 };
 
@@ -441,13 +436,6 @@ static GFXDECODE_START( gfx_lastduel )
 	GFXDECODE_ENTRY( "gfx2", 0, text_layout,   0x300, 16 )  /* colors 0x300-0x33f */
 	GFXDECODE_ENTRY( "gfx3", 0, madgear_tile,  0x000, 16 )  /* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx4", 0, madgear_tile,  0x100, 16 )  /* colors 0x100-0x1ff */
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_madgear )
-	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )  /* colors 0x200-0x2ff */
-	GFXDECODE_ENTRY( "gfx2", 0, text_layout,   0x300, 16 )  /* colors 0x300-0x33f */
-	GFXDECODE_ENTRY( "gfx3", 0, madgear_tile,  0x000, 16 )  /* colors 0x000-0x0ff */
-	GFXDECODE_ENTRY( "gfx4", 0, madgear_tile2, 0x100, 16 )  /* colors 0x100-0x1ff */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -465,14 +453,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastduel_state::madgear_timer_cb)
 MACHINE_START_MEMBER(lastduel_state,lastduel)
 {
 	save_item(NAME(m_tilemap_priority));
-	save_item(NAME(m_scroll));
+	save_item(NAME(m_vctrl));
 }
 
 MACHINE_START_MEMBER(lastduel_state,madgear)
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
-	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
+	m_audiobank->configure_entries(0, 2, &ROM[0x8000], 0x4000);
 
 	MACHINE_START_CALL_MEMBER(lastduel);
 }
@@ -484,7 +472,7 @@ void lastduel_state::machine_reset()
 	m_tilemap_priority = 0;
 
 	for (i = 0; i < 8; i++)
-		m_scroll[i] = 0;
+		m_vctrl[i] = 0;
 }
 
 MACHINE_CONFIG_START(lastduel_state::lastduel)
@@ -515,6 +503,7 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastduel)
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT_CLASS(2, lastduel_state, lastduel_RRRRGGGGBBBBIIII)
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
 
@@ -558,8 +547,9 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_madgear)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastduel)
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT_CLASS(2, lastduel_state, lastduel_RRRRGGGGBBBBIIII)
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)
 
@@ -724,8 +714,7 @@ ROM_START( madgear )
 	ROM_LOAD16_BYTE( "mg_01.5b",    0x40001, 0x20000, CRC(1cea2af0) SHA1(9f4642ed2d21fa525e9fecaac6235a3653df3030) )
 
 	ROM_REGION( 0x18000 , "audiocpu", 0 ) /* audio CPU */
-	ROM_LOAD( "mg_05.14j",   0x00000,  0x08000, CRC(2fbfc945) SHA1(8066516dcf9261abee1edd103bdbe0cc18913ed3) )
-	ROM_CONTINUE(            0x10000,  0x08000 )
+	ROM_LOAD( "mg_05.14j",   0x00000,  0x10000, CRC(2fbfc945) SHA1(8066516dcf9261abee1edd103bdbe0cc18913ed3) )
 
 	ROM_REGION( 0x80000, "sprites", 0 ) /* CN-SUB daughter cards replace unused NEC 23C2000 mask ROMS (QFP52) at 5A & 13A */
 	ROM_LOAD32_BYTE( "mg_m11.rom0",   0x000002, 0x10000, CRC(ee319a64) SHA1(ce8d65fdac3ec1009b22764807c03dd96b340660) )    /* Interleaved sprites */
@@ -744,7 +733,7 @@ ROM_START( madgear )
 	ROM_LOAD( "ls-12.7l",     0x000000, 0x40000, CRC(6c1b2c6c) SHA1(18f22129f13c6bfa7e285f0e09a35644272f6ecb) ) /* NEC 23C2000 256kx8 mask ROM (QFP52) */
 
 	ROM_REGION( 0x80000, "gfx4", 0 )
-	ROM_LOAD( "ls-11.2l",     0x000000, 0x80000, CRC(6bf81c64) SHA1(2289978c6bdb6e4f86e7094e861df147e757e249) ) /* NEC 23C4000 512kx8 mask ROM (QFP64) */
+	ROM_LOAD16_WORD_SWAP( "ls-11.2l",     0x000000, 0x80000, CRC(6bf81c64) SHA1(2289978c6bdb6e4f86e7094e861df147e757e249) ) /* NEC 23C4000 512kx8 mask ROM (QFP64) */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM */
 	ROM_LOAD( "ls-06.10e",    0x00000, 0x20000, CRC(88d39a5b) SHA1(8fb2d1d26e2ffb93dfc9cf8f23bb81eb64496c2b) )
@@ -762,8 +751,7 @@ ROM_START( madgearj )
 	ROM_LOAD16_BYTE( "mg_01.5b",   0x40001, 0x20000, CRC(1cea2af0) SHA1(9f4642ed2d21fa525e9fecaac6235a3653df3030) )
 
 	ROM_REGION(  0x18000 , "audiocpu", 0 ) /* audio CPU */
-	ROM_LOAD( "mg_05.14j",   0x00000,  0x08000, CRC(2fbfc945) SHA1(8066516dcf9261abee1edd103bdbe0cc18913ed3) )
-	ROM_CONTINUE(            0x10000,  0x08000 )
+	ROM_LOAD( "mg_05.14j",   0x00000,  0x10000, CRC(2fbfc945) SHA1(8066516dcf9261abee1edd103bdbe0cc18913ed3) )
 
 	ROM_REGION( 0x80000, "sprites", 0 ) /* CN-SUB daughter cards replace unused NEC 23C2000 mask ROMS (QFP52) at 5A & 13A */
 	ROM_LOAD32_BYTE( "mg_m11.rom0",   0x000002, 0x10000, CRC(ee319a64) SHA1(ce8d65fdac3ec1009b22764807c03dd96b340660) )    /* Interleaved sprites */
@@ -782,7 +770,7 @@ ROM_START( madgearj )
 	ROM_LOAD( "ls-12.7l",     0x000000, 0x40000, CRC(6c1b2c6c) SHA1(18f22129f13c6bfa7e285f0e09a35644272f6ecb) ) /* NEC 23C2000 256kx8 mask ROM (QFP52) */
 
 	ROM_REGION( 0x80000, "gfx4", 0 )
-	ROM_LOAD( "ls-11.2l",     0x000000, 0x80000, CRC(6bf81c64) SHA1(2289978c6bdb6e4f86e7094e861df147e757e249) ) /* NEC 23C4000 512kx8 mask ROM (QFP64) */
+	ROM_LOAD16_WORD_SWAP( "ls-11.2l",     0x000000, 0x80000, CRC(6bf81c64) SHA1(2289978c6bdb6e4f86e7094e861df147e757e249) ) /* NEC 23C4000 512kx8 mask ROM (QFP64) */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM */
 	ROM_LOAD( "ls-06.10e",    0x00000, 0x20000, CRC(88d39a5b) SHA1(8fb2d1d26e2ffb93dfc9cf8f23bb81eb64496c2b) )
@@ -800,8 +788,7 @@ ROM_START( ledstorm )
 	ROM_LOAD16_BYTE( "mde_01.5b",  0x40001, 0x20000, CRC(1cea2af0) SHA1(9f4642ed2d21fa525e9fecaac6235a3653df3030) )
 
 	ROM_REGION(  0x18000 , "audiocpu", 0 ) /* audio CPU */
-	ROM_LOAD( "mde_05.14j",   0x00000,  0x08000, CRC(2fbfc945) SHA1(8066516dcf9261abee1edd103bdbe0cc18913ed3) )
-	ROM_CONTINUE(             0x10000,  0x08000 )
+	ROM_LOAD( "mde_05.14j",   0x00000,  0x10000, CRC(2fbfc945) SHA1(8066516dcf9261abee1edd103bdbe0cc18913ed3) )
 
 	ROM_REGION( 0x80000, "sprites", 0 ) /* CN-SUB daughter cards replace unused NEC 23C2000 mask ROMS (QFP52) at 5A & 13A */
 	ROM_LOAD32_BYTE( "11.rom0",   0x000002, 0x10000, CRC(ee319a64) SHA1(ce8d65fdac3ec1009b22764807c03dd96b340660) )    /* Interleaved sprites */
@@ -820,7 +807,7 @@ ROM_START( ledstorm )
 	ROM_LOAD( "ls-12.7l",     0x000000, 0x40000, CRC(6c1b2c6c) SHA1(18f22129f13c6bfa7e285f0e09a35644272f6ecb) ) /* NEC 23C2000 256kx8 mask ROM (QFP52) */
 
 	ROM_REGION( 0x80000, "gfx4", 0 )
-	ROM_LOAD( "ls-11.2l",     0x000000, 0x80000, CRC(6bf81c64) SHA1(2289978c6bdb6e4f86e7094e861df147e757e249) ) /* NEC 23C4000 512kx8 mask ROM (QFP64) */
+	ROM_LOAD16_WORD_SWAP( "ls-11.2l",     0x000000, 0x80000, CRC(6bf81c64) SHA1(2289978c6bdb6e4f86e7094e861df147e757e249) ) /* NEC 23C4000 512kx8 mask ROM (QFP64) */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM */
 	ROM_LOAD( "ls-06.10e",    0x00000, 0x20000, CRC(88d39a5b) SHA1(8fb2d1d26e2ffb93dfc9cf8f23bb81eb64496c2b) )
@@ -838,8 +825,7 @@ ROM_START( leds2011 )
 	ROM_LOAD16_BYTE( "ls-01.5b",  0x40001, 0x20000, CRC(8bf934dd) SHA1(f2287a4361af4986eb010dfbfb6de3a3d4124937) )
 
 	ROM_REGION(  0x18000 , "audiocpu", 0 ) /* audio CPU */
-	ROM_LOAD( "ls-07.14j",    0x00000,  0x08000, CRC(98af7838) SHA1(a0b87b9ce3c1b0e5d7696ffaab9cea483b9ee928) )
-	ROM_CONTINUE(             0x10000,  0x08000 )
+	ROM_LOAD( "ls-07.14j",    0x00000,  0x10000, CRC(98af7838) SHA1(a0b87b9ce3c1b0e5d7696ffaab9cea483b9ee928) )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "ls-10.13a",    0x00001, 0x40000, CRC(db2c5883) SHA1(00899f96e2cbf6930c107a53f660a944fa9a2682) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
@@ -852,7 +838,7 @@ ROM_START( leds2011 )
 	ROM_LOAD( "ls-12.7l",     0x000000, 0x40000, CRC(6c1b2c6c) SHA1(18f22129f13c6bfa7e285f0e09a35644272f6ecb) ) /* NEC 23C2000 256kx8 mask ROM (QFP52) */
 
 	ROM_REGION( 0x80000, "gfx4", 0 )
-	ROM_LOAD( "ls-11.2l",     0x000000, 0x80000, CRC(6bf81c64) SHA1(2289978c6bdb6e4f86e7094e861df147e757e249) ) /* NEC 23C4000 512kx8 mask ROM (QFP64) */
+	ROM_LOAD16_WORD_SWAP( "ls-11.2l",     0x000000, 0x80000, CRC(6bf81c64) SHA1(2289978c6bdb6e4f86e7094e861df147e757e249) ) /* NEC 23C4000 512kx8 mask ROM (QFP64) */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM */
 	ROM_LOAD( "ls-06.10e",    0x00000, 0x20000, CRC(88d39a5b) SHA1(8fb2d1d26e2ffb93dfc9cf8f23bb81eb64496c2b) )
@@ -870,8 +856,7 @@ ROM_START( leds2011u )
 	ROM_LOAD16_BYTE( "ls-01.5b",  0x40001, 0x20000, CRC(8bf934dd) SHA1(f2287a4361af4986eb010dfbfb6de3a3d4124937) )
 
 	ROM_REGION(  0x18000 , "audiocpu", 0 ) /* audio CPU */
-	ROM_LOAD( "ls-07.14j",    0x00000,  0x08000, CRC(98af7838) SHA1(a0b87b9ce3c1b0e5d7696ffaab9cea483b9ee928) )
-	ROM_CONTINUE(             0x10000,  0x08000 )
+	ROM_LOAD( "ls-07.14j",    0x00000,  0x10000, CRC(98af7838) SHA1(a0b87b9ce3c1b0e5d7696ffaab9cea483b9ee928) )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "ls-10.13a",    0x00001, 0x40000, CRC(db2c5883) SHA1(00899f96e2cbf6930c107a53f660a944fa9a2682) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
@@ -884,7 +869,7 @@ ROM_START( leds2011u )
 	ROM_LOAD( "ls-12.7l",     0x000000, 0x40000, CRC(6c1b2c6c) SHA1(18f22129f13c6bfa7e285f0e09a35644272f6ecb) ) /* NEC 23C2000 256kx8 mask ROM (QFP52) */
 
 	ROM_REGION( 0x80000, "gfx4", 0 )
-	ROM_LOAD( "ls-11.2l",     0x000000, 0x80000, CRC(6bf81c64) SHA1(2289978c6bdb6e4f86e7094e861df147e757e249) ) /* NEC 23C4000 512kx8 mask ROM (QFP64) */
+	ROM_LOAD16_WORD_SWAP( "ls-11.2l",     0x000000, 0x80000, CRC(6bf81c64) SHA1(2289978c6bdb6e4f86e7094e861df147e757e249) ) /* NEC 23C4000 512kx8 mask ROM (QFP64) */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM */
 	ROM_LOAD( "ls-06.10e",    0x00000, 0x20000, CRC(88d39a5b) SHA1(8fb2d1d26e2ffb93dfc9cf8f23bb81eb64496c2b) )
