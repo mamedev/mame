@@ -1794,10 +1794,8 @@ READ8_MEMBER ( apple2_state::apple2_c03x_r )
 	{
 		if (!offset)
 		{
-			speaker_sound_device *speaker = machine().device<speaker_sound_device>("a2speaker");
-
 			m_a2_speaker_state ^= 1;
-			speaker->level_w(m_a2_speaker_state);
+			m_speaker->level_w(m_a2_speaker_state);
 		}
 	}
 	return apple2_getfloatingbusvalue();
@@ -2112,7 +2110,7 @@ void apple2_state::apple2_iwm_setdiskreg(uint8_t data)
 {
 	m_fdc_diskreg = data & 0xC0;
 	if (apple2_fdc_has_35())
-		sony_set_sel_line( machine().device("fdc"),m_fdc_diskreg & 0x80);
+		sony_set_sel_line(m_iicpiwm, m_fdc_diskreg & 0x80);
 }
 
 
