@@ -71,17 +71,25 @@ READ16_MEMBER(topcat_device::vram_r)
 
 	if (mem_mask & m_plane_mask << 8)
 		ret |= m_vram[offset*2] ? m_plane_mask << 8 : 0;
-
+	//LOG("%s: %04X: %04X (mask %04X)\n", __FUNCTION__, offset, ret, mem_mask);
 	return ret;
 }
 
 WRITE16_MEMBER(topcat_device::vram_w)
 {
-	if (mem_mask & m_plane_mask)
-		modify_vram_offset(offset * 2 + 1, (data & m_plane_mask));
+	if (mem_mask & m_plane_mask) {
+		bool src = data & m_plane_mask;
+		bool dst = m_vram[offset * 2 + 1] & m_plane_mask;
+		execute_rule(src, (replacement_rule_t)((m_pixel_replacement_rule >> 8) & 0x0f), dst);
+		modify_vram_offset(offset * 2 + 1, dst);
+	}
 
-	if (mem_mask & m_plane_mask << 8)
-		modify_vram_offset(offset * 2, (data & m_plane_mask << 8));
+	if (mem_mask & (m_plane_mask << 8)) {
+		bool src = data & (m_plane_mask << 8);
+		bool dst = m_vram[offset * 2] & m_plane_mask;
+		execute_rule(src, (replacement_rule_t)((m_pixel_replacement_rule >> 8) & 0x0f), dst);
+		modify_vram_offset(offset * 2, dst);
+	}
 }
 
 void topcat_device::get_cursor_pos(int &startx, int &starty, int &endx, int &endy)
@@ -358,10 +366,10 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 		m_enable_alt_frame = data;
 		break;
 	case TOPCAT_REG_PIXEL_REPLACE_RULE:
-		m_pixel_replacement_rule = data;
+		m_pixel_replacement_rule = data | (data >> 8);
 		break;
 	case TOPCAT_REG_MOVE_REPLACE_RULE:
-		m_move_replacement_rule = data;
+		m_move_replacement_rule = data | (data >> 8);
 		break;
 	case TOPCAT_REG_SOURCE_X_PIXEL:
 		m_source_x_pixel = data;
