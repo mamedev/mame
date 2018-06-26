@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "hd63450.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(HD63450, hd63450_device, "hd63450", "Hitachi HD63450 DMAC")
 
 hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -158,7 +161,7 @@ WRITE16_MEMBER(hd63450_device::write)
 		{
 			// Writes to CSR clear all corresponding 1 bits except PCS and ACT
 			m_reg[channel].csr &= ~((data & 0xf600) >> 8);
-//          logerror("DMA#%i: Channel status write : %02x\n",channel,dmac.reg[channel].csr);
+//          LOG("DMA#%i: Channel status write : %02x\n",channel,dmac.reg[channel].csr);
 
 			// Clearing ERR also resets CER (which is otherwise read-only)
 			if ((data & 0x1000) != 0)
@@ -169,19 +172,19 @@ WRITE16_MEMBER(hd63450_device::write)
 		if (ACCESSING_BITS_8_15)
 		{
 			m_reg[channel].dcr = (data & 0xff00) >> 8;
-			logerror("DMA#%i: Device Control write : %02x\n",channel,m_reg[channel].dcr);
+			LOG("DMA#%i: Device Control write : %02x\n",channel,m_reg[channel].dcr);
 		}
 		if (ACCESSING_BITS_0_7)
 		{
 			m_reg[channel].ocr = data & 0x00ff;
-			logerror("DMA#%i: Operation Control write : %02x\n",channel,m_reg[channel].ocr);
+			LOG("DMA#%i: Operation Control write : %02x\n",channel,m_reg[channel].ocr);
 		}
 		break;
 	case 0x03:  // SCR / CCR
 		if (ACCESSING_BITS_8_15)
 		{
 			m_reg[channel].scr = (data & 0xff00) >> 8;
-			logerror("DMA#%i: Sequence Control write : %02x\n",channel,m_reg[channel].scr);
+			LOG("DMA#%i: Sequence Control write : %02x\n",channel,m_reg[channel].scr);
 		}
 		if (ACCESSING_BITS_0_7)
 		{
@@ -194,68 +197,68 @@ WRITE16_MEMBER(hd63450_device::write)
 				dma_transfer_halt(channel);
 			if (data & 0x0040)  // continure operation
 				dma_transfer_continue(channel);
-			logerror("DMA#%i: Channel Control write : %02x\n",channel,m_reg[channel].ccr);
+			LOG("DMA#%i: Channel Control write : %02x\n",channel,m_reg[channel].ccr);
 		}
 		break;
 	case 0x05:  // MTC
 		m_reg[channel].mtc = data;
-		logerror("DMA#%i:  Memory Transfer Counter write : %04x\n",channel,m_reg[channel].mtc);
+		LOG("DMA#%i:  Memory Transfer Counter write : %04x\n",channel,m_reg[channel].mtc);
 		break;
 	case 0x06:  // MAR (high)
 		m_reg[channel].mar = (m_reg[channel].mar & 0x0000ffff) | (data << 16);
-		logerror("DMA#%i:  Memory Address write : %08lx\n",channel,m_reg[channel].mar);
+		LOG("DMA#%i:  Memory Address write : %08lx\n",channel,m_reg[channel].mar);
 		break;
 	case 0x07:  // MAR (low)
 		m_reg[channel].mar = (m_reg[channel].mar & 0xffff0000) | (data & 0x0000ffff);
-		logerror("DMA#%i:  Memory Address write : %08lx\n",channel,m_reg[channel].mar);
+		LOG("DMA#%i:  Memory Address write : %08lx\n",channel,m_reg[channel].mar);
 		break;
 	case 0x0a:  // DAR (high)
 		m_reg[channel].dar = (m_reg[channel].dar & 0x0000ffff) | (data << 16);
-		logerror("DMA#%i:  Device Address write : %08lx\n",channel,m_reg[channel].dar);
+		LOG("DMA#%i:  Device Address write : %08lx\n",channel,m_reg[channel].dar);
 		break;
 	case 0x0b:  // DAR (low)
 		m_reg[channel].dar = (m_reg[channel].dar & 0xffff0000) | (data & 0x0000ffff);
-		logerror("DMA#%i:  Device Address write : %08lx\n",channel,m_reg[channel].dar);
+		LOG("DMA#%i:  Device Address write : %08lx\n",channel,m_reg[channel].dar);
 		break;
 	case 0x0d:  // BTC
 		m_reg[channel].btc = data;
-		logerror("DMA#%i:  Base Transfer Counter write : %04x\n",channel,m_reg[channel].btc);
+		LOG("DMA#%i:  Base Transfer Counter write : %04x\n",channel,m_reg[channel].btc);
 		break;
 	case 0x0e:  // BAR (high)
 		m_reg[channel].bar = (m_reg[channel].bar & 0x0000ffff) | (data << 16);
-		logerror("DMA#%i:  Base Address write : %08lx\n",channel,m_reg[channel].bar);
+		LOG("DMA#%i:  Base Address write : %08lx\n",channel,m_reg[channel].bar);
 		break;
 	case 0x0f:  // BAR (low)
 		m_reg[channel].bar = (m_reg[channel].bar & 0xffff0000) | (data & 0x0000ffff);
-		logerror("DMA#%i:  Base Address write : %08lx\n",channel,m_reg[channel].bar);
+		LOG("DMA#%i:  Base Address write : %08lx\n",channel,m_reg[channel].bar);
 		break;
 	case 0x12:  // NIV
 		m_reg[channel].niv = data & 0xff;
-		logerror("DMA#%i:  Normal IRQ Vector write : %02x\n",channel,m_reg[channel].niv);
+		LOG("DMA#%i:  Normal IRQ Vector write : %02x\n",channel,m_reg[channel].niv);
 		break;
 	case 0x13:  // EIV
 		m_reg[channel].eiv = data & 0xff;
-		logerror("DMA#%i:  Error IRQ Vector write : %02x\n",channel,m_reg[channel].eiv);
+		LOG("DMA#%i:  Error IRQ Vector write : %02x\n",channel,m_reg[channel].eiv);
 		break;
 	case 0x14:  // MFC
 		m_reg[channel].mfc = data & 0xff;
-		logerror("DMA#%i:  Memory Function Code write : %02x\n",channel,m_reg[channel].mfc);
+		LOG("DMA#%i:  Memory Function Code write : %02x\n",channel,m_reg[channel].mfc);
 		break;
 	case 0x16:  // CPR
 		m_reg[channel].cpr = data & 0xff;
-		logerror("DMA#%i:  Channel Priority write : %02x\n",channel,m_reg[channel].cpr);
+		LOG("DMA#%i:  Channel Priority write : %02x\n",channel,m_reg[channel].cpr);
 		break;
 	case 0x18:  // DFC
 		m_reg[channel].dfc = data & 0xff;
-		logerror("DMA#%i:  Device Function Code write : %02x\n",channel,m_reg[channel].dfc);
+		LOG("DMA#%i:  Device Function Code write : %02x\n",channel,m_reg[channel].dfc);
 		break;
 	case 0x1c:  // BFC
 		m_reg[channel].bfc = data & 0xff;
-		logerror("DMA#%i:  Base Function Code write : %02x\n",channel,m_reg[channel].bfc);
+		LOG("DMA#%i:  Base Function Code write : %02x\n",channel,m_reg[channel].bfc);
 		break;
 	case 0x1f:
 		m_reg[channel].gcr = data & 0xff;
-		logerror("DMA#%i:  General Control write : %02x\n",channel,m_reg[channel].gcr);
+		LOG("DMA#%i:  General Control write : %02x\n",channel,m_reg[channel].gcr);
 		break;
 	}
 }
@@ -290,7 +293,7 @@ void hd63450_device::dma_transfer_start(int channel)
 
 	m_transfer_size[channel] = m_reg[channel].mtc;
 
-	logerror("DMA: Transfer begins: size=0x%08x\n",m_transfer_size[channel]);
+	LOG("DMA: Transfer begins: size=0x%08x\n",m_transfer_size[channel]);
 }
 
 void hd63450_device::set_timer(int channel, const attotime &tm)
@@ -312,7 +315,7 @@ void hd63450_device::dma_transfer_abort(int channel)
 	if (!dma_in_progress(channel))
 		return;
 
-	logerror("DMA#%i: Transfer aborted\n",channel);
+	LOG("DMA#%i: Transfer aborted\n",channel);
 	m_timer[channel]->adjust(attotime::never);
 	m_reg[channel].csr |= 0x90;  // channel error
 	m_reg[channel].csr &= ~0x08;  // channel no longer active
@@ -383,7 +386,7 @@ void hd63450_device::single_transfer(int x)
 				break;
 			}
 		}
-//              logerror("DMA#%i: byte transfer %08lx -> %08lx  (byte = %02x)\n",x,dmac.reg[x].dar,dmac.reg[x].mar,data);
+//              LOG("DMA#%i: byte transfer %08lx -> %08lx  (byte = %02x)\n",x,dmac.reg[x].dar,dmac.reg[x].mar,data);
 	}
 	else  // memory -> device
 	{
@@ -421,7 +424,7 @@ void hd63450_device::single_transfer(int x)
 				break;
 			}
 		}
-//              logerror("DMA#%i: byte transfer %08lx -> %08lx\n",x,m_reg[x].mar,m_reg[x].dar);
+//              LOG("DMA#%i: byte transfer %08lx -> %08lx\n",x,m_reg[x].mar,m_reg[x].dar);
 	}
 
 
@@ -443,7 +446,7 @@ void hd63450_device::single_transfer(int x)
 	if (m_reg[x].mtc <= 0)
 	{
 		// End of transfer
-		logerror("DMA#%i: End of transfer\n",x);
+		LOG("DMA#%i: End of transfer\n",x);
 		if ((m_reg[x].ocr & 0x0c) != 0 && m_reg[x].btc > 0)
 		{
 			m_reg[x].btc--;
