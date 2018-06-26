@@ -19,7 +19,7 @@
       hooked up by the current z80 core
     - PC-88VA stock version has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31.
       Making a patch for the latter makes the system to jump into a "DIP-Switch" display.
-	  bp f0b31,pc=0xf0b36
+	  bp f0b31,pc=0xf0b36,g
     - unemulated upd71071 demand mode.
     - Fix floppy motor hook-up;
 
@@ -536,12 +536,15 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 	}
 }
 
+// TODO: checkout this one
 void pc88va_state::tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	uint32_t target_offset = (spr_offset & 0xffff)/2;
+//	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	space.write_word(spr_offset, space.read_word(spr_offset) & ~0x200);
-	space.write_word(spr_offset, space.read_word(spr_offset) | (sw_bit & 0x200));
+//	space.write_word(spr_offset, space.read_word(spr_offset) & ~0x200);
+//	space.write_word(spr_offset, space.read_word(spr_offset) | (sw_bit & 0x200));
+	m_tvram[target_offset] = (m_tvram[target_offset] & ~0x200) | (sw_bit & 0x200);
 }
 
 /* TODO: very preliminary, needs something showable first */
@@ -629,7 +632,7 @@ void pc88va_state::execute_curdef_cmd()
 	m_tsp.curn = (m_buf_ram[0] & 0xf8);
 	m_tsp.curn_blink = (m_buf_ram[0] & 1);
 
-	tsp_sprite_enable(0xa0000 + m_tsp.spr_offset + m_tsp.curn, (m_buf_ram[0] & 2) << 8);
+	tsp_sprite_enable(m_tsp.spr_offset + m_tsp.curn, (m_buf_ram[0] & 2) << 8);
 }
 
 void pc88va_state::execute_actscr_cmd()
@@ -691,7 +694,7 @@ void pc88va_state::execute_sprsw_cmd()
 	[0] ---- --x- sprite off/on switch
 	*/
 
-	tsp_sprite_enable(0xa0000 + m_tsp.spr_offset + (m_buf_ram[0] & 0xf8), (m_buf_ram[0] & 2) << 8);
+	tsp_sprite_enable(m_tsp.spr_offset + (m_buf_ram[0] & 0xf8), (m_buf_ram[0] & 2) << 8);
 }
 
 WRITE8_MEMBER(pc88va_state::idp_param_w)
