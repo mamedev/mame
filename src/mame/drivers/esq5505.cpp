@@ -669,15 +669,19 @@ MACHINE_CONFIG_START(esq5505_state::eps)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(eps_map)
 
+	MCFG_DEVICE_MODIFY("duart")
+	MCFG_DEVICE_CLOCK(10_MHz_XTAL / 2)
+
 	MCFG_ESQPANEL2X40_VFX_REMOVE("panel")
 	MCFG_ESQPANEL1X22_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(*this, esq5505_state, analog_w))
 
-	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 
-	MCFG_DEVICE_ADD("mc68450", HD63450, "maincpu")   // MC68450 compatible
+	MCFG_DEVICE_ADD("mc68450", HD63450, 10_MHz_XTAL)   // MC68450 compatible
+	MCFG_HD63450_CPU("maincpu")
 	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
 	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
 	MCFG_HD63450_DMA_END_CB(WRITE8(*this, esq5505_state, dma_end))

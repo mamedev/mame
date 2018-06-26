@@ -869,7 +869,7 @@ ROM_START( tmek )
 	ROM_LOAD32_BYTE( "0042d", 0x00002, 0x20000, CRC(ef9feda4) SHA1(9fb6e91d4c22e28ced61d0d1f28f5e43191c8762) )
 	ROM_LOAD32_BYTE( "0041d", 0x00003, 0x20000, CRC(179da056) SHA1(5f7ddf44aab55beaf2c377b0c93279acb6273255) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078c", 0x000000, 0x080000, CRC(ff5b979a) SHA1(deb8ee454b6b7c7bddb2ba0c808869e45b19e55f) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -924,7 +924,7 @@ ROM_START( tmek51p )
 	ROM_LOAD32_BYTE( "prog2", 0x00002, 0x20000, CRC(bdcf5942) SHA1(21c54694bfe1e5663e67a54afed2a0f37b0f00de) )
 	ROM_LOAD32_BYTE( "prog3", 0x00003, 0x20000, CRC(7b59022a) SHA1(7395063ff0ecda0453dc7d981ca0b90b8411b715) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078c", 0x000000, 0x080000, CRC(ff5b979a) SHA1(deb8ee454b6b7c7bddb2ba0c808869e45b19e55f) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -979,7 +979,7 @@ ROM_START( tmek45 )
 	ROM_LOAD32_BYTE( "0042c", 0x00002, 0x20000, CRC(ba8745be) SHA1(139a3132ea2c69e37e63868402fcf10852953e9b) )
 	ROM_LOAD32_BYTE( "0041c", 0x00003, 0x20000, CRC(0285bc17) SHA1(346d9fcbea4b22986be04971074531bc0c014c79) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078b", 0x000000, 0x080000, CRC(a952771c) SHA1(49982ea864a99c07f45886ada7e2c9427a75f775) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -1034,7 +1034,7 @@ ROM_START( tmek44 )
 	ROM_LOAD32_BYTE( "0042b", 0x00002, 0x20000, CRC(ce68a9b3) SHA1(47b7a0ac8cce3d40f3f7559ec1b137dfdeaf1d83) )
 	ROM_LOAD32_BYTE( "0041b", 0x00003, 0x20000, CRC(b71ec759) SHA1(d4bed4bbab2c3bd278da4cd0f53580d7f66d8152) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078a", 0x000000, 0x080000, CRC(314d736f) SHA1(b23946fde6ea47d6a6e3430a9df4b06d453a94c8) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -1089,7 +1089,7 @@ ROM_START( tmek20 )
 	ROM_LOAD32_BYTE( "pgm2", 0x00002, 0x20000, CRC(ce9a77d4) SHA1(025143b59d85180286086940b05c8e5ea0b4a7fe) )
 	ROM_LOAD32_BYTE( "pgm3", 0x00003, 0x20000, CRC(28b0e210) SHA1(7567671beecc7d30e9d4b61cf7d3448bb1dbb072) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078", 0x000000, 0x080000, BAD_DUMP CRC(314d736f) SHA1(b23946fde6ea47d6a6e3430a9df4b06d453a94c8) ) // not dumped from this pcb, rom taken from another set instead
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -1144,7 +1144,7 @@ ROM_START( primrage )
 	ROM_LOAD32_BYTE( "136102-1042b.27l", 0x000002, 0x80000, CRC(750e8095) SHA1(4660637136b1a25169d8c43646c8b87081763987) )
 	ROM_LOAD32_BYTE( "136102-1041b.25l", 0x000003, 0x80000, CRC(6a90d283) SHA1(7c18c97cb5e5cdd26a52cd6bc099fbce87055311) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "136102-1078a.11a", 0x000000, 0x080000, CRC(0656435f) SHA1(f8e498171e754eb8703dad6b2351509bbb27e06b) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -1230,7 +1230,7 @@ ROM_START( primrage20 )
 	ROM_LOAD32_BYTE( "136102-0042b.27l", 0x000002, 0x80000, CRC(cd6062b9) SHA1(2973fb561ab68cd48ec132b6720c04d10bedfd19) )
 	ROM_LOAD32_BYTE( "136102-0041b.25l", 0x000003, 0x80000, CRC(3008f6f0) SHA1(45aac457b4584ee3bd3561e3b2e34e49aa61fbc5) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "136102-0078a.11a", 0x000000, 0x080000, CRC(91df8d8f) SHA1(6d361f88de604b8f11dd9bfe85ff18bcd322862d) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -1308,7 +1308,7 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 
 void atarigt_state::init_tmek()
 {
-	m_is_primrage = 0;
+	m_is_primrage = false;
 
 	/* setup protection */
 	m_protection_r = &atarigt_state::tmek_protection_r;
@@ -1321,7 +1321,7 @@ void atarigt_state::init_tmek()
 
 void atarigt_state::init_primrage()
 {
-	m_is_primrage = 1;
+	m_is_primrage = true;
 
 	/* install protection */
 	m_protection_r = &atarigt_state::primrage_protection_r;

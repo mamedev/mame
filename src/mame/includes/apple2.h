@@ -36,7 +36,7 @@
 
 #define IIC_ACIA1_TAG "acia1"
 #define IIC_ACIA2_TAG "acia2"
-#define IICP_IWM_TAG    "iwm"
+#define IICP_IWM_TAG    "fdc"
 
 #define LASER128_UDC_TAG "l128udc"
 
@@ -140,6 +140,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_ay3600(*this, "ay3600"),
 		m_a2bus(*this, "a2bus"),
+		m_speaker(*this, "a2speaker"),
 		m_a2eauxslot(*this, AUXSLOT_TAG),
 		m_joy1x(*this, "joystick_1_x"),
 		m_joy1y(*this, "joystick_1_y"),
@@ -163,6 +164,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
 	required_device<a2bus_device> m_a2bus;
+	required_device<speaker_sound_device> m_speaker;
 	optional_device<a2eauxslot_device> m_a2eauxslot;
 
 	optional_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;

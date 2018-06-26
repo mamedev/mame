@@ -81,9 +81,9 @@ private:
 	// live state
 	uint8_t m_bgflag;
 	uint8_t m_spritectrl[4];
-	uint8_t m_spriteylow[0x300]; // 0x200 low y + 0x100 bg stuff
-	uint8_t m_spritecodelow[0x2000]; // tnzs.c stuff only uses half?
-	uint8_t m_spritecodehigh[0x2000]; // ^
+	std::unique_ptr<uint8_t[]> m_spriteylow;
+	std::unique_ptr<uint8_t[]> m_spritecodelow; // tnzs.cpp stuff only uses half?
+	std::unique_ptr<uint8_t[]> m_spritecodehigh; // ^
 };
 
 DECLARE_DEVICE_TYPE(SETA001_SPRITE, seta001_device)
