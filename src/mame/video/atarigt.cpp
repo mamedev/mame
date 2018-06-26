@@ -64,8 +64,7 @@ TILE_GET_INFO_MEMBER(atarigt_state::get_playfield_tile_info)
 
 TILEMAP_MAPPER_MEMBER(atarigt_state::atarigt_playfield_scan)
 {
-	int bank = 1 - (col / (num_cols / 2));
-	return bank * (num_rows * num_cols / 2) + row * (num_cols / 2) + (col % (num_cols / 2));
+	return (((col & 0x40) ^ 0x40) << 6) | ((row & 0x3f) << 6) | (col & 0x3f);
 }
 
 
