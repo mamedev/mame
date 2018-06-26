@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert and unknown others
+// copyright-holders:Jurgen Buchmueller, Robbbert
+// Originally written in MESS 0.1 by Jurgen Buchmueller.
+// Substantially rewritten by Robbbert in 2008, many new clones added
 /***************************************************************************
 TRS80 memory map
 
