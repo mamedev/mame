@@ -2688,6 +2688,7 @@ files {
 	MAME_DIR .. "src/mame/video/baraduke.cpp",
 	MAME_DIR .. "src/mame/drivers/cswat.cpp",
 	MAME_DIR .. "src/mame/drivers/dambustr.cpp",
+	MAME_DIR .. "src/mame/drivers/dkmb.cpp",
 	MAME_DIR .. "src/mame/drivers/gal3.cpp",
 	MAME_DIR .. "src/mame/drivers/galaga.cpp",
 	MAME_DIR .. "src/mame/includes/galaga.h",
