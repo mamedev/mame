@@ -138,6 +138,12 @@
 
 #include "x68000.lh"
 
+#define LOG_FDC (1 << 1)
+#define LOG_SYS (1 << 2)
+#define LOG_IRQ (1 << 3)
+//#define VERBOSE (LOG_FDC | LOG_SYS | LOG_IRQ)
+#include "logmacro.h"
+
 
 static constexpr uint32_t adpcm_clock[2] = { 8000000, 4000000 };
 static constexpr uint32_t adpcm_div[4] = { 1024, 768, 512, /* Reserved */512 };
@@ -244,7 +250,7 @@ int x68k_state::x68k_read_mouse()
 		m_mouse.bufferempty = 1;
 		i_val &= ~0x01;
 		m_scc->set_reg_b(0, i_val);
-		logerror("SCC: mouse buffer empty\n");
+		LOGMASKED(LOG_SYS, "SCC: mouse buffer empty\n");
 	}
 
 	return ipt;
@@ -577,7 +583,7 @@ WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 		m_adpcm.pan = data & 0x03;
 		m_adpcm.rate = (data & 0x0c) >> 2;
 		if (m_adpcm.rate == 3)
-			logerror("PPI: Invalid ADPCM sample rate set.\n");
+			LOGMASKED(LOG_SYS, "PPI: Invalid ADPCM sample rate set.\n");
 
 		x68k_set_adpcm();
 		m_okim6258->set_divider(m_adpcm.rate);
@@ -631,7 +637,7 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 			}
 		}
 		m_fdc.control_drives = data & 0x0f;
-		logerror("FDC: signal control set to %02x\n",data);
+		LOGMASKED(LOG_FDC, "FDC: signal control set to %02x\n",data);
 		break;
 	case 0x01: {
 		x = data & 3;
@@ -647,7 +653,7 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 		if(x != m_fdc.select_drive)
 			m_access_drv_out[m_fdc.select_drive] = 1;
 		m_fdc.select_drive = x;
-		logerror("FDC: Drive #%i: Drive selection set to %02x\n",x,data);
+		LOGMASKED(LOG_FDC, "FDC: Drive #%i: Drive selection set to %02x\n",x,data);
 		break;
 		}
 	}
@@ -673,12 +679,12 @@ READ16_MEMBER(x68k_state::x68k_fdc_r)
 				}
 				// bit 7 = disk inserted
 				// bit 6 = disk error (in insertion, presumably)
-				logerror("FDC: Drive #%i Disk check - returning %02x\n",x,ret);
+				LOGMASKED(LOG_FDC, "FDC: Drive #%i Disk check - returning %02x\n",x,ret);
 			}
 		}
 		return ret;
 	case 0x01:
-		logerror("FDC: IOC selection is write-only\n");
+		LOGMASKED(LOG_FDC, "FDC: IOC selection is write-only\n");
 		return 0xff;
 	}
 	return 0xff;
@@ -691,7 +697,7 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 		m_current_vector[1] = m_ioc.fdcvector;
 		m_ioc.irqstatus |= 0x80;
 		m_current_irq_line = 1;
-		logerror("FDC: IRQ triggered\n");
+		LOGMASKED(LOG_FDC, "FDC: IRQ triggered\n");
 		m_maincpu->set_input_line_and_vector(1, ASSERT_LINE, m_current_vector[1]);
 	}
 	else
@@ -738,26 +744,26 @@ WRITE16_MEMBER(x68k_state::x68k_ioc_w)
 	{
 	case 0x00:
 		m_ioc.irqstatus = data & 0x0f;
-		logerror("I/O: Status register write %02x\n",data);
+		LOGMASKED(LOG_SYS, "I/O: Status register write %02x\n",data);
 		break;
 	case 0x01:
 		switch(data & 0x03)
 		{
 		case 0x00:
 			m_ioc.fdcvector = data & 0xfc;
-			logerror("IOC: FDC IRQ vector = 0x%02x\n",data & 0xfc);
+			LOGMASKED(LOG_IRQ, "IOC: FDC IRQ vector = 0x%02x\n",data & 0xfc);
 			break;
 		case 0x01:
 			m_ioc.fddvector = data & 0xfc;
-			logerror("IOC: FDD IRQ vector = 0x%02x\n",data & 0xfc);
+			LOGMASKED(LOG_IRQ, "IOC: FDD IRQ vector = 0x%02x\n",data & 0xfc);
 			break;
 		case 0x02:
 			m_ioc.hdcvector = data & 0xfc;
-			logerror("IOC: HDD IRQ vector = 0x%02x\n",data & 0xfc);
+			LOGMASKED(LOG_IRQ, "IOC: HDD IRQ vector = 0x%02x\n",data & 0xfc);
 			break;
 		case 0x03:
 			m_ioc.prnvector = data & 0xfc;
-			logerror("IOC: Printer IRQ vector = 0x%02x\n",data & 0xfc);
+			LOGMASKED(LOG_IRQ, "IOC: Printer IRQ vector = 0x%02x\n",data & 0xfc);
 			break;
 		}
 		break;
@@ -769,7 +775,7 @@ READ16_MEMBER(x68k_state::x68k_ioc_r)
 	switch(offset)
 	{
 	case 0x00:
-		logerror("I/O: Status register read\n");
+		LOGMASKED(LOG_SYS, "I/O: Status register read\n");
 		return (m_ioc.irqstatus & 0xdf) | 0x20;
 	default:
 		return 0x00;
@@ -814,7 +820,7 @@ WRITE16_MEMBER(x68k_state::x68k_sysport_w)
 		COMBINE_DATA(&m_sysport.sram_writeprotect);
 		break;
 	default:
-//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",m_maincpu->pc(),data,offset);
+//      LOGMASKED(LOG_SYS, "SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",m_maincpu->pc(),data,offset);
 		break;
 	}
 }
@@ -834,7 +840,7 @@ READ16_MEMBER(x68k_state::x68k_sysport_r)
 	case 0x05:  // CPU type and speed
 		return m_sysport.cputype;
 	default:
-		logerror("Read from invalid or unimplemented system port %04x\n",offset);
+		LOGMASKED(LOG_SYS, "Read from invalid or unimplemented system port %04x\n",offset);
 		return 0xff;
 	}
 }
@@ -901,7 +907,7 @@ WRITE16_MEMBER(x68k_state::x68k_vid_w)
 		COMBINE_DATA(m_video.reg+2);
 		break;
 	default:
-		logerror("VC: Invalid video controller write (offset = 0x%04x, data = %04x)\n",offset,data);
+		LOGMASKED(LOG_SYS, "VC: Invalid video controller write (offset = 0x%04x, data = %04x)\n",offset,data);
 	}
 }
 
@@ -916,7 +922,7 @@ READ16_MEMBER(x68k_state::x68k_vid_r)
 	case 0x100:
 		return m_video.reg[2];
 	default:
-		logerror("VC: Invalid video controller read (offset = 0x%04x)\n",offset);
+		LOGMASKED(LOG_SYS, "VC: Invalid video controller read (offset = 0x%04x)\n",offset);
 	}
 
 	return 0xff;
@@ -931,13 +937,13 @@ READ16_MEMBER(x68k_state::x68k_areaset_r)
 WRITE16_MEMBER(x68k_state::x68k_areaset_w)
 {
 	// TODO
-	logerror("SYS: Supervisor area set: 0x%02x\n",data & 0xff);
+	LOGMASKED(LOG_SYS, "SYS: Supervisor area set: 0x%02x\n",data & 0xff);
 }
 
 WRITE16_MEMBER(x68k_state::x68k_enh_areaset_w )
 {
 	// TODO
-	logerror("SYS: Enhanced Supervisor area set (from %iMB): 0x%02x\n",(offset + 1) * 2,data & 0xff);
+	LOGMASKED(LOG_SYS, "SYS: Enhanced Supervisor area set (from %iMB): 0x%02x\n",(offset + 1) * 2,data & 0xff);
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_bus_error)
@@ -956,7 +962,7 @@ void x68k_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
-	logerror("%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
+	LOGMASKED(LOG_SYS, "%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
 }
 
 READ16_MEMBER(x68k_state::x68k_rom0_r)
@@ -1012,7 +1018,7 @@ void x68k_state::dma_irq(int channel)
 {
 	m_current_vector[3] = m_hd63450->get_vector(channel);
 	m_current_irq_line = 3;
-	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,m_current_vector[3]);
+	LOGMASKED(LOG_SYS, "DMA#%i: DMA End (vector 0x%02x)\n",channel,m_current_vector[3]);
 	m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,m_current_vector[3]);
 }
 
@@ -1034,7 +1040,7 @@ WRITE8_MEMBER(x68k_state::dma_error)
 	{
 		m_current_vector[3] = m_hd63450->get_error_vector(offset);
 		m_current_irq_line = 3;
-		logerror("DMA#%i: DMA Error (vector 0x%02x)\n",offset,m_current_vector[3]);
+		LOGMASKED(LOG_SYS, "DMA#%i: DMA Error (vector 0x%02x)\n",offset,m_current_vector[3]);
 		m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,m_current_vector[3]);
 	}
 }
@@ -1085,7 +1091,7 @@ IRQ_CALLBACK_MEMBER(x68k_state::x68k_int_ack)
 			m_current_vector[6] = m_mfpdev->get_vector();
 		else
 			m_maincpu->set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
-		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[6],irqline);
+		LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[6],irqline);
 		return m_current_vector[6];
 	}
 
@@ -1099,7 +1105,7 @@ IRQ_CALLBACK_MEMBER(x68k_state::x68k_int_ack)
 		m_mouse.irqactive = 0;
 	}
 
-	logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[irqline],irqline);
+	LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[irqline],irqline);
 	return m_current_vector[irqline];
 }
 
@@ -1427,7 +1433,7 @@ void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
 		m_ioc.irqstatus |= 0x40;
 		m_current_irq_line = 1;
 		m_maincpu->set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);  // Disk insert/eject interrupt
-		logerror("IOC: Disk image inserted\n");
+		LOGMASKED(LOG_FDC, "IOC: Disk image inserted\n");
 	}
 }
 
@@ -1457,7 +1463,7 @@ WRITE_LINE_MEMBER(x68k_state::x68k_irq2_line)
 	}
 	else
 		m_maincpu->set_input_line_and_vector(2,CLEAR_LINE,m_current_vector[2]);
-	logerror("EXP: IRQ2 set to %i\n",state);
+	LOGMASKED(LOG_IRQ, "EXP: IRQ2 set to %i\n",state);
 
 }
 
@@ -1465,7 +1471,7 @@ WRITE_LINE_MEMBER(x68k_state::x68k_irq4_line)
 {
 	m_current_vector[4] = m_expansion->vector();
 	m_maincpu->set_input_line_and_vector(4,state,m_current_vector[4]);
-	logerror("EXP: IRQ4 set to %i (vector %02x)\n",state,m_current_vector[4]);
+	LOGMASKED(LOG_IRQ, "EXP: IRQ4 set to %i (vector %02x)\n",state,m_current_vector[4]);
 }
 
 static void x68000_exp_cards(device_slot_interface &device)
@@ -1677,9 +1683,7 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55.45)
-	MCFG_SCREEN_SIZE(1096, 568)  // initial setting
-	MCFG_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
+	MCFG_SCREEN_RAW_PARAMS(69.55199_MHz_XTAL / 2, 1096, 0, 768, 568, 0, 512)  // initial setting
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcgpalette", gfxdecode_device::empty)

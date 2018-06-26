@@ -307,6 +307,7 @@ const double XTAL::known_xtals[] = {
 	 35'904'000, /* 35.904_MHz_XTAL        Used on HP98543 graphics board */
 	 36'000'000, /* 36_MHz_XTAL            Sega Model 1 video board */
 	 38'769'220, /* 38.76922_MHz_XTAL      Namco System 21 video board */
+	 38'863'630, /* 38.86363_MHz_XTAL      Sharp X68000 15.98kHz video */
 	 39'321'600, /* 39.3216_MHz_XTAL       Sun 2/120 */
 	 39'710'000, /* 39.71_MHz_XTAL         Wyse WY-60 132-column display clock */
 	 40'000'000, /* 40_MHz_XTAL            - */
@@ -348,6 +349,7 @@ const double XTAL::known_xtals[] = {
 	 66'666'700, /* 66.6667_MHz_XTAL       Later Midway games */
 	 67'737'600, /* 67.7376_MHz_XTAL       PSX-based h/w, Sony ZN1-2-based */
 	 68'850'000, /* 68.85_MHz_XTAL         Wyse WY-50 */
+	 69'551'990, /* 69.55199_MHz_XTAL      Sharp X68000 31.5kHz video */
 	 72'000'000, /* 72_MHz_XTAL            Aristocrat MKV */
 	 72'576'000, /* 72.576_MHz_XTAL        Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede" */
 	 73'728'000, /* 73.728_MHz_XTAL        Ms. Pac-Man/Galaga 20th Anniversary */
