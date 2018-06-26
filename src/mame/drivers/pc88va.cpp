@@ -19,6 +19,7 @@
       hooked up by the current z80 core
     - PC-88VA stock version has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31.
       Making a patch for the latter makes the system to jump into a "DIP-Switch" display.
+	  bp f0b31,pc=0xf0b36
     - unemulated upd71071 demand mode.
     - Fix floppy motor hook-up;
 
@@ -31,11 +32,15 @@
 
 void pc88va_state::video_start()
 {
+	m_kanjiram = auto_alloc_array(machine(), uint8_t, 0x4000);
+	m_gfxdecode->gfx(2)->set_source(m_kanjiram);
+	m_gfxdecode->gfx(3)->set_source(m_kanjiram);
+	printf("mammt\n");
 }
 
 void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *tvram = (uint16_t *)(memregion("tvram")->base());
+	uint16_t *tvram = m_tvram;
 	int offs,i;
 
 	offs = m_tsp.spr_offset;
@@ -144,7 +149,8 @@ uint32_t pc88va_state::calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y
 
 void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *tvram = memregion("tvram")->base();
+	uint16_t *tvram = m_tvram;
+	// TODO: PCG select won't work with this arrangement
 	uint8_t *kanji = memregion("kanji")->base();
 	int xi,yi;
 	int x,y;
@@ -159,24 +165,24 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	//uint8_t blink,dwidc,dwid,uline,hline;
 	uint8_t screen_fg_col,screen_bg_col;
 
-	count = (tvram[m_tsp.tvram_vreg_offset+0] | tvram[m_tsp.tvram_vreg_offset+1] << 8);
+	count = tvram[m_tsp.tvram_vreg_offset/2];
 
-	attr_mode = tvram[m_tsp.tvram_vreg_offset+0xa] & 0x1f;
+	attr_mode = tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0x1f;
 	/* Note: bug in docs has the following two reversed */
-	screen_fg_col = (tvram[m_tsp.tvram_vreg_offset+0xb] & 0xf0) >> 4;
-	screen_bg_col = tvram[m_tsp.tvram_vreg_offset+0xb] & 0x0f;
+	screen_fg_col = (tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0xf000) >> 12;
+	screen_bg_col = (tvram[(m_tsp.tvram_vreg_offset+0xa) / 2] & 0x0f00) >> 8;
 
 	for(y=0;y<13;y++)
 	{
 		for(x=0;x<80;x++)
 		{
-			jis1 = (tvram[count+0] & 0x7f) + 0x20;
-			jis2 = tvram[count+1] & 0x7f;
-			lr_half_gfx = ((tvram[count+1] & 0x80) >> 7);
+			jis1 = (tvram[count] & 0x7f) + 0x20;
+			jis2 = (tvram[count] & 0x7f00) >> 8;
+			lr_half_gfx = ((tvram[count] & 0x8000) >> 15);
 
 			tile_num = calc_kanji_rom_addr(jis1,jis2,x,y);
 
-			attr = (tvram[count+m_tsp.attr_offset] & 0x00ff);
+			attr = (tvram[count+(m_tsp.attr_offset/2)] & 0x00ff);
 
 			fg_col = bg_col = reverse = secret = 0; //blink = dwidc = dwid = uline = hline = 0;
 
@@ -317,7 +323,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				}
 			}
 
-			count+=2;
+			count++;
 			count&=0xffff;
 		}
 	}
@@ -403,110 +409,47 @@ void pc88va_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-READ16_MEMBER(pc88va_state::sys_mem_r)
-{
-	switch((m_bank_reg & 0xf00) >> 8)
-	{
-		case 0: // select bus slot
-			return 0xffff;
-		case 1: // TVRAM
-		{
-			uint16_t *tvram = (uint16_t *)(memregion("tvram")->base());
-
-			if(((offset*2) & 0x30000) == 0)
-				return tvram[offset];
-
-			return 0xffff;
-		}
-		case 4:
-		{
-			uint16_t *gvram = (uint16_t *)(memregion("gvram")->base());
-
-			return gvram[offset];
-		}
-		case 8: // kanji ROM
-		case 9:
-		{
-			uint16_t *knj_ram = (uint16_t *)(memregion("kanji")->base());
-			uint32_t knj_offset;
-
-			knj_offset = (offset + (((m_bank_reg & 0x100) >> 8)*0x20000));
-
-			/* 0x00000 - 0x3ffff Kanji ROM 1*/
-			/* 0x40000 - 0x4ffff Kanji ROM 2*/
-			/* 0x50000 - 0x53fff Backup RAM */
-			/* anything else is a NOP (I presume?) */
-
-			return knj_ram[knj_offset];
-		}
-		case 0xc: // Dictionary ROM
-		case 0xd:
-		{
-			uint16_t *dic_rom = (uint16_t *)(memregion("dictionary")->base());
-			uint32_t dic_offset;
-
-			dic_offset = (offset + (((m_bank_reg & 0x100) >> 8)*0x20000));
-
-			return dic_rom[dic_offset];
-		}
-	}
-
-	return 0xffff;
-}
-
-WRITE16_MEMBER(pc88va_state::sys_mem_w)
-{
-	switch((m_bank_reg & 0xf00) >> 8)
-	{
-		case 0: // select bus slot
-			break;
-		case 1: // TVRAM
-		{
-			uint16_t *tvram = (uint16_t *)(memregion("tvram")->base());
-
-			if(((offset*2) & 0x30000) == 0)
-				COMBINE_DATA(&tvram[offset]);
-		}
-		break;
-		case 4: // TVRAM
-		{
-			uint16_t *gvram = (uint16_t *)(memregion("gvram")->base());
-
-			COMBINE_DATA(&gvram[offset]);
-		}
-		break;
-		case 8: // kanji ROM, backup RAM at 0xb0000 - 0xb3fff
-		case 9:
-		{
-			uint16_t *knj_ram = (uint16_t *)(memregion("kanji")->base());
-			uint32_t knj_offset;
-
-			knj_offset = ((offset) + (((m_bank_reg & 0x100) >> 8)*0x20000));
-
-			if(knj_offset >= 0x50000/2 && knj_offset <= 0x53fff/2) // TODO: there's an area that can be write protected
-			{
-				COMBINE_DATA(&knj_ram[knj_offset]);
-				m_gfxdecode->gfx(0)->mark_dirty((knj_offset * 2) / 8);
-				m_gfxdecode->gfx(1)->mark_dirty((knj_offset * 2) / 32);
-			}
-		}
-		break;
-		case 0xc: // Dictionary ROM
-		case 0xd:
-		{
-			// NOP?
-		}
-		break;
-	}
-}
 
 void pc88va_state::pc88va_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).ram();
-//  AM_RANGE(0x80000, 0x9ffff) AM_RAM // EMM
-	map(0xa0000, 0xdffff).rw(FUNC(pc88va_state::sys_mem_r), FUNC(pc88va_state::sys_mem_w));
+//  map(0x80000, 0x9ffff).ram(); // EMM
+	map(0xa0000, 0xdffff).m(m_sysbank, FUNC(address_map_bank_device::amap16));
 	map(0xe0000, 0xeffff).bankr("rom00_bank");
 	map(0xf0000, 0xfffff).bankr("rom10_bank");
+}
+
+/* 0x00000 - 0x3ffff Kanji ROM 1*/
+/* 0x40000 - 0x4ffff Kanji ROM 2*/
+/* 0x50000 - 0x53fff Backup RAM */
+/* above that is a NOP presumably */
+READ8_MEMBER(pc88va_state::kanji_ram_r)
+{
+	return m_kanjiram[offset];
+}
+
+WRITE8_MEMBER(pc88va_state::kanji_ram_w)
+{
+	// TODO: there's an area that can be write protected
+	m_kanjiram[offset] = data;
+	m_gfxdecode->gfx(2)->mark_dirty(offset / 8);
+	m_gfxdecode->gfx(3)->mark_dirty(offset / 32);
+}
+
+
+void pc88va_state::sysbank_map(address_map &map)
+{
+	// 0 select bus slot (?)
+	// 1 tvram
+	map(0x040000, 0x04ffff).ram().share("tvram");
+	// 4 gvram
+	map(0x100000, 0x13ffff).ram().share("gvram");
+	// 8-9 kanji
+	map(0x200000, 0x23ffff).rom().region("kanji", 0x00000);
+	map(0x240000, 0x24ffff).rom().region("kanji", 0x40000);
+	map(0x250000, 0x253fff).rw(FUNC(pc88va_state::kanji_ram_r),FUNC(pc88va_state::kanji_ram_w));
+	// c-d dictionary
+	map(0x300000, 0x37ffff).rom().region("dictionary", 0);
 }
 
 /* IDP = NEC uPD72022 */
@@ -813,18 +756,15 @@ WRITE16_MEMBER(pc88va_state::bios_bank_w)
 {
 	/*
 	-x-- ---- ---- ---- SMM (compatibility mode)
-	---x ---- ---- ---- GMSP (VRAM drawing Mode)
+	---x ---- ---- ---- GMSP (VRAM drawing mode)
 	---- xxxx ---- ---- SMBC (0xa0000 - 0xdffff RAM bank)
 	---- ---- xxxx ---- RBC1 (0xf0000 - 0xfffff ROM bank)
 	---- ---- ---- xxxx RBC0 (0xe0000 - 0xeffff ROM bank)
 	*/
-	if ((mem_mask&0xffff) == 0xffff)
-		m_bank_reg = data;
-	else if ((mem_mask & 0xffff) == 0xff00)
-		m_bank_reg = (data & 0xff00) | (m_bank_reg & 0x00ff);
-	else if ((mem_mask & 0xffff) == 0x00ff)
-		m_bank_reg = (data & 0x00ff) | (m_bank_reg & 0xff00);
-
+	COMBINE_DATA(&m_bank_reg);
+	
+	/* SMBC */
+	m_sysbank->set_bank((m_bank_reg & 0xf00) >> 8);
 
 	/* RBC1 */
 	{
@@ -1056,12 +996,10 @@ WRITE16_MEMBER(pc88va_state::video_pri_w)
 
 READ8_MEMBER(pc88va_state::backupram_dsw_r)
 {
-	uint16_t *knj_ram = (uint16_t *)(memregion("kanji")->base());
-
 	if(offset == 0)
-		return knj_ram[(0x50000 + 0x1fc2) / 2] & 0xff;
+		return m_kanjiram[0x1fc2 / 2] & 0xff;
 
-	return knj_ram[(0x50000 + 0x1fc6) / 2] & 0xff;
+	return m_kanjiram[0x1fc6 / 2] & 0xff;
 }
 
 WRITE8_MEMBER(pc88va_state::sys_port1_w)
@@ -1391,8 +1329,8 @@ static const gfx_layout pc88va_chars_8x8 =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8
 };
 
@@ -1402,15 +1340,40 @@ static const gfx_layout pc88va_chars_16x16 =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP16(0,1) },
+	{ STEP16(0,16) },
 	16*16
 };
 
-/* decoded for debugging purpose, this will be nuked in the end... */
+// same as above but with static size
+static const gfx_layout pc88va_kanji_8x8 =
+{
+	8,8,
+	0x4000/8,
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
+};
+
+static const gfx_layout pc88va_kanji_16x16 =
+{
+	16,16,
+	0x4000/32,
+	1,
+	{ 0 },
+	{ STEP16(0,1) },
+	{ STEP16(0,16) },
+	16*16
+};
+
+// TODO: decoded for debugging purpose, this will be nuked in the end ...
 static GFXDECODE_START( gfx_pc88va )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_8x8,    0, 1 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_16x16,  0, 1 )
+	GFXDECODE_ENTRY( nullptr,   0x00000, pc88va_kanji_8x8,    0, 1 )
+	GFXDECODE_ENTRY( nullptr,   0x00000, pc88va_kanji_16x16,  0, 1 )
 GFXDECODE_END
 
 READ8_MEMBER(pc88va_state::cpu_8255_c_r)
@@ -1499,6 +1462,7 @@ void pc88va_state::machine_start()
 	m_fdd[0]->get_device()->set_rpm(300);
 	m_fdd[1]->get_device()->set_rpm(300);
 	m_fdc->set_rate(250000);
+
 }
 
 void pc88va_state::machine_reset()
@@ -1510,6 +1474,7 @@ void pc88va_state::machine_reset()
 	membank("rom00_bank")->set_base(&ROM00[0x00000]);
 
 	m_bank_reg = 0x4100;
+	m_sysbank->set_bank(1);
 	m_backupram_wp = 1;
 
 	/* default palette */
@@ -1608,13 +1573,13 @@ static void pc88va_floppies(device_slot_interface &device)
 
 READ8_MEMBER(pc88va_state::dma_memr_cb)
 {
-printf("%08x\n",offset);
+	printf("%08x\n",offset);
 	return 0;
 }
 
 WRITE8_MEMBER(pc88va_state::dma_memw_cb)
 {
-printf("%08x %02x\n",offset,data);
+	printf("%08x %02x\n",offset,data);
 }
 
 
@@ -1694,6 +1659,13 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	MCFG_PIT8253_CLK1(8000000) /* BEEP frequency setting */
 	MCFG_PIT8253_CLK2(8000000) /* RS232C baud rate setting */
 
+	MCFG_DEVICE_ADD("sysbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(sysbank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18+4)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x40000)
+	
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ym", YM2203, 3993600) //unknown clock / divider
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -1725,10 +1697,6 @@ ROM_START( pc88va2 )
 
 	ROM_REGION( 0x80000, "dictionary", 0 )
 	ROM_LOAD( "vadic_va2.rom", 0x00000, 0x80000, CRC(a6108f4d) SHA1(3665db538598abb45d9dfe636423e6728a812b12) )
-
-	ROM_REGION( 0x10000, "tvram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x40000, "gvram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( pc88va )
@@ -1753,10 +1721,6 @@ ROM_START( pc88va )
 
 	ROM_REGION( 0x80000, "dictionary", 0 )
 	ROM_LOAD( "vadic.rom",  0x0000, 0x80000, CRC(f913c605) SHA1(5ba1f3578d0aaacdaf7194a80e6d520c81ae55fb))
-
-	ROM_REGION( 0x10000, "tvram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x40000, "gvram", ROMREGION_ERASE00 )
 ROM_END
 
 

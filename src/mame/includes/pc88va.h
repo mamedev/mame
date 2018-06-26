@@ -19,6 +19,7 @@
 #include "machine/pit8253.h"
 //#include "machine/upd71071.h"
 #include "machine/upd765.h"
+#include "machine/bankdev.h"
 #include "sound/2203intf.h"
 
 #include "emupal.h"
@@ -73,8 +74,12 @@ public:
 		m_pic1(*this, "pic8259_master"),
 		m_pic2(*this, "pic8259_slave"),
 		m_palram(*this, "palram"),
+		m_sysbank(*this, "sysbank"),
+		m_tvram(*this, "tvram"),
+		m_gvram(*this, "gvram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette") 
+		{ }
 
 	void pc88va(machine_config &config);
 protected:
@@ -92,6 +97,10 @@ private:
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_shared_ptr<uint16_t> m_palram;
+	required_device<address_map_bank_device> m_sysbank;
+	required_shared_ptr<uint16_t> m_tvram;
+	required_shared_ptr<uint16_t> m_gvram;
+	uint8_t *m_kanjiram;
 	uint16_t m_bank_reg;
 	uint16_t m_screen_ctrl_reg;
 	uint8_t m_timer3_io_reg;
@@ -124,6 +133,8 @@ private:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE16_MEMBER(backupram_wp_1_w);
 	DECLARE_WRITE16_MEMBER(backupram_wp_0_w);
+	DECLARE_READ8_MEMBER(kanji_ram_r);
+	DECLARE_WRITE8_MEMBER(kanji_ram_w);
 	DECLARE_READ8_MEMBER(hdd_status_r);
 	#if TEST_SUBFDC
 	DECLARE_READ8_MEMBER(upd765_tc_r);
@@ -188,8 +199,10 @@ private:
 	void execute_spron_cmd();
 	void execute_sprsw_cmd();
 
-	void pc88va_io_map(address_map &map);
 	void pc88va_map(address_map &map);
+	void pc88va_io_map(address_map &map);
+	void sysbank_map(address_map &map);
+
 	void pc88va_z80_io_map(address_map &map);
 	void pc88va_z80_map(address_map &map);
 protected:
