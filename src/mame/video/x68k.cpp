@@ -171,7 +171,7 @@ void x68k_state::x68k_crtc_refresh_mode()
 
 //  LOG("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",m_crtc.reg[0],m_crtc.reg[1],m_crtc.reg[2],m_crtc.reg[3],
 //      m_crtc.reg[4],m_crtc.reg[5],m_crtc.reg[6],m_crtc.reg[7],m_crtc.reg[8],m_crtc.reg[9]);
-	unsigned div = BIT(m_crtc.reg[20], 1) ? 1 : BIT(m_crtc.reg[20], 0) ? 2 : 4;
+	unsigned div = (m_crtc.reg[20] & 0x03) == 0 ? 4 : 2;
 	if ((m_crtc.reg[20] & 0x0c) == 0)
 		div *= BIT(m_crtc.reg[20], 4) ? 3 : 2;
 	attotime refresh = attotime::from_ticks(scr.max_x * scr.max_y, (BIT(m_crtc.reg[20], 4) ? 69.55199_MHz_XTAL : 38.86363_MHz_XTAL) / div);
@@ -442,7 +442,7 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
             if(data & 0x0400)
                 m_crtc.interlace = 1;
         }*/
-		LOG("CRTC: Register 20 = %04x\n", m_crtc.reg[20]);
+		logerror("CRTC: Register 20 = %04x\n", m_crtc.reg[20]);
 		x68k_crtc_refresh_mode();
 		break;
 	case 576:  // operation register
