@@ -336,7 +336,7 @@ READ16_MEMBER(taitoair_state::stick2_input_r)
 
 WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
 {
-	membank("z80bank")->set_entry(data & 3);
+	m_z80bank->set_entry(data & 3);
 }
 
 /*!
@@ -382,7 +382,7 @@ WRITE8_MEMBER(taitoair_state::coin_control_w)
 void taitoair_state::airsys_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).rom();
-	map(0x0c0000, 0x0cffff).ram().share("m68000_mainram");
+	map(0x0c0000, 0x0cffff).ram();
 	map(0x140000, 0x140001).w(FUNC(taitoair_state::system_control_w)); /* Pause the TMS32025 */
 	map(0x180000, 0x187fff).ram().w(FUNC(taitoair_state::airsys_gradram_w)).share("gradram"); /* "gradiation ram (0/1)" */
 	map(0x188000, 0x189fff).mirror(0x2000).ram().w(FUNC(taitoair_state::airsys_paletteram16_w)).share("paletteram");
@@ -677,7 +677,7 @@ GFXDECODE_END
 
 void taitoair_state::machine_start()
 {
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_q.header));
 	save_item(NAME(m_q.pcount));
@@ -747,7 +747,7 @@ MACHINE_CONFIG_START(taitoair_state::airsys)
 
 	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
 	MCFG_TC0080VCO_GFX_REGION(0)
-	MCFG_TC0080VCO_TX_REGION(1)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
@@ -843,10 +843,10 @@ ROM_START( toplandj )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 */
 	ROM_LOAD16_BYTE( "b62_27.ic43",  0x00000, 0x20000, CRC(c717c3b7) SHA1(b5bee250dc4ba530b1d3a73926dc848a0f340a70) )
 	ROM_LOAD16_BYTE( "b62_26.ic14",  0x00001, 0x20000, CRC(340bfa56) SHA1(b5df3dc43ed299a22213b517ac4a1c1d776bbdbf) )
-	ROM_LOAD16_BYTE( "b62_25.42",  0x40000, 0x20000, CRC(1bd53a72) SHA1(ada679198739cd6a419d3fa4311bb92dc385099c) )
-	ROM_LOAD16_BYTE( "b62_24.13",  0x40001, 0x20000, CRC(845026c5) SHA1(ab8d8f5f6597bfcde4e9ccf9e0181b8b6e769ada) )
-	ROM_LOAD16_BYTE( "b62_23.41",  0x80000, 0x20000, CRC(ef3a971c) SHA1(0840668dda48f4c9a85410361bfba3ae9580a71f) )
-	ROM_LOAD16_BYTE( "b62_22.12",  0x80001, 0x20000, CRC(94279201) SHA1(8518d8e722d4f2516f75224d9a21ab20d8ee6c78) )
+	ROM_LOAD16_BYTE( "b62_25.42",    0x40000, 0x20000, CRC(1bd53a72) SHA1(ada679198739cd6a419d3fa4311bb92dc385099c) )
+	ROM_LOAD16_BYTE( "b62_24.13",    0x40001, 0x20000, CRC(845026c5) SHA1(ab8d8f5f6597bfcde4e9ccf9e0181b8b6e769ada) )
+	ROM_LOAD16_BYTE( "b62_23.41",    0x80000, 0x20000, CRC(ef3a971c) SHA1(0840668dda48f4c9a85410361bfba3ae9580a71f) )
+	ROM_LOAD16_BYTE( "b62_22.12",    0x80001, 0x20000, CRC(94279201) SHA1(8518d8e722d4f2516f75224d9a21ab20d8ee6c78) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 */
 	ROM_LOAD( "b62_19.ic34", 0x00000, 0x10000, CRC(2c0a3786) SHA1(58dc4a18d1d1b0d023721677a9c1b091a6304f4a) )
@@ -946,9 +946,9 @@ ROM_END
 
 ROM_START( ainfernoj )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 */
-	ROM_LOAD16_BYTE( "c45_22.43", 0x00000, 0x20000, CRC(50300926) SHA1(9c2a60282d3f9f115b94cb5b6d64bbfc9d726d1d) )
-	ROM_LOAD16_BYTE( "c45_20.14", 0x00001, 0x20000, CRC(39b189d9) SHA1(002013c02b546d3f5a9f3a3149971975a73cc8ce) )
-	ROM_LOAD16_BYTE( "c45_21.42", 0x40000, 0x20000, CRC(1b687241) SHA1(309e42f79cbd48ceae58a15afb648aef838822f0) )
+	ROM_LOAD16_BYTE( "c45_22.43",  0x00000, 0x20000, CRC(50300926) SHA1(9c2a60282d3f9f115b94cb5b6d64bbfc9d726d1d) )
+	ROM_LOAD16_BYTE( "c45_20.14",  0x00001, 0x20000, CRC(39b189d9) SHA1(002013c02b546d3f5a9f3a3149971975a73cc8ce) )
+	ROM_LOAD16_BYTE( "c45_21.42",  0x40000, 0x20000, CRC(1b687241) SHA1(309e42f79cbd48ceae58a15afb648aef838822f0) )
 	ROM_LOAD16_BYTE( "c45_19.ic13",0x40001, 0x20000, CRC(5ec474dd) SHA1(7b436ba60628a410a5053095dafaee0bd7932daf) )
 
 	/* 0x80000 to 0xbffff is empty for this game */

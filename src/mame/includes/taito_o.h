@@ -14,13 +14,15 @@
 class taitoo_state : public driver_device
 {
 public:
-	taitoo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	taitoo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_tc0080vco(*this, "tc0080vco"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -28,6 +30,9 @@ public:
 	required_device<tc0080vco_device> m_tc0080vco;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	required_ioport m_in0;
+	required_ioport m_in1;
 
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(io_r);

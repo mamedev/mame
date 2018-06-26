@@ -58,8 +58,8 @@ READ16_MEMBER(taitoo_state::io_r)
 
 	switch(offset)
 	{
-		case 0: retval = ioport("IN0")->read() & (clear_hack ? 0xf7ff : 0xffff); break;
-		case 1: retval = ioport("IN1")->read() & (clear_hack ? 0xfff7 : 0xffff); break;
+		case 0: retval = m_in0->read() & (clear_hack ? 0xf7ff : 0xffff); break;
+		case 1: retval = m_in1->read() & (clear_hack ? 0xfff7 : 0xffff); break;
 		default: logerror("IO R %x %x = %x @ %x\n", offset, mem_mask, retval, m_maincpu->pc());
 	}
 	return retval;
@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 
 	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
 	MCFG_TC0080VCO_GFX_REGION(0)
-	MCFG_TC0080VCO_TX_REGION(1)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
@@ -265,10 +265,7 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 2000000) /*?? MHz */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(0, "mono",  0.25)
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono",  1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0) // TODO : Unknown rate
 MACHINE_CONFIG_END
 
 ROM_START( parentj )
@@ -290,4 +287,4 @@ ROM_START( parentj )
 	ROM_LOAD( "ampal22v10a-0233.c42", 0x000, 0x2dd, CRC(0c030a81) SHA1(0f8198df2cb046683d2db9ac8e609cdff53083ed) )
 ROM_END
 
-GAME( 1989, parentj, 0, parentj,  parentj, taitoo_state, driver_init, ROT0, "Taito", "Parent Jack", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, parentj, 0, parentj,  parentj, taitoo_state, driver_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

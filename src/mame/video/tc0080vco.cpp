@@ -80,13 +80,10 @@ this seems to be the only zoom feature actually used in the games.
 
 DEFINE_DEVICE_TYPE(TC0080VCO, tc0080vco_device, "tc0080vco", "Taito TC0080VCO")
 
-tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0080VCO, tag, owner, clock),
+tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TC0080VCO, tag, owner, clock),
+	device_gfx_interface(mconfig, *this, nullptr),
 	m_ram(nullptr),
-	m_bg0_ram_0(nullptr),
-	m_bg0_ram_1(nullptr),
-	m_bg1_ram_0(nullptr),
-	m_bg1_ram_1(nullptr),
 	m_tx_ram_0(nullptr),
 	m_tx_ram_1(nullptr),
 	m_char_ram(nullptr),
@@ -95,19 +92,21 @@ tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *ta
 	m_chain_ram_1(nullptr),
 	m_spriteram(nullptr),
 	m_scroll_ram(nullptr),
-	m_bg0_scrollx(0),
-	m_bg0_scrolly(0),
-	m_bg1_scrollx(0),
-	m_bg1_scrolly(0),
 	m_flipscreen(0),
 	m_gfxnum(0),
-	m_txnum(0),
 	m_bg_xoffs(0),
 	m_bg_yoffs(0),
 	m_bg_flip_yoffs(0),
 	m_has_fg0(1),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
+	for (int layer = 0; layer < 2; layer++)
+	{
+		m_bg_ram_0[layer] = nullptr;
+		m_bg_ram_1[layer] = nullptr;
+		m_bg_scrollx[layer] = 0;
+		m_bg_scrolly[layer] = 0;
+	}
 }
 
 //-------------------------------------------------
@@ -134,8 +133,8 @@ void tc0080vco_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
@@ -149,7 +148,7 @@ void tc0080vco_device::device_start()
 	m_tilemap[0]->set_scroll_rows(512);
 
 	/* Perform extra initialisations for text layer */
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[2] = &machine().tilemap().create(*this,        tilemap_get_info_delegate(FUNC(tc0080vco_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_tilemap[2]->set_scrolldx(0, 0);
 	m_tilemap[2]->set_scrolldy(48, -448);
@@ -162,20 +161,20 @@ void tc0080vco_device::device_start()
 	m_tx_ram_0      = m_ram.get() + 0x01000 / 2;
 	m_chain_ram_0   = m_ram.get() + 0x00000 / 2;    /* only used from +0x2000 */
 
-	m_bg0_ram_0     = m_ram.get() + 0x0c000 / 2;
-	m_bg1_ram_0     = m_ram.get() + 0x0e000 / 2;
+	m_bg_ram_0[0]   = m_ram.get() + 0x0c000 / 2;
+	m_bg_ram_0[1]   = m_ram.get() + 0x0e000 / 2;
 
 	m_tx_ram_1      = m_ram.get() + 0x11000 / 2;
 	m_chain_ram_1   = m_ram.get() + 0x10000 / 2;    /* only used from +0x12000 */
 
-	m_bg0_ram_1     = m_ram.get() + 0x1c000 / 2;
-	m_bg1_ram_1     = m_ram.get() + 0x1e000 / 2;
+	m_bg_ram_1[0]   = m_ram.get() + 0x1c000 / 2;
+	m_bg_ram_1[1]   = m_ram.get() + 0x1e000 / 2;
 	m_bgscroll_ram  = m_ram.get() + 0x20000 / 2;
 	m_spriteram     = m_ram.get() + 0x20400 / 2;
 	m_scroll_ram    = m_ram.get() + 0x20800 / 2;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(&m_gfxdecode->palette(), charlayout, (uint8_t *)m_char_ram, 0, 1, 512));
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), charlayout, (uint8_t *)m_char_ram, 0, 1, 512));
 
 	save_pointer(NAME(m_ram), TC0080VCO_RAM_SIZE / 2);
 	machine().save().register_postload(save_prepost_delegate(FUNC(tc0080vco_device::postload), this));
@@ -203,35 +202,20 @@ static const int tc0080vco_zoomy_conv_table[] =
 };
 #endif
 
-
-TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg0_tile_info)
+template<int Layer>
+TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg_tile_info)
 {
 	int color, tile;
 
-	color = m_bg0_ram_1[tile_index] & 0x001f;
-	tile  = m_bg0_ram_0[tile_index] & 0x7fff;
+	color = m_bg_ram_1[Layer][tile_index] & 0x001f;
+	tile  = m_bg_ram_0[Layer][tile_index] & 0x7fff;
 
 	tileinfo.category = 0;
 
 	SET_TILE_INFO_MEMBER(m_gfxnum,
 			tile,
 			color,
-			TILE_FLIPYX((m_bg0_ram_1[tile_index] & 0x00c0) >> 6));
-}
-
-TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg1_tile_info)
-{
-	int color, tile;
-
-	color = m_bg1_ram_1[tile_index] & 0x001f;
-	tile  = m_bg1_ram_0[tile_index] & 0x7fff;
-
-	tileinfo.category = 0;
-
-	SET_TILE_INFO_MEMBER(m_gfxnum,
-			tile,
-			color,
-			TILE_FLIPYX((m_bg1_ram_1[tile_index] & 0x00c0) >> 6));
+			TILE_FLIPYX((m_bg_ram_1[Layer][tile_index] & 0x00c0) >> 6));
 }
 
 TILE_GET_INFO_MEMBER(tc0080vco_device::get_tx_tile_info)
@@ -255,7 +239,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_tx_tile_info)
 		tileinfo.category = 0;
 	}
 
-	SET_TILE_INFO_MEMBER(m_txnum,
+	SET_TILE_INFO_MEMBER(0,
 			tile,
 			0,
 			0);
@@ -273,26 +257,26 @@ WRITE16_MEMBER( tc0080vco_device::scrollram_w )
 			m_tilemap[1]->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 			m_tilemap[2]->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-			m_bg0_scrollx = m_scroll_ram[1] & 0x03ff;
-			m_bg1_scrollx = m_scroll_ram[2] & 0x03ff;
-			m_bg0_scrolly = m_scroll_ram[3] & 0x03ff;
-			m_bg1_scrolly = m_scroll_ram[4] & 0x03ff;
+			m_bg_scrollx[0] = m_scroll_ram[1] & 0x03ff;
+			m_bg_scrollx[1] = m_scroll_ram[2] & 0x03ff;
+			m_bg_scrolly[0] = m_scroll_ram[3] & 0x03ff;
+			m_bg_scrolly[1] = m_scroll_ram[4] & 0x03ff;
 			break;
 
 		case 0x01:          /* BG0 scroll X */
-			m_bg0_scrollx = data & 0x03ff;
+			m_bg_scrollx[0] = data & 0x03ff;
 			break;
 
 		case 0x02:          /* BG1 scroll X */
-			m_bg1_scrollx = data & 0x03ff;
+			m_bg_scrollx[1] = data & 0x03ff;
 			break;
 
 		case 0x03:          /* BG0 scroll Y */
-			m_bg0_scrolly = data & 0x03ff;
+			m_bg_scrolly[0] = data & 0x03ff;
 			break;
 
 		case 0x04:          /* BG1 scroll Y */
-			m_bg1_scrolly = data & 0x03ff;
+			m_bg_scrolly[1] = data & 0x03ff;
 			break;
 
 		default:
@@ -313,7 +297,7 @@ WRITE16_MEMBER( tc0080vco_device::word_w )
 
 	if (offset < 0x1000 / 2)
 	{
-		m_gfxdecode->gfx(m_txnum)->mark_dirty(offset / 8);
+		gfx(0)->mark_dirty(offset / 8);
 #if 0
 		if (!m_has_fg0)
 		{
@@ -344,7 +328,7 @@ WRITE16_MEMBER( tc0080vco_device::word_w )
 
 	else if (offset < 0x11000 / 2)
 	{
-		m_gfxdecode->gfx(m_txnum)->mark_dirty((offset - 0x10000 / 2) / 8);
+		gfx(0)->mark_dirty((offset - 0x10000 / 2) / 8);
 #if 0
 		if (!m_has_fg0)
 		{
@@ -383,17 +367,17 @@ void tc0080vco_device::tilemap_update( )
 	if (!m_flipscreen)
 	{
 		for (j = 0; j < 0x400; j++)
-			m_tilemap[0]->set_scrollx((j + 0) & 0x3ff, -m_bg0_scrollx - m_bgscroll_ram[j & 0x1ff]);
+			m_tilemap[0]->set_scrollx((j + 0) & 0x3ff, -m_bg_scrollx[0] - m_bgscroll_ram[j & 0x1ff]);
 	}
 	else
 	{
 		for (j = 0; j < 0x400; j++)
-			m_tilemap[0]->set_scrollx((j + 0) & 0x3ff, -m_bg0_scrollx + m_bgscroll_ram[j & 0x1ff]);
+			m_tilemap[0]->set_scrollx((j + 0) & 0x3ff, -m_bg_scrollx[0] + m_bgscroll_ram[j & 0x1ff]);
 	}
 
-	m_tilemap[0]->set_scrolly(0,  m_bg0_scrolly);
-	m_tilemap[1]->set_scrollx(0, -m_bg1_scrollx);
-	m_tilemap[1]->set_scrolly(0,  m_bg1_scrolly);
+	m_tilemap[0]->set_scrolly(0,  m_bg_scrolly[0]);
+	m_tilemap[1]->set_scrollx(0, -m_bg_scrollx[1]);
+	m_tilemap[1]->set_scrolly(0,  m_bg_scrolly[1]);
 	m_tilemap[2]->set_scrollx(0, 0);   /* no scroll (maybe) */
 	m_tilemap[2]->set_scrolly(0, 0);
 }
@@ -689,8 +673,8 @@ void tc0080vco_device::postload()
 	m_tilemap[1]->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	m_tilemap[2]->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	m_bg0_scrollx = m_scroll_ram[1] & 0x03ff;
-	m_bg1_scrollx = m_scroll_ram[2] & 0x03ff;
-	m_bg0_scrolly = m_scroll_ram[3] & 0x03ff;
-	m_bg1_scrolly = m_scroll_ram[4] & 0x03ff;
+	m_bg_scrollx[0] = m_scroll_ram[1] & 0x03ff;
+	m_bg_scrollx[1] = m_scroll_ram[2] & 0x03ff;
+	m_bg_scrolly[0] = m_scroll_ram[3] & 0x03ff;
+	m_bg_scrolly[1] = m_scroll_ram[4] & 0x03ff;
 }

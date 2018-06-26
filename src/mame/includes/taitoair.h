@@ -28,27 +28,26 @@ struct taitoair_poly {
 class taitoair_state : public driver_device
 {
 public:
-	taitoair_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_m68000_mainram(*this, "m68000_mainram"),
-			m_line_ram(*this, "line_ram"),
-			m_dsp_ram(*this, "dsp_ram"),
-			m_paletteram(*this, "paletteram"),
-			m_gradram(*this, "gradram"),
-			m_tc0430grw(*this, "tc0430grw"),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_dsp(*this, "dsp"),
-			m_tc0080vco(*this, "tc0080vco"),
-			m_tc0220ioc(*this, "tc0220ioc"),
-			m_yoke(*this, "yokectrl"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
-			{ }
+	taitoair_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_line_ram(*this, "line_ram"),
+		m_dsp_ram(*this, "dsp_ram"),
+		m_paletteram(*this, "paletteram"),
+		m_gradram(*this, "gradram"),
+		m_tc0430grw(*this, "tc0430grw"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_dsp(*this, "dsp"),
+		m_tc0080vco(*this, "tc0080vco"),
+		m_tc0220ioc(*this, "tc0220ioc"),
+		m_yoke(*this, "yokectrl"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_z80bank(*this, "z80bank")
+	{ }
 
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_m68000_mainram;
 	required_shared_ptr<uint16_t> m_line_ram;
 	required_shared_ptr<uint16_t> m_dsp_ram;          // Shared 68000/TMS32025 RAM
 	required_shared_ptr<uint16_t> m_paletteram;
@@ -71,6 +70,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	required_memory_bank m_z80bank;
 
 	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
 

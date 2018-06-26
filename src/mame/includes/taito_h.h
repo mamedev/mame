@@ -13,18 +13,18 @@
 class taitoh_state : public driver_device
 {
 public:
-	taitoh_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_m68000_mainram(*this, "m68000_mainram"),
+	taitoh_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tc0080vco(*this, "tc0080vco"),
 		m_tc0040ioc(*this, "tc0040ioc"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
-
-	/* memory pointers */
-	required_shared_ptr<uint16_t> m_m68000_mainram;
+		m_palette(*this, "palette"),
+		m_z80bank(*this, "z80bank"),
+		m_trackx(*this, "P%uX", 1U),
+		m_tracky(*this, "P%uY", 1U)
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -33,6 +33,10 @@ public:
 	optional_device<tc0040ioc_device> m_tc0040ioc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	required_memory_bank m_z80bank;
+	optional_ioport_array<2> m_trackx;
+	optional_ioport_array<2> m_tracky;
 
 	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_READ8_MEMBER(syvalion_input_bypass_r);

@@ -161,11 +161,6 @@ some kind of zoom table?
 
 ***************************************************************************/
 
-#define P1TRACKX_PORT_TAG     "P1X"
-#define P1TRACKY_PORT_TAG     "P1Y"
-#define P2TRACKX_PORT_TAG     "P2X"
-#define P2TRACKY_PORT_TAG     "P2Y"
-
 READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 {
 	/* Bypass TC0040IOC controller for analog input */
@@ -175,37 +170,37 @@ READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 	switch( port )
 	{
 		case 0x08:              /* trackball y coords bottom 8 bits for 2nd player */
-			return ioport(P2TRACKY_PORT_TAG)->read();
+			return m_tracky[1]->read();
 
 		case 0x09:              /* trackball y coords top 8 bits for 2nd player */
-			if (ioport(P2TRACKY_PORT_TAG)->read() & 0x80)   /* y- direction (negative value) */
+			if (m_tracky[1]->read() & 0x80)   /* y- direction (negative value) */
 				return 0xff;
 			else                                                /* y+ direction (positive value) */
 				return 0x00;
 
 		case 0x0a:              /* trackball x coords bottom 8 bits for 2nd player */
-			return ioport(P2TRACKX_PORT_TAG)->read();
+			return m_trackx[1]->read();
 
 		case 0x0b:              /* trackball x coords top 8 bits for 2nd player */
-			if (ioport(P2TRACKX_PORT_TAG)->read() & 0x80)   /* x- direction (negative value) */
+			if (m_trackx[1]->read() & 0x80)   /* x- direction (negative value) */
 				return 0xff;
 			else                                                /* x+ direction (positive value) */
 				return 0x00;
 
 		case 0x0c:              /* trackball y coords bottom 8 bits for 1st player */
-			return ioport(P1TRACKY_PORT_TAG)->read();
+			return m_tracky[0]->read();
 
 		case 0x0d:              /* trackball y coords top 8 bits for 1st player */
-			if (ioport(P1TRACKY_PORT_TAG)->read() & 0x80)   /* y- direction (negative value) */
+			if (m_tracky[0]->read() & 0x80)   /* y- direction (negative value) */
 				return 0xff;
 			else                                                /* y+ direction (positive value) */
 				return 0x00;
 
 		case 0x0e:              /* trackball x coords bottom 8 bits for 1st player */
-			return ioport(P1TRACKX_PORT_TAG)->read();
+			return m_trackx[0]->read();
 
 		case 0x0f:              /* trackball x coords top 8 bits for 1st player */
-			if (ioport(P1TRACKX_PORT_TAG)->read() & 0x80)   /* x- direction (negative value) */
+			if (m_trackx[0]->read() & 0x80)   /* x- direction (negative value) */
 				return 0xff;
 			else                                                /* x+ direction (positive value) */
 				return 0x00;
@@ -217,7 +212,7 @@ READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 
 WRITE8_MEMBER(taitoh_state::sound_bankswitch_w)
 {
-	membank("z80bank")->set_entry(data & 3);
+	m_z80bank->set_entry(data & 3);
 }
 
 WRITE8_MEMBER(taitoh_state::coin_control_w)
@@ -238,7 +233,7 @@ WRITE8_MEMBER(taitoh_state::coin_control_w)
 void taitoh_state::syvalion_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x10ffff).mirror(0x010000).ram().share("m68000_mainram");
+	map(0x100000, 0x10ffff).mirror(0x010000).ram();
 	map(0x200001, 0x200001).r(FUNC(taitoh_state::syvalion_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x200003, 0x200003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::port_r), FUNC(tc0040ioc_device::port_w));
 	map(0x300000, 0x300001).nopr();
@@ -251,7 +246,7 @@ void taitoh_state::syvalion_map(address_map &map)
 void taitoh_state::recordbr_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x10ffff).mirror(0x010000).ram().share("m68000_mainram");
+	map(0x100000, 0x10ffff).mirror(0x010000).ram();
 	map(0x200000, 0x200003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0x00ff);
 	map(0x300000, 0x300001).nopr();
 	map(0x300001, 0x300001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
@@ -263,7 +258,7 @@ void taitoh_state::recordbr_map(address_map &map)
 void taitoh_state::tetristh_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x10ffff).mirror(0x010000).ram().share("m68000_mainram");
+	map(0x100000, 0x10ffff).mirror(0x010000).ram();
 	map(0x200000, 0x200001).nopr();
 	map(0x200001, 0x200001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x200003, 0x200003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -275,7 +270,7 @@ void taitoh_state::tetristh_map(address_map &map)
 void taitoh_state::dleague_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
-	map(0x100000, 0x10ffff).mirror(0x010000).ram().share("m68000_mainram");
+	map(0x100000, 0x10ffff).mirror(0x010000).ram();
 	map(0x200000, 0x20000f).rw("tc0220ioc", FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x300000, 0x300001).nopr();
 	map(0x300001, 0x300001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
@@ -355,16 +350,16 @@ static INPUT_PORTS_START( syvalion )
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START(P1TRACKX_PORT_TAG)
+	PORT_START("P1X")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
 
-	PORT_START(P1TRACKY_PORT_TAG)
+	PORT_START("P1Y")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START(P2TRACKX_PORT_TAG)
+	PORT_START("P2X")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
 
-	PORT_START(P2TRACKY_PORT_TAG)
+	PORT_START("P2Y")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -417,16 +412,16 @@ static INPUT_PORTS_START( syvalionp )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	// x and y are swapped on the proto, x also isn't reversed
-	PORT_START(P1TRACKX_PORT_TAG)
+	PORT_START("P1X")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
 
-	PORT_START(P1TRACKY_PORT_TAG)
+	PORT_START("P1Y")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
 
-	PORT_START(P2TRACKX_PORT_TAG)
+	PORT_START("P2X")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
 
-	PORT_START(P2TRACKY_PORT_TAG)
+	PORT_START("P2Y")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -640,7 +635,7 @@ void taitoh_state::machine_reset()
 
 void taitoh_state::machine_start()
 {
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
 
@@ -680,7 +675,7 @@ MACHINE_CONFIG_START(taitoh_state::syvalion)
 
 	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
 	MCFG_TC0080VCO_GFX_REGION(0)
-	MCFG_TC0080VCO_TX_REGION(1)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
@@ -736,7 +731,7 @@ MACHINE_CONFIG_START(taitoh_state::recordbr)
 
 	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
 	MCFG_TC0080VCO_GFX_REGION(0)
-	MCFG_TC0080VCO_TX_REGION(1)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
@@ -801,7 +796,7 @@ MACHINE_CONFIG_START(taitoh_state::dleague)
 
 	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
 	MCFG_TC0080VCO_GFX_REGION(0)
-	MCFG_TC0080VCO_TX_REGION(1)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
