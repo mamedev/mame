@@ -35,7 +35,6 @@ void pc88va_state::video_start()
 	m_kanjiram = auto_alloc_array(machine(), uint8_t, 0x4000);
 	m_gfxdecode->gfx(2)->set_source(m_kanjiram);
 	m_gfxdecode->gfx(3)->set_source(m_kanjiram);
-	printf("mammt\n");
 }
 
 void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
