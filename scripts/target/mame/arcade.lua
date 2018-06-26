@@ -3714,6 +3714,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/changela.cpp",
 	MAME_DIR .. "src/mame/includes/changela.h",
 	MAME_DIR .. "src/mame/video/changela.cpp",
+	MAME_DIR .. "src/mame/drivers/cpzodiac.cpp",
 	MAME_DIR .. "src/mame/drivers/crbaloon.cpp",
 	MAME_DIR .. "src/mame/includes/crbaloon.h",
 	MAME_DIR .. "src/mame/video/crbaloon.cpp",
