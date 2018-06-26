@@ -67,19 +67,22 @@ public:
 	{
 	}
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	void mirage(machine_config &config);
 
 	void init_mirage();
+
+private:
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);
 	DECLARE_WRITE_LINE_MEMBER(mirage_doc_irq);
 	DECLARE_READ8_MEMBER(mirage_adc_read);
 
-	void mirage(machine_config &config);
 	void mirage_map(address_map &map);
 
-protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	virtual void video_start() override;

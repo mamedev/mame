@@ -50,6 +50,13 @@ public:
 		m_port61(0)
 	{ }
 
+	void europc(machine_config &config);
+	void europc2(machine_config &config);
+	void euroxt(machine_config &config);
+
+	void init_europc();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<pc_keyboard_device> m_keyboard;
@@ -63,8 +70,6 @@ public:
 
 	DECLARE_READ8_MEMBER( europc_rtc_r );
 	DECLARE_WRITE8_MEMBER( europc_rtc_w );
-
-	void init_europc();
 
 	void europc_rtc_set_time();
 
@@ -84,9 +89,6 @@ public:
 		TIMER_RTC
 	};
 	static void cfg_builtin_720K(device_t *device);
-	void europc(machine_config &config);
-	void europc2(machine_config &config);
-	void euroxt(machine_config &config);
 	void europc_io(address_map &map);
 	void europc_map(address_map &map);
 };

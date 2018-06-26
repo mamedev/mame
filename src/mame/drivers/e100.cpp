@@ -158,6 +158,10 @@ public:
 		,m_pia1_B(0)
 		,m_50hz(0)
 		{ }
+
+	void e100(machine_config &config);
+
+private:
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_kbd_74145;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -179,9 +183,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
-	void e100(machine_config &config);
 	void e100_map(address_map &map);
-protected:
+
 	required_ioport m_io_line0;
 	required_ioport m_io_line1;
 	required_ioport m_io_line2;

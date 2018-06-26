@@ -19,6 +19,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
 
+	void embargo(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -35,7 +38,6 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_embargo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void embargo(machine_config &config);
 	void main_data_map(address_map &map);
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
