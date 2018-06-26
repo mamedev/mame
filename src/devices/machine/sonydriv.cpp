@@ -430,6 +430,12 @@ static void sony_doaction(device_t *device)
 			break;
 		case 0x03:  /* Reset diskswitched */
 			f->disk_switched = 0;
+			// flopdrv.cpp won't reset its disk switch flag without
+			// doing a seek.  So we do a seek of 0 tracks, which works.
+			if (cur_image)
+			{
+				cur_image->floppy_drive_seek(0);
+			}
 			break;
 		case 0x04:  /* Step disk */
 			if (cur_image)

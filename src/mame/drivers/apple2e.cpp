@@ -2296,14 +2296,10 @@ READ8_MEMBER(apple2e_state::c800_r)
 		return mig_r(offset-0x600);
 	}
 
-	if (offset == 0x7ff)
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		if (!machine().side_effects_disabled())
-		{
-			m_cnxx_slot = CNXX_UNCLAIMED;
-			update_slotrom_banks();
-		}
-
+		m_cnxx_slot = CNXX_UNCLAIMED;
+		update_slotrom_banks();
 		return 0xff;
 	}
 
