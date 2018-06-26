@@ -46,7 +46,11 @@ public:
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
+	void dmax8000(machine_config &config);
+
 	void init_dmax8000();
+
+private:
 	DECLARE_MACHINE_RESET(dmax8000);
 	DECLARE_WRITE8_MEMBER(port0c_w);
 	DECLARE_WRITE8_MEMBER(port0d_w);
@@ -54,10 +58,9 @@ public:
 	DECLARE_WRITE8_MEMBER(port40_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	void dmax8000(machine_config &config);
 	void dmax8000_io(address_map &map);
 	void dmax8000_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;

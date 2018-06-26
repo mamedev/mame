@@ -29,13 +29,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker") { }
 
+	void daruma(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(dev0_r);
 	DECLARE_WRITE8_MEMBER(dev1_w);
 	DECLARE_WRITE8_MEMBER(dev2_w);
 	DECLARE_READ8_MEMBER(dev4_r);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	void daruma(machine_config &config);
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
 };

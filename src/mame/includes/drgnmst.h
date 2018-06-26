@@ -25,6 +25,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void drgnmst(machine_config &config);
+
+	void init_drgnmst();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_vidregs;
 	required_shared_ptr<uint16_t> m_fg_videoram;
@@ -65,7 +70,6 @@ public:
 	DECLARE_WRITE16_MEMBER(drgnmst_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_md_videoram_w);
-	void init_drgnmst();
 	TILE_GET_INFO_MEMBER(get_drgnmst_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_drgnmst_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_drgnmst_md_tile_info);
@@ -82,6 +86,5 @@ public:
 	required_device<pic16c55_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void drgnmst(machine_config &config);
 	void drgnmst_main_map(address_map &map);
 };

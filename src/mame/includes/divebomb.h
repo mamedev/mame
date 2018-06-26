@@ -35,6 +35,9 @@ public:
 	{
 	}
 
+	void divebomb(machine_config &config);
+
+private:
 	required_device<cpu_device> m_spritecpu;
 	required_device<cpu_device> m_fgcpu;
 	required_device<cpu_device> m_rozcpucpu;
@@ -76,7 +79,6 @@ public:
 	template<int Chip> DECLARE_WRITE8_MEMBER(rozcpu_wrap_enable_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(rozcpu_enable_w);
 	DECLARE_WRITE8_MEMBER(rozcpu_pal_w);
-	void divebomb(machine_config &config);
 	void divebomb_fgcpu_iomap(address_map &map);
 	void divebomb_fgcpu_map(address_map &map);
 	void divebomb_rozcpu_iomap(address_map &map);

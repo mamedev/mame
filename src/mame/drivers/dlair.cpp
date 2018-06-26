@@ -79,7 +79,7 @@ public:
 	void dleuro(machine_config &config);
 	void dlair_ldv1000(machine_config &config);
 
-protected:
+private:
 	void laserdisc_data_w(uint8_t data)
 	{
 		if (m_ldv1000 != nullptr) m_ldv1000->data_w(data);
@@ -135,7 +135,6 @@ protected:
 	void dleuro_map(address_map &map);
 	void dlus_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<gfxdecode_device> m_gfxdecode;

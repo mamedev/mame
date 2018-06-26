@@ -50,6 +50,9 @@ public:
 	{
 	}
 
+	void dgnalpha(machine_config &config);
+
+private:
 	DECLARE_FLOPPY_FORMATS(dragon_formats);
 
 
@@ -66,8 +69,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	void dgnalpha(machine_config &config);
-protected:
 	/* driver overrides */
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
@@ -87,7 +88,6 @@ protected:
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
 
-private:
 	uint8_t m_just_reset;
 
 	/* modem */

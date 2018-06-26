@@ -125,6 +125,10 @@ public:
 		std::fill(std::begin(m_old_linescroll), std::end(m_old_linescroll), 0);
 	}
 
+	void baryon(machine_config &config);
+	void dreamwld(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr_array<uint32_t, 2> m_vram;
@@ -163,8 +167,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void baryon(machine_config &config);
-	void dreamwld(machine_config &config);
 	void baryon_map(address_map &map);
 	void dreamwld_map(address_map &map);
 	void oki1_map(address_map &map);

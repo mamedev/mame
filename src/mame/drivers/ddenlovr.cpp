@@ -175,6 +175,51 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void mjmywrld(machine_config &config);
+	void mjmyster(machine_config &config);
+	void mmpanic(machine_config &config);
+	void nettoqc(machine_config &config);
+	void mjmyornt(machine_config &config);
+	void kotbinsp(machine_config &config);
+	void mjgnight(machine_config &config);
+	void ddenlovrk(machine_config &config);
+	void quizchq(machine_config &config);
+	void mjmyuniv(machine_config &config);
+	void dtoyoken(machine_config &config);
+	void hgokou(machine_config &config);
+	void seljan2(machine_config &config);
+	void janshinp(machine_config &config);
+	void hkagerou(machine_config &config);
+	void ultrchmp(machine_config &config);
+	void rongrong(machine_config &config);
+	void mjflove(machine_config &config);
+	void hanakanz(machine_config &config);
+	void jongtei(machine_config &config);
+	void akamaru(machine_config &config);
+	void mjchuuka(machine_config &config);
+	void hparadis(machine_config &config);
+	void mjreach1(machine_config &config);
+	void ddenlovr(machine_config &config);
+	void funkyfig(machine_config &config);
+	void hginga(machine_config &config);
+	void daimyojn(machine_config &config);
+	void htengoku(machine_config &config);
+	void sryudens(machine_config &config);
+	void hgokbang(machine_config &config);
+	void quiz365(machine_config &config);
+	void kotbinyo(machine_config &config);
+	void mjschuka(machine_config &config);
+	void ddenlovj(machine_config &config);
+
+	void init_rongrong();
+	void init_momotaro();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovr_blitter_irq_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
+
+private:
 	void set_blitter_irq(write_line_delegate &&handler) { m_blitter_irq_handler = std::move(handler); }
 
 	DECLARE_MACHINE_START(ddenlovr);
@@ -204,10 +249,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(hanakanz_rtc_irq);
 	DECLARE_WRITE_LINE_MEMBER(mjflove_rtc_irq);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovr_blitter_irq_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
 	DECLARE_WRITE8_MEMBER(ddenlovr_bgcolor_w);
 	DECLARE_WRITE8_MEMBER(ddenlovr_bgcolor2_w);
 	DECLARE_WRITE8_MEMBER(ddenlovr_priority_w);
@@ -348,8 +389,6 @@ public:
 	DECLARE_WRITE8_MEMBER(seljan2_rombank_w);
 	DECLARE_WRITE8_MEMBER(seljan2_palette_enab_w);
 	DECLARE_WRITE8_MEMBER(seljan2_palette_w);
-	void init_rongrong();
-	void init_momotaro();
 	DECLARE_WRITE8_MEMBER(htengoku_select_w);
 	DECLARE_WRITE8_MEMBER(htengoku_coin_w);
 	DECLARE_READ8_MEMBER(htengoku_input_r);
@@ -391,41 +430,6 @@ public:
 	void mmpanic_update_leds();
 	void mjchuuka_get_romdata();
 	uint8_t hgokou_player_r( int player );
-	void mjmywrld(machine_config &config);
-	void mjmyster(machine_config &config);
-	void mmpanic(machine_config &config);
-	void nettoqc(machine_config &config);
-	void mjmyornt(machine_config &config);
-	void kotbinsp(machine_config &config);
-	void mjgnight(machine_config &config);
-	void ddenlovrk(machine_config &config);
-	void quizchq(machine_config &config);
-	void mjmyuniv(machine_config &config);
-	void dtoyoken(machine_config &config);
-	void hgokou(machine_config &config);
-	void seljan2(machine_config &config);
-	void janshinp(machine_config &config);
-	void hkagerou(machine_config &config);
-	void ultrchmp(machine_config &config);
-	void rongrong(machine_config &config);
-	void mjflove(machine_config &config);
-	void hanakanz(machine_config &config);
-	void jongtei(machine_config &config);
-	void akamaru(machine_config &config);
-	void mjchuuka(machine_config &config);
-	void hparadis(machine_config &config);
-	void mjreach1(machine_config &config);
-	void ddenlovr(machine_config &config);
-	void funkyfig(machine_config &config);
-	void hginga(machine_config &config);
-	void daimyojn(machine_config &config);
-	void htengoku(machine_config &config);
-	void sryudens(machine_config &config);
-	void hgokbang(machine_config &config);
-	void quiz365(machine_config &config);
-	void kotbinyo(machine_config &config);
-	void mjschuka(machine_config &config);
-	void ddenlovj(machine_config &config);
 	void akamaru_map(address_map &map);
 	void daimyojn_portmap(address_map &map);
 	void ddenlovj_map(address_map &map);
@@ -475,7 +479,6 @@ public:
 	void sryudens_portmap(address_map &map);
 	void ultrchmp_map(address_map &map);
 
-protected:
 	write_line_delegate m_blitter_irq_handler;
 
 	optional_shared_ptr<uint16_t> m_protection1;
