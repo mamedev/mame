@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/hd63450.h"
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
 #include "machine/nvram.h"
@@ -62,6 +63,7 @@ void harriet_state::harriet_map(address_map &map)
 	map(0x7f0000, 0x7fffff).ram();
 	map(0xf10000, 0xf1001f).rw("duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xf20000, 0xf2002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
+	map(0xf30000, 0xf30fff).rw("dmac", FUNC(hd63450_device::read), FUNC(hd63450_device::write));
 	map(0xf4003f, 0xf4003f).r(FUNC(harriet_state::unk_status_r));
 }
 
@@ -93,6 +95,9 @@ MACHINE_CONFIG_START(harriet_state::harriet)
 	MCFG_MC68901_RX_CLOCK(9600)
 	MCFG_MC68901_TX_CLOCK(9600)
 	MCFG_MC68901_OUT_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+
+	MCFG_DEVICE_ADD("dmac", HD63450, 40_MHz_XTAL / 4) // MC68450R10
+	MCFG_HD63450_CPU("maincpu")
 
 	MCFG_DEVICE_ADD("timekpr", M48T02, 0)
 	MCFG_NVRAM_ADD_0FILL("zpram") // MK48Z02
