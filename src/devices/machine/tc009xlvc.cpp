@@ -42,15 +42,14 @@ WRITE8_MEMBER(tc0091lvc_device::vram_w)
 	if ((offset & 0xc000) == 0)
 		return;
 
-	if(m_vram[offset] == data)
-		return;
+	assert(m_vram[offset] != data);
 
 	COMBINE_DATA(&m_vram[offset]);
 	gfx(2)->mark_dirty(offset / 32);
 
-	if ((offset & 0xe000) == 0x8000) // 0x8000-0x9000 Background tilemap
+	if ((offset >= 0x8000) && (offset < 0xa000)) // 0x8000-0x9000 Background tilemap
 		m_bg_tilemap[(offset >> 12) & 1]->mark_tile_dirty((offset & 0xfff) / 2);
-	else if ((offset & 0xf000) == 0xa000) // 0xa000 Text tilemap
+	else if (offset < 0xb000) // 0xa000 Text tilemap
 		m_tx_tilemap->mark_tile_dirty((offset & 0xfff) / 2);
 
 }
