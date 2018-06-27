@@ -2262,7 +2262,7 @@ MACHINE_CONFIG_START(tumbleb_state::cookbib_mcu)
 	htchctch(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("protection", I8052, 16000000)  // AT89C52
+	MCFG_DEVICE_ADD("protection", AT89C52, 16000000)
 	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, tumbleb_state, prot_p0_w))
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, tumbleb_state, prot_p1_w))
 	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, tumbleb_state, prot_p2_w))

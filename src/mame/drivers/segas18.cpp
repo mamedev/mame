@@ -1337,7 +1337,7 @@ MACHINE_CONFIG_START(segas18_state::system18)
 	MCFG_315_5296_OUT_CNT1_CB(WRITELINE("segaic16vid", segaic16_video_device, set_display_enable))
 	MCFG_315_5296_OUT_CNT2_CB(WRITELINE(*this, segas18_state, set_vdp_enable))
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 15000000, "maincpu") // ??? Frequency is a complete guess
 	MCFG_SEGA315_5313_IS_PAL(false)
 	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, segas18_state, vdp_sndirqline_callback_s18));
 	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, segas18_state, vdp_lv6irqline_callback_s18));
@@ -1345,6 +1345,7 @@ MACHINE_CONFIG_START(segas18_state::system18)
 	MCFG_SEGA315_5313_ALT_TIMING(1);
 	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x2000);
 	MCFG_SEGA315_5313_PALETTE("palette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.0)
 
 	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "screen", 0, 1)
 

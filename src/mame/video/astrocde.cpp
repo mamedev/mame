@@ -206,7 +206,7 @@ VIDEO_START_MEMBER(astrocde_state,profpac)
 	init_savestate();
 
 	/* register our specific save state data */
-	save_pointer(NAME(m_profpac_videoram.get()), 0x4000 * 4);
+	save_pointer(NAME(m_profpac_videoram), 0x4000 * 4);
 	save_item(NAME(m_profpac_palette));
 	save_item(NAME(m_profpac_colormap));
 	save_item(NAME(m_profpac_intercept));

@@ -7,9 +7,9 @@
     If you have any questions about how this driver works, don't hesitate to
     ask.  - Mike Balfour (mab22@po.cwru.edu)
 
-	To Do:
-	- Device-ify video and audio hardware to turn optional_devices into
-	  required_devices.
+    To Do:
+    - Device-ify video and audio hardware to turn optional_devices into
+      required_devices.
 
 ****************************************************************************/
 

@@ -45,6 +45,23 @@ Dumped by Chackn
 #include "screen.h"
 #include "speaker.h"
 
+/* VDP device to give us our own memory map */
+class janshi_vdp_device : public device_t, public device_memory_interface
+{
+public:
+	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void map(address_map &map);
+
+protected:
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual space_config_vector memory_space_config() const override;
+
+private:
+	address_space_config        m_space_config;
+};
 
 class pinkiri8_state : public driver_device
 {
@@ -61,6 +78,7 @@ public:
 		m_janshi_paletteram2(*this, "janshivdp:paletteram2"),
 		m_janshi_crtc_regs(*this, "janshivdp:crtc_regs"),
 		m_maincpu(*this, "maincpu"),
+		m_vdp(*this, "janshivdp"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
@@ -105,29 +123,13 @@ private:
 	uint8_t m_prot_index;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<janshi_vdp_device> m_vdp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
 
 
 
-/* VDP device to give us our own memory map */
-class janshi_vdp_device : public device_t, public device_memory_interface
-{
-public:
-	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	void map(address_map &map);
-
-protected:
-	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual space_config_vector memory_space_config() const override;
-
-private:
-	address_space_config        m_space_config;
-};
 
 
 void janshi_vdp_device::map(address_map &map)
@@ -428,7 +430,7 @@ WRITE8_MEMBER(pinkiri8_state::pinkiri8_vram_w)
 
 		case 3:
 		{
-			address_space &vdp_space = machine().device<janshi_vdp_device>("janshivdp")->space();
+			address_space &vdp_space = m_vdp->space();
 
 			if (LOG_VRAM) printf("%02x ", data);
 			m_prev_writes++;

@@ -449,7 +449,7 @@ void multigam_state::multigam3_mmc3_scanline_cb( int scanline, int vblank, int b
 		if (--m_multigam3_mmc3_scanline_counter == -1)
 		{
 			m_multigam3_mmc3_scanline_counter = m_multigam3_mmc3_scanline_latch;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 }
@@ -591,7 +591,7 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 		break;
 
 		case 0x6000: /* disable irqs */
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
 		break;
 

@@ -350,10 +350,7 @@ READ8_MEMBER( pc1512_keyboard_device::kb_bus_r )
 	if (!BIT(m_kb_y, 8)) data &= m_y[8]->read();
 	if (!BIT(m_kb_y, 9)) data &= m_y[9]->read();
 	if (!BIT(m_kb_y, 10)) data &= m_y[10]->read();
-	if (!m_joy_com)
-	{
-		data &= m_joy->joy_r();
-	}
+	if (!m_joy_com) data &= m_joy->read_joy();
 
 	return data;
 }

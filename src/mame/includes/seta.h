@@ -59,6 +59,7 @@ public:
 		m_extra_port(*this, "EXTRA"),
 		m_track_x(*this, "TRACK%u_X", 1U),
 		m_track_y(*this, "TRACK%u_Y", 1U),
+		m_key(*this, "KEY%u", 0U),
 		m_sharedram(*this,"sharedram"),
 		m_vram(*this,"vram_%u", 0U),
 		m_vctrl(*this,"vctrl_%u", 0U),
@@ -88,6 +89,7 @@ public:
 	optional_ioport m_extra_port;
 	optional_ioport_array<2> m_track_x;
 	optional_ioport_array<2> m_track_y;
+	optional_ioport_array<5> m_key;
 
 	optional_shared_ptr<uint8_t> m_sharedram;
 	optional_shared_ptr_array<uint16_t, 2> m_vram;
@@ -406,6 +408,8 @@ public:
 		m_dsw1(*this, "DSW1"),
 		m_dsw2_3(*this, "DSW2_3"),
 		m_cabinet(*this, "CABINET"),
+		m_p1x(*this, "P1X"),
+		m_p1y(*this, "P1Y"),
 		m_out_cancel(*this, "cancel%u", 1U),
 		m_out_payout(*this, "payout%u", 1U),
 		m_out_start(*this, "start%u", 1U),
@@ -449,6 +453,8 @@ private:
 	required_ioport_array<5> m_key1, m_key2;
 	required_ioport m_dsw1, m_dsw2_3;
 	optional_ioport m_cabinet;
+	optional_ioport m_p1x;
+	optional_ioport m_p1y;
 
 	output_finder<2> m_out_cancel;
 	output_finder<2> m_out_payout;

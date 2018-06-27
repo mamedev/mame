@@ -223,7 +223,6 @@ seem to have access to.
 #include "includes/system1.h"
 
 #include "cpu/mcs51/mcs51.h"
-#include "machine/z80pio.h"
 #include "machine/segacrpt_device.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
@@ -526,8 +525,6 @@ WRITE8_MEMBER(system1_state::sound_control_w)
 
 READ8_MEMBER(system1_state::sound_data_r)
 {
-	z80pio_device *pio = machine().device<z80pio_device>("pio");
-
 	/* if we have an 8255 PPI, get the data from the port and toggle the ack */
 	if (m_ppi8255 != nullptr)
 	{
@@ -537,11 +534,11 @@ READ8_MEMBER(system1_state::sound_data_r)
 	}
 
 	/* if we have a Z80 PIO, get the data from the port and toggle the strobe */
-	else if (pio != nullptr)
+	else if (m_pio != nullptr)
 	{
-		uint8_t data = pio->port_read(z80pio_device::PORT_A);
-		pio->strobe(z80pio_device::PORT_A, false);
-		pio->strobe(z80pio_device::PORT_A, true);
+		uint8_t data = m_pio->port_read(z80pio_device::PORT_A);
+		m_pio->strobe(z80pio_device::PORT_A, false);
+		m_pio->strobe(z80pio_device::PORT_A, true);
 		return data;
 	}
 

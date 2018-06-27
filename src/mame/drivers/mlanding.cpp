@@ -192,7 +192,7 @@ void mlanding_state::machine_start()
 	m_dma_bank->configure_entries(0, 2, m_dma_ram.get(), c_dma_bank_words * 2);
 
 	// Register state for saving
-	save_pointer(NAME(m_dma_ram.get()), c_dma_bank_words * 2);
+	save_pointer(NAME(m_dma_ram), c_dma_bank_words * 2);
 	save_item(NAME(m_dma_cpu_bank));
 	save_item(NAME(m_dma_busy));
 	save_item(NAME(m_dsp_hold_signal));
@@ -577,7 +577,7 @@ void mlanding_state::msm5205_update(int chip)
 	uint8_t data = rom[m_msm_pos[chip]];
 	msm5205_device *msm = chip ? m_msm2 : m_msm1;
 
-	msm->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
+	msm->write_data((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
 
 	if (m_msm_nibble[chip])
 		++m_msm_pos[chip];

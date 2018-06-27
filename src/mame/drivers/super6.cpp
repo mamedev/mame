@@ -242,32 +242,6 @@ WRITE8_MEMBER( super6_state::fdc_w )
 }
 
 
-//-------------------------------------------------
-//  baud_w - baud rate
-//-------------------------------------------------
-
-WRITE8_MEMBER( super6_state::baud_w )
-{
-	/*
-
-	    bit     description
-
-	    0       SIO channel A baud bit A
-	    1       SIO channel A baud bit B
-	    2       SIO channel A baud bit C
-	    3       SIO channel A baud bit D
-	    4       SIO channel B baud bit A
-	    5       SIO channel B baud bit B
-	    6       SIO channel B baud bit C
-	    7       SIO channel B baud bit D
-
-	*/
-
-	m_brg->write_str(data & 0x0f);
-	m_brg->write_stt(data >> 4);
-}
-
-
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -298,7 +272,7 @@ void super6_state::super6_io(address_map &map)
 	map(0x15, 0x15).portr("J7").w(FUNC(super6_state::s100_w));
 	map(0x16, 0x16).w(FUNC(super6_state::bank0_w));
 	map(0x17, 0x17).w(FUNC(super6_state::bank1_w));
-	map(0x18, 0x18).mirror(0x03).w(FUNC(super6_state::baud_w));
+	map(0x18, 0x18).mirror(0x03).w(BR1945_TAG, FUNC(com8116_device::stt_str_w));
 //  AM_RANGE(0x40, 0x40) ?
 //  AM_RANGE(0xe0, 0xe7) HDC?
 }

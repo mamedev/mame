@@ -224,6 +224,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_irq_function );
 	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_timer_tick );
 	DECLARE_READ8_MEMBER( apollo_pic8259_get_slave_ack );
+	DECLARE_WRITE_LINE_MEMBER( apollo_rtc_irq_function );
 
 	DECLARE_READ8_MEMBER(pc_dma8237_0_dack_r);
 	DECLARE_READ8_MEMBER(pc_dma8237_1_dack_r);
@@ -247,7 +248,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
-	TIMER_CALLBACK_MEMBER( apollo_rtc_timer );
 
 	void apollo_pic_set_irq_line(int irq, int state);
 	void select_dma_channel(int channel, bool state);
@@ -283,7 +283,6 @@ private:
 	uint8_t sio_output_data;
 	int m_dma_channel;
 	bool m_cur_eop;
-	emu_timer *m_dn3000_timer;
 };
 
 /*----------- machine/apollo_config.c -----------*/

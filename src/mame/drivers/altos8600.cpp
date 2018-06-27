@@ -798,8 +798,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("ics", ACS8600_ICS, 0)
-	MCFG_ACS8600_ICS_MAINCPU(":dmac") // TODO: fixme
+	MCFG_DEVICE_ADD("ics", ACS8600_ICS, "dmac")
 	MCFG_ACS8600_ICS_IRQ1(WRITELINE("pic8259_1", pic8259_device, ir5_w))
 	MCFG_ACS8600_ICS_IRQ2(WRITELINE("pic8259_1", pic8259_device, ir6_w))
 

@@ -712,7 +712,7 @@ SAMPLES_START_CB_MEMBER(m63_state::fghtbskt_sh_start)
 	uint8_t *ROM = memregion("samples")->base();
 
 	m_samplebuf = std::make_unique<int16_t[]>(len);
-	save_pointer(NAME(m_samplebuf.get()), len);
+	save_pointer(NAME(m_samplebuf), len);
 
 	for(i = 0; i < len; i++)
 		m_samplebuf[i] = ((int8_t)(ROM[i] ^ 0x80)) * 256;

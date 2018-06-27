@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, ???
+// copyright-holders:David Haywood, Barry Rodewald
 /* Sega MegaTech
 
 About MegaTech:
@@ -104,6 +104,16 @@ public:
 		m_region_maincpu(*this, "maincpu")
 	{ }
 
+	void megatech_multislot(machine_config &config);
+	void megatech_fixedslot(machine_config &config);
+
+	void init_mt_crt();
+	void init_mt_slot();
+
+private:
+
+	void megatech(machine_config &config);
+
 	DECLARE_READ8_MEMBER(cart_select_r);
 	DECLARE_WRITE8_MEMBER(cart_select_w);
 	DECLARE_READ8_MEMBER(bios_portc_r);
@@ -120,12 +130,11 @@ public:
 	DECLARE_WRITE8_MEMBER(bios_port_7f_w);
 	DECLARE_READ8_MEMBER(vdp1_count_r);
 	DECLARE_READ8_MEMBER(sms_count_r);
+	DECLARE_WRITE8_MEMBER(sms_sn_w);
 	DECLARE_READ8_MEMBER(sms_ioport_dc_r);
 	DECLARE_READ8_MEMBER(sms_ioport_dd_r);
 	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);
 
-	void init_mt_crt();
-	void init_mt_slot();
 	DECLARE_MACHINE_RESET(megatech);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
@@ -142,12 +151,9 @@ public:
 	uint32_t screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_main);
 
-	void megatech(machine_config &config);
-	void megatech_multislot(machine_config &config);
-	void megatech_fixedslot(machine_config &config);
 	void megatech_bios_map(address_map &map);
 	void megatech_bios_portmap(address_map &map);
-private:
+
 	uint8_t m_mt_cart_select_reg;
 	uint32_t m_bios_port_ctrl;
 	int m_current_MACHINE_IS_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
@@ -320,6 +326,11 @@ READ8_MEMBER(mtech_state::sms_count_r)
 		return m_vdp->vcount_read(prg, offset);
 }
 
+WRITE8_MEMBER(mtech_state::sms_sn_w)
+{
+	address_space &prg = m_z80snd->space(AS_PROGRAM);
+	m_vdp->vdp_w(prg, 0x10 >> 1, data, 0x00ff);
+}
 
 READ8_MEMBER (mtech_state::sms_ioport_dc_r)
 {
@@ -383,7 +394,7 @@ void mtech_state::set_genz80_as_sms()
 
 	// ports
 	io.install_read_handler      (0x40, 0x41, 0, 0x3e, 0, read8_delegate(FUNC(mtech_state::sms_count_r),this));
-	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8_delegate(FUNC(sn76496_device::command_w),(sn76496_base_device *)m_snsnd));
+	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8_delegate(FUNC(mtech_state::sms_sn_w),this));
 	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::vram_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::vram_write),(sega315_5124_device *)m_vdp));
 	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::register_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::register_write),(sega315_5124_device *)m_vdp));
 

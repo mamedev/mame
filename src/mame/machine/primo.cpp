@@ -167,18 +167,18 @@ WRITE8_MEMBER(primo_state::primo_ki_2_w)
 	// bit 7, 6 - not used
 
 	// bit 5 - SCLK
-	m_iec->clk_w(!BIT(data, 5));
+	m_iec->host_clk_w(!BIT(data, 5));
 
 	// bit 4 - SDATA
-	m_iec->data_w(!BIT(data, 4));
+	m_iec->host_data_w(!BIT(data, 4));
 
 	// bit 3 - not used
 
 	// bit 2 - SRQ
-	m_iec->srq_w(!BIT(data, 2));
+	m_iec->host_srq_w(!BIT(data, 2));
 
 	// bit 1 - ATN
-	m_iec->atn_w(!BIT(data, 1));
+	m_iec->host_atn_w(!BIT(data, 1));
 
 	// bit 0 - not used
 

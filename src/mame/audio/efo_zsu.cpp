@@ -233,7 +233,7 @@ MACHINE_CONFIG_START(efo_zsu_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("fifo", CD40105, 0)
 	MCFG_40105_DATA_OUT_READY_CB(WRITELINE(*this, efo_zsu_device, fifo_dor_w))
-	MCFG_40105_DATA_OUT_CB(WRITELINE("adpcm", msm5205_device, data_w))
+	MCFG_40105_DATA_OUT_CB(WRITE8("adpcm", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("adpcm", MSM5205, 4000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

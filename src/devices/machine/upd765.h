@@ -233,6 +233,7 @@ protected:
 		SEEK_WAIT_DONE,
 		SEEK_DONE,
 
+		HEAD_LOAD,
 		HEAD_LOAD_DONE,
 
 		WAIT_INDEX,
@@ -345,7 +346,8 @@ protected:
 	emu_timer *poll_timer;
 
 	static std::string tts(attotime t);
-	std::string ttsn();
+	std::string results() const;
+	std::string ttsn() const;
 
 	enum {
 		C_CONFIGURE,
