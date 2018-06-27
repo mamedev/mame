@@ -51,6 +51,14 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void isbc2861(machine_config &config);
+	void isbc86(machine_config &config);
+	void rpc86(machine_config &config);
+	void isbc8605(machine_config &config);
+	void isbc286(machine_config &config);
+	void isbc8630(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
@@ -71,12 +79,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(led_ds1_w);
 	DECLARE_WRITE_LINE_MEMBER(led_ds3_w);
 	DECLARE_WRITE_LINE_MEMBER(megabyte_select_w);
-	void isbc2861(machine_config &config);
-	void isbc86(machine_config &config);
-	void rpc86(machine_config &config);
-	void isbc8605(machine_config &config);
-	void isbc286(machine_config &config);
-	void isbc8630(machine_config &config);
 	void isbc2861_mem(address_map &map);
 	void isbc286_io(address_map &map);
 	void isbc286_mem(address_map &map);
@@ -86,7 +88,7 @@ public:
 	void isbc_io(address_map &map);
 	void rpc86_io(address_map &map);
 	void rpc86_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void machine_reset() override;
 
@@ -103,7 +105,6 @@ protected:
 	optional_shared_ptr<u16> m_biosram;
 	output_finder<2> m_leds;
 
-private:
 	bool m_upperen;
 	offs_t m_megabyte_page;
 	bool m_nmi_enable;

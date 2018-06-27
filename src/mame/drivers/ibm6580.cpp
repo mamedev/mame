@@ -150,6 +150,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void ibm6580(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(ibm6580);
 
 	DECLARE_WRITE16_MEMBER(pic_latch_w);
@@ -183,10 +186,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ibm6580(machine_config &config);
 	void ibm6580_io(address_map &map);
 	void ibm6580_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

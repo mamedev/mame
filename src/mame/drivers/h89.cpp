@@ -36,6 +36,9 @@ public:
 	{
 	}
 
+	void h89(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_WRITE8_MEMBER( port_f2_w );
@@ -43,7 +46,6 @@ public:
 	uint8_t m_port_f2;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
-	void h89(machine_config &config);
 	void h89_io(address_map &map);
 	void h89_mem(address_map &map);
 };

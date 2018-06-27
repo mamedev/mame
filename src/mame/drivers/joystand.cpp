@@ -133,6 +133,9 @@ public:
 		m_outputs(*this, "outputs")
 	{ }
 
+	void joystand(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
@@ -204,7 +207,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
-	void joystand(machine_config &config);
 	void joystand_map(address_map &map);
 };
 

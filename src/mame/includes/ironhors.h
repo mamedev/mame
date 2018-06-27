@@ -29,6 +29,10 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_spriteram(*this, "spriteram") { }
 
+	void farwest(machine_config &config);
+	void ironhors(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
@@ -47,19 +51,16 @@ public:
 	DECLARE_PALETTE_INIT(ironhors);
 	DECLARE_VIDEO_START(farwest);
 
-	void farwest(machine_config &config);
-	void ironhors(machine_config &config);
 	void farwest_master_map(address_map &map);
 	void farwest_slave_map(address_map &map);
 	void master_map(address_map &map);
 	void slave_io_map(address_map &map);
 	void slave_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;

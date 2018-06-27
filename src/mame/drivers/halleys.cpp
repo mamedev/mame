@@ -226,6 +226,14 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void benberob(machine_config &config);
+	void halleys(machine_config &config);
+
+	void init_halley87();
+	void init_benberob();
+	void init_halleys();
+
+private:
 	uint16_t *m_render_layer[MAX_LAYERS];
 	uint8_t m_sound_fifo[MAX_SOUNDS];
 	uint8_t *m_gfx_plane02;
@@ -271,9 +279,6 @@ public:
 	DECLARE_READ8_MEMBER(io_mirror_r);
 	void blit(int offset);
 	DECLARE_WRITE8_MEMBER(sndnmi_msk_w);
-	void init_halley87();
-	void init_benberob();
-	void init_halleys();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(halleys);
@@ -293,8 +298,6 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void benberob(machine_config &config);
-	void halleys(machine_config &config);
 	void halleys_map(address_map &map);
 	void sound_map(address_map &map);
 };
