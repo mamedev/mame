@@ -92,7 +92,7 @@ public:
 
 	void gts1(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER (gts1_solenoid_r);
 	DECLARE_WRITE8_MEMBER(gts1_solenoid_w);
 	DECLARE_READ8_MEMBER (gts1_switches_r);
@@ -114,7 +114,6 @@ protected:
 	void gts1_data(address_map &map);
 	void gts1_io(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<3> m_dips;
 	required_ioport_array<5> m_switches;

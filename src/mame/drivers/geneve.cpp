@@ -222,6 +222,13 @@ public:
 	{
 	}
 
+	void geneve_common(machine_config &config);
+	void geneve(machine_config &config);
+	void genmod(machine_config &config);
+
+	void init_geneve();
+
+private:
 	// CRU (Communication Register Unit) handling
 	DECLARE_READ8_MEMBER(cruread);
 	DECLARE_WRITE8_MEMBER(cruwrite);
@@ -256,7 +263,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ext_ready );
 	DECLARE_WRITE_LINE_MEMBER( mapper_ready );
 
-	void init_geneve();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -270,9 +276,6 @@ public:
 
 	int m_ready_line;
 	int m_ready_line1;
-	void geneve_common(machine_config &config);
-	void geneve(machine_config &config);
-	void genmod(machine_config &config);
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
