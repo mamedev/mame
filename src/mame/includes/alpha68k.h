@@ -8,12 +8,13 @@
 
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class alpha68k_state : public driver_device
 {
 public:
-	alpha68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	alpha68k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
@@ -22,7 +23,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_outlatch(*this, "outlatch"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_color_proms(*this, "color_proms"),
+		m_in(*this, "IN%u", 0U),
+		m_audiobank(*this, "audiobank") { }
 
 	void tnextspc(machine_config &config);
 	void alpha68k_II(machine_config &config);
@@ -66,7 +70,6 @@ private:
 	DECLARE_READ16_MEMBER(control_4_r);
 	DECLARE_READ16_MEMBER(jongbou_inputs_r);
 	DECLARE_WRITE8_MEMBER(outlatch_w);
-	DECLARE_WRITE8_MEMBER(paddlema_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(tnextspc_soundlatch_w);
 	DECLARE_READ16_MEMBER(kyros_alpha_trigger_r);
 	DECLARE_READ16_MEMBER(alpha_II_trigger_r);
@@ -133,27 +136,31 @@ private:
 	optional_device<ls259_device> m_outlatch;
 	required_device<generic_latch_8_device> m_soundlatch;
 
+	optional_region_ptr<uint8_t> m_color_proms;
+
+	optional_ioport_array<7> m_in;
+	optional_memory_bank m_audiobank;
+
 	uint8_t       m_sound_nmi_mask;
 	uint8_t       m_sound_pa_latch;
 
 	/* video-related */
 	tilemap_t     *m_fix_tilemap;
-	int         m_bank_base;
-	int         m_flipscreen;
-	int         m_last_bank;
+	int           m_bank_base;
+	int           m_flipscreen;
 
 	/* misc */
-	int         m_invert_controls;
-	int         m_microcontroller_id;
-	int         m_coin_id;
-	unsigned    m_trigstate;
-	unsigned    m_deposits1;
-	unsigned    m_deposits2;
-	unsigned    m_credits;
-	unsigned    m_coinvalue;
-	unsigned    m_microcontroller_data;
-	int         m_latch;
-	unsigned    m_game_id;  // see below
+	int           m_invert_controls;
+	int           m_microcontroller_id;
+	int           m_coin_id;
+	unsigned      m_trigstate;
+	unsigned      m_deposits1;
+	unsigned      m_deposits2;
+	unsigned      m_credits;
+	unsigned      m_coinvalue;
+	unsigned      m_microcontroller_data;
+	int           m_latch;
+	unsigned      m_game_id;  // see below
 };
 
 /* game_id - used to deal with a few game specific situations */

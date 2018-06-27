@@ -16,6 +16,8 @@
 
 #include "video/i8275.h"
 
+#include "emupal.h"
+
 
 class zorba_state : public driver_device
 {

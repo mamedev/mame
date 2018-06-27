@@ -8,6 +8,8 @@
 
 ***************************************************************************/
 
+#include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -19,6 +21,7 @@ class mystston_state : public driver_device
 public:
 	mystston_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_ay8910(*this, "ay%u", 1U),
 		m_ay8910_data(*this, "ay8910_data"),
 		m_ay8910_select(*this, "ay8910_select"),
 		m_bg_videoram(*this, "bg_videoram"),
@@ -33,6 +36,7 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* machine state */
+	required_device_array<ay8910_device, 2> m_ay8910;
 	required_shared_ptr<uint8_t> m_ay8910_data;
 	required_shared_ptr<uint8_t> m_ay8910_select;
 

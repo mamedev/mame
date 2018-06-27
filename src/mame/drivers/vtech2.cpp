@@ -69,7 +69,6 @@
 #include "includes/vtech2.h"
 
 #include "cpu/z80/z80.h"
-#include "imagedev/flopdrv.h"
 #include "sound/wave.h"
 
 #include "screen.h"

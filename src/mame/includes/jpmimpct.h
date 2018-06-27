@@ -11,6 +11,7 @@
 #include "machine/timer.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/upd7759.h"
+#include "emupal.h"
 
 struct duart_t
 {
@@ -62,6 +63,7 @@ class jpmimpct_state : public driver_device
 public:
 	jpmimpct_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_duart_1_timer(*this, "duart_1_timer")
 		, m_vfd(*this, "vfd")
 		, m_vram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
@@ -143,6 +145,8 @@ private:
 	struct bt477_t m_bt477;
 	void jpm_draw_lamps(int data, int lamp_strobe);
 	void update_irqs();
+
+	required_device<timer_device> m_duart_1_timer;
 	optional_device<s16lf01_device> m_vfd;
 	optional_shared_ptr<uint16_t> m_vram;
 	required_device<cpu_device> m_maincpu;

@@ -87,6 +87,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 

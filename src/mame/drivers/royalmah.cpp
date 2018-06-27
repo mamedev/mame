@@ -104,6 +104,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

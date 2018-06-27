@@ -14,6 +14,7 @@
 #include "pocketc.h"
 #include "cpu/sc61860/sc61860.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 
 #define CONTRAST (ioport("DSW0")->read() & 0x07)
 

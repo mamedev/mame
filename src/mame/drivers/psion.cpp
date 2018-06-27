@@ -504,7 +504,7 @@ void psion_state::machine_start()
 	save_item(NAME(m_port2));
 	save_item(NAME(m_port6_ddr));
 	save_item(NAME(m_port6));
-	save_pointer(NAME(m_paged_ram.get()), m_ram_bank_count * 0x4000);
+	save_pointer(NAME(m_paged_ram), m_ram_bank_count * 0x4000);
 }
 
 void psion_state::machine_reset()

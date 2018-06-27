@@ -16,6 +16,7 @@
 #include "sound/dac.h"
 #include "sound/beep.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 
 class novagbase_state : public driver_device
 {

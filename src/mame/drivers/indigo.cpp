@@ -27,6 +27,7 @@
 #include "machine/eepromser.h"
 #include "machine/sgi.h"
 #include "machine/wd33c93.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -611,7 +612,7 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_WD33C93_IRQ_CB(WRITELINE(*this, indigo_state, scsi_irq))      /* command completion IRQ */
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(indigo_state::indigo4k)

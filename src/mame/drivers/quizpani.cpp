@@ -52,6 +52,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

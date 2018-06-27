@@ -81,6 +81,7 @@ ROMS: All ROM labels say only "PROM" and a number.
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

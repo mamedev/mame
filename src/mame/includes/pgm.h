@@ -17,6 +17,7 @@
 #include "machine/timer.h"
 #include "machine/v3021.h"
 #include "sound/ics2115.h"
+#include "emupal.h"
 
 #define PGMARM7LOGERROR 0
 

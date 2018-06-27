@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert and unknown others
+// copyright-holders:Robbbert
 /***************************************************************************
 
     Acorn 6809
@@ -58,6 +58,7 @@ enter  show next address
 #include "video/mc6845.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

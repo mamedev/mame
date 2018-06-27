@@ -18,6 +18,7 @@
 #include "imagedev/printer.h"
 #include "machine/mos6551.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 
 //**************************************************************************

@@ -63,6 +63,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include "hp2640.lh"

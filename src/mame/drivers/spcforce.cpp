@@ -42,6 +42,7 @@ TODO:
 #include "cpu/mcs48/mcs48.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

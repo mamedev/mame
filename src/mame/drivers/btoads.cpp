@@ -332,7 +332,7 @@ MACHINE_CONFIG_START(btoads_state::btoads)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_BSMT2000_ADD("bsmt", SOUND_CLOCK)
+	MCFG_DEVICE_ADD("bsmt", BSMT2000, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

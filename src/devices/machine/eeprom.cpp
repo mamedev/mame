@@ -181,7 +181,7 @@ void eeprom_base_device::device_start()
 
 	// save states
 	save_item(NAME(m_completion_time));
-	save_pointer(m_data.get(), "m_data", size);
+	save_pointer(NAME(m_data), size);
 }
 
 

@@ -45,6 +45,7 @@
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

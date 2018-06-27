@@ -16,6 +16,7 @@
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

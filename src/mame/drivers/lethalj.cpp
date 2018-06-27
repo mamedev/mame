@@ -143,6 +143,7 @@ Pin #11(+) | | R               |
 #include "includes/lethalj.h"
 
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "speaker.h"
 
 

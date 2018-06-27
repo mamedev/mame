@@ -1316,7 +1316,7 @@ MACHINE_CONFIG_START(cps2_state::cps2)
 
 	MCFG_MACHINE_START_OVERRIDE(cps2_state, cps2)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9931,7 +9931,7 @@ void cps2_state::init_gigaman2()
 	init_cps2nc();
 
 	m_gigaman2_dummyqsound_ram = std::make_unique<uint16_t[]>(0x20000 / 2);
-	save_pointer(NAME(m_gigaman2_dummyqsound_ram.get()), 0x20000 / 2);
+	save_pointer(NAME(m_gigaman2_dummyqsound_ram), 0x20000 / 2);
 
 	space.install_readwrite_handler(0x618000, 0x619fff, read16_delegate(FUNC(cps2_state::gigaman2_dummyqsound_r),this), write16_delegate(FUNC(cps2_state::gigaman2_dummyqsound_w), this)); // no qsound..
 

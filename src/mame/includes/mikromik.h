@@ -17,6 +17,7 @@
 #include "machine/upd765.h"
 #include "video/i8275.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 #define I8085A_TAG      "ic40"

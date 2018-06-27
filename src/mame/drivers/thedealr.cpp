@@ -35,6 +35,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/seta001.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -48,6 +49,7 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_seta001(*this, "spritegen"),
 		m_palette(*this, "palette"),
+		m_iox_io(*this, "IOX"),
 		m_leds(*this, "led%u", 0U)
 	{ }
 
@@ -83,6 +85,7 @@ private:
 	required_device<cpu_device> m_subcpu;
 	required_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
+	optional_ioport m_iox_io;
 	output_finder<8> m_leds;
 };
 
@@ -201,7 +204,7 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 		{
 			case 0x01:  // inputs?
 			{
-				uint16_t buttons = ioport("IOX")->read();
+				uint16_t buttons = m_iox_io->read();
 				m_iox_ret = 0;
 				for (int i = 0; i < 16; ++i)
 				{

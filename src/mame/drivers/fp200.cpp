@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

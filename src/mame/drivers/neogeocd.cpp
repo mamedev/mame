@@ -848,7 +848,7 @@ void ngcd_state::machine_start()
 	// NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same
 	m_meminternal_data = make_unique_clear<uint8_t[]>(0x2000);
 	subdevice<nvram_device>("saveram")->set_base(m_meminternal_data.get(), 0x2000);
-	save_pointer(NAME(m_meminternal_data.get()), 0x2000);
+	save_pointer(NAME(m_meminternal_data), 0x2000);
 
 	m_tempcdc->reset_cd();
 }

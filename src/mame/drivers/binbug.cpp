@@ -61,6 +61,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

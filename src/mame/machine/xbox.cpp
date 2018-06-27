@@ -11,6 +11,7 @@
 #include "debug/debugcmd.h"
 
 #include "debugger.h"
+#include "romload.h"
 
 #include <functional>
 

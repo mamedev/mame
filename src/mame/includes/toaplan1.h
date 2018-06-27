@@ -8,6 +8,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/3812intf.h"
 #include "video/toaplan_scu.h"
+#include "emupal.h"
 #include "screen.h"
 
 class toaplan1_state : public driver_device

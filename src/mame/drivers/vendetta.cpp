@@ -453,7 +453,7 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 							/* interrupts are triggered by the main CPU */
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

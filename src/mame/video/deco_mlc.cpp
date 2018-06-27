@@ -28,9 +28,9 @@ void deco_mlc_state::video_start()
 	m_spriteram_spare = std::make_unique<uint16_t[]>(0x3000/4);
 	m_spriteram = std::make_unique<uint16_t[]>(0x3000/4);
 
-	save_pointer(NAME(m_spriteram.get()), 0x3000/4);
-	save_pointer(NAME(m_spriteram_spare.get()), 0x3000/4);
-	save_pointer(NAME(m_buffered_spriteram.get()), 0x3000/4);
+	save_pointer(NAME(m_spriteram), 0x3000/4);
+	save_pointer(NAME(m_spriteram_spare), 0x3000/4);
+	save_pointer(NAME(m_buffered_spriteram), 0x3000/4);
 }
 
 

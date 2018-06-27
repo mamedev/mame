@@ -62,8 +62,8 @@ VIDEO_START_MEMBER(midyunit_state,common)
 
 	/* register for state saving */
 	save_item(NAME(m_autoerase_enable));
-	save_pointer(NAME(m_local_videoram.get()), 0x80000/2);
-	save_pointer(NAME(m_cmos_ram.get()), (0x2000 * 4)/2);
+	save_pointer(NAME(m_local_videoram), 0x80000/2);
+	save_pointer(NAME(m_cmos_ram), (0x2000 * 4)/2);
 	save_item(NAME(m_videobank_select));
 	save_item(NAME(m_dma_register));
 }

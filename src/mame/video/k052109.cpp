@@ -244,7 +244,7 @@ void k052109_device::device_start()
 	m_firq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
 
-	save_pointer(NAME(m_ram.get()), 0x6000);
+	save_pointer(NAME(m_ram), 0x6000);
 	save_item(NAME(m_rmrd_line));
 	save_item(NAME(m_romsubbank));
 	save_item(NAME(m_scrollctrl));

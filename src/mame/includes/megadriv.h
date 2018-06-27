@@ -47,7 +47,6 @@ public:
 		m_ymsnd(*this,"ymsnd"),
 		m_scan_timer(*this, "md_scan_timer"),
 		m_vdp(*this,"gen_vdp"),
-		m_snsnd(*this, "snsnd"),
 		m_megadrive_ram(*this,"megadrive_ram"),
 		m_io_reset(*this, "RESET")
 	{ }
@@ -56,7 +55,6 @@ public:
 	optional_device<ym2612_device> m_ymsnd;
 	optional_device<timer_device> m_scan_timer;
 	required_device<sega315_5313_device> m_vdp;
-	required_device<sn76496_base_device> m_snsnd;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
 
 

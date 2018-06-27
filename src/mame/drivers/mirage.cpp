@@ -46,6 +46,7 @@ MR_01-.3A    [a0b758aa]
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -295,7 +296,7 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", miragemj_state,  irq6_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93C45
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)  // 93C45
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)

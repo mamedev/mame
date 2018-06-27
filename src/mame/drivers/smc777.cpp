@@ -27,6 +27,7 @@
 #include "sound/beep.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "imagedev/snapquik.h"
@@ -970,11 +971,11 @@ void smc777_state::machine_start()
 	m_gvram = make_unique_clear<uint8_t[]>(0x8000);
 	m_pcg = make_unique_clear<uint8_t[]>(0x800);
 
-	save_pointer(NAME(m_work_ram.get()), 0x10000);
-	save_pointer(NAME(m_vram.get()), 0x800);
-	save_pointer(NAME(m_attr.get()), 0x800);
-	save_pointer(NAME(m_gvram.get()), 0x8000);
-	save_pointer(NAME(m_pcg.get()), 0x800);
+	save_pointer(NAME(m_work_ram), 0x10000);
+	save_pointer(NAME(m_vram), 0x800);
+	save_pointer(NAME(m_attr), 0x800);
+	save_pointer(NAME(m_gvram), 0x8000);
+	save_pointer(NAME(m_pcg), 0x800);
 
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, smc777_charlayout, m_pcg.get(), 0, 8, 0));
 }

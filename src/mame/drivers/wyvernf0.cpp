@@ -39,6 +39,7 @@ TODO:
 #include "sound/msm5232.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -621,7 +622,7 @@ MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 
 	// sprite codes lookup in banked RAM
 	m_objram = std::make_unique<uint8_t[]>(0x1000 * 2);
-	save_pointer(NAME(m_objram.get()), 0x1000 * 2);
+	save_pointer(NAME(m_objram), 0x1000 * 2);
 	membank("rambank")->configure_entries(0, 2, m_objram.get(), 0x1000);
 
 	save_item(NAME(m_sound_nmi_enable));

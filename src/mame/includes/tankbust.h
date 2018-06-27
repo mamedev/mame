@@ -1,5 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
+
+#include "emupal.h"
+
 class tankbust_state : public driver_device
 {
 public:

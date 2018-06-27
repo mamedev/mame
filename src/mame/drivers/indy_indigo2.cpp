@@ -59,6 +59,7 @@
 
 #include "video/newport.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

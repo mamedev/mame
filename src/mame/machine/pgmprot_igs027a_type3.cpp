@@ -214,8 +214,8 @@ void pgm_arm_type3_state::svg_basic_init()
 	m_svg_shareram[1] = std::make_unique<uint32_t[]>(0x20000 / 4);
 	m_svg_ram_sel = 0;
 
-	save_pointer(NAME(m_svg_shareram[0].get()), 0x20000 / 4);
-	save_pointer(NAME(m_svg_shareram[1].get()), 0x20000 / 4);
+	save_pointer(NAME(m_svg_shareram[0]), 0x20000 / 4);
+	save_pointer(NAME(m_svg_shareram[1]), 0x20000 / 4);
 	save_item(NAME(m_svg_ram_sel));
 }
 

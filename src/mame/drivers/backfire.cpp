@@ -23,6 +23,7 @@
 #include "cpu/arm/arm.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -127,8 +128,8 @@ void backfire_state::video_start()
 	m_left =  std::make_unique<bitmap_ind16>(80*8, 32*8);
 	m_right = std::make_unique<bitmap_ind16>(80*8, 32*8);
 
-	save_pointer(NAME(m_spriteram_1.get()), 0x2000/2);
-	save_pointer(NAME(m_spriteram_2.get()), 0x2000/2);
+	save_pointer(NAME(m_spriteram_1), 0x2000/2);
+	save_pointer(NAME(m_spriteram_2), 0x2000/2);
 
 	save_item(NAME(*m_left));
 	save_item(NAME(*m_right));
@@ -425,7 +426,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_DEVICE_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
 	MCFG_DEVICE_PROGRAM_MAP(backfire_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("adc", ADC0808, 1000000) // unknown clock
 	MCFG_ADC0808_IN0_CB(IOPORT("PADDLE0"))

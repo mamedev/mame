@@ -122,6 +122,7 @@ as well as Up Right, Cocktail or Flip Screen from the service menu.
 #include "cpu/h8/h8s2357.h"
 #include "sound/okim9810.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -355,8 +356,8 @@ MACHINE_CONFIG_START(invqix_state::invqix)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 
 ROM_START( invqix )

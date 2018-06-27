@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert and unknown others
+// copyright-holders:Juergen Buchmueller, Robbbert
 /*****************************************************************************
  *
  * includes/trs80.h
@@ -21,6 +21,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "emupal.h"
 
 #include "formats/trs_cas.h"
 

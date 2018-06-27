@@ -651,7 +651,7 @@ void iteagle_eeprom_device::eeprom_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(iteagle_eeprom_device::device_add_mconfig)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

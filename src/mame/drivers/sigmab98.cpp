@@ -124,6 +124,7 @@ Notes:
 #include "sound/okim9810.h"
 #include "sound/ymz280b.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -2847,7 +2848,7 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sigmab98)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
@@ -3002,7 +3003,7 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")   // battery backed RAM
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 

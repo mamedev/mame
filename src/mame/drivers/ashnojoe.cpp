@@ -80,6 +80,7 @@ Coin B is not used
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -280,11 +281,11 @@ WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 {
 	if (m_msm5205_vclk_toggle == 0)
 	{
-		m_msm->data_w(m_adpcm_byte >> 4);
+		m_msm->write_data(m_adpcm_byte >> 4);
 	}
 	else
 	{
-		m_msm->data_w(m_adpcm_byte & 0xf);
+		m_msm->write_data(m_adpcm_byte & 0xf);
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 

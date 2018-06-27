@@ -33,6 +33,7 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

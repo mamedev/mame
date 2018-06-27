@@ -27,6 +27,7 @@ Debugging information:
 
 #include "emu.h"
 #include "cpu/hcd62121/hcd62121.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 

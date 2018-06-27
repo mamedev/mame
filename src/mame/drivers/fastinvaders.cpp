@@ -18,6 +18,7 @@ http://www.citylan.it/wiki/index.php/Fast_Invaders_%288275_version%29
 #include "machine/timer.h"
 #include "video/i8275.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 

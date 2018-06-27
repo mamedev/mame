@@ -10,6 +10,7 @@
 #include "machine/timer.h"
 #include "machine/msm6242.h"
 #include "sound/c140.h"
+#include "emupal.h"
 #include "screen.h"
 
 

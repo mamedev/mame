@@ -14,6 +14,7 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 
 #define Z8400A_TAG      "5f"
 #define FDC1797_TAG     "5n"
@@ -28,30 +29,30 @@ class vixen_state : public driver_device
 {
 public:
 	vixen_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z8400A_TAG),
-			m_fdc(*this, FDC1797_TAG),
-			m_io_i8155(*this, P8155H_IO_TAG),
-			m_usart(*this, P8251A_TAG),
-			m_discrete(*this, DISCRETE_TAG),
-			m_ieee488(*this, IEEE488_TAG),
-			m_palette(*this, "palette"),
-			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, FDC1797_TAG":0"),
-			m_floppy1(*this, FDC1797_TAG":1"),
-			m_rs232(*this, RS232_TAG),
-			m_rom(*this, Z8400A_TAG),
-			m_sync_rom(*this, "video"),
-			m_char_rom(*this, "chargen"),
-			m_video_ram(*this, "video_ram"),
-			m_key(*this, "KEY.%u", 0),
-			m_cmd_d1(0),
-			m_fdint(0),
-			m_vsync(0),
-			m_srq(1),
-			m_atn(1),
-			m_rxrdy(0),
-			m_txrdy(0)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z8400A_TAG)
+		, m_fdc(*this, FDC1797_TAG)
+		, m_io_i8155(*this, P8155H_IO_TAG)
+		, m_usart(*this, P8251A_TAG)
+		, m_discrete(*this, DISCRETE_TAG)
+		, m_ieee488(*this, IEEE488_TAG)
+		, m_palette(*this, "palette")
+		, m_ram(*this, RAM_TAG)
+		, m_floppy0(*this, FDC1797_TAG":0")
+		, m_floppy1(*this, FDC1797_TAG":1")
+		, m_rs232(*this, RS232_TAG)
+		, m_rom(*this, Z8400A_TAG)
+		, m_sync_rom(*this, "video")
+		, m_char_rom(*this, "chargen")
+		, m_video_ram(*this, "video_ram")
+		, m_key(*this, "KEY.%u", 0)
+		, m_cmd_d1(0)
+		, m_fdint(0)
+		, m_vsync(0)
+		, m_srq(1)
+		, m_atn(1)
+		, m_rxrdy(0)
+		, m_txrdy(0)
 	{ }
 
 	DECLARE_READ8_MEMBER( status_r );

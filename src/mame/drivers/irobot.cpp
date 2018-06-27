@@ -91,19 +91,6 @@
 
 /*************************************
  *
- *  NVRAM handler
- *
- *************************************/
-
-WRITE8_MEMBER(irobot_state::irobot_nvram_w)
-{
-	m_nvram[offset] = data & 0x0f;
-}
-
-
-
-/*************************************
- *
  *  IRQ acknowledgement
  *
  *************************************/
@@ -157,7 +144,7 @@ void irobot_state::irobot_map(address_map &map)
 	map(0x1140, 0x1140).w(FUNC(irobot_state::irobot_statwr_w));
 	map(0x1180, 0x1180).w(FUNC(irobot_state::irobot_out0_w));
 	map(0x11c0, 0x11c0).w(FUNC(irobot_state::irobot_rom_banksel_w));
-	map(0x1200, 0x12ff).ram().w(FUNC(irobot_state::irobot_nvram_w)).share("nvram");
+	map(0x1200, 0x12ff).rw("nvram", FUNC(x2212_device::read), FUNC(x2212_device::write));
 	map(0x1300, 0x1300).mirror(0xff).r("adc", FUNC(adc0809_device::data_r));
 	map(0x1400, 0x143f).rw(FUNC(irobot_state::quad_pokeyn_r), FUNC(irobot_state::quad_pokeyn_w));
 	map(0x1800, 0x18ff).w(FUNC(irobot_state::irobot_paletteram_w));
@@ -305,7 +292,7 @@ MACHINE_CONFIG_START(irobot_state::irobot)
 	MCFG_ADC0808_IN0_CB(IOPORT("AN0"))
 	MCFG_ADC0808_IN1_CB(IOPORT("AN1"))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_X2212_ADD_AUTOSAVE("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -24,6 +24,7 @@
 //#include "sound/speaker.h"
 
 #include "debugger.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 

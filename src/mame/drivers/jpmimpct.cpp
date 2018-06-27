@@ -259,8 +259,7 @@ READ16_MEMBER(jpmimpct_state::duart_1_r)
 		case 0xe:
 		{
 			attotime rate = attotime::from_hz(MC68681_1_CLOCK) * (16 * duart_1.CT);
-			timer_device *duart_timer = machine().device<timer_device>("duart_1_timer");
-			duart_timer->adjust(rate, 0, rate);
+			m_duart_1_timer->adjust(rate, 0, rate);
 			break;
 		}
 		case 0xf:
@@ -1336,17 +1335,17 @@ MACHINE_CONFIG_START(jpmimpct_state::impctawp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEFAULT_LAYOUT(layout_jpmimpct)
 
-	MCFG_STARPOINT_48STEP_ADD("reel0")
+	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel0_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel1")
+	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel1_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel2")
+	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel2_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel3")
+	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel3_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel4")
+	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel4_optic_cb))
-	MCFG_STARPOINT_48STEP_ADD("reel5")
+	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel5_optic_cb))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)

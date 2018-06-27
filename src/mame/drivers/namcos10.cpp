@@ -40,6 +40,7 @@ Point Blank 3 (GNN2 Ver. A)                        (C) Namco, 2000
 *Ren-ai Quiz High School Angel                     (C) Namco, 2002
 Seishun Quiz Colorful High School (CHS1 Ver.A)     (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)            (C) Namco, 2004
+Shamisen Brothers                                  (C) Kato/Konami, 2003
 Star Trigon (STT1 Ver.A)                           (C) Namco, 2002
 *Taiko No Tatsujin                                 (C) Namco, 2001
 Taiko No Tatsujin 2 (TK21 Ver.C)                   (C) Namco, 2001

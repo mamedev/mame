@@ -4,6 +4,7 @@
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 #include "video/jalblend.h"
+#include "emupal.h"
 
 class psychic5_state : public driver_device
 {

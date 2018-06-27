@@ -90,6 +90,7 @@
 #include "cpu/tms32051/tms32051.h"
 #include "video/tc0780fpa.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 #define LOG_PPC_TO_TLCS_COMMANDS        1

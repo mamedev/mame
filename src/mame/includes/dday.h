@@ -5,6 +5,8 @@
     D-Day
 
 *************************************************************************/
+
+#include "emupal.h"
 #include "screen.h"
 #include "sound/ay8910.h"
 

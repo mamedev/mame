@@ -163,6 +163,7 @@ JC-301-00  W11 9510K7059    23C16000        U85
 #include "video/sknsspr.h"
 #include "video/kaneko_tmap.h"
 #include "machine/kaneko_toybox.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -272,10 +273,10 @@ void jchan_state::video_start()
 	m_spritegen[1]->skns_sprite_kludge(0,0);
 
 	save_item(NAME(m_irq_sub_enable));
-	save_pointer(NAME(m_sprite_ram32[0].get()), 0x4000/4);
-	save_pointer(NAME(m_sprite_ram32[1].get()), 0x4000/4);
-	save_pointer(NAME(m_sprite_regs32[0].get()), 0x40/4);
-	save_pointer(NAME(m_sprite_regs32[1].get()), 0x40/4);
+	save_pointer(NAME(m_sprite_ram32[0]), 0x4000/4);
+	save_pointer(NAME(m_sprite_ram32[1]), 0x4000/4);
+	save_pointer(NAME(m_sprite_regs32[0]), 0x40/4);
+	save_pointer(NAME(m_sprite_regs32[1]), 0x40/4);
 }
 
 
@@ -632,9 +633,9 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 	MCFG_DEVICE_ADD("spritegen1", SKNS_SPRITE, 0)
 	MCFG_DEVICE_ADD("spritegen2", SKNS_SPRITE, 0)
 
-	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
+	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

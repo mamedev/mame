@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(fireball_state::fireball)
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, fireball_state, p3_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_0", fireball_state, int_0, attotime::from_hz(555))  //9ms from scope reading 111Hz take care of this in the handler
 
-	MCFG_EEPROM_SERIAL_X24C44_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_X24C44_16BIT)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

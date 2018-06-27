@@ -24,6 +24,7 @@ likewise a 2 screen game
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "speaker.h"
 
@@ -307,7 +308,7 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -360,7 +361,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

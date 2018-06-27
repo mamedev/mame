@@ -1100,7 +1100,7 @@ MACHINE_CONFIG_START(stv_state::stv)
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually AK93C45F */
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT) /* Actually AK93C45F */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1282,12 +1282,12 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 }
 
 
-MACHINE_START_MEMBER(stv_state,stv)
+MACHINE_START_MEMBER(stv_state, stv)
 {
-	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
+	m_scsp->set_ram_base(m_sound_ram);
 
 	// save states
-//  save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+//  save_pointer(NAME(m_scu_regs), 0x100/4);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_prev_gamebank_select));
 	save_item(NAME(m_port_sel));

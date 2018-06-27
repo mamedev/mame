@@ -56,6 +56,7 @@
 #include "sound/sn76496.h"
 #include "video/ef9369.h"
 #include "video/tms34061.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

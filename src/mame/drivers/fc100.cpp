@@ -46,6 +46,7 @@ TODO:
 #include "sound/wave.h"
 #include "video/mc6847.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 #include "formats/fc100_cas.h"
@@ -555,7 +556,7 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fc100_cart")
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

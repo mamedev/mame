@@ -14,6 +14,8 @@ DEC VT Terminal video emulation
 
 #pragma once
 
+#include "emupal.h"
+
 
 class vt100_video_device : public device_t,
 	public device_video_interface

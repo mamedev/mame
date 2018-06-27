@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ikki_state : public driver_device

@@ -19,6 +19,7 @@ There are interrupt handlers at 5.5 (0x002c) and 6.5 (0x0034).
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 

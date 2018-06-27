@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "machine/eepromser.h"
+#include "emupal.h"
 
 class stlforce_state : public driver_device
 {

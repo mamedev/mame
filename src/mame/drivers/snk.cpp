@@ -327,22 +327,9 @@ enum
 
 /*********************************************************************/
 
-WRITE8_MEMBER(snk_state::marvins_soundlatch_w)
-{
-	m_marvins_sound_busy_flag = 1;
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
-READ8_MEMBER(snk_state::marvins_soundlatch_r)
-{
-	m_marvins_sound_busy_flag = 0;
-	return m_soundlatch->read(space, 0);
-}
-
 CUSTOM_INPUT_MEMBER(snk_state::marvins_sound_busy)
 {
-	return m_marvins_sound_busy_flag;
+	return m_soundlatch->pending_r() ? 1 : 0;
 }
 
 READ8_MEMBER(snk_state::marvins_sound_nmi_ack_r)
@@ -459,7 +446,6 @@ TIMER_CALLBACK_MEMBER(snk_state::sndirq_update_callback)
 }
 
 
-
 WRITE_LINE_MEMBER(snk_state::ymirq_callback_1 )
 {
 	if (state)
@@ -473,7 +459,6 @@ WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
 }
 
 
-
 WRITE8_MEMBER(snk_state::snk_soundlatch_w)
 {
 	m_soundlatch->write(space, offset, data);
@@ -484,7 +469,6 @@ CUSTOM_INPUT_MEMBER(snk_state::snk_sound_busy)
 {
 	return (m_sound_status & 4) ? 1 : 0;
 }
-
 
 
 READ8_MEMBER(snk_state::snk_sound_status_r)
@@ -508,7 +492,6 @@ WRITE8_MEMBER(snk_state::snk_sound_status_w)
 }
 
 
-
 READ8_MEMBER(snk_state::tnk3_cmdirq_ack_r)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_CLEAR);
@@ -528,7 +511,6 @@ READ8_MEMBER(snk_state::tnk3_busy_clear_r)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), BUSY_CLEAR);
 	return 0xff;
 }
-
 
 
 /*****************************************************************************
@@ -720,9 +702,8 @@ hand, always returning 0xf inbetween valid values confuses the game.
 
 CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 {
-	static const char *const ports[] = { "P1ROT", "P2ROT" };
 	int which = (int)(uintptr_t)param;
-	int value = ioport(ports[which])->read();
+	int value = m_rot_io[which]->read();
 
 	if ((m_last_value[which] == 0x5 && value == 0x6) || (m_last_value[which] == 0x6 && value == 0x5))
 	{
@@ -737,7 +718,7 @@ CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 
 CUSTOM_INPUT_MEMBER(snk_state::gwarb_rotary)
 {
-	if (ioport("JOYSTICK_MODE")->read() == 1)
+	if (m_joymode_io->read() == 1)
 	{
 		return gwar_rotary(field, param);
 	}
@@ -784,12 +765,12 @@ WRITE8_MEMBER(snk_state::countryc_trackball_w)
 
 CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_x)
 {
-	return ioport(m_countryc_trackball ? "TRACKBALLX2" : "TRACKBALLX1")->read();
+	return m_trackball_x_io[m_countryc_trackball]->read();
 }
 
 CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
 {
-	return ioport(m_countryc_trackball ? "TRACKBALLY2" : "TRACKBALLY1")->read();
+	return m_trackball_y_io[m_countryc_trackball]->read();
 }
 
 
@@ -802,14 +783,14 @@ CUSTOM_INPUT_MEMBER(snk_state::snk_bonus_r)
 	switch (bit_mask)
 	{
 		case 0x01:  /* older games : "Occurrence" Dip Switch (DSW2:1) */
-			return ((ioport("BONUS")->read() & bit_mask) >> 0);
+			return ((m_bonus_io->read() & bit_mask) >> 0);
 		case 0xc0:  /* older games : "Bonus Life" Dip Switches (DSW1:7,8) */
-			return ((ioport("BONUS")->read() & bit_mask) >> 6);
+			return ((m_bonus_io->read() & bit_mask) >> 6);
 
 		case 0x04:  /* later games : "Occurrence" Dip Switch (DSW1:3) */
-			return ((ioport("BONUS")->read() & bit_mask) >> 2);
+			return ((m_bonus_io->read() & bit_mask) >> 2);
 		case 0x30:  /* later games : "Bonus Life" Dip Switches (DSW2:5,6) */
-			return ((ioport("BONUS")->read() & bit_mask) >> 4);
+			return ((m_bonus_io->read() & bit_mask) >> 4);
 
 		default:
 			logerror("snk_bonus_r : invalid %02X bit_mask\n",bit_mask);
@@ -826,7 +807,7 @@ void snk_state::marvins_cpuA_map(address_map &map)
 	map(0x8000, 0x8000).portr("IN0");
 	map(0x8100, 0x8100).portr("IN1");
 	map(0x8200, 0x8200).portr("IN2");
-	map(0x8300, 0x8300).w(FUNC(snk_state::marvins_soundlatch_w));
+	map(0x8300, 0x8300).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x8400, 0x8400).portr("DSW1");
 	map(0x8500, 0x8500).portr("DSW2");
 	map(0x8600, 0x8600).w(FUNC(snk_state::marvins_flipscreen_w));
@@ -875,7 +856,7 @@ void snk_state::madcrash_cpuA_map(address_map &map)
 	map(0x8000, 0x8000).portr("IN0");
 	map(0x8100, 0x8100).portr("IN1");
 	map(0x8200, 0x8200).portr("IN2");
-	map(0x8300, 0x8300).w(FUNC(snk_state::marvins_soundlatch_w));
+	map(0x8300, 0x8300).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x8400, 0x8400).portr("DSW1");
 	map(0x8500, 0x8500).portr("DSW2");
 	map(0x8600, 0x8600).mirror(0xff).w(FUNC(snk_state::marvins_flipscreen_w));
@@ -924,7 +905,7 @@ void snk_state::madcrush_cpuA_map(address_map &map)
 	map(0x8000, 0x8000).portr("IN0");
 	map(0x8100, 0x8100).portr("IN1");
 	map(0x8200, 0x8200).portr("IN2");
-	map(0x8300, 0x8300).w(FUNC(snk_state::marvins_soundlatch_w));
+	map(0x8300, 0x8300).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x8400, 0x8400).portr("DSW1");
 	map(0x8500, 0x8500).portr("DSW2");
 	map(0x8600, 0x8600).mirror(0xff).w(FUNC(snk_state::marvins_flipscreen_w));
@@ -1127,6 +1108,13 @@ void snk_state::tnk3_cpuA_map(address_map &map)
 	map(0xd000, 0xd7ff).ram().share("spriteram"); // + work ram
 	map(0xd800, 0xf7ff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
 	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+}
+
+// replace coin counter with trackball select
+void snk_state::countryc_cpuA_map(address_map &map)
+{
+	tnk3_cpuA_map(map);
+	map(0xc300, 0xc300).portr("IN3").w(FUNC(snk_state::countryc_trackball_w));
 }
 
 void snk_state::tnk3_cpuB_map(address_map &map)
@@ -1390,7 +1378,7 @@ void snk_state::tdfever_cpuB_map(address_map &map)
 void snk_state::marvins_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4000).r(FUNC(snk_state::marvins_soundlatch_r));
+	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x8002, 0x8007).w("wave", FUNC(snkwave_device::snkwave_w));
 	map(0x8008, 0x8009).w("ay2", FUNC(ay8910_device::address_data_w));
@@ -3514,9 +3502,9 @@ static const gfx_layout charlayout_4bpp =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
+	{ STEP4(0,1) },
 	{ 4*1, 4*0, 4*3, 4*2, 4*5, 4*4, 4*7, 4*6 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,4*8) },
 	32*8
 };
 
@@ -3525,11 +3513,10 @@ static const gfx_layout tilelayout_4bpp =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
+	{ STEP4(0,1) },
 	{ 4*1, 4*0, 4*3, 4*2, 4*5, 4*4, 4*7, 4*6,
 		32+4*1, 32+4*0, 32+4*3, 32+4*2, 32+4*5, 32+4*4, 32+4*7, 32+4*6 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	{ STEP16(0,4*16) },
 	64*16
 };
 
@@ -3539,9 +3526,8 @@ static const gfx_layout spritelayout_3bpp =
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 7,6,5,4,3,2,1,0, 15,14,13,12,11,10,9,8 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(8*0+7,-1), STEP8(8*1+7,-1) },
+	{ STEP16(0,16) },
 	16*16
 };
 
@@ -3551,12 +3537,8 @@ static const gfx_layout spritelayout_4bpp =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{
-		8,9,10,11,12,13,14,15,
-		0,1,2,3,4,5,6,7
-	},
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(8*1,1), STEP8(8*0,1) },
+	{ STEP16(0,16) },
 	16*16
 };
 
@@ -3566,20 +3548,8 @@ static const gfx_layout bigspritelayout_3bpp =
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{
-		7,6,5,4,3,2,1,0,
-		15,14,13,12,11,10,9,8,
-		23,22,21,20,19,18,17,16,
-		31,30,29,28,27,26,25,24
-	},
-	{
-		0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
-		16*32+0*32, 16*32+1*32, 16*32+2*32, 16*32+3*32,
-		16*32+4*32, 16*32+5*32, 16*32+6*32, 16*32+7*32,
-		16*32+8*32, 16*32+9*32, 16*32+10*32, 16*32+11*32,
-		16*32+12*32, 16*32+13*32, 16*32+14*32, 16*32+15*32,
-	},
+	{ STEP8(8*0+7,-1), STEP8(8*1+7,-1), STEP8(8*2+7,-1), STEP8(8*3+7,-1) },
+	{ STEP32(0,32) },
 	16*32*2
 };
 
@@ -3589,20 +3559,8 @@ static const gfx_layout bigspritelayout_4bpp =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{
-		24,25,26,27,28,29,30,31,
-		16,17,18,19,20,21,22,23,
-		8,9,10,11,12,13,14,15,
-		0,1,2,3,4,5,6,7
-	},
-	{
-		0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
-		16*32+0*32, 16*32+1*32, 16*32+2*32, 16*32+3*32,
-		16*32+4*32, 16*32+5*32, 16*32+6*32, 16*32+7*32,
-		16*32+8*32, 16*32+9*32, 16*32+10*32, 16*32+11*32,
-		16*32+12*32, 16*32+13*32, 16*32+14*32, 16*32+15*32,
-	},
+	{ STEP8(8*3,1), STEP8(8*2,1), STEP8(8*1,1), STEP8(8*0,1) },
+	{ STEP32(0,32) },
 	16*32*2
 };
 
@@ -3685,6 +3643,7 @@ MACHINE_CONFIG_START(snk_state::marvins)
 	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(HOLDLINE("audiocpu", 0))
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)  /* verified on schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
@@ -3899,6 +3858,13 @@ MACHINE_CONFIG_START(snk_state::fitegolf2)
 	fitegolf(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_fitegolf2)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(snk_state::countryc)
+	fitegolf(config);
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(countryc_cpuA_map)
 MACHINE_CONFIG_END
 
 
@@ -6574,13 +6540,6 @@ ROM_END
 
 /***********************************************************************/
 
-void snk_state::init_countryc()
-{
-	// replace coin counter with trackball select
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc300, 0xc300, write8_delegate(FUNC(snk_state::countryc_trackball_w),this));
-}
-
-
 
 GAME( 1983, marvins,   0,        marvins,   marvins,   snk_state, empty_init, ROT270, "SNK",     "Marvin's Maze", 0 )
 GAME( 1984, vangrd2,   0,        vangrd2,   vangrd2,   snk_state, empty_init, ROT270, "SNK",     "Vanguard II", 0 )
@@ -6604,7 +6563,7 @@ GAME( 1987, sathena,   athena,   athena,    athena,    snk_state, empty_init, RO
 GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (World?)", 0 )
 GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US)", 0 )
 GAME( 1988, fitegolf2, fitegolf, fitegolf2, fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2)", 0 )
-GAME( 1988, countryc,  0,        fitegolf,  countryc,  snk_state, init_countryc,ROT0, "SNK",     "Country Club", 0 )
+GAME( 1988, countryc,  0,        countryc,  countryc,  snk_state, empty_init, ROT0,   "SNK",     "Country Club", 0 )
 
 GAME( 1986, ikari,     0,        ikari,     ikari,     snk_state, empty_init, ROT270, "SNK",     "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)
 GAME( 1986, ikaria,    ikari,    ikari,     ikaria,    snk_state, empty_init, ROT270, "SNK",     "Ikari Warriors (US)", 0 ) // distributed by Tradewest(?)

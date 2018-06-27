@@ -23,6 +23,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -61,7 +62,7 @@ public:
 void horse_state::machine_start()
 {
 	m_colorram = std::make_unique<uint8_t []>(0x200);
-	save_pointer(NAME(m_colorram.get()), 0x200);
+	save_pointer(NAME(m_colorram), 0x200);
 	save_item(NAME(m_output));
 }
 

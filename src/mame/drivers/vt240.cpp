@@ -19,6 +19,7 @@
 #include "machine/bankdev.h"
 #include "machine/x2212.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 #include "screen.h"
 
 

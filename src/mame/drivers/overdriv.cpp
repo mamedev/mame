@@ -35,6 +35,7 @@
 #include "sound/k053260.h"
 #include "sound/ym2151.h"
 #include "video/k053250.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include "overdriv.lh"
@@ -344,8 +345,8 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_EEPROM_SERIAL_ER5911_16BIT_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(overdriv_default_eeprom, 128)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_16BIT)
+	MCFG_EEPROM_DATA(overdriv_default_eeprom, 128)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

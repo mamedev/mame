@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
 	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 3))

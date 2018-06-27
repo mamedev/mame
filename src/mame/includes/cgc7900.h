@@ -17,6 +17,7 @@
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #define M68000_TAG      "uh8"
@@ -53,8 +54,7 @@ public:
 			m_color_status_bg(*this, "color_status_bg"),
 			m_roll_overlay(*this, "roll_overlay"),
 			m_i8251_0(*this, INS8251_0_TAG),
-			m_i8251_1(*this, INS8251_1_TAG),
-			m_dbrg(*this, K1135A_TAG)
+			m_i8251_1(*this, INS8251_1_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -77,7 +77,6 @@ public:
 	required_shared_ptr<uint16_t> m_roll_overlay;
 	required_device<i8251_device> m_i8251_0;
 	required_device<i8251_device> m_i8251_1;
-	required_device<com8116_device> m_dbrg;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -99,10 +98,6 @@ public:
 	DECLARE_READ16_MEMBER( unmapped_r );
 
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { irq_encoder(N, state); }
-
-	DECLARE_WRITE8_MEMBER(baud_write);
-	DECLARE_WRITE_LINE_MEMBER(write_rs232_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_rs449_clock);
 
 	void update_clut();
 	void draw_bitmap(screen_device *screen, bitmap_rgb32 &bitmap);

@@ -9,6 +9,7 @@
 #include "video/decospr.h"
 #include "video/deco16ic.h"
 #include "machine/deco104.h"
+#include "emupal.h"
 
 class pktgaldx_state : public driver_device
 {

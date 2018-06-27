@@ -442,23 +442,22 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(atarig1_state::hydra)
+MACHINE_CONFIG_START(atarig1_state::hydrap)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_hydra)
-	MCFG_SLAPSTIC_ADD("slapstic", 116)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(atarig1_state::hydrap)
-	hydra(config);
-	MCFG_DEVICE_REMOVE("slapstic")
+MACHINE_CONFIG_START(atarig1_state::hydra)
+	hydrap(config);
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 116, true)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(atarig1_state::pitfight9)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_SLAPSTIC_ADD("slapstic", 114)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 114, true)
 	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
@@ -466,7 +465,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atarig1_state::pitfight7)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_SLAPSTIC_ADD("slapstic", 112)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 112, true)
 	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
@@ -474,7 +473,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atarig1_state::pitfight)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_SLAPSTIC_ADD("slapstic", 111)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 111, true)
 	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
@@ -482,7 +481,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atarig1_state::pitfightj)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_SLAPSTIC_ADD("slapstic", 113)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 113, true)
 	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 

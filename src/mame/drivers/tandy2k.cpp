@@ -25,7 +25,6 @@
 #include "emu.h"
 #include "includes/tandy2k.h"
 
-#include "machine/pckeybrd.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -141,7 +140,7 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 
 	// keyboard enable
 	m_kb->power_w(BIT(data, 0));
-	machine().device<pc_keyboard_device>("pc_keyboard")->enable(BIT(data, 0));
+	m_pc_keyboard->enable(BIT(data, 0));
 
 	// external baud rate clock
 	m_extclk = BIT(data, 1);
@@ -214,7 +213,7 @@ READ8_MEMBER( tandy2k_state::kbint_clr_r )
 		m_kb->busy_w(1);
 		m_pic1->ir0_w(CLEAR_LINE);
 
-		return machine().device<pc_keyboard_device>("pc_keyboard")->read(space, 0);
+		m_pc_keyboard->read(space, 0);
 	}
 
 	return 0xff;
@@ -764,7 +763,7 @@ void tandy2k_state::machine_start()
 
 void tandy2k_state::device_reset_after_children()
 {
-	machine().device<pc_keyboard_device>("pc_keyboard")->enable(0);
+	m_pc_keyboard->enable(0);
 }
 
 // Machine Driver
@@ -860,7 +859,7 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_perror))
@@ -874,7 +873,7 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_TANDY2000_KEYBOARD_DATA_CALLBACK(WRITELINE(*this, tandy2k_state, kbddat_w))
 
 	// temporary until the tandy keyboard has a rom dump
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(I8259A_1_TAG, pic8259_device, ir0_w))
+	MCFG_PC_KEYB_ADD(m_pc_keyboard, WRITELINE(I8259A_1_TAG, pic8259_device, ir0_w))
 
 
 	// software lists

@@ -490,7 +490,7 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc2)
 
 	save_item(NAME(m_subcpu_int_flag));
 	save_item(NAME(m_subcpu_nmi_flag));
-	save_pointer(NAME(m_bankedram.get()), 0x4000 * 3);
+	save_pointer(NAME(m_bankedram), 0x4000 * 3);
 }
 
 void fromanc2_state::machine_reset()
@@ -518,7 +518,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromanc2)
@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
@@ -634,7 +634,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc4)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("uart", NS16550, 2000000) // actual type is TL16C550CFN; clock unknown
 	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_2))

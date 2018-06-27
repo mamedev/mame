@@ -70,8 +70,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_out2 );
 
 	void at_8042_set_outport(uint8_t data, int initial);
-	void at_8042_receive(uint8_t data);
+	void at_8042_receive(uint8_t data, bool mouse = false);
 	void at_8042_check_keyboard();
+	void at_8042_check_mouse();
 	void at_8042_clear_keyboard_received();
 
 protected:
@@ -79,9 +80,13 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	uint8_t m_inport, m_outport, m_data, m_command;
+	uint8_t m_inport;
+	uint8_t m_outport;
+	uint8_t m_data;
+	uint8_t m_command;
 
 	struct {
 		int received;
@@ -90,6 +95,10 @@ private:
 	struct {
 		int received;
 		int on;
+		uint8_t sample_rate;
+		bool receiving_sample_rate;
+		uint8_t transmit_buf[8];
+		uint8_t to_transmit;
 	} m_mouse;
 
 	int m_last_write_to_control;
@@ -108,6 +117,9 @@ private:
 	int m_poll_delay;
 
 	required_device<at_keyboard_device> m_keyboard_dev;
+	required_ioport m_mousex_port;
+	required_ioport m_mousey_port;
+	required_ioport m_mousebtn_port;
 
 	kbdc8042_type_t     m_keybtype;
 
@@ -117,6 +129,10 @@ private:
 	devcb_write_line    m_output_buffer_empty_cb;
 
 	devcb_write8        m_speaker_cb;
+
+	uint16_t            m_mouse_x;
+	uint16_t            m_mouse_y;
+	uint8_t             m_mouse_btn;
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
 };

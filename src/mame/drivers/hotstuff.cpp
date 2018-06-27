@@ -6,6 +6,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h"
 #include "machine/z80scc.h"
+#include "emupal.h"
 #include "screen.h"
 
 

@@ -1069,12 +1069,12 @@ WRITE8_MEMBER( x1_state::x1_6845_w )
 	if(offset == 0)
 	{
 		m_crtc_index = data & 31;
-		machine().device<mc6845_device>("crtc")->address_w(space, offset, data);
+		m_crtc->address_w(space, offset, data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		machine().device<mc6845_device>("crtc")->register_w(space, offset, data);
+		m_crtc->register_w(space, offset, data);
 	}
 }
 
@@ -1547,9 +1547,9 @@ WRITE8_MEMBER(x1_state::io_write_byte)
 
 READ8_MEMBER(x1_state::ym_r)
 {
-	uint8_t result = machine().device<ym2151_device>("ym")->read(space, offset);
+	uint8_t result = m_ym->read(space, offset);
 	if (!BIT(offset, 0))
-		result = (result & 0x7f) | (ioport("SOUND_SW")->read() & 0x80);
+		result = (result & 0x7f) | (m_sound_sw->read() & 0x80);
 	return result;
 }
 
@@ -2175,9 +2175,9 @@ MACHINE_START_MEMBER(x1_state,x1)
 	m_emm_ram = make_unique_clear<uint8_t[]>(0x1000000);
 	m_pcg_ram = make_unique_clear<uint8_t[]>(0x1800);
 
-	save_pointer(NAME(m_work_ram.get()), 0x10000*0x10);
-	save_pointer(NAME(m_emm_ram.get()), 0x1000000);
-	save_pointer(NAME(m_pcg_ram.get()), 0x1800);
+	save_pointer(NAME(m_work_ram), 0x10000*0x10);
+	save_pointer(NAME(m_emm_ram), 0x1000000);
+	save_pointer(NAME(m_pcg_ram), 0x1800);
 
 	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0));
 }

@@ -3444,7 +3444,7 @@ MACHINE_CONFIG_START(metro_state::dokyusp)
 	MCFG_DEVICE_PROGRAM_MAP(dokyusp_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -3472,7 +3472,7 @@ MACHINE_CONFIG_START(metro_state::gakusai)
 	MCFG_DEVICE_PROGRAM_MAP(gakusai_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -3501,7 +3501,7 @@ MACHINE_CONFIG_START(metro_state::gakusai2)
 
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

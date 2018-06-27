@@ -319,8 +319,8 @@ VIDEO_START_MEMBER(argus_state,butasan)
 	save_item(NAME(m_bg_status));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_palette_intensity));
-	save_pointer(NAME(m_butasan_pagedram[0].get()), 0x1000);
-	save_pointer(NAME(m_butasan_pagedram[1].get()), 0x1000);
+	save_pointer(NAME(m_butasan_pagedram[0]), 0x1000);
+	save_pointer(NAME(m_butasan_pagedram[1]), 0x1000);
 	save_item(NAME(m_butasan_page_latch));
 	save_item(NAME(m_butasan_bg1_status));
 	save_item(NAME(m_butasan_unknown));

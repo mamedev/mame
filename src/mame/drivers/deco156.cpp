@@ -22,6 +22,7 @@
 #include "sound/ymz280b.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -86,7 +87,7 @@ void deco156_state::video_start()
 	/* and register the allocated ram so that save states still work */
 	save_item(NAME(m_pf1_rowscroll));
 	save_item(NAME(m_pf2_rowscroll));
-	save_pointer(NAME(m_spriteram.get()), 0x2000/2);
+	save_pointer(NAME(m_spriteram), 0x2000/2);
 }
 
 
@@ -334,7 +335,7 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_DEVICE_PROGRAM_MAP(hvysmsh_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -388,7 +389,7 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_DEVICE_PROGRAM_MAP(wcvol95_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)

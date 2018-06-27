@@ -61,6 +61,7 @@ Keep pressed 9 and press reset to enter service mode.
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -587,7 +588,7 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 
 	SPEAKER(config, "lspeaker").front_left();

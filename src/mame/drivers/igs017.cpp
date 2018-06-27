@@ -58,6 +58,7 @@ Notes:
 #include "machine/timer.h"
 #include "video/igs017_igs031.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

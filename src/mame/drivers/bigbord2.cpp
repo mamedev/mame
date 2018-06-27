@@ -82,6 +82,7 @@ X - change banks
 #include "machine/z80sio.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

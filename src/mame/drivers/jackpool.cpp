@@ -23,6 +23,7 @@ TODO:
 #include "machine/eepromser.h"
 #include "machine/ins8250.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -262,7 +263,7 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("uart", NS16550, 1843200) // exact type and clock unknown
 

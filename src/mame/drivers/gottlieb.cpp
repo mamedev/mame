@@ -249,7 +249,7 @@ void gottlieb_state::machine_start()
 		save_item(NAME(m_laserdisc_status));
 		save_item(NAME(m_laserdisc_philips_code));
 
-		save_pointer(NAME(m_laserdisc_audio_buffer.get()), AUDIORAM_SIZE);
+		save_pointer(NAME(m_laserdisc_audio_buffer), AUDIORAM_SIZE);
 		save_item(NAME(m_laserdisc_audio_address));
 		save_item(NAME(m_laserdisc_last_samples));
 		save_item(NAME(m_laserdisc_last_time));

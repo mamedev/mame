@@ -11,6 +11,7 @@
 
 #include "machine/intelfsh.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 class ti68k_state : public driver_device
 {

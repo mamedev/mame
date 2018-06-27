@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class mrdo_state : public driver_device
 {
 public:

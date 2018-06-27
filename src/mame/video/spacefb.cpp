@@ -91,7 +91,7 @@ void spacefb_state::video_start()
 	   uses whatever value is on the shift register on power-up */
 	m_star_shift_reg = 0x18f89;
 
-	save_pointer(NAME(m_object_present_map.get()), width * height);
+	save_pointer(NAME(m_object_present_map), width * height);
 	save_item(NAME(m_port_0));
 	save_item(NAME(m_port_2));
 	save_item(NAME(m_star_shift_reg));

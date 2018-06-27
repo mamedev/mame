@@ -665,8 +665,8 @@ MACHINE_CONFIG_START(powerbal_state::magicstk)
 	MCFG_DEVICE_PROGRAM_MAP(magicstk_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", powerbal_state, irq2_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(powerbal_state,powerbal)
 	MCFG_MACHINE_RESET_OVERRIDE(powerbal_state,powerbal)

@@ -35,6 +35,7 @@ References:
 #include "machine/nl_hazelvid.h"
 #include "netlist/devices/net_lib.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

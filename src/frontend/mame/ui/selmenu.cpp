@@ -29,6 +29,7 @@
 #include "emuopts.h"
 #include "rendfont.h"
 #include "rendutil.h"
+#include "romload.h"
 #include "softlist.h"
 #include "softlist_dev.h"
 #include "uiinput.h"

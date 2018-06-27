@@ -41,6 +41,7 @@ the devices themselves. An example shows a i8251 used as the US1 device.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 

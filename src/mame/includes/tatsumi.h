@@ -6,6 +6,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/cxd1095.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class tatsumi_state : public driver_device
 {
@@ -65,7 +66,7 @@ public:
 		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
 		int scalex, int scaley, int rotate, int write_priority_only );
 	void update_cluts(int fake_palette_offset, int object_base, int length);
-	
+
 protected:
 	uint8_t m_hd6445_reg[64];
 	void apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap, uint8_t xor_output);
@@ -161,12 +162,12 @@ public:
 	void roundup5_z80_map(address_map &map);
 
 protected:
-//	virtual void machine_reset() override;
+//  virtual void machine_reset() override;
 
 private:
 	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type);
-	
+
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_bg_scrollx;
 	required_shared_ptr<uint16_t> m_bg_scrolly;
@@ -220,7 +221,7 @@ public:
 	void master_map(address_map &map);
 	void slave_map(address_map &map);
 	void sound_map(address_map &map);
-	
+
 protected:
 	virtual void machine_reset() override;
 private:
@@ -242,7 +243,7 @@ private:
 	uint16_t m_road_color_bank, m_prev_road_bank;
 	uint16_t m_layer_page_size[4];
 	bool m_layer1_can_be_road;
-	
+
 	void tile_expand();
 	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, const uint16_t layer_page_size, bool is_road, int hi_priority);
 	void draw_bg_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int hi_priority);

@@ -165,6 +165,7 @@ From JP manual
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -269,7 +270,7 @@ void topspeed_state::msm5205_update(int chip)
 
 	uint8_t data = m_msm_rom[chip][m_msm_pos[chip]];
 
-	m_msm[chip]->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
+	m_msm[chip]->write_data((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
 
 	if (m_msm_nibble[chip])
 		++m_msm_pos[chip];

@@ -17,6 +17,7 @@
 #include "sound/scsp.h"
 #include "video/segaic24.h"
 #include "video/poly.h"
+#include "emupal.h"
 #include "screen.h"
 
 class model2_renderer;

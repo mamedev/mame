@@ -10,6 +10,7 @@
 #define MAME_INCLUDES_GALEB_H
 
 #include "sound/dac.h"
+#include "emupal.h"
 
 class galeb_state : public driver_device
 {

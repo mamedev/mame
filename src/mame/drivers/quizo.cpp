@@ -28,6 +28,7 @@ Xtals 8MHz, 21.47727MHz
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -278,7 +279,7 @@ void quizo_state::init_quizo()
 	m_videoram=std::make_unique<uint8_t[]>(0x4000*2);
 	membank("bank1")->configure_entries(0, 6, memregion("user1")->base(), 0x4000);
 
-	save_pointer(NAME(m_videoram.get()), 0x4000*2);
+	save_pointer(NAME(m_videoram), 0x4000*2);
 	//save_item(NAME(m_port60));
 	save_item(NAME(m_port70));
 }

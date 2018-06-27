@@ -13,6 +13,7 @@
 #include "sound/msm5205.h"
 #include "video/vsystem_gga.h"
 #include "video/vsystem_spr2.h"
+#include "emupal.h"
 #include "screen.h"
 
 class fromance_state : public driver_device

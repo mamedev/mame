@@ -18,6 +18,7 @@
 #include "cpu/upd7810/upd7811.h"
 #include "machine/clock.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "cz101.lh"

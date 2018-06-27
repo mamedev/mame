@@ -29,6 +29,7 @@ notes:
 #include "cpu/sh/sh4.h"
 #include "machine/ins8250.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "screen.h"
 
 class aristmk6_state : public driver_device
@@ -353,8 +354,8 @@ MACHINE_CONFIG_START(aristmk6_state::aristmk6)
 	MCFG_DEVICE_ADD( "uart0", NS16550, 8_MHz_XTAL )
 	MCFG_DEVICE_ADD( "uart1", NS16550, 8_MHz_XTAL )
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom0")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0xFF)
+	MCFG_DEVICE_ADD("eeprom0", EEPROM_SERIAL_93C56_16BIT)
+	MCFG_EEPROM_DEFAULT_VALUE(0xFF)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -4,6 +4,7 @@
 #include "machine/nb1412m2.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class terracre_state : public driver_device
 {

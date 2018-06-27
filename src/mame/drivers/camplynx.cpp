@@ -162,6 +162,7 @@
 #include "sound/volt_reg.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 #include "formats/camplynx_cas.h"
 #include "formats/camplynx_dsk.h"

@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "video/decbac06.h"
+#include "emupal.h"
 
 class pcktgal_state : public driver_device
 {

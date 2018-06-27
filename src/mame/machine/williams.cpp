@@ -25,7 +25,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_va11_callback)
 		return;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
-	m_pia_1->cb1_w(BIT(scanline, 5));
+	m_pia[1]->cb1_w(BIT(scanline, 5));
 }
 
 
@@ -34,67 +34,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_count240_callback)
 	int scanline = param;
 
 	// the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13
-	m_pia_1->ca1_w(scanline >= 240 ? 1 : 0);
+	m_pia[1]->ca1_w(scanline >= 240 ? 1 : 0);
 }
-
-
-WRITE_LINE_MEMBER(williams_state::williams_main_irq)
-{
-	int combined_state = m_pia_1->irq_a_state() | m_pia_1->irq_b_state();
-
-	/* IRQ to the main CPU */
-	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-WRITE_LINE_MEMBER(williams_state::williams_main_firq)
-{
-	/* FIRQ to the main CPU */
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-WRITE_LINE_MEMBER(williams_state::williams_snd_irq)
-{
-	int combined_state = m_pia_2->irq_a_state() | m_pia_2->irq_b_state();
-
-	/* IRQ to the sound CPU */
-	m_soundcpu->set_input_line(M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-}
-/* Same as above, but for second sound board */
-WRITE_LINE_MEMBER(blaster_state::williams_snd_irq_b)
-{
-	int combined_state = m_pia_2b->irq_a_state() | m_pia_2b->irq_b_state();
-
-	/* IRQ to the sound CPU */
-	m_soundcpu_b->set_input_line(M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
-/*************************************
- *
- *  Newer Williams interrupts
- *
- *************************************/
-
-WRITE_LINE_MEMBER(williams2_state::mysticm_main_irq)
-{
-	int combined_state = m_pia_0->irq_b_state() | m_pia_1->irq_a_state() | m_pia_1->irq_b_state();
-
-	/* IRQ to the main CPU */
-	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-WRITE_LINE_MEMBER(williams2_state::tshoot_main_irq)
-{
-	int combined_state = m_pia_0->irq_a_state() | m_pia_0->irq_b_state() | m_pia_1->irq_a_state() | m_pia_1->irq_b_state();
-
-	/* IRQ to the main CPU */
-	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 
 /*************************************
@@ -106,8 +47,8 @@ WRITE_LINE_MEMBER(williams2_state::tshoot_main_irq)
 MACHINE_START_MEMBER(williams_state,williams_common)
 {
 	/* configure the memory bank */
-	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + 0x10000);
-	membank("bank1")->configure_entry(0, m_videoram);
+	m_mainbank->configure_entry(1, memregion("maincpu")->base() + 0x10000);
+	m_mainbank->configure_entry(0, m_videoram);
 }
 
 
@@ -131,8 +72,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_va11_callback)
 		return;
 
 	// the IRQ signal comes into CB1, and is set to VA11
-	m_pia_0->cb1_w(BIT(scanline, 5));
-	m_pia_1->ca1_w(BIT(scanline, 5));
+	m_pia[0]->cb1_w(BIT(scanline, 5));
+	m_pia[1]->ca1_w(BIT(scanline, 5));
 }
 
 
@@ -141,7 +82,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_endscreen_callback)
 	int scanline = param;
 
 	// the /ENDSCREEN signal comes into CA1
-	m_pia_0->ca1_w(scanline >= 254 ? 0 : 1);
+	m_pia[0]->ca1_w(scanline >= 254 ? 0 : 1);
 }
 
 
@@ -155,8 +96,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_endscreen_callback)
 MACHINE_START_MEMBER(williams2_state,williams2)
 {
 	/* configure memory banks */
-	membank("bank1")->configure_entries(1, 4, memregion("maincpu")->base() + 0x10000, 0x10000);
-	membank("bank1")->configure_entry(0, m_videoram);
+	m_mainbank->configure_entries(1, 4, memregion("maincpu")->base() + 0x10000, 0x10000);
+	m_mainbank->configure_entry(0, m_videoram);
 	membank("vram8000")->set_base(&m_videoram[0x8000]);
 }
 
@@ -178,7 +119,7 @@ MACHINE_RESET_MEMBER(williams2_state,williams2)
 WRITE8_MEMBER(williams_state::williams_vram_select_w)
 {
 	/* VRAM/ROM banking from bit 0 */
-	membank("bank1")->set_entry(data & 0x01);
+	m_mainbank->set_entry(data & 0x01);
 
 	/* cocktail flip from bit 1 */
 	m_cocktail = data & 0x02;
@@ -192,20 +133,20 @@ WRITE8_MEMBER(williams2_state::williams2_bank_select_w)
 	{
 		/* page 0 is video ram */
 		case 0:
-			membank("bank1")->set_entry(0);
+			m_mainbank->set_entry(0);
 			m_bank8000->set_bank(0);
 			break;
 
 		/* pages 1 and 2 are ROM */
 		case 1:
 		case 2:
-			membank("bank1")->set_entry(1 + ((data & 6) >> 1));
+			m_mainbank->set_entry(1 + ((data & 6) >> 1));
 			m_bank8000->set_bank(0);
 			break;
 
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
-			membank("bank1")->set_entry(1 + ((data & 4) >> 1));
+			m_mainbank->set_entry(1 + ((data & 4) >> 1));
 			m_bank8000->set_bank(1);
 			break;
 	}
@@ -221,8 +162,8 @@ WRITE8_MEMBER(williams2_state::williams2_bank_select_w)
 
 TIMER_CALLBACK_MEMBER(williams_state::williams_deferred_snd_cmd_w)
 {
-	m_pia_2->portb_w(param);
-	m_pia_2->cb1_w((param == 0xff) ? 0 : 1);
+	m_pia[2]->write_portb(param);
+	m_pia[2]->cb1_w((param == 0xff) ? 0 : 1);
 }
 
 WRITE8_MEMBER(williams_state::williams_snd_cmd_w)
@@ -238,7 +179,7 @@ WRITE8_MEMBER(williams_state::playball_snd_cmd_w)
 
 TIMER_CALLBACK_MEMBER(williams2_state::williams2_deferred_snd_cmd_w)
 {
-	m_pia_2->porta_w(param);
+	m_pia[2]->write_porta(param);
 }
 
 WRITE8_MEMBER(williams2_state::williams2_snd_cmd_w)
@@ -440,11 +381,11 @@ WRITE8_MEMBER(williams_state::sinistar_vram_select_w)
 MACHINE_START_MEMBER(blaster_state,blaster)
 {
 	/* banking is different for blaster */
-	membank("bank1")->configure_entries(1, 16, memregion("maincpu")->base() + 0x18000, 0x4000);
-	membank("bank1")->configure_entry(0, m_videoram);
+	m_mainbank->configure_entries(1, 16, memregion("maincpu")->base() + 0x18000, 0x4000);
+	m_mainbank->configure_entry(0, m_videoram);
 
-	membank("bank2")->configure_entries(1, 16, memregion("maincpu")->base() + 0x10000, 0x0000);
-	membank("bank2")->configure_entry(0, &m_videoram[0x4000]);
+	m_blaster_bankb->configure_entries(1, 16, memregion("maincpu")->base() + 0x10000, 0x0000);
+	m_blaster_bankb->configure_entry(0, &m_videoram[0x4000]);
 
 	/* register for save states */
 	save_item(NAME(m_vram_bank));
@@ -454,8 +395,8 @@ MACHINE_START_MEMBER(blaster_state,blaster)
 
 inline void blaster_state::update_blaster_banking()
 {
-	membank("bank1")->set_entry(m_vram_bank * (m_rom_bank + 1));
-	membank("bank2")->set_entry(m_vram_bank * (m_rom_bank + 1));
+	m_mainbank->set_entry(m_vram_bank * (m_rom_bank + 1));
+	m_blaster_bankb->set_entry(m_vram_bank * (m_rom_bank + 1));
 }
 
 
@@ -485,8 +426,8 @@ TIMER_CALLBACK_MEMBER(blaster_state::blaster_deferred_snd_cmd_w)
 	uint8_t l_data = param | 0x80;
 	uint8_t r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
 
-	m_pia_2->portb_w(l_data); m_pia_2->cb1_w((l_data == 0xff) ? 0 : 1);
-	m_pia_2b->portb_w(r_data); m_pia_2b->cb1_w((r_data == 0xff) ? 0 : 1);
+	m_pia[2]->write_portb(l_data); m_pia[2]->cb1_w((l_data == 0xff) ? 0 : 1);
+	m_pia[3]->write_portb(r_data); m_pia[3]->cb1_w((r_data == 0xff) ? 0 : 1);
 }
 
 
@@ -516,6 +457,16 @@ WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
  *
  *************************************/
 
+MACHINE_START_MEMBER(tshoot_state,tshoot)
+{
+	MACHINE_START_CALL_MEMBER(williams2);
+	m_grenade_lamp.resolve();
+	m_gun_lamp.resolve();
+	m_p1_gun_recoil.resolve();
+	m_feather_blower.resolve();
+}
+
+
 CUSTOM_INPUT_MEMBER(tshoot_state::gun_r)
 {
 	int data = m_gun[(uintptr_t)param]->read();
@@ -533,13 +484,13 @@ WRITE_LINE_MEMBER(tshoot_state::maxvol_w)
 WRITE8_MEMBER(tshoot_state::lamp_w)
 {
 	/* set the grenade lamp */
-	output().set_value("Grenade_lamp", (~data & 0x4)>>2 );
+	m_grenade_lamp   = BIT(~data, 2);
 	/* set the gun lamp */
-	output().set_value("Gun_lamp", (~data & 0x8)>>3 );
+	m_gun_lamp       = BIT(~data, 3);
 	/* gun coil */
-	output().set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
+	m_p1_gun_recoil  = BIT(data, 4);
 	/* feather coil */
-	output().set_value("Feather_Blower", (data & 0x20)>>5 );
+	m_feather_blower = BIT(data, 5);
 }
 
 
@@ -565,7 +516,7 @@ MACHINE_RESET_MEMBER(joust2_state,joust2)
 
 TIMER_CALLBACK_MEMBER(joust2_state::joust2_deferred_snd_cmd_w)
 {
-	m_pia_2->porta_w(param & 0xff);
+	m_pia[2]->write_porta(param & 0xff);
 }
 
 

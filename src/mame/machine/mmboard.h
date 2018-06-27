@@ -14,6 +14,7 @@
 
 #include "sound/beep.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

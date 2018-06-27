@@ -21,6 +21,7 @@
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 #define PCW16_BORDER_HEIGHT 8
 #define PCW16_BORDER_WIDTH 8

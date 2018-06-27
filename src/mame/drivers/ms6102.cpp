@@ -44,6 +44,7 @@
 #include "machine/vt100_kbd.h"
 #include "video/i8275.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #define LOG_GENERAL (1U <<  0)

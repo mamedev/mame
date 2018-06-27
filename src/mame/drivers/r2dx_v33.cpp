@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, David Haywood, ???
+// copyright-holders:Olivier Galibert, David Haywood
 /*
 
 Raiden 2 / DX V33 Version
@@ -88,6 +88,16 @@ public:
 		m_math(*this, "math")
 	{ }
 
+	void nzerotea(machine_config &config);
+	void rdx_v33(machine_config &config);
+	void zerotm2k(machine_config &config);
+
+	void init_rdx_v33();
+	void init_nzerotea();
+	void init_zerotm2k();
+
+private:
+
 	DECLARE_WRITE16_MEMBER(r2dx_angle_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dx_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dy_w);
@@ -110,9 +120,6 @@ public:
 	DECLARE_WRITE16_MEMBER(rdx_v33_eeprom_w);
 	DECLARE_WRITE16_MEMBER(zerotm2k_eeprom_w);
 	DECLARE_WRITE16_MEMBER(r2dx_rom_bank_w);
-	void init_rdx_v33();
-	void init_nzerotea();
-	void init_zerotm2k();
 
 	DECLARE_WRITE16_MEMBER(r2dx_tilemapdma_w);
 	DECLARE_WRITE16_MEMBER(r2dx_paldma_w);
@@ -123,18 +130,14 @@ public:
 	DECLARE_MACHINE_RESET(r2dx_v33);
 	DECLARE_MACHINE_RESET(nzeroteam);
 
-	void nzerotea(machine_config &config);
-	void rdx_v33(machine_config &config);
-	void zerotm2k(machine_config &config);
 	void nzerotea_map(address_map &map);
 	void nzeroteam_base_map(address_map &map);
 	void r2dx_oki_map(address_map &map);
 	void rdx_v33_map(address_map &map);
 	void zerotm2k_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	void r2dx_setbanking(void);
 
 	int m_r2dxbank;
@@ -373,7 +376,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_paldma_w)
 	{
 		uint16_t palval = space.read_word(src);
 		src += 2;
-		m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
+		m_palette->write16(space, i, palval, 0xffff);
 	}
 }
 
@@ -793,7 +796,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,r2dx_v33)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -805,7 +808,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -843,7 +846,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -873,7 +876,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::zerotm2k)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(zerotm2k_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 void r2dx_v33_state::init_rdx_v33()

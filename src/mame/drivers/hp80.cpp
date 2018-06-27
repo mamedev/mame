@@ -8,6 +8,7 @@
 // This is WIP: lot of things still missing
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "cpu/capricorn/capricorn.h"
 #include "speaker.h"

@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+
+#include "emupal.h"
+
 class bigstrkb_state : public driver_device
 {
 public:

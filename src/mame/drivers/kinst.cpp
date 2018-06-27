@@ -184,6 +184,7 @@ Notes:
 #include "cpu/mips/mips3.h"
 #include "machine/ataintf.h"
 #include "machine/idehd.h"
+#include "emupal.h"
 #include "screen.h"
 
 

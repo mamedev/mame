@@ -25,6 +25,7 @@
 #include "machine/6840ptm.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -484,7 +485,7 @@ void zwackery_state::machine_start()
 	m_spriteram = std::make_unique<uint8_t[]>(0x800);
 
 	// register for save states
-	save_pointer(NAME(m_spriteram.get()), 0x800);
+	save_pointer(NAME(m_spriteram), 0x800);
 }
 
 

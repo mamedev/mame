@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 	MCFG_DEVICE_PROGRAM_MAP(undrfire_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("INPUTS0"))
@@ -630,7 +630,7 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480))   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
 	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 5))

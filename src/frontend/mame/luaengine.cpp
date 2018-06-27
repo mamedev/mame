@@ -807,6 +807,7 @@ void lua_engine::initialize()
 			return lua_yield(L, 0);
 		});
 	emu["lang_translate"] = &lang_translate;
+	emu["pid"] = &osd_getpid;
 
 /*
  * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style with 'rwc' with addtional c for create *and truncate* (be careful)

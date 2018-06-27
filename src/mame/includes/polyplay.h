@@ -8,6 +8,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 
 #define POLYPLAY_MAIN_CLOCK XTAL(9'830'400)
 

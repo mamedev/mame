@@ -259,6 +259,7 @@ Thrill Drive 713A13  -       713A14  -
 #include "sound/k056800.h"
 #include "video/voodoo.h"
 #include "video/k001604.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 

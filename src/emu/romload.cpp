@@ -8,6 +8,8 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "romload.h"
+
 #include "emuopts.h"
 #include "drivenum.h"
 #include "softlist_dev.h"

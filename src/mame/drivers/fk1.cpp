@@ -15,6 +15,7 @@
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 

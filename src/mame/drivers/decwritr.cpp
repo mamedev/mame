@@ -414,6 +414,7 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
 	MCFG_DEVICE_PROGRAM_MAP(la120_mem)
 	MCFG_DEVICE_IO_MAP(la120_io)
+	//MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("prtlsi", dc305_device, inta_cb)
 
 	/* video hardware */
 	//TODO: no actual screen! has 8 leds above the keyboard (similar to vt100/vk100) and has 4 7segment leds for showing an error code.
@@ -424,6 +425,9 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_SCREEN_REFRESH_RATE(30)
 
 	//MCFG_DEVICE_ADD("prtlsi", DC305, XTAL(18'000'000) / 9)
+	//MCFG_DC305_OUT_RXC_CB(WRITELINE("usart", i8251_device, write_rxc))
+	//MCFG_DC305_OUT_TXC_CB(WRITELINE("usart", i8251_device, write_txc))
+	//MCFG_DC305_OUT_INT_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("ledlatch", LS259, 0) // E2 on keyboard
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // ON LINE
@@ -448,14 +452,14 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainint", input_merger_device, in_w<1>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("usart", i8251_device, write_dsr))
-
-	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE("usart", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("usart", i8251_device, write_txc))
 	*/
 
 	MCFG_DEVICE_ADD("nvm", ER1400, 0)

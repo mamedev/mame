@@ -27,6 +27,7 @@ are the same of IGS.  AMT may be previous IGS name.
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -447,4 +448,4 @@ ROM_START( cabaret )
 	ROM_LOAD( "cg-7.u98",  0x0000, 0x8000, CRC(b93ae6f8) SHA1(accb87045c278d5d79fff65bb763aa6e8025a945) )   /* background maps, read by the CPU */
 ROM_END
 
-GAME( 1992, cabaret, 0, cabaret, cabaret, cabaret_state, init_cabaret, ROT0, "AMT Co. Ltd.", "Cabaret", MACHINE_NOT_WORKING )
+GAME( 1992, cabaret, 0, cabaret, cabaret, cabaret_state, init_cabaret, ROT0, "AMT Co. Ltd.", "Cabaret Show", MACHINE_NOT_WORKING )

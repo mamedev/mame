@@ -10,7 +10,7 @@
     driver by Angelo Salese
 
     TODO:
-    - inputs in Cycle Maabou;
+    - inputs in Cycle Maabou (weird dial/positional input);
     - sound (controlled by three i8741);
     - add flipscreen;
     - color prom resistor network is guessed, cyclemb yellows are more reddish on pcb video and photos;
@@ -77,6 +77,7 @@ Dumped by Chack'n
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -247,7 +248,7 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	0x27 cone (0x13 0x00)
 	*/
 
-	for(i=0;i<0x40;i+=2)
+	for(i=0;i<0x80;i+=2)
 	{
 		y = 0xf1 - m_obj2_ram[i];
 		x = m_obj2_ram[i+1] - 56;

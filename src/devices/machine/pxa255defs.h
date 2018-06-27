@@ -2,12 +2,14 @@
 // copyright-holders:Ryan Holtz
 /**************************************************************************
  *
- * Intel PXA255 on-chip peripheral emulation
- *
- * Mostly-incomplete implementation by Ryan Holtz
+ * Intel XScale PXA255 peripheral emulation defines
  *
  **************************************************************************/
 
+#ifndef DEVICES_MACHINE_PXA255DEFS
+#define DEVICES_MACHINE_PXA255DEFS
+
+#pragma once
 
 /*
   PXA255 DMA controller
@@ -165,28 +167,6 @@
 		#define PXA255_DCMD_WIDTH_2 (0x00008000)
 		#define PXA255_DCMD_WIDTH_4 (0x0000c000)
 
-struct PXA255_DMA_Regs
-{
-	uint32_t dcsr[16];
-
-	uint32_t pad0[44];
-
-	uint32_t dint;
-
-	uint32_t pad1[3];
-
-	uint32_t drcmr[40];
-
-	uint32_t pad2[24];
-
-	uint32_t ddadr[16];
-	uint32_t dsadr[16];
-	uint32_t dtadr[16];
-	uint32_t dcmd[16];
-
-	emu_timer* timer[16];
-};
-
 /*
 
   PXA255 Inter-Integrated-Circuit Sound (I2S) Controller
@@ -232,29 +212,6 @@ struct PXA255_DMA_Regs
 #define PXA255_SADIV            (PXA255_I2S_BASE_ADDR + 0x00000060)
 #define PXA255_SADR             (PXA255_I2S_BASE_ADDR + 0x00000080)
 
-struct PXA255_I2S_Regs
-{
-	uint32_t sacr0;
-	uint32_t sacr1;
-
-	uint32_t pad0;
-
-	uint32_t sasr0;
-
-	uint32_t pad1;
-
-	uint32_t saimr;
-	uint32_t saicr;
-
-	uint32_t pad2[17];
-
-	uint32_t sadiv;
-
-	uint32_t pad3[6];
-
-	uint32_t sadr;
-};
-
 /*
 
   PXA255 OS Timer register
@@ -280,17 +237,6 @@ struct PXA255_I2S_Regs
 	#define PXA255_OIER_E1      (0x00000002)
 	#define PXA255_OIER_E2      (0x00000004)
 	#define PXA255_OIER_E3      (0x00000008)
-
-struct PXA255_OSTMR_Regs
-{
-	uint32_t osmr[4];
-	uint32_t oscr;
-	uint32_t ossr;
-	uint32_t ower;
-	uint32_t oier;
-
-	emu_timer* timer[4];
-};
 
 /*
 
@@ -333,16 +279,6 @@ struct PXA255_OSTMR_Regs
 #define PXA255_INT_RTC_HZ       (1 << 30)
 #define PXA255_INT_RTC_ALARM    (1 << 31)
 
-struct PXA255_INTC_Regs
-{
-	uint32_t icip;
-	uint32_t icmr;
-	uint32_t iclr;
-	uint32_t icfp;
-	uint32_t icpr;
-	uint32_t iccr;
-};
-
 /*
 
   PXA255 General-Purpose I/O registers
@@ -379,44 +315,6 @@ struct PXA255_INTC_Regs
 #define PXA255_GAFR1_U          (PXA255_GPIO_BASE_ADDR + 0x00000060)
 #define PXA255_GAFR2_L          (PXA255_GPIO_BASE_ADDR + 0x00000064)
 #define PXA255_GAFR2_U          (PXA255_GPIO_BASE_ADDR + 0x00000068)
-
-struct PXA255_GPIO_Regs
-{
-	uint32_t gplr0; // GPIO Pin-Leve
-	uint32_t gplr1;
-	uint32_t gplr2;
-
-	uint32_t gpdr0;
-	uint32_t gpdr1;
-	uint32_t gpdr2;
-
-	uint32_t gpsr0;
-	uint32_t gpsr1;
-	uint32_t gpsr2;
-
-	uint32_t gpcr0;
-	uint32_t gpcr1;
-	uint32_t gpcr2;
-
-	uint32_t grer0;
-	uint32_t grer1;
-	uint32_t grer2;
-
-	uint32_t gfer0;
-	uint32_t gfer1;
-	uint32_t gfer2;
-
-	uint32_t gedr0;
-	uint32_t gedr1;
-	uint32_t gedr2;
-
-	uint32_t gafr0l;
-	uint32_t gafr0u;
-	uint32_t gafr1l;
-	uint32_t gafr1u;
-	uint32_t gafr2l;
-	uint32_t gafr2u;
-};
 
 /*
 
@@ -478,34 +376,4 @@ struct PXA255_GPIO_Regs
 #define PXA255_FIDR1            (PXA255_LCD_BASE_ADDR + 0x00000218)
 #define PXA255_LDCMD1           (PXA255_LCD_BASE_ADDR + 0x0000021c)
 
-struct PXA255_LCD_DMA_Regs
-{
-	uint32_t fdadr;
-	uint32_t fsadr;
-	uint32_t fidr;
-	uint32_t ldcmd;
-	emu_timer *eof;
-};
-
-struct PXA255_LCD_Regs
-{
-	uint32_t lccr0;
-	uint32_t lccr1;
-	uint32_t lccr2;
-	uint32_t lccr3;
-
-	uint32_t pad0[4];
-
-	uint32_t fbr[2];
-
-	uint32_t pad1[4];
-
-	uint32_t lcsr;
-	uint32_t liidr;
-	uint32_t trgbr;
-	uint32_t tcr;
-
-	uint32_t pad2[110];
-
-	PXA255_LCD_DMA_Regs dma[2];
-};
+#endif // DEVICES_MACHINE_PXA255DEFS
