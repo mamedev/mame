@@ -80,7 +80,6 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_videoram;
 	uint32_t screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint8_t *m_char_rom;
 	uint8_t m_row;
 	tilemap_t *m_bg_tilemap;
 

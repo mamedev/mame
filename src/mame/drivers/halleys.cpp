@@ -193,7 +193,6 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 
 #define MAX_LAYERS    6
 #define MAX_SPRITES   256
-#define MAX_SOUNDS    16
 
 #define SP_2BACK     0x100
 #define SP_ALPHA     0x200
@@ -235,7 +234,6 @@ public:
 
 private:
 	uint16_t *m_render_layer[MAX_LAYERS];
-	uint8_t m_sound_fifo[MAX_SOUNDS];
 	uint8_t *m_gfx_plane02;
 	uint8_t *m_gfx_plane13;
 	std::unique_ptr<uint8_t[]> m_collision_list;
@@ -262,7 +260,6 @@ private:
 	int m_firq_level;
 	emu_timer *m_blitter_reset_timer;
 	offs_t m_collision_detection;
-	int m_latch_delay;
 	std::vector<uint8_t> m_paletteram;
 
 	DECLARE_WRITE8_MEMBER(bgtile_w);
