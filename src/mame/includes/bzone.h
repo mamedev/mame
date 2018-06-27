@@ -11,6 +11,7 @@
 #pragma once
 
 #include "audio/redbaron.h"
+#include "machine/er2055.h"
 #include "machine/mathbox.h"
 #include "sound/discrete.h"
 
@@ -59,6 +60,7 @@ class redbaron_state : public bzone_state
 public:
 	redbaron_state(const machine_config &mconfig, device_type type, const char *tag) :
 		bzone_state(mconfig, type, tag),
+		m_earom(*this, "earom"),
 		m_redbaronsound(*this, "custom"),
 		m_fake_ports(*this, "FAKE%u", 1U)
 	{ }
@@ -68,12 +70,17 @@ public:
 protected:
 	DECLARE_READ8_MEMBER(redbaron_joy_r);
 	DECLARE_WRITE8_MEMBER(redbaron_joysound_w);
+	DECLARE_READ8_MEMBER(earom_read);
+	DECLARE_WRITE8_MEMBER(earom_write);
+	DECLARE_WRITE8_MEMBER(earom_control_w);
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void redbaron_map(address_map &map);
 
 private:
+	required_device<er2055_device> m_earom;
 	required_device<redbaron_sound_device> m_redbaronsound;
 	required_ioport_array<2> m_fake_ports;
 	uint8_t m_rb_input_select;
