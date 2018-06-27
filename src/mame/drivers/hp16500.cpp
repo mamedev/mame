@@ -65,6 +65,12 @@ public:
 		m_mlc(*this, "mlc")
 		{ }
 
+	void hp16500(machine_config &config);
+	void hp16500a(machine_config &config);
+	void hp1651(machine_config &config);
+	void hp1650(machine_config &config);
+
+private:
 	virtual void video_start() override;
 	uint32_t screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -97,15 +103,11 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_1650);
 
-	void hp16500(machine_config &config);
-	void hp16500a(machine_config &config);
-	void hp1651(machine_config &config);
-	void hp1650(machine_config &config);
 	void hp16500_map(address_map &map);
 	void hp16500a_map(address_map &map);
 	void hp1650_map(address_map &map);
 	void hp1651_map(address_map &map);
-private:
+
 	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
 };
 

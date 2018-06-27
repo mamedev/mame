@@ -204,9 +204,11 @@ public:
 		driver_device(mconfig, type, tag)
 	{ }
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void hp9845a(machine_config &config);
 	void hp9835a(machine_config &config);
+	
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 static INPUT_PORTS_START( hp9845 )
@@ -833,6 +835,9 @@ class hp9845b_state : public hp9845_base_state
 public:
 	hp9845b_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp9845b(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
@@ -845,8 +850,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	void hp9845b(machine_config &config);
-protected:
 	void set_graphic_mode(bool graphic);
 	void set_video_mar(uint16_t mar);
 	void video_fill_buff(bool buff_idx);
@@ -2062,6 +2065,9 @@ class hp9845c_state : public hp9845ct_base_state
 public:
 	hp9845c_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp9845c(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -2070,8 +2076,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
-	void hp9845c(machine_config &config);
-protected:
 	virtual void set_graphic_mode(bool graphic , bool alpha) override;
 	void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
 	void graphic_video_render(unsigned video_scanline);
@@ -2799,6 +2803,9 @@ class hp9845t_state : public hp9845ct_base_state
 public:
 	hp9845t_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp9845t(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -2807,8 +2814,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
-	void hp9845t(machine_config &config);
-protected:
 	virtual void set_graphic_mode(bool graphic , bool alpha) override;
 	void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
 	void graphic_video_render(unsigned video_scanline);

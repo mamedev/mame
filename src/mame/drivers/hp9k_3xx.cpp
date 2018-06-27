@@ -96,6 +96,17 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
+	void hp9k370(machine_config &config);
+	void hp9k330(machine_config &config);
+	void hp9k382(machine_config &config);
+	void hp9k310(machine_config &config);
+	void hp9k340(machine_config &config);
+	void hp9k380(machine_config &config);
+	void hp9k320(machine_config &config);
+	void hp9k332(machine_config &config);
+	void hp9k300(machine_config &config);
+
+private:
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<i8042_device> m_iocpu;
 	optional_device<hp_hil_mlc_device> m_mlc;
@@ -147,14 +158,6 @@ public:
 #endif
 	}
 
-	void hp9k370(machine_config &config);
-	void hp9k330(machine_config &config);
-	void hp9k382(machine_config &config);
-	void hp9k310(machine_config &config);
-	void hp9k340(machine_config &config);
-	void hp9k380(machine_config &config);
-	void hp9k320(machine_config &config);
-	void hp9k332(machine_config &config);
 	void hp9k310_map(address_map &map);
 	void hp9k320_map(address_map &map);
 	void hp9k330_map(address_map &map);
@@ -164,11 +167,6 @@ public:
 	void hp9k382_map(address_map &map);
 	void hp9k3xx_common(address_map &map);
 	void iocpu_map(address_map &map);
-
-protected:
-	void hp9k300(machine_config &config);
-
-private:
 
 	DECLARE_WRITE_LINE_MEMBER(cpu_reset);
 
