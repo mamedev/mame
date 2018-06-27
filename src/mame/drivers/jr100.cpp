@@ -51,6 +51,9 @@ public:
 		m_line8(*this, "LINE8") ,
 		m_maincpu(*this, "maincpu") { }
 
+	void jr100(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_pcg;
 	required_shared_ptr<uint8_t> m_vram;
@@ -73,9 +76,8 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(jr100);
 
 
-	void jr100(machine_config &config);
 	void jr100_mem(address_map &map);
-protected:
+
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;

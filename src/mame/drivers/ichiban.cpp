@@ -55,6 +55,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ichibanjyan(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
@@ -64,7 +67,6 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ichibanjyan(machine_config &config);
 	void ichibanjyan_io(address_map &map);
 	void ichibanjyan_map(address_map &map);
 };

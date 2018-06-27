@@ -32,13 +32,15 @@ public:
 		, m_inputs(*this, "SW.%u", 0)
 		{ }
 
+	void inderp(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(clock_tick);
 	DECLARE_WRITE8_MEMBER(inputs_w);
 	DECLARE_READ8_MEMBER(inputs_r);
 
-	void inderp(machine_config &config);
 	void maincpu_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<10> m_inputs;
 	u8 m_inbank;

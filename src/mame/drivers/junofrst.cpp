@@ -115,7 +115,7 @@ public:
 
 	void junofrst(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE8_MEMBER(bankselect_w);
 	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
@@ -133,7 +133,6 @@ protected:
 	void mcu_io_map(address_map &map);
 	void mcu_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_i8039;
 	required_device<filter_rc_device> m_filter_0_0;

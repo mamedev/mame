@@ -31,6 +31,33 @@ public:
 		m_fakey(*this, "FAKEY"),
 		m_visarea(0, 0, 0, 0) { }
 
+	void grmatch(machine_config &config);
+	void rimrockn(machine_config &config);
+	void gtg2(machine_config &config);
+	void slikshot_lo(machine_config &config);
+	void slikshot_lo_noz80(machine_config &config);
+	void ninclown(machine_config &config);
+	void sstrike(machine_config &config);
+	void stratab_hi(machine_config &config);
+	void hstennis_lo(machine_config &config);
+	void wfortune(machine_config &config);
+	void stratab_lo(machine_config &config);
+	void slikshot_hi(machine_config &config);
+	void hstennis_hi(machine_config &config);
+
+	void init_rimrockn();
+	void init_grmatch();
+	void init_peggle();
+	void init_slikshot();
+	void init_neckneck();
+	void init_arligntn();
+	void init_hstennis();
+	void init_sstrike();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
+
+private:
 	static constexpr uint32_t YBUFFER_COUNT = 15;
 	static constexpr uint32_t VRAM_SIZE = 0x40000;
 	static constexpr uint32_t VRAM_MASK = VRAM_SIZE - 1;
@@ -119,17 +146,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pia_porta_out);
 	DECLARE_WRITE8_MEMBER(ym2203_portb_out);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
-
-	void init_rimrockn();
-	void init_grmatch();
-	void init_peggle();
-	void init_slikshot();
-	void init_neckneck();
-	void init_arligntn();
-	void init_hstennis();
-	void init_sstrike();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -191,19 +207,6 @@ public:
 	void itech8_sound_ym3812_external(machine_config &config);
 	void itech8_core_lo(machine_config &config);
 	void itech8_core_hi(machine_config &config);
-	void grmatch(machine_config &config);
-	void rimrockn(machine_config &config);
-	void gtg2(machine_config &config);
-	void slikshot_lo(machine_config &config);
-	void slikshot_lo_noz80(machine_config &config);
-	void ninclown(machine_config &config);
-	void sstrike(machine_config &config);
-	void stratab_hi(machine_config &config);
-	void hstennis_lo(machine_config &config);
-	void wfortune(machine_config &config);
-	void stratab_lo(machine_config &config);
-	void slikshot_hi(machine_config &config);
-	void hstennis_hi(machine_config &config);
 	void gtg2_map(address_map &map);
 	void ninclown_map(address_map &map);
 	void slikz80_io_map(address_map &map);
@@ -214,6 +217,6 @@ public:
 	void sound3812_map(address_map &map);
 	void tmshi_map(address_map &map);
 	void tmslo_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
