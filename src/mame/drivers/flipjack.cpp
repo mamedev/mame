@@ -109,6 +109,11 @@ public:
 		m_layer = 0;
 	}
 
+	void flipjack(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<hd6845_device> m_crtc;
@@ -128,13 +133,11 @@ public:
 	DECLARE_WRITE8_MEMBER(flipjack_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(flipjack_bank_w);
 	DECLARE_WRITE8_MEMBER(flipjack_layer_w);
-	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
 	DECLARE_READ8_MEMBER(flipjack_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(flipjack_portc_w);
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(flipjack);
 	uint32_t screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void flipjack(machine_config &config);
 	void flipjack_main_io_map(address_map &map);
 	void flipjack_main_map(address_map &map);
 	void flipjack_sound_io_map(address_map &map);

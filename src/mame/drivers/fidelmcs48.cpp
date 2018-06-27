@@ -41,6 +41,9 @@ public:
 		: fidelbase_state(mconfig, type, tag)
 	{ }
 
+	void sc6(machine_config &config);
+
+private:
 	// SC6
 	void sc6_prepare_display();
 	DECLARE_WRITE8_MEMBER(sc6_mux_w);
@@ -49,7 +52,6 @@ public:
 	DECLARE_READ_LINE_MEMBER(sc6_input6_r);
 	DECLARE_READ_LINE_MEMBER(sc6_input7_r);
 	void sc6_map(address_map &map);
-	void sc6(machine_config &config);
 };
 
 

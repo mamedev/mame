@@ -55,7 +55,7 @@ public:
 	void init_pesadelo();
 	void pesadelo(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void io_mem(address_map &map);
@@ -64,7 +64,6 @@ protected:
 	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
 	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
 
-private:
 	required_device<cpu_device> m_maincpu;
 
 	uint8_t m_input_mask;

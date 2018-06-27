@@ -45,14 +45,15 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(port1a_w);
-	void init_dsb46();
-	DECLARE_MACHINE_RESET(dsb46);
-
 	void dsb46(machine_config &config);
+
+	void init_dsb46();
+
+private:
+	DECLARE_WRITE8_MEMBER(port1a_w);
+	DECLARE_MACHINE_RESET(dsb46);
 	void dsb46_io(address_map &map);
 	void dsb46_mem(address_map &map);
-private:
 	required_device<cpu_device> m_maincpu;
 };
 

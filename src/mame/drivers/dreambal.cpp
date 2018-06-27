@@ -43,13 +43,17 @@ public:
 		m_eeprom(*this, "eeprom")
 	{ }
 
+	void dreambal(machine_config &config);
+
+	void init_dreambal();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<deco104_device> m_deco104;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	void init_dreambal();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -73,7 +77,6 @@ public:
 			m_eeprom->cs_write(data&0x4 ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
-	void dreambal(machine_config &config);
 	void dreambal_map(address_map &map);
 };
 

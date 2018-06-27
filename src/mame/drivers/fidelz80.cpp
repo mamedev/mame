@@ -523,6 +523,22 @@ public:
 		m_beeper(*this, "beeper")
 	{ }
 
+	void cc10(machine_config &config);
+	void vcc(machine_config &config);
+
+	void bcc(machine_config &config);
+
+	void scc(machine_config &config);
+
+	void vsc(machine_config &config);
+
+	void vbrc(machine_config &config);
+
+	void dsc(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+private:
 	// devices/pointers
 	optional_device<i8041_device> m_mcu;
 	optional_device<z80pio_device> m_z80pio;
@@ -533,8 +549,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); }
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// CC10 and VCC/UVC
 	void vcc_prepare_display();
@@ -550,22 +564,18 @@ public:
 	void cc10_map(address_map &map);
 	void vcc_io(address_map &map);
 	void vcc_map(address_map &map);
-	void cc10(machine_config &config);
-	void vcc(machine_config &config);
 
 	// BCC
 	DECLARE_READ8_MEMBER(bcc_input_r);
 	DECLARE_WRITE8_MEMBER(bcc_control_w);
 	void bcc_io(address_map &map);
 	void bcc_map(address_map &map);
-	void bcc(machine_config &config);
 
 	// SCC
 	DECLARE_READ8_MEMBER(scc_input_r);
 	DECLARE_WRITE8_MEMBER(scc_control_w);
 	void scc_io(address_map &map);
 	void scc_map(address_map &map);
-	void scc(machine_config &config);
 
 	// VSC
 	void vsc_prepare_display();
@@ -579,7 +589,6 @@ public:
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
 	void vsc_io(address_map &map);
 	void vsc_map(address_map &map);
-	void vsc(machine_config &config);
 
 	// VBRC
 	void vbrc_prepare_display();
@@ -591,14 +600,12 @@ public:
 	DECLARE_WRITE8_MEMBER(vbrc_ioexp_port_w);
 	void vbrc_main_io(address_map &map);
 	void vbrc_main_map(address_map &map);
-	void vbrc(machine_config &config);
 
 	// DSC
 	void dsc_prepare_display();
 	DECLARE_WRITE8_MEMBER(dsc_control_w);
 	DECLARE_WRITE8_MEMBER(dsc_select_w);
 	DECLARE_READ8_MEMBER(dsc_input_r);
-	void dsc(machine_config &config);
 	void dsc_map(address_map &map);
 };
 

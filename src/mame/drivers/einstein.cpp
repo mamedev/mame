@@ -87,7 +87,11 @@ public:
 		m_int(0)
 	{}
 
+	void einstein(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_button);
+
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_timer_callback);
 	DECLARE_WRITE8_MEMBER(keyboard_line_write);
 	DECLARE_READ8_MEMBER(keyboard_data_read);
@@ -107,14 +111,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ardy_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(strobe_callback);
 
-	void einstein(machine_config &config);
 	void einstein_io(address_map &map);
 	void einstein_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	void einstein_scan_keyboard();
 
 	required_device<cpu_device> m_maincpu;

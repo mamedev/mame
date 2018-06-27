@@ -190,6 +190,15 @@ public:
 		m_spuata(*this, "spu_ata")
 	{ }
 
+	void firebeat2(machine_config &config);
+	void firebeat(machine_config &config);
+	void firebeat_spu(machine_config &config);
+
+	void init_ppd();
+	void init_kbm();
+	void init_ppp();
+
+private:
 	required_device<ppc4xx_device> m_maincpu;
 	optional_device<m68000_device> m_audiocpu;
 	required_shared_ptr<uint32_t> m_work_ram;
@@ -214,9 +223,6 @@ public:
 	int m_ibutton_read_subkey_ptr;
 	uint8_t m_ibutton_subkey_data[0x40];
 
-	void init_ppd();
-	void init_kbm();
-	void init_ppp();
 	DECLARE_MACHINE_START(firebeat);
 	DECLARE_MACHINE_RESET(firebeat);
 	DECLARE_VIDEO_START(firebeat);
@@ -268,9 +274,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gcu0_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(gcu1_interrupt);
 	static void cdrom_config(device_t *device);
-	void firebeat2(machine_config &config);
-	void firebeat(machine_config &config);
-	void firebeat_spu(machine_config &config);
 	void firebeat_map(address_map &map);
 	void firebeat2_map(address_map &map);
 	void spu_map(address_map &map);

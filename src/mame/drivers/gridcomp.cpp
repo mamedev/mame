@@ -111,6 +111,16 @@ public:
 		, m_ram(*this, RAM_TAG)
 	{ }
 
+	void grid1129(machine_config &config);
+	void grid1131(machine_config &config);
+	void grid1121(machine_config &config);
+	void grid1139(machine_config &config);
+	void grid1109(machine_config &config);
+	void grid1101(machine_config &config);
+
+	void init_gridcomp();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i80130_device> m_osp;
 	required_device<i8255_device> m_modem;
@@ -118,7 +128,6 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 
-	void init_gridcomp();
 	DECLARE_MACHINE_START(gridcomp);
 	DECLARE_MACHINE_RESET(gridcomp);
 
@@ -136,16 +145,10 @@ public:
 
 	void kbd_put(u16 data);
 
-	void grid1129(machine_config &config);
-	void grid1131(machine_config &config);
-	void grid1121(machine_config &config);
-	void grid1139(machine_config &config);
-	void grid1109(machine_config &config);
-	void grid1101(machine_config &config);
 	void grid1101_io(address_map &map);
 	void grid1101_map(address_map &map);
 	void grid1121_map(address_map &map);
-private:
+
 	bool m_kbd_ready;
 	uint16_t m_kbd_data;
 
