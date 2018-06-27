@@ -16,7 +16,6 @@
 		</part>
 	</software>
 	
-	<!--  -->
 	<software name="appetisv" cloneof="appetide">
 		<description>Amiga Appetizer (Sv)</description>
 		<year>1989</year>
