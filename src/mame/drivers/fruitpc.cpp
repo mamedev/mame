@@ -35,6 +35,9 @@ public:
 		, m_inp4(*this, "INP4")
 	{ }
 
+	void fruitpc(machine_config &config);
+
+private:
 	required_device<isa8_device> m_isabus;
 	required_ioport m_inp1;
 	required_ioport m_inp2;
@@ -44,7 +47,6 @@ public:
 	DECLARE_READ8_MEMBER(fruit_inp_r);
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
 	static void fruitpc_sb_conf(device_t *device);
-	void fruitpc(machine_config &config);
 	void fruitpc_io(address_map &map);
 	void fruitpc_map(address_map &map);
 };

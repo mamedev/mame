@@ -37,6 +37,13 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void fcombat(machine_config &config);
+
+	void init_fcombat();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -69,15 +76,12 @@ public:
 	DECLARE_READ8_MEMBER(e300_r);
 	DECLARE_WRITE8_MEMBER(ee00_w);
 	DECLARE_WRITE8_MEMBER(fcombat_videoreg_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	void init_fcombat();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(fcombat);
 	uint32_t screen_update_fcombat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void fcombat(machine_config &config);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 };

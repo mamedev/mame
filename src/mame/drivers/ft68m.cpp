@@ -29,11 +29,13 @@ public:
 	{
 	}
 
+	void ft68m(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(switches_r);
 
-	void ft68m(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
