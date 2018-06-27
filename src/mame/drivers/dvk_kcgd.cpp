@@ -98,8 +98,8 @@ private:
 	DECLARE_WRITE8_MEMBER(palette_index_w);
 	DECLARE_WRITE8_MEMBER(palette_data_w);
 
-	emu_timer *m_vsync_on_timer;
-	emu_timer *m_vsync_off_timer;
+	//emu_timer *m_vsync_on_timer;
+	//emu_timer *m_vsync_off_timer;
 	emu_timer *m_500hz_timer;
 
 	void kcgd_mem(address_map &map);

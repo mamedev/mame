@@ -58,7 +58,6 @@ private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_fg_tilemapram;
 	required_shared_ptr<uint16_t> m_bg_tilemapram;
-	uint16_t *  m_sprites;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

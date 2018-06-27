@@ -149,8 +149,6 @@ public:
 	void gal3(machine_config &config);
 
 private:
-	uint32_t *m_mpSharedRAM0;
-	//uint32_t *m_mpSharedRAM1;
 	uint16_t m_namcos21_video_enable;
 	required_shared_ptr<uint16_t> m_rso_shared_ram;
 	optional_shared_ptr<uint16_t> m_generic_paletteram_16;

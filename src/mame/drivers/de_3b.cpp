@@ -50,13 +50,8 @@ private:
 	// driver_device overrides
 	virtual void machine_reset() override;
 
-	uint8_t m_strobe;
 	uint8_t m_kbdrow;
-	uint8_t m_diag;
-	bool m_ca1;
-	bool m_irq_active;
 	uint8_t m_sound_data;
-
 };
 
 

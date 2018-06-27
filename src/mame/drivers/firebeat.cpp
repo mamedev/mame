@@ -212,7 +212,6 @@ private:
 	uint8_t m_extend_board_irq_enable;
 	uint8_t m_extend_board_irq_active;
 //  emu_timer *m_keyboard_timer;
-	int m_tick;
 	int m_layer;
 	int m_cab_data_ptr;
 	const int * m_cur_cab_data;

@@ -82,8 +82,6 @@ private:
 //  output_finder<32> m_digits;
 //  output_finder<> m_diag_digit;
 
-	bool m_nmi_enable;
-
 //  uint32_t m_segment1;
 //  uint32_t m_segment2;
 	uint8_t m_strobe;

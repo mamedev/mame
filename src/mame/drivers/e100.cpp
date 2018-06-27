@@ -149,10 +149,6 @@ public:
 		,m_io_line7(*this, "LINE7")
 		,m_io_line8(*this, "LINE8")
 		,m_io_line9(*this, "LINE9")
-		,m_line0(0)
-		,m_line1(0)
-		,m_line2(0)
-		,m_line3(0)
 		,m_pia1(*this, PIA1_TAG)
 		,m_pia2(*this, PIA2_TAG)
 		,m_pia1_B(0)
@@ -195,10 +191,6 @@ private:
 	required_ioport m_io_line7;
 	required_ioport m_io_line8;
 	required_ioport m_io_line9;
-	uint8_t m_line0;
-	uint8_t m_line1;
-	uint8_t m_line2;
-	uint8_t m_line3;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	uint8_t m_pia1_B;

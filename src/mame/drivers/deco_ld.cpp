@@ -159,7 +159,6 @@ private:
 	required_shared_ptr<uint8_t> m_vram1;
 	required_shared_ptr<uint8_t> m_attr1;
 
-	uint8_t m_laserdisc_data;
 	int m_nmimask;
 	DECLARE_READ8_MEMBER(acia_status_hack_r);
 	DECLARE_READ8_MEMBER(sound_status_r);
