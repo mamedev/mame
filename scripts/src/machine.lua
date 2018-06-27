@@ -2256,6 +2256,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pxa255.h,MACHINES["PXA255"] = true
+---------------------------------------------------
+
+if (MACHINES["PXA255"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pxa255.cpp",
+		MAME_DIR .. "src/devices/machine/pxa255.h",
+		MAME_DIR .. "src/devices/machine/pxa255defs.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/r10696.h,MACHINES["R10696"] = true
 ---------------------------------------------------
 

@@ -31,24 +31,24 @@ PALETTE_INIT_MEMBER(gaplus_base_state, gaplus)
 	for (int i = 0; i < 256; i++)
 	{
 		/* red component */
-        int bit0 = BIT(color_prom[i], 0);
-        int bit1 = BIT(color_prom[i], 1);
-        int bit2 = BIT(color_prom[i], 2);
-        int bit3 = BIT(color_prom[i], 3);
-        int r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		
-	    /* green component */
+		int bit0 = BIT(color_prom[i], 0);
+		int bit1 = BIT(color_prom[i], 1);
+		int bit2 = BIT(color_prom[i], 2);
+		int bit3 = BIT(color_prom[i], 3);
+		int r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		/* green component */
 		bit0 = BIT(color_prom[i + 0x100], 0);
 		bit1 = BIT(color_prom[i + 0x100], 1);
 		bit2 = BIT(color_prom[i + 0x100], 2);
 		bit3 = BIT(color_prom[i + 0x100], 3);
-        int g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		/* blue component */
 		bit0 = BIT(color_prom[i + 0x200], 0);
 		bit1 = BIT(color_prom[i + 0x200], 1);
 		bit2 = BIT(color_prom[i + 0x200], 2);
 		bit3 = BIT(color_prom[i + 0x200], 3);
-        int b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -82,13 +82,13 @@ TILEMAP_MAPPER_MEMBER(gaplus_base_state::tilemap_scan)
 	row += 2;
 	col -= 2;
 	if (col & 0x20)
-        return row + ((col & 0x1f) << 5);
-    return col + (row << 5);
+		return row + ((col & 0x1f) << 5);
+	return col + (row << 5);
 }
 
 TILE_GET_INFO_MEMBER(gaplus_base_state::get_tile_info)
 {
-    const uint8_t attr = m_videoram[tile_index + 0x400];
+	const uint8_t attr = m_videoram[tile_index + 0x400];
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
 	SET_TILE_INFO_MEMBER(0,
@@ -120,8 +120,8 @@ void gaplus_base_state::starfield_init()
 	int generator = 0;
 	int set = 0;
 
-    const int width = m_screen->width();
-    const int height = m_screen->height();
+	const int width = m_screen->width();
+	const int height = m_screen->height();
 
 	m_total_stars = 0;
 
@@ -129,24 +129,24 @@ void gaplus_base_state::starfield_init()
 	/* this comes from the Galaxian hardware, Gaplus is probably different */
 
 	for (int y = 0; y < height; y++)
-    {
+	{
 		for (int x = width * 2 - 1; x >= 0; x--)
-        {
+		{
 			generator <<= 1;
-            const int bit1 = (~generator >> 17) & 1;
-            const int bit2 = (generator >> 5) & 1;
+			const int bit1 = (~generator >> 17) & 1;
+			const int bit2 = (generator >> 5) & 1;
 
 			if (bit1 ^ bit2) generator |= 1;
 
 			if (BIT(~generator, 16) && (generator & 0xff) == 0xff)
-            {
-                const int color = ~(generator >> 8) & 0x3f;
+			{
+				const int color = ~(generator >> 8) & 0x3f;
 				if (color && m_total_stars < MAX_STARS)
-                {
-                    m_stars[m_total_stars].x = x;
-                    m_stars[m_total_stars].y = y;
-                    m_stars[m_total_stars].col = color;
-                    m_stars[m_total_stars].set = set++;
+				{
+					m_stars[m_total_stars].x = x;
+					m_stars[m_total_stars].y = y;
+					m_stars[m_total_stars].col = color;
+					m_stars[m_total_stars].set = set++;
 
 					if (set == 3)
 						set = 0;
@@ -217,14 +217,14 @@ void gaplus_base_state::starfield_render(bitmap_ind16 &bitmap)
 	if ((m_starfield_control[0] & 1) == 0)
 		return;
 
-    const int width = m_screen->width();
-    const int height = m_screen->height();
+	const int width = m_screen->width();
+	const int height = m_screen->height();
 
-    /* draw the starfields */
+	/* draw the starfields */
 	for (int i = 0; i < m_total_stars; i++)
 	{
-        int x = m_stars[i].x;
-        int y = m_stars[i].y;
+		int x = m_stars[i].x;
+		int y = m_stars[i].y;
 
 		if (x >= 0 && x < width && y >= 0 && y < height)
 		{
@@ -249,15 +249,15 @@ void gaplus_base_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 				{ 0, 1 },
 				{ 2, 3 }
 			};
-		    const int sprite = spriteram[offs] | ((spriteram_3[offs] & 0x40) << 2);
-		    const int color = spriteram[offs+1] & 0x3f;
-		    const int sx = spriteram_2[offs+1] + 0x100 * (spriteram_3[offs+1] & 1) - 71;
+			const int sprite = spriteram[offs] | ((spriteram_3[offs] & 0x40) << 2);
+			const int color = spriteram[offs+1] & 0x3f;
+			const int sx = spriteram_2[offs+1] + 0x100 * (spriteram_3[offs+1] & 1) - 71;
 			int sy = 256 - spriteram_2[offs] - 8;
 			int flipx = BIT(spriteram_3[offs], 0);
 			int flipy = BIT(spriteram_3[offs], 1);
-		    const int sizex = BIT(spriteram_3[offs], 3);
-		    const int sizey = BIT(spriteram_3[offs], 5);
-		    const int duplicate = spriteram_3[offs] & 0x80;
+			const int sizex = BIT(spriteram_3[offs], 3);
+			const int sizey = BIT(spriteram_3[offs], 5);
+			const int duplicate = spriteram_3[offs] & 0x80;
 
 			if (flip_screen())
 			{

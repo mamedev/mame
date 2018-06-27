@@ -1128,6 +1128,10 @@ MACHINE_CONFIG_START(apollo_state::dn3000)
 	MCFG_RAM_MODIFY("messram")
 	MCFG_RAM_DEFAULT_SIZE("8M")
 	MCFG_RAM_EXTRA_OPTIONS("4M")
+
+	// FIXME: is this interrupt really only connected on DN3000?
+	MCFG_DEVICE_MODIFY(APOLLO_RTC_TAG)
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, apollo_state, apollo_rtc_irq_function))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apollo_state::dsp3000)

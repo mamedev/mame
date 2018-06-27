@@ -534,6 +534,7 @@ MACHINES["PIT8253"] = true
 MACHINES["PLA"] = true
 --MACHINES["PROFILE"] = true
 MACHINES["PROM82S129"] = true
+MACHINES["PXA255"] = true
 MACHINES["R64H156"] = true
 MACHINES["RF5C296"] = true
 MACHINES["RIOT6532"] = true
@@ -2517,7 +2518,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/pc8001.cpp",
 	MAME_DIR .. "src/mame/includes/pc8001.h",
 	MAME_DIR .. "src/mame/drivers/pc8801.cpp",
+	MAME_DIR .. "src/mame/includes/pc8801.h",
 	MAME_DIR .. "src/mame/drivers/pc88va.cpp",
+	MAME_DIR .. "src/mame/includes/pc88va.h",
 	MAME_DIR .. "src/mame/drivers/pc100.cpp",
 	MAME_DIR .. "src/mame/drivers/pc9801.cpp",
 	MAME_DIR .. "src/mame/includes/pc9801.h",
@@ -2629,6 +2632,7 @@ files {
 createMESSProjects(_target, _subtarget, "olympia")
 files {
 	MAME_DIR .. "src/mame/drivers/olyboss.cpp",
+	MAME_DIR .. "src/mame/drivers/olytext.cpp",
 	MAME_DIR .. "src/mame/drivers/peoplepc.cpp",
 }
 

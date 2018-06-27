@@ -130,9 +130,9 @@ private:
 
 	devcb_write8        m_speaker_cb;
 
-	uint16_t			m_mouse_x;
-	uint16_t			m_mouse_y;
-	uint8_t				m_mouse_btn;
+	uint16_t            m_mouse_x;
+	uint16_t            m_mouse_y;
+	uint8_t             m_mouse_btn;
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
 };

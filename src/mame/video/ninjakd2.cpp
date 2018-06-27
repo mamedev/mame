@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(robokid_state::robokid_get_bg_tile_info)
  *  Video system start
  *
  *************************************/
- 
+
 void ninjakd2_state::video_init_common()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -117,7 +117,7 @@ void robokid_state::video_init_banked(uint32_t vram_alloc_size)
 		{
 			m_robokid_bg_videoram[i] = make_unique_clear<uint8_t[]>(vram_alloc_size);
 
-			save_pointer(NAME(m_robokid_bg_videoram[i].get()), vram_alloc_size, i);
+			save_pointer(NAME(m_robokid_bg_videoram[i]), vram_alloc_size, i);
 		}
 		m_vram_bank_mask = (vram_alloc_size >> 10) - 1;
 	}

@@ -234,6 +234,8 @@ DEFINE_DEVICE_TYPE(I87C51, i87c51_device, "i87c51", "Intel I87C51")
 DEFINE_DEVICE_TYPE(I80C32, i80c32_device, "i80c32", "Intel I80C32")
 DEFINE_DEVICE_TYPE(I80C52, i80c52_device, "i80c52", "Intel I80C52")
 DEFINE_DEVICE_TYPE(I87C52, i87c52_device, "i87c52", "Intel I87C52")
+DEFINE_DEVICE_TYPE(AT89C52, at89c52_device, "at89c52", "Atmel AT89C52")
+DEFINE_DEVICE_TYPE(AT89S52, at89s52_device, "at89s52", "Atmel AT89S52")
 DEFINE_DEVICE_TYPE(AT89C4051, at89c4051_device, "at89c4051", "Atmel AT89C4051")
 DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
 
@@ -360,6 +362,16 @@ i80c32_device::i80c32_device(const machine_config &mconfig, const char *tag, dev
 
 i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80c52_device(mconfig, I87C52, tag, owner, clock, 13, 8)
+{
+}
+
+at89c52_device::at89c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80c52_device(mconfig, AT89C52, tag, owner, clock, 13, 8)
+{
+}
+
+at89s52_device::at89s52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80c52_device(mconfig, AT89S52, tag, owner, clock, 13, 8)
 {
 }
 

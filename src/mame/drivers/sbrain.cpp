@@ -62,7 +62,6 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_beep(*this, "beeper")
-		, m_brg(*this, "brg")
 		, m_u0(*this, "uart0")
 		, m_u1(*this, "uart1")
 		, m_ppi(*this, "ppi")
@@ -88,7 +87,6 @@ public:
 	DECLARE_READ8_MEMBER(port50_r);
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(baud_w);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
 
@@ -111,7 +109,6 @@ private:
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
-	required_device<com8116_device> m_brg;
 	required_device<i8251_device> m_u0;
 	required_device<i8251_device> m_u1;
 	required_device<i8255_device> m_ppi;
@@ -143,7 +140,7 @@ void sbrain_state::sbrain_io(address_map &map)
 	map(0x50, 0x57).r(FUNC(sbrain_state::port50_r));
 	map(0x58, 0x58).mirror(6).rw(m_u1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x59, 0x59).mirror(6).rw(m_u1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x60, 0x67).w(FUNC(sbrain_state::baud_w));
+	map(0x60, 0x60).mirror(7).w("brg", FUNC(com8116_device::stt_str_w));
 	map(0x68, 0x6b).mirror(4).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -201,12 +198,6 @@ WRITE8_MEMBER( sbrain_state::port10_w )
 
 	m_floppy0->get_device()->mon_w(0); // motors run all the time
 	m_floppy1->get_device()->mon_w(0);
-}
-
-WRITE8_MEMBER( sbrain_state::baud_w )
-{
-	m_brg->write_str(data & 0x0f);
-	m_brg->write_stt(data >> 4);
 }
 
 READ8_MEMBER( sbrain_state::ppi_pa_r )

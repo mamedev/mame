@@ -385,7 +385,7 @@ VIDEO_START_MEMBER(seta_state,seta_2_layers)
 	m_tilemap[0] = &machine().tilemap().create(
 			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info<0>), this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
-	
+
 	/* layer 1 */
 	m_tilemap[1] = &machine().tilemap().create(
 			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info<1>), this), TILEMAP_SCAN_ROWS,

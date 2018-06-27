@@ -134,8 +134,8 @@ void pce_cd_device::device_start()
 
 	// TODO: add proper restore for the cd data...
 	save_item(NAME(m_regs));
-	save_pointer(NAME(m_bram.get()), PCE_BRAM_SIZE * 2);
-	save_pointer(NAME(m_adpcm_ram.get()), PCE_ADPCM_RAM_SIZE);
+	save_pointer(NAME(m_bram), PCE_BRAM_SIZE * 2);
+	save_pointer(NAME(m_adpcm_ram), PCE_ADPCM_RAM_SIZE);
 	save_item(NAME(m_bram_locked));
 	save_item(NAME(m_adpcm_read_ptr));
 	save_item(NAME(m_adpcm_read_buf));
@@ -161,16 +161,16 @@ void pce_cd_device::device_start()
 	save_item(NAME(m_scsi_last_RST));
 	save_item(NAME(m_cd_motor_on));
 	save_item(NAME(m_selected));
-	save_pointer(NAME(m_command_buffer.get()), PCE_CD_COMMAND_BUFFER_SIZE);
+	save_pointer(NAME(m_command_buffer), PCE_CD_COMMAND_BUFFER_SIZE);
 	save_item(NAME(m_command_buffer_index));
 	save_item(NAME(m_status_sent));
 	save_item(NAME(m_message_after_status));
 	save_item(NAME(m_message_sent));
-	save_pointer(NAME(m_data_buffer.get()), 8192);
+	save_pointer(NAME(m_data_buffer), 8192);
 	save_item(NAME(m_data_buffer_size));
 	save_item(NAME(m_data_buffer_index));
 	save_item(NAME(m_data_transferred));
-	save_pointer(NAME(m_acard_ram.get()), PCE_ACARD_RAM_SIZE);
+	save_pointer(NAME(m_acard_ram), PCE_ACARD_RAM_SIZE);
 	save_item(NAME(m_acard_latch));
 	save_item(NAME(m_acard_ctrl));
 	save_item(NAME(m_acard_base_addr));
@@ -183,7 +183,7 @@ void pce_cd_device::device_start()
 	save_item(NAME(m_last_frame));
 	save_item(NAME(m_cdda_status));
 	save_item(NAME(m_cdda_play_mode));
-	save_pointer(NAME(m_subcode_buffer.get()), 96);
+	save_pointer(NAME(m_subcode_buffer), 96);
 	save_item(NAME(m_end_mark));
 	save_item(NAME(m_cdda_volume));
 	save_item(NAME(m_adpcm_volume));

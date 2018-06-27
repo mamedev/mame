@@ -72,7 +72,7 @@ void naomi_m4_board::device_start()
 	buffer = std::make_unique<uint8_t[]>(BUFFER_SIZE);
 	enc_init();
 
-	save_pointer(NAME(buffer.get()), BUFFER_SIZE);
+	save_pointer(NAME(buffer), BUFFER_SIZE);
 	save_item(NAME(rom_cur_address));
 	save_item(NAME(buffer_actual_size));
 	save_item(NAME(encryption));

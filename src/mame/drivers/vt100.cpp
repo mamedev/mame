@@ -67,7 +67,6 @@ public:
 		m_keyboard(*this, "keyboard"),
 		m_kbduart(*this, "kbduart"),
 		m_pusart(*this, "pusart"),
-		m_dbrg(*this, "dbrg"),
 		m_nvr(*this, "nvr"),
 		m_rstbuf(*this, "rstbuf"),
 		m_rs232(*this, RS232_TAG),
@@ -81,7 +80,6 @@ public:
 	required_device<vt100_keyboard_device> m_keyboard;
 	required_device<ay31015_device> m_kbduart;
 	required_device<i8251_device> m_pusart;
-	required_device<com8116_device> m_dbrg;
 	required_device<er1400_device> m_nvr;
 	required_device<rst_pos_buffer_device> m_rstbuf;
 	required_device<rs232_port_device> m_rs232;
@@ -161,12 +159,6 @@ READ8_MEMBER(vt100_state::flags_r)
 	return ret;
 }
 
-WRITE8_MEMBER(vt100_state::baud_rate_w)
-{
-	m_dbrg->write_str(data & 0x0f);
-	m_dbrg->write_stt(data >> 4);
-}
-
 READ8_MEMBER(vt100_state::modem_r)
 {
 	uint8_t ret = 0x0f;
@@ -201,7 +193,7 @@ void vt100_state::vt100_io(address_map &map)
 	map(0x00, 0x00).rw("pusart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x01, 0x01).rw("pusart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// 0x02 Baud rate generator
-	map(0x02, 0x02).w(FUNC(vt100_state::baud_rate_w));
+	map(0x02, 0x02).w("dbrg", FUNC(com8116_device::stt_str_w));
 	// 0x22 Modem buffer
 	map(0x22, 0x22).r(FUNC(vt100_state::modem_r));
 	// 0x42 Flags buffer

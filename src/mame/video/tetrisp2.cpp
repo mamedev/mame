@@ -233,7 +233,7 @@ VIDEO_START_MEMBER(tetrisp2_state,tetrisp2)
 	ms32_rearrange_sprites(machine(), "gfx1");
 
 	save_item(NAME(m_flipscreen_old));
-	save_pointer(NAME(m_priority.get()), 0x40000);
+	save_pointer(NAME(m_priority), 0x40000);
 }
 
 VIDEO_START_MEMBER(tetrisp2_state,nndmseal)
@@ -259,7 +259,7 @@ VIDEO_START_MEMBER(tetrisp2_state,rockntread)
 	ms32_rearrange_sprites(machine(), "gfx1");
 
 	save_item(NAME(m_flipscreen_old));
-	save_pointer(NAME(m_priority.get()), 0x40000);
+	save_pointer(NAME(m_priority), 0x40000);
 }
 
 

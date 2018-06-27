@@ -2223,36 +2223,38 @@ MACHINE_CONFIG_END
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "sp-s2.sp1",         0x00000, 0x020000, CRC(9036d879) SHA1(4f5ed7105b7128794654ce82b51723e16e389543) ) /* 5 Dark Blue - Europe, 1 Slot, has also been found on 2 Slot and 4 Slot (the old hacks were designed for this one) */ \
 	ROM_SYSTEM_BIOS( 1, "euro-s1", "Europe MVS (Ver. 1)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "sp-s.sp1",          0x00000, 0x020000, CRC(c7f2fa45) SHA1(09576ff20b4d6b365e78e6a5698ea450262697cd) ) /* 3 Dark Blue - Europe, 4 Slot */ \
+	ROM_SYSTEM_BIOS( 2, "asia-mv1c", "Asia NEO-MVH MV1C" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "sp-45.sp1",         0x00000, 0x080000, CRC(03cc9f6a) SHA1(cdf1f49e3ff2bac528c21ed28449cf35b7957dc1) ) /* 6 Dark Blue - Latest Asia bios (MV1C - mask ROM) */ \
+	ROM_SYSTEM_BIOS( 3, "asia-mv1b", "Asia MV1B" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3, "sp-s3.sp1",         0x00000, 0x020000, CRC(91b64be3) SHA1(720a3e20d26818632aedf2c2fd16c54f213543e1) ) /* 6 Dark Blue - Asia (MV1B) */ \
 	\
-	ROM_SYSTEM_BIOS( 2, "us", "US MVS (Ver. 2?)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "sp-u2.sp1",         0x00000, 0x020000, CRC(e72943de) SHA1(5c6bba07d2ec8ac95776aa3511109f5e1e2e92eb) ) /* 5 Cyan - US, 2 Slot */ \
-	ROM_SYSTEM_BIOS( 3, "us-e", "US MVS (Ver. 1)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3, "sp-e.sp1",          0x00000, 0x020000, CRC(2723a5b5) SHA1(5dbff7531cf04886cde3ef022fb5ca687573dcb8) ) /* 5 Yellow - US, 6 Slot (V5?) */ \
-	ROM_SYSTEM_BIOS( 4, "us-v2", "US MVS (4 slot, Ver 2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "sp1-u2",            0x00000, 0x020000, CRC(62f021f4) SHA1(62d372269e1b3161c64ae21123655a0a22ffd1bb) ) /* 3 Cyan - US, 4 slot - also seen with "v2" label*/ \
-	ROM_SYSTEM_BIOS( 5, "us-u3", "US MVS (U3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "sp1-u3.bin",        0x00000, 0x020000, CRC(2025b7a2) SHA1(73d774746196f377111cd7aa051cc8bb5dd948b3) ) /* 2 Green - 6 Slot */ \
+	ROM_SYSTEM_BIOS( 4, "us", "US MVS (Ver. 2?)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "sp-u2.sp1",         0x00000, 0x020000, CRC(e72943de) SHA1(5c6bba07d2ec8ac95776aa3511109f5e1e2e92eb) ) /* 5 Cyan - US, 2 Slot */ \
+	ROM_SYSTEM_BIOS( 5, "us-e", "US MVS (Ver. 1)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "sp-e.sp1",          0x00000, 0x020000, CRC(2723a5b5) SHA1(5dbff7531cf04886cde3ef022fb5ca687573dcb8) ) /* 5 Yellow - US, 6 Slot (V5?) */ \
+	ROM_SYSTEM_BIOS( 6, "us-v2", "US MVS (4 slot, Ver 2)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "sp1-u2",            0x00000, 0x020000, CRC(62f021f4) SHA1(62d372269e1b3161c64ae21123655a0a22ffd1bb) ) /* 3 Cyan - US, 4 slot - also seen with "v2" label*/ \
+	ROM_SYSTEM_BIOS( 7, "us-u3", "US MVS (U3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7, "sp1-u3.bin",        0x00000, 0x020000, CRC(2025b7a2) SHA1(73d774746196f377111cd7aa051cc8bb5dd948b3) ) /* 2 Green - 6 Slot */ \
 	\
-	ROM_SYSTEM_BIOS( 6, "asia", "Asia MVS (Ver. 3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "asia-s3.rom",       0x00000, 0x020000, CRC(91b64be3) SHA1(720a3e20d26818632aedf2c2fd16c54f213543e1) ) /* 6 Dark Blue - Asia */ \
+	ROM_SYSTEM_BIOS( 8, "japan", "Japan MVS (Ver. 3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 8, "vs-bios.rom",       0x00000, 0x020000, CRC(f0e8f27d) SHA1(ecf01eda815909f1facec62abf3594eaa8d11075) ) /* 6 Red - Japan, Ver 6 VS Bios */ \
+	ROM_SYSTEM_BIOS( 9, "japan-s2", "Japan MVS (Ver. 2)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 9, "sp-j2.sp1",         0x00000, 0x020000, CRC(acede59c) SHA1(b6f97acd282fd7e94d9426078a90f059b5e9dd91) ) /* 5 Red - Japan, Older */ \
+	ROM_SYSTEM_BIOS( 10, "japan-s1", "Japan MVS (Ver. 1)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 10, "sp1.jipan.1024",   0x00000, 0x020000, CRC(9fb0abe4) SHA1(18a987ce2229df79a8cf6a84f968f0e42ce4e59d) ) /* 3 Red - Japan, Older */ \
+	ROM_SYSTEM_BIOS( 11, "japan-mv1b", "Japan MV1B" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 11, "japan-j3.bin",     0x00000, 0x020000, CRC(dff6d41f) SHA1(e92910e20092577a4523a6b39d578a71d4de7085) ) /* 6 Red - Latest Japan bios (MV1B) */ \
+	ROM_SYSTEM_BIOS( 12, "japan-j3a", "Japan MVS (J3, alt)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12, "sp1-j3.bin",       0x00000, 0x020000, CRC(fbc6d469) SHA1(46b2b409b5b68869e367b40c846373623edb632a) ) /* 2 Red - 6 Slot */ \
+	ROM_SYSTEM_BIOS( 13, "japan-mv1c", "Japan NEO-MVH MV1C" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 13, "sp-j3.sp1",        0x00000, 0x080000, CRC(486cb450) SHA1(52c21ea817928904b80745a8c8d15cbad61e1dc1) ) /* 6 Red - Latest Japan bios (MV1C - mask ROM) */ \
 	\
-	ROM_SYSTEM_BIOS( 7, "japan", "Japan MVS (Ver. 3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 7, "vs-bios.rom",       0x00000, 0x020000, CRC(f0e8f27d) SHA1(ecf01eda815909f1facec62abf3594eaa8d11075) ) /* 6 Red - Japan, Ver 6 VS Bios */ \
-	ROM_SYSTEM_BIOS( 8, "japan-s2", "Japan MVS (Ver. 2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 8, "sp-j2.sp1",         0x00000, 0x020000, CRC(acede59c) SHA1(b6f97acd282fd7e94d9426078a90f059b5e9dd91) ) /* 5 Red - Japan, Older */ \
-	ROM_SYSTEM_BIOS( 9, "japan-s1", "Japan MVS (Ver. 1)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "sp1.jipan.1024",    0x00000, 0x020000, CRC(9fb0abe4) SHA1(18a987ce2229df79a8cf6a84f968f0e42ce4e59d) ) /* 3 Red - Japan, Older */ \
-	ROM_SYSTEM_BIOS( 10, "mv1c", "NEO-MVH MV1C" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 10, "sp-45.sp1",        0x00000, 0x080000, CRC(03cc9f6a) SHA1(cdf1f49e3ff2bac528c21ed28449cf35b7957dc1) ) /* 6 Dark Blue - Latest Asia bios (overdump?) */ \
-	ROM_SYSTEM_BIOS( 11, "japan-j3", "Japan MVS (J3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 11, "japan-j3.bin",     0x00000, 0x020000, CRC(dff6d41f) SHA1(e92910e20092577a4523a6b39d578a71d4de7085) ) /* 6 Red - Latest Japan bios; correct chip label unknown */ \
-	ROM_SYSTEM_BIOS( 12, "japan-hotel", "Custom Japanese Hotel" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 12, "sp-1v1_3db8c.bin", 0x00000, 0x020000, CRC(162f0ebe) SHA1(fe1c6dd3dfcf97d960065b1bb46c1e11cb7bf271) ) /* 6 Red - 'rare MVS found in japanese hotels' shows v1.3 in test mode */ \
-	ROM_SYSTEM_BIOS( 13, "japan-j3a", "Japan MVS (J3, alt)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 13, "sp1-j3.bin",       0x00000, 0x020000, CRC(fbc6d469) SHA1(46b2b409b5b68869e367b40c846373623edb632a) ) /* 2 Red - 6 Slot */ \
+	ROM_SYSTEM_BIOS( 14, "japan-hotel", "Custom Japanese Hotel" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 14, "sp-1v1_3db8c.bin", 0x00000, 0x020000, CRC(162f0ebe) SHA1(fe1c6dd3dfcf97d960065b1bb46c1e11cb7bf271) ) /* 6 Red - 'rare MVS found in japanese hotels' shows v1.3 in test mode */ \
 	\
-	NEOGEO_UNIBIOS(14) \
-	NEOGEO_UNIBIOS_1_2_AND_OLDER(14)
+	NEOGEO_UNIBIOS(15) \
+	NEOGEO_UNIBIOS_1_2_AND_OLDER(15)
 
 
 #define NEO_BIOS_AUDIO_64K(name, hash) \
@@ -6196,6 +6198,52 @@ ROM_START( stakwin )
 	ROM_LOAD16_BYTE( "088-c4.c4", 0x400001, 0x200000, CRC(4604f0dc) SHA1(ddf5dbb5e07313998a8f695ad19354ea54585dd6) ) /* Plane 2,3 */ /* TC5316200 */
 ROM_END
 
+/*
+
+large development boards, has SRAMs + battery for some of the program & both MVS and AES connectors on different edges
+
+X3002-C3 (Z80 program + C ROMs + S1 ROM)
+X3002-P2B (68k program + V ROMs)
+
+8x HM628128 SRAM marked P1-P8 near the 68k program
+
+likely impossible to emulate as the content of the SRAM (most of the program / data) is lost due to dead battery
+
+*/
+
+ROM_START( stakwindev )
+	ROM_REGION( 0x200000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_BYTE( "sp1.sp1", 0x000001, 0x080000, CRC(96b58fa4) SHA1(23c8c2a4d7a16838fb54306fb193b355edc75060) )
+	ROM_LOAD16_BYTE( "sp2.sp2", 0x000000, 0x080000, CRC(4e7202ee) SHA1(ab10dda5594ad8a21af219c6907a9841de7384c3) )
+	// SP2/SP3 unpopulated, P1-P8 are RAM
+
+	NEO_SFIX_128K( "s1.s1", CRC(2193d089) SHA1(1b6f57d2f4265f210194488356fc3653dfa35932) )
+
+	NEO_BIOS_AUDIO_512K( "m1.m1", CRC(daedbcd7) SHA1(d6d0e67ff7865ff5a0262aba381468e198d50536) )
+
+	ROM_REGION( 0x200000, "cslot1:ymsnd", 0 )
+	ROM_LOAD( "v1.v1", 0x000000, 0x80000, CRC(ac590b85) SHA1(47ff2ba9648b7145c29b534cd1f6839abb43bee2) )
+	ROM_LOAD( "v2.v2", 0x080000, 0x80000, CRC(23ad8a91) SHA1(da620c182fe9fc36421da73f2937e627d9a641bf) )
+	ROM_LOAD( "v3.v3", 0x100000, 0x80000, CRC(e2d216b6) SHA1(28b70e57a352ef6a08a5564f7756113a66e7dbb7) )
+	// V4 - V16 unpopulated
+
+	ROM_REGION( 0x800000, "cslot1:sprites", 0 ) // note, ROM_LOAD32_BYTE
+	ROM_LOAD32_BYTE( "c1.c1",   0x000000, 0x80000, CRC(fb2f29d3) SHA1(1f4cf27d7da1262bae28a8dd88c56d8a9324e982) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "c2.c2",   0x000002, 0x80000, CRC(6108e6db) SHA1(f4cdb5df29698f1ba362a227b82d43c3baaa8948) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "c3.c3",   0x000001, 0x80000, CRC(702a21b1) SHA1(79006062b516bda35bb77c864ba9ea26135ee8ed) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "c4.c4",   0x000003, 0x80000, CRC(3223b05f) SHA1(1595f8029f71c3acd949ddd5539d62424c0b697e) ) /* Plane 3 */
+	ROM_LOAD32_BYTE( "c5.c5",   0x200000, 0x80000, CRC(36b93e77) SHA1(19431b1ad44b9418f26b94c15572d11caec0994e) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "c6.c6",   0x200002, 0x80000, CRC(a7a104c8) SHA1(421a8ef11e299b7379a8198c871c8f11ad97deb0) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "c7.c7",   0x200001, 0x80000, CRC(f0d8b2ca) SHA1(2565a44d3ee9375af595d84638c7a76f631f8f9b) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "c8.c8",   0x200003, 0x80000, CRC(3bdd06eb) SHA1(dce84eb477229dfa8233cde8b946b64db1efae1d) ) /* Plane 3 */
+	ROM_LOAD32_BYTE( "c9.c9",   0x400000, 0x80000, CRC(25621e44) SHA1(3e380c1f52233dd1346c0363d920d1f96491cc45) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "c10.c10", 0x400002, 0x80000, CRC(17b2115e) SHA1(8c5d1b12ac7e739a7ac1f2189a2f3ca959d06377) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "c11.c11", 0x400001, 0x80000, CRC(7d3cd161) SHA1(5ac30c35e815dd2b0235394c1768e419395a1b5a) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "c12.c12", 0x400003, 0x80000, CRC(c6970ed6) SHA1(e963d0a5fb718e0eec2115d63ab34a0de0523792) ) /* Plane 3 */
+	// C13 - C32 unpopulated
+ROM_END
+
+
 /****************************************
  ID-0089
  . NGM-089
@@ -8824,21 +8872,21 @@ ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 20
 ROM_END
 
 /*
-	The Program roms for the set below are actually 4 ROMs contained on a recycled NeoGeo Pocket card and marked
+    The Program roms for the set below are actually 4 ROMs contained on a recycled NeoGeo Pocket card and marked
 
-	SNK48249Q
-	JAPAN9948HAK
-	T8V12A
-	(two of these)
+    SNK48249Q
+    JAPAN9948HAK
+    T8V12A
+    (two of these)
 
-	SNK48327V
-	JAPAN9948HAK
-	T8V12A
-	(two of these)
+    SNK48327V
+    JAPAN9948HAK
+    T8V12A
+    (two of these)
 
-	KOF2000 and Garou boards have been found with the same setup (data verified to match existing sets)
-	The roms were dumped via the NGPC cartridge edge connector, so the exact way they should be split into 4 is unknown.
-	As a result the ROM has been split to match the usual configuration as it likely exists like this too anyway.
+    KOF2000 and Garou boards have been found with the same setup (data verified to match existing sets)
+    The roms were dumped via the NGPC cartridge edge connector, so the exact way they should be split into 4 is unknown.
+    As a result the ROM has been split to match the usual configuration as it likely exists like this too anyway.
 */
 
 ROM_START( mslug3a ) /* Original Version - Encrypted Code & GFX */ /* MVS VERSION */
@@ -11770,6 +11818,7 @@ GAME( 1999, s1945p,     neogeo,   s1945p,    neogeo,    mvs_led_state, empty_ini
 GAME( 1995, quizkof,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Quiz King of Fighters (SAM-080 ~ SAH-080)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, quizkofk,   quizkof,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Quiz King of Fighters (Korean release)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, stakwin,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Stakes Winner / Stakes Winner - GI Kinzen  Seiha e no Michi", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, stakwindev, stakwin,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Stakes Winner / Stakes Winner - GI Kinzen  Seiha e no Michi (early development board)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_IS_INCOMPLETE )
 GAME( 1996, ragnagrd,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Ragnagard / Shin-Oh-Ken", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, pgoal,      neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Pleasure Goal / Futsal - 5 on 5 Mini Soccer (NGM-219)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ironclad,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus", "Choutetsu Brikin'ger - Iron Clad (prototype)", MACHINE_SUPPORTS_SAVE )

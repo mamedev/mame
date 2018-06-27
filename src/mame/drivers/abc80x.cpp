@@ -603,7 +603,7 @@ void abc806_state::abc806_mem(address_map &map)
 void abc806_state::abc806_io(address_map &map)
 {
 	abc800m_io(map);
-	
+
 	map(0x06, 0x06).mirror(0xff18).w(FUNC(abc806_state::hrs_w));
 	map(0x07, 0x07).mirror(0xff18).w(FUNC(abc806_state::hrc_w));
 	map(0x34, 0x34).select(0xff00).rw(FUNC(abc806_state::mai_r), FUNC(abc806_state::mao_w));

@@ -15,6 +15,7 @@ DEFINE_DEVICE_TYPE(ACS8600_ICS, acs8600_ics_device, "acs8600_ics", "Altos ACS860
 acs8600_ics_device::acs8600_ics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ACS8600_ICS, tag, owner, clock),
 	m_icscpu(*this, "icscpu"),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_out_irq1_func(*this),
 	m_out_irq2_func(*this)
 {
@@ -195,7 +196,7 @@ MACHINE_CONFIG_END
 
 void acs8600_ics_device::device_start()
 {
-	m_maincpu_mem = &machine().device<cpu_device>(m_maincpu_tag)->space(AS_PROGRAM);
+	m_maincpu_mem = &m_maincpu->space(AS_PROGRAM);
 	m_out_irq1_func.resolve_safe();
 	m_out_irq2_func.resolve_safe();
 }

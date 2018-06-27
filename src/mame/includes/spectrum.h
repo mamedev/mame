@@ -119,6 +119,8 @@ public:
 
 	int m_ROMSelection;
 
+	emu_timer *m_irq_off_timer;
+
 	// Build up the screen bitmap line-by-line as the z80 uses CPU cycles.
 	// Elimiates sprite flicker on various games (E.g. Marauder and
 	// Stormlord) and makes Firefly playable.

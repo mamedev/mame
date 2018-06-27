@@ -1821,7 +1821,7 @@ MACHINE_CONFIG_START(snowbros_state::semicom_mcu)
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_ADD("protection", I80C52, XTAL(16'000'000))  // AT89C52
+	MCFG_DEVICE_ADD("protection", AT89C52, XTAL(16'000'000))
 	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, snowbros_state, prot_p0_w))
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, snowbros_state, prot_p1_w))
 	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, snowbros_state, prot_p2_w))

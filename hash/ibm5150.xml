@@ -9935,7 +9935,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="starflg2">
-		<description>Starflight 2: Trade Routes of the Cloud Nebula</description>
+		<description>Starflight 2: Trade Routes of the Cloud Nebula (5.25")</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Binary Systems" />
@@ -9954,7 +9954,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="starflg2a" cloneof="starflg2">
-		<description>Starflight 2: Trade Routes of the Cloud Nebula (Alt)</description>
+		<description>Starflight 2: Trade Routes of the Cloud Nebula (5.25", Alt)</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Binary Systems" />
@@ -9966,6 +9966,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Starflight 2 Disk 2.bin" size="368640" crc="be83f4cb" sha1="04f4450fd1aad9558e882d925b96ebb1397b9d46" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starflg2_35" cloneof="starflg2">
+		<description>Starflight 2: Trade Routes of the Cloud Nebula (3.5")</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Binary Systems" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Starflight 2 - Trade Routes of the Cloud Nebula [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="ca96256f" sha1="a56171d525026459734fdaa77a246a6b7b0da52d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

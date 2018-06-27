@@ -306,7 +306,7 @@ INPUT_PORTS_START( martmast )
 	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
-	PORT_CONFSETTING(      0x0006, DEF_STR( USA ) )
+	PORT_CONFSETTING(      0x0006, "USA (Andamiro USA license)" )
 	PORT_CONFSETTING(      0x00ff, "Untouched" ) // don't hack the region
 INPUT_PORTS_END
 

@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(cv1k_state::cv1k)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
 
 	MCFG_RTC9701_ADD("eeprom")
-	MCFG_DEVICE_ADD("game", NANDFLASH)
+	MCFG_DEVICE_ADD("game", PARALLEL_NANDFLASH)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

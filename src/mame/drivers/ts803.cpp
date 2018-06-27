@@ -374,8 +374,8 @@ Bit 2 = 0 alpha memory access (round off)
 void ts803_state::machine_start()
 {
 	//save these 2 so we can examine them in the debugger
-	save_pointer(NAME(m_videoram.get()), 0x8000);
-	save_pointer(NAME(m_56kram.get()), 0xc000);
+	save_pointer(NAME(m_videoram), 0x8000);
+	save_pointer(NAME(m_56kram), 0xc000);
 }
 
 void ts803_state::machine_reset()

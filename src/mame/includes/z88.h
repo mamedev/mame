@@ -113,9 +113,9 @@ private:
 		uint8_t page;
 	} m_bank[4];
 
-	int			m_bank_type[4];
-	uint8_t *	m_bios;
-	uint8_t *	m_ram_base;
+	int         m_bank_type[4];
+	uint8_t *   m_bios;
+	uint8_t *   m_ram_base;
 };
 
 #endif /* MAME_INCLUDES_Z88_H */

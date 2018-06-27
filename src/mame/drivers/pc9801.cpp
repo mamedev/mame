@@ -916,8 +916,8 @@ READ8_MEMBER(pc9801_state::pc9801rs_2dd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0: return machine().device<upd765a_device>("upd765_2hd")->msr_r(space, 0, 0xff);
-			case 2: return machine().device<upd765a_device>("upd765_2hd")->fifo_r(space, 0, 0xff);
+			case 0: return m_fdc_2hd->msr_r(space, 0, 0xff);
+			case 2: return m_fdc_2hd->fifo_r(space, 0, 0xff);
 			case 4: return 0x44; //2dd flag
 		}
 	}
@@ -936,7 +936,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2dd_w)
 	{
 		switch(offset & 6)
 		{
-			case 2: machine().device<upd765a_device>("upd765_2hd")->fifo_w(space, 0, data, 0xff); return;
+			case 2: m_fdc_2hd->fifo_w(space, 0, data, 0xff); return;
 			case 4: logerror("%02x 2DD FDC ctrl\n",data); return;
 		}
 	}
