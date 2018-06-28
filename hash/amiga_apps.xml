@@ -42,7 +42,6 @@
 		</part>
 	</software>
 	
-	<!-- Seems to be using some sort of copy protection or possibly dumped from a faulty disk. -->
 	<software name ="deskbudg">
 		<description>Desktop Budget (Sv)</description>
 		<year>1989</year>
@@ -122,7 +121,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="SuperDuper 2.02" />
 			<dataarea name="flop" size="901120">
-				<rom name="superduper 2.02.adf" size="901120" crc="fba10303" sha1="281945a469e0e791ab63c7c4cb5b8ffbb1663095" offset="0"/>
+				<rom name="superduper 2.02.adf" size="901120" crc="fba10303" sha1="281945a469e0e791ab63c7c4cb5b8ffbb1663095" status="baddump" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
