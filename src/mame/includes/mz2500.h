@@ -20,6 +20,7 @@
 #include "machine/z80pio.h"
 #include "sound/2203intf.h"
 #include "sound/beep.h"
+#include "machine/bankdev.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -47,7 +48,11 @@ public:
 		m_floppy2(*this, "mb8877a:2"),
 		m_floppy3(*this, "mb8877a:3"),
 		m_floppy(nullptr),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_rambank(*this, "rambank%u", 0),
+		m_tvram(*this, "tvram"),
+		m_cgram(*this, "cgram"),
+		m_wram(*this, "wram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -61,10 +66,13 @@ public:
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
-
 	floppy_image_device *m_floppy;
+	required_device<palette_device> m_palette;
+	required_device_array<address_map_bank_device, 8> m_rambank;
+	required_shared_ptr<uint8_t> m_tvram;
+	required_shared_ptr<uint8_t> m_cgram;
+	required_shared_ptr<uint8_t> m_wram;
 
-	std::unique_ptr<uint8_t[]> m_main_ram;
 	uint8_t *m_ipl_rom;
 	uint8_t *m_kanji_rom;
 	uint8_t *m_kanji2_rom;
@@ -119,22 +127,6 @@ public:
 	uint8_t m_pio_latchb;
 	uint8_t m_ym_porta;
 	uint8_t m_screen_enable;
-	DECLARE_READ8_MEMBER(bank0_r);
-	DECLARE_READ8_MEMBER(bank1_r);
-	DECLARE_READ8_MEMBER(bank2_r);
-	DECLARE_READ8_MEMBER(bank3_r);
-	DECLARE_READ8_MEMBER(bank4_r);
-	DECLARE_READ8_MEMBER(bank5_r);
-	DECLARE_READ8_MEMBER(bank6_r);
-	DECLARE_READ8_MEMBER(bank7_r);
-	DECLARE_WRITE8_MEMBER(bank0_w);
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank2_w);
-	DECLARE_WRITE8_MEMBER(bank3_w);
-	DECLARE_WRITE8_MEMBER(bank4_w);
-	DECLARE_WRITE8_MEMBER(bank5_w);
-	DECLARE_WRITE8_MEMBER(bank6_w);
-	DECLARE_WRITE8_MEMBER(bank7_w);
 	DECLARE_READ8_MEMBER(mz2500_bank_addr_r);
 	DECLARE_WRITE8_MEMBER(mz2500_bank_addr_w);
 	DECLARE_READ8_MEMBER(mz2500_bank_data_r);
@@ -164,9 +156,14 @@ public:
 	DECLARE_READ8_MEMBER(mz2500_emm_data_r);
 	DECLARE_WRITE8_MEMBER(mz2500_emm_addr_w);
 	DECLARE_WRITE8_MEMBER(mz2500_emm_data_w);
+
+	DECLARE_READ8_MEMBER(rmw_r);
+	DECLARE_WRITE8_MEMBER(rmw_w);
+	DECLARE_READ8_MEMBER(kanji_pcg_r);
+	DECLARE_WRITE8_MEMBER(kanji_pcg_w);
+	DECLARE_READ8_MEMBER(dict_rom_r);
+
 	uint8_t mz2500_cg_latch_compare();
-	uint8_t mz2500_ram_read(uint16_t offset, uint8_t bank_num);
-	void mz2500_ram_write(uint16_t offset, uint8_t data, uint8_t bank_num);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -204,11 +201,12 @@ public:
 	void mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,uint16_t  pen,uint8_t width,uint8_t height);
 	void mz2500_reconfigure_screen();
 	uint8_t pal_256_param(int index, int param);
-	void mz2500_reset(mz2500_state *state, uint8_t type);
-	required_device<palette_device> m_palette;
+	void reset_banks(uint8_t type);
+	
 	void mz2500(machine_config &config);
 	void mz2500_io(address_map &map);
 	void mz2500_map(address_map &map);
+	void mz2500_bank_window_map(address_map &map);
 };
 
 
