@@ -3061,6 +3061,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/pve500.cpp",
 	MAME_DIR .. "src/mame/drivers/smc777.cpp",
 	MAME_DIR .. "src/mame/drivers/ps2sony.cpp",
+	MAME_DIR .. "src/mame/machine/ps2timer.cpp",
+	MAME_DIR .. "src/mame/machine/ps2timer.h",
 }
 
 createMESSProjects(_target, _subtarget, "sord")

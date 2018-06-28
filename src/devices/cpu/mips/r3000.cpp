@@ -114,11 +114,12 @@
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(R3041, r3041_device, "r3041", "MIPS R3041")
-DEFINE_DEVICE_TYPE(R3051, r3051_device, "r3051", "MIPS R3051")
-DEFINE_DEVICE_TYPE(R3052, r3052_device, "r3052", "MIPS R3052")
-DEFINE_DEVICE_TYPE(R3071, r3071_device, "r3071", "MIPS R3071")
-DEFINE_DEVICE_TYPE(R3081, r3081_device, "r3081", "MIPS R3081")
+DEFINE_DEVICE_TYPE(R3041,       r3041_device,     "r3041",   "MIPS R3041")
+DEFINE_DEVICE_TYPE(R3051,       r3051_device,     "r3051",   "MIPS R3051")
+DEFINE_DEVICE_TYPE(R3052,       r3052_device,     "r3052",   "MIPS R3052")
+DEFINE_DEVICE_TYPE(R3071,       r3071_device,     "r3071",   "MIPS R3071")
+DEFINE_DEVICE_TYPE(R3081,       r3081_device,     "r3081",   "MIPS R3081")
+DEFINE_DEVICE_TYPE(SONYPS2_IOP, iop_device,       "sonyiop", "Sony Playstation 2 IOP")
 
 
 //-------------------------------------------------
@@ -206,6 +207,14 @@ r3081_device::r3081_device(const machine_config &mconfig, const char *tag, devic
 
 
 //-------------------------------------------------
+//  iop_device - constructor
+//-------------------------------------------------
+
+iop_device::iop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: r3000_device(mconfig, SONYPS2_IOP, tag, owner, clock, CHIP_TYPE_IOP) { }
+
+
+//-------------------------------------------------
 //  device_start - start up the device
 //-------------------------------------------------
 
@@ -260,6 +269,12 @@ void r3000_device::device_start()
 			m_icache_size = 16384;  // or 8kB
 			m_dcache_size = 4096;   // or 8kB
 			m_hasfpu = true;
+			break;
+		}
+		case CHIP_TYPE_IOP:
+		{
+			m_icache_size = 4096;
+			m_dcache_size = 1024;
 			break;
 		}
 	}
@@ -396,6 +411,12 @@ void r3000_device::device_reset()
 	m_nextpc = ~0;
 	m_cpr[0][COP0_PRId] = 0x0200;
 	m_cpr[0][COP0_Status] = 0x0000;
+}
+
+void iop_device::device_reset()
+{
+	r3000_device::device_reset();
+	m_cpr[0][COP0_PRId] = 0x2;
 }
 
 
