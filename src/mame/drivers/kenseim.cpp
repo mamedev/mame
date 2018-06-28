@@ -159,7 +159,10 @@ public:
 		m_from68k_st4(0),
 		m_from68k_st3(0),
 		m_from68k_st2(0),
-		m_lamps(*this, "lamp%u", 1U)
+		m_lamps(*this, "lamp%u", 1U),
+		m_startlamp(*this, "startlamp%u", 1U),
+		m_molea(*this, "molea_%u", 0U),
+		m_moleb(*this, "moleb_%u", 0U)
 	{
 		for (int i = 0; i < 6; i++)
 		{
@@ -188,16 +191,12 @@ public:
 	{
 		for (int i = 0; i < 6; i++)
 		{
-			char temp[32];
-			sprintf(temp, "molea_%d", i);
-			output().set_value(temp, mole_state_a[i]);
+			m_molea[i] = mole_state_a[i];
 		}
 
 		for (int i = 0; i < 6; i++)
 		{
-			char temp[32];
-			sprintf(temp, "moleb_%d", i);
-			output().set_value(temp, mole_state_b[i]);
+			m_moleb[i] = mole_state_b[i];
 		}
 	}
 
@@ -207,10 +206,7 @@ public:
 	void init_kenseim();
 
 	// certain
-
 	DECLARE_WRITE8_MEMBER(mb8936_portc_w); // 20x LEDs
-
-
 
 	// uncertain
 	DECLARE_WRITE8_MEMBER(cpu_portc_w); // 4 bit out (lamps, coinlock etc.?)
@@ -223,7 +219,6 @@ public:
 	WRITE8_MEMBER(mb8936_porta_w); // maybe molesa output? (6-bits?)
 	WRITE8_MEMBER(mb8936_portb_w); // maybe molesb output? (6-bits?)
 	WRITE8_MEMBER(mb8936_portf_w); // maybe strobe output?
-
 
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_1234_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_5678_r);
@@ -255,6 +250,9 @@ private:
 	int mole_state_a[6];
 	int mole_state_b[6];
 	output_finder<20> m_lamps;
+	output_finder<2> m_startlamp;
+	output_finder<6> m_molea;
+	output_finder<6> m_moleb;
 };
 
 
@@ -359,12 +357,9 @@ WRITE8_MEMBER(kenseim_state::cpu_portc_w)
 	// d7: right start button lamp
 	machine().bookkeeping().coin_lockout_w(0, (data & 0x10) ? 0 : 1); // toggles if you attempt to insert a coin when there are already 15 coins inserted
 	machine().bookkeeping().coin_counter_w(0, (data & 0x20) ? 0 : 1);
-	output().set_value("startlamp1", (data & 0x80) ? 0 : 1);
-	output().set_value("startlamp2", (data & 0x40) ? 0 : 1);
+	m_startlamp[0] = BIT(data, 7);
+	m_startlamp[1] = BIT(data, 6);
 }
-
-
-
 
 
 /*******************************
@@ -453,11 +448,6 @@ WRITE8_MEMBER(kenseim_state::cpu_porte_w)
 }
 
 
-
-
-
-
-
 void kenseim_state::kenseim_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -468,7 +458,6 @@ void kenseim_state::kenseim_io_map(address_map &map)
 {
 	map(0x20, 0x27).mirror(0xff00).rw("mb89363b", FUNC(mb89363b_device::read), FUNC(mb89363b_device::write));
 }
-
 
 
 static const z80_daisy_config daisy_chain_gamecpu[] =
@@ -664,9 +653,8 @@ ROM_START( kenseim )
 	ROMX_LOAD( "knm_12.5c",  0x400004, 0x80000, CRC(5da8303a) SHA1(de30149e323f7892bb9967a98a0d3cd9c261dc69) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "knm_13.6c",  0x400006, 0x80000, CRC(889bb671) SHA1(c7952ed801343e79c06be8ed765a293e7322307b) , ROM_GROUPWORD | ROM_SKIP(6) )
 
-	ROM_REGION( 0x28000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "knm_09.12a",  0x00000, 0x08000, CRC(15394dd7) SHA1(d96413cc8fa6cd3cfdafb2ab6305e41cfd2b8874) )
-	ROM_CONTINUE(            0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "knm_09.12a",  0x00000, 0x20000, CRC(15394dd7) SHA1(d96413cc8fa6cd3cfdafb2ab6305e41cfd2b8874) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "knm_18.11c",  0x00000, 0x20000, CRC(9e3e4773) SHA1(6e750a9610fabc4bf4964b5a754414d612d43dec) )
@@ -703,6 +691,9 @@ void kenseim_state::init_kenseim()
 	m_led_latch = 0;
 
 	m_lamps.resolve();
+	m_startlamp.resolve();
+	m_molea.resolve();
+	m_moleb.resolve();
 }
 
 
