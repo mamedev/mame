@@ -1017,7 +1017,7 @@ READ32_MEMBER(ps2sony_state::unk_f440_r)
 	uint32_t ret = 0;
 
 	const uint8_t lsb5 = m_unk_f430_reg & 0x1f;
-	const uint16_t cmd = (uint16_t)(m_unk_f430_reg >> 16);
+	const uint16_t cmd = (uint16_t)(m_unk_f430_reg >> 16) & 0xfff;
 	const uint8_t subcmd = (m_unk_f430_reg >> 6) & 0xf;
 	if (subcmd == 0)
 	{
@@ -1239,7 +1239,7 @@ MACHINE_CONFIG_END
 ROM_START( ps2 )
 	// These came from the redump.org "Sony - PlayStation 2 - BIOS Datfile" (version 2017-10-26)
 	ROM_REGION(0x400000, "bios", 0)
-	ROM_DEFAULT_BIOS( "scph90002_e" )
+	ROM_DEFAULT_BIOS( "scph10000_t" )
 	ROM_SYSTEM_BIOS( 0, "scph10000_t", "SCPH-10000 (Version 5.0 01/17/00 T)" )
 	ROMX_LOAD( "ps2-0100j-20000117.bin", 0x0000, 0x400000, CRC(b7ef81a9) SHA1(aea061e6e263fdcc1c4fdbd68553ef78dae74263), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "dtlh10000_t_old", "DTL-H10000 (Version 5.0 02/17/00 T)" )
@@ -1350,14 +1350,20 @@ ROM_START( ps2 )
 	ROMX_LOAD( "ps2-0250j-20100415.bin", 0x0000, 0x400000, CRC(4e8c160c) SHA1(4b5ef16b67e3b523d28ed2406106cb80470a06d0), ROM_BIOS(53) )
 
 	// These came from unknown sources and are of unknown quality
-	ROM_SYSTEM_BIOS( 54, "unknown", "Unknown" )
-	ROM_LOAD( "scph-30004r_bios_v6_eur_160.bin", 0x000000, 0x400000, CRC(9386a740) SHA1(8fa040852d4b8688f0c84bcfffc65eb208f2b432) )
-	ROM_LOAD( "scph39004.bin", 0x000000, 0x400000, CRC(1f2a283c) SHA1(004cc467439f053d5a1fcf4d1b7c13338ce63403) )
-	ROM_LOAD( "scph50003.bin", 0x000000, 0x400000, CRC(a5860b09) SHA1(003f9bdae45a04c5eb28689813e818566a8c4610) )
-	ROM_LOAD( "scph_bios_v9_eur_190.bin", 0x000000, 0x400000, CRC(bfe41270) SHA1(dbd7f4d41d54e4f0bf3c4042bb42a42d5d4ef95e) )
-	ROM_LOAD( "scph_bios_v10_chn_190.bin", 0x000000, 0x400000, CRC(40d6c676) SHA1(b7548a92bd2caa9d60cbc7f79573a5d510f88012) )
-	ROM_LOAD( "scph_bios_v12_rus_200.bin", 0x000000, 0x400000, CRC(92aa71a2) SHA1(cce6fac0f7e682ad167e1e828b2d53192c3d5051) )
-	ROM_LOAD( "scph_bios_v15_jap_220.bin", 0x000000, 0x400000, CRC(493c1e58) SHA1(d9a7537fa463fcdd3e270af14a93731736cafc4a) )
+	ROM_SYSTEM_BIOS( 54, "unknown0", "Unknown0" )
+	ROMX_LOAD( "scph-30004r_bios_v6_eur_160.bin", 0x000000, 0x400000, CRC(9386a740) SHA1(8fa040852d4b8688f0c84bcfffc65eb208f2b432), ROM_BIOS(54) )
+	ROM_SYSTEM_BIOS( 55, "unknown1", "Unknown1" )
+	ROMX_LOAD( "scph39004.bin", 0x000000, 0x400000, CRC(1f2a283c) SHA1(004cc467439f053d5a1fcf4d1b7c13338ce63403), ROM_BIOS(55) )
+	ROM_SYSTEM_BIOS( 56, "unknown2", "Unknown2" )
+	ROMX_LOAD( "scph50003.bin", 0x000000, 0x400000, CRC(a5860b09) SHA1(003f9bdae45a04c5eb28689813e818566a8c4610), ROM_BIOS(56) )
+	ROM_SYSTEM_BIOS( 57, "unknown3", "Unknown3" )
+	ROMX_LOAD( "scph_bios_v9_eur_190.bin", 0x000000, 0x400000, CRC(bfe41270) SHA1(dbd7f4d41d54e4f0bf3c4042bb42a42d5d4ef95e), ROM_BIOS(57) )
+	ROM_SYSTEM_BIOS( 58, "unknown4", "Unknown4" )
+	ROMX_LOAD( "scph_bios_v10_chn_190.bin", 0x000000, 0x400000, CRC(40d6c676) SHA1(b7548a92bd2caa9d60cbc7f79573a5d510f88012), ROM_BIOS(58) )
+	ROM_SYSTEM_BIOS( 59, "unknown5", "Unknown5" )
+	ROMX_LOAD( "scph_bios_v12_rus_200.bin", 0x000000, 0x400000, CRC(92aa71a2) SHA1(cce6fac0f7e682ad167e1e828b2d53192c3d5051), ROM_BIOS(59) )
+	ROM_SYSTEM_BIOS( 60, "unknown6", "Unknown6" )
+	ROMX_LOAD( "scph_bios_v15_jap_220.bin", 0x000000, 0x400000, CRC(493c1e58) SHA1(d9a7537fa463fcdd3e270af14a93731736cafc4a), ROM_BIOS(60) )
 ROM_END
 
 CONS( 2000, ps2, 0, 0, ps2sony, ps2sony, ps2sony_state, empty_init, "Sony", "PlayStation 2", MACHINE_IS_SKELETON )
