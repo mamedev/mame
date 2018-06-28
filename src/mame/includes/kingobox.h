@@ -5,6 +5,10 @@
     King of Boxer - Ring King
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_KINGOBOX_H
+#define MAME_INCLUDES_KINGOBOX_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
@@ -13,8 +17,8 @@
 class kingofb_state : public driver_device
 {
 public:
-	kingofb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kingofb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_scroll_y(*this, "scroll_y"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -28,7 +32,8 @@ public:
 		m_nmigate(*this, "nmigate"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_scroll_y;
@@ -92,3 +97,5 @@ public:
 	void ringking_sprite_map(address_map &map);
 	void ringking_video_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_KINGOBOX_H

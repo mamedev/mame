@@ -5,6 +5,10 @@
     Diet Go Go
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_DIETGO_H
+#define MAME_INCLUDES_DIETGO_H
+
+#pragma once
 
 #include "cpu/h6280/h6280.h"
 #include "video/decospr.h"
@@ -51,3 +55,5 @@ private:
 	void dietgo_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DIETGO_H
