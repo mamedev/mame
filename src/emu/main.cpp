@@ -20,6 +20,6 @@ machine_manager::machine_manager(emu_options& options, osd_interface& osd)
 
 void machine_manager::start_http_server()
 {
-	m_http = std::make_unique<http_manager>(options().http(), options().http_port(), options().http_root());
+	m_http = std::make_unique<http_manager>(options().http(), options().http_address(), options().http_port(), options().http_root());
 }
 

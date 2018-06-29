@@ -261,57 +261,35 @@ struct websocket_connection_impl : public http_manager::websocket_connection {
 	}
 };
 
-http_manager::http_manager(bool active, short port, const char *root)
+http_manager::http_manager(bool active, const char *address, short port, const char *root)
   : m_active(active), m_io_context(std::make_shared<asio::io_context>()), m_root(root)
 {
 	if (!active) return;
 
+	m_up = "..";
+	m_up.append(PATH_SEPARATOR);
+
+	m_up_at_start = PATH_SEPARATOR;
+	m_up_at_start.append(m_up);
+
 	m_server = std::make_unique<webpp::http_server>();
 	m_server->m_config.port = port;
+	if (address != nullptr) {
+		m_server->m_config.address = address;
+	}
 	m_server->set_io_context(m_io_context);
 	m_wsserver = std::make_unique<webpp::ws_server>();
 
 	auto& endpoint = m_wsserver->m_endpoint["/"];
 
-	m_server->on_get([root](auto response, auto request) {
-		std::string doc_root = root;
-
+	// By default, serve a Not Found page for anything that is not registered.
+	m_server->on_get([this](auto response, auto request) {
 		auto request_impl = std::make_shared<http_request_impl>(request);
+		auto response_impl = std::make_shared<http_response_impl>(response);
 
-		std::string path = request_impl->get_path();
-		// If path ends in slash (i.e. is a directory) then add "index.html".
-		if (path[path.size() - 1] == '/')
-		{
-			path += "index.html";
-		}
+		this->serve_document(request_impl, response_impl, "NotFound.html");
 
-		// Determine the file extension.
-		std::size_t last_slash_pos = path.find_last_of("/");
-		std::size_t last_dot_pos = path.find_last_of(".");
-		std::string extension;
-		if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos)
-		{
-			extension = path.substr(last_dot_pos + 1);
-		}
-
-		// Open the file to send back.
-		std::string full_path = doc_root + path;
-		std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
-		if (!is)
-		{
-			response->status(400).send("Error");
-		}
-		else
-		{
-			// Fill out the reply to be sent to the client.
-			std::string content;
-			char buf[512];
-			while (is.read(buf, sizeof(buf)).gcount() > 0)
-				content.append(buf, size_t(is.gcount()));
-
-			response->type(extension_to_type(extension));
-			response->status(200).send(content);
-		}
+		response_impl->send();
 	});
 
 	endpoint.on_open = [&](auto connection) {
@@ -408,11 +386,17 @@ void http_manager::on_error(http_manager::websocket_endpoint_ptr endpoint, std::
 	}
 }
 
+bool http_manager::is_path_safe(const std::string &path) {
+	return path.find(m_up_at_start) != 0 && path.find(m_up) == std::string::npos;
+}
+
 bool http_manager::read_file(std::ostream &os, const std::string &path) {
-	std::ostringstream full_path;
-	full_path << m_root << path;
+	std::string full_path(m_root);
+	full_path.append(PATH_SEPARATOR);
+	full_path.append(path);
+
 	util::core_file::ptr f;
-	osd_file::error e = util::core_file::open(full_path.str(), OPEN_FLAG_READ, f);
+	osd_file::error e = util::core_file::open(full_path, OPEN_FLAG_READ, f);
 	if (e == osd_file::error::NONE)
 	{
 		int c;
@@ -427,9 +411,22 @@ bool http_manager::read_file(std::ostream &os, const std::string &path) {
 void http_manager::serve_document(http_request_ptr request, http_response_ptr response, const std::string &filename) {
 	if (!m_active) return;
 
+	if (!is_path_safe(filename)) {
+		this->serve_document(request, response, "NotFound.html");
+		return;
+	}
+
 	std::ostringstream os;
 	if (read_file(os, filename))
 	{
+		std::size_t last_slash_pos = filename.find_last_of("/");
+		std::size_t last_dot_pos = filename.find_last_of(".");
+		std::string extension;
+		if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos)
+		{
+			extension = filename.substr(last_dot_pos + 1);
+			response->set_content_type(extension_to_type(extension));
+		}
 		response->set_status(200);
 		response->set_body(os.str());
 	}
@@ -443,6 +440,11 @@ void http_manager::serve_template(http_request_ptr request, http_response_ptr re
 								  const std::string &filename, substitution substitute, char init, char term)
 {
 	if (!m_active) return;
+
+	if (!is_path_safe(filename)) {
+		this->serve_document(request, response, "NotFound.html");
+		return;
+	}
 
 	// printf("webserver: serving template '%s' at path '%s'\n", filename.c_str(), request->get_path().c_str());
 	std::stringstream ss;

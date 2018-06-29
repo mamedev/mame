@@ -217,6 +217,7 @@ const options_entry emu_options::s_option_entries[] =
 
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "HTTP SERVER OPTIONS" },
 	{ OPTION_HTTP,                                       "0",         OPTION_BOOLEAN,    "HTTP server enable" },
+	{ OPTION_HTTP_ADDRESS,                               nullptr,     OPTION_STRING,     "HTTP server address" },
 	{ OPTION_HTTP_PORT,                                  "8080",      OPTION_INTEGER,    "HTTP server port" },
 	{ OPTION_HTTP_ROOT,                                  "web",       OPTION_STRING,     "HTTP server document root" },
 
