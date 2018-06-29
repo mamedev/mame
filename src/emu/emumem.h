@@ -304,6 +304,8 @@ public:
 protected:
 	// Address range storage
 	struct range {
+		template<int Width, int AddrShift, endianness_t Endian> friend class address_space_specific;
+
 		offs_t start;
 		offs_t end;
 
