@@ -208,9 +208,6 @@ static char *core_i64_hex_format(u64 value, u8 mindigits)
 //  CONSTANTS
 //**************************************************************************
 
-// banking constants
-const int BANK_ENTRY_UNSPECIFIED = -1;
-
 // other address map constants
 const int MEMORY_BLOCK_CHUNK = 65536;                   // minimum chunk size of allocated memory blocks
 

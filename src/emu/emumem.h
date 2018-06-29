@@ -260,6 +260,8 @@ class handler_entry
 {
 	DISABLE_COPYING(handler_entry);
 
+	template<int Width, int AddrShift, endianness_t Endian> friend class address_space_specific;
+
 public:
 	// Typing flags
 	static constexpr u32 F_DISPATCH    = 0x00000001; // handler that forwards the access to other handlers
@@ -304,8 +306,6 @@ public:
 protected:
 	// Address range storage
 	struct range {
-		template<int Width, int AddrShift, endianness_t Endian> friend class address_space_specific;
-
 		offs_t start;
 		offs_t end;
 
