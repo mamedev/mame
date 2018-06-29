@@ -77,6 +77,14 @@ public:
 			m_rambank(*this, "rambank%u", 1)
 			{ }
 
+	void macs(machine_config &config);
+
+	void init_macs();
+	void init_kisekaeh();
+	void init_kisekaem();
+	void init_macs2();
+
+private:
 	uint8_t m_mux_data;
 	uint8_t m_rev;
 	uint8_t m_cart_bank;
@@ -86,10 +94,6 @@ public:
 	DECLARE_READ8_MEMBER(macs_input_r);
 	DECLARE_WRITE8_MEMBER(macs_rom_bank_w);
 	DECLARE_WRITE8_MEMBER(macs_output_w);
-	void init_macs();
-	void init_kisekaeh();
-	void init_kisekaem();
-	void init_macs2();
 	DECLARE_MACHINE_RESET(macs);
 	DECLARE_MACHINE_START(macs);
 	ST0016_DMA_OFFS_CB(dma_offset);
@@ -103,7 +107,6 @@ public:
 	required_memory_bank_array<2> m_rombank;
 	required_memory_bank_array<2> m_rambank;
 
-	void macs(machine_config &config);
 	void macs_io(address_map &map);
 	void macs_mem(address_map &map);
 };

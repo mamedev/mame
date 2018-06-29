@@ -46,6 +46,10 @@ public:
 		, m_tms5501(*this, "tms5501")
 	{ }
 
+	void mcb216(machine_config &config);
+	void cb308(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(tms5501_status_r);
 
 	DECLARE_MACHINE_RESET(mcb216);
@@ -53,12 +57,10 @@ public:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	void mcb216(machine_config &config);
-	void cb308(machine_config &config);
 	void cb308_mem(address_map &map);
 	void mcb216_io(address_map &map);
 	void mcb216_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<tms5501_device> m_tms5501;
 };

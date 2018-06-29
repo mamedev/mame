@@ -53,14 +53,15 @@ public:
 	mfabfz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		{ }
+	{ }
 
-		void mfabfz85(machine_config &config);
-		void mfabfz(machine_config &config);
-		void mfabfz85_io(address_map &map);
-		void mfabfz_io(address_map &map);
-		void mfabfz_mem(address_map &map);
+	void mfabfz85(machine_config &config);
+	void mfabfz(machine_config &config);
+
 private:
+	void mfabfz85_io(address_map &map);
+	void mfabfz_io(address_map &map);
+	void mfabfz_mem(address_map &map);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };

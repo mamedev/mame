@@ -66,8 +66,9 @@ public:
 	{ }
 
 	void msbc1(machine_config &config);
-	void msbc1_mem(address_map &map);
+
 private:
+	void msbc1_mem(address_map &map);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };

@@ -73,7 +73,11 @@ public:
 		, m_crtc(*this, "crtc")
 	{ }
 
+	void micral(machine_config &config);
+
 	void init_micral();
+
+private:
 	DECLARE_MACHINE_RESET(micral);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
@@ -82,11 +86,10 @@ public:
 	DECLARE_WRITE8_MEMBER(video_w);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void micral(machine_config &config);
 	void io_kbd(address_map &map);
 	void mem_kbd(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u16 s_curpos;
 	u8 s_command;
 	u8 s_data;

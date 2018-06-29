@@ -129,13 +129,16 @@
 class miniforce_state : public driver_device
 {
 public:
-miniforce_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device (mconfig, type, tag)
+	miniforce_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 	{
 	}
-	virtual void machine_start () override;
-	virtual void machine_reset () override;
+
 	void miniforce(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void miniforce_mem(address_map &map);
 };
 

@@ -29,14 +29,17 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(k8915_a8_w);
+	void k8915(machine_config &config);
+
 	void init_k8915();
+
+private:
+	DECLARE_WRITE8_MEMBER(k8915_a8_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void k8915(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t m_framecnt;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
