@@ -97,8 +97,11 @@ protected:
 
 	void check_external_panel_server();
 
-	virtual const std::string get_front_panel_html_file() const { return ""; }
-	virtual const std::string get_front_panel_js_file() const { return ""; }
+	const std::string get_front_panel_html_file() const { return slashes_to_separators(get_front_panel_html_file_with_slashes()); }
+	const std::string get_front_panel_js_file() const { return slashes_to_separators(get_front_panel_js_file_with_slashes()); }
+
+	virtual const std::string get_front_panel_html_file_with_slashes() const { return ""; }
+	virtual const std::string get_front_panel_js_file_with_slashes() const { return ""; }
 	virtual bool write_contents(std::ostream &o) { return false; }
 
 	std::vector<uint8_t> m_light_states;
@@ -106,6 +109,22 @@ protected:
 	bool m_eps_mode;
 
 	esqpanel::external_panel_server *m_external_panel_server;
+
+	const std::string slashes_to_separators(const std::string s) const {
+		std::string t(s);
+		size_t start_pos = 0;
+		while (start_pos != std::string::npos) {
+			size_t slash = t.find('/', start_pos);
+			if (slash == std::string::npos) {
+				start_pos = slash;
+			} else {
+				t.replace(slash, 1, PATH_SEPARATOR);
+				start_pos = slash + 1;
+			}
+		}
+		std::cerr << "slashes_to_separators: '" << s << "' -> '" << t << "'" << std::endl;
+		return t;
+	}
 
 private:
 	static const int XMIT_RING_SIZE = 16;
@@ -155,8 +174,8 @@ protected:
 
 	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
-	virtual const std::string get_front_panel_html_file() const override { return "/esqpanel/vfx/FrontPanel.html"; }
-	virtual const std::string get_front_panel_js_file() const override { return "/esqpanel/vfx/FrontPanel.js"; }
+	virtual const std::string get_front_panel_html_file_with_slashes() const override { return "/esqpanel/vfx/FrontPanel.html"; }
+	virtual const std::string get_front_panel_js_file_with_slashes() const override { return "/esqpanel/vfx/FrontPanel.js"; }
 	virtual bool write_contents(std::ostream &o) override;
 
 	required_device<esq2x40_device> m_vfd;
