@@ -10,6 +10,7 @@
 #include "machine/timer.h"
 #include "sound/discrete.h"
 #include "emupal.h"
+#include "screen.h"
 
 class ironhors_state : public driver_device
 {
@@ -20,6 +21,7 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_disc_ih(*this, "disc_ih"),
 		m_interrupt_enable(*this, "int_enable"),
@@ -45,8 +47,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_farwest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(farwest_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(ironhors_scanline_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(farwest_scanline_tick);
 
 	DECLARE_PALETTE_INIT(ironhors);
 	DECLARE_VIDEO_START(farwest);
@@ -66,6 +68,7 @@ private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<discrete_device> m_disc_ih;
 
