@@ -3045,7 +3045,7 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 	{
 		try
 		{
-			if (!m_condition.execute() != 0)
+			if (!m_condition.execute())
 			{
 				debug.cpu().set_within_instruction(false);
 				return;
