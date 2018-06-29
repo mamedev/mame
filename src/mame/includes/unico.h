@@ -29,19 +29,19 @@ public:
 
 protected:
 	DECLARE_PALETTE_DECODER(unico_R6G6B6X);
-	DECLARE_READ16_MEMBER(unico_vram_r);
-	DECLARE_WRITE16_MEMBER(unico_vram_w);
-	DECLARE_READ16_MEMBER(unico_scroll_r);
-	DECLARE_WRITE16_MEMBER(unico_scroll_w);
-	DECLARE_READ16_MEMBER(unico_spriteram_r);
-	DECLARE_WRITE16_MEMBER(unico_spriteram_w);
+	DECLARE_READ16_MEMBER(vram_r);
+	DECLARE_WRITE16_MEMBER(vram_w);
+	DECLARE_READ16_MEMBER(scroll_r);
+	DECLARE_WRITE16_MEMBER(scroll_w);
+	DECLARE_READ16_MEMBER(spriteram_r);
+	DECLARE_WRITE16_MEMBER(spriteram_w);
 
-	DECLARE_WRITE8_MEMBER(burglarx_sound_bank_w);
+	DECLARE_WRITE8_MEMBER(burglarx_okibank_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	uint32_t screen_update_unico(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	void burglarx_map(address_map &map);
 
@@ -76,11 +76,11 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(zeropnt_sound_bank_w);
-	DECLARE_READ16_MEMBER(unico_gunx_0_msb_r);
-	DECLARE_READ16_MEMBER(unico_guny_0_msb_r);
-	DECLARE_READ16_MEMBER(unico_gunx_1_msb_r);
-	DECLARE_READ16_MEMBER(unico_guny_1_msb_r);
+	DECLARE_WRITE8_MEMBER(zeropnt_okibank_leds_w);
+	DECLARE_READ16_MEMBER(gunx_0_msb_r);
+	DECLARE_READ16_MEMBER(guny_0_msb_r);
+	DECLARE_READ16_MEMBER(gunx_1_msb_r);
+	DECLARE_READ16_MEMBER(guny_1_msb_r);
 
 	required_memory_bank m_okibank;
 
@@ -111,10 +111,10 @@ protected:
 	DECLARE_READ32_MEMBER(zeropnt2_guny_0_msb_r);
 	DECLARE_READ32_MEMBER(zeropnt2_gunx_1_msb_r);
 	DECLARE_READ32_MEMBER(zeropnt2_guny_1_msb_r);
-	DECLARE_WRITE8_MEMBER(zeropnt2_sound_bank_w);
-	DECLARE_WRITE8_MEMBER(zeropnt2_leds_w);
+	DECLARE_WRITE8_MEMBER(zeropnt2_okibank);
+	DECLARE_WRITE8_MEMBER(leds_w);
 
-	DECLARE_WRITE32_MEMBER(zeropnt2_eeprom_w);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
 
 	void zeropnt2_map(address_map &map);
 

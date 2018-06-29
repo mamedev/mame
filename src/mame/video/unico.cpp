@@ -85,9 +85,9 @@ TILE_GET_INFO_MEMBER(unico_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
 }
 
-READ16_MEMBER(unico_state::unico_vram_r) { return m_vram[offset]; }
+READ16_MEMBER(unico_state::vram_r) { return m_vram[offset]; }
 
-WRITE16_MEMBER(unico_state::unico_vram_w)
+WRITE16_MEMBER(unico_state::vram_w)
 {
 	int tile = ((offset / 0x2000) + 1) % 3;
 	COMBINE_DATA(&m_vram[offset]);
@@ -95,10 +95,10 @@ WRITE16_MEMBER(unico_state::unico_vram_w)
 }
 
 
-READ16_MEMBER(unico_state::unico_scroll_r) { return m_scroll[offset]; }
-WRITE16_MEMBER(unico_state::unico_scroll_w) { COMBINE_DATA(&m_scroll[offset]); }
-READ16_MEMBER(unico_state::unico_spriteram_r) { return m_spriteram[offset]; }
-WRITE16_MEMBER(unico_state::unico_spriteram_w)  { COMBINE_DATA(&m_spriteram[offset]); }
+READ16_MEMBER(unico_state::scroll_r) { return m_scroll[offset]; }
+WRITE16_MEMBER(unico_state::scroll_w) { COMBINE_DATA(&m_scroll[offset]); }
+READ16_MEMBER(unico_state::spriteram_r) { return m_spriteram[offset]; }
+WRITE16_MEMBER(unico_state::spriteram_w)  { COMBINE_DATA(&m_spriteram[offset]); }
 
 
 /***************************************************************************
@@ -167,7 +167,7 @@ void unico_state::video_start()
 
 ***************************************************************************/
 
-void unico_state::unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void unico_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int offs;
 
@@ -229,7 +229,7 @@ void unico_state::unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 
 ***************************************************************************/
 
-uint32_t unico_state::screen_update_unico(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t unico_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -263,7 +263,7 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 	if (layers_ctrl & 4)    m_tilemap[2]->draw(screen, bitmap, cliprect, 0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)    unico_draw_sprites(screen,bitmap,cliprect);
+	if (layers_ctrl & 8)    draw_sprites(screen,bitmap,cliprect);
 
 	return 0;
 }
