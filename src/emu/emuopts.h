@@ -194,6 +194,7 @@
 #define OPTION_LANGUAGE             "language"
 
 #define OPTION_HTTP                 "http"
+#define OPTION_HTTP_ADDRESS         "http_address"
 #define OPTION_HTTP_PORT            "http_port"
 #define OPTION_HTTP_ROOT            "http_root"
 
@@ -478,6 +479,7 @@ public:
 
 	// Web server specific options
 	bool  http() const { return bool_value(OPTION_HTTP); }
+	const char *http_address() const { return value(OPTION_HTTP_ADDRESS); }
 	short http_port() const { return int_value(OPTION_HTTP_PORT); }
 	const char *http_root() const { return value(OPTION_HTTP_ROOT); }
 
