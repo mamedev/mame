@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="generic_flop" description="Generic and platform agnostic disk images">
+
+	<!-- 
+	Contains GEM-files of various graphic design border patterns.
+
+	Can be used with e.g. GEM Desktop Publisher, Ventura Publisher, Publish-It, Timeworks Publisher ST and Migraph Easy-Draw. 
+	-->
+	<software name="bordpack">
+		<description>Border Pack</description>
+		<year>1988?</year>
+		<publisher>Migraph</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="A" />
+			<dataarea name="flop" size="737280">
+				<rom name="migraph border pack (disk a).img" size="737280" crc="5fe762ea" sha1="3b05dc046659e68344e7325e2f656161e3d010e1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="B" />
+			<dataarea name="flop" size="737280">
+				<rom name="migraph border pack (disk b).img" size="737280" crc="cd70e4f8" sha1="a670beb94cf41ab671909e03eee9d2884c85a7c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- 
+	Contains GS-format standard MIDI files.
+
+	Can be fully used with any Roland GS-compatible devise, e.g. Roland SC-55 or Roland SC-7. 
+	-->
+	<software name="dansbnd3">
+		<description>Melo-Disc presenterar Dansbandshits nr 3</description>
+		<year>1996</year>
+		<publisher>Roland Scandinavia</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dansbandshits nr 3.img" size="737280" crc="47e7f04b" sha1="d98c881686d75f2504f04f7a0c20282c07cc439c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+</softwarelist>
