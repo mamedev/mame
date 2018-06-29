@@ -4306,7 +4306,7 @@ WRITE8_MEMBER(ddenlovr_state::htengoku_blit_romregion_w)
 void ddenlovr_state::htengoku_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x07).w("blitter", FUNC(dynax_blitter_rev2_device::regs_w));       // Blitter
+	map(0x01, 0x07).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));       // Blitter
 	map(0x20, 0x20).w(FUNC(ddenlovr_state::htengoku_select_w));      // Controls
 	map(0x21, 0x21).w(FUNC(ddenlovr_state::htengoku_coin_w));        //
 	map(0x22, 0x22).r(FUNC(ddenlovr_state::htengoku_coin_r));         //
@@ -4329,7 +4329,7 @@ void ddenlovr_state::htengoku_io_map(address_map &map)
 	map(0xc0, 0xc0).w(FUNC(ddenlovr_state::dynax_extra_scrollx_w));  // screen scroll X
 	map(0xc1, 0xc1).w(FUNC(ddenlovr_state::dynax_extra_scrolly_w));  // screen scroll Y
 	map(0xc3, 0xc3).w(FUNC(ddenlovr_state::dynax_vblank_ack_w));     // VBlank IRQ Ack
-	map(0xc4, 0xc4).w("blitter", FUNC(dynax_blitter_rev2_device::pen_w));       // Destination Pen
+	map(0xc4, 0xc4).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w));       // Destination Pen
 	map(0xc5, 0xc5).w(FUNC(ddenlovr_state::dynax_blit_dest_w));      // Destination Layer
 	map(0xc6, 0xc6).w(FUNC(ddenlovr_state::htengoku_blit_romregion_w));  // Blitter ROM bank
 	map(0xe0, 0xe7).w(m_mainlatch, FUNC(ls259_device::write_d1));
@@ -4382,7 +4382,7 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))        // Blitter IRQ Ack
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
@@ -4392,7 +4392,7 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, sprtmtch_vblank_w))
 
-	MCFG_DEVICE_ADD("blitter", DYNAX_BLITTER_REV2, 0)
+	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
 	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, hnoridur_blit_pixel_w))
 	MCFG_DYNAX_BLITTER_REV2_SCROLLX_CB(WRITE8(*this, dynax_state, dynax_blit_scrollx_w))
 	MCFG_DYNAX_BLITTER_REV2_SCROLLY_CB(WRITE8(*this, dynax_state, dynax_blit_scrolly_w))
@@ -9731,7 +9731,7 @@ MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256)
@@ -9948,7 +9948,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mmpanic)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
@@ -10036,7 +10036,7 @@ MACHINE_CONFIG_START(ddenlovr_state::hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
@@ -10083,7 +10083,7 @@ MACHINE_CONFIG_START(ddenlovr_state::kotbinyo)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.1656)   // HSync 15.1015kHz
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
@@ -10208,7 +10208,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjschuka)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
@@ -10260,7 +10260,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyster)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mjmyster_map)
 	MCFG_DEVICE_IO_MAP(mjmyster_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(NOOP)
+	MCFG_TMPZ84C015_IN_PA_CB(CONSTANT(0))
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mmpanic_rombank_w))
 
@@ -10298,7 +10298,7 @@ MACHINE_CONFIG_START(ddenlovr_state::hginga)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(hginga_map)
 	MCFG_DEVICE_IO_MAP(hginga_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(NOOP)
+	MCFG_TMPZ84C015_IN_PA_CB(CONSTANT(0))
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, hginga_rombank_w))
 
@@ -10325,7 +10325,7 @@ MACHINE_CONFIG_START(ddenlovr_state::hgokou)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(hgokou_map)
 	MCFG_DEVICE_IO_MAP(hgokou_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(NOOP)
+	MCFG_TMPZ84C015_IN_PA_CB(CONSTANT(0))
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, hginga_rombank_w))
 
@@ -10371,7 +10371,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyuniv)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mjmyster_map)
 	MCFG_DEVICE_IO_MAP(mjmyster_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(NOOP)
+	MCFG_TMPZ84C015_IN_PA_CB(CONSTANT(0))
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mmpanic_rombank_w))
 
@@ -10397,7 +10397,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyornt)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(quizchq_map)
 	MCFG_DEVICE_IO_MAP(mjmyster_portmap)
-	MCFG_TMPZ84C015_IN_PA_CB(NOOP)
+	MCFG_TMPZ84C015_IN_PA_CB(CONSTANT(0))
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mmpanic_rombank_w))
 
@@ -10501,7 +10501,7 @@ MACHINE_CONFIG_START(ddenlovr_state::jongtei)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256)
@@ -10558,7 +10558,7 @@ MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.8532)   // VSync 60.8532Hz, HSync 15.2790kHz
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
@@ -10609,7 +10609,7 @@ MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.8532)   // VSync 60.8532Hz, HSync 15.2790kHz ?
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
@@ -10681,7 +10681,7 @@ MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.8532)   // VSync 60.8532Hz, HSync 15.2790kHz ?
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)
@@ -10733,7 +10733,7 @@ MACHINE_CONFIG_START(ddenlovr_state::daimyojn)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.7922)   // HSync 15.4248kHz
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(336, 256+22)

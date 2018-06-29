@@ -5,6 +5,11 @@
     Hana Yayoi & other Dynax games (using 1st version of their blitter)
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_HNAYAYOI_H
+#define MAME_INCLUDES_HNAYAYOI_H
+
+#pragma once
+
 #include "sound/msm5205.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -12,11 +17,12 @@
 class hnayayoi_state : public driver_device
 {
 public:
-	hnayayoi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	hnayayoi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void untoucha(machine_config &config);
 	void hnayayoi(machine_config &config);
@@ -66,3 +72,5 @@ private:
 	void untoucha_io_map(address_map &map);
 	void untoucha_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_HNAYAYOI_H

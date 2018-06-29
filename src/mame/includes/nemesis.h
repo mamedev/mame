@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_NEMESIS_H
+#define MAME_INCLUDES_NEMESIS_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "sound/flt_rc.h"
@@ -14,8 +18,8 @@
 class nemesis_state : public driver_device
 {
 public:
-	nemesis_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nemesis_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_charram(*this, "charram"),
 		m_xscroll1(*this, "xscroll1"),
 		m_xscroll2(*this, "xscroll2"),
@@ -39,7 +43,8 @@ public:
 		m_vlm(*this, "vlm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_charram;
@@ -156,3 +161,5 @@ public:
 	void salamand_vlm_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NEMESIS_H

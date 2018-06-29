@@ -59,11 +59,11 @@
 class hp16500_state : public driver_device
 {
 public:
-	hp16500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hp16500_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mlc(*this, "mlc")
-		{ }
+	{ }
 
 	void hp16500(machine_config &config);
 	void hp16500a(machine_config &config);

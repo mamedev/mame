@@ -1791,7 +1791,7 @@ MACHINE_CONFIG_START(fidelz80_state::vbrc)
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t0_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t1_r))
 
-	MCFG_I8243_ADD("i8243", NOOP, WRITE8(*this, fidelz80_state, vbrc_ioexp_port_w))
+	MCFG_I8243_ADD("i8243", CONSTANT(0), WRITE8(*this, fidelz80_state, vbrc_ioexp_port_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vbrc)

@@ -506,7 +506,7 @@ void hp9845_base_state::machine_reset()
 	m_irh_pending = 0;
 	m_pa = 0;
 
-	sts_w(GVIDEO_PA , true);
+	set_sts(GVIDEO_PA , true);
 
 	memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
 	m_kb_scancode = 0x7f;
@@ -560,10 +560,10 @@ void hp9845_base_state::update_irq()
 
 WRITE8_MEMBER(hp9845_base_state::irq_w)
 {
-	irq_w((uint8_t)offset , data != 0);
+	set_irq(uint8_t(offset) , data != 0);
 }
 
-void hp9845_base_state::irq_w(uint8_t sc , int state)
+void hp9845_base_state::set_irq(uint8_t sc , int state)
 {
 	unsigned bit_n = sc % 8;
 
@@ -593,10 +593,10 @@ void hp9845_base_state::update_flg_sts()
 
 WRITE8_MEMBER(hp9845_base_state::sts_w)
 {
-	sts_w((uint8_t)offset , data != 0);
+	set_sts(uint8_t(offset) , data != 0);
 }
 
-void hp9845_base_state::sts_w(uint8_t sc , int state)
+void hp9845_base_state::set_sts(uint8_t sc , int state)
 {
 	if (state) {
 		BIT_SET(m_sts_status, sc);
@@ -610,10 +610,10 @@ void hp9845_base_state::sts_w(uint8_t sc , int state)
 
 WRITE8_MEMBER(hp9845_base_state::flg_w)
 {
-	flg_w((uint8_t)offset , data != 0);
+	set_flg(uint8_t(offset) , data != 0);
 }
 
-void hp9845_base_state::flg_w(uint8_t sc , int state)
+void hp9845_base_state::set_flg(uint8_t sc , int state)
 {
 	if (state) {
 		BIT_SET(m_flg_status, sc);
@@ -737,7 +737,7 @@ WRITE16_MEMBER(hp9845_base_state::kb_irq_clear_w)
 void hp9845_base_state::update_kb_prt_irq()
 {
 	bool state = BIT(m_kb_status , 0) || m_prt_irl;
-	irq_w(0 , state);
+	set_irq(0 , state);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::beeper_off)
@@ -761,42 +761,42 @@ WRITE_LINE_MEMBER(hp9845_base_state::prt_irl_w)
 
 WRITE_LINE_MEMBER(hp9845_base_state::prt_flg_w)
 {
-	flg_w(PRINTER_PA , state);
+	set_flg(PRINTER_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::prt_sts_w)
 {
-	sts_w(PRINTER_PA , state);
+	set_sts(PRINTER_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t14_irq_w)
 {
-	irq_w(T14_PA , state);
+	set_irq(T14_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t14_flg_w)
 {
-	flg_w(T14_PA , state);
+	set_flg(T14_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t14_sts_w)
 {
-	sts_w(T14_PA , state);
+	set_sts(T14_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t15_irq_w)
 {
-	irq_w(T15_PA , state);
+	set_irq(T15_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t15_flg_w)
 {
-	flg_w(T15_PA , state);
+	set_flg(T15_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t15_sts_w)
 {
-	sts_w(T15_PA , state);
+	set_sts(T15_PA , state);
 }
 
 INPUT_CHANGED_MEMBER(hp9845_base_state::togglekey_changed)
@@ -1348,11 +1348,11 @@ void hp9845b_state::update_graphic_bits()
 			m_gv_fsm_state == GV_STAT_WAIT_DS_1 ||
 			m_gv_fsm_state == GV_STAT_WAIT_DS_2;
 
-		flg_w(GVIDEO_PA , gv_ready);
+		set_flg(GVIDEO_PA , gv_ready);
 
 		bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-		irq_w(GVIDEO_PA , irq);
+		set_irq(GVIDEO_PA , irq);
 
 		bool dmar = gv_ready && m_gv_dma_en;
 
@@ -2775,11 +2775,11 @@ void hp9845c_state::update_graphic_bits()
 			m_gv_fsm_state == GV_STAT_WAIT_TRIG_1;
 	}
 
-	flg_w(GVIDEO_PA , gv_ready);
+	set_flg(GVIDEO_PA , gv_ready);
 
 	bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-	irq_w(GVIDEO_PA , irq);
+	set_irq(GVIDEO_PA , irq);
 
 	bool dmar = gv_ready && m_gv_dma_en;
 
@@ -3621,11 +3621,11 @@ void hp9845t_state::update_graphic_bits()
 	// Fix for this problem is in commit 27004d00
 	// My apologies to Tony Duell for doubting at one point the correctness
 	// of his 98780A schematics.. :)
-	flg_w(GVIDEO_PA , gv_ready);
+	set_flg(GVIDEO_PA , gv_ready);
 
 	bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-	irq_w(GVIDEO_PA , irq);
+	set_irq(GVIDEO_PA , irq);
 
 	bool dmar = gv_ready && m_gv_dma_en;
 

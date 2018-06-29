@@ -5,6 +5,10 @@
       Dynax hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_DYNAX_H
+#define MAME_INCLUDES_DYNAX_H
+
+#pragma once
 
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
@@ -28,11 +32,11 @@ public:
 		, m_palette(*this, "palette")
 		, m_mainlatch(*this, "mainlatch")
 		, m_bankdev(*this, "bankdev")
+		, m_blitter(*this, "blitter")
 		, m_msm(*this, "msm")
 		, m_mainirq(*this, "mainirq")
 		, m_soundirq(*this, "soundirq")
 		, m_soundlatch(*this, "soundlatch")
-		, m_blitter(*this, "blitter")
 		, m_blitter2(*this, "blitter2")
 		, m_blitter_gfx(*this, "blitter")
 		, m_led(*this, "led0")
@@ -87,6 +91,7 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_device<ls259_device> m_mainlatch;
 	optional_device<address_map_bank_device> m_bankdev;
+	optional_device<dynax_blitter_rev2_device> m_blitter;
 
 	/* input / output */
 	uint8_t m_input_sel;
@@ -290,7 +295,6 @@ private:
 	optional_device<rst_pos_buffer_device> m_mainirq;
 	optional_device<rst_pos_buffer_device> m_soundirq;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_device<dynax_blitter_rev2_device> m_blitter;
 	optional_device<dynax_blitter_rev2_device> m_blitter2;
 	optional_region_ptr<uint8_t> m_blitter_gfx;
 	output_finder<> m_led;
@@ -342,3 +346,5 @@ private:
 	uint8_t m_gekisha_val[2];
 
 };
+
+#endif // MAME_INCLUDES_DYNAX_H

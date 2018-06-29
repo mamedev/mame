@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour
+#ifndef MAME_INCLUDES_RUNAWAY_H
+#define MAME_INCLUDES_RUNAWAY_H
+
+#pragma once
 
 #include "machine/er2055.h"
 #include "emupal.h"
@@ -56,3 +60,5 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 };
+
+#endif // MAME_INCLUDES_RUNAWAY_H
