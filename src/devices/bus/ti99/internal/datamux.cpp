@@ -426,21 +426,21 @@ WRITE16_MEMBER( datamux_device::write )
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-SETOFFSET_MEMBER( datamux_device::setoffset )
+READ8_MEMBER( datamux_device::setoffset )
 {
-	m_addr_buf = offset << 1;
+	m_addr_buf = offset;
 	m_waitcount = 0;
 
 	if (TRACE_ADDRESS) logerror("set address %04x\n", m_addr_buf);
 
 	if ((m_addr_buf & 0xe000) == 0x0000)
 	{
-		return; // console ROM
+		return 0; // console ROM
 	}
 
 	if ((m_addr_buf & 0xfc00) == 0x8000)
 	{
-		return; // console RAM
+		return 0; // console RAM
 	}
 
 	// Initialize counter
@@ -467,6 +467,8 @@ SETOFFSET_MEMBER( datamux_device::setoffset )
 		ready_join();
 	}
 	else m_waitcount = 0;
+
+	return 0;
 }
 
 /*
