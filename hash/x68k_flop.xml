@@ -1288,7 +1288,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		<publisher>エグザクト (Exact)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="aquales (demo) (1991)(exact).dim" size="1261824" crc="84b506D7" SHA1="101b51d194135cd74f678f27fbbb22ed9e00af4d" Offset="000000" />
+				<rom name="aquales (demo) (1991)(exact).dim" size="1261824" crc="84b506D7" sha1="101b51d194135cd74f678f27fbbb22ed9e00af4d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
