@@ -36,6 +36,13 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	enum
+	{
+		TIMER_A,
+		TIMER_B,
+		TIMER_IRQ_SYNC
+	};
+
 	void irq_handler(int irq);
 	void timer_handler(int c, const attotime &period);
 	void update_request() { m_stream->update(); }
@@ -47,7 +54,7 @@ private:
 	static void static_update_request(device_t *param, int interval) { downcast<ym3812_device *>(param)->update_request(); }
 
 	sound_stream *  m_stream;
-	emu_timer *     m_timer[2];
+	emu_timer *     m_timer[3];
 	void *          m_chip;
 	devcb_write_line m_irq_handler;
 };
