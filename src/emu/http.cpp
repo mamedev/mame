@@ -16,6 +16,8 @@ HTTP server handling
 #include <inttypes.h>
 #include <stdint.h>
 
+#undef DEBUG
+#define DEBUG 0
 
 const static struct mapping
 {
@@ -287,6 +289,9 @@ http_manager::http_manager(bool active, const char *address, short port, const c
 		auto request_impl = std::make_shared<http_request_impl>(request);
 		auto response_impl = std::make_shared<http_response_impl>(response);
 
+#if DEBUG
+		std::cerr << "default on_get() for '" << request_impl->get_resource() << "': returning 404 Not Found" << std::endl;
+#endif
 		this->serve_document(request_impl, response_impl, "NotFound.html");
 
 		response_impl->send();
@@ -395,6 +400,10 @@ bool http_manager::read_file(std::ostream &os, const std::string &path) {
 	full_path.append(PATH_SEPARATOR);
 	full_path.append(path);
 
+#if DEBUG
+	std::cerr << "read_file(): m_root = '" << m_root << "', path = '" << path << "' => full_path = '" << full_path << "')" << std::endl;
+#endif
+
 	util::core_file::ptr f;
 	osd_file::error e = util::core_file::open(full_path, OPEN_FLAG_READ, f);
 	if (e == osd_file::error::NONE)
@@ -411,7 +420,14 @@ bool http_manager::read_file(std::ostream &os, const std::string &path) {
 void http_manager::serve_document(http_request_ptr request, http_response_ptr response, const std::string &filename) {
 	if (!m_active) return;
 
+#if DEBUG
+	std::cerr << "serve_document('" << filename << "')" << std::endl;
+#endif
+
 	if (!is_path_safe(filename)) {
+#if DEBUG
+		std::cerr << "serve_document(): filename is not safe, serving NotFound" << std::endl;
+#endif
 		this->serve_document(request, response, "NotFound.html");
 		return;
 	}
@@ -441,7 +457,14 @@ void http_manager::serve_template(http_request_ptr request, http_response_ptr re
 {
 	if (!m_active) return;
 
+#if DEBUG
+	std::cerr << "serve_template('" << filename << "')" << std::endl;
+#endif
+
 	if (!is_path_safe(filename)) {
+#if DEBUG
+		std::cerr << "serve_template(): filename is not safe, serving NotFound" << std::endl;
+#endif
 		this->serve_document(request, response, "NotFound.html");
 		return;
 	}
