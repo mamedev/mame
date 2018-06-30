@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "lh5801.h"
+#include "5801dasm.h"
 
 #include "debugger.h"
 
@@ -63,7 +64,7 @@ enum
 #define H 0x10
 
 
-DEFINE_DEVICE_TYPE(LH5801, lh5801_cpu_device, "lh5801", "LH5801")
+DEFINE_DEVICE_TYPE(LH5801, lh5801_cpu_device, "lh5801", "Sharp LH5801")
 
 
 lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -91,7 +92,7 @@ void lh5801_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
-	m_direct = &m_program->direct();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 
 	m_in_func.resolve_safe(0);
 
@@ -148,7 +149,7 @@ void lh5801_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_p.w.l).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_t).noshow().formatstr("%8s");
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void lh5801_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -224,7 +225,7 @@ void lh5801_cpu_device::execute_run()
 		{
 			m_oldpc = P;
 
-			debugger_instruction_hook(this, P);
+			debugger_instruction_hook(P);
 			lh5801_instruction();
 		}
 
@@ -256,8 +257,7 @@ void lh5801_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
-offs_t lh5801_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> lh5801_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( lh5801 );
-	return CPU_DISASSEMBLE_NAME(lh5801)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<lh5801_disassembler>();
 }

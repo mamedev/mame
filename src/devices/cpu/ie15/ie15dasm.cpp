@@ -1,34 +1,37 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
 #include "emu.h"
+#include "ie15dasm.h"
 
-#define OP(A)   oprom[(A) - PC]
-#define ARG(A)  opram[(A) - PC]
+u32 ie15_disassembler::opcode_alignment() const
+{
+	return 1;
+}
 
-CPU_DISASSEMBLE(ie15)
+offs_t ie15_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
 	uint8_t op;
 	unsigned PC = pc;
 
-	op = OP(pc++);
+	op = opcodes.r8(pc++);
 	switch (op & 0xf0)
 	{
 		case 0x00:
 			util::stream_format(stream, "add  r%d", op & 0x0f);
 			break;
 		case 0x10:
-			util::stream_format(stream, "jmp  $%04x", (((op & 0x0f) << 8) | ARG(pc)) + 1);
+			util::stream_format(stream, "jmp  $%04x", (((op & 0x0f) << 8) | params.r8(pc)) + 1);
 			pc+=1;
 			break;
 		case 0x20:
-			util::stream_format(stream, "ldc  r%d, #$%02x", (op & 0x0f), ARG(pc));
+			util::stream_format(stream, "ldc  r%d, #$%02x", (op & 0x0f), params.r8(pc));
 			pc+=1;
 			break;
 		case 0x30: switch (op)
 		{
 			case 0x30:
-				util::stream_format(stream, "lca  #$%02x", ARG(pc));
+				util::stream_format(stream, "lca  #$%02x", params.r8(pc));
 				pc+=1;
 				break;
 			case 0x33:
@@ -123,5 +126,5 @@ CPU_DISASSEMBLE(ie15)
 			break;
 	}
 
-	return (pc - PC) | flags | DASMFLAG_SUPPORTED;
+	return (pc - PC) | flags | SUPPORTED;
 }

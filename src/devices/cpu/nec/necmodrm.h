@@ -39,10 +39,10 @@ static struct {
 {                           \
 	WORD val;                   \
 	if (ModRM >= 0xc0)              \
-		Wreg(Mod_RM.RM.w[ModRM]) = FETCHWORD(); \
+		Wreg(Mod_RM.RM.w[ModRM]) = fetchword(); \
 	else {                      \
 		(this->*s_GetEA[ModRM])();         \
-		val = FETCHWORD();              \
+		val = fetchword();              \
 		write_mem_word( m_EA , val);          \
 	}                       \
 }
@@ -61,10 +61,10 @@ static struct {
 #define PutImmRMByte(ModRM)                 \
 {                           \
 	if (ModRM >= 0xc0)              \
-		Breg(Mod_RM.RM.b[ModRM])=FETCH();   \
+		Breg(Mod_RM.RM.b[ModRM])=fetch();   \
 	else {                      \
 		(this->*s_GetEA[ModRM])();         \
-		write_mem_byte( m_EA , FETCH() );     \
+		write_mem_byte( m_EA , fetch() );     \
 	}                       \
 }
 
@@ -77,30 +77,30 @@ static struct {
 }
 
 #define DEF_br8                         \
-	uint32_t ModRM = FETCH(),src,dst;     \
+	uint32_t ModRM = fetch(),src,dst;     \
 	src = RegByte(ModRM);               \
 	dst = GetRMByte(ModRM)
 
 #define DEF_wr16                        \
-	uint32_t ModRM = FETCH(),src,dst;     \
+	uint32_t ModRM = fetch(),src,dst;     \
 	src = RegWord(ModRM);               \
 	dst = GetRMWord(ModRM)
 
 #define DEF_r8b                         \
-	uint32_t ModRM = FETCH(),src,dst;     \
+	uint32_t ModRM = fetch(),src,dst;     \
 	dst = RegByte(ModRM);               \
 	src = GetRMByte(ModRM)
 
 #define DEF_r16w                        \
-	uint32_t ModRM = FETCH(),src,dst;     \
+	uint32_t ModRM = fetch(),src,dst;     \
 	dst = RegWord(ModRM);               \
 	src = GetRMWord(ModRM)
 
 #define DEF_ald8                        \
-	uint32_t src = FETCH();                   \
+	uint32_t src = fetch();                   \
 	uint32_t dst = Breg(AL)
 
 #define DEF_axd16                       \
-	uint32_t src = FETCH();               \
+	uint32_t src = fetch();               \
 	uint32_t dst = Wreg(AW);          \
-	src += (FETCH() << 8)
+	src += (fetch() << 8)

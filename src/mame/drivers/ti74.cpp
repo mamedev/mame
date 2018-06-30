@@ -75,6 +75,7 @@
 #include "cpu/tms7000/tms7000.h"
 #include "machine/nvram.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -85,21 +86,14 @@
 class ti74_state : public driver_device
 {
 public:
-	ti74_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ti74_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_key_matrix(*this, "IN.%u", 0),
-		m_battery_inp(*this, "BATTERY")
+		m_battery_inp(*this, "BATTERY"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
-
-	required_device<tms70c46_device> m_maincpu;
-	required_device<generic_slot_device> m_cart;
-	required_ioport_array<8> m_key_matrix;
-	required_ioport m_battery_inp;
-
-	u8 m_key_select;
-	u8 m_power;
 
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_battery_status(int state);
@@ -108,13 +102,29 @@ public:
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(ti74);
 	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
+	void ti74(machine_config &config);
+	void ti95(machine_config &config);
+	void main_map(address_map &map);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
+private:
+	required_device<tms70c46_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
+	required_ioport_array<8> m_key_matrix;
+	required_ioport m_battery_inp;
+
+	u8 m_key_select;
+	u8 m_power;
+
+	output_finder<80> m_lamps;
 };
 
 
@@ -171,7 +181,7 @@ void ti74_state::update_lcd_indicator(u8 y, u8 x, int state)
 	// above    | _LOW _ERROR  2nd  INV  ALPHA  LC  INS  DEGRAD  HEX  OCT  I/O
 	// screen-  | _P{70} <{71}                                             RUN{3}
 	//   area   .                                                          SYS{4}
-	output().set_lamp_value(y * 10 + x, state);
+	m_lamps[y * 10 + x] = state ? 1 : 0;
 }
 
 HD44780_PIXEL_UPDATE(ti74_state::ti74_pixel_update)
@@ -263,13 +273,14 @@ WRITE8_MEMBER(ti74_state::bankswitch_w)
 	// d3: N/C
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ti74_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("sysram.ic3")
+void ti74_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x1000, 0x1001).rw("hd44780", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
+	map(0x2000, 0x3fff).ram().share("sysram.ic3");
 	//AM_RANGE(0x4000, 0xbfff) // mapped by the cartslot
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("sysbank")
-ADDRESS_MAP_END
+	map(0xc000, 0xdfff).bankr("sysbank");
+}
 
 
 
@@ -488,6 +499,8 @@ void ti74_state::machine_reset()
 
 void ti74_state::machine_start()
 {
+	m_lamps.resolve();
+
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
@@ -503,14 +516,14 @@ void ti74_state::machine_start()
 	save_item(NAME(m_power));
 }
 
-static MACHINE_CONFIG_START( ti74 )
+MACHINE_CONFIG_START(ti74_state::ti74)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(ti74_state, keyboard_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(ti74_state, bankswitch_w))
-	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(ti74_state, keyboard_w))
+	MCFG_DEVICE_ADD("maincpu", TMS70C46, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, ti74_state, keyboard_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, ti74_state, bankswitch_w))
+	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(*this, ti74_state, keyboard_w))
 
 	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
 
@@ -539,14 +552,14 @@ static MACHINE_CONFIG_START( ti74 )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti74_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ti95 )
+MACHINE_CONFIG_START(ti74_state::ti95)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(ti74_state, keyboard_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(ti74_state, bankswitch_w))
-	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(ti74_state, keyboard_w))
+	MCFG_DEVICE_ADD("maincpu", TMS70C46, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, ti74_state, keyboard_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, ti74_state, bankswitch_w))
+	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(*this, ti74_state, keyboard_w))
 
 	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
 
@@ -572,7 +585,7 @@ static MACHINE_CONFIG_START( ti95 )
 	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
 	MCFG_GENERIC_LOAD(ti74_state, ti74_cartridge)
 
-	//MCFG_SOFTWARE_LIST_ADD("cart_list", "ti95_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti95_cart")
 MACHINE_CONFIG_END
 
 
@@ -601,6 +614,6 @@ ROM_START( ti95 )
 ROM_END
 
 
-//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE    INIT  COMPANY, FULLNAME, FLAGS
-COMP( 1985, ti74, 0,      0, ti74,   ti74, ti74_state, 0, "Texas Instruments", "TI-74 BASICALC", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1986, ti95, 0,      0, ti95,   ti95, ti74_state, 0, "Texas Instruments", "TI-95 PROCALC", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY              FULLNAME          FLAGS
+COMP( 1985, ti74, 0,      0, ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 BASICALC", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1986, ti95, 0,      0, ti95,    ti95,  ti74_state, empty_init, "Texas Instruments", "TI-95 PROCALC",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

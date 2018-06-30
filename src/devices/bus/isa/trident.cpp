@@ -162,7 +162,7 @@ void trident_vga_device::device_start()
 
 	int i;
 	for (i = 0; i < 0x100; i++)
-		m_palette->set_pen_color(i, 0, 0, 0);
+		set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;
@@ -242,8 +242,8 @@ uint32_t trident_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &
 		}
 		else /* TODO: other modes */
 		{
-			bg_col = m_palette->pen(tri.cursor_bg & 0xff);
-			fg_col = m_palette->pen(tri.cursor_fg & 0xff);
+			bg_col = pen(tri.cursor_bg & 0xff);
+			fg_col = pen(tri.cursor_fg & 0xff);
 		}
 
 		for(y=0;y<cursor_size;y++)
@@ -346,8 +346,8 @@ void trident_vga_device::trident_define_video_mode()
 	switch(tri.clock)
 	{
 	case 0:
-	default: xtal = XTAL_25_1748MHz; break;
-	case 1:  xtal = XTAL_28_63636MHz; break;
+	default: xtal = 25174800; break;
+	case 1:  xtal = 28636363; break;
 	case 2:  xtal = 44900000; break;
 	case 3:  xtal = 36000000; break;
 	case 4:  xtal = 57272000; break;
@@ -378,8 +378,8 @@ void trident_vga_device::trident_define_video_mode()
 	switch((vga.miscellaneous_output & 0x0c) >> 2)
 	{
 	case 0:
-	default: xtal = XTAL_25_1748MHz; break;
-	case 1:  xtal = XTAL_28_63636MHz; break;
+	default: xtal = 25174800; break;
+	case 1:  xtal = 28636363; break;
 	case 2:  xtal = calculate_clock(); break;
 	}
 

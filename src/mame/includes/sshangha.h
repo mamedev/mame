@@ -3,6 +3,7 @@
 #include "video/deco16ic.h"
 #include "video/decospr.h"
 #include "machine/deco146.h"
+#include "emupal.h"
 
 class sshangha_state : public driver_device
 {
@@ -64,7 +65,7 @@ public:
 	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_tilelow_w);
 	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_tilehigh_w);
 	DECLARE_WRITE16_MEMBER(sshangha_video_w);
-	DECLARE_DRIVER_INIT(sshangha);
+	void init_sshangha();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -72,4 +73,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
+	void sshanghb(machine_config &config);
+	void sshangha(machine_config &config);
+	void sshangha_map(address_map &map);
+	void sshangha_sound_map(address_map &map);
+	void sshanghb_map(address_map &map);
 };

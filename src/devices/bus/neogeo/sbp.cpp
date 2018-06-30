@@ -36,7 +36,7 @@ READ16_MEMBER( neogeo_sbp_cart_device::protection_r )
 {
 	uint16_t* rom = (get_rom_size()) ? get_rom_base() : get_region_rom_base();
 	uint16_t origdata = rom[offset + (0x200/2)];
-	uint16_t data =  BITSWAP16(origdata, 11,10,9,8,15,14,13,12,3,2,1,0,7,6,5,4);
+	uint16_t data =  bitswap<16>(origdata, 11,10,9,8,15,14,13,12,3,2,1,0,7,6,5,4);
 
 	int realoffset = 0x200 + (offset * 2);
 	logerror("sbp_lowerrom_r offset %08x data %04x\n", realoffset, data);

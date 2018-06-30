@@ -15,39 +15,7 @@ All rights reserved.
 #include "emu.h"
 #include "spc700ds.h"
 
-
-
-struct spc700_opcode_struct
-{
-	unsigned char name;
-	unsigned char args[2];
-};
-
-enum
-{
-	IMP , A   , X   , Y   , YA  , SP  , PSW , C   , REL , UPAG, IMM , XI  ,
-	XII , YI  , DP  , DPX , DPY , DPI , DXI , DIY , ABS , ABX , ABY , AXI , N0  ,
-	N1  , N2  , N3  , N4  , N5  , N6  , N7  , N8  , N9  , N10 , N11 , N12 ,
-	N13 , N14 , N15 , DP0 , DP1 , DP2 , DP3 , DP4 , DP5 , DP6 , DP7 , MEMN,
-	MEMI
-};
-
-
-enum
-{
-	ADC   ,  ADDW  ,  AND   ,  AND1  ,  ASL   ,  BBC   ,  BBS   ,  BCC   ,
-	BCS   ,  BEQ   ,  BMI   ,  BNE   ,  BPL   ,  BRA   ,  BRK   ,  BVC   ,
-	BVS   ,  CALL  ,  CBNE  ,  CLR1  ,  CLRC  ,  CLRP  ,  CLRV  ,  CMP   ,
-	CMPW  ,  DAA   ,  DAS   ,  DBNZ  ,  DEC   ,  DECW  ,  DI    ,  DIV   ,
-	EI    ,  EOR   ,  EOR1  ,  INC   ,  INCW  ,  JMP   ,  LSR   ,  MOV   ,
-	MOV1  ,  MOVW  ,  MUL   ,  NOP   ,  NOT1  ,  NOTQ  ,  NOTC  ,  OR    ,
-	OR1   ,  PCALL ,  POP   ,  PUSH  ,  RET   ,  RETI  ,  ROL   ,  ROR   ,
-	SBC   ,  SET1  ,  SETC  ,  SETP  ,  SLEEP ,  STOP  ,  SUBW  ,  TCALL ,
-	TCLR1 ,  TSET1 ,  XCN
-};
-
-
-static const char *const g_opnames[] =
+const char *const spc700_disassembler::g_opnames[] =
 {
 	"ADC  ", "ADDW ", "AND  ", "AND1 ", "ASL  ", "BBC  ", "BBS  ", "BCC  ",
 	"BCS  ", "BEQ  ", "BMI  ", "BNE  ", "BPL  ", "BRA  ", "BRK  ", "BVC  ",
@@ -60,7 +28,7 @@ static const char *const g_opnames[] =
 	"TCLR1", "TSET1", "XCN  "
 };
 
-static const spc700_opcode_struct g_opcodes[256] =
+const spc700_disassembler::spc700_opcode_struct spc700_disassembler::g_opcodes[256] =
 {
 /* 00 */ {NOP    , {IMP , IMP }},
 /* 01 */ {TCALL  , {N0  , IMP }},
@@ -320,45 +288,44 @@ static const spc700_opcode_struct g_opcodes[256] =
 /* FF */ {STOP   , {IMP , IMP }},
 };
 
-static unsigned int g_pc;
-static const uint8_t *rombase;
-
-static inline unsigned int read_8_immediate(void)
+inline unsigned int spc700_disassembler::read_8_immediate(offs_t &pc, const data_buffer &opcodes)
 {
-	g_pc++;
-	return *rombase++;
+	return opcodes.r8(pc++);
 }
 
-static inline unsigned int read_16_immediate(void)
+inline unsigned int spc700_disassembler::read_16_immediate(offs_t &pc, const data_buffer &opcodes)
 {
-	unsigned int result;
-	g_pc += 2;
-	result = *rombase++;
-	return result | (*rombase++ << 8);
+	u16 r = opcodes.r16(pc);
+	pc += 2;
+	return r;
 }
 
-CPU_DISASSEMBLE(spc700)
+u32 spc700_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t spc700_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	const spc700_opcode_struct* opcode;
 	uint32_t flags = 0;
 	int var;
 	int i;
+	offs_t base_pc = pc;
 
-	g_pc = pc;
-	rombase = oprom;
-	opcode = g_opcodes + read_8_immediate();
+	opcode = g_opcodes + read_8_immediate(pc, opcodes);
 
 	stream << g_opnames[opcode->name] << " ";
 
 	if (opcode->name == CALL)
-		flags = DASMFLAG_STEP_OVER;
+		flags = STEP_OVER;
 	else if (opcode->name == RET || opcode->name == RETI)
-		flags = DASMFLAG_STEP_OUT;
+		flags = STEP_OUT;
 
 	if (opcode->args[0] == DP && (opcode->args[1] == DP || opcode->args[1] == IMM))
 	{
-		int src = read_8_immediate();
-		int dst = read_8_immediate();
+		int src = read_8_immediate(pc, opcodes);
+		int dst = read_8_immediate(pc, opcodes);
 		util::stream_format(stream, "$%02x,%s$%02x", dst, (opcode->args[1] == IMM ? "#" : ""), src);
 	}
 	else for(i=0;i<2;i++)
@@ -378,22 +345,22 @@ CPU_DISASSEMBLE(spc700)
 			case SP:   util::stream_format(stream, "SP"); break;
 			case PSW:  util::stream_format(stream, "PSW"); break;
 			case C:    util::stream_format(stream, "C"); break;
-			case REL:  util::stream_format(stream, "%04x", ((g_pc + (char)read_8_immediate())&0xffff)); break;
-			case UPAG: util::stream_format(stream, "$%02x", read_8_immediate()); break;
-			case IMM:  util::stream_format(stream, "#$%02x", read_8_immediate()); break;
+			case REL:  util::stream_format(stream, "%04x", ((pc + (char)read_8_immediate(pc, opcodes))&0xffff)); break;
+			case UPAG: util::stream_format(stream, "$%02x", read_8_immediate(pc, opcodes)); break;
+			case IMM:  util::stream_format(stream, "#$%02x", read_8_immediate(pc, opcodes)); break;
 			case XI:   util::stream_format(stream, "(X)"); break;
 			case XII:  util::stream_format(stream, "(X)+"); break;
 			case YI:   util::stream_format(stream, "(Y)"); break;
-			case DP:   util::stream_format(stream, "$%02x", read_8_immediate()); break;
-			case DPX:  util::stream_format(stream, "$%02x+X", read_8_immediate()); break;
-			case DPY:  util::stream_format(stream, "$%02x+Y", read_8_immediate()); break;
-			case DPI:  util::stream_format(stream, "($%02x)", read_8_immediate()); break;
-			case DXI:  util::stream_format(stream, "($%02x+X)", read_8_immediate()); break;
-			case DIY:  util::stream_format(stream, "($%02x)+Y", read_8_immediate()); break;
-			case ABS:  util::stream_format(stream, "$%04x", read_16_immediate()); break;
-			case ABX:  util::stream_format(stream, "$%04x+X", read_16_immediate()); break;
-			case ABY:  util::stream_format(stream, "$%04x+Y", read_16_immediate()); break;
-			case AXI:  util::stream_format(stream, "($%04x+X)", read_16_immediate()); break;
+			case DP:   util::stream_format(stream, "$%02x", read_8_immediate(pc, opcodes)); break;
+			case DPX:  util::stream_format(stream, "$%02x+X", read_8_immediate(pc, opcodes)); break;
+			case DPY:  util::stream_format(stream, "$%02x+Y", read_8_immediate(pc, opcodes)); break;
+			case DPI:  util::stream_format(stream, "($%02x)", read_8_immediate(pc, opcodes)); break;
+			case DXI:  util::stream_format(stream, "($%02x+X)", read_8_immediate(pc, opcodes)); break;
+			case DIY:  util::stream_format(stream, "($%02x)+Y", read_8_immediate(pc, opcodes)); break;
+			case ABS:  util::stream_format(stream, "$%04x", read_16_immediate(pc, opcodes)); break;
+			case ABX:  util::stream_format(stream, "$%04x+X", read_16_immediate(pc, opcodes)); break;
+			case ABY:  util::stream_format(stream, "$%04x+Y", read_16_immediate(pc, opcodes)); break;
+			case AXI:  util::stream_format(stream, "($%04x+X)", read_16_immediate(pc, opcodes)); break;
 			case N0:   util::stream_format(stream, "0"); break;
 			case N1:   util::stream_format(stream, "1"); break;
 			case N2:   util::stream_format(stream, "2"); break;
@@ -410,23 +377,23 @@ CPU_DISASSEMBLE(spc700)
 			case N13:  util::stream_format(stream, "13"); break;
 			case N14:  util::stream_format(stream, "14"); break;
 			case N15:  util::stream_format(stream, "15"); break;
-			case DP0:  util::stream_format(stream, "$%02x.0", read_8_immediate()); break;
-			case DP1:  util::stream_format(stream, "$%02x.1", read_8_immediate()); break;
-			case DP2:  util::stream_format(stream, "$%02x.2", read_8_immediate()); break;
-			case DP3:  util::stream_format(stream, "$%02x.3", read_8_immediate()); break;
-			case DP4:  util::stream_format(stream, "$%02x.4", read_8_immediate()); break;
-			case DP5:  util::stream_format(stream, "$%02x.5", read_8_immediate()); break;
-			case DP6:  util::stream_format(stream, "$%02x.6", read_8_immediate()); break;
-			case DP7:  util::stream_format(stream, "$%02x.7", read_8_immediate()); break;
+			case DP0:  util::stream_format(stream, "$%02x.0", read_8_immediate(pc, opcodes)); break;
+			case DP1:  util::stream_format(stream, "$%02x.1", read_8_immediate(pc, opcodes)); break;
+			case DP2:  util::stream_format(stream, "$%02x.2", read_8_immediate(pc, opcodes)); break;
+			case DP3:  util::stream_format(stream, "$%02x.3", read_8_immediate(pc, opcodes)); break;
+			case DP4:  util::stream_format(stream, "$%02x.4", read_8_immediate(pc, opcodes)); break;
+			case DP5:  util::stream_format(stream, "$%02x.5", read_8_immediate(pc, opcodes)); break;
+			case DP6:  util::stream_format(stream, "$%02x.6", read_8_immediate(pc, opcodes)); break;
+			case DP7:  util::stream_format(stream, "$%02x.7", read_8_immediate(pc, opcodes)); break;
 			case MEMN:
-				var = read_16_immediate();
+				var = read_16_immediate(pc, opcodes);
 				util::stream_format(stream, "%04x.%d", var&0x1fff, var>>13);
 				break;
 			case MEMI:
-				var = read_16_immediate();
+				var = read_16_immediate(pc, opcodes);
 				util::stream_format(stream, "/%04x.%d", var&0x1fff, var>>13);
 				break;
 		}
 	}
-	return (g_pc - pc) | flags | DASMFLAG_SUPPORTED;
+	return (pc - base_pc) | flags | SUPPORTED;
 }

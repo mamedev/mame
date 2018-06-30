@@ -24,6 +24,9 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void summit(machine_config &config);
+	void sumt_map(address_map &map);
+	void sumt_portmap(address_map &map);
 protected:
 
 	// devices
@@ -31,13 +34,15 @@ protected:
 };
 
 
-static ADDRESS_MAP_START( sumt_map, AS_PROGRAM, 8, sumt8035_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void sumt8035_state::sumt_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
 
-static ADDRESS_MAP_START( sumt_portmap, AS_IO, 8, sumt8035_state )
-ADDRESS_MAP_END
+void sumt8035_state::sumt_portmap(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( summit )
@@ -233,11 +238,11 @@ static INPUT_PORTS_START( summit )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( summit )
+MACHINE_CONFIG_START(sumt8035_state::summit)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8035,5000000)
-	MCFG_CPU_PROGRAM_MAP(sumt_map)
-	MCFG_CPU_IO_MAP(sumt_portmap)
+	MCFG_DEVICE_ADD("maincpu",I8035,5000000)
+	MCFG_DEVICE_PROGRAM_MAP(sumt_map)
+	MCFG_DEVICE_IO_MAP(sumt_portmap)
 
 MACHINE_CONFIG_END
 
@@ -255,5 +260,5 @@ ROM_START( sm_ultng )
 ROM_END
 
 
-GAME( 1981, sm_ngacc,  0,    summit, summit, sumt8035_state,  0, ROT270, "Summit Coin", "Nudge Accumulator (Summit Coin)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, sm_ultng,  0,    summit, summit, sumt8035_state,  0, ROT270, "Summit Coin", "Ultimate Nudge (Summit Coin)",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, sm_ngacc,  0,    summit, summit, sumt8035_state, empty_init, ROT270, "Summit Coin", "Nudge Accumulator (Summit Coin)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, sm_ultng,  0,    summit, summit, sumt8035_state, empty_init, ROT270, "Summit Coin", "Ultimate Nudge (Summit Coin)",    MACHINE_IS_SKELETON_MECHANICAL )

@@ -17,12 +17,6 @@ public:
 	// construction/destruction
 	a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-
-	DECLARE_READ8_MEMBER(read8_r);
-
 private:
 	// device-level overrides
 	virtual void device_start() override;
@@ -30,7 +24,16 @@ private:
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+
+private:
 	void check_bankswitch(offs_t offset);
+
+	DECLARE_READ8_MEMBER(read8_r);
+
+	void harmony_arm7_map(address_map &map);
 
 	required_device<lpc210x_device> m_cpu;
 };

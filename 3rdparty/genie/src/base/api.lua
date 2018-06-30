@@ -188,6 +188,7 @@
 					EnableSSE2 = 1,
 					EnableAVX = 1,
 					EnableAVX2 = 1,
+					PedanticWarnings = 1,
 					ExtraWarnings = 1,
 					FatalWarnings = 1,
 					FloatFast = 1,
@@ -213,6 +214,7 @@
 					FastCall = 1,
 					StdCall = 1,
 					SingleOutputDir = 1,
+					ObjcARC = 1,
 					Optimize = 1,
 					OptimizeSize = 1,
 					OptimizeSpeed = 1,
@@ -399,7 +401,7 @@
 				return value
 			end,
 			linkagecopy = true,
-			--mergecopiestotail = true,
+			mergecopiestotail = true,
 		},
 
 		location =
@@ -1090,10 +1092,17 @@
 		table.insert(sln.groups, group)
 		sln.groups[inpath] = group
 
+		-- add to the parent's child list
+		if parent ~= nil then
+			table.insert(parent.groups, group)
+		end
+
 		group.solution = sln
 		group.name = name
 		group.uuid = os.uuid(curpath)
 		group.parent = parent
+		group.projects = { }
+		group.groups = { }
 		return group
 	end
 
@@ -1162,6 +1171,9 @@
 
 		local group = creategroupsfrompath(premake.CurrentGroup, sln)
 
+		if group ~= nil then
+			table.insert(group.projects, prj)
+		end
 
 		prj.solution       = sln
 		prj.name           = name

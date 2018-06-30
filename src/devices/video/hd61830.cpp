@@ -21,13 +21,14 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(HD61830, hd61830_device, "hd61830", "Hitachi HD61830B LCD Controller")
-const device_type HD61830B = HD61830;
+decltype(HD61830) HD61830B = HD61830;
 
 
 // default address map
-static ADDRESS_MAP_START( hd61830, 0, 8, hd61830_device )
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void hd61830_device::hd61830(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
 
 
 // internal character generator ROM
@@ -83,7 +84,7 @@ hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, d
 	m_cac(0),
 	m_blink(0),
 	m_cursor(0),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(hd61830)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(hd61830_device::hd61830), this)),
 	m_char_rom(*this, "hd61830")
 {
 }
@@ -450,7 +451,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					pixel = m_cursor ? 1 : 0;
 			}
 
-			if (sy < m_screen->height() && sx < m_screen->width())
+			if (sy < screen().height() && sx < screen().width())
 				bitmap.pix16(sy, sx) = pixel;
 		}
 	}
@@ -464,17 +465,28 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 void hd61830_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint16_t ma = 0;
-	for (int y = 0; y < (m_nx / m_vp); y++)
+	int rows = m_nx / m_vp;
+	uint16_t rac1 = m_dsa & 0xfff;
+	uint16_t rac2 = rac1 + (rows * m_hn);
+	for (int y = 0; y < rows; y++)
 	{
 		for (int x = 0; x < m_hn; x+=2)
 		{
-			uint8_t md1 = readbyte(ma);
-			uint8_t md2 = readbyte(ma+1);
+			uint8_t md1 = readbyte(rac1);
+			uint8_t md2 = readbyte(rac1+1);
 
 			draw_char(bitmap, cliprect, ma, x, y, md1);
 			draw_char(bitmap, cliprect, ma+1, x+1, y, md2);
 
+			md1 = readbyte(rac2);
+			md2 = readbyte(rac2+1);
+
+			draw_char(bitmap, cliprect, ma, x, y + rows, md1);
+			draw_char(bitmap, cliprect, ma+1, x+1, y + rows, md2);
+
 			ma+=2;
+			rac1+=2;
+			rac2+=2;
 		}
 	}
 }

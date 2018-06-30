@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(PDS030_LVIEW, nubus_lview_device, "pd3_lviw", "Sigma Designs 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nubus_lview_device::device_add_mconfig )
+MACHINE_CONFIG_START(nubus_lview_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( LVIEW_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_lview_device, screen_update)
 	MCFG_SCREEN_SIZE(832,600)
@@ -67,10 +67,9 @@ nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_typ
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
-	m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0),
-	m_assembled_tag(util::string_format("%s:%s", tag, LVIEW_SCREEN_NAME))
+	m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0)
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	set_screen(*this, LVIEW_SCREEN_NAME);
 }
 
 //-------------------------------------------------
@@ -81,8 +80,6 @@ void nubus_lview_device::device_start()
 {
 	uint32_t slotspace;
 
-	// set_nubus_device makes m_slot valid
-	set_nubus_device();
 	install_declaration_rom(this, LVIEW_ROM_REGION);
 
 	slotspace = get_slotspace();
@@ -92,12 +89,12 @@ void nubus_lview_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
 
-	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_lview_device::vram_r), this), write32_delegate(FUNC(nubus_lview_device::vram_w), this));
-	m_nubus->install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_lview_device::vram_r), this), write32_delegate(FUNC(nubus_lview_device::vram_w), this));
-	m_nubus->install_device(slotspace+0xb0000, slotspace+0xbffff, read32_delegate(FUNC(nubus_lview_device::lview_r), this), write32_delegate(FUNC(nubus_lview_device::lview_w), this));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_lview_device::vram_r), this), write32_delegate(FUNC(nubus_lview_device::vram_w), this));
+	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_lview_device::vram_r), this), write32_delegate(FUNC(nubus_lview_device::vram_w), this));
+	nubus().install_device(slotspace+0xb0000, slotspace+0xbffff, read32_delegate(FUNC(nubus_lview_device::lview_r), this), write32_delegate(FUNC(nubus_lview_device::lview_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(599, 0), 0);
+	m_timer->adjust(screen().time_until_pos(599, 0), 0);
 }
 
 //-------------------------------------------------
@@ -123,7 +120,7 @@ void nubus_lview_device::device_timer(emu_timer &timer, device_timer_id tid, int
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(599, 0), 0);
+	m_timer->adjust(screen().time_until_pos(599, 0), 0);
 }
 
 /***************************************************************************
@@ -165,9 +162,9 @@ READ32_MEMBER( nubus_lview_device::lview_r )
 {
 	uint32_t rv = 0;
 
-//    printf("prot_r: @ %x, mask %08x [PC=%x  state %d]\n", offset, mem_mask, machine().device("maincpu")->safe_pc(), m_protstate);
+//    printf("%s prot_r: @ %x, mask %08x [state %d]\n", machine().describe_context().c_str(), offset, mem_mask, m_protstate);
 
-	if ((m_protstate == 1) || (m_protstate == 10) || (machine().device("maincpu")->safe_pc() == 0x5aac))
+	if ((m_protstate == 1) || (m_protstate == 10) || (machine().device<cpu_device>("maincpu")->pc() == 0x5aac))
 	{
 		rv = 0x02020202;
 	}
@@ -183,7 +180,7 @@ READ32_MEMBER( nubus_lview_device::lview_r )
 
 WRITE32_MEMBER( nubus_lview_device::lview_w )
 {
-//    if (offset != 0x7a && offset != 0x3ffb) printf("prot_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//    if (offset != 0x7a && offset != 0x3ffb) logerror("prot_w: %08x @ %x, mask %08x %s\n", data, offset, mem_mask, machine().describe_context());
 
 	if (offset == 0x7a)
 	{

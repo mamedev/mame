@@ -38,7 +38,7 @@ void sega8_mgear_device::device_reset()
 }
 
 
-MACHINE_CONFIG_MEMBER( sega8_mgear_device::device_add_mconfig )
+MACHINE_CONFIG_START(sega8_mgear_device::device_add_mconfig)
 	MCFG_SMS_CARTRIDGE_ADD("subslot", sms_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
 MACHINE_CONFIG_END

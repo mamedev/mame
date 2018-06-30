@@ -218,7 +218,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 
 
 
-DEFINE_DEVICE_TYPE(SPC700, spc700_device, "spc700", "SPC700")
+DEFINE_DEVICE_TYPE(SPC700, spc700_device, "spc700", "Sony SPC700")
 
 
 spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1249,7 +1249,7 @@ void spc700_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_debugger_temp).mask(0x1ff).callexport().formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_debugger_temp).formatstr("%8s").noshow();
 
-	m_icountptr = &m_ICount;
+	set_icountptr(m_ICount);
 }
 
 
@@ -1353,9 +1353,9 @@ void spc700_device::execute_set_input( int inptnum, int state )
 
 #include "spc700ds.h"
 
-offs_t spc700_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> spc700_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(spc700)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<spc700_disassembler>();
 }
 
 //int dump_flag = 0;
@@ -1371,7 +1371,7 @@ void spc700_device::execute_run()
 	while(CLOCKS > 0)
 	{
 		REG_PPC = REG_PC;
-		debugger_instruction_hook(this, REG_PC);
+		debugger_instruction_hook(REG_PC);
 		REG_PC++;
 
 		switch(REG_IR = read_8_immediate(REG_PPC))

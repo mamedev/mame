@@ -10,14 +10,18 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
+#include "esripdsm.h"
 
+u32 esrip_disassembler::opcode_alignment() const
+{
+	return 1;
+}
 
 /***************************************************************************
     DISASSEMBLY HOOK (TODO: FINISH)
 ***************************************************************************/
 
-CPU_DISASSEMBLE(esrip)
+offs_t esrip_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 #if 0
 	static const char* const jmp_types[] =
@@ -45,7 +49,7 @@ CPU_DISASSEMBLE(esrip)
 	};
 #endif
 
-	uint64_t inst = big_endianize_int64(*(uint64_t *)oprom);
+	uint64_t inst = opcodes.r64(pc);
 
 	uint32_t inst_hi = inst >> 32;
 	uint32_t inst_lo = inst & 0xffffffff;
@@ -91,5 +95,5 @@ CPU_DISASSEMBLE(esrip)
 			ctrl3 & 0x80 ? ' ' : '7'
 			);
 
-	return 1 | DASMFLAG_SUPPORTED;
+	return 1 | SUPPORTED;
 }

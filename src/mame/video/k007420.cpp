@@ -42,7 +42,7 @@ void k007420_device::device_start()
 
 	m_ram = make_unique_clear<uint8_t[]>(0x200);
 
-	save_pointer(NAME(m_ram.get()), 0x200);
+	save_pointer(NAME(m_ram), 0x200);
 	save_item(NAME(m_flipscreen));   // current one uses 7342 one
 	save_item(NAME(m_regs)); // current one uses 7342 ones
 }
@@ -247,14 +247,4 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 			m_ram[(current_sprite*8)+6], m_ram[(current_sprite*8)+7]);
 	}
 #endif
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void k007420_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<k007420_device &>(device).m_palette.set_tag(tag);
 }

@@ -84,6 +84,7 @@ PROM  : Type MB7051
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -99,16 +100,9 @@ public:
 		m_videoram(*this, "videoram")
 	{ }
 
-	// devices/pointers
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<alpha_8201_device> m_alpha_8201;
+	void shougi(machine_config &config);
 
-	required_shared_ptr<uint8_t> m_videoram;
-
-	uint8_t m_nmi_enabled;
-	int m_r;
-
+protected:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(semaphore_r);
 
@@ -118,6 +112,20 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
 	virtual void machine_start() override;
+	void main_map(address_map &map);
+	void readport_sub(address_map &map);
+	void sub_map(address_map &map);
+
+private:
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<alpha_8201_device> m_alpha_8201;
+
+	required_shared_ptr<uint8_t> m_videoram;
+
+	uint8_t m_nmi_enabled;
+	int m_r;
 };
 
 
@@ -240,19 +248,20 @@ WRITE_LINE_MEMBER(shougi_state::nmi_enable_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM /* 2114 x 2 (0x400 x 4bit each) */
-	AM_RANGE(0x4800, 0x480f) AM_DEVWRITE("mainlatch", ls259_device, write_a3)
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW")
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1")
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* game won't boot if watchdog doesn't work */
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x7000, 0x73ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
-	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE("sharedram") /* 2114 x 2 (0x400 x 4bit each) */
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram") /* 4116 x 16 (32K) */
-ADDRESS_MAP_END
+void shougi_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram(); /* 2114 x 2 (0x400 x 4bit each) */
+	map(0x4800, 0x480f).w("mainlatch", FUNC(ls259_device::write_a3));
+	map(0x4800, 0x4800).portr("DSW");
+	map(0x5000, 0x5000).portr("P1");
+	map(0x5800, 0x5800).portr("P2").w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* game won't boot if watchdog doesn't work */
+	map(0x6000, 0x6000).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x6800, 0x6800).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x7000, 0x73ff).rw(m_alpha_8201, FUNC(alpha_8201_device::ext_ram_r), FUNC(alpha_8201_device::ext_ram_w));
+	map(0x7800, 0x7bff).ram().share("sharedram"); /* 2114 x 2 (0x400 x 4bit each) */
+	map(0x8000, 0xffff).ram().share("videoram"); /* 4116 x 16 (32K) */
+}
 
 
 // subcpu side
@@ -266,15 +275,17 @@ READ8_MEMBER(shougi_state::semaphore_r)
 }
 
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, shougi_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("sharedram") /* 2114 x 2 (0x400 x 4bit each) */
-ADDRESS_MAP_END
+void shougi_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x63ff).ram().share("sharedram"); /* 2114 x 2 (0x400 x 4bit each) */
+}
 
-static ADDRESS_MAP_START( readport_sub, AS_IO, 8, shougi_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x00ff)
-	AM_RANGE(0x00, 0x00) AM_READ(semaphore_r)
-ADDRESS_MAP_END
+void shougi_state::readport_sub(address_map &map)
+{
+	map.global_mask(0x00ff);
+	map(0x00, 0x00).r(FUNC(shougi_state::semaphore_r));
+}
 
 
 
@@ -360,25 +371,25 @@ INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
 }
 
 
-static MACHINE_CONFIG_START( shougi )
+MACHINE_CONFIG_START(shougi_state::shougi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", shougi_state, vblank_nmi)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shougi_state, vblank_nmi)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_10MHz/4)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_IO_MAP(readport_sub)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(10'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_IO_MAP(readport_sub)
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_10MHz/4/8)
+	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(10'000'000)/4/8)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // 0: sharedram = sub, 1: sharedram = main (TODO!)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(shougi_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, shougi_state, nmi_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("alpha_8201", alpha_8201_device, mcu_start_w)) // start/halt ALPHA-8201
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("alpha_8201", alpha_8201_device, bus_dir_w)) MCFG_DEVCB_INVERT // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("alpha_8201", alpha_8201_device, mcu_start_w)) // start/halt ALPHA-8201
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("alpha_8201", alpha_8201_device, bus_dir_w)) MCFG_DEVCB_INVERT // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // nothing? connected to +5v via resistor
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -399,9 +410,9 @@ static MACHINE_CONFIG_START( shougi )
 	MCFG_PALETTE_INIT_OWNER(shougi_state, shougi)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_10MHz/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -459,6 +470,6 @@ ROM_START( shougi2 )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT  MONITOR  COMPANY                              FULLNAME          FLAGS */
-GAME( 1982, shougi,  0,      shougi,  shougi,  shougi_state, 0,    ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, shougi2, 0,      shougi,  shougi2, shougi_state, 0,    ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT        MONITOR  COMPANY                              FULLNAME          FLAGS */
+GAME( 1982, shougi,  0,      shougi,  shougi,  shougi_state, empty_init, ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, shougi2, 0,      shougi,  shougi2, shougi_state, empty_init, ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_gray"><rect><color red="0.13" green="0.13" blue="0.13" /></rect></element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.15" green="0.03" blue="0.035" /></disk>
+		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
+	</element>
+
+	<element name="text_1"><text string="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_q"><text string="Question:" align="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_a"><text string="Answer:" align="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+
+	<element name="counter" defstate="1">
+		<simplecounter maxstate="9" digits="1">
+			<color red="0.95" green="0.95" blue="0.95" />
+		</simplecounter>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-1.5" right="17.5" top="-0.5" bottom="14.5" />
+
+		<bezel name="0.0" element="led"><bounds x="2" y="0" width="2" height="2" /></bezel>
+		<bezel name="0.1" element="led"><bounds x="2" y="3" width="2" height="2" /></bezel>
+		<bezel name="0.2" element="led"><bounds x="2" y="6" width="2" height="2" /></bezel>
+		<bezel name="0.3" element="led"><bounds x="2" y="9" width="2" height="2" /></bezel>
+		<bezel name="0.4" element="led"><bounds x="2" y="12" width="2" height="2" /></bezel>
+
+		<bezel element="text_1"><bounds x="-1" y="0" width="2" height="2" /></bezel>
+		<bezel element="text_2"><bounds x="-1" y="3" width="2" height="2" /></bezel>
+		<bezel element="text_3"><bounds x="-1" y="6" width="2" height="2" /></bezel>
+		<bezel element="text_4"><bounds x="-1" y="9" width="2" height="2" /></bezel>
+		<bezel element="text_5"><bounds x="-1" y="12" width="2" height="2" /></bezel>
+
+		<bezel element="static_gray"><bounds x="6" y="0.5" width="0.2" height="13" /></bezel>
+
+		<bezel element="text_q"><bounds x="8" y="0" width="10" height="2" /></bezel>
+		<bezel element="text_a"><bounds x="8" y="3" width="10" height="2" /></bezel>
+		<bezel name="q_pos" element="counter"><bounds x="15" y="0" width="2" height="2" /></bezel>
+		<bezel name="a_pos" element="counter"><bounds x="15" y="3" width="2" height="2" /></bezel>
+
+	</view>
+</mamelayout>

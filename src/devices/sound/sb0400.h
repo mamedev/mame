@@ -7,11 +7,13 @@
 
 #include "machine/pci.h"
 
-#define MCFG_SB0400_ADD(_tag, _subdevice_id) \
-	MCFG_PCI_DEVICE_ADD(_tag, SB0400, 0x11020008, 0x00, 0x040100, _subdevice_id)
-
 class sb0400_device : public pci_device {
 public:
+	sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id)
+		: sb0400_device(mconfig, tag, owner, clock)
+	{
+		set_ids(0x11020008, 0x00, 0x040100, subdevice_id);
+	}
 	sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -19,7 +21,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 32);
+	void map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(SB0400, sb0400_device)

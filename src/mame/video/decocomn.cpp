@@ -23,16 +23,6 @@ decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag,
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void decocomn_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<decocomn_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -46,7 +36,7 @@ void decocomn_device::device_start()
 	m_dirty_palette = make_unique_clear<uint8_t[]>(4096);
 
 	save_item(NAME(m_priority));
-	save_pointer(NAME(m_dirty_palette.get()), 4096);
+	save_pointer(NAME(m_dirty_palette), 4096);
 }
 
 //-------------------------------------------------
@@ -64,20 +54,6 @@ void decocomn_device::device_reset()
 
 /* Later games have double buffered paletteram - the real palette ram is
 only updated on a DMA call */
-
-WRITE16_MEMBER( decocomn_device::nonbuffered_palette_w )
-{
-	int r,g,b;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	if (offset&1) offset--;
-
-	b = (m_generic_paletteram_16[offset] >> 0) & 0xff;
-	g = (m_generic_paletteram_16[offset + 1] >> 8) & 0xff;
-	r = (m_generic_paletteram_16[offset + 1] >> 0) & 0xff;
-
-	m_palette->set_pen_color(offset / 2, rgb_t(r,g,b));
-}
 
 WRITE16_MEMBER( decocomn_device::buffered_palette_w )
 {
@@ -119,7 +95,7 @@ WRITE16_MEMBER( decocomn_device::priority_w )
 	m_priority = data;
 }
 
-READ16_MEMBER( decocomn_device::priority_r )
+uint16_t decocomn_device::priority_r()
 {
 	return m_priority;
 }

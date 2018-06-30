@@ -10,8 +10,9 @@
 
 #include "emu.h"
 #include "r65c02.h"
+#include "r65c02d.h"
 
-DEFINE_DEVICE_TYPE(R65C02, r65c02_device, "r65c02", "R65C02")
+DEFINE_DEVICE_TYPE(R65C02, r65c02_device, "r65c02", "Rockwell R65C02")
 
 r65c02_device::r65c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	r65c02_device(mconfig, R65C02, tag, owner, clock)
@@ -23,9 +24,9 @@ r65c02_device::r65c02_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-offs_t r65c02_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> r65c02_device::create_disassembler()
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return std::make_unique<r65c02_disassembler>();
 }
 
 #include "cpu/m6502/r65c02.hxx"

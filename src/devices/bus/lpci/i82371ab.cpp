@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(I82371AB, i82371ab_device, "i82371ab", "Intel 82371AB")
 
 
 i82371ab_device::i82371ab_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: southbridge_device(mconfig, I82371AB, tag, owner, clock)
+	: southbridge_extended_device(mconfig, I82371AB, tag, owner, clock)
 	, pci_device_interface(mconfig, *this)
 {
 }
@@ -53,11 +53,11 @@ void i82371ab_device::pci_isa_w(device_t *busdevice, int offset, uint32_t data, 
 		switch (offset)
 		{
 			case 0x04:
-				/* clear reserved bits */
+				// clear reserved bits
 				m_regs[0][offset] = cdata & 0x05;
 				break;
 			case 0x06:
-				/* set new status */
+				// set new status
 				m_regs[0][offset] |= 0x80;
 				break;
 			case 0x07:
@@ -92,11 +92,11 @@ void i82371ab_device::pci_ide_w(device_t *busdevice, int offset, uint32_t data, 
 		switch (offset)
 		{
 			case 0x04:
-				/* clear reserved bits */
+				// clear reserved bits
 				m_regs[1][offset] = cdata & 0x05;
 				break;
 			case 0x06:
-				/* set new status */
+				// set new status
 				m_regs[1][offset] |= 0x80;
 				break;
 			case 0x07:
@@ -131,11 +131,11 @@ void i82371ab_device::pci_usb_w(device_t *busdevice, int offset, uint32_t data, 
 		switch (offset)
 		{
 			case 0x04:
-				/* clear reserved bits */
+				// clear reserved bits
 				m_regs[2][offset] = cdata & 0x05;
 				break;
 			case 0x06:
-				/* set new status */
+				// set new status
 				m_regs[2][offset] |= 0x80;
 				break;
 			case 0x07:
@@ -170,11 +170,11 @@ void i82371ab_device::pci_acpi_w(device_t *busdevice, int offset, uint32_t data,
 		switch (offset)
 		{
 			case 0x04:
-				/* clear reserved bits */
+				// clear reserved bits
 				m_regs[3][offset] = cdata & 0x05;
 				break;
 			case 0x06:
-				/* set new status */
+				// set new status
 				m_regs[3][offset] |= 0x80;
 				break;
 			case 0x07:
@@ -210,14 +210,19 @@ void i82371ab_device::pci_write(pci_bus_device *pcibus, int function, int offset
 	}
 }
 
+void i82371ab_device::remap(int space_id, offs_t start, offs_t end)
+{
+	m_isabus->remap(space_id, start, end);
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void i82371ab_device::device_start()
 {
-	southbridge_device::device_start();
-	/* setup save states */
+	southbridge_extended_device::device_start();
+	// setup save states
 	save_item(NAME(m_regs));
 }
 
@@ -227,29 +232,29 @@ void i82371ab_device::device_start()
 
 void i82371ab_device::device_reset()
 {
-	southbridge_device::device_reset();
+	southbridge_extended_device::device_reset();
 	memset(m_regs, 0, sizeof(m_regs));
 	uint32_t (*regs32)[64] = (uint32_t (*)[64])(m_regs);
 
-	/* isa */
+	// isa
 	regs32[0][0x00] = 0x71108086;
 	regs32[0][0x04] = 0x00000000;
 	regs32[0][0x08] = 0x06010000;
 	regs32[0][0x0c] = 0x00800000;
 
-	/* ide */
+	// ide
 	regs32[1][0x00] = 0x71118086;
 	regs32[1][0x04] = 0x02800000;
 	regs32[1][0x08] = 0x01018000;
 	regs32[1][0x0c] = 0x00000000;
 
-	/* usb */
+	// usb
 	regs32[2][0x00] = 0x71128086;
 	regs32[2][0x04] = 0x02800000;
 	regs32[2][0x08] = 0x0c030000;
 	regs32[2][0x0c] = 0x00000000;
 
-	/* acpi */
+	// acpi
 	regs32[3][0x00] = 0x71138086;
 	regs32[3][0x04] = 0x02800000;
 	regs32[3][0x08] = 0x06800000;

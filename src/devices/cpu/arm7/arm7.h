@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "arm7dasm.h"
+
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
@@ -30,6 +32,9 @@
 
 #define ARM7_MAX_FASTRAM       4
 #define ARM7_MAX_HOTSPOTS      16
+
+#define MCFG_ARM_HIGH_VECTORS() \
+	downcast<arm7_cpu_device &>(*device).set_high_vectors();
 
 
 /***************************************************************************
@@ -46,11 +51,13 @@
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
 
-class arm7_cpu_device : public cpu_device
+class arm7_cpu_device : public cpu_device, public arm7_disassembler::config
 {
 public:
 	// construction/destruction
 	arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_high_vectors() { m_vectorbase = 0xffff0000; }
 
 protected:
 	enum
@@ -101,6 +108,8 @@ protected:
 
 	arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint8_t archFlags, endianness_t endianness);
 
+	void postload();
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -121,9 +130,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual bool get_t_flag() const override;
 
 	address_space_config m_program_config;
 
@@ -152,7 +160,8 @@ protected:
 	int m_icount;
 	endianness_t m_endian;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	std::function<u32 (offs_t)> m_pr32;
+	std::function<const void * (offs_t)> m_prptr;
 
 	/* Coprocessor Registers */
 	uint32_t m_control;
@@ -167,6 +176,8 @@ protected:
 
 	uint8_t m_archRev;          // ARM architecture revision (3, 4, and 5 are valid)
 	uint8_t m_archFlags;        // architecture flags
+
+	uint32_t m_vectorbase;
 
 //#if ARM7_MMU_ENABLE_HACK
 //  uint32_t mmu_enable_addr; // workaround for "MMU is enabled when PA != VA" problem
@@ -220,16 +231,16 @@ protected:
 	int detect_fault(int desc_lvl1, int ap, int flags);
 	void arm7_check_irq_state();
 	void update_irq_state();
-	void arm7_cpu_write32(uint32_t addr, uint32_t data);
-	void arm7_cpu_write16(uint32_t addr, uint16_t data);
-	void arm7_cpu_write8(uint32_t addr, uint8_t data);
-	uint32_t arm7_cpu_read32(uint32_t addr);
-	uint16_t arm7_cpu_read16(uint32_t addr);
-	uint8_t arm7_cpu_read8(uint32_t addr);
+	virtual void arm7_cpu_write32(uint32_t addr, uint32_t data);
+	virtual void arm7_cpu_write16(uint32_t addr, uint16_t data);
+	virtual void arm7_cpu_write8(uint32_t addr, uint8_t data);
+	virtual uint32_t arm7_cpu_read32(uint32_t addr);
+	virtual uint32_t arm7_cpu_read16(uint32_t addr);
+	virtual uint8_t arm7_cpu_read8(uint32_t addr);
 
 	// Coprocessor support
 	DECLARE_WRITE32_MEMBER( arm7_do_callback );
-	DECLARE_READ32_MEMBER( arm7_rt_r_callback );
+	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback );
 	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback );
 	void arm7_dt_r_callback(uint32_t insn, uint32_t *prn);
 	void arm7_dt_w_callback(uint32_t insn, uint32_t *prn);
@@ -364,6 +375,8 @@ protected:
 	/* internal compiler state */
 	struct compiler_state
 	{
+		compiler_state &operator=(compiler_state const &) = delete;
+
 		uint32_t              cycles;                     /* accumulated cycles */
 		uint8_t               checkints;                  /* need to check interrupts before next instruction */
 		uint8_t               checksoftints;              /* need to check software interrupts before next instruction */
@@ -416,114 +429,114 @@ protected:
 		hotspot_info        hotspot[ARM7_MAX_HOTSPOTS];
 	} m_impstate;
 
-	typedef void ( arm7_cpu_device::*arm7thumb_drcophandler)(drcuml_block*, compiler_state*, const opcode_desc*);
+	typedef void ( arm7_cpu_device::*arm7thumb_drcophandler)(drcuml_block &, compiler_state &, const opcode_desc *);
 	static const arm7thumb_drcophandler drcthumb_handler[0x40*0x10];
 
-	void drctg00_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* Shift left */
-	void drctg00_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* Shift right */
-	void drctg01_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg01_10(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg01_11(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* SUB Rd, Rs, Rn */
-	void drctg01_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* ADD Rd, Rs, #imm */
-	void drctg01_13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* SUB Rd, Rs, #imm */
-	void drctg02_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg02_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg03_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* ADD Rd, #Offset8 */
-	void drctg03_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* SUB Rd, #Offset8 */
-	void drctg04_00_00(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* AND Rd, Rs */
-	void drctg04_00_01(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* EOR Rd, Rs */
-	void drctg04_00_02(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* LSL Rd, Rs */
-	void drctg04_00_03(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* LSR Rd, Rs */
-	void drctg04_00_04(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* ASR Rd, Rs */
-	void drctg04_00_05(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* ADC Rd, Rs */
-	void drctg04_00_06(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);  /* SBC Rd, Rs */
-	void drctg04_00_07(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* ROR Rd, Rs */
-	void drctg04_00_08(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* TST Rd, Rs */
-	void drctg04_00_09(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* NEG Rd, Rs */
-	void drctg04_00_0a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* CMP Rd, Rs */
-	void drctg04_00_0b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* CMN Rd, Rs - check flags, add dasm */
-	void drctg04_00_0c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* ORR Rd, Rs */
-	void drctg04_00_0d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* MUL Rd, Rs */
-	void drctg04_00_0e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* BIC Rd, Rs */
-	void drctg04_00_0f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* MVN Rd, Rs */
-	void drctg04_01_00(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg04_01_01(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* ADD Rd, HRs */
-	void drctg04_01_02(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* ADD HRd, Rs */
-	void drctg04_01_03(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* Add HRd, HRs */
-	void drctg04_01_10(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);  /* CMP Rd, Rs */
-	void drctg04_01_11(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* CMP Rd, Hs */
-	void drctg04_01_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* CMP Hd, Rs */
-	void drctg04_01_13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* CMP Hd, Hs */
-	void drctg04_01_20(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* MOV Rd, Rs (undefined) */
-	void drctg04_01_21(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* MOV Rd, Hs */
-	void drctg04_01_22(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* MOV Hd, Rs */
-	void drctg04_01_23(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* MOV Hd, Hs */
-	void drctg04_01_30(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg04_01_31(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg04_01_32(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg04_01_33(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg04_0203(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg05_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);  /* STR Rd, [Rn, Rm] */
-	void drctg05_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);  /* STRH Rd, [Rn, Rm] */
-	void drctg05_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);  /* STRB Rd, [Rn, Rm] */
-	void drctg05_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);  /* LDSB Rd, [Rn, Rm] todo, add dasm */
-	void drctg05_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);  /* LDR Rd, [Rn, Rm] */
-	void drctg05_5(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);  /* LDRH Rd, [Rn, Rm] */
-	void drctg05_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);  /* LDRB Rd, [Rn, Rm] */
-	void drctg05_7(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);  /* LDSH Rd, [Rn, Rm] */
-	void drctg06_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* Store */
-	void drctg06_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* Load */
-	void drctg07_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* Store */
-	void drctg07_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);  /* Load */
-	void drctg08_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* Store */
-	void drctg08_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* Load */
-	void drctg09_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* Store */
-	void drctg09_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* Load */
-	void drctg0a_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);  /* ADD Rd, PC, #nn */
-	void drctg0a_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* ADD Rd, SP, #nn */
-	void drctg0b_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* ADD SP, #imm */
-	void drctg0b_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0b_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0b_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0b_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* PUSH {Rlist} */
-	void drctg0b_5(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* PUSH {Rlist}{LR} */
-	void drctg0b_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0b_7(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0b_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0b_9(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0b_a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0b_b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0b_c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* POP {Rlist} */
-	void drctg0b_d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* POP {Rlist}{PC} */
-	void drctg0b_e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0b_f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0c_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* Store */
-	void drctg0c_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* Load */
-	void drctg0d_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_EQ:
-	void drctg0d_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_NE:
-	void drctg0d_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_CS:
-	void drctg0d_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_CC:
-	void drctg0d_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_MI:
-	void drctg0d_5(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_PL:
-	void drctg0d_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_VS:
-	void drctg0d_7(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_VC:
-	void drctg0d_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_HI:
-	void drctg0d_9(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_LS:
-	void drctg0d_a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_GE:
-	void drctg0d_b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_LT:
-	void drctg0d_c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_GT:
-	void drctg0d_d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_LE:
-	void drctg0d_e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // COND_AL:
-	void drctg0d_f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); // SWI (this is sort of a "hole" in the opcode encoding)
-	void drctg0e_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0e_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0f_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void drctg0f_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* BL */
+	void drctg00_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* Shift left */
+	void drctg00_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* Shift right */
+	void drctg01_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg01_10(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg01_11(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* SUB Rd, Rs, Rn */
+	void drctg01_12(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* ADD Rd, Rs, #imm */
+	void drctg01_13(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* SUB Rd, Rs, #imm */
+	void drctg02_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg02_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg03_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* ADD Rd, #Offset8 */
+	void drctg03_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* SUB Rd, #Offset8 */
+	void drctg04_00_00(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* AND Rd, Rs */
+	void drctg04_00_01(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* EOR Rd, Rs */
+	void drctg04_00_02(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* LSL Rd, Rs */
+	void drctg04_00_03(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* LSR Rd, Rs */
+	void drctg04_00_04(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* ASR Rd, Rs */
+	void drctg04_00_05(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* ADC Rd, Rs */
+	void drctg04_00_06(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);  /* SBC Rd, Rs */
+	void drctg04_00_07(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* ROR Rd, Rs */
+	void drctg04_00_08(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* TST Rd, Rs */
+	void drctg04_00_09(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* NEG Rd, Rs */
+	void drctg04_00_0a(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* CMP Rd, Rs */
+	void drctg04_00_0b(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* CMN Rd, Rs - check flags, add dasm */
+	void drctg04_00_0c(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* ORR Rd, Rs */
+	void drctg04_00_0d(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* MUL Rd, Rs */
+	void drctg04_00_0e(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* BIC Rd, Rs */
+	void drctg04_00_0f(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* MVN Rd, Rs */
+	void drctg04_01_00(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg04_01_01(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* ADD Rd, HRs */
+	void drctg04_01_02(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* ADD HRd, Rs */
+	void drctg04_01_03(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* Add HRd, HRs */
+	void drctg04_01_10(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);  /* CMP Rd, Rs */
+	void drctg04_01_11(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* CMP Rd, Hs */
+	void drctg04_01_12(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* CMP Hd, Rs */
+	void drctg04_01_13(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* CMP Hd, Hs */
+	void drctg04_01_20(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* MOV Rd, Rs (undefined) */
+	void drctg04_01_21(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* MOV Rd, Hs */
+	void drctg04_01_22(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* MOV Hd, Rs */
+	void drctg04_01_23(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* MOV Hd, Hs */
+	void drctg04_01_30(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg04_01_31(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg04_01_32(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg04_01_33(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg04_0203(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg05_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);  /* STR Rd, [Rn, Rm] */
+	void drctg05_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);  /* STRH Rd, [Rn, Rm] */
+	void drctg05_2(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);  /* STRB Rd, [Rn, Rm] */
+	void drctg05_3(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);  /* LDSB Rd, [Rn, Rm] todo, add dasm */
+	void drctg05_4(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);  /* LDR Rd, [Rn, Rm] */
+	void drctg05_5(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);  /* LDRH Rd, [Rn, Rm] */
+	void drctg05_6(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);  /* LDRB Rd, [Rn, Rm] */
+	void drctg05_7(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);  /* LDSH Rd, [Rn, Rm] */
+	void drctg06_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* Store */
+	void drctg06_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* Load */
+	void drctg07_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* Store */
+	void drctg07_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);  /* Load */
+	void drctg08_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* Store */
+	void drctg08_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* Load */
+	void drctg09_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* Store */
+	void drctg09_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* Load */
+	void drctg0a_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);  /* ADD Rd, PC, #nn */
+	void drctg0a_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* ADD Rd, SP, #nn */
+	void drctg0b_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* ADD SP, #imm */
+	void drctg0b_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0b_2(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0b_3(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0b_4(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* PUSH {Rlist} */
+	void drctg0b_5(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* PUSH {Rlist}{LR} */
+	void drctg0b_6(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0b_7(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0b_8(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0b_9(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0b_a(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0b_b(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0b_c(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* POP {Rlist} */
+	void drctg0b_d(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* POP {Rlist}{PC} */
+	void drctg0b_e(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0b_f(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0c_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* Store */
+	void drctg0c_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* Load */
+	void drctg0d_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_EQ:
+	void drctg0d_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_NE:
+	void drctg0d_2(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_CS:
+	void drctg0d_3(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_CC:
+	void drctg0d_4(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_MI:
+	void drctg0d_5(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_PL:
+	void drctg0d_6(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_VS:
+	void drctg0d_7(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_VC:
+	void drctg0d_8(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_HI:
+	void drctg0d_9(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_LS:
+	void drctg0d_a(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_GE:
+	void drctg0d_b(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_LT:
+	void drctg0d_c(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_GT:
+	void drctg0d_d(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_LE:
+	void drctg0d_e(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // COND_AL:
+	void drctg0d_f(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); // SWI (this is sort of a "hole" in the opcode encoding)
+	void drctg0e_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0e_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0f_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void drctg0f_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc); /* BL */
 
 	void update_reg_ptr();
 	const int* m_reg_group;
-	void load_fast_iregs(drcuml_block *block);
-	void save_fast_iregs(drcuml_block *block);
+	void load_fast_iregs(drcuml_block &block);
+	void save_fast_iregs(drcuml_block &block);
 	void arm7_drc_init();
 	void arm7_drc_exit();
 	void execute_run_drc();
@@ -540,24 +553,24 @@ protected:
 	void static_generate_out_of_cycles();
 	void static_generate_detect_fault(uml::code_handle **handleptr);
 	void static_generate_tlb_translate(uml::code_handle **handleptr);
-	void static_generate_memory_accessor(int size, bool istlb, bool iswrite, const char *name, uml::code_handle **handleptr);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param);
-	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
-	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t linkreg);
+	void static_generate_memory_accessor(int size, bool istlb, bool iswrite, const char *name, uml::code_handle *&handleptr);
+	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param);
+	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
+	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_delay_slot_and_branch(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint8_t linkreg);
 
-	typedef bool ( arm7_cpu_device::*drcarm7ops_ophandler)(drcuml_block*, compiler_state*, const opcode_desc*, uint32_t);
+	typedef bool ( arm7_cpu_device::*drcarm7ops_ophandler)(drcuml_block &, compiler_state &, const opcode_desc *, uint32_t);
 	static const drcarm7ops_ophandler drcops_handler[0x10];
 
-	void saturate_qbit_overflow(drcuml_block *block);
-	bool drcarm7ops_0123(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
-	bool drcarm7ops_4567(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
-	bool drcarm7ops_89(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
-	bool drcarm7ops_ab(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
-	bool drcarm7ops_cd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
-	bool drcarm7ops_e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
-	bool drcarm7ops_f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
-	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void saturate_qbit_overflow(drcuml_block &block);
+	bool drcarm7ops_0123(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t op);
+	bool drcarm7ops_4567(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t op);
+	bool drcarm7ops_89(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t op);
+	bool drcarm7ops_ab(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t op);
+	bool drcarm7ops_cd(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t op);
+	bool drcarm7ops_e(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t op);
+	bool drcarm7ops_f(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t op);
+	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
 };
 
@@ -602,8 +615,38 @@ class arm946es_cpu_device : public arm9_cpu_device
 public:
 	// construction/destruction
 	arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// 946E-S has Protection Unit instead of ARM MMU so CP15 is quite different
+	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback ) override;
+	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback ) override;
+
+	virtual void arm7_cpu_write32(uint32_t addr, uint32_t data) override;
+	virtual void arm7_cpu_write16(uint32_t addr, uint16_t data) override;
+	virtual void arm7_cpu_write8(uint32_t addr, uint8_t data) override;
+	virtual uint32_t arm7_cpu_read32(uint32_t addr) override;
+	virtual uint32_t arm7_cpu_read16(uint32_t addr) override;
+	virtual uint8_t arm7_cpu_read8(uint32_t addr) override;
+
+protected:
+	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+
+private:
+	uint32_t cp15_control, cp15_itcm_base, cp15_dtcm_base, cp15_itcm_size, cp15_dtcm_size;
+	uint32_t cp15_itcm_end, cp15_dtcm_end, cp15_itcm_reg, cp15_dtcm_reg;
+	uint8_t ITCM[0x8000], DTCM[0x4000];
+
+	void RefreshITCM();
+	void RefreshDTCM();
 };
 
+class igs036_cpu_device : public arm946es_cpu_device
+{
+public:
+	// construction/destruction
+	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 class pxa255_cpu_device : public arm7_cpu_device
 {
@@ -619,15 +662,6 @@ public:
 	// construction/destruction
 	sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
-class igs036_cpu_device : public arm9_cpu_device
-{
-public:
-	// construction/destruction
-	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback ) override;
-};
-
 
 DECLARE_DEVICE_TYPE(ARM7,     arm7_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7_BE,  arm7_be_cpu_device)

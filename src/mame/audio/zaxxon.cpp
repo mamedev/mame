@@ -92,8 +92,8 @@ static const char *const zaxxon_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START( zaxxon_samples )
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+MACHINE_CONFIG_START(zaxxon_state::zaxxon_samples)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(12)
 	MCFG_SAMPLES_NAMES(zaxxon_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -192,8 +192,8 @@ static const char *const congo_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START( congo_samples )
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+MACHINE_CONFIG_START(zaxxon_state::congo_samples)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(congo_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)

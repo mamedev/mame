@@ -59,6 +59,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	uint32_t tile_callback( uint32_t code );
+	void taotaido(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_port_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_TAOTAIDO_H

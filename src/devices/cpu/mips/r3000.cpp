@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "r3000.h"
+#include "r3kdasm.h"
 #include "debugger.h"
 
 
@@ -113,11 +114,12 @@
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(R3041, r3041_device, "r3041", "R3041")
-DEFINE_DEVICE_TYPE(R3051, r3051_device, "r3051", "R3051")
-DEFINE_DEVICE_TYPE(R3052, r3052_device, "r3052", "R3052")
-DEFINE_DEVICE_TYPE(R3071, r3071_device, "r3071", "R3071")
-DEFINE_DEVICE_TYPE(R3081, r3081_device, "r3081", "R3081")
+DEFINE_DEVICE_TYPE(R3041,       r3041_device,     "r3041",   "MIPS R3041")
+DEFINE_DEVICE_TYPE(R3051,       r3051_device,     "r3051",   "MIPS R3051")
+DEFINE_DEVICE_TYPE(R3052,       r3052_device,     "r3052",   "MIPS R3052")
+DEFINE_DEVICE_TYPE(R3071,       r3071_device,     "r3071",   "MIPS R3071")
+DEFINE_DEVICE_TYPE(R3081,       r3081_device,     "r3081",   "MIPS R3081")
+DEFINE_DEVICE_TYPE(SONYPS2_IOP, iop_device,       "sonyiop", "Sony Playstation 2 IOP")
 
 
 //-------------------------------------------------
@@ -129,7 +131,6 @@ r3000_device::r3000_device(const machine_config &mconfig, device_type type, cons
 		m_program_config_be("program", ENDIANNESS_BIG, 32, 29),
 		m_program_config_le("program", ENDIANNESS_LITTLE, 32, 29),
 		m_program(nullptr),
-		m_direct(nullptr),
 		m_chip_type(chiptype),
 		m_hasfpu(false),
 		m_endianness(ENDIANNESS_BIG),
@@ -147,7 +148,7 @@ r3000_device::r3000_device(const machine_config &mconfig, device_type type, cons
 		m_in_brcond3(*this)
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// clear some additional state
 	memset(m_r, 0, sizeof(m_r));
@@ -206,6 +207,14 @@ r3081_device::r3081_device(const machine_config &mconfig, const char *tag, devic
 
 
 //-------------------------------------------------
+//  iop_device - constructor
+//-------------------------------------------------
+
+iop_device::iop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: r3000_device(mconfig, SONYPS2_IOP, tag, owner, clock, CHIP_TYPE_IOP) { }
+
+
+//-------------------------------------------------
 //  device_start - start up the device
 //-------------------------------------------------
 
@@ -213,7 +222,18 @@ void r3000_device::device_start()
 {
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	if(m_program->endianness() == ENDIANNESS_LITTLE)
+	{
+		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
+	else
+	{
+		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
 
 	// determine the cache sizes
 	switch (m_chip_type)
@@ -249,6 +269,12 @@ void r3000_device::device_start()
 			m_icache_size = 16384;  // or 8kB
 			m_dcache_size = 4096;   // or 8kB
 			m_hasfpu = true;
+			break;
+		}
+		case CHIP_TYPE_IOP:
+		{
+			m_icache_size = 4096;
+			m_dcache_size = 1024;
 			break;
 		}
 	}
@@ -387,6 +413,12 @@ void r3000_device::device_reset()
 	m_cpr[0][COP0_Status] = 0x0000;
 }
 
+void iop_device::device_reset()
+{
+	r3000_device::device_reset();
+	m_cpr[0][COP0_PRId] = 0x2;
+}
+
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
@@ -453,41 +485,13 @@ void r3000_device::state_string_export(const device_state_entry &entry, std::str
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t r3000_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t r3000_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t r3000_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> r3000_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( r3000le );
-	extern CPU_DISASSEMBLE( r3000be );
-
-	if (m_endianness == ENDIANNESS_BIG)
-		return CPU_DISASSEMBLE_NAME(r3000be)(this, stream, pc, oprom, opram, options);
-	else
-		return CPU_DISASSEMBLE_NAME(r3000le)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<r3000_disassembler>();
 }
 
 
@@ -497,7 +501,7 @@ offs_t r3000_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 
 inline uint32_t r3000_device::readop(offs_t pc)
 {
-	return m_direct->read_dword(pc);
+	return m_pr32(pc);
 }
 
 uint8_t r3000_device::readmem(offs_t offset)
@@ -1055,7 +1059,7 @@ void r3000_device::execute_run()
 
 		// debugging
 		m_ppc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		// instruction fetch
 		m_op = readop(m_pc);

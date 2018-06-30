@@ -148,7 +148,7 @@ void m107_state::video_start()
 	save_item(NAME(m_sprite_display));
 	save_item(NAME(m_raster_irq_position));
 	save_item(NAME(m_control));
-	save_pointer(NAME(m_buffered_spriteram.get()), 0x1000/2);
+	save_pointer(NAME(m_buffered_spriteram), 0x1000/2);
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -382,7 +382,7 @@ WRITE16_MEMBER(m107_state::spritebuffer_w)
 		/*
 		TODO: this register looks a lot more complex than how the game uses it. All of them seems to test various bit combinations during POST.
 		*/
-//      logerror("%04x: buffered spriteram\n",space.device().safe_pc());
+//      logerror("%s: buffered spriteram\n",m_maincpu->pc());
 		m_sprite_display    = (!(data & 0x1000));
 
 		memcpy(m_buffered_spriteram.get(), m_spriteram, 0x1000);

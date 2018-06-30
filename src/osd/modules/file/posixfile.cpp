@@ -217,6 +217,8 @@ osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags,
 		return posix_open_socket(path, openflags, file, filesize);
 	else if (posix_check_ptty_path(path))
 		return posix_open_ptty(openflags, file, filesize, dst);
+	else if (posix_check_domain_path(path))
+		return posix_open_domain(path, openflags, file, filesize);
 
 	// select the file open modes
 	int access;
@@ -446,7 +448,7 @@ bool osd_is_absolute_path(std::string const &path)
 	if (!path.empty() && is_path_separator(path[0]))
 		return true;
 #if !defined(WIN32)
-	else if (!path.empty() && (path[0] == '.'))
+	else if (!path.empty() && (path[0] == '.') && (!path[1] || is_path_separator(path[1]))) // FIXME: why is this even here? foo/./bar is a valid way to refer to foo/bar
 		return true;
 #elif !defined(UNDER_CE)
 	else if ((path.length() > 1) && (path[1] == ':'))

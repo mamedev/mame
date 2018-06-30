@@ -28,19 +28,26 @@ class mc1502_state : public driver_device
 {
 public:
 	mc1502_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_upd8251(*this, "upd8251"),
-		m_pic8259(*this, "pic8259"),
-		m_pit8253(*this, "pit8253"),
-		m_ppi8255n1(*this, "ppi8255n1"),
-		m_ppi8255n2(*this, "ppi8255n2"),
-		m_isabus(*this, "isa"),
-		m_speaker(*this, "speaker"),
-		m_cassette(*this, "cassette"),
-		m_centronics(*this, "centronics"),
-		m_ram(*this, RAM_TAG) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_upd8251(*this, "upd8251")
+		, m_pic8259(*this, "pic8259")
+		, m_pit8253(*this, "pit8253")
+		, m_ppi8255n1(*this, "ppi8255n1")
+		, m_ppi8255n2(*this, "ppi8255n2")
+		, m_isabus(*this, "isa")
+		, m_speaker(*this, "speaker")
+		, m_cassette(*this, "cassette")
+		, m_centronics(*this, "centronics")
+		, m_ram(*this, RAM_TAG)
+		, m_kbdio(*this, "Y%u", 1)
+	{ }
 
+	void mc1502(machine_config &config);
+
+	void init_mc1502();
+
+private:
 	required_device<cpu_device>  m_maincpu;
 	required_device<i8251_device> m_upd8251;
 	required_device<pic8259_device>  m_pic8259;
@@ -52,8 +59,8 @@ public:
 	required_device<cassette_image_device>  m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
+	required_ioport_array<12> m_kbdio;
 
-	DECLARE_DRIVER_INIT(mc1502);
 	DECLARE_MACHINE_START(mc1502);
 	DECLARE_MACHINE_RESET(mc1502);
 
@@ -81,7 +88,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mc1502_kppi_portb_w);
 	DECLARE_WRITE8_MEMBER(mc1502_kppi_portc_w);
 
-private:
+	void mc1502_io(address_map &map);
+	void mc1502_map(address_map &map);
+
 	int m_pit_out2;
 };
 

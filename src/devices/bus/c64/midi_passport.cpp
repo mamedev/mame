@@ -58,22 +58,22 @@ WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::write_acia_clock )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_passport_midi_cartridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_passport_midi_cartridge_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(c64_passport_midi_cartridge_device, acia_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, c64_passport_midi_cartridge_device, acia_irq_w))
 
 	MCFG_DEVICE_ADD(MC6840_TAG, PTM6840, 1021800)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(1021800.0f, 1021800.0f, 1021800.0f)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(c64_passport_midi_cartridge_device, ptm_irq_w))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, c64_passport_midi_cartridge_device, ptm_irq_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(MC6850_TAG, acia6850_device, write_rxd))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_TAG, acia6850_device, write_rxd))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) /// TODO: work out if the clock should come from the 6840
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(c64_passport_midi_cartridge_device, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, c64_passport_midi_cartridge_device, write_acia_clock))
 MACHINE_CONFIG_END
 
 
@@ -135,12 +135,8 @@ uint8_t c64_passport_midi_cartridge_device::c64_cd_r(address_space &space, offs_
 			data = m_ptm->read(space, offset & 0x07);
 			break;
 
-		case 8:
-			data = m_acia->status_r(space, 0);
-			break;
-
-		case 9:
-			data = m_acia->data_r(space, 0);
+		case 8: case 9:
+			data = m_acia->read(space, offset & 0x01);
 			break;
 		}
 	}
@@ -164,12 +160,8 @@ void c64_passport_midi_cartridge_device::c64_cd_w(address_space &space, offs_t o
 			m_ptm->write(space, offset & 0x07, data);
 			break;
 
-		case 8:
-			m_acia->control_w(space, 0, data);
-			break;
-
-		case 9:
-			m_acia->data_w(space, 0, data);
+		case 8: case 9:
+			m_acia->write(space, offset & 0x01, data);
 			break;
 
 		case 0x30:

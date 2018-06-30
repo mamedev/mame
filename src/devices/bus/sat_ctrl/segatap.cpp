@@ -108,7 +108,7 @@ uint8_t saturn_segatap_device::read_id(int idx)
 }
 
 
-MACHINE_CONFIG_MEMBER( saturn_segatap_device::device_add_mconfig )
+MACHINE_CONFIG_START(saturn_segatap_device::device_add_mconfig)
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl1", saturn_joys, "joypad")
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl2", saturn_joys, "joypad")
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl3", saturn_joys, "joypad")

@@ -322,6 +322,7 @@ enum ioport_type
 		IPT_UI_DEBUG_BREAK,
 		IPT_UI_PAUSE,
 		IPT_UI_PAUSE_SINGLE,
+		IPT_UI_REWIND_SINGLE,
 		IPT_UI_RESET_MACHINE,
 		IPT_UI_SOFT_RESET,
 		IPT_UI_SHOW_GFX,
@@ -332,7 +333,8 @@ enum ioport_type
 		IPT_UI_SHOW_FPS,
 		IPT_UI_SNAPSHOT,
 		IPT_UI_TIMECODE,
-		IPT_UI_RECORD_MOVIE,
+		IPT_UI_RECORD_MNG,
+		IPT_UI_RECORD_AVI,
 		IPT_UI_TOGGLE_CHEAT,
 		IPT_UI_UP,
 		IPT_UI_DOWN,
@@ -386,12 +388,10 @@ enum ioport_type
 
 	IPT_UI_LAST,
 
-	// other meaning not mapped to standard defaults
-	IPT_OTHER,
+	IPT_OTHER, // not mapped to standard defaults
 
-	// special meaning handled by custom code
-	IPT_SPECIAL,
-	IPT_CUSTOM,
+	IPT_SPECIAL, // uninterpreted characters
+	IPT_CUSTOM, // handled by custom code
 	IPT_OUTPUT,
 
 	IPT_COUNT

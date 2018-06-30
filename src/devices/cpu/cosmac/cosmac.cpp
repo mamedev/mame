@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "cosmac.h"
+#include "cosdasm.h"
 #include "coreutil.h"
 
 // permit our enums to be saved
@@ -290,7 +291,7 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 		m_dmaout(CLEAR_LINE),
 		m_program(nullptr),
 		m_io(nullptr),
-		m_direct(nullptr)
+		m_cache(nullptr)
 {
 	for (auto & elem : m_ef)
 		elem = CLEAR_LINE;
@@ -337,7 +338,7 @@ void cosmac_device::device_start()
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	// register our state for the debugger
@@ -384,7 +385,7 @@ void cosmac_device::device_start()
 	save_item(NAME(m_q));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -479,44 +480,20 @@ void cosmac_device::state_string_export(const device_state_entry &entry, std::st
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t cosmac_device::disasm_min_opcode_bytes() const
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t cosmac_device::disasm_max_opcode_bytes() const
-{
-	return 3;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t cdp1801_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> cdp1801_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( cdp1801 );
-	return CPU_DISASSEMBLE_NAME( cdp1801 )(this, stream, pc, oprom, opram, options);
+	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1801);
 }
 
-offs_t cdp1802_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( cdp1802 );
-	return CPU_DISASSEMBLE_NAME( cdp1802 )(this, stream, pc, oprom, opram, options);
-}
 
+std::unique_ptr<util::disasm_interface> cdp1802_device::create_disassembler()
+{
+	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1802);
+}
 
 //**************************************************************************
 //  INLINE HELPERS
@@ -528,7 +505,7 @@ offs_t cdp1802_device::disasm_disassemble(std::ostream &stream, offs_t pc, const
 
 inline uint8_t cosmac_device::read_opcode(offs_t pc)
 {
-	return m_direct->read_byte(pc);
+	return m_cache->read_byte(pc);
 }
 
 
@@ -789,7 +766,7 @@ inline void cosmac_device::debug()
 {
 	if (device_t::machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debugger_instruction_hook(this, R[P]);
+		debugger_instruction_hook(R[P]);
 	}
 }
 

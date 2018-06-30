@@ -12,13 +12,12 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wshadow") // warning: declaration of 'u
 #include <ShaderLang.h>
 #include <ResourceLimits.h>
 #include <SPIRV/SPVRemapper.h>
-//#include <spirv-tools/libspirv.hpp>
-//#include <spirv-tools/optimizer.hpp>
+#include <SPIRV/GlslangToSpv.h>
 BX_PRAGMA_DIAGNOSTIC_POP()
 
 namespace bgfx
 {
-	static bx::CrtAllocator s_allocator;
+	static bx::DefaultAllocator s_allocator;
 	bx::AllocatorI* g_allocator = &s_allocator;
 
 	struct TinyStlAllocator
@@ -49,12 +48,6 @@ namespace bgfx
 namespace stl = tinystl;
 
 #include "../../src/shader_spirv.h"
-
-namespace glslang
-{
-	void GlslangToSpv(const glslang::TIntermediate& _intermediate, std::vector<uint32_t>& _spirv);
-
-} // namespace glslang
 
 namespace bgfx { namespace spirv
 {
@@ -475,6 +468,8 @@ namespace bgfx { namespace spirv
 		return true;
 	}
 
+#define DBG(...)
+
 	void disassemble(bx::WriterI* _writer, bx::ReaderSeekerI* _reader, bx::Error* _err)
 	{
 		BX_UNUSED(_writer);
@@ -495,26 +490,27 @@ namespace bgfx { namespace spirv
 				const SpvReflection::Id& id = it->second;
 				uint32_t num = uint32_t(id.members.size() );
 				if (0 < num
-				&&  0 != strcmp(id.var.name.c_str(), "gl_PerVertex") )
+				&&  0 != bx::strCmp(id.var.name.c_str(), "gl_PerVertex") )
 				{
-					printf("%3d: %s %d %s\n"
+					DBG("%3d: %s %d %s\n"
 						, it->first
 						, id.var.name.c_str()
 						, id.var.location
 						, getName(id.var.storageClass)
 						);
-					printf("{\n");
+					DBG("{\n");
 					for (uint32_t ii = 0; ii < num; ++ii)
 					{
 						const SpvReflection::Id::Variable& var = id.members[ii];
-						printf("\t\t%s %s %d %s\n"
+						DBG("\t\t%s %s %d %s\n"
 							, spvx.getTypeName(var.type).c_str()
 							, var.name.c_str()
 							, var.offset
 							, getName(var.storageClass)
 							);
+						BX_UNUSED(var);
 					}
-					printf("}\n");
+					DBG("}\n");
 				}
 			}
 
@@ -523,10 +519,10 @@ namespace bgfx { namespace spirv
 
 	struct DebugOutputWriter : public bx::WriterI
 	{
-		virtual int32_t write(const void* _data, int32_t _size, bx::Error*) BX_OVERRIDE
+		virtual int32_t write(const void* _data, int32_t _size, bx::Error*) override
 		{
 			char* out = (char*)alloca(_size + 1);
-			memcpy(out, _data, _size);
+			bx::memCopy(out, _data, _size);
 			out[_size] = '\0';
 			printf("%s", out);
 			return _size;
@@ -549,25 +545,18 @@ namespace bgfx { namespace spirv
 //		fprintf(stderr, "%s\n", _message);
 //	}
 
-	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
+	static bool compile(const Options& _options, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
 	{
-		BX_UNUSED(_cmdLine, _version, _code, _writer);
-
-		const char* type = _cmdLine.findOption('\0', "type");
-		if (NULL == type)
-		{
-			fprintf(stderr, "Error: Shader type must be specified.\n");
-			return false;
-		}
+		BX_UNUSED(_version);
 
 		glslang::InitializeProcess();
 
 		glslang::TProgram* program = new glslang::TProgram;
 
-		EShLanguage stage = getLang(type[0]);
+		EShLanguage stage = getLang(_options.shaderType);
 		if (EShLangCount == stage)
 		{
-			fprintf(stderr, "Error: Unknown shader type %s.\n", type);
+			fprintf(stderr, "Error: Unknown shader type '%c'.\n", _options.shaderType);
 			return false;
 		}
 		glslang::TShader* shader = new glslang::TShader(stage);
@@ -606,7 +595,7 @@ namespace bgfx { namespace spirv
 				int32_t start   = 0;
 				int32_t end     = INT32_MAX;
 
-				const char* err = strstr(log, "ERROR:");
+				const char* err = bx::strFind(log, "ERROR:");
 
 				bool found = false;
 
@@ -653,7 +642,7 @@ namespace bgfx { namespace spirv
 					uint16_t count = (uint16_t)program->getNumLiveUniformVariables();
 					bx::write(_writer, count);
 
-					uint32_t fragmentBit = type[0] == 'f' ? BGFX_UNIFORM_FRAGMENTBIT : 0;
+					uint32_t fragmentBit = _options.shaderType == 'f' ? BGFX_UNIFORM_FRAGMENTBIT : 0;
 					for (uint16_t ii = 0; ii < count; ++ii)
 					{
 						Uniform un;
@@ -752,7 +741,7 @@ namespace bgfx { namespace spirv
 
 				if (optimized)
 				{
-					uint16_t shaderSize = (uint16_t)spirv.size()*sizeof(uint32_t);
+					uint32_t shaderSize = (uint32_t)spirv.size()*sizeof(uint32_t);
 					bx::write(_writer, shaderSize);
 					bx::write(_writer, spirv.data(), shaderSize);
 					uint8_t nul = 0;
@@ -771,9 +760,9 @@ namespace bgfx { namespace spirv
 
 } // namespace spirv
 
-	bool compileSPIRVShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
+	bool compileSPIRVShader(const Options& _options, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
 	{
-		return spirv::compile(_cmdLine, _version, _code, _writer);
+		return spirv::compile(_options, _version, _code, _writer);
 	}
 
 } // namespace bgfx

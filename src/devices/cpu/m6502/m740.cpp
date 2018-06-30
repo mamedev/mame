@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "m740.h"
 
-DEFINE_DEVICE_TYPE(M740, m740_device, "m740", "M740")
+DEFINE_DEVICE_TYPE(M740, m740_device, "m740", "Mitsubishi M740")
 
 m740_device::m740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m740_device(mconfig, M740, tag, owner, clock)
@@ -23,9 +23,14 @@ m740_device::m740_device(const machine_config &mconfig, device_type type, const 
 {
 }
 
-offs_t m740_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+u32 m740_device::get_state_base() const
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return inst_state_base;
+}
+
+std::unique_ptr<util::disasm_interface> m740_device::create_disassembler()
+{
+	return std::make_unique<m740_disassembler>(this);
 }
 
 void m740_device::device_start()

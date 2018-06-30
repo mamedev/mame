@@ -160,7 +160,7 @@ void i386_device::pentium_rsm()
 	REG32(ESI) = READ32(smram_state+SMRAM_ESI);
 	REG32(EDI) = READ32(smram_state+SMRAM_EDI);
 	m_eip = READ32(smram_state+SMRAM_EIP);
-	m_eflags = READ32(smram_state+SMRAM_EAX);
+	m_eflags = READ32(smram_state+SMRAM_EFLAGS);
 	m_cr[3] = READ32(smram_state+SMRAM_CR3);
 	m_cr[0] = READ32(smram_state+SMRAM_CR0);
 

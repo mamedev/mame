@@ -5,23 +5,10 @@
 // ********************************************************************************
 
 #include "emu.h"
-#include "hphybrid.h"
-#include "debugger.h"
-
+#include "hphybrid_dasm.h"
 #include "hphybrid_defs.h"
 
-
-typedef void (*fn_dis_param)(std::ostream &stream , offs_t pc , uint16_t opcode , bool is_3001);
-
-typedef struct {
-		uint16_t m_op_mask;
-		uint16_t m_opcode;
-		const char *m_mnemonic;
-		fn_dis_param m_param_fn;
-		uint32_t m_dasm_flags;
-} dis_entry_t;
-
-static void addr_2_str(std::ostream &stream, uint16_t addr , bool indirect , bool is_3001)
+void hp_hybrid_disassembler::addr_2_str(std::ostream &stream, uint16_t addr , bool indirect , bool is_3001)
 {
 	util::stream_format(stream, "$%04x" , addr);
 
@@ -168,11 +155,11 @@ static void addr_2_str(std::ostream &stream, uint16_t addr , bool indirect , boo
 	}
 }
 
-static void param_none(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
+void hp_hybrid_disassembler::param_none(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
 {
 }
 
-static void param_loc(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
+void hp_hybrid_disassembler::param_loc(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
 {
 	uint16_t base;
 	uint16_t off;
@@ -193,12 +180,12 @@ static void param_loc(std::ostream &stream, offs_t pc , uint16_t opcode , bool i
 	addr_2_str(stream, base + off , (opcode & 0x8000) != 0 , is_3001);
 }
 
-static void param_addr32(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
+void hp_hybrid_disassembler::param_addr32(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
 {
 	addr_2_str(stream, opcode & 0x1f , (opcode & 0x8000) != 0 , is_3001);
 }
 
-static void param_skip(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
+void hp_hybrid_disassembler::param_skip(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
 {
 	uint16_t off = opcode & 0x3f;
 	if (off & 0x20) {
@@ -207,7 +194,7 @@ static void param_skip(std::ostream &stream, offs_t pc , uint16_t opcode , bool 
 	addr_2_str(stream , pc + off , false , is_3001);
 }
 
-static void param_skip_sc(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
+void hp_hybrid_disassembler::param_skip_sc(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
 {
 	param_skip(stream, pc, opcode , is_3001);
 
@@ -220,7 +207,7 @@ static void param_skip_sc(std::ostream &stream, offs_t pc , uint16_t opcode , bo
 	}
 }
 
-static void param_ret(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
+void hp_hybrid_disassembler::param_ret(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
 {
 	int off = opcode & 0x3f;
 
@@ -234,12 +221,12 @@ static void param_ret(std::ostream &stream, offs_t pc , uint16_t opcode , bool i
 	}
 }
 
-static void param_n16(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
+void hp_hybrid_disassembler::param_n16(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
 {
 	util::stream_format(stream , "%u" , (opcode & 0xf) + 1);
 }
 
-static void param_reg_id(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
+void hp_hybrid_disassembler::param_reg_id(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
 {
 	addr_2_str(stream, opcode & 7, false , is_3001);
 
@@ -250,133 +237,133 @@ static void param_reg_id(std::ostream &stream, offs_t pc , uint16_t opcode , boo
 	}
 }
 
-static const dis_entry_t dis_table[] = {
+const hp_hybrid_disassembler::dis_entry_t hp_hybrid_disassembler::dis_table[] = {
 		// *** BPC Instructions ***
-		{0xffff , 0x0000 , "NOP" , param_none , 0 },
-		{0x7800 , 0x0000 , "LDA" , param_loc , 0 },
-		{0x7800 , 0x0800 , "LDB" , param_loc , 0 },
-		{0x7800 , 0x1000 , "CPA" , param_loc , 0 },
-		{0x7800 , 0x1800 , "CPB" , param_loc , 0 },
-		{0x7800 , 0x2000 , "ADA" , param_loc , 0 },
-		{0x7800 , 0x2800 , "ADB" , param_loc , 0 },
-		{0x7800 , 0x3000 , "STA" , param_loc , 0 },
-		{0x7800 , 0x3800 , "STB" , param_loc , 0 },
-		{0x7800 , 0x4000 , "JSM" , param_loc , DASMFLAG_STEP_OVER },
-		{0x7800 , 0x4800 , "ISZ" , param_loc , 0 },
-		{0x7800 , 0x5000 , "AND" , param_loc , 0 },
-		{0x7800 , 0x5800 , "DSZ" , param_loc , 0 },
-		{0x7800 , 0x6000 , "IOR" , param_loc , 0 },
-		{0x7800 , 0x6800 , "JMP" , param_loc , 0 },
-		{0x7fe0 , 0x7000 , "EXE" , param_addr32 , 0 },
-		{0xffc0 , 0x7400 , "RZA" , param_skip , 0 },
-		{0xffc0 , 0x7C00 , "RZB" , param_skip , 0 },
-		{0xffc0 , 0x7440 , "RIA" , param_skip , 0 },
-		{0xffc0 , 0x7C40 , "RIB" , param_skip , 0 },
-		{0xffc0 , 0x7500 , "SZA" , param_skip , 0 },
-		{0xffc0 , 0x7D00 , "SZB" , param_skip , 0 },
-		{0xffc0 , 0x7540 , "SIA" , param_skip , 0 },
-		{0xffc0 , 0x7D40 , "SIB" , param_skip , 0 },
-		{0xffc0 , 0x7480 , "SFS" , param_skip , 0 },
-		{0xffc0 , 0x7580 , "SFC" , param_skip , 0 },
-		{0xffc0 , 0x7c80 , "SSS" , param_skip , 0 },
-		{0xffc0 , 0x7d80 , "SSC" , param_skip , 0 },
-		{0xffc0 , 0x7cc0 , "SHS" , param_skip , 0 },
-		{0xffc0 , 0x7dc0 , "SHC" , param_skip , 0 },
-		{0xff00 , 0x7600 , "SLA" , param_skip_sc , 0 },
-		{0xff00 , 0x7e00 , "SLB" , param_skip_sc , 0 },
-		{0xff00 , 0x7700 , "RLA" , param_skip_sc , 0 },
-		{0xff00 , 0x7f00 , "RLB" , param_skip_sc , 0 },
-		{0xff00 , 0xf400 , "SAP" , param_skip_sc , 0 },
-		{0xff00 , 0xfc00 , "SBP" , param_skip_sc , 0 },
-		{0xff00 , 0xf500 , "SAM" , param_skip_sc , 0 },
-		{0xff00 , 0xfd00 , "SBM" , param_skip_sc , 0 },
-		{0xff00 , 0xf600 , "SOC" , param_skip_sc , 0 },
-		{0xff00 , 0xf700 , "SOS" , param_skip_sc , 0 },
-		{0xff00 , 0xfe00 , "SEC" , param_skip_sc , 0 },
-		{0xff00 , 0xff00 , "SES" , param_skip_sc , 0 },
-		{0xffff , 0xf020 , "TCA" , param_none , 0 },
-		{0xffff , 0xf820 , "TCB" , param_none , 0 },
-		{0xffff , 0xf060 , "CMA" , param_none , 0 },
-		{0xffff , 0xf860 , "CMB" , param_none , 0 },
-		{0xff80 , 0xf080 , "RET" , param_ret , DASMFLAG_STEP_OUT },
-		{0xfff0 , 0xf100 , "AAR" , param_n16 , 0 },
-		{0xfff0 , 0xf900 , "ABR" , param_n16 , 0 },
-		{0xffff , 0xf14f , "CLA" , param_none , 0 },
-		{0xfff0 , 0xf140 , "SAR" , param_n16 , 0 },
-		{0xffff , 0xf94f , "CLB" , param_none , 0 },
-		{0xfff0 , 0xf940 , "SBR" , param_n16 , 0 },
-		{0xfff0 , 0xf180 , "SAL" , param_n16 , 0 },
-		{0xfff0 , 0xf980 , "SBL" , param_n16 , 0 },
-		{0xfff0 , 0xf1c0 , "RAR" , param_n16 , 0 },
-		{0xfff0 , 0xf9c0 , "RBR" , param_n16 , 0 },
+		{0xffff , 0x0000 , "NOP" , &hp_hybrid_disassembler::param_none , 0 },
+		{0x7800 , 0x0000 , "LDA" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7800 , 0x0800 , "LDB" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7800 , 0x1000 , "CPA" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7800 , 0x1800 , "CPB" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7800 , 0x2000 , "ADA" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7800 , 0x2800 , "ADB" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7800 , 0x3000 , "STA" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7800 , 0x3800 , "STB" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7800 , 0x4000 , "JSM" , &hp_hybrid_disassembler::param_loc , STEP_OVER },
+		{0x7800 , 0x4800 , "ISZ" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7800 , 0x5000 , "AND" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7800 , 0x5800 , "DSZ" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7800 , 0x6000 , "IOR" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7800 , 0x6800 , "JMP" , &hp_hybrid_disassembler::param_loc , 0 },
+		{0x7fe0 , 0x7000 , "EXE" , &hp_hybrid_disassembler::param_addr32 , 0 },
+		{0xffc0 , 0x7400 , "RZA" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7C00 , "RZB" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7440 , "RIA" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7C40 , "RIB" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7500 , "SZA" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7D00 , "SZB" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7540 , "SIA" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7D40 , "SIB" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7480 , "SFS" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7580 , "SFC" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7c80 , "SSS" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7d80 , "SSC" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7cc0 , "SHS" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xffc0 , 0x7dc0 , "SHC" , &hp_hybrid_disassembler::param_skip , 0 },
+		{0xff00 , 0x7600 , "SLA" , &hp_hybrid_disassembler::param_skip_sc , 0 },
+		{0xff00 , 0x7e00 , "SLB" , &hp_hybrid_disassembler::param_skip_sc , 0 },
+		{0xff00 , 0x7700 , "RLA" , &hp_hybrid_disassembler::param_skip_sc , 0 },
+		{0xff00 , 0x7f00 , "RLB" , &hp_hybrid_disassembler::param_skip_sc , 0 },
+		{0xff00 , 0xf400 , "SAP" , &hp_hybrid_disassembler::param_skip_sc , 0 },
+		{0xff00 , 0xfc00 , "SBP" , &hp_hybrid_disassembler::param_skip_sc , 0 },
+		{0xff00 , 0xf500 , "SAM" , &hp_hybrid_disassembler::param_skip_sc , 0 },
+		{0xff00 , 0xfd00 , "SBM" , &hp_hybrid_disassembler::param_skip_sc , 0 },
+		{0xff00 , 0xf600 , "SOC" , &hp_hybrid_disassembler::param_skip_sc , 0 },
+		{0xff00 , 0xf700 , "SOS" , &hp_hybrid_disassembler::param_skip_sc , 0 },
+		{0xff00 , 0xfe00 , "SEC" , &hp_hybrid_disassembler::param_skip_sc , 0 },
+		{0xff00 , 0xff00 , "SES" , &hp_hybrid_disassembler::param_skip_sc , 0 },
+		{0xffff , 0xf020 , "TCA" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0xf820 , "TCB" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0xf060 , "CMA" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0xf860 , "CMB" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xff80 , 0xf080 , "RET" , &hp_hybrid_disassembler::param_ret , STEP_OUT },
+		{0xfff0 , 0xf100 , "AAR" , &hp_hybrid_disassembler::param_n16 , 0 },
+		{0xfff0 , 0xf900 , "ABR" , &hp_hybrid_disassembler::param_n16 , 0 },
+		{0xffff , 0xf14f , "CLA" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xfff0 , 0xf140 , "SAR" , &hp_hybrid_disassembler::param_n16 , 0 },
+		{0xffff , 0xf94f , "CLB" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xfff0 , 0xf940 , "SBR" , &hp_hybrid_disassembler::param_n16 , 0 },
+		{0xfff0 , 0xf180 , "SAL" , &hp_hybrid_disassembler::param_n16 , 0 },
+		{0xfff0 , 0xf980 , "SBL" , &hp_hybrid_disassembler::param_n16 , 0 },
+		{0xfff0 , 0xf1c0 , "RAR" , &hp_hybrid_disassembler::param_n16 , 0 },
+		{0xfff0 , 0xf9c0 , "RBR" , &hp_hybrid_disassembler::param_n16 , 0 },
 		// *** IOC Instructions ***
-		{0xffff , 0x7100 , "SDO" , param_none , 0 },
-		{0xffff , 0x7108 , "SDI" , param_none , 0 },
-		{0xffff , 0x7110 , "EIR" , param_none , 0 },
-		{0xffff , 0x7118 , "DIR" , param_none , 0 },
-		{0xffff , 0x7120 , "DMA" , param_none , 0 },
-		{0xffff , 0x7128 , "PCM" , param_none , 0 },
-		{0xffff , 0x7138 , "DDR" , param_none , 0 },
-		{0xffff , 0x7140 , "DBL" , param_none , 0 },
-		{0xffff , 0x7148 , "CBL" , param_none , 0 },
-		{0xffff , 0x7150 , "DBU" , param_none , 0 },
-		{0xffff , 0x7158 , "CBU" , param_none , 0 },
-		{0xff78 , 0x7160 , "PWC" , param_reg_id , 0 },
-		{0xff78 , 0x7168 , "PWD" , param_reg_id , 0 },
-		{0xff78 , 0x7960 , "PBC" , param_reg_id , 0 },
-		{0xff78 , 0x7968 , "PBD" , param_reg_id , 0 },
-		{0xff78 , 0x7170 , "WWC" , param_reg_id , 0 },
-		{0xff78 , 0x7178 , "WWD" , param_reg_id , 0 },
-		{0xff78 , 0x7970 , "WBC" , param_reg_id , 0 },
-		{0xff78 , 0x7978 , "WBD" , param_reg_id , 0 },
+		{0xffff , 0x7100 , "SDO" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0x7108 , "SDI" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0x7110 , "EIR" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0x7118 , "DIR" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0x7120 , "DMA" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0x7128 , "PCM" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0x7138 , "DDR" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0x7140 , "DBL" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0x7148 , "CBL" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0x7150 , "DBU" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xffff , 0x7158 , "CBU" , &hp_hybrid_disassembler::param_none , 0 },
+		{0xff78 , 0x7160 , "PWC" , &hp_hybrid_disassembler::param_reg_id , 0 },
+		{0xff78 , 0x7168 , "PWD" , &hp_hybrid_disassembler::param_reg_id , 0 },
+		{0xff78 , 0x7960 , "PBC" , &hp_hybrid_disassembler::param_reg_id , 0 },
+		{0xff78 , 0x7968 , "PBD" , &hp_hybrid_disassembler::param_reg_id , 0 },
+		{0xff78 , 0x7170 , "WWC" , &hp_hybrid_disassembler::param_reg_id , 0 },
+		{0xff78 , 0x7178 , "WWD" , &hp_hybrid_disassembler::param_reg_id , 0 },
+		{0xff78 , 0x7970 , "WBC" , &hp_hybrid_disassembler::param_reg_id , 0 },
+		{0xff78 , 0x7978 , "WBD" , &hp_hybrid_disassembler::param_reg_id , 0 },
 		// *** END ***
 		{0 , 0 , nullptr , nullptr , 0 }
 };
 
-static const dis_entry_t dis_table_emc[] = {
+const hp_hybrid_disassembler::dis_entry_t hp_5061_3001_disassembler::dis_table_emc[] = {
 		// *** EMC Instructions ***
-		{0xffff , 0x7200 , "MWA" , param_none , 0 },
-		{0xffff , 0x7220 , "CMY" , param_none , 0 },
-		{0xffff , 0x7260 , "CMX" , param_none , 0 },
-		{0xffff , 0x7280 , "FXA" , param_none , 0 },
-		{0xfff0 , 0x7300 , "XFR" , param_n16 , 0 },
-		{0xffff , 0x7340 , "NRM" , param_none , 0 },
-		{0xfff0 , 0x7380 , "CLR" , param_n16 , 0 },
-		{0xffff , 0x73c0 , "CDC" , param_none , 0 },
-		{0xffc0 , 0x74c0 , "SDS" , param_skip , 0 },
-		{0xffc0 , 0x75c0 , "SDC" , param_skip , 0 },
-		{0xffff , 0x7a00 , "FMP" , param_none , 0 },
-		{0xffff , 0x7a21 , "FDV" , param_none , 0 },
-		{0xffff , 0x7b00 , "MRX" , param_none , 0 },
-		{0xffff , 0x7b21 , "DRS" , param_none , 0 },
-		{0xffff , 0x7b40 , "MRY" , param_none , 0 },
-		{0xffff , 0x7b61 , "MLY" , param_none , 0 },
-		{0xffff , 0x7b8f , "MPY" , param_none , 0 },
+		{0xffff , 0x7200 , "MWA" , &hp_5061_3001_disassembler::param_none , 0 },
+		{0xffff , 0x7220 , "CMY" , &hp_5061_3001_disassembler::param_none , 0 },
+		{0xffff , 0x7260 , "CMX" , &hp_5061_3001_disassembler::param_none , 0 },
+		{0xffff , 0x7280 , "FXA" , &hp_5061_3001_disassembler::param_none , 0 },
+		{0xfff0 , 0x7300 , "XFR" , &hp_5061_3001_disassembler::param_n16 , 0 },
+		{0xffff , 0x7340 , "NRM" , &hp_5061_3001_disassembler::param_none , 0 },
+		{0xfff0 , 0x7380 , "CLR" , &hp_5061_3001_disassembler::param_n16 , 0 },
+		{0xffff , 0x73c0 , "CDC" , &hp_5061_3001_disassembler::param_none , 0 },
+		{0xffc0 , 0x74c0 , "SDS" , &hp_5061_3001_disassembler::param_skip , 0 },
+		{0xffc0 , 0x75c0 , "SDC" , &hp_5061_3001_disassembler::param_skip , 0 },
+		{0xffff , 0x7a00 , "FMP" , &hp_5061_3001_disassembler::param_none , 0 },
+		{0xffff , 0x7a21 , "FDV" , &hp_5061_3001_disassembler::param_none , 0 },
+		{0xffff , 0x7b00 , "MRX" , &hp_5061_3001_disassembler::param_none , 0 },
+		{0xffff , 0x7b21 , "DRS" , &hp_5061_3001_disassembler::param_none , 0 },
+		{0xffff , 0x7b40 , "MRY" , &hp_5061_3001_disassembler::param_none , 0 },
+		{0xffff , 0x7b61 , "MLY" , &hp_5061_3001_disassembler::param_none , 0 },
+		{0xffff , 0x7b8f , "MPY" , &hp_5061_3001_disassembler::param_none , 0 },
 				// *** Undocumented instructions of 5061-3001 ***
-				{0xffff , 0x7026 , "CIM" , param_none , 0 },
-				{0xffff , 0x7027 , "SIM" , param_none , 0 },
+				{0xffff , 0x7026 , "CIM" , &hp_5061_3001_disassembler::param_none , 0 },
+				{0xffff , 0x7027 , "SIM" , &hp_5061_3001_disassembler::param_none , 0 },
 		// *** END ***
 		{0 , 0 , nullptr , nullptr , 0 }
 };
 
-static offs_t disassemble_table(uint16_t opcode , offs_t pc , const dis_entry_t *table , bool is_3001 , std::ostream &stream)
+offs_t hp_hybrid_disassembler::disassemble_table(uint16_t opcode , offs_t pc , const dis_entry_t *table , bool is_3001 , std::ostream &stream)
 {
 	const dis_entry_t *p;
 
 	for (p = table; p->m_op_mask; p++) {
 		if ((opcode & p->m_op_mask) == p->m_opcode) {
 			stream << p->m_mnemonic << " ";
-			p->m_param_fn(stream , pc , opcode , is_3001);
-			return 1 | p->m_dasm_flags | DASMFLAG_SUPPORTED;
+			(this->*(p->m_param_fn))(stream , pc , opcode , is_3001);
+			return 1 | p->m_dasm_flags | SUPPORTED;
 		}
 	}
 
 	return 0;
 }
 
-CPU_DISASSEMBLE(hp_hybrid)
+offs_t hp_hybrid_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint16_t opcode = ((uint16_t)oprom[ 0 ] << 8) | oprom[ 1 ];
+	uint16_t opcode = opcodes.r16(pc);
 	offs_t res;
 
 	res = disassemble_table(opcode, pc, dis_table, false, stream);
@@ -385,15 +372,15 @@ CPU_DISASSEMBLE(hp_hybrid)
 	{
 		// Unknown opcode
 		stream << "???";
-		res = 1 | DASMFLAG_SUPPORTED;
+		res = 1 | SUPPORTED;
 	}
 
 	return res;
 }
 
-CPU_DISASSEMBLE(hp_5061_3001)
+offs_t hp_5061_3001_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint16_t opcode = ((uint16_t)oprom[ 0 ] << 8) | oprom[ 1 ];
+	uint16_t opcode = opcodes.r16(pc);
 	offs_t res;
 
 	res = disassemble_table(opcode, pc, dis_table_emc, true, stream);
@@ -407,8 +394,13 @@ CPU_DISASSEMBLE(hp_5061_3001)
 	{
 		// Unknown opcode
 		stream << "???";
-		res = 1 | DASMFLAG_SUPPORTED;
+		res = 1 | SUPPORTED;
 	}
 
 	return res;
+}
+
+u32 hp_hybrid_disassembler::opcode_alignment() const
+{
+	return 1;
 }

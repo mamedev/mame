@@ -29,12 +29,12 @@ protected:
 	// device_execute_interface overrides
 	virtual void execute_one() override;
 
-	// device_disasm_interface overrides
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
-
 	// timers
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void write_v(uint8_t data) override;
+
+	void data_128x4(address_map &map);
+	void program_2kx9(address_map &map);
 
 	emu_timer *m_timer;
 	void reset_timer();

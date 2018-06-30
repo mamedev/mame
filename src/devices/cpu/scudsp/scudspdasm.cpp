@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Mariusz Wojcieszek
 #include "emu.h"
-#include "debugger.h"
-#include "scudsp.h"
+#include "scudspdasm.h"
 
-static const char *const ALU_Commands[] =
+const char *const scudsp_disassembler::ALU_Commands[] =
 {
 	"    ",     /* 0000 */
 	"AND ",  /* 0001 */
@@ -24,7 +23,7 @@ static const char *const ALU_Commands[] =
 	"RL8 ",  /* 1111 */
 };
 
-static const char *const X_Commands[] =
+const char *const scudsp_disassembler::X_Commands[] =
 {
 	"",             /* 000 */
 	"",             /* 001 */   /* NOP? check instruction @ 0x0B */
@@ -33,7 +32,7 @@ static const char *const X_Commands[] =
 	"MOV %s,X",     /* 100 */
 };
 
-static const char *const Y_Commands[] =
+const char *const scudsp_disassembler::Y_Commands[] =
 {
 	"",             /* 000 */
 	"CLR A",        /* 001 */
@@ -42,7 +41,7 @@ static const char *const Y_Commands[] =
 	"MOV %s,Y",     /* 100 */
 };
 
-static const char *const D1_Commands[] =
+const char *const scudsp_disassembler::D1_Commands[] =
 {
 	"",                 /* 00 */
 	"MOV %I8,%d",       /* 01 */
@@ -50,7 +49,7 @@ static const char *const D1_Commands[] =
 	"MOV %S,%d",        /* 11 */
 };
 
-static const char *const SourceMemory[] =
+const char *const scudsp_disassembler::SourceMemory[] =
 {
 	"M0",           /* 000 */
 	"M1",           /* 001 */
@@ -62,7 +61,7 @@ static const char *const SourceMemory[] =
 	"MC3",          /* 111 */
 };
 
-static const char *const SourceMemory2[] =
+const char *const scudsp_disassembler::SourceMemory2[] =
 {
 	"M0",           /* 0000 */
 	"M1",           /* 0001 */
@@ -82,7 +81,7 @@ static const char *const SourceMemory2[] =
 	"???",          /* 1111 */
 };
 
-static const char *const DestMemory[] =
+const char *const scudsp_disassembler::DestMemory[] =
 {
 	"MC0",          /* 0000 */
 	"MC1",          /* 0001 */
@@ -102,7 +101,7 @@ static const char *const DestMemory[] =
 	"CT3",          /* 1111 */
 };
 
-static const char *const DestDMAMemory[] =
+const char *const scudsp_disassembler::DestDMAMemory[] =
 {
 	"M0",           /* 000 */
 	"M1",           /* 001 */
@@ -114,19 +113,19 @@ static const char *const DestDMAMemory[] =
 	"???",          /* 111 */
 };
 
-static const char *const MVI_Command[] =
+const char *const scudsp_disassembler::MVI_Command[] =
 {
 	"MVI %I,%d",    /* 0 */
 	"MVI %I,%d,%f", /* 1 */
 };
 
-static const char *const JMP_Command[] =
+const char *const scudsp_disassembler::JMP_Command[] =
 {
 	"JMP %IA",
 	"JMP %f,%IA",
 };
 
-static const char *const DMA_Command[] =
+const char *const scudsp_disassembler::DMA_Command[] =
 {
 	"DMA%H%A D0,%M,%I",
 	"DMA%H%A %s,D0,%I",
@@ -135,8 +134,9 @@ static const char *const DMA_Command[] =
 };
 
 
-static void scudsp_dasm_prefix( const char* format, char* buffer, uint32_t *data )
+std::string scudsp_disassembler::scudsp_dasm_prefix( const char* format, uint32_t *data )
 {
+	std::string result;
 	for ( ; *format; format++ )
 	{
 		if ( *format == '%' )
@@ -145,104 +145,82 @@ static void scudsp_dasm_prefix( const char* format, char* buffer, uint32_t *data
 			{
 				case 'H':
 					if ( *data )
-					{
-						strcpy( buffer, "H" );
-					}
-					else
-					{
-						*buffer = 0;
-					}
+						result += 'H';
 					break;
 				case 'A':
 					if ( *data == 0 )
-					{
-						strcpy( buffer, "0" );
-					}
-					else if ( *data == 1 )
-					{
-						*buffer = 0;
-					}
-					else
-					{
-						sprintf( buffer, "%d", 1 << (*data - 1) );
-					}
+						result += '0';
+					else if ( *data != 1 )
+						result += util::string_format("%d",  1 << (*data - 1) );
 					break;
 				case 's':
-					strcpy( buffer, SourceMemory[ *data & 0x7 ] );
+					result += SourceMemory[ *data & 0x7 ];
 					break;
 				case 'd':
-					strcpy( buffer, DestMemory[ *data & 0xf ] );
+					result += DestMemory[ *data & 0xf ];
 					break;
 				case 'S':
-					strcpy( buffer, SourceMemory2[ *data & 0xf ] );
+					result += SourceMemory2[ *data & 0xf ];
 					break;
 				case 'I':
 					++format;
 					if ( *format == '8' )
-					{
-						sprintf( buffer, "#$%x", *data );
-					}
+						result += util::string_format("#$%x", *data );
 					else if ( *format == 'A' )
-					{
-						sprintf( buffer, "$%X", *data );
-					}
+						result += util::string_format("$%X", *data );
 					else
 					{
 						--format;
-						sprintf( buffer, "#$%X", *data );
+						result += util::string_format("#$%X", *data );
 					}
 					break;
 				case 'f':
 					if ( !(*data & 0x20) )
-					{
-						strcpy( buffer, "N" );
-						buffer++;
-					}
+						result += 'N';
 					switch( *data & 0xf )
 					{
 						case 0x3:
-							strcpy( buffer, "ZS" );
+							result += "ZS";
 							break;
 						case 0x2:
-							strcpy( buffer, "S" );
+							result += 'S';
 							break;
 						case 0x4:
-							strcpy( buffer, "C" );
+							result += 'C';
 							break;
 						case 0x8:
-							strcpy( buffer, "T0" );
+							result += "T0";
 							break;
 						case 0x1:
-							strcpy( buffer, "Z" );
+							result += 'Z';
 							break;
 						default:
-							strcpy( buffer, "?" );
+							result += '?';
 							break;
 					}
 					break;
 				case 'M':
-					strcpy( buffer, DestDMAMemory[ *data ] );
+					result += DestDMAMemory[ *data ];
 					break;
 
 			}
 			data++;
-			buffer += strlen( buffer );
 		}
 		else
-		{
-			*buffer++ = *format;
-		}
+			result += *format;
 	}
-	*buffer = 0;
+	return result;
 }
 
-
-CPU_DISASSEMBLE(scudsp)
+u32 scudsp_disassembler::opcode_alignment() const
 {
-	uint32_t op = oprom[0]<<24|oprom[1]<<16|oprom[2]<<8|oprom[3]<<0;
+	return 1;
+}
+
+offs_t scudsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	uint32_t op = opcodes.r32(pc);
 	unsigned size = 1;
-//  const char *sym, *sym2;
-	char temp_buffer[64];
 	uint32_t data[4];
 
 	switch( op >> 30 )
@@ -260,31 +238,15 @@ CPU_DISASSEMBLE(scudsp)
 			/* X-Bus */
 			data[0] = (op & 0x700000) >> 20;
 			if ( op & 0x2000000 )
-			{
-				scudsp_dasm_prefix( X_Commands[ 4 ], temp_buffer, data );
-			}
-			else
-			{
-				*temp_buffer = 0;
-			}
-			util::stream_format(stream, "%s", temp_buffer);
+				stream << scudsp_dasm_prefix( X_Commands[ 4 ], data );
 
-			scudsp_dasm_prefix( X_Commands[ (op & 0x1800000) >> 23 ], temp_buffer,  data );
-			util::stream_format(stream, "%s", temp_buffer);
+			stream << scudsp_dasm_prefix( X_Commands[ (op & 0x1800000) >> 23 ], data );
 
 			data[0] = (op & 0x1C000 ) >> 14 ;
 			if ( op & 0x80000 )
-			{
-				scudsp_dasm_prefix( Y_Commands[4], temp_buffer, data );
-			}
-			else
-			{
-				*temp_buffer = 0;
-			}
-			util::stream_format(stream, "%s", temp_buffer);
+				stream << scudsp_dasm_prefix( Y_Commands[4], data );
 
-			scudsp_dasm_prefix( Y_Commands[ (op & 0x60000) >> 17 ], temp_buffer,  data );
-			util::stream_format(stream, "%s", temp_buffer);
+			stream << scudsp_dasm_prefix( Y_Commands[ (op & 0x60000) >> 17 ], data );
 
 			/* D1-Bus */
 			switch( (op & 0x3000) >> 12 )
@@ -299,8 +261,7 @@ CPU_DISASSEMBLE(scudsp)
 					break;
 			}
 
-			scudsp_dasm_prefix( D1_Commands[ (op & 0x3000) >> 12 ], temp_buffer, data);
-			util::stream_format(stream, "%s", temp_buffer);
+			stream << scudsp_dasm_prefix( D1_Commands[ (op & 0x3000) >> 12 ], data);
 			break;
 		case 2:
 			if ( (op & 0x2000000) )
@@ -308,15 +269,13 @@ CPU_DISASSEMBLE(scudsp)
 				data[0] = op & 0x7FFFF;
 				data[1] = (op & 0x3C000000) >> 26;
 				data[2] = (op & 0x3F80000 ) >> 19;
-				scudsp_dasm_prefix( MVI_Command[1], temp_buffer, data); /* TODO: bad mem*/
-				stream << temp_buffer;
+				stream << scudsp_dasm_prefix( MVI_Command[1], data); /* TODO: bad mem*/
 			}
 			else
 			{
 				data[0] = op & 0x1FFFFFF;
 				data[1] = (op & 0x3C000000) >> 26;
-				scudsp_dasm_prefix( MVI_Command[0], temp_buffer, data ); /* TODO: bad mem*/
-				stream << temp_buffer;
+				stream << scudsp_dasm_prefix( MVI_Command[0], data ); /* TODO: bad mem*/
 			}
 			break;
 		case 3:
@@ -327,22 +286,19 @@ CPU_DISASSEMBLE(scudsp)
 					data[1] = (op & 0x38000) >> 15; /* A */
 					data[2] = (op & 0x700) >> 8; /* Mem */
 					data[3] = (op & 0xff);
-					scudsp_dasm_prefix( DMA_Command[(op & 0x3000) >> 12], temp_buffer, data );
-					stream << temp_buffer;
+					stream << scudsp_dasm_prefix( DMA_Command[(op & 0x3000) >> 12], data );
 					break;
 				case 1:
 					if ( op & 0x3F80000 )
 					{
 						data[0] = (op & 0x3F80000) >> 19;
 						data[1] = op & 0xff;
-						scudsp_dasm_prefix( JMP_Command[1], temp_buffer, data );
-						stream << temp_buffer;
+						stream << scudsp_dasm_prefix( JMP_Command[1], data );
 					}
 					else
 					{
 						data[0] = op & 0xff;
-						scudsp_dasm_prefix( JMP_Command[0], temp_buffer, data );
-						stream << temp_buffer;
+						stream << scudsp_dasm_prefix( JMP_Command[0], data );
 					}
 					break;
 				case 2:

@@ -13,6 +13,7 @@
 
 #include "graphics.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 
 
 
@@ -51,6 +52,8 @@ protected:
 
 private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );
+
+	void hrg_map(address_map &map);
 };
 
 
@@ -68,6 +71,8 @@ protected:
 
 private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );
+
+	void uhrg_map(address_map &map);
 };
 
 

@@ -37,20 +37,11 @@ public:
 	pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* Callbacks */
-	template <class Object> static devcb_base &m68k_r_callback(device_t &device, Object &&cb) { return downcast<pdc_device &>(device).m_m68k_r_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &m68k_w_callback(device_t &device, Object &&cb) { return downcast<pdc_device &>(device).m_m68k_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &m68k_r_callback(Object &&cb) { return m_m68k_r_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &m68k_w_callback(Object &&cb) { return m_m68k_w_cb.set_callback(std::forward<Object>(cb)); }
 
 	/* Read and Write members */
 	DECLARE_WRITE_LINE_MEMBER(hdd_irq);
-
-	DECLARE_READ8_MEMBER(p0_7_r);
-	DECLARE_WRITE8_MEMBER(p0_7_w);
-	DECLARE_READ8_MEMBER(fdd_68k_r);
-	DECLARE_WRITE8_MEMBER(fdd_68k_w);
-	DECLARE_WRITE8_MEMBER(p38_w);
-	DECLARE_READ8_MEMBER(p38_r);
-	DECLARE_READ8_MEMBER(p39_r);
-	DECLARE_WRITE8_MEMBER(p50_5f_w);
 
 	/* Main CPU accessible registers */
 	uint8_t reg_p0;
@@ -88,6 +79,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	DECLARE_READ8_MEMBER(p0_7_r);
+	DECLARE_WRITE8_MEMBER(p0_7_w);
+	DECLARE_READ8_MEMBER(fdd_68k_r);
+	DECLARE_WRITE8_MEMBER(fdd_68k_w);
+	DECLARE_WRITE8_MEMBER(p38_w);
+	DECLARE_READ8_MEMBER(p38_r);
+	DECLARE_READ8_MEMBER(p39_r);
+	DECLARE_WRITE8_MEMBER(p50_5f_w);
+
+	void pdc_io(address_map &map);
+	void pdc_mem(address_map &map);
+
 	/* Protected variables */
 	//uint32_t fdd_68k_dma_address;
 	bool b_fdc_irq;
@@ -108,13 +111,12 @@ private:
 };
 
 /* Device type */
-extern const device_type PDC;
 DECLARE_DEVICE_TYPE(PDC, pdc_device)
 
 /* MCFG defines */
 #define MCFG_PDC_R_CB(_devcb) \
-	devcb = &pdc_device::m68k_r_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<pdc_device &>(*device).m68k_r_callback(DEVCB_##_devcb);
 #define MCFG_PDC_W_CB(_devcb) \
-	devcb = &pdc_device::m68k_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<pdc_device &>(*device).m68k_w_callback(DEVCB_##_devcb);
 
 #endif // MAME_MACHINE_PDC_H

@@ -11,7 +11,7 @@
 #	define SDL_MAIN_HANDLED
 #endif // BX_PLATFORM_WINDOWS
 
-#include <bx/bx.h>
+#include <bx/os.h>
 
 #include <SDL2/SDL.h>
 
@@ -25,12 +25,10 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 #	undef None
 #endif // defined(None)
 
-#include <stdio.h>
 #include <bx/mutex.h>
 #include <bx/thread.h>
 #include <bx/handlealloc.h>
 #include <bx/readerwriter.h>
-#include <bx/crtimpl.h>
 #include <tinystl/allocator.h>
 #include <tinystl/string.h>
 
@@ -251,7 +249,7 @@ namespace entry
 		int m_argc;
 		char** m_argv;
 
-		static int32_t threadFunc(void* _userData);
+		static int32_t threadFunc(bx::Thread* _thread, void* _userData);
 	};
 
 	///
@@ -487,16 +485,25 @@ namespace entry
 			WindowHandle defaultWindow = { 0 };
 			setWindowSize(defaultWindow, m_width, m_height, true);
 
-			bx::FileReaderI* reader = getFileReader();
+			bx::FileReaderI* reader = NULL;
+			while (NULL == reader)
+			{
+				reader = getFileReader();
+				bx::sleep(100);
+			}
+
 			if (bx::open(reader, "gamecontrollerdb.txt") )
 			{
 				bx::AllocatorI* allocator = getAllocator();
 				uint32_t size = (uint32_t)bx::getSize(reader);
-				void* data = BX_ALLOC(allocator, size);
+				void* data = BX_ALLOC(allocator, size + 1);
 				bx::read(reader, data, size);
 				bx::close(reader);
+				((char*)data)[size] = '\0';
 
-				SDL_GameControllerAddMapping( (char*)data);
+				if (SDL_GameControllerAddMapping( (char*)data) < 0) {
+					DBG("SDL game controller add mapping failed: %s", SDL_GetError());
+				}
 
 				BX_FREE(allocator, data);
 			}
@@ -1083,8 +1090,10 @@ namespace entry
 		sdlPostEvent(SDL_USER_WINDOW_MOUSE_LOCK, _handle, NULL, _lock);
 	}
 
-	int32_t MainThreadEntry::threadFunc(void* _userData)
+	int32_t MainThreadEntry::threadFunc(bx::Thread* _thread, void* _userData)
 	{
+		BX_UNUSED(_thread);
+
 		MainThreadEntry* self = (MainThreadEntry*)_userData;
 		int32_t result = main(self->m_argc, self->m_argv);
 

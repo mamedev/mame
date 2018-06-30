@@ -20,21 +20,25 @@ namespace bgfx { namespace gl
 	struct SwapChainGL
 	{
 		SwapChainGL(EAGLContext *_context, CAEAGLLayer *_layer)
-		: m_context(_context)
-		, m_fbo(0)
-		, m_colorRbo(0)
-		, m_depthStencilRbo(0)
+			: m_context(_context)
+			, m_fbo(0)
+			, m_colorRbo(0)
+			, m_depthStencilRbo(0)
 		{
 			_layer.contentsScale = [UIScreen mainScreen].scale;
 
-			_layer.opaque = [_layer.style valueForKey:@"opaque"] == nil ? true : [[_layer.style valueForKey:@"opaque"] boolValue];
+			_layer.opaque = [_layer.style valueForKey:@"opaque"] == nil
+				? true
+				: [[_layer.style valueForKey:@"opaque"] boolValue]
+				;
 
 			_layer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys
-											: [NSNumber numberWithBool:false]
-											, kEAGLDrawablePropertyRetainedBacking
-											, kEAGLColorFormatRGBA8
-											, kEAGLDrawablePropertyColorFormat
-											, nil];
+				: [NSNumber numberWithBool:false]
+				, kEAGLDrawablePropertyRetainedBacking
+				, kEAGLColorFormatRGBA8
+				, kEAGLDrawablePropertyColorFormat
+				, nil
+				];
 
 			[EAGLContext setCurrentContext:_context];
 
@@ -72,20 +76,20 @@ namespace bgfx { namespace gl
 			GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, 0) );
 			if (0 != m_fbo)
 			{
-			    GL_CHECK(glDeleteFramebuffers(1, &m_fbo) );
-			    m_fbo = 0;
+				GL_CHECK(glDeleteFramebuffers(1, &m_fbo) );
+				m_fbo = 0;
 			}
 
 			if (0 != m_colorRbo)
 			{
-			    GL_CHECK(glDeleteRenderbuffers(1, &m_colorRbo) );
-			    m_colorRbo = 0;
+				GL_CHECK(glDeleteRenderbuffers(1, &m_colorRbo) );
+				m_colorRbo = 0;
 			}
 
 			if (0 != m_depthStencilRbo)
 			{
-			    GL_CHECK(glDeleteRenderbuffers(1, &m_depthStencilRbo) );
-			    m_depthStencilRbo = 0;
+				GL_CHECK(glDeleteRenderbuffers(1, &m_depthStencilRbo) );
+				m_depthStencilRbo = 0;
 			}
 		}
 
@@ -93,20 +97,23 @@ namespace bgfx { namespace gl
 		{
 			GL_CHECK(glGenRenderbuffers(1, &m_depthStencilRbo) );
 			GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilRbo) );
-			GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, _width, _height) ); // from OES_packed_depth_stencil
+			GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _width, _height) );
 			GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
 			GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
 
-			BX_CHECK(GL_FRAMEBUFFER_COMPLETE ==  glCheckFramebufferStatus(GL_FRAMEBUFFER)
-						, "glCheckFramebufferStatus failed 0x%08x"
-						, glCheckFramebufferStatus(GL_FRAMEBUFFER)
-						);
+			GLenum err = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			BX_CHECK(GL_FRAMEBUFFER_COMPLETE == err, "glCheckFramebufferStatus failed 0x%08x", err);
+			BX_UNUSED(err);
 
 			makeCurrent();
+
 			GL_CHECK(glClearColor(0.0f, 0.0f, 0.0f, 0.0f) );
 			GL_CHECK(glClear(GL_COLOR_BUFFER_BIT) );
+
 			swapBuffers();
+
 			GL_CHECK(glClear(GL_COLOR_BUFFER_BIT) );
+
 			swapBuffers();
 		}
 
@@ -162,15 +169,24 @@ namespace bgfx { namespace gl
 		layer.opaque = [layer.style valueForKey:@"opaque"] == nil ? true : [[layer.style valueForKey:@"opaque"] boolValue];
 
 		layer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys
-										: [NSNumber numberWithBool:false]
-										, kEAGLDrawablePropertyRetainedBacking
-										, kEAGLColorFormatRGBA8
-										, kEAGLDrawablePropertyColorFormat
-										, nil
-										];
+			: [NSNumber numberWithBool:false]
+			, kEAGLDrawablePropertyRetainedBacking
+			, kEAGLColorFormatRGBA8
+			, kEAGLDrawablePropertyColorFormat
+			, nil
+			];
 
-		EAGLContext* context = [ [EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-		BX_CHECK(NULL != context, "Failed to create kEAGLRenderingAPIOpenGLES2 context.");
+		EAGLContext* context = (EAGLContext*)g_platformData.context;
+		if (NULL == context)
+		{
+			context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
+			if (NULL == context)
+			{
+				context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+			}
+		}
+		BX_CHECK(NULL != context, "No valid OpenGLES context.");
+
 		m_context = (void*)context;
 		[EAGLContext setCurrentContext:context];
 
@@ -191,7 +207,7 @@ namespace bgfx { namespace gl
 
 		GL_CHECK(glGenRenderbuffers(1, &m_depthStencilRbo) );
 		GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilRbo) );
-		GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, width, height) ); // from OES_packed_depth_stencil
+		GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height) );
 		GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
 		GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
 
@@ -278,7 +294,7 @@ namespace bgfx { namespace gl
 
 		GL_CHECK(glGenRenderbuffers(1, &m_depthStencilRbo) );
 		GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilRbo) );
-		GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, width, height) ); // from OES_packed_depth_stencil
+		GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height) );
 		GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
 		GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
 
@@ -340,18 +356,20 @@ namespace bgfx { namespace gl
 	void GlContext::import()
 	{
 		BX_TRACE("Import:");
-#	define GL_EXTENSION(_optional, _proto, _func, _import) \
-		{ \
-			if (_func == NULL) \
-			{ \
-				_func = (_proto)bx::dlsym(s_opengles, #_import); \
-				BX_TRACE("%p " #_func " (" #_import ")", _func); \
-			} \
-			BGFX_FATAL(_optional || NULL != _func, Fatal::UnableToInitialize, "Failed to create OpenGLES context. EAGLGetProcAddress(\"%s\")", #_import); \
+#	define GL_EXTENSION(_optional, _proto, _func, _import)                        \
+		{                                                                         \
+			if (_func == NULL)                                                    \
+			{                                                                     \
+				_func = (_proto)bx::dlsym(s_opengles, #_import);                  \
+				BX_TRACE("%p " #_func " (" #_import ")", _func);                  \
+			}                                                                     \
+			BGFX_FATAL(_optional || NULL != _func, Fatal::UnableToInitialize      \
+				, "Failed to create OpenGLES context. EAGLGetProcAddress(\"%s\")" \
+				, #_import);                                                      \
 		}
 #	include "glimports.h"
 	}
 
 } /* namespace gl */ } // namespace bgfx
 
-#endif // BX_PLATFORM_IOS && (BGFX_CONFIG_RENDERER_OPENGLES2|BGFX_CONFIG_RENDERER_OPENGLES3|BGFX_CONFIG_RENDERER_OPENGL)
+#endif // BX_PLATFORM_IOS && (BGFX_CONFIG_RENDERER_OPENGLES|BGFX_CONFIG_RENDERER_OPENGL)

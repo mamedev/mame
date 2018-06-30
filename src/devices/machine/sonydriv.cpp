@@ -272,8 +272,9 @@ int sony_read_status(device_t *device)
 
 	if (LOG_SONY_EXTRA)
 	{
-		printf("sony.status(): action=%x pc=0x%08x%s\n",
-			action, (int) device->machine().firstcpu->pc(), sony.floppy_enable ? "" : " (no drive enabled)");
+		device->logerror("%s sony.status(): action=%x%s\n",
+			device->machine().describe_context(),
+			action, sony.floppy_enable ? "" : " (no drive enabled)");
 	}
 
 	if ((! sony_enable2()) && sony.floppy_enable)
@@ -429,6 +430,12 @@ static void sony_doaction(device_t *device)
 			break;
 		case 0x03:  /* Reset diskswitched */
 			f->disk_switched = 0;
+			// flopdrv.cpp won't reset its disk switch flag without
+			// doing a seek.  So we do a seek of 0 tracks, which works.
+			if (cur_image)
+			{
+				cur_image->floppy_drive_seek(0);
+			}
 			break;
 		case 0x04:  /* Step disk */
 			if (cur_image)
@@ -471,7 +478,7 @@ void sony_set_lines(device_t *device,uint8_t lines)
 
 	{
 		//int action = ((sony.lines & (SONY_CA1 | SONY_CA0)) << 2) | (sony.sel_line << 1) | ((sony.lines & SONY_CA2) >> 2);
-		//printf("sony.set_lines: %02x, action now %d\n", lines&0xf, action);
+		//logerror("sony.set_lines: %02x, action now %d\n", lines&0xf, action);
 	}
 
 	/* have we just set LSTRB ? */
@@ -513,7 +520,7 @@ void sony_set_sel_line(device_t *device,int sel)
 
 	{
 		//int action = ((sony.lines & (SONY_CA1 | SONY_CA0)) << 2) | (sony.sel_line << 1) | ((sony.lines & SONY_CA2) >> 2);
-		//printf("sony.set_sel_line: %d, action now %d\n", sony.sel_line, action);
+		//logerror("sony.set_sel_line: %d, action now %d\n", sony.sel_line, action);
 	}
 
 	if (LOG_SONY_EXTRA)

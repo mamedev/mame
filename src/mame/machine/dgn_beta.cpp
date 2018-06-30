@@ -149,7 +149,7 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 	int                 MapPage;
 	char                page_num[10];
 
-	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,space_0.device().safe_pc()));
+	LOG_BANK_UPDATE(("\n\n%s Updating banks %d to %d\n", machine().describe_context(), first, last));
 	for(Page=first;Page<=last;Page++)
 	{
 		sprintf(page_num,"bank%d",Page+1);
@@ -946,9 +946,9 @@ void dgn_beta_state::machine_start()
   OS9 Syscalls for disassembly
 ****************************************************************************/
 
-offs_t dgn_beta_state::dgnbeta_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t dgn_beta_state::dgnbeta_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
 {
-	return coco_state::os9_dasm_override(device, stream, pc, oprom, opram, options);
+	return coco_state::os9_dasm_override(stream, pc, opcodes, params);
 }
 
 void dgn_beta_state::execute_beta_dat_log(int ref, const std::vector<std::string> &params)

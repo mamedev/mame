@@ -6,8 +6,7 @@
 *******************************************/
 
 #include "emu.h"
-#include "debugger.h"
-#include "v810.h"
+#include "v810dasm.h"
 
 #define I5(x) (((x)&0x1f)|(((x)&0x10)?0xffffffe0:0))
 #define UI5(x) ((x)&0x1f)
@@ -17,7 +16,7 @@
 #define D26(x,y) ((y)|((x&0x3ff)<<16 )|((x&0x200)?0xfc000000:0))
 #define D9(x) ((x&0x1ff)|((x&0x100)?0xfffffe00:0))
 
-static const char *const dRegs[]=
+const char *const v810_disassembler::dRegs[]=
 {
 "R0","R1","R2","SP","R4",
 "R5","R6","R7","R8","R9",
@@ -39,13 +38,18 @@ static const char *const dRegs[]=
 #define GET2s(opcode) dRegs[((opcode)>>5)&0x1f]
 #define GETRs(opcode) dRegs[32+((opcode)&0x1f)]
 
-CPU_DISASSEMBLE(v810)
+u32 v810_disassembler::opcode_alignment() const
+{
+	return 2;
+}
+
+offs_t v810_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
 	uint32_t opc,opc2;
 	unsigned size;
-	opc = oprom[0] | (oprom[1] << 8);
-	opc2 = oprom[2] | (oprom[3] << 8);
+	opc = opcodes.r16(pc);
+	opc2 = opcodes.r16(pc+2);
 
 	switch(opc>>10)
 	{
@@ -55,7 +59,7 @@ CPU_DISASSEMBLE(v810)
 		case 0x03: util::stream_format(stream,"CMP %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
 		case 0x04: util::stream_format(stream,"SHL %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
 		case 0x05: util::stream_format(stream,"SHR %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x06: util::stream_format(stream,"JMP [%s]",GET1s(opc)); size=2; if ((opc&0x1f) == 31) flags = DASMFLAG_STEP_OUT; break;
+		case 0x06: util::stream_format(stream,"JMP [%s]",GET1s(opc)); size=2; if ((opc&0x1f) == 31) flags = STEP_OUT; break;
 		case 0x07: util::stream_format(stream,"SAR %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
 		case 0x08: util::stream_format(stream,"MUL %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
 		case 0x09: util::stream_format(stream,"DIV %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
@@ -74,7 +78,7 @@ CPU_DISASSEMBLE(v810)
 		case 0x16: util::stream_format(stream,"EI"); size=2; break;
 		case 0x17: util::stream_format(stream,"SAR %X,%s",UI5(opc),GET2s(opc)); size=2; break;
 		case 0x18: util::stream_format(stream,"TRAP %X",I5(opc)); size=2; break;
-		case 0x19: util::stream_format(stream,"RETI"); size=2; flags = DASMFLAG_STEP_OUT; break;
+		case 0x19: util::stream_format(stream,"RETI"); size=2; flags = STEP_OUT; break;
 		case 0x1a: util::stream_format(stream,"HALT"); size=2; break;
 		case 0x1b: util::stream_format(stream,"Unk 0x1B"); size=2; break;
 		case 0x1c: util::stream_format(stream,"LDSR %s,%s",GET2s(opc),GETRs(opc));size=2; break;
@@ -134,7 +138,7 @@ CPU_DISASSEMBLE(v810)
 		case 0x28:  util::stream_format(stream,"MOVEA %X, %s, %s",I16(opc2),GET1s(opc),GET2s(opc));size=4; break;
 		case 0x29:  util::stream_format(stream,"ADDI %X, %s, %s",I16(opc2),GET1s(opc),GET2s(opc));size=4; break;
 		case 0x2a:  util::stream_format(stream,"JR %X",pc+D26(opc,opc2));size=4; break;
-		case 0x2b:  util::stream_format(stream,"JAL %X",pc+D26(opc,opc2));size=4; flags = DASMFLAG_STEP_OVER; break;
+		case 0x2b:  util::stream_format(stream,"JAL %X",pc+D26(opc,opc2));size=4; flags = STEP_OVER; break;
 		case 0x2c:  util::stream_format(stream,"ORI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
 		case 0x2d:  util::stream_format(stream,"ANDI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
 		case 0x2e:  util::stream_format(stream,"XORI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
@@ -173,5 +177,5 @@ CPU_DISASSEMBLE(v810)
 
 		default : size=2;
 	}
-	return size | flags | DASMFLAG_SUPPORTED;
+	return size | flags | SUPPORTED;
 }

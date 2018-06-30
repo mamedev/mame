@@ -63,6 +63,8 @@ std::vector<submenu::option> const submenu::advanced_options = {
 
 	{ submenu::option_type::HEAD, __("State/Playback Options") },
 	{ submenu::option_type::EMU,  __("Automatic save/restore"),                  OPTION_AUTOSAVE },
+	{ submenu::option_type::EMU,  __("Rewind"),                                  OPTION_REWIND },
+	{ submenu::option_type::EMU,  __("Rewind capacity"),                         OPTION_REWIND_CAPACITY },
 	{ submenu::option_type::EMU,  __("Bilinear snapshot"),                       OPTION_SNAPBILINEAR },
 	{ submenu::option_type::EMU,  __("Burn-in"),                                 OPTION_BURNIN },
 
@@ -340,10 +342,9 @@ void submenu::populate(float &customtop, float &custombottom)
 			switch (sm_option->entry->type())
 			{
 			case OPTION_BOOLEAN:
-				arrow_flags = sm_option->options->bool_value(sm_option->name) ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW;
-				item_append(_(sm_option->description),
-					(arrow_flags == FLAG_RIGHT_ARROW) ? "On" : "Off",
-					arrow_flags,
+				item_append_on_off(_(sm_option->description),
+					sm_option->options->bool_value(sm_option->name),
+					0,
 					static_cast<void*>(&(*sm_option)));
 				break;
 			case OPTION_INTEGER:

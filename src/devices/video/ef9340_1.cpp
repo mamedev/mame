@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "ef9340_1.h"
-#include "ef9341_chargen.h"
 
 #include "screen.h"
 
@@ -28,7 +27,9 @@ static constexpr uint8_t bgr2rgb[8] =
 
 ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EF9340_1, tag, owner, clock)
-	, device_video_interface(mconfig, *this), m_line_timer(nullptr)
+	, device_video_interface(mconfig, *this)
+	, m_line_timer(nullptr)
+	, m_charset(*this, "ef9340_1")
 //, m_start_vpos(START_Y)
 	//, m_start_vblank(START_Y + SCREEN_HEIGHT)
 	//, m_screen_lines(LINES)
@@ -36,13 +37,25 @@ ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag,
 }
 
 
+ROM_START( ef9340_1 )
+	ROM_REGION( 0xA00, "ef9340_1", 0 )
+	ROM_LOAD( "charset_ef9340_1.rom", 0x0000, 0x0A00, CRC(d557a7bf) SHA1(d100b0f6a0d5a2d540844bf362788659ed9a6eb4) )
+ROM_END
+
+
+const tiny_rom_entry *ef9340_1_device::device_rom_region() const
+{
+	return ROM_NAME( ef9340_1 );
+}
+
+
 void ef9340_1_device::device_start()
 {
 	// Let the screen create our temporary bitmap with the screen's dimensions
-	m_screen->register_screen_bitmap(m_tmp_bitmap);
+	screen().register_screen_bitmap(m_tmp_bitmap);
 
 	m_line_timer = timer_alloc(TIMER_LINE);
-	m_line_timer->adjust( m_screen->time_until_pos(0, 0), 0,  m_screen->scan_period() );
+	m_line_timer->adjust( screen().time_until_pos(0, 0), 0,  screen().scan_period() );
 
 	// register our state
 	save_item(NAME(m_ef9341.TA));
@@ -81,7 +94,7 @@ void ef9340_1_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	switch ( id )
 	{
 		case TIMER_LINE:
-			ef9340_scanline(m_screen->vpos());
+			ef9340_scanline(screen().vpos());
 			break;
 	}
 }
@@ -213,7 +226,7 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 
 						if ( b >= 0xa0 )
 						{
-							m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ] = BITSWAP8(m_ef9341.TA,0,1,2,3,4,5,6,7);
+							m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ] = bitswap<8>(m_ef9341.TA,0,1,2,3,4,5,6,7);
 						}
 
 						// Increment slice number
@@ -327,7 +340,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 				else
 				{
 					// Normal
-					char_data = ef9341_char_set[1][b & 0x7f][slice];
+					char_data = m_charset[((b | 0x80) * 10) + slice];
 					fg = bgr2rgb[ a & 0x07 ];
 					bg = bgr2rgb[ ( a >> 4 ) & 0x07 ];
 				}
@@ -362,7 +375,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 				else
 				{
 					// Normal
-					char_data = ef9341_char_set[0][b & 0x7f][slice];
+					char_data = m_charset[((b & 0x7f) * 10) + slice];
 
 					if ( a & 0x40 )
 					{

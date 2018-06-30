@@ -25,25 +25,28 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_Z80, bbc_tube_z80_device, "bbc_tube_z80", "Acorn Z80
 //  ADDRESS_MAP( tube_z80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_z80_mem, AS_PROGRAM, 8, bbc_tube_z80_device)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
-ADDRESS_MAP_END
+void bbc_tube_z80_device::tube_z80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(bbc_tube_z80_device::mem_r), FUNC(bbc_tube_z80_device::mem_w));
+}
 
 //-------------------------------------------------
 //  ADDRESS_MAP( tube_z80_fetch )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_z80_fetch, AS_OPCODES, 8, bbc_tube_z80_device)
-	AM_RANGE(0x000, 0xffff) AM_READ(opcode_r)
-ADDRESS_MAP_END
+void bbc_tube_z80_device::tube_z80_fetch(address_map &map)
+{
+	map(0x000, 0xffff).r(FUNC(bbc_tube_z80_device::opcode_r));
+}
 
 //-------------------------------------------------
 //  ADDRESS_MAP( tube_z80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_z80_io, AS_IO, 8, bbc_tube_z80_device)
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ula", tube_device, parasite_r, parasite_w)
-ADDRESS_MAP_END
+void bbc_tube_z80_device::tube_z80_io(address_map &map)
+{
+	map(0x00, 0x07).mirror(0xff00).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w));
+}
 
 //-------------------------------------------------
 //  ROM( tube_z80 )
@@ -51,23 +54,23 @@ ADDRESS_MAP_END
 
 ROM_START( tube_z80 )
 	ROM_REGION(0x1000, "rom", 0)
-	ROM_LOAD("Z80_120.rom", 0x0000, 0x1000, CRC(315bfc20) SHA1(069077df498599a9c880d4ec9f4bc53fcc602d82))
+	ROM_LOAD("z80_120.rom", 0x0000, 0x1000, CRC(315bfc20) SHA1(069077df498599a9c880d4ec9f4bc53fcc602d82))
 ROM_END
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bbc_tube_z80_device::device_add_mconfig )
-	MCFG_CPU_ADD("z80", Z80, XTAL_12MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(tube_z80_mem)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(tube_z80_fetch)
-	MCFG_CPU_IO_MAP(tube_z80_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, bbc_tube_z80_device, irq_callback)
+MACHINE_CONFIG_START(bbc_tube_z80_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("z80", Z80, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tube_z80_mem)
+	MCFG_DEVICE_OPCODES_MAP(tube_z80_fetch)
+	MCFG_DEVICE_IO_MAP(tube_z80_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, bbc_tube_z80_device, irq_callback)
 
 	MCFG_TUBE_ADD("ula")
-	MCFG_TUBE_HIRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
-	MCFG_TUBE_PNMI_HANDLER(WRITELINE(bbc_tube_z80_device, nmi_w))
+	MCFG_TUBE_HIRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
+	MCFG_TUBE_PNMI_HANDLER(WRITELINE(*this, bbc_tube_z80_device, nmi_w))
 	MCFG_TUBE_PIRQ_HANDLER(INPUTLINE("z80", INPUT_LINE_IRQ0))
 
 	/* internal ram */
@@ -145,7 +148,7 @@ WRITE8_MEMBER(bbc_tube_z80_device::host_w)
 
 READ8_MEMBER(bbc_tube_z80_device::opcode_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		if (offset == 0x0066 && m_z80->input_state(INPUT_LINE_NMI))
 			m_rom_enabled = true;

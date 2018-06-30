@@ -187,6 +187,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/agat840k_hle_dsk.h,FORMATS["AGAT840K_HLE_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["AGAT840K_HLE_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/agat840k_hle_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/agat840k_hle_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/ami_dsk.h,FORMATS["AMI_DSK"] = true
 --------------------------------------------------
 
@@ -1334,6 +1346,18 @@ if (FORMATS["PMD_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/pmd_cas.cpp",
 		MAME_DIR.. "src/lib/formats/pmd_cas.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/poly_dsk.h,FORMATS["POLY_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["POLY_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/poly_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/poly_dsk.h",
 	}
 end
 

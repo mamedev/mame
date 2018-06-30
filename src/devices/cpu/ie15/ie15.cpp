@@ -2,6 +2,7 @@
 // copyright-holders:Sergey Svishchev
 #include "emu.h"
 #include "ie15.h"
+#include "ie15dasm.h"
 
 #include "debugger.h"
 
@@ -34,10 +35,10 @@ ie15_cpu_device::ie15_cpu_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, IE15_CPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 14)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8), m_A(0), m_CF(0), m_ZF(0), m_RF(0), m_flags(0)
-	, m_program(nullptr), m_io(nullptr), m_direct(nullptr)
+	, m_program(nullptr), m_io(nullptr), m_cache(nullptr)
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 //-------------------------------------------------
@@ -48,7 +49,7 @@ void ie15_cpu_device::device_start()
 {
 	// find address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	// save state
@@ -149,34 +150,12 @@ void ie15_cpu_device::state_string_export(const device_state_entry &entry, std::
 }
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
+//  create_disassembler
 //-------------------------------------------------
 
-uint32_t ie15_cpu_device::disasm_min_opcode_bytes() const
+std::unique_ptr<util::disasm_interface> ie15_cpu_device::create_disassembler()
 {
-	return 1;
-}
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t ie15_cpu_device::disasm_max_opcode_bytes() const
-{
-	return 2;
-}
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
-//  helper function
-//-------------------------------------------------
-
-offs_t ie15_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( ie15 );
-	return CPU_DISASSEMBLE_NAME(ie15)(nullptr, stream, pc, oprom, opram, 0);
+	return std::make_unique<ie15_disassembler>();
 }
 
 //**************************************************************************
@@ -214,7 +193,7 @@ void ie15_cpu_device::execute_run()
 	{
 		do
 		{
-			debugger_instruction_hook(this, m_PC.d);
+			debugger_instruction_hook(m_PC.d);
 			execute_one(rop());
 		} while (m_icount > 0);
 	}
@@ -427,14 +406,14 @@ inline void ie15_cpu_device::execute_one(int opcode)
 
 inline uint8_t ie15_cpu_device::rop()
 {
-	uint8_t retVal = m_direct->read_byte(m_PC.w.l);
+	uint8_t retVal = m_cache->read_byte(m_PC.w.l);
 	m_PC.w.l = (m_PC.w.l + 1) & 0x0fff;
 	return retVal;
 }
 
 inline uint8_t ie15_cpu_device::arg()
 {
-	uint8_t retVal = m_direct->read_byte(m_PC.w.l);
+	uint8_t retVal = m_cache->read_byte(m_PC.w.l);
 	return retVal;
 }
 

@@ -459,7 +459,7 @@ WRITE32_MEMBER( sh2_device::sh7604_w )
 	//      logerror("sh2_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfffffe00+offset*4, offset, data, mem_mask);
 
 //    if(offset != 0x20)
-//        printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, space.device().safe_pc());
+//        printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, pc());
 
 	switch( offset )
 	{
@@ -722,15 +722,8 @@ READ32_MEMBER( sh2_device::sh7604_r )
 	return m_m[offset];
 }
 
-void sh2_device::sh2_set_frt_input(int state)
+void sh2_device::set_frt_input(int state)
 {
-	if(state == PULSE_LINE)
-	{
-		sh2_set_frt_input(ASSERT_LINE);
-		sh2_set_frt_input(CLEAR_LINE);
-		return;
-	}
-
 	if(m_frt_input == state) {
 		return;
 	}

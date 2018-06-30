@@ -12,6 +12,7 @@
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -62,11 +63,15 @@ public:
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_DRIVER_INIT(craft);
+	void init_craft();
 	virtual void machine_reset() override;
 	uint32_t screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<dac_byte_interface> m_dac;
+	void craft(machine_config &config);
+	void craft_data_map(address_map &map);
+	void craft_io_map(address_map &map);
+	void craft_prg_map(address_map &map);
 };
 
 inline void craft_state::verboselog(int n_level, const char *s_fmt, ...)
@@ -79,7 +84,7 @@ inline void craft_state::verboselog(int n_level, const char *s_fmt, ...)
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", m_maincpu->safe_pc(), buf );
+		logerror( "%s: %s", machine().describe_context(), buf );
 	}
 #endif
 }
@@ -181,17 +186,20 @@ void craft_state::video_update()
 * Address maps                                       *
 \****************************************************/
 
-static ADDRESS_MAP_START( craft_prg_map, AS_PROGRAM, 8, craft_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void craft_state::craft_prg_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+}
 
-static ADDRESS_MAP_START( craft_data_map, AS_DATA, 8, craft_state )
-	AM_RANGE(0x0100, 0x04ff) AM_RAM
-ADDRESS_MAP_END
+void craft_state::craft_data_map(address_map &map)
+{
+	map(0x0100, 0x04ff).ram();
+}
 
-static ADDRESS_MAP_START( craft_io_map, AS_IO, 8, craft_state )
-	AM_RANGE(AVR8_IO_PORTA, AVR8_IO_PORTD) AM_READWRITE( port_r, port_w )
-ADDRESS_MAP_END
+void craft_state::craft_io_map(address_map &map)
+{
+	map(AVR8_IO_PORTA, AVR8_IO_PORTD).rw(FUNC(craft_state::port_r), FUNC(craft_state::port_w));
+}
 
 /****************************************************\
 * Input ports                                        *
@@ -227,7 +235,7 @@ uint32_t craft_state::screen_update_craft(screen_device &screen, bitmap_rgb32 &b
 * Machine definition                                 *
 \****************************************************/
 
-DRIVER_INIT_MEMBER(craft_state,craft)
+void craft_state::init_craft()
 {
 }
 
@@ -237,13 +245,13 @@ void craft_state::machine_reset()
 	m_last_cycles = 0;
 }
 
-static MACHINE_CONFIG_START( craft )
+MACHINE_CONFIG_START(craft_state::craft)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ATMEGA88, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(craft_prg_map)
-	MCFG_CPU_DATA_MAP(craft_data_map)
-	MCFG_CPU_IO_MAP(craft_io_map)
+	MCFG_DEVICE_ADD("maincpu", ATMEGA88, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(craft_prg_map)
+	MCFG_DEVICE_DATA_MAP(craft_data_map)
+	MCFG_DEVICE_IO_MAP(craft_io_map)
 	MCFG_CPU_AVR8_EEPROM("eeprom")
 
 	/* video hardware */
@@ -256,10 +264,10 @@ static MACHINE_CONFIG_START( craft )
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("avr8")
-	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "avr8", 0.25) // pd1/pd2/pd4/pd5/pd6/pd7 + 2k(x7) + 1k(x5)
+	SPEAKER(config, "avr8").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "avr8", 0.25) // pd1/pd2/pd4/pd5/pd6/pd7 + 2k(x7) + 1k(x5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( craft )
@@ -269,5 +277,5 @@ ROM_START( craft )
 	ROM_LOAD( "eeprom.raw", 0x0000, 0x0200, CRC(e18a2af9) SHA1(81fc6f2d391edfd3244870214fac37929af0ac0c) )
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT  STATE           INIT      COMPANY          FULLNAME */
-CONS(2008, craft,    0,        0,        craft,    craft, craft_state,    craft,    "Linus Akesson", "Craft", MACHINE_NOT_WORKING)
+/*   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME */
+CONS(2008, craft, 0,      0,      craft,   craft, craft_state, init_craft, "Linus Akesson", "Craft", MACHINE_NOT_WORKING)

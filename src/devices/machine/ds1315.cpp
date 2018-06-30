@@ -7,9 +7,9 @@
     Dallas Semiconductor's Phantom Time Chip DS1315.
     NOTE: writes are decoded, but the host's time will always be returned when asked.
 
-	November 2017: R. Belmont added capability to emulate DS1216 and other DS121x 
-	parts where the clock sits in the same place as a ROM.  The backing callback
-	returns the ROM contents when the RTC is locked.
+    November 2017: R. Belmont added capability to emulate DS1216 and other DS121x
+    parts where the clock sits in the same place as a ROM.  The backing callback
+    returns the ROM contents when the RTC is locked.
 
     April 2015: chip enable / chip reset / phantom writes by Karl-Ludwig Deisenhofer
 
@@ -33,9 +33,9 @@
 DEFINE_DEVICE_TYPE(DS1315, ds1315_device, "ds1315", "Dallas DS1315 Phantom Time Chip")
 
 ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DS1315, tag, owner, clock), 
-	m_backing_read(*this),	
-	m_mode(), 
+	: device_t(mconfig, DS1315, tag, owner, clock),
+	m_backing_read(*this),
+	m_mode(),
 	m_count(0)
 {
 }
@@ -106,14 +106,14 @@ READ8_MEMBER( ds1315_device::read )
 			m_mode = DS_SEEK_MATCHING;
 		}
 
-		return m_backing_read(offset);		
-	}	
+		return m_backing_read(offset);
+	}
 	else if (m_mode == DS_CALENDAR_IO)
 	{
 		return read_data(space, offset);
 	}
 
-	return 0xff;	// shouldn't happen, but compilers don't know that
+	return 0xff;    // shouldn't happen, but compilers don't know that
 }
 
 

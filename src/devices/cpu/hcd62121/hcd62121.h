@@ -6,12 +6,12 @@
 #pragma once
 
 
-#define MCFG_HCD62121_KOL_CB(_devcb) devcb = &hcd62121_cpu_device::set_kol_callback(*device, DEVCB_##_devcb);
-#define MCFG_HCD62121_KOH_CB(_devcb) devcb = &hcd62121_cpu_device::set_koh_callback(*device, DEVCB_##_devcb);
-#define MCFG_HCD62121_PORT_CB(_devcb) devcb = &hcd62121_cpu_device::set_port_callback(*device, DEVCB_##_devcb);
-#define MCFG_HCD62121_OPT_CB(_devcb) devcb = &hcd62121_cpu_device::set_opt_callback(*device, DEVCB_##_devcb);
-#define MCFG_HCD62121_KI_CB(_devcb) devcb = &hcd62121_cpu_device::set_ki_callback(*device, DEVCB_##_devcb);
-#define MCFG_HCD62121_IN0_CB(_devcb) devcb = &hcd62121_cpu_device::set_in0_callback(*device, DEVCB_##_devcb);
+#define MCFG_HCD62121_KOL_CB(_devcb) devcb = &downcast<hcd62121_cpu_device &>(*device).set_kol_callback(DEVCB_##_devcb);
+#define MCFG_HCD62121_KOH_CB(_devcb) devcb = &downcast<hcd62121_cpu_device &>(*device).set_koh_callback(DEVCB_##_devcb);
+#define MCFG_HCD62121_PORT_CB(_devcb) devcb = &downcast<hcd62121_cpu_device &>(*device).set_port_callback(DEVCB_##_devcb);
+#define MCFG_HCD62121_OPT_CB(_devcb) devcb = &downcast<hcd62121_cpu_device &>(*device).set_opt_callback(DEVCB_##_devcb);
+#define MCFG_HCD62121_KI_CB(_devcb) devcb = &downcast<hcd62121_cpu_device &>(*device).set_ki_callback(DEVCB_##_devcb);
+#define MCFG_HCD62121_IN0_CB(_devcb) devcb = &downcast<hcd62121_cpu_device &>(*device).set_in0_callback(DEVCB_##_devcb);
 
 
 class hcd62121_cpu_device :  public cpu_device
@@ -20,12 +20,12 @@ public:
 	// construction/destruction
 	hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_kol_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_kol_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_koh_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_koh_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_port_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_opt_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_opt_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ki_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_ki_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in0_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_in0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_kol_callback(Object &&cb) { return m_kol_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_koh_callback(Object &&cb) { return m_koh_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port_callback(Object &&cb) { return m_port_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_opt_callback(Object &&cb) { return m_opt_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ki_callback(Object &&cb) { return m_ki_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in0_callback(Object &&cb) { return m_in0_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	enum
@@ -61,18 +61,16 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual u32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual u32 disasm_max_opcode_bytes() const override { return 18; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	u8 read_op();
 	u8 datasize(u8 op);
 	void read_reg(int size, u8 op1);
 	void write_reg(int size, u8 op1);
-	void read_regreg(int size, u8 op1, u8 op2, bool op_is_logical);
+	void read_regreg(int size, u8 op1, u8 op2, bool copy_extend_immediate);
 	void write_regreg(int size, u8 op1, u8 op2);
-	void read_iregreg(int size, u8 op1, u8 op2);
+	void read_iregreg(int size, u8 op1, u8 op2, bool copy_extend_immediate);
 	void write_iregreg(int size, u8 op1, u8 op2);
 	void write_iregreg2(int size, u8 op1, u8 op2);
 	bool check_cond(u8 op);
@@ -82,12 +80,12 @@ private:
 	void set_zh_flag(bool is_zh);
 	void set_cl_flag(bool is_cl);
 	void op_msk(int size);
-	void op_imsk(int size);
 	void op_and(int size);
 	void op_or(int size);
 	void op_xor(int size);
 	void op_add(int size);
 	void op_addb(int size);
+	void op_subb(int size);
 	void op_sub(int size);
 	void op_pushw(u16 source);
 	u16 op_popw();

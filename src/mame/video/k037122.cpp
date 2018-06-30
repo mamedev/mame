@@ -59,9 +59,9 @@ void k037122_device::device_start()
 
 	set_gfx(m_gfx_index,std::make_unique<gfx_element>(&palette(), k037122_char_layout, (uint8_t*)m_char_ram.get(), 0, palette().entries() / 16, 0));
 
-	save_pointer(NAME(m_reg.get()), 0x400 / 4);
-	save_pointer(NAME(m_char_ram.get()), 0x200000 / 4);
-	save_pointer(NAME(m_tile_ram.get()), 0x20000 / 4);
+	save_pointer(NAME(m_reg), 0x400 / 4);
+	save_pointer(NAME(m_char_ram), 0x200000 / 4);
+	save_pointer(NAME(m_tile_ram), 0x20000 / 4);
 
 }
 
@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer1)
 
 void k037122_device::tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	const rectangle &visarea = m_screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 
 	if (m_reg[0xc] & 0x10000)
 	{

@@ -11,6 +11,7 @@
 #include "video/k052109.h"
 #include "video/k053251.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 
 class surpratk_state : public driver_device
 {
@@ -47,4 +48,7 @@ public:
 	K05324X_CB_MEMBER(sprite_callback);
 	K052109_CB_MEMBER(tile_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
+	void surpratk(machine_config &config);
+	void bank0000_map(address_map &map);
+	void surpratk_map(address_map &map);
 };

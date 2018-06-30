@@ -7,11 +7,10 @@
     Front-end for RSP recompiler
 
 ***************************************************************************/
+#ifndef MAME_CPU_RSP_RSPFE_H
+#define MAME_CPU_RSP_RSPFE_H
 
 #pragma once
-
-#ifndef __RSPFE_H__
-#define __RSPFE_H__
 
 #include "rsp.h"
 #include "cpu/drcfe.h"
@@ -30,11 +29,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class rsp_frontend : public drc_frontend
+class rsp_device::frontend : public drc_frontend
 {
 public:
 	// construction/destruction
-	rsp_frontend(rsp_device &rsp, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
+	frontend(rsp_device &rsp, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
 
 protected:
 	// required overrides
@@ -53,4 +52,4 @@ private:
 
 
 
-#endif /* __RSPFE_H__ */
+#endif // MAME_CPU_RSP_RSPFE_H

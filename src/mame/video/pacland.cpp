@@ -189,6 +189,8 @@ TILE_GET_INFO_MEMBER(pacland_state::get_fg_tile_info)
 
 void pacland_state::video_start()
 {
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
+
 	m_screen->register_screen_bitmap(m_fg_bitmap);
 	m_fg_bitmap.fill(0xffff);
 
@@ -301,7 +303,7 @@ void pacland_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		}
 
 		sy -= 16 * sizey;
-		sy = (sy & 0xff) - 32;  // fix wraparound
+		sy = (sy & 0xff) - 32; // fix wraparound
 
 		for (y = 0;y <= sizey;y++)
 		{
@@ -382,7 +384,21 @@ uint32_t pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	/* draw high priority fg tiles */
 	draw_fg(screen, bitmap, cliprect, 1);
 
-	/* draw sprite pixels with colortable values >= 0xf0, which have priority over everything */
-	draw_sprites(screen, bitmap, cliprect, flip, 2);
+	/* draw sprite pixels with colortable values >= 0xf0, which have priority over all fg tiles */
+	m_sprite_bitmap.fill(0, cliprect);
+	draw_sprites(screen, m_sprite_bitmap, cliprect, flip, 2);
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint16_t *src = &m_sprite_bitmap.pix16(y);
+		uint16_t *dst = &bitmap.pix16(y);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			uint16_t pix = src[x];
+			if (pix != 0 && dst[x] < 0x800)
+				dst[x] = pix;
+		}
+	}
+
 	return 0;
 }

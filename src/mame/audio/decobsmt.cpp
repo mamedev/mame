@@ -16,19 +16,21 @@
 #define M6809_TAG   "soundcpu"
 #define BSMT_TAG    "bsmt"
 
-static ADDRESS_MAP_START( decobsmt_map, AS_PROGRAM, 8, decobsmt_device )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_WRITE(bsmt_reset_w)
-	AM_RANGE(0x2002, 0x2003) AM_READ(bsmt_comms_r)
-	AM_RANGE(0x2006, 0x2007) AM_READ(bsmt_status_r)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(bsmt0_w)
-	AM_RANGE(0xa000, 0xa0ff) AM_WRITE(bsmt1_w)
-	AM_RANGE(0x2000, 0xffff) AM_ROM AM_REGION(":soundcpu", 0x2000)
-ADDRESS_MAP_END
+void decobsmt_device::decobsmt_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0xffff).rom().region(":soundcpu", 0x2000);
+	map(0x2000, 0x2001).w(FUNC(decobsmt_device::bsmt_reset_w));
+	map(0x2002, 0x2003).r(FUNC(decobsmt_device::bsmt_comms_r));
+	map(0x2006, 0x2007).r(FUNC(decobsmt_device::bsmt_status_r));
+	map(0x6000, 0x6000).w(FUNC(decobsmt_device::bsmt0_w));
+	map(0xa000, 0xa0ff).w(FUNC(decobsmt_device::bsmt1_w));
+}
 
-static ADDRESS_MAP_START( bsmt_map, 0, 8, decobsmt_device )
-	AM_RANGE(0x000000, 0xffffff) AM_ROM AM_REGION(":bsmt", 0)
-ADDRESS_MAP_END
+void decobsmt_device::bsmt_map(address_map &map)
+{
+	map(0x000000, 0xffffff).rom().region(":bsmt", 0);
+}
 
 void decobsmt_device::bsmt_ready_callback()
 {
@@ -46,13 +48,14 @@ DEFINE_DEVICE_TYPE(DECOBSMT, decobsmt_device, "decobsmt", "Data East/Sega/Stern 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( decobsmt_device::device_add_mconfig )
-	MCFG_CPU_ADD(M6809_TAG, M6809, (3579580/2))
-	MCFG_CPU_PROGRAM_MAP(decobsmt_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(decobsmt_device, decobsmt_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
+MACHINE_CONFIG_START(decobsmt_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(M6809_TAG, MC6809E, XTAL(24'000'000) / 12) // 68B09E U6 (E & Q = 2 MHz according to manual)
+	MCFG_DEVICE_PROGRAM_MAP(decobsmt_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(decobsmt_device, decobsmt_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_BSMT2000_ADD(BSMT_TAG, 24000000)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD(BSMT_TAG, BSMT2000, XTAL(24'000'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, bsmt_map)
 	MCFG_BSMT2000_READY_CALLBACK(decobsmt_device, bsmt_ready_callback)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)

@@ -36,25 +36,26 @@
 //  ADDRESS_MAP( sage2_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( sage2_mem, AS_PROGRAM, 16, sage2_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xffc000, 0xffc007) AM_DEVREADWRITE8(I8253_1_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0xffc010, 0xffc01f) AM_NOP //AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
-	AM_RANGE(0xffc020, 0xffc027) AM_DEVREADWRITE8(I8255A_0_TAG, i8255_device, read, write, 0x00ff) // i8255, DIPs + Floppy ctrl port
-	AM_RANGE(0xffc030, 0xffc031) AM_DEVREADWRITE8(I8251_1_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xffc032, 0xffc033) AM_DEVREADWRITE8(I8251_1_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xffc040, 0xffc043) AM_DEVREADWRITE8(I8259_TAG, pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0xffc050, 0xffc053) AM_DEVICE8(UPD765_TAG, upd765a_device, map, 0x00ff)
-	AM_RANGE(0xffc060, 0xffc067) AM_DEVREADWRITE8(I8255A_1_TAG, i8255_device, read, write, 0x00ff) // i8255, Printer
-	AM_RANGE(0xffc070, 0xffc071) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xffc072, 0xffc073) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xffc080, 0xffc087) AM_MIRROR(0x78) AM_DEVREADWRITE8(I8253_0_TAG, pit8253_device, read, write, 0x00ff)
+void sage2_state::sage2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xffc000, 0xffc007).rw(I8253_1_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0xffc010, 0xffc01f).noprw(); //AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
+	map(0xffc020, 0xffc027).rw(I8255A_0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // i8255, DIPs + Floppy ctrl port
+	map(0xffc031, 0xffc031).rw(m_usart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xffc033, 0xffc033).rw(m_usart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xffc040, 0xffc043).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0xffc050, 0xffc053).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0xffc060, 0xffc067).rw(I8255A_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // i8255, Printer
+	map(0xffc071, 0xffc071).rw(m_usart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xffc073, 0xffc073).rw(m_usart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xffc080, 0xffc087).mirror(0x78).rw(I8253_0_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 //  AM_RANGE(0xffc400, 0xffc407) AM_DEVREADWRITE8(S2651_0_TAG, s2651_device, read, write, 0x00ff)
 //  AM_RANGE(0xffc440, 0xffc447) AM_DEVREADWRITE8(S2651_1_TAG, s2651_device, read, write, 0x00ff)
 //  AM_RANGE(0xffc480, 0xffc487) AM_DEVREADWRITE8(S2651_2_TAG, s2651_device, read, write, 0x00ff)
 //  AM_RANGE(0xffc4c0, 0xffc4c7) AM_DEVREADWRITE8(S2651_3_TAG, s2651_device, read, write, 0x00ff)
 //  AM_RANGE(0xffc500, 0xffc7ff) // Winchester drive ports
-ADDRESS_MAP_END
+}
 
 
 
@@ -305,7 +306,7 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 	m_pic->ir7_w(BIT(data, 2));
 
 	// processor LED
-	output().set_led_value(0, BIT(data, 3));
+	m_led = BIT(data, 3);
 
 	// centronics
 	m_centronics->write_strobe(BIT(data, 4));
@@ -340,9 +341,10 @@ WRITE_LINE_MEMBER( sage2_state::br2_w )
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( sage2_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Mitsubishi M4859
-SLOT_INTERFACE_END
+static void sage2_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD); // Mitsubishi M4859
+}
 
 void sage2_state::update_fdc_int()
 {
@@ -377,6 +379,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void sage2_state::machine_start()
 {
+	m_led.resolve();
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x000000, 0x001fff, 0x07e000, m_rom->base()); // Avoid the 68000 reading from lalaland in its reset handler
 }
@@ -407,10 +410,10 @@ READ16_MEMBER(sage2_state::rom_r)
 //  MACHINE_CONFIG( sage2 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( sage2 )
+MACHINE_CONFIG_START(sage2_state::sage2)
 	// basic machine hardware
-	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_16MHz/2)
-	MCFG_CPU_PROGRAM_MAP(sage2_mem)
+	MCFG_DEVICE_ADD(M68000_TAG, M68000, XTAL(16'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(sage2_mem)
 
 	// devices
 	MCFG_DEVICE_ADD(I8259_TAG, PIC8259, 0)
@@ -419,62 +422,62 @@ static MACHINE_CONFIG_START( sage2 )
 	MCFG_DEVICE_ADD(I8255A_0_TAG, I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("J7"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("J6"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(sage2_state, ppi0_pc_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sage2_state, ppi0_pc_w))
 
 	MCFG_DEVICE_ADD(I8255A_1_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_IN_PORTB_CB(READ8(sage2_state, ppi1_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(sage2_state, ppi1_pc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, sage2_state, ppi1_pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sage2_state, ppi1_pc_w))
 
 	MCFG_DEVICE_ADD(I8253_0_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(0) // from U75 OUT0
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir6_w))
-	MCFG_PIT8253_CLK1(XTAL_16MHz/2/125)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(I8253_0_TAG, pit8253_device, write_clk2))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8259_TAG, pic8259_device, ir6_w))
+	MCFG_PIT8253_CLK1(XTAL(16'000'000)/2/125)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(I8253_0_TAG, pit8253_device, write_clk2))
 	MCFG_PIT8253_CLK2(0) // from OUT2
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(I8259_TAG, pic8259_device, ir0_w))
 
 	MCFG_DEVICE_ADD(I8253_1_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_16MHz/2/125)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8253_0_TAG, pit8253_device, write_clk0))
-	MCFG_PIT8253_CLK1(XTAL_16MHz/2/13)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(sage2_state, br1_w))
-	MCFG_PIT8253_CLK2(XTAL_16MHz/2/13)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(sage2_state, br2_w))
+	MCFG_PIT8253_CLK0(XTAL(16'000'000)/2/125)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8253_0_TAG, pit8253_device, write_clk0))
+	MCFG_PIT8253_CLK1(XTAL(16'000'000)/2/13)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, sage2_state, br1_w))
+	MCFG_PIT8253_CLK2(XTAL(16'000'000)/2/13)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, sage2_state, br2_w))
 
 	MCFG_DEVICE_ADD(I8251_0_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
 	MCFG_I8251_RXRDY_HANDLER(INPUTLINE(M68000_TAG, M68K_IRQ_5))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir2_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(I8259_TAG, pic8259_device, ir2_w))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_0_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_0_TAG, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251_0_TAG, i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_0_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_0_TAG, i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251_0_TAG, i8251_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD(I8251_1_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir1_w))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir3_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(I8259_TAG, pic8259_device, ir1_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(I8259_TAG, pic8259_device, ir3_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_1_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_1_TAG, i8251_device, write_dsr))
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_1_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_1_TAG, i8251_device, write_dsr))
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(sage2_state, fdc_irq))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, sage2_state, fdc_irq))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(sage2_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(sage2_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(sage2_state, write_centronics_perror))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(sage2_state, write_centronics_select))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(sage2_state, write_centronics_fault))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, sage2_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, sage2_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, sage2_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, sage2_state, write_centronics_select))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, sage2_state, write_centronics_fault))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -516,7 +519,7 @@ ROM_END
 //  DRIVER_INIT( sage2 )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(sage2_state,sage2)
+void sage2_state::init_sage2()
 {
 }
 
@@ -526,5 +529,5 @@ DRIVER_INIT_MEMBER(sage2_state,sage2)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY            FULLNAME   FLAGS
-COMP( 1982, sage2,  0,      0,      sage2,   sage2, sage2_state, sage2, "Sage Technology", "Sage II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY            FULLNAME   FLAGS
+COMP( 1982, sage2,  0,      0,      sage2,   sage2, sage2_state, init_sage2, "Sage Technology", "Sage II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

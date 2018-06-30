@@ -6,13 +6,14 @@
  *
  ****************************************************************************/
 
-#ifndef DGN_BETA_H_
-#define DGN_BETA_H_
+#ifndef MAME_INCLUDES_DGN_BETA_H
+#define MAME_INCLUDES_DGN_BETA_H
 
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
+#include "emupal.h"
 
 /* Tags */
 
@@ -98,6 +99,27 @@ public:
 		m_floppy3(*this, FDC_TAG ":3"),
 		m_palette(*this, "palette") { }
 
+	void dgnbeta(machine_config &config);
+
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b0_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b1_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b2_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b3_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b4_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b5_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b6_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b7_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b8_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b9_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bA_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bB_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bC_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bD_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bE_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bF_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bG_w);
+
+private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<mc6845_device> m_mc6845;
@@ -168,23 +190,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(dgn);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b0_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b1_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b2_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b3_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b4_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b5_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b6_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b7_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b8_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b9_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bA_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bB_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bC_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bD_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bE_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bF_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bG_w);
+
 	DECLARE_READ8_MEMBER(d_pia0_pa_r);
 	DECLARE_WRITE8_MEMBER(d_pia0_pa_w);
 	DECLARE_READ8_MEMBER(d_pia0_pb_r);
@@ -230,11 +236,12 @@ public:
 	void ScanInKeyboard(void);
 	void dgn_beta_frame_interrupt (int data);
 
-	offs_t dgnbeta_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
+	offs_t dgnbeta_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
-private:
+	void dgnbeta_map(address_map &map);
+
 	void execute_beta_key_dump(int ref, const std::vector<std::string> &params);
 	void execute_beta_dat_log(int ref, const std::vector<std::string> &params);
 };
 
-#endif /* DGN_BETA_H_ */
+#endif // MAME_INCLUDES_DGN_BETA_H

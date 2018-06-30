@@ -44,14 +44,14 @@ enum software_compatibility
 //**************************************************************************
 
 #define MCFG_SOFTWARE_LIST_CONFIG(_list,_list_type) \
-	software_list_device::static_set_type(*device, _list, _list_type);
+	downcast<software_list_device &>(*device).set_type(_list, _list_type);
 
 #define MCFG_SOFTWARE_LIST_ADD( _tag, _list ) \
-	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 ) \
+	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST ) \
 	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_ORIGINAL_SYSTEM)
 
 #define MCFG_SOFTWARE_LIST_COMPATIBLE_ADD( _tag, _list ) \
-	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 ) \
+	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST ) \
 	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_COMPATIBLE_SYSTEM)
 
 #define MCFG_SOFTWARE_LIST_MODIFY( _tag, _list ) \
@@ -64,7 +64,7 @@ enum software_compatibility
 
 #define MCFG_SOFTWARE_LIST_FILTER( _tag, _filter ) \
 	MCFG_DEVICE_MODIFY( _tag ) \
-	software_list_device::static_set_filter(*device, _filter);
+	downcast<software_list_device &>(*device).set_filter(_filter);
 
 #define MCFG_SOFTWARE_LIST_REMOVE( _tag ) \
 	MCFG_DEVICE_REMOVE( _tag )
@@ -80,7 +80,7 @@ enum software_compatibility
 class software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const = 0;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const = 0;
 };
 
 
@@ -89,7 +89,7 @@ public:
 class false_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -102,7 +102,7 @@ private:
 class rom_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -115,7 +115,7 @@ private:
 class image_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -132,11 +132,11 @@ class software_list_device : public device_t
 
 public:
 	// construction/destruction
-	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// inline configuration helpers
-	static void static_set_type(device_t &device, const char *list, softlist_type list_type);
-	static void static_set_filter(device_t &device, const char *filter);
+	void set_type(const char *list, softlist_type list_type) { m_list_name.assign(list); m_list_type = list_type; }
+	void set_filter(const char *filter) { m_filter = filter; }
 
 	// getters
 	const std::string &list_name() const { return m_list_name; }

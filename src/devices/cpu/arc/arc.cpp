@@ -12,9 +12,10 @@
 #include "emu.h"
 #include "debugger.h"
 #include "arc.h"
+#include "arcdasm.h"
 
 
-DEFINE_DEVICE_TYPE(ARC, arc_cpu_device, "arc_a4", "ARCtangent A4")
+DEFINE_DEVICE_TYPE(ARC, arc_cpu_device, "arc_a4", "Argonaut ARCtangent A4")
 
 
 arc_cpu_device::arc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -26,12 +27,10 @@ arc_cpu_device::arc_cpu_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-offs_t arc_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> arc_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( arc );
-	return CPU_DISASSEMBLE_NAME(arc)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<arc_disassembler>();
 }
-
 
 /*****************************************************************************/
 
@@ -67,7 +66,7 @@ void arc_cpu_device::device_start()
 	state_add(ARC_PC,  "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
 	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -123,7 +122,7 @@ void arc_cpu_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(this, m_pc<<2);
+		debugger_instruction_hook(m_pc<<2);
 
 		//uint32_t op = READ32(m_pc);
 

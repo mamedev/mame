@@ -654,7 +654,7 @@ void amstrad_state::amstrad_update_video()
 
 	if ( m_gate_array.draw_p )
 	{
-		uint32_t cycles_passed = (now - m_gate_array.last_draw_time ).as_ticks(XTAL_16MHz);
+		uint32_t cycles_passed = (now - m_gate_array.last_draw_time ).as_ticks(XTAL(16'000'000));
 
 		while( cycles_passed )
 		{
@@ -729,7 +729,7 @@ void amstrad_state::amstrad_plus_update_video()
 
 	if ( m_gate_array.draw_p )
 	{
-		uint32_t cycles_passed = (now - m_gate_array.last_draw_time ).as_ticks(XTAL_16MHz);
+		uint32_t cycles_passed = (now - m_gate_array.last_draw_time ).as_ticks(XTAL(16'000'000));
 
 		while( cycles_passed )
 		{
@@ -1947,28 +1947,22 @@ b8 b0 Function Read/Write state
 If b10 is reset but none of b7-b5 are reset, user expansion peripherals are selected.
 The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which causes the expansion peripherals to reset.
  */
-	if ( m_system_type != SYSTEM_GX4000 )
+	if (m_fdc.found())  // if FDC is present (it isn't on a 464 or GX4000)
 	{
-		if(m_fdc)  // if FDC is present (it isn't on a 464)
+		if ( ( offset & (1<<10) ) == 0 )
 		{
-			if ( ( offset & (1<<10) ) == 0 )
-			{
-				if ( ( offset & (1<<10) ) == 0 )
-				{
-					int b8b0 = ( ( offset & (1<<8) ) >> (8 - 1) ) | ( offset & 0x01 );
+			int b8b0 = ( ( offset & (1<<8) ) >> (8 - 1) ) | ( offset & 0x01 );
 
-					switch (b8b0)
-					{
-					case 0x02:
-						data = m_fdc->msr_r(space, 0);
-						break;
-					case 0x03:
-						data = m_fdc->fifo_r(space, 0);
-						break;
-					default:
-						break;
-					}
-				}
+			switch (b8b0)
+			{
+			case 0x02:
+				data = m_fdc->msr_r(space, 0);
+				break;
+			case 0x03:
+				data = m_fdc->fifo_r(space, 0);
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -2159,39 +2153,33 @@ b8 b0 Function Read/Write state
 If b10 is reset but none of b7-b5 are reset, user expansion peripherals are selected.
 The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which causes the expansion peripherals to reset.
 */
-		if(m_system_type != SYSTEM_GX4000)
+		if (m_fdc.found())  // if FDC is present (it isn't on a 464 or GX4000)
 		{
-			if(m_fdc)  // if FDC is present (it isn't on a 464)
+			if ((offset & (1<<7)) == 0)
 			{
-				if ((offset & (1<<7)) == 0)
+				unsigned int b8b0 = ((offset & 0x0100) >> (8 - 1)) | (offset & 0x01);
+
+				switch (b8b0)
 				{
-					unsigned int b8b0 = ((offset & 0x0100) >> (8 - 1)) | (offset & 0x01);
-
-					switch (b8b0)
+				case 0x00:
+				case 0x01:
+					/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
+					 * "1" the FDD motor will be active.
+					 * "0" the FDD motor will be in-active.*/
+					for (auto &fd : m_floppy)
 					{
-					case 0x00:
-					case 0x01:
-						{
-							/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
-							 * "1" the FDD motor will be active.
-							 * "0" the FDD motor will be in-active.*/
-							floppy_image_device *floppy;
-							floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
-							if(floppy)
-								floppy->mon_w(!BIT(data, 0));
-							floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
-							if(floppy)
-								floppy->mon_w(!BIT(data, 0));
-							break;
-						}
-
-					case 0x03: /* Write Data register of FDC */
-						m_fdc->fifo_w(space, 0,data);
-						break;
-
-					default:
-						break;
+						floppy_image_device *floppy = fd->get_device();
+						if(floppy)
+							floppy->mon_w(!BIT(data, 0));
 					}
+					break;
+
+				case 0x03: /* Write Data register of FDC */
+					m_fdc->fifo_w(space, 0,data);
+					break;
+
+				default:
+					break;
 				}
 			}
 		}
@@ -2208,7 +2196,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 	{
 		m_aleste_mode = data;
 		logerror("EXTEND: Port &FABF write 0x%02x\n",data);
-		m_crtc->set_clock( ( m_aleste_mode & 0x02 ) ? ( XTAL_16MHz / 8 ) : ( XTAL_16MHz / 16 ) );
+		m_crtc->set_clock( ( m_aleste_mode & 0x02 ) ? ( XTAL(16'000'000) / 8 ) : ( XTAL(16'000'000) / 16 ) );
 	}
 
 	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
@@ -2550,8 +2538,12 @@ void amstrad_state::update_psg()
 		break;
 	case 3:
 		{/* b6 and b7 = 1 ? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
-			m_ay->address_w(space, 0, m_ppi_port_outputs[amstrad_ppi_PortA]);
-			m_prev_reg = m_ppi_port_outputs[amstrad_ppi_PortA];
+			/* ignore if an invalid PSG register is selected, usually when the PPI port directions are changed after selecting the PSG register */
+			if(m_ppi_port_outputs[amstrad_ppi_PortA] <= 15)
+			{
+				m_ay->address_w(space, 0, m_ppi_port_outputs[amstrad_ppi_PortA]);
+				m_prev_reg = m_ppi_port_outputs[amstrad_ppi_PortA];
+			}
 		}
 		break;
 	default:
@@ -2932,7 +2924,14 @@ void amstrad_state::enumerate_roms()
 	if (m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000)
 	{
 		uint8_t *crt = m_region_cart->base();
-		int bank_mask = (m_cart->get_rom_size() / 0x4000) - 1;
+		int bank_mask = 0x7ffff;
+
+		if (m_cart->get_rom_size() <= 0x20000)
+			bank_mask = 0x1ffff;
+		else if (m_cart->get_rom_size() <= 0x40000)
+			bank_mask = 0x3ffff;
+		else if (m_cart->get_rom_size() <= 0x80000)
+			bank_mask = 0x7ffff;
 
 		/* ROMs are stored on the inserted cartridge in the Plus/GX4000 */
 		for (int i = 0; i < 128; i++) // fill ROM table
@@ -3100,7 +3099,7 @@ TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
 		visarea.set(0, 64 + 640 + 64 - 1, 16, 16 + 15 + 200 + 15 - 1);
 		height = 262;
 	}
-	refresh = HZ_TO_ATTOSECONDS( XTAL_16MHz ) * 1024 * height;
+	refresh = HZ_TO_ATTOSECONDS( XTAL(16'000'000) ) * 1024 * height;
 	m_screen->configure( 1024, height, visarea, refresh );
 }
 

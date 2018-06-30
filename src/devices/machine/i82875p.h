@@ -9,32 +9,46 @@
 
 #include "pci.h"
 
-#define MCFG_I82875P_HOST_ADD(_tag, _subdevice_id, _cpu_tag, _ram_size)    \
-	MCFG_PCI_HOST_ADD(_tag, I82875P_HOST, 0x80862578, 0x02, _subdevice_id) \
-	downcast<i82875p_host_device *>(device)->set_cpu_tag(_cpu_tag);        \
-	downcast<i82875p_host_device *>(device)->set_ram_size(_ram_size);
-
-#define MCFG_I82875P_AGP_ADD(_tag) \
-	MCFG_AGP_BRIDGE_ADD(_tag, I82875P_AGP, 0x80862579, 0x02)
-
-#define MCFG_I82875P_OVERFLOW_ADD(_tag, _subdevice_id)    \
-	MCFG_PCI_DEVICE_ADD(_tag, I82875P_OVERFLOW, 0x8086257e, 0x02, 0x088000, _subdevice_id)
-
 class i82875p_host_device : public pci_host_device {
 public:
+	template <typename T>
+	i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id, T &&cpu_tag, int ram_size)
+		: i82875p_host_device(mconfig, tag, owner, clock)
+	{
+		set_ids_host(0x80862578, 0x02, subdevice_id);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_ram_size(ram_size);
+	}
+
 	i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_cpu_tag(const char *tag);
+	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_size(int ram_size);
+
+	virtual DECLARE_READ8_MEMBER(capptr_r) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	virtual void config_map(address_map &map) override;
 
-	virtual DECLARE_READ8_MEMBER(capptr_r) override;
+private:
+	void agp_translation_map(address_map &map);
+
+	int ram_size;
+	required_device<device_memory_interface> cpu;
+	std::vector<uint32_t> ram;
+
+	uint8_t agpm, fpllcont, pam[8], smram, esmramc;
+	uint8_t apsize, amtt, lptt;
+	uint16_t toud, mchcfg, errcmd, smicmd, scicmd, skpd;
+	uint32_t agpctrl, attbase;
 
 	DECLARE_READ8_MEMBER(  agpm_r);
 	DECLARE_WRITE8_MEMBER( agpm_w);
@@ -79,23 +93,6 @@ public:
 	DECLARE_WRITE16_MEMBER(skpd_w);
 	DECLARE_READ32_MEMBER( capreg1_r);
 	DECLARE_READ8_MEMBER(  capreg2_r);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-private:
-	DECLARE_ADDRESS_MAP(agp_translation_map, 32);
-
-	const char *cpu_tag;
-	int ram_size;
-	cpu_device *cpu;
-	std::vector<uint32_t> ram;
-
-	uint8_t agpm, fpllcont, pam[8], smram, esmramc;
-	uint8_t apsize, amtt, lptt;
-	uint16_t toud, mchcfg, errcmd, smicmd, scicmd, skpd;
-	uint32_t agpctrl, attbase;
 };
 
 class i82875p_agp_device : public agp_bridge_device {
@@ -109,9 +106,14 @@ protected:
 
 class i82875p_overflow_device : public pci_device {
 public:
+	i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id)
+		: i82875p_overflow_device(mconfig, tag, owner, clock)
+	{
+		set_ids(0x8086257e, 0x02, 0x088000, subdevice_id);
+	}
 	i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-
+private:
 	DECLARE_READ8_MEMBER  (dram_row_boundary_r);
 	DECLARE_WRITE8_MEMBER (dram_row_boundary_w);
 	DECLARE_READ8_MEMBER  (dram_row_attribute_r);
@@ -126,7 +128,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(overflow_map, 32);
+	void overflow_map(address_map &map);
 
 	uint8_t dram_row_boundary[8], dram_row_attribute[4];
 	uint32_t dram_timing, dram_controller_mode;

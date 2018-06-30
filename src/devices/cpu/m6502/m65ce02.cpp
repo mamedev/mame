@@ -10,8 +10,9 @@
 
 #include "emu.h"
 #include "m65ce02.h"
+#include "m65ce02d.h"
 
-DEFINE_DEVICE_TYPE(M65CE02, m65ce02_device, "m65ce02", "M65CE02")
+DEFINE_DEVICE_TYPE(M65CE02, m65ce02_device, "m65ce02", "MOS Technology M65CE02")
 
 m65ce02_device::m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m65ce02_device(mconfig, M65CE02, tag, owner, clock)
@@ -23,9 +24,9 @@ m65ce02_device::m65ce02_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-offs_t m65ce02_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> m65ce02_device::create_disassembler()
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return std::make_unique<m65ce02_disassembler>();
 }
 
 void m65ce02_device::init()
@@ -43,10 +44,10 @@ void m65ce02_device::init()
 
 void m65ce02_device::device_start()
 {
-	if(direct_disabled)
-		mintf = new mi_default_nd;
+	if(cache_disabled)
+		mintf = std::make_unique<mi_default_nd>();
 	else
-		mintf = new mi_default_normal;
+		mintf = std::make_unique<mi_default_normal>();
 
 	init();
 }
@@ -69,10 +70,6 @@ void m65ce02_device::state_import(const device_state_entry &entry)
 		B <<= 8;
 		break;
 	}
-}
-
-void m65ce02_device::state_export(const device_state_entry &entry)
-{
 }
 
 void m65ce02_device::state_string_export(const device_state_entry &entry, std::string &str) const

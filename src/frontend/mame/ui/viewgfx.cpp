@@ -9,6 +9,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "emupal.h"
 #include "ui/ui.h"
 #include "uiinput.h"
 #include "render.h"
@@ -1320,7 +1321,11 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state &state,
 	{
 		state.bitmap->fill(0);
 		tilemap_t *tilemap = machine.tilemap().find(state.tilemap.which);
-		tilemap->draw_debug(*machine.first_screen(), *state.bitmap, state.tilemap.xoffs, state.tilemap.yoffs, state.tilemap.flags);
+		screen_device *first_screen = screen_device_iterator(machine.root_device()).first();
+		if (first_screen)
+		{
+			tilemap->draw_debug(*first_screen, *state.bitmap, state.tilemap.xoffs, state.tilemap.yoffs, state.tilemap.flags);
+		}
 
 		// reset the texture to force an update
 		state.texture->set_bitmap(*state.bitmap, state.bitmap->cliprect(), TEXFORMAT_RGB32);

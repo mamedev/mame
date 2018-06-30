@@ -978,7 +978,7 @@ READ8_MEMBER(fm7_state::fm77av_video_flags_r)
 {
 	uint8_t ret = 0xff;
 
-	if(machine().first_screen()->vblank())
+	if(m_screen->vblank())
 		ret &= ~0x80;
 
 	if(m_alu.busy != 0)
@@ -1019,7 +1019,7 @@ READ8_MEMBER(fm7_state::fm77av_sub_modestatus_r)
 	ret |= 0xbc;
 	ret |= (m_video.modestatus & 0x40);
 
-	if(!machine().first_screen()->vblank())
+	if(!m_screen->vblank())
 		ret |= 0x02;
 
 	if(m_video.vsync_flag != 0)
@@ -1034,12 +1034,12 @@ WRITE8_MEMBER(fm7_state::fm77av_sub_modestatus_w)
 	if(data & 0x40)
 	{
 		rectangle rect(0, 320-1, 0, 200-1);
-		machine().first_screen()->configure(320,200,rect,HZ_TO_ATTOSECONDS(60));
+		m_screen->configure(512, 262, rect, m_screen->frame_period().as_attoseconds());
 	}
 	else
 	{
 		rectangle rect(0, 640-1, 0, 200-1);
-		machine().first_screen()->configure(640,200,rect,HZ_TO_ATTOSECONDS(60));
+		m_screen->configure(1024, 262, rect, m_screen->frame_period().as_attoseconds());
 	}
 }
 
@@ -1087,7 +1087,7 @@ WRITE8_MEMBER(fm7_state::fm77av_sub_bank_w)
 			break;
 	}
 	// reset sub CPU, set busy flag, set reset flag
-	m_sub->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+	m_sub->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	m_video.sub_busy = 0x80;
 	m_video.sub_halt = 0;
 	m_video.sub_reset = 1;
@@ -1269,7 +1269,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm77av_vsync)
 	else
 	{
 		m_video.vsync_flag = 0;
-		m_fm77av_vsync_timer->adjust(machine().first_screen()->time_until_vblank_end());
+		m_fm77av_vsync_timer->adjust(m_screen->time_until_vblank_end());
 	}
 }
 

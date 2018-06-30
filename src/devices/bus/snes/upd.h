@@ -18,6 +18,13 @@ public:
 	// construction/destruction
 	sns_rom20_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	virtual void speedup_addon_bios_access() override;
 
 	// additional reading and writing
@@ -27,13 +34,10 @@ public:
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
 
-protected:
-	sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	void dsp_data_map_lorom(address_map &map);
+	void dsp_prg_map_lorom(address_map &map);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
+private:
 	required_device<upd7725_device> m_upd7725;
 
 	std::vector<uint32_t> m_dsp_prg;
@@ -48,6 +52,13 @@ public:
 	// construction/destruction
 	sns_rom21_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	sns_rom21_necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	virtual void speedup_addon_bios_access() override;
 
 	// additional reading and writing
@@ -57,13 +68,10 @@ public:
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
 
-protected:
-	sns_rom21_necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	void dsp_data_map_hirom(address_map &map);
+	void dsp_prg_map_hirom(address_map &map);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
+private:
 	required_device<upd7725_device> m_upd7725;
 
 	std::vector<uint32_t> m_dsp_prg;
@@ -77,13 +85,6 @@ class sns_rom_setadsp_device : public sns_rom_device
 public:
 	virtual void speedup_addon_bios_access() override;
 
-	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
-
-	virtual DECLARE_READ32_MEMBER(setadsp_prg_r);
-	virtual DECLARE_READ16_MEMBER(setadsp_data_r);
-
 protected:
 	// construction/destruction
 	sns_rom_setadsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -91,6 +92,17 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	// additional reading and writing
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+
+	virtual DECLARE_READ32_MEMBER(setadsp_prg_r);
+	virtual DECLARE_READ16_MEMBER(setadsp_data_r);
+
+	void st01x_data_map(address_map &map);
+	void st01x_prg_map(address_map &map);
+
+private:
 	required_device<upd96050_device> m_upd96050;
 
 	std::vector<uint32_t> m_dsp_prg;

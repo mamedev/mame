@@ -62,14 +62,14 @@
 
 #define MCFG_SPECTRUM_PASSTHRU_EXPANSION_SLOT_ADD() \
 	MCFG_SPECTRUM_EXPANSION_SLOT_ADD(SPECTRUM_EXPANSION_SLOT_TAG, spectrum_expansion_devices, nullptr) \
-	MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, irq_w)) \
-	MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, nmi_w))
+	MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, irq_w)) \
+	MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(WRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, nmi_w))
 
 #define MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(_devcb) \
-	devcb = &spectrum_expansion_slot_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<spectrum_expansion_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &spectrum_expansion_slot_device::set_nmi_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<spectrum_expansion_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -88,11 +88,8 @@ public:
 	virtual ~spectrum_expansion_slot_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
-	{ return downcast<spectrum_expansion_slot_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
-	{ return downcast<spectrum_expansion_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_handler(Object &&cb) { return m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( mreq_r );
 	DECLARE_WRITE8_MEMBER( mreq_w );
@@ -104,6 +101,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -139,9 +137,9 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(SPECTRUM_EXPANSION_SLOT, spectrum_expansion_slot_device)
 
-SLOT_INTERFACE_EXTERN( spectrum_expansion_devices );
-SLOT_INTERFACE_EXTERN( spec128_expansion_devices );
-SLOT_INTERFACE_EXTERN( specpls3_expansion_devices );
+void spectrum_expansion_devices(device_slot_interface &device);
+void spec128_expansion_devices(device_slot_interface &device);
+void specpls3_expansion_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_SPECTRUM_EXP_H

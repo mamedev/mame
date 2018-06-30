@@ -388,7 +388,7 @@ void tceptor_state::video_start()
 	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
-	save_pointer(NAME(m_sprite_ram_buffered.get()), 0x200 / 2);
+	save_pointer(NAME(m_sprite_ram_buffered), 0x200 / 2);
 	save_item(NAME(m_bg1_scroll_x));
 	save_item(NAME(m_bg1_scroll_y));
 	save_item(NAME(m_bg2_scroll_x));
@@ -535,11 +535,24 @@ WRITE_LINE_MEMBER(tceptor_state::screen_vblank_tceptor)
 	if (state)
 	{
 		memcpy(m_sprite_ram_buffered.get(), m_sprite_ram, 0x200);
+
+		if (m_m6809_irq_enable)
+			m_maincpu->set_input_line(0, HOLD_LINE);
+		else
+			m_m6809_irq_enable = 1;
+
+		if (m_m68k_irq_enable)
+			m_subcpu->set_input_line(1, HOLD_LINE);
+
+		if (m_mcu_irq_enable)
+			m_mcu->set_input_line(0, HOLD_LINE);
+		else
+			m_mcu_irq_enable = 1;
 	}
 }
 
 WRITE8_MEMBER(tceptor_state::tceptor2_shutter_w)
 {
 	// 3D scope shutter control
-	output().set_value("shutter", data & 1);
+	m_shutter = BIT(data, 0);
 }

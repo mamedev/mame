@@ -27,7 +27,7 @@ Notes:
 ********************************************************************************************************************/
 
 #include "emu.h"
-#include "includes/nb1414m4.h"
+#include "machine/nb1414m4.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(NB1414M4, nb1414m4_device, "nb1414m4", "NB1414M4 Mahjong Custom")
@@ -92,7 +92,7 @@ void nb1414m4_device::fill(uint16_t dst, uint8_t tile, uint8_t pal, uint8_t *vra
 void nb1414m4_device::insert_coin_msg(uint8_t *vram)
 {
 	int credit_count = (vram[0xf] & 0xff);
-	uint8_t fl_cond = m_screen->frame_number() & 0x10; /* for insert coin "flickering" */
+	uint8_t fl_cond = screen().frame_number() & 0x10; /* for insert coin "flickering" */
 	uint16_t dst;
 
 	if(credit_count == 0)
@@ -112,7 +112,7 @@ void nb1414m4_device::insert_coin_msg(uint8_t *vram)
 void nb1414m4_device::credit_msg(uint8_t *vram)
 {
 	int credit_count = (vram[0xf] & 0xff);
-	uint8_t fl_cond = m_screen->frame_number() & 0x10; /* for insert coin "flickering" */
+	uint8_t fl_cond = screen().frame_number() & 0x10; /* for insert coin "flickering" */
 	uint16_t dst;
 
 	dst = ((m_data[0x023]<<8)|(m_data[0x024]&0xff)) & 0x3fff;
@@ -319,7 +319,7 @@ void nb1414m4_device::exec(uint16_t mcu_cmd, uint8_t *vram, uint16_t &scrollx, u
 		case 0x8000: break; //Ninja Emaki, attract mode
 		case 0xff00: break; //Ninja Emaki POST, presumably invalid
 		default:
-			popmessage("NB 1414M4 executes %04x command, contact MAMEdev\n",mcu_cmd);
+			popmessage("NB 1414M4 executes %04x command, contact MAMEdev",mcu_cmd);
 			break;
 	}
 

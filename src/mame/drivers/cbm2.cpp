@@ -11,6 +11,7 @@
 */
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -221,6 +222,19 @@ public:
 
 	// timers
 	emu_timer *m_todclk_timer;
+	void _128k(machine_config &config);
+	void _256k(machine_config &config);
+	void cbm2lp_ntsc(machine_config &config);
+	void cbm2lp_pal(machine_config &config);
+	void cbm2hp_ntsc(machine_config &config);
+	void cbm2hp_pal(machine_config &config);
+	void cbm620(machine_config &config);
+	void b128(machine_config &config);
+	void b256(machine_config &config);
+	void cbm610(machine_config &config);
+	void cbm2_mem(address_map &map);
+	void ext_io(address_map &map);
+	void ext_mem(address_map &map);
 };
 
 
@@ -235,6 +249,12 @@ public:
 		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4) override;
 
 	DECLARE_READ8_MEMBER( tpi2_pc_r );
+	void b256hp(machine_config &config);
+	void b128hp(machine_config &config);
+	void cbm710(machine_config &config);
+	void cbm730(machine_config &config);
+	void cbm720(machine_config &config);
+	void bx256hp(machine_config &config);
 };
 
 
@@ -300,6 +320,11 @@ public:
 
 	// interrupt state
 	int m_vic_irq;
+	void p500_pal(machine_config &config);
+	void p500_ntsc(machine_config &config);
+	void p500_mem(address_map &map);
+	void vic_colorram_map(address_map &map);
+	void vic_videoram_map(address_map &map);
 };
 
 
@@ -1133,57 +1158,63 @@ READ8_MEMBER( p500_state::vic_colorram_r )
 //  ADDRESS_MAP( cbm2_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( cbm2_mem, AS_PROGRAM, 8, cbm2_state )
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void cbm2_state::cbm2_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(FUNC(cbm2_state::read), FUNC(cbm2_state::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( ext_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ext_mem, AS_PROGRAM, 8, cbm2_state )
-	AM_RANGE(0x00000, 0xeffff) AM_READWRITE(ext_read, ext_write)
-	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0xf000) AM_ROM AM_REGION(EXT_I8088_TAG, 0)
-ADDRESS_MAP_END
+void cbm2_state::ext_mem(address_map &map)
+{
+	map(0x00000, 0xeffff).r(FUNC(cbm2_state::ext_read)).w(FUNC(cbm2_state::ext_write));
+	map(0xf0000, 0xf0fff).mirror(0xf000).rom().region(EXT_I8088_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( ext_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ext_io, AS_IO, 8, cbm2_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0001) AM_MIRROR(0x1e) AM_DEVREADWRITE(EXT_I8259A_TAG, pic8259_device, read, write)
-	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x18) AM_DEVREADWRITE(EXT_MOS6525_TAG, tpi6525_device, read, write)
-ADDRESS_MAP_END
+void cbm2_state::ext_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0001).mirror(0x1e).rw(EXT_I8259A_TAG, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0020, 0x0027).mirror(0x18).rw(EXT_MOS6525_TAG, FUNC(tpi6525_device::read), FUNC(tpi6525_device::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( p500_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( p500_mem, AS_PROGRAM, 8, p500_state )
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void p500_state::p500_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(FUNC(p500_state::read), FUNC(p500_state::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, 0, 8, p500_state )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
-ADDRESS_MAP_END
+void p500_state::vic_videoram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(FUNC(p500_state::vic_videoram_r));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, 1, 8, p500_state )
-	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
-ADDRESS_MAP_END
+void p500_state::vic_colorram_map(address_map &map)
+{
+	map(0x000, 0x3ff).r(FUNC(p500_state::vic_colorram_r));
+}
 
 
 
@@ -1441,20 +1472,20 @@ READ8_MEMBER( cbm2_state::sid_potx_r )
 
 	switch (m_cia_pa >> 6)
 	{
-	case 1: data = m_joy1->pot_x_r(); break;
-	case 2: data = m_joy2->pot_x_r(); break;
+	case 1: data = m_joy1->read_pot_x(); break;
+	case 2: data = m_joy2->read_pot_x(); break;
 	case 3:
 		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
 		{
-			data = 1 / (1 / m_joy1->pot_x_r() + 1 / m_joy2->pot_x_r());
+			data = 1 / (1 / m_joy1->read_pot_x() + 1 / m_joy2->read_pot_x());
 		}
 		else if (m_joy1->has_pot_x())
 		{
-			data = m_joy1->pot_x_r();
+			data = m_joy1->read_pot_x();
 		}
 		else if (m_joy2->has_pot_x())
 		{
-			data = m_joy2->pot_x_r();
+			data = m_joy2->read_pot_x();
 		}
 		break;
 	}
@@ -1468,20 +1499,20 @@ READ8_MEMBER( cbm2_state::sid_poty_r )
 
 	switch (m_cia_pa >> 6)
 	{
-	case 1: data = m_joy1->pot_y_r(); break;
-	case 2: data = m_joy2->pot_y_r(); break;
+	case 1: data = m_joy1->read_pot_y(); break;
+	case 2: data = m_joy2->read_pot_y(); break;
 	case 3:
 		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
 		{
-			data = 1 / (1 / m_joy1->pot_y_r() + 1 / m_joy2->pot_y_r());
+			data = 1 / (1 / m_joy1->read_pot_y() + 1 / m_joy2->read_pot_y());
 		}
 		else if (m_joy1->has_pot_y())
 		{
-			data = m_joy1->pot_y_r();
+			data = m_joy1->read_pot_y();
 		}
 		else if (m_joy2->has_pot_y())
 		{
-			data = m_joy2->pot_y_r();
+			data = m_joy2->read_pot_y();
 		}
 		break;
 	}
@@ -1799,8 +1830,8 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 	data &= m_user->d1_r(space, 0);
 
 	// joystick
-	data &= ~(!BIT(m_joy1->joy_r(), 5) << 6);
-	data &= ~(!BIT(m_joy2->joy_r(), 5) << 7);
+	data &= ~(!BIT(m_joy1->read_joy(), 5) << 6);
+	data &= ~(!BIT(m_joy2->read_joy(), 5) << 7);
 
 	return data;
 }
@@ -1852,8 +1883,8 @@ READ8_MEMBER( cbm2_state::cia_pb_r )
 	uint8_t data = 0;
 
 	// joystick
-	data |= m_joy1->joy_r() & 0x0f;
-	data |= (m_joy2->joy_r() & 0x0f) << 4;
+	data |= m_joy1->read_joy() & 0x0f;
+	data |= (m_joy2->read_joy() & 0x0f) << 4;
 
 	// user port
 	data &= m_user->d2_r(space, 0);
@@ -2258,7 +2289,7 @@ MACHINE_RESET_MEMBER( p500_state, p500 )
 //  MACHINE_CONFIG( 128k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( 128k )
+MACHINE_CONFIG_START(cbm2_state::_128k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("256K")
@@ -2269,7 +2300,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( 256k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( 256k )
+MACHINE_CONFIG_START(cbm2_state::_256k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
@@ -2279,20 +2310,20 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( p500_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( p500_ntsc )
+MACHINE_CONFIG_START(p500_state::p500_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(p500_state, p500_ntsc)
 	MCFG_MACHINE_RESET_OVERRIDE(p500_state, p500)
 
 	// basic hardware
-	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL_14_31818MHz/14)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
-	MCFG_CPU_PROGRAM_MAP(p500_mem)
+	MCFG_DEVICE_ADD(M6509_TAG, M6509, XTAL(14'318'181)/14)
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_DEVICE_PROGRAM_MAP(p500_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(MOS6567_TAG, MOS6567, XTAL_14_31818MHz/14)
+	MCFG_DEVICE_ADD(MOS6567_TAG, MOS6567, XTAL(14'318'181)/14)
 	MCFG_MOS6566_CPU(M6509_TAG)
-	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(p500_state, vic_irq_w))
+	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, p500_state, vic_irq_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
 	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
@@ -2303,85 +2334,85 @@ static MACHINE_CONFIG_START( p500_ntsc )
 	MCFG_SCREEN_UPDATE_DEVICE(MOS6567_TAG, mos6567_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL_14_31818MHz/14)
-	MCFG_MOS6581_POTX_CALLBACK(READ8(p500_state, sid_potx_r))
-	MCFG_MOS6581_POTY_CALLBACK(READ8(p500_state, sid_poty_r))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(14'318'181)/14)
+	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, p500_state, sid_potx_r))
+	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, p500_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
 	MCFG_PLS100_ADD(PLA1_TAG)
 	MCFG_PLS100_ADD(PLA2_TAG)
 	MCFG_DEVICE_ADD(MOS6525_1_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(p500_state, tpi1_irq_w))
-	MCFG_TPI6525_IN_PA_CB(READ8(cbm2_state, tpi1_pa_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(cbm2_state, tpi1_pa_w))
-	MCFG_TPI6525_IN_PB_CB(READ8(cbm2_state, tpi1_pb_r))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(cbm2_state, tpi1_pb_w))
-	MCFG_TPI6525_OUT_CA_CB(WRITELINE(p500_state, tpi1_ca_w))
-	MCFG_TPI6525_OUT_CB_CB(WRITELINE(p500_state, tpi1_cb_w))
+	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(*this, p500_state, tpi1_irq_w))
+	MCFG_TPI6525_IN_PA_CB(READ8(*this, cbm2_state, tpi1_pa_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, cbm2_state, tpi1_pa_w))
+	MCFG_TPI6525_IN_PB_CB(READ8(*this, cbm2_state, tpi1_pb_r))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, tpi1_pb_w))
+	MCFG_TPI6525_OUT_CA_CB(WRITELINE(*this, p500_state, tpi1_ca_w))
+	MCFG_TPI6525_OUT_CB_CB(WRITELINE(*this, p500_state, tpi1_cb_w))
 	MCFG_DEVICE_ADD(MOS6525_2_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(cbm2_state, tpi2_pa_w))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(cbm2_state, tpi2_pb_w))
-	MCFG_TPI6525_IN_PC_CB(READ8(p500_state, tpi2_pc_r))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(p500_state, tpi2_pc_w))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, cbm2_state, tpi2_pa_w))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, tpi2_pb_w))
+	MCFG_TPI6525_IN_PC_CB(READ8(*this, p500_state, tpi2_pc_r))
+	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, p500_state, tpi2_pc_w))
 	MCFG_DEVICE_ADD(MOS6551A_TAG, MOS6551, VIC6567_CLOCK)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_MOS6551_RXC_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_etc))
-	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL_14_31818MHz/14)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_MOS6551_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_MOS6551_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_MOS6551_RXC_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_etc))
+	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL(14'318'181)/14)
 	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i2_w))
-	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w))
-	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, sp_w))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(cbm2_state, cia_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(cbm2_state, cia_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(cbm2_state, cia_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8(CBM2_USER_PORT_TAG, cbm2_user_port_device, d2_w))
-	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, pc_w))
-	MCFG_DS75160A_ADD(DS75160A_TAG, DEVREAD8(IEEE488_TAG, ieee488_device, dio_r), DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(MOS6525_1_TAG, tpi6525_device, i2_w))
+	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w))
+	MCFG_MOS6526_SP_CALLBACK(WRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, sp_w))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, cbm2_state, cia_pa_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, cbm2_state, cia_pa_w))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, cbm2_state, cia_pb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(CBM2_USER_PORT_TAG, cbm2_user_port_device, d2_w))
+	MCFG_MOS6526_PC_CALLBACK(WRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, pc_w))
+	MCFG_DS75160A_ADD(DS75160A_TAG, READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
 	MCFG_DEVICE_ADD(DS75161A_TAG, DS75161A, 0)
-	MCFG_DS75161A_IN_REN_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, ren_r))
-	MCFG_DS75161A_IN_IFC_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, ifc_r))
-	MCFG_DS75161A_IN_NDAC_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, ndac_r))
-	MCFG_DS75161A_IN_NRFD_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, nrfd_r))
-	MCFG_DS75161A_IN_DAV_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, dav_r))
-	MCFG_DS75161A_IN_EOI_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, eoi_r))
-	MCFG_DS75161A_IN_ATN_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, atn_r))
-	MCFG_DS75161A_IN_SRQ_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, srq_r))
-	MCFG_DS75161A_OUT_REN_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
-	MCFG_DS75161A_OUT_IFC_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
-	MCFG_DS75161A_OUT_NDAC_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
-	MCFG_DS75161A_OUT_NRFD_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, nrfd_w))
-	MCFG_DS75161A_OUT_DAV_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, dav_w))
-	MCFG_DS75161A_OUT_EOI_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
-	MCFG_DS75161A_OUT_ATN_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, atn_w))
-	MCFG_DS75161A_OUT_SRQ_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, srq_w))
+	MCFG_DS75161A_IN_REN_CB(READLINE(IEEE488_TAG, ieee488_device, ren_r))
+	MCFG_DS75161A_IN_IFC_CB(READLINE(IEEE488_TAG, ieee488_device, ifc_r))
+	MCFG_DS75161A_IN_NDAC_CB(READLINE(IEEE488_TAG, ieee488_device, ndac_r))
+	MCFG_DS75161A_IN_NRFD_CB(READLINE(IEEE488_TAG, ieee488_device, nrfd_r))
+	MCFG_DS75161A_IN_DAV_CB(READLINE(IEEE488_TAG, ieee488_device, dav_r))
+	MCFG_DS75161A_IN_EOI_CB(READLINE(IEEE488_TAG, ieee488_device, eoi_r))
+	MCFG_DS75161A_IN_ATN_CB(READLINE(IEEE488_TAG, ieee488_device, atn_r))
+	MCFG_DS75161A_IN_SRQ_CB(READLINE(IEEE488_TAG, ieee488_device, srq_r))
+	MCFG_DS75161A_OUT_REN_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ren_w))
+	MCFG_DS75161A_OUT_IFC_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ifc_w))
+	MCFG_DS75161A_OUT_NDAC_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
+	MCFG_DS75161A_OUT_NRFD_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_nrfd_w))
+	MCFG_DS75161A_OUT_DAV_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
+	MCFG_DS75161A_OUT_EOI_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_eoi_w))
+	MCFG_DS75161A_OUT_ATN_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_atn_w))
+	MCFG_DS75161A_OUT_SRQ_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_srq_w))
 	MCFG_CBM_IEEE488_ADD("c8050")
-	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i1_w))
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, nullptr, DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(MOS6525_1_TAG, tpi6525_device, i1_w))
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, nullptr, WRITELINE(MOS6526_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
-	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS6567_TAG, mos6567_device, lp_w))
+	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS6567_TAG, mos6567_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
-	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/14, cbm2_expansion_cards, nullptr)
+	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL(14'318'181)/14, cbm2_expansion_cards, nullptr)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, cbm2_user_port_cards, nullptr)
-	MCFG_CBM2_USER_PORT_IRQ_CALLBACK(WRITELINE(p500_state, user_irq_w))
-	MCFG_CBM2_USER_PORT_SP_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, sp_w))
-	MCFG_CBM2_USER_PORT_CNT_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, cnt_w))
-	MCFG_CBM2_USER_PORT_FLAG_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, write_cts))
+	MCFG_CBM2_USER_PORT_IRQ_CALLBACK(WRITELINE(*this, p500_state, user_irq_w))
+	MCFG_CBM2_USER_PORT_SP_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, sp_w))
+	MCFG_CBM2_USER_PORT_CNT_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, cnt_w))
+	MCFG_CBM2_USER_PORT_FLAG_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, flag_w))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_cts))
 
 	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
-	MCFG_FRAGMENT_ADD(128k)
+	_128k(config);
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
@@ -2395,20 +2426,20 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( p500_pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( p500_pal )
+MACHINE_CONFIG_START(p500_state::p500_pal)
 	MCFG_MACHINE_START_OVERRIDE(p500_state, p500_pal)
 	MCFG_MACHINE_RESET_OVERRIDE(p500_state, p500)
 
 	// basic hardware
-	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL_17_734472MHz/18)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
-	MCFG_CPU_PROGRAM_MAP(p500_mem)
+	MCFG_DEVICE_ADD(M6509_TAG, M6509, XTAL(17'734'472)/18)
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_DEVICE_PROGRAM_MAP(p500_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(MOS6569_TAG, MOS6569, XTAL_17_734472MHz/18)
+	MCFG_DEVICE_ADD(MOS6569_TAG, MOS6569, XTAL(17'734'472)/18)
 	MCFG_MOS6566_CPU(M6509_TAG)
-	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(p500_state, vic_irq_w))
+	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, p500_state, vic_irq_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
 	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
@@ -2419,82 +2450,82 @@ static MACHINE_CONFIG_START( p500_pal )
 	MCFG_SCREEN_UPDATE_DEVICE(MOS6569_TAG, mos6569_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL_17_734472MHz/18)
-	MCFG_MOS6581_POTX_CALLBACK(READ8(p500_state, sid_potx_r))
-	MCFG_MOS6581_POTY_CALLBACK(READ8(p500_state, sid_poty_r))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(17'734'472)/18)
+	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, p500_state, sid_potx_r))
+	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, p500_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
 	MCFG_PLS100_ADD(PLA1_TAG)
 	MCFG_PLS100_ADD(PLA2_TAG)
 	MCFG_DEVICE_ADD(MOS6525_1_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(p500_state, tpi1_irq_w))
-	MCFG_TPI6525_IN_PA_CB(READ8(cbm2_state, tpi1_pa_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(cbm2_state, tpi1_pa_w))
-	MCFG_TPI6525_IN_PB_CB(READ8(cbm2_state, tpi1_pb_r))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(cbm2_state, tpi1_pb_w))
-	MCFG_TPI6525_OUT_CA_CB(WRITELINE(p500_state, tpi1_ca_w))
-	MCFG_TPI6525_OUT_CB_CB(WRITELINE(p500_state, tpi1_cb_w))
+	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(*this, p500_state, tpi1_irq_w))
+	MCFG_TPI6525_IN_PA_CB(READ8(*this, cbm2_state, tpi1_pa_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, cbm2_state, tpi1_pa_w))
+	MCFG_TPI6525_IN_PB_CB(READ8(*this, cbm2_state, tpi1_pb_r))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, tpi1_pb_w))
+	MCFG_TPI6525_OUT_CA_CB(WRITELINE(*this, p500_state, tpi1_ca_w))
+	MCFG_TPI6525_OUT_CB_CB(WRITELINE(*this, p500_state, tpi1_cb_w))
 	MCFG_DEVICE_ADD(MOS6525_2_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(cbm2_state, tpi2_pa_w))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(cbm2_state, tpi2_pb_w))
-	MCFG_TPI6525_IN_PC_CB(READ8(p500_state, tpi2_pc_r))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(p500_state, tpi2_pc_w))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, cbm2_state, tpi2_pa_w))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, tpi2_pb_w))
+	MCFG_TPI6525_IN_PC_CB(READ8(*this, p500_state, tpi2_pc_r))
+	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, p500_state, tpi2_pc_w))
 	MCFG_DEVICE_ADD(MOS6551A_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL_17_734472MHz/18)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL(17'734'472)/18)
 	MCFG_MOS6526_TOD(50)
-	MCFG_MOS6526_IRQ_CALLBACK(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i2_w))
-	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w))
-	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, sp_w))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(cbm2_state, cia_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(cbm2_state, cia_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(cbm2_state, cia_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8(CBM2_USER_PORT_TAG, cbm2_user_port_device, d2_w))
-	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, pc_w))
-	MCFG_DS75160A_ADD(DS75160A_TAG, DEVREAD8(IEEE488_TAG, ieee488_device, dio_r), DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(MOS6525_1_TAG, tpi6525_device, i2_w))
+	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w))
+	MCFG_MOS6526_SP_CALLBACK(WRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, sp_w))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, cbm2_state, cia_pa_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, cbm2_state, cia_pa_w))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, cbm2_state, cia_pb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(CBM2_USER_PORT_TAG, cbm2_user_port_device, d2_w))
+	MCFG_MOS6526_PC_CALLBACK(WRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, pc_w))
+	MCFG_DS75160A_ADD(DS75160A_TAG, READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
 	MCFG_DEVICE_ADD(DS75161A_TAG, DS75161A, 0)
-	MCFG_DS75161A_IN_REN_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, ren_r))
-	MCFG_DS75161A_IN_IFC_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, ifc_r))
-	MCFG_DS75161A_IN_NDAC_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, ndac_r))
-	MCFG_DS75161A_IN_NRFD_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, nrfd_r))
-	MCFG_DS75161A_IN_DAV_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, dav_r))
-	MCFG_DS75161A_IN_EOI_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, eoi_r))
-	MCFG_DS75161A_IN_ATN_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, atn_r))
-	MCFG_DS75161A_IN_SRQ_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, srq_r))
-	MCFG_DS75161A_OUT_REN_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
-	MCFG_DS75161A_OUT_IFC_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
-	MCFG_DS75161A_OUT_NDAC_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
-	MCFG_DS75161A_OUT_NRFD_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, nrfd_w))
-	MCFG_DS75161A_OUT_DAV_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, dav_w))
-	MCFG_DS75161A_OUT_EOI_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
-	MCFG_DS75161A_OUT_ATN_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, atn_w))
-	MCFG_DS75161A_OUT_SRQ_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, srq_w))
+	MCFG_DS75161A_IN_REN_CB(READLINE(IEEE488_TAG, ieee488_device, ren_r))
+	MCFG_DS75161A_IN_IFC_CB(READLINE(IEEE488_TAG, ieee488_device, ifc_r))
+	MCFG_DS75161A_IN_NDAC_CB(READLINE(IEEE488_TAG, ieee488_device, ndac_r))
+	MCFG_DS75161A_IN_NRFD_CB(READLINE(IEEE488_TAG, ieee488_device, nrfd_r))
+	MCFG_DS75161A_IN_DAV_CB(READLINE(IEEE488_TAG, ieee488_device, dav_r))
+	MCFG_DS75161A_IN_EOI_CB(READLINE(IEEE488_TAG, ieee488_device, eoi_r))
+	MCFG_DS75161A_IN_ATN_CB(READLINE(IEEE488_TAG, ieee488_device, atn_r))
+	MCFG_DS75161A_IN_SRQ_CB(READLINE(IEEE488_TAG, ieee488_device, srq_r))
+	MCFG_DS75161A_OUT_REN_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ren_w))
+	MCFG_DS75161A_OUT_IFC_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ifc_w))
+	MCFG_DS75161A_OUT_NDAC_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
+	MCFG_DS75161A_OUT_NRFD_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_nrfd_w))
+	MCFG_DS75161A_OUT_DAV_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
+	MCFG_DS75161A_OUT_EOI_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_eoi_w))
+	MCFG_DS75161A_OUT_ATN_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_atn_w))
+	MCFG_DS75161A_OUT_SRQ_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_srq_w))
 	MCFG_CBM_IEEE488_ADD("c8050")
-	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i1_w))
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, nullptr, DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(MOS6525_1_TAG, tpi6525_device, i1_w))
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, nullptr, WRITELINE(MOS6526_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
-	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
+	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
-	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_17_734472MHz/18, cbm2_expansion_cards, nullptr)
+	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL(17'734'472)/18, cbm2_expansion_cards, nullptr)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, cbm2_user_port_cards, nullptr)
-	MCFG_CBM2_USER_PORT_IRQ_CALLBACK(WRITELINE(p500_state, user_irq_w))
-	MCFG_CBM2_USER_PORT_SP_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, sp_w))
-	MCFG_CBM2_USER_PORT_CNT_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, cnt_w))
-	MCFG_CBM2_USER_PORT_FLAG_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, write_cts))
+	MCFG_CBM2_USER_PORT_IRQ_CALLBACK(WRITELINE(*this, p500_state, user_irq_w))
+	MCFG_CBM2_USER_PORT_SP_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, sp_w))
+	MCFG_CBM2_USER_PORT_CNT_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, cnt_w))
+	MCFG_CBM2_USER_PORT_FLAG_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, flag_w))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_cts))
 
 	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
-	MCFG_FRAGMENT_ADD(128k)
+	_128k(config);
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
@@ -2508,14 +2539,14 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2lp_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm2lp_ntsc )
+MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_ntsc)
 	MCFG_MACHINE_RESET_OVERRIDE(cbm2_state, cbm2)
 
 	// basic hardware
-	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL_18MHz/9)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
-	MCFG_CPU_PROGRAM_MAP(cbm2_mem)
+	MCFG_DEVICE_ADD(M6509_TAG, M6509, XTAL(18'000'000)/9)
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_DEVICE_PROGRAM_MAP(cbm2_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
 	// video hardware
@@ -2529,79 +2560,79 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, SCREEN_TAG, XTAL_18MHz/9)
+	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, SCREEN_TAG, XTAL(18'000'000)/9)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(9)
 	MCFG_MC6845_UPDATE_ROW_CB(cbm2_state, crtc_update_row)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL_18MHz/9)
-	MCFG_MOS6581_POTX_CALLBACK(READ8(cbm2_state, sid_potx_r))
-	MCFG_MOS6581_POTY_CALLBACK(READ8(cbm2_state, sid_poty_r))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(18'000'000)/9)
+	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, cbm2_state, sid_potx_r))
+	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, cbm2_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
 	MCFG_PLS100_ADD(PLA1_TAG)
 	MCFG_DEVICE_ADD(MOS6525_1_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(cbm2_state, tpi1_irq_w))
-	MCFG_TPI6525_IN_PA_CB(READ8(cbm2_state, tpi1_pa_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(cbm2_state, tpi1_pa_w))
-	MCFG_TPI6525_IN_PA_CB(READ8(cbm2_state, tpi1_pb_r))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(cbm2_state, tpi1_pb_w))
-	MCFG_TPI6525_OUT_CA_CB(WRITELINE(cbm2_state, tpi1_ca_w))
+	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(*this, cbm2_state, tpi1_irq_w))
+	MCFG_TPI6525_IN_PA_CB(READ8(*this, cbm2_state, tpi1_pa_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, cbm2_state, tpi1_pa_w))
+	MCFG_TPI6525_IN_PA_CB(READ8(*this, cbm2_state, tpi1_pb_r))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, tpi1_pb_w))
+	MCFG_TPI6525_OUT_CA_CB(WRITELINE(*this, cbm2_state, tpi1_ca_w))
 	MCFG_DEVICE_ADD(MOS6525_2_TAG, TPI6525, 0)
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(cbm2_state, tpi2_pa_w))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(cbm2_state, tpi2_pb_w))
-	MCFG_TPI6525_IN_PC_CB(READ8(cbm2_state, tpi2_pc_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, cbm2_state, tpi2_pa_w))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, tpi2_pb_w))
+	MCFG_TPI6525_IN_PC_CB(READ8(*this, cbm2_state, tpi2_pc_r))
 	MCFG_DEVICE_ADD(MOS6551A_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL_18MHz/9)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL(18'000'000)/9)
 	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i2_w))
-	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w))
-	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, sp_w))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(cbm2_state, cia_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(cbm2_state, cia_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(cbm2_state, cia_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8(CBM2_USER_PORT_TAG, cbm2_user_port_device, d2_w))
-	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, pc_w))
-	MCFG_DS75160A_ADD(DS75160A_TAG, DEVREAD8(IEEE488_TAG, ieee488_device, dio_r), DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(MOS6525_1_TAG, tpi6525_device, i2_w))
+	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w))
+	MCFG_MOS6526_SP_CALLBACK(WRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, sp_w))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, cbm2_state, cia_pa_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, cbm2_state, cia_pa_w))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, cbm2_state, cia_pb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(CBM2_USER_PORT_TAG, cbm2_user_port_device, d2_w))
+	MCFG_MOS6526_PC_CALLBACK(WRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, pc_w))
+	MCFG_DS75160A_ADD(DS75160A_TAG, READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
 	MCFG_DEVICE_ADD(DS75161A_TAG, DS75161A, 0)
-	MCFG_DS75161A_IN_REN_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, ren_r))
-	MCFG_DS75161A_IN_IFC_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, ifc_r))
-	MCFG_DS75161A_IN_NDAC_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, ndac_r))
-	MCFG_DS75161A_IN_NRFD_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, nrfd_r))
-	MCFG_DS75161A_IN_DAV_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, dav_r))
-	MCFG_DS75161A_IN_EOI_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, eoi_r))
-	MCFG_DS75161A_IN_ATN_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, atn_r))
-	MCFG_DS75161A_IN_SRQ_CB(DEVREADLINE(IEEE488_TAG, ieee488_device, srq_r))
-	MCFG_DS75161A_OUT_REN_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
-	MCFG_DS75161A_OUT_IFC_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
-	MCFG_DS75161A_OUT_NDAC_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
-	MCFG_DS75161A_OUT_NRFD_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, nrfd_w))
-	MCFG_DS75161A_OUT_DAV_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, dav_w))
-	MCFG_DS75161A_OUT_EOI_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
-	MCFG_DS75161A_OUT_ATN_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, atn_w))
-	MCFG_DS75161A_OUT_SRQ_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, srq_w))
+	MCFG_DS75161A_IN_REN_CB(READLINE(IEEE488_TAG, ieee488_device, ren_r))
+	MCFG_DS75161A_IN_IFC_CB(READLINE(IEEE488_TAG, ieee488_device, ifc_r))
+	MCFG_DS75161A_IN_NDAC_CB(READLINE(IEEE488_TAG, ieee488_device, ndac_r))
+	MCFG_DS75161A_IN_NRFD_CB(READLINE(IEEE488_TAG, ieee488_device, nrfd_r))
+	MCFG_DS75161A_IN_DAV_CB(READLINE(IEEE488_TAG, ieee488_device, dav_r))
+	MCFG_DS75161A_IN_EOI_CB(READLINE(IEEE488_TAG, ieee488_device, eoi_r))
+	MCFG_DS75161A_IN_ATN_CB(READLINE(IEEE488_TAG, ieee488_device, atn_r))
+	MCFG_DS75161A_IN_SRQ_CB(READLINE(IEEE488_TAG, ieee488_device, srq_r))
+	MCFG_DS75161A_OUT_REN_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ren_w))
+	MCFG_DS75161A_OUT_IFC_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ifc_w))
+	MCFG_DS75161A_OUT_NDAC_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
+	MCFG_DS75161A_OUT_NRFD_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_nrfd_w))
+	MCFG_DS75161A_OUT_DAV_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
+	MCFG_DS75161A_OUT_EOI_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_eoi_w))
+	MCFG_DS75161A_OUT_ATN_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_atn_w))
+	MCFG_DS75161A_OUT_SRQ_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_srq_w))
 	MCFG_CBM_IEEE488_ADD("c8050")
-	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i1_w))
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, nullptr, DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(MOS6525_1_TAG, tpi6525_device, i1_w))
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, nullptr, WRITELINE(MOS6526_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
-	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_18MHz/9, cbm2_expansion_cards, nullptr)
+	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL(18'000'000)/9, cbm2_expansion_cards, nullptr)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, cbm2_user_port_cards, nullptr)
-	MCFG_CBM2_USER_PORT_IRQ_CALLBACK(WRITELINE(cbm2_state, user_irq_w))
-	MCFG_CBM2_USER_PORT_SP_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, sp_w))
-	MCFG_CBM2_USER_PORT_CNT_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, cnt_w))
-	MCFG_CBM2_USER_PORT_FLAG_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, write_cts))
+	MCFG_CBM2_USER_PORT_IRQ_CALLBACK(WRITELINE(*this, cbm2_state, user_irq_w))
+	MCFG_CBM2_USER_PORT_SP_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, sp_w))
+	MCFG_CBM2_USER_PORT_CNT_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, cnt_w))
+	MCFG_CBM2_USER_PORT_FLAG_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, flag_w))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(MOS6551A_TAG, mos6551_device, write_cts))
 
 	MCFG_QUICKLOAD_ADD("quickload", cbm2_state, cbmb, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -2617,8 +2648,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b128 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( b128, cbm2lp_ntsc )
-	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_START(cbm2_state::b128)
+	cbm2lp_ntsc(config);
+	_128k(config);
 MACHINE_CONFIG_END
 
 
@@ -2626,8 +2658,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b256 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( b256, cbm2lp_ntsc )
-	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_START(cbm2_state::b256)
+	cbm2lp_ntsc(config);
+	_256k(config);
 MACHINE_CONFIG_END
 
 
@@ -2635,7 +2668,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2lp_pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm2lp_pal, cbm2lp_ntsc )
+MACHINE_CONFIG_START(cbm2_state::cbm2lp_pal)
+	cbm2lp_ntsc(config);
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	MCFG_DEVICE_MODIFY(MOS6526_TAG)
@@ -2647,8 +2681,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm610 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm610, cbm2lp_pal )
-	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_START(cbm2_state::cbm610)
+	cbm2lp_pal(config);
+	_128k(config);
 MACHINE_CONFIG_END
 
 
@@ -2656,8 +2691,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm620 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm620, cbm2lp_pal )
-	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_START(cbm2_state::cbm620)
+	cbm2lp_pal(config);
+	_256k(config);
 MACHINE_CONFIG_END
 
 
@@ -2665,9 +2701,10 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2hp_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm2hp_ntsc, cbm2lp_ntsc )
+MACHINE_CONFIG_START(cbm2_state::cbm2hp_ntsc)
+	cbm2lp_ntsc(config);
 	MCFG_DEVICE_MODIFY(MOS6525_2_TAG)
-	MCFG_TPI6525_IN_PC_CB(READ8(cbm2hp_state, tpi2_pc_r))
+	MCFG_TPI6525_IN_PC_CB(READ8(*this, cbm2hp_state, tpi2_pc_r))
 MACHINE_CONFIG_END
 
 
@@ -2675,8 +2712,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b128hp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( b128hp, cbm2hp_ntsc )
-	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_START(cbm2hp_state::b128hp)
+	cbm2hp_ntsc(config);
+	_128k(config);
 MACHINE_CONFIG_END
 
 
@@ -2684,8 +2722,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b256hp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( b256hp, cbm2hp_ntsc )
-	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_START(cbm2hp_state::b256hp)
+	cbm2hp_ntsc(config);
+	_256k(config);
 MACHINE_CONFIG_END
 
 
@@ -2693,29 +2732,30 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( bx256hp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( bx256hp, b256hp )
+MACHINE_CONFIG_START(cbm2hp_state::bx256hp)
+	b256hp(config);
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_ntsc)
 
-	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
-	MCFG_CPU_PROGRAM_MAP(ext_mem)
-	MCFG_CPU_IO_MAP(ext_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(EXT_I8259A_TAG, pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD(EXT_I8088_TAG, I8088, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ext_mem)
+	MCFG_DEVICE_IO_MAP(ext_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(EXT_I8259A_TAG, pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD(EXT_I8259A_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(EXT_I8088_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(EXT_MOS6525_TAG, TPI6525, 0)
-	MCFG_TPI6525_IN_PA_CB(DEVREAD8(EXT_MOS6526_TAG, mos6526_device, pa_r))
-	MCFG_TPI6525_IN_PB_CB(READ8(cbm2_state, ext_tpi_pb_r))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(cbm2_state, ext_tpi_pb_w))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(cbm2_state, ext_tpi_pc_w))
+	MCFG_TPI6525_IN_PA_CB(READ8(EXT_MOS6526_TAG, mos6526_device, pa_r))
+	MCFG_TPI6525_IN_PB_CB(READ8(*this, cbm2_state, ext_tpi_pb_r))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, ext_tpi_pb_w))
+	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, cbm2_state, ext_tpi_pc_w))
 
-	MCFG_DEVICE_ADD(EXT_MOS6526_TAG, MOS6526, XTAL_18MHz/9)
+	MCFG_DEVICE_ADD(EXT_MOS6526_TAG, MOS6526, XTAL(18'000'000)/9)
 	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(cbm2_state, ext_cia_irq_w))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(DEVREAD8(EXT_MOS6525_TAG, tpi6525_device, pa_r))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(cbm2_state, ext_cia_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(cbm2_state, ext_cia_pb_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, cbm2_state, ext_cia_irq_w))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(EXT_MOS6525_TAG, tpi6525_device, pa_r))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, cbm2_state, ext_cia_pb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, cbm2_state, ext_cia_pb_w))
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list2", "bx256hp_flop")
 MACHINE_CONFIG_END
@@ -2725,12 +2765,13 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2hp_pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm2hp_pal, cbm2hp_ntsc )
+MACHINE_CONFIG_START(cbm2_state::cbm2hp_pal)
+	cbm2hp_ntsc(config);
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	// devices
 	MCFG_DEVICE_MODIFY(MOS6525_2_TAG)
-	MCFG_TPI6525_IN_PC_CB(READ8(cbm2hp_state, tpi2_pc_r))
+	MCFG_TPI6525_IN_PC_CB(READ8(*this, cbm2hp_state, tpi2_pc_r))
 
 	MCFG_DEVICE_MODIFY(MOS6526_TAG)
 	MCFG_MOS6526_TOD(50)
@@ -2741,8 +2782,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm710 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm710, cbm2hp_pal )
-	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_START(cbm2hp_state::cbm710)
+	cbm2hp_pal(config);
+	_128k(config);
 MACHINE_CONFIG_END
 
 
@@ -2750,8 +2792,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm720 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm720, cbm2hp_pal )
-	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_START(cbm2hp_state::cbm720)
+	cbm2hp_pal(config);
+	_256k(config);
 MACHINE_CONFIG_END
 
 
@@ -2759,29 +2802,30 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm730 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm730, cbm720 )
+MACHINE_CONFIG_START(cbm2hp_state::cbm730)
+	cbm720(config);
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_pal)
 
-	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
-	MCFG_CPU_PROGRAM_MAP(ext_mem)
-	MCFG_CPU_IO_MAP(ext_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(EXT_I8259A_TAG, pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD(EXT_I8088_TAG, I8088, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ext_mem)
+	MCFG_DEVICE_IO_MAP(ext_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(EXT_I8259A_TAG, pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD(EXT_I8259A_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(EXT_I8088_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(EXT_MOS6525_TAG, TPI6525, 0)
-	MCFG_TPI6525_IN_PA_CB(DEVREAD8(EXT_MOS6526_TAG, mos6526_device, pa_r))
-	MCFG_TPI6525_IN_PB_CB(READ8(cbm2_state, ext_tpi_pb_r))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(cbm2_state, ext_tpi_pb_w))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(cbm2_state, ext_tpi_pc_w))
+	MCFG_TPI6525_IN_PA_CB(READ8(EXT_MOS6526_TAG, mos6526_device, pa_r))
+	MCFG_TPI6525_IN_PB_CB(READ8(*this, cbm2_state, ext_tpi_pb_r))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cbm2_state, ext_tpi_pb_w))
+	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, cbm2_state, ext_tpi_pc_w))
 
-	MCFG_DEVICE_ADD(EXT_MOS6526_TAG, MOS6526, XTAL_18MHz/9)
+	MCFG_DEVICE_ADD(EXT_MOS6526_TAG, MOS6526, XTAL(18'000'000)/9)
 	MCFG_MOS6526_TOD(50)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(cbm2_state, ext_cia_irq_w))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(DEVREAD8(EXT_MOS6525_TAG, tpi6525_device, pa_r))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(cbm2_state, ext_cia_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(cbm2_state, ext_cia_pb_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, cbm2_state, ext_cia_irq_w))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(EXT_MOS6525_TAG, tpi6525_device, pa_r))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, cbm2_state, ext_cia_pb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, cbm2_state, ext_cia_pb_w))
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list2", "bx256hp_flop")
 MACHINE_CONFIG_END
@@ -2797,18 +2841,19 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( p500 )
-	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901236-01.u84", 0x0000, 0x2000, CRC(33eb6aa2) SHA1(7e3497ae2edbb38c753bd31ed1bf3ae798c9a976), ROM_BIOS(1) )
-	ROMX_LOAD( "901235-01.u83", 0x2000, 0x2000, CRC(18a27feb) SHA1(951b5370dd7db762b8504a141f9f26de345069bb), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901236-02.u84", 0x0000, 0x2000, CRC(c62ab16f) SHA1(f50240407bade901144f7e9f489fa9c607834eca), ROM_BIOS(2) )
-	ROMX_LOAD( "901235-02.u83", 0x2000, 0x2000, CRC(20b7df33) SHA1(1b9a55f12f8cf025754d8029cc5324b474c35841), ROM_BIOS(2) )
+
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROMX_LOAD( "901236-01.u84", 0x0000, 0x2000, CRC(33eb6aa2) SHA1(7e3497ae2edbb38c753bd31ed1bf3ae798c9a976), ROM_BIOS(0) )
+	ROMX_LOAD( "901235-01.u83", 0x2000, 0x2000, CRC(18a27feb) SHA1(951b5370dd7db762b8504a141f9f26de345069bb), ROM_BIOS(0) )
+	ROMX_LOAD( "901236-02.u84", 0x0000, 0x2000, CRC(c62ab16f) SHA1(f50240407bade901144f7e9f489fa9c607834eca), ROM_BIOS(1) )
+	ROMX_LOAD( "901235-02.u83", 0x2000, 0x2000, CRC(20b7df33) SHA1(1b9a55f12f8cf025754d8029cc5324b474c35841), ROM_BIOS(1) )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
-	ROMX_LOAD( "901234-01.u82", 0x0000, 0x2000, CRC(67962025) SHA1(24b41b65c85bf30ab4e2911f677ce9843845b3b1), ROM_BIOS(1) )
-	ROMX_LOAD( "901234-02.u82", 0x0000, 0x2000, CRC(f46bbd2b) SHA1(097197d4d08e0b82e0466a5f1fbd49a24f3d2523), ROM_BIOS(2) )
+	ROMX_LOAD( "901234-01.u82", 0x0000, 0x2000, CRC(67962025) SHA1(24b41b65c85bf30ab4e2911f677ce9843845b3b1), ROM_BIOS(0) )
+	ROMX_LOAD( "901234-02.u82", 0x0000, 0x2000, CRC(f46bbd2b) SHA1(097197d4d08e0b82e0466a5f1fbd49a24f3d2523), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u76", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
@@ -2848,18 +2893,19 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( b128 )
-	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901243-02b.u59", 0x0000, 0x2000, CRC(9d0366f9) SHA1(625f7337ea972a8bce2bdf2daababc0ed0b3b69b), ROM_BIOS(1) )
-	ROMX_LOAD( "901242-02b.u60", 0x2000, 0x2000, CRC(837978b5) SHA1(56e8d2f86bf73ba36b3d3cb84dd75806b66c530a), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901243-04a.u59", 0x0000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(2) )
-	ROMX_LOAD( "901242-04a.u60", 0x2000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(2) )
+
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROMX_LOAD( "901243-02b.u59", 0x0000, 0x2000, CRC(9d0366f9) SHA1(625f7337ea972a8bce2bdf2daababc0ed0b3b69b), ROM_BIOS(0) )
+	ROMX_LOAD( "901242-02b.u60", 0x2000, 0x2000, CRC(837978b5) SHA1(56e8d2f86bf73ba36b3d3cb84dd75806b66c530a), ROM_BIOS(0) )
+	ROMX_LOAD( "901243-04a.u59", 0x0000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(1) )
+	ROMX_LOAD( "901242-04a.u60", 0x2000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(1) )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
-	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
-	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(0) )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
@@ -2884,9 +2930,9 @@ ROM_START( b256 )
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
@@ -2920,18 +2966,19 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( b128hp )
-	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901243-02b.u59", 0x0000, 0x2000, CRC(9d0366f9) SHA1(625f7337ea972a8bce2bdf2daababc0ed0b3b69b), ROM_BIOS(1) )
-	ROMX_LOAD( "901242-02b.u60", 0x2000, 0x2000, CRC(837978b5) SHA1(56e8d2f86bf73ba36b3d3cb84dd75806b66c530a), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901243-04a.u59", 0x0000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(2) )
-	ROMX_LOAD( "901242-04a.u60", 0x2000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(2) )
+
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROMX_LOAD( "901243-02b.u59", 0x0000, 0x2000, CRC(9d0366f9) SHA1(625f7337ea972a8bce2bdf2daababc0ed0b3b69b), ROM_BIOS(0) )
+	ROMX_LOAD( "901242-02b.u60", 0x2000, 0x2000, CRC(837978b5) SHA1(56e8d2f86bf73ba36b3d3cb84dd75806b66c530a), ROM_BIOS(0) )
+	ROMX_LOAD( "901243-04a.u59", 0x0000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(1) )
+	ROMX_LOAD( "901242-04a.u60", 0x2000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(1) )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
-	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
-	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(0) )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
@@ -2955,9 +3002,9 @@ ROM_START( b256hp )
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
@@ -2984,9 +3031,9 @@ ROM_START( bx256hp )
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
@@ -3043,20 +3090,20 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            INIT    COMPANY                         FULLNAME                    FLAGS
-COMP( 1983, p500,       0,      0,      p500_ntsc,  cbm2,       p500_state,      0,      "Commodore Business Machines",  "P500 (NTSC)",              MACHINE_SUPPORTS_SAVE )
-COMP( 1983, p500p,      p500,   0,      p500_pal,   cbm2,       p500_state,      0,      "Commodore Business Machines",  "P500 (PAL)",               MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b500,       0,      0,      b128,       cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "B500",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b128,       b500,   0,      b128,       cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "B128",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b256,       b500,   0,      b256,       cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "B256",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm610,     b500,   0,      cbm610,     cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "CBM 610",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm620,     b500,   0,      cbm620,     cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "CBM 620",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm620_hu,  b500,   0,      cbm620,     cbm2_hu,    cbm2_state,      0,      "Commodore Business Machines",  "CBM 620 (Hungary)",        MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b128hp,     0,      0,      b128hp,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "B128-80HP",                MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b256hp,     b128hp, 0,      b256hp,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "B256-80HP",                MACHINE_SUPPORTS_SAVE )
-COMP( 1983, bx256hp,    b128hp, 0,      bx256hp,    cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "BX256-80HP",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing
-COMP( 1983, cbm710,     b128hp, 0,      cbm710,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 710",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm720,     b128hp, 0,      cbm720,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 720",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm720_de,  b128hp, 0,      cbm720,     cbm2_de,    cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 720 (Germany)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm720_se,  b128hp, 0,      cbm720,     cbm2_se,    cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 720 (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm730,     b128hp, 0,      cbm730,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 730",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY                         FULLNAME                    FLAGS
+COMP( 1983, p500,      0,      0,      p500_ntsc, cbm2,    p500_state,   empty_init, "Commodore Business Machines",  "P500 (NTSC)",              MACHINE_SUPPORTS_SAVE )
+COMP( 1983, p500p,     p500,   0,      p500_pal,  cbm2,    p500_state,   empty_init, "Commodore Business Machines",  "P500 (PAL)",               MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b500,      0,      0,      b128,      cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "B500",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b128,      b500,   0,      b128,      cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "B128",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b256,      b500,   0,      b256,      cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "B256",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm610,    b500,   0,      cbm610,    cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "CBM 610",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm620,    b500,   0,      cbm620,    cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "CBM 620",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm620_hu, b500,   0,      cbm620,    cbm2_hu, cbm2_state,   empty_init, "Commodore Business Machines",  "CBM 620 (Hungary)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b128hp,    0,      0,      b128hp,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "B128-80HP",                MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b256hp,    b128hp, 0,      b256hp,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "B256-80HP",                MACHINE_SUPPORTS_SAVE )
+COMP( 1983, bx256hp,   b128hp, 0,      bx256hp,   cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "BX256-80HP",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing
+COMP( 1983, cbm710,    b128hp, 0,      cbm710,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 710",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720,    b128hp, 0,      cbm720,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720_de, b128hp, 0,      cbm720,    cbm2_de, cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720 (Germany)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720_se, b128hp, 0,      cbm720,    cbm2_se, cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720 (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm730,    b128hp, 0,      cbm730,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 730",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing

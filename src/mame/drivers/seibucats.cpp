@@ -4,6 +4,15 @@
 
     Seibu CATS E-Touch Mahjong Series (c) 2001 Seibu Kaihatsu
 
+    TODO:
+    - verify obj roms (maybe bad or wrong decryption);
+    - coins inputs are ok?
+    - touchscreen;
+    - sound;
+    - DVD player;
+
+=========================================================================================================================================================
+
     CPU and system control devices:
     - Intel i386DX (U0169; lower right corner)
     - SEI600 SB08-1513 custom DMA chip (U0154; above i386DX)
@@ -69,13 +78,14 @@
 #include "machine/i8251.h"
 //#include "machine/microtch.h"
 //#include "machine/rtc4543.h"
+#include "machine/seibuspi.h"
 #include "sound/ymz280b.h"
 #include "screen.h"
 #include "speaker.h"
 
 // TBD, assume same as Seibu SPI
-#define MAIN_CLOCK   (XTAL_50MHz/2)
-#define PIXEL_CLOCK  (XTAL_28_63636MHz/4)
+#define MAIN_CLOCK   (XTAL(50'000'000)/2)
+#define PIXEL_CLOCK  (XTAL(28'636'363)/4)
 
 #define SPI_HTOTAL   (448)
 #define SPI_HBEND    (0)
@@ -91,6 +101,7 @@ class seibucats_state : public seibuspi_state
 public:
 	seibucats_state(const machine_config &mconfig, device_type type, const char *tag)
 		: seibuspi_state(mconfig, type, tag)
+//        m_key(*this, "KEY.%u", 0)
 	{
 	}
 
@@ -103,7 +114,10 @@ public:
 	DECLARE_WRITE16_MEMBER(input_select_w);
 	DECLARE_WRITE16_MEMBER(output_latch_w);
 	DECLARE_WRITE16_MEMBER(aux_rtc_w);
+	void init_seibucats();
 
+	void seibucats(machine_config &config);
+	void seibucats_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -114,18 +128,28 @@ protected:
 
 private:
 	uint16_t m_input_select;
+
+//  optional_ioport_array<5> m_key;
+//  optional_ioport m_special;
 };
 
+// identical to EJ Sakura
 READ16_MEMBER(seibucats_state::input_mux_r)
 {
-	// TODO: mahjong keyboard is read from here
-	return m_eeprom->do_read() << 14;
+	uint16_t ret = m_special->read();
+
+	// multiplexed inputs
+	for (int i = 0; i < 5; i++)
+		if (m_input_select >> i & 1)
+			ret &= m_key[i]->read();
+
+	return ret;
 }
 
 WRITE16_MEMBER(seibucats_state::input_select_w)
 {
 	// Note that this is active high in ejsakura but active low here
-	m_input_select = data;
+	m_input_select = data ^ 0xffff;
 }
 
 WRITE16_MEMBER(seibucats_state::output_latch_w)
@@ -139,87 +163,90 @@ WRITE16_MEMBER(seibucats_state::aux_rtc_w)
 {
 }
 
-static ADDRESS_MAP_START( seibucats_map, AS_PROGRAM, 32, seibucats_state )
+void seibucats_state::seibucats_map(address_map &map)
+{
 	// TODO: map devices
-	AM_RANGE(0x00000010, 0x00000013) AM_READ8(spi_status_r, 0x000000ff)
-	AM_RANGE(0x00000400, 0x00000403) AM_WRITE16(input_select_w, 0x0000ffff)
-	AM_RANGE(0x00000404, 0x00000407) AM_WRITE16(output_latch_w, 0x0000ffff)
-	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
-	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
-	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
-	AM_RANGE(0x00000560, 0x00000563) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
+	map(0x00000000, 0x0003ffff).ram().share("mainram");
 
-	AM_RANGE(0x00000600, 0x00000607) AM_READ16(input_mux_r, 0x0000ffff)
+	map(0x00000010, 0x00000010).r(FUNC(seibucats_state::spi_status_r));
+	map(0x00000400, 0x00000401).w(FUNC(seibucats_state::input_select_w));
+	map(0x00000404, 0x00000405).w(FUNC(seibucats_state::output_latch_w));
+	map(0x00000484, 0x00000487).w(FUNC(seibucats_state::palette_dma_start_w));
+	map(0x00000490, 0x00000493).w(FUNC(seibucats_state::video_dma_length_w));
+	map(0x00000494, 0x00000497).w(FUNC(seibucats_state::video_dma_address_w));
+	map(0x00000562, 0x00000563).w(FUNC(seibucats_state::sprite_dma_start_w));
 
-	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("ipl", 0) AM_WRITENOP // emjjoshi attempts to write there?
+	map(0x00000600, 0x00000607).r(FUNC(seibucats_state::input_mux_r)).umask32(0x0000ffff);
+
+	map(0x00200000, 0x003fffff).rom().region("ipl", 0).nopw(); // emjjoshi attempts to write there?
 	// following are likely to be Seibu CATS specific
-	AM_RANGE(0x01200000, 0x01200007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x000000ff)
-	AM_RANGE(0x01200100, 0x01200107) AM_WRITENOP // YMF721-S MIDI data
-	AM_RANGE(0x01200104, 0x01200107) AM_READNOP // YMF721-S MIDI status
-	AM_RANGE(0x01200200, 0x01200203) AM_DEVREADWRITE8("usart1", i8251_device, data_r, data_w, 0x000000ff)
-	AM_RANGE(0x01200204, 0x01200207) AM_DEVREADWRITE8("usart1", i8251_device, status_r, control_w, 0x000000ff)
-	AM_RANGE(0x01200300, 0x01200303) AM_DEVREADWRITE8("usart2", i8251_device, data_r, data_w, 0x000000ff)
-	AM_RANGE(0x01200304, 0x01200307) AM_DEVREADWRITE8("usart2", i8251_device, status_r, control_w, 0x000000ff)
-	AM_RANGE(0xa0000000, 0xa1ffffff) AM_NOP // NVRAM on ROM board
-	AM_RANGE(0xa2000000, 0xa2000003) AM_WRITE16(aux_rtc_w, 0x0000ffff)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+	map(0x01200000, 0x01200007).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x000000ff);
+	map(0x01200100, 0x01200107).nopw(); // YMF721-S MIDI data
+	map(0x01200104, 0x01200107).nopr(); // YMF721-S MIDI status
+	map(0x01200200, 0x01200200).rw("usart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01200204, 0x01200204).rw("usart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x01200300, 0x01200300).rw("usart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01200304, 0x01200304).rw("usart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xa0000000, 0xa1ffffff).noprw(); // NVRAM on ROM board
+	map(0xa2000000, 0xa2000001).w(FUNC(seibucats_state::aux_rtc_w));
+	map(0xffe00000, 0xffffffff).rom().region("ipl", 0);
+}
+
+static INPUT_PORTS_START( spi_mahjong_keyboard )
+	PORT_START("KEY.0")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY.1")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
+	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY.2")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY.3")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY.4")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_SERVICE_NO_TOGGLE( 0x00000200, IP_ACTIVE_LOW)
+	PORT_BIT( 0xfffffdc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( seibucats )
-	/* dummy active high structure */
-	PORT_START("SYSA")
-	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_INCLUDE( spi_mahjong_keyboard )
 
-	/* dummy active low structure */
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("SPECIAL")
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0xffffbf3f, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout sys386f_spritelayout =
@@ -238,7 +265,7 @@ static const gfx_layout sys386f_spritelayout =
 };
 
 
-static GFXDECODE_START( seibucats )
+static GFXDECODE_START( gfx_seibucats )
 	GFXDECODE_ENTRY( "gfx1", 0, sys386f_spritelayout,   5632, 16 ) // Not used, legacy charlayout
 	GFXDECODE_ENTRY( "gfx2", 0, sys386f_spritelayout,   4096, 24 ) // Not used, legacy tilelayout
 	GFXDECODE_ENTRY( "gfx3", 0, sys386f_spritelayout,   0, 96 )
@@ -267,17 +294,17 @@ IRQ_CALLBACK_MEMBER(seibucats_state::spi_irq_callback)
 }
 #endif
 
-static MACHINE_CONFIG_START( seibucats )
+MACHINE_CONFIG_START(seibucats_state::seibucats)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I386, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(seibucats_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state, spi_irq_callback)
+	MCFG_DEVICE_ADD("maincpu",I386, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(seibucats_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state, spi_irq_callback)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
-	//MCFG_JRC6355E_ADD("rtc", XTAL_32_768kHz)
+	//MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("usart1", I8251, 0)
 	MCFG_DEVICE_ADD("usart2", I8251, 0)
@@ -288,16 +315,17 @@ static MACHINE_CONFIG_START( seibucats )
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seibucats)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seibucats)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
 //  MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	//MCFG_PALETTE_INIT_OWNER(seibucats_state, seibucats)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_384MHz)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'384'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -308,6 +336,14 @@ MACHINE_CONFIG_END
   Machine driver(s)
 
 ***************************************************************************/
+
+#define SEIBUCATS_OBJ_LOAD \
+	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE00) \
+/*  obj4.u0234 empty slot */ \
+	ROM_LOAD16_WORD_SWAP("obj03.u0232", 0x100000, 0x100000, BAD_DUMP CRC(15c230cf) SHA1(7e12871d6e34e28cd4b5b23af6b0cbdff9432500)  ) \
+	ROM_LOAD16_WORD_SWAP("obj02.u0233", 0x200000, 0x100000, BAD_DUMP CRC(dffd0114) SHA1(b74254061b6da5a2ce310ea89684db430b43583e)  ) \
+	ROM_LOAD16_WORD_SWAP("obj01.u0231", 0x300000, 0x100000, BAD_DUMP CRC(ee5ae0fd) SHA1(0baff6ca4e8bceac4e09732da267f57578dcc280)  )
+
 
 ROM_START( emjjoshi )
 	ROM_REGION32_LE( 0x200000, "ipl", 0 ) /* i386 program */
@@ -320,14 +356,10 @@ ROM_START( emjjoshi )
 
 	ROM_REGION( 0x900000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms - none! */
 
-	ROM_REGION( 0x600000, "gfx3", 0)
-	ROM_LOAD("obj1.u0231", 0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD("obj2.u0233", 0x200000, 0x200000, NO_DUMP )
-	ROM_LOAD("obj3.u0232", 0x400000, 0x200000, NO_DUMP )
-//  obj4.u0234 empty slot
+	SEIBUCATS_OBJ_LOAD
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "At the Girls Dorm SKTP-10002", 0, SHA1(be47c105089d6ef4ce05a6e1ba2ec7a3101015dc) )
+	DISK_IMAGE_READONLY( "at the girls dorm sktp-10002", 0, SHA1(be47c105089d6ef4ce05a6e1ba2ec7a3101015dc) )
 ROM_END
 
 
@@ -343,14 +375,10 @@ ROM_START( emjscanb )
 
 	ROM_REGION( 0x900000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms - none! */
 
-	ROM_REGION( 0x600000, "gfx3", 0)
-	ROM_LOAD("obj1.u0231", 0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD("obj2.u0233", 0x200000, 0x200000, NO_DUMP )
-	ROM_LOAD("obj3.u0232", 0x400000, 0x200000, NO_DUMP )
-//  obj4.u0234 empty slot
+	SEIBUCATS_OBJ_LOAD
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "Scandal Blue SKTP-10008", 0, SHA1(17fe67698a9bc5dbd452c4b1afa739294ec2011c) )
+	DISK_IMAGE_READONLY( "scandal blue sktp-10008", 0, SHA1(17fe67698a9bc5dbd452c4b1afa739294ec2011c) )
 ROM_END
 
 ROM_START( emjtrapz )
@@ -364,25 +392,40 @@ ROM_START( emjtrapz )
 
 	ROM_REGION( 0x900000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms - none! */
 
-	ROM_REGION( 0x600000, "gfx3", 0)
-	ROM_LOAD("obj1.u0231", 0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD("obj2.u0233", 0x200000, 0x200000, NO_DUMP )
-	ROM_LOAD("obj3.u0232", 0x400000, 0x200000, NO_DUMP )
-//  obj4.u0234 empty slot
+	SEIBUCATS_OBJ_LOAD
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "Trap Zone SKTP-00009", 0, SHA1(b4a51f42eeaeefc329031651859caa108418a96e) )
+	DISK_IMAGE_READONLY( "trap zone sktp-00009", 0, SHA1(b4a51f42eeaeefc329031651859caa108418a96e) )
 ROM_END
+
+void seibucats_state::init_seibucats()
+{
+	uint16_t *src = (uint16_t *)memregion("gfx3")->base();
+	uint16_t tmp[0x40 / 2], offset;
+
+	// sprite_reorder() only
+	for (int i = 0; i < memregion("gfx3")->bytes() / 0x40; i++)
+	{
+		memcpy(tmp, src, 0x40);
+
+		for (int j = 0; j < 0x40 / 2; j++)
+		{
+			offset = (j >> 1) | (j << 4 & 0x10);
+			*src++ = tmp[offset];
+		}
+	}
+//  seibuspi_rise11_sprite_decrypt_rfjet(memregion("gfx3")->base(), 0x300000);
+}
 
 // Gravure Collection
 // Pakkun Ball TV
 /* 01 */ // Mahjong Shichau zo!
-/* 02 */ GAME( 1999, emjjoshi,  0,   seibucats,  seibucats, seibucats_state,  0,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #2: Joshiryou de NE! (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 02 */ GAME( 1999, emjjoshi,  0,   seibucats,  seibucats, seibucats_state, init_seibucats, ROT0, "Seibu Kaihatsu / CATS", "E-Touch Mahjong Series #2: Joshiryou de NE! (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 /* 03 */ // Lingerie DE Ikou
 /* 04 */ // Marumie Network
 /* 05 */ // BINKAN Lips
-/* 06 */ GAME( 2001, emjscanb,  0,   seibucats,  seibucats, seibucats_state,  0,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #6: Scandal Blue - Midara na Daishou (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-/* 07 */ GAME( 2001, emjtrapz,  0,   seibucats,  seibucats, seibucats_state,  0,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #7: Trap Zone - Yokubou no Kaisoku Densha (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 06 */ GAME( 2001, emjscanb,  0,   seibucats,  seibucats, seibucats_state, init_seibucats, ROT0, "Seibu Kaihatsu / CATS", "E-Touch Mahjong Series #6: Scandal Blue - Midara na Daishou (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 07 */ GAME( 2001, emjtrapz,  0,   seibucats,  seibucats, seibucats_state, init_seibucats, ROT0, "Seibu Kaihatsu / CATS", "E-Touch Mahjong Series #7: Trap Zone - Yokubou no Kaisoku Densha (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 /* 08 */ // Poison
 /* 09 */ // Nurse Call
 /* 10 */ // Secret Love

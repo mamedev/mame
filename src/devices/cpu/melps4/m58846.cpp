@@ -10,33 +10,26 @@
 #include "m58846.h"
 
 
-DEFINE_DEVICE_TYPE(M58846, m58846_device, "m58846", "M58846")
+DEFINE_DEVICE_TYPE(M58846, m58846_device, "m58846", "Mitsubishi M58846")
 
 
 // internal memory maps
-static ADDRESS_MAP_START(program_2kx9, AS_PROGRAM, 16, m58846_device)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void m58846_device::program_2kx9(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
 
-static ADDRESS_MAP_START(data_128x4, AS_DATA, 8, m58846_device)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void m58846_device::data_128x4(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+}
 
 
 // device definitions
 m58846_device::m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: melps4_cpu_device(mconfig, M58846, tag, owner, clock, 11, ADDRESS_MAP_NAME(program_2kx9), 7, ADDRESS_MAP_NAME(data_128x4), 12 /* number of D pins */, 2 /* subroutine page */, 1 /* interrupt page */), m_timer(nullptr)
+	: melps4_cpu_device(mconfig, M58846, tag, owner, clock, 11, address_map_constructor(FUNC(m58846_device::program_2kx9), this), 7, address_map_constructor(FUNC(m58846_device::data_128x4), this), 12 /* number of D pins */, 2 /* subroutine page */, 1 /* interrupt page */), m_timer(nullptr)
 { }
-
-
-// disasm
-offs_t m58846_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE(m58846);
-	return CPU_DISASSEMBLE_NAME(m58846)(this, stream, pc, oprom, opram, options);
-}
-
 
 
 //-------------------------------------------------

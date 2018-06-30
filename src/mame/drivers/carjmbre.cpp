@@ -6,8 +6,11 @@
     Omori Electric CAD (OEC) 1983
 
     TODO:
-    - colors are wrong
-    - sprite priorities?
+    - colors are probably wrong
+    - sprite priorities? (eg. player car jumping on the ramp, 1 part disappears)
+    - first 2 letters on titlescreen look misaligned with the tilemap
+    - The spriteram holds 2 sprite lists (00-7f and 80-ff), they are identical.
+      Is it an unused feature? Or a RAM access speed workaround?
 
 ----------------------------------------------------------------------------
 
@@ -43,6 +46,7 @@
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -82,6 +86,10 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
+	void carjmbre(machine_config &config);
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -178,7 +186,7 @@ uint32_t carjmbre_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void carjmbre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = 0x80 - 4; offs >= 0; offs -= 4)
 	{
 		int sy = m_spriteram[offs];
 		int code = m_spriteram[offs + 1];
@@ -234,37 +242,40 @@ WRITE8_MEMBER(carjmbre_state::flipscreen_w)
 	flip_screen_set(data & 1);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, carjmbre_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8803, 0x8803) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0x8805, 0x8805) AM_WRITE(bgcolor_w)
-	AM_RANGE(0x8807, 0x8807) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM // 6116
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram") // 2114*4
-	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_SHARE("spriteram") // 5101*2
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN1")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN2")
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void carjmbre_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8803, 0x8803).w(FUNC(carjmbre_state::nmi_enable_w));
+	map(0x8805, 0x8805).w(FUNC(carjmbre_state::bgcolor_w));
+	map(0x8807, 0x8807).w(FUNC(carjmbre_state::flipscreen_w));
+	map(0x8000, 0x87ff).ram(); // 6116
+	map(0x9000, 0x97ff).ram().w(FUNC(carjmbre_state::videoram_w)).share("videoram"); // 2114*4
+	map(0x9800, 0x98ff).ram().share("spriteram"); // 5101*2
+	map(0xa000, 0xa000).portr("IN1");
+	map(0xa800, 0xa800).portr("IN2");
+	map(0xb800, 0xb800).portr("DSW").w("soundlatch", FUNC(generic_latch_8_device::write));
+}
 
 
 // audiocpu side
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, carjmbre_state )
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM // 6116
-ADDRESS_MAP_END
+void carjmbre_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).mirror(0x1000).rom();
+	map(0x2000, 0x27ff).ram(); // 6116
+}
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, carjmbre_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x22, 0x22) AM_WRITENOP // bdir/bc2/bc1 1/0/1 inactive write
-	AM_RANGE(0x24, 0x24) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x30, 0x31) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x32, 0x32) AM_WRITENOP // bdir/bc2/bc1 1/0/1 inactive write
-	AM_RANGE(0x34, 0x34) AM_DEVREAD("ay2", ay8910_device, data_r)
-ADDRESS_MAP_END
+void carjmbre_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x20, 0x21).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x22, 0x22).nopw(); // bdir/bc2/bc1 1/0/1 inactive write
+	map(0x24, 0x24).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x30, 0x31).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x32, 0x32).nopw(); // bdir/bc2/bc1 1/0/1 inactive write
+	map(0x34, 0x34).r("ay2", FUNC(ay8910_device::data_r));
+}
 
 
 
@@ -339,22 +350,22 @@ static const gfx_layout carjmbre_spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( carjmbre )
+static GFXDECODE_START( gfx_carjmbre )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, carjmbre_spritelayout, 0, 16 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( carjmbre )
+MACHINE_CONFIG_START(carjmbre_state::carjmbre)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", carjmbre_state, vblank_nmi)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", carjmbre_state, vblank_nmi)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -365,19 +376,19 @@ static MACHINE_CONFIG_START( carjmbre )
 	MCFG_SCREEN_UPDATE_DRIVER(carjmbre_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carjmbre)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_carjmbre)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(carjmbre_state, carjmbre)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/6/2)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/6/2)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -419,4 +430,4 @@ ROM_START( carjmbre )
 ROM_END
 
 
-GAME( 1983, carjmbre, 0, carjmbre, carjmbre, carjmbre_state, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, carjmbre, 0, carjmbre, carjmbre, carjmbre_state, empty_init, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )

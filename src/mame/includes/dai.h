@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef DAI_H_
-#define DAI_H_
+#ifndef MAME_INCLUDES_DAI_H
+#define MAME_INCLUDES_DAI_H
 
 #include "cpu/i8085/i8085.h"
 #include "audio/dai_snd.h"
@@ -17,17 +17,12 @@
 #include "machine/tms5501.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "emupal.h"
 
 
 class dai_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BOOTSTRAP,
-		TIMER_TMS5501
-	};
-
 	dai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -37,6 +32,15 @@ public:
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_palette(*this, "palette")  { }
+
+	void dai(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_BOOTSTRAP,
+		TIMER_TMS5501
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -68,6 +72,8 @@ public:
 	void dai_update_memory(int dai_rom_bank);
 	IRQ_CALLBACK_MEMBER(int_ack);
 
+	void dai_io(address_map &map);
+	void dai_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -78,4 +84,4 @@ protected:
 extern const unsigned char dai_palette[16*3];
 
 
-#endif /* DAI_H_ */
+#endif // MAME_INCLUDES_DAI_H

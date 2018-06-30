@@ -7,6 +7,9 @@
 #include "bgfx_utils.h"
 #include "imgui/imgui.h"
 
+namespace
+{
+
 struct PosColorVertex
 {
 	float m_x;
@@ -142,19 +145,25 @@ void screenSpaceQuad(float _textureWidth, float _textureHeight, bool _originBott
 		vertex[2].m_u = maxu;
 		vertex[2].m_v = maxv;
 
-		bgfx::setVertexBuffer(&vb);
+		bgfx::setVertexBuffer(0, &vb);
 	}
 }
 
 class ExampleOIT : public entry::AppI
 {
-	void init(int _argc, char** _argv) BX_OVERRIDE
+public:
+	ExampleOIT(const char* _name, const char* _description)
+		: entry::AppI(_name, _description)
+	{
+	}
+
+	void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 	{
 		Args args(_argc, _argv);
 
-		m_width  = 1280;
-		m_height = 720;
-		m_debug  = BGFX_DEBUG_TEXT;
+		m_width  = _width;
+		m_height = _height;
+		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
 		bgfx::init(args.m_type, args.m_pciId);
@@ -206,12 +215,11 @@ class ExampleOIT : public entry::AppI
 		m_wbPass         = loadProgram("vs_oit",      "fs_oit_wb"               );
 		m_wbBlit         = loadProgram("vs_oit_blit", "fs_oit_wb_blit"          );
 
-		m_fbtextures[0].idx = bgfx::invalidHandle;
-		m_fbtextures[1].idx = bgfx::invalidHandle;
-		m_fbh.idx = bgfx::invalidHandle;
+		m_fbtextures[0].idx = bgfx::kInvalidHandle;
+		m_fbtextures[1].idx = bgfx::kInvalidHandle;
+		m_fbh.idx = bgfx::kInvalidHandle;
 
 		m_mode = 1;
-		m_scrollArea = 0;
 		m_frontToBack = true;
 		m_fadeInOut   = false;
 
@@ -219,25 +227,35 @@ class ExampleOIT : public entry::AppI
 		m_oldHeight = 0;
 		m_oldReset  = m_reset;
 
+		m_mrtSupported = true
+			&& 2 <= caps->limits.maxFBAttachments
+			&& bgfx::isTextureValid(0, false, 1, bgfx::TextureFormat::RGBA16F, BGFX_TEXTURE_RT)
+			&& bgfx::isTextureValid(0, false, 1, bgfx::TextureFormat::R16F,    BGFX_TEXTURE_RT)
+			;
+
 		m_timeOffset = bx::getHPCounter();
 	}
 
-	int shutdown() BX_OVERRIDE
+	int shutdown() override
 	{
 		// Cleanup.
 		imguiDestroy();
 
-		bgfx::destroyFrameBuffer(m_fbh);
-		bgfx::destroyIndexBuffer(m_ibh);
-		bgfx::destroyVertexBuffer(m_vbh);
-		bgfx::destroyProgram(m_blend);
-		bgfx::destroyProgram(m_wbSeparatePass);
-		bgfx::destroyProgram(m_wbSeparateBlit);
-		bgfx::destroyProgram(m_wbPass);
-		bgfx::destroyProgram(m_wbBlit);
-		bgfx::destroyUniform(s_texColor0);
-		bgfx::destroyUniform(s_texColor1);
-		bgfx::destroyUniform(u_color);
+		if (bgfx::isValid(m_fbh) )
+		{
+			bgfx::destroy(m_fbh);
+		}
+
+		bgfx::destroy(m_ibh);
+		bgfx::destroy(m_vbh);
+		bgfx::destroy(m_blend);
+		bgfx::destroy(m_wbSeparatePass);
+		bgfx::destroy(m_wbSeparateBlit);
+		bgfx::destroy(m_wbPass);
+		bgfx::destroy(m_wbBlit);
+		bgfx::destroy(s_texColor0);
+		bgfx::destroy(s_texColor1);
+		bgfx::destroy(u_color);
 
 		// Shutdown bgfx.
 		bgfx::shutdown();
@@ -245,30 +263,10 @@ class ExampleOIT : public entry::AppI
 		return 0;
 	}
 
-	bool update() BX_OVERRIDE
+	bool update() override
 	{
 		if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState) )
 		{
-			if (m_oldWidth  != m_width
-			||  m_oldHeight != m_height
-			||  m_oldReset  != m_reset
-			||  !bgfx::isValid(m_fbh) )
-			{
-				// Recreate variable size render targets when resolution changes.
-				m_oldWidth  = m_width;
-				m_oldHeight = m_height;
-				m_oldReset  = m_reset;
-
-				if (bgfx::isValid(m_fbh) )
-				{
-					bgfx::destroyFrameBuffer(m_fbh);
-				}
-
-				m_fbtextures[0] = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::RGBA16F, BGFX_TEXTURE_RT);
-				m_fbtextures[1] = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::R16F,    BGFX_TEXTURE_RT);
-				m_fbh = bgfx::createFrameBuffer(BX_COUNTOF(m_fbtextures), m_fbtextures, true);
-			}
-
 			imguiBeginFrame(m_mouseState.m_mx
 				,  m_mouseState.m_my
 				, (m_mouseState.m_buttons[entry::MouseButton::Left  ] ? IMGUI_MBUT_LEFT   : 0)
@@ -279,148 +277,167 @@ class ExampleOIT : public entry::AppI
 				, uint16_t(m_height)
 				);
 
-			imguiBeginScrollArea("Settings", m_width - m_width / 4 - 10, 10, m_width / 4, m_height / 3, &m_scrollArea);
-			imguiSeparatorLine();
-
-			imguiLabel("Blend mode:");
-
-			m_mode = imguiChoose(m_mode
-				, "None"
-				, "Separate"
-				, "MRT Independent"
+			showExampleDialog(this
+				, !m_mrtSupported
+				? "MRT or frame buffer texture format are not supported."
+				: NULL
 				);
 
-			imguiSeparatorLine();
-
-			if (imguiCheck("Front to back", m_frontToBack) )
+			if (m_mrtSupported)
 			{
-				m_frontToBack ^= true;
-			}
-
-			if (imguiCheck("Fade in/out", m_fadeInOut) )
-			{
-				m_fadeInOut ^= true;
-			}
-
-			imguiEndScrollArea();
-			imguiEndFrame();
-
-			// Set view 0 default viewport.
-			bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height) );
-			bgfx::setViewRect(1, 0, 0, uint16_t(m_width), uint16_t(m_height) );
-
-			int64_t now = bx::getHPCounter();
-			static int64_t last = now;
-			const int64_t frameTime = now - last;
-			last = now;
-			const double freq = double(bx::getHPFrequency() );
-			const double toMs = 1000.0/freq;
-
-			float time = (float)( (now-m_timeOffset)/freq);
-
-			// Use debug font to print information about this example.
-			bgfx::dbgTextClear();
-			// Reference:
-			// Weighted, Blended Order-Independent Transparency
-			// http://jcgt.org/published/0002/02/09/
-			// http://casual-effects.blogspot.com/2014/03/weighted-blended-order-independent.html
-			bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/19-oit");
-			bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Weighted, Blended Order Independent Transparency.");
-			bgfx::dbgTextPrintf(0, 3, 0x0f, "Frame: % 7.3f[ms]", double(frameTime)*toMs);
-
-			float at[3] = { 0.0f, 0.0f, 0.0f };
-			float eye[3] = { 0.0f, 0.0f, -7.0f };
-
-			float view[16];
-			float proj[16];
-
-			// Set view and projection matrix for view 0.
-			bx::mtxLookAt(view, eye, at);
-			mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f);
-
-			bgfx::setViewTransform(0, view, proj);
-
-			// Set palette color for index 0
-			bgfx::setPaletteColor(0, 0.0f, 0.0f, 0.0f, 0.0f);
-
-			// Set palette color for index 1
-			bgfx::setPaletteColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
-
-			bgfx::setViewClear(0
-				, BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
-				, 1.0f // Depth
-				, 0    // Stencil
-				, 0    // FB texture 0, color palette 0
-				, 1 == m_mode ? 1 : 0 // FB texture 1, color palette 1
-				);
-
-			bgfx::setViewClear(1
-				, BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
-				, 1.0f // Depth
-				, 0    // Stencil
-				, 0    // Color palette 0
-				);
-
-			bgfx::FrameBufferHandle invalid = BGFX_INVALID_HANDLE;
-			bgfx::setViewFrameBuffer(0, 0 == m_mode ? invalid : m_fbh);
-
-			// Set view and projection matrix for view 1.
-			bx::mtxIdentity(view);
-			bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-			bgfx::setViewTransform(1, view, proj);
-
-			for (uint32_t depth = 0; depth < 3; ++depth)
-			{
-				uint32_t zz = m_frontToBack ? 2-depth : depth;
-
-				for (uint32_t yy = 0; yy < 3; ++yy)
+				if (m_oldWidth  != m_width
+				||  m_oldHeight != m_height
+				||  m_oldReset  != m_reset
+				||  !bgfx::isValid(m_fbh) )
 				{
-					for (uint32_t xx = 0; xx < 3; ++xx)
+					// Recreate variable size render targets when resolution changes.
+					m_oldWidth  = m_width;
+					m_oldHeight = m_height;
+					m_oldReset  = m_reset;
+
+					if (bgfx::isValid(m_fbh) )
 					{
-						float color[4] = { xx*1.0f/3.0f, zz*1.0f/3.0f, yy*1.0f/3.0f, 0.5f };
+						bgfx::destroy(m_fbh);
+					}
 
-						if (m_fadeInOut
-						&&  zz == 1)
+					m_fbtextures[0] = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::RGBA16F, BGFX_TEXTURE_RT);
+					m_fbtextures[1] = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::R16F,    BGFX_TEXTURE_RT);
+					m_fbh = bgfx::createFrameBuffer(BX_COUNTOF(m_fbtextures), m_fbtextures, true);
+				}
+
+				ImGui::SetNextWindowPos(
+					ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
+					, ImGuiSetCond_FirstUseEver
+					);
+				ImGui::Begin("Settings"
+					, NULL
+					, ImVec2(m_width / 5.0f, m_height / 3.0f)
+					, ImGuiWindowFlags_AlwaysAutoResize
+					);
+
+				ImGui::Separator();
+
+				ImGui::Text("Blend mode:");
+
+				ImGui::RadioButton("None", &m_mode, 0);
+				ImGui::RadioButton("Separate", &m_mode, 1);
+				ImGui::RadioButton("MRT Independent", &m_mode, 2);
+
+				ImGui::Separator();
+
+				ImGui::Checkbox("Front to back", &m_frontToBack);
+				ImGui::Checkbox("Fade in/out", &m_fadeInOut);
+
+				ImGui::End();
+
+				// Set view 0 default viewport.
+				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height) );
+				bgfx::setViewRect(1, 0, 0, uint16_t(m_width), uint16_t(m_height) );
+
+				int64_t now = bx::getHPCounter();
+				const double freq = double(bx::getHPFrequency() );
+				float time = (float)( (now-m_timeOffset)/freq);
+
+				// Reference:
+				// Weighted, Blended Order-Independent Transparency
+				// http://jcgt.org/published/0002/02/09/
+				// http://casual-effects.blogspot.com/2014/03/weighted-blended-order-independent.html
+
+				float at[3] = { 0.0f, 0.0f, 0.0f };
+				float eye[3] = { 0.0f, 0.0f, -7.0f };
+
+				float view[16];
+				float proj[16];
+
+				// Set view and projection matrix for view 0.
+				bx::mtxLookAt(view, eye, at);
+				mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f);
+
+				bgfx::setViewTransform(0, view, proj);
+
+				// Set palette color for index 0
+				bgfx::setPaletteColor(0, 0.0f, 0.0f, 0.0f, 0.0f);
+
+				// Set palette color for index 1
+				bgfx::setPaletteColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
+
+				bgfx::setViewClear(0
+					, BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
+					, 1.0f // Depth
+					, 0    // Stencil
+					, 0    // FB texture 0, color palette 0
+					, 1 == m_mode ? 1 : 0 // FB texture 1, color palette 1
+					);
+
+				bgfx::setViewClear(1
+					, BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
+					, 1.0f // Depth
+					, 0    // Stencil
+					, 0    // Color palette 0
+					);
+
+				bgfx::FrameBufferHandle invalid = BGFX_INVALID_HANDLE;
+				bgfx::setViewFrameBuffer(0, 0 == m_mode ? invalid : m_fbh);
+
+				// Set view and projection matrix for view 1.
+				bx::mtxIdentity(view);
+
+				const bgfx::Caps* caps = bgfx::getCaps();
+				bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
+				bgfx::setViewTransform(1, view, proj);
+
+				for (uint32_t depth = 0; depth < 3; ++depth)
+				{
+					uint32_t zz = m_frontToBack ? 2-depth : depth;
+
+					for (uint32_t yy = 0; yy < 3; ++yy)
+					{
+						for (uint32_t xx = 0; xx < 3; ++xx)
 						{
-							color[3] = bx::fsin(time*3.0f)*0.49f+0.5f;
-						}
+							float color[4] = { xx*1.0f/3.0f, zz*1.0f/3.0f, yy*1.0f/3.0f, 0.5f };
 
-						bgfx::setUniform(u_color, color);
+							if (m_fadeInOut
+							&&  zz == 1)
+							{
+								color[3] = bx::fsin(time*3.0f)*0.49f+0.5f;
+							}
 
-						BX_UNUSED(time);
-						float mtx[16];
-						bx::mtxRotateXY(mtx, time*0.023f + xx*0.21f, time*0.03f + yy*0.37f);
-						//mtxIdentity(mtx);
-						mtx[12] = -2.5f + float(xx)*2.5f;
-						mtx[13] = -2.5f + float(yy)*2.5f;
-						mtx[14] = -2.5f + float(zz)*2.5f;
+							bgfx::setUniform(u_color, color);
 
-						// Set transform for draw call.
-						bgfx::setTransform(mtx);
+							BX_UNUSED(time);
+							float mtx[16];
+							bx::mtxRotateXY(mtx, time*0.023f + xx*0.21f, time*0.03f + yy*0.37f);
+							//mtxIdentity(mtx);
+							mtx[12] = -2.5f + float(xx)*2.5f;
+							mtx[13] = -2.5f + float(yy)*2.5f;
+							mtx[14] = -2.5f + float(zz)*2.5f;
 
-						// Set vertex and index buffer.
-						bgfx::setVertexBuffer(m_vbh);
-						bgfx::setIndexBuffer(m_ibh);
+							// Set transform for draw call.
+							bgfx::setTransform(mtx);
 
-						const uint64_t state = 0
-							| BGFX_STATE_CULL_CW
-							| BGFX_STATE_RGB_WRITE
-							| BGFX_STATE_ALPHA_WRITE
-							| BGFX_STATE_DEPTH_TEST_LESS
-							| BGFX_STATE_MSAA
-							;
+							// Set vertex and index buffer.
+							bgfx::setVertexBuffer(0, m_vbh);
+							bgfx::setIndexBuffer(m_ibh);
 
-						const uint64_t stateNoDepth = 0
-						| BGFX_STATE_CULL_CW
-						| BGFX_STATE_RGB_WRITE
-						| BGFX_STATE_ALPHA_WRITE
-						| BGFX_STATE_DEPTH_TEST_ALWAYS
-						| BGFX_STATE_MSAA
-						;
+							const uint64_t state = 0
+								| BGFX_STATE_CULL_CW
+								| BGFX_STATE_RGB_WRITE
+								| BGFX_STATE_ALPHA_WRITE
+								| BGFX_STATE_DEPTH_TEST_LESS
+								| BGFX_STATE_MSAA
+								;
 
-						bgfx::ProgramHandle program = BGFX_INVALID_HANDLE;
-						switch (m_mode)
-						{
+							const uint64_t stateNoDepth = 0
+								| BGFX_STATE_CULL_CW
+								| BGFX_STATE_RGB_WRITE
+								| BGFX_STATE_ALPHA_WRITE
+								| BGFX_STATE_DEPTH_TEST_ALWAYS
+								| BGFX_STATE_MSAA
+								;
+
+							bgfx::ProgramHandle program = BGFX_INVALID_HANDLE;
+							switch (m_mode)
+							{
 							case 0:
 								// Set vertex and fragment shaders.
 								program = m_blend;
@@ -453,27 +470,30 @@ class ExampleOIT : public entry::AppI
 									| BGFX_STATE_BLEND_FUNC_RT_1(BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_SRC_COLOR)
 									);
 								break;
-						}
+							}
 
-						// Submit primitive for rendering to view 0.
-						bgfx::submit(0, program);
+							// Submit primitive for rendering to view 0.
+							bgfx::submit(0, program);
+						}
 					}
+				}
+
+				if (0 != m_mode)
+				{
+					bgfx::setTexture(0, s_texColor0, m_fbtextures[0]);
+					bgfx::setTexture(1, s_texColor1, m_fbtextures[1]);
+					bgfx::setState(0
+						| BGFX_STATE_RGB_WRITE
+						| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_INV_SRC_ALPHA, BGFX_STATE_BLEND_SRC_ALPHA)
+						);
+					screenSpaceQuad( (float)m_width, (float)m_height, s_flipV);
+					bgfx::submit(1
+						, 1 == m_mode ? m_wbSeparateBlit : m_wbBlit
+						);
 				}
 			}
 
-			if (0 != m_mode)
-			{
-				bgfx::setTexture(0, s_texColor0, m_fbtextures[0]);
-				bgfx::setTexture(1, s_texColor1, m_fbtextures[1]);
-				bgfx::setState(0
-					| BGFX_STATE_RGB_WRITE
-					| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_INV_SRC_ALPHA, BGFX_STATE_BLEND_SRC_ALPHA)
-					);
-				screenSpaceQuad( (float)m_width, (float)m_height, s_flipV);
-				bgfx::submit(1
-					, 1 == m_mode ? m_wbSeparateBlit : m_wbBlit
-					);
-			}
+			imguiEndFrame();
 
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.
@@ -490,10 +510,10 @@ class ExampleOIT : public entry::AppI
 	uint32_t m_debug;
 	uint32_t m_reset;
 
-	uint32_t m_mode;
-	int32_t  m_scrollArea;
+	int32_t m_mode;
 	bool m_frontToBack;
 	bool m_fadeInOut;
+	bool m_mrtSupported;
 
 	uint32_t m_oldWidth;
 	uint32_t m_oldHeight;
@@ -520,4 +540,6 @@ class ExampleOIT : public entry::AppI
 	bgfx::FrameBufferHandle m_fbh;
 };
 
-ENTRY_IMPLEMENT_MAIN(ExampleOIT);
+} // namespace
+
+ENTRY_IMPLEMENT_MAIN(ExampleOIT, "19-oit", "Weighted, Blended Order Independent Transparency.");

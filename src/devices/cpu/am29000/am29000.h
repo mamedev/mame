@@ -458,9 +458,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	void signal_exception(uint32_t type);
 	void external_irq_check();
@@ -632,9 +630,10 @@ protected:
 	uint32_t          m_next_pc;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_data;
-	direct_read_data *m_datadirect;
+
+	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_datacache;
 	address_space *m_io;
 
 	typedef void ( am29000_cpu_device::*opcode_func ) ();

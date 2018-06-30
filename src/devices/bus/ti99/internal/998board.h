@@ -337,7 +337,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_SETOFFSET_MEMBER( set_address );
+	DECLARE_READ8_MEMBER( set_address );
 
 	// Debugger support
 	int get_physical_address_debug(offs_t offset);
@@ -422,6 +422,33 @@ private:
 /*
     Custom chip: OSO
 */
+
+/* Status register bits */
+typedef enum
+{
+	HSKWT = 0x80,
+	HSKRD = 0x40,
+	BAVIAS = 0x20,
+	BAVAIS = 0x10,
+	SBAV = 0x08,
+	WBUSY = 0x04,
+	RBUSY = 0x02,
+	SHSK = 0x01
+} oso_status;
+
+/* Control register bits */
+typedef enum
+{
+	WIEN = 0x80,
+	RIEN = 0x40,
+	BAVIAEN = 0x20,
+	BAVAIEN = 0x10,
+	BAVC = 0x08,
+	WEN = 0x04,
+	REN = 0x02,
+	CR7 = 0x01
+} oso_control;
+
 class oso_device : public bus::hexbus::hexbus_chained_device
 {
 public:
@@ -429,9 +456,6 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	void device_start() override;
-	// Don't add a hexbus connector; we use the one from the driver instance
-	virtual void device_add_mconfig(machine_config &config) override { };
-
 	void hexbus_value_changed(uint8_t data) override;
 
 	WRITE_LINE_MEMBER( clock_in );
@@ -440,47 +464,73 @@ public:
 	devcb_write_line m_int;
 
 private:
-	bool control_bit(int bit) { return (m_control & bit)!=0; }
-	bool status_bit(int bit) { return (m_status & bit)!=0; }
+	bool control_bit(oso_control bit) { return (m_control & bit)!=0; }
+	bool status_bit(oso_status bit) { return (m_status & bit)!=0; }
 	void clear_int_status();
 	void set_status(int bit, bool set) { m_status = (set)? (m_status | bit) : (m_status & ~bit); }
 	void update_hexbus();
 
+	// Registers
 	uint8_t m_data;
 	uint8_t m_status;
 	uint8_t m_control;
 	uint8_t m_xmit;
 
-	uint8_t m_lasthxvalue;
+	bool m_bav;         // Bus available; when true, a communication is about to happen
+	bool m_sbav;        // Stable BAV; the BAV signal is true for two clock cycles
+	bool m_sbavold;     // Old SBAV state
+	bool m_bavold;
 
-	int m_clkcount;
+	bool m_hsk;         // Handshake line; when true, a bus member needs more time to process the message
+	bool m_hsklocal;    // Local level of HSK
+	bool m_shsk;        // Stable HSK
+	bool m_hskold;
 
-	bool m_sbav;
-	bool m_sbavold;
-	bool m_bav;
-	bool m_bavhold;
+	// Page 3 in OSO schematics: Write timing
+	bool m_wq1;         // Flipflop 1
+	bool m_wq1old;      // Previous state
+	bool m_wq2;         // Flipflop 2
+	bool m_wq2old;      // Previous state
+	bool m_wnp;         // Write nibble selection; true means upper 4 bits
+	bool m_wbusy;       // When true, direct the transmit register towards the output
+	bool m_wbusyold;    // Old state of the WBUSY line
+	bool m_sendbyte;    // Byte has been loaded into the XMIT register
+	bool m_wrset;       // Start sending
+	bool m_counting;    // Counter running
+	int m_clkcount;     // Counter for 30 cycles
 
-	bool m_shsk;
-	bool m_shskold;
-	bool m_hsk;
-	bool m_hskhold;
+	// Page 4 in OSO schematics: Read timing
+	bool m_rq1;         // Flipflop 1
+	bool m_rq2;         // Flipflop 2
+	bool m_rq2old;      // Previous state
+	bool m_rnib;        // Read nibble, true means upper 4 bits
+	bool m_rnibcold;    // Needed to detect the raising edge
+	bool m_rdset;       // Start reading
+	bool m_rdsetold;    // Old state
+	bool m_msns;        // Upper 4 bits
+	bool m_lsns;        // Lower 4 bits
 
-	// Page 3 in OSO schematics
-	bool m_wq1;
-	bool m_wq1old;
-	bool m_wq2;
-	bool m_wq2old;
-	bool m_wnp;
-	bool m_wbusy;
-	bool m_wbusyold;
-	bool m_sendbyte;
+	// Page 6 (RHSUS*)
+	bool m_rhsus;       // Needed to assert the HSK line until the CPU has read the byte
 
-	bool m_wrst;
+	bool m_rbusy;
 
-	bool m_counting;
+	bool m_phi3;
 
-	bool m_rq2;
-	bool m_rq2old;
+	// Debugging help
+	uint8_t m_oldvalue;
+/*
+    // This is a buffer to enqueue changes on the Hexbus
+    // This is not part of the real implementation, but in the emulation
+    // there is no guarantee that two subsequent bus changes will be sensed
+    // on the other side
+
+    void enqueue(uint8_t val);
+    uint8_t dequeue();
+
+    uint8_t m_queue[8];
+    int m_qhead;
+    int m_qtail; */
 };
 
 class mainboard8_device : public device_t
@@ -491,7 +541,7 @@ public:
 	// Memory space
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_SETOFFSET_MEMBER( setoffset );
+	DECLARE_READ8_MEMBER( setoffset );
 
 	// Memory space for debugger access
 	DECLARE_READ8_MEMBER( debugger_read );
@@ -513,20 +563,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( holda_line );
 
-	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object)
-	{
-		return downcast<mainboard8_device &>(device).m_ready.set_callback(object);
-	}
-
-	template<class _Object> static devcb_base &set_reset_wr_callback(device_t &device, _Object object)
-	{
-		return downcast<mainboard8_device &>(device).m_console_reset.set_callback(object);
-	}
-
-	template<class _Object> static devcb_base &set_hold_wr_callback(device_t &device, _Object object)
-	{
-		return downcast<mainboard8_device &>(device).m_hold_line.set_callback(object);
-	}
+	template<class Object> devcb_base &set_ready_wr_callback(Object &&cb) { return m_ready.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_reset_wr_callback(Object &&cb) { return m_console_reset.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_hold_wr_callback(Object &&cb) { return m_hold_line.set_callback(std::forward<Object>(cb)); }
 
 	void set_paddress(int address);
 
@@ -640,16 +679,16 @@ private:
 } } } // end namespace bus::ti99::internal
 
 #define MCFG_MAINBOARD8_READY_CALLBACK(_write) \
-	devcb = &bus::ti99::internal::mainboard8_device::set_ready_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<bus::ti99::internal::mainboard8_device &>(*device).set_ready_wr_callback(DEVCB_##_write);
 
 #define MCFG_MAINBOARD8_RESET_CALLBACK(_write) \
-	devcb = &bus::ti99::internal::mainboard8_device::set_reset_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<bus::ti99::internal::mainboard8_device &>(*device).set_reset_wr_callback(DEVCB_##_write);
 
 #define MCFG_MAINBOARD8_HOLD_CALLBACK(_write) \
-	devcb = &bus::ti99::internal::mainboard8_device::set_hold_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<bus::ti99::internal::mainboard8_device &>(*device).set_hold_wr_callback(DEVCB_##_write);
 
 #define MCFG_OSO_INT_CALLBACK(_int) \
-	devcb = &bus::ti99::internal::oso_device::set_int_callback(*device, DEVCB##_int);
+	devcb = &downcast<bus::ti99::internal::oso_device &>(*device).set_int_callback(DEVCB##_int);
 
 DECLARE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device)
 DECLARE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device)

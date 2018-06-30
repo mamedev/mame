@@ -296,7 +296,7 @@ void ti99_multi_cart_conn_device::device_reset(void)
 	m_grom_selected = false;
 }
 
-MACHINE_CONFIG_MEMBER( ti99_multi_cart_conn_device::device_add_mconfig )
+MACHINE_CONFIG_START(ti99_multi_cart_conn_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("cartridge1", TI99_CART, 0)
 	MCFG_DEVICE_ADD("cartridge2", TI99_CART, 0)
 	MCFG_DEVICE_ADD("cartridge3", TI99_CART, 0)

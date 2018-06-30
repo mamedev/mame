@@ -28,12 +28,15 @@
 #include "bus/a2bus/a2eauxslot.h"
 #include "bus/rs232/rs232.h"
 
+#include "emupal.h"
+#include "screen.h"
+
 
 #define AUXSLOT_TAG "auxbus"
 
 #define IIC_ACIA1_TAG "acia1"
 #define IIC_ACIA2_TAG "acia2"
-#define IICP_IWM_TAG    "iwm"
+#define IICP_IWM_TAG    "fdc"
 
 #define LASER128_UDC_TAG "l128udc"
 
@@ -133,9 +136,11 @@ public:
 	apple2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_ram(*this, RAM_TAG),
 		m_ay3600(*this, "ay3600"),
 		m_a2bus(*this, "a2bus"),
+		m_speaker(*this, "a2speaker"),
 		m_a2eauxslot(*this, AUXSLOT_TAG),
 		m_joy1x(*this, "joystick_1_x"),
 		m_joy1y(*this, "joystick_1_y"),
@@ -155,9 +160,11 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
 	required_device<a2bus_device> m_a2bus;
+	required_device<speaker_sound_device> m_speaker;
 	optional_device<a2eauxslot_device> m_a2eauxslot;
 
 	optional_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
@@ -369,7 +376,7 @@ public:
 	void apple2_iwm_setdiskreg(uint8_t data);
 	void apple2_init_common();
 	void apple2eplus_init_common(void *apple2cp_ce00_ram);
-	int8_t apple2_slotram_r(address_space &space, int slotnum, int offset);
+	int8_t apple2_slotram_r(int slotnum, int offset);
 	int a2_no_ctrl_reset();
 
 private:

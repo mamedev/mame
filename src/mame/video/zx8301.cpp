@@ -56,9 +56,10 @@ DEFINE_DEVICE_TYPE(ZX8301, zx8301_device, "zx8301", "Sinclair ZX8301")
 
 
 // default address map
-static ADDRESS_MAP_START( zx8301, 0, 8, zx8301_device )
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-ADDRESS_MAP_END
+void zx8301_device::zx8301(address_map &map)
+{
+	map(0x00000, 0x1ffff).ram();
+}
 
 
 //-------------------------------------------------
@@ -112,7 +113,7 @@ zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, ZX8301, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(zx8301))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(zx8301_device::zx8301), this))
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_write_vsync(*this)
 	, m_dispoff(1)
@@ -216,7 +217,7 @@ READ8_MEMBER( zx8301_device::data_r )
 
 	if (m_vda)
 	{
-		m_cpu->spin_until_time(m_screen->time_until_pos(256, 0));
+		m_cpu->spin_until_time(screen().time_until_pos(256, 0));
 	}
 
 	return readbyte(offset);
@@ -233,7 +234,7 @@ WRITE8_MEMBER( zx8301_device::data_w )
 
 	if (m_vda)
 	{
-		m_cpu->spin_until_time(m_screen->time_until_pos(256, 0));
+		m_cpu->spin_until_time(screen().time_until_pos(256, 0));
 	}
 
 	writebyte(offset, data);

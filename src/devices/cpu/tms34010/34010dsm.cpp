@@ -8,30 +8,23 @@
  */
 
 #include "emu.h"
+#include "34010dsm.h"
 
-#ifdef STANDALONE
-#define PC __pc + (offset << 3)
-#define OP_WORD(v) { v = filebuf[_pc>>3]; _pc += 8; v = v | (filebuf[_pc>>3] << 8); _pc += 8;}
-#define PARAM_WORD(v) { v = filebuf[_pc>>3]; _pc += 8; v = v | (filebuf[_pc>>3] << 8); _pc += 8;}
-#define PARAM_LONG(v) { int v1, v2; PARAM_WORD(v1); PARAM_WORD(v2); v = v1 | (v2 << 16); }
-#else
-#define PC __pc
-#define OP_WORD(v) { v = rombase[(__pc - pcbase) >> 3] | (rombase[(__pc + 8 - pcbase) >> 3] << 8); _pc += 16; }
-#define PARAM_WORD(v) { v = rambase[(__pc + 16 - pcbase) >> 3] | (rambase[(__pc + 24 - pcbase) >> 3] << 8); _pc += 16; }
-#define PARAM_LONG(v) { v = rambase[(__pc + 16 - pcbase) >> 3] | (rambase[(__pc + 24 - pcbase) >> 3] << 8) | (rambase[(__pc + 32 - pcbase) >> 3] << 16) | (rambase[(__pc + 40 - pcbase) >> 3] << 24); _pc += 32; }
-#define PARM2_LONG(v) { v = rambase[(__pc + 48 - pcbase) >> 3] | (rambase[(__pc + 56 - pcbase) >> 3] << 8) | (rambase[(__pc + 64 - pcbase) >> 3] << 16) | (rambase[(__pc + 72 - pcbase) >> 3] << 24); _pc += 32; }
-#endif
+uint16_t tms34010_disassembler::r16(offs_t &pos, const data_buffer &opcodes)
+{
+	uint16_t r = opcodes.r16(pos);
+	pos += 16;
+	return r;
+}
 
-static uint8_t rf;
-static uint32_t __pc, _pc;
-static uint16_t op,rs,rd;
+uint32_t tms34010_disassembler::r32(offs_t &pos, const data_buffer &opcodes)
+{
+	uint32_t r = opcodes.r32(pos);
+	pos += 32;
+	return r;
+}
 
-static const uint8_t *rombase;
-static const uint8_t *rambase;
-static offs_t pcbase;
-
-
-static void print_reg(std::ostream &stream, uint8_t reg)
+void tms34010_disassembler::print_reg(std::ostream &stream, uint8_t reg)
 {
 	if (reg != 0x0f)
 	{
@@ -43,73 +36,51 @@ static void print_reg(std::ostream &stream, uint8_t reg)
 	}
 }
 
-static void print_src_reg(std::ostream &stream)
+void tms34010_disassembler::print_src_reg(std::ostream &stream)
 {
 	print_reg(stream, rs);
 }
 
-static void print_des_reg(std::ostream &stream)
+void tms34010_disassembler::print_des_reg(std::ostream &stream)
 {
 	print_reg(stream, rd);
 }
 
-static void print_src_des_reg(std::ostream &stream)
+void tms34010_disassembler::print_src_des_reg(std::ostream &stream)
 {
 	print_src_reg(stream);
 	stream << ",";
 	print_des_reg(stream);
 }
 
-static void print_word_parm(std::ostream &stream)
+void tms34010_disassembler::print_word_parm(std::ostream &stream, offs_t &pos, const data_buffer &params)
 {
-	uint16_t w;
-
-	PARAM_WORD(w);
-
-	util::stream_format(stream, "%Xh", w);
+	util::stream_format(stream, "%Xh", r16(pos, params));
 }
 
-static void print_word_parm_1s_comp(std::ostream &stream)
+void tms34010_disassembler::print_word_parm_1s_comp(std::ostream &stream, offs_t &pos, const data_buffer &params)
 {
-	uint16_t w;
-
-	PARAM_WORD(w);
-	w = ~w;
-	util::stream_format(stream, "%Xh", w);
+	util::stream_format(stream, "%Xh", u16(~r16(pos, params)));
 }
 
-static void print_long_parm(std::ostream &stream)
+void tms34010_disassembler::print_long_parm(std::ostream &stream, offs_t &pos, const data_buffer &params)
 {
-	uint32_t l;
-
-	PARAM_LONG(l);
-	util::stream_format(stream, "%Xh", l);
+	util::stream_format(stream, "%Xh", r32(pos, params));
 }
 
-static void print_long_parm2(std::ostream &stream)
+void tms34010_disassembler::print_long_parm_1s_comp(std::ostream &stream, offs_t &pos, const data_buffer &params)
 {
-	uint32_t l;
-
-	PARM2_LONG(l);
-	util::stream_format(stream, "%Xh", l);
+	util::stream_format(stream, "%Xh", u32(~r32(pos, params)));
 }
 
-static void print_long_parm_1s_comp(std::ostream &stream)
-{
-	uint32_t l;
-
-	PARAM_LONG(l);
-	util::stream_format(stream, "%Xh", ~l);
-}
-
-static void print_constant(std::ostream &stream)
+void tms34010_disassembler::print_constant(std::ostream &stream)
 {
 	uint8_t constant = (op >> 5) & 0x1f;
 
 	util::stream_format(stream, "%Xh", constant);
 }
 
-static void print_constant_1_32(std::ostream &stream)
+void tms34010_disassembler::print_constant_1_32(std::ostream &stream)
 {
 	uint8_t constant = (op >> 5) & 0x1f;
 	if (!constant) constant = 0x20;
@@ -117,52 +88,48 @@ static void print_constant_1_32(std::ostream &stream)
 	util::stream_format(stream, "%Xh", constant);
 }
 
-static void print_constant_1s_comp(std::ostream &stream)
+void tms34010_disassembler::print_constant_1s_comp(std::ostream &stream)
 {
 	uint8_t constant = (~op >> 5) & 0x1f;
 
 	util::stream_format(stream, "%Xh", constant);
 }
 
-static void print_constant_2s_comp(std::ostream &stream)
+void tms34010_disassembler::print_constant_2s_comp(std::ostream &stream)
 {
 	uint8_t constant = 32 - ((op >> 5) & 0x1f);
 
 	util::stream_format(stream, "%Xh", constant);
 }
 
-static void print_relative(std::ostream &stream)
+void tms34010_disassembler::print_relative(std::ostream &stream, offs_t pc, offs_t &pos, const data_buffer &params)
 {
-	uint16_t l;
-	int16_t ls;
+	int16_t ls = (int16_t)r16(pos, params);
 
-	PARAM_WORD(l);
-	ls = (int16_t)l;
-
-	util::stream_format(stream, "%Xh", PC + 32 + (ls << 4));
+	util::stream_format(stream, "%Xh", pc + 32 + (ls << 4));
 }
 
-static void print_relative_8bit(std::ostream &stream)
+void tms34010_disassembler::print_relative_8bit(std::ostream &stream, offs_t pc)
 {
 	int8_t ls = (int8_t)op;
 
-	util::stream_format(stream, "%Xh", PC + 16 + (ls << 4));
+	util::stream_format(stream, "%Xh", pc + 16 + (ls << 4));
 }
 
-static void print_relative_5bit(std::ostream &stream)
+void tms34010_disassembler::print_relative_5bit(std::ostream &stream, offs_t pc)
 {
 	int8_t ls = (int8_t)((op >> 5) & 0x1f);
 	if (op & 0x0400) ls = -ls;
 
-	util::stream_format(stream, "%Xh", PC + 16 + (ls << 4));
+	util::stream_format(stream, "%Xh", pc + 16 + (ls << 4));
 }
 
-static void print_field(std::ostream &stream)
+void tms34010_disassembler::print_field(std::ostream &stream)
 {
 	util::stream_format(stream, "%c", (op & 0x200) ? '1' : '0');
 }
 
-static void print_condition_code(std::ostream &stream)
+void tms34010_disassembler::print_condition_code(std::ostream &stream)
 {
 	switch (op & 0x0f00)
 	{
@@ -185,7 +152,7 @@ static void print_condition_code(std::ostream &stream)
 	}
 }
 
-static void print_reg_list_range(std::ostream &stream, int8_t first, int8_t last)
+void tms34010_disassembler::print_reg_list_range(std::ostream &stream, int8_t first, int8_t last)
 {
 	if ((first != -1 ) && (first != last))
 	{
@@ -197,13 +164,12 @@ static void print_reg_list_range(std::ostream &stream, int8_t first, int8_t last
 	}
 }
 
-static void print_reg_list(std::ostream &stream, uint16_t rev)
+void tms34010_disassembler::print_reg_list(std::ostream &stream, uint16_t rev, offs_t &pos, const data_buffer &params)
 {
-	uint16_t l;
 	uint8_t i;
 	int8_t first = -1, last = 0;
 
-	PARAM_WORD(l);
+	uint16_t l = r16(pos, params);
 
 	for (i = 0; i  < 16; i++)
 	{
@@ -241,15 +207,14 @@ static void print_reg_list(std::ostream &stream, uint16_t rev)
 }
 
 
-static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
+offs_t tms34010_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	int flags = 0;
 	uint8_t bad = 0;
 	uint16_t subop;
+	offs_t pos = pc;
 
-	__pc = _pc = pc;
-
-	OP_WORD(op);
+	op = r16(pos, opcodes);
 
 	subop = (op & 0x01e0);
 	rs = (op >> 5) & 0x0f;          /* Source register */
@@ -267,21 +232,21 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x0040:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "IDLE   ");
 			else
 				bad = 1;
 			break;
 
 		case 0x0080:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "MWAIT  ");
 			else
 				bad = 1;
 			break;
 
 		case 0x00e0:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "BLMOVE %d,%d", (op >> 1) & 1, op & 1);
 			else
 				bad = 1;
@@ -334,21 +299,21 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		switch (subop)
 		{
 		case 0x0040:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "SETCSP ");
 			else
 				bad = 1;
 			break;
 
 		case 0x0060:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "SETCDP ");
 			else
 				bad = 1;
 			break;
 
 		case 0x0080:
-			if (is_34020)
+			if (m_is_34020)
 			{
 				util::stream_format(stream, "RPIX   ");
 				print_des_reg(stream);
@@ -358,7 +323,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x00a0:
-			if (is_34020)
+			if (m_is_34020)
 			{
 				util::stream_format(stream, "EXGPS  ");
 				print_des_reg(stream);
@@ -368,7 +333,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x00c0:
-			if (is_34020)
+			if (m_is_34020)
 			{
 				util::stream_format(stream, "GETPS  ");
 				print_des_reg(stream);
@@ -378,7 +343,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x00e0:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "SETCMP ");
 			else
 				bad = 1;
@@ -394,9 +359,9 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 
 		case 0x0140:
 			util::stream_format(stream, "MOVB   @");
-			print_long_parm(stream);
+			print_long_parm(stream, pos, params);
 			stream << ",@";
-			print_long_parm2(stream);
+			print_long_parm(stream, pos, params);
 			break;
 
 		case 0x0160:
@@ -434,10 +399,9 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		switch (subop)
 		{
 		case 0x0000:
-			if (is_34020 && (op & 0xfe00) == 0x0600)
+			if (m_is_34020 && (op & 0xfe00) == 0x0600)
 			{
-				uint32_t x;
-				PARAM_LONG(x);
+				uint32_t x = r32(pos, params);
 				util::stream_format(stream, "CEXEC  %d,%06X,%d", (x >> 7) & 1, (x >> 8) & 0x1fffff, (x >> 29) & 7);
 			}
 			else
@@ -445,10 +409,9 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x0020:
-			if (is_34020 && (op & 0xfe00) == 0x0600)
+			if (m_is_34020 && (op & 0xfe00) == 0x0600)
 			{
-				uint32_t x;
-				PARAM_LONG(x);
+				uint32_t x = r32(pos, params);
 				util::stream_format(stream, "CMOVGC ");
 				print_des_reg(stream);
 				util::stream_format(stream, ",%06X,%d", (x >> 8) & 0x1fffff, (x >> 29) & 7);
@@ -458,10 +421,9 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x0040:
-			if (is_34020 && (op & 0xfe00) == 0x0600)
+			if (m_is_34020 && (op & 0xfe00) == 0x0600)
 			{
-				uint32_t x;
-				PARAM_LONG(x);
+				uint32_t x = r32(pos, params);
 				util::stream_format(stream, "CMOVGC ");
 				print_des_reg(stream);
 				stream << ",";
@@ -474,10 +436,9 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x0060:
-			if (is_34020 && (op & 0xfe00) == 0x0600)
+			if (m_is_34020 && (op & 0xfe00) == 0x0600)
 			{
-				uint32_t x;
-				PARAM_LONG(x);
+				uint32_t x = r32(pos, params);
 
 				if (op == 0x0660 && (x & 0xff) == 0x01)
 				{
@@ -499,10 +460,9 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x0080:
-			if (is_34020 && (op & 0xfe00) == 0x0600)
+			if (m_is_34020 && (op & 0xfe00) == 0x0600)
 			{
-				uint32_t x;
-				PARAM_LONG(x);
+				uint32_t x = r32(pos, params);
 				util::stream_format(stream, "CMOVMC *");
 				rf = (x & 0x10) ? 'B' : 'A';
 				print_reg(stream, x & 0x0f);
@@ -513,10 +473,9 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x00a0:
-			if (is_34020 && (op & 0xfe00) == 0x0600)
+			if (m_is_34020 && (op & 0xfe00) == 0x0600)
 			{
-				uint32_t x;
-				PARAM_LONG(x);
+				uint32_t x = r32(pos, params);
 				util::stream_format(stream, "CMOVCM *");
 				print_des_reg(stream);
 				util::stream_format(stream, "+,%d,%d,%06X,%d", x & 0x1f, (x >> 7) & 1, (x >> 8) & 0x1fffff, (x >> 29) & 7);
@@ -526,10 +485,9 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x00c0:
-			if (is_34020 && (op & 0xfe00) == 0x0600)
+			if (m_is_34020 && (op & 0xfe00) == 0x0600)
 			{
-				uint32_t x;
-				PARAM_LONG(x);
+				uint32_t x = r32(pos, params);
 				util::stream_format(stream, "CMOVCM *-");
 				print_des_reg(stream);
 				util::stream_format(stream, ",%d,%d,%06X,%d", x & 0x1f, (x >> 7) & 1, (x >> 8) & 0x1fffff, (x >> 29) & 7);
@@ -539,10 +497,9 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x00e0:
-			if (is_34020 && (op & 0xfe00) == 0x0600)
+			if (m_is_34020 && (op & 0xfe00) == 0x0600)
 			{
-				uint32_t x;
-				PARAM_LONG(x);
+				uint32_t x = r32(pos, params);
 				util::stream_format(stream, "CMOVMC *");
 				rf = (x & 0x10) ? 'B' : 'A';
 				print_reg(stream, x & 0x0f);
@@ -581,14 +538,14 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			util::stream_format(stream, "MOVE   ");
 			print_des_reg(stream);
 			stream << ",@";
-			print_long_parm(stream);
+			print_long_parm(stream, pos, params);
 			stream << ",";
 			print_field(stream);
 			break;
 
 		case 0x01a0:
 			util::stream_format(stream, "MOVE   @");
-			print_long_parm(stream);
+			print_long_parm(stream, pos, params);
 			stream << ",";
 			print_des_reg(stream);
 			stream << ",";
@@ -597,9 +554,9 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 
 		case 0x01c0:
 			util::stream_format(stream, "MOVE   @");
-			print_long_parm(stream);
+			print_long_parm(stream, pos, params);
 			stream << ",@";
-			print_long_parm2(stream);
+			print_long_parm(stream, pos, params);
 			stream << ",";
 			print_field(stream);
 			break;
@@ -608,7 +565,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			if (op & 0x200)
 			{
 				util::stream_format(stream, "MOVE   @");
-				print_long_parm(stream);
+				print_long_parm(stream, pos, params);
 				stream << ",";
 				print_des_reg(stream);
 			}
@@ -617,7 +574,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 				util::stream_format(stream, "MOVB   ");
 				print_des_reg(stream);
 				stream << ",@";
-				print_long_parm(stream);
+				print_long_parm(stream, pos, params);
 			}
 			break;
 
@@ -631,20 +588,19 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		switch (subop)
 		{
 		case 0x0000:
-			if (is_34020)
+			if (m_is_34020)
 			{
 				util::stream_format(stream, "TRAPL  ");
-				flags = DASMFLAG_STEP_OVER;
+				flags = STEP_OVER;
 			}
 			else
 				bad = 1;
 			break;
 
 		case 0x0020:
-			if (is_34020)
+			if (m_is_34020)
 			{
-				uint32_t x;
-				PARAM_LONG(x);
+				uint32_t x = r32(pos, params);
 				util::stream_format(stream, "CMOVMC *-");
 				rf = (x & 0x10) ? 'B' : 'A';
 				print_reg(stream, x & 0x0f);
@@ -655,24 +611,24 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x0040:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "VBLT   B,L");
 			else
 				bad = 1;
 			break;
 
 		case 0x0060:
-			if (is_34020)
+			if (m_is_34020)
 			{
 				util::stream_format(stream, "RETM   ");
-				flags = DASMFLAG_STEP_OUT;
+				flags = STEP_OUT;
 			}
 			else
 				bad = 1;
 			break;
 
 		case 0x00e0:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "CLIP   ");
 			else
 				bad = 1;
@@ -680,23 +636,23 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 
 		case 0x0100:
 			util::stream_format(stream, "TRAP   %Xh", op & 0x1f);
-			flags = DASMFLAG_STEP_OVER;
+			flags = STEP_OVER;
 			break;
 
 		case 0x0120:
 			util::stream_format(stream, "CALL   ");
 			print_des_reg(stream);
-			flags = DASMFLAG_STEP_OVER;
+			flags = STEP_OVER;
 			break;
 
 		case 0x0140:
 			util::stream_format(stream, "RETI   ");
-			flags = DASMFLAG_STEP_OUT;
+			flags = STEP_OUT;
 			break;
 
 		case 0x0160:
 			util::stream_format(stream, "RETS   ");
-			flags = DASMFLAG_STEP_OUT;
+			flags = STEP_OUT;
 			if (op & 0x1f)
 			{
 				util::stream_format(stream, "%Xh", op & 0x1f);
@@ -706,25 +662,25 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		case 0x0180:
 			util::stream_format(stream, "MMTM   ");
 			print_des_reg(stream);
-			print_reg_list(stream, 1);
+			print_reg_list(stream, 1, pos, params);
 			break;
 
 		case 0x01a0:
 			util::stream_format(stream, "MMFM   ");
 			print_des_reg(stream);
-			print_reg_list(stream, 0);
+			print_reg_list(stream, 0, pos, params);
 			break;
 
 		case 0x01c0:
 			util::stream_format(stream, "MOVI   ");
-			print_word_parm(stream);
+			print_word_parm(stream, pos, params);
 			stream << ",";
 			print_des_reg(stream);
 			break;
 
 		case 0x01e0:
 			util::stream_format(stream, "MOVI   ");
-			print_long_parm(stream);
+			print_long_parm(stream, pos, params);
 			stream << ",";
 			print_des_reg(stream);
 			break;
@@ -739,28 +695,28 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		switch (subop)
 		{
 		case 0x0000:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "VLCOL  ");
 			else
 				bad = 1;
 			break;
 
 		case 0x0020:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "PFILL  XY");
 			else
 				bad = 1;
 			break;
 
 		case 0x0040:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "VFILL  L");
 			else
 				bad = 1;
 			break;
 
 		case 0x0060:
-			if (is_34020)
+			if (m_is_34020)
 			{
 				util::stream_format(stream, "CVMXYL ");
 				print_des_reg(stream);
@@ -770,7 +726,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x0080:
-			if (is_34020)
+			if (m_is_34020)
 			{
 				util::stream_format(stream, "CVDXYL ");
 				print_des_reg(stream);
@@ -780,14 +736,14 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x00a0:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "FPIXEQ ");
 			else
 				bad = 1;
 			break;
 
 		case 0x00c0:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "FPIXNE ");
 			else
 				bad = 1;
@@ -795,56 +751,56 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 
 		case 0x0100:
 			util::stream_format(stream, "ADDI   ");
-			print_word_parm(stream);
+			print_word_parm(stream, pos, params);
 			stream << ",";
 			print_des_reg(stream);
 			break;
 
 		case 0x0120:
 			util::stream_format(stream, "ADDI   ");
-			print_long_parm(stream);
+			print_long_parm(stream, pos, params);
 			stream << ",";
 			print_des_reg(stream);
 			break;
 
 		case 0x0140:
 			util::stream_format(stream, "CMPI   ");
-			print_word_parm_1s_comp(stream);
+			print_word_parm_1s_comp(stream, pos, params);
 			stream << ",";
 			print_des_reg(stream);
 			break;
 
 		case 0x0160:
 			util::stream_format(stream, "CMPI   ");
-			print_long_parm_1s_comp(stream);
+			print_long_parm_1s_comp(stream, pos, params);
 			stream << ",";
 			print_des_reg(stream);
 			break;
 
 		case 0x0180:
 			util::stream_format(stream, "ANDI   ");
-			print_long_parm_1s_comp(stream);
+			print_long_parm_1s_comp(stream, pos, params);
 			stream << ",";
 			print_des_reg(stream);
 			break;
 
 		case 0x01a0:
 			util::stream_format(stream, "ORI    ");
-			print_long_parm(stream);
+			print_long_parm(stream, pos, params);
 			stream << ",";
 			print_des_reg(stream);
 			break;
 
 		case 0x01c0:
 			util::stream_format(stream, "XORI   ");
-			print_long_parm(stream);
+			print_long_parm(stream, pos, params);
 			stream << ",";
 			print_des_reg(stream);
 			break;
 
 		case 0x01e0:
 			util::stream_format(stream, "SUBI   ");
-			print_word_parm_1s_comp(stream);
+			print_word_parm_1s_comp(stream, pos, params);
 			stream << ",";
 			print_des_reg(stream);
 			break;
@@ -859,10 +815,10 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		switch (subop)
 		{
 		case 0x0000:
-			if (is_34020)
+			if (m_is_34020)
 			{
 				util::stream_format(stream, "ADDXYI ");
-				print_long_parm(stream);
+				print_long_parm(stream, pos, params);
 				stream << ",";
 				print_des_reg(stream);
 			}
@@ -871,7 +827,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			break;
 
 		case 0x0040:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "LINIT  ");
 			else
 				bad = 1;
@@ -879,21 +835,21 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 
 		case 0x0100:
 			util::stream_format(stream, "SUBI   ");
-			print_long_parm_1s_comp(stream);
+			print_long_parm_1s_comp(stream, pos, params);
 			stream << ",";
 			print_des_reg(stream);
 			break;
 
 		case 0x0120:
 			util::stream_format(stream, "CALLR  ");
-			print_relative(stream);
-			flags = DASMFLAG_STEP_OVER;
+			print_relative(stream, pc, pos, params);
+			flags = STEP_OVER;
 			break;
 
 		case 0x0140:
 			util::stream_format(stream, "CALLA  ");
-			print_long_parm(stream);
-			flags = DASMFLAG_STEP_OVER;
+			print_long_parm(stream, pos, params);
+			flags = STEP_OVER;
 			break;
 
 		case 0x0160:
@@ -904,24 +860,24 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			util::stream_format(stream, "DSJ    ");
 			print_des_reg(stream);
 			stream << ",";
-			print_relative(stream);
-			flags = DASMFLAG_STEP_OVER;
+			print_relative(stream, pc, pos, params);
+			flags = STEP_OVER;
 			break;
 
 		case 0x01a0:
 			util::stream_format(stream, "DSJEQ  ");
 			print_des_reg(stream);
 			stream << ",";
-			print_relative(stream);
-			flags = DASMFLAG_STEP_OVER;
+			print_relative(stream, pc, pos, params);
+			flags = STEP_OVER;
 			break;
 
 		case 0x01c0:
 			util::stream_format(stream, "DSJNE  ");
 			print_des_reg(stream);
 			stream << ",";
-			print_relative(stream);
-			flags = DASMFLAG_STEP_OVER;
+			print_relative(stream, pc, pos, params);
+			flags = STEP_OVER;
 			break;
 
 		case 0x01e0:
@@ -935,18 +891,18 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 
 
 	case 0x0e00:
-		flags = DASMFLAG_STEP_OVER;
+		flags = STEP_OVER;
 		switch (subop)
 		{
 		case 0x0000:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "PIXBLT L,M,L");
 			else
 				bad = 1;
 			break;
 
 		case 0x00e0:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "TFILL  XY");
 			else
 				bad = 1;
@@ -1088,7 +1044,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 
 	case 0x3400:
 	case 0x3600:
-		if (is_34020)
+		if (m_is_34020)
 		{
 			util::stream_format(stream, "CMPK   ");
 			print_constant_1_32(stream);
@@ -1106,8 +1062,8 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		util::stream_format(stream, "DSJS   ");
 		print_des_reg(stream);
 		stream << ",";
-		print_relative_5bit(stream);
-		flags = DASMFLAG_STEP_OVER;
+		print_relative_5bit(stream, pc);
+		flags = STEP_OVER;
 		break;
 
 
@@ -1279,7 +1235,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 
 
 	case 0x7a00:
-		if (is_34020)
+		if (m_is_34020)
 		{
 			util::stream_format(stream, "RMO    ");
 			print_src_des_reg(stream);
@@ -1289,7 +1245,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		break;
 
 	case 0x7e00:
-		if (is_34020)
+		if (m_is_34020)
 		{
 			util::stream_format(stream, "SWAPF  *");
 			print_src_des_reg(stream);
@@ -1423,7 +1379,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		stream << ",*";
 		print_des_reg(stream);
 		stream << "(";
-		print_word_parm(stream);
+		print_word_parm(stream, pos, params);
 		stream << ")";
 		break;
 
@@ -1432,7 +1388,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		util::stream_format(stream, "MOVB   *");
 		print_src_reg(stream);
 		stream << "(";
-		print_word_parm(stream);
+		print_word_parm(stream, pos, params);
 		stream << "),";
 		print_des_reg(stream);
 		break;
@@ -1445,7 +1401,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		stream << ",*";
 		print_des_reg(stream);
 		stream << "(";
-		print_word_parm(stream);
+		print_word_parm(stream, pos, params);
 		stream << "),";
 		print_field(stream);
 		break;
@@ -1456,7 +1412,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		util::stream_format(stream, "MOVE   *");
 		print_src_reg(stream);
 		stream << "(";
-		print_word_parm(stream);
+		print_word_parm(stream, pos, params);
 		stream << "),";
 		print_des_reg(stream);
 		stream << ",";
@@ -1469,11 +1425,11 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		util::stream_format(stream, "MOVE   *");
 		print_src_reg(stream);
 		stream << "(";
-		print_word_parm(stream);
+		print_word_parm(stream, pos, params);
 		stream << "),*";
 		print_des_reg(stream);
 		stream << "(";
-		print_word_parm(stream);
+		print_word_parm(stream, pos, params);
 		stream << "),";
 		print_field(stream);
 		break;
@@ -1483,11 +1439,11 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		util::stream_format(stream, "MOVB   *");
 		print_src_reg(stream);
 		stream << "(";
-		print_word_parm(stream);
+		print_word_parm(stream, pos, params);
 		stream << "),*";
 		print_des_reg(stream);
 		stream << "(";
-		print_word_parm(stream);
+		print_word_parm(stream, pos, params);
 		stream << ")";
 		break;
 
@@ -1515,15 +1471,15 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		switch (op & 0x00ff)
 		{
 		case 0x00:
-			print_relative(stream);
+			print_relative(stream, pc, pos, params);
 			break;
 
 		case 0x80:
-			print_long_parm(stream);
+			print_long_parm(stream, pos, params);
 			break;
 
 		default:
-			print_relative_8bit(stream);
+			print_relative_8bit(stream, pc);
 		}
 		break;
 
@@ -1533,7 +1489,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		util::stream_format(stream, "MOVE   *");
 		print_src_reg(stream);
 		stream << "(";
-		print_word_parm(stream);
+		print_word_parm(stream, pos, params);
 		stream << "),*";
 		print_des_reg(stream);
 		stream << "+,";
@@ -1547,7 +1503,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		{
 		case 0x0000:
 			util::stream_format(stream, "MOVE   @");
-			print_long_parm(stream);
+			print_long_parm(stream, pos, params);
 			stream << ",*";
 			print_des_reg(stream);
 			stream << "+,";
@@ -1567,10 +1523,9 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		break;
 
 	case 0xd800:
-		if (is_34020)
+		if (m_is_34020)
 		{
-			uint32_t x;
-			PARAM_WORD(x);
+			uint32_t x = r16(pos, params);
 			util::stream_format(stream, "CEXEC  %d,%06X,%d", op & 1, ((x << 5) & 0x1fffe0) | ((op >> 1) & 0x1f), (x >> 13) & 7);
 		}
 		else
@@ -1582,14 +1537,14 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		switch (subop)
 		{
 		case 0x0000:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "FLINE   0");
 			else
 				bad = 1;
 			break;
 
 		case 0x0080:
-			if (is_34020)
+			if (m_is_34020)
 				util::stream_format(stream, "FLINE   1");
 			else
 				bad = 1;
@@ -1639,7 +1594,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 
 
 	case 0xea00:
-		if (is_34020)
+		if (m_is_34020)
 		{
 			util::stream_format(stream, "CVSXYL ");
 			print_src_des_reg(stream);
@@ -1723,21 +1678,14 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 		util::stream_format(stream, "DW     %04Xh", op & 0xffff);
 	}
 
-	return (_pc - __pc) | flags | DASMFLAG_SUPPORTED;
+	return (pos - pc) | flags | SUPPORTED;
 }
 
-CPU_DISASSEMBLE( tms34010 )
+uint32_t tms34010_disassembler::opcode_alignment() const
 {
-	rombase = oprom;
-	rambase = opram;
-	pcbase = pc;
-	return Dasm340x0(stream, pc, false);
+	return 16;
 }
 
-CPU_DISASSEMBLE( tms34020 )
+tms34010_disassembler::tms34010_disassembler(bool is_34020) : m_is_34020(is_34020)
 {
-	rombase = oprom;
-	rambase = opram;
-	pcbase = pc;
-	return Dasm340x0(stream, pc, true);
 }

@@ -32,7 +32,7 @@ static const gfx_layout charlayout =
 //  GFXDECODE( abc80 )
 //-------------------------------------------------
 
-static GFXDECODE_START( abc80 )
+static GFXDECODE_START( gfx_abc80 )
 	GFXDECODE_ENTRY( "chargen", 0,     charlayout, 0, 1 ) // normal characters
 	GFXDECODE_ENTRY( "chargen", 0x500, charlayout, 0, 1 ) // graphics characters
 GFXDECODE_END
@@ -163,7 +163,7 @@ void abc80_state::video_start()
 	m_scanline_timer->adjust(m_screen->time_until_pos(0, ABC80_HBEND), 0, m_screen->scan_period());
 
 	m_blink_timer = timer_alloc(TIMER_ID_BLINK);
-	m_blink_timer->adjust(attotime::from_hz(XTAL_11_9808MHz/2/6/64/312/16), 0, attotime::from_hz(XTAL_11_9808MHz/2/6/64/312/16));
+	m_blink_timer->adjust(attotime::from_hz(XTAL(11'980'800)/2/6/64/312/16), 0, attotime::from_hz(XTAL(11'980'800)/2/6/64/312/16));
 
 	m_vsync_on_timer = timer_alloc(TIMER_ID_VSYNC_ON);
 	m_vsync_on_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->frame_period());
@@ -192,12 +192,12 @@ uint32_t abc80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //  MACHINE_CONFIG_START( abc80_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START( abc80_video )
+MACHINE_CONFIG_START(abc80_state::abc80_video)
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc80_state, screen_update)
 
-	MCFG_SCREEN_RAW_PARAMS(XTAL_11_9808MHz/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(11'980'800)/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", abc80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_abc80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END

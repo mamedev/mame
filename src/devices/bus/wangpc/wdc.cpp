@@ -64,37 +64,39 @@ const tiny_rom_entry *wangpc_wdc_device::device_rom_region() const
 //  ADDRESS_MAP( wangpc_wdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( wangpc_wdc_mem, AS_PROGRAM, 8, wangpc_wdc_device )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-ADDRESS_MAP_END
+void wangpc_wdc_device::wangpc_wdc_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region(Z80_TAG, 0);
+	map(0x1000, 0x17ff).ram();
+	map(0x2000, 0x27ff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( wangpc_wdc_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( wangpc_wdc_io, AS_IO, 8, wangpc_wdc_device )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(port_r)
-	AM_RANGE(0x03, 0x03) AM_WRITE(status_w)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(ctc_ch0_r, ctc_ch0_w)
-	AM_RANGE(0x14, 0x14) AM_READWRITE(ctc_ch1_r, ctc_ch1_w)
-	AM_RANGE(0x18, 0x18) AM_READWRITE(ctc_ch2_r, ctc_ch2_w)
-	AM_RANGE(0x1c, 0x1c) AM_READWRITE(ctc_ch3_r, ctc_ch3_w)
-ADDRESS_MAP_END
+void wangpc_wdc_device::wangpc_wdc_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(FUNC(wangpc_wdc_device::port_r));
+	map(0x03, 0x03).w(FUNC(wangpc_wdc_device::status_w));
+	map(0x10, 0x10).rw(FUNC(wangpc_wdc_device::ctc_ch0_r), FUNC(wangpc_wdc_device::ctc_ch0_w));
+	map(0x14, 0x14).rw(FUNC(wangpc_wdc_device::ctc_ch1_r), FUNC(wangpc_wdc_device::ctc_ch1_w));
+	map(0x18, 0x18).rw(FUNC(wangpc_wdc_device::ctc_ch2_r), FUNC(wangpc_wdc_device::ctc_ch2_w));
+	map(0x1c, 0x1c).rw(FUNC(wangpc_wdc_device::ctc_ch3_r), FUNC(wangpc_wdc_device::ctc_ch3_w));
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_START( wangpc_wdc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( wangpc_wdc_device::device_add_mconfig )
-	MCFG_CPU_ADD(Z80_TAG, Z80, 2000000) // XTAL_10MHz / ?
+MACHINE_CONFIG_START(wangpc_wdc_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 2000000) // XTAL(10'000'000) / ?
 	//MCFG_Z80_DAISY_CHAIN(wangpc_wdc_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(wangpc_wdc_mem)
-	MCFG_CPU_IO_MAP(wangpc_wdc_io)
+	MCFG_DEVICE_PROGRAM_MAP(wangpc_wdc_mem)
+	MCFG_DEVICE_IO_MAP(wangpc_wdc_io)
 
 	MCFG_DEVICE_ADD(MK3882_TAG, Z80CTC, 2000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

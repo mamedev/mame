@@ -29,9 +29,6 @@ public:
 	// construction/destruction
 	tiki100_8088_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -47,6 +44,12 @@ private:
 	required_device<i8088_cpu_device> m_maincpu;
 
 	uint8_t m_data;
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	void i8088_io(address_map &map);
+	void i8088_mem(address_map &map);
 };
 
 

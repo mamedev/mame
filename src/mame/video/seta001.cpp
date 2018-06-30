@@ -9,12 +9,13 @@
 
 	used by:
 
-	seta.c
-	taito_x.c
-	tnzs.c
-	srmp2.c
-	champbwl.c
-	cchance.c
+	seta.cpp
+	taito_x.cpp
+	tnzs.cpp
+	srmp2.cpp
+	champbwl.cpp
+	cchance.cpp
+	thedealr.cpp
 
 	note: the data bus is almost certainly 8-bit, dating back to the earliest
 	    hardware the games were used on.  the RAM arrangements changes
@@ -38,26 +39,19 @@ seta001_device::seta001_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void seta001_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<seta001_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
 void seta001_device::device_start()
 {
+	m_spriteylow = std::make_unique<uint8_t[]>(0x300); // 0x200 low y + 0x100 bg stuff
+	m_spritecodelow = std::make_unique<uint8_t[]>(0x2000);
+	m_spritecodehigh = std::make_unique<uint8_t[]>(0x2000);
+
 	// chukatai draws a column on the left from uninitialized RAM which causes garbage in a debug build
 	// if we initialize ram this is a single line in the top left instead.
 	// maybe there is less RAM actually present and it should mirror, or there is another flaw?
 	memset(m_spritectrl,0xff,4);
-	memset(m_spriteylow,0xff,0x300);
-	memset(m_spritecodelow,0xff,0x2000);
-	memset(m_spritecodehigh,0xff,0x2000);
-
+	memset(m_spriteylow.get(),0xff,0x300);
+	memset(m_spritecodelow.get(),0xff,0x2000);
+	memset(m_spritecodehigh.get(),0xff,0x2000);
 
 	m_fg_flipxoffs = 0;
 	m_fg_noflipxoffs = 0;
@@ -81,9 +75,9 @@ void seta001_device::device_start()
 
 	save_item(NAME(m_bgflag));
 	save_item(NAME(m_spritectrl));
-	save_item(NAME(m_spriteylow));
-	save_item(NAME(m_spritecodelow));
-	save_item(NAME(m_spritecodehigh));
+	save_pointer(NAME(m_spriteylow),0x300);
+	save_pointer(NAME(m_spritecodelow),0x2000);
+	save_pointer(NAME(m_spritecodehigh),0x2000);
 }
 
 void seta001_device::device_reset()
@@ -209,24 +203,24 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 	int offs, col;
 	int xoffs, yoffs;
 
-	int total_color_codes   =   m_gfxdecode->gfx(0)->colors();
+	int const total_color_codes   =   m_gfxdecode->gfx(0)->colors();
 
-	int ctrl    =   m_spritectrl[0];
-	int ctrl2   =   m_spritectrl[1];
+	int const ctrl    =   m_spritectrl[0];
+	int const ctrl2   =   m_spritectrl[1];
 
-	int flip    =   ctrl & 0x40;
+	int const flip    =   ctrl & 0x40;
 	int numcol  =   ctrl2 & 0x0f;
 
 	int scrollx, scrolly;
 
 	uint32_t upper;
 
-	uint8_t* scrollram = m_spriteylow+0x200;
+	const uint8_t* scrollram = &m_spriteylow[0x200];
 
 	/* Sprites Banking and/or Sprites Buffering */
 	uint16_t bank = ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? bank_size : 0 );
 
-	int max_y   =   0xf0;
+	int const max_y   =   0xf0;
 
 	// HACKS
 	// used in conjunction with setac_type
@@ -240,10 +234,8 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 		default:    col0    =   0x0;
 	}
 
-
 	xoffs = flip ? m_bg_flipxoffs : m_bg_noflipxoffs;
 	yoffs = flip ? m_bg_flipyoffs : m_bg_noflipyoffs;
-
 
 	if (m_bgflag & 0x80)
 		transpen = -1;
@@ -324,17 +316,17 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 
 void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size)
 {
-	int screenflip = (m_spritectrl[0] & 0x40) >> 6;
+	int const screenflip = (m_spritectrl[0] & 0x40) >> 6;
 	int i;
-	int ctrl2 = m_spritectrl[1];
+	int const ctrl2 = m_spritectrl[1];
 	int xoffs, yoffs;
 
-	int total_color_codes   =   m_gfxdecode->gfx(0)->colors();
+	int const total_color_codes   =   m_gfxdecode->gfx(0)->colors();
 
-	uint8_t *char_pointer = m_spritecodelow + 0x0000;
-	uint8_t *x_pointer = m_spritecodelow + 0x0200;
-	uint8_t *ctrl_pointer = m_spritecodehigh + 0x0000;
-	uint8_t *color_pointer = m_spritecodehigh + 0x0200;
+	uint8_t *char_pointer = &m_spritecodelow[0x0000];
+	uint8_t *x_pointer = &m_spritecodelow[0x0200];
+	uint8_t *ctrl_pointer = &m_spritecodehigh[0x0000];
+	uint8_t *color_pointer = &m_spritecodehigh[0x0200];
 
 	xoffs   =   screenflip ? m_fg_flipxoffs : m_fg_noflipxoffs;
 	yoffs   =   screenflip ? m_fg_flipyoffs : m_fg_noflipyoffs;
@@ -347,8 +339,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 		color_pointer += bank_size;
 	}
 
-	int max_y = screen.height();
-
+	int const max_y = screen.height();
 
 	/* Draw up to 512 sprites, mjyuugi has glitches if you draw them all.. */
 	for (i = m_spritelimit; i >= 0; i--)
@@ -357,7 +348,6 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 
 		code = char_pointer[i] + ((ctrl_pointer[i] & 0x3f) << 8);
 		color = (color_pointer[i] & 0xf8) >> 3;
-
 
 		sx = x_pointer[i] - ((color_pointer[i] & 1) << 8);
 		sy =  (m_spriteylow[i] & 0xff);
@@ -419,7 +409,7 @@ void seta001_device::setac_eof()
 	// is this handling right?
 	// it differs to tnzs, and thundercade has sprite flickering issues (not related to the devicification)
 
-	int ctrl2   =   m_spritectrl[1];
+	int const ctrl2 = m_spritectrl[1];
 
 	if (~ctrl2 & 0x20)
 	{
@@ -438,7 +428,7 @@ void seta001_device::setac_eof()
 
 void seta001_device::tnzs_eof( void )
 {
-	int ctrl2 = m_spritectrl[1];
+	int const ctrl2 = m_spritectrl[1];
 	if (~ctrl2 & 0x20)
 	{
 		// note I copy sprites only. setac implementation also copies the "floating tilemap"

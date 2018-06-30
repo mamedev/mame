@@ -65,7 +65,7 @@ void mb8421_device::device_start()
 	m_ram = make_unique_clear<u8[]>(0x800);
 
 	// state save
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 }
 
 void mb8421_mb8431_16_device::device_start()
@@ -75,7 +75,7 @@ void mb8421_mb8431_16_device::device_start()
 	m_ram = make_unique_clear<u16[]>(0x800);
 
 	// state save
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 }
 
 //-------------------------------------------------
@@ -96,7 +96,7 @@ void mb8421_master_device::device_reset()
 template<read_or_write row, bool is_right>
 void mb8421_master_device::update_intr(offs_t offset)
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return;
 
 	if (row == read_or_write::WRITE && offset == (is_right ? 0x7fe : 0x7ff))

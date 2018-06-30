@@ -18,69 +18,10 @@
 
 ******************************************************************************/
 
-#ifdef __OS2__
-/* To avoid name clash of _brk */
-#define __STRICT_ANSI__
-#endif
-
 #include "emu.h"
+#include "6280dasm.h"
 
-#define RDOP(addr)   (oprom[addr - pc])
-#define RDBYTE(addr) (opram[addr - pc])
-#define RDWORD(addr) (opram[addr - pc] | ( oprom[(addr) + 1 - pc] << 8 ))
-
-enum addr_mode {
-	_non=0,      /* no additional arguments */
-	_acc,        /* accumulator */
-	_imp,        /* implicit */
-	_imm,        /* immediate */
-	_abs,        /* absolute */
-	_zpg,        /* zero page */
-	_zpx,        /* zero page + X */
-	_zpy,        /* zero page + Y */
-	_zpi,        /* zero page indirect */
-	_abx,        /* absolute + X */
-	_aby,        /* absolute + Y */
-	_rel,        /* relative */
-	_idx,        /* zero page pre indexed */
-	_idy,        /* zero page post indexed */
-	_ind,        /* indirect */
-	_iax,        /* indirect + X */
-	_blk,        /* block */
-	_zrl,        /* zero page relative */
-	_imz,        /* immediate, zero page */
-	_izx,        /* immediate, zero page + X */
-	_ima,        /* immediate, absolute */
-	_imx         /* immediate, absolute + X */
-};
-
-enum opcodes {
-	/* 6502 opcodes */
-	_adc=0,_and,  _asl,  _bcc,  _bcs,  _beq,  _bit,  _bmi,
-	_bne,  _bpl,  _brk,  _bvc,  _bvs,  _clc,  _cld,  _cli,
-	_clv,  _cmp,  _cpx,  _cpy,  _dec,  _dex,  _dey,  _eor,
-	_inc,  _inx,  _iny,  _jmp,  _jsr,  _lda,  _ldx,  _ldy,
-	_lsr,  _nop,  _ora,  _pha,  _php,  _pla,  _plp,  _rol,
-	_ror,  _rti,  _rts,  _sbc,  _sec,  _sed,  _sei,  _sta,
-	_stx,  _sty,  _tax,  _tay,  _tsx,  _txa,  _txs,  _tya,
-	_ill,
-
-	/* Hu6280 extensions */
-	_bra,  _stz,  _trb,  _tsb,  _dea,  _ina,  _sax,  _bsr,
-	_phx,  _phy,  _plx,  _ply,  _csh,  _csl,  _tam,  _tma,
-	_cla,  _cly,  _clx,  _st0,  _st1,  _st2,  _tst,  _set,
-	_tdd,  _tia,  _tii,  _tin,  _tai,  _say,  _sxy,
-
-	_sm0,  _sm1,  _sm2,  _sm3,  _sm4,  _sm5,  _sm6,  _sm7,
-	_rm0,  _rm1,  _rm2,  _rm3,  _rm4,  _rm5,  _rm6,  _rm7,
-
-	_bs0,  _bs1,  _bs2,  _bs3,  _bs4,  _bs5,  _bs6,  _bs7,
-	_br0,  _br1,  _br2,  _br3,  _br4,  _br5,  _br6,  _br7
-
-};
-
-
-static const char *const token[]=
+const char *const h6280_disassembler::token[]=
 {
 	/* 6502 opcodes */
 	"adc", "and", "asl", "bcc", "bcs", "beq", "bit", "bmi",
@@ -105,7 +46,7 @@ static const char *const token[]=
 	"bbr0", "bbr1", "bbr2", "bbr3", "bbr4", "bbr5", "bbr6", "bbr7"
 };
 
-static const unsigned char op6280[512]=
+const unsigned char h6280_disassembler::op6280[512]=
 {
 	_brk,_imp, _ora,_idx, _sxy,_imp, _st0,_imm, _tsb,_zpg, _ora,_zpg, _asl,_zpg, _rm0,_zpg, /* 00 */
 	_php,_imp, _ora,_imm, _asl,_acc, _ill,_non, _tsb,_abs, _ora,_abs, _asl,_abs, _br0,_zrl,
@@ -141,16 +82,22 @@ static const unsigned char op6280[512]=
 	_sed,_imp, _sbc,_aby, _plx,_imp, _ill,_non, _ill,_non, _sbc,_abx, _inc,_abx, _bs7,_zrl
 };
 
+u32 h6280_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
 /*****************************************************************************
  *  Disassemble a single command and return the number of bytes it uses.
  *****************************************************************************/
-CPU_DISASSEMBLE(h6280)
+offs_t h6280_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
-	int PC, OP, opc, arg;
+	offs_t PC;
+	int OP, opc, arg;
 
 	PC = pc;
-	OP = RDOP(PC);
+	OP = opcodes.r8(PC);
 	OP = OP << 1;
 	PC++;
 
@@ -158,9 +105,9 @@ CPU_DISASSEMBLE(h6280)
 	arg = op6280[OP+1];
 
 	if (opc == _jsr || opc == _bsr)
-		flags = DASMFLAG_STEP_OVER;
+		flags = STEP_OVER;
 	else if (opc == _rts)
-		flags = DASMFLAG_STEP_OUT;
+		flags = STEP_OUT;
 
 	switch(arg)
 	{
@@ -171,84 +118,84 @@ CPU_DISASSEMBLE(h6280)
 			util::stream_format(stream, "%s", token[opc]);
 			break;
 		case _rel:
-			util::stream_format(stream, "%-5s$%04X", token[opc], (PC + 1 + (signed char)RDBYTE(PC)) & 0xffff);
+			util::stream_format(stream, "%-5s$%04X", token[opc], (PC + 1 + (signed char)params.r8(PC)) & 0xffff);
 			PC+=1;
 			break;
 		case _imm:
-			util::stream_format(stream, "%-5s#$%02X", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s#$%02X", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _zpg:
-			util::stream_format(stream, "%-5s$%02X", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s$%02X", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _zpx:
-			util::stream_format(stream, "%-5s$%02X,x", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s$%02X,x", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _zpy:
-			util::stream_format(stream, "%-5s$%02X,y", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s$%02X,y", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _idx:
-			util::stream_format(stream, "%-5s($%02X,x)", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s($%02X,x)", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _idy:
-			util::stream_format(stream, "%-5s($%02X),y", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s($%02X),y", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _zpi:
-			util::stream_format(stream, "%-5s($%02X)", token[opc], RDBYTE(PC));
+			util::stream_format(stream, "%-5s($%02X)", token[opc], params.r8(PC));
 			PC+=1;
 			break;
 		case _abs:
-			util::stream_format(stream, "%-5s$%04X", token[opc], RDWORD(PC));
+			util::stream_format(stream, "%-5s$%04X", token[opc], params.r16(PC));
 			PC+=2;
 			break;
 		case _abx:
-			util::stream_format(stream, "%-5s$%04X,x", token[opc], RDWORD(PC));
+			util::stream_format(stream, "%-5s$%04X,x", token[opc], params.r16(PC));
 			PC+=2;
 			break;
 		case _aby:
-			util::stream_format(stream, "%-5s$%04X,y", token[opc], RDWORD(PC));
+			util::stream_format(stream, "%-5s$%04X,y", token[opc], params.r16(PC));
 			PC+=2;
 			break;
 		case _ind:
-			util::stream_format(stream, "%-5s($%04X)", token[opc], RDWORD(PC));
+			util::stream_format(stream, "%-5s($%04X)", token[opc], params.r16(PC));
 			PC+=2;
 			break;
 		case _iax:
-			util::stream_format(stream, "%-5s($%04X),X", token[opc], RDWORD(PC));
+			util::stream_format(stream, "%-5s($%04X),X", token[opc], params.r16(PC));
 			PC+=2;
 			break;
 		case _blk:
-			util::stream_format(stream, "%-5s$%04X $%04X $%04X", token[opc], RDWORD(PC), RDWORD(PC+2), RDWORD(PC+4));
+			util::stream_format(stream, "%-5s$%04X $%04X $%04X", token[opc], params.r16(PC), params.r16(PC+2), params.r16(PC+4));
 			PC+=6;
 			break;
 		case _zrl:
-			util::stream_format(stream, "%-5s$%02X $%04X", token[opc], RDBYTE(PC), (PC + 2 + (signed char)RDBYTE(PC+1)) & 0xffff);
+			util::stream_format(stream, "%-5s$%02X $%04X", token[opc], params.r8(PC), (PC + 2 + (signed char)params.r8(PC+1)) & 0xffff);
 			PC+=2;
 			break;
 		case _imz:
-			util::stream_format(stream, "%-5s#$%02X $%02X", token[opc], RDBYTE(PC), RDBYTE(PC+1));
+			util::stream_format(stream, "%-5s#$%02X $%02X", token[opc], params.r8(PC), params.r8(PC+1));
 			PC+=2;
 			break;
 		case _izx:
-			util::stream_format(stream, "%-5s#$%02X $%02X,x", token[opc], RDBYTE(PC), RDBYTE(PC+1));
+			util::stream_format(stream, "%-5s#$%02X $%02X,x", token[opc], params.r8(PC), params.r8(PC+1));
 			PC+=2;
 			break;
 		case _ima:
-			util::stream_format(stream, "%-5s#$%02X $%04X", token[opc], RDBYTE(PC), RDWORD(PC+1));
+			util::stream_format(stream, "%-5s#$%02X $%04X", token[opc], params.r8(PC), params.r16(PC+1));
 			PC+=3;
 			break;
 		case _imx:
-			util::stream_format(stream, "%-5s#$%02X $%04X,x", token[opc], RDBYTE(PC), RDWORD(PC+1));
+			util::stream_format(stream, "%-5s#$%02X $%04X,x", token[opc], params.r8(PC), params.r16(PC+1));
 			PC+=3;
 			break;
 
 		default:
 			util::stream_format(stream, "%-5s$%02X", token[opc], OP >> 1);
 	}
-	return (PC - pc) | flags | DASMFLAG_SUPPORTED;
+	return (PC - pc) | flags | SUPPORTED;
 }

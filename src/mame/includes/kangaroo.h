@@ -8,6 +8,8 @@
 
 ***************************************************************************/
 
+#include "emupal.h"
+
 class kangaroo_state : public driver_device
 {
 public:
@@ -39,4 +41,9 @@ public:
 	void blitter_execute(  );
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	void nomcu(machine_config &config);
+	void mcu(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
 };

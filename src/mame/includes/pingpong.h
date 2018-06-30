@@ -2,6 +2,7 @@
 // copyright-holders:Jarek Parchanski
 
 #include "machine/timer.h"
+#include "emupal.h"
 
 class pingpong_state : public driver_device
 {
@@ -30,8 +31,8 @@ public:
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(pingpong_videoram_w);
 	DECLARE_WRITE8_MEMBER(pingpong_colorram_w);
-	DECLARE_DRIVER_INIT(cashquiz);
-	DECLARE_DRIVER_INIT(merlinmm);
+	void init_cashquiz();
+	void init_merlinmm();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pingpong);
@@ -39,4 +40,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(pingpong_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(merlinmm_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void merlinmm(machine_config &config);
+	void pingpong(machine_config &config);
+	void merlinmm_map(address_map &map);
+	void pingpong_map(address_map &map);
 };

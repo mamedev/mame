@@ -11,24 +11,21 @@
 
 #include <map>
 
-
-class sparc_debug_state
+class sparc_disassembler : public util::disasm_interface
 {
 public:
-	virtual uint64_t get_reg_r(unsigned index) const = 0;
-	virtual uint64_t get_translated_pc() const = 0;
-	virtual uint8_t get_icc() const = 0;
-	virtual uint8_t get_xcc() const = 0;
-	virtual uint8_t get_fcc(unsigned index) const = 0; // ?><=
+	struct config
+	{
+	public:
+		virtual ~config() = default;
 
-protected:
-	~sparc_debug_state() { }
-};
+		virtual uint64_t get_reg_r(unsigned index) const = 0;
+		virtual uint64_t get_translated_pc() const = 0;
+		virtual uint8_t get_icc() const = 0;
+		virtual uint8_t get_xcc() const = 0;
+		virtual uint8_t get_fcc(unsigned index) const = 0; // ?><=
+	};
 
-
-class sparc_disassembler
-{
-public:
 	enum vis_level { vis_none, vis_1, vis_2, vis_2p, vis_3, vis_3b };
 
 	struct asi_desc
@@ -58,8 +55,8 @@ public:
 	};
 	typedef std::map<uint8_t, prftch_desc> prftch_desc_map;
 
-	sparc_disassembler(const sparc_debug_state *state, unsigned version);
-	sparc_disassembler(const sparc_debug_state *state, unsigned version, vis_level vis);
+	sparc_disassembler(const config *conf, unsigned version);
+	sparc_disassembler(const config *conf, unsigned version, vis_level vis);
 
 	template <typename T> void add_state_reg_desc(const T &desc)
 	{
@@ -106,13 +103,16 @@ public:
 		}
 	}
 
+	virtual u32 opcode_alignment() const override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
 	offs_t dasm(std::ostream &stream, offs_t pc, uint32_t op) const;
 
 private:
 	struct branch_desc
 	{
 		int32_t           (*get_disp)(uint32_t op);
-		const char *    (*get_comment)(const sparc_debug_state *state, bool use_cc, offs_t pc, uint32_t op);
+		const char *    (*get_comment)(const config *conf, bool use_cc, offs_t pc, uint32_t op);
 		int             disp_width;
 		bool            use_pred, use_cc;
 		const char      *reg_cc[4];
@@ -238,7 +238,7 @@ private:
 	static const vis_op_desc_map::value_type    VIS3_OP_DESC[];
 	static const vis_op_desc_map::value_type    VIS3B_OP_DESC[];
 
-	//const sparc_debug_state *m_state;
+	//const config *m_config;
 	unsigned                m_version;
 	vis_level               m_vis_level;
 	int                     m_op_field_width;

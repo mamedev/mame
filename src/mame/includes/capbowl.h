@@ -24,15 +24,16 @@ public:
 		TIMER_UPDATE
 	};
 
-	capbowl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	capbowl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tms34061(*this, "tms34061"),
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
-		m_rowaddress(*this, "rowaddress") { }
+		m_rowaddress(*this, "rowaddress")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -68,7 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bowlrama_blitter_w);
 	DECLARE_READ8_MEMBER(bowlrama_blitter_r);
 
-	DECLARE_DRIVER_INIT(capbowl);
+	void init_capbowl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -78,6 +79,11 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline rgb_t pen_for_pixel( uint8_t const *src, uint8_t pix );
 
+	void bowlrama(machine_config &config);
+	void capbowl(machine_config &config);
+	void bowlrama_map(address_map &map);
+	void capbowl_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -94,7 +94,7 @@ bgfx::TextureHandle texture_manager::handle(std::string name)
 		handle = (iter->second)->texture();
 	}
 
-	assert(handle.idx != bgfx::invalidHandle);
+	assert(handle.idx != bgfx::kInvalidHandle);
 	return handle;
 }
 

@@ -67,7 +67,7 @@ TILEMAP_MAPPER_MEMBER(atarigx2_state::atarigx2_playfield_scan)
  *
  *************************************/
 
-VIDEO_START_MEMBER(atarigx2_state,atarigx2)
+void atarigx2_state::video_start()
 {
 	/* blend the playfields and free the temporary one */
 	blend_gfx(0, 2, 0x0f, 0x30);

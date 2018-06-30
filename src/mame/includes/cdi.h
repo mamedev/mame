@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef _INCLUDES_CDI_H_
-#define _INCLUDES_CDI_H_
+
+#ifndef MAME_INCLUDES_CDI_H
+#define MAME_INCLUDES_CDI_H
 
 #include "machine/cdi070.h"
 #include "machine/cdislave.h"
@@ -9,11 +10,12 @@
 #include "sound/dmadac.h"
 #include "video/mcd212.h"
 #include "cpu/mcs51/mcs51.h"
+#include "screen.h"
 
 /*----------- driver state -----------*/
 
-#define CLOCK_A XTAL_30MHz
-#define CLOCK_B XTAL_19_6608MHz
+#define CLOCK_A XTAL(30'000'000)
+#define CLOCK_B XTAL(19'660'800)
 
 class cdi_state : public driver_device
 {
@@ -25,16 +27,16 @@ public:
 		, m_planeb(*this, "planeb")
 		, m_input1(*this, "INPUT1")
 		, m_input2(*this, "INPUT2")
-		, m_mousex(*this, "MOUSEX")
-		, m_mousey(*this, "MOUSEY")
-		, m_mousebtn(*this, "MOUSEBTN")
 		, m_slave_hle(*this, "slave_hle")
 		, m_servo(*this, "servo")
 		, m_slave(*this, "slave")
 		, m_scc(*this, "scc68070")
 		, m_cdic(*this, "cdic")
 		, m_cdda(*this, "cdda")
-		, m_mcd212(*this, "mcd212") { }
+		, m_mcd212(*this, "mcd212")
+		, m_lcd(*this, "lcd")
+		, m_dmadac(*this, "dac%u", 1U)
+	{ }
 
 	enum m68hc05eg_io_reg_t
 	{
@@ -77,9 +79,6 @@ public:
 	required_shared_ptr<uint16_t> m_planeb;
 	optional_ioport m_input1;
 	optional_ioport m_input2;
-	required_ioport m_mousex;
-	required_ioport m_mousey;
-	required_ioport m_mousebtn;
 	optional_device<cdislave_device> m_slave_hle;
 	optional_device<cpu_device> m_servo;
 	optional_device<cpu_device> m_slave;
@@ -87,8 +86,9 @@ public:
 	optional_device<cdicdic_device> m_cdic;
 	required_device<cdda_device> m_cdda;
 	required_device<mcd212_device> m_mcd212;
+	optional_device<screen_device> m_lcd;
 
-	dmadac_sound_device *m_dmadac[2];
+	required_device_array<dmadac_sound_device, 2> m_dmadac;
 
 	INTERRUPT_GEN_MEMBER( mcu_frame );
 
@@ -120,6 +120,20 @@ public:
 
 	uint32_t screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void cdimono1(machine_config &config);
+	void cdimono2(machine_config &config);
+	void quizard4(machine_config &config);
+	void cdimono1_base(machine_config &config);
+	void cdi910(machine_config &config);
+	void quizard2(machine_config &config);
+	void quizard3(machine_config &config);
+	void quizard1(machine_config &config);
+	void quizard(machine_config &config);
+	void cdi910_mem(address_map &map);
+	void cdimono1_mem(address_map &map);
+	void cdimono2_mem(address_map &map);
+	void cdimono2_servo_mem(address_map &map);
+	void cdimono2_slave_mem(address_map &map);
 };
 
 /*----------- debug defines -----------*/
@@ -130,4 +144,4 @@ public:
 
 #define ENABLE_UART_PRINTING (0)
 
-#endif // _INCLUDES_CDI_H_
+#endif // MAME_INCLUDES_CDI_H

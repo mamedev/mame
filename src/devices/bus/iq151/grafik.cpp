@@ -52,11 +52,12 @@ void iq151_grafik_device::device_start()
 
 void iq151_grafik_device::device_reset()
 {
-	screen_device *screen = machine().first_screen();
-
 	// if required adjust screen size
-	if (screen->visible_area().max_x < 64*8-1)
-		screen->set_visible_area(0, 64*8-1, 0, 32*8-1);
+	if (m_screen != nullptr && m_screen->visible_area().max_x < 64*8-1)
+	{
+		printf("adjusting screen size\n");
+		m_screen->set_visible_area(0, 64*8-1, 0, 32*8-1);
+	}
 
 	memset(m_videoram, 0x00, sizeof(m_videoram));
 }
@@ -65,11 +66,11 @@ void iq151_grafik_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( iq151_grafik_device::device_add_mconfig )
+MACHINE_CONFIG_START(iq151_grafik_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(iq151_grafik_device, x_write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(iq151_grafik_device, y_write))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(iq151_grafik_device, control_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, iq151_grafik_device, x_write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, iq151_grafik_device, y_write))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, iq151_grafik_device, control_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

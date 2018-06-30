@@ -39,9 +39,9 @@ DEFINE_DEVICE_TYPE(AGAT7VIDEO, agat7video_device, "agat7video", "Agat-7 Video")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(agat7video_device::device_add_mconfig)
+MACHINE_CONFIG_START(agat7video_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("a7screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_10_5MHz, 672, 0, 512, 312, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(10'500'000), 672, 0, 512, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(agat7video_device, screen_update)
 	MCFG_SCREEN_PALETTE("a7palette")
 
@@ -56,7 +56,12 @@ MACHINE_CONFIG_END
 
 agat7video_device::agat7video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AGAT7VIDEO, tag, owner, clock),
-	m_palette(*this, "a7palette")
+	m_ram_dev(*this, finder_base::DUMMY_TAG),
+	m_palette(*this, "a7palette"),
+	m_char_region(*this, finder_base::DUMMY_TAG),
+	m_char_ptr(nullptr),
+	m_char_size(0),
+	m_start_address(0)
 {
 }
 
@@ -67,6 +72,9 @@ agat7video_device::agat7video_device(const machine_config &mconfig, const char *
 
 void agat7video_device::device_start()
 {
+	m_char_ptr = m_char_region->base();
+	m_char_size = m_char_region->bytes();
+
 //  save_item(NAME(m_video_mode));
 	save_item(NAME(m_start_address));
 }
@@ -172,11 +180,11 @@ void agat7video_device::text_update_lores(screen_device &screen, bitmap_ind16 &b
 			ch = m_ram_dev->read(address);
 			attr = m_ram_dev->read(address + 1);
 			if (BIT(attr, 5)) {
-				fg = BITSWAP8(attr,7,6,5,3,4,2,1,0) & 15;
+				fg = bitswap<8>(attr,7,6,5,3,4,2,1,0) & 15;
 				bg = 0;
 			} else {
 				fg = 0;
-				bg = BITSWAP8(attr,7,6,5,3,4,2,1,0) & 15;
+				bg = bitswap<8>(attr,7,6,5,3,4,2,1,0) & 15;
 			}
 			plot_text_character(bitmap, col * 16, row, 2, ch, m_char_ptr, m_char_size, fg, bg);
 		}

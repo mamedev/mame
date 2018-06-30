@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "ti990_10.h"
+#include "9900dasm.h"
 
 /*
     The following defines can be set to 0 or 1 to disable or enable certain
@@ -61,7 +62,7 @@ void ti990_10_device::device_start()
 	m_cru = &space(AS_IO);
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	state_add(STATE_GENPC, "GENPC", PC).formatstr("%4s").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", PC).formatstr("%4s").noshow();
@@ -122,22 +123,10 @@ uint32_t ti990_10_device::execute_input_lines() const
 	return 2;
 }
 
-// device_disasm_interface overrides
-uint32_t ti990_10_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-uint32_t ti990_10_device::disasm_max_opcode_bytes() const
-{
-	return 6;
-}
-
 // TODO: check 9900dasm
-offs_t ti990_10_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> ti990_10_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms9900 );
-	return CPU_DISASSEMBLE_NAME(tms9900)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<tms9900_disassembler>(TMS9900_ID);
 }
 
-DEFINE_DEVICE_TYPE(TI990_10, ti990_10_device, "ti990_10_cpu", "TI990/10 CPU")
+DEFINE_DEVICE_TYPE(TI990_10, ti990_10_device, "ti990_10_cpu", "Texas Instruments TI990/10 CPU")

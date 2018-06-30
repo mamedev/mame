@@ -14,11 +14,12 @@
 #include "h8.h"
 #include "h8_dma.h"
 #include "h8_dtc.h"
+#include "h8d.h"
 
-h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_delegate map_delegate) :
+h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_constructor map_delegate) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	program_config("program", ENDIANNESS_BIG, 16, mode_a16 ? 16 : 24, 0, map_delegate),
-	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), direct(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
+	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), cache(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
 	TMP1(0), TMP2(0), TMPR(0), inst_state(0), inst_substate(0), icount(0), bcount(0), irq_vector(0), taken_irq_vector(0), irq_level(0), taken_irq_level(0), irq_required(false), irq_nmi(false)
 {
 	supports_advanced = false;
@@ -31,7 +32,7 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 void h8_device::device_start()
 {
 	program = &space(AS_PROGRAM);
-	direct = &program->direct();
+	cache   = program->cache<1, 0, ENDIANNESS_BIG>();
 	io      = &space(AS_IO);
 
 	state_add(STATE_GENPC,     "GENPC",     NPC).noshow();
@@ -99,7 +100,7 @@ void h8_device::device_start()
 	save_item(NAME(taken_irq_level));
 	save_item(NAME(irq_nmi));
 
-	m_icountptr = &icount;
+	set_icountptr(icount);
 
 	PC = 0;
 	PPC = 0;
@@ -176,6 +177,11 @@ uint32_t h8_device::execute_input_lines() const
 	return 0;
 }
 
+bool h8_device::execute_input_edge_triggered(int inputnum) const
+{
+	return inputnum == INPUT_LINE_NMI;
+}
+
 void h8_device::recompute_bcount(uint64_t event_time)
 {
 	if(!event_time || event_time >= total_cycles() + icount) {
@@ -207,7 +213,7 @@ void h8_device::execute_run()
 			if(inst_state < 0x10000) {
 				PPC = NPC;
 				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-					debugger_instruction_hook(this, NPC);
+					debugger_instruction_hook(NPC);
 			}
 			do_exec_full();
 		}
@@ -324,260 +330,10 @@ void h8_device::state_string_export(const device_state_entry &entry, std::string
 	}
 }
 
-
-uint32_t h8_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-uint32_t h8_device::disasm_max_opcode_bytes() const
-{
-	return 10;
-}
-
-void h8_device::disassemble_am(std::ostream &stream, int am, offs_t pc, const uint8_t *oprom, uint32_t opcode, int slot, int offset)
-{
-	static const char *const r8_names[16] = {
-		"r0h", "r1h",  "r2h", "r3h",  "r4h", "r5h",  "r6h", "r7h",
-		"r0l", "r1l",  "r2l", "r3l",  "r4l", "r5l",  "r6l", "r7l"
-	};
-
-	static const char *const r16_names[16] = {
-		"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
-		"e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7",
-	};
-
-	static const char *const r32_names[8] = {
-		"er0", "er1", "er2", "er3", "er4", "er5", "er6", "sp",
-	};
-
-	switch(am) {
-	case DASM_r8l:
-		util::stream_format(stream, "%s", r8_names[opcode & 15]);
-		break;
-
-	case DASM_r8h:
-		util::stream_format(stream, "%s", r8_names[(opcode >> 4) & 15]);
-		break;
-
-	case DASM_r8u:
-		util::stream_format(stream, "%s", r8_names[(opcode >> 8) & 15]);
-		break;
-
-	case DASM_r16l:
-		util::stream_format(stream, "%s", r16_names[opcode & 15]);
-		break;
-
-	case DASM_r16h:
-		util::stream_format(stream, "%s", r16_names[(opcode >> 4) & 15]);
-		break;
-
-	case DASM_r32l:
-		util::stream_format(stream, "%s", r32_names[opcode & 7]);
-		break;
-
-	case DASM_r32h:
-		util::stream_format(stream, "%s", r32_names[(opcode >> 4) & 7]);
-		break;
-
-	case DASM_r16ih:
-		util::stream_format(stream, "@%s", r16_names[(opcode >> 4) & 7]);
-		break;
-
-	case DASM_r16ihh:
-		util::stream_format(stream, "@%s", r16_names[(opcode >> 20) & 7]);
-		break;
-
-	case DASM_pr16h:
-		util::stream_format(stream, "@-%s", r16_names[(opcode >> 4) & 7]);
-		break;
-
-	case DASM_r16ph:
-		util::stream_format(stream, "@%s+", r16_names[(opcode >> 4) & 7]);
-		break;
-
-	case DASM_r16d16h:
-		util::stream_format(stream, "@(%x, %s)", (oprom[offset-2] << 8) | oprom[offset-1], r16_names[(opcode >> 4) & 7]);
-		break;
-
-	case DASM_r32ih:
-		util::stream_format(stream, "@%s", r32_names[(opcode >> 4) & 7]);
-		break;
-
-	case DASM_r32ihh:
-		util::stream_format(stream, "@%s", r32_names[(opcode >> 20) & 7]);
-		break;
-
-	case DASM_pr32h:
-		util::stream_format(stream, "@-%s", r32_names[(opcode >> 4) & 7]);
-		break;
-
-	case DASM_r32pl:
-		util::stream_format(stream, "@%s+", r32_names[opcode & 7]);
-		break;
-
-	case DASM_r32ph:
-		util::stream_format(stream, "@%s+", r32_names[(opcode >> 4) & 7]);
-		break;
-
-	case DASM_r32d16h:
-		util::stream_format(stream, "@(%x, %s)", (oprom[offset-2] << 8) | oprom[offset-1], r32_names[(opcode >> 4) & 7]);
-		break;
-
-	case DASM_r32d32hh:
-		util::stream_format(stream, "@(%x, %s)", (oprom[offset-4] << 24) | (oprom[offset-3] << 16) | (oprom[offset-2] << 8) | oprom[offset-1], r32_names[(opcode >> 20) & 7]);
-		break;
-
-	case DASM_psp:
-		util::stream_format(stream, "@-sp");
-		break;
-
-	case DASM_spp:
-		util::stream_format(stream, "@sp+");
-		break;
-
-	case DASM_r32n2l:
-		util::stream_format(stream, "%s-%s", r32_names[opcode & 6], r32_names[(opcode & 6) + 1]);
-		break;
-
-	case DASM_r32n3l:
-		util::stream_format(stream, "%s-%s", r32_names[opcode & 4], r32_names[(opcode & 4) + 2]);
-		break;
-
-	case DASM_r32n4l:
-		util::stream_format(stream, "%s-%s", r32_names[opcode & 4], r32_names[(opcode & 4) + 3]);
-		break;
-
-	case DASM_abs8:
-		util::stream_format(stream, "@%08x", 0xffffff00 | oprom[1]);
-		break;
-
-	case DASM_abs16:
-		if(offset >= 6)
-			util::stream_format(stream, "@%08x", int16_t((oprom[offset-4] << 8) | oprom[offset-3]));
-		else
-			util::stream_format(stream, "@%08x", int16_t((oprom[offset-2] << 8) | oprom[offset-1]));
-		break;
-
-	case DASM_abs32:
-		if(slot == 3)
-			util::stream_format(stream, "@%08x", (oprom[offset-6] << 24) | (oprom[offset-5] << 16) | (oprom[offset-4] << 8) | oprom[offset-3]);
-		else
-			util::stream_format(stream, "@%08x", (oprom[offset-4] << 24) | (oprom[offset-3] << 16) | (oprom[offset-2] << 8) | oprom[offset-1]);
-		break;
-
-	case DASM_abs8i:
-		util::stream_format(stream, "@%02x", oprom[1]);
-		break;
-
-	case DASM_abs16e:
-		util::stream_format(stream, "%04x", (oprom[2] << 8) | oprom[3]);
-		break;
-
-	case DASM_abs24e:
-		util::stream_format(stream, "%08x", (oprom[1] << 16) | (oprom[2] << 8) | oprom[3]);
-		break;
-
-	case DASM_rel8:
-		util::stream_format(stream, "%08x", pc + 2 + int8_t(oprom[1]));
-		break;
-
-	case DASM_rel16:
-		util::stream_format(stream, "%08x", pc + 4 + int16_t((oprom[2] << 8) | oprom[3]));
-		break;
-
-	case DASM_one:
-		util::stream_format(stream, "#1");
-		break;
-
-	case DASM_two:
-		util::stream_format(stream, "#2");
-		break;
-
-	case DASM_four:
-		util::stream_format(stream, "#4");
-		break;
-
-	case DASM_imm2:
-		util::stream_format(stream, "#%x", (opcode >> 4) & 3);
-		break;
-
-	case DASM_imm3:
-		util::stream_format(stream, "#%x", (opcode >> 4) & 7);
-		break;
-
-	case DASM_imm8:
-		util::stream_format(stream, "#%02x", oprom[1]);
-		break;
-
-	case DASM_imm16:
-		util::stream_format(stream, "#%04x", (oprom[2] << 8) | oprom[3]);
-		break;
-
-	case DASM_imm32:
-		util::stream_format(stream, "#%08x", (oprom[2] << 16) | (oprom[3] << 16) | (oprom[4] << 8) | oprom[5]);
-		break;
-
-	case DASM_ccr:
-		util::stream_format(stream, "ccr");
-		break;
-
-	case DASM_exr:
-		util::stream_format(stream, "exr");
-		break;
-
-	case DASM_macl:
-		util::stream_format(stream, "macl");
-		break;
-
-	case DASM_mach:
-		util::stream_format(stream, "mach");
-		break;
-
-	default:
-		util::stream_format(stream, "<%d>", am);
-		break;
-	}
-}
-
-offs_t h8_device::disassemble_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table)
-{
-	uint32_t slot[5];
-	slot[0] = (oprom[0] << 8) | oprom[1];
-	slot[1] = (oprom[0] << 24) | (oprom[1] << 16) | (oprom[2] << 8) | oprom[3];
-	slot[2] = (oprom[0] << 24) | (oprom[1] << 16) | (oprom[4] << 8) | oprom[5];
-	slot[3] = (oprom[0] << 24) | (oprom[1] << 16) | (oprom[6] << 8) | oprom[7];
-	slot[4] = (oprom[2] << 24) | (oprom[3] << 16) | (oprom[4] << 8) | oprom[5];
-
-	int inst;
-	for(inst=0;; inst++) {
-		const disasm_entry &e = table[inst];
-		if((slot[e.slot] & e.mask) == e.val && (slot[0] & e.mask0) == e.val0)
-			break;
-	}
-	const disasm_entry &e = table[inst];
-	stream << e.opcode;
-
-	if(e.am1 != DASM_none) {
-		stream << ' ';
-		disassemble_am(stream, e.am1, pc, oprom, slot[e.slot], e.slot, e.flags & DASMFLAG_LENGTHMASK);
-	}
-	if(e.am2 != DASM_none) {
-		stream << ", ";
-		disassemble_am(stream, e.am2, pc, oprom, slot[e.slot], e.slot, e.flags & DASMFLAG_LENGTHMASK);
-	}
-	return e.flags | DASMFLAG_SUPPORTED;
-}
-
-offs_t h8_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
-}
-
 uint16_t h8_device::read16i(uint32_t adr)
 {
 	icount--;
-	return direct->read_word(adr & ~1);
+	return cache->read_word(adr & ~1);
 }
 
 uint16_t h8_device::fetch()
@@ -1590,6 +1346,11 @@ void h8_device::set_nz32(uint32_t v)
 		CCR |= F_Z;
 	else if(int32_t(v) < 0)
 		CCR |= F_N;
+}
+
+std::unique_ptr<util::disasm_interface> h8_device::create_disassembler()
+{
+	return std::make_unique<h8_disassembler>();
 }
 
 #include "cpu/h8/h8.hxx"

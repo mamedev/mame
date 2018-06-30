@@ -14,7 +14,7 @@
 #pragma once
 
 #define MCFG_MEA8000_REQ_CALLBACK(_write) \
-	devcb = &mea8000_device::set_reqwr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mea8000_device &>(*device).set_reqwr_callback(*device, DEVCB_##_write);
 
 /* define to use double instead of int (slow but useful for debugging) */
 #undef MEA8000_FLOAT_MODE
@@ -25,7 +25,7 @@ class mea8000_device : public device_t, public device_sound_interface
 public:
 	mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_req_wr_callback(device_t &device, Object &&cb) { return downcast<mea8000_device &>(device).m_write_req.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_req_wr_callback(Object &&cb) { return m_write_req.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

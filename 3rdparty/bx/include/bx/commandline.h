@@ -60,6 +60,12 @@ namespace bx
 		///
 		bool hasArg(bool& _value, const char _short, const char* _long = NULL) const;
 
+		///
+		int32_t getNum() const;
+
+		///
+		char const* get(int32_t _idx) const;
+
 	private:
 		///
 		const char* find(int32_t _skip, const char _short, const char* _long, int32_t _numParams) const;

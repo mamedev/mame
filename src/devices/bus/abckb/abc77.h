@@ -32,12 +32,7 @@ public:
 	// construction/destruction
 	abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// abc_keyboard_interface overrides
-	virtual void txd_w(int state) override;
-
 	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );
-
-	DECLARE_WRITE8_MEMBER( j3_w );
 
 protected:
 	abc77_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -52,6 +47,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	// abc_keyboard_interface overrides
+	virtual void txd_w(int state) override;
+
+private:
 	enum
 	{
 		TIMER_SERIAL,
@@ -73,7 +72,6 @@ protected:
 	int m_keydown;                  // key down
 	int m_clock;                    // transmit clock
 	int m_hys;                      // hysteresis
-	int m_reset;                    // reset
 	int m_stb;                      // strobe
 	uint8_t m_j3;
 
@@ -81,11 +79,14 @@ protected:
 	emu_timer *m_serial_timer;
 	emu_timer *m_reset_timer;
 
-private:
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ_LINE_MEMBER( t1_r );
 	DECLARE_WRITE_LINE_MEMBER( prog_w );
+	DECLARE_WRITE8_MEMBER( j3_w );
+
+	void abc77_io(address_map &map);
+	void abc77_map(address_map &map);
 };
 
 

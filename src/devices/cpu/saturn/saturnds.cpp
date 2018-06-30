@@ -9,19 +9,7 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-
-#include "saturn.h"
-
-#define SATURN_HP_MNEMONICS
-
-#if defined SATURN_HP_MNEMONICS
-// class/hp mnemonics
-static int set=0;
-#else
-// readable/normal mnemonics
-static int set=1;
-#endif
+#include "saturnds.h"
 
 #define P "P"
 #define WP "WP"
@@ -33,551 +21,382 @@ static int set=1;
 #define W "W"
 #define A "A"
 
-static const char *const adr_b[]=
+const char *const saturn_disassembler::adr_b[]=
 { P, WP, XS, X, S, M, B, W };
 
-static const char *const adr_af[]=
+const char *const saturn_disassembler::adr_af[]=
 { P, WP, XS, X, S, M, B, W, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, A };
 
-static const char *const adr_a[]=
+const char *const saturn_disassembler::adr_a[]=
 	{ P, WP, XS, X, S, M, B, W };
 
-static const char number_2_hex[]=
+const char saturn_disassembler::number_2_hex[]=
 { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
-#define SATURN_PEEKOP_DIS8(v)   v = (int8_t)( oprom[pos] | ( oprom[pos+1] << 4 ) ); pos+= 2;
+#define SATURN_PEEKOP_DIS8(v)   v = (int8_t)( opcodes.r8(pos) | ( opcodes.r8(pos+1) << 4 ) ); pos+= 2;
 
-#define SATURN_PEEKOP_DIS12(v)  v = oprom[pos] | ( oprom[pos+1] << 4 ) | ( oprom[pos+2] << 8 ); \
+#define SATURN_PEEKOP_DIS12(v)  v = opcodes.r8(pos) | ( opcodes.r8(pos+1) << 4 ) | ( opcodes.r8(pos+2) << 8 ); \
 								pos += 3;                                                       \
 								if ( v & 0x0800 )   v = -0x1000 + v;
 
-#define SATURN_PEEKOP_DIS16(v)  v = (int16_t)( oprom[pos] | ( oprom[pos+1] << 4 ) | ( oprom[pos+2] << 8 ) | ( oprom[pos+3] << 12 ) ); pos += 4;
+#define SATURN_PEEKOP_DIS16(v)  v = (int16_t)( opcodes.r8(pos) | ( opcodes.r8(pos+1) << 4 ) | ( opcodes.r8(pos+2) << 8 ) | ( opcodes.r8(pos+3) << 12 ) ); pos += 4;
 
-#define SATURN_PEEKOP_ADR(v)    v = oprom[pos] | ( oprom[pos+1] << 4 ) | ( oprom[pos+2] << 8 ) | ( oprom[pos+3] << 12 ) | ( oprom[pos+4] << 16 ); pos += 5;
-
-
-// don't split branch and return, source relies on this ordering
-enum MNEMONICS
-{
-	Return, ReturnSetXM, ReturnSetCarry, ReturnClearCarry, ReturnFromInterrupt,
-	jump3,jump4,jump,
-	call3,call4,call,
-	branchCarrySet, returnCarrySet,
-	branchCarryClear, returnCarryClear,
-
-	outCS, outC, inA, inC,
-	unconfig, config, Cid, shutdown, cp1, reset, buscc,
-	CcopyP, PcopyC, sreq, CswapP,
-
-	inton, AloadImm, buscb,
-	clearAbit, setAbit,
-	branchAbitclear, returnAbitclear,
-	branchAbitset, returnAbitset,
-	clearCbit, setCbit,
-	branchCbitclear, returnCbitclear,
-	branchCbitset, returnCbitset,
-	PCloadA, buscd, PCloadC, intoff, rsi,
-
-	jumpA, jumpC, PCcopyA, PCcopyC, AcopyPC, CcopyPC,
-
-	clearHST,
-	branchHSTclear, returnHSTclear,
-
-	clearBitST, setBitST,
-	branchSTclear, returnSTclear,
-	branchSTset, returnSTset,
+#define SATURN_PEEKOP_ADR(v)    v = opcodes.r8(pos) | ( opcodes.r8(pos+1) << 4 ) | ( opcodes.r8(pos+2) << 8 ) | ( opcodes.r8(pos+3) << 12 ) | ( opcodes.r8(pos+4) << 16 ); pos += 5;
 
 
-	branchPdiffers, returnPdiffers,
-	branchPequals, returnPequals,
+const char *const saturn_disassembler::mnemonics[][2] = {
+	{ "rtn",                  "RET" },
+	{ "rtnsXM",               "RETSETXM" },
+	{ "rtnsC",                "RETSETC" },
+	{ "rtncC",                "RETCLRC" },
+	{ "rti",                  "RETI" },
+	{ "goto    %05x",         "JUMP.3   %05x" },
+	{ "goto    %05x",         "JUMP.4   %05x" },
+	{ "goto    %05x",         "JUMP     %05x" },
+	{ "gosub   %05x",         "CALL.3   %05x" },
+	{ "gosub   %05x",         "CALL.4   %05x" },
+	{ "gosub   %05x",         "CALL     %05x" },
+	{ "goC     %05x",         "BRCS     %05x" },
+	{ "rtnC",                 "RETCS" },
+	{ "gonC    %05x",         "BRCC     %05x" },
+	{ "rtnnC",                "RETCC" },
 
-	branchAequalsB, returnAequalsB,
-	branchBequalsC, returnBequalsC,
-	branchAequalsC, returnAequalsC,
-	branchCequalsD, returnCequalsD,
-	branchAdiffersB, returnAdiffersB,
-	branchBdiffersC, returnBdiffersC,
-	branchAdiffersC, returnAdiffersC,
-	branchCdiffersD, returnCdiffersD,
-	branchAzero, returnAzero,
-	branchBzero, returnBzero,
-	branchCzero, returnCzero,
-	branchDzero, returnDzero,
-	branchAnotzero, returnAnotzero,
-	branchBnotzero, returnBnotzero,
-	branchCnotzero, returnCnotzero,
-	branchDnotzero, returnDnotzero,
+	{ "OUT=CS",               "OUT.S    C" },
+	{ "OUT=C",                "OUT.X    C" },
+	{ "A=IN",                 "IN.4     A" },
+	{ "C=IN",                 "IN.4     C" },
+	{ "uncnfg",               "UNCNFG" },
+	{ "config",               "CONFIG" },
+	{ "C=id",                 "MOVE.A   ID,C" },
+	{ "!shutdn",              "!SHUTDN" },
+	{ "C+P+1",                "ADD.A    P+1,C" },
+	{ "reset",                "RESET" },
+	{ "!buscc",               "!BUSCC" },
+	{ "C=P     %x",           "MOVE.1   P,C,%x" },
+	{ "P=C     %x",           "MOVE.1   C,%x,P" },
+	{ "!sreq?",               "!SREQ" },
+	{ "CPex    %x",           "SWAP.1   P,C,%x" },
 
-	branchAgreaterB, returnAgreaterB,
-	branchBgreaterC, returnBgreaterC,
-	branchCgreaterA, returnCgreaterA,
-	branchDgreaterC, returnDgreaterC,
-	branchAlowerB, returnAlowerB,
-	branchBlowerC, returnBlowerC,
-	branchClowerA, returnClowerA,
-	branchDlowerC, returnDlowerC,
-	branchAnotlowerB, returnAnotlowerB,
-	branchBnotlowerC, returnBnotlowerC,
-	branchCnotlowerA, returnCnotlowerA,
-	branchDnotlowerC, returnDnotlowerC,
-	branchAnotgreaterB, returnAnotgreaterB,
-	branchBnotgreaterC, returnBnotgreaterC,
-	branchCnotgreaterA, returnCnotgreaterA,
-	branchDnotgreaterC, returnDnotgreaterC,
+	{ "!inton",               "!INTON" },
+	{ "LA %-2x   %s",         "MOVE.P%-2x %s,A" },
+	{ "!buscb",               "!BUSCB" },
+	{ "Abit=0  %x",           "CLRB     %x,A" },
+	{ "Abit=1  %x",           "SETB     %x,A" },
+	{ "?Abit=0 %x,%05x",      "BRBC     %x,A,%05x" },
+	{ "?Abit=0 %x,rtn",       "RETBC    %x,A" },
+	{ "?Abit=1 %x,%05x",      "BRBS     %x,A,%05x" },
+	{ "?Abit=1 %x,rtn",       "RETBS    %x,A" },
+	{ "Cbit=0  %x",           "CLRB     %x,C" },
+	{ "Cbit=1  %x",           "SETB     %x,C" },
+	{ "?Cbit=0 %x,%05x",      "BRBC     %x,C,%05x" },
+	{ "?Cbit=0 %x,rtn",       "RETBC    %x,C" },
+	{ "?Cbit=1 %x,%05x",      "BRBS     %x,C,%05x" },
+	{ "?Cbit=1 %x,rtn",       "RETBS    %x,C" },
+	{ "PC=(A)",               "JUMP.A   @A" },
+	{ "!buscd",               "!BUSCD" },
+	{ "PC=(C)",               "JUMP.A   @C" },
+	{ "!intoff",              "!INTOFF" },
+	{ "!rsi",                 "!RSI" },
 
-	SetHexMode, SetDecMode,
-	PushC, PopC,
+	{ "PC=A",                 "JUMP.A   A" },
+	{ "PC=C",                 "JUMP.A   C" },
+	{ "A=PC",                 "MOVE.A   PC,A" },
+	{ "C=PC",                 "MOVE.A   PC,C" },
+	{ "APCex",                "SWAP.A   A,PC" },
+	{ "CPCex",                "SWAP.A   C,PC" },
 
-	D0loadImm2, D0loadImm4, D0loadImm5,
-	D1loadImm2, D1loadImm4, D1loadImm5,
-	PloadImm, CloadImm,
+	{ "HST=0   %x",           "CLRHST   %x" },
+	{ "?HST=0  %x,%05x",      "BRBCHST  %x,%05x" },
+	{ "?HST=0  %x,rtn",           "RETBCHST %x" },
+	{ "ST=0    %x",           "CLRB     %x,ST" },
+	{ "ST=1    %x",           "SETB     %x,ST" },
+	{ "?ST=0   %x,%05x",      "BRBC     ST,%x,%05x" },
+	{ "?ST=0   %x,rtn",           "RETBC    ST,%x" },
+	{ "?ST=1   %x,%05x",      "BRBS     ST,%x,%05x" },
+	{ "?ST=1   %x,rtn",           "RETBS    ST,%x" },
+	{ "?P#     %x,%05x",      "BRNE     P,%x,%05x" },
+	{ "?P#     %x,rtn",           "RETNE    P,%x" },
+	{ "?P=     %x,%05x",      "BREQ     P,%x,%05x" },
+	{ "?P=     %x,rtn",           "RETEQ    P,%x" },
 
-	clearST,
-	CcopyST, STcopyC,
-	swapCST,
+	{ "?A=B    %s,%05x",      "BREQ.%-2s  A,B,%05x" },
+	{ "?A=B    %s,rtn",           "RETEQ.%-2s A,B" },
+	{ "?B=C    %s,%05x",      "BREQ.%-2s  B,C,%05x" },
+	{ "?B=C    %s,rtn",           "RETEQ.%-2s B,C" },
+	{ "?A=C    %s,%05x",      "BREQ.%-2s  A,C,%05x" },
+	{ "?A=C    %s,rtn",           "RETEQ.%-2s A,C" },
+	{ "?C=D    %s,%05x",      "BREQ.%-2s  C,D,%05x" },
+	{ "?C=D    %s,rtn",           "RETEQ.%-2s C,D" },
+	{ "?A#B    %s,%05x",      "BRNE.%-2s  A,B,%05x" },
+	{ "?A#B    %s,rtn",           "RETNE.%-2s A,B" },
+	{ "?B#C    %s,%05x",      "BRNE.%-2s  B,C,%05x" },
+	{ "?B#C    %s,rtn",           "RETNE.%-2s B,C" },
+	{ "?A#C    %s,%05x",      "BRNE.%-2s  A,C,%05x" },
+	{ "?A#C    %s,rtn",           "RETNE.%-2s A,C" },
+	{ "?C#D    %s,%05x",      "BRNE.%-2s  C,D,%05x" },
+	{ "?C#D    %s,rtn",           "RETNE.%-2s C,D" },
+	{ "?A=0    %s,%05x",      "BRZ.%-2s   A,%05x" },
+	{ "?A=0    %s,rtn",           "RETZ.%-2s  A" },
+	{ "?B=0    %s,%05x",      "BRZ.%-2s   B,%05x" },
+	{ "?B=0    %s,rtn",           "RETZ.%-2s  B" },
+	{ "?C=0    %s,%05x",      "BRZ.%-2s   C,%05x" },
+	{ "?C=0    %s,rtn",           "RETZ.%-2s  C" },
+	{ "?D=0    %s,%05x",      "BRZ.%-2s   D,%05x" },
+	{ "?D=0    %s,rtn",           "RETZ.%-2s  D" },
+	{ "?A#0    %s,%05x",      "BRNZ.%-2s  A,%05x" },
+	{ "?A#0    %s,rtn",           "RETNZ.%-2s A" },
+	{ "?B#0    %s,%05x",      "BRNZ.%-2s  B,%05x" },
+	{ "?B#0    %s,rtn",           "RETNZ.%-2s B" },
+	{ "?C#0    %s,%05x",      "BRNZ.%-2s  C,%05x" },
+	{ "?C#0    %s,rtn",           "RETNZ.%-2s C" },
+	{ "?D#0    %s,%05x",      "BRNZ.%-2s  D,%05x" },
+	{ "?D#0    %s,rtn",           "RETNZ.%-2s D" },
 
-	incP, decP,
+	{ "?A>B    %s,%05x",      "BRGT.%-2s  A,B,%05x" },
+	{ "?A>B    %s,rtn",           "RETGT.%-2s A,B" },
+	{ "?B>C    %s,%05x",      "BRGT.%-2s  B,C,%05x" },
+	{ "?B>C    %s,rtn",           "RETGT.%-2s B,C" },
+	{ "?C>A    %s,%05x",      "BRGT.%-2s  C,A,%05x" },
+	{ "?C>A    %s,rtn",           "RETGT.%-2s C,A" },
+	{ "?D>C    %s,%05x",      "BRGT.%-2s  D,C,%05x" },
+	{ "?D>C    %s,rtn",           "RETGT.%-2s D,C" },
+	{ "?A<B    %s,%05x",      "BRLT.%-2s  A,B,%05x" },
+	{ "?A<B    %s,rtn",           "RETLT.%-2s A,B" },
+	{ "?B<C    %s,%05x",      "BRLT.%-2s  B,C,%05x" },
+	{ "?B<C    %s,rtn",           "RETLT.%-2s B,C" },
+	{ "?C<A    %s,%05x",      "BRLT.%-2s  C,A,%05x" },
+	{ "?C<A    %s,rtn",           "RETLT.%-2s C,A" },
+	{ "?D<C    %s,%05x",      "BRLT.%-2s  D,C,%05x" },
+	{ "?D<C    %s,rtn",           "RETLT.%-2s D,C" },
+	{ "?A>=B   %s,%05x",      "BRGE.%-2s  A,B,%05x" },
+	{ "?A>=B   %s,rtn",           "RETGE.%-2s A,B" },
+	{ "?B>=C   %s,%05x",      "BRGE.%-2s  B,C,%05x" },
+	{ "?B>=C   %s,rtn",           "RETGE.%-2s B,C" },
+	{ "?C>=A   %s,%05x",      "BRGE.%-2s  C,A,%05x" },
+	{ "?C>=A   %s,rtn",           "RETGE.%-2s C,A" },
+	{ "?D>=C   %s,%05x",      "BRGE.%-2s  D,C,%05x" },
+	{ "?D>=C   %s,rtn",           "RETGE.%-2s D,C" },
+	{ "?A<=B   %s,%05x",      "BRLE.%-2s  A,B,%05x" },
+	{ "?A<=B   %s,rtn",           "RETLE.%-2s A,B" },
+	{ "?B<=C   %s,%05x",      "BRLE.%-2s  B,C,%05x" },
+	{ "?B<=C   %s,rtn",           "RETLE.%-2s B,C" },
+	{ "?C<=A   %s,%05x",      "BRLE.%-2s  C,A,%05x" },
+	{ "?C<=A   %s,rtn",           "RETLE.%-2s C,A" },
+	{ "?D<=C   %s,%05x",      "BRLE.%-2s  D,C,%05x" },
+	{ "?D<=C   %s,rtn",           "RETLE.%-2s D,C" },
 
-	R0copyA, R1copyA, R2copyA, R3copyA, R4copyA,
-	R0copyC, R1copyC, R2copyC, R3copyC, R4copyC,
-
-	AcopyR0, AcopyR1, AcopyR2, AcopyR3, AcopyR4,
-	CcopyR0, CcopyR1, CcopyR2, CcopyR3, CcopyR4,
-
-	D0copyA, D1copyA, D0copyC, D1copyC,
-	D0copyAShort, D1copyAShort, D0copyCShort, D1copyCShort, // other class mnemonic
-
-	SwapAR0, SwapAR1, SwapAR2, SwapAR3, SwapAR4,
-	SwapCR0, SwapCR1, SwapCR2, SwapCR3, SwapCR4,
-
-	SwapAD0, SwapAD1, SwapCD0, SwapCD1,
-	SwapAD0Short, SwapAD1Short, SwapCD0Short, SwapCD1Short, // other class mnemonic
-
-	D0storeA, D1storeA, D0storeC, D1storeC,
-	AloadD0, AloadD1, CloadD0, CloadD1,
-
-	D0addImm, D1addImm, D0subImm, D1subImm,
-	AaddImm, BaddImm, CaddImm, DaddImm,
-	AsubImm, BsubImm, CsubImm, DsubImm,
-
-	AandB, BandC, CandA, DandC, BandA, CandB, AandC, CandD,
-	AorB, BorC, CorA, DorC, BorA, CorB, AorC, CorD,
-
-	Ashiftrightbit, Bshiftrightbit, Cshiftrightbit, Dshiftrightbit,
-
-	AshiftleftCarry, BshiftleftCarry, CshiftleftCarry, DshiftleftCarry,
-	AshiftrightCarry, BshiftrightCarry, CshiftrightCarry, DshiftrightCarry,
-
-	AaddB, BaddC, CaddA, DaddC, AaddA, BaddB, CaddC, DaddD,
-	BaddA, CaddB, AaddC, CaddD, decA, decB, decC, decD,
-
-	AsubB, BsubC, CsubA, DsubC, incA, incB, incC, incD,
-	BsubA, CsubB, AsubC, CsubD, AsubnB, BsubnC, CsubnA, DsubnC,
-
-	clearA, clearB, clearC, clearD,
-	AcopyB, BcopyC, CcopyA, DcopyC, BcopyA, CcopyB, AcopyC, CcopyD,
-	AswapB, BswapC, CswapA, DswapC,
-
-	Ashiftleft, Bshiftleft, Cshiftleft, Dshiftleft,
-	Ashiftright, Bshiftright, Cshiftright, Dshiftright,
-	negateA, negateB, negateC, negateD,
-	notA, notB, notC, notD
-
-};
-
-static const struct {
-	const char *name[2];
-} mnemonics[]={
-	{ { "rtn",                  "RET" } },
-	{ { "rtnsXM",               "RETSETXM" } },
-	{ { "rtnsC",                "RETSETC" } },
-	{ { "rtncC",                "RETCLRC" } },
-	{ { "rti",                  "RETI" } },
-	{ { "goto    %05x",         "JUMP.3   %05x" } },
-	{ { "goto    %05x",         "JUMP.4   %05x" } },
-	{ { "goto    %05x",         "JUMP     %05x" } },
-	{ { "gosub   %05x",         "CALL.3   %05x" } },
-	{ { "gosub   %05x",         "CALL.4   %05x" } },
-	{ { "gosub   %05x",         "CALL     %05x" } },
-	{ { "goC     %05x",         "BRCS     %05x" } },
-	{ { "rtnC",                 "RETCS" } },
-	{ { "gonC    %05x",         "BRCC     %05x" } },
-	{ { "rtnnC",                "RETCC" } },
-
-	{ { "OUT=CS",               "OUT.S    C" } },
-	{ { "OUT=C",                "OUT.X    C" } },
-	{ { "A=IN",                 "IN.4     A" } },
-	{ { "C=IN",                 "IN.4     C" } },
-	{ { "uncnfg",               "UNCNFG" } },
-	{ { "config",               "CONFIG" } },
-	{ { "C=id",                 "MOVE.A   ID,C" } },
-	{ { "!shutdn",              "!SHUTDN" } },
-	{ { "C+P+1",                "ADD.A    P+1,C" } },
-	{ { "reset",                "RESET" } },
-	{ { "!buscc",               "!BUSCC" } },
-	{ { "C=P     %x",           "MOVE.1   P,C,%x" } },
-	{ { "P=C     %x",           "MOVE.1   C,%x,P" } },
-	{ { "!sreq?",               "!SREQ" } },
-	{ { "CPex    %x",           "SWAP.1   P,C,%x" } },
-
-	{ { "!inton",               "!INTON" } },
-	{ { "LA %-2x   %s",         "MOVE.P%-2x %s,A" } },
-	{ { "!buscb",               "!BUSCB" } },
-	{ { "Abit=0  %x",           "CLRB     %x,A" } },
-	{ { "Abit=1  %x",           "SETB     %x,A" } },
-	{ { "?Abit=0 %x,%05x",      "BRBC     %x,A,%05x" } },
-	{ { "?Abit=0 %x,rtn",       "RETBC    %x,A" } },
-	{ { "?Abit=1 %x,%05x",      "BRBS     %x,A,%05x" } },
-	{ { "?Abit=1 %x,rtn",       "RETBS    %x,A" } },
-	{ { "Cbit=0  %x",           "CLRB     %x,C" } },
-	{ { "Cbit=1  %x",           "SETB     %x,C" } },
-	{ { "?Cbit=0 %x,%05x",      "BRBC     %x,C,%05x" } },
-	{ { "?Cbit=0 %x,rtn",       "RETBC    %x,C" } },
-	{ { "?Cbit=1 %x,%05x",      "BRBS     %x,C,%05x" } },
-	{ { "?Cbit=1 %x,rtn",       "RETBS    %x,C" } },
-	{ { "PC=(A)",               "JUMP.A   @A" } },
-	{ { "!buscd",               "!BUSCD" } },
-	{ { "PC=(C)",               "JUMP.A   @C" } },
-	{ { "!intoff",              "!INTOFF" } },
-	{ { "!rsi",                 "!RSI" } },
-
-	{ { "PC=A",                 "JUMP.A   A" } },
-	{ { "PC=C",                 "JUMP.A   C" } },
-	{ { "A=PC",                 "MOVE.A   PC,A" } },
-	{ { "C=PC",                 "MOVE.A   PC,C" } },
-	{ { "APCex",                "SWAP.A   A,PC" } },
-	{ { "CPCex",                "SWAP.A   C,PC" } },
-
-	{ { "HST=0   %x",           "CLRHST   %x" } },
-	{ { "?HST=0  %x,%05x",      "BRBCHST  %x,%05x" } },
-	{ { "?HST=0  %x,rtn",           "RETBCHST %x" } },
-	{ { "ST=0    %x",           "CLRB     %x,ST" } },
-	{ { "ST=1    %x",           "SETB     %x,ST" } },
-	{ { "?ST=0   %x,%05x",      "BRBC     ST,%x,%05x" } },
-	{ { "?ST=0   %x,rtn",           "RETBC    ST,%x" } },
-	{ { "?ST=1   %x,%05x",      "BRBS     ST,%x,%05x" } },
-	{ { "?ST=1   %x,rtn",           "RETBS    ST,%x" } },
-	{ { "?P#     %x,%05x",      "BRNE     P,%x,%05x" } },
-	{ { "?P#     %x,rtn",           "RETNE    P,%x" } },
-	{ { "?P=     %x,%05x",      "BREQ     P,%x,%05x" } },
-	{ { "?P=     %x,rtn",           "RETEQ    P,%x" } },
-
-	{ { "?A=B    %s,%05x",      "BREQ.%-2s  A,B,%05x" } },
-	{ { "?A=B    %s,rtn",           "RETEQ.%-2s A,B" } },
-	{ { "?B=C    %s,%05x",      "BREQ.%-2s  B,C,%05x" } },
-	{ { "?B=C    %s,rtn",           "RETEQ.%-2s B,C" } },
-	{ { "?A=C    %s,%05x",      "BREQ.%-2s  A,C,%05x" } },
-	{ { "?A=C    %s,rtn",           "RETEQ.%-2s A,C" } },
-	{ { "?C=D    %s,%05x",      "BREQ.%-2s  C,D,%05x" } },
-	{ { "?C=D    %s,rtn",           "RETEQ.%-2s C,D" } },
-	{ { "?A#B    %s,%05x",      "BRNE.%-2s  A,B,%05x" } },
-	{ { "?A#B    %s,rtn",           "RETNE.%-2s A,B" } },
-	{ { "?B#C    %s,%05x",      "BRNE.%-2s  B,C,%05x" } },
-	{ { "?B#C    %s,rtn",           "RETNE.%-2s B,C" } },
-	{ { "?A#C    %s,%05x",      "BRNE.%-2s  A,C,%05x" } },
-	{ { "?A#C    %s,rtn",           "RETNE.%-2s A,C" } },
-	{ { "?C#D    %s,%05x",      "BRNE.%-2s  C,D,%05x" } },
-	{ { "?C#D    %s,rtn",           "RETNE.%-2s C,D" } },
-	{ { "?A=0    %s,%05x",      "BRZ.%-2s   A,%05x" } },
-	{ { "?A=0    %s,rtn",           "RETZ.%-2s  A" } },
-	{ { "?B=0    %s,%05x",      "BRZ.%-2s   B,%05x" } },
-	{ { "?B=0    %s,rtn",           "RETZ.%-2s  B" } },
-	{ { "?C=0    %s,%05x",      "BRZ.%-2s   C,%05x" } },
-	{ { "?C=0    %s,rtn",           "RETZ.%-2s  C" } },
-	{ { "?D=0    %s,%05x",      "BRZ.%-2s   D,%05x" } },
-	{ { "?D=0    %s,rtn",           "RETZ.%-2s  D" } },
-	{ { "?A#0    %s,%05x",      "BRNZ.%-2s  A,%05x" } },
-	{ { "?A#0    %s,rtn",           "RETNZ.%-2s A" } },
-	{ { "?B#0    %s,%05x",      "BRNZ.%-2s  B,%05x" } },
-	{ { "?B#0    %s,rtn",           "RETNZ.%-2s B" } },
-	{ { "?C#0    %s,%05x",      "BRNZ.%-2s  C,%05x" } },
-	{ { "?C#0    %s,rtn",           "RETNZ.%-2s C" } },
-	{ { "?D#0    %s,%05x",      "BRNZ.%-2s  D,%05x" } },
-	{ { "?D#0    %s,rtn",           "RETNZ.%-2s D" } },
-
-	{ { "?A>B    %s,%05x",      "BRGT.%-2s  A,B,%05x" } },
-	{ { "?A>B    %s,rtn",           "RETGT.%-2s A,B" } },
-	{ { "?B>C    %s,%05x",      "BRGT.%-2s  B,C,%05x" } },
-	{ { "?B>C    %s,rtn",           "RETGT.%-2s B,C" } },
-	{ { "?C>A    %s,%05x",      "BRGT.%-2s  C,A,%05x" } },
-	{ { "?C>A    %s,rtn",           "RETGT.%-2s C,A" } },
-	{ { "?D>C    %s,%05x",      "BRGT.%-2s  D,C,%05x" } },
-	{ { "?D>C    %s,rtn",           "RETGT.%-2s D,C" } },
-	{ { "?A<B    %s,%05x",      "BRLT.%-2s  A,B,%05x" } },
-	{ { "?A<B    %s,rtn",           "RETLT.%-2s A,B" } },
-	{ { "?B<C    %s,%05x",      "BRLT.%-2s  B,C,%05x" } },
-	{ { "?B<C    %s,rtn",           "RETLT.%-2s B,C" } },
-	{ { "?C<A    %s,%05x",      "BRLT.%-2s  C,A,%05x" } },
-	{ { "?C<A    %s,rtn",           "RETLT.%-2s C,A" } },
-	{ { "?D<C    %s,%05x",      "BRLT.%-2s  D,C,%05x" } },
-	{ { "?D<C    %s,rtn",           "RETLT.%-2s D,C" } },
-	{ { "?A>=B   %s,%05x",      "BRGE.%-2s  A,B,%05x" } },
-	{ { "?A>=B   %s,rtn",           "RETGE.%-2s A,B" } },
-	{ { "?B>=C   %s,%05x",      "BRGE.%-2s  B,C,%05x" } },
-	{ { "?B>=C   %s,rtn",           "RETGE.%-2s B,C" } },
-	{ { "?C>=A   %s,%05x",      "BRGE.%-2s  C,A,%05x" } },
-	{ { "?C>=A   %s,rtn",           "RETGE.%-2s C,A" } },
-	{ { "?D>=C   %s,%05x",      "BRGE.%-2s  D,C,%05x" } },
-	{ { "?D>=C   %s,rtn",           "RETGE.%-2s D,C" } },
-	{ { "?A<=B   %s,%05x",      "BRLE.%-2s  A,B,%05x" } },
-	{ { "?A<=B   %s,rtn",           "RETLE.%-2s A,B" } },
-	{ { "?B<=C   %s,%05x",      "BRLE.%-2s  B,C,%05x" } },
-	{ { "?B<=C   %s,rtn",           "RETLE.%-2s B,C" } },
-	{ { "?C<=A   %s,%05x",      "BRLE.%-2s  C,A,%05x" } },
-	{ { "?C<=A   %s,rtn",           "RETLE.%-2s C,A" } },
-	{ { "?D<=C   %s,%05x",      "BRLE.%-2s  D,C,%05x" } },
-	{ { "?D<=C   %s,rtn",           "RETLE.%-2s D,C" } },
-
-	{ { "sethex",               "SETHEX" } },
-	{ { "setdec",               "SETDEC" } },
-	{ { "RSTK=C",               "PUSH.A   C" } },
-	{ { "C=RSTK",               "POP.A    C" } },
+	{ "sethex",               "SETHEX" },
+	{ "setdec",               "SETDEC" },
+	{ "RSTK=C",               "PUSH.A   C" },
+	{ "C=RSTK",               "POP.A    C" },
 
 	// load immediate
-	{ { "D0=     %02x",         "MOVE.2   %02x,D0" } },
-	{ { "D0=     %04x",         "MOVE.4   %04x,D0" } },
-	{ { "D0=     %05x",         "MOVE.5   %05x,D0" } },
+	{ "D0=     %02x",         "MOVE.2   %02x,D0" },
+	{ "D0=     %04x",         "MOVE.4   %04x,D0" },
+	{ "D0=     %05x",         "MOVE.5   %05x,D0" },
 
-	{ { "D1=     %02x",         "MOVE.2   %02x,D1" } },
-	{ { "D1=     %04x",         "MOVE.4   %04x,D1" } },
-	{ { "D1=     %05x",         "MOVE.5   %05x,D1" } },
+	{ "D1=     %02x",         "MOVE.2   %02x,D1" },
+	{ "D1=     %04x",         "MOVE.4   %04x,D1" },
+	{ "D1=     %05x",         "MOVE.5   %05x,D1" },
 
-	{ { "P=      %x",           "MOVE     %x,P" } },
-	{ { "lC %-2x   %s",         "MOVE.P%-2x %s,C" } },
+	{ "P=      %x",           "MOVE     %x,P" },
+	{ "lC %-2x   %s",         "MOVE.P%-2x %s,C" },
 
-	{ { "clrST",                "CLR.X    ST" } },
-	{ { "C=ST",                 "MOVE.X   ST,C" } },
-	{ { "ST=C",                 "MOVE.X   C,ST" } },
-	{ { "CSTex",                "SWAP.X   C,ST" } },
+	{ "clrST",                "CLR.X    ST" },
+	{ "C=ST",                 "MOVE.X   ST,C" },
+	{ "ST=C",                 "MOVE.X   C,ST" },
+	{ "CSTex",                "SWAP.X   C,ST" },
 
-	{ { "P=P+1",                "INC      P" } },
-	{ { "P=P-1",                "DEC      P" } },
+	{ "P=P+1",                "INC      P" },
+	{ "P=P-1",                "DEC      P" },
 
 	// copy
-	{ { "R0=A    %s",           "MOVE.%-2s  A,R0" } },
-	{ { "R1=A    %s",           "MOVE.%-2s  A,R1" } },
-	{ { "R2=A    %s",           "MOVE.%-2s  A,R2" } },
-	{ { "R3=A    %s",           "MOVE.%-2s  A,R3" } },
-	{ { "R4=A    %s",           "MOVE.%-2s  A,R4" } },
+	{ "R0=A    %s",           "MOVE.%-2s  A,R0" },
+	{ "R1=A    %s",           "MOVE.%-2s  A,R1" },
+	{ "R2=A    %s",           "MOVE.%-2s  A,R2" },
+	{ "R3=A    %s",           "MOVE.%-2s  A,R3" },
+	{ "R4=A    %s",           "MOVE.%-2s  A,R4" },
 
-	{ { "R0=C    %s",           "MOVE.%-2s  C,R0" } },
-	{ { "R1=C    %s",           "MOVE.%-2s  C,R1" } },
-	{ { "R2=C    %s",           "MOVE.%-2s  C,R2" } },
-	{ { "R3=C    %s",           "MOVE.%-2s  C,R3" } },
-	{ { "R4=C    %s",           "MOVE.%-2s  C,R4" } },
+	{ "R0=C    %s",           "MOVE.%-2s  C,R0" },
+	{ "R1=C    %s",           "MOVE.%-2s  C,R1" },
+	{ "R2=C    %s",           "MOVE.%-2s  C,R2" },
+	{ "R3=C    %s",           "MOVE.%-2s  C,R3" },
+	{ "R4=C    %s",           "MOVE.%-2s  C,R4" },
 
-	{ { "A=R0    %s",           "MOVE.%-2s  R0,A" } },
-	{ { "A=R1    %s",           "MOVE.%-2s  R1,A" } },
-	{ { "A=R2    %s",           "MOVE.%-2s  R2,A" } },
-	{ { "A=R3    %s",           "MOVE.%-2s  R3,A" } },
-	{ { "A=R4    %s",           "MOVE.%-2s  R4,A" } },
+	{ "A=R0    %s",           "MOVE.%-2s  R0,A" },
+	{ "A=R1    %s",           "MOVE.%-2s  R1,A" },
+	{ "A=R2    %s",           "MOVE.%-2s  R2,A" },
+	{ "A=R3    %s",           "MOVE.%-2s  R3,A" },
+	{ "A=R4    %s",           "MOVE.%-2s  R4,A" },
 
-	{ { "C=R0    %s",           "MOVE.%-2s  R0,C" } },
-	{ { "C=R1    %s",           "MOVE.%-2s  R1,C" } },
-	{ { "C=R2    %s",           "MOVE.%-2s  R2,C" } },
-	{ { "C=R3    %s",           "MOVE.%-2s  R3,C" } },
-	{ { "C=R4    %s",           "MOVE.%-2s  R4,C" } },
+	{ "C=R0    %s",           "MOVE.%-2s  R0,C" },
+	{ "C=R1    %s",           "MOVE.%-2s  R1,C" },
+	{ "C=R2    %s",           "MOVE.%-2s  R2,C" },
+	{ "C=R3    %s",           "MOVE.%-2s  R3,C" },
+	{ "C=R4    %s",           "MOVE.%-2s  R4,C" },
 
-	{ { "D0=A",                 "MOVE.A   A,D0" } },
-	{ { "D1=A",                 "MOVE.A   A,D1" } },
-	{ { "D0=C",                 "MOVE.A   C,D0" } },
-	{ { "D1=C",                 "MOVE.A   C,D1" } },
-	{ { "D0=As",                "MOVE.S   A,D0" } },
-	{ { "D1=As",                "MOVE.S   A,D1" } },
-	{ { "D0=Cs",                "MOVE.S   C,D0" } },
-	{ { "D1=Cs",                "MOVE.S   C,D1" } },
+	{ "D0=A",                 "MOVE.A   A,D0" },
+	{ "D1=A",                 "MOVE.A   A,D1" },
+	{ "D0=C",                 "MOVE.A   C,D0" },
+	{ "D1=C",                 "MOVE.A   C,D1" },
+	{ "D0=As",                "MOVE.S   A,D0" },
+	{ "D1=As",                "MOVE.S   A,D1" },
+	{ "D0=Cs",                "MOVE.S   C,D0" },
+	{ "D1=Cs",                "MOVE.S   C,D1" },
 
 	// swap operations
-	{ { "AR0ex   %s",           "SWAP.%-2s  A,R0" } },
-	{ { "AR1ex   %s",           "SWAP.%-2s  A,R1" } },
-	{ { "AR2ex   %s",           "SWAP.%-2s  A,R2" } },
-	{ { "AR3ex   %s",           "SWAP.%-2s  A,R3" } },
-	{ { "AR4ex   %s",           "SWAP.%-2s  A,R4" } },
+	{ "AR0ex   %s",           "SWAP.%-2s  A,R0" },
+	{ "AR1ex   %s",           "SWAP.%-2s  A,R1" },
+	{ "AR2ex   %s",           "SWAP.%-2s  A,R2" },
+	{ "AR3ex   %s",           "SWAP.%-2s  A,R3" },
+	{ "AR4ex   %s",           "SWAP.%-2s  A,R4" },
 
-	{ { "CR0ex   %s",           "SWAP.%-2s  C,R0" } },
-	{ { "CR1ex   %s",           "SWAP.%-2s  C,R1" } },
-	{ { "CR2ex   %s",           "SWAP.%-2s  C,R2" } },
-	{ { "CR3ex   %s",           "SWAP.%-2s  C,R3" } },
-	{ { "CR4ex   %s",           "SWAP.%-2s  C,R4" } },
+	{ "CR0ex   %s",           "SWAP.%-2s  C,R0" },
+	{ "CR1ex   %s",           "SWAP.%-2s  C,R1" },
+	{ "CR2ex   %s",           "SWAP.%-2s  C,R2" },
+	{ "CR3ex   %s",           "SWAP.%-2s  C,R3" },
+	{ "CR4ex   %s",           "SWAP.%-2s  C,R4" },
 
-	{ { "AD0ex",                "SWAP.A   A,D0" } },
-	{ { "AD1ex",                "SWAP.A   A,D1" } },
-	{ { "CD0ex",                "SWAP.A   C,D0" } },
-	{ { "CD1ex",                "SWAP.A   C,D1" } },
-	{ { "AD0xs",                "SWAP.S   A,D0" } },
-	{ { "AD1xs",                "SWAP.S   A,D1" } },
-	{ { "CD0xs",                "SWAP.S   C,D0" } },
-	{ { "CD1xs",                "SWAP.S   C,D1" } },
+	{ "AD0ex",                "SWAP.A   A,D0" },
+	{ "AD1ex",                "SWAP.A   A,D1" },
+	{ "CD0ex",                "SWAP.A   C,D0" },
+	{ "CD1ex",                "SWAP.A   C,D1" },
+	{ "AD0xs",                "SWAP.S   A,D0" },
+	{ "AD1xs",                "SWAP.S   A,D1" },
+	{ "CD0xs",                "SWAP.S   C,D0" },
+	{ "CD1xs",                "SWAP.S   C,D1" },
 
 	// store
-	{ { "Dat0=A  %s",           "MOVE.%-2s  A,@D0" } },
-	{ { "Dat1=A  %s",           "MOVE.%-2s  A,@D0" } },
-	{ { "Dat0=C  %s",           "MOVE.%-2s  C,@D0" } },
-	{ { "Dat1=C  %s",           "MOVE.%-2s  C,@D0" } },
+	{ "Dat0=A  %s",           "MOVE.%-2s  A,@D0" },
+	{ "Dat1=A  %s",           "MOVE.%-2s  A,@D0" },
+	{ "Dat0=C  %s",           "MOVE.%-2s  C,@D0" },
+	{ "Dat1=C  %s",           "MOVE.%-2s  C,@D0" },
 
 	// load
-	{ { "A=Dat0  %s",           "MOVE.%-2s  @D0,A" } },
-	{ { "A=Dat1  %s",           "MOVE.%-2s  @D0,A" } },
-	{ { "C=Dat0  %s",           "MOVE.%-2s  @D0,C" } },
-	{ { "C=Dat1  %s",           "MOVE.%-2s  @D0,C" } },
+	{ "A=Dat0  %s",           "MOVE.%-2s  @D0,A" },
+	{ "A=Dat1  %s",           "MOVE.%-2s  @D0,A" },
+	{ "C=Dat0  %s",           "MOVE.%-2s  @D0,C" },
+	{ "C=Dat1  %s",           "MOVE.%-2s  @D0,C" },
 
 	// add/sub immediate
-	{ { "D0=D0+  %x",           "ADD.A    %x,D0" } },
-	{ { "D1=D1+  %x",           "ADD.A    %x,D1" } },
-	{ { "D0=D0-  %x",           "SUB.A    %x,D0" } },
-	{ { "D1=D1-  %x",           "SUB.A    %x,D1" } },
+	{ "D0=D0+  %x",           "ADD.A    %x,D0" },
+	{ "D1=D1+  %x",           "ADD.A    %x,D1" },
+	{ "D0=D0-  %x",           "SUB.A    %x,D0" },
+	{ "D1=D1-  %x",           "SUB.A    %x,D1" },
 
-	{ { "A=A+    %s,%x",        "ADD.%-2s   %x,A" } },
-	{ { "B=B+    %s,%x",        "ADD.%-2s   %x,B" } },
-	{ { "C=C+    %s,%x",        "ADD.%-2s   %x,C" } },
-	{ { "D=D+    %s,%x",        "ADD.%-2s   %x,D" } },
-	{ { "A=A-    %s,%x",        "SUB.%-2s   %x,A" } },
-	{ { "B=B-    %s,%x",        "SUB.%-2s   %x,B" } },
-	{ { "C=C-    %s,%x",        "SUB.%-2s   %x,C" } },
-	{ { "D=D-    %s,%x",        "SUB.%-2s   %x,D" } },
+	{ "A=A+    %s,%x",        "ADD.%-2s   %x,A" },
+	{ "B=B+    %s,%x",        "ADD.%-2s   %x,B" },
+	{ "C=C+    %s,%x",        "ADD.%-2s   %x,C" },
+	{ "D=D+    %s,%x",        "ADD.%-2s   %x,D" },
+	{ "A=A-    %s,%x",        "SUB.%-2s   %x,A" },
+	{ "B=B-    %s,%x",        "SUB.%-2s   %x,B" },
+	{ "C=C-    %s,%x",        "SUB.%-2s   %x,C" },
+	{ "D=D-    %s,%x",        "SUB.%-2s   %x,D" },
 
-	{ { "A=A&B   %s",           "AND.%-2s   B,A" } },
-	{ { "B=B&C   %s",           "AND.%-2s   C,B" } },
-	{ { "C=C&A   %s",           "AND.%-2s   A,C" } },
-	{ { "D=D&C   %s",           "AND.%-2s   C,D" } },
-	{ { "B=B&A   %s",           "AND.%-2s   A,B" } },
-	{ { "C=C&B   %s",           "AND.%-2s   B,C" } },
-	{ { "A=A&C   %s",           "AND.%-2s   C,A" } },
-	{ { "C=C&D   %s",           "AND.%-2s   D,C" } },
+	{ "A=A&B   %s",           "AND.%-2s   B,A" },
+	{ "B=B&C   %s",           "AND.%-2s   C,B" },
+	{ "C=C&A   %s",           "AND.%-2s   A,C" },
+	{ "D=D&C   %s",           "AND.%-2s   C,D" },
+	{ "B=B&A   %s",           "AND.%-2s   A,B" },
+	{ "C=C&B   %s",           "AND.%-2s   B,C" },
+	{ "A=A&C   %s",           "AND.%-2s   C,A" },
+	{ "C=C&D   %s",           "AND.%-2s   D,C" },
 
-	{ { "A=A!B   %s",           "OR.%-2s    B,A" } },
-	{ { "B=B!C   %s",           "OR.%-2s    C,B" } },
-	{ { "C=C!A   %s",           "OR.%-2s    A,C" } },
-	{ { "D=D!C   %s",           "OR.%-2s    C,D" } },
-	{ { "B=B!A   %s",           "OR.%-2s    A,B" } },
-	{ { "C=C!B   %s",           "OR.%-2s    B,C" } },
-	{ { "A=A!C   %s",           "OR.%-2s    C,A" } },
-	{ { "C=C!D   %s",           "OR.%-2s    D,C" } },
+	{ "A=A!B   %s",           "OR.%-2s    B,A" },
+	{ "B=B!C   %s",           "OR.%-2s    C,B" },
+	{ "C=C!A   %s",           "OR.%-2s    A,C" },
+	{ "D=D!C   %s",           "OR.%-2s    C,D" },
+	{ "B=B!A   %s",           "OR.%-2s    A,B" },
+	{ "C=C!B   %s",           "OR.%-2s    B,C" },
+	{ "A=A!C   %s",           "OR.%-2s    C,A" },
+	{ "C=C!D   %s",           "OR.%-2s    D,C" },
 
-	{ { "Asrb    %s",           "SRB.%-2s   A" } },
-	{ { "Bsrb    %s",           "SRB.%-2s   B" } },
-	{ { "Csrb    %s",           "SRB.%-2s   C" } },
-	{ { "Dsrb    %s",           "SRB.%-2s   D" } },
+	{ "Asrb    %s",           "SRB.%-2s   A" },
+	{ "Bsrb    %s",           "SRB.%-2s   B" },
+	{ "Csrb    %s",           "SRB.%-2s   C" },
+	{ "Dsrb    %s",           "SRB.%-2s   D" },
 
-	{ { "Aslc    %s",           "RLN.%-2s   A" } },
-	{ { "Bslc    %s",           "RLN.%-2s   B" } },
-	{ { "Cslc    %s",           "RLN.%-2s   C" } },
-	{ { "Dslc    %s",           "RLN.%-2s   D" } },
-	{ { "Asrc    %s",           "RRN.%-2s   A" } },
-	{ { "Bsrc    %s",           "RRN.%-2s   B" } },
-	{ { "Csrc    %s",           "RRN.%-2s   C" } },
-	{ { "Dsrc    %s",           "RRN.%-2s   D" } },
+	{ "Aslc    %s",           "RLN.%-2s   A" },
+	{ "Bslc    %s",           "RLN.%-2s   B" },
+	{ "Cslc    %s",           "RLN.%-2s   C" },
+	{ "Dslc    %s",           "RLN.%-2s   D" },
+	{ "Asrc    %s",           "RRN.%-2s   A" },
+	{ "Bsrc    %s",           "RRN.%-2s   B" },
+	{ "Csrc    %s",           "RRN.%-2s   C" },
+	{ "Dsrc    %s",           "RRN.%-2s   D" },
 
-	{ { "A=A+B   %s",           "ADD.%-2s   B,A" } },
-	{ { "B=B+C   %s",           "ADD.%-2s   C,B" } },
-	{ { "C=C+A   %s",           "ADD.%-2s   A,C" } },
-	{ { "D=D+C   %s",           "ADD.%-2s   C,D" } },
-	{ { "A=A+A   %s",           "ADD.%-2s   A,A" } },
-	{ { "B=B+B   %s",           "ADD.%-2s   B,B" } },
-	{ { "C=C+C   %s",           "ADD.%-2s   C,C" } },
-	{ { "D=D+C   %s",           "ADD.%-2s   D,D" } },
-	{ { "B=B+A   %s",           "ADD.%-2s   A,B" } },
-	{ { "C=C+B   %s",           "ADD.%-2s   B,C" } },
-	{ { "A=A+C   %s",           "ADD.%-2s   C,A" } },
-	{ { "C=C+D   %s",           "ADD.%-2s   D,C" } },
-	{ { "A=A-1   %s",           "DEC.%-2s   A" } },
-	{ { "B=B-1   %s",           "DEC.%-2s   B" } },
-	{ { "C=C-1   %s",           "DEC.%-2s   C" } },
-	{ { "D=D-1   %s",           "DEC.%-2s   D" } },
+	{ "A=A+B   %s",           "ADD.%-2s   B,A" },
+	{ "B=B+C   %s",           "ADD.%-2s   C,B" },
+	{ "C=C+A   %s",           "ADD.%-2s   A,C" },
+	{ "D=D+C   %s",           "ADD.%-2s   C,D" },
+	{ "A=A+A   %s",           "ADD.%-2s   A,A" },
+	{ "B=B+B   %s",           "ADD.%-2s   B,B" },
+	{ "C=C+C   %s",           "ADD.%-2s   C,C" },
+	{ "D=D+C   %s",           "ADD.%-2s   D,D" },
+	{ "B=B+A   %s",           "ADD.%-2s   A,B" },
+	{ "C=C+B   %s",           "ADD.%-2s   B,C" },
+	{ "A=A+C   %s",           "ADD.%-2s   C,A" },
+	{ "C=C+D   %s",           "ADD.%-2s   D,C" },
+	{ "A=A-1   %s",           "DEC.%-2s   A" },
+	{ "B=B-1   %s",           "DEC.%-2s   B" },
+	{ "C=C-1   %s",           "DEC.%-2s   C" },
+	{ "D=D-1   %s",           "DEC.%-2s   D" },
 
-	{ { "A=A-B   %s",           "ADD.%-2s   B,A" } },
-	{ { "B=B-C   %s",           "ADD.%-2s   C,B" } },
-	{ { "C=C-A   %s",           "ADD.%-2s   A,C" } },
-	{ { "D=D-C   %s",           "ADD.%-2s   C,D" } },
-	{ { "A=A+1   %s",           "INC.%-2s   A" } },
-	{ { "B=B+1   %s",           "INC.%-2s   B" } },
-	{ { "C=C+1   %s",           "INC.%-2s   C" } },
-	{ { "D=D+1   %s",           "INC.%-2s   D" } },
-	{ { "B=B-A   %s",           "SUB.%-2s   A,B" } },
-	{ { "C=C-B   %s",           "SUB.%-2s   B,C" } },
-	{ { "A=A-C   %s",           "SUB.%-2s   C,A" } },
-	{ { "C=C-D   %s",           "SUB.%-2s   D,C" } },
-	{ { "A=B-A   %s",           "SUBN.%-2s  B,A" } },
-	{ { "B=C-B   %s",           "SUBN.%-2s  C,B" } },
-	{ { "C=A-C   %s",           "SUBN.%-2s  A,C" } },
-	{ { "D=C-D   %s",           "SUBN.%-2s  C,D" } },
+	{ "A=A-B   %s",           "ADD.%-2s   B,A" },
+	{ "B=B-C   %s",           "ADD.%-2s   C,B" },
+	{ "C=C-A   %s",           "ADD.%-2s   A,C" },
+	{ "D=D-C   %s",           "ADD.%-2s   C,D" },
+	{ "A=A+1   %s",           "INC.%-2s   A" },
+	{ "B=B+1   %s",           "INC.%-2s   B" },
+	{ "C=C+1   %s",           "INC.%-2s   C" },
+	{ "D=D+1   %s",           "INC.%-2s   D" },
+	{ "B=B-A   %s",           "SUB.%-2s   A,B" },
+	{ "C=C-B   %s",           "SUB.%-2s   B,C" },
+	{ "A=A-C   %s",           "SUB.%-2s   C,A" },
+	{ "C=C-D   %s",           "SUB.%-2s   D,C" },
+	{ "A=B-A   %s",           "SUBN.%-2s  B,A" },
+	{ "B=C-B   %s",           "SUBN.%-2s  C,B" },
+	{ "C=A-C   %s",           "SUBN.%-2s  A,C" },
+	{ "D=C-D   %s",           "SUBN.%-2s  C,D" },
 
-	{ { "A=0     %s",           "CLR.%-2s   A" } },
-	{ { "B=0     %s",           "CLR.%-2s   B" } },
-	{ { "C=0     %s",           "CLR.%-2s   C" } },
-	{ { "D=0     %s",           "CLR.%-2s   D" } },
-	{ { "A=B     %s",           "MOVE.%-2s  B,A" } },
-	{ { "B=C     %s",           "MOVE.%-2s  C,B" } },
-	{ { "C=A     %s",           "MOVE.%-2s  A,C" } },
-	{ { "D=C     %s",           "MOVE.%-2s  C,D" } },
-	{ { "B=A     %s",           "MOVE.%-2s  A,B" } },
-	{ { "C=B     %s",           "MOVE.%-2s  B,C" } },
-	{ { "A=C     %s",           "MOVE.%-2s  C,A" } },
-	{ { "C=D     %s",           "MOVE.%-2s  D,C" } },
-	{ { "ABex    %s",           "SWAP.%-2s  A,B" } },
-	{ { "BCex    %s",           "SWAP.%-2s  B,C" } },
-	{ { "ACex    %s",           "SWAP.%-2s  A,C" } },
-	{ { "CDex    %s",           "SWAP.%-2s  C,D" } },
+	{ "A=0     %s",           "CLR.%-2s   A" },
+	{ "B=0     %s",           "CLR.%-2s   B" },
+	{ "C=0     %s",           "CLR.%-2s   C" },
+	{ "D=0     %s",           "CLR.%-2s   D" },
+	{ "A=B     %s",           "MOVE.%-2s  B,A" },
+	{ "B=C     %s",           "MOVE.%-2s  C,B" },
+	{ "C=A     %s",           "MOVE.%-2s  A,C" },
+	{ "D=C     %s",           "MOVE.%-2s  C,D" },
+	{ "B=A     %s",           "MOVE.%-2s  A,B" },
+	{ "C=B     %s",           "MOVE.%-2s  B,C" },
+	{ "A=C     %s",           "MOVE.%-2s  C,A" },
+	{ "C=D     %s",           "MOVE.%-2s  D,C" },
+	{ "ABex    %s",           "SWAP.%-2s  A,B" },
+	{ "BCex    %s",           "SWAP.%-2s  B,C" },
+	{ "ACex    %s",           "SWAP.%-2s  A,C" },
+	{ "CDex    %s",           "SWAP.%-2s  C,D" },
 
-	{ { "Asl     %s",           "SLN.%-2s   A" } },
-	{ { "Bsl     %s",           "SLN.%-2s   B" } },
-	{ { "Csl     %s",           "SLN.%-2s   C" } },
-	{ { "Dsl     %s",           "SLN.%-2s   D" } },
-	{ { "Asr     %s",           "SRN.%-2s   A" } },
-	{ { "Bsr     %s",           "SRN.%-2s   B" } },
-	{ { "Csr     %s",           "SRN.%-2s   C" } },
-	{ { "Dsr     %s",           "SRN.%-2s   D" } },
-	{ { "A=-A    %s",           "NEG.%-2s   A" } },
-	{ { "B=-B    %s",           "NEG.%-2s   B" } },
-	{ { "C=-C    %s",           "NEG.%-2s   C" } },
-	{ { "D=-D    %s",           "NEG.%-2s   D" } },
-	{ { "A=-A-1  %s",           "NOT.%-2s   A" } },
-	{ { "B=-B-1  %s",           "NOT.%-2s   B" } },
-	{ { "C=-C-1  %s",           "NOT.%-2s   C" } },
-	{ { "D=-D-1  %s",           "NOT.%-2s   D" } }
-
+	{ "Asl     %s",           "SLN.%-2s   A" },
+	{ "Bsl     %s",           "SLN.%-2s   B" },
+	{ "Csl     %s",           "SLN.%-2s   C" },
+	{ "Dsl     %s",           "SLN.%-2s   D" },
+	{ "Asr     %s",           "SRN.%-2s   A" },
+	{ "Bsr     %s",           "SRN.%-2s   B" },
+	{ "Csr     %s",           "SRN.%-2s   C" },
+	{ "Dsr     %s",           "SRN.%-2s   D" },
+	{ "A=-A    %s",           "NEG.%-2s   A" },
+	{ "B=-B    %s",           "NEG.%-2s   B" },
+	{ "C=-C    %s",           "NEG.%-2s   C" },
+	{ "D=-D    %s",           "NEG.%-2s   D" },
+	{ "A=-A-1  %s",           "NOT.%-2s   A" },
+	{ "B=-B-1  %s",           "NOT.%-2s   B" },
+	{ "C=-C-1  %s",           "NOT.%-2s   C" },
+	{ "D=-D-1  %s",           "NOT.%-2s   D" }
 };
 
-enum opcode_sel
-{
-	Complete=-1,
-	Illegal,
-	Opcode0, Opcode0E, Opcode0Ea,
-	Opcode1, Opcode10, Opcode11, Opcode12, Opcode13, Opcode14, Opcode15,
-	Opcode8, Opcode80, Opcode808, Opcode8081,
-	Opcode81, Opcode818, Opcode818a, Opcode819, Opcode819a,
-	Opcode81A, Opcode81Aa, Opcode81Aa0,Opcode81Aa1, Opcode81Aa2, Opcode81B,
-	Opcode8A, Opcode8B,
-	Opcode9, Opcode9a, Opcode9b,
-	OpcodeA, OpcodeAa, OpcodeAb,
-	OpcodeB, OpcodeBa, OpcodeBb,
-	OpcodeC,
-	OpcodeD,
-	OpcodeE,
-	OpcodeF
-};
 
-enum opcode_adr
-{
-	AdrNone,
-	AdrAF, AdrA, AdrB, AdrCount,
-	BranchReturn, TestBranchRet, ImmBranch,
-	ABranchReturn, // address field A
-	xBranchReturn, // address field specified in previous opcode entry
-	Imm, ImmCount, ImmCload, Imm2, Imm4, Imm5,
-	Dis3, Dis3Call, Dis4, Dis4Call, Abs,
-	FieldP, FieldWP, FieldXS, FieldX, FieldS, FieldM, FieldB, FieldW, FieldA,
-	AdrImmCount
-};
 
-struct OPCODE
-{
-	opcode_sel sel;
-	opcode_adr adr;
-	MNEMONICS mnemonic;
-};
-
-static const char *field_2_string(int adr_enum)
+const char *saturn_disassembler::field_2_string(int adr_enum)
 {
 	switch (adr_enum) {
 	case FieldP: return P;
@@ -593,7 +412,7 @@ static const char *field_2_string(int adr_enum)
 	return nullptr;
 }
 
-static const OPCODE opcodes[][0x10]= {
+const saturn_disassembler::OPCODE saturn_disassembler::opcs[][0x10]= {
 	{
 		// first digit
 		{ Opcode0 },
@@ -805,7 +624,7 @@ static const OPCODE opcodes[][0x10]= {
 		{ Complete,     AdrNone,        inA },
 		{ Complete,     AdrNone,        inC },
 		{ Complete,     AdrNone,        unconfig },
-		{ Complete,     AdrNone,        config },
+		{ Complete,     AdrNone,        xconfig },
 		{ Complete,     AdrNone,        Cid },
 		{ Complete,     AdrNone,        shutdown },
 		{ Opcode808 },
@@ -1258,31 +1077,42 @@ static const OPCODE opcodes[][0x10]= {
 	}
 };
 
-static const int field_adr_af[]=
+const int saturn_disassembler::field_adr_af[]=
 { FieldP, FieldWP, FieldXS, FieldX, FieldS, FieldM, FieldB, FieldW, 0, 0, 0, 0, 0, 0, 0, FieldA };
 
-static const int field_adr_a[]=
+const int saturn_disassembler::field_adr_a[]=
 { FieldP, FieldWP, FieldXS, FieldX, FieldS, FieldM, FieldB, FieldW};
 
-static const int field_adr_b[]=
+const int saturn_disassembler::field_adr_b[]=
 { FieldP, FieldWP, FieldXS, FieldX, FieldS, FieldM, FieldB, FieldW };
 
-CPU_DISASSEMBLE(saturn)
+saturn_disassembler::saturn_disassembler(config *conf) : m_config(conf)
+{
+}
+
+u32 saturn_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t saturn_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	int adr=0;
 
 	int cont=1; // operation still not complete disassembled
 	char bin[10]; int binsize=0; // protocollizing fetched nibbles
 	char number[17];
-	const OPCODE *level=opcodes[0]; //pointer to current digit
+	const OPCODE *level=opcs[0]; //pointer to current digit
 	int op; // currently fetched nibble
-	int pos = 0;
+	offs_t pos = pc;
 
 	int i,c,v;
 
+	int mnemonics_bank = m_config->get_nonstandard_mnemonics_mode() ? 1 : 0;
+
 	while (cont)
 	{
-		op = oprom[pos++] & 0xf;
+		op = opcodes.r8(pos++) & 0xf;
 		level+=op;
 		switch (level->sel) {
 		case Illegal:
@@ -1316,155 +1146,155 @@ CPU_DISASSEMBLE(saturn)
 			cont=0;
 			switch (level->adr==AdrNone?adr:level->adr) {
 			case AdrNone:
-				stream << mnemonics[level->mnemonic].name[set];
+				stream << mnemonics[level->mnemonic][mnemonics_bank];
 				break;
 			case Imm:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], oprom[pos++]);
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], opcodes.r8(pos++));
 				break;
 			case ImmCount:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], oprom[pos++]+1);
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], opcodes.r8(pos++)+1);
 				break;
 			case AdrImmCount:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], field_2_string(adr), oprom[pos++]+1);
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], field_2_string(adr), opcodes.r8(pos++)+1);
 				break;
 			case AdrCount: // mnemonics have string %s for address field
-				snprintf(number,sizeof(number),"%x",oprom[pos++]+1);
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], number);
+				snprintf(number,sizeof(number),"%x",opcodes.r8(pos++)+1);
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], number);
 				break;
 			case Imm2:
-				v=oprom[pos++];
-				v|=oprom[pos++]<<4;
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], v);
+				v=opcodes.r8(pos++);
+				v|=opcodes.r8(pos++)<<4;
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], v);
 				break;
 			case Imm4:
-				v=oprom[pos++];
-				v|=oprom[pos++]<<4;
-				v|=oprom[pos++]<<8;
-				v|=oprom[pos++]<<12;
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], v);
+				v=opcodes.r8(pos++);
+				v|=opcodes.r8(pos++)<<4;
+				v|=opcodes.r8(pos++)<<8;
+				v|=opcodes.r8(pos++)<<12;
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], v);
 				break;
 			case Imm5:
-				v=oprom[pos++];
-				v|=oprom[pos++]<<4;
-				v|=oprom[pos++]<<8;
-				v|=oprom[pos++]<<12;
-				v|=oprom[pos++]<<16;
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], v);
+				v=opcodes.r8(pos++);
+				v|=opcodes.r8(pos++)<<4;
+				v|=opcodes.r8(pos++)<<8;
+				v|=opcodes.r8(pos++)<<12;
+				v|=opcodes.r8(pos++)<<16;
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], v);
 				break;
 			case ImmCload:
-				c=i=oprom[pos++] & 0xf;
+				c=i=opcodes.r8(pos++) & 0xf;
 				number[i+1]=0;
-				for (;i>=0; i--) number[i]=number_2_hex[oprom[pos++] & 0xf];
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], c+1, number);
+				for (;i>=0; i--) number[i]=number_2_hex[opcodes.r8(pos++) & 0xf];
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], c+1, number);
 				break;
 			case Dis3:
 				SATURN_PEEKOP_DIS12(v);
 				c=(pc+pos-3+v)&0xfffff;
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], c );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], c );
 				break;
 			case Dis3Call:
 				SATURN_PEEKOP_DIS12(v);
 				c=(pc+pos+v)&0xfffff;
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], c );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], c );
 				break;
 			case Dis4:
 				SATURN_PEEKOP_DIS16(v);
 				c=(pc+pos-4+v)&0xfffff;
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], c );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], c );
 				break;
 			case Dis4Call:
 				SATURN_PEEKOP_DIS16(v);
 				c=(pc+pos+v)&0xfffff;
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], c );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], c );
 				break;
 			case Abs:
 				SATURN_PEEKOP_ADR(v);
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], v );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], v );
 				break;
 			case BranchReturn:
 				SATURN_PEEKOP_DIS8(v);
 				if (v==0) {
-					stream << mnemonics[level->mnemonic+1].name[set];
+					stream << mnemonics[level->mnemonic+1][mnemonics_bank];
 				} else {
 					c=(pc+pos-2+v)&0xfffff;
-					util::stream_format(stream, mnemonics[level->mnemonic].name[set], c);
+					util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], c);
 				}
 				break;
 			case ABranchReturn:
 				SATURN_PEEKOP_DIS8(v);
 				if (v==0) {
-					util::stream_format(stream, mnemonics[level->mnemonic+1].name[set], A);
+					util::stream_format(stream, mnemonics[level->mnemonic+1][mnemonics_bank], A);
 				} else {
 					c=(pc+pos-2+v)&0xfffff;
-					util::stream_format(stream, mnemonics[level->mnemonic].name[set], A, c);
+					util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], A, c);
 				}
 				break;
 			case xBranchReturn:
 				SATURN_PEEKOP_DIS8(v);
 				if (v==0) {
-					util::stream_format(stream, mnemonics[level->mnemonic+1].name[set], field_2_string(adr));
+					util::stream_format(stream, mnemonics[level->mnemonic+1][mnemonics_bank], field_2_string(adr));
 				} else {
 					c=(pc+pos-2+v)&0xfffff;
-					util::stream_format(stream, mnemonics[level->mnemonic].name[set], field_2_string(adr), c);
+					util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], field_2_string(adr), c);
 				}
 				break;
 			case TestBranchRet:
-				i=oprom[pos++];
+				i=opcodes.r8(pos++);
 				SATURN_PEEKOP_DIS8(v);
 				if (v==0) {
-					util::stream_format(stream, mnemonics[level->mnemonic+1].name[set], i);
+					util::stream_format(stream, mnemonics[level->mnemonic+1][mnemonics_bank], i);
 				} else {
 					c=(pc+pos-2+v)&0xfffff;
-					util::stream_format(stream, mnemonics[level->mnemonic].name[set], i, c);
+					util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], i, c);
 				}
 				break;
 			case ImmBranch:
-				i=oprom[pos++];
+				i=opcodes.r8(pos++);
 				SATURN_PEEKOP_DIS8(v);
 				c=(pc+pos-2+v)&0xfffff;
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], i, c);
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], i, c);
 				break;
 			case FieldP:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], P );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], P );
 				break;
 			case FieldWP:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], WP );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], WP );
 				break;
 			case FieldXS:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], XS );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], XS );
 				break;
 			case FieldX:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], X );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], X );
 				break;
 			case FieldS:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], S );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], S );
 				break;
 			case FieldM:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], M );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], M );
 				break;
 			case FieldB:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], B );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], B );
 				break;
 			case FieldA:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], A );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], A );
 				break;
 			case FieldW:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], W );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], W );
 				break;
 			case AdrA:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], adr_a[oprom[pos++] & 0x7] );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], adr_a[opcodes.r8(pos++) & 0x7] );
 				break;
 			case AdrAF:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], adr_af[oprom[pos++] & 0xf] );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], adr_af[opcodes.r8(pos++) & 0xf] );
 				break;
 			case AdrB:
-				util::stream_format(stream, mnemonics[level->mnemonic].name[set], adr_b[oprom[pos++] & 0x7] );
+				util::stream_format(stream, mnemonics[level->mnemonic][mnemonics_bank], adr_b[opcodes.r8(pos++) & 0x7] );
 				break;
 			}
 			break;
 		}
-		level = opcodes[level->sel];
+		level = opcs[level->sel];
 	}
 
-	return pos;
+	return pos - pc;
 }

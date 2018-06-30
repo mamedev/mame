@@ -7,11 +7,13 @@
 
 #include "machine/pci.h"
 
-#define MCFG_GEFORCE_7600GS_ADD(_tag, _subdevice_id) \
-	MCFG_AGP_DEVICE_ADD(_tag, GEFORCE_7600GS, 0x10de02e1, 0xa1, _subdevice_id)
-
 class geforce_7600gs_device : public pci_device {
 public:
+	geforce_7600gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id)
+		: geforce_7600gs_device(mconfig, tag, owner, clock)
+	{
+		set_ids_agp(0x10de02e1, 0xa1, subdevice_id);
+	}
 	geforce_7600gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -19,9 +21,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map1, 32);
-	DECLARE_ADDRESS_MAP(map2, 32);
-	DECLARE_ADDRESS_MAP(map3, 32);
+	void map1(address_map &map);
+	void map2(address_map &map);
+	void map3(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(GEFORCE_7600GS, geforce_7600gs_device)

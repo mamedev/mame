@@ -2,23 +2,46 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /**********************************************************************************
 
-    General Processor Modello T
+General Processor Modello T
 
-    2012-12-10 Skeleton driver.
-    2013-09-27 Added keyboard and cursor.
+2012-12-10 Skeleton driver.
+2013-09-27 Added keyboard and cursor.
 
-    Made in Italy, a single board with numerous small daughter boards.
-    The 3 units (keyboard, disk drives, main unit) had wooden cabinets.
-    It had an inbuilt small green-screen CRT, like a Kaypro, and the RAM could
-    be 16, 32, or 48k. The FDC is a FD1791.
+Made in Italy, a single board with numerous small daughter boards.
+The 3 units (keyboard, disk drives, main unit) had wooden cabinets.
+It had an inbuilt small green-screen CRT, like a Kaypro, and the RAM could
+be 16, 32, or 48k. The FDC is a FD1791.
 
-    All the articles and doco (what there is of it) is all in Italian.
+All the articles and doco (what there is of it) is all in Italian.
+
+Doco found...
+
+Port 77 out (cassette control):
+- d0 = recording signal #1
+- d1 = relay #1 (0 = open)
+- d2 = recording signal #2
+- d3 = relay #2 (0 = open)
+
+Port 77 in:
+- d0 = free
+- d1 = playback signal
+- d2 = signal from the anti-glare circuit
+- d3 = same as d2
+
+Optional ports:
+- 3c to 3f (FDC)
+- 5c to 5f (PRT)
+- 6c to 6f (US2)
+- 78 to 7b (US1)
+It's not clear if these are meant to be 3881 PIOs connected to the devices, or for
+the devices themselves. An example shows a i8251 used as the US1 device.
 
 ***********************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -30,15 +53,19 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
-	{
-	}
+	{ }
 
+	void modellot(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port77_r);
 	DECLARE_READ8_MEMBER(portff_r);
 	void kbd_put(u8 data);
 	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-private:
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -46,19 +73,21 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, modellot_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xbfff) AM_RAM // 48k ram
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void modellot_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).ram(); // 48k ram
+	map(0xc000, 0xc3ff).ram().share("videoram");
+	map(0xe000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, modellot_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x77, 0x77) AM_READ(port77_r)
-	AM_RANGE(0xff, 0xff) AM_READ(portff_r)
-ADDRESS_MAP_END
+void modellot_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x77, 0x77).r(FUNC(modellot_state::port77_r));
+	map(0xff, 0xff).r(FUNC(modellot_state::portff_r));
+}
 
 
 /* Input ports */
@@ -100,7 +129,7 @@ const gfx_layout modellot_charlayout =
 	8*8             /* space between characters */
 };
 
-static GFXDECODE_START( modellot )
+static GFXDECODE_START( gfx_modellot )
 	GFXDECODE_ENTRY( "chargen", 0x0000, modellot_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -149,11 +178,11 @@ uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static MACHINE_CONFIG_START( modellot )
+MACHINE_CONFIG_START(modellot_state::modellot)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -164,7 +193,7 @@ static MACHINE_CONFIG_START( modellot )
 	MCFG_SCREEN_UPDATE_DRIVER(modellot_state, screen_update_modellot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", modellot )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_modellot)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
@@ -187,4 +216,4 @@ ROM_START( modellot )
 ROM_END
 
 /* Driver */
-COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, 0, "General Processor", "Modello T", MACHINE_IS_SKELETON )
+COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, empty_init, "General Processor", "Modello T", MACHINE_IS_SKELETON )

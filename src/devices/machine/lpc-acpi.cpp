@@ -5,37 +5,38 @@
 
 DEFINE_DEVICE_TYPE(LPC_ACPI, lpc_acpi_device, "lpc_acpi", "LPC ACPI")
 
-DEVICE_ADDRESS_MAP_START(map, 32, lpc_acpi_device)
-	AM_RANGE(0x00, 0x03) AM_READWRITE16(pm1_sts_r,        pm1_sts_w,        0x0000ffff)
-	AM_RANGE(0x00, 0x03) AM_READWRITE16(pm1_en_r,         pm1_en_w,         0xffff0000)
-	AM_RANGE(0x04, 0x07) AM_READWRITE  (pm1_cnt_r,        pm1_cnt_w)
-	AM_RANGE(0x08, 0x0b) AM_READ       (pm1_tmr_r)
-	AM_RANGE(0x10, 0x13) AM_READWRITE  (proc_cnt_r,       proc_cnt_w)
-	AM_RANGE(0x14, 0x17) AM_READ8      (lv2_r,                              0x000000ff)
-	AM_RANGE(0x28, 0x2b) AM_READWRITE  (gpe0_sts_r,       gpe0_sts_w)
-	AM_RANGE(0x2c, 0x2f) AM_READWRITE  (gpe0_en_r,        gpe0_en_w)
-	AM_RANGE(0x30, 0x33) AM_READWRITE  (smi_en_r,         smi_en_w)
-	AM_RANGE(0x34, 0x37) AM_READWRITE  (smi_sts_r,        smi_sts_w)
-	AM_RANGE(0x38, 0x3b) AM_READWRITE16(alt_gp_smi_en_r,  alt_gp_smi_en_w,  0x0000ffff)
-	AM_RANGE(0x38, 0x3b) AM_READWRITE16(alt_gp_smi_sts_r, alt_gp_smi_sts_w, 0xffff0000)
-	AM_RANGE(0x44, 0x47) AM_READWRITE16(devact_sts_r,     devact_sts_w,     0x0000ffff)
-	AM_RANGE(0x48, 0x4b) AM_READWRITE16(devtrap_en_r,     devtrap_en_w,     0x0000ffff)
-	AM_RANGE(0x4c, 0x4f) AM_READ16     (bus_addr_track_r,                   0x0000ffff)
-	AM_RANGE(0x4c, 0x4f) AM_READ8      (bus_cyc_track_r,                    0x00ff0000)
+void lpc_acpi_device::map(address_map &map)
+{
+	map(0x00, 0x01).rw(FUNC(lpc_acpi_device::pm1_sts_r), FUNC(lpc_acpi_device::pm1_sts_w));
+	map(0x02, 0x03).rw(FUNC(lpc_acpi_device::pm1_en_r), FUNC(lpc_acpi_device::pm1_en_w));
+	map(0x04, 0x07).rw(FUNC(lpc_acpi_device::pm1_cnt_r), FUNC(lpc_acpi_device::pm1_cnt_w));
+	map(0x08, 0x0b).r(FUNC(lpc_acpi_device::pm1_tmr_r));
+	map(0x10, 0x13).rw(FUNC(lpc_acpi_device::proc_cnt_r), FUNC(lpc_acpi_device::proc_cnt_w));
+	map(0x14, 0x14).r(FUNC(lpc_acpi_device::lv2_r));
+	map(0x28, 0x2b).rw(FUNC(lpc_acpi_device::gpe0_sts_r), FUNC(lpc_acpi_device::gpe0_sts_w));
+	map(0x2c, 0x2f).rw(FUNC(lpc_acpi_device::gpe0_en_r), FUNC(lpc_acpi_device::gpe0_en_w));
+	map(0x30, 0x33).rw(FUNC(lpc_acpi_device::smi_en_r), FUNC(lpc_acpi_device::smi_en_w));
+	map(0x34, 0x37).rw(FUNC(lpc_acpi_device::smi_sts_r), FUNC(lpc_acpi_device::smi_sts_w));
+	map(0x38, 0x39).rw(FUNC(lpc_acpi_device::alt_gp_smi_en_r), FUNC(lpc_acpi_device::alt_gp_smi_en_w));
+	map(0x3a, 0x3b).rw(FUNC(lpc_acpi_device::alt_gp_smi_sts_r), FUNC(lpc_acpi_device::alt_gp_smi_sts_w));
+	map(0x44, 0x45).rw(FUNC(lpc_acpi_device::devact_sts_r), FUNC(lpc_acpi_device::devact_sts_w));
+	map(0x48, 0x49).rw(FUNC(lpc_acpi_device::devtrap_en_r), FUNC(lpc_acpi_device::devtrap_en_w));
+	map(0x4c, 0x4d).r(FUNC(lpc_acpi_device::bus_addr_track_r));
+	map(0x4e, 0x4e).r(FUNC(lpc_acpi_device::bus_cyc_track_r));
 
-	AM_RANGE(0x60, 0x63) AM_READWRITE8 (tco_rld_r,        tco_rld_w,        0x000000ff)
-	AM_RANGE(0x60, 0x63) AM_READWRITE8 (tco_tmr_r,        tco_tmr_w,        0x0000ff00)
-	AM_RANGE(0x60, 0x63) AM_READWRITE8 (tco_dat_in_r,     tco_dat_in_w,     0x00ff0000)
-	AM_RANGE(0x60, 0x63) AM_READWRITE8 (tco_dat_out_r,    tco_dat_out_w,    0xff000000)
-	AM_RANGE(0x64, 0x67) AM_READWRITE16(tco1_sts_r,       tco1_sts_w,       0x0000ffff)
-	AM_RANGE(0x64, 0x67) AM_READWRITE16(tco2_sts_r,       tco2_sts_w,       0xffff0000)
-	AM_RANGE(0x68, 0x6b) AM_READWRITE16(tco1_cnt_r,       tco1_cnt_w,       0x0000ffff)
-	AM_RANGE(0x68, 0x6b) AM_READWRITE16(tco2_cnt_r,       tco2_cnt_w,       0xffff0000)
-	AM_RANGE(0x6c, 0x6f) AM_READWRITE8 (tco_message1_r,   tco_message1_w,   0x000000ff)
-	AM_RANGE(0x6c, 0x6f) AM_READWRITE8 (tco_message2_r,   tco_message2_w,   0x0000ff00)
-	AM_RANGE(0x6c, 0x6f) AM_READWRITE8 (tco_wdstatus_r,   tco_wdstatus_w,   0x00ff0000)
-	AM_RANGE(0x70, 0x73) AM_READWRITE8 (sw_irq_gen_r,     sw_irq_gen_w,     0x000000ff)
-ADDRESS_MAP_END
+	map(0x60, 0x60).rw(FUNC(lpc_acpi_device::tco_rld_r), FUNC(lpc_acpi_device::tco_rld_w));
+	map(0x61, 0x61).rw(FUNC(lpc_acpi_device::tco_tmr_r), FUNC(lpc_acpi_device::tco_tmr_w));
+	map(0x62, 0x62).rw(FUNC(lpc_acpi_device::tco_dat_in_r), FUNC(lpc_acpi_device::tco_dat_in_w));
+	map(0x63, 0x63).rw(FUNC(lpc_acpi_device::tco_dat_out_r), FUNC(lpc_acpi_device::tco_dat_out_w));
+	map(0x64, 0x65).rw(FUNC(lpc_acpi_device::tco1_sts_r), FUNC(lpc_acpi_device::tco1_sts_w));
+	map(0x66, 0x67).rw(FUNC(lpc_acpi_device::tco2_sts_r), FUNC(lpc_acpi_device::tco2_sts_w));
+	map(0x68, 0x69).rw(FUNC(lpc_acpi_device::tco1_cnt_r), FUNC(lpc_acpi_device::tco1_cnt_w));
+	map(0x6a, 0x6b).rw(FUNC(lpc_acpi_device::tco2_cnt_r), FUNC(lpc_acpi_device::tco2_cnt_w));
+	map(0x6c, 0x6c).rw(FUNC(lpc_acpi_device::tco_message1_r), FUNC(lpc_acpi_device::tco_message1_w));
+	map(0x6d, 0x6d).rw(FUNC(lpc_acpi_device::tco_message2_r), FUNC(lpc_acpi_device::tco_message2_w));
+	map(0x6e, 0x6e).rw(FUNC(lpc_acpi_device::tco_wdstatus_r), FUNC(lpc_acpi_device::tco_wdstatus_w));
+	map(0x70, 0x70).rw(FUNC(lpc_acpi_device::sw_irq_gen_r), FUNC(lpc_acpi_device::sw_irq_gen_w));
+}
 
 lpc_acpi_device::lpc_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: lpc_device(mconfig, LPC_ACPI, tag, owner, clock)

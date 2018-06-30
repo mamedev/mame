@@ -92,6 +92,7 @@ Notes:
 
 #include "sound/2203intf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -163,6 +164,13 @@ public:
 	bool m_mcu_pending;
 	bool m_mcu_written;
 	bool m_mcu_repeat;
+	void quizpun(machine_config &config);
+	void quizpun2(machine_config &config);
+	void quizpun2_cop_map(address_map &map);
+	void quizpun2_io_map(address_map &map);
+	void quizpun2_map(address_map &map);
+	void quizpun2_sound_io_map(address_map &map);
+	void quizpun2_sound_map(address_map &map);
 };
 
 /***************************************************************************
@@ -313,35 +321,38 @@ WRITE8_MEMBER(quizpun2_state::irq_ack)
 WRITE8_MEMBER(quizpun2_state::soundlatch_w)
 {
 	m_soundlatch->write(space, 0, data ^ 0x80);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8, quizpun2_state )
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank1")
+void quizpun2_state::quizpun2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
 
-	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE(fg_ram_w) AM_SHARE("fg_ram")
-	AM_RANGE( 0xc000, 0xcfff ) AM_RAM_WRITE(bg_ram_w) AM_SHARE("bg_ram")
+	map(0xa000, 0xbfff).ram().w(FUNC(quizpun2_state::fg_ram_w)).share("fg_ram");
+	map(0xc000, 0xcfff).ram().w(FUNC(quizpun2_state::bg_ram_w)).share("bg_ram");
 
-	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE( 0xe000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+	map(0xd000, 0xd3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xe000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( quizpun2_io_map, AS_IO, 8, quizpun2_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x40, 0x40 ) AM_WRITE(irq_ack)
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE(soundlatch_w)
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE(rombank_w)
-	AM_RANGE( 0x70, 0x70 ) AM_WRITE(scroll_w)
-	AM_RANGE( 0x80, 0x80 ) AM_READ_PORT( "DSW" )
-	AM_RANGE( 0x90, 0x90 ) AM_READ_PORT( "IN0" )
-	AM_RANGE( 0xa0, 0xa0 ) AM_READ_PORT( "IN1" )
-	AM_RANGE( 0xe0, 0xe0 ) AM_READWRITE(quizpun_protection_r, quizpun_protection_w)
-ADDRESS_MAP_END
+void quizpun2_state::quizpun2_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).w(FUNC(quizpun2_state::irq_ack));
+	map(0x50, 0x50).w(FUNC(quizpun2_state::soundlatch_w));
+	map(0x60, 0x60).w(FUNC(quizpun2_state::rombank_w));
+	map(0x70, 0x70).w(FUNC(quizpun2_state::scroll_w));
+	map(0x80, 0x80).portr("DSW");
+	map(0x90, 0x90).portr("IN0");
+	map(0xa0, 0xa0).portr("IN1");
+	map(0xe0, 0xe0).rw(FUNC(quizpun2_state::quizpun_protection_r), FUNC(quizpun2_state::quizpun_protection_w));
+}
 
-static ADDRESS_MAP_START( quizpun2_cop_map, AS_PROGRAM, 8, quizpun2_state )
-	AM_RANGE( 0x000, 0x3ff ) AM_ROM AM_REGION("cop", 0)
-ADDRESS_MAP_END
+void quizpun2_state::quizpun2_cop_map(address_map &map)
+{
+	map(0x000, 0x3ff).rom().region("cop", 0);
+}
 
 // quizpun
 
@@ -464,18 +475,20 @@ WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_c_w)
                             Memory Maps - Sound CPU
 ***************************************************************************/
 
-static ADDRESS_MAP_START( quizpun2_sound_map, AS_PROGRAM, 8, quizpun2_state )
-	AM_RANGE( 0x0000, 0xf7ff ) AM_ROM
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void quizpun2_state::quizpun2_sound_map(address_map &map)
+{
+	map(0x0000, 0xf7ff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( quizpun2_sound_io_map, AS_IO, 8, quizpun2_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITENOP  // IRQ end
-	AM_RANGE( 0x20, 0x20 ) AM_WRITENOP  // NMI end
-	AM_RANGE( 0x40, 0x40 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE( 0x60, 0x61 ) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-ADDRESS_MAP_END
+void quizpun2_state::quizpun2_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw();  // IRQ end
+	map(0x20, 0x20).nopw();  // NMI end
+	map(0x40, 0x40).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x60, 0x61).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 /***************************************************************************
                                 Input Ports
@@ -548,7 +561,7 @@ static const gfx_layout layout_16x16x1 =
 	16*16*1
 };
 
-static GFXDECODE_START( quizpun2 )
+static GFXDECODE_START( gfx_quizpun2 )
 	GFXDECODE_ENTRY( "bg",  0, layout_16x16x4,     0, 256/16 )
 	GFXDECODE_ENTRY( "fg",  0, layout_16x16x1, 0x100, 256/2  )
 	GFXDECODE_ENTRY( "fg2", 0, layout_16x16x1, 0x100, 256/2  )
@@ -558,32 +571,32 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( quizpun2 )
+MACHINE_CONFIG_START(quizpun2_state::quizpun2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2) // 4 MHz
-	MCFG_CPU_PROGRAM_MAP(quizpun2_map)
-	MCFG_CPU_IO_MAP(quizpun2_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizpun2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2) // 4 MHz
+	MCFG_DEVICE_PROGRAM_MAP(quizpun2_map)
+	MCFG_DEVICE_IO_MAP(quizpun2_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizpun2_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)    // 4 MHz
-	MCFG_CPU_PROGRAM_MAP(quizpun2_sound_map)
-	MCFG_CPU_IO_MAP(quizpun2_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizpun2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)    // 4 MHz
+	MCFG_DEVICE_PROGRAM_MAP(quizpun2_sound_map)
+	MCFG_DEVICE_IO_MAP(quizpun2_sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizpun2_state,  irq0_line_hold)
 	// NMI generated by main CPU
 
-	MCFG_CPU_ADD("cop", COP402, XTAL_8MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(quizpun2_cop_map)
+	MCFG_DEVICE_ADD("cop", COP402, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(quizpun2_cop_map)
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false)
-	MCFG_COP400_WRITE_D_CB(WRITE8(quizpun2_state, cop_d_w))
-	MCFG_COP400_WRITE_G_CB(WRITE8(quizpun2_state, cop_g_w))
-	MCFG_COP400_READ_L_CB(READ8(quizpun2_state, cop_l_r))
-	MCFG_COP400_WRITE_L_CB(WRITE8(quizpun2_state, cop_l_w))
-	MCFG_COP400_READ_IN_CB(READ8(quizpun2_state, cop_in_r))
-	MCFG_COP400_READ_SI_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read))
-	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
-	MCFG_COP400_WRITE_SK_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, quizpun2_state, cop_d_w))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, quizpun2_state, cop_g_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, quizpun2_state, cop_l_r))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, quizpun2_state, cop_l_w))
+	MCFG_COP400_READ_IN_CB(READ8(*this, quizpun2_state, cop_in_r))
+	MCFG_COP400_READ_SI_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -594,29 +607,30 @@ static MACHINE_CONFIG_START( quizpun2 )
 	MCFG_SCREEN_UPDATE_DRIVER(quizpun2_state, screen_update_quizpun2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizpun2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizpun2)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_8MHz / 2) // 4 MHz
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(8'000'000) / 2) // 4 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizpun, quizpun2 )
+MACHINE_CONFIG_START(quizpun2_state::quizpun)
+	quizpun2(config);
 	MCFG_DEVICE_REMOVE("cop")
 
-	MCFG_CPU_ADD("mcu", M68705P5, XTAL_4MHz) // xtal is 4MHz, divided by 4 internally
-	MCFG_M68705_PORTA_R_CB(READ8(quizpun2_state, quizpun_68705_port_a_r))
-	MCFG_M68705_PORTB_R_CB(READ8(quizpun2_state, quizpun_68705_port_b_r))
-	MCFG_M68705_PORTC_R_CB(READ8(quizpun2_state, quizpun_68705_port_c_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(quizpun2_state, quizpun_68705_port_a_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(quizpun2_state, quizpun_68705_port_b_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(quizpun2_state, quizpun_68705_port_c_w))
+	MCFG_DEVICE_ADD("mcu", M68705P5, XTAL(4'000'000)) // xtal is 4MHz, divided by 4 internally
+	MCFG_M68705_PORTA_R_CB(READ8(*this, quizpun2_state, quizpun_68705_port_a_r))
+	MCFG_M68705_PORTB_R_CB(READ8(*this, quizpun2_state, quizpun_68705_port_b_r))
+	MCFG_M68705_PORTC_R_CB(READ8(*this, quizpun2_state, quizpun_68705_port_c_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, quizpun2_state, quizpun_68705_port_a_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, quizpun2_state, quizpun_68705_port_b_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(*this, quizpun2_state, quizpun_68705_port_c_w))
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -696,5 +710,5 @@ ROM_START( quizpun )
 	ROM_LOAD( "93c46eeprom.bin", 0, 0x80, CRC(4d244cc8) SHA1(6593d5b7ac1ebb77fee4648ad1d3d9b59a25fdc8) BAD_DUMP ) // backup ram error
 ROM_END
 
-GAME( 1988, quizpun,  0, quizpun,  quizpun2, quizpun2_state, 0, ROT270, "Space Computer", "Quiz Punch",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, quizpun2, 0, quizpun2, quizpun2, quizpun2_state, 0, ROT270, "Space Computer", "Quiz Punch II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, quizpun,  0, quizpun,  quizpun2, quizpun2_state, empty_init, ROT270, "Space Computer", "Quiz Punch",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, quizpun2, 0, quizpun2, quizpun2, quizpun2_state, empty_init, ROT270, "Space Computer", "Quiz Punch II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

@@ -25,19 +25,20 @@
 
 	local cflags =
 	{
-		EnableSSE      = "-msse",
-		EnableSSE2     = "-msse2",
-		EnableAVX      = "-mavx",
-		EnableAVX2     = "-mavx2",
-		ExtraWarnings  = "-Wall -Wextra",
-		FatalWarnings  = "-Werror",
-		FloatFast      = "-ffast-math",
-		FloatStrict    = "-ffloat-store",
-		NoFramePointer = "-fomit-frame-pointer",
-		Optimize       = "-O2",
-		OptimizeSize   = "-Os",
-		OptimizeSpeed  = "-O3",
-		Symbols        = "-g",
+		EnableSSE        = "-msse",
+		EnableSSE2       = "-msse2",
+		EnableAVX        = "-mavx",
+		EnableAVX2       = "-mavx2",
+		PedanticWarnings = "-Wall -Wextra -pedantic",
+		ExtraWarnings    = "-Wall -Wextra",
+		FatalWarnings    = "-Werror",
+		FloatFast        = "-ffast-math",
+		FloatStrict      = "-ffloat-store",
+		NoFramePointer   = "-fomit-frame-pointer",
+		Optimize         = "-O2",
+		OptimizeSize     = "-Os",
+		OptimizeSpeed    = "-O3",
+		Symbols          = "-g",
 	}
 
 	local cxxflags =
@@ -45,6 +46,11 @@
 		NoExceptions   = "-fno-exceptions",
 		NoRTTI         = "-fno-rtti",
 		UnsignedChar   = "-funsigned-char",
+	}
+
+	local objcflags =
+	{
+		ObjcARC     = "-fobjc-arc",
 	}
 
 
@@ -137,6 +143,11 @@
 	function premake.gcc.getcxxflags(cfg)
 		local result = table.translate(cfg.flags, cxxflags)
 		return result
+	end
+
+
+	function premake.gcc.getobjcflags(cfg)
+		return table.translate(cfg.flags, objcflags)
 	end
 
 
@@ -236,6 +247,7 @@
 		local result = {}
 		for _, value in ipairs(premake.getlinks(cfg, "system", "fullpath")) do
 			if premake.gcc.islibfile(value) then
+				value = path.rebase(value, cfg.project.location, cfg.location)
 				table.insert(result, _MAKE.esc(value))
 			elseif path.getextension(value) == ".framework" then
 				table.insert(result, '-framework ' .. _MAKE.esc(path.getbasename(value)))
@@ -294,12 +306,10 @@
 	function premake.gcc.getdefines(defines)
 		local result = { }
 		for _,def in ipairs(defines) do
-			table.insert(result, '-D' .. def)
+			table.insert(result, "-D" .. def)
 		end
 		return result
 	end
-
-
 
 --
 -- Decorate include file search paths for the GCC command line.
@@ -308,7 +318,7 @@
 	function premake.gcc.getincludedirs(includedirs)
 		local result = { }
 		for _,dir in ipairs(includedirs) do
-			table.insert(result, "-I" .. _MAKE.esc(dir))
+			table.insert(result, "-I\"" .. dir .. "\"")
 		end
 		return result
 	end
@@ -320,7 +330,7 @@
 	function premake.gcc.getquoteincludedirs(includedirs)
 		local result = { }
 		for _,dir in ipairs(includedirs) do
-			table.insert(result, "-iquote " .. _MAKE.esc(dir))
+			table.insert(result, "-iquote \"" .. dir .. "\"")
 		end
 		return result
 	end

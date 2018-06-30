@@ -55,7 +55,7 @@ READ8_MEMBER(taito68705_mcu_device_base::data_r)
 {
 	// clear MCU semaphore flag and return data
 	u8 const result(m_mcu_latch);
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_mcu_flag = false;
 		m_semaphore_cb(CLEAR_LINE);
@@ -189,11 +189,11 @@ taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, devi
 {
 }
 
-MACHINE_CONFIG_MEMBER(taito68705_mcu_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
-	MCFG_M68705_PORTC_R_CB(READ8(taito68705_mcu_device, mcu_portc_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(taito68705_mcu_device, mcu_pa_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(taito68705_mcu_device, mcu_portb_w))
+MACHINE_CONFIG_START(taito68705_mcu_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
+	MCFG_M68705_PORTC_R_CB(READ8(*this, taito68705_mcu_device, mcu_portc_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, taito68705_mcu_device, mcu_pa_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, taito68705_mcu_device, mcu_portb_w))
 MACHINE_CONFIG_END
 
 void taito68705_mcu_device::device_start()
@@ -321,12 +321,12 @@ arkanoid_68705p3_device::arkanoid_68705p3_device(
 {
 }
 
-MACHINE_CONFIG_MEMBER(arkanoid_68705p3_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", M68705P3, DERIVED_CLOCK(1, 1))
-	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_68705p3_device, mcu_pb_r))
-	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_68705p3_device, mcu_pc_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_68705p3_device, mcu_pa_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(arkanoid_68705p3_device, mcu_pc_w))
+MACHINE_CONFIG_START(arkanoid_68705p3_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("mcu", M68705P3, DERIVED_CLOCK(1, 1))
+	MCFG_M68705_PORTB_R_CB(READ8(*this, arkanoid_68705p3_device, mcu_pb_r))
+	MCFG_M68705_PORTC_R_CB(READ8(*this, arkanoid_68705p3_device, mcu_pc_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, arkanoid_68705p3_device, mcu_pa_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(*this, arkanoid_68705p3_device, mcu_pc_w))
 MACHINE_CONFIG_END
 
 
@@ -339,10 +339,10 @@ arkanoid_68705p5_device::arkanoid_68705p5_device(
 {
 }
 
-MACHINE_CONFIG_MEMBER(arkanoid_68705p5_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
-	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_68705p5_device, mcu_pb_r))
-	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_68705p5_device, mcu_pc_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_68705p5_device, mcu_pa_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(arkanoid_68705p5_device, mcu_pc_w))
+MACHINE_CONFIG_START(arkanoid_68705p5_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
+	MCFG_M68705_PORTB_R_CB(READ8(*this, arkanoid_68705p5_device, mcu_pb_r))
+	MCFG_M68705_PORTC_R_CB(READ8(*this, arkanoid_68705p5_device, mcu_pc_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, arkanoid_68705p5_device, mcu_pa_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(*this, arkanoid_68705p5_device, mcu_pc_w))
 MACHINE_CONFIG_END

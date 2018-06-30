@@ -7,10 +7,14 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-#include "lc8670.h"
+#include "lc8670dsm.h"
 
-const lc8670_cpu_device::dasm_entry lc8670_cpu_device::s_dasm_table[] =
+u32 lc8670_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+const lc8670_disassembler::dasm_entry lc8670_disassembler::s_dasm_table[] =
 {
 	{ "NOP" ,   OP_NULL,   OP_NULL, 0 },        // 0x0*
 	{ "BR"  ,   OP_R8  ,   OP_NULL, 0 },
@@ -94,7 +98,7 @@ const lc8670_cpu_device::dasm_entry lc8670_cpu_device::s_dasm_table[] =
 	{ "SET1",   OP_D9B3,   OP_NULL, 0 },
 };
 
-void lc8670_cpu_device::dasm_arg(uint8_t op, char *buffer, offs_t pc, int arg, const uint8_t *oprom, int &pos)
+void lc8670_disassembler::dasm_arg(uint8_t op, char *buffer, offs_t pc, int arg, const data_buffer &opcodes, offs_t &pos)
 {
 	switch( arg )
 	{
@@ -105,71 +109,88 @@ void lc8670_cpu_device::dasm_arg(uint8_t op, char *buffer, offs_t pc, int arg, c
 			pc++;
 			// fall through
 		case OP_R8RI:
-			buffer += sprintf(buffer, "%04x", (pc + 1 + oprom[pos] - (oprom[pos]&0x80 ? 0x100 : 0)) & 0xffff);
+			buffer += sprintf(buffer, "%04x", (pc + 1 + opcodes.r8(pos) - (opcodes.r8(pos)&0x80 ? 0x100 : 0)) & 0xffff);
 			pos++;
 			break;
 		case OP_R16:
-			buffer += sprintf(buffer, "%04x", (pc + 2 + ((oprom[pos+1]<<8) | oprom[pos])) & 0xffff);
+			buffer += sprintf(buffer, "%04x", (pc + 2 + ((opcodes.r8(pos+1)<<8) | opcodes.r8(pos))) & 0xffff);
 			pos += 2;
 			break;
 		case OP_RI:
 			buffer += sprintf(buffer, "@%x", op & 0x03);
 			break;
 		case OP_A12:
-			buffer += sprintf(buffer, "%04x", ((pc + 2) & 0xf000) | ((op & 0x10)<<7) | ((op & 0x07)<<8) | oprom[pos]);
+			buffer += sprintf(buffer, "%04x", ((pc + 2) & 0xf000) | ((op & 0x10)<<7) | ((op & 0x07)<<8) | opcodes.r8(pos));
 			pos++;
 			break;
 		case OP_A16:
-			buffer += sprintf(buffer, "%04x", (oprom[pos]<<8) | oprom[pos+1]);
+			buffer += sprintf(buffer, "%04x", (opcodes.r8(pos)<<8) | opcodes.r8(pos+1));
 			pos += 2;
 			break;
 		case OP_I8:
-			buffer += sprintf(buffer, "#$%02x", oprom[pos++]);
+			buffer += sprintf(buffer, "#$%02x", opcodes.r8(pos++));
 			break;
 		case OP_B3:
 			buffer += sprintf(buffer, "%x", op & 0x07);
 			break;
 		case OP_D9:
-			buffer += sprintf(buffer, "($%03x)", ((op & 0x01)<<8) | oprom[pos]);
+			buffer += sprintf(buffer, "($%03x)", ((op & 0x01)<<8) | opcodes.r8(pos));
 			pos++;
 			break;
 		case OP_D9B3:
-			buffer += sprintf(buffer, "($%03x)", ((op & 0x10)<<4) | oprom[pos]);
+			buffer += sprintf(buffer, "($%03x)", ((op & 0x10)<<4) | opcodes.r8(pos));
 			buffer += sprintf(buffer, ",%x", op & 0x07);
 			pos++;
 			break;
 		case OP_RII8:
 			buffer += sprintf(buffer, "@%x", op & 0x03);
-			buffer += sprintf(buffer, ",#$%02x", oprom[pos]);
+			buffer += sprintf(buffer, ",#$%02x", opcodes.r8(pos));
 			pos++;
 			break;
 	}
 }
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t lc8670_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t lc8670_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	int pos = 0;
+	offs_t pos = pc;
 	char arg1[16], arg2[16];
 
-	uint8_t op = oprom[pos++];
+	uint8_t op = opcodes.r8(pos++);
 
-	int op_idx = decode_op(op);
+	int idx;
+	switch (op & 0x0f)
+	{
+		case 0: case 1:
+			idx =  op & 0x0f;
+			break;
+		case 2: case 3:
+			idx = 2;
+			break;
+		case 4: case 5: case 6: case 7:
+			idx = 3;
+			break;
+		default:
+			idx = 4;
+			break;
+	}
+
+	int op_idx = ((op>>4) & 0x0f) * 5 + idx;
 	const dasm_entry *inst = &s_dasm_table[op_idx];
 
 	util::stream_format(stream, "%-8s", inst->str);
 
-	dasm_arg(op, inst->inv ? arg2 : arg1, pc+0, inst->arg1, oprom, pos);
-	dasm_arg(op, inst->inv ? arg1 : arg2, pc+1, inst->arg2, oprom, pos);
+	dasm_arg(op, inst->inv ? arg2 : arg1, pc+0, inst->arg1, opcodes, pos);
+	dasm_arg(op, inst->inv ? arg1 : arg2, pc+1, inst->arg2, opcodes, pos);
 
 	stream << arg1;
 
 	if (inst->arg2 != OP_NULL)
 		stream << "," << arg2;
 
-	return pos;
+	return pos - pc;
 }

@@ -31,9 +31,6 @@ public:
 	// construction/destruction
 	c1551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( tpi0_r );
-	DECLARE_WRITE8_MEMBER( tpi0_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -62,6 +59,11 @@ private:
 	DECLARE_READ8_MEMBER( tpi1_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi1_pc_w );
 
+	DECLARE_READ8_MEMBER( tpi0_r );
+	DECLARE_WRITE8_MEMBER( tpi0_w );
+
+	void c1551_mem(address_map &map);
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	enum
@@ -80,6 +82,7 @@ private:
 	required_device<floppy_image_device> m_floppy;
 	required_device<plus4_expansion_slot_device> m_exp;
 	required_ioport m_jp1;
+	output_finder<2> m_leds;
 
 	// TCBM bus
 	uint8_t m_tcbm_data;                      // data
@@ -95,7 +98,6 @@ private:
 
 
 // device type definition
-extern const device_type C1551;
 DECLARE_DEVICE_TYPE(C1551, c1551_device)
 
 #endif // MAME_BUS_PLUS4_C1551_H

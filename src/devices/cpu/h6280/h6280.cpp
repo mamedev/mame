@@ -112,6 +112,7 @@
 
 #include "emu.h"
 #include "h6280.h"
+#include "6280dasm.h"
 #include "debugger.h"
 
 /* 6280 flags */
@@ -153,7 +154,7 @@ enum
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "HuC6280")
+DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "Hudson Soft HuC6280")
 
 //-------------------------------------------------
 //  h6280_device - constructor
@@ -268,7 +269,7 @@ void h6280_device::device_start()
 	save_item(NAME(m_io_buffer));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_icount = 0;
 
 	/* clear pending interrupts */
@@ -300,7 +301,7 @@ void h6280_device::device_reset()
 	m_io_buffer = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	/* set I and B flags */
@@ -2220,36 +2221,13 @@ void h6280_device::state_string_export(const device_state_entry &entry, std::str
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t h6280_device::disasm_min_opcode_bytes() const
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t h6280_device::disasm_max_opcode_bytes() const
-{
-	return 7;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t h6280_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> h6280_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( h6280 );
-	return CPU_DISASSEMBLE_NAME(h6280)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<h6280_disassembler>();
 }
 
 
@@ -2283,6 +2261,17 @@ uint32_t h6280_device::execute_max_cycles() const
 uint32_t h6280_device::execute_input_lines() const
 {
 	return 4;
+}
+
+
+//-------------------------------------------------
+//  execute_input_edge_triggered - return true if
+//  the input line has an asynchronous edge trigger
+//-------------------------------------------------
+
+bool h6280_device::execute_input_edge_triggered(int inputnum) const
+{
+	return inputnum == H6280_NMI_STATE;
 }
 
 
@@ -2397,7 +2386,7 @@ void h6280_device::pull(uint8_t &value)
  ***************************************************************/
 uint8_t h6280_device::read_opcode()
 {
-	return m_direct->read_byte(translated(PCW));
+	return m_cache->read_byte(translated(PCW));
 }
 
 /***************************************************************
@@ -2405,7 +2394,7 @@ uint8_t h6280_device::read_opcode()
  ***************************************************************/
 uint8_t h6280_device::read_opcode_arg()
 {
-	return m_direct->read_byte(translated(PCW));
+	return m_cache->read_byte(translated(PCW));
 }
 
 
@@ -2428,7 +2417,7 @@ void h6280_device::execute_run()
 	{
 		m_ppc = m_pc;
 
-		debugger_instruction_hook(this, PCW);
+		debugger_instruction_hook(PCW);
 
 		/* Execute 1 instruction */
 		in = read_opcode();

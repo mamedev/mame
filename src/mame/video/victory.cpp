@@ -15,7 +15,7 @@
 /* from what I can tell, this should be divided by 32, not 8  */
 /* but the interrupt test does some precise timing, and fails */
 /* if it's not 8 */
-#define VICTORY_MICRO_STATE_CLOCK   (XTAL_11_289MHz)
+#define VICTORY_MICRO_STATE_CLOCK   (XTAL(11'289'000))
 #define MICRO_STATE_CLOCK_PERIOD    attotime::from_hz(VICTORY_MICRO_STATE_CLOCK / 8)
 
 
@@ -52,9 +52,9 @@ void victory_state::video_start()
 
 	/* register for state saving */
 	save_item(NAME(m_paletteram));
-	save_pointer(NAME(m_rram.get()), 0x4000);
-	save_pointer(NAME(m_gram.get()), 0x4000);
-	save_pointer(NAME(m_bram.get()), 0x4000);
+	save_pointer(NAME(m_rram), 0x4000);
+	save_pointer(NAME(m_gram), 0x4000);
+	save_pointer(NAME(m_bram), 0x4000);
 	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_fgcoll));
 	save_item(NAME(m_fgcollx));
@@ -144,7 +144,7 @@ READ8_MEMBER(victory_state::video_control_r)
 	{
 		case 0x00:  /* 5XFIQ */
 			result = m_fgcollx;
-			if (LOG_COLLISION) logerror("%04X:5XFIQ read = %02X\n", space.device().safe_pcbase(), result);
+			if (LOG_COLLISION) logerror("%04X:5XFIQ read = %02X\n", m_maincpu->pcbase(), result);
 			return result;
 
 		case 0x01:  /* 5CLFIQ */
@@ -154,12 +154,12 @@ READ8_MEMBER(victory_state::video_control_r)
 				m_fgcoll = 0;
 				update_irq();
 			}
-			if (LOG_COLLISION) logerror("%04X:5CLFIQ read = %02X\n", space.device().safe_pcbase(), result);
+			if (LOG_COLLISION) logerror("%04X:5CLFIQ read = %02X\n", m_maincpu->pcbase(), result);
 			return result;
 
 		case 0x02:  /* 5BACKX */
 			result = m_bgcollx & 0xfc;
-			if (LOG_COLLISION) logerror("%04X:5BACKX read = %02X\n", space.device().safe_pcbase(), result);
+			if (LOG_COLLISION) logerror("%04X:5BACKX read = %02X\n", m_maincpu->pcbase(), result);
 			return result;
 
 		case 0x03:  /* 5BACKY */
@@ -169,7 +169,7 @@ READ8_MEMBER(victory_state::video_control_r)
 				m_bgcoll = 0;
 				update_irq();
 			}
-			if (LOG_COLLISION) logerror("%04X:5BACKY read = %02X\n", space.device().safe_pcbase(), result);
+			if (LOG_COLLISION) logerror("%04X:5BACKY read = %02X\n", m_maincpu->pcbase(), result);
 			return result;
 
 		case 0x04:  /* 5STAT */
@@ -184,11 +184,11 @@ READ8_MEMBER(victory_state::video_control_r)
 			result |= (~m_vblank_irq & 1) << 5;
 			result |= (~m_bgcoll & 1) << 4;
 			result |= (m_screen->vpos() & 0x100) >> 5;
-			if (LOG_COLLISION) logerror("%04X:5STAT read = %02X\n", space.device().safe_pcbase(), result);
+			if (LOG_COLLISION) logerror("%04X:5STAT read = %02X\n", m_maincpu->pcbase(), result);
 			return result;
 
 		default:
-			logerror("%04X:video_control_r(%02X)\n", space.device().safe_pcbase(), offset);
+			logerror("%04X:video_control_r(%02X)\n", m_maincpu->pcbase(), offset);
 			break;
 	}
 	return 0;
@@ -208,12 +208,12 @@ WRITE8_MEMBER(victory_state::video_control_w)
 	switch (offset)
 	{
 		case 0x00:  /* LOAD IL */
-			if (LOG_MICROCODE) logerror("%04X:IL=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:IL=%02X\n", m_maincpu->pcbase(), data);
 			micro.i = (micro.i & 0xff00) | (data & 0x00ff);
 			break;
 
 		case 0x01:  /* LOAD IH */
-			if (LOG_MICROCODE) logerror("%04X:IH=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:IH=%02X\n", m_maincpu->pcbase(), data);
 			micro.i = (micro.i & 0x00ff) | ((data << 8) & 0xff00);
 			if (micro.cmdlo == 5)
 			{
@@ -223,7 +223,7 @@ WRITE8_MEMBER(victory_state::video_control_w)
 			break;
 
 		case 0x02:  /* LOAD CMD */
-			if (LOG_MICROCODE) logerror("%04X:CMD=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:CMD=%02X\n", m_maincpu->pcbase(), data);
 			micro.cmd = data;
 			micro.cmdlo = data & 7;
 			if (micro.cmdlo == 0)
@@ -238,12 +238,12 @@ WRITE8_MEMBER(victory_state::video_control_w)
 			break;
 
 		case 0x03:  /* LOAD G */
-			if (LOG_MICROCODE) logerror("%04X:G=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:G=%02X\n", m_maincpu->pcbase(), data);
 			micro.g = data;
 			break;
 
 		case 0x04:  /* LOAD X */
-			if (LOG_MICROCODE) logerror("%04X:X=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:X=%02X\n", m_maincpu->pcbase(), data);
 			micro.xp = data;
 			if (micro.cmdlo == 3)
 			{
@@ -253,7 +253,7 @@ WRITE8_MEMBER(victory_state::video_control_w)
 			break;
 
 		case 0x05:  /* LOAD Y */
-			if (LOG_MICROCODE) logerror("%04X:Y=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:Y=%02X\n", m_maincpu->pcbase(), data);
 			micro.yp = data;
 			if (micro.cmdlo == 4)
 			{
@@ -263,12 +263,12 @@ WRITE8_MEMBER(victory_state::video_control_w)
 			break;
 
 		case 0x06:  /* LOAD R */
-			if (LOG_MICROCODE) logerror("%04X:R=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:R=%02X\n", m_maincpu->pcbase(), data);
 			micro.r = data;
 			break;
 
 		case 0x07:  /* LOAD B */
-			if (LOG_MICROCODE) logerror("%04X:B=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:B=%02X\n", m_maincpu->pcbase(), data);
 			micro.b = data;
 			if (micro.cmdlo == 2)
 			{
@@ -283,12 +283,12 @@ WRITE8_MEMBER(victory_state::video_control_w)
 			break;
 
 		case 0x08:  /* SCROLLX */
-			if (LOG_MICROCODE) logerror("%04X:SCROLLX write = %02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:SCROLLX write = %02X\n", m_maincpu->pcbase(), data);
 			m_scrollx = data;
 			break;
 
 		case 0x09:  /* SCROLLY */
-			if (LOG_MICROCODE) logerror("%04X:SCROLLY write = %02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:SCROLLY write = %02X\n", m_maincpu->pcbase(), data);
 			m_scrolly = data;
 			break;
 
@@ -300,18 +300,18 @@ WRITE8_MEMBER(victory_state::video_control_w)
 			// D3 = SINVERT
 			// D2 = BIR12
 			// D1 = SELOVER
-			if (LOG_MICROCODE) logerror("%04X:CONTROL write = %02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:CONTROL write = %02X\n", m_maincpu->pcbase(), data);
 			m_video_control = data;
 			break;
 
 		case 0x0b:  /* CLRVIRQ */
-			if (LOG_MICROCODE) logerror("%04X:CLRVIRQ write = %02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:CLRVIRQ write = %02X\n", m_maincpu->pcbase(), data);
 			m_vblank_irq = 0;
 			update_irq();
 			break;
 
 		default:
-			if (LOG_MICROCODE) logerror("%04X:video_control_w(%02X) = %02X\n", space.device().safe_pcbase(), offset, data);
+			if (LOG_MICROCODE) logerror("%04X:video_control_w(%02X) = %02X\n", m_maincpu->pcbase(), offset, data);
 			break;
 	}
 }
@@ -511,24 +511,25 @@ Registers:
  *
  *************************************/
 
-static inline void count_states(struct micro_t &micro, int states)
+inline void victory_state::micro_t::count_states(int states)
 {
-	attotime state_time = MICRO_STATE_CLOCK_PERIOD * states;
+	attotime const state_time = MICRO_STATE_CLOCK_PERIOD * states;
 
-	if (!micro.timer)
+	if (!timer)
 	{
-		micro.timer->adjust(attotime::never);
-		micro.timer_active = 1;
-		micro.endtime = state_time;
+		// FIXME: how is dereferencing the timer when it's null supposed to be a good idea?
+		timer->adjust(attotime::never);
+		timer_active = 1;
+		endtime = state_time;
 	}
-	else if (micro.timer->elapsed() > micro.endtime)
+	else if (timer->elapsed() > endtime)
 	{
-		micro.timer->adjust(attotime::never);
-		micro.timer_active = 1;
-		micro.endtime = state_time;
+		timer->adjust(attotime::never);
+		timer_active = 1;
+		endtime = state_time;
 	}
 	else
-		micro.endtime += state_time;
+		endtime += state_time;
 }
 
 
@@ -560,7 +561,7 @@ int victory_state::command2()
 	if (micro.cmd & 0x40)
 		m_rram[addr] = micro.r;
 
-	count_states(micro, 3);
+	micro.count_states(3);
 	return 0;
 }
 
@@ -667,7 +668,7 @@ int victory_state::command3()
 		}
 	}
 
-	count_states(micro, 3 + (2 + 2 * ycount) * xcount);
+	micro.count_states(3 + (2 + 2 * ycount) * xcount);
 
 	return micro.cmd & 0x80;
 }
@@ -704,7 +705,7 @@ int victory_state::command4()
 
 	if (LOG_MICROCODE) logerror("================= EXECUTE BEGIN\n");
 
-	count_states(micro, 4);
+	micro.count_states(4);
 
 	micro.pc = micro.yp << 1;
 	do
@@ -869,7 +870,7 @@ int victory_state::command5()
 
 	micro.xp = x;
 
-	count_states(micro, 3 + 2 * (0x100 - (micro.i & 0xff)));
+	micro.count_states(3 + 2 * (0x100 - (micro.i & 0xff)));
 
 	return micro.cmd & 0x80;
 }
@@ -919,7 +920,7 @@ int victory_state::command6()
 			m_rram[daddr] = m_rram[saddr];
 	}
 
-	count_states(micro, 3 + 2 * (64 - (micro.r & 31) * 2));
+	micro.count_states(3 + 2 * (64 - (micro.r & 31) * 2));
 
 	return micro.cmd & 0x80;
 }
@@ -999,7 +1000,7 @@ int victory_state::command7()
 		if (m_fgcoll) update_irq();
 	}
 
-	count_states(micro, 4);
+	micro.count_states(4);
 
 	return micro.cmd & 0x80;
 }

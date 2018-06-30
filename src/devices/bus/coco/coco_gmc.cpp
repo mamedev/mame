@@ -17,6 +17,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "coco_gmc.h"
+
 #include "coco_pak.h"
 #include "sound/sn76496.h"
 #include "speaker.h"
@@ -49,9 +51,9 @@ namespace
 };
 
 
-MACHINE_CONFIG_MEMBER(coco_pak_gmc_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("gmc_speaker")
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_4MHz)
+MACHINE_CONFIG_START(coco_pak_gmc_device::device_add_mconfig)
+	SPEAKER(config, "gmc_speaker").front_center();
+	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, 4_MHz_XTAL)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "gmc_speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -60,15 +62,15 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(COCO_PAK_GMC, coco_pak_gmc_device, "cocopakgmc", "CoCo Games Master Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_GMC, device_cococart_interface, coco_pak_gmc_device, "cocopakgmc", "CoCo Games Master Cartridge")
 
 //-------------------------------------------------
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
 coco_pak_gmc_device::coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: coco_pak_banked_device(mconfig, COCO_PAK_GMC, tag, owner, clock),
-		m_psg(*this, SN76489AN_TAG)
+	: coco_pak_banked_device(mconfig, COCO_PAK_GMC, tag, owner, clock)
+	, m_psg(*this, SN76489AN_TAG)
 {
 }
 

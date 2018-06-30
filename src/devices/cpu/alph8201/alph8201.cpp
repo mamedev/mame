@@ -163,7 +163,7 @@ Timming
 #include "emu.h"
 #include "alph8201.h"
 #include "debugger.h"
-
+#include "8201dasm.h"
 
 DEFINE_DEVICE_TYPE(ALPHA8201L, alpha8201_cpu_device, "alpha8201l", "ALPHA-8201L")
 DEFINE_DEVICE_TYPE(ALPHA8301L, alpha8301_cpu_device, "alpha8301l", "ALPHA-8301L")
@@ -394,7 +394,7 @@ const alpha8201_cpu_device::s_opcode alpha8201_cpu_device::opcode_8301[256]=
 void alpha8201_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 
 	state_add( ALPHA8201_PC, "PC", m_pc.w.l ).callimport().mask(0x3ff).formatstr("%03X");
 	state_add( ALPHA8201_SP, "SP", m_sp ).callimport().callexport().formatstr("%02X");
@@ -440,7 +440,7 @@ void alpha8201_cpu_device::device_start()
 	save_item(NAME(m_savec));
 	save_item(NAME(m_savez));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -665,7 +665,7 @@ osd_printf_debug("alpha8201 START ENTRY=%02X PC=%03X\n",pcptr,m_pc.w.l);
 
 		/* run */
 		m_PREVPC = m_pc.w.l;
-		debugger_instruction_hook(this, m_pc.w.l);
+		debugger_instruction_hook(m_pc.w.l);
 		opcode =M_RDOP(m_pc.w.l);
 #if TRACE_PC
 osd_printf_debug("alpha8201:  PC = %03x,  opcode = %02x\n", m_pc.w.l, opcode);
@@ -690,9 +690,7 @@ void alpha8201_cpu_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-
-offs_t alpha8201_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+std::unique_ptr<util::disasm_interface> alpha8201_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( alpha8201 );
-	return CPU_DISASSEMBLE_NAME(alpha8201)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<alpha8201_disassembler>();
 }

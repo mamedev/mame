@@ -46,12 +46,12 @@
 
 // Platform
 #define BX_PLATFORM_ANDROID    0
-#define BX_PLATFORM_EMSCRIPTEN 0
 #define BX_PLATFORM_BSD        0
+#define BX_PLATFORM_EMSCRIPTEN 0
 #define BX_PLATFORM_HURD       0
 #define BX_PLATFORM_IOS        0
 #define BX_PLATFORM_LINUX      0
-#define BX_PLATFORM_NACL       0
+#define BX_PLATFORM_NX         0
 #define BX_PLATFORM_OSX        0
 #define BX_PLATFORM_PS4        0
 #define BX_PLATFORM_QNX        0
@@ -59,7 +59,6 @@
 #define BX_PLATFORM_STEAMLINK  0
 #define BX_PLATFORM_WINDOWS    0
 #define BX_PLATFORM_WINRT      0
-#define BX_PLATFORM_XBOX360    0
 #define BX_PLATFORM_XBOXONE    0
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Compilers
@@ -143,10 +142,7 @@
 #endif // BX_PLATFORM_
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Operating_Systems
-#if defined(_XBOX_VER)
-#	undef  BX_PLATFORM_XBOX360
-#	define BX_PLATFORM_XBOX360 1
-#elif defined(_DURANGO) || defined(_XBOX_ONE)
+#if defined(_DURANGO) || defined(_XBOX_ONE)
 #	undef  BX_PLATFORM_XBOXONE
 #	define BX_PLATFORM_XBOXONE 1
 #elif defined(_WIN32) || defined(_WIN64)
@@ -181,11 +177,6 @@
 #	include <sys/cdefs.h> // Defines __BIONIC__ and includes android/api-level.h
 #	undef  BX_PLATFORM_ANDROID
 #	define BX_PLATFORM_ANDROID __ANDROID_API__
-#elif defined(__native_client__)
-// NaCl compiler defines __linux__
-#	include <ppapi/c/pp_macros.h>
-#	undef  BX_PLATFORM_NACL
-#	define BX_PLATFORM_NACL PPAPI_RELEASE
 #elif defined(__STEAMLINK__)
 // SteamLink compiler defines __linux__
 #	undef  BX_PLATFORM_STEAMLINK
@@ -223,6 +214,9 @@
 #elif defined(__GNU__)
 #	undef  BX_PLATFORM_HURD
 #	define BX_PLATFORM_HURD 1
+#elif defined(__NX__)
+# undef BX_PLATFORM_NX
+# define BX_PLATFORM_NX 1
 #endif //
 
 #if !BX_CRT_NONE
@@ -258,27 +252,27 @@
 
 #define BX_PLATFORM_POSIX (0      \
 		|| BX_PLATFORM_ANDROID    \
-		|| BX_PLATFORM_EMSCRIPTEN \
 		|| BX_PLATFORM_BSD        \
+		|| BX_PLATFORM_EMSCRIPTEN \
 		|| BX_PLATFORM_HURD       \
 		|| BX_PLATFORM_IOS        \
 		|| BX_PLATFORM_LINUX      \
-		|| BX_PLATFORM_NACL       \
+		|| BX_PLATFORM_NX         \
 		|| BX_PLATFORM_OSX        \
-		|| BX_PLATFORM_QNX        \
-		|| BX_PLATFORM_STEAMLINK  \
 		|| BX_PLATFORM_PS4        \
+		|| BX_PLATFORM_QNX        \
 		|| BX_PLATFORM_RPI        \
+		|| BX_PLATFORM_STEAMLINK  \
 		)
 
 #define BX_PLATFORM_NONE !(0      \
 		|| BX_PLATFORM_ANDROID    \
-		|| BX_PLATFORM_EMSCRIPTEN \
 		|| BX_PLATFORM_BSD        \
+		|| BX_PLATFORM_EMSCRIPTEN \
 		|| BX_PLATFORM_HURD       \
 		|| BX_PLATFORM_IOS        \
 		|| BX_PLATFORM_LINUX      \
-		|| BX_PLATFORM_NACL       \
+		|| BX_PLATFORM_NX         \
 		|| BX_PLATFORM_OSX        \
 		|| BX_PLATFORM_PS4        \
 		|| BX_PLATFORM_QNX        \
@@ -286,7 +280,6 @@
 		|| BX_PLATFORM_STEAMLINK  \
 		|| BX_PLATFORM_WINDOWS    \
 		|| BX_PLATFORM_WINRT      \
-		|| BX_PLATFORM_XBOX360    \
 		|| BX_PLATFORM_XBOXONE    \
 		)
 
@@ -321,22 +314,23 @@
 #if BX_PLATFORM_ANDROID
 #	define BX_PLATFORM_NAME "Android " \
 				BX_STRINGIZE(BX_PLATFORM_ANDROID)
+#elif BX_PLATFORM_BSD
+#	define BX_PLATFORM_NAME "BSD"
 #elif BX_PLATFORM_EMSCRIPTEN
 #	define BX_PLATFORM_NAME "asm.js " \
 				BX_STRINGIZE(__EMSCRIPTEN_major__) "." \
 				BX_STRINGIZE(__EMSCRIPTEN_minor__) "." \
 				BX_STRINGIZE(__EMSCRIPTEN_tiny__)
-#elif BX_PLATFORM_BSD
-#	define BX_PLATFORM_NAME "BSD"
 #elif BX_PLATFORM_HURD
 #	define BX_PLATFORM_NAME "Hurd"
 #elif BX_PLATFORM_IOS
 #	define BX_PLATFORM_NAME "iOS"
 #elif BX_PLATFORM_LINUX
 #	define BX_PLATFORM_NAME "Linux"
-#elif BX_PLATFORM_NACL
-#	define BX_PLATFORM_NAME "NaCl " \
-				BX_STRINGIZE(BX_PLATFORM_NACL)
+#elif BX_PLATFORM_NONE
+#	define BX_PLATFORM_NAME "None"
+#elif BX_PLATFORM_NX
+#	define BX_PLATFORM_NAME "NX"
 #elif BX_PLATFORM_OSX
 #	define BX_PLATFORM_NAME "OSX"
 #elif BX_PLATFORM_PS4
@@ -351,12 +345,8 @@
 #	define BX_PLATFORM_NAME "Windows"
 #elif BX_PLATFORM_WINRT
 #	define BX_PLATFORM_NAME "WinRT"
-#elif BX_PLATFORM_XBOX360
-#	define BX_PLATFORM_NAME "Xbox 360"
 #elif BX_PLATFORM_XBOXONE
 #	define BX_PLATFORM_NAME "Xbox One"
-#elif BX_PLATFORM_NONE
-#	define BX_PLATFORM_NAME "None"
 #else
 #	error "Unknown BX_PLATFORM!"
 #endif // BX_PLATFORM_

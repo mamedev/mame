@@ -15,13 +15,18 @@
 
 
 
-class dmg_ppu_device :  public device_t,
-						public device_video_interface
+class dmg_ppu_device :  public device_t, public device_video_interface
 {
 public:
+	template <typename T>
+	dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: dmg_ppu_device(mconfig, tag, owner, u32(0))
+	{
+		set_lr35902_tag(std::forward<T>(cpu_tag));
+	}
 	dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_lr35902_tag(device_t &device, const char *tag) { downcast<dmg_ppu_device &>(device).m_lr35902.set_tag(tag); }
+	template <typename T> void set_lr35902_tag(T &&tag) { m_lr35902.set_tag(std::forward<T>(tag)); }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -231,6 +236,12 @@ private:
 class mgb_ppu_device : public dmg_ppu_device
 {
 public:
+	template <typename T>
+	mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: mgb_ppu_device(mconfig, tag, owner, u32(0))
+	{
+		set_lr35902_tag(std::forward<T>(cpu_tag));
+	}
 	mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -243,6 +254,12 @@ protected:
 class sgb_ppu_device : public dmg_ppu_device
 {
 public:
+	template <typename T>
+	sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: sgb_ppu_device(mconfig, tag, owner, u32(0))
+	{
+		set_lr35902_tag(std::forward<T>(cpu_tag));
+	}
 	sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void sgb_io_write_pal(int offs, uint8_t *data);
@@ -264,6 +281,12 @@ protected:
 class cgb_ppu_device : public dmg_ppu_device
 {
 public:
+	template <typename T>
+	cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: cgb_ppu_device(mconfig, tag, owner, u32(0))
+	{
+		set_lr35902_tag(std::forward<T>(cpu_tag));
+	}
 	cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER(video_r) override;
@@ -291,23 +314,5 @@ DECLARE_DEVICE_TYPE(DMG_PPU, dmg_ppu_device)
 DECLARE_DEVICE_TYPE(MGB_PPU, mgb_ppu_device)
 DECLARE_DEVICE_TYPE(SGB_PPU, sgb_ppu_device)
 DECLARE_DEVICE_TYPE(CGB_PPU, cgb_ppu_device)
-
-
-#define MCFG_DMG_PPU_ADD(_tag, _cpu_tag ) \
-		MCFG_DEVICE_ADD( _tag, DMG_PPU, 0 ) \
-		dmg_ppu_device::static_set_lr35902_tag(*device, "^" _cpu_tag);
-
-#define MCFG_MGB_PPU_ADD(_tag, _cpu_tag ) \
-		MCFG_DEVICE_ADD( _tag, MGB_PPU, 0 ) \
-		dmg_ppu_device::static_set_lr35902_tag(*device, "^" _cpu_tag);
-
-#define MCFG_SGB_PPU_ADD(_tag, _cpu_tag ) \
-		MCFG_DEVICE_ADD( _tag, SGB_PPU, 0 ) \
-		dmg_ppu_device::static_set_lr35902_tag(*device, "^" _cpu_tag);
-
-#define MCFG_CGB_PPU_ADD(_tag, _cpu_tag ) \
-		MCFG_DEVICE_ADD( _tag, CGB_PPU, 0 ) \
-		dmg_ppu_device::static_set_lr35902_tag(*device, "^" _cpu_tag);
-
 
 #endif // MAME_VIDEO_GB_LCD_H

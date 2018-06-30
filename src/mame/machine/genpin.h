@@ -32,9 +32,6 @@ const char *const genpin_sample_names[] =
 	nullptr   /* end of array */
 };
 
-MACHINE_CONFIG_EXTERN( genpin_audio );
-
-
 class genpin_class : public driver_device
 {
 public:
@@ -44,6 +41,8 @@ public:
 	{ }
 
 	required_device<samples_device> m_samples;
+
+	void genpin_audio(machine_config &config);
 };
 
 

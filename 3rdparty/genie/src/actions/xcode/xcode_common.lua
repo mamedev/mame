@@ -654,16 +654,13 @@
 		local wrapperWritten = false
 
 		local function doblock(id, name, which)
-			-- start with the project-level commands (most common)
-			local prjcmds = tr.project[which]
-			local commands = table.join(prjcmds, {})
-
-			-- see if there are any config-specific commands to add
+			-- see if there are any commands to add for each config
+			local commands = {}
 			for _, cfg in ipairs(tr.configs) do
 				local cfgcmds = cfg[which]
-				if #cfgcmds > #prjcmds then
+				if #cfgcmds > 0 then
 					table.insert(commands, 'if [ "${CONFIGURATION}" = "' .. xcode.getconfigname(cfg) .. '" ]; then')
-					for i = #prjcmds + 1, #cfgcmds do
+					for i = 1, #cfgcmds do
 						local cmd = cfgcmds[i]
 						cmd = cmd:gsub('\\','\\\\')
 						table.insert(commands, cmd)
@@ -790,6 +787,10 @@
 			local ext = cfg.targetextension
 			ext = iif(ext:startswith("."), ext:sub(2), ext)
 			_p(4,'EXECUTABLE_EXTENSION = %s;', ext)
+		end
+
+		if cfg.flags.ObjcARC then
+			_p(4,'CLANG_ENABLE_OBJC_ARC = YES;')
 		end
 
 		local outdir = path.getdirectory(cfg.buildtarget.bundlepath)
@@ -1035,7 +1036,9 @@
 			_p(4,'SYMROOT = "%s";', targetdir)
 		end
 
-		if cfg.flags.ExtraWarnings then
+		if cfg.flags.PedanticWarnings
+		or cfg.flags.ExtraWarnings
+		then
 			_p(4,'WARNING_CFLAGS = "-Wall";')
 		end
 

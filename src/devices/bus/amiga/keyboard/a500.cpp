@@ -34,24 +34,25 @@ DEFINE_DEVICE_TYPE_NS(A500_KBD_GB, bus::amiga::keyboard, a500_kbd_gb_device, "a5
 
 namespace bus { namespace amiga { namespace keyboard {
 
-namespace {
+void a500_kbd_device::mpu6500_map(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x000, 0x03f).ram();
+	map(0x080, 0x080).rw(FUNC(a500_kbd_device::port_a_r), FUNC(a500_kbd_device::port_a_w));
+	map(0x081, 0x081).portr("special").w(FUNC(a500_kbd_device::port_b_w));
+	map(0x082, 0x082).w(FUNC(a500_kbd_device::port_c_w));
+	map(0x083, 0x083).w(FUNC(a500_kbd_device::port_d_w));
+	map(0x084, 0x085).w(FUNC(a500_kbd_device::latch_w));
+	map(0x086, 0x087).r(FUNC(a500_kbd_device::counter_r));
+	map(0x088, 0x088).w(FUNC(a500_kbd_device::transfer_latch_w));
+	map(0x089, 0x089).w(FUNC(a500_kbd_device::clear_pa0_detect));
+	map(0x08a, 0x08a).w(FUNC(a500_kbd_device::clear_pa1_detect));
+	map(0x08f, 0x08f).rw(FUNC(a500_kbd_device::control_r), FUNC(a500_kbd_device::control_w));
+	map(0x090, 0x0ff).noprw();
+	map(0x800, 0xfff).rom().region("ic1", 0);
+}
 
-ADDRESS_MAP_START( mpu6500_map, AS_PROGRAM, 8, a500_kbd_device )
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x000, 0x03f) AM_RAM
-	AM_RANGE(0x080, 0x080) AM_READWRITE(port_a_r, port_a_w)
-	AM_RANGE(0x081, 0x081) AM_READ_PORT("special") AM_WRITE(port_b_w)
-	AM_RANGE(0x082, 0x082) AM_WRITE(port_c_w)
-	AM_RANGE(0x083, 0x083) AM_WRITE(port_d_w)
-	AM_RANGE(0x084, 0x085) AM_WRITE(latch_w)
-	AM_RANGE(0x086, 0x087) AM_READ(counter_r)
-	AM_RANGE(0x088, 0x088) AM_WRITE(transfer_latch_w)
-	AM_RANGE(0x089, 0x089) AM_WRITE(clear_pa0_detect)
-	AM_RANGE(0x08a, 0x08a) AM_WRITE(clear_pa1_detect)
-	AM_RANGE(0x08f, 0x08f) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0x090, 0x0ff) AM_NOP
-	AM_RANGE(0x800, 0xfff) AM_ROM AM_REGION("ic1", 0)
-ADDRESS_MAP_END
+namespace {
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -136,9 +137,9 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_MEMBER(a500_kbd_device::device_add_mconfig)
-	MCFG_CPU_ADD("ic1", M6502, XTAL_3MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(mpu6500_map)
+MACHINE_CONFIG_START(a500_kbd_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("ic1", M6502, XTAL(3'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mpu6500_map)
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *a500_kbd_device::device_rom_region() const
@@ -279,7 +280,7 @@ void a500_kbd_device::device_reset()
 	m_counter = 0xffff; // not initialized by hardware
 	m_control = 0x00;
 
-	m_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_3MHz / 2));
+	m_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL(3'000'000) / 2));
 	m_watchdog->adjust(attotime::from_msec(54));
 }
 
@@ -442,7 +443,7 @@ WRITE8_MEMBER( a500_kbd_device::latch_w )
 
 READ8_MEMBER( a500_kbd_device::counter_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_control &= ~COUNTER_OVERFLOW;
 		update_irqs();

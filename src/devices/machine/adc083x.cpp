@@ -46,10 +46,10 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(ADC0831, adc0831_device, "adc0831", "ADC0831")
-DEFINE_DEVICE_TYPE(ADC0832, adc0832_device, "adc0832", "ADC0832")
-DEFINE_DEVICE_TYPE(ADC0834, adc0834_device, "adc0834", "ADC0834")
-DEFINE_DEVICE_TYPE(ADC0838, adc0838_device, "adc0838", "ADC0838")
+DEFINE_DEVICE_TYPE(ADC0831, adc0831_device, "adc0831", "ADC0831 A/D Converter")
+DEFINE_DEVICE_TYPE(ADC0832, adc0832_device, "adc0832", "ADC0832 A/D Converter")
+DEFINE_DEVICE_TYPE(ADC0834, adc0834_device, "adc0834", "ADC0834 A/D Converter")
+DEFINE_DEVICE_TYPE(ADC0838, adc0838_device, "adc0838", "ADC0838 A/D Converter")
 
 adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t mux_bits)
 	: device_t(mconfig, type, tag, owner, clock),

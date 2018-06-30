@@ -18,6 +18,7 @@ TODO: Separate out i860XR and i860XP (make different types, etc).
 #include "emu.h"
 #include "debugger.h"
 #include "i860.h"
+#include "i860dis.h"
 
 
 /* Control register numbers.  */
@@ -31,7 +32,7 @@ enum {
 };
 
 
-DEFINE_DEVICE_TYPE(I860, i860_cpu_device, "i860xr", "i860XR")
+DEFINE_DEVICE_TYPE(I860, i860_cpu_device, "i860xr", "Intel i860XR")
 
 
 i860_cpu_device::i860_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -137,7 +138,7 @@ void i860_cpu_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -231,11 +232,9 @@ void i860_cpu_device::device_reset()
 	reset_i860();
 }
 
-
-offs_t i860_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> i860_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i860 );
-	return CPU_DISASSEMBLE_NAME(i860)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<i860_disassembler>();
 }
 
 

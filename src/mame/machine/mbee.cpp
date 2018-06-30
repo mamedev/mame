@@ -279,7 +279,7 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 	data &= 0x3f; // (bits 0-5 are referred to as S0-S5)
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint8_t *prom = memregion("pals")->base();
-	uint8_t b_data = BITSWAP8(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
+	uint8_t b_data = bitswap<8>(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
 	uint8_t b_bank, b_byte, b_byte_t, b_addr, p_bank = 1;
 	uint16_t b_vid;
 	char banktag[10];
@@ -291,11 +291,11 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 		for (b_bank = 0; b_bank < 16; b_bank++)
 		{
 			b_vid = b_bank << 12;
-			b_addr = BITSWAP8(b_bank, 7,4,5,3,1,2,6,0) & 0x1f; // arrange address bits to A12,-,A14,A13,A15
+			b_addr = bitswap<8>(b_bank, 7,4,5,3,1,2,6,0) & 0x1f; // arrange address bits to A12,-,A14,A13,A15
 
 			// Calculate read-bank
 			b_byte_t = prom[b_addr | (b_data << 8) | 0x82]; // read-bank (RDS and MREQ are low, RFSH is high)
-			b_byte = BITSWAP8(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
+			b_byte = bitswap<8>(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
 
 			if (first_time || (b_byte != m_bank_array[p_bank]))
 			{
@@ -327,7 +327,7 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 
 			// Calculate write-bank
 			b_byte_t = prom[b_addr | (b_data << 8) | 0xc0]; // write-bank (XWR and MREQ are low, RFSH is high)
-			b_byte = BITSWAP8(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
+			b_byte = bitswap<8>(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
 
 			if (first_time || (b_byte != m_bank_array[p_bank]))
 			{
@@ -487,13 +487,13 @@ MACHINE_RESET_MEMBER( mbee_state, mbeett )
 	m_maincpu->set_pc(0x8000);
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbee )
+void mbee_state::init_mbee()
 {
 	m_size = 0x8000;
 	m_has_oldkb = 1;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbeeic )
+void mbee_state::init_mbeeic()
 {
 	uint8_t *RAM = memregion("pakrom")->base();
 	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
@@ -503,7 +503,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeic )
 	m_has_oldkb = 1;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbeepc )
+void mbee_state::init_mbeepc()
 {
 	uint8_t *RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
@@ -516,7 +516,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc )
 	m_has_oldkb = 1;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
+void mbee_state::init_mbeepc85()
 {
 	uint8_t *RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
@@ -529,7 +529,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
 	m_has_oldkb = 1;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
+void mbee_state::init_mbeeppc()
 {
 	uint8_t *RAM = memregion("basicrom")->base();
 	m_basic->configure_entries(0, 2, &RAM[0x0000], 0x2000);
@@ -545,7 +545,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
 	m_has_oldkb = 1;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbee56 )
+void mbee_state::init_mbee56()
 {
 	m_size = 0xe000;
 	m_has_oldkb = 1;
@@ -553,7 +553,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee56 )
 
 // 128k uses 32 RAM banks.
 // PP has 1024k which is 256 banks, but having 64 banks stops it crashing during the self-test. Need a schematic before we can fix it.
-DRIVER_INIT_MEMBER( mbee_state, mbee128 )
+void mbee_state::init_mbee128()
 {
 	uint8_t *RAM = memregion("rams")->base();
 	uint8_t *ROM = memregion("roms")->base();
@@ -574,7 +574,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 	m_has_oldkb = 1;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbee256 )
+void mbee_state::init_mbee256()
 {
 	uint8_t *RAM = memregion("rams")->base();
 	uint8_t *ROM = memregion("roms")->base();
@@ -597,7 +597,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee256 )
 	m_has_oldkb = 0;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbeett )
+void mbee_state::init_mbeett()
 {
 	uint8_t *RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);

@@ -498,7 +498,7 @@ legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,i
 	int cnt = 0;
 	for (i=0;i<4;i++) {
 		legacy_floppy_image_device *disk = floppy_get_device(machine,i);
-		if (disk->floppy_get_drive_type()==ftype) {
+		if (disk && disk->floppy_get_drive_type()==ftype) {
 			if (cnt==drive) {
 				return disk;
 			}
@@ -508,9 +508,9 @@ legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,i
 	return nullptr;
 }
 
-int floppy_get_drive(device_t *image)
+static int floppy_get_drive(device_t *image)
 {
-	int drive =0;
+	int drive = -1;
 	if (strcmp(image->tag(), ":" FLOPPY_0) == 0) drive = 0;
 	if (strcmp(image->tag(), ":" FLOPPY_1) == 0) drive = 1;
 	if (strcmp(image->tag(), ":" FLOPPY_2) == 0) drive = 2;
@@ -523,14 +523,14 @@ int floppy_get_drive_by_type(legacy_floppy_image_device *image,int ftype)
 	int i,drive =0;
 	for (i=0;i<4;i++) {
 		legacy_floppy_image_device *disk = floppy_get_device(image->machine(),i);
-		if (disk->floppy_get_drive_type()==ftype) {
+		if (disk && disk->floppy_get_drive_type()==ftype) {
 			if (image==disk) {
 				return drive;
 			}
 			drive++;
 		}
 	}
-	return drive;
+	return -1;
 }
 
 int floppy_get_count(running_machine &machine)
@@ -718,7 +718,7 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 		m_wpt(0),
 		m_rdy(0),
 		m_dskchg(0),
-		m_drive_id(0),
+		m_drive_id(-1),
 		m_active(0),
 		m_config(nullptr),
 		m_flags(0),

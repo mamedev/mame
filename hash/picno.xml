@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/142354502350/the-konami-picno-%E3%83%94%E3%82%AF%E3%83%8E-1992-a-drawing-tablet:
+(* denotes dumped)
+   RX101 Save Card / セーブカード
+  *RX102 Montage / モンタージュ
+   RX103 Fushigi no Kuni no Alice / ふしぎの国のアリス
+   RX104 ???
+  *RX105 Picno de A B C
+  *RX106 Anime Enikki / アニメ絵日記
+  *RX107 Picno de A I U E O / ピクノであいうえお
+  *RX108 Picno de 1 2 3 / ピクノで123
+  *RX109 Picno Art Puzzle / ピクノアートパズル
+  *RX110 Real Montage / リアルモンタージュ
+  *RX111 Kiiroi Kyōryū-kun Parasa no Obake Taiji / きいろい恐竜くん パラサのオバケ退治
+   RX112 Anime Box / アニメボックス
+   RX113 Picno de Nihon Chizu / ピクノでにほんちず
+   RX114 ???
+   RX115 Dokkin Shinri Game / どっきん心理ゲーム
+  *RX116 Kanji Club / 漢字俱楽部
+   RX117 Picno de Kuku / ピクノで九九
+  *RX118 Shirayuki-hime Monogatari / しらゆきひめ物語
+   RX119 Nontan to Issho Anime Stamp / ノンタンといっしょ アニメスタンプ
+   RX120 Manfī no Fushigi na Bōken / マンフィーのふしぎなぼうけん
+   RX121 ???
+   RX122 Son Gokū no Bōken / そんごくうの冒険
+   RX123 Sen'yō Card Soft / 専用カードソフト
+   RX124 Chibimaruko-chan no Tashizan Hikizan / ちびまる子ちゃんのたしざんひきざん
+-->
+
+<softwarelist name="picno" description="Konami Picno cartridges">
+
+	<software name="aenikki" supported="no">
+		<description>Anime Enikki</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX106"/>
+		<info name="alt_title" value="アニメ絵日記"/>
+		<part name="cart" interface="picno_cart">
+			<feature name="pcb" value="R0-028" />
+			<dataarea name="rom" size="524288">
+				<rom name="rx106.bin" size="524288" crc="aa334046" sha1="ee3f37c4a9256c1be446fc4ea877da1be1cf04d6" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kanjiclb" supported="no">
+		<description>Kanji Club</description>
+		<year>1994</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX116"/>
+		<info name="alt_title" value="漢字俱楽部"/>
+		<part name="cart" interface="picno_cart">
+			<feature name="pcb" value="R0-028" />
+			<dataarea name="rom" size="524288">
+				<rom name="rx116.bin" size="524288" crc="78b6eb10" sha1="dae38fbeeb0b411e849a800fe12ad1d1d42f9a99" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kiiroi" supported="no">
+		<description>Kiiroi Kyōryū-kun Parasa no Obake Taiji</description>
+		<year>1994</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX111"/>
+		<info name="alt_title" value="きいろい恐竜くん パラサのオバケ退治"/>
+		<part name="cart" interface="picno_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="rx111.bin" size="524288" crc="c2b1a5ab" sha1="3af4124d16fbd66805d26b7ddf9b6bcc8f5d07f5" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="montage" supported="no">
+		<description>Montage</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX102"/>
+		<info name="alt_title" value="モンタージュ"/>
+		<part name="cart" interface="picno_cart">
+			<feature name="pcb" value="R0-028" />
+			<dataarea name="rom" size="262144">
+				<rom name="rx102.bin" size="262144" crc="014b1da5" sha1="718000598da119fde15899e0b746e0d1b3c9b038" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artpuzzl" supported="no">
+		<description>Picno Art Puzzle</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX109"/>
+		<info name="alt_title" value="ピクノアートパズル"/>
+		<part name="cart" interface="picno_cart">
+			<feature name="pcb" value="R0-034" />
+			<dataarea name="rom" size="1048576">
+				<rom name="rx109.bin" size="1048576" crc="6de0342b" sha1="43534c4beb67036a5225634fa72567d93c4ee35e" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picno123" supported="no">
+		<description>Picno de 1 2 3</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX108"/>
+		<info name="alt_title" value="ピクノで123"/>
+		<part name="cart" interface="picno_cart">
+			<feature name="pcb" value="R0-034?" />
+			<dataarea name="rom" size="1048576">
+				<rom name="rx108.bin" size="1048576" crc="ca4a4d22" sha1="8ee0b6b6c69ea5d49472b56d6e00c1d5fb2ffdaa" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picnoabc" supported="no">
+		<description>Picno de A B C</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX105"/>
+		<part name="cart" interface="picno_cart">
+			<feature name="pcb" value="R0-028" />
+			<dataarea name="rom" size="524288">
+				<rom name="rx105.bin" size="524288" crc="590e3bd8" sha1="05a1c22aa916c8177ab743ef633bae31cb28c0db" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pdeaiueo" supported="no">
+		<description>Picno de A I U E O</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX107"/>
+		<info name="alt_title" value="ピクノであいうえお"/>
+		<part name="cart" interface="picno_cart">
+			<feature name="pcb" value="R0-034" />
+			<dataarea name="rom" size="1048576">
+				<rom name="rx107.bin" size="1048576" crc="f56e48bc" sha1="aa0ec867183e799c0ded1cfdaab92250a6fb6556" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmontage" supported="no">
+		<description>Real Montage</description>
+		<year>1994</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX110"/>
+		<info name="alt_title" value="リアルモンタージュ"/>
+		<part name="cart" interface="picno_cart">
+			<feature name="pcb" value="R0-028" />
+			<dataarea name="rom" size="524288">
+				<rom name="rx110.bin" size="524288" crc="3fa2de37" sha1="27b99bc33ec00b025188039c434da5ad425492dc" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shm" supported="no">
+		<description>Shirayuki-hime Monogatari</description>
+		<year>1994</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX118"/>
+		<info name="alt_title" value="しらゆきひめ物語"/>
+		<part name="cart" interface="picno_cart">
+			<feature name="pcb" value="R0-028" />
+			<dataarea name="rom" size="524288">
+				<rom name="RX118 - Shirayuki Hime Monogatari.bin" size="524288" crc="6720748f" sha1="cb6c1a4d53bb583e2114923f24ab2383a5e078c4" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

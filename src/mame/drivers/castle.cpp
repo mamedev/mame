@@ -55,6 +55,11 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void castle_V1rvE(machine_config &config);
+	void castle_V2rvA(machine_config &config);
+	void V1rvE_mastermap(address_map &map);
+	void V1rvE_slavemap(address_map &map);
+	void V2rvA_map(address_map &map);
 protected:
 
 	// devices
@@ -62,13 +67,15 @@ protected:
 };
 
 
-static ADDRESS_MAP_START( V1rvE_mastermap, AS_PROGRAM, 8, castle_state )
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void castle_state::V1rvE_mastermap(address_map &map)
+{
+	map(0x8000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( V1rvE_slavemap, AS_PROGRAM, 8, castle_state )
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void castle_state::V1rvE_slavemap(address_map &map)
+{
+	map(0x8000, 0xffff).rom();
+}
 
 
 
@@ -76,24 +83,25 @@ static INPUT_PORTS_START( castrev )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( castle_V1rvE )
-	MCFG_CPU_ADD("maincpu", HD6303Y, 1000000)
-	MCFG_CPU_PROGRAM_MAP(V1rvE_mastermap)
+MACHINE_CONFIG_START(castle_state::castle_V1rvE)
+	MCFG_DEVICE_ADD("maincpu", HD6303Y, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(V1rvE_mastermap)
 
-	MCFG_CPU_ADD("slavecpu", HD6303Y, 1000000)
-	MCFG_CPU_PROGRAM_MAP(V1rvE_slavemap)
+	MCFG_DEVICE_ADD("slavecpu", HD6303Y, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(V1rvE_slavemap)
 MACHINE_CONFIG_END
 
 
 
-static ADDRESS_MAP_START( V2rvA_map, AS_PROGRAM, 8, castle_state )
-	AM_RANGE(0x2000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void castle_state::V2rvA_map(address_map &map)
+{
+	map(0x2000, 0xffff).rom();
+}
 
 
-static MACHINE_CONFIG_START( castle_V2rvA )
-	MCFG_CPU_ADD("maincpu", HD6303Y, 1000000)
-	MCFG_CPU_PROGRAM_MAP(V2rvA_map)
+MACHINE_CONFIG_START(castle_state::castle_V2rvA)
+	MCFG_DEVICE_ADD("maincpu", HD6303Y, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(V2rvA_map)
 MACHINE_CONFIG_END
 
 
@@ -113,7 +121,7 @@ ROM_END
 
 
 // 4.00 JACKPOT. VERSION 1 (for revision E CPU) Written by and copyright of David John Powell - 25th February 1987
-GAME( 1987, castrev,    0,  castle_V1rvE, castrev, castle_state, 0, ROT0, "Castle","Revolution (Castle) (MACH2000 V1rvE)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, castrev, 0, castle_V1rvE, castrev, castle_state, empty_init, ROT0, "Castle","Revolution (Castle) (MACH2000 V1rvE)",  MACHINE_IS_SKELETON_MECHANICAL )
 
 // I'm *guessing* this is on MACH2000 V2rvA hardware, it contains strings saying 'MACH 2000 test' and is designed for a single CPU.
-GAME( 198?, castfpt,    0,  castle_V2rvA, castrev, castle_state, 0, ROT0, "Castle","Fortune Pot (Castle) (MACH2000 V2rvA)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, castfpt, 0, castle_V2rvA, castrev, castle_state, empty_init, ROT0, "Castle","Fortune Pot (Castle) (MACH2000 V2rvA)", MACHINE_IS_SKELETON_MECHANICAL )

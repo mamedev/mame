@@ -7,6 +7,7 @@
 
 #include "video/poly.h"
 #include "cpu/sharc/sharc.h"
+#include "video/k001006.h"
 
 #include <float.h>
 
@@ -104,7 +105,14 @@ class k001005_device : public device_t, public device_video_interface
 public:
 	k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_texel_chip(device_t &device, const char *tag);
+	template <typename T> k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&texel_tag)
+		: k001005_device(mconfig, tag, owner, clock)
+	{
+		set_texel_tag(std::forward<T>(texel_tag));
+	}
+
+
+	template <typename T> void set_texel_tag(T &&tag) { m_k001006.set_tag(std::forward<T>(tag)); }
 
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void swap_buffers();
@@ -120,8 +128,7 @@ protected:
 
 private:
 	// internal state
-	device_t *m_k001006;
-	const char *m_k001006_tag;
+	optional_device<k001006_device> m_k001006;
 
 	std::unique_ptr<uint16_t[]>    m_ram[2];
 	std::unique_ptr<uint32_t[]>     m_fifo;
@@ -137,9 +144,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(K001005, k001005_device)
-
-
-#define MCFG_K001005_TEXEL_CHIP(_tag) \
-	k001005_device::set_texel_chip(*device, _tag);
 
 #endif // MAME_VIDEO_K001005_H

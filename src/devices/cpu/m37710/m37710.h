@@ -12,6 +12,9 @@ M37710 CPU Emulator v0.1
 
 */
 
+#include "m7700ds.h"
+
+
 /* ======================================================================== */
 /* =============================== DEFINES ================================ */
 /* ======================================================================== */
@@ -94,15 +97,14 @@ enum
 #define M37710_INTERNAL_ROM_REGION "internal"
 #define M37710_INTERNAL_ROM(_tag) (_tag ":" M37710_INTERNAL_ROM_REGION)
 
-class m37710_cpu_device : public cpu_device
+class m37710_cpu_device : public cpu_device, public m7700_disassembler::config
 {
-public:
+protected:
 	DECLARE_READ8_MEMBER( m37710_internal_r );
 	DECLARE_WRITE8_MEMBER( m37710_internal_w );
 
-protected:
 	// construction/destruction
-	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_delegate map_delegate);
+	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -124,9 +126,9 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual bool get_m_flag() const override;
+	virtual bool get_x_flag() const override;
 
 private:
 	address_space_config m_program_config;
@@ -168,7 +170,7 @@ private:
 	uint32_t m_source;        /* temp register */
 	uint32_t m_destination;   /* temp register */
 	address_space *m_program;
-	direct_read_data *m_direct;
+	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_io;
 	uint32_t m_stopped;       /* Sets how the CPU is stopped */
 
@@ -233,8 +235,6 @@ private:
 	TIMER_CALLBACK_MEMBER( m37710_timer_cb );
 	void m37710_external_tick(int timer, int state);
 	void m37710_recalc_timer(int timer);
-	uint8_t m37710_internal_r(int offset);
-	void m37710_internal_w(int offset, uint8_t data);
 	uint32_t m37710i_get_reg_M0X0(int regnum);
 	uint32_t m37710i_get_reg_M0X1(int regnum);
 	uint32_t m37710i_get_reg_M1X0(int regnum);
@@ -2024,7 +2024,7 @@ public:
 	// construction/destruction
 	m37702s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 };
 
 class m37702m2_device : public m37710_cpu_device
@@ -2034,7 +2034,7 @@ public:
 	m37702m2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	m37702m2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 };
 
 class m37710s4_device : public m37710_cpu_device
@@ -2043,7 +2043,7 @@ public:
 	// construction/destruction
 	m37710s4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 };
 
 class m37720s1_device : public m37710_cpu_device
@@ -2052,7 +2052,7 @@ public:
 	// construction/destruction
 	m37720s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(M37702M2, m37702m2_device)

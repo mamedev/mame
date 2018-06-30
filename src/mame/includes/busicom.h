@@ -13,6 +13,7 @@
 
 #include "cpu/mcs40/mcs40.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 class busicom_state : public driver_device
 {
@@ -45,6 +46,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	uint8_t get_bit_selected(uint32_t val,int num);
 
+	void busicom(machine_config &config);
+	void busicom_mem(address_map &map);
+	void busicom_mp(address_map &map);
+	void busicom_rom(address_map &map);
+	void busicom_rp(address_map &map);
+	void busicom_stat(address_map &map);
 private:
 	required_device<i4004_cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;

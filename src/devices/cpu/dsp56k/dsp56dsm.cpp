@@ -10,22 +10,25 @@
 
 #include "emu.h"
 #include "opcode.h"
+#include "dsp56dsm.h"
 
-#include "emu.h"
-#include "dsp56k.h"
+u32 dsp56k_disassembler::opcode_alignment() const
+{
+	return 1;
+}
 
 /*****************************/
 /* Main disassembly function */
 /*****************************/
-CPU_DISASSEMBLE(dsp56k)
+offs_t dsp56k_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	const uint16_t w0 = oprom[0] | (oprom[1] << 8);
-	const uint16_t w1 = oprom[2] | (oprom[3] << 8);
+	const uint16_t w0 = opcodes.r16(pc);
+	const uint16_t w1 = opcodes.r16(pc+1);
 
 	// Decode and disassemble.
 	DSP56K::Opcode op(w0, w1);
 	stream << op.disassemble();
 
 	const unsigned size = op.size();
-	return (size | DASMFLAG_SUPPORTED);
+	return (size | SUPPORTED);
 }

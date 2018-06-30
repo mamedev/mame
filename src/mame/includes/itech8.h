@@ -31,6 +31,33 @@ public:
 		m_fakey(*this, "FAKEY"),
 		m_visarea(0, 0, 0, 0) { }
 
+	void grmatch(machine_config &config);
+	void rimrockn(machine_config &config);
+	void gtg2(machine_config &config);
+	void slikshot_lo(machine_config &config);
+	void slikshot_lo_noz80(machine_config &config);
+	void ninclown(machine_config &config);
+	void sstrike(machine_config &config);
+	void stratab_hi(machine_config &config);
+	void hstennis_lo(machine_config &config);
+	void wfortune(machine_config &config);
+	void stratab_lo(machine_config &config);
+	void slikshot_hi(machine_config &config);
+	void hstennis_hi(machine_config &config);
+
+	void init_rimrockn();
+	void init_grmatch();
+	void init_peggle();
+	void init_slikshot();
+	void init_neckneck();
+	void init_arligntn();
+	void init_hstennis();
+	void init_sstrike();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
+
+private:
 	static constexpr uint32_t YBUFFER_COUNT = 15;
 	static constexpr uint32_t VRAM_SIZE = 0x40000;
 	static constexpr uint32_t VRAM_MASK = VRAM_SIZE - 1;
@@ -119,17 +146,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pia_porta_out);
 	DECLARE_WRITE8_MEMBER(ym2203_portb_out);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
-
-	DECLARE_DRIVER_INIT(rimrockn);
-	DECLARE_DRIVER_INIT(grmatch);
-	DECLARE_DRIVER_INIT(peggle);
-	DECLARE_DRIVER_INIT(slikshot);
-	DECLARE_DRIVER_INIT(neckneck);
-	DECLARE_DRIVER_INIT(arligntn);
-	DECLARE_DRIVER_INIT(hstennis);
-	DECLARE_DRIVER_INIT(sstrike);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -142,7 +158,8 @@ public:
 	uint32_t screen_update_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(generate_nmi);
+	DECLARE_WRITE_LINE_MEMBER(generate_nmi);
+	DECLARE_WRITE_LINE_MEMBER(ninclown_irq);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_CALLBACK_MEMBER(behind_the_beam_update);
 	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
@@ -184,6 +201,22 @@ public:
 	DECLARE_WRITE16_MEMBER(grom_bank16_w);
 	DECLARE_WRITE16_MEMBER(display_page16_w);
 
-protected:
+	void itech8_sound_ym2203(machine_config &config);
+	void itech8_sound_ym2608b(machine_config &config);
+	void itech8_sound_ym3812(machine_config &config);
+	void itech8_sound_ym3812_external(machine_config &config);
+	void itech8_core_lo(machine_config &config);
+	void itech8_core_hi(machine_config &config);
+	void gtg2_map(address_map &map);
+	void ninclown_map(address_map &map);
+	void slikz80_io_map(address_map &map);
+	void slikz80_mem_map(address_map &map);
+	void sound2203_map(address_map &map);
+	void sound2608b_map(address_map &map);
+	void sound3812_external_map(address_map &map);
+	void sound3812_map(address_map &map);
+	void tmshi_map(address_map &map);
+	void tmslo_map(address_map &map);
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

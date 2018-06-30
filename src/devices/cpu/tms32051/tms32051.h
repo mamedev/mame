@@ -62,6 +62,8 @@ public:
 	DECLARE_READ16_MEMBER( cpuregs_r );
 	DECLARE_WRITE16_MEMBER( cpuregs_w );
 
+	void tms32051_internal_data(address_map &map);
+	void tms32051_internal_pgm(address_map &map);
 protected:
 	tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data);
 
@@ -80,9 +82,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -161,7 +161,7 @@ protected:
 	} m_shadow;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_data;
 	address_space *m_io;
 	int m_icount;
@@ -375,6 +375,8 @@ public:
 	// construction/destruction
 	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void tms32053_internal_data(address_map &map);
+	void tms32053_internal_pgm(address_map &map);
 protected:
 	virtual void device_reset() override;
 };

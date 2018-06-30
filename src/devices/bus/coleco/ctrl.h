@@ -27,7 +27,7 @@
 
 
 #define MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(_write) \
-	devcb = &colecovision_control_port_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<colecovision_control_port_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 
 
@@ -68,7 +68,7 @@ public:
 	colecovision_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<colecovision_control_port_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	uint8_t read() { uint8_t data = 0xff; if (exists()) data = m_device->joy_r(); return data; }
@@ -95,7 +95,7 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(COLECOVISION_CONTROL_PORT, colecovision_control_port_device)
 
-SLOT_INTERFACE_EXTERN( colecovision_control_port_devices );
+void colecovision_control_port_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_COLECO_CTRL_H

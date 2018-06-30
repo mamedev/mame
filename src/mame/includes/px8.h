@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder,Dirk Best
 #pragma once
 
-#ifndef __PX8__
-#define __PX8__
+#ifndef MAME_INCLUDES_PX8_H
+#define MAME_INCLUDES_PX8_H
 
 
 #include "cpu/z80/z80.h"
@@ -13,6 +13,7 @@
 #include "machine/i8251.h"
 #include "bus/epson_sio/pf10.h"
 #include "sound/wave.h"
+#include "emupal.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -80,6 +81,11 @@ public:
 	/* keyboard state */
 	int m_ksc;              /* keyboard scan column */
 	DECLARE_PALETTE_INIT(px8);
+	void px8(machine_config &config);
+	void px8_io(address_map &map);
+	void px8_mem(address_map &map);
+	void px8_slave_io(address_map &map);
+	void px8_slave_mem(address_map &map);
 };
 
 #endif

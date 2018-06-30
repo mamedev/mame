@@ -31,19 +31,13 @@
 /* 6840 PTM handlers */
 WRITE_LINE_MEMBER( swtpc09_state::ptm_o1_callback )
 {
-	// RH 3 Oct. 2016 FIXME: Does the hardware actually work this way, incrementing a counter any time
-	// the O1 line on the PTM changes? This seems unlikely, as the current implementation will increment
-	// m_pia_counter on both 0->1 and 1->0 transitions. Is that really correct?
-	pia6821_device *pia = machine().device<pia6821_device>("pia");
-
 	m_pia_counter++;
 	//pia_counter = pia_counter && 0xff;
-	if (m_pia_counter & 0x80) pia->ca1_w(1);
+	if (m_pia_counter & 0x80) m_pia->ca1_w(1);
 }
 
 WRITE_LINE_MEMBER( swtpc09_state::ptm_o3_callback )
 {
-	//ptm6840_device *ptm = machine().device<ptm6840_device>("ptm");
 	/* the output from timer3 is the input clock for timer2 */
 	//m_ptm->set_c2(state);
 }
@@ -71,13 +65,10 @@ READ8_MEMBER( swtpc09_state::pia0_ca1_r )
 
 WRITE_LINE_MEMBER( swtpc09_state::pia0_irq_a )
 {
-		pia6821_device *pia = machine().device<pia6821_device>("pia");
-
-		if ( pia->irq_a_state())
-			swtpc09_irq_handler(PIA_IRQ, ASSERT_LINE);
-		else
-			swtpc09_irq_handler(PIA_IRQ, CLEAR_LINE);
-
+	if ( m_pia->irq_a_state())
+		swtpc09_irq_handler(PIA_IRQ, ASSERT_LINE);
+	else
+		swtpc09_irq_handler(PIA_IRQ, CLEAR_LINE);
 }
 
 
@@ -88,12 +79,12 @@ WRITE_LINE_MEMBER( swtpc09_state::acia_interrupt )
 	if (state)
 	{
 		swtpc09_irq_handler(ACIA_IRQ, ASSERT_LINE);
-		LOG(("swtpc09_acia_irq_assert\n"));
+		logerror("swtpc09_acia_irq_assert\n");
 	}
 	else
 	{
 		swtpc09_irq_handler(ACIA_IRQ, CLEAR_LINE);
-		LOG(("swtpc09_acia_irq_clear\n"));
+		logerror("swtpc09_acia_irq_clear\n");
 	}
 }
 
@@ -115,19 +106,19 @@ WRITE8_MEMBER ( swtpc09_state::dmf2_dma_address_reg_w )
 	if ((m_fdc_dma_address_reg & 0x10) && (m_system_type == UNIFLEX_DMF2 || m_system_type == FLEX_DMF2))
 		swtpc09_irq_handler(FDC_IRQ, CLEAR_LINE); //then clear the irq to cpu
 
-	LOG(("swtpc09_dmf2_dma_address_reg_w %02X\n", data));
+	logerror("swtpc09_dmf2_dma_address_reg_w %02X\n", data);
 }
 
 /* DMF2 fdc control register */
 READ8_MEMBER ( swtpc09_state::dmf2_control_reg_r )
 {
-	//LOG(("swtpc09_dmf2_control_reg_r $%02X\n", m_fdc_status));
+	//logerror("swtpc09_dmf2_control_reg_r $%02X\n", m_fdc_status);
 	return m_fdc_status;
 }
 
 WRITE8_MEMBER ( swtpc09_state::dmf2_control_reg_w )
 {
-	LOG(("swtpc09_dmf2_control_reg_w $%02X\n", data));
+	logerror("swtpc09_dmf2_control_reg_w $%02X\n", data);
 
 	floppy_image_device *floppy = nullptr;
 
@@ -150,9 +141,8 @@ WRITE8_MEMBER ( swtpc09_state::dmf2_control_reg_w )
 /* FDC controller dma transfer */
 void swtpc09_state::swtpc09_fdc_dma_transfer()
 {
-	uint8_t *RAM = memregion("maincpu")->base();
 	uint32_t offset;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	address_space &space = *m_banked_space;
 
 	offset = (m_fdc_dma_address_reg & 0x0f)<<16;
 
@@ -162,15 +152,15 @@ void swtpc09_state::swtpc09_fdc_dma_transfer()
 		{
 			uint8_t data = m_fdc->data_r(space, 0);
 
-			LOG(("swtpc09_dma_write_mem %05X %02X\n", m_m6844_channel[0].address + offset, data));
-			RAM[m_m6844_channel[0].address + offset] = data;
+			logerror("swtpc09_dma_write_mem %05X %02X\n", m_m6844_channel[0].address + offset, data);
+			space.write_byte(m_m6844_channel[0].address + offset, data);
 		}
 		else
 		{
-			uint8_t data = RAM[m_m6844_channel[0].address + offset];
+			uint8_t data = space.read_byte(m_m6844_channel[0].address + offset);
 
 			m_fdc->data_w(space, 0, data);
-			//LOG(("swtpc09_dma_read_mem %04X %02X\n", m_m6844_channel[0].address, data));
+			//logerror("swtpc09_dma_read_mem %04X %02X\n", m_m6844_channel[0].address, data);
 		}
 
 		m_m6844_channel[0].address++;
@@ -192,7 +182,7 @@ void swtpc09_state::swtpc09_fdc_dma_transfer()
 /* common interrupt handler */
 void swtpc09_state::swtpc09_irq_handler(uint8_t peripheral, uint8_t state)
 {
-	LOG(("swtpc09_irq_handler peripheral:%02X state:%02X\n", peripheral, state));
+	logerror("swtpc09_irq_handler peripheral:%02X state:%02X\n", peripheral, state);
 
 	switch (state)
 	{
@@ -209,12 +199,12 @@ void swtpc09_state::swtpc09_irq_handler(uint8_t peripheral, uint8_t state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_active_interrupt=true;
-		LOG(("swtpc09_irq_assert %02X\n", peripheral));
+		logerror("swtpc09_irq_assert %02X\n", peripheral);
 	}
 	else if (m_active_interrupt && !m_interrupt)  //active interrupt and it needs to be cleared
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-		LOG(("swtpc09_irq_clear %02X\n", peripheral));
+		logerror("swtpc09_irq_clear %02X\n", peripheral);
 		m_active_interrupt=false;
 	}
 }
@@ -222,7 +212,7 @@ void swtpc09_state::swtpc09_irq_handler(uint8_t peripheral, uint8_t state)
 /* handlers for fdc */
 WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 {
-	LOG(("swtpc09_fdc_intrq_w %02X\n", state));
+	logerror("swtpc09_fdc_intrq_w %02X\n", state);
 	if ( m_system_type == UNIFLEX_DMF3 )  //IRQ from 1791 is connect into VIA ca2
 	{
 		if (state)
@@ -260,7 +250,7 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 			m_fdc_status |= 0x40;
 			if (!(m_fdc_dma_address_reg & 0x10))  // is dmf2 fdc irq enabled
 			{
-				LOG(("swtpc09_fdc_int ** assert\n"));
+				logerror("swtpc09_fdc_int ** assert\n");
 				swtpc09_irq_handler(FDC_IRQ, ASSERT_LINE);
 			}
 		}
@@ -269,7 +259,7 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 			m_fdc_status &= ~0x40;
 			if (!(m_fdc_dma_address_reg & 0x10)) // is dmf2 fdc irq enabled
 			{
-				LOG(("swtpc09_fdc_int ** clear\n"));
+				logerror("swtpc09_fdc_int ** clear\n");
 				swtpc09_irq_handler(FDC_IRQ, CLEAR_LINE);
 			}
 		}
@@ -322,7 +312,7 @@ WRITE8_MEMBER( swtpc09_state::dmf3_via_write_porta )
 //WRITE_LINE_MEMBER( swtpc09_state::dmf3_via_write_ca1 )
 //{
 //  return m_via_ca1_input;
-//    LOG(("swtpc09_dmf3_via_write_ca1 %02X\n", state));
+//    logerror("swtpc09_dmf3_via_write_ca1 %02X\n", state);
 
 //}
 
@@ -343,19 +333,19 @@ READ8_MEMBER ( swtpc09_state::dmf3_dma_address_reg_r )
 WRITE8_MEMBER ( swtpc09_state::dmf3_dma_address_reg_w )
 {
 	m_fdc_dma_address_reg = data;
-	LOG(("swtpc09_dmf3_dma_address_reg_w %02X\n", data));
+	logerror("swtpc09_dmf3_dma_address_reg_w %02X\n", data);
 }
 
 /* DMF3 fdc control register */
 READ8_MEMBER ( swtpc09_state::dmf3_control_reg_r )
 {
-	//LOG(("swtpc09_dmf3_control_reg_r $%02X\n", m_fdc_status));
+	//logerror("swtpc09_dmf3_control_reg_r $%02X\n", m_fdc_status);
 	return m_fdc_status;
 }
 
 WRITE8_MEMBER ( swtpc09_state::dmf3_control_reg_w )
 {
-	LOG(("swtpc09_dmf3_control_reg_w $%02X\n", data));
+	logerror("swtpc09_dmf3_control_reg_w $%02X\n", data);
 
 	floppy_image_device *floppy = nullptr;
 
@@ -379,7 +369,7 @@ WRITE8_MEMBER ( swtpc09_state::dmf3_control_reg_w )
 
 WRITE8_MEMBER ( swtpc09_state::dc4_control_reg_w )
 {
-	LOG(("swtpc09_dc4_control_reg_w $%02X\n", data));
+	logerror("swtpc09_dc4_control_reg_w $%02X\n", data);
 
 	floppy_image_device *floppy = nullptr;
 
@@ -421,28 +411,28 @@ WRITE8_MEMBER( swtpc09_state::piaide_b_w )
 	{
 		if (!(data & 0x02))  //rd line bit 1
 		{
-			tempidedata = m_ide->read_cs0(space, (data&0x1c)>>2, 0xffff);
-			LOG(("swtpc09_ide_bus_r: offset $%02X data %04X\n", (data&0x1c)>>2, tempidedata));
+			tempidedata = m_ide->read_cs0((data&0x1c)>>2);
+			logerror("swtpc09_ide_bus_r: offset $%02X data %04X\n", (data&0x1c)>>2, tempidedata);
 			m_piaide_porta = tempidedata & 0x00ff;
 		}
 		else if (!(data & 0x01))  //wr line bit 0
 		{
-			m_ide->write_cs0(space, (data&0x1c)>>2, m_piaide_porta, 0xffff);
-			LOG(("swtpc09_ide_bus_w: offset $%02X data %04X\n", (data&0x1c)>>2, m_piaide_porta));
+			m_ide->write_cs0((data&0x1c)>>2, m_piaide_porta);
+			logerror("swtpc09_ide_bus_w: offset $%02X data %04X\n", (data&0x1c)>>2, m_piaide_porta);
 		}
 	}
 	else if ((data & 0x20)&&(!(data&0x40)))  //cs0=1 cs1=0 bit 5&6
 	{
 		if (!(data & 0x02))  //rd line bit 1
 		{
-			tempidedata = m_ide->read_cs1(space, (data&0x1c)>>2, 0xffff);
-			LOG(("swtpc09_ide_bus_r: offset $%02X data %04X\n", (data&0x1c)>>2, tempidedata));
+			tempidedata = m_ide->read_cs1((data&0x1c)>>2);
+			logerror("swtpc09_ide_bus_r: offset $%02X data %04X\n", (data&0x1c)>>2, tempidedata);
 			m_piaide_porta = tempidedata & 0x00ff;
 		}
 		else if (!(data & 0x01))  //wr line bit 0
 		{
-			m_ide->write_cs1(space, (data&0x1c)>>2, m_piaide_porta, 0xffff);
-			LOG(("swtpc09_ide_bus_w: offset $%02X data %04X\n", (data&0x1c)>>2, m_piaide_porta));
+			m_ide->write_cs1((data&0x1c)>>2, m_piaide_porta);
+			logerror("swtpc09_ide_bus_w: offset $%02X data %04X\n", (data&0x1c)>>2, m_piaide_porta);
 		}
 	}
 }
@@ -453,128 +443,20 @@ WRITE8_MEMBER( swtpc09_state::piaide_b_w )
 /* memory map is created based on system_type flag       */
 /* this is accommodate the different cards installed     */
 
-WRITE8_MEMBER(swtpc09_state::dat_w)
+offs_t swtpc09_state::dat_translate(offs_t offset) const
 {
-	uint8_t a16_to_a19, a12_to_a15;
-	uint8_t *RAM = memregion("maincpu")->base();
-	uint32_t physical_address, logical_address;
+	// lower 4 bits are inverted
+	return offs_t(m_dat[offset >> 12] ^ 0x0f) << 12 | (offset & 0x0fff);
+}
 
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
+READ8_MEMBER(swtpc09_state::main_r)
+{
+	return m_banked_space->read_byte(dat_translate(offset));
+}
 
-	fd1793_device *fdc = machine().device<fd1793_device>("fdc");
-	pia6821_device *pia = machine().device<pia6821_device>("pia");
-	ptm6840_device *ptm = machine().device<ptm6840_device>("ptm");
-	acia6850_device *acia = machine().device<acia6850_device>("acia");
-	via6522_device *via = machine().device<via6522_device>("via");
-	pia6821_device *piaide = machine().device<pia6821_device>("piaide");
-
-	a16_to_a19 = data & 0xf0;
-	a12_to_a15 = ~data & 0x0f; //lower 4 bits are inverted
-	physical_address = ((a16_to_a19 + a12_to_a15) << 12);
-	logical_address = offset << 12;
-	LOG(("swtpc09_dat_bank_unmap Logical address:%04X\n", offset << 12 ));
-	LOG(("swtpc09_dat_bank_set dat:%02X Logical address:%04X Physical address:%05X\n", data, offset << 12,  physical_address ));
-
-
-	// unmap page to be changed
-	mem.unmap_readwrite(offset << 12, (offset << 12)+0x0fff);
-
-	// map in new page
-	if (a12_to_a15 == 0x0e)  // 0xE000 address range to be mapped in at this page
-	{
-		if (m_system_type == FLEX_DMF2)   // if flex/sbug, map in acia at 0xE004
-		{
-			mem.nop_readwrite(logical_address+0x000, logical_address+0x003);
-			mem.install_readwrite_handler(logical_address+0x004, logical_address+0x004, read8_delegate(FUNC(acia6850_device::status_r), acia), write8_delegate(FUNC(acia6850_device::control_w),acia));
-			mem.install_readwrite_handler(logical_address+0x005, logical_address+0x005, read8_delegate(FUNC(acia6850_device::data_r), acia), write8_delegate(FUNC(acia6850_device::data_w),acia));
-			mem.nop_readwrite(logical_address+0x006, logical_address+0x07f);
-			mem.install_readwrite_handler(logical_address+0x080, logical_address+0x08f, read8_delegate(FUNC(pia6821_device::read), pia), write8_delegate(FUNC(pia6821_device::write), pia));
-			mem.install_readwrite_handler(logical_address+0x090, logical_address+0x09f, read8_delegate(FUNC(ptm6840_device::read), ptm), write8_delegate(FUNC(ptm6840_device::write), ptm));
-			mem.nop_readwrite(logical_address+0x0a0, logical_address+0xfff);
-		}
-		else if (m_system_type == FLEX_DC4_PIAIDE)   // if flex/sbug and dc4 and piaide
-		{
-			mem.nop_readwrite(logical_address+0x000, logical_address+0x003);
-			mem.install_readwrite_handler(logical_address+0x004, logical_address+0x004, read8_delegate(FUNC(acia6850_device::status_r), acia), write8_delegate(FUNC(acia6850_device::control_w),acia));
-			mem.install_readwrite_handler(logical_address+0x005, logical_address+0x005, read8_delegate(FUNC(acia6850_device::data_r), acia), write8_delegate(FUNC(acia6850_device::data_w),acia));
-			mem.install_write_handler(logical_address+0x014, logical_address+0x014, write8_delegate(FUNC(swtpc09_state::dc4_control_reg_w),this));
-			mem.install_readwrite_handler(logical_address+0x018, logical_address+0x01b, read8_delegate(FUNC(fd1793_device::read), fdc), write8_delegate(FUNC(fd1793_device::write),fdc));
-			//mem.nop_readwrite(logical_address+0x01c, logical_address+0x05f);
-			mem.install_readwrite_handler(logical_address+0x060, logical_address+0x06f, read8_delegate(FUNC(pia6821_device::read), piaide), write8_delegate(FUNC(pia6821_device::write), piaide));
-			//mem.nop_readwrite(logical_address+0x070, logical_address+0x07f);
-			mem.install_readwrite_handler(logical_address+0x080, logical_address+0x08f, read8_delegate(FUNC(pia6821_device::read), pia), write8_delegate(FUNC(pia6821_device::write), pia));
-			mem.install_readwrite_handler(logical_address+0x090, logical_address+0x09f, read8_delegate(FUNC(ptm6840_device::read), ptm), write8_delegate(FUNC(ptm6840_device::write), ptm));
-			//mem.nop_readwrite(logical_address+0x0a0, logical_address+0x7ff);
-			mem.install_rom(logical_address+0x800, logical_address+0xfff, &RAM[0xe800]); //piaide rom
-		}
-		else        // assume unibug, map in acia at 0xE000
-		{
-			mem.install_readwrite_handler(logical_address+0x000, logical_address+0x000, read8_delegate(FUNC(acia6850_device::status_r), acia), write8_delegate(FUNC(acia6850_device::control_w), acia));
-			mem.install_readwrite_handler(logical_address+0x001, logical_address+0x001, read8_delegate(FUNC(acia6850_device::data_r), acia), write8_delegate(FUNC(acia6850_device::data_w), acia));
-			mem.nop_readwrite(logical_address+0x002, logical_address+0x07f);
-			mem.install_readwrite_handler(logical_address+0x080, logical_address+0x08f, read8_delegate(FUNC(pia6821_device::read), pia), write8_delegate(FUNC(pia6821_device::write), pia));
-			mem.install_readwrite_handler(logical_address+0x090, logical_address+0x09f, read8_delegate(FUNC(ptm6840_device::read), ptm), write8_delegate(FUNC(ptm6840_device::write), ptm));
-			mem.nop_readwrite(logical_address+0x0a0, logical_address+0xfff);
-		}
-	}
-	else if (a12_to_a15 == 0x0f)   // 0xF000 address range to be mapped in at this page
-	{
-		if (m_system_type == UNIFLEX_DMF2 || m_system_type == FLEX_DMF2)   // if DMF2 conroller this is the map
-		{
-			mem.install_readwrite_handler(logical_address+0x000, logical_address+0x01f, read8_delegate(FUNC(swtpc09_state::m6844_r),this), write8_delegate(FUNC(swtpc09_state::m6844_w),this));
-			mem.install_readwrite_handler(logical_address+0x020, logical_address+0x023, read8_delegate(FUNC(fd1793_device::read), fdc), write8_delegate(FUNC(fd1793_device::write),fdc));
-			mem.install_readwrite_handler(logical_address+0x024, logical_address+0x03f, read8_delegate(FUNC(swtpc09_state::dmf2_control_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf2_control_reg_w),this));
-			mem.install_readwrite_handler(logical_address+0x040, logical_address+0x041, read8_delegate(FUNC(swtpc09_state::dmf2_dma_address_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf2_dma_address_reg_w),this));
-			//mem.nop_readwrite(logical_address+0x042, logical_address+0x7ff);
-			mem.install_rom(logical_address+0x800, logical_address+0xfff, &RAM[0xf800]);
-			mem.install_write_handler(logical_address+0xff0, logical_address+0xfff, write8_delegate(FUNC(swtpc09_state::dat_w),this));
-		}
-		else if (m_system_type == FLEX_DC4_PIAIDE)   // 2k ram for piaide on s09 board
-		{
-			//mem.install_readwrite_handler(logical_address+0x000, logical_address+0x01f, read8_delegate(FUNC(swtpc09_state::m6844_r),this), write8_delegate(FUNC(swtpc09_state::m6844_w),this));
-			//mem.install_readwrite_handler(logical_address+0x020, logical_address+0x023, read8_delegate(FUNC(fd1793_device::read), fdc), write8_delegate(FUNC(fd1793_device::write),fdc));
-			//mem.install_readwrite_handler(logical_address+0x024, logical_address+0x03f, read8_delegate(FUNC(swtpc09_state::dmf2_control_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf2_control_reg_w),this));
-			//mem.install_readwrite_handler(logical_address+0x040, logical_address+0x041, read8_delegate(FUNC(swtpc09_state::dmf2_dma_address_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf2_dma_address_reg_w),this));
-			mem.install_ram(logical_address+0x000, logical_address+0x7ff, &RAM[0xf000]);
-			mem.install_rom(logical_address+0x800, logical_address+0xfff, &RAM[0xf800]);
-			mem.install_write_handler(logical_address+0xff0, logical_address+0xfff, write8_delegate(FUNC(swtpc09_state::dat_w),this));
-		}
-		else    // assume DMF3 controller
-		{
-			mem.install_readwrite_handler(logical_address+0x000, logical_address+0x01f, read8_delegate(FUNC(swtpc09_state::m6844_r),this), write8_delegate(FUNC(swtpc09_state::m6844_w),this));
-			mem.install_readwrite_handler(logical_address+0x020, logical_address+0x023, read8_delegate(FUNC(fd1793_device::read), fdc), write8_delegate(FUNC(fd1793_device::write),fdc));
-			mem.install_readwrite_handler(logical_address+0x024, logical_address+0x024, read8_delegate(FUNC(swtpc09_state::dmf3_control_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf3_control_reg_w),this));
-			mem.install_readwrite_handler(logical_address+0x025, logical_address+0x025, read8_delegate(FUNC(swtpc09_state::dmf3_dma_address_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf3_dma_address_reg_w),this));
-			//mem.nop_readwrite(logical_address+0x030, logical_address+0x03f);
-			mem.install_readwrite_handler(logical_address+0x040, logical_address+0x04f, read8_delegate(FUNC(via6522_device::read), via), write8_delegate(FUNC(via6522_device::write), via));
-			//mem.nop_readwrite(logical_address+0x050, logical_address+0x7ff);
-			mem.install_rom(logical_address+0x800, logical_address+0xfff, &RAM[0xf800]);
-			mem.install_write_handler(logical_address+0xff0, logical_address+0xfff, write8_delegate(FUNC(swtpc09_state::dat_w),this));
-		}
-	}
-	else if (offset==0x0f)  // then we need to leave in top part of ram and dat write
-	{
-		mem.install_ram(logical_address, logical_address+0x0eff, &RAM[physical_address]);
-		mem.install_rom(logical_address+0xf00, logical_address+0xfff, &RAM[0xff00]);
-		mem.install_write_handler(logical_address+0xff0, logical_address+0xfff, write8_delegate(FUNC(swtpc09_state::dat_w),this));
-
-	}
-	else   // all the rest is treated as ram, 1MB ram emulated
-	{
-		mem.install_ram(logical_address, logical_address+0x0fff, &RAM[physical_address]);
-	}
-
-// unused code to limit to 256k ram
-//    else if (!(a12_to_a15 & 0x0c) )  // limit ram to 256k || a12_to_a15 == 0x02
-//    {
-//        memory_install_ram(space, logical_address, logical_address+0x0fff, 0, 0, &RAM[physical_address]);
-//    }
-//
-//    else   // all the rest is treated as unallocated
-//    {
-//        memory_nop_readwrite(space, logical_address, logical_address+0x0fff, 0, 0);
-//    }
-
+WRITE8_MEMBER(swtpc09_state::main_w)
+{
+	m_banked_space->write_byte(dat_translate(offset), data);
 }
 
 /*  MC6844 DMA controller I/O */
@@ -632,7 +514,7 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 			{
 				swtpc09_irq_handler(0x01, CLEAR_LINE);
 				m_m6844_interrupt &= 0x7f;  // clear interrupt indication bit 7
-				LOG(("swtpc09_6844_r interrupt cleared \n"));
+				logerror("swtpc09_6844_r interrupt cleared \n");
 			}
 			break;
 
@@ -654,7 +536,7 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 		/* 0x17-0x1f not used */
 		default: break;
 	}
-	//LOG(("swtpc09_6844_r %02X %02X\n", offset, result & 0xff));
+	//logerror("swtpc09_6844_r %02X %02X\n", offset, result & 0xff);
 
 	if (m_system_type == UNIFLEX_DMF2 || m_system_type == FLEX_DMF2)   // if DMF2 controller data bus is inverted to 6844
 	{
@@ -674,7 +556,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 	if (m_system_type == UNIFLEX_DMF2 || m_system_type == FLEX_DMF2)   // if DMF2 controller data bus is inverted to 6844
 		data = ~data & 0xff;
 
-	LOG(("swtpc09_6844_w %02X %02X\n", offset, data));
+	logerror("swtpc09_6844_w %02X %02X\n", offset, data);
 	/* switch off the offset we were given */
 	switch (offset)
 	{
@@ -730,7 +612,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 				{
 					/* mark us active */
 					m_m6844_channel[i].active = 1;
-					LOG(("swtpc09_dma_channel active %02X\n", i));
+					logerror("swtpc09_dma_channel active %02X\n", i);
 
 					/* set the DMA busy bit and clear the DMA end bit */
 					m_m6844_channel[i].control |= 0x40;
@@ -757,7 +639,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 		/* interrupt control */
 		case 0x15:
 			m_m6844_interrupt = (m_m6844_interrupt & 0x80) | (data & 0x7f);
-			LOG(("swtpc09_m_m6844_interrupt_w %02X\n", m_m6844_interrupt));
+			logerror("swtpc09_m_m6844_interrupt_w %02X\n", m_m6844_interrupt);
 			break;
 
 		/* chaining control */
@@ -771,92 +653,47 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 }
 
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09 )
+void swtpc09_state::machine_start()
 {
-	int i;
 	m_pia_counter = 0;  // init ptm/pia counter to 0
 	m_term_data = 0;    // terminal keyboard input
 	m_fdc_status = 0;    // for floppy controller
+	m_interrupt = 0;
+	m_active_interrupt = false;
+
+	// reset the 6844
+	for (int i = 0; i < 4; i++)
+	{
+		m_m6844_channel[i].active = 0;
+		m_m6844_channel[i].control = 0x00;
+	}
+	m_m6844_priority = 0x00;
+	m_m6844_interrupt = 0x00;
+	m_m6844_chain = 0x00;
+
+	m_banked_space = &subdevice<address_map_bank_device>("bankdev")->space(AS_PROGRAM);
+
+	m_brg->rsa_w(0);
+	m_brg->rsb_w(1);
+}
+
+void swtpc09_state::init_swtpc09()
+{
 	m_system_type = FLEX_DMF2;
-	m_interrupt = 0;
-	m_active_interrupt = false;
-
-	/* reset the 6844 */
-	for (i = 0; i < 4; i++)
-	{
-		m_m6844_channel[i].active = 0;
-		m_m6844_channel[i].control = 0x00;
-	}
-	m_m6844_priority = 0x00;
-	m_m6844_interrupt = 0x00;
-	m_m6844_chain = 0x00;
-
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09i )
+void swtpc09_state::init_swtpc09i()
 {
-	int i;
-	m_pia_counter = 0;  // init ptm/pia counter to 0
-	m_term_data = 0;    // terminal keyboard input
-	m_fdc_status = 0;    // for floppy controller
 	m_system_type = FLEX_DC4_PIAIDE;
-	m_interrupt = 0;
-	m_active_interrupt = false;
-
-	/* reset the 6844 */
-	for (i = 0; i < 4; i++)
-	{
-		m_m6844_channel[i].active = 0;
-		m_m6844_channel[i].control = 0x00;
-	}
-	m_m6844_priority = 0x00;
-	m_m6844_interrupt = 0x00;
-	m_m6844_chain = 0x00;
-
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09u )
+void swtpc09_state::init_swtpc09u()
 {
-	int i;
-	m_pia_counter = 0;  //init ptm/pia counter to 0
-	m_term_data = 0;  //terminal keyboard input
-	m_fdc_status = 0;    // for floppy controller
 	m_system_type = UNIFLEX_DMF2;
-	m_interrupt = 0;
-	m_active_interrupt = false;
-
-	/* reset the 6844 */
-	for (i = 0; i < 4; i++)
-	{
-		m_m6844_channel[i].active = 0;
-		m_m6844_channel[i].control = 0x00;
-	}
-	m_m6844_priority = 0x00;
-	m_m6844_interrupt = 0x00;
-	m_m6844_chain = 0x00;
-
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09d3 )
+void swtpc09_state::init_swtpc09d3()
 {
-	int i;
-	m_pia_counter = 0;  //init ptm/pia counter to 0
-	m_term_data = 0;  //terminal keyboard input
-	m_fdc_status = 0;    // for floppy controller
 	m_via_ca1_input = 0;
 	m_system_type = UNIFLEX_DMF3;
-	m_interrupt = 0;
-	m_active_interrupt = false;
-
-
-	/* reset the 6844 */
-	for (i = 0; i < 4; i++)
-	{
-		m_m6844_channel[i].active = 0;
-		m_m6844_channel[i].control = 0x00;
-	}
-	m_m6844_priority = 0x00;
-	m_m6844_interrupt = 0x00;
-	m_m6844_chain = 0x00;
-
 }

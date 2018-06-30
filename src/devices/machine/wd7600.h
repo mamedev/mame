@@ -21,10 +21,10 @@
 
 #define MCFG_WD7600_ADD(_tag, _clock, _cputag, _isatag, _biostag, _keybctag) \
 	MCFG_DEVICE_ADD(_tag, WD7600, _clock) \
-	wd7600_device::static_set_cputag(*device, _cputag); \
-	wd7600_device::static_set_isatag(*device, _isatag); \
-	wd7600_device::static_set_biostag(*device, _biostag); \
-	wd7600_device::static_set_keybctag(*device, _keybctag);
+	downcast<wd7600_device &>(*device).set_cputag(_cputag); \
+	downcast<wd7600_device &>(*device).set_isatag(_isatag); \
+	downcast<wd7600_device &>(*device).set_biostag(_biostag); \
+	downcast<wd7600_device &>(*device).set_keybctag(_keybctag);
 
 #define MCFG_WD7600_IOR(_ior) \
 	devcb = &downcast<wd7600_device *>(device)->set_ior_callback(DEVCB_##_ior);
@@ -78,10 +78,10 @@ public:
 	template <class Object> devcb_base &set_spkr_callback(Object &&spkr) { return m_write_spkr.set_callback(std::forward<Object>(spkr)); }
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	static void static_set_isatag(device_t &device, const char *tag);
-	static void static_set_biostag(device_t &device, const char *tag);
-	static void static_set_keybctag(device_t &device, const char *tag);
+	void set_cputag(const char *tag) { m_cputag = tag; }
+	void set_isatag(const char *tag) { m_isatag = tag; }
+	void set_biostag(const char *tag) { m_biostag = tag; }
+	void set_keybctag(const char *tag) { m_keybctag = tag; }
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER( irq01_w ) { m_pic1->ir1_w(state); }
@@ -134,7 +134,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(rtc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER( pic1_int_w ) { m_write_intr(state); }
 	DECLARE_READ8_MEMBER( pic1_slave_ack_r );
 	DECLARE_WRITE_LINE_MEMBER( ctc_out1_w );

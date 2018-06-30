@@ -16,6 +16,11 @@ mpeg_audio::mpeg_audio(const void *_base, unsigned int _accepted, bool lsb_first
 	do_gb = lsb_first ? do_gb_lsb : do_gb_msb;
 	position_align = _position_align ? _position_align - 1 : 0;
 
+	for (int i = 0; i < 32; i++) {
+		for (int j = 0; j < 32; j++)
+			m_cos_cache[i][j] = cos(i*(2 * j + 1)*M_PI / 64);
+	}
+
 	clear();
 }
 
@@ -722,10 +727,10 @@ void mpeg_audio::retrieve_subbuffer(int step)
 void mpeg_audio::idct32(const double *input, double *output)
 {
 	// Simplest idct32 ever, non-fast at all
-	for(int i=0; i<32; i++) {
+	for (int i = 0; i < 32; i++) {
 		double s = 0;
-		for(int j=0; j<32; j++)
-			s += input[j] * cos(i*(2*j+1)*M_PI/64);
+		for (int j = 0; j < 32; j++)
+			s += input[j] * m_cos_cache[i][j];
 		output[i] = s;
 	}
 }

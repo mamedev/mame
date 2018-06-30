@@ -82,7 +82,7 @@ private:
 	virtual void dack_w(int line,uint8_t data) override;
 	virtual void eop_w(int state) override;
 
-	const char *cpu_context();
+	std::string cpu_context() const;
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 
 	void tape_status_clear(uint16_t value);

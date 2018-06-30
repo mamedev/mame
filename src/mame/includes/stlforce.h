@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "machine/eepromser.h"
+#include "emupal.h"
 
 class stlforce_state : public driver_device
 {
@@ -54,8 +55,8 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 
-	DECLARE_DRIVER_INIT(twinbrat);
-	DECLARE_DRIVER_INIT(stlforce);
+	void init_twinbrat();
+	void init_stlforce();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_mlow_tile_info);
@@ -65,4 +66,8 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void stlforce(machine_config &config);
+	void twinbrat(machine_config &config);
+	void stlforce_map(address_map &map);
+	void twinbrat_oki_map(address_map &map);
 };

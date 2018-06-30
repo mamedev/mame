@@ -3,21 +3,13 @@
 #include "audio/seibu.h"
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
-
-ADDRESS_MAP_EXTERN(raiden2_sound_map, 8);
-ADDRESS_MAP_EXTERN(zeroteam_sound_map, 8);
+#include "emupal.h"
 
 class raiden2_state : public driver_device
 {
 public:
 	raiden2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		/*
-		  back_data(*this, "back_data"),
-		  fore_data(*this, "fore_data"),
-		  mid_data(*this, "mid_data"),
-		  text_data(*this, "text_data"),
-		  */
 			sprites(*this, "sprites") ,
 			m_maincpu(*this, "maincpu"),
 			m_seibu_sound(*this, "seibu_sound"),
@@ -47,10 +39,11 @@ public:
 
 	}
 
-	std::unique_ptr<uint16_t[]> back_data;
-	std::unique_ptr<uint16_t[]> fore_data;
-	std::unique_ptr<uint16_t[]> mid_data;
-	std::unique_ptr<uint16_t[]> text_data; // private buffers, allocated in init
+	std::unique_ptr<uint16_t[]> m_back_data;
+	std::unique_ptr<uint16_t[]> m_fore_data;
+	std::unique_ptr<uint16_t[]> m_mid_data;
+	std::unique_ptr<uint16_t[]> m_text_data; // private buffers, allocated in init
+	std::unique_ptr<uint16_t[]> m_palette_data;
 	required_shared_ptr<uint16_t> sprites;
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
@@ -127,10 +120,10 @@ public:
 
 	const int *cur_spri; // cfg
 
-	DECLARE_DRIVER_INIT(raidendx);
-	DECLARE_DRIVER_INIT(xsedae);
-	DECLARE_DRIVER_INIT(zeroteam);
-	DECLARE_DRIVER_INIT(raiden2);
+	void init_raidendx();
+	void init_xsedae();
+	void init_zeroteam();
+	void init_raiden2();
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
@@ -153,6 +146,17 @@ public:
 	bitmap_ind16 tile_buffer, sprite_buffer;
 	optional_device<raiden2cop_device> m_raiden2cop;
 
+	void raidendx(machine_config &config);
+	void xsedae(machine_config &config);
+	void zeroteam(machine_config &config);
+	void raiden2(machine_config &config);
+	void raiden2_cop_mem(address_map &map);
+	void raiden2_mem(address_map &map);
+	void raiden2_sound_map(address_map &map);
+	void raidendx_mem(address_map &map);
+	void xsedae_mem(address_map &map);
+	void zeroteam_mem(address_map &map);
+	void zeroteam_sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 };

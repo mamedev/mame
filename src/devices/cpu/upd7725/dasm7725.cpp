@@ -10,11 +10,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "upd7725.h"
+#include "dasm7725.h"
 
-CPU_DISASSEMBLE(upd7725)
+u32 necdsp_disassembler::opcode_alignment() const
 {
-	uint32_t opcode = oprom[2] | (oprom[1] << 8) | (oprom[0] << 16);
+	return 1;
+}
+
+offs_t necdsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	uint32_t opcode = opcodes.r32(pc) >> 8;
 	uint32_t type = (opcode >> 22);
 
 //  printf("dasm: PC %x opcode %08x\n", pc, opcode);
@@ -220,5 +225,5 @@ CPU_DISASSEMBLE(upd7725)
 	}
 	}
 
-	return 1 | DASMFLAG_SUPPORTED;
+	return 1 | SUPPORTED;
 }

@@ -42,8 +42,8 @@ void mb60553_zooming_tilemap_device::device_start()
 	m_lineram = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_vram = make_unique_clear<uint16_t[]>(0x4000/2);
 
-	save_pointer(NAME(m_lineram.get()), 0x1000/2);
-	save_pointer(NAME(m_vram.get()), 0x4000/2);
+	save_pointer(NAME(m_lineram), 0x1000/2);
+	save_pointer(NAME(m_vram), 0x4000/2);
 	save_item(NAME(m_pal_base));
 	save_item(NAME(m_bank));
 	save_item(NAME(m_regs));
@@ -55,19 +55,6 @@ void mb60553_zooming_tilemap_device::device_start()
 void mb60553_zooming_tilemap_device::device_reset()
 {
 }
-
-
-void mb60553_zooming_tilemap_device::set_gfx_region(device_t &device, int gfxregion)
-{
-	mb60553_zooming_tilemap_device &dev = downcast<mb60553_zooming_tilemap_device &>(device);
-	dev.m_gfx_region = gfxregion;
-}
-
-void mb60553_zooming_tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<mb60553_zooming_tilemap_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
 
 
 /*** Fujitsu MB60553 (screen tilemap) **********************************************/

@@ -25,6 +25,7 @@
 // - Correct character generator ROMs (a huge "thank you" to Ansgar Kueckes for the dumps!)
 // - 98775 light pen controller
 // - Display softkeys on 45C & 45T
+// - HLE of integral printer
 // What's not yet in:
 // - Better naming of tape drive image (it's now "magt1" and "magt2", should be "t15" and "t14")
 // - Better documentation of this file
@@ -32,7 +33,6 @@
 // - Speed, as usual
 // - Light pen tracing sometimes behaves erratically in 45C and 45T
 // What will probably never be in:
-// - Integral printer (firmware and character generator ROMs are very difficult to dump)
 // - Fast LPU processor (dump of microcode PROMs is not available)
 
 #include "emu.h"
@@ -48,6 +48,7 @@
 
 #include "hp9845b.lh"
 
+#include "machine/hp9845_printer.h"
 
 // Debugging
 #define VERBOSE 0
@@ -187,6 +188,7 @@ constexpr unsigned LP_FOV = 9;  // Field of view
 constexpr unsigned LP_XOFFSET = 5;  // x-offset of LP (due to delay in hit recognition)
 
 // Peripheral Addresses (PA)
+#define PRINTER_PA          0
 #define IO_SLOT_FIRST_PA    1
 #define IO_SLOT_LAST_PA     12
 #define GVIDEO_PA           13
@@ -202,6 +204,10 @@ public:
 		driver_device(mconfig, type, tag)
 	{ }
 
+	void hp9845a(machine_config &config);
+	void hp9835a(machine_config &config);
+	
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -222,10 +228,10 @@ static INPUT_PORTS_START(hp9845_base)
 	PORT_START("KEY0")
 	PORT_BIT(BIT_MASK(0)  , IP_ACTIVE_HIGH , IPT_UNUSED)    // N/U
 	PORT_BIT(BIT_MASK(1)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_TOGGLE PORT_NAME("Prt all") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845_base_state, togglekey_changed, 1) // Print All
-	PORT_BIT(BIT_MASK(2)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Keypad +")        // KP +
-	PORT_BIT(BIT_MASK(3)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_NAME("Keypad ,")        // KP ,
-	PORT_BIT(BIT_MASK(4)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) PORT_NAME("Keypad .")        // KP .
-	PORT_BIT(BIT_MASK(5)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) PORT_NAME("Keypad 0")            // KP 0
+	PORT_BIT(BIT_MASK(2)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))                           // KP +
+	PORT_BIT(BIT_MASK(3)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_COMMA_PAD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))                         // KP ,
+	PORT_BIT(BIT_MASK(4)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))                             // KP .
+	PORT_BIT(BIT_MASK(5)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD))                                 // KP 0
 	PORT_BIT(BIT_MASK(6)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Execute")    // Execute
 	PORT_BIT(BIT_MASK(7)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_ENTER) PORT_NAME("Cont") PORT_CHAR(13)    // Cont
 	PORT_BIT(BIT_MASK(8)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))        // Right
@@ -238,10 +244,10 @@ static INPUT_PORTS_START(hp9845_base)
 	PORT_BIT(BIT_MASK(15)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)    PORT_CHAR(UCHAR_SHIFT_1)   // Shift
 	PORT_BIT(BIT_MASK(16)  , IP_ACTIVE_HIGH , IPT_UNUSED)   // N/U
 	PORT_BIT(BIT_MASK(17)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_TOGGLE PORT_NAME("Auto st") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845_base_state, togglekey_changed, 2) // Auto Start
-	PORT_BIT(BIT_MASK(18)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) PORT_NAME("Keypad -")        // KP -
-	PORT_BIT(BIT_MASK(19)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD)) PORT_NAME("Keypad 3")        // KP 3
-	PORT_BIT(BIT_MASK(20)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_NAME("Keypad 2")        // KP 2
-	PORT_BIT(BIT_MASK(21)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) PORT_NAME("Keypad 1")        // KP 1
+	PORT_BIT(BIT_MASK(18)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) // KP -
+	PORT_BIT(BIT_MASK(19)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))         // KP 3
+	PORT_BIT(BIT_MASK(20)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD))         // KP 2
+	PORT_BIT(BIT_MASK(21)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD))         // KP 1
 	PORT_BIT(BIT_MASK(22)  , IP_ACTIVE_HIGH , IPT_UNUSED)   // N/U
 	PORT_BIT(BIT_MASK(23)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))  // Left
 	PORT_BIT(BIT_MASK(24)  , IP_ACTIVE_HIGH , IPT_UNUSED)   // Repeat
@@ -256,11 +262,11 @@ static INPUT_PORTS_START(hp9845_base)
 	PORT_START("KEY1")
 	PORT_BIT(BIT_MASK(0)  , IP_ACTIVE_HIGH , IPT_UNUSED)    // N/U
 	PORT_BIT(BIT_MASK(1)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_INSERT) PORT_NAME("Ins chr")    // Ins Char
-	PORT_BIT(BIT_MASK(2)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) PORT_NAME("Keypad *")        // KP *
-	PORT_BIT(BIT_MASK(3)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_NAME("Keypad 6")        // KP 6
-	PORT_BIT(BIT_MASK(4)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_5_PAD) PORT_CHAR(UCHAR_MAMEKEY(5_PAD)) PORT_NAME("Keypad 5")        // KP 5
-	PORT_BIT(BIT_MASK(5)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_NAME("Keypad 4")        // KP 4
-	PORT_BIT(BIT_MASK(6)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_NAME("Keypad =")        // KP =
+	PORT_BIT(BIT_MASK(2)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))     // KP *
+	PORT_BIT(BIT_MASK(3)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD))           // KP 6
+	PORT_BIT(BIT_MASK(4)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_5_PAD) PORT_CHAR(UCHAR_MAMEKEY(5_PAD))           // KP 5
+	PORT_BIT(BIT_MASK(5)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD))           // KP 4
+	PORT_BIT(BIT_MASK(6)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_EQUALS_PAD) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD)) // KP =
 	PORT_BIT(BIT_MASK(7)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_NAME("Pause")      // Pause
 	PORT_BIT(BIT_MASK(8)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_UP)   PORT_CHAR(UCHAR_MAMEKEY(UP))    // Up
 	PORT_BIT(BIT_MASK(9)  , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_NAME("Store")  // Store
@@ -272,10 +278,10 @@ static INPUT_PORTS_START(hp9845_base)
 	PORT_BIT(BIT_MASK(15)  , IP_ACTIVE_HIGH , IPT_UNUSED)   // N/U
 	PORT_BIT(BIT_MASK(16)  , IP_ACTIVE_HIGH , IPT_UNUSED)   // N/U
 	PORT_BIT(BIT_MASK(17)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("Ins ln")      // Ins Ln
-	PORT_BIT(BIT_MASK(18)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) PORT_NAME("Keypad /")        // KP /
-	PORT_BIT(BIT_MASK(19)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) PORT_NAME("Keypad 9")        // KP 9
-	PORT_BIT(BIT_MASK(20)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_NAME("Keypad 8")        // KP 8
-	PORT_BIT(BIT_MASK(21)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD)) PORT_NAME("Keypad 7")        // KP 7
+	PORT_BIT(BIT_MASK(18)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // KP /
+	PORT_BIT(BIT_MASK(19)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))         // KP 9
+	PORT_BIT(BIT_MASK(20)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))         // KP 8
+	PORT_BIT(BIT_MASK(21)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD))         // KP 7
 	PORT_BIT(BIT_MASK(22)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("Result")     // Result
 	PORT_BIT(BIT_MASK(23)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("Run")        // Run
 	PORT_BIT(BIT_MASK(24)  , IP_ACTIVE_HIGH , IPT_UNUSED)   // N/U
@@ -406,27 +412,22 @@ INPUT_PORTS_END
 //  hp9845_base_state
 // *******************
 hp9845_base_state::hp9845_base_state(const machine_config &mconfig, device_type type, const char *tag) :
-			  driver_device(mconfig, type, tag),
-			  m_lpu(*this , "lpu"),
-			  m_ppu(*this , "ppu"),
-			  m_screen(*this , "screen"),
-			  m_palette(*this , "palette"),
-			  m_gv_timer(*this , "gv_timer"),
-			  m_io_key0(*this , "KEY0"),
-			  m_io_key1(*this , "KEY1"),
-			  m_io_key2(*this , "KEY2"),
-			  m_io_key3(*this , "KEY3"),
-			  m_io_shiftlock(*this, "SHIFTLOCK"),
-			  m_t14(*this , "t14"),
-			  m_t15(*this , "t15"),
-			  m_beeper(*this , "beeper"),
-			  m_beep_timer(*this , "beep_timer"),
-			  m_io_slot0(*this , "slot0"),
-			  m_io_slot1(*this , "slot1"),
-			  m_io_slot2(*this , "slot2"),
-			  m_io_slot3(*this , "slot3"),
-			  m_ram(*this , RAM_TAG),
-			  m_chargen(*this , "chargen")
+	driver_device(mconfig, type, tag),
+	m_lpu(*this, "lpu"),
+	m_ppu(*this, "ppu"),
+	m_screen(*this, "screen"),
+	m_palette(*this, "palette"),
+	m_gv_timer(*this, "gv_timer"),
+	m_io_key(*this, "KEY%u", 0U),
+	m_io_shiftlock(*this, "SHIFTLOCK"),
+	m_t14(*this, "t14"),
+	m_t15(*this, "t15"),
+	m_beeper(*this, "beeper"),
+	m_beep_timer(*this, "beep_timer"),
+	m_io_slot(*this, "slot%u", 0U),
+	m_ram(*this, RAM_TAG),
+	m_softkeys(*this, "Softkey%u", 0U),
+	m_chargen(*this, "chargen")
 {
 }
 
@@ -439,7 +440,8 @@ void hp9845_base_state::setup_ram_block(unsigned block , unsigned offset)
 
 void hp9845_base_state::machine_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_softkeys.resolve();
+	m_screen->register_screen_bitmap(m_bitmap);
 
 	// setup RAM dynamically for -ramsize
 	// 0K..64K
@@ -483,22 +485,11 @@ void hp9845_base_state::machine_reset()
 	int sc;
 	read16_delegate rhandler;
 	write16_delegate whandler;
-	if ((sc = m_io_slot0->get_rw_handlers(rhandler , whandler)) >= 0) {
-		logerror("Install R/W handlers for slot 0 @ SC = %d\n" , sc);
-		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
-	}
-	if ((sc = m_io_slot1->get_rw_handlers(rhandler , whandler)) >= 0) {
-		logerror("Install R/W handlers for slot 1 @ SC = %d\n" , sc);
-		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
-	}
-	if ((sc = m_io_slot2->get_rw_handlers(rhandler , whandler)) >= 0) {
-		logerror("Install R/W handlers for slot 2 @ SC = %d\n" , sc);
-		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
-	}
-	if ((sc = m_io_slot3->get_rw_handlers(rhandler , whandler)) >= 0) {
-		logerror("Install R/W handlers for slot 3 @ SC = %d\n" , sc);
-		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
-	}
+	for (unsigned i = 0; 4 > i; ++i)
+		if ((sc = m_io_slot[i]->get_rw_handlers(rhandler , whandler)) >= 0) {
+			logerror("Install R/W handlers for slot %u @ SC = %d\n", i, sc);
+			m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
+		}
 
 	// Some sensible defaults
 	m_video_load_mar = false;
@@ -515,13 +506,15 @@ void hp9845_base_state::machine_reset()
 	m_irh_pending = 0;
 	m_pa = 0;
 
-	sts_w(GVIDEO_PA , true);
+	set_sts(GVIDEO_PA , true);
 
 	memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
 	m_kb_scancode = 0x7f;
 	m_kb_status = 0;
 
 	m_beeper->set_state(0);
+
+	m_prt_irl = false;
 
 	logerror("STS=%04x FLG=%04x\n" , m_sts_status , m_flg_status);
 }
@@ -567,10 +560,10 @@ void hp9845_base_state::update_irq()
 
 WRITE8_MEMBER(hp9845_base_state::irq_w)
 {
-	irq_w((uint8_t)offset , data != 0);
+	set_irq(uint8_t(offset) , data != 0);
 }
 
-void hp9845_base_state::irq_w(uint8_t sc , int state)
+void hp9845_base_state::set_irq(uint8_t sc , int state)
 {
 	unsigned bit_n = sc % 8;
 
@@ -600,10 +593,10 @@ void hp9845_base_state::update_flg_sts()
 
 WRITE8_MEMBER(hp9845_base_state::sts_w)
 {
-	sts_w((uint8_t)offset , data != 0);
+	set_sts(uint8_t(offset) , data != 0);
 }
 
-void hp9845_base_state::sts_w(uint8_t sc , int state)
+void hp9845_base_state::set_sts(uint8_t sc , int state)
 {
 	if (state) {
 		BIT_SET(m_sts_status, sc);
@@ -617,10 +610,10 @@ void hp9845_base_state::sts_w(uint8_t sc , int state)
 
 WRITE8_MEMBER(hp9845_base_state::flg_w)
 {
-	flg_w((uint8_t)offset , data != 0);
+	set_flg(uint8_t(offset) , data != 0);
 }
 
-void hp9845_base_state::flg_w(uint8_t sc , int state)
+void hp9845_base_state::set_flg(uint8_t sc , int state)
 {
 	if (state) {
 		BIT_SET(m_flg_status, sc);
@@ -632,12 +625,12 @@ void hp9845_base_state::flg_w(uint8_t sc , int state)
 	}
 }
 
-void hp9845_base_state::kb_scan_ioport(ioport_value pressed , ioport_port *port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx)
+void hp9845_base_state::kb_scan_ioport(ioport_value pressed , ioport_port &port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx)
 {
 	while (pressed) {
 		unsigned bit_no = 31 - count_leading_zeros(pressed);
 		ioport_value mask = BIT_MASK(bit_no);
-		int seq_len = port->field(mask)->seq().length();
+		int seq_len = port.field(mask)->seq().length();
 		if (seq_len > max_seq_len) {
 			max_seq_len = seq_len;
 			max_seq_idx = bit_no + idx_base;
@@ -648,11 +641,11 @@ void hp9845_base_state::kb_scan_ioport(ioport_value pressed , ioport_port *port 
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::kb_scan)
 {
-		ioport_value input[ 4 ];
-		input[ 0 ] = m_io_key0->read();
-		input[ 1 ] = m_io_key1->read();
-		input[ 2 ] = m_io_key2->read();
-		input[ 3 ] = m_io_key3->read();
+		ioport_value input[ 4 ]{
+				m_io_key[0]->read(),
+				m_io_key[1]->read(),
+				m_io_key[2]->read(),
+				m_io_key[3]->read() };
 
 		// Shift lock
 		ioport_value shiftlock = m_io_shiftlock->read();
@@ -697,10 +690,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::kb_scan)
 
 		int max_seq_len = 0;
 		unsigned max_seq_idx = 0;
-		kb_scan_ioport(input[ 0 ] & ~m_kb_state[ 0 ] , m_io_key0 , 0 , max_seq_len , max_seq_idx);
-		kb_scan_ioport(input[ 1 ] & ~m_kb_state[ 1 ] , m_io_key1 , 32 , max_seq_len , max_seq_idx);
-		kb_scan_ioport(input[ 2 ] & ~m_kb_state[ 2 ] , m_io_key2 , 64 , max_seq_len , max_seq_idx);
-		kb_scan_ioport(input[ 3 ] & ~m_kb_state[ 3 ] , m_io_key3 , 96 , max_seq_len , max_seq_idx);
+		for (unsigned i = 0; 4 > i; ++i)
+			kb_scan_ioport(input[i] & ~m_kb_state[i] , *m_io_key[i] , i << 5 , max_seq_len , max_seq_idx);
 		// TODO: handle repeat key
 		// TODO: handle ctrl+stop
 
@@ -708,8 +699,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::kb_scan)
 			// Key pressed, store scancode & generate IRL
 			//logerror("idx=%u msl=%d\n" , max_seq_idx , max_seq_len);
 			m_kb_scancode = max_seq_idx;
-			irq_w(0 , 1);
 			BIT_SET(m_kb_status, 0);
+			update_kb_prt_irq();
 
 			// Special case: pressing stop key sets LPU "status" flag
 			if (max_seq_idx == 0x47) {
@@ -732,8 +723,8 @@ READ16_MEMBER(hp9845_base_state::kb_status_r)
 
 WRITE16_MEMBER(hp9845_base_state::kb_irq_clear_w)
 {
-		irq_w(0 , 0);
 		BIT_CLR(m_kb_status, 0);
+		update_kb_prt_irq();
 		m_lpu->status_w(0);
 
 		if (BIT(data , 15)) {
@@ -741,6 +732,12 @@ WRITE16_MEMBER(hp9845_base_state::kb_irq_clear_w)
 			m_beep_timer->adjust(attotime::from_ticks(64, KEY_SCAN_OSCILLATOR / 512));
 			m_beeper->set_state(1);
 		}
+}
+
+void hp9845_base_state::update_kb_prt_irq()
+{
+	bool state = BIT(m_kb_status , 0) || m_prt_irl;
+	set_irq(0 , state);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::beeper_off)
@@ -756,34 +753,50 @@ WRITE8_MEMBER(hp9845_base_state::pa_w)
 	}
 }
 
+WRITE_LINE_MEMBER(hp9845_base_state::prt_irl_w)
+{
+	m_prt_irl = state;
+	update_kb_prt_irq();
+}
+
+WRITE_LINE_MEMBER(hp9845_base_state::prt_flg_w)
+{
+	set_flg(PRINTER_PA , state);
+}
+
+WRITE_LINE_MEMBER(hp9845_base_state::prt_sts_w)
+{
+	set_sts(PRINTER_PA , state);
+}
+
 WRITE_LINE_MEMBER(hp9845_base_state::t14_irq_w)
 {
-	irq_w(T14_PA , state);
+	set_irq(T14_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t14_flg_w)
 {
-	flg_w(T14_PA , state);
+	set_flg(T14_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t14_sts_w)
 {
-	sts_w(T14_PA , state);
+	set_sts(T14_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t15_irq_w)
 {
-	irq_w(T15_PA , state);
+	set_irq(T15_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t15_flg_w)
 {
-	flg_w(T15_PA , state);
+	set_flg(T15_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t15_sts_w)
 {
-	sts_w(T15_PA , state);
+	set_sts(T15_PA , state);
 }
 
 INPUT_CHANGED_MEMBER(hp9845_base_state::togglekey_changed)
@@ -799,14 +812,14 @@ INPUT_CHANGED_MEMBER(hp9845_base_state::togglekey_changed)
 		break;
 	case 1: // Prt all
 		{
-			bool state = BIT(m_io_key0->read(), 1);
+			bool state = BIT(m_io_key[0]->read(), 1);
 			popmessage("PRT ALL %s", state ? "ON" : "OFF");
 			output().set_value("prt_all_led" , state);
 		}
 		break;
 	case 2: // Auto st
 		{
-			bool state = BIT(m_io_key0->read(), 17);
+			bool state = BIT(m_io_key[0]->read(), 17);
 			popmessage("AUTO ST %s", state ? "ON" : "OFF");
 			output().set_value("auto_st_led" , state);
 		}
@@ -822,6 +835,9 @@ class hp9845b_state : public hp9845_base_state
 public:
 	hp9845b_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp9845b(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
@@ -834,7 +850,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-protected:
 	void set_graphic_mode(bool graphic);
 	void set_video_mar(uint16_t mar);
 	void video_fill_buff(bool buff_idx);
@@ -1046,7 +1061,7 @@ void hp9845b_state::video_fill_buff(bool buff_idx)
 				// Limit on accesses per row reached
 				break;
 			}
-			m_video_word = prog_space.read_word(m_video_mar << 1);
+			m_video_word = prog_space.read_word(m_video_mar);
 			if (m_video_load_mar) {
 				// Load new address into MAR after start of a new frame or NWA instruction
 				if (m_video_first_mar) {
@@ -1333,11 +1348,11 @@ void hp9845b_state::update_graphic_bits()
 			m_gv_fsm_state == GV_STAT_WAIT_DS_1 ||
 			m_gv_fsm_state == GV_STAT_WAIT_DS_2;
 
-		flg_w(GVIDEO_PA , gv_ready);
+		set_flg(GVIDEO_PA , gv_ready);
 
 		bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-		irq_w(GVIDEO_PA , irq);
+		set_irq(GVIDEO_PA , irq);
 
 		bool dmar = gv_ready && m_gv_dma_en;
 
@@ -1375,7 +1390,7 @@ protected:
 	void update_line_pattern();
 	void pattern_fill(uint16_t x0 , uint16_t y0 , uint16_t x1 , uint16_t y1 , unsigned fill_idx);
 	static uint16_t get_gv_mem_addr(unsigned x , unsigned y);
-	virtual void update_graphic_bits(void) = 0;
+	virtual void update_graphic_bits() = 0;
 	static int get_wrapped_scanline(unsigned scanline);
 	void render_lp_cursor(unsigned video_scanline , unsigned pen_idx);
 
@@ -1386,7 +1401,7 @@ protected:
 	void compute_lp_data();
 	void lp_scanline_update(unsigned video_scanline);
 
-	virtual void update_gcursor(void) = 0;
+	virtual void update_gcursor() = 0;
 
 	bool m_alpha_sel;
 	bool m_gv_sk_en;
@@ -1584,7 +1599,7 @@ INPUT_CHANGED_MEMBER(hp9845ct_base_state::softkey_changed)
 	uint8_t softkey_data = m_io_softkeys->read();
 	unsigned softkey;
 	for (softkey = 0; softkey < 8; softkey++) {
-		output().set_indexed_value("Softkey" , softkey , !BIT(softkey_data , 7 - softkey));
+		m_softkeys[softkey] = !BIT(softkey_data , 7 - softkey);
 	}
 	for (softkey = 0; softkey < 8 && BIT(softkey_data , 7 - softkey); softkey++) {
 	}
@@ -1620,7 +1635,7 @@ void hp9845ct_base_state::video_fill_buff(bool buff_idx)
 			// Limit on accesses per row reached
 			break;
 		}
-		m_video_word = prog_space.read_word(m_video_mar << 1);
+		m_video_word = prog_space.read_word(m_video_mar);
 		if (m_video_load_mar) {
 			// Load new address into MAR after start of a new frame or NWA instruction
 			if (m_video_first_mar) {
@@ -2050,6 +2065,9 @@ class hp9845c_state : public hp9845ct_base_state
 public:
 	hp9845c_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp9845c(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -2058,7 +2076,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
-protected:
 	virtual void set_graphic_mode(bool graphic , bool alpha) override;
 	void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
 	void graphic_video_render(unsigned video_scanline);
@@ -2069,7 +2086,7 @@ protected:
 	virtual void advance_gv_fsm(bool ds , bool trigger) override;
 	virtual void update_graphic_bits() override;
 
-	virtual void update_gcursor(void) override;
+	virtual void update_gcursor() override;
 
 	// Palette indexes
 	static constexpr unsigned pen_graphic(unsigned rgb) { return rgb; }
@@ -2758,18 +2775,18 @@ void hp9845c_state::update_graphic_bits()
 			m_gv_fsm_state == GV_STAT_WAIT_TRIG_1;
 	}
 
-	flg_w(GVIDEO_PA , gv_ready);
+	set_flg(GVIDEO_PA , gv_ready);
 
 	bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-	irq_w(GVIDEO_PA , irq);
+	set_irq(GVIDEO_PA , irq);
 
 	bool dmar = gv_ready && m_gv_dma_en;
 
 	m_ppu->dmar_w(dmar);
 }
 
-void hp9845c_state::update_gcursor(void)
+void hp9845c_state::update_gcursor()
 {
 	m_gv_cursor_color = ~m_gv_lyc & 0x7;
 	m_gv_cursor_y = (~m_gv_lyc >> 6) & 0x1ff;
@@ -2786,6 +2803,9 @@ class hp9845t_state : public hp9845ct_base_state
 public:
 	hp9845t_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp9845t(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -2794,7 +2814,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
-protected:
 	virtual void set_graphic_mode(bool graphic , bool alpha) override;
 	void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
 	void graphic_video_render(unsigned video_scanline);
@@ -2805,7 +2824,7 @@ protected:
 	virtual void advance_gv_fsm(bool ds , bool trigger) override;
 	virtual void update_graphic_bits() override;
 
-	virtual void update_gcursor(void) override;
+	virtual void update_gcursor() override;
 
 	std::vector<uint16_t> m_graphic_mem;
 
@@ -3602,18 +3621,18 @@ void hp9845t_state::update_graphic_bits()
 	// Fix for this problem is in commit 27004d00
 	// My apologies to Tony Duell for doubting at one point the correctness
 	// of his 98780A schematics.. :)
-	flg_w(GVIDEO_PA , gv_ready);
+	set_flg(GVIDEO_PA , gv_ready);
 
 	bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-	irq_w(GVIDEO_PA , irq);
+	set_irq(GVIDEO_PA , irq);
 
 	bool dmar = gv_ready && m_gv_dma_en;
 
 	m_ppu->dmar_w(dmar);
 }
 
-void hp9845t_state::update_gcursor(void)
+void hp9845t_state::update_gcursor()
 {
 	m_gv_cursor_fs = (m_gv_lyc & 0x3) == 0;
 	m_gv_cursor_gc = !BIT(m_gv_lyc , 1);
@@ -3626,9 +3645,9 @@ const uint8_t hp9845t_state::m_back_arrow_shape[] = {
 	0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00, 0x00
 };
 
-static MACHINE_CONFIG_START( hp9845a )
-	//MCFG_CPU_ADD("lpu", HP_5061_3010, XTAL_11_4MHz)
-	//MCFG_CPU_ADD("ppu", HP_5061_3011, XTAL_11_4MHz)
+MACHINE_CONFIG_START(hp9845_state::hp9845a)
+	//MCFG_DEVICE_ADD("lpu", HP_5061_3010, XTAL(11'400'000))
+	//MCFG_DEVICE_ADD("ppu", HP_5061_3011, XTAL(11'400'000))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3641,9 +3660,9 @@ static MACHINE_CONFIG_START( hp9845a )
 	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845a_rom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9835a )
-	//MCFG_CPU_ADD("lpu", HP_5061_3001, XTAL_11_4MHz)
-	//MCFG_CPU_ADD("ppu", HP_5061_3001, XTAL_11_4MHz)
+MACHINE_CONFIG_START(hp9845_state::hp9835a)
+	//MCFG_DEVICE_ADD("lpu", HP_5061_3001, XTAL(11'400'000))
+	//MCFG_DEVICE_ADD("ppu", HP_5061_3001, XTAL(11'400'000))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3685,43 +3704,48 @@ MACHINE_CONFIG_END
     - all LPU RAM is dynamically mapped at machine start according to -ramsize option
 */
 
-static ADDRESS_MAP_START(global_mem_map , AS_PROGRAM , 16 , hp9845_base_state)
-	ADDRESS_MAP_GLOBAL_MASK(0x3f7fff)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x014000 , 0x017fff) AM_RAM AM_SHARE("ppu_ram")
-	AM_RANGE(0x030000 , 0x037fff) AM_ROM AM_REGION("lpu" , 0)
-	AM_RANGE(0x050000 , 0x057fff) AM_ROM AM_REGION("ppu" , 0)
-ADDRESS_MAP_END
+void hp9845_base_state::global_mem_map(address_map &map)
+{
+	map.global_mask(0x3f7fff);
+	map.unmap_value_low();
+	map(0x014000, 0x017fff).ram().share("ppu_ram");
+	map(0x030000, 0x037fff).rom().region("lpu", 0);
+	map(0x050000, 0x057fff).rom().region("ppu", 0);
+}
 
-static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845_base_state)
-	ADDRESS_MAP_UNMAP_LOW
+void hp9845_base_state::ppu_io_map(address_map &map)
+{
+	map.unmap_value_low();
+	// PA = 0, IC = 0..1
+	// Internal printer
+	map(HP_MAKE_IOADDR(PRINTER_PA, 0), HP_MAKE_IOADDR(PRINTER_PA, 1)).rw("printer", FUNC(hp9845_printer_device::printer_r), FUNC(hp9845_printer_device::printer_w));
 	// PA = 0, IC = 2
 	// Keyboard scancode input
-	AM_RANGE(HP_MAKE_IOADDR(0 , 2) , HP_MAKE_IOADDR(0 , 2)) AM_READ(kb_scancode_r)
+	map(HP_MAKE_IOADDR(0, 2), HP_MAKE_IOADDR(0, 2)).r(FUNC(hp9845_base_state::kb_scancode_r));
 	// PA = 0, IC = 3
 	// Keyboard status input & keyboard interrupt clear
-	AM_RANGE(HP_MAKE_IOADDR(0 , 3) , HP_MAKE_IOADDR(0 , 3)) AM_READWRITE(kb_status_r , kb_irq_clear_w)
+	map(HP_MAKE_IOADDR(0, 3), HP_MAKE_IOADDR(0, 3)).rw(FUNC(hp9845_base_state::kb_status_r), FUNC(hp9845_base_state::kb_irq_clear_w));
 	// PA = 13, IC = 0..3
 	// Graphic video
-	AM_RANGE(HP_MAKE_IOADDR(GVIDEO_PA , 0) , HP_MAKE_IOADDR(GVIDEO_PA , 3)) AM_READWRITE(graphic_r , graphic_w)
+	map(HP_MAKE_IOADDR(GVIDEO_PA, 0), HP_MAKE_IOADDR(GVIDEO_PA, 3)).rw(FUNC(hp9845_base_state::graphic_r), FUNC(hp9845_base_state::graphic_w));
 	// PA = 14, IC = 0..3
 	// Left-hand side tape drive (T14)
-	AM_RANGE(HP_MAKE_IOADDR(T14_PA , 0) , HP_MAKE_IOADDR(T14_PA , 3))        AM_DEVREADWRITE("t14" , hp_taco_device , reg_r , reg_w)
+	map(HP_MAKE_IOADDR(T14_PA, 0), HP_MAKE_IOADDR(T14_PA, 3)).rw("t14", FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
 	// PA = 15, IC = 0..3
 	// Right-hand side tape drive (T15)
-	AM_RANGE(HP_MAKE_IOADDR(T15_PA , 0) , HP_MAKE_IOADDR(T15_PA , 3))        AM_DEVREADWRITE("t15" , hp_taco_device , reg_r , reg_w)
-ADDRESS_MAP_END
+	map(HP_MAKE_IOADDR(T15_PA, 0), HP_MAKE_IOADDR(T15_PA, 3)).rw("t15", FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
+}
 
-static MACHINE_CONFIG_START(hp9845_base)
-	MCFG_CPU_ADD("lpu", HP_5061_3001, 5700000)
-	MCFG_CPU_PROGRAM_MAP(global_mem_map)
+MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
+	MCFG_DEVICE_ADD("lpu", HP_5061_3001, 5700000)
+	MCFG_DEVICE_PROGRAM_MAP(global_mem_map)
 	MCFG_HPHYBRID_SET_9845_BOOT(true)
-	MCFG_CPU_ADD("ppu", HP_5061_3001, 5700000)
-	MCFG_CPU_PROGRAM_MAP(global_mem_map)
-	MCFG_CPU_IO_MAP(ppu_io_map)
+	MCFG_DEVICE_ADD("ppu", HP_5061_3001, 5700000)
+	MCFG_DEVICE_PROGRAM_MAP(global_mem_map)
+	MCFG_DEVICE_IO_MAP(ppu_io_map)
 	MCFG_HPHYBRID_SET_9845_BOOT(true)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(hp9845_base_state , irq_callback)
-	MCFG_HPHYBRID_PA_CHANGED(WRITE8(hp9845_base_state , pa_w))
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp9845_base_state , irq_callback)
+	MCFG_HPHYBRID_PA_CHANGED(WRITE8(*this, hp9845_base_state , pa_w))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3732,73 +3756,79 @@ static MACHINE_CONFIG_START(hp9845_base)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp9845_base_state , kb_scan , attotime::from_hz(100))
 
 	// Beeper
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper" , BEEP , KEY_SCAN_OSCILLATOR / 512)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper" , BEEP , KEY_SCAN_OSCILLATOR / 512)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 0.50)
 
 	MCFG_TIMER_DRIVER_ADD("beep_timer" , hp9845_base_state , beeper_off);
 
 	// Tape controller
 	MCFG_DEVICE_ADD("t15" , HP_TACO , 4000000)
-	MCFG_TACO_IRQ_HANDLER(WRITELINE(hp9845_base_state , t15_irq_w))
-	MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845_base_state , t15_flg_w))
-	MCFG_TACO_STS_HANDLER(WRITELINE(hp9845_base_state , t15_sts_w))
+	MCFG_TACO_IRQ_HANDLER(WRITELINE(*this, hp9845_base_state , t15_irq_w))
+	MCFG_TACO_FLG_HANDLER(WRITELINE(*this, hp9845_base_state , t15_flg_w))
+	MCFG_TACO_STS_HANDLER(WRITELINE(*this, hp9845_base_state , t15_sts_w))
 	MCFG_DEVICE_ADD("t14" , HP_TACO , 4000000)
-	MCFG_TACO_IRQ_HANDLER(WRITELINE(hp9845_base_state , t14_irq_w))
-	MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845_base_state , t14_flg_w))
-	MCFG_TACO_STS_HANDLER(WRITELINE(hp9845_base_state , t14_sts_w))
+	MCFG_TACO_IRQ_HANDLER(WRITELINE(*this, hp9845_base_state , t14_irq_w))
+	MCFG_TACO_FLG_HANDLER(WRITELINE(*this, hp9845_base_state , t14_flg_w))
+	MCFG_TACO_STS_HANDLER(WRITELINE(*this, hp9845_base_state , t14_sts_w))
 
 	// In real machine there were 8 slots for LPU ROMs and 8 slots for PPU ROMs in
 	// right-hand side and left-hand side drawers, respectively.
 	// Here we do away with the distinction between LPU & PPU ROMs: in the end they
 	// are visible to both CPUs at the same addresses.
 	MCFG_DEVICE_ADD("drawer1", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer2", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer3", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer4", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer5", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer6", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer7", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer8", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 
 	// I/O slots
 	MCFG_HP9845_IO_SLOT_ADD("slot0")
-	MCFG_HP9845_IO_IRQ_CB(WRITE8(hp9845_base_state , irq_w))
-	MCFG_HP9845_IO_STS_CB(WRITE8(hp9845_base_state , sts_w))
-	MCFG_HP9845_IO_FLG_CB(WRITE8(hp9845_base_state , flg_w))
+	MCFG_HP9845_IO_IRQ_CB(WRITE8(*this, hp9845_base_state , irq_w))
+	MCFG_HP9845_IO_STS_CB(WRITE8(*this, hp9845_base_state , sts_w))
+	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
 	MCFG_HP9845_IO_SLOT_ADD("slot1")
-	MCFG_HP9845_IO_IRQ_CB(WRITE8(hp9845_base_state , irq_w))
-	MCFG_HP9845_IO_STS_CB(WRITE8(hp9845_base_state , sts_w))
-	MCFG_HP9845_IO_FLG_CB(WRITE8(hp9845_base_state , flg_w))
+	MCFG_HP9845_IO_IRQ_CB(WRITE8(*this, hp9845_base_state , irq_w))
+	MCFG_HP9845_IO_STS_CB(WRITE8(*this, hp9845_base_state , sts_w))
+	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
 	MCFG_HP9845_IO_SLOT_ADD("slot2")
-	MCFG_HP9845_IO_IRQ_CB(WRITE8(hp9845_base_state , irq_w))
-	MCFG_HP9845_IO_STS_CB(WRITE8(hp9845_base_state , sts_w))
-	MCFG_HP9845_IO_FLG_CB(WRITE8(hp9845_base_state , flg_w))
+	MCFG_HP9845_IO_IRQ_CB(WRITE8(*this, hp9845_base_state , irq_w))
+	MCFG_HP9845_IO_STS_CB(WRITE8(*this, hp9845_base_state , sts_w))
+	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
 	MCFG_HP9845_IO_SLOT_ADD("slot3")
-	MCFG_HP9845_IO_IRQ_CB(WRITE8(hp9845_base_state , irq_w))
-	MCFG_HP9845_IO_STS_CB(WRITE8(hp9845_base_state , sts_w))
-	MCFG_HP9845_IO_FLG_CB(WRITE8(hp9845_base_state , flg_w))
+	MCFG_HP9845_IO_IRQ_CB(WRITE8(*this, hp9845_base_state , irq_w))
+	MCFG_HP9845_IO_STS_CB(WRITE8(*this, hp9845_base_state , sts_w))
+	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
 
 	// LPU memory options
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("192K")
 	MCFG_RAM_EXTRA_OPTIONS("64K, 320K, 448K")
+
+	// Internal printer
+	MCFG_DEVICE_ADD("printer" , HP9845_PRINTER , 0)
+	MCFG_9845PRT_IRL_HANDLER(WRITELINE(*this, hp9845_base_state , prt_irl_w))
+	MCFG_9845PRT_FLG_HANDLER(WRITELINE(*this, hp9845_base_state , prt_flg_w))
+	MCFG_9845PRT_STS_HANDLER(WRITELINE(*this, hp9845_base_state , prt_sts_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(hp9845b)
-	MCFG_FRAGMENT_ADD(hp9845_base)
+MACHINE_CONFIG_START(hp9845b_state::hp9845b)
+	hp9845_base(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp9845b_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp9845b_state, vblank_w))
 	MCFG_SCREEN_COLOR(rgb_t::green())
 	// These parameters are for alpha video
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_HBSTART , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES)
@@ -3811,12 +3841,12 @@ static MACHINE_CONFIG_START(hp9845b)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(hp9845c)
-	MCFG_FRAGMENT_ADD(hp9845_base)
+MACHINE_CONFIG_START(hp9845c_state::hp9845c)
+	hp9845_base(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845c_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp9845c_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp9845c_state, vblank_w))
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_770_PIXEL_CLOCK , VIDEO_770_HTOTAL , VIDEO_770_HBEND , VIDEO_770_HBSTART , VIDEO_770_VTOTAL , VIDEO_770_VBEND , VIDEO_770_VBSTART)
 	MCFG_PALETTE_ADD("palette", 24)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp9845c_state, scanline_timer, "screen", 0, 1)
@@ -3825,12 +3855,12 @@ static MACHINE_CONFIG_START(hp9845c)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(hp9845t)
-	MCFG_FRAGMENT_ADD(hp9845_base)
+MACHINE_CONFIG_START(hp9845t_state::hp9845t)
+	hp9845_base(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845t_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp9845t_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp9845t_state, vblank_w))
 	MCFG_SCREEN_COLOR(rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_780_PIXEL_CLOCK , VIDEO_780_HTOTAL , VIDEO_780_HBEND , VIDEO_780_HBSTART , VIDEO_780_VTOTAL , VIDEO_780_VBEND , VIDEO_780_VBSTART)
 	MCFG_PALETTE_ADD("palette", 5)
@@ -3879,11 +3909,11 @@ ROM_START( hp9845b )
 	ROM_REGION(0x800 , "optional_chargen" , 0)
 	ROM_LOAD("optional_chrgen.bin" , 0 , 0x800 , CRC(0ecfa63b) SHA1(c295e6393d1503d903c1d2ce576fa597df9746bf))
 
-		ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
-		ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
+	ROM_LOAD("9845-lpu-standard-processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
 
-		ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
-		ROM_LOAD("9845-PPU-Standard-Graphics.bin", 0, 0x10000, CRC(f866510f) SHA1(3e22cd2072e3a5f3603a1eb8477b6b4a198d184d))
+	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
+	ROM_LOAD("9845-ppu-standard-graphics.bin", 0, 0x10000, CRC(f866510f) SHA1(3e22cd2072e3a5f3603a1eb8477b6b4a198d184d))
 
 #if 0
 	ROM_REGION( 0200000, "lpu", ROMREGION_16BIT | ROMREGION_BE )
@@ -3948,10 +3978,10 @@ ROM_START( hp9845c )
 	ROM_LOAD("optional_chrgen.bin" , 0 , 0x800 , CRC(0ecfa63b) SHA1(c295e6393d1503d903c1d2ce576fa597df9746bf))
 
 	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+	ROM_LOAD("9845-lpu-standard-processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
 
 	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics.bin", 0, 0x10000, CRC(96e11edc) SHA1(3f1da50edb35dfc57ec2ecfd816a8c8230e110bd))
+	ROM_LOAD("9845-ppu-color-enhanced-graphics.bin", 0, 0x10000, CRC(96e11edc) SHA1(3f1da50edb35dfc57ec2ecfd816a8c8230e110bd))
 ROM_END
 
 ROM_START( hp9845t )
@@ -3959,10 +3989,10 @@ ROM_START( hp9845t )
 	ROM_LOAD("1818-1395.bin" , 0 , 0x1000 , CRC(7b555edf) SHA1(3b08e094635ef02aef9a2e37b049c61bcf1ec037))
 
 	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+	ROM_LOAD("9845-lpu-standard-processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
 
 	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics.bin", 0, 0x10000, CRC(96e11edc) SHA1(3f1da50edb35dfc57ec2ecfd816a8c8230e110bd))
+	ROM_LOAD("9845-ppu-color-enhanced-graphics.bin", 0, 0x10000, CRC(96e11edc) SHA1(3f1da50edb35dfc57ec2ecfd816a8c8230e110bd))
 ROM_END
 
 ROM_START( hp9845b_de )
@@ -3973,10 +4003,10 @@ ROM_START( hp9845b_de )
 	ROM_LOAD("optional_chrgen.bin" , 0 , 0x800 , CRC(0ecfa63b) SHA1(c295e6393d1503d903c1d2ce576fa597df9746bf))
 
 	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+	ROM_LOAD("9845-lpu-standard-processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
 
 	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-PPU-Standard-Graphics-Ger.bin", 0, 0x10000, CRC(c968363d) SHA1(bc6805403371ca49d1a137f22cd254e3b0e0dbb4))
+	ROM_LOAD("9845-ppu-standard-graphics-ger.bin", 0, 0x10000, CRC(c968363d) SHA1(bc6805403371ca49d1a137f22cd254e3b0e0dbb4))
 ROM_END
 
 ROM_START( hp9845c_de )
@@ -3987,10 +4017,10 @@ ROM_START( hp9845c_de )
 	ROM_LOAD("optional_chrgen.bin" , 0 , 0x800 , CRC(0ecfa63b) SHA1(c295e6393d1503d903c1d2ce576fa597df9746bf))
 
 	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+	ROM_LOAD("9845-lpu-standard-processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
 
 	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics-Ger.bin", 0, 0x10000, CRC(a7ef79ee) SHA1(637742ed8fc8201a8e7bac62654f21c5409dfb76))
+	ROM_LOAD("9845-ppu-color-enhanced-graphics-ger.bin", 0, 0x10000, CRC(a7ef79ee) SHA1(637742ed8fc8201a8e7bac62654f21c5409dfb76))
 ROM_END
 
 ROM_START( hp9845t_de )
@@ -3998,20 +4028,20 @@ ROM_START( hp9845t_de )
 	ROM_LOAD("1818-1395.bin" , 0 , 0x1000 , CRC(7b555edf) SHA1(3b08e094635ef02aef9a2e37b049c61bcf1ec037))
 
 	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+	ROM_LOAD("9845-lpu-standard-processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
 
 	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics-Ger.bin", 0, 0x10000, CRC(a7ef79ee) SHA1(637742ed8fc8201a8e7bac62654f21c5409dfb76))
+	ROM_LOAD("9845-ppu-color-enhanced-graphics-ger.bin", 0, 0x10000, CRC(a7ef79ee) SHA1(637742ed8fc8201a8e7bac62654f21c5409dfb76))
 ROM_END
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE        INPUT           STATE          INIT  COMPANY             FULLNAME  FLAGS
-COMP( 1977, hp9845a,    0,       0,      hp9845a,       hp9845,         hp9845_state,  0,    "Hewlett-Packard",  "9845A",  MACHINE_IS_SKELETON )
-COMP( 1977, hp9845s,    hp9845a, 0,      hp9845a,       hp9845,         hp9845_state,  0,    "Hewlett-Packard",  "9845S",  MACHINE_IS_SKELETON )
-COMP( 1979, hp9835a,    0,       0,      hp9835a,       hp9845,         hp9845_state,  0,    "Hewlett-Packard",  "9835A",  MACHINE_IS_SKELETON )
-COMP( 1979, hp9835b,    hp9835a, 0,      hp9835a,       hp9845,         hp9845_state,  0,    "Hewlett-Packard",  "9835B",  MACHINE_IS_SKELETON )
-COMP( 1979, hp9845b,    0,       0,      hp9845b,       hp9845_base,    hp9845b_state, 0,    "Hewlett-Packard",  "9845B",  0 )
-COMP( 1982, hp9845t,    0,       0,      hp9845t,       hp9845ct,       hp9845t_state, 0,    "Hewlett-Packard",  "9845T",  0 )
-COMP( 1980, hp9845c,    0,       0,      hp9845c,       hp9845ct,       hp9845c_state, 0,    "Hewlett-Packard",  "9845C",  0 )
-COMP( 1979, hp9845b_de, hp9845b, 0,      hp9845b,       hp9845_base_de, hp9845b_state, 0,    "Hewlett-Packard",  "9845B (Germany)", 0 )
-COMP( 1982, hp9845t_de, hp9845t, 0,      hp9845t,       hp9845ct_de,    hp9845t_state, 0,    "Hewlett-Packard",  "9845T (Germany)", 0 )
-COMP( 1980, hp9845c_de, hp9845c, 0,      hp9845c,       hp9845ct_de,    hp9845c_state, 0,    "Hewlett-Packard",  "9845C (Germany)", 0 )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE  INPUT           CLASS          INIT        COMPANY            FULLNAME  FLAGS
+COMP( 1977, hp9845a,    0,       0,      hp9845a, hp9845,         hp9845_state,  empty_init, "Hewlett-Packard", "9845A",  MACHINE_IS_SKELETON )
+COMP( 1977, hp9845s,    hp9845a, 0,      hp9845a, hp9845,         hp9845_state,  empty_init, "Hewlett-Packard", "9845S",  MACHINE_IS_SKELETON )
+COMP( 1979, hp9835a,    0,       0,      hp9835a, hp9845,         hp9845_state,  empty_init, "Hewlett-Packard", "9835A",  MACHINE_IS_SKELETON )
+COMP( 1979, hp9835b,    hp9835a, 0,      hp9835a, hp9845,         hp9845_state,  empty_init, "Hewlett-Packard", "9835B",  MACHINE_IS_SKELETON )
+COMP( 1979, hp9845b,    0,       0,      hp9845b, hp9845_base,    hp9845b_state, empty_init, "Hewlett-Packard", "9845B",  0 )
+COMP( 1982, hp9845t,    0,       0,      hp9845t, hp9845ct,       hp9845t_state, empty_init, "Hewlett-Packard", "9845T",  0 )
+COMP( 1980, hp9845c,    0,       0,      hp9845c, hp9845ct,       hp9845c_state, empty_init, "Hewlett-Packard", "9845C",  0 )
+COMP( 1979, hp9845b_de, hp9845b, 0,      hp9845b, hp9845_base_de, hp9845b_state, empty_init, "Hewlett-Packard", "9845B (Germany)", 0 )
+COMP( 1982, hp9845t_de, hp9845t, 0,      hp9845t, hp9845ct_de,    hp9845t_state, empty_init, "Hewlett-Packard", "9845T (Germany)", 0 )
+COMP( 1980, hp9845c_de, hp9845c, 0,      hp9845c, hp9845ct_de,    hp9845c_state, empty_init, "Hewlett-Packard", "9845C (Germany)", 0 )

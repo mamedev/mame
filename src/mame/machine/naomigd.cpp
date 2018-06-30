@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "naomigd.h"
+#include "romload.h"
 #include "imagedev/chd_cd.h"
 
 /*
@@ -405,13 +406,6 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 {
 	image_tag = nullptr;
 	pic_tag = nullptr;
-}
-
-void naomi_gdrom_board::static_set_tags(device_t &device, const char *_image_tag, const char *_pic_tag)
-{
-	naomi_gdrom_board &dev = downcast<naomi_gdrom_board &>(device);
-	dev.image_tag = _image_tag;
-	dev.pic_tag = _pic_tag;
 }
 
 void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, uint32_t &file_start, uint32_t &file_size)

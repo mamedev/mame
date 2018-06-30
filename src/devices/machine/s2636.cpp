@@ -186,7 +186,7 @@ s2636_device::s2636_device(const machine_config &mconfig, const char *tag, devic
 
 void s2636_device::device_start()
 {
-	m_bitmap.resize(m_screen->width(), m_screen->height());
+	m_bitmap.resize(screen().width(), screen().height());
 
 	save_item(NAME(m_bitmap));
 
@@ -218,8 +218,8 @@ void s2636_device::device_start()
 bitmap_ind16 const &s2636_device::update(const rectangle &cliprect)
 {
 	m_vrst = true;
-	m_screen_line = m_screen->visible_area().min_y;
-	while (m_screen_line <= m_screen->visible_area().max_y)
+	m_screen_line = screen().visible_area().min_y;
+	while (m_screen_line <= screen().visible_area().max_y)
 		render_next_line();
 
 	return m_bitmap;
@@ -246,7 +246,7 @@ void s2636_device::render_next_line()
 	assert(m_screen_line < m_bitmap.height());
 
 	// pre-clear the line for convenience
-	rectangle const &vis_area = m_screen->visible_area();
+	rectangle const &vis_area = screen().visible_area();
 	uint16_t *const   row = &m_bitmap.pix16(m_screen_line);
 	m_bitmap.plot_box(0, m_screen_line, m_bitmap.width(), 1, 0);
 
@@ -416,7 +416,7 @@ READ8_MEMBER( s2636_device::read_data )
 	{
 	case REG_COL_BG_CMPL:
 	case REG_VBL_COL_OBJ:
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			m_registers[offset] = 0x00; // collision/completion/VRESET flags reset on read
 		break;
 	}
@@ -436,7 +436,7 @@ WRITE8_MEMBER( s2636_device::write_data )
 
 WRITE_LINE_MEMBER( s2636_device::write_intack )
 {
-	assert((ASSERT_LINE == state) || (HOLD_LINE == state) || (CLEAR_LINE == state) || (PULSE_LINE == state));
+	assert((ASSERT_LINE == state) || (HOLD_LINE == state) || (CLEAR_LINE == state));
 
 	// pretend interrupt acknowledge is handled instantaneously
 	m_intack = state;
@@ -459,7 +459,7 @@ void s2636_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		{
 			if (m_registers[REG_SND_PERIOD])
 			{
-				m_sample_cnt = (machine().sample_rate() * (m_registers[REG_SND_PERIOD] + 1) * m_screen->scan_period()).seconds();
+				m_sample_cnt = (machine().sample_rate() * (m_registers[REG_SND_PERIOD] + 1) * screen().scan_period()).seconds();
 				m_sound_lvl = !m_sound_lvl;
 			}
 			else

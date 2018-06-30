@@ -25,9 +25,10 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_65C102, bbc_tube_65c102_device, "bbc_tube_65c102", "
 //  ADDRESS_MAP( tube_6502_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_6502_mem, AS_PROGRAM, 8, bbc_tube_65c102_device)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void bbc_tube_65c102_device::tube_6502_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(bbc_tube_65c102_device::read), FUNC(bbc_tube_65c102_device::write));
+}
 
 //-------------------------------------------------
 //  ROM( tube_65c102 )
@@ -35,16 +36,16 @@ ADDRESS_MAP_END
 
 ROM_START( tube_65c102 )
 	ROM_REGION(0x1000, "rom", 0)
-	ROM_LOAD("65C102_BOOT_110.rom", 0x0000, 0x1000, CRC(ad5b70cc) SHA1(0ac9a1c70e55a79e2c81e102afae1d016af229fa)) // 2201,243-02
+	ROM_LOAD("65c102_boot_110.rom", 0x0000, 0x1000, CRC(ad5b70cc) SHA1(0ac9a1c70e55a79e2c81e102afae1d016af229fa)) // 2201,243-02
 ROM_END
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bbc_tube_65c102_device::device_add_mconfig )
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_16MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(tube_6502_mem)
+MACHINE_CONFIG_START(bbc_tube_65c102_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(tube_6502_mem)
 
 	MCFG_TUBE_ADD("ula")
 	MCFG_TUBE_PNMI_HANDLER(INPUTLINE("maincpu", M65C02_NMI_LINE))
@@ -130,7 +131,7 @@ READ8_MEMBER(bbc_tube_65c102_device::read)
 
 	if ((offset >= 0xfef0) && (offset <= 0xfeff))
 	{
-		if (!machine().side_effect_disabled()) m_rom_enabled = false;
+		if (!machine().side_effects_disabled()) m_rom_enabled = false;
 		data = m_ula->parasite_r(space, offset);
 	}
 	else if (m_rom_enabled && (offset >= 0xf000))

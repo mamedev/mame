@@ -10,56 +10,62 @@
 ***************************************************************************/
 
 #include "emu.h"
-
-enum
-{
-	TYPE_1801,
-	TYPE_1802
-};
+#include "cosdasm.h"
 
 #define CDP1801_OPCODE(...) \
 	util::stream_format(stream, __VA_ARGS__)
 
 #define CDP1802_OPCODE(...) \
-	if (variant < TYPE_1802) stream << "illegal"; else util::stream_format(stream, __VA_ARGS__)
+	if (m_variant < TYPE_1802) stream << "illegal"; else util::stream_format(stream, __VA_ARGS__)
 
-static offs_t implied(const uint8_t opcode)
+offs_t cosmac_disassembler::implied(const uint8_t opcode)
 {
 	return opcode & 0x0f;
 }
 
-static offs_t immediate(const uint8_t **opram)
+offs_t cosmac_disassembler::immediate(offs_t &pc, const data_buffer &params)
 {
-	return *(*opram)++;
+	return params.r8(pc++);
 }
 
-static offs_t short_branch(offs_t pc, const uint8_t **opram)
+offs_t cosmac_disassembler::short_branch(offs_t base_pc, offs_t &pc, const data_buffer &params)
 {
-	return (pc & 0xff00) | immediate(opram);
+	return (base_pc & 0xff00) | immediate(pc, params);
 }
 
-static offs_t long_branch(const uint8_t **opram)
+offs_t cosmac_disassembler::long_branch(offs_t &pc, const data_buffer &params)
 {
-	return (immediate(opram) << 8) | immediate(opram);
+	u16 res = params.r16(pc);
+	pc += 2;
+	return res;
 }
 
-static offs_t short_skip(offs_t pc)
+offs_t cosmac_disassembler::short_skip(offs_t pc)
 {
 	return pc + 2;
 }
 
-static offs_t long_skip(offs_t pc)
+offs_t cosmac_disassembler::long_skip(offs_t pc)
 {
 	return pc + 3;
 }
 
-static uint32_t disassemble(device_t *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t variant)
+
+u32 cosmac_disassembler::opcode_alignment() const
 {
-	const uint8_t *startram = opram;
+	return 1;
+}
+
+cosmac_disassembler::cosmac_disassembler(int variant) : m_variant(variant)
+{
+}
+
+offs_t cosmac_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	offs_t base_pc = pc;
 	uint32_t flags = 0;
 
-	opram++;
-	uint8_t opcode = *oprom++;
+	uint8_t opcode = opcodes.r8(pc++);
 
 	switch (opcode)
 	{
@@ -73,20 +79,20 @@ static uint32_t disassemble(device_t *device, std::ostream &stream, offs_t pc, c
 	case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 	case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 		CDP1801_OPCODE("DEC R%01X", implied(opcode)); break;
-	case 0x30: CDP1801_OPCODE("BR %04X", short_branch(pc, &opram)); break;
-	case 0x32: CDP1801_OPCODE("BZ %04X", short_branch(pc, &opram)); break;
-	case 0x33: CDP1801_OPCODE("BDF %04X", short_branch(pc, &opram)); break;
-	case 0x34: CDP1801_OPCODE("B1 %04X", short_branch(pc, &opram)); break;
-	case 0x35: CDP1801_OPCODE("B2 %04X", short_branch(pc, &opram)); break;
-	case 0x36: CDP1801_OPCODE("B3 %04X", short_branch(pc, &opram)); break;
-	case 0x37: CDP1801_OPCODE("B4 %04X", short_branch(pc, &opram)); break;
+	case 0x30: CDP1801_OPCODE("BR %04X", short_branch(base_pc, pc, params)); break;
+	case 0x32: CDP1801_OPCODE("BZ %04X", short_branch(base_pc, pc, params)); break;
+	case 0x33: CDP1801_OPCODE("BDF %04X", short_branch(base_pc, pc, params)); break;
+	case 0x34: CDP1801_OPCODE("B1 %04X", short_branch(base_pc, pc, params)); break;
+	case 0x35: CDP1801_OPCODE("B2 %04X", short_branch(base_pc, pc, params)); break;
+	case 0x36: CDP1801_OPCODE("B3 %04X", short_branch(base_pc, pc, params)); break;
+	case 0x37: CDP1801_OPCODE("B4 %04X", short_branch(base_pc, pc, params)); break;
 	case 0x38: CDP1801_OPCODE("SKP %04X", short_skip(pc)); break;
-	case 0x3a: CDP1801_OPCODE("BNZ %04X", short_branch(pc, &opram)); break;
-	case 0x3b: CDP1801_OPCODE("BNF %04X", short_branch(pc, &opram)); break;
-	case 0x3c: CDP1801_OPCODE("BN1 %04X", short_branch(pc, &opram)); break;
-	case 0x3d: CDP1801_OPCODE("BN2 %04X", short_branch(pc, &opram)); break;
-	case 0x3e: CDP1801_OPCODE("BN3 %04X", short_branch(pc, &opram)); break;
-	case 0x3f: CDP1801_OPCODE("BN4 %04X", short_branch(pc, &opram)); break;
+	case 0x3a: CDP1801_OPCODE("BNZ %04X", short_branch(base_pc, pc, params)); break;
+	case 0x3b: CDP1801_OPCODE("BNF %04X", short_branch(base_pc, pc, params)); break;
+	case 0x3c: CDP1801_OPCODE("BN1 %04X", short_branch(base_pc, pc, params)); break;
+	case 0x3d: CDP1801_OPCODE("BN2 %04X", short_branch(base_pc, pc, params)); break;
+	case 0x3e: CDP1801_OPCODE("BN3 %04X", short_branch(base_pc, pc, params)); break;
+	case 0x3f: CDP1801_OPCODE("BN4 %04X", short_branch(base_pc, pc, params)); break;
 	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47:
 	case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
 		CDP1801_OPCODE("LDA R%01X", implied(opcode)); break;
@@ -107,8 +113,8 @@ static uint32_t disassemble(device_t *device, std::ostream &stream, offs_t pc, c
 	case 0x6d: CDP1801_OPCODE("INP 5"); break;
 	case 0x6e: CDP1801_OPCODE("INP 6"); break;
 	case 0x6f: CDP1801_OPCODE("INP 7"); break;
-	case 0x70: CDP1801_OPCODE("RET"); flags = DASMFLAG_STEP_OUT; break;
-	case 0x71: CDP1801_OPCODE("DIS"); flags = DASMFLAG_STEP_OUT; break;
+	case 0x70: CDP1801_OPCODE("RET"); flags = STEP_OUT; break;
+	case 0x71: CDP1801_OPCODE("DIS"); flags = STEP_OUT; break;
 	case 0x78: CDP1801_OPCODE("SAV"); break;
 	case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 	case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
@@ -124,7 +130,7 @@ static uint32_t disassemble(device_t *device, std::ostream &stream, offs_t pc, c
 		CDP1801_OPCODE("PHI R%01X", implied(opcode)); break;
 	case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 	case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
-		CDP1801_OPCODE("SEP R%01X", implied(opcode)); flags = DASMFLAG_STEP_OVER; break;
+		CDP1801_OPCODE("SEP R%01X", implied(opcode)); flags = STEP_OVER; break;
 	case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
 	case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
 		CDP1801_OPCODE("SEX R%01X", implied(opcode)); break;
@@ -136,16 +142,16 @@ static uint32_t disassemble(device_t *device, std::ostream &stream, offs_t pc, c
 	case 0xf5: CDP1801_OPCODE("SD"); break;
 	case 0xf6: CDP1801_OPCODE("SHR"); break;
 	case 0xf7: CDP1801_OPCODE("SM"); break;
-	case 0xf8: CDP1801_OPCODE("LDI #%02X", immediate(&opram)); break;
-	case 0xf9: CDP1801_OPCODE("ORI #%02X", immediate(&opram)); break;
-	case 0xfa: CDP1801_OPCODE("ANI #%02X", immediate(&opram)); break;
-	case 0xfb: CDP1801_OPCODE("XRI #%02X", immediate(&opram)); break;
-	case 0xfc: CDP1801_OPCODE("ADI #%02X", immediate(&opram)); break;
-	case 0xfd: CDP1801_OPCODE("SDI #%02X", immediate(&opram)); break;
-	case 0xff: CDP1801_OPCODE("SMI #%02X", immediate(&opram)); break;
+	case 0xf8: CDP1801_OPCODE("LDI #%02X", immediate(pc, params)); break;
+	case 0xf9: CDP1801_OPCODE("ORI #%02X", immediate(pc, params)); break;
+	case 0xfa: CDP1801_OPCODE("ANI #%02X", immediate(pc, params)); break;
+	case 0xfb: CDP1801_OPCODE("XRI #%02X", immediate(pc, params)); break;
+	case 0xfc: CDP1801_OPCODE("ADI #%02X", immediate(pc, params)); break;
+	case 0xfd: CDP1801_OPCODE("SDI #%02X", immediate(pc, params)); break;
+	case 0xff: CDP1801_OPCODE("SMI #%02X", immediate(pc, params)); break;
 	// CDP1802
-	case 0x31: CDP1802_OPCODE("BQ %04X", short_branch(pc, &opram)); break;
-	case 0x39: CDP1802_OPCODE("BNQ %04X", short_branch(pc, &opram)); break;
+	case 0x31: CDP1802_OPCODE("BQ %04X", short_branch(base_pc, pc, params)); break;
+	case 0x39: CDP1802_OPCODE("BNQ %04X", short_branch(base_pc, pc, params)); break;
 	case 0x60: CDP1802_OPCODE("IRX"); break;
 	case 0x72: CDP1802_OPCODE("LDXA"); break;
 	case 0x73: CDP1802_OPCODE("STXD"); break;
@@ -156,14 +162,14 @@ static uint32_t disassemble(device_t *device, std::ostream &stream, offs_t pc, c
 	case 0x79: CDP1802_OPCODE("MARK"); break;
 	case 0x7a: CDP1802_OPCODE("REQ"); break;
 	case 0x7b: CDP1802_OPCODE("SEQ"); break;
-	case 0x7c: CDP1802_OPCODE("ADCI #%02X", immediate(&opram)); break;
-	case 0x7d: CDP1802_OPCODE("SDBI #%02X", immediate(&opram)); break;
+	case 0x7c: CDP1802_OPCODE("ADCI #%02X", immediate(pc, params)); break;
+	case 0x7d: CDP1802_OPCODE("SDBI #%02X", immediate(pc, params)); break;
 	case 0x7e: CDP1802_OPCODE("SHLC"); break;
-	case 0x7f: CDP1802_OPCODE("SMBI #%02X", immediate(&opram)); break;
-	case 0xc0: CDP1802_OPCODE("LBR %04X", long_branch(&opram)); break;
-	case 0xc1: CDP1802_OPCODE("LBQ %04X", long_branch(&opram)); break;
-	case 0xc2: CDP1802_OPCODE("LBZ %04X", long_branch(&opram)); break;
-	case 0xc3: CDP1802_OPCODE("LBDF %04X", long_branch(&opram)); break;
+	case 0x7f: CDP1802_OPCODE("SMBI #%02X", immediate(pc, params)); break;
+	case 0xc0: CDP1802_OPCODE("LBR %04X", long_branch(pc, params)); break;
+	case 0xc1: CDP1802_OPCODE("LBQ %04X", long_branch(pc, params)); break;
+	case 0xc2: CDP1802_OPCODE("LBZ %04X", long_branch(pc, params)); break;
+	case 0xc3: CDP1802_OPCODE("LBDF %04X", long_branch(pc, params)); break;
 	case 0xc4: CDP1802_OPCODE("NOP"); break;
 	case 0xc5: CDP1802_OPCODE("LSNQ %04X", long_skip(pc)); break;
 	case 0xc6: CDP1802_OPCODE("LSNZ %04X", long_skip(pc)); break;
@@ -181,17 +187,5 @@ static uint32_t disassemble(device_t *device, std::ostream &stream, offs_t pc, c
 	default:   CDP1801_OPCODE("illegal"); break;
 	}
 
-	return (opram - startram) | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE( cdp1801 )
-{
-	return disassemble(device, stream, pc, oprom, opram, TYPE_1801);
-}
-
-
-CPU_DISASSEMBLE( cdp1802 )
-{
-	return disassemble(device, stream, pc, oprom, opram, TYPE_1802);
+	return (pc - base_pc) | flags | SUPPORTED;
 }

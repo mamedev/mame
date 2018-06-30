@@ -9,9 +9,9 @@
 //
 //============================================================
 
-#include <bx/fpumath.h>
+#include <bx/math.h>
 #include <bx/readerwriter.h>
-#include <bx/crtimpl.h>
+#include <bx/file.h>
 
 #include "emu.h"
 
@@ -23,7 +23,7 @@ shader_manager::~shader_manager()
 {
 	for (std::pair<std::string, bgfx::ShaderHandle> shader : m_shaders)
 	{
-		bgfx::destroyShader(shader.second);
+		bgfx::destroy(shader.second);
 	}
 	m_shaders.clear();
 }
@@ -96,7 +96,7 @@ bgfx::ShaderHandle shader_manager::load_shader(std::string name)
 
 const bgfx::Memory* shader_manager::load_mem(std::string name)
 {
-	bx::CrtFileReader reader;
+	bx::FileReader reader;
 	if (bx::open(&reader, name.c_str()))
 	{
 		uint32_t size(bx::getSize(&reader));

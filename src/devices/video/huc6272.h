@@ -20,14 +20,11 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_HUC6272_ADD(tag, freq) \
-		MCFG_DEVICE_ADD((tag), HUC6272, (freq))
-
 #define MCFG_HUC6272_IRQ_CHANGED_CB(cb) \
-		devcb = &huc6272_device::set_irq_changed_callback(*device, (DEVCB_##cb));
+		devcb = &downcast<huc6272_device &>(*device).set_irq_changed_callback((DEVCB_##cb));
 
 #define MCFG_HUC6272_RAINBOW(tag) \
-		huc6272_device::set_rainbow_tag(*device, (tag));
+		downcast<huc6272_device &>(*device).set_rainbow_tag((tag));
 
 
 //**************************************************************************
@@ -43,8 +40,8 @@ public:
 	// construction/destruction
 	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_changed_callback(device_t &device, Object &&cb) { return downcast<huc6272_device &>(device).m_irq_changed_cb.set_callback(std::forward<Object>(cb)); }
-	static void set_rainbow_tag(device_t &device, const char *tag) { downcast<huc6272_device &>(device).m_huc6271_tag = tag; }
+	template <class Object> devcb_base &set_irq_changed_callback(Object &&cb) { return m_irq_changed_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename T> void set_rainbow_tag(T &&tag) { m_huc6271.set_tag(std::forward<T>(tag)); }
 
 	// I/O operations
 	DECLARE_WRITE32_MEMBER( write );
@@ -59,9 +56,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	const char *m_huc6271_tag;
-
-	huc6271_device *m_huc6271;
+	required_device<huc6271_device> m_huc6271;
 
 	uint8_t m_register;
 	uint32_t m_kram_addr_r, m_kram_addr_w;
@@ -108,6 +103,9 @@ private:
 	uint32_t read_dword(offs_t address);
 	void write_dword(offs_t address, uint32_t data);
 	void write_microprg_data(offs_t address, uint16_t data);
+
+	void kram_map(address_map &map);
+	void microprg_map(address_map &map);
 };
 
 // device type definition

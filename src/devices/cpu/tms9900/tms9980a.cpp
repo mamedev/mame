@@ -53,6 +53,7 @@
 
 #include "emu.h"
 #include "tms9980a.h"
+#include "9900dasm.h"
 
 /*
     The following defines can be set to 0 or 1 to disable or enable certain
@@ -182,7 +183,8 @@ void tms9980a_device::mem_read()
 	case 1:
 		m_pass = 4;         // make the CPU visit this method more than once
 		if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
-		m_prgspace->set_address(m_address & m_prgaddr_mask & ~1);
+		if (m_sospace)
+			m_sospace->read_byte(m_address & m_prgaddr_mask & ~1);
 		if (TRACE_ADDRESSBUS) logerror("tms9980a: set address bus %04x\n", m_address & m_prgaddr_mask & ~1);
 		m_check_ready = true;
 		break;
@@ -193,7 +195,8 @@ void tms9980a_device::mem_read()
 		m_current_value = (value << 8) & 0xff00;
 		break;
 	case 3:
-		m_prgspace->set_address((m_address & m_prgaddr_mask) | 1);
+		if (m_sospace)
+			m_sospace->read_byte((m_address & m_prgaddr_mask) | 1);
 		if (TRACE_ADDRESSBUS) logerror("tms9980a: set address bus %04x\n", (m_address & m_prgaddr_mask) | 1);
 		break;
 	case 4:
@@ -215,7 +218,8 @@ void tms9980a_device::mem_write()
 	case 1:
 		m_pass = 4;         // make the CPU visit this method once more
 		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
-		m_prgspace->set_address(m_address & m_prgaddr_mask & ~1);
+		if (m_sospace)
+			m_sospace->read_byte(m_address & m_prgaddr_mask & ~1);
 		if (TRACE_ADDRESSBUS) logerror("tms9980a: set address bus %04x\n", m_address & m_prgaddr_mask & ~1);
 		m_prgspace->write_byte(m_address & 0x3ffe & ~1, (m_current_value >> 8)&0xff);
 		if (TRACE_MEM) logerror("tms9980a: memory write high byte %04x <- %02x\n", m_address & m_prgaddr_mask & ~1, (m_current_value >> 8)&0xff);
@@ -225,7 +229,8 @@ void tms9980a_device::mem_write()
 		// no action here, just wait for READY
 		break;
 	case 3:
-		m_prgspace->set_address((m_address & m_prgaddr_mask) | 1);
+		if (m_sospace)
+			m_sospace->read_byte((m_address & m_prgaddr_mask) | 1);
 		if (TRACE_ADDRESSBUS) logerror("tms9980a: set address bus %04x\n", (m_address & m_prgaddr_mask) | 1);
 		m_prgspace->write_byte((m_address & m_prgaddr_mask) | 1, m_current_value & 0xff);
 		if (TRACE_MEM) logerror("tms9980a: memory write low byte %04x <- %02x\n", (m_address & m_prgaddr_mask) | 1,  m_current_value & 0xff);
@@ -252,7 +257,7 @@ void tms9980a_device::acquire_instruction()
 	{
 		decode(m_current_value);
 		if (TRACE_OP) logerror("tms9980a: ===== Next operation %04x (%s) at %04x =====\n", IR, opname[m_command], PC);
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		PC = (PC + 2) & 0xfffe & m_prgaddr_mask;
 	}
 	// IAQ will be cleared in the main loop
@@ -282,20 +287,10 @@ uint32_t tms9980a_device::execute_input_lines() const
 // execute_burn = nop
 
 // device_disasm_interface overrides
-uint32_t tms9980a_device::disasm_min_opcode_bytes() const
+
+std::unique_ptr<util::disasm_interface> tms9980a_device::create_disassembler()
 {
-	return 2;
+	return std::make_unique<tms9900_disassembler>(TMS9980_ID);
 }
 
-uint32_t tms9980a_device::disasm_max_opcode_bytes() const
-{
-	return 6;
-}
-
-offs_t tms9980a_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( tms9980 );
-	return CPU_DISASSEMBLE_NAME(tms9980)(this, stream, pc, oprom, opram, options);
-}
-
-DEFINE_DEVICE_TYPE(TMS9980A, tms9980a_device, "tms9980a", "TMS9980A")
+DEFINE_DEVICE_TYPE(TMS9980A, tms9980a_device, "tms9980a", "Texas Instruments TMS9980A")

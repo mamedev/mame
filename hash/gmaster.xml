@@ -3,9 +3,7 @@
 <!--
 Undumped:
 - Bomb Disposer
-- Car Racing
 - Invader
-- Move It
 - S-Race
 - Tank War
 -->
@@ -17,6 +15,17 @@ Undumped:
 		<part name="cart" interface="gmaster_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="bubbleboy.bin" size="16384" crc="edd0679d" sha1="5f6f81b1a5ba6d21e5fb5bc38aa9ee0770b46b97" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carracing">
+		<description>Car Racing</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="carracing.bin" size="32768" crc="71babd86" sha1="8f45fea8e9d01a1ed71a7ed5a8a6690bd40834f9" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -94,6 +103,17 @@ Undumped:
 		<part name="cart" interface="gmaster_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="kungfu.bin" size="32768" crc="3ea0670b" sha1="01647f87f59f2b05bb46f7bdb2fab38bcd8e3d6e" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moveit">
+		<description>Move It</description>
+		<year>199?</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="moveit.bin" size="32768" crc="3be5590c" sha1="68bcf5f97ee09f716c66f67fa304b40769b44ea8" offset="00000" />
 			</dataarea>
 		</part>
 	</software>

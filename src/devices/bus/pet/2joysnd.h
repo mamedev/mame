@@ -61,7 +61,6 @@ protected:
 
 
 // device type definition
-extern const device_type PET_USERPORT_JOYSTICK_AND_SOUND_DEVICE;
 DECLARE_DEVICE_TYPE(PET_USERPORT_JOYSTICK_AND_SOUND_DEVICE, pet_userport_joystick_and_sound_device)
 
 

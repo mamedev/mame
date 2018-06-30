@@ -166,11 +166,12 @@
 #include "machine/nvram.h"
 #include "video/mc6845.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_16MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
 
 
 class supercrd_state : public driver_device
@@ -194,6 +195,8 @@ public:
 	uint32_t screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void supercrd(machine_config &config);
+	void supercrd_map(address_map &map);
 };
 
 
@@ -285,14 +288,15 @@ uint32_t supercrd_state::screen_update_supercrd(screen_device &screen, bitmap_in
 *   Memory map information   *
 *****************************/
 
-static ADDRESS_MAP_START( supercrd_map, AS_PROGRAM, 8, supercrd_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(supercrd_videoram_w) AM_SHARE("videoram") // wrong
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(supercrd_colorram_w) AM_SHARE("colorram") // wrong
+void supercrd_state::supercrd_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram().w(FUNC(supercrd_state::supercrd_videoram_w)).share("videoram"); // wrong
+	map(0xd000, 0xdfff).ram().w(FUNC(supercrd_state::supercrd_colorram_w)).share("colorram"); // wrong
 //  AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("nvram")
 //  AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 //  AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+}
 
 
 /*****************************
@@ -403,7 +407,7 @@ static const gfx_layout charlayout =
    in the first and second half of the bipolar PROM.
 */
 
-static GFXDECODE_START( supercrd )  /* Adressing the first half of the palette */
+static GFXDECODE_START( gfx_supercrd )  /* Adressing the first half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -412,10 +416,10 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( supercrd )
+MACHINE_CONFIG_START(supercrd_state::supercrd)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
-	MCFG_CPU_PROGRAM_MAP(supercrd_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
+	MCFG_DEVICE_PROGRAM_MAP(supercrd_map)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -432,7 +436,7 @@ static MACHINE_CONFIG_START( supercrd )
 	MCFG_SCREEN_UPDATE_DRIVER(supercrd_state, screen_update_supercrd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supercrd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supercrd)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(supercrd_state, supercrd)
@@ -443,7 +447,7 @@ static MACHINE_CONFIG_START( supercrd )
 //  MCFG_MC6845_CHAR_WIDTH(4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
@@ -510,6 +514,6 @@ ROM_START( fruitstr )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT    ROT   COMPANY      FULLNAME                  FLAGS
-GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, 0,      ROT0, "Fun World", "Super Card (encrypted)", MACHINE_NOT_WORKING )
-GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, 0,      ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY      FULLNAME                  FLAGS
+GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, empty_init, ROT0, "Fun World", "Super Card (encrypted)", MACHINE_NOT_WORKING )
+GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, empty_init, ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_NOT_WORKING )

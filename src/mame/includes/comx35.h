@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __COMX35__
-#define __COMX35__
+#ifndef MAME_INCLUDES_COMX35_H
+#define MAME_INCLUDES_COMX35_H
 
 #include "bus/comx35/exp.h"
 #include "cpu/cosmac/cosmac.h"
@@ -87,6 +87,14 @@ public:
 	CDP1869_CHAR_RAM_WRITE_MEMBER(comx35_charram_w);
 	CDP1869_PCB_READ_MEMBER(comx35_pcb_r);
 
+	void pal(machine_config &config);
+	void ntsc(machine_config &config);
+	void comx35_pal_video(machine_config &config);
+	void comx35_ntsc_video(machine_config &config);
+
+	void cdp1869_page_ram(address_map &map);
+	void comx35_io(address_map &map);
+	void comx35_mem(address_map &map);
 	// processor state
 	int m_clear;                // CPU mode
 	int m_q;                    // Q flag
@@ -96,10 +104,5 @@ public:
 	int m_prd;                  // predisplay
 	int m_cr1;                  // interrupt enable
 };
-
-// ---------- defined in video/comx35.c ----------
-
-MACHINE_CONFIG_EXTERN( comx35_pal_video );
-MACHINE_CONFIG_EXTERN( comx35_ntsc_video );
 
 #endif

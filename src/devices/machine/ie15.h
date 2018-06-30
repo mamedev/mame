@@ -13,6 +13,7 @@
 
 #include "screen.h"
 #include "speaker.h"
+#include "diserial.h"
 
 
 #define SCREEN_PAGE     (80*48)
@@ -40,6 +41,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
 
+	DECLARE_WRITE_LINE_MEMBER(serial_rx_callback);
+
 protected:
 	ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -57,9 +60,16 @@ protected:
 
 	void term_write(uint8_t data) { m_serial_rx_char = data; m_serial_rx_ready = IE_FALSE; }
 
-public:
+private:
+	static const device_timer_id TIMER_HBLANK = 0;
+	void scanline_callback();
+	void update_leds();
+	void draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void ie15core(machine_config &config);
+
 	DECLARE_WRITE16_MEMBER(kbd_put);
-	DECLARE_WRITE_LINE_MEMBER(serial_rx_callback);
 	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_READ8_MEMBER(mem_r);
 	DECLARE_WRITE8_MEMBER(mem_addr_lo_w);
@@ -84,12 +94,9 @@ public:
 	DECLARE_WRITE8_MEMBER(serial_speed_w);
 	TIMER_CALLBACK_MEMBER(ie15_beepoff);
 
-private:
-	static const device_timer_id TIMER_HBLANK = 0;
-	void scanline_callback();
-	void update_leds();
-	void draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void ie15_io(address_map &map);
+	void ie15_mem(address_map &map);
+
 	std::unique_ptr<uint32_t[]> m_tmpbmp;
 
 	emu_timer *m_hblank_timer;

@@ -9,6 +9,7 @@
 #ifndef MAME_VIDEO_APPLE2_H
 #define MAME_VIDEO_APPLE2_H
 
+#include "emupal.h"
 
 class a2_video_device :
 	public device_t

@@ -158,6 +158,7 @@ const osd::directory::entry *posix_directory::read()
 	case DT_REG:
 		m_entry.type = entry::entry_type::FILE;
 		break;
+	case DT_UNKNOWN:
 	case DT_LNK:
 		if (stat_err)
 			m_entry.type = entry::entry_type::OTHER;

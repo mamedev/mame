@@ -22,6 +22,7 @@
 #include "machine/ins8250.h"
 #include "machine/keyboard.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -51,6 +52,9 @@ public:
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void zrt80(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_term_data;
@@ -97,28 +101,30 @@ WRITE8_MEMBER(zrt80_state::zrt80_38_w)
 	m_beep->set_state(1);
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, zrt80_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM // Z25 - Main firmware
-	AM_RANGE(0x1000, 0x1fff) AM_ROM // Z24 - Expansion
-	AM_RANGE(0x4000, 0x43ff) AM_RAM // Board RAM
+void zrt80_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom(); // Z25 - Main firmware
+	map(0x1000, 0x1fff).rom(); // Z24 - Expansion
+	map(0x4000, 0x43ff).ram(); // Board RAM
 	// Normally video RAM is 0x800 but could be expanded up to 8K
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram") // Video RAM
+	map(0xc000, 0xdfff).ram().share("videoram"); // Video RAM
 
-ADDRESS_MAP_END
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, zrt80_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w )
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x10, 0x17) AM_READ(zrt80_10_r)
-	AM_RANGE(0x18, 0x1F) AM_READ_PORT("DIPSW2")
-	AM_RANGE(0x20, 0x27) AM_READ_PORT("DIPSW3")
-	AM_RANGE(0x30, 0x37) AM_WRITE(zrt80_30_w)
-	AM_RANGE(0x38, 0x3F) AM_WRITE(zrt80_38_w)
-ADDRESS_MAP_END
+void zrt80_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x07).rw(m_8250, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x08, 0x08).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x09, 0x09).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x10, 0x17).r(FUNC(zrt80_state::zrt80_10_r));
+	map(0x18, 0x1F).portr("DIPSW2");
+	map(0x20, 0x27).portr("DIPSW3");
+	map(0x30, 0x37).w(FUNC(zrt80_state::zrt80_30_w));
+	map(0x38, 0x3F).w(FUNC(zrt80_state::zrt80_38_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( zrt80 )
@@ -263,15 +269,15 @@ static const gfx_layout zrt80_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( zrt80 )
+static GFXDECODE_START( gfx_zrt80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, zrt80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( zrt80 )
+MACHINE_CONFIG_START(zrt80_state::zrt80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(2'457'600))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -280,16 +286,16 @@ static MACHINE_CONFIG_START( zrt80 )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zrt80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zrt80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 800)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_20MHz / 8)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(20'000'000) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
 	MCFG_MC6845_UPDATE_ROW_CB(zrt80_state, crtc_update_row)
@@ -312,5 +318,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT  COMPANY                       FULLNAME   FLAGS */
-COMP( 1982, zrt80,  0,       0,      zrt80,     zrt80, zrt80_state, 0,    "Digital Research Computers", "ZRT-80",  0)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                       FULLNAME   FLAGS */
+COMP( 1982, zrt80, 0,      0,      zrt80,   zrt80, zrt80_state, empty_init, "Digital Research Computers", "ZRT-80",  0)

@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef ADAM_H_
-#define ADAM_H_
+#ifndef MAME_INCLUDES_ADAM_H
+#define MAME_INCLUDES_ADAM_H
 
 #include "bus/adam/exp.h"
 #include "bus/adamnet/adamnet.h"
@@ -52,7 +52,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_netcpu;
+	required_device<m6801_cpu_device> m_netcpu;
 	required_device<tms9928a_device> m_vdc;
 	required_device<sn76489a_device> m_psg;
 	required_device<ram_device> m_ram;
@@ -112,6 +112,11 @@ public:
 
 	// video state
 	int m_vdp_nmi;
+	void adam(machine_config &config);
+	void adam_io(address_map &map);
+	void adam_mem(address_map &map);
+	void m6801_io(address_map &map);
+	void m6801_mem(address_map &map);
 };
 
 #endif

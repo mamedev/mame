@@ -74,6 +74,7 @@ public:
 	void set_command_callback(write32_delegate callback);
 
 
+	void mp_internal_map(address_map &map);
 protected:
 	// device level overrides
 	virtual void device_start() override;
@@ -93,9 +94,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 
@@ -132,7 +131,7 @@ protected:
 	int m_icount;
 
 	address_space *m_program;
-	direct_read_data* m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> * m_cache;
 
 	write32_delegate m_cmd_callback;
 
@@ -163,6 +162,7 @@ public:
 		PP_PC = 1
 	};
 
+	void pp_internal_map(address_map &map);
 protected:
 	// device level overrides
 	virtual void device_start() override;
@@ -181,9 +181,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 8; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 
@@ -193,7 +191,7 @@ protected:
 	int m_icount;
 
 	address_space *m_program;
-	direct_read_data* m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> * m_cache;
 };
 
 

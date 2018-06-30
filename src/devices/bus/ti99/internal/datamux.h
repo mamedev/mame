@@ -35,7 +35,7 @@ public:
 	datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_SETOFFSET_MEMBER( setoffset );
+	DECLARE_READ8_MEMBER( setoffset );
 
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
@@ -43,10 +43,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( gromclk_in );
 
-	template <class Object> static devcb_base &static_set_ready_callback(device_t &device, Object &&cb)
-	{
-		return downcast<datamux_device &>(device).m_ready.set_callback(std::forward<Object>(cb));
-	}
+	template <class Object> devcb_base &set_ready_callback(Object &&cb) { return m_ready.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	/* Constructor */
@@ -121,6 +118,10 @@ private:
 	// Counter for the wait states.
 	int   m_waitcount;
 
+	// Keep the state of the ROMG* and MEMEN* lines so that debugger does not mess up things
+	line_state m_romgq_state;
+	line_state m_memen_state;
+
 	// Use the memory expansion?
 	bool m_use32k;
 
@@ -137,7 +138,7 @@ private:
 /******************************************************************************/
 
 #define MCFG_DMUX_READY_HANDLER( _intcallb ) \
-	devcb = &bus::ti99::internal::datamux_device::static_set_ready_callback( *device, DEVCB_##_intcallb );
+	devcb = &downcast<bus::ti99::internal::datamux_device &>(*device).set_ready_callback(DEVCB_##_intcallb);
 
 } } } // end namespace bus::ti99::internal
 

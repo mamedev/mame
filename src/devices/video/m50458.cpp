@@ -29,17 +29,18 @@
 // device type definition
 DEFINE_DEVICE_TYPE(M50458, m50458_device, "m50458", "Mitsubishi M50458 OSD")
 
-static ADDRESS_MAP_START( m50458_vram, 0, 16, m50458_device )
-	AM_RANGE(0x0000, 0x023f) AM_RAM // vram
-	AM_RANGE(0x0240, 0x0241) AM_WRITE(vreg_120_w)
-	AM_RANGE(0x0242, 0x0243) AM_WRITE(vreg_121_w)
-	AM_RANGE(0x0244, 0x0245) AM_WRITE(vreg_122_w)
-	AM_RANGE(0x0246, 0x0247) AM_WRITE(vreg_123_w)
-	AM_RANGE(0x0248, 0x0249) AM_WRITE(vreg_124_w)
-	AM_RANGE(0x024a, 0x024b) AM_WRITE(vreg_125_w)
-	AM_RANGE(0x024c, 0x024d) AM_WRITE(vreg_126_w)
-	AM_RANGE(0x024e, 0x024f) AM_WRITE(vreg_127_w)
-ADDRESS_MAP_END
+void m50458_device::m50458_vram(address_map &map)
+{
+	map(0x0000, 0x023f).ram(); // vram
+	map(0x0240, 0x0241).w(FUNC(m50458_device::vreg_120_w));
+	map(0x0242, 0x0243).w(FUNC(m50458_device::vreg_121_w));
+	map(0x0244, 0x0245).w(FUNC(m50458_device::vreg_122_w));
+	map(0x0246, 0x0247).w(FUNC(m50458_device::vreg_123_w));
+	map(0x0248, 0x0249).w(FUNC(m50458_device::vreg_124_w));
+	map(0x024a, 0x024b).w(FUNC(m50458_device::vreg_125_w));
+	map(0x024c, 0x024d).w(FUNC(m50458_device::vreg_126_w));
+	map(0x024e, 0x024f).w(FUNC(m50458_device::vreg_127_w));
+}
 
 // internal GFX ROM (TODO: GFXs in here should be 12x18, not 16x18)
 // (also note: ROM length CAN'T be 0x1200)
@@ -179,7 +180,7 @@ m50458_device::m50458_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, M50458, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, nullptr, *ADDRESS_MAP_NAME(m50458_vram))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(), address_map_constructor(FUNC(m50458_device::m50458_vram), this))
 {
 }
 
@@ -285,6 +286,8 @@ WRITE_LINE_MEMBER( m50458_device::set_cs_line )
 
 WRITE_LINE_MEMBER( m50458_device::set_clock_line )
 {
+	(void)m_clock_line;
+
 	if (m_reset_line == CLEAR_LINE)
 	{
 		if(state == 1)
@@ -370,7 +373,7 @@ uint32_t m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 						pix |= ((m_shadow_gfx[offset+0] >> (7-(xi & 0x7))) & 1);
 
 					/* blinking, VERY preliminary */
-					if(tile & 0x800 && m_screen->frame_number() & m_blink)
+					if(tile & 0x800 && screen.frame_number() & m_blink)
 						pix = 0;
 
 					if(yi == 17 && tile & 0x1000) /* underline? */

@@ -33,6 +33,7 @@ TODO:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -40,14 +41,37 @@ TODO:
 class rmhaihai_state : public driver_device
 {
 public:
-	rmhaihai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	rmhaihai_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
+	void init_rmhaihai();
+	void rmhaihai(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_WRITE8_MEMBER(keyboard_w);
+	DECLARE_READ8_MEMBER(samples_r);
+	DECLARE_WRITE8_MEMBER(ctrl_w);
+	DECLARE_WRITE8_MEMBER(adpcm_w);
+
+	virtual void video_start() override;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	void rmhaihai_io_map(address_map &map);
+	void rmhaihai_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -58,24 +82,29 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_keyboard_cmd;
 	int m_gfxbank;
+};
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(samples_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
+
+class rmhaisei_state : public rmhaihai_state
+{
+public:
+	using rmhaihai_state::rmhaihai_state;
+	void rmhaisei(machine_config &config);
+};
+
+
+class themj_state : public rmhaihai_state
+{
+public:
+	using rmhaihai_state::rmhaihai_state;
+	void themj(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	void themj_io_map(address_map &map);
+	void themj_map(address_map &map);
 	DECLARE_WRITE8_MEMBER(themj_rombank_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
-
-	DECLARE_DRIVER_INIT(rmhaihai);
-	virtual void video_start() override;
-	DECLARE_MACHINE_START(themj);
-	DECLARE_MACHINE_RESET(themj);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -123,8 +152,8 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1" };
 
-	logerror("%04x: keyboard_r\n",space.device().safe_pc());
-	switch(space.device().safe_pc())
+	logerror("%04x: keyboard_r\n",m_maincpu->pc());
+	switch(m_maincpu->pc())
 	{
 		/* read keyboard */
 		case 0x0280:
@@ -173,7 +202,7 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 
 WRITE8_MEMBER(rmhaihai_state::keyboard_w)
 {
-logerror("%04x: keyboard_w %02x\n",space.device().safe_pc(),data);
+logerror("%04x: keyboard_w %02x\n",m_maincpu->pc(),data);
 	m_keyboard_cmd = data;
 }
 
@@ -184,9 +213,9 @@ READ8_MEMBER(rmhaihai_state::samples_r)
 
 WRITE8_MEMBER(rmhaihai_state::adpcm_w)
 {
-	m_msm->data_w(data);         /* bit0..3  */
-	m_msm->reset_w(BIT(data, 5)); /* bit 5    */
-	m_msm->vclk_w(BIT(data, 4)); /* bit4     */
+	m_msm->write_data(data);        // bit0..3
+	m_msm->reset_w(BIT(data, 5));   // bit 5
+	m_msm->vclk_w(BIT(data, 4));    // bit4
 }
 
 WRITE8_MEMBER(rmhaihai_state::ctrl_w)
@@ -203,20 +232,20 @@ WRITE8_MEMBER(rmhaihai_state::ctrl_w)
 	m_gfxbank = (data & 0x40) >> 6; /* rmhaisei only */
 }
 
-WRITE8_MEMBER(rmhaihai_state::themj_rombank_w)
+WRITE8_MEMBER(themj_state::themj_rombank_w)
 {
 	logerror("banksw %d\n", data & 0x03);
 	membank("bank1")->set_entry(data & 0x03);
 	membank("bank2")->set_entry(data & 0x03);
 }
 
-MACHINE_START_MEMBER(rmhaihai_state,themj)
+void themj_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x12000, 0x4000);
 }
 
-MACHINE_RESET_MEMBER(rmhaihai_state,themj)
+void themj_state::machine_reset()
 {
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
@@ -224,53 +253,57 @@ MACHINE_RESET_MEMBER(rmhaihai_state,themj)
 
 
 
-static ADDRESS_MAP_START( rmhaihai_map, AS_PROGRAM, 8, rmhaihai_state )
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb83c, 0xb83c) AM_WRITENOP    // ??
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP    // ??
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM         /* rmhaisei only */
-ADDRESS_MAP_END
+void rmhaihai_state::rmhaihai_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xa000, 0xa7ff).ram().share("nvram");
+	map(0xa800, 0xafff).ram().w(FUNC(rmhaihai_state::colorram_w)).share("colorram");
+	map(0xb000, 0xb7ff).ram().w(FUNC(rmhaihai_state::videoram_w)).share("videoram");
+	map(0xb83c, 0xb83c).nopw();    // ??
+	map(0xbc00, 0xbc00).nopw();    // ??
+	map(0xc000, 0xdfff).rom();
+	map(0xe000, 0xffff).rom();         /* rmhaisei only */
+}
 
-static ADDRESS_MAP_START( rmhaihai_io_map, AS_IO, 8, rmhaihai_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP    // ??
-	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)    // ??
-	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
-	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
-	AM_RANGE(0x8080, 0x8080) AM_WRITENOP    // ??
-	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP    // ??
-	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP    // ??
-ADDRESS_MAP_END
+void rmhaihai_state::rmhaihai_io_map(address_map &map)
+{
+	map(0x0000, 0x7fff).r(FUNC(rmhaihai_state::samples_r));
+	map(0x8000, 0x8000).r(FUNC(rmhaihai_state::keyboard_r)).nopw();    // ??
+	map(0x8001, 0x8001).nopr().w(FUNC(rmhaihai_state::keyboard_w));    // ??
+	map(0x8020, 0x8020).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x8020, 0x8021).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x8040, 0x8040).w(FUNC(rmhaihai_state::adpcm_w));
+	map(0x8060, 0x8060).w(FUNC(rmhaihai_state::ctrl_w));
+	map(0x8080, 0x8080).nopw();    // ??
+	map(0xbc04, 0xbc04).nopw();    // ??
+	map(0xbc0c, 0xbc0c).nopw();    // ??
+}
 
-static ADDRESS_MAP_START( themj_map, AS_PROGRAM, 8, rmhaihai_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void themj_state::themj_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xa7ff).ram();
+	map(0xa800, 0xafff).ram().w(FUNC(themj_state::colorram_w)).share("colorram");
+	map(0xb000, 0xb7ff).ram().w(FUNC(themj_state::videoram_w)).share("videoram");
+	map(0xc000, 0xdfff).bankr("bank2");
+	map(0xe000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( themj_io_map, AS_IO, 8, rmhaihai_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP    // ??
-	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)    // ??
-	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
-	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
-	AM_RANGE(0x8080, 0x8080) AM_WRITENOP    // ??
-	AM_RANGE(0x80a0, 0x80a0) AM_WRITE(themj_rombank_w)
-	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP    // ??
-	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP    // ??
-ADDRESS_MAP_END
+void themj_state::themj_io_map(address_map &map)
+{
+	map(0x0000, 0x7fff).r(FUNC(themj_state::samples_r));
+	map(0x8000, 0x8000).r(FUNC(themj_state::keyboard_r)).nopw();    // ??
+	map(0x8001, 0x8001).nopr().w(FUNC(themj_state::keyboard_w));    // ??
+	map(0x8020, 0x8020).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x8020, 0x8021).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x8040, 0x8040).w(FUNC(themj_state::adpcm_w));
+	map(0x8060, 0x8060).w(FUNC(themj_state::ctrl_w));
+	map(0x8080, 0x8080).nopw();    // ??
+	map(0x80a0, 0x80a0).w(FUNC(themj_state::themj_rombank_w));
+	map(0xbc04, 0xbc04).nopw();    // ??
+	map(0xbc0c, 0xbc0c).nopw();    // ??
+}
 
 
 static INPUT_PORTS_START( mjctrl )
@@ -462,22 +495,22 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( rmhaihai )
+static GFXDECODE_START( gfx_rmhaihai )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( themj )
+static GFXDECODE_START( gfx_themj )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rmhaihai )
+MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,20000000/4)  /* 5 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(rmhaihai_map)
-	MCFG_CPU_IO_MAP(rmhaihai_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rmhaihai_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",Z80,20000000/4)  /* 5 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(rmhaihai_map)
+	MCFG_DEVICE_IO_MAP(rmhaihai_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rmhaihai_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -490,48 +523,47 @@ static MACHINE_CONFIG_START( rmhaihai )
 	MCFG_SCREEN_UPDATE_DRIVER(rmhaihai_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rmhaihai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rmhaihai)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 20000000/16)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 20000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 500000)
+	MCFG_DEVICE_ADD("msm", MSM5205, 500000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rmhaisei, rmhaihai )
+MACHINE_CONFIG_START(rmhaisei_state::rmhaisei)
+	rmhaihai(config);
 
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", themj)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_themj)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( themj, rmhaihai )
+MACHINE_CONFIG_START(themj_state::themj)
+	rmhaihai(config);
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(themj_map)
-	MCFG_CPU_IO_MAP(themj_io_map)
-
-	MCFG_MACHINE_START_OVERRIDE(rmhaihai_state,themj)
-	MCFG_MACHINE_RESET_OVERRIDE(rmhaihai_state,themj)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(themj_map)
+	MCFG_DEVICE_IO_MAP(themj_io_map)
 
 	MCFG_DEVICE_REMOVE("nvram")
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", themj)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_themj)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x200)
 MACHINE_CONFIG_END
@@ -708,21 +740,17 @@ ROM_START( themj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
+void rmhaihai_state::init_rmhaihai()
 {
-	uint8_t *rom = memregion("gfx1")->base();
-	int size = memregion("gfx1")->bytes();
-	int a,b;
-
-	size /= 2;
-	rom += size;
+	int size = memregion("gfx1")->bytes() / 2;
+	uint8_t *rom = memregion("gfx1")->base() + size;
 
 	/* unpack the high bit of gfx */
-	for (b = size - 0x4000;b >= 0;b -= 0x4000)
+	for (int b = size - 0x4000; b >= 0; b -= 0x4000)
 	{
-		if (b) memcpy(rom + b,rom + b/2,0x2000);
+		if (b) memcpy(rom + b, rom + b/2, 0x2000);
 
-		for (a = 0;a < 0x2000;a++)
+		for (int a = 0; a < 0x2000;a++)
 		{
 			rom[a + b + 0x2000] = rom[a + b] >> 4;
 		}
@@ -730,9 +758,9 @@ DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
 }
 
 
-GAME( 1985, rmhaihai,  0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, newer)", MACHINE_SUPPORTS_SAVE ) // writes Homedata in NVRAM
-GAME( 1985, rmhaihai2, rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, rmhaihib,  rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rmhaijin,  0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rmhaisei,  0,        rmhaisei, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, themj,     0,        themj,    rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihai,  0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, newer)", MACHINE_SUPPORTS_SAVE ) // writes Homedata in NVRAM
+GAME( 1985, rmhaihai2, rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihib,  rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rmhaijin,  0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rmhaisei,  0,        rmhaisei, rmhaihai, rmhaisei_state, init_rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, themj,     0,        themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", MACHINE_SUPPORTS_SAVE )

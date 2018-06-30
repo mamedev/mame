@@ -8,9 +8,10 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "diserial.h"
 
-device_serial_interface::device_serial_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "serial"),
+device_serial_interface::device_serial_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "serial"),
 	m_start_bit_hack_for_external_clocks(false),
 	m_df_start_bit_count(0),
 	m_df_word_length(0),

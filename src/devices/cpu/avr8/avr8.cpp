@@ -59,6 +59,7 @@
 
 #include "emu.h"
 #include "avr8.h"
+#include "avr8dasm.h"
 #include "debugger.h"
 
 #define VERBOSE_LEVEL   (0)
@@ -563,37 +564,41 @@ static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ATMEGA88,   atmega88_device,   "atmega88",   "ATmega88")
-DEFINE_DEVICE_TYPE(ATMEGA644,  atmega644_device,  "atmega644",  "ATmega644")
-DEFINE_DEVICE_TYPE(ATMEGA1280, atmega1280_device, "atmega1280", "ATmega1280")
-DEFINE_DEVICE_TYPE(ATMEGA2560, atmega2560_device, "atmega2560", "ATmega2560")
+DEFINE_DEVICE_TYPE(ATMEGA88,   atmega88_device,   "atmega88",   "Atmel ATmega88")
+DEFINE_DEVICE_TYPE(ATMEGA644,  atmega644_device,  "atmega644",  "Atmel ATmega644")
+DEFINE_DEVICE_TYPE(ATMEGA1280, atmega1280_device, "atmega1280", "Atmel ATmega1280")
+DEFINE_DEVICE_TYPE(ATMEGA2560, atmega2560_device, "atmega2560", "Atmel ATmega2560")
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
 //**************************************************************************
 
-static ADDRESS_MAP_START( atmega88_internal_map, AS_DATA, 8, atmega88_device )
-	AM_RANGE(0x0000, 0x00ff) AM_READWRITE( regs_r, regs_w )
-ADDRESS_MAP_END
+void atmega88_device::atmega88_internal_map(address_map &map)
+{
+	map(0x0000, 0x00ff).rw(FUNC(atmega88_device::regs_r), FUNC(atmega88_device::regs_w));
+}
 
-static ADDRESS_MAP_START( atmega644_internal_map, AS_DATA, 8, atmega644_device )
-	AM_RANGE(0x0000, 0x00ff) AM_READWRITE( regs_r, regs_w )
-ADDRESS_MAP_END
+void atmega644_device::atmega644_internal_map(address_map &map)
+{
+	map(0x0000, 0x00ff).rw(FUNC(atmega644_device::regs_r), FUNC(atmega644_device::regs_w));
+}
 
-static ADDRESS_MAP_START( atmega1280_internal_map, AS_DATA, 8, atmega1280_device )
-	AM_RANGE(0x0000, 0x01ff) AM_READWRITE( regs_r, regs_w )
-ADDRESS_MAP_END
+void atmega1280_device::atmega1280_internal_map(address_map &map)
+{
+	map(0x0000, 0x01ff).rw(FUNC(atmega1280_device::regs_r), FUNC(atmega1280_device::regs_w));
+}
 
-static ADDRESS_MAP_START( atmega2560_internal_map, AS_DATA, 8, atmega2560_device )
-	AM_RANGE(0x0000, 0x01ff) AM_READWRITE( regs_r, regs_w )
-ADDRESS_MAP_END
+void atmega2560_device::atmega2560_internal_map(address_map &map)
+{
+	map(0x0000, 0x01ff).rw(FUNC(atmega2560_device::regs_r), FUNC(atmega2560_device::regs_w));
+}
 
 //-------------------------------------------------
 //  atmega88_device - constructor
 //-------------------------------------------------
 
 atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, ADDRESS_MAP_NAME(atmega88_internal_map), CPU_TYPE_ATMEGA88)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, address_map_constructor(FUNC(atmega88_device::atmega88_internal_map), this), CPU_TYPE_ATMEGA88)
 {
 }
 
@@ -602,7 +607,7 @@ atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 atmega644_device::atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA644, 0xffff, ADDRESS_MAP_NAME(atmega644_internal_map), CPU_TYPE_ATMEGA644)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA644, 0xffff, address_map_constructor(FUNC(atmega644_device::atmega644_internal_map), this), CPU_TYPE_ATMEGA644)
 {
 }
 
@@ -611,7 +616,7 @@ atmega644_device::atmega644_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA1280, 0x1ffff, ADDRESS_MAP_NAME(atmega1280_internal_map), CPU_TYPE_ATMEGA1280)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA1280, 0x1ffff, address_map_constructor(FUNC(atmega1280_device::atmega1280_internal_map), this), CPU_TYPE_ATMEGA1280)
 {
 }
 
@@ -620,7 +625,7 @@ atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, ADDRESS_MAP_NAME(atmega2560_internal_map), CPU_TYPE_ATMEGA2560)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, address_map_constructor(FUNC(atmega2560_device::atmega2560_internal_map), this), CPU_TYPE_ATMEGA2560)
 {
 }
 
@@ -819,7 +824,7 @@ void avr8_device::device_start()
 	save_item(NAME(m_elapsed_cycles));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 //-------------------------------------------------
@@ -911,36 +916,13 @@ void avr8_device::state_string_export(const device_state_entry &entry, std::stri
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t avr8_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t avr8_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t avr8_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> avr8_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( avr8 );
-	return CPU_DISASSEMBLE_NAME(avr8)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<avr8_disassembler>();
 }
 
 
@@ -2976,7 +2958,7 @@ void avr8_device::execute_run()
 		m_pc &= m_addr_mask;
 		m_shifted_pc &= (m_addr_mask << 1) | 1;
 
-		debugger_instruction_hook(this, m_shifted_pc);
+		debugger_instruction_hook(m_shifted_pc);
 
 		op = (uint32_t)m_program->read_word(m_shifted_pc);
 

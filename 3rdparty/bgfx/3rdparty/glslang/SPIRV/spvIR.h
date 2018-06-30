@@ -65,6 +65,14 @@ const Id NoResult = 0;
 const Id NoType = 0;
 
 const Decoration NoPrecision = DecorationMax;
+
+#ifdef __GNUC__
+#   define POTENTIALLY_UNUSED __attribute__((unused))
+#else
+#   define POTENTIALLY_UNUSED
+#endif
+
+POTENTIALLY_UNUSED
 const MemorySemanticsMask MemorySemanticsAllMemory =
                 (MemorySemanticsMask)(MemorySemanticsSequentiallyConsistentMask |
                                       MemorySemanticsUniformMemoryMask |
@@ -87,7 +95,6 @@ public:
     void addImmediateOperand(unsigned int immediate) { operands.push_back(immediate); }
     void addStringOperand(const char* str)
     {
-        originalString = str;
         unsigned int word;
         char* wordString = (char*)&word;
         char* wordPtr = wordString;
@@ -120,7 +127,6 @@ public:
     Id getTypeId() const { return typeId; }
     Id getIdOperand(int op) const { return operands[op]; }
     unsigned int getImmediateOperand(int op) const { return operands[op]; }
-    const char* getStringOperand() const { return originalString.c_str(); }
 
     // Write out the binary form.
     void dump(std::vector<unsigned int>& out) const
@@ -151,7 +157,6 @@ protected:
     Id typeId;
     Op opCode;
     std::vector<Id> operands;
-    std::string originalString;        // could be optimized away; convenience for getting string operand
     Block* block;
 };
 

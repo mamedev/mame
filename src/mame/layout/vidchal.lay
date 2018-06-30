@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk state="1"><color red="1.0" green="0.15" blue="0.18" /></disk>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.15" blue="0.18" /></led7seg>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="60" top="-2" bottom="25" />
+
+		<bezel name="digit4" element="digit"><bounds x="0" y="10" width="10" height="15" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="10" y="10" width="10" height="15" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="20" y="10" width="10" height="15" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="30" y="10" width="10" height="15" /></bezel>
+		<bezel name="digit0" element="digit"><bounds x="40" y="10" width="10" height="15" /></bezel>
+		<bezel name="digit5" element="digit"><bounds x="50" y="10" width="10" height="15" /></bezel>
+
+		<!-- 3 leds reflected inside gun barrel -->
+		<bezel name="6.a" element="led"><bounds x="28" y="-1.5" width="4" height="4" /></bezel>
+		<bezel name="6.a" element="led"><bounds x="30" y="2" width="4" height="4" /></bezel>
+		<bezel name="6.a" element="led"><bounds x="26" y="2" width="4" height="4" /></bezel>
+
+	</view>
+</mamelayout>

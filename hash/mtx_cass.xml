@@ -151,6 +151,18 @@ TODO: find out why the driver does not recognize the program on the tapes...
 		</part>
 	</software>
 
+	<software name="demotape" supported="no">
+		<description>Demonstration Tape</description>
+		<year>1983</year>
+		<publisher>Memotech</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="883174">
+				<rom name="demonstration tape.wav" size="883174" crc="354bdd13" sha1="09faf6f5c591ff38f723ef80fc2ec5b18188084a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="goldmine" supported="no">
 		<description>Goldmine</description>
 		<year>1983</year>
@@ -303,6 +315,18 @@ TODO: find out why the driver does not recognize the program on the tapes...
 		<part name="cass1" interface="mtx_cass">
 			<dataarea name="cass" size="2198847">
 				<rom name="mtx chess (1983)(continental software).wav" size="2198847" crc="5e96b81f" sha1="bb5c67af8bf49ed454c816abe19a583df83ebd01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="draughts" supported="no">
+		<description>MTX Draughts</description>
+		<year>1983</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1134980">
+				<rom name="mtx draughts (1983)(continental software).wav" size="1134980" crc="42e7007b" sha1="9a3b45f9312c4389015f6fa644277b010b19ee06" offset="0" />
 			</dataarea>
 		</part>
 	</software>

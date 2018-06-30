@@ -81,12 +81,27 @@ plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &m
 
 
 //-------------------------------------------------
+//  device_validity_check -
+//-------------------------------------------------
+
+void plus4_expansion_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<device_plus4_expansion_card_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement device_plus4_expansion_card_interface\n", carddev->tag(), carddev->name());
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void plus4_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_plus4_expansion_card_interface *>(get_card_device());
+	device_t *const carddev = get_card_device();
+	m_card = dynamic_cast<device_plus4_expansion_card_interface *>(carddev);
+	if (carddev && !m_card)
+		fatalerror("Card device %s (%s) does not implement device_plus4_expansion_card_interface\n", carddev->tag(), carddev->name());
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();
@@ -110,10 +125,6 @@ void plus4_expansion_slot_device::device_start()
 
 void plus4_expansion_slot_device::device_reset()
 {
-	if (get_card_device())
-	{
-		get_card_device()->reset();
-	}
 }
 
 
@@ -189,10 +200,11 @@ void plus4_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint
 #include "sid.h"
 #include "std.h"
 
-SLOT_INTERFACE_START( plus4_expansion_cards )
-	SLOT_INTERFACE("c1551", C1551)
-	SLOT_INTERFACE("sid", PLUS4_SID)
+void plus4_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("c1551", C1551);
+	device.option_add("sid", PLUS4_SID);
 
 	// the following need ROMs from the software list
-	SLOT_INTERFACE_INTERNAL("standard", PLUS4_STD)
-SLOT_INTERFACE_END
+	device.option_add_internal("standard", PLUS4_STD);
+}

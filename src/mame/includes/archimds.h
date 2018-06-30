@@ -6,13 +6,14 @@
  *
  *****************************************************************************/
 
-#ifndef _ARCHIMEDES_H_
-#define _ARCHIMEDES_H_
+#ifndef MAME_INCLUDES_ARCHIMEDES_H
+#define MAME_INCLUDES_ARCHIMEDES_H
 
 #include "machine/aakart.h"
 #include "sound/dac.h"
 #include "machine/i2cmem.h"
 #include "machine/wd_fdc.h"
+#include "emupal.h"
 #include "screen.h"
 
 // interrupt definitions.  these are for the real Archimedes computer - arcade
@@ -197,4 +198,4 @@ private:
 #define VIDC_VCSR       0xb8
 #define VIDC_VCER       0xbc
 
-#endif  // _ARCHIMEDES_H_
+#endif // MAME_INCLUDES_ARCHIMEDES_H

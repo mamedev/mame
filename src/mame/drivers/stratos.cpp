@@ -24,7 +24,7 @@ public:
 		, nvram_bank(*this, "nvram_bank")
 	{ }
 
-	DECLARE_DRIVER_INIT(stratos);
+	void init_stratos();
 	DECLARE_WRITE8_MEMBER(p2000_w);
 	DECLARE_READ8_MEMBER(p2200_r);
 	DECLARE_WRITE8_MEMBER(p2200_w);
@@ -37,6 +37,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void stratos(machine_config &config);
+	void stratos_mem(address_map &map);
 private:
 	std::unique_ptr<uint8_t[]> nvram_data;
 	uint8_t control, led_latch_control;
@@ -52,7 +54,7 @@ private:
 	required_memory_bank nvram_bank;
 };
 
-DRIVER_INIT_MEMBER( stratos_state, stratos )
+void stratos_state::init_stratos()
 {
 	nvram_data = std::make_unique<uint8_t[]>(0x2000);
 	nvram->set_base(nvram_data.get(), 0x2000);
@@ -120,7 +122,7 @@ uint32_t stratos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	if(machine().input().code_pressed(KEYCODE_W)) {
 		if(!nmi) {
-			maincpu->set_input_line(M65C02_NMI_LINE, PULSE_LINE);
+			maincpu->pulse_input_line(M65C02_NMI_LINE, attotime::zero);
 			nmi = true;
 		}
 	} else
@@ -328,24 +330,25 @@ WRITE8_MEMBER(stratos_state::lcd_w)
 	}
 }
 
-static ADDRESS_MAP_START( stratos_mem, AS_PROGRAM, 8, stratos_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(p2000_w)
-	AM_RANGE(0x2200, 0x2200) AM_READWRITE(p2200_r, p2200_w)
-	AM_RANGE(0x2400, 0x2400) AM_WRITE(p2400_w)
-	AM_RANGE(0x2600, 0x2600) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0x2800, 0x37ff) AM_RAMBANK("nvram_bank")
-	AM_RANGE(0x3800, 0x3800) AM_READWRITE(lcd_r, lcd_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank_4000")
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank_8000")
-ADDRESS_MAP_END
+void stratos_state::stratos_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2000).w(FUNC(stratos_state::p2000_w));
+	map(0x2200, 0x2200).rw(FUNC(stratos_state::p2200_r), FUNC(stratos_state::p2200_w));
+	map(0x2400, 0x2400).w(FUNC(stratos_state::p2400_w));
+	map(0x2600, 0x2600).rw(FUNC(stratos_state::control_r), FUNC(stratos_state::control_w));
+	map(0x2800, 0x37ff).bankrw("nvram_bank");
+	map(0x3800, 0x3800).rw(FUNC(stratos_state::lcd_r), FUNC(stratos_state::lcd_w));
+	map(0x4000, 0x7fff).bankr("bank_4000");
+	map(0x8000, 0xffff).bankr("bank_8000");
+}
 
 static INPUT_PORTS_START( stratos )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( stratos )
-	MCFG_CPU_ADD("maincpu", M65C02, 5670000)
-	MCFG_CPU_PROGRAM_MAP(stratos_mem)
+MACHINE_CONFIG_START(stratos_state::stratos)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 5670000)
+	MCFG_DEVICE_PROGRAM_MAP(stratos_mem)
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -368,5 +371,5 @@ ROM_START( stratos )
 	ROM_FILL(0x00000, 0x10000, 0xff)
 ROM_END
 
-/*     YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS          INIT     COMPANY    FULLNAME                           FLAGS */
-CONS(  1986, stratos,  0,       0,      stratos,   stratos,  stratos_state, stratos, "Saitek",  "Kasparov Stratos Chess Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME                           FLAGS */
+CONS(  1986, stratos, 0,      0,      stratos, stratos, stratos_state, init_stratos, "Saitek",  "Kasparov Stratos Chess Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

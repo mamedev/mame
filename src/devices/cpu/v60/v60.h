@@ -99,6 +99,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 1; }
 	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -110,9 +111,7 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 22; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	typedef uint32_t (v60_device::*am_func)();
@@ -152,7 +151,6 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	offs_t              m_fetch_xor;
 	offs_t              m_start_pc;
 	uint32_t              m_reg[68];
 	struct {
@@ -164,7 +162,9 @@ private:
 	uint8_t               m_irq_line;
 	uint8_t               m_nmi_line;
 	address_space *m_program;
-	direct_read_data *  m_direct;
+	std::function<u8  (offs_t)> m_pr8;
+	std::function<u16 (offs_t)> m_pr16;
+	std::function<u32 (offs_t)> m_pr32;
 	address_space *m_io;
 	uint32_t              m_PPC;
 	int                 m_icount;
@@ -777,9 +777,6 @@ class v70_device : public v60_device
 public:
 	// construction/destruction
 	v70_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
 

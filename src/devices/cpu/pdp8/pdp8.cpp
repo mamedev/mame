@@ -9,8 +9,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "pdp8.h"
-
-CPU_DISASSEMBLE( pdp8 );
+#include "pdp8dasm.h"
 
 #define OP          ((op >> 011) & 07)
 
@@ -44,7 +43,7 @@ CPU_DISASSEMBLE( pdp8 );
 #define OPR_GROUP1_VAL  0000
 #define OPR_GROUP2_VAL  0400
 
-DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "PDP8")
+DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "DEC PDP8")
 
 //-------------------------------------------------
 //  pdp8_device - constructor
@@ -95,7 +94,7 @@ void pdp8_device::device_start()
 	save_item(NAME(m_halt));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void pdp8_device::device_stop()
@@ -148,36 +147,13 @@ void pdp8_device::state_string_export(const device_state_entry &entry, std::stri
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t pdp8_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t pdp8_device::disasm_max_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t pdp8_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> pdp8_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( pdp8 );
-	return CPU_DISASSEMBLE_NAME(pdp8)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<pdp8_disassembler>();
 }
 
 
@@ -240,7 +216,7 @@ void pdp8_device::execute_run()
 	{
 		m_pc &= 07777;
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		uint16_t op = m_program->read_word(m_pc);
 

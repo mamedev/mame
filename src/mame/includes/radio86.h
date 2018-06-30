@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef radio86_H_
-#define radio86_H_
+#ifndef MAME_INCLUDES_RADIO86_H
+#define MAME_INCLUDES_RADIO86_H
 
 #include "machine/i8255.h"
 #include "machine/i8257.h"
@@ -15,6 +15,7 @@
 #include "imagedev/cassette.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 
 
 class radio86_state : public driver_device
@@ -35,23 +36,8 @@ public:
 		m_ppi8255_2(*this, "ppi8255_2"),
 		m_region_maincpu(*this, "maincpu"),
 		m_bank1(*this, "bank1"),
-		m_io_line0(*this, "LINE0"),
-		m_io_line1(*this, "LINE1"),
-		m_io_line2(*this, "LINE2"),
-		m_io_line3(*this, "LINE3"),
-		m_io_line4(*this, "LINE4"),
-		m_io_line5(*this, "LINE5"),
-		m_io_line6(*this, "LINE6"),
-		m_io_line7(*this, "LINE7"),
-		m_io_line8(*this, "LINE8"),
-		m_io_cline0(*this, "CLINE0"),
-		m_io_cline1(*this, "CLINE1"),
-		m_io_cline2(*this, "CLINE2"),
-		m_io_cline3(*this, "CLINE3"),
-		m_io_cline4(*this, "CLINE4"),
-		m_io_cline5(*this, "CLINE5"),
-		m_io_cline6(*this, "CLINE6"),
-		m_io_cline7(*this, "CLINE7"),
+		m_io_line(*this, "LINE%u", 0),
+		m_io_cline(*this, "CLINE%u", 0),
 		m_palette(*this, "palette") { }
 
 	virtual void video_start() override;
@@ -68,8 +54,8 @@ public:
 	DECLARE_READ8_MEMBER(radio_io_r);
 	DECLARE_WRITE8_MEMBER(radio_io_w);
 	DECLARE_WRITE8_MEMBER(radio86_pagesel);
-	DECLARE_DRIVER_INIT(radioram);
-	DECLARE_DRIVER_INIT(radio86);
+	void init_radioram();
+	void init_radio86();
 	DECLARE_MACHINE_RESET(radio86);
 	DECLARE_PALETTE_INIT(radio86);
 	DECLARE_READ8_MEMBER(radio86_8255_portb_r2);
@@ -77,6 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(radio86_8255_porta_w2);
 	DECLARE_WRITE8_MEMBER(radio86_8255_portc_w2);
 	DECLARE_READ8_MEMBER(rk7007_8255_portc_r);
+	DECLARE_READ8_MEMBER(kr03_8255_portb_r2);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_READ8_MEMBER(radio86rom_romdisk_porta_r);
 	DECLARE_READ8_MEMBER(radio86ram_romdisk_porta_r);
@@ -88,6 +75,23 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	required_device<cpu_device> m_maincpu;
 
+	void impuls03(machine_config &config);
+	void mikron2(machine_config &config);
+	void rk7007(machine_config &config);
+	void rk700716(machine_config &config);
+	void radiorom(machine_config &config);
+	void radio86(machine_config &config);
+	void radio16(machine_config &config);
+	void radioram(machine_config &config);
+	void kr03(machine_config &config);
+	void impuls03_mem(address_map &map);
+	void mikron2_mem(address_map &map);
+	void radio86_16_mem(address_map &map);
+	void radio86_io(address_map &map);
+	void radio86_mem(address_map &map);
+	void radio86ram_mem(address_map &map);
+	void radio86rom_mem(address_map &map);
+	void rk7007_io(address_map &map);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cart;    // for ROMDisk - only Radio86K & Orion?
@@ -96,23 +100,8 @@ protected:
 	optional_device<i8255_device> m_ppi8255_2;
 	required_memory_region m_region_maincpu;
 	required_memory_bank m_bank1;
-	required_ioport m_io_line0;
-	required_ioport m_io_line1;
-	required_ioport m_io_line2;
-	required_ioport m_io_line3;
-	required_ioport m_io_line4;
-	required_ioport m_io_line5;
-	required_ioport m_io_line6;
-	required_ioport m_io_line7;
-	required_ioport m_io_line8;
-	optional_ioport m_io_cline0;
-	optional_ioport m_io_cline1;
-	optional_ioport m_io_cline2;
-	optional_ioport m_io_cline3;
-	optional_ioport m_io_cline4;
-	optional_ioport m_io_cline5;
-	optional_ioport m_io_cline6;
-	optional_ioport m_io_cline7;
+	required_ioport_array<9> m_io_line;
+	optional_ioport_array<8> m_io_cline;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void radio86_init_keyboard();
@@ -126,4 +115,4 @@ public:
 INPUT_PORTS_EXTERN( radio86 );
 INPUT_PORTS_EXTERN( ms7007 );
 
-#endif /* radio86_H_ */
+#endif // MAME_INCLUDES_RADIO86_H

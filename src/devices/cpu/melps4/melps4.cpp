@@ -39,6 +39,7 @@
 
 #include "emu.h"
 #include "melps4.h"
+#include "melps4d.h"
 #include "debugger.h"
 
 
@@ -231,7 +232,7 @@ void melps4_cpu_device::device_start()
 	state_add(MELPS4_V, "V", m_v).formatstr("%1X");
 	state_add(MELPS4_W, "W", m_w).formatstr("%1X");
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 device_memory_interface::space_config_vector melps4_cpu_device::memory_space_config() const
@@ -451,9 +452,9 @@ void melps4_cpu_device::execute_run()
 		m_prohibit_irq = false;
 
 		// fetch next opcode
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		m_icount--;
-		m_op = m_program->read_word(m_pc << 1) & 0x1ff;
+		m_op = m_program->read_word(m_pc) & 0x1ff;
 		m_bitmask = 1 << (m_op & 3);
 		m_pc = (m_pc & ~0x7f) | ((m_pc + 1) & 0x7f); // stays in the same page
 
@@ -470,4 +471,9 @@ void melps4_cpu_device::execute_run()
 		else
 			execute_one();
 	}
+}
+
+std::unique_ptr<util::disasm_interface> melps4_cpu_device::create_disassembler()
+{
+	return std::make_unique<melps4_disassembler>();
 }

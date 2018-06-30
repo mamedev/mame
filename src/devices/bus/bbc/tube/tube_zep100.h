@@ -32,15 +32,6 @@ public:
 	// construction/destruction
 	bbc_tube_zep100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( mem_r );
-	DECLARE_WRITE8_MEMBER( mem_w );
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
-
-	DECLARE_WRITE8_MEMBER( via_pb_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -62,6 +53,18 @@ private:
 
 	uint8_t m_port_b;
 	bool m_rom_enabled;
+
+	DECLARE_READ8_MEMBER( mem_r );
+	DECLARE_WRITE8_MEMBER( mem_w );
+	DECLARE_READ8_MEMBER( io_r );
+	DECLARE_WRITE8_MEMBER( io_w );
+
+	DECLARE_WRITE8_MEMBER( via_pb_w );
+	DECLARE_READ8_MEMBER( ppi_pb_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+
+	void tube_zep100_io(address_map &map);
+	void tube_zep100_mem(address_map &map);
 };
 
 

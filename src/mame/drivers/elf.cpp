@@ -74,17 +74,19 @@ WRITE8_MEMBER( elf2_state::memory_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( elf2_mem, AS_PROGRAM, 8, elf2_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x00ff) AM_RAMBANK("bank1")
-ADDRESS_MAP_END
+void elf2_state::elf2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x0000, 0x00ff).bankrw("bank1");
+}
 
-static ADDRESS_MAP_START( elf2_io, AS_IO, 8, elf2_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01, 0x01) AM_READ(dispon_r)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(data_r, data_w)
-ADDRESS_MAP_END
+void elf2_state::elf2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x01, 0x01).r(FUNC(elf2_state::dispon_r));
+	map(0x04, 0x04).rw(FUNC(elf2_state::data_r), FUNC(elf2_state::data_w));
+}
 
 /* Input Ports */
 
@@ -152,7 +154,7 @@ READ_LINE_MEMBER( elf2_state::ef4_r )
 
 WRITE_LINE_MEMBER( elf2_state::q_w )
 {
-	output().set_led_value(0, state);
+	m_led = state ? 1 : 0;
 }
 
 READ8_MEMBER( elf2_state::dma_r )
@@ -200,7 +202,10 @@ void elf2_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
+	m_led.resolve();
+
 	/* initialize LED displays */
+	m_7segs.resolve();
 	m_led_l->rbi_w(1);
 	m_led_h->rbi_w(1);
 
@@ -230,42 +235,42 @@ QUICKLOAD_LOAD_MEMBER( elf2_state, elf )
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( elf2 )
+MACHINE_CONFIG_START(elf2_state::elf2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
-	MCFG_CPU_PROGRAM_MAP(elf2_mem)
-	MCFG_CPU_IO_MAP(elf2_io)
-	MCFG_COSMAC_WAIT_CALLBACK(READLINE(elf2_state, wait_r))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(elf2_state, clear_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(elf2_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(elf2_state, q_w))
-	MCFG_COSMAC_DMAR_CALLBACK(READ8(elf2_state, dma_r))
-	MCFG_COSMAC_DMAW_CALLBACK(DEVWRITE8(CDP1861_TAG, cdp1861_device, dma_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(elf2_state, sc_w))
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(3'579'545)/2)
+	MCFG_DEVICE_PROGRAM_MAP(elf2_mem)
+	MCFG_DEVICE_IO_MAP(elf2_io)
+	MCFG_COSMAC_WAIT_CALLBACK(READLINE(*this, elf2_state, wait_r))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, elf2_state, clear_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, elf2_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, elf2_state, q_w))
+	MCFG_COSMAC_DMAR_CALLBACK(READ8(*this, elf2_state, dma_r))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(CDP1861_TAG, cdp1861_device, dma_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, elf2_state, sc_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_elf2)
 
-	MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, XTAL_3_579545MHz/2)
+	MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, XTAL(3'579'545)/2)
 	MCFG_CDP1861_IRQ_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT))
 	MCFG_CDP1861_DMA_OUT_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT))
 	MCFG_CDP1861_EFX_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1))
-	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_579545MHz/2)
+	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL(3'579'545)/2)
 
 	/* devices */
 	MCFG_DEVICE_ADD(MM74C923_TAG, MM74C923, 0)
 	MCFG_MM74C922_OSC(CAP_U(0.15))
 	MCFG_MM74C922_DEBOUNCE(CAP_U(1))
-	MCFG_MM74C922_DA_CALLBACK(WRITELINE(elf2_state, da_w))
+	MCFG_MM74C922_DA_CALLBACK(WRITELINE(*this, elf2_state, da_w))
 	MCFG_MM74C922_X1_CALLBACK(IOPORT("X1"))
 	MCFG_MM74C922_X2_CALLBACK(IOPORT("X2"))
 	MCFG_MM74C922_X3_CALLBACK(IOPORT("X3"))
 	MCFG_MM74C922_X4_CALLBACK(IOPORT("X4"))
 
 	MCFG_DEVICE_ADD(DM9368_H_TAG, DM9368, 0)
-	MCFG_OUTPUT_NAME("digit0")
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, elf2_state, digit_w<0>))
 	MCFG_DEVICE_ADD(DM9368_L_TAG, DM9368, 0)
-	MCFG_OUTPUT_NAME("digit1")
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, elf2_state, digit_w<1>))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
@@ -285,5 +290,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE       INIT    COMPANY         FULLNAME    FLAGS
-COMP( 1978, elf2,   0,      0,      elf2,   elf2, elf2_state, 0,      "Netronics",    "Elf II",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1978, elf2, 0,      0,      elf2,    elf2,  elf2_state, empty_init, "Netronics", "Elf II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)

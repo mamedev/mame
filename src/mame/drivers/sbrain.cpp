@@ -46,6 +46,8 @@ To Do:
 #include "machine/wd_fdc.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
+//#include "video/dp8350.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -60,7 +62,6 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_beep(*this, "beeper")
-		, m_brg(*this, "brg")
 		, m_u0(*this, "uart0")
 		, m_u1(*this, "uart1")
 		, m_ppi(*this, "ppi")
@@ -74,7 +75,7 @@ public:
 		, m_keyboard(*this, "X%u", 0)
 		{}
 
-	DECLARE_DRIVER_INIT(sbrain);
+	void init_sbrain();
 	DECLARE_MACHINE_RESET(sbrain);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
@@ -86,10 +87,14 @@ public:
 	DECLARE_READ8_MEMBER(port50_r);
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(baud_w);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
 
+	void sbrain(machine_config &config);
+	void sbrain_io(address_map &map);
+	void sbrain_mem(address_map &map);
+	void sbrain_subio(address_map &map);
+	void sbrain_submem(address_map &map);
 private:
 	bool m_busak;
 	u8 m_keydown;
@@ -104,7 +109,6 @@ private:
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
-	required_device<com8116_device> m_brg;
 	required_device<i8251_device> m_u0;
 	required_device<i8251_device> m_u1;
 	required_device<i8255_device> m_ppi;
@@ -118,36 +122,40 @@ private:
 	required_ioport_array<10> m_keyboard;
 };
 
-static ADDRESS_MAP_START( sbrain_mem, AS_PROGRAM, 8, sbrain_state )
-	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xbfff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0xc000, 0xf7ff ) AM_RAM
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void sbrain_state::sbrain_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bankr0").bankw("bankw0");
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0xbfff).bankrw("bank2");
+	map(0xc000, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("videoram");
+}
 
-static ADDRESS_MAP_START( sbrain_io, AS_IO, 8, sbrain_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(6) AM_DEVREADWRITE("uart0", i8251_device, data_r, data_w)
-	AM_RANGE(0x41, 0x41) AM_MIRROR(6) AM_DEVREADWRITE("uart0", i8251_device, status_r, control_w)
-	AM_RANGE(0x48, 0x4f) AM_READ(port48_r) //chr_int_latch
-	AM_RANGE(0x50, 0x57) AM_READ(port50_r)
-	AM_RANGE(0x58, 0x58) AM_MIRROR(6) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0x59, 0x59) AM_MIRROR(6) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0x60, 0x67) AM_WRITE(baud_w)
-	AM_RANGE(0x68, 0x6b) AM_MIRROR(4) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-ADDRESS_MAP_END
+void sbrain_state::sbrain_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).mirror(6).rw(m_u0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x41, 0x41).mirror(6).rw(m_u0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x48, 0x4f).r(FUNC(sbrain_state::port48_r)); //chr_int_latch
+	map(0x50, 0x57).r(FUNC(sbrain_state::port50_r));
+	map(0x58, 0x58).mirror(6).rw(m_u1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x59, 0x59).mirror(6).rw(m_u1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x60, 0x60).mirror(7).w("brg", FUNC(com8116_device::stt_str_w));
+	map(0x68, 0x6b).mirror(4).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-static ADDRESS_MAP_START( sbrain_submem, AS_PROGRAM, 8, sbrain_state )
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
-	AM_RANGE( 0x8800, 0x8bff ) AM_RAM AM_REGION("subcpu", 0x8800)
-ADDRESS_MAP_END
+void sbrain_state::sbrain_submem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x8800, 0x8bff).ram().region("subcpu", 0x8800);
+}
 
-static ADDRESS_MAP_START( sbrain_subio, AS_IO, 8, sbrain_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("fdc", fd1791_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(port10_r,port10_w)
-ADDRESS_MAP_END
+void sbrain_state::sbrain_subio(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x08, 0x0b).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
+	map(0x10, 0x10).rw(FUNC(sbrain_state::port10_r), FUNC(sbrain_state::port10_w));
+}
 
 
 READ8_MEMBER( sbrain_state::port48_r )
@@ -190,12 +198,6 @@ WRITE8_MEMBER( sbrain_state::port10_w )
 
 	m_floppy0->get_device()->mon_w(0); // motors run all the time
 	m_floppy1->get_device()->mon_w(0);
-}
-
-WRITE8_MEMBER( sbrain_state::baud_w )
-{
-	m_brg->str_w(data & 0x0f);
-	m_brg->stt_w(data >> 4);
 }
 
 READ8_MEMBER( sbrain_state::ppi_pa_r )
@@ -325,16 +327,16 @@ static INPUT_PORTS_START( sbrain )
 	PORT_START("X1")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_DEL_PAD)
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_ASTERISK)
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Insert") PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Insert") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 
 	PORT_START("X2")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 
 	PORT_START("X3")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
@@ -448,7 +450,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbrain_state::kbd_scan)
 	m_term_data = 0xff;
 }
 
-DRIVER_INIT_MEMBER( sbrain_state, sbrain )
+void sbrain_state::init_sbrain()
 {
 	u8 *main = memregion("maincpu")->base();
 	u8 *sub = memregion("subcpu")->base();
@@ -460,9 +462,10 @@ DRIVER_INIT_MEMBER( sbrain_state, sbrain )
 	m_bank2->configure_entry(1, &main[0x8000]);
 }
 
-static SLOT_INTERFACE_START( sbrain_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void sbrain_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_RESET_MEMBER( sbrain_state, sbrain )
 {
@@ -526,16 +529,16 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	return 0;
 }
 
-static MACHINE_CONFIG_START( sbrain )
+MACHINE_CONFIG_START(sbrain_state::sbrain)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(sbrain_mem)
-	MCFG_CPU_IO_MAP(sbrain_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbrain_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(sbrain_mem)
+	MCFG_DEVICE_IO_MAP(sbrain_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sbrain_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL_16MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(sbrain_submem)
-	MCFG_CPU_IO_MAP(sbrain_subio)
+	MCFG_DEVICE_ADD("subcpu", Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(sbrain_submem)
+	MCFG_DEVICE_IO_MAP(sbrain_subio)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sbrain_state, sbrain)
 
@@ -550,31 +553,33 @@ static MACHINE_CONFIG_START( sbrain )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
+	//MCFG_DEVICE_ADD("crtc", DP8350, 10.92_MHz_XTAL)
+
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 800)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(sbrain_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(sbrain_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(sbrain_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(sbrain_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(sbrain_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(sbrain_state, ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, sbrain_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, sbrain_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, sbrain_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sbrain_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, sbrain_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sbrain_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD("uart0", I8251, 0)
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 
-	MCFG_DEVICE_ADD("brg", COM8116, XTAL_5_0688MHz) // BR1941L
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("uart0", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart0", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
+	MCFG_DEVICE_ADD("brg", COM8116, 5.0688_MHz_XTAL) // BR1941L
+	MCFG_COM8116_FR_HANDLER(WRITELINE("uart0", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart0", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
 
-	MCFG_FD1791_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_DEVICE_ADD("fdc", FD1791, 16_MHz_XTAL / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -588,14 +593,14 @@ ROM_START( sbrain )
 
 	ROM_REGION( 0x10000, "subcpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "4_003", "4.003" )
-	ROMX_LOAD( "4_003_vc8001.z69", 0x0000, 0x0800, CRC(3ce3cd53) SHA1(fb6ade6bd67de3d9f911a1a48481ca619bda65ae), ROM_BIOS(1) )
+	ROMX_LOAD("4_003_vc8001.z69", 0x0000, 0x0800, CRC(3ce3cd53) SHA1(fb6ade6bd67de3d9f911a1a48481ca619bda65ae), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "3_1", "3.1" )
-	ROMX_LOAD( "3_1.z69", 0x0000, 0x0800, CRC(b6a2e6a5) SHA1(a646faaecb9ac45ee1a42764628e8971524d5c13), ROM_BIOS(2) )
+	ROMX_LOAD("3_1.z69", 0x0000, 0x0800, CRC(b6a2e6a5) SHA1(a646faaecb9ac45ee1a42764628e8971524d5c13), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "3_05", "3.05" )
-	ROMX_LOAD( "qd_3_05.z69", 0x0000, 0x0800, CRC(aedbe777) SHA1(9ee9ca3f05e11ceb80896f06c3a3ae352db214dc), ROM_BIOS(3) )
+	ROMX_LOAD("qd_3_05.z69", 0x0000, 0x0800, CRC(aedbe777) SHA1(9ee9ca3f05e11ceb80896f06c3a3ae352db214dc), ROM_BIOS(2))
 	// Using the chargen from 'c10' for now.
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
+	ROM_LOAD("c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
-COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, sbrain, "Intertec", "Superbrain", MACHINE_NOT_WORKING )
+COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, init_sbrain, "Intertec", "Superbrain", MACHINE_NOT_WORKING )

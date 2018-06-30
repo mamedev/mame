@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "am29000.h"
+#include "am29dasm.h"
 
 
 DEFINE_DEVICE_TYPE(AM29000, am29000_cpu_device, "am29000", "AMC Am29000")
@@ -130,9 +131,9 @@ device_memory_interface::space_config_vector am29000_cpu_device::memory_space_co
 void am29000_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
 	m_data = &space(AS_DATA);
-	m_datadirect = &m_data->direct();
+	m_datacache = m_data->cache<2, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 	m_cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
 
@@ -408,7 +409,7 @@ void am29000_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).callimport().noshow();
 	state_add(STATE_GENFLAGS, "CURFLAGS", m_alu).formatstr("%13s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -510,7 +511,7 @@ uint32_t am29000_cpu_device::read_program_word(uint32_t address)
 {
 	/* TODO: ROM enable? */
 	if (m_cps & CPS_PI || m_cps & CPS_RE)
-		return m_direct->read_dword(address);
+		return m_cache->read_dword(address);
 	else
 	{
 		fatalerror("Am29000 instruction MMU translation enabled!\n");
@@ -657,7 +658,7 @@ void am29000_cpu_device::execute_run()
 			if (m_cfg & CFG_VF)
 			{
 				uint32_t vaddr = m_vab | m_exception_queue[0] * 4;
-				uint32_t vect = m_datadirect->read_dword(vaddr);
+				uint32_t vect = m_datacache->read_dword(vaddr);
 
 				m_pc = vect & ~3;
 				m_next_pc = m_pc;
@@ -672,7 +673,7 @@ void am29000_cpu_device::execute_run()
 		}
 
 		if (call_debugger)
-			debugger_instruction_hook(this, m_pc);
+			debugger_instruction_hook(m_pc);
 
 		fetch_decode();
 
@@ -702,9 +703,7 @@ void am29000_cpu_device::execute_set_input(int inputnum, int state)
 	// TODO : CHECK IRQs
 }
 
-
-offs_t am29000_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> am29000_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( am29000 );
-	return CPU_DISASSEMBLE_NAME(am29000)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<am29000_disassembler>();
 }

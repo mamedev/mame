@@ -17,8 +17,6 @@
 #include "emu.h"
 #include "waixing.h"
 
-#include "cpu/m6502/m6502.h"
-
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -929,7 +927,7 @@ READ8_MEMBER(nes_waixing_sh2_device::chr_r)
 void nes_waixing_sec_device::prg_cb(int start, int bank)
 {
 	if (m_reg)
-		bank = BITSWAP8(bank & 0x1f,7,6,5,2,1,3,4,0);
+		bank = bitswap<8>(bank & 0x1f,7,6,5,2,1,3,4,0);
 
 	prg8_x(start, bank);
 }
@@ -937,7 +935,7 @@ void nes_waixing_sec_device::prg_cb(int start, int bank)
 void nes_waixing_sec_device::chr_cb(int start, int bank, int source)
 {
 	if (m_reg)
-		bank = BITSWAP8(bank, 5,4,2,6,7,3,1,0);
+		bank = bitswap<8>(bank, 5,4,2,6,7,3,1,0);
 
 	chr1_x(start, bank, source);
 }
@@ -977,7 +975,7 @@ void nes_waixing_sgz_device::hblank_irq(int scanline, int vblank, int blanked)
 	{
 		m_irq_count = m_irq_count_latch;
 		m_irq_enable = m_irq_enable_latch;
-		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		hold_irq_line();
 	}
 }
 

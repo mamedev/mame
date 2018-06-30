@@ -19,20 +19,20 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 			case 0:
 				switch(y)
 				{
-					case 0: output().set_value("a_next", state);  break;
-					case 1: output().set_value("b_next", state);  break;
-					case 2: output().set_value("fill_next", state); break;
-					case 3: output().set_value("user_next", state); break;
-					case 4: output().set_value("play", state);    break;
-					case 5: output().set_value("record", state);  break;
-					case 6: output().set_value("compose", state); break;
-					case 7: output().set_value("perform", state); break;
+					case 0: m_a_next = state;  break;
+					case 1: m_b_next = state;  break;
+					case 2: m_fill_next = state; break;
+					case 3: m_user_next = state; break;
+					case 4: m_play = state;    break;
+					case 5: m_record = state;  break;
+					case 6: m_compose = state; break;
+					case 7: m_perform = state; break;
 				}
 				break;
 			case 1:
 				if (y == 0)
 				{
-					output().set_value("song", state);
+					m_song = state;
 				}
 				else if (y < 8)
 				{
@@ -41,7 +41,7 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 					else
 						m_lcd_digits[0] &= ~(1<<(y-1));
 
-					output().set_value("digit0", BITSWAP8(m_lcd_digits[0],7,3,1,4,6,5,2,0));
+					m_digit[0] = bitswap<8>(m_lcd_digits[0],7,3,1,4,6,5,2,0);
 				}
 				break;
 			case 2:
@@ -56,26 +56,26 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 					else
 						m_lcd_digits[1] &= ~(1<<(y-1));
 
-					output().set_value("digit1", BITSWAP8(m_lcd_digits[1],7,3,1,4,6,5,2,0));
+					m_digit[1] = bitswap<8>(m_lcd_digits[1],7,3,1,4,6,5,2,0);
 				}
 				break;
 			case 3:
 				switch(y)
 				{
-					case 0: output().set_value("b", state);       break;
-					case 1: output().set_value("a", state);       break;
-					case 2: output().set_value("fill", state);    break;
-					case 3: output().set_value("user", state);    break;
-					case 4: output().set_value("edited", state);  break;
-					case 5: output().set_value("set", state);     break;
-					case 6: output().set_value("drum", state);    break;
-					case 7: output().set_value("press_play", state); break;
+					case 0: m_b = state;       break;
+					case 1: m_a = state;       break;
+					case 2: m_fill = state;    break;
+					case 3: m_user = state;    break;
+					case 4: m_edited = state;  break;
+					case 5: m_set = state;     break;
+					case 6: m_drum = state;    break;
+					case 7: m_press_play = state; break;
 				}
 				break;
 			case 4:
 				if (y == 7)
 				{
-					output().set_value("metronome", state);
+					m_metronome = state;
 				}
 				else if (y < 7)
 				{
@@ -84,7 +84,7 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 					else
 						m_lcd_digits[4] &= ~(1<<y);
 
-					output().set_value("digit4", BITSWAP8(m_lcd_digits[4],7,3,5,2,0,1,4,6));
+					m_digit[4] = bitswap<8>(m_lcd_digits[4],7,3,5,2,0,1,4,6);
 				}
 				break;
 		}
@@ -96,7 +96,7 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 			case 0:
 				if (y == 7)
 				{
-					output().set_value("tempo", state);
+					m_tempo = state;
 				}
 				else if (y < 7)
 				{
@@ -105,13 +105,13 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 					else
 						m_lcd_digits[3] &= ~(1<<y);
 
-					output().set_value("digit3", BITSWAP8(m_lcd_digits[3],7,3,5,2,0,1,4,6));
+					m_digit[3] = bitswap<8>(m_lcd_digits[3],7,3,5,2,0,1,4,6);
 				}
 				break;
 			case 1:
 				if (y == 7)
 				{
-					output().set_value("page", state);
+					m_page = state;
 				}
 				else if (y < 7)
 				{
@@ -120,46 +120,46 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 					else
 						m_lcd_digits[2] &= ~(1<<y);
 
-					output().set_value("digit2", BITSWAP8(m_lcd_digits[2],7,3,5,2,0,1,4,6));
+					m_digit[2] = bitswap<8>(m_lcd_digits[2],7,3,5,2,0,1,4,6);
 				}
 				break;
 			case 2:
 				switch(y)
 				{
-					case 0: output().set_value("step_edit", state);   break;
-					case 1: output().set_value("swing_off", state);   break;
-					case 2: output().set_value("swing_62", state);    break;
-					case 3: output().set_value("click_l1", state);    break;
-					case 4: output().set_value("click_note", state);  break;
-					case 5: output().set_value("click_l2", state);    break;
-					case 6: output().set_value("click_3", state);     break;
-					case 7: output().set_value("backup", state);      break;
+					case 0: m_step_edit = state;   break;
+					case 1: m_swing_off = state;   break;
+					case 2: m_swing_62 = state;    break;
+					case 3: m_click_l1 = state;    break;
+					case 4: m_click_note = state;  break;
+					case 5: m_click_l2 = state;    break;
+					case 6: m_click_3 = state;     break;
+					case 7: m_backup = state;      break;
 				}
 				break;
 			case 3:
 				switch(y)
 				{
-					case 0: output().set_value("drum_set", state);    break;
-					case 1: output().set_value("swing", state);       break;
-					case 2: output().set_value("swing_58", state);    break;
-					case 3: output().set_value("click_off", state);   break;
-					case 4: output().set_value("click", state);       break;
-					case 5: output().set_value("quantize_off", state); break;
-					case 6: output().set_value("quantize_3", state);  break;
-					case 7: output().set_value("midi_setup", state);  break;
+					case 0: m_drum_set = state;    break;
+					case 1: m_swing = state;       break;
+					case 2: m_swing_58 = state;    break;
+					case 3: m_click_off = state;   break;
+					case 4: m_click = state;       break;
+					case 5: m_quantize_off = state; break;
+					case 6: m_quantize_3 = state;  break;
+					case 7: m_midi_setup = state;  break;
 				}
 				break;
 			case 4:
 				switch(y)
 				{
-					case 0: output().set_value("record_setup", state); break;
-					case 1: output().set_value("quantize", state);    break;
-					case 2: output().set_value("swing_54", state);    break;
-					case 3: output().set_value("quantize_l1", state); break;
-					case 4: output().set_value("quantize_l2", state); break;
-					case 5: output().set_value("quantize_l3", state); break;
-					case 6: output().set_value("quantize_note", state); break;
-					case 7: output().set_value("setup", state);       break;
+					case 0: m_record_setup = state; break;
+					case 1: m_quantize = state;    break;
+					case 2: m_swing_54 = state;    break;
+					case 3: m_quantize_l1 = state; break;
+					case 4: m_quantize_l2 = state; break;
+					case 5: m_quantize_l3 = state; break;
+					case 6: m_quantize_note = state; break;
+					case 7: m_setup = state;       break;
 				}
 				break;
 		}

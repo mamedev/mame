@@ -327,10 +327,11 @@ field:      X address   D           Function    Y address   D (part 2)
 
 #include "emu.h"
 #include "apexc.h"
+#include "apexcdsm.h"
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APEXC")
+DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APE(X)C")
 
 
 /* decrement ICount by n */
@@ -340,7 +341,8 @@ DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APEXC")
 apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, APEXC, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 15, 0)
-	, m_io_config("io", ENDIANNESS_BIG, 8, 1, 0)
+	, m_tape_read_cb(*this)
+	, m_tape_punch_cb(*this)
 	, m_a(0)
 	, m_r(0)
 	, m_cr(0)
@@ -354,8 +356,7 @@ apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *ta
 device_memory_interface::space_config_vector apexc_cpu_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
+		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }
 
@@ -439,12 +440,12 @@ void apexc_cpu_device::word_write(uint32_t address, uint32_t data, uint32_t mask
 
 uint8_t apexc_cpu_device::papertape_read()
 {
-	return m_io->read_byte(0) & 0x1f;
+	return m_tape_read_cb() & 0x1f;
 }
 
 void apexc_cpu_device::papertape_punch(uint8_t data)
 {
-	m_io->write_byte(0, data);
+	m_tape_punch_cb(data);
 }
 
 /*
@@ -763,8 +764,10 @@ special_fetch:
 
 void apexc_cpu_device::device_start()
 {
+	m_tape_read_cb.resolve_safe(0);
+	m_tape_punch_cb.resolve_safe();
+
 	m_program = &space(AS_PROGRAM);
-	m_io = &space(AS_IO);
 
 	save_item(NAME(m_a));
 	save_item(NAME(m_r));
@@ -784,7 +787,7 @@ void apexc_cpu_device::device_start()
 	state_add( STATE_GENPC, "PC", m_pc ).mask(0x7ffc).callimport().formatstr("%04X");
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).mask(0x7ffc).callimport().noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -843,7 +846,7 @@ void apexc_cpu_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		if (m_running)
 			execute();
@@ -854,9 +857,7 @@ void apexc_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-
-offs_t apexc_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> apexc_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( apexc );
-	return CPU_DISASSEMBLE_NAME(apexc)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<apexc_disassembler>();
 }

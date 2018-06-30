@@ -71,10 +71,10 @@ public:
 	DECLARE_WRITE8_MEMBER(tomahawk_audio_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(service_coin_inserted);
-	DECLARE_DRIVER_INIT(afire);
-	DECLARE_DRIVER_INIT(abattle);
-	DECLARE_DRIVER_INIT(sstarbtl);
-	DECLARE_DRIVER_INIT(acombat3);
+	void init_afire();
+	void init_abattle();
+	void init_sstarbtl();
+	void init_acombat3();
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(astrof);
 	DECLARE_MACHINE_START(abattle);
@@ -91,12 +91,15 @@ public:
 	void spfghmk2_set_video_control_2( uint8_t data );
 	void tomahawk_set_video_control_2( uint8_t data );
 	void video_update_common( bitmap_rgb32 &bitmap, const rectangle &cliprect, pen_t *pens, int num_pens );
+	void base(machine_config &config);
+	void astrof(machine_config &config);
+	void abattle(machine_config &config);
+	void spfghmk2(machine_config &config);
+	void tomahawk(machine_config &config);
+	void astrof_audio(machine_config &config);
+	void spfghmk2_audio(machine_config &config);
+	void tomahawk_audio(machine_config &config);
+	void astrof_map(address_map &map);
+	void spfghmk2_map(address_map &map);
+	void tomahawk_map(address_map &map);
 };
-
-/*----------- defined in audio/astrof.c -----------*/
-
-MACHINE_CONFIG_EXTERN( astrof_audio );
-
-MACHINE_CONFIG_EXTERN( spfghmk2_audio );
-
-MACHINE_CONFIG_EXTERN( tomahawk_audio );

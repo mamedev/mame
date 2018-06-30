@@ -303,7 +303,7 @@ WRITE8_MEMBER( micropolis_device::data_w )
 	else
 	{
 		if (VERBOSE)
-			logerror("%s: micropolis_data_w $%02X\n", space.machine().describe_context(), data);
+			logerror("%s: micropolis_data_w $%02X\n", machine().describe_context(), data);
 	}
 	m_data = data;
 }

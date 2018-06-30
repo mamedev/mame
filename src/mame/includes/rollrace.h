@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
+
+#include "emupal.h"
+
 class rollrace_state : public driver_device
 {
 public:
@@ -58,6 +61,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	void rollace2(machine_config &config);
+	void rollrace(machine_config &config);
+	void rollrace_map(address_map &map);
+	void rollrace_sound_map(address_map &map);
 };

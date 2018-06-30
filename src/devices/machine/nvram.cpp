@@ -34,31 +34,6 @@ nvram_device::nvram_device(const machine_config &mconfig, const char *tag, devic
 
 
 //-------------------------------------------------
-//  static_set_interface - configuration helper
-//  to set the interface
-//-------------------------------------------------
-
-void nvram_device::static_set_default_value(device_t &device, default_value value)
-{
-	nvram_device &nvram = downcast<nvram_device &>(device);
-	nvram.m_default_value = value;
-}
-
-
-//-------------------------------------------------
-//  static_set_custom_handler - configuration
-//  helper to set a custom callback
-//-------------------------------------------------
-
-void nvram_device::static_set_custom_handler(device_t &device, init_delegate &&handler)
-{
-	nvram_device &nvram = downcast<nvram_device &>(device);
-	nvram.m_default_value = DEFAULT_CUSTOM;
-	nvram.m_custom_handler = std::move(handler);
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

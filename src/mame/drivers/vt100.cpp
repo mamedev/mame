@@ -6,17 +6,34 @@
 
         29/04/2009 Preliminary driver.
 
-        TODO: keyboard doesn't work properly, kb uart comms issue?
-        TODO: split keyboard off as a synchronous serial device?
-        TODO: vt100 gives a '2' error on startup indicating bad nvram checksum
-              adding the serial nvram support should fix this
+        TODO: some video attributes are not fully supported yet
         TODO: support for the on-AVO character set roms
         TODO: finish support for the on-cpu board alternate character set rom
+        TODO: STP (standard terminal port) bus for VT1XX-AC and VT125
 
         An enormous amount of useful info can be derived from the VT125 technical manual:
         http://www.bitsavers.org/pdf/dec/terminal/vt100/EK-VT100-TM-003_VT100_Technical_Manual_Jul82.pdf starting on page 6-70, pdf page 316
         And its schematics:
         http://bitsavers.org/pdf/dec/terminal/vt125/MP01053_VT125_Mar82.pdf
+
+*****************************************************************************
+
+        Quick overview of "Set-Up" controls:
+
+        2   Set/Clear Tab (A)       Shift+A   Set Answerback Message (B)
+        3   Clear All Tabs (A)      Shift+S   Save Settings
+        4   On Line/Local           Shift+R   Recall Settings
+        5   Set-Up A/B
+        6   Toggle 1/0 (B)
+        7   Transmit Speed (B)
+        8   Receive Speed (B)
+        9   80/132 Columns (A)
+        0   Reset Terminal
+
+        If the NVR is not yet initialized, a '2' error will appear when the
+        terminal is powered on. This is non-fatal and can ordinarily be
+        remedied by entering "Set-Up" and then saving the settings.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -24,19 +41,21 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
+#include "machine/ay31015.h"
 #include "machine/com8116.h"
+#include "machine/er1400.h"
 #include "machine/i8251.h"
-#include "machine/timer.h"
-#include "sound/beep.h"
+#include "machine/input_merger.h"
+#include "machine/ins8250.h"
+#include "machine/rstbuf.h"
+#include "machine/vt100_kbd.h"
 #include "video/vtvideo.h"
 #include "screen.h"
-#include "speaker.h"
 
 #include "vt100.lh"
 
 
 #define RS232_TAG       "rs232"
-#define COM5016T_TAG    "com5016t"
 
 class vt100_state : public driver_device
 {
@@ -45,65 +64,81 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "vt100_video"),
-		m_speaker(*this, "beeper"),
-		m_uart(*this, "i8251"),
-		m_dbrg(*this, COM5016T_TAG),
+		m_keyboard(*this, "keyboard"),
+		m_kbduart(*this, "kbduart"),
+		m_pusart(*this, "pusart"),
+		m_nvr(*this, "nvr"),
+		m_rstbuf(*this, "rstbuf"),
+		m_rs232(*this, RS232_TAG),
+		m_printer_uart(*this, "printuart"),
 		m_p_ram(*this, "p_ram")
 	{
 	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
-	required_device<beep_device> m_speaker;
-	required_device<i8251_device> m_uart;
-	required_device<com8116_device> m_dbrg;
-	DECLARE_READ8_MEMBER(vt100_flags_r);
-	DECLARE_WRITE8_MEMBER(vt100_keyboard_w);
-	DECLARE_READ8_MEMBER(vt100_keyboard_r);
-	DECLARE_WRITE8_MEMBER(vt100_baud_rate_w);
-	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
-	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
-	DECLARE_WRITE_LINE_MEMBER(vt100_clear_video_interrupt);
+	required_device<vt100_keyboard_device> m_keyboard;
+	required_device<ay31015_device> m_kbduart;
+	required_device<i8251_device> m_pusart;
+	required_device<er1400_device> m_nvr;
+	required_device<rst_pos_buffer_device> m_rstbuf;
+	required_device<rs232_port_device> m_rs232;
+	optional_device<ins8250_device> m_printer_uart;
+	DECLARE_READ8_MEMBER(flags_r);
+	DECLARE_WRITE8_MEMBER(baud_rate_w);
+	DECLARE_READ8_MEMBER(modem_r);
+	DECLARE_WRITE8_MEMBER(nvr_latch_w);
+	DECLARE_READ8_MEMBER(printer_r);
+	DECLARE_WRITE8_MEMBER(printer_w);
+	DECLARE_READ8_MEMBER(video_ram_r);
+	DECLARE_WRITE8_MEMBER(uart_clock_w);
 	required_shared_ptr<uint8_t> m_p_ram;
-	bool m_keyboard_int;
-	bool m_receiver_int;
-	bool m_vertical_int;
-	bool m_key_scan;
-	uint8_t m_key_code;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
-	uint8_t bit_sel(uint8_t data);
+	IRQ_CALLBACK_MEMBER(vt102_irq_callback);
+	void vt100(machine_config &config);
+	void vt100ac(machine_config &config);
+	void vt101(machine_config &config);
+	void vt102(machine_config &config);
+	void vt180(machine_config &config);
+	void vt100_mem(address_map &map);
+	void vt100_io(address_map &map);
+	void vt102_io(address_map &map);
+	void stp_mem(address_map &map);
+	void stp_io(address_map &map);
+	void vt180_mem(address_map &map);
+	void vt180_io(address_map &map);
 };
 
 
 
 
-static ADDRESS_MAP_START(vt100_mem, AS_PROGRAM, 8, vt100_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM ( 4 * 2K)
-	AM_RANGE( 0x2000, 0x2bff ) AM_RAM AM_SHARE("p_ram") // Screen and scratch RAM
-	AM_RANGE( 0x2c00, 0x2fff ) AM_RAM  // AVO Screen RAM
-	AM_RANGE( 0x3000, 0x3fff ) AM_RAM  // AVO Attribute RAM (4 bits wide)
+void vt100_state::vt100_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();  // ROM ( 4 * 2K)
+	map(0x2000, 0x2bff).ram().share("p_ram"); // Screen and scratch RAM
+	map(0x2c00, 0x2fff).ram();  // AVO Screen RAM
+	map(0x3000, 0x3fff).ram();  // AVO Attribute RAM (4 bits wide)
 	// 0x4000, 0x7fff is unassigned
-	AM_RANGE( 0x8000, 0x9fff ) AM_ROM  // Program memory expansion ROM (4 * 2K)
-	AM_RANGE( 0xa000, 0xbfff ) AM_ROM  // Program memory expansion ROM (1 * 8K)
+	map(0x8000, 0x9fff).rom();  // Program memory expansion ROM (4 * 2K)
+	map(0xa000, 0xbfff).rom();  // Program memory expansion ROM (1 * 8K)
 	// 0xc000, 0xffff is unassigned
-ADDRESS_MAP_END
+}
 
-static ADDRESS_MAP_START(vt180_mem, AS_PROGRAM, 8, vt100_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x1fff ) AM_ROM
-	AM_RANGE( 0x2000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void vt100_state::vt180_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START(vt180_io, AS_IO, 8, vt100_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void vt100_state::vt180_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 // 0 - XMIT flag H
 // 1 - Advance Video L
@@ -113,221 +148,89 @@ ADDRESS_MAP_END
 // 5 - NVR data H
 // 6 - LBA 7 H
 // 7 - Keyboard TBMT H
-READ8_MEMBER( vt100_state::vt100_flags_r )
+READ8_MEMBER(vt100_state::flags_r)
 {
 	uint8_t ret = 0;
-	ret |= m_crtc->lba7_r(space, 0) << 6;
-	ret |= m_keyboard_int << 7;
+
+	ret |= m_pusart->txrdy_r();
+	ret |= !m_nvr->data_r() << 5;
+	ret |= m_crtc->lba7_r() << 6;
+	ret |= m_kbduart->tbmt_r() << 7;
 	return ret;
 }
 
-uint8_t vt100_state::bit_sel(uint8_t data)
+READ8_MEMBER(vt100_state::modem_r)
 {
-	if (!BIT(data,7)) return 0x70;
-	if (!BIT(data,6)) return 0x60;
-	if (!BIT(data,5)) return 0x50;
-	if (!BIT(data,4)) return 0x40;
-	if (!BIT(data,3)) return 0x30;
-	if (!BIT(data,2)) return 0x20;
-	if (!BIT(data,1)) return 0x10;
-	if (!BIT(data,0)) return 0x00;
-	return 0;
+	uint8_t ret = 0x0f;
+
+	ret |= m_rs232->cts_r() << 7;
+	ret |= m_rs232->si_r() << 6;
+	ret |= m_rs232->ri_r() << 5;
+	ret |= m_rs232->dcd_r() << 4;
+
+	return ret;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(vt100_state::keyboard_callback)
+WRITE8_MEMBER(vt100_state::nvr_latch_w)
 {
-	uint8_t i, code;
-	char kbdrow[8];
-	if (m_key_scan)
-	{
-		for(i = 0; i < 16; i++)
-		{
-			sprintf(kbdrow,"LINE%X", i);
-			code =  ioport(kbdrow)->read();
-			if (code < 0xff)
-			{
-				m_keyboard_int = 1;
-				m_key_code = i | bit_sel(code);
-				m_maincpu->set_input_line(0, HOLD_LINE);
-				break;
-			}
-		}
-	}
+	// data inverted due to negative logic
+	m_nvr->c3_w(!BIT(data, 3));
+	m_nvr->c2_w(!BIT(data, 2));
+	m_nvr->c1_w(!BIT(data, 1));
+
+	// C2 is used to disable pullup on data line
+	m_nvr->data_w(BIT(data, 2) ? 0 : !BIT(data, 0));
+
+	// SPDS present on pins 11, 19 and 23 of EIA connector
+	m_rs232->write_spds(BIT(data, 5));
 }
 
-
-WRITE8_MEMBER( vt100_state::vt100_keyboard_w )
+void vt100_state::vt100_io(address_map &map)
 {
-	output().set_value("online_led",BIT(data, 5) ? 0 : 1);
-	output().set_value("local_led", BIT(data, 5));
-	output().set_value("locked_led",BIT(data, 4) ? 0 : 1);
-	output().set_value("l1_led", BIT(data, 3) ? 0 : 1);
-	output().set_value("l2_led", BIT(data, 2) ? 0 : 1);
-	output().set_value("l3_led", BIT(data, 1) ? 0 : 1);
-	output().set_value("l4_led", BIT(data, 0) ? 0 : 1);
-	m_key_scan = BIT(data, 6);
-	m_speaker->set_state(BIT(data, 7));
-}
-
-READ8_MEMBER( vt100_state::vt100_keyboard_r )
-{
-	return m_key_code;
-}
-
-WRITE8_MEMBER( vt100_state::vt100_baud_rate_w )
-{
-	m_dbrg->str_w(data & 0x0f);
-	m_dbrg->stt_w(data >> 4);
-}
-
-WRITE8_MEMBER( vt100_state::vt100_nvr_latch_w )
-{
-}
-
-static ADDRESS_MAP_START(vt100_io, AS_IO, 8, vt100_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	// 0x00, 0x01 PUSART  (Intel 8251)
-	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
-	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
+	map(0x00, 0x00).rw("pusart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01, 0x01).rw("pusart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// 0x02 Baud rate generator
-	AM_RANGE (0x02, 0x02) AM_WRITE(vt100_baud_rate_w)
+	map(0x02, 0x02).w("dbrg", FUNC(com8116_device::stt_str_w));
 	// 0x22 Modem buffer
-	// AM_RANGE (0x22, 0x22)
+	map(0x22, 0x22).r(FUNC(vt100_state::modem_r));
 	// 0x42 Flags buffer
-	AM_RANGE (0x42, 0x42) AM_READ(vt100_flags_r)
+	map(0x42, 0x42).r(FUNC(vt100_state::flags_r));
 	// 0x42 Brightness D/A latch
-	AM_RANGE (0x42, 0x42) AM_DEVWRITE("vt100_video", vt100_video_device, brightness_w)
+	map(0x42, 0x42).w(m_crtc, FUNC(vt100_video_device::brightness_w));
 	// 0x62 NVR latch
-	AM_RANGE (0x62, 0x62) AM_WRITE(vt100_nvr_latch_w)
-	// 0x82 Keyboard UART data output
-	AM_RANGE (0x82, 0x82) AM_READ(vt100_keyboard_r)
-	// 0x82 Keyboard UART data input
-	AM_RANGE (0x82, 0x82) AM_WRITE(vt100_keyboard_w)
+	map(0x62, 0x62).w(FUNC(vt100_state::nvr_latch_w));
+	// 0x82 Keyboard UART data
+	map(0x82, 0x82).rw("kbduart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	// 0xA2 Video processor DC012
-	AM_RANGE (0xa2, 0xa2) AM_DEVWRITE("vt100_video", vt100_video_device, dc012_w)
+	map(0xa2, 0xa2).w(m_crtc, FUNC(vt100_video_device::dc012_w));
 	// 0xC2 Video processor DC011
-	AM_RANGE (0xc2, 0xc2) AM_DEVWRITE("vt100_video", vt100_video_device, dc011_w)
+	map(0xc2, 0xc2).w(m_crtc, FUNC(vt100_video_device::dc011_w));
 	// 0xE2 Graphics port
-	// AM_RANGE (0xe2, 0xe2)
-ADDRESS_MAP_END
+	// map (0xe2, 0xe2)
+}
+
+READ8_MEMBER(vt100_state::printer_r)
+{
+	return m_printer_uart->ins8250_r(space, offset >> 2);
+}
+
+WRITE8_MEMBER(vt100_state::printer_w)
+{
+	m_printer_uart->ins8250_w(space, offset >> 2, data);
+}
+
+void vt100_state::vt102_io(address_map &map)
+{
+	vt100_io(map);
+	map(0x03, 0x03).select(0x1c).r(FUNC(vt100_state::printer_r));
+	map(0x23, 0x23).select(0x1c).w(FUNC(vt100_state::printer_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vt100 )
-	PORT_START("LINE0")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 7") PORT_CODE(KEYCODE_7_PAD)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 8") PORT_CODE(KEYCODE_8_PAD)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num .") PORT_CODE(KEYCODE_DEL_PAD)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 9") PORT_CODE(KEYCODE_9_PAD)
-	PORT_START("LINE1")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF3") PORT_CODE(KEYCODE_F3)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF4") PORT_CODE(KEYCODE_F4)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num Enter") PORT_CODE(KEYCODE_ENTER_PAD)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num ,") PORT_CODE(KEYCODE_PLUS_PAD)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 3") PORT_CODE(KEYCODE_3_PAD)
-	PORT_START("LINE2")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF1") PORT_CODE(KEYCODE_F1)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF2") PORT_CODE(KEYCODE_F2)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 2") PORT_CODE(KEYCODE_2_PAD)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 5") PORT_CODE(KEYCODE_5_PAD)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 6") PORT_CODE(KEYCODE_6_PAD)
-	PORT_START("LINE3")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CODE(KEYCODE_DEL)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_F6)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 0") PORT_CODE(KEYCODE_0_PAD)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 1") PORT_CODE(KEYCODE_1_PAD)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 4") PORT_CODE(KEYCODE_4_PAD)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num -") PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_START("LINE4")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num Return") PORT_CODE(KEYCODE_ENTER_PAD)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_CLOSEBRACE)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("~") PORT_CODE(KEYCODE_TILDE)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("=") PORT_CODE(KEYCODE_EQUALS)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line feed") PORT_CODE(KEYCODE_RALT)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_START("LINE5")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
-	PORT_START("LINE6")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("'") PORT_CODE(KEYCODE_QUOTE)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)
-	PORT_START("LINE7")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_Y)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE)
-	PORT_START("LINE8")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)
-	PORT_START("LINE9")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)
-	PORT_START("LINEA")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("No scroll") PORT_CODE(KEYCODE_LALT)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)
-	PORT_START("LINEB")
-		PORT_BIT(0x7F, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Setup") PORT_CODE(KEYCODE_F5)
-	PORT_START("LINEC")
-		PORT_BIT(0x7F, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
-	PORT_START("LINED")
-		PORT_BIT(0x7F, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
-	PORT_START("LINEE")
-		PORT_BIT(0x7F, IP_ACTIVE_LOW, IPT_UNUSED)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps lock") PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_START("LINEF")
-		PORT_BIT(0x7F, IP_ACTIVE_LOW,  IPT_UNUSED)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // Always return 0x7f on last scan line
 INPUT_PORTS_END
 
 uint32_t vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -342,47 +245,53 @@ uint32_t vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &b
 //          A4 - receiver
 //          A5 - vertical frequency
 //          all other set to 1
-IRQ_CALLBACK_MEMBER(vt100_state::vt100_irq_callback)
+IRQ_CALLBACK_MEMBER(vt100_state::vt102_irq_callback)
 {
-	uint8_t ret = 0xc7 | (m_keyboard_int << 3) | (m_receiver_int << 4) | (m_vertical_int << 5);
-	m_receiver_int = 0;
-	return ret;
+	if (irqline == 0)
+		return m_rstbuf->inta_cb(device, 0);
+	else
+		return 0xff;
 }
 
 void vt100_state::machine_start()
 {
+	m_kbduart->write_tsb(0);
+	m_kbduart->write_eps(1);
+	m_kbduart->write_np(1);
+	m_kbduart->write_nb1(1);
+	m_kbduart->write_nb2(1);
+	m_kbduart->write_cs(1);
+	m_kbduart->write_swe(0);
+
+	m_pusart->write_cts(0);
+
+	if (m_printer_uart.found())
+	{
+		auto *printer_port = subdevice<rs232_port_device>("printer");
+		printer_port->write_dtr(0);
+		printer_port->write_rts(0);
+	}
 }
 
 void vt100_state::machine_reset()
 {
-	m_keyboard_int = 0;
-	m_receiver_int = 0;
-	m_vertical_int = 0;
-	output().set_value("online_led",1);
-	output().set_value("local_led", 0);
-	output().set_value("locked_led",1);
-	output().set_value("l1_led", 1);
-	output().set_value("l2_led", 1);
-	output().set_value("l3_led", 1);
-	output().set_value("l4_led", 1);
-
-	m_key_scan = 0;
+	nvr_latch_w(machine().dummy_space(), 0, 0);
 }
 
-READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
+READ8_MEMBER(vt100_state::video_ram_r)
 {
 	return m_p_ram[offset];
 }
 
-WRITE_LINE_MEMBER( vt100_state::vt100_clear_video_interrupt )
+WRITE8_MEMBER(vt100_state::uart_clock_w)
 {
-	m_vertical_int = 0;
-}
+	m_kbduart->write_tcp(BIT(data, 1));
+	m_kbduart->write_rcp(BIT(data, 1));
 
-INTERRUPT_GEN_MEMBER(vt100_state::vt100_vertical_interrupt)
-{
-	m_vertical_int = 1;
-	device.execute().set_input_line(0, HOLD_LINE);
+	if (data == 0 || data == 3)
+		m_keyboard->signal_line_w(m_kbduart->so_r());
+	else
+		m_keyboard->signal_line_w(BIT(data, 0));
 }
 
 /* F4 Character Displayer */
@@ -399,71 +308,154 @@ static const gfx_layout vt100_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( vt100 )
+static GFXDECODE_START( gfx_vt100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vt100_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( vt100 )
+MACHINE_CONFIG_START(vt100_state::vt100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_24_8832MHz / 9)
-	MCFG_CPU_PROGRAM_MAP(vt100_mem)
-	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt100_state,  vt100_vertical_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(24'883'200) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(vt100_mem)
+	MCFG_DEVICE_IO_MAP(vt100_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("rstbuf", rst_pos_buffer_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(80*10, 25*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*10-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'073'400)*2/3, 102*10, 0, 80*10, 262, 0, 25*10)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(24'073'400), 170*9, 0, 132*9, 262, 0, 25*10)
 	MCFG_SCREEN_UPDATE_DRIVER(vt100_state, screen_update_vt100)
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", vt100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vt100_video:palette", gfx_vt100)
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
 
-	MCFG_DEVICE_ADD("vt100_video", VT100_VIDEO, 0)
+	MCFG_DEVICE_ADD("vt100_video", VT100_VIDEO, XTAL(24'073'400))
 	MCFG_VT_SET_SCREEN("screen")
 	MCFG_VT_CHARGEN("chargen")
-	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, vt100_read_video_ram_r))
-	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(vt100_state, vt100_clear_video_interrupt))
+	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(*this, vt100_state, video_ram_r))
+	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE("rstbuf", rst_pos_buffer_device, rst4_w))
+	MCFG_VT_VIDEO_LBA3_LBA4_CALLBACK(WRITE8(*this, vt100_state, uart_clock_w))
+	MCFG_VT_VIDEO_LBA7_CALLBACK(WRITELINE("nvr", er1400_device, clock_w))
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0) // 2.7648Mhz phi-clock (not used for tx clock or rx clock?)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("pusart", I8251, XTAL(24'883'200) / 9)
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("rstbuf", rst_pos_buffer_device, rst2_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("pusart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("pusart", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL_5_0688MHz/*XTAL_24_8832MHz / 9*/) // COM5016T-013, 2.7648Mhz Clock, currently hacked wrongly
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
+	MCFG_DEVICE_ADD("dbrg", COM5016_013, XTAL(24'883'200) / 9) // COM5016T-013 (or WD1943CD-02), 2.7648Mhz Clock
+	MCFG_COM8116_FR_HANDLER(WRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("pusart", i8251_device, write_txc))
 
-	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 786) // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_DEVICE_ADD("nvr", ER1400, 0)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", vt100_state, keyboard_callback, attotime::from_hz(800))
+	MCFG_DEVICE_ADD("keyboard", VT100_KEYBOARD, 0)
+	MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(WRITELINE("kbduart", ay31015_device, write_si))
+
+	MCFG_DEVICE_ADD("kbduart", AY31015, 0)
+	MCFG_AY31015_WRITE_DAV_CB(WRITELINE("rstbuf", rst_pos_buffer_device, rst1_w))
+	MCFG_AY31015_AUTO_RDAV(true)
+
+	MCFG_DEVICE_ADD("rstbuf", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vt180, vt100 )
-	MCFG_CPU_ADD("z80cpu", Z80, XTAL_24_8832MHz / 9)
-	MCFG_CPU_PROGRAM_MAP(vt180_mem)
-	MCFG_CPU_IO_MAP(vt180_io)
+void vt100_state::stp_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom().region("stp", 0);
+	map(0x2000, 0x27ff).ram();
+}
+
+void vt100_state::stp_io(address_map &map)
+{
+	map(0x80, 0x80).rw("stpusart0", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x90, 0x90).rw("stpusart0", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xa0, 0xa0).rw("stpusart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xb0, 0xb0).rw("stpusart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc0).rw("stpusart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xd0, 0xd0).rw("stpusart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
+
+MACHINE_CONFIG_START(vt100_state::vt100ac)
+	vt100(config);
+	MCFG_DEVICE_ADD("stpcpu", I8085A, 4915200)
+	MCFG_DEVICE_PROGRAM_MAP(stp_mem)
+	MCFG_DEVICE_IO_MAP(stp_io)
+
+	MCFG_DEVICE_ADD("stpusart0", I8251, 2457600)
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("stprxint", input_merger_device, in_w<0>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("stptxint", input_merger_device, in_w<0>))
+
+	MCFG_DEVICE_ADD("stpusart1", I8251, 2457600)
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("stprxint", input_merger_device, in_w<1>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("stptxint", input_merger_device, in_w<1>))
+
+	MCFG_DEVICE_ADD("stpusart2", I8251, 2457600) // for printer?
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("stprxint", input_merger_device, in_w<2>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("stptxint", input_merger_device, in_w<2>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("stptxint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("stpcpu", I8085_RST55_LINE))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("stprxint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("stpcpu", I8085_RST65_LINE))
+
+	MCFG_DEVICE_MODIFY("dbrg")
+	MCFG_COM8116_FR_HANDLER(WRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart0", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart1", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart2", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("pusart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart0", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart2", i8251_device, write_txc))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vt102, vt100 )
-	MCFG_CPU_REPLACE("maincpu",I8085A, XTAL_24_8832MHz / 9)
-	MCFG_CPU_PROGRAM_MAP(vt100_mem)
-	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt100_state,  vt100_vertical_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
+MACHINE_CONFIG_START(vt100_state::vt180)
+	vt100(config);
+	MCFG_DEVICE_ADD("z80cpu", Z80, XTAL(24'883'200) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(vt180_mem)
+	MCFG_DEVICE_IO_MAP(vt180_io)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(vt100_state::vt101)
+	vt100(config);
+	MCFG_DEVICE_REPLACE("maincpu", I8085A, XTAL(24'073'400) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(vt100_mem)
+	MCFG_DEVICE_IO_MAP(vt100_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vt100_state, vt102_irq_callback)
+
+	MCFG_DEVICE_MODIFY("pusart")
+	MCFG_DEVICE_CLOCK(XTAL(24'073'400) / 8)
+	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST55_LINE)) // 8085 pin 9, mislabeled RST 7.5 on schematics
+
+	MCFG_DEVICE_REPLACE("dbrg", COM8116_003, XTAL(24'073'400) / 4)
+	MCFG_COM8116_FR_HANDLER(WRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("pusart", i8251_device, write_txc))
+
+	MCFG_DEVICE_MODIFY("kbduart")
+	MCFG_AY31015_WRITE_TBMT_CB(INPUTLINE("maincpu", I8085_RST65_LINE))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(vt100_state::vt102)
+	vt101(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(vt102_io)
+
+	MCFG_DEVICE_ADD("printuart", INS8250, XTAL(24'073'400) / 16)
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("printer", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", I8085_RST75_LINE)) // 8085 pin 7, mislabeled RST 5.5 on schematics
+
+	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("printuart", ins8250_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("printuart", ins8250_device, dsr_w))
 MACHINE_CONFIG_END
 
 /* VT1xx models:
@@ -592,9 +584,9 @@ ROM_START( vt100 ) // This is from the schematics at http://www.bitsavers.org/pd
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "vt100" )
 	ROM_SYSTEM_BIOS( 0, "vt100o", "VT100 older roms" )
-	ROMX_LOAD( "23-031e2-00.e56", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1)) // version 1 1978 'earlier rom', dump needed, correct for earlier vt100s
+	ROMX_LOAD( "23-031e2-00.e56", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(0)) // version 1 1978 'earlier rom', dump needed, correct for earlier vt100s
 	ROM_SYSTEM_BIOS( 1, "vt100", "VT100 newer roms" )
-	ROMX_LOAD( "23-061e2-00.e56", 0x0000, 0x0800, CRC(3dae97ff) SHA1(e3437850c33565751b86af6c2fe270a491246d15), ROM_BIOS(2)) // version 2 1979 or 1980 'later rom', correct for later vt100s
+	ROMX_LOAD( "23-061e2-00.e56", 0x0000, 0x0800, CRC(3dae97ff) SHA1(e3437850c33565751b86af6c2fe270a491246d15), ROM_BIOS(1)) // version 2 1979 or 1980 'later rom', correct for later vt100s
 	ROM_LOAD( "23-032e2-00.e52", 0x0800, 0x0800, CRC(3d86db99) SHA1(cdd8bdecdc643442f6e7d2c83cf002baf8101867))
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
@@ -674,20 +666,15 @@ ROM_START( vt100ac ) // This is from the VT180 technical manual at http://www.bi
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-095e2.e40", 0x0000, 0x0800, CRC(6c8acf44) SHA1(b3ef5af920995a40a316c6dc008960c461853bfc)) // Label: "23095E2 // (C)DEC // (M)QQ8227" @E40
 	ROM_LOAD( "23-096e2.e45", 0x0800, 0x0800, CRC(77f21473) SHA1(6f10b250777c12cca63ee611735f9f36cc05a7ef)) // Label: "23096E2 // (C)DEC // (M)QQ8227" @E45
-	ROM_LOAD( "23-139e2.bad3.e52", 0x1000, 0x0800, BAD_DUMP CRC(eaede07a) SHA1(410cef41c4f3a6a37570a82f359dd2b2d536d3dd)) // Label: "AMD // 37108 8232DKP // 23-139E2 // AM9218CPC // (C)DEC_1979" @E52;  // revision 2?; revision 1 is 23-097e2 MAYBE // bytes with A1 and A2 both high and a3 high? are mostly correct, rest are likely all wrong.
+	ROM_LOAD( "23-139e2.e52", 0x1000, 0x0800, CRC(c3302ce5) SHA1(a2ab3b9b48b5e850b2d7b22e6f8ef6099599e4b6)) // Label: "AMD // 37108 8232DKP // 23-139E2 // AM9218CPC // (C)DEC_1979" @E52;  // revision 2?; revision 1 is 23-097e2 MAYBE
 	ROM_LOAD( "23-140e2.e56", 0x1800, 0x0800, CRC(4bf1ce4e) SHA1(279f47ec9a68c801c3c05005dd782202ac9e51a4)) // Label: "AMD // 37109 8230DHP // 23-140E2 // AM9218CPC // (C)DEC 1979" @E56  // revision 2?; revision 1 is 23-098e2 MAYBE
 
-	/* bad rom tracing
-	bpset 1be then set pc=1d5 to bypass rom test
-	obvious entry points are 1000, 1016 (which is the first one hit, from f95), 1025, 112e, 1167, 11db, 136e, 1470, 1480, 16a9, 1719, 17e5
-	corresponding functions in vt100 roms are: WRITE ME
-	*/
-
-	ROM_REGION(0x1000, "avo", 0) // all switches on avo are open EXCEPT S2-3; does this map at 0xa000-0xcfff (mirrored) in maincpu space?
-	// are 184 and 185 an older version of the stp avo firmware?
+	ROM_REGION(0x1000, "avo", 0) // all switches on "54-13097-00 // PN2280402L" AVO are open EXCEPT S2-3; does this map at 0xa000-0xcfff (mirrored) in maincpu space?
+	// This same set of roms also appears on the "PN1030385J-F" AVO, which has no dipswitches; instead a single jumper? resistor installed in the NDIP20 footprint between E16 and E22, between pins 6 and 15 of the footprint
 	//NOTE: for both of these two avo roms, Pin 18 is positive enable CE, Pin 20 is negative enable /CE1, Pin 21 is negative enable /CE2,
 	ROM_LOAD( "23-186e2.avo.e21", 0x0000, 0x0800, CRC(1592dec1) SHA1(c4b8fc9fc0514e0cd46ad2de03abe72271ce460b)) // Label: "S 8218 // C69063 // 23186E2" @E21
 	ROM_LOAD( "23-187e2.avo.e17", 0x0800, 0x0800, CRC(c6d72a41) SHA1(956f9eb945a250fd05c76100b38c0ba381ab8fde)) // Label: "S 8228 // C69062 // 23187E2" @E17
+	// are 184 and 185 an older version of the VT100-AC AVO firmware?
 
 	ROM_REGION(0x2000, "stp", 0) // stp switches 1 and 5 are closed, 2,3,4 open
 	ROM_LOAD( "23-029e4.stp.e14", 0x0000, 0x2000, CRC(da55c62b) SHA1(261b02b774d57253d1dedecab8ca0e368c2a96cd)) // Label: "S 8218 // C43020 // 23029E4 (C) DEC // TP02" @E14
@@ -812,9 +799,9 @@ ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 // 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-028e4-00.e71", 0x0000, 0x2000, CRC(fccce02c) SHA1(f3e3e93a857443685b816cab4fb52e34c0bc72b1)) // rom is unique to vt101; "CN55004N 8232 // DEC TP03 // 23-028E4-00" 24-pin mask rom (mc68764 pinout)
-	//e69 socket is empty/unpopulated on vt101
-	//e67 socket is empty/unpopulated on vt101
-	//dip40 chip in the lower right corner of MB in vt101 (the STP/AVO asic) is absent
+	// E69 socket is empty/unpopulated on vt101
+	// E67 socket is empty/unpopulated on vt101
+	// DIP40 at E74 in the lower right corner of MB in vt101 (WD8250 UART) is absent
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
@@ -829,11 +816,11 @@ ROM_START( vt102 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "vt102" )
 	ROM_SYSTEM_BIOS( 0, "vt102o", "VT102 older roms" )
-	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(1)) // shared with vt131
-	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(1)) // shared with vt131
+	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(0)) // shared with vt131
+	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(0)) // shared with vt131
 	ROM_SYSTEM_BIOS( 1, "vt102", "VT102 newer roms" )
-	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(2)) // shared with vt131
-	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(2)) // shared with vt131
+	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(1)) // shared with vt131
+	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(1)) // shared with vt131
 	//e67 socket is empty on vt102 but populated on vt131 below
 
 	ROM_REGION(0x1000, "chargen", 0)
@@ -848,11 +835,11 @@ ROM_START( vt131 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt131 mainboa
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "vt131" )
 	ROM_SYSTEM_BIOS( 0, "vt131o", "VT131 older roms" )
-	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(1)) // shared with vt102
-	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(1)) // shared with vt102
+	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(0)) // shared with vt102
+	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(0)) // shared with vt102
 	ROM_SYSTEM_BIOS( 1, "vt131", "VT131 newer roms" )
-	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(2)) // shared with vt102
-	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(2)) // shared with vt102
+	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(1)) // shared with vt102
+	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(1)) // shared with vt102
 	ROM_LOAD( "23-280e2-00.e67", 0xA000, 0x0800, CRC(71b4172e) SHA1(5a82c7dc313bb92b9829eb8350840e072825a797)) // called "VT131 ROM" in the vt101 quick reference guide; pins 20, 18 and 21 are /CE /CE2 and /CE3 on this mask rom
 
 	ROM_REGION(0x1000, "chargen", 0)
@@ -880,16 +867,16 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                     FULLNAME       FLAGS */
-COMP( 1978, vt100,    0,      0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100",MACHINE_NOT_WORKING)
-//COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING)
-COMP( 1979, vt100ac, vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING)
-COMP( 1981, vt101,    vt102,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT101", MACHINE_NOT_WORKING)
-COMP( 1981, vt102,    0,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT102", MACHINE_NOT_WORKING)
-//COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT103", MACHINE_NOT_WORKING)
-COMP( 1978, vt105,    vt100,  0,       vt100,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT105", MACHINE_NOT_WORKING)
-//COMP( 1978, vt110,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT110", MACHINE_NOT_WORKING)
-//COMP( 1981, vt125,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT125", MACHINE_NOT_WORKING)
-COMP( 1981, vt131,    vt102,  0,       vt102,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT131", MACHINE_NOT_WORKING)
-//COMP( 1979, vt132,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT132", MACHINE_NOT_WORKING)
-COMP( 1983, vt180,    vt100,  0,       vt180,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT180", MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                          FULLNAME    FLAGS */
+COMP( 1978, vt100,   0,      0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT100",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1978, vt100wp, vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1979, vt100ac, vt100,  0,      vt100ac, vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1981, vt101,   vt102,  0,      vt101,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT101",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1981, vt102,   0,      0,      vt102,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT102",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1979, vt103,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT103",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1978, vt105,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT105",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1978, vt110,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT110",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1981, vt125,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT125",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1981, vt131,   vt102,  0,      vt102,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT131",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1979, vt132,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT132",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1983, vt180,   vt100,  0,      vt180,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT180",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

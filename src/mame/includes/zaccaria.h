@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "audio/zaccaria.h"
+#include "emupal.h"
 
 class zaccaria_state : public driver_device
 {
@@ -34,9 +35,11 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zaccaria);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,uint8_t *spriteram,int color,int section);
 
+	void zaccaria(machine_config &config);
+	void main_map(address_map &map);
 protected:
 	required_device<cpu_device>                 m_maincpu;
 	required_device<gfxdecode_device>           m_gfxdecode;

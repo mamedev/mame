@@ -62,6 +62,11 @@ namespace glslang {
         EatPatchConstantFunc,
         EatPatchSize,
         EatUnroll,
+        EatLoop,
+        EatBinding,
+        EatGlobalBinding,
+        EatLocation,
+        EatInputAttachment
     };
 }
 
@@ -81,14 +86,26 @@ namespace glslang {
     public:
         // Search for and potentially add the attribute into the map.  Return the
         // attribute type enum for it, if found, else EatNone.
-        TAttributeType setAttribute(const TString* name, TIntermAggregate* value);
+        TAttributeType setAttribute(const TString& nameSpace, const TString* name, TIntermAggregate* value);
 
         // Const lookup: search for (but do not modify) the attribute in the map.
         const TIntermAggregate* operator[](TAttributeType) const;
 
+        // True if entry exists in map (even if value is nullptr)
+        bool contains(TAttributeType) const;
+
+        // Obtain attribute as integer
+        bool getInt(TAttributeType attr, int& value, int argNum = 0) const;
+
+        // Obtain attribute as string, with optional to-lower transform
+        bool getString(TAttributeType attr, TString& value, int argNum = 0, bool convertToLower = true) const;
+
     protected:
+        // Helper to get attribute const union
+        const TConstUnion* getConstUnion(TAttributeType attr, TBasicType, int argNum) const;
+
         // Find an attribute enum given its name.
-        static TAttributeType attributeFromName(const TString&);
+        static TAttributeType attributeFromName(const TString& nameSpace, const TString& name);
 
         std::unordered_map<TAttributeType, TIntermAggregate*> attributes;
     };

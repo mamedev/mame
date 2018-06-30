@@ -18,15 +18,14 @@
 
 
 #define MCFG_S11C_BG_ROM_REGION(_region) \
-	s11c_bg_device::static_set_romregion(*device, _region);
+	downcast<s11c_bg_device &>(*device).set_romregion(_region);
 
 
-class s11c_bg_device : public device_t,
-	public device_mixer_interface
+class s11c_bg_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	required_device<cpu_device> m_cpu;
 	required_device<ym2151_device> m_ym2151;
@@ -42,8 +41,9 @@ public:
 	void ctrl_w(uint8_t data);
 	void data_w(uint8_t data);
 
-	static void static_set_romregion(device_t &device, const char *tag);
+	void set_romregion(const char *tag) { m_regiontag = tag; }
 
+	void s11c_bg_map(address_map &map);
 protected:
 	// overrides
 	virtual void device_start() override;

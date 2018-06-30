@@ -102,20 +102,17 @@ static const uint16_t BD1charset[]=
 };
 
 bfm_bd1_device::bfm_bd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BFM_BD1, tag, owner, clock),
-	m_port_val(0)
+	: device_t(mconfig, BFM_BD1, tag, owner, clock)
+	, m_outputs()
+	, m_port_val(0)
 {
-}
-
-void bfm_bd1_device::static_set_value(device_t &device, int val)
-{
-	bfm_bd1_device &bd1 = downcast<bfm_bd1_device &>(device);
-	bd1.m_port_val = val;
 }
 
 void bfm_bd1_device::device_start()
 {
-	save_item(NAME(m_cursor));
+	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", unsigned(m_port_val) << 4);
+	m_outputs->resolve();
+
 	save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_start));        // display window start pos 0-15
 	save_item(NAME(m_window_end));      // display window end   pos 0-15
@@ -127,15 +124,14 @@ void bfm_bd1_device::device_start()
 	save_item(NAME(m_display_mode));
 	save_item(NAME(m_flash_rate));
 	save_item(NAME(m_flash_control));
-	save_item(NAME(m_chars));
-	save_item(NAME(m_attrs));
-	save_item(NAME(m_outputs));
-	save_item(NAME(m_user_data));           // user defined character data (16 bit)
-	save_item(NAME(m_user_def));            // user defined character state
 	save_item(NAME(m_sclk));
 	save_item(NAME(m_data));
 
-	device_reset();
+	save_item(NAME(m_cursor));
+	save_item(NAME(m_chars));
+	save_item(NAME(m_attrs));
+	save_item(NAME(m_user_data));           // user defined character data (16 bit)
+	save_item(NAME(m_user_def));            // user defined character state
 }
 
 void bfm_bd1_device::device_reset()
@@ -157,14 +153,13 @@ void bfm_bd1_device::device_reset()
 	m_sclk = 0;
 	m_data = 0;
 
-	memset(m_chars, 0, sizeof(m_chars));
-	memset(m_outputs, 0, sizeof(m_outputs));
-	memset(m_attrs, 0, sizeof(m_attrs));
+	std::fill(std::begin(m_chars), std::end(m_chars), 0);
+	std::fill(std::begin(m_attrs), std::end(m_attrs), 0);
 }
 
 uint16_t bfm_bd1_device::set_display(uint16_t segin)
 {
-	return BITSWAP16(segin,8,12,11,7,6,4,10,3,14,15,0,13,9,5,1,2);
+	return bitswap<16>(segin,8,12,11,7,6,4,10,3,14,15,0,13,9,5,1,2);
 }
 
 void bfm_bd1_device::device_post_load()
@@ -174,18 +169,8 @@ void bfm_bd1_device::device_post_load()
 
 void bfm_bd1_device::update_display()
 {
-	for (int i =0; i<16; i++)
-	{
-		if (m_attrs[i] != AT_BLANK)
-		{
-			m_outputs[i] = set_display(m_chars[i]);
-		}
-		else
-		{
-			m_outputs[i] = 0;
-		}
-		machine().output().set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
-	}
+	for (int i = 0; i < 16; i++)
+		(*m_outputs)[i] = (m_attrs[i] != AT_BLANK) ? set_display(m_chars[i]) : 0;
 }
 ///////////////////////////////////////////////////////////////////////////
 void bfm_bd1_device::blank(int data)
@@ -300,8 +285,8 @@ int bfm_bd1_device::write_char(int data)
 				case 0x01:  // clr inside window
 					if ( m_window_size > 0 )
 					{
-						memset(m_chars+m_window_start,0,m_window_size);
-						memset(m_attrs+m_window_start,0,m_window_size);
+						std::fill_n(m_chars + m_window_start, m_window_size, 0);
+						std::fill_n(m_attrs + m_window_start, m_window_size, 0);
 					}
 
 					break;
@@ -330,8 +315,8 @@ int bfm_bd1_device::write_char(int data)
 					break;
 
 				case 0x03:  // clr entire display
-					memset(m_chars, 0, sizeof(m_chars));
-					memset(m_attrs, 0, sizeof(m_attrs));
+					std::fill(std::begin(m_chars), std::end(m_chars), 0);
+					std::fill(std::begin(m_attrs), std::end(m_attrs), 0);
 				}
 				break;
 

@@ -42,8 +42,6 @@ public:
 
 
 // device type definition
-extern const device_type ARCADIA_ROM_STD;
-extern const device_type ARCADIA_ROM_GOLF;
 DECLARE_DEVICE_TYPE(ARCADIA_ROM_STD,  arcadia_rom_device)
 DECLARE_DEVICE_TYPE(ARCADIA_ROM_GOLF, arcadia_golf_device)
 

@@ -22,10 +22,10 @@
 //-------------------------------------------------
 
 driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
-	: device_t(mconfig, type, tag, nullptr, 0),
-		m_system(nullptr),
-		m_flip_screen_x(0),
-		m_flip_screen_y(0)
+	: device_t(mconfig, type, tag, nullptr, 0)
+	, m_system(nullptr)
+	, m_flip_screen_x(0)
+	, m_flip_screen_y(0)
 {
 }
 
@@ -71,6 +71,27 @@ void driver_device::set_game_driver(const game_driver &game)
 void driver_device::static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback)
 {
 	downcast<driver_device &>(device).m_callbacks[type] = callback;
+}
+
+
+//-------------------------------------------------
+//  empty_init - default implementation which
+//  calls driver init
+//-------------------------------------------------
+
+void driver_device::empty_init()
+{
+	driver_init();
+}
+
+
+//-------------------------------------------------
+//  driver_init - default implementation which
+//  does nothing
+//-------------------------------------------------
+
+void driver_device::driver_init()
+{
 }
 
 
@@ -173,7 +194,7 @@ const tiny_rom_entry *driver_device::device_rom_region() const
 void driver_device::device_add_mconfig(machine_config &config)
 {
 	assert(m_system);
-	m_system->machine_config(config, this, nullptr);
+	m_system->machine_creator(config, *this);
 }
 
 
@@ -201,7 +222,7 @@ void driver_device::device_start()
 			throw device_missing_dependencies();
 
 	// call the game-specific init
-	m_system->driver_init(machine());
+	m_system->driver_init(*this);
 
 	// finish image devices init process
 	machine().image().postdevice_init();
@@ -260,55 +281,6 @@ void driver_device::device_reset_after_children()
 
 
 //**************************************************************************
-//  INTERRUPT ENABLE AND VECTOR HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  irq_pulse_clear - clear a "pulsed" IRQ line
-//-------------------------------------------------
-
-void driver_device::irq_pulse_clear(void *ptr, s32 param)
-{
-	device_execute_interface *exec = reinterpret_cast<device_execute_interface *>(ptr);
-	int irqline = param;
-	exec->set_input_line(irqline, CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
-//  generic_pulse_irq_line - "pulse" an IRQ line by
-//  asserting it and then clearing it x cycle(s)
-//  later
-//-------------------------------------------------
-
-void driver_device::generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles)
-{
-	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET && cycles > 0);
-	exec.set_input_line(irqline, ASSERT_LINE);
-
-	attotime target_time = exec.local_time() + exec.cycles_to_attotime(cycles * exec.min_cycles());
-	machine().scheduler().timer_set(target_time - machine().time(), timer_expired_delegate(FUNC(driver_device::irq_pulse_clear), this), irqline, (void *)&exec);
-}
-
-
-//-------------------------------------------------
-//  generic_pulse_irq_line_and_vector - "pulse" an
-//  IRQ line by asserting it and then clearing it
-//  x cycle(s) later, specifying a vector
-//-------------------------------------------------
-
-void driver_device::generic_pulse_irq_line_and_vector(device_execute_interface &exec, int irqline, int vector, int cycles)
-{
-	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET && cycles > 0);
-	exec.set_input_line_and_vector(irqline, ASSERT_LINE, vector);
-
-	attotime target_time = exec.local_time() + exec.cycles_to_attotime(cycles * exec.min_cycles());
-	machine().scheduler().timer_set(target_time - machine().time(), timer_expired_delegate(FUNC(driver_device::irq_pulse_clear), this), irqline, (void *)&exec);
-}
-
-
-
-//**************************************************************************
 //  INTERRUPT GENERATION CALLBACK HELPERS
 //**************************************************************************
 
@@ -316,7 +288,7 @@ void driver_device::generic_pulse_irq_line_and_vector(device_execute_interface &
 //  NMI callbacks
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( driver_device::nmi_line_pulse )   { device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::nmi_line_pulse )   { device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 INTERRUPT_GEN_MEMBER( driver_device::nmi_line_assert )  { device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE); }
 
 
@@ -380,23 +352,6 @@ void driver_device::flip_screen_set(u32 on)
 		m_flip_screen_x = m_flip_screen_y = on;
 		updateflip();
 	}
-}
-
-
-//-------------------------------------------------
-//  flip_screen_set_no_update - set global flip
-//  do not call updateflip.
-//-------------------------------------------------
-
-void driver_device::flip_screen_set_no_update(u32 on)
-{
-	// flip_screen_y is not updated on purpose
-	// this function is for drivers which
-	// were writing to flip_screen_x to
-	// bypass updateflip
-	if (on)
-		on = ~0;
-	m_flip_screen_x = on;
 }
 
 

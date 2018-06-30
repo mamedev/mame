@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -924,8 +924,8 @@ namespace bx
 		_dst[3] = float( ( (packed>>30) &   0x3) ) /    3.0f;
 	}
 
-	// R11G11B10F
-	inline void packR11G11B10F(void* _dst, const float* _src)
+	// RG11B10F
+	inline void packRG11B10F(void* _dst, const float* _src)
 	{
 		*( (uint32_t*)_dst) = 0
 			| ( (halfFromFloat(_src[0])>> 4) &      0x7ff)
@@ -934,7 +934,7 @@ namespace bx
 			;
 	}
 
-	inline void unpackR11G11B10F(float* _dst, const void* _src)
+	inline void unpackRG11B10F(float* _dst, const void* _src)
 	{
 		uint32_t packed = *( (const uint32_t*)_src);
 		_dst[0] = halfToFloat( (packed<< 4) & 0x7ff0);

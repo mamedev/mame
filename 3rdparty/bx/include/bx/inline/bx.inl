@@ -32,4 +32,40 @@ namespace bx
 		Ty tmp = _a; _a = _b; _b = tmp;
 	}
 
+	template<typename Ty>
+	inline Ty min(const Ty& _a, const Ty& _b)
+	{
+		return _a < _b ? _a : _b;
+	}
+
+	template<typename Ty>
+	inline Ty max(const Ty& _a, const Ty& _b)
+	{
+		return _a > _b ? _a : _b;
+	}
+
+	template<typename Ty>
+	inline Ty min(const Ty& _a, const Ty& _b, const Ty& _c)
+	{
+		return min(min(_a, _b), _c);
+	}
+
+	template<typename Ty>
+	inline Ty max(const Ty& _a, const Ty& _b, const Ty& _c)
+	{
+		return max(max(_a, _b), _c);
+	}
+
+	template<typename Ty>
+	inline Ty mid(const Ty& _a, const Ty& _b, const Ty& _c)
+	{
+		return max(min(_a, _b), min(max(_a, _b), _c) );
+	}
+
+	template<typename Ty>
+	inline Ty clamp(const Ty& _a, const Ty& _min, const Ty& _max)
+	{
+		return max(min(_a, _max), _min);
+	}
+
 } // namespace bx

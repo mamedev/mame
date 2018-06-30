@@ -21,14 +21,16 @@
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
+#include "screen.h"
 
 /* Spectrum crystals */
 
-#define X1 XTAL_14MHz       // Main clock (48k Spectrum)
+#define X1 XTAL(14'000'000)       // Main clock (48k Spectrum)
 #define X1_128_AMSTRAD  35469000 // Main clock (Amstrad 128K model, +2A?)
 #define X1_128_SINCLAIR 17734475 // Main clock (Sinclair 128K model)
 
-#define X2 XTAL_4_433619MHz // PAL color subcarrier
+#define X2 XTAL(4'433'619) // PAL color subcarrier
 
 /* Spectrum screen size in pixels */
 #define SPEC_UNSEEN_LINES  16   /* Non-visible scanlines before first border
@@ -63,10 +65,17 @@ struct EVENT_LIST_ITEM
 class spectrum_state : public driver_device
 {
 public:
+		enum
+		{
+				TIMER_IRQ_ON,
+				TIMER_IRQ_OFF,
+				TIMER_SCANLINE
+		};
 	spectrum_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_speaker(*this, "speaker"),
@@ -110,13 +119,19 @@ public:
 
 	int m_ROMSelection;
 
+	emu_timer *m_irq_off_timer;
+
+	// Build up the screen bitmap line-by-line as the z80 uses CPU cycles.
+	// Elimiates sprite flicker on various games (E.g. Marauder and
+	// Stormlord) and makes Firefly playable.
+	emu_timer *m_scanline_timer;
 
 	EVENT_LIST_ITEM *m_pCurrentItem;
 	int m_NumEvents;
 	int m_TotalEvents;
 	char *m_pEventListBuffer;
 	int m_LastFrameStartTime;
-	int m_CyclesPerFrame;
+	int m_CyclesPerLine;
 
 	uint8_t *m_ram_0000;
 	uint8_t m_ram_disabled_by_beta;
@@ -145,9 +160,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ts2068_port_ff_w);
 	DECLARE_WRITE8_MEMBER(tc2048_port_ff_w);
 
-	DECLARE_DRIVER_INIT(spectrum);
-	DECLARE_DRIVER_INIT(plus2);
-	DECLARE_DRIVER_INIT(plus3);
+	void init_spectrum();
+	void init_plus2();
+	void init_plus3();
 	DECLARE_MACHINE_RESET(spectrum);
 	DECLARE_VIDEO_START(spectrum);
 	DECLARE_PALETTE_INIT(spectrum);
@@ -183,7 +198,25 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( spectrum );
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 
+	void spectrum_common(machine_config &config);
+	void spectrum(machine_config &config);
+	void ts2068(machine_config &config);
+	void uk2086(machine_config &config);
+	void tc2048(machine_config &config);
+	void spectrum_plus3(machine_config &config);
+	void spectrum_128(machine_config &config);
+	void spectrum_128_io(address_map &map);
+	void spectrum_128_mem(address_map &map);
+	void spectrum_io(address_map &map);
+	void spectrum_mem(address_map &map);
+	void spectrum_plus3_io(address_map &map);
+	void spectrum_plus3_mem(address_map &map);
+	void tc2048_io(address_map &map);
+	void tc2048_mem(address_map &map);
+	void ts2068_io(address_map &map);
+	void ts2068_mem(address_map &map);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
@@ -257,7 +290,5 @@ protected:
 INPUT_PORTS_EXTERN( spectrum );
 INPUT_PORTS_EXTERN( spec128 );
 INPUT_PORTS_EXTERN( spec_plus );
-
-MACHINE_CONFIG_EXTERN( spectrum );
 
 #endif // MAME_INCLUDES_SPECTRUM_H

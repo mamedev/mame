@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "cp1610.h"
 #include "debugger.h"
-
+#include "1610dasm.h"
 
 DEFINE_DEVICE_TYPE(CP1610, cp1610_cpu_device, "cp1610", "GI CP1610")
 
@@ -27,9 +27,9 @@ DEFINE_DEVICE_TYPE(CP1610, cp1610_cpu_device, "cp1610", "GI CP1610")
 #define C  0x10
 
 
-#define cp1610_readop(A) m_program->read_word((A)<<1)
-#define cp1610_readmem16(A) m_program->read_word((A)<<1)
-#define cp1610_writemem16(A,B) m_program->write_word((A)<<1,B)
+#define cp1610_readop(A) m_program->read_word(A)
+#define cp1610_readmem16(A) m_program->read_word(A)
+#define cp1610_writemem16(A,B) m_program->write_word(A,B)
 
 /* clear all flags */
 #define CLR_SZOC                \
@@ -2122,7 +2122,7 @@ void cp1610_cpu_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(this, m_r[7]);
+		debugger_instruction_hook(m_r[7]);
 
 		m_mask_interrupts = 0;
 
@@ -3363,13 +3363,13 @@ void cp1610_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_r[7]).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void cp1610_cpu_device::device_reset()
 {
 	/* This is how we set the reset vector */
-	set_input_line(CP1610_RESET, PULSE_LINE);
+	pulse_input_line(CP1610_RESET, attotime::zero);
 }
 
 void cp1610_cpu_device::execute_set_input(int irqline, int state)
@@ -3422,9 +3422,7 @@ void cp1610_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-
-offs_t cp1610_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> cp1610_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( cp1610 );
-	return CPU_DISASSEMBLE_NAME(cp1610)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<cp1610_disassembler>();
 }

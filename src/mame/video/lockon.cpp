@@ -14,7 +14,7 @@
 #define CURSOR_XPOS         168
 #define CURSOR_YPOS         239
 #define FRAMEBUFFER_MAX_X   431
-#define FRAMEBUFFER_MAX_Y   (uint32_t)((FRAMEBUFFER_CLOCK / (float)(FRAMEBUFFER_MAX_X-1)) / ((float)PIXEL_CLOCK/(HTOTAL*VTOTAL)))
+#define FRAMEBUFFER_MAX_Y   (uint32_t)((FRAMEBUFFER_CLOCK / (FRAMEBUFFER_MAX_X-1)).dvalue() / (PIXEL_CLOCK/(HTOTAL*VTOTAL)).dvalue())
 
 
 /*************************************
@@ -906,7 +906,7 @@ void lockon_state::video_start()
 
 	save_item(NAME(*m_back_buffer));
 	save_item(NAME(*m_front_buffer));
-	save_pointer(NAME(m_obj_pal_ram.get()), 2048);
+	save_pointer(NAME(m_obj_pal_ram), 2048);
 }
 
 uint32_t lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -65,8 +65,6 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(ultennis_hack_r);
 	DECLARE_WRITE16_MEMBER(protection_bit_w);
-	DECLARE_READ16_MEMBER(shtstar_unk_r);
-	DECLARE_READ16_MEMBER(shtstar_unk_2_r);
 	DECLARE_READ16_MEMBER(artmagic_blitter_r);
 	DECLARE_WRITE16_MEMBER(artmagic_blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(m68k_gen_int);
@@ -74,10 +72,10 @@ public:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
-	DECLARE_DRIVER_INIT(shtstar);
-	DECLARE_DRIVER_INIT(cheesech);
-	DECLARE_DRIVER_INIT(ultennis);
-	DECLARE_DRIVER_INIT(stonebal);
+	void init_shtstar();
+	void init_cheesech();
+	void init_ultennis();
+	void init_stonebal();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -87,6 +85,18 @@ public:
 	void update_irq_state();
 	inline uint16_t *address_to_vram(offs_t *address);
 
+	void cheesech(machine_config &config);
+	void artmagic(machine_config &config);
+	void shtstar(machine_config &config);
+	void stonebal(machine_config &config);
+	void main_map(address_map &map);
+	void shtstar_guncpu_io_map(address_map &map);
+	void shtstar_guncpu_map(address_map &map);
+	void shtstar_map(address_map &map);
+	void shtstar_subcpu_map(address_map &map);
+	void stonebal_map(address_map &map);
+	void stonebal_tms_map(address_map &map);
+	void tms_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

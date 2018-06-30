@@ -40,16 +40,21 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	virtual uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 
 	required_memory_region m_exp_rom;
 	required_device<via6522_device> m_via6522_0;
 	required_device<via6522_device> m_via6522_1;
-	required_device<mc68681_device> m_duart;
+	required_device<scn2681_device> m_duart;
 	required_device<tms5220_device> m_tms;
 	required_device<centronics_device> m_centronics;
 	required_device<input_merger_device> m_irqs;
+
+	uint8_t m_romsel;
 };
 
 

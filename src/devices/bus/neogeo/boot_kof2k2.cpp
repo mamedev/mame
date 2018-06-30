@@ -12,20 +12,20 @@
 #include "boot_kof2k2.h"
 
 
-MACHINE_CONFIG_MEMBER( neogeo_kof2002b_cart_device::device_add_mconfig )
+MACHINE_CONFIG_START(neogeo_kof2002b_cart_device::device_add_mconfig)
 	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
 	MCFG_CMC_PROT_ADD("cmc_prot")
 	MCFG_PCM2_PROT_ADD("pcm2_prot")
 	MCFG_KOF2002_PROT_ADD("kof2k2_prot")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( neogeo_kf2k2mp_cart_device::device_add_mconfig )
+MACHINE_CONFIG_START(neogeo_kf2k2mp_cart_device::device_add_mconfig)
 	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
 	MCFG_CMC_PROT_ADD("cmc_prot")
 	MCFG_PCM2_PROT_ADD("pcm2_prot")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( neogeo_kf2k2mp2_cart_device::device_add_mconfig )
+MACHINE_CONFIG_START(neogeo_kf2k2mp2_cart_device::device_add_mconfig)
 	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
 	MCFG_CMC_PROT_ADD("cmc_prot")
 	MCFG_PCM2_PROT_ADD("pcm2_prot")

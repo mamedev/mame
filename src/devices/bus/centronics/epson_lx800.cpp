@@ -52,48 +52,49 @@ const tiny_rom_entry *epson_lx800_device::device_rom_region() const
 //  ADDRESS_MAP( lx800_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( lx800_mem, AS_PROGRAM, 8, epson_lx800_device )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM /* 32k firmware */
-	AM_RANGE(0x8000, 0x9fff) AM_RAM /* 8k external RAM */
-	AM_RANGE(0xa000, 0xbfff) AM_NOP /* not used */
-	AM_RANGE(0xc000, 0xc007) AM_MIRROR(0x1ff8) AM_DEVREADWRITE("ic3b", e05a03_device, read, write)
-	AM_RANGE(0xe000, 0xfeff) AM_NOP /* not used */
-ADDRESS_MAP_END
+void epson_lx800_device::lx800_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); /* 32k firmware */
+	map(0x8000, 0x9fff).ram(); /* 8k external RAM */
+	map(0xa000, 0xbfff).noprw(); /* not used */
+	map(0xc000, 0xc007).mirror(0x1ff8).rw("ic3b", FUNC(e05a03_device::read), FUNC(e05a03_device::write));
+	map(0xe000, 0xfeff).noprw(); /* not used */
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( epson_lx800_device::device_add_mconfig )
+MACHINE_CONFIG_START(epson_lx800_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
-	MCFG_CPU_PROGRAM_MAP(lx800_mem)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(epson_lx800_device, porta_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(epson_lx800_device, porta_w))
+	MCFG_DEVICE_ADD("maincpu", UPD7810, XTAL(14'745'600))
+	MCFG_DEVICE_PROGRAM_MAP(lx800_mem)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(*this, epson_lx800_device, porta_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, epson_lx800_device, porta_w))
 	MCFG_UPD7810_PORTB_READ_CB(IOPORT("DIPSW1"))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(epson_lx800_device, portc_r))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(epson_lx800_device, portc_w))
-	MCFG_UPD7810_AN0(READLINE(epson_lx800_device, an0_r))
-	MCFG_UPD7810_AN1(READLINE(epson_lx800_device, an1_r))
-	MCFG_UPD7810_AN2(READLINE(epson_lx800_device, an2_r))
-	MCFG_UPD7810_AN3(READLINE(epson_lx800_device, an3_r))
-	MCFG_UPD7810_AN4(READLINE(epson_lx800_device, an4_r))
-	MCFG_UPD7810_AN5(READLINE(epson_lx800_device, an5_r))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, epson_lx800_device, portc_r))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, epson_lx800_device, portc_w))
+	MCFG_UPD7810_AN0(READLINE(*this, epson_lx800_device, an0_r))
+	MCFG_UPD7810_AN1(READLINE(*this, epson_lx800_device, an1_r))
+	MCFG_UPD7810_AN2(READLINE(*this, epson_lx800_device, an2_r))
+	MCFG_UPD7810_AN3(READLINE(*this, epson_lx800_device, an3_r))
+	MCFG_UPD7810_AN4(READLINE(*this, epson_lx800_device, an4_r))
+	MCFG_UPD7810_AN5(READLINE(*this, epson_lx800_device, an5_r))
 
 	MCFG_DEFAULT_LAYOUT(layout_lx800)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 4000) // ?
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 4000) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 	/* gate array */
 	MCFG_DEVICE_ADD("ic3b", E05A03, 0)
-	MCFG_E05A03_PE_LP_CALLBACK(WRITELINE(epson_lx800_device, paperempty_led_w))
-	MCFG_E05A03_RESO_CALLBACK(WRITELINE(epson_lx800_device, reset_w))
-	MCFG_E05A03_PE_CALLBACK(WRITELINE(epson_lx800_device, centronics_pe_w))
-	MCFG_E05A03_DATA_CALLBACK(READ8(epson_lx800_device, centronics_data_r))
+	MCFG_E05A03_PE_LP_CALLBACK(WRITELINE(*this, epson_lx800_device, paperempty_led_w))
+	MCFG_E05A03_RESO_CALLBACK(WRITELINE(*this, epson_lx800_device, reset_w))
+	MCFG_E05A03_PE_CALLBACK(WRITELINE(*this, epson_lx800_device, centronics_pe_w))
+	MCFG_E05A03_DATA_CALLBACK(READ8(*this, epson_lx800_device, centronics_data_r))
 MACHINE_CONFIG_END
 
 

@@ -60,23 +60,23 @@
 
 #define MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD() \
 	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, 0, plus4_expansion_cards, nullptr) \
-	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, irq_w)) \
-	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(DEVREAD8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_r)) \
-	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(DEVWRITE8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_w)) \
-	MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, aec_w))
+	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, irq_w)) \
+	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_r)) \
+	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_w)) \
+	MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, aec_w))
 
 
 #define MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &plus4_expansion_slot_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<plus4_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(_read) \
-	devcb = &plus4_expansion_slot_device::set_cd_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<plus4_expansion_slot_device &>(*device).set_cd_rd_callback(DEVCB_##_read);
 
 #define MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(_write) \
-	devcb = &plus4_expansion_slot_device::set_cd_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<plus4_expansion_slot_device &>(*device).set_cd_wr_callback(DEVCB_##_write);
 
 #define MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(_write) \
-	devcb = &plus4_expansion_slot_device::set_aec_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<plus4_expansion_slot_device &>(*device).set_aec_wr_callback(DEVCB_##_write);
 
 
 
@@ -96,10 +96,10 @@ public:
 	// construction/destruction
 	plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<plus4_expansion_slot_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_rd_callback(device_t &device, Object &&cb) { return downcast<plus4_expansion_slot_device &>(device).m_read_dma_cd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_wr_callback(device_t &device, Object &&cb) { return downcast<plus4_expansion_slot_device &>(device).m_write_dma_cd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_aec_wr_callback(device_t &device, Object &&cb) { return downcast<plus4_expansion_slot_device &>(device).m_write_aec.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cd_rd_callback(Object &&cb) { return m_read_dma_cd.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cd_wr_callback(Object &&cb) { return m_write_dma_cd.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_aec_wr_callback(Object &&cb) { return m_write_aec.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
@@ -114,6 +114,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -178,6 +179,6 @@ protected:
 DECLARE_DEVICE_TYPE(PLUS4_EXPANSION_SLOT, plus4_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( plus4_expansion_cards );
+void plus4_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_PLUS4_EXP_H

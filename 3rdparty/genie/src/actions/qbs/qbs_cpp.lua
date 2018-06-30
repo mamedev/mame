@@ -135,7 +135,9 @@ function qbs.generate_project(prj)
 					_p(indent, 'cpp.runtimeLibrary: "dynamic"')
 				end
 
-				if cfg.flags.ExtraWarnings then
+				if cfg.flags.PedanticWarnings
+				or cfg.flags.ExtraWarnings
+				then
 					_p(indent, 'cpp.warningLevel: "all"')
 				else
 					_p(indent, 'cpp.warningLevel: "default"')

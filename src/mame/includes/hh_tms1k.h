@@ -12,6 +12,7 @@
 #pragma once
 
 #include "cpu/tms1000/tms1000.h"
+#include "cpu/tms1000/tms1000c.h"
 #include "cpu/tms1000/tms1100.h"
 #include "cpu/tms1000/tms1400.h"
 #include "cpu/tms1000/tms0970.h"

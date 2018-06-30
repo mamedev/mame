@@ -73,6 +73,8 @@ private:
 	DECLARE_READ8_MEMBER( cia_pb_r );
 	DECLARE_WRITE8_MEMBER( cia_pb_w );
 
+	void c1581_mem(address_map &map);
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	required_device<cpu_device> m_maincpu;
@@ -80,6 +82,7 @@ private:
 	required_device<wd1772_device> m_fdc;
 	required_device<floppy_image_device> m_floppy;
 	required_ioport m_address;
+	output_finder<2> m_leds;
 
 	int m_data_out;             // serial data out
 	int m_atn_ack;              // attention acknowledge

@@ -19,12 +19,12 @@ public:
 
 	optional_device<cpu_device> m_prot;
 
-	DECLARE_DRIVER_INIT(kov2);
-	DECLARE_DRIVER_INIT(kov2p);
-	DECLARE_DRIVER_INIT(martmast);
-	DECLARE_DRIVER_INIT(ddp2);
-	DECLARE_DRIVER_INIT(dw2001);
-	DECLARE_DRIVER_INIT(dwpc);
+	void init_kov2();
+	void init_kov2p();
+	void init_martmast();
+	void init_ddp2();
+	void init_dw2001();
+	void init_dwpc();
 	DECLARE_MACHINE_START(pgm_arm_type2);
 	DECLARE_READ32_MEMBER( arm7_latch_arm_r );
 	DECLARE_WRITE32_MEMBER( arm7_latch_arm_w );
@@ -40,10 +40,10 @@ public:
 	DECLARE_WRITE32_MEMBER( kov2p_arm_region_w );
 	DECLARE_READ32_MEMBER( ddp2_speedup_r );
 	DECLARE_READ16_MEMBER( ddp2_main_speedup_r );
+	void pgm_arm_type2(machine_config &config);
+	void _55857F_arm7_map(address_map &map);
+	void kov2_mem(address_map &map);
 };
-
-/* emulations */
-MACHINE_CONFIG_EXTERN( pgm_arm_type2 );
 
 /* simulations (or missing) */
 INPUT_PORTS_EXTERN( ddp2 );

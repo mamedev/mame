@@ -25,35 +25,33 @@ DECLARE_DEVICE_TYPE(M68705U3, m68705u3_device)
 // ======================> m68705_device
 
 #define MCFG_M68705_PORTA_R_CB(obj) \
-	devcb = &m68705_device::set_port_cb_r<0>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_r<0>(DEVCB_##obj);
 
 #define MCFG_M68705_PORTB_R_CB(obj) \
-	devcb = &m68705_device::set_port_cb_r<1>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_r<1>(DEVCB_##obj);
 
 #define MCFG_M68705_PORTC_R_CB(obj) \
-	devcb = &m68705_device::set_port_cb_r<2>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_r<2>(DEVCB_##obj);
 
 #define MCFG_M68705_PORTD_R_CB(obj) \
-	devcb = &m68705_device::set_port_cb_r<3>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_r<3>(DEVCB_##obj);
 
 #define MCFG_M68705_PORTA_W_CB(obj) \
-	devcb = &m68705_device::set_port_cb_w<0>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_w<0>(DEVCB_##obj);
 
 #define MCFG_M68705_PORTB_W_CB(obj) \
-	devcb = &m68705_device::set_port_cb_w<1>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_w<1>(DEVCB_##obj);
 
 #define MCFG_M68705_PORTC_W_CB(obj) \
-	devcb = &m68705_device::set_port_cb_w<2>(*device, DEVCB_##obj);
+	devcb = &downcast<m68705_device &>(*device).set_port_cb_w<2>(DEVCB_##obj);
 
 
 class m68705_device : public m6805_base_device, public device_nvram_interface
 {
 public:
-	// static configuration helpers
-	template<std::size_t N, typename Object> static devcb_base &set_port_cb_r(device_t &device, Object &&obj)
-	{ return downcast<m68705_device &>(device).m_port_cb_r[N].set_callback(std::forward<Object>(obj)); }
-	template<std::size_t N, typename Object> static devcb_base &set_port_cb_w(device_t &device, Object &&obj)
-	{ return downcast<m68705_device &>(device).m_port_cb_w[N].set_callback(std::forward<Object>(obj)); }
+	// configuration helpers
+	template<std::size_t N, typename Object> devcb_base &set_port_cb_r(Object &&obj) { return m_port_cb_r[N].set_callback(std::forward<Object>(obj)); }
+	template<std::size_t N, typename Object> devcb_base &set_port_cb_w(Object &&obj) { return m_port_cb_w[N].set_callback(std::forward<Object>(obj)); }
 
 protected:
 	// state index constants
@@ -98,7 +96,7 @@ protected:
 			u32 clock,
 			device_type type,
 			u32 addr_width,
-			address_map_delegate internal_map);
+			address_map_constructor internal_map);
 
 	template <offs_t B> DECLARE_READ8_MEMBER(eprom_r);
 	template <offs_t B> DECLARE_WRITE8_MEMBER(eprom_w);
@@ -191,7 +189,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_w) { port_input_w<2>(space, offset, data, mem_mask); }
 
 protected:
-	DECLARE_ADDRESS_MAP(p_map, 8);
+	void p_map(address_map &map);
 
 	m68705p_device(
 			machine_config const &mconfig,
@@ -202,12 +200,7 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual offs_t disasm_disassemble(
-			std::ostream &stream,
-			offs_t pc,
-			const uint8_t *oprom,
-			const uint8_t *opram,
-			uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -222,7 +215,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pd_w) { port_input_w<3>(space, offset, data, mem_mask); } // TODO: PD6 is also /INT2
 
 protected:
-	DECLARE_ADDRESS_MAP(u_map, 8);
+	void u_map(address_map &map);
 
 	m68705u_device(
 			machine_config const &mconfig,
@@ -230,7 +223,7 @@ protected:
 			device_t *owner,
 			u32 clock,
 			device_type type,
-			address_map_delegate internal_map);
+			address_map_constructor internal_map);
 	m68705u_device(
 			machine_config const &mconfig,
 			char const *tag,
@@ -240,12 +233,7 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual offs_t disasm_disassemble(
-			std::ostream &stream,
-			offs_t pc,
-			const uint8_t *oprom,
-			const uint8_t *opram,
-			uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -257,7 +245,7 @@ public:
 	// TODO: voltage inputs for ADC (shared with digital port D pins)
 
 protected:
-	DECLARE_ADDRESS_MAP(r_map, 8);
+	void r_map(address_map &map);
 
 	m68705r_device(
 			machine_config const &mconfig,
@@ -268,12 +256,7 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual offs_t disasm_disassemble(
-			std::ostream &stream,
-			offs_t pc,
-			const uint8_t *oprom,
-			const uint8_t *opram,
-			uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 

@@ -211,7 +211,7 @@ uint32_t teleprinter_device::tp_update(screen_device &device, bitmap_rgb32 &bitm
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-MACHINE_CONFIG_MEMBER( teleprinter_device::device_add_mconfig )
+MACHINE_CONFIG_START(teleprinter_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(TELEPRINTER_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -221,8 +221,8 @@ MACHINE_CONFIG_MEMBER( teleprinter_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(generic_terminal_device, kbd_put))
 
-	MCFG_SPEAKER_STANDARD_MONO("bell")
-	MCFG_SOUND_ADD("beeper", BEEP, 2'000)
+	SPEAKER(config, "bell").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 2'000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 0.50)
 MACHINE_CONFIG_END
 

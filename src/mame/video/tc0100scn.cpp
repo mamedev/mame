@@ -185,26 +185,6 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void tc0100scn_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<tc0100scn_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void tc0100scn_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<tc0100scn_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -303,7 +283,7 @@ void tc0100scn_device::device_start()
 	set_colbanks(0, 0, 0);  /* standard values, only Wgp & multiscreen games change them */
 									/* we call this here, so that they can be modified at video_start*/
 
-	save_pointer(NAME(m_ram.get()), TC0100SCN_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram), TC0100SCN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_dblwidth));
 	save_item(NAME(m_gfxbank));

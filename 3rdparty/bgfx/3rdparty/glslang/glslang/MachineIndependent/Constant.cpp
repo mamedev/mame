@@ -38,6 +38,7 @@
 #include <cmath>
 #include <cfloat>
 #include <cstdlib>
+#include <climits>
 
 namespace {
 
@@ -193,7 +194,7 @@ TIntermTyped* TIntermConstantUnion::fold(TOperator op, const TIntermTyped* right
 
             case EbtUint:
                 if (rightUnionArray[i] == 0) {
-                    newConstArray[i].setUConst(0xFFFFFFFF);
+                    newConstArray[i].setUConst(0xFFFFFFFFu);
                 } else
                     newConstArray[i].setUConst(leftUnionArray[i].getUConst() / rightUnionArray[i].getUConst());
                 break;
@@ -213,6 +214,23 @@ TIntermTyped* TIntermConstantUnion::fold(TOperator op, const TIntermTyped* right
                 } else
                     newConstArray[i].setU64Const(leftUnionArray[i].getU64Const() / rightUnionArray[i].getU64Const());
                 break;
+#ifdef AMD_EXTENSIONS
+            case EbtInt16:
+                if (rightUnionArray[i] == 0)
+                    newConstArray[i].setIConst(0x7FFF);
+                else if (rightUnionArray[i].getIConst() == -1 && leftUnionArray[i].getIConst() == (int)0x8000)
+                    newConstArray[i].setIConst(0x8000);
+                else
+                    newConstArray[i].setIConst(leftUnionArray[i].getIConst() / rightUnionArray[i].getIConst());
+                break;
+
+            case EbtUint16:
+                if (rightUnionArray[i] == 0) {
+                    newConstArray[i].setUConst(0xFFFFu);
+                } else
+                    newConstArray[i].setUConst(leftUnionArray[i].getUConst() / rightUnionArray[i].getUConst());
+                break;
+#endif
             default:
                 return 0;
             }
@@ -246,8 +264,31 @@ TIntermTyped* TIntermConstantUnion::fold(TOperator op, const TIntermTyped* right
         for (int i = 0; i < newComps; i++) {
             if (rightUnionArray[i] == 0)
                 newConstArray[i] = leftUnionArray[i];
-            else
-                newConstArray[i] = leftUnionArray[i] % rightUnionArray[i];
+            else {
+                switch (getType().getBasicType()) {
+                case EbtInt:
+                    if (rightUnionArray[i].getIConst() == -1 && leftUnionArray[i].getIConst() == INT_MIN) {
+                        newConstArray[i].setIConst(0);
+                        break;
+                    } else goto modulo_default;
+
+                case EbtInt64:
+                    if (rightUnionArray[i].getI64Const() == -1 && leftUnionArray[i].getI64Const() == LLONG_MIN) {
+                        newConstArray[i].setI64Const(0);
+                        break;
+                    } else goto modulo_default;
+#ifdef AMD_EXTENSIONS
+                case EbtInt16:
+                    if (rightUnionArray[i].getIConst() == -1 && leftUnionArray[i].getIConst() == SHRT_MIN) {
+                        newConstArray[i].setIConst(0);
+                        break;
+                    } else goto modulo_default;
+#endif
+                default:
+                modulo_default:
+                    newConstArray[i] = leftUnionArray[i] % rightUnionArray[i];
+                }
+            }
         }
         break;
 
@@ -457,10 +498,16 @@ TIntermTyped* TIntermConstantUnion::fold(TOperator op, const TType& returnType) 
             case EbtFloat16:
 #endif
             case EbtFloat: newConstArray[i].setDConst(-unionArray[i].getDConst()); break;
+#ifdef AMD_EXTENSIONS
+            case EbtInt16:
+#endif
             case EbtInt:   newConstArray[i].setIConst(-unionArray[i].getIConst()); break;
+#ifdef AMD_EXTENSIONS
+            case EbtUint16:
+#endif
             case EbtUint:  newConstArray[i].setUConst(static_cast<unsigned int>(-static_cast<int>(unionArray[i].getUConst())));  break;
             case EbtInt64: newConstArray[i].setI64Const(-unionArray[i].getI64Const()); break;
-            case EbtUint64: newConstArray[i].setU64Const(static_cast<unsigned int>(-static_cast<int>(unionArray[i].getU64Const())));  break;
+            case EbtUint64: newConstArray[i].setU64Const(static_cast<unsigned long long>(-static_cast<long long>(unionArray[i].getU64Const())));  break;
             default:
                 return 0;
             }
@@ -610,6 +657,14 @@ TIntermTyped* TIntermConstantUnion::fold(TOperator op, const TType& returnType) 
         case EOpUintBitsToFloat:
         case EOpDoubleBitsToInt64:
         case EOpDoubleBitsToUint64:
+        case EOpInt64BitsToDouble:
+        case EOpUint64BitsToDouble:
+#ifdef AMD_EXTENSIONS
+        case EOpFloat16BitsToInt16:
+        case EOpFloat16BitsToUint16:
+        case EOpInt16BitsToFloat16:
+        case EOpUint16BitsToFloat16:
+#endif
 
         default:
             return 0;
@@ -702,6 +757,9 @@ TIntermTyped* TIntermediate::fold(TIntermAggregate* aggrNode)
 #endif
                            children[0]->getAsTyped()->getBasicType() == EbtDouble;
     bool isSigned = children[0]->getAsTyped()->getBasicType() == EbtInt ||
+#ifdef AMD_EXTENSIONS
+                    children[0]->getAsTyped()->getBasicType() == EbtInt16 ||
+#endif
                     children[0]->getAsTyped()->getBasicType() == EbtInt64;
     bool isInt64 = children[0]->getAsTyped()->getBasicType() == EbtInt64 ||
                    children[0]->getAsTyped()->getBasicType() == EbtUint64;

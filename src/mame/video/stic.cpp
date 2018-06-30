@@ -379,7 +379,7 @@
 
 
 
-DEFINE_DEVICE_TYPE(STIC, stic_device, "stic", "STIC (Standard Television Interface Chip) Video Chip");
+DEFINE_DEVICE_TYPE(STIC, stic_device, "stic", "AY-3-8900-1 STIC");
 
 //-------------------------------------------------
 //  stic_device - constructor
@@ -387,6 +387,7 @@ DEFINE_DEVICE_TYPE(STIC, stic_device, "stic", "STIC (Standard Television Interfa
 
 stic_device::stic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, STIC, tag, owner, clock),
+	device_video_interface(mconfig, *this),
 	m_grom(*this, "grom"),
 	m_x_scale(1),
 	m_y_scale(1)
@@ -408,7 +409,7 @@ stic_device::~stic_device()
 
 void stic_device::device_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	save_item(NAME(m_stic_registers));
 	save_item(NAME(m_gramdirty));
@@ -1292,7 +1293,7 @@ WRITE16_MEMBER( stic_device::write )
 		case STIC_CSR + CSR1:
 		case STIC_CSR + CSR2:
 		case STIC_CSR + CSR3:
-			//logerror("Setting color_stack[%x] = %x (%x)\n", offset & (CSRS - 1),data & STIC_CSR_BG, space.device().safe_pc());
+			//logerror("Setting color_stack[%x] = %x (%s)\n", offset & (CSRS - 1),data & STIC_CSR_BG, m_maincpu->pc());
 			break;
 		// Border Color
 		case STIC_BCR:

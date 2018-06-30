@@ -47,6 +47,7 @@ public:
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
+	void bailey(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -87,7 +88,7 @@ void bailey_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( bailey )
+MACHINE_CONFIG_START(bailey_state::bailey)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -152,5 +153,5 @@ ROM_START( fun4a )
 ROM_END
 
 
-GAME( 1976, fun4,  0,    bailey, 0, bailey_state,  0, ROT0, "Bailey International", "Fun Four (set 1) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, fun4a, fun4, bailey, 0, bailey_state,  0, ROT0, "Bailey International", "Fun Four (set 2) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, fun4,  0,    bailey, 0, bailey_state, empty_init, ROT0, "Bailey International", "Fun Four (set 1) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, fun4a, fun4, bailey, 0, bailey_state, empty_init, ROT0, "Bailey International", "Fun Four (set 2) [TTL]", MACHINE_IS_SKELETON )

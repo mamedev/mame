@@ -292,20 +292,22 @@ WRITE8_MEMBER( comx35_state::io_w )
 //  ADDRESS_MAP( comx35_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( comx35_mem, AS_PROGRAM, 8, comx35_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
-ADDRESS_MAP_END
+void comx35_state::comx35_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(FUNC(comx35_state::mem_r), FUNC(comx35_state::mem_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( comx35_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( comx35_io, AS_IO, 8, comx35_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x07) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void comx35_state::comx35_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x07).rw(FUNC(comx35_state::io_r), FUNC(comx35_state::io_w));
+}
 
 
 
@@ -593,20 +595,20 @@ void comx35_state::machine_reset()
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pal )
+MACHINE_CONFIG_START(comx35_state::pal)
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, cdp1869_device::CPU_CLK_PAL)
-	MCFG_CPU_PROGRAM_MAP(comx35_mem)
-	MCFG_CPU_IO_MAP(comx35_io)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, cdp1869_device::CPU_CLK_PAL)
+	MCFG_DEVICE_PROGRAM_MAP(comx35_mem)
+	MCFG_DEVICE_IO_MAP(comx35_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(comx35_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(comx35_state, ef2_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(comx35_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(comx35_state, q_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(comx35_state, sc_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, comx35_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, comx35_state, ef2_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, comx35_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, comx35_state, q_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, comx35_state, sc_w))
 
 	// sound and video hardware
-	MCFG_FRAGMENT_ADD(comx35_pal_video)
+	comx35_pal_video(config);
 
 	// peripheral hardware
 	MCFG_DEVICE_ADD(CDP1871_TAG, CDP1871, cdp1869_device::CPU_CLK_PAL/8)
@@ -628,7 +630,7 @@ static MACHINE_CONFIG_START( pal )
 
 	// expansion bus
 	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, comx_expansion_cards, "eb")
-	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx35_state, irq_w))
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, comx35_state, irq_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -643,20 +645,20 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ntsc )
+MACHINE_CONFIG_START(comx35_state::ntsc)
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, cdp1869_device::CPU_CLK_NTSC)
-	MCFG_CPU_PROGRAM_MAP(comx35_mem)
-	MCFG_CPU_IO_MAP(comx35_io)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, cdp1869_device::CPU_CLK_NTSC)
+	MCFG_DEVICE_PROGRAM_MAP(comx35_mem)
+	MCFG_DEVICE_IO_MAP(comx35_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(comx35_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(comx35_state, ef2_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(comx35_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(comx35_state, q_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(comx35_state, sc_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, comx35_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, comx35_state, ef2_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, comx35_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, comx35_state, q_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, comx35_state, sc_w))
 
 	// sound and video hardware
-	MCFG_FRAGMENT_ADD(comx35_ntsc_video)
+	comx35_ntsc_video(config);
 
 	// peripheral hardware
 	MCFG_DEVICE_ADD(CDP1871_TAG, CDP1871, cdp1869_device::CPU_CLK_PAL/8)
@@ -678,7 +680,7 @@ static MACHINE_CONFIG_START( ntsc )
 
 	// expansion bus
 	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, comx_expansion_cards, "eb")
-	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx35_state, irq_w))
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, comx35_state, irq_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -702,9 +704,9 @@ ROM_START( comx35p )
 	ROM_REGION( 0x4000, CDP1802_TAG, 0 )
 	ROM_DEFAULT_BIOS( "basic100" )
 	ROM_SYSTEM_BIOS( 0, "basic100", "COMX BASIC V1.00" )
-	ROMX_LOAD( "comx_10.u21", 0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(1) )
+	ROMX_LOAD( "comx_10.u21", 0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "basic101", "COMX BASIC V1.01" )
-	ROMX_LOAD( "comx_11.u21", 0x0000, 0x4000, CRC(609d89cd) SHA1(799646810510d8236fbfafaff7a73d5170990f16), ROM_BIOS(2) )
+	ROMX_LOAD( "comx_11.u21", 0x0000, 0x4000, CRC(609d89cd) SHA1(799646810510d8236fbfafaff7a73d5170990f16), ROM_BIOS(1) )
 ROM_END
 
 
@@ -720,6 +722,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   STATE         INIT  COMPANY                         FULLNAME            FLAGS
-COMP( 1983, comx35p,    0,      0,      pal,        comx35, comx35_state, 0,    "Comx World Operations Ltd",    "COMX 35 (PAL)",    MACHINE_IMPERFECT_SOUND )
-COMP( 1983, comx35n,    comx35p,0,      ntsc,       comx35, comx35_state, 0,    "Comx World Operations Ltd",    "COMX 35 (NTSC)",   MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                      FULLNAME          FLAGS
+COMP( 1983, comx35p, 0,       0,      pal,     comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (PAL)",  MACHINE_IMPERFECT_SOUND )
+COMP( 1983, comx35n, comx35p, 0,      ntsc,    comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (NTSC)", MACHINE_IMPERFECT_SOUND )

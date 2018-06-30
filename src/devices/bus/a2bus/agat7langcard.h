@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "a2bus.h"
 
 //**************************************************************************
@@ -35,10 +34,10 @@ protected:
 	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
-	virtual void write_cnxx(address_space &space, uint8_t offset, uint8_t data) override;
-	virtual uint8_t read_inh_rom(address_space &space, uint16_t offset) override;
-	virtual void write_inh_rom(address_space &space, uint16_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_inh_rom(uint16_t offset) override;
+	virtual void write_inh_rom(uint16_t offset, uint8_t data) override;
 	virtual uint16_t inh_start() override { return 0xd000; }
 	virtual uint16_t inh_end() override { return 0xffff; }
 	virtual int inh_type() override;
@@ -47,15 +46,14 @@ private:
 	void do_io(int offset);
 
 	int m_inh_state;
-	int m_last_offset;
 	int m_dxxx_bank;
 	int m_main_bank;
-	uint8_t m_ram[32*1024];
+	uint8_t m_ram[32 * 1024];
 	uint8_t m_mode;
+	uint8_t m_csr;
 };
 
 // device type definition
-extern const device_type A2BUS_AGAT7LANGCARD;
 DECLARE_DEVICE_TYPE(A2BUS_AGAT7LANGCARD, a2bus_agat7langcard_device)
 
 #endif // MAME_BUS_A2BUS_AGAT7LANGCARD_H

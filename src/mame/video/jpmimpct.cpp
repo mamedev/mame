@@ -90,12 +90,12 @@ READ16_MEMBER(jpmimpct_state::jpmimpct_bt477_r)
 
 TMS340X0_TO_SHIFTREG_CB_MEMBER(jpmimpct_state::to_shiftreg)
 {
-	memcpy(shiftreg, &m_vram[TOWORD(address)], 512 * sizeof(uint16_t));
+	memcpy(shiftreg, &m_vram[address >> 4], 512 * sizeof(uint16_t));
 }
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(jpmimpct_state::from_shiftreg)
 {
-	memcpy(&m_vram[TOWORD(address)], shiftreg, 512 * sizeof(uint16_t));
+	memcpy(&m_vram[address >> 4], shiftreg, 512 * sizeof(uint16_t));
 }
 
 

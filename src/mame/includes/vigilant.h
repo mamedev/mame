@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour
 #include "audio/m72.h"
+#include "emupal.h"
 
 class vigilant_state : public driver_device
 {
@@ -57,4 +58,14 @@ public:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void vigilant_postload();
+	void vigilant(machine_config &config);
+	void kikcubic(machine_config &config);
+	void buccanrs(machine_config &config);
+	void buccanrs_sound_io_map(address_map &map);
+	void kikcubic_io_map(address_map &map);
+	void kikcubic_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void vigilant_io_map(address_map &map);
+	void vigilant_map(address_map &map);
 };

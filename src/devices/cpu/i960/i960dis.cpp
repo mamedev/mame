@@ -7,17 +7,10 @@
 */
 
 #include "emu.h"
-#include "i960.h"
 #include "i960dis.h"
 
-struct mnemonic_t
-{
-	const char      *mnem;
-	unsigned short  type;
-};
 
-
-static const mnemonic_t mnemonic[256] = {
+const i960_disassembler::mnemonic_t i960_disassembler::mnemonic[256] = {
 	{ "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, // 00
 	{ "b", 8 }, { "call", 8 }, { "ret", 9 }, { "bal", 8 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 },
 
@@ -67,7 +60,7 @@ static const mnemonic_t mnemonic[256] = {
 	{ "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }
 };
 
-static const mnemonic_t mnem_reg[100] =
+const i960_disassembler::mnemonic_t i960_disassembler::mnem_reg[100] =
 {
 	{ "notbit", 0x580 }, { "and", 0x581 }, { "andnot", 0x582 }, { "setbit", 0x583 }, { "notand",0x584 },
 	{ "xor", 0x586 }, { "or", 0x587 }, { "nor", 0x588 }, { "xnor",0x589 }, { "not",0x58a },
@@ -93,13 +86,13 @@ static const mnemonic_t mnem_reg[100] =
 	{ "ending_code",0 }
 };
 
-static const char *const constnames[32] =
+const char *const i960_disassembler::constnames[32] =
 {
 	"0x0", "0x1", "0x2", "0x3", "0x4", "0x5", "0x6", "0x7", "0x8", "0x9", "0xa", "0xb", "0xc", "0xd", "0xe", "0xf",
 	"0x10", "0x11", "0x12", "0x13", "0x14", "0x15", "0x16", "0x17", "0x18", "0x19", "0x1a", "0x1b", "0x1c", "0x1d", "0x1e", "0x1f"
 };
 
-static const char *const regnames[32] =
+const char *const i960_disassembler::regnames[32] =
 {
 	"pfp","sp","rip","r3", "r4","r5","r6","r7", "r8","r9","r10","r11", "r12","r13","r14","r15",
 	"g0","g1","g2","g3", "g4","g5","g6","g7", "g8","g9","g10","g11", "g12","g13","g14","fp",
@@ -128,118 +121,120 @@ static const char *const regnames[32] =
 #define COBRSRC1 ((iCode >> 19) & 0x1f)
 #define COBRSRC2 ((iCode >> 14) & 0x1f)
 
-static char *dis_decode_reg(unsigned long iCode, char* tmpStr,unsigned char cnt)
+std::string i960_disassembler::dis_decode_reg(u32 iCode, unsigned char cnt)
 {
-	char src1[10];
-	char src2[10];
-	char dst[10];
+	std::string src1, src2, dst;
 
-	if (S1) src1[0] = 0;
+	if (S1)
+		src1 = "";
 	else
 	{
-		if(M1)  sprintf(src1,"0x%lx",SRC1);
-		else        sprintf(src1,"%s",regnames[SRC1]);
+		if(M1)
+			src1 = util::string_format("0x%lx", SRC1);
+		else
+			src1 = util::string_format("%s", regnames[SRC1]);
 	}
-	if (S2) sprintf(src2,"reserved");
+
+	if (S2)
+		src2 = "reserved";
 	else
 	{
-		if(M2)  sprintf(src2,"0x%lx,",SRC2);
-		else        sprintf(src2,"%s,",regnames[SRC2]);
+		if(M2)
+			src2 = util::string_format("0x%lx,", SRC2);
+		else
+			src2 = util::string_format("%s,", regnames[SRC2]);
 	}
-	if(M3)      dst[0] = 0;
-	else            sprintf(dst,"%s,",regnames[DST]);
+
+	if(M3)
+		dst = "";
+	else
+		dst = util::string_format("%s,", regnames[DST]);
+
 	if (cnt == 1)
-		sprintf(tmpStr,"%s%s",dst,src1);
+		return util::string_format("%s%s", dst, src1);
 	else
-		sprintf(tmpStr,"%s%s%s",dst,src2,src1);
-	return tmpStr;
+		return util::string_format("%s%s%s", dst, src2, src1);
 }
 
-#define READ32(dis,offs) ((dis)->oprom[(offs) + 0] | ((dis)->oprom[(offs) + 1] << 8) | ((dis)->oprom[(offs) + 2] << 16) | ((dis)->oprom[(offs) + 3] << 24))
-
-static void i960_disassemble(disassemble_t *diss)
+offs_t i960_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	unsigned char op,op2;
-	unsigned char /*mode,*/ modeh, model;
-	unsigned char dst,abase,reg2;
-	unsigned short opc;
-	unsigned long iCode;
-	char tmpStr[256];
-	long i;
+	u32 IP = pc;
 
-	iCode = READ32(diss,0);
-	op = (unsigned char) (iCode >> 24);
-	op2 = (unsigned char) (iCode >> 7)&0xf;
+	u32 iCode = opcodes.r32(IP);
+	u8 op = (unsigned char) (iCode >> 24);
+	u8 op2 = (unsigned char) (iCode >> 7)&0xf;
+	u16 opc = 0;
+	u32 i = 0;
 
-	model = (unsigned char) (iCode >> 10) &0x3;
-	modeh = (unsigned char) (iCode >> 12) &0x3;
+	u8 model = (unsigned char) (iCode >> 10) &0x3;
+	u8 modeh = (unsigned char) (iCode >> 12) &0x3;
 	//mode = (unsigned char) (iCode >> 10) &0x7;
-	dst = (unsigned char) (iCode >> 19) &0x1f;
-	abase = (unsigned char) (iCode>>14)&0x1f;
-	reg2 = (unsigned char) (iCode)&0x1f;
+	u8 dst = (unsigned char) (iCode >> 19) &0x1f;
+	u8 abase = (unsigned char) (iCode>>14)&0x1f;
+	u8 reg2 = (unsigned char) (iCode)&0x1f;
 
-	diss->IPinc = 4;
-	diss->disflags = 0;
+	offs_t IPinc = 4;
+	offs_t disflags = 0;
 
 	if (op == 0x09 || op == 0x0b || op == 0x66 || op == 0x85 || op == 0x86)
-		diss->disflags = DASMFLAG_STEP_OVER;
+		disflags = STEP_OVER;
 	else if (op == 0x0a)
-		diss->disflags = DASMFLAG_STEP_OUT;
+		disflags = STEP_OUT;
 
 	switch(mnemonic[op].type)
 	{
 	case 0: // not yet implemented
-		util::stream_format(diss->stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
+		util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 		break;
 	case 1: // memory access
 		switch(modeh)
 		{
 		case 0:
-			util::stream_format(diss->stream, "%-8s%s,0x%lx",NEM,REG_DST, iCode&0xfff);
+			util::stream_format(stream, "%-8s%s,0x%lx",NEM,REG_DST, iCode&0xfff);
 			break;
 		case 1:
 			switch (model)
 			{
 			case 0:
-				util::stream_format(diss->stream, "%-8s%s,(%s)",NEM,REG_DST, REG_ABASE);
+				util::stream_format(stream, "%-8s%s,(%s)",NEM,REG_DST, REG_ABASE);
 				break;
 			case 3:
-				util::stream_format(diss->stream, "%-8s%s,(%s)[%s*%ld]",NEM,REG_DST, REG_ABASE,REG_REG2,(iCode>>7)&0x7);
+				util::stream_format(stream, "%-8s%s,(%s)[%s*%ld]",NEM,REG_DST, REG_ABASE,REG_REG2,(iCode>>7)&0x7);
 				break;
 			default:
-				util::stream_format(diss->stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
+				util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 				break;
 			}
 			break;
 		case 2:
-			util::stream_format(diss->stream, "%-8s%s,0x%lx(%s)",NEM,REG_DST, iCode&0xfff,REG_ABASE);
+			util::stream_format(stream, "%-8s%s,0x%lx(%s)",NEM,REG_DST, iCode&0xfff,REG_ABASE);
 			break;
 		case 3:
 			switch (model)
 			{
 			case 0:
-				util::stream_format(diss->stream, "%-8s%s,0x%x",NEM,REG_DST, READ32(diss,4));
-				diss->IPinc = 8;
+				util::stream_format(stream, "%-8s%s,0x%x",NEM,REG_DST, opcodes.r32(IP + 4));
+				IPinc = 8;
 				break;
 			case 1:
-				util::stream_format(diss->stream, "%-8s%s,0x%x(%s)",NEM,REG_DST, READ32(diss,4),REG_ABASE);
-				diss->IPinc = 8;
+				util::stream_format(stream, "%-8s%s,0x%x(%s)",NEM,REG_DST, opcodes.r32(IP + 4),REG_ABASE);
+				IPinc = 8;
 				break;
 			case 2:
-				util::stream_format(diss->stream, "%-8s%s,0x%x[%s*%ld]",NEM,REG_DST, READ32(diss,4),REG_REG2,(iCode>>7)&0x7);
-				diss->IPinc = 8;
+				util::stream_format(stream, "%-8s%s,0x%x[%s*%ld]",NEM,REG_DST, opcodes.r32(IP + 4),REG_REG2,(iCode>>7)&0x7);
+				IPinc = 8;
 				break;
 			case 3:
-				util::stream_format(diss->stream, "%-8s%s,0x%x(%s)[%s*%ld]",NEM,REG_DST, READ32(diss,4),REG_ABASE,REG_REG2,(iCode>>7)&0x7);
-				diss->IPinc = 8;
+				util::stream_format(stream, "%-8s%s,0x%x(%s)[%s*%ld]",NEM,REG_DST, opcodes.r32(IP + 4),REG_ABASE,REG_REG2,(iCode>>7)&0x7);
+				IPinc = 8;
 				break;
 			default:
-				util::stream_format(diss->stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
+				util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 				break;
 			}
 			break;
 		default:
-			util::stream_format(diss->stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
+			util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 			break;
 		}
 		break;
@@ -253,8 +248,8 @@ static void i960_disassemble(disassemble_t *diss)
 			i++;
 		}
 
-		if (mnem_reg[i].type == opc) util::stream_format(diss->stream, "%-8s%s", mnem_reg[i].mnem,dis_decode_reg(iCode,tmpStr,1));
-		else util::stream_format(diss->stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
+		if (mnem_reg[i].type == opc) util::stream_format(stream, "%-8s%s", mnem_reg[i].mnem,dis_decode_reg(iCode,1));
+		else util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 		break;
 	case 3:
 		i = 0;
@@ -266,38 +261,34 @@ static void i960_disassemble(disassemble_t *diss)
 			i++;
 		}
 
-		if (mnem_reg[i].type == opc) util::stream_format(diss->stream, "%-8s%s", mnem_reg[i].mnem,dis_decode_reg(iCode,tmpStr,0));
-		else util::stream_format(diss->stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
+		if (mnem_reg[i].type == opc) util::stream_format(stream, "%-8s%s", mnem_reg[i].mnem,dis_decode_reg(iCode,0));
+		else util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 		break;
 
 	case 6: // bitpos and branch type
-		util::stream_format(diss->stream, "%-8s%ld,%s,0x%lx",NEM, COBRSRC1, REG_COBR_SRC2,((((long)iCode&0x00fffffc)<<19)>>19) + (diss->IP));
+		util::stream_format(stream, "%-8s%ld,%s,0x%lx",NEM, COBRSRC1, REG_COBR_SRC2,((((s32)iCode&0x00fffffc)<<19)>>19) + (IP));
 		break;
 	case 7: // compare and branch type
-		util::stream_format(diss->stream, "%-8s%s,%s,0x%lx",NEM,REG_COBR_SRC1,REG_COBR_SRC2,((((long)iCode&0x00fffffc)<<19)>>19) + (diss->IP));
+		util::stream_format(stream, "%-8s%s,%s,0x%lx",NEM,REG_COBR_SRC1,REG_COBR_SRC2,((((s32)iCode&0x00fffffc)<<19)>>19) + (IP));
 		break;
 	case 8: // target type
-		util::stream_format(diss->stream, "%-8s%08lx",NEM,((((long)iCode&0x00fffffc)<<8)>>8) + (diss->IP));
+		util::stream_format(stream, "%-8s%08lx",NEM,((((s32)iCode&0x00fffffc)<<8)>>8) + (IP));
 		break;
 	case 9: // no operands
-		util::stream_format(diss->stream, "%s",NEM);
+		util::stream_format(stream, "%s",NEM);
 		break;
 	case 10: // TEST type: register only
-		util::stream_format(diss->stream, "%s %s", NEM, REG_DST);
+		util::stream_format(stream, "%s %s", NEM, REG_DST);
 		break;
 	default:
-		diss->stream << "???";
+		stream << "???";
 		break;
 	}
+
+	return IPinc | disflags | SUPPORTED;
 }
 
-
-
-CPU_DISASSEMBLE(i960)
+u32 i960_disassembler::opcode_alignment() const
 {
-	disassemble_t dis(stream, pc, oprom);
-
-	i960_disassemble(&dis);
-
-	return dis.IPinc | dis.disflags | DASMFLAG_SUPPORTED;
+	return 4;
 }

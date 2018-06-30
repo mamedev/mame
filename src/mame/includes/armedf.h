@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Phil Stroffolino, Carlos A. Lozano
 
-#include "includes/nb1414m4.h"
+#include "machine/nb1414m4.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class armedf_state : public driver_device
 {
@@ -79,14 +80,14 @@ public:
 	DECLARE_WRITE16_MEMBER(armedf_fg_scrolly_w);
 	DECLARE_WRITE16_MEMBER(armedf_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(armedf_bg_scrolly_w);
-	DECLARE_DRIVER_INIT(cclimbr2);
-	DECLARE_DRIVER_INIT(armedf);
-	DECLARE_DRIVER_INIT(legion);
-	DECLARE_DRIVER_INIT(terrafu);
-	DECLARE_DRIVER_INIT(legionjb);
-	DECLARE_DRIVER_INIT(kozure);
-	DECLARE_DRIVER_INIT(terraf);
-	DECLARE_DRIVER_INIT(terrafjb);
+	void init_cclimbr2();
+	void init_armedf();
+	void init_legion();
+	void init_terrafu();
+	void init_legionjb();
+	void init_kozure();
+	void init_terraf();
+	void init_terrafjb();
 	TILEMAP_MAPPER_MEMBER(armedf_scan_type1);
 	TILEMAP_MAPPER_MEMBER(armedf_scan_type2);
 	TILEMAP_MAPPER_MEMBER(armedf_scan_type3);
@@ -103,6 +104,27 @@ public:
 	void armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 						uint32_t code,uint32_t color, uint32_t clut,int flipx,int flipy,int offsx,int offsy,
 						int transparent_color);
+	void terraf_sound(machine_config &config);
+	void terrafb(machine_config &config);
+	void legion(machine_config &config);
+	void terraf(machine_config &config);
+	void legionjb(machine_config &config);
+	void cclimbr2(machine_config &config);
+	void terrafjb(machine_config &config);
+	void armedf(machine_config &config);
+	void kozure(machine_config &config);
+	void armedf_map(address_map &map);
+	void cclimbr2_map(address_map &map);
+	void cclimbr2_soundmap(address_map &map);
+	void kozure_map(address_map &map);
+	void legion_map(address_map &map);
+	void legionjb_map(address_map &map);
+	void sound_3526_portmap(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void terraf_map(address_map &map);
+	void terrafjb_extraz80_map(address_map &map);
+	void terrafjb_extraz80_portmap(address_map &map);
 };
 
 class bigfghtr_state : public armedf_state
@@ -121,4 +143,8 @@ public:
 	DECLARE_WRITE8_MEMBER(main_sharedram_w);
 	DECLARE_READ8_MEMBER(main_sharedram_r);
 	DECLARE_WRITE8_MEMBER(mcu_spritelist_w);
+	void bigfghtr(machine_config &config);
+	void bigfghtr_map(address_map &map);
+	void bigfghtr_mcu_io_map(address_map &map);
+	void bigfghtr_mcu_map(address_map &map);
 };

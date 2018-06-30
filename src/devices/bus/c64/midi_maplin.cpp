@@ -44,18 +44,18 @@ WRITE_LINE_MEMBER( c64_maplin_midi_cartridge_device::write_acia_clock )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_maplin_midi_cartridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_maplin_midi_cartridge_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(c64_maplin_midi_cartridge_device, acia_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, c64_maplin_midi_cartridge_device, acia_irq_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(MC6850_TAG, acia6850_device, write_rxd))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_TAG, acia6850_device, write_rxd))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(c64_maplin_midi_cartridge_device, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, c64_maplin_midi_cartridge_device, write_acia_clock))
 MACHINE_CONFIG_END
 
 
@@ -107,11 +107,8 @@ uint8_t c64_maplin_midi_cartridge_device::c64_cd_r(address_space &space, offs_t 
 		switch (offset & 0xff)
 		{
 		case 0:
-			data = m_acia->status_r(space, 0);
-			break;
-
 		case 1:
-			data = m_acia->data_r(space, 0);
+			data = m_acia->read(space, offset & 1);
 			break;
 		}
 	}
@@ -131,11 +128,8 @@ void c64_maplin_midi_cartridge_device::c64_cd_w(address_space &space, offs_t off
 		switch (offset & 0xff)
 		{
 		case 0:
-			m_acia->control_w(space, 0, data);
-			break;
-
 		case 1:
-			m_acia->data_w(space, 0, data);
+			m_acia->write(space, offset & 1, data);
 			break;
 		}
 	}

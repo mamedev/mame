@@ -3,18 +3,21 @@
 /*************************************************************************
 
     Incredible Technologies/Strata system
-    (8-bit blitter variant)
+    (32-bit blitter variant)
 
 **************************************************************************/
 
 #include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "machine/timekpr.h"
+#include "emupal.h"
 #include "screen.h"
 
-#define VIDEO_CLOCK     XTAL_8MHz           /* video (pixel) clock */
-#define CPU_CLOCK       XTAL_12MHz          /* clock for 68000-based systems */
-#define CPU020_CLOCK    XTAL_25MHz          /* clock for 68EC020-based systems */
-#define SOUND_CLOCK     XTAL_16MHz          /* clock for sound board */
-#define TMS_CLOCK       XTAL_40MHz          /* TMS320C31 clocks on drivedge */
+#define VIDEO_CLOCK     XTAL(8'000'000)           /* video (pixel) clock */
+#define CPU_CLOCK       XTAL(12'000'000)          /* clock for 68000-based systems */
+#define CPU020_CLOCK    XTAL(25'000'000)          /* clock for 68EC020-based systems */
+#define SOUND_CLOCK     XTAL(16'000'000)          /* clock for sound board */
+#define TMS_CLOCK       XTAL(40'000'000)          /* TMS320C31 clocks on drivedge */
 
 
 class itech32_state : public driver_device
@@ -28,6 +31,8 @@ public:
 		m_dsp2(*this, "dsp2"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_ticket(*this, "ticket"),
+		m_timekeeper(*this, "m48t02"),
 		m_main_ram(*this, "main_ram", 0),
 		m_nvram(*this, "nvram", 0),
 		m_video(*this, "video", 0),
@@ -35,15 +40,46 @@ public:
 		m_drivedge_zbuf_control(*this, "drivedge_zctl"),
 		m_tms1_boot(*this, "tms1_boot"),
 		m_tms1_ram(*this, "tms1_ram"),
-		m_tms2_ram(*this, "tms2_ram") { }
+		m_tms2_ram(*this, "tms2_ram"),
+		m_leds(*this, "led%u", 0U)
+	{ }
 
+	void tourny(machine_config &config);
+	void sftm(machine_config &config);
+	void drivedge(machine_config &config);
+	void bloodstm(machine_config &config);
+	void timekill(machine_config &config);
 
+	void init_gtclasscp();
+	void init_shufshot();
+	void init_wcbowlt();
+	void init_hardyard();
+	void init_s_ver();
+	void init_sftm110();
+	void init_wcbowln();
+	void init_gt2kp();
+	void init_sftm();
+	void init_drivedge();
+	void init_wcbowl();
+	void init_wcbowlj();
+	void init_aamat();
+	void init_bloodstm();
+	void init_aama();
+	void init_timekill();
+	void init_gt3d();
+	void init_gt3dl();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(special_port_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_dsp1;
 	optional_device<cpu_device> m_dsp2;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ticket_dispenser_device> m_ticket;
+	optional_device<timekeeper_device> m_timekeeper;
 
 	optional_shared_ptr<uint16_t> m_main_ram;
 	optional_shared_ptr<uint16_t> m_nvram;
@@ -53,6 +89,7 @@ public:
 	optional_shared_ptr<uint32_t> m_tms1_boot;
 	optional_shared_ptr<uint32_t> m_tms1_ram;
 	optional_shared_ptr<uint32_t> m_tms2_ram;
+	output_finder<4> m_leds;
 
 	void nvram_init(nvram_device &nvram, void *base, size_t length);
 
@@ -147,29 +184,10 @@ public:
 	DECLARE_WRITE32_MEMBER(itech020_video_w);
 	DECLARE_WRITE32_MEMBER(drivedge_zbuf_control_w);
 	DECLARE_READ32_MEMBER(itech020_video_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(special_port_r);
 	DECLARE_WRITE8_MEMBER(drivedge_portb_out);
 	DECLARE_WRITE_LINE_MEMBER(drivedge_turbo_light);
 	DECLARE_WRITE8_MEMBER(pia_portb_out);
 
-	DECLARE_DRIVER_INIT(gtclasscp);
-	DECLARE_DRIVER_INIT(shufshot);
-	DECLARE_DRIVER_INIT(wcbowlt);
-	DECLARE_DRIVER_INIT(hardyard);
-	DECLARE_DRIVER_INIT(s_ver);
-	DECLARE_DRIVER_INIT(sftm110);
-	DECLARE_DRIVER_INIT(wcbowln);
-	DECLARE_DRIVER_INIT(gt2kp);
-	DECLARE_DRIVER_INIT(sftm);
-	DECLARE_DRIVER_INIT(drivedge);
-	DECLARE_DRIVER_INIT(wcbowl);
-	DECLARE_DRIVER_INIT(wcbowlj);
-	DECLARE_DRIVER_INIT(aamat);
-	DECLARE_DRIVER_INIT(bloodstm);
-	DECLARE_DRIVER_INIT(aama);
-	DECLARE_DRIVER_INIT(timekill);
-	DECLARE_DRIVER_INIT(gt3d);
-	DECLARE_DRIVER_INIT(gt3dl);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -181,7 +199,7 @@ public:
 	void init_gt_common();
 
 	uint32_t screen_update_itech32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(generate_int1);
+	WRITE_LINE_MEMBER(generate_int1);
 	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	inline offs_t compute_safe_address(int x, int y);
@@ -199,4 +217,12 @@ public:
 	void handle_video_command();
 	inline int determine_irq_state(int vint, int xint, int qint);
 	void itech32_update_interrupts(int vint, int xint, int qint);
+	void bloodstm_map(address_map &map);
+	void drivedge_map(address_map &map);
+	void drivedge_tms1_map(address_map &map);
+	void drivedge_tms2_map(address_map &map);
+	void itech020_map(address_map &map);
+	void sound_020_map(address_map &map);
+	void sound_map(address_map &map);
+	void timekill_map(address_map &map);
 };

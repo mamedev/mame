@@ -6,8 +6,8 @@
 
 *************************************************************************/
 
-#ifndef _ESRIPSYS_H_
-#define _ESRIPSYS_H_
+#ifndef MAME_INCLUDES_ESRIPSYS_H
+#define MAME_INCLUDES_ESRIPSYS_H
 
 #pragma once
 
@@ -17,7 +17,7 @@
 #include "screen.h"
 
 /* TODO */
-#define ESRIPSYS_PIXEL_CLOCK    (XTAL_25MHz / 2)
+#define ESRIPSYS_PIXEL_CLOCK    (XTAL(25'000'000) / 2)
 #define ESRIPSYS_HTOTAL         (512 + 141 + 2)
 #define ESRIPSYS_HBLANK_START   (512)
 #define ESRIPSYS_HBLANK_END     (0)
@@ -49,6 +49,14 @@ public:
 			m_dac(*this, "dac"),
 			m_screen(*this, "screen") { }
 
+	void esripsys(machine_config &config);
+
+	void init_esripsys();
+
+	DECLARE_INPUT_CHANGED_MEMBER(keypad_interrupt);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_interrupt);
+
+private:
 	required_device<cpu_device> m_framecpu;
 	required_device<esrip_device> m_videocpu;
 	required_device<cpu_device> m_gamecpu;
@@ -112,11 +120,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tms5220_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(esripsys_bg_intensity_w);
-	DECLARE_INPUT_CHANGED_MEMBER(keypad_interrupt);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	DECLARE_WRITE8_MEMBER(esripsys_dac_w);
-	DECLARE_DRIVER_INIT(esripsys);
 	virtual void video_start() override;
 	uint32_t screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(esripsys_vblank_irq);
@@ -126,6 +131,10 @@ public:
 	required_device<dac_word_interface> m_dac;
 	required_device<screen_device> m_screen;
 	ESRIP_DRAW(esripsys_draw);
+	void frame_cpu_map(address_map &map);
+	void game_cpu_map(address_map &map);
+	void sound_cpu_map(address_map &map);
+	void video_cpu_map(address_map &map);
 };
 
-#endif // _ESRIPSYS_H_
+#endif // MAME_INCLUDES_ESRIPSYS_H

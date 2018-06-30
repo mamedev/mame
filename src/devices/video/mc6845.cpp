@@ -129,13 +129,13 @@ void mc6845_device::call_on_update_address(int strobe)
 }
 
 
-WRITE8_MEMBER( mc6845_device::address_w )
+void mc6845_device::write_address(uint8_t data)
 {
 	m_register_address_latch = data & 0x1f;
 }
 
 
-READ8_MEMBER( mc6845_device::status_r )
+uint8_t mc6845_device::read_status()
 {
 	uint8_t ret = 0;
 
@@ -155,7 +155,30 @@ READ8_MEMBER( mc6845_device::status_r )
 }
 
 
-READ8_MEMBER( mc6845_device::register_r )
+void mc6845_device::transparent_update()
+{
+	if (m_supports_transparent && MODE_TRANSPARENT)
+	{
+		if (MODE_TRANSPARENT_PHI2)
+		{
+			m_update_addr++;
+			m_update_addr &= 0x3fff;
+			call_on_update_address(0);
+		}
+		else
+		{
+			/* MODE_TRANSPARENT_BLANK */
+			if (m_update_ready_bit)
+			{
+				m_update_ready_bit = false;
+				update_upd_adr_timer();
+			}
+		}
+	}
+}
+
+
+uint8_t mc6845_device::read_register()
 {
 	uint8_t ret = 0;
 
@@ -167,26 +190,7 @@ READ8_MEMBER( mc6845_device::register_r )
 		case 0x0f:  ret = (m_cursor_addr    >> 0) & 0xff; break;
 		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = false; break;
 		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = false; break;
-		case 0x1f:
-			if (m_supports_transparent && MODE_TRANSPARENT)
-			{
-				if(MODE_TRANSPARENT_PHI2)
-				{
-					m_update_addr++;
-					m_update_addr &= 0x3fff;
-					call_on_update_address(0);
-				}
-				else
-				{
-					/* MODE_TRANSPARENT_BLANK */
-					if(m_update_ready_bit)
-					{
-						m_update_ready_bit = false;
-						update_upd_adr_timer();
-					}
-				}
-			}
-			break;
+		case 0x1f:  transparent_update(); break;
 
 		/* all other registers are write only and return 0 */
 		default: break;
@@ -196,7 +200,7 @@ READ8_MEMBER( mc6845_device::register_r )
 }
 
 
-WRITE8_MEMBER( mc6845_device::register_w )
+void mc6845_device::write_register(uint8_t data)
 {
 	LOG("%s:M6845 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
@@ -236,26 +240,7 @@ WRITE8_MEMBER( mc6845_device::register_w )
 					call_on_update_address(0);
 			}
 			break;
-		case 0x1f:
-			if (m_supports_transparent && MODE_TRANSPARENT)
-			{
-				if(MODE_TRANSPARENT_PHI2)
-				{
-					m_update_addr++;
-					m_update_addr &= 0x3fff;
-					call_on_update_address(0);
-				}
-				else
-				{
-					/* MODE_TRANSPARENT_BLANK */
-					if(m_update_ready_bit)
-					{
-						m_update_ready_bit = false;
-						update_upd_adr_timer();
-					}
-				}
-			}
-			break;
+		case 0x1f:  transparent_update(); break;
 		default: break;
 	}
 
@@ -578,8 +563,8 @@ void mc6845_device::recompute_parameters(bool postload)
 			LOG("M6845 config screen: HTOTAL: %d  VTOTAL: %d  MAX_X: %d  MAX_Y: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
-			if ( m_screen != nullptr )
-				m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+			if (has_screen())
+				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			if(!m_reconfigure_cb.isnull())
 				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh);
@@ -749,8 +734,8 @@ void mc6845_device::handle_line_timer()
 			/* also update the cursor state now */
 			update_cursor_state();
 
-			if (m_screen != nullptr)
-				m_screen->reset_origin();
+			if (has_screen())
+				screen().reset_origin();
 		}
 		else
 		{
@@ -1347,6 +1332,24 @@ void mos8563_device::device_start()
 		data ^= 0xff;
 	}
 
+	// VICE palette
+	set_pen_color(0, rgb_t::black());
+	set_pen_color(1, rgb_t(0x55, 0x55, 0x55));
+	set_pen_color(2, rgb_t(0x00, 0x00, 0xaa));
+	set_pen_color(3, rgb_t(0x55, 0x55, 0xff));
+	set_pen_color(4, rgb_t(0x00, 0xaa, 0x00));
+	set_pen_color(5, rgb_t(0x55, 0xff, 0x55));
+	set_pen_color(6, rgb_t(0x00, 0xaa, 0xaa));
+	set_pen_color(7, rgb_t(0x55, 0xff, 0xff));
+	set_pen_color(8, rgb_t(0xaa, 0x00, 0x00));
+	set_pen_color(9, rgb_t(0xff, 0x55, 0x55));
+	set_pen_color(10, rgb_t(0xaa, 0x00, 0xaa));
+	set_pen_color(11, rgb_t(0xff, 0x55, 0xff));
+	set_pen_color(12, rgb_t(0xaa, 0x55, 0x00));
+	set_pen_color(13, rgb_t(0xff, 0xff, 0x55));
+	set_pen_color(14, rgb_t(0xaa, 0xaa, 0xaa));
+	set_pen_color(15, rgb_t::white());
+
 	save_item(NAME(m_char_buffer));
 	save_item(NAME(m_attr_buffer));
 	save_item(NAME(m_attribute_addr));
@@ -1433,9 +1436,10 @@ device_memory_interface::space_config_vector mos8563_device::memory_space_config
 }
 
 // default address maps
-static ADDRESS_MAP_START( mos8563_videoram_map, 0, 8, mos8563_device )
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mos8563_device::mos8563_videoram_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
 
 
 r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1500,8 +1504,8 @@ ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag,
 mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, type, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
-		m_palette(*this, "palette")
+		device_palette_interface(mconfig, *this),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mos8563_device::mos8563_videoram_map), this))
 {
 	set_clock_scale(1.0/8);
 }
@@ -1516,34 +1520,6 @@ mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, d
 mos8568_device::mos8568_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mos8563_device(mconfig, MOS8568, tag, owner, clock)
 {
-}
-
-
-MACHINE_CONFIG_MEMBER(mos8563_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(mos8563_device, mos8563)
-MACHINE_CONFIG_END
-
-
-// VICE palette
-PALETTE_INIT_MEMBER(mos8563_device, mos8563)
-{
-	palette.set_pen_color(0, rgb_t::black());
-	palette.set_pen_color(1, rgb_t(0x55, 0x55, 0x55));
-	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0xaa));
-	palette.set_pen_color(3, rgb_t(0x55, 0x55, 0xff));
-	palette.set_pen_color(4, rgb_t(0x00, 0xaa, 0x00));
-	palette.set_pen_color(5, rgb_t(0x55, 0xff, 0x55));
-	palette.set_pen_color(6, rgb_t(0x00, 0xaa, 0xaa));
-	palette.set_pen_color(7, rgb_t(0x55, 0xff, 0xff));
-	palette.set_pen_color(8, rgb_t(0xaa, 0x00, 0x00));
-	palette.set_pen_color(9, rgb_t(0xff, 0x55, 0x55));
-	palette.set_pen_color(10, rgb_t(0xaa, 0x00, 0xaa));
-	palette.set_pen_color(11, rgb_t(0xff, 0x55, 0xff));
-	palette.set_pen_color(12, rgb_t(0xaa, 0x55, 0x00));
-	palette.set_pen_color(13, rgb_t(0xff, 0xff, 0x55));
-	palette.set_pen_color(14, rgb_t(0xaa, 0xaa, 0xaa));
-	palette.set_pen_color(15, rgb_t::white());
 }
 
 
@@ -1582,8 +1558,6 @@ uint8_t mos8563_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectang
 
 MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
-
 	ra += (m_vert_scroll & 0x0f);
 	ra &= 0x0f;
 
@@ -1621,7 +1595,7 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 				if (x < 0) x = 0;
 				int color = BIT(code, 7) ? fg : bg;
 
-				bitmap.pix32(vbp + y, hbp + x) = pen[de ? color : 0];
+				bitmap.pix32(vbp + y, hbp + x) = pen(de ? color : 0);
 			}
 		}
 		else
@@ -1657,7 +1631,7 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 				if (x < 0) x = 0;
 				int color = BIT(data, 7) ? fg : bg;
 
-				bitmap.pix32(vbp + y, hbp + x) = pen[de ? color : 0];
+				bitmap.pix32(vbp + y, hbp + x) = pen(de ? color : 0);
 
 				if ((bit < 8) || !HSS_SEMI) data <<= 1;
 			}

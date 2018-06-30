@@ -5,12 +5,13 @@
 
 DEFINE_DEVICE_TYPE(LPC_PIT, lpc_pit_device, "lpc_pit", "LPC PIT")
 
-DEVICE_ADDRESS_MAP_START(map, 32, lpc_pit_device)
-	AM_RANGE(0x40, 0x43) AM_READWRITE8(status_r, access_w,  0x00ffffff)
-	AM_RANGE(0x40, 0x43) AM_WRITE8    (          control_w, 0xff000000)
-	AM_RANGE(0x50, 0x53) AM_READWRITE8(status_r, access_w,  0x00ffffff)
-	AM_RANGE(0x50, 0x53) AM_WRITE8    (          control_w, 0xff000000)
-ADDRESS_MAP_END
+void lpc_pit_device::map(address_map &map)
+{
+	map(0x40, 0x42).rw(FUNC(lpc_pit_device::status_r), FUNC(lpc_pit_device::access_w));
+	map(0x43, 0x43).w(FUNC(lpc_pit_device::control_w));
+	map(0x50, 0x52).rw(FUNC(lpc_pit_device::status_r), FUNC(lpc_pit_device::access_w));
+	map(0x53, 0x53).w(FUNC(lpc_pit_device::control_w));
+}
 
 lpc_pit_device::lpc_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: lpc_device(mconfig, LPC_PIT, tag, owner, clock)

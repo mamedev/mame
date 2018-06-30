@@ -7,7 +7,7 @@ set(SOURCES
     hlslGrammar.cpp
     hlslParseables.cpp)
 
-  set(HEADERS
+set(HEADERS
     hlslAttributes.h
     hlslParseHelper.h
     hlslTokens.h
@@ -19,10 +19,13 @@ set(SOURCES
 
 add_library(HLSL STATIC ${SOURCES} ${HEADERS})
 set_property(TARGET HLSL PROPERTY FOLDER hlsl)
+set_property(TARGET HLSL PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 if(WIN32)
     source_group("Source" FILES ${SOURCES} ${HEADERS})
 endif(WIN32)
 
-install(TARGETS HLSL
-        ARCHIVE DESTINATION lib)
+if(ENABLE_GLSLANG_INSTALL)
+    install(TARGETS HLSL
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif(ENABLE_GLSLANG_INSTALL)

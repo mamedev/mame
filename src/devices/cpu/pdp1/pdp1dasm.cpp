@@ -1,13 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Raphael Nabet
 #include "emu.h"
-#include "cpu/pdp1/pdp1.h"
+#include "pdp1dasm.h"
+#include "pdp1.h"
 
-/* PDP1 registers */
-static int ib;
-static int y;
-
-static inline void ea (void)
+inline void pdp1_disassembler::ea()
 {
 /*  while (1)
     {
@@ -20,15 +17,20 @@ static inline void ea (void)
 
 #define IN if (ib) util::stream_format(stream, " i")
 
-CPU_DISASSEMBLE(pdp1)
+u32 pdp1_disassembler::opcode_alignment() const
+{
+	return 4;
+}
+
+offs_t pdp1_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	int md;
 	//int etime = 0;
 
-	md = oprom[0] << 24 | oprom[1] << 16 | oprom[2] << 8 | oprom[3];
+	md = opcodes.r32(pc);
 
-	y = md & 07777;
-	ib = (md >> 12) & 1;               /* */
+	int y = md & 07777;
+	int ib = (md >> 12) & 1;               /* */
 	switch (md >> 13)
 	{
 	case pdp1_device::AND:

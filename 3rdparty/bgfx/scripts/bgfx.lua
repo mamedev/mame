@@ -36,9 +36,13 @@ function overridefiles(_srcPath, _dstPath, _files)
 end
 
 function bgfxProject(_name, _kind, _defines)
-
 	project ("bgfx" .. _name)
 		uuid (os.uuid("bgfx" .. _name))
+		bgfxProjectBase(_kind, _defines)
+		copyLib()
+end
+
+function bgfxProjectBase(_kind, _defines)
 		kind (_kind)
 
 		if _kind == "SharedLib" then
@@ -47,6 +51,7 @@ function bgfxProject(_name, _kind, _defines)
 			}
 
 			links {
+				"bimg",
 				"bx",
 			}
 
@@ -73,6 +78,7 @@ function bgfxProject(_name, _kind, _defines)
 			path.join(BGFX_DIR, "3rdparty"),
 			path.join(BGFX_DIR, "3rdparty/dxsdk/include"),
 			path.join(BX_DIR,   "include"),
+			path.join(BIMG_DIR, "include"),
 		}
 
 		defines {
@@ -141,10 +147,11 @@ function bgfxProject(_name, _kind, _defines)
 				"-weak_framework MetalKit",
 			}
 
-		configuration { "not nacl", "not linux-steamlink" }
+		configuration { "not nacl", "not linux-steamlink", "not NX32", "not NX64" }
 			includedirs {
 				--nacl has GLES2 headers modified...
 				--steamlink has EGL headers modified...
+				--NX has EGL headers modified...
 				path.join(BGFX_DIR, "3rdparty/khronos"),
 			}
 
@@ -220,6 +227,4 @@ function bgfxProject(_name, _kind, _defines)
 		end
 
 		configuration {}
-
-		copyLib()
 end

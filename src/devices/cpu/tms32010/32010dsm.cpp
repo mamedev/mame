@@ -25,153 +25,133 @@
 	\**************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
+#include "32010dsm.h"
+
 #include <ctype.h>
-
-#include "tms32010.h"
-
+#include <stdexcept>
 
 
-typedef unsigned char byte;
-typedef unsigned short int word;
-
-#define FMT(a,b) a, b
-#define PTRS_PER_FORMAT 2
-
-static const char *const arith[4] = { "*" , "*-" , "*+" , "??" } ;
-static const char *const nextar[4] = { ",AR0" , ",AR1" , "" , "" } ;
+const char *const tms32010_disassembler::arith[4] = { "*" , "*-" , "*+" , "??" } ;
+const char *const tms32010_disassembler::nextar[4] = { ",AR0" , ",AR1" , "" , "" } ;
 
 
-static const char *const TMS32010Formats[] = {
-	FMT("0000ssss0aaaaaaa", "add  %A%S"),
-	FMT("0000ssss10mmn00n", "add  %M%S%N"),
-	FMT("0001ssss0aaaaaaa", "sub  %A%S"),
-	FMT("0001ssss10mmn00n", "sub  %M%S%N"),
-	FMT("0010ssss0aaaaaaa", "lac  %A%S"),
-	FMT("0010ssss10mmn00n", "lac  %M%S%N"),
-	FMT("0011000r0aaaaaaa", "sar  %R,%A"),
-	FMT("0011000r10mmn00n", "sar  %R%M%N"),
-	FMT("0011100r0aaaaaaa", "lar  %R,%A"),
-	FMT("0011100r10mmn00n", "lar  %R%M%N"),
-	FMT("01000ppp0aaaaaaa", "in   %A,%P"),
-	FMT("01000ppp10mmn00n", "in   %M,%P%N"),
-	FMT("01001ppp0aaaaaaa", "out  %A,%P"),
-	FMT("01001ppp10mmn00n", "out  %M,%P%N"),
-	FMT("01010sss0aaaaaaa", "sacl %A"),     /* This instruction has a shift but */
-	FMT("01010sss10mmn00n", "sacl %M%N"),   /* is documented as not performed */
-	FMT("01011sss0aaaaaaa", "sach %A%S"),
-	FMT("01011sss10mmn00n", "sach %M%S%N"),
-	FMT("011000000aaaaaaa", "addh %A"),
-	FMT("0110000010mmn00n", "addh %M%N"),
-	FMT("011000010aaaaaaa", "adds %A"),
-	FMT("0110000110mmn00n", "adds %M%N"),
-	FMT("011000100aaaaaaa", "subh %A"),
-	FMT("0110001010mmn00n", "subh %M%N"),
-	FMT("011000110aaaaaaa", "subs %A"),
-	FMT("0110001110mmn00n", "subs %M%N"),
-	FMT("011001000aaaaaaa", "subc %A"),
-	FMT("0110010010mmn00n", "subc %M%N"),
-	FMT("011001010aaaaaaa", "zalh %A"),
-	FMT("0110010110mmn00n", "zalh %M%N"),
-	FMT("011001100aaaaaaa", "zals %A"),
-	FMT("0110011010mmn00n", "zals %M%N"),
-	FMT("011001110aaaaaaa", "tblr %A"),
-	FMT("0110011110mmn00n", "tblr %M%N"),
-	FMT("011010001000000k", "larp %K"),
-	FMT("011010000aaaaaaa", "mar  %A"),     /* Actually this is executed as a NOP */
-/*  FMT("0110100010mmn00n", "mar  %M%N"),   */
+const char *const tms32010_disassembler::TMS32010Formats[] = {
+	"0000ssss0aaaaaaa", "add  %A%S",
+	"0000ssss10mmn00n", "add  %M%S%N",
+	"0001ssss0aaaaaaa", "sub  %A%S",
+	"0001ssss10mmn00n", "sub  %M%S%N",
+	"0010ssss0aaaaaaa", "lac  %A%S",
+	"0010ssss10mmn00n", "lac  %M%S%N",
+	"0011000r0aaaaaaa", "sar  %R,%A",
+	"0011000r10mmn00n", "sar  %R%M%N",
+	"0011100r0aaaaaaa", "lar  %R,%A",
+	"0011100r10mmn00n", "lar  %R%M%N",
+	"01000ppp0aaaaaaa", "in   %A,%P",
+	"01000ppp10mmn00n", "in   %M,%P%N",
+	"01001ppp0aaaaaaa", "out  %A,%P",
+	"01001ppp10mmn00n", "out  %M,%P%N",
+	"01010sss0aaaaaaa", "sacl %A",     /* This instruction has a shift but */
+	"01010sss10mmn00n", "sacl %M%N",   /* is documented as not performed */
+	"01011sss0aaaaaaa", "sach %A%S",
+	"01011sss10mmn00n", "sach %M%S%N",
+	"011000000aaaaaaa", "addh %A",
+	"0110000010mmn00n", "addh %M%N",
+	"011000010aaaaaaa", "adds %A",
+	"0110000110mmn00n", "adds %M%N",
+	"011000100aaaaaaa", "subh %A",
+	"0110001010mmn00n", "subh %M%N",
+	"011000110aaaaaaa", "subs %A",
+	"0110001110mmn00n", "subs %M%N",
+	"011001000aaaaaaa", "subc %A",
+	"0110010010mmn00n", "subc %M%N",
+	"011001010aaaaaaa", "zalh %A",
+	"0110010110mmn00n", "zalh %M%N",
+	"011001100aaaaaaa", "zals %A",
+	"0110011010mmn00n", "zals %M%N",
+	"011001110aaaaaaa", "tblr %A",
+	"0110011110mmn00n", "tblr %M%N",
+	"011010001000000k", "larp %K",
+	"011010000aaaaaaa", "mar  %A",     /* Actually this is executed as a NOP */
+/*  "0110100010mmn00n", "mar  %M%N",   */
 /*  MAR indirect has been expanded out to all its variations because one of */
 /*  its opcodes is the same as LARP (actually performs the same function) */
 
-	FMT("0110100010001000", "mar  *"),
-	FMT("0110100010001001", "mar  *"),
-	FMT("0110100010010000", "mar  *-,AR0"),
-	FMT("0110100010010001", "mar  *-,AR1"),
-	FMT("0110100010011000", "mar  *-"),
-	FMT("0110100010011001", "mar  *-"),
-	FMT("0110100010100000", "mar  *+,AR0"),
-	FMT("0110100010100001", "mar  *+,AR1"),
-	FMT("0110100010101000", "mar  *+"),
-	FMT("0110100010101001", "mar  *+"),
-	FMT("0110100010110000", "mar  ??,AR0"),
-	FMT("0110100010110001", "mar  ??,AR1"),
-	FMT("0110100010111000", "mar  ??"),
-	FMT("0110100010111001", "mar  ??"),
+	"0110100010001000", "mar  *",
+	"0110100010001001", "mar  *",
+	"0110100010010000", "mar  *-,AR0",
+	"0110100010010001", "mar  *-,AR1",
+	"0110100010011000", "mar  *-",
+	"0110100010011001", "mar  *-",
+	"0110100010100000", "mar  *+,AR0",
+	"0110100010100001", "mar  *+,AR1",
+	"0110100010101000", "mar  *+",
+	"0110100010101001", "mar  *+",
+	"0110100010110000", "mar  ??,AR0",
+	"0110100010110001", "mar  ??,AR1",
+	"0110100010111000", "mar  ??",
+	"0110100010111001", "mar  ??",
 
-	FMT("011010010aaaaaaa", "dmov %A"),
-	FMT("0110100110mmn00n", "dmov %M%N"),
-	FMT("011010100aaaaaaa", "lt   %A"),
-	FMT("0110101010mmn00n", "lt   %M%N"),
-	FMT("011010110aaaaaaa", "ltd  %A"),
-	FMT("0110101110mmn00n", "ltd  %M%N"),
-	FMT("011011000aaaaaaa", "lta  %A"),
-	FMT("0110110010mmn00n", "lta  %M%N"),
-	FMT("011011010aaaaaaa", "mpy  %A"),
-	FMT("0110110110mmn00n", "mpy  %M%N"),
-	FMT("011011100000000k", "ldpk %K"),
-	FMT("011011110aaaaaaa", "ldp  %A"),
-	FMT("0110111110mmn00n", "ldp  %M%N"),
-	FMT("0111000rdddddddd", "lark %R,%D"),
-	FMT("011110000aaaaaaa", "xor  %A"),
-	FMT("0111100010mmn00n", "xor  %M%N"),
-	FMT("011110010aaaaaaa", "and  %A"),
-	FMT("0111100110mmn00n", "and  %M%N"),
-	FMT("011110100aaaaaaa", "or   %A"),
-	FMT("0111101010mmn00n", "or   %M%N"),
-	FMT("011110110aaaaaaa", "lst  %A"),
-	FMT("0111101110mmn00n", "lst  %M%N"),
-	FMT("011111000aaaaaaa", "sst  %A"),
-	FMT("0111110010mmn00n", "sst  %M%N"),
-	FMT("011111010aaaaaaa", "tblw %A"),
-	FMT("0111110110mmn00n", "tblw %M%N"),
-	FMT("01111110dddddddd", "lack %D"),
-	FMT("0111111110000000", "nop"),         /* 7F80 */
-	FMT("0111111110000001", "dint"),
-	FMT("0111111110000010", "eint"),
-	FMT("0111111110001000", "abs"),         /* 7F88 */
-	FMT("0111111110001001", "zac"),
-	FMT("0111111110001010", "rovm"),
-	FMT("0111111110001011", "sovm"),
-	FMT("0111111110001100", "cala"),
-	FMT("0111111110001101", "ret"),
-	FMT("0111111110001110", "pac"),
-	FMT("0111111110001111", "apac"),
-	FMT("0111111110010000", "spac"),
-	FMT("0111111110011100", "push"),
-	FMT("0111111110011101", "pop"),         /* 7F9D */
-	FMT("100wwwwwwwwwwwww", "mpyk %W"),
-	FMT("1111010000000000bbbbbbbbbbbbbbbb", "banz %B"),
-	FMT("1111010100000000bbbbbbbbbbbbbbbb", "bv   %B"),
-	FMT("1111011000000000bbbbbbbbbbbbbbbb", "bioz %B"),
-	FMT("1111100000000000bbbbbbbbbbbbbbbb", "call %B"),
-	FMT("1111100100000000bbbbbbbbbbbbbbbb", "b    %B"),
-	FMT("1111101000000000bbbbbbbbbbbbbbbb", "blz  %B"),
-	FMT("1111101100000000bbbbbbbbbbbbbbbb", "blez %B"),
-	FMT("1111110000000000bbbbbbbbbbbbbbbb", "bgz  %B"),
-	FMT("1111110100000000bbbbbbbbbbbbbbbb", "bgez %B"),
-	FMT("1111111000000000bbbbbbbbbbbbbbbb", "bnz  %B"),
-	FMT("1111111100000000bbbbbbbbbbbbbbbb", "bz   %B"),
+	"011010010aaaaaaa", "dmov %A",
+	"0110100110mmn00n", "dmov %M%N",
+	"011010100aaaaaaa", "lt   %A",
+	"0110101010mmn00n", "lt   %M%N",
+	"011010110aaaaaaa", "ltd  %A",
+	"0110101110mmn00n", "ltd  %M%N",
+	"011011000aaaaaaa", "lta  %A",
+	"0110110010mmn00n", "lta  %M%N",
+	"011011010aaaaaaa", "mpy  %A",
+	"0110110110mmn00n", "mpy  %M%N",
+	"011011100000000k", "ldpk %K",
+	"011011110aaaaaaa", "ldp  %A",
+	"0110111110mmn00n", "ldp  %M%N",
+	"0111000rdddddddd", "lark %R,%D",
+	"011110000aaaaaaa", "xor  %A",
+	"0111100010mmn00n", "xor  %M%N",
+	"011110010aaaaaaa", "and  %A",
+	"0111100110mmn00n", "and  %M%N",
+	"011110100aaaaaaa", "or   %A",
+	"0111101010mmn00n", "or   %M%N",
+	"011110110aaaaaaa", "lst  %A",
+	"0111101110mmn00n", "lst  %M%N",
+	"011111000aaaaaaa", "sst  %A",
+	"0111110010mmn00n", "sst  %M%N",
+	"011111010aaaaaaa", "tblw %A",
+	"0111110110mmn00n", "tblw %M%N",
+	"01111110dddddddd", "lack %D",
+	"0111111110000000", "nop",         /* 7F80 */
+	"0111111110000001", "dint",
+	"0111111110000010", "eint",
+	"0111111110001000", "abs",         /* 7F88 */
+	"0111111110001001", "zac",
+	"0111111110001010", "rovm",
+	"0111111110001011", "sovm",
+	"0111111110001100", "cala",
+	"0111111110001101", "ret",
+	"0111111110001110", "pac",
+	"0111111110001111", "apac",
+	"0111111110010000", "spac",
+	"0111111110011100", "push",
+	"0111111110011101", "pop",         /* 7F9D */
+	"100wwwwwwwwwwwww", "mpyk %W",
+	"1111010000000000bbbbbbbbbbbbbbbb", "banz %B",
+	"1111010100000000bbbbbbbbbbbbbbbb", "bv   %B",
+	"1111011000000000bbbbbbbbbbbbbbbb", "bioz %B",
+	"1111100000000000bbbbbbbbbbbbbbbb", "call %B",
+	"1111100100000000bbbbbbbbbbbbbbbb", "b    %B",
+	"1111101000000000bbbbbbbbbbbbbbbb", "blz  %B",
+	"1111101100000000bbbbbbbbbbbbbbbb", "blez %B",
+	"1111110000000000bbbbbbbbbbbbbbbb", "bgz  %B",
+	"1111110100000000bbbbbbbbbbbbbbbb", "bgez %B",
+	"1111111000000000bbbbbbbbbbbbbbbb", "bnz  %B",
+	"1111111100000000bbbbbbbbbbbbbbbb", "bz   %B",
 	nullptr
 };
 
-#define MAX_OPS ((ARRAY_LENGTH(TMS32010Formats) - 1) / PTRS_PER_FORMAT)
-
-struct TMS32010Opcode  {
-	word mask;          /* instruction mask */
-	word bits;          /* constant bits */
-	word extcode;       /* value that gets extension code */
-	const char *parse;      /* how to parse bits */
-	const char *fmt;            /* instruction format */
-};
-
-static TMS32010Opcode Op[MAX_OPS+1];
-static int OpInizialized = 0;
-
-static void InitDasm32010(void)
+tms32010_disassembler::tms32010_disassembler()
 {
 	const char *p;
 	const char *const *ops;
-	word mask, bits;
+	u16 mask, bits;
 	int bit;
 	int i;
 
@@ -197,32 +177,25 @@ static void InitDasm32010(void)
 				case 'r':
 				case 's':
 				case 'w':
-					bit --;
+					bit--;
 					break;
-				default: fatalerror("Invalid instruction encoding '%s %s'\n",
-					ops[0],ops[1]);
+				default:
+					throw std::logic_error(util::string_format("Invalid instruction encoding '%s %s'\n", ops[0],ops[1]));
 			}
 		}
 		if (bit != -1 )
 		{
-			fatalerror("not enough bits in encoding '%s %s' %d\n",
-				ops[0],ops[1],bit);
+			throw std::logic_error(util::string_format("not enough bits in encoding '%s %s' %d\n", ops[0],ops[1],bit));
 		}
 		while (isspace((uint8_t)*p)) p++;
-		if (*p) Op[i].extcode = *p;
-		Op[i].bits = bits;
-		Op[i].mask = mask;
-		Op[i].fmt = ops[1];
-		Op[i].parse = ops[0];
+		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
 
-		ops += PTRS_PER_FORMAT;
+		ops += 2;
 		i++;
 	}
-
-	OpInizialized = 1;
 }
 
-CPU_DISASSEMBLE(tms32010)
+offs_t tms32010_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
 	int a, b, d, k, m, n, p, r, s, w;   /* these can all be filled in by parsing an instruction */
@@ -234,11 +207,9 @@ CPU_DISASSEMBLE(tms32010)
 	//char *buffertmp;
 	const char *cp;             /* character pointer in OpFormats */
 
-	if (!OpInizialized) InitDasm32010();
-
 	op = -1;                /* no matching opcode */
-	code = (oprom[0] << 8) | oprom[1];
-	for ( i = 0; i < MAX_OPS; i++)
+	code = opcodes.r16(pc);
+	for ( i = 0; i < int(Op.size()); i++)
 	{
 		if ((code & Op[i].mask) == Op[i].bits)
 		{
@@ -253,14 +224,14 @@ CPU_DISASSEMBLE(tms32010)
 	if (op == -1)
 	{
 		util::stream_format(stream, "dw   %04Xh *(invalid op)", code);
-		return cnt | DASMFLAG_SUPPORTED;
+		return cnt | SUPPORTED;
 	}
 	//buffertmp = buffer;
 	if (Op[op].extcode)
 	{
 		bit = 31;
 		code <<= 16;
-		code |= (opram[2] << 8) | opram[3];
+		code |= opcodes.r16(pc+1);
 		cnt++;
 	}
 	else
@@ -289,7 +260,7 @@ CPU_DISASSEMBLE(tms32010)
 			case 'w': w <<=1; w |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
 			case ' ': break;
 			case '1': case '0':  bit--; break;
-			case '\0': fatalerror("premature end of parse string, opcode %x, bit = %d\n",code,bit);
+			case '\0': throw std::logic_error(util::string_format("premature end of parse string, opcode %x, bit = %d\n",code,bit));
 		}
 		cp++;
 	}
@@ -298,9 +269,9 @@ CPU_DISASSEMBLE(tms32010)
 	cp = Op[op].fmt;
 
 	if (!strncmp(cp, "cal", 3))
-		flags = DASMFLAG_STEP_OVER;
+		flags = STEP_OVER;
 	else if (!strncmp(cp, "ret", 3))
-		flags = DASMFLAG_STEP_OUT;
+		flags = STEP_OUT;
 
 	while (*cp)
 	{
@@ -321,7 +292,7 @@ CPU_DISASSEMBLE(tms32010)
 				case 'S': sprintf(num,",%d",s); break;
 				case 'W': sprintf(num,"%04Xh",w); break;
 				default:
-					fatalerror("illegal escape character in format '%s'\n",Op[op].fmt);
+					throw std::logic_error(util::string_format("illegal escape character in format '%s'\n",Op[op].fmt));
 			}
 			stream << num;
 		}
@@ -330,5 +301,11 @@ CPU_DISASSEMBLE(tms32010)
 			stream << *cp++;
 		}
 	}
-	return cnt | flags | DASMFLAG_SUPPORTED;
+	return cnt | flags | SUPPORTED;
 }
+
+u32 tms32010_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+

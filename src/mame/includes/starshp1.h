@@ -25,8 +25,13 @@
  *  Horizontal Visible Area    384 (0x180)         768 (0x300)
  *  Horizontal Blanking Time   128 (0x080)         256 (0x100)
  */
+#ifndef MAME_INCLUDES_STARSHP1_H
+#define MAME_INCLUDES_STARSHP1_H
+
+#pragma once
 
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -44,8 +49,8 @@
 class starshp1_state : public driver_device
 {
 public:
-	starshp1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	starshp1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_hpos_ram(*this, "hpos_ram"),
 		m_vpos_ram(*this, "vpos_ram"),
@@ -54,32 +59,16 @@ public:
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_led(*this, "led0")
+	{ }
 
-	int m_analog_in_select;
-	int m_attract;
-	required_shared_ptr<uint8_t> m_playfield_ram;
-	required_shared_ptr<uint8_t> m_hpos_ram;
-	required_shared_ptr<uint8_t> m_vpos_ram;
-	required_shared_ptr<uint8_t> m_obj_ram;
-	int m_ship_explode;
-	int m_ship_picture;
-	int m_ship_hoffset;
-	int m_ship_voffset;
-	int m_ship_size;
-	int m_circle_hpos;
-	int m_circle_vpos;
-	int m_circle_size;
-	int m_circle_mod;
-	int m_circle_kill;
-	int m_phasor;
-	int m_collision_latch;
-	int m_starfield_kill;
-	int m_mux;
-	int m_inverse;
-	std::unique_ptr<uint16_t[]> m_LSFR;
-	bitmap_ind16 m_helper;
-	tilemap_t *m_bg_tilemap;
+	DECLARE_CUSTOM_INPUT_MEMBER(starshp1_analog_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(collision_latch_r);
+	void starshp1(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 	DECLARE_WRITE8_MEMBER(starshp1_collision_reset_w);
 	DECLARE_WRITE8_MEMBER(starshp1_analog_in_w);
 	DECLARE_WRITE_LINE_MEMBER(ship_explode_w);
@@ -93,8 +82,6 @@ public:
 	DECLARE_WRITE8_MEMBER(starshp1_ssadd_w);
 	DECLARE_WRITE8_MEMBER(starshp1_sspic_w);
 	DECLARE_WRITE8_MEMBER(starshp1_playfield_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(starshp1_analog_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(collision_latch_r);
 	DECLARE_WRITE_LINE_MEMBER(attract_w);
 	DECLARE_WRITE_LINE_MEMBER(phasor_w);
 	DECLARE_WRITE8_MEMBER(starshp1_analog_out_w);
@@ -119,16 +106,45 @@ public:
 	int spaceship_collision(bitmap_ind16 &bitmap, const rectangle &rect);
 	int point_in_circle(int x, int y, int center_x, int center_y, int r);
 	int circle_collision(const rectangle &rect);
+	void starshp1_map(address_map &map);
+
+private:
+	int m_analog_in_select;
+	int m_attract;
+	required_shared_ptr<uint8_t> m_playfield_ram;
+	required_shared_ptr<uint8_t> m_hpos_ram;
+	required_shared_ptr<uint8_t> m_vpos_ram;
+	required_shared_ptr<uint8_t> m_obj_ram;
+	int m_ship_explode;
+	int m_ship_picture;
+	int m_ship_hoffset;
+	int m_ship_voffset;
+	int m_ship_size;
+	int m_circle_hpos;
+	int m_circle_vpos;
+	int m_circle_size;
+	int m_circle_mod;
+	int m_circle_kill;
+	int m_phasor;
+	int m_collision_latch;
+	int m_starfield_kill;
+	int m_mux;
+	int m_inverse;
+	std::unique_ptr<uint16_t[]> m_LSFR;
+	bitmap_ind16 m_helper;
+	tilemap_t *m_bg_tilemap;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	output_finder<> m_led;
 };
 
 /*----------- defined in audio/starshp1.c -----------*/
 
-DISCRETE_SOUND_EXTERN( starshp1 );
+DISCRETE_SOUND_EXTERN( starshp1_discrete );
 
 /* Discrete Sound Input Nodes */
 #define STARSHP1_NOISE_AMPLITUDE    NODE_01
@@ -141,3 +157,5 @@ DISCRETE_SOUND_EXTERN( starshp1 );
 #define STARSHP1_KICKER             NODE_08
 #define STARSHP1_PHASOR_ON          NODE_09
 #define STARSHP1_ATTRACT            NODE_10
+
+#endif // MAME_INCLUDES_STARSHP1_H

@@ -789,8 +789,8 @@ static void get_base_name(char* base_name, opcode_struct* op)
 /* Write the name of an opcode handler function */
 static void write_function_name(FILE* filep, char* base_name)
 {
-	fprintf(filep, "void m68000_base_device_ops::%s(m68000_base_device* mc68kcpu)\n", base_name);
-	fprintf(g_prototype_file, "static void %s(m68000_base_device* mc68kcpu);\n", base_name);
+	fprintf(filep, "void m68000_base_device::%s()\n", base_name);
+	fprintf(g_prototype_file, "void %s();\n", base_name);
 }
 
 static void add_opcode_output_table_entry(opcode_struct* op, char* name)
@@ -803,7 +803,7 @@ static void add_opcode_output_table_entry(opcode_struct* op, char* name)
 
 	*ptr = *op;
 
-	sprintf( ptr->name, "m68000_base_device_ops::%s", name);
+	sprintf( ptr->name, "&m68000_base_device::%s", name);
 	ptr->bits = num_bits(ptr->op_mask);
 }
 
@@ -880,17 +880,17 @@ static void generate_opcode_handler(FILE* filep, body_struct* body, replace_stru
 	/* Add any replace strings needed */
 	if(ea_mode != EA_MODE_NONE)
 	{
-		sprintf(str, "EA_%s_8(mc68kcpu)", g_ea_info_table[ea_mode].ea_add);
+		sprintf(str, "EA_%s_8()", g_ea_info_table[ea_mode].ea_add);
 		add_replace_string(replace, ID_OPHANDLER_EA_AY_8, str);
-		sprintf(str, "EA_%s_16(mc68kcpu)", g_ea_info_table[ea_mode].ea_add);
+		sprintf(str, "EA_%s_16()", g_ea_info_table[ea_mode].ea_add);
 		add_replace_string(replace, ID_OPHANDLER_EA_AY_16, str);
-		sprintf(str, "EA_%s_32(mc68kcpu)", g_ea_info_table[ea_mode].ea_add);
+		sprintf(str, "EA_%s_32()", g_ea_info_table[ea_mode].ea_add);
 		add_replace_string(replace, ID_OPHANDLER_EA_AY_32, str);
-		sprintf(str, "OPER_%s_8(mc68kcpu)", g_ea_info_table[ea_mode].ea_add);
+		sprintf(str, "OPER_%s_8()", g_ea_info_table[ea_mode].ea_add);
 		add_replace_string(replace, ID_OPHANDLER_OPER_AY_8, str);
-		sprintf(str, "OPER_%s_16(mc68kcpu)", g_ea_info_table[ea_mode].ea_add);
+		sprintf(str, "OPER_%s_16()", g_ea_info_table[ea_mode].ea_add);
 		add_replace_string(replace, ID_OPHANDLER_OPER_AY_16, str);
-		sprintf(str, "OPER_%s_32(mc68kcpu)", g_ea_info_table[ea_mode].ea_add);
+		sprintf(str, "OPER_%s_32()", g_ea_info_table[ea_mode].ea_add);
 		add_replace_string(replace, ID_OPHANDLER_OPER_AY_32, str);
 	}
 
@@ -972,8 +972,8 @@ static void generate_opcode_cc_variants(FILE* filep, body_struct* body, replace_
 	for(i=2;i<16;i++)
 	{
 		/* Add replace strings for this condition code */
-		sprintf(repl, "COND_%s(mc68kcpu)", g_cc_table[i][1]);
-		sprintf(replnot, "COND_NOT_%s(mc68kcpu)", g_cc_table[i][1]);
+		sprintf(repl, "COND_%s()", g_cc_table[i][1]);
+		sprintf(replnot, "COND_NOT_%s()", g_cc_table[i][1]);
 
 		add_replace_string(replace, ID_OPHANDLER_CC, repl);
 		add_replace_string(replace, ID_OPHANDLER_NOT_CC, replnot);
@@ -1358,9 +1358,7 @@ int main(int argc, char *argv[])
 				error_exit("Duplicate opcode handler section");
 
 			fprintf(g_table_file, "%s\n\n", ophandler_header_insert);
-			fprintf(g_prototype_file, "#ifdef OPCODE_PROTOTYPES\n\n");
 			process_opcode_handlers(g_table_file);
-			fprintf(g_prototype_file, "#else\n");
 			fprintf(g_table_file, "%s\n\n", ophandler_footer_insert);
 
 			ophandler_body_read = 1;
@@ -1390,7 +1388,6 @@ int main(int argc, char *argv[])
 			fprintf(g_table_file, "%s\n\n", table_footer_insert);
 
 			fprintf(g_prototype_file, "%s\n\n", prototype_footer_insert);
-			fprintf(g_prototype_file, "#endif\n");
 
 			break;
 		}

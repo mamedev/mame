@@ -51,7 +51,7 @@ const options_entry emu_options::s_option_entries[] =
 	// output directory options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },
 	{ OPTION_CFG_DIRECTORY,                              "cfg",       OPTION_STRING,     "directory to save configurations" },
-	{ OPTION_NVRAM_DIRECTORY,                            "nvram",     OPTION_STRING,     "directory to save nvram contents" },
+	{ OPTION_NVRAM_DIRECTORY,                            "nvram",     OPTION_STRING,     "directory to save NVRAM contents" },
 	{ OPTION_INPUT_DIRECTORY,                            "inp",       OPTION_STRING,     "directory to save input device logs" },
 	{ OPTION_STATE_DIRECTORY,                            "sta",       OPTION_STRING,     "directory to save states" },
 	{ OPTION_SNAPSHOT_DIRECTORY,                         "snap",      OPTION_STRING,     "directory to save/load screenshots" },
@@ -62,6 +62,8 @@ const options_entry emu_options::s_option_entries[] =
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE STATE/PLAYBACK OPTIONS" },
 	{ OPTION_STATE,                                      nullptr,     OPTION_STRING,     "saved state to load" },
 	{ OPTION_AUTOSAVE,                                   "0",         OPTION_BOOLEAN,    "enable automatic restore at startup, and automatic save at exit time" },
+	{ OPTION_REWIND,                                     "0",         OPTION_BOOLEAN,    "enable rewind savestates" },
+	{ OPTION_REWIND_CAPACITY "(1-2048)",                 "100",       OPTION_INTEGER,    "rewind buffer size in megabytes" },
 	{ OPTION_PLAYBACK ";pb",                             nullptr,     OPTION_STRING,     "playback an input file" },
 	{ OPTION_RECORD ";rec",                              nullptr,     OPTION_STRING,     "record an input file" },
 	{ OPTION_RECORD_TIMECODE,                            "0",         OPTION_BOOLEAN,    "record an input timecode file (requires -record option)" },
@@ -116,6 +118,8 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_USE_BEZELS ";bezel",                        "1",         OPTION_BOOLEAN,    "enable bezels if artwork is enabled and available" },
 	{ OPTION_USE_CPANELS ";cpanel",                      "1",         OPTION_BOOLEAN,    "enable cpanels if artwork is enabled and available" },
 	{ OPTION_USE_MARQUEES ";marquee",                    "1",         OPTION_BOOLEAN,    "enable marquees if artwork is enabled and available" },
+	{ OPTION_FALLBACK_ARTWORK,                           nullptr,     OPTION_STRING,     "fallback artwork if no external artwork or internal driver layout defined" },
+	{ OPTION_OVERRIDE_ARTWORK,                           nullptr,     OPTION_STRING,     "override artwork for external artwork and internal driver layout" },
 
 	// screen options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE SCREEN OPTIONS" },
@@ -183,6 +187,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_COMM_LOCAL_PORT,                            "15112",     OPTION_STRING,     "local port to bind to" },
 	{ OPTION_COMM_REMOTE_HOST,                           "127.0.0.1", OPTION_STRING,     "remote address to connect to" },
 	{ OPTION_COMM_REMOTE_PORT,                           "15112",     OPTION_STRING,     "remote port to connect to" },
+	{ OPTION_COMM_FRAME_SYNC,                            "0",         OPTION_BOOLEAN,    "sync frames" },
 
 	// misc options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE MISC OPTIONS" },
@@ -198,6 +203,10 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_RAMSIZE ";ram",                             nullptr,     OPTION_STRING,     "size of RAM (if supported by driver)" },
 	{ OPTION_CONFIRM_QUIT,                               "0",         OPTION_BOOLEAN,    "display confirm quit screen on exit" },
 	{ OPTION_UI_MOUSE,                                   "1",         OPTION_BOOLEAN,    "display ui mouse cursor" },
+	{ OPTION_LANGUAGE ";lang",                           "English",   OPTION_STRING,     "display language" },
+	{ OPTION_NVRAM_SAVE ";nvwrite",                      "1",         OPTION_BOOLEAN,    "save NVRAM on exit" },
+
+	{ nullptr,                                           nullptr,     OPTION_HEADER,     "SCRIPTING OPTIONS" },
 	{ OPTION_AUTOBOOT_COMMAND ";ab",                     nullptr,     OPTION_STRING,     "command to execute after machine boot" },
 	{ OPTION_AUTOBOOT_DELAY,                             "0",         OPTION_INTEGER,    "timer delay in sec to trigger command execution on autoboot" },
 	{ OPTION_AUTOBOOT_SCRIPT ";script",                  nullptr,     OPTION_STRING,     "lua script to execute after machine boot" },
@@ -205,7 +214,6 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_PLUGINS,                                    "1",         OPTION_BOOLEAN,    "enable LUA plugin support" },
 	{ OPTION_PLUGIN,                                     nullptr,     OPTION_STRING,     "list of plugins to enable" },
 	{ OPTION_NO_PLUGIN,                                  nullptr,     OPTION_STRING,     "list of plugins to disable" },
-	{ OPTION_LANGUAGE ";lang",                           "English",   OPTION_STRING,     "display language" },
 
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "HTTP SERVER OPTIONS" },
 	{ OPTION_HTTP,                                       "0",         OPTION_BOOLEAN,    "HTTP server enable" },
@@ -375,14 +383,17 @@ namespace
 	std::vector<std::string> get_full_option_names(const device_image_interface &image)
 	{
 		std::vector<std::string> result;
+		bool same_name = image.instance_name() == image.brief_instance_name();
 
 		result.push_back(image.instance_name());
-		result.push_back(image.brief_instance_name());
+		if (!same_name)
+			result.push_back(image.brief_instance_name());
 
 		if (strcmp(image.device_typename(image.image_type()), image.instance_name().c_str()) == 0)
 		{
 			result.push_back(image.instance_name() + "1");
-			result.push_back(image.brief_instance_name() + "1");
+			if (!same_name)
+				result.push_back(image.brief_instance_name() + "1");
 		}
 		return result;
 	}
@@ -739,9 +750,9 @@ void emu_options::reevaluate_default_card_software()
 			// retrieve info about the device instance
 			auto &slot_opt(slot_option(slot.slot_name()));
 
-			// device_slot_interface::get_default_card_software() is essentially a hook
-			// that lets devices provide a feedback loop to force a specified software
-			// list entry to be loaded
+			// device_slot_interface::get_default_card_software() allows a device that
+			// implements both device_slot_interface and device_image_interface to
+			// probe an image and specify the card device that should be loaded
 			//
 			// In the repeated cycle of adding slots and slot devices, this gives a chance
 			// for devices to "plug in" default software list items.  Of course, the fact
@@ -787,10 +798,10 @@ std::string emu_options::get_default_card_software(device_slot_interface &slot)
 			util::hash_collection hashes = image->calculate_hash_on_file(file);
 
 			return hashfile_extrainfo(
-				hash_path(),
-				image->device().mconfig().gamedrv(),
-				hashes,
-				extrainfo);
+					hash_path(),
+					image->device().mconfig().gamedrv(),
+					hashes,
+					extrainfo);
 		};
 	}
 

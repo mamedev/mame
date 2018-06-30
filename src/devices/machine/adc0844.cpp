@@ -126,7 +126,7 @@ void adc0844_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	case 0x0d: m_result = clamp(0xff - (m_ch4_cb(0) - m_ch2_cb(0))); break;
 	case 0x0e: m_result = clamp(0xff - (m_ch4_cb(0) - m_ch3_cb(0))); break;
 	// undefined
-	case 0x0f: m_result = 0x00;	break;
+	case 0x0f: m_result = 0x00; break;
 	}
 
 	m_intr_cb(ASSERT_LINE);
@@ -171,7 +171,7 @@ void adc0848_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	case 0x1d: m_result = clamp(0xff - (m_ch8_cb(0) - m_ch6_cb(0))); break;
 	case 0x1e: m_result = clamp(0xff - (m_ch8_cb(0) - m_ch7_cb(0))); break;
 	// undefined
-	case 0x1f: m_result = 0x00;	break;
+	case 0x1f: m_result = 0x00; break;
 	}
 
 	m_intr_cb(ASSERT_LINE);

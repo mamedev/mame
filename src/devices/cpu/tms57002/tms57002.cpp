@@ -11,24 +11,30 @@
 #include "emu.h"
 #include "tms57002.h"
 #include "debugger.h"
+#include "57002dsm.h"
 
 
-DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "TMS57002")
+DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "Texas Instruments TMS57002 \"DASP\"")
 
 // Can't use a DEVICE_ADDRESS_MAP, not yet anyway
-static ADDRESS_MAP_START(internal_pgm, AS_PROGRAM, 32, tms57002_device)
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
+void tms57002_device::internal_pgm(address_map &map)
+{
+	map(0x00, 0xff).ram();
+}
 
 tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS57002, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, macc(0), st0(0), st1(0), sti(0), txrd(0)
-	, program_config("program", ENDIANNESS_LITTLE, 32, 8, -2, ADDRESS_MAP_NAME(internal_pgm))
+	, program_config("program", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(tms57002_device::internal_pgm), this))
 	, data_config("data", ENDIANNESS_LITTLE, 8, 20)
 {
 }
 
+std::unique_ptr<util::disasm_interface> tms57002_device::create_disassembler()
+{
+	return std::make_unique<tms57002_disassembler>();
+}
 
 WRITE_LINE_MEMBER(tms57002_device::pload_w)
 {
@@ -103,7 +109,7 @@ WRITE8_MEMBER(tms57002_device::data_w)
 				sti = (sti & ~SU_MASK) | SU_PRG;
 				break;
 			case SU_PRG:
-				program->write_dword(pc++ << 2, val);
+				program->write_dword(pc++, val);
 				break;
 			}
 		}
@@ -684,7 +690,7 @@ int tms57002_device::decode_get_pc()
 
 	for(;;) {
 		short ipc;
-		uint32_t opcode = program->read_dword(adr << 2);
+		uint32_t opcode = program->read_dword(adr);
 
 		cs.inc = 0;
 
@@ -719,7 +725,7 @@ void tms57002_device::execute_run()
 	while(icount > 0 && !(sti & (S_IDLE | IN_PLOAD | IN_CLOAD))) {
 		int iipc;
 
-		debugger_instruction_hook(this, pc);
+		debugger_instruction_hook(pc);
 
 		if(ipc == -1)
 			ipc = decode_get_pc();
@@ -837,7 +843,7 @@ void tms57002_device::device_start()
 	state_add(TMS57002_HOST2, "HOST2",  host[2]);
 	state_add(TMS57002_HOST3, "HOST3",  host[3]);
 
-	m_icountptr = &icount;
+	set_icountptr(icount);
 
 	stream_alloc(4, 4, STREAM_SYNC);
 
@@ -890,22 +896,6 @@ uint32_t tms57002_device::execute_max_cycles() const
 uint32_t tms57002_device::execute_input_lines() const
 {
 	return 0;
-}
-
-uint32_t tms57002_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-uint32_t tms57002_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-offs_t tms57002_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( tms57002 );
-	return CPU_DISASSEMBLE_NAME(tms57002)(this, stream, pc, oprom, opram, options);
 }
 
 device_memory_interface::space_config_vector tms57002_device::memory_space_config() const

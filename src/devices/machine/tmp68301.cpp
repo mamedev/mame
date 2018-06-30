@@ -21,20 +21,21 @@
 
 DEFINE_DEVICE_TYPE(TMP68301, tmp68301_device, "tmp68301", "Toshiba TMP68301")
 
-static ADDRESS_MAP_START( tmp68301_regs, 0, 16, tmp68301_device )
+void tmp68301_device::tmp68301_regs(address_map &map)
+{
 //  AM_RANGE(0x000,0x3ff) AM_RAM
-	AM_RANGE(0x080,0x093) AM_READWRITE8(icr_r, icr_w,0x00ff)
+	map(0x080, 0x093).rw(FUNC(tmp68301_device::icr_r), FUNC(tmp68301_device::icr_w)).umask16(0x00ff);
 
-	AM_RANGE(0x094,0x095) AM_READWRITE(imr_r,imr_w)
-	AM_RANGE(0x098,0x099) AM_READWRITE(iisr_r,iisr_w)
+	map(0x094, 0x095).rw(FUNC(tmp68301_device::imr_r), FUNC(tmp68301_device::imr_w));
+	map(0x098, 0x099).rw(FUNC(tmp68301_device::iisr_r), FUNC(tmp68301_device::iisr_w));
 
 	/* Parallel Port */
-	AM_RANGE(0x100,0x101) AM_READWRITE(pdir_r,pdir_w)
-	AM_RANGE(0x10a,0x10b) AM_READWRITE(pdr_r,pdr_w)
+	map(0x100, 0x101).rw(FUNC(tmp68301_device::pdir_r), FUNC(tmp68301_device::pdir_w));
+	map(0x10a, 0x10b).rw(FUNC(tmp68301_device::pdr_r), FUNC(tmp68301_device::pdr_w));
 
 	/* Serial Port */
-	AM_RANGE(0x18e,0x18f) AM_READWRITE(scr_r,scr_w)
-ADDRESS_MAP_END
+	map(0x18e, 0x18f).rw(FUNC(tmp68301_device::scr_r), FUNC(tmp68301_device::scr_w));
+}
 
 // IRQ Mask register, 0x94
 READ16_MEMBER(tmp68301_device::imr_r)
@@ -119,6 +120,7 @@ WRITE8_MEMBER(tmp68301_device::icr_w)
 tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMP68301, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
+		m_cpu(*this, finder_base::DUMMY_TAG),
 		m_in_parallel_cb(*this),
 		m_out_parallel_cb(*this),
 		m_imr(0),
@@ -126,7 +128,7 @@ tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag,
 		m_scr(0),
 		m_pdir(0),
 		m_pdr(0),
-		m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, nullptr, *ADDRESS_MAP_NAME(tmp68301_regs))
+	  m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, address_map_constructor(), address_map_constructor(FUNC(tmp68301_device::tmp68301_regs), this))
 {
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(m_icr, 0, sizeof(m_icr));
@@ -204,7 +206,7 @@ inline void tmp68301_device::write_word(offs_t address, uint16_t data)
 IRQ_CALLBACK_MEMBER(tmp68301_device::irq_callback)
 {
 	int vector = m_irq_vector[irqline];
-//  logerror("%s: irq callback returns %04X for level %x\n",machine.describe_context(),vector,int_level);
+//  logerror("%s: irq callback returns %04X for level %x\n",machine().describe_context(),vector,int_level);
 	return vector;
 }
 
@@ -215,7 +217,7 @@ TIMER_CALLBACK_MEMBER( tmp68301_device::timer_callback )
 	uint16_t ICR  =   m_regs[0x8e/2+i];    // Interrupt Controller Register (ICR7..9)
 	uint16_t IVNR =   m_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
 
-//  logerror("s: callback timer %04X, j = %d\n",machine.describe_context(),i,tcount);
+//  logerror("s: callback timer %04X, j = %d\n",machine().describe_context(),i,tcount);
 
 	if  (   (TCR & 0x0004) &&   // INT
 			!(m_imr & (0x100<<i))
@@ -227,7 +229,7 @@ TIMER_CALLBACK_MEMBER( tmp68301_device::timer_callback )
 		m_irq_vector[level]  =   IVNR & 0x00e0;
 		m_irq_vector[level]  +=  4+i;
 
-		machine().firstcpu->set_input_line(level,HOLD_LINE);
+		m_cpu->set_input_line(level,HOLD_LINE);
 	}
 
 	if (TCR & 0x0080)   // N/1
@@ -270,7 +272,7 @@ void tmp68301_device::update_timer( int i )
 		{
 			int scale = (TCR & 0x3c00)>>10;         // P4..1
 			if (scale > 8) scale = 8;
-			duration = attotime::from_hz(machine().firstcpu->unscaled_clock()) * ((1 << scale) * max);
+			duration = attotime::from_hz(m_cpu->unscaled_clock()) * ((1 << scale) * max);
 		}
 		break;
 	}
@@ -310,7 +312,7 @@ void tmp68301_device::update_irq_state(uint16_t cause)
 			m_irq_vector[level]  =   IVNR & 0x00e0;
 			m_irq_vector[level]  +=  i;
 
-			machine().firstcpu->set_input_line(level,HOLD_LINE);
+			m_cpu->set_input_line(level,HOLD_LINE);
 		}
 	}
 }
@@ -349,7 +351,7 @@ void tmp68301_device::update_irq_serial(uint16_t cause, uint8_t type)
 			 */
 			m_irq_vector[level]  +=  type;
 
-			machine().firstcpu->set_input_line(level,HOLD_LINE);
+			m_cpu->set_input_line(level,HOLD_LINE);
 		}
 	}
 }
@@ -368,7 +370,7 @@ WRITE16_MEMBER( tmp68301_device::regs_w )
 
 	if (!ACCESSING_BITS_0_7)    return;
 
-//  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n",space.device().safe_pc(),offset*2,data,mem_mask^0xffff);
+//  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n", m_cpu->pc(),offset*2,data,mem_mask^0xffff);
 
 	switch( offset * 2 )
 	{

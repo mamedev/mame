@@ -107,14 +107,14 @@ AC RETURNS (pins 3,4) - adaptor. A total of 6W may be drawn from these lines as 
 
 #define MCFG_ELECTRON_PASSTHRU_EXPANSION_SLOT_ADD(_def_slot) \
 	MCFG_ELECTRON_EXPANSION_SLOT_ADD(ELECTRON_EXPANSION_SLOT_TAG, electron_expansion_devices, _def_slot, false) \
-	MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, irq_w)) \
-	MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, nmi_w))
+	MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, irq_w)) \
+	MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(WRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, nmi_w))
 
 #define MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(_devcb) \
-	devcb = &electron_expansion_slot_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<electron_expansion_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &electron_expansion_slot_device::set_nmi_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<electron_expansion_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -133,11 +133,11 @@ public:
 	virtual ~electron_expansion_slot_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
-	{ return downcast<electron_expansion_slot_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_handler(Object &&cb) { return m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
-	{ return downcast<electron_expansion_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
+	uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data);
+	void expbus_w(address_space &space, offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
@@ -163,6 +163,9 @@ public:
 	// construction/destruction
 	virtual ~device_electron_expansion_interface();
 
+	virtual uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data) { return data; }
+	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) { }
+
 protected:
 	device_electron_expansion_interface(const machine_config &mconfig, device_t &device);
 
@@ -171,10 +174,9 @@ protected:
 
 
 // device type definition
-extern const device_type ELECTRON_EXPANSION_SLOT;
 DECLARE_DEVICE_TYPE(ELECTRON_EXPANSION_SLOT, electron_expansion_slot_device)
 
-SLOT_INTERFACE_EXTERN( electron_expansion_devices );
+void electron_expansion_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_ELECTRON_EXP_H

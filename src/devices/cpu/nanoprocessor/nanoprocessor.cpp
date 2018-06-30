@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "nanoprocessor.h"
+#include "nanoprocessor_dasm.h"
 #include "debugger.h"
 
 // Index of state variables
@@ -33,53 +34,53 @@ enum {
 #define BIT_MASK(n) (1U << (n))
 
 // Macros to clear/set single bits
-#define BIT_CLR(w , n)  ((w) &= ~BIT_MASK(n))
-#define BIT_SET(w , n)  ((w) |= BIT_MASK(n))
+#define BIT_CLR(w, n)  ((w) &= ~BIT_MASK(n))
+#define BIT_SET(w, n)  ((w) |= BIT_MASK(n))
 
 // Bits in m_flags
 #define NANO_DC0_BIT    0   // DC0
 #define NANO_E_BIT  (NANO_DC0_BIT + HP_NANO_DC_NO)  // Extend flag
 #define NANO_I_BIT  (NANO_E_BIT + 1)    // Interrupt flag
 
-DEFINE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device, "nanoprocessor", "HP-Nanoprocessor")
+DEFINE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device, "nanoprocessor", "Hewlett Packard HP-Nanoprocessor")
 
 hp_nanoprocessor_device::hp_nanoprocessor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	cpu_device(mconfig , HP_NANOPROCESSOR , tag , owner , clock),
+	cpu_device(mconfig, HP_NANOPROCESSOR, tag, owner, clock),
 	m_dc_changed_func(*this),
 	m_read_dc_func(*this),
-	m_program_config("program" , ENDIANNESS_BIG , 8 , 11),
-	m_io_config("io" , ENDIANNESS_BIG , 8 , 4)
+	m_program_config("program", ENDIANNESS_BIG, 8, 11),
+	m_io_config("io", ENDIANNESS_BIG, 8, 4)
 {
 }
 
 void hp_nanoprocessor_device::device_start()
 {
-	state_add(NANO_REG_A , "A" , m_reg_A);
-	state_add(NANO_REG_R0 , "R0" , m_reg_R[ 0 ]);
-	state_add(NANO_REG_R1 , "R1" , m_reg_R[ 1 ]);
-	state_add(NANO_REG_R2 , "R2" , m_reg_R[ 2 ]);
-	state_add(NANO_REG_R3 , "R3" , m_reg_R[ 3 ]);
-	state_add(NANO_REG_R4 , "R4" , m_reg_R[ 4 ]);
-	state_add(NANO_REG_R5 , "R5" , m_reg_R[ 5 ]);
-	state_add(NANO_REG_R6 , "R6" , m_reg_R[ 6 ]);
-	state_add(NANO_REG_R7 , "R7" , m_reg_R[ 7 ]);
-	state_add(NANO_REG_R8 , "R8" , m_reg_R[ 8 ]);
-	state_add(NANO_REG_R9 , "R9" , m_reg_R[ 9 ]);
-	state_add(NANO_REG_R10 , "R10" , m_reg_R[ 10 ]);
-	state_add(NANO_REG_R11 , "R11" , m_reg_R[ 11 ]);
-	state_add(NANO_REG_R12 , "R12" , m_reg_R[ 12 ]);
-	state_add(NANO_REG_R13 , "R13" , m_reg_R[ 13 ]);
-	state_add(NANO_REG_R14 , "R14" , m_reg_R[ 14 ]);
-	state_add(NANO_REG_R15 , "R15" , m_reg_R[ 15 ]);
-	state_add(NANO_REG_PA , "PA" , m_reg_PA).formatstr("%03X");
-	state_add(STATE_GENPC , "GENPC" , m_reg_PA).noshow();
-	state_add(STATE_GENPCBASE , "GENPCBASE" , m_reg_PA).noshow();
-	state_add(NANO_REG_SSR , "SSR" , m_reg_SSR).formatstr("%03X");
-	state_add(NANO_REG_ISR , "ISR" , m_reg_ISR).formatstr("%03X");
-	state_add(STATE_GENFLAGS , "GENFLAGS" , m_flags).noshow().formatstr("%10s");
+	state_add(NANO_REG_A, "A", m_reg_A);
+	state_add(NANO_REG_R0, "R0", m_reg_R[ 0 ]);
+	state_add(NANO_REG_R1, "R1", m_reg_R[ 1 ]);
+	state_add(NANO_REG_R2, "R2", m_reg_R[ 2 ]);
+	state_add(NANO_REG_R3, "R3", m_reg_R[ 3 ]);
+	state_add(NANO_REG_R4, "R4", m_reg_R[ 4 ]);
+	state_add(NANO_REG_R5, "R5", m_reg_R[ 5 ]);
+	state_add(NANO_REG_R6, "R6", m_reg_R[ 6 ]);
+	state_add(NANO_REG_R7, "R7", m_reg_R[ 7 ]);
+	state_add(NANO_REG_R8, "R8", m_reg_R[ 8 ]);
+	state_add(NANO_REG_R9, "R9", m_reg_R[ 9 ]);
+	state_add(NANO_REG_R10, "R10", m_reg_R[ 10 ]);
+	state_add(NANO_REG_R11, "R11", m_reg_R[ 11 ]);
+	state_add(NANO_REG_R12, "R12", m_reg_R[ 12 ]);
+	state_add(NANO_REG_R13, "R13", m_reg_R[ 13 ]);
+	state_add(NANO_REG_R14, "R14", m_reg_R[ 14 ]);
+	state_add(NANO_REG_R15, "R15", m_reg_R[ 15 ]);
+	state_add(NANO_REG_PA, "PA", m_reg_PA).formatstr("%03X");
+	state_add(STATE_GENPC, "GENPC", m_reg_PA).noshow();
+	state_add(STATE_GENPCBASE, "GENPCBASE", m_reg_PA).noshow();
+	state_add(NANO_REG_SSR, "SSR", m_reg_SSR).formatstr("%03X");
+	state_add(NANO_REG_ISR, "ISR", m_reg_ISR).formatstr("%03X");
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).noshow().formatstr("%10s");
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_reg_A));
@@ -89,7 +90,7 @@ void hp_nanoprocessor_device::device_start()
 	save_item(NAME(m_reg_ISR));
 	save_item(NAME(m_flags));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_dc_changed_func.resolve_safe();
 	m_read_dc_func.resolve_safe(0xff);
@@ -122,7 +123,7 @@ void hp_nanoprocessor_device::execute_run()
 		// Check for interrupts (interrupt line is always enabled. Masking is done
 		// outside of the NP, usually by ANDing the DC7 line with the interrupt
 		// request signal)
-		if (BIT(m_flags , NANO_I_BIT)) {
+		if (BIT(m_flags, NANO_I_BIT)) {
 			m_reg_ISR = m_reg_PA;
 			m_reg_PA = (uint16_t)(standard_irq_callback(0) & 0xff);
 			// Vector fetching takes 1 cycle
@@ -131,7 +132,7 @@ void hp_nanoprocessor_device::execute_run()
 			// Need this to propagate the clearing of DC7 to the clearing of int. line
 			yield();
 		} else {
-			debugger_instruction_hook(this , m_reg_PA);
+			debugger_instruction_hook(m_reg_PA);
 
 			uint8_t opcode = fetch();
 			execute_one(opcode);
@@ -156,23 +157,22 @@ void hp_nanoprocessor_device::state_string_export(const device_state_entry &entr
 {
 	if (entry.index() == STATE_GENFLAGS) {
 		// DC7 is reported as "I" because it is usually used as interrupt enable
-		str = string_format("%c %c%c%c%c%c%c%c%c" , BIT(m_flags , NANO_E_BIT) ? 'E' : ' ',
-							BIT(m_flags , NANO_DC0_BIT + 7) ? 'I' : ' ',
-							BIT(m_flags , NANO_DC0_BIT + 6) ? '6' : ' ',
-							BIT(m_flags , NANO_DC0_BIT + 5) ? '5' : ' ',
-							BIT(m_flags , NANO_DC0_BIT + 4) ? '4' : ' ',
-							BIT(m_flags , NANO_DC0_BIT + 3) ? '3' : ' ',
-							BIT(m_flags , NANO_DC0_BIT + 2) ? '2' : ' ',
-							BIT(m_flags , NANO_DC0_BIT + 1) ? '1' : ' ',
-							BIT(m_flags , NANO_DC0_BIT + 0) ? '0' : ' ');
+		str = string_format("%c %c%c%c%c%c%c%c%c", BIT(m_flags, NANO_E_BIT) ? 'E' : ' ',
+							BIT(m_flags, NANO_DC0_BIT + 7) ? 'I' : ' ',
+							BIT(m_flags, NANO_DC0_BIT + 6) ? '6' : ' ',
+							BIT(m_flags, NANO_DC0_BIT + 5) ? '5' : ' ',
+							BIT(m_flags, NANO_DC0_BIT + 4) ? '4' : ' ',
+							BIT(m_flags, NANO_DC0_BIT + 3) ? '3' : ' ',
+							BIT(m_flags, NANO_DC0_BIT + 2) ? '2' : ' ',
+							BIT(m_flags, NANO_DC0_BIT + 1) ? '1' : ' ',
+							BIT(m_flags, NANO_DC0_BIT + 0) ? '0' : ' ');
 	}
 
 }
 
-offs_t hp_nanoprocessor_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> hp_nanoprocessor_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(hp_nanoprocessor);
-	return CPU_DISASSEMBLE_NAME(hp_nanoprocessor)(this , stream , pc , oprom , opram , options);
+	return std::make_unique<hp_nanoprocessor_disassembler>();
 }
 
 void hp_nanoprocessor_device::execute_one(uint8_t opcode)
@@ -299,14 +299,14 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 
 	case 0x1f:
 		// SES
-		if (BIT(m_flags , NANO_E_BIT)) {
+		if (BIT(m_flags, NANO_E_BIT)) {
 			skip();
 		}
 		break;
 
 	case 0x3f:
 		// SEZ
-		if (!BIT(m_flags , NANO_E_BIT)) {
+		if (!BIT(m_flags, NANO_E_BIT)) {
 			skip();
 		}
 		break;
@@ -359,7 +359,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 		switch (opcode & 0xf8) {
 		case 0x10:
 			// SBS
-			if (BIT(m_reg_A , opcode & 7)) {
+			if (BIT(m_reg_A, opcode & 7)) {
 				skip();
 			}
 			break;
@@ -369,7 +369,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 			{
 				uint8_t tmp = m_read_dc_func();
 				tmp &= (uint8_t)(m_flags >> NANO_DC0_BIT);
-				if (BIT(tmp , opcode & 7)) {
+				if (BIT(tmp, opcode & 7)) {
 					skip();
 				}
 			}
@@ -387,7 +387,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 
 		case 0x30:
 			// SBZ
-			if (!BIT(m_reg_A , opcode & 7)) {
+			if (!BIT(m_reg_A, opcode & 7)) {
 				skip();
 			}
 			break;
@@ -397,7 +397,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 			{
 				uint8_t tmp = m_read_dc_func();
 				tmp &= (uint8_t)(m_flags >> NANO_DC0_BIT);
-				if (!BIT(tmp , opcode & 7)) {
+				if (!BIT(tmp, opcode & 7)) {
 					skip();
 				}
 			}
@@ -459,7 +459,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 
 			case 0x50:
 				// OTA
-				m_io->write_byte(opcode & 0xf , m_reg_A);
+				m_io->write_byte(opcode & 0xf, m_reg_A);
 				break;
 
 			case 0x60:
@@ -474,7 +474,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 
 			case 0xc0:
 				// OTR
-				m_io->write_byte(opcode & 0xf , fetch());
+				m_io->write_byte(opcode & 0xf, fetch());
 				break;
 
 			case 0xd0:
@@ -493,7 +493,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 				break;
 
 			default:
-				logerror("Unknown opcode %02x @ 0x03x\n" , opcode , m_reg_PA);
+				logerror("Unknown opcode %02x @ 0x03x\n", opcode, m_reg_PA);
 				break;
 			}
 		}
@@ -507,7 +507,7 @@ uint16_t hp_nanoprocessor_device::pa_offset(unsigned off) const
 
 uint8_t hp_nanoprocessor_device::fetch(void)
 {
-	uint8_t res = m_direct->read_byte(m_reg_PA);
+	uint8_t res = m_cache->read_byte(m_reg_PA);
 	m_reg_PA = pa_offset(1);
 	return res;
 }

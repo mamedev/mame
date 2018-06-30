@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders:James Wallace
 /***************************************************************************
 
     Sony LDP-1450 laserdisc emulation.

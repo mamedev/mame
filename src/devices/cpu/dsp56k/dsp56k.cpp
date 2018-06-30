@@ -33,6 +33,7 @@
 
 #include "emu.h"
 #include "dsp56k.h"
+#include "dsp56dsm.h"
 
 #include "opcode.h"
 
@@ -59,7 +60,7 @@
 #include "dsp56mem.h"
 
 
-DEFINE_DEVICE_TYPE_NS(DSP56156, DSP56K, dsp56k_device, "dsp56156", "DSP56156")
+DEFINE_DEVICE_TYPE_NS(DSP56156, DSP56K, dsp56k_device, "dsp56156", "Motorola DSP56156")
 
 
 namespace DSP56K {
@@ -108,21 +109,23 @@ enum
 /****************************************************************************
  *  Internal Memory Maps
  ****************************************************************************/
-static ADDRESS_MAP_START( dsp56156_program_map, AS_PROGRAM, 16, dsp56k_device )
-	AM_RANGE(0x0000,0x07ff) AM_RAM AM_SHARE("dsk56k_program_ram")   /* 1-5 */
+void dsp56k_device::dsp56156_program_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("dsk56k_program_ram");   /* 1-5 */
 //  AM_RANGE(0x2f00,0x2fff) AM_ROM                              /* 1-5 PROM reserved memory.  Is this the right spot for it? */
-ADDRESS_MAP_END
+}
 
-static ADDRESS_MAP_START( dsp56156_x_data_map, AS_DATA, 16, dsp56k_device )
-	AM_RANGE(0x0000,0x07ff) AM_RAM                              /* 1-5 */
-	AM_RANGE(0xffc0,0xffff) AM_READWRITE(peripheral_register_r, peripheral_register_w)   /* 1-5 On-chip peripheral registers memory mapped in data space */
-ADDRESS_MAP_END
+void dsp56k_device::dsp56156_x_data_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();                              /* 1-5 */
+	map(0xffc0, 0xffff).rw(FUNC(dsp56k_device::peripheral_register_r), FUNC(dsp56k_device::peripheral_register_w));   /* 1-5 On-chip peripheral registers memory mapped in data space */
+}
 
 
 dsp56k_device::dsp56k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, DSP56156, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(dsp56156_program_map))
-	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(dsp56156_x_data_map))
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, address_map_constructor(FUNC(dsp56k_device::dsp56156_program_map), this))
+	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, address_map_constructor(FUNC(dsp56k_device::dsp56156_x_data_map), this))
 	, m_program_ram(*this, "dsk56k_program_ram")
 {
 }
@@ -138,7 +141,7 @@ device_memory_interface::space_config_vector dsp56k_device::memory_space_config(
 /***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
-#define ROPCODE(pc)   cpustate->direct->read_word(pc)
+#define ROPCODE(pc)   cpustate->cache->read_word(pc)
 
 
 /***************************************************************************
@@ -289,7 +292,7 @@ void dsp56k_device::device_start()
 	save_item(NAME(m_dsp56k_core.peripheral_ram));
 
 	m_dsp56k_core.program = &space(AS_PROGRAM);
-	m_dsp56k_core.direct = &m_dsp56k_core.program->direct();
+	m_dsp56k_core.cache = m_dsp56k_core.program->cache<1, -1, ENDIANNESS_LITTLE>();
 	m_dsp56k_core.data = &space(AS_DATA);
 
 	state_add(DSP56K_PC,     "PC", m_dsp56k_core.PCU.pc).formatstr("%04X");
@@ -345,7 +348,7 @@ void dsp56k_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_dsp56k_core.PCU.sp).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_dsp56k_core.PCU.sr).formatstr("%14s").noshow();
 
-	m_icountptr = &m_dsp56k_core.icount;
+	set_icountptr(m_dsp56k_core.icount);
 }
 
 
@@ -461,11 +464,12 @@ static size_t execute_one_new(dsp56k_core* cpustate)
 {
 	// For MAME
 	cpustate->ppc = PC;
-	debugger_instruction_hook(cpustate->device, PC);
+	if (cpustate->device->machine().debug_flags & DEBUG_FLAG_CALL_HOOK) // FIXME: if this was a member, the helper would work
+		cpustate->device->debug()->instruction_hook(PC);
 
-	cpustate->op = ROPCODE(ADDRESS(PC));
-	uint16_t w0 = ROPCODE(ADDRESS(PC));
-	uint16_t w1 = ROPCODE(ADDRESS(PC) + ADDRESS(1));
+	cpustate->op = ROPCODE(PC);
+	uint16_t w0 = ROPCODE(PC);
+	uint16_t w1 = ROPCODE(PC + 1);
 
 	Opcode op(w0, w1);
 	op.evaluate(cpustate);
@@ -503,9 +507,9 @@ void dsp56k_device::execute_run()
 }
 
 
-offs_t dsp56k_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> dsp56k_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(dsp56k)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<dsp56k_disassembler>();
 }
 
 } // namespace DSP56K

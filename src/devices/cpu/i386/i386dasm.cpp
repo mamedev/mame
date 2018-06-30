@@ -7,117 +7,9 @@
 */
 
 #include "emu.h"
+#include "i386dasm.h"
 
-enum
-{
-	PARAM_REG = 1,      /* 16 or 32-bit register */
-	PARAM_REG8,         /* 8-bit register */
-	PARAM_REG16,        /* 16-bit register */
-	PARAM_REG32,        /* 32-bit register */
-	PARAM_REG3264,      /* 32-bit or 64-bit register */
-	PARAM_REG2_32,      /* 32-bit register */
-	PARAM_MMX,          /* MMX register */
-	PARAM_MMX2,         /* MMX register in modrm */
-	PARAM_XMM,          /* XMM register */
-	PARAM_RM,           /* 16 or 32-bit memory or register */
-	PARAM_RM8,          /* 8-bit memory or register */
-	PARAM_RM16,         /* 16-bit memory or register */
-	PARAM_RM32,         /* 32-bit memory or register */
-	PARAM_RMPTR,        /* 16 or 32-bit memory or register */
-	PARAM_RMPTR8,       /* 8-bit memory or register */
-	PARAM_RMPTR16,      /* 16-bit memory or register */
-	PARAM_RMPTR32,      /* 32-bit memory or register */
-	PARAM_RMXMM,        /* 32 or 64-bit memory or register */
-	PARAM_REGORXMM,     /* 32 or 64-bit register or XMM register */
-	PARAM_M64,          /* 64-bit memory */
-	PARAM_M64PTR,       /* 64-bit memory */
-	PARAM_MMXM,         /* 64-bit memory or MMX register */
-	PARAM_XMMM,         /* 128-bit memory or XMM register */
-	PARAM_I4,           /* 4-bit signed immediate */
-	PARAM_I8,           /* 8-bit signed immediate */
-	PARAM_I16,          /* 16-bit signed immediate */
-	PARAM_UI8,          /* 8-bit unsigned immediate */
-	PARAM_UI16,         /* 16-bit unsigned immediate */
-	PARAM_IMM,          /* 16 or 32-bit immediate */
-	PARAM_IMM64,        /* 16, 32 or 64-bit immediate */
-	PARAM_ADDR,         /* 16:16 or 16:32 address */
-	PARAM_REL,          /* 16 or 32-bit PC-relative displacement */
-	PARAM_REL8,         /* 8-bit PC-relative displacement */
-	PARAM_MEM_OFFS,     /* 16 or 32-bit mem offset */
-	PARAM_PREIMP,       /* prefix with implicit register */
-	PARAM_SREG,         /* segment register */
-	PARAM_CREG,         /* control register */
-	PARAM_DREG,         /* debug register */
-	PARAM_TREG,         /* test register */
-	PARAM_1,            /* used by shift/rotate instructions */
-	PARAM_AL,
-	PARAM_CL,
-	PARAM_DL,
-	PARAM_BL,
-	PARAM_AH,
-	PARAM_CH,
-	PARAM_DH,
-	PARAM_BH,
-	PARAM_DX,
-	PARAM_EAX,          /* EAX or AX */
-	PARAM_ECX,          /* ECX or CX */
-	PARAM_EDX,          /* EDX or DX */
-	PARAM_EBX,          /* EBX or BX */
-	PARAM_ESP,          /* ESP or SP */
-	PARAM_EBP,          /* EBP or BP */
-	PARAM_ESI,          /* ESI or SI */
-	PARAM_EDI,          /* EDI or DI */
-	PARAM_XMM0,
-	PARAM_XMM64,            /* 64-bit memory or XMM register */
-	PARAM_XMM32,            /* 32-bit memory or XMM register */
-	PARAM_XMM16             /* 16-bit memory or XMM register */
-};
-
-enum
-{
-	MODRM = 1,
-	GROUP,
-	FPU,
-	OP_SIZE,
-	ADDR_SIZE,
-	TWO_BYTE,
-	PREFIX,
-	SEG_CS,
-	SEG_DS,
-	SEG_ES,
-	SEG_FS,
-	SEG_GS,
-	SEG_SS,
-	ISREX,
-	THREE_BYTE          /* [prefix] 0f op1 op2 and then mod/rm */
-};
-
-#define FLAGS_MASK          0x0ff
-#define VAR_NAME            0x100
-#define VAR_NAME4           0x200
-#define ALWAYS64            0x400
-#define SPECIAL64           0x800
-#define SPECIAL64_ENT(x)    (SPECIAL64 | ((x) << 24))
-#define GROUP_MOD           0x1000
-
-struct I386_OPCODE {
-	const char *mnemonic;
-	uint32_t flags;
-	uint32_t param1;
-	uint32_t param2;
-	uint32_t param3;
-	offs_t dasm_flags;
-};
-
-struct GROUP_OP {
-	char mnemonic[32];
-	const I386_OPCODE *opcode;
-};
-
-static const uint8_t *opcode_ptr;
-static const uint8_t *opcode_ptr_base;
-
-static const I386_OPCODE i386_opcode_table1[256] =
+const i386_disassembler::I386_OPCODE i386_disassembler::i386_opcode_table1[256] =
 {
 	// 0x00
 	{"add",             MODRM,          PARAM_RM8,          PARAM_REG8,         0               },
@@ -283,7 +175,7 @@ static const I386_OPCODE i386_opcode_table1[256] =
 	{"xchg",            0,              PARAM_EAX,          PARAM_EDI,          0               },
 	{"cbw\0cwde\0cdqe", VAR_NAME,       0,                  0,                  0               },
 	{"cwd\0cdq\0cqo",   VAR_NAME,       0,                  0,                  0               },
-	{"call",            ALWAYS64,       PARAM_ADDR,         0,                  0,              DASMFLAG_STEP_OVER},
+	{"call",            ALWAYS64,       PARAM_ADDR,         0,                  0,              STEP_OVER},
 	{"wait",            0,              0,                  0,                  0               },
 	{"pushf\0pushfd\0pushfq",VAR_NAME,  0,                  0,                  0               },
 	{"popf\0popfd\0popfq",VAR_NAME,     0,                  0,                  0               },
@@ -326,20 +218,20 @@ static const I386_OPCODE i386_opcode_table1[256] =
 	// 0xc0
 	{"groupC0",         GROUP,          0,                  0,                  0               },
 	{"groupC1",         GROUP,          0,                  0,                  0               },
-	{"ret",             0,              PARAM_UI16,         0,                  0,              DASMFLAG_STEP_OUT},
-	{"ret",             0,              0,                  0,                  0,              DASMFLAG_STEP_OUT},
+	{"ret",             0,              PARAM_UI16,         0,                  0,              STEP_OUT},
+	{"ret",             0,              0,                  0,                  0,              STEP_OUT},
 	{"les",             MODRM,          PARAM_REG,          PARAM_RM,           0               },
 	{"lds",             MODRM,          PARAM_REG,          PARAM_RM,           0               },
 	{"mov",             MODRM,          PARAM_RMPTR8,       PARAM_UI8,          0               },
 	{"mov",             MODRM,          PARAM_RMPTR,        PARAM_IMM,          0               },
 	{"enter",           0,              PARAM_UI16,         PARAM_UI8,          0               },
 	{"leave",           0,              0,                  0,                  0               },
-	{"retf",            0,              PARAM_UI16,         0,                  0,              DASMFLAG_STEP_OUT},
-	{"retf",            0,              0,                  0,                  0,              DASMFLAG_STEP_OUT},
-	{"int 3",           0,              0,                  0,                  0,              DASMFLAG_STEP_OVER},
-	{"int",             0,              PARAM_UI8,          0,                  0,              DASMFLAG_STEP_OVER},
+	{"retf",            0,              PARAM_UI16,         0,                  0,              STEP_OUT},
+	{"retf",            0,              0,                  0,                  0,              STEP_OUT},
+	{"int 3",           0,              0,                  0,                  0,              STEP_OVER},
+	{"int",             0,              PARAM_UI8,          0,                  0,              STEP_OVER},
 	{"into",            0,              0,                  0,                  0               },
-	{"iret",            0,              0,                  0,                  0,              DASMFLAG_STEP_OUT},
+	{"iret",            0,              0,                  0,                  0,              STEP_OUT},
 	// 0xd0
 	{"groupD0",         GROUP,          0,                  0,                  0               },
 	{"groupD1",         GROUP,          0,                  0,                  0               },
@@ -358,15 +250,15 @@ static const I386_OPCODE i386_opcode_table1[256] =
 	{"escape",          FPU,            0,                  0,                  0               },
 	{"escape",          FPU,            0,                  0,                  0               },
 	// 0xe0
-	{"loopne",          0,              PARAM_REL8,         0,                  0,              DASMFLAG_STEP_OVER},
-	{"loopz",           0,              PARAM_REL8,         0,                  0,              DASMFLAG_STEP_OVER},
-	{"loop",            0,              PARAM_REL8,         0,                  0,              DASMFLAG_STEP_OVER},
+	{"loopne",          0,              PARAM_REL8,         0,                  0,              STEP_OVER},
+	{"loopz",           0,              PARAM_REL8,         0,                  0,              STEP_OVER},
+	{"loop",            0,              PARAM_REL8,         0,                  0,              STEP_OVER},
 	{"jcxz\0jecxz\0jrcxz",VAR_NAME,     PARAM_REL8,         0,                  0               },
 	{"in",              0,              PARAM_AL,           PARAM_UI8,          0               },
 	{"in",              0,              PARAM_EAX,          PARAM_UI8,          0               },
 	{"out",             0,              PARAM_UI8,          PARAM_AL,           0               },
 	{"out",             0,              PARAM_UI8,          PARAM_EAX,          0               },
-	{"call",            0,              PARAM_REL,          0,                  0,              DASMFLAG_STEP_OVER},
+	{"call",            0,              PARAM_REL,          0,                  0,              STEP_OVER},
 	{"jmp",             0,              PARAM_REL,          0,                  0               },
 	{"jmp",             0,              PARAM_ADDR,         0,                  0               },
 	{"jmp",             0,              PARAM_REL8,         0,                  0               },
@@ -393,12 +285,12 @@ static const I386_OPCODE i386_opcode_table1[256] =
 	{"groupFF",         GROUP,          0,                  0,                  0               }
 };
 
-static const I386_OPCODE x64_opcode_alt[] =
+const i386_disassembler::I386_OPCODE i386_disassembler::x64_opcode_alt[] =
 {
 	{"movsxd",          MODRM | ALWAYS64,PARAM_REG,         PARAM_RMPTR32,      0               },
 };
 
-static const I386_OPCODE i386_opcode_table2[256] =
+const i386_disassembler::I386_OPCODE i386_disassembler::i386_opcode_table2[256] =
 {
 	// 0x00
 	{"group0F00",       GROUP,          0,                  0,                  0               },
@@ -724,7 +616,7 @@ static const I386_OPCODE i386_opcode_table2[256] =
 	{"bsr\0"
 		"???\0"
 		"???\0"
-		"lzcnt",            MODRM|VAR_NAME4,    PARAM_REG,          PARAM_RM,           0,              DASMFLAG_STEP_OVER},
+		"lzcnt",            MODRM|VAR_NAME4,    PARAM_REG,          PARAM_RM,           0,              STEP_OVER},
 	{"movsx",           MODRM,          PARAM_REG,          PARAM_RMPTR8,       0               },
 	{"movsx",           MODRM,          PARAM_REG,          PARAM_RMPTR16,      0               },
 	// 0xc0
@@ -821,7 +713,7 @@ static const I386_OPCODE i386_opcode_table2[256] =
 	{"???",             0,              0,                  0,                  0               }
 };
 
-static const I386_OPCODE i386_opcode_table0F38[256] =
+const i386_disassembler::I386_OPCODE i386_disassembler::i386_opcode_table0F38[256] =
 {
 	// 0x00
 	{"pshufb\0"
@@ -1265,7 +1157,7 @@ static const I386_OPCODE i386_opcode_table0F38[256] =
 	{"???",             0,              0,          0,              0               },
 };
 
-static const I386_OPCODE i386_opcode_table0F3A[256] =
+const i386_disassembler::I386_OPCODE i386_disassembler::i386_opcode_table0F3A[256] =
 {
 	// 0x00
 	{"???",             0,              0,          0,              0               },
@@ -1613,7 +1505,7 @@ static const I386_OPCODE i386_opcode_table0F3A[256] =
 	{"???",             0,              0,          0,              0               },
 };
 
-static const I386_OPCODE group80_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group80_table[8] =
 {
 	{"add",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
 	{"or",              0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
@@ -1625,7 +1517,7 @@ static const I386_OPCODE group80_table[8] =
 	{"cmp",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               }
 };
 
-static const I386_OPCODE group81_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group81_table[8] =
 {
 	{"add",             0,              PARAM_RMPTR,        PARAM_IMM,          0               },
 	{"or",              0,              PARAM_RMPTR,        PARAM_IMM,          0               },
@@ -1637,7 +1529,7 @@ static const I386_OPCODE group81_table[8] =
 	{"cmp",             0,              PARAM_RMPTR,        PARAM_IMM,          0               }
 };
 
-static const I386_OPCODE group83_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group83_table[8] =
 {
 	{"add",             0,              PARAM_RMPTR,        PARAM_I8,           0               },
 	{"or",              0,              PARAM_RMPTR,        PARAM_I8,           0               },
@@ -1649,7 +1541,7 @@ static const I386_OPCODE group83_table[8] =
 	{"cmp",             0,              PARAM_RMPTR,        PARAM_I8,           0               }
 };
 
-static const I386_OPCODE groupC0_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::groupC0_table[8] =
 {
 	{"rol",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
 	{"ror",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
@@ -1661,7 +1553,7 @@ static const I386_OPCODE groupC0_table[8] =
 	{"sar",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               }
 };
 
-static const I386_OPCODE groupC1_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::groupC1_table[8] =
 {
 	{"rol",             0,              PARAM_RMPTR,        PARAM_UI8,          0               },
 	{"ror",             0,              PARAM_RMPTR,        PARAM_UI8,          0               },
@@ -1673,7 +1565,7 @@ static const I386_OPCODE groupC1_table[8] =
 	{"sar",             0,              PARAM_RMPTR,        PARAM_UI8,          0               }
 };
 
-static const I386_OPCODE groupD0_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::groupD0_table[8] =
 {
 	{"rol",             0,              PARAM_RMPTR8,       PARAM_1,            0               },
 	{"ror",             0,              PARAM_RMPTR8,       PARAM_1,            0               },
@@ -1685,7 +1577,7 @@ static const I386_OPCODE groupD0_table[8] =
 	{"sar",             0,              PARAM_RMPTR8,       PARAM_1,            0               }
 };
 
-static const I386_OPCODE groupD1_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::groupD1_table[8] =
 {
 	{"rol",             0,              PARAM_RMPTR,        PARAM_1,            0               },
 	{"ror",             0,              PARAM_RMPTR,        PARAM_1,            0               },
@@ -1697,7 +1589,7 @@ static const I386_OPCODE groupD1_table[8] =
 	{"sar",             0,              PARAM_RMPTR,        PARAM_1,            0               }
 };
 
-static const I386_OPCODE groupD2_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::groupD2_table[8] =
 {
 	{"rol",             0,              PARAM_RMPTR8,       PARAM_CL,           0               },
 	{"ror",             0,              PARAM_RMPTR8,       PARAM_CL,           0               },
@@ -1709,7 +1601,7 @@ static const I386_OPCODE groupD2_table[8] =
 	{"sar",             0,              PARAM_RMPTR8,       PARAM_CL,           0               }
 };
 
-static const I386_OPCODE groupD3_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::groupD3_table[8] =
 {
 	{"rol",             0,              PARAM_RMPTR,        PARAM_CL,           0               },
 	{"ror",             0,              PARAM_RMPTR,        PARAM_CL,           0               },
@@ -1721,7 +1613,7 @@ static const I386_OPCODE groupD3_table[8] =
 	{"sar",             0,              PARAM_RMPTR,        PARAM_CL,           0               }
 };
 
-static const I386_OPCODE groupF6_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::groupF6_table[8] =
 {
 	{"test",            0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
 	{"test",            0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
@@ -1733,7 +1625,7 @@ static const I386_OPCODE groupF6_table[8] =
 	{"idiv",            0,              PARAM_RMPTR8,       0,                  0               }
 };
 
-static const I386_OPCODE groupF7_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::groupF7_table[8] =
 {
 	{"test",            0,              PARAM_RMPTR,        PARAM_IMM,          0               },
 	{"test",            0,              PARAM_RMPTR,        PARAM_IMM,          0               },
@@ -1745,7 +1637,7 @@ static const I386_OPCODE groupF7_table[8] =
 	{"idiv",            0,              PARAM_RMPTR,        0,                  0               }
 };
 
-static const I386_OPCODE groupFE_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::groupFE_table[8] =
 {
 	{"inc",             0,              PARAM_RMPTR8,       0,                  0               },
 	{"dec",             0,              PARAM_RMPTR8,       0,                  0               },
@@ -1757,19 +1649,19 @@ static const I386_OPCODE groupFE_table[8] =
 	{"???",             0,              0,                  0,                  0               }
 };
 
-static const I386_OPCODE groupFF_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::groupFF_table[8] =
 {
 	{"inc",             0,              PARAM_RMPTR,        0,                  0               },
 	{"dec",             0,              PARAM_RMPTR,        0,                  0               },
-	{"call",            ALWAYS64,       PARAM_RMPTR,        0,                  0,              DASMFLAG_STEP_OVER},
-	{"call    far ptr ",0,              PARAM_RM,           0,                  0,              DASMFLAG_STEP_OVER},
+	{"call",            ALWAYS64,       PARAM_RMPTR,        0,                  0,              STEP_OVER},
+	{"call    far ptr ",0,              PARAM_RM,           0,                  0,              STEP_OVER},
 	{"jmp",             ALWAYS64,       PARAM_RMPTR,        0,                  0               },
 	{"jmp     far ptr ",0,              PARAM_RM,           0,                  0               },
 	{"push",            0,              PARAM_RMPTR,        0,                  0               },
 	{"???",             0,              0,                  0,                  0               }
 };
 
-static const I386_OPCODE group0F00_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group0F00_table[8] =
 {
 	{"sldt",            0,              PARAM_RM,           0,                  0               },
 	{"str",             0,              PARAM_RM,           0,                  0               },
@@ -1781,7 +1673,7 @@ static const I386_OPCODE group0F00_table[8] =
 	{"???",             0,              0,                  0,                  0               }
 };
 
-static const I386_OPCODE group0F01_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group0F01_table[8] =
 {
 	{"sgdt",            0,              PARAM_RM,           0,                  0               },
 	{"sidt",            0,              PARAM_RM,           0,                  0               },
@@ -1793,7 +1685,7 @@ static const I386_OPCODE group0F01_table[8] =
 	{"invlpg",          0,              PARAM_RM,           0,                  0               }
 };
 
-static const I386_OPCODE group0F0D_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group0F0D_table[8] =
 {
 	{"prefetch",        0,              PARAM_RM8,          0,                  0               },
 	{"prefetchw",       0,              PARAM_RM8,          0,                  0               },
@@ -1805,7 +1697,7 @@ static const I386_OPCODE group0F0D_table[8] =
 	{"???",             0,              0,                  0,                  0               }
 };
 
-static const I386_OPCODE group0F12_table[4] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group0F12_table[4] =
 {
 	{ "movlps\0"
 		"movlpd\0"
@@ -1825,7 +1717,7 @@ static const I386_OPCODE group0F12_table[4] =
 		"movsldup",     VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         0               }
 };
 
-static const I386_OPCODE group0F16_table[4] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group0F16_table[4] =
 {
 	{ "movhps\0"
 		"movhpd\0"
@@ -1845,7 +1737,7 @@ static const I386_OPCODE group0F16_table[4] =
 		"movshdup",     VAR_NAME4,PARAM_XMM,         PARAM_XMMM,          0               }
 };
 
-static const I386_OPCODE group0F18_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group0F18_table[8] =
 {
 	{"prefetchnta",     0,              PARAM_RM8,          0,                  0               },
 	{"prefetch0",       0,              PARAM_RM8,          0,                  0               },
@@ -1857,7 +1749,7 @@ static const I386_OPCODE group0F18_table[8] =
 	{"???",             0,              0,                  0,                  0               }
 };
 
-static const I386_OPCODE group0F71_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group0F71_table[8] =
 {
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
@@ -1869,7 +1761,7 @@ static const I386_OPCODE group0F71_table[8] =
 	{"???",             0,              0,                  0,                  0               }
 };
 
-static const I386_OPCODE group0F72_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group0F72_table[8] =
 {
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
@@ -1881,7 +1773,7 @@ static const I386_OPCODE group0F72_table[8] =
 	{"???",             0,              0,                  0,                  0               }
 };
 
-static const I386_OPCODE group0F73_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group0F73_table[8] =
 {
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
@@ -1893,7 +1785,7 @@ static const I386_OPCODE group0F73_table[8] =
 	{"pslldq",          0,              PARAM_MMX2,         PARAM_UI8,          0               },
 };
 
-static const I386_OPCODE group0FAE_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group0FAE_table[8] =
 {
 	{"fxsave",          0,              PARAM_RM,           0,                  0               },
 	{"fxrstor",         0,              PARAM_RM,           0,                  0               },
@@ -1906,7 +1798,7 @@ static const I386_OPCODE group0FAE_table[8] =
 };
 
 
-static const I386_OPCODE group0FBA_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group0FBA_table[8] =
 {
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
@@ -1918,7 +1810,7 @@ static const I386_OPCODE group0FBA_table[8] =
 	{"btc",             0,              PARAM_RM,           PARAM_UI8,          0               }
 };
 
-static const I386_OPCODE group0FC7_table[8] =
+const i386_disassembler::I386_OPCODE i386_disassembler::group0FC7_table[8] =
 {
 	{"???",             0,              0,                  0,                  0               },
 	{"cmpxchg8b",           MODRM,              PARAM_M64PTR,               0,                  0               },
@@ -1933,7 +1825,7 @@ static const I386_OPCODE group0FC7_table[8] =
 	{"vmptrtst",            MODRM,              PARAM_M64PTR,               0,                  0               }
 };
 
-static const GROUP_OP group_op_table[] =
+const i386_disassembler::GROUP_OP i386_disassembler::group_op_table[] =
 {
 	{ "group80",            group80_table           },
 	{ "group81",            group81_table           },
@@ -1964,98 +1856,60 @@ static const GROUP_OP group_op_table[] =
 
 
 
-static const char *const i386_reg[3][16] =
+const char *const i386_disassembler::i386_reg[3][16] =
 {
 	{"ax",  "cx",  "dx",  "bx",  "sp",  "bp",  "si",  "di",  "r8w", "r9w", "r10w","r11w","r12w","r13w","r14w","r15w"},
 	{"eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi", "r8d", "r9d", "r10d","r11d","r12d","r13d","r14d","r15d"},
 	{"rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi", "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15"}
 };
 
-static const char *const i386_reg8[8] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
-static const char *const i386_reg8rex[16] = {"al", "cl", "dl", "bl", "spl", "bpl", "sil", "dil", "r8l", "r9l", "r10l", "r11l", "r12l", "r13l", "r14l", "r15l"};
-static const char *const i386_sreg[8] = {"es", "cs", "ss", "ds", "fs", "gs", "???", "???"};
+const char *const i386_disassembler::i386_reg8[8] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
+const char *const i386_disassembler::i386_reg8rex[16] = {"al", "cl", "dl", "bl", "spl", "bpl", "sil", "dil", "r8l", "r9l", "r10l", "r11l", "r12l", "r13l", "r14l", "r15l"};
+const char *const i386_disassembler::i386_sreg[8] = {"es", "cs", "ss", "ds", "fs", "gs", "???", "???"};
 
-static int address_size;
-static int operand_size;
-static int address_prefix;
-static int operand_prefix;
-static int max_length;
-static uint64_t pc;
-static uint8_t modrm;
-static uint32_t segment;
-static offs_t dasm_flags;
-static std::string modrm_string;
-static uint8_t rex, regex, sibex, rmex;
-static uint8_t pre0f;
-static uint8_t curmode;
-
-#define MODRM_REG1  ((modrm >> 3) & 0x7)
-#define MODRM_REG2  (modrm & 0x7)
-#define MODRM_MOD   ((modrm >> 6) & 0x3)
-
-static inline uint8_t FETCH(void)
+inline uint8_t i386_disassembler::FETCH(offs_t base_pc, offs_t &pc, const data_buffer &opcodes)
 {
-	if ((opcode_ptr - opcode_ptr_base) + 1 > max_length)
+	if ((pc - base_pc) + 1 > max_length)
 		return 0xff;
+	uint8_t d = opcodes.r8(pc);
 	pc++;
-	return *opcode_ptr++;
-}
-
-#if 0
-static inline uint16_t FETCH16(void)
-{
-	uint16_t d;
-	if ((opcode_ptr - opcode_ptr_base) + 2 > max_length)
-		return 0xffff;
-	d = opcode_ptr[0] | (opcode_ptr[1] << 8);
-	opcode_ptr += 2;
-	pc += 2;
-	return d;
-}
-#endif
-
-static inline uint32_t FETCH32(void)
-{
-	uint32_t d;
-	if ((opcode_ptr - opcode_ptr_base) + 4 > max_length)
-		return 0xffffffff;
-	d = opcode_ptr[0] | (opcode_ptr[1] << 8) | (opcode_ptr[2] << 16) | (opcode_ptr[3] << 24);
-	opcode_ptr += 4;
-	pc += 4;
 	return d;
 }
 
-static inline uint8_t FETCHD(void)
+inline uint16_t i386_disassembler::FETCH16(offs_t base_pc, offs_t &pc, const data_buffer &opcodes)
 {
-	if ((opcode_ptr - opcode_ptr_base) + 1 > max_length)
-		return 0xff;
-	pc++;
-	return *opcode_ptr++;
-}
-
-static inline uint16_t FETCHD16(void)
-{
-	uint16_t d;
-	if ((opcode_ptr - opcode_ptr_base) + 2 > max_length)
+	if ((pc - base_pc) + 2 > max_length)
 		return 0xffff;
-	d = opcode_ptr[0] | (opcode_ptr[1] << 8);
-	opcode_ptr += 2;
+	uint16_t d = opcodes.r16(pc);
 	pc += 2;
 	return d;
 }
 
-static inline uint32_t FETCHD32(void)
+inline uint32_t i386_disassembler::FETCH32(offs_t base_pc, offs_t &pc, const data_buffer &opcodes)
 {
-	uint32_t d;
-	if ((opcode_ptr - opcode_ptr_base) + 4 > max_length)
+	if ((pc - base_pc) + 4 > max_length)
 		return 0xffffffff;
-	d = opcode_ptr[0] | (opcode_ptr[1] << 8) | (opcode_ptr[2] << 16) | (opcode_ptr[3] << 24);
-	opcode_ptr += 4;
+	uint32_t d = opcodes.r32(pc);
 	pc += 4;
 	return d;
 }
 
-static char *hexstring(uint32_t value, int digits)
+inline uint8_t i386_disassembler::FETCHD(offs_t base_pc, offs_t &pc, const data_buffer &opcodes)
+{
+	return FETCH(base_pc, pc, opcodes);
+}
+
+inline uint16_t i386_disassembler::FETCHD16(offs_t base_pc, offs_t &pc, const data_buffer &opcodes)
+{
+	return FETCH16(base_pc, pc, opcodes);
+}
+
+inline uint32_t i386_disassembler::FETCHD32(offs_t base_pc, offs_t &pc, const data_buffer &opcodes)
+{
+	return FETCH32(base_pc, pc, opcodes);
+}
+
+char *i386_disassembler::hexstring(uint32_t value, int digits)
 {
 	static char buffer[20];
 	buffer[0] = '0';
@@ -2066,7 +1920,7 @@ static char *hexstring(uint32_t value, int digits)
 	return (buffer[1] >= '0' && buffer[1] <= '9') ? &buffer[1] : &buffer[0];
 }
 
-static char *hexstring64(uint32_t lo, uint32_t hi)
+char *i386_disassembler::hexstring64(uint32_t lo, uint32_t hi)
 {
 	static char buffer[40];
 	buffer[0] = '0';
@@ -2077,15 +1931,15 @@ static char *hexstring64(uint32_t lo, uint32_t hi)
 	return (buffer[1] >= '0' && buffer[1] <= '9') ? &buffer[1] : &buffer[0];
 }
 
-static char *hexstringpc(uint64_t pc)
+char *i386_disassembler::hexstringpc(uint64_t pc)
 {
-	if (curmode == 64)
+	if (m_config->get_mode() == 64)
 		return hexstring64((uint32_t)pc, (uint32_t)(pc >> 32));
 	else
 		return hexstring((uint32_t)pc, 0);
 }
 
-static char *shexstring(uint32_t value, int digits, bool always)
+char *i386_disassembler::shexstring(uint32_t value, int digits, bool always)
 {
 	static char buffer[20];
 	if (value >= 0x80000000)
@@ -2097,18 +1951,18 @@ static char *shexstring(uint32_t value, int digits, bool always)
 	return buffer;
 }
 
-static void handle_sib_byte(std::ostream &stream, uint8_t mod)
+void i386_disassembler::handle_sib_byte(std::ostream &stream, uint8_t mod, offs_t base_pc, offs_t &pc, const data_buffer &opcodes)
 {
 	uint32_t i32;
 	uint8_t scale, i, base;
-	uint8_t sib = FETCHD();
+	uint8_t sib = FETCHD(base_pc, pc, opcodes);
 
 	scale = (sib >> 6) & 0x3;
 	i = ((sib >> 3) & 0x7) | sibex;
 	base = (sib & 0x7) | rmex;
 
 	if (base == 5 && mod == 0) {
-		i32 = FETCH32();
+		i32 = FETCHD32(base_pc, pc, opcodes);
 		util::stream_format(stream, "%s", hexstring(i32, 0));
 	} else if (base != 5 || mod != 3)
 		util::stream_format(stream, "%s", i386_reg[address_size][base]);
@@ -2120,14 +1974,14 @@ static void handle_sib_byte(std::ostream &stream, uint8_t mod)
 	}
 }
 
-static void handle_modrm(std::ostream &stream)
+void i386_disassembler::handle_modrm(std::ostream &stream, offs_t base_pc, offs_t &pc, const data_buffer &opcodes)
 {
 	int8_t disp8;
 	int16_t disp16;
 	int32_t disp32;
 	uint8_t mod, rm;
 
-	modrm = FETCHD();
+	modrm = FETCHD(base_pc, pc, opcodes);
 	mod = (modrm >> 6) & 0x3;
 	rm = (modrm & 0x7) | rmex;
 
@@ -2147,38 +2001,38 @@ static void handle_modrm(std::ostream &stream)
 	util::stream_format(stream, "[" );
 	if( address_size == 2 ) {
 		if ((rm & 7) == 4)
-			handle_sib_byte(stream, mod );
+			handle_sib_byte(stream, mod, base_pc, pc, opcodes);
 		else if ((rm & 7) == 5 && mod == 0) {
-			disp32 = FETCHD32();
+			disp32 = FETCHD32(base_pc, pc, opcodes);
 			util::stream_format(stream, "rip%s", shexstring(disp32, 0, true));
 		} else
 			util::stream_format(stream, "%s", i386_reg[2][rm]);
 		if( mod == 1 ) {
-			disp8 = FETCHD();
+			disp8 = FETCHD(base_pc, pc, opcodes);
 			if (disp8 != 0)
 				util::stream_format(stream, "%s", shexstring((int32_t)disp8, 0, true) );
 		} else if( mod == 2 ) {
-			disp32 = FETCHD32();
+			disp32 = FETCHD32(base_pc, pc, opcodes);
 			if (disp32 != 0)
 				util::stream_format(stream, "%s", shexstring(disp32, 0, true) );
 		}
 	} else if (address_size == 1) {
 		if ((rm & 7) == 4)
-			handle_sib_byte(stream, mod );
+			handle_sib_byte(stream, mod, base_pc, pc, opcodes);
 		else if ((rm & 7) == 5 && mod == 0) {
-			disp32 = FETCHD32();
-			if (curmode == 64)
+			disp32 = FETCHD32(base_pc, pc, opcodes);
+			if (m_config->get_mode() == 64)
 				util::stream_format(stream, "eip%s", shexstring(disp32, 0, true) );
 			else
 				util::stream_format(stream, "%s", hexstring(disp32, 0) );
 		} else
 			util::stream_format(stream, "%s", i386_reg[1][rm]);
 		if( mod == 1 ) {
-			disp8 = FETCHD();
+			disp8 = FETCHD(base_pc, pc, opcodes);
 			if (disp8 != 0)
 				util::stream_format(stream, "%s", shexstring((int32_t)disp8, 0, true) );
 		} else if( mod == 2 ) {
-			disp32 = FETCHD32();
+			disp32 = FETCHD32(base_pc, pc, opcodes);
 			if (disp32 != 0)
 				util::stream_format(stream, "%s", shexstring(disp32, 0, true) );
 		}
@@ -2193,7 +2047,7 @@ static void handle_modrm(std::ostream &stream)
 			case 5: util::stream_format(stream, "di" ); break;
 			case 6:
 				if( mod == 0 ) {
-					disp16 = FETCHD16();
+					disp16 = FETCHD16(base_pc, pc, opcodes);
 					util::stream_format(stream, "%s", hexstring((unsigned) (uint16_t) disp16, 0) );
 				} else {
 					util::stream_format(stream, "bp" );
@@ -2202,11 +2056,11 @@ static void handle_modrm(std::ostream &stream)
 			case 7: util::stream_format(stream, "bx" ); break;
 		}
 		if( mod == 1 ) {
-			disp8 = FETCHD();
+			disp8 = FETCHD(base_pc, pc, opcodes);
 			if (disp8 != 0)
 				util::stream_format(stream, "%s", shexstring((int32_t)disp8, 0, true) );
 		} else if( mod == 2 ) {
-			disp16 = FETCHD16();
+			disp16 = FETCHD16(base_pc, pc, opcodes);
 			if (disp16 != 0)
 				util::stream_format(stream, "%s", shexstring((int32_t)disp16, 0, true) );
 		}
@@ -2214,14 +2068,14 @@ static void handle_modrm(std::ostream &stream)
 	util::stream_format(stream, "]" );
 }
 
-static void handle_modrm(std::string &buffer)
+void i386_disassembler::handle_modrm(std::string &buffer, offs_t base_pc, offs_t &pc, const data_buffer &opcodes)
 {
 	std::stringstream stream;
-	handle_modrm(stream);
+	handle_modrm(stream, base_pc, pc, opcodes);
 	buffer = stream.str();
 }
 
-static void handle_param(std::ostream &stream, uint32_t param)
+void i386_disassembler::handle_param(std::ostream &stream, uint32_t param, offs_t base_pc, offs_t &pc, const data_buffer &opcodes)
 {
 	uint8_t i8;
 	uint16_t i16;
@@ -2235,58 +2089,58 @@ static void handle_param(std::ostream &stream, uint32_t param)
 	switch(param)
 	{
 		case PARAM_REG:
-			util::stream_format(stream, "%s", i386_reg[operand_size][MODRM_REG1 | regex] );
+			util::stream_format(stream, "%s", i386_reg[operand_size][MODRM_REG1() | regex] );
 			break;
 
 		case PARAM_REG8:
-			util::stream_format(stream, "%s", (rex ? i386_reg8rex : i386_reg8)[MODRM_REG1 | regex] );
+			util::stream_format(stream, "%s", (rex ? i386_reg8rex : i386_reg8)[MODRM_REG1() | regex] );
 			break;
 
 		case PARAM_REG16:
-			util::stream_format(stream, "%s", i386_reg[0][MODRM_REG1 | regex] );
+			util::stream_format(stream, "%s", i386_reg[0][MODRM_REG1() | regex] );
 			break;
 
 		case PARAM_REG32:
-			util::stream_format(stream, "%s", i386_reg[1][MODRM_REG1 | regex] );
+			util::stream_format(stream, "%s", i386_reg[1][MODRM_REG1() | regex] );
 			break;
 
 		case PARAM_REG3264:
-			util::stream_format(stream, "%s", i386_reg[(operand_size == 2) ? 2 : 1][MODRM_REG1 | regex] );
+			util::stream_format(stream, "%s", i386_reg[(operand_size == 2) ? 2 : 1][MODRM_REG1() | regex] );
 			break;
 
 		case PARAM_MMX:
 			if (pre0f == 0x66 || pre0f == 0xf2 || pre0f == 0xf3)
-				util::stream_format(stream, "xmm%d", MODRM_REG1 | regex );
+				util::stream_format(stream, "xmm%d", MODRM_REG1() | regex );
 			else
-				util::stream_format(stream, "mm%d", MODRM_REG1 | regex );
+				util::stream_format(stream, "mm%d", MODRM_REG1() | regex );
 			break;
 
 		case PARAM_MMX2:
 			if (pre0f == 0x66 || pre0f == 0xf2 || pre0f == 0xf3)
-				util::stream_format(stream, "xmm%d", MODRM_REG2 | regex );
+				util::stream_format(stream, "xmm%d", MODRM_REG2() | regex );
 			else
-				util::stream_format(stream, "mm%d", MODRM_REG2 | regex );
+				util::stream_format(stream, "mm%d", MODRM_REG2() | regex );
 			break;
 
 		case PARAM_XMM:
-			util::stream_format(stream, "xmm%d", MODRM_REG1 | regex );
+			util::stream_format(stream, "xmm%d", MODRM_REG1() | regex );
 			break;
 
 		case PARAM_REGORXMM:
 			if (pre0f != 0xf2 && pre0f != 0xf3)
-				util::stream_format(stream, "xmm%d", MODRM_REG1 | regex );
+				util::stream_format(stream, "xmm%d", MODRM_REG1() | regex );
 			else
-				util::stream_format(stream, "%s", i386_reg[(operand_size == 2) ? 2 : 1][MODRM_REG1 | regex] );
+				util::stream_format(stream, "%s", i386_reg[(operand_size == 2) ? 2 : 1][MODRM_REG1() | regex] );
 			break;
 
 		case PARAM_REG2_32:
-			util::stream_format(stream, "%s", i386_reg[1][MODRM_REG2 | rmex] );
+			util::stream_format(stream, "%s", i386_reg[1][MODRM_REG2() | rmex] );
 			break;
 
 		case PARAM_RM:
 		case PARAM_RMPTR:
 			if( modrm >= 0xc0 ) {
-				util::stream_format(stream, "%s", i386_reg[operand_size][MODRM_REG2 | rmex] );
+				util::stream_format(stream, "%s", i386_reg[operand_size][MODRM_REG2() | rmex] );
 			} else {
 				if (param == PARAM_RMPTR)
 				{
@@ -2304,7 +2158,7 @@ static void handle_param(std::ostream &stream, uint32_t param)
 		case PARAM_RM8:
 		case PARAM_RMPTR8:
 			if( modrm >= 0xc0 ) {
-				util::stream_format(stream, "%s", (rex ? i386_reg8rex : i386_reg8)[MODRM_REG2 | rmex] );
+				util::stream_format(stream, "%s", (rex ? i386_reg8rex : i386_reg8)[MODRM_REG2() | rmex] );
 			} else {
 				if (param == PARAM_RMPTR8)
 					util::stream_format(stream, "byte ptr " );
@@ -2315,7 +2169,7 @@ static void handle_param(std::ostream &stream, uint32_t param)
 		case PARAM_RM16:
 		case PARAM_RMPTR16:
 			if( modrm >= 0xc0 ) {
-				util::stream_format(stream, "%s", i386_reg[0][MODRM_REG2 | rmex] );
+				util::stream_format(stream, "%s", i386_reg[0][MODRM_REG2() | rmex] );
 			} else {
 				if (param == PARAM_RMPTR16)
 					util::stream_format(stream, "word ptr " );
@@ -2326,7 +2180,7 @@ static void handle_param(std::ostream &stream, uint32_t param)
 		case PARAM_RM32:
 		case PARAM_RMPTR32:
 			if( modrm >= 0xc0 ) {
-				util::stream_format(stream, "%s", i386_reg[1][MODRM_REG2 | rmex] );
+				util::stream_format(stream, "%s", i386_reg[1][MODRM_REG2() | rmex] );
 			} else {
 				if (param == PARAM_RMPTR32)
 					util::stream_format(stream, "dword ptr " );
@@ -2337,9 +2191,9 @@ static void handle_param(std::ostream &stream, uint32_t param)
 		case PARAM_RMXMM:
 			if( modrm >= 0xc0 ) {
 				if (pre0f != 0xf2 && pre0f != 0xf3)
-					util::stream_format(stream, "xmm%d", MODRM_REG2 | rmex );
+					util::stream_format(stream, "xmm%d", MODRM_REG2() | rmex );
 				else
-					util::stream_format(stream, "%s", i386_reg[(operand_size == 2) ? 2 : 1][MODRM_REG2 | rmex] );
+					util::stream_format(stream, "%s", i386_reg[(operand_size == 2) ? 2 : 1][MODRM_REG2() | rmex] );
 			} else {
 				if (param == PARAM_RMPTR32)
 					util::stream_format(stream, "dword ptr " );
@@ -2361,9 +2215,9 @@ static void handle_param(std::ostream &stream, uint32_t param)
 		case PARAM_MMXM:
 			if( modrm >= 0xc0 ) {
 				if (pre0f == 0x66 || pre0f == 0xf2 || pre0f == 0xf3)
-					util::stream_format(stream, "xmm%d", MODRM_REG2 | rmex );
+					util::stream_format(stream, "xmm%d", MODRM_REG2() | rmex );
 				else
-					util::stream_format(stream, "mm%d", MODRM_REG2 | rmex );
+					util::stream_format(stream, "mm%d", MODRM_REG2() | rmex );
 			} else {
 				util::stream_format(stream, "%s", modrm_string );
 			}
@@ -2371,70 +2225,70 @@ static void handle_param(std::ostream &stream, uint32_t param)
 
 		case PARAM_XMMM:
 			if( modrm >= 0xc0 ) {
-				util::stream_format(stream, "xmm%d", MODRM_REG2 | rmex );
+				util::stream_format(stream, "xmm%d", MODRM_REG2() | rmex );
 			} else {
 				util::stream_format(stream, "%s", modrm_string );
 			}
 			break;
 
 		case PARAM_I4:
-			i8 = FETCHD();
+			i8 = FETCHD(base_pc, pc, opcodes);
 			util::stream_format(stream, "%d", i8 & 0x0f );
 			break;
 
 		case PARAM_I8:
-			i8 = FETCHD();
+			i8 = FETCHD(base_pc, pc, opcodes);
 			util::stream_format(stream, "%s", shexstring((int8_t)i8, 0, false) );
 			break;
 
 		case PARAM_I16:
-			i16 = FETCHD16();
+			i16 = FETCHD16(base_pc, pc, opcodes);
 			util::stream_format(stream, "%s", shexstring((int16_t)i16, 0, false) );
 			break;
 
 		case PARAM_UI8:
-			i8 = FETCHD();
+			i8 = FETCHD(base_pc, pc, opcodes);
 			util::stream_format(stream, "%s", shexstring((uint8_t)i8, 0, false) );
 			break;
 
 		case PARAM_UI16:
-			i16 = FETCHD16();
+			i16 = FETCHD16(base_pc, pc, opcodes);
 			util::stream_format(stream, "%s", shexstring((uint16_t)i16, 0, false) );
 			break;
 
 		case PARAM_IMM64:
 			if (operand_size == 2) {
-				uint32_t lo32 = FETCHD32();
-				i32 = FETCHD32();
+				uint32_t lo32 = FETCHD32(base_pc, pc, opcodes);
+				i32 = FETCHD32(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstring64(lo32, i32) );
 			} else if( operand_size ) {
-				i32 = FETCHD32();
+				i32 = FETCHD32(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstring(i32, 0) );
 			} else {
-				i16 = FETCHD16();
+				i16 = FETCHD16(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstring(i16, 0) );
 			}
 			break;
 
 		case PARAM_IMM:
 			if( operand_size ) {
-				i32 = FETCHD32();
+				i32 = FETCHD32(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstring(i32, 0) );
 			} else {
-				i16 = FETCHD16();
+				i16 = FETCHD16(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstring(i16, 0) );
 			}
 			break;
 
 		case PARAM_ADDR:
 			if( operand_size ) {
-				addr = FETCHD32();
-				ptr = FETCHD16();
+				addr = FETCHD32(base_pc, pc, opcodes);
+				ptr = FETCHD16(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s:", hexstring(ptr, 4) );
 				util::stream_format(stream, "%s", hexstring(addr, 0) );
 			} else {
-				addr = FETCHD16();
-				ptr = FETCHD16();
+				addr = FETCHD16(base_pc, pc, opcodes);
+				ptr = FETCHD16(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s:", hexstring(ptr, 4) );
 				util::stream_format(stream, "%s", hexstring(addr, 0) );
 			}
@@ -2442,17 +2296,17 @@ static void handle_param(std::ostream &stream, uint32_t param)
 
 		case PARAM_REL:
 			if( operand_size ) {
-				d32 = FETCHD32();
+				d32 = FETCHD32(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstringpc(pc + d32) );
 			} else {
 				/* make sure to keep the relative offset within the segment */
-				d16 = FETCHD16();
+				d16 = FETCHD16(base_pc, pc, opcodes);
 				util::stream_format(stream, "%s", hexstringpc((pc & 0xFFFF0000) | ((pc + d16) & 0x0000FFFF)) );
 			}
 			break;
 
 		case PARAM_REL8:
-			d8 = FETCHD();
+			d8 = FETCHD(base_pc, pc, opcodes);
 			util::stream_format(stream, "%s", hexstringpc(pc + d8) );
 			break;
 
@@ -2468,10 +2322,10 @@ static void handle_param(std::ostream &stream, uint32_t param)
 			}
 
 			if( address_size ) {
-				i32 = FETCHD32();
+				i32 = FETCHD32(base_pc, pc, opcodes);
 				util::stream_format(stream, "[%s]", hexstring(i32, 0) );
 			} else {
-				i16 = FETCHD16();
+				i16 = FETCHD16(base_pc, pc, opcodes);
 				util::stream_format(stream, "[%s]", hexstring(i16, 0) );
 			}
 			break;
@@ -2489,19 +2343,19 @@ static void handle_param(std::ostream &stream, uint32_t param)
 			break;
 
 		case PARAM_SREG:
-			util::stream_format(stream, "%s", i386_sreg[MODRM_REG1] );
+			util::stream_format(stream, "%s", i386_sreg[MODRM_REG1()] );
 			break;
 
 		case PARAM_CREG:
-			util::stream_format(stream, "cr%d", MODRM_REG1 | regex );
+			util::stream_format(stream, "cr%d", MODRM_REG1() | regex );
 			break;
 
 		case PARAM_TREG:
-			util::stream_format(stream, "tr%d", MODRM_REG1 | regex );
+			util::stream_format(stream, "tr%d", MODRM_REG1() | regex );
 			break;
 
 		case PARAM_DREG:
-			util::stream_format(stream, "dr%d", MODRM_REG1 | regex );
+			util::stream_format(stream, "dr%d", MODRM_REG1() | regex );
 			break;
 
 		case PARAM_1:
@@ -2536,7 +2390,7 @@ static void handle_param(std::ostream &stream, uint32_t param)
 	}
 }
 
-static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
+void i386_disassembler::handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2, offs_t base_pc, offs_t &pc, const data_buffer &opcodes)
 {
 	switch (op1 & 0x7)
 	{
@@ -2545,8 +2399,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fadd    dword ptr %s", modrm_string); break;
@@ -2581,8 +2434,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fld     dword ptr %s", modrm_string); break;
@@ -2645,8 +2497,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fiadd   dword ptr %s", modrm_string); break;
@@ -2689,8 +2540,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fild    dword ptr %s", modrm_string); break;
@@ -2739,8 +2589,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fadd    qword ptr %s", modrm_string); break;
@@ -2786,8 +2635,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fld     qword ptr %s", modrm_string); break;
@@ -2830,8 +2678,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fiadd   word ptr %s", modrm_string); break;
@@ -2879,8 +2726,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm(modrm_string, base_pc, pc, opcodes);
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: util::stream_format(stream, "fild    word ptr %s", modrm_string); break;
@@ -2913,7 +2759,7 @@ static void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2)
 	}
 }
 
-static void decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t op1)
+void i386_disassembler::decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t op1, offs_t base_pc, offs_t &pc, const data_buffer &opcodes)
 {
 	int i;
 	uint8_t op2;
@@ -2924,15 +2770,15 @@ static void decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t o
 	switch( op->flags & FLAGS_MASK )
 	{
 		case ISREX:
-			if (curmode == 64)
+			if (m_config->get_mode() == 64)
 			{
 				rex = op1;
 				operand_size = (op1 & 8) ? 2 : 1;
 				regex = (op1 << 1) & 8;
 				sibex = (op1 << 2) & 8;
 				rmex = (op1 << 3) & 8;
-				op2 = FETCH();
-				decode_opcode(stream, &i386_opcode_table1[op2], op1 );
+				op2 = FETCH(base_pc, pc, opcodes);
+				decode_opcode(stream, &i386_opcode_table1[op2], op1, base_pc, pc, opcodes);
 				return;
 			}
 			break;
@@ -2944,37 +2790,37 @@ static void decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t o
 				operand_size ^= 1;
 				operand_prefix = 1;
 			}
-			op2 = FETCH();
-			decode_opcode(stream, &i386_opcode_table1[op2], op2 );
+			op2 = FETCH(base_pc, pc, opcodes);
+			decode_opcode(stream, &i386_opcode_table1[op2], op2, base_pc, pc, opcodes);
 			return;
 
 		case ADDR_SIZE:
 			rex = regex = sibex = rmex = 0;
 			if(address_prefix == 0)
 			{
-				if (curmode != 64)
+				if (m_config->get_mode() != 64)
 					address_size ^= 1;
 				else
 					address_size ^= 3;
 				address_prefix = 1;
 			}
-			op2 = FETCH();
-			decode_opcode(stream, &i386_opcode_table1[op2], op2 );
+			op2 = FETCH(base_pc, pc, opcodes);
+			decode_opcode(stream, &i386_opcode_table1[op2], op2, base_pc, pc, opcodes);
 			return;
 
 		case TWO_BYTE:
-			if (&opcode_ptr[-2] >= opcode_ptr_base)
-				pre0f = opcode_ptr[-2];
-			op2 = FETCHD();
-			decode_opcode(stream, &i386_opcode_table2[op2], op1 );
+			if (pc - 2 >= base_pc)
+				pre0f = opcodes.r8(pc-2);
+			op2 = FETCHD(base_pc, pc, opcodes);
+			decode_opcode(stream, &i386_opcode_table2[op2], op1, base_pc, pc, opcodes);
 			return;
 
 		case THREE_BYTE:
-			op2 = FETCHD();
-			if (opcode_ptr[-2] == 0x38)
-				decode_opcode(stream, &i386_opcode_table0F38[op2], op1 );
+			op2 = FETCHD(base_pc, pc, opcodes);
+			if (opcodes.r8(pc-2) == 0x38)
+				decode_opcode(stream, &i386_opcode_table0F38[op2], op1, base_pc, pc, opcodes);
 			else
-				decode_opcode(stream, &i386_opcode_table0F3A[op2], op1 );
+				decode_opcode(stream, &i386_opcode_table0F3A[op2], op1, base_pc, pc, opcodes);
 			return;
 
 		case SEG_CS:
@@ -2985,43 +2831,43 @@ static void decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t o
 		case SEG_SS:
 			rex = regex = sibex = rmex = 0;
 			segment = op->flags;
-			op2 = FETCH();
-			decode_opcode(stream, &i386_opcode_table1[op2], op2 );
+			op2 = FETCH(base_pc, pc, opcodes);
+			decode_opcode(stream, &i386_opcode_table1[op2], op2, base_pc, pc, opcodes);
 			return;
 
 		case PREFIX:
-			op2 = FETCH();
+			op2 = FETCH(base_pc, pc, opcodes);
 			if ((op2 != 0x0f) && (op2 != 0x90))
 				util::stream_format(stream, "%-7s ", op->mnemonic );
 			if ((op2 == 0x90) && !pre0f)
 				pre0f = op1;
-			decode_opcode(stream, &i386_opcode_table1[op2], op2 );
+			decode_opcode(stream, &i386_opcode_table1[op2], op2, base_pc, pc, opcodes);
 			return;
 
 		case GROUP:
-			handle_modrm( modrm_string );
+			handle_modrm(modrm_string, base_pc, pc, opcodes);
 			for( i=0; i < ARRAY_LENGTH(group_op_table); i++ ) {
 				if( strcmp(op->mnemonic, group_op_table[i].mnemonic) == 0 ) {
 					if (op->flags & GROUP_MOD)
-						decode_opcode(stream, &group_op_table[i].opcode[MODRM_MOD], op1 );
+						decode_opcode(stream, &group_op_table[i].opcode[MODRM_MOD()], op1, base_pc, pc, opcodes);
 					else
-						decode_opcode(stream, &group_op_table[i].opcode[MODRM_REG1], op1 );
+						decode_opcode(stream, &group_op_table[i].opcode[MODRM_REG1()], op1, base_pc, pc, opcodes);
 					return;
 				}
 			}
 			goto handle_unknown;
 
 		case FPU:
-			op2 = FETCHD();
-			handle_fpu(stream, op1, op2);
+			op2 = FETCHD(base_pc, pc, opcodes);
+			handle_fpu(stream, op1, op2, base_pc, pc, opcodes);
 			return;
 
 		case MODRM:
-			handle_modrm( modrm_string );
+			handle_modrm(modrm_string, base_pc, pc, opcodes);
 			break;
 	}
 
-	if ((op->flags & ALWAYS64) && curmode == 64)
+	if ((op->flags & ALWAYS64) && m_config->get_mode() == 64)
 		operand_size = 2;
 
 	if ((op->flags & VAR_NAME) && operand_size > 0)
@@ -3044,17 +2890,17 @@ static void decode_opcode(std::ostream &stream, const I386_OPCODE *op, uint8_t o
 	dasm_flags = op->dasm_flags;
 
 	if( op->param1 != 0 ) {
-		handle_param(stream, op->param1 );
+		handle_param(stream, op->param1, base_pc, pc, opcodes);
 	}
 
 	if( op->param2 != 0 ) {
 		util::stream_format(stream, "," );
-		handle_param(stream, op->param2 );
+		handle_param(stream, op->param2, base_pc, pc, opcodes);
 	}
 
 	if( op->param3 != 0 ) {
 		util::stream_format(stream, "," );
-		handle_param(stream, op->param3 );
+		handle_param(stream, op->param3, base_pc, pc, opcodes);
 	}
 	return;
 
@@ -3062,12 +2908,12 @@ handle_unknown:
 	util::stream_format(stream, "???");
 }
 
-int i386_dasm_one_ex(std::ostream &stream, uint64_t eip, const uint8_t *oprom, int mode)
+offs_t i386_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
+	offs_t base_pc = pc;
 	uint8_t op;
 
-	opcode_ptr = opcode_ptr_base = oprom;
-	switch(mode)
+	switch(m_config->get_mode())
 	{
 		case 1: /* 8086/8088/80186/80188 */
 			address_size = 0;
@@ -3095,37 +2941,24 @@ int i386_dasm_one_ex(std::ostream &stream, uint64_t eip, const uint8_t *oprom, i
 			max_length = 15;
 			break;
 	}
-	pc = eip;
 	dasm_flags = 0;
 	segment = 0;
-	curmode = mode;
 	pre0f = 0;
 	rex = regex = sibex = rmex = 0;
 	address_prefix = 0;
 	operand_prefix = 0;
 
-	op = FETCH();
+	op = FETCH(base_pc, pc, opcodes);
 
-	decode_opcode( stream, &i386_opcode_table1[op], op );
-	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;
+	decode_opcode( stream, &i386_opcode_table1[op], op, base_pc, pc, opcodes);
+	return (pc-base_pc) | dasm_flags | SUPPORTED;
 }
 
-int i386_dasm_one(std::ostream &stream, offs_t eip, const uint8_t *oprom, int mode)
+i386_disassembler::i386_disassembler(config *conf) : m_config(conf)
 {
-	return i386_dasm_one_ex(stream, eip, oprom, mode);
 }
 
-CPU_DISASSEMBLE( x86_16 )
+u32 i386_disassembler::opcode_alignment() const
 {
-	return i386_dasm_one_ex(stream, pc, oprom, 16);
-}
-
-CPU_DISASSEMBLE( x86_32 )
-{
-	return i386_dasm_one_ex(stream, pc, oprom, 32);
-}
-
-CPU_DISASSEMBLE( x86_64 )
-{
-	return i386_dasm_one_ex(stream, pc, oprom, 64);
+	return 1;
 }

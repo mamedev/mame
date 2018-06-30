@@ -6,13 +6,13 @@
 #ifndef BX_THREAD_H_HEADER_GUARD
 #define BX_THREAD_H_HEADER_GUARD
 
-#include "bx.h"
-#include "semaphore.h"
+#include "allocator.h"
+#include "mpscqueue.h"
 
 namespace bx
 {
 	///
-	typedef int32_t (*ThreadFn)(void* _userData);
+	typedef int32_t (*ThreadFn)(class Thread* _self, void* _userData);
 
 	///
 	class Thread
@@ -44,6 +44,12 @@ namespace bx
 		///
 		void setThreadName(const char* _name);
 
+		///
+		void push(void* _ptr);
+
+		///
+		void* pop();
+
 	private:
 		friend struct ThreadInternal;
 		int32_t entry();
@@ -52,6 +58,7 @@ namespace bx
 
 		ThreadFn  m_fn;
 		void*     m_userData;
+		MpScUnboundedBlockingQueue<void> m_queue;
 		Semaphore m_sem;
 		uint32_t  m_stackSize;
 		int32_t   m_exitCode;

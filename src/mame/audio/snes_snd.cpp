@@ -114,15 +114,6 @@ static const int gauss[]=
 #undef NO_PMOD
 #undef NO_ECHO
 
-#define CPU_RATE        1024000
-#define SAMP_FREQ       32000
-
-
-/* Original SPC DSP took samples 32000 times a second, which is once every (1024000/32000 = 32) cycles. */
-#ifdef UNUSED_DEFINITION
-	static const int               TS_CYC = CPU_RATE / SAMP_FREQ;
-#endif
-
 /* Ptrs to Gaussian table */
 static const int *const G1 = &gauss[256];
 static const int *const G2 = &gauss[512];
@@ -156,10 +147,10 @@ ALLOW_SAVE_TYPE(snes_sound_device::env_state_t32);
 
 
 
-DEFINE_DEVICE_TYPE(SNES, snes_sound_device, "snes_sound", "SNES Custom DSP (SPC700)")
+DEFINE_DEVICE_TYPE(SNES_SOUND, snes_sound_device, "snes_sound", "SNES Custom DSP (SPC700)")
 
 snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SNES, tag, owner, clock)
+	: device_t(mconfig, SNES_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {
 }
@@ -170,26 +161,17 @@ snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *
 
 void snes_sound_device::device_start()
 {
-	m_channel = machine().sound().stream_alloc(*this, 0, 2, 32000);
+	m_channel = machine().sound().stream_alloc(*this, 0, 2, clock());
 
 	m_ram = make_unique_clear<uint8_t[]>(SNES_SPCRAM_SIZE);
 
 	/* put IPL image at the top of RAM */
 	memcpy(m_ipl_region, machine().root_device().memregion("sound_ipl")->base(), 64);
 
-	/* Initialize the timers */
-	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
-	m_timer[0]->adjust(attotime::from_hz(8000),  0, attotime::from_hz(8000));
-	m_timer[0]->enable(false);
-	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
-	m_timer[1]->adjust(attotime::from_hz(8000),  1, attotime::from_hz(8000));
-	m_timer[1]->enable(false);
-	m_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
-	m_timer[2]->adjust(attotime::from_hz(64000), 2, attotime::from_hz(64000));
-	m_timer[2]->enable(false);
+	m_tick_timer = timer_alloc(TIMER_TICK_ID);
 
 	state_register();
-	save_pointer(NAME(m_ram.get()), SNES_SPCRAM_SIZE);
+	save_pointer(NAME(m_ram), SNES_SPCRAM_SIZE);
 }
 
 //-------------------------------------------------
@@ -198,19 +180,63 @@ void snes_sound_device::device_start()
 
 void snes_sound_device::device_reset()
 {
+	int i;
 	/* default to ROM visible */
 	m_ram[0xf1] = 0x80;
 
 	/* Sort out the ports */
-	for (int i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++)
 	{
 		m_port_in[i] = 0;
 		m_port_out[i] = 0;
 	}
 
+	for(i=0; i<3; i++)
+	{
+		m_timer_enabled[i] = false;
+		m_TnDIV[i] = 256;
+		m_counter[i] = 0;
+		m_subcounter[i] = 0;
+	}
+
+	attotime period = attotime::from_hz(64000);
+	m_tick_timer->adjust(period, 0, period);
+
 	dsp_reset();
 }
 
+inline void snes_sound_device::update_timer_tick(uint8_t which)
+{
+	if(m_timer_enabled[which] == false)
+		return;
+
+	m_subcounter[which]++;
+
+	// if timer channel is 0 or 1 we update at 64000/8
+	if(m_subcounter[which] >= 8 || which == 2)
+	{
+		m_subcounter[which] = 0;
+		m_counter[which]++;
+		if (m_counter[which] >= m_TnDIV[which] ) // minus =
+		{
+			m_counter[which] = 0;
+			m_ram[0xfd + which]++;
+			m_ram[0xfd + which] &= 0x0f;
+		}
+	}
+}
+
+void snes_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if(id != TIMER_TICK_ID)
+	{
+		assert_always(false, "Unknown id in snes_sound_device::device_timer");
+		return;
+	}
+
+	for(int ch=0;ch<3;ch++)
+		update_timer_tick(ch);
+}
 
 
 /*****************************************************************************
@@ -987,20 +1013,6 @@ int snes_sound_device::advance_envelope( int v )
 	return envx;
 }
 
-
-TIMER_CALLBACK_MEMBER( snes_sound_device::spc_timer )
-{
-	int which = param;
-
-	m_counter[which]++;
-	if (m_counter[which] >= m_ram[0xfa + which] ) // minus =
-	{
-		m_counter[which] = 0;
-		m_ram[0xfd + which]++;
-		m_ram[0xfd + which] &= 0x0f;
-	}
-}
-
 /*-------------------------------------------------
     spc700_set_volume - sets SPC700 volume level
     for both speakers, used for fade in/out effects
@@ -1066,7 +1078,7 @@ READ8_MEMBER( snes_sound_device::spc_io_r )
 		case 0x5:       /* Port 1 */
 		case 0x6:       /* Port 2 */
 		case 0x7:       /* Port 3 */
-			// osd_printf_debug("SPC: rd %02x @ %d, PC=%x\n", m_port_in[offset - 4], offset - 4, space.device().safe_pc());
+			// osd_printf_debug("%s SPC: rd %02x @ %d\n", machine().describe_context().c_str(), m_port_in[offset - 4], offset - 4);
 			return m_port_in[offset - 4];
 		case 0x8: //normal RAM, can be read even if the ram disabled flag ($f0 bit 1) is active
 		case 0x9:
@@ -1098,14 +1110,15 @@ WRITE8_MEMBER( snes_sound_device::spc_io_w )
 		case 0x1:       /* Control */
 			for (int i = 0; i < 3; i++)
 			{
-				if (BIT(data, i) && !m_enabled[i])
+				if (BIT(data, i) && m_timer_enabled[i] == false)
 				{
+					m_subcounter[i] = 0;
 					m_counter[i] = 0;
 					m_ram[0xfd + i] = 0;
 				}
 
-				m_enabled[i] = BIT(data, i);
-				m_timer[i]->enable(m_enabled[i]);
+				m_timer_enabled[i] = BIT(data, i);
+				//m_timer[i]->enable(m_timer_enabled[i]);
 			}
 
 			if (BIT(data, 4))
@@ -1132,15 +1145,19 @@ WRITE8_MEMBER( snes_sound_device::spc_io_w )
 		case 0x5:       /* Port 1 */
 		case 0x6:       /* Port 2 */
 		case 0x7:       /* Port 3 */
-			// osd_printf_debug("SPC: %02x to APU @ %d (PC=%x)\n", data, offset & 3, space.device().safe_pc());
+			// osd_printf_debug("%s SPC: %02x to APU @ %d\n", machine().describe_context().c_str(), data, offset & 3);
 			m_port_out[offset - 4] = data;
-			space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+			// Unneeded, we already run at perfect_interleave
+			// machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 			break;
 		case 0xa:       /* Timer 0 */
 		case 0xb:       /* Timer 1 */
 		case 0xc:       /* Timer 2 */
-			if (data == 0)
-				data = 255;
+			// if 0 then TnDiv is divided by 256, otherwise it's divided by 1 to 255
+			if(data == 0)
+				m_TnDIV[offset - 0xa] = 256;
+			else
+				m_TnDIV[offset - 0xa] = data;
 			break;
 		case 0xd:       /* Counter 0 */
 		case 0xe:       /* Counter 1 */
@@ -1203,7 +1220,8 @@ void snes_sound_device::state_register()
 	save_item(NAME(m_echo_ptr));
 #endif
 
-	save_item(NAME(m_enabled));
+	save_item(NAME(m_timer_enabled));
+	save_item(NAME(m_subcounter));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_port_in));
 	save_item(NAME(m_port_out));

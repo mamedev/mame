@@ -31,7 +31,7 @@
 	MCFG_IRQ_FUNC(_irqf)
 
 #define MCFG_ASC_TYPE(_type) \
-	asc_device::static_set_type(*device, asc_device::asc_type::_type);
+	downcast<asc_device &>(*device).set_type(asc_device::asc_type::_type);
 
 #define MCFG_IRQ_FUNC(_irqf) \
 	devcb = &downcast<asc_device *>(device)->set_irqf(DEVCB_##_irqf);
@@ -64,7 +64,7 @@ public:
 	asc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_type(device_t &device, asc_type type);
+	void set_type(asc_type type) { m_chip_type = type; }
 
 
 	template <class Write> devcb_base &set_irqf(Write &&wr)

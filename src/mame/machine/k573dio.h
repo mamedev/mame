@@ -19,15 +19,15 @@ class k573dio_device : public device_t
 public:
 	k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _write> void set_output_cb(_write _output_cb)
+	template <class Write> void set_output_cb(Write &&_output_cb)
 	{
-		output_cb.set_callback(_output_cb);
+		output_cb.set_callback(std::forward<Write>(_output_cb));
 	}
 
 	required_device<mas3507d_device> mas3507d;
 	required_device<ds2401_device> digital_id;
 
-	DECLARE_ADDRESS_MAP(amap, 16);
+	void amap(address_map &map);
 
 	DECLARE_READ16_MEMBER(a00_r);
 	DECLARE_READ16_MEMBER(a02_r);

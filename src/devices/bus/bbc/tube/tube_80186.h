@@ -48,6 +48,9 @@ private:
 	required_device<tube_device> m_ula;
 	required_device<ram_device> m_ram;
 	required_memory_region m_bootstrap;
+
+	void tube_80186_io(address_map &map);
+	void tube_80186_mem(address_map &map);
 };
 
 

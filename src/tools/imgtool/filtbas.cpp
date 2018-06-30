@@ -245,8 +245,8 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 			}
 			else
 			{
-				place_integer_be(line_header, 0, 2, address);
-				place_integer_be(line_header, 2, 2, line_number);
+				place_integer_le(line_header, 0, 2, address);
+				place_integer_le(line_header, 2, 2, line_number);
 			}
 
 			/* emit line header */

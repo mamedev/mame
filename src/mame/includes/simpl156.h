@@ -10,6 +10,7 @@
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
+#include "emupal.h"
 
 class simpl156_state : public driver_device
 {
@@ -56,13 +57,23 @@ public:
 	DECLARE_READ32_MEMBER(prtytime_speedup_r);
 	DECLARE_READ32_MEMBER(charlien_speedup_r);
 	DECLARE_READ32_MEMBER(osman_speedup_r);
-	DECLARE_DRIVER_INIT(simpl156);
-	DECLARE_DRIVER_INIT(joemacr);
-	DECLARE_DRIVER_INIT(charlien);
-	DECLARE_DRIVER_INIT(prtytime);
-	DECLARE_DRIVER_INIT(osman);
-	DECLARE_DRIVER_INIT(chainrec);
+	void init_simpl156();
+	void init_joemacr();
+	void init_charlien();
+	void init_prtytime();
+	void init_osman();
+	void init_chainrec();
 	virtual void video_start() override;
 	uint32_t screen_update_simpl156(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(simpl156_vbl_interrupt);
+	void joemacr(machine_config &config);
+	void magdrop(machine_config &config);
+	void chainrec(machine_config &config);
+	void mitchell156(machine_config &config);
+	void magdropp(machine_config &config);
+	void chainrec_map(address_map &map);
+	void joemacr_map(address_map &map);
+	void magdrop_map(address_map &map);
+	void magdropp_map(address_map &map);
+	void mitchell156_map(address_map &map);
 };

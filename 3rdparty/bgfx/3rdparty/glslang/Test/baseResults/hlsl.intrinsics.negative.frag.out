@@ -1,11 +1,10 @@
 hlsl.intrinsics.negative.frag
-ERROR: 0:10: 'determinant' : no matching overloaded function found 
-ERROR: 0:23: 'length' : ambiguous best function under implicit type conversion 
+ERROR: 0:10: 'determinant' : ambiguous best function under implicit type conversion 
 ERROR: 0:25: 'normalize' : ambiguous best function under implicit type conversion 
 ERROR: 0:26: 'reflect' : ambiguous best function under implicit type conversion 
 ERROR: 0:27: 'refract' : ambiguous best function under implicit type conversion 
 ERROR: 0:28: 'refract' : no matching overloaded function found 
-ERROR: 0:30: 'transpose' : no matching overloaded function found 
+ERROR: 0:30: 'transpose' : ambiguous best function under implicit type conversion 
 ERROR: 0:39: 'GetRenderTargetSamplePosition' : no matching overloaded function found 
 ERROR: 0:46: 'asdouble' : double2 conversion not implemented 
 ERROR: 0:47: 'CheckAccessFullyMapped' : no matching overloaded function found 
@@ -59,10 +58,10 @@ ERROR: 0:133: 'normalize' : no matching overloaded function found
 ERROR: 0:133: 'reflect' : no matching overloaded function found 
 ERROR: 0:133: 'refract' : no matching overloaded function found 
 ERROR: 0:133: 'reversebits' : no matching overloaded function found 
-ERROR: 60 compilation errors.  No code generated.
+ERROR: 59 compilation errors.  No code generated.
 
 
-Shader version: 450
+Shader version: 500
 gl_FragCoord origin is upper left
 ERROR: node is still EOpNull!
 0:2  Function Definition: PixelShaderFunctionS(f1;f1;f1;i1; ( temp float)
@@ -105,8 +104,9 @@ ERROR: node is still EOpNull!
 0:9                0 (const int)
 0:9              Constant:
 0:9                3 (const int)
-0:10      Constant:
-0:10        0.000000
+0:10      determinant ( temp float)
+ERROR: node is still EOpNull!
+0:10          'inF0' ( in float)
 0:12      direct index ( temp float)
 0:12        unpackHalf2x16 ( temp 2-component vector of float)
 0:12          Convert float to uint ( temp uint)
@@ -120,8 +120,7 @@ ERROR: node is still EOpNull!
 0:14        Convert float to uint ( temp uint)
 0:14          'inF0' ( in float)
 0:23      length ( temp float)
-0:23        Construct vec2 ( in 2-component vector of float)
-0:23          'inF0' ( in float)
+0:23        'inF0' ( in float)
 0:24      Function Call: msad4(u1;vu2;vu4; ( temp 4-component vector of uint)
 0:24        Convert float to uint ( temp uint)
 0:24          'inF0' ( in float)
@@ -152,8 +151,9 @@ ERROR: node is still EOpNull!
 0:29      bitFieldReverse ( temp uint)
 0:29        Convert float to uint ( temp uint)
 0:29          'inF0' ( in float)
-0:30      Constant:
-0:30        0.000000
+0:30      transpose ( temp 1X1 matrix of float)
+ERROR: node is still EOpNull!
+0:30          'inF0' ( in float)
 0:32      Branch: Return with expression
 0:32        Constant:
 0:32          0.000000
@@ -374,7 +374,7 @@ ERROR: node is still EOpNull!
 0:?         'inF2' (layout( location=2) in 4-component vector of float)
 0:80      move second child to first child ( temp 4-component vector of int)
 0:?         'inI0' ( temp 4-component vector of int)
-0:?         'inI0' (layout( location=3) in 4-component vector of int)
+0:?         'inI0' (layout( location=3) flat in 4-component vector of int)
 0:80      move second child to first child ( temp 4-component vector of float)
 0:?         '@entryPointOutput' (layout( location=0) out 4-component vector of float)
 0:80        Function Call: @PixelShaderFunction(vf4;vf4;vf4;vi4; ( temp 4-component vector of float)
@@ -518,13 +518,13 @@ ERROR: node is still EOpNull!
 0:?     'inF0' (layout( location=0) in 4-component vector of float)
 0:?     'inF1' (layout( location=1) in 4-component vector of float)
 0:?     'inF2' (layout( location=2) in 4-component vector of float)
-0:?     'inI0' (layout( location=3) in 4-component vector of int)
+0:?     'inI0' (layout( location=3) flat in 4-component vector of int)
 
 
 Linked fragment stage:
 
 
-Shader version: 450
+Shader version: 500
 gl_FragCoord origin is upper left
 ERROR: node is still EOpNull!
 0:2  Function Definition: PixelShaderFunctionS(f1;f1;f1;i1; ( temp float)
@@ -567,8 +567,9 @@ ERROR: node is still EOpNull!
 0:9                0 (const int)
 0:9              Constant:
 0:9                3 (const int)
-0:10      Constant:
-0:10        0.000000
+0:10      determinant ( temp float)
+ERROR: node is still EOpNull!
+0:10          'inF0' ( in float)
 0:12      direct index ( temp float)
 0:12        unpackHalf2x16 ( temp 2-component vector of float)
 0:12          Convert float to uint ( temp uint)
@@ -582,8 +583,7 @@ ERROR: node is still EOpNull!
 0:14        Convert float to uint ( temp uint)
 0:14          'inF0' ( in float)
 0:23      length ( temp float)
-0:23        Construct vec2 ( in 2-component vector of float)
-0:23          'inF0' ( in float)
+0:23        'inF0' ( in float)
 0:24      Function Call: msad4(u1;vu2;vu4; ( temp 4-component vector of uint)
 0:24        Convert float to uint ( temp uint)
 0:24          'inF0' ( in float)
@@ -614,8 +614,9 @@ ERROR: node is still EOpNull!
 0:29      bitFieldReverse ( temp uint)
 0:29        Convert float to uint ( temp uint)
 0:29          'inF0' ( in float)
-0:30      Constant:
-0:30        0.000000
+0:30      transpose ( temp 1X1 matrix of float)
+ERROR: node is still EOpNull!
+0:30          'inF0' ( in float)
 0:32      Branch: Return with expression
 0:32        Constant:
 0:32          0.000000
@@ -836,7 +837,7 @@ ERROR: node is still EOpNull!
 0:?         'inF2' (layout( location=2) in 4-component vector of float)
 0:80      move second child to first child ( temp 4-component vector of int)
 0:?         'inI0' ( temp 4-component vector of int)
-0:?         'inI0' (layout( location=3) in 4-component vector of int)
+0:?         'inI0' (layout( location=3) flat in 4-component vector of int)
 0:80      move second child to first child ( temp 4-component vector of float)
 0:?         '@entryPointOutput' (layout( location=0) out 4-component vector of float)
 0:80        Function Call: @PixelShaderFunction(vf4;vf4;vf4;vi4; ( temp 4-component vector of float)
@@ -980,6 +981,6 @@ ERROR: node is still EOpNull!
 0:?     'inF0' (layout( location=0) in 4-component vector of float)
 0:?     'inF1' (layout( location=1) in 4-component vector of float)
 0:?     'inF2' (layout( location=2) in 4-component vector of float)
-0:?     'inI0' (layout( location=3) in 4-component vector of int)
+0:?     'inI0' (layout( location=3) flat in 4-component vector of int)
 
 SPIR-V is not generated for failed compile or link

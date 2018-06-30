@@ -9,10 +9,10 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
+#include "ssp1601d.h"
 
 
-static const char *const reg[16] =
+const char *const ssp1601_disassembler::reg[16] =
 {
 	"-",    "X",     "Y",    "A",
 	"ST",   "STACK", "PC",   "P",
@@ -20,22 +20,22 @@ static const char *const reg[16] =
 	"EXT4", "EXT5",  "EXT6", "AL"
 };
 
-static const char *const rij[8] =
+const char *const ssp1601_disassembler::rij[8] =
 {
 	"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"
 };
 
-static const char *const modifier[4] =
+const char *const ssp1601_disassembler::modifier[4] =
 {
 	"", "+!", "-", "+"
 };
 
-static const char *const modifier_sf[4] =
+const char *const ssp1601_disassembler::modifier_sf[4] =
 {
 	"|00", "|01", "|10", "|11"
 };
 
-static const char *const cond[16] =
+const char *const ssp1601_disassembler::cond[16] =
 {
 	"always",   "RESERVED", "gpi0",     "gpi1",
 	"l",        "z",        "ov",       "n",
@@ -43,18 +43,18 @@ static const char *const cond[16] =
 	"RESERVED", "RESERVED", "RESERVED", "RESERVED",
 };
 
-static const char *const acc_op[8] =
+const char *const ssp1601_disassembler::acc_op[8] =
 {
 	"ror", "rol", "shr", "shl", "inc", "dec", "neg", "abs"
 };
 
 // pag. 81 uses different addresses!
-static const char *const flag_op[16] =
+const char *const ssp1601_disassembler::flag_op[16] =
 {
 	"?", "?", "resl", "setl", "resie", "setie", "?", "?", "resop", "setop", "?", "?", "?", "?", "res", "set"
 };
 
-static const char *const arith_ops[8] =
+const char *const ssp1601_disassembler::arith_ops[8] =
 {
 	"", "add", "", "cmp", "add", "and", "or", "eor"
 };
@@ -68,27 +68,24 @@ static const char *const arith_ops[8] =
 #define MODIFIER_LOW        MODIFIER((op >> 2) & 3, op&3)
 #define MODIFIER_HIGH       MODIFIER((op >> 6) & 3, (op >> 4)&3)
 
-#define READ_OP_DASM(p) ((base_oprom[p] << 8) | base_oprom[(p) + 1])
-
-static char *get_cond(int op)
+std::string ssp1601_disassembler::get_cond(int op)
 {
-	static char scond[16];
-	if (op&0xf0) sprintf(scond, "%s=%i", cond[(op >> 4) & 0xf], BIT_B);
-	else         sprintf(scond, "%s", cond[(op >> 4) & 0xf]);
-	return scond;
+	if (op&0xf0) return util::string_format("%s=%i", cond[(op >> 4) & 0xf], BIT_B);
+	else         return util::string_format("%s", cond[(op >> 4) & 0xf]);
 }
 
-
-static unsigned dasm_ssp1601(std::ostream &stream, unsigned pc, const uint8_t *oprom)
+u32 ssp1601_disassembler::opcode_alignment() const
 {
-	const uint8_t *base_oprom;
+	return 1;
+}
+
+offs_t ssp1601_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
 	uint16_t op;
 	int size = 1;
 	int flags = 0;
 
-	base_oprom = oprom;
-
-	op = READ_OP_DASM(0);
+	op = opcodes.r16(pc);
 
 	switch (op >> 9)
 	{
@@ -102,7 +99,7 @@ static unsigned dasm_ssp1601(std::ostream &stream, unsigned pc, const uint8_t *o
 			{
 				// ret
 				util::stream_format(stream, "ret");
-				flags |= DASMFLAG_STEP_OUT;
+				flags |= STEP_OUT;
 			}
 			else
 			{
@@ -128,7 +125,7 @@ static unsigned dasm_ssp1601(std::ostream &stream, unsigned pc, const uint8_t *o
 
 		// ldi d, imm
 		case 0x04:
-			util::stream_format(stream, "ld %s, %X", reg[(op >> 4) & 0xf], READ_OP_DASM(2));
+			util::stream_format(stream, "ld %s, %X", reg[(op >> 4) & 0xf], opcodes.r16(pc+1));
 			size = 2;
 			break;
 
@@ -139,7 +136,7 @@ static unsigned dasm_ssp1601(std::ostream &stream, unsigned pc, const uint8_t *o
 
 		// ldi (ri), imm
 		case 0x06:
-			util::stream_format(stream, "ld (%s%s), %X", RIJ, MODIFIER_LOW, READ_OP_DASM(2));
+			util::stream_format(stream, "ld (%s%s), %X", RIJ, MODIFIER_LOW, opcodes.r16(pc+1));
 			size = 2;
 			break;
 
@@ -203,7 +200,7 @@ static unsigned dasm_ssp1601(std::ostream &stream, unsigned pc, const uint8_t *o
 		case 0x54:
 		case 0x64:
 		case 0x74:
-			util::stream_format(stream, "%si A, %X", arith_ops[op >> 13], READ_OP_DASM(2));
+			util::stream_format(stream, "%si A, %X", arith_ops[op >> 13], opcodes.r16(pc+1));
 			size = 2;
 			break;
 
@@ -244,8 +241,8 @@ static unsigned dasm_ssp1601(std::ostream &stream, unsigned pc, const uint8_t *o
 
 		// call cond, addr
 		case 0x24:
-			util::stream_format(stream, "call %s, %X", get_cond(op), READ_OP_DASM(2));
-			flags |= DASMFLAG_STEP_OVER;
+			util::stream_format(stream, "call %s, %X", get_cond(op), opcodes.r16(pc+1));
+			flags |= STEP_OVER;
 			size = 2;
 			break;
 
@@ -256,7 +253,7 @@ static unsigned dasm_ssp1601(std::ostream &stream, unsigned pc, const uint8_t *o
 
 		// bra cond, addr
 		case 0x26:
-			util::stream_format(stream, "bra %s, %X", get_cond(op), READ_OP_DASM(2));
+			util::stream_format(stream, "bra %s, %X", get_cond(op), opcodes.r16(pc+1));
 			size = 2;
 			break;
 
@@ -285,14 +282,5 @@ static unsigned dasm_ssp1601(std::ostream &stream, unsigned pc, const uint8_t *o
 			break;
 	}
 
-	return size | flags | DASMFLAG_SUPPORTED;
-}
-
-// vim:ts=4
-
-CPU_DISASSEMBLE( ssp1601 )
-{
-	//ssp1601_state_t *ssp1601_state = get_safe_token(device);
-
-	return dasm_ssp1601(stream, pc, oprom);
+	return size | flags | SUPPORTED;
 }

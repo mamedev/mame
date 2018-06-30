@@ -5,56 +5,21 @@
  *
  *   Note: this is not the good and proper way to disassemble anything, but it works
  *
+ *   Secondary note: it actually stopped being not nice a while ago
+ *
  *   I'm afraid to put my name on it, but I feel obligated:
  *   This code written by Aaron Giles (agiles@sirius.com) for the MAME project
  *
  */
 
 #include "emu.h"
-#include "m6805.h"
-
-#include "debugger.h"
-
-namespace {
-
-enum class md {
-	INH,    // inherent
-	BTR,    // bit test and relative
-	BIT,    // bit set/clear
-	REL,    // relative
-	IMM,    // immediate
-	DIR,    // direct address
-	EXT,    // extended address
-	IDX,    // indexed
-	IX1,    // indexed + byte offset
-	IX2     // indexed + word offset
-};
-
-enum class lvl {
-	HMOS,
-	CMOS,
-	HC
-};
-
-enum class op_names {
-	adca,   adda,   anda,   asl,    asla,   aslx,   asr,    asra,
-	asrx,   bcc,    bclr,   bcs,    beq,    bhcc,   bhcs,   bhi,
-	bih,    bil,    bit,    bls,    bmc,    bmi,    bms,    bne,
-	bpl,    bra,    brclr,  brn,    brset,  bset,   bsr,    clc,
-	cli,    clr,    clra,   clrx,   cmpa,   com,    coma,   comx,
-	cpx,    dec,    deca,   decx,   eora,   ill,    inc,    inca,
-	incx,   jmp,    jsr,    lda,    ldx,    lsr,    lsra,   lsrx,
-	mul,    neg,    nega,   negx,   nop,    ora,    rol,    rola,
-	rolx,   ror,    rora,   rorx,   rsp,    rti,    rts,    sbca,
-	sec,    sei,    sta,    stop,   stx,    suba,   swi,    tax,
-	tst,    tsta,   tstx,   txa,    wait
-};
+#include "6805dasm.h"
 
 #define OP(name, mode)   { op_names::name, #name,   md::mode, lvl::HMOS }
 #define OPC(name, mode)  { op_names::name, #name,   md::mode, lvl::CMOS }
 #define OPHC(name, mode) { op_names::name, #name,   md::mode, lvl::HC   }
 #define ILLEGAL          { op_names::ill,  nullptr, md::INH,  lvl::HMOS }
-struct { op_names op; char const *name; md mode; lvl level; } const disasm[0x100] = {
+const m6805_base_disassembler::info m6805_base_disassembler::disasm[0x100] = {
 	OP  (brset,BTR), OP  (brclr,BTR), OP  (brset,BTR), OP  (brclr,BTR), // 00
 	OP  (brset,BTR), OP  (brclr,BTR), OP  (brset,BTR), OP  (brclr,BTR),
 	OP  (brset,BTR), OP  (brclr,BTR), OP  (brset,BTR), OP  (brclr,BTR),
@@ -121,43 +86,35 @@ struct { op_names op; char const *name; md mode; lvl level; } const disasm[0x100
 	OP  (jmp,  IDX), OP  (jsr,  IDX), OP  (ldx,  IDX), OP  (stx,  IDX)
 };
 
-
-template <typename T>
-void format_address(
-		std::ostream& stream,
-		T address,
-		std::pair<u16, char const *> const symbols[],
-		std::size_t symbol_count)
+m6805_base_disassembler::m6805_base_disassembler(lvl level, std::pair<u16, char const *> const symbols[], std::size_t symbol_count) : m_level(level), m_symbols(symbols), m_symbol_count(symbol_count)
 {
-	auto const symbol= std::lower_bound(
-			&symbols[0],
-			&symbols[symbol_count],
-			address,
-			[] (auto const &sym, u16 addr) { return sym.first < addr; });
-	if ((symbol_count != (symbol - symbols)) && (symbol->first == address))
-		stream << symbol->second;
-	else
-		util::stream_format(stream, "$%0*X", 2 * sizeof(T), address);
 }
 
-
-offs_t disassemble(
-		cpu_device *device,
-		std::ostream &stream,
-		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
-		int options,
-		lvl level,
-		std::pair<u16, char const *> const symbols[],
-		std::size_t symbol_count)
+u32 m6805_base_disassembler::opcode_alignment() const
 {
-	u8 const code = oprom[0];
+	return 1;
+}
 
-	if (!disasm[code].name || (disasm[code].level > level))
+template <typename T> std::string m6805_base_disassembler::address(T offset) const
+{
+	auto const symbol = std::lower_bound(m_symbols,
+										 m_symbols + m_symbol_count,
+										 offset,
+										 [] (auto const &sym, u16 addr) { return sym.first < addr; });
+	if ((m_symbol_count != (symbol - m_symbols)) && (symbol->first == offset))
+		return symbol->second;
+	else
+		return util::string_format("$%0*X", 2 * sizeof(T), offset);
+}
+
+offs_t m6805_base_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	u8 const code = opcodes.r8(pc);
+
+	if (!disasm[code].name || (disasm[code].level > m_level))
 	{
 		util::stream_format(stream, "%-6s$%02X", "fcb", code);
-		return 1 | DASMFLAG_SUPPORTED;
+		return 1 | SUPPORTED;
 	}
 	else
 	{
@@ -166,11 +123,11 @@ offs_t disassemble(
 		{
 		case op_names::bsr:
 		case op_names::jsr:
-			flags = DASMFLAG_STEP_OVER;
+			flags = STEP_OVER;
 			break;
 		case op_names::rts:
 		case op_names::rti:
-			flags = DASMFLAG_STEP_OUT;
+			flags = STEP_OUT;
 			break;
 		default:
 			flags = 0;
@@ -178,55 +135,46 @@ offs_t disassemble(
 
 		util::stream_format(stream, "%-6s", disasm[code].name);
 
-		int bit;
-		u16 ea;
 		switch (disasm[code].mode)
 		{
 		case md::INH:   // inherent
-			return 1 | flags | DASMFLAG_SUPPORTED;
+			return 1 | flags | SUPPORTED;
 
 		case md::BTR:   // bit test and relative branch
-			bit = (code >> 1) & 7;
-			util::stream_format(stream, "%d,", bit);
-			format_address(stream, opram[1], symbols, symbol_count);
-			util::stream_format(stream, ",$%03X", pc + 3 + s8(opram[2]));
-			return 3 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "%d, %s, $%03X", (code >> 1) & 7, address(params.r8(pc+1)), pc + 3 + s8(params.r8(pc+2)));
+			return 3 | flags | SUPPORTED;
 
 		case md::BIT:   // bit test
-			bit = (code >> 1) & 7;
-			util::stream_format(stream, "%d,", bit);
-			format_address(stream, opram[1], symbols, symbol_count);
-			return 2 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "%d, %s", (code >> 1) & 7, address(params.r8(pc+1)));
+			return 2 | flags | SUPPORTED;
 
 		case md::REL:   // relative
-			util::stream_format(stream, "$%03X", pc + 2 + s8(opram[1]));
-			return 2 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "$%03X", pc + 2 + s8(params.r8(pc+1)));
+			return 2 | flags | SUPPORTED;
 
 		case md::IMM:   // immediate
-			util::stream_format(stream, "#$%02X", opram[1]);
-			return 2 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "#$%02X", params.r8(pc+1));
+			return 2 | flags | SUPPORTED;
 
 		case md::DIR:   // direct (zero page address)
-			format_address(stream, opram[1], symbols, symbol_count);
-			return 2 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "%s", address(params.r8(pc+1)));
+			return 2 | flags | SUPPORTED;
 
 		case md::EXT:   // extended (16 bit address)
-			ea = (opram[1] << 8) + opram[2];
-			format_address(stream, ea, symbols, symbol_count);
-			return 3 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "%s", address(params.r16(pc+1)));
+			return 3 | flags | SUPPORTED;
 
 		case md::IDX:   // indexed
 			util::stream_format(stream, "(x)");
-			return 1 | flags | DASMFLAG_SUPPORTED;
+			return 1 | flags | SUPPORTED;
 
 		case md::IX1:   // indexed + byte (zero page)
-			util::stream_format(stream, "(x+$%02X)", opram[1]);
-			return 2 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "(x+$%02X)", params.r8(pc+1));
+			return 2 | flags | SUPPORTED;
 
 		case md::IX2:   // indexed + word (16 bit address)
-			ea = (opram[1] << 8) + opram[2];
-			util::stream_format(stream, "(x+$%04X)", ea);
-			return 3 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "(x+$%04X)", params.r16(pc+1));
+			return 3 | flags | SUPPORTED;
 		}
 
 		// if we fall off the switch statement something is very wrong
@@ -234,48 +182,22 @@ offs_t disassemble(
 	}
 }
 
-} // anonymous namespace
-
-
-offs_t CPU_DISASSEMBLE_NAME(m6805)(
-		cpu_device *device,
-		std::ostream &stream,
-		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
-		int options,
-		std::pair<u16, char const *> const symbols[],
-		std::size_t symbol_count)
+m6805_disassembler::m6805_disassembler() : m6805_base_disassembler(lvl::HMOS)
 {
-	return disassemble(device, stream, pc, oprom, opram, options, lvl::HMOS, symbols, symbol_count);
 }
 
-offs_t CPU_DISASSEMBLE_NAME(m146805)(
-		cpu_device *device,
-		std::ostream &stream,
-		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
-		int options,
-		std::pair<u16, char const *> const symbols[],
-		std::size_t symbol_count)
+m6805_disassembler::m6805_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count) : m6805_base_disassembler(lvl::HMOS, symbols, symbol_count)
 {
-	return disassemble(device, stream, pc, oprom, opram, options, lvl::CMOS, symbols, symbol_count);
 }
 
-offs_t CPU_DISASSEMBLE_NAME(m68hc05)(
-		cpu_device *device,
-		std::ostream &stream,
-		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
-		int options,
-		std::pair<u16, char const *> const symbols[],
-		std::size_t symbol_count)
+m146805_disassembler::m146805_disassembler() : m6805_base_disassembler(lvl::CMOS)
 {
-	return disassemble(device, stream, pc, oprom, opram, options, lvl::HC, symbols, symbol_count);
 }
 
-CPU_DISASSEMBLE(m6805)   { return CPU_DISASSEMBLE_NAME(m6805)  (device, stream, pc, oprom, opram, options, nullptr, 0); }
-CPU_DISASSEMBLE(m146805) { return CPU_DISASSEMBLE_NAME(m146805)(device, stream, pc, oprom, opram, options, nullptr, 0); }
-CPU_DISASSEMBLE(m68hc05) { return CPU_DISASSEMBLE_NAME(m68hc05)(device, stream, pc, oprom, opram, options, nullptr, 0); }
+m68hc05_disassembler::m68hc05_disassembler() : m6805_base_disassembler(lvl::HC)
+{
+}
+
+m68hc05_disassembler::m68hc05_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count) : m6805_base_disassembler(lvl::HC, symbols, symbol_count)
+{
+}

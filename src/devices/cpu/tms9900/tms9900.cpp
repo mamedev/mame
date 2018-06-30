@@ -110,8 +110,11 @@
 
 #include "emu.h"
 #include "tms9900.h"
+#include "9900dasm.h"
 
 #define NOPRG -1
+
+constexpr int tms99xx_device::AS_SETOFFSET;
 
 /* tms9900 ST register bits. */
 enum
@@ -175,9 +178,10 @@ enum
     twice their number. Accordingly, the TMS9900 has a CRU bitmask 0x0fff.
 ****************************************************************************/
 
-tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, uint32_t clock)
+tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, const char *tag, int data_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock),
-		m_program_config("program", ENDIANNESS_BIG, databus_width, prg_addr_bits),
+		m_program_config("program", ENDIANNESS_BIG, data_width, prg_addr_bits),
+		m_setoffset_config("setoffset", ENDIANNESS_BIG, data_width, prg_addr_bits),
 		m_io_config("cru", ENDIANNESS_BIG, 8, cru_addr_bits),
 		m_prgspace(nullptr),
 		m_cru(nullptr),
@@ -222,10 +226,11 @@ void tms99xx_device::device_start()
 	// TODO: Restore state save feature
 	resolve_lines();
 	m_prgspace = &space(AS_PROGRAM);
+	m_sospace = has_space(AS_SETOFFSET) ? &space(AS_SETOFFSET) : nullptr;
 	m_cru = &space(AS_IO);
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_state_any = 0;
 	PC = 0;
@@ -420,7 +425,7 @@ void tms99xx_device::state_string_export(const device_state_entry &entry, std::s
 uint16_t tms99xx_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;
-	auto dis = machine().disable_side_effect();
+	auto dis = machine().disable_side_effects();
 	uint16_t value = m_prgspace->read_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe);
 	m_icount = temp;
 	return value;
@@ -429,17 +434,24 @@ uint16_t tms99xx_device::read_workspace_register_debug(int reg)
 void tms99xx_device::write_workspace_register_debug(int reg, uint16_t data)
 {
 	int temp = m_icount;
-	auto dis = machine().disable_side_effect();
+	auto dis = machine().disable_side_effects();
 	m_prgspace->write_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe, data);
 	m_icount = temp;
 }
 
 device_memory_interface::space_config_vector tms99xx_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
-	};
+	if (has_configured_map(AS_SETOFFSET))
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM,   &m_program_config),
+			std::make_pair(AS_SETOFFSET, &m_setoffset_config),
+			std::make_pair(AS_IO,        &m_io_config)
+		};
+	else
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM,   &m_program_config),
+			std::make_pair(AS_IO,        &m_io_config)
+		};
 }
 
 /**************************************************************************
@@ -1503,7 +1515,7 @@ void tms99xx_device::acquire_instruction()
 	{
 		decode(m_current_value);
 		if (TRACE_EXEC) logerror("%04x: %04x (%s)\n", PC, IR, opname[m_command]);
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		PC = (PC + 2) & 0xfffe & m_prgaddr_mask;
 		// IAQ will be cleared in the main loop
 	}
@@ -1522,7 +1534,8 @@ void tms99xx_device::mem_read()
 	if (m_mem_phase==1)
 	{
 		if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
-		m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
+		if (m_sospace)
+			m_sospace->read_byte(m_address & m_prgaddr_mask & 0xfffe);
 		m_check_ready = true;
 		m_mem_phase = 2;
 		m_pass = 2;
@@ -1549,7 +1562,8 @@ void tms99xx_device::mem_write()
 		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
 		// When writing, the data bus is asserted immediately after the address bus
 		if (TRACE_ADDRESSBUS) logerror("set address (w) %04x\n", m_address);
-		m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
+		if (m_sospace)
+			m_sospace->read_byte(m_address & m_prgaddr_mask & 0xfffe);
 		if (TRACE_MEM) logerror("mem w %04x <- %04x\n",  m_address, m_current_value);
 		m_prgspace->write_word(m_address & m_prgaddr_mask & 0xfffe, m_current_value);
 		m_check_ready = true;
@@ -2751,21 +2765,11 @@ uint32_t tms99xx_device::execute_input_lines() const
 // execute_burn = nop
 
 // device_disasm_interface overrides
-uint32_t tms99xx_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
 
-uint32_t tms99xx_device::disasm_max_opcode_bytes() const
+std::unique_ptr<util::disasm_interface> tms99xx_device::create_disassembler()
 {
-	return 6;
-}
-
-offs_t tms99xx_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( tms9900 );
-	return CPU_DISASSEMBLE_NAME(tms9900)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<tms9900_disassembler>(TMS9900_ID);
 }
 
 
-DEFINE_DEVICE_TYPE(TMS9900, tms9900_device, "tms9900", "TMS9900")
+DEFINE_DEVICE_TYPE(TMS9900, tms9900_device, "tms9900", "Texas Instruments TMS9900")

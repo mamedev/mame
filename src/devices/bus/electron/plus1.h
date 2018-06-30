@@ -14,8 +14,7 @@
 #include "softlist.h"
 #include "machine/adc0844.h"
 #include "bus/centronics/ctronics.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "bus/electron/cart/slot.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -30,32 +29,34 @@ public:
 	electron_plus1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	virtual uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) override;
+
 private:
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE_LINE_MEMBER(busy_w);
 	DECLARE_WRITE_LINE_MEMBER(ready_w);
-
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(electron_cart_sk1) { return load_cart(image, m_cart_sk1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(electron_cart_sk2) { return load_cart(image, m_cart_sk2); }
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 
 	required_memory_region m_exp_rom;
-	required_device<generic_slot_device> m_cart_sk1;
-	required_device<generic_slot_device> m_cart_sk2;
+	required_device<electron_cartslot_device> m_cart_sk1;
+	required_device<electron_cartslot_device> m_cart_sk2;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<adc0844_device> m_adc;
 	required_ioport_array<4> m_joy;
 	required_ioport m_buttons;
 
+	uint8_t m_romsel;
 	int m_centronics_busy;
 	int m_adc_ready;
 };

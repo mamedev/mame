@@ -6,14 +6,15 @@
 
 DEFINE_DEVICE_TYPE(NEXTKBD, nextkbd_device, "nextkbd", "NeXT Keyboard")
 
-DEVICE_ADDRESS_MAP_START(amap, 32, nextkbd_device)
-	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_snd_r, ctrl_snd_w, 0xff000000)
-	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_kms_r, ctrl_kms_w, 0x00ff0000)
-	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_dma_r, ctrl_dma_w, 0x0000ff00)
-	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_cmd_r, ctrl_cmd_w, 0x000000ff)
-	AM_RANGE(0x4, 0x7) AM_READWRITE(cdata_r,  cdata_w)
-	AM_RANGE(0x8, 0xb) AM_READWRITE(kmdata_r, kmdata_w)
-ADDRESS_MAP_END
+void nextkbd_device::amap(address_map &map)
+{
+	map(0x0, 0x0).rw(FUNC(nextkbd_device::status_snd_r), FUNC(nextkbd_device::ctrl_snd_w));
+	map(0x1, 0x1).rw(FUNC(nextkbd_device::status_kms_r), FUNC(nextkbd_device::ctrl_kms_w));
+	map(0x2, 0x2).rw(FUNC(nextkbd_device::status_dma_r), FUNC(nextkbd_device::ctrl_dma_w));
+	map(0x3, 0x3).rw(FUNC(nextkbd_device::status_cmd_r), FUNC(nextkbd_device::ctrl_cmd_w));
+	map(0x4, 0x7).rw(FUNC(nextkbd_device::cdata_r), FUNC(nextkbd_device::cdata_w));
+	map(0x8, 0xb).rw(FUNC(nextkbd_device::kmdata_r), FUNC(nextkbd_device::kmdata_w));
+}
 
 nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NEXTKBD, tag, owner, clock),
@@ -162,31 +163,31 @@ bool nextkbd_device::fifo_empty() const
 
 READ8_MEMBER( nextkbd_device::status_snd_r )
 {
-	logerror("%s: status_snd_r %02x (%08x)\n", tag(), ctrl_snd, (unsigned int)space.device().safe_pc());
+	logerror("status_snd_r %02x %s\n", ctrl_snd, machine().describe_context());
 	return ctrl_snd;
 }
 
 READ8_MEMBER( nextkbd_device::status_kms_r )
 {
-	logerror("%s: status_kms_r %02x (%08x)\n", tag(), ctrl_kms, (unsigned int)space.device().safe_pc());
+	logerror("status_kms_r %02x %s\n", ctrl_kms, machine().describe_context());
 	return ctrl_kms;
 }
 
 READ8_MEMBER( nextkbd_device::status_dma_r )
 {
-	logerror("%s: status_dma_r %02x (%08x)\n", tag(), ctrl_dma, (unsigned int)space.device().safe_pc());
+	logerror("status_dma_r %02x %s\n", ctrl_dma, machine().describe_context());
 	return ctrl_dma;
 }
 
 READ8_MEMBER( nextkbd_device::status_cmd_r )
 {
-	logerror("%s: status_cmd_r %02x (%08x)\n", tag(), ctrl_cmd, (unsigned int)space.device().safe_pc());
+	logerror("status_cmd_r %02x %s\n", ctrl_cmd, machine().describe_context());
 	return ctrl_cmd;
 }
 
 READ32_MEMBER( nextkbd_device::cdata_r )
 {
-	logerror("%s: cdata_r %08x @ %08x (%08x)\n", tag(), cdata, mem_mask, (unsigned int)space.device().safe_pc());
+	logerror("cdata_r %08x @ %08x %s\n", cdata, mem_mask, machine().describe_context());
 	return cdata;
 }
 
@@ -196,7 +197,7 @@ READ32_MEMBER( nextkbd_device::kmdata_r )
 	ctrl_kms &= ~(C_KBD_INTERRUPT|C_KBD_DATA);
 	if(old & C_KBD_INTERRUPT)
 		int_change_cb(false);
-	logerror("%s: kmdata_r %08x @ %08x (%08x)\n", tag(), kmdata, mem_mask, (unsigned int)space.device().safe_pc());
+	logerror("kmdata_r %08x @ %08x %s\n", kmdata, mem_mask, machine().describe_context());
 	return kmdata;
 }
 
@@ -206,7 +207,7 @@ WRITE8_MEMBER( nextkbd_device::ctrl_snd_w )
 	ctrl_snd = (ctrl_snd & ~C_SOUND_WMASK) | (data & C_SOUND_WMASK);
 	uint8_t diff = old ^ ctrl_snd;
 
-	logerror("%s: ctrl_snd_w %02x | %02x (%08x)\n", tag(), ctrl_snd, diff, (unsigned int)space.device().safe_pc());
+	logerror("ctrl_snd_w %02x | %02x %s\n", ctrl_snd, diff, machine().describe_context());
 }
 
 WRITE8_MEMBER( nextkbd_device::ctrl_kms_w )
@@ -215,7 +216,7 @@ WRITE8_MEMBER( nextkbd_device::ctrl_kms_w )
 	ctrl_kms = (ctrl_kms & ~C_KMS_WMASK) | (data & C_KMS_WMASK);
 	uint8_t diff = old ^ ctrl_kms;
 
-	logerror("%s: ctrl_kms_w %02x | %02x (%08x)\n", tag(), ctrl_kms, diff, (unsigned int)space.device().safe_pc());
+	logerror("ctrl_kms_w %02x | %02x %s\n", ctrl_kms, diff, machine().describe_context());
 }
 
 WRITE8_MEMBER( nextkbd_device::ctrl_dma_w )
@@ -224,25 +225,25 @@ WRITE8_MEMBER( nextkbd_device::ctrl_dma_w )
 	ctrl_dma = (ctrl_dma & ~C_WMASK) | (data & C_WMASK);
 	uint8_t diff = old ^ ctrl_dma;
 
-	logerror("%s: ctrl_dma_w %02x | %02x (%08x)\n", tag(), ctrl_dma, diff, (unsigned int)space.device().safe_pc());
+	logerror("ctrl_dma_w %02x | %02x %s\n", ctrl_dma, diff, machine().describe_context());
 }
 
 WRITE8_MEMBER( nextkbd_device::ctrl_cmd_w )
 {
 	ctrl_cmd = data;
-	logerror("%s: ctrl_cmd_w %02x (%08x)\n", tag(), ctrl_cmd, (unsigned int)space.device().safe_pc());
+	logerror("ctrl_cmd_w %02x %s\n", ctrl_cmd, machine().describe_context());
 }
 
 WRITE32_MEMBER( nextkbd_device::cdata_w )
 {
 	COMBINE_DATA(&cdata);
-	logerror("%s: cdata_w %08x @ %08x (%08x)\n", tag(), data, mem_mask, (unsigned int)space.device().safe_pc());
+	logerror("cdata_w %08x @ %08x %s\n", data, mem_mask, machine().describe_context());
 	handle_command();
 }
 
 WRITE32_MEMBER( nextkbd_device::kmdata_w )
 {
-	logerror("%s: kmdata_w %08x @ %08x (%08x)\n", tag(), data, mem_mask, (unsigned int)space.device().safe_pc());
+	logerror("kmdata_w %08x @ %08x %s\n", data, mem_mask, machine().describe_context());
 }
 
 INPUT_CHANGED_MEMBER( nextkbd_device::update )
@@ -290,7 +291,7 @@ INPUT_CHANGED_MEMBER( nextkbd_device::update )
 
 void nextkbd_device::handle_fifo_command()
 {
-	logerror("%s: Fifo command %08x?\n", tag(), cdata);
+	logerror("Fifo command %08x?\n", cdata);
 	fifo_ir = 0;
 	fifo_iw = 0;
 	fifo_size = 0;
@@ -304,18 +305,18 @@ void nextkbd_device::handle_kbd_command()
 {
 	switch(cdata >> 24) {
 	case 0x00:
-		logerror("%s: Keyboard LED control %06x?\n", tag(), cdata & 0xffffff);
+		logerror("Keyboard LED control %06x?\n", cdata & 0xffffff);
 		ctrl_kms |= C_KBD_DATA; // Hmmmm.  The rom wants it, but I'm not sure if data is actually expected
 		break;
 
 	case 0xef:
-		logerror("%s: Set keyboard/mouse address to %d\n", tag(), (cdata >> 17) & 7);
+		logerror("Set keyboard/mouse address to %d\n", (cdata >> 17) & 7);
 		km_address = ((cdata >> 17) & 7) << 25;
 		ctrl_kms |= C_KBD_DATA; // Hmmmm.  The rom wants it, but I'm not sure if data is actually expected
 		break;
 
 	default:
-		logerror("%s: Unhandled keyboard command %02x.%06x\n", tag(), cdata >> 24, cdata & 0xffffff);
+		logerror("Unhandled keyboard command %02x.%06x\n", cdata >> 24, cdata & 0xffffff);
 		break;
 	}
 }
@@ -332,7 +333,7 @@ void nextkbd_device::handle_command()
 		break;
 
 	default:
-		logerror("%s: Unhandled command %02x.%08x\n", tag(), ctrl_cmd, cdata);
+		logerror("Unhandled command %02x.%08x\n", ctrl_cmd, cdata);
 		break;
 	}
 }

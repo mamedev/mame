@@ -80,6 +80,7 @@ TODO:
 #include "machine/i8255.h"
 #include "machine/ins8154.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -160,7 +161,7 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_pb_r);
 	DECLARE_WRITE8_MEMBER(ay8910_pb_w);
 
-	DECLARE_DRIVER_INIT(vega);
+	void init_vega();
 
 
 	virtual void machine_start() override;
@@ -168,6 +169,9 @@ public:
 	DECLARE_PALETTE_INIT(vega);
 	void draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vega(machine_config &config);
+	void vega_io_map(address_map &map);
+	void vega_map(address_map &map);
 };
 
 WRITE8_MEMBER(vega_state::extern_w)
@@ -315,7 +319,7 @@ READ8_MEMBER(vega_state::extern_r)
 		{
 			/* AY 3-8910 */
 			m_ay8910->data_w(space, 0, offset);
-			return 0xff;//mame_rand(space.machine);
+			return 0xff;//mame_rand(machine);
 		}
 
 		case 2: /* 08-0b */
@@ -385,14 +389,16 @@ WRITE8_MEMBER(vega_state::rombank_w)
 	membank("bank1")->set_entry(data >>7);
 }
 
-static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 8, vega_state )
-	AM_RANGE(0x000, 0x7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0x800, 0xfff) AM_ROM
-ADDRESS_MAP_END
+void vega_state::vega_map(address_map &map)
+{
+	map(0x000, 0x7ff).bankr("bank1");
+	map(0x800, 0xfff).rom();
+}
 
-static ADDRESS_MAP_START( vega_io_map, AS_IO, 8, vega_state )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(extern_r, extern_w)
-ADDRESS_MAP_END
+void vega_state::vega_io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(FUNC(vega_state::extern_r), FUNC(vega_state::extern_w));
+}
 
 
 static INPUT_PORTS_START( vega )
@@ -506,7 +512,7 @@ void vega_state::draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const
 			int flip=BIT(id,5);
 
 
-			int num=(BITSWAP8( ((id>>2) &7),   7,6,5,4,3,0,1,2 ));
+			int num=(bitswap<8>( ((id>>2) &7),   7,6,5,4,3,0,1,2 ));
 
 			int bank=id&3;
 
@@ -556,7 +562,7 @@ uint32_t vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bit
 			for(x=0;x<40;++x)
 			{
 				int character=m_txt_ram[idx];
-				//int color=BITSWAP8(color_lookup[character],7,6,5,4,0,1,2,3)>>1;
+				//int color=bitswap<8>(color_lookup[character],7,6,5,4,0,1,2,3)>>1;
 				int color=color_lookup[character]&0xf;
 				/*
 				 bit 0 - unknown
@@ -565,7 +571,7 @@ uint32_t vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bit
 				 bit 3 - red
 				 */
 
-					color=BITSWAP8(color,7,6,5,4,0,1,2,3)&0x7;
+					color=bitswap<8>(color,7,6,5,4,0,1,2,3)&0x7;
 
 				color^=0xf;
 
@@ -691,7 +697,7 @@ static const gfx_layout tile_layout3 =
 };
 
 
-static GFXDECODE_START( test_decode )
+static GFXDECODE_START( gfx_test_decode )
 	GFXDECODE_ENTRY( "gfx1", 0,  text_charlayout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0,  tile_layout2, 16, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0,  tile_layout3, 16, 1 )
@@ -789,31 +795,31 @@ void vega_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( vega )
-	MCFG_CPU_ADD("maincpu", I8035, 4000000)
-	MCFG_CPU_PROGRAM_MAP(vega_map)
-	MCFG_CPU_IO_MAP(vega_io_map)
+MACHINE_CONFIG_START(vega_state::vega)
+	MCFG_DEVICE_ADD("maincpu", I8035, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(vega_map)
+	MCFG_DEVICE_IO_MAP(vega_io_map)
 	MCFG_MCS48_PORT_P1_IN_CB(IOPORT("DSW"))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(vega_state, rombank_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(vega_state, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(vega_state, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(vega_state, t1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, vega_state, rombank_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, vega_state, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, vega_state, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, vega_state, t1_r))
 	MCFG_MCS48_PORT_PROG_OUT_CB(NOOP) /* prog - inputs CLK */
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vega_state, irq0_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vega_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(vega_state, txtram_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(vega_state, txtram_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, vega_state, txtram_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vega_state, txtram_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(vega_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(vega_state, randomizer))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(vega_state, ppi_pc_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, vega_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, vega_state, randomizer))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, vega_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD( "ins8154", INS8154, 0 )
-	MCFG_INS8154_IN_A_CB(READ8(vega_state, ins8154_pa_r))
-	MCFG_INS8154_OUT_A_CB(WRITE8(vega_state, ins8154_pa_w))
-	MCFG_INS8154_IN_B_CB(READ8(vega_state, ins8154_pb_r))
-	MCFG_INS8154_OUT_B_CB(WRITE8(vega_state, ins8154_pb_w))
+	MCFG_INS8154_IN_A_CB(READ8(*this, vega_state, ins8154_pa_r))
+	MCFG_INS8154_OUT_A_CB(WRITE8(*this, vega_state, ins8154_pa_w))
+	MCFG_INS8154_IN_B_CB(READ8(*this, vega_state, ins8154_pb_r))
+	MCFG_INS8154_OUT_B_CB(WRITE8(*this, vega_state, ins8154_pb_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -827,17 +833,17 @@ static MACHINE_CONFIG_START( vega )
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(vega_state, vega)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", test_decode)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_test_decode)
 
 	/* sound hardware */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay8910", AY8910, 1500000 )
-	MCFG_AY8910_PORT_A_READ_CB(READ8(vega_state, ay8910_pa_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(vega_state, ay8910_pb_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(vega_state, ay8910_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(vega_state, ay8910_pb_w))
+	MCFG_DEVICE_ADD("ay8910", AY8910, 1500000 )
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, vega_state, ay8910_pa_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, vega_state, ay8910_pb_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, vega_state, ay8910_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, vega_state, ay8910_pb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END
@@ -876,10 +882,10 @@ ROM_START( vega )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(vega_state, vega)
+void vega_state::init_vega()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x1000], 0x800);
 }
 
-GAME( 1982, vega,   0, vega, vega, vega_state, vega, ROT270, "Olympia", "Vega", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1982, vega,   0, vega, vega, vega_state, init_vega, ROT270, "Olympia", "Vega", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

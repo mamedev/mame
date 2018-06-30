@@ -29,7 +29,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bsktball_state::bsktball_scanline)
 	if(scanline == 0) // vblank irq
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	else if(((scanline % 28) == 0) && (m_nmi_on)) // 32v timer irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -152,18 +152,4 @@ READ8_MEMBER(bsktball_state::bsktball_in0_r)
 
 		return (temp | m_dir0 | m_dir1 | m_dir2 | m_dir3);
 	}
-}
-
-/***************************************************************************
-    bsktball_led_w
-***************************************************************************/
-
-WRITE_LINE_MEMBER(bsktball_state::led1_w)
-{
-	output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(bsktball_state::led2_w)
-{
-	output().set_led_value(1, state);
 }

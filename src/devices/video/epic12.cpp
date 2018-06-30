@@ -61,7 +61,7 @@ void epic12_device::device_start()
 	save_item(NAME(m_gfx_scroll_0_y_shadowcopy));
 	save_item(NAME(m_gfx_scroll_1_x_shadowcopy));
 	save_item(NAME(m_gfx_scroll_1_y_shadowcopy));
-	save_pointer(NAME(m_ram16_copy.get()), m_main_ramsize/2);
+	save_pointer(NAME(m_ram16_copy), m_main_ramsize/2);
 	save_item(NAME(*m_bitmaps));
 }
 
@@ -828,7 +828,7 @@ READ32_MEMBER( epic12_device::blitter_r )
 			return 0xffffffff;
 
 		case 0x50:
-			return space.machine().root_device().ioport(":DSW")->read();
+			return machine().root_device().ioport(":DSW")->read();
 
 		default:
 			logerror("unknownblitter_r %08x %08x\n", offset*4, mem_mask);
@@ -852,7 +852,7 @@ READ32_MEMBER( epic12_device::blitter_r_unsafe )
 			return 0xffffffff;
 
 		case 0x50:
-			return space.machine().root_device().ioport(":DSW")->read();
+			return machine().root_device().ioport(":DSW")->read();
 
 		default:
 			logerror("unknownblitter_r %08x %08x\n", offset*4, mem_mask);

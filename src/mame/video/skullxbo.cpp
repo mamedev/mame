@@ -78,10 +78,6 @@ const atari_motion_objects_config skullxbo_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(skullxbo_state,skullxbo)
-{
-}
-
 
 
 /*************************************
@@ -165,7 +161,7 @@ WRITE16_MEMBER( skullxbo_state::playfield_latch_w )
 
 WRITE16_MEMBER(skullxbo_state::playfield_latched_w)
 {
-	m_playfield_tilemap->write(space, offset, data, mem_mask);
+	m_playfield_tilemap->write16(space, offset, data, mem_mask);
 	if (m_playfield_latch != -1)
 	{
 		uint16_t oldval = m_playfield_tilemap->extmem_read(offset);

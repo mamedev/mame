@@ -65,7 +65,7 @@ K051960_CB_MEMBER(mainevt_state::mainevt_sprite_callback)
 K051960_CB_MEMBER(mainevt_state::dv_sprite_callback)
 {
 	enum { sprite_colorbase = 128 / 16 };
-	
+
 	// enable shadow if upper bits are 0
 	*shadow = ((*color & 0xe0) >> 5) == 0;
 

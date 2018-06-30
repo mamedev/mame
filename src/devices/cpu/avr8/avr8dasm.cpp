@@ -7,7 +7,7 @@
 */
 
 #include "emu.h"
-#include "avr8.h"
+#include "avr8dasm.h"
 
 #define RD2(op)         (((op) >> 4) & 0x0003)
 #define RD3(op)         (((op) >> 4) & 0x0007)
@@ -25,11 +25,16 @@
 #define ACONST6(op)     ((((op) >> 5) & 0x0030) | ((op) & 0x000f))
 #define MULCONST2(op)   ((((op) >> 6) & 0x0002) | (((op) >> 3) & 0x0001))
 
-CPU_DISASSEMBLE(avr8)
+u32 avr8_disassembler::opcode_alignment() const
 {
-	int pos = 0;
-	uint32_t op = oprom[pos++];
-	op |= oprom[pos++] << 8;
+	return 2;
+}
+
+offs_t avr8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	offs_t base_pc = pc;
+	uint32_t op = opcodes.r16(pc);
+	pc += 2;
 	uint32_t addr;
 	const char* register_names[0x40] = {"PINA", "DDRA", "PORTA", "PINB", "DDRB", "PORTB", "PINC", "DDRC", "PORTC", "PIND", "DDRD", "PORTD", "PINE", "DDRE", "PORTE", "PINF", "DDRF", "PORTF", "PING", "DDRG", "PORTG", "TIFR0", "TIFR1", "TIFR2","TIFR3", "TIFR4", "TIFR5", "PCIFR", "EIFR", "EIMSK", "GPIOR0", "EECR", "EEDR", "EEARL", "EEARH", "GTCCR", "TCCR0A", "TCCR0B", "TCNT0", "OCR0A", "OCR0B", "0x29", "GPIOR1", "GPIOR2", "SPCR", "SPSR", "SPDR", "0x2F", "ACSR", "OCDR", "0x32", "SMCR", "MCUSR", "MCUCR", "0x36", "SPMCSR", "0x38", "0x39", "0x3A", "RAMPZ", "EIND", "SPL", "SPH", "SREG"};
 
@@ -226,8 +231,8 @@ CPU_DISASSEMBLE(avr8)
 					{
 						case 0x0000:
 							op <<= 16;
-							op |= oprom[pos++];
-							op |= oprom[pos++] << 8;
+							op |= opcodes.r16(pc);
+							pc += 2;
 							util::stream_format(stream, "LDS     R%d, (0x%04x)", RD5(op >> 16), op & 0x0000ffff);
 							break;
 						case 0x0001:
@@ -277,8 +282,8 @@ CPU_DISASSEMBLE(avr8)
 					{
 						case 0x0000:
 							op <<= 16;
-							op |= oprom[pos++];
-							op |= oprom[pos++] << 8;
+							op |= opcodes.r16(pc);
+							pc += 2;
 							util::stream_format(stream, "STS     (0x%04x), R%d", op & 0x0000ffff, RD5(op >> 16));
 							break;
 						case 0x0001:
@@ -410,15 +415,15 @@ CPU_DISASSEMBLE(avr8)
 						case 0x000c:
 						case 0x000d:
 							addr = KCONST22(op) << 16;
-							addr |= oprom[pos++];
-							addr |= oprom[pos++] << 8;
+							addr |= opcodes.r16(pc);
+							pc += 2;
 							util::stream_format(stream, "JMP     0x%06x", addr << 1);
 							break;
 						case 0x000e:
 						case 0x000f:
 							addr = KCONST22(op) << 16;
-							addr |= oprom[pos++];
-							addr |= oprom[pos++] << 8;
+							addr |= opcodes.r16(pc);
+							pc += 2;
 							util::stream_format(stream, "CALL    0x%06x", addr << 1);
 							break;
 						default:
@@ -505,15 +510,15 @@ CPU_DISASSEMBLE(avr8)
 						case 0x000c:
 						case 0x000d:
 							op <<= 16;
-							op |= oprom[pos++];
-							op |= oprom[pos++] << 8;
+							op |= opcodes.r16(pc);
+							pc += 2;
 							util::stream_format(stream, "JMP     0x%06x", KCONST22(op) << 1);
 							break;
 						case 0x000e:
 						case 0x000f:
 							op <<= 16;
-							op |= oprom[pos++];
-							op |= oprom[pos++] << 8;
+							op |= opcodes.r16(pc);
+							pc += 2;
 							util::stream_format(stream, "CALL    0x%06x", KCONST22(op) << 1);
 							break;
 					}
@@ -669,5 +674,5 @@ CPU_DISASSEMBLE(avr8)
 			break;
 	}
 
-	return pos | DASMFLAG_SUPPORTED;
+	return (pc - base_pc) | SUPPORTED;
 }

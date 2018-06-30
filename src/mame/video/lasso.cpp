@@ -93,7 +93,7 @@ PALETTE_INIT_MEMBER(lasso_state,wwjgtin)
 	{
 		uint8_t ctabentry;
 		int raw_pen = i - 0x40;
-		
+
 		if (raw_pen & 0x03)
 			ctabentry = (((raw_pen & 0xf0) >> 2) + (raw_pen & 0x03)) & 0x3f;
 		else

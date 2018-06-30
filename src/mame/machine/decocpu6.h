@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/m6502/m6502d.h"
 #include "cpu/m6502/m6502.h"
 
 class deco_cpu6_device : public m6502_device {
@@ -17,10 +18,17 @@ protected:
 		virtual ~mi_decrypt() {}
 		virtual uint8_t read_sync(uint16_t adr) override;
 	};
+	class disassembler : public m6502_disassembler {
+	public:
+		disassembler() = default;
+		virtual ~disassembler() = default;
+		virtual u32 interface_flags() const override;
+		virtual u8 decrypt8(u8 value, offs_t pc, bool opcode) const override;
+	};
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 DECLARE_DEVICE_TYPE(DECO_CPU6, deco_cpu6_device)

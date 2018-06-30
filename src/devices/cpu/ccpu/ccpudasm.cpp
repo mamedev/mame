@@ -11,13 +11,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ccpu.h"
+#include "ccpudasm.h"
 
+u32 ccpu_disassembler::opcode_alignment() const
+{
+	return 1;
+}
 
-CPU_DISASSEMBLE(ccpu)
+offs_t ccpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	unsigned startpc = pc;
-	uint8_t opcode = oprom[pc++ - startpc];
+	uint8_t opcode = opcodes.r8(pc++);
 	uint8_t tempval;
 
 	switch (opcode)
@@ -40,7 +44,7 @@ CPU_DISASSEMBLE(ccpu)
 
 		/* A8I */
 		case 0x20:
-			util::stream_format(stream, "A8I  $%X", oprom[pc++ - startpc]);
+			util::stream_format(stream, "A8I  $%X", opcodes.r8(pc++));
 			break;
 
 		/* A4I */
@@ -53,7 +57,7 @@ CPU_DISASSEMBLE(ccpu)
 
 		/* S8I */
 		case 0x30:
-			util::stream_format(stream, "S8I  $%X", oprom[pc++ - startpc]);
+			util::stream_format(stream, "S8I  $%X", opcodes.r8(pc++));
 			break;
 
 		/* S4I */
@@ -69,7 +73,7 @@ CPU_DISASSEMBLE(ccpu)
 		case 0x44:  case 0x45:  case 0x46:  case 0x47:
 		case 0x48:  case 0x49:  case 0x4a:  case 0x4b:
 		case 0x4c:  case 0x4d:  case 0x4e:  case 0x4f:
-			tempval = oprom[pc++ - startpc];
+			tempval = opcodes.r8(pc++);
 			util::stream_format(stream, "LPAI $%03X", (opcode & 0x0f) + (tempval & 0xf0) + ((tempval & 0x0f) << 8));
 			break;
 
@@ -326,5 +330,5 @@ CPU_DISASSEMBLE(ccpu)
 			break;
 	}
 
-	return (pc - startpc) | DASMFLAG_SUPPORTED;
+	return (pc - startpc) | SUPPORTED;
 }

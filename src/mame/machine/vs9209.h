@@ -16,40 +16,40 @@
 //**************************************************************************
 
 #define MCFG_VS9209_IN_PORTA_CB(_devcb) \
-	devcb = &vs9209_device::set_input_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_input_cb(0, DEVCB_##_devcb);
 #define MCFG_VS9209_IN_PORTB_CB(_devcb) \
-	devcb = &vs9209_device::set_input_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_input_cb(1, DEVCB_##_devcb);
 #define MCFG_VS9209_IN_PORTC_CB(_devcb) \
-	devcb = &vs9209_device::set_input_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_input_cb(2, DEVCB_##_devcb);
 #define MCFG_VS9209_IN_PORTD_CB(_devcb) \
-	devcb = &vs9209_device::set_input_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_input_cb(3, DEVCB_##_devcb);
 #define MCFG_VS9209_IN_PORTE_CB(_devcb) \
-	devcb = &vs9209_device::set_input_cb(*device, 4, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_input_cb(4, DEVCB_##_devcb);
 #define MCFG_VS9209_IN_PORTF_CB(_devcb) \
-	devcb = &vs9209_device::set_input_cb(*device, 5, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_input_cb(5, DEVCB_##_devcb);
 #define MCFG_VS9209_IN_PORTG_CB(_devcb) \
-	devcb = &vs9209_device::set_input_cb(*device, 6, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_input_cb(6, DEVCB_##_devcb);
 #define MCFG_VS9209_IN_PORTH_CB(_devcb) \
-	devcb = &vs9209_device::set_input_cb(*device, 7, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_input_cb(7, DEVCB_##_devcb);
 
 #ifdef VS9209_PROBABLY_NONEXISTENT_OUTPUTS
 #define MCFG_VS9209_OUT_PORTA_CB(_devcb) \
-	devcb = &vs9209_device::set_output_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_output_cb(0, DEVCB_##_devcb);
 #define MCFG_VS9209_OUT_PORTB_CB(_devcb) \
-	devcb = &vs9209_device::set_output_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_output_cb(1, DEVCB_##_devcb);
 #define MCFG_VS9209_OUT_PORTC_CB(_devcb) \
-	devcb = &vs9209_device::set_output_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_output_cb(2, DEVCB_##_devcb);
 #define MCFG_VS9209_OUT_PORTD_CB(_devcb) \
-	devcb = &vs9209_device::set_output_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_output_cb(3, DEVCB_##_devcb);
 #endif
 #define MCFG_VS9209_OUT_PORTE_CB(_devcb) \
-	devcb = &vs9209_device::set_output_cb(*device, 4, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_output_cb(4, DEVCB_##_devcb);
 #define MCFG_VS9209_OUT_PORTF_CB(_devcb) \
-	devcb = &vs9209_device::set_output_cb(*device, 5, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_output_cb(5, DEVCB_##_devcb);
 #define MCFG_VS9209_OUT_PORTG_CB(_devcb) \
-	devcb = &vs9209_device::set_output_cb(*device, 6, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_output_cb(6, DEVCB_##_devcb);
 #define MCFG_VS9209_OUT_PORTH_CB(_devcb) \
-	devcb = &vs9209_device::set_output_cb(*device, 7, DEVCB_##_devcb);
+	devcb = &downcast<vs9209_device &>(*device).set_output_cb(7, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -63,18 +63,16 @@ public:
 	// construction/destruction
 	vs9209_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration
-	template<class Object>
-	static devcb_base &set_input_cb(device_t &device, int p, Object &&obj)
+	// configuration
+	template<class Object> devcb_base &set_input_cb(int p, Object &&obj)
 	{
 		assert(p >= 0 && p < 8);
-		return downcast<vs9209_device &>(device).m_input_cb[p].set_callback(std::forward<Object>(obj));
+		return m_input_cb[p].set_callback(std::forward<Object>(obj));
 	}
-	template<class Object>
-	static devcb_base &set_output_cb(device_t &device, int p, Object &&obj)
+	template<class Object> devcb_base &set_output_cb(int p, Object &&obj)
 	{
 		assert(p >= 0 && p < 8);
-		return downcast<vs9209_device &>(device).m_output_cb[p].set_callback(std::forward<Object>(obj));
+		return m_output_cb[p].set_callback(std::forward<Object>(obj));
 	}
 
 	// memory handlers

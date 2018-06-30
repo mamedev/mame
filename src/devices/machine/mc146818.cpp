@@ -490,18 +490,17 @@ int mc146818_device::get_timer_bypass()
 
 void mc146818_device::update_irq()
 {
-	// IRQ line is active low
 	if (((m_data[REG_C] & REG_C_UF) && (m_data[REG_B] & REG_B_UIE)) ||
 		((m_data[REG_C] & REG_C_AF) && (m_data[REG_B] & REG_B_AIE)) ||
 		((m_data[REG_C] & REG_C_PF) && (m_data[REG_B] & REG_B_PIE)))
 	{
 		m_data[REG_C] |= REG_C_IRQF;
-		m_write_irq(CLEAR_LINE);
+		m_write_irq(ASSERT_LINE);
 	}
 	else
 	{
 		m_data[REG_C] &= ~REG_C_IRQF;
-		m_write_irq(ASSERT_LINE);
+		m_write_irq(CLEAR_LINE);
 	}
 }
 
@@ -528,7 +527,7 @@ READ8_MEMBER( mc146818_device::read )
 			// Update In Progress (UIP) time for 32768 Hz is 244+1984usec
 			/// TODO: support other dividers
 			/// TODO: don't set this if update is stopped
-			if ((space.machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
+			if ((machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
 				data |= REG_A_UIP;
 			break;
 
@@ -582,8 +581,11 @@ WRITE8_MEMBER( mc146818_device::write )
 
 		case REG_A:
 			// top bit of A is read only
-			m_data[REG_A] = data & ~REG_A_UIP;
-			update_timer();
+			if ((data ^ m_data[REG_A]) & ~REG_A_UIP)
+			{
+				m_data[REG_A] = data & ~REG_A_UIP;
+				update_timer();
+			}
 			break;
 
 		case REG_B:

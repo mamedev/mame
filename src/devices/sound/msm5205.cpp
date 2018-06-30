@@ -67,13 +67,13 @@ msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, d
 }
 
 msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_s1(false),
-		m_s2(false),
-		m_bitwidth(4),
-		m_vck_cb(*this),
-		m_vck_legacy_cb(*this)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_s1(false)
+	, m_s2(false)
+	, m_bitwidth(4)
+	, m_vck_cb(*this)
+	, m_vck_legacy_cb(*this)
 {
 }
 
@@ -81,18 +81,6 @@ msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, 
 msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: msm5205_device(mconfig, MSM6585, tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  set_prescaler_selector - configuration helper
-//-------------------------------------------------
-
-void msm5205_device::set_prescaler_selector(device_t &device, int select)
-{
-	msm5205_device &msm = downcast<msm5205_device &>(device);
-	msm.m_s1 = BIT(select, 1);
-	msm.m_s2 = BIT(select, 0);
-	msm.m_bitwidth = (select & 4) ? 4 : 3;
 }
 
 //-------------------------------------------------
@@ -274,17 +262,12 @@ WRITE_LINE_MEMBER(msm5205_device::reset_w)
  *    Handle an update of the data to the chip
  */
 
-void msm5205_device::data_w(int data)
+void msm5205_device::write_data(int data)
 {
 	if (m_bitwidth == 4)
 		m_data = data & 0x0f;
 	else
 		m_data = (data & 0x07) << 1; /* unknown */
-}
-
-WRITE8_MEMBER(msm5205_device::data_w)
-{
-	data_w(data);
 }
 
 int msm5205_device::get_prescaler() const

@@ -5,18 +5,22 @@
 
 DEFINE_DEVICE_TYPE(SEGA_LINDBERGH_BASEBOARD, sega_lindbergh_baseboard_device, "lindbergh_baseboard", "Sega Lindbergh Baseboard")
 
-DEVICE_ADDRESS_MAP_START(map1, 32, sega_lindbergh_baseboard_device)
-ADDRESS_MAP_END
+void sega_lindbergh_baseboard_device::map1(address_map &map)
+{
+}
 
-DEVICE_ADDRESS_MAP_START(map2, 32, sega_lindbergh_baseboard_device)
-ADDRESS_MAP_END
+void sega_lindbergh_baseboard_device::map2(address_map &map)
+{
+}
 
-DEVICE_ADDRESS_MAP_START(map3, 32, sega_lindbergh_baseboard_device)
-ADDRESS_MAP_END
+void sega_lindbergh_baseboard_device::map3(address_map &map)
+{
+}
 
 sega_lindbergh_baseboard_device::sega_lindbergh_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, SEGA_LINDBERGH_BASEBOARD, tag, owner, clock)
 {
+	set_ids(0x105718c1, 0x10, 0x068000, 0x11db067b);
 }
 
 void sega_lindbergh_baseboard_device::device_start()

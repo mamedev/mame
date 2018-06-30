@@ -1,5 +1,4 @@
 constFold.frag
-Warning, version 430 is not yet complete; most version-specific features are present, but some are missing.
 ERROR: 0:109: '[' :  index out of range '-1'
 ERROR: 0:110: '[' :  vector index out of range '4'
 ERROR: 0:111: '[' :  index out of range '-2'
@@ -179,7 +178,7 @@ ERROR: node is still EOpNull!
 0:83      Constant:
 0:83        2147483647 (const int)
 0:84      Constant:
-0:84        inf
+0:84        +1.#INF
 0:88      Constant:
 0:88        2 (const uint)
 0:88        3 (const uint)

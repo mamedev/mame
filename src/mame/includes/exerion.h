@@ -5,10 +5,12 @@
     Jaleco Exerion
 
 *************************************************************************/
+
+#include "emupal.h"
 #include "screen.h"
 
 
-#define EXERION_MASTER_CLOCK      (XTAL_19_968MHz)   /* verified on pcb */
+#define EXERION_MASTER_CLOCK      (XTAL(19'968'000))   /* verified on pcb */
 #define EXERION_CPU_CLOCK         (EXERION_MASTER_CLOCK / 6)
 #define EXERION_AY8910_CLOCK      (EXERION_CPU_CLOCK / 2)
 #define EXERION_PIXEL_CLOCK       (EXERION_MASTER_CLOCK / 3)
@@ -34,6 +36,17 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void exerion(machine_config &config);
+	void irion(machine_config &config);
+
+	void init_exerion();
+	void init_exerionb();
+	void init_irion();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(exerion_controls_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_main_ram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -62,16 +75,14 @@ public:
 	DECLARE_WRITE8_MEMBER(exerion_videoreg_w);
 	DECLARE_WRITE8_MEMBER(exerion_video_latch_w);
 	DECLARE_READ8_MEMBER(exerion_video_timing_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(exerion_controls_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_READ8_MEMBER(exerion_porta_r);
 	DECLARE_WRITE8_MEMBER(exerion_portb_w);
-	DECLARE_DRIVER_INIT(exerion);
-	DECLARE_DRIVER_INIT(exerionb);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(exerion);
 	uint32_t screen_update_exerion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map);
+	void sub_map(address_map &map);
 };

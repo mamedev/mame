@@ -219,7 +219,7 @@ The actual carts are mostly only about 1/3rd to 1/2 populated.
 Some of the IC locations between DG1 and DG2 are different also. See the source code below
 for the exact number of ROMs used per game and ROM placements.
 
-Games that use the LVS-DG1 cart: Road's Edge
+Games that use the LVS-DG1 cart: Road's Edge, Samurai Shodown 64 / Samurai Spirits 64
 
 Games that use the LVS-DG2 cart: Fatal Fury: Wild Ambition, Buriki One, SS 64 II
 
@@ -441,7 +441,6 @@ or Fatal Fury for example).
 #include "cpu/mips/mips3.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "machine/hng64_net.h"
 
 
 /* TODO: NOT measured! */
@@ -470,13 +469,13 @@ READ32_MEMBER(hng64_state::hng64_random_read)
 
 READ32_MEMBER(hng64_state::hng64_com_r)
 {
-	//logerror("com read  (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, m_com_ram[offset]);
+	//logerror("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_com_ram[offset]);
 	return m_com_ram[offset];
 }
 
 WRITE32_MEMBER(hng64_state::hng64_com_w)
 {
-	//logerror("com write (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, data);
+	//logerror("com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&m_com_ram[offset]);
 }
 
@@ -510,7 +509,7 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 
 #if 0
 	if((offset*4) != 0x1084)
-		printf("HNG64 port read (PC=%08x) 0x%08x\n", space.device().safe_pc(), offset*4);
+		printf("HNG64 port read (PC=%08x) 0x%08x\n", m_maincpu->pc(), offset*4);
 #endif
 
 	rtc_addr = offset >> 1;
@@ -584,14 +583,14 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 
 #if 0
 	if(((offset*4) & 0xff00) == 0x1100)
-		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], space.device().safe_pc());
+		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 #endif
 
 	switch(offset*4)
 	{
 		case 0x1084: //MIPS->MCU latch port
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
-			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], space.device().safe_pc());
+			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 			break;
 		//0x110c global irq mask?
 		/* irq ack */
@@ -603,7 +602,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 			do_dma(space);
 			break;
 		//default:
-		//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], space.device().safe_pc());
+		//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 	}
 }
 
@@ -619,7 +618,7 @@ READ32_MEMBER(hng64_state::fight_io_r)
 	*/
 	if(ioport("SYSTEM")->read() & 0x00030000 && m_mcu_type == BURIKI_MCU)
 	{
-		space.write_byte(0xf3ce4, 1);
+		m_maincpu->space(AS_PROGRAM).write_byte(0xf3ce4, 1);
 	}
 
 	switch (offset*4)
@@ -745,7 +744,7 @@ READ32_MEMBER(hng64_state::racing_io_r)
 
 READ32_MEMBER(hng64_state::hng64_dualport_r)
 {
-	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], space.device().safe_pc());
+	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], m_maincpu->pc());
 
 	/*
 	command table:
@@ -783,7 +782,7 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 
 WRITE32_MEMBER(hng64_state::hng64_dualport_w)
 {
-	//printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], space.device().safe_pc());
+	//printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], m_maincpu->pc());
 	COMBINE_DATA (&m_dualport[offset]);
 }
 
@@ -849,45 +848,47 @@ READ32_MEMBER(hng64_state::unk_vreg_r)
 /* The following is guesswork, needs confirmation with a test on the real board. */
 WRITE32_MEMBER(hng64_state::hng64_sprite_clear_even_w)
 {
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
 
 	spr_offs = (offset) * 0x10 * 4;
 
 	if(ACCESSING_BITS_16_31)
 	{
-		space.write_dword(0x20000000+0x00+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x08+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x10+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x18+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x00+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x08+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x10+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x18+0x00+spr_offs, 0x00000000);
 	}
 	if(ACCESSING_BITS_8_15)
 	{
-		space.write_dword(0x20000000+0x00+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x08+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x10+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x18+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x00+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x08+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x10+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x18+0x20+spr_offs, 0x00000000);
 	}
 }
 
 WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 {
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
 
 	spr_offs = (offset) * 0x10 * 4;
 
 	if(ACCESSING_BITS_16_31)
 	{
-		space.write_dword(0x20000000+0x04+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x14+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x1c+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x04+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x14+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x1c+0x00+spr_offs, 0x00000000);
 	}
 	if(ACCESSING_BITS_0_15)
 	{
-		space.write_dword(0x20000000+0x04+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x14+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x1c+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x04+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x14+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x1c+0x20+spr_offs, 0x00000000);
 	}
 }
 
@@ -946,53 +947,54 @@ WRITE16_MEMBER(hng64_state::main_sound_comms_w)
 }
 
 
-static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
+void hng64_state::hng_map(address_map &map)
+{
 
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x04000000, 0x05ffffff) AM_WRITENOP AM_ROM AM_REGION("gameprg", 0) AM_SHARE("cart")
+	map(0x00000000, 0x00ffffff).ram().share("mainram");
+	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0).share("cart");
 
 	// Ports
-	AM_RANGE(0x1f700000, 0x1f702fff) AM_READWRITE(hng64_sysregs_r, hng64_sysregs_w) AM_SHARE("sysregs")
+	map(0x1f700000, 0x1f702fff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs");
 
 	// SRAM.  Coin data, Player Statistics, etc.
-	AM_RANGE(0x1F800000, 0x1F803fff) AM_RAM AM_SHARE("nvram")
+	map(0x1F800000, 0x1F803fff).ram().share("nvram");
 
 	// Dualport RAM
-	AM_RANGE(0x1F808000, 0x1F8087ff) AM_READWRITE(hng64_dualport_r, hng64_dualport_w) AM_SHARE("dualport")
+	map(0x1F808000, 0x1F8087ff).rw(FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).share("dualport");
 
 	// BIOS
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
+	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0).share("rombase");
 
 	// Video
-	AM_RANGE(0x20000000, 0x2000bfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2000d800, 0x2000e3ff) AM_WRITE(hng64_sprite_clear_even_w)
-	AM_RANGE(0x2000e400, 0x2000efff) AM_WRITE(hng64_sprite_clear_odd_w)
-	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_SHARE("spriteregs")
-	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_SHARE("videoram")    // Tilemap
-	AM_RANGE(0x20190000, 0x20190037) AM_RAM_WRITE(hng64_vregs_w) AM_SHARE("videoregs")
-	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_SHARE("tcram")   // Transition Control
-	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE16(dl_w,0xffffffff) // 3d Display List
-	AM_RANGE(0x20300200, 0x20300203) AM_WRITE(dl_upload_w)  // 3d Display List Upload
-	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
-	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
+	map(0x20000000, 0x2000bfff).ram().share("spriteram");
+	map(0x2000d800, 0x2000e3ff).w(FUNC(hng64_state::hng64_sprite_clear_even_w));
+	map(0x2000e400, 0x2000efff).w(FUNC(hng64_state::hng64_sprite_clear_odd_w));
+	map(0x20010000, 0x20010013).ram().share("spriteregs");
+	map(0x20100000, 0x2017ffff).ram().w(FUNC(hng64_state::hng64_videoram_w)).share("videoram");    // Tilemap
+	map(0x20190000, 0x20190037).ram().w(FUNC(hng64_state::hng64_vregs_w)).share("videoregs");
+	map(0x20200000, 0x20203fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x20208000, 0x2020805f).rw(FUNC(hng64_state::tcram_r), FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
+	map(0x20300000, 0x203001ff).w(FUNC(hng64_state::dl_w)); // 3d Display List
+	map(0x20300200, 0x20300203).w(FUNC(hng64_state::dl_upload_w));  // 3d Display List Upload
+	map(0x20300214, 0x20300217).w(FUNC(hng64_state::dl_control_w));
+	map(0x20300218, 0x2030021b).r(FUNC(hng64_state::unk_vreg_r));
 
 	// 3d?
-	AM_RANGE(0x30000000, 0x3000002f) AM_RAM AM_SHARE("3dregs")
-	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r, hng64_3d_1_w) AM_SHARE("3d_1")  // 3D Display Buffer A
-	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r, hng64_3d_2_w) AM_SHARE("3d_2")  // 3D Display Buffer B
+	map(0x30000000, 0x3000002f).ram().share("3dregs");
+	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_3d_1_r), FUNC(hng64_state::hng64_3d_1_w)).share("3d_1");  // 3D Display Buffer A
+	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::hng64_3d_2_r), FUNC(hng64_state::hng64_3d_2_w)).share("3d_2");  // 3D Display Buffer B
 
 	// Sound
-	AM_RANGE(0x60000000, 0x601fffff) AM_READWRITE(hng64_soundram2_r, hng64_soundram2_w) // actually seems unmapped, see note in audio/hng64.c
-	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)   // program + data for V53A gets uploaded here
+	map(0x60000000, 0x601fffff).rw(FUNC(hng64_state::hng64_soundram2_r), FUNC(hng64_state::hng64_soundram2_w)); // actually seems unmapped, see note in audio/hng64.c
+	map(0x60200000, 0x603fffff).rw(FUNC(hng64_state::hng64_soundram_r), FUNC(hng64_state::hng64_soundram_w));   // program + data for V53A gets uploaded here
 
 	// These are sound ports of some sort
-	AM_RANGE(0x68000000, 0x6800000f) AM_READWRITE16(main_sound_comms_r,main_sound_comms_w,0xffffffff)
-	AM_RANGE(0x6f000000, 0x6f000003) AM_WRITE(hng64_soundcpu_enable_w)
+	map(0x68000000, 0x6800000f).rw(FUNC(hng64_state::main_sound_comms_r), FUNC(hng64_state::main_sound_comms_w));
+	map(0x6f000000, 0x6f000003).w(FUNC(hng64_state::hng64_soundcpu_enable_w));
 
 	// Communications
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_READWRITE(hng64_com_r, hng64_com_w) AM_SHARE("com_ram")
-	AM_RANGE(0xc0001000, 0xc0001007) AM_READWRITE8(hng64_com_share_mips_r, hng64_com_share_mips_w,0xffffffff)
+	map(0xc0000000, 0xc0000fff).rw(FUNC(hng64_state::hng64_com_r), FUNC(hng64_state::hng64_com_w)).share("com_ram");
+	map(0xc0001000, 0xc0001007).rw(FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
 
 	/* 6e000000-6fffffff */
 	/* 80000000-81ffffff */
@@ -1000,7 +1002,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	/* 90000000-97ffffff */
 	/* 98000000-9bffffff */
 	/* a0000000-a3ffffff */
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( hng64 )
@@ -1131,10 +1133,10 @@ static INPUT_PORTS_START( roadedge )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Shift Up")
 	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Shift Down")
-	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, left_handle_r, nullptr)
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, right_handle_r, nullptr)
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, acc_down_r, nullptr)
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, brake_down_r, nullptr)
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, left_handle_r, nullptr)
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, right_handle_r, nullptr)
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, acc_down_r, nullptr)
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, brake_down_r, nullptr)
 
 	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
@@ -1355,7 +1357,7 @@ static const gfx_layout hng64_texlayout =
 	texlayout_yoffset
 };
 
-static GFXDECODE_START( hng64 )
+static GFXDECODE_START( gfx_hng64 )
 	/* tilemap tiles */
 	GFXDECODE_ENTRY( "scrtile", 0, hng64_8x8x4_tilelayout,  0x0, 0x100 )
 	GFXDECODE_ENTRY( "scrtile", 0, hng64_8x8x8_tilelayout,  0x0, 0x10 )
@@ -1386,12 +1388,12 @@ static void hng64_reorder( uint8_t* gfxregion, size_t gfxregionsize)
 	memcpy(gfxregion, &buffer[0], gfxregionsize);
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)
+void hng64_state::init_hng64_reorder_gfx()
 {
 	hng64_reorder(memregion("scrtile")->base(), memregion("scrtile")->bytes());
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64)
+void hng64_state::init_hng64()
 {
 	/* 1 meg of virtual address space for the com cpu */
 	m_com_virtual_mem = std::make_unique<uint8_t[]>(0x100000);
@@ -1400,46 +1402,46 @@ DRIVER_INIT_MEMBER(hng64_state,hng64)
 	m_soundram = std::make_unique<uint16_t[]>(0x200000/2);
 	m_soundram2 = std::make_unique<uint16_t[]>(0x200000/2);
 
-	DRIVER_INIT_CALL(hng64_reorder_gfx);
+	init_hng64_reorder_gfx();
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_fght)
+void hng64_state::init_hng64_fght()
 {
 	m_no_machine_error_code = 0x01000000;
-	DRIVER_INIT_CALL(hng64);
+	init_hng64();
 }
 
-DRIVER_INIT_MEMBER(hng64_state,fatfurwa)
+void hng64_state::init_fatfurwa()
 {
 	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memregion("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
-	DRIVER_INIT_CALL(hng64_fght);
+	init_hng64_fght();
 	m_mcu_type = FIGHT_MCU;
 }
 
-DRIVER_INIT_MEMBER(hng64_state,buriki)
+void hng64_state::init_buriki()
 {
-	DRIVER_INIT_CALL(hng64_fght);
+	init_hng64_fght();
 	m_mcu_type = BURIKI_MCU;
 }
 
-DRIVER_INIT_MEMBER(hng64_state,ss64)
+void hng64_state::init_ss64()
 {
-	DRIVER_INIT_CALL(hng64_fght);
+	init_hng64_fght();
 	m_mcu_type = SAMSHO_MCU;
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_race)
+void hng64_state::init_hng64_race()
 {
 	m_no_machine_error_code = 0x02000000;
 	m_mcu_type = RACING_MCU;
-	DRIVER_INIT_CALL(hng64);
+	init_hng64();
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_shoot)
+void hng64_state::init_hng64_shoot()
 {
 	m_mcu_type = SHOOT_MCU;
 	m_no_machine_error_code = 0x03000000;
-	DRIVER_INIT_CALL(hng64);
+	init_hng64();
 }
 
 void hng64_state::set_irq(uint32_t irq_vector)
@@ -1530,41 +1532,39 @@ void hng64_state::machine_reset()
 	reset_sound();
 }
 
-MACHINE_CONFIG_EXTERN(hng64_audio);
-
-static MACHINE_CONFIG_START(hng64)
+MACHINE_CONFIG_START(hng64_state::hng64)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
+	MCFG_DEVICE_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_CPU_PROGRAM_MAP(hng_map)
+	MCFG_DEVICE_PROGRAM_MAP(hng_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hng64_state, hng64_irq, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("rtc", RTC62423, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RTC62423, XTAL(32'768))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hng64)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hng64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(hng64_state, screen_update_hng64)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hng64_state, screen_vblank_hng64))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hng64_state, screen_vblank_hng64))
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
-	MCFG_FRAGMENT_ADD( hng64_audio )
-	MCFG_FRAGMENT_ADD( hng64_network )
+	hng64_audio(config);
+	hng64_network(config);
 
-	MCFG_CPU_ADD("iomcu", TMP87PH40AN, 8000000)
+	MCFG_DEVICE_ADD("iomcu", TMP87PH40AN, 8000000)
 	MCFG_DEVICE_DISABLE() // work in progress
 
 MACHINE_CONFIG_END
 
 
 #define ROM_LOAD_HNG64_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash,  ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash,  ROM_BIOS(bios))
 
 // all BIOS roms are said to be from 'fighting' type PCB, it is unknown if the actual MIPS BIOS differs on the others, or only the MCU internal ROM
 #define HNG64_BIOS \
@@ -2002,13 +2002,13 @@ ROM_START( buriki )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,    0,      hng64, hng64,    hng64_state,  hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT )
+GAME( 1997, hng64,    0,     hng64, hng64,    hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64,  hng64, roadedge, hng64_state,  hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 001 */
-GAME( 1998, sams64,   hng64,  hng64, hng64,    hng64_state,  ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) /* 002 */
-GAME( 1998, xrally,   hng64,  hng64, roadedge, hng64_state,  hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 003 */
-GAME( 1998, bbust2,   hng64,  hng64, bbust2,   hng64_state,  hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 004 */
-GAME( 1998, sams64_2, hng64,  hng64, hng64,    hng64_state,  ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) /* 005 */
-GAME( 1998, fatfurwa, hng64,  hng64, hng64,    hng64_state,  fatfurwa,    ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 006 */
-GAME( 1999, buriki,   hng64,  hng64, hng64,    hng64_state,  buriki,      ROT0, "SNK", "Buriki One (rev.B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 007 */
+GAME( 1997, roadedge, hng64, hng64, roadedge, hng64_state, init_hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 001 */
+GAME( 1998, sams64,   hng64, hng64, hng64,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) /* 002 */
+GAME( 1998, xrally,   hng64, hng64, roadedge, hng64_state, init_hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 003 */
+GAME( 1998, bbust2,   hng64, hng64, bbust2,   hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 004 */
+GAME( 1998, sams64_2, hng64, hng64, hng64,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) /* 005 */
+GAME( 1998, fatfurwa, hng64, hng64, hng64,    hng64_state, init_fatfurwa,    ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 006 */
+GAME( 1999, buriki,   hng64, hng64, hng64,    hng64_state, init_buriki,      ROT0, "SNK", "Buriki One (rev.B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 007 */

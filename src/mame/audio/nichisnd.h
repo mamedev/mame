@@ -45,6 +45,8 @@ public:
 	DECLARE_WRITE8_MEMBER( soundbank_w );
 	DECLARE_WRITE8_MEMBER( sound_host_command_w );
 
+	void nichisnd_io_map(address_map &map);
+	void nichisnd_map(address_map &map);
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;

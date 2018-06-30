@@ -77,12 +77,37 @@ March 2013 NPW:
     Removed unused jmp/jsr _slap functions from 6809ops.c,
     m6809_slapstick check moved into the opcode functions.
 
+******************************************************************************
+
+    M6809 cycle timings are relative to a four-phase clock cycle defined by
+    the Q and E signals on pins 35 and 34. The Q clock must lead the E clock
+    by approximately half a cycle. On the MC6809E, Q and E are inputs, and
+    one 74LS74 wired as a two-stage Johnson counter is almost sufficient to
+    generate both (though E requires voltage levels above TTL). On the
+    MC6809, however, Q and E are output from an internal clock generator
+    which can be driven by a crystal oscillator connected to pins 38 and 39.
+    (The MC6809E reuses the same numbered pins for the unrelated TSC and LIC
+    functions.) The frequencies of Q and E on the MC6809 are that of the XTAL
+    divided by 4. MAME's emulation formerly assigned this internal clock
+    divider to the MC6809E and not to the MC6809; the confusion resulting
+    from this error is in the process of being straightened out.
+
+    Maximum clock ratings:
+
+                        Q & E           EXTAL
+        MC6809(E)       1.0 MHz         4.0 MHz
+        MC68A09(E)      1.5 MHz         6.0 MHz
+        MC68B09(E)      2.0 MHz         8.0 MHz
+        HD63B09(E)      2.0 MHz         8.0 MHz
+        HD63C09(E)      3.0 MHz         12.0 MHz
+
 *****************************************************************************/
 
 #include "emu.h"
 #include "debugger.h"
 #include "m6809.h"
 #include "m6809inl.h"
+#include "6x09dasm.h"
 
 
 //**************************************************************************
@@ -103,8 +128,9 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "M6809")
-DEFINE_DEVICE_TYPE(M6809E, m6809e_device, "m6809e", "M6809E")
+DEFINE_DEVICE_TYPE(MC6809, mc6809_device, "mc6809", "Motorola MC6809")
+DEFINE_DEVICE_TYPE(MC6809E, mc6809e_device, "mc6809e", "Motorola MC6809E")
+DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "MC6809 (legacy)")
 
 
 //-------------------------------------------------
@@ -128,13 +154,13 @@ m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *
 void m6809_base_device::device_start()
 {
 	if (!m_mintf)
-		m_mintf = new mi_default;
+		m_mintf = std::make_unique<mi_default>();
 
 	m_mintf->m_program  = &space(AS_PROGRAM);
 	m_mintf->m_sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_mintf->m_program;
 
-	m_mintf->m_direct  = &m_mintf->m_program->direct();
-	m_mintf->m_sdirect = &m_mintf->m_sprogram->direct();
+	m_mintf->m_cache  = m_mintf->m_program->cache<0, 0, ENDIANNESS_BIG>();
+	m_mintf->m_scache = m_mintf->m_sprogram->cache<0, 0, ENDIANNESS_BIG>();
 
 	m_lic_func.resolve_safe();
 
@@ -193,7 +219,7 @@ void m6809_base_device::device_start()
 	save_item(NAME(m_cond));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_icount = 0;
 }
 
@@ -350,36 +376,13 @@ void m6809_base_device::state_string_export(const device_state_entry &entry, std
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t m6809_base_device::disasm_min_opcode_bytes() const
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t m6809_base_device::disasm_max_opcode_bytes() const
-{
-	return 5;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t m6809_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> m6809_base_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( m6809 );
-	return CPU_DISASSEMBLE_NAME(m6809)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<m6809_disassembler>();
 }
 
 
@@ -583,12 +586,12 @@ uint8_t m6809_base_device::mi_default::read(uint16_t adr)
 
 uint8_t m6809_base_device::mi_default::read_opcode(uint16_t adr)
 {
-	return m_sdirect->read_byte(adr);
+	return m_scache->read_byte(adr);
 }
 
 uint8_t m6809_base_device::mi_default::read_opcode_arg(uint16_t adr)
 {
-	return m_direct->read_byte(adr);
+	return m_cache->read_byte(adr);
 }
 
 
@@ -600,21 +603,32 @@ void m6809_base_device::mi_default::write(uint16_t adr, uint8_t val)
 
 
 //-------------------------------------------------
-//  m6809_device
+//  mc6809_device
 //-------------------------------------------------
 
-m6809_device::m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6809_base_device(mconfig, tag, owner, clock, M6809, 1)
+mc6809_device::mc6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6809_base_device(mconfig, tag, owner, clock, MC6809, 4)
 {
 }
 
 
 
 //-------------------------------------------------
-//  m6809e_device
+//  mc6809e_device
 //-------------------------------------------------
 
-m6809e_device::m6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: m6809_base_device(mconfig, tag, owner, clock, M6809E, 4)
+mc6809e_device::mc6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: m6809_base_device(mconfig, tag, owner, clock, MC6809E, 1)
+{
+}
+
+
+
+//-------------------------------------------------
+//  m6809_device
+//-------------------------------------------------
+
+m6809_device::m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6809_base_device(mconfig, tag, owner, clock, M6809, 1)
 {
 }

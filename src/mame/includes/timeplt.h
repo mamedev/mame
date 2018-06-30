@@ -6,7 +6,9 @@
 
 ***************************************************************************/
 
+#include "machine/74259.h"
 #include "sound/tc8830f.h"
+#include "emupal.h"
 #include "screen.h"
 
 class timeplt_state : public driver_device
@@ -16,6 +18,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tc8830f(*this, "tc8830f"),
+		m_mainlatch(*this, "mainlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -27,6 +30,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<tc8830f_device> m_tc8830f;
+	required_device<ls259_device> m_mainlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -77,5 +81,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void timeplt(machine_config &config);
+	void chkun(machine_config &config);
+	void psurge(machine_config &config);
+	void bikkuric(machine_config &config);
+	void chkun_main_map(address_map &map);
+	void psurge_main_map(address_map &map);
+	void timeplt_main_map(address_map &map);
 };

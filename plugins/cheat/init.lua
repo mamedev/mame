@@ -92,9 +92,13 @@ function cheat.startplugin()
 		local newcheats = {}
 		local file = emu.file(manager:machine():options().entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat") , 1)
 		if emu.softname() ~= "" then
-			for name, image in pairs(manager:machine().images) do
-				if image:exists() and image:software_list_name() ~= "" then
-					filename = image:software_list_name() .. "/" .. emu.softname()
+			if emu.softname():find(":") then
+				filename = emu.softname():gsub(":", "/")
+			else
+				for name, image in pairs(manager:machine().images) do
+					if image:exists() and image:software_list_name() ~= "" then
+						filename = image:software_list_name() .. "/" .. emu.softname()
+					end
 				end
 			end
 		end
@@ -178,7 +182,7 @@ function cheat.startplugin()
 	end
 
 	local function cheat_error(cheat, msg)
-		emu.print_verbose("error cheat script error: \"" .. cheat.desc .. "\" " .. msg)
+		emu.print_error("error cheat script error: \"" .. cheat.desc .. "\" " .. msg)
 		cheat.desc = cheat.desc .. " error"
 		cheat.script = nil
 		cheat.enabled = nil

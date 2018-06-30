@@ -8,11 +8,11 @@
 
 #pragma once
 
-#ifndef _PC4_H_
-#define _PC4_H_
-
+#ifndef MAME_INCLUDES_PC4_H
+#define MAME_INCLUDES_PC4_H
 
 #include "sound/beep.h"
+#include "emupal.h"
 
 class pc4_state : public driver_device
 {
@@ -67,10 +67,13 @@ public:
 	uint8_t m_blink;
 	DECLARE_PALETTE_INIT(pc4);
 
+	void pc4(machine_config &config);
+	void pc4_io(address_map &map);
+	void pc4_mem(address_map &map);
 protected:
 	required_memory_region m_region_charset;
 	required_memory_bank m_rombank;
 	ioport_port *io_port[8];
 };
 
-#endif  // _PC4_H_
+#endif // MAME_INCLUDES_PC4_H

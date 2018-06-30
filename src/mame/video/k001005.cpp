@@ -3,9 +3,6 @@
 #include "emu.h"
 #include "k001005.h"
 
-#include "video/k001006.h"
-
-
 /*****************************************************************************/
 /* Konami K001005 Polygon Renderer (KS10071) */
 
@@ -60,7 +57,7 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 	}
 
 	// save state
-	parent.save_pointer(NAME(m_3dfifo.get()), 0x10000);
+	parent.save_pointer(NAME(m_3dfifo), 0x10000);
 	parent.save_item(NAME(m_3dfifo_ptr));
 	parent.save_item(NAME(*m_fb[0]));
 	parent.save_item(NAME(*m_fb[1]));
@@ -1186,18 +1183,18 @@ void k001005_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 DEFINE_DEVICE_TYPE(K001005, k001005_device, "k001005", "K001005 Polygon Renderer")
 
 k001005_device::k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K001005, tag, owner, clock),
-		device_video_interface(mconfig, *this),
-		m_k001006(nullptr),
-		m_fifo(nullptr),
-		m_status(0),
-		m_ram_ptr(0),
-		m_fifo_read_ptr(0),
-		m_fifo_write_ptr(0),
-		m_reg_far_z(0)
+	: device_t(mconfig, K001005, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_k001006(*this, finder_base::DUMMY_TAG)
+	, m_fifo(nullptr)
+	, m_status(0)
+	, m_ram_ptr(0)
+	, m_fifo_read_ptr(0)
+	, m_fifo_write_ptr(0)
+	, m_reg_far_z(0)
 {
-		m_ram[0] = nullptr;
-		m_ram[1] = nullptr;
+	m_ram[0] = nullptr;
+	m_ram[1] = nullptr;
 }
 
 //-------------------------------------------------
@@ -1206,18 +1203,16 @@ k001005_device::k001005_device(const machine_config &mconfig, const char *tag, d
 
 void k001005_device::device_start()
 {
-	m_k001006 = machine().device(m_k001006_tag);
-
 	m_ram[0] = std::make_unique<uint16_t[]>(0x140000);
 	m_ram[1] = std::make_unique<uint16_t[]>(0x140000);
 
 	m_fifo = std::make_unique<uint32_t[]>(0x800);
 
-	m_renderer = auto_alloc(machine(), k001005_renderer(*this, *m_screen, m_k001006));
+	m_renderer = auto_alloc(machine(), k001005_renderer(*this, screen(), m_k001006));
 
-	save_pointer(NAME(m_ram[0].get()), 0x140000);
-	save_pointer(NAME(m_ram[1].get()), 0x140000);
-	save_pointer(NAME(m_fifo.get()), 0x800);
+	save_pointer(NAME(m_ram[0]), 0x140000);
+	save_pointer(NAME(m_ram[1]), 0x140000);
+	save_pointer(NAME(m_fifo), 0x800);
 	save_item(NAME(m_status));
 	save_item(NAME(m_ram_ptr));
 	save_item(NAME(m_fifo_read_ptr));
@@ -1313,7 +1308,7 @@ READ32_MEMBER( k001005_device::read )
 			}
 
 		default:
-			//osd_printf_debug("m_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
+			//osd_printf_debug("%s m_r: %08X, %08X\n", machine().describe_context().c_str(), offset, mem_mask);
 			break;
 	}
 	return 0;
@@ -1327,7 +1322,7 @@ WRITE32_MEMBER( k001005_device::write )
 	{
 		case 0x000:         // FIFO write
 		{
-			//osd_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
+			//osd_printf_debug("%s K001005 FIFO write: %08X\n", machine().describe_context().c_str(), data);
 			if (m_status != 1 && m_status != 2)
 			{
 				if (m_fifo_write_ptr < 0x400)
@@ -1344,7 +1339,7 @@ WRITE32_MEMBER( k001005_device::write )
 				dsp->set_flag_input(1, ASSERT_LINE);
 			}
 
-		//  osd_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
+		//  osd_printf_debug("%s K001005 FIFO write: %08X\n", machine().describe_context().c_str(), data);
 			m_fifo[m_fifo_write_ptr] = data;
 			m_fifo_write_ptr++;
 			m_fifo_write_ptr &= 0x7ff;
@@ -1362,16 +1357,16 @@ WRITE32_MEMBER( k001005_device::write )
 #endif
 
 			// !!! HACK to get past the FIFO B test (GTI Club & Thunder Hurricane) !!!
-			if (space.device().safe_pc() == 0x201ee)
+			if (dsp->pc() == 0x201ee)
 			{
 				// This is used to make the SHARC timeout
-				space.device().execute().spin_until_trigger(10000);
+				dsp->spin_until_trigger(10000);
 			}
 			// !!! HACK to get past the FIFO B test (Winding Heat & Midnight Run) !!!
-			if (space.device().safe_pc() == 0x201e6)
+			if (dsp->pc() == 0x201e6)
 			{
 				// This is used to make the SHARC timeout
-				space.device().execute().spin_until_trigger(10000);
+				dsp->spin_until_trigger(10000);
 			}
 
 			break;
@@ -1451,7 +1446,7 @@ WRITE32_MEMBER( k001005_device::write )
 			break;
 
 		default:
-			//osd_printf_debug("m_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+			//osd_printf_debug("%s m_w: %08X, %08X, %08X\n", machine().describe_context().c_str(), data, offset, mem_mask);
 			break;
 	}
 
@@ -1460,9 +1455,4 @@ WRITE32_MEMBER( k001005_device::write )
 void k001005_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	m_renderer->draw(bitmap, cliprect);
-}
-
-void k001005_device::set_texel_chip(device_t &device, const char *tag)
-{
-	downcast<k001005_device &>(device).m_k001006_tag = tag;
 }

@@ -35,6 +35,7 @@
 #include "emu.h"
 #include "m6805.h"
 #include "m6805defs.h"
+#include "6805dasm.h"
 
 #include "debugger.h"
 
@@ -250,7 +251,7 @@ m6805_base_device::m6805_base_device(
 		uint32_t clock,
 		device_type const type,
 		configuration_params const &params,
-		address_map_delegate internal_map)
+		address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_params(params)
 	, m_program_config("program", ENDIANNESS_BIG, 8, params.m_addr_width, 0, internal_map)
@@ -262,10 +263,10 @@ m6805_base_device::m6805_base_device(
 void m6805_base_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc.w.l).noshow();
@@ -302,9 +303,6 @@ void m6805_base_device::device_reset()
 	m_pending_interrupts = 0;
 
 	m_nmi_state = 0;
-
-	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
 
 	/* IRQ disabled */
 	SEI;
@@ -409,35 +407,13 @@ void m6805_base_device::interrupt()
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t m6805_base_device::disasm_min_opcode_bytes() const
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t m6805_base_device::disasm_max_opcode_bytes() const
-{
-	return 3;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t m6805_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> m6805_base_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<m6805_disassembler>();
 }
 
 
@@ -516,7 +492,7 @@ void m6805_base_device::execute_run()
 			interrupt();
 		}
 
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		u8 const ireg = rdop(PC++);
 
@@ -691,6 +667,6 @@ void hd63705_device::interrupt_vector()
 }
 
 
-DEFINE_DEVICE_TYPE(M6805,     m6805_device,     "m6805",     "M6805")
-DEFINE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device, "m68hc05eg", "MC68HC05EG")
-DEFINE_DEVICE_TYPE(HD63705,   hd63705_device,   "hd63705",   "HD63705")
+DEFINE_DEVICE_TYPE(M6805,     m6805_device,     "m6805",     "Motorola M6805")
+DEFINE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device, "m68hc05eg", "Motorola MC68HC05EG")
+DEFINE_DEVICE_TYPE(HD63705,   hd63705_device,   "hd63705",   "Hitachi HD63705")

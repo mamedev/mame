@@ -13,7 +13,7 @@ h8_port_device::h8_port_device(const machine_config &mconfig, const char *tag, d
 
 void h8_port_device::set_info(int _address, uint8_t _default_ddr, uint8_t _mask)
 {
-	address = 2*_address;
+	address = _address;
 	default_ddr = _default_ddr;
 	mask = _mask;
 }

@@ -9,8 +9,12 @@
 #include <entry/input.h>
 #include <debugdraw/debugdraw.h>
 #include "camera.h"
+#include "imgui/imgui.h"
 
 #include <bx/uint32_t.h>
+
+namespace
+{
 
 void imageCheckerboard(void* _dst, uint32_t _width, uint32_t _height, uint32_t _step, uint32_t _0, uint32_t _1)
 {
@@ -25,15 +29,21 @@ void imageCheckerboard(void* _dst, uint32_t _width, uint32_t _height, uint32_t _
 	}
 }
 
-class DebugDrawApp : public entry::AppI
+class ExampleDebugDraw : public entry::AppI
 {
-	void init(int _argc, char** _argv) BX_OVERRIDE
+public:
+	ExampleDebugDraw(const char* _name, const char* _description)
+		: entry::AppI(_name, _description)
+	{
+	}
+
+	void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 	{
 		Args args(_argc, _argv);
 
-		m_width  = 1280;
-		m_height = 720;
-		m_debug  = BGFX_DEBUG_TEXT;
+		m_width  = _width;
+		m_height = _height;
+		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC | BGFX_RESET_MSAA_X16;
 
 		bgfx::init(args.m_type, args.m_pciId);
@@ -64,10 +74,14 @@ class DebugDrawApp : public entry::AppI
 		imageCheckerboard(data, 32, 32, 4, 0xff808080, 0xffc0c0c0);
 
 		m_sprite = ddCreateSprite(32, 32, data);
+
+		imguiCreate();
 	}
 
-	virtual int shutdown() BX_OVERRIDE
+	virtual int shutdown() override
 	{
+		imguiDestroy();
+
 		ddDestroy(m_sprite);
 
 		ddShutdown();
@@ -80,23 +94,59 @@ class DebugDrawApp : public entry::AppI
 		return 0;
 	}
 
-	bool update() BX_OVERRIDE
+	template<typename Ty>
+	bool intersect(const Ray& _ray, const Ty& _shape)
+	{
+		Hit hit;
+		if (::intersect(_ray, _shape, &hit) )
+		{
+			ddPush();
+
+			ddSetWireframe(false);
+
+			ddSetColor(0xff0000ff);
+
+			float tmp[3];
+			bx::vec3Mul(tmp, hit.m_normal, 0.7f);
+
+			float end[3];
+			bx::vec3Add(end, hit.m_pos, tmp);
+
+			ddDrawCone(hit.m_pos, end, 0.1f);
+
+			ddPop();
+
+			return true;
+		}
+
+		return false;
+	}
+
+	bool update() override
 	{
 		if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState) )
 		{
+			imguiBeginFrame(
+				   m_mouseState.m_mx
+				,  m_mouseState.m_my
+				, (m_mouseState.m_buttons[entry::MouseButton::Left  ] ? IMGUI_MBUT_LEFT   : 0)
+				| (m_mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
+				| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
+				,  m_mouseState.m_mz
+				, uint16_t(m_width)
+				, uint16_t(m_height)
+				);
+
+			showExampleDialog(this);
+
+			imguiEndFrame();
+
 			int64_t now = bx::getHPCounter() - m_timeOffset;
 			static int64_t last = now;
 			const int64_t frameTime = now - last;
 			last = now;
 			const double freq = double(bx::getHPFrequency() );
-			const double toMs = 1000.0/freq;
 			const float deltaTime = float(frameTime/freq);
-
-			// Use debug font to print information about this example.
-			bgfx::dbgTextClear();
-			bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/29-debugdraw");
-			bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Debug draw.");
-			bgfx::dbgTextPrintf(0, 3, 0x0f, "Frame: % 7.3f[ms]", double(frameTime)*toMs);
 
 			// Update camera.
 			cameraUpdate(deltaTime, m_mouseState);
@@ -124,25 +174,37 @@ class DebugDrawApp : public entry::AppI
 				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height) );
 			}
 
-			float zero[3] = {};
+			float mtxVp[16];
+			bx::mtxMul(mtxVp, view, proj);
 
-			float mvp[16];
+			float mtxInvVp[16];
+			bx::mtxInverse(mtxInvVp, mtxVp);
+
+			float zero[3] = {};
 			float eye[] = { 5.0f, 10.0f, 5.0f };
 			bx::mtxLookAt(view, eye, zero);
 			bx::mtxProj(proj, 45.0f, float(m_width)/float(m_height), 1.0f, 15.0f, bgfx::getCaps()->homogeneousDepth);
-			bx::mtxMul(mvp, view, proj);
+			bx::mtxMul(mtxVp, view, proj);
+
+			Ray ray = makeRay(
+				   (float(m_mouseState.m_mx)/float(m_width)  * 2.0f - 1.0f)
+				, -(float(m_mouseState.m_my)/float(m_height) * 2.0f - 1.0f)
+				, mtxInvVp
+				);
+
+			const uint32_t selected = 0xff80ffff;
 
 			ddBegin(0);
 			ddDrawAxis(0.0f, 0.0f, 0.0f);
 
 			ddPush();
-				ddSetColor(0xff00ff00);
-
 				Aabb aabb =
 				{
 					{  5.0f, 1.0f, 1.0f },
 					{ 10.0f, 5.0f, 5.0f },
 				};
+				ddSetWireframe(true);
+				ddSetColor(intersect(ray, aabb) ? selected : 0xff00ff00);
 				ddDraw(aabb);
 			ddPop();
 
@@ -151,39 +213,49 @@ class DebugDrawApp : public entry::AppI
 			Obb obb;
 			bx::mtxRotateX(obb.m_mtx, time);
 			ddSetWireframe(true);
+			ddSetColor(intersect(ray, obb) ? selected : 0xffffffff);
+			ddDraw(obb);
+
+			bx::mtxSRT(obb.m_mtx, 1.0f, 1.0f, 1.0f, time*0.23f, time, 0.0f, 3.0f, 0.0f, 0.0f);
+
+			ddPush();
+				toAabb(aabb, obb);
+				ddSetWireframe(true);
+				ddSetColor(0xff0000ff);
+				ddDraw(aabb);
+			ddPop();
+
+			ddSetWireframe(false);
+			ddSetColor(intersect(ray, obb) ? selected : 0xffffffff);
 			ddDraw(obb);
 
 			ddSetColor(0xffffffff);
-			bx::mtxSRT(obb.m_mtx, 1.0f, 1.0f, 1.0f, 0.0f, time, 0.0f, 3.0f, 0.0f, 0.0f);
-			ddSetWireframe(false);
-			ddDraw(obb);
-
 			ddSetTranslate(0.0f, -2.0f, 0.0f);
 			ddDrawGrid(Axis::Y, zero, 20, 1.0f);
 			ddSetTransform(NULL);
 
-			ddDrawFrustum(mvp);
+			ddDrawFrustum(mtxVp);
 
 			ddPush();
 				Sphere sphere = { { 0.0f, 5.0f, 0.0f }, 1.0f };
-				ddSetColor(0xfff0c0ff);
+				ddSetColor(intersect(ray, sphere) ? selected : 0xfff0c0ff);
 				ddSetWireframe(true);
 				ddSetLod(3);
 				ddDraw(sphere);
 				ddSetWireframe(false);
 
-				ddSetColor(0xc0ffc0ff);
 				sphere.m_center[0] = -2.0f;
+				ddSetColor(intersect(ray, sphere) ? selected : 0xc0ffc0ff);
 				ddSetLod(2);
 				ddDraw(sphere);
 
-				ddSetColor(0xa0f0ffff);
 				sphere.m_center[0] = -4.0f;
+				ddSetColor(intersect(ray, sphere) ? selected : 0xa0f0ffff);
 				ddSetLod(1);
 				ddDraw(sphere);
 
-				ddSetColor(0xffc0ff00);
 				sphere.m_center[0] = -6.0f;
+				ddSetColor(intersect(ray, sphere) ? selected : 0xffc0ff00);
 				ddSetLod(0);
 				ddDraw(sphere);
 			ddPop();
@@ -216,22 +288,42 @@ class DebugDrawApp : public entry::AppI
 				ddPush();
 					ddSetSpin(time*0.3f);
 					{
-						float from[3] = { -11.0f, 4.0f,  0.0f };
-						float to[3]   = { -13.0f, 6.0f,  1.0f };
-						ddDrawCone(from, to, 1.0f );
-					}
+						Cone cone =
+						{
+							{ -11.0f, 4.0f,  0.0f },
+							{ -13.0f, 6.0f,  1.0f },
+							1.0f
+						};
 
-					{
-						float from[3] = {  -9.0f, 2.0f, -1.0f };
-						float to[3]   = { -11.0f, 4.0f,  0.0f };
-						ddDrawCylinder(from, to, 0.5f );
+						Cylinder cylinder =
+						{
+							{  -9.0f, 2.0f, -1.0f },
+							{ -11.0f, 4.0f,  0.0f },
+							0.5f
+						};
+
+						ddSetColor(false
+							|| intersect(ray, cone)
+							|| intersect(ray, cylinder)
+							? selected
+							: 0xffffffff
+							);
+
+						ddDraw(cone);
+						ddDraw(cylinder);
 					}
 				ddPop();
 
 				{
-					float from[3] = {  0.0f, 7.0f, 0.0f };
-					float to[3]   = { -6.0f, 7.0f, 0.0f };
-					ddDrawCylinder(from, to, 0.5f, true);
+					ddSetLod(0);
+					Capsule capsule =
+					{
+						{  0.0f, 7.0f, 0.0f },
+						{ -6.0f, 7.0f, 0.0f },
+						0.5f
+					};
+					ddSetColor(intersect(ray, capsule) ? selected : 0xffffffff);
+					ddDraw(capsule);
 				}
 			ddPop();
 
@@ -253,11 +345,15 @@ class DebugDrawApp : public entry::AppI
 
 				float up[3] = { 0.0f, 4.0f, 0.0f };
 				bx::vec3MulMtx(cylinder.m_end, up, mtx);
+				ddSetColor(intersect(ray, cylinder) ? selected : 0xffffffff);
 				ddDraw(cylinder);
 
-				toAabb(aabb, cylinder);
-				ddSetColor(0xff0000ff);
-				ddDraw(aabb);
+				ddPush();
+					toAabb(aabb, cylinder);
+					ddSetWireframe(true);
+					ddSetColor(0xff0000ff);
+					ddDraw(aabb);
+				ddPop();
 
 			ddPop();
 
@@ -286,4 +382,6 @@ class DebugDrawApp : public entry::AppI
 	uint32_t m_reset;
 };
 
-ENTRY_IMPLEMENT_MAIN(DebugDrawApp);
+} // namespace
+
+ENTRY_IMPLEMENT_MAIN(ExampleDebugDraw, "29-debugdraw", "Debug draw.");

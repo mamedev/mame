@@ -27,7 +27,9 @@
 #ifndef DIRENT_H
 #define DIRENT_H
 
-#ifdef _MSC_VER
+#if defined(__clang__)
+#	pragma clang diagnostic ignored "-Wunused-function"
+#elif defined(_MSC_VER)
 #	pragma warning(disable:4505) // error C4505: '_wreaddir': unreferenced local function has been removed
 #else
 #	pragma GCC diagnostic ignored "-Wunused-function"

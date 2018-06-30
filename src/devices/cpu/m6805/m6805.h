@@ -100,7 +100,7 @@ protected:
 			uint32_t clock,
 			device_type const type,
 			configuration_params const &params,
-			address_map_delegate internal_map);
+			address_map_constructor internal_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -114,14 +114,13 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override;
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override;
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return true; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -147,8 +146,8 @@ protected:
 
 	unsigned    rdmem(u32 addr)             { return unsigned(m_program->read_byte(addr)); }
 	void        wrmem(u32 addr, u8 value)   { m_program->write_byte(addr, value); }
-	unsigned    rdop(u32 addr)              { return unsigned(m_direct->read_byte(addr)); }
-	unsigned    rdop_arg(u32 addr)          { return unsigned(m_direct->read_byte(addr)); }
+	unsigned    rdop(u32 addr)              { return unsigned(m_cache->read_byte(addr)); }
+	unsigned    rdop_arg(u32 addr)          { return unsigned(m_cache->read_byte(addr)); }
 
 	unsigned    rm(u32 addr)                { return rdmem(addr); }
 	void        rm16(u32 addr, PAIR &p);
@@ -279,7 +278,7 @@ protected:
 
 	// address spaces
 	address_space *m_program;
-	direct_read_data *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 };
 
 
@@ -321,6 +320,7 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 
 	virtual void interrupt_vector() override;
 	virtual bool test_il() override { return m_nmi_state != CLEAR_LINE; }
@@ -361,9 +361,5 @@ protected:
 #define HD63705_INT_SCI             0x06
 #define HD63705_INT_ADCONV          0x07
 #define HD63705_INT_NMI             0x08
-
-CPU_DISASSEMBLE( m6805 );
-CPU_DISASSEMBLE( m146805 );
-CPU_DISASSEMBLE( m68hc05 );
 
 #endif // MAME_CPU_M6805_M6805_H

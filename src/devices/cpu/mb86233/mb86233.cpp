@@ -1,1666 +1,1209 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi
-/***************************************************************************
-
-    mb86233.c
-    Core implementation for the portable Fujitsu MB86233 series DSP emulator.
-
-    Written by ElSemi
-    MAME version by Ernesto Corvi
-
-    TODO:
-    - Properly emulate the TGP Tables from the ROM (See GETEXTERNAL)
-    - Many unknown opcodes and addressing modes
-    - Interrupts?
-
-***************************************************************************/
+// copyright-holders:Olivier Galibert
 
 #include "emu.h"
 #include "debugger.h"
 #include "mb86233.h"
+#include "mb86233d.h"
+
+/*
+  Driver based on the initial reverse-engineering of Elsemi, extended,
+  generalized and made to look more like a cpu since then thanks in
+  part to a "manual" that barely deserves the name.
+
+  The 86232 has 512 32-bits dwords of triple-port memory (1 write, 2
+  read).  The 86233/86234 have instead two normal (1 read, 1 write,
+  non-simultaneous) independant ram banks, one of 256 dwords and one
+  of 512.
+
+  The ram banks are mapped at 0x000-0x0ff and 0x200-0x3ff (proven by
+  geometrizer code that clears the ram at startup).  Move and load
+  instructions kind of target a specific ram, but do it by adding
+  0x200 to the address on one side of the other, which can then end up
+  anywhere.  In particular model1 coprocessor has the output fifo at
+  0x400, which is sometimes hit by having x1 at 0x200 and using the
+  automatic 0x200 adder.  Theorically external accesses to 100-1ff and
+  400+ seem to be routed externally, since they're used for the fifo
+  in model 1.
+
+  The cpu can theorically work in either floating point (32-bits ieee
+  flots) or fixed point (32/36/48 bits registers) modes.  All sega
+  programs start by activating floating point and staying there, so
+  fixed point is not implemented.
+
+  An interrupt is used to update the rf0 (status? leds?) registers in
+  the coprocessor programs.  It's on bit 1 of the mask (irq3?) and
+  vector 0x004.  It's probably periodic, maybe on vblank.  Note that
+  the copro programs never initialize the stack pointer.  Interrupts
+  are not implemented at this point.
+
+  The 86233 and 86234 dies are slightly different in the die shots,
+  but there's no known programming-level difference at this point.
+  It's unclear whether some register-file linked functionality is
+  internal or external though (fifos, banking in model2/86234), so
+  there may lie the actual differences.
+*/
 
 
-DEFINE_DEVICE_TYPE(MB86233, mb86233_cpu_device, "mb86233", "MB86233")
+DEFINE_DEVICE_TYPE(MB86233, mb86233_device, "mb86233", "Fujitsu MB86233 (TGP)")
+DEFINE_DEVICE_TYPE(MB86234, mb86234_device, "mb86234", "Fujitsu MB86234 (TGP)")
 
 
-mb86233_cpu_device::mb86233_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, MB86233, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, -2)
-	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_pc(0), m_reps(0), m_pcsp(0), m_eb(0), m_shift(0), m_repcnt(0), m_sr(0)
-	, m_fpucontrol(0), m_program(nullptr), m_direct(nullptr), m_icount(0), m_fifo_wait(0)
-	, m_fifo_read_cb(*this)
-	, m_fifo_read_ok_cb(*this)
-	, m_fifo_write_cb(*this)
-	, m_tablergn(nullptr), m_ARAM(nullptr), m_BRAM(nullptr)
-	, m_Tables(nullptr)
+mb86233_device::mb86233_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 16, -2)
+	, m_data_config("data", ENDIANNESS_LITTLE, 32, 16, -2)
+	, m_io_config("io", ENDIANNESS_LITTLE, 32, 16, -2)
+	, m_rf_config("rf", ENDIANNESS_LITTLE, 32, 4, -2)
 {
 }
 
-device_memory_interface::space_config_vector mb86233_cpu_device::memory_space_config() const
+mb86233_device::mb86233_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mb86233_device(mconfig, MB86233, tag, owner, clock)
+{
+}
+
+mb86234_device::mb86234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mb86233_device(mconfig, MB86234, tag, owner, clock)
+{
+}
+
+device_memory_interface::space_config_vector mb86233_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config)
+		std::make_pair(AS_PROGRAM,  &m_program_config),
+		std::make_pair(AS_DATA,     &m_data_config),
+		std::make_pair(AS_IO,       &m_io_config),
+		std::make_pair(AS_RF,       &m_rf_config)
 	};
 }
 
 
-offs_t mb86233_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> mb86233_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( mb86233 );
-	return CPU_DISASSEMBLE_NAME(mb86233)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<mb86233_disassembler>();
 }
 
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
 
-#define ZERO_FLAG   (1 << 0)
-#define SIGN_FLAG   (1 << 1)
-#define EXTERNAL_FLAG   (1 << 2)        //This seems to be a flag coming from some external circuit??
-
-#define GETPC()             m_pc
-#define GETA()              m_a
-#define GETB()              m_b
-#define GETD()              m_d
-#define GETP()              m_p
-#define GETSR()             m_sr
-#define GETGPR(a)           m_gpr[a]
-#define GETSHIFT()          m_shift
-#define GETPCS()            m_pcs
-#define GETPCSP()           m_pcsp
-#define GETEB()             m_eb
-#define GETREPS()           m_reps
-#define GETEXTPORT()        m_extport
-#define GETFIFOWAIT()       m_fifo_wait
-#define GETARAM()           m_ARAM
-#define GETBRAM()           m_BRAM
-#define GETREPCNT()         m_repcnt
-
-#define ROPCODE(a)          m_direct->read_dword(a<<2)
-#define RDMEM(a)            m_program->read_dword((a<<2))
-#define WRMEM(a,v)          m_program->write_dword((a<<2), v)
-
-/***************************************************************************
-    Initialization and Shutdown
-***************************************************************************/
-
-void mb86233_cpu_device::device_start()
+void mb86233_device::device_start()
 {
-	m_pc = 0;
-	m_a.u = 0;
-	m_b.u = 0;
-	m_d.u = 0;
-	m_p.u = 0;
-	m_reps = 0;
-	m_pcs[0] = m_pcs[1] = m_pcs[2] = m_pcs[3] = 0;
-	m_pcsp = 0;
-	m_eb = 0;
-	m_shift = 0;
-	m_repcnt = 0;
-	m_sr = 0;
-	memset(m_gpr, 0, sizeof(m_gpr));
-	memset(m_extport, 0, sizeof(m_extport));
-	m_fifo_wait = 0;
-
-	m_fifo_read_cb.resolve_safe(0);
-	m_fifo_read_ok_cb.resolve_safe(0);
-	m_fifo_write_cb.resolve_safe();
-
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_cache  = m_program->cache<2, -2, ENDIANNESS_LITTLE>();
 
-	if ( m_tablergn )
-	{
-		m_Tables = (uint32_t*) machine().root_device().memregion(m_tablergn)->base();
-	}
+	m_data     = &space(AS_DATA);
+	m_io       = &space(AS_IO);
+	m_rf       = &space(AS_RF);
 
-	memset( m_RAM, 0, 2 * 0x200 * sizeof(uint32_t) );
-	m_ARAM = &m_RAM[0];
-	m_BRAM = &m_RAM[0x200];
+	state_add(STATE_GENPC,     "GENPC", m_pc);
+	state_add(STATE_GENPCBASE, "PC",    m_ppc).noshow();
+	state_add(STATE_GENSP,     "SP",    m_sp);
+	state_add(STATE_GENFLAGS,  "ST",    m_st);
 
+	state_add(REG_A,           "A",     m_a);
+	state_add(REG_B,           "B",     m_b);
+	state_add(REG_D,           "D",     m_d);
+	state_add(REG_P,           "P",     m_p);
+	state_add(REG_R,           "R",     m_r);
+	state_add(REG_R,           "RPC",   m_rpc);
+	state_add(REG_C0,          "C0",    m_c0);
+	state_add(REG_C1,          "C1",    m_c1);
+	state_add(REG_B0,          "B0",    m_b0);
+	state_add(REG_B1,          "B1",    m_b1);
+	state_add(REG_X0,          "X0",    m_x0);
+	state_add(REG_X1,          "X1",    m_x1);
+	state_add(REG_I0,          "I0",    m_i0);
+	state_add(REG_I1,          "I1",    m_i1);
+	state_add(REG_SFT,         "SFT",   m_sft);
+	state_add(REG_VSM,         "VSM",   m_vsm);
+	state_add(REG_PCS0,        "PCS0",  m_pcs[0]);
+	state_add(REG_PCS1,        "PCS1",  m_pcs[1]);
+	state_add(REG_PCS2,        "PCS2",  m_pcs[2]);
+	state_add(REG_PCS3,        "PCS3",  m_pcs[3]);
+	state_add(REG_MASK,        "MASK",  m_mask);
+	state_add(REG_M,           "M",     m_m);
+
+	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
-	save_item(NAME(m_a.u));
-	save_item(NAME(m_b.u));
-	save_item(NAME(m_d.u));
-	save_item(NAME(m_p.u));
-	save_item(NAME(m_reps));
+	save_item(NAME(m_st));
+	save_item(NAME(m_sp));
+	save_item(NAME(m_a));
+	save_item(NAME(m_b));
+	save_item(NAME(m_d));
+	save_item(NAME(m_p));
+	save_item(NAME(m_r));
+	save_item(NAME(m_rpc));
+	save_item(NAME(m_c0));
+	save_item(NAME(m_c1));
+	save_item(NAME(m_b0));
+	save_item(NAME(m_b1));
+	save_item(NAME(m_x0));
+	save_item(NAME(m_x1));
+	save_item(NAME(m_i0));
+	save_item(NAME(m_i1));
+	save_item(NAME(m_sft));
+	save_item(NAME(m_vsm));
+	save_item(NAME(m_vsmr));
 	save_item(NAME(m_pcs));
-	save_item(NAME(m_pcsp));
-	save_item(NAME(m_eb));
-	save_item(NAME(m_shift));
-	save_item(NAME(m_repcnt));
-	save_item(NAME(m_sr));
-	save_item(NAME(m_gpr));
-	save_item(NAME(m_extport));
-	save_item(NAME(m_RAM));
+	save_item(NAME(m_mask));
+	save_item(NAME(m_m));
+	save_item(NAME(m_gpio0));
+	save_item(NAME(m_gpio1));
+	save_item(NAME(m_gpio2));
+	save_item(NAME(m_gpio3));
 
-	state_add( MB86233_PC,    "PC", m_pc).formatstr("%04X");
-	state_add( MB86233_A,     "PA", m_a.u).formatstr("%08X");
-	state_add( MB86233_B,     "PB", m_b.u).formatstr("%08X");
-	state_add( MB86233_P,     "PP", m_p.u).formatstr("%08X");
-	state_add( MB86233_D,     "PD", m_d.u).formatstr("%08X");
-	state_add( MB86233_REP,   "REPS", m_reps).formatstr("%08X");
-	state_add( MB86233_SP,    "PCSP", m_pcsp).mask(0xf).formatstr("%01X");
-	state_add( MB86233_EB,    "EB", m_eb).formatstr("%08X");
-	state_add( MB86233_SHIFT, "SHIFT", m_shift).formatstr("%08X");
-	state_add( MB86233_R0,    "R0", m_gpr[0]).formatstr("%08X");
-	state_add( MB86233_R1,    "R1", m_gpr[1]).formatstr("%08X");
-	state_add( MB86233_R2,    "R2", m_gpr[2]).formatstr("%08X");
-	state_add( MB86233_R3,    "R3", m_gpr[3]).formatstr("%08X");
-	state_add( MB86233_R4,    "R4", m_gpr[4]).formatstr("%08X");
-	state_add( MB86233_R5,    "R5", m_gpr[5]).formatstr("%08X");
-	state_add( MB86233_R6,    "R6", m_gpr[6]).formatstr("%08X");
-	state_add( MB86233_R7,    "R7", m_gpr[7]).formatstr("%08X");
-	state_add( MB86233_R8,    "R8", m_gpr[8]).formatstr("%08X");
-	state_add( MB86233_R9,    "R9", m_gpr[9]).formatstr("%08X");
-	state_add( MB86233_R10,   "R10", m_gpr[10]).formatstr("%08X");
-	state_add( MB86233_R11,   "R11", m_gpr[11]).formatstr("%08X");
-	state_add( MB86233_R12,   "R12", m_gpr[12]).formatstr("%08X");
-	state_add( MB86233_R13,   "R13", m_gpr[13]).formatstr("%08X");
-	state_add( MB86233_R14,   "R14", m_gpr[14]).formatstr("%08X");
-	state_add( MB86233_R15,   "R15", m_gpr[15]).formatstr("%08X");
+	save_item(NAME(m_alu_stmask));
+	save_item(NAME(m_alu_stset));
+	save_item(NAME(m_alu_r1));
+	save_item(NAME(m_alu_r2));
 
-	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%2s").noshow();
+	m_gpio0 = m_gpio1 = m_gpio2 = m_gpio3 = false;
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
-void mb86233_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
+void mb86233_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
-	switch (entry.index())
-	{
-		case STATE_GENFLAGS:
-			str = string_format("%c%c", (m_sr & SIGN_FLAG) ? 'N' : 'n', (m_sr & ZERO_FLAG) ? 'Z' : 'z');
-			break;
-	}
 }
 
-
-void mb86233_cpu_device::device_reset()
+WRITE_LINE_MEMBER(mb86233_device::gpio0_w)
 {
-	/* zero registers and flags */
+	m_gpio0 = state;
+}
+
+WRITE_LINE_MEMBER(mb86233_device::gpio1_w)
+{
+	m_gpio1 = state;
+}
+
+WRITE_LINE_MEMBER(mb86233_device::gpio2_w)
+{
+	m_gpio2 = state;
+}
+
+WRITE_LINE_MEMBER(mb86233_device::gpio3_w)
+{
+	m_gpio3 = state;
+}
+
+void mb86233_device::device_reset()
+{
 	m_pc = 0;
-	m_sr = 0;
-	m_pcsp = 0;
-	m_eb = 0;
-	m_shift = 0;
-	m_fifo_wait = 0;
+	m_ppc = 0;
+	m_st = F_ZRC|F_ZRD|F_ZX0|F_ZX1|F_ZX2|F_ZC0|F_ZC1;
+	m_sp = 0;
+
+	m_a = 0;
+	m_b = 0;
+	m_d = 0;
+	m_p = 0;
+	m_r = 1;
+	m_rpc = 1;
+	m_c0 = 1;
+	m_c1 = 1;
+	m_b0 = 0;
+	m_b1 = 0;
+	m_x0 = 0;
+	m_x1 = 0;
+	m_i0 = 0;
+	m_i1 = 0;
+	m_sft = 0;
+	m_vsm = 0;
+	m_vsmr = 7;
+	m_mask = 0;
+	m_m = 1;
+
+	m_alu_stmask = 0;
+	m_alu_stset = 0;
+	m_alu_r1 = 0;
+	m_alu_r2 = 0;
+
+	std::fill(std::begin(m_pcs), std::end(m_pcs), 0);
+
+	m_stall = false;
 }
 
-
-
-/***************************************************************************
-    Status Register
-***************************************************************************/
-
-#define ZERO_FLAG   (1 << 0)
-#define SIGN_FLAG   (1 << 1)
-#define EXTERNAL_FLAG   (1 << 2)        //This seems to be a flag coming from some external circuit??
-
-void mb86233_cpu_device::FLAGSF( float v )
+s32 mb86233_device::s24_32(u32 val)
 {
-	GETSR() &= ~(ZERO_FLAG|SIGN_FLAG);
-
-	if ( v == 0 )
-		GETSR() |= ZERO_FLAG;
-
-	if ( v < 0 )
-		GETSR() |= SIGN_FLAG;
+	if(val & 0x00800000)
+		return val | 0xff000000;
+	else
+		return val & 0x00ffffff;
 }
 
-void mb86233_cpu_device::FLAGSI( uint32_t v )
+u32 mb86233_device::set_exp(u32 val, u32 exp)
 {
-	GETSR() &= ~(ZERO_FLAG|SIGN_FLAG);
-
-	if ( v == 0 )
-		GETSR() |= ZERO_FLAG;
-
-	if ( v & 0x80000000 )
-		GETSR() |= SIGN_FLAG;
+	return (val & 0x807fffff) | ((exp & 0xff) << 23);
 }
 
-
-
-/***************************************************************************
-    Condition Codes
-***************************************************************************/
-
-int mb86233_cpu_device::COND( uint32_t cond )
+u32 mb86233_device::set_mant(u32 val, u32 mant)
 {
-	switch( cond )
-	{
-		case 0x00:  /* eq */
-			if ( (GETSR() & ZERO_FLAG) ) return 1;
-		break;
+	return (val & 0x07f800000) | ((mant & 0x00800000) << 8) | (mant & 0x007fffff);
+}
 
-		case 0x01:  /* ge */
-			if ( (GETSR() & ZERO_FLAG) || ((GETSR() & SIGN_FLAG)==0) ) return 1;
-		break;
+u32 mb86233_device::get_exp(u32 val)
+{
+	return (val >> 23) & 0xff;
+}
 
-		case 0x02:  /* le */
-			if ( (GETSR() & ZERO_FLAG) || (GETSR() & SIGN_FLAG) ) return 1;
-		break;
+u32 mb86233_device::get_mant(u32 val)
+{
+	return val & 0x80000000 ? val | 0x7f800000 : val & 0x807fffff;
+}
 
-		case 0x06:  /* never */
-		break;
+void mb86233_device::pcs_push()
+{
+	for(unsigned int i=3; i; i--)
+		m_pcs[i] = m_pcs[i-1];
+	m_pcs[0] = m_pc;
+}
 
-		case 0x0a:
-			if(GETSR() & EXTERNAL_FLAG) return 1;
-		break;
+void mb86233_device::pcs_pop()
+{
+	m_pc = m_pcs[0];
+	for(unsigned int i=0; i != 3; i++)
+		m_pcs[i] = m_pcs[i+1];
+}
 
-		case 0x10:  /* --r12 != 0 */
-			GETGPR(12)--;
-			if ( GETGPR(12) != 0 ) return 1;
-		break;
+void mb86233_device::testdz()
+{
+	if(m_d)
+		m_st &= ~F_ZRD;
+	else
+		m_st |= F_ZRD;
+	if(m_d & 0x80000000)
+		m_st |= F_SGD;
+	else
+		m_st &= ~F_SGD;
+}
 
-		case 0x11:  /* --r13 != 0 */
-			GETGPR(13)--;
-			if ( GETGPR(13) != 0 ) return 1;
-		break;
+void mb86233_device::alu_pre(u32 alu)
+{
+	switch(alu) {
+	case 0x00: break; // no alu
 
-		case 0x16:  /* always */
-			return 1;
-
-		default:
-			logerror( "TGP: Unknown condition code (cc=%d) at PC:%x\n", cond, GETPC());
+	case 0x01: {
+		// andd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = m_d & m_a;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
 		break;
 	}
 
+	case 0x02: {
+		// orad
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = m_d | m_a;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x03: {
+		// eord
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = m_d ^ m_a;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x04: {
+		// notd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = ~m_d;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x05: {
+		// fcpd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		u32 r = f2u(u2f(m_d) - u2f(m_a));
+		m_alu_stset = r ? r & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x06: {
+		// fmad
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = f2u(u2f(m_d) + u2f(m_a));
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x07: {
+		// fsbd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = f2u(u2f(m_d) - u2f(m_a));
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x08: {
+		// fml
+		m_alu_stmask = 0;
+		m_alu_r1 = f2u(u2f(m_a) * u2f(m_b));
+		m_alu_stset = 0;
+		break;
+	}
+
+	case 0x09: {
+		// fmsd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = f2u(u2f(m_d) + u2f(m_p));
+		m_alu_r2 = f2u(u2f(m_a) * u2f(m_b));
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x0a: {
+		// fmrd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = f2u(u2f(m_d) - u2f(m_p));
+		m_alu_r2 = f2u(u2f(m_a) * u2f(m_b));
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x0b: {
+		// fabd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = m_d & 0x7fffffff;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x0c: {
+		// fsmd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = f2u(u2f(m_d) + u2f(m_p));
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x0d: {
+		// fspd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = m_p;
+		m_alu_r2 = f2u(u2f(m_a) * u2f(m_b));
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x0e: {
+		// cxfd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = f2u(s32(m_d));
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x0f: {
+		// cfxd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		switch((m_m >> 1) & 3) {
+		case 0: m_alu_r1 = s32(roundf(u2f(m_d))); break;
+		case 1: m_alu_r1 = s32(ceilf(u2f(m_d))); break;
+		case 2: m_alu_r1 = s32(floorf(u2f(m_d))); break;
+		case 3: m_alu_r1 = s32(u2f(m_d)); break;
+		}
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x10: {
+		// fdvd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = f2u(u2f(m_d) / u2f(m_a));
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x11: {
+		// fned
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = m_d ? m_d ^ 0x80000000 : 0;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x13: {
+		// d = b + a
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = f2u(u2f(m_b) + u2f(m_a));
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x14: {
+		// d = b - a
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = f2u(u2f(m_b) - u2f(m_a));
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x16: {
+		// lsrd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = m_d >> m_sft;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x17: {
+		// lsld
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = m_d << m_sft;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x18: {
+		// asrd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = s32(m_d) >> m_sft;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x19: {
+		// asld
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = s32(m_d) << m_sft;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x1a: {
+		// addd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = m_d + m_a;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	case 0x1b: {
+		// subd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = m_d - m_a;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
+	default:
+		logerror("unhandled alu pre %02x\n", alu);
+		break;
+	}
+}
+
+void mb86233_device::alu_update_st()
+{
+	m_st = (m_st & ~m_alu_stmask) | m_alu_stset;
+}
+
+void mb86233_device::alu_post(u32 alu)
+{
+	switch(alu) {
+	case 0x00: break; // no alu
+
+	case 0x05:
+		// flags only
+		alu_update_st();
+		break;
+
+	case 0x01: case 0x02: case 0x03: case 0x04:
+	case 0x06: case 0x07: case 0x0b: case 0x0c:
+	case 0x0e: case 0x0f: case 0x10: case 0x11:
+	case 0x13: case 0x14: case 0x16: case 0x17:
+	case 0x18: case 0x19: case 0x1a: case 0x1b:
+		// d update
+		m_d = m_alu_r1;
+		alu_update_st();
+		break;
+
+	case 0x08:
+		// p update
+		m_p = m_alu_r1;
+		break;
+
+	case 0x09: case 0x0a: case 0xd:
+		// d, p update
+		m_d = m_alu_r1;
+		m_p = m_alu_r2;
+		alu_update_st();
+		break;
+
+	default:
+		logerror("unhandled alu post %02x\n", alu);
+		break;
+	}
+}
+
+u16 mb86233_device::ea_pre_0(u32 r)
+{
+	switch(r & 0x180) {
+	case 0x000: return r & 0x7f;
+	case 0x080: case 0x100: return (r & 0x7f) + m_b0 + m_x0;
+	case 0x180: {
+		switch(r & 0x60) {
+		case 0x00: return m_b0 + m_x0;
+		case 0x20: return m_x0;
+		case 0x40: return m_b0 + (m_x0 & m_vsmr);
+		case 0x60: return m_x0 & m_vsmr;
+		}
+	}
+	}
 	return 0;
 }
 
-
-
-/***************************************************************************
-    ALU
-***************************************************************************/
-
-void mb86233_cpu_device::ALU( uint32_t alu)
+void mb86233_device::ea_post_0(u32 r)
 {
-	float   ftmp;
-
-	switch(alu)
-	{
-		case 0x00:  /* NOP */
-		break;
-
-		case 0x01:  /* D = D & A */
-			GETD().u &= GETA().u;
-			FLAGSI( GETD().u);
-		break;
-
-		case 0x02:  /* D = D | A */
-			GETD().u |= GETA().u;
-			FLAGSI( GETD().u);
-		break;
-
-		case 0x03:  /* D = D ^ A */
-			GETD().u ^= GETA().u;
-			FLAGSI( GETD().u);
-		break;
-
-		case 0x04:  /* D = D ~ A */
-			GETD().u = ~GETA().u;
-			FLAGSI( GETD().u);
-		break;
-
-		case 0x05:  /* CMP D,A */
-			ftmp = GETD().f - GETA().f;
-			FLAGSF( ftmp);
-			m_icount--;
-		break;
-
-		case 0x06:  /* D = D + A */
-			GETD().f += GETA().f;
-			FLAGSF( GETD().f);
-			m_icount--;
-		break;
-
-		case 0x07:  /* D = D - A */
-			GETD().f -= GETA().f;
-			FLAGSF( GETD().f);
-			m_icount--;
-		break;
-
-		case 0x08:  /* P = A * B */
-			GETP().f = GETA().f * GETB().f;
-			m_icount--;
-		break;
-
-		case 0x09:  /* D = D + P; P = A * B */
-			GETD().f += GETP().f;
-			GETP().f = GETA().f * GETB().f;
-			FLAGSF( GETD().f);
-			m_icount--;
-		break;
-
-		case 0x0A:  /* D = D - P; P = A * B */
-			GETD().f -= GETP().f;
-			GETP().f = GETA().f * GETB().f;
-			FLAGSF( GETD().f);
-			m_icount--;
-		break;
-
-		case 0x0B:  /* D = fabs(D) */
-			GETD().f = fabs( GETD().f );
-			FLAGSF( GETD().f);
-			m_icount--;
-		break;
-
-		case 0x0C:  /* D = D + P */
-			GETD().f += GETP().f;
-			FLAGSF( GETD().f);
-			m_icount--;
-		break;
-
-		case 0x0D:  /* D = P; P = A * B */
-			GETD().f = GETP().f;
-			GETP().f = GETA().f * GETB().f;
-			FLAGSF( GETD().f);
-			m_icount--;
-		break;
-
-		case 0x0E:  /* D = float(D) */
-			GETD().f = (float)GETD().i;
-			FLAGSF( GETD().f);
-			m_icount--;
-		break;
-
-		case 0x0F:  /* D = int(D) */
-			switch((m_fpucontrol>>1)&3)
-			{
-				//case 0: GETD().i = floor(GETD().f+0.5f); break;
-				//case 1: GETD().i = ceil(GETD().f); break;
-				case 2: GETD().i = floor(GETD().f); break; // Manx TT
-				case 3: GETD().i = (int32_t)GETD().f; break;
-				default: popmessage("TGP uses D = int(D) with FPU control = %02x, contact MAMEdev",m_fpucontrol>>1); break;
-			}
-
-			FLAGSI( GETD().i);
-		break;
-
-		case 0x10:  /* D = D / A */
-			if ( GETA().u != 0 )
-				GETD().f = GETD().f / GETA().f;
-			FLAGSF( GETD().f);
-			m_icount--;
-		break;
-
-		case 0x11:  /* D = -D */
-			GETD().f = -GETD().f;
-			FLAGSF( GETD().f);
-			m_icount--;
-		break;
-
-		case 0x13:  /* D = A + B */
-			GETD().f = GETA().f + GETB().f;
-			FLAGSF( GETD().f);
-			m_icount--;
-		break;
-
-		case 0x14:  /* D = B - A */
-			GETD().f = GETB().f - GETA().f;
-			FLAGSF( GETD().f);
-			m_icount--;
-		break;
-
-		case 0x16:  /* LSR D, SHIFT */
-			GETD().u >>= GETSHIFT();
-			FLAGSI( GETD().u);
-		break;
-
-		case 0x17:  /* LSL D, SHIFT */
-			GETD().u <<= GETSHIFT();
-			FLAGSI( GETD().u);
-		break;
-
-		case 0x18:  /* ASR D, SHIFT */
-//          GETD().u = (GETD().u & 0x80000000) | (GETD().u >> GETSHIFT());
-			GETD().i >>= GETSHIFT();
-			FLAGSI( GETD().u);
-		break;
-
-		case 0x1A:  /* D = D + A */
-			GETD().i += GETA().i;
-			FLAGSI( GETD().u);
-		break;
-
-		case 0x1B:  /* D = D - A */
-			GETD().i -= GETA().i;
-			FLAGSI( GETD().u);
-		break;
-
-		default:
-			fatalerror( "TGP: Unknown ALU op %x at PC:%04x\n", alu, GETPC() );
+	if(!(r & 0x100))
+		return;
+	if(!(r & 0x080))
+		m_x0 += m_i0;
+	else {
+		if(r & 0x10)
+			m_x0 += (r & 0xf) - 0x10;
+		else
+			m_x0 += r & 0xf;
 	}
 }
 
-
-
-/***************************************************************************
-    Memory Access
-***************************************************************************/
-
-uint32_t mb86233_cpu_device::ScaleExp(unsigned int v,int scale)
+u16 mb86233_device::ea_pre_1(u32 r)
 {
-	int exp=(v>>23)&0xff;
-	exp+=scale;
-	v&=~0x7f800000;
-	return v|(exp<<23);
-}
-
-
-uint32_t mb86233_cpu_device::GETEXTERNAL( uint32_t EB, uint32_t offset )
-{
-	uint32_t      addr;
-
-	if ( EB == 0 && offset >= 0x20 && offset <= 0x2f )  /* TGP Tables in ROM - FIXME - */
-	{
-		if(offset>=0x20 && offset<=0x23)    //SIN from value at RAM(0x20) in 0x4000/PI steps
-		{
-			uint32_t r;
-			uint32_t value=GETEXTPORT()[0x20];
-			uint32_t off;
-			value+=(offset-0x20)<<14;
-			off=value&0x3fff;
-			if((value&0x7fff)==0)
-				r=0;
-			else if((value&0x7fff)==0x4000)
-				r=0x3f800000;
-			else
-			{
-				if(value&0x4000)
-					off=0x4000-off;
-				r=m_Tables[off];
-			}
-			if(value&0x8000)
-				r|=1<<31;
-			return r;
+	switch(r & 0x180) {
+	case 0x000: return r & 0x7f;
+	case 0x080: case 0x100: return (r & 0x7f) + m_b1 + m_x1;
+	case 0x180: {
+		switch(r & 0x60) {
+		case 0x00: return m_b1 + m_x1;
+		case 0x20: return m_x1;
+		case 0x40: return m_b1 + (m_x1 & m_vsmr);
+		case 0x60: return m_x1 & m_vsmr;
 		}
-
-		if(offset==0x27)
-		{
-			unsigned int value=GETEXTPORT()[0x27];
-			int exp=(value>>23)&0xff;
-			unsigned int res;
-			unsigned int sign=0;
-			MB86233_REG a,b;
-			int index;
-
-			a.u=GETEXTPORT()[0x24];
-			b.u=GETEXTPORT()[0x25];
-
-
-			if(!exp)
-			{
-				if((a.u&0x7fffffff)<=(b.u&0x7fffffff))
-				{
-					if(b.u&0x80000000)
-						res=0xc000;
-					else
-						res=0x4000;
-				}
-				else
-				{
-					if(a.u&0x80000000)
-						res=0x8000;
-					else
-						res=0x0000;
-				}
-				return res;
-			}
-
-			if((a.u^b.u)&0x80000000)
-				sign=16;                //the negative values are in the high word
-
-			if((exp&0x70)!=0x70)
-				index=0;
-			else if(exp<0x70 || exp>0x7e)
-				index=0x3fff;
-			else
-			{
-				int expdif=exp-0x71;
-				int base;
-				int mask;
-				int shift;
-
-
-				if(expdif<0)
-					expdif=0;
-				base=1<<expdif;
-				mask=base-1;
-				shift=23-expdif;
-
-				index=base+((value>>shift)&mask);
-
-			}
-
-			res=(m_Tables[index+0x10000/4]>>sign)&0xffff;
-
-			if((a.u&0x7fffffff)<=(b.u&0x7fffffff))
-				res=0x4000-res;
-
-
-			if((a.u&0x80000000) && (b.u&0x80000000))    //3rd quadrant
-			{
-				res=0x8000|res;
-			}
-			else if((a.u&0x80000000) && !(b.u&0x80000000))  //2nd quadrant
-			{
-				res=res&0x7fff;
-			}
-			else if(!(a.u&0x80000000) && (b.u&0x80000000))  //2nd quadrant
-			{
-				res=0x8000|res;
-			}
-
-			return res;
-
-		}
-
-		if(offset==0x28)
-		{
-			uint32_t offset=(GETEXTPORT()[0x28]>>10)&0x1fff;
-			uint32_t value=m_Tables[offset*2+0x20000/4];
-			uint32_t srcexp=(GETEXTPORT()[0x28]>>23)&0xff;
-
-			value&=0x7FFFFFFF;
-
-			return ScaleExp(value,0x7f-srcexp);
-		}
-		if(offset==0x29)
-		{
-			uint32_t offset=(GETEXTPORT()[0x28]>>10)&0x1fff;
-			uint32_t value=m_Tables[offset*2+(0x20000/4)+1];
-			uint32_t srcexp=(GETEXTPORT()[0x28]>>23)&0xff;
-
-			value&=0x7FFFFFFF;
-			if(GETEXTPORT()[0x28]&(1<<31))
-				value|=1<<31;
-
-			return ScaleExp(value,0x7f-srcexp);
-		}
-		if(offset==0x2a)
-		{
-			uint32_t offset=((GETEXTPORT()[0x2a]>>11)&0x1fff)^0x1000;
-			uint32_t value=m_Tables[offset*2+0x30000/4];
-			uint32_t srcexp=(GETEXTPORT()[0x2a]>>24)&0x7f;
-
-			value&=0x7FFFFFFF;
-
-			return ScaleExp(value,0x3f-srcexp);
-		}
-		if(offset==0x2b)
-		{
-			uint32_t offset=((GETEXTPORT()[0x2a]>>11)&0x1fff)^0x1000;
-			uint32_t value=m_Tables[offset*2+(0x30000/4)+1];
-			uint32_t srcexp=(GETEXTPORT()[0x2a]>>24)&0x7f;
-
-			value&=0x7FFFFFFF;
-			if(GETEXTPORT()[0x2a]&(1<<31))
-				value|=1<<31;
-
-			return ScaleExp(value,0x3f-srcexp);
-		}
-
-		return GETEXTPORT()[offset];
 	}
-
-	addr = ( EB & 0xFFFF0000 ) | ( offset & 0xFFFF );
-
-	return RDMEM(addr);
+	}
+	return 0;
 }
 
-void mb86233_cpu_device::SETEXTERNAL( uint32_t EB, uint32_t offset, uint32_t value )
+void mb86233_device::ea_post_1(u32 r)
 {
-	uint32_t  addr;
+	if(!(r & 0x100))
+		return;
+	if(!(r & 0x080))
+		m_x1 += m_i1;
+	else {
+		if(r & 0x10)
+			m_x1 += (r & 0xf) - 0x10;
+		else
+			m_x1 += r & 0xf;
+	}
+}
 
-	if ( EB == 0 && offset >= 0x20 && offset <= 0x2f )  /* TGP Tables in ROM - FIXME - */
-	{
-		GETEXTPORT()[offset] = value;
+u32 mb86233_device::read_reg(u32 r)
+{
+	r &= 0x3f;
+	if(r >= 0x20 && r < 0x30)
+		return m_rf->read_dword(r & 0x1f);
+	switch(r) {
+	case 0x00: return m_b0;
+	case 0x01: return m_b1;
+	case 0x02: return m_x0;
+	case 0x03: return m_x1;
 
-		if(offset==0x25 || offset==0x24)
-		{
-			if((GETEXTPORT()[0x24]&0x7fffffff)<=(GETEXTPORT()[0x25]&0x7fffffff))
-			{
-				GETSR()|=EXTERNAL_FLAG;
-			}
-			else
-			{
-				GETSR()&=~EXTERNAL_FLAG;
-			}
-		}
+	case 0x0c: return m_c0;
+	case 0x0d: return m_c1;
+
+	case 0x10: return m_a;
+	case 0x11: return get_exp(m_a);
+	case 0x12: return get_mant(m_a);
+	case 0x13: return m_b;
+	case 0x14: return get_exp(m_b);
+	case 0x15: return get_mant(m_b);
+	case 0x19: return m_d;
+		/* c */
+	case 0x1a: return get_exp(m_d);
+	case 0x1b: return get_mant(m_d);
+	case 0x1c: return m_p;
+	case 0x1d: return get_exp(m_p);
+	case 0x1e: return get_mant(m_p);
+	case 0x1f: return m_sft;
+
+	case 0x34: return m_rpc;
+
+	default:
+		logerror("unimplemented read_reg(%02x)\n", r);
+		return 0;
+	}
+}
+
+void mb86233_device::write_reg(u32 r, u32 v)
+{
+	r &= 0x3f;
+	if(r >= 0x20 && r < 0x30) {
+		m_rf->write_dword(r & 0x1f, v);
 		return;
 	}
+	switch(r) {
+	case 0x00: m_b0 = v; break;
+	case 0x01: m_b1 = v; break;
+	case 0x02: m_x0 = v; break;
+	case 0x03: m_x1 = v; break;
 
-	addr = ( EB & 0xFFFF0000 ) | ( offset & 0xFFFF );
+	case 0x05: m_i0 = v; break;
+	case 0x06: m_i1 = v; break;
 
-	WRMEM( addr, value );
-}
+	case 0x08: m_sp = v; break;
 
+	case 0x0a: m_vsm = v & 7; m_vsmr = (8 << m_vsm) - 1; break;
 
-
-/***************************************************************************
-    Register Access
-***************************************************************************/
-
-uint32_t mb86233_cpu_device::GETREGS( uint32_t reg, int source )
-{
-	uint32_t  mode = ( reg >> 6 ) & 0x07;
-
-	reg &= 0x3f;
-
-	if ( mode == 0 || mode == 1 || mode == 3 )
-	{
-		if ( reg < 0x10 )
-		{
-			return GETGPR(reg);
-		}
-
-		switch( reg )
-		{
-			case 0x10:  /* A */
-				return GETA().u;
-
-			case 0x11:  /* A.e */
-				return (GETA().u >> 23) & 0xff;
-
-			case 0x12:  /* A.m */
-				return (GETA().u & 0x7fffff) | ((GETA().u&0x80000000) >> 8);
-
-			case 0x13:  /* B */
-				return GETB().u;
-
-			case 0x14:  /* B.e */
-				return (GETB().u >> 23) & 0xff;
-
-			case 0x15:  /* B.m */
-				return (GETB().u & 0x7fffff) | ((GETB().u&0x80000000) >> 8);
-
-			case 0x19:  /* D */
-				return GETD().u;
-
-			case 0x1A:  /* D.e */
-				return (GETD().u >> 23) & 0xff;
-
-			case 0x1B:  /* D.m */
-				return (GETD().u & 0x7fffff) | ((GETD().u&0x80000000) >> 8);
-
-			case 0x1C:  /* P */
-				return GETP().u;
-
-			case 0x1D:  /* P.e */
-				return (GETP().u >> 23) & 0xff;
-
-			case 0x1E:  /* P.m */
-				return (GETP().u & 0x7fffff) | ((GETP().u&0x80000000) >> 8);
-
-			case 0x1F:  /* Shift */
-				return GETSHIFT();
-
-			case 0x20:  /* Parallel Port */
-				logerror( "TGP: Parallel port read at PC:%04x\n", GETPC() );
-				return 0;
-
-			case 0x21:  /* FIn */
-			{
-				if ( m_fifo_read_ok_cb() == ASSERT_LINE )
-				{
-					return m_fifo_read_cb();
-				}
-
-				GETFIFOWAIT() = 1;
-				return 0;
-			}
-
-			case 0x22:  /* FOut */
-				return 0;
-
-			case 0x23:  /* EB */
-				return GETEB();
-
-			case 0x34:
-				return GETREPCNT();
-
-			default:
-				fatalerror( "TGP: Unknown GETREG (%d) at PC=%04x\n", reg, GETPC() );
-		}
-	}
-	else if ( mode == 2 )   /* Indexed */
-	{
-		uint32_t  addr = reg & 0x1f;
-
-		if ( source )
-		{
-			if( !( reg & 0x20 ) )
-				addr += GETGPR(0);
-
-			addr += GETGPR(2);
-		}
+	case 0x0c:
+		m_c0 = v;
+		if(m_c0 == 1)
+			m_st |= F_ZC0;
 		else
-		{
-			if( !( reg & 0x20 ) )
-				addr += GETGPR(1);
+			m_st &= ~F_ZC0;
+		break;
 
-			addr += GETGPR(3);
-		}
-
-		return addr;
-	}
-	else if( mode == 6 )    /* Indexed with postop */
-	{
-		uint32_t  addr = 0;
-
-		if ( source )
-		{
-			if( !( reg & 0x20 ) )
-				addr += GETGPR(0);
-
-			addr += GETGPR(2);
-		}
+	case 0x0d:
+		m_c1 = v;
+		if(m_c1 == 1)
+			m_st |= F_ZC1;
 		else
-		{
-			if( !( reg & 0x20 ) )
-				addr += GETGPR(1);
+			m_st &= ~F_ZC1;
+		break;
 
-			addr += GETGPR(3);
-		}
+	case 0x0f: break;
 
-		if ( reg & 0x10 )
-		{
-			if ( source )
-				GETGPR(2) -= 0x20 - ( reg & 0x1f );
-			else
-				GETGPR(3) -= 0x20 - ( reg & 0x1f );
-		}
-		else
-		{
-			if ( source )
-				GETGPR(2) += ( reg & 0x1f );
-			else
-				GETGPR(3) += ( reg & 0x1f );
-		}
+	case 0x10: m_a = v; break;
+	case 0x11: m_a = set_exp(m_a, v); break;
+	case 0x12: m_a = set_mant(m_a, v); break;
+	case 0x13: m_b = v; break;
+	case 0x14: m_b = set_exp(m_b, v); break;
+	case 0x15: m_b = set_mant(m_b, v); break;
+		/* c */
+	case 0x19: m_d = v; testdz(); break;
+	case 0x1a: m_d = set_exp(m_d, v); testdz(); break;
+	case 0x1b: m_d = set_mant(m_d, v); testdz(); break;
+	case 0x1c: m_p = v; break;
+	case 0x1d: m_p = set_exp(m_p, v); break;
+	case 0x1e: m_p = set_mant(m_p, v); break;
+	case 0x1f: m_sft = v; break;
 
-		return addr;
-	}
-	else
-	{
-		fatalerror( "TGP: Unknown GETREG mode %d at PC:%04x\n", mode, GETPC() );
-	}
+	case 0x34: m_rpc = v; break;
+	case 0x3c: m_mask = v; break;
 
-	// never executed
-	//return 0;
-}
-
-void mb86233_cpu_device::SETREGS( uint32_t reg, uint32_t val )
-{
-	int     mode = ( reg >> 6) & 0x07;
-
-	reg &= 0x3f;
-
-	if( mode == 0 || mode == 1 || mode == 3 )
-	{
-		if(reg==12 || reg==13) // counter regs seem to be 8 bit only
-			val&=0xff;
-
-		if ( reg < 0x10 )
-		{
-			GETGPR(reg) = val;
-			return;
-		}
-
-		switch( reg )
-		{
-			case 0x10:  /* A */
-				GETA().u = val;
-			break;
-
-			case 0x11:  /* A.e */
-				GETA().u &= ~((0x0000007f) << 23);
-				GETA().u |= (( val & 0xff ) << 23 );
-			break;
-
-			case 0x12:  /* A.m */
-				GETA().u &= ~( 0x807fffff );
-				GETA().u |= ( val & 0x7fffff );
-				GETA().u |= ( val & 0x800000 ) << 8;
-			break;
-
-			case 0x13:  /* B */
-				GETB().u = val;
-			break;
-
-			case 0x14:  /* B.e */
-				GETB().u &= ~((0x0000007f) << 23);
-				GETB().u |= (( val & 0xff ) << 23 );
-			break;
-
-			case 0x15:  /* B.m */
-				GETB().u &= ~( 0x807fffff );
-				GETB().u |= ( val & 0x7fffff );
-				GETB().u |= ( val & 0x800000 ) << 8;
-			break;
-
-			case 0x19:  /* D */
-				GETD().u = val;
-			break;
-
-			case 0x1A:  /* D.e */
-				GETD().u &= ~((0x0000007f) << 23);
-				GETD().u |= (( val & 0xff ) << 23 );
-			break;
-
-			case 0x1B:  /* B.m */
-				GETD().u &= ~( 0x807fffff );
-				GETD().u |= ( val & 0x7fffff );
-				GETD().u |= ( val & 0x800000 ) << 8;
-			break;
-
-			case 0x1C:  /* P */
-				GETP().u = val;
-			break;
-
-			case 0x1D:  /* P.e */
-				GETP().u &= ~((0x000000ff) << 23);
-				GETP().u |= (( val & 0xff ) << 23 );
-			break;
-
-			case 0x1E:  /* P.m */
-				GETP().u &= ~( 0x807fffff );
-				GETP().u |= ( val & 0x7fffff );
-				GETP().u |= ( val & 0x800000 ) << 8;
-			break;
-
-			case 0x1F:
-				GETSHIFT() = val;
-			break;
-
-			case 0x20: /* Parallel Port */
-				logerror( "TGP: Parallel port write: %08x at PC:%04x\n", val, GETPC() );
-			break;
-
-			case 0x22: /* FOut */
-				m_fifo_write_cb( val );
-			break;
-
-			case 0x23:
-				GETEB() = val;
-			break;
-
-			case 0x34:
-				GETREPCNT() = val;
-			break;
-
-			default:
-				fatalerror( "TGP: Unknown register write (r:%d, mode:%d) at PC:%04x\n", reg, mode, GETPC());
-		}
-	}
-	else
-	{
-		fatalerror( "TGP: Unknown register write (r:%d, mode:%d) at PC:%04x\n", reg, mode, GETPC());
+	default:
+		logerror("unimplemented write_reg(%02x, %08x)\n", r, v);
+		break;
 	}
 }
 
-
-/***************************************************************************
-    Addressing Modes
-***************************************************************************/
-
-uint32_t mb86233_cpu_device::INDIRECT( uint32_t reg, int source )
+void mb86233_device::write_mem_internal_1(u32 r, u32 v, bool bank)
 {
-	uint32_t  mode = ( reg >> 6 ) & 0x07;
-
-	if ( mode == 0 || mode == 1 || mode == 3 )
-	{
-		return reg;
-	}
-	else if ( mode == 2 )
-	{
-		uint32_t  addr = reg & 0x3f;
-
-		if ( source )
-		{
-			if( !(reg & 0x20) )
-				addr += GETGPR(0);
-
-			addr += GETGPR(2);
-		}
-		else
-		{
-			if( !(reg & 0x20) )
-				addr += GETGPR(1);
-
-			addr += GETGPR(3);
-		}
-
-		return addr;
-	}
-	else if ( mode == 6 || mode == 7 )
-	{
-		uint32_t  addr = 0;
-
-		if ( source )
-		{
-			if ( !( reg & 0x20 ) )
-				addr += GETGPR(0);
-
-			addr += GETGPR(2);
-		}
-		else
-		{
-			if ( !( reg & 0x20 ) )
-				addr += GETGPR(1);
-
-			addr += GETGPR(3);
-		}
-
-		if ( reg & 0x10 )
-		{
-			if ( source )
-				GETGPR(2) -= 0x20 - ( reg & 0x1f );
-			else
-				GETGPR(3) -= 0x20 - ( reg & 0x1f );
-		}
-		else
-		{
-			if ( source )
-				GETGPR(2) += ( reg & 0x1f );
-			else
-				GETGPR(3) += ( reg & 0x1f );
-		}
-		if( mode == 7)
-		{
-			if ( source )
-				GETGPR(2)&=0x3f;
-			else
-				GETGPR(3)&=0x3f;
-		}
-
-		return addr;
-	}
-	else
-	{
-		fatalerror( "TGP: Unknown INDIRECT mode %d at PC:%04x\n", mode, GETPC() );
-	}
-
-	// never executed
-	//return 0;
+	u16 ea = ea_pre_1(r);
+	if(bank)
+		ea += 0x200;
+	m_data->write_dword(ea, v);
+	ea_post_1(r);
 }
 
-/***************************************************************************
-    Core Execution Loop
-***************************************************************************/
-
-void mb86233_cpu_device::execute_run()
+void mb86233_device::write_mem_io_1(u32 r, u32 v)
 {
-	while( m_icount > 0 )
-	{
-		uint32_t      val;
-		uint32_t      opcode;
+	u16 ea = ea_pre_1(r);
+	m_io->write_dword(ea, v);
+	ea_post_1(r);
+}
 
-		debugger_instruction_hook(this, GETPC());
+void mb86233_device::execute_run()
+{
+	while(m_icount > 0) {
+		m_ppc = m_pc;
+		debugger_instruction_hook(m_ppc);
+		u32 opcode = m_cache->read_dword(m_pc++);
 
-		opcode = ROPCODE(GETPC());
+		switch((opcode >> 26) & 0x3f) {
+		case 0x00: {
+			// lab
+			u32 r1 = opcode & 0x1ff;
+			u32 r2 = (opcode >> 9) & 0x1ff;
+			u32 alu = (opcode >> 21) & 0x1f;
+			u32 op = (opcode >> 18) & 0x7;
 
-		GETFIFOWAIT() = 0;
+			alu_pre(alu);
 
-		switch( (opcode >> 26) & 0x3f )
-		{
-			case 0x00:  /* dual move */
-			{
-				uint32_t      r1 = opcode & 0x1ff;
-				uint32_t      r2 = ( opcode >> 9 ) & 0x7f;
-				uint32_t      alu = ( opcode >> 21 ) & 0x1f;
-				uint32_t      op = ( opcode >> 16 ) & 0x1f;
+			switch(op) {
+			case 0: case 1: {
+				// lab mem, mem (e)
 
-				ALU( alu );
+				u32 ea1 = ea_pre_0(r1);
+				u32 v1 = m_data->read_dword(ea1);
+				if(m_stall) goto do_stall;
 
-				switch( op )
-				{
-					case 0x01:
-						GETA().u = GETARAM()[INDIRECT(r1,1)];
-						GETB().u = GETEXTERNAL( GETEB(),INDIRECT(r2|(2<<6), 0));
-					break;
+				u32 ea2 = ea_pre_1(r2);
+				u32 v2 = m_io->read_dword(ea2);
+				if(m_stall) goto do_stall;
 
-					case 0x04: // ?
-						GETA().u = GETARAM()[r1];
-						GETB().u = GETEXTERNAL( GETEB(),r2);
-					break;
+				ea_post_0(r1);
+				ea_post_1(r2);
 
-					case 0x0C:
-						GETA().u = GETARAM()[INDIRECT(r1,1)];
-						GETB().u = GETBRAM()[r2];
-					break;
-
-					case 0x0D: // VF2 shadows
-						GETA().u = GETARAM()[INDIRECT(r1,1)];
-						GETB().u = GETBRAM()[INDIRECT(r2|2<<6,0)];
-					break;
-
-					case 0x0F:
-						GETA().u = GETARAM()[r1];
-						GETB().u = GETBRAM()[INDIRECT(r2|6<<6,0)];
-					break;
-
-					case 0x10:
-						GETA().u = GETBRAM()[INDIRECT(r1,1)];
-						GETB().u = GETARAM()[r2];
-					break;
-
-					case 0x11:
-						GETA().u = GETBRAM()[INDIRECT(r1,1)];
-						GETB().u = GETARAM()[INDIRECT(r2|(2<<6),0)];
-					break;
-
-					default:
-						logerror( "TGP: Unknown TGP double move (op=%d) at PC:%x\n", op, GETPC());
-					break;
-				}
-			}
-			break;
-
-			case 0x7:   /* LD/MOV */
-			{
-				uint32_t      r1 = opcode & 0x1ff;
-				uint32_t      r2 = ( opcode >> 9 ) & 0x7f;
-				uint32_t      alu = ( opcode >> 21 ) & 0x1f;
-				uint32_t      op = ( opcode >> 16 ) & 0x1f;
-
-				switch( op )
-				{
-					case 0x04:  /* MOV RAM->External */
-					{
-						SETEXTERNAL( GETEB(), r2, GETARAM()[r1]);
-						ALU(alu);
-					}
-					break;
-
-					case 0x0c:  /* MOV RAM->BRAM */
-					{
-						GETBRAM()[r2] = GETARAM()[r1];
-						ALU(alu);
-					}
-					break;
-
-					case 0x0d: /* Move RAM->BRAM indirect? */
-					{
-						val = GETARAM()[r1];
-						ALU(alu);
-						GETBRAM()[INDIRECT(r2|(2<<6),0)] = val;
-					}
-					break;
-
-					case 0x1d:  /* MOV RAM->Reg */
-					{
-						if ( r1 & 0x180 )
-						{
-							val = GETARAM()[GETREGS(r1,0)];
-						}
-						else
-						{
-							val = GETARAM()[r1];
-						}
-
-						/* if we're waiting for data, don't complete the instruction */
-						if ( GETFIFOWAIT() )
-							break;
-
-						ALU(alu);
-						SETREGS(r2,val);
-					}
-					break;
-
-					case 0x1c:  /* MOV Reg->RAMInd */
-					{
-						val = GETREGS(r2,1);
-
-						/* if we're waiting for data, don't complete the instruction */
-						if ( GETFIFOWAIT() )
-							break;
-
-						ALU(alu);
-
-						if ( ( r2 >> 6 ) & 0x01)
-						{
-							SETEXTERNAL( GETEB(),INDIRECT(r1,0),val);
-						}
-						else
-						{
-							GETARAM()[INDIRECT(r1,0)] = val;
-						}
-					}
-					break;
-
-					case 0x1f:  /* MOV Reg->Reg */
-					{
-						if ( r1 == 0x10 && r2 == 0xf )
-						{
-							/* NOP */
-							ALU( alu);
-						}
-						else
-						{
-							val = GETREGS(r1,1);
-
-							/* if we're waiting for data, don't complete the instruction */
-							if ( GETFIFOWAIT() )
-								break;
-
-							ALU(alu);
-							SETREGS(r2, val);
-						}
-					}
-					break;
-
-					case 0x0f:  /* MOV RAMInd->BRAMInd */
-					{
-						val = GETARAM()[INDIRECT(r1,1)];
-						ALU(alu);
-						GETBRAM()[INDIRECT(r2|(6<<6),0)] = val;
-					}
-					break;
-
-					case 0x13:  /* MOV BRAMInd->RAMInd */
-					{
-						val = GETBRAM()[INDIRECT(r1,1)];
-						ALU(alu);
-						GETARAM()[INDIRECT(r2|(6<<6),0)] = val;
-					}
-					break;
-
-					case 0x10:  /* MOV RAMInd->RAM  */
-					{
-						val = GETBRAM()[INDIRECT(r1,1)];
-						ALU(alu);
-						GETARAM()[r2] = val;
-					}
-					break;
-
-					case 0x1e:  /* External->Reg */
-					{
-						uint32_t  offset;
-
-						if ( (( r2 >> 6 ) & 7) == 1 )
-						{
-							offset = INDIRECT(r1,1);
-							val = GETEXTERNAL(0,offset);
-						}
-						else
-						{
-							offset = INDIRECT(r1,0);
-							val = GETEXTERNAL(GETEB(),offset);
-						}
-
-						ALU(alu);
-						SETREGS(r2,val);
-					}
-					break;
-
-					case 0x03:  /* RAM->External Ind */
-					{
-						val = GETARAM()[r1];
-						ALU(alu);
-						SETEXTERNAL(GETEB(),INDIRECT(r2|(6<<6),0),val);
-					}
-					break;
-
-					case 0x07:  /* RAMInd->External */
-					{
-						val = GETARAM()[INDIRECT(r1,1)];
-						ALU(alu);
-						SETEXTERNAL( GETEB(),INDIRECT(r2|(6<<6),0),val);
-					}
-					break;
-
-					case 0x08:  /* External->RAM */
-					{
-						val = GETEXTERNAL( GETEB(),INDIRECT(r1,1));
-						ALU(alu);
-						GETARAM()[r2] = val;
-					}
-					break;
-
-					case 0x0b:  /* External->RAMInd */
-					{
-						val = GETEXTERNAL( GETEB(),INDIRECT(r1,1));
-						ALU( alu);
-						GETARAM()[INDIRECT(r2|(6<<6),0)] = val;
-					}
-					break;
-
-					case 0x17: /* External r2-> RAMInd r3 */
-					{
-						uint32_t  offset;
-
-						offset = INDIRECT(r1,1);
-
-						val = GETEXTERNAL( GETEB(), offset);
-						ALU(alu);
-						GETARAM()[INDIRECT(r2|(6<<6),0)] = val;
-					}
-					break;
-					case 0x14:
-					{
-						uint32_t  offset;
-
-						offset = INDIRECT(r1,1);
-
-						val = GETEXTERNAL( 0, offset);
-						ALU(alu);
-						GETARAM()[r2] = val;
-					}
-					break;
-
-					default:
-						fatalerror( "TGP: Unknown TGP move (op=%02x) at PC:%x\n", op, GETPC());
-				}
-			}
-			break;
-
-			case 0x0d: /* CONTROL? */
-			{
-				uint32_t  sub = (opcode>>16) & 0xff;
-
-				switch(sub)
-				{
-					case 0x0a: // FPU Round Control opcode
-						m_fpucontrol = opcode & 0xff;
-						logerror( "TGP: FPU Round CONTROL sets %02x at PC:%x\n", m_fpucontrol, GETPC());
-						break;
-					default:
-						logerror( "TGP: Unknown CONTROL sub-type %02x at PC:%x\n", sub, GETPC());
-						break;
-				}
-
+				m_a = v1;
+				m_b = v2;
 				break;
 			}
 
-			case 0x0e:  /* LDIMM24 */
-			{
-				uint32_t  sub = (opcode>>24) & 0x03;
-				uint32_t  imm = opcode & 0xffffff;
+			case 3: {
+				// lab mem, mem + 0x200
 
-				/* sign extend 24->32 */
-				if ( imm & 0x800000 )
-					imm |= 0xFF000000;
+				u32 ea1 = ea_pre_0(r1);
+				u32 v1 = m_data->read_dword(ea1);
+				if(m_stall) goto do_stall;
 
-				switch( sub )
-				{
-					case 0x00: /* P */
-						GETP().u = imm;
-					break;
+				u32 ea2 = ea_pre_1(r2) + 0x200;
+				u32 v2 = m_data->read_dword(ea2);
+				if(m_stall) goto do_stall;
 
-					case 0x01: /* A */
-						GETA().u = imm;
-					break;
+				ea_post_0(r1);
+				ea_post_1(r2);
 
-					case 0x02: /* B */
-						GETB().u = imm;
-					break;
-
-					case 0x03: /* D */
-						GETD().u = imm;
-					break;
-				}
+				m_a = v1;
+				m_b = v2;
+				break;
 			}
-			break;
 
-			case 0x0f:  /* REP/CLEAR/FLAGS */
-			{
-				uint32_t      alu = ( opcode >> 20 ) & 0x1f;
-				uint32_t      sub2 = ( opcode >> 16 ) & 0x0f;
+			case 4: {
+				// lab mem + 0x200, mem
 
-				ALU(alu);
+				u32 ea1 = ea_pre_0(r1) + 0x200;
+				u32 v1 = m_data->read_dword(ea1);
+				if(m_stall) goto do_stall;
 
-				if( sub2 == 0x00 )          /* CLEAR reg */
-				{
-					uint32_t  reg = opcode & 0x1f;
+				u32 ea2 = ea_pre_1(r2);
+				u32 v2 = m_data->read_dword(ea2);
+				if(m_stall) goto do_stall;
 
-					switch( reg )
-					{
-						case 0x10:
-							GETD().u = 0;
-						break;
+				ea_post_0(r1);
+				ea_post_1(r2);
 
-						case 0x08:
-							GETB().u = 0;
-						break;
-
-						case 0x04:
-							GETA().u = 0;
-						break;
-					}
-				}
-				else if ( sub2 == 0x04 )    /* REP xxx */
-				{
-					uint32_t sub3 = ( opcode >> 12 ) & 0x0f;
-
-					if ( sub3 == 0 )
-					{
-						GETREPS() = opcode & 0xfff;
-
-						if ( GETREPS() == 0 )
-							GETREPS() = 0x100;
-
-						GETPC()++;
-					}
-					else if ( sub3 == 8 )
-					{
-						GETREPS() = GETREGS( opcode & 0xfff, 0 );
-						GETPC()++;
-					}
-				}
-				else if ( sub2 == 0x02 )    /* CLRFLAGS */
-				{
-					GETSR() &= ~(opcode&0xfff);
-				}
-				else if ( sub2 == 0x06 )    /* SETFLAGS */
-				{
-					GETSR() |= (opcode&0xfff);
-				}
+				m_a = v1;
+				m_b = v2;
+				break;
 			}
-			break;
-
-			case 0x10:  /* LDIMM rx */
-			{
-				uint32_t  sub = (opcode>>24) & 0x03;
-				uint32_t  imm = opcode & 0xffff;
-
-				GETGPR(sub) = imm;
-			}
-			break;
-
-			case 0x13:  /* LDIMM r1x */
-			{
-				uint32_t  sub = (opcode>>24) & 0x03;
-				uint32_t  imm = opcode & 0xffffff;
-
-				if ( sub == 0 ) /* R12 */
-					GETGPR(12) = imm;
-				else if ( sub == 1 ) /* R13 */
-					GETGPR(13) = imm;
-				else
-					logerror( "TGP: Unknown LDIMM r12 (sub=%d) at PC:%04x\n", sub, GETPC() );
-			}
-			break;
-
-			case 0x14:  /* LDIMM m,e */
-			{
-				uint32_t  sub = (opcode>>24) & 0x03;
-				uint32_t  imm = opcode & 0xffffff;
-
-				if ( sub == 0 ) /* A */
-				{
-					GETA().u = imm;
-				}
-				else if ( sub == 1 ) /* A.e */
-				{
-					GETA().u &= ~0x7f800000;
-					GETA().u |= (imm & 0xff) << 23;
-				}
-				else if ( sub == 2 ) /* A.m */
-				{
-					GETA().u &= 0x7f800000;
-					GETA().u |= (imm & 0x7fffff ) | ((imm & 0x800000) << 8);
-				}
-				else
-				{
-					fatalerror( "TGP: Unknown LDIMM m,e (sub=%d) at PC:%04x\n", sub, GETPC() );
-				}
-			}
-			break;
-
-			case 0x15:  /* LDIMM m,e */
-			{
-				uint32_t  sub = (opcode>>24) & 0x03;
-				uint32_t  imm = opcode & 0xffffff;
-
-				if ( sub == 0 ) /* B.e again? */
-				{
-					//GETB().u = ((imm & 0x7f) << 23) | ((imm & 0xff) << 8) | ( imm & 0xff );
-					GETB().u &= ~0x7f800000;
-					GETB().u |= (imm & 0xff) << 23;
-				}
-				else if ( sub == 1 ) /* B.e */
-				{
-					GETB().u &= ~0x7f800000;
-					GETB().u |= (imm & 0xff) << 23;
-				}
-				else if ( sub == 2 ) /* B.m */
-				{
-					GETB().u &= 0x7f800000;
-					GETB().u |= (imm & 0x7fffff ) | ((imm & 0x800000) << 8);
-				}
-				else
-				{
-					fatalerror( "TGP: Unknown LDIMM m,e (sub=%d) at PC:%04x\n", sub, GETPC() );
-				}
-			}
-			break;
-
-			case 0x16:  /* LDIMM m,e */
-			{
-				uint32_t  sub = (opcode>>24) & 0x03;
-				uint32_t  imm = opcode & 0xffffff;
-
-				if ( sub == 1 ) /* clear + D.m */
-				{
-					GETD().u = (imm & 0x7fffff ) | ((imm & 0x800000) << 8);
-				}
-				else if ( sub == 2 ) /* D.e */
-				{
-					GETD().u &= ~0x7f800000;
-					GETD().u |= (imm & 0xff) << 23;
-				}
-				else if ( sub == 3 ) /* D.m */
-				{
-					GETD().u &= 0x7f800000;
-					GETD().u |= (imm & 0x7fffff ) | ((imm & 0x800000) << 8);
-				}
-				else
-				{
-					fatalerror( "TGP: Unknown LDIMM m,e (sub=%d) at PC:%04x\n", sub, GETPC() );
-				}
-			}
-			break;
-
-			case 0x17:  /* LDIMM special reg */
-			{
-				uint32_t  sub = (opcode>>24) & 0x03;
-				uint32_t  imm = opcode & 0xffffff;
-
-				if ( sub == 0x03 )
-				{
-					GETSHIFT() = imm;
-				}
-				else
-				{
-					logerror( "TGP: Unknown LDIMM special reg (sub=%d) at PC:%04x\n", sub, GETPC() );
-				}
-			}
-			break;
-
-			case 0x18:  /* LDIMM external reg */
-			{
-				uint32_t  sub = (opcode>>24) & 0x03;
-				uint32_t  imm = opcode & 0xffffff;
-
-				if ( sub == 0x03 )
-				{
-					GETEB() = imm;
-				}
-				else
-				{
-					fatalerror( "TGP: Unknown LDIMM external reg (sub=%d) at PC:%04x\n", sub, GETPC() );
-				}
-			}
-			break;
-
-			case 0x1d:  //LDIMM to Rep regs
-			{
-				uint32_t sub = (opcode>>24)&0x3;
-				uint32_t imm = opcode&0xffffff;
-				if(sub == 0x00)
-				{
-					GETREPCNT() = imm;
-				}
-				else
-				{
-					fatalerror( "TGP: Unknown LDIMM REPCnt (sub=%d) at PC:%04x\n", sub, GETPC() );
-				}
-			}
-			break;
-
-			case 0x2f:  /* Conditional Branches */
-			{
-				uint32_t  cond = ( opcode >> 20 ) & 0x1f;
-				uint32_t  subtype = ( opcode >> 16 ) & 0x0f;
-				uint32_t  data = opcode & 0xffff;
-
-				if( COND( cond) )
-				{
-					switch( subtype )
-					{
-						case 0x00:  /* BRIF <addr> */
-							GETPC() = data - 1;
-						break;
-
-						case 0x02:  /* BRIF indirect */
-							data = GETREGS(data&0x7f,0) - 1;
-
-							/* if we're waiting for data, don't complete the instruction */
-							if ( GETFIFOWAIT() )
-								break;
-
-							GETPC() = data;
-						break;
-
-						case 0x04:  /* BSIF <addr> */
-							GETPCS()[GETPCSP()] = GETPC();
-							GETPCSP()++;
-							GETPC() = data - 1;
-						break;
-
-						case 0x06:  /* BSIF indirect */
-							GETPCS()[GETPCSP()] = GETPC();
-							GETPCSP()++;
-							if ( data & 0x4000 )
-								data = GETREGS(data&0x7f,0) - 1;
-							else
-								data = ((GETARAM()[data&0x3ff])&0xffff)-1;
-
-							/* if we're waiting for data, don't complete the instruction */
-							if ( GETFIFOWAIT() )
-								break;
-
-							GETPC() = data;
-						break;
-
-						case 0x0a:  /* RTIF */
-							--GETPCSP();
-							GETPC() = GETPCS()[GETPCSP()];
-						break;
-
-						case 0x0c:  /* LDIF */
-							SETREGS(((data>>9)&0x7f), GETARAM()[data&0x1FF] );
-						break;
-
-						case 0x0e:  /* RIIF */
-							fatalerror( "TGP: RIIF unimplemented at PC:%04x\n", GETPC() );
-
-						default:
-							fatalerror( "TGP: Unknown Branch opcode (subtype=%d) at PC:%04x\n", subtype, GETPC() );
-					}
-				}
-			}
-			break;
-
-			case 0x3f:  /* Inverse Conditional Branches */
-			{
-				uint32_t  cond = ( opcode >> 20 ) & 0x1f;
-				uint32_t  subtype = ( opcode >> 16 ) & 0x0f;
-				uint32_t  data = opcode & 0xffff;
-
-				if( !COND( cond) )
-				{
-					switch( subtype )
-					{
-						case 0x00:  /* BRUL <addr> */
-							GETPC() = data - 1;
-						break;
-
-						case 0x02:  /* BRUL indirect */
-							data = GETREGS(data&0x7f,0) - 1;
-
-							/* if we're waiting for data, don't complete the instruction */
-							if ( GETFIFOWAIT() )
-								break;
-
-							GETPC() = data;
-						break;
-
-						case 0x04:  /* BSUL <addr> */
-							GETPCS()[GETPCSP()] = GETPC();
-							GETPCSP()++;
-							GETPC() = data - 1;
-						break;
-
-						case 0x06:  /* BSUL indirect */
-							data = GETARAM()[data] - 1;
-
-							/* if we're waiting for data, don't complete the instruction */
-							if ( GETFIFOWAIT() )
-								break;
-
-							GETPC() = data;
-						break;
-
-						case 0x0a:  /* RTUL */
-							--GETPCSP();
-							GETPC() = GETPCS()[GETPCSP()];
-						break;
-
-						case 0x0c:  /* LDUL */
-							SETREGS(((data>>9)&0x7f), GETARAM()[data&0x1FF] );
-						break;
-
-						case 0x0e:  /* RIUL */
-							fatalerror( "TGP: RIUL unimplemented at PC:%04x\n", GETPC() );
-
-						default:
-							fatalerror( "TGP: Unknown Branch opcode (subtype=%d) at PC:%04x\n", subtype, GETPC() );
-					}
-				}
-			}
-			break;
-
-			case 0x1f:
-			case 0x12:
-				logerror( "TGP: unknown opcode %08x at PC:%04x (%02x)\n", opcode, GETPC(),(opcode >> 26) & 0x3f );
-			break;
 
 			default:
-				fatalerror( "TGP: unknown opcode %08x at PC:%04x (%02x)\n", opcode, GETPC(),(opcode >> 26) & 0x3f );
+				logerror("unhandled lab subop %x\n", op);
+				logerror("%x\n", m_ppc);
+				break;
+
+			}
+
+			alu_post(alu);
+			break;
 		}
 
-		if ( GETFIFOWAIT() == 0 )
-		{
-			if( GETREPS() == 0 )
-				GETPC()++;
-			else
-				--GETREPS();
 
-			m_icount--;
+		case 0x07: {
+			// ld / mov
+			u32 r1 = opcode & 0x1ff;
+			u32 r2 = (opcode >> 9) & 0x1ff;
+			u32 alu = (opcode >> 21) & 0x1f;
+			u32 op = (opcode >> 18) & 0x7;
+
+			alu_pre(alu);
+
+			switch(op) {
+			case 0: {
+				// mov mem, mem (e)
+				u32 ea = ea_pre_0(r1);
+				u32 v = m_data->read_dword(ea);
+				if(m_stall) goto do_stall;
+				ea_post_0(r1);
+				write_mem_io_1(r2, v);
+				break;
+			}
+
+			case 1: {
+				// mov mem + 0x200, mem (e)
+				u32 ea = ea_pre_0(r1) + 0x200*0;
+				u32 v = m_data->read_dword(ea);
+				if(m_stall) goto do_stall;
+				ea_post_0(r1);
+				write_mem_io_1(r2, v);
+				break;
+			}
+
+			case 2: {
+				// mov mem (e), mem
+				u32 ea = ea_pre_0(r1);
+				u32 v = m_io->read_dword(ea);
+				if(m_stall) goto do_stall;
+				ea_post_0(r1);
+				write_mem_internal_1(r2, v, false);
+				break;
+			}
+
+			case 3: {
+				// mov mem, mem + 0x200
+				u32 ea = ea_pre_0(r1);
+				u32 v = m_data->read_dword(ea);
+				if(m_stall) goto do_stall;
+				ea_post_0(r1);
+				write_mem_internal_1(r2, v, true);
+				break;
+			}
+
+			case 4: {
+				// mov mem + 0x200, mem
+				u32 ea = ea_pre_0(r1) + 0x200;
+				u32 v = m_data->read_dword(ea);
+				if(m_stall) goto do_stall;
+				ea_post_0(r1);
+				write_mem_internal_1(r2, v, false);
+				break;
+			}
+
+			case 5: {
+				// mov mem (o), mem
+				u32 ea = ea_pre_0(r1);
+				u32 v = m_program->read_dword(ea);
+				if(m_stall) goto do_stall;
+				ea_post_0(r1);
+				write_mem_internal_1(r2, v, false);
+				break;
+			}
+
+			case 7: {
+				switch(r2 >> 6) {
+				case 0: {
+					// mov reg, mem
+					u32 v = read_reg(r2);
+					if(m_stall) goto do_stall;
+					write_mem_internal_1(r1, v, false);
+					break;
+				}
+
+				case 1: {
+					// mov reg, mem (e)
+					u32 v = read_reg(r2);
+					if(m_stall) goto do_stall;
+					write_mem_io_1(r1, v);
+					break;
+				}
+
+				case 2: {
+					// mov mem + 0x200, reg
+					u32 ea = ea_pre_1(r1) + 0x200;
+					u32 v = m_data->read_dword(ea);
+					if(m_stall) goto do_stall;
+					ea_post_1(r1);
+					write_reg(r2, v);
+					break;
+				}
+
+				case 3: {
+					// mov mem, reg
+					u32 ea = ea_pre_1(r1);
+					u32 v = m_data->read_dword(ea);
+					if(m_stall) goto do_stall;
+					ea_post_1(r1);
+					write_reg(r2, v);
+					break;
+				}
+
+				case 4: {
+					// mov mem (e), reg
+					u32 ea = ea_pre_1(r1);
+					u32 v = m_io->read_dword(ea);
+					if(m_stall) goto do_stall;
+					ea_post_1(r1);
+					write_reg(r2, v);
+					break;
+				}
+
+				case 5: {
+					// mov mem (o), reg
+					u32 ea = ea_pre_0(r1);
+					u32 v = m_program->read_dword(ea);
+					if(m_stall) goto do_stall;
+					ea_post_0(r1);
+					write_reg(r2, v);
+					break;
+				}
+
+				case 6: {
+					// mov reg, reg
+					u32 v = read_reg(r1);
+					if(m_stall) goto do_stall;
+					write_reg(r2, v);
+					break;
+				}
+
+				default:
+					logerror("unhandler ld/mov subop 7/%x\n", r2 >> 6);
+					break;
+				}
+				break;
+			}
+
+			default:
+				logerror("unhandler ld/mov subop %x\n", op);
+				break;
+			}
+
+			alu_post(alu);
+			break;
 		}
-		else
-		{
-			m_icount = 0;
+
+		case 0x0d: {
+			// stm/clm
+			u32 sub2 = (opcode >> 17) & 7;
+
+			// Theorically has restricted alu too
+
+			switch(sub2) {
+			case 5:
+				// stmh
+				// bit 0 = floating point
+				// bit 1-2 = rounding mode
+				m_m = opcode;
+				break;
+
+			default:
+				logerror("unimplemented opcode 0d/%x\n", sub2);
+				break;
+			}
+			break;
 		}
+
+		case 0x0e: {
+			// lipl / lia / lib / lid
+			switch((opcode >> 24) & 0x3) {
+			case 0:
+				m_p = (m_p & 0xffffff000000) | (opcode & 0xffffff);
+				break;
+			case 1:
+				m_a = s24_32(opcode);
+				break;
+			case 2:
+				m_b = s24_32(opcode);
+				break;
+			case 3:
+				m_d = s24_32(opcode);
+				testdz();
+				break;
+			}
+			break;
+		}
+
+		case 0x0f: {
+			// rep/clr0/clr1/set
+			u32 alu = (opcode >> 20) & 0x1f;
+			u32 sub2 = (opcode >> 17) & 7;
+
+			alu_pre(alu);
+
+			switch(sub2) {
+			case 0:
+				// clr0
+				if(opcode & 0x0004) m_a = 0;
+				if(opcode & 0x0008) m_b = 0;
+				if(opcode & 0x0010) m_d = 0;
+				break;
+
+			case 1:
+				// clr1 - flags mapping unknown
+				break;
+
+			case 2: {
+				// rep
+				u8 r = opcode & 0x8000 ? read_reg(opcode) : opcode;
+				if(m_stall) goto do_stall;
+				m_r = r;
+				goto rep_start;
+			}
+
+			case 3:
+				// set - flags mapping unknown
+				// 0800 = enable interrupt flag
+				break;
+
+			default:
+				logerror("unimplemented opcode 0f/%x\n", sub2);
+				break;
+			}
+
+			alu_post(alu);
+			break;
+		}
+
+		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
+		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f: {
+			// ldi
+			write_reg(opcode >> 24, s24_32(opcode));
+			break;
+		}
+
+		case 0x2f: case 0x3f: {
+			// Conditional branch of every kind
+			u32 cond = ( opcode >> 20 ) & 0x1f;
+			u32 subtype = ( opcode >> 17 ) & 7;
+			u32 data = opcode & 0xffff;
+			bool invert = opcode & 0x40000000;
+
+			bool cond_passed = false;
+
+			switch(cond) {
+			case 0x00: // zrd - d zero
+				cond_passed = m_st & F_ZRD;
+				break;
+
+			case 0x01: // ged - d >= 0
+				cond_passed = !(m_st & F_SGD);
+				break;
+
+			case 0x02: // led - d <= 0
+				cond_passed = m_st & (F_ZRD | F_SGD);
+				break;
+
+			case 0x0a: // gpio0
+				cond_passed = m_gpio0;
+				break;
+
+			case 0x0b: // gpio1
+				cond_passed = m_gpio1;
+				break;
+
+			case 0x0c: // gpio2
+				cond_passed = m_gpio2;
+				break;
+
+			case 0x10: // zc0 - c0 == 1
+				cond_passed = !(m_st & F_ZC0);
+				break;
+
+			case 0x11: // zc1 - c1 == 1
+				cond_passed = !(m_st & F_ZC1);
+				break;
+
+			case 0x12: // gpio3
+				cond_passed = m_gpio3;
+				break;
+
+			case 0x16: // alw - always
+				cond_passed = true;
+				break;
+
+			default:
+				logerror("unimplemented condition %x\n", cond);
+				break;
+			}
+			if(invert)
+				cond_passed = !cond_passed;
+
+			if(cond_passed) {
+				switch(subtype) {
+				case 0: // brif #adr
+					m_pc = data;
+					break;
+
+				case 1: // brul
+					if(opcode & 0x4000) {
+						// brul reg
+						u32 v = read_reg(opcode);
+						if(m_stall) goto do_stall;
+						m_pc = v;
+					} else {
+						// brul adr
+						u32 ea = ea_pre_0(opcode);
+						u32 v = m_data->read_dword(ea);
+						if(m_stall) goto do_stall;
+						ea_post_0(opcode);
+						m_pc = v;
+					}
+					break;
+
+				case 2: // bsif #adr
+					pcs_push();
+					m_pc = data;
+					break;
+
+				case 3: // bsul
+					if(opcode & 0x4000) {
+						// bsul reg
+						u32 v = read_reg(opcode);
+						if(m_stall) goto do_stall;
+						pcs_push();
+						m_pc = v;
+					} else {
+						// bsul adr
+						u32 ea = ea_pre_0(opcode);
+						u32 v = m_data->read_dword(ea);
+						if(m_stall) goto do_stall;
+						ea_post_0(opcode);
+						pcs_push();
+						m_pc = v;
+					}
+					break;
+
+				case 5: // rtif #adr
+					pcs_pop();
+					break;
+
+				case 6: { // ldif adr, rn
+					u32 ea = ea_pre_0(opcode);
+					u32 v = m_data->read_dword(ea);
+					if(m_stall) goto do_stall;
+					ea_post_0(opcode);
+					write_reg(opcode >> 9, v);
+					break;
+				}
+
+				default:
+					logerror("unimplemented branch subtype %x\n", subtype);
+					break;
+				}
+			}
+
+			if(subtype < 2)
+				switch(cond) {
+				case 0x10:
+					if(m_c0 != 1) {
+						m_c0 --;
+						if(m_c0 == 1)
+							m_st |= F_ZC0;
+					}
+					break;
+
+				case 0x11:
+					if(m_c1 != 1) {
+						m_c1 --;
+						if(m_c1 == 1)
+							m_st |= F_ZC1;
+					}
+				break;
+				}
+
+			break;
+		}
+
+		default:
+			logerror("unimplemented opcode type %02x\n", (opcode >> 26) & 0x3f);
+			break;
+		}
+
+		if(m_r != 1) {
+			m_pc = m_ppc;
+			m_r --;
+		}
+
+	rep_start:
+		if(0) {
+		do_stall:
+			m_pc = m_ppc;
+			m_stall = false;
+		}
+		m_icount--;
 	}
 }

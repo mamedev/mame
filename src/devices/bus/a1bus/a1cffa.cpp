@@ -33,7 +33,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a1bus_cffa_device::device_add_mconfig )
+MACHINE_CONFIG_START(a1bus_cffa_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 
@@ -55,7 +55,7 @@ a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a1bus_card_interface(mconfig, *this)
 	, m_ata(*this, CFFA_ATA_TAG)
-	, m_rom(nullptr)
+	, m_rom(*this, CFFA_ROM_REGION)
 	, m_lastdata(0)
 	, m_writeprotect(false)
 {
@@ -67,12 +67,8 @@ a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type 
 
 void a1bus_cffa_device::device_start()
 {
-	set_a1bus_device();
-
-	m_rom = device().machine().root_device().memregion(this->subtag(CFFA_ROM_REGION).c_str())->base();
-
 	install_device(0xafe0, 0xafff, read8_delegate(FUNC(a1bus_cffa_device::cffa_r), this), write8_delegate(FUNC(a1bus_cffa_device::cffa_w), this));
-	install_bank(0x9000, 0xafdf, (char *)"bank_cffa1", m_rom);
+	install_bank(0x9000, 0xafdf, "bank_cffa1", &m_rom[0]);
 
 	save_item(NAME(m_lastdata));
 	save_item(NAME(m_writeprotect));
@@ -100,7 +96,7 @@ READ8_MEMBER(a1bus_cffa_device::cffa_r)
 			break;
 
 		case 0x8:
-			m_lastdata = m_ata->read_cs0(space, (offset & 0xf) - 8, 0xff);
+			m_lastdata = m_ata->read_cs0((offset & 0xf) - 8, 0xff);
 			return m_lastdata & 0x00ff;
 
 		case 0x9:
@@ -110,7 +106,7 @@ READ8_MEMBER(a1bus_cffa_device::cffa_r)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->read_cs0(space, (offset & 0xf) - 8, 0xff);
+			return m_ata->read_cs0((offset & 0xf) - 8, 0xff);
 	}
 
 	return 0xff;
@@ -135,7 +131,7 @@ WRITE8_MEMBER(a1bus_cffa_device::cffa_w)
 
 
 		case 0x8:
-			m_ata->write_cs0(space, (offset & 0xf) - 8, data, 0xff);
+			m_ata->write_cs0((offset & 0xf) - 8, data, 0xff);
 			break;
 
 		case 0x9:
@@ -145,7 +141,7 @@ WRITE8_MEMBER(a1bus_cffa_device::cffa_w)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			m_ata->write_cs0(space, (offset & 0xf) - 8, data, 0xff);
+			m_ata->write_cs0((offset & 0xf) - 8, data, 0xff);
 			break;
 
 	}

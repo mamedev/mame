@@ -108,7 +108,7 @@ void cdp1864_device::device_start()
 	m_hsync_timer = timer_alloc(TIMER_HSYNC);
 
 	// find devices
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	// register for state saving
 	save_item(NAME(m_disp));
@@ -128,8 +128,8 @@ void cdp1864_device::device_start()
 
 void cdp1864_device::device_reset()
 {
-	m_int_timer->adjust(m_screen->time_until_pos(SCANLINE_INT_START, 0));
-	m_efx_timer->adjust(m_screen->time_until_pos(SCANLINE_EFX_TOP_START, 0));
+	m_int_timer->adjust(screen().time_until_pos(SCANLINE_INT_START, 0));
+	m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_TOP_START, 0));
 	m_dma_timer->adjust(clocks_to_attotime(CDP1864_CYCLES_DMA_START));
 
 	m_disp = 0;
@@ -148,7 +148,7 @@ void cdp1864_device::device_reset()
 
 void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int scanline = m_screen->vpos();
+	int scanline = screen().vpos();
 
 	switch (id)
 	{
@@ -160,7 +160,7 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				m_write_irq(ASSERT_LINE);
 			}
 
-			m_int_timer->adjust(m_screen->time_until_pos(SCANLINE_INT_END, 0));
+			m_int_timer->adjust(screen().time_until_pos(SCANLINE_INT_END, 0));
 		}
 		else
 		{
@@ -169,7 +169,7 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				m_write_irq(CLEAR_LINE);
 			}
 
-			m_int_timer->adjust(m_screen->time_until_pos(SCANLINE_INT_START, 0));
+			m_int_timer->adjust(screen().time_until_pos(SCANLINE_INT_START, 0));
 		}
 		break;
 
@@ -178,22 +178,22 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 		case SCANLINE_EFX_TOP_START:
 			m_write_efx(ASSERT_LINE);
-			m_efx_timer->adjust(m_screen->time_until_pos(SCANLINE_EFX_TOP_END, 0));
+			m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_TOP_END, 0));
 			break;
 
 		case SCANLINE_EFX_TOP_END:
 			m_write_efx(CLEAR_LINE);
-			m_efx_timer->adjust(m_screen->time_until_pos(SCANLINE_EFX_BOTTOM_START, 0));
+			m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_BOTTOM_START, 0));
 			break;
 
 		case SCANLINE_EFX_BOTTOM_START:
 			m_write_efx(ASSERT_LINE);
-			m_efx_timer->adjust(m_screen->time_until_pos(SCANLINE_EFX_BOTTOM_END, 0));
+			m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_BOTTOM_END, 0));
 			break;
 
 		case SCANLINE_EFX_BOTTOM_END:
 			m_write_efx(CLEAR_LINE);
-			m_efx_timer->adjust(m_screen->time_until_pos(SCANLINE_EFX_TOP_START, 0));
+			m_efx_timer->adjust(screen().time_until_pos(SCANLINE_EFX_TOP_START, 0));
 			break;
 		}
 		break;
@@ -339,8 +339,8 @@ WRITE8_MEMBER( cdp1864_device::tone_latch_w )
 WRITE8_MEMBER( cdp1864_device::dma_w )
 {
 	int rdata = 1, bdata = 1, gdata = 1;
-	int sx = m_screen->hpos() + 4;
-	int y = m_screen->vpos();
+	int sx = screen().hpos() + 4;
+	int y = screen().vpos();
 
 	if (!m_con)
 	{

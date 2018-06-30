@@ -23,8 +23,9 @@
 ///*************************************************************************
 
 #define MCFG_DAVE_ADD(_tag, _clock, _program_map, _io_map) \
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") \
-	MCFG_SOUND_ADD(_tag, DAVE, _clock) \
+	SPEAKER(config, "lspeaker").front_left(); \
+	SPEAKER(config, "rspeaker").front_right(); \
+	MCFG_DEVICE_ADD(_tag, DAVE, _clock) \
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25) \
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _program_map) \
@@ -32,13 +33,13 @@
 
 
 #define MCFG_DAVE_IRQ_CALLBACK(_write) \
-	devcb = &dave_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<dave_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_DAVE_LH_CALLBACK(_write) \
-	devcb = &dave_device::set_lh_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<dave_device &>(*device).set_lh_wr_callback(DEVCB_##_write);
 
 #define MCFG_DAVE_RH_CALLBACK(_write) \
-	devcb = &dave_device::set_rh_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<dave_device &>(*device).set_rh_wr_callback(DEVCB_##_write);
 
 
 
@@ -55,16 +56,18 @@ class dave_device : public device_t,
 public:
 	dave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<dave_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_lh_wr_callback(device_t &device, Object &&cb) { return downcast<dave_device &>(device).m_write_lh.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rh_wr_callback(device_t &device, Object &&cb) { return downcast<dave_device &>(device).m_write_rh.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_lh_wr_callback(Object &&cb) { return m_write_lh.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rh_wr_callback(Object &&cb) { return m_write_rh.set_callback(std::forward<Object>(cb)); }
 
-	virtual DECLARE_ADDRESS_MAP(z80_program_map, 8);
-	virtual DECLARE_ADDRESS_MAP(z80_io_map, 8);
+	virtual void z80_program_map(address_map &map);
+	virtual void z80_io_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER( int1_w );
 	DECLARE_WRITE_LINE_MEMBER( int2_w );
 
+	void io_map(address_map &map);
+	void program_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

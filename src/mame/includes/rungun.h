@@ -12,6 +12,7 @@
 #include "video/k053936.h"
 #include "machine/k054321.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 
 class rungun_state : public driver_device
@@ -32,8 +33,17 @@ public:
 		m_screen(*this, "screen"),
 		m_k054321(*this, "k054321"),
 		m_sysreg(*this, "sysreg")
-	{ }
+		{ }
 
+	void rng(machine_config &config);
+	void rng_dual(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -74,19 +84,19 @@ public:
 	bool        m_single_screen_mode;
 	uint8_t       m_video_mux_bank;
 
-	DECLARE_READ16_MEMBER(rng_sysregs_r);
-	DECLARE_WRITE16_MEMBER(rng_sysregs_w);
+	DECLARE_READ16_MEMBER(sysregs_r);
+	DECLARE_WRITE16_MEMBER(sysregs_w);
 	DECLARE_WRITE16_MEMBER(sound_cmd1_w);
 	DECLARE_WRITE16_MEMBER(sound_cmd2_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_READ16_MEMBER(sound_status_msb_r);
 	DECLARE_WRITE8_MEMBER(sound_status_w);
 	DECLARE_WRITE8_MEMBER(sound_ctrl_w);
-	DECLARE_READ16_MEMBER(rng_ttl_ram_r);
-	DECLARE_WRITE16_MEMBER(rng_ttl_ram_w);
-	DECLARE_READ16_MEMBER(rng_psac2_videoram_r);
-	DECLARE_WRITE16_MEMBER(rng_psac2_videoram_w);
-	DECLARE_READ8_MEMBER(rng_53936_rom_r);
+	DECLARE_READ16_MEMBER(ttl_ram_r);
+	DECLARE_WRITE16_MEMBER(ttl_ram_w);
+	DECLARE_READ16_MEMBER(psac2_videoram_r);
+	DECLARE_WRITE16_MEMBER(psac2_videoram_w);
+	DECLARE_READ8_MEMBER(k53936_rom_r);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
@@ -96,9 +106,6 @@ public:
 
 	K055673_CB_MEMBER(sprite_callback);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint32_t screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -108,4 +115,8 @@ public:
 	void   sprite_dma_trigger(void);
 
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
+
+	void k054539_map(address_map &map);
+	void rungun_map(address_map &map);
+	void rungun_sound_map(address_map &map);
 };

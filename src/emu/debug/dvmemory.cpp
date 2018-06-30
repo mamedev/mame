@@ -14,7 +14,9 @@
 #include "debugcpu.h"
 #include "debugger.h"
 
+#include <algorithm>
 #include <ctype.h>
+#include <tuple>
 
 
 //**************************************************************************
@@ -98,6 +100,7 @@ debug_view_memory::debug_view_memory(running_machine &machine, debug_view_osd_up
 		m_expression(machine),
 		m_chunks_per_row(16),
 		m_bytes_per_chunk(1),
+		m_steps_per_chunk(1),
 		m_data_format(1),
 		m_reverse_view(false),
 		m_ascii_view(true),
@@ -152,24 +155,26 @@ void debug_view_memory::enumerate_sources()
 		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), *region.second.get())));
 	}
 
-	// finally add all global array symbols
-	for (int itemnum = 0; itemnum < 10000; itemnum++)
+	// finally add all global array symbols in alphabetical order
+	std::vector<std::tuple<std::string, void *, u32, u32> > itemnames;
+	itemnames.reserve(machine().save().registration_count());
+
+	for (int itemnum = 0; itemnum < machine().save().registration_count(); itemnum++)
 	{
-		// stop when we run out of items
 		u32 valsize, valcount;
 		void *base;
-		const char *itemname = machine().save().indexed_item(itemnum, base, valsize, valcount);
-		if (itemname == nullptr)
-			break;
+		std::string name_string(machine().save().indexed_item(itemnum, base, valsize, valcount));
 
 		// add pretty much anything that's not a timer (we may wish to cull other items later)
 		// also, don't trim the front of the name, it's important to know which VIA6522 we're looking at, e.g.
-		if (strncmp(itemname, "timer/", 6))
-		{
-			name.assign(itemname);
-			m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), base, valsize, valcount)));
-		}
+		if (strncmp(name_string.c_str(), "timer/", 6))
+			itemnames.emplace_back(std::move(name_string), base, valsize, valcount);
 	}
+
+	std::sort(itemnames.begin(), itemnames.end(), [] (auto const &x, auto const &y) { return std::get<0>(x) < std::get<0>(y); });
+
+	for (auto const &item : itemnames)
+		m_source_list.append(*global_alloc(debug_view_memory_source(std::get<0>(item).c_str(), std::get<1>(item), std::get<2>(item), std::get<3>(item))));
 
 	// reset the source to a known good entry
 	set_source(*m_source_list.first());
@@ -197,6 +202,7 @@ void debug_view_memory::view_notify(debug_view_notification type)
 		if (m_bytes_per_chunk > 8)
 			m_bytes_per_chunk = 8;
 		m_data_format = m_bytes_per_chunk;
+		m_steps_per_chunk = source.m_space ? source.m_space->byte_to_address(m_bytes_per_chunk) : m_bytes_per_chunk;
 		if (source.m_space != nullptr)
 			m_expression.set_context(&source.m_space->device().debug()->symtable());
 		else
@@ -290,7 +296,8 @@ void debug_view_memory::view_update()
 				if (dest >= destmin && dest < destmax)
 					dest->byte = addrtext[ch];
 
-			// generate the data
+			// generate the data and the ascii string
+			std::string chunkascii;
 			for (int chunknum = 0; chunknum < m_chunks_per_row; chunknum++)
 			{
 				int chunkindex = m_reverse_view ? (m_chunks_per_row - 1 - chunknum) : chunknum;
@@ -298,7 +305,7 @@ void debug_view_memory::view_update()
 
 				if (m_data_format <= 8) {
 					u64 chunkdata;
-					bool ismapped = read(m_bytes_per_chunk, addrbyte + chunknum * m_bytes_per_chunk, chunkdata);
+					bool ismapped = read(m_bytes_per_chunk, address + chunknum * m_steps_per_chunk, chunkdata);
 					dest = destrow + m_section[1].m_pos + 1 + chunkindex * spacing;
 					for (int ch = 0; ch < posdata.m_spacing; ch++, dest++)
 						if (dest >= destmin && dest < destmax)
@@ -307,6 +314,10 @@ void debug_view_memory::view_update()
 							if (shift < 64)
 								dest->byte = ismapped ? "0123456789ABCDEF"[(chunkdata >> shift) & 0x0f] : '*';
 						}
+					for (int i=0; i < m_bytes_per_chunk; i++) {
+						u8 chval = chunkdata >> (8 * (m_bytes_per_chunk - i - 1));
+						chunkascii += char((ismapped && isprint(chval)) ? chval : '.');
+					}
 				}
 				else {
 					int ch;
@@ -316,9 +327,9 @@ void debug_view_memory::view_update()
 					bool ismapped;
 
 					if (m_data_format != 11)
-						ismapped = read(m_bytes_per_chunk, addrbyte + chunknum * m_bytes_per_chunk, chunkdata);
+						ismapped = read(m_bytes_per_chunk, address + chunknum * m_steps_per_chunk, chunkdata);
 					else
-						ismapped = read(m_bytes_per_chunk, addrbyte + chunknum * m_bytes_per_chunk, chunkdata80);
+						ismapped = read(m_bytes_per_chunk, address + chunknum * m_steps_per_chunk, chunkdata80);
 
 					if (ismapped)
 						switch (m_data_format)
@@ -338,6 +349,7 @@ void debug_view_memory::view_update()
 						valuetext[0] = '*';
 						valuetext[1] = 0;
 					}
+
 					dest = destrow + m_section[1].m_pos + 1 + chunkindex * spacing;
 					// first copy the text
 					for (ch = 0; (ch < spacing) && (valuetext[ch] != 0); ch++, dest++)
@@ -347,20 +359,23 @@ void debug_view_memory::view_update()
 					for (; ch < spacing; ch++, dest++)
 						if (dest >= destmin && dest < destmax)
 							dest->byte = ' ';
+
+					for (int i=0; i < m_bytes_per_chunk; i++) {
+						u8 chval = chunkdata >> (8 * (m_bytes_per_chunk - i - 1));
+						chunkascii += char((ismapped && isprint(chval)) ? chval : '.');
+					}
 				}
 			}
 
-			// generate the ASCII data
+			// generate the ASCII data, but follow the chunks
 			if (m_section[2].m_width > 0)
 			{
 				dest = destrow + m_section[2].m_pos + 1;
-				for (int ch = 0; ch < m_bytes_per_row; ch++, dest++)
+				for (size_t i = 0; i != chunkascii.size(); i++) {
 					if (dest >= destmin && dest < destmax)
-					{
-						u64 chval;
-						bool ismapped = read(1, addrbyte + ch, chval);
-						dest->byte = (ismapped && isprint(chval)) ? chval : '.';
-					}
+						dest->byte = chunkascii[i];
+					dest++;
+				}
 			}
 		}
 	}
@@ -529,14 +544,16 @@ void debug_view_memory::recompute()
 
 	// determine the maximum address and address format string from the raw information
 	int addrchars;
+	u64 maxbyte;
 	if (source.m_space != nullptr)
 	{
-		m_maxaddr = m_no_translation ? source.m_space->bytemask() : source.m_space->logbytemask();
+		m_maxaddr = m_no_translation ? source.m_space->addrmask() : source.m_space->logaddrmask();
+		maxbyte = source.m_space->address_to_byte_end(m_maxaddr);
 		addrchars = m_no_translation ? source.m_space->addrchars() : source.m_space->logaddrchars();
 	}
 	else
 	{
-		m_maxaddr = source.m_length - 1;
+		maxbyte = m_maxaddr = source.m_length - 1;
 		addrchars = string_format("%X", m_maxaddr).size();
 	}
 
@@ -547,6 +564,8 @@ void debug_view_memory::recompute()
 		m_addrformat = string_format("%%0%dX%*s", addrchars, 8 - addrchars, "");
 
 	// if we are viewing a space with a minimum chunk size, clamp the bytes per chunk
+	// BAD
+#if 0
 	if (source.m_space != nullptr && source.m_space->byte_to_address(1) > 1)
 	{
 		u32 min_bytes_per_chunk = source.m_space->byte_to_address(1);
@@ -557,10 +576,14 @@ void debug_view_memory::recompute()
 		}
 		m_chunks_per_row = std::max(1U, m_chunks_per_row);
 	}
+#endif
 
 	// recompute the byte offset based on the most recent expression result
 	m_bytes_per_row = m_bytes_per_chunk * m_chunks_per_row;
-	m_byte_offset = m_expression.value() % m_bytes_per_row;
+	offs_t val = m_expression.value();
+	if (source.m_space)
+		val = source.m_space->address_to_byte(val);
+	m_byte_offset = val % m_bytes_per_row;
 
 	// compute the section widths
 	m_section[0].m_width = 1 + 8 + 1;
@@ -590,7 +613,7 @@ void debug_view_memory::recompute()
 	}
 
 	// derive total sizes from that
-	m_total.y = (u64(m_maxaddr) - u64(m_byte_offset) + u64(m_bytes_per_row) /*- 1*/) / m_bytes_per_row;
+	m_total.y = (maxbyte - u64(m_byte_offset) + u64(m_bytes_per_row) /*- 1*/) / m_bytes_per_row;
 
 	// reset the current cursor position
 	set_cursor_pos(pos);
@@ -609,19 +632,16 @@ bool debug_view_memory::needs_recompute()
 	// handle expression changes
 	if (m_expression.dirty())
 	{
+		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
+		offs_t val = m_expression.value();
+		if (source.m_space)
+			val = source.m_space->address_to_byte(val & source.m_space->logaddrmask());
 		recompute = true;
-		m_topleft.y = (m_expression.value() - m_byte_offset) / m_bytes_per_row;
+		m_topleft.y = (val - m_byte_offset) / m_bytes_per_row;
 		m_topleft.y = std::max(m_topleft.y, 0);
 		m_topleft.y = std::min(m_topleft.y, m_total.y - 1);
 
-		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
-		offs_t resultbyte;
-		if (source.m_space != nullptr)
-			resultbyte  = source.m_space->address_to_byte(m_expression.value()) & source.m_space->logbytemask();
-		else
-			resultbyte = m_expression.value();
-
-		set_cursor_pos(cursor_pos(resultbyte, m_bytes_per_chunk * 8 - 4));
+		set_cursor_pos(cursor_pos(val, m_bytes_per_chunk * 8 - 4));
 	}
 
 	// expression is clean at this point, and future recomputation is not necessary
@@ -737,9 +757,9 @@ bool debug_view_memory::read(u8 size, offs_t offs, u64 &data)
 	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 
 	// if no raw data, just use the standard debug routines
-	if (source.m_space != nullptr)
+	if (source.m_space)
 	{
-		auto dis = machine().disable_side_effect();
+		auto dis = machine().disable_side_effects();
 
 		bool ismapped = offs <= m_maxaddr;
 		if (ismapped && !m_no_translation)
@@ -820,9 +840,9 @@ void debug_view_memory::write(u8 size, offs_t offs, u64 data)
 	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 
 	// if no raw data, just use the standard debug routines
-	if (source.m_space != nullptr)
+	if (source.m_space)
 	{
-		auto dis = machine().disable_side_effect();
+		auto dis = machine().disable_side_effects();
 
 		switch (size)
 		{
@@ -916,13 +936,14 @@ void debug_view_memory::set_data_format(int format)
 		return;
 
 	pos = begin_update_and_get_cursor_pos();
+	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 	if ((format <= 8) && (m_data_format <= 8)) {
-		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 
 		pos.m_address += (pos.m_shift / 8) ^ ((source.m_endianness == ENDIANNESS_LITTLE) ? 0 : (m_bytes_per_chunk - 1));
 		pos.m_shift %= 8;
 
 		m_bytes_per_chunk = format;
+		m_steps_per_chunk = source.m_space ? source.m_space->byte_to_address(m_bytes_per_chunk) : m_bytes_per_chunk;
 		m_chunks_per_row = m_bytes_per_row / format;
 		if (m_chunks_per_row < 1)
 			m_chunks_per_row = 1;
@@ -955,6 +976,7 @@ void debug_view_memory::set_data_format(int format)
 			}
 		}
 		m_chunks_per_row = m_bytes_per_row / m_bytes_per_chunk;
+		m_steps_per_chunk = source.m_space ? source.m_space->byte_to_address(m_bytes_per_chunk) : m_bytes_per_chunk;
 		pos.m_shift = 0;
 		pos.m_address -= pos.m_address % m_bytes_per_chunk;
 	}

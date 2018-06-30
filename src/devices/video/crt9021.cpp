@@ -95,7 +95,7 @@ crt9021_device::crt9021_device(const machine_config &mconfig, const char *tag, d
 void crt9021_device::device_start()
 {
 	// register bitmap
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	// state saving
 	save_item(NAME(m_data));
@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER( crt9021_device::ld_sh_w )
 			// TODO
 		}
 
-		m_display_cb(m_bitmap, m_screen->vpos(), m_screen->hpos(), m_sr, m_intout);
+		m_display_cb(m_bitmap, screen().vpos(), screen().hpos(), m_sr, m_intout);
 	}
 }
 

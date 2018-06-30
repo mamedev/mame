@@ -75,19 +75,19 @@ READ16_MEMBER(saturn_state::saturn_soundram_r)
 /* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  */
 WRITE32_MEMBER(saturn_state::minit_w)
 {
-	//logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
+	//logerror("%s MINIT write = %08x\n", machine().describe_context(),data);
 	machine().scheduler().boost_interleave(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
 	machine().scheduler().trigger(1000);
 	machine().scheduler().synchronize(); // force resync
-	m_slave->sh2_set_frt_input(PULSE_LINE);
+	m_slave->pulse_frt_input();
 }
 
 WRITE32_MEMBER(saturn_state::sinit_w)
 {
-	//logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
+	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
 	machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
 	machine().scheduler().synchronize(); // force resync
-	m_maincpu->sh2_set_frt_input(PULSE_LINE);
+	m_maincpu->pulse_frt_input();
 }
 
 /*
@@ -111,7 +111,7 @@ Shinrei Jusatsushi Taromaru (options menu)
 
 WRITE32_MEMBER(saturn_state::saturn_minit_w)
 {
-	//logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
+	//logerror("%s MINIT write = %08x\n", machine().describe_context(),data);
 	if(m_fake_comms->read() & 1)
 		machine().scheduler().synchronize(); // force resync
 	else
@@ -120,18 +120,18 @@ WRITE32_MEMBER(saturn_state::saturn_minit_w)
 		machine().scheduler().trigger(1000);
 	}
 
-	m_slave->sh2_set_frt_input(PULSE_LINE);
+	m_slave->pulse_frt_input();
 }
 
 WRITE32_MEMBER(saturn_state::saturn_sinit_w)
 {
-	//logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
+	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
 	if(m_fake_comms->read() & 1)
 		machine().scheduler().synchronize(); // force resync
 	else
 		machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
 
-	m_maincpu->sh2_set_frt_input(PULSE_LINE);
+	m_maincpu->pulse_frt_input();
 }
 
 
@@ -319,7 +319,7 @@ static const gfx_layout tiles16x16x8_layout =
 
 
 
-GFXDECODE_START( stv )
+GFXDECODE_START( gfx_stv )
 	GFXDECODE_ENTRY( nullptr, 0, tiles8x8x4_layout,   0x00, (0x80*(2+1))  )
 	GFXDECODE_ENTRY( nullptr, 0, tiles16x16x4_layout, 0x00, (0x80*(2+1))  )
 	GFXDECODE_ENTRY( nullptr, 0, tiles8x8x8_layout,   0x00, (0x08*(2+1))  )
@@ -377,12 +377,10 @@ WRITE_LINE_MEMBER(saturn_state::system_halt_w)
 
 WRITE_LINE_MEMBER(saturn_state::dot_select_w)
 {
-	uint32_t xtal;
+	const XTAL &xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
 
-	xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
-
-	machine().device("maincpu")->set_unscaled_clock(xtal/2);
-	machine().device("slave")->set_unscaled_clock(xtal/2);
+	m_maincpu->set_unscaled_clock(xtal/2);
+	m_slave->set_unscaled_clock(xtal/2);
 
 	m_vdp2.dotsel = state ^ 1;
 	stv_vdp2_dynamic_res_change();

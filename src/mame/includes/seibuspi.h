@@ -6,31 +6,28 @@
 
 ******************************************************************************/
 
-#include "machine/intelfsh.h"
 #include "machine/eepromser.h"
 #include "machine/7200fifo.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 class seibuspi_state : public driver_device
 {
 public:
 	seibuspi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_mainram(*this, "mainram"),
-		m_z80_rom(*this, "audiocpu"),
-		m_eeprom(*this, "eeprom"),
-		m_soundflash1(*this, "soundflash1"),
-		m_soundflash2(*this, "soundflash2"),
-		m_soundfifo1(*this, "soundfifo1"),
-		m_soundfifo2(*this, "soundfifo2"),
-		m_oki1(*this, "oki1"),
-		m_oki2(*this, "oki2"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_key(*this, "KEY.%u", 0),
-		m_special(*this, "SPECIAL")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_mainram(*this, "mainram")
+		, m_z80_rom(*this, "audiocpu")
+		, m_eeprom(*this, "eeprom")
+		, m_soundfifo(*this, "soundfifo%u", 1)
+		, m_oki(*this, "oki%u", 1)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_key(*this, "KEY.%u", 0)
+		, m_special(*this, "SPECIAL")
+		, m_z80_bank(*this, "z80_bank")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -38,17 +35,15 @@ public:
 	required_shared_ptr<uint32_t> m_mainram;
 	optional_memory_region m_z80_rom;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<intel_e28f008sa_device> m_soundflash1;
-	optional_device<intel_e28f008sa_device> m_soundflash2;
-	optional_device<fifo7200_device> m_soundfifo1;
-	optional_device<fifo7200_device> m_soundfifo2;
-	optional_device<okim6295_device> m_oki1;
-	optional_device<okim6295_device> m_oki2;
+	optional_device_array<fifo7200_device, 2> m_soundfifo;
+	optional_device_array<okim6295_device, 2> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	optional_ioport_array<5> m_key;
 	optional_ioport m_special;
+
+	optional_memory_bank m_z80_bank;
 
 	int m_z80_prg_transfer_pos;
 	int m_z80_lastbank;
@@ -106,8 +101,6 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(spi_layerbanks_eeprom_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
-	DECLARE_READ8_MEMBER(flashrom_read);
-	DECLARE_WRITE8_MEMBER(flashrom_write);
 
 	DECLARE_READ32_MEMBER(senkyu_speedup_r);
 	DECLARE_READ32_MEMBER(senkyua_speedup_r);
@@ -145,16 +138,16 @@ public:
 	void register_video_state();
 	void init_spi_common();
 	void init_sei252();
-	DECLARE_DRIVER_INIT(batlball);
-	DECLARE_DRIVER_INIT(senkyu);
-	DECLARE_DRIVER_INIT(viprp1);
-	DECLARE_DRIVER_INIT(viprp1o);
-	DECLARE_DRIVER_INIT(rdft);
-	DECLARE_DRIVER_INIT(rfjet);
-	DECLARE_DRIVER_INIT(senkyua);
-	DECLARE_DRIVER_INIT(rdft2);
-	DECLARE_DRIVER_INIT(ejanhs);
-	DECLARE_DRIVER_INIT(sys386f);
+	void init_batlball();
+	void init_senkyu();
+	void init_viprp1();
+	void init_viprp1o();
+	void init_rdft();
+	void init_rfjet();
+	void init_senkyua();
+	void init_rdft2();
+	void init_ejanhs();
+	void init_sys386f();
 
 	void text_decrypt(uint8_t *rom);
 	void bg_decrypt(uint8_t *rom, int size);
@@ -164,4 +157,24 @@ public:
 
 	void rfjet_text_decrypt(uint8_t *rom);
 	void rfjet_bg_decrypt(uint8_t *rom, int size);
+	void sys386f(machine_config &config);
+	void sxx2f(machine_config &config);
+	void rdft2(machine_config &config);
+	void ejanhs(machine_config &config);
+	void sys386i(machine_config &config);
+	void sxx2g(machine_config &config);
+	void spi(machine_config &config);
+	void sxx2e(machine_config &config);
+	void base_map(address_map &map);
+	void rdft2_map(address_map &map);
+	void rise_map(address_map &map);
+	void sei252_map(address_map &map);
+	void spi_map(address_map &map);
+	void spi_soundmap(address_map &map);
+	void spi_ymf271_map(address_map &map);
+	void sxx2e_map(address_map &map);
+	void sxx2e_soundmap(address_map &map);
+	void sxx2f_map(address_map &map);
+	void sys386f_map(address_map &map);
+	void sys386i_map(address_map &map);
 };

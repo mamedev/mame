@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef BEBOX_H_
-#define BEBOX_H_
+#ifndef MAME_INCLUDES_BEBOX_H
+#define MAME_INCLUDES_BEBOX_H
 
 #include "machine/53c810.h"
 #include "machine/am9517a.h"
@@ -32,19 +32,19 @@ public:
 	};
 
 	bebox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_ppc1(*this, "ppc1"),
-			m_ppc2(*this, "ppc2"),
-			m_lsi53c810(*this, "lsi53c810"),
-			m_dma8237_1(*this, "dma8237_1"),
-			m_dma8237_2(*this, "dma8237_2"),
-			m_pic8259_1(*this, "pic8259_1"),
-			m_pic8259_2(*this, "pic8259_2"),
-			m_pit8254(*this, "pit8254"),
-			m_ram(*this, RAM_TAG),
-			m_smc37c78(*this, "smc37c78"),
-			m_flash(*this, "flash"),
-			m_pcibus(*this, "pcibus")
+		: driver_device(mconfig, type, tag)
+		, m_ppc1(*this, "ppc1")
+		, m_ppc2(*this, "ppc2")
+		, m_lsi53c810(*this, "lsi53c810")
+		, m_dma8237_1(*this, "dma8237_1")
+		, m_dma8237_2(*this, "dma8237_2")
+		, m_pic8259_1(*this, "pic8259_1")
+		, m_pic8259_2(*this, "pic8259_2")
+		, m_pit8254(*this, "pit8254")
+		, m_ram(*this, RAM_TAG)
+		, m_smc37c78(*this, "smc37c78")
+		, m_flash(*this, "flash")
+		, m_pcibus(*this, "pcibus")
 	{
 	}
 
@@ -67,7 +67,7 @@ public:
 	uint16_t m_dma_offset[2][4];
 	uint8_t m_at_pages[0x10];
 	uint32_t m_scsi53c810_data[0x100 / 4];
-	DECLARE_DRIVER_INIT(bebox);
+	void init_bebox();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_master_set_int_line);
@@ -120,14 +120,19 @@ public:
 	void bebox_set_irq_bit(unsigned int interrupt_bit, int val);
 	void bebox_update_interrupts();
 
+	static void mpc105_config(device_t *device);
+	void bebox(machine_config &config);
+	void bebox2(machine_config &config);
+	void bebox_mem(address_map &map);
+	void bebox_slave_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+#ifdef UNUSED_LEGACY_CODE
+	uint32_t scsi53c810_pci_read(int function, int offset, uint32_t mem_mask);
+	void scsi53c810_pci_write(int function, int offset, uint32_t data, uint32_t mem_mask);
+#endif
 };
 
 
-/*----------- defined in machine/bebox.c -----------*/
-
-uint32_t scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, uint32_t mem_mask);
-void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, int offset, uint32_t data, uint32_t mem_mask);
-
-#endif /* BEBOX_H_ */
+#endif // MAME_INCLUDES_BEBOX_H

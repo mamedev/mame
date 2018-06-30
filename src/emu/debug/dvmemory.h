@@ -107,6 +107,7 @@ private:
 	debug_view_expression m_expression;         // expression describing the start address
 	u32                 m_chunks_per_row;       // number of chunks displayed per line
 	u8                  m_bytes_per_chunk;      // bytes per chunk
+	u8                  m_steps_per_chunk;      // bytes per chunk
 	int                 m_data_format;          // 1-8 current values 9 32bit floating point
 	bool                m_reverse_view;         // reverse-endian view?
 	bool                m_ascii_view;           // display ASCII characters?

@@ -54,9 +54,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	// helpers
@@ -73,9 +71,6 @@ private:
 	void check_irq();
 	void gen_exception(int cause, uint32_t param = 0);
 
-	offs_t disasm(std::ostream &stream, offs_t pc, uint32_t opcode);
-	void disasm32(std::ostream &stream, offs_t pc, uint32_t opcode);
-	void disasm16(std::ostream &stream, offs_t pc, uint16_t opcode);
 	void unemulated_op(const char * op);
 
 	// 32-bit opcodes
@@ -113,7 +108,7 @@ private:
 
 	address_space_config m_program_config;
 	address_space *     m_program;
-	direct_read_data *  m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	// internal state
 	int                 m_icount;
@@ -130,19 +125,6 @@ private:
 	typedef void (score7_cpu_device::*op_handler)();
 	static const op_handler s_opcode32_table[4*8];
 	static const op_handler s_opcode16_table[8];
-
-	// mnemonics
-	static const char *const m_cond[16];
-	static const char *const m_tcs[4];
-	static const char *const m_rix1_op[8];
-	static const char *const m_rix2_op[8];
-	static const char *const m_r2_op[16];
-	static const char *const m_i1_op[8];
-	static const char *const m_i2_op[8];
-	static const char *const m_ls_op[8];
-	static const char *const m_i1a_op[8];
-	static const char *const m_i1b_op[8];
-	static const char *const m_cr_op[2];
 };
 
 DECLARE_DEVICE_TYPE(SCORE7, score7_cpu_device)

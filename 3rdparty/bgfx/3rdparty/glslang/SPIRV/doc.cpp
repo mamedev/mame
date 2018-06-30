@@ -68,9 +68,9 @@ namespace spv {
 // Also, the ceilings are declared next to these, to help keep them in sync.
 // Ceilings should be
 //  - one more than the maximum value an enumerant takes on, for non-mask enumerants
-//    (for non-sparse enums, this is the number of enumurants)
+//    (for non-sparse enums, this is the number of enumerants)
 //  - the number of bits consumed by the set of masks
-//    (for non-sparse mask enums, this is the number of enumurants)
+//    (for non-sparse mask enums, this is the number of enumerants)
 //
 
 const int SourceLanguageCeiling = 6; // HLSL todo: need official enumerant
@@ -175,12 +175,13 @@ const char* ExecutionModeString(int mode)
     case 31: return "ContractionOff";
     case 32: return "Bad";
 
+    case 4446:  return "PostDepthCoverage";
     case ExecutionModeCeiling:
     default: return "Bad";
     }
 }
 
-const int StorageClassCeiling = 12;
+const int StorageClassCeiling = 13;
 
 const char* StorageClassString(int StorageClass)
 {
@@ -197,6 +198,7 @@ const char* StorageClassString(int StorageClass)
     case 9:  return "PushConstant";
     case 10: return "AtomicCounter";
     case 11: return "Image";
+    case 12: return "StorageBuffer";
 
     case StorageClassCeiling:
     default: return "Bad";
@@ -329,6 +331,7 @@ const char* BuiltInString(int builtIn)
     case 4424: return "BaseVertex";
     case 4425: return "BaseInstance";
     case 4426: return "DrawIndex";
+    case 5014: return "FragStencilRefEXT";
 
 #ifdef AMD_EXTENSIONS
     case 4992: return "BaryCoordNoPerspAMD";
@@ -635,13 +638,15 @@ const char* SelectControlString(int cont)
     }
 }
 
-const int LoopControlCeiling = 2;
+const int LoopControlCeiling = 4;
 
 const char* LoopControlString(int cont)
 {
     switch (cont) {
     case 0:  return "Unroll";
     case 1:  return "DontUnroll";
+    case 2:  return "DependencyInfinite";
+    case 3:  return "DependencyLength";
 
     case LoopControlCeiling:
     default: return "Bad";
@@ -830,9 +835,25 @@ const char* CapabilityString(int info)
     case 4427: return "DrawParameters";
     case 4431: return "SubgroupVoteKHR";
 
+    case 4433: return "StorageUniformBufferBlock16";
+    case 4434: return "StorageUniform16";
+    case 4435: return "StoragePushConstant16";
+    case 4436: return "StorageInputOutput16";
+
     case 4437: return "DeviceGroup";
     case 4439: return "MultiView";
 
+    case 5013: return "StencilExportEXT";
+
+#ifdef AMD_EXTENSIONS
+    case 5009: return "ImageGatherBiasLodAMD";
+    case 5010: return "FragmentMaskAMD";
+    case 5015: return "ImageReadWriteLodAMD";
+#endif
+
+    case 4445: return "AtomicStorageOps";
+
+    case 4447: return "SampleMaskPostDepthCoverage";
 #ifdef NV_EXTENSIONS
     case 5251: return "GeometryShaderPassthroughNV";
     case 5254: return "ShaderViewportIndexLayerNV";
@@ -1187,6 +1208,9 @@ const char* OpcodeString(int op)
     case 5005: return "OpGroupFMaxNonUniformAMD";
     case 5006: return "OpGroupUMaxNonUniformAMD";
     case 5007: return "OpGroupSMaxNonUniformAMD";
+
+    case 5011: return "OpFragmentMaskFetchAMD";
+    case 5012: return "OpFragmentFetchAMD";
 #endif
 
     case OpcodeCeiling:
@@ -2849,6 +2873,15 @@ void Parameterize()
     InstructionDesc[OpGroupFMaxNonUniformAMD].operands.push(OperandScope, "'Execution'");
     InstructionDesc[OpGroupFMaxNonUniformAMD].operands.push(OperandGroupOperation, "'Operation'");
     InstructionDesc[OpGroupFMaxNonUniformAMD].operands.push(OperandId, "X");
+
+    InstructionDesc[OpFragmentMaskFetchAMD].capabilities.push_back(CapabilityFragmentMaskAMD);
+    InstructionDesc[OpFragmentMaskFetchAMD].operands.push(OperandId, "'Image'");
+    InstructionDesc[OpFragmentMaskFetchAMD].operands.push(OperandId, "'Coordinate'");
+
+    InstructionDesc[OpFragmentFetchAMD].capabilities.push_back(CapabilityFragmentMaskAMD);
+    InstructionDesc[OpFragmentFetchAMD].operands.push(OperandId, "'Image'");
+    InstructionDesc[OpFragmentFetchAMD].operands.push(OperandId, "'Coordinate'");
+    InstructionDesc[OpFragmentFetchAMD].operands.push(OperandId, "'Fragment Index'");
 #endif
 }
 

@@ -43,6 +43,9 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdint.h>
+#include <cstdio>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 namespace glslang {
 
@@ -184,22 +187,18 @@ void ReleaseGlobalLock()
   pthread_mutex_unlock(&gMutex);
 }
 
-// TODO: non-windows: if we need these on linux, flesh them out
-void* OS_CreateThread(TThreadEntrypoint /*entry*/)
-{
-    return 0;
-}
-
-void OS_WaitForAllThreads(void* /*threads*/, int /*numThreads*/)
-{
-}
-
-void OS_Sleep(int /*milliseconds*/)
-{
-}
+// #define DUMP_COUNTERS
 
 void OS_DumpMemoryCounters()
 {
+#ifdef DUMP_COUNTERS
+    struct rusage usage;
+
+    if (getrusage(RUSAGE_SELF, &usage) == 0)
+        printf("Working set size: %ld\n", usage.ru_maxrss * 1024);
+#else
+    printf("Recompile with DUMP_COUNTERS defined to see counters.\n");
+#endif
 }
 
 } // end namespace glslang

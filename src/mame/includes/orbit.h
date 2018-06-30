@@ -13,6 +13,7 @@
 #include "machine/74259.h"
 #include "machine/timer.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Discrete Sound Input Nodes */
@@ -41,9 +42,10 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void orbit(machine_config &config);
+
+protected:
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
-	DECLARE_WRITE_LINE_MEMBER(heat_rst_led_w);
-	DECLARE_WRITE_LINE_MEMBER(hyper_led_w);
 	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -55,14 +57,15 @@ public:
 	DECLARE_WRITE8_MEMBER(orbit_noise_amp_w);
 	DECLARE_WRITE8_MEMBER(orbit_noise_rst_w);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void orbit_map(address_map &map);
 
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void update_misc_flags(address_space &space, uint8_t val);
 
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
@@ -82,6 +85,6 @@ protected:
 };
 /*----------- defined in audio/orbit.c -----------*/
 
-DISCRETE_SOUND_EXTERN( orbit );
+DISCRETE_SOUND_EXTERN( orbit_discrete );
 
 #endif // MAME_INCLUDES_ORBIT_H

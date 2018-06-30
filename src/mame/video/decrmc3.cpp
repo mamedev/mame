@@ -30,34 +30,6 @@ deco_rmc3_device::deco_rmc3_device(const machine_config &mconfig, const char *ta
 
 
 //**************************************************************************
-//  INITIALIZATION AND CONFIGURATION
-//**************************************************************************
-
-void deco_rmc3_device::static_set_init(device_t &device, deco_rmc3_palette_init_delegate init)
-{
-	downcast<deco_rmc3_device &>(device).m_init = init;
-}
-
-
-void deco_rmc3_device::static_set_entries(device_t &device, u32 entries)
-{
-	downcast<deco_rmc3_device &>(device).m_entries = entries;
-}
-
-
-void deco_rmc3_device::static_set_indirect_entries(device_t &device, u32 entries)
-{
-	downcast<deco_rmc3_device &>(device).m_indirect_entries = entries;
-}
-
-void deco_rmc3_device::static_set_prom_region(device_t &device, const char *region)
-{
-	downcast<deco_rmc3_device &>(device).m_prom_region.set_tag(region);
-}
-
-
-
-//**************************************************************************
 //  GENERIC WRITE HANDLERS
 //**************************************************************************
 
@@ -92,35 +64,35 @@ inline void deco_rmc3_device::update_for_write(offs_t byte_offset, int bytes_mod
 //  write - write a byte to the base paletteram
 //-------------------------------------------------
 
-WRITE8_MEMBER(deco_rmc3_device::write)
+WRITE8_MEMBER(deco_rmc3_device::write8)
 {
 	m_paletteram.write8(offset, data);
 	update_for_write(offset, 1);
 }
 
-WRITE16_MEMBER(deco_rmc3_device::write)
+WRITE16_MEMBER(deco_rmc3_device::write16)
 {
 	m_paletteram.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
 }
 
-WRITE32_MEMBER(deco_rmc3_device::write)
+WRITE32_MEMBER(deco_rmc3_device::write32)
 {
 	m_paletteram.write32(offset, data, mem_mask);
 	update_for_write(offset * 4, 4);
 }
 
-READ8_MEMBER(deco_rmc3_device::read)
+READ8_MEMBER(deco_rmc3_device::read8)
 {
 	return m_paletteram.read8(offset);
 }
 
-READ16_MEMBER(deco_rmc3_device::read)
+READ16_MEMBER(deco_rmc3_device::read16)
 {
 	return m_paletteram.read16(offset);
 }
 
-READ32_MEMBER(deco_rmc3_device::read)
+READ32_MEMBER(deco_rmc3_device::read32)
 {
 	return m_paletteram.read32(offset);
 }
@@ -131,14 +103,14 @@ READ32_MEMBER(deco_rmc3_device::read)
 //  paletteram
 //-------------------------------------------------
 
-WRITE8_MEMBER(deco_rmc3_device::write_ext)
+WRITE8_MEMBER(deco_rmc3_device::write8_ext)
 {
 	m_paletteram_ext.write8(offset, data);
 	update_for_write(offset, 1);
 }
 
 
-WRITE16_MEMBER(deco_rmc3_device::write_ext)
+WRITE16_MEMBER(deco_rmc3_device::write16_ext)
 {
 	m_paletteram_ext.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);

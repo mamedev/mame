@@ -72,8 +72,8 @@ public:
 	virtual space_config_vector memory_space_config() const override;
 
 	typedef delegate<uint32_t (bool)> a20_cb;
-	static void static_set_a20_callback(device_t &device, a20_cb object) { downcast<i80286_cpu_device &>(device).m_a20_callback = object; }
-	template <class Object> static devcb_base &static_set_shutdown_callback(device_t &device, Object &&cb) { return downcast<i80286_cpu_device &>(device).m_out_shutdown_func.set_callback(std::forward<Object>(cb)); }
+	template <typename Object> void set_a20_callback(Object &&cb) { m_a20_callback = std::forward<Object>(cb); }
+	template <class Object> devcb_base &set_shutdown_callback(Object &&cb) { return m_out_shutdown_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	virtual void execute_run() override;
@@ -95,7 +95,6 @@ protected:
 	virtual void write_port_word(uint16_t port, uint16_t data) override;
 
 	// Executing instructions
-	virtual uint8_t fetch_op() override;
 	virtual uint8_t fetch() override;
 	virtual uint32_t calc_addr(int seg, uint16_t offset, int size, int op, bool override = true) override;
 
@@ -112,7 +111,7 @@ private:
 	void switch_task(uint16_t ntask, int type);
 	void trap(uint32_t error);
 	int verify(uint16_t selector, int operation, uint8_t rights, bool valid);
-	uint32_t pc() { return m_pc = m_base[CS] + m_ip; }
+	uint32_t update_pc() { return m_pc = m_base[CS] + m_ip; }
 
 	int m_trap_level;
 	uint16_t m_msw;
@@ -163,9 +162,9 @@ private:
 };
 
 #define MCFG_80286_A20(_class, _a20_cb) \
-		i80286_cpu_device::static_set_a20_callback(*device, i80286_cpu_device::a20_cb(&_class::_a20_cb, (_class *)owner));
+	downcast<i80286_cpu_device &>(*device).set_a20_callback(i80286_cpu_device::a20_cb(&_class::_a20_cb, this));
 
 #define MCFG_80286_SHUTDOWN(_devcb) \
-	devcb = &i80286_cpu_device::static_set_shutdown_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<i80286_cpu_device &>(*device).set_shutdown_callback(DEVCB_##_devcb);
 
 #endif // MAME_CPU_I86_I286_H

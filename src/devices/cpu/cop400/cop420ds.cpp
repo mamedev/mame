@@ -9,11 +9,17 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "cop420ds.h"
 
-CPU_DISASSEMBLE(cop420)
+u32 cop420_disassembler::opcode_alignment() const
 {
-	uint8_t opcode = oprom[0];
-	uint8_t next_opcode = oprom[1];
+	return 1;
+}
+
+offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	uint8_t opcode = opcodes.r8(pc);
+	uint8_t next_opcode = opcodes.r8(pc+1);
 	uint16_t address;
 	uint32_t flags = 0;
 	int bytes = 1;
@@ -38,7 +44,7 @@ CPU_DISASSEMBLE(cop420)
 			{
 				address = (uint16_t)(0x80 | (opcode & 0x3F));
 				util::stream_format(stream, "JSRP %03X", address);
-				flags = DASMFLAG_STEP_OVER;
+				flags = STEP_OVER;
 			}
 		}
 	}
@@ -72,7 +78,7 @@ CPU_DISASSEMBLE(cop420)
 	{
 		address = ((opcode & 0x03) << 8) | next_opcode;
 		util::stream_format(stream, "JSR %03X", address);
-		flags = DASMFLAG_STEP_OVER;
+		flags = STEP_OVER;
 		bytes = 2;
 	}
 	else if (opcode >= 0x70 && opcode <= 0x7F)
@@ -346,12 +352,12 @@ CPU_DISASSEMBLE(cop420)
 
 		case 0x48:
 			util::stream_format(stream, "RET");
-			flags = DASMFLAG_STEP_OUT;
+			flags = STEP_OUT;
 			break;
 
 		case 0x49:
 			util::stream_format(stream, "RETSK");
-			flags = DASMFLAG_STEP_OUT;
+			flags = STEP_OUT;
 			break;
 
 		case 0x4A:
@@ -396,5 +402,5 @@ CPU_DISASSEMBLE(cop420)
 		}
 	}
 
-	return bytes | flags | DASMFLAG_SUPPORTED;
+	return bytes | flags | SUPPORTED;
 }

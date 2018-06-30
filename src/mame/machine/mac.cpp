@@ -127,7 +127,7 @@ void mac_fdc_set_enable_lines(device_t *device, int enable_mask)
 {
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
-	if (mac->m_model != MODEL_MAC_SE)
+	if (mac->m_model != mac_state::MODEL_MAC_SE)
 	{
 		sony_set_enable_lines(device, enable_mask);
 	}
@@ -1021,7 +1021,7 @@ WRITE16_MEMBER ( mac_state::macii_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
 
-//  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
 
 	if ((reg == 0) && (offset == 0x100))
 	{
@@ -1166,7 +1166,7 @@ void mac_state::scc_mouse_irq(int x, int y)
 
 READ16_MEMBER ( mac_state::mac_scc_r )
 {
-	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
+	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	uint16_t result;
 
 	result = scc->reg_r(space, offset);
@@ -1177,13 +1177,13 @@ READ16_MEMBER ( mac_state::mac_scc_r )
 
 WRITE16_MEMBER ( mac_state::mac_scc_w )
 {
-	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
+	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	scc->reg_w(space, offset, data);
 }
 
 WRITE16_MEMBER ( mac_state::mac_scc_2_w )
 {
-	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
+	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	scc->reg_w(space, offset, data >> 8);
 }
 
@@ -1202,22 +1202,22 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	 */
 
 	uint16_t result = 0;
-	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	result = fdc->read(offset >> 8);
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, space.device().safe_pc());
+		printf("%s mac_iwm_r: offset=0x%08x mem_mask %04x = %02x\n", machine().describe_context().c_str(), offset, mem_mask, result);
 
 	return (result << 8) | result;
 }
 
 WRITE16_MEMBER ( mac_state::mac_iwm_w )
 {
-	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
 		fdc->write((offset >> 8), data & 0xff);
@@ -1288,7 +1288,7 @@ WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 
 READ8_MEMBER(mac_state::mac_via_in_a)
 {
-//  printf("VIA1 IN_A (PC %x)\n", m_maincpu->safe_pc());
+//  printf("%s VIA1 IN_A\n", machine().describe_context().c_str());
 
 	switch (m_model)
 	{
@@ -1343,7 +1343,7 @@ READ8_MEMBER(mac_state::mac_via_in_a)
 
 READ8_MEMBER(mac_state::mac_via_in_a_pmu)
 {
-//  printf("VIA1 IN_A (PC %x)\n", m_maincpu->safe_pc());
+//  printf("%s VIA1 IN_A\n", machine().describe_context().c_str());
 
 	#if LOG_ADB
 //  printf("Read PM data %x\n", m_pm_data_recv);
@@ -1355,11 +1355,8 @@ READ8_MEMBER(mac_state::mac_via_in_b)
 {
 	int val = 0;
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (machine().first_screen())
-	{
-		if (machine().first_screen()->vpos() >= MAC_V_VIS)
-			val |= 0x40;
-	}
+	if (m_screen->vpos() >= MAC_V_VIS)
+		val |= 0x40;
 
 	if (ADB_IS_BITBANG_CLASS)
 	{
@@ -1392,7 +1389,36 @@ READ8_MEMBER(mac_state::mac_via_in_b)
 		val |= m_rtc->data_r();
 	}
 
-//  printf("VIA1 IN_B = %02x (PC %x)\n", val, m_maincpu->safe_pc());
+//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
+
+	return val;
+}
+
+READ8_MEMBER(mac_state::mac_via_in_b_ii)
+{
+	int val = 0;
+
+	if (ADB_IS_BITBANG_CLASS)
+	{
+		val |= m_adb_state<<4;
+
+		if (!m_adb_irq_pending)
+		{
+			val |= 0x08;
+		}
+
+		val |= m_rtc->data_r();
+	}
+	else if (ADB_IS_EGRET)
+	{
+		val |= m_egret->get_xcvr_session()<<3;
+	}
+	else if (ADB_IS_CUDA)
+	{
+		val |= m_cuda->get_treq()<<3;
+	}
+
+//  printf("%s VIA1 IN_B_II = %02x\n", machine().describe_context().c_str(), val);
 
 	return val;
 }
@@ -1402,13 +1428,12 @@ READ8_MEMBER(mac_state::mac_via_in_b_via2pmu)
 	int val = 0;
 	// TODO: is this valid for VIA2 PMU machines?
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (machine().first_screen())
-	{
-		if (machine().first_screen()->vpos() >= MAC_V_VIS)
-			val |= 0x40;
-	}
 
-//  printf("VIA1 IN_B = %02x (PC %x)\n", val, m_maincpu->safe_pc());
+	if (m_screen->vpos() >= MAC_V_VIS)
+		val |= 0x40;
+
+
+//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
 
 	return val;
 }
@@ -1419,7 +1444,7 @@ READ8_MEMBER(mac_state::mac_via_in_b_pmu)
 //  printf("Read VIA B: PM_ACK %x\n", m_pm_ack);
 	val = 0x80 | 0x04 | m_pm_ack;   // SCC wait/request (bit 2 must be set at 900c1a or startup tests always fail)
 
-//  printf("VIA1 IN_B = %02x (PC %x)\n", val, m_maincpu->safe_pc());
+//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
 
 	return val;
 }
@@ -1427,7 +1452,7 @@ READ8_MEMBER(mac_state::mac_via_in_b_pmu)
 WRITE8_MEMBER(mac_state::mac_via_out_a)
 {
 	device_t *fdc = machine().device("fdc");
-//  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("%s VIA1 OUT A: %02x\n", machine().describe_context().c_str(), data);
 
 	set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
@@ -1459,7 +1484,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 
 WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
 {
-//  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("%s VIA1 OUT A: %02x\n", machine().describe_context().c_str(), data);
 
 	#if LOG_ADB
 //  printf("%02x to PM\n", data);
@@ -1470,7 +1495,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
 
 WRITE8_MEMBER(mac_state::mac_via_out_b)
 {
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
 	if (AUDIO_IS_CLASSIC)
 	{
@@ -1505,7 +1530,7 @@ void mac_state::update_volume(void)
 
 WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
 {
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
 	// SE and Classic have SCSI enable/disable here
 	if ((m_model == MODEL_MAC_SE) || (m_model == MODEL_MAC_CLASSIC))
@@ -1535,10 +1560,10 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
 
 WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
 {
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
 	#if LOG_ADB
-	printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, space.device().safe_pc());
+	printf("%s 68K: New Egret state: SS %d VF %d\n", machine().describe_context().c_str(), (data>>5)&1, (data>>4)&1);
 	#endif
 	m_egret->set_via_full((data&0x10) ? 1 : 0);
 	m_egret->set_sys_session((data&0x20) ? 1 : 0);
@@ -1546,10 +1571,10 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
 
 WRITE8_MEMBER(mac_state::mac_via_out_b_cdadb)
 {
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
 	#if LOG_ADB
-	printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, space.device().safe_pc());
+	printf("%s 68K: New Cuda state: TIP %d BYTEACK %d\n", machine().describe_context().c_str(), (data>>5)&1, (data>>4)&1);
 	#endif
 	m_cuda->set_byteack((data&0x10) ? 1 : 0);
 	m_cuda->set_tip((data&0x20) ? 1 : 0);
@@ -1557,12 +1582,12 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_cdadb)
 
 WRITE8_MEMBER(mac_state::mac_via_out_b_via2pmu)
 {
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 }
 
 WRITE8_MEMBER(mac_state::mac_via_out_b_pmu)
 {
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
 	device_t *fdc = machine().device("fdc");
 
@@ -1682,7 +1707,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 	data = m_via2->read(space, offset);
 
 	if (LOG_VIA)
-		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, space.device().safe_pc());
+		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, m_maincpu->pc());
 
 	return (data & 0xff) | (data << 8);
 }
@@ -1693,7 +1718,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 	offset &= 0x0f;
 
 	if (LOG_VIA)
-		logerror("mac_via2_w: offset=%x data=0x%08x mask=%x (PC=%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		logerror("mac_via2_w: offset=%x data=0x%08x mask=%x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
 		m_via2->write(space, offset, data & 0xff);
@@ -1725,7 +1750,7 @@ READ8_MEMBER(mac_state::mac_via2_in_a_pmu)
 
 READ8_MEMBER(mac_state::mac_via2_in_b)
 {
-//  logerror("VIA2 IN B (PC %x)\n", m_maincpu->safe_pc());
+//  logerror("%s VIA2 IN B\n", machine().describe_context());
 
 	if ((m_model == MODEL_MAC_LC) || (m_model == MODEL_MAC_LC_II) || (m_model == MODEL_MAC_CLASSIC_II))
 	{
@@ -1742,7 +1767,7 @@ READ8_MEMBER(mac_state::mac_via2_in_b)
 
 READ8_MEMBER(mac_state::mac_via2_in_b_pmu)
 {
-//  logerror("VIA2 IN B (PC %x)\n", m_maincpu->safe_pc());
+//  logerror("%s VIA2 IN B\n", machine().describe_context());
 
 	if (m_pm_ack == 2)
 	{
@@ -1756,18 +1781,18 @@ READ8_MEMBER(mac_state::mac_via2_in_b_pmu)
 
 WRITE8_MEMBER(mac_state::mac_via2_out_a)
 {
-//  logerror("VIA2 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  logerror("%s VIA2 OUT A: %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(mac_state::mac_via2_out_a_pmu)
 {
-//  logerror("VIA2 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  logerror("%s VIA2 OUT A: %02x\n", machine().describe_context(), data);
 	m_pm_data_send = data;
 }
 
 WRITE8_MEMBER(mac_state::mac_via2_out_b)
 {
-//  logerror("VIA2 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  logerror("%s VIA2 OUT B: %02x\n", machine().describe_context(), data);
 
 	// chain 60.15 Hz to VIA1
 	m_via1->write_ca1(data>>7);
@@ -1781,7 +1806,7 @@ WRITE8_MEMBER(mac_state::mac_via2_out_b)
 
 WRITE8_MEMBER(mac_state::mac_via2_out_b_pmu)
 {
-//  logerror("VIA2 OUT B PMU: %02x (PC %x)\n", data, m_maincpu->pc());
+//  logerror("%s VIA2 OUT B PMU: %02x\n", machine().describe_context(), data);
 
 	if ((data & 4) && !(m_pm_req & 4))
 	{
@@ -1866,10 +1891,15 @@ void mac_state::machine_start()
 		}
 	}
 
-	if (machine().first_screen())
+	if (m_screen)
 	{
 		this->m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_scanline_tick),this));
-		this->m_scanline_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+		this->m_scanline_timer->adjust(m_screen->time_until_pos(0, 0));
+	}
+	else
+	{
+		m_adbupdate_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_adbrefresh_tick),this));
+		m_adbupdate_timer->adjust(attotime::from_hz(70));
 	}
 
 	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_6015_tick),this));
@@ -2167,7 +2197,7 @@ void mac_state::mac_driver_init(model_t model)
 }
 
 #define MAC_DRIVER_INIT(label, model)   \
-DRIVER_INIT_MEMBER(mac_state,label)     \
+void mac_state::init_##label()     \
 {   \
 	mac_driver_init(model); \
 }
@@ -2305,6 +2335,12 @@ void mac_state::vblank_irq()
 	}
 }
 
+TIMER_CALLBACK_MEMBER(mac_state::mac_adbrefresh_tick)
+{
+	vblank_irq();
+	m_adbupdate_timer->adjust(attotime::from_hz(70));
+}
+
 TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 {
 	int scanline;
@@ -2320,7 +2356,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 		}
 	}
 
-	scanline = machine().first_screen()->vpos();
+	scanline = m_screen->vpos();
 	if (scanline == MAC_V_VIS)
 		vblank_irq();
 
@@ -2331,7 +2367,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 			mouse_callback();
 	}
 
-	m_scanline_timer->adjust(machine().first_screen()->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
+	m_scanline_timer->adjust(m_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
 }
 
 WRITE_LINE_MEMBER(mac_state::nubus_irq_9_w)
@@ -3190,20 +3226,20 @@ const char *lookup_trap(uint16_t opcode)
 
 
 
-offs_t mac_state::mac_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t mac_state::mac_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
 {
 	uint16_t opcode;
 	unsigned result = 0;
 	const char *trap;
 
-	opcode = oprom[0]<<8 | oprom[1];
+	opcode = opcodes.r16(pc);
 	if ((opcode & 0xF000) == 0xA000)
 	{
 		trap = lookup_trap(opcode);
 		if (trap != nullptr)
 		{
 			stream << trap;
-			result = 2;
+			result = 2 | util::disasm_interface::SUPPORTED;
 		}
 	}
 	return result;

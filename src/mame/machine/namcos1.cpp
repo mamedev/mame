@@ -19,13 +19,13 @@ WRITE8_MEMBER( namcos1_state::_3dcs_w )
 
 READ8_MEMBER( namcos1_state::no_key_r )
 {
-	popmessage("CPU %s PC %08x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
+	popmessage("%s: keychip read %04x\n", m_mcu->tag(), m_mcu->pc(), offset);
 	return 0;
 }
 
 WRITE8_MEMBER( namcos1_state::no_key_w )
 {
-	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
+	popmessage("%s: keychip write %04x=%02x\n", m_mcu->tag(), m_mcu->pc(), offset, data);
 }
 
 
@@ -130,7 +130,7 @@ CPU #0 PC e3d4: keychip read 0003     [AND #$37 = key no.]
 */
 READ8_MEMBER( namcos1_state::key_type1_r )
 {
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
+//  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
 	if (offset < 3)
 	{
@@ -161,7 +161,7 @@ READ8_MEMBER( namcos1_state::key_type1_r )
 
 WRITE8_MEMBER( namcos1_state::key_type1_w )
 {
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
+//  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
 	if (offset < 4)
 		m_key[offset] = data;
@@ -313,7 +313,7 @@ CPU #0 PC e574: keychip read 0001
 
 READ8_MEMBER( namcos1_state::key_type2_r )
 {
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
+//  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
 	m_key_numerator_high_word = 0;
 
@@ -332,7 +332,7 @@ READ8_MEMBER( namcos1_state::key_type2_r )
 
 WRITE8_MEMBER( namcos1_state::key_type2_w )
 {
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
+//  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
 	if (offset < 5)
 	{
@@ -439,7 +439,7 @@ CPU #0 PC e45a: keychip read 0030     [discarded]
 
 READ8_MEMBER( namcos1_state::key_type3_r )
 {
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
+//  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
 	/* I need to handle blastoff's read from 0858. The game previously writes to 0858,
 	   using it as temporary storage, so maybe it expects to act as RAM, however
@@ -455,14 +455,14 @@ READ8_MEMBER( namcos1_state::key_type3_r )
 	if (op == m_key_bottom4) return (offset << 4) | (m_key[m_key_swap4_arg] & 0x0f);
 	if (op == m_key_top4)    return (offset << 4) | (m_key[m_key_swap4_arg] >> 4);
 
-	popmessage("CPU %s PC %08x: keychip read %04x", space.device().tag(), space.device().safe_pc(), offset);
+	popmessage("%s: keychip read %04x", machine().describe_context(), offset);
 
 	return 0;
 }
 
 WRITE8_MEMBER( namcos1_state::key_type3_w )
 {
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
+//  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
 	m_key[(offset & 0x70) >> 4] = data;
 }
@@ -490,7 +490,7 @@ WRITE8_MEMBER(namcos1_state::sound_bankswitch_w)
 
 WRITE_LINE_MEMBER(namcos1_state::subres_w)
 {
-//  logerror("reset control pc=%04x %02x\n",space.device().safe_pc(),data);
+//  logerror("reset control %s %02x\n",machine().describe_context(),data);
 	if (state != m_reset)
 	{
 		m_mcu_patch_data = 0;
@@ -582,7 +582,7 @@ WRITE8_MEMBER(namcos1_state::mcu_bankswitch_w)
 
 WRITE8_MEMBER(namcos1_state::mcu_patch_w)
 {
-	//logerror("mcu C000 write pc=%04x data=%02x\n",space.device().safe_pc(),data);
+	//logerror("mcu C000 write %s data=%02x\n",machine().describe_context(),data);
 	if (m_mcu_patch_data == 0xa6) return;
 	m_mcu_patch_data = data;
 	m_triram[0] = data;
@@ -625,7 +625,7 @@ void namcos1_state::driver_init()
 /*******************************************************************************
 *   Shadowland / Youkai Douchuuki specific                                     *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,shadowld)
+void namcos1_state::init_shadowld()
 {
 	driver_init();
 }
@@ -633,7 +633,7 @@ DRIVER_INIT_MEMBER(namcos1_state,shadowld)
 /*******************************************************************************
 *   Dragon Spirit specific (CUS136)                                            *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,dspirit)
+void namcos1_state::init_dspirit()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -645,7 +645,7 @@ DRIVER_INIT_MEMBER(namcos1_state,dspirit)
 /*******************************************************************************
 *   World Court specific (CUS143)                                              *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,wldcourt)
+void namcos1_state::init_wldcourt()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -657,7 +657,7 @@ DRIVER_INIT_MEMBER(namcos1_state,wldcourt)
 /*******************************************************************************
 *   Blazer specific (CUS144)                                                   *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,blazer)
+void namcos1_state::init_blazer()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -669,7 +669,7 @@ DRIVER_INIT_MEMBER(namcos1_state,blazer)
 /*******************************************************************************
 *   Puzzle Club specific                                                       *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,puzlclub)
+void namcos1_state::init_puzlclub()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -681,7 +681,7 @@ DRIVER_INIT_MEMBER(namcos1_state,puzlclub)
 /*******************************************************************************
 *   Pac-Mania specific (CUS151)                                                *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,pacmania)
+void namcos1_state::init_pacmania()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -696,7 +696,7 @@ DRIVER_INIT_MEMBER(namcos1_state,pacmania)
 /*******************************************************************************
 *   Alice in Wonderland / Marchen Maze specific (CUS152)                       *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,alice)
+void namcos1_state::init_alice()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -711,7 +711,7 @@ DRIVER_INIT_MEMBER(namcos1_state,alice)
 /*******************************************************************************
 *   Galaga '88 specific (CUS153)                                               *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,galaga88)
+void namcos1_state::init_galaga88()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -726,7 +726,7 @@ DRIVER_INIT_MEMBER(namcos1_state,galaga88)
 /*******************************************************************************
 *   World Stadium specific (CUS154)                                            *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,ws)
+void namcos1_state::init_ws()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -741,7 +741,7 @@ DRIVER_INIT_MEMBER(namcos1_state,ws)
 /*******************************************************************************
 *   Bakutotsu Kijuutei specific (CUS155)                                       *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,bakutotu)
+void namcos1_state::init_bakutotu()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -756,7 +756,7 @@ DRIVER_INIT_MEMBER(namcos1_state,bakutotu)
 /*******************************************************************************
 *   Splatter House specific (CUS181)                                           *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,splatter)
+void namcos1_state::init_splatter()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -774,7 +774,7 @@ DRIVER_INIT_MEMBER(namcos1_state,splatter)
 /*******************************************************************************
 *   Rompers specific (CUS182)                                                  *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,rompers)
+void namcos1_state::init_rompers()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -792,7 +792,7 @@ DRIVER_INIT_MEMBER(namcos1_state,rompers)
 /*******************************************************************************
 *   Blast Off specific (CUS183)                                                *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,blastoff)
+void namcos1_state::init_blastoff()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -810,7 +810,7 @@ DRIVER_INIT_MEMBER(namcos1_state,blastoff)
 /*******************************************************************************
 *   World Stadium '89 specific (CUS184)                                        *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,ws89)
+void namcos1_state::init_ws89()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -828,7 +828,7 @@ DRIVER_INIT_MEMBER(namcos1_state,ws89)
 /*******************************************************************************
 *   Tank Force specific (CUS185)                                               *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,tankfrce)
+void namcos1_state::init_tankfrce()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -843,9 +843,9 @@ DRIVER_INIT_MEMBER(namcos1_state,tankfrce)
 	m_key_top4      = -1;
 }
 
-DRIVER_INIT_MEMBER(namcos1_state,tankfrc4)
+void namcos1_state::init_tankfrc4()
 {
-	DRIVER_INIT_CALL(tankfrce);
+	init_tankfrce();
 
 	m_input_count = 0;
 	m_strobe_count = 0;
@@ -860,7 +860,7 @@ DRIVER_INIT_MEMBER(namcos1_state,tankfrc4)
 /*******************************************************************************
 *   Dangerous Seed specific (CUS308)                                           *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,dangseed)
+void namcos1_state::init_dangseed()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -878,7 +878,7 @@ DRIVER_INIT_MEMBER(namcos1_state,dangseed)
 /*******************************************************************************
 *   Pistol Daimyo no Bouken specific (CUS309)                                  *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,pistoldm)
+void namcos1_state::init_pistoldm()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -896,7 +896,7 @@ DRIVER_INIT_MEMBER(namcos1_state,pistoldm)
 /*******************************************************************************
 *   World Stadium '90 specific (CUS310)                                        *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,ws90)
+void namcos1_state::init_ws90()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -914,7 +914,7 @@ DRIVER_INIT_MEMBER(namcos1_state,ws90)
 /*******************************************************************************
 *   Souko Ban DX specific (CUS311)                                             *
 *******************************************************************************/
-DRIVER_INIT_MEMBER(namcos1_state,soukobdx)
+void namcos1_state::init_soukobdx()
 {
 	driver_init();
 	m_c117->space(AS_PROGRAM).install_readwrite_handler(0x2f8000, 0x2f9fff,
@@ -964,7 +964,7 @@ READ8_MEMBER( namcos1_state::quester_paddle_r )
 	}
 }
 
-DRIVER_INIT_MEMBER(namcos1_state,quester)
+void namcos1_state::init_quester()
 {
 	m_strobe = 0;
 	driver_init();
@@ -1052,7 +1052,7 @@ READ8_MEMBER( namcos1_state::berabohm_buttons_r )
 	}
 }
 
-DRIVER_INIT_MEMBER(namcos1_state,berabohm)
+void namcos1_state::init_berabohm()
 {
 	m_input_count = 0;
 	m_strobe = 0;
@@ -1129,7 +1129,7 @@ READ8_MEMBER( namcos1_state::faceoff_inputs_r )
 	}
 }
 
-DRIVER_INIT_MEMBER(namcos1_state,faceoff)
+void namcos1_state::init_faceoff()
 {
 	m_input_count = 0;
 	m_strobe_count = 0;

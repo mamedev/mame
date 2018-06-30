@@ -43,7 +43,7 @@ layout(push_constant) buffer pcb {            // ERROR, not on a buffer
 layout(push_constant) uniform float pcfloat;  // ERROR 2X: not on a non-block, and non-opaque outside block
 
 layout(push_constant) uniform;                // ERROR, needs an object
-
+layout(std430, push_constant) uniform pcb1 { int a; } pcb1inst;
 layout(push_constant) uniform pcb2 {
     int a;
 };                                            // Okay now to have no instance name
@@ -94,4 +94,12 @@ void callUserTexture()
     userTexture(cond ? sampler2D(t2d,s) : sampler2D(t2d,s), vTexCoord);  // ERROR, no ?:, not point of use
 
     gl_NumSamples;   // ERROR, not for Vulkan
+}
+
+void noise()
+{
+    noise1(dv4);
+    noise2(4.0);
+    noise3(vec2(3));
+    noise4(dv4);
 }

@@ -18,12 +18,14 @@
 DEFINE_DEVICE_TYPE(PROF80_MMU, prof80_mmu_device, "prof80_mmu", "PROF80 MMU")
 
 
-DEVICE_ADDRESS_MAP_START( z80_program_map, 8, prof80_mmu_device )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(program_r, program_w)
-ADDRESS_MAP_END
+void prof80_mmu_device::z80_program_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(prof80_mmu_device::program_r), FUNC(prof80_mmu_device::program_w));
+}
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, prof80_mmu_device )
-ADDRESS_MAP_END
+void prof80_mmu_device::program_map(address_map &map)
+{
+}
 
 
 
@@ -38,7 +40,7 @@ ADDRESS_MAP_END
 prof80_mmu_device::prof80_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PROF80_MMU, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_program_space_config("program", ENDIANNESS_LITTLE, 8, 20, 0, *ADDRESS_MAP_NAME(program_map))
+	, m_program_space_config("program", ENDIANNESS_LITTLE, 8, 20, 0, address_map_constructor(FUNC(prof80_mmu_device::program_map), this))
 {
 }
 

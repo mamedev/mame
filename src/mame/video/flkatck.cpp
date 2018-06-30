@@ -18,11 +18,11 @@
 
 TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_A)
 {
-	uint8_t ctrl_0 = m_k007121->ctrlram_r(generic_space(), 0);
-	uint8_t ctrl_2 = m_k007121->ctrlram_r(generic_space(), 2);
-	uint8_t ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
-	uint8_t ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
-	uint8_t ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
+	uint8_t ctrl_0 = m_k007121->ctrlram_r(0);
+	uint8_t ctrl_2 = m_k007121->ctrlram_r(2);
+	uint8_t ctrl_3 = m_k007121->ctrlram_r(3);
+	uint8_t ctrl_4 = m_k007121->ctrlram_r(4);
+	uint8_t ctrl_5 = m_k007121->ctrlram_r(5);
 	int attr = m_k007121_ram[tile_index];
 	int code = m_k007121_ram[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -97,7 +97,7 @@ WRITE8_MEMBER(flkatck_state::flkatck_k007121_regs_w)
 	switch (offset)
 	{
 		case 0x04:  /* ROM bank select */
-			if (data != m_k007121->ctrlram_r(space, 4))
+			if (data != m_k007121->ctrlram_r(4))
 				machine().tilemap().mark_all_dirty();
 			break;
 
@@ -130,7 +130,6 @@ uint32_t flkatck_state::screen_update_flkatck(screen_device &screen, bitmap_ind1
 	rectangle clip[2];
 	const rectangle &visarea = screen.visible_area();
 
-	address_space &space = machine().dummy_space();
 	if (m_flipscreen)
 	{
 		clip[0] = visarea;
@@ -139,8 +138,8 @@ uint32_t flkatck_state::screen_update_flkatck(screen_device &screen, bitmap_ind1
 		clip[1] = visarea;
 		clip[1].min_x = clip[1].max_x - 40;
 
-		m_k007121_tilemap[0]->set_scrollx(0, m_k007121->ctrlram_r(space, 0) - 56 );
-		m_k007121_tilemap[0]->set_scrolly(0, m_k007121->ctrlram_r(space, 2));
+		m_k007121_tilemap[0]->set_scrollx(0, m_k007121->ctrlram_r(0) - 56 );
+		m_k007121_tilemap[0]->set_scrolly(0, m_k007121->ctrlram_r(2));
 		m_k007121_tilemap[1]->set_scrollx(0, -16);
 	}
 	else
@@ -152,8 +151,8 @@ uint32_t flkatck_state::screen_update_flkatck(screen_device &screen, bitmap_ind1
 		clip[1].max_x = 39;
 		clip[1].min_x = 0;
 
-		m_k007121_tilemap[0]->set_scrollx(0, m_k007121->ctrlram_r(space, 0) - 40 );
-		m_k007121_tilemap[0]->set_scrolly(0, m_k007121->ctrlram_r(space, 2));
+		m_k007121_tilemap[0]->set_scrollx(0, m_k007121->ctrlram_r(0) - 40 );
+		m_k007121_tilemap[0]->set_scrolly(0, m_k007121->ctrlram_r(2));
 		m_k007121_tilemap[1]->set_scrollx(0, 0);
 	}
 

@@ -168,7 +168,7 @@ PALETTE_INIT_MEMBER(gsword_state, gsword)
 	/* sprites */
 	for (unsigned i = 0x100; i < 0x200; i++)
 	{
-		uint8_t ctabentry = (BITSWAP8(color_prom[i - 0x100],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
+		uint8_t ctabentry = (bitswap<8>(color_prom[i - 0x100],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }

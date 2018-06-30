@@ -10,7 +10,7 @@
 //============================================================
 
 #include <bx/readerwriter.h>
-#include <bx/crtimpl.h>
+#include <bx/file.h>
 
 #include "emu.h"
 #include "../frontend/mame/ui/slider.h"
@@ -143,7 +143,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 	osd_subst_env(path, util::string_format("%s" PATH_SEPARATOR "chains" PATH_SEPARATOR, m_options.bgfx_path()));
 	path += name;
 
-	bx::CrtFileReader reader;
+	bx::FileReader reader;
 	if (!bx::open(&reader, path.c_str()))
 	{
 		printf("Unable to open chain file %s, falling back to no post processing\n", path.c_str());

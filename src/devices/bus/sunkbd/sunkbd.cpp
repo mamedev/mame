@@ -52,10 +52,14 @@ void sun_keyboard_port_device::device_config_complete()
 }
 
 
-void sun_keyboard_port_device::device_start()
+void sun_keyboard_port_device::device_resolve_objects()
 {
 	m_rxd_handler.resolve_safe();
+}
 
+
+void sun_keyboard_port_device::device_start()
+{
 	save_item(NAME(m_rxd));
 
 	m_rxd = 1;
@@ -87,11 +91,12 @@ device_sun_keyboard_port_interface::~device_sun_keyboard_port_interface()
 
 #include "hlekbd.h"
 
-SLOT_INTERFACE_START( default_sun_keyboard_devices )
-	SLOT_INTERFACE("type3hle",   SUN_TYPE3_HLE_KEYBOARD)
-	SLOT_INTERFACE("type4hle",   SUN_TYPE4_HLE_KEYBOARD)
-	SLOT_INTERFACE("type5hle",   SUN_TYPE5_HLE_KEYBOARD)
-	SLOT_INTERFACE("type5gbhle", SUN_TYPE5_GB_HLE_KEYBOARD)
-	SLOT_INTERFACE("type5sehle", SUN_TYPE5_SE_HLE_KEYBOARD)
-	SLOT_INTERFACE("type5jphle", SUN_TYPE5_JP_HLE_KEYBOARD)
-SLOT_INTERFACE_END
+void default_sun_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("type3hle",   SUN_TYPE3_HLE_KEYBOARD);
+	device.option_add("type4hle",   SUN_TYPE4_HLE_KEYBOARD);
+	device.option_add("type5hle",   SUN_TYPE5_HLE_KEYBOARD);
+	device.option_add("type5gbhle", SUN_TYPE5_GB_HLE_KEYBOARD);
+	device.option_add("type5sehle", SUN_TYPE5_SE_HLE_KEYBOARD);
+	device.option_add("type5jphle", SUN_TYPE5_JP_HLE_KEYBOARD);
+}

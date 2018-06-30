@@ -49,20 +49,21 @@ const tiny_rom_entry *c64_supercpu_device::device_rom_region() const
 //  ADDRESS_MAP( c64_supercpu_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c64_supercpu_map, AS_PROGRAM, 8, c64_supercpu_device )
-	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("sram")
-	AM_RANGE(0x020000, 0xf7ffff) AM_RAM AM_SHARE("dimm")
-	AM_RANGE(0xf80000, 0xf9ffff) AM_MIRROR(0x60000) AM_ROM AM_REGION(G65816_TAG, 0)
-ADDRESS_MAP_END
+void c64_supercpu_device::c64_supercpu_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).ram().share("sram");
+	map(0x020000, 0xf7ffff).ram().share("dimm");
+	map(0xf80000, 0xf9ffff).mirror(0x60000).rom().region(G65816_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_supercpu_device::device_add_mconfig )
-	MCFG_CPU_ADD(G65816_TAG, G65816, 1000000)
-	MCFG_CPU_PROGRAM_MAP(c64_supercpu_map)
+MACHINE_CONFIG_START(c64_supercpu_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(G65816_TAG, G65816, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(c64_supercpu_map)
 
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END

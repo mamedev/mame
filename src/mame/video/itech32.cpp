@@ -206,7 +206,7 @@ void itech32_state::video_start()
 	save_item(NAME(m_grom_bank));
 	save_item(NAME(m_color_latch));
 	save_item(NAME(m_enable_latch));
-	save_pointer(NAME(m_videoram.get()), VRAM_WIDTH * (m_vram_height + 16) * 2);
+	save_pointer(NAME(m_videoram), VRAM_WIDTH * (m_vram_height + 16) * 2);
 }
 
 
@@ -319,7 +319,7 @@ WRITE16_MEMBER(itech32_state::bloodstm_paletteram_w)
 		mem_mask >>= 8;
 	}
 
-	m_palette->write(space, offset, data, mem_mask);
+	m_palette->write16(space, offset, data, mem_mask);
 }
 
 

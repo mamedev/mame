@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
+#include "emupal.h"
 
 class wc90_state : public driver_device
 {
@@ -79,4 +80,10 @@ public:
 	DECLARE_VIDEO_START(wc90t);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void wc90t(machine_config &config);
+	void wc90(machine_config &config);
+	void pac90(machine_config &config);
+	void sound_map(address_map &map);
+	void wc90_map_1(address_map &map);
+	void wc90_map_2(address_map &map);
 };

@@ -37,17 +37,6 @@ tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void tc0280grd_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<tc0280grd_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -61,7 +50,7 @@ void tc0280grd_device::device_start()
 
 	m_ram = make_unique_clear<uint16_t[]>(TC0280GRD_RAM_SIZE / 2);
 
-	save_pointer(NAME(m_ram.get()), TC0280GRD_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram), TC0280GRD_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 }
 

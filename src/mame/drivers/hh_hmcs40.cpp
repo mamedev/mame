@@ -85,7 +85,7 @@
     On MAME they will show with full brightness, see eg. building explosions.
     Currently there's a workaround in place.
   - bzaxxon 3D effect is difficult to simulate
-  - improve SVGs of bzaxxon, bpengo, bbtime
+  - improve/redo SVGs of: bzaxxon, bpengo, bbtime
 
 ***************************************************************************/
 
@@ -364,18 +364,19 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void bambball(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(bambball_state::plate_w)
 {
-	// R1x-R3x(,D0-D3): vfd matrix plate
+	// R1x-R3x(,D0-D3): vfd plate
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 plate = BITSWAP16(m_plate,13,8,4,12,9,10,14,1,7,0,15,11,6,3,5,2);
+	u16 plate = bitswap<16>(m_plate,13,8,4,12,9,10,14,1,7,0,15,11,6,3,5,2);
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -387,7 +388,7 @@ WRITE16_MEMBER(bambball_state::grid_w)
 	// D7-D10: input mux
 	m_inp_mux = data >> 7 & 0xf;
 
-	// D7-D15: vfd matrix grid
+	// D7-D15: vfd grid
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D3: more plates (update display there)
@@ -399,7 +400,6 @@ READ8_MEMBER(bambball_state::input_r)
 	// R0x: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -430,15 +430,15 @@ static INPUT_PORTS_START( bambball )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bambball )
+MACHINE_CONFIG_START(bambball_state::bambball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(bambball_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bambball_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bambball_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bambball_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bambball_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38750, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(*this, bambball_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bambball_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bambball_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bambball_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bambball_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -449,8 +449,8 @@ static MACHINE_CONFIG_START( bambball )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -478,20 +478,21 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void bmboxing(machine_config &config);
 };
 
 // handlers
 
 void bmboxing_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	u32 plate = BITSWAP16(m_plate,15,14,13,12,1,2,0,3,11,4,10,7,5,6,9,8);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	u32 plate = bitswap<16>(m_plate,15,14,13,12,1,2,0,3,11,4,10,7,5,6,9,8);
 	display_matrix(12, 9, plate, grid);
 }
 
 WRITE8_MEMBER(bmboxing_state::plate_w)
 {
-	// R1x-R3x: vfd matrix plate
+	// R1x-R3x: vfd plate
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -505,7 +506,7 @@ WRITE16_MEMBER(bmboxing_state::grid_w)
 	// D9-D12: input mux
 	m_inp_mux = data >> 9 & 0xf;
 
-	// D4-D12: vfd matrix grid
+	// D4-D12: vfd grid
 	m_grid = data >> 4 & 0x1ff;
 	prepare_display();
 }
@@ -515,7 +516,6 @@ READ8_MEMBER(bmboxing_state::input_r)
 	// R0x: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -566,15 +566,15 @@ static INPUT_PORTS_START( bmboxing )
 	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bmboxing )
+MACHINE_CONFIG_START(bmboxing_state::bmboxing)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(bmboxing_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bmboxing_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bmboxing_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bmboxing_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bmboxing_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38750, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(*this, bmboxing_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bmboxing_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bmboxing_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bmboxing_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bmboxing_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.4"))
 
 	/* video hardware */
@@ -586,8 +586,8 @@ static MACHINE_CONFIG_START( bmboxing )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -617,20 +617,21 @@ public:
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void bfriskyt(machine_config &config);
 };
 
 // handlers
 
 void bfriskyt_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP24(m_plate,23,22,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<24>(m_plate,23,22,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21);
 	display_matrix(22, 8, plate, grid);
 }
 
 WRITE8_MEMBER(bfriskyt_state::plate_w)
 {
-	// R0x-R3x: vfd matrix plate
+	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -649,7 +650,7 @@ WRITE16_MEMBER(bfriskyt_state::grid_w)
 		update_int1();
 	}
 
-	// D8-D15: vfd matrix grid
+	// D8-D15: vfd grid
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D5: more plates
@@ -662,7 +663,6 @@ void bfriskyt_state::update_int1()
 	// INT1 on multiplexed inputs
 	set_interrupt(1, read_inputs(5));
 }
-
 
 // config
 
@@ -691,15 +691,15 @@ INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( bfriskyt )
+MACHINE_CONFIG_START(bfriskyt_state::bfriskyt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bfriskyt_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bfriskyt_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bfriskyt_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bfriskyt_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bfriskyt_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bfriskyt_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bfriskyt_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bfriskyt_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bfriskyt_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bfriskyt_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -710,8 +710,8 @@ static MACHINE_CONFIG_START( bfriskyt )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -744,19 +744,20 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ16_MEMBER(input_r);
+	void packmon(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(packmon_state::plate_w)
 {
-	// R0x-R3x(,D0-D3): vfd matrix plate
+	// R0x-R3x(,D0-D3): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,0,1,2,3,4,5,6,19,18,17,16,15,14,13,12,11,10,9,8,7);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,0,1,2,3,4,5,6,19,18,17,16,15,14,13,12,11,10,9,8,7);
 	display_matrix(20, 10, plate, grid);
 }
 
@@ -768,7 +769,7 @@ WRITE16_MEMBER(packmon_state::grid_w)
 	// D11-D15: input mux
 	m_inp_mux = data >> 11 & 0x1f;
 
-	// D6-D15: vfd matrix grid
+	// D6-D15: vfd grid
 	m_grid = data >> 6 & 0x3ff;
 
 	// D0-D3: plate 9-12 (update display there)
@@ -780,7 +781,6 @@ READ16_MEMBER(packmon_state::input_r)
 	// D5: multiplexed inputs
 	return read_inputs(5) & 0x20;
 }
-
 
 // config
 
@@ -801,16 +801,16 @@ static INPUT_PORTS_START( packmon )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( packmon )
+MACHINE_CONFIG_START(packmon_state::packmon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(packmon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(packmon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(packmon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(packmon_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(packmon_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(READ16(packmon_state, input_r))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, packmon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, packmon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, packmon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, packmon_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, packmon_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(READ16(*this, packmon_state, input_r))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -821,8 +821,8 @@ static MACHINE_CONFIG_START( packmon )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -859,20 +859,21 @@ public:
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void msthawk(machine_config &config);
 };
 
 // handlers
 
 void msthawk_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u32 plate = BITSWAP24(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = bitswap<24>(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(21, 10, plate, grid);
 }
 
 WRITE8_MEMBER(msthawk_state::plate_w)
 {
-	// R0x-R3x: vfd matrix plate
+	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -891,7 +892,7 @@ WRITE16_MEMBER(msthawk_state::grid_w)
 		update_int0();
 	}
 
-	// D6-D15: vfd matrix grid
+	// D6-D15: vfd grid
 	m_grid = data >> 6 & 0x3ff;
 
 	// D0-D4: more plates
@@ -904,7 +905,6 @@ void msthawk_state::update_int0()
 	// INT0 on multiplexed inputs
 	set_interrupt(0, read_inputs(6));
 }
-
 
 // config
 
@@ -936,15 +936,15 @@ INPUT_CHANGED_MEMBER(msthawk_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( msthawk )
+MACHINE_CONFIG_START(msthawk_state::msthawk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(msthawk_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(msthawk_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(msthawk_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(msthawk_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(msthawk_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, msthawk_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, msthawk_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, msthawk_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, msthawk_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, msthawk_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -955,8 +955,8 @@ static MACHINE_CONFIG_START( msthawk )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -986,19 +986,20 @@ public:
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void bzaxxon(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(bzaxxon_state::plate_w)
 {
-	// R0x-R3x(,D0-D2): vfd matrix plate
+	// R0x-R3x(,D0-D2): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,6,7,8,9,10,5,4,3,2,1,0);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,5,7,0,1,2,3,4,6,19,16,17,18,15,14,13,12,10,8,9,11) | 0x800;
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,6,7,8,9,10,5,4,3,2,1,0);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,5,7,0,1,2,3,4,6,19,16,17,18,15,14,13,12,10,8,9,11) | 0x800;
 	display_matrix(20, 11, plate, grid);
 }
 
@@ -1015,7 +1016,7 @@ WRITE16_MEMBER(bzaxxon_state::grid_w)
 		update_int1();
 	}
 
-	// D5-D15: vfd matrix grid
+	// D5-D15: vfd grid
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0-D2: plate 7-9 (update display there)
@@ -1027,7 +1028,6 @@ void bzaxxon_state::update_int1()
 	// INT1 on multiplexed inputs
 	set_interrupt(1, read_inputs(4));
 }
-
 
 // config
 
@@ -1057,15 +1057,15 @@ INPUT_CHANGED_MEMBER(bzaxxon_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( bzaxxon )
+MACHINE_CONFIG_START(bzaxxon_state::bzaxxon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 450000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bzaxxon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bzaxxon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bzaxxon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bzaxxon_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bzaxxon_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 450000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bzaxxon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bzaxxon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bzaxxon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bzaxxon_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bzaxxon_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.5"))
 
 	/* video hardware */
@@ -1077,8 +1077,8 @@ static MACHINE_CONFIG_START( bzaxxon )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1106,19 +1106,20 @@ public:
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void zackman(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(zackman_state::plate_w)
 {
-	// R0x-R6x(,D0,D1): vfd matrix plate
+	// R0x-R6x(,D0,D1): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP32(m_plate,31,30,27,0,1,2,3,4,5,6,7,8,9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<32>(m_plate,31,30,27,0,1,2,3,4,5,6,7,8,9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12);
 	display_matrix(29, 8, plate, grid);
 }
 
@@ -1135,7 +1136,7 @@ WRITE16_MEMBER(zackman_state::grid_w)
 		update_int0();
 	}
 
-	// D8-D15: vfd matrix grid
+	// D8-D15: vfd grid
 	m_grid = data >> 8 & 0xff;
 
 	// D0,D1: plate 12,13 (update display there)
@@ -1147,7 +1148,6 @@ void zackman_state::update_int0()
 	// INT0 on multiplexed inputs
 	set_interrupt(0, read_inputs(4));
 }
-
 
 // config
 
@@ -1173,18 +1173,18 @@ INPUT_CHANGED_MEMBER(zackman_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( zackman )
+MACHINE_CONFIG_START(zackman_state::zackman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(zackman_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, zackman_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -1195,8 +1195,8 @@ static MACHINE_CONFIG_START( zackman )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1226,20 +1226,21 @@ public:
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void bpengo(machine_config &config);
 };
 
 // handlers
 
 void bpengo_state::prepare_display()
 {
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP32(m_plate,31,30,29,28,23,22,21,16,17,18,19,20,27,26,25,24,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<32>(m_plate,31,30,29,28,23,22,21,16,17,18,19,20,27,26,25,24,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(25, 8, plate, grid);
 }
 
 WRITE8_MEMBER(bpengo_state::plate_w)
 {
-	// R0x-R6x: vfd matrix plate
+	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -1258,7 +1259,7 @@ WRITE16_MEMBER(bpengo_state::grid_w)
 		update_int0();
 	}
 
-	// D0-D7: vfd matrix grid
+	// D0-D7: vfd grid
 	m_grid = data & 0xff;
 	prepare_display();
 }
@@ -1268,7 +1269,6 @@ void bpengo_state::update_int0()
 	// INT0 on multiplexed inputs
 	set_interrupt(0, read_inputs(4));
 }
-
 
 // config
 
@@ -1300,18 +1300,18 @@ INPUT_CHANGED_MEMBER(bpengo_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( bpengo )
+MACHINE_CONFIG_START(bpengo_state::bpengo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bpengo_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bpengo_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.5"))
 
 	/* video hardware */
@@ -1323,8 +1323,8 @@ static MACHINE_CONFIG_START( bpengo )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1354,20 +1354,21 @@ public:
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void bbtime(machine_config &config);
 };
 
 // handlers
 
 void bbtime_state::prepare_display()
 {
-	u8 grid = BITSWAP8(m_grid,7,6,0,1,2,3,4,5);
-	u32 plate = BITSWAP32(m_plate,31,30,29,28,25,24,26,27,22,23,15,14,12,11,10,8,7,6,4,1,5,9,13,3,2,16,17,18,19,20,0,21) | 0x1;
+	u8 grid = bitswap<8>(m_grid,7,6,0,1,2,3,4,5);
+	u32 plate = bitswap<32>(m_plate,31,30,29,28,25,24,26,27,22,23,15,14,12,11,10,8,7,6,4,1,5,9,13,3,2,16,17,18,19,20,0,21) | 0x1;
 	display_matrix(28, 6, plate, grid);
 }
 
 WRITE8_MEMBER(bbtime_state::plate_w)
 {
-	// R0x-R6x: vfd matrix plate
+	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -1386,7 +1387,7 @@ WRITE16_MEMBER(bbtime_state::grid_w)
 		update_int0();
 	}
 
-	// D4-D9: vfd matrix grid
+	// D4-D9: vfd grid
 	m_grid = data >> 4 & 0x3f;
 	prepare_display();
 }
@@ -1396,7 +1397,6 @@ void bbtime_state::update_int0()
 	// INT0 on multiplexed inputs
 	set_interrupt(0, read_inputs(5));
 }
-
 
 // config
 
@@ -1425,18 +1425,18 @@ INPUT_CHANGED_MEMBER(bbtime_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( bbtime )
+MACHINE_CONFIG_START(bbtime_state::bbtime)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bbtime_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bbtime_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -1447,8 +1447,8 @@ static MACHINE_CONFIG_START( bbtime )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1474,19 +1474,20 @@ public:
 
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
+	void bdoramon(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(bdoramon_state::plate_w)
 {
-	// R0x-R3x(,D0-D3): vfd matrix plate
+	// R0x-R3x(,D0-D3): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,7,6);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,11,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1,0);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,7,6);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,11,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(19, 8, plate, grid);
 }
 
@@ -1495,13 +1496,12 @@ WRITE16_MEMBER(bdoramon_state::grid_w)
 	// D7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
 
-	// D8-D15: vfd matrix grid
+	// D8-D15: vfd grid
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D3: plate 15-18 (update display there)
 	plate_w(space, 4, data & 0xf);
 }
-
 
 // config
 
@@ -1525,16 +1525,16 @@ static INPUT_PORTS_START( bdoramon )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bdoramon )
+MACHINE_CONFIG_START(bdoramon_state::bdoramon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bdoramon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bdoramon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bdoramon_state, plate_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bdoramon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bdoramon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bdoramon_state, plate_w))
 	MCFG_HMCS40_READ_R_CB(2, IOPORT("IN.3"))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bdoramon_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bdoramon_state, grid_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bdoramon_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bdoramon_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.2"))
 
 	/* video hardware */
@@ -1546,8 +1546,8 @@ static MACHINE_CONFIG_START( bdoramon )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1573,19 +1573,20 @@ public:
 
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
+	void bultrman(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(bultrman_state::plate_w)
 {
-	// R0x-R3x(,D0-D2): vfd matrix plate
+	// R0x-R3x(,D0-D2): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,18,17,16,15,14,13,12,3,11,10,9,8,7,6,5,4,1,2);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,0,18,17,16,15,14,13,12,3,11,10,9,8,7,6,5,4,1,2);
 	display_matrix(18, 8, plate, grid);
 }
 
@@ -1594,14 +1595,13 @@ WRITE16_MEMBER(bultrman_state::grid_w)
 	// D7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
 
-	// D8-D15: vfd matrix grid
+	// D8-D15: vfd grid
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D2: plate 15-17 (update display there)
 	//plate_w(space, 4, data & 7);
 	plate_w(space, 4, data & (1 << offset) & 7);
 }
-
 
 // config
 
@@ -1618,15 +1618,15 @@ static INPUT_PORTS_START( bultrman )
 	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bultrman )
+MACHINE_CONFIG_START(bultrman_state::bultrman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 350000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bultrman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bultrman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bultrman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bultrman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bultrman_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 350000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bultrman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bultrman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bultrman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bultrman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bultrman_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
 
 	/* video hardware */
@@ -1638,8 +1638,8 @@ static MACHINE_CONFIG_START( bultrman )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1666,19 +1666,20 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
+	void machiman(machine_config &config);
 };
 
 // handlers
 
 void machiman_state::prepare_display()
 {
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
 	display_matrix(19, 5, plate, m_grid);
 }
 
 WRITE8_MEMBER(machiman_state::plate_w)
 {
-	// R0x-R3x,R6012: vfd matrix plate
+	// R0x-R3x,R6012: vfd plate
 	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 16 : offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -1689,11 +1690,10 @@ WRITE16_MEMBER(machiman_state::grid_w)
 	// D13: speaker out
 	m_speaker->level_w(data >> 13 & 1);
 
-	// D0-D4: vfd matrix grid
+	// D0-D4: vfd grid
 	m_grid = data & 0x1f;
 	prepare_display();
 }
-
 
 // config
 
@@ -1707,16 +1707,16 @@ static INPUT_PORTS_START( machiman )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( machiman )
+MACHINE_CONFIG_START(machiman_state::machiman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(machiman_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, machiman_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
 
 	/* video hardware */
@@ -1728,8 +1728,8 @@ static MACHINE_CONFIG_START( machiman )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1765,13 +1765,14 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(sound2_w);
 	DECLARE_WRITE16_MEMBER(speaker_w);
+	void pairmtch(machine_config &config);
 };
 
 // handlers: maincpu side
 
 WRITE8_MEMBER(pairmtch_state::plate_w)
 {
-	// R2x,R3x,R6x: vfd matrix plate
+	// R2x,R3x,R6x: vfd plate
 	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 8 : (offset-2) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	display_matrix(12, 6, m_plate, m_grid);
@@ -1788,7 +1789,7 @@ WRITE16_MEMBER(pairmtch_state::grid_w)
 	// D10,D15: input mux
 	m_inp_mux = (data >> 10 & 1) | (data >> 14 & 2);
 
-	// D0-D5: vfd matrix grid
+	// D0-D5: vfd grid
 	m_grid = data & 0x3f;
 	display_matrix(12, 6, m_plate, m_grid);
 }
@@ -1802,7 +1803,7 @@ READ8_MEMBER(pairmtch_state::input_r)
 WRITE8_MEMBER(pairmtch_state::sound_w)
 {
 	// R5x: soundlatch (to audiocpu R2x)
-	m_soundlatch->write(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
+	m_soundlatch->write(space, 0, bitswap<8>(data,7,6,5,4,0,1,2,3));
 }
 
 
@@ -1811,7 +1812,7 @@ WRITE8_MEMBER(pairmtch_state::sound_w)
 WRITE8_MEMBER(pairmtch_state::sound2_w)
 {
 	// R2x: soundlatch (to maincpu R5x)
-	m_soundlatch2->write(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
+	m_soundlatch2->write(space, 0, bitswap<8>(data,7,6,5,4,0,1,2,3));
 }
 
 WRITE16_MEMBER(pairmtch_state::speaker_w)
@@ -1822,7 +1823,6 @@ WRITE16_MEMBER(pairmtch_state::speaker_w)
 	// D1: sound ack (to maincpu INT0)
 	m_maincpu->set_input_line(0, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
 }
-
 
 // config
 
@@ -1855,23 +1855,23 @@ static INPUT_PORTS_START( pairmtch )
 	PORT_BIT( 0x86bf, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pairmtch )
+MACHINE_CONFIG_START(pairmtch_state::pairmtch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(pairmtch_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(pairmtch_state, plate_w))
-	MCFG_HMCS40_READ_R_CB(4, READ8(pairmtch_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(pairmtch_state, sound_w))
-	MCFG_HMCS40_READ_R_CB(5, DEVREAD8("soundlatch2", generic_latch_8_device, read))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(pairmtch_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(pairmtch_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, pairmtch_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, pairmtch_state, plate_w))
+	MCFG_HMCS40_READ_R_CB(4, READ8(*this, pairmtch_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, pairmtch_state, sound_w))
+	MCFG_HMCS40_READ_R_CB(5, READ8("soundlatch2", generic_latch_8_device, read))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, pairmtch_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, pairmtch_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.2"))
 
-	MCFG_CPU_ADD("audiocpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(pairmtch_state, sound2_w))
-	MCFG_HMCS40_READ_R_CB(2, DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(pairmtch_state, speaker_w))
+	MCFG_DEVICE_ADD("audiocpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, pairmtch_state, sound2_w))
+	MCFG_HMCS40_READ_R_CB(2, READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, pairmtch_state, speaker_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1879,12 +1879,12 @@ static MACHINE_CONFIG_START( pairmtch )
 	MCFG_DEFAULT_LAYOUT(layout_pairmtch)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1913,18 +1913,19 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ16_MEMBER(input_r);
+	void alnattck(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(alnattck_state::plate_w)
 {
-	// R0x-R3x(,D0-D3): vfd matrix plate
+	// R0x-R3x(,D0-D3): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,16,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,16,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15);
 	display_matrix(20, 10, plate, m_grid);
 }
 
@@ -1936,7 +1937,7 @@ WRITE16_MEMBER(alnattck_state::grid_w)
 	// D7-D13: input mux
 	m_inp_mux = data >> 7 & 0x7f;
 
-	// D6-D15: vfd matrix grid
+	// D6-D15: vfd grid
 	m_grid = data >> 6 & 0x3ff;
 
 	// D0-D3: plate 16-19 (update display there)
@@ -1948,7 +1949,6 @@ READ16_MEMBER(alnattck_state::input_r)
 	// D5: multiplexed inputs
 	return read_inputs(7) & 0x20;
 }
-
 
 // config
 
@@ -1977,16 +1977,16 @@ static INPUT_PORTS_START( alnattck )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Fire")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( alnattck )
+MACHINE_CONFIG_START(alnattck_state::alnattck)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(alnattck_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(alnattck_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(alnattck_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(alnattck_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(alnattck_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(READ16(alnattck_state, input_r))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, alnattck_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, alnattck_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, alnattck_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, alnattck_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, alnattck_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(READ16(*this, alnattck_state, input_r))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -1997,8 +1997,8 @@ static MACHINE_CONFIG_START( alnattck )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2030,6 +2030,7 @@ public:
 	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume;
+	void cdkong(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -2054,7 +2055,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 
 void cdkong_state::prepare_display()
 {
-	u32 plate = BITSWAP32(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4) | 0x800800;
+	u32 plate = bitswap<32>(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4) | 0x800800;
 	display_matrix(29, 11, plate, m_grid);
 }
 
@@ -2064,7 +2065,7 @@ WRITE8_MEMBER(cdkong_state::plate_w)
 	m_r[offset] = data;
 	speaker_decay_reset();
 
-	// R0x-R6x: vfd matrix plate
+	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2075,11 +2076,10 @@ WRITE16_MEMBER(cdkong_state::grid_w)
 	// D3: speaker out
 	m_speaker->level_w(data >> 3 & 1);
 
-	// D4-D14: vfd matrix grid
+	// D4-D14: vfd grid
 	m_grid = data >> 4 & 0x7ff;
 	prepare_display();
 }
-
 
 // config
 
@@ -2104,18 +2104,18 @@ void cdkong_state::machine_start()
 	save_item(NAME(m_speaker_volume));
 }
 
-static MACHINE_CONFIG_START( cdkong )
+MACHINE_CONFIG_START(cdkong_state::cdkong)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(cdkong_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, cdkong_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
 
 	/* video hardware */
@@ -2127,8 +2127,8 @@ static MACHINE_CONFIG_START( cdkong )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(1))
 MACHINE_CONFIG_END
@@ -2166,14 +2166,15 @@ public:
 	DECLARE_READ8_MEMBER(input_r);
 
 	DECLARE_INPUT_CHANGED_MEMBER(player_switch);
+	void cgalaxn(machine_config &config);
 };
 
 // handlers
 
 void cgalaxn_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
-	u16 plate = BITSWAP16(m_plate,15,14,6,5,4,3,2,1,7,8,9,10,11,0,12,13);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
+	u16 plate = bitswap<16>(m_plate,15,14,6,5,4,3,2,1,7,8,9,10,11,0,12,13);
 	display_matrix(15, 12, plate, grid);
 }
 
@@ -2183,7 +2184,7 @@ WRITE8_MEMBER(cgalaxn_state::grid_w)
 	if (offset == hmcs40_cpu_device::PORT_R1X)
 		m_inp_mux = data & 3;
 
-	// R1x-R3x: vfd matrix grid
+	// R1x-R3x: vfd grid
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2196,7 +2197,7 @@ WRITE16_MEMBER(cgalaxn_state::plate_w)
 
 	// D1: start alien attack whine sound effect (edge triggered)
 
-	// D2-D15: vfd matrix plate
+	// D2-D15: vfd plate
 	m_plate = (m_plate & 0x4000) | (data >> 2 & 0x3fff);
 	prepare_display();
 }
@@ -2206,7 +2207,6 @@ READ8_MEMBER(cgalaxn_state::input_r)
 	// R0x: multiplexed inputs
 	return read_inputs(2);
 }
-
 
 // config
 
@@ -2237,15 +2237,15 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 	prepare_display();
 }
 
-static MACHINE_CONFIG_START( cgalaxn )
+MACHINE_CONFIG_START(cgalaxn_state::cgalaxn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(cgalaxn_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(cgalaxn_state, grid_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(cgalaxn_state, grid_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(cgalaxn_state, grid_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(cgalaxn_state, plate_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(*this, cgalaxn_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, cgalaxn_state, grid_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, cgalaxn_state, grid_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, cgalaxn_state, grid_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, cgalaxn_state, plate_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2256,8 +2256,8 @@ static MACHINE_CONFIG_START( cgalaxn )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2296,19 +2296,20 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void cpacman(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(cpacman_state::plate_w)
 {
-	// R1x-R6x(,D1,D2): vfd matrix plate
+	// R1x-R6x(,D1,D2): vfd plate
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
-	u32 plate = BITSWAP32(m_plate,31,30,29,28,27,0,1,2,3,8,9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12,4,5,6,7);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
+	u32 plate = bitswap<32>(m_plate,31,30,29,28,27,0,1,2,3,8,9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12,4,5,6,7);
 	display_matrix(27, 11, plate, grid);
 }
 
@@ -2320,7 +2321,7 @@ WRITE16_MEMBER(cpacman_state::grid_w)
 	// D13-D15: input mux
 	m_inp_mux = data >> 13 & 7;
 
-	// D5-D15: vfd matrix grid
+	// D5-D15: vfd grid
 	m_grid = data >> 5 & 0x7ff;
 
 	// D1,D2: plate 8,14 (update display there)
@@ -2332,7 +2333,6 @@ READ8_MEMBER(cpacman_state::input_r)
 	// R0x: multiplexed inputs
 	return read_inputs(3);
 }
-
 
 // config
 
@@ -2356,18 +2356,18 @@ static INPUT_PORTS_START( cpacman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cpacman )
+MACHINE_CONFIG_START(cpacman_state::cpacman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(cpacman_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(cpacman_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(*this, cpacman_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, cpacman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, cpacman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, cpacman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, cpacman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, cpacman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, cpacman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, cpacman_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2378,8 +2378,8 @@ static MACHINE_CONFIG_START( cpacman )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2413,19 +2413,20 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void cmspacmn(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(cmspacmn_state::plate_w)
 {
-	// R1x-R6x(,D0,D1): vfd matrix plate
+	// R1x-R6x(,D0,D1): vfd plate
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,0,1);
-	u64 plate = BIT(m_plate,15)<<32 | BITSWAP32(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
+	u16 grid = bitswap<16>(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,0,1);
+	u64 plate = BIT(m_plate,15)<<32 | bitswap<32>(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
 	display_matrix(33, 12, plate, grid);
 }
 
@@ -2437,7 +2438,7 @@ WRITE16_MEMBER(cmspacmn_state::grid_w)
 	// D13-D15: input mux
 	m_inp_mux = data >> 13 & 7;
 
-	// D5-D15: vfd matrix grid
+	// D5-D15: vfd grid
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0,D1: more plates (update display there)
@@ -2449,7 +2450,6 @@ READ8_MEMBER(cmspacmn_state::input_r)
 	// R0x: multiplexed inputs
 	return read_inputs(3);
 }
-
 
 // config
 
@@ -2473,18 +2473,18 @@ static INPUT_PORTS_START( cmspacmn )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cmspacmn )
+MACHINE_CONFIG_START(cmspacmn_state::cmspacmn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(cmspacmn_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(cmspacmn_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(*this, cmspacmn_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, cmspacmn_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, cmspacmn_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, cmspacmn_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, cmspacmn_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, cmspacmn_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, cmspacmn_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, cmspacmn_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2495,8 +2495,8 @@ static MACHINE_CONFIG_START( cmspacmn )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2528,6 +2528,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ16_MEMBER(input_r);
+	void sag(machine_config &config);
 };
 
 // handlers
@@ -2540,7 +2541,7 @@ void sag_state::prepare_display()
 
 	// grid 8-11 are 7segs
 	set_display_segmask(0xf00, 0x7f);
-	u8 seg = BITSWAP8(m_plate,3,4,5,6,7,8,9,10);
+	u8 seg = bitswap<8>(m_plate,3,4,5,6,7,8,9,10);
 	for (int y = 8; y < 12; y++)
 		m_display_state[y] = (m_grid >> y & 1) ? seg : 0;
 
@@ -2550,7 +2551,7 @@ void sag_state::prepare_display()
 
 WRITE8_MEMBER(sag_state::plate_w)
 {
-	// R0x-R3x: vfd matrix plate
+	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2564,7 +2565,7 @@ WRITE16_MEMBER(sag_state::grid_w)
 	// D2-D7: input mux
 	m_inp_mux = data >> 2 & 0x3f;
 
-	// D1-D12: vfd matrix grid
+	// D1-D12: vfd grid
 	m_grid = data >> 1 & 0xfff;
 	prepare_display();
 }
@@ -2574,7 +2575,6 @@ READ16_MEMBER(sag_state::input_r)
 	// D13-D15: multiplexed inputs
 	return read_inputs(6) << 13;
 }
-
 
 // config
 
@@ -2589,7 +2589,7 @@ static INPUT_PORTS_START( sag )
 	PORT_START("IN.1") // D3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Button 2")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 4")
-	PORT_BIT( 0x04, 0x04, IPT_SPECIAL ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x01) // 1 player
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x01) // 1 player
 
 	PORT_START("IN.2") // D4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("P1 Button 3")
@@ -2601,7 +2601,7 @@ static INPUT_PORTS_START( sag )
 	PORT_START("IN.3") // D5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Button 4")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 2")
-	PORT_BIT( 0x04, 0x04, IPT_SPECIAL ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x00) // demo
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x00) // demo
 
 	PORT_START("IN.4") // D6
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button 5")
@@ -2620,23 +2620,23 @@ static INPUT_PORTS_START( sag )
 	PORT_CONFSETTING(    0x02, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( sag )
+MACHINE_CONFIG_START(sag_state::sag)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 450000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(sag_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(sag_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(sag_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(sag_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(sag_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(READ16(sag_state, input_r))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 450000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, sag_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, sag_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, sag_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, sag_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, sag_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(READ16(*this, sag_state, input_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_sag)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2664,14 +2664,15 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void egalaxn2(machine_config &config);
 };
 
 // handlers
 
 void egalaxn2_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
+	u16 grid = bitswap<16>(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
 	display_matrix(24, 15, plate, grid);
 }
 
@@ -2683,14 +2684,14 @@ WRITE16_MEMBER(egalaxn2_state::grid_w)
 	// D1-D4: input mux
 	m_inp_mux = data >> 1 & 0xf;
 
-	// D1-D15: vfd matrix grid
+	// D1-D15: vfd grid
 	m_grid = data >> 1 & 0x7fff;
 	prepare_display();
 }
 
 WRITE8_MEMBER(egalaxn2_state::plate_w)
 {
-	// R1x-R6x: vfd matrix plate
+	// R1x-R6x: vfd plate
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2701,7 +2702,6 @@ READ8_MEMBER(egalaxn2_state::input_r)
 	// R0x: multiplexed inputs
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -2735,18 +2735,18 @@ static INPUT_PORTS_START( egalaxn2 )
 	PORT_CONFSETTING(    0x04, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( egalaxn2 )
+MACHINE_CONFIG_START(egalaxn2_state::egalaxn2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(egalaxn2_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(egalaxn2_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(*this, egalaxn2_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, egalaxn2_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, egalaxn2_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, egalaxn2_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, egalaxn2_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, egalaxn2_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, egalaxn2_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, egalaxn2_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2757,8 +2757,8 @@ static MACHINE_CONFIG_START( egalaxn2 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2783,6 +2783,8 @@ public:
 	epacman2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: egalaxn2_state(mconfig, type, tag)
 	{ }
+
+	void epacman2(machine_config &config);
 };
 
 // handlers are identical to Galaxian 2, so we can use those
@@ -2819,7 +2821,8 @@ static INPUT_PORTS_START( epacman2 )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( epacman2, egalaxn2 )
+MACHINE_CONFIG_START(epacman2_state::epacman2)
+	egalaxn2(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2861,6 +2864,7 @@ public:
 
 	void update_int();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void eturtles(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -2870,8 +2874,8 @@ protected:
 
 void eturtles_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,1,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
-	u32 plate = BITSWAP32(m_plate,31,30,11,12,18,19,16,17,22,15,20,21,27,26,23,25,24,2,3,1,0,6,4,5,10,9,2,8,7,14,1,13);
+	u16 grid = bitswap<16>(m_grid,15,1,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
+	u32 plate = bitswap<32>(m_plate,31,30,11,12,18,19,16,17,22,15,20,21,27,26,23,25,24,2,3,1,0,6,4,5,10,9,2,8,7,14,1,13);
 	display_matrix(30, 15, plate | (grid >> 5 & 8), grid); // grid 8 also forces plate 3 high
 }
 
@@ -2879,7 +2883,7 @@ WRITE8_MEMBER(eturtles_state::plate_w)
 {
 	m_r[offset] = data;
 
-	// R0x-R6x: vfd matrix plate
+	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2897,7 +2901,7 @@ WRITE16_MEMBER(eturtles_state::grid_w)
 		update_int();
 	}
 
-	// D1-D15: vfd matrix grid
+	// D1-D15: vfd grid
 	m_grid = data >> 1 & 0x7fff;
 	prepare_display();
 }
@@ -2937,7 +2941,6 @@ READ8_MEMBER(eturtles_state::cop_ack_r)
 	// G0: ack from maincpu D0
 	return m_d & 1;
 }
-
 
 // config
 
@@ -2984,25 +2987,25 @@ void eturtles_state::machine_start()
 	save_item(NAME(m_cop_irq));
 }
 
-static MACHINE_CONFIG_START( eturtles )
+MACHINE_CONFIG_START(eturtles_state::eturtles)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(eturtles_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, eturtles_state, grid_w))
 
-	MCFG_CPU_ADD("audiocpu", COP411, 215000) // approximation
+	MCFG_DEVICE_ADD("audiocpu", COP411, 215000) // approximation
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(eturtles_state, speaker_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(eturtles_state, cop_irq_w))
-	MCFG_COP400_READ_L_CB(READ8(eturtles_state, cop_latch_r))
-	MCFG_COP400_READ_G_CB(READ8(eturtles_state, cop_ack_r))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, eturtles_state, speaker_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, eturtles_state, cop_irq_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, eturtles_state, cop_latch_r))
+	MCFG_COP400_READ_G_CB(READ8(*this, eturtles_state, cop_ack_r))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -3015,8 +3018,8 @@ static MACHINE_CONFIG_START( eturtles )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3043,14 +3046,15 @@ public:
 
 	virtual void prepare_display() override;
 	DECLARE_READ8_MEMBER(cop_data_r);
+	void estargte(machine_config &config);
 };
 
 // handlers (most of it is in eturtles_state above)
 
 void estargte_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,0,14,13,12,11,10,9,8,7,6,5,4,3,2,1);
-	u32 plate = BITSWAP32(m_plate,31,30,29,15,17,19,21,23,25,27,26,24,3,22,20,18,16,14,12,10,8,6,4,2,0,1,3,5,7,9,11,13);
+	u16 grid = bitswap<16>(m_grid,15,0,14,13,12,11,10,9,8,7,6,5,4,3,2,1);
+	u32 plate = bitswap<32>(m_plate,31,30,29,15,17,19,21,23,25,27,26,24,3,22,20,18,16,14,12,10,8,6,4,2,0,1,3,5,7,9,11,13);
 	display_matrix(29, 14, plate, grid);
 }
 
@@ -3060,7 +3064,6 @@ READ8_MEMBER(estargte_state::cop_data_r)
 	// L7: ack from maincpu D0
 	return m_r[0] | (m_d << 7 & 0x80);
 }
-
 
 // config
 
@@ -3094,24 +3097,24 @@ static INPUT_PORTS_START( estargte )
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( estargte )
+MACHINE_CONFIG_START(estargte_state::estargte)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(eturtles_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, eturtles_state, grid_w))
 
-	MCFG_CPU_ADD("audiocpu", COP411, 190000) // approximation
+	MCFG_DEVICE_ADD("audiocpu", COP411, 190000) // approximation
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(eturtles_state, speaker_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(eturtles_state, cop_irq_w))
-	MCFG_COP400_READ_L_CB(READ8(estargte_state, cop_data_r))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, eturtles_state, speaker_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, eturtles_state, cop_irq_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, estargte_state, cop_data_r))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -3124,8 +3127,8 @@ static MACHINE_CONFIG_START( estargte )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3155,19 +3158,20 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ16_MEMBER(input_r);
+	void ghalien(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(ghalien_state::plate_w)
 {
-	// R0x-R3x(,D10-D13): vfd matrix plate
+	// R0x-R3x(,D10-D13): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,14,12,10,8,9,13,15,2,0,1,3,11,7,5,4,6,19,17,16,18);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,14,12,10,8,9,13,15,2,0,1,3,11,7,5,4,6,19,17,16,18);
 	display_matrix(20, 10, plate, grid);
 }
 
@@ -3179,7 +3183,7 @@ WRITE16_MEMBER(ghalien_state::grid_w)
 	// D0-D6: input mux
 	m_inp_mux = data & 0x7f;
 
-	// D0-D9: vfd matrix grid
+	// D0-D9: vfd grid
 	m_grid = data & 0x3ff;
 
 	// D10-D13: more plates (update display there)
@@ -3191,7 +3195,6 @@ READ16_MEMBER(ghalien_state::input_r)
 	// D15: multiplexed inputs
 	return read_inputs(7) & 0x8000;
 }
-
 
 // config
 
@@ -3220,16 +3223,16 @@ static INPUT_PORTS_START( ghalien )
 	PORT_CONFSETTING(      0x8000, "Professional" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ghalien )
+MACHINE_CONFIG_START(ghalien_state::ghalien)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(ghalien_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(ghalien_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(ghalien_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(ghalien_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(ghalien_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(READ16(ghalien_state, input_r))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, ghalien_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, ghalien_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, ghalien_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, ghalien_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, ghalien_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(READ16(*this, ghalien_state, input_r))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -3240,8 +3243,8 @@ static MACHINE_CONFIG_START( ghalien )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3274,19 +3277,20 @@ public:
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void gckong(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(gckong_state::plate_w)
 {
-	// R0x-R3x(,D0,D1): vfd matrix plate
+	// R0x-R3x(,D0,D1): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
-	u32 plate = BITSWAP32(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0) | 0x8000;
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
+	u32 plate = bitswap<32>(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0) | 0x8000;
 	display_matrix(32, 11, plate, grid);
 }
 
@@ -3303,7 +3307,7 @@ WRITE16_MEMBER(gckong_state::grid_w)
 		update_int1();
 	}
 
-	// D5-D15: vfd matrix grid
+	// D5-D15: vfd grid
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0,D1: more plates (update display there)
@@ -3315,7 +3319,6 @@ void gckong_state::update_int1()
 	// INT1 on multiplexed inputs
 	set_interrupt(1, read_inputs(4));
 }
-
 
 // config
 
@@ -3347,15 +3350,15 @@ INPUT_CHANGED_MEMBER(gckong_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( gckong )
+MACHINE_CONFIG_START(gckong_state::gckong)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(gckong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(gckong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(gckong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(gckong_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(gckong_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, gckong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, gckong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, gckong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, gckong_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, gckong_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.5"))
 
 	/* video hardware */
@@ -3367,8 +3370,8 @@ static MACHINE_CONFIG_START( gckong )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3397,18 +3400,19 @@ public:
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void gdigdug(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(gdigdug_state::plate_w)
 {
-	// R0x-R6x(,D0-D3): vfd matrix plate
+	// R0x-R6x(,D0-D3): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u32 plate = BITSWAP32(m_plate,30,31,0,1,2,3,4,5,6,7,20,21,22,27,26,25,28,29,24,23,15,14,13,12,8,9,10,11,19,18,17,16);
+	u32 plate = bitswap<32>(m_plate,30,31,0,1,2,3,4,5,6,7,20,21,22,27,26,25,28,29,24,23,15,14,13,12,8,9,10,11,19,18,17,16);
 	display_matrix(32, 9, plate, m_grid);
 }
 
@@ -3425,7 +3429,7 @@ WRITE16_MEMBER(gdigdug_state::grid_w)
 		update_int1();
 	}
 
-	// D7-D15: vfd matrix grid
+	// D7-D15: vfd grid
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D3: more plates (update display there)
@@ -3437,7 +3441,6 @@ void gdigdug_state::update_int1()
 	// INT1 on multiplexed inputs
 	set_interrupt(1, read_inputs(5));
 }
-
 
 // config
 
@@ -3466,18 +3469,18 @@ INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( gdigdug )
+MACHINE_CONFIG_START(gdigdug_state::gdigdug)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(gdigdug_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, gdigdug_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -3488,8 +3491,8 @@ static MACHINE_CONFIG_START( gdigdug )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3522,19 +3525,20 @@ public:
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void mwcbaseb(machine_config &config);
 };
 
 // handlers
 
 void mwcbaseb_state::prepare_display()
 {
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	display_matrix(16, 8, m_plate, grid);
 }
 
 WRITE8_MEMBER(mwcbaseb_state::plate_w)
 {
-	// R1x-R3x,R6x: vfd matrix plate
+	// R1x-R3x,R6x: vfd plate
 	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 12 : (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -3545,7 +3549,7 @@ WRITE16_MEMBER(mwcbaseb_state::grid_w)
 	// D9-D15: input mux
 	m_inp_mux = data >> 9 & 0x7f;
 
-	// D0-D7: vfd matrix grid
+	// D0-D7: vfd grid
 	m_grid = data & 0xff;
 	prepare_display();
 }
@@ -3561,7 +3565,6 @@ READ8_MEMBER(mwcbaseb_state::input_r)
 	// R4x: multiplexed inputs
 	return read_inputs(7);
 }
-
 
 // config
 
@@ -3628,17 +3631,17 @@ INPUT_PORTS_END
 
 static const s16 mwcbaseb_speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
 
-static MACHINE_CONFIG_START( mwcbaseb )
+MACHINE_CONFIG_START(mwcbaseb_state::mwcbaseb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(mwcbaseb_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(mwcbaseb_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(mwcbaseb_state, plate_w))
-	MCFG_HMCS40_READ_R_CB(4, READ8(mwcbaseb_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(mwcbaseb_state, speaker_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(mwcbaseb_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(mwcbaseb_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, mwcbaseb_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, mwcbaseb_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, mwcbaseb_state, plate_w))
+	MCFG_HMCS40_READ_R_CB(4, READ8(*this, mwcbaseb_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, mwcbaseb_state, speaker_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, mwcbaseb_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, mwcbaseb_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -3649,8 +3652,8 @@ static MACHINE_CONFIG_START( mwcbaseb )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(8, mwcbaseb_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -3677,18 +3680,19 @@ public:
 
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
+	void pbqbert(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(pbqbert_state::plate_w)
 {
-	// R0x-R6x(,D8): vfd matrix plate
+	// R0x-R6x(,D8): vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u32 plate = BITSWAP32(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23) | 0x400000;
+	u32 plate = bitswap<32>(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23) | 0x400000;
 	display_matrix(30, 8, plate, m_grid);
 }
 
@@ -3697,13 +3701,12 @@ WRITE16_MEMBER(pbqbert_state::grid_w)
 	// D14: speaker out
 	m_speaker->level_w(data >> 14 & 1);
 
-	// D0-D7: vfd matrix grid
+	// D0-D7: vfd grid
 	m_grid = data & 0xff;
 
 	// D8: plate 25 (update display there)
 	plate_w(space, 7, data >> 8 & 1);
 }
-
 
 // config
 
@@ -3716,18 +3719,18 @@ static INPUT_PORTS_START( pbqbert )
 	PORT_BIT( 0xe1ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pbqbert )
+MACHINE_CONFIG_START(pbqbert_state::pbqbert)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(pbqbert_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, pbqbert_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.0"))
 
 	/* video hardware */
@@ -3739,8 +3742,8 @@ static MACHINE_CONFIG_START( pbqbert )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3770,20 +3773,21 @@ public:
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void kingman(machine_config &config);
 };
 
 // handlers
 
 void kingman_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	u32 plate = BITSWAP24(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	u32 plate = bitswap<24>(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
 	display_matrix(23, 9, plate, grid);
 }
 
 WRITE8_MEMBER(kingman_state::plate_w)
 {
-	// R0x-R3x: vfd matrix plate
+	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -3802,7 +3806,7 @@ WRITE16_MEMBER(kingman_state::grid_w)
 		update_int0();
 	}
 
-	// D7-D15: vfd matrix grid
+	// D7-D15: vfd grid
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D4: more plates
@@ -3815,7 +3819,6 @@ void kingman_state::update_int0()
 	// INT0 on multiplexed inputs
 	set_interrupt(0, read_inputs(4));
 }
-
 
 // config
 
@@ -3841,15 +3844,15 @@ INPUT_CHANGED_MEMBER(kingman_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( kingman )
+MACHINE_CONFIG_START(kingman_state::kingman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(kingman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(kingman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(kingman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(kingman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(kingman_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, kingman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, kingman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, kingman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, kingman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, kingman_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -3860,8 +3863,8 @@ static MACHINE_CONFIG_START( kingman )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3891,20 +3894,21 @@ public:
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void tmtron(machine_config &config);
 };
 
 // handlers
 
 void tmtron_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0);
-	u32 plate = BITSWAP24(m_plate,23,5,2,21,1,6,7,9,10,11,21,0,19,3,4,8,3,18,17,16,12,13,14,15);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0);
+	u32 plate = bitswap<24>(m_plate,23,5,2,21,1,6,7,9,10,11,21,0,19,3,4,8,3,18,17,16,12,13,14,15);
 	display_matrix(23, 10, plate, grid);
 }
 
 WRITE8_MEMBER(tmtron_state::plate_w)
 {
-	// R0x-R3x: vfd matrix plate
+	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -3923,7 +3927,7 @@ WRITE16_MEMBER(tmtron_state::grid_w)
 		update_int1();
 	}
 
-	// D6-D15: vfd matrix grid
+	// D6-D15: vfd grid
 	m_grid = data >> 6 & 0x3ff;
 
 	// D0-D3,D5: more plates
@@ -3936,7 +3940,6 @@ void tmtron_state::update_int1()
 	// INT1 on multiplexed inputs
 	set_interrupt(1, read_inputs(4));
 }
-
 
 // config
 
@@ -3962,15 +3965,15 @@ INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( tmtron )
+MACHINE_CONFIG_START(tmtron_state::tmtron)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(tmtron_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(tmtron_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(tmtron_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(tmtron_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(tmtron_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, tmtron_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, tmtron_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, tmtron_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, tmtron_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, tmtron_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -3981,8 +3984,8 @@ static MACHINE_CONFIG_START( tmtron )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4012,18 +4015,19 @@ public:
 
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
+	void vinvader(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(vinvader_state::plate_w)
 {
-	// R1x-R3x(,D4-D6): vfd matrix plate
+	// R1x-R3x(,D4-D6): vfd plate
 	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	u16 plate = BITSWAP16(m_plate,15,11,7,3,10,6,14,2,9,5,13,1,8,4,12,0);
+	u16 plate = bitswap<16>(m_plate,15,11,7,3,10,6,14,2,9,5,13,1,8,4,12,0);
 	display_matrix(12, 9, plate, m_grid);
 }
 
@@ -4032,13 +4036,12 @@ WRITE16_MEMBER(vinvader_state::grid_w)
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
 
-	// D7-D15: vfd matrix grid
+	// D7-D15: vfd grid
 	m_grid = data >> 7 & 0x1ff;
 
 	// D4-D6: more plates (update display there)
 	plate_w(space, 3 + hmcs40_cpu_device::PORT_R1X, data >> 4 & 7);
 }
-
 
 // config
 
@@ -4056,15 +4059,15 @@ static INPUT_PORTS_START( vinvader )
 	PORT_BIT( 0xfff5, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vinvader )
+MACHINE_CONFIG_START(vinvader_state::vinvader)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
+	MCFG_DEVICE_ADD("maincpu", HD38750, 400000) // approximation
 	MCFG_HMCS40_READ_R_CB(0, IOPORT("IN.0"))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(vinvader_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(vinvader_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(vinvader_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(vinvader_state, grid_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, vinvader_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, vinvader_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, vinvader_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, vinvader_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
 
 	/* video hardware */
@@ -4076,8 +4079,8 @@ static MACHINE_CONFIG_START( vinvader )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4147,7 +4150,7 @@ ROM_START( bzaxxon )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 521080, "svg", 0)
-	ROM_LOAD( "bzaxxon.svg", 0, 521080, CRC(f4fbb2de) SHA1(83db400e67d91ae4bfee3e8568ae9df94ebede19) )
+	ROM_LOAD( "bzaxxon.svg", 0, 521080, BAD_DUMP CRC(f4fbb2de) SHA1(83db400e67d91ae4bfee3e8568ae9df94ebede19) )
 ROM_END
 
 
@@ -4167,7 +4170,7 @@ ROM_START( bpengo )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 744461, "svg", 0)
-	ROM_LOAD( "bpengo.svg", 0, 744461, CRC(2b9abaa5) SHA1(c70a6ac1fa757fdd3ababfe6e00573ef1410c1eb) )
+	ROM_LOAD( "bpengo.svg", 0, 744461, BAD_DUMP CRC(2b9abaa5) SHA1(c70a6ac1fa757fdd3ababfe6e00573ef1410c1eb) )
 ROM_END
 
 
@@ -4177,7 +4180,7 @@ ROM_START( bbtime )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 461605, "svg", 0)
-	ROM_LOAD( "bbtime.svg", 0, 461605, CRC(5b335271) SHA1(46c45b711358e8397ae707668aecead9e341ab8a) )
+	ROM_LOAD( "bbtime.svg", 0, 461605, BAD_DUMP CRC(5b335271) SHA1(46c45b711358e8397ae707668aecead9e341ab8a) )
 ROM_END
 
 
@@ -4438,47 +4441,47 @@ ROM_END
 
 
 
-//    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1979, bambball,  0,        0, bambball, bambball, bambball_state, 0, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, bmboxing_state, 0, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, bambball,  0,        0, bambball, bambball, bambball_state, empty_init, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, bmboxing_state, empty_init, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, bfriskyt_state, 0, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, packmon,   0,        0, packmon,  packmon,  packmon_state,  0, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  0, "Bandai (Mattel license)", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, bzaxxon,   0,        0, bzaxxon,  bzaxxon,  bzaxxon_state,  0, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, zackman,   0,        0, zackman,  zackman,  zackman_state,  0, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   bpengo_state,   0, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   bbtime_state,   0, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, bdoramon_state, 0, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bultrman,  0,        0, bultrman, bultrman, bultrman_state, 0, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, machiman,  0,        0, machiman, machiman, machiman_state, 0, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, pairmtch_state, 0, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, bfriskyt_state, empty_init, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, packmon,   0,        0, packmon,  packmon,  packmon_state,  empty_init, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  empty_init, "Bandai (Mattel license)", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bzaxxon,   0,        0, bzaxxon,  bzaxxon,  bzaxxon_state,  empty_init, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, zackman,   0,        0, zackman,  zackman,  zackman_state,  empty_init, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   bpengo_state,   empty_init, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   bbtime_state,   empty_init, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, bdoramon_state, empty_init, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bultrman,  0,        0, bultrman, bultrman, bultrman_state, empty_init, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, machiman,  0,        0, machiman, machiman, machiman_state, empty_init, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, pairmtch_state, empty_init, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, alnattck,  0,        0, alnattck, alnattck, alnattck_state, 0, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   cdkong_state,   0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  cgalaxn_state,  0, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  cpacman_state,  0, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  cpacman_state,  0, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, cmspacmn_state, 0, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, alnattck,  0,        0, alnattck, alnattck, alnattck_state, empty_init, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   cdkong_state,   empty_init, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  cgalaxn_state,  empty_init, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  cpacman_state,  empty_init, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  cpacman_state,  empty_init, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, cmspacmn_state, empty_init, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, sag_si2,   0,        0, sag,      sag,      sag_state,      0, "Entex", "Select-A-Game: Space Invader 2", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING ) // suspect bad dump
-CONS( 1981, sag_bb4,   0,        0, sag,      sag,      sag_state,      0, "Entex", "Select-A-Game: Baseball 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, sag_pb,    0,        0, sag,      sag,      sag_state,      0, "Entex", "Select-A-Game: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, egalaxn2_state, 0, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2,  0,        0, epacman2, epacman2, epacman2_state, 0, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2r, epacman2, 0, epacman2, epacman2, epacman2_state, 0, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, 0, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, eturtles,  0,        0, eturtles, eturtles, eturtles_state, 0, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, sag_si2,   0,        0, sag,      sag,      sag_state,      empty_init, "Entex", "Select-A-Game: Space Invader 2", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING ) // suspect bad dump
+CONS( 1981, sag_bb4,   0,        0, sag,      sag,      sag_state,      empty_init, "Entex", "Select-A-Game: Baseball 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, sag_pb,    0,        0, sag,      sag,      sag_state,      empty_init, "Entex", "Select-A-Game: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, egalaxn2_state, empty_init, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, epacman2,  0,        0, epacman2, epacman2, epacman2_state, empty_init, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, epacman2r, epacman2, 0, epacman2, epacman2, epacman2_state, empty_init, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, empty_init, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, eturtles,  0,        0, eturtles, eturtles, eturtles_state, empty_init, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  ghalien_state,  0, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   0, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  0, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  ghalien_state,  empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, 0, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  pbqbert_state,  0, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  pbqbert_state,  empty_init, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, kingman,   0,        0, kingman,  kingman,  kingman_state,  0, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   tmtron_state,   0, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, kingman,   0,        0, kingman,  kingman,  kingman_state,  empty_init, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   tmtron_state,   empty_init, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, vinvader,  0,        0, vinvader, vinvader, vinvader_state, 0, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, vinvader,  0,        0, vinvader, vinvader, vinvader_state, empty_init, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )

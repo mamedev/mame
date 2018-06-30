@@ -41,25 +41,25 @@
 //**************************************************************************
 
 #define MCFG_I8155_IN_PORTA_CB(_devcb) \
-	devcb = &i8155_device::set_in_pa_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8155_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_I8155_IN_PORTB_CB(_devcb) \
-	devcb = &i8155_device::set_in_pb_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8155_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_I8155_IN_PORTC_CB(_devcb) \
-	devcb = &i8155_device::set_in_pc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8155_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_I8155_OUT_PORTA_CB(_devcb) \
-	devcb = &i8155_device::set_out_pa_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8155_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_I8155_OUT_PORTB_CB(_devcb) \
-	devcb = &i8155_device::set_out_pb_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8155_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_I8155_OUT_PORTC_CB(_devcb) \
-	devcb = &i8155_device::set_out_pc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8155_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_I8155_OUT_TIMEROUT_CB(_devcb) \
-	devcb = &i8155_device::set_out_to_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8155_device &>(*device).set_out_to_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -75,13 +75,13 @@ public:
 	// construction/destruction
 	i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_in_pa_callback(device_t &device, Object &&cb)  { return downcast<i8155_device &>(device).m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_pb_callback(device_t &device, Object &&cb)  { return downcast<i8155_device &>(device).m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_pc_callback(device_t &device, Object &&cb)  { return downcast<i8155_device &>(device).m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_pa_callback(device_t &device, Object &&cb) { return downcast<i8155_device &>(device).m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_pb_callback(device_t &device, Object &&cb) { return downcast<i8155_device &>(device).m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_pc_callback(device_t &device, Object &&cb) { return downcast<i8155_device &>(device).m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_to_callback(device_t &device, Object &&cb) { return downcast<i8155_device &>(device).m_out_to_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pa_callback(Object &&cb)  { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pc_callback(Object &&cb)  { return m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pc_callback(Object &&cb) { return m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_to_callback(Object &&cb) { return m_out_to_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
@@ -102,16 +102,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual space_config_vector memory_space_config() const override;
-
-	inline uint8_t get_timer_mode();
-	inline void timer_output(int to);
-	inline void timer_stop_count();
-	inline void timer_reload_count();
-	inline int get_port_mode(int port);
-	inline uint8_t read_port(int port);
-	inline void write_port(int port, uint8_t data);
-
-	void register_w(int offset, uint8_t data);
 
 private:
 	devcb_read8        m_in_pa_cb;
@@ -145,6 +135,18 @@ private:
 	emu_timer *m_timer;         // counter timer
 
 	const address_space_config      m_space_config;
+
+	inline uint8_t get_timer_mode();
+	inline void timer_output(int to);
+	inline void timer_stop_count();
+	inline void timer_reload_count();
+	inline int get_port_mode(int port);
+	inline uint8_t read_port(int port);
+	inline void write_port(int port, uint8_t data);
+
+	void register_w(int offset, uint8_t data);
+
+	void i8155(address_map &map);
 };
 
 

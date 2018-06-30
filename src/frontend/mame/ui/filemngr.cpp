@@ -154,7 +154,9 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 		}
 	}
 	item_append(menu_item_type::SEPARATOR);
-	item_append("Reset", "", 0, (void *)1);
+
+	if (m_warnings.empty() || m_curr_selected)
+		item_append("Reset", "", 0, (void *)1);
 
 	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -172,8 +174,7 @@ void menu_file_manager::handle()
 	{
 		if ((uintptr_t)event->itemref == 1)
 		{
-			if (m_curr_selected)
-				machine().schedule_hard_reset();
+			machine().schedule_hard_reset();
 		}
 		else
 		{

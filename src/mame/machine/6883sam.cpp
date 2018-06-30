@@ -73,8 +73,7 @@ DEFINE_DEVICE_TYPE(SAM6883, sam6883_device, "sam6883", "MC6883 SAM")
 
 sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SAM6883, tag, owner, clock)
-	, m_cpu_tag(nullptr)
-	, m_cpu_space_ref(AS_PROGRAM)
+	, sam6883_friend_device_interface(mconfig, *this, 4)
 	, m_cpu_space(nullptr)
 	, m_read_res(*this)
 	, m_space_0000(*this)
@@ -89,6 +88,14 @@ sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+sam6883_friend_device_interface::sam6883_friend_device_interface(const machine_config &mconfig, device_t &device, int divider)
+	: device_interface(device, "sam6883")
+	, m_cpu(device, finder_base::DUMMY_TAG)
+	, m_sam_state(0x0000)
+	, m_divider(divider)
+{
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -96,9 +103,7 @@ sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, d
 
 void sam6883_device::device_start()
 {
-	// find the CPU
-	m_cpu = machine().device<cpu_device>(m_cpu_tag);
-	m_cpu_space = &m_cpu->space(m_cpu_space_ref);
+	m_cpu_space = &m_cpu->space(AS_PROGRAM);
 
 	// resolve callbacks
 	m_read_res.resolve_safe(0);
@@ -296,7 +301,7 @@ void sam6883_device::update_memory(void)
 //  clock
 //-------------------------------------------------
 
-void sam6883_friend_device::update_cpu_clock(void)
+void sam6883_friend_device_interface::update_cpu_clock(void)
 {
 	// The infamous speed up poke.
 	//
@@ -321,9 +326,7 @@ void sam6883_friend_device::update_cpu_clock(void)
 	// access but RAM was not.  I don't know how to simulate this.
 
 	int speed = (m_sam_state & (SAM_STATE_R1|SAM_STATE_R0)) / SAM_STATE_R0;
-
-	// the line below is weird because we are not strictly emulating the M6809E with emphasis on the 'E'
-	m_cpu->owner()->set_clock_scale(speed ? 2 : 1);
+	m_cpu->owner()->set_unscaled_clock(device().clock() / (m_divider * (speed ? 2 : 4)));
 }
 
 

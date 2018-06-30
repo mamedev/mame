@@ -30,6 +30,7 @@
 
 #include "emu.h"
 #include "dsp32.h"
+#include "dsp32dis.h"
 #include "debugger.h"
 
 
@@ -136,7 +137,7 @@
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DSP32C, dsp32c_device, "dsp32c", "DSP32C")
+DEFINE_DEVICE_TYPE(DSP32C, dsp32c_device, "dsp32c", "AT&T DSP32C")
 
 //-------------------------------------------------
 //  dsp32c_device - constructor
@@ -174,11 +175,11 @@ dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, dev
 		m_lastpins(0),
 		m_ppc(0),
 		m_program(nullptr),
-		m_direct(nullptr),
+		m_cache(nullptr),
 		m_output_pins_changed(*this)
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 //-------------------------------------------------
@@ -191,7 +192,7 @@ void dsp32c_device::device_start()
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_r[15]).noshow();
@@ -397,38 +398,14 @@ void dsp32c_device::state_string_export(const device_state_entry &entry, std::st
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t dsp32c_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t dsp32c_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t dsp32c_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> dsp32c_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( dsp32c );
-	return CPU_DISASSEMBLE_NAME(dsp32c)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<dsp32c_disassembler>();
 }
-
 
 
 
@@ -438,7 +415,7 @@ offs_t dsp32c_device::disasm_disassemble(std::ostream &stream, offs_t pc, const 
 
 inline uint32_t dsp32c_device::ROPCODE(offs_t pc)
 {
-	return m_direct->read_dword(pc);
+	return m_cache->read_dword(pc);
 }
 
 inline uint8_t dsp32c_device::RBYTE(offs_t addr)

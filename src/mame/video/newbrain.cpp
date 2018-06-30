@@ -180,13 +180,13 @@ static const gfx_layout newbrain_charlayout =
 	8                   /* every char takes 16 x 1 bytes */
 };
 
-static GFXDECODE_START( newbrain )
+static GFXDECODE_START( gfx_newbrain )
 	GFXDECODE_ENTRY( "chargen", 0x0000, newbrain_charlayout, 0, 1 )
 GFXDECODE_END
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START( newbrain_video )
+MACHINE_CONFIG_START(newbrain_state::newbrain_video)
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(newbrain_state, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -195,5 +195,5 @@ MACHINE_CONFIG_START( newbrain_video )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", newbrain)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_newbrain)
 MACHINE_CONFIG_END

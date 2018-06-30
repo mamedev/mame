@@ -27,6 +27,11 @@ project "bin2c"
 			"pthread",
 		}
 
+	configuration { "vs20* or mingw*" }
+		links {
+			"psapi",
+		}
+
 	configuration {}
 
 	strip()

@@ -14,7 +14,7 @@
 #include "abcbus.h"
 #include "bus/scsi/scsi.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80dma.h"
 
 
@@ -31,19 +31,6 @@ class luxor_55_21056_device :  public device_t,
 public:
 	// construction/destruction
 	luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	DECLARE_READ8_MEMBER( sasi_status_r );
-	DECLARE_WRITE8_MEMBER( stat_w );
-	DECLARE_READ8_MEMBER( out_r );
-	DECLARE_WRITE8_MEMBER( inp_w );
-	DECLARE_READ8_MEMBER( sasi_data_r );
-	DECLARE_WRITE8_MEMBER( sasi_data_w );
-	DECLARE_READ8_MEMBER( rdy_reset_r );
-	DECLARE_WRITE8_MEMBER( rdy_reset_w );
-	DECLARE_READ8_MEMBER( sasi_sel_r );
-	DECLARE_WRITE8_MEMBER( sasi_sel_w );
-	DECLARE_READ8_MEMBER( sasi_rst_r );
-	DECLARE_WRITE8_MEMBER( sasi_rst_w );
 
 protected:
 	// device-level overrides
@@ -76,6 +63,22 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_cd );
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_msg );
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_bsy );
+
+	DECLARE_READ8_MEMBER( sasi_status_r );
+	DECLARE_WRITE8_MEMBER( stat_w );
+	DECLARE_READ8_MEMBER( out_r );
+	DECLARE_WRITE8_MEMBER( inp_w );
+	DECLARE_READ8_MEMBER( sasi_data_r );
+	DECLARE_WRITE8_MEMBER( sasi_data_w );
+	DECLARE_READ8_MEMBER( rdy_reset_r );
+	DECLARE_WRITE8_MEMBER( rdy_reset_w );
+	DECLARE_READ8_MEMBER( sasi_sel_r );
+	DECLARE_WRITE8_MEMBER( sasi_sel_w );
+	DECLARE_READ8_MEMBER( sasi_rst_r );
+	DECLARE_WRITE8_MEMBER( sasi_rst_w );
+
+	void luxor_55_21056_io(address_map &map);
+	void luxor_55_21056_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dma_device> m_dma;

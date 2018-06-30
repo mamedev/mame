@@ -1,12 +1,11 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#ifndef BX_SIMD128_SSE_H_HEADER_GUARD
-#define BX_SIMD128_SSE_H_HEADER_GUARD
-
-#include "simd_ni.inl"
+#ifndef BX_SIMD_T_H_HEADER_GUARD
+#	error "Must be included from bx/simd_t.h!"
+#endif // BX_SIMD_T_H_HEADER_GUARD
 
 namespace bx
 {
@@ -14,10 +13,10 @@ namespace bx
 #define ELEMy 1
 #define ELEMz 2
 #define ELEMw 3
-#define BX_SIMD128_IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
-			template<> \
-			BX_SIMD_FORCE_INLINE simd128_sse_t simd_swiz_##_x##_y##_z##_w(simd128_sse_t _a) \
-			{ \
+#define BX_SIMD128_IMPLEMENT_SWIZZLE(_x, _y, _z, _w)                                                   \
+			template<>                                                                                 \
+			BX_SIMD_FORCE_INLINE simd128_sse_t simd_swiz_##_x##_y##_z##_w(simd128_sse_t _a)            \
+			{                                                                                          \
 				return _mm_shuffle_ps( _a, _a, _MM_SHUFFLE(ELEM##_w, ELEM##_z, ELEM##_y, ELEM##_x ) ); \
 			}
 
@@ -29,17 +28,17 @@ namespace bx
 #undef ELEMy
 #undef ELEMx
 
-#define BX_SIMD128_IMPLEMENT_TEST(_xyzw, _mask) \
-			template<> \
+#define BX_SIMD128_IMPLEMENT_TEST(_xyzw, _mask)                                  \
+			template<>                                                           \
 			BX_SIMD_FORCE_INLINE bool simd_test_any_##_xyzw(simd128_sse_t _test) \
-			{ \
-				return 0x0 != (_mm_movemask_ps(_test)&(_mask) ); \
-			} \
-			\
-			template<> \
+			{                                                                    \
+				return 0x0 != (_mm_movemask_ps(_test)&(_mask) );                 \
+			}                                                                    \
+			                                                                     \
+			template<>                                                           \
 			BX_SIMD_FORCE_INLINE bool simd_test_all_##_xyzw(simd128_sse_t _test) \
-			{ \
-				return (_mask) == (_mm_movemask_ps(_test)&(_mask) ); \
+			{                                                                    \
+				return (_mask) == (_mm_movemask_ps(_test)&(_mask) );             \
 			}
 
 BX_SIMD128_IMPLEMENT_TEST(x    , 0x1);
@@ -91,7 +90,7 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd128_sse_t simd_shuf_yBxA(simd128_sse_t _a, simd128_sse_t _b)
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd_shuf_AxBy(simd128_sse_t _a, simd128_sse_t _b)
 	{
 		return _mm_unpacklo_ps(_b, _a);
 	}
@@ -643,5 +642,3 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 	typedef simd128_sse_t simd128_t;
 
 } // namespace bx
-
-#endif // BX_SIMD128_SSE_H_HEADER_GUARD

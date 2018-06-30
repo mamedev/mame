@@ -17,7 +17,7 @@
 /*************************************
 *  Constants
 *************************************/
-#define ZEUS2_VIDEO_CLOCK     XTAL_66_6667MHz
+#define ZEUS2_VIDEO_CLOCK     XTAL(66'666'700)
 
 #define DUMP_WAVE_RAM       0
 #define TRACK_REG_USAGE     0
@@ -102,20 +102,18 @@ typedef zeus2_renderer::extent_t z2_poly_extent;
 *  Zeus2 Video Device
 *************************************/
 #define MCFG_ZEUS2_VBLANK_CB(_devcb) \
-	devcb = &zeus2_device::set_vblank_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<zeus2_device &>(*device).set_vblank_callback(DEVCB_##_devcb);
 
 #define MCFG_ZEUS2_IRQ_CB(_devcb) \
-	devcb = &zeus2_device::set_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<zeus2_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_ZEUS2_FLOAT_MODE(_mode) \
 	downcast<zeus2_device *>(device)->set_float_mode(_mode);
 
-class zeus2_device : public device_t
+class zeus2_device : public device_t, public device_video_interface
 {
 public:
 	zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	screen_device *m_screen;              /* the screen we are acting on */
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ32_MEMBER( zeus2_r );
@@ -123,8 +121,8 @@ public:
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(display_irq);
 
-	template <class Object> static devcb_base &set_vblank_callback(device_t &device, Object &&cb) { return downcast<zeus2_device &>(device).m_vblank.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<zeus2_device &>(device).m_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_vblank_callback(Object &&cb) { return m_vblank.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq.set_callback(std::forward<Object>(cb)); }
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_irq;
 

@@ -88,7 +88,7 @@ READ8_MEMBER(spectrum_usource_device::mreq_r)
 {
 	uint8_t data;
 
-	if (!machine().side_effect_disabled() && (offset == 0x2bae))
+	if (!machine().side_effects_disabled() && (offset == 0x2bae))
 	{
 		m_romcs = !m_romcs;
 	}

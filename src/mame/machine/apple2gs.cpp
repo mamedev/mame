@@ -130,7 +130,6 @@
 #include "machine/ram.h"
 
 #include "debugger.h"
-#include "screen.h"
 
 #define LOG_C0XX            0
 #define LOG_ADB             0
@@ -726,8 +725,8 @@ TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_scanline_tick)
 {
 	int scanline;
 
-	scanline = machine().first_screen()->vpos();
-	machine().first_screen()->update_partial(scanline);
+	scanline = m_screen->vpos();
+	m_screen->update_partial(scanline);
 
 	/* check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area */
 	if ((m_newvideo & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
@@ -768,15 +767,15 @@ TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_scanline_tick)
 		#endif
 
 		/* call Apple II interrupt handler */
-		if ((machine().first_screen()->vpos() % 8) == 7)
+		if ((m_screen->vpos() % 8) == 7)
 		{
 			//apple2_interrupt(m_maincpu);
 			/* TODO: check me! */
-			machine().first_screen()->update_partial(machine().first_screen()->vpos());
+			m_screen->update_partial(m_screen->vpos());
 		}
 	}
 
-	m_scanline_timer->adjust(machine().first_screen()->time_until_pos((scanline+1)%262, 0));
+	m_scanline_timer->adjust(m_screen->time_until_pos((scanline+1)%262, 0));
 }
 
 
@@ -881,7 +880,7 @@ int apple2gs_state::apple2gs_get_vpos()
 
 	};
 
-	scan = machine().first_screen()->vpos();
+	scan = m_screen->vpos();
 
 	if (scan < BORDER_TOP)
 	{
@@ -899,7 +898,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 {
 	uint8_t result;
 
-	if(machine().side_effect_disabled())
+	if(machine().side_effects_disabled())
 	{
 		return 0;
 	}
@@ -919,7 +918,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 		#endif
 
 		case 0x19:  /* C019 - RDVBLBAR */
-			result = (space.machine().first_screen()->vpos() >= (192+BORDER_TOP)) ? 0x80 : 0x00;
+			result = (m_screen->vpos() >= (192+BORDER_TOP)) ? 0x80 : 0x00;
 			break;
 
 		case 0x22:  /* C022 - TBCOLOR */
@@ -1020,7 +1019,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 			break;
 
 		case 0x2F:  /* C02F - HORIZCNT */
-			result = space.machine().first_screen()->hpos() / 11;
+			result = m_screen->hpos() / 11;
 			if (result > 0)
 			{
 				result += 0x40;
@@ -1661,7 +1660,7 @@ uint8_t apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 						m_a2_cnxx_slot = slot;
 						apple2_update_memory();
 					}
-					result = slotdevice->read_cnxx(space, address&0xff);
+					result = slotdevice->read_cnxx(address&0xff);
 				}
 				else
 				{
@@ -1674,7 +1673,7 @@ uint8_t apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 			slotdevice = nullptr;
 
 			// if CFFF accessed, reset C800 area to internal ROM
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 			{
 				if ((address & 0xfff) == 0xfff)
 				{
@@ -1690,7 +1689,7 @@ uint8_t apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 
 			if (slotdevice)
 			{
-				result = slotdevice->read_c800(space, address&0x7ff);
+				result = slotdevice->read_c800(address&0x7ff);
 			}
 			else
 			{
@@ -1708,7 +1707,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, uin
 	int slot;
 
 	// if CFFF accessed, reset C800 area to internal ROM
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		if ((address & 0xfff) == 0xfff)
 		{
@@ -1753,7 +1752,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, uin
 						m_a2_cnxx_slot = slot;
 						apple2_update_memory();
 					}
-					slotdevice->write_cnxx(space, address&0xff, data);
+					slotdevice->write_cnxx(address&0xff, data);
 				}
 				// (else slot is your card but there's no card inserted so the write goes nowhere)
 			}
@@ -1776,7 +1775,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, uin
 
 			if (slotdevice)
 			{
-				slotdevice->write_c800(space, address&0x7ff, data);
+				slotdevice->write_c800(address&0x7ff, data);
 			}
 			else
 			{
@@ -1838,7 +1837,7 @@ void apple2gs_state::apple2gs_setup_memory()
 
 	/* allocate memory for E00000-E1FFFF */
 	m_slowmem = make_unique_clear<uint8_t[]>(128*1024);
-	save_pointer(m_slowmem.get(), "APPLE2GS_SLOWMEM", 128*1024);
+	save_pointer(m_slowmem, "APPLE2GS_SLOWMEM", 128*1024);
 
 	// install expanded memory
 	// fair warning: other code assumes banks 0 and 1 are the first 128k of the RAM device, so you must install bank 1 at 0x10000
@@ -1914,7 +1913,7 @@ void apple2gs_state::apple2gs_setup_memory()
 
 READ8_MEMBER(apple2gs_state::apple2gs_read_vector)
 {
-	return space.read_byte(offset | 0xFF0000);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
 }
 
 MACHINE_RESET_MEMBER(apple2gs_state,apple2gs)
@@ -1979,13 +1978,10 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 	m_machinetype = APPLE_IIGS;
 	apple2eplus_init_common(nullptr);
 
-	/* set up Apple IIgs vectoring */
-	m_maincpu->set_read_vector_callback(read8_delegate(FUNC(apple2gs_state::apple2gs_read_vector),this));
-
 	/* setup globals */
 	m_is_rom3 = true;
 
-	machine().device<nvram_device>("nvram")->set_base(m_clock_bram, sizeof(m_clock_bram));
+	subdevice<nvram_device>("nvram")->set_base(m_clock_bram, sizeof(m_clock_bram));
 
 	/* save state stuff.  note that the driver takes care of docram. */
 	uint8_t* ram = m_ram->pointer();
@@ -2046,7 +2042,7 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 	m_scanline_timer->adjust(attotime::never);
 
 	// fire on scanline zero
-	m_scanline_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0));
 }
 
 MACHINE_START_MEMBER(apple2gs_state,apple2gs)

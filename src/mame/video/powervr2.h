@@ -32,8 +32,8 @@ public:
 		ERR_PVRIF_ILL_ADDR_IRQ
 	};
 
-	DECLARE_ADDRESS_MAP(ta_map, 32);
-	DECLARE_ADDRESS_MAP(pd_dma_map, 32);
+	void ta_map(address_map &map);
+	void pd_dma_map(address_map &map);
 
 	struct {
 		uint32_t pvr_addr;
@@ -141,7 +141,7 @@ public:
 	int next_y;
 
 	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template<class _cb> void set_irq_cb(_cb cb) { irq_cb.set_callback(cb); }
+	template <class Object> void set_irq_cb(Object &&cb) { irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER(  id_r );
 	DECLARE_READ32_MEMBER(  revision_r );

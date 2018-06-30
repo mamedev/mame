@@ -35,6 +35,7 @@
 #include "sound/spkrdev.h"
 #include "video/cgapal.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -74,7 +75,9 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
+		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_kbdio(*this, "Y%u", 1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -86,9 +89,12 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_DRIVER_INIT(poisk1);
+	required_ioport_array<8> m_kbdio;
+
+	void init_poisk1();
 	DECLARE_MACHINE_START(poisk1);
 	DECLARE_MACHINE_RESET(poisk1);
 
@@ -136,6 +142,9 @@ public:
 	DECLARE_WRITE8_MEMBER(p1_ppi2_portb_w);
 	DECLARE_READ8_MEMBER(p1_ppi2_portc_r);
 	const char *m_cputag;
+	void poisk1(machine_config &config);
+	void poisk1_io(address_map &map);
+	void poisk1_map(address_map &map);
 };
 
 /*
@@ -238,9 +247,9 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 	if (BIT((data ^ m_video.color_select_68), 7))
 	{
 		if (BIT(data, 7))
-			machine().first_screen()->set_visible_area(0, 640 - 1, 0, 200 - 1);
+			m_screen->set_visible_area(0, 640 - 1, 0, 200 - 1);
 		else
-			machine().first_screen()->set_visible_area(0, 320 - 1, 0, 200 - 1);
+			m_screen->set_visible_area(0, 320 - 1, 0, 200 - 1);
 	}
 	m_video.color_select_68 = data;
 	set_palette_luts();
@@ -486,14 +495,14 @@ READ8_MEMBER(p1_state::p1_ppi_portb_r)
 	uint16_t key = 0xffff;
 	uint8_t ret = 0;
 
-	if (m_kbpoll_mask & 0x01) { key &= ioport("Y1")->read(); }
-	if (m_kbpoll_mask & 0x02) { key &= ioport("Y2")->read(); }
-	if (m_kbpoll_mask & 0x04) { key &= ioport("Y3")->read(); }
-	if (m_kbpoll_mask & 0x08) { key &= ioport("Y4")->read(); }
-	if (m_kbpoll_mask & 0x10) { key &= ioport("Y5")->read(); }
-	if (m_kbpoll_mask & 0x20) { key &= ioport("Y6")->read(); }
-	if (m_kbpoll_mask & 0x40) { key &= ioport("Y7")->read(); }
-	if (m_kbpoll_mask & 0x80) { key &= ioport("Y8")->read(); }
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_kbpoll_mask, i))
+		{
+			key &= m_kbdio[i]->read();
+		}
+	}
+
 	ret = key & 0xff;
 //  DBG_LOG(1,"p1_ppi_portb_r",("= %02X\n", ret));
 	return ret;
@@ -504,14 +513,14 @@ READ8_MEMBER(p1_state::p1_ppi_portc_r)
 	uint16_t key = 0xffff;
 	uint8_t ret = 0;
 
-	if (m_kbpoll_mask & 0x01) { key &= ioport("Y1")->read(); }
-	if (m_kbpoll_mask & 0x02) { key &= ioport("Y2")->read(); }
-	if (m_kbpoll_mask & 0x04) { key &= ioport("Y3")->read(); }
-	if (m_kbpoll_mask & 0x08) { key &= ioport("Y4")->read(); }
-	if (m_kbpoll_mask & 0x10) { key &= ioport("Y5")->read(); }
-	if (m_kbpoll_mask & 0x20) { key &= ioport("Y6")->read(); }
-	if (m_kbpoll_mask & 0x40) { key &= ioport("Y7")->read(); }
-	if (m_kbpoll_mask & 0x80) { key &= ioport("Y8")->read(); }
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_kbpoll_mask, i))
+		{
+			key &= m_kbdio[i]->read();
+		}
+	}
+
 	ret = (key >> 8) & 0xff;
 	DBG_LOG(2,"p1_ppi_portc_r",("= %02X\n", ret));
 	return ret;
@@ -586,7 +595,7 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
  *
  **********************************************************/
 
-DRIVER_INIT_MEMBER(p1_state, poisk1)
+void p1_state::init_poisk1()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -612,69 +621,71 @@ MACHINE_RESET_MEMBER(p1_state, poisk1)
  * macros
  */
 
-static ADDRESS_MAP_START( poisk1_map, AS_PROGRAM, 8, p1_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0xc000)
-ADDRESS_MAP_END
+void p1_state::poisk1_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xfc000, 0xfffff).rom().region("bios", 0xc000);
+}
 
-static ADDRESS_MAP_START( poisk1_io, AS_IO, 8, p1_state )
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x0028, 0x002B) AM_READWRITE(p1_trap_r, p1_trap_w)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+void p1_state::poisk1_io(address_map &map)
+{
+	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0028, 0x002B).rw(FUNC(p1_state::p1_trap_r), FUNC(p1_state::p1_trap_w));
+	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	// can't use regular AM_DEVREADWRITE, because THIS IS SPARTA!
 	// 1st PPI occupies ports 60, 69, 6A and 6B; 2nd PPI -- 68, 61, 62 and 63.
-	AM_RANGE(0x0060, 0x006F) AM_READWRITE(p1_ppi_r, p1_ppi_w)
-	AM_RANGE(0x03D0, 0x03DF) AM_READWRITE(p1_cga_r, p1_cga_w)
-ADDRESS_MAP_END
+	map(0x0060, 0x006F).rw(FUNC(p1_state::p1_ppi_r), FUNC(p1_state::p1_ppi_w));
+	map(0x03D0, 0x03DF).rw(FUNC(p1_state::p1_cga_r), FUNC(p1_state::p1_cga_w));
+}
 
 static INPUT_PORTS_START( poisk1 )
 	PORT_INCLUDE( poisk1_keyboard_v91 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( poisk1 )
+MACHINE_CONFIG_START(p1_state::poisk1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, 5000000)
-	MCFG_CPU_PROGRAM_MAP(poisk1_map)
-	MCFG_CPU_IO_MAP(poisk1_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, 5000000)
+	MCFG_DEVICE_PROGRAM_MAP(poisk1_map)
+	MCFG_DEVICE_IO_MAP(poisk1_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE( p1_state, poisk1 )
 	MCFG_MACHINE_RESET_OVERRIDE( p1_state, poisk1 )
 
 	MCFG_DEVICE_ADD( "pit8253", PIT8253 ,0)
-	MCFG_PIT8253_CLK0(XTAL_15MHz/12) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_15MHz/12) /* keyboard poll -- XXX edge or level triggered? */
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir6_w))
-	MCFG_PIT8253_CLK2(XTAL_15MHz/12) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(p1_state, p1_pit8253_out2_changed))
+	MCFG_PIT8253_CLK0(XTAL(15'000'000)/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12) /* keyboard poll -- XXX edge or level triggered? */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic8259", pic8259_device, ir6_w))
+	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, p1_state, p1_pit8253_out2_changed))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("ppi8255n1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(p1_state, p1_ppi_porta_r)) /*60H*/
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(p1_state, p1_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(p1_state, p1_ppi_portb_r)) /*69H*/
-	MCFG_I8255_IN_PORTC_CB(READ8(p1_state, p1_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(p1_state, p1_ppi_portc_w))   /*6AH*/
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, p1_state, p1_ppi_porta_r)) /*60H*/
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, p1_state, p1_ppi_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, p1_state, p1_ppi_portb_r)) /*69H*/
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, p1_state, p1_ppi_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, p1_state, p1_ppi_portc_w))   /*6AH*/
 
 	MCFG_DEVICE_ADD("ppi8255n2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(p1_state, p1_ppi2_porta_w))  /*68H*/
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(p1_state, p1_ppi2_portb_w))  /*61H*/
-	MCFG_I8255_IN_PORTC_CB(READ8(p1_state, p1_ppi2_portc_r))    /*62H*/
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, p1_state, p1_ppi2_porta_w))  /*68H*/
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, p1_state, p1_ppi2_portb_w))  /*61H*/
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, p1_state, p1_ppi2_portc_r))    /*62H*/
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", p1_isa8_cards, "fdc", false)
-	MCFG_ISA8_SLOT_ADD("isa", "isa2", p1_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("isa", "isa3", p1_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("isa", "isa4", p1_isa8_cards, nullptr, false)
+	MCFG_ISA8_CPU("maincpu")
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259", pic8259_device, ir7_w))
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", p1_isa8_cards, "fdc", false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -682,12 +693,12 @@ static MACHINE_CONFIG_START( poisk1 )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","poisk1_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","poisk1_cass")
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "speaker", SPEAKER_SOUND, 0 )
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "speaker", SPEAKER_SOUND )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL_15MHz, 912,0,640, 262,0,200 )
+	MCFG_SCREEN_RAW_PARAMS( XTAL(15'000'000), 912,0,640, 262,0,200 )
 	MCFG_SCREEN_UPDATE_DRIVER( p1_state, screen_update )
 
 	/* XXX verify palette */
@@ -704,32 +715,32 @@ ROM_START( poisk1 )
 
 	ROM_DEFAULT_BIOS("v91")
 	ROM_SYSTEM_BIOS(0, "v89r0", "1989r0")
-	ROMX_LOAD( "BIOS.RF6", 0xe000, 0x2000, CRC(c0f333e3) SHA1(a44f355b7deae3693e1462d57543a42944fd0969), ROM_BIOS(1))
+	ROMX_LOAD("bios.rf6", 0xe000, 0x2000, CRC(c0f333e3) SHA1(a44f355b7deae3693e1462d57543a42944fd0969), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v89", "1989")
-	ROMX_LOAD( "biosp1s.rf4", 0xe000, 0x2000, CRC(1a85f671) SHA1(f0e59b2c4d92164abca55a96a58071ce869ff988), ROM_BIOS(2))
+	ROMX_LOAD("biosp1s.rf4", 0xe000, 0x2000, CRC(1a85f671) SHA1(f0e59b2c4d92164abca55a96a58071ce869ff988), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v91", "1991")
-	ROMX_LOAD( "poisk_1991.bin", 0xe000, 0x2000, CRC(d61c56fd) SHA1(de202e1f7422d585a1385a002a4fcf9d756236e5), ROM_BIOS(3))
+	ROMX_LOAD("poisk_1991.bin", 0xe000, 0x2000, CRC(d61c56fd) SHA1(de202e1f7422d585a1385a002a4fcf9d756236e5), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v91r2", "1991r2")
-	ROMX_LOAD( "p_bios_nm.bin", 0xe000, 0x2000, CRC(84430b4f) SHA1(3e477962be3cea09662cb2e3ad9966ad01c7455d), ROM_BIOS(4))
+	ROMX_LOAD("p_bios_nm.bin", 0xe000, 0x2000, CRC(84430b4f) SHA1(3e477962be3cea09662cb2e3ad9966ad01c7455d), ROM_BIOS(3))
 
 	ROM_SYSTEM_BIOS(4, "test1", "Test 1")
-	ROMX_LOAD( "TEST1.RF6", 0x00000, 0x2000, CRC(a5f05dff) SHA1(21dd0cea605bd7be22e94f8355d86b2478d9527e), ROM_BIOS(5))
+	ROMX_LOAD("test1.rf6", 0x00000, 0x2000, CRC(a5f05dff) SHA1(21dd0cea605bd7be22e94f8355d86b2478d9527e), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(5, "test2", "Test 2")
-	ROMX_LOAD( "TEST2.RF6", 0x00000, 0x2000, CRC(eff730e4) SHA1(fcbc08de9b8592c974eaea837839f1a9caf36a75), ROM_BIOS(6))
+	ROMX_LOAD("test2.rf6", 0x00000, 0x2000, CRC(eff730e4) SHA1(fcbc08de9b8592c974eaea837839f1a9caf36a75), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS(6, "test3", "Test 3")
-	ROMX_LOAD( "TEST3.RF6", 0x00000, 0x2000, CRC(23025dc9) SHA1(dca4cb580162bb28f6e49ff625b677001d40d573), ROM_BIOS(7))
+	ROMX_LOAD("test3.rf6", 0x00000, 0x2000, CRC(23025dc9) SHA1(dca4cb580162bb28f6e49ff625b677001d40d573), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS(7, "test4", "Test 4")
-	ROMX_LOAD( "TEST4.RF6", 0x00000, 0x2000, CRC(aac8fc5e) SHA1(622abb5ac66d38a474ee54fe016aff0ba0b5794f), ROM_BIOS(8))
+	ROMX_LOAD("test4.rf6", 0x00000, 0x2000, CRC(aac8fc5e) SHA1(622abb5ac66d38a474ee54fe016aff0ba0b5794f), ROM_BIOS(7))
 	ROM_SYSTEM_BIOS(8, "test5", "Test 5")
-	ROMX_LOAD( "TEST5.RF6", 0x00000, 0x2000, CRC(f308e679) SHA1(37bd35f62015d338b3347fd4e3ec455eab048b66), ROM_BIOS(9))
+	ROMX_LOAD("test5.rf6", 0x00000, 0x2000, CRC(f308e679) SHA1(37bd35f62015d338b3347fd4e3ec455eab048b66), ROM_BIOS(8))
 
 	// 0xc0000, sets 80x25 text and loops asking for 'Boot from hard disk (Y or N)?'
-	ROM_LOAD( "boot_net.rf4", 0x00000, 0x2000, CRC(316c2030) SHA1(d043325596455772252e465b85321f1b5c529d0b)) // NET BIOS
+	ROM_LOAD("boot_net.rf4", 0x00000, 0x2000, CRC(316c2030) SHA1(d043325596455772252e465b85321f1b5c529d0b)) // NET BIOS
 	// 0xc0000, accesses ports 0x90..0x97
-	ROM_LOAD( "pois_net.bin", 0x00000, 0x2000, CRC(cf9dd80a) SHA1(566bcb40c0cb2c8bfd5b485f0db689fdeaca3e86)) // ??? BIOS
+	ROM_LOAD("pois_net.bin", 0x00000, 0x2000, CRC(cf9dd80a) SHA1(566bcb40c0cb2c8bfd5b485f0db689fdeaca3e86)) // ??? BIOS
 
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
-	ROM_LOAD( "poisk.cga", 0x0000, 0x0800, CRC(f6eb39f0) SHA1(0b788d8d7a8e92cc612d044abcb2523ad964c200))
+	ROM_LOAD("poisk.cga", 0x0000, 0x0800, CRC(f6eb39f0) SHA1(0b788d8d7a8e92cc612d044abcb2523ad964c200))
 ROM_END
 
 /***************************************************************************
@@ -738,5 +749,5 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR     NAME       PARENT      COMPAT  MACHINE   INPUT    STATE     INIT    COMPANY          FULLNAME   FLAGS
-COMP ( 1989,    poisk1,    ibm5150,    0,      poisk1,   poisk1,  p1_state, poisk1, "Electronmash",  "Poisk-1", 0 )
+//    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT   CLASS     INIT         COMPANY         FULLNAME   FLAGS
+COMP( 1989, poisk1, ibm5150, 0,      poisk1,  poisk1, p1_state, init_poisk1, "Electronmash", "Poisk-1", 0 )

@@ -281,7 +281,7 @@
 #		define GLM_COMPILER (GLM_COMPILER_GCC70)
 #	elif (__GNUC__ == 7) && (__GNUC_MINOR__ == 1)
 #		define GLM_COMPILER (GLM_COMPILER_GCC71)
-#	elif (__GNUC__ == 7) && (__GNUC_MINOR__ == 2)
+#	elif (__GNUC__ == 7) && (__GNUC_MINOR__ >= 2)
 #		define GLM_COMPILER (GLM_COMPILER_GCC72)
 #	elif (__GNUC__ >= 8)
 #		define GLM_COMPILER (GLM_COMPILER_GCC80)

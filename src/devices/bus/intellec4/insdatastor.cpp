@@ -80,7 +80,7 @@ void imm4_22_device::device_start()
 	save_item(NAME(m_rom_mirror));
 	save_item(NAME(m_memory));
 	save_item(NAME(m_status));
-	save_pointer(NAME(m_prom.get()), 1024U);
+	save_pointer(NAME(m_prom), 1024U);
 }
 
 void imm4_22_device::device_reset()
@@ -115,7 +115,7 @@ WRITE8_MEMBER(imm4_22_device::rom_out)
 READ8_MEMBER(imm4_22_device::rom_in)
 {
 	// GPIO read - hooking this up would be a pain with MAME as it is
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		logerror("ROM %u in\n", (m_rom_page << 2) | ((offset >> 4) & 0x03U));
 	return 0x0fU;
 }

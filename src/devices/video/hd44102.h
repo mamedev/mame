@@ -21,7 +21,7 @@
 #define MCFG_HD44102_ADD(_tag, _screen_tag, _sx, _sy) \
 	MCFG_DEVICE_ADD(_tag, HD44102, 0) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	hd44102_device::static_set_offsets(*device, _sx, _sy);
+	downcast<hd44102_device &>(*device).set_offsets(_sx, _sy);
 
 
 
@@ -39,7 +39,7 @@ public:
 	hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_offsets(device_t &device, int sx, int sy);
+	void set_offsets(int sx, int sy) { m_sx = sx; m_sy = sy; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

@@ -23,6 +23,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "video/msm6222b.h"
+#include "emupal.h"
 #include "screen.h"
 
 static INPUT_PORTS_START( d110 )
@@ -73,6 +74,9 @@ public:
 	DECLARE_PALETTE_INIT(d110);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void d110(machine_config &config);
+	void d110_io(address_map &map);
+	void d110_map(address_map &map);
 private:
 
 	uint8_t  m_lcd_data_buffer[256];
@@ -213,27 +217,29 @@ PALETTE_INIT_MEMBER(d110_state, d110)
 	palette.set_pen_color(1, rgb_t(0, 0, 0));
 }
 
-static ADDRESS_MAP_START( d110_map, AS_PROGRAM, 8, d110_state )
-	AM_RANGE(0x0100, 0x0100) AM_WRITE(bank_w)
-	AM_RANGE(0x0200, 0x0200) AM_WRITE(so_w)
-	AM_RANGE(0x021a, 0x021a) AM_READ_PORT("SC0") AM_WRITENOP
-	AM_RANGE(0x021c, 0x021c) AM_READ_PORT("SC1")
-	AM_RANGE(0x0300, 0x0300) AM_WRITE(lcd_data_w)
-	AM_RANGE(0x0380, 0x0380) AM_READWRITE(lcd_ctrl_r, lcd_ctrl_w)
-	AM_RANGE(0x1000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x1000)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("fixed")
-ADDRESS_MAP_END
+void d110_state::d110_map(address_map &map)
+{
+	map(0x0100, 0x0100).w(FUNC(d110_state::bank_w));
+	map(0x0200, 0x0200).w(FUNC(d110_state::so_w));
+	map(0x021a, 0x021a).portr("SC0").nopw();
+	map(0x021c, 0x021c).portr("SC1");
+	map(0x0300, 0x0300).w(FUNC(d110_state::lcd_data_w));
+	map(0x0380, 0x0380).rw(FUNC(d110_state::lcd_ctrl_r), FUNC(d110_state::lcd_ctrl_w));
+	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
+	map(0x8000, 0xbfff).bankrw("bank");
+	map(0xc000, 0xffff).bankrw("fixed");
+}
 
-static ADDRESS_MAP_START( d110_io, AS_IO, 16, d110_state )
-	AM_RANGE(i8x9x_device::SERIAL, i8x9x_device::SERIAL) AM_WRITE(midi_w)
-	AM_RANGE(i8x9x_device::P0,     i8x9x_device::P0)     AM_READ(port0_r)
-ADDRESS_MAP_END
+void d110_state::d110_io(address_map &map)
+{
+	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(FUNC(d110_state::midi_w));
+	map(i8x9x_device::P0, i8x9x_device::P0).r(FUNC(d110_state::port0_r));
+}
 
-static MACHINE_CONFIG_START( d110 )
-	MCFG_CPU_ADD( "maincpu", P8098, XTAL_12MHz )
-	MCFG_CPU_PROGRAM_MAP( d110_map )
-	MCFG_CPU_IO_MAP( d110_io )
+MACHINE_CONFIG_START(d110_state::d110)
+	MCFG_DEVICE_ADD( "maincpu", P8098, XTAL(12'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP( d110_map )
+	MCFG_DEVICE_IO_MAP( d110_io )
 
 // Battery-backed main ram
 	MCFG_RAM_ADD( "ram" )
@@ -269,10 +275,10 @@ ROM_START( d110 )
 	ROM_DEFAULT_BIOS( "110" )
 
 	ROM_SYSTEM_BIOS( 0, "106", "Firmware 1.06" )
-	ROMX_LOAD( "d-110.v1.06.ic19.bin",         0,   0x8000, CRC(3dd5b6e9) SHA1(73b155fb0a8adc2362e73cb0803dafba9ccfb508), ROM_BIOS(1) )
+	ROMX_LOAD( "d-110.v1.06.ic19.bin",         0,   0x8000, CRC(3dd5b6e9) SHA1(73b155fb0a8adc2362e73cb0803dafba9ccfb508), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS( 1, "110", "Firmware 1.10" )
-	ROMX_LOAD( "d-110.v1.10.ic19.bin",         0,   0x8000, CRC(3ae68187) SHA1(28635510f30d6c1fb88e00da03e5b4e045c380cb), ROM_BIOS(2) )
+	ROMX_LOAD( "d-110.v1.10.ic19.bin",         0,   0x8000, CRC(3ae68187) SHA1(28635510f30d6c1fb88e00da03e5b4e045c380cb), ROM_BIOS(1) )
 
 	ROM_REGION( 0x20000, "presets", 0 )
 	ROM_LOAD(  "r15179873-lh5310-97.ic12.bin", 0,  0x20000, CRC(580a8f9e) SHA1(05587a0542b01625dcde37de5bb339880e47eb93) )
@@ -285,4 +291,4 @@ ROM_START( d110 )
 	ROM_LOAD(  "r15179879.ic6.bin",            0,   0x8000, CRC(5d34174e) SHA1(17bd2887711c5c5458aba6d3be5972b2096eb450) )
 ROM_END
 
-CONS( 1988, d110,  0, 0, d110, d110, d110_state, 0, "Roland", "D110",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1988, d110, 0, 0, d110, d110, d110_state, empty_init, "Roland", "D110", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

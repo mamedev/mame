@@ -63,17 +63,6 @@ es5503_device::es5503_device(const machine_config &mconfig, const char *tag, dev
 
 
 //-------------------------------------------------
-//  static_set_type - configuration helper to set
-//  the IRQ callback
-//-------------------------------------------------
-
-void es5503_device::static_set_channels(device_t &device, int channels)
-{
-	es5503_device &es5503 = downcast<es5503_device &>(device);
-	es5503.output_channels = channels;
-}
-
-//-------------------------------------------------
 //  device_timer - called when our device timer expires
 //-------------------------------------------------
 

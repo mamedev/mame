@@ -39,7 +39,7 @@ PALETTE_INIT_MEMBER(cvs_state,cvs)
 			uint8_t ctabentry = color_prom[(i << 8) | attr] & 0x07;
 
 			/* bits 0 and 2 are swapped */
-			ctabentry = BITSWAP8(ctabentry,7,6,5,4,3,0,1,2);
+			ctabentry = bitswap<8>(ctabentry,7,6,5,4,3,0,1,2);
 
 			palette.set_pen_indirect((attr << 3) | i, ctabentry);
 		}
@@ -82,7 +82,7 @@ void cvs_state::set_pens(  )
 WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
 {
 	if (data & 0xce)
-		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",space.device().safe_pc(), data & 0xce);
+		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",m_maincpu->pc(), data & 0xce);
 
 	m_stars_on = data & 0x01;
 
@@ -90,8 +90,8 @@ WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
 	if (data & 0x04)   logerror("           SCREEN ROTATE\n");
 	if (data & 0x08)   logerror("           SHADE BRIGHTER TO LEFT\n");
 
-	output().set_led_value(1, data & 0x10);  /* lamp 1 */
-	output().set_led_value(2, data & 0x20);  /* lamp 2 */
+	m_lamps[0] = BIT(data, 4);  /* lamp 1 */
+	m_lamps[1] = BIT(data, 5);  /* lamp 2 */
 
 	if (data & 0x40)   logerror("           SHADE BRIGHTER TO BOTTOM\n");
 	if (data & 0x80)   logerror("           SHADE BRIGHTER TO TOP\n");

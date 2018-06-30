@@ -32,15 +32,17 @@ DEFINE_DEVICE_TYPE(COMPIS_UHRG, compis_uhrg_device, "compis_uhrg", "Compis UHRG"
 //  ADDRESS_MAP( upd7220_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hrg_map, 0, 16, compis_hrg_device )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x00000, 0x7fff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void compis_hrg_device::hrg_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x00000, 0x7fff).ram().share("video_ram");
+}
 
-static ADDRESS_MAP_START( uhrg_map, 0, 16, compis_uhrg_device )
-	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void compis_uhrg_device::uhrg_map(address_map &map)
+{
+	map.global_mask(0x1ffff);
+	map(0x00000, 0x1ffff).ram().share("video_ram");
+}
 
 
 //-------------------------------------------------
@@ -75,7 +77,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( compis_uhrg_device::display_pixels )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( compis_hrg_device::device_add_mconfig )
+MACHINE_CONFIG_START(compis_hrg_device::device_add_mconfig)
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -93,7 +95,7 @@ MACHINE_CONFIG_MEMBER( compis_hrg_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER( compis_uhrg_device::device_add_mconfig )
+MACHINE_CONFIG_START(compis_uhrg_device::device_add_mconfig)
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(50)

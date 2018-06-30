@@ -37,7 +37,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	DECLARE_WRITE8_MEMBER(latch_w);
 	DECLARE_READ8_MEMBER(shifter_r);

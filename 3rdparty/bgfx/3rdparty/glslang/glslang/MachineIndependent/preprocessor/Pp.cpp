@@ -76,12 +76,15 @@ TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY OR OTHERWISE, EVEN IF
 NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \****************************************************************************/
 
+#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #include <sstream>
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
+#include <climits>
 
 #include "PpContext.h"
 #include "PpTokens.h"
@@ -239,15 +242,20 @@ int TPpContext::CPPelse(int matchelse, TPpToken* ppToken)
         int nextAtom = atomStrings.getAtom(ppToken->name);
         if (nextAtom == PpAtomIf || nextAtom == PpAtomIfdef || nextAtom == PpAtomIfndef) {
             depth++;
-            ifdepth++;
-            elsetracker++;
+            if (ifdepth >= maxIfNesting || elsetracker >= maxIfNesting) {
+                parseContext.ppError(ppToken->loc, "maximum nesting depth exceeded", "#if/#ifdef/#ifndef", "");
+                return EndOfInput;
+            } else {
+                ifdepth++;
+                elsetracker++;
+            }
         } else if (nextAtom == PpAtomEndif) {
             token = extraTokenCheck(nextAtom, ppToken, scanToken(ppToken));
             elseSeen[elsetracker] = false;
             --elsetracker;
             if (depth == 0) {
                 // found the #endif we are looking for
-                if (ifdepth)
+                if (ifdepth > 0)
                     --ifdepth;
                 break;
             }
@@ -264,7 +272,7 @@ int TPpContext::CPPelse(int matchelse, TPpToken* ppToken)
                     parseContext.ppError(ppToken->loc, "#elif after #else", "#elif", "");
                 /* we decrement ifdepth here, because CPPif will increment
                 * it and we really want to leave it alone */
-                if (ifdepth) {
+                if (ifdepth > 0) {
                     --ifdepth;
                     elseSeen[elsetracker] = false;
                     --elsetracker;
@@ -343,8 +351,8 @@ namespace {
     int op_add(int a, int b) { return a + b; }
     int op_sub(int a, int b) { return a - b; }
     int op_mul(int a, int b) { return a * b; }
-    int op_div(int a, int b) { return a / b; }
-    int op_mod(int a, int b) { return a % b; }
+    int op_div(int a, int b) { return a == INT_MIN && b == -1 ? 0 : a / b; }
+    int op_mod(int a, int b) { return a == INT_MIN && b == -1 ? 0 : a % b; }
     int op_pos(int a) { return a; }
     int op_neg(int a) { return -a; }
     int op_cmpl(int a) { return ~a; }
@@ -391,6 +399,14 @@ int TPpContext::eval(int token, int precedence, bool shortCircuit, int& res, boo
     TSourceLoc loc = ppToken->loc;  // because we sometimes read the newline before reporting the error
     if (token == PpAtomIdentifier) {
         if (strcmp("defined", ppToken->name) == 0) {
+            if (! parseContext.isReadingHLSL() && isMacroInput()) {
+                if (parseContext.relaxedErrors())
+                    parseContext.ppWarn(ppToken->loc, "nonportable when expanded from macros for preprocessor expression",
+                                                      "defined", "");
+                else
+                    parseContext.ppError(ppToken->loc, "cannot use in preprocessor expression when expanded from macros",
+                                                       "defined", "");
+            }
             bool needclose = 0;
             token = scanToken(ppToken);
             if (token == '(') {
@@ -526,11 +542,12 @@ int TPpContext::evalToToken(int token, bool shortCircuit, int& res, bool& err, T
 int TPpContext::CPPif(TPpToken* ppToken)
 {
     int token = scanToken(ppToken);
-    elsetracker++;
-    ifdepth++;
-    if (ifdepth > maxIfNesting) {
+    if (ifdepth >= maxIfNesting || elsetracker >= maxIfNesting) {
         parseContext.ppError(ppToken->loc, "maximum nesting depth exceeded", "#if", "");
-        return 0;
+        return EndOfInput;
+    } else {
+        elsetracker++;
+        ifdepth++;
     }
     int res = 0;
     bool err = false;
@@ -546,11 +563,14 @@ int TPpContext::CPPif(TPpToken* ppToken)
 int TPpContext::CPPifdef(int defined, TPpToken* ppToken)
 {
     int token = scanToken(ppToken);
-    if (++ifdepth > maxIfNesting) {
+    if (ifdepth > maxIfNesting || elsetracker > maxIfNesting) {
         parseContext.ppError(ppToken->loc, "maximum nesting depth exceeded", "#ifdef", "");
-        return 0;
+        return EndOfInput;
+    } else {
+        elsetracker++;
+        ifdepth++;
     }
-    elsetracker++;
+
     if (token != PpAtomIdentifier) {
         if (defined)
             parseContext.ppError(ppToken->loc, "must be followed by macro name", "#ifdef", "");
@@ -611,14 +631,14 @@ int TPpContext::CPPinclude(TPpToken* ppToken)
     TShader::Includer::IncludeResult* res = nullptr;
     if (startWithLocalSearch)
         res = includer.includeLocal(filename.c_str(), currentSourceFile.c_str(), includeStack.size() + 1);
-    if (! res || res->headerName.empty()) {
+    if (res == nullptr || res->headerName.empty()) {
         includer.releaseInclude(res);
         res = includer.includeSystem(filename.c_str(), currentSourceFile.c_str(), includeStack.size() + 1);
     }
 
     // Process the results
-    if (res && !res->headerName.empty()) {
-        if (res->headerData && res->headerLength) {
+    if (res != nullptr && !res->headerName.empty()) {
+        if (res->headerData != nullptr && res->headerLength > 0) {
             // path for processing one or more tokens from an included header, hand off 'res'
             const bool forNextLine = parseContext.lineDirectiveShouldSetNextLine();
             std::ostringstream prologue;
@@ -636,8 +656,8 @@ int TPpContext::CPPinclude(TPpToken* ppToken)
     } else {
         // error path, clean up
         std::string message =
-            res ? std::string(res->headerData, res->headerLength)
-                : std::string("Could not process include directive");
+            res != nullptr ? std::string(res->headerData, res->headerLength)
+                           : std::string("Could not process include directive");
         parseContext.ppError(directiveLoc, message.c_str(), "#include", "for header name: %s", filename.c_str());
         includer.releaseInclude(res);
     }
@@ -714,6 +734,7 @@ int TPpContext::CPPerror(TPpToken* ppToken)
         if (token == PpAtomConstInt   || token == PpAtomConstUint   ||
             token == PpAtomConstInt64 || token == PpAtomConstUint64 ||
 #ifdef AMD_EXTENSIONS
+            token == PpAtomConstInt16 || token == PpAtomConstUint16 ||
             token == PpAtomConstFloat16 ||
 #endif
             token == PpAtomConstFloat || token == PpAtomConstDouble) {
@@ -748,6 +769,10 @@ int TPpContext::CPPpragma(TPpToken* ppToken)
         case PpAtomConstUint:
         case PpAtomConstInt64:
         case PpAtomConstUint64:
+#ifdef AMD_EXTENSIONS
+        case PpAtomConstInt16:
+        case PpAtomConstUint16:
+#endif
         case PpAtomConstFloat:
         case PpAtomConstDouble:
 #ifdef AMD_EXTENSIONS
@@ -776,8 +801,12 @@ int TPpContext::CPPversion(TPpToken* ppToken)
 {
     int token = scanToken(ppToken);
 
-    if (errorOnVersion || versionSeen)
-        parseContext.ppError(ppToken->loc, "must occur first in shader", "#version", "");
+    if (errorOnVersion || versionSeen) {
+        if (parseContext.isReadingHLSL())
+            parseContext.ppError(ppToken->loc, "invalid preprocessor command", "#version", "");
+        else
+            parseContext.ppError(ppToken->loc, "must occur first in shader", "#version", "");
+    }
     versionSeen = true;
 
     if (token == '\n') {
@@ -867,16 +896,16 @@ int TPpContext::readCPPline(TPpToken* ppToken)
             token = CPPdefine(ppToken);
             break;
         case PpAtomElse:
-            if (elsetracker[elseSeen])
+            if (elseSeen[elsetracker])
                 parseContext.ppError(ppToken->loc, "#else after #else", "#else", "");
-            elsetracker[elseSeen] = true;
-            if (! ifdepth)
+            elseSeen[elsetracker] = true;
+            if (ifdepth == 0)
                 parseContext.ppError(ppToken->loc, "mismatched statements", "#else", "");
             token = extraTokenCheck(PpAtomElse, ppToken, scanToken(ppToken));
             token = CPPelse(0, ppToken);
             break;
         case PpAtomElif:
-            if (! ifdepth)
+            if (ifdepth == 0)
                 parseContext.ppError(ppToken->loc, "mismatched statements", "#elif", "");
             if (elseSeen[elsetracker])
                 parseContext.ppError(ppToken->loc, "#elif after #else", "#elif", "");
@@ -887,7 +916,7 @@ int TPpContext::readCPPline(TPpToken* ppToken)
             token = CPPelse(0, ppToken);
             break;
         case PpAtomEndif:
-            if (! ifdepth)
+            if (ifdepth == 0)
                 parseContext.ppError(ppToken->loc, "mismatched statements", "#endif", "");
             else {
                 elseSeen[elsetracker] = false;
@@ -1049,6 +1078,10 @@ int TPpContext::tMacroInput::scan(TPpToken* ppToken)
         pasting = true;
     }
 
+    // HLSL does expand macros before concatenation
+    if (pasting && pp->parseContext.isReadingHLSL())
+        pasting = false;
+
     // TODO: preprocessor:  properly handle whitespace (or lack of it) between tokens when expanding
     if (token == PpAtomIdentifier) {
         int i;
@@ -1124,7 +1157,6 @@ int TPpContext::MacroExpand(TPpToken* ppToken, bool expandUndef, bool newLineOka
     }
 
     MacroSymbol* macro = macroAtom == 0 ? nullptr : lookupMacroDef(macroAtom);
-    int token;
     int depth = 0;
 
     // no recursive expansions
@@ -1146,13 +1178,12 @@ int TPpContext::MacroExpand(TPpToken* ppToken, bool expandUndef, bool newLineOka
     TSourceLoc loc = ppToken->loc;  // in case we go to the next line before discovering the error
     in->mac = macro;
     if (macro->args.size() > 0 || macro->emptyArgs) {
-        token = scanToken(ppToken);
+        int token = scanToken(ppToken);
         if (newLineOkay) {
             while (token == '\n')
                 token = scanToken(ppToken);
         }
         if (token != '(') {
-            parseContext.ppError(loc, "expected '(' following", "macro expansion", atomStrings.getString(macroAtom));
             UngetToken(token, ppToken);
             delete in;
             return 0;

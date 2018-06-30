@@ -6,14 +6,15 @@
 #pragma once
 
 #include "machine/i8255.h"
+#include "emupal.h"
 
 typedef device_delegate<uint16_t (uint16_t)> igs017_igs031_palette_scramble_delegate;
 
-#define MCFG_PALETTE_SCRAMBLE_CB( _class, _method) \
-	igs017_igs031_device::set_palette_scramble_cb(*device, igs017_igs031_palette_scramble_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+#define MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( _class, _method) \
+	downcast<igs017_igs031_device &>(*device).set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
-#define MCFG_REVERSE_TEXT_BITS \
-	igs017_igs031_device::static_set_text_reverse_bits(*device);
+#define MCFG_IGS017_IGS031_REVERSE_TEXT_BITS \
+	downcast<igs017_igs031_device &>(*device).set_text_reverse_bits();
 
 class igs017_igs031_device : public device_t,
 							public device_gfx_interface,
@@ -23,20 +24,18 @@ class igs017_igs031_device : public device_t,
 public:
 	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename Object> void set_palette_scramble_cb(Object &&cb) { m_palette_scramble_cb = std::forward<Object>(cb); }
 
-	static void set_palette_scramble_cb(device_t &device,igs017_igs031_palette_scramble_delegate newtilecb);
-
-	static void static_set_text_reverse_bits(device_t &device)
+	void set_text_reverse_bits()
 	{
-		igs017_igs031_device &dev = downcast<igs017_igs031_device &>(device);
-		dev.m_revbits = 1;
+		m_revbits = 1;
 	}
 
 	uint16_t palette_callback_straight(uint16_t bgr);
 
 	igs017_igs031_palette_scramble_delegate m_palette_scramble_cb;
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

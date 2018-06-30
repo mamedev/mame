@@ -665,6 +665,12 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 		outtoc.tracks[0].frames = size / 2048;
 		outtoc.tracks[0].datasize = 2048;
 		outinfo.track[0].swap = false;
+	} else if ((size % 2336)==0 ) {
+		// 2352 byte mode 2
+		outtoc.tracks[0].trktype = CD_TRACK_MODE2;
+		outtoc.tracks[0].frames = size / 2336;
+		outtoc.tracks[0].datasize = 2336;
+		outinfo.track[0].swap = false;
 	} else if ((size % 2352)==0 ) {
 		// 2352 byte mode 2 raw
 		outtoc.tracks[0].trktype = CD_TRACK_MODE2_RAW;
@@ -899,12 +905,14 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					wavlen = parse_wav_sample(lastfname.c_str(), &wavoffs);
 					if (!wavlen)
 					{
+						fclose(infile);
 						printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname.c_str());
 						return CHDERR_INVALID_DATA;
 					}
 				}
 				else
 				{
+					fclose(infile);
 					printf("ERROR: Unhandled track type %s\n", token);
 					return CHDERR_UNSUPPORTED_FORMAT;
 				}
@@ -946,6 +954,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
 				if (outtoc.tracks[trknum].datasize == 0)
 				{
+					fclose(infile);
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 					return CHDERR_UNSUPPORTED_FORMAT;
 				}
@@ -1291,6 +1300,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
 				if (outtoc.tracks[trknum].datasize == 0)
 				{
+					fclose(infile);
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 					return CHDERR_UNSUPPORTED_FORMAT;
 				}

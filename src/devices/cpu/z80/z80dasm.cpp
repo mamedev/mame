@@ -9,20 +9,8 @@
 
 #include "emu.h"
 #include "debugger.h"
-#include "z80.h"
+#include "z80dasm.h"
 
-enum e_mnemonics
-{
-	zADC  ,zADD  ,zAND  ,zBIT  ,zCALL ,zCCF  ,zCP   ,zCPD  ,
-	zCPDR ,zCPI  ,zCPIR ,zCPL  ,zDAA  ,zDB   ,zDEC  ,zDI   ,
-	zDJNZ ,zEI   ,zEX   ,zEXX  ,zHLT  ,zIM   ,zIN   ,zINC  ,
-	zIND  ,zINDR ,zINI  ,zINIR ,zJP   ,zJR   ,zLD   ,zLDD  ,
-	zLDDR ,zLDI  ,zLDIR ,zNEG  ,zNOP  ,zOR   ,zOTDR ,zOTIR ,
-	zOUT  ,zOUTD ,zOUTI ,zPOP  ,zPUSH ,zRES  ,zRET  ,zRETI ,
-	zRETN ,zRL   ,zRLA  ,zRLC  ,zRLCA ,zRLD  ,zRR   ,zRRA  ,
-	zRRC  ,zRRCA ,zRRD  ,zRST  ,zSBC  ,zSCF  ,zSET  ,zSLA  ,
-	zSLL  ,zSRA  ,zSRL  ,zSUB  ,zXOR
-};
 
 static const char *const s_mnemonic[] =
 {
@@ -37,29 +25,20 @@ static const char *const s_mnemonic[] =
 	"sll" ,"sra" ,"srl" ,"sub" ,"xor "
 };
 
-#define _OVER DASMFLAG_STEP_OVER
-#define _OUT  DASMFLAG_STEP_OUT
-
-static const uint32_t s_flags[] =
+const u32 z80_disassembler::s_flags[] =
 {
-	0    ,0    ,0    ,0    ,_OVER,0    ,0    ,0    ,
-	_OVER,0    ,_OVER,0    ,0    ,0    ,0    ,0    ,
-	_OVER,0    ,0    ,0    ,_OVER,0    ,0    ,0    ,
-	0    ,_OVER,0    ,_OVER,0    ,0    ,0    ,0    ,
-	_OVER,0    ,_OVER,0    ,0    ,0    ,_OVER,_OVER,
-	0    ,0    ,0    ,0    ,0    ,0    ,_OUT ,_OUT ,
-	_OUT ,0    ,0    ,0    ,0    ,0    ,0    ,0    ,
-	0    ,0    ,0    ,_OVER,0    ,0    ,0    ,0    ,
-	0    ,0    ,0    ,0    ,0
+	0        ,0        ,0        ,0        ,STEP_OVER,0    ,0        ,0        ,
+	STEP_OVER,0        ,STEP_OVER,0        ,0        ,0    ,0        ,0        ,
+	STEP_OVER,0        ,0        ,0        ,STEP_OVER,0    ,0        ,0        ,
+	0        ,STEP_OVER,0        ,STEP_OVER,0        ,0    ,0        ,0        ,
+	STEP_OVER,0        ,STEP_OVER,0        ,0        ,0    ,STEP_OVER,STEP_OVER,
+	0        ,0        ,0        ,0        ,0        ,0    ,STEP_OUT ,STEP_OUT ,
+	STEP_OUT ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
+	0        ,0        ,0        ,STEP_OVER,0        ,0    ,0        ,0        ,
+	0        ,0        ,0        ,0        ,0
 };
 
-struct z80dasm
-{
-	uint8_t mnemonic;
-	const char *arguments;
-};
-
-static const z80dasm mnemonic_xx_cb[256] =
+const z80_disassembler::z80dasm z80_disassembler::mnemonic_xx_cb[256] =
 {
 	{zRLC,"b=Y"},   {zRLC,"c=Y"},   {zRLC,"d=Y"},   {zRLC,"e=Y"},
 	{zRLC,"h=Y"},   {zRLC,"l=Y"},   {zRLC,"Y"},     {zRLC,"a=Y"},
@@ -127,7 +106,7 @@ static const z80dasm mnemonic_xx_cb[256] =
 	{zSET,"h=7,Y"}, {zSET,"l=7,Y"}, {zSET,"7,Y"},   {zSET,"a=7,Y"}
 };
 
-static const z80dasm mnemonic_cb[256] =
+const z80_disassembler::z80dasm z80_disassembler::mnemonic_cb[256] =
 {
 	{zRLC,"b"},     {zRLC,"c"},     {zRLC,"d"},     {zRLC,"e"},
 	{zRLC,"h"},     {zRLC,"l"},     {zRLC,"(hl)"},  {zRLC,"a"},
@@ -195,7 +174,7 @@ static const z80dasm mnemonic_cb[256] =
 	{zSET,"7,h"},   {zSET,"7,l"},   {zSET,"7,(hl)"},{zSET,"7,a"}
 };
 
-static const z80dasm mnemonic_ed[256] =
+const z80_disassembler::z80dasm z80_disassembler::mnemonic_ed[256] =
 {
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
@@ -214,21 +193,21 @@ static const z80dasm mnemonic_ed[256] =
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zIN,"b,(c)"},  {zOUT,"(c),b"}, {zSBC,"hl,bc"}, {zLD,"(W),bc"},
-	{zNEG,nullptr},       {zRETN,nullptr},      {zIM,"0"},      {zLD,"i,a"},
+	{zNEG,nullptr}, {zRETN,nullptr},{zIM,"0"},      {zLD,"i,a"},
 	{zIN,"c,(c)"},  {zOUT,"(c),c"}, {zADC,"hl,bc"}, {zLD,"bc,(W)"},
-	{zNEG,"*"},     {zRETI,nullptr},      {zIM,"0"},      {zLD,"r,a"},
+	{zNEG,"*"},     {zRETI,nullptr},{zIM,"0"},      {zLD,"r,a"},
 	{zIN,"d,(c)"},  {zOUT,"(c),d"}, {zSBC,"hl,de"}, {zLD,"(W),de"},
-	{zNEG,"*"},     {zRETN,nullptr},      {zIM,"1"},      {zLD,"a,i"},
+	{zNEG,"*"},     {zRETN,nullptr},{zIM,"1"},      {zLD,"a,i"},
 	{zIN,"e,(c)"},  {zOUT,"(c),e"}, {zADC,"hl,de"}, {zLD,"de,(W)"},
-	{zNEG,"*"},     {zRETI,nullptr},      {zIM,"2"},      {zLD,"a,r"},
+	{zNEG,"*"},     {zRETI,nullptr},{zIM,"2"},      {zLD,"a,r"},
 	{zIN,"h,(c)"},  {zOUT,"(c),h"}, {zSBC,"hl,hl"}, {zLD,"(W),hl"},
-	{zNEG,"*"},     {zRETN,nullptr},      {zIM,"0"},      {zRRD,"(hl)"},
+	{zNEG,"*"},     {zRETN,nullptr},{zIM,"0"},      {zRRD,"(hl)"},
 	{zIN,"l,(c)"},  {zOUT,"(c),l"}, {zADC,"hl,hl"}, {zLD,"hl,(W)"},
-	{zNEG,"*"},     {zRETI,nullptr},      {zIM,"0"},      {zRLD,"(hl)"},
+	{zNEG,"*"},     {zRETI,nullptr},{zIM,"0"},      {zRLD,"(hl)"},
 	{zIN,"0,(c)"},  {zOUT,"(c),0"}, {zSBC,"hl,sp"}, {zLD,"(W),sp"},
-	{zNEG,"*"},     {zRETN,nullptr},      {zIM,"1"},      {zDB,"?"},
+	{zNEG,"*"},     {zRETN,nullptr},{zIM,"1"},      {zDB,"?"},
 	{zIN,"a,(c)"},  {zOUT,"(c),a"}, {zADC,"hl,sp"}, {zLD,"sp,(W)"},
-	{zNEG,"*"},     {zRETI,nullptr},      {zIM,"2"},      {zDB,"?"},
+	{zNEG,"*"},     {zRETI,nullptr},{zIM,"2"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
@@ -263,7 +242,7 @@ static const z80dasm mnemonic_ed[256] =
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"}
 };
 
-static const z80dasm mnemonic_xx[256] =
+const z80_disassembler::z80dasm z80_disassembler::mnemonic_xx[256] =
 {
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
@@ -331,9 +310,9 @@ static const z80dasm mnemonic_xx[256] =
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"}
 };
 
-static const z80dasm mnemonic_main[256] =
+const z80_disassembler::z80dasm z80_disassembler::mnemonic_main[256] =
 {
-	{zNOP,nullptr},       {zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
+	{zNOP,nullptr}, {zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
 	{zINC,"b"},     {zDEC,"b"},     {zLD,"b,B"},    {zRLCA,nullptr},
 	{zEX,"af,af'"}, {zADD,"hl,bc"}, {zLD,"a,(bc)"}, {zDEC,"bc"},
 	{zINC,"c"},     {zDEC,"c"},     {zLD,"c,B"},    {zRRCA,nullptr},
@@ -383,11 +362,11 @@ static const z80dasm mnemonic_main[256] =
 	{zCP,"h"},      {zCP,"l"},      {zCP,"(hl)"},   {zCP,"a"},
 	{zRET,"nz"},    {zPOP,"bc"},    {zJP,"nz,A"},   {zJP,"A"},
 	{zCALL,"nz,A"}, {zPUSH,"bc"},   {zADD,"a,B"},   {zRST,"V"},
-	{zRET,"z"},     {zRET,nullptr},       {zJP,"z,A"},    {zDB,"cb"},
+	{zRET,"z"},     {zRET,nullptr}, {zJP,"z,A"},    {zDB,"cb"},
 	{zCALL,"z,A"},  {zCALL,"A"},    {zADC,"a,B"},   {zRST,"V"},
 	{zRET,"nc"},    {zPOP,"de"},    {zJP,"nc,A"},   {zOUT,"(P),a"},
 	{zCALL,"nc,A"}, {zPUSH,"de"},   {zSUB,"B"},     {zRST,"V"},
-	{zRET,"c"},     {zEXX,nullptr},       {zJP,"c,A"},    {zIN,"a,(P)"},
+	{zRET,"c"},     {zEXX,nullptr}, {zJP,"c,A"},    {zIN,"a,(P)"},
 	{zCALL,"c,A"},  {zDB,"dd"},     {zSBC,"a,B"},   {zRST,"V"},
 	{zRET,"po"},    {zPOP,"hl"},    {zJP,"po,A"},   {zEX,"(sp),hl"},
 	{zCALL,"po,A"}, {zPUSH,"hl"},   {zAND,"B"},     {zRST,"V"},
@@ -399,65 +378,83 @@ static const z80dasm mnemonic_main[256] =
 	{zCALL,"m,A"},  {zDB,"fd"},     {zCP,"B"},      {zRST,"V"}
 };
 
-static char sign(int8_t offset)
+char z80_disassembler::sign(s8 offset)
 {
 	return (offset < 0)? '-':'+';
 }
 
-static int offs(int8_t offset)
+u32 z80_disassembler::offs(s8 offset)
 {
-	if (offset < 0) return -offset;
+	if (offset < 0)
+		return -offset;
 	return offset;
 }
 
-/****************************************************************************
- * Disassemble opcode at PC and return number of bytes it takes
- ****************************************************************************/
-CPU_DISASSEMBLE(z80)
+z80_disassembler::z80_disassembler()
 {
-	const z80dasm *d;
-	const char *src, *ixy;
-	int8_t offset = 0;
-	uint8_t op, op1 = 0;
-	uint16_t ea;
-	int pos = 0;
+}
 
-	ixy = "oops!!";
+u32 z80_disassembler::opcode_alignment() const
+{
+	return 1;
+}
 
-	op = oprom[pos++];
+offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	s8 offset = 0;
 
+	offs_t pos = pc;
+	std::string ixy = "oops!!";
+
+	const z80dasm *d = nullptr;
+	u8 op = opcodes.r8(pos++);
 	switch (op)
 	{
 	case 0xcb:
-		op = oprom[pos++];
+		op = opcodes.r8(pos++);
 		d = &mnemonic_cb[op];
 		break;
 	case 0xed:
-		op1 = oprom[pos++];
-		d = &mnemonic_ed[op1];
+		d = &mnemonic_ed[opcodes.r8(pos++)];
+		if (d->mnemonic == zDB)
+			pos--;
 		break;
 	case 0xdd:
+	{
 		ixy = "ix";
-		op1 = oprom[pos++];
+		u8 op1 = opcodes.r8(pos++);
 		if( op1 == 0xcb )
 		{
-			offset = (int8_t) opram[pos++];
-			op1 = opram[pos++]; /* fourth byte from opbase.ram! */
+			offset = params.r8(pos++);
+			op1 = params.r8(pos++);
 			d = &mnemonic_xx_cb[op1];
 		}
-		else d = &mnemonic_xx[op1];
+		else
+		{
+			d = &mnemonic_xx[op1];
+			if (d->mnemonic == zDB)
+				pos--;
+		}
 		break;
+	}
 	case 0xfd:
+	{
 		ixy = "iy";
-		op1 = oprom[pos++];
+		u8 op1 = opcodes.r8(pos++);
 		if( op1 == 0xcb )
 		{
-			offset = (int8_t) opram[pos++];
-			op1 = opram[pos++]; /* fourth byte from opbase.ram! */
+			offset = params.r8(pos++);
+			op1 = params.r8(pos++);
 			d = &mnemonic_xx_cb[op1];
 		}
-		else d = &mnemonic_xx[op1];
+		else
+		{
+			d = &mnemonic_xx[op1];
+			if (d->mnemonic == zDB)
+				pos--;
+		}
 		break;
+	}
 	default:
 		d = &mnemonic_main[op];
 		break;
@@ -466,47 +463,40 @@ CPU_DISASSEMBLE(z80)
 	if( d->arguments )
 	{
 		util::stream_format(stream, "%-4s ", s_mnemonic[d->mnemonic]);
-		src = d->arguments;
+		const char *src = d->arguments;
 		while( *src )
 		{
 			switch( *src )
 			{
 			case '?':   /* illegal opcode */
-				util::stream_format(stream, "$%02x,$%02x", op, op1 );
+				util::stream_format(stream, "$%02x", op );
 				break;
 			case 'A':
-				ea = opram[pos+0] + ( opram[pos+1] << 8 );
+				util::stream_format(stream, "$%04X", params.r16(pos) );
 				pos += 2;
-				util::stream_format(stream, "$%04X", ea );
 				break;
 			case 'B':   /* Byte op arg */
-				ea = opram[pos++];
-				util::stream_format(stream, "$%02X", ea );
+				util::stream_format(stream, "$%02X", params.r8(pos++) );
 				break;
 			case 'N':   /* Immediate 16 bit */
-				ea = opram[pos+0] + ( opram[pos+1] << 8 );
+				util::stream_format(stream, "$%04X", params.r16(pos) );
 				pos += 2;
-				util::stream_format(stream, "$%04X", ea );
 				break;
 			case 'O':   /* Offset relative to PC */
-				offset = (int8_t) opram[pos++];
-				util::stream_format(stream, "$%04X", (pc + offset + 2) & 0xffff);
+				util::stream_format(stream, "$%04X", (pc + s8(params.r8(pos++)) + 2) & 0xffff);
 				break;
 			case 'P':   /* Port number */
-				ea = opram[pos++];
-				util::stream_format(stream, "$%02X", ea );
+				util::stream_format(stream, "$%02X", params.r8(pos++) );
 				break;
 			case 'V':   /* Restart vector */
-				ea = op & 0x38;
-				util::stream_format(stream, "$%02X", ea );
+				util::stream_format(stream, "$%02X", op & 0x38 );
 				break;
 			case 'W':   /* Memory address word */
-				ea = opram[pos+0] + ( opram[pos+1] << 8 );
+				util::stream_format(stream, "$%04X", params.r16(pos) );
 				pos += 2;
-				util::stream_format(stream, "$%04X", ea );
 				break;
 			case 'X':
-				offset = (int8_t) opram[pos++];
+				offset = params.r8(pos++);
 				/* fall through */
 			case 'Y':
 				util::stream_format(stream,"(%s%c$%02x)", ixy, sign(offset), offs(offset) );
@@ -525,5 +515,5 @@ CPU_DISASSEMBLE(z80)
 		util::stream_format(stream, "%s", s_mnemonic[d->mnemonic]);
 	}
 
-	return pos | s_flags[d->mnemonic] | DASMFLAG_SUPPORTED;
+	return (pos - pc) | s_flags[d->mnemonic] | SUPPORTED;
 }

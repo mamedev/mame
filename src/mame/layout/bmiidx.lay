@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="spotlight0"><text string="spot 1" state="1"/></element>
+	<element name="spotlight1"><text string="spot 2" state="1"/></element>
+	<element name="spotlight2"><text string="spot 3" state="1"/></element>
+	<element name="spotlight3"><text string="spot 4" state="1"/></element>
+	<element name="spotlight4"><text string="spot 5" state="1"/></element>
+	<element name="spotlight5"><text string="spot 6" state="1"/></element>
+	<element name="spotlight6"><text string="spot 7" state="1"/></element>
+	<element name="spotlight7"><text string="spot 8" state="1"/></element>
+	<element name="key1-1"><text string="key 1-1" state="1"/></element>
+	<element name="key1-2"><text string="key 1-2" state="1"/></element>
+	<element name="key1-3"><text string="key 1-3" state="1"/></element>
+	<element name="key1-4"><text string="key 1-4" state="1"/></element>
+	<element name="key1-5"><text string="key 1-5" state="1"/></element>
+	<element name="key1-6"><text string="key 1-6" state="1"/></element>
+	<element name="key1-7"><text string="key 1-7" state="1"/></element>
+	<element name="key2-1"><text string="key 2-1" state="1"/></element>
+	<element name="key2-2"><text string="key 2-2" state="1"/></element>
+	<element name="key2-3"><text string="key 2-3" state="1"/></element>
+	<element name="key2-4"><text string="key 2-4" state="1"/></element>
+	<element name="key2-5"><text string="key 2-5" state="1"/></element>
+	<element name="key2-6"><text string="key 2-6" state="1"/></element>
+	<element name="key2-7"><text string="key 2-7" state="1"/></element>
+	<element name="unknown3"><text string="unknown3" state="1"/></element>
+	<element name="unknown4"><text string="unknown4" state="1"/></element>
+	<element name="1p"><text string="1p" state="1"/></element>
+	<element name="2p"><text string="2p" state="1"/></element>
+	<element name="effect"><text string="effect" state="1"/></element>
+	<element name="vefx"><text string="vefx" state="1"/></element>
+	<element name="credit"><text string="credit" state="1"/></element>
+	<element name="neonlamp"><text string="neon" state="1"/></element>
+	<element name="unknown1"><text string="unknown1" state="1"/></element>
+	<element name="unknown2"><text string="unknown2" state="1"/></element>
+	<element name="main_led0"><text string="main 1" state="1"/></element>
+	<element name="main_led1"><text string="main 2" state="1"/></element>
+	<element name="main_led2"><text string="main 3" state="1"/></element>
+	<element name="main_led3"><text string="main 4" state="1"/></element>
+	<element name="main_led4"><text string="main 5" state="1"/></element>
+	<element name="main_led5"><text string="main 6" state="1"/></element>
+	<element name="main_led6"><text string="main 7" state="1"/></element>
+	<element name="main_led7"><text string="main 8" state="1"/></element>
+	<element name="main_led8"><text string="main 9" state="1"/></element>
+	<element name="spu_led0"><text string="spu 1" state="1"/></element>
+	<element name="spu_led1"><text string="spu 2" state="1"/></element>
+	<element name="spu_led2"><text string="spu 3" state="1"/></element>
+	<element name="spu_led3"><text string="spu 4" state="1"/></element>
+	<element name="spu_led4"><text string="spu 5" state="1"/></element>
+	<element name="spu_led5"><text string="spu 6" state="1"/></element>
+	<element name="spu_led6"><text string="spu 7" state="1"/></element>
+	<element name="spu_led7"><text string="spu 8" state="1"/></element>
+
+	<element name="led">
+		<led16seg>
+			<color red="0" green="0.6" blue="1.0" />
+		</led16seg>
+	</element>
+
+	<view name="Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="320" bottom="240"/>
+		</screen>
+
+		<bezel name="1p" element="1p"><bounds x="0" y="240" width="48" height="16"/></bezel>
+		<bezel name="2p" element="2p"><bounds x="0" y="256" width="48" height="16"/></bezel>
+		<bezel name="effect" element="effect"><bounds x="0" y="272" width="48" height="16"/></bezel>
+		<bezel name="vefx" element="vefx"><bounds x="0" y="288" width="48" height="16"/></bezel>
+
+		<bezel name="credit" element="credit"><bounds x="48" y="240" width="48" height="16"/></bezel>
+		<bezel name="neonlamp" element="neonlamp"><bounds x="48" y="256" width="48" height="16"/></bezel>
+		<bezel name="unknown1" element="neonlamp"><bounds x="48" y="272" width="48" height="16"/></bezel>
+		<bezel name="unknown2" element="neonlamp"><bounds x="48" y="288" width="48" height="16"/></bezel>
+
+		<bezel name="spotlight0" element="spotlight0"><bounds x="96" y="240" width="48" height="16"/></bezel>
+		<bezel name="spotlight1" element="spotlight1"><bounds x="96" y="256" width="48" height="16"/></bezel>
+		<bezel name="spotlight2" element="spotlight2"><bounds x="96" y="272" width="48" height="16"/></bezel>
+		<bezel name="spotlight3" element="spotlight3"><bounds x="96" y="288" width="48" height="16"/></bezel>
+
+		<bezel name="spotlight4" element="spotlight4"><bounds x="144" y="240" width="48" height="16"/></bezel>
+		<bezel name="spotlight5" element="spotlight5"><bounds x="144" y="256" width="48" height="16"/></bezel>
+		<bezel name="spotlight6" element="spotlight6"><bounds x="144" y="272" width="48" height="16"/></bezel>
+		<bezel name="spotlight7" element="spotlight7"><bounds x="144" y="288" width="48" height="16"/></bezel>
+
+		<bezel name="led0" element="led" state="0">
+			<bounds x="0" y="304" width="32" height="64"/>
+		</bezel>
+		<bezel name="led1" element="led" state="0">
+			<bounds x="32" y="304" width="32" height="64"/>
+		</bezel>
+		<bezel name="led2" element="led" state="0">
+			<bounds x="64" y="304" width="32" height="64"/>
+		</bezel>
+		<bezel name="led3" element="led" state="0">
+			<bounds x="96" y="304" width="32" height="64"/>
+		</bezel>
+		<bezel name="led4" element="led" state="0">
+			<bounds x="128" y="304" width="32" height="64"/>
+		</bezel>
+		<bezel name="led5" element="led" state="0">
+			<bounds x="160" y="304" width="32" height="64"/>
+		</bezel>
+		<bezel name="led6" element="led" state="0">
+			<bounds x="192" y="304" width="32" height="64"/>
+		</bezel>
+		<bezel name="led7" element="led" state="0">
+			<bounds x="224" y="304" width="32" height="64"/>
+		</bezel>
+		<bezel name="led8" element="led" state="0">
+			<bounds x="256" y="304" width="32" height="64"/>
+		</bezel>
+
+		<bezel name="key1-1" element="key1-1"><bounds x="0" y="368" width="48" height="16"/></bezel>
+		<bezel name="key1-2" element="key1-2"><bounds x="0" y="384" width="48" height="16"/></bezel>
+		<bezel name="key1-3" element="key1-3"><bounds x="0" y="400" width="48" height="16"/></bezel>
+		<bezel name="key1-4" element="key1-4"><bounds x="0" y="416" width="48" height="16"/></bezel>
+
+		<bezel name="key1-5" element="key1-5"><bounds x="48" y="368" width="48" height="16"/></bezel>
+		<bezel name="key1-6" element="key1-6"><bounds x="48" y="384" width="48" height="16"/></bezel>
+		<bezel name="key1-7" element="key1-7"><bounds x="48" y="400" width="48" height="16"/></bezel>
+		<bezel name="key2-1" element="key2-1"><bounds x="48" y="416" width="48" height="16"/></bezel>
+
+		<bezel name="key2-2" element="key2-2"><bounds x="96" y="368" width="48" height="16"/></bezel>
+		<bezel name="key2-3" element="key2-3"><bounds x="96" y="384" width="48" height="16"/></bezel>
+		<bezel name="key2-4" element="key2-4"><bounds x="96" y="400" width="48" height="16"/></bezel>
+		<bezel name="key2-5" element="key2-5"><bounds x="96" y="416" width="48" height="16"/></bezel>
+
+		<bezel name="key2-6" element="key2-6"><bounds x="144" y="368" width="48" height="16"/></bezel>
+		<bezel name="key2-7" element="key2-7"><bounds x="144" y="384" width="48" height="16"/></bezel>
+		<bezel name="unknown3" element="unknown3"><bounds x="144" y="400" width="48" height="16"/></bezel>
+		<bezel name="unknown4" element="unknown4"><bounds x="144" y="416" width="48" height="16"/></bezel>
+
+		<bezel name="main_led0" element="main_led0"><bounds x="0" y="432" width="24" height="16"/></bezel>
+		<bezel name="main_led1" element="main_led1"><bounds x="24" y="432" width="24" height="16"/></bezel>
+		<bezel name="main_led2" element="main_led2"><bounds x="48" y="432" width="24" height="16"/></bezel>
+		<bezel name="main_led3" element="main_led3"><bounds x="72" y="432" width="24" height="16"/></bezel>
+		<bezel name="main_led4" element="main_led4"><bounds x="96" y="432" width="24" height="16"/></bezel>
+		<bezel name="main_led5" element="main_led5"><bounds x="120" y="432" width="24" height="16"/></bezel>
+		<bezel name="main_led6" element="main_led6"><bounds x="144" y="432" width="24" height="16"/></bezel>
+		<bezel name="main_led7" element="main_led7"><bounds x="168" y="432" width="24" height="16"/></bezel>
+		<bezel name="main_led8" element="main_led8"><bounds x="192" y="432" width="24" height="16"/></bezel>
+
+		<bezel name="spu_led0" element="spu_led0"><bounds x="0" y="448" width="24" height="16"/></bezel>
+		<bezel name="spu_led1" element="spu_led1"><bounds x="24" y="448" width="24" height="16"/></bezel>
+		<bezel name="spu_led2" element="spu_led2"><bounds x="48" y="448" width="24" height="16"/></bezel>
+		<bezel name="spu_led3" element="spu_led3"><bounds x="72" y="448" width="24" height="16"/></bezel>
+		<bezel name="spu_led4" element="spu_led4"><bounds x="96" y="448" width="24" height="16"/></bezel>
+		<bezel name="spu_led5" element="spu_led5"><bounds x="120" y="448" width="24" height="16"/></bezel>
+		<bezel name="spu_led6" element="spu_led6"><bounds x="144" y="448" width="24" height="16"/></bezel>
+		<bezel name="spu_led7" element="spu_led7"><bounds x="168" y="448" width="24" height="16"/></bezel>
+	</view>
+</mamelayout>

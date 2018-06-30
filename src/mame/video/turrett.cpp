@@ -312,7 +312,7 @@ WRITE32_MEMBER( turrett_state::dma_w )
 
 			while (words--)
 			{
-				ram[addr & DIMM_BANK_MASK] = m_ata->read_cs0(space, 0, 0xffff);
+				ram[addr & DIMM_BANK_MASK] = m_ata->read_cs0(0);
 				++addr;
 			}
 
@@ -324,7 +324,7 @@ WRITE32_MEMBER( turrett_state::dma_w )
 		{
 			while (words--)
 			{
-				uint16_t data = m_ata->read_cs0(space, 0, 0xffff);
+				uint16_t data = m_ata->read_cs0(0);
 
 				// TODO: Verify if this is correct
 				if ((data & 0xc400) == 0xc400)

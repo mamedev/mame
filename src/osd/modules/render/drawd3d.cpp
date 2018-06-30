@@ -762,15 +762,12 @@ void renderer_d3d9::update_presentation_parameters()
 
 void renderer_d3d9::update_gamma_ramp()
 {
-	if (m_gamma_supported)
+	if (!m_gamma_supported)
 	{
 		return;
 	}
 
 	auto win = assert_window();
-
-	// create a standard ramp
-	D3DGAMMARAMP ramp;
 
 	// set the gamma if we need to
 	if (win->fullscreen())
@@ -782,14 +779,16 @@ void renderer_d3d9::update_gamma_ramp()
 		float gamma = options.full_screen_gamma();
 		if (brightness != 1.0f || contrast != 1.0f || gamma != 1.0f)
 		{
+			D3DGAMMARAMP ramp;
+
 			for (int i = 0; i < 256; i++)
 			{
 				ramp.red[i] = ramp.green[i] = ramp.blue[i] = apply_brightness_contrast_gamma(i, brightness, contrast, gamma) << 8;
 			}
+
+			m_device->SetGammaRamp(0, 0, &ramp);
 		}
 	}
-
-	m_device->SetGammaRamp(0, 0, &ramp);
 }
 
 
@@ -1295,7 +1294,7 @@ void renderer_d3d9::pick_best_mode()
 	auto win = assert_window();
 
 	// determine the refresh rate of the primary screen
-	const screen_device *primary_screen = win->machine().config().first_screen();
+	const screen_device *primary_screen = screen_device_iterator(win->machine().root_device()).first();
 	if (primary_screen != nullptr)
 	{
 		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
@@ -2709,7 +2708,7 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, int source_width, int source_he
 
 	auto win = d3d->assert_window();
 
-	auto first_screen = win->machine().first_screen();
+	const screen_device *first_screen = screen_device_iterator(win->machine().root_device()).first();
 	bool vector_screen =
 		first_screen != nullptr &&
 		first_screen->screen_type() == SCREEN_TYPE_VECTOR;

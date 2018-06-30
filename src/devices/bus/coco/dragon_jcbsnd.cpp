@@ -21,7 +21,7 @@
 
 ROM_START( dragon_jcbsnd )
 	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("D32SEM.ROM", 0x0000, 0x1000, CRC(4cd0f30b) SHA1(d07bb9272e3d3928059853730ff656905a80b68e))
+	ROM_LOAD("d32sem.rom", 0x0000, 0x1000, CRC(4cd0f30b) SHA1(d07bb9272e3d3928059853730ff656905a80b68e))
 ROM_END
 
 //**************************************************************************
@@ -80,9 +80,9 @@ uint8_t* dragon_jcbsnd_device::get_cart_base()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( dragon_jcbsnd_device::device_add_mconfig )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, DERIVED_CLOCK(1, 4)) /* AY-3-8910 - clock not verified */
+MACHINE_CONFIG_START(dragon_jcbsnd_device::device_add_mconfig)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, DERIVED_CLOCK(1, 1)) /* AY-3-8910 - clock not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

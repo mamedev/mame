@@ -15,7 +15,7 @@ class naomi_m1_board : public naomi_board
 public:
 	naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(submap, 16) override;
+	virtual void submap(address_map &map) override;
 
 	DECLARE_READ16_MEMBER(actel_id_r);
 

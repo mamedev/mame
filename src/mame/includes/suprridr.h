@@ -7,6 +7,7 @@
 **************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class suprridr_state : public driver_device
 {
@@ -63,4 +64,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int is_screen_flipped();
+	void suprridr(machine_config &config);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
 };

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 
 enum
@@ -143,7 +143,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 16; }
 	virtual uint32_t execute_input_lines() const override { return 5; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_burn(int32_t cycles) override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -158,9 +159,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -188,9 +187,9 @@ private:
 	uint8_t   m_dma0_cnt;                       /* dma0 counter / divide by 20 */
 	uint8_t   m_dma1_cnt;                       /* dma1 counter / divide by 20 */
 	address_space *m_program;
-	direct_read_data *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_oprogram;
-	direct_read_data *m_odirect;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_ocache;
 	address_space *m_iospace;
 	uint8_t   m_rtemp;
 	uint32_t  m_ioltemp;
@@ -202,6 +201,9 @@ private:
 	static const opcode_func s_z180ops[6][0x100];
 
 	inline void z180_mmu();
+	inline u8 RM(offs_t addr);
+	inline u8 IN(u16 port);
+	inline void OUT(u16 port, u8 value);
 	inline void RM16( offs_t addr, PAIR *r );
 	inline void WM16( offs_t addr, PAIR *r );
 	inline uint8_t ROP();

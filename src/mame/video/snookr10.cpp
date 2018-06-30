@@ -150,7 +150,7 @@ PALETTE_INIT_MEMBER(snookr10_state, apple10)
 		g = combine_2_weights(weights_g, bit0, bit1);
 
 		/* encrypted color matrix */
-		cn = BITSWAP8(i,4,5,6,7,2,3,0,1);
+		cn = bitswap<8>(i,4,5,6,7,2,3,0,1);
 
 		palette.set_pen_color(cn, rgb_t(r,g,b));
 	}
@@ -165,7 +165,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::apple10_get_bg_tile_info)
 */
 	int offs = tile_index;
 	int attr = m_videoram[offs] + (m_colorram[offs] << 8);
-	int code = BITSWAP16((attr & 0xfff),15,14,13,12,8,9,10,11,0,1,2,3,4,5,6,7); /* encrypted tile matrix */
+	int code = bitswap<16>((attr & 0xfff),15,14,13,12,8,9,10,11,0,1,2,3,4,5,6,7); /* encrypted tile matrix */
 	int color = m_colorram[offs] >> 4;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
@@ -219,7 +219,7 @@ PALETTE_INIT_MEMBER(snookr10_state, crystalc)
 		g = combine_2_weights(weights_g, bit0, bit1);
 
 		/* encrypted color matrix */
-		cn = BITSWAP8(i,7,5,6,4,3,2,1,0);
+		cn = bitswap<8>(i,7,5,6,4,3,2,1,0);
 
 		palette.set_pen_color(cn, rgb_t(r,g,b));
 	}
@@ -234,7 +234,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::crystalc_get_bg_tile_info)
 */
 	int offs = tile_index;
 	int attr = m_videoram[offs] + (m_colorram[offs] << 8);
-	int code = BITSWAP16((attr & 0xfff),15,14,13,12,0,10,5,1,7,6,9,4,3,2,8,11); /* encrypted tile matrix */
+	int code = bitswap<16>((attr & 0xfff),15,14,13,12,0,10,5,1,7,6,9,4,3,2,8,11); /* encrypted tile matrix */
 	int color = m_colorram[offs] >> 4;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);

@@ -18,20 +18,6 @@
 
 namespace bx
 {
-	struct FileInfo
-	{
-		enum Enum
-		{
-			Regular,
-			Directory,
-
-			Count
-		};
-
-		uint64_t m_size;
-		Enum m_type;
-	};
-
 	///
 	void sleep(uint32_t _ms);
 
@@ -64,15 +50,6 @@ namespace bx
 
 	///
 	int chdir(const char* _path);
-
-	///
-	char* pwd(char* _buffer, uint32_t _size);
-
-	///
-	bool getTempPath(char* _out, uint32_t* _inOutSize);
-
-	///
-	bool stat(const char* _filePath, FileInfo& _fileInfo);
 
 	///
 	void* exec(const char* const* _argv);

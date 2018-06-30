@@ -557,8 +557,8 @@ static uint16_t feistel(uint16_t val, const int *bitsA, const int *bitsB,
 		const struct optimised_sbox* boxes1, const struct optimised_sbox* boxes2, const struct optimised_sbox* boxes3, const struct optimised_sbox* boxes4,
 		uint32_t key1, uint32_t key2, uint32_t key3, uint32_t key4)
 {
-	uint8_t l = BITSWAP8(val, bitsB[7],bitsB[6],bitsB[5],bitsB[4],bitsB[3],bitsB[2],bitsB[1],bitsB[0]);
-	uint8_t r = BITSWAP8(val, bitsA[7],bitsA[6],bitsA[5],bitsA[4],bitsA[3],bitsA[2],bitsA[1],bitsA[0]);
+	uint8_t l = bitswap<8>(val, bitsB[7],bitsB[6],bitsB[5],bitsB[4],bitsB[3],bitsB[2],bitsB[1],bitsB[0]);
+	uint8_t r = bitswap<8>(val, bitsA[7],bitsA[6],bitsA[5],bitsA[4],bitsA[3],bitsA[2],bitsA[1],bitsA[0]);
 
 	l ^= fn(r, boxes1, key1);
 	r ^= fn(l, boxes2, key2);
@@ -741,20 +741,12 @@ struct game_keys
 
 
 
-DRIVER_INIT_MEMBER(cps_state,cps2crypt)
+void cps2_state::init_cps2crypt()
 {
 	if (m_region_key)
 	{
-		uint32_t key[2];
-		uint32_t lower;
-		uint32_t upper;
-
-		int b;
-
-		unsigned short decoded[10];
-		memset(decoded, 0, sizeof(decoded));
-
-		for (b = 0; b < 10 * 16; b++)
+		unsigned short decoded[10] = { 0 };
+		for (int b = 0; b < 10 * 16; b++)
 		{
 			int bit = (317 - b) % 160;
 			if ((m_region_key->base()[bit / 8] >> ((bit ^ 7) % 8)) & 1)
@@ -763,14 +755,14 @@ DRIVER_INIT_MEMBER(cps_state,cps2crypt)
 			}
 		}
 
-		key[0] = (decoded[0] << 16) | decoded[1];
-		key[1] = (decoded[2] << 16) | decoded[3];
+		uint32_t key[2] = { ((uint32_t)decoded[0] << 16) | decoded[1], ((uint32_t)decoded[2] << 16) | decoded[3] };
 		// decoded[4] == watchdog instruction third word
 		// decoded[5] == watchdog instruction second word
 		// decoded[6] == watchdog instruction first word
 		// decoded[7] == 0x4000 (bits 8 to 23 of CPS2 object output address)
 		// decoded[8] == 0x0900
 
+		uint32_t lower, upper;
 		if (decoded[9] == 0xffff)
 		{
 			// On a dead board, the only encrypted range is actually FF0000-FFFFFF.

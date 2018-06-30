@@ -10,7 +10,8 @@
 namespace bx
 {
 	template <typename Ty>
-	inline MpScUnboundedQueueT<Ty>::MpScUnboundedQueueT()
+	inline MpScUnboundedQueueT<Ty>::MpScUnboundedQueueT(AllocatorI* _allocator)
+		: m_queue(_allocator)
 	{
 	}
 
@@ -39,7 +40,8 @@ namespace bx
 	}
 
 	template <typename Ty>
-	inline MpScUnboundedBlockingQueue<Ty>::MpScUnboundedBlockingQueue()
+	inline MpScUnboundedBlockingQueue<Ty>::MpScUnboundedBlockingQueue(AllocatorI* _allocator)
+		: m_queue(_allocator)
 	{
 	}
 

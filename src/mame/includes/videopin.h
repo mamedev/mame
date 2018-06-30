@@ -5,8 +5,13 @@
     Atari Video Pinball hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_VIDEOPIN_H
+#define MAME_INCLUDES_VIDEOPIN_H
+
+#pragma once
 
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Discrete Sound Input Nodes */
@@ -26,32 +31,20 @@ public:
 		TIMER_INTERRUPT
 	};
 
-	videopin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	videopin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_video_ram(*this, "video_ram") { }
+		m_video_ram(*this, "video_ram"),
+		m_led(*this, "led0")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<discrete_device> m_discrete;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	void videopin(machine_config &config);
 
-	required_shared_ptr<uint8_t> m_video_ram;
-
-	attotime m_time_pushed;
-	attotime m_time_released;
-	uint8_t m_prev;
-	uint8_t m_mask;
-	int m_ball_x;
-	int m_ball_y;
-	tilemap_t* m_bg_tilemap;
-	emu_timer *m_interrupt_timer;
-
+protected:
 	DECLARE_READ8_MEMBER(misc_r);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
@@ -66,6 +59,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void main_map(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -73,9 +68,27 @@ public:
 	void update_plunger();
 	double calc_plunger_pos();
 
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_video_ram;
+	output_finder<> m_led;
+
+	attotime m_time_pushed;
+	attotime m_time_released;
+	uint8_t m_prev;
+	uint8_t m_mask;
+	int m_ball_x;
+	int m_ball_y;
+	tilemap_t* m_bg_tilemap;
+	emu_timer *m_interrupt_timer;
 };
 
 /*----------- defined in audio/videopin.c -----------*/
-DISCRETE_SOUND_EXTERN( videopin );
+DISCRETE_SOUND_EXTERN( videopin_discrete );
+
+#endif // MAME_INCLUDES_VIDEOPIN_H

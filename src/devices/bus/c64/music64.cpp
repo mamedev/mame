@@ -44,7 +44,7 @@ DEFINE_DEVICE_TYPE(C64_MUSIC64, c64_music64_cartridge_device, "c64_music64", "C6
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_music64_cartridge_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_music64_cartridge_device::device_add_mconfig)
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
 

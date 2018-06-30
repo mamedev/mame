@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __TMC600__
-#define __TMC600__
+#ifndef MAME_INCLUDES_TMC600_H
+#define MAME_INCLUDES_TMC600_H
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
@@ -16,13 +16,13 @@
 #include "sound/cdp1869.h"
 #include "speaker.h"
 
-#define SCREEN_TAG      	"screen"
-#define CDP1802_TAG     	"cdp1802"
-#define CDP1869_TAG     	"cdp1869"
-#define CDP1852_KB_TAG		"cdp1852_kb"
-#define CDP1852_BUS_TAG		"cdp1852_bus"
-#define CDP1852_TMC700_TAG	"cdp1852_printer"
-#define CENTRONICS_TAG  	"centronics"
+#define SCREEN_TAG          "screen"
+#define CDP1802_TAG         "cdp1802"
+#define CDP1869_TAG         "cdp1869"
+#define CDP1852_KB_TAG      "cdp1852_kb"
+#define CDP1852_BUS_TAG     "cdp1852_bus"
+#define CDP1852_TMC700_TAG  "cdp1852_printer"
+#define CENTRONICS_TAG      "centronics"
 
 #define TMC600_PAGE_RAM_SIZE    0x400
 #define TMC600_PAGE_RAM_MASK    0x3ff
@@ -85,10 +85,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
 	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
+	void tmc600(machine_config &config);
+	void tmc600_video(machine_config &config);
+	void cdp1869_page_ram(address_map &map);
+	void tmc600_io_map(address_map &map);
+	void tmc600_map(address_map &map);
 };
-
-// ---------- defined in video/tmc600.c ----------
-
-MACHINE_CONFIG_EXTERN( tmc600_video );
 
 #endif

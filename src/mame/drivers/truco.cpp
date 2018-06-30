@@ -212,7 +212,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_12MHz          /* confirmed */
+#define MASTER_CLOCK    XTAL(12'000'000)          /* confirmed */
 #define CPU_CLOCK       (MASTER_CLOCK/16)   /* guess */
 #define CRTC_CLOCK      (MASTER_CLOCK/8)    /* guess */
 
@@ -261,15 +261,16 @@ WRITE_LINE_MEMBER(truco_state::pia_irqb_w)
 *                Memory Map                *
 *******************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, truco_state )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM                                     /* General purpose RAM */
-	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_SHARE("videoram")                /* Video RAM */
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_SHARE("battery_ram")             /* Battery backed RAM */
-	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x8005, 0x8005) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x8008, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void truco_state::main_map(address_map &map)
+{
+	map(0x0000, 0x17ff).ram();                                     /* General purpose RAM */
+	map(0x1800, 0x7bff).ram().share("videoram");                /* Video RAM */
+	map(0x7c00, 0x7fff).ram().share("battery_ram");             /* Battery backed RAM */
+	map(0x8000, 0x8003).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8004, 0x8004).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x8005, 0x8005).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x8008, 0xffff).rom();
+}
 /*
 CRTC:
 
@@ -416,12 +417,12 @@ INTERRUPT_GEN_MEMBER(truco_state::interrupt)
 *              Machine Driver              *
 *******************************************/
 
-static MACHINE_CONFIG_START( truco )
+MACHINE_CONFIG_START(truco_state::truco)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", truco_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6809, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", truco_state,  interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1.6))    /* 1.6 seconds */
@@ -429,11 +430,11 @@ static MACHINE_CONFIG_START( truco )
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("P1"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("JMPRS"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(truco_state,porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(truco_state,portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(truco_state,pia_ca2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(truco_state,pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(truco_state,pia_irqb_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, truco_state,porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, truco_state,portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, truco_state,pia_ca2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, truco_state,pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, truco_state,pia_irqb_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -452,10 +453,10 @@ static MACHINE_CONFIG_START( truco )
 	MCFG_MC6845_CHAR_WIDTH(4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -471,5 +472,5 @@ ROM_START( truco )
 	ROM_LOAD( "truco.u2",   0x0c000, 0x4000, CRC(ff355750) SHA1(1538f20b1919928ffca439e4046a104ddfbc756c) )
 ROM_END
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT  ROT   COMPANY           FULLNAME      FLAGS
-GAME( 198?, truco,   0,      truco,   truco,   truco_state,   0,    ROT0, "Playtronic SRL", "Truco-Tron", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    STATE        INIT         ROT   COMPANY           FULLNAME      FLAGS
+GAME( 198?, truco,   0,      truco,   truco,   truco_state, empty_init, ROT0, "Playtronic SRL", "Truco-Tron", MACHINE_SUPPORTS_SAVE )

@@ -15,49 +15,66 @@
 #include "emu.h"
 #include "debugger.h"
 #include "tlcs90.h"
-
-static const char *const op_names[] =   {   "??",       "nop",  "ex",   "exx",  "ld",   "ldw",  "lda",  "ldi",  "ldir", "ldd",  "lddr", "cpi",  "cpir", "cpd",  "cpdr", "push", "pop",  "jp",   "jr",   "call", "callr",    "ret",  "reti", "halt", "di",   "ei",   "swi",  "daa",  "cpl",  "neg",  "ldar", "rcf",  "scf",  "ccf",  "tset", "bit",  "set",  "res",  "inc",  "dec",  "incx", "decx", "incw", "decw", "add",  "adc",  "sub",  "sbc",  "and",  "xor",  "or",   "cp",   "rlc",  "rrc",  "rl",   "rr",   "sla",  "sra",  "sll",  "srl",  "rld",  "rrd",  "djnz", "mul",  "div"   };
+#include "tlcs90d.h"
 
 ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental type
 
 
-DEFINE_DEVICE_TYPE(TMP90840,  tmp90840_device,  "tmp90840",  "TMP90840")
-DEFINE_DEVICE_TYPE(TMP90841,  tmp90841_device,  "tmp90841",  "TMP90841")
-DEFINE_DEVICE_TYPE(TMP90845,  tmp90845_device,  "tmp90845",  "TMP90845")
-DEFINE_DEVICE_TYPE(TMP91640,  tmp91640_device,  "tmp91640",  "TMP91640")
-DEFINE_DEVICE_TYPE(TMP91641,  tmp91641_device,  "tmp91641",  "TMP91641")
-DEFINE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device, "tmp90ph44", "TMP90PH44")
+DEFINE_DEVICE_TYPE(TMP90840,  tmp90840_device,  "tmp90840",  "Toshiba TMP90840")
+DEFINE_DEVICE_TYPE(TMP90841,  tmp90841_device,  "tmp90841",  "Toshiba TMP90841")
+DEFINE_DEVICE_TYPE(TMP90845,  tmp90845_device,  "tmp90845",  "Toshiba TMP90845")
+DEFINE_DEVICE_TYPE(TMP91640,  tmp91640_device,  "tmp91640",  "Toshiba TMP91640")
+DEFINE_DEVICE_TYPE(TMP91641,  tmp91641_device,  "tmp91641",  "Toshiba TMP91641")
+DEFINE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device, "tmp90ph44", "Toshiba TMP90PH44")
 
 
-static ADDRESS_MAP_START(tmp90840_mem, AS_PROGRAM, 8, tlcs90_device)
-	AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // 8KB ROM (internal)
-	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
-ADDRESS_MAP_END
+#define T90_IOBASE  0xffc0
 
-static ADDRESS_MAP_START(tmp90841_mem, AS_PROGRAM, 8, tlcs90_device)
+enum e_ir
+{
+	T90_P0=T90_IOBASE,  T90_P1,     T90_P01CR_IRFL, T90_IRFH,   T90_P2,     T90_P2CR,   T90_P3,     T90_P3CR,
+	T90_P4,             T90_P4CR,   T90_P5,         T90_SMMOD,  T90_P6,     T90_P7,     T90_P67CR,  T90_SMCR,
+	T90_P8,             T90_P8CR,   T90_WDMOD,      T90_WDCR,   T90_TREG0,  T90_TREG1,  T90_TREG2,  T90_TREG3,
+	T90_TCLK,           T90_TFFCR,  T90_TMOD,       T90_TRUN,   T90_CAP1L,  T90_CAP1H,  T90_CAP2L,  T90_CAL2H,
+	T90_TREG4L,         T90_TREG4H, T90_TREG5L,     T90_TREG5H, T90_T4MOD,  T90_T4FFCR, T90_INTEL,  T90_INTEH,
+	T90_DMAEH,          T90_SCMOD,  T90_SCCR,       T90_SCBUF,  T90_BX,     T90_BY,     T90_ADREG,  T90_ADMOD
+};
+
+
+void tlcs90_device::tmp90840_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();  // 8KB ROM (internal)
+	map(0xfec0, 0xffbf).ram();  // 256b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+}
+
+void tlcs90_device::tmp90841_mem(address_map &map)
+{
 //  AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // rom-less
-	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
-ADDRESS_MAP_END
+	map(0xfec0, 0xffbf).ram();  // 256b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+}
 
-static ADDRESS_MAP_START(tmp91640_mem, AS_PROGRAM, 8, tlcs90_device )
-	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB ROM (internal)
-	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
-ADDRESS_MAP_END
+void tlcs90_device::tmp91640_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();    // 16KB ROM (internal)
+	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+}
 
-static ADDRESS_MAP_START(tmp91641_mem, AS_PROGRAM, 8, tlcs90_device )
+void tlcs90_device::tmp91641_mem(address_map &map)
+{
 //  AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // rom-less
-	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
-ADDRESS_MAP_END
+	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+}
 
-static ADDRESS_MAP_START(tmp90ph44_mem, AS_PROGRAM, 8, tlcs90_device )
-	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB PROM (internal)
-	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
-	AM_RANGE(   T90_IOBASE, T90_IOBASE+55   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w ) // TODO: has 8 more registers
-ADDRESS_MAP_END
+void tlcs90_device::tmp90ph44_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();    // 16KB PROM (internal)
+	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
+	map(T90_IOBASE, T90_IOBASE+55).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w)); // TODO: has 8 more registers
+}
 
 
 tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
@@ -70,36 +87,36 @@ tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, co
 
 
 tmp90840_device::tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90840, tag, owner, clock, ADDRESS_MAP_NAME(tmp90840_mem))
+	: tlcs90_device(mconfig, TMP90840, tag, owner, clock, address_map_constructor(FUNC(tmp90840_device::tmp90840_mem), this))
 {
 }
 
 tmp90841_device::tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90841, tag, owner, clock, ADDRESS_MAP_NAME(tmp90841_mem))
+	: tlcs90_device(mconfig, TMP90841, tag, owner, clock, address_map_constructor(FUNC(tmp90841_device::tmp90841_mem), this))
 {
 }
 
 tmp90845_device::tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90845, tag, owner, clock, ADDRESS_MAP_NAME(tmp90841_mem))
+	: tlcs90_device(mconfig, TMP90845, tag, owner, clock, address_map_constructor(FUNC(tmp90845_device::tmp90841_mem), this))
 {
 }
 
 
 
 tmp91640_device::tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP91640, tag, owner, clock, ADDRESS_MAP_NAME(tmp91640_mem))
+	: tlcs90_device(mconfig, TMP91640, tag, owner, clock, address_map_constructor(FUNC(tmp91640_device::tmp91640_mem), this))
 {
 }
 
 
 tmp91641_device::tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP91641, tag, owner, clock, ADDRESS_MAP_NAME(tmp91641_mem))
+	: tlcs90_device(mconfig, TMP91641, tag, owner, clock, address_map_constructor(FUNC(tmp91641_device::tmp91641_mem), this))
 {
 }
 
 
 tmp90ph44_device::tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90PH44, tag, owner, clock, ADDRESS_MAP_NAME(tmp90ph44_mem))
+	: tlcs90_device(mconfig, TMP90PH44, tag, owner, clock, address_map_constructor(FUNC(tmp90ph44_device::tmp90ph44_mem), this))
 {
 }
 
@@ -141,9 +158,6 @@ enum    {
 
 #define F   m_af.b.l
 
-static const char *const r8_names[] =   {   "b",    "c",    "d",    "e",    "h",    "l",    "a"                             };
-static const char *const r16_names[]    =   {   "bc",   "de",   "hl",   "??",   "ix",   "iy",   "sp",   "af",   "af'",  "pc"    };
-
 // Condition Codes
 
 #define FLS 0x0
@@ -184,8 +198,6 @@ static uint8_t SZ_BIT[256];   /* zero, sign and parity/overflow (=zero) flags fo
 static uint8_t SZP[256];      /* zero, sign and parity flags */
 static uint8_t SZHV_inc[256]; /* zero, sign, half carry and overflow flags INC r8 */
 static uint8_t SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
-
-static const char *const cc_names[] =   {   "f",    "lt",   "le",   "ule",  "ov",   "mi",   "z",    "c",    "",     "ge",   "gt",   "ugt",  "nov",  "pl",   "nz",   "nc"    };
 
 // Opcodes
 
@@ -996,76 +1008,6 @@ void tlcs90_device::decode()
 	OP( UNKNOWN,2 )     NONE( 1 )       NONE( 2 )
 }
 
-static const char *const ir_names[] =   {
-	"P0",       "P1",       "P01CR/IRFL",   "IRFH",     "P2",       "P2CR",     "P3",       "P3CR",
-	"P4",       "P4CR",     "P5",           "SMMOD",    "P6",       "P7",       "P67CR",    "SMCR",
-	"P8",       "P8CR",     "WDMOD",        "WDCR",     "TREG0",    "TREG1",    "TREG2",    "TREG3",
-	"TCLK",     "TFFCR",    "TMOD",         "TRUN",     "CAP1L",    "CAP1H",    "CAP2L",    "CAL2H",
-	"TREG4L",   "TREG4H",   "TREG5L",       "TREG5H",   "T4MOD",    "T4FFCR",   "INTEL",    "INTEH",
-	"DMAEH",    "SCMOD",    "SCCR",         "SCBUF",    "BX",       "BY",       "ADREG",    "ADMOD"
-};
-
-const char *tlcs90_device::internal_registers_names(uint16_t x)
-{
-	int ir = x - T90_IOBASE;
-	if ( ir >= 0 && ir < ARRAY_LENGTH(ir_names) )
-		return ir_names[ir];
-	return nullptr;
-}
-bool tlcs90_device::stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const e_mode mode, const uint16_t r, const uint16_t rb)
-{
-	const char *reg_name;
-	switch ( mode )
-	{
-	case e_mode::NONE:   return false;
-
-	case e_mode::BIT8:   util::stream_format(stream, "%s%d",            pre,    r                                   );   return true;
-	case e_mode::I8:     util::stream_format(stream, "%s$%02X",         pre,    r                                   );   return true;
-	case e_mode::D8:     util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7f)-(r&0x80))&0xffff     );   return true;
-	case e_mode::I16:    util::stream_format(stream, "%s$%04X",         pre,    r                                   );   return true;
-	case e_mode::D16:    util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7fff)-(r&0x8000))&0xffff );   return true;
-	case e_mode::MI16:
-		reg_name = internal_registers_names(r);
-		if (reg_name)
-			util::stream_format(stream, "%s(%s)", pre, reg_name);
-		else
-			util::stream_format(stream, "%s($%04X)",       pre,    r                                   );
-		return true;
-	case e_mode::R8:     util::stream_format(stream, "%s%s",            pre,    r8_names[r]                         );   return true;
-	case e_mode::R16:    util::stream_format(stream, "%s%s",            pre,    r16_names[r]                        );   return true;
-	case e_mode::MR16:   util::stream_format(stream, "%s(%s)",          pre,    r16_names[r]                        );   return true;
-
-	case e_mode::MR16R8: util::stream_format(stream, "%s(%s+%s)",       pre,    r16_names[r],   r8_names[rb]        );   return true;
-	case e_mode::MR16D8: util::stream_format(stream, "%s(%s%c$%02X)",   pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );   return true;
-
-	case e_mode::CC:     util::stream_format(stream, "%s%s",            pre,    cc_names[r]                         );   return true;
-
-	case e_mode::R16R8:  util::stream_format(stream, "%s%s+%s",         pre,    r16_names[r],   r8_names[rb]        );   return true;
-	case e_mode::R16D8:  util::stream_format(stream, "%s%s%c$%02X",     pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );   return true;
-
-	default:
-		fatalerror("%04x: unimplemented addr mode = %d\n",pc,std::underlying_type_t<e_mode>(mode));
-	}
-
-	// never executed
-	return false;
-}
-
-offs_t tlcs90_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	m_addr = pc;
-
-	decode();
-	m_op &= ~OP_16;
-
-	util::stream_format         (stream, "%-5s",                op_names[ m_op ] ); // strlen("callr") == 5
-	bool streamed = stream_arg  (stream, pc,       " ",         m_mode1, m_r1, m_r1b );
-	stream_arg                  (stream, pc, streamed ?",":"",  m_mode2, m_r2, m_r2b );
-
-	return (m_addr - pc) | DASMFLAG_SUPPORTED;
-}
-
-
 uint16_t tlcs90_device::r8( const uint16_t r )
 {
 	switch( r )
@@ -1331,9 +1273,20 @@ void tlcs90_device::leave_halt()
 	}
 }
 
-void tlcs90_device::take_interrupt(tlcs90_e_irq irq)
+void tlcs90_device::raise_irq(int irq)
+{
+	m_irq_state |= 1 << irq;
+}
+
+void tlcs90_device::clear_irq(int irq)
 {
 	m_irq_state &= ~(1 << irq);
+}
+
+void tlcs90_device::take_interrupt(tlcs90_e_irq irq)
+{
+	if (irq != INT0 || (m_p8cr & 1) == 1)
+		clear_irq(irq);
 
 	leave_halt();
 
@@ -1359,7 +1312,7 @@ void tlcs90_device::check_interrupts()
 	{
 		mask = (1 << irq);
 		if(irq >= INT0) mask &= m_irq_mask;
-		if ( m_irq_state & mask )
+		if (m_irq_state & mask)
 		{
 			take_interrupt( irq );
 			return;
@@ -1387,16 +1340,18 @@ void tlcs90_device::execute_set_input(int inputnum, int state)
 
 void tlcs90_device::set_irq_line(int irq, int state)
 {
-	if ( ((m_irq_state >> irq)&1) == state ) return;
+	if ( ((m_irq_line_state >> irq)&1) == state ) return;
 
 	if (state)
 	{
-		m_irq_state |= 1 << irq;
-		check_interrupts();
+		raise_irq(irq);
+		m_irq_line_state |= 1 << irq;
 	}
 	else
 	{
-		m_irq_state &= ~(1 << irq);
+		if (irq == INT0 && (m_p8cr & 1) == 0)
+			clear_irq(irq);
+		m_irq_line_state &= ~(1 << irq);
 	}
 }
 
@@ -1416,7 +1371,7 @@ void tlcs90_device::execute_run()
 	do
 	{
 		m_prvpc.d = m_pc.d;
-		debugger_instruction_hook(this, m_pc.d);
+		debugger_instruction_hook(m_pc.d);
 
 		check_interrupts();
 
@@ -2055,7 +2010,22 @@ void tlcs90_device::device_reset()
     dedicated input ports and CPU registers remain unchanged,
     but PC IFF BX BY = 0, A undefined
 */
-	memset(m_internal_registers, 0, sizeof(m_internal_registers));
+
+	std::fill(std::begin(m_port_latch), std::end(m_port_latch), 0);
+	m_p4cr = 0;
+	m_p67cr = 0;
+	m_p8cr = 0;
+	m_smmod = 0;
+
+	m_ixbase = 0;
+	m_iybase = 0;
+
+	m_tmod = 0;
+	m_tclk = 0;
+	m_trun = 0;
+	m_t4mod = 0;
+	std::fill(std::begin(m_treg_8bit), std::end(m_treg_8bit), 0);
+	std::fill(std::begin(m_treg_16bit), std::end(m_treg_16bit), 0);
 }
 
 void tlcs90_device::execute_burn(int32_t cycles)
@@ -2337,32 +2307,47 @@ FFED    BX      R/W     Reset   Description
 
 READ8_MEMBER( tlcs90_device::t90_internal_registers_r )
 {
-	uint8_t data = m_internal_registers[offset];
 	switch ( T90_IOBASE + offset )
 	{
 		case T90_P3:    // 7,4,1,0
-			return (data & 0x6c) | (m_port_read_cb[3]() & 0x93);
+			return (m_port_latch[3] & 0x6c) | (m_port_read_cb[3]() & 0x93);
 
 		case T90_P4:    // only output
-			return data & 0x0f;
+			return m_port_latch[4] & 0x0f;
 
 		case T90_P5:
 			return (m_port_read_cb[5]() & 0x3f);
 
 		case T90_P6:
-			return (data & 0xf0) | (m_port_read_cb[6]() & 0x0f);
+			return (m_port_latch[6] & 0xf0) | (m_port_read_cb[6]() & 0x0f);
 
 		case T90_P7:
-			return (data & 0xf0) | (m_port_read_cb[7]() & 0x0f);
+			return (m_port_latch[7] & 0xf0) | (m_port_read_cb[7]() & 0x0f);
 
 		case T90_P8:    // 2,1,0
-			return (data & 0x08) | (m_port_read_cb[8]() & 0x07);
+			return (m_port_latch[8] & 0x08) | (m_port_read_cb[8]() & 0x07);
 
 		case T90_BX:
+			return 0xf0 | (m_ixbase >> 16);
+
 		case T90_BY:
-			return 0xf0 | data;
+			return 0xf0 | (m_iybase >> 16);
+
+		case T90_TMOD:
+			return m_tmod;
+
+		case T90_TCLK:
+			return m_tclk;
+
+		case T90_TRUN:
+			return m_trun;
+
+		case T90_T4MOD:
+			return m_t4mod;
 	}
-	return data;
+
+	logerror("Read from unimplemented SFR at %04X\n", T90_IOBASE + offset);
+	return 0;
 }
 
 void tlcs90_device::t90_start_timer(int i)
@@ -2372,7 +2357,7 @@ void tlcs90_device::t90_start_timer(int i)
 
 	m_timer_value[i] = 0;
 
-	switch((m_internal_registers[ T90_TMOD - T90_IOBASE ] >> (i * 2)) & 0x03)
+	switch((m_tmod >> (i * 2)) & 0x03)
 	{
 		case 0:
 			// 8-bit mode
@@ -2388,7 +2373,7 @@ void tlcs90_device::t90_start_timer(int i)
 			return;
 	}
 
-	switch((m_internal_registers[ T90_TCLK - T90_IOBASE ] >> (i * 2)) & 0x03)
+	switch((m_tclk >> (i * 2)) & 0x03)
 	{
 		case 0: if (i & 1)  logerror("%04X: CPU Timer %d clocked by Timer %d match signal\n", m_pc.w.l, i,i-1);
 				else        logerror("%04X: CPU Timer %d, unsupported TCLK = 0\n", m_pc.w.l, i);
@@ -2414,11 +2399,11 @@ void tlcs90_device::t90_start_timer4()
 
 	m_timer4_value = 0;
 
-	switch(m_internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x03)
+	switch(m_t4mod & 0x03)
 	{
 		case 1:     prescaler =   1;    break;
 		case 2:     prescaler =  16;    break;
-		default:    logerror("%04X: CPU Timer 4, unsupported T4MOD = %d\n", m_pc.w.l,m_internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x03);
+		default:    logerror("%04X: CPU Timer 4, unsupported T4MOD = %d\n", m_pc.w.l,m_t4mod & 0x03);
 					return;
 	}
 
@@ -2447,12 +2432,12 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 	int i = param;
 
 	int mask = 0x20 | (1 << i);
-	if ( (m_internal_registers[ T90_TRUN - T90_IOBASE ] & mask) != mask )
+	if ( (m_trun & mask) != mask )
 		return;
 
 	timer_fired = 0;
 
-	mode = (m_internal_registers[ T90_TMOD - T90_IOBASE ] >> ((i & ~1) + 2)) & 0x03;
+	mode = (m_tmod >> ((i & ~1) + 2)) & 0x03;
 	// Match
 	switch (mode)
 	{
@@ -2462,7 +2447,7 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 		// TODO: hmm...
 	case 0x00: // 8bit
 		m_timer_value[i]++;
-		if ( m_timer_value[i] == m_internal_registers[ T90_TREG0+i - T90_IOBASE ] )
+		if ( m_timer_value[i] == m_treg_8bit[i] )
 		timer_fired = 1;
 		break;
 
@@ -2471,8 +2456,8 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 		break;
 		m_timer_value[i]++;
 		if(m_timer_value[i] == 0) m_timer_value[i+1]++;
-		if(m_timer_value[i+1] == m_internal_registers[ T90_TREG0+i+1 - T90_IOBASE ])
-		if(m_timer_value[i] == m_internal_registers[ T90_TREG0+i - T90_IOBASE ])
+		if(m_timer_value[i+1] == m_treg_8bit[i+1])
+		if(m_timer_value[i] == m_treg_8bit[i])
 			timer_fired = 1;
 		break;
 	}
@@ -2486,17 +2471,17 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 		case 0x00: // 8bit
 		if(i & 1)
 			break;
-		if ( (m_internal_registers[ T90_TCLK - T90_IOBASE ] & (0x0C << (i * 2))) == 0 ) // T0/T1 match signal clocks T1/T3
+		if ( (m_tclk & (0x0C << (i * 2))) == 0 ) // T0/T1 match signal clocks T1/T3
 			t90_timer_callback(ptr, i+1);
 		break;
 		case 0x01: // 16bit, only can happen for i=0,2
 		m_timer_value[i+1] = 0;
-		set_irq_line(INTT0 + i+1, 1);
+		raise_irq(INTT0 + i+1);
 		break;
 	}
 	// regular handling
 	m_timer_value[i] = 0;
-	set_irq_line(INTT0 + i, 1);
+	raise_irq(INTT0 + i);
 	}
 }
 
@@ -2508,16 +2493,16 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 
 	// Match
 
-	if ( m_timer4_value == (m_internal_registers[ T90_TREG4L - T90_IOBASE ] + (m_internal_registers[ T90_TREG4H - T90_IOBASE ] << 8)) )
+	if ( m_timer4_value == m_treg_16bit[0] )
 	{
 //      logerror("CPU Timer 4 matches TREG4\n");
-		set_irq_line(INTT4, 1);
+		raise_irq(INTT4);
 	}
-	if ( m_timer4_value == (m_internal_registers[ T90_TREG5L - T90_IOBASE ] + (m_internal_registers[ T90_TREG5H - T90_IOBASE ] << 8)) )
+	if ( m_timer4_value == m_treg_16bit[1] )
 	{
 //      logerror("CPU Timer 4 matches TREG5\n");
-		set_irq_line(INTT5, 1);
-		if (m_internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x04)
+		raise_irq(INTT5);
+		if (m_t4mod & 0x04)
 			m_timer4_value = 0;
 	}
 
@@ -2532,13 +2517,58 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 {
 	uint8_t out_mask;
-	uint8_t old = m_internal_registers[offset];
+
 	switch ( T90_IOBASE + offset )
 	{
+		case T90_TMOD:
+			m_tmod = data;
+			break;
+
+		case T90_TCLK:
+			m_tclk = data;
+			break;
+
+		case T90_TREG0:
+			m_treg_8bit[0] = data;
+			break;
+
+		case T90_TREG1:
+			m_treg_8bit[1] = data;
+			break;
+
+		case T90_TREG2:
+			m_treg_8bit[2] = data;
+			break;
+
+		case T90_TREG3:
+			m_treg_8bit[3] = data;
+			break;
+
+		case T90_T4MOD:
+			m_t4mod = data;
+			break;
+
+		case T90_TREG4L:
+			m_treg_16bit[0] = (m_treg_16bit[0] & 0xff00) | data;
+			break;
+
+		case T90_TREG4H:
+			m_treg_16bit[0] = (m_treg_16bit[0] & 0x00ff) | (data << 8);
+			break;
+
+		case T90_TREG5L:
+			m_treg_16bit[1] = (m_treg_16bit[1] & 0xff00) | data;
+			break;
+
+		case T90_TREG5H:
+			m_treg_16bit[1] = (m_treg_16bit[1] & 0x00ff) | (data << 8);
+			break;
+
 		case T90_TRUN:
 		{
 			int i;
 			uint8_t mask;
+			uint8_t old = m_trun;
 			// Timers 0-3
 			for (i = 0; i < 4; i++)
 			{
@@ -2557,6 +2587,8 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 				if ( (data & mask) == mask )    t90_start_timer4();
 				else                            t90_stop_timer4();
 			}
+
+			m_trun = data;
 			break;
 		}
 
@@ -2590,24 +2622,29 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 								((data & 0x01) ? (1 << INTT1) : 0) ;
 			break;
 
+		case T90_IRFH:
+			if (data >= int(INTSWI) + 2 && data < int(INTMAX) + 2)
+				clear_irq(data - 2);
+			break;
+
 		case T90_P3:
-			data &= 0x6c;
-			m_port_write_cb[3](data);
+			m_port_latch[3] = data & 0x6c;
+			m_port_write_cb[3](m_port_latch[3]);
 			break;
 
 		case T90_P4:
-			data &= 0x0f;
-			out_mask = (~m_internal_registers[ T90_P4CR - T90_IOBASE ]) & 0x0f;
+			m_port_latch[4] = data & 0x0f;
+			out_mask = ~m_p4cr & 0x0f;
 			if (out_mask)
 			{
-				data &= out_mask;
-				m_port_write_cb[4](data);
+				m_port_write_cb[4](m_port_latch[4] & out_mask);
 			}
 			break;
 
 		case T90_P6:
-			out_mask = m_internal_registers[ T90_P67CR - T90_IOBASE ] & 0x0f;
-			switch (m_internal_registers[ T90_SMMOD - T90_IOBASE ] & 0x03)
+			m_port_latch[6] = data & 0x0f;
+			out_mask = m_p67cr & 0x0f;
+			switch (m_smmod & 0x03)
 			{
 				case 1:
 					data &= ~0x01;
@@ -2622,14 +2659,14 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 			if (out_mask)
 			{
-				data &= out_mask;
-				m_port_write_cb[6](data);
+				m_port_write_cb[6](m_port_latch[6] & out_mask);
 			}
 			break;
 
 		case T90_P7:
-			out_mask = (m_internal_registers[ T90_P67CR - T90_IOBASE ] & 0xf0) >> 4;
-			switch ((m_internal_registers[ T90_SMMOD - T90_IOBASE ]>>4) & 0x03)
+			m_port_latch[7] = data & 0x0f;
+			out_mask = m_p67cr >> 4;
+			switch ((m_smmod >> 4) & 0x03)
 			{
 				case 1:
 					data &= ~0x01;
@@ -2644,29 +2681,47 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 			if (out_mask)
 			{
-				data &= out_mask;
-				m_port_write_cb[7](data);
+				m_port_write_cb[7](m_port_latch[7] & out_mask);
 			}
 			break;
 
 		case T90_P8:
-			data &= 0x0f;
-			out_mask = (~m_internal_registers[ T90_P8CR - T90_IOBASE ]) & 0x08;
+			m_port_latch[8] = data & 0x0f;
+			out_mask = ~m_p8cr & 0x08;
 			if (out_mask)
 			{
-				data &= out_mask;
-				m_port_write_cb[8](data);
+				m_port_write_cb[8](m_port_latch[8] & out_mask);
 			}
+			break;
+
+		case T90_P4CR:
+			m_p4cr = data;
+			break;
+
+		case T90_P67CR:
+			m_p67cr = data;
+			break;
+
+		case T90_P8CR:
+			m_p8cr = data;
+			break;
+
+		case T90_SMMOD:
+			m_smmod = data;
 			break;
 
 		case T90_BX:
 			m_ixbase = (data & 0xf) << 16;
 			break;
+
 		case T90_BY:
 			m_iybase = (data & 0xf) << 16;
 			break;
+
+		default:
+			logerror("Write to unimplemented SFR at %04X\n", T90_IOBASE + offset);
+			break;
 	}
-	m_internal_registers[offset] = data;
 }
 
 
@@ -2693,15 +2748,26 @@ void tlcs90_device::device_start()
 	save_item(NAME(m_halt));
 	save_item(NAME(m_after_EI));
 	save_item(NAME(m_irq_state));
+	save_item(NAME(m_irq_line_state));
 	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_extra_cycles));
 
-	save_item(NAME(m_internal_registers));
+	save_item(NAME(m_port_latch));
+	save_item(NAME(m_p4cr));
+	save_item(NAME(m_p67cr));
+	save_item(NAME(m_p8cr));
+	save_item(NAME(m_smmod));
 	save_item(NAME(m_ixbase));
 	save_item(NAME(m_iybase));
 
 	save_item(NAME(m_timer_value));
 	save_item(NAME(m_timer4_value));
+	save_item(NAME(m_tmod));
+	save_item(NAME(m_tclk));
+	save_item(NAME(m_trun));
+	save_item(NAME(m_treg_8bit));
+	save_item(NAME(m_t4mod));
+	save_item(NAME(m_treg_16bit));
 
 	// Work registers
 	save_item(NAME(m_op));
@@ -2743,9 +2809,8 @@ void tlcs90_device::device_start()
 	m_prvpc.d = m_pc.d = m_sp.d = m_af.d = m_bc.d = m_de.d = m_hl.d = m_ix.d = m_iy.d = 0;
 	m_af2.d = m_bc2.d = m_de2.d = m_hl2.d = 0;
 	m_halt = m_after_EI = 0;
-	m_irq_state = m_irq_mask = 0;
+	m_irq_state = m_irq_line_state = m_irq_mask = 0;
 	m_extra_cycles = 0;
-	memset(m_internal_registers, 0, sizeof(m_internal_registers));
 	m_ixbase = m_iybase = 0;
 	m_timer_value[0] = m_timer_value[1] = m_timer_value[2] = m_timer_value[3] = 0;
 	m_timer4_value = 0;
@@ -2789,7 +2854,7 @@ void tlcs90_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_sp.w.l).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", F ).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -2810,4 +2875,9 @@ void tlcs90_device::state_string_export(const device_state_entry &entry, std::st
 			);
 			break;
 	}
+}
+
+std::unique_ptr<util::disasm_interface> tlcs90_device::create_disassembler()
+{
+	return std::make_unique<tlcs90_disassembler>();
 }

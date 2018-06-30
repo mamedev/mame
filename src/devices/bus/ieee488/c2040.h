@@ -40,6 +40,8 @@ public:
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
 
+	void c2040_fdc_mem(address_map &map);
+	void c2040_main_mem(address_map &map);
 protected:
 	c2040_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -79,6 +81,7 @@ protected:
 	required_device<c2040_fdc_device> m_fdc;
 	required_memory_region m_gcr;
 	required_ioport m_address;
+	output_finder<4> m_leds;
 
 	// IEEE-488 bus
 	int m_rfdo;                         // not ready for data output

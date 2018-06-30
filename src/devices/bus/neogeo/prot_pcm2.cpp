@@ -82,7 +82,7 @@ void pcm2_prot_device::swap(uint8_t* ymrom, uint32_t ymsize, int value)
 
 	for (int i = 0; i < 0x1000000; i++)
 	{
-		j = BITSWAP24(i,23,22,21,20,19,18,17,0,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,16);
+		j = bitswap<24>(i,23,22,21,20,19,18,17,0,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,16);
 		j ^= addrs[value][1];
 		d = ((i + addrs[value][0]) & 0xffffff);
 		src[j] = buf[d] ^ xordata[value][j & 0x7];

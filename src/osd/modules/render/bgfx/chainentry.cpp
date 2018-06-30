@@ -12,7 +12,7 @@
 #include "emu.h"
 
 #include <bgfx/bgfx.h>
-#include <bx/fpumath.h>
+#include <bx/math.h>
 
 #include "chainentry.h"
 
@@ -57,8 +57,6 @@ bgfx_chain_entry::~bgfx_chain_entry()
 
 void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen)
 {
-	bgfx::setViewSeq(view, true);
-
 	if (!setup_view(view, screen_width, screen_height, screen))
 	{
 		return;
@@ -71,7 +69,7 @@ void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager&
 
 	bgfx::TransientVertexBuffer buffer;
 	put_screen_buffer(prim, &buffer);
-	bgfx::setVertexBuffer(&buffer);
+	bgfx::setVertexBuffer(0,&buffer);
 
 	setup_auto_uniforms(prim, textures, screen_count, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y, rotation_type, swap_xy, screen);
 
@@ -260,8 +258,10 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	bgfx::setViewFrameBuffer(view, handle);
 	bgfx::setViewRect(view, 0, 0, width, height);
 
+	const bgfx::Caps* caps = bgfx::getCaps();
+
 	float projMat[16];
-	bx::mtxOrtho(projMat, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+	bx::mtxOrtho(projMat, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
 	bgfx::setViewTransform(view, nullptr, projMat);
 
 	m_clear->bind(view);

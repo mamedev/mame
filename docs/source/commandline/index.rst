@@ -7,3 +7,5 @@ MAME Commandline Usage and OS-Specific Configuration
 	commandline-all
 	windowsconfig
 	sdlconfig
+
+	commandline-index

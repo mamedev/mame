@@ -17,18 +17,17 @@
 
 
 #define MCFG_WPC_ROM_REGION(_region) \
-	wpcsnd_device::static_set_romregion(*device, _region);
+	downcast<wpcsnd_device &>(*device).set_romregion(_region);
 
 #define MCFG_WPC_SOUND_REPLY_CALLBACK(_reply) \
 	downcast<wpcsnd_device *>(device)->set_reply_callback(DEVCB_##_reply);
 
 
-class wpcsnd_device : public device_t,
-	public device_mixer_interface
+class wpcsnd_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	required_device<cpu_device> m_cpu;
 	required_device<ym2151_device> m_ym2151;
@@ -49,11 +48,12 @@ public:
 	uint8_t ctrl_r();
 	uint8_t data_r();
 
-	static void static_set_romregion(device_t &device, const char *tag);
+	void set_romregion(const char *tag) { m_rom.set_tag(tag); }
 
 	// callbacks
 	template <class Reply> void set_reply_callback(Reply &&cb) { m_reply_cb.set_callback(std::forward<Reply>(cb)); }
 
+	void wpcsnd_map(address_map &map);
 protected:
 	// overrides
 	virtual void device_start() override;

@@ -2,8 +2,8 @@
 // copyright-holders:F. Ulivi
 // Driver for Intel Intellec MDS series-II
 
-#ifndef _IMDS2_H_
-#define _IMDS2_H_
+#ifndef MAME_INCLUDES_IMDS2_H
+#define MAME_INCLUDES_IMDS2_H
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
@@ -17,12 +17,16 @@
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 
 class imds2_state : public driver_device
 {
-	public:
+public:
 	imds2_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void imds2(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(ipc_mem_read);
 	DECLARE_WRITE8_MEMBER(ipc_mem_write);
 	DECLARE_WRITE8_MEMBER(imds2_ipc_control_w);
@@ -72,13 +76,17 @@ class imds2_state : public driver_device
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 
-	private:
+	void ioc_io_map(address_map &map);
+	void ioc_mem_map(address_map &map);
+	void ipc_io_map(address_map &map);
+	void ipc_mem_map(address_map &map);
+
 	required_device<i8085a_cpu_device> m_ipccpu;
 	required_device<pic8259_device> m_ipcsyspic;
 	required_device<pic8259_device> m_ipclocpic;
 	required_device<pit8253_device> m_ipctimer;
-		required_device<i8251_device> m_ipcusart0;
-		required_device<i8251_device> m_ipcusart1;
+	required_device<i8251_device> m_ipcusart0;
+	required_device<i8251_device> m_ipcusart1;
 	required_device<rs232_port_device> m_serial0;
 	required_device<rs232_port_device> m_serial1;
 	required_device<i8080a_cpu_device> m_ioccpu;
@@ -147,4 +155,4 @@ class imds2_state : public driver_device
 	uint8_t m_device_status_byte;
 };
 
-#endif /* _IMDS2_H_ */
+#endif // MAME_INCLUDES_IMDS2_H

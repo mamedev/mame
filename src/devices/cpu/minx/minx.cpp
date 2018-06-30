@@ -46,6 +46,7 @@ TODO:
 
 #include "emu.h"
 #include "minx.h"
+#include "minxd.h"
 #include "debugger.h"
 
 #define FLAG_I  0x80
@@ -124,7 +125,7 @@ void minx_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_curpc).formatstr("%06X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).formatstr("%14s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -189,7 +190,7 @@ void minx_cpu_device::execute_run()
 	do
 	{
 		m_curpc = GET_MINX_PC;
-		debugger_instruction_hook(this, m_curpc);
+		debugger_instruction_hook(m_curpc);
 
 		if ( m_interrupt_pending )
 		{
@@ -234,8 +235,7 @@ void minx_cpu_device::execute_set_input(int inputnum, int state)
 }
 
 
-offs_t minx_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> minx_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( minx );
-	return CPU_DISASSEMBLE_NAME(minx)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<minx_disassembler>();
 }

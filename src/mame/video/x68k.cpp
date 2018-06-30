@@ -36,6 +36,9 @@
 #include "emu.h"
 #include "includes/x68k.h"
 
+//#define VERBOSE 0
+#include "logmacro.h"
+
 
 PALETTE_DECODER_MEMBER(x68k_state, GGGGGRRRRRBBBBBI)
 {
@@ -166,10 +169,14 @@ void x68k_state::x68k_crtc_refresh_mode()
 	if(visiblescr.max_y >= scr.max_y - 1)
 		visiblescr.max_y = scr.max_y - 2;
 
-//  logerror("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",m_crtc.reg[0],m_crtc.reg[1],m_crtc.reg[2],m_crtc.reg[3],
+//  LOG("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",m_crtc.reg[0],m_crtc.reg[1],m_crtc.reg[2],m_crtc.reg[3],
 //      m_crtc.reg[4],m_crtc.reg[5],m_crtc.reg[6],m_crtc.reg[7],m_crtc.reg[8],m_crtc.reg[9]);
-	logerror("video_screen_configure(machine.first_screen(),%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
-	m_screen->configure(scr.max_x,scr.max_y,visiblescr,HZ_TO_ATTOSECONDS(55.45));
+	unsigned div = (m_crtc.reg[20] & 0x03) == 0 ? 4 : 2;
+	if ((m_crtc.reg[20] & 0x0c) == 0)
+		div *= BIT(m_crtc.reg[20], 4) ? 3 : 2;
+	attotime refresh = attotime::from_ticks(scr.max_x * scr.max_y, (BIT(m_crtc.reg[20], 4) ? 69.55199_MHz_XTAL : 38.86363_MHz_XTAL) / div);
+	LOG("m_screen->configure(%i,%i,[%i,%i,%i,%i],%f)\n", scr.max_x, scr.max_y, visiblescr.min_x, visiblescr.min_y, visiblescr.max_x, visiblescr.max_y, ATTOSECONDS_TO_HZ(refresh.as_attoseconds()));
+	m_screen->configure(scr.max_x, scr.max_y, visiblescr, refresh.as_attoseconds());
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
@@ -284,7 +291,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_raster_irq)
 		end_time = m_screen->time_until_pos(scan,m_crtc.hend);
 		m_raster_irq->adjust(irq_time, scan);
 		timer_set(end_time, TIMER_X68K_CRTC_RASTER_END);
-		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,m_screen->vpos());
+		LOG("GPIP6: Raster triggered at line %i (%i)\n",scan,m_screen->vpos());
 	}
 }
 
@@ -300,7 +307,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
 		vblank_line = m_crtc.vbegin;
 		irq_time = m_screen->time_until_pos(vblank_line,2);
 		m_vblank_irq->adjust(irq_time);
-		logerror("CRTC: VBlank on\n");
+		LOG("CRTC: VBlank on\n");
 	}
 	if(val == 0)  // V-DISP off
 	{
@@ -310,7 +317,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
 			vblank_line = m_crtc.vtotal;
 		irq_time = m_screen->time_until_pos(vblank_line,2);
 		m_vblank_irq->adjust(irq_time, 1);
-		logerror("CRTC: VBlank off\n");
+		LOG("CRTC: VBlank off\n");
 	}
 
 	m_mfpdev->tai_w(!m_crtc.vblank);
@@ -393,7 +400,7 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 			if(irq_time.as_double() > 0)
 				m_raster_irq->adjust(irq_time, (data) / m_crtc.vmultiple);
 		}
-		logerror("CRTC: Write to raster IRQ register - %i\n",data);
+		LOG("CRTC: Write to raster IRQ register - %i\n",data);
 		break;
 	case 20:
 		if(ACCESSING_BITS_0_7)
@@ -435,6 +442,7 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
             if(data & 0x0400)
                 m_crtc.interlace = 1;
         }*/
+		logerror("CRTC: Register 20 = %04x\n", m_crtc.reg[20]);
 		x68k_crtc_refresh_mode();
 		break;
 	case 576:  // operation register
@@ -446,14 +454,14 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 		}
 		break;
 	}
-//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",m_maincpu->safe_pc(),data,offset);
+//  LOG("%s CRTC: Wrote %04x to CRTC register %i\n",machine().describe_context(),data,offset);
 }
 
 READ16_MEMBER(x68k_state::x68k_crtc_r )
 {
 	if(offset < 24)
 	{
-//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",m_maincpu->safe_pc(),m_crtc.reg[offset],offset);
+//      LOG("%s CRTC: Read %04x from CRTC register %i\n",machine().describe_context(),m_crtc.reg[offset],offset);
 		switch(offset)
 		{
 		case 9:
@@ -476,7 +484,7 @@ READ16_MEMBER(x68k_state::x68k_crtc_r )
 	}
 	if(offset == 576) // operation port, operation bits are set to 0 when operation is complete
 		return m_crtc.operation;
-//  logerror("CRTC: [%08x] Read from unknown CRTC register %i\n",activecpu_get_pc(),offset);
+//  LOG("CRTC: [%08x] Read from unknown CRTC register %i\n",activecpu_get_pc(),offset);
 	return 0xffff;
 }
 

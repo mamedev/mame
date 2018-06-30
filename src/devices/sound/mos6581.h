@@ -36,10 +36,10 @@
 //**************************************************************************
 
 #define MCFG_MOS6581_POTX_CALLBACK(_read) \
-	devcb = &mos6581_device::set_potx_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<mos6581_device &>(*device).set_potx_rd_callback(DEVCB_##_read);
 
 #define MCFG_MOS6581_POTY_CALLBACK(_read) \
-	devcb = &mos6581_device::set_poty_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<mos6581_device &>(*device).set_poty_rd_callback(DEVCB_##_read);
 
 
 
@@ -64,8 +64,8 @@ public:
 	mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~mos6581_device();
 
-	template <class Object> static devcb_base &set_potx_rd_callback(device_t &device, Object &&cb) { return downcast<mos6581_device &>(device).m_read_potx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_poty_rd_callback(device_t &device, Object &&cb) { return downcast<mos6581_device &>(device).m_read_poty.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_potx_rd_callback(Object &&cb) { return m_read_potx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_poty_rd_callback(Object &&cb) { return m_read_poty.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

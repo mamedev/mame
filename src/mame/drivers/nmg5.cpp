@@ -228,6 +228,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -283,10 +284,10 @@ public:
 	DECLARE_WRITE16_MEMBER(gfx_bank_w);
 	DECLARE_WRITE16_MEMBER(priority_reg_w);
 	DECLARE_WRITE8_MEMBER(oki_banking_w);
-	DECLARE_DRIVER_INIT(prot_val_00);
-	DECLARE_DRIVER_INIT(prot_val_10);
-	DECLARE_DRIVER_INIT(prot_val_20);
-	DECLARE_DRIVER_INIT(prot_val_40);
+	void init_prot_val_00();
+	void init_prot_val_10();
+	void init_prot_val_20();
+	void init_prot_val_40();
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	virtual void machine_start() override;
@@ -294,6 +295,16 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap( bitmap_ind16 &bitmap );
+	void nmg5(machine_config &config);
+	void pclubys(machine_config &config);
+	void garogun(machine_config &config);
+	void searchp2(machine_config &config);
+	void _7ordi(machine_config &config);
+	void nmg5_map(address_map &map);
+	void nmg5_sound_map(address_map &map);
+	void pclubys_map(address_map &map);
+	void pclubys_sound_map(address_map &map);
+	void sound_io_map(address_map &map);
 };
 
 
@@ -315,7 +326,7 @@ WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -357,44 +368,46 @@ WRITE8_MEMBER(nmg5_state::oki_banking_w)
 
 ********************************************************************/
 
-static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16, nmg5_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x180000, 0x180001) AM_WRITE(nmg5_soundlatch_w)
-	AM_RANGE(0x180002, 0x180003) AM_WRITENOP
-	AM_RANGE(0x180004, 0x180005) AM_READWRITE(prot_r, prot_w)
-	AM_RANGE(0x180006, 0x180007) AM_WRITE(gfx_bank_w)
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("DSW")
-	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x18000e, 0x18000f) AM_WRITE(priority_reg_w)
-	AM_RANGE(0x300002, 0x300009) AM_WRITEONLY AM_SHARE("scroll_ram")
-	AM_RANGE(0x30000a, 0x30000f) AM_WRITENOP
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("bitmap")
-ADDRESS_MAP_END
+void nmg5_state::nmg5_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x120000, 0x12ffff).ram();
+	map(0x140000, 0x1407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x160000, 0x1607ff).ram().share("spriteram");
+	map(0x180000, 0x180001).w(FUNC(nmg5_state::nmg5_soundlatch_w));
+	map(0x180002, 0x180003).nopw();
+	map(0x180004, 0x180005).rw(FUNC(nmg5_state::prot_r), FUNC(nmg5_state::prot_w));
+	map(0x180006, 0x180007).w(FUNC(nmg5_state::gfx_bank_w));
+	map(0x180008, 0x180009).portr("DSW");
+	map(0x18000a, 0x18000b).portr("SYSTEM");
+	map(0x18000c, 0x18000d).portr("INPUTS");
+	map(0x18000e, 0x18000f).w(FUNC(nmg5_state::priority_reg_w));
+	map(0x300002, 0x300009).writeonly().share("scroll_ram");
+	map(0x30000a, 0x30000f).nopw();
+	map(0x320000, 0x321fff).ram().w(FUNC(nmg5_state::bg_videoram_w)).share("bg_videoram");
+	map(0x322000, 0x323fff).ram().w(FUNC(nmg5_state::fg_videoram_w)).share("fg_videoram");
+	map(0x800000, 0x80ffff).ram().share("bitmap");
+}
 
-static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16, nmg5_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x460000, 0x4607ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x480000, 0x480001) AM_WRITE(nmg5_soundlatch_w)
-	AM_RANGE(0x480002, 0x480003) AM_WRITENOP
-	AM_RANGE(0x480004, 0x480005) AM_READWRITE(prot_r, prot_w)
-	AM_RANGE(0x480006, 0x480007) AM_WRITE(gfx_bank_w)
-	AM_RANGE(0x480008, 0x480009) AM_READ_PORT("DSW")
-	AM_RANGE(0x48000a, 0x48000b) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x48000c, 0x48000d) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x48000e, 0x48000f) AM_WRITE(priority_reg_w)
-	AM_RANGE(0x500002, 0x500009) AM_WRITEONLY AM_SHARE("scroll_ram")
-	AM_RANGE(0x520000, 0x521fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x522000, 0x523fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("bitmap")
-ADDRESS_MAP_END
+void nmg5_state::pclubys_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x20ffff).ram();
+	map(0x440000, 0x4407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x460000, 0x4607ff).ram().share("spriteram");
+	map(0x480000, 0x480001).w(FUNC(nmg5_state::nmg5_soundlatch_w));
+	map(0x480002, 0x480003).nopw();
+	map(0x480004, 0x480005).rw(FUNC(nmg5_state::prot_r), FUNC(nmg5_state::prot_w));
+	map(0x480006, 0x480007).w(FUNC(nmg5_state::gfx_bank_w));
+	map(0x480008, 0x480009).portr("DSW");
+	map(0x48000a, 0x48000b).portr("SYSTEM");
+	map(0x48000c, 0x48000d).portr("INPUTS");
+	map(0x48000e, 0x48000f).w(FUNC(nmg5_state::priority_reg_w));
+	map(0x500002, 0x500009).writeonly().share("scroll_ram");
+	map(0x520000, 0x521fff).ram().w(FUNC(nmg5_state::bg_videoram_w)).share("bg_videoram");
+	map(0x522000, 0x523fff).ram().w(FUNC(nmg5_state::fg_videoram_w)).share("fg_videoram");
+	map(0x800000, 0x80ffff).ram().share("bitmap");
+}
 
 /*******************************************************************
 
@@ -402,23 +415,26 @@ ADDRESS_MAP_END
 
 ********************************************************************/
 
-static ADDRESS_MAP_START( nmg5_sound_map, AS_PROGRAM, 8, nmg5_state )
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void nmg5_state::nmg5_sound_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).ram();
+}
 
-static ADDRESS_MAP_START( pclubys_sound_map, AS_PROGRAM, 8, nmg5_state )
-	AM_RANGE(0x0000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void nmg5_state::pclubys_sound_map(address_map &map)
+{
+	map(0x0000, 0xf7ff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, nmg5_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(oki_banking_w)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x18, 0x18) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void nmg5_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(nmg5_state::oki_banking_w));
+	map(0x10, 0x11).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x18, 0x18).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1c, 0x1c).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 static INPUT_PORTS_START( nmg5 )
 	PORT_START("DSW")
@@ -473,7 +489,7 @@ static INPUT_PORTS_START( nmg5 )
 	PORT_START("SYSTEM")    /* Coins */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN2 )
-	PORT_BIT( 0x0050, IP_ACTIVE_HIGH, IPT_SPECIAL )         // otherwise it doesn't boot (unneeded for 'nmg5e' - see notes)
+	PORT_BIT( 0x0050, IP_ACTIVE_HIGH, IPT_CUSTOM )         // otherwise it doesn't boot (unneeded for 'nmg5e' - see notes)
 	PORT_BIT( 0xffac, IP_ACTIVE_LOW,  IPT_UNUSED )          // tested in service mode
 
 	PORT_START("INPUTS")
@@ -947,12 +963,12 @@ static const gfx_layout layout_16x16x5 =
 	32*8
 };
 
-static GFXDECODE_START( nmg5 )
+static GFXDECODE_START( gfx_nmg5 )
 	GFXDECODE_ENTRY( "gfx1", 0, nmg5_layout_8x8x8, 0x000,  2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x5,   0x200, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( pclubys )
+static GFXDECODE_START( gfx_pclubys )
 	GFXDECODE_ENTRY( "gfx1", 0, pclubys_layout_8x8x8, 0x000,  2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x5,      0x200, 16 )
 GFXDECODE_END
@@ -974,16 +990,16 @@ void nmg5_state::machine_reset()
 	m_input_data = 0;
 }
 
-static MACHINE_CONFIG_START( nmg5 )
+MACHINE_CONFIG_START(nmg5_state::nmg5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(nmg5_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nmg5_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(nmg5_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nmg5_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 4000000)      /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(nmg5_sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)      /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(nmg5_sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 
 	/* video hardware */
@@ -995,7 +1011,7 @@ static MACHINE_CONFIG_START( nmg5 )
 	MCFG_SCREEN_UPDATE_DRIVER(nmg5_state, screen_update_nmg5)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nmg5)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nmg5)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1008,59 +1024,63 @@ static MACHINE_CONFIG_START( nmg5 )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000) /* 4MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000) /* 4MHz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1000000 , PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000 , okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( garogun, nmg5 )
+MACHINE_CONFIG_START(nmg5_state::garogun)
+	nmg5(config);
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pclubys_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pclubys_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(pclubys_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(pclubys_sound_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pclubys, nmg5 )
+MACHINE_CONFIG_START(nmg5_state::pclubys)
+	nmg5(config);
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pclubys_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pclubys_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(pclubys_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(pclubys_sound_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pclubys)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( searchp2, nmg5 )
+MACHINE_CONFIG_START(nmg5_state::searchp2)
+	nmg5(config);
 
 	/* basic machine hardware */
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(55) // !
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pclubys)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( 7ordi, nmg5 )
+MACHINE_CONFIG_START(nmg5_state::_7ordi)
+	nmg5(config);
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(pclubys_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(pclubys_sound_map)
 MACHINE_CONFIG_END
 
 
@@ -1561,35 +1581,35 @@ ROM_START( 7ordi )
 	ROM_RELOAD(0x60000,0x20000)
 ROM_END
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_00)
+void nmg5_state::init_prot_val_00()
 {
 	m_prot_val = 0x00;
 }
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_10)
+void nmg5_state::init_prot_val_10()
 {
 	m_prot_val = 0x10;
 }
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_20)
+void nmg5_state::init_prot_val_20()
 {
 	m_prot_val = 0x20;
 }
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_40)
+void nmg5_state::init_prot_val_40()
 {
 	m_prot_val = 0x40;
 }
 
-GAME( 1998, nmg5,      0,        nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, nmg5a,     nmg5,     nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 2, censored)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, nmg5e,     nmg5,     nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 3, earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, searchey,  0,        nmg5,     searchey,  nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean / Japanese / Italian)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, searcheya, searchey, nmg5,     searcheya, nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, searchp2,  0,        searchp2, searchp2,  nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye Plus V2.0", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, pclubys,   0,        pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, pclubysa,  pclubys,  pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, garogun,   0,        garogun,  garogun,   nmg5_state, prot_val_40, ROT0, "Yun Sung", "Garogun Seroyang (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, 7ordi,     0,        7ordi,    7ordi,     nmg5_state, prot_val_20, ROT0, "Yun Sung", "7 Ordi (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( ????, wondstck,  0,        nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( ????, wondstcka, wondstck, nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 2, censored)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, nmg5,      0,        nmg5,     nmg5,      nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, nmg5a,     nmg5,     nmg5,     nmg5,      nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 2, censored)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, nmg5e,     nmg5,     nmg5,     nmg5,      nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 3, earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, searchey,  0,        nmg5,     searchey,  nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean / Japanese / Italian)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, searcheya, searchey, nmg5,     searcheya, nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, searchp2,  0,        searchp2, searchp2,  nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Search Eye Plus V2.0", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, pclubys,   0,        pclubys,  pclubys,   nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, pclubysa,  pclubys,  pclubys,  pclubys,   nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, garogun,   0,        garogun,  garogun,   nmg5_state, init_prot_val_40, ROT0, "Yun Sung", "Garogun Seroyang (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, 7ordi,     0,        _7ordi,   7ordi,     nmg5_state, init_prot_val_20, ROT0, "Yun Sung", "7 Ordi (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( ????, wondstck,  0,        nmg5,     wondstck,  nmg5_state, init_prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( ????, wondstcka, wondstck, nmg5,     wondstck,  nmg5_state, init_prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 2, censored)", MACHINE_SUPPORTS_SAVE )

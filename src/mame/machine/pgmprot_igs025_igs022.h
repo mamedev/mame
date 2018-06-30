@@ -17,8 +17,8 @@ public:
 
 	required_shared_ptr<uint16_t> m_sharedprotram;
 
-	DECLARE_DRIVER_INIT(killbld);
-	DECLARE_DRIVER_INIT(drgw3);
+	void init_killbld();
+	void init_drgw3();
 	DECLARE_MACHINE_RESET(killbld);
 	DECLARE_MACHINE_RESET(dw3);
 
@@ -26,10 +26,11 @@ public:
 
 	required_device<igs025_device> m_igs025;
 	required_device<igs022_device> m_igs022;
+	void pgm_022_025(machine_config &config);
+	void pgm_022_025_dw3(machine_config &config);
+	void pgm_022_025_killbld(machine_config &config);
+	void killbld_mem(address_map &map);
 };
-
-MACHINE_CONFIG_EXTERN(pgm_022_025_dw3);
-MACHINE_CONFIG_EXTERN(pgm_022_025_killbld);
 
 INPUT_PORTS_EXTERN( killbld );
 INPUT_PORTS_EXTERN( dw3 );

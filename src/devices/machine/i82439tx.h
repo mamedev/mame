@@ -9,17 +9,40 @@
 
 #include "pci.h"
 
-#define MCFG_I82439TX_ADD(_tag, _cpu_tag, _ram_size)    \
-	MCFG_PCI_HOST_ADD(_tag, I82439TX_NEW, 0x80867100, 0x03, 0x00000000) \
-	downcast<i82439tx_host_device *>(device)->set_cpu_tag(_cpu_tag); \
-	downcast<i82439tx_host_device *>(device)->set_ram_size(_ram_size);
-
 class i82439tx_host_device : public pci_host_device {
 public:
+	template <typename T>
+	i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int ram_size)
+		: i82439tx_host_device(mconfig, tag, owner, clock)
+	{
+		set_ids_host(0x80867100, 0x03, 0x00000000);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_ram_size(ram_size);
+	}
 	i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_cpu_tag(const char *tag);
+	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_size(int ram_size);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void reset_all_mappings() override;
+
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
+	virtual void config_map(address_map &map) override;
+
+private:
+	int ram_size;
+	required_device<device_memory_interface> cpu;
+	std::vector<uint32_t> ram;
+
+	uint8_t pcon, cc, dramec, dramc, dramt;
+	uint8_t pam[7], drb[8];
+	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
 
 	DECLARE_READ8_MEMBER (pcon_r);
 	DECLARE_WRITE8_MEMBER(pcon_w);
@@ -46,29 +69,8 @@ public:
 	DECLARE_READ8_MEMBER (errsts_r);
 	DECLARE_WRITE8_MEMBER(errsts_w);
 	DECLARE_READ8_MEMBER (errsyn_r);
-
-	virtual void reset_all_mappings() override;
-
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
-
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-private:
-	const char *cpu_tag;
-	int ram_size;
-	cpu_device *cpu;
-	std::vector<uint32_t> ram;
-
-	uint8_t pcon, cc, dramec, dramc, dramt;
-	uint8_t pam[7], drb[8];
-	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
 };
 
-DECLARE_DEVICE_TYPE(I82439TX_NEW, i82439tx_host_device)
+DECLARE_DEVICE_TYPE(I82439TX, i82439tx_host_device)
 
 #endif // MAME_MACHINE_I82439TX_H

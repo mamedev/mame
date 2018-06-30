@@ -100,7 +100,7 @@ void cdp1862_device::device_start()
 	m_read_gd.resolve_safe(0);
 
 	// find devices
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	// init palette
 	initialize_palette();
@@ -129,8 +129,8 @@ void cdp1862_device::device_reset()
 WRITE8_MEMBER( cdp1862_device::dma_w )
 {
 	int rd = 1, bd = 1, gd = 1;
-	int sx = m_screen->hpos() + 4;
-	int y = m_screen->vpos();
+	int sx = screen().hpos() + 4;
+	int y = screen().vpos();
 	int x;
 
 	if (!m_con)

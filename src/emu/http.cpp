@@ -48,6 +48,7 @@ const static struct mapping
 	{ "jpx",     "image/jpx" },
 	{ "js",      "application/javascript" },
 	{ "json",    "application/json" },
+	{ "lay",     "text/xml" },
 	{ "m3u",     "audio/x-mpegurl" },
 	{ "m4v",     "video/x-m4v" },
 	{ "mid",     "audio/x-midi" },

@@ -358,12 +358,3 @@ WRITE8_MEMBER(pce_cart_slot_device::write_cart)
 	if (m_cart)
 		m_cart->write_cart(space, offset, data);
 }
-
-
-/*-------------------------------------------------
- Internal header logging
- -------------------------------------------------*/
-
-void pce_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t len)
-{
-}

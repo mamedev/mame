@@ -158,7 +158,7 @@ public:
 	void set_visible_position(debug_view_xy pos);
 	void set_cursor_position(debug_view_xy pos);
 	void set_cursor_visible(bool visible = true);
-	void set_source(const debug_view_source &source);
+	virtual void set_source(const debug_view_source &source);
 
 	// helpers
 	void process_char(int character) { view_char(character); }

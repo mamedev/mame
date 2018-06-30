@@ -74,16 +74,6 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void pc080sn_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<pc080sn_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -125,7 +115,7 @@ void pc080sn_device::device_start()
 	m_bgscroll_ram[0] = m_ram.get() + 0x4000 /2;
 	m_bgscroll_ram[1] = m_ram.get() + 0xc000 /2;
 
-	save_pointer(NAME(m_ram.get()), PC080SN_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram), PC080SN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 	machine().save().register_postload(save_prepost_delegate(FUNC(pc080sn_device::restore_scroll), this));
 

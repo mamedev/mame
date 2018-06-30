@@ -1557,6 +1557,7 @@ static imgtoolerr_t fat_construct_dirent(const char *filename, creation_policy_t
 		memcpy(created_entry, created_entry + created_entry_len - FAT_DIRENT_SIZE, FAT_DIRENT_SIZE);
 		created_entry_len = FAT_DIRENT_SIZE;
 		free(created_entry);
+		created_entry = NULL;
 		new_created_entry = (uint8_t *) malloc(created_entry_len);
 		if (!new_created_entry)
 		{

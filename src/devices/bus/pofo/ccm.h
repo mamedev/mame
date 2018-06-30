@@ -142,11 +142,10 @@ protected:
 
 
 // device type definition
-extern const device_type PORTFOLIO_MEMORY_CARD_SLOT;
 DECLARE_DEVICE_TYPE(PORTFOLIO_MEMORY_CARD_SLOT, portfolio_memory_card_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( portfolio_memory_cards );
+void portfolio_memory_cards(device_slot_interface &device);
 
 
 

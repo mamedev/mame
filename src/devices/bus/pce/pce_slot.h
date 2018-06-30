@@ -79,8 +79,6 @@ public:
 	int get_type() { return m_type; }
 	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 
-	void internal_header_logging(uint8_t *ROM, uint32_t len);
-
 	void set_intf(const char * interface) { m_interface = interface; }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }

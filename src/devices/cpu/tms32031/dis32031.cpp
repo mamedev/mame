@@ -9,40 +9,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "tms32031.h"
-
-
-/***************************************************************************
-    MEMORY ACCESSORS
-***************************************************************************/
-
-#define INTEGER         0
-#define FLOAT           1
-#define NODEST          2
-#define NOSOURCE        4
-#define NOSOURCE1       NOSOURCE
-#define NOSOURCE2       8
-#define SWAPSRCDST      16
-#define UNSIGNED        32
-
+#include "dis32031.h"
 
 /***************************************************************************
     CODE CODE
 ***************************************************************************/
 
-#if 0
-static inline char *signed_16bit(int16_t val)
-{
-	static char temp[10];
-	if (val < 0)
-		sprintf(temp, "-$%x", -val & 0xffff);
-	else
-		sprintf(temp, "$%x", val);
-	return temp;
-}
-#endif
-
-static const char *const regname[32] =
+const char *const tms32031_disassembler::regname[32] =
 {
 	"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
 	"AR0", "AR1", "AR2", "AR3", "AR4", "AR5", "AR6", "AR7",
@@ -50,7 +23,7 @@ static const char *const regname[32] =
 	"IOF", "RS", "RE", "RC", "??", "??", "??", "??"
 };
 
-static const char *const condition[32] =
+const char *const tms32031_disassembler::condition[32] =
 {
 	"U", "LO", "LS", "HI", "HS", "EQ", "NE", "LT",
 	"LE", "GT", "GE", "??", "NV", "V", "NUF", "UF",
@@ -122,7 +95,7 @@ static const char *const condition[32] =
 //  19 = LUF (LUF)
 //  20 = ZUF (Z | UF)
 
-static void append_indirect(uint8_t ma, int8_t disp, std::ostream &stream)
+void tms32031_disassembler::append_indirect(uint8_t ma, int8_t disp, std::ostream &stream)
 {
 	std::string dispstr;
 	int mode = (ma >> 3) & 0x1f;
@@ -172,14 +145,14 @@ static void append_indirect(uint8_t ma, int8_t disp, std::ostream &stream)
 	}
 }
 
-static std::string get_indirect(uint8_t ma, int8_t disp)
+std::string tms32031_disassembler::get_indirect(uint8_t ma, int8_t disp)
 {
 	std::ostringstream stream;
 	append_indirect(ma, disp, stream);
 	return stream.str();
 }
 
-static void append_immediate(uint16_t data, int is_float, int is_unsigned, std::ostream &stream)
+void tms32031_disassembler::append_immediate(uint16_t data, int is_float, int is_unsigned, std::ostream &stream)
 {
 	if (is_float)
 	{
@@ -203,7 +176,7 @@ static void append_immediate(uint16_t data, int is_float, int is_unsigned, std::
 		util::stream_format(stream, "$%04X", data);
 }
 
-static void disasm_general(const char *opstring, uint32_t op, int flags, std::ostream &stream)
+void tms32031_disassembler::disasm_general(const char *opstring, uint32_t op, int flags, std::ostream &stream)
 {
 	util::stream_format(stream, "%-6s", opstring);
 
@@ -244,7 +217,7 @@ static void disasm_general(const char *opstring, uint32_t op, int flags, std::os
 	}
 }
 
-static void disasm_3op(const char *opstring, uint32_t op, int flags, std::ostream &stream)
+void tms32031_disassembler::disasm_3op(const char *opstring, uint32_t op, int flags, std::ostream &stream)
 {
 	util::stream_format(stream, "%-6s", opstring);
 
@@ -289,7 +262,7 @@ static void disasm_3op(const char *opstring, uint32_t op, int flags, std::ostrea
 	}
 }
 
-static void disasm_conditional(const char *opstring, uint32_t op, int flags, std::ostream &stream)
+void tms32031_disassembler::disasm_conditional(const char *opstring, uint32_t op, int flags, std::ostream &stream)
 {
 	char temp[10];
 	sprintf(temp, "%s%s", opstring, condition[(op >> 23) & 31]);
@@ -297,7 +270,7 @@ static void disasm_conditional(const char *opstring, uint32_t op, int flags, std
 }
 
 
-static void disasm_parallel_3op3op(const char *opstring1, const char *opstring2, uint32_t op, int flags, const uint8_t *srctable, std::ostream &stream)
+void tms32031_disassembler::disasm_parallel_3op3op(const char *opstring1, const char *opstring2, uint32_t op, int flags, const uint8_t *srctable, std::ostream &stream)
 {
 	const uint8_t *s = &srctable[((op >> 24) & 3) * 4];
 	int d1 = (op >> 23) & 1;
@@ -315,7 +288,7 @@ static void disasm_parallel_3op3op(const char *opstring1, const char *opstring2,
 }
 
 
-static void disasm_parallel_3opstore(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream)
+void tms32031_disassembler::disasm_parallel_3opstore(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream)
 {
 	int d1 = (op >> 22) & 7;
 	int s1 = (op >> 19) & 7;
@@ -335,7 +308,7 @@ static void disasm_parallel_3opstore(const char *opstring1, const char *opstring
 }
 
 
-static void disasm_parallel_loadload(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream)
+void tms32031_disassembler::disasm_parallel_loadload(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream)
 {
 	int d2 = (op >> 22) & 7;
 	int d1 = (op >> 19) & 7;
@@ -349,7 +322,7 @@ static void disasm_parallel_loadload(const char *opstring1, const char *opstring
 }
 
 
-static void disasm_parallel_storestore(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream)
+void tms32031_disassembler::disasm_parallel_storestore(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream)
 {
 	int s2 = (op >> 22) & 7;
 	int s1 = (op >> 16) & 7;
@@ -364,9 +337,10 @@ static void disasm_parallel_storestore(const char *opstring1, const char *opstri
 
 
 
-static unsigned dasm_tms3203x(std::ostream &stream, unsigned pc, uint32_t op)
+offs_t tms32031_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
+	uint32_t op = opcodes.r32(pc);
 
 	switch (op >> 23)
 	{
@@ -485,7 +459,7 @@ static unsigned dasm_tms3203x(std::ostream &stream, unsigned pc, uint32_t op)
 
 		case 0x0c4: case 0x0c5:
 			util::stream_format(stream, "CALL  $%06X", op & 0xffffff);
-			flags = DASMFLAG_STEP_OVER;
+			flags = STEP_OVER;
 			break;
 
 
@@ -537,7 +511,7 @@ static unsigned dasm_tms3203x(std::ostream &stream, unsigned pc, uint32_t op)
 			char temp[10];
 			sprintf(temp, "CALL%s", condition[(op >> 16) & 31]);
 			util::stream_format(stream, "%-6s%s", temp, regname[op & 31]);
-			flags = DASMFLAG_STEP_OVER;
+			flags = STEP_OVER;
 			break;
 		}
 
@@ -546,7 +520,7 @@ static unsigned dasm_tms3203x(std::ostream &stream, unsigned pc, uint32_t op)
 			char temp[10];
 			sprintf(temp, "CALL%s", condition[(op >> 16) & 31]);
 			util::stream_format(stream, "%-6s$%06X", temp, (pc + 1 + (int16_t)op) & 0xffffff);
-			flags = DASMFLAG_STEP_OVER;
+			flags = STEP_OVER;
 			break;
 		}
 
@@ -556,19 +530,19 @@ static unsigned dasm_tms3203x(std::ostream &stream, unsigned pc, uint32_t op)
 			char temp[10];
 			sprintf(temp, "TRAP%s", condition[(op >> 16) & 31]);
 			util::stream_format(stream, "%-6s$%02X", temp, op & 31);
-			flags = DASMFLAG_STEP_OVER;
+			flags = STEP_OVER;
 			break;
 		}
 
 
 		case 0x0f0:
 			util::stream_format(stream, "RETI%s", condition[(op >> 16) & 31]);
-			flags = DASMFLAG_STEP_OUT;
+			flags = STEP_OUT;
 			break;
 
 		case 0x0f1:
 			util::stream_format(stream, "RETS%s", condition[(op >> 16) & 31]);
-			flags = DASMFLAG_STEP_OUT;
+			flags = STEP_OUT;
 			break;
 
 
@@ -720,12 +694,11 @@ static unsigned dasm_tms3203x(std::ostream &stream, unsigned pc, uint32_t op)
 			break;
 	}
 
-	return 1 | flags | DASMFLAG_SUPPORTED;
+	return 1 | flags | SUPPORTED;
 }
 
-
-CPU_DISASSEMBLE( tms3203x )
+u32 tms32031_disassembler::opcode_alignment() const
 {
-	uint32_t op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
-	return dasm_tms3203x(stream, pc, op);
+	return 1;
 }
+

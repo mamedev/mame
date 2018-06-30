@@ -6,25 +6,6 @@
 #pragma once
 
 
-#define MCFG_PCI_ROOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PCI_ROOT, 0)
-
-#define MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, _pclass, _subsystem_id) \
-	MCFG_DEVICE_ADD(_tag, _type, 0) \
-	downcast<pci_device *>(device)->set_ids(_main_id, _revision, _pclass, _subsystem_id);
-
-#define MCFG_AGP_DEVICE_ADD(_tag, _type, _main_id, _revision, _subsystem_id) \
-	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x030000, _subsystem_id)
-
-#define MCFG_PCI_HOST_ADD(_tag, _type, _main_id, _revision, _subsystem_id) \
-	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x060000, _subsystem_id)
-
-#define MCFG_PCI_BRIDGE_ADD(_tag, _main_id, _revision) \
-	MCFG_PCI_DEVICE_ADD(_tag, PCI_BRIDGE, _main_id, _revision, 0x060400, 0x00000000)
-
-#define MCFG_AGP_BRIDGE_ADD(_tag, _type, _main_id, _revision) \
-	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x060400, 0x00000000)
-
 class pci_device : public device_t {
 public:
 	typedef delegate<void ()> mapper_cb;
@@ -32,6 +13,9 @@ public:
 	mapper_cb remap_cb, remap_config_cb;
 
 	void set_ids(uint32_t main_id, uint8_t revision, uint32_t pclass, uint32_t subsystem_id);
+	void set_ids_host(uint32_t main_id, uint32_t revision, uint64_t subsystem_id) { set_ids(main_id, revision, 0x060000, subsystem_id); }
+	void set_ids_bridge(uint32_t main_id, uint32_t revision) { set_ids(main_id, revision, 0x060400, 0x00000000); }
+	void set_ids_agp(uint64_t main_id, uint32_t revision, uint32_t subsystem_id) { set_ids(main_id, revision, 0x030000, subsystem_id); }
 	void set_multifunction_device(bool enable);
 
 	virtual void set_remap_cb(mapper_cb _remap_cb);
@@ -41,9 +25,12 @@ public:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space);
 
+	// Specify if this device must be mapped before all the others on the pci bus
+	virtual bool map_first() const { return false; }
+
 	void map_config(uint8_t device, address_space *config_space);
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32);
+	virtual void config_map(address_map &map);
 
 	uint32_t unmapped_r(offs_t offset, uint32_t mem_mask, int bank);
 	void unmapped_w(offs_t offset, uint32_t data, uint32_t mem_mask, int bank);
@@ -99,7 +86,7 @@ protected:
 	};
 
 	struct bank_info {
-		address_map_delegate map;
+		address_map_constructor map;
 		device_t *device;
 
 		uint64_t adr;
@@ -129,9 +116,9 @@ protected:
 	virtual void device_reset() override;
 
 	void skip_map_regs(int count);
-	void add_map(uint64_t size, int flags, address_map_delegate &map, device_t *relative_to = nullptr);
+	void add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to = nullptr);
 	template <typename T> void add_map(uint64_t size, int flags, void (T::*map)(address_map &map), const char *name) {
-		address_map_delegate delegate(map, name, static_cast<T *>(this));
+		address_map_constructor delegate(map, name, static_cast<T *>(this));
 		add_map(size, flags, delegate);
 	}
 
@@ -153,6 +140,11 @@ protected:
 
 class pci_bridge_device : public pci_device, public device_memory_interface {
 public:
+	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision)
+		: pci_bridge_device(mconfig, tag, owner, clock)
+	{
+		set_ids_bridge(main_id, revision);
+	}
 	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void set_remap_cb(mapper_cb _remap_cb) override;
@@ -162,7 +154,7 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(header_type_r) override;
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	virtual void config_map(address_map &map) override;
 
 	DECLARE_READ32_MEMBER (b_address_base_r);
 	DECLARE_WRITE32_MEMBER(b_address_base_w);
@@ -243,7 +235,7 @@ protected:
 
 class pci_host_device : public pci_bridge_device {
 public:
-	DECLARE_ADDRESS_MAP(io_configuration_access_map, 32);
+	void io_configuration_access_map(address_map &map);
 
 protected:
 	pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

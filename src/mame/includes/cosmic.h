@@ -9,10 +9,11 @@
 #include "machine/timer.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
+#include "emupal.h"
 #include "screen.h"
 
-#define COSMICG_MASTER_CLOCK     XTAL_9_828MHz
-#define Z80_MASTER_CLOCK         XTAL_10_816MHz
+#define COSMICG_MASTER_CLOCK     XTAL(9'828'000)
+#define Z80_MASTER_CLOCK         XTAL(10'816'000)
 
 
 class cosmic_state : public driver_device
@@ -79,11 +80,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(cosmicg_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq0);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
-	DECLARE_DRIVER_INIT(devzone);
-	DECLARE_DRIVER_INIT(cosmicg);
-	DECLARE_DRIVER_INIT(nomnlnd);
-	DECLARE_DRIVER_INIT(cosmica);
-	DECLARE_DRIVER_INIT(panic);
+	void init_devzone();
+	void init_cosmicg();
+	void init_nomnlnd();
+	void init_cosmica();
+	void init_panic();
 	DECLARE_MACHINE_START(cosmic);
 	DECLARE_MACHINE_RESET(cosmic);
 	DECLARE_MACHINE_RESET(cosmicg);
@@ -108,4 +109,16 @@ public:
 	pen_t cosmica_map_color(uint8_t x, uint8_t y);
 	pen_t cosmicg_map_color(uint8_t x, uint8_t y);
 	pen_t magspot_map_color(uint8_t x, uint8_t y);
+	void cosmic(machine_config &config);
+	void cosmica(machine_config &config);
+	void cosmicg(machine_config &config);
+	void nomnlnd(machine_config &config);
+	void devzone(machine_config &config);
+	void panic(machine_config &config);
+	void magspot(machine_config &config);
+	void cosmica_map(address_map &map);
+	void cosmicg_io_map(address_map &map);
+	void cosmicg_map(address_map &map);
+	void magspot_map(address_map &map);
+	void panic_map(address_map &map);
 };

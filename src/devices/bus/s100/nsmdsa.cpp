@@ -47,16 +47,17 @@ const tiny_rom_entry *s100_mds_a_device::device_rom_region() const
 //  SLOT_INTERFACE( mds_a_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( mds_a_floppies )
-	SLOT_INTERFACE( "525sd", FLOPPY_525_SD ) // Shugart SA-400
-SLOT_INTERFACE_END
+static void mds_a_floppies(device_slot_interface &device)
+{
+	device.option_add("525sd", FLOPPY_525_SD); // Shugart SA-400
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( s100_mds_a_device::device_add_mconfig )
+MACHINE_CONFIG_START(s100_mds_a_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD("floppy0", mds_a_floppies, "525sd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("floppy1", mds_a_floppies, "525sd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

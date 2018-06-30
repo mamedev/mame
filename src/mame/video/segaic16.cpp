@@ -389,24 +389,6 @@ segaic16_video_device::segaic16_video_device(const machine_config &mconfig, cons
 	m_pagelatch_cb =  segaic16_video_pagelatch_delegate(FUNC(segaic16_video_device::tilemap_16b_fill_latch), this);
 }
 
-void segaic16_video_device::set_pagelatch_cb(device_t &device,segaic16_video_pagelatch_delegate newtilecb)
-{
-	segaic16_video_device &dev = downcast<segaic16_video_device &>(device);
-	dev.m_pagelatch_cb = newtilecb;
-}
-
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void segaic16_video_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<segaic16_video_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-
 void segaic16_video_device::device_start()
 {
 	if(!m_gfxdecode->started())
@@ -433,7 +415,7 @@ void segaic16_video_device::set_display_enable(int enable)
 	enable = (enable != 0);
 	if (m_display_enable != enable)
 	{
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 		m_display_enable = enable;
 	}
 }
@@ -457,7 +439,7 @@ void draw_virtual_tilemap(screen_device &screen, segaic16_video_device::tilemap_
 
 	if (info->flip)
 	{
-		pages = BITSWAP16(pages,
+		pages = bitswap<16>(pages,
 			3, 2, 1, 0,
 			7, 6, 5, 4,
 			11, 10, 9, 8,
@@ -1047,7 +1029,7 @@ TIMER_CALLBACK_MEMBER( segaic16_video_device::tilemap_16b_latch_values )
 	}
 
 	/* set a timer to do this again next frame */
-	info->latch_timer->adjust(m_screen->time_until_pos(261), param);
+	info->latch_timer->adjust(screen().time_until_pos(261), param);
 }
 
 
@@ -1227,7 +1209,7 @@ void segaic16_video_device::tilemap_set_bank(int which, int banknum, int offset)
 
 	if (info->bank[banknum] != offset)
 	{
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 		info->bank[banknum] = offset;
 		machine().tilemap().mark_all_dirty();
 	}
@@ -1249,7 +1231,7 @@ void segaic16_video_device::tilemap_set_flip(int which, int flip)
 	flip = (flip != 0);
 	if (info->flip != flip)
 	{
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 		info->flip = flip;
 		info->textmap->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		for (pagenum = 0; pagenum < info->numpages; pagenum++)
@@ -1272,7 +1254,7 @@ void segaic16_video_device::tilemap_set_rowscroll(int which, int enable)
 	enable = (enable != 0);
 	if (info->rowscroll != enable)
 	{
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 		info->rowscroll = enable;
 	}
 }
@@ -1292,7 +1274,7 @@ void segaic16_video_device::tilemap_set_colscroll(int which, int enable)
 	enable = (enable != 0);
 	if (info->colscroll != enable)
 	{
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 		info->colscroll = enable;
 	}
 }
@@ -1328,7 +1310,7 @@ WRITE16_MEMBER( segaic16_video_device::textram_w )
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 
 	COMBINE_DATA(&m_textram[offset]);
 	m_bg_tilemap[0].textmap->mark_tile_dirty(offset);
@@ -1382,7 +1364,7 @@ void segaic16_video_device::rotate_init(int which, int type, int colorbase)
 	info->buffer = std::make_unique<uint16_t[]>(info->ramsize/2);
 
 	save_item(NAME(info->colorbase), which);
-	save_pointer(NAME((uint8_t *) info->buffer.get()), info->ramsize, which);
+	save_pointer(NAME(info->buffer), info->ramsize/2, which);
 }
 
 

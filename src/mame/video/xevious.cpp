@@ -259,7 +259,7 @@ READ8_MEMBER( xevious_state::xevious_bb_r )
 		/* return BB0 */
 		dat2 = rom2c[adr_2c];
 		/* swap bit 6 & 7 */
-		dat2 = BITSWAP8(dat2, 6,7,5,4,3,2,1,0);
+		dat2 = bitswap<8>(dat2, 6,7,5,4,3,2,1,0);
 		/* flip x & y */
 		if (dat1 & 0x400) dat2 ^= 0x40;
 		if (dat1 & 0x200) dat2 ^= 0x80;

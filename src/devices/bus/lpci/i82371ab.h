@@ -18,7 +18,7 @@
 
 // ======================> i82371ab_device
 
-class i82371ab_device :  public southbridge_device,
+class i82371ab_device :  public southbridge_extended_device,
 							public pci_device_interface
 {
 public:
@@ -27,6 +27,8 @@ public:
 
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) override;
+
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 protected:
 	// device-level overrides

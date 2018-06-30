@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "ccpu.h"
+#include "ccpudasm.h"
 #include "debugger.h"
 
 
@@ -22,10 +23,10 @@ DEFINE_DEVICE_TYPE(CCPU, ccpu_cpu_device, "ccpu", "Cinematronics CPU")
     MACROS
 ***************************************************************************/
 
-#define READOP(a)         (m_direct->read_byte(a))
+#define READOP(a)         (m_cache->read_byte(a))
 
-#define RDMEM(a)          (m_data->read_word((a) * 2) & 0xfff)
-#define WRMEM(a,v)        (m_data->write_word((a) * 2, (v)))
+#define RDMEM(a)          (m_data->read_word((a) & 0xfff))
+#define WRMEM(a,v)        (m_data->write_word((a), (v)))
 
 #define READPORT(a)       (m_io->read_byte(a))
 #define WRITEPORT(a,v)    (m_io->write_byte((a), (v)))
@@ -106,7 +107,7 @@ void ccpu_cpu_device::device_start()
 	assert(!m_vector_callback.isnull());
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
@@ -145,7 +146,7 @@ void ccpu_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_PC).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).formatstr("%6s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -219,7 +220,7 @@ void ccpu_cpu_device::execute_run()
 		opcode = READOP(m_PC);
 		if (opcode == 0x51 || opcode == 0x59)
 			m_extinput = m_external_input();
-		debugger_instruction_hook(this, m_PC);
+		debugger_instruction_hook(m_PC);
 		m_PC++;
 
 		switch (opcode)
@@ -695,8 +696,7 @@ void ccpu_cpu_device::execute_run()
 }
 
 
-offs_t ccpu_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> ccpu_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( ccpu );
-	return CPU_DISASSEMBLE_NAME(ccpu)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<ccpu_disassembler>();
 }

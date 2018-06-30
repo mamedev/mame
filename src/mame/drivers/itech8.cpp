@@ -8,11 +8,11 @@
     driver by Aaron Giles
 
     Games supported:
-        * Strata Bowling [2 sets]
+        * Strata Bowling [3 sets]
         * Super Strike Bowling
         * Wheel of Fortune [2 sets]
         * Grudge Match
-        * Golden Tee Golf [2 sets]
+        * Golden Tee Golf [4 sets]
         * Golden Tee Golf II [3 sets]
         * Slick Shot [3 sets]
         * Dyno-Bop
@@ -536,7 +536,7 @@ void itech8_state::update_interrupts(int periodic, int tms34061, int blitter)
 	if (blitter != -1) m_blitter_int = blitter;
 
 	/* handle the 6809 case */
-	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
+	if (main_cpu_type == MC6809 || main_cpu_type == HD6309)
 	{
 		/* just modify lines that have changed */
 		if (periodic != -1) m_maincpu->set_input_line(INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
@@ -566,13 +566,23 @@ TIMER_CALLBACK_MEMBER(itech8_state::irq_off)
 }
 
 
-INTERRUPT_GEN_MEMBER(itech8_state::generate_nmi)
+WRITE_LINE_MEMBER(itech8_state::generate_nmi)
 {
-	/* signal the NMI */
-	update_interrupts(1, -1, -1);
-	m_irq_off_timer->adjust(attotime::from_usec(1));
+	if (state)
+	{
+		/* signal the NMI */
+		update_interrupts(1, -1, -1);
+		m_irq_off_timer->adjust(attotime::from_usec(1));
 
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
+		if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
+	}
+}
+
+WRITE_LINE_MEMBER(itech8_state::ninclown_irq)
+{
+	// definitely doesn't like the generate_nmi code, so we just generate VBlank irq here instead
+	if (state)
+		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 
@@ -625,7 +635,7 @@ void itech8_state::machine_reset()
 	device_type main_cpu_type = m_maincpu->type();
 
 	/* make sure bank 0 is selected */
-	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
+	if (main_cpu_type == MC6809 || main_cpu_type == HD6309)
 	{
 		membank("bank1")->set_entry(0);
 		m_maincpu->reset();
@@ -748,8 +758,8 @@ WRITE8_MEMBER(itech8_state::pia_portb_out)
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	m_pia_portb_data = data;
-	m_ticket->write(space, 0, (data & 0x10) << 3);
-	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
+	m_ticket->motor_w(BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 }
 
 
@@ -762,8 +772,8 @@ WRITE8_MEMBER(itech8_state::ym2203_portb_out)
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	m_pia_portb_data = data;
-	m_ticket->write(machine().dummy_space(), 0, data & 0x80);
-	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
+	m_ticket->motor_w(BIT(data, 7));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 }
 
 
@@ -857,67 +867,71 @@ WRITE8_MEMBER(itech8_state::ninclown_palette_w)
  *************************************/
 
 /*------ common layout with TMS34061 at 0000 ------*/
-static ADDRESS_MAP_START( tmslo_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(tms34061_r, tms34061_w)
-	AM_RANGE(0x1100, 0x1100) AM_WRITENOP
-	AM_RANGE(0x1120, 0x1120) AM_WRITE(sound_data_w)
-	AM_RANGE(0x1140, 0x1140) AM_READ_PORT("40") AM_WRITE(grom_bank_w)
-	AM_RANGE(0x1160, 0x1160) AM_READ_PORT("60") AM_WRITE(page_w)
-	AM_RANGE(0x1180, 0x1180) AM_READ_PORT("80") AM_DEVWRITE("tms34061", tms34061_device, latch_w)
-	AM_RANGE(0x11a0, 0x11a0) AM_WRITE(nmi_ack_w)
-	AM_RANGE(0x11c0, 0x11df) AM_READ(blitter_r) AM_WRITE(blitter_bank_w)
-	AM_RANGE(0x11e0, 0x11ff) AM_WRITE(palette_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void itech8_state::tmslo_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rw(FUNC(itech8_state::tms34061_r), FUNC(itech8_state::tms34061_w));
+	map(0x1100, 0x1100).nopw();
+	map(0x1120, 0x1120).w(FUNC(itech8_state::sound_data_w));
+	map(0x1140, 0x1140).portr("40").w(FUNC(itech8_state::grom_bank_w));
+	map(0x1160, 0x1160).portr("60").w(FUNC(itech8_state::page_w));
+	map(0x1180, 0x1180).portr("80").w(m_tms34061, FUNC(tms34061_device::latch_w));
+	map(0x11a0, 0x11a0).w(FUNC(itech8_state::nmi_ack_w));
+	map(0x11c0, 0x11df).r(FUNC(itech8_state::blitter_r)).w(FUNC(itech8_state::blitter_bank_w));
+	map(0x11e0, 0x11ff).w(FUNC(itech8_state::palette_w));
+	map(0x2000, 0x3fff).ram().share("nvram");
+	map(0x4000, 0xffff).bankr("bank1");
+}
 
 
 /*------ common layout with TMS34061 at 1000 ------*/
-static ADDRESS_MAP_START( tmshi_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(tms34061_r, tms34061_w)
-	AM_RANGE(0x0100, 0x0100) AM_WRITENOP
-	AM_RANGE(0x0120, 0x0120) AM_WRITE(sound_data_w)
-	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("40") AM_WRITE(grom_bank_w)
-	AM_RANGE(0x0160, 0x0160) AM_READ_PORT("60") AM_WRITE(page_w)
-	AM_RANGE(0x0180, 0x0180) AM_READ_PORT("80") AM_DEVWRITE("tms34061", tms34061_device, latch_w)
-	AM_RANGE(0x01a0, 0x01a0) AM_WRITE(nmi_ack_w)
-	AM_RANGE(0x01c0, 0x01df) AM_READ(blitter_r) AM_WRITE(blitter_bank_w)
-	AM_RANGE(0x01e0, 0x01ff) AM_WRITE(palette_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void itech8_state::tmshi_map(address_map &map)
+{
+	map(0x1000, 0x1fff).rw(FUNC(itech8_state::tms34061_r), FUNC(itech8_state::tms34061_w));
+	map(0x0100, 0x0100).nopw();
+	map(0x0120, 0x0120).w(FUNC(itech8_state::sound_data_w));
+	map(0x0140, 0x0140).portr("40").w(FUNC(itech8_state::grom_bank_w));
+	map(0x0160, 0x0160).portr("60").w(FUNC(itech8_state::page_w));
+	map(0x0180, 0x0180).portr("80").w(m_tms34061, FUNC(tms34061_device::latch_w));
+	map(0x01a0, 0x01a0).w(FUNC(itech8_state::nmi_ack_w));
+	map(0x01c0, 0x01df).r(FUNC(itech8_state::blitter_r)).w(FUNC(itech8_state::blitter_bank_w));
+	map(0x01e0, 0x01ff).w(FUNC(itech8_state::palette_w));
+	map(0x2000, 0x3fff).ram().share("nvram");
+	map(0x4000, 0xffff).bankr("bank1");
+}
 
 
 /*------ Golden Tee Golf II 1992 layout ------*/
-static ADDRESS_MAP_START( gtg2_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x0100, 0x0100) AM_READ_PORT("40") AM_WRITE(nmi_ack_w)
-	AM_RANGE(0x0120, 0x0120) AM_READ_PORT("60") AM_WRITE(page_w)
-	AM_RANGE(0x0140, 0x015f) AM_WRITE(palette_w)
-	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("80")
-	AM_RANGE(0x0160, 0x0160) AM_WRITE(grom_bank_w)
-	AM_RANGE(0x0180, 0x019f) AM_READ(blitter_r) AM_WRITE(blitter_bank_w)
-	AM_RANGE(0x01c0, 0x01c0) AM_WRITE(gtg2_sound_data_w)
-	AM_RANGE(0x01e0, 0x01e0) AM_DEVWRITE("tms34061", tms34061_device, latch_w)
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(tms34061_r, tms34061_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void itech8_state::gtg2_map(address_map &map)
+{
+	map(0x0100, 0x0100).portr("40").w(FUNC(itech8_state::nmi_ack_w));
+	map(0x0120, 0x0120).portr("60").w(FUNC(itech8_state::page_w));
+	map(0x0140, 0x015f).w(FUNC(itech8_state::palette_w));
+	map(0x0140, 0x0140).portr("80");
+	map(0x0160, 0x0160).w(FUNC(itech8_state::grom_bank_w));
+	map(0x0180, 0x019f).r(FUNC(itech8_state::blitter_r)).w(FUNC(itech8_state::blitter_bank_w));
+	map(0x01c0, 0x01c0).w(FUNC(itech8_state::gtg2_sound_data_w));
+	map(0x01e0, 0x01e0).w(m_tms34061, FUNC(tms34061_device::latch_w));
+	map(0x1000, 0x1fff).rw(FUNC(itech8_state::tms34061_r), FUNC(itech8_state::tms34061_w));
+	map(0x2000, 0x3fff).ram().share("nvram");
+	map(0x4000, 0xffff).bankr("bank1");
+}
 
 /*------ Ninja Clowns layout ------*/
-static ADDRESS_MAP_START( ninclown_map, AS_PROGRAM, 16, itech8_state )
-	AM_RANGE(0x000000, 0x00007f) AM_RAM AM_REGION("maincpu", 0)
-	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x004000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x07ffff) AM_READ(rom_constant_r)
-	AM_RANGE(0x100080, 0x100081) AM_WRITE8(sound_data_w, 0xff00)
-	AM_RANGE(0x100100, 0x100101) AM_READ_PORT("40") AM_WRITE(grom_bank16_w)
-	AM_RANGE(0x100180, 0x100181) AM_READ_PORT("60") AM_WRITE(display_page16_w)
-	AM_RANGE(0x100240, 0x100241) AM_DEVWRITE8("tms34061", tms34061_device, latch_w, 0xff00)
-	AM_RANGE(0x100280, 0x100281) AM_READ_PORT("80") AM_WRITENOP
-	AM_RANGE(0x100300, 0x10031f) AM_READWRITE8(blitter_r, blitter_w, 0xffff)
-	AM_RANGE(0x100380, 0x1003ff) AM_READWRITE8(ninclown_palette_r, ninclown_palette_w, 0xff00)
-	AM_RANGE(0x110000, 0x110fff) AM_READWRITE8(tms34061_r, tms34061_w, 0xffff)
-ADDRESS_MAP_END
+void itech8_state::ninclown_map(address_map &map)
+{
+	map(0x000000, 0x00007f).ram().region("maincpu", 0);
+	map(0x000080, 0x003fff).ram().share("nvram");
+	map(0x004000, 0x03ffff).rom();
+	map(0x040000, 0x07ffff).r(FUNC(itech8_state::rom_constant_r));
+	map(0x100080, 0x100080).w(FUNC(itech8_state::sound_data_w));
+	map(0x100100, 0x100101).portr("40").w(FUNC(itech8_state::grom_bank16_w));
+	map(0x100180, 0x100181).portr("60").w(FUNC(itech8_state::display_page16_w));
+	map(0x100240, 0x100240).w(m_tms34061, FUNC(tms34061_device::latch_w));
+	map(0x100280, 0x100281).portr("80").nopw();
+	map(0x100300, 0x10031f).rw(FUNC(itech8_state::blitter_r), FUNC(itech8_state::blitter_w));
+	map(0x100380, 0x1003ff).rw(FUNC(itech8_state::ninclown_palette_r), FUNC(itech8_state::ninclown_palette_w)).umask16(0xff00);
+	map(0x110000, 0x110fff).rw(FUNC(itech8_state::tms34061_r), FUNC(itech8_state::tms34061_w));
+}
 
 
 
@@ -928,48 +942,52 @@ ADDRESS_MAP_END
  *************************************/
 
 /*------ YM2203-based sound ------*/
-static ADDRESS_MAP_START( sound2203_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
-	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0002) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void itech8_state::sound2203_map(address_map &map)
+{
+	map(0x0000, 0x0000).nopw();
+	map(0x1000, 0x1000).r(FUNC(itech8_state::sound_data_r));
+	map(0x2000, 0x2001).mirror(0x0002).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x3000, 0x37ff).ram();
+	map(0x4000, 0x4000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 
 /*------ YM2608B-based sound ------*/
-static ADDRESS_MAP_START( sound2608b_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
-	AM_RANGE(0x2000, 0x2000) AM_READ(sound_data_r)
-	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void itech8_state::sound2608b_map(address_map &map)
+{
+	map(0x1000, 0x1000).nopw();
+	map(0x2000, 0x2000).r(FUNC(itech8_state::sound_data_r));
+	map(0x4000, 0x4003).rw("ymsnd", FUNC(ym2608_device::read), FUNC(ym2608_device::write));
+	map(0x6000, 0x67ff).ram();
+	map(0x8000, 0xffff).rom();
+}
 
 
 /*------ YM3812-based sound ------*/
-static ADDRESS_MAP_START( sound3812_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
-	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void itech8_state::sound3812_map(address_map &map)
+{
+	map(0x0000, 0x0000).nopw();
+	map(0x1000, 0x1000).r(FUNC(itech8_state::sound_data_r));
+	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x3000, 0x37ff).ram();
+	map(0x4000, 0x4000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x5000, 0x5003).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 
 /*------ external YM3812-based sound board ------*/
-static ADDRESS_MAP_START( sound3812_external_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
-	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x5000, 0x500f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void itech8_state::sound3812_external_map(address_map &map)
+{
+	map(0x0000, 0x0000).nopw();
+	map(0x1000, 0x1000).r(FUNC(itech8_state::sound_data_r));
+	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x3000, 0x37ff).ram();
+	map(0x4000, 0x4000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x5000, 0x500f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 
 
@@ -979,15 +997,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( slikz80_mem_map, AS_PROGRAM, 8, itech8_state )
-	AM_RANGE(0x0000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void itech8_state::slikz80_mem_map(address_map &map)
+{
+	map(0x0000, 0x7ff).rom();
+}
 
 
-static ADDRESS_MAP_START( slikz80_io_map, AS_IO, 8, itech8_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(slikz80_port_r, slikz80_port_w)
-ADDRESS_MAP_END
+void itech8_state::slikz80_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(FUNC(itech8_state::slikz80_port_r), FUNC(itech8_state::slikz80_port_w));
+}
 
 
 
@@ -999,7 +1019,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wfortune )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
@@ -1028,7 +1048,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( grmatch )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, "Adjustments Lockout" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
@@ -1066,7 +1086,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( stratab )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
@@ -1121,7 +1141,7 @@ CUSTOM_INPUT_MEMBER(itech8_state::gtg_mux)
 
 static INPUT_PORTS_START( gtg )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
@@ -1132,7 +1152,7 @@ static INPUT_PORTS_START( gtg )
 	PORT_START("60")
 	/* it is still unknown how the second player inputs are muxed in */
 	/* currently we map both sets of controls to the same inputs */
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,gtg_mux, "P1\0P2")
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,gtg_mux, "P1\0P2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1158,7 +1178,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gtgt )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
@@ -1185,7 +1205,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gtg2t )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
@@ -1222,14 +1242,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( slikshot )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("60")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Yellow")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Red")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1249,14 +1269,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dynobop )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("60")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* ball gate */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* ball gate */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* ball detect */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* ball detect */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1276,14 +1296,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sstrike )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("60")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Hook")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Hook")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1303,7 +1323,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pokrdice )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Lower Right") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
@@ -1332,7 +1352,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hstennis )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
@@ -1367,7 +1387,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( arlingtn )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  /* see code at e23c */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -1398,7 +1418,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( peggle )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
@@ -1420,7 +1440,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pegglet )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
@@ -1442,7 +1462,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( neckneck )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )  /* see code at e23c */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -1483,7 +1503,7 @@ static INPUT_PORTS_START( rimrockn )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, nullptr) /* input from sound board */
 
 	PORT_START("80")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1665,12 +1685,11 @@ WRITE_LINE_MEMBER(itech8_state::generate_tms34061_interrupt)
 
 /************* core pieces ******************/
 
-static MACHINE_CONFIG_START( itech8_core_lo )
+MACHINE_CONFIG_START(itech8_state::itech8_core_lo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, CLOCK_8MHz/4)
-	MCFG_CPU_PROGRAM_MAP(tmslo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  generate_nmi)
+	MCFG_DEVICE_ADD("maincpu", MC6809, CLOCK_8MHz)
+	MCFG_DEVICE_PROGRAM_MAP(tmslo_map)
 
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
@@ -1683,107 +1702,110 @@ static MACHINE_CONFIG_START( itech8_core_lo )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 263)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, itech8_state, generate_nmi))
 
 	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
 	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
 	MCFG_TMS34061_VRAM_SIZE(itech8_state::VRAM_SIZE)
-	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(itech8_state, generate_tms34061_interrupt))      /* interrupt gen callback */
+	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(*this, itech8_state, generate_tms34061_interrupt))      /* interrupt gen callback */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, CLOCK_8MHz/4)
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(itech8_state, pia_portb_out))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, itech8_state, pia_portb_out))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( itech8_core_hi, itech8_core_lo )
+MACHINE_CONFIG_START(itech8_state::itech8_core_hi)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tmshi_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tmshi_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( itech8_sound_ym2203 )
+MACHINE_CONFIG_START(itech8_state::itech8_sound_ym2203)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
-	MCFG_CPU_PROGRAM_MAP(sound2203_map)
+	MCFG_DEVICE_ADD("soundcpu", MC6809, CLOCK_8MHz)
+	MCFG_DEVICE_PROGRAM_MAP(sound2203_map)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ymsnd", YM2203, CLOCK_8MHz/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, CLOCK_8MHz/2)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(itech8_state, ym2203_portb_out))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, itech8_state, ym2203_portb_out))
 	MCFG_SOUND_ROUTE(0, "mono", 0.07)
 	MCFG_SOUND_ROUTE(1, "mono", 0.07)
 	MCFG_SOUND_ROUTE(2, "mono", 0.07)
 	MCFG_SOUND_ROUTE(3, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_8MHz/8, okim6295_device::PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( itech8_sound_ym2608b )
+MACHINE_CONFIG_START(itech8_state::itech8_sound_ym2608b)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
-	MCFG_CPU_PROGRAM_MAP(sound2608b_map)
+	MCFG_DEVICE_ADD("soundcpu", MC6809, CLOCK_8MHz)
+	MCFG_DEVICE_PROGRAM_MAP(sound2608b_map)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ymsnd", YM2608, CLOCK_8MHz)
+	MCFG_DEVICE_ADD("ymsnd", YM2608, CLOCK_8MHz)
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(itech8_state, ym2203_portb_out))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, itech8_state, ym2203_portb_out))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( itech8_sound_ym3812 )
+MACHINE_CONFIG_START(itech8_state::itech8_sound_ym3812)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
-	MCFG_CPU_PROGRAM_MAP(sound3812_map)
+	MCFG_DEVICE_ADD("soundcpu", MC6809, CLOCK_8MHz)
+	MCFG_DEVICE_PROGRAM_MAP(sound3812_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(DEVREADLINE("ticket", ticket_dispenser_device, line_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(itech8_state, pia_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(itech8_state, pia_portb_out))
+	MCFG_PIA_READPB_HANDLER(READLINE("ticket", ticket_dispenser_device, line_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, itech8_state, pia_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, itech8_state, pia_portb_out))
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_8MHz/8, okim6295_device::PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( itech8_sound_ym3812_external )
+MACHINE_CONFIG_START(itech8_state::itech8_sound_ym3812_external)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
-	MCFG_CPU_PROGRAM_MAP(sound3812_external_map)
+	MCFG_DEVICE_ADD("soundcpu", MC6809, CLOCK_8MHz)
+	MCFG_DEVICE_PROGRAM_MAP(sound3812_external_map)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_8MHz/8, okim6295_device::PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
 /************* full drivers ******************/
 
-static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
+MACHINE_CONFIG_START(itech8_state::wfortune)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1794,10 +1816,11 @@ static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
+MACHINE_CONFIG_START(itech8_state::grmatch)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2608b)
+	itech8_sound_ym2608b(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1810,10 +1833,11 @@ static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
+MACHINE_CONFIG_START(itech8_state::stratab_hi)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1823,10 +1847,11 @@ static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stratab_lo, itech8_core_lo )
+MACHINE_CONFIG_START(itech8_state::stratab_lo)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1835,14 +1860,15 @@ static MACHINE_CONFIG_DERIVED( stratab_lo, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( slikshot_hi, itech8_core_hi )
+MACHINE_CONFIG_START(itech8_state::slikshot_hi)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
-	MCFG_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
-	MCFG_CPU_PROGRAM_MAP(slikz80_mem_map)
-	MCFG_CPU_IO_MAP(slikz80_io_map)
+	MCFG_DEVICE_ADD("sub", Z80, CLOCK_8MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(slikz80_mem_map)
+	MCFG_DEVICE_IO_MAP(slikz80_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1852,14 +1878,15 @@ static MACHINE_CONFIG_DERIVED( slikshot_hi, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( slikshot_lo, itech8_core_lo )
+MACHINE_CONFIG_START(itech8_state::slikshot_lo)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
-	MCFG_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
-	MCFG_CPU_PROGRAM_MAP(slikz80_mem_map)
-	MCFG_CPU_IO_MAP(slikz80_io_map)
+	MCFG_DEVICE_ADD("sub", Z80, CLOCK_8MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(slikz80_mem_map)
+	MCFG_DEVICE_IO_MAP(slikz80_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1869,10 +1896,11 @@ static MACHINE_CONFIG_DERIVED( slikshot_lo, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( slikshot_lo_noz80, itech8_core_lo )
+MACHINE_CONFIG_START(itech8_state::slikshot_lo_noz80)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
+	itech8_sound_ym2203(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1881,7 +1909,8 @@ static MACHINE_CONFIG_DERIVED( slikshot_lo_noz80, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sstrike, slikshot_lo )
+MACHINE_CONFIG_START(itech8_state::sstrike)
+	slikshot_lo(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(itech8_state,sstrike)
@@ -1889,10 +1918,11 @@ static MACHINE_CONFIG_DERIVED( sstrike, slikshot_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hstennis_hi, itech8_core_hi )
+MACHINE_CONFIG_START(itech8_state::hstennis_hi)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812)
+	itech8_sound_ym3812(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1901,10 +1931,11 @@ static MACHINE_CONFIG_DERIVED( hstennis_hi, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hstennis_lo, itech8_core_lo )
+MACHINE_CONFIG_START(itech8_state::hstennis_lo)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812)
+	itech8_sound_ym3812(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1913,14 +1944,14 @@ static MACHINE_CONFIG_DERIVED( hstennis_lo, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( rimrockn, itech8_core_hi )
+MACHINE_CONFIG_START(itech8_state::rimrockn)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
+	itech8_sound_ym3812_external(config);
 
-	MCFG_CPU_REPLACE("maincpu", HD6309, CLOCK_12MHz)
-	MCFG_CPU_PROGRAM_MAP(tmshi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  generate_nmi)
+	MCFG_DEVICE_REPLACE("maincpu", HD6309, CLOCK_12MHz)
+	MCFG_DEVICE_PROGRAM_MAP(tmshi_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1929,30 +1960,31 @@ static MACHINE_CONFIG_DERIVED( rimrockn, itech8_core_hi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
+MACHINE_CONFIG_START(itech8_state::ninclown)
+	itech8_core_hi(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
+	itech8_sound_ym3812_external(config);
 
-	MCFG_CPU_REPLACE("maincpu", M68000, CLOCK_12MHz)
-	MCFG_CPU_PROGRAM_MAP(ninclown_map)
-	// definitely doesn't like the generate_nmi code, so we just generate VBlank irq here instead
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  irq3_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, CLOCK_12MHz)
+	MCFG_DEVICE_PROGRAM_MAP(ninclown_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(64, 423, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2page_large)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, itech8_state, ninclown_irq))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gtg2, itech8_core_lo )
+MACHINE_CONFIG_START(itech8_state::gtg2)
+	itech8_core_lo(config);
 
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
+	itech8_sound_ym3812_external(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gtg2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gtg2_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2069,9 +2101,31 @@ ROM_END
 
 ROM_START( gtg )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtg.bin_3.1.u5", 0x04000, 0x4000, CRC(61984272) SHA1(be735f8576fb2cccc0e9e6ea6f2fd54b6c0b3bb3) ) /* Joystick version */
-	ROM_CONTINUE(        0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_LOAD( "gtg_joy_3.3_u5.u5", 0x04000, 0x4000, CRC(983a5c0c) SHA1(245fd6b86e96ef57ea9a85c7a501d846e135cfc6) ) /* Joystick version - Labeled GTG JOY V3.3 (U5) */
+	ROM_CONTINUE(                  0x10000, 0xc000 )
+	ROM_COPY( "maincpu",  0x14000, 0x08000, 0x8000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(358d2440) SHA1(7b09350c89f9d2c86dc187d8812bbf26b576a38f) )
+
+	ROM_REGION( 0xc0000, "grom", 0 )
+	ROM_LOAD( "golf-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "golf-grom1.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
+	ROM_LOAD( "golf-grom2.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
+	ROM_LOAD( "golf-grom3.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
+	ROM_LOAD( "golf-grom4.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
+	ROM_LOAD( "grom5.grom5",      0xa0000, 0x20000, CRC(c108c56c) SHA1(5c67b6479e093c34e7ee2b68d93eba07a96f72e4) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
+ROM_END
+
+
+ROM_START( gtgj31 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
+	ROM_LOAD( "gtg_joy_3.1_u5.u5", 0x04000, 0x4000, CRC(61984272) SHA1(be735f8576fb2cccc0e9e6ea6f2fd54b6c0b3bb3) ) /* Joystick version - Labeled GTG JOY V3.1 (U5) */
+	ROM_CONTINUE(                  0x10000, 0xc000 )
+	ROM_COPY( "maincpu",  0x14000, 0x08000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(358d2440) SHA1(7b09350c89f9d2c86dc187d8812bbf26b576a38f) )
@@ -2087,6 +2141,7 @@ ROM_START( gtg )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
 ROM_END
+
 
 ROM_START( gtgt )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
@@ -2108,6 +2163,7 @@ ROM_START( gtgt )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "golf-srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
 ROM_END
+
 
 ROM_START( gtgt1 )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
@@ -2134,28 +2190,27 @@ ROM_END
 ROM_START( gtg2t )
 	/* banks are loaded in the opposite order from the others, */
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtg2.bin_1.1.u5", 0x10000, 0x4000, CRC(c7b3a9f3) SHA1(5edaca6fd6ee58bd1676dc9b2c86da4dd2f51687) ) /* Trackball version */
-	ROM_CONTINUE(        0x04000, 0xc000 )
-	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
+	ROM_LOAD( "gtgii_tb_v1.1.u5", 0x10000, 0x4000, CRC(c7b3a9f3) SHA1(5edaca6fd6ee58bd1676dc9b2c86da4dd2f51687) ) /* Trackball version - labeled GTGII TB V1.1 (U5) */
+	ROM_CONTINUE(                 0x04000, 0xc000 )
+	ROM_COPY( "maincpu",  0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(dd2a5905) SHA1(dc93f13de3953852a6757361eb9683a57d3ed326) )
+	ROM_LOAD( "gtgii_snd_v1_u27.u27", 0x08000, 0x8000, CRC(dd2a5905) SHA1(dc93f13de3953852a6757361eb9683a57d3ed326) ) /* labeled GTGII SND V1 (U27) */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(a4182776) SHA1(9f4704d1a61a4fffce454c82cb3eb4629d9a2006) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(0580bb99) SHA1(012d473bc63632a5ed1a250daa54a00a4e30e8b2) )
-	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(89edb624) SHA1(e77d5ecd04f44f184e76eb2506660a04b6bc7fe8) )
-	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(f6557950) SHA1(fd2bbd6b852a9f2775a23d9fdaa20d31d6766d7f) )
-	ROM_LOAD( "grom5.bin", 0xa0000, 0x20000, CRC(a680ce6a) SHA1(fe51546933c093cea81858b213afb0e926e9eb4e) )
+	ROM_LOAD( "gtgii-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "gtgii-grom1.grom1", 0x20000, 0x20000, CRC(a4182776) SHA1(9f4704d1a61a4fffce454c82cb3eb4629d9a2006) )
+	ROM_LOAD( "gtgii-grom2.grom2", 0x40000, 0x20000, CRC(0580bb99) SHA1(012d473bc63632a5ed1a250daa54a00a4e30e8b2) )
+	ROM_LOAD( "gtgii-grom3.grom3", 0x60000, 0x20000, CRC(89edb624) SHA1(e77d5ecd04f44f184e76eb2506660a04b6bc7fe8) )
+	ROM_LOAD( "gtgii-grom4.grom4", 0x80000, 0x20000, CRC(f6557950) SHA1(fd2bbd6b852a9f2775a23d9fdaa20d31d6766d7f) )
+	ROM_LOAD( "gtgii-grom5.grom5", 0xa0000, 0x20000, CRC(a680ce6a) SHA1(fe51546933c093cea81858b213afb0e926e9eb4e) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom00.bin", 0x00000, 0x20000, CRC(4dd4db42) SHA1(0dffb51e8de36d8747f443fd65fe9927815eaff0) )
+	ROM_LOAD( "gtgii_vr_srom0.srom0", 0x00000, 0x20000, CRC(4dd4db42) SHA1(0dffb51e8de36d8747f443fd65fe9927815eaff0) ) /* labeled GTGII VR-SROM0 */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.u11", 0x0000, 0x0104, CRC(9bf5a75f) SHA1(79786f7ce656f30a33a92887a290b767a7cbbf31) )
 ROM_END
-
 
 
 ROM_START( gtg2j )
@@ -2165,15 +2220,15 @@ ROM_START( gtg2j )
 	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(dd2a5905) SHA1(dc93f13de3953852a6757361eb9683a57d3ed326) )
+	ROM_LOAD( "gtgii_snd_v1_u27.u27", 0x08000, 0x8000, CRC(dd2a5905) SHA1(dc93f13de3953852a6757361eb9683a57d3ed326) ) /* labeled GTGII SND V1 (U27) */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(a4182776) SHA1(9f4704d1a61a4fffce454c82cb3eb4629d9a2006) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(0580bb99) SHA1(012d473bc63632a5ed1a250daa54a00a4e30e8b2) )
-	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(89edb624) SHA1(e77d5ecd04f44f184e76eb2506660a04b6bc7fe8) )
-	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(f6557950) SHA1(fd2bbd6b852a9f2775a23d9fdaa20d31d6766d7f) )
-	ROM_LOAD( "grom5.bin", 0xa0000, 0x20000, CRC(a680ce6a) SHA1(fe51546933c093cea81858b213afb0e926e9eb4e) )
+	ROM_LOAD( "gtgii-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "gtgii-grom1.grom1", 0x20000, 0x20000, CRC(a4182776) SHA1(9f4704d1a61a4fffce454c82cb3eb4629d9a2006) )
+	ROM_LOAD( "gtgii-grom2.grom2", 0x40000, 0x20000, CRC(0580bb99) SHA1(012d473bc63632a5ed1a250daa54a00a4e30e8b2) )
+	ROM_LOAD( "gtgii-grom3.grom3", 0x60000, 0x20000, CRC(89edb624) SHA1(e77d5ecd04f44f184e76eb2506660a04b6bc7fe8) )
+	ROM_LOAD( "gtgii-grom4.grom4", 0x80000, 0x20000, CRC(f6557950) SHA1(fd2bbd6b852a9f2775a23d9fdaa20d31d6766d7f) )
+	ROM_LOAD( "gtgii-grom5.grom5", 0xa0000, 0x20000, CRC(a680ce6a) SHA1(fe51546933c093cea81858b213afb0e926e9eb4e) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
@@ -2396,7 +2451,7 @@ ROM_END
 
 
 ROM_START( arlingtn ) /* PCB  p/n 1030 rev. 1A */
-	ROM_REGION( 0x1c000, "maincpu", 0 )	/* banks are loaded in the opposite order from the others, */
+	ROM_REGION( 0x1c000, "maincpu", 0 ) /* banks are loaded in the opposite order from the others, */
 	ROM_LOAD( "ahr-d_v_1.21.u5", 0x10000, 0x4000, CRC(00aae02e) SHA1(3bcfbd256c34ae222dde24ba9544f19da70b698e) ) /* Service menu reports version as 1.21-D */
 	ROM_CONTINUE(                0x04000, 0xc000 )
 	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
@@ -2652,7 +2707,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(itech8_state,grmatch)
+void itech8_state::init_grmatch()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(itech8_state::grmatch_palette_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(itech8_state::grmatch_xscroll_w),this));
@@ -2664,7 +2719,7 @@ DRIVER_INIT_MEMBER(itech8_state,grmatch)
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,slikshot)
+void itech8_state::init_slikshot()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x0180, 0x0180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x01cf, 0x01cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
@@ -2691,7 +2746,7 @@ DRIVER_INIT_MEMBER(itech8_state,slikshot)
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,sstrike)
+void itech8_state::init_sstrike()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x1180, 0x1180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x11cf, 0x11cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
@@ -2699,31 +2754,31 @@ DRIVER_INIT_MEMBER(itech8_state,sstrike)
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,hstennis)
+void itech8_state::init_hstennis()
 {
 	m_visarea.set(0, 375, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,arligntn)
+void itech8_state::init_arligntn()
 {
 	m_visarea.set(16, 389, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,peggle)
+void itech8_state::init_peggle()
 {
 	m_visarea.set(18, 367, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,neckneck)
+void itech8_state::init_neckneck()
 {
 	m_visarea.set(8, 375, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,rimrockn)
+void itech8_state::init_rimrockn()
 {
 	/* additional input ports */
 	m_maincpu->space(AS_PROGRAM).install_read_port (0x0161, 0x0161, "161");
@@ -2747,47 +2802,48 @@ DRIVER_INIT_MEMBER(itech8_state,rimrockn)
  *************************************/
 
 /* Wheel of Fortune-style PCB */
-GAME( 1989, wfortune, 0,        wfortune,           wfortune, itech8_state, 0,        ROT0,   "GameTek", "Wheel Of Fortune (set 1)", 0 )
-GAME( 1989, wfortunea,wfortune, wfortune,           wfortune, itech8_state, 0,        ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 )
+GAME( 1989, wfortune,   0,        wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 1)", 0 )
+GAME( 1989, wfortunea,  wfortune, wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 )
 
 /* Grudge Match-style PCB */
-GAME( 1989, grmatch,  0,        grmatch,            grmatch,  itech8_state, grmatch,  ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
+GAME( 1989, grmatch,    0,        grmatch,           grmatch,  itech8_state, init_grmatch,  ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
 
 /* Strata Bowling-style PCB */
-GAME( 1990, stratab,  0,        stratab_hi,         stratab,  itech8_state, 0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ) // still says V1 in service mode?
-GAME( 1990, stratab1, stratab,  stratab_hi,         stratab,  itech8_state, 0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
-GAME( 1990, gtg,      0,        stratab_hi,         gtg,      itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
-GAME( 1989, gtgt,     gtg,      stratab_hi,         gtgt,     itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
-GAME( 1989, gtgt1,    gtg,      stratab_hi,         gtgt,     itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
-GAME( 1989, gtg2t,    gtg2,     stratab_hi,         gtg2t,    itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
-GAME( 1991, gtg2j,    gtg2,     stratab_lo,         gtg,      itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
+GAME( 1990, stratab,    0,        stratab_hi,        stratab,  itech8_state, empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ) // still says V1 in service mode?
+GAME( 1990, stratab1,   stratab,  stratab_hi,        stratab,  itech8_state, empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
+GAME( 1990, gtg,        0,        stratab_hi,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.3)", 0 )
+GAME( 1990, gtgj31,     gtg,      stratab_hi,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
+GAME( 1989, gtgt,       gtg,      stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
+GAME( 1989, gtgt1,      gtg,      stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
+GAME( 1989, gtg2t,      gtg2,     stratab_hi,        gtg2t,    itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
+GAME( 1991, gtg2j,      gtg2,     stratab_lo,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 
 /* Slick Shot-style PCB */
-GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", MACHINE_MECHANICAL )
-GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
-GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
-GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop (V1.1)", MACHINE_MECHANICAL )
-GAME( 1990, sstrike,   0,        sstrike,           sstrike,  itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling (V1)", MACHINE_MECHANICAL )
-GAME( 1990, stratabs,  stratab,  sstrike,           stratabs, itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4T, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab
-GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, itech8_state, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
+GAME( 1990, slikshot,   0,        slikshot_hi,       slikshot, itech8_state, init_slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", MACHINE_MECHANICAL )
+GAME( 1990, slikshot17, slikshot, slikshot_hi,       slikshot, itech8_state, init_slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
+GAME( 1990, slikshot16, slikshot, slikshot_hi,       slikshot, itech8_state, init_slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
+GAME( 1990, dynobop,    0,        slikshot_hi,       dynobop,  itech8_state, init_slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop (V1.1)", MACHINE_MECHANICAL )
+GAME( 1990, sstrike,    0,        sstrike,           sstrike,  itech8_state, init_sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling (V1)", MACHINE_MECHANICAL )
+GAME( 1990, stratabs,   stratab,  sstrike,           stratabs, itech8_state, init_sstrike,  ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4T, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab
+GAME( 1991, pokrdice,   0,        slikshot_lo_noz80, pokrdice, itech8_state, empty_init,    ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 
 /* Hot Shots Tennis-style PCB */
-GAME( 1990, hstennis,  0,        hstennis_hi,       hstennis, itech8_state, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
-GAME( 1990, hstennis10,hstennis, hstennis_hi,       hstennis, itech8_state, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 )
-GAME( 1991, arlingtn,  0,        hstennis_hi,       arlingtn, itech8_state, arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 )
-GAME( 1991, peggle,    0,        hstennis_lo,       peggle,   itech8_state, peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 )
-GAME( 1991, pegglet,   peggle,   hstennis_lo,       pegglet,  itech8_state, peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 )
-GAME( 1992, neckneck,  0,        hstennis_lo,       neckneck, itech8_state, neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 )
+GAME( 1990, hstennis,   0,        hstennis_hi,       hstennis, itech8_state, init_hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
+GAME( 1990, hstennis10, hstennis, hstennis_hi,       hstennis, itech8_state, init_hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 )
+GAME( 1991, arlingtn,   0,        hstennis_hi,       arlingtn, itech8_state, init_arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 )
+GAME( 1991, peggle,     0,        hstennis_lo,       peggle,   itech8_state, init_peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 )
+GAME( 1991, pegglet,    peggle,   hstennis_lo,       pegglet,  itech8_state, init_peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 )
+GAME( 1992, neckneck,   0,        hstennis_lo,       neckneck, itech8_state, init_neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 )
 
 /* Rim Rockin' Basketball-style PCB */
-GAME( 1991, rimrockn,   0,        rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
-GAME( 1991, rimrockn20, rimrockn, rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
-GAME( 1991, rimrockn16, rimrockn, rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
-GAME( 1991, rimrockn12, rimrockn, rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
+GAME( 1991, rimrockn,   0,        rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
+GAME( 1991, rimrockn20, rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
+GAME( 1991, rimrockn16, rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
+GAME( 1991, rimrockn12, rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
 
 /* Ninja Clowns-style PCB */
-GAME( 1991, ninclown, 0,        ninclown,           ninclown, itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (27 oct 91)", 0 )
+GAME( 1991, ninclown,   0,        ninclown,          ninclown, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (27 oct 91)", 0 )
 
 /* Golden Tee Golf II-style PCB */
-GAME( 1992, gpgolf,   0,        gtg2,               gpgolf,   itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 )
-GAME( 1992, gtg2,     0,        gtg2,               gtg2,     itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 )
+GAME( 1992, gpgolf,     0,        gtg2,              gpgolf,   itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 )
+GAME( 1992, gtg2,       0,        gtg2,              gtg2,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 )

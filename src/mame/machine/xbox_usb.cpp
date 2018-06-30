@@ -1541,6 +1541,7 @@ int ohci_game_controller_device::handle_interrupt_pid(int endpoint, int pid, uin
 
 void ohci_game_controller_device::device_start()
 {
+	initialize(machine());
 }
 
 ioport_constructor ohci_game_controller_device::device_input_ports() const

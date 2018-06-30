@@ -51,14 +51,14 @@ static const gfx_layout char16layout =
 	32*32
 };
 
-static GFXDECODE_START( cshooter )
+static GFXDECODE_START( gfx_cshooter )
 	GFXDECODE_ENTRY( "tx_gfx", 0,     charlayout, 0, 16  )
 	GFXDECODE_ENTRY( "spr_gfx", 0,     char16layout, 0, 16  )
 	GFXDECODE_ENTRY( "bg_gfx", 0,     char16layout, 0, 16  )
 	GFXDECODE_ENTRY( "fg_gfx", 0,     char16layout, 0, 16  )
 GFXDECODE_END
 
-MACHINE_CONFIG_MEMBER( airraid_video_device::device_add_mconfig )
+MACHINE_CONFIG_START(airraid_video_device::device_add_mconfig)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -69,7 +69,7 @@ MACHINE_CONFIG_MEMBER( airraid_video_device::device_add_mconfig )
 	MCFG_SCREEN_UPDATE_DRIVER(airraid_video_device, screen_update_airraid)
 	MCFG_SCREEN_PALETTE("^palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "^palette", cshooter)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "^palette", gfx_cshooter)
 
 MACHINE_CONFIG_END
 

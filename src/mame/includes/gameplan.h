@@ -13,16 +13,16 @@ driver by Chris Moore
 #include "machine/gen_latch.h"
 #include "screen.h"
 
-#define GAMEPLAN_MAIN_MASTER_CLOCK       (XTAL_3_579545MHz)
-#define GAMEPLAN_AUDIO_MASTER_CLOCK      (XTAL_3_579545MHz)
+#define GAMEPLAN_MAIN_MASTER_CLOCK       (XTAL(3'579'545))
+#define GAMEPLAN_AUDIO_MASTER_CLOCK      (XTAL(3'579'545))
 #define GAMEPLAN_MAIN_CPU_CLOCK          (GAMEPLAN_MAIN_MASTER_CLOCK / 4)
 #define GAMEPLAN_AUDIO_CPU_CLOCK         (GAMEPLAN_AUDIO_MASTER_CLOCK / 4)
 #define GAMEPLAN_AY8910_CLOCK            (GAMEPLAN_AUDIO_MASTER_CLOCK / 2)
-#define GAMEPLAN_PIXEL_CLOCK             (XTAL_11_6688MHz / 2)
+#define GAMEPLAN_PIXEL_CLOCK             (XTAL(11'668'800) / 2)
 
 /* Used Leprechaun/Pot of Gold (and Pirate Treasure) - as stated in manual for Pot Of Gold */
 
-#define LEPRECHAUN_MAIN_MASTER_CLOCK     (XTAL_4MHz)
+#define LEPRECHAUN_MAIN_MASTER_CLOCK     (XTAL(4'000'000))
 #define LEPRECHAUN_MAIN_CPU_CLOCK        (LEPRECHAUN_MAIN_MASTER_CLOCK / 4)
 
 
@@ -48,6 +48,14 @@ public:
 			m_screen(*this, "screen"),
 			m_soundlatch(*this, "soundlatch") { }
 
+	void gameplan(machine_config &config);
+	void gameplan_video(machine_config &config);
+	void leprechn(machine_config &config);
+	void leprechn_video(machine_config &config);
+	void trvquest(machine_config &config);
+	void trvquest_video(machine_config &config);
+
+private:
 	/* machine state */
 	uint8_t   m_current_port;
 	optional_shared_ptr<uint8_t> m_trvquest_question;
@@ -107,12 +115,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(trvquest_coin_w);
 	DECLARE_WRITE_LINE_MEMBER(trvquest_misc_w);
 
-protected:
+	void cpu_map(address_map &map);
+	void gameplan_audio_map(address_map &map);
+	void gameplan_main_map(address_map &map);
+	void leprechn_audio_map(address_map &map);
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
-
-/*----------- defined in video/gameplan.c -----------*/
-
-MACHINE_CONFIG_EXTERN( gameplan_video );
-MACHINE_CONFIG_EXTERN( leprechn_video );
-MACHINE_CONFIG_EXTERN( trvquest_video );

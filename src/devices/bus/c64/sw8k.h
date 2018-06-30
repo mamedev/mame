@@ -48,7 +48,6 @@ private:
 
 
 // device type definition
-extern const device_type C64_SW8K;
 DECLARE_DEVICE_TYPE(C64_SW8K, c64_switchable_8k_cartridge_device)
 
 

@@ -10,31 +10,9 @@ Sharp sm8500 CPU disassembly
 *******************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-#include "sm8500.h"
+#include "sm8500d.h"
 
-enum e_mnemonics
-{
-	zADC=0, zADCW, zADD, zADDW, zAND, zANDW, zBAND, zBBC, zBBS,
-	zBCLR, zBCMP, zBMOV, zBOR, zBR, zBTST, zBSET, zBXOR, zCALL, zCALS, zCLR,
-	zCLRC, zCMP, zCMPW, zCOM, zCOMC, zDA, zDBNZ, zDEC,
-	zDECW, zDI, zDIV, zEI, zEXTS, zHALT, zINC, zINCW,
-	zIRET, zJMP, zMOV, zMOVM, zMOVW, zMULT, zNEG, zNOP, zOR,
-	zORW, zPOP, zPOPW, zPUSH, zPUSHW, zRET, zRL, zRLC,
-	zRR, zRRC, zSBC, zSBCW, zSETC, zSLL, zSRA, zSRL, zSTOP,
-	zSUB, zSUBW, zSWAP, zXOR, zXORW, zMOVPS0, zINVLD, zDM,
-/* unknowns */
-z5A, z5B,
-
-/* more complicated instructions */
-z1A, z1B, z4F
-};
-
-/* instructions not found:
-5A, 5B,
-*/
-
-static const char *const s_mnemonic[] =
+const char *const sm8500_disassembler::s_mnemonic[] =
 {
 	"adc",  "adcw", "add",  "addw", "and",  "andw",  "band", "bbc",  "bbs",
 	"bclr", "bcmp", "bmov", "bor",  "br",   "btst", "bset",  "bxor", "call", "cals", "clr",
@@ -51,45 +29,29 @@ static const char *const s_mnemonic[] =
 "comp1A", "comp1B", "comp4F",
 };
 
-#define _OVER DASMFLAG_STEP_OVER
-#define _OUT  DASMFLAG_STEP_OUT
-
-static const uint32_t s_flags[] = {
+const uint32_t sm8500_disassembler::s_flags[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, _OVER, _OVER, 0,
-	0, 0, 0, 0, 0, 0, _OVER, 0,
-	0, 0, 0, 0, 0, _OVER, 0, 0,
-	_OUT, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, _OUT, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, STEP_OVER, STEP_OVER, 0,
+	0, 0, 0, 0, 0, 0, STEP_OVER, 0,
+	0, 0, 0, 0, 0, STEP_OVER, 0, 0,
+	STEP_OUT, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, STEP_OUT, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0,
 	0, 0, 0
 };
 
-struct sm8500dasm
-{
-	uint8_t   mnemonic;
-	uint8_t   arguments;
-};
-
-static const char *const sm8500_cond[16] = {
+const char *const sm8500_disassembler::sm8500_cond[16] = {
 	"F", "LT", "LE", "ULE", "OV",  "MI", "Z",  "C",
 	"T", "GE", "GT", "UGT", "NOV", "PL", "NZ", "NC"
 };
 
-static const uint8_t sm8500_b2w[8] = {
+const uint8_t sm8500_disassembler::sm8500_b2w[8] = {
 	0, 8, 2, 10, 4, 12, 6, 14
 };
 
-enum e_addrmodes {
-	AM_R=1, AM_rr, AM_r1, AM_S, AM_rmb, AM_mbr, AM_Ri, AM_rmw, AM_mwr, AM_smw, AM_mws,
-	AM_Sw, AM_iR, AM_rbr, AM_riw, AM_cjp, AM_rib, AM_pi, AM_cbr, AM_i, AM_ii,
-	AM_ss, AM_RR, AM_2, AM_SS, AM_bR, AM_Rbr, AM_Rb, AM_rR, AM_Rr, AM_Rii, AM_RiR,
-	AM_riB, AM_iS, AM_CALS, AM_bid, AM_1A, AM_1B, AM_4F
-};
-
-static const sm8500dasm mnemonic[256] = {
+const sm8500_disassembler::sm8500dasm sm8500_disassembler::mnemonic[256] = {
 	/* 00 - 0F */
 		{zCLR, AM_R},  {zNEG,AM_R},   {zCOM,AM_R},   {zRR,AM_R},
 		{zRL, AM_R},   {zRRC,AM_R},  {zRLC,AM_R},   {zSRL,AM_R},
@@ -173,16 +135,21 @@ static const sm8500dasm mnemonic[256] = {
 
 };
 
-CPU_DISASSEMBLE(sm8500)
+u32 sm8500_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t sm8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	const sm8500dasm *instr;
 	uint8_t op;
 	int8_t offset;
 	uint16_t ea;
 	uint16_t ea2;
-	int pos = 0;
+	offs_t pos = pc;
 
-	op = oprom[pos++];
+	op = opcodes.r8(pos++);
 
 	instr = &mnemonic[op];
 
@@ -193,34 +160,34 @@ CPU_DISASSEMBLE(sm8500)
 		}
 		switch( instr->arguments ) {
 		case AM_R:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "R%02Xh", ea);
 			break;
 		case AM_iR:
-			util::stream_format(stream, "R%02Xh, $%02X", oprom[pos + 1], oprom[pos + 0]);
+			util::stream_format(stream, "R%02Xh, $%02X", opcodes.r8(pos+1), opcodes.r8(pos));
 			pos += 2;
 			break;
 		case AM_iS:
-			util::stream_format(stream, "RR%02Xh, $%02X", oprom[pos + 1], oprom[pos + 0]);
+			util::stream_format(stream, "RR%02Xh, $%02X", opcodes.r8(pos+1), opcodes.r8(pos));
 			pos += 2;
 			break;
 		case AM_Sw:
-			ea2 = oprom[pos++];
-			ea = oprom[pos++] << 8;
-			ea += oprom[pos++];
+			ea2 = opcodes.r8(pos++);
+			ea = opcodes.r8(pos++) << 8;
+			ea += opcodes.r8(pos++);
 			util::stream_format(stream, "RR%02Xh, $%04X", ea2, ea);
 			break;
 		case AM_rib:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "r%02Xh, $%02X", op & 0x07, ea);
 			break;
 		case AM_riw:
-			ea = oprom[pos++] << 8;
-			ea += oprom[pos++];
+			ea = opcodes.r8(pos++) << 8;
+			ea += opcodes.r8(pos++);
 			util::stream_format(stream, "rr%02Xh, $%04X", sm8500_b2w[op & 0x07], ea);
 			break;
 		case AM_rmb:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "r%02Xh,", ( ea >> 3 ) & 0x07);
 			switch( ea & 0xC0 ) {
 			case 0x00:
@@ -228,7 +195,7 @@ CPU_DISASSEMBLE(sm8500)
 			case 0x40:
 				util::stream_format(stream, "(r%02Xh)+", ea & 0x07); break;
 			case 0x80:
-				ea2 = oprom[pos++];
+				ea2 = opcodes.r8(pos++);
 				if ( ea & 0x07 ) {
 					util::stream_format(stream, "$%02X(r%02Xh)", ea2, ea & 0x07);
 				} else {
@@ -240,14 +207,14 @@ CPU_DISASSEMBLE(sm8500)
 			}
 			break;
 		case AM_mbr:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			switch( ea & 0xC0 ) {
 			case 0x00:
 				util::stream_format(stream, "@r%02Xh", ea & 0x07); break;
 			case 0x40:
 				util::stream_format(stream, "(r%02Xh)+", ea & 0x07); break;
 			case 0x80:
-				ea2 = oprom[pos++];
+				ea2 = opcodes.r8(pos++);
 				if ( ea & 0x07 ) {
 					util::stream_format(stream, "$%02X(r%02Xh)", ea2, ea & 0x07);
 				} else {
@@ -260,7 +227,7 @@ CPU_DISASSEMBLE(sm8500)
 			util::stream_format(stream, ",r%02Xh", ( ea >> 3 ) & 0x07);
 			break;
 		case AM_rmw:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "r%02Xh,", ( ea >> 3 ) & 0x07);
 			switch( ea & 0xC0 ) {
 			case 0x00:
@@ -268,8 +235,8 @@ CPU_DISASSEMBLE(sm8500)
 			case 0x40:
 				util::stream_format(stream, "(rr%02Xh)+", sm8500_b2w[ea & 0x07]); break;
 			case 0x80:
-				ea2 = oprom[pos++] << 8;
-				ea2 += oprom[pos++];
+				ea2 = opcodes.r8(pos++) << 8;
+				ea2 += opcodes.r8(pos++);
 				if ( ea & 0x07 ) {
 					util::stream_format(stream, "$%04X(rr%02Xh)", ea2, sm8500_b2w[ea & 0x07]);
 				} else {
@@ -281,15 +248,15 @@ CPU_DISASSEMBLE(sm8500)
 			}
 			break;
 		case AM_mwr:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			switch( ea & 0xC0 ) {
 			case 0x00:
 				util::stream_format(stream, "@rr%02Xh", sm8500_b2w[ea & 0x07]); break;
 			case 0x40:
 				util::stream_format(stream, "(rr%02Xh)+", sm8500_b2w[ea & 0x07]); break;
 			case 0x80:
-				ea2 = oprom[pos++] << 8;
-				ea2 += oprom[pos++];
+				ea2 = opcodes.r8(pos++) << 8;
+				ea2 += opcodes.r8(pos++);
 				if ( ea & 0x07 ) {
 					util::stream_format(stream, "$%04X(rr%02Xh)", ea2, sm8500_b2w[ea & 0x07]);
 				} else {
@@ -302,7 +269,7 @@ CPU_DISASSEMBLE(sm8500)
 			util::stream_format(stream, ",r%02Xh", ( ea >> 3 ) & 0x07);
 			break;
 		case AM_smw:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "rr%02Xh,", sm8500_b2w[( ea >> 3 ) & 0x07]);
 			switch( ea & 0xC0 ) {
 			case 0x00:
@@ -310,8 +277,8 @@ CPU_DISASSEMBLE(sm8500)
 			case 0x40:
 				util::stream_format(stream, "(rr%02Xh)+", sm8500_b2w[ea & 0x07]); break;
 			case 0x80:
-				ea2 = oprom[pos++] << 8;
-				ea2 += oprom[pos++];
+				ea2 = opcodes.r8(pos++) << 8;
+				ea2 += opcodes.r8(pos++);
 				if ( ea & 0x07 ) {
 					util::stream_format(stream, "$%04X(rr%02Xh)", ea2, sm8500_b2w[ea & 0x07]);
 				} else {
@@ -323,15 +290,15 @@ CPU_DISASSEMBLE(sm8500)
 			}
 			break;
 		case AM_mws:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			switch( ea & 0xC0 ) {
 			case 0x00:
 				util::stream_format(stream, "@rr%02Xh", sm8500_b2w[ea & 0x07]); break;
 			case 0x40:
 				util::stream_format(stream, "(rr%02Xh)+", sm8500_b2w[ea & 0x07]); break;
 			case 0x80:
-				ea2 = oprom[pos++] << 8;
-				ea2 += oprom[pos++];
+				ea2 = opcodes.r8(pos++) << 8;
+				ea2 += opcodes.r8(pos++);
 				if ( ea & 0x07 ) {
 					util::stream_format(stream, "$%04X(rr%02Xh)", ea2, sm8500_b2w[ea & 0x07]);
 				} else {
@@ -344,20 +311,20 @@ CPU_DISASSEMBLE(sm8500)
 			util::stream_format(stream, ",rr%02Xh", sm8500_b2w[( ea >> 3 ) & 0x07]);
 			break;
 		case AM_cbr:
-			offset = (int8_t) oprom[pos++];
+			offset = (int8_t) opcodes.r8(pos++);
 			util::stream_format(stream, "%s,$%04X", sm8500_cond[ op & 0x0F ], pc + pos + offset);
 			break;
 		case AM_rbr:
-			offset = (int8_t) oprom[pos++];
+			offset = (int8_t) opcodes.r8(pos++);
 			util::stream_format(stream, "r%02Xh,$%04X", op & 0x07, pc + pos + offset);
 			break;
 		case AM_cjp:
-			ea = oprom[pos++] << 8;
-			ea += oprom[pos++];
+			ea = opcodes.r8(pos++) << 8;
+			ea += opcodes.r8(pos++);
 			util::stream_format(stream, "%s,$%04X", sm8500_cond[ op & 0x0F], ea);
 			break;
 		case AM_rr:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			switch( ea & 0xc0 ) {
 			case 0x00:
 				util::stream_format(stream, "r%02Xh,r%02Xh", (ea >> 3 ) & 0x07, ea & 0x07);
@@ -370,7 +337,7 @@ CPU_DISASSEMBLE(sm8500)
 			}
 			break;
 		case AM_r1:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			switch( ea & 0xC0 ) {
 			case 0x00:
 				util::stream_format(stream, "@r%02Xh", (ea >> 3 ) & 0x07);
@@ -383,29 +350,29 @@ CPU_DISASSEMBLE(sm8500)
 			}
 			break;
 		case AM_S:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "RR%02Xh", ea);
 			break;
 		case AM_pi:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "r%02Xh, $%02X", 0x10 + (op & 0x07), ea);
 			break;
 		case AM_Ri:
-			ea = oprom[pos++];
-			ea2 = oprom[pos++];
+			ea = opcodes.r8(pos++);
+			ea2 = opcodes.r8(pos++);
 			util::stream_format(stream, "R%02Xh,$%02X", ea, ea2);
 			break;
 		case AM_i:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "$%02X", ea);
 			break;
 		case AM_ii:
-			ea = oprom[pos++] << 8;
-			ea += oprom[pos++];
+			ea = opcodes.r8(pos++) << 8;
+			ea += opcodes.r8(pos++);
 			util::stream_format(stream, "$%04X", ea);
 			break;
 		case AM_ss:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			switch( ea & 0xC0 ) {
 			case 0x00:
 				util::stream_format(stream, "rr%02Xh,rr%02Xh", sm8500_b2w[( ea >> 3 ) & 0x07], sm8500_b2w[ea & 0x07]); break;
@@ -418,18 +385,18 @@ CPU_DISASSEMBLE(sm8500)
 			}
 			break;
 		case AM_RR:
-			ea = oprom[pos++];
-			ea2 = oprom[pos++];
+			ea = opcodes.r8(pos++);
+			ea2 = opcodes.r8(pos++);
 			util::stream_format(stream, "R%02Xh,R%02Xh", ea2, ea);
 			break;
 		case AM_2:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			switch( ea & 0xC0 ) {
 			case 0x00:
 				util::stream_format(stream, "rr%02Xh", sm8500_b2w[ea & 0x07]); break;
 			case 0x40:
-				ea2 = oprom[pos++] << 8;
-				ea2 += oprom[pos++];
+				ea2 = opcodes.r8(pos++) << 8;
+				ea2 += opcodes.r8(pos++);
 				if ( ea & 0x38 ) {
 					util::stream_format(stream, "@$%04X(r%02Xh)", ea2, ( ea >> 3 ) & 0x07);
 				} else {
@@ -443,13 +410,13 @@ CPU_DISASSEMBLE(sm8500)
 			}
 			break;
 		case AM_SS:
-			ea = oprom[pos++];
-			ea2 = oprom[pos++];
+			ea = opcodes.r8(pos++);
+			ea2 = opcodes.r8(pos++);
 			util::stream_format(stream, "RR%02Xh,RR%02Xh", ea2, ea);
 			break;
 		case AM_bR:
-			ea = oprom[pos++];
-			ea2 = oprom[pos++];
+			ea = opcodes.r8(pos++);
+			ea2 = opcodes.r8(pos++);
 			switch( ea & 0xC0 ) {
 			case 0x00:
 				util::stream_format(stream, "BF,R%02Xh,#%d", ea2, ea & 0x07); break;
@@ -462,41 +429,41 @@ CPU_DISASSEMBLE(sm8500)
 			}
 			break;
 		case AM_Rbr:
-			ea = oprom[pos++];
-			offset = (int8_t) oprom[pos++];
+			ea = opcodes.r8(pos++);
+			offset = (int8_t) opcodes.r8(pos++);
 			util::stream_format(stream, "R%02Xh,#%d,$%04X", ea, op & 0x07, pc + pos + offset);
 			break;
 		case AM_Rb:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "R%02Xh,#%d", ea, op&0x07);
 			break;
 		case AM_rR:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "r%02Xh,R%02Xh", op & 0x07, ea);
 			break;
 		case AM_Rr:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "R%02Xh,r%02Xh", ea, op & 0x07);
 			break;
 		case AM_Rii:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "R%02Xh,", ea);
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "$%02X,", ea);
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "$%02X", ea);
 			break;
 		case AM_RiR:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "R%02Xh,", ea);
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "$%02X,", ea);
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "R%02Xh", ea);
 			break;
 		case AM_riB:
-			ea = oprom[pos++];
-			ea2 = oprom[pos++];
+			ea = opcodes.r8(pos++);
+			ea2 = opcodes.r8(pos++);
 			switch( ea & 0xC0 ) {
 			case 0x00:
 				util::stream_format(stream, "#%2x(r%02Xh),#%d", ea2, ea >> 3, ea & 0x07);
@@ -510,23 +477,23 @@ CPU_DISASSEMBLE(sm8500)
 			}
 			break;
 		case AM_CALS:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			util::stream_format(stream, "$%04X", 0x1000 | ( ( op & 0x0f ) << 8 ) | ea);
 			break;
 		case AM_bid:
-			ea = oprom[pos++];
-			ea2 = oprom[pos++];
+			ea = opcodes.r8(pos++);
+			ea2 = opcodes.r8(pos++);
 			if ( ea & 0x38 ) {
 				util::stream_format(stream, "$%02X(r%02Xh)", ea2, ( ea >> 3 ) & 0x07);
 			} else {
 				util::stream_format(stream, "$%04X", 0xFF00 + ea2);
 			}
 			util::stream_format(stream, ",#%d,", ea & 0x07);
-			offset = (int8_t) oprom[pos++];
+			offset = (int8_t) opcodes.r8(pos++);
 			util::stream_format(stream, "$%04X", pc + pos + offset);
 			break;
 		case AM_1A:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			switch( ea & 0x07 ) {
 			case 0x00: util::stream_format(stream, "%-4s ", s_mnemonic[ zCLR ]); break;
 			case 0x01: util::stream_format(stream, "%-4s ", s_mnemonic[ zNEG ]); break;
@@ -540,7 +507,7 @@ CPU_DISASSEMBLE(sm8500)
 			util::stream_format(stream, "@r%02Xh", ( ea >> 3 ) & 0x07);
 			break;
 		case AM_1B:
-			ea = oprom[pos++];
+			ea = opcodes.r8(pos++);
 			switch( ea & 0x07 ) {
 			case 0x00: util::stream_format(stream, "%-4s ", s_mnemonic[ zINC ]); break;
 			case 0x01: util::stream_format(stream, "%-4s ", s_mnemonic[ zDEC ]); break;
@@ -554,8 +521,8 @@ CPU_DISASSEMBLE(sm8500)
 			util::stream_format(stream, "@r%02Xh", ( ea >> 3 ) & 0x07);
 			break;
 		case AM_4F:
-			ea = oprom[pos++];
-			ea2 = oprom[pos++];
+			ea = opcodes.r8(pos++);
+			ea2 = opcodes.r8(pos++);
 			switch( ea & 0xc0 ) {
 			case 0x00: util::stream_format(stream, "%-4s ", s_mnemonic[ zBCMP ]); break;
 			case 0x40: util::stream_format(stream, "%-4s ", s_mnemonic[ zBAND ]); break;
@@ -577,5 +544,5 @@ CPU_DISASSEMBLE(sm8500)
 		util::stream_format(stream, "%s", s_mnemonic[ instr->mnemonic ]);
 	}
 
-	return pos | s_flags[instr->mnemonic] | DASMFLAG_SUPPORTED;
+	return (pos - pc) | s_flags[instr->mnemonic] | SUPPORTED;
 }

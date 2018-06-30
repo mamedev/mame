@@ -1,27 +1,32 @@
 // license:GPL-2.0+
 // copyright-holders:Felipe Sanches
 #include "emu.h"
-#include "cpu/patinhofeio/patinhofeio_cpu.h"
+#include "patinho_feio_dasm.h"
 
-CPU_DISASSEMBLE(patinho_feio)
+u32 patinho_feio_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t patinho_feio_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	int addr, value, n, f;
 
-	switch (oprom[0] & 0xF0) {
+	switch (opcodes.r8(pc) & 0xF0) {
 		case 0x00:
 			//PLA = "Pula": Unconditionally JUMP to effective address
-			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
+			addr = (opcodes.r8(pc) & 0x0F) << 8 | opcodes.r8(pc+1);
 			util::stream_format(stream, "PLA     /%03X", addr);
 			return 2;
 		case 0x10:
 			//PLAX = "Pulo indexado": Unconditionally JUMP to indexed address
-			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
+			addr = (opcodes.r8(pc) & 0x0F) << 8 | opcodes.r8(pc+1);
 			util::stream_format(stream, "PLAX    (IDX) + /%03X", addr);
 			return 2;
 		case 0x20:
 			//ARM = "Armazena": Stores the contents of the
 			//                  accumulator in the given 12bit address
-			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
+			addr = (opcodes.r8(pc) & 0x0F) << 8 | opcodes.r8(pc+1);
 			if (addr==0){
 				util::stream_format(stream, "ARM     (IDX)");
 			}else{
@@ -31,13 +36,13 @@ CPU_DISASSEMBLE(patinho_feio)
 		case 0x30:
 			//ARMX = "Armazenamento indexado": Stores the contents of the accumulator in the
 			//                                 given 12bit address (indexed by IDX)
-			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
+			addr = (opcodes.r8(pc) & 0x0F) << 8 | opcodes.r8(pc+1);
 			util::stream_format(stream, "ARMX    (IDX) + /%03X", addr);
 			return 2;
 		case 0x40:
 			//CAR = "Carrega": Loads the contents of the given 12bit address
 			//                 into the accumulator
-			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
+			addr = (opcodes.r8(pc) & 0x0F) << 8 | opcodes.r8(pc+1);
 			if (addr==0){
 				util::stream_format(stream, "CAR     (IDX)");
 			}else{
@@ -47,39 +52,39 @@ CPU_DISASSEMBLE(patinho_feio)
 		case 0x50:
 			//CARX = "Carga indexada": Loads the contents of the given 12bit address
 			//                         (indexed by IDX) into the accumulator
-			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
+			addr = (opcodes.r8(pc) & 0x0F) << 8 | opcodes.r8(pc+1);
 			util::stream_format(stream, "CARX    (IDX) + /%03X", addr);
 			return 2;
 		case 0x60:
 			//SOM = "Soma": Adds the contents of the given 12bit address
 			//              into the accumulator
-			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
+			addr = (opcodes.r8(pc) & 0x0F) << 8 | opcodes.r8(pc+1);
 			util::stream_format(stream, "SOM     /%03X", addr);
 			return 2;
 		case 0x70:
 			//SOMX = "Soma indexada": Adds the contents of the given 12bit address
 			//                        (indexed by IDX) into the accumulator
-			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
+			addr = (opcodes.r8(pc) & 0x0F) << 8 | opcodes.r8(pc+1);
 			util::stream_format(stream, "SOMX    (IDX) + /%03X", addr);
 			return 2;
 		case 0xA0:
 			//PLAN = "Pula se ACC for negativo": Jumps to the 12bit address
 			//                                   if the accumulator is negative
-			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
+			addr = (opcodes.r8(pc) & 0x0F) << 8 | opcodes.r8(pc+1);
 			util::stream_format(stream, "PLAN    /%03X", addr);
 			return 2;
 		case 0xB0:
 			//PLAZ = "Pula se ACC for zero": Jumps to the 12bit address
 			//                               if the accumulator is zero
-			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
+			addr = (opcodes.r8(pc) & 0x0F) << 8 | opcodes.r8(pc+1);
 			util::stream_format(stream, "PLAZ    /%03X", addr);
 			return 2;
 		case 0xC0:
-			n = (oprom[0] & 0x0F);
-			f = (oprom[1] & 0x0F);
+			n = (opcodes.r8(pc) & 0x0F);
+			f = (opcodes.r8(pc+1) & 0x0F);
 			n+= (n < 10) ? '0' : 'A'-10;
 			f+= (f < 10) ? '0' : 'A'-10;
-			switch(oprom[1] & 0xF0)
+			switch(opcodes.r8(pc+1) & 0xF0)
 			{
 				case 0x10: util::stream_format(stream, "FNC     /%c%c", n, f); return 2;
 				case 0x20: util::stream_format(stream, "SAL     /%c%c", n, f); return 2;
@@ -88,11 +93,11 @@ CPU_DISASSEMBLE(patinho_feio)
 			}
 			break;
 		case 0xD0:
-			value = oprom[1] & 0x0F;
-			switch (oprom[0] & 0x0F)
+			value = opcodes.r8(pc+1) & 0x0F;
+			switch (opcodes.r8(pc) & 0x0F)
 			{
 				case 0x01:
-					switch (oprom[1] & 0xF0)
+					switch (opcodes.r8(pc+1) & 0xF0)
 					{
 						case 0x00: util::stream_format(stream, "DD      /%01X", value); return 2; //DD = "Deslocamento para a direita": Shift right
 						case 0x10: util::stream_format(stream, "DDV     /%01X", value); return 2; //DDV = "Deslocamento para a direita c/ V": Shift right with carry
@@ -105,25 +110,25 @@ CPU_DISASSEMBLE(patinho_feio)
 						case 0x80: util::stream_format(stream, "DDS     /%01X", value); return 2; //DDS = "Deslocamento para a direita com duplicacao de sinal": Shift right with sign duplication
 					}
 					break;
-				case 0x02: util::stream_format(stream, "XOR     /%02X", oprom[1]); return 2; //Logical XOR
-				case 0x04: util::stream_format(stream, "NAND    /%02X", oprom[1]); return 2; //Logical NAND
-				case 0x08: util::stream_format(stream, "SOMI    /%02X", oprom[1]); return 2; //SOMI = "Soma imediata": Add immediate value into accumulator
-				case 0x0A: util::stream_format(stream, "CARI    /%02X", oprom[1]); return 2; //CARI = "Carrega imediato": Loads an immediate value into the accumulator
+				case 0x02: util::stream_format(stream, "XOR     /%02X", opcodes.r8(pc+1)); return 2; //Logical XOR
+				case 0x04: util::stream_format(stream, "NAND    /%02X", opcodes.r8(pc+1)); return 2; //Logical NAND
+				case 0x08: util::stream_format(stream, "SOMI    /%02X", opcodes.r8(pc+1)); return 2; //SOMI = "Soma imediata": Add immediate value into accumulator
+				case 0x0A: util::stream_format(stream, "CARI    /%02X", opcodes.r8(pc+1)); return 2; //CARI = "Carrega imediato": Loads an immediate value into the accumulator
 			}
 			break;
 		case 0xE0:
 			//SUS = "Subtrai um ou salta"
-			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
+			addr = (opcodes.r8(pc) & 0x0F) << 8 | opcodes.r8(pc+1);
 			util::stream_format(stream, "SUS     /%03X", addr);
 			return 2;
 		case 0xF0:
 			//PUG = "Pula e guarda"
-			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
+			addr = (opcodes.r8(pc) & 0x0F) << 8 | opcodes.r8(pc+1);
 			util::stream_format(stream, "PUG     /%03X", addr);
 			return 2;
 	}
 
-	switch (oprom[0]) {
+	switch (opcodes.r8(pc)) {
 		case 0x80: util::stream_format(stream, "LIMPO");       return 1;
 		case 0x81: util::stream_format(stream, "UM");          return 1;
 		case 0x82: util::stream_format(stream, "CMP1");        return 1;

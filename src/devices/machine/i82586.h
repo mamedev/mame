@@ -7,7 +7,7 @@
 #pragma once
 
 #define MCFG_I82586_IRQ_CB(_out_irq) \
-	devcb = &i82586_base_device::static_set_out_irq_callback(*device, DEVCB_##_out_irq);
+	devcb = &downcast<i82586_base_device &>(*device).set_out_irq_callback(DEVCB_##_out_irq);
 
 class i82586_base_device :
 	public device_t,
@@ -157,7 +157,7 @@ public:
 
 	static const u32 FCS_RESIDUE = 0xdebb20e3; // the residue after computing the fcs over a complete frame (including fcs)
 
-	template <class Object> static devcb_base &static_set_out_irq_callback(device_t &device, Object &&cb) { return downcast<i82586_base_device &>(device).m_out_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(ca);
 	virtual void recv_cb(u8 *buf, int length) override;

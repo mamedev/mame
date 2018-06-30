@@ -97,11 +97,15 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void d6809(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( term_r );
 	DECLARE_WRITE8_MEMBER( term_w );
 	void kbd_put(u8 data);
 
-private:
+	void mem_map(address_map &map);
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -121,15 +125,16 @@ WRITE8_MEMBER( d6809_state::term_w )
 		m_terminal->write(space, 0, data);
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, d6809_state )
-	ADDRESS_MAP_UNMAP_HIGH
+void d6809_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
 	// 00-FF is for various devices.
-	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE("acia1", mos6551_device, read, write)
-	AM_RANGE(0x0004, 0x0007) AM_DEVREADWRITE("acia2", mos6551_device, read, write)
-	AM_RANGE(0x00ff, 0x00ff) AM_READWRITE(term_r,term_w)
-	AM_RANGE(0x1000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+	map(0x0000, 0x0003).rw("acia1", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x0004, 0x0007).rw("acia2", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x00ff, 0x00ff).rw(FUNC(d6809_state::term_r), FUNC(d6809_state::term_w));
+	map(0x1000, 0xdfff).ram();
+	map(0xe000, 0xffff).rom().region("roms", 0);
+}
 
 
 /* Input ports */
@@ -147,13 +152,13 @@ void d6809_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( d6809 )
+MACHINE_CONFIG_START(d6809_state::d6809)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_14_7456MHz / 8) // MC68B09EP
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(14'745'600) / 8) // MC68B09EP
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD("acia1", MOS6551, XTAL_14_7456MHz / 8) // uses Q clock
-	MCFG_DEVICE_ADD("acia2", MOS6551, XTAL_14_7456MHz / 8) // uses Q clock
+	MCFG_DEVICE_ADD("acia1", MOS6551, XTAL(14'745'600) / 8) // uses Q clock
+	MCFG_DEVICE_ADD("acia2", MOS6551, XTAL(14'745'600) / 8) // uses Q clock
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -168,5 +173,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY     FULLNAME         FLAGS
-COMP( 1983, d6809,  0,      0,       d6809,   d6809, d6809_state, 0,    "Dunfield", "6809 Portable", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME         FLAGS
+COMP( 1983, d6809, 0,      0,      d6809,   d6809, d6809_state, empty_init, "Dunfield", "6809 Portable", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

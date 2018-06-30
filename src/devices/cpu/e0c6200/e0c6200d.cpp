@@ -7,21 +7,9 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
-#include "e0c6200.h"
+#include "e0c6200d.h"
 
-// opcode mnemonics
-enum e_mnemonics
-{
-	em_JP, em_RETD, em_CALL, em_CALZ,
-	em_LD, em_LBPX, em_ADC, em_CP, em_ADD, em_SUB, em_SBC, em_AND, em_OR, em_XOR,
-	em_RLC, em_FAN, em_PSET, em_LDPX, em_LDPY, em_SET, em_RST, em_INC, em_DEC,
-	em_RRC, em_ACPX, em_ACPY, em_SCPX, em_SCPY, em_PUSH, em_POP,
-	em_RETS, em_RET, em_JPBA, em_HALT, em_SLP, em_NOP5, em_NOP7,
-	em_NOT, em_SCF, em_SZF, em_SDF, em_EI, em_DI, em_RDF, em_RZF, em_RCF, em_ILL
-};
-
-static const char *const em_name[] =
+const char *const e0c6200_disassembler::em_name[] =
 {
 	"JP", "RETD", "CALL", "CALZ",
 	"LD", "LBPX", "ADC", "CP", "ADD", "SUB", "SBC", "AND", "OR", "XOR",
@@ -31,32 +19,20 @@ static const char *const em_name[] =
 	"NOT", "SCF", "SZF", "SDF", "EI", "DI", "RDF", "RZF", "RCF", "?"
 };
 
-#define _OVER DASMFLAG_STEP_OVER
-#define _OUT  DASMFLAG_STEP_OUT
-
-static const u32 em_flags[] =
+const u32 e0c6200_disassembler::em_flags[] =
 {
-	0, _OUT, _OVER, _OVER,
+	0, STEP_OUT, STEP_OVER, STEP_OVER,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0,
-	_OUT, _OUT, 0, _OVER, _OVER, 0, 0,
+	STEP_OUT, STEP_OUT, 0, STEP_OVER, STEP_OVER, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 
-// opcode params
-enum e_params
-{
-	ep_S, ep_E, ep_I, ep_R0, ep_R2, ep_R4, ep_Q,
-	ep_cC, ep_cNC, ep_cZ, ep_cNZ,
-	ep_A, ep_B, ep_X, ep_Y, ep_MX, ep_MY, ep_XP, ep_XH, ep_XL, ep_YP, ep_YH, ep_YL,
-	ep_P, ep_F, ep_MN, ep_SP, ep_SPH, ep_SPL
-};
-
 // 0-digit is number of bits per opcode parameter, 0 bits is literal,
 // 0x10-digit is for shift-right, 0x100-digit is special flag for r/q param
-static const u16 ep_bits[] =
+const u16 e0c6200_disassembler::ep_bits[] =
 {
 	8, 8, 4, 0x102, 0x122, 0x142, 0x102,
 	0, 0, 0, 0,
@@ -65,10 +41,10 @@ static const u16 ep_bits[] =
 };
 
 // redirect for r/q param
-static const u8 ep_redirect_r[4] = { ep_A, ep_B, ep_MX, ep_MY };
+const u8 e0c6200_disassembler::ep_redirect_r[4] = { ep_A, ep_B, ep_MX, ep_MY };
 
 // literal opcode parameter
-static const char *const ep_name[] =
+const char *const e0c6200_disassembler::ep_name[] =
 {
 	" ", " ", " ", " ", " ", " ", " ",
 	"C", "NC", "Z", "NZ",
@@ -77,7 +53,7 @@ static const char *const ep_name[] =
 };
 
 
-static char* decode_param(u16 opcode, int param, char* buffer)
+std::string e0c6200_disassembler::decode_param(u16 opcode, int param)
 {
 	int bits = ep_bits[param] & 0xf;
 	int shift = ep_bits[param] >> 4 & 0xf;
@@ -89,30 +65,22 @@ static char* decode_param(u16 opcode, int param, char* buffer)
 
 	// literal param
 	if (ep_bits[param] == 0)
-	{
-		strcpy(buffer, ep_name[param]);
-		return buffer;
-	}
+		return ep_name[param];
 
 	// print value like how it's documented in the manual
-	char val[10];
-	if (bits > 4 || opmask > 9)
-		sprintf(val, "%02XH", opmask);
-	else
-		sprintf(val, "%d", opmask);
+	std::string val = (bits > 4 || opmask > 9) ?
+		util::string_format("%02XH", opmask) :
+		util::string_format("%d", opmask);
 
 	if (param == ep_MN)
-		sprintf(buffer, "M%s", val);
+		return 'M' + val;
 	else
-		strcpy(buffer, val);
-
-	return buffer;
+		return val;
 }
 
-
-CPU_DISASSEMBLE(e0c6200)
+offs_t e0c6200_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	u16 op = (oprom[1] | oprom[0] << 8) & 0xfff;
+	u16 op = opcodes.r16(pc) & 0xfff;
 
 	int m;
 	int p1 = -1;
@@ -693,15 +661,34 @@ CPU_DISASSEMBLE(e0c6200)
 	util::stream_format(stream, "%-6s", em_name[m]);
 
 	// fetch param(s)
-	char pbuffer[10];
 	if (p1 != -1)
 	{
-		util::stream_format(stream, "%s", decode_param(op, p1, pbuffer));
+		util::stream_format(stream, "%s", decode_param(op, p1));
 		if (p2 != -1)
 		{
-			util::stream_format(stream, ",%s", decode_param(op, p2, pbuffer));
+			util::stream_format(stream, ",%s", decode_param(op, p2));
 		}
 	}
 
-	return 1 | em_flags[m] | DASMFLAG_SUPPORTED;
+	return 1 | em_flags[m] | SUPPORTED;
+}
+
+u32 e0c6200_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+u32 e0c6200_disassembler::interface_flags() const
+{
+	return PAGED2LEVEL;
+}
+
+u32 e0c6200_disassembler::page_address_bits() const
+{
+	return 8;
+}
+
+u32 e0c6200_disassembler::page2_address_bits() const
+{
+	return 4;
 }

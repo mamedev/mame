@@ -34,9 +34,9 @@ const tiny_rom_entry *vtech_rs232_interface_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( vtech_rs232_interface_device::device_add_mconfig )
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(vtech_rs232_interface_device, rs232_rx_w))
+MACHINE_CONFIG_START(vtech_rs232_interface_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, vtech_rs232_interface_device, rs232_rx_w))
 MACHINE_CONFIG_END
 
 

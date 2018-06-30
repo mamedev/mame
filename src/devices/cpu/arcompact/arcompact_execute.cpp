@@ -4,7 +4,13 @@
 #include "emu.h"
 #include "debugger.h"
 #include "arcompact.h"
-#include "arcompact_common.h"
+#include "arcompactdasm.h"
+
+#define REG_BLINK (0x1f) // r31
+#define REG_SP (0x1c) // r28
+#define REG_ILINK1 (0x1d) // r29
+#define REG_ILINK2 (0x1e) // r30
+#define REG_LP_COUNT (0x3c) // r60
 
 #define ARCOMPACT_LOGGING 1
 
@@ -19,7 +25,7 @@ void arcompact_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 //      printf("new pc %04x\n", m_pc);
 
@@ -128,35 +134,35 @@ int arcompact_device::check_condition(uint8_t condition)
 		case 0x00: return 1; // AL
 		case 0x01: return CONDITION_EQ;
 		case 0x02: return !CONDITION_EQ; // NE
-		case 0x03: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x03: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
 		case 0x04: return CONDITION_MI; // MI (N)
 		case 0x05: return CONDITION_CS; // CS (Carry Set / Lower than)
-		case 0x06: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x07: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x08: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x09: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x0a: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x0b: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x0c: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x0d: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x0e: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x0f: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x10: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x11: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x12: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x13: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x14: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x15: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x16: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x17: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x18: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x19: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x1a: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x1b: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x1c: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x1d: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x1e: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x1f: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x06: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x07: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x08: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x09: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x0a: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x0b: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x0c: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x0d: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x0e: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x0f: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x10: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x11: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x12: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x13: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x14: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x15: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x16: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x17: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x18: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x19: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x1a: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x1b: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x1c: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x1d: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x1e: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x1f: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
 	}
 
 		return -1;
@@ -1844,58 +1850,58 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_helper(OPS_32, const char
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_01(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x01], /*"ADC"*/ 0,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x01], /*"ADC"*/ 0,0);
 }
 
 
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_03(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x03], /*"SBC"*/ 0,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x03], /*"SBC"*/ 0,0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_08(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x08], /*"MAX"*/ 0,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x08], /*"MAX"*/ 0,0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_09(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x09], /*"MIN"*/ 0,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x09], /*"MIN"*/ 0,0);
 }
 
 
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_0b(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x0b], /*"TST"*/ 1,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x0b], /*"TST"*/ 1,0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_0c(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x0c], /*"CMP"*/ 1,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x0c], /*"CMP"*/ 1,0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_0d(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x0d], /*"RCMP"*/ 1,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x0d], /*"RCMP"*/ 1,0);
 }
 
 
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_10(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x10], /*"BCLR"*/ 0,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x10], /*"BCLR"*/ 0,0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_11(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x11], /*"BTST"*/ 0,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x11], /*"BTST"*/ 0,0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_12(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x12], /*"BXOR"*/ 0,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x12], /*"BXOR"*/ 0,0);
 }
 
 
@@ -1905,22 +1911,22 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_12(OPS_32)
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_1a(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x1a], /*"MPY"*/ 0,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x1a], /*"MPY"*/ 0,0);
 } // *
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_1b(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x1b], /*"MPYH"*/ 0,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x1b], /*"MPYH"*/ 0,0);
 } // *
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_1c(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x1c], /*"MPYHU"*/ 0,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x1c], /*"MPYHU"*/ 0,0);
 } // *
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_1d(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x1d], /*"MPYU"*/ 0,0);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x1d], /*"MPYU"*/ 0,0);
 } // *
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p00(OPS_32)
@@ -2202,12 +2208,12 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p11_m1(OPS_32)
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_22(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x22], /*"JL"*/ 1,1);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x22], /*"JL"*/ 1,1);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_23(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x23], /*"JL.D"*/ 1,1);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x23], /*"JL.D"*/ 1,1);
 }
 
 
@@ -2238,7 +2244,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_28(OPS_32) // LPcc (loop 
 	{ // 0010 0RRR 1110 1000 0RRR uuuu uu1Q QQQQ
 		COMMON32_GET_u6
 		COMMON32_GET_CONDITION
-		//arcompact_fatal("Lp conditional %s not supported %d", conditions[condition], u);
+		//arcompact_fatal("Lp conditional %s not supported %d", arcompact_disassembler::conditions[condition], u);
 
 		// if the loop condition fails then just jump to after the end of the loop, don't set any registers
 		if (!check_condition(condition))
@@ -2264,7 +2270,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_28(OPS_32) // LPcc (loop 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_29(OPS_32)
 {
 	// leapster bios uses formats for FLAG that are not defined, bug I guess work anyway (P modes 0 / 1)
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x29], /*"FLAG"*/ 1,1);
+	return arcompact_handle04_helper(PARAMS, arcompact_disassembler::opcodes_04[0x29], /*"FLAG"*/ 1,1);
 }
 
 

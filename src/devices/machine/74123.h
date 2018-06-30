@@ -58,25 +58,25 @@
 ***************************************************************************/
 
 #define MCFG_TTL74123_CONNECTION_TYPE(_ctype) \
-	ttl74123_device::set_connection_type(*device, _ctype);
+	downcast<ttl74123_device &>(*device).set_connection_type(_ctype);
 
 #define MCFG_TTL74123_RESISTOR_VALUE(_value) \
-	ttl74123_device::set_resistor_value(*device, _value);
+	downcast<ttl74123_device &>(*device).set_resistor_value(_value);
 
 #define MCFG_TTL74123_CAPACITOR_VALUE(_value) \
-	ttl74123_device::set_capacitor_value(*device, _value);
+	downcast<ttl74123_device &>(*device).set_capacitor_value(_value);
 
 #define MCFG_TTL74123_A_PIN_VALUE(_value) \
-	ttl74123_device::set_a_pin_value(*device, _value);
+	downcast<ttl74123_device &>(*device).set_a_pin_value(_value);
 
 #define MCFG_TTL74123_B_PIN_VALUE(_value) \
-	ttl74123_device::set_b_pin_value(*device, _value);
+	downcast<ttl74123_device &>(*device).set_b_pin_value(_value);
 
 #define MCFG_TTL74123_CLEAR_PIN_VALUE(_value) \
-	ttl74123_device::set_clear_pin_value(*device, _value);
+	downcast<ttl74123_device &>(*device).set_clear_pin_value(_value);
 
 #define MCFG_TTL74123_OUTPUT_CHANGED_CB(_devcb) \
-	devcb = &ttl74123_device::set_output_changed_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<ttl74123_device &>(*device).set_output_changed_callback(DEVCB_##_devcb);
 
 /* constants for the different ways the cap/res can be connected.
    This determines the formula for calculating the pulse width */
@@ -97,13 +97,13 @@ public:
 	// construction/destruction
 	ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_connection_type(device_t &device, int type) { downcast<ttl74123_device &>(device).m_connection_type = type; }
-	static void set_resistor_value(device_t &device, double value) { downcast<ttl74123_device &>(device).m_res = value; }
-	static void set_capacitor_value(device_t &device, double value) { downcast<ttl74123_device &>(device).m_cap = value; }
-	static void set_a_pin_value(device_t &device, int value) { downcast<ttl74123_device &>(device).m_a = value; }
-	static void set_b_pin_value(device_t &device, int value) { downcast<ttl74123_device &>(device).m_b = value; }
-	static void set_clear_pin_value(device_t &device, int value) { downcast<ttl74123_device &>(device).m_clear = value; }
-	template <class Object> static devcb_base &set_output_changed_callback(device_t &device, Object &&cb) { return downcast<ttl74123_device &>(device).m_output_changed_cb.set_callback(std::forward<Object>(cb)); }
+	void set_connection_type(int type) { m_connection_type = type; }
+	void set_resistor_value(double value) { m_res = value; }
+	void set_capacitor_value(double value) { m_cap = value; }
+	void set_a_pin_value(int value) { m_a = value; }
+	void set_b_pin_value(int value) { m_b = value; }
+	void set_clear_pin_value(int value) { m_clear = value; }
+	template <class Object> devcb_base &set_output_changed_callback(Object &&cb) { return m_output_changed_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(a_w);
 	DECLARE_WRITE_LINE_MEMBER(b_w);

@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 
 class paradise_state : public driver_device
@@ -67,9 +68,9 @@ public:
 	// tgtball specific
 	DECLARE_WRITE8_MEMBER(tgtball_flipscreen_w);
 
-	DECLARE_DRIVER_INIT(torus);
-	DECLARE_DRIVER_INIT(paradise);
-	DECLARE_DRIVER_INIT(tgtball);
+	void init_torus();
+	void init_paradise();
+	void init_tgtball();
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
@@ -87,4 +88,16 @@ public:
 
 	void update_pix_palbank();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void penkyi(machine_config &config);
+	void tgtball(machine_config &config);
+	void paradise(machine_config &config);
+	void madball(machine_config &config);
+	void torus(machine_config &config);
+	void penky(machine_config &config);
+	void base_map(address_map &map);
+	void paradise_io_map(address_map &map);
+	void paradise_map(address_map &map);
+	void tgtball_map(address_map &map);
+	void torus_io_map(address_map &map);
+	void torus_map(address_map &map);
 };

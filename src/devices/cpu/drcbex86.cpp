@@ -3000,6 +3000,9 @@ void drcbe_x86::op_debug(x86code *&dst, const instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
+	using debugger_hook_func = void (*)(device_debug *, offs_t);
+	static const debugger_hook_func debugger_inst_hook = [] (device_debug *dbg, offs_t pc) { dbg->instruction_hook(pc); }; // TODO: kill trampoline if possible
+
 	if ((m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		// normalize parameters
@@ -3008,14 +3011,14 @@ void drcbe_x86::op_debug(x86code *&dst, const instruction &inst)
 		// test and branch
 		emit_test_m32_imm(dst, MABS(&m_device.machine().debug_flags), DEBUG_FLAG_CALL_HOOK);        // test  [debug_flags],DEBUG_FLAG_CALL_HOOK
 		emit_link skip = { nullptr };
-		emit_jcc_short_link(dst, x86emit::COND_Z, skip);                                        // jz    skip
+		emit_jcc_short_link(dst, x86emit::COND_Z, skip);                        // jz    skip
 
 		// push the parameter
 		emit_mov_m32_p32(dst, MBD(REG_ESP, 4), pcp);                            // mov   [esp+4],pcp
-		emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)&m_device);                    // mov   [esp],device
-		emit_call(dst, (x86code *)debugger_instruction_hook);                           // call  debug_cpu_instruction_hook
+		emit_mov_m32_imm(dst, MBD(REG_ESP, 0), (uintptr_t)m_device.debug());    // mov   [esp],device.debug
+		emit_call(dst, (x86code *)debugger_inst_hook);                          // call  debugger_inst_hook
 
-		track_resolve_link(dst, skip);                                              // skip:
+		track_resolve_link(dst, skip);                                          // skip:
 	}
 }
 
@@ -6719,9 +6722,8 @@ int drcbe_x86::ddivu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t s
 	if (src2 == 0)
 		return FLAG_V;
 
-	// shortcut if no remainder
 	dstlo = src1 / src2;
-	if (dstlo != dsthi)
+	if (&dstlo != &dsthi)
 		dsthi = src1 % src2;
 	return ((dstlo == 0) << 2) | ((dstlo >> 60) & FLAG_S);
 }
@@ -6737,9 +6739,8 @@ int drcbe_x86::ddivs(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src
 	if (src2 == 0)
 		return FLAG_V;
 
-	// shortcut if no remainder
 	dstlo = src1 / src2;
-	if (dstlo != dsthi)
+	if (&dstlo != &dsthi)
 		dsthi = src1 % src2;
 	return ((dstlo == 0) << 2) | ((dstlo >> 60) & FLAG_S);
 }

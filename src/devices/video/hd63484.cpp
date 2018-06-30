@@ -29,6 +29,7 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_auto_configure_screen(true),
+	m_external_skew(0),
 	m_ar(0),
 	m_sr(0),
 	m_fifo_ptr(-1),
@@ -367,7 +368,7 @@ const tiny_rom_entry *hd63484_device::device_rom_region() const
 
 inline uint16_t hd63484_device::readword(offs_t address)
 {
-	return space().read_word(address << 1);
+	return space().read_word(address);
 }
 
 
@@ -377,7 +378,7 @@ inline uint16_t hd63484_device::readword(offs_t address)
 
 inline void hd63484_device::writeword(offs_t address, uint16_t data)
 {
-	space().write_word(address << 1, data);
+	space().write_word(address, data);
 }
 
 
@@ -525,13 +526,14 @@ inline void hd63484_device::recompute_parameters()
 	int ppw = 16 / get_bpp();
 	int ppmc = ppw * (1 << gai) / acm;  // TODO: GAI > 3
 	int vbstart = m_vds + m_sp[1];
+	int hbend = (m_hsw + m_hds + m_external_skew) * ppmc;
 	if (BIT(m_dcr, 13)) vbstart += m_sp[0];
 	if (BIT(m_dcr, 11)) vbstart += m_sp[2];
 
-	rectangle visarea = m_screen->visible_area();
-	visarea.set((m_hsw + m_hds) * ppmc, (m_hsw + m_hds + m_hdw) * ppmc - 1, m_vds, vbstart - 1);
-	attoseconds_t frame_period = m_screen->frame_period().attoseconds(); // TODO: use clock() to calculate the frame_period
-	m_screen->configure(m_hc * ppmc, m_vc, visarea, frame_period);
+	rectangle visarea = screen().visible_area();
+	visarea.set(hbend, hbend + (m_hdw * ppmc) - 1, m_vds, vbstart - 1);
+	attoseconds_t frame_period = screen().frame_period().attoseconds(); // TODO: use clock() to calculate the frame_period
+	screen().configure(m_hc * ppmc, m_vc, visarea, frame_period);
 }
 
 
@@ -1785,7 +1787,7 @@ uint16_t hd63484_device::video_registers_r(int offset)
 			break;
 
 		case 0x80:
-			res = m_screen->vpos() & 0xfff; // Raster Count
+			res = screen().vpos() & 0xfff; // Raster Count
 			break;
 
 		default:
@@ -1827,6 +1829,7 @@ void hd63484_device::video_registers_w(int offset)
 			break;
 
 		case 0x04:
+			logerror("OMR: %04x\n", vreg_data);
 			m_omr = vreg_data;
 			break;
 
@@ -1910,13 +1913,13 @@ void hd63484_device::video_registers_w(int offset)
 	}
 }
 
-READ16_MEMBER( hd63484_device::status_r )
+READ16_MEMBER( hd63484_device::status16_r )
 {
 	// kothello is coded so that upper byte of this should be 0xff (tests with jc opcode). Maybe it's just unconnected?
 	return m_sr | 0xff00;
 }
 
-READ16_MEMBER( hd63484_device::data_r )
+READ16_MEMBER( hd63484_device::data16_r )
 {
 	uint16_t res;
 
@@ -1937,13 +1940,13 @@ READ16_MEMBER( hd63484_device::data_r )
 	return res;
 }
 
-WRITE16_MEMBER( hd63484_device::address_w )
+WRITE16_MEMBER( hd63484_device::address16_w )
 {
 	if(ACCESSING_BITS_0_7)
 		m_ar = data & 0xfe;
 }
 
-WRITE16_MEMBER( hd63484_device::data_w )
+WRITE16_MEMBER( hd63484_device::data16_w )
 {
 	if(ACCESSING_BITS_8_15)
 		m_vreg[m_ar] = (data & 0xff00) >> 8;
@@ -1956,17 +1959,17 @@ WRITE16_MEMBER( hd63484_device::data_w )
 	inc_ar(2);
 }
 
-READ8_MEMBER( hd63484_device::status_r )
+READ8_MEMBER( hd63484_device::status8_r )
 {
 	return m_sr;
 }
 
-WRITE8_MEMBER( hd63484_device::address_w )
+WRITE8_MEMBER( hd63484_device::address8_w )
 {
 	m_ar = data;
 }
 
-READ8_MEMBER( hd63484_device::data_r )
+READ8_MEMBER( hd63484_device::data8_r )
 {
 	uint8_t res = 0xff;
 
@@ -1980,7 +1983,7 @@ READ8_MEMBER( hd63484_device::data_r )
 	return res;
 }
 
-WRITE8_MEMBER( hd63484_device::data_w )
+WRITE8_MEMBER( hd63484_device::data8_w )
 {
 	m_vreg[m_ar] = data;
 
@@ -2052,12 +2055,12 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 	int bpp = get_bpp();
 	int ppw = 16 / bpp;
 	uint32_t mask = (1 << bpp) - 1;
-	uint32_t base_offs = m_sar[layer_n] + (y - vs) * m_mwr[layer_n];
-	uint32_t wind_offs = m_sar[3] + (y - m_vws) * m_mwr[3];
+	uint32_t base_offs = m_sar[layer_n] + (y - vs) * m_mwr[layer_n] + m_external_skew;
+	uint32_t wind_offs = m_sar[3] + (y - m_vws) * m_mwr[3] + m_external_skew;
 	int step = (m_omr & 0x08) ? 2 : 1;
 	int gai = (m_omr>>4) & 0x07;
 	int ppmc = ppw * (1 << gai) / step;  // TODO: GAI > 3
-	int ws = m_hsw + m_hws;
+	int ws = m_hsw + m_hws + m_external_skew;
 
 	if (m_omr & 0x08)
 	{

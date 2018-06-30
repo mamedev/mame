@@ -58,6 +58,7 @@ March 2013 NPW:
 #include "debugger.h"
 #include "konami.h"
 #include "m6809inl.h"
+#include "6x09dasm.h"
 
 
 //**************************************************************************
@@ -105,14 +106,13 @@ void konami_cpu_device::device_start()
 
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t konami_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> konami_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( konami );
-	return CPU_DISASSEMBLE_NAME(konami)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<konami_disassembler>();
 }
 
 

@@ -48,11 +48,13 @@
 
 
 
-DEFINE_DEVICE_TYPE(PHOENIX, phoenix_sound_device, "phoenix_sound", "Phoenix Custom Sound")
+DEFINE_DEVICE_TYPE(PHOENIX_SOUND, phoenix_sound_device, "phoenix_sound", "Phoenix Custom Sound")
 
 phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PHOENIX, tag, owner, clock)
+	: device_t(mconfig, PHOENIX_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_discrete(*this, ":discrete")
+	, m_tms(*this, ":tms")
 {
 }
 
@@ -69,9 +71,6 @@ void phoenix_sound_device::device_start()
 	memset(&m_c24_state, 0, sizeof(m_c24_state));
 	memset(&m_c25_state, 0, sizeof(m_c25_state));
 	memset(&m_noise_state, 0, sizeof(m_noise_state));
-
-	m_discrete = machine().device<discrete_device>("discrete");
-	m_tms = machine().device<tms36xx_device>("tms");
 
 	m_poly18 = std::make_unique<uint32_t[]>(1ul << (18-5));
 
@@ -102,7 +101,7 @@ void phoenix_sound_device::device_start()
 	save_item(NAME(m_noise_state.polyoffs));
 	save_item(NAME(m_noise_state.lowpass_counter));
 	save_item(NAME(m_noise_state.lowpass_polybit));
-	save_pointer(NAME(m_poly18.get()), (1ul << (18-5)));
+	save_pointer(NAME(m_poly18), (1ul << (18-5)));
 }
 
 int phoenix_sound_device::update_c24(int samplerate)
@@ -341,7 +340,7 @@ static const discrete_mixer_desc phoenix_mixer =
 #define PHOENIX_EFFECT_4_SND        0
 
 
-DISCRETE_SOUND_START(phoenix)
+DISCRETE_SOUND_START(phoenix_discrete)
 	/************************************************/
 	/* Input register mapping for phoenix           */
 	/************************************************/

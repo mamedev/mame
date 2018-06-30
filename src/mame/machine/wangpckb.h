@@ -11,10 +11,11 @@
 
 #pragma once
 
-
 #include "cpu/mcs51/mcs51.h"
+
 #include "sound/sn76496.h"
 
+#include "diserial.h"
 
 
 //**************************************************************************
@@ -33,7 +34,7 @@
 	MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
 
 #define MCFG_WANGPCKB_TXD_HANDLER(_devcb) \
-	devcb = &wangpc_keyboard_device::set_txd_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<wangpc_keyboard_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -49,7 +50,7 @@ public:
 	// construction/destruction
 	wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<wangpc_keyboard_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 
@@ -59,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER( kb_p2_w );
 	DECLARE_WRITE8_MEMBER( kb_p3_w );
 
+	void wangpc_keyboard_io(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -79,6 +81,7 @@ private:
 	required_device<i8051_device> m_maincpu;
 	required_ioport_array<16> m_y;
 	devcb_write_line m_txd_handler;
+	output_finder<6> m_leds;
 
 	uint8_t m_keylatch;
 	int m_rxd;

@@ -241,6 +241,7 @@
 
 #include "emu.h"
 #include "cpu/h8/h83002.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -259,6 +260,9 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(bingoman);
+	void bingoman(machine_config &config);
+	void bingoman_io_map(address_map &map);
+	void bingoman_prg_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -276,13 +280,15 @@ uint32_t bingoman_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static ADDRESS_MAP_START( bingoman_prg_map, AS_PROGRAM, 16, bingoman_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-ADDRESS_MAP_END
+void bingoman_state::bingoman_prg_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+}
 
-static ADDRESS_MAP_START( bingoman_io_map, AS_IO, 8, bingoman_state )
+void bingoman_state::bingoman_io_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( bingoman )
 	/* dummy active high structure */
@@ -353,7 +359,7 @@ static const gfx_layout charlayout =
 };
 #endif
 
-static GFXDECODE_START( bingoman )
+static GFXDECODE_START( gfx_bingoman )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -371,12 +377,12 @@ PALETTE_INIT_MEMBER(bingoman_state, bingoman)
 {
 }
 
-static MACHINE_CONFIG_START( bingoman )
+MACHINE_CONFIG_START(bingoman_state::bingoman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83002, XTAL_20MHz) /* TODO: correct CPU type */
-	MCFG_CPU_PROGRAM_MAP(bingoman_prg_map)
-	MCFG_CPU_IO_MAP(bingoman_io_map)
+	MCFG_DEVICE_ADD("maincpu", H83002, XTAL(20'000'000)) /* TODO: correct CPU type */
+	MCFG_DEVICE_PROGRAM_MAP(bingoman_prg_map)
+	MCFG_DEVICE_IO_MAP(bingoman_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -387,13 +393,13 @@ static MACHINE_CONFIG_START( bingoman )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bingoman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bingoman)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(bingoman_state, bingoman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 
@@ -464,6 +470,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT  ROT    COMPANY          FULLNAME                    FLAGS   */
-GAME( 1993, bingoman,  0,        bingoman,  bingoman, bingoman_state, 0,    ROT0, "HP Automaten",  "Bingo Mania (P03-P07-P14)", MACHINE_IS_SKELETON )
-GAME( 1993, bingomana, bingoman, bingoman,  bingoman, bingoman_state, 0,    ROT0, "HP Automaten",  "Bingo Mania (A03)",         MACHINE_IS_SKELETON )
+/*    YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT        ROT    COMPANY          FULLNAME                    FLAGS   */
+GAME( 1993, bingoman,  0,        bingoman,  bingoman, bingoman_state, empty_init, ROT0, "HP Automaten",  "Bingo Mania (P03-P07-P14)", MACHINE_IS_SKELETON )
+GAME( 1993, bingomana, bingoman, bingoman,  bingoman, bingoman_state, empty_init, ROT0, "HP Automaten",  "Bingo Mania (A03)",         MACHINE_IS_SKELETON )

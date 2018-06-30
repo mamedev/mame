@@ -43,6 +43,8 @@ public:
 	// explicit decryption helpers
 	void decrypt(offs_t baseaddr, uint32_t size, offs_t regionoffs, uint16_t *opcodesptr, uint16_t *dataptr) { decrypt(baseaddr, size, &m_plaintext[regionoffs/2], opcodesptr, dataptr); }
 
+	void decrypted_opcodes_map(address_map &map);
+
 protected:
 	// construction/destruction
 	fd1089_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

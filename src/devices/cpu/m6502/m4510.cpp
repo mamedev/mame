@@ -2,41 +2,45 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m4510.c
+    m4510.cpp
 
     65ce02 with a mmu and a cia integrated
+
+    differences between the standard 65ce02 and this CPU:
+    http://www.zimmers.net/anonftp/pub/cbm/c65/65ce02.txt
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "m4510.h"
+#include "m4510d.h"
 
-DEFINE_DEVICE_TYPE(M4510, m4510_device, "m4510", "M4510")
+DEFINE_DEVICE_TYPE(M4510, m4510_device, "m4510", "CSG M4510")
 
 m4510_device::m4510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m65ce02_device(mconfig, M4510, tag, owner, clock),
 	map_enable(0),
 	nomap(false)
 {
-	program_config.m_addrbus_width = 20;
+	program_config.m_addr_width = 20;
 	program_config.m_logaddr_width = 16;
 	program_config.m_page_shift = 13;
-	sprogram_config.m_addrbus_width = 20;
+	sprogram_config.m_addr_width = 20;
 	sprogram_config.m_logaddr_width = 16;
 	sprogram_config.m_page_shift = 13;
 }
 
-offs_t m4510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> m4510_device::create_disassembler()
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return std::make_unique<m4510_disassembler>();
 }
 
 void m4510_device::device_start()
 {
-	if(direct_disabled)
-		mintf = new mi_4510_nd(this);
+	if(cache_disabled)
+		mintf = std::make_unique<mi_4510_nd>(this);
 	else
-		mintf = new mi_4510_normal(this);
+		mintf = std::make_unique<mi_4510_normal>(this);
 
 	m65ce02_device::init();
 
@@ -78,12 +82,12 @@ uint8_t m4510_device::mi_4510_normal::read(uint16_t adr)
 
 uint8_t m4510_device::mi_4510_normal::read_sync(uint16_t adr)
 {
-	return sdirect->read_byte(base->map(adr));
+	return scache->read_byte(base->map(adr));
 }
 
 uint8_t m4510_device::mi_4510_normal::read_arg(uint16_t adr)
 {
-	return direct->read_byte(base->map(adr));
+	return cache->read_byte(base->map(adr));
 }
 
 void m4510_device::mi_4510_normal::write(uint16_t adr, uint8_t val)

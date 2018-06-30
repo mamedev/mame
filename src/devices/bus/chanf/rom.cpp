@@ -192,7 +192,7 @@ void chanf_rom_device::common_write_2102(uint32_t offset, uint8_t data)
 		m_latch[1] = data;
 		// all bits but 2,3 come from this write, but they are shuffled
 		// notice that data is 8bits, so when swapping bit8 & bit9 are always 0!
-		m_addr_latch = (m_addr_latch & 0x0c) | (BITSWAP16((uint16_t) data, 15, 14, 13, 12, 11, 10, 7, 6, 5, 3, 2, 1, 9, 8, 4, 0));
+		m_addr_latch = (m_addr_latch & 0x0c) | (bitswap<16>((uint16_t) data, 15, 14, 13, 12, 11, 10, 7, 6, 5, 3, 2, 1, 9, 8, 4, 0));
 	}
 }
 

@@ -342,7 +342,7 @@ READ8_MEMBER(apollo_state::apollo_dma_2_r){
 	// (8237dma.c was always fast enough to omit these problems)
 	if (offset == 8)
 	{
-		switch (space.device().safe_pcbase())
+		switch (m_maincpu->pcbase())
 		{
 		case 0x00102e22: // DN3000
 		case 0x01002f3c: // DN3500
@@ -692,17 +692,9 @@ READ8_MEMBER(apollo_state::apollo_rtc_r)
 	return data;
 }
 
-// TODO: this is covering for missing mc146818 functionality
-TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
+WRITE_LINE_MEMBER(apollo_state::apollo_rtc_irq_function)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	// FIXME: reading register 0x0c will clear all interrupt flags
-	if ((apollo_rtc_r(space, 0x0c) & 0x80))
-	{
-		//SLOG2(("apollo_rtc_timer - set_irq_line %d", APOLLO_IRQ_RTC));
-		apollo_pic_set_irq_line(APOLLO_IRQ_RTC, 1);
-	}
+	apollo_pic_set_irq_line(APOLLO_IRQ_RTC, state);
 }
 
 //##########################################################################
@@ -713,9 +705,8 @@ TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
 #define VERBOSE 0
 
 apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	mc68681_base_device(mconfig, APOLLO_SIO, tag, owner, clock),
-	m_csrb(0),
-	m_ip6(0)
+	duart_base_device(mconfig, APOLLO_SIO, tag, owner, clock),
+	m_csrb(0)
 {
 }
 
@@ -728,10 +719,7 @@ void apollo_sio::device_reset()
 	ip3_w((input_data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	ip4_w((input_data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 	ip5_w((input_data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-//  ip6_w((input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-
-	// MC2681 has IP[6] (instead of /IACK on MC68681)
-	m_ip6 = (input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE;
+	ip6_w((input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER( apollo_sio::read )
@@ -744,7 +732,7 @@ READ8_MEMBER( apollo_sio::read )
 			"1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter",
 			"Stop Counter" };
 
-	int data = mc68681_base_device::read(space, offset/2, mem_mask);
+	int data = duart_base_device::read(space, offset/2, mem_mask);
 
 	switch (offset / 2)
 	{
@@ -760,10 +748,6 @@ READ8_MEMBER( apollo_sio::read )
 			// (to prevent that the MD selftest or SK command will hang in Service mode)
 			data = 0xff;
 		}
-		break;
-	case 0x0d: /* IP */
-		// MC2681 has IP[6] (instead of /IACK on MC68681)
-		data = (data & ~0x40) | (m_ip6 ? 0x40 : 0);
 		break;
 	}
 
@@ -804,11 +788,11 @@ WRITE8_MEMBER( apollo_sio::write )
 		break;
 #endif
 	}
-	mc68681_base_device::write(space, offset/2, data, mem_mask);
+	duart_base_device::write(space, offset/2, data, mem_mask);
 }
 
 // device type definition
-DEFINE_DEVICE_TYPE(APOLLO_SIO, apollo_sio, "apollo_sio", "DN3000/DS3500 SIO")
+DEFINE_DEVICE_TYPE(APOLLO_SIO, apollo_sio, "apollo_sio", "DN3000/DS3500 SIO (MC2681)")
 
 WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
 {
@@ -1056,116 +1040,120 @@ void apollo_ni::set_node_id_from_disk()
 #undef VERBOSE
 #define VERBOSE 0
 
-static SLOT_INTERFACE_START(apollo_isa_cards)
-	SLOT_INTERFACE("wdc", ISA16_OMTI8621_APOLLO)   // Combo ESDI/AT floppy controller
-	SLOT_INTERFACE("ctape", ISA8_SC499)     // Archive SC499 cartridge tape
-	SLOT_INTERFACE("3c505", ISA16_3C505)   // 3Com 3C505 Ethernet card
-SLOT_INTERFACE_END
+static void apollo_isa_cards(device_slot_interface &device)
+{
+	device.option_add("wdc", ISA16_OMTI8621_APOLLO);    // Combo ESDI/AT floppy controller
+	device.option_add("ctape", ISA8_SC499);             // Archive SC499 cartridge tape
+	device.option_add("3c505", ISA16_3C505);            // 3Com 3C505 Ethernet card
+}
 
-MACHINE_CONFIG_START( common )
+MACHINE_CONFIG_START(apollo_state::common)
 	// configuration MUST be reset first !
 	MCFG_DEVICE_ADD(APOLLO_CONF_TAG, APOLLO_CONF, 0)
 
-	MCFG_DEVICE_ADD( APOLLO_DMA1_TAG, AM9517A, XTAL_14_31818MHz/3 )
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(apollo_state, apollo_dma_1_hrq_changed))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(apollo_state, apollo_dma8237_out_eop))
-	MCFG_I8237_IN_MEMR_CB(READ8(apollo_state, apollo_dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(apollo_state, apollo_dma_write_byte))
-	MCFG_I8237_IN_IOR_0_CB(READ8(apollo_state, pc_dma8237_0_dack_r))
-	MCFG_I8237_IN_IOR_1_CB(READ8(apollo_state, pc_dma8237_1_dack_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(apollo_state, pc_dma8237_2_dack_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(apollo_state, pc_dma8237_3_dack_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(apollo_state, pc_dma8237_0_dack_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(apollo_state, pc_dma8237_1_dack_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(apollo_state, pc_dma8237_2_dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(apollo_state, pc_dma8237_3_dack_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(apollo_state, pc_dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(apollo_state, pc_dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(apollo_state, pc_dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(apollo_state, pc_dack3_w))
-	MCFG_DEVICE_ADD( APOLLO_DMA2_TAG, AM9517A, XTAL_14_31818MHz/3 )
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(apollo_state, apollo_dma_2_hrq_changed))
-	MCFG_I8237_IN_MEMR_CB(READ8(apollo_state, apollo_dma_read_word))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(apollo_state, apollo_dma_write_word))
-	MCFG_I8237_IN_IOR_1_CB(READ8(apollo_state, pc_dma8237_5_dack_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(apollo_state, pc_dma8237_6_dack_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(apollo_state, pc_dma8237_7_dack_r))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(apollo_state, pc_dma8237_5_dack_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(apollo_state, pc_dma8237_6_dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(apollo_state, pc_dma8237_7_dack_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(apollo_state, pc_dack4_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(apollo_state, pc_dack5_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(apollo_state, pc_dack6_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(apollo_state, pc_dack7_w))
+	MCFG_DEVICE_ADD(APOLLO_DMA1_TAG, AM9517A, 14.318181_MHz_XTAL / 3)
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, apollo_state, apollo_dma_1_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, apollo_state, apollo_dma8237_out_eop))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, apollo_state, apollo_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, apollo_state, apollo_dma_write_byte))
+	MCFG_I8237_IN_IOR_0_CB(READ8(*this, apollo_state, pc_dma8237_0_dack_r))
+	MCFG_I8237_IN_IOR_1_CB(READ8(*this, apollo_state, pc_dma8237_1_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(*this, apollo_state, pc_dma8237_2_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(*this, apollo_state, pc_dma8237_3_dack_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, apollo_state, pc_dma8237_0_dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, apollo_state, pc_dma8237_1_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, apollo_state, pc_dma8237_2_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, apollo_state, pc_dma8237_3_dack_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, apollo_state, pc_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, apollo_state, pc_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, apollo_state, pc_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, apollo_state, pc_dack3_w))
+
+	MCFG_DEVICE_ADD(APOLLO_DMA2_TAG, AM9517A, 14.318181_MHz_XTAL / 3)
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, apollo_state, apollo_dma_2_hrq_changed))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, apollo_state, apollo_dma_read_word))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, apollo_state, apollo_dma_write_word))
+	MCFG_I8237_IN_IOR_1_CB(READ8(*this, apollo_state, pc_dma8237_5_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(*this, apollo_state, pc_dma8237_6_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(*this, apollo_state, pc_dma8237_7_dack_r))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, apollo_state, pc_dma8237_5_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, apollo_state, pc_dma8237_6_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, apollo_state, pc_dma8237_7_dack_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, apollo_state, pc_dack4_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, apollo_state, pc_dack5_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, apollo_state, pc_dack6_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, apollo_state, pc_dack7_w))
 
 	MCFG_DEVICE_ADD(APOLLO_PIC1_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(apollo_state, apollo_pic8259_master_set_int_line))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, apollo_state, apollo_pic8259_master_set_int_line))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(apollo_state, apollo_pic8259_get_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, apollo_state, apollo_pic8259_get_slave_ack))
 
 	MCFG_DEVICE_ADD(APOLLO_PIC2_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(apollo_state, apollo_pic8259_slave_set_int_line))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, apollo_state, apollo_pic8259_slave_set_int_line))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD(APOLLO_PTM_TAG, PTM6840, 0)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 125000, 62500)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(apollo_state, apollo_ptm_irq_function))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, apollo_state, apollo_ptm_irq_function))
 	MCFG_DEVICE_ADD("ptmclock", CLOCK, 250000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(apollo_state, apollo_ptm_timer_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, apollo_state, apollo_ptm_timer_tick))
 
-	MCFG_MC146818_ADD( APOLLO_RTC_TAG, XTAL_32_768kHz )
-	MCFG_MC146818_UTC( true )
-	MCFG_MC146818_BINARY( false )
-	MCFG_MC146818_24_12( false )
-	MCFG_MC146818_EPOCH( 0 )
+	MCFG_DEVICE_ADD(APOLLO_RTC_TAG, MC146818, 32.768_kHz_XTAL)
+	// FIXME: is this interrupt really only connected on DN3000?
+	//MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, apollo_state, apollo_rtc_irq_function))
+	MCFG_MC146818_UTC(true)
+	MCFG_MC146818_BINARY(false)
+	MCFG_MC146818_24_12(false)
+	MCFG_MC146818_EPOCH(0)
 
-	MCFG_APOLLO_NI_ADD( APOLLO_NI_TAG, 0 )
+	MCFG_APOLLO_NI_ADD(APOLLO_NI_TAG, 0)
 
-	MCFG_APOLLO_SIO_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz )
-	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio2_irq_handler))
+	MCFG_APOLLO_SIO_ADD(APOLLO_SIO2_TAG, 3.6864_MHz_XTAL)
+	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(*this, apollo_state, sio2_irq_handler))
 
 	MCFG_DEVICE_ADD(APOLLO_ISA_TAG, ISA16, 0)
-	MCFG_ISA16_CPU(":" MAINCPU)
+	MCFG_ISA16_CPU(MAINCPU)
 	MCFG_ISA16_BUS_CUSTOM_SPACES()
-	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir2_w)) // in place of irq 2 on at irq 9 is used
-	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir7_w))
-	MCFG_ISA_OUT_IRQ10_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ11_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ12_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ14_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ15_CB(DEVWRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq0_w))
-	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq3_w))
-	MCFG_ISA_OUT_DRQ5_CB(DEVWRITELINE(APOLLO_DMA2_TAG, am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ6_CB(DEVWRITELINE(APOLLO_DMA2_TAG, am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ7_CB(DEVWRITELINE(APOLLO_DMA2_TAG, am9517a_device, dreq3_w))
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa1", apollo_isa_cards, "wdc", false)
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa2", apollo_isa_cards, "ctape", false)
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa3", apollo_isa_cards, "3c505", false)
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa4", apollo_isa_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa5", apollo_isa_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa6", apollo_isa_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa7", apollo_isa_cards, nullptr, false)
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir2_w)) // in place of irq 2 on at irq 9 is used
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir7_w))
+	MCFG_ISA_OUT_IRQ10_CB(WRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ11_CB(WRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ12_CB(WRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ14_CB(WRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ15_CB(WRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir7_w))
+	MCFG_ISA_OUT_DRQ0_CB(WRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq0_w))
+	MCFG_ISA_OUT_DRQ1_CB(WRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(WRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(WRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq3_w))
+	MCFG_ISA_OUT_DRQ5_CB(WRITELINE(APOLLO_DMA2_TAG, am9517a_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ6_CB(WRITELINE(APOLLO_DMA2_TAG, am9517a_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ7_CB(WRITELINE(APOLLO_DMA2_TAG, am9517a_device, dreq3_w))
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, "wdc", false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, "ctape", false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, "3c505", false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa7", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false)
 
 	MCFG_SOFTWARE_LIST_ADD("ctape_list", "apollo_ctape")
 MACHINE_CONFIG_END
 
 // for machines with the keyboard and a graphics head
-MACHINE_CONFIG_START( apollo )
-	MCFG_FRAGMENT_ADD(common)
-	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
-	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
-	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))
-	MCFG_APOLLO_SIO_A_TX_CALLBACK(DEVWRITELINE(APOLLO_KBD_TAG, apollo_kbd_device, rx_w))
+MACHINE_CONFIG_START(apollo_state::apollo)
+	common(config);
+	MCFG_APOLLO_SIO_ADD(APOLLO_SIO_TAG, 3.6864_MHz_XTAL)
+	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(*this, apollo_state, sio_irq_handler))
+	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(*this, apollo_state, sio_output))
+	MCFG_APOLLO_SIO_A_TX_CALLBACK(WRITELINE(APOLLO_KBD_TAG, apollo_kbd_device, rx_w))
 
 #ifdef APOLLO_XXL
-	MCFG_APOLLO_SIO_B_TX_CALLBACK(DEVWRITELINE(APOLLO_STDIO_TAG, apollo_stdio_device, rx_w))
+	MCFG_APOLLO_SIO_B_TX_CALLBACK(WRITELINE(APOLLO_STDIO_TAG, apollo_stdio_device, rx_w))
 #endif
 MACHINE_CONFIG_END
 
@@ -1179,20 +1167,20 @@ static DEVICE_INPUT_DEFAULTS_START( apollo_terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 // for headless machines using a serial console
-MACHINE_CONFIG_START( apollo_terminal )
-	MCFG_FRAGMENT_ADD(common)
-	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
-	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
-	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))
-	MCFG_APOLLO_SIO_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+MACHINE_CONFIG_START(apollo_state::apollo_terminal)
+	common(config);
+	MCFG_APOLLO_SIO_ADD(APOLLO_SIO_TAG, 3.6864_MHz_XTAL)
+	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(*this, apollo_state, sio_irq_handler))
+	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(*this, apollo_state, sio_output))
+	MCFG_APOLLO_SIO_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_b_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_b_w))
 
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", apollo_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", apollo_terminal)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(apollo_state,apollo)
+void apollo_state::init_apollo()
 {
 	MLOG1(("driver_init_apollo"));
 }
@@ -1200,13 +1188,6 @@ DRIVER_INIT_MEMBER(apollo_state,apollo)
 MACHINE_START_MEMBER(apollo_state,apollo)
 {
 	MLOG1(("machine_start_apollo"));
-
-	if (apollo_is_dn3000())
-	{
-		//MLOG1(("faking mc146818 interrupts (DN3000 only)"));
-		// fake mc146818 interrupts (DN3000 only)
-		m_dn3000_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apollo_state::apollo_rtc_timer),this));
-	}
 
 	m_dma_channel = -1;
 	m_cur_eop = false;
@@ -1242,11 +1223,6 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 
 	ptm_counter = 0;
 	sio_output_data = 0xff;
-
-	if (apollo_is_dn3000())
-	{
-		m_dn3000_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
-	}
 }
 
 #ifdef APOLLO_XXL
@@ -1324,7 +1300,8 @@ void apollo_stdio_device::device_reset()
 void apollo_stdio_device::device_timer(emu_timer &timer, device_timer_id id,
 		int param, void *ptr)
 {
-	device_serial_interface::device_timer(timer, id, param, ptr);
+//  FIXME?
+//  device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 void apollo_stdio_device::rcv_complete() // Rx completed receiving byte

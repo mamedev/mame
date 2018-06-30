@@ -67,6 +67,10 @@ void TType::buildMangledName(TString& mangledName) const
     case EbtUint:               mangledName += 'u';      break;
     case EbtInt64:              mangledName += "i64";    break;
     case EbtUint64:             mangledName += "u64";    break;
+#ifdef AMD_EXTENSIONS
+    case EbtInt16:              mangledName += "i16";    break;
+    case EbtUint16:             mangledName += "u16";    break;
+#endif
     case EbtBool:               mangledName += 'b';      break;
     case EbtAtomicUint:         mangledName += "au";     break;
     case EbtSampler:
@@ -99,6 +103,23 @@ void TType::buildMangledName(TString& mangledName) const
         case EsdSubpass:  mangledName += "P";  break;
         default: break; // some compilers want this
         }
+
+        if (sampler.hasReturnStruct()) {
+            // Name mangle for sampler return struct uses struct table index.
+            mangledName += "-tx-struct";
+
+            char text[16]; // plenty enough space for the small integers.
+            snprintf(text, sizeof(text), "%d-", sampler.structReturnIndex);
+            mangledName += text;
+        } else {
+            switch (sampler.getVectorSize()) {
+            case 1: mangledName += "1"; break;
+            case 2: mangledName += "2"; break;
+            case 3: mangledName += "3"; break;
+            case 4: break; // default to prior name mangle behavior
+            }
+        }
+
         if (sampler.ms)
             mangledName += "M";
         break;

@@ -422,7 +422,7 @@ int i8089_channel_device::execute_run()
 	else if (executing())
 	{
 		// call debugger
-		debugger_instruction_hook(m_iop, m_iop->m_current_tp);
+		m_iop->debugger_instruction_hook(m_iop->m_current_tp);
 
 		// dma transfer pending?
 		if (m_xfer_pending)

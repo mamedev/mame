@@ -89,6 +89,18 @@ void generic_latch_base_device::set_latch_written(bool latch_written)
 	}
 }
 
+READ8_MEMBER(generic_latch_base_device::acknowledge_r)
+{
+	if (!machine().side_effects_disabled())
+		set_latch_written(false);
+	return space.unmap();
+}
+
+WRITE8_MEMBER(generic_latch_base_device::acknowledge_w)
+{
+	set_latch_written(false);
+}
+
 //-------------------------------------------------
 //  generic_latch_8_device - constructor
 //-------------------------------------------------
@@ -101,7 +113,7 @@ generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, co
 
 READ8_MEMBER( generic_latch_8_device::read )
 {
-	if (!has_separate_acknowledge() && !machine().side_effect_disabled())
+	if (!has_separate_acknowledge() && !machine().side_effects_disabled())
 		set_latch_written(false);
 	return m_latched_value;
 }
@@ -121,26 +133,14 @@ WRITE8_MEMBER( generic_latch_8_device::clear_w )
 	m_latched_value = 0x00;
 }
 
-WRITE_LINE_MEMBER( generic_latch_8_device::preset_w )
+WRITE_LINE_MEMBER( generic_latch_8_device::preset )
 {
 	m_latched_value = 0xff;
 }
 
-WRITE_LINE_MEMBER( generic_latch_8_device::clear_w )
+WRITE_LINE_MEMBER( generic_latch_8_device::clear )
 {
 	m_latched_value = 0x00;
-}
-
-READ8_MEMBER( generic_latch_8_device::acknowledge_r )
-{
-	if (!machine().side_effect_disabled())
-		set_latch_written(false);
-	return space.unmap();
-}
-
-WRITE8_MEMBER( generic_latch_8_device::acknowledge_w )
-{
-	set_latch_written(false);
 }
 
 //-------------------------------------------------
@@ -184,7 +184,7 @@ generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, 
 
 READ16_MEMBER( generic_latch_16_device::read )
 {
-	if (!has_separate_acknowledge() && !machine().side_effect_disabled())
+	if (!has_separate_acknowledge() && !machine().side_effects_disabled())
 		set_latch_written(false);
 	return m_latched_value;
 }
@@ -204,12 +204,12 @@ WRITE16_MEMBER( generic_latch_16_device::clear_w )
 	m_latched_value = 0x0000;
 }
 
-WRITE_LINE_MEMBER( generic_latch_16_device::preset_w )
+WRITE_LINE_MEMBER( generic_latch_16_device::preset )
 {
 	m_latched_value = 0xffff;
 }
 
-WRITE_LINE_MEMBER( generic_latch_16_device::clear_w )
+WRITE_LINE_MEMBER( generic_latch_16_device::clear )
 {
 	m_latched_value = 0x0000;
 }

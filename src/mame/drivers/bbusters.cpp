@@ -202,6 +202,7 @@ foreground and not behind the moving elevator layer.
 #include "machine/nvram.h"
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -258,7 +259,7 @@ WRITE16_MEMBER(bbusters_state::sound_cpu_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch->write(space, 0, data&0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -281,9 +282,9 @@ READ16_MEMBER(bbusters_state::control_3_r)
 
 WRITE16_MEMBER(bbusters_state::gun_select_w)
 {
-	logerror("%08x: gun r\n",space.device().safe_pc());
+	logerror("%08x: gun r\n",m_maincpu->pc());
 
-	space.device().execute().set_input_line(2, HOLD_LINE);
+	m_maincpu->set_input_line(2, HOLD_LINE);
 
 	m_gun_select = data & 0xff;
 }
@@ -324,74 +325,79 @@ READ16_MEMBER(bbusters_state::mechatt_gun_r)
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( bbusters_map, AS_PROGRAM, 16, bbusters_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(video_w) AM_SHARE("videoram")
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0a1000, 0x0a7fff) AM_RAM     /* service mode */
-	AM_RANGE(0x0a8000, 0x0a8fff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x0a9000, 0x0affff) AM_RAM     /* service mode */
-	AM_RANGE(0x0b0000, 0x0b1fff) AM_RAM_WRITE(pf1_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x0b2000, 0x0b3fff) AM_RAM_WRITE(pf2_w) AM_SHARE("pf2_data")
-	AM_RANGE(0x0b4000, 0x0b5fff) AM_RAM     /* service mode */
-	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_SHARE("pf1_scroll_data")
-	AM_RANGE(0x0b8008, 0x0b800b) AM_WRITEONLY AM_SHARE("pf2_scroll_data")
-	AM_RANGE(0x0d0000, 0x0d0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("COINS")  /* Coins */
-	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("IN0")    /* Player 1 & 2 */
-	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("IN1")    /* Player 3 */
-	AM_RANGE(0x0e0008, 0x0e0009) AM_READ_PORT("DSW1")   /* Dip 1 */
-	AM_RANGE(0x0e000a, 0x0e000b) AM_READ_PORT("DSW2")   /* Dip 2 */
-	AM_RANGE(0x0e0018, 0x0e0019) AM_READ(sound_status_r)
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READWRITE(kludge_r, gun_select_w)
-	AM_RANGE(0x0e8002, 0x0e8003) AM_READ(control_3_r)
+void bbusters_state::bbusters_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x08ffff).ram().share("ram");
+	map(0x090000, 0x090fff).ram().w(FUNC(bbusters_state::video_w)).share("videoram");
+	map(0x0a0000, 0x0a0fff).ram().share("spriteram");
+	map(0x0a1000, 0x0a7fff).ram();     /* service mode */
+	map(0x0a8000, 0x0a8fff).ram().share("spriteram2");
+	map(0x0a9000, 0x0affff).ram();     /* service mode */
+	map(0x0b0000, 0x0b1fff).ram().w(FUNC(bbusters_state::pf1_w)).share("pf1_data");
+	map(0x0b2000, 0x0b3fff).ram().w(FUNC(bbusters_state::pf2_w)).share("pf2_data");
+	map(0x0b4000, 0x0b5fff).ram();     /* service mode */
+	map(0x0b8000, 0x0b8003).writeonly().share("pf1_scroll_data");
+	map(0x0b8008, 0x0b800b).writeonly().share("pf2_scroll_data");
+	map(0x0d0000, 0x0d0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x0e0000, 0x0e0001).portr("COINS");  /* Coins */
+	map(0x0e0002, 0x0e0003).portr("IN0");    /* Player 1 & 2 */
+	map(0x0e0004, 0x0e0005).portr("IN1");    /* Player 3 */
+	map(0x0e0008, 0x0e0009).portr("DSW1");   /* Dip 1 */
+	map(0x0e000a, 0x0e000b).portr("DSW2");   /* Dip 2 */
+	map(0x0e0018, 0x0e0019).r(FUNC(bbusters_state::sound_status_r));
+	map(0x0e8000, 0x0e8001).rw(FUNC(bbusters_state::kludge_r), FUNC(bbusters_state::gun_select_w));
+	map(0x0e8002, 0x0e8003).r(FUNC(bbusters_state::control_3_r));
 	/* AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP */
-	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITE(three_gun_output_w)
-	AM_RANGE(0x0f0018, 0x0f0019) AM_WRITE(sound_cpu_w)
-	AM_RANGE(0x0f8000, 0x0f80ff) AM_READ(eprom_r) AM_WRITEONLY AM_SHARE("eeprom") /* Eeprom */
-ADDRESS_MAP_END
+	map(0x0f0008, 0x0f0009).w(FUNC(bbusters_state::three_gun_output_w));
+	map(0x0f0018, 0x0f0019).w(FUNC(bbusters_state::sound_cpu_w));
+	map(0x0f8000, 0x0f80ff).r(FUNC(bbusters_state::eprom_r)).writeonly().share("eeprom"); /* Eeprom */
+}
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( mechatt_map, AS_PROGRAM, 16, bbusters_state )
-	AM_RANGE(0x000000, 0x06ffff) AM_ROM
-	AM_RANGE(0x070000, 0x07ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(video_w) AM_SHARE("videoram")
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0a1000, 0x0a7fff) AM_WRITENOP
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(pf1_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_SHARE("pf1_scroll_data")
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(pf2_w) AM_SHARE("pf2_data")
-	AM_RANGE(0x0c8000, 0x0c8003) AM_WRITEONLY AM_SHARE("pf2_scroll_data")
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("IN0")
-	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0e0004, 0x0e0007) AM_READ(mechatt_gun_r)
+void bbusters_state::mechatt_map(address_map &map)
+{
+	map(0x000000, 0x06ffff).rom();
+	map(0x070000, 0x07ffff).ram().share("ram");
+	map(0x090000, 0x090fff).ram().w(FUNC(bbusters_state::video_w)).share("videoram");
+	map(0x0a0000, 0x0a0fff).ram().share("spriteram");
+	map(0x0a1000, 0x0a7fff).nopw();
+	map(0x0b0000, 0x0b3fff).ram().w(FUNC(bbusters_state::pf1_w)).share("pf1_data");
+	map(0x0b8000, 0x0b8003).writeonly().share("pf1_scroll_data");
+	map(0x0c0000, 0x0c3fff).ram().w(FUNC(bbusters_state::pf2_w)).share("pf2_data");
+	map(0x0c8000, 0x0c8003).writeonly().share("pf2_scroll_data");
+	map(0x0d0000, 0x0d07ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x0e0000, 0x0e0001).portr("IN0");
+	map(0x0e0002, 0x0e0003).portr("DSW1");
+	map(0x0e0004, 0x0e0007).r(FUNC(bbusters_state::mechatt_gun_r));
 	/* AM_RANGE(0x0e4002, 0x0e4003) AM_WRITENOP  Gun force feedback? */
-	AM_RANGE(0x0e4002, 0x0e4003) AM_WRITE(two_gun_output_w)
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READWRITE(sound_status_r, sound_cpu_w)
-ADDRESS_MAP_END
+	map(0x0e4002, 0x0e4003).w(FUNC(bbusters_state::two_gun_output_w));
+	map(0x0e8000, 0x0e8001).rw(FUNC(bbusters_state::sound_status_r), FUNC(bbusters_state::sound_cpu_w));
+}
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bbusters_state )
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_status_w)
-ADDRESS_MAP_END
+void bbusters_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(bbusters_state::sound_status_w));
+}
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, bbusters_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
-ADDRESS_MAP_END
+void bbusters_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xc0, 0xc1).nopw(); /* -> Main CPU */
+}
 
-static ADDRESS_MAP_START( sounda_portmap, AS_IO, 8, bbusters_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
-	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
-ADDRESS_MAP_END
+void bbusters_state::sounda_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ymsnd", FUNC(ym2608_device::read), FUNC(ym2608_device::write));
+	map(0xc0, 0xc1).nopw(); /* -> Main CPU */
+}
 
 /******************************************************************************/
 
@@ -628,7 +634,7 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( bbusters )
+static GFXDECODE_START( gfx_bbusters )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 512, 16 )
@@ -636,7 +642,7 @@ static GFXDECODE_START( bbusters )
 	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,  1024+256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( mechatt )
+static GFXDECODE_START( gfx_mechatt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 512, 16 )
@@ -647,16 +653,16 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( bbusters )
+MACHINE_CONFIG_START(bbusters_state::bbusters)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(bbusters_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbusters_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(bbusters_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bbusters_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000) /* Accurate */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000) /* Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	MCFG_NVRAM_ADD_0FILL("eeprom")
 
@@ -666,25 +672,26 @@ static MACHINE_CONFIG_START( bbusters )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bbusters_state, screen_update_bbuster)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bbusters)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bbusters)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(bbusters_state,bbuster)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
@@ -692,16 +699,16 @@ static MACHINE_CONFIG_START( bbusters )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mechatt )
+MACHINE_CONFIG_START(bbusters_state::mechatt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(mechatt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbusters_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(mechatt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bbusters_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000) /* Accurate */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sounda_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000) /* Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sounda_portmap)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -709,23 +716,24 @@ static MACHINE_CONFIG_START( mechatt )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bbusters_state, screen_update_mechatt)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mechatt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mechatt)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(bbusters_state,mechatt)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2608, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2608, 8000000)
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
@@ -881,8 +889,8 @@ ROM_END
 
 ROM_START( bbustersj )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "bb3_ver2_j2.k10", 0x000000, 0x20000, CRC(605eb62f) SHA1(b13afd561731ad9115c5b997b8a7a79a57557612) ) /* red "J2" stamped on program labels - 2 Player version */
-	ROM_LOAD16_BYTE( "bb5_ver2_j2.k12", 0x000001, 0x20000, CRC(9deea26f) SHA1(c5436db0c55da9b0c5e0e053f59a1e17ee4690a6) )
+	ROM_LOAD16_BYTE( "bb3_ver2_j3.k10", 0x000000, 0x20000, CRC(6a1cd941) SHA1(d29775703f30b0a440e5e960006c0d33bb09992c) ) /* red "J3" stamped on program labels - 3 Player version */
+	ROM_LOAD16_BYTE( "bb5_ver2_j3.k12", 0x000001, 0x20000, CRC(7b180752) SHA1(7ae98e3eb81b19a9208e8dae1cdd64796021d034) )
 	ROM_LOAD16_BYTE( "bb-2.k8",    0x040000, 0x20000, CRC(20141805) SHA1(0958579681bda81bcf48d020a14bc147c1e575f1) )
 	ROM_LOAD16_BYTE( "bb-4.k11",   0x040001, 0x20000, CRC(d482e0e9) SHA1(e56ca92965e8954b613ba4b0e3975e3a12840c30) )
 
@@ -929,8 +937,8 @@ ROM_END
 
 ROM_START( bbustersja )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "bb3_ver2_j3.k10", 0x000000, 0x20000, CRC(6a1cd941) SHA1(d29775703f30b0a440e5e960006c0d33bb09992c) ) /* red "J3" stamped on program labels - 3 Player version */
-	ROM_LOAD16_BYTE( "bb5_ver2_j3.k12", 0x000001, 0x20000, CRC(7b180752) SHA1(7ae98e3eb81b19a9208e8dae1cdd64796021d034) )
+	ROM_LOAD16_BYTE( "bb3_ver2_j2.k10", 0x000000, 0x20000, CRC(605eb62f) SHA1(b13afd561731ad9115c5b997b8a7a79a57557612) ) /* red "J2" stamped on program labels - 2 Player version */
+	ROM_LOAD16_BYTE( "bb5_ver2_j2.k12", 0x000001, 0x20000, CRC(9deea26f) SHA1(c5436db0c55da9b0c5e0e053f59a1e17ee4690a6) )
 	ROM_LOAD16_BYTE( "bb-2.k8",    0x040000, 0x20000, CRC(20141805) SHA1(0958579681bda81bcf48d020a14bc147c1e575f1) )
 	ROM_LOAD16_BYTE( "bb-4.k11",   0x040001, 0x20000, CRC(d482e0e9) SHA1(e56ca92965e8954b613ba4b0e3975e3a12840c30) )
 
@@ -1161,13 +1169,13 @@ ROM_END
 /******************************************************************************/
 
 // as soon as you calibrate the guns in test mode the game refuses to boot
-GAME( 1989, bbusters,   0,        bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (World)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersu,  bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (US, Version 3)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersua, bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersj,  bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (Japan, Version 2, 2 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersja, bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (Japan, Version 2, 3 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbusters,   0,        bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (World)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersu,  bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 3)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersua, bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 2)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersj,  bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 3 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersja, bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 2 Player)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mechatt,    0,        mechatt,  mechatt,  bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (World)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mechattj,   mechatt,  mechatt,  mechattj, bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (Japan)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mechattu,   mechatt,  mechatt,  mechattu, bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (US)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mechattu1,  mechatt,  mechatt,  mechattu, bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (US, Version 1, Single Player)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechatt,    0,        mechatt,  mechatt,  bbusters_state, empty_init, ROT0, "SNK", "Mechanized Attack (World)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechattj,   mechatt,  mechatt,  mechattj, bbusters_state, empty_init, ROT0, "SNK", "Mechanized Attack (Japan)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechattu,   mechatt,  mechatt,  mechattu, bbusters_state, empty_init, ROT0, "SNK", "Mechanized Attack (US)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechattu1,  mechatt,  mechatt,  mechattu, bbusters_state, empty_init, ROT0, "SNK", "Mechanized Attack (US, Version 1, Single Player)", MACHINE_SUPPORTS_SAVE )

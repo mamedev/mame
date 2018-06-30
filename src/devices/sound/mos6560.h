@@ -48,7 +48,7 @@
 	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE) \
 	MCFG_SCREEN_VISIBLE_AREA(MOS6560_MAME_XPOS, MOS6560_MAME_XPOS + MOS6560_MAME_XSIZE - 1, MOS6560_MAME_YPOS, MOS6560_MAME_YPOS + MOS6560_MAME_YSIZE - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
-	MCFG_SOUND_ADD(_tag, MOS6560, _clock) \
+	MCFG_DEVICE_ADD(_tag, MOS6560, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_DEVICE_ADDRESS_MAP(0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(1, _colorram_map)
@@ -60,7 +60,7 @@
 	MCFG_SCREEN_SIZE((MOS6561_XSIZE + 7) & ~7, MOS6561_YSIZE) \
 	MCFG_SCREEN_VISIBLE_AREA(MOS6561_MAME_XPOS, MOS6561_MAME_XPOS + MOS6561_MAME_XSIZE - 1, MOS6561_MAME_YPOS, MOS6561_MAME_YPOS + MOS6561_MAME_YSIZE - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
-	MCFG_SOUND_ADD(_tag, MOS6561, _clock) \
+	MCFG_DEVICE_ADD(_tag, MOS6561, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_DEVICE_ADDRESS_MAP(0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(1, _colorram_map)
@@ -72,17 +72,17 @@
 	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE) \
 	MCFG_SCREEN_VISIBLE_AREA(0, 23*8 - 1, 0, 22*8 - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
-	MCFG_SOUND_ADD(_tag, MOS656X_ATTACK_UFO, _clock) \
+	MCFG_DEVICE_ADD(_tag, MOS656X_ATTACK_UFO, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_DEVICE_ADDRESS_MAP(0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(1, _colorram_map)
 
 
 #define MCFG_MOS6560_POTX_CALLBACK(_read) \
-	devcb = &mos6560_device::set_potx_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<mos6560_device &>(*device).set_potx_rd_callback(DEVCB_##_read);
 
 #define MCFG_MOS6560_POTY_CALLBACK(_read) \
-	devcb = &mos6560_device::set_poty_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<mos6560_device &>(*device).set_poty_rd_callback(DEVCB_##_read);
 
 
 
@@ -136,8 +136,8 @@ class mos6560_device : public device_t,
 public:
 	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_potx_rd_callback(device_t &device, Object &&cb) { return downcast<mos6560_device &>(device).m_read_potx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_poty_rd_callback(device_t &device, Object &&cb) { return downcast<mos6560_device &>(device).m_read_poty.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_potx_rd_callback(Object &&cb) { return m_read_potx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_poty_rd_callback(Object &&cb) { return m_read_poty.set_callback(std::forward<Object>(cb)); }
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -150,6 +150,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void mos6560_colorram_map(address_map &map);
+	void mos6560_videoram_map(address_map &map);
 protected:
 	enum
 	{

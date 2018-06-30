@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "patinhofeio_cpu.h"
+#include "patinho_feio_dasm.h"
 #include "debugger.h"
 #include "includes/patinhofeio.h" // FIXME: this is a dependency from devices on MAME
 
@@ -52,13 +53,14 @@ void patinho_feio_cpu_device::compute_effective_address(unsigned int addr){
 DEFINE_DEVICE_TYPE(PATO_FEIO_CPU, patinho_feio_cpu_device, "pato_feio_cpu", "Patinho Feio CPU")
 
 //Internal 4kbytes of RAM
-static ADDRESS_MAP_START(prog_8bit, AS_PROGRAM, 8, patinho_feio_cpu_device)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("internalram")
-ADDRESS_MAP_END
+void patinho_feio_cpu_device::prog_8bit(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("internalram");
+}
 
 patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, PATO_FEIO_CPU, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(prog_8bit))
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(patinho_feio_cpu_device::prog_8bit), this))
 	, m_icount(0)
 	, m_rc_read_cb(*this)
 	, m_buttons_read_cb(*this)
@@ -144,7 +146,7 @@ void patinho_feio_cpu_device::device_start()
 			m_iodev_write_cb[i].resolve();
 	}
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void patinho_feio_cpu_device::device_reset()
@@ -174,7 +176,7 @@ void patinho_feio_cpu_device::execute_run() {
 		m_ext = READ_ACC_EXTENSION_REG();
 		m_idx = READ_INDEX_REG();
 		((patinho_feio_state*) owner())->update_panel(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		if (!m_run){
 			if (!m_buttons_read_cb.isnull()){
@@ -356,14 +358,14 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x92:
 			//ST 1 = "Se T=1, Pula"
 			//       If T is one, skip the next instruction
-						if ((FLAGS & T) == 1)
+						if ((FLAGS & T) == T)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x93:
 			//STM 1 = "Se T=1, Pula e muda"
 			//        If T is one, skip the next instruction
 			//        and toggle T.
-			if ((FLAGS & T) == 1){
+			if ((FLAGS & T) == T){
 				INCREMENT_PC_4K; //skip
 				FLAGS &= ~T; //set T=0
 			}
@@ -782,8 +784,7 @@ void patinho_feio_cpu_device::execute_instruction()
 	printf("unimplemented opcode: 0x%02X\n", m_opcode);
 }
 
-offs_t patinho_feio_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> patinho_feio_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( patinho_feio );
-	return CPU_DISASSEMBLE_NAME(patinho_feio)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<patinho_feio_disassembler>();
 }

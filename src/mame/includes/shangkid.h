@@ -2,6 +2,7 @@
 // copyright-holders:Phil Stroffolino
 
 #include "sound/ay8910.h"
+#include "emupal.h"
 
 class shangkid_state : public driver_device
 {
@@ -57,9 +58,9 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_DRIVER_INIT(dynamski);
-	DECLARE_DRIVER_INIT(shangkid);
-	DECLARE_DRIVER_INIT(chinhero);
+	void init_dynamski();
+	void init_shangkid();
+	void init_chinhero();
 	DECLARE_VIDEO_START(shangkid);
 	DECLARE_PALETTE_INIT(dynamski);
 	DECLARE_MACHINE_RESET(shangkid);
@@ -70,4 +71,18 @@ public:
 	void shangkid_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dynamski_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	void dynamski_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void dynamski(machine_config &config);
+	void chinhero(machine_config &config);
+	void shangkid(machine_config &config);
+	void chinhero_bbx_map(address_map &map);
+	void chinhero_bbx_portmap(address_map &map);
+	void chinhero_main_map(address_map &map);
+	void chinhero_sound_map(address_map &map);
+	void dynamski_map(address_map &map);
+	void dynamski_portmap(address_map &map);
+	void shangkid_bbx_map(address_map &map);
+	void shangkid_bbx_portmap(address_map &map);
+	void shangkid_main_map(address_map &map);
+	void shangkid_sound_map(address_map &map);
+	void sound_portmap(address_map &map);
 };

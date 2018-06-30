@@ -45,7 +45,7 @@ WRITE8_MEMBER( decodmd_type1_device::ctrl_w )
 		m_blank = 0;
 		m_frameswap = false;
 		m_status = 0;
-		m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 	m_ctrl = data;
 }
@@ -185,25 +185,27 @@ void decodmd_type1_device::set_busy(uint8_t input, uint8_t val)
 
 TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type1_device::dmd_nmi)
 {
-	m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-static ADDRESS_MAP_START( decodmd1_map, AS_PROGRAM, 8, decodmd_type1_device )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("dmdbank2") // last 16k of ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("dmdbank1")
-	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("dmdram")
-ADDRESS_MAP_END
+void decodmd_type1_device::decodmd1_map(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("dmdbank2"); // last 16k of ROM
+	map(0x4000, 0x7fff).bankr("dmdbank1");
+	map(0x8000, 0x9fff).bankrw("dmdram");
+}
 
-static ADDRESS_MAP_START( decodmd1_io_map, AS_IO, 8, decodmd_type1_device )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(dmd_port_r, dmd_port_w)
-ADDRESS_MAP_END
+void decodmd_type1_device::decodmd1_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(FUNC(decodmd_type1_device::dmd_port_r), FUNC(decodmd_type1_device::dmd_port_w));
+}
 
-MACHINE_CONFIG_MEMBER( decodmd_type1_device::device_add_mconfig )
+MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", Z80, XTAL_8MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(decodmd1_map)
-	MCFG_CPU_IO_MAP(decodmd1_io_map)
+	MCFG_DEVICE_ADD("dmdcpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(decodmd1_map)
+	MCFG_DEVICE_IO_MAP(decodmd1_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
@@ -222,11 +224,11 @@ MACHINE_CONFIG_MEMBER( decodmd_type1_device::device_add_mconfig )
 
 	MCFG_DEVICE_ADD("bitlatch", HC259, 0) // U4
 	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(MEMBANK("dmdbank1")) MCFG_DEVCB_MASK(0x07) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(decodmd_type1_device, blank_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(decodmd_type1_device, status_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(decodmd_type1_device, rowdata_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(decodmd_type1_device, rowclock_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(decodmd_type1_device, test_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, decodmd_type1_device, blank_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, decodmd_type1_device, status_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, decodmd_type1_device, rowdata_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, decodmd_type1_device, rowclock_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, decodmd_type1_device, test_w))
 MACHINE_CONFIG_END
 
 
@@ -264,12 +266,6 @@ void decodmd_type1_device::device_reset()
 	m_rowselect = 0;
 	m_blank = 0;
 	m_frameswap = false;
-}
-
-void decodmd_type1_device::static_set_gfxregion(device_t &device, const char *tag)
-{
-	decodmd_type1_device &cpuboard = downcast<decodmd_type1_device &>(device);
-	cpuboard.m_gfxtag = tag;
 }
 
 uint32_t decodmd_type1_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )

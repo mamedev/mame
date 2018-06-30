@@ -20,13 +20,15 @@ public:
 	tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	void data_192x4(address_map &map);
+
 	// overrides
 	//virtual void device_start() override;
 
 	virtual u32 decode_fixed(u16 op) override { return 0; } // not yet
 	virtual u32 decode_micro(u8 sel) override;
 	virtual void device_reset() override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 };

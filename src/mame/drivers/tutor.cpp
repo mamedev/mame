@@ -227,6 +227,11 @@ public:
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void pyuutajr(machine_config &config);
+	void tutor(machine_config &config);
+	void pyuutajr_mem(address_map &map);
+	void tutor_io(address_map &map);
+	void tutor_memmap(address_map &map);
 };
 
 
@@ -265,8 +270,10 @@ void tutor_state::machine_reset()
 	m_tape_interrupt_enable = 0;
 	m_centronics_busy = 0;
 
-	// Enable auto wait states by lowering READY during reset
-	m_maincpu->ready_line(CLEAR_LINE);
+	// Disable auto wait states; with enabled wait states, cassette loading fails
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
+	m_maincpu->hold_line(CLEAR_LINE);
 }
 
 /*
@@ -484,7 +491,7 @@ WRITE8_MEMBER( tutor_state::tutor_printer_w )
 	{
 	case 0x10:
 		/* data */
-		m_cent_data_out->write(space, 0, data);
+		m_cent_data_out->write(data);
 		break;
 
 	case 0x40:
@@ -544,39 +551,41 @@ WRITE8_MEMBER( tutor_state::test_w )
 }
 #endif
 
-static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8, tutor_state)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") AM_WRITENOP
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") AM_WRITENOP
-	AM_RANGE(0xc000, 0xdfff) AM_NOP /*free for expansion, or cartridge ROM?*/
+void tutor_state::tutor_memmap(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1").nopw();
+	map(0x8000, 0xbfff).bankr("bank2").nopw();
+	map(0xc000, 0xdfff).noprw(); /*free for expansion, or cartridge ROM?*/
 
-	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)    /*VDP data*/
-	AM_RANGE(0xe002, 0xe002) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)/*VDP status*/
-	AM_RANGE(0xe100, 0xe1ff) AM_READWRITE(tutor_mapper_r, tutor_mapper_w)   /*cartridge mapper*/
-	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("sn76489a", sn76489a_device, write)    /*sound chip*/
-	AM_RANGE(0xe800, 0xe8ff) AM_READWRITE(tutor_printer_r, tutor_printer_w) /*printer*/
-	AM_RANGE(0xee00, 0xeeff) AM_READNOP AM_WRITE( tutor_cassette_w)     /*cassette interface*/
+	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));    /*VDP data*/
+	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));/*VDP status*/
+	map(0xe100, 0xe1ff).rw(FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
+	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::command_w));    /*sound chip*/
+	map(0xe800, 0xe8ff).rw(FUNC(tutor_state::tutor_printer_r), FUNC(tutor_state::tutor_printer_w)); /*printer*/
+	map(0xee00, 0xeeff).nopr().w(FUNC(tutor_state::tutor_cassette_w));     /*cassette interface*/
 
-	AM_RANGE(0xf000, 0xffff) AM_READ(tutor_highmem_r) AM_WRITENOP /*free for expansion (and internal processor RAM)*/
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).r(FUNC(tutor_state::tutor_highmem_r)).nopw(); /*free for expansion (and internal processor RAM)*/
+}
 
-static ADDRESS_MAP_START(pyuutajr_mem, AS_PROGRAM, 8, tutor_state)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") AM_WRITENOP
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") AM_WRITENOP
-	AM_RANGE(0xc000, 0xdfff) AM_NOP /*free for expansion, or cartridge ROM?*/
+void tutor_state::pyuutajr_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1").nopw();
+	map(0x8000, 0xbfff).bankr("bank2").nopw();
+	map(0xc000, 0xdfff).noprw(); /*free for expansion, or cartridge ROM?*/
 
-	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)    /*VDP data*/
-	AM_RANGE(0xe002, 0xe002) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)/*VDP status*/
-	AM_RANGE(0xe100, 0xe1ff) AM_READWRITE(tutor_mapper_r, tutor_mapper_w)   /*cartridge mapper*/
-	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("sn76489a", sn76489a_device, write)    /*sound chip*/
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("LINE0")
-	AM_RANGE(0xea00, 0xea00) AM_READ_PORT("LINE1")
-	AM_RANGE(0xec00, 0xec00) AM_READ_PORT("LINE2")
-	AM_RANGE(0xee00, 0xee00) AM_READ_PORT("LINE3")
+	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));    /*VDP data*/
+	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));/*VDP status*/
+	map(0xe100, 0xe1ff).rw(FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
+	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::command_w));    /*sound chip*/
+	map(0xe800, 0xe800).portr("LINE0");
+	map(0xea00, 0xea00).portr("LINE1");
+	map(0xec00, 0xec00).portr("LINE2");
+	map(0xee00, 0xee00).portr("LINE3");
 
-	AM_RANGE(0xf000, 0xffff) AM_READ(tutor_highmem_r) AM_WRITENOP /*free for expansion (and internal processor RAM)*/
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).r(FUNC(tutor_state::tutor_highmem_r)).nopw(); /*free for expansion (and internal processor RAM)*/
+}
 
 /*
     CRU map summary:
@@ -588,10 +597,11 @@ ADDRESS_MAP_END
     >ed00(r): tape input
 */
 
-static ADDRESS_MAP_START(tutor_io, AS_IO, 8, tutor_state)
-	AM_RANGE(0xec0, 0xec7) AM_READ(key_r)               /*keyboard interface*/
-	AM_RANGE(0xed0, 0xed0) AM_READ(tutor_cassette_r)        /*cassette interface*/
-ADDRESS_MAP_END
+void tutor_state::tutor_io(address_map &map)
+{
+	map(0xec0, 0xec7).r(FUNC(tutor_state::key_r));               /*keyboard interface*/
+	map(0xed0, 0xed0).r(FUNC(tutor_state::tutor_cassette_r));        /*cassette interface*/
+}
 
 /* tutor keyboard: 56 keys
 
@@ -732,29 +742,28 @@ static INPUT_PORTS_START(pyuutajr)
 		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tutor )
+MACHINE_CONFIG_START(tutor_state::tutor)
 	// basic machine hardware
 	// TMS9995 CPU @ 10.7 MHz
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_10_738635MHz, tutor_memmap, tutor_io)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(10'738'635), tutor_memmap, tutor_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn76489a", SN76489A, 3579545)   /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("sn76489a", SN76489A, 3579545)   /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(tutor_state, write_centronics_busy))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tutor_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -767,9 +776,10 @@ static MACHINE_CONFIG_START( tutor )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tutor")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pyuutajr, tutor )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pyuutajr_mem)
+MACHINE_CONFIG_START(tutor_state::pyuutajr)
+	tutor(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pyuutajr_mem)
 	//MCFG_DEVICE_REMOVE("centronics")
 	//MCFG_DEVICE_REMOVE("cassette")
 MACHINE_CONFIG_END
@@ -795,7 +805,7 @@ ROM_START(pyuutajr)
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(2ca37e62) SHA1(eebdc5c37d3b532edd5e5ca65eb785269ebd1ac0))      /* system ROM */
 ROM_END
 
-//   YEAR    NAME      PARENT      COMPAT  MACHINE     INPUT     STATE          INIT    COMPANY   FULLNAME           FLAGS
-COMP(1983?,  tutor,    0,          0,      tutor,      tutor,    tutor_state,   0,      "Tomy",   "Tomy Tutor" ,     0)
-COMP(1982,   pyuuta,   tutor,      0,      tutor,      tutor,    tutor_state,   0,      "Tomy",   "Tomy Pyuuta" ,    0)
-COMP(1983,   pyuutajr, tutor,      0,      pyuutajr,   pyuutajr, tutor_state,   0,      "Tomy",   "Tomy Pyuuta Jr.", 0)
+//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS        INIT        COMPANY   FULLNAME           FLAGS
+COMP( 1983?, tutor,    0,      0,      tutor,    tutor,    tutor_state, empty_init, "Tomy",   "Tomy Tutor" ,     0)
+COMP( 1982,  pyuuta,   tutor,  0,      tutor,    tutor,    tutor_state, empty_init, "Tomy",   "Tomy Pyuuta" ,    0)
+COMP( 1983,  pyuutajr, tutor,  0,      pyuutajr, pyuutajr, tutor_state, empty_init, "Tomy",   "Tomy Pyuuta Jr.", 0)

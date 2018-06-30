@@ -27,10 +27,8 @@ DEFINE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device,  "cxd8654q",  "CXD8654Q GPU")
 
 psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
 	, m_vblank_handler(*this)
-#if PSXGPU_DEBUG_VIEWER
-	, m_screen(*this, "screen")
-#endif
 {
 }
 
@@ -38,7 +36,7 @@ void psxgpu_device::device_start()
 {
 	m_vblank_handler.resolve_safe();
 
-	if( m_type == CXD8538Q )
+	if (type() == CXD8538Q)
 	{
 		psx_gpu_init( 1 );
 	}
@@ -120,8 +118,8 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 void psxgpu_device::DebugMeshInit()
 {
-	int width = m_screen->width();
-	int height = m_screen->height();
+	int width = screen().width();
+	int height = screen().height();
 
 	m_debug.b_mesh = 0;
 	m_debug.b_texture = 0;
@@ -136,8 +134,8 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 {
 	int n_coord;
 	int n_colour;
-	int width = m_screen->width();
-	int height = m_screen->height();
+	int width = screen().width();
+	int height = screen().height();
 
 	n_coordx += m_n_displaystartx;
 	n_coordy += n_displaystarty;
@@ -334,8 +332,8 @@ int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 
 	if( m_debug.b_texture )
 	{
-		int width = m_screen->width();
-		int height = m_screen->height();
+		int width = screen().width();
+		int height = screen().height();
 
 		for( n_y = 0; n_y < height; n_y++ )
 		{
@@ -363,7 +361,7 @@ int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 				}
 				p_n_interleave[ n_x ] = p_p_vram[ n_yi ][ n_xi ];
 			}
-			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, m_screen->palette().pens() );
+			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, screen().palette().pens() );
 		}
 	}
 	return m_debug.b_texture;
@@ -445,7 +443,7 @@ void psxgpu_device::updatevisiblearea()
 #endif
 
 	visarea.set(0, n_screenwidth - 1, 0, n_screenheight - 1);
-	machine().first_screen()->configure(n_screenwidth, n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
+	screen().configure(n_screenwidth, n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
 }
 
 void psxgpu_device::psx_gpu_init( int n_gputype )
@@ -572,7 +570,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	// icky!!!
 	machine().save().save_memory( this, "globals", nullptr, 0, "m_packet", (uint8_t *)&m_packet, 1, sizeof( m_packet ) );
 
-	save_pointer(NAME(p_vram.get()), width * height );
+	save_pointer(NAME(p_vram), width * height );
 	save_item(NAME(n_gpu_buffer_offset));
 	save_item(NAME(n_vramx));
 	save_item(NAME(n_vramy));
@@ -3194,6 +3192,7 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 		case 0x40:
 		case 0x41:
 		case 0x42:
+		case 0x43:
 			if( n_gpu_buffer_offset < 2 )
 			{
 				n_gpu_buffer_offset++;
@@ -3309,7 +3308,9 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 			}
 			break;
 		case 0x68:
+		case 0x69:
 		case 0x6a:
+		case 0x6b:
 			if( n_gpu_buffer_offset < 1 )
 			{
 				n_gpu_buffer_offset++;
@@ -3326,6 +3327,8 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 			break;
 		case 0x70:
 		case 0x71:
+		case 0x72:
+		case 0x73:
 			/* 8*8 rectangle */
 			if( n_gpu_buffer_offset < 1 )
 			{
@@ -3357,6 +3360,8 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 			break;
 		case 0x78:
 		case 0x79:
+		case 0x7a:
+		case 0x7b:
 			/* 16*16 rectangle */
 			if( n_gpu_buffer_offset < 1 )
 			{
@@ -3804,14 +3809,14 @@ PALETTE_INIT_MEMBER( psxgpu_device, psx )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( psxgpu_device::device_add_mconfig )
+MACHINE_CONFIG_START(psxgpu_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE( 1024, 1024 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
 	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, psxgpu_device, update_screen )
-	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(&psxgpu_device::vblank, (psxgpu_device *) owner));
+	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(&psxgpu_device::vblank, this));
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD( "palette", 65536 )

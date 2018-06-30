@@ -9,13 +9,14 @@
 
 #pragma once
 
-#ifndef DRIVERS_NOVAGBASE_H
-#define DRIVERS_NOVAGBASE_H
+#ifndef MAME_INCLUDES_NOVAGBASE_H
+#define MAME_INCLUDES_NOVAGBASE_H
 
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/beep.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 
 class novagbase_state : public driver_device
 {
@@ -50,6 +51,7 @@ public:
 	u16 m_led_select;
 	u16 m_led_data;
 	u8 m_lcd_control;
+	u8 m_lcd_data;
 
 	u16 read_inputs(int columns);
 
@@ -80,4 +82,4 @@ protected:
 INPUT_PORTS_EXTERN( novag_cb_buttons );
 INPUT_PORTS_EXTERN( novag_cb_magnets );
 
-#endif // DRIVERS_NOVAGBASE_H
+#endif // MAME_INCLUDES_NOVAGBASE_H

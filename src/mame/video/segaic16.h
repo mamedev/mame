@@ -13,7 +13,7 @@
 typedef device_delegate<void (int, uint16_t*, uint16_t*, uint16_t*, uint16_t*)> segaic16_video_pagelatch_delegate;
 
 #define MCFG_SEGAIC16_VIDEO_SET_PAGELATCH_CB( _class, _method) \
-	segaic16_video_device::set_pagelatch_cb(*device, segaic16_video_pagelatch_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+	downcast<segaic16_video_device &>(*device).set_pagelatch_cb(segaic16_video_pagelatch_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 
 /*************************************
@@ -98,12 +98,16 @@ public:
 		std::unique_ptr<uint16_t[]>        buffer;                         /* buffered data */
 	};
 
+	template <typename T> segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&decode_tag)
+		: segaic16_video_device(mconfig, tag, owner, clock)
+	{
+		m_gfxdecode.set_tag(std::forward<T>(decode_tag));
+	}
 
 	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_pagelatch_cb(device_t &device,segaic16_video_pagelatch_delegate newtilecb);
+	// configuration
+	void set_pagelatch_cb(segaic16_video_pagelatch_delegate newtilecb) { m_pagelatch_cb = newtilecb; }
 
 	uint8_t m_display_enable;
 	optional_shared_ptr<uint16_t> m_tileram;
@@ -160,11 +164,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(SEGAIC16VID, segaic16_video_device)
-
-#define MCFG_SEGAIC16VID_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGAIC16VID, 0)
-
-#define MCFG_SEGAIC16VID_GFXDECODE(_gfxtag) \
-	segaic16_video_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif // MAME_VIDEO_SEGAIC16_H

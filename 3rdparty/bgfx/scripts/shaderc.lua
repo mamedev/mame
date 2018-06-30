@@ -213,13 +213,19 @@ project "fcpp"
 			"/wd4706", -- warning C4706: assignment within conditional expression
 		}
 
+	configuration { "not vs*" }
+		buildoptions {
+			"-Wno-implicit-fallthrough",
+		}
+
 	configuration {}
 
 project "shaderc"
 	kind "ConsoleApp"
 
 	includedirs {
-		path.join(BX_DIR, "include"),
+		path.join(BX_DIR,   "include"),
+		path.join(BIMG_DIR, "include"),
 		path.join(BGFX_DIR, "include"),
 
 		path.join(BGFX_DIR, "3rdparty/dxsdk/include"),

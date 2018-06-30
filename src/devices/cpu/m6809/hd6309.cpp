@@ -118,23 +118,35 @@ March 2013 NPW:
 #include "debugger.h"
 #include "hd6309.h"
 #include "m6809inl.h"
+#include "6x09dasm.h"
 
 
 //**************************************************************************
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(HD6309, hd6309_device, "hd6309", "HD6309")
+DEFINE_DEVICE_TYPE(HD6309, hd6309_device, "hd6309", "Hitachi HD6309")
+DEFINE_DEVICE_TYPE(HD6309E, hd6309e_device, "hd6309e", "Hitachi HD6309E")
 
 
 //-------------------------------------------------
 //  hd6309_device - constructor
 //-------------------------------------------------
 
-hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6809_base_device(mconfig, tag, owner, clock, HD6309, 4),
+hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int divider) :
+	m6809_base_device(mconfig, tag, owner, clock, type, divider),
 	m_md(0),
 	m_temp_im(0)
+{
+}
+
+hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	hd6309_device(mconfig, tag, owner, clock, HD6309, 4)
+{
+}
+
+hd6309e_device::hd6309e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	hd6309_device(mconfig, tag, owner, clock, HD6309E, 1)
 {
 }
 
@@ -285,38 +297,13 @@ void hd6309_device::device_post_load()
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t hd6309_device::disasm_min_opcode_bytes() const
-{
-	return 1;
-}
-
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t hd6309_device::disasm_max_opcode_bytes() const
-{
-	return 5;
-}
-
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t hd6309_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> hd6309_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( hd6309 );
-	return CPU_DISASSEMBLE_NAME(hd6309)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<hd6309_disassembler>();
 }
 
 

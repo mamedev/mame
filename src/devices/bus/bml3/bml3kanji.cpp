@@ -78,7 +78,7 @@ void bml3bus_kanji_device::device_start()
 	m_rom = memregion(KANJI_ROM_REGION)->base();
 
 	// install into memory
-	address_space &space_prg = machine().firstcpu->space(AS_PROGRAM);
+	address_space &space_prg = m_bml3bus->space();
 	space_prg.install_readwrite_handler(0xff75, 0xff76, read8_delegate( FUNC(bml3bus_kanji_device::bml3_kanji_r), this), write8_delegate(FUNC(bml3bus_kanji_device::bml3_kanji_w), this) );
 }
 

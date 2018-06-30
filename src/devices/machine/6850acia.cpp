@@ -16,7 +16,7 @@
     MACROS
 ***************************************************************************/
 
-//#define VERBOSE 1
+#define VERBOSE 1
 //#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
@@ -275,6 +275,19 @@ READ8_MEMBER( acia6850_device::data_r )
 	update_irq();
 
 	return m_rdr;
+}
+
+WRITE8_MEMBER( acia6850_device::write )
+{
+	if (BIT(offset, 0))
+		data_w(space, 0, data);
+	else
+		control_w(space, 0, data);
+}
+
+READ8_MEMBER( acia6850_device::read )
+{
+	return BIT(offset, 0) ? data_r(space, 0) : status_r(space, 0);
 }
 
 DECLARE_WRITE_LINE_MEMBER( acia6850_device::write_cts )
@@ -569,15 +582,20 @@ void acia6850_device::output_irq(int irq)
 	{
 		m_irq = irq;
 
-		if (irq)
-		{
-			m_status &= ~SR_IRQ;
-		}
-		else
-		{
-			m_status |= SR_IRQ;
-		}
-
-		m_irq_handler(!m_irq);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(acia6850_device::delayed_output_irq), this), irq);
 	}
+}
+
+TIMER_CALLBACK_MEMBER(acia6850_device::delayed_output_irq)
+{
+	if (m_irq)
+	{
+		m_status &= ~SR_IRQ;
+	}
+	else
+	{
+		m_status |= SR_IRQ;
+	}
+
+	m_irq_handler(!m_irq);
 }

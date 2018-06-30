@@ -106,7 +106,7 @@ IRQ1
 0x00000001 DMA Player bus
 
 */
-void _3do_state::m_3do_request_fiq(uint32_t irq_req, uint8_t type)
+void _3do_state::m_request_fiq(uint32_t irq_req, uint8_t type)
 {
 	if(type)
 		m_clio.irq1 |= irq_req;
@@ -121,7 +121,7 @@ void _3do_state::m_3do_request_fiq(uint32_t irq_req, uint8_t type)
 	if((m_clio.irq0 & m_clio.irq0_enable) || (m_clio.irq1 & m_clio.irq1_enable))
 	{
 		//printf("Go irq %08x & %08x %08x & %08x\n",m_clio.irq0, m_clio.irq0_enable, m_clio.irq1, m_clio.irq1_enable);
-		generic_pulse_irq_line(*m_maincpu, ARM7_FIRQ_LINE, 1);
+		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
 
@@ -153,7 +153,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( _3do_state::timer_x16_cb )
 			if(m_clio.timer_count[i] == 0xffffffff) // timer hit
 			{
 				if(i & 1) // odd timer irq fires
-					m_3do_request_fiq(8 << (7-(i >> 1)),0);
+					m_request_fiq(8 << (7-(i >> 1)),0);
 
 				carry_val = 1;
 
@@ -170,8 +170,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( _3do_state::timer_x16_cb )
 	}
 }
 
-READ8_MEMBER(_3do_state::_3do_nvarea_r) { return m_nvmem[offset]; }
-WRITE8_MEMBER(_3do_state::_3do_nvarea_w) { m_nvmem[offset] = data; }
+READ8_MEMBER(_3do_state::nvarea_r) { return m_nvmem[offset]; }
+WRITE8_MEMBER(_3do_state::nvarea_w) { m_nvmem[offset] = data; }
 
 
 
@@ -200,7 +200,7 @@ WRITE8_MEMBER(_3do_state::_3do_nvarea_w) { m_nvmem[offset] = data; }
 3022630
 */
 
-READ32_MEMBER(_3do_state::_3do_slow2_r){
+READ32_MEMBER(_3do_state::slow2_r){
 	uint32_t data = 0;
 
 	logerror( "%08X: UNK_318 read offset = %08X\n", m_maincpu->pc(), offset );
@@ -215,7 +215,7 @@ READ32_MEMBER(_3do_state::_3do_slow2_r){
 }
 
 
-WRITE32_MEMBER(_3do_state::_3do_slow2_w)
+WRITE32_MEMBER(_3do_state::slow2_w)
 {
 	logerror( "%08X: UNK_318 write offset = %08X, data = %08X, mask = %08X\n", m_maincpu->pc(), offset, data, mem_mask );
 
@@ -237,7 +237,7 @@ WRITE32_MEMBER(_3do_state::_3do_slow2_w)
 
 
 
-READ32_MEMBER(_3do_state::_3do_svf_r)
+READ32_MEMBER(_3do_state::svf_r)
 {
 	uint32_t addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	uint32_t *p = m_vram + addr;
@@ -262,7 +262,7 @@ READ32_MEMBER(_3do_state::_3do_svf_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_3do_state::_3do_svf_w)
+WRITE32_MEMBER(_3do_state::svf_w)
 {
 	uint32_t addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	uint32_t *p = m_vram + addr;
@@ -302,7 +302,7 @@ WRITE32_MEMBER(_3do_state::_3do_svf_w)
 
 
 
-READ32_MEMBER(_3do_state::_3do_madam_r){
+READ32_MEMBER(_3do_state::madam_r){
 	logerror( "%08X: MADAM read offset = %08X\n", m_maincpu->pc(), offset*4 );
 
 	switch( offset ) {
@@ -461,7 +461,7 @@ READ32_MEMBER(_3do_state::_3do_madam_r){
 }
 
 
-WRITE32_MEMBER(_3do_state::_3do_madam_w){
+WRITE32_MEMBER(_3do_state::madam_w){
 	if(offset == 0)
 	{
 		if(data == 0x0a)
@@ -655,9 +655,9 @@ WRITE32_MEMBER(_3do_state::_3do_madam_w){
 
 
 
-READ32_MEMBER(_3do_state::_3do_clio_r)
+READ32_MEMBER(_3do_state::clio_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		if(offset != 0x200/4 && offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4 &&
 			offset != 0x118/4 && offset != 0x11c/4)
@@ -775,14 +775,14 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 		return m_clio.uncle_rom;
 
 	default:
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			logerror( "%08X: unhandled CLIO read offset = %08X\n", m_maincpu->pc(), offset * 4 );
 		break;
 	}
 	return 0;
 }
 
-WRITE32_MEMBER(_3do_state::_3do_clio_w)
+WRITE32_MEMBER(_3do_state::clio_w)
 {
 	if(offset != 0x200/4 && offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4 &&
 		offset != 0x118/4 && offset != 0x11c/4)
@@ -856,22 +856,22 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 	case 0x0040/4:
 		LOG(("%08x PEND0\n",data));
 		m_clio.irq0 |= data;
-		m_3do_request_fiq(0,0);
+		m_request_fiq(0,0);
 		break;
 	case 0x0044/4:
 		//LOG(("%08x PEND0 CLEAR\n",data));
 		m_clio.irq0 &= ~data;
-		m_3do_request_fiq(0,0);
+		m_request_fiq(0,0);
 		break;
 	case 0x0048/4:
 		LOG(("%08x MASK0\n",data));
 		m_clio.irq0_enable |= data;
-		m_3do_request_fiq(0,0);
+		m_request_fiq(0,0);
 		break;
 	case 0x004c/4:
 		LOG(("%08x MASK0 CLEAR\n",data));
 		m_clio.irq0_enable &= ~data;
-		m_3do_request_fiq(0,0);
+		m_request_fiq(0,0);
 		break;
 	case 0x0050/4:
 		m_clio.mode |= data;
@@ -888,22 +888,22 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 	case 0x0060/4:
 		LOG(("%08x PEND1\n",data));
 		m_clio.irq1 |= data;
-		m_3do_request_fiq(0,1);
+		m_request_fiq(0,1);
 		break;
 	case 0x0064/4:
 		LOG(("%08x PEND1 CLEAR\n",data));
 		m_clio.irq1 &= ~data;
-		m_3do_request_fiq(0,1);
+		m_request_fiq(0,1);
 		break;
 	case 0x0068/4:
 		LOG(("%08x MASK1\n",data));
 		m_clio.irq1_enable |= data;
-		m_3do_request_fiq(0,1);
+		m_request_fiq(0,1);
 		break;
 	case 0x006c/4:
 		LOG(("%08x MASK1 CLEAR\n",data));
 		m_clio.irq1_enable &= ~data;
-		m_3do_request_fiq(0,1);
+		m_request_fiq(0,1);
 		break;
 	case 0x0080/4:
 		m_clio.hdelay = data;
@@ -1030,7 +1030,7 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 
 /* 9 -> 5 bits translation */
 
-VIDEO_START_MEMBER(_3do_state,_3do)
+void _3do_state::video_start()
 {
 	/* We only keep the odd bits and get rid of the even bits */
 //  for ( int i = 0; i < 512; i++ )
@@ -1040,7 +1040,7 @@ VIDEO_START_MEMBER(_3do_state,_3do)
 }
 
 
-uint32_t _3do_state::screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t _3do_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint32_t *source_p = m_vram + 0x1c0000 / 4;
 
@@ -1096,35 +1096,31 @@ uint32_t _3do_state::screen_update__3do(screen_device &screen, bitmap_rgb32 &bit
  *
  */
 
-void _3do_state::m_3do_madam_init( void )
+void _3do_state::m_madam_init( void )
 {
 	memset( &m_madam, 0, sizeof(MADAM) );
 	m_madam.revision = 0x01020000;
 	m_madam.msysbits = 0x51;
 }
 
-void _3do_state::m_3do_slow2_init( void )
+void _3do_state::m_slow2_init( void )
 {
 	m_slow2.cg_input = 0;
 	m_slow2.cg_output = 0x00000005 - 1;
 }
 
-void _3do_state::m_3do_clio_init( screen_device *screen )
+void _3do_state::m_clio_init()
 {
 	memset( &m_clio, 0, sizeof(CLIO) );
-	m_clio.screen = screen;
+	m_clio.screen = m_screen;
 	m_clio.revision = 0x02022000 /* 0x04000000 */;
 	m_clio.unclerev = 0x03800000;
 	m_clio.expctl = 0x80;    /* ARM has the expansion bus */
-	m_dspp.N = std::make_unique<uint16_t[]>(0x800 );
-	m_dspp.EI = std::make_unique<uint16_t[]>(0x400 );
-	m_dspp.EO = std::make_unique<uint16_t[]>(0x400 );
+	m_dspp.N = make_unique_clear<uint16_t[]>(0x800);
+	m_dspp.EI = make_unique_clear<uint16_t[]>(0x400);
+	m_dspp.EO = make_unique_clear<uint16_t[]>(0x400);
 
-	memset(m_dspp.N.get(), 0, sizeof(uint16_t) * 0x400);
-	memset(m_dspp.EI.get(), 0, sizeof(uint16_t) * 0x400);
-	memset(m_dspp.EO.get(), 0, sizeof(uint16_t) * 0x400);
-
-	save_pointer(NAME(m_dspp.N.get()), 0x800);
-	save_pointer(NAME(m_dspp.EI.get()), 0x400);
-	save_pointer(NAME(m_dspp.EO.get()), 0x400);
+	save_pointer(NAME(m_dspp.N), 0x800);
+	save_pointer(NAME(m_dspp.EI), 0x400);
+	save_pointer(NAME(m_dspp.EO), 0x400);
 }

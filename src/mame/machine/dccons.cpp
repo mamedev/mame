@@ -49,7 +49,7 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 	//osd_printf_debug("ATAPI: xfer_end.  xferlen = %d\n", atapi_xferlen);
 
 	m_ata->write_dmack(1);
-
+	atapi_xfercomplete = 0;
 	while (atapi_xferlen > 0 )
 	{
 		struct sh4_ddt_dma ddtdata;
@@ -63,6 +63,7 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 		}
 
 		atapi_xferlen -= 2048;
+		atapi_xfercomplete += 2048;
 
 		// perform the DMA
 		ddtdata.destination = atapi_xferbase;   // destination address
@@ -125,7 +126,7 @@ READ32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_r )
 			break;
 		case SB_GDLEND:
 			//machine().debug_break();
-			return atapi_xferlen; // TODO: check me
+			return atapi_xfercomplete;
 		case SB_SECUR_EADR:     // always read 0xFF on hardware
 			return 0x000000ff;
 		case SB_SECUR_STATE:    // state of BIOS checksum security system (R/O):

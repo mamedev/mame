@@ -98,7 +98,7 @@ Notes:
 #include "speaker.h"
 
 
-#define PIXEL_CLOCK         (XTAL_18_432MHz/3)
+#define PIXEL_CLOCK         (XTAL(18'432'000)/3)
 
 #define HTOTAL              (396)
 #define HBEND               (0)
@@ -147,37 +147,40 @@ WRITE8_MEMBER( zodiack_state::control_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zodiack_state )
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x5800, 0x5fff) AM_RAM
-	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("DSW0") AM_WRITE(control_w)
-	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
-	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN0")
-	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN1")
-	AM_RANGE(0x6090, 0x6090) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(master_soundlatch_w)
-	AM_RANGE(0x7000, 0x7000) AM_READNOP AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)  /* NOP??? */
-	AM_RANGE(0x7100, 0x7100) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x7200, 0x7200) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(attributes_w) AM_SHARE("attributeram")
-	AM_RANGE(0x9040, 0x905f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9060, 0x907f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x9080, 0x93ff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram_2")
-	AM_RANGE(0xc000, 0xcfff) AM_ROM
-ADDRESS_MAP_END
+void zodiack_state::main_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0x5800, 0x5fff).ram();
+	map(0x6081, 0x6081).portr("DSW0").w(FUNC(zodiack_state::control_w));
+	map(0x6082, 0x6082).portr("DSW1");
+	map(0x6083, 0x6083).portr("IN0");
+	map(0x6084, 0x6084).portr("IN1");
+	map(0x6090, 0x6090).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(zodiack_state::master_soundlatch_w));
+	map(0x7000, 0x7000).nopr().w("watchdog", FUNC(watchdog_timer_device::reset_w));  /* NOP??? */
+	map(0x7100, 0x7100).w(FUNC(zodiack_state::nmi_mask_w));
+	map(0x7200, 0x7200).w(FUNC(zodiack_state::flipscreen_w));
+	map(0x9000, 0x903f).ram().w(FUNC(zodiack_state::attributes_w)).share("attributeram");
+	map(0x9040, 0x905f).ram().share("spriteram");
+	map(0x9060, 0x907f).ram().share("bulletsram");
+	map(0x9080, 0x93ff).ram();
+	map(0xa000, 0xa3ff).ram().w(FUNC(zodiack_state::videoram_w)).share("videoram");
+	map(0xb000, 0xb3ff).ram().w(FUNC(zodiack_state::videoram2_w)).share("videoram_2");
+	map(0xc000, 0xcfff).rom();
+}
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, zodiack_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(sound_nmi_enable_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
-ADDRESS_MAP_END
+void zodiack_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x4000, 0x4000).w(FUNC(zodiack_state::sound_nmi_enable_w));
+	map(0x6000, 0x6000).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, zodiack_state  )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void zodiack_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 
 
@@ -542,7 +545,7 @@ static const gfx_layout bulletlayout =
 	0   /* no use */
 };
 
-static GFXDECODE_START( zodiack )
+static GFXDECODE_START( gfx_zodiack )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   8*4    , 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, spritelayout, 0      , 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, bulletlayout, 8*4+8*2, 1 )
@@ -563,18 +566,18 @@ void zodiack_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( zodiack )
+MACHINE_CONFIG_START(zodiack_state::zodiack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zodiack_state, zodiack_main_nmi_gen)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zodiack_state, irq0_line_hold, 1*60) // sound related - unknown source, timing is guessed
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", zodiack_state, zodiack_main_nmi_gen)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(zodiack_state, irq0_line_hold, 1*60) // sound related - unknown source, timing is guessed
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zodiack_state, zodiack_sound_nmi_gen, 8*60) // sound tempo - unknown source, timing is guessed
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(zodiack_state, zodiack_sound_nmi_gen, 8*60) // sound tempo - unknown source, timing is guessed
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -584,17 +587,17 @@ static MACHINE_CONFIG_START( zodiack )
 	MCFG_SCREEN_UPDATE_DRIVER(zodiack_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zodiack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zodiack)
 	MCFG_PALETTE_ADD("palette", 4*8+2*8+2*1)
 	MCFG_PALETTE_INDIRECT_ENTRIES(48+1)
 	MCFG_PALETTE_INIT_OWNER(zodiack_state,zodiack)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -726,19 +729,19 @@ ROM_START( bounty2 ) // The PCB uses a large CPU epoxy module marked "CPU PACKII
 	ROM_LOAD( "mb7051.2b",   0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
 ROM_END
 
-DRIVER_INIT_MEMBER(zodiack_state,zodiack)
+void zodiack_state::init_zodiack()
 {
 	m_percuss_hardware = false;
 }
 
-DRIVER_INIT_MEMBER(zodiack_state,percuss)
+void zodiack_state::init_percuss()
 {
 	m_percuss_hardware = true;
 }
 
-GAME( 1983, zodiack,  0,      zodiack, zodiack,  zodiack_state, zodiack, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
-GAME( 1983, dogfight, 0,      zodiack, dogfight, zodiack_state, zodiack, ROT270, "Orca / Thunderbolt",                    "Dog Fight (Thunderbolt)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
-GAME( 1982, moguchan, 0,      zodiack, moguchan, zodiack_state, percuss, ROT270, "Orca (Eastern Commerce Inc. license)",  "Mogu Chan (bootleg?)",    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
-GAME( 1981, percuss,  0,      zodiack, percuss,  zodiack_state, percuss, ROT270, "Orca",                                  "The Percussor",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bounty,   0,      zodiack, bounty,   zodiack_state, percuss, ROT180, "Orca",                                  "The Bounty (set 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bounty2,  bounty, zodiack, bounty,   zodiack_state, percuss, ROT180, "Orca",                                  "The Bounty (set 2)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // seems to use a different memory map
+GAME( 1983, zodiack,  0,      zodiack, zodiack,  zodiack_state, init_zodiack, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
+GAME( 1983, dogfight, 0,      zodiack, dogfight, zodiack_state, init_zodiack, ROT270, "Orca / Thunderbolt",                    "Dog Fight (Thunderbolt)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
+GAME( 1982, moguchan, 0,      zodiack, moguchan, zodiack_state, init_percuss, ROT270, "Orca (Eastern Commerce Inc. license)",  "Mogu Chan (bootleg?)",    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
+GAME( 1981, percuss,  0,      zodiack, percuss,  zodiack_state, init_percuss, ROT270, "Orca",                                  "The Percussor",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bounty,   0,      zodiack, bounty,   zodiack_state, init_percuss, ROT180, "Orca",                                  "The Bounty (set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bounty2,  bounty, zodiack, bounty,   zodiack_state, init_percuss, ROT180, "Orca",                                  "The Bounty (set 2)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // seems to use a different memory map

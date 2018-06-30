@@ -195,7 +195,7 @@ WRITE8_MEMBER( k053251_device::write )
 			}
 
 			if (!m_tilemaps_set)
-				space.machine().tilemap().mark_all_dirty();
+				machine().tilemap().mark_all_dirty();
 		}
 		else if (offset == 10)
 		{
@@ -211,7 +211,7 @@ WRITE8_MEMBER( k053251_device::write )
 			}
 
 			if (!m_tilemaps_set)
-				space.machine().tilemap().mark_all_dirty();
+				machine().tilemap().mark_all_dirty();
 		}
 	}
 }

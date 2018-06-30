@@ -6,6 +6,10 @@
 
 premake.cmake = { }
 
+--
+-- Register the "cmake" action
+--
+
 newaction {
 	trigger         = "cmake",
 	shortname       = "CMake",
@@ -13,7 +17,7 @@ newaction {
 	valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
 	valid_languages = { "C", "C++" },
 	valid_tools     = {
-	cc   = { "gcc" },
+		cc   = { "gcc" },
 	},
 	onsolution = function(sln)
 		premake.generate(sln, "CMakeLists.txt", premake.cmake.workspace)
@@ -28,4 +32,3 @@ newaction {
 		premake.clean.file(prj, "%%/CMakeLists.txt")
 	end
 }
-

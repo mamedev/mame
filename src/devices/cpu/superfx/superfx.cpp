@@ -5,7 +5,7 @@
 #include "superfx.h"
 
 
-DEFINE_DEVICE_TYPE(SUPERFX, superfx_device, "superfx", "SuperFX")
+DEFINE_DEVICE_TYPE(SUPERFX, superfx_device, "superfx", "Nintendo SuperFX")
 
 superfx_device::superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SUPERFX, tag, owner, clock)
@@ -704,7 +704,7 @@ void superfx_device::device_start()
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().formatstr("%06X");
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().formatstr("%06X");
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -787,7 +787,7 @@ void superfx_device::execute_run()
 			break;
 		}
 
-		debugger_instruction_hook(this, (m_pbr << 16) | m_r[15]);
+		debugger_instruction_hook((m_pbr << 16) | m_r[15]);
 
 		op = superfx_peekpipe();
 
@@ -1445,12 +1445,12 @@ void superfx_device::execute_run()
 	}
 }
 
-offs_t superfx_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+u16 superfx_device::get_alt() const
 {
-	uint8_t  op = *(uint8_t *)(opram + 0);
-	uint8_t  param0 = *(uint8_t *)(opram + 1);
-	uint8_t  param1 = *(uint8_t *)(opram + 2);
-	uint16_t alt = m_sfr & SUPERFX_SFR_ALT;
+	return m_sfr & SUPERFX_SFR_ALT;
+}
 
-	return superfx_dasm_one(stream, pc, op, param0, param1, alt);
+std::unique_ptr<util::disasm_interface> superfx_device::create_disassembler()
+{
+	return std::make_unique<superfx_disassembler>(this);
 }

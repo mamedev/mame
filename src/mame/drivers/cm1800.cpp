@@ -2,15 +2,15 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        CM-1800
-        (note name is in cyrilic letters)
+CM-1800
+(note name is in cyrilic letters)
 
-        more info at http://ru.wikipedia.org/wiki/%D0%A1%D0%9C_%D0%AD%D0%92%D0%9C
-            and http://sapr.lti-gti.ru/index.php?id=66
+more info at http://ru.wikipedia.org/wiki/%D0%A1%D0%9C_%D0%AD%D0%92%D0%9C
+         and http://www.computer-museum.ru/histussr/sm1800.htm
 
-        26/04/2011 Skeleton driver.
+2011-04-26 Skeleton driver.
 
-Commands:
+Commands to be in uppercase:
 C Compare
 D Dump
 F Fill
@@ -35,7 +35,8 @@ to be a save command.
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/terminal.h"
+#include "machine/ay31015.h"
+#include "bus/rs232/rs232.h"
 
 
 class cm1800_state : public driver_device
@@ -43,52 +44,39 @@ class cm1800_state : public driver_device
 public:
 	cm1800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_terminal(*this, "terminal")
 		, m_maincpu(*this, "maincpu")
+		, m_uart(*this, "uart")
 	{ }
 
-	DECLARE_READ8_MEMBER( term_status_r );
-	DECLARE_READ8_MEMBER( term_r );
-	void kbd_put(u8 data);
+	DECLARE_READ8_MEMBER(uart_status_r);
 
+	void cm1800(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
-
-	uint8_t m_term_data;
-
-	required_device<generic_terminal_device> m_terminal;
 	required_device<cpu_device> m_maincpu;
+	required_device<ay31015_device> m_uart;
 };
 
-READ8_MEMBER( cm1800_state::term_status_r )
+READ8_MEMBER(cm1800_state::uart_status_r)
 {
-	return (m_term_data) ? 5 : 4;
+	return (m_uart->dav_r()) | (m_uart->tbmt_r() << 2);
 }
 
-READ8_MEMBER( cm1800_state::term_r )
+void cm1800_state::mem_map(address_map &map)
 {
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom().region("roms", 0);
+	map(0x0800, 0xffff).ram();
 }
 
-void cm1800_state::kbd_put(u8 data)
+void cm1800_state::io_map(address_map &map)
 {
-	m_term_data = data;
+	map.unmap_value_high();
+	map(0x00, 0x00).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0x01, 0x01).r(FUNC(cm1800_state::uart_status_r));
 }
-
-static ADDRESS_MAP_START(cm1800_mem, AS_PROGRAM, 8, cm1800_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x0800, 0xffff ) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cm1800_io , AS_IO, 8, cm1800_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_READ(term_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ(term_status_r)
-	AM_RANGE(0x03, 0x03) // unknown uart, initialisation bytes 08 then 48, so not 6551.
-ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( cm1800 )
@@ -97,17 +85,32 @@ INPUT_PORTS_END
 
 void cm1800_state::machine_reset()
 {
+	m_uart->write_xr(0);
+	m_uart->write_xr(1);
+	m_uart->write_swe(0);
+	m_uart->write_np(1);
+	m_uart->write_tsb(0);
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_eps(1);
+	m_uart->write_cs(1);
+	m_uart->write_cs(0);
 }
 
-static MACHINE_CONFIG_START( cm1800 )
+MACHINE_CONFIG_START(cm1800_state::cm1800)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
-	MCFG_CPU_PROGRAM_MAP(cm1800_mem)
-	MCFG_CPU_IO_MAP(cm1800_io)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(cm1800_state, kbd_put))
+	MCFG_DEVICE_ADD("uart", AY51013, 0) // exact uart type is unknown
+	MCFG_AY51013_TX_CLOCK(153600)
+	MCFG_AY51013_RX_CLOCK(153600)
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_AY51013_AUTO_RDAV(true)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -118,5 +121,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY      FULLNAME   FLAGS */
-COMP( 1981, cm1800,  0,      0,       cm1800,    cm1800, cm1800_state,  0,    "<unknown>", "CM-1800", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME   FLAGS */
+COMP( 1981, cm1800, 0,      0,      cm1800,  cm1800, cm1800_state, empty_init, "<unknown>", "CM-1800", MACHINE_NO_SOUND_HW)

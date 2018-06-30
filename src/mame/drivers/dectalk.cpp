@@ -252,20 +252,23 @@ dgc (dg(no!spam)cx@mac.com)
 class dectalk_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_OUTFIFO_READ
-	};
-
 	dectalk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dsp(*this, "dsp"),
-		m_duart(*this, "duartn68681"),
+		m_duart(*this, "duart"),
 		m_nvram(*this, "x2212"),
 		m_dac(*this, "dac")
 	{
 	}
+
+	void dectalk(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_OUTFIFO_READ
+	};
 
 	// input fifo, between m68k and tms32010
 	uint16_t m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
@@ -277,27 +280,27 @@ public:
 	uint8_t m_outfifo_count;
 	uint8_t m_outfifo_tail_ptr;
 	uint8_t m_outfifo_head_ptr;
-	uint8_t m_infifo_semaphore; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
-	uint8_t m_spc_error_latch; // latch for error status of speech dsp, d-latch 74ls74 @ E64 'upper half'
-	uint8_t m_m68k_spcflags_latch; // latch for initializing the speech dsp, d-latch 74ls74 @ E29 'lower half', AND latch for spc irq enable, d-latch 74ls74 @ E29 'upper half'; these are stored in bits 0 and 6 respectively, the rest of the bits stored here MUST be zeroed!
-	uint8_t m_m68k_tlcflags_latch; // latch for telephone interface stuff, d-latches 74ls74 @ E93 'upper half' and @ 103 'upper and lower halves'
-	uint8_t m_simulate_outfifo_error; // simulate an error on the outfifo, which does something unusual to the dsp latches
-	uint8_t m_tlc_tonedetect;
-	uint8_t m_tlc_ringdetect;
+	bool m_infifo_semaphore; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
+	bool m_spc_error_latch; // latch for error status of speech dsp, d-latch 74ls74 @ E64 'upper half'
+	uint8_t m_m68k_spcflags_latch; // latch for initializing the speech dsp, d-latch 74ls74 @ E29 'lower half', AND latch for spc irq enable, d-latch 74ls74 @ E29 'upper half'; these are stored in bits 0 and 6 respectively, the rest of the bits stored here MUST be zeroed! // TODO: Split this into two separate booleans!
+	uint8_t m_m68k_tlcflags_latch; // latch for telephone interface stuff, d-latches 74ls74 @ E93 'upper half' and @ 103 'upper and lower halves' // TODO: Split this into three separate booleans!
+	bool m_simulate_outfifo_error; // simulate an error on the outfifo, which does something unusual to the dsp latches
+	bool m_tlc_tonedetect;
+	bool m_tlc_ringdetect;
 	uint8_t m_tlc_dtmf; // dtmf holding reg
 	uint8_t m_duart_inport; // low 4 bits of duart input
 	uint8_t m_duart_outport; // most recent duart output
-	uint8_t m_hack_self_test; // temp variable for hack below
+	bool m_hack_self_test_is_second_read; // temp variable for hack below
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
-	required_device<mc68681_device> m_duart;
+	required_device<scn2681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
-	DECLARE_WRITE_LINE_MEMBER(dectalk_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(dectalk_duart_txa);
-	DECLARE_READ8_MEMBER(dectalk_duart_input);
-	DECLARE_WRITE8_MEMBER(dectalk_duart_output);
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(duart_txa);
+	DECLARE_READ8_MEMBER(duart_input);
+	DECLARE_WRITE8_MEMBER(duart_output);
 	DECLARE_READ8_MEMBER(nvram_recall);
 	DECLARE_WRITE8_MEMBER(led_write);
 	DECLARE_WRITE8_MEMBER(nvram_store);
@@ -315,36 +318,39 @@ public:
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 	emu_timer *m_outfifo_read_timer;
-	void dectalk_outfifo_check();
-	void dectalk_clear_all_fifos();
-	void dectalk_semaphore_w(uint16_t data);
-	uint16_t dectalk_outfifo_r();
+	void outfifo_check();
+	void clear_all_fifos();
+	void dsp_semaphore_w(bool state);
+	uint16_t dsp_outfifo_r();
 	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
-protected:
+	void m68k_mem(address_map &map);
+	void tms32010_io(address_map &map);
+	void tms32010_mem(address_map &map);
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
 /* 2681 DUART */
-WRITE_LINE_MEMBER(dectalk_state::dectalk_duart_irq_handler)
+WRITE_LINE_MEMBER(dectalk_state::duart_irq_handler)
 {
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, HOLD_LINE, vector);
 }
 
-READ8_MEMBER(dectalk_state::dectalk_duart_input)
+READ8_MEMBER(dectalk_state::duart_input)
 {
 	uint8_t data = 0;
 	data |= m_duart_inport&0xf;
 	data |= (ioport("duart_in")->read()&0xf0);
-	if ((m_hack_self_test == 1) && (ioport("hacks")->read()&0x01)) data |= 0x10; // hack to prevent hang if selftest disable bit is kept low past the first read; i suppose the proper use of this bit was an incremental switch, or perhaps its expecting an interrupt later from serial in or tone in? added a dipswitch to disable the hack for testing
-		m_hack_self_test = 1;
+	if ((m_hack_self_test_is_second_read) && (ioport("hacks")->read()&0x01)) data |= 0x10; // hack to prevent hang if selftest disable bit is kept low past the first read; i suppose the proper use of this bit was an incremental switch, or perhaps its expecting an interrupt later from serial in or tone in? added a dipswitch to disable the hack for testing
+		m_hack_self_test_is_second_read = true;
 	return data;
 }
 
-WRITE8_MEMBER(dectalk_state::dectalk_duart_output)
+WRITE8_MEMBER(dectalk_state::duart_output)
 {
 	m_duart_outport = data;
 #ifdef SERIAL_TO_STDERR
@@ -352,7 +358,7 @@ WRITE8_MEMBER(dectalk_state::dectalk_duart_output)
 #endif
 }
 
-WRITE_LINE_MEMBER(dectalk_state::dectalk_duart_txa)
+WRITE_LINE_MEMBER(dectalk_state::duart_txa)
 {
 	//TODO: this needs to be plumbed so it shows up optionally on a second terminal somehow, or connects to diserial
 	// it is the second 'alternate' serial connection on the DTC-01, used for a serial passthru and other stuff.
@@ -365,7 +371,7 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_duart_txa)
 #define SPC_INITIALIZE state->m_m68k_spcflags_latch&0x1 // speech initialize flag
 #define SPC_IRQ_ENABLED ((state->m_m68k_spcflags_latch&0x40)>>6) // irq enable flag
 
-void dectalk_state::dectalk_outfifo_check ()
+void dectalk_state::outfifo_check()
 {
 	// check if output fifo is full; if it isn't, set the int on the dsp
 	if (m_outfifo_count < 16)
@@ -374,7 +380,7 @@ void dectalk_state::dectalk_outfifo_check ()
 		m_dsp->set_input_line(0, CLEAR_LINE); // TMS32010 INT
 }
 
-void dectalk_state::dectalk_clear_all_fifos(  )
+void dectalk_state::clear_all_fifos()
 {
 	// clear fifos (TODO: memset would work better here...)
 	int i;
@@ -384,14 +390,14 @@ void dectalk_state::dectalk_clear_all_fifos(  )
 	for (i=0; i<32; i++) m_infifo[i] = 0;
 	m_infifo_count = 0;
 	m_infifo_tail_ptr = m_infifo_head_ptr = 0;
-	dectalk_outfifo_check();
+	outfifo_check();
 }
 
 // helper for dsp infifo_semaphore flag to make dealing with interrupts easier
-void dectalk_state::dectalk_semaphore_w ( uint16_t data )
+void dectalk_state::dsp_semaphore_w(bool state)
 {
-	m_infifo_semaphore = data&1;
-	if ((m_infifo_semaphore == 1) && (m_m68k_spcflags_latch&0x40))
+	m_infifo_semaphore = state;
+	if ((m_infifo_semaphore) && (m_m68k_spcflags_latch&0x40))
 	{
 #ifdef VERBOSE
 		logerror("speech int fired!\n");
@@ -403,7 +409,7 @@ void dectalk_state::dectalk_semaphore_w ( uint16_t data )
 }
 
 // read the output fifo and set the interrupt line active on the dsp
-uint16_t dectalk_state::dectalk_outfifo_r (  )
+uint16_t dectalk_state::dsp_outfifo_r (  )
 {
 	uint16_t data = 0xffff;
 #ifdef USE_LOOSE_TIMING_OUTPUT
@@ -422,7 +428,7 @@ uint16_t dectalk_state::dectalk_outfifo_r (  )
 		m_outfifo_count--;
 	}
 	m_outfifo_tail_ptr&=0xf;
-	dectalk_outfifo_check();
+	outfifo_check();
 	return ((data&0xfff0)^0x8000); // yes this is right, top bit is inverted and bottom 4 are ignored
 	//return data; // not right but want to get it working first
 }
@@ -430,21 +436,21 @@ uint16_t dectalk_state::dectalk_outfifo_r (  )
 /* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
 WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 {
-	m_hack_self_test = 0; // hack
+	m_hack_self_test_is_second_read = false; // hack
 	// stuff that is DIRECTLY affected by the RESET line
-	machine().device<x2212_device>("x2212")->recall(0);
-	machine().device<x2212_device>("x2212")->recall(1);
-	machine().device<x2212_device>("x2212")->recall(0); // nvram recall
+	m_nvram->recall(0);
+	m_nvram->recall(1);
+	m_nvram->recall(0); // nvram recall
 	m_m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	m_m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
 	m_duart->reset(); // reset the DUART
 	// stuff that is INDIRECTLY affected by the RESET line
-	dectalk_clear_all_fifos(); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
-	dectalk_semaphore_w(0); // on the original DECtalk DTC-01 pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
-	m_spc_error_latch = 0; // spc error latch is cleared on /reset
+	clear_all_fifos(); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
+	dsp_semaphore_w(false); // on the original DECtalk DTC-01 pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
+	m_spc_error_latch = false; // spc error latch is cleared on /reset
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
-	m_tlc_tonedetect = 0; // TODO, needed for selftest pass
-	m_tlc_ringdetect = 0; // TODO
+	m_tlc_tonedetect = false; // TODO, needed for selftest pass
+	m_tlc_ringdetect = false; // TODO
 	m_tlc_dtmf = 0; // TODO
 	m_duart_inport = 0xf;
 	m_duart_outport = 0;
@@ -472,9 +478,9 @@ void dectalk_state::machine_start()
 	save_item(NAME(m_tlc_dtmf));
 	save_item(NAME(m_duart_inport));
 	save_item(NAME(m_duart_outport));
-	save_item(NAME(m_hack_self_test));
-	dectalk_clear_all_fifos();
-	m_simulate_outfifo_error = 0;
+	save_item(NAME(m_hack_self_test_is_second_read));
+	clear_all_fifos();
+	m_simulate_outfifo_error = false; // TODO: HACK for now, should be hooked to a fake dipswitch to simulate fifo errors
 }
 
 void dectalk_state::machine_reset()
@@ -541,8 +547,8 @@ READ16_MEMBER(dectalk_state::m68k_spcflags_r)// 68k read from the speech flags
 {
 	uint8_t data = 0;
 	data |= m_m68k_spcflags_latch; // bits 0 and 6
-	data |= m_spc_error_latch<<5; // bit 5
-	data |= m_infifo_semaphore<<7; // bit 7
+	data |= m_spc_error_latch?0x20:0; // bit 5
+	data |= m_infifo_semaphore?0x80:0; // bit 7
 #ifdef SPC_LOG_68K
 	logerror("m68k: SPC flags read, returning data = %04X\n",data);
 #endif
@@ -564,11 +570,11 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 #ifdef SPC_LOG_68K
 		logerror(" | 0x01: initialize speech: fifos reset, clear error+semaphore latches and dsp reset\n");
 #endif
-		dectalk_clear_all_fifos();
+		clear_all_fifos();
 		m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 		// clear the two speech side latches
-		m_spc_error_latch = 0;
-		dectalk_semaphore_w(0);
+		m_spc_error_latch = false;
+		dsp_semaphore_w(false);
 	}
 	else // (data&0x1) == 0
 	{
@@ -583,15 +589,15 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 		logerror(" | 0x02: clear error+semaphore latches\n");
 #endif
 		// clear the two speech side latches
-		m_spc_error_latch = 0;
-		dectalk_semaphore_w(0);
+		m_spc_error_latch = false;
+		dsp_semaphore_w(false);
 	}
 	if ((data&0x40) == 0x40) // bit 6 - spc irq enable
 	{
 #ifdef SPC_LOG_68K
 		logerror(" | 0x40: speech int enabled\n");
 #endif
-		if (m_infifo_semaphore == 1)
+		if (m_infifo_semaphore)
 		{
 #ifdef SPC_LOG_68K
 			logerror("    speech int fired!\n");
@@ -611,9 +617,9 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 READ16_MEMBER(dectalk_state::m68k_tlcflags_r)// dtmf flags read
 {
 	uint16_t data = 0;
-	data |= m_m68k_tlcflags_latch; // bits 6, 8, 14;
-	data |= m_tlc_tonedetect<<7; // bit 7 is tone detect
-	data |= m_tlc_ringdetect<<14; // bit 15 is ring detect
+	data |= m_m68k_tlcflags_latch; // bits 6, 8, 14: tone detected int enable, answer phone relay enable, and ring int enable respectively
+	data |= m_tlc_tonedetect?0x0080:0; // bit 7 is tone detected
+	data |= m_tlc_ringdetect?0x8000:0; // bit 15 is ring detected
 #ifdef TLC_LOG
 	logerror("m68k: TLC flags read, returning data = %04X\n",data);
 #endif
@@ -626,12 +632,12 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 	logerror("m68k: TLC flags written with %04X, only storing %04X\n",data, data&0x4140);
 #endif
 	m_m68k_tlcflags_latch = data&0x4140; // ONLY store bits 6 8 and 14!
-	if ((data&0x40) == 0x40) // bit 6: tone detect interrupt enable
+	if (data&0x40) // bit 6: tone detect interrupt enable
 	{
 #ifdef TLC_LOG
 		logerror(" | 0x40: tone detect int enabled\n");
 #endif
-		if (m_tlc_tonedetect == 1)
+		if (m_tlc_tonedetect)
 		{
 #ifdef TLC_LOG
 			logerror("    TLC int fired!\n");
@@ -644,10 +650,10 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 #ifdef TLC_LOG
 		logerror(" | 0x40 = 0: tone detect int disabled\n");
 #endif
-	if (((data&0x4000)!=0x4000) || (m_tlc_ringdetect == 0)) // check to be sure we don't disable int if both ints fired at once
+	if ((!(data&0x4000)) || (!m_tlc_ringdetect)) // check to be sure we don't disable int if both ints fired at once
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
 	}
-	if ((data&0x100) == 0x100) // bit 8: answer phone relay enable
+	if (data&0x100) // bit 8: answer phone relay enable
 	{
 #ifdef TLC_LOG
 		logerror(" | 0x100: answer phone relay enabled\n");
@@ -659,7 +665,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 		logerror(" | 0x100 = 0: answer phone relay disabled\n");
 #endif
 	}
-	if ((data&0x4000) == 0x4000) // bit 14: ring int enable
+	if (data&0x4000) // bit 14: ring int enable
 	{
 #ifdef TLC_LOG
 		logerror(" | 0x4000: ring detect int enabled\n");
@@ -677,7 +683,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 #ifdef TLC_LOG
 		logerror(" | 0x4000 = 0: ring detect int disabled\n");
 #endif
-	if (((data&0x40)!=0x40) || (m_tlc_tonedetect == 0)) // check to be sure we don't disable int if both ints fired at once
+	if ((!(data&0x40)) || (!m_tlc_tonedetect)) // check to be sure we don't disable int if both ints fired at once
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
 	}
 }
@@ -702,7 +708,7 @@ WRITE16_MEMBER(dectalk_state::spc_latch_outfifo_error_stats)// latch 74ls74 @ E6
 #ifdef SPC_LOG_DSP
 	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);
 #endif
-	dectalk_semaphore_w((~m_simulate_outfifo_error)&1); // always set to 1 here, unless outfifo desync-between-the-three-parallel-fifo-chips error occurs.
+	dsp_semaphore_w(m_simulate_outfifo_error?false:true); // always set to true here, unless outfifo desync-between-the-three-parallel-fifo-chips error occurs.
 	m_spc_error_latch = (data&1); // latch the dsp 'soft error' state aka "ERROR DETECTED D5 H" on schematics (different from the outfifo error state above!)
 }
 
@@ -742,7 +748,7 @@ WRITE16_MEMBER(dectalk_state::spc_outfifo_data_w)
 	m_outfifo_head_ptr++;
 	m_outfifo_count++;
 	m_outfifo_head_ptr&=0xf;
-	//dectalk_outfifo_check(); // outfifo check should only be done in the audio 10khz polling function
+	//outfifo_check(); // outfifo check should only be done in the audio 10khz polling function
 }
 
 READ_LINE_MEMBER(dectalk_state::spc_semaphore_r)// Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
@@ -780,42 +786,40 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 0   x   x   x   1   x   x   1   0   1   x   x   x   x   0   *   *   *   *   *   *   *   *   1       RW  NVRAM (read/write volatile ram, does not store to eeprom)
 0   x   x   x   1   x   x   1   0   1   x   x   x   x   1   *   *   *   *   *   *   *   *   1       RW  NVRAM (all reads do /recall from eeprom, all writes do /store to eeprom)
 0   x   x   x   1   x   x   1   1   0   x   x   x   x   x   x   x   x   x   *   *   *   *   x       RW  DUART (keep in mind that a0 is not connected)
-0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   0   0   *       RW  SPC flags: fifo writable (readonly, d7), spc irq suppress (readwrite, d6), fifo error status (readonly, d5), 'fifo release'/clear-tms-fifo-error-status-bits (writeonly, d1), speech initialize/clear (readwrite, d0) [see schematic sheet 4]
-0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   0   1   0?      W   SPC fifo write (clocks fifo)
-0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   1   0   *       RW  TLC flags: ring detect (readonly, d15), ring detected irq enable (readwrite, d14), answer phone (readwrite, d8), tone detected (readonly, d7), tone detected irq enable (readwrite, d6) [see schematic sheet 6]
-0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   1   1   *       R   TLC tone chip read, reads on bits d0-d7 only, d4-d7 are tied low; d15-d8 are probably open bus
+0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   0   0   0?       RW  SPC SR (flags): fifo-not-full (spc writable) flag (readonly, d7), fifo-not-full spc irq mask (readwrite, d6), fifo error status (readonly, d5), 'fifo release'/clear-tms-fifo-error-status-bits (writeonly, d1), speech initialize/clear (readwrite, d0) [see schematic sheet 4]
+0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   0   1   *       W   SPC DR fifo write (clocks fifo)
+0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   1   0   *       RW  TLC SR (flags): ring detect (readonly, d15), ring detected irq enable (readwrite, d14), answer phone (readwrite, d8), tone detected (readonly, d7), tone detected irq enable (readwrite, d6) [see schematic sheet 6]
+0   x   x   x   1   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   1   1   *       R   TLC DR tone chip read, reads on bits d0-d7 only, d4-d7 are tied low; d15-d8 are probably open bus
 1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x           OPEN BUS
               |               |               |               |               |
 */
 
-static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, dectalk_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x740000) AM_ROM /* ROM */
-	AM_RANGE(0x080000, 0x093fff) AM_MIRROR(0x760000) AM_RAM /* RAM */
-	AM_RANGE(0x094000, 0x0943ff) AM_MIRROR(0x763c00) AM_WRITE8(led_write, 0x00ff)  /* LED array */
-	AM_RANGE(0x094000, 0x0941ff) AM_MIRROR(0x763c00) AM_DEVREADWRITE8("x2212", x2212_device, read, write, 0xff00) /* Xicor X2212 NVRAM */
-	AM_RANGE(0x094200, 0x0943ff) AM_MIRROR(0x763c00) AM_READWRITE8(nvram_recall, nvram_store, 0xff00) /* Xicor X2212 NVRAM */
-	AM_RANGE(0x098000, 0x09801f) AM_MIRROR(0x763fe0) AM_DEVREADWRITE8("duartn68681", mc68681_device, read, write, 0xff ) /* DUART */
-	AM_RANGE(0x09c000, 0x09c001) AM_MIRROR(0x763ff8) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) /* SPC flags reg */
-	AM_RANGE(0x09c002, 0x09c003) AM_MIRROR(0x763ff8) AM_WRITE(m68k_infifo_w) /* SPC fifo reg */
-	AM_RANGE(0x09c004, 0x09c005) AM_MIRROR(0x763ff8) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) /* telephone status flags */
-	AM_RANGE(0x09c006, 0x09c007) AM_MIRROR(0x763ff8) AM_READ(m68k_tlc_dtmf_r) /* telephone dtmf read */
-ADDRESS_MAP_END
+void dectalk_state::m68k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).mirror(0x740000).rom(); /* ROM */
+	map(0x080000, 0x093fff).mirror(0x760000).ram(); /* RAM */
+	map(0x094000, 0x0943ff).mirror(0x763c00).w(FUNC(dectalk_state::led_write)).umask16(0x00ff);  /* LED array */
+	map(0x094000, 0x0941ff).mirror(0x763c00).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0xff00); /* Xicor X2212 NVRAM */
+	map(0x094200, 0x0943ff).mirror(0x763c00).rw(FUNC(dectalk_state::nvram_recall), FUNC(dectalk_state::nvram_store)).umask16(0xff00); /* Xicor X2212 NVRAM */
+	map(0x098000, 0x09801f).mirror(0x763fe0).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff); /* DUART */
+	map(0x09c000, 0x09c001).mirror(0x763ff8).rw(FUNC(dectalk_state::m68k_spcflags_r), FUNC(dectalk_state::m68k_spcflags_w)); /* SPC flags reg */
+	map(0x09c002, 0x09c003).mirror(0x763ff8).w(FUNC(dectalk_state::m68k_infifo_w)); /* SPC fifo reg */
+	map(0x09c004, 0x09c005).mirror(0x763ff8).rw(FUNC(dectalk_state::m68k_tlcflags_r), FUNC(dectalk_state::m68k_tlcflags_w)); /* telephone status flags */
+	map(0x09c006, 0x09c007).mirror(0x763ff8).r(FUNC(dectalk_state::m68k_tlc_dtmf_r)); /* telephone dtmf read */
+}
 
-// do we even need this below?
-static ADDRESS_MAP_START(m68k_io, AS_IO, 16, dectalk_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void dectalk_state::tms32010_mem(address_map &map)
+{
+	map(0x000, 0x7ff).rom(); /* ROM */
+}
 
-static ADDRESS_MAP_START(tms32010_mem, AS_PROGRAM, 16, dectalk_state )
-	AM_RANGE(0x000, 0x7ff) AM_ROM /* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(tms32010_io, AS_IO, 16, dectalk_state )
-	AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
-	AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
+void dectalk_state::tms32010_io(address_map &map)
+{
+	map(0, 0).w(FUNC(dectalk_state::spc_latch_outfifo_error_stats)); // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
+	map(1, 1).rw(FUNC(dectalk_state::spc_infifo_data_r), FUNC(dectalk_state::spc_outfifo_data_w)); //read from input fifo, write to sound fifo
 	//AM_RANGE(8, 8) //the newer firmware seems to want something mapped here?
-ADDRESS_MAP_END
+}
 
 /******************************************************************************
  Input Ports
@@ -858,8 +862,7 @@ void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 {
-	uint16_t data;
-	data = dectalk_outfifo_r();
+	uint16_t data = dsp_outfifo_r();
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
 #endif
@@ -867,29 +870,27 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	m_dac->write(data >> 4);
 	// hack for break key, requires hacked up duart core so disabled for now
 	// also it doesn't work well, the setup menu is badly corrupt
-	/*device_t *duart = machine().device("duartn68681");
-	if (machine.input().code_pressed(KEYCODE_F1))
-	    duart68681_rx_break(duart, 1, 1);
+	/*if (machine.input().code_pressed(KEYCODE_F1))
+	    m_duart->duart_rx_break(1, 1);
 	else
-	    duart68681_rx_break(duart, 1, 0);*/
+	    m_duart->duart_rx_break(1, 0);*/
 }
 
-static MACHINE_CONFIG_START( dectalk )
+MACHINE_CONFIG_START(dectalk_state::dectalk)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
-	MCFG_CPU_PROGRAM_MAP(m68k_mem)
-	MCFG_CPU_IO_MAP(m68k_io)
-	MCFG_MC68681_ADD( "duartn68681", XTAL_3_6864MHz ) /* 2681 duart (not 68681!); Y3 3.6864MHz Xtal */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_txa))
-	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(dectalk_state, dectalk_duart_input))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(dectalk_state, dectalk_duart_output))
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
+	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400)) // MC2681 DUART ; Y3 3.6864MHz xtal */
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, dectalk_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, dectalk_state, duart_txa))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, dectalk_state, duart_input))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, dectalk_state, duart_output))
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
-	MCFG_CPU_PROGRAM_MAP(tms32010_mem)
-	MCFG_CPU_IO_MAP(tms32010_io)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(dectalk_state, spc_semaphore_r)) //read infifo-has-data-in-it fifo readable status
+	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(20'000'000)) /* Y1 20MHz xtal */
+	MCFG_DEVICE_PROGRAM_MAP(tms32010_mem)
+	MCFG_DEVICE_IO_MAP(tms32010_io)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, dectalk_state, spc_semaphore_r)) //read infifo-has-data-in-it fifo readable status
 #ifdef USE_LOOSE_TIMING
 	MCFG_QUANTUM_TIME(attotime::from_hz(100))
 #else
@@ -901,15 +902,15 @@ static MACHINE_CONFIG_START( dectalk )
 	/* video hardware */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duartn68681", mc68681_device, rx_b_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
 MACHINE_CONFIG_END
 
 
@@ -934,55 +935,55 @@ ROM_START( dectalk )
 	 *   for proms it is: a1 = 82s123(0x20, 8b TS); a2 = 82s129(0x100 4b TS); a9 = 82s131(0x200 4b TS); b1 = 82s135(0x100 8b TS); f1 = 82s137(0x400 4b TS); f4 = 82s191(0x800 8b TS); s0 = MC68HC05; m2 = i8051 or other MCS-51; (there are more)
 	 */
 	ROM_SYSTEM_BIOS( 0, "v20", "DTC-01 Version 2.0")
-	ROMX_LOAD("23-123e5.e8", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510123E5" @ E8
-	ROMX_LOAD("23-119e5.e22", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510119E5" @ E22
-	ROMX_LOAD("23-124e5.e7", 0x08000, 0x4000, CRC(9edeafcb) SHA1(7724babf4ae5d77c0b4200f608d599058d04b25c), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510124E5" @ E7
-	ROMX_LOAD("23-120e5.e21", 0x08001, 0x4000, CRC(f2a346a6) SHA1(af5e4ea0b3631f7d6f16c22e86a33fa2cb520ee0), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510120E5" @ E21
-	ROMX_LOAD("23-125e5.e6", 0x10000, 0x4000, CRC(1c0100d1) SHA1(1b60cd71dfa83408b17e13f683b6bf3198c905cc), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510125E5" @ E6
-	ROMX_LOAD("23-121e5.e20", 0x10001, 0x4000, CRC(4cb081bd) SHA1(4ad0b00628a90085cd7c78a354256c39fd14db6c), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510121E5" @ E20
-	ROMX_LOAD("23-126e5.e5", 0x18000, 0x4000, CRC(7823dedb) SHA1(e2b2415eec838ddd46094f2fea93fd289dd0caa2), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510126E5" @ E5
-	ROMX_LOAD("23-122e5.e19", 0x18001, 0x4000, CRC(b86370e6) SHA1(92ab22a24484ad0d0f5c8a07347105509999f3ee), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510122E5" @ E19
-	ROMX_LOAD("23-103e5.e4", 0x20000, 0x4000, CRC(35aac6b9) SHA1(b5aec0bf37a176ff4d66d6a10357715957662ebd), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510103E5" @ E4
-	ROMX_LOAD("23-095e5.e18", 0x20001, 0x4000, CRC(2296fe39) SHA1(891f3a3b4ce75ef14001257bc8f1f60463a9a7cb), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510095E5" @ E18
-	ROMX_LOAD("23-104e5.e3", 0x28000, 0x4000, CRC(9658b43c) SHA1(4d6808f67cbdd316df23adc8ddf701df57aa854a), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510104E5" @ E3
-	ROMX_LOAD("23-096e5.e17", 0x28001, 0x4000, CRC(cf236077) SHA1(496c69e52cfa013173f7b9c500ce544a03ad01f7), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510096E5" @ E17
-	ROMX_LOAD("23-105e5.e2", 0x30000, 0x4000, CRC(09cddd28) SHA1(de0c25687bab3ff0c88c98622092e0b58331aa16), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510105E5" @ E2
-	ROMX_LOAD("23-097e5.e16", 0x30001, 0x4000, CRC(49434da1) SHA1(c450abae0ccf372d7eb87370b8a8c97a45e164d3), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510097E5" @ E16
-	ROMX_LOAD("23-106e5.e1", 0x38000, 0x4000, CRC(a389ab31) SHA1(355348bfc96a04193136cdde3418366e6476c3ca), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510106E5" @ E1
-	ROMX_LOAD("23-098e5.e15", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510098E5" @ E15
+	ROMX_LOAD("23-123e5.e8", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510123E5" @ E8
+	ROMX_LOAD("23-119e5.e22", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510119E5" @ E22
+	ROMX_LOAD("23-124e5.e7", 0x08000, 0x4000, CRC(9edeafcb) SHA1(7724babf4ae5d77c0b4200f608d599058d04b25c), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510124E5" @ E7
+	ROMX_LOAD("23-120e5.e21", 0x08001, 0x4000, CRC(f2a346a6) SHA1(af5e4ea0b3631f7d6f16c22e86a33fa2cb520ee0), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510120E5" @ E21
+	ROMX_LOAD("23-125e5.e6", 0x10000, 0x4000, CRC(1c0100d1) SHA1(1b60cd71dfa83408b17e13f683b6bf3198c905cc), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510125E5" @ E6
+	ROMX_LOAD("23-121e5.e20", 0x10001, 0x4000, CRC(4cb081bd) SHA1(4ad0b00628a90085cd7c78a354256c39fd14db6c), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510121E5" @ E20
+	ROMX_LOAD("23-126e5.e5", 0x18000, 0x4000, CRC(7823dedb) SHA1(e2b2415eec838ddd46094f2fea93fd289dd0caa2), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510126E5" @ E5
+	ROMX_LOAD("23-122e5.e19", 0x18001, 0x4000, CRC(b86370e6) SHA1(92ab22a24484ad0d0f5c8a07347105509999f3ee), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510122E5" @ E19
+	ROMX_LOAD("23-103e5.e4", 0x20000, 0x4000, CRC(35aac6b9) SHA1(b5aec0bf37a176ff4d66d6a10357715957662ebd), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510103E5" @ E4
+	ROMX_LOAD("23-095e5.e18", 0x20001, 0x4000, CRC(2296fe39) SHA1(891f3a3b4ce75ef14001257bc8f1f60463a9a7cb), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510095E5" @ E18
+	ROMX_LOAD("23-104e5.e3", 0x28000, 0x4000, CRC(9658b43c) SHA1(4d6808f67cbdd316df23adc8ddf701df57aa854a), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510104E5" @ E3
+	ROMX_LOAD("23-096e5.e17", 0x28001, 0x4000, CRC(cf236077) SHA1(496c69e52cfa013173f7b9c500ce544a03ad01f7), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510096E5" @ E17
+	ROMX_LOAD("23-105e5.e2", 0x30000, 0x4000, CRC(09cddd28) SHA1(de0c25687bab3ff0c88c98622092e0b58331aa16), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510105E5" @ E2
+	ROMX_LOAD("23-097e5.e16", 0x30001, 0x4000, CRC(49434da1) SHA1(c450abae0ccf372d7eb87370b8a8c97a45e164d3), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510097E5" @ E16
+	ROMX_LOAD("23-106e5.e1", 0x38000, 0x4000, CRC(a389ab31) SHA1(355348bfc96a04193136cdde3418366e6476c3ca), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510106E5" @ E1
+	ROMX_LOAD("23-098e5.e15", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510098E5" @ E15
 
 	// DECtalk DTC-01 firmware v1.8 (first half: 05Dec83 tag; second half: 11Oct83 tag), all roms are 27128 eproms
 	ROM_SYSTEM_BIOS( 1, "v18", "DTC-01 Version 1.8")
-	ROMX_LOAD("23-063e5.e8", 0x00000, 0x4000, CRC(9f5ca045) SHA1(1b1b9c1e092c44329b385fb04001e13422eb8d39), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-059e5.e22", 0x00001, 0x4000, CRC(b299cf64) SHA1(84bbe9ff303ea6ce7b1c0b1ad05421edd18fae49), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-064e5.e7", 0x08000, 0x4000, CRC(e4ff20f4) SHA1(fdd91e4d2ef92608a08b2e78b6108e31ff53a1f9), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-060e5.e21", 0x08001, 0x4000, CRC(213c65ba) SHA1(c95662d0d40499af01cdc23f05936762ab54081a), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-065e5.e6", 0x10000, 0x4000, CRC(38ea0c75) SHA1(232b622cef6d69a493db1ed02e5236235c68daba), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-061e5.e20", 0x10001, 0x4000, CRC(44f6fe5c) SHA1(81daa4abae273c7f0aead902b5c3c842f7e7f116), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-066e5.e5", 0x18000, 0x4000, CRC(957aa8cf) SHA1(5f9f916b99867d1adbafd58d411feb630f6e4b6d), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-062e5.e19", 0x18001, 0x4000, CRC(10ab969c) SHA1(46ee22a295b8709b6f829751aca5f92e4f459a9f), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-032e5.e4", 0x20000, 0x4000, CRC(0f805e3a) SHA1(1d8008e30a448358224364fd8237dbb08907b219), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-031e5.e18", 0x20001, 0x4000, CRC(846b5b68) SHA1(55c759b3fb927d2dfc9d77e8e080748866bea854), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-034e5.e3", 0x28000, 0x4000, CRC(90700738) SHA1(738337c5b6acd3f30c3c4be2457370d2ce9313f9), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-033e5.e17", 0x28001, 0x4000, CRC(48756a4d) SHA1(5946ccd367d88a484bb1549d0cc990b9b7d88f0c), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-036e5.e2", 0x30000, 0x4000, CRC(5c2d4f73) SHA1(30f95e5383c4f71bc700346e2d49e8ad70b94c8c), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-035e5.e16", 0x30001, 0x4000, CRC(80116443) SHA1(7b3b68e61b421dedaad88b5600c739943a316c9e), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-038e5.e1", 0x38000, 0x4000, CRC(c840493f) SHA1(abd6af442690e981a9089f19febffc8f3fb52717), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-037e5.e15", 0x38001, 0x4000, CRC(d62ab309) SHA1(a743a23625feadf6e46ef889e2bb04af88589992), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-063e5.e8", 0x00000, 0x4000, CRC(9f5ca045) SHA1(1b1b9c1e092c44329b385fb04001e13422eb8d39), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-059e5.e22", 0x00001, 0x4000, CRC(b299cf64) SHA1(84bbe9ff303ea6ce7b1c0b1ad05421edd18fae49), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-064e5.e7", 0x08000, 0x4000, CRC(e4ff20f4) SHA1(fdd91e4d2ef92608a08b2e78b6108e31ff53a1f9), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-060e5.e21", 0x08001, 0x4000, CRC(213c65ba) SHA1(c95662d0d40499af01cdc23f05936762ab54081a), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-065e5.e6", 0x10000, 0x4000, CRC(38ea0c75) SHA1(232b622cef6d69a493db1ed02e5236235c68daba), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-061e5.e20", 0x10001, 0x4000, CRC(44f6fe5c) SHA1(81daa4abae273c7f0aead902b5c3c842f7e7f116), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-066e5.e5", 0x18000, 0x4000, CRC(957aa8cf) SHA1(5f9f916b99867d1adbafd58d411feb630f6e4b6d), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-062e5.e19", 0x18001, 0x4000, CRC(10ab969c) SHA1(46ee22a295b8709b6f829751aca5f92e4f459a9f), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-032e5.e4", 0x20000, 0x4000, CRC(0f805e3a) SHA1(1d8008e30a448358224364fd8237dbb08907b219), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-031e5.e18", 0x20001, 0x4000, CRC(846b5b68) SHA1(55c759b3fb927d2dfc9d77e8e080748866bea854), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-034e5.e3", 0x28000, 0x4000, CRC(90700738) SHA1(738337c5b6acd3f30c3c4be2457370d2ce9313f9), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-033e5.e17", 0x28001, 0x4000, CRC(48756a4d) SHA1(5946ccd367d88a484bb1549d0cc990b9b7d88f0c), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-036e5.e2", 0x30000, 0x4000, CRC(5c2d4f73) SHA1(30f95e5383c4f71bc700346e2d49e8ad70b94c8c), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-035e5.e16", 0x30001, 0x4000, CRC(80116443) SHA1(7b3b68e61b421dedaad88b5600c739943a316c9e), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-038e5.e1", 0x38000, 0x4000, CRC(c840493f) SHA1(abd6af442690e981a9089f19febffc8f3fb52717), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-037e5.e15", 0x38001, 0x4000, CRC(d62ab309) SHA1(a743a23625feadf6e46ef889e2bb04af88589992), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_REGION(0x2000,"dsp", 0)
 	// older dsp firmware from earlier dectalk firmware 2.0 units, both proms are 82s191 equivalent; this dsp firmware clips with the 1.8 dectalk firmware. this lacks the debug code?
-	ROMX_LOAD("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "LM8506205F4 // M1-76161-5" @ E70
-	ROMX_LOAD("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "LM8504204F4 // 78S191" @ E69
+	ROMX_LOAD("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
+	ROMX_LOAD("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "LM8504204F4 // 78S191" @ E69
 	// Final? firmware from 2.0 dectalk firmware units; this dsp firmware clips with the 1.8 dectalk firmware
 	// this firmware seems to have some leftover test garbage mapped into its space, which is not present on the dtc-01 board
 	// it writes 0x0000 to 0x90 on start, and it writes a sequence of values to 0xFF down to 0xE9
 	// it also wants something readable mapped at 0x08 (for debug purposes?) or else it waits for an interrupt (as the older firmware always does)
-	ROMX_LOAD("23-410f4.e70", 0x000, 0x800, CRC(121e2ec3) SHA1(3fabe018d0e0b478093951cb20501853358faa18), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("23-409f4.e69", 0x001, 0x800, CRC(61f67c79) SHA1(9a13426c92f879f2953f180f805990a91c37ac43), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-410f4.e70", 0x000, 0x800, CRC(121e2ec3) SHA1(3fabe018d0e0b478093951cb20501853358faa18), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("23-409f4.e69", 0x001, 0x800, CRC(61f67c79) SHA1(9a13426c92f879f2953f180f805990a91c37ac43), ROM_SKIP(1) | ROM_BIOS(0))
 	// older dsp firmware from dectalk firmware 1.8 units; while this dsp firmware works with 2.0 dectalk firmware, its a bit quieter than the proper one.
-	ROMX_LOAD("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3), ROM_SKIP(1) | ROM_BIOS(2)) // HM1-76161-5
-	ROMX_LOAD("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c), ROM_SKIP(1) | ROM_BIOS(2)) // HM1-76161-5
+	ROMX_LOAD("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3), ROM_SKIP(1) | ROM_BIOS(1)) // HM1-76161-5
+	ROMX_LOAD("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c), ROM_SKIP(1) | ROM_BIOS(1)) // HM1-76161-5
 
 	// TODO: load this as default if the nvram file is missing, OR get the setup page working enough that it can be saved properly to the chip from an NVR FAULT state!
 	// NOTE: this nvram image is ONLY VALID for v2.0; v1.8 expects a different image.
@@ -1011,5 +1012,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT      COMPANY                          FULLNAME            FLAGS */
-COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, 0,        "Digital Equipment Corporation", "DECtalk DTC-01",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME          FLAGS */
+COMP( 1984, dectalk, 0,      0,      dectalk, dectalk, dectalk_state, empty_init, "Digital Equipment Corporation", "DECtalk DTC-01", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

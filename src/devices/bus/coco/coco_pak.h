@@ -64,4 +64,9 @@ private:
 	uint8_t m_pos;
 };
 
+
+// device type definitions
+DECLARE_DEVICE_TYPE(COCO_PAK, coco_pak_device)
+DECLARE_DEVICE_TYPE(COCO_PAK_BANKED, coco_pak_banked_device)
+
 #endif // MAME_BUS_COCO_COCO_PAK_H

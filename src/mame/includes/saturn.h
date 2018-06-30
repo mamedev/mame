@@ -1,29 +1,30 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
+#ifndef MAME_INCLUDES_SATURN_H
+#define MAME_INCLUDES_SATURN_H
 
-#include "cdrom.h"
-#include "machine/timer.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/adsp2100/adsp2100.h"
-#include "machine/sega_scu.h"
-#include "machine/smpc.h"
-#include "cpu/sh/sh2.h"
-
-#include "bus/sat_ctrl/ctrl.h"
+#pragma once
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "machine/315-5881_crypt.h"
-#include "machine/315-5838_317-0229_comp.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/sh/sh2.h"
 
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
-#include "debugger.h"
 
-#define MAX_FILTERS (24)
-#define MAX_BLOCKS  (200)
-#define MAX_DIR_SIZE    (256*1024)
+#include "machine/315-5881_crypt.h"
+#include "machine/315-5838_317-0229_comp.h"
+#include "machine/sega_scu.h"
+#include "machine/smpc.h"
+#include "machine/timer.h"
+
+#include "sound/scsp.h"
+
+#include "debugger.h"
+#include "emupal.h"
+#include "screen.h"
 
 class saturn_state : public driver_device
 {
@@ -38,9 +39,11 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_slave(*this, "slave"),
 			m_audiocpu(*this, "audiocpu"),
+			m_scsp(*this, "scsp"),
 			m_smpc_hle(*this, "smpc"),
 			m_scu(*this, "scu"),
 			m_gfxdecode(*this, "gfxdecode"),
+			m_screen(*this, "screen"),
 			m_palette(*this, "palette")
 	{
 	}
@@ -104,17 +107,14 @@ public:
 		int       old_tvmd;
 	}m_vdp2;
 
-	/* Saturn specific*/
-	int m_saturn_region;
-	uint8_t m_cart_type;
-	uint32_t *m_cart_dram;
-
 	required_device<sh2_device> m_maincpu;
 	required_device<sh2_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
+	required_device<scsp_device> m_scsp;
 	required_device<smpc_hle_device> m_smpc_hle;
 	required_device<sega_scu_device> m_scu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	bitmap_rgb32 m_tmpbitmap;
@@ -265,8 +265,8 @@ public:
 
 	void refresh_palette_data( void );
 	inline int stv_vdp2_window_process(int x,int y);
-	void stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
-	void stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
+	void stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y);
+	void stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y);
 	int get_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t win_num);
 	int stv_vdp2_apply_window_on_layer(rectangle &cliprect);
 
@@ -291,8 +291,9 @@ public:
 	void stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap, bitmap_rgb32 &roz_bitmap, const rectangle &cliprect, int iRP, int planesizex, int planesizey, int planerenderedsizex, int planerenderedsizey);
-	bool stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter);
-	int get_roz_mode3_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable,uint8_t winarea);
+	inline bool stv_vdp2_roz_window(int x, int y);
+	inline bool stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter);
+	inline int get_roz_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable,uint8_t winarea);
 	void stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter );
 	uint8_t stv_vdp2_check_vram_cycle_pattern_registers( uint8_t access_command_pnmdr, uint8_t access_command_cpdr, uint8_t bitmap_enable );
 	uint8_t stv_vdp2_is_rotation_applied(void);
@@ -351,6 +352,7 @@ public:
 		uint8_t   linescroll_interval;
 		uint32_t  linescroll_table_address;
 		uint8_t   vertical_linescroll_enable;
+		uint8_t   vertical_cell_scroll_enable;
 		uint8_t   linezoom_enable;
 
 		uint8_t  plane_size;
@@ -422,173 +424,6 @@ public:
 
 	} stv_rbg_cache_data;
 
-	/* stvcd */
-	DECLARE_READ32_MEMBER( stvcd_r );
-	DECLARE_WRITE32_MEMBER( stvcd_w );
-
-	TIMER_DEVICE_CALLBACK_MEMBER( stv_sector_cb );
-	TIMER_DEVICE_CALLBACK_MEMBER( stv_sh1_sim );
-
-	struct direntryT
-	{
-		uint8_t record_size;
-		uint8_t xa_record_size;
-		uint32_t firstfad;        // first sector of file
-		uint32_t length;      // length of file
-		uint8_t year;
-		uint8_t month;
-		uint8_t day;
-		uint8_t hour;
-		uint8_t minute;
-		uint8_t second;
-		uint8_t gmt_offset;
-		uint8_t flags;        // iso9660 flags
-		uint8_t file_unit_size;
-		uint8_t interleave_gap_size;
-		uint16_t volume_sequencer_number;
-		uint8_t name[128];
-	};
-
-	struct filterT
-	{
-		uint8_t mode;
-		uint8_t chan;
-		uint8_t smmask;
-		uint8_t cimask;
-		uint8_t fid;
-		uint8_t smval;
-		uint8_t cival;
-		uint8_t condtrue;
-		uint8_t condfalse;
-		uint32_t fad;
-		uint32_t range;
-	};
-
-	struct blockT
-	{
-		int32_t size; // size of block
-		int32_t FAD;  // FAD on disc
-		uint8_t data[CD_MAX_SECTOR_DATA];
-		uint8_t chan; // channel
-		uint8_t fnum; // file number
-		uint8_t subm; // subchannel mode
-		uint8_t cinf; // coding information
-	};
-
-	struct partitionT
-	{
-		int32_t size;
-		blockT *blocks[MAX_BLOCKS];
-		uint8_t bnum[MAX_BLOCKS];
-		uint8_t numblks;
-	};
-
-	// 16-bit transfer types
-	enum transT
-	{
-		XFERTYPE_INVALID,
-		XFERTYPE_TOC,
-		XFERTYPE_FILEINFO_1,
-		XFERTYPE_FILEINFO_254,
-		XFERTYPE_SUBQ,
-		XFERTYPE_SUBRW
-	};
-
-	// 32-bit transfer types
-	enum trans32T
-	{
-		XFERTYPE32_INVALID,
-		XFERTYPE32_GETSECTOR,
-		XFERTYPE32_GETDELETESECTOR,
-		XFERTYPE32_PUTSECTOR,
-		XFERTYPE32_MOVESECTOR
-	};
-
-
-	void stvcd_reset(void);
-	void stvcd_exit(void);
-	void stvcd_set_tray_open(void);
-	void stvcd_set_tray_close(void);
-
-	int get_track_index(uint32_t fad);
-	int sega_cdrom_get_adr_control(cdrom_file *file, int track);
-	void cr_standard_return(uint16_t cur_status);
-	void mpeg_standard_return(uint16_t cur_status);
-	void cd_free_block(blockT *blktofree);
-	void cd_defragblocks(partitionT *part);
-	void cd_getsectoroffsetnum(uint32_t bufnum, uint32_t *sectoffs, uint32_t *sectnum);
-
-	uint16_t cd_readWord(uint32_t addr);
-	void cd_writeWord(uint32_t addr, uint16_t data);
-	uint32_t cd_readLong(uint32_t addr);
-	void cd_writeLong(uint32_t addr, uint32_t data);
-
-	void cd_readTOC(void);
-	void cd_readblock(uint32_t fad, uint8_t *dat);
-	void cd_playdata(void);
-
-	void cd_exec_command( void );
-	// iso9660 utilities
-	void make_dir_current(uint32_t fad);
-	void read_new_dir(uint32_t fileno);
-
-	blockT *cd_alloc_block(uint8_t *blknum);
-	partitionT *cd_filterdata(filterT *flt, int trktype, uint8_t *p_ok);
-	partitionT *cd_read_filtered_sector(int32_t fad, uint8_t *p_ok);
-
-	cdrom_file *cdrom;// = (cdrom_file *)nullptr;
-
-	// local variables
-	timer_device *sector_timer;
-	timer_device *sh1_timer;
-	partitionT partitions[MAX_FILTERS];
-	partitionT *transpart;
-
-	blockT blocks[MAX_BLOCKS];
-	blockT curblock;
-
-	uint8_t tocbuf[102*4];
-	uint8_t subqbuf[5*2];
-	uint8_t subrwbuf[12*2];
-	uint8_t finfbuf[256];
-
-	int32_t sectlenin, sectlenout;
-
-	uint8_t lastbuf, playtype;
-
-	transT xfertype;
-	trans32T xfertype32;
-	uint32_t xfercount, calcsize;
-	uint32_t xferoffs, xfersect, xfersectpos, xfersectnum, xferdnum;
-
-	filterT filters[MAX_FILTERS];
-	filterT *cddevice;
-	int cddevicenum;
-
-	uint16_t cr1, cr2, cr3, cr4;
-	uint16_t prev_cr1, prev_cr2, prev_cr3, prev_cr4;
-	uint8_t status_type;
-	uint16_t hirqmask, hirqreg;
-	uint16_t cd_stat;
-	uint32_t cd_curfad;// = 0;
-	uint32_t cd_fad_seek;
-	uint32_t fadstoplay;// = 0;
-	uint32_t in_buffer;// = 0;    // amount of data in the buffer
-	int oddframe;// = 0;
-	int buffull, sectorstore, freeblocks;
-	int cur_track;
-	uint8_t cmd_pending;
-	uint8_t cd_speed;
-	uint8_t cdda_maxrepeat;
-	uint8_t cdda_repeat_count;
-	uint8_t tray_is_closed;
-	int get_timing_command( void );
-
-	direntryT curroot;       // root entry of current filesystem
-	std::vector<direntryT> curdir;       // current directory
-	int numfiles;            // # of entries in current directory
-	int firstfile;           // first non-directory file
-
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
 
 //  DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
@@ -612,8 +447,9 @@ public:
 };
 
 
-#define MASTER_CLOCK_352 XTAL_57_2727MHz
-#define MASTER_CLOCK_320 XTAL_53_693175MHz
+// These two clocks are synthesized by the 315-5746
+#define MASTER_CLOCK_352 XTAL(14'318'181)*4
+#define MASTER_CLOCK_320 XTAL(14'318'181)*3.75
 #define CEF_1   m_vdp1_regs[0x010/2]|=0x0002
 #define CEF_0   m_vdp1_regs[0x010/2]&=~0x0002
 #define BEF_1   m_vdp1_regs[0x010/2]|=0x0001
@@ -623,4 +459,6 @@ public:
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
 
-GFXDECODE_EXTERN( stv );
+extern gfx_decode_entry const gfx_stv[];
+
+#endif // MAME_INCLUDES_SATURN_H

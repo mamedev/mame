@@ -66,15 +66,16 @@ TODO:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START(kim1_map, AS_PROGRAM, 8, kim1_state)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u3", mos6530_device, read, write )
-	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u2", mos6530_device, read, write )
-	AM_RANGE(0x1780, 0x17bf) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x17c0, 0x17ff) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0xe000) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0xe000) AM_ROM
-ADDRESS_MAP_END
+void kim1_state::kim1_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0xe000).ram();
+	map(0x1700, 0x173f).mirror(0xe000).rw("miot_u3", FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x1740, 0x177f).mirror(0xe000).rw(m_riot2, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x1780, 0x17bf).mirror(0xe000).ram();
+	map(0x17c0, 0x17ff).mirror(0xe000).ram();
+	map(0x1800, 0x1bff).mirror(0xe000).rom();
+	map(0x1c00, 0x1fff).mirror(0xe000).rom();
+}
 
 // RS and ST key input
 INPUT_CHANGED_MEMBER(kim1_state::trigger_reset)
@@ -140,18 +141,10 @@ READ8_MEMBER( kim1_state::kim1_u2_read_a )
 {
 	uint8_t data = 0xff;
 
-	switch( ( m_u2_port_b >> 1 ) & 0x0f )
-	{
-	case 0:
-		data = m_row0->read();
-		break;
-	case 1:
-		data = m_row1->read();
-		break;
-	case 2:
-		data = m_row2->read();
-		break;
-	}
+	offs_t const sel = ( m_u2_port_b >> 1 ) & 0x0f;
+	if ( 3U > sel )
+		data = m_row[sel]->read();
+
 	return data;
 }
 
@@ -164,7 +157,7 @@ WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
 	{
 		if ( data & 0x80 )
 		{
-			output().set_digit_value( idx-4, data & 0x7f );
+			m_digit[idx - 4] = data & 0x7f;
 			m_led_time[idx - 4] = 15;
 		}
 	}
@@ -218,13 +211,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_update_leds)
 		if ( m_led_time[i] )
 			m_led_time[i]--;
 		else
-			output().set_digit_value( i, 0 );
+			m_digit[i] = 0;
 	}
 }
 
 // Register for save states
 void kim1_state::machine_start()
 {
+	m_digit.resolve();
+
 	save_item(NAME(m_u2_port_b));
 	save_item(NAME(m_311_output));
 	save_item(NAME(m_cassette_high_count));
@@ -245,10 +240,10 @@ void kim1_state::machine_reset()
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( kim1 )
+MACHINE_CONFIG_START(kim1_state::kim1)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
-	MCFG_CPU_PROGRAM_MAP(kim1_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kim1_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	// video hardware
@@ -256,10 +251,10 @@ static MACHINE_CONFIG_START( kim1 )
 
 	// devices
 	MCFG_DEVICE_ADD("miot_u2", MOS6530, 1000000)
-	MCFG_MOS6530_IN_PA_CB(READ8(kim1_state, kim1_u2_read_a))
-	MCFG_MOS6530_OUT_PA_CB(WRITE8(kim1_state, kim1_u2_write_a))
-	MCFG_MOS6530_IN_PB_CB(READ8(kim1_state, kim1_u2_read_b))
-	MCFG_MOS6530_OUT_PB_CB(WRITE8(kim1_state, kim1_u2_write_b))
+	MCFG_MOS6530_IN_PA_CB(READ8(*this, kim1_state, kim1_u2_read_a))
+	MCFG_MOS6530_OUT_PA_CB(WRITE8(*this, kim1_state, kim1_u2_write_a))
+	MCFG_MOS6530_IN_PB_CB(READ8(*this, kim1_state, kim1_u2_read_b))
+	MCFG_MOS6530_OUT_PB_CB(WRITE8(*this, kim1_state, kim1_u2_write_b))
 
 	MCFG_DEVICE_ADD("miot_u3", MOS6530, 1000000)
 
@@ -290,5 +285,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  CLASS           INIT  COMPANY             FULLNAME  FLAGS
-COMP( 1975, kim1,     0,        0,      kim1,     kim1,  kim1_state,     0,    "MOS Technologies", "KIM-1" , MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME  FLAGS
+COMP( 1975, kim1, 0,      0,      kim1,    kim1,  kim1_state, empty_init, "MOS Technologies", "KIM-1",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)

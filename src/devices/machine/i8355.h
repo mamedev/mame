@@ -49,16 +49,16 @@
 ///*************************************************************************
 
 #define MCFG_I8355_IN_PA_CB(_devcb) \
-	devcb = &i8355_device::set_in_pa_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8355_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_I8355_OUT_PA_CB(_devcb) \
-	devcb = &i8355_device::set_out_pa_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8355_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_I8355_IN_PB_CB(_devcb) \
-	devcb = &i8355_device::set_in_pb_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8355_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_I8355_OUT_PB_CB(_devcb) \
-	devcb = &i8355_device::set_out_pb_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<i8355_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
 
 
 ///*************************************************************************
@@ -73,10 +73,10 @@ public:
 	// construction/destruction
 	i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_in_pa_callback(device_t &device, Object &&cb) { return downcast<i8355_device &>(device).m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_pa_callback(device_t &device, Object &&cb) { return downcast<i8355_device &>(device).m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_pb_callback(device_t &device, Object &&cb) { return downcast<i8355_device &>(device).m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_pb_callback(device_t &device, Object &&cb) { return downcast<i8355_device &>(device).m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pa_callback(Object &&cb) { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pb_callback(Object &&cb) { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );

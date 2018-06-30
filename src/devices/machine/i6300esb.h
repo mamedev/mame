@@ -10,12 +10,6 @@
 #include "lpc-rtc.h"
 #include "lpc-pit.h"
 
-#define MCFG_I6300ESB_LPC_ADD(_tag) \
-	MCFG_PCI_DEVICE_ADD(_tag, I6300ESB_LPC, 0x808625a1, 0x02, 0x060100, 0x00000000)
-
-#define MCFG_I6300ESB_WATCHDOG_ADD(_tag, _subdevice_id) \
-	MCFG_PCI_DEVICE_ADD(_tag, I6300ESB_WATCHDOG, 0x808625ab, 0x02, 0x088000, _subdevice_id)
-
 class i6300esb_lpc_device : public pci_device {
 public:
 	i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -24,8 +18,7 @@ public:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
-
+	virtual void config_map(address_map &map) override;
 
 protected:
 	virtual void device_start() override;
@@ -37,7 +30,7 @@ private:
 	required_device<lpc_pit_device> pit;
 	required_memory_region m_region;
 
-	DECLARE_ADDRESS_MAP(internal_io_map, 32);
+	void internal_io_map(address_map &map);
 
 	uint32_t pmbase, gpio_base, fwh_sel1, gen_cntl, etr1, rst_cnt2, gpi_rout;
 	uint16_t bios_cntl, pci_dma_cfg, gen1_dec, lpc_en, gen2_dec, fwh_sel2, func_dis, gen_pmcon_1;
@@ -145,6 +138,11 @@ private:
 
 class i6300esb_watchdog_device : public pci_device {
 public:
+	i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id)
+		: i6300esb_watchdog_device(mconfig, tag, owner, clock)
+	{
+		set_ids(0x808625ab, 0x02, 0x088000, subdevice_id);
+	}
 	i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -152,7 +150,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 32);
+	void map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(I6300ESB_LPC,      i6300esb_lpc_device)

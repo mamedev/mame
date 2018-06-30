@@ -49,9 +49,16 @@ There is also a non-shader extension
 Building
 --------
 
+Instead of building manually, you can also download the binaries for your
+platform directly from the [master-tot release][master-tot-release] on GitHub.
+Those binaries are automatically uploaded by the buildbots after successful
+testing and they always reflect the current top of the tree of the master
+branch.
+
 ### Dependencies
 
 * [CMake][cmake]: for generating compilation targets.
+* [Python 2.7][python]: for executing SPIRV-Tools scripts. (Optional if not using SPIRV-Tools.)
 * [bison][bison]: _optional_, but needed when changing the grammar (glslang.y).
 * [googletest][googletest]: _optional_, but should use if making any changes to glslang.
 
@@ -73,6 +80,18 @@ git clone https://github.com/KhronosGroup/glslang.git
 cd <the directory glslang was cloned to, "External" will be a subdirectory>
 git clone https://github.com/google/googletest.git External/googletest
 ```
+
+If you wish to assure that SPIR-V generated from HLSL is legal for Vulkan,
+or wish to invoke -Os to reduce SPIR-V size from HLSL or GLSL, install
+spirv-tools with this:
+
+```bash
+./update_glslang_sources.py
+```
+
+For running the CMake GUI or Visual Studio with python dependencies, you will,
+in addition to python within the cygwin environment, need a Windows [python][python]
+installation, including selecting the `PATH` update.
 
 #### 3) Configure
 
@@ -301,6 +320,8 @@ Basic Internal Operation
 
 
 [cmake]: https://cmake.org/
+[python]: https://www.python.org/
 [bison]: https://www.gnu.org/software/bison/
 [googletest]: https://github.com/google/googletest
 [bison-gnu-win32]: http://gnuwin32.sourceforge.net/packages/bison.htm
+[master-tot-release]: https://github.com/KhronosGroup/glslang/releases/tag/master-tot

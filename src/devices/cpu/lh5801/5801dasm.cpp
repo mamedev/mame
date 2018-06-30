@@ -9,104 +9,14 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-
-#include "lh5801.h"
+#include "5801dasm.h"
 
 #if defined(SEC)
 #undef SEC
 #endif
 
-namespace {
 
-class Entry
-{
-public:
-	enum Ins
-	{
-		ILL, ILL2, PREFD, NOP,
-
-		LDA, STA, LDI, LDX, STX,
-		LDE, SDE, LIN, SIN,
-		TIN, // (x++)->(y++)
-		ADC, ADI, ADR, SBC, SBI,
-		DCA, DCS, // bcd add and sub
-		CPA, CPI, CIN, // A compared with (x++)
-		AND, ANI, ORA, ORI, EOR, EAI, BIT, BII,
-		INC, DEC,
-		DRL, DRR, // digit rotates
-		ROL, ROR,
-		SHL, SHR,
-		AEX, // A nibble swap
-
-		BCR, BCS, BHR, BHS, BZR, BZS, BVR, BVS,
-		BCH, LOP, // loop with ul
-		JMP, SJP, RTN, RTI, HLT,
-		VCR, VCS, VHR, VHS, VVS, VZR, VZS,
-		VMJ, VEJ,
-		PSH, POP, ATT, TTA,
-		REC, SEC, RIE, SIE,
-
-		AM0, AM1, // load timer reg
-		ITA, // reads input port
-		ATP, // akku send to data bus
-		CDV, // clears internal divider
-		OFF, // clears bf flip flop
-		RDP, SDP,// reset display flip flop
-		RPU, SPU,// flip flop pu off
-		RPV, SPV // flip flop pv off
-	};
-
-	enum Adr
-	{
-		Imp,
-		Reg,
-		Vec, // imm byte (vector at 0xffxx)
-		Vej,
-		Imm,
-		RegImm,
-		Imm16,
-		RegImm16,
-		ME0,
-		ME0Imm,
-		Abs,
-		AbsImm,
-		ME1,
-		ME1Imm,
-		ME1Abs,
-		ME1AbsImm,
-		RelP,
-		RelM
-	};
-
-	enum Regs
-	{
-		RegNone,
-		A,
-		XL, XH, X,
-		YL, YH, Y,
-		UL, UH, U,
-		P, S
-	};
-
-	const char *ins_name() const { return ins_names[ins]; }
-	const char *reg_name() const { return reg_names[reg]; }
-
-	Ins ins;
-	Adr adr;
-	Regs reg;
-
-	static const Entry table[0x100];
-	static const Entry table_fd[0x100];
-
-protected:
-	Entry(Ins i, Adr a = Imp, Regs r = RegNone) : ins(i), adr(a), reg(r) { }
-
-	static const char *const ins_names[];
-	static const char *const reg_names[];
-};
-
-const char *const Entry::ins_names[]={
+const char *const lh5801_disassembler::ins_names[]={
 	"ILL", "ILL", nullptr, "NOP",
 	"LDA", "STA", "LDI", "LDX", "STX",
 	"LDE", "SDE", "LIN", "SIN",
@@ -138,11 +48,11 @@ const char *const Entry::ins_names[]={
 	"RPV", "SPV",
 };
 
-const char *const Entry::reg_names[]= {
+const char *const lh5801_disassembler::reg_names[]= {
 	nullptr, "A", "XL", "XH", "X", "YL", "YH", "Y", "UL", "UH", "U", "P", "S"
 };
 
-const Entry Entry::table[0x100]={
+const lh5801_disassembler::Entry lh5801_disassembler::table[0x100]={
 	{ SBC, Reg, XL }, // 0
 	{ SBC, ME0, X },
 	{ ADC, Reg, XL },
@@ -401,7 +311,7 @@ const Entry Entry::table[0x100]={
 	{ ILL }
 };
 
-const Entry Entry::table_fd[0x100]={
+const lh5801_disassembler::Entry lh5801_disassembler::table_fd[0x100]={
 	{ ILL2 }, // 0x00
 	{ SBC, ME1, X },
 	{ ILL2 },
@@ -660,90 +570,93 @@ const Entry Entry::table_fd[0x100]={
 	{ ILL2 }
 };
 
-} // anonymous namespace
 
-
-CPU_DISASSEMBLE(lh5801)
+u32 lh5801_disassembler::opcode_alignment() const
 {
-	int pos = 0;
+	return 1;
+}
+
+offs_t lh5801_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	offs_t pos = pc;
 	int oper;
 	uint16_t absolut;
 	const Entry *entry;
 	int temp;
 
-	oper=oprom[pos++];
-	entry=Entry::table+oper;
+	oper=opcodes.r8(pos++);
+	entry=table+oper;
 
-	if (Entry::table[oper].ins==Entry::PREFD) {
-		oper=oprom[pos++];
-		entry=Entry::table_fd+oper;
+	if (table[oper].ins==PREFD) {
+		oper=opcodes.r8(pos++);
+		entry=table_fd+oper;
 	}
 	switch (entry->ins) {
-	case Entry::ILL:
+	case ILL:
 		util::stream_format(stream, "%s %02x", entry->ins_name(), oper);break;
-	case Entry::ILL2:
+	case ILL2:
 		util::stream_format(stream, "%s fd%02x", entry->ins_name(), oper);break;
 	default:
 		switch(entry->adr) {
-		case Entry::Imp:
+		case Imp:
 			util::stream_format(stream, "%s", entry->ins_name());break;
-		case Entry::Reg:
+		case Reg:
 			util::stream_format(stream, "%s %s", entry->ins_name(),entry->reg_name());break;
-		case Entry::RegImm:
+		case RegImm:
 			util::stream_format(stream, "%s %s,%02x", entry->ins_name(),
-					entry->reg_name(), oprom[pos++]);
+					entry->reg_name(), opcodes.r8(pos++));
 			break;
-		case Entry::RegImm16:
-			absolut=oprom[pos++]<<8;
-			absolut|=oprom[pos++];
+		case RegImm16:
+			absolut=opcodes.r8(pos++)<<8;
+			absolut|=opcodes.r8(pos++);
 			util::stream_format(stream, "%s %s,%04x", entry->ins_name(),entry->reg_name(),absolut );
 			break;
-		case Entry::Vec:
-			util::stream_format(stream, "%s (ff%02x)", entry->ins_name(),oprom[pos++]);break;
-		case Entry::Vej:
+		case Vec:
+			util::stream_format(stream, "%s (ff%02x)", entry->ins_name(),opcodes.r8(pos++));break;
+		case Vej:
 			util::stream_format(stream, "%s (ff%02x)", entry->ins_name(), oper);break;
-		case Entry::Imm:
-			util::stream_format(stream, "%s %02x", entry->ins_name(),oprom[pos++]);break;
-		case Entry::Imm16:
-			absolut=oprom[pos++]<<8;
-			absolut|=oprom[pos++];
+		case Imm:
+			util::stream_format(stream, "%s %02x", entry->ins_name(),opcodes.r8(pos++));break;
+		case Imm16:
+			absolut=opcodes.r8(pos++)<<8;
+			absolut|=opcodes.r8(pos++);
 			util::stream_format(stream, "%s %04x", entry->ins_name(),absolut);break;
-		case Entry::RelP:
-			temp=oprom[pos++];
+		case RelP:
+			temp=opcodes.r8(pos++);
 			util::stream_format(stream, "%s %04x", entry->ins_name(),pc+pos+temp);break;
-		case Entry::RelM:
-			temp=oprom[pos++];
+		case RelM:
+			temp=opcodes.r8(pos++);
 			util::stream_format(stream, "%s %04x", entry->ins_name(),pc+pos-temp);break;
-		case Entry::Abs:
-			absolut=oprom[pos++]<<8;
-			absolut|=oprom[pos++];
+		case Abs:
+			absolut=opcodes.r8(pos++)<<8;
+			absolut|=opcodes.r8(pos++);
 			util::stream_format(stream, "%s (%04x)", entry->ins_name(),absolut);break;
-		case Entry::ME1Abs:
-			absolut=oprom[pos++]<<8;
-			absolut|=oprom[pos++];
+		case ME1Abs:
+			absolut=opcodes.r8(pos++)<<8;
+			absolut|=opcodes.r8(pos++);
 			util::stream_format(stream, "%s #(%04x)", entry->ins_name(),absolut);break;
-		case Entry::AbsImm:
-			absolut=oprom[pos++]<<8;
-			absolut|=oprom[pos++];
+		case AbsImm:
+			absolut=opcodes.r8(pos++)<<8;
+			absolut|=opcodes.r8(pos++);
 			util::stream_format(stream, "%s (%04x),%02x", entry->ins_name(),absolut,
-					oprom[pos++]);break;
-		case Entry::ME1AbsImm:
-			absolut=oprom[pos++]<<8;
-			absolut|=oprom[pos++];
+					opcodes.r8(pos++));break;
+		case ME1AbsImm:
+			absolut=opcodes.r8(pos++)<<8;
+			absolut|=opcodes.r8(pos++);
 			util::stream_format(stream, "%s #(%04x),%02x", entry->ins_name(),absolut,
-					oprom[pos++]);break;
-		case Entry::ME0:
+					opcodes.r8(pos++));break;
+		case ME0:
 			util::stream_format(stream, "%s (%s)", entry->ins_name(),entry->reg_name());break;
-		case Entry::ME0Imm:
-			util::stream_format(stream, "%s (%s),%02x", entry->ins_name(),entry->reg_name(),oprom[pos++]);
+		case ME0Imm:
+			util::stream_format(stream, "%s (%s),%02x", entry->ins_name(),entry->reg_name(),opcodes.r8(pos++));
 			break;
-		case Entry::ME1:
+		case ME1:
 			util::stream_format(stream, "%s #(%s)", entry->ins_name(),entry->reg_name());break;
-		case Entry::ME1Imm:
-			util::stream_format(stream, "%s #(%s),%02x", entry->ins_name(),entry->reg_name(),oprom[pos++]);
+		case ME1Imm:
+			util::stream_format(stream, "%s #(%s),%02x", entry->ins_name(),entry->reg_name(),opcodes.r8(pos++));
 			break;
 		}
 	}
 
-	return pos;
+	return pos - pc;
 }

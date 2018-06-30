@@ -9,6 +9,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/tc0080vco.h"
+#include "emupal.h"
 
 class taitoo_state : public driver_device
 {
@@ -34,4 +35,6 @@ public:
 	uint32_t screen_update_parentj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(parentj_interrupt);
 	void parentj_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	void parentj(machine_config &config);
+	void parentj_map(address_map &map);
 };

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "g65816ds.h"
 #include "g65816cm.h"
 
 /* ======================================================================== */
@@ -45,13 +46,15 @@ enum
 #define G65816_INT_NMI G65816_LINE_NMI
 
 
-class g65816_device : public cpu_device
+class g65816_device : public cpu_device, public g65816_disassembler::config
 {
 public:
+	enum {
+		AS_VECTORS = AS_OPCODES + 1,
+	};
+
 	// construction/destruction
 	g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	void set_read_vector_callback(read8_delegate read_vector);
 
 protected:
 	/* Registers - used by g65816_set_reg() and g65816_get_reg() */
@@ -85,11 +88,14 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual bool get_m_flag() const override;
+	virtual bool get_x_flag() const override;
 
 	address_space_config m_program_config;
+	address_space_config m_data_config;
+	address_space_config m_opcode_config;
+	address_space_config m_vector_config;
 
 	typedef void (g65816_device::*opcode_func) ();
 	typedef unsigned (g65816_device::*get_reg_func)(int regnum);
@@ -138,6 +144,7 @@ protected:
 	void g65816_restore_state();
 	unsigned g65816i_read_8_normal(unsigned address);
 	unsigned g65816i_read_8_immediate(unsigned address);
+	unsigned g65816i_read_8_opcode(unsigned address);
 	unsigned g65816i_read_8_direct(unsigned address);
 	unsigned g65816i_read_8_vector(unsigned address);
 	void g65816i_write_8_normal(unsigned address, unsigned value);
@@ -221,8 +228,9 @@ protected:
 	unsigned m_fastROM;       /* SNES specific */
 	unsigned m_ir;            /* Instruction Register */
 	unsigned m_irq_delay;     /* delay 1 instruction before checking irq */
-	address_space *m_program;
-	read8_delegate m_read_vector; /* Read vector override */
+	address_space *m_data_space;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_program_cache;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_opcode_cache;
 	unsigned m_stopped;       /* Sets how the CPU is stopped */
 	const opcode_func* m_opcodes;
 	get_reg_func m_get_reg;
@@ -1544,6 +1552,7 @@ public:
 
 	void set_5a22_map();
 
+	void _5a22_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

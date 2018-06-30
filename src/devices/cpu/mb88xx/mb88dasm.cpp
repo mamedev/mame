@@ -10,14 +10,18 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "mb88xx.h"
+#include "mb88dasm.h"
 
+u32 mb88_disassembler::opcode_alignment() const
+{
+	return 1;
+}
 
-CPU_DISASSEMBLE(mb88)
+offs_t mb88_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	unsigned startpc = pc;
-	uint8_t op = oprom[pc++ - startpc];
-	uint8_t arg = oprom[pc - startpc];
+	uint8_t op = opcodes.r8(pc++);
+	uint8_t arg = opcodes.r8(pc);
 
 	switch( op )
 	{
@@ -220,5 +224,5 @@ CPU_DISASSEMBLE(mb88)
 		break;
 	}
 
-	return (pc - startpc) | DASMFLAG_SUPPORTED;
+	return (pc - startpc) | SUPPORTED;
 }

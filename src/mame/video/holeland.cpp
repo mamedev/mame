@@ -21,7 +21,7 @@
 TILE_GET_INFO_MEMBER(holeland_state::holeland_get_tile_info)
 {
 	/*
-	--x- ---- priority?
+	x--- ---- priority (1) behind sprites
 	xxxx ---- color
 	---- xx-- flip yx
 	---- --xx tile upper bits
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(holeland_state::holeland_get_tile_info)
 			tile_number,
 			m_palette_offset + ((attr >> 4) & 0x0f),
 			TILE_FLIPYX((attr >> 2) & 0x03));
-	tileinfo.group = (attr >> 5) & 1;
+	tileinfo.group = (attr >> 7) & 1;
 }
 
 TILE_GET_INFO_MEMBER(holeland_state::crzrally_get_tile_info)

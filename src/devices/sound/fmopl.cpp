@@ -309,11 +309,37 @@ struct OPL_CH
 			SLOT.eg_sel_rr = eg_rate_select[SLOT.rr + SLOT.ksr ];
 		}
 	}
+
+	/* CSM Key Control */
+	void CSMKeyControll()
+	{
+		SLOT[SLOT1].KEYON(4);
+		SLOT[SLOT2].KEYON(4);
+
+		/* The key off should happen exactly one sample later - not implemented correctly yet */
+
+		SLOT[SLOT1].KEYOFF(~4);
+		SLOT[SLOT2].KEYOFF(~4);
+	}
 };
 
 /* OPL state */
-struct FM_OPL
+class FM_OPL
 {
+protected:
+	FM_OPL()
+#if BUILD_Y8950
+		: deltat(nullptr, [] (YM_DELTAT *p) { p->~YM_DELTAT(); })
+#endif
+	{
+	}
+
+public:
+	~FM_OPL()
+	{
+		UnLockTable();
+	}
+
 	/* FM channel slots */
 	OPL_CH  P_CH[9];                /* OPL/OPL2 chips have 9 channels*/
 
@@ -349,7 +375,7 @@ struct FM_OPL
 #if BUILD_Y8950
 	/* Delta-T ADPCM unit (Y8950) */
 
-	YM_DELTAT *deltat;
+	std::unique_ptr<YM_DELTAT, void (*)(YM_DELTAT *)> deltat;
 
 	/* Keyboard and I/O ports interface */
 	uint8_t   portDirection;
@@ -908,9 +934,201 @@ struct FM_OPL
 	}
 
 
-	void WriteReg(int r, int v);
 	void ResetChip();
 	void postload();
+
+	void clock_changed(uint32_t c, uint32_t r)
+	{
+		clock = c;
+		rate  = r;
+
+		/* init global tables */
+		initialize();
+	}
+
+	int Write(int a, int v)
+	{
+		if( !(a&1) )
+		{   /* address port */
+			address = v & 0xff;
+		}
+		else
+		{   /* data port */
+			if (UpdateHandler) UpdateHandler(UpdateParam, 0);
+			WriteReg(address, v);
+		}
+		return status>>7;
+	}
+
+	unsigned char Read(int a)
+	{
+		if( !(a&1) )
+		{
+			/* status port */
+
+			#if BUILD_Y8950
+
+			if(type&OPL_TYPE_ADPCM)    /* Y8950 */
+			{
+				return (status & (statusmask|0x80)) | (deltat->PCM_BSY&1);
+			}
+
+			#endif
+
+			/* OPL and OPL2 */
+			return status & (statusmask|0x80);
+		}
+
+#if BUILD_Y8950
+		/* data port */
+		switch(address)
+		{
+		case 0x05: /* KeyBoard IN */
+			if(type&OPL_TYPE_KEYBOARD)
+			{
+				if(keyboardhandler_r)
+					return keyboardhandler_r(keyboard_param);
+				else
+					device->logerror("Y8950: read unmapped KEYBOARD port\n");
+			}
+			return 0;
+
+		case 0x0f: /* ADPCM-DATA  */
+			if(type&OPL_TYPE_ADPCM)
+			{
+				uint8_t val;
+
+				val = deltat->ADPCM_Read();
+				/*logerror("Y8950: read ADPCM value read=%02x\n",val);*/
+				return val;
+			}
+			return 0;
+
+		case 0x19: /* I/O DATA    */
+			if(type&OPL_TYPE_IO)
+			{
+				if(porthandler_r)
+					return porthandler_r(port_param);
+				else
+					device->logerror("Y8950:read unmapped I/O port\n");
+			}
+			return 0;
+		case 0x1a: /* PCM-DATA    */
+			if(type&OPL_TYPE_ADPCM)
+			{
+				device->logerror("Y8950 A/D conversion is accessed but not implemented !\n");
+				return 0x80; /* 2's complement PCM data - result from A/D conversion */
+			}
+			return 0;
+		}
+#endif
+
+		return 0xff;
+	}
+
+
+	int TimerOver(int c)
+	{
+		if( c )
+		{   /* Timer B */
+			STATUS_SET(0x20);
+		}
+		else
+		{   /* Timer A */
+			STATUS_SET(0x40);
+			/* CSM mode key,TL controll */
+			if( mode & 0x80 )
+			{   /* CSM mode total level latch and auto key on */
+				int ch;
+				if(UpdateHandler) UpdateHandler(UpdateParam,0);
+				for(ch=0; ch<9; ch++)
+					P_CH[ch].CSMKeyControll();
+			}
+		}
+		/* reload timer */
+		if (timer_handler) (timer_handler)(TimerParam,c,TimerBase * T[c]);
+		return status>>7;
+	}
+
+
+	/* Create one of virtual YM3812/YM3526/Y8950 */
+	/* 'clock' is chip clock in Hz  */
+	/* 'rate'  is sampling rate  */
+	static FM_OPL *Create(device_t *device, uint32_t clock, uint32_t rate, int type)
+	{
+		if (LockTable(device) == -1)
+			return nullptr;
+
+		/* calculate OPL state size */
+		size_t state_size = sizeof(FM_OPL);
+#if BUILD_Y8950
+		if (type & OPL_TYPE_ADPCM)
+			state_size+= sizeof(YM_DELTAT);
+#endif
+
+		/* allocate memory block */
+		char *ptr = reinterpret_cast<char *>(::operator new(state_size));
+		std::fill_n(ptr, state_size, 0);
+
+		FM_OPL *const OPL = new(ptr) FM_OPL;
+
+		ptr += sizeof(FM_OPL);
+
+#if BUILD_Y8950
+		if (type & OPL_TYPE_ADPCM)
+		{
+			OPL->deltat.reset(reinterpret_cast<YM_DELTAT *>(ptr));
+			ptr += sizeof(YM_DELTAT);
+		}
+#endif
+
+		OPL->device = device;
+		OPL->type  = type;
+		OPL->clock_changed(clock, rate);
+
+		return OPL;
+	}
+
+
+	/* Optional handlers */
+
+	void SetTimerHandler(OPL_TIMERHANDLER handler, device_t *device)
+	{
+		timer_handler = handler;
+		TimerParam = device;
+	}
+	void SetIRQHandler(OPL_IRQHANDLER handler, device_t *device)
+	{
+		IRQHandler = handler;
+		IRQParam = device;
+	}
+	void SetUpdateHandler(OPL_UPDATEHANDLER handler, device_t *device)
+	{
+		UpdateHandler = handler;
+		UpdateParam = device;
+	}
+
+private:
+	void WriteReg(int r, int v);
+
+	uint32_t volume_calc(OPL_SLOT const &OP) const
+	{
+		return OP.TLL + uint32_t(OP.volume) + (LFO_AM & OP.AMmask);
+	}
+
+	static inline signed int op_calc(uint32_t phase, unsigned int env, signed int pm, unsigned int wave_tab)
+	{
+		uint32_t const p = (env<<4) + sin_tab[wave_tab + ((((signed int)((phase & ~FREQ_MASK) + (pm<<16))) >> FREQ_SH ) & SIN_MASK) ];
+
+		return (p >= TL_TAB_LEN) ? 0 : tl_tab[p];
+	}
+
+	static inline signed int op_calc1(uint32_t phase, unsigned int env, signed int pm, unsigned int wave_tab)
+	{
+		uint32_t const p = (env<<4) + sin_tab[wave_tab + ((((signed int)((phase & ~FREQ_MASK) + pm      )) >> FREQ_SH ) & SIN_MASK) ];
+
+		return (p >= TL_TAB_LEN) ? 0 : tl_tab[p];
+	}
 
 
 	/* lock/unlock for common table */
@@ -939,27 +1157,6 @@ struct FM_OPL
 		/* last time */
 		CloseTable();
 	}
-
-private:
-	uint32_t volume_calc(OPL_SLOT const &OP) const
-	{
-		return OP.TLL + uint32_t(OP.volume) + (LFO_AM & OP.AMmask);
-	}
-
-	static inline signed int op_calc(uint32_t phase, unsigned int env, signed int pm, unsigned int wave_tab)
-	{
-		uint32_t const p = (env<<4) + sin_tab[wave_tab + ((((signed int)((phase & ~FREQ_MASK) + (pm<<16))) >> FREQ_SH ) & SIN_MASK) ];
-
-		return (p >= TL_TAB_LEN) ? 0 : tl_tab[p];
-	}
-
-	static inline signed int op_calc1(uint32_t phase, unsigned int env, signed int pm, unsigned int wave_tab)
-	{
-		uint32_t const p = (env<<4) + sin_tab[wave_tab + ((((signed int)((phase & ~FREQ_MASK) + pm      )) >> FREQ_SH ) & SIN_MASK) ];
-
-		return (p >= TL_TAB_LEN) ? 0 : tl_tab[p];
-	}
-
 
 	static int init_tables();
 
@@ -1781,13 +1978,11 @@ void FM_OPL::ResetChip()
 #if BUILD_Y8950
 	if(type&OPL_TYPE_ADPCM)
 	{
-		YM_DELTAT *DELTAT = deltat;
-
-		DELTAT->freqbase = freqbase;
-		DELTAT->output_pointer = &output_deltat[0];
-		DELTAT->portshift = 5;
-		DELTAT->output_range = 1<<23;
-		DELTAT->ADPCM_Reset(0,YM_DELTAT::EMULATION_MODE_NORMAL,device);
+		deltat->freqbase = freqbase;
+		deltat->output_pointer = &output_deltat[0];
+		deltat->portshift = 5;
+		deltat->output_range = 1<<23;
+		deltat->ADPCM_Reset(0,YM_DELTAT::EMULATION_MODE_NORMAL,device);
 	}
 #endif
 }
@@ -1936,197 +2131,6 @@ static void OPL_save_state(FM_OPL *OPL, device_t *device)
 	device->machine().save().register_postload(save_prepost_delegate(FUNC(FM_OPL::postload), OPL));
 }
 
-static void OPL_clock_changed(FM_OPL *OPL, uint32_t clock, uint32_t rate)
-{
-	OPL->clock = clock;
-	OPL->rate  = rate;
-
-	/* init global tables */
-	OPL->initialize();
-}
-
-
-/* Create one of virtual YM3812/YM3526/Y8950 */
-/* 'clock' is chip clock in Hz  */
-/* 'rate'  is sampling rate  */
-static FM_OPL *OPLCreate(device_t *device, uint32_t clock, uint32_t rate, int type)
-{
-	char *ptr;
-	FM_OPL *OPL;
-	int state_size;
-
-	if (FM_OPL::LockTable(device) == -1) return nullptr;
-
-	/* calculate OPL state size */
-	state_size  = sizeof(FM_OPL);
-
-#if BUILD_Y8950
-	if (type&OPL_TYPE_ADPCM) state_size+= sizeof(YM_DELTAT);
-#endif
-
-	/* allocate memory block */
-	ptr = (char *)auto_alloc_array_clear(device->machine(), uint8_t, state_size);
-
-	OPL  = (FM_OPL *)ptr;
-
-	ptr += sizeof(FM_OPL);
-
-#if BUILD_Y8950
-	if (type&OPL_TYPE_ADPCM)
-	{
-		OPL->deltat = (YM_DELTAT *)ptr;
-	}
-	ptr += sizeof(YM_DELTAT);
-#endif
-
-	OPL->device = device;
-	OPL->type  = type;
-	OPL_clock_changed(OPL, clock, rate);
-
-	return OPL;
-}
-
-/* Destroy one of virtual YM3812 */
-static void OPLDestroy(FM_OPL *OPL)
-{
-	FM_OPL::UnLockTable();
-	auto_free(OPL->device->machine(), OPL);
-}
-
-/* Optional handlers */
-
-static void OPLSetTimerHandler(FM_OPL *OPL,OPL_TIMERHANDLER timer_handler,device_t *device)
-{
-	OPL->timer_handler   = timer_handler;
-	OPL->TimerParam = device;
-}
-static void OPLSetIRQHandler(FM_OPL *OPL,OPL_IRQHANDLER IRQHandler,device_t *device)
-{
-	OPL->IRQHandler     = IRQHandler;
-	OPL->IRQParam = device;
-}
-static void OPLSetUpdateHandler(FM_OPL *OPL,OPL_UPDATEHANDLER UpdateHandler,device_t *device)
-{
-	OPL->UpdateHandler = UpdateHandler;
-	OPL->UpdateParam = device;
-}
-
-static int OPLWrite(FM_OPL *OPL,int a,int v)
-{
-	if( !(a&1) )
-	{   /* address port */
-		OPL->address = v & 0xff;
-	}
-	else
-	{   /* data port */
-		if(OPL->UpdateHandler) OPL->UpdateHandler(OPL->UpdateParam,0);
-		OPL->WriteReg(OPL->address,v);
-	}
-	return OPL->status>>7;
-}
-
-static unsigned char OPLRead(FM_OPL *OPL,int a)
-{
-	if( !(a&1) )
-	{
-		/* status port */
-
-		#if BUILD_Y8950
-
-		if(OPL->type&OPL_TYPE_ADPCM)    /* Y8950 */
-		{
-			return (OPL->status & (OPL->statusmask|0x80)) | (OPL->deltat->PCM_BSY&1);
-		}
-
-		#endif
-
-		/* OPL and OPL2 */
-		return OPL->status & (OPL->statusmask|0x80);
-	}
-
-#if BUILD_Y8950
-	/* data port */
-	switch(OPL->address)
-	{
-	case 0x05: /* KeyBoard IN */
-		if(OPL->type&OPL_TYPE_KEYBOARD)
-		{
-			if(OPL->keyboardhandler_r)
-				return OPL->keyboardhandler_r(OPL->keyboard_param);
-			else
-				OPL->device->logerror("Y8950: read unmapped KEYBOARD port\n");
-		}
-		return 0;
-
-	case 0x0f: /* ADPCM-DATA  */
-		if(OPL->type&OPL_TYPE_ADPCM)
-		{
-			uint8_t val;
-
-			val = OPL->deltat->ADPCM_Read();
-			/*logerror("Y8950: read ADPCM value read=%02x\n",val);*/
-			return val;
-		}
-		return 0;
-
-	case 0x19: /* I/O DATA    */
-		if(OPL->type&OPL_TYPE_IO)
-		{
-			if(OPL->porthandler_r)
-				return OPL->porthandler_r(OPL->port_param);
-			else
-				OPL->device->logerror("Y8950:read unmapped I/O port\n");
-		}
-		return 0;
-	case 0x1a: /* PCM-DATA    */
-		if(OPL->type&OPL_TYPE_ADPCM)
-		{
-			OPL->device->logerror("Y8950 A/D conversion is accessed but not implemented !\n");
-			return 0x80; /* 2's complement PCM data - result from A/D conversion */
-		}
-		return 0;
-	}
-#endif
-
-	return 0xff;
-}
-
-/* CSM Key Controll */
-static inline void CSMKeyControll(OPL_CH *CH)
-{
-	CH->SLOT[SLOT1].KEYON(4);
-	CH->SLOT[SLOT2].KEYON(4);
-
-	/* The key off should happen exactly one sample later - not implemented correctly yet */
-
-	CH->SLOT[SLOT1].KEYOFF(~4);
-	CH->SLOT[SLOT2].KEYOFF(~4);
-}
-
-
-static int OPLTimerOver(FM_OPL *OPL,int c)
-{
-	if( c )
-	{   /* Timer B */
-		OPL->STATUS_SET(0x20);
-	}
-	else
-	{   /* Timer A */
-		OPL->STATUS_SET(0x40);
-		/* CSM mode key,TL controll */
-		if( OPL->mode & 0x80 )
-		{   /* CSM mode total level latch and auto key on */
-			int ch;
-			if(OPL->UpdateHandler) OPL->UpdateHandler(OPL->UpdateParam,0);
-			for(ch=0; ch<9; ch++)
-				CSMKeyControll( &OPL->P_CH[ch] );
-		}
-	}
-	/* reload timer */
-	if (OPL->timer_handler) (OPL->timer_handler)(OPL->TimerParam,c,OPL->TimerBase * OPL->T[c]);
-	return OPL->status>>7;
-}
-
 
 #define MAX_OPL_CHIPS 2
 
@@ -2135,13 +2139,13 @@ static int OPLTimerOver(FM_OPL *OPL,int c)
 
 void ym3812_clock_changed(void *chip, uint32_t clock, uint32_t rate)
 {
-	OPL_clock_changed((FM_OPL *)chip, clock, rate);
+	reinterpret_cast<FM_OPL *>(chip)->clock_changed(clock, rate);
 }
 
 void * ym3812_init(device_t *device, uint32_t clock, uint32_t rate)
 {
 	/* emulator create */
-	FM_OPL *YM3812 = OPLCreate(device,clock,rate,OPL_TYPE_YM3812);
+	FM_OPL *YM3812 = FM_OPL::Create(device,clock,rate,OPL_TYPE_YM3812);
 	if (YM3812)
 	{
 		OPL_save_state(YM3812, device);
@@ -2155,7 +2159,7 @@ void ym3812_shutdown(void *chip)
 	FM_OPL *YM3812 = (FM_OPL *)chip;
 
 	/* emulator shutdown */
-	OPLDestroy(YM3812);
+	delete YM3812;
 }
 void ym3812_reset_chip(void *chip)
 {
@@ -2166,35 +2170,32 @@ void ym3812_reset_chip(void *chip)
 int ym3812_write(void *chip, int a, int v)
 {
 	FM_OPL *YM3812 = (FM_OPL *)chip;
-	return OPLWrite(YM3812, a, v);
+	return YM3812->Write(a, v);
 }
 
 unsigned char ym3812_read(void *chip, int a)
 {
 	FM_OPL *YM3812 = (FM_OPL *)chip;
 	/* YM3812 always returns bit2 and bit1 in HIGH state */
-	return OPLRead(YM3812, a) | 0x06 ;
+	return YM3812->Read(a) | 0x06 ;
 }
 int ym3812_timer_over(void *chip, int c)
 {
 	FM_OPL *YM3812 = (FM_OPL *)chip;
-	return OPLTimerOver(YM3812, c);
+	return YM3812->TimerOver(c);
 }
 
 void ym3812_set_timer_handler(void *chip, OPL_TIMERHANDLER timer_handler, device_t *device)
 {
-	FM_OPL *YM3812 = (FM_OPL *)chip;
-	OPLSetTimerHandler(YM3812, timer_handler, device);
+	reinterpret_cast<FM_OPL *>(chip)->SetTimerHandler(timer_handler, device);
 }
 void ym3812_set_irq_handler(void *chip,OPL_IRQHANDLER IRQHandler,device_t *device)
 {
-	FM_OPL *YM3812 = (FM_OPL *)chip;
-	OPLSetIRQHandler(YM3812, IRQHandler, device);
+	reinterpret_cast<FM_OPL *>(chip)->SetIRQHandler(IRQHandler, device);
 }
 void ym3812_set_update_handler(void *chip,OPL_UPDATEHANDLER UpdateHandler,device_t *device)
 {
-	FM_OPL *YM3812 = (FM_OPL *)chip;
-	OPLSetUpdateHandler(YM3812, UpdateHandler, device);
+	reinterpret_cast<FM_OPL *>(chip)->SetUpdateHandler(UpdateHandler, device);
 }
 
 
@@ -2268,13 +2269,13 @@ void ym3812_update_one(void *chip, OPLSAMPLE *buffer, int length)
 
 void ym3526_clock_changed(void *chip, uint32_t clock, uint32_t rate)
 {
-	OPL_clock_changed((FM_OPL *)chip, clock, rate);
+	reinterpret_cast<FM_OPL *>(chip)->clock_changed(clock, rate);
 }
 
 void *ym3526_init(device_t *device, uint32_t clock, uint32_t rate)
 {
 	/* emulator create */
-	FM_OPL *YM3526 = OPLCreate(device,clock,rate,OPL_TYPE_YM3526);
+	FM_OPL *YM3526 = FM_OPL::Create(device,clock,rate,OPL_TYPE_YM3526);
 	if (YM3526)
 	{
 		OPL_save_state(YM3526, device);
@@ -2287,7 +2288,7 @@ void ym3526_shutdown(void *chip)
 {
 	FM_OPL *YM3526 = (FM_OPL *)chip;
 	/* emulator shutdown */
-	OPLDestroy(YM3526);
+	delete YM3526;
 }
 void ym3526_reset_chip(void *chip)
 {
@@ -2298,35 +2299,32 @@ void ym3526_reset_chip(void *chip)
 int ym3526_write(void *chip, int a, int v)
 {
 	FM_OPL *YM3526 = (FM_OPL *)chip;
-	return OPLWrite(YM3526, a, v);
+	return YM3526->Write(a, v);
 }
 
 unsigned char ym3526_read(void *chip, int a)
 {
 	FM_OPL *YM3526 = (FM_OPL *)chip;
 	/* YM3526 always returns bit2 and bit1 in HIGH state */
-	return OPLRead(YM3526, a) | 0x06 ;
+	return YM3526->Read(a) | 0x06 ;
 }
 int ym3526_timer_over(void *chip, int c)
 {
 	FM_OPL *YM3526 = (FM_OPL *)chip;
-	return OPLTimerOver(YM3526, c);
+	return YM3526->TimerOver(c);
 }
 
 void ym3526_set_timer_handler(void *chip, OPL_TIMERHANDLER timer_handler, device_t *device)
 {
-	FM_OPL *YM3526 = (FM_OPL *)chip;
-	OPLSetTimerHandler(YM3526, timer_handler, device);
+	reinterpret_cast<FM_OPL *>(chip)->SetTimerHandler(timer_handler, device);
 }
 void ym3526_set_irq_handler(void *chip,OPL_IRQHANDLER IRQHandler,device_t *device)
 {
-	FM_OPL *YM3526 = (FM_OPL *)chip;
-	OPLSetIRQHandler(YM3526, IRQHandler, device);
+	reinterpret_cast<FM_OPL *>(chip)->SetIRQHandler(IRQHandler, device);
 }
 void ym3526_set_update_handler(void *chip,OPL_UPDATEHANDLER UpdateHandler,device_t *device)
 {
-	FM_OPL *YM3526 = (FM_OPL *)chip;
-	OPLSetUpdateHandler(YM3526, UpdateHandler, device);
+	reinterpret_cast<FM_OPL *>(chip)->SetUpdateHandler(UpdateHandler, device);
 }
 
 
@@ -2413,7 +2411,7 @@ static void Y8950_deltat_status_reset(void *chip, uint8_t changebits)
 void *y8950_init(device_t *device, uint32_t clock, uint32_t rate)
 {
 	/* emulator create */
-	FM_OPL *Y8950 = OPLCreate(device,clock,rate,OPL_TYPE_Y8950);
+	FM_OPL *Y8950 = FM_OPL::Create(device,clock,rate,OPL_TYPE_Y8950);
 	if (Y8950)
 	{
 		Y8950->deltat->status_set_handler = Y8950_deltat_status_set;
@@ -2436,7 +2434,7 @@ void y8950_shutdown(void *chip)
 {
 	FM_OPL *Y8950 = (FM_OPL *)chip;
 	/* emulator shutdown */
-	OPLDestroy(Y8950);
+	delete Y8950;
 }
 void y8950_reset_chip(void *chip)
 {
@@ -2447,34 +2445,31 @@ void y8950_reset_chip(void *chip)
 int y8950_write(void *chip, int a, int v)
 {
 	FM_OPL *Y8950 = (FM_OPL *)chip;
-	return OPLWrite(Y8950, a, v);
+	return Y8950->Write(a, v);
 }
 
 unsigned char y8950_read(void *chip, int a)
 {
 	FM_OPL *Y8950 = (FM_OPL *)chip;
-	return OPLRead(Y8950, a);
+	return Y8950->Read(a);
 }
 int y8950_timer_over(void *chip, int c)
 {
 	FM_OPL *Y8950 = (FM_OPL *)chip;
-	return OPLTimerOver(Y8950, c);
+	return Y8950->TimerOver(c);
 }
 
 void y8950_set_timer_handler(void *chip, OPL_TIMERHANDLER timer_handler, device_t *device)
 {
-	FM_OPL *Y8950 = (FM_OPL *)chip;
-	OPLSetTimerHandler(Y8950, timer_handler, device);
+	reinterpret_cast<FM_OPL *>(chip)->SetTimerHandler(timer_handler, device);
 }
 void y8950_set_irq_handler(void *chip,OPL_IRQHANDLER IRQHandler,device_t *device)
 {
-	FM_OPL *Y8950 = (FM_OPL *)chip;
-	OPLSetIRQHandler(Y8950, IRQHandler, device);
+	reinterpret_cast<FM_OPL *>(chip)->SetIRQHandler(IRQHandler, device);
 }
 void y8950_set_update_handler(void *chip,OPL_UPDATEHANDLER UpdateHandler,device_t *device)
 {
-	FM_OPL *Y8950 = (FM_OPL *)chip;
-	OPLSetUpdateHandler(Y8950, UpdateHandler, device);
+	reinterpret_cast<FM_OPL *>(chip)->SetUpdateHandler(UpdateHandler, device);
 }
 
 void y8950_set_delta_t_memory(void *chip, void * deltat_mem_ptr, int deltat_mem_size )
@@ -2496,7 +2491,7 @@ void y8950_update_one(void *chip, OPLSAMPLE *buffer, int length)
 	int i;
 	FM_OPL      *OPL = (FM_OPL *)chip;
 	uint8_t       rhythm  = OPL->rhythm&0x20;
-	YM_DELTAT   *DELTAT = OPL->deltat;
+	YM_DELTAT   &DELTAT = *OPL->deltat;
 	OPLSAMPLE   *buf    = buffer;
 
 	for( i=0; i < length ; i++ )
@@ -2509,8 +2504,8 @@ void y8950_update_one(void *chip, OPLSAMPLE *buffer, int length)
 		OPL->advance_lfo();
 
 		/* deltaT ADPCM */
-		if( DELTAT->portstate&0x80 )
-			DELTAT->ADPCM_CALC();
+		if( DELTAT.portstate&0x80 )
+			DELTAT.ADPCM_CALC();
 
 		/* FM part */
 		OPL->CALC_CH(OPL->P_CH[0]);

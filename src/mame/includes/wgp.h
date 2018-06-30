@@ -9,6 +9,7 @@
 #include "audio/taitosnd.h"
 #include "machine/taitoio.h"
 #include "video/tc0100scn.h"
+#include "emupal.h"
 
 
 class wgp_state : public driver_device
@@ -50,12 +51,17 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(pivram_word_w);
 	DECLARE_WRITE16_MEMBER(piv_ctrl_word_w);
-	DECLARE_DRIVER_INIT(wgp);
-	DECLARE_DRIVER_INIT(wgp2);
+	void init_wgp();
+	void init_wgp2();
 	DECLARE_VIDEO_START(wgp2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cpub_interrupt);
 
+	void wgp2(machine_config &config);
+	void wgp(machine_config &config);
+	void cpu2_map(address_map &map);
+	void main_map(address_map &map);
+	void z80_sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

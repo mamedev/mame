@@ -63,6 +63,8 @@ using namespace glslang;
 
 %}
 
+%define parse.error verbose
+
 %union {
     struct {
         glslang::TSourceLoc loc;
@@ -119,7 +121,7 @@ extern int yylex(YYSTYPE*, TParseContext&);
 %expect 1     // One shift reduce conflict because of if | else
 
 %token <lex> ATTRIBUTE VARYING
-%token <lex> CONST BOOL FLOAT DOUBLE INT UINT INT64_T UINT64_T FLOAT16_T
+%token <lex> CONST BOOL FLOAT DOUBLE INT UINT INT64_T UINT64_T INT16_T UINT16_T FLOAT16_T
 %token <lex> BREAK CONTINUE DO ELSE FOR IF DISCARD RETURN SWITCH CASE DEFAULT SUBROUTINE
 %token <lex> BVEC2 BVEC3 BVEC4 IVEC2 IVEC3 IVEC4 I64VEC2 I64VEC3 I64VEC4 UVEC2 UVEC3 UVEC4 U64VEC2 U64VEC3 U64VEC4 VEC2 VEC3 VEC4
 %token <lex> MAT2 MAT3 MAT4 CENTROID IN OUT INOUT
@@ -127,6 +129,7 @@ extern int yylex(YYSTYPE*, TParseContext&);
 %token <lex> COHERENT VOLATILE RESTRICT READONLY WRITEONLY
 %token <lex> DVEC2 DVEC3 DVEC4 DMAT2 DMAT3 DMAT4
 %token <lex> F16VEC2 F16VEC3 F16VEC4 F16MAT2 F16MAT3 F16MAT4
+%token <lex> I16VEC2 I16VEC3 I16VEC4 U16VEC2 U16VEC3 U16VEC4
 %token <lex> NOPERSPECTIVE FLAT SMOOTH LAYOUT __EXPLICITINTERPAMD
 
 %token <lex> MAT2X2 MAT2X3 MAT2X4
@@ -186,7 +189,7 @@ extern int yylex(YYSTYPE*, TParseContext&);
 %token <lex> STRUCT VOID WHILE
 
 %token <lex> IDENTIFIER TYPE_NAME
-%token <lex> FLOATCONSTANT DOUBLECONSTANT INTCONSTANT UINTCONSTANT INT64CONSTANT UINT64CONSTANT BOOLCONSTANT FLOAT16CONSTANT
+%token <lex> FLOATCONSTANT DOUBLECONSTANT INTCONSTANT UINTCONSTANT INT64CONSTANT UINT64CONSTANT INT16CONSTANT UINT16CONSTANT BOOLCONSTANT FLOAT16CONSTANT
 %token <lex> LEFT_OP RIGHT_OP
 %token <lex> INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP
 %token <lex> AND_OP OR_OP XOR_OP MUL_ASSIGN DIV_ASSIGN ADD_ASSIGN
@@ -270,6 +273,18 @@ primary_expression
     | UINT64CONSTANT {
         parseContext.int64Check($1.loc, "64-bit unsigned integer literal");
         $$ = parseContext.intermediate.addConstantUnion($1.u64, $1.loc, true);
+    }
+    | INT16CONSTANT {
+#ifdef AMD_EXTENSIONS
+        parseContext.int16Check($1.loc, "16-bit integer literal");
+        $$ = parseContext.intermediate.addConstantUnion((short)$1.i, $1.loc, true);
+#endif
+    }
+    | UINT16CONSTANT {
+#ifdef AMD_EXTENSIONS
+        parseContext.int16Check($1.loc, "16-bit unsigned integer literal");
+        $$ = parseContext.intermediate.addConstantUnion((unsigned short)$1.u, $1.loc, true);
+#endif
     }
     | FLOATCONSTANT {
         $$ = parseContext.intermediate.addConstantUnion($1.d, EbtFloat, $1.loc, true);
@@ -845,6 +860,11 @@ function_header
         // Add the function as a prototype after parsing it (we do not support recursion)
         TFunction *function;
         TType type($1);
+
+        // Potentially rename shader entry point function.  No-op most of the time.
+        parseContext.renameShaderFunction($2.string);
+
+        // Make the function
         function = new TFunction($2.string, type);
         $$ = function;
     }
@@ -1229,6 +1249,7 @@ storage_qualifier
         $$.qualifier.storage = EvqBuffer;
     }
     | SHARED {
+        parseContext.globalCheck($1.loc, "shared");
         parseContext.profileRequires($1.loc, ECoreProfile | ECompatibilityProfile, 430, E_GL_ARB_compute_shader, "shared");
         parseContext.profileRequires($1.loc, EEsProfile, 310, 0, "shared");
         parseContext.requireStage($1.loc, EShLangCompute, "shared");
@@ -1258,25 +1279,25 @@ storage_qualifier
     | SUBROUTINE {
         parseContext.spvRemoved($1.loc, "subroutine");
         parseContext.globalCheck($1.loc, "subroutine");
+        parseContext.unimplemented($1.loc, "subroutine");
         $$.init($1.loc);
-        $$.qualifier.storage = EvqUniform;
     }
     | SUBROUTINE LEFT_PAREN type_name_list RIGHT_PAREN {
         parseContext.spvRemoved($1.loc, "subroutine");
         parseContext.globalCheck($1.loc, "subroutine");
+        parseContext.unimplemented($1.loc, "subroutine");
         $$.init($1.loc);
-        $$.qualifier.storage = EvqUniform;
-        // TODO: 4.0 semantics: subroutines
-        // 1) make sure each identifier is a type declared earlier with SUBROUTINE
-        // 2) save all of the identifiers for future comparison with the declared function
     }
     ;
 
 type_name_list
-    : TYPE_NAME {
-        // TODO: 4.0 functionality: subroutine type to list
+    : IDENTIFIER {
+        // TODO
     }
-    | type_name_list COMMA TYPE_NAME {
+    | type_name_list COMMA IDENTIFIER {
+        // TODO: 4.0 semantics: subroutines
+        // 1) make sure each identifier is a type declared earlier with SUBROUTINE
+        // 2) save all of the identifiers for future comparison with the declared function
     }
     ;
 
@@ -1359,6 +1380,20 @@ type_specifier_nonarray
         parseContext.int64Check($1.loc, "64-bit unsigned integer", parseContext.symbolTable.atBuiltInLevel());
         $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
         $$.basicType = EbtUint64;
+    }
+    | INT16_T {
+#ifdef AMD_EXTENSIONS
+        parseContext.int16Check($1.loc, "16-bit integer", parseContext.symbolTable.atBuiltInLevel());
+        $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
+        $$.basicType = EbtInt16;
+#endif
+    }
+    | UINT16_T {
+#ifdef AMD_EXTENSIONS
+        parseContext.int16Check($1.loc, "16-bit unsigned integer", parseContext.symbolTable.atBuiltInLevel());
+        $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
+        $$.basicType = EbtUint16;
+#endif
     }
     | BOOL {
         $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
@@ -1469,6 +1504,30 @@ type_specifier_nonarray
         $$.basicType = EbtInt64;
         $$.setVector(4);
     }
+    | I16VEC2 {
+#ifdef AMD_EXTENSIONS
+        parseContext.int16Check($1.loc, "16-bit integer vector", parseContext.symbolTable.atBuiltInLevel());
+        $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
+        $$.basicType = EbtInt16;
+        $$.setVector(2);
+#endif
+    }
+    | I16VEC3 {
+#ifdef AMD_EXTENSIONS
+        parseContext.int16Check($1.loc, "16-bit integer vector", parseContext.symbolTable.atBuiltInLevel());
+        $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
+        $$.basicType = EbtInt16;
+        $$.setVector(3);
+#endif
+    }
+    | I16VEC4 {
+#ifdef AMD_EXTENSIONS
+        parseContext.int16Check($1.loc, "16-bit integer vector", parseContext.symbolTable.atBuiltInLevel());
+        $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
+        $$.basicType = EbtInt16;
+        $$.setVector(4);
+#endif
+    }
     | UVEC2 {
         parseContext.fullIntegerCheck($1.loc, "unsigned integer vector");
         $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
@@ -1504,6 +1563,30 @@ type_specifier_nonarray
         $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
         $$.basicType = EbtUint64;
         $$.setVector(4);
+    }
+    | U16VEC2 {
+#ifdef AMD_EXTENSIONS
+        parseContext.int16Check($1.loc, "16-bit unsigned integer vector", parseContext.symbolTable.atBuiltInLevel());
+        $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
+        $$.basicType = EbtUint16;
+        $$.setVector(2);
+#endif
+    }
+    | U16VEC3 {
+#ifdef AMD_EXTENSIONS
+        parseContext.int16Check($1.loc, "16-bit unsigned integer vector", parseContext.symbolTable.atBuiltInLevel());
+        $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
+        $$.basicType = EbtUint16;
+        $$.setVector(3);
+#endif
+    }
+    | U16VEC4 {
+#ifdef AMD_EXTENSIONS
+        parseContext.int16Check($1.loc, "16-bit unsigned integer vector", parseContext.symbolTable.atBuiltInLevel());
+        $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
+        $$.basicType = EbtUint16;
+        $$.setVector(4);
+#endif
     }
     | MAT2 {
         $$.init($1.loc, parseContext.symbolTable.atGlobalLevel());
@@ -2775,7 +2858,7 @@ jump_statement
         if (parseContext.currentFunctionType->getBasicType() != EbtVoid)
             parseContext.error($1.loc, "non-void function must return a value", "return", "");
         if (parseContext.inMain)
-            parseContext.postMainReturn = true;
+            parseContext.postEntryPointReturn = true;
     }
     | RETURN expression SEMICOLON {
         $$ = parseContext.handleReturnValue($1.loc, $2);
@@ -2794,8 +2877,10 @@ translation_unit
         parseContext.intermediate.setTreeRoot($$);
     }
     | translation_unit external_declaration {
-        $$ = parseContext.intermediate.growAggregate($1, $2);
-        parseContext.intermediate.setTreeRoot($$);
+        if ($2 != nullptr) {
+            $$ = parseContext.intermediate.growAggregate($1, $2);
+            parseContext.intermediate.setTreeRoot($$);
+        }
     }
     ;
 
@@ -2805,6 +2890,11 @@ external_declaration
     }
     | declaration {
         $$ = $1;
+    }
+    | SEMICOLON {
+        parseContext.requireProfile($1.loc, ~EEsProfile, "extraneous semicolon");
+        parseContext.profileRequires($1.loc, ~EEsProfile, 460, nullptr, "extraneous semicolon");
+        $$ = nullptr;
     }
     ;
 
@@ -2826,7 +2916,7 @@ function_definition
         // information. This information can be queried from the parse tree
         $$->getAsAggregate()->setOptimize(parseContext.contextPragma.optimize);
         $$->getAsAggregate()->setDebug(parseContext.contextPragma.debug);
-        $$->getAsAggregate()->addToPragmaTable(parseContext.contextPragma.pragmaTable);
+        $$->getAsAggregate()->setPragmaTable(parseContext.contextPragma.pragmaTable);
     }
     ;
 

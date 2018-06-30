@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "am29000.h"
+#include "am29dasm.h"
 
 
 /***************************************************************************
@@ -36,38 +36,38 @@
     CODE
 ***************************************************************************/
 
-static std::string dasm_type1(uint32_t op)
+std::string am29000_disassembler::dasm_type1(uint32_t op)
 {
 	return (op & OP_M_BIT)
 		? string_format("r%d, r%d, $%02x", OP_RC, OP_RA, OP_I8)
 		: string_format("r%d, r%d, r%d", OP_RC, OP_RA, OP_RB);
 }
 
-static std::string dasm_type2(uint32_t op)
+std::string am29000_disassembler::dasm_type2(uint32_t op)
 {
 	return string_format("r%d, r%d, r%d", OP_RC, OP_RA, OP_RB);
 }
 
-static std::string dasm_type3(uint32_t op)
+std::string am29000_disassembler::dasm_type3(uint32_t op)
 {
 	return string_format("r%d, $%04x", OP_RA, OP_I16);
 }
 
-static std::string dasm_type4(uint32_t op, uint32_t pc)
+std::string am29000_disassembler::dasm_type4(uint32_t op, uint32_t pc)
 {
 	return (op & OP_M_BIT)
 		? string_format("r%d, $%04x", OP_RA, OP_IJMP)
 		: string_format("r%d, $%04x", OP_RA, pc + OP_SJMP);
 }
 
-static std::string dasm_type5(uint32_t op)
+std::string am29000_disassembler::dasm_type5(uint32_t op)
 {
 	return (op & OP_M_BIT)
 		? string_format("trap%d, r%d, $%02x", OP_VN, OP_RA, OP_I8)
 		: string_format("trap%d, r%d, r%d", OP_VN, OP_RA, OP_RB);
 }
 
-static std::string dasm_type6(uint32_t op)
+std::string am29000_disassembler::dasm_type6(uint32_t op)
 {
 	return (op & OP_M_BIT)
 		? string_format("%d, %x, r%d, $%02x", OP_CE, OP_CNTL, OP_RA, OP_I8)
@@ -82,7 +82,7 @@ static std::string dasm_type6(uint32_t op)
 #define TYPE_6      dasm_type6(op)
 
 
-static const char* get_spr(int spid)
+const char* am29000_disassembler::get_spr(int spid)
 {
 	switch (spid)
 	{
@@ -117,9 +117,14 @@ static const char* get_spr(int spid)
 	}
 }
 
-CPU_DISASSEMBLE(am29000)
+u32 am29000_disassembler::opcode_alignment() const
 {
-	uint32_t op = (oprom[0] << 24) | (oprom[1] << 16) | (oprom[2] << 8) | oprom[3];
+	return 4;
+}
+
+offs_t am29000_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	uint32_t op = opcodes.r32(pc);
 	uint32_t flags = 0;
 
 	switch (op >> 24)
@@ -228,5 +233,5 @@ CPU_DISASSEMBLE(am29000)
 		default:                util::stream_format(stream, "??????");                                      break;
 	}
 
-	return 4 | flags | DASMFLAG_SUPPORTED;
+	return 4 | flags | SUPPORTED;
 }

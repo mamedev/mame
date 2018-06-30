@@ -27,6 +27,7 @@ Cart sizes: 1MB, 2MB, 4MB
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -48,6 +49,8 @@ public:
 	required_device<generic_slot_device> m_cart;
 	uint32_t  m_rom_size;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pockchalv1_cart);
+	void pockchalv1(machine_config &config);
+	void pockchalv1_map(address_map &map);
 };
 
 
@@ -69,9 +72,10 @@ uint32_t pockchalv1_state::screen_update_pockchalv1(screen_device &screen, bitma
 }
 
 
-static ADDRESS_MAP_START( pockchalv1_map, AS_PROGRAM, 8, pockchalv1_state )
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void pockchalv1_state::pockchalv1_map(address_map &map)
+{
+	map(0xc000, 0xffff).ram();
+}
 
 
 static INPUT_PORTS_START( pockchalv1 )
@@ -91,12 +95,12 @@ void pockchalv1_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( pockchalv1 )
+MACHINE_CONFIG_START(pockchalv1_state::pockchalv1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMP90845,8000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(pockchalv1_map)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", pockchalv1_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", TMP90845,8000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pockchalv1_map)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pockchalv1_state,  irq0_line_hold)
 
 	// wrong, it's a b&w / greyscale thing
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -126,5 +130,5 @@ MACHINE_CONFIG_END
 ROM_START( pockchal )
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY                FULLNAME                      FLAGS
-CONS( 199?, pockchal, 0,      0,      pockchalv1, pockchalv1, pockchalv1_state, 0,    "Benesse Corporation", "Pocket Challenge W (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                FULLNAME                      FLAGS
+CONS( 199?, pockchal, 0,      0,      pockchalv1, pockchalv1, pockchalv1_state, empty_init, "Benesse Corporation", "Pocket Challenge W (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

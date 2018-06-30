@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "scmp.h"
+#include "scmpdasm.h"
 
 #include "debugger.h"
 
@@ -17,8 +18,8 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(SCMP,    scmp_device,    "ins8050", "INS 8050 SC/MP")
-DEFINE_DEVICE_TYPE(INS8060, ins8060_device, "ins8060", "INS 8060 SC/MP II")
+DEFINE_DEVICE_TYPE(SCMP,    scmp_device,    "ins8050", "National Semiconductor INS 8050 SC/MP")
+DEFINE_DEVICE_TYPE(INS8060, ins8060_device, "ins8060", "National Semiconductor INS 8060 SC/MP II")
 
 
 scmp_device::scmp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -30,7 +31,7 @@ scmp_device::scmp_device(const machine_config &mconfig, const char *tag, device_
 scmp_device::scmp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_AC(0), m_ER(0), m_SR(0), m_program(nullptr), m_direct(nullptr), m_icount(0)
+	, m_AC(0), m_ER(0), m_SR(0), m_program(nullptr), m_cache(nullptr), m_icount(0)
 	, m_flag_out_func(*this)
 	, m_sout_func(*this)
 	, m_sin_func(*this)
@@ -54,10 +55,9 @@ ins8060_device::ins8060_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-offs_t scmp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> scmp_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( scmp );
-	return CPU_DISASSEMBLE_NAME(scmp)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<scmp_disassembler>();
 }
 
 
@@ -70,14 +70,14 @@ uint8_t scmp_device::ROP()
 {
 	uint16_t pc = m_PC.w.l;
 	m_PC.w.l = ADD12(m_PC.w.l,1);
-	return m_direct->read_byte( pc);
+	return m_cache->read_byte( pc);
 }
 
 uint8_t scmp_device::ARG()
 {
 	uint16_t pc = m_PC.w.l;
 	m_PC.w.l = ADD12(m_PC.w.l,1);
-	return m_direct->read_byte(pc);
+	return m_cache->read_byte(pc);
 }
 
 uint8_t scmp_device::RM(uint32_t a)
@@ -475,7 +475,7 @@ void scmp_device::execute_run()
 		if ((m_SR & 0x08) && (m_sensea_func())) {
 			take_interrupt();
 		}
-		debugger_instruction_hook(this, m_PC.d);
+		debugger_instruction_hook(m_PC.d);
 		execute_one(ROP());
 
 	} while (m_icount > 0);
@@ -502,7 +502,7 @@ void scmp_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 
 	/* resolve callbacks */
 	m_flag_out_func.resolve_safe();
@@ -520,7 +520,7 @@ void scmp_device::device_start()
 	save_item(NAME(m_ER));
 	save_item(NAME(m_SR));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 

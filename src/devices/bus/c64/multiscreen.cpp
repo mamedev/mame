@@ -102,18 +102,19 @@ const tiny_rom_entry *c64_multiscreen_cartridge_device::device_rom_region() cons
 }
 
 
-static ADDRESS_MAP_START( multiscreen_mem, AS_PROGRAM, 8, c64_multiscreen_cartridge_device )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(MC6802P_TAG, 0)
-ADDRESS_MAP_END
+void c64_multiscreen_cartridge_device::multiscreen_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region(MC6802P_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_multiscreen_cartridge_device::device_add_mconfig )
-	MCFG_CPU_ADD(MC6802P_TAG, M6802, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(multiscreen_mem)
+MACHINE_CONFIG_START(c64_multiscreen_cartridge_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(MC6802P_TAG, M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(multiscreen_mem)
 
 	MCFG_DEVICE_ADD(MC6821P_0_TAG, PIA6821, 0)
 	MCFG_DEVICE_ADD(MC6821P_1_TAG, PIA6821, 0)

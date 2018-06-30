@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "amis2000.h"
+#include "amis2000d.h"
 #include "debugger.h"
 
 
@@ -34,38 +35,42 @@ DEFINE_DEVICE_TYPE(AMI_S2152, amis2152_cpu_device, "amis2152", "AMI S2152")
 
 
 // internal memory maps
-static ADDRESS_MAP_START(program_1k, AS_PROGRAM, 8, amis2000_base_device)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-ADDRESS_MAP_END
+void amis2000_base_device::program_1k(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();
+}
 
-static ADDRESS_MAP_START(program_1_5k, AS_PROGRAM, 8, amis2000_base_device)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0400, 0x05ff) AM_NOP // 0x00
-	AM_RANGE(0x0600, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void amis2000_base_device::program_1_5k(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0x05ff).noprw(); // 0x00
+	map(0x0600, 0x07ff).rom();
+}
 
 
-static ADDRESS_MAP_START(data_64x4, AS_DATA, 8, amis2000_base_device)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void amis2000_base_device::data_64x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-static ADDRESS_MAP_START(data_80x4, AS_DATA, 8, amis2000_base_device)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-	AM_RANGE(0x40, 0x4f) AM_RAM
-ADDRESS_MAP_END
+void amis2000_base_device::data_80x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+	map(0x40, 0x4f).ram();
+}
 
 
 // device definitions
 amis2000_cpu_device::amis2000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: amis2000_base_device(mconfig, AMI_S2000, tag, owner, clock, 2, 10, 3, 13, ADDRESS_MAP_NAME(program_1k), 6, ADDRESS_MAP_NAME(data_64x4))
+	: amis2000_base_device(mconfig, AMI_S2000, tag, owner, clock, 2, 10, 3, 13, address_map_constructor(FUNC(amis2000_cpu_device::program_1k), this), 6, address_map_constructor(FUNC(amis2000_cpu_device::data_64x4), this))
 { }
 
 amis2150_cpu_device::amis2150_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: amis2000_base_device(mconfig, AMI_S2150, tag, owner, clock, 3, 11, 3, 13, ADDRESS_MAP_NAME(program_1_5k), 7, ADDRESS_MAP_NAME(data_80x4))
+	: amis2000_base_device(mconfig, AMI_S2150, tag, owner, clock, 3, 11, 3, 13, address_map_constructor(FUNC(amis2150_cpu_device::program_1_5k), this), 7, address_map_constructor(FUNC(amis2150_cpu_device::data_80x4), this))
 { }
 
 amis2152_cpu_device::amis2152_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: amis2000_base_device(mconfig, AMI_S2152, tag, owner, clock, 3, 11, 3, 13, ADDRESS_MAP_NAME(program_1_5k), 7, ADDRESS_MAP_NAME(data_80x4))
+	: amis2000_base_device(mconfig, AMI_S2152, tag, owner, clock, 3, 11, 3, 13, address_map_constructor(FUNC(amis2152_cpu_device::program_1_5k), this), 7, address_map_constructor(FUNC(amis2152_cpu_device::data_80x4), this))
 { }
 
 device_memory_interface::space_config_vector amis2000_base_device::memory_space_config() const
@@ -98,10 +103,9 @@ void amis2000_base_device::state_string_export(const device_state_entry &entry, 
 	}
 }
 
-offs_t amis2000_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+std::unique_ptr<util::disasm_interface> amis2000_base_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(amis2000);
-	return CPU_DISASSEMBLE_NAME(amis2000)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<amis2000_disassembler>();
 }
 
 
@@ -182,7 +186,7 @@ void amis2000_base_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add(STATE_GENFLAGS, "CURFLAGS", m_f).formatstr("%6s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -246,7 +250,7 @@ void amis2000_base_device::execute_run()
 		// remember previous opcode
 		m_prev_op = m_op;
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		m_op = m_program->read_byte(m_pc);
 		m_pc = (m_pc + 1) & 0x1fff;
 

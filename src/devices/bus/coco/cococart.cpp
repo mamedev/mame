@@ -249,7 +249,7 @@ void cococart_slot_device::set_line_timer(coco_cartridge_line &line, cococart_sl
 {
 	// calculate delay; delay dependant on cycles per second
 	attotime delay = (line.delay != 0)
-		? machine().firstcpu->cycles_to_attotime(line.delay)
+		? clocks_to_attotime(line.delay)
 		: attotime::zero;
 
 	line.timer[line.timer_index]->adjust(delay, (int) value);
@@ -446,6 +446,9 @@ std::string cococart_slot_device::get_default_card_software(get_default_card_sof
 //  DEVICE COCO CART INTERFACE - Implemented by devices that plug into
 //  CoCo cartridge slots
 //**************************************************************************
+
+template class device_finder<device_cococart_interface, false>;
+template class device_finder<device_cococart_interface, true>;
 
 //-------------------------------------------------
 //  device_cococart_interface - constructor

@@ -22,6 +22,7 @@ DEFINE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device, "wswan_video", "Bandai Wonde
 
 wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WSWAN_VIDEO, tag, owner, clock)
+	, m_screen(*this, ":screen")
 	, m_vdp_type(VDP_TYPE_WSWAN)
 {
 }
@@ -81,7 +82,7 @@ void wswan_video_device::common_save()
 
 void wswan_video_device::device_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 
 	m_timer = timer_alloc(TIMER_SCANLINE);
 	m_timer->adjust(attotime::from_ticks(256, 3072000), 0, attotime::from_ticks(256, 3072000));

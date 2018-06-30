@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "upd7725.h"
+#include "dasm7725.h"
 
 
 //**************************************************************************
@@ -21,8 +22,8 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(UPD7725,  upd7725_device,  "upd7725",  "uPD7725")
-DEFINE_DEVICE_TYPE(UPD96050, upd96050_device, "upd96050", "uPD96050")
+DEFINE_DEVICE_TYPE(UPD7725,  upd7725_device,  "upd7725",  "NEC uPD7725")
+DEFINE_DEVICE_TYPE(UPD96050, upd96050_device, "upd96050", "NEC uPD96050")
 
 necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits)
 	: cpu_device(mconfig, type, tag, owner, clock),
@@ -32,7 +33,7 @@ necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, co
 		m_irq_firing(0),
 		m_program(nullptr),
 		m_data(nullptr),
-		m_direct(nullptr),
+		m_cache(nullptr),
 		m_in_int_cb(*this),
 		//m_in_si_cb(*this),
 		//m_in_sck_cb(*this),
@@ -67,7 +68,7 @@ void necdsp_device::device_start()
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
-	m_direct = &m_program->direct();
+	m_cache = m_program->cache<2, -2, ENDIANNESS_BIG>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC, "GENPC", regs.pc).noshow();
@@ -149,7 +150,7 @@ void necdsp_device::device_start()
 	save_item(NAME(m_irq));
 	save_item(NAME(m_irq_firing));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	for (auto & elem : dataRAM)
 	{
@@ -316,35 +317,13 @@ void necdsp_device::execute_set_input(int inputnum, int state)
 }
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t necdsp_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t necdsp_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t necdsp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> necdsp_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( upd7725 );
-	return CPU_DISASSEMBLE_NAME(upd7725)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<necdsp_disassembler>();
 }
 
 void necdsp_device::execute_run()
@@ -356,12 +335,12 @@ void necdsp_device::execute_run()
 		// call debugger hook if necessary
 		if (device_t::machine().debug_flags & DEBUG_FLAG_ENABLED)
 		{
-			debugger_instruction_hook(this, regs.pc);
+			debugger_instruction_hook(regs.pc);
 		}
 
 		if (m_irq_firing == 0) // normal opcode
 		{
-			opcode = m_direct->read_dword(regs.pc<<2)>>8;
+			opcode = m_cache->read_dword(regs.pc) >> 8;
 			regs.pc++;
 		}
 		else if (m_irq_firing == 1) // if we're in an interrupt cycle, execute a op 'nop' first...
@@ -413,13 +392,13 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	case  3: regs.idb = regs.tr; break;
 	case  4: regs.idb = regs.dp; break;
 	case  5: regs.idb = regs.rp; break;
-	case  6: regs.idb = m_data->read_word(regs.rp<<1); break;
+	case  6: regs.idb = m_data->read_word(regs.rp); break;
 	case  7: regs.idb = 0x8000 - regs.flaga.s1; break;  //SGN
 	case  8: regs.idb = regs.dr; regs.sr.rqm = 1; break;
 	case  9: regs.idb = regs.dr; break;
 	case 10: regs.idb = regs.sr; break;
 	case 11: regs.idb = regs.si; break;  //MSB = first bit in from serial, 'natural' SI register order
-	case 12: regs.idb = BITSWAP16(regs.si, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB = first bit in from serial, 'reversed' SI register order
+	case 12: regs.idb = bitswap<16>(regs.si, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB = first bit in from serial, 'reversed' SI register order
 	case 13: regs.idb = regs.k; break;
 	case 14: regs.idb = regs.l; break;
 	case 15: regs.idb = dataRAM[regs.dp]; break;
@@ -607,10 +586,10 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 				m_out_p0_cb(regs.sr.p0);
 				m_out_p1_cb(regs.sr.p1);
 				break;
-	case  8: regs.so = BITSWAP16(id, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB first output, output tapped at bit 15 shifting left
+	case  8: regs.so = bitswap<16>(id, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB first output, output tapped at bit 15 shifting left
 	case  9: regs.so = id; break;  //MSB first output, output tapped at bit 15 shifting left
 	case 10: regs.k = id; break;
-	case 11: regs.k = id; regs.l = m_data->read_word(regs.rp<<1); break;
+	case 11: regs.k = id; regs.l = m_data->read_word(regs.rp); break;
 	case 12: regs.l = id; regs.k = dataRAM[regs.dp | 0x40]; break;
 	case 13: regs.l = id; break;
 	case 14: regs.trb = id; break;

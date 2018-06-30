@@ -26,43 +26,40 @@ DECLARE_DEVICE_TYPE(M68HC705C8A, m68hc705c8a_device)
 // ======================> m68hc05_device
 
 #define MCFG_M68HC05_PORTA_R_CB(obj) \
-	devcb = &m68hc05_device::set_port_cb_r<0>(*device, DEVCB_##obj);
+	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_r<0>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTB_R_CB(obj) \
-	devcb = &m68hc05_device::set_port_cb_r<1>(*device, DEVCB_##obj);
+	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_r<1>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTC_R_CB(obj) \
-	devcb = &m68hc05_device::set_port_cb_r<2>(*device, DEVCB_##obj);
+	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_r<2>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTD_R_CB(obj) \
-	devcb = &m68hc05_device::set_port_cb_r<3>(*device, DEVCB_##obj);
+	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_r<3>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTA_W_CB(obj) \
-	devcb = &m68hc05_device::set_port_cb_w<0>(*device, DEVCB_##obj);
+	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_w<0>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTB_W_CB(obj) \
-	devcb = &m68hc05_device::set_port_cb_w<1>(*device, DEVCB_##obj);
+	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_w<1>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTC_W_CB(obj) \
-	devcb = &m68hc05_device::set_port_cb_w<2>(*device, DEVCB_##obj);
+	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_w<2>(DEVCB_##obj);
 
 #define MCFG_M68HC05_PORTD_W_CB(obj) \
-	devcb = &m68hc05_device::set_port_cb_w<3>(*device, DEVCB_##obj);
+	devcb = &downcast<m68hc05_device &>(*device).set_port_cb_w<3>(DEVCB_##obj);
 
 #define MCFG_M68HC05_TCMP_CB(obj) \
-	devcb = &m68hc05_device::set_tcmp_cb(*device, DEVCB_##obj);
+	devcb = &downcast<m68hc05_device &>(*device).set_tcmp_cb(DEVCB_##obj);
 
 
 class m68hc05_device : public m6805_base_device
 {
 public:
-	// static configuration helpers
-	template<std::size_t N, typename Object> static devcb_base &set_port_cb_r(device_t &device, Object &&obj)
-	{ return downcast<m68hc05_device &>(device).m_port_cb_r[N].set_callback(std::forward<Object>(obj)); }
-	template<std::size_t N, typename Object> static devcb_base &set_port_cb_w(device_t &device, Object &&obj)
-	{ return downcast<m68hc05_device &>(device).m_port_cb_w[N].set_callback(std::forward<Object>(obj)); }
-	template<typename Object> static devcb_base &set_tcmp_cb(device_t &device, Object &&obj)
-	{ return downcast<m68hc05_device &>(device).m_tcmp_cb.set_callback(std::forward<Object>(obj)); }
+	//  configuration helpers
+	template<std::size_t N, typename Object> devcb_base &set_port_cb_r(Object &&obj) { return m_port_cb_r[N].set_callback(std::forward<Object>(obj)); }
+	template<std::size_t N, typename Object> devcb_base &set_port_cb_w(Object &&obj) { return m_port_cb_w[N].set_callback(std::forward<Object>(obj)); }
+	template<typename Object> devcb_base &set_tcmp_cb(Object &&obj) { return m_tcmp_cb.set_callback(std::forward<Object>(obj)); }
 
 protected:
 	// state index constants
@@ -108,7 +105,7 @@ protected:
 			device_t *owner,
 			u32 clock,
 			device_type type,
-			address_map_delegate internal_map);
+			address_map_constructor internal_map);
 
 	void set_port_bits(std::array<u8, PORT_COUNT> const &bits);
 	void set_port_interrupt(std::array<u8, PORT_COUNT> const &interrupt);
@@ -138,12 +135,7 @@ protected:
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const override;
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const override;
 
-	virtual offs_t disasm_disassemble(
-			std::ostream &stream,
-			offs_t pc,
-			const u8 *oprom,
-			const uint8_t *opram,
-			u32 options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void interrupt() override;
 	virtual bool test_il() override;
@@ -213,7 +205,7 @@ protected:
 			device_t *owner,
 			u32 clock,
 			device_type type,
-			address_map_delegate internal_map);
+			address_map_constructor internal_map);
 };
 
 
@@ -225,16 +217,11 @@ public:
 	m68hc05c4_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	DECLARE_ADDRESS_MAP(c4_map, 8);
+	void c4_map(address_map &map);
 
 	virtual void device_start() override;
 
-	virtual offs_t disasm_disassemble(
-			std::ostream &stream,
-			offs_t pc,
-			const u8 *oprom,
-			const u8 *opram,
-			u32 options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -246,16 +233,11 @@ public:
 	m68hc05c8_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	DECLARE_ADDRESS_MAP(c8_map, 8);
+	void c8_map(address_map &map);
 
 	virtual void device_start() override;
 
-	virtual offs_t disasm_disassemble(
-			std::ostream &stream,
-			offs_t pc,
-			const u8 *oprom,
-			const u8 *opram,
-			u32 options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -267,19 +249,14 @@ public:
 	m68hc705c8a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	DECLARE_ADDRESS_MAP(c8a_map, 8);
+	void c8a_map(address_map &map);
 
 	virtual tiny_rom_entry const *device_rom_region() const override;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual offs_t disasm_disassemble(
-			std::ostream &stream,
-			offs_t pc,
-			const u8 *oprom,
-			const u8 *opram,
-			u32 options) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 

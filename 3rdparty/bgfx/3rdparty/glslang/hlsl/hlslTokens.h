@@ -216,6 +216,22 @@ enum EHlslTokenClass {
     EHTokFloat4x2,
     EHTokFloat4x3,
     EHTokFloat4x4,
+    EHTokHalf1x1,
+    EHTokHalf1x2,
+    EHTokHalf1x3,
+    EHTokHalf1x4,
+    EHTokHalf2x1,
+    EHTokHalf2x2,
+    EHTokHalf2x3,
+    EHTokHalf2x4,
+    EHTokHalf3x1,
+    EHTokHalf3x2,
+    EHTokHalf3x3,
+    EHTokHalf3x4,
+    EHTokHalf4x1,
+    EHTokHalf4x2,
+    EHTokHalf4x3,
+    EHTokHalf4x4,
     EHTokDouble1x1,
     EHTokDouble1x2,
     EHTokDouble1x3,
@@ -257,6 +273,8 @@ enum EHlslTokenClass {
     EHTokRWTexture2darray,
     EHTokRWTexture3d,
     EHTokRWBuffer,
+    EHTokSubpassInput,
+    EHTokSubpassInputMS,
 
     // Structure buffer variants
     EHTokAppendStructuredBuffer,
@@ -265,6 +283,7 @@ enum EHlslTokenClass {
     EHTokRWByteAddressBuffer,
     EHTokRWStructuredBuffer,
     EHTokStructuredBuffer,
+    EHTokTextureBuffer,
 
     // variable, user type, ...
     EHTokIdentifier,
@@ -274,6 +293,8 @@ enum EHlslTokenClass {
     EHTokTBuffer,
     EHTokTypedef,
     EHTokThis,
+    EHTokNamespace,
+    EHTokConstantBuffer,
 
     // constant
     EHTokFloatConstant,

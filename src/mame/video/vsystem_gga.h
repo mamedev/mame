@@ -51,7 +51,7 @@
 //**************************************************************************
 
 #define MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(_devcb) \
-	devcb = &vsystem_gga_device::static_set_write_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<vsystem_gga_device &>(*device).set_write_cb(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -67,7 +67,7 @@ public:
 	vsystem_gga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// static configuration
-	template<class Obj> static devcb_base &static_set_write_cb(device_t &device, Obj &&object) { return downcast<vsystem_gga_device &>(device).m_write_cb.set_callback(std::forward<Obj>(object)); }
+	template<class Obj> devcb_base &set_write_cb(Obj &&object) { return m_write_cb.set_callback(std::forward<Obj>(object)); }
 
 	// memory handlers
 	DECLARE_WRITE8_MEMBER(write);

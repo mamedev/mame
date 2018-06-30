@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef VERIFONE_TRANZ330_H
-#define VERIFONE_TRANZ330_H
+
+#ifndef MAME_INCLUDES_TRANZ330_H
+#define MAME_INCLUDES_TRANZ330_H
 
 #pragma once
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"
@@ -41,20 +42,26 @@ public:
 		, m_keypad(*this, "COL.%u", 0)
 	{ }
 
+	void tranz330(machine_config &config);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER( syncb_w );
+	DECLARE_WRITE_LINE_MEMBER(syncb_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
-	DECLARE_WRITE_LINE_MEMBER( sound_w );
+	DECLARE_WRITE_LINE_MEMBER(sound_w);
 
-	DECLARE_WRITE8_MEMBER( pio_a_w );
-	DECLARE_READ8_MEMBER( pio_b_r );
-	DECLARE_READ8_MEMBER( card_r );
+	DECLARE_WRITE8_MEMBER(pio_a_w);
+	DECLARE_READ8_MEMBER( pio_b_r);
+	DECLARE_READ8_MEMBER(card_r);
+
+	void tranz330_mem(address_map &map);
+	void tranz330_io(address_map &map);
 
 private:
-	required_device<cpu_device>             m_cpu;
+	required_device<z80_device>             m_cpu;
 	required_device<z80ctc_device>          m_ctc;
 	required_device<z80dart_device>         m_dart;
 	required_device<z80pio_device>          m_pio;

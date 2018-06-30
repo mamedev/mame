@@ -26,7 +26,6 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type SONY_LDP1000;
 DECLARE_DEVICE_TYPE(SONY_LDP1000, sony_ldp1000_device)
 
 // ======================> sony_ldp1000_device

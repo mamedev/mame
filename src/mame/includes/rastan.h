@@ -49,4 +49,7 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_rastan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(rastan_msm5205_vck);
+	void rastan(machine_config &config);
+	void rastan_map(address_map &map);
+	void rastan_s_map(address_map &map);
 };

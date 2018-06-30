@@ -154,28 +154,6 @@ atari_motion_objects_device::atari_motion_objects_device(const machine_config &m
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void atari_motion_objects_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<atari_motion_objects_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_config: Set the tag of the
-//  sound CPU
-//-------------------------------------------------
-
-void atari_motion_objects_device::static_set_config(device_t &device, const atari_motion_objects_config &config)
-{
-	atari_motion_objects_device &target = downcast<atari_motion_objects_device &>(device);
-	static_cast<atari_motion_objects_config &>(target) = config;
-}
-
-
-//-------------------------------------------------
 //  draw: Render the motion objects to the
 //  destination bitmap.
 //-------------------------------------------------
@@ -343,7 +321,7 @@ void atari_motion_objects_device::device_start()
 
 	// allocate a timer to periodically force update
 	m_force_update_timer = timer_alloc(TID_FORCE_UPDATE);
-	m_force_update_timer->adjust(m_screen->time_until_pos(0));
+	m_force_update_timer->adjust(screen().time_until_pos(0));
 
 	// register for save states
 	save_item(NAME(m_bank));
@@ -378,11 +356,11 @@ void atari_motion_objects_device::device_timer(emu_timer &timer, device_timer_id
 	{
 		case TID_FORCE_UPDATE:
 			if (param > 0)
-				m_screen->update_partial(param - 1);
+				screen().update_partial(param - 1);
 			param += 64;
-			if (param >= m_screen->visible_area().max_y)
+			if (param >= screen().visible_area().max_y)
 				param = 0;
-			timer.adjust(m_screen->time_until_pos(param), param);
+			timer.adjust(screen().time_until_pos(param), param);
 			break;
 	}
 }

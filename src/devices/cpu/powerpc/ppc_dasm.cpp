@@ -16,103 +16,10 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
+#include "ppc_dasm.h"
+
 #include "ppccom.h"
 
-/*
- * Operand Formats
- *
- * These convey information on what operand fields are present and how they
- * ought to be printed.
- *
- * I'm fairly certain all of these are used, but that is not guaranteed.
- */
-
-enum
-{
-	F_NONE,         // <no operands>
-	F_LI,           // LI*4+PC if AA=0 else LI*4
-	F_BCx,          // BO, BI, target_addr  used only by BCx
-	F_RT_RA_0_SIMM, // rT, rA|0, SIMM       rA|0 means if rA == 0, print 0
-	F_ADDIS,        // rT, rA, SIMM (printed as unsigned)   only used by ADDIS
-	F_RT_RA_SIMM,   // rT, rA, SIMM
-	F_RA_RT_UIMM,   // rA, rT, UIMM
-	F_CMP_SIMM,     // crfD, L, A, SIMM
-	F_CMP_UIMM,     // crfD, L, A, UIMM
-	F_RT_RA_0_RB,   // rT, rA|0, rB
-	F_RT_RA_RB,     // rT, rA, rB
-	F_RT_D_RA_0,    // rT, d(rA|0)
-	F_RT_D_RA,      // rT, d(rA)
-	F_RA_RT_RB,     // rA, rT, rB
-	F_FRT_D_RA_0,   // frT, d(RA|0)
-	F_FRT_D_RA,     // frT, d(RA)
-	F_FRT_RA_0_RB,  // frT, rA|0, rB
-	F_FRT_RA_RB,    // frT, rA, rB
-	F_TWI,          // TO, rA, SIMM         only used by TWI instruction
-	F_CMP,          // crfD, L, rA, rB
-	F_RA_RT,        // rA, rT
-	F_RA_0_RB,      // rA|0, rB
-	F_FRT_FRB,      // frT, frB
-	F_FCMP,         // crfD, frA, frB
-	F_CRFD_CRFS,    // crfD, crfS
-	F_MCRXR,        // crfD                 only used by MCRXR
-	F_RT,           // rT
-	F_MFSR,         // rT, SR               only used by MFSR
-	F_MTSR,         // SR, rT               only used by MTSR
-	F_MFFSx,        // frT                  only used by MFFSx
-	F_FCRBD,        // crbD                 FPSCR[crbD]
-	F_MTFSFIx,      // crfD, IMM            only used by MTFSFIx
-	F_RB,           // rB
-	F_TW,           // TO, rA, rB           only used by TW
-	F_RT_RA_0_NB,   // rT, rA|0, NB         print 32 if NB == 0
-	F_SRAWIx,       // rA, rT, SH           only used by SRAWIx
-	F_BO_BI,        // BO, BI
-	F_CRBD_CRBA_CRBB,   // crbD, crbA, crbB
-	F_RT_SPR,       // rT, SPR              and TBR
-	F_MTSPR,        // SPR, rT              only used by MTSPR
-	F_MTCRF,        // CRM, rT              only used by MTCRF
-	F_MTFSFx,       // FM, frB              only used by MTFSFx
-	F_RT_DCR,       // rT, DCR
-	F_MTDCR,        // DCR, rT
-	F_RT_RA,        // rT, rA
-	F_FRT_FRA_FRC_FRB,  // frT, frA, frC, frB
-	F_FRT_FRA_FRB,  // frT, frA, frB
-	F_FRT_FRA_FRC,  // frT, frA, frC
-	F_RA_RT_SH_MB_ME,   // rA, rT, SH, MB, ME
-	F_RLWNMx,       // rT, rA, rB, MB, ME   only used by RLWNMx
-	F_RT_RB         // rT, rB
-};
-
-/*
- * Flags
- */
-
-#define FL_OE           (1 << 0)    // if there is an OE field
-#define FL_RC           (1 << 1)    // if there is an RC field
-#define FL_LK           (1 << 2)    // if there is an LK field
-#define FL_AA           (1 << 3)    // if there is an AA field
-#define FL_CHECK_RA_RT  (1 << 4)    // assert rA!=0 and rA!=rT
-#define FL_CHECK_RA     (1 << 5)    // assert rA!=0
-#define FL_CHECK_LSWI   (1 << 6)    // specific check for LSWI validity
-#define FL_CHECK_LSWX   (1 << 7)    // specific check for LSWX validity
-#define FL_SO           (1 << 8)    // use DASMFLAG_STEP_OUT
-
-
-/*
- * Instruction Descriptor
- *
- * Describes the layout of an instruction.
- */
-
-struct IDESCR
-{
-	char    mnem[32];   // mnemonic
-	uint32_t  match;      // bit pattern of instruction after it has been masked
-	uint32_t  mask;       // mask of variable fields (AND with ~mask to compare w/
-						// bit pattern to determine a match)
-	int format;         // operand format
-	int flags;          // flags
-};
 
 /*
  * Instruction Table
@@ -121,7 +28,7 @@ struct IDESCR
  * and print instructions.
  */
 
-static const IDESCR itab[] =
+const powerpc_disassembler::IDESCR powerpc_disassembler::itab[] =
 {
 	{ "add",    D_OP(31)|D_XO(266), M_RT|M_RA|M_RB|M_OE|M_RC,   F_RT_RA_RB,     FL_OE|FL_RC },
 	{ "addc",   D_OP(31)|D_XO(10),  M_RT|M_RA|M_RB|M_OE|M_RC,   F_RT_RA_RB,     FL_OE|FL_RC },
@@ -342,18 +249,18 @@ static const IDESCR itab[] =
  * Use an index of BI&3 into this table to obtain the CR field bit name.
  */
 
-static const char *const crbit[4] = { "lt", "gt", "eq", "so" };
-static const char *const crnbit[4] = { "ge", "le", "ne", "nso" };
+const char *const powerpc_disassembler::crbit[4] = { "lt", "gt", "eq", "so" };
+const char *const powerpc_disassembler::crnbit[4] = { "ge", "le", "ne", "nso" };
 
 
 /*
  * SPR():
  *
- * Decode the SPR (or TBR) field and append the register name to dest. If
- * no name is associated with the field value, the value itself is printed.
+ * Decode the SPR (or TBR) field and return the register name. If
+ * no name is associated with the field value, return the value itself.
  */
 
-static void SPR(char *dest, int spr_field)
+std::string powerpc_disassembler::SPR(int spr_field)
 {
 	int spr;
 
@@ -371,93 +278,93 @@ static void SPR(char *dest, int spr_field)
 	switch (spr)
 	{
 		/* UISA SPR register indexes */
-		case SPR_XER:       strcat(dest, "xer");    break;
-		case SPR_LR:        strcat(dest, "lr");     break;
-		case SPR_CTR:       strcat(dest, "ctr");    break;
+		case SPR_XER:       return "xer";
+		case SPR_LR:        return "lr";
+		case SPR_CTR:       return "ctr";
 
 		/* VEA SPR register indexes */
-		case SPRVEA_TBL_R:  strcat(dest, "tbl");    break;
-		case SPRVEA_TBU_R:  strcat(dest, "tbu");    break;
+		case SPRVEA_TBL_R:  return "tbl";
+		case SPRVEA_TBU_R:  return "tbu";
 
 		/* OEA SPR register indexes */
-		case SPROEA_DSISR:  strcat(dest, "dsisr");  break;
-		case SPROEA_DAR:    strcat(dest, "dar");    break;
-		case SPROEA_DEC:    strcat(dest, "dec");    break;
-		case SPROEA_SDR1:   strcat(dest, "sdr1");   break;
-		case SPROEA_SRR0:   strcat(dest, "srr0");   break;
-		case SPROEA_SRR1:   strcat(dest, "srr1");   break;
-		case SPROEA_SPRG0:  strcat(dest, "sprg0");  break;
-		case SPROEA_SPRG1:  strcat(dest, "sprg1");  break;
-		case SPROEA_SPRG2:  strcat(dest, "sprg2");  break;
-		case SPROEA_SPRG3:  strcat(dest, "sprg3");  break;
-		case SPROEA_ASR:    strcat(dest, "asr");    break;
-		case SPROEA_EAR:    strcat(dest, "ear");    break;
-		case SPROEA_PVR:    strcat(dest, "pvr");    break;
-		case SPROEA_IBAT0U: strcat(dest, "ibat0u"); break;
-		case SPROEA_IBAT0L: strcat(dest, "ibat0l"); break;
-		case SPROEA_IBAT1U: strcat(dest, "ibat1u"); break;
-		case SPROEA_IBAT1L: strcat(dest, "ibat1l"); break;
-		case SPROEA_IBAT2U: strcat(dest, "ibat2u"); break;
-		case SPROEA_IBAT2L: strcat(dest, "ibat2l"); break;
-		case SPROEA_IBAT3U: strcat(dest, "ibat3u"); break;
-		case SPROEA_IBAT3L: strcat(dest, "ibat3l"); break;
-		case SPROEA_DBAT0U: strcat(dest, "dbat0u"); break;
-		case SPROEA_DBAT0L: strcat(dest, "dbat0l"); break;
-		case SPROEA_DBAT1U: strcat(dest, "dbat1u"); break;
-		case SPROEA_DBAT1L: strcat(dest, "dbat1l"); break;
-		case SPROEA_DBAT2U: strcat(dest, "dbat2u"); break;
-		case SPROEA_DBAT2L: strcat(dest, "dbat2l"); break;
-		case SPROEA_DBAT3U: strcat(dest, "dbat3u"); break;
-		case SPROEA_DBAT3L: strcat(dest, "dbat3l"); break;
-		case SPROEA_DABR:   strcat(dest, "dabr/iac2");  break;  // unsupported on 603e/EC603e
+		case SPROEA_DSISR:  return "dsisr";
+		case SPROEA_DAR:    return "dar";
+		case SPROEA_DEC:    return "dec";
+		case SPROEA_SDR1:   return "sdr1";
+		case SPROEA_SRR0:   return "srr0";
+		case SPROEA_SRR1:   return "srr1";
+		case SPROEA_SPRG0:  return "sprg0";
+		case SPROEA_SPRG1:  return "sprg1";
+		case SPROEA_SPRG2:  return "sprg2";
+		case SPROEA_SPRG3:  return "sprg3";
+		case SPROEA_ASR:    return "asr";
+		case SPROEA_EAR:    return "ear";
+		case SPROEA_PVR:    return "pvr";
+		case SPROEA_IBAT0U: return "ibat0u";
+		case SPROEA_IBAT0L: return "ibat0l";
+		case SPROEA_IBAT1U: return "ibat1u";
+		case SPROEA_IBAT1L: return "ibat1l";
+		case SPROEA_IBAT2U: return "ibat2u";
+		case SPROEA_IBAT2L: return "ibat2l";
+		case SPROEA_IBAT3U: return "ibat3u";
+		case SPROEA_IBAT3L: return "ibat3l";
+		case SPROEA_DBAT0U: return "dbat0u";
+		case SPROEA_DBAT0L: return "dbat0l";
+		case SPROEA_DBAT1U: return "dbat1u";
+		case SPROEA_DBAT1L: return "dbat1l";
+		case SPROEA_DBAT2U: return "dbat2u";
+		case SPROEA_DBAT2L: return "dbat2l";
+		case SPROEA_DBAT3U: return "dbat3u";
+		case SPROEA_DBAT3L: return "dbat3l";
+		case SPROEA_DABR:   return "dabr/iac2";  // unsupported on 603e/EC603e
 
 		/* PowerPC 603E SPR register indexes */
-		case SPR603_HID0:   strcat(dest, "hid0/dbsr");  break;
-		case SPR603_HID1:   strcat(dest, "hid1");   break;
-		case SPR603_DMISS:  strcat(dest, "dmiss");  break;
-		case SPR603_DCMP:   strcat(dest, "dcmp");   break;
-		case SPR603_HASH1:  strcat(dest, "hash1");  break;
-		case SPR603_HASH2:  strcat(dest, "hash2/icdbdr");   break;
-		case SPR603_IMISS:  strcat(dest, "imiss");  break;
-		case SPR603_ICMP:   strcat(dest, "icmp/dear");  break;
-		case SPR603_RPA:    strcat(dest, "rpa/evpr");   break;
-		case SPR603_IABR:   strcat(dest, "iabr/dbcr");  break;
+		case SPR603_HID0:   return "hid0/dbsr";
+		case SPR603_HID1:   return "hid1";
+		case SPR603_DMISS:  return "dmiss";
+		case SPR603_DCMP:   return "dcmp";
+		case SPR603_HASH1:  return "hash1";
+		case SPR603_HASH2:  return "hash2/icdbdr";
+		case SPR603_IMISS:  return "imiss";
+		case SPR603_ICMP:   return "icmp/dear";
+		case SPR603_RPA:    return "rpa/evpr";
+		case SPR603_IABR:   return "iabr/dbcr";
 
 		/* PowerPC 4XX SPR register indexes */
-		case SPR4XX_SGR:    strcat(dest, "sgr");    break;
-		case SPR4XX_DCWR:   strcat(dest, "dcwr");   break;
-		case SPR4XX_PID:    strcat(dest, "pid");    break;
-		case SPR4XX_TBHU:   strcat(dest, "tbhu");   break;
-		case SPR4XX_TBLU:   strcat(dest, "tblu");   break;
-//      case SPR4XX_ICDBDR: strcat(dest, "icdbdr"); break;  // same as SPR603E_HASH2
-//      case SPR4XX_DEAR:   strcat(dest, "dear");   break;  // same as SPR603E_ICMP
-//      case SPR4XX_EVPR:   strcat(dest, "evpr");   break;  // same as SPR603E_RPA
-		case SPR4XX_CDBCR:  strcat(dest, "cdbcr");  break;
-		case SPR4XX_TSR:    strcat(dest, "tsr");    break;
-		case SPR4XX_TCR:    strcat(dest, "tcr");    break;
-		case SPR4XX_PIT:    strcat(dest, "pit");    break;
-		case SPR4XX_TBHI:   strcat(dest, "tbhi");   break;
-		case SPR4XX_TBLO:   strcat(dest, "tblo");   break;
-		case SPR4XX_SRR2:   strcat(dest, "srr2");   break;
-		case SPR4XX_SRR3:   strcat(dest, "srr3");   break;
-//      case SPR4XX_DBSR:   strcat(dest, "dbsr");   break;  // same as SPR603E_HID0
-//      case SPR4XX_DBCR:   strcat(dest, "dbcr");   break;  // same as SPR603E_IABR
-		case SPR4XX_IAC1:   strcat(dest, "iac1");   break;
-//      case SPR4XX_IAC2:   strcat(dest, "iac2");   break;  // same as SPROEA_DABR
-		case SPR4XX_DAC1:   strcat(dest, "dac1");   break;
-		case SPR4XX_DAC2:   strcat(dest, "dac2");   break;
-		case SPR4XX_DCCR:   strcat(dest, "dccr");   break;
-		case SPR4XX_ICCR:   strcat(dest, "iccr");   break;
-		case SPR4XX_PBL1:   strcat(dest, "pbl1");   break;
-		case SPR4XX_PBU1:   strcat(dest, "pbu1");   break;
-		case SPR4XX_PBL2:   strcat(dest, "pbl2");   break;
-		case SPR4XX_PBU2:   strcat(dest, "pbu2");   break;
+		case SPR4XX_SGR:    return "sgr";
+		case SPR4XX_DCWR:   return "dcwr";
+		case SPR4XX_PID:    return "pid";
+		case SPR4XX_TBHU:   return "tbhu";
+		case SPR4XX_TBLU:   return "tblu";
+//      case SPR4XX_ICDBDR: return "icdbdr";  // same as SPR603E_HASH2
+//      case SPR4XX_DEAR:   return "dear";  // same as SPR603E_ICMP
+//      case SPR4XX_EVPR:   return "evpr";  // same as SPR603E_RPA
+		case SPR4XX_CDBCR:  return "cdbcr";
+		case SPR4XX_TSR:    return "tsr";
+		case SPR4XX_TCR:    return "tcr";
+		case SPR4XX_PIT:    return "pit";
+		case SPR4XX_TBHI:   return "tbhi";
+		case SPR4XX_TBLO:   return "tblo";
+		case SPR4XX_SRR2:   return "srr2";
+		case SPR4XX_SRR3:   return "srr3";
+//      case SPR4XX_DBSR:   return "dbsr";  // same as SPR603E_HID0
+//      case SPR4XX_DBCR:   return "dbcr";  // same as SPR603E_IABR
+		case SPR4XX_IAC1:   return "iac1";
+//      case SPR4XX_IAC2:   return "iac2";  // same as SPROEA_DABR
+		case SPR4XX_DAC1:   return "dac1";
+		case SPR4XX_DAC2:   return "dac2";
+		case SPR4XX_DCCR:   return "dccr";
+		case SPR4XX_ICCR:   return "iccr";
+		case SPR4XX_PBL1:   return "pbl1";
+		case SPR4XX_PBU1:   return "pbu1";
+		case SPR4XX_PBL2:   return "pbl2";
+		case SPR4XX_PBU2:   return "pbu2";
 
-		default:            sprintf(dest + strlen(dest), "%d", spr); break;
+		default:            return util::string_format("%d", spr);
 	}
 }
 
-static void DCR(char *dest, int dcr_field)
+std::string powerpc_disassembler::DCR(int dcr_field)
 {
 	int dcr;
 
@@ -474,50 +381,50 @@ static void DCR(char *dest, int dcr_field)
 
 	switch (dcr)
 	{
-		case 144:   strcat(dest, "bear"); break;
-		case 145:   strcat(dest, "besr"); break;
-		case 128:   strcat(dest, "br0"); break;
-		case 129:   strcat(dest, "br1"); break;
-		case 130:   strcat(dest, "br2"); break;
-		case 131:   strcat(dest, "br3"); break;
-		case 132:   strcat(dest, "br4"); break;
-		case 133:   strcat(dest, "br5"); break;
-		case 134:   strcat(dest, "br6"); break;
-		case 135:   strcat(dest, "br7"); break;
-		case 112:   strcat(dest, "brh0"); break;
-		case 113:   strcat(dest, "brh1"); break;
-		case 114:   strcat(dest, "brh2"); break;
-		case 115:   strcat(dest, "brh3"); break;
-		case 116:   strcat(dest, "brh4"); break;
-		case 117:   strcat(dest, "brh5"); break;
-		case 118:   strcat(dest, "brh6"); break;
-		case 119:   strcat(dest, "brh7"); break;
-		case 196:   strcat(dest, "dmacc0"); break;
-		case 204:   strcat(dest, "dmacc1"); break;
-		case 212:   strcat(dest, "dmacc2"); break;
-		case 220:   strcat(dest, "dmacc3"); break;
-		case 192:   strcat(dest, "dmacr0"); break;
-		case 200:   strcat(dest, "dmacr1"); break;
-		case 208:   strcat(dest, "dmacr2"); break;
-		case 216:   strcat(dest, "dmacr3"); break;
-		case 193:   strcat(dest, "dmact0"); break;
-		case 201:   strcat(dest, "dmact1"); break;
-		case 209:   strcat(dest, "dmact2"); break;
-		case 217:   strcat(dest, "dmact3"); break;
-		case 194:   strcat(dest, "dmada0"); break;
-		case 202:   strcat(dest, "dmada1"); break;
-		case 210:   strcat(dest, "dmada2"); break;
-		case 218:   strcat(dest, "dmada3"); break;
-		case 195:   strcat(dest, "dmasa0"); break;
-		case 203:   strcat(dest, "dmasa1"); break;
-		case 211:   strcat(dest, "dmasa2"); break;
-		case 219:   strcat(dest, "dmasa3"); break;
-		case 224:   strcat(dest, "dmasr"); break;
-		case 66:    strcat(dest, "exier"); break;
-		case 64:    strcat(dest, "exisr"); break;
-		case 160:   strcat(dest, "iocr"); break;
+		case 144:   return "bear";
+		case 145:   return "besr";
+		case 128:   return "br0";
+		case 129:   return "br1";
+		case 130:   return "br2";
+		case 131:   return "br3";
+		case 132:   return "br4";
+		case 133:   return "br5";
+		case 134:   return "br6";
+		case 135:   return "br7";
+		case 112:   return "brh0";
+		case 113:   return "brh1";
+		case 114:   return "brh2";
+		case 115:   return "brh3";
+		case 116:   return "brh4";
+		case 117:   return "brh5";
+		case 118:   return "brh6";
+		case 119:   return "brh7";
+		case 196:   return "dmacc0";
+		case 204:   return "dmacc1";
+		case 212:   return "dmacc2";
+		case 220:   return "dmacc3";
+		case 192:   return "dmacr0";
+		case 200:   return "dmacr1";
+		case 208:   return "dmacr2";
+		case 216:   return "dmacr3";
+		case 193:   return "dmact0";
+		case 201:   return "dmact1";
+		case 209:   return "dmact2";
+		case 217:   return "dmact3";
+		case 194:   return "dmada0";
+		case 202:   return "dmada1";
+		case 210:   return "dmada2";
+		case 218:   return "dmada3";
+		case 195:   return "dmasa0";
+		case 203:   return "dmasa1";
+		case 211:   return "dmasa2";
+		case 219:   return "dmasa3";
+		case 224:   return "dmasr";
+		case 66:    return "exier";
+		case 64:    return "exisr";
+		case 160:   return "iocr";
 
-		default:    sprintf(dest + strlen(dest), "%d", dcr); break;
+		default:    return util::string_format("%d", dcr);
 	}
 }
 
@@ -529,22 +436,22 @@ static void DCR(char *dest, int dcr_field)
  * unsigned 16-bit integer.
  */
 
-static void DecodeSigned16(char *outbuf, uint32_t op, int do_unsigned)
+std::string powerpc_disassembler::DecodeSigned16(uint32_t op, int do_unsigned)
 {
 	int16_t s;
 
 	s = G_SIMM(op);
 	if (do_unsigned)    // sign extend to unsigned 32-bits
-		sprintf(outbuf, "0x%04X", (uint32_t) s);
+		return util::string_format("0x%04X", (uint32_t) s);
 	else                // print as signed 16 bits
 	{
 		if (s < 0)
 		{
 			s *= -1;
-			sprintf(outbuf, "-0x%04X", s);
+			return util::string_format("-0x%04X", s);
 		}
 		else
-			sprintf(outbuf, "0x%04X",s);
+			return util::string_format("0x%04X",s);
 	}
 }
 
@@ -554,7 +461,7 @@ static void DecodeSigned16(char *outbuf, uint32_t op, int do_unsigned)
  * Generate a mask from bit MB through ME (PPC-style backwards bit numbering.)
  */
 
-static uint32_t Mask(int mb, int me)
+uint32_t powerpc_disassembler::Mask(int mb, int me)
 {
 	uint32_t  i, mask;
 
@@ -575,76 +482,13 @@ static uint32_t Mask(int mb, int me)
 }
 
 /*
- * Check():
- *
- * Perform checks on the instruction as required by the flags. Returns 1 if
- * the instruction failed.
- */
-
-#if 0
-static int Check(uint32_t op, int flags)
-{
-	int nb, rt, ra;
-
-	if( !flags ) return 0;  // nothing to check for!
-
-	rt = G_RT(op);
-	ra = G_RA(op);
-
-	if (flags & FL_CHECK_RA_RT) // invalid if rA==0 or rA==rT
-	{
-		if ((G_RA(op) == 0) || (G_RA(op) == G_RT(op)))
-			return 1;
-	}
-
-	if (flags & FL_CHECK_RA)    // invalid if rA==0
-	{
-		if (G_RA(op) == 0)
-			return 1;
-	}
-
-	if (flags & FL_CHECK_LSWI)
-	{
-		/*
-		 * Check that rA is not in the range of registers to be loaded (even
-		 * if rA == 0)
-		 */
-
-		nb = G_NB(op);
-
-		if (ra >= rt && ra <= (rt + nb - 1))    return 1;
-		if ((rt + nb - 1) > 31) // register wrap-around!
-		{
-			if (ra < ((rt + nb - 1) - 31))
-				return 1;
-		}
-	}
-
-	if (flags & FL_CHECK_LSWX)
-	{
-		/*
-		 * Check that rT != rA, rT != rB, and rD and rA both do not specify
-		 * R0.
-		 *
-		 * We cannot check fully whether rA or rB are in the range of
-		 * registers specified to be loaded because that depends on XER.
-		 */
-
-		if (rt == ra || rt == G_RB(op) || ((rt == 0) && (ra == 0)))
-			return 1;
-	}
-
-	return 0;   // passed checks
-}
-#endif
-/*
  * Simplified():
  *
- * Handles all simplified instruction forms. Returns 1 if one was decoded,
- * otherwise 0 to indicate disassembly should carry on as normal.
+ * Handles all simplified instruction forms. Returns true if one was decoded,
+ * otherwise false to indicate disassembly should carry on as normal.
  */
 
-static int Simplified(uint32_t op, uint32_t vpc, char *signed16, char *mnem, char *oprs)
+bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &signed16, std::string &mnem, std::string &oprs)
 {
 	uint32_t  value, disp;
 
@@ -653,96 +497,96 @@ static int Simplified(uint32_t op, uint32_t vpc, char *signed16, char *mnem, cha
 		value |= 0xffff0000;
 
 	if (op == (D_OP(24)|D_RT(0)|D_RA(0)|D_UIMM(0)))
-		strcat(mnem, "nop");        // ori r0,r0,0 -> nop
+		mnem += "nop";        // ori r0,r0,0 -> nop
 	else if ((op & ~(M_RT|M_RA|M_RB|M_RC)) == (D_OP(31)|D_XO(444)))
 	{
 		if (G_RT(op) == G_RB(op))
 		{
-			strcat(mnem, "mr");     // orx rA,rT,rT -> mrx rA,rT
-			if (op & M_RC)  strcat(mnem, ".");
-			sprintf(oprs, "r%d,r%d", G_RA(op), G_RT(op));
+			mnem += "mr";     // orx rA,rT,rT -> mrx rA,rT
+			if (op & M_RC)  mnem += ".";
+			oprs = util::string_format("r%d,r%d", G_RA(op), G_RT(op));
 		}
 		else
-			return 0;
+			return false;
 	}
 	else if ((op & ~(M_RT|M_RA|M_RB|M_RC)) == (D_OP(31)|D_XO(124)))
 	{
 		if (G_RT(op) == G_RB(op))
 		{
-			strcat(mnem, "not");    // nor rA,rT,rT -> not rA,rT
-			if (op & M_RC)  strcat(mnem, ".");
-			sprintf(oprs, "r%d,r%d", G_RA(op), G_RT(op));
+			mnem += "not";    // nor rA,rT,rT -> not rA,rT
+			if (op & M_RC)  mnem += ".";
+			oprs = util::string_format("r%d,r%d", G_RA(op), G_RT(op));
 		}
 		else
-			return 0;
+			return false;
 	}
 	else if ((op & ~(M_RT|M_RA|M_SIMM)) == D_OP(14))
 	{
 		if (G_RA(op) == 0)
 		{
-			strcat(mnem, "li");     // addi rT,0,value -> li rT,value
-			sprintf(oprs, "r%d,0x%08X", G_RT(op), value);
+			mnem += "li";     // addi rT,0,value -> li rT,value
+			oprs = util::string_format("r%d,0x%08X", G_RT(op), value);
 		}
 		else
-			return 0;
+			return false;
 	}
 	else if ((op & ~(M_RT|M_RA|M_SIMM)) == D_OP(15))
 	{
 		if (G_RA(op) == 0)
 		{
-			strcat(mnem, "li"); // addis rT,0,value -> li rT,(value<<16)
-			sprintf(oprs, "r%d,0x%08X", G_RT(op), value << 16);
+			mnem += "li"; // addis rT,0,value -> li rT,(value<<16)
+			oprs = util::string_format("r%d,0x%08X", G_RT(op), value << 16);
 		}
 		else
 		{
-			strcat(mnem, "addi");   // addis rT,rA,SIMM -> addi rT,rA,SIMM<<16
-			sprintf(oprs, "r%d,r%d,0x%08X", G_RT(op), G_RA(op), value << 16);
+			mnem += "addi";   // addis rT,rA,SIMM -> addi rT,rA,SIMM<<16
+			oprs = util::string_format("r%d,r%d,0x%08X", G_RT(op), G_RA(op), value << 16);
 		}
 	}
 	else if ((op & ~(M_RT|M_RA|M_UIMM)) == D_OP(29))
 	{
-		strcat(mnem, "andi.");  // andis. rA,rT,UIMM -> andi. rA,rT,UIMM<<16
-		sprintf(oprs, "r%d,r%d,0x%08X", G_RA(op), G_RT(op), G_UIMM(op) << 16);
+		mnem += "andi.";  // andis. rA,rT,UIMM -> andi. rA,rT,UIMM<<16
+		oprs = util::string_format("r%d,r%d,0x%08X", G_RA(op), G_RT(op), G_UIMM(op) << 16);
 	}
 	else if ((op & ~(M_RT|M_RA|M_UIMM)) == D_OP(25))
 	{
-		strcat(mnem, "ori");    // oris rA,rT,UIMM -> ori rA,rT,UIMM<<16
-		sprintf(oprs, "r%d,r%d,0x%08X", G_RA(op), G_RT(op), G_UIMM(op) << 16);
+		mnem += "ori";    // oris rA,rT,UIMM -> ori rA,rT,UIMM<<16
+		oprs = util::string_format("r%d,r%d,0x%08X", G_RA(op), G_RT(op), G_UIMM(op) << 16);
 	}
 	else if ((op & ~(M_RT|M_RA|M_UIMM)) == D_OP(27))
 	{
-		strcat(mnem, "xori");   // xoris rA,rT,UIMM -> xori rA,rT,UIMM<<16
-		sprintf(oprs, "r%d,r%d,0x%08X", G_RA(op), G_RT(op), G_UIMM(op) << 16);
+		mnem += "xori";   // xoris rA,rT,UIMM -> xori rA,rT,UIMM<<16
+		oprs = util::string_format("r%d,r%d,0x%08X", G_RA(op), G_RT(op), G_UIMM(op) << 16);
 	}
 	else if ((op & ~(M_RT|M_RA|M_SH|M_MB|M_ME|M_RC)) == D_OP(20))
 	{
 		value = Mask(G_MB(op), G_ME(op));
-		strcat(mnem, "rlwimi"); // rlwimi[.] rA,rT,SH,MB,ME -> rlwimi[.] rA,rT,SH,MASK
-		if (op & M_RC) strcat(mnem, ".");
-		sprintf(oprs, "r%d,r%d,%d,0x%08X", G_RA(op), G_RT(op), G_SH(op), value);
+		mnem += "rlwimi"; // rlwimi[.] rA,rT,SH,MB,ME -> rlwimi[.] rA,rT,SH,MASK
+		if (op & M_RC) mnem += ".";
+		oprs = util::string_format("r%d,r%d,%d,0x%08X", G_RA(op), G_RT(op), G_SH(op), value);
 	}
 	else if ((op & ~(M_RT|M_RA|M_SH|M_MB|M_ME|M_RC)) == D_OP(21))
 	{
 		value = Mask(G_MB(op), G_ME(op));
 		if (G_SH(op) == 0)      // rlwinm[.] rA,rT,0,MB,ME -> and[.] rA,rT,MASK
 		{
-			strcat(mnem, "and");
-			if (op & M_RC) strcat(mnem, ".");
-			sprintf(oprs, "r%d,r%d,0x%08X", G_RA(op), G_RT(op), value);
+			mnem += "and";
+			if (op & M_RC) mnem += ".";
+			oprs = util::string_format("r%d,r%d,0x%08X", G_RA(op), G_RT(op), value);
 		}
 		else                    // rlwinm[.] rA,rT,SH,MASK
 		{
-			strcat(mnem, "rlwinm");
-			if (op & M_RC) strcat(mnem, ".");
-			sprintf(oprs, "r%d,r%d,%d,0x%08X", G_RA(op), G_RT(op), G_SH(op), value);
+			mnem += "rlwinm";
+			if (op & M_RC) mnem += ".";
+			oprs = util::string_format("r%d,r%d,%d,0x%08X", G_RA(op), G_RT(op), G_SH(op), value);
 		}
 	}
 	else if ((op & ~(M_RT|M_RA|M_RB|M_MB|M_ME|M_RC)) == D_OP(23))
 	{
 		value = Mask(G_MB(op), G_ME(op));
-		strcat(mnem, "rlwnm");  // rlwnm[.] rA,rT,SH,MB,ME -> rlwnm[.] rA,rT,SH,MASK
-		if (op & M_RC) strcat(mnem, ".");
-		sprintf(oprs, "r%d,r%d,r%d,0x%08X", G_RA(op), G_RT(op), G_RB(op), value);
+		mnem += "rlwnm";  // rlwnm[.] rA,rT,SH,MB,ME -> rlwnm[.] rA,rT,SH,MASK
+		if (op & M_RC) mnem += ".";
+		oprs = util::string_format("r%d,r%d,r%d,0x%08X", G_RA(op), G_RT(op), G_RB(op), value);
 	}
 	else if ((op & ~(M_BO|M_BI|M_BD|M_AA|M_LK)) == D_OP(16))
 	{
@@ -753,105 +597,100 @@ static int Simplified(uint32_t op, uint32_t vpc, char *signed16, char *mnem, cha
 		switch (G_BO(op))
 		{
 			case 0x04:  case 0x05:  case 0x06:  case 0x07:
-				strcat(mnem, "b");
-				strcat(mnem, crnbit[G_BI(op) & 3]);
+				mnem += "b";
+				mnem += crnbit[G_BI(op) & 3];
 				break;
 			case 0x0c:  case 0x0d:  case 0x0e:  case 0x0f:
-				strcat(mnem, "b");
-				strcat(mnem, crbit[G_BI(op) & 3]);
+				mnem += "b";
+				mnem += crbit[G_BI(op) & 3];
 				break;
 			case 0x10:  case 0x11:  case 0x18:  case 0x19:
-				strcat(mnem, "bdnz");
+				mnem += "bdnz";
 				break;
 			case 0x12:  case 0x13:  case 0x1a:  case 0x1b:
-				strcat(mnem, "bdz");
+				mnem += "bdz";
 				break;
 			case 0x14:  case 0x15:  case 0x16:  case 0x17:
 			case 0x1c:  case 0x1d:  case 0x1e:  case 0x1f:
-				strcat(mnem, "b");
+				mnem += "b";
 				break;
 			default:
-				return 0;
+				return false;
 		}
 
-		if (op & M_LK)  strcat(mnem, "l");
-		if (op & M_AA)  strcat(mnem, "a");
+		if (op & M_LK)  mnem += "l";
+		if (op & M_AA)  mnem += "a";
 
 		if (!(G_BO(op) & 0x10) && G_BI(op) / 4 != 0)
-			sprintf(oprs, "cr%d,0x%08X", G_BI(op) / 4, disp + ((op & M_AA) ? 0 : vpc));
+			oprs = util::string_format("cr%d,0x%08X", G_BI(op) / 4, disp + ((op & M_AA) ? 0 : vpc));
 		else
-			sprintf(oprs, "0x%08X", disp + ((op & M_AA) ? 0 : vpc));
+			oprs = util::string_format("0x%08X", disp + ((op & M_AA) ? 0 : vpc));
 	}
 	else if ((op & ~(M_BO|M_BI|M_LK)) == (D_OP(19)|D_XO(528)) || (op & ~(M_BO|M_BI|M_LK)) == (D_OP(19)|D_XO(16)))
 	{
 		switch (G_BO(op))
 		{
 			case 0x04:  case 0x05:  case 0x06:  case 0x07:
-				strcat(mnem, "b");
-				strcat(mnem, crnbit[G_BI(op) & 3]);
+				mnem += "b";
+				mnem += crnbit[G_BI(op) & 3];
 				break;
 			case 0x0c:  case 0x0d:  case 0x0e:  case 0x0f:
-				strcat(mnem, "b");
-				strcat(mnem, crbit[G_BI(op) & 3]);
+				mnem += "b";
+				mnem += crbit[G_BI(op) & 3];
 				break;
 			case 0x10:  case 0x11:  case 0x18:  case 0x19:
-				strcat(mnem, "bdnz");
+				mnem += "bdnz";
 				break;
 			case 0x12:  case 0x13:  case 0x1a:  case 0x1b:
-				strcat(mnem, "bdz");
+				mnem += "bdz";
 				break;
 			case 0x14:  case 0x15:  case 0x16:  case 0x17:
 			case 0x1c:  case 0x1d:  case 0x1e:  case 0x1f:
-				strcat(mnem, "b");
+				mnem += "b";
 				break;
 			default:
-				return 0;
+				return false;
 		}
 
-		strcat(mnem, (G_XO(op) == 528) ? "ctr" : "lr");
-		if (op & M_LK)  strcat(mnem, "l");
-		if (op & M_AA)  strcat(mnem, "a");
+		mnem += (G_XO(op) == 528) ? "ctr" : "lr";
+		if (op & M_LK)  mnem += "l";
+		if (op & M_AA)  mnem += "a";
 
 		if (!(G_BO(op) & 0x10) && G_BI(op) / 4 != 0)
-			sprintf(oprs, "cr%d", G_BI(op) / 4);
+			oprs = util::string_format("cr%d", G_BI(op) / 4);
 	}
 	else if ((op & ~(M_RT|M_RA|M_RB|M_OE|M_RC)) == (D_OP(31)|D_XO(40)))
 	{
-		strcat(mnem, "sub");
-		if (op & M_OE) strcat(mnem, "o");
-		if (op & M_RC) strcat(mnem, ".");
-		sprintf(oprs, "r%d,r%d,r%d", G_RT(op), G_RB(op), G_RA(op));
+		mnem += "sub";
+		if (op & M_OE) mnem += "o";
+		if (op & M_RC) mnem += ".";
+		oprs = util::string_format("r%d,r%d,r%d", G_RT(op), G_RB(op), G_RA(op));
 	}
 	else if ((op & ~(M_RT|M_RA|M_RB|M_OE|M_RC)) == (D_OP(31)|D_XO(8)))
 	{
-		strcat(mnem, "subc");
-		if (op & M_OE) strcat(mnem, "o");
-		if (op & M_RC) strcat(mnem, ".");
-		sprintf(oprs, "r%d,r%d,r%d", G_RT(op), G_RB(op), G_RA(op));
+		mnem += "subc";
+		if (op & M_OE) mnem += "o";
+		if (op & M_RC) mnem += ".";
+		oprs = util::string_format("r%d,r%d,r%d", G_RT(op), G_RB(op), G_RA(op));
 	}
 	else
-		return 0;   // no match
+		return false;   // no match
 
-	return 1;
+	return true;
 }
 
-offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
+offs_t powerpc_disassembler::dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
 {
-	char signed16[12];
+	std::string signed16, mnem, oprs;
 	uint32_t disp;
 	int i,j;
-	char mnem[200];
-	char oprs[200];
-	offs_t flags = DASMFLAG_SUPPORTED;
-
-	mnem[0] = '\0'; // so we can use strcat()
-	oprs[0] = '\0';
+	offs_t flags = SUPPORTED;
 
 	/*
 	 * Decode signed 16-bit fields (SIMM and d) to spare us the work later
 	 */
 
-	DecodeSigned16(signed16, op, 0);
+	signed16 = DecodeSigned16(op, 0);
 
 	/*
 	 * Try simplified forms first, then real instructions
@@ -859,7 +698,7 @@ offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
 
 	if( Simplified(op, pc, signed16, mnem, oprs) ) {
 		util::stream_format(stream, "%s", mnem);
-		for( j = strlen(mnem); j < 10; j++ ) {
+		for( j = mnem.size(); j < 10; j++ ) {
 			util::stream_format(stream, " ");
 		}
 		util::stream_format(stream, "%s", oprs);
@@ -878,11 +717,11 @@ offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
 			 * Base mnemonic followed be O, ., L, A
 			 */
 
-			strcat(mnem, itab[i].mnem);
-			if (itab[i].flags & FL_OE)  if (op & M_OE) strcat(mnem, "o");
-			if (itab[i].flags & FL_RC)  if (op & M_RC) strcat(mnem, ".");
-			if (itab[i].flags & FL_LK)  if (op & M_LK) strcat(mnem, "l");
-			if (itab[i].flags & FL_AA)  if (op & M_AA) strcat(mnem, "a");
+			mnem += itab[i].mnem;
+			if (itab[i].flags & FL_OE)  if (op & M_OE) mnem += "o";
+			if (itab[i].flags & FL_RC)  if (op & M_RC) mnem += ".";
+			if (itab[i].flags & FL_LK)  if (op & M_LK) mnem += "l";
+			if (itab[i].flags & FL_AA)  if (op & M_AA) mnem += "a";
 
 			/*
 			 * Print operands
@@ -891,44 +730,44 @@ offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
 			switch (itab[i].format)
 			{
 			case F_RT_RA_RB:
-				sprintf(oprs, "r%d,r%d,r%d", G_RT(op), G_RA(op), G_RB(op));
+				oprs = util::string_format("r%d,r%d,r%d", G_RT(op), G_RA(op), G_RB(op));
 				break;
 
 			case F_RT_RA_0_SIMM:
 				if (G_RA(op))
-					sprintf(oprs, "r%d,r%d,%s", G_RT(op), G_RA(op), signed16);
+					oprs = util::string_format("r%d,r%d,%s", G_RT(op), G_RA(op), signed16);
 				else
-					sprintf(oprs, "r%d,0,%s", G_RT(op), signed16);
+					oprs = util::string_format("r%d,0,%s", G_RT(op), signed16);
 				break;
 
 			case F_ADDIS:
 				if (G_RA(op))
-					sprintf(oprs, "r%d,r%d,0x%04X", G_RT(op), G_RA(op), G_SIMM(op));
+					oprs = util::string_format("r%d,r%d,0x%04X", G_RT(op), G_RA(op), G_SIMM(op));
 				else
-					sprintf(oprs, "r%d,0,0x%04X", G_RT(op), G_SIMM(op));
+					oprs = util::string_format("r%d,0,0x%04X", G_RT(op), G_SIMM(op));
 				break;
 
 			case F_RT_RA_SIMM:
-				sprintf(oprs, "r%d,r%d,%s", G_RT(op), G_RA(op), signed16);
+				oprs = util::string_format("r%d,r%d,%s", G_RT(op), G_RA(op), signed16);
 				break;
 
 			case F_RT_RA:
-				sprintf(oprs, "r%d,r%d", G_RT(op), G_RA(op));
+				oprs = util::string_format("r%d,r%d", G_RT(op), G_RA(op));
 				break;
 
 			case F_RA_RT_RB:
-				sprintf(oprs, "r%d,r%d,r%d", G_RA(op), G_RT(op), G_RB(op));
+				oprs = util::string_format("r%d,r%d,r%d", G_RA(op), G_RT(op), G_RB(op));
 				break;
 
 			case F_RA_RT_UIMM:
-				sprintf(oprs, "r%d,r%d,0x%04X", G_RA(op), G_RT(op), G_UIMM(op));
+				oprs = util::string_format("r%d,r%d,0x%04X", G_RA(op), G_RT(op), G_UIMM(op));
 				break;
 
 			case F_LI:
 				disp = G_LI(op) * 4;
 				if (disp & 0x02000000)  // sign extend
 					disp |= 0xfc000000;
-				sprintf(oprs, "0x%08X", disp + ((op & M_AA) ? 0 : pc));
+				oprs = util::string_format("0x%08X", disp + ((op & M_AA) ? 0 : pc));
 				break;
 
 			case F_BCx:
@@ -937,213 +776,209 @@ offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
 					disp |= 0xffff0000;
 
 				if (G_BO(op) & 0x10)    // BI is ignored (don't print CR bit)
-					sprintf(oprs, "0x%02X,%d,0x%08X", G_BO(op), G_BI(op), disp + ((op & M_AA) ? 0 : pc));
+					oprs = util::string_format("0x%02X,%d,0x%08X", G_BO(op), G_BI(op), disp + ((op & M_AA) ? 0 : pc));
 				else                    // BI gives us the condition bit
-					sprintf(oprs, "0x%02X,cr%d[%s],0x%08X", G_BO(op), G_BI(op) / 4, crbit[G_BI(op) & 3], disp + ((op & M_AA) ? 0 : pc));
+					oprs = util::string_format("0x%02X,cr%d[%s],0x%08X", G_BO(op), G_BI(op) / 4, crbit[G_BI(op) & 3], disp + ((op & M_AA) ? 0 : pc));
 				break;
 
 			case F_BO_BI:
 				if (G_BO(op) & 0x10)    // BI is ignored (don't print CR bit)
-					sprintf(oprs, "0x%02X,%d", G_BO(op), G_BI(op));
+					oprs = util::string_format("0x%02X,%d", G_BO(op), G_BI(op));
 				else
-					sprintf(oprs, "0x%02X,cr%d[%s]", G_BO(op), G_BI(op) / 4, crbit[G_BI(op) & 3]);
+					oprs = util::string_format("0x%02X,cr%d[%s]", G_BO(op), G_BI(op) / 4, crbit[G_BI(op) & 3]);
 				break;
 
 			case F_CMP:
 				if (G_L(op))
-					strcat(mnem, "d");
+					mnem += "d";
 				if (G_CRFD(op) == 0)
-					sprintf(oprs, "r%d,r%d", G_RA(op), G_RB(op));
+					oprs = util::string_format("r%d,r%d", G_RA(op), G_RB(op));
 				else
-					sprintf(oprs, "cr%d,r%d,r%d", G_CRFD(op), G_RA(op), G_RB(op));
+					oprs = util::string_format("cr%d,r%d,r%d", G_CRFD(op), G_RA(op), G_RB(op));
 				break;
 
 			case F_CMP_SIMM:
 				if (G_L(op))
-					strcat(mnem, "d");
+					mnem += "d";
 				if (G_CRFD(op) == 0)
-					sprintf(oprs, "r%d,%s", G_RA(op), signed16);
+					oprs = util::string_format("r%d,%s", G_RA(op), signed16);
 				else
-					sprintf(oprs, "cr%d,r%d,%s", G_CRFD(op), G_RA(op), signed16);
+					oprs = util::string_format("cr%d,r%d,%s", G_CRFD(op), G_RA(op), signed16);
 				break;
 
 			case F_CMP_UIMM:
 				if (G_L(op))
-					strcat(mnem, "d");
+					mnem += "d";
 				if (G_CRFD(op) == 0)
-					sprintf(oprs, "r%d,0x%04X", G_RA(op), G_UIMM(op));
+					oprs = util::string_format("r%d,0x%04X", G_RA(op), G_UIMM(op));
 				else
-					sprintf(oprs, "cr%d,r%d,0x%04X", G_CRFD(op), G_RA(op), G_UIMM(op));
+					oprs = util::string_format("cr%d,r%d,0x%04X", G_CRFD(op), G_RA(op), G_UIMM(op));
 				break;
 
 			case F_RA_RT:
-				sprintf(oprs, "r%d,r%d", G_RA(op), G_RT(op));
+				oprs = util::string_format("r%d,r%d", G_RA(op), G_RT(op));
 				break;
 
 			case F_CRBD_CRBA_CRBB:
-				sprintf(oprs, "cr%d[%s],cr%d[%s],cr%d[%s]", G_CRBD(op) / 4, crbit[G_CRBD(op) & 3], G_CRBA(op) / 4, crbit[G_CRBA(op) & 3], G_CRBB(op) / 4, crbit[G_CRBB(op) & 3]);
+				oprs = util::string_format("cr%d[%s],cr%d[%s],cr%d[%s]", G_CRBD(op) / 4, crbit[G_CRBD(op) & 3], G_CRBA(op) / 4, crbit[G_CRBA(op) & 3], G_CRBB(op) / 4, crbit[G_CRBB(op) & 3]);
 				break;
 
 			case F_RA_0_RB:
 				if (G_RA(op))
-					sprintf(oprs, "r%d,r%d", G_RA(op), G_RB(op));
+					oprs = util::string_format("r%d,r%d", G_RA(op), G_RB(op));
 				else
-					sprintf(oprs, "0,r%d", G_RB(op));
+					oprs = util::string_format("0,r%d", G_RB(op));
 				break;
 
 			case F_RT_RA_0_RB:
 				if (G_RA(op))
-					sprintf(oprs, "r%d,r%d,r%d", G_RT(op), G_RA(op), G_RB(op));
+					oprs = util::string_format("r%d,r%d,r%d", G_RT(op), G_RA(op), G_RB(op));
 				else
-					sprintf(oprs, "r%d,0,r%d", G_RT(op), G_RB(op));
+					oprs = util::string_format("r%d,0,r%d", G_RT(op), G_RB(op));
 				break;
 
 			case F_FRT_FRB:
-				sprintf(oprs, "f%d,f%d", G_RT(op), G_RB(op));
+				oprs = util::string_format("f%d,f%d", G_RT(op), G_RB(op));
 				break;
 
 			case F_FRT_FRA_FRB:
-				sprintf(oprs, "f%d,f%d,f%d", G_RT(op), G_RA(op), G_RB(op));
+				oprs = util::string_format("f%d,f%d,f%d", G_RT(op), G_RA(op), G_RB(op));
 				break;
 
 			case F_FCMP:
-				sprintf(oprs, "cr%d,f%d,f%d", G_CRFD(op), G_RA(op), G_RB(op));
+				oprs = util::string_format("cr%d,f%d,f%d", G_CRFD(op), G_RA(op), G_RB(op));
 				break;
 
 			case F_FRT_FRA_FRC_FRB:
-				sprintf(oprs, "f%d,f%d,f%d,f%d", G_RT(op), G_RA(op), G_REGC(op), G_RB(op));
+				oprs = util::string_format("f%d,f%d,f%d,f%d", G_RT(op), G_RA(op), G_REGC(op), G_RB(op));
 				break;
 
 			case F_FRT_FRA_FRC:
-				sprintf(oprs, "f%d,f%d,f%d", G_RT(op), G_RA(op), G_REGC(op));
+				oprs = util::string_format("f%d,f%d,f%d", G_RT(op), G_RA(op), G_REGC(op));
 				break;
 
 			case F_RT_D_RA_0:
 				if (G_RA(op))
-					sprintf(oprs, "r%d,%s(r%d)", G_RT(op), signed16, G_RA(op));
+					oprs = util::string_format("r%d,%s(r%d)", G_RT(op), signed16, G_RA(op));
 				else
-					sprintf(oprs, "r%d,0x%08X", G_RT(op), (uint32_t) ((int16_t) G_D(op)));
+					oprs = util::string_format("r%d,0x%08X", G_RT(op), (uint32_t) ((int16_t) G_D(op)));
 				break;
 
 			case F_RT_D_RA:
-				sprintf(oprs, "r%d,%s(r%d)", G_RT(op), signed16, G_RA(op));
+				oprs = util::string_format("r%d,%s(r%d)", G_RT(op), signed16, G_RA(op));
 				break;
 
 			case F_FRT_D_RA_0:
 				if (G_RA(op))
-					sprintf(oprs, "f%d,%s(r%d)", G_RT(op), signed16, G_RA(op));
+					oprs = util::string_format("f%d,%s(r%d)", G_RT(op), signed16, G_RA(op));
 				else
-					sprintf(oprs, "f%d,0x%08X", G_RT(op), (uint32_t) ((int16_t) G_D(op)));
+					oprs = util::string_format("f%d,0x%08X", G_RT(op), (uint32_t) ((int16_t) G_D(op)));
 				break;
 
 			case F_FRT_D_RA:
-				sprintf(oprs, "f%d,%s(r%d)", G_RT(op), signed16, G_RA(op));
+				oprs = util::string_format("f%d,%s(r%d)", G_RT(op), signed16, G_RA(op));
 				break;
 
 			case F_FRT_RA_RB:
-				sprintf(oprs, "f%d,r%d,r%d", G_RT(op), G_RA(op), G_RB(op));
+				oprs = util::string_format("f%d,r%d,r%d", G_RT(op), G_RA(op), G_RB(op));
 				break;
 
 			case F_FRT_RA_0_RB:
 				if (G_RA(op))
-					sprintf(oprs, "f%d,r%d,r%d", G_RT(op), G_RA(op), G_RB(op));
+					oprs = util::string_format("f%d,r%d,r%d", G_RT(op), G_RA(op), G_RB(op));
 				else
-					sprintf(oprs, "f%d,0,r%d", G_RT(op), G_RB(op));
+					oprs = util::string_format("f%d,0,r%d", G_RT(op), G_RB(op));
 				break;
 
 			case F_RT_RA_0_NB:
 				if (G_RA(op))
-					sprintf(oprs, "r%d,r%d,%d", G_RT(op), G_RA(op), G_NB(op) ? G_NB(op) : 32);
+					oprs = util::string_format("r%d,r%d,%d", G_RT(op), G_RA(op), G_NB(op) ? G_NB(op) : 32);
 				else
-					sprintf(oprs, "r%d,0,%d", G_RT(op), G_NB(op) ? G_NB(op) : 32);
+					oprs = util::string_format("r%d,0,%d", G_RT(op), G_NB(op) ? G_NB(op) : 32);
 				break;
 
 			case F_CRFD_CRFS:
-				sprintf(oprs, "cr%d,cr%d", G_CRFD(op), G_CRFS(op));
+				oprs = util::string_format("cr%d,cr%d", G_CRFD(op), G_CRFS(op));
 				break;
 
 			case F_MCRXR:
-				sprintf(oprs, "cr%d", G_CRFD(op));
+				oprs = util::string_format("cr%d", G_CRFD(op));
 				break;
 
 			case F_RT:
-				sprintf(oprs, "r%d", G_RT(op));
+				oprs = util::string_format("r%d", G_RT(op));
 				break;
 
 			case F_MFFSx:
-				sprintf(oprs, "f%d", G_RT(op));
+				oprs = util::string_format("f%d", G_RT(op));
 				break;
 
 			case F_FCRBD:
-				sprintf(oprs, "fpscr[%d]", G_CRBD(op));
+				oprs = util::string_format("fpscr[%d]", G_CRBD(op));
 				break;
 
 			case F_RT_SPR:
-				sprintf(oprs, "r%d,", G_RT(op));
-				SPR(oprs, G_SPR(op));
+				oprs = util::string_format("r%d,", G_RT(op)) + SPR(G_SPR(op));
 				break;
 
 			case F_RT_DCR:
-				sprintf(oprs, "r%d,", G_RT(op));
-				DCR(oprs, G_DCR(op));
+				oprs = util::string_format("r%d,", G_RT(op)) + DCR(G_DCR(op));
 				break;
 
 			case F_MFSR:
-				sprintf(oprs, "r%d,sr%d", G_RT(op), G_SR(op));
+				oprs = util::string_format("r%d,sr%d", G_RT(op), G_SR(op));
 				break;
 
 			case F_MTCRF:
-				sprintf(oprs, "0x%02X,r%d", G_CRM(op), G_RT(op));
+				oprs = util::string_format("0x%02X,r%d", G_CRM(op), G_RT(op));
 				break;
 
 			case F_MTFSFx:
-				sprintf(oprs, "0x%02X,f%d", G_FM(op), G_RB(op));
+				oprs = util::string_format("0x%02X,f%d", G_FM(op), G_RB(op));
 				break;
 
 			case F_MTFSFIx:
-				sprintf(oprs, "cr%d,0x%X", G_CRFD(op), G_IMM(op));
+				oprs = util::string_format("cr%d,0x%X", G_CRFD(op), G_IMM(op));
 				break;
 
 			case F_MTSPR:
-				SPR(oprs, G_SPR(op));
-				sprintf(oprs + strlen(oprs), ",r%d", G_RT(op));
+				oprs = SPR(G_SPR(op)) + util::string_format(",r%d", G_RT(op));
 				break;
 
 			case F_MTDCR:
-				DCR(oprs, G_DCR(op));
-				sprintf(oprs + strlen(oprs), ",r%d", G_RT(op));
+				oprs = DCR(G_DCR(op)) + util::string_format(",r%d", G_RT(op));
 				break;
 
 			case F_MTSR:
-				sprintf(oprs, "sr%d,r%d", G_SR(op), G_RT(op));
+				oprs = util::string_format("sr%d,r%d", G_SR(op), G_RT(op));
 				break;
 
 			case F_RT_RB:
-				sprintf(oprs, "r%d,r%d", G_RT(op), G_RB(op));
+				oprs = util::string_format("r%d,r%d", G_RT(op), G_RB(op));
 				break;
 
 			case F_RA_RT_SH_MB_ME:
-				sprintf(oprs, "r%d,r%d,%d,%d,%d", G_RA(op), G_RT(op), G_SH(op), G_MB(op), G_ME(op));
+				oprs = util::string_format("r%d,r%d,%d,%d,%d", G_RA(op), G_RT(op), G_SH(op), G_MB(op), G_ME(op));
 				break;
 
 			case F_RLWNMx:
-				sprintf(oprs, "r%d,r%d,r%d,%d,%d", G_RA(op), G_RT(op), G_RB(op), G_MB(op), G_ME(op));
+				oprs = util::string_format("r%d,r%d,r%d,%d,%d", G_RA(op), G_RT(op), G_RB(op), G_MB(op), G_ME(op));
 				break;
 
 			case F_SRAWIx:
-				sprintf(oprs, "r%d,r%d,%d", G_RA(op), G_RT(op), G_SH(op));
+				oprs = util::string_format("r%d,r%d,%d", G_RA(op), G_RT(op), G_SH(op));
 				break;
 
 			case F_RB:
-				sprintf(oprs, "r%d", G_RB(op));
+				oprs = util::string_format("r%d", G_RB(op));
 				break;
 
 			case F_TW:
-				sprintf(oprs, "%d,r%d,r%d", G_TO(op), G_RA(op), G_RB(op));
+				oprs = util::string_format("%d,r%d,r%d", G_TO(op), G_RA(op), G_RB(op));
 				break;
 
 			case F_TWI:
-				sprintf(oprs, "%d,r%d,%s", G_TO(op), G_RA(op), signed16);
+				oprs = util::string_format("%d,r%d,%s", G_TO(op), G_RA(op), signed16);
 				break;
 
 			case F_NONE:
@@ -1152,12 +987,12 @@ offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
 			}
 
 			if ((itab[i].flags & FL_LK) && (op & M_LK))
-				flags |= DASMFLAG_STEP_OVER;
+				flags |= STEP_OVER;
 			else if (itab[i].flags & FL_SO)
-				flags |= DASMFLAG_STEP_OUT;
+				flags |= STEP_OUT;
 
 			util::stream_format(stream, "%s", mnem);
-			for( j = strlen(mnem); j < 10; j++ ) {
+			for( j = mnem.size(); j < 10; j++ ) {
 				util::stream_format(stream, " ");
 			}
 			util::stream_format(stream, "%s", oprs);
@@ -1169,10 +1004,12 @@ offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
 	return 4 | flags;
 }
 
-
-CPU_DISASSEMBLE( powerpc )
+offs_t powerpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint32_t op = *(uint32_t *)oprom;
-	op = big_endianize_int32(op);
-	return ppc_dasm_one(stream, pc, op);
+	return dasm_one(stream, pc, opcodes.r32(pc));
+}
+
+u32 powerpc_disassembler::opcode_alignment() const
+{
+	return 4;
 }

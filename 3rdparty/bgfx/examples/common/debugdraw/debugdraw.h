@@ -92,7 +92,10 @@ void ddClose();
 void ddDraw(const Aabb& _aabb);
 
 ///
-void ddDraw(const Cylinder& _cylinder, bool _capsule = false);
+void ddDraw(const Cylinder& _cylinder);
+
+///
+void ddDraw(const Capsule& _capsule);
 
 ///
 void ddDraw(const Disk& _disk);
@@ -102,6 +105,9 @@ void ddDraw(const Obb& _obb);
 
 ///
 void ddDraw(const Sphere& _sphere);
+
+///
+void ddDraw(const Cone& _cone);
 
 ///
 void ddDrawFrustum(const void* _viewProj);
@@ -128,7 +134,7 @@ void ddDrawQuad(bgfx::TextureHandle _handle, const float* _normal, const float* 
 void ddDrawCone(const void* _from, const void* _to, float _radius);
 
 ///
-void ddDrawCylinder(const void* _from, const void* _to, float _radius, bool _capsule = false);
+void ddDrawCylinder(const void* _from, const void* _to, float _radius);
 
 ///
 void ddDrawCapsule(const void* _from, const void* _to, float _radius);

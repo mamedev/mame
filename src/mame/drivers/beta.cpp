@@ -52,35 +52,41 @@
 class beta_state : public driver_device
 {
 public:
-	beta_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	beta_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M6502_TAG),
 		m_speaker(*this, "speaker"),
 		m_eprom(*this, EPROM_TAG),
-		m_q6(*this, "Q6"),
-		m_q7(*this, "Q7"),
-		m_q8(*this, "Q8"),
-		m_q9(*this, "Q9")
+		m_q(*this, "Q%u", 6U),
+		m_digits(*this, "digit%u", 0U),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<generic_slot_device> m_eprom;
-	required_ioport m_q6;
-	required_ioport m_q7;
-	required_ioport m_q8;
-	required_ioport m_q9;
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	void beta(machine_config &config);
 
+protected:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( riot_pa_r );
 	DECLARE_WRITE8_MEMBER( riot_pa_w );
 	DECLARE_READ8_MEMBER( riot_pb_r );
 	DECLARE_WRITE8_MEMBER( riot_pb_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( beta_eprom );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( beta_eprom );
+
+	TIMER_CALLBACK_MEMBER(led_refresh);
+
+	void beta_mem(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<generic_slot_device> m_eprom;
+	required_ioport_array<4> m_q;
+	output_finder<6> m_digits;
+	output_finder<2> m_leds;
 
 	/* EPROM state */
 	int m_eprom_oe;
@@ -95,17 +101,17 @@ public:
 	uint8_t m_segment;
 
 	emu_timer *m_led_refresh_timer;
-	TIMER_CALLBACK_MEMBER(led_refresh);
 };
 
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( beta_mem, AS_PROGRAM, 8, beta_state )
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_new_device, ram_map)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_new_device, io_map)
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x7800) AM_ROM
-ADDRESS_MAP_END
+void beta_state::beta_mem(address_map &map)
+{
+	map(0x0000, 0x007f).mirror(0x7f00).m(M6532_TAG, FUNC(mos6532_new_device::ram_map));
+	map(0x0080, 0x00ff).mirror(0x7f00).m(M6532_TAG, FUNC(mos6532_new_device::io_map));
+	map(0x8000, 0x87ff).mirror(0x7800).rom();
+}
 
 /* Input Ports */
 
@@ -156,9 +162,7 @@ INPUT_PORTS_END
 TIMER_CALLBACK_MEMBER(beta_state::led_refresh)
 {
 	if (m_ls145_p < 6)
-	{
-		output().set_digit_value(m_ls145_p, m_segment);
-	}
+		m_digits[m_ls145_p] = m_segment;
 }
 
 READ8_MEMBER( beta_state::riot_pa_r )
@@ -182,10 +186,12 @@ READ8_MEMBER( beta_state::riot_pa_r )
 
 	switch (m_ls145_p)
 	{
-	case 6: data &= m_q6->read(); break;
-	case 7: data &= m_q7->read(); break;
-	case 8: data &= m_q8->read(); break;
-	case 9: data &= m_q9->read(); break;
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+		data &= m_q[m_ls145_p - 6]->read();
+		break;
 	default:
 		if (!m_eprom_oe && !m_eprom_ce)
 		{
@@ -217,7 +223,7 @@ WRITE8_MEMBER( beta_state::riot_pa_w )
 //  logerror("PA %02x\n", data);
 
 	/* display */
-	m_segment = BITSWAP8(data, 7, 3, 4, 1, 0, 2, 5, 6) & 0x7f;
+	m_segment = bitswap<8>(data, 7, 3, 4, 1, 0, 2, 5, 6) & 0x7f;
 	m_led_refresh_timer->adjust(attotime::from_usec(70));
 
 	/* EPROM data */
@@ -255,10 +261,10 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 	m_speaker->level_w(!BIT(data, 4));
 
 	/* address led */
-	output().set_led_value(0, BIT(data, 5));
+	m_leds[0] = BIT(data, 5);
 
 	/* data led */
-	output().set_led_value(1, !BIT(data, 5));
+	m_leds[1] = !BIT(data, 5);
 
 	/* EPROM address shift */
 	if (!BIT(m_old_data, 5) && BIT(data, 5))
@@ -310,6 +316,9 @@ DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 
 void beta_state::machine_start()
 {
+	m_digits.resolve();
+	m_leds.resolve();
+
 	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beta_state::led_refresh),this));
 
 	m_eprom_rom.resize(0x800);
@@ -335,25 +344,25 @@ void beta_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( beta )
+MACHINE_CONFIG_START(beta_state::beta)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_4MHz/4)
-	MCFG_CPU_PROGRAM_MAP(beta_mem)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(4'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(beta_mem)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_beta )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(M6532_TAG, MOS6532_NEW, XTAL_4MHz/4)
-	MCFG_MOS6530n_IN_PA_CB(READ8(beta_state, riot_pa_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(beta_state, riot_pa_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(beta_state, riot_pb_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(beta_state, riot_pb_w))
+	MCFG_DEVICE_ADD(M6532_TAG, MOS6532_NEW, XTAL(4'000'000)/4)
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, beta_state, riot_pa_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, beta_state, riot_pa_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, beta_state, riot_pb_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, beta_state, riot_pb_w))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	/* EPROM socket */
@@ -376,5 +385,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE       INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1984, beta,   0,      0,      beta,   beta, beta_state, 0,    "Pitronics", "Beta",   MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1984, beta, 0,      0,      beta,    beta,  beta_state, empty_init, "Pitronics", "Beta",   MACHINE_SUPPORTS_SAVE )

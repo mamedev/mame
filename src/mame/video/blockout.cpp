@@ -115,17 +115,11 @@ uint32_t blockout_state::screen_update_blockout(screen_device &screen, bitmap_in
 		for (x = 0; x < 320; x += 8)
 		{
 			int d = m_frontvideoram[y * 64 + (x / 8)];
-
-			if (d)
+			int xi;
+			for(xi=0;xi<8;xi++)
 			{
-				if (d & 0x80) bitmap.pix16(y, x + 0) = color;
-				if (d & 0x40) bitmap.pix16(y, x + 1) = color;
-				if (d & 0x20) bitmap.pix16(y, x + 2) = color;
-				if (d & 0x10) bitmap.pix16(y, x + 3) = color;
-				if (d & 0x08) bitmap.pix16(y, x + 4) = color;
-				if (d & 0x04) bitmap.pix16(y, x + 5) = color;
-				if (d & 0x02) bitmap.pix16(y, x + 6) = color;
-				if (d & 0x01) bitmap.pix16(y, x + 7) = color;
+				if(d & 1 << (7-xi))
+					bitmap.pix16(y, x + xi) = color;
 			}
 		}
 	}

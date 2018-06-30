@@ -9,10 +9,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "asap.h"
+#include "asapdasm.h"
 
 
-static const char *const reg[32] =
+const char *const asap_disassembler::reg[32] =
 {
 	"0",    "r1",   "r2",   "r3",   "r4",   "r5",   "r6",   "r7",
 	"r8",   "r9",   "r10",  "r11",  "r12",  "r13",  "r14",  "r15",
@@ -20,12 +20,12 @@ static const char *const reg[32] =
 	"r24",  "r25",  "r26",  "r27",  "r28",  "r29",  "r30",  "r31"
 };
 
-static const char *const setcond[2] =
+const char *const asap_disassembler::setcond[2] =
 {
 	"  ", ".c"
 };
 
-static const char *const condition[16] =
+const char *const asap_disassembler::condition[16] =
 {
 	"sp", "mz", "gt", "le", "ge", "lt", "hi", "ls", "cc", "cs", "pl", "mi", "ne", "eq", "vc", "vs"
 };
@@ -35,19 +35,17 @@ static const char *const condition[16] =
     CODE CODE
 ***************************************************************************/
 
-static inline char *src2(uint32_t op, int scale)
+std::string asap_disassembler::src2(uint32_t op, int scale)
 {
-	static char temp[20];
 	if ((op & 0xffe0) == 0xffe0)
-		sprintf(temp, "%s", reg[op & 31]);
+		return util::string_format("%s", reg[op & 31]);
 	else
-		sprintf(temp, "$%x", (op & 0xffff) << scale);
-	return temp;
+		return util::string_format("$%x", (op & 0xffff) << scale);
 }
 
-CPU_DISASSEMBLE(asap)
+offs_t asap_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint32_t op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
+	uint32_t op = opcodes.r32(pc);
 	int opcode = op >> 27;
 	int cond = (op >> 21) & 1;
 	int rdst = (op >> 22) & 31;
@@ -58,21 +56,21 @@ CPU_DISASSEMBLE(asap)
 
 	switch (opcode)
 	{
-		case 0x00:  util::stream_format(stream, "trap   $00"); flags = DASMFLAG_STEP_OVER;                              break;
+		case 0x00:  util::stream_format(stream, "trap   $00"); flags = STEP_OVER;                              break;
 		case 0x01:  util::stream_format(stream, "b%s    $%08x", condition[rdst & 15], pc + ((int32_t)(op << 10) >> 8));   break;
 		case 0x02:  if ((op & 0x003fffff) == 3)
 					{
-						uint32_t nextop = oprom[4] | (oprom[5] << 8) | (oprom[6] << 16) | (oprom[7] << 24);
+						uint32_t nextop = opcodes.r32(pc+4);
 						if ((nextop >> 27) == 0x10 && ((nextop >> 22) & 31) == rdst && (nextop & 0xffff) == 0)
 						{
-							uint32_t nextnextop = oprom[8] | (oprom[9] << 8) | (oprom[10] << 16) | (oprom[11] << 24);
+							uint32_t nextnextop = opcodes.r32(pc+8);
 							util::stream_format(stream, "llit%s $%08x,%s", setcond[cond], nextnextop, reg[rdst]);
-							return 12 | DASMFLAG_STEP_OVER | DASMFLAG_SUPPORTED;
+							return 12 | STEP_OVER | SUPPORTED;
 						}
 					}
 					if (rdst)
 					{
-						flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+						flags = STEP_OVER | step_over_extra(1);
 						util::stream_format(stream, "bsr    %s,$%08x", reg[rdst], pc + ((int32_t)(op << 10) >> 8));
 					}
 					else
@@ -123,24 +121,29 @@ CPU_DISASSEMBLE(asap)
 		case 0x1d:  util::stream_format(stream, "putps  %s", src2(op,0));                                               break;
 		case 0x1e:  if (rdst && rsrc2_iszero)
 					{
-						flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+						flags = STEP_OVER | step_over_extra(1);
 						util::stream_format(stream, "jsr%s  %s,%s", setcond[cond], reg[rdst], reg[rsrc1]);
 					}
 					else if (rdst)
 					{
-						flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+						flags = STEP_OVER | step_over_extra(1);
 						util::stream_format(stream, "jsr%s  %s,%s[%s]", setcond[cond], reg[rdst], reg[rsrc1], src2(op,2));
 					}
 					else if (rsrc2_iszero)
 					{
 						if (rsrc1 == 28)
-							flags = DASMFLAG_STEP_OUT;
+							flags = STEP_OUT;
 						util::stream_format(stream, "jmp%s  %s", setcond[cond], reg[rsrc1]);
 					}
 					else
 						util::stream_format(stream, "jmp%s  %s[%s]", setcond[cond], reg[rsrc1], src2(op,2));
 			break;
-		case 0x1f:  util::stream_format(stream, "trap   $1f"); flags = DASMFLAG_STEP_OVER;                              break;
+		case 0x1f:  util::stream_format(stream, "trap   $1f"); flags = STEP_OVER;                              break;
 	}
-	return 4 | flags | DASMFLAG_SUPPORTED;
+	return 4 | flags | SUPPORTED;
+}
+
+u32 asap_disassembler::opcode_alignment() const
+{
+	return 4;
 }

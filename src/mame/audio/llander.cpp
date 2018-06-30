@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "includes/asteroid.h"
-#include "audio/llander.h"
 #include "sound/discrete.h"
 #include "speaker.h"
 
@@ -42,7 +41,7 @@ static const discrete_lfsr_desc llander_lfsr =
 	14          /* Output bit */
 };
 
-static DISCRETE_SOUND_START(llander)
+static DISCRETE_SOUND_START(llander_discrete)
 	/************************************************/
 	/* llander Effects Relataive Gain Table         */
 	/*                                              */
@@ -99,10 +98,9 @@ WRITE8_MEMBER(asteroid_state::llander_sounds_w)
 }
 
 
-MACHINE_CONFIG_START( llander_sound )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+MACHINE_CONFIG_START(asteroid_state::llander_sound)
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(llander)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, llander_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

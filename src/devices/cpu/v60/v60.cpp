@@ -75,10 +75,11 @@ Package: 132-pin PGA, 200-pin QFP
 
 #include "emu.h"
 #include "v60.h"
+#include "v60d.h"
 #include "debugger.h"
 
-DEFINE_DEVICE_TYPE(V60, v60_device, "v60", "V60")
-DEFINE_DEVICE_TYPE(V70, v70_device, "v70", "V70")
+DEFINE_DEVICE_TYPE(V60, v60_device, "v60", "NEC V60")
+DEFINE_DEVICE_TYPE(V70, v70_device, "v70", "NEC V70")
 
 
 // Set m_PIR (Processor ID) for NEC m_ LSB is reserved to NEC,
@@ -93,7 +94,6 @@ v60_device::v60_device(const machine_config &mconfig, device_type type, const ch
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, databits, addrbits, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 24, 0)
-	, m_fetch_xor(BYTE4_XOR_LE(0))
 	, m_start_pc(0xfffffff0)
 {
 	m_reg[45] = pir;
@@ -115,34 +115,16 @@ device_memory_interface::space_config_vector v60_device::memory_space_config() c
 }
 
 
-offs_t v60_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> v60_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( v60 );
-	return CPU_DISASSEMBLE_NAME(v60)(this, stream, pc, oprom, opram, options);
-}
-
-
-offs_t v70_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( v70 );
-	return CPU_DISASSEMBLE_NAME(v70)(this, stream, pc, oprom, opram, options);
+	return std::make_unique<v60_disassembler>();
 }
 
 
 // memory accessors
-#if defined(LSB_FIRST) && !defined(ALIGN_INTS)
-#define OpRead8(a)   (m_direct->read_byte(a))
-#define OpRead16(a)  (m_direct->read_word(a))
-#define OpRead32(a)  (m_direct->read_dword(a))
-#else
-#define OpRead8(a)   (m_direct->read_byte((a), m_fetch_xor))
-#define OpRead16(a)  ((m_direct->read_byte(((a)+0), m_fetch_xor) << 0) | \
-							(m_direct->read_byte(((a)+1), m_fetch_xor) << 8))
-#define OpRead32(a)  ((m_direct->read_byte(((a)+0), m_fetch_xor) << 0) | \
-							(m_direct->read_byte(((a)+1), m_fetch_xor) << 8) | \
-							(m_direct->read_byte(((a)+2), m_fetch_xor) << 16) | \
-							(m_direct->read_byte(((a)+3), m_fetch_xor) << 24))
-#endif
+#define OpRead8(a)   m_pr8(a)
+#define OpRead16(a)  m_pr16(a)
+#define OpRead32(a)  m_pr32(a)
 
 
 // macros stolen from MAME for flags calc
@@ -428,10 +410,23 @@ void v60_device::device_start()
 	m_moddim = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	if (m_program->data_width() == 16)
+	{
+		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address); };
+		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word_unaligned(address); };
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword_unaligned(address); };
+	}
+	else
+	{
+		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address); };
+		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word_unaligned(address); };
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword_unaligned(address); };
+	}
+
 	m_io = &space(AS_IO);
 
-	save_item(NAME(m_fetch_xor));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_irq_line));
 	save_item(NAME(m_nmi_line));
@@ -505,7 +500,7 @@ void v60_device::device_start()
 	state_add( STATE_GENSP, "GENSP", SP ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -613,7 +608,7 @@ void v60_device::execute_run()
 	{
 		uint32_t inc;
 		m_PPC = PC;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		m_icount -= 8;  /* fix me -- this is just an average */
 		inc = (this->*s_OpCodeTable[OpRead8(PC)])();
 		PC += inc;

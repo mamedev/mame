@@ -7,7 +7,7 @@
 #define BX_RNG_H_HEADER_GUARD
 
 #include "bx.h"
-#include "fpumath.h"
+#include "math.h"
 #include "uint32_t.h"
 
 namespace bx
@@ -28,24 +28,6 @@ namespace bx
 	private:
 		uint32_t m_z;
 		uint32_t m_w;
-	};
-
-	/// George Marsaglia's FIB
-	class RngFib
-	{
-	public:
-		///
-		RngFib(uint32_t _a = 9983651, uint32_t _b = 95746118);
-
-		///
-		void reset(uint32_t _a = 9983651, uint32_t _b = 95746118);
-
-		///
-		uint32_t gen();
-
-	private:
-		uint32_t m_a;
-		uint32_t m_b;
 	};
 
 	/// George Marsaglia's SHR3

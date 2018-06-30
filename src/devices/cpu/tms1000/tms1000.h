@@ -22,12 +22,17 @@ public:
 protected:
 	tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
+	void program_10bit_8(address_map &map);
+	void data_64x4(address_map &map);
+	void program_9bit_8(address_map &map);
+	void data_32x4(address_map &map);
+
 	// overrides
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual u32 decode_micro(u8 sel);
 };
 
 class tms1070_cpu_device : public tms1000_cpu_device
@@ -76,12 +81,12 @@ public:
 };
 
 
-DECLARE_DEVICE_TYPE(TMS1000,  tms1000_cpu_device)
-DECLARE_DEVICE_TYPE(TMS1070,  tms1070_cpu_device)
-DECLARE_DEVICE_TYPE(TMS1040,  tms1040_cpu_device)
-DECLARE_DEVICE_TYPE(TMS1200,  tms1200_cpu_device)
-DECLARE_DEVICE_TYPE(TMS1700,  tms1700_cpu_device)
-DECLARE_DEVICE_TYPE(TMS1730,  tms1730_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1000, tms1000_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1070, tms1070_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1040, tms1040_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1200, tms1200_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1700, tms1700_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1730, tms1730_cpu_device)
 DECLARE_DEVICE_TYPE(MC141000, mc141000_cpu_device)
 DECLARE_DEVICE_TYPE(MC141200, mc141200_cpu_device)
 

@@ -6,16 +6,13 @@
 #ifndef MAME_MACHINE_WPC_SHIFT_H
 #define MAME_MACHINE_WPC_SHIFT_H
 
-#define MCFG_WPC_SHIFT_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, WPC_SHIFT, 0 )
-
 class wpc_shift_device : public device_t
 {
 public:
 	wpc_shift_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_shift_device();
 
-	DECLARE_ADDRESS_MAP(registers, 8);
+	void registers(address_map &map);
 
 	DECLARE_READ8_MEMBER(adrh_r);
 	DECLARE_WRITE8_MEMBER(adrh_w);

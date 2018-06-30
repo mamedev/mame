@@ -102,7 +102,7 @@ void k051733_device::device_reset()
 
 WRITE8_MEMBER( k051733_device::write )
 {
-	//logerror("%04x: write %02x to 051733 address %02x\n", space.device().safe_pc(), data, offset);
+	//logerror("%s: write %02x to 051733 address %02x\n", m_maincpu->pc(), data, offset);
 
 	m_ram[offset] = data;
 }

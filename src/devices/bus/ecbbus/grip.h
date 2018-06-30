@@ -15,12 +15,13 @@
 
 #include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
 #include "machine/z80sti.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 
 
@@ -35,17 +36,6 @@ class ecb_grip21_device : public device_t, public device_ecbbus_card_interface
 public:
 	// construction/destruction
 	ecb_grip21_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// not really public
-	DECLARE_WRITE8_MEMBER( vol0_w );
-	DECLARE_WRITE8_MEMBER( vol1_w );
-	DECLARE_WRITE8_MEMBER( flash_w );
-	DECLARE_WRITE8_MEMBER( page_w );
-	DECLARE_READ8_MEMBER( stat_r );
-	DECLARE_READ8_MEMBER( lrs_r );
-	DECLARE_WRITE8_MEMBER( lrs_w );
-	DECLARE_READ8_MEMBER( cxstb_r );
-	DECLARE_WRITE8_MEMBER( cxstb_w );
 
 protected:
 	// device-level overrides
@@ -113,6 +103,18 @@ private:
 	// timers
 	emu_timer *m_kb_timer;
 
+	DECLARE_WRITE8_MEMBER( vol0_w );
+	DECLARE_WRITE8_MEMBER( vol1_w );
+	DECLARE_WRITE8_MEMBER( flash_w );
+	DECLARE_WRITE8_MEMBER( page_w );
+	DECLARE_READ8_MEMBER( stat_r );
+	DECLARE_READ8_MEMBER( lrs_r );
+	DECLARE_WRITE8_MEMBER( lrs_w );
+	DECLARE_READ8_MEMBER( cxstb_r );
+	DECLARE_WRITE8_MEMBER( cxstb_w );
+
+	void grip_io(address_map &map);
+	void grip_mem(address_map &map);
 
 	/*
 	required_device<hd6345_device> m_crtc;

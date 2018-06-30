@@ -18,6 +18,7 @@ MAME Documentation
     commandline/index
     advanced/index
 
+    debugger/index
     tools/index
 
     techspecs/index

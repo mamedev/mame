@@ -6,17 +6,18 @@
 #ifndef BGFX_DEFINES_H_HEADER_GUARD
 #define BGFX_DEFINES_H_HEADER_GUARD
 
-#define BGFX_API_VERSION UINT32_C(39)
+#define BGFX_API_VERSION UINT32_C(57)
 
-///
+/// Color RGB/alpha/depth write. When it's not specified write will be disabled.
 #define BGFX_STATE_RGB_WRITE               UINT64_C(0x0000000000000001) //!< Enable RGB write.
 #define BGFX_STATE_ALPHA_WRITE             UINT64_C(0x0000000000000002) //!< Enable alpha write.
 #define BGFX_STATE_DEPTH_WRITE             UINT64_C(0x0000000000000004) //!< Enable depth write.
 
+/// Depth test state. When `BGFX_STATE_DEPTH_` is not specified depth test will be disabled.
 #define BGFX_STATE_DEPTH_TEST_LESS         UINT64_C(0x0000000000000010) //!< Enable depth test, less.
-#define BGFX_STATE_DEPTH_TEST_LEQUAL       UINT64_C(0x0000000000000020) //!< Enable depth test, less equal.
+#define BGFX_STATE_DEPTH_TEST_LEQUAL       UINT64_C(0x0000000000000020) //!< Enable depth test, less or equal.
 #define BGFX_STATE_DEPTH_TEST_EQUAL        UINT64_C(0x0000000000000030) //!< Enable depth test, equal.
-#define BGFX_STATE_DEPTH_TEST_GEQUAL       UINT64_C(0x0000000000000040) //!< Enable depth test, greater equal.
+#define BGFX_STATE_DEPTH_TEST_GEQUAL       UINT64_C(0x0000000000000040) //!< Enable depth test, greater or equal.
 #define BGFX_STATE_DEPTH_TEST_GREATER      UINT64_C(0x0000000000000050) //!< Enable depth test, greater.
 #define BGFX_STATE_DEPTH_TEST_NOTEQUAL     UINT64_C(0x0000000000000060) //!< Enable depth test, not equal.
 #define BGFX_STATE_DEPTH_TEST_NEVER        UINT64_C(0x0000000000000070) //!< Enable depth test, never.
@@ -24,33 +25,38 @@
 #define BGFX_STATE_DEPTH_TEST_SHIFT        4                            //!< Depth test state bit shift.
 #define BGFX_STATE_DEPTH_TEST_MASK         UINT64_C(0x00000000000000f0) //!< Depth test state bit mask.
 
-#define BGFX_STATE_BLEND_ZERO              UINT64_C(0x0000000000001000) //!<
-#define BGFX_STATE_BLEND_ONE               UINT64_C(0x0000000000002000) //!<
-#define BGFX_STATE_BLEND_SRC_COLOR         UINT64_C(0x0000000000003000) //!<
-#define BGFX_STATE_BLEND_INV_SRC_COLOR     UINT64_C(0x0000000000004000) //!<
-#define BGFX_STATE_BLEND_SRC_ALPHA         UINT64_C(0x0000000000005000) //!<
-#define BGFX_STATE_BLEND_INV_SRC_ALPHA     UINT64_C(0x0000000000006000) //!<
-#define BGFX_STATE_BLEND_DST_ALPHA         UINT64_C(0x0000000000007000) //!<
-#define BGFX_STATE_BLEND_INV_DST_ALPHA     UINT64_C(0x0000000000008000) //!<
-#define BGFX_STATE_BLEND_DST_COLOR         UINT64_C(0x0000000000009000) //!<
-#define BGFX_STATE_BLEND_INV_DST_COLOR     UINT64_C(0x000000000000a000) //!<
-#define BGFX_STATE_BLEND_SRC_ALPHA_SAT     UINT64_C(0x000000000000b000) //!<
-#define BGFX_STATE_BLEND_FACTOR            UINT64_C(0x000000000000c000) //!<
-#define BGFX_STATE_BLEND_INV_FACTOR        UINT64_C(0x000000000000d000) //!<
+/// Use BGFX_STATE_BLEND_FUNC(_src, _dst) or BGFX_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA)
+/// helper macros.
+#define BGFX_STATE_BLEND_ZERO              UINT64_C(0x0000000000001000) //!< 0, 0, 0, 0
+#define BGFX_STATE_BLEND_ONE               UINT64_C(0x0000000000002000) //!< 1, 1, 1, 1
+#define BGFX_STATE_BLEND_SRC_COLOR         UINT64_C(0x0000000000003000) //!< Rs, Gs, Bs, As
+#define BGFX_STATE_BLEND_INV_SRC_COLOR     UINT64_C(0x0000000000004000) //!< 1-Rs, 1-Gs, 1-Bs, 1-As
+#define BGFX_STATE_BLEND_SRC_ALPHA         UINT64_C(0x0000000000005000) //!< As, As, As, As
+#define BGFX_STATE_BLEND_INV_SRC_ALPHA     UINT64_C(0x0000000000006000) //!< 1-As, 1-As, 1-As, 1-As
+#define BGFX_STATE_BLEND_DST_ALPHA         UINT64_C(0x0000000000007000) //!< Ad, Ad, Ad, Ad
+#define BGFX_STATE_BLEND_INV_DST_ALPHA     UINT64_C(0x0000000000008000) //!< 1-Ad, 1-Ad, 1-Ad ,1-Ad
+#define BGFX_STATE_BLEND_DST_COLOR         UINT64_C(0x0000000000009000) //!< Rd, Gd, Bd, Ad
+#define BGFX_STATE_BLEND_INV_DST_COLOR     UINT64_C(0x000000000000a000) //!< 1-Rd, 1-Gd, 1-Bd, 1-Ad
+#define BGFX_STATE_BLEND_SRC_ALPHA_SAT     UINT64_C(0x000000000000b000) //!< f, f, f, 1; f = min(As, 1-Ad)
+#define BGFX_STATE_BLEND_FACTOR            UINT64_C(0x000000000000c000) //!< Blend factor
+#define BGFX_STATE_BLEND_INV_FACTOR        UINT64_C(0x000000000000d000) //!< 1-Blend factor
 #define BGFX_STATE_BLEND_SHIFT             12                           //!< Blend state bit shift.
 #define BGFX_STATE_BLEND_MASK              UINT64_C(0x000000000ffff000) //!< Blend state bit mask.
 
-#define BGFX_STATE_BLEND_EQUATION_ADD      UINT64_C(0x0000000000000000) //!<
-#define BGFX_STATE_BLEND_EQUATION_SUB      UINT64_C(0x0000000010000000) //!<
-#define BGFX_STATE_BLEND_EQUATION_REVSUB   UINT64_C(0x0000000020000000) //!<
-#define BGFX_STATE_BLEND_EQUATION_MIN      UINT64_C(0x0000000030000000) //!<
-#define BGFX_STATE_BLEND_EQUATION_MAX      UINT64_C(0x0000000040000000) //!<
+/// Use BGFX_STATE_BLEND_EQUATION(_equation) or BGFX_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, _equationA)
+/// helper macros.
+#define BGFX_STATE_BLEND_EQUATION_ADD      UINT64_C(0x0000000000000000) //!< Blend add: src + dst.
+#define BGFX_STATE_BLEND_EQUATION_SUB      UINT64_C(0x0000000010000000) //!< Blend subtract: src - dst.
+#define BGFX_STATE_BLEND_EQUATION_REVSUB   UINT64_C(0x0000000020000000) //!< Blend reverse subtract: dst - src.
+#define BGFX_STATE_BLEND_EQUATION_MIN      UINT64_C(0x0000000030000000) //!< Blend min: min(src, dst).
+#define BGFX_STATE_BLEND_EQUATION_MAX      UINT64_C(0x0000000040000000) //!< Blend max: max(src, dst).
 #define BGFX_STATE_BLEND_EQUATION_SHIFT    28                           //!< Blend equation bit shift.
 #define BGFX_STATE_BLEND_EQUATION_MASK     UINT64_C(0x00000003f0000000) //!< Blend equation bit mask.
 
 #define BGFX_STATE_BLEND_INDEPENDENT       UINT64_C(0x0000000400000000) //!< Enable blend independent.
 #define BGFX_STATE_BLEND_ALPHA_TO_COVERAGE UINT64_C(0x0000000800000000) //!< Enable alpha to coverage.
 
+/// Cull state. When `BGFX_STATE_CULL_*` is not specified culling will be disabled.
 #define BGFX_STATE_CULL_CW                 UINT64_C(0x0000001000000000) //!< Cull clockwise triangles.
 #define BGFX_STATE_CULL_CCW                UINT64_C(0x0000002000000000) //!< Cull counter-clockwise triangles.
 #define BGFX_STATE_CULL_SHIFT              36                           //!< Culling mode bit shift.
@@ -67,11 +73,12 @@
 #define BGFX_STATE_PT_SHIFT                48                           //!< Primitive type bit shift.
 #define BGFX_STATE_PT_MASK                 UINT64_C(0x0007000000000000) //!< Primitive type bit mask.
 
+/// See BGFX_STATE_POINT_SIZE(_size) helper macro.
 #define BGFX_STATE_POINT_SIZE_SHIFT        52                           //!< Point size bit shift.
 #define BGFX_STATE_POINT_SIZE_MASK         UINT64_C(0x00f0000000000000) //!< Point size bit mask.
 
-/// Enable MSAA write when writing into MSAA frame buffer. This flag is ignored when not writing into
-/// MSAA frame buffer.
+/// Enable MSAA write when writing into MSAA frame buffer.
+/// This flag is ignored when not writing into MSAA frame buffer.
 #define BGFX_STATE_MSAA                    UINT64_C(0x0100000000000000) //!< Enable MSAA rasterization.
 #define BGFX_STATE_LINEAA                  UINT64_C(0x0200000000000000) //!< Enable line AA rasterization.
 #define BGFX_STATE_CONSERVATIVE_RASTER     UINT64_C(0x0400000000000000) //!< Enable conservative rasterization.
@@ -80,55 +87,96 @@
 #define BGFX_STATE_RESERVED_SHIFT          61                           //!< Internal bits shift.
 #define BGFX_STATE_RESERVED_MASK           UINT64_C(0xe000000000000000) //!< Internal bits mask.
 
-/// See BGFX_STATE_POINT_SIZE(_size) helper macro.
 #define BGFX_STATE_NONE                    UINT64_C(0x0000000000000000) //!< No state.
 #define BGFX_STATE_MASK                    UINT64_C(0xffffffffffffffff) //!< State mask.
 
 /// Default state is write to RGB, alpha, and depth with depth test less enabled, with clockwise
 /// culling and MSAA (when writing into MSAA frame buffer, otherwise this flag is ignored).
-#define BGFX_STATE_DEFAULT (0 \
-					| BGFX_STATE_RGB_WRITE \
-					| BGFX_STATE_ALPHA_WRITE \
-					| BGFX_STATE_DEPTH_TEST_LESS \
-					| BGFX_STATE_DEPTH_WRITE \
-					| BGFX_STATE_CULL_CW \
-					| BGFX_STATE_MSAA \
-					)
+#define BGFX_STATE_DEFAULT (0            \
+			| BGFX_STATE_RGB_WRITE       \
+			| BGFX_STATE_ALPHA_WRITE     \
+			| BGFX_STATE_DEPTH_TEST_LESS \
+			| BGFX_STATE_DEPTH_WRITE     \
+			| BGFX_STATE_CULL_CW         \
+			| BGFX_STATE_MSAA            \
+			)
 
+/// Alpha reference value.
 #define BGFX_STATE_ALPHA_REF(_ref)   ( ( (uint64_t)(_ref )<<BGFX_STATE_ALPHA_REF_SHIFT )&BGFX_STATE_ALPHA_REF_MASK)
+
+/// Point size value.
 #define BGFX_STATE_POINT_SIZE(_size) ( ( (uint64_t)(_size)<<BGFX_STATE_POINT_SIZE_SHIFT)&BGFX_STATE_POINT_SIZE_MASK)
 
-///
+/// Blend function separate.
 #define BGFX_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA) (UINT64_C(0) \
-					| ( ( (uint64_t)(_srcRGB)|( (uint64_t)(_dstRGB)<<4) )   ) \
-					| ( ( (uint64_t)(_srcA  )|( (uint64_t)(_dstA  )<<4) )<<8) \
-					)
+			| ( ( (uint64_t)(_srcRGB)|( (uint64_t)(_dstRGB)<<4) )   )               \
+			| ( ( (uint64_t)(_srcA  )|( (uint64_t)(_dstA  )<<4) )<<8)               \
+			)
 
-#define BGFX_STATE_BLEND_EQUATION_SEPARATE(_rgb, _a) ( (uint64_t)(_rgb)|( (uint64_t)(_a)<<3) )
+/// Blend equation separate.
+#define BGFX_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, _equationA) ( (uint64_t)(_equationRGB)|( (uint64_t)(_equationA)<<3) )
 
-///
+/// Blend function.
 #define BGFX_STATE_BLEND_FUNC(_src, _dst)    BGFX_STATE_BLEND_FUNC_SEPARATE(_src, _dst, _src, _dst)
+
+/// Blend equation.
 #define BGFX_STATE_BLEND_EQUATION(_equation) BGFX_STATE_BLEND_EQUATION_SEPARATE(_equation, _equation)
 
-#define BGFX_STATE_BLEND_ADD         (BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE,       BGFX_STATE_BLEND_ONE          ) )
-#define BGFX_STATE_BLEND_ALPHA       (BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA) )
-#define BGFX_STATE_BLEND_DARKEN      (BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE,       BGFX_STATE_BLEND_ONE          ) | BGFX_STATE_BLEND_EQUATION(BGFX_STATE_BLEND_EQUATION_MIN) )
-#define BGFX_STATE_BLEND_LIGHTEN     (BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE,       BGFX_STATE_BLEND_ONE          ) | BGFX_STATE_BLEND_EQUATION(BGFX_STATE_BLEND_EQUATION_MAX) )
-#define BGFX_STATE_BLEND_MULTIPLY    (BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_DST_COLOR, BGFX_STATE_BLEND_ZERO         ) )
-#define BGFX_STATE_BLEND_NORMAL      (BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE,       BGFX_STATE_BLEND_INV_SRC_ALPHA) )
-#define BGFX_STATE_BLEND_SCREEN      (BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE,       BGFX_STATE_BLEND_INV_SRC_COLOR) )
-#define BGFX_STATE_BLEND_LINEAR_BURN (BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_DST_COLOR, BGFX_STATE_BLEND_INV_DST_COLOR) | BGFX_STATE_BLEND_EQUATION(BGFX_STATE_BLEND_EQUATION_SUB) )
+/// Utility predefined blend modes.
+
+/// Additive blending.
+#define BGFX_STATE_BLEND_ADD (0                                         \
+	| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE) \
+	)
+
+/// Alpha blend.
+#define BGFX_STATE_BLEND_ALPHA (0                                                       \
+	| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA) \
+	)
+
+/// Selects darker color of blend.
+#define BGFX_STATE_BLEND_DARKEN (0                                      \
+	| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE) \
+	| BGFX_STATE_BLEND_EQUATION(BGFX_STATE_BLEND_EQUATION_MIN)          \
+	)
+
+/// Selects lighter color of blend.
+#define BGFX_STATE_BLEND_LIGHTEN (0                                     \
+	| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE) \
+	| BGFX_STATE_BLEND_EQUATION(BGFX_STATE_BLEND_EQUATION_MAX)          \
+	)
+
+/// Multiplies colors.
+#define BGFX_STATE_BLEND_MULTIPLY (0                                           \
+	| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_DST_COLOR, BGFX_STATE_BLEND_ZERO) \
+	)
+
+/// Opaque pixels will cover the pixels directly below them without any math or algorithm applied to them.
+#define BGFX_STATE_BLEND_NORMAL (0                                                \
+	| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_INV_SRC_ALPHA) \
+	)
+
+/// Multiplies the inverse of the blend and base colors.
+#define BGFX_STATE_BLEND_SCREEN (0                                                \
+	| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_INV_SRC_COLOR) \
+	)
+
+/// Decreases the brightness of the base color based on the value of the blend color.
+#define BGFX_STATE_BLEND_LINEAR_BURN (0                                                 \
+	| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_DST_COLOR, BGFX_STATE_BLEND_INV_DST_COLOR) \
+	| BGFX_STATE_BLEND_EQUATION(BGFX_STATE_BLEND_EQUATION_SUB)                          \
+	)
 
 ///
-#define BGFX_STATE_BLEND_FUNC_RT_x(_src, _dst) (0 \
-					| ( uint32_t( (_src)>>BGFX_STATE_BLEND_SHIFT) \
-					| ( uint32_t( (_dst)>>BGFX_STATE_BLEND_SHIFT)<<4) ) \
-					)
+#define BGFX_STATE_BLEND_FUNC_RT_x(_src, _dst) (0               \
+			| ( (uint32_t)( (_src)>>BGFX_STATE_BLEND_SHIFT)       \
+			| ( (uint32_t)( (_dst)>>BGFX_STATE_BLEND_SHIFT)<<4) ) \
+			)
 
-#define BGFX_STATE_BLEND_FUNC_RT_xE(_src, _dst, _equation) (0 \
-					| BGFX_STATE_BLEND_FUNC_RT_x(_src, _dst) \
-					| ( uint32_t( (_equation)>>BGFX_STATE_BLEND_EQUATION_SHIFT)<<8) \
-					)
+#define BGFX_STATE_BLEND_FUNC_RT_xE(_src, _dst, _equation) (0               \
+			| BGFX_STATE_BLEND_FUNC_RT_x(_src, _dst)                        \
+			| ( (uint32_t)( (_equation)>>BGFX_STATE_BLEND_EQUATION_SHIFT)<<8) \
+			)
 
 #define BGFX_STATE_BLEND_FUNC_RT_1(_src, _dst)  (BGFX_STATE_BLEND_FUNC_RT_x(_src, _dst)<< 0)
 #define BGFX_STATE_BLEND_FUNC_RT_2(_src, _dst)  (BGFX_STATE_BLEND_FUNC_RT_x(_src, _dst)<<11)
@@ -193,10 +241,10 @@
 #define BGFX_STENCIL_DEFAULT             UINT32_C(0x00000000) //!<
 
 /// Set stencil ref value.
-#define BGFX_STENCIL_FUNC_REF(_ref) ( (uint32_t(_ref)<<BGFX_STENCIL_FUNC_REF_SHIFT)&BGFX_STENCIL_FUNC_REF_MASK)
+#define BGFX_STENCIL_FUNC_REF(_ref) ( ((uint32_t)(_ref)<<BGFX_STENCIL_FUNC_REF_SHIFT)&BGFX_STENCIL_FUNC_REF_MASK)
 
 /// Set stencil rmask value.
-#define BGFX_STENCIL_FUNC_RMASK(_mask) ( (uint32_t(_mask)<<BGFX_STENCIL_FUNC_RMASK_SHIFT)&BGFX_STENCIL_FUNC_RMASK_MASK)
+#define BGFX_STENCIL_FUNC_RMASK(_mask) ( ((uint32_t)(_mask)<<BGFX_STENCIL_FUNC_RMASK_SHIFT)&BGFX_STENCIL_FUNC_RMASK_MASK)
 
 ///
 #define BGFX_CLEAR_NONE                  UINT16_C(0x0000) //!< No clear flags.
@@ -214,112 +262,114 @@
 #define BGFX_CLEAR_DISCARD_DEPTH         UINT16_C(0x0800) //!< Discard frame buffer depth attachment.
 #define BGFX_CLEAR_DISCARD_STENCIL       UINT16_C(0x1000) //!< Discard frame buffer stencil attachment.
 
-#define BGFX_CLEAR_DISCARD_COLOR_MASK (0 \
-			| BGFX_CLEAR_DISCARD_COLOR_0 \
-			| BGFX_CLEAR_DISCARD_COLOR_1 \
-			| BGFX_CLEAR_DISCARD_COLOR_2 \
-			| BGFX_CLEAR_DISCARD_COLOR_3 \
-			| BGFX_CLEAR_DISCARD_COLOR_4 \
-			| BGFX_CLEAR_DISCARD_COLOR_5 \
-			| BGFX_CLEAR_DISCARD_COLOR_6 \
-			| BGFX_CLEAR_DISCARD_COLOR_7 \
+#define BGFX_CLEAR_DISCARD_COLOR_MASK (0    \
+			| BGFX_CLEAR_DISCARD_COLOR_0    \
+			| BGFX_CLEAR_DISCARD_COLOR_1    \
+			| BGFX_CLEAR_DISCARD_COLOR_2    \
+			| BGFX_CLEAR_DISCARD_COLOR_3    \
+			| BGFX_CLEAR_DISCARD_COLOR_4    \
+			| BGFX_CLEAR_DISCARD_COLOR_5    \
+			| BGFX_CLEAR_DISCARD_COLOR_6    \
+			| BGFX_CLEAR_DISCARD_COLOR_7    \
 			)
-#define BGFX_CLEAR_DISCARD_MASK (0 \
+#define BGFX_CLEAR_DISCARD_MASK (0          \
 			| BGFX_CLEAR_DISCARD_COLOR_MASK \
-			| BGFX_CLEAR_DISCARD_DEPTH \
-			| BGFX_CLEAR_DISCARD_STENCIL \
+			| BGFX_CLEAR_DISCARD_DEPTH      \
+			| BGFX_CLEAR_DISCARD_STENCIL    \
 			)
 
+///
 #define BGFX_DEBUG_NONE                  UINT32_C(0x00000000) //!< No debug.
 #define BGFX_DEBUG_WIREFRAME             UINT32_C(0x00000001) //!< Enable wireframe for all primitives.
 #define BGFX_DEBUG_IFH                   UINT32_C(0x00000002) //!< Enable infinitely fast hardware test. No draw calls will be submitted to driver. It’s useful when profiling to quickly assess bottleneck between CPU and GPU.
 #define BGFX_DEBUG_STATS                 UINT32_C(0x00000004) //!< Enable statistics display.
 #define BGFX_DEBUG_TEXT                  UINT32_C(0x00000008) //!< Enable debug text display.
+#define BGFX_DEBUG_PROFILER              UINT32_C(0x00000010) //!< Enable profiler.
 
 ///
 #define BGFX_BUFFER_NONE                 UINT16_C(0x0000) //!<
 
-#define BGFX_BUFFER_COMPUTE_FORMAT_8x1   UINT16_C(0x0001) //!<
-#define BGFX_BUFFER_COMPUTE_FORMAT_8x2   UINT16_C(0x0002) //!<
-#define BGFX_BUFFER_COMPUTE_FORMAT_8x4   UINT16_C(0x0003) //!<
-#define BGFX_BUFFER_COMPUTE_FORMAT_16x1  UINT16_C(0x0004) //!<
-#define BGFX_BUFFER_COMPUTE_FORMAT_16x2  UINT16_C(0x0005) //!<
-#define BGFX_BUFFER_COMPUTE_FORMAT_16x4  UINT16_C(0x0006) //!<
-#define BGFX_BUFFER_COMPUTE_FORMAT_32x1  UINT16_C(0x0007) //!<
-#define BGFX_BUFFER_COMPUTE_FORMAT_32x2  UINT16_C(0x0008) //!<
-#define BGFX_BUFFER_COMPUTE_FORMAT_32x4  UINT16_C(0x0009) //!<
+#define BGFX_BUFFER_COMPUTE_FORMAT_8x1   UINT16_C(0x0001) //!< 1 8-bit value
+#define BGFX_BUFFER_COMPUTE_FORMAT_8x2   UINT16_C(0x0002) //!< 2 8-bit values
+#define BGFX_BUFFER_COMPUTE_FORMAT_8x4   UINT16_C(0x0003) //!< 4 8-bit values
+#define BGFX_BUFFER_COMPUTE_FORMAT_16x1  UINT16_C(0x0004) //!< 1 16-bit value
+#define BGFX_BUFFER_COMPUTE_FORMAT_16x2  UINT16_C(0x0005) //!< 2 16-bit values
+#define BGFX_BUFFER_COMPUTE_FORMAT_16x4  UINT16_C(0x0006) //!< 4 16-bit values
+#define BGFX_BUFFER_COMPUTE_FORMAT_32x1  UINT16_C(0x0007) //!< 1 32-bit value
+#define BGFX_BUFFER_COMPUTE_FORMAT_32x2  UINT16_C(0x0008) //!< 2 32-bit values
+#define BGFX_BUFFER_COMPUTE_FORMAT_32x4  UINT16_C(0x0009) //!< 4 32-bit values
 #define BGFX_BUFFER_COMPUTE_FORMAT_SHIFT 0                //!<
 #define BGFX_BUFFER_COMPUTE_FORMAT_MASK  UINT16_C(0x000f) //!<
 
-#define BGFX_BUFFER_COMPUTE_TYPE_UINT    UINT16_C(0x0010) //!<
-#define BGFX_BUFFER_COMPUTE_TYPE_INT     UINT16_C(0x0020) //!<
-#define BGFX_BUFFER_COMPUTE_TYPE_FLOAT   UINT16_C(0x0030) //!<
+#define BGFX_BUFFER_COMPUTE_TYPE_INT     UINT16_C(0x0010) //!< Type `int`.
+#define BGFX_BUFFER_COMPUTE_TYPE_UINT    UINT16_C(0x0020) //!< Type `uint`.
+#define BGFX_BUFFER_COMPUTE_TYPE_FLOAT   UINT16_C(0x0030) //!< Type `float`.
 #define BGFX_BUFFER_COMPUTE_TYPE_SHIFT   4                //!<
 #define BGFX_BUFFER_COMPUTE_TYPE_MASK    UINT16_C(0x0030) //!<
 
 #define BGFX_BUFFER_COMPUTE_READ         UINT16_C(0x0100) //!< Buffer will be read by shader.
 #define BGFX_BUFFER_COMPUTE_WRITE        UINT16_C(0x0200) //!< Buffer will be used for writing.
 #define BGFX_BUFFER_DRAW_INDIRECT        UINT16_C(0x0400) //!< Buffer will be used for storing draw indirect commands.
-#define BGFX_BUFFER_ALLOW_RESIZE         UINT16_C(0x0800) //!<
-#define BGFX_BUFFER_INDEX32              UINT16_C(0x1000) //!<
+#define BGFX_BUFFER_ALLOW_RESIZE         UINT16_C(0x0800) //!< Allow dynamic index/vertex buffer resize during update.
+#define BGFX_BUFFER_INDEX32              UINT16_C(0x1000) //!< Index buffer contains 32-bit indices.
 
 #define BGFX_BUFFER_COMPUTE_READ_WRITE (0 \
-			| BGFX_BUFFER_COMPUTE_READ \
-			| BGFX_BUFFER_COMPUTE_WRITE \
+			| BGFX_BUFFER_COMPUTE_READ    \
+			| BGFX_BUFFER_COMPUTE_WRITE   \
 			)
 
 ///
 #define BGFX_TEXTURE_NONE                UINT32_C(0x00000000) //!<
-#define BGFX_TEXTURE_U_MIRROR            UINT32_C(0x00000001) //!<
-#define BGFX_TEXTURE_U_CLAMP             UINT32_C(0x00000002) //!<
-#define BGFX_TEXTURE_U_BORDER            UINT32_C(0x00000003) //!<
+#define BGFX_TEXTURE_U_MIRROR            UINT32_C(0x00000001) //!< Wrap U mode: Mirror
+#define BGFX_TEXTURE_U_CLAMP             UINT32_C(0x00000002) //!< Wrap U mode: Clamp
+#define BGFX_TEXTURE_U_BORDER            UINT32_C(0x00000003) //!< Wrap U mode: Border
 #define BGFX_TEXTURE_U_SHIFT             0                    //!<
 #define BGFX_TEXTURE_U_MASK              UINT32_C(0x00000003) //!<
-#define BGFX_TEXTURE_V_MIRROR            UINT32_C(0x00000004) //!<
-#define BGFX_TEXTURE_V_CLAMP             UINT32_C(0x00000008) //!<
-#define BGFX_TEXTURE_V_BORDER            UINT32_C(0x0000000c) //!<
+#define BGFX_TEXTURE_V_MIRROR            UINT32_C(0x00000004) //!< Wrap V mode: Mirror
+#define BGFX_TEXTURE_V_CLAMP             UINT32_C(0x00000008) //!< Wrap V mode: Clamp
+#define BGFX_TEXTURE_V_BORDER            UINT32_C(0x0000000c) //!< Wrap V mode: Border
 #define BGFX_TEXTURE_V_SHIFT             2                    //!<
 #define BGFX_TEXTURE_V_MASK              UINT32_C(0x0000000c) //!<
-#define BGFX_TEXTURE_W_MIRROR            UINT32_C(0x00000010) //!<
-#define BGFX_TEXTURE_W_CLAMP             UINT32_C(0x00000020) //!<
-#define BGFX_TEXTURE_W_BORDER            UINT32_C(0x00000030) //!<
+#define BGFX_TEXTURE_W_MIRROR            UINT32_C(0x00000010) //!< Wrap W mode: Mirror
+#define BGFX_TEXTURE_W_CLAMP             UINT32_C(0x00000020) //!< Wrap W mode: Clamp
+#define BGFX_TEXTURE_W_BORDER            UINT32_C(0x00000030) //!< Wrap W mode: Border
 #define BGFX_TEXTURE_W_SHIFT             4                    //!<
 #define BGFX_TEXTURE_W_MASK              UINT32_C(0x00000030) //!<
-#define BGFX_TEXTURE_MIN_POINT           UINT32_C(0x00000040) //!<
-#define BGFX_TEXTURE_MIN_ANISOTROPIC     UINT32_C(0x00000080) //!<
+#define BGFX_TEXTURE_MIN_POINT           UINT32_C(0x00000040) //!< Min sampling mode: Point
+#define BGFX_TEXTURE_MIN_ANISOTROPIC     UINT32_C(0x00000080) //!< Min sampling mode: Anisotropic
 #define BGFX_TEXTURE_MIN_SHIFT           6                    //!<
 #define BGFX_TEXTURE_MIN_MASK            UINT32_C(0x000000c0) //!<
-#define BGFX_TEXTURE_MAG_POINT           UINT32_C(0x00000100) //!<
-#define BGFX_TEXTURE_MAG_ANISOTROPIC     UINT32_C(0x00000200) //!<
+#define BGFX_TEXTURE_MAG_POINT           UINT32_C(0x00000100) //!< Mag sampling mode: Point
+#define BGFX_TEXTURE_MAG_ANISOTROPIC     UINT32_C(0x00000200) //!< Mag sampling mode: Anisotropic
 #define BGFX_TEXTURE_MAG_SHIFT           8                    //!<
 #define BGFX_TEXTURE_MAG_MASK            UINT32_C(0x00000300) //!<
-#define BGFX_TEXTURE_MIP_POINT           UINT32_C(0x00000400) //!<
+#define BGFX_TEXTURE_MIP_POINT           UINT32_C(0x00000400) //!< Mip sampling mode: Point
 #define BGFX_TEXTURE_MIP_SHIFT           10                   //!<
 #define BGFX_TEXTURE_MIP_MASK            UINT32_C(0x00000400) //!<
-#define BGFX_TEXTURE_MSAA_SAMPLE         UINT32_C(0x00000800) //!<
+#define BGFX_TEXTURE_MSAA_SAMPLE         UINT32_C(0x00000800) //!< Texture will be used for MSAA sampling.
 #define BGFX_TEXTURE_RT                  UINT32_C(0x00001000) //!<
-#define BGFX_TEXTURE_RT_MSAA_X2          UINT32_C(0x00002000) //!<
-#define BGFX_TEXTURE_RT_MSAA_X4          UINT32_C(0x00003000) //!<
-#define BGFX_TEXTURE_RT_MSAA_X8          UINT32_C(0x00004000) //!<
-#define BGFX_TEXTURE_RT_MSAA_X16         UINT32_C(0x00005000) //!<
+#define BGFX_TEXTURE_RT_MSAA_X2          UINT32_C(0x00002000) //!< Render target MSAAx2 mode.
+#define BGFX_TEXTURE_RT_MSAA_X4          UINT32_C(0x00003000) //!< Render target MSAAx4 mode.
+#define BGFX_TEXTURE_RT_MSAA_X8          UINT32_C(0x00004000) //!< Render target MSAAx8 mode.
+#define BGFX_TEXTURE_RT_MSAA_X16         UINT32_C(0x00005000) //!< Render target MSAAx16 mode.
 #define BGFX_TEXTURE_RT_MSAA_SHIFT       12                   //!<
 #define BGFX_TEXTURE_RT_MSAA_MASK        UINT32_C(0x00007000) //!<
-#define BGFX_TEXTURE_RT_WRITE_ONLY       UINT32_C(0x00008000) //!<
+#define BGFX_TEXTURE_RT_WRITE_ONLY       UINT32_C(0x00008000) //!< Render target will be used for writing only.
 #define BGFX_TEXTURE_RT_MASK             UINT32_C(0x0000f000) //!<
-#define BGFX_TEXTURE_COMPARE_LESS        UINT32_C(0x00010000) //!<
-#define BGFX_TEXTURE_COMPARE_LEQUAL      UINT32_C(0x00020000) //!<
-#define BGFX_TEXTURE_COMPARE_EQUAL       UINT32_C(0x00030000) //!<
-#define BGFX_TEXTURE_COMPARE_GEQUAL      UINT32_C(0x00040000) //!<
-#define BGFX_TEXTURE_COMPARE_GREATER     UINT32_C(0x00050000) //!<
-#define BGFX_TEXTURE_COMPARE_NOTEQUAL    UINT32_C(0x00060000) //!<
-#define BGFX_TEXTURE_COMPARE_NEVER       UINT32_C(0x00070000) //!<
-#define BGFX_TEXTURE_COMPARE_ALWAYS      UINT32_C(0x00080000) //!<
+#define BGFX_TEXTURE_COMPARE_LESS        UINT32_C(0x00010000) //!< Compare when sampling depth texture: less.
+#define BGFX_TEXTURE_COMPARE_LEQUAL      UINT32_C(0x00020000) //!< Compare when sampling depth texture: less or equal.
+#define BGFX_TEXTURE_COMPARE_EQUAL       UINT32_C(0x00030000) //!< Compare when sampling depth texture: equal.
+#define BGFX_TEXTURE_COMPARE_GEQUAL      UINT32_C(0x00040000) //!< Compare when sampling depth texture: greater or equal.
+#define BGFX_TEXTURE_COMPARE_GREATER     UINT32_C(0x00050000) //!< Compare when sampling depth texture: greater.
+#define BGFX_TEXTURE_COMPARE_NOTEQUAL    UINT32_C(0x00060000) //!< Compare when sampling depth texture: not equal.
+#define BGFX_TEXTURE_COMPARE_NEVER       UINT32_C(0x00070000) //!< Compare when sampling depth texture: never.
+#define BGFX_TEXTURE_COMPARE_ALWAYS      UINT32_C(0x00080000) //!< Compare when sampling depth texture: always.
 #define BGFX_TEXTURE_COMPARE_SHIFT       16                   //!<
 #define BGFX_TEXTURE_COMPARE_MASK        UINT32_C(0x000f0000) //!<
-#define BGFX_TEXTURE_COMPUTE_WRITE       UINT32_C(0x00100000) //!<
-#define BGFX_TEXTURE_SRGB                UINT32_C(0x00200000) //!<
-#define BGFX_TEXTURE_BLIT_DST            UINT32_C(0x00400000) //!<
-#define BGFX_TEXTURE_READ_BACK           UINT32_C(0x00800000) //!<
+#define BGFX_TEXTURE_COMPUTE_WRITE       UINT32_C(0x00100000) //!< Texture will be used for compute write.
+#define BGFX_TEXTURE_SRGB                UINT32_C(0x00200000) //!< Sample texture as sRGB.
+#define BGFX_TEXTURE_BLIT_DST            UINT32_C(0x00400000) //!< Texture will be used as blit destination.
+#define BGFX_TEXTURE_READ_BACK           UINT32_C(0x00800000) //!< Texture will be used for read back from GPU.
 #define BGFX_TEXTURE_BORDER_COLOR_SHIFT  24                   //!<
 #define BGFX_TEXTURE_BORDER_COLOR_MASK   UINT32_C(0x0f000000) //!<
 #define BGFX_TEXTURE_RESERVED_SHIFT      28                   //!<
@@ -328,13 +378,13 @@
 #define BGFX_TEXTURE_BORDER_COLOR(_index) ( (_index << BGFX_TEXTURE_BORDER_COLOR_SHIFT) & BGFX_TEXTURE_BORDER_COLOR_MASK)
 
 #define BGFX_TEXTURE_SAMPLER_BITS_MASK (0 \
-			| BGFX_TEXTURE_U_MASK \
-			| BGFX_TEXTURE_V_MASK \
-			| BGFX_TEXTURE_W_MASK \
-			| BGFX_TEXTURE_MIN_MASK \
-			| BGFX_TEXTURE_MAG_MASK \
-			| BGFX_TEXTURE_MIP_MASK \
-			| BGFX_TEXTURE_COMPARE_MASK \
+			| BGFX_TEXTURE_U_MASK         \
+			| BGFX_TEXTURE_V_MASK         \
+			| BGFX_TEXTURE_W_MASK         \
+			| BGFX_TEXTURE_MIN_MASK       \
+			| BGFX_TEXTURE_MAG_MASK       \
+			| BGFX_TEXTURE_MIP_MASK       \
+			| BGFX_TEXTURE_COMPARE_MASK   \
 			)
 
 ///

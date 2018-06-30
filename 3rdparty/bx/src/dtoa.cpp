@@ -3,8 +3,9 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+#include "bx_p.h"
 #include <bx/cpu.h>
-#include <bx/fpumath.h>
+#include <bx/math.h>
 #include <bx/string.h>
 #include <bx/uint32_t.h>
 
@@ -12,28 +13,31 @@
 
 namespace bx
 {
-	// https://github.com/miloyip/dtoa-benchmark
-	//
-	// Copyright (C) 2014 Milo Yip
-	//
-	// Permission is hereby granted, free of charge, to any person obtaining a copy
-	// of this software and associated documentation files (the "Software"), to deal
-	// in the Software without restriction, including without limitation the rights
-	// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	// copies of the Software, and to permit persons to whom the Software is
-	// furnished to do so, subject to the following conditions:
-	//
-	// The above copyright notice and this permission notice shall be included in
-	// all copies or substantial portions of the Software.
-	//
-	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	// THE SOFTWARE.
-	//
+	/*
+	 * https://github.com/miloyip/dtoa-benchmark
+	 *
+	 * Copyright (C) 2014 Milo Yip
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 *
+	 */
+
 	struct DiyFp
 	{
 		DiyFp()
@@ -77,7 +81,7 @@ namespace bx
 
 		DiyFp operator*(const DiyFp& rhs) const
 		{
-			const uint64_t M32 = 0xFFFFFFFF;
+			const uint64_t M32 = UINT32_MAX;
 			const uint64_t a = f >> 32;
 			const uint64_t b = f & M32;
 			const uint64_t c = rhs.f >> 32;
@@ -105,23 +109,23 @@ namespace bx
 
 		void NormalizedBoundaries(DiyFp* minus, DiyFp* plus) const
 		{
-			DiyFp pl = DiyFp((f << 1) + 1, e - 1).NormalizeBoundary();
-			DiyFp mi = (f == kDpHiddenBit) ? DiyFp((f << 2) - 1, e - 2) : DiyFp((f << 1) - 1, e - 1);
+			DiyFp pl = DiyFp( (f << 1) + 1, e - 1).NormalizeBoundary();
+			DiyFp mi = (f == kDpHiddenBit) ? DiyFp( (f << 2) - 1, e - 2) : DiyFp( (f << 1) - 1, e - 1);
 			mi.f <<= mi.e - pl.e;
 			mi.e = pl.e;
 			*plus = pl;
 			*minus = mi;
 		}
 
-#define UINT64_C2(h, l) ((static_cast<uint64_t>(h) << 32) | static_cast<uint64_t>(l))
+#define UINT64_C2(h, l) ( (static_cast<uint64_t>(h) << 32) | static_cast<uint64_t>(l) )
 
-		static const int32_t kDiySignificandSize = 64;
-		static const int32_t kDpSignificandSize = 52;
-		static const int32_t kDpExponentBias = 0x3FF + kDpSignificandSize;
-		static const int32_t kDpMinExponent = -kDpExponentBias;
-		static const uint64_t kDpExponentMask = UINT64_C2(0x7FF00000, 0x00000000);
-		static const uint64_t kDpSignificandMask = UINT64_C2(0x000FFFFF, 0xFFFFFFFF);
-		static const uint64_t kDpHiddenBit = UINT64_C2(0x00100000, 0x00000000);
+		static const int32_t  kDiySignificandSize = 64;
+		static const int32_t  kDpSignificandSize  = 52;
+		static const int32_t  kDpExponentBias     = 0x3FF + kDpSignificandSize;
+		static const int32_t  kDpMinExponent      = -kDpExponentBias;
+		static const uint64_t kDpExponentMask     = UINT64_C2(0x7FF00000, 0x00000000);
+		static const uint64_t kDpSignificandMask  = UINT64_C2(0x000FFFFF, 0xFFFFFFFF);
+		static const uint64_t kDpHiddenBit        = UINT64_C2(0x00100000, 0x00000000);
 
 		uint64_t f;
 		int32_t e;
@@ -217,10 +221,10 @@ namespace bx
 			k++;
 		}
 
-		uint32_t index = static_cast<uint32_t>((k >> 3) + 1);
-		*K = -(-348 + static_cast<int32_t>(index << 3));	// decimal exponent no need lookup table
+		uint32_t index = static_cast<uint32_t>( (k >> 3) + 1);
+		*K = -(-348 + static_cast<int32_t>(index << 3) );	// decimal exponent no need lookup table
 
-		BX_CHECK(index < sizeof(s_kCachedPowers_F) / sizeof(s_kCachedPowers_F[0]));
+		BX_CHECK(index < sizeof(s_kCachedPowers_F) / sizeof(s_kCachedPowers_F[0]), "");
 		return DiyFp(s_kCachedPowers_F[index], s_kCachedPowers_E[index]);
 	}
 
@@ -228,7 +232,7 @@ namespace bx
 	{
 		while (rest < wp_w
 			&& delta - rest >= ten_kappa
-			&& (rest + ten_kappa < wp_w || wp_w - rest > rest + ten_kappa - wp_w))
+			&& (rest + ten_kappa < wp_w || wp_w - rest > rest + ten_kappa - wp_w) )
 		{
 			buffer[len - 1]--;
 			rest += ten_kappa;
@@ -256,7 +260,7 @@ namespace bx
 		const DiyFp wp_w = Mp - W;
 		uint32_t p1 = static_cast<uint32_t>(Mp.f >> -one.e);
 		uint64_t p2 = Mp.f & (one.f - 1);
-		int32_t kappa = static_cast<int32_t>(CountDecimalDigit32(p1));
+		int32_t kappa = static_cast<int32_t>(CountDecimalDigit32(p1) );
 		*len = 0;
 
 		while (kappa > 0)
@@ -436,17 +440,17 @@ namespace bx
 
 		if (isNan(_value) )
 		{
-			return (int32_t)strlncpy(_dst, _max, "nan") + sign;
+			return (int32_t)strCopy(_dst, _max, "nan") + sign;
 		}
 		else if (isInfinite(_value) )
 		{
-			return (int32_t)strlncpy(_dst, _max, "inf") + sign;
+			return (int32_t)strCopy(_dst, _max, "inf") + sign;
 		}
 
 		int32_t len;
 		if (0.0 == _value)
 		{
-			len = (int32_t)strlncpy(_dst, _max, "0.0");
+			len = (int32_t)strCopy(_dst, _max, "0.0");
 		}
 		else
 		{
@@ -555,6 +559,586 @@ namespace bx
 	int32_t toString(char* _dst, int32_t _max, uint64_t _value, uint32_t _base)
 	{
 		return toStringUnsigned(_dst, _max, _value, _base);
+	}
+
+	/*
+	 * https://github.com/grzegorz-kraszewski/stringtofloat/
+	 *
+	 * MIT License
+	 *
+	 * Copyright (c) 2016 Grzegorz Kraszewski
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in all
+	 * copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	 * SOFTWARE.
+	 */
+
+	/*
+	 * IMPORTANT
+	 *
+	 * The code works in "round towards zero" mode. This is different from
+	 * GCC standard library strtod(), which uses "round half to even" rule.
+	 * Therefore it cannot be used as a direct drop-in replacement, as in
+	 * some cases results will be different on the least significant bit of
+	 * mantissa. Read more in the README.md file.
+	 */
+
+#define DIGITS 18
+
+#define DOUBLE_PLUS_ZERO      UINT64_C(0x0000000000000000)
+#define DOUBLE_MINUS_ZERO     UINT64_C(0x8000000000000000)
+#define DOUBLE_PLUS_INFINITY  UINT64_C(0x7ff0000000000000)
+#define DOUBLE_MINUS_INFINITY UINT64_C(0xfff0000000000000)
+
+	union HexDouble
+	{
+		double d;
+		uint64_t u;
+	};
+
+#define lsr96(s2, s1, s0, d2, d1, d0)      \
+	d0 = ( (s0) >> 1) | ( ( (s1) & 1) << 31); \
+	d1 = ( (s1) >> 1) | ( ( (s2) & 1) << 31); \
+	d2 = (s2) >> 1;
+
+#define lsl96(s2, s1, s0, d2, d1, d0)              \
+	d2 = ( (s2) << 1) | ( ( (s1) & (1 << 31) ) >> 31); \
+	d1 = ( (s1) << 1) | ( ( (s0) & (1 << 31) ) >> 31); \
+	d0 = (s0) << 1;
+
+	/*
+	 * Undefine the below constant if your processor or compiler is slow
+	 * at 64-bit arithmetic. This is a rare case however. 64-bit macros are
+	 * better for deeply pipelined CPUs (no conditional execution), are
+	 * very efficient for 64-bit processors and also fast on 32-bit processors
+	 * featuring extended precision arithmetic (x86, PowerPC_32, M68k and probably
+	 * more).
+	 */
+
+#define USE_64BIT_FOR_ADDSUB_MACROS 0
+
+#if USE_64BIT_FOR_ADDSUB_MACROS
+
+#define add96(s2, s1, s0, d2, d1, d0) {   \
+	uint64_t w;                           \
+	w = (uint64_t)(s0) + (uint64_t)(d0);  \
+	(s0) = w;                             \
+	w >>= 32;                             \
+	w += (uint64_t)(s1) + (uint64_t)(d1); \
+	(s1) = w;                             \
+	w >>= 32;                             \
+	w += (uint64_t)(s2) + (uint64_t)(d2); \
+	(s2) = w; }
+
+#define sub96(s2, s1, s0, d2, d1, d0) {   \
+	uint64_t w;                           \
+	w = (uint64_t)(s0) - (uint64_t)(d0);  \
+	(s0) = w;                             \
+	w >>= 32;                             \
+	w += (uint64_t)(s1) - (uint64_t)(d1); \
+	(s1) = w;                             \
+	w >>= 32;                             \
+	w += (uint64_t)(s2) - (uint64_t)(d2); \
+	(s2) = w; }
+
+#else
+
+#define add96(s2, s1, s0, d2, d1, d0) {                                \
+	uint32_t _x, _c;                                                   \
+	_x = (s0); (s0) += (d0);                                           \
+	if ( (s0) < _x) _c = 1; else _c = 0;                               \
+	_x = (s1); (s1) += (d1) + _c;                                      \
+	if ( ( (s1) < _x) || ( ( (s1) == _x) && _c) ) _c = 1; else _c = 0; \
+	(s2) += (d2) + _c; }
+
+#define sub96(s2, s1, s0, d2, d1, d0) {                                \
+	uint32_t _x, _c;                                                   \
+	_x = (s0); (s0) -= (d0);                                           \
+	if ( (s0) > _x) _c = 1; else _c = 0;                               \
+	_x = (s1); (s1) -= (d1) + _c;                                      \
+	if ( ( (s1) > _x) || ( ( (s1) == _x) && _c) ) _c = 1; else _c = 0; \
+	(s2) -= (d2) + _c; }
+
+#endif   /* USE_64BIT_FOR_ADDSUB_MACROS */
+
+	/* parser state machine states */
+
+#define FSM_A    0
+#define FSM_B    1
+#define FSM_C    2
+#define FSM_D    3
+#define FSM_E    4
+#define FSM_F    5
+#define FSM_G    6
+#define FSM_H    7
+#define FSM_I    8
+#define FSM_STOP 9
+
+	/* The structure is filled by parser, then given to converter. */
+	struct PrepNumber
+	{
+		int negative;      /* 0 if positive number, 1 if negative */
+		int32_t exponent;  /* power of 10 exponent */
+		uint64_t mantissa; /* integer mantissa */
+	};
+
+	/* Possible parser return values. */
+
+#define PARSER_OK     0  // parser finished OK
+#define PARSER_PZERO  1  // no digits or number is smaller than +-2^-1022
+#define PARSER_MZERO  2  // number is negative, module smaller
+#define PARSER_PINF   3  // number is higher than +HUGE_VAL
+#define PARSER_MINF   4  // number is lower than -HUGE_VAL
+
+	inline char next(const char*& _s, const char* _term)
+	{
+		return _s != _term
+			? *_s++
+			: '\0'
+			;
+	}
+
+	static int parser(const char* _s, const char* _term, PrepNumber* _pn)
+	{
+		int state = FSM_A;
+		int digx = 0;
+		char c = ' ';            /* initial value for kicking off the state machine */
+		int result = PARSER_OK;
+		int expneg = 0;
+		int32_t expexp = 0;
+
+		while (state != FSM_STOP) // && _s != _term)
+		{
+			switch (state)
+			{
+			case FSM_A:
+				if (isSpace(c) )
+				{
+					c = next(_s, _term);
+				}
+				else
+				{
+					state = FSM_B;
+				}
+				break;
+
+			case FSM_B:
+				state = FSM_C;
+
+				if (c == '+')
+				{
+					c = next(_s, _term);
+				}
+				else if (c == '-')
+				{
+					_pn->negative = 1;
+					c = next(_s, _term);
+				}
+				else if (isNumeric(c) )
+				{
+				}
+				else if (c == '.')
+				{
+				}
+				else
+				{
+					state = FSM_STOP;
+				}
+				break;
+
+			case FSM_C:
+				if (c == '0')
+				{
+					c = next(_s, _term);
+				}
+				else if (c == '.')
+				{
+					c = next(_s, _term);
+					state = FSM_D;
+				}
+				else
+				{
+					state = FSM_E;
+				}
+				break;
+
+			case FSM_D:
+				if (c == '0')
+				{
+					c = next(_s, _term);
+					if (_pn->exponent > -2147483647) _pn->exponent--;
+				}
+				else
+				{
+					state = FSM_F;
+				}
+				break;
+
+			case FSM_E:
+				if (isNumeric(c) )
+				{
+					if (digx < DIGITS)
+					{
+						_pn->mantissa *= 10;
+						_pn->mantissa += c - '0';
+						digx++;
+					}
+					else if (_pn->exponent < 2147483647)
+					{
+						_pn->exponent++;
+					}
+
+					c = next(_s, _term);
+				}
+				else if (c == '.')
+				{
+					c = next(_s, _term);
+					state = FSM_F;
+				}
+				else
+				{
+					state = FSM_F;
+				}
+				break;
+
+			case FSM_F:
+				if (isNumeric(c) )
+				{
+					if (digx < DIGITS)
+					{
+						_pn->mantissa *= 10;
+						_pn->mantissa += c - '0';
+						_pn->exponent--;
+						digx++;
+					}
+
+					c = next(_s, _term);
+				}
+				else if ('e' == toLower(c) )
+				{
+					c = next(_s, _term);
+					state = FSM_G;
+				}
+				else
+				{
+					state = FSM_G;
+				}
+				break;
+
+			case FSM_G:
+				if (c == '+')
+				{
+					c = next(_s, _term);
+				}
+				else if (c == '-')
+				{
+					expneg = 1;
+					c = next(_s, _term);
+				}
+
+				state = FSM_H;
+				break;
+
+			case FSM_H:
+				if (c == '0')
+				{
+					c = next(_s, _term);
+				}
+				else
+				{
+					state = FSM_I;
+				}
+				break;
+
+			case FSM_I:
+				if (isNumeric(c) )
+				{
+					if (expexp < 214748364)
+					{
+						expexp *= 10;
+						expexp += c - '0';
+					}
+
+					c = next(_s, _term);
+				}
+				else
+				{
+					state = FSM_STOP;
+				}
+				break;
+			}
+		}
+
+		if (expneg)
+		{
+			expexp = -expexp;
+		}
+
+		_pn->exponent += expexp;
+
+		if (_pn->mantissa == 0)
+		{
+			if (_pn->negative)
+			{
+				result = PARSER_MZERO;
+			}
+			else
+			{
+				result = PARSER_PZERO;
+			}
+		}
+		else if (_pn->exponent > 309)
+		{
+			if (_pn->negative)
+			{
+				result = PARSER_MINF;
+			}
+			else
+			{
+				result = PARSER_PINF;
+			}
+		}
+		else if (_pn->exponent < -328)
+		{
+			if (_pn->negative)
+			{
+				result = PARSER_MZERO;
+			}
+			else
+			{
+				result = PARSER_PZERO;
+			}
+		}
+
+		return result;
+	}
+
+	static double converter(PrepNumber* _pn)
+	{
+		int binexp = 92;
+		HexDouble hd;
+		uint32_t s2, s1, s0; /* 96-bit precision integer */
+		uint32_t q2, q1, q0; /* 96-bit precision integer */
+		uint32_t r2, r1, r0; /* 96-bit precision integer */
+		uint32_t mask28 = UINT32_C(0xf) << 28;
+
+		hd.u = 0;
+
+		s0 = (uint32_t)(_pn->mantissa & UINT32_MAX);
+		s1 = (uint32_t)(_pn->mantissa >> 32);
+		s2 = 0;
+
+		while (_pn->exponent > 0)
+		{
+			lsl96(s2, s1, s0, q2, q1, q0); // q = p << 1
+			lsl96(q2, q1, q0, r2, r1, r0); // r = p << 2
+			lsl96(r2, r1, r0, s2, s1, s0); // p = p << 3
+			add96(s2, s1, s0, q2, q1, q0); // p = (p << 3) + (p << 1)
+
+			_pn->exponent--;
+
+			while (s2 & mask28)
+			{
+				lsr96(s2, s1, s0, q2, q1, q0);
+				binexp++;
+				s2 = q2;
+				s1 = q1;
+				s0 = q0;
+			}
+		}
+
+		while (_pn->exponent < 0)
+		{
+			while (!(s2 & (1 << 31) ) )
+			{
+				lsl96(s2, s1, s0, q2, q1, q0);
+				binexp--;
+				s2 = q2;
+				s1 = q1;
+				s0 = q0;
+			}
+
+			q2 = s2 / 10;
+			r1 = s2 % 10;
+			r2 = (s1 >> 8) | (r1 << 24);
+			q1 = r2 / 10;
+			r1 = r2 % 10;
+			r2 = ( (s1 & 0xFF) << 16) | (s0 >> 16) | (r1 << 24);
+			r0 = r2 / 10;
+			r1 = r2 % 10;
+			q1 = (q1 << 8) | ( (r0 & 0x00FF0000) >> 16);
+			q0 = r0 << 16;
+			r2 = (s0 & UINT16_MAX) | (r1 << 16);
+			q0 |= r2 / 10;
+			s2 = q2;
+			s1 = q1;
+			s0 = q0;
+
+			_pn->exponent++;
+		}
+
+		if (s2 || s1 || s0)
+		{
+			while (!(s2 & mask28) )
+			{
+				lsl96(s2, s1, s0, q2, q1, q0);
+				binexp--;
+				s2 = q2;
+				s1 = q1;
+				s0 = q0;
+			}
+		}
+
+		binexp += 1023;
+
+		if (binexp > 2046)
+		{
+			if (_pn->negative)
+			{
+				hd.u = DOUBLE_MINUS_INFINITY;
+			}
+			else
+			{
+				hd.u = DOUBLE_PLUS_INFINITY;
+			}
+		}
+		else if (binexp < 1)
+		{
+			if (_pn->negative)
+			{
+				hd.u = DOUBLE_MINUS_ZERO;
+			}
+		}
+		else if (s2)
+		{
+			uint64_t q;
+			uint64_t binexs2 = (uint64_t)binexp;
+
+			binexs2 <<= 52;
+			q =   ( (uint64_t)(s2 & ~mask28) << 24)
+			  | ( ( (uint64_t)s1 + 128) >> 8) | binexs2;
+
+			if (_pn->negative)
+			{
+				q |= (1ULL << 63);
+			}
+
+			hd.u = q;
+		}
+
+		return hd.d;
+	}
+
+	int32_t toString(char* _out, int32_t _max, bool _value)
+	{
+		StringView str(_value ? "true" : "false");
+		strCopy(_out, _max, str);
+		return str.getLength();
+	}
+
+	bool fromString(bool* _out, const StringView& _str)
+	{
+		char ch = toLower(_str.getPtr()[0]);
+		*_out = ch == 't' ||  ch == '1';
+		return 0 != _str.getLength();
+	}
+
+	bool fromString(float* _out, const StringView& _str)
+	{
+		double dbl;
+		bool result = fromString(&dbl, _str);
+		*_out = float(dbl);
+		return result;
+	}
+
+	bool fromString(double* _out, const StringView& _str)
+	{
+		PrepNumber pn;
+		pn.mantissa = 0;
+		pn.negative = 0;
+		pn.exponent = 0;
+
+		HexDouble hd;
+		hd.u = DOUBLE_PLUS_ZERO;
+
+		switch (parser(_str.getPtr(), _str.getTerm(), &pn) )
+		{
+		case PARSER_OK:
+			*_out = converter(&pn);
+			break;
+
+		case PARSER_PZERO:
+			*_out = hd.d;
+			break;
+
+		case PARSER_MZERO:
+			hd.u = DOUBLE_MINUS_ZERO;
+			*_out = hd.d;
+			break;
+
+		case PARSER_PINF:
+			hd.u = DOUBLE_PLUS_INFINITY;
+			*_out = hd.d;
+			break;
+
+		case PARSER_MINF:
+			hd.u = DOUBLE_MINUS_INFINITY;
+			*_out = hd.d;
+			break;
+		}
+
+		return true;
+	}
+
+	bool fromString(int32_t* _out, const StringView& _str)
+	{
+		const char* str  = _str.getPtr();
+		const char* term = _str.getTerm();
+
+		str = strws(str);
+		char ch = *str++;
+		bool neg = false;
+		switch (ch)
+		{
+		case '-':
+		case '+': neg = '-' == ch;
+			break;
+
+		default:
+			--str;
+			break;
+		}
+
+		int32_t result = 0;
+
+		for (ch = *str++; isNumeric(ch) && str <= term; ch = *str++)
+		{
+			result = 10*result - (ch - '0');
+		}
+
+		*_out = neg ? result : -result;
+
+		return true;
+	}
+
+	bool fromString(uint32_t* _out, const StringView& _str)
+	{
+		fromString( (int32_t*)_out, _str);
+		return true;
 	}
 
 } // namespace bx

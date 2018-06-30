@@ -5,7 +5,7 @@
 
 #include "ctlrport.h"
 
-SLOT_INTERFACE_EXTERN(psx_controllers_nomulti);
+void psx_controllers_nomulti(device_slot_interface &device);
 
 class psx_multitap_device : public device_t,
 							public device_psx_controller_interface
@@ -38,6 +38,6 @@ private:
 	required_device<psx_controller_port_device> m_portd;
 };
 
-extern const device_type PSX_MULTITAP;
+DECLARE_DEVICE_TYPE(PSX_MULTITAP, psx_multitap_device)
 
 #endif // MAME_BUS_PSX_MULTITAP_H

@@ -26,7 +26,7 @@ device_palette_interface::device_palette_interface(const machine_config &mconfig
 	: device_interface(device, "palette"),
 		m_palette(nullptr),
 		m_pens(nullptr),
-		m_format(),
+		m_format(BITMAP_FORMAT_RGB32),
 		m_shadow_table(nullptr),
 		m_shadow_group(0),
 		m_hilight_group(0),
@@ -57,10 +57,6 @@ void device_palette_interface::interface_validity_check(validity_checker &valid)
 
 void device_palette_interface::interface_pre_start()
 {
-	// reset all our data
-	screen_device *screen = device().machine().first_screen();
-	m_format = (screen != nullptr) ? screen->format() : BITMAP_FORMAT_INVALID;
-
 	// allocate the palette
 	u32 numentries = palette_entries();
 	allocate_palette(numentries);
@@ -164,7 +160,7 @@ void device_palette_interface::interface_post_stop()
 void device_palette_interface::set_indirect_color(int index, rgb_t rgb)
 {
 	// make sure we are in range
-	assert(index < m_indirect_pens.size());
+	assert(index < m_indirect_colors.size());
 
 	// alpha doesn't matter
 	rgb.set_a(255);

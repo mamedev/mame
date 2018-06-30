@@ -21,7 +21,7 @@ Download (stable)
 
 [![Build Status](https://travis-ci.org/bkaradzic/GENie.svg?branch=master)](https://travis-ci.org/bkaradzic/GENie)
 
-	version 807 (commit 83efdca3c3c63cb47bd1b4daa8b73d526841f900)
+	version 849 (commit f3788f8531e75ddde92df41ecc1ccdb34f1d75ff)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -48,8 +48,8 @@ Documentation
 History
 -------
 
-Initial version of **GENie** is fork of Premake 4.4 beta 5, and there is no
-intention to keep it compatible with it.
+Initial version of **GENie** is [fork](https://github.com/bkaradzic/GENie/blob/c7e7da4aafe4210aa014a8ae8f6b01ce1d6802f0/README.md#why-fork)
+of Premake 4.4 beta 5, and there is no intention to keep it compatible with it.
 
 ## Changelog (since fork)
 
@@ -115,6 +115,8 @@ intention to keep it compatible with it.
  - Added vs2017 support.
  - Removed vs2008 support.
  - Added `removeplatforms` that removes VS build target platforms.
+ - Added `PedanticWarnings` flag.
+ - Added `ObjcARC` flag to enable automatic reference counting for Objective-C(++).
 
 Debugging GENie scripts
 -----------------------
@@ -181,7 +183,7 @@ PS3.
 	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers, Bill Freist,
 	Terry Hendrix II, Ryan Juckett, Andrew Johnson, Johan Sköld,
 	Alastair Murray, Patrick Munns, Jan-Eric Duden, Phil Stevens, Stuart Carnie,
-	Nikolay Aleksiev, Jon Olson.
+	Nikolay Aleksiev, Jon Olson, Mike Fitzgerald.
 	All rights reserved.
 
 	https://github.com/bkaradzic/genie

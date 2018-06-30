@@ -19,6 +19,9 @@ n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_
 	, dd_present(false)
 	, disk_present(false)
 	, cart_present(false)
+	, m_vr4300(*this, "^maincpu")
+	, m_rsp(*this, "^rsp")
+	, ai_dac(*this, "^dac%u", 1U)
 {
 	for (int32_t i = 0; i < 256; i++)
 	{
@@ -123,8 +126,6 @@ void n64_periphs::device_reset()
 {
 	uint32_t *cart = (uint32_t*)machine().root_device().memregion("user2")->base();
 
-	m_vr4300 = machine().device<mips3_device>("maincpu");
-	m_rsp = machine().device<rsp_device>("rsp");
 	m_mem_map = &m_vr4300->space(AS_PROGRAM);
 
 	m_rdram = m_n64->rdram();
@@ -158,8 +159,6 @@ void n64_periphs::device_reset()
 	vi_xscale = 0;
 	vi_yscale = 0;
 
-	ai_dac[0] = machine().device<dmadac_sound_device>("dac1");
-	ai_dac[1] = machine().device<dmadac_sound_device>("dac2");
 	ai_timer->adjust(attotime::never);
 	memset(ai_fifo, 0, sizeof(ai_fifo));
 	ai_fifo_wpos = 0;
@@ -987,7 +986,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 TIMER_CALLBACK_MEMBER(n64_periphs::vi_scanline_callback)
 {
 	signal_rcp_interrupt(VI_INTERRUPT);
-	vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr));
+	vi_scanline_timer->adjust(screen().time_until_pos(vi_intr));
 }
 
 // Video Interface
@@ -1000,7 +999,7 @@ void n64_periphs::vi_recalculate_resolution()
 	int width = ((vi_xscale & 0x00000fff) * (x_end - x_start)) / 0x400;
 	int height = ((vi_yscale & 0x00000fff) * (y_end - y_start)) / 0x400;
 
-	rectangle visarea = m_screen->visible_area();
+	rectangle visarea = screen().visible_area();
 	// DACRATE is the quarter pixel clock and period will be for a field, not a frame
 	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC) / 2;
 
@@ -1026,7 +1025,7 @@ void n64_periphs::vi_recalculate_resolution()
 
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
-	m_screen->configure((vi_hsync & 0x00000fff)>>2, (vi_vsync & 0x00000fff), visarea, period);
+	screen().configure((vi_hsync & 0x00000fff)>>2, (vi_vsync & 0x00000fff), visarea, period);
 }
 
 READ32_MEMBER( n64_periphs::vi_reg_r )
@@ -1051,7 +1050,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
-			ret = (m_screen->vpos() & 0x3FE) + field;
+			ret = (screen().vpos() & 0x3FE) + field;
 			break;
 
 		case 0x14/4:        // VI_BURST_REG
@@ -1123,7 +1122,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 
 		case 0x0c/4:        // VI_INTR_REG
 			vi_intr = data;
-			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr));
+			vi_scanline_timer->adjust(screen().time_until_pos(vi_intr));
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
@@ -1271,7 +1270,8 @@ void n64_periphs::ai_dma()
 
 	//osd_printf_debug("DACDMA: %x for %x bytes\n", current->address, current->length);
 
-	dmadac_transfer(&ai_dac[0], 2, 1, 2, current->length/4, ram);
+	ai_dac[0]->transfer(0, 1, 2, current->length/4, ram);
+	ai_dac[1]->transfer(1, 1, 2, current->length/4, ram);
 
 	ai_status |= 0x40000000;
 
@@ -1287,7 +1287,7 @@ void n64_periphs::ai_dma()
 
 TIMER_CALLBACK_MEMBER(n64_periphs::ai_timer_callback)
 {
-	machine().device<n64_periphs>("rcp")->ai_timer_tick();
+	ai_timer_tick();
 }
 
 void n64_periphs::ai_timer_tick()
@@ -1365,10 +1365,17 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
 			break;
 
 		case 0x10/4:        // AI_DACRATE_REG
+		{
 			ai_dacrate = data & 0x3fff;
-			dmadac_set_frequency(&ai_dac[0], 2, (double)DACRATE_NTSC / (double)(ai_dacrate+1));
-			dmadac_enable(&ai_dac[0], 2, 1);
+			const double frequency = (double)DACRATE_NTSC / (double)(ai_dacrate+1);
+
+			ai_dac[0]->set_frequency(frequency);
+			ai_dac[0]->enable(1);
+
+			ai_dac[1]->set_frequency(frequency);
+			ai_dac[1]->enable(1);
 			break;
+		}
 
 		case 0x14/4:        // AI_BITRATE_REG
 			ai_bitrate = data & 0xf;
@@ -2085,7 +2092,7 @@ void n64_periphs::handle_pif()
 
 TIMER_CALLBACK_MEMBER(n64_periphs::si_dma_callback)
 {
-	machine().device<n64_periphs>("rcp")->si_dma_tick();
+	si_dma_tick();
 }
 
 void n64_periphs::si_dma_tick()
@@ -2674,7 +2681,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 
 READ32_MEMBER( n64_periphs::pif_ram_r )
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		if( offset == ( 0x24 / 4 ) )
 		{
@@ -2712,12 +2719,10 @@ WRITE32_MEMBER( n64_periphs::pif_ram_w )
 
 void n64_state::n64_machine_stop()
 {
-	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
-
-	if( periphs->m_nvram_image == nullptr )
+	if (m_rcp_periphs->m_nvram_image == nullptr)
 		return;
 
-	device_image_interface *image = dynamic_cast<device_image_interface *>(periphs->m_nvram_image);
+	device_image_interface *image = dynamic_cast<device_image_interface *>(m_rcp_periphs->m_nvram_image);
 
 	uint8_t data[0x30800];
 	if (m_sram == nullptr)
@@ -2728,9 +2733,9 @@ void n64_state::n64_machine_stop()
 	{
 		memcpy(data, m_sram, 0x20000);
 	}
-	memcpy(data + 0x20000, periphs->m_save_data.eeprom, 0x800);
-	memcpy(data + 0x20800, periphs->m_save_data.mempak[0], 0x8000);
-	memcpy(data + 0x28800, periphs->m_save_data.mempak[1], 0x8000);
+	memcpy(data + 0x20000, m_rcp_periphs->m_save_data.eeprom, 0x800);
+	memcpy(data + 0x20800, m_rcp_periphs->m_save_data.mempak[0], 0x8000);
+	memcpy(data + 0x28800, m_rcp_periphs->m_save_data.mempak[1], 0x8000);
 	image->battery_save(data, 0x30800);
 }
 
@@ -2741,11 +2746,10 @@ void n64_state::machine_start()
 	/* configure fast RAM regions */
 	//m_vr4300->add_fastram(0x00000000, 0x007fffff, false, m_rdram);
 
-	rsp_device *rsp = machine().device<rsp_device>("rsp");
-	rsp->rspdrc_set_options(RSPDRC_STRICT_VERIFY);
-	rsp->rspdrc_flush_drc_cache();
-	rsp->rsp_add_dmem(m_rsp_dmem);
-	rsp->rsp_add_imem(m_rsp_imem);
+	m_rsp->rspdrc_set_options(RSPDRC_STRICT_VERIFY);
+	m_rsp->rspdrc_flush_drc_cache();
+	m_rsp->rsp_add_dmem(m_rsp_dmem);
+	m_rsp->rsp_add_imem(m_rsp_imem);
 
 	/* add a hook for battery save */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&n64_state::n64_machine_stop,this));

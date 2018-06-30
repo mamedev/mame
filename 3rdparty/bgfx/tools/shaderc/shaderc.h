@@ -61,45 +61,45 @@ namespace bgfx
 #include <bx/uint32_t.h>
 #include <bx/string.h>
 #include <bx/hash.h>
-#include <bx/crtimpl.h>
+#include <bx/file.h>
 #include "../../src/vertexdecl.h"
 
 namespace bgfx
 {
 	extern bool g_verbose;
 
-	class LineReader
+	class LineReader : public bx::ReaderI
 	{
 	public:
 		LineReader(const char* _str)
 			: m_str(_str)
 			, m_pos(0)
-			, m_size((uint32_t)strlen(_str))
+			, m_size(bx::strLen(_str) )
 		{
 		}
 
-		std::string getLine()
+		virtual int32_t read(void* _data, int32_t _size, bx::Error* _err) override
 		{
-			const char* str = &m_str[m_pos];
-			skipLine();
+			if (m_str[m_pos] == '\0'
+			||  m_pos == m_size)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "LineReader: EOF.");
+				return 0;
+			}
 
-			const char* eol = &m_str[m_pos];
-
-			std::string tmp;
-			tmp.assign(str, eol - str);
-			return tmp;
-		}
-
-		bool isEof() const
-		{
-			return m_str[m_pos] == '\0';
-		}
-
-		void skipLine()
-		{
-			const char* str = &m_str[m_pos];
+			uint32_t pos = m_pos;
+			const char* str = &m_str[pos];
 			const char* nl = bx::strnl(str);
-			m_pos += (uint32_t)(nl - str);
+			pos += (uint32_t)(nl - str);
+
+			const char* eol = &m_str[pos];
+
+			uint32_t size = bx::uint32_min(uint32_t(eol - str), _size);
+
+			bx::memCopy(_data, str, size);
+			m_pos += size;
+
+			return size;
 		}
 
 		const char* m_str;
@@ -122,6 +122,41 @@ namespace bgfx
 		uint16_t regCount;
 	};
 
+	struct Options
+	{
+		Options();
+
+		void dump();
+
+		char shaderType;
+		std::string platform;
+		std::string profile;
+
+		std::string	inputFilePath;
+		std::string	outputFilePath;
+
+		std::vector<std::string> includeDirs;
+		std::vector<std::string> defines;
+		std::vector<std::string> dependencies;
+
+		bool disasm;
+		bool raw;
+		bool preprocessOnly;
+		bool depends;
+
+		bool debugInformation;
+
+		bool avoidFlowControl;
+		bool noPreshader;
+		bool partialPrecision;
+		bool preferFlowControl;
+		bool backwardsCompatibility;
+		bool warningsAreErrors;
+
+		bool optimize;
+		uint32_t optimizationLevel;
+	};
+
 	typedef std::vector<Uniform> UniformArray;
 
 	void printCode(const char* _code, int32_t _line = 0, int32_t _start = 0, int32_t _end = INT32_MAX, int32_t _column = -1);
@@ -129,10 +164,10 @@ namespace bgfx
 	int32_t writef(bx::WriterI* _writer, const char* _format, ...);
 	void writeFile(const char* _filePath, const void* _data, int32_t _size);
 
-	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
-	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
-	bool compilePSSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
-	bool compileSPIRVShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
+	bool compileGLSLShader(const Options& _options, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
+	bool compileHLSLShader(const Options& _options, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
+	bool compilePSSLShader(const Options& _options, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
+	bool compileSPIRVShader(const Options& _options, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
 
 } // namespace bgfx
 

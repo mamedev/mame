@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class sidepckt_state : public driver_device
 {
@@ -49,8 +50,8 @@ public:
 	DECLARE_READ8_MEMBER(scroll_y_r);
 	DECLARE_WRITE8_MEMBER(scroll_y_w);
 
-	DECLARE_DRIVER_INIT(sidepckt);
-	DECLARE_DRIVER_INIT(sidepcktj);
+	void init_sidepckt();
+	void init_sidepcktj();
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -60,4 +61,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void sidepcktb(machine_config &config);
+	void sidepckt(machine_config &config);
+	void sidepckt_map(address_map &map);
+	void sidepcktb_map(address_map &map);
+	void sound_map(address_map &map);
 };

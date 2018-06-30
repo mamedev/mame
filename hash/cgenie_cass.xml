@@ -103,9 +103,9 @@ distributor of the Colour Genie EG2000 computers.
 	</software>
 
 	<software name="coldemo" supported="yes">
-		<description>Colourdemo</description>
+		<description>Colour Genie Demonstration Kassette</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Carsten Schmidt</publisher>
 		<info name="author" value="Carsten Schmidt, Kalle Braun" />
 		<info name="usage" value="Load with CLOAD, enter RUN to start" />
 		<part name="cass1" interface="cgenie_cass">
@@ -242,7 +242,7 @@ distributor of the Colour Genie EG2000 computers.
 	</software>
 
 	<software name="colrot" supported="yes">
-		<description>Colrot</description>
+		<description>Colour-ROT</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
 		<info name="author" value="Udo Gerber" />
@@ -423,7 +423,7 @@ distributor of the Colour Genie EG2000 computers.
 	<software name="eatman" supported="yes">
 		<description>Eatman</description>
 		<year>1983</year>
-		<publisher>Computer Service W. Neumann - Molimerx Ltd.</publisher>
+		<publisher>Molimerx Ltd.</publisher>
 		<info name="author" value="Bernd Herd" />
 		<info name="usage" value="Type SYSTEM and load with EATMAN, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">

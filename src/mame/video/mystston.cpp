@@ -26,8 +26,8 @@
  *
  *************************************/
 // HMC20
-// MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,8,248)
-#define PIXEL_CLOCK     (XTAL_12MHz / 2)
+// MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
+#define PIXEL_CLOCK     (XTAL(12'000'000) / 2)
 #define HTOTAL          (384)
 #define HBEND           (0)
 #define HBSTART         (256)
@@ -296,7 +296,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( mystston )
+static GFXDECODE_START( gfx_mystston )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   4*8, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 2*8, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0*8, 2 )
@@ -310,11 +310,11 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( mystston_video )
+MACHINE_CONFIG_START(mystston_state::mystston_video)
 	MCFG_VIDEO_START_OVERRIDE(mystston_state,mystston)
 	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mystston)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mystston)
 	MCFG_PALETTE_ADD("palette", 0x40)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

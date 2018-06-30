@@ -86,7 +86,7 @@ static const discrete_mixer_desc bsktball_mixer =
 #define BSKTBALL_NOTE_SND       NODE_12
 #define BSKTBALL_CROWD_SND      NODE_13
 
-DISCRETE_SOUND_START(bsktball)
+DISCRETE_SOUND_START(bsktball_discrete)
 	/************************************************/
 	/* Input register mapping for bsktball          */
 	/************************************************/

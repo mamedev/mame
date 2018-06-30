@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Allard van der Bas
+
+#include "emupal.h"
+
 class wiping_state : public driver_device
 {
 public:
@@ -39,4 +42,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	void wiping(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

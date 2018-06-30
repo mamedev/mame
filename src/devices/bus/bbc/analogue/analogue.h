@@ -67,6 +67,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -95,6 +96,6 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_ANALOGUE_SLOT, bbc_analogue_slot_device)
 
-SLOT_INTERFACE_EXTERN( bbc_analogue_devices );
+void bbc_analogue_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_BBC_ANALOGUE_ANALOGUE_H
