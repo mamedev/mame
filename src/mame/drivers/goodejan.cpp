@@ -661,6 +661,7 @@ MACHINE_CONFIG_START(goodejan_state::goodejan)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, GOODEJAN_MHZ1/2)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

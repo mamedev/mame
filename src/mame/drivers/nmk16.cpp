@@ -4051,6 +4051,7 @@ MACHINE_CONFIG_START(nmk16_state::mustangb)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
@@ -4237,6 +4238,7 @@ MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound har
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES

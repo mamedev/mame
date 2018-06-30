@@ -396,6 +396,7 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(airraid_sound_map)
 	MCFG_DEVICE_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
