@@ -74,8 +74,10 @@ public:
 	{ }
 
 	void m6805evs(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	void mem_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
 };

@@ -67,6 +67,9 @@ public:
 		m_video_address(0)
 	{ }
 
+	void psi98(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_READ8_MEMBER(memory_r);
 	DECLARE_WRITE8_MEMBER(memory_w);
@@ -106,14 +109,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rs232b_rx_w);
 	DECLARE_WRITE_LINE_MEMBER(siob_tx_w);
 
-	void psi98(machine_config &config);
 	void psi98_io(address_map &map);
 	void psi98_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<z80_device> m_cpu;
 	required_device<z80dma_device> m_dma;
 	required_device<z80sio_device> m_sio;

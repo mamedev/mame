@@ -55,6 +55,9 @@ public:
 		m_wram(*this, "wram")
 	{ }
 
+	void mz2500(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<rp5c15_device> m_rtc;
@@ -203,7 +206,6 @@ public:
 	uint8_t pal_256_param(int index, int param);
 	void reset_banks(uint8_t type);
 	
-	void mz2500(machine_config &config);
 	void mz2500_io(address_map &map);
 	void mz2500_map(address_map &map);
 	void mz2500_bank_window_map(address_map &map);

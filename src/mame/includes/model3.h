@@ -80,6 +80,48 @@ public:
 		m_step20_with_old_real3d = false;
 	}
 
+	void model3_21_5881(machine_config &config);
+	void model3_20_5881(machine_config &config);
+	void model3_15(machine_config &config);
+	void model3_10(machine_config &config);
+	void model3_20(machine_config &config);
+	void model3_21(machine_config &config);
+	void scud(machine_config &config);
+
+	void init_lemans24();
+	void init_vs298();
+	void init_vs299();
+	void init_swtrilgy();
+	void init_scudplus();
+	void init_model3_20();
+	void init_bass();
+	void init_vs2();
+	void init_daytona2();
+	void init_eca();
+	void init_srally2();
+	void init_harleya();
+	void init_skichamp();
+	void init_spikeofe();
+	void init_scud();
+	void init_harley();
+	void init_swtrilga();
+	void init_vs29815();
+	void init_model3_10();
+	void init_vs215();
+	void init_getbass();
+	void init_scudplusa();
+	void init_dirtdvls();
+	void init_vf3();
+	void init_von2();
+	void init_lostwsga();
+	void init_oceanhun();
+	void init_dayto2pe();
+	void init_spikeout();
+	void init_magtruck();
+	void init_lamachin();
+	void init_model3_15();
+
+private:
 	required_device<ppc_device> m_maincpu;
 	optional_device<lsi53c810_device> m_lsi53c810;
 	required_device<cpu_device> m_audiocpu;
@@ -236,38 +278,7 @@ public:
 	void pci_device_set_reg(uint32_t value);
 	void configure_fast_ram();
 	void interleave_vroms();
-	void init_lemans24();
-	void init_vs298();
-	void init_vs299();
-	void init_swtrilgy();
-	void init_scudplus();
-	void init_model3_20();
-	void init_bass();
-	void init_vs2();
-	void init_daytona2();
-	void init_eca();
-	void init_srally2();
-	void init_harleya();
-	void init_skichamp();
-	void init_spikeofe();
-	void init_scud();
-	void init_harley();
-	void init_swtrilga();
-	void init_vs29815();
-	void init_model3_10();
-	void init_vs215();
-	void init_getbass();
-	void init_scudplusa();
-	void init_dirtdvls();
-	void init_vf3();
-	void init_von2();
-	void init_lostwsga();
-	void init_oceanhun();
-	void init_dayto2pe();
-	void init_spikeout();
-	void init_magtruck();
-	void init_lamachin();
-	void init_model3_15();
+
 	DECLARE_MACHINE_START(model3_10);
 	DECLARE_MACHINE_RESET(model3_10);
 	DECLARE_MACHINE_START(model3_15);
@@ -337,13 +348,6 @@ public:
 
 	uint16_t crypt_read_callback(uint32_t addr);
 
-	void model3_21_5881(machine_config &config);
-	void model3_20_5881(machine_config &config);
-	void model3_15(machine_config &config);
-	void model3_10(machine_config &config);
-	void model3_20(machine_config &config);
-	void model3_21(machine_config &config);
-	void scud(machine_config &config);
 	void model3_5881_mem(address_map &map);
 	void model3_10_mem(address_map &map);
 	void model3_mem(address_map &map);

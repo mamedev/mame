@@ -30,7 +30,7 @@ public:
 	void init_metalmx();
 	void metalmx(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ32_MEMBER(unk_r);
 	DECLARE_READ32_MEMBER(watchdog_r);
 	DECLARE_WRITE32_MEMBER(shifter_w);
@@ -58,7 +58,6 @@ protected:
 	void gsp_map(address_map &map);
 	void main_map(address_map &map);
 
-private:
 	required_device<m68ec020_device> m_maincpu;
 	required_device<tms34020_device> m_gsp;
 	required_device<adsp2105_device> m_adsp;

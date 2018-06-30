@@ -161,6 +161,15 @@ public:
 	{
 	}
 
+	void mac512ke(machine_config &config);
+	void mac128k(machine_config &config);
+	void macplus(machine_config &config);
+
+	void init_mac128k512k();
+	void init_mac512ke();
+	void init_macplus();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
 	required_device<ram_device> m_ram;
@@ -238,9 +247,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
-	void init_mac128k512k();
-	void init_mac512ke();
-	void init_macplus();
 	DECLARE_VIDEO_START(mac);
 	DECLARE_PALETTE_INIT(mac);
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -262,9 +268,6 @@ public:
 	void mac_driver_init(mac128model_t model);
 	void update_volume();
 
-	void mac512ke(machine_config &config);
-	void mac128k(machine_config &config);
-	void macplus(machine_config &config);
 	void mac512ke_map(address_map &map);
 	void macplus_map(address_map &map);
 private:
