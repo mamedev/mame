@@ -187,8 +187,6 @@ private:
 	mac128model_t m_model;
 
 	uint32_t m_overlay;
-	int m_drive_select;
-	int m_scsiirq_enable;
 
 	int m_irq_count, m_ca1_data, m_ca2_data;
 
