@@ -281,7 +281,13 @@ public:
 		m_screen(*this, "screen"),
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
-		m_io_analog(*this, "AN%u", 0),
+		m_io_analog(*this, "AN%u", 0U),
+		m_io_gun_x(*this, "LIGHT%u_X", 0U),
+		m_io_gun_y(*this, "LIGHT%u_Y", 0U),
+		m_io_fake(*this, "FAKE"),
+		m_io_gearshift(*this, "GEAR"),
+		m_io_system(*this, "SYSTEM"),
+		m_wheel_driver(*this, "wheel"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U)
 		{}
@@ -294,6 +300,12 @@ public:
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
+	optional_ioport_array<2> m_io_gun_x;
+	optional_ioport_array<2> m_io_gun_y;
+	optional_ioport m_io_fake;
+	optional_ioport m_io_gearshift;
+	optional_ioport m_io_system;
+	output_finder<1> m_wheel_driver;
 	output_finder<16> m_lamps;
 	output_finder<24> m_leds;
 
@@ -437,6 +449,7 @@ void seattle_state::machine_start()
 	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
 
+	m_wheel_driver.resolve();
 	m_lamps.resolve();
 	m_leds.resolve();
 }
@@ -667,7 +680,7 @@ WRITE32_MEMBER(seattle_state::analog_port_w)
 		m_pending_analog_read = currValue;
 	}
 	// Declare calibration finished as soon as a SYSTEM button is hit
-	if (!m_wheel_calibrated && ((~ioport("SYSTEM")->read()) & 0xffff)) {
+	if (!m_wheel_calibrated && ((~m_io_system->read()) & 0xffff)) {
 		m_wheel_calibrated = true;
 		//osd_printf_info("wheel calibration comlete wheel: %02x\n", currValue);
 	}
@@ -697,7 +710,7 @@ WRITE32_MEMBER(seattle_state::wheel_board_w)
 		}
 		else
 		{
-			output().set_value("wheel", arg); // target wheel angle. signed byte.
+			m_wheel_driver[0] = arg; // target wheel angle. signed byte.
 			m_wheel_force = int8_t(arg);
 		}
 	}
@@ -712,7 +725,7 @@ WRITE32_MEMBER(seattle_state::wheel_board_w)
 DECLARE_CUSTOM_INPUT_MEMBER(seattle_state::gearshift_r)
 {
 	// Check for gear change and save gear selection
-	uint32_t gear = ioport("GEAR")->read();
+	uint32_t gear = m_io_gearshift->read();
 	for (int i = 0; i < 4; i++)
 	{
 		if (gear & (1 << i))
@@ -734,39 +747,39 @@ READ32_MEMBER(seattle_state::carnevil_gun_r)
 	switch (offset)
 	{
 		case 0:     /* low 8 bits of X */
-			result = (ioport("LIGHT0_X")->read() << 4) & 0xff;
+			result = (m_io_gun_x[0]->read() << 4) & 0xff;
 			break;
 
 		case 1:     /* upper 4 bits of X */
-			result = (ioport("LIGHT0_X")->read() >> 4) & 0x0f;
-			result |= (ioport("FAKE")->read() & 0x03) << 4;
+			result = (m_io_gun_x[0]->read() >> 4) & 0x0f;
+			result |= (m_io_fake->read() & 0x03) << 4;
 			result |= 0x40;
 			break;
 
 		case 2:     /* low 8 bits of Y */
-			result = (ioport("LIGHT0_Y")->read() << 2) & 0xff;
+			result = (m_io_gun_y[0]->read() << 2) & 0xff;
 			break;
 
 		case 3:     /* upper 4 bits of Y */
-			result = (ioport("LIGHT0_Y")->read() >> 6) & 0x03;
+			result = (m_io_gun_y[0]->read() >> 6) & 0x03;
 			break;
 
 		case 4:     /* low 8 bits of X */
-			result = (ioport("LIGHT1_X")->read() << 4) & 0xff;
+			result = (m_io_gun_x[1]->read() << 4) & 0xff;
 			break;
 
 		case 5:     /* upper 4 bits of X */
-			result = (ioport("LIGHT1_X")->read() >> 4) & 0x0f;
-			result |= (ioport("FAKE")->read() & 0x30);
+			result = (m_io_gun_x[1]->read() >> 4) & 0x0f;
+			result |= (m_io_fake->read() & 0x30);
 			result |= 0x40;
 			break;
 
 		case 6:     /* low 8 bits of Y */
-			result = (ioport("LIGHT1_Y")->read() << 2) & 0xff;
+			result = (m_io_gun_y[1]->read() << 2) & 0xff;
 			break;
 
 		case 7:     /* upper 4 bits of Y */
-			result = (ioport("LIGHT1_Y")->read() >> 6) & 0x03;
+			result = (m_io_gun_y[1]->read() >> 6) & 0x03;
 			break;
 	}
 	return result;
