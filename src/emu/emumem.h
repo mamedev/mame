@@ -916,7 +916,7 @@ public:
 	void remove_change_notifier(int id);
 
 	void invalidate_caches(read_or_write mode) {
-		if(!(u32(mode) & ~m_in_notification)) {
+		if(u32(mode) & ~m_in_notification) {
 			u32 old = m_in_notification;
 			m_in_notification |= u32(mode);
 			for(const auto &n : m_notifiers)
