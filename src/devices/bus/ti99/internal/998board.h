@@ -337,7 +337,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_SETOFFSET_MEMBER( set_address );
+	DECLARE_READ8_MEMBER( set_address );
 
 	// Debugger support
 	int get_physical_address_debug(offs_t offset);
@@ -541,7 +541,7 @@ public:
 	// Memory space
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_SETOFFSET_MEMBER( setoffset );
+	DECLARE_READ8_MEMBER( setoffset );
 
 	// Memory space for debugger access
 	DECLARE_READ8_MEMBER( debugger_read );

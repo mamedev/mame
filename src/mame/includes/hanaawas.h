@@ -18,6 +18,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void hanaawas(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -44,7 +47,6 @@ public:
 	DECLARE_WRITE8_MEMBER(hanaawas_portB_w);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void hanaawas(machine_config &config);
 	void hanaawas_map(address_map &map);
 	void io_map(address_map &map);
 };

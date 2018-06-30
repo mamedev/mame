@@ -194,7 +194,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 	case -1: m_pc_delta_to_bytes = [](offs_t delta) { return delta << 1; }; break;
 	case  0: m_pc_delta_to_bytes = [](offs_t delta) { return delta;      }; break;
 	case  3: m_pc_delta_to_bytes = [](offs_t delta) { return delta >> 3; }; break;
-	default: throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer::setup_methods: Abnormal address buf shift\n");
+	default: throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer::setup_methods: Abnormal address bus shift\n");
 	}
 
 	// Define the filler

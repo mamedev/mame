@@ -13050,7 +13050,7 @@ NOTE: This DATA rom is compatible with the Multi-Poker XMP00030 + CG2451 set bel
 	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* Errors with INCOMPATIBLE EPROM error, no dumped program works with this DATA set */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x002474p.u66",   0x00000, 0x10000, CRC(74cc1423) SHA1(0522cee3a7e123ce51739c69f38915ca92bd03e5) ) /* Double Double Bonus Plus */
+	ROM_LOAD( "x002474p.u66",   0x00000, 0x10000, CRC(74cc1423) SHA1(0522cee3a7e123ce51739c69f38915ca92bd03e5) ) /* Double Double Bonus Plus - 09/20/00   @ IGT  L01-0198 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2275.u77",  0x00000, 0x8000, CRC(15d5d6b8) SHA1(61b6821d4cc059732bc3831bf19bf01aa3910b31) )

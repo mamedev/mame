@@ -317,6 +317,14 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
+	void dwarfd(machine_config &config);
+	void pokeresp(machine_config &config);
+	void qc(machine_config &config);
+
+	void init_qc();
+	void init_dwarfd();
+
+private:
 	/* video-related */
 	int m_crt_access;
 	bool m_back_color;
@@ -337,17 +345,12 @@ public:
 	DECLARE_READ8_MEMBER(qc_b8_r);
 	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
-	void init_qc();
-	void init_dwarfd();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(dwarfd);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(pesp_display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(qc_display_pixels);
-	void dwarfd(machine_config &config);
-	void pokeresp(machine_config &config);
-	void qc(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	void pokeresp_map(address_map &map);

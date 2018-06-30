@@ -146,8 +146,9 @@ public:
 		m_rso_shared_ram(*this, "rso_shared_ram"),
 		m_generic_paletteram_16(*this, "paletteram") { }
 
-	uint32_t *m_mpSharedRAM0;
-	//uint32_t *m_mpSharedRAM1;
+	void gal3(machine_config &config);
+
+private:
 	uint16_t m_namcos21_video_enable;
 	required_shared_ptr<uint16_t> m_rso_shared_ram;
 	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
@@ -166,7 +167,6 @@ public:
 	DECLARE_VIDEO_START(gal3);
 	uint32_t screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette(  );
-	void gal3(machine_config &config);
 	void cpu_mst_map(address_map &map);
 	void cpu_slv_map(address_map &map);
 	void psn_b1_cpu_map(address_map &map);

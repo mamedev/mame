@@ -10620,6 +10620,9 @@ sfiiiu                          // 04/02/1997 (c) 1997 (USA)
 warzard                         // 21/11/1996 (c) 1996 (Japan)
 warzardr1                       // 23/10/1996 (c) 1996 (Japan)
 
+@source:cpzodiac.cpp
+cpzodiac                        //
+
 @source:craft.cpp
 craft                           // Craft, by [lft]
 
@@ -10765,6 +10768,7 @@ pinkswts                        // (c) 2006 Cave (AMI license) - 2006/04/06 MAST
 pinkswtsa                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER...
 pinkswtsb                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER.
 pinkswtsx                       // (c) 2006 Cave (AMI license) - 2006/xx/xx MASTER VER.
+pinkswtssc                      // bootleg
 
 @source:cvicny.cpp
 cvicny                          //
@@ -11438,6 +11442,9 @@ popn1                           // GX803 (c) 1998 (Asia)
 popn2                           // GX831 (c) 1998 (Japan)
 popn3                           // GX980 (c) 1999 (Japan)
 popnstage                       // GQ970 (c) 1999 (Japan)
+
+@source:dkmb.cpp
+dkmb
 
 @source:dkong.cpp
 8ballact                        // (c) 1984 Seatongrove Ltd (Magic Eletronics USA license)
@@ -28085,6 +28092,7 @@ gratia                          // (c) 1996
 gratiaa                         // (c) 1996
 hayaosi2                        // (c) 1993
 hayaosi3                        // (c) 1994
+hayaosi3a                       // (c) 1994
 kirarast                        // (c) 1996
 p47aces                         // (c) 1995
 tetrisp                         // (c) 1995 Jaleco / BPS

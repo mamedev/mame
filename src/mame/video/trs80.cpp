@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert and unknown others
+// copyright-holders:Juergen Buchmueller, Robbbert
 /***************************************************************************
 
   trs80.c

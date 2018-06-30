@@ -53,12 +53,17 @@ public:
 		m_gf4500(*this, "gf4500")
 		{ }
 
+	void gizmondo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
+
+	void init_gizmondo();
+
+private:
 	uint32_t m_port[9];
 	required_device<s3c2440_device> m_s3c2440;
-	void init_gizmondo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<cpu_device> m_maincpu;
 	required_device<gf4500_device> m_gf4500;
@@ -66,7 +71,6 @@ public:
 	DECLARE_WRITE32_MEMBER(s3c2440_gpio_port_w);
 
 	bitmap_rgb32 m_bitmap;
-	void gizmondo(machine_config &config);
 	void gizmondo_map(address_map &map);
 };
 

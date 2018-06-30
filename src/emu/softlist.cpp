@@ -8,7 +8,9 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "softlist.h"
+
 #include "hash.h"
 
 #include "expat.h"

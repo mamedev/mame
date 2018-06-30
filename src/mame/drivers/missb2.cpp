@@ -36,21 +36,24 @@ public:
 		, m_oki(*this, "oki")
 	{ }
 
+	void missb2(machine_config &config);
+	void bublpong(machine_config &config);
+
+	void init_missb2();
+
+private:
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
 	DECLARE_WRITE8_MEMBER(missb2_oki_w);
 	DECLARE_READ8_MEMBER(missb2_oki_r);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	void init_missb2();
 	DECLARE_MACHINE_START(missb2);
 	DECLARE_MACHINE_RESET(missb2);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void missb2(machine_config &config);
-	void bublpong(machine_config &config);
 	void maincpu_map(address_map &map);
 	void sound_map(address_map &map);
 	void subcpu_map(address_map &map);
-protected:
+
 	void configure_banks();
 
 	required_shared_ptr<uint8_t> m_bgvram;

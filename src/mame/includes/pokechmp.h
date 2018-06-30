@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_INCLUDES_POKECHMP_H
+#define MAME_INCLUDES_POKECHMP_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -7,15 +11,16 @@
 class pokechmp_state : public driver_device
 {
 public:
-	pokechmp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pokechmp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
@@ -41,3 +46,5 @@ public:
 	void pokechmp_oki_map(address_map &map);
 	void pokechmp_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_POKECHMP_H

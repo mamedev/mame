@@ -30,6 +30,9 @@ public:
 		m_vfd(*this, "vfd")
 	{ }
 
+	void globalfr(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<s16lf01_device> m_vfd;
 
@@ -37,7 +40,6 @@ public:
 
 	DECLARE_WRITE16_MEMBER(vfd_w);
 
-	void globalfr(machine_config &config);
 	void globalfr_map(address_map &map);
 };
 

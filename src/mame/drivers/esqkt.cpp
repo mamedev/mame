@@ -114,6 +114,11 @@ public:
 		, m_mdout(*this, "mdout")
 	{ }
 
+	void kt(machine_config &config);
+
+	void init_kt();
+
+private:
 	required_device<m68ec020_device> m_maincpu;
 	required_device<es5510_device> m_esp;
 	required_device<esq_5505_5510_pump_device> m_pump;
@@ -132,11 +137,8 @@ public:
 	uint8_t m_duart_io;
 	bool  m_bCalibSecondByte;
 
-public:
-	void init_kt();
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
-	void kt(machine_config &config);
 	void kt_map(address_map &map);
 };
 

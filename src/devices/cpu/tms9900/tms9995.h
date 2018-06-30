@@ -49,6 +49,8 @@ enum
 class tms9995_device : public cpu_device
 {
 public:
+	static constexpr int AS_SETOFFSET = 4;
+
 	tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// READY input line. When asserted (high), the memory is ready for data exchange.
@@ -125,8 +127,10 @@ private:
 	uint8_t   m_onchip_memory[256];
 
 	const address_space_config      m_program_config;
+	const address_space_config      m_setoffset_config;
 	const address_space_config      m_io_config;
 	address_space*                  m_prgspace;
+	address_space*                  m_sospace;
 	address_space*                  m_cru;
 
 	// Processor states

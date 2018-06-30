@@ -267,6 +267,7 @@ public:
 	void ti99_8_50hz(machine_config &config);
 	void crumap(address_map &map);
 	void memmap(address_map &map);
+	void memmap_setoffset(address_map &map);
 private:
 	// Keyboard support
 	void    set_keyboard_column(int number, int data);
@@ -297,7 +298,12 @@ private:
 */
 void ti99_8_state::memmap(address_map &map)
 {
-	map(0x0000, 0xffff).rw(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::read), FUNC(bus::ti99::internal::mainboard8_device::write)).setoffset(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::setoffset));
+	map(0x0000, 0xffff).rw(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::read), FUNC(bus::ti99::internal::mainboard8_device::write));
+}
+
+void ti99_8_state::memmap_setoffset(address_map &map)
+{
+	map(0x0000, 0xffff).r(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::setoffset));
 }
 
 /*
@@ -723,6 +729,7 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	// TMS9995-MP9537 CPU @ 10.7 MHz
 	// MP9537 mask: This variant of the TMS9995 does not contain on-chip RAM
 	MCFG_TMS99xx_ADD("maincpu", TMS9995_MP9537, XTAL(10'738'635), memmap, crumap)
+	MCFG_DEVICE_ADDRESS_MAP(tms9995_device::AS_SETOFFSET, memmap_setoffset)
 	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(*this, ti99_8_state, external_operation) )
 	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(*this, ti99_8_state, clock_out) )
 	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(*this, ti99_8_state, dbin_line) )

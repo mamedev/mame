@@ -202,6 +202,22 @@ public:
 		m_ram(*this, "ram")
 	{ }
 
+	void fex68k(machine_config &config);
+	void fex68km2(machine_config &config);
+	void fex68km3(machine_config &config);
+
+	void fdes2265(machine_config &config);
+	void fdes2325(machine_config &config);
+	void init_fdes2265();
+
+	void eag(machine_config &config);
+	void eagv7(machine_config &config);
+	void eagv9(machine_config &config);
+	void eagv10(machine_config &config);
+	void eagv11(machine_config &config);
+	void init_eag();
+
+private:
 	optional_device<ram_device> m_ram;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE); }
@@ -212,22 +228,15 @@ public:
 	void fex68k_map(address_map &map);
 	void fex68km2_map(address_map &map);
 	void fex68km3_map(address_map &map);
-	void fex68k(machine_config &config);
-	void fex68km2(machine_config &config);
-	void fex68km3(machine_config &config);
 
 	// Designer Master
 	DECLARE_WRITE8_MEMBER(fdes68k_control_w);
 	DECLARE_READ8_MEMBER(fdes68k_input_r);
 	DECLARE_WRITE8_MEMBER(fdes68k_lcd_w);
-	void init_fdes2265();
 	void fdes2265_map(address_map &map);
 	void fdes2325_map(address_map &map);
-	void fdes2265(machine_config &config);
-	void fdes2325(machine_config &config);
 
 	// EAG(6114/6117)
-	void init_eag();
 	void eag_prepare_display();
 	DECLARE_READ8_MEMBER(eag_input1_r);
 	DECLARE_WRITE8_MEMBER(eag_leds_w);
@@ -237,11 +246,6 @@ public:
 	void eag_map(address_map &map);
 	void eagv7_map(address_map &map);
 	void eagv11_map(address_map &map);
-	void eag(machine_config &config);
-	void eagv7(machine_config &config);
-	void eagv9(machine_config &config);
-	void eagv10(machine_config &config);
-	void eagv11(machine_config &config);
 };
 
 

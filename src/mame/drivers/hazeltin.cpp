@@ -136,6 +136,9 @@ public:
 	{
 	}
 
+	void hazl1500(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -166,10 +169,9 @@ public:
 	NETDEV_ANALOG_CALLBACK_MEMBER(vblank_cb);
 	NETDEV_ANALOG_CALLBACK_MEMBER(tvinterq_cb);
 
-	void hazl1500(machine_config &config);
 	void hazl1500_io(address_map &map);
 	void hazl1500_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<netlist_mame_device> m_video_board;
 	required_device<netlist_mame_ram_pointer_device> m_u9;

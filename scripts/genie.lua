@@ -1192,6 +1192,9 @@ configuration { "mingw*" }
 				"-static",
 			}
 		end
+		buildoptions {
+			"-Wa,-mbig-obj",
+		}
 		linkoptions {
 			"-Wl,--start-group",
 		}

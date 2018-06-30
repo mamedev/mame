@@ -229,10 +229,11 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void itt3030(machine_config &config);
+
+private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-public:
 
 	DECLARE_READ8_MEMBER(vsync_r);
 	DECLARE_WRITE8_MEMBER( beep_w );
@@ -252,11 +253,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
 	DECLARE_PALETTE_INIT(itt3030);
 
-	void itt3030(machine_config &config);
 	void itt3030_io(address_map &map);
 	void itt3030_map(address_map &map);
 	void lower48_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

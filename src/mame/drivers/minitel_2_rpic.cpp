@@ -93,6 +93,9 @@ public:
 		{
 		}
 
+	void minitel2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ts9347_device> m_ts9347;
 	required_device<palette_device> m_palette;
@@ -110,10 +113,9 @@ public:
 	DECLARE_READ8_MEMBER ( ts9347_io_r );
 	DECLARE_WRITE8_MEMBER ( ts9347_io_w );
 
-	void minitel2(machine_config &config);
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
-protected:
+
 	required_ioport_array<16> m_io_kbd;
 	virtual void machine_start() override;
 

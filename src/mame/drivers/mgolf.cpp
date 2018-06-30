@@ -30,7 +30,7 @@ public:
 
 	void mgolf(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(wram_r);
 	DECLARE_READ8_MEMBER(dial_r);
@@ -54,7 +54,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void cpu_map(address_map &map);
 
-private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

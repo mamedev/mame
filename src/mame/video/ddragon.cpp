@@ -148,8 +148,8 @@ void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		int attr = src[i + 1];
 		if (attr & 0x80)  /* visible */
 		{
-			int sx = 240 - (src[i + 4] | ((attr & 2) << 7));
-			int sy = 232 - (src[i + 0] | ((attr & 1) << 8));
+			int sx = 240 - src[i + 4] + ((attr & 2) << 7);
+			int sy = 232 - src[i + 0] + ((attr & 1) << 8);
 			int size = (attr & 0x30) >> 4;
 			int flipx = attr & 8;
 			int flipy = attr & 4;
