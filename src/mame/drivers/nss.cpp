@@ -318,6 +318,13 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void nss(machine_config &config);
+
+	void init_nss();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
+
+private:
 	required_device<cpu_device> m_bioscpu;
 	required_device<m50458_device> m_m50458;
 	required_device<s3520cf_device> m_s3520cf;
@@ -343,15 +350,11 @@ public:
 	DECLARE_WRITE8_MEMBER(port_04_w);
 	DECLARE_WRITE8_MEMBER(port_07_w);
 
-	void init_nss();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(nss_vblank_irq);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
-	void nss(machine_config &config);
 	void bios_io_map(address_map &map);
 	void bios_map(address_map &map);
 	void snes_map(address_map &map);

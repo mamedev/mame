@@ -34,6 +34,33 @@ public:
 		m_dsw_sel(*this, "dsw_sel")
 	{ }
 
+	void ns1(machine_config &config);
+
+	void init_pacmania();
+	void init_ws();
+	void init_wldcourt();
+	void init_tankfrc4();
+	void init_blazer();
+	void init_dangseed();
+	void init_splatter();
+	void init_alice();
+	void init_faceoff();
+	void init_puzlclub();
+	void init_bakutotu();
+	void init_rompers();
+	void init_ws90();
+	void init_tankfrce();
+	void init_soukobdx();
+	void init_shadowld();
+	void init_berabohm();
+	void init_galaga88();
+	void init_blastoff();
+	void init_quester();
+	void init_ws89();
+	void init_dspirit();
+	void init_pistoldm();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
@@ -103,29 +130,6 @@ public:
 	DECLARE_READ8_MEMBER(key_type3_r);
 	DECLARE_WRITE8_MEMBER(key_type3_w);
 
-	void init_pacmania();
-	void init_ws();
-	void init_wldcourt();
-	void init_tankfrc4();
-	void init_blazer();
-	void init_dangseed();
-	void init_splatter();
-	void init_alice();
-	void init_faceoff();
-	void init_puzlclub();
-	void init_bakutotu();
-	void init_rompers();
-	void init_ws90();
-	void init_tankfrce();
-	void init_soukobdx();
-	void init_shadowld();
-	void init_berabohm();
-	void init_galaga88();
-	void init_blastoff();
-	void init_quester();
-	void init_ws89();
-	void init_dspirit();
-	void init_pistoldm();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -142,13 +146,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
-	void ns1(machine_config &config);
 	void main_map(address_map &map);
 	void mcu_map(address_map &map);
 	void mcu_port_map(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
 	void virtual_map(address_map &map);
-private:
+
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *info_vram);
 };

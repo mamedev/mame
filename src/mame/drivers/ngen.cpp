@@ -101,16 +101,15 @@ public:
 		m_hd_buffer(*this,"hd_buffer_ram")
 	{}
 
+	void ngen(machine_config &config);
+
+	DECLARE_READ8_MEMBER(hd_buffer_r);
+	DECLARE_WRITE8_MEMBER(hd_buffer_w);
+
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out1_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_w);
-	DECLARE_WRITE_LINE_MEMBER(cpu_timer_w);
-	DECLARE_WRITE_LINE_MEMBER(timer_clk_out);
-	DECLARE_WRITE16_MEMBER(cpu_peripheral_cb);
-	DECLARE_WRITE16_MEMBER(peripheral_w);
-	DECLARE_READ16_MEMBER(peripheral_r);
-	DECLARE_WRITE16_MEMBER(xbus_w);
-	DECLARE_READ16_MEMBER(xbus_r);
+
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	DECLARE_WRITE_LINE_MEMBER(dma_eop_changed);
 	DECLARE_WRITE_LINE_MEMBER(dack0_w);
@@ -119,7 +118,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dack3_w);
 	DECLARE_READ8_MEMBER(dma_read_word);
 	DECLARE_WRITE8_MEMBER(dma_write_word);
-	MC6845_UPDATE_ROW(crtc_update_row);
 	// TODO: sort out what devices use which channels
 	DECLARE_READ8_MEMBER( dma_0_dack_r ) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
 	DECLARE_READ8_MEMBER( dma_1_dack_r ) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
@@ -129,33 +127,46 @@ public:
 	DECLARE_WRITE8_MEMBER( dma_1_dack_w ){  }
 	DECLARE_WRITE8_MEMBER( dma_2_dack_w ){  }
 	DECLARE_WRITE8_MEMBER( dma_3_dack_w ){ popmessage("IOW3: data %02x",data); }
+	
+	MC6845_UPDATE_ROW(crtc_update_row);
+
+	DECLARE_WRITE_LINE_MEMBER(timer_clk_out);
+	
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
+
+protected:
+	void ngen386_io(address_map &map);
+	void ngen386_mem(address_map &map);
+	void ngen386i_mem(address_map &map);
+	
+
+private:
+	DECLARE_WRITE16_MEMBER(cpu_peripheral_cb);
+	DECLARE_WRITE16_MEMBER(peripheral_w);
+	DECLARE_READ16_MEMBER(peripheral_r);
+	DECLARE_WRITE16_MEMBER(xbus_w);
+	DECLARE_READ16_MEMBER(xbus_r);
+
+	DECLARE_WRITE_LINE_MEMBER(cpu_timer_w);
 
 	DECLARE_WRITE16_MEMBER(hfd_w);
 	DECLARE_READ16_MEMBER(hfd_r);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE8_MEMBER(fdc_control_w);
 	DECLARE_READ8_MEMBER(irq_cb);
 	DECLARE_WRITE8_MEMBER(hdc_control_w);
 	DECLARE_WRITE8_MEMBER(disk_addr_ext);
-	DECLARE_READ8_MEMBER(hd_buffer_r);
-	DECLARE_WRITE8_MEMBER(hd_buffer_w);
 
 	DECLARE_READ16_MEMBER(b38_keyboard_r);
 	DECLARE_WRITE16_MEMBER(b38_keyboard_w);
 	DECLARE_READ16_MEMBER(b38_crtc_r);
 	DECLARE_WRITE16_MEMBER(b38_crtc_w);
-	void ngen(machine_config &config);
-	void ngen386_io(address_map &map);
-	void ngen386_mem(address_map &map);
-	void ngen386i_mem(address_map &map);
 	void ngen_io(address_map &map);
 	void ngen_mem(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-private:
 	optional_device<i80186_cpu_device> m_maincpu;
 	optional_device<i386_device> m_i386cpu;
 	required_device<mc6845_device> m_crtc;

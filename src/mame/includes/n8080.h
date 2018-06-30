@@ -23,6 +23,15 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void sheriff(machine_config &config);
+	void sheriff_sound(machine_config &config);
+	void westgun2(machine_config &config);
+	void helifire(machine_config &config);
+	void helifire_sound(machine_config &config);
+	void spacefev(machine_config &config);
+	void spacefev_sound(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_colorram;      // for helifire
@@ -122,13 +131,7 @@ public:
 	TIMER_CALLBACK_MEMBER( delayed_sound_1_callback );
 	void delayed_sound_2( int data );
 	TIMER_CALLBACK_MEMBER( delayed_sound_2_callback );
-	void sheriff(machine_config &config);
-	void sheriff_sound(machine_config &config);
-	void westgun2(machine_config &config);
-	void helifire(machine_config &config);
-	void helifire_sound(machine_config &config);
-	void spacefev(machine_config &config);
-	void spacefev_sound(machine_config &config);
+
 	void helifire_main_cpu_map(address_map &map);
 	void helifire_sound_io_map(address_map &map);
 	void main_cpu_map(address_map &map);
