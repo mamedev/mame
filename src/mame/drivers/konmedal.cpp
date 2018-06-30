@@ -57,6 +57,11 @@ public:
 		m_oki(*this, "oki")
 	{ }
 
+	void shuriboy(machine_config &config);
+	void ddboy(machine_config &config);
+	void tsukande(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(konmedal);
 	DECLARE_MACHINE_START(shuriboy);
 
@@ -86,18 +91,14 @@ public:
 	DECLARE_READ8_MEMBER(shuri_irq_r);
 	DECLARE_WRITE8_MEMBER(shuri_irq_w);
 
-	void shuriboy(machine_config &config);
-	void ddboy(machine_config &config);
-	void tsukande(machine_config &config);
 	void ddboy_main(address_map &map);
 	void medal_main(address_map &map);
 	void shuriboy_main(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<k056832_device> m_k056832;
 	optional_device<k052109_device> m_k052109;

@@ -64,7 +64,7 @@ public:
 
 	void flicker(machine_config &config);
 
-protected:
+private:
 	virtual void driver_start() override;
 
 	DECLARE_WRITE8_MEMBER(ram0_out) { m_ram0_output = data; }
@@ -81,7 +81,6 @@ protected:
 	void flicker_rom_ports(address_map &map);
 	void flicker_status(address_map &map);
 
-private:
 	required_device<i4004_cpu_device>   m_maincpu;
 	required_ioport                     m_testport;
 	required_ioport                     m_coinport;

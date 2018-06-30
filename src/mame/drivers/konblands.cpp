@@ -40,6 +40,10 @@ public:
 	{
 	}
 
+	void konblands(machine_config &config);
+	void konblandsh(machine_config &config);
+
+private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(konblands);
@@ -52,18 +56,15 @@ public:
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
 
-	void konblands(machine_config &config);
-	void konblandsh(machine_config &config);
 	void konblands_map(address_map &map);
 	void konblandsh_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<pioneer_ldv1000_device> m_laserdisc;

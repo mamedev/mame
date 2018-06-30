@@ -34,7 +34,7 @@ public:
 
 	void mnchmobl(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 

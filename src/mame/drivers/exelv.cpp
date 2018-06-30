@@ -81,6 +81,10 @@ public:
 			m_cart(*this, "cartslot")
 	{ }
 
+	void exeltel(machine_config &config);
+	void exl100(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tms3556_device> m_tms3556;
 	required_device<tms5220c_device> m_tms5220c;
@@ -116,8 +120,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
-	void exeltel(machine_config &config);
-	void exl100(machine_config &config);
 	void tms7020_mem(address_map &map);
 	void tms7040_mem(address_map &map);
 };

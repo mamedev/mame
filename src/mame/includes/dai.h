@@ -23,12 +23,6 @@
 class dai_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BOOTSTRAP,
-		TIMER_TMS5501
-	};
-
 	dai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -38,6 +32,15 @@ public:
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_palette(*this, "palette")  { }
+
+	void dai(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_BOOTSTRAP,
+		TIMER_TMS5501
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -69,7 +72,6 @@ public:
 	void dai_update_memory(int dai_rom_bank);
 	IRQ_CALLBACK_MEMBER(int_ack);
 
-	void dai(machine_config &config);
 	void dai_io(address_map &map);
 	void dai_mem(address_map &map);
 protected:

@@ -50,10 +50,11 @@ public:
 	{
 	}
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void maxaflex(machine_config &config);
 
-protected:
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	DECLARE_READ8_MEMBER(mcu_portA_r);
 	DECLARE_WRITE8_MEMBER(mcu_portA_w);
 	DECLARE_WRITE8_MEMBER(mcu_portB_w);
@@ -70,7 +71,6 @@ protected:
 	bool atari_input_disabled() const { return !BIT(m_portB_out, 7); }
 	void mmu(uint8_t new_mmu);
 
-private:
 	void a600xl_mem(address_map &map);
 
 	uint8_t m_portB_out;

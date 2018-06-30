@@ -25,11 +25,6 @@
 class mjsister_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_DAC
-	};
-
 	mjsister_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -37,6 +32,14 @@ public:
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac"),
 		m_rombank(*this, "bank1") { }
+
+	void mjsister(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_DAC
+	};
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap0;
@@ -92,10 +95,9 @@ public:
 	void plot0( int offset, uint8_t data );
 	void plot1( int offset, uint8_t data );
 
-	void mjsister(machine_config &config);
 	void mjsister_io_map(address_map &map);
 	void mjsister_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	emu_timer *m_dac_timer;

@@ -23,6 +23,13 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_soundnmi(*this, "soundnmi") { }
 
+	void lkageb(machine_config &config);
+	void lkage(machine_config &config);
+
+	void init_bygone();
+	void init_lkage();
+
+private:
 	required_shared_ptr<uint8_t> m_vreg;
 	required_shared_ptr<uint8_t> m_scroll;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -61,8 +68,6 @@ public:
 	DECLARE_READ8_MEMBER(fake_status_r);
 
 	DECLARE_WRITE8_MEMBER(lkage_videoram_w);
-	void init_bygone();
-	void init_lkage();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
@@ -71,8 +76,6 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_lkage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void lkageb(machine_config &config);
-	void lkage(machine_config &config);
 	void lkage_io_map(address_map &map);
 	void lkage_map(address_map &map);
 	void lkage_map_boot(address_map &map);

@@ -37,6 +37,11 @@ class mc10_state : public driver_device
 public:
 	mc10_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void alice90(machine_config &config);
+	void alice32(machine_config &config);
+	void mc10(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mc10_bfff_r);
 	DECLARE_WRITE8_MEMBER(mc10_bfff_w);
 	DECLARE_READ8_MEMBER(mc10_port1_r);
@@ -49,18 +54,14 @@ public:
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
 
-	void alice90(machine_config &config);
-	void alice32(machine_config &config);
-	void mc10(machine_config &config);
 	void alice32_mem(address_map &map);
 	void alice90_mem(address_map &map);
 	void mc10_io(address_map &map);
 	void mc10_mem(address_map &map);
-protected:
+
 	// device-level overrides
 	virtual void driver_start() override;
 
-private:
 	//printer state
 	enum class printer_state : uint8_t
 	{

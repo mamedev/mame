@@ -35,6 +35,9 @@ public:
 			m_maincpu_region(*this, "maincpu"),
 			m_ram(*this, "ram"){ }
 
+	void gp2x(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<uint32_t> m_maincpu_region;
 	DECLARE_READ32_MEMBER(gp2x_lcdc_r);
@@ -56,7 +59,6 @@ public:
 	uint32_t m_nand_ptr_temp;
 	uint32_t m_timer;
 	uint32_t screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void gp2x(machine_config &config);
 	void gp2x_map(address_map &map);
 };
 

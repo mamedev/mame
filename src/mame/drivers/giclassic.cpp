@@ -64,6 +64,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void giclassic(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
 	required_device<palette_device> m_palette;
@@ -81,9 +84,8 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(vrom_r);
 
-	void giclassic(machine_config &config);
 	void satellite_main(address_map &map);
-private:
+
 	uint8_t m_control;
 };
 

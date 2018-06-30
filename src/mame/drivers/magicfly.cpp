@@ -465,6 +465,11 @@ public:
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void bchance(machine_config &config);
+	void magicfly(machine_config &config);
+	void _7mezzo(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
@@ -483,9 +488,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void bchance(machine_config &config);
-	void magicfly(machine_config &config);
-	void _7mezzo(machine_config &config);
 	void magicfly_map(address_map &map);
 };
 

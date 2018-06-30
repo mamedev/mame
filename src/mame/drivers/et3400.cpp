@@ -49,11 +49,13 @@ public:
 		, m_digit(*this, "digit%u", 1U)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
-	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
 	void et3400(machine_config &config);
 
-protected:
+	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
+	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
+
+private:
+
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(keypad_r);
@@ -66,7 +68,6 @@ protected:
 
 	void mem_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device_array<ls259_device, 6> m_displatch;

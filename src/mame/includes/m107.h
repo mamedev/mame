@@ -36,6 +36,16 @@ public:
 	{
 	}
 
+	void airass(machine_config &config);
+	void wpksoc(machine_config &config);
+	void firebarr(machine_config &config);
+	void dsoccr94(machine_config &config);
+
+	void init_firebarr();
+	void init_dsoccr94();
+	void init_wpksoc();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -69,9 +79,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 
-	void init_firebarr();
-	void init_dsoccr94();
-	void init_wpksoc();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -80,10 +87,6 @@ public:
 	void update_scroll_positions();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int laynum, int category,int opaque);
 	void screenrefresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void airass(machine_config &config);
-	void wpksoc(machine_config &config);
-	void firebarr(machine_config &config);
-	void dsoccr94(machine_config &config);
 	void dsoccr94_io_map(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);

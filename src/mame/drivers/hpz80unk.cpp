@@ -57,16 +57,18 @@ public:
 		, m_uart(*this, "uart%u", 1)
 	{ }
 
+	void hpz80unk(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port02_r);
 	DECLARE_READ8_MEMBER(port03_r);
 	DECLARE_READ8_MEMBER(port0d_r);
 	DECLARE_READ8_MEMBER(portfc_r);
 
-	void hpz80unk(machine_config &config);
 	void hpz80unk_io(address_map &map);
 	void hpz80unk_mem(address_map &map);
-private:
+
 	uint8_t m_port02_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

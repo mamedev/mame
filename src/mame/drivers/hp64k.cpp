@@ -174,6 +174,9 @@ class hp64k_state : public driver_device
 public:
 	hp64k_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp64k(machine_config &config);
+
+private:
 	virtual void driver_start() override;
 	//virtual void machine_start();
 	virtual void video_start() override;
@@ -237,10 +240,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
 
 	DECLARE_WRITE_LINE_MEMBER(hp64k_baud_clk_w);
-	void hp64k(machine_config &config);
 	void cpu_io_map(address_map &map);
 	void cpu_mem_map(address_map &map);
-private:
+
 	required_device<hp_5061_3011_cpu_device> m_cpu;
 	required_device<i8275_device> m_crtc;
 	required_device<palette_device> m_palette;

@@ -32,12 +32,14 @@ public:
 		, m_uart(*this, "uart")
 	{ }
 
+	void m79152pc(machine_config &config);
+
+private:
 	uint32_t screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void m79152pc(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_attributes;

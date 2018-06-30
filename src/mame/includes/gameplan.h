@@ -48,6 +48,14 @@ public:
 			m_screen(*this, "screen"),
 			m_soundlatch(*this, "soundlatch") { }
 
+	void gameplan(machine_config &config);
+	void gameplan_video(machine_config &config);
+	void leprechn(machine_config &config);
+	void leprechn_video(machine_config &config);
+	void trvquest(machine_config &config);
+	void trvquest_video(machine_config &config);
+
+private:
 	/* machine state */
 	uint8_t   m_current_port;
 	optional_shared_ptr<uint8_t> m_trvquest_question;
@@ -107,16 +115,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(trvquest_coin_w);
 	DECLARE_WRITE_LINE_MEMBER(trvquest_misc_w);
 
-	void gameplan(machine_config &config);
-	void gameplan_video(machine_config &config);
-	void leprechn(machine_config &config);
-	void leprechn_video(machine_config &config);
-	void trvquest(machine_config &config);
-	void trvquest_video(machine_config &config);
 	void cpu_map(address_map &map);
 	void gameplan_audio_map(address_map &map);
 	void gameplan_main_map(address_map &map);
 	void leprechn_audio_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

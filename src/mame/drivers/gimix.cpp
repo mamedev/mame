@@ -98,6 +98,11 @@ public:
 		, m_dma_dip(*this, "dma_s2")
 	{}
 
+	void gimix(machine_config &config);
+	
+	DECLARE_INPUT_CHANGED_MEMBER(drive_size_cb);
+
+private:
 	DECLARE_WRITE8_MEMBER(system_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
@@ -111,14 +116,12 @@ public:
 	DECLARE_READ8_MEMBER(pia_pb_r);
 	DECLARE_WRITE8_MEMBER(pia_pb_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(test_timer_w);
-	DECLARE_INPUT_CHANGED_MEMBER(drive_size_cb);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	void gimix(machine_config &config);
 	void gimix_banked_mem(address_map &map);
 	void gimix_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	uint8_t m_dma_status;
 	uint8_t m_dma_ctrl;

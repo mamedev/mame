@@ -395,10 +395,13 @@ public:
 	hikaru_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
+
+	void hikaru(machine_config &config);
+
+private:
 	virtual void video_start() override;
 	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void hikaru(machine_config &config);
 	void hikaru_map(address_map &map);
 	void hikaru_map_slave(address_map &map);
 };

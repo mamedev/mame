@@ -222,6 +222,13 @@ public:
 	{
 	}
 
+	void geneve_common(machine_config &config);
+	void geneve(machine_config &config);
+	void genmod(machine_config &config);
+
+	void init_geneve();
+
+private:
 	// CRU (Communication Register Unit) handling
 	DECLARE_READ8_MEMBER(cruread);
 	DECLARE_WRITE8_MEMBER(cruwrite);
@@ -256,7 +263,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ext_ready );
 	DECLARE_WRITE_LINE_MEMBER( mapper_ready );
 
-	void init_geneve();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -270,12 +276,10 @@ public:
 
 	int m_ready_line;
 	int m_ready_line1;
-	void geneve_common(machine_config &config);
-	void geneve(machine_config &config);
-	void genmod(machine_config &config);
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
+	void memmap_setoffset(address_map &map);
 };
 
 /*
@@ -284,7 +288,12 @@ public:
 
 void geneve_state::memmap(address_map &map)
 {
-	map(0x0000, 0xffff).rw(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::readm), FUNC(bus::ti99::internal::geneve_mapper_device::writem)).setoffset(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::setoffset));
+	map(0x0000, 0xffff).rw(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::readm), FUNC(bus::ti99::internal::geneve_mapper_device::writem));
+}
+
+void geneve_state::memmap_setoffset(address_map &map)
+{
+	map(0x0000, 0xffff).r(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::setoffset));
 }
 
 /*
@@ -714,6 +723,7 @@ MACHINE_CONFIG_START(geneve_state::geneve_common)
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, memmap, crumap)
+	MCFG_DEVICE_ADDRESS_MAP(tms9995_device::AS_SETOFFSET, memmap_setoffset)
 	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(*this, geneve_state, external_operation) )
 	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(*this, geneve_state, clock_out) )
 	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(*this, geneve_state, dbin_line) )

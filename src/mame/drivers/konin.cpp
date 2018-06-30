@@ -62,13 +62,15 @@ public:
 		, m_iopit(*this, "iopit")
 	{ }
 
+	void konin(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(picu_b_w);
 	DECLARE_WRITE_LINE_MEMBER(picu_r3_w);
 
-	void konin(machine_config &config);
 	void konin_io(address_map &map);
 	void konin_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8214_device> m_picu;

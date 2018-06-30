@@ -21,6 +21,14 @@ public:
 		m_spriteram(*this,"spriteram")
 		{ }
 
+	void martchmp(machine_config &config);
+	void mystwarr(machine_config &config);
+	void dadandrn(machine_config &config);
+	void viostorm(machine_config &config);
+	void gaiapols(machine_config &config);
+	void metamrph(machine_config &config);
+
+private:
 	required_device<k054321_device> m_k054321;
 	required_shared_ptr<uint16_t> m_gx_workram;
 	optional_shared_ptr<uint16_t> m_spriteram;
@@ -97,12 +105,6 @@ public:
 	K055673_CB_MEMBER(gaiapols_sprite_callback);
 	K055673_CB_MEMBER(martchmp_sprite_callback);
 	void decode_tiles();
-	void martchmp(machine_config &config);
-	void mystwarr(machine_config &config);
-	void dadandrn(machine_config &config);
-	void viostorm(machine_config &config);
-	void gaiapols(machine_config &config);
-	void metamrph(machine_config &config);
 	void dadandrn_map(address_map &map);
 	void gaiapols_map(address_map &map);
 	void martchmp_map(address_map &map);

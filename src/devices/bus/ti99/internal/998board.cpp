@@ -347,7 +347,7 @@ WRITE_LINE_MEMBER( mainboard8_device::dbin_in )
 	m_dbin_level = (line_state)state;
 }
 
-SETOFFSET_MEMBER( mainboard8_device::setoffset )
+READ8_MEMBER( mainboard8_device::setoffset )
 {
 	LOGMASKED(LOG_ADDRESS, "set %s %04x\n", (m_dbin_level==ASSERT_LINE)? "R" : "W", offset);
 
@@ -386,6 +386,8 @@ SETOFFSET_MEMBER( mainboard8_device::setoffset )
 	// AMIGO is the one to control the READY line to the CPU
 	// MOFETTA does not contribute to READY
 	m_ready(m_amigo->cpury_out());
+
+	return 0;
 }
 
 WRITE_LINE_MEMBER( mainboard8_device::reset_console )
@@ -1945,7 +1947,7 @@ WRITE_LINE_MEMBER( amigo_device::lascs_in )
     3. Set the physical address bus with the second 16 bits of the physical
        address. Clear the MSAST line. Forward any incoming READY=0 to the CPU.
 */
-SETOFFSET_MEMBER( amigo_device::set_address )
+READ8_MEMBER( amigo_device::set_address )
 {
 	// Check whether the mapper itself is accessed
 	int mapaddr = (m_crus==ASSERT_LINE)? 0x8810 : 0xf870;
@@ -1991,6 +1993,8 @@ SETOFFSET_MEMBER( amigo_device::set_address )
 		m_ready_out = m_srdy;
 		LOGMASKED(LOG_CPURY, "Setting CPURY = %d (LAS)\n", m_ready_out);
 	}
+
+	return 0;
 }
 
 /*

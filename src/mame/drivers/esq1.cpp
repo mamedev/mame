@@ -396,6 +396,13 @@ public:
 		m_mdout(*this, "mdout")
 	{ }
 
+	void sq80(machine_config &config);
+
+	void esq1(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<scn2681_device> m_duart;
 	required_device<esq1_filters> m_filters;
@@ -422,11 +429,8 @@ public:
 	uint8_t m_seqram[0x10000];
 	uint8_t m_dosram[0x2000];
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 	void send_through_panel(uint8_t data);
-	void esq1(machine_config &config);
-	void sq80(machine_config &config);
 	void esq1_map(address_map &map);
 	void sq80_map(address_map &map);
 };

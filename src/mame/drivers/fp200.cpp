@@ -36,6 +36,11 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void fp200(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(keyb_irq);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	uint8_t m_io_type;
@@ -63,16 +68,14 @@ public:
 	DECLARE_WRITE8_MEMBER(fp200_lcd_w);
 	DECLARE_READ8_MEMBER(fp200_keyb_r);
 	DECLARE_WRITE8_MEMBER(fp200_keyb_w);
-	DECLARE_INPUT_CHANGED_MEMBER(keyb_irq);
 
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	DECLARE_READ_LINE_MEMBER(sid_r);
 
 	DECLARE_PALETTE_INIT(fp200);
-	void fp200(machine_config &config);
 	void fp200_io(address_map &map);
 	void fp200_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

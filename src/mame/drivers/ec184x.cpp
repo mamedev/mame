@@ -48,7 +48,7 @@ public:
 
 	void init_ec1841();
 
-protected:
+private:
 	DECLARE_MACHINE_RESET(ec1841);
 	DECLARE_READ8_MEMBER(memboard_r);
 	DECLARE_WRITE8_MEMBER(memboard_w);

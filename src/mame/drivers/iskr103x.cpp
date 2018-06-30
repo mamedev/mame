@@ -35,9 +35,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	void iskr1030m(machine_config &config);
 	void iskr1031(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	void iskr1031_io(address_map &map);
 	void iskr1031_map(address_map &map);
 };
