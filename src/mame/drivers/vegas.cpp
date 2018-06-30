@@ -1109,7 +1109,7 @@ WRITE32_MEMBER(vegas_state::wheel_board_w)
 		switch (op)
 		{
 		case 0x0:
-			m_wheel_driver[0] = arg;
+			m_wheel_driver[0] = arg; // target wheel angle. signed byte.
 			m_wheel_force = int8_t(~arg);
 			break;
 
