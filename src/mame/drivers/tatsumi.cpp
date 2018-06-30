@@ -14,31 +14,31 @@
     TODO:
     - Sprite rotation
     - Round Up 5: Finish road layer.
-	  Tunnel sections are borderline unplayable, plus slopes are ugly to watch.
+      Tunnel sections are borderline unplayable, plus slopes are ugly to watch.
     - Apache 3: road layer, has twelve rotation registers!
     - (fixed) Cycle Warriors: transparent road layer on sidelines, wrong mask_data?
     - (fixed) Missing BG layer (Round Up 5) - banked VRAM data from somewhere!?
-    - Round Up 5: always boots with a coin inserted 
-	  $5152 is the coin counter, gets an explicit 1 at boot.
-	  There are other two buffers read from 68k before that, written to $5156 and $515a
-	  If these are 0xffff by then game boots normally ...
-    - (fixed) Round Up 5 doesn't survive a reset 
-    - (fixed?) Cycle Warriors: test mode text does not appear as it needs a -256 Y 
-	  scroll offset from somewhere. 
-	- (fixed) Cycle Warriors: sometimes it draws garbage on character select or even hangs
-	  depending on where player coins up, most likely caused by miscommunication with sub CPU?
-	- (fixed) Cycle Warriors: ranking screen is completely wrong;
+    - Round Up 5: always boots with a coin inserted
+      $5152 is the coin counter, gets an explicit 1 at boot.
+      There are other two buffers read from 68k before that, written to $5156 and $515a
+      If these are 0xffff by then game boots normally ...
+    - (fixed) Round Up 5 doesn't survive a reset
+    - (fixed?) Cycle Warriors: test mode text does not appear as it needs a -256 Y
+      scroll offset from somewhere.
+    - (fixed) Cycle Warriors: sometimes it draws garbage on character select or even hangs
+      depending on where player coins up, most likely caused by miscommunication with sub CPU?
+    - (fixed) Cycle Warriors: ranking screen is completely wrong;
     - (fixed) Cycle Warriors: ugly orange color on character select and briefing screens, layer disable?
     - Combine Big Fight & CycleWarriors video routines - currently each
       game uses different sized tilemaps - these are probably software
       controlled rather than hardwired, but I don't think either game
       changes the size at runtime.
-	- Split these games into individual drivers, write new devices for video routines.
+    - Split these games into individual drivers, write new devices for video routines.
     - Dip switches
-	- Deviceify HD6445 (superset of 6845)
+    - Deviceify HD6445 (superset of 6845)
     - Various other things..
 
-	
+
     reference of bigfight : https://youtu.be/aUUoUCr6yhk
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
@@ -218,13 +218,13 @@ WRITE16_MEMBER(cyclwarr_state::output_w)
 }
 
 WRITE8_MEMBER(roundup5_state::output_w)
-{	
+{
 	/*
-		---- x--- depending on Output Mode dipswitch:
-				  A Mode: enables when police siren is on
-				  B Mode: enables when player collides with objects or go offroad
-		---- -x-- start button light
-		---- --xx coin counters
+	    ---- x--- depending on Output Mode dipswitch:
+	              A Mode: enables when police siren is on
+	              B Mode: enables when player collides with objects or go offroad
+	    ---- -x-- start button light
+	    ---- --xx coin counters
 	*/
 	// avoid spurious write to coin counters
 	if(data == 0xff)
@@ -346,7 +346,7 @@ void cyclwarr_state::common_map(address_map &map)
 	map(0x0c0000, 0x0c3fff).rw(FUNC(cyclwarr_state::cyclwarr_sprite_r), FUNC(cyclwarr_state::cyclwarr_sprite_w)).share("spriteram");
 	map(0x0ca000, 0x0ca1ff).rw(FUNC(cyclwarr_state::tatsumi_sprite_control_r), FUNC(cyclwarr_state::tatsumi_sprite_control_w)).share("obj_ctrl_ram");
 	map(0x0d0000, 0x0d3fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	
+
 	// games accesses these ranges differently, we do mirroring in rom loading to make them match.
 	// address bit A19 controls if access routes to upper or lower roms
 	// TODO: it's unknown what Big Fight is supposed to return for the lower roms, let's assume mirror for the time being.
@@ -944,7 +944,7 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	MCFG_DEVICE_PROGRAM_MAP(roundup5_z80_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	
+
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
@@ -980,13 +980,13 @@ MACHINE_CONFIG_END
 void cyclwarr_state::machine_reset()
 {
 	uint16_t *src;
-	
+
 	// transfer data from rom to initial vector table
 	src = (uint16_t *)memregion("master_rom")->base();
-	
+
 	for(int i=0;i<0x100/2;i++)
 		m_master_ram[i] = src[i];
-		
+
 	src = (uint16_t *)memregion("slave_rom")->base();
 
 	for(int i=0;i<0x100/2;i++)
@@ -996,10 +996,10 @@ void cyclwarr_state::machine_reset()
 	// TODO: better way?
 	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	
+
 	m_last_control = 0;
 	m_control_word = 0;
-	
+
 	m_road_color_bank = m_prev_road_bank = 0;
 }
 
@@ -1065,8 +1065,8 @@ MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 	cyclwarr(config);
 
 	// TODO: it's same video HW, we don't know how/where video registers are mapped
-//	MCFG_SCREEN_MODIFY("screen")
-//	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_bigfight)
+//  MCFG_SCREEN_MODIFY("screen")
+//  MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_bigfight)
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, bigfight)
 

@@ -34,15 +34,17 @@ public:
 		, m_pit(*this, "pit")
 	{ }
 
+	void imsai(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 
-	void imsai(machine_config &config);
 	void imsai_io(address_map &map);
 	void imsai_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

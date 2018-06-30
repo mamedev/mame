@@ -262,6 +262,6 @@ public:
 	headonsa_state(const machine_config &mconfig, device_type type, const char *tag)
 		: vicdual_state(mconfig, type, tag)
 	{}
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(headonsa_coin_inserted);
 };

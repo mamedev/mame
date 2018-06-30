@@ -72,6 +72,9 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
+	void excali64(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(excali64);
 	DECLARE_WRITE8_MEMBER(ppib_w);
 	DECLARE_READ8_MEMBER(ppic_r);
@@ -96,10 +99,9 @@ public:
 	DECLARE_MACHINE_RESET(excali64);
 	required_device<palette_device> m_palette;
 
-	void excali64(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t *m_p_videoram;
 	uint8_t *m_p_hiresram;
 	uint8_t m_sys_status;

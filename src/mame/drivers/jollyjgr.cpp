@@ -141,6 +141,10 @@ public:
 		m_bm_palette(*this, "bm_palette")
 	{ }
 
+	void fspider(machine_config &config);
+	void jollyjgr(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -175,8 +179,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_bm_palette;
-	void fspider(machine_config &config);
-	void jollyjgr(machine_config &config);
 	void fspider_map(address_map &map);
 	void jollyjgr_map(address_map &map);
 };

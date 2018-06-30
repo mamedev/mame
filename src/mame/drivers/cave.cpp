@@ -2737,8 +2737,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::sailormn_startup )
 
 MACHINE_RESET_MEMBER(cave_state,sailormn)
 {
-	timer_device *startup = machine().device<timer_device>("startup");
-	startup->adjust(attotime::from_usec(1000), 0, attotime::zero);
+	m_startup->adjust(attotime::from_usec(1000), 0, attotime::zero);
 	MACHINE_RESET_CALL_MEMBER(cave);
 }
 
@@ -2750,7 +2749,7 @@ MACHINE_CONFIG_START(cave_state::sailormn)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	// could be a wachdog, but if it is then our watchdog address is incorrect as there are periods where the game doesn't write it.
-	MCFG_TIMER_DRIVER_ADD("startup", cave_state, sailormn_startup)
+	MCFG_TIMER_DRIVER_ADD(m_startup, cave_state, sailormn_startup)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL) // Bidirectional Communication
 	MCFG_DEVICE_PROGRAM_MAP(sailormn_sound_map)

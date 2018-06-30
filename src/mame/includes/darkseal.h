@@ -30,11 +30,11 @@ public:
 		, m_paletteram_ext(*this, "palette_ext")
 	{ }
 
-	void init_darkseal();
-
 	void darkseal(machine_config &config);
 
-protected:
+	void init_darkseal();
+
+private:
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_WRITE16_MEMBER(palette_ext_w);
@@ -44,7 +44,6 @@ protected:
 	void darkseal_map(address_map &map);
 	void sound_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
 	required_device<palette_device> m_palette;

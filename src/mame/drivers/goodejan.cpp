@@ -97,6 +97,10 @@ public:
 		m_sc3_vram(*this, "sc3_vram"),
 		m_spriteram16(*this, "sprite_ram") { }
 
+	void totmejan(machine_config &config);
+	void goodejan(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -139,8 +143,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void totmejan(machine_config &config);
-	void goodejan(machine_config &config);
 	void common_io_map(address_map &map);
 	void goodejan_io_map(address_map &map);
 	void goodejan_map(address_map &map);

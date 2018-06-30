@@ -304,7 +304,7 @@ void cocoloco_state::video_start()
 {
 	m_videoram = std::make_unique<uint8_t[]>(0x2000 * 8);
 
-	save_pointer(NAME(m_videoram.get()), 0x2000 * 8);
+	save_pointer(NAME(m_videoram), 0x2000 * 8);
 	save_item(NAME(m_videobank));
 }
 

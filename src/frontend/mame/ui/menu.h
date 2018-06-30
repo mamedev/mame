@@ -56,6 +56,7 @@ public:
 	void item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 	void item_append(menu_item item);
 	void item_append(menu_item_type type, uint32_t flags = 0);
+	void item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 
 	// Global initialization
 	static void init(running_machine &machine, ui_options &mopt);

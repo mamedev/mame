@@ -703,6 +703,9 @@ public:
 		m_ata(*this, "ata"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_legacy_pci(*this, "pcibus"),
+		m_jvs_host(*this, "cobra_jvs_host"),
+		m_dmadac(*this, "dac%u", 1U),
 		m_generic_paletteram_32(*this, "paletteram"),
 		m_main_ram(*this, "main_ram"),
 		m_sub_ram(*this, "sub_ram"),
@@ -722,6 +725,9 @@ public:
 	required_device<ata_interface_device> m_ata;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<pci_bus_legacy_device> m_legacy_pci;
+	required_device<cobra_jvs_host> m_jvs_host;
+	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	required_shared_ptr<uint64_t> m_main_ram;
 	required_shared_ptr<uint32_t> m_sub_ram;
@@ -829,8 +835,6 @@ public:
 	std::unique_ptr<int16_t[]> m_sound_dma_buffer_l;
 	std::unique_ptr<int16_t[]> m_sound_dma_buffer_r;
 	uint32_t m_sound_dma_ptr;
-
-	dmadac_sound_device *m_dmadac[2];
 
 	void init_racjamdx();
 	void init_bujutsu();
@@ -1404,16 +1408,12 @@ void cobra_state::mpc106_pci_w(int function, int reg, uint32_t data, uint32_t me
 
 READ64_MEMBER(cobra_state::main_mpc106_r)
 {
-	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	//return pci_64be_r(offset, mem_mask);
-	return device->read_64be(space, offset, mem_mask);
+	return m_legacy_pci->read_64be(space, offset, mem_mask);
 }
 
 WRITE64_MEMBER(cobra_state::main_mpc106_w)
 {
-	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	//pci_64be_w(offset, data, mem_mask);
-	device->write_64be(space, offset, data, mem_mask);
+	m_legacy_pci->write_64be(space, offset, data, mem_mask);
 }
 
 READ64_MEMBER(cobra_state::main_fifo_r)
@@ -2002,15 +2002,13 @@ WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
 	{
 		m_sound_dma_ptr = 0;
 
-		dmadac_transfer(&m_dmadac[0], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_l.get());
-		dmadac_transfer(&m_dmadac[1], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_r.get());
+		m_dmadac[0]->transfer(0, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_l.get());
+		m_dmadac[1]->transfer(0, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_r.get());
 	}
 }
 
 WRITE8_MEMBER(cobra_state::sub_jvs_w)
 {
-	cobra_jvs_host *jvs = machine().device<cobra_jvs_host>("cobra_jvs_host");
-
 #if LOG_JVS
 	printf("sub_jvs_w: %02X\n", data);
 #endif
@@ -2018,7 +2016,7 @@ WRITE8_MEMBER(cobra_state::sub_jvs_w)
 	const uint8_t *rec_data;
 	uint32_t rec_size;
 
-	jvs->write(data, rec_data, rec_size);
+	m_jvs_host->write(data, rec_data, rec_size);
 
 	if (rec_size > 0)
 	{
@@ -3274,12 +3272,10 @@ void cobra_state::machine_reset()
 
 	m_sound_dma_ptr = 0;
 
-	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
-	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
-	dmadac_enable(&m_dmadac[0], 1, 1);
-	dmadac_enable(&m_dmadac[1], 1, 1);
-	dmadac_set_frequency(&m_dmadac[0], 1, 44100);
-	dmadac_set_frequency(&m_dmadac[1], 1, 44100);
+	m_dmadac[0]->enable(1);
+	m_dmadac[1]->enable(1);
+	m_dmadac[0]->set_frequency(44100);
+	m_dmadac[1]->set_frequency(44100);
 }
 
 MACHINE_CONFIG_START(cobra_state::cobra)
@@ -3300,7 +3296,7 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 	MCFG_QUANTUM_TIME(attotime::from_hz(15005))
 
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
+	MCFG_PCI_BUS_LEGACY_ADD(m_legacy_pci, 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, cobra_state, mpc106_pci_r, mpc106_pci_w)
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
@@ -3322,10 +3318,10 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("dac1", DMADAC)
+	MCFG_DEVICE_ADD(m_dmadac[0], DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("dac2", DMADAC)
+	MCFG_DEVICE_ADD(m_dmadac[1], DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
@@ -3337,12 +3333,12 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 	MCFG_K001604_ROZ_OFFSET(0)  // correct?
 	MCFG_K001604_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("cobra_jvs_host", COBRA_JVS_HOST, 4000000)
-	MCFG_JVS_DEVICE_ADD("cobra_jvs1", COBRA_JVS, "cobra_jvs_host")
+	MCFG_DEVICE_ADD(m_jvs_host, COBRA_JVS_HOST, 4000000)
+	MCFG_JVS_DEVICE_ADD(m_jvs1, COBRA_JVS, "cobra_jvs_host")
 	cobra_jvs::static_set_main_board(*device, true);
-	MCFG_JVS_DEVICE_ADD("cobra_jvs2", COBRA_JVS, "cobra_jvs_host")
+	MCFG_JVS_DEVICE_ADD(m_jvs2, COBRA_JVS, "cobra_jvs_host")
 	cobra_jvs::static_set_main_board(*device, true);
-	MCFG_JVS_DEVICE_ADD("cobra_jvs3", COBRA_JVS, "cobra_jvs_host")
+	MCFG_JVS_DEVICE_ADD(m_jvs3, COBRA_JVS, "cobra_jvs_host")
 	cobra_jvs::static_set_main_board(*device, true);
 MACHINE_CONFIG_END
 

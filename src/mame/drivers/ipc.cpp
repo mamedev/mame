@@ -55,9 +55,11 @@ public:
 	{ }
 
 	void ipc(machine_config &config);
+
+private:
 	void ipc_io(address_map &map);
 	void ipc_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };

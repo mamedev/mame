@@ -28,6 +28,12 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void firetrapbl(machine_config &config);
+	void firetrap(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_bg1videoram;
 	required_shared_ptr<uint8_t> m_bg2videoram;
@@ -78,7 +84,6 @@ public:
 	DECLARE_WRITE8_MEMBER(firetrap_bg1_scrolly_w);
 	DECLARE_WRITE8_MEMBER(firetrap_bg2_scrollx_w);
 	DECLARE_WRITE8_MEMBER(firetrap_bg2_scrolly_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	TILEMAP_MAPPER_MEMBER(get_fg_memory_offset);
 	TILEMAP_MAPPER_MEMBER(get_bg_memory_offset);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -93,8 +98,6 @@ public:
 	inline void get_bg_tile_info(tile_data &tileinfo, int tile_index, uint8_t *bgvideoram, int gfx_region);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(firetrap_adpcm_int);
-	void firetrapbl(machine_config &config);
-	void firetrap(machine_config &config);
 	void firetrap_base_map(address_map &map);
 	void firetrap_bootleg_map(address_map &map);
 	void firetrap_map(address_map &map);

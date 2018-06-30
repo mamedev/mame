@@ -5,6 +5,11 @@
     Pocket Gal Deluxe
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_PKTGALDX_H
+#define MAME_INCLUDES_PKTGALDX_H
+
+#pragma once
+
 #include "sound/okim6295.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
@@ -14,8 +19,8 @@
 class pktgaldx_state : public driver_device
 {
 public:
-	pktgaldx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pktgaldx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_deco104(*this, "ioprot104"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
@@ -28,7 +33,8 @@ public:
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	optional_device<deco104_device> m_deco104;
 
@@ -68,3 +74,5 @@ public:
 	void pktgaldb_map(address_map &map);
 	void pktgaldx_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PKTGALDX_H

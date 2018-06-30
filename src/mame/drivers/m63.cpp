@@ -149,6 +149,14 @@ public:
 	{
 	}
 
+	void atomboy(machine_config &config);
+	void m63(machine_config &config);
+	void fghtbskt(machine_config &config);
+
+	void init_wilytowr();
+	void init_fghtbskt();
+
+private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scrollram;
 	required_shared_ptr<uint8_t> m_videoram2;
@@ -199,8 +207,6 @@ public:
 	DECLARE_WRITE8_MEMBER(fghtbskt_samples_w);
 	SAMPLES_START_CB_MEMBER(fghtbskt_sh_start);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	void init_wilytowr();
-	void init_fghtbskt();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_MACHINE_START(m63);
@@ -211,9 +217,6 @@ public:
 	INTERRUPT_GEN_MEMBER(snd_irq);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void atomboy(machine_config &config);
-	void m63(machine_config &config);
-	void fghtbskt(machine_config &config);
 	void fghtbskt_map(address_map &map);
 	void i8039_map(address_map &map);
 	void i8039_port_map(address_map &map);
@@ -712,7 +715,7 @@ SAMPLES_START_CB_MEMBER(m63_state::fghtbskt_sh_start)
 	uint8_t *ROM = memregion("samples")->base();
 
 	m_samplebuf = std::make_unique<int16_t[]>(len);
-	save_pointer(NAME(m_samplebuf.get()), len);
+	save_pointer(NAME(m_samplebuf), len);
 
 	for(i = 0; i < len; i++)
 		m_samplebuf[i] = ((int8_t)(ROM[i] ^ 0x80)) * 256;

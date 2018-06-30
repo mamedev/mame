@@ -112,14 +112,15 @@ Stephh's notes (based on the games Z80 code and some tests) :
 class royalmah_state : public driver_device
 {
 public:
-	royalmah_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	royalmah_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_ay(*this, "aysnd"),
 		m_videoram(*this, "videoram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_rtc(*this, "rtc"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 
 	DECLARE_READ8_MEMBER(player_1_port_r);

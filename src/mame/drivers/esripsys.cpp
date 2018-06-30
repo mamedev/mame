@@ -635,9 +635,9 @@ void esripsys_state::init_esripsys()
 	membank("bank4")->set_base(&rom[0x8000]);
 
 	/* Register stuff for state saving */
-	save_pointer(NAME(m_fdt_a.get()), FDT_RAM_SIZE);
-	save_pointer(NAME(m_fdt_b.get()), FDT_RAM_SIZE);
-	save_pointer(NAME(m_cmos_ram.get()), CMOS_RAM_SIZE);
+	save_pointer(NAME(m_fdt_a), FDT_RAM_SIZE);
+	save_pointer(NAME(m_fdt_b), FDT_RAM_SIZE);
+	save_pointer(NAME(m_cmos_ram), CMOS_RAM_SIZE);
 
 	save_item(NAME(m_g_iodata));
 	save_item(NAME(m_g_ioaddr));

@@ -51,6 +51,14 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void isbc2861(machine_config &config);
+	void isbc86(machine_config &config);
+	void rpc86(machine_config &config);
+	void isbc8605(machine_config &config);
+	void isbc286(machine_config &config);
+	void isbc8630(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
@@ -71,12 +79,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(led_ds1_w);
 	DECLARE_WRITE_LINE_MEMBER(led_ds3_w);
 	DECLARE_WRITE_LINE_MEMBER(megabyte_select_w);
-	void isbc2861(machine_config &config);
-	void isbc86(machine_config &config);
-	void rpc86(machine_config &config);
-	void isbc8605(machine_config &config);
-	void isbc286(machine_config &config);
-	void isbc8630(machine_config &config);
 	void isbc2861_mem(address_map &map);
 	void isbc286_io(address_map &map);
 	void isbc286_mem(address_map &map);
@@ -86,7 +88,7 @@ public:
 	void isbc_io(address_map &map);
 	void rpc86_io(address_map &map);
 	void rpc86_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void machine_reset() override;
 
@@ -103,7 +105,6 @@ protected:
 	optional_shared_ptr<u16> m_biosram;
 	output_finder<2> m_leds;
 
-private:
 	bool m_upperen;
 	offs_t m_megabyte_page;
 	bool m_nmi_enable;
@@ -432,8 +433,7 @@ MACHINE_CONFIG_START(isbc_state::isbc8605)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(isbc8605_io)
 
-	MCFG_DEVICE_ADD("isbc_208", ISBC_208, 0)
-	MCFG_ISBC_208_MAINCPU("maincpu")
+	MCFG_DEVICE_ADD("isbc_208", ISBC_208, "maincpu")
 	MCFG_ISBC_208_IRQ(WRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 
@@ -442,7 +442,7 @@ MACHINE_CONFIG_START(isbc_state::isbc8630)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(isbc8630_io)
 
-	MCFG_ISBC_215_ADD("isbc_215g", 0x100, "maincpu")
+	MCFG_DEVICE_ADD("isbc_215g", ISBC_215G, 0x100, "maincpu")
 	MCFG_ISBC_215_IRQ(WRITELINE("pic_0", pic8259_device, ir5_w))
 
 	MCFG_DEVICE_ADD("statuslatch", LS259, 0) // U14
@@ -547,7 +547,7 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_1", pic8259_device, ir5_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_1", pic8259_device, ir6_w))
 
-	MCFG_ISBC_215_ADD("isbc_215g", 0x100, "maincpu")
+	MCFG_DEVICE_ADD("isbc_215g", ISBC_215G, 0x100, "maincpu")
 	MCFG_ISBC_215_IRQ(WRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 

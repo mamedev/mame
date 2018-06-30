@@ -174,18 +174,15 @@ public:
 		m_floppy(nullptr)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<pia6821_device> m_pia0;
-	required_device<pia6821_device> m_pia1;
-	required_device<pic8259_device> m_picm;
-	required_device<pic8259_device> m_pics;
-	required_device<fd1797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	required_device<mc6845_device> m_crtc;
-	required_device<palette_device> m_palette;
+	void z100(machine_config &config);
+
+	virtual void driver_init() override;
+
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	DECLARE_READ8_MEMBER(z100_vram_r);
 	DECLARE_WRITE8_MEMBER(z100_vram_w);
@@ -201,28 +198,38 @@ public:
 	DECLARE_WRITE8_MEMBER(video_pia_B_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CA2_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CB2_w);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void z100_io(address_map &map);
+	void z100_mem(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<pia6821_device> m_pia0;
+	required_device<pia6821_device> m_pia1;
+	required_device<pic8259_device> m_picm;
+	required_device<pic8259_device> m_pics;
+	required_device<fd1797_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
+
 	std::unique_ptr<uint8_t[]> m_gvram;
-	uint8_t m_keyb_press,m_keyb_status;
+	uint8_t m_keyb_press;
+	uint8_t m_keyb_status;
 	uint8_t m_vram_enable;
 	uint8_t m_gbank;
 	uint8_t m_display_mask;
 	uint8_t m_flash;
 	uint8_t m_clr_val;
-	uint8_t m_crtc_vreg[0x100],m_crtc_index;
+	uint8_t m_crtc_vreg[0x100];
+	uint8_t m_crtc_index;
 	uint16_t m_start_addr;
 
 	floppy_image_device *m_floppy;
-
-	mc6845_device *m_mc6845;
-	void init_z100();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	void z100(machine_config &config);
-	void z100_io(address_map &map);
-	void z100_mem(address_map &map);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -248,7 +255,7 @@ void z100_state::video_start()
 	m_gvram = make_unique_clear<uint8_t[]>(0x30000);
 }
 
-uint32_t z100_state::screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t z100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,xi,yi;
 	int dot;
@@ -646,11 +653,6 @@ WRITE_LINE_MEMBER( z100_state::video_pia_CB2_w )
 	m_clr_val = (state & 1) ? 0x00 : 0xff;
 }
 
-void z100_state::machine_start()
-{
-	m_mc6845 = machine().device<mc6845_device>("crtc");
-}
-
 void z100_state::machine_reset()
 {
 	int i;
@@ -685,7 +687,7 @@ MACHINE_CONFIG_START(z100_state::z100)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(z100_state, screen_update_z100)
+	MCFG_SCREEN_UPDATE_DRIVER(z100_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8)
@@ -729,7 +731,7 @@ ROM_START( z100 )
 	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
-void z100_state::init_z100()
+void z100_state::driver_init()
 {
 	uint8_t *ROM = memregion("ipl")->base();
 
@@ -742,5 +744,5 @@ void z100_state::init_z100()
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT       COMPANY   FULLNAME  FLAGS
-COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, init_z100, "Zenith", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT         COMPANY   FULLNAME  FLAGS
+COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, driver_init, "Zenith", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

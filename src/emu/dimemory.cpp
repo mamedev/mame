@@ -117,34 +117,6 @@ void device_memory_interface::set_addrmap(int spacenum, address_map_constructor 
 
 
 //-------------------------------------------------
-//  dump - dump memory tables to the given file in
-//  human-readable format
-//-------------------------------------------------
-
-void device_memory_interface::dump(FILE *file) const
-{
-	for (auto const &space : m_addrspace)
-		if (space) {
-			fprintf(file,
-					"\n\n"
-					"====================================================\n"
-					"Device '%s' %s address space read handler dump\n"
-					"====================================================\n",
-					device().tag(), space->name());
-			space->dump_map(file, read_or_write::READ);
-
-			fprintf(file,
-					"\n\n"
-					"====================================================\n"
-					"Device '%s' %s address space write handler dump\n"
-					"====================================================\n",
-					device().tag(), space->name());
-			space->dump_map(file, read_or_write::WRITE);
-		}
-}
-
-
-//-------------------------------------------------
 //  memory_translate - translate from logical to
 //  phyiscal addresses; designed to be overridden
 //  by the actual device implementation if address

@@ -103,6 +103,11 @@ public:
 		m_digits(*this, "digit%u%u", 0U, 0U)
 	{ }
 
+	void imolagp(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slavecpu;
 	required_device<timer_device> m_steer_pot_timer;
@@ -126,7 +131,6 @@ public:
 	DECLARE_READ8_MEMBER(imola_draw_mode_r);
 	DECLARE_WRITE8_MEMBER(vreg_control_w);
 	DECLARE_WRITE8_MEMBER(vreg_data_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
 
@@ -135,7 +139,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(imolagp);
 	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void imolagp(machine_config &config);
 	void imolagp_master_io(address_map &map);
 	void imolagp_master_map(address_map &map);
 	void imolagp_slave_io(address_map &map);

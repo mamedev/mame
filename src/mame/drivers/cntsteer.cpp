@@ -44,8 +44,8 @@
 class cntsteer_state : public driver_device
 {
 public:
-	cntsteer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cntsteer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -55,7 +55,8 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -959,7 +960,7 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))

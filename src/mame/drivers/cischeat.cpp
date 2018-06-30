@@ -147,10 +147,6 @@ Common Issues:
 
 - Some ROMs aren't used (priorities?)
 - Screen control register (priorities, layers enabling etc.) - Where is it?
-- In cischeat & bigrun, at the start of some levels, you can see the empty
-  scrolling layers as they are filled. In f1gpstar, I'm unsure whether they
-  are correct in a few places (e.g. in the attract mode, where cars move
-  horizontally, the wheels don't follow for this reason, I think
 - Sound communication not quite right: see Test Mode
 
 To Do:
@@ -159,8 +155,21 @@ To Do:
 - Use the Tilemap Manager for the road layers (when this kind of layers
   will be supported) for performance and better priority support.
   A line based zooming is additionally needed for f1gpstar.
+- Wild Pilot road needs some serious work (empty gaps, ship "floating"
+  in stage 6 etc.);
 - Force feedback :)
+- Major cleanups needed, especially in video file;
+- Split the non-road games into own driver, merge them with Alien Command,
+  device-ify the sprite chip;
 
+BTANBs:
+- In cischeat & bigrun, at the start of some levels, you can see the empty
+  scrolling layers as they are filled. In f1gpstar, I'm unsure whether they
+  are correct in a few places (e.g. in the attract mode, where cars move
+  horizontally, the wheels don't follow for this reason, I think)
+  Update: this happens on real HW as well (at least for Big Run);
+- Some serious sprite popups happening in Big Run, again this happens on
+  the reference video too so not a bug.
 
 2008-08
 Dip locations verified for Big Run with the manual. Also added missing dips
@@ -218,7 +227,7 @@ void cischeat_state::bigrun_map(address_map &map)
 	map(0x082308, 0x082309).w(FUNC(cischeat_state::cischeat_comms_w));
 	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
-	/* It's actually 0x840000-0x847ff, divided in four banks and shared with other boards.
+	/* It's actually 0x84000-0x847ff, divided in four banks and shared with other boards.
 	    Each board expects reads from the other boards and writes to own bank.
 	    Amusingly, if you run the communication test as ID = X then soft reset -> ID = Y, what was at ID = X gets an OK in the second test
 	    so it's likely to be the only thing needed. */
@@ -412,7 +421,7 @@ void wildplt_state::wildplt_map(address_map &map)
 	map(0x082308, 0x082309).nopr().w(FUNC(cischeat_state::f1gpstar_comms_w));
 	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
-//  AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
+//  map(0x088000, 0x088fff).ram(); // Linking with other units (not present on this)
 
 	map(0x090000, 0x097fff).ram().share("share2"); // Sharedram with sub CPU#2
 	map(0x098000, 0x09ffff).ram().share("share1"); // Sharedram with sub CPU#1
@@ -1905,22 +1914,31 @@ GFXDECODE_END
                     Big Run, Cisco Heat, F1 GrandPrix Star
 **************************************************************************/
 
-/*
- irq 1 is comms related, presumably the bridge chip is capable of sending the irq signal at given times. Wild Pilot of course doesn't need it.
- irq 2/4 controls gameplay speed, currently unknown about the timing
- */
+// TODO: irq generation is unknown, as usual with Jaleco/NMK HW
+//       - irq 1 is comms related, presumably the bridge chip is capable of sending the irq signal at given times. 
+//         Wild Pilot of course doesn't need it.
+//       - irq 2/4 controls gameplay speed, currently unknown about the timing
+//       - 2 updates palettes while 4 is vblank?
+//       - Calling 2 every frame causes attract mode to desync in Big Run.
+//       - Not calling 1 in Big Run causes service mode to not work at all, so even if the comms doesn't work
+//         something still triggers it somehow?
 TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 {
 	int scanline = param;
+	
+	if(m_screen->frame_number() & 1)
+	{
+		if(scanline == 240)
+			m_cpu1->set_input_line(1, HOLD_LINE);
+		
+		return;
+	}
 
 	if(scanline == 240) // vblank-out irq
-		m_cpu1->set_input_line(m_screen->frame_number() & 1 ? 4 : 1, HOLD_LINE);
+		m_cpu1->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 0)
 		m_cpu1->set_input_line(2, HOLD_LINE);
-
-//  if(scanline == 69)
-//      m_cpu1->set_input_line(1, HOLD_LINE);
 }
 
 WRITE_LINE_MEMBER(cischeat_state::sound_irq)
@@ -1949,7 +1967,7 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_DEVICE_ADD("soundcpu", M68000, 6000000)
 	MCFG_DEVICE_PROGRAM_MAP(bigrun_sound_map)
 	// timing set by the YM irqhandler
-//	MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
+//  MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -2217,7 +2235,7 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -3636,7 +3654,7 @@ void cischeat_state::init_captflag()
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)",  MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
 GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
 GAMEL( 1991, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 GAMEL( 1991, f1gpstaro, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )

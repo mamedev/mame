@@ -124,9 +124,9 @@ protected:
 private:
 	static constexpr device_timer_id TIMER_FLP_CLEAR = 0;
 
-	devcb_write_line			m_out_flp_cb;
-	device_z88cart_interface*	m_cart;
-	emu_timer *					m_flp_timer;
+	devcb_write_line            m_out_flp_cb;
+	device_z88cart_interface*   m_cart;
+	emu_timer *                 m_flp_timer;
 };
 
 

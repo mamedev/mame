@@ -99,6 +99,9 @@ public:
 	{
 	}
 
+	void h19(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(h19_keyclick_w);
 	DECLARE_WRITE8_MEMBER(h19_bell_w);
 	DECLARE_READ8_MEMBER(kbd_key_r);
@@ -109,10 +112,9 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void h19(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
 

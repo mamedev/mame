@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "diimage.h"
+#include "romload.h"
 #include "softlist_dev.h"
 #include "validity.h"
 

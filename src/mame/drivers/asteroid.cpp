@@ -249,7 +249,6 @@ NOTE: Previous program versions, for the second line would only show 4 digits.  
 #include "includes/asteroid.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
-#include "machine/atari_vg.h"
 #include "machine/output_latch.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
@@ -281,6 +280,32 @@ WRITE_LINE_MEMBER(asteroid_state::coin_counter_center_w)
 WRITE_LINE_MEMBER(asteroid_state::coin_counter_right_w)
 {
 	machine().bookkeeping().coin_counter_w(2, state);
+}
+
+
+
+/*************************************
+ *
+ *  High score EAROM
+ *
+ *************************************/
+
+READ8_MEMBER(asteroid_state::earom_read)
+{
+	return m_earom->data();
+}
+
+WRITE8_MEMBER(asteroid_state::earom_write)
+{
+	m_earom->set_address(offset & 0x3f);
+	m_earom->set_data(data);
+}
+
+WRITE8_MEMBER(asteroid_state::earom_control_w)
+{
+	// CK = DB0, C1 = /DB2, C2 = DB1, CS1 = DB3, /CS2 = GND
+	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
+	m_earom->set_clk(BIT(data, 0));
 }
 
 
@@ -323,12 +348,12 @@ void asteroid_state::astdelux_map(address_map &map)
 	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r)).nopw();    /* IN1 */
 	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
 	map(0x2c00, 0x2c0f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x2c40, 0x2c7f).r("earom", FUNC(atari_vg_earom_device::read));
+	map(0x2c40, 0x2c7f).r(FUNC(asteroid_state::earom_read));
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
-	map(0x3200, 0x323f).w("earom", FUNC(atari_vg_earom_device::write)).nopr();
+	map(0x3200, 0x323f).w(FUNC(asteroid_state::earom_write)).nopr();
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3600, 0x3600).w(FUNC(asteroid_state::asteroid_explode_w));
-	map(0x3a00, 0x3a00).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
+	map(0x3a00, 0x3a00).w(FUNC(asteroid_state::earom_control_w));
 	map(0x3c00, 0x3c07).w("audiolatch", FUNC(ls259_device::write_d7));
 	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::asteroid_noise_reset_w));
 	map(0x4000, 0x47ff).ram().share("vectorram").region("maincpu", 0x4000);
@@ -762,7 +787,7 @@ MACHINE_CONFIG_START(asteroid_state::astdelux)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(astdelux_map)
 
-	MCFG_ATARIVGEAROM_ADD("earom")
+	MCFG_DEVICE_ADD("earom", ER2055)
 
 	/* sound hardware */
 	astdelux_sound(config);

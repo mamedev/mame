@@ -81,7 +81,7 @@ void kaneko_pandora_device::device_start()
 	save_item(NAME(m_clear_bitmap));
 	save_item(NAME(m_bg_pen));
 	save_item(NAME(m_flip_screen));
-	save_pointer(NAME(m_spriteram.get()), 0x1000);
+	save_pointer(NAME(m_spriteram), 0x1000);
 	save_item(NAME(*m_sprites_bitmap));
 }
 

@@ -39,15 +39,17 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void instantm(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
-	void instantm(machine_config &config);
 	void main_map(address_map &map);
 	void sub_io(address_map &map);
 	void sub_map(address_map &map);
-private:
+
 	u8 m_port01;
 	bool m_clock_en;
 	virtual void machine_start() override;

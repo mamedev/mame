@@ -105,6 +105,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void mekd2(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER(mekd2_key40_r);
 	DECLARE_READ8_MEMBER(mekd2_key_r);
 	DECLARE_WRITE_LINE_MEMBER(mekd2_nmi_w);
@@ -115,9 +118,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
 
-	void mekd2(machine_config &config);
 	void mekd2_mem(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_cass_data[4];
 	uint8_t m_segment;

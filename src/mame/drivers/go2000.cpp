@@ -56,6 +56,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void go2000(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_videoram2;
@@ -73,7 +76,6 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void go2000(machine_config &config);
 	void go2000_map(address_map &map);
 	void go2000_sound_io(address_map &map);
 	void go2000_sound_map(address_map &map);

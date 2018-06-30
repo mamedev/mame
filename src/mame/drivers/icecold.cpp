@@ -36,8 +36,12 @@ public:
 			m_start_output(*this, "start")
 	{ }
 
+	void icecold(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
 	DECLARE_CUSTOM_INPUT_MEMBER( motors_limit_r );
+
+private:
 	DECLARE_WRITE8_MEMBER( scanlines_w );
 	DECLARE_WRITE8_MEMBER( digit_w );
 	DECLARE_READ8_MEMBER( kbd_r );
@@ -82,7 +86,6 @@ public:
 	int     m_lmotor;           // left motor position (0-100)
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
-	void icecold(machine_config &config);
 	void icecold_map(address_map &map);
 };
 

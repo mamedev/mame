@@ -40,7 +40,7 @@ public:
 
 	void elekscmp(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -49,7 +49,6 @@ protected:
 
 	void mem_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<4> m_x;
 	output_finder<8> m_digit;

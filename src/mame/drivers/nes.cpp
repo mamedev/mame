@@ -201,7 +201,7 @@ MACHINE_START_MEMBER( nes_state, fds )
 
 	// register saves
 	save_item(NAME(m_last_frame_flip));
-	save_pointer(NAME(m_ciram.get()), 0x800);
+	save_pointer(NAME(m_ciram), 0x800);
 }
 
 MACHINE_RESET_MEMBER( nes_state, fds )

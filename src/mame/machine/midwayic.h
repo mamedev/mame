@@ -192,6 +192,11 @@ private:
 	void ioasic_register_state();
 	void update_ioasic_irq();
 
+	required_ioport m_io_dips;
+	required_ioport m_io_system;
+	required_ioport m_io_in1;
+	required_ioport m_io_in2;
+
 	devcb_write8    m_serial_tx_cb;
 	devcb_write32   m_aux_output_cb;
 

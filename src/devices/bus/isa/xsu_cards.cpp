@@ -66,7 +66,7 @@ void ec184x_isa8_cards(device_slot_interface &device)
 	device.option_add("ec1840.0002", ISA8_EC1840_0002); // MDA with downloadable font
 	device.option_add("ec1840.0003", ISA8_FDC_XT);
 	device.option_add("ec1841.0002", ISA8_EC1841_0002); // CGA with downloadable font
-    device.option_add("ec1841.0003", ISA8_EC1841_0003); // FDC + mouse port
+	device.option_add("ec1841.0003", ISA8_EC1841_0003); // FDC + mouse port
 	device.option_add("ec1841.0004", ISA8_LPT);
 /*
     device.option_add("ec1841.0004", ISA8_EC1841_0004); // BSC-like serial ports + parallel port

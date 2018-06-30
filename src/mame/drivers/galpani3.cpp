@@ -90,9 +90,11 @@ public:
 		m_priority_buffer(*this, "priority_buffer"),
 		m_sprregs(*this, "sprregs"),
 		m_sprite_bitmap(1024, 1024)
-
 	{ }
 
+	void galpani3(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<kaneko_grap2_device, 3> m_grap2;
 	required_device<palette_device> m_palette;
@@ -114,12 +116,10 @@ public:
 	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrollx_w);
 	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrolly_w);
 
-
 	virtual void video_start() override;
 
 	uint32_t screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
-	void galpani3(machine_config &config);
 	void galpani3_map(address_map &map);
 };
 
@@ -157,8 +157,8 @@ void galpani3_state::video_start()
 
 	save_item(NAME(m_priority_buffer_scrollx));
 	save_item(NAME(m_priority_buffer_scrolly));
-	save_pointer(NAME(m_spriteram32.get()), 0x4000/4);
-	save_pointer(NAME(m_spc_regs.get()), 0x40/4);
+	save_pointer(NAME(m_spriteram32), 0x4000/4);
+	save_pointer(NAME(m_spc_regs), 0x40/4);
 }
 
 #define SPRITE_DRAW_PIXEL(_pri)                                    \

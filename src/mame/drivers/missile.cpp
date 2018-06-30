@@ -380,13 +380,20 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void missileb(machine_config &config);
+	void missile(machine_config &config);
+	void missilea(machine_config &config);
+
+	void init_missilem();
+	void init_suprmatk();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+
+private:
 	DECLARE_WRITE8_MEMBER(missile_w);
 	DECLARE_READ8_MEMBER(missile_r);
 	DECLARE_WRITE8_MEMBER(bootleg_w);
 	DECLARE_READ8_MEMBER(bootleg_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
-	void init_missilem();
-	void init_suprmatk();
 	uint32_t screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	inline int scanline_to_v(int scanline);
@@ -399,13 +406,9 @@ public:
 
 	TIMER_CALLBACK_MEMBER(clock_irq);
 	TIMER_CALLBACK_MEMBER(adjust_cpu_speed);
-	void missileb(machine_config &config);
-	void missile(machine_config &config);
-	void missilea(machine_config &config);
 	void bootleg_main_map(address_map &map);
 	void main_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -1022,9 +1025,9 @@ static INPUT_PORTS_START( missile )
 	PORT_DIPNAME( 0x04, 0x04, "Bonus Credit for 4 Coins" ) PORT_DIPLOCATION("R8:!3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Trackball Size" ) PORT_DIPLOCATION("R8:!4")
-	PORT_DIPSETTING(    0x00, "Large" )
-	PORT_DIPSETTING(    0x08, "Mini" )
+	PORT_DIPNAME( 0x08, 0x08, "Trackball Size" ) PORT_DIPLOCATION("R8:!4")
+	PORT_DIPSETTING(    0x00, "Mini" ) // Faster Cursor Speed
+	PORT_DIPSETTING(    0x08, "Large" ) // Slower Cursor Speed
 	PORT_DIPNAME( 0x70, 0x70, "Bonus City" ) PORT_DIPLOCATION("R8:!5,!6,!7")
 	PORT_DIPSETTING(    0x10, "8000" )
 	PORT_DIPSETTING(    0x70, "10000" )
@@ -1112,9 +1115,9 @@ static INPUT_PORTS_START( suprmatk )
 	PORT_DIPNAME( 0x04, 0x04, "Bonus Credit for 4 Coins" ) PORT_DIPLOCATION("R8:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Trackball Size" ) PORT_DIPLOCATION("R8:4")
-	PORT_DIPSETTING(    0x00, "Large" )
-	PORT_DIPSETTING(    0x08, "Mini" )
+	PORT_DIPNAME( 0x08, 0x08, "Trackball Size" ) PORT_DIPLOCATION("R8:4")
+	PORT_DIPSETTING(    0x00, "Mini" ) // Faster Cursor Speed
+	PORT_DIPSETTING(    0x08, "Large" ) // Slower Cursor Speed
 	PORT_DIPNAME( 0x70, 0x70, "Bonus City" ) PORT_DIPLOCATION("R8:5,6,7")
 	PORT_DIPSETTING(    0x10, "8000" )
 	PORT_DIPSETTING(    0x70, "10000" )

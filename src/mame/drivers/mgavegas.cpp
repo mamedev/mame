@@ -52,8 +52,8 @@ Ver. 2.2 should exist
 class mgavegas_state : public driver_device
 {
 public:
-	mgavegas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mgavegas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ay(*this, "aysnd"),
 		m_msm(*this, "5205"),
@@ -62,7 +62,13 @@ public:
 		m_filter2(*this, "filter2")
 	{ }
 
+	void mgavegas(machine_config &config);
 
+	void init_mgavegas();
+	void init_mgavegas21();
+	void init_mgavegas133();
+
+private:
 	uint8_t m_int;
 
 	//OUT1
@@ -136,16 +142,9 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_a_r);
 	DECLARE_READ8_MEMBER(ay8910_b_r);
 
-	void init_mgavegas();
-	void init_mgavegas21();
-	void init_mgavegas133();
-
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
-
-	void mgavegas(machine_config &config);
 	void mgavegas_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -159,9 +158,6 @@ protected:
 	virtual void machine_reset() override;
 	void update_custom();
 	void update_lamp();
-
-
-private:
 };
 
 
@@ -353,7 +349,7 @@ WRITE8_MEMBER(mgavegas_state::csoki_w)
 	if (LOG_MSM5205)
 		logerror("MSM5205 write to %04X data = %02X \n",offset+0xc800,data);
 	m_msm->reset_w(data&0x10>>4);
-	m_msm->data_w(data&0x0f);
+	m_msm->write_data(data&0x0f);
 }
 
 

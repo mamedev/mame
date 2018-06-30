@@ -906,7 +906,7 @@ void lockon_state::video_start()
 
 	save_item(NAME(*m_back_buffer));
 	save_item(NAME(*m_front_buffer));
-	save_pointer(NAME(m_obj_pal_ram.get()), 2048);
+	save_pointer(NAME(m_obj_pal_ram), 2048);
 }
 
 uint32_t lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -363,6 +363,19 @@ public:
 		m_watchdog(*this, "watchdog")
 	{ }
 
+	void terabrst(machine_config &config);
+	void sscope2(machine_config &config);
+	void hornet_2board(machine_config &config);
+	void hornet_2board_v2(machine_config &config);
+	void hornet(machine_config &config);
+
+	void init_hornet();
+	void init_hornet_2board();
+	void init_gradius4();
+	void init_nbapbp();
+	void init_terabrst();
+
+private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2800;
 
@@ -426,11 +439,6 @@ public:
 	DECLARE_READ8_MEMBER(comm_eeprom_r);
 	DECLARE_WRITE8_MEMBER(comm_eeprom_w);
 
-	void init_hornet();
-	void init_hornet_2board();
-	void init_gradius4();
-	void init_nbapbp();
-	void init_terabrst();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(hornet_2board);
@@ -440,11 +448,6 @@ public:
 	int jvs_encode_data(uint8_t *in, int length);
 	int jvs_decode_data(uint8_t *in, uint8_t *out, int length);
 	void jamma_jvs_cmd_exec();
-	void terabrst(machine_config &config);
-	void sscope2(machine_config &config);
-	void hornet_2board(machine_config &config);
-	void hornet_2board_v2(machine_config &config);
-	void hornet(machine_config &config);
 	void gn680_memmap(address_map &map);
 	void hornet_map(address_map &map);
 	void sharc0_map(address_map &map);
@@ -1022,7 +1025,7 @@ void hornet_state::machine_start()
 
 	save_item(NAME(m_led_reg0));
 	save_item(NAME(m_led_reg1));
-	save_pointer(NAME(m_jvs_sdata.get()), 1024);
+	save_pointer(NAME(m_jvs_sdata), 1024);
 	save_item(NAME(m_jvs_sdata_ptr));
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hornet_state::sound_irq), this));

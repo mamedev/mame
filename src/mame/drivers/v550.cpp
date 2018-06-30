@@ -15,7 +15,8 @@
 #include "emu.h"
 //include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-//#include "machine/com8116.h"
+#include "machine/com8116.h"
+#include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -40,6 +41,7 @@ public:
 private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
+	void pvtc_map(address_map &map);
 
 	virtual void machine_start() override;
 
@@ -60,6 +62,7 @@ void v550_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("gdc", FUNC(upd7220_device::read), FUNC(upd7220_device::write));
+	map(0x10, 0x10).w("brg1", FUNC(com8116_device::stt_str_w));
 	map(0x20, 0x23).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x30, 0x30).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x31, 0x31).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -67,8 +70,15 @@ void v550_state::io_map(address_map &map)
 	map(0x41, 0x41).rw("mpsc", FUNC(upd7201_new_device::ca_r), FUNC(upd7201_new_device::ca_w));
 	map(0x48, 0x48).rw("mpsc", FUNC(upd7201_new_device::db_r), FUNC(upd7201_new_device::db_w));
 	map(0x49, 0x49).rw("mpsc", FUNC(upd7201_new_device::cb_r), FUNC(upd7201_new_device::cb_w));
+	map(0x50, 0x50).w("brg2", FUNC(com8116_device::stt_str_w));
 	map(0x60, 0x67).rw("pvtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
-	map(0x70, 0x70).nopw(); // DRAM refresh address?
+	map(0x70, 0x70).rw("pvtc", FUNC(scn2672_device::buffer_r), FUNC(scn2672_device::buffer_w));
+	map(0x71, 0x71).noprw(); // TODO: attribute buffer
+}
+
+void v550_state::pvtc_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
 }
 
 
@@ -94,18 +104,30 @@ MACHINE_CONFIG_START(v550_state::v550)
 	MCFG_DEVICE_ADD("ppi", I8255, 0) // NEC D8255AC-5
 
 	MCFG_DEVICE_ADD("usart", I8251, 4'000'000) // NEC D8251AC
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainint", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 4'000'000) // NEC D7201C
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
 
-	//MCFG_DEVICE_ADD("brg1", COM8116_020, 5068800)
-	//MCFG_DEVICE_ADD("brg2", COM8116_020, 5068800)
+	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("brg1", COM8116, 5068800) // actually SMC COM8116T-020 (unknown clock)
+	MCFG_COM8116_FT_HANDLER(WRITELINE("mpsc", upd7201_new_device, txca_w))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxca_w))
+
+	MCFG_DEVICE_ADD("brg2", COM8116, 5068800) // actually SMC COM8116T-020
+	MCFG_COM8116_FT_HANDLER(WRITELINE("mpsc", upd7201_new_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mpsc", upd7201_new_device, rxcb_w))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("usart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("usart", i8251_device, write_rxc))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(16'248'600, 918, 0, 720, 295, 0, 272)
 	MCFG_SCREEN_UPDATE_DRIVER(v550_state, screen_update)
 
 	MCFG_DEVICE_ADD("pvtc", SCN2672, 1'805'400)
+	MCFG_DEVICE_ADDRESS_MAP(0, pvtc_map)
 	MCFG_SCN2672_CHARACTER_WIDTH(9)
 	MCFG_SCN2672_INTR_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_VIDEO_SET_SCREEN("screen")

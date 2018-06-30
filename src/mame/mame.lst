@@ -70,10 +70,10 @@ flagrall                        // ?
 3do                             // 3DO consoles
 3do_pal                         //
 3dobios                         //
-alg3do							//
+alg3do                          //
 md23do                          //
 orbatak                         //
-sht3do							//
+sht3do                          //
 
 @source:3x3puzzl.cpp
 3x3puzzl                        // (c) 199? Ace
@@ -10620,6 +10620,9 @@ sfiiiu                          // 04/02/1997 (c) 1997 (USA)
 warzard                         // 21/11/1996 (c) 1996 (Japan)
 warzardr1                       // 23/10/1996 (c) 1996 (Japan)
 
+@source:cpzodiac.cpp
+cpzodiac                        //
+
 @source:craft.cpp
 craft                           // Craft, by [lft]
 
@@ -10765,6 +10768,7 @@ pinkswts                        // (c) 2006 Cave (AMI license) - 2006/04/06 MAST
 pinkswtsa                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER...
 pinkswtsb                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER.
 pinkswtsx                       // (c) 2006 Cave (AMI license) - 2006/xx/xx MASTER VER.
+pinkswtssc                      // bootleg
 
 @source:cvicny.cpp
 cvicny                          //
@@ -11438,6 +11442,9 @@ popn1                           // GX803 (c) 1998 (Asia)
 popn2                           // GX831 (c) 1998 (Japan)
 popn3                           // GX980 (c) 1999 (Japan)
 popnstage                       // GQ970 (c) 1999 (Japan)
+
+@source:dkmb.cpp
+dkmb
 
 @source:dkong.cpp
 8ballact                        // (c) 1984 Seatongrove Ltd (Magic Eletronics USA license)
@@ -12287,6 +12294,7 @@ hidctch2a                       // (c) 1999 Eolith
 hidctch3                        // (c) 2000 Eolith
 hidnc2k                         // (c) 2000 Eolith
 hidnctch                        // (c) 1998 Eolith
+hidnctcha                       // (c) 1998 Eolith
 ironfort                        // (c) 1998 Eolith
 ironfortc                       // (c) 1998 Eolith
 landbrk                         // (c) 1999 Eolith
@@ -15056,6 +15064,7 @@ airtrix                         // 2001.02? Air Trix (Rev A)
 airtrixo                        // 2000.10 Air Trix (original)
 braveff                         // 1999.06 Syouboushi Brave Fire Fighters
 hikaru                          // 2000.?? Hikaru BIOS
+hikcheck                        // 2000.05 Hikaru Check ROM Board
 pharrier                        // 2000.12 Planet Harriers (Rev A)
 swracer                         // 2000.06 Star Wars: Racer Arcade
 sgnascar                        // 2000.10 Nascar Arcade (Rev A)
@@ -20934,6 +20943,7 @@ megat5nj                        // (c) 1997 Merit
 megat5t                         // (c) 1997 Merit
 megat5tg                        // (c) 1997 Merit
 megat6                          // (c) 1998 Merit
+megat7e                         // (c) 1998 Merit
 meritjp                         // (c) 1987 Merit
 mtjpoker                        // (c) 1994 Merit
 pbss330                         // (c) 1994 Merit
@@ -28082,6 +28092,7 @@ gratia                          // (c) 1996
 gratiaa                         // (c) 1996
 hayaosi2                        // (c) 1993
 hayaosi3                        // (c) 1994
+hayaosi3a                       // (c) 1994
 kirarast                        // (c) 1996
 p47aces                         // (c) 1995
 tetrisp                         // (c) 1995 Jaleco / BPS
@@ -29236,6 +29247,7 @@ f355                            // 1999.07 Ferrari F355 Challenge (deluxe, no li
 f355bios                        // 1999.08 F355 Challenge Twin/Deluxe (BIOS)
 f355dlx                         // 1999.07 F355 Challenge Deluxe (BIOS)
 f355twin                        // 1999.07 Ferrari F355 Challenge (twin/deluxe)
+f355twinp                       // 1999.?? Ferrari F355 Challenge (twin/deluxe, prototype)
 f355twn2                        // 2001.01 Ferrari F355 Challenge 2 - International Course Edition (twin/deluxe)
 fotns                           // 2005.12 Hokuto no Ken
 ftspeed                         // 2004.09 Faster than Speed
@@ -29332,9 +29344,11 @@ pjustic                         // 2000.12 Moero! Justice Gakuen / Project Justi
 pokasuka                        // 2007.07 Pokasuka Ghost!
 pstone                          // 1999.02 Power Stone
 pstone2                         // 2000.04 Power Stone 2
+pstone2b                        // bootleg
 psyvar2                         // 2003.11 Psyvariar 2 - The Will To Fabricate
 puyoda                          // 1999.12 Puyo Puyo Da!
-puyofev                         // 2003.11 Puyo Puyo Fever
+puyofev                         // 2003.11 Puyo Pop Fever
+puyofevj                        // 2003.11 Puyo Puyo Fever
 puyofevp                        // 2003.?? Puyo Puyo Fever (prototype ver 0.01)
 qmegamis                        // 2000.05 Quiz Ah Megamisama
 quizqgd                         // 2002.?? Quiz Keitai Q mode
@@ -29897,6 +29911,7 @@ ssideki2                        // 0061 (c) 1994 SNK
 ssideki3                        // 0081 (c) 1995 SNK
 ssideki4                        // 0215 (c) 1996 SNK
 stakwin                         // 0088 (c) 1995 Saurus
+stakwindev                      // prototype
 stakwin2                        // 0227 (c) 1996 Saurus
 strhoop                         // 0079 (c) 1994 Data East Corporation
 superspy                        // 0011 (c) 1990 SNK
@@ -30372,6 +30387,9 @@ olybossc                        // Olympia BOSS C
 olybossd                        // Olympia BOSS D
 bossa85                         // Olympia BOSS A 8085
 bossb85                         // Olympia BOSS B 8085
+
+@source:olytext.cpp
+olytext                         // Olympia Olytext 20
 
 @source:omegrace.cpp
 deltrace                        // bootleg
@@ -31303,6 +31321,7 @@ pex0057pb                       // (c) 1995 IGT - International Game Technology
 pex0057pc                       // (c) 1995 IGT - International Game Technology
 pex0057pd                       // (c) 1995 IGT - International Game Technology
 pex0057pe                       // (c) 1995 IGT - International Game Technology
+pex0057pf                       // (c) 1995 IGT - International Game Technology
 pex0060p                        // (c) 1995 IGT - International Game Technology
 pex0124p                        // (c) 1995 IGT - International Game Technology
 pex0150p                        // (c) 1995 IGT - International Game Technology
@@ -31348,6 +31367,7 @@ pex0726p                        // (c) 1995 IGT - International Game Technology
 pex0727p                        // (c) 1995 IGT - International Game Technology
 pex0763p                        // (c) 1995 IGT - International Game Technology
 pex0764p                        // (c) 1995 IGT - International Game Technology
+pex0827s                        // (c) 1997 IGT - International Game Technology
 pex0838s                        // (c) 1997 IGT - International Game Technology
 pex0841s                        // (c) 1997 IGT - International Game Technology
 pex0846s                        // (c) 1997 IGT - International Game Technology
@@ -32463,6 +32483,7 @@ s1945bl                         // (c) 1995 (Hong Kong bootleg)
 s1945j                          // (c) 1995
 s1945jn                         // (c) 1995
 s1945k                          // (c) 1995
+s1945n                          // (c) 1995
 samuraia                        // (c) 1993 (World)
 sngkace                         // (c) 1993 (Japan)
 sngkacea                        // (c) 1993 (Japan)
@@ -33191,8 +33212,10 @@ diner_l1                        //
 diner_l2                        //
 diner_l3                        //
 diner_l4                        //
-gs_l3                           //
-gs_l4                           //
+gs_la3                          //
+gs_lg6                          //
+gs_lu3                          //
+gs_lu4                          //
 pool_l5                         //
 pool_l6                         //
 pool_l7                         //
@@ -36372,6 +36395,7 @@ hthero93                        // 1993.03 D49 (c) 1992 Taito Corporation (Japan
 hthero93u                       // 1993.04 D49 (c) 1992 Taito America Corporation (US)
 hthero94                        // 1994.09 D78 (c) 1994 Taito (US)
 hthero95                        // 1994.11 D94 (c) 1995 Taito Corporation (Japan)
+hthero95a                       // 1995.05 D94 (c) 1995 Taito Corporation Japan (Asia)
 hthero95u                       // 1995.05 D94 (c) 1995 Taito America Corporation (US)
 intcup94                        // 1994.?? D78 (c) 1994 Taito (World)
 kaiserkn                        // 1994.?? D84 (c) 1994 Taito Corporation Japan (World)

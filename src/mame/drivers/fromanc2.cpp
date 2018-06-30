@@ -490,7 +490,7 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc2)
 
 	save_item(NAME(m_subcpu_int_flag));
 	save_item(NAME(m_subcpu_nmi_flag));
-	save_pointer(NAME(m_bankedram.get()), 0x4000 * 3);
+	save_pointer(NAME(m_bankedram), 0x4000 * 3);
 }
 
 void fromanc2_state::machine_reset()

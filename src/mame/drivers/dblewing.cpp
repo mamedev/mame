@@ -86,8 +86,8 @@ Notes:
 class dblewing_state : public driver_device
 {
 public:
-	dblewing_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dblewing_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_spriteram(*this, "spriteram"),
@@ -100,6 +100,11 @@ public:
 		m_soundlatch_pending(false)
 	{ }
 
+	void dblewing(machine_config &config);
+
+	void init_dblewing();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_pf1_rowscroll;
 	required_shared_ptr<uint16_t> m_pf2_rowscroll;
@@ -115,7 +120,6 @@ public:
 
 	DECLARE_READ8_MEMBER(irq_latch_r);
 	DECLARE_WRITE_LINE_MEMBER(soundlatch_irq_w);
-	void init_dblewing();
 	uint32_t screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -124,12 +128,10 @@ public:
 	READ16_MEMBER( wf_protection_region_0_104_r );
 	WRITE16_MEMBER( wf_protection_region_0_104_w );
 
-	void dblewing(machine_config &config);
 	void dblewing_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void sound_io(address_map &map);
 	void sound_map(address_map &map);
-private:
 	bool m_soundlatch_pending;
 };
 

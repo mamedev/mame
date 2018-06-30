@@ -71,8 +71,8 @@
 class guab_state : public driver_device
 {
 public:
-	guab_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	guab_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tms34061(*this, "tms34061"),
 		m_sn(*this, "snsnd"),
@@ -82,6 +82,11 @@ public:
 		m_sound_buffer(0), m_sound_latch(false)
 	{ }
 
+	void guab(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	EF9369_COLOR_UPDATE(ef9369_color_update);
 	DECLARE_WRITE16_MEMBER(tms34061_w);
 	DECLARE_READ16_MEMBER(tms34061_r);
@@ -99,16 +104,14 @@ public:
 	DECLARE_READ8_MEMBER(watchdog_r);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	void guab(machine_config &config);
 	void guab_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34061_device> m_tms34061;
 	required_device<sn76489_device> m_sn;

@@ -98,7 +98,7 @@ VIDEO_START_MEMBER(quasar_state,quasar)
 
 	/* register save */
 	save_item(NAME(m_collision_background));
-	save_pointer(NAME(m_effectram.get()), 0x400);
+	save_pointer(NAME(m_effectram), 0x400);
 }
 
 uint32_t quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

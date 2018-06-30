@@ -18,6 +18,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void drmicro(machine_config &config);
+
+private:
 	/* memory pointers */
 	std::unique_ptr<uint8_t[]>       m_videoram;
 
@@ -47,7 +50,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void drmicro(machine_config &config);
 	void drmicro_map(address_map &map);
 	void io_map(address_map &map);
 };
