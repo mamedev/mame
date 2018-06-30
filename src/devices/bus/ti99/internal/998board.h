@@ -470,6 +470,8 @@ private:
 	void set_status(int bit, bool set) { m_status = (set)? (m_status | bit) : (m_status & ~bit); }
 	void update_hexbus();
 
+	required_device<bus::hexbus::hexbus_device> m_hexbusout;
+
 	// Registers
 	uint8_t m_data;
 	uint8_t m_status;
@@ -638,6 +640,9 @@ private:
 	required_device<amigo_device>    m_amigo;
 	required_device<oso_device>       m_oso;
 
+	// Link to main cpu
+	required_device<cpu_device>             m_maincpu;
+
 	// More devices
 	required_device<tms9928a_device>        m_video;
 	required_device<sn76496_base_device>    m_sound;
@@ -653,16 +658,34 @@ private:
 	line_state m_crus_debug;
 
 	// System GROM library
-	tmc0430_device* m_sgrom[3];
+	required_device<tmc0430_device> m_sgrom0;
+	required_device<tmc0430_device> m_sgrom1;
+	required_device<tmc0430_device> m_sgrom2;
 
 	// Text-to-speech GROM library
-	tmc0430_device* m_tsgrom[8];
+	required_device<tmc0430_device> m_tsgrom0;
+	required_device<tmc0430_device> m_tsgrom1;
+	required_device<tmc0430_device> m_tsgrom2;
+	required_device<tmc0430_device> m_tsgrom3;
+	required_device<tmc0430_device> m_tsgrom4;
+	required_device<tmc0430_device> m_tsgrom5;
+	required_device<tmc0430_device> m_tsgrom6;
+	required_device<tmc0430_device> m_tsgrom7;
 
 	// Pascal 8 GROM library
-	tmc0430_device* m_p8grom[8];
+	required_device<tmc0430_device> m_p8grom0;
+	required_device<tmc0430_device> m_p8grom1;
+	required_device<tmc0430_device> m_p8grom2;
+	required_device<tmc0430_device> m_p8grom3;
+	required_device<tmc0430_device> m_p8grom4;
+	required_device<tmc0430_device> m_p8grom5;
+	required_device<tmc0430_device> m_p8grom6;
+	required_device<tmc0430_device> m_p8grom7;
 
 	// Pascal 3 GROM library
-	tmc0430_device* m_p3grom[3];
+	required_device<tmc0430_device> m_p3grom0;
+	required_device<tmc0430_device> m_p3grom1;
+	required_device<tmc0430_device> m_p3grom2;
 
 	// Idle flags for GROMs
 	bool m_sgrom_idle;

@@ -72,6 +72,9 @@ private:
 	// Console RAM
 	required_device<ram_device> m_padram;
 
+	// Link to the CPU
+	required_device<cpu_device> m_cpu;
+
 	// Keeps the address space pointer
 	address_space* m_spacep;
 
