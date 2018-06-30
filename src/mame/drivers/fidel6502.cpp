@@ -537,6 +537,7 @@ private:
 	DECLARE_READ8_MEMBER(div_trampoline_r);
 	void div_set_cpu_freq(offs_t offset);
 	void div_trampoline(address_map &map);
+	u16 m_div_status;
 
 	// CSC, SU9, RSC
 	void csc_prepare_display();
@@ -616,7 +617,30 @@ private:
 	DECLARE_WRITE8_MEMBER(kishon_control_w);
 	void chesster_map(address_map &map);
 	void kishon_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
+
+
+// machine start/reset
+
+void fidel6502_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// register for savestates
+	save_item(NAME(m_div_status));
+}
+
+void fidel6502_state::machine_reset()
+{
+	fidelbase_state::machine_reset();
+
+	m_div_status = ~0;
+}
+
 
 
 /***************************************************************************
@@ -629,13 +653,18 @@ private:
 
 void fidel6502_state::div_set_cpu_freq(offs_t offset)
 {
-	if (m_div_config->read() & 2)
+	static const u16 mask = 0x6000;
+	u16 status = (offset & mask) | m_div_config->read();
+
+	if (status != m_div_status && status & 2)
 	{
 		// when a13/a14 is high, XTAL goes through divider(s)
 		// (depending on factory-set jumper, either one or two 7474)
-		float div = (m_div_config->read() & 1) ? 0.25 : 0.5;
-		m_maincpu->set_clock_scale((offset & 0x6000) ? div : 1.0);
+		float div = (status & 1) ? 0.25 : 0.5;
+		m_maincpu->set_clock_scale((offset & mask) ? div : 1.0);
 	}
+
+	m_div_status = status;
 }
 
 WRITE8_MEMBER(fidel6502_state::div_trampoline_w)
@@ -709,7 +738,7 @@ void fidel6502_state::su9_set_cpu_freq()
 
 MACHINE_RESET_MEMBER(fidel6502_state, su9)
 {
-	fidelbase_state::machine_reset();
+	fidel6502_state::machine_reset();
 	su9_set_cpu_freq();
 }
 
@@ -961,7 +990,7 @@ void fidel6502_state::sc9c_set_cpu_freq()
 
 MACHINE_RESET_MEMBER(fidel6502_state, sc9c)
 {
-	fidelbase_state::machine_reset();
+	fidel6502_state::machine_reset();
 	sc9c_set_cpu_freq();
 }
 
@@ -1206,7 +1235,7 @@ void fidel6502_state::init_fdesdis()
 
 MACHINE_RESET_MEMBER(fidel6502_state, fphantom)
 {
-	fidelbase_state::machine_reset();
+	fidel6502_state::machine_reset();
 	m_rombank->set_entry(0);
 }
 
