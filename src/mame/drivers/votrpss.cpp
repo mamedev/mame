@@ -89,6 +89,9 @@ public:
 		, m_ppi(*this, "ppi")
 	{ }
 
+	void votrpss(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
 	DECLARE_READ8_MEMBER(ppi_pb_r);
@@ -100,10 +103,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	IRQ_CALLBACK_MEMBER(irq_ack);
 
-	void votrpss(machine_config &config);
 	void votrpss_io(address_map &map);
 	void votrpss_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	uint8_t m_porta;
 	uint8_t m_portb;

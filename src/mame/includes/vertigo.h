@@ -39,7 +39,7 @@ public:
 
 	void vertigo(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE_LINE_MEMBER(adc_eoc_w);
 	DECLARE_READ16_MEMBER(vertigo_io_convert);
 	DECLARE_READ16_MEMBER(vertigo_coin_r);
@@ -60,7 +60,6 @@ protected:
 	void vertigo_motor(address_map &map);
 	void exidy440_audio_map(address_map &map);
 
-private:
 	struct am2901
 	{
 		uint32_t ram[16];   /* internal ram */

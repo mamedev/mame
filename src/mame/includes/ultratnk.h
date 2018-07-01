@@ -18,11 +18,6 @@
 class ultratnk_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_NMI
-	};
-
 	ultratnk_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -39,6 +34,11 @@ public:
 	void ultratnk(machine_config &config);
 
 protected:
+	enum
+	{
+		TIMER_NMI
+	};
+
 	DECLARE_READ8_MEMBER(wram_r);
 	DECLARE_READ8_MEMBER(analog_r);
 	DECLARE_READ8_MEMBER(coin_r);

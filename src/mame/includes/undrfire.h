@@ -19,11 +19,6 @@ struct uf_tempsprite
 class undrfire_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTERRUPT5
-	};
-
 	undrfire_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -47,6 +42,11 @@ protected:
 	virtual void video_start() override;
 
 private:
+	enum
+	{
+		TIMER_INTERRUPT5
+	};
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 	required_device<tc0100scn_device> m_tc0100scn;

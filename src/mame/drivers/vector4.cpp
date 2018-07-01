@@ -23,11 +23,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-
 	void vector4(machine_config &config);
+
+private:
 	void vector4_io(address_map &map);
 	void vector4_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
