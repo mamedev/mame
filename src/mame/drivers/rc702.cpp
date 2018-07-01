@@ -58,7 +58,11 @@ public:
 	{
 	}
 
+	void rc702(machine_config &config);
+
 	void init_rc702();
+
+private:
 	DECLARE_MACHINE_RESET(rc702);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
@@ -75,10 +79,9 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	void kbd_put(u8 data);
 
-	void rc702(machine_config &config);
 	void rc702_io(address_map &map);
 	void rc702_mem(address_map &map);
-private:
+
 	bool m_q_state;
 	bool m_qbar_state;
 	bool m_drq_state;
