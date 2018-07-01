@@ -114,6 +114,9 @@ public:
 		m_adpcm(*this, "adpcm") ,
 		m_palette(*this, "palette"){ }
 
+	void jantotsu(machine_config &config);
+
+private:
 	/* sound-related */
 	uint32_t   m_adpcm_pos;
 	uint8_t    m_adpcm_idle;
@@ -144,7 +147,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
 	required_device<palette_device> m_palette;
-	void jantotsu(machine_config &config);
 	void jantotsu_io(address_map &map);
 	void jantotsu_map(address_map &map);
 };

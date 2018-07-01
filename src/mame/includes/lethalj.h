@@ -36,23 +36,27 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void lethalj(machine_config &config);
+	void gameroom(machine_config &config);
+
+	void init_cfarm();
+	void init_ripribit();
+	void init_cclownz();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(cclownz_paddle);
+
+private:
 	DECLARE_WRITE16_MEMBER(ripribit_control_w);
 	DECLARE_WRITE16_MEMBER(cfarm_control_w);
 	DECLARE_WRITE16_MEMBER(cclownz_control_w);
 	DECLARE_READ16_MEMBER(lethalj_gun_r);
 	DECLARE_WRITE16_MEMBER(lethalj_blitter_w);
 	void do_blit();
-	DECLARE_CUSTOM_INPUT_MEMBER(cclownz_paddle);
-	void init_cfarm();
-	void init_ripribit();
-	void init_cclownz();
 	inline void get_crosshair_xy(int player, int *x, int *y);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
-	void lethalj(machine_config &config);
-	void gameroom(machine_config &config);
 	void lethalj_map(address_map &map);
-protected:
+
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void video_start() override;

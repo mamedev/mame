@@ -190,14 +190,17 @@ public:
 	DECLARE_WRITE16_MEMBER(stepstag_neon_w);
 	DECLARE_WRITE16_MEMBER(stepstag_step_leds_w);
 	DECLARE_WRITE16_MEMBER(stepstag_button_leds_w);
-	DECLARE_WRITE16_MEMBER( stepstag_palette_w );
+	DECLARE_WRITE16_MEMBER( stepstag_palette_left_w );
+	DECLARE_WRITE16_MEMBER( stepstag_palette_mid_w );
+	DECLARE_WRITE16_MEMBER( stepstag_palette_right_w );
+
 	void init_stepstag();
 	DECLARE_VIDEO_START(stepstag);
 	uint32_t screen_update_stepstag_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_main(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	inline int mypal(int x);
+//	inline int mypal(int x);
 
 	void stepstag(machine_config &config);
 	void vjdash(machine_config &config);
@@ -218,4 +221,5 @@ private:
 	optional_shared_ptr<uint16_t> m_vj_paletteram_m;
 	optional_shared_ptr<uint16_t> m_vj_paletteram_r;
 	required_device<generic_latch_16_device> m_soundlatch;
+	void convert_yuv422_to_rgb888(palette_device *paldev, uint16_t *palram,uint32_t offset);
 };

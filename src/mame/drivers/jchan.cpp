@@ -183,6 +183,11 @@ public:
 		, m_ctrl(*this, "ctrl")
 	{ }
 
+	void jchan(machine_config &config);
+
+	void init_jchan();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<palette_device> m_palette;
@@ -206,13 +211,11 @@ public:
 	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32_w);
 	template<int Chip> DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_w);
 
-	void init_jchan();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
-	void jchan(machine_config &config);
 	void jchan_main(address_map &map);
 	void jchan_sub(address_map &map);
 };

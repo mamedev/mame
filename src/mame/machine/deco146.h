@@ -25,7 +25,7 @@
 	downcast<deco_146_base_device &>(*device).set_interface_scramble(a9,a8,a7,a6,a5,a4,a3,a2,a1,a0);
 
 #define MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE \
-	downcast<deco_146_base_device &>(*device).set_interface_scramble(0,1,2,3,4,5,6,7,8,9);
+	downcast<deco_146_base_device &>(*device).set_interface_scramble_reverse();
 
 #define MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE \
 	downcast<deco_146_base_device &>(*device).set_interface_scramble_interleave();
@@ -98,6 +98,7 @@ public:
 		m_external_addrswap[1] = a1;
 		m_external_addrswap[0] = a0;
 	}
+	void set_interface_scramble_reverse() { set_interface_scramble(0,1,2,3,4,5,6,7,8,9); }
 	void set_interface_scramble_interleave() { set_interface_scramble(4, 5, 3, 6, 2, 7, 1, 8, 0, 9); }
 	void set_use_magic_read_address_xor(bool use_xor) { m_magic_read_address_xor_enabled = use_xor; }
 

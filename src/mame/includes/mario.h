@@ -71,6 +71,13 @@ public:
 		m_videoram(*this, "videoram"),
 		m_monitor(0) { }
 
+	void mario_base(machine_config &config);
+	void masao(machine_config &config);
+	void masao_audio(machine_config &config);
+	void mario(machine_config &config);
+	void mario_audio(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -140,11 +147,6 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_ea(int ea);
-	void mario_base(machine_config &config);
-	void masao(machine_config &config);
-	void masao_audio(machine_config &config);
-	void mario(machine_config &config);
-	void mario_audio(machine_config &config);
 	void mario_io_map(address_map &map);
 	void mario_map(address_map &map);
 	void mario_sound_io_map(address_map &map);

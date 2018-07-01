@@ -225,8 +225,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_T4426, device_cococart_interface, coco_t4426_device, "coco_t4426", "Terco CNC Programming Station 4426 multi cart")
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;
 
 //**************************************************************************
 //  LIVE DEVICE

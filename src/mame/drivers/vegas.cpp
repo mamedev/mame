@@ -328,7 +328,13 @@ public:
 		m_uart0(*this, "uart0"),
 		m_uart1(*this, "uart1"),
 		m_uart2(*this, "uart2"),
-		m_io_analog(*this, "AN.%u", 0),
+		m_io_analog(*this, "AN.%u", 0U),
+		m_io_49way_x(*this, "49WAYX_P%u", 1U),
+		m_io_49way_y(*this, "49WAYY_P%u", 1U),
+		m_io_keypad(*this, "KEYPAD"),
+		m_io_gearshift(*this, "GEAR"),
+		m_io_system(*this, "SYSTEM"),
+		m_wheel_driver(*this, "wheel"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_a2d_shift(0)
 	{ }
@@ -344,6 +350,12 @@ public:
 	optional_device<ns16550_device> m_uart1;
 	optional_device<ns16550_device> m_uart2;
 	optional_ioport_array<8> m_io_analog;
+	optional_ioport_array<4> m_io_49way_x;
+	optional_ioport_array<4> m_io_49way_y;
+	optional_ioport m_io_keypad;
+	optional_ioport m_io_gearshift;
+	optional_ioport m_io_system;
+	output_finder<1> m_wheel_driver;
 	output_finder<16> m_lamps;
 
 	int m_a2d_shift;
@@ -457,6 +469,7 @@ void vegas_state::machine_start()
 	/* set the fastest DRC options, but strict verification */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
+	m_wheel_driver.resolve();
 	m_lamps.resolve();
 
 	/* register for save states */
@@ -939,7 +952,7 @@ WRITE32_MEMBER( vegas_state::analog_port_w )
 		m_pending_analog_read = currValue;
 	}
 	// Declare calibration finished as soon as a SYSTEM button is hit
-	if (!m_wheel_calibrated && ((~ioport("SYSTEM")->read()) & 0xffff)) {
+	if (!m_wheel_calibrated && ((~m_io_system->read()) & 0xffff)) {
 		m_wheel_calibrated = true;
 		//osd_printf_info("wheel calibration comlete wheel: %02x\n", currValue);
 	}
@@ -1039,28 +1052,28 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 	uint8_t data = 0;
 	switch (index) {
 	case 0:
-		data = translate49[ioport("49WAYX_P1")->read() >> 4];
+		data = translate49[m_io_49way_x[0]->read() >> 4];
 		break;
 	case 1:
-		data = translate49[ioport("49WAYY_P1")->read() >> 4];
+		data = translate49[m_io_49way_y[0]->read() >> 4];
 		break;
 	case 2:
-		data = translate49[ioport("49WAYX_P2")->read() >> 4];
+		data = translate49[m_io_49way_x[1]->read() >> 4];
 		break;
 	case 3:
-		data = translate49[ioport("49WAYY_P2")->read() >> 4];
+		data = translate49[m_io_49way_y[1]->read() >> 4];
 		break;
 	case 4:
-		data = translate49[ioport("49WAYX_P3")->read() >> 4];
+		data = translate49[m_io_49way_x[2]->read() >> 4];
 		break;
 	case 5:
-		data = translate49[ioport("49WAYY_P3")->read() >> 4];
+		data = translate49[m_io_49way_y[2]->read() >> 4];
 		break;
 	case 6:
-		data = translate49[ioport("49WAYX_P4")->read() >> 4];
+		data = translate49[m_io_49way_x[3]->read() >> 4];
 		break;
 	case 7:
-		data = translate49[ioport("49WAYY_P4")->read() >> 4];
+		data = translate49[m_io_49way_y[3]->read() >> 4];
 		break;
 	case 10:
 	case 11:
@@ -1096,7 +1109,7 @@ WRITE32_MEMBER(vegas_state::wheel_board_w)
 		switch (op)
 		{
 		case 0x0:
-			machine().output().set_value("wheel", arg); // target wheel angle. signed byte.
+			m_wheel_driver[0] = arg; // target wheel angle. signed byte.
 			m_wheel_force = int8_t(~arg);
 			break;
 
@@ -1124,7 +1137,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::keypad_r)
 			break;
 	}
 	if (row_sel <= 3) {
-		uint32_t bits = ioport((const char *)param)->read();
+		uint32_t bits = m_io_keypad->read();
 		bits >>= row_sel * 3;
 		return bits & 0x7;
 	}
@@ -1140,7 +1153,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::keypad_r)
 DECLARE_CUSTOM_INPUT_MEMBER(vegas_state::gearshift_r)
 {
 	// Check for gear change and save gear selection
-	uint32_t gear = ioport("GEAR")->read();
+	uint32_t gear = m_io_gearshift->read();
 	for (int i = 0; i < 4; i++)
 	{
 		if (gear & (1 << i))

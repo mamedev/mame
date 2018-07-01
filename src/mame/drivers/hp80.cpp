@@ -127,6 +127,9 @@ class hp85_state : public driver_device
 public:
 	hp85_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp85(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -166,10 +169,9 @@ public:
 	DECLARE_WRITE8_MEMBER(irl_w);
 	DECLARE_WRITE8_MEMBER(halt_w);
 
-	void hp85(machine_config &config);
 	void cpu_mem_map(address_map &map);
 	void rombank_mem_map(address_map &map);
-protected:
+
 	required_device<capricorn_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

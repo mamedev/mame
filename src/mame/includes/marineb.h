@@ -16,6 +16,15 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void springer(machine_config &config);
+	void wanted(machine_config &config);
+	void hopprobo(machine_config &config);
+	void marineb(machine_config &config);
+	void bcruzm12(machine_config &config);
+	void hoccer(machine_config &config);
+	void changes(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -57,13 +66,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(marineb_vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(wanted_vblank_irq);
 	void set_tilemap_scrolly( int cols );
-	void springer(machine_config &config);
-	void wanted(machine_config &config);
-	void hopprobo(machine_config &config);
-	void marineb(machine_config &config);
-	void bcruzm12(machine_config &config);
-	void hoccer(machine_config &config);
-	void changes(machine_config &config);
 	void marineb_io_map(address_map &map);
 	void marineb_map(address_map &map);
 	void wanted_io_map(address_map &map);

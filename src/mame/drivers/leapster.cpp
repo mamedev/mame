@@ -223,13 +223,16 @@ public:
 		m_cart(*this, "cartslot")
 		{ }
 
+	void leapster(machine_config &config);
 
+	void init_leapster();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
-	void init_leapster();
 
 	DECLARE_READ32_MEMBER(leapster_random_r)
 	{
@@ -241,10 +244,9 @@ public:
 		printf("leapster_aux004b_w %04x\n", data);
 	}
 
-	void leapster(machine_config &config);
 	void leapster_aux(address_map &map);
 	void leapster_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 

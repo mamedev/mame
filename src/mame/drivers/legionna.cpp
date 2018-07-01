@@ -1198,6 +1198,7 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
@@ -1251,6 +1252,7 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
@@ -1305,6 +1307,7 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IO_MAP(godzilla_sound_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
@@ -1361,6 +1364,7 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
@@ -1415,6 +1419,7 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
@@ -1470,6 +1475,7 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))

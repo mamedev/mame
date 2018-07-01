@@ -31,13 +31,6 @@ static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;
 class flyball_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_POT_ASSERT,
-		TIMER_POT_CLEAR,
-		TIMER_QUARTER
-	};
-
 	flyball_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -51,7 +44,14 @@ public:
 
 	void flyball(machine_config &config);
 
-protected:
+private:
+	enum
+	{
+		TIMER_POT_ASSERT,
+		TIMER_POT_CLEAR,
+		TIMER_QUARTER
+	};
+
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(scanline_r);
 	DECLARE_READ8_MEMBER(potsense_r);
@@ -80,7 +80,6 @@ protected:
 	void flyball_map(address_map &map);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

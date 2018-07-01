@@ -71,6 +71,16 @@
 #include "emu.h"
 #include "datamux.h"
 
+#define LOG_WARN        (1U<<1)   // Warnings
+#define LOG_READY       (1U<<2)   // READY line
+#define LOG_ACCESS      (1U<<3)   // Access to this GROM
+#define LOG_ADDRESS     (1U<<4)   // Address register
+#define LOG_WAITCOUNT   (1U<<5)   // Wait state counter
+
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE_NS(TI99_DATAMUX, bus::ti99::internal, datamux_device, "ti99_datamux", "TI-99 Databus multiplexer")
 
 namespace bus { namespace ti99 { namespace internal {
@@ -86,6 +96,7 @@ datamux_device::datamux_device(const machine_config &mconfig, const char *tag, d
 	m_gromport(*owner, TI99_GROMPORT_TAG),
 	m_ram16b(*owner, TI99_EXPRAM_TAG),
 	m_padram(*owner, TI99_PADRAM_TAG),
+	m_cpu(*owner, "maincpu"),
 	m_spacep(nullptr),
 	m_ready(*this),
 	m_addr_buf(0),
@@ -102,12 +113,6 @@ datamux_device::datamux_device(const machine_config &mconfig, const char *tag, d
 	m_grom_idle(true)
 {
 }
-
-#define TRACE_READY 0
-#define TRACE_ACCESS 0
-#define TRACE_ADDRESS 0
-#define TRACE_WAITCOUNT 0
-#define TRACE_SETUP 0
 
 /***************************************************************************
     DEVICE ACCESSOR FUNCTIONS
@@ -127,7 +132,7 @@ void datamux_device::read_all(address_space& space, uint16_t addr, uint8_t *valu
 			{
 				for (int i=0; i < 3; i++)
 				{
-					m_grom[i]->readz(space, addr, value);
+					m_grom[i]->readz(value);
 				}
 			}
 			// GROMport (GROMs)
@@ -160,7 +165,7 @@ void datamux_device::write_all(address_space& space, uint16_t addr, uint8_t valu
 		if (m_console_groms_present)
 		{
 			for (int i=0; i < 3; i++)
-				m_grom[i]->write(space, addr, value);
+				m_grom[i]->write(value);
 		}
 		// GROMport
 		m_gromport->write(space, addr, value);
@@ -203,18 +208,15 @@ void datamux_device::setaddress_all(address_space& space, uint16_t addr)
 	bool iscartrom = ((addr & 0xe000)==0x6000);
 
 	// Always deliver to GROM so that the select line may be cleared
-	int lines = (m_dbin==ASSERT_LINE)? 1 : 0;
-	if (a14==ASSERT_LINE) lines |= 2;
-	line_state select = isgrom? ASSERT_LINE : CLEAR_LINE;
-
-	if (select) m_grom_idle = false;
+	line_state gsq = isgrom? ASSERT_LINE : CLEAR_LINE;
+	if (isgrom) m_grom_idle = false;
 
 	if (m_console_groms_present)
 		for (int i=0; i < 3; i++)
-			m_grom[i]->set_lines(space, lines, select);
+			m_grom[i]->set_lines((line_state)m_dbin, a14, gsq);
 
 	// GROMport (GROMs)
-	m_gromport->set_gromlines(space, lines, select);
+	m_gromport->set_gromlines((line_state)m_dbin, a14, gsq);
 
 	// Sound chip and video chip do not require the address to be set before access
 
@@ -370,7 +372,7 @@ READ16_MEMBER( datamux_device::read )
 				// Reading the even address now (addr)
 				uint8_t hbyte = 0;
 				read_all(space, m_addr_buf, &hbyte);
-				if (TRACE_ACCESS) logerror("Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
+				LOGMASKED(LOG_ACCESS, "Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
 
 				value = (hbyte<<8) | m_latch;
 			}
@@ -417,7 +419,7 @@ WRITE16_MEMBER( datamux_device::write )
 		m_latch = (data >> 8) & 0xff;
 
 		// write odd byte
-		if (TRACE_ACCESS) logerror("datamux: write odd byte to address %04x <- %02x\n",  m_addr_buf+1, data & 0xff);
+		LOGMASKED(LOG_ACCESS, "Write odd byte to address %04x <- %02x\n",  m_addr_buf+1, data & 0xff);
 		write_all(space, m_addr_buf+1, data & 0xff);
 	}
 }
@@ -426,21 +428,21 @@ WRITE16_MEMBER( datamux_device::write )
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-SETOFFSET_MEMBER( datamux_device::setoffset )
+READ8_MEMBER( datamux_device::setoffset )
 {
-	m_addr_buf = offset << 1;
+	m_addr_buf = offset;
 	m_waitcount = 0;
 
-	if (TRACE_ADDRESS) logerror("set address %04x\n", m_addr_buf);
+	LOGMASKED(LOG_ADDRESS, "Set address %04x\n", m_addr_buf);
 
 	if ((m_addr_buf & 0xe000) == 0x0000)
 	{
-		return; // console ROM
+		return 0; // console ROM
 	}
 
 	if ((m_addr_buf & 0xfc00) == 0x8000)
 	{
-		return; // console RAM
+		return 0; // console RAM
 	}
 
 	// Initialize counter
@@ -467,6 +469,8 @@ SETOFFSET_MEMBER( datamux_device::setoffset )
 		ready_join();
 	}
 	else m_waitcount = 0;
+
+	return 0;
 }
 
 /*
@@ -478,10 +482,10 @@ WRITE_LINE_MEMBER( datamux_device::clock_in )
 	// return immediately if the datamux is currently inactive
 	if (m_waitcount>0)
 	{
-		if (TRACE_WAITCOUNT) logerror("datamux: wait count %d\n", m_waitcount);
+		LOGMASKED(LOG_WAITCOUNT, "Wait count %d\n", m_waitcount);
 		if (m_sysready==CLEAR_LINE)
 		{
-			if (TRACE_READY) logerror("datamux: stalled due to external READY=0\n");
+			LOGMASKED(LOG_READY, "Stalled due to external READY=0\n");
 			return;
 		}
 
@@ -499,7 +503,7 @@ WRITE_LINE_MEMBER( datamux_device::clock_in )
 				{
 					// read odd byte
 					read_all(*m_spacep, m_addr_buf+1, &m_latch);
-					if (TRACE_ACCESS) logerror("datamux: read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
+					LOGMASKED(LOG_ACCESS, "Read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
 					// do the setaddress for the even address
 					setaddress_all(*m_spacep, m_addr_buf);
 				}
@@ -522,7 +526,7 @@ WRITE_LINE_MEMBER( datamux_device::clock_in )
 					// do the setaddress for the even address
 					setaddress_all(*m_spacep, m_addr_buf);
 					// write even byte
-					if (TRACE_ACCESS) logerror("datamux: write even byte to address %04x <- %02x\n",  m_addr_buf, m_latch);
+					LOGMASKED(LOG_ACCESS, "Write even byte to address %04x <- %02x\n",  m_addr_buf, m_latch);
 					write_all(*m_spacep, m_addr_buf, m_latch);
 				}
 			}
@@ -541,15 +545,12 @@ void datamux_device::ready_join()
 WRITE_LINE_MEMBER( datamux_device::dbin_in )
 {
 	m_dbin = (line_state)state;
-	if (TRACE_ADDRESS) logerror("data bus in = %d\n", (m_dbin==ASSERT_LINE)? 1:0 );
+	LOGMASKED(LOG_ADDRESS, "Data bus in = %d\n", (m_dbin==ASSERT_LINE)? 1:0 );
 }
 
 WRITE_LINE_MEMBER( datamux_device::ready_line )
 {
-	if (TRACE_READY)
-	{
-		if (state != m_sysready) logerror("READY line from PBox = %d\n", state);
-	}
+	if (state != m_sysready) LOGMASKED(LOG_READY, "READY line from PBox = %d\n", state);
 	m_sysready = (line_state)state;
 	// Also propagate to CPU via driver
 	ready_join();
@@ -617,8 +618,7 @@ void datamux_device::device_reset(void)
 
 	// Get the pointer to the address space already here, because we cannot
 	// save that pointer to a savestate, and we need it on restore
-	cpu_device* cpu = downcast<cpu_device*>(machine().device("maincpu"));
-	m_spacep = &cpu->space(AS_PROGRAM);
+	m_spacep = &m_cpu->space(AS_PROGRAM);
 }
 
 void datamux_device::device_config_complete()

@@ -23,19 +23,19 @@ public:
 
 	void jvh2(machine_config &config);
 	void jvh(machine_config &config);
+
+	void init_jvh();
+
+private:
 	void escape_io(address_map &map);
 	void jvh_map(address_map &map);
 	void jvh_sub_map(address_map &map);
 	void movmastr_io(address_map &map);
-protected:
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	void init_jvh();
 };
 
 

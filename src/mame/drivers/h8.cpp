@@ -72,6 +72,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void h8(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(portf0_r);
 	DECLARE_WRITE8_MEMBER(portf0_w);
 	DECLARE_WRITE8_MEMBER(portf1_w);
@@ -82,10 +85,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_p);
 
-	void h8(machine_config &config);
 	void h8_io(address_map &map);
 	void h8_mem(address_map &map);
-private:
+
 	uint8_t m_digit;
 	uint8_t m_segment;
 	uint8_t m_irq_ctl;

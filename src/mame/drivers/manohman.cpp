@@ -153,13 +153,12 @@ public:
 
 	void manohman(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	void mem_map(address_map &map);
 
 	IRQ_CALLBACK_MEMBER(iack_handler);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<pit68230_device> m_pit;

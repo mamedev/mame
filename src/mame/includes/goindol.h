@@ -24,6 +24,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void goindol(machine_config &config);
+	void init_goindol();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_fg_scrolly;
@@ -48,7 +52,6 @@ public:
 	DECLARE_WRITE8_MEMBER(prot_fcb0_w);
 	DECLARE_WRITE8_MEMBER(goindol_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(goindol_bg_videoram_w);
-	void init_goindol();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
@@ -59,7 +62,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void goindol(machine_config &config);
 	void goindol_map(address_map &map);
 	void sound_map(address_map &map);
 };

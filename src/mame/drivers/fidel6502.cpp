@@ -477,6 +477,51 @@ public:
 		m_div_config(*this, "div_config")
 	{ }
 
+	void csc(machine_config &config);
+	void su9(machine_config &config);
+	void rsc(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq);
+
+	void eas(machine_config &config);
+	void eag(machine_config &config);
+	void pc(machine_config &config);
+	void init_eag();
+
+	void sc9b(machine_config &config);
+	void sc9c(machine_config &config);
+	void sc9d(machine_config &config);
+	void playmatic(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(sc9c_cpu_freq);
+
+	void sc12_map(address_map &map);
+	void sc12(machine_config &config);
+	void sc12b(machine_config &config);
+
+	void as12(machine_config &config);
+
+	void fexcel(machine_config &config);
+	void fexcelb(machine_config &config);
+	void fexcel4(machine_config &config);
+	void fexceld(machine_config &config);
+	void fexcelv(machine_config &config);
+	void fexcelp(machine_config &config);
+	void granits(machine_config &config);
+	void fdes2100(machine_config &config);
+	void fdes2000(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
+
+	void fdes2000d(machine_config &config);
+	void fdes2100d(machine_config &config);
+	void init_fdesdis();
+
+	void fphantom(machine_config &config);
+	void init_fphantom();
+
+	void chesster(machine_config &config);
+	void kishon(machine_config &config);
+	void init_chesster();
+
+private:
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
 	optional_memory_bank m_rombank;
@@ -492,6 +537,7 @@ public:
 	DECLARE_READ8_MEMBER(div_trampoline_r);
 	void div_set_cpu_freq(offs_t offset);
 	void div_trampoline(address_map &map);
+	u16 m_div_status;
 
 	// CSC, SU9, RSC
 	void csc_prepare_display();
@@ -508,14 +554,10 @@ public:
 	DECLARE_READ_LINE_MEMBER(csc_pia1_ca1_r);
 	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
 	DECLARE_MACHINE_RESET(su9);
-	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq);
 	void su9_set_cpu_freq();
 	void csc_map(address_map &map);
 	void su9_map(address_map &map);
 	void rsc_map(address_map &map);
-	void csc(machine_config &config);
-	void su9(machine_config &config);
-	void rsc(machine_config &config);
 
 	// EAS, EAG, PC
 	void eas_prepare_display();
@@ -525,13 +567,9 @@ public:
 	DECLARE_WRITE8_MEMBER(eas_ppi_porta_w);
 	DECLARE_READ8_MEMBER(eas_ppi_portb_r);
 	DECLARE_WRITE8_MEMBER(eas_ppi_portc_w);
-	void init_eag();
 	void eas_map(address_map &map);
 	void eag_map(address_map &map);
 	void pc_map(address_map &map);
-	void eas(machine_config &config);
-	void eag(machine_config &config);
-	void pc(machine_config &config);
 
 	// SC9
 	void sc9_prepare_display();
@@ -540,21 +578,13 @@ public:
 	DECLARE_READ8_MEMBER(sc9_input_r);
 	DECLARE_READ8_MEMBER(sc9d_input_r);
 	DECLARE_MACHINE_RESET(sc9c);
-	DECLARE_INPUT_CHANGED_MEMBER(sc9c_cpu_freq);
 	void sc9c_set_cpu_freq();
 	void sc9_map(address_map &map);
 	void sc9d_map(address_map &map);
-	void sc9b(machine_config &config);
-	void sc9c(machine_config &config);
-	void sc9d(machine_config &config);
-	void playmatic(machine_config &config);
 
 	// SC12
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
-	void sc12_map(address_map &map);
-	void sc12(machine_config &config);
-	void sc12b(machine_config &config);
 
 	// AS12
 	void as12_prepare_display();
@@ -562,10 +592,8 @@ public:
 	DECLARE_WRITE8_MEMBER(as12_led_w);
 	DECLARE_READ8_MEMBER(as12_input_r);
 	void as12_map(address_map &map);
-	void as12(machine_config &config);
 
 	// Excellence
-	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
 	DECLARE_READ8_MEMBER(fexcelv_speech_r);
 	DECLARE_WRITE8_MEMBER(fexcel_ttl_w);
 	DECLARE_READ8_MEMBER(fexcelb_ttl_r);
@@ -573,40 +601,46 @@ public:
 	void fexcel_map(address_map &map);
 	void fexcelb_map(address_map &map);
 	void fexcelp_map(address_map &map);
-	void fexcel(machine_config &config);
-	void fexcelb(machine_config &config);
-	void fexcel4(machine_config &config);
-	void fexceld(machine_config &config);
-	void fexcelv(machine_config &config);
-	void fexcelp(machine_config &config);
-	void granits(machine_config &config);
-	void fdes2100(machine_config &config);
-	void fdes2000(machine_config &config);
 
 	// Designer Display
 	DECLARE_WRITE8_MEMBER(fdesdis_control_w);
 	DECLARE_WRITE8_MEMBER(fdesdis_lcd_w);
 	DECLARE_READ8_MEMBER(fdesdis_input_r);
-	void init_fdesdis();
 	void fdesdis_map(address_map &map);
-	void fdes2000d(machine_config &config);
-	void fdes2100d(machine_config &config);
 
 	// Phantom
 	DECLARE_MACHINE_RESET(fphantom);
-	void init_fphantom();
 	void fphantom_map(address_map &map);
-	void fphantom(machine_config &config);
 
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
 	DECLARE_WRITE8_MEMBER(kishon_control_w);
-	void init_chesster();
 	void chesster_map(address_map &map);
 	void kishon_map(address_map &map);
-	void chesster(machine_config &config);
-	void kishon(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
+
+
+// machine start/reset
+
+void fidel6502_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// register for savestates
+	save_item(NAME(m_div_status));
+}
+
+void fidel6502_state::machine_reset()
+{
+	fidelbase_state::machine_reset();
+
+	m_div_status = ~0;
+}
+
 
 
 /***************************************************************************
@@ -619,13 +653,18 @@ public:
 
 void fidel6502_state::div_set_cpu_freq(offs_t offset)
 {
-	if (m_div_config->read() & 2)
+	static const u16 mask = 0x6000;
+	u16 status = (offset & mask) | m_div_config->read();
+
+	if (status != m_div_status && status & 2)
 	{
 		// when a13/a14 is high, XTAL goes through divider(s)
 		// (depending on factory-set jumper, either one or two 7474)
-		float div = (m_div_config->read() & 1) ? 0.25 : 0.5;
-		m_maincpu->set_clock_scale((offset & 0x6000) ? div : 1.0);
+		float div = (status & 1) ? 0.25 : 0.5;
+		m_maincpu->set_clock_scale((offset & mask) ? div : 1.0);
 	}
+
+	m_div_status = status;
 }
 
 WRITE8_MEMBER(fidel6502_state::div_trampoline_w)
@@ -699,7 +738,7 @@ void fidel6502_state::su9_set_cpu_freq()
 
 MACHINE_RESET_MEMBER(fidel6502_state, su9)
 {
-	fidelbase_state::machine_reset();
+	fidel6502_state::machine_reset();
 	su9_set_cpu_freq();
 }
 
@@ -951,7 +990,7 @@ void fidel6502_state::sc9c_set_cpu_freq()
 
 MACHINE_RESET_MEMBER(fidel6502_state, sc9c)
 {
-	fidelbase_state::machine_reset();
+	fidel6502_state::machine_reset();
 	sc9c_set_cpu_freq();
 }
 
@@ -1196,7 +1235,7 @@ void fidel6502_state::init_fdesdis()
 
 MACHINE_RESET_MEMBER(fidel6502_state, fphantom)
 {
-	fidelbase_state::machine_reset();
+	fidel6502_state::machine_reset();
 	m_rombank->set_entry(0);
 }
 

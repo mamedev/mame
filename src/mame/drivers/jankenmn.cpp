@@ -173,7 +173,7 @@ public:
 
 	void jankenmn(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(lamps3_w);
@@ -183,7 +183,6 @@ protected:
 	void jankenmn_map(address_map &map);
 	void jankenmn_port_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	output_finder<2> m_digits;
 	output_finder<16> m_lamps;

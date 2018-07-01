@@ -476,6 +476,7 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)
 	MCFG_DEVICE_PROGRAM_MAP(kothello_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 

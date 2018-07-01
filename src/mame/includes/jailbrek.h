@@ -27,6 +27,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void jailbrek(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -61,7 +64,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(interrupt_nmi);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void jailbrek(machine_config &config);
 	void jailbrek_map(address_map &map);
 	void vlm_map(address_map &map);
 };

@@ -779,6 +779,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
 	MCFG_DEVICE_PROGRAM_MAP(zeroteam_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

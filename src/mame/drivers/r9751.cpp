@@ -97,6 +97,11 @@ public:
 	{
 	}
 
+	void r9751(machine_config &config);
+
+	void init_r9751();
+
+private:
 	void kbd_put(u8 data);
 
 	DECLARE_READ32_MEMBER(r9751_mmio_5ff_r);
@@ -111,11 +116,8 @@ public:
 	DECLARE_READ8_MEMBER(pdc_dma_r);
 	DECLARE_WRITE8_MEMBER(pdc_dma_w);
 
-	void init_r9751();
-
-	void r9751(machine_config &config);
 	void r9751_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<pdc_device> m_pdc;
 	required_device<smioc_device> m_smioc;

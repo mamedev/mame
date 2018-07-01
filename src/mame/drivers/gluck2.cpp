@@ -214,6 +214,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram") { }
 
+	void gluck2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -230,7 +233,6 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gluck2(machine_config &config);
 	void gluck2_map(address_map &map);
 };
 

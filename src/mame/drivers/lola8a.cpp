@@ -49,6 +49,9 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
+	void lola8a(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(lola8a_port_a_r);
 	DECLARE_WRITE8_MEMBER(lola8a_port_b_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
@@ -57,10 +60,9 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void lola8a(machine_config &config);
 	void lola8a_io(address_map &map);
 	void lola8a_mem(address_map &map);
-private:
+
 	uint8_t m_portb;
 	virtual void machine_reset() override { m_maincpu->set_pc(0x8000); }
 	required_device<cpu_device> m_maincpu;

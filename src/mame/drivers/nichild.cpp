@@ -49,6 +49,9 @@ public:
 	{
 	}
 
+	void nichild(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(gfx_r);
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
@@ -59,16 +62,13 @@ public:
 	DECLARE_WRITE8_MEMBER(gfxbank_w);
 	INTERRUPT_GEN_MEMBER(vdp_irq);
 
-	void nichild(machine_config &config);
-
 	void nichild_io(address_map &map);
 	void nichild_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<v9938_device> m_v9938;
 	required_region_ptr<uint8_t> m_gfxrom;

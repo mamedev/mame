@@ -5,11 +5,11 @@
     Dynax blitter, "revision 2" (TC17G032AP-0246 custom DIP64)
 
 **********************************************************************/
+#ifndef MAME_VIDEO_DYNAX_BLITTER_REV2_H
+#define MAME_VIDEO_DYNAX_BLITTER_REV2_H
 
 #pragma once
 
-#ifndef MAME_VIDEO_DYNAX_BLITTER_REV2_H
-#define MAME_VIDEO_DYNAX_BLITTER_REV2_H
 
 //**************************************************************************
 //  CONFIGURATION MACROS

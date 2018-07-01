@@ -123,10 +123,11 @@ public:
 		m_watchdog(*this, "watchdog")
 	{ }
 
-	void init_looping();
 	void looping(machine_config &config);
 
-protected:
+	void init_looping();
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(looping_videoram_w);
@@ -164,7 +165,6 @@ protected:
 	void looping_sound_io_map(address_map &map);
 	void looping_sound_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;

@@ -27,7 +27,7 @@ public:
 	}
 
 	void harriet(machine_config &config);
-protected:
+private:
 	DECLARE_READ8_MEMBER(zpram_r);
 	DECLARE_WRITE8_MEMBER(zpram_w);
 	DECLARE_READ8_MEMBER(unk_status_r);

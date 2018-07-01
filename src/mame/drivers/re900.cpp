@@ -98,6 +98,12 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void re900(machine_config &config);
+	void bs94(machine_config &config);
+
+	void init_re900();
+
+private:
 	// common
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_WRITE8_MEMBER(cpu_port_0_w);
@@ -109,13 +115,9 @@ public:
 	DECLARE_WRITE8_MEMBER(re_mux_port_A_w);
 	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
 
-	void init_re900();
-	void re900(machine_config &config);
-	void bs94(machine_config &config);
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 
 	required_device<cpu_device> m_maincpu;

@@ -429,6 +429,12 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
+	void magicard(machine_config &config);
+	void hotslots(machine_config &config);
+
+	void init_magicard();
+
+private:
 	required_shared_ptr<uint16_t> m_magicram;
 	required_shared_ptr<uint16_t> m_magicramb;
 	required_shared_ptr<uint16_t> m_pcab_vregs;
@@ -459,7 +465,6 @@ public:
 	DECLARE_WRITE16_MEMBER(scc68070_dma_ch2_w);
 	DECLARE_READ16_MEMBER(scc68070_mmu_r);
 	DECLARE_WRITE16_MEMBER(scc68070_mmu_w);
-	void init_magicard();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -467,8 +472,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void magicard(machine_config &config);
-	void hotslots(machine_config &config);
 	void hotslots_mem(address_map &map);
 	void magicard_mem(address_map &map);
 	void ramdac_map(address_map &map);
