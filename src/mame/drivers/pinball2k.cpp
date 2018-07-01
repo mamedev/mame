@@ -74,9 +74,9 @@ private:
 	uint8_t m_mediagx_config_regs[256];
 
 	//uint8_t m_controls_data;
-	uint8_t m_parallel_pointer;
-	uint8_t m_parallel_latched;
-	uint32_t m_parport;
+	//uint8_t m_parallel_pointer;
+	//uint8_t m_parallel_latched;
+	//uint32_t m_parport;
 	//int m_control_num;
 	//int m_control_num2;
 	//int m_control_read;

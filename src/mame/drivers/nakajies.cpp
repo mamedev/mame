@@ -332,7 +332,6 @@ private:
 	uint8_t   m_irq_active;
 
 	uint8_t   m_lcd_memory_start;
-	uint8_t*  m_ram_base1;
 
 	uint8_t   m_matrix;
 

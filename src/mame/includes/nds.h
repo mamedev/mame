@@ -93,9 +93,9 @@ private:
 
 	// DMA
 	emu_timer *m_dma_timer[8];
-	uint32_t m_dma_src[8];
-	uint32_t m_dma_dst[8];
-	uint16_t m_dma_cnt[8];
+	//uint32_t m_dma_src[8];
+	//uint32_t m_dma_dst[8];
+	//uint16_t m_dma_cnt[8];
 
 	// Timers
 	uint32_t m_timer_regs[8];

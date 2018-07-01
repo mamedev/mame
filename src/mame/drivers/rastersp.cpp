@@ -136,7 +136,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	std::unique_ptr<uint8_t[]>   m_nvram8;
-	uint8_t   m_io_reg;
 	uint8_t   m_irq_status;
 	uint32_t  m_dpyaddr;
 	std::unique_ptr<uint16_t[]> m_paletteram;

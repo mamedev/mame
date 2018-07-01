@@ -406,16 +406,16 @@ void nmk16_tomagic_state::tomagic_map(address_map &map)
 	map(0x080002, 0x080003).portr("IN1");
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
-	map(0x080014, 0x080015).w(FUNC(nmk16_state::nmk_flipscreen_w));
-	map(0x080018, 0x080019).w(FUNC(nmk16_state::nmk_tilebank_w));
+	map(0x080014, 0x080015).w(FUNC(nmk16_tomagic_state::nmk_flipscreen_w));
+	map(0x080018, 0x080019).w(FUNC(nmk16_tomagic_state::nmk_tilebank_w));
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
 	map(0x08c200, 0x08c3ff).writeonly().share("scrollramy");
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_tomagic_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0x094001, 0x094001).w(m_oki[0], FUNC(okim6295_device::write));
 	map(0x094003, 0x094003).r(m_oki[0], FUNC(okim6295_device::read));
-	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
+	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(FUNC(nmk16_tomagic_state::nmk_txvideoram_w)).share("nmk_txvideoram");
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
 }
 
