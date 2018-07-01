@@ -146,7 +146,6 @@ private:
 	int m_acia_irq;
 
 	// keyboard
-	int m_kbhalt;
 	int m_kc;
 
 	// GPIB

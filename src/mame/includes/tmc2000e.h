@@ -59,7 +59,6 @@ private:
 
 	/* keyboard state */
 	int m_keylatch;         /* key latch */
-	int m_reset;            /* reset activated */
 	void tmc2000e_io_map(address_map &map);
 	void tmc2000e_map(address_map &map);
 

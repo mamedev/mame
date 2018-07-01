@@ -64,7 +64,6 @@ private:
 	required_ioport m_pc0;
 	required_memory_region m_charrom;
 
-	ioport_port *m_key[8];
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	inline void plot_sprite_part( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t pat, uint8_t col, uint8_t screen_sprite_start_line );

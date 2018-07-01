@@ -717,7 +717,7 @@ MACHINE_CONFIG_START(snesb_state::kinstb)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
 	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snesb_state, snes_open_bus_r))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */

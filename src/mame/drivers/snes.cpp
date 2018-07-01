@@ -1353,7 +1353,7 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
 	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_console_state, snes_open_bus_r))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SNES_CONTROL_PORT_ADD("ctrl1", snes_control_port_devices, "joypad")

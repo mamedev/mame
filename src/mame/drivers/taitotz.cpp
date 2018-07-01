@@ -590,7 +590,7 @@ private:
 	uint32_t m_video_reg;
 	uint32_t m_scr_base;
 
-	uint64_t m_video_fifo_mem[4];
+	//uint64_t m_video_fifo_mem[4];
 
 	uint16_t m_io_share_ram[0x2000];
 
@@ -605,7 +605,6 @@ private:
 
 
 	uint32_t m_reg105;
-	int m_count;
 
 	std::unique_ptr<taitotz_renderer> m_renderer;
 

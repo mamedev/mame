@@ -872,7 +872,7 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nss_state, nss_vblank_irq))
 
 	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, nss_state, snes_open_bus_r))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// NSS

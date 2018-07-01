@@ -78,9 +78,6 @@ private:
 	DECLARE_READ8_MEMBER( tdv2324_main_io_e6 );
 	DECLARE_WRITE8_MEMBER( tdv2324_main_io_e2 );
 
-	uint8_t m_sub_status;
-	uint8_t m_sub_data;
-
 	// video state
 	required_shared_ptr<uint8_t> m_video_ram;
 	void tdv2324_fdc_mem(address_map &map);

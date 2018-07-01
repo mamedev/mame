@@ -371,9 +371,6 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
-	uint8_t m_keyboard_line;
-	uint8_t m_floppy_control;
-
 	void swyft_mem(address_map &map);
 
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
