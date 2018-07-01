@@ -181,6 +181,14 @@ public:
 		m_in0(*this, "IN0")
 	{ }
 
+	void skattv(machine_config &config);
+	void quickjac(machine_config &config);
+	void fashiong(machine_config &config);
+	void fstation(machine_config &config);
+	void funland(machine_config &config);
+	void skattva(machine_config &config);
+
+private:
 	required_device<microtouch_device> m_microtouch;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
@@ -200,12 +208,7 @@ public:
 	IRQ_CALLBACK_MEMBER(duart_iack_handler);
 	//INTERRUPT_GEN_MEMBER(adp_int);
 	void skattva_nvram_init(nvram_device &nvram, void *base, size_t size);
-	void skattv(machine_config &config);
-	void quickjac(machine_config &config);
-	void fashiong(machine_config &config);
-	void fstation(machine_config &config);
-	void funland(machine_config &config);
-	void skattva(machine_config &config);
+
 	void adp_hd63484_map(address_map &map);
 	void fashiong_hd63484_map(address_map &map);
 	void fstation_hd63484_map(address_map &map);
