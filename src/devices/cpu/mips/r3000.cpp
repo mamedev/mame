@@ -211,7 +211,10 @@ r3081_device::r3081_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 iop_device::iop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, SONYPS2_IOP, tag, owner, clock, CHIP_TYPE_IOP) { }
+	: r3000_device(mconfig, SONYPS2_IOP, tag, owner, clock, CHIP_TYPE_IOP)
+{
+	m_endianness = ENDIANNESS_LITTLE;
+}
 
 
 //-------------------------------------------------
@@ -384,7 +387,6 @@ void r3000_device::device_start()
 	save_item(NAME(m_dcache));
 }
 
-
 //-------------------------------------------------
 //  device_post_load -
 //-------------------------------------------------
@@ -416,7 +418,7 @@ void r3000_device::device_reset()
 void iop_device::device_reset()
 {
 	r3000_device::device_reset();
-	m_cpr[0][COP0_PRId] = 0x2;
+	m_cpr[0][COP0_PRId] = 0x1f;
 }
 
 
@@ -506,31 +508,43 @@ inline uint32_t r3000_device::readop(offs_t pc)
 
 uint8_t r3000_device::readmem(offs_t offset)
 {
+	if (SR & SR_IsC)
+		return 0;
 	return m_program->read_byte(offset);
 }
 
 uint16_t r3000_device::readmem_word(offs_t offset)
 {
+	if (SR & SR_IsC)
+		return 0;
 	return m_program->read_word(offset);
 }
 
 uint32_t r3000_device::readmem_dword(offs_t offset)
 {
+	if (SR & SR_IsC)
+		return 0;
 	return m_program->read_dword(offset);
 }
 
 void r3000_device::writemem(offs_t offset, uint8_t data)
 {
+	if (SR & SR_IsC)
+		return;
 	m_program->write_byte(offset, data);
 }
 
 void r3000_device::writemem_word(offs_t offset, uint16_t data)
 {
+	if (SR & SR_IsC)
+		return;
 	m_program->write_word(offset, data);
 }
 
 void r3000_device::writemem_dword(offs_t offset, uint32_t data)
 {
+	if (SR & SR_IsC)
+		return;
 	m_program->write_dword(offset, data);
 }
 
@@ -624,7 +638,7 @@ void r3000_device::writecache_le_dword(offs_t offset, uint32_t data)
 inline void r3000_device::generate_exception(int exception)
 {
 	// set the exception PC
-	m_cpr[0][COP0_EPC] = m_pc;
+	m_cpr[0][COP0_EPC] = (exception == EXCEPTION_SYSCALL ? m_ppc : m_pc);
 
 	// put the cause in the low 8 bits and clear the branch delay flag
 	CAUSE = (CAUSE & ~0x800000ff) | (exception << 2);
@@ -641,10 +655,11 @@ inline void r3000_device::generate_exception(int exception)
 	SR = (SR & 0xffffffc0) | ((SR << 2) & 0x3c);
 
 	// based on the BEV bit, we either go to ROM or RAM
-	m_pc = (SR & SR_BEV) ? 0xbfc00000 : 0x80000000;
+	bool bev = (SR & SR_BEV) ? true : false;
+	m_pc = bev ? 0xbfc00000 : 0x80000000;
 
-	// most exceptions go to offset 0x180, except for TLB stuff
-	if (exception >= EXCEPTION_TLBMOD && exception <= EXCEPTION_TLBSTORE)
+	// most exceptions go to offset 0x180, except for TLB stuff and syscall (if BEV is unset)
+	if ((exception >= EXCEPTION_TLBMOD && exception <= EXCEPTION_TLBSTORE) || !bev)
 		m_pc += 0x80;
 	else
 		m_pc += 0x180;

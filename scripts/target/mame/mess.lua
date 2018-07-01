@@ -3063,6 +3063,10 @@ files {
 	MAME_DIR .. "src/mame/drivers/ps2sony.cpp",
 	MAME_DIR .. "src/mame/machine/ps2timer.cpp",
 	MAME_DIR .. "src/mame/machine/ps2timer.h",
+	MAME_DIR .. "src/mame/machine/ioptimer.cpp",
+	MAME_DIR .. "src/mame/machine/ioptimer.h",
+	MAME_DIR .. "src/mame/machine/iopdma.cpp",
+	MAME_DIR .. "src/mame/machine/iopdma.h",
 }
 
 createMESSProjects(_target, _subtarget, "sord")

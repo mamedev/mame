@@ -130,6 +130,7 @@ void ps2_timer_device::update_count()
     {
         m_elapsed_time -= attotime::from_ticks(ticks, frequency);
         m_count += ticks;
+    	m_count &= 0xffff;
     }
 }
 

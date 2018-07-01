@@ -159,6 +159,8 @@ iLinkSGUID=0x--------
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
 #include "machine/ps2timer.h"
+#include "machine/ioptimer.h"
+#include "machine/iopdma.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -168,7 +170,10 @@ public:
 	ps2sony_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_iop(*this, "iop")
 		, m_timer(*this, "timer%u", 0U)
+		, m_iop_timer(*this, "iop_timer")
+		, m_iop_dma(*this, "iop_dma")
 		, m_screen(*this, "screen")
 		, m_iop_ram(*this, "iop_ram")
         , m_sp_ram(*this, "sp_ram")
@@ -210,25 +215,46 @@ protected:
     DECLARE_WRITE32_MEMBER(dmac_w);
     DECLARE_READ32_MEMBER(intc_r);
     DECLARE_WRITE32_MEMBER(intc_w);
-    DECLARE_READ32_MEMBER(sif_smflg_r);
-    DECLARE_WRITE32_MEMBER(sif_smflg_w);
+    DECLARE_READ32_MEMBER(sif_r);
+    DECLARE_WRITE32_MEMBER(sif_w);
     DECLARE_WRITE8_MEMBER(debug_w);
     DECLARE_READ32_MEMBER(unk_f430_r);
     DECLARE_WRITE32_MEMBER(unk_f430_w);
     DECLARE_READ32_MEMBER(unk_f440_r);
     DECLARE_WRITE32_MEMBER(unk_f440_w);
     DECLARE_READ32_MEMBER(unk_f520_r);
+    DECLARE_READ64_MEMBER(board_id_r);
+
+    DECLARE_WRITE64_MEMBER(ee_iop_ram_w);
+    DECLARE_READ64_MEMBER(ee_iop_ram_r);
+    DECLARE_READ32_MEMBER(iop_intc_r);
+    DECLARE_WRITE32_MEMBER(iop_intc_w);
+    DECLARE_READ32_MEMBER(iop_sif_r);
+    DECLARE_WRITE32_MEMBER(iop_sif_w);
+    DECLARE_READ32_MEMBER(iop_dma_ctrl0_r);
+    DECLARE_WRITE32_MEMBER(iop_dma_ctrl0_w);
+    DECLARE_READ32_MEMBER(iop_dma_ctrl1_r);
+    DECLARE_WRITE32_MEMBER(iop_dma_ctrl1_w);
+    DECLARE_WRITE32_MEMBER(iop_debug_w);
+
+	DECLARE_WRITE_LINE_MEMBER(iop_timer_irq);
 
 	void check_irq0();
 	void raise_interrupt(int line);
+
+	void check_iop_irq();
+	void raise_iop_interrupt(int line);
 
     void mem_map(address_map &map);
     void iop_map(address_map &map);
 
 	required_device<cpu_device>		m_maincpu;
+	required_device<iop_device>		m_iop;
 	required_device_array<ps2_timer_device, 4> m_timer;
+	required_device<iop_timer_device> m_iop_timer;
+	required_device<iop_dma_device> m_iop_dma;
 	required_device<screen_device>	m_screen;
-	required_shared_ptr<uint64_t>	m_iop_ram;
+	required_shared_ptr<uint32_t>	m_iop_ram;
     required_shared_ptr<uint64_t>	m_sp_ram;
 	required_shared_ptr<uint64_t>	m_vu0_imem;
 	required_shared_ptr<uint64_t>	m_vu0_dmem;
@@ -252,6 +278,14 @@ protected:
 	uint64_t m_ipu_out_fifo[0x1000];
 	uint64_t m_ipu_out_fifo_index;
 
+	uint32_t m_sif_ms_mailbox;
+	uint32_t m_sif_sm_mailbox;
+	uint32_t m_sif_ms_flag;
+	uint32_t m_sif_sm_flag;
+	uint32_t m_sif_ctrl;
+
+	uint32_t m_dmac_d5_chcr;
+
 	enum
 	{
 		INT_GS = 0,
@@ -273,6 +307,10 @@ protected:
 
 	uint32_t m_istat;
 	uint32_t m_imask;
+
+	uint32_t m_iop_istat;
+	uint32_t m_iop_imask;
+	uint32_t m_iop_ienable;
 
 	emu_timer *m_vblank_timer;
 };
@@ -428,6 +466,7 @@ READ32_MEMBER(ps2sony_state::dmac_channel_r)
 			logerror("%s: dmac_channel_r: D4_TADR (%08x)\n", machine().describe_context(), ret);
 			break;
 		case 0xc000/8: /* D5_CHCR */
+			ret = m_dmac_d5_chcr;
 			logerror("%s: dmac_channel_r: D5_CHCR (%08x)\n", machine().describe_context(), ret);
 			break;
 		case 0xc010/8: /* D5_MADR */
@@ -493,6 +532,8 @@ READ32_MEMBER(ps2sony_state::dmac_channel_r)
 
 WRITE32_MEMBER(ps2sony_state::dmac_channel_w)
 {
+	static const char* mode_strings[4] = { "Normal", "Chain", "Interleave", "Undefined" };
+
 	switch (offset + 0x8000/8)
 	{
 		case 0x8000/8: /* D0_CHCR */
@@ -571,7 +612,9 @@ WRITE32_MEMBER(ps2sony_state::dmac_channel_w)
 			logerror("%s: dmac_channel_w: D4_TADR = %08x\n", machine().describe_context(), data);
 			break;
 		case 0xc000/8: /* D5_CHCR */
-			logerror("%s: dmac_channel_w: D5_CHCR = %08x\n", machine().describe_context(), data);
+			logerror("%s: dmac_channel_w: D5_CHCR = %08x (DIR=%s Memory, MOD=%s, ASP=%d, TTE=%s DMAtag, \n", machine().describe_context(), data, BIT(data, 0) ? "From" : "To", mode_strings[(data >> 1) & 3], (data >> 3) & 3, BIT(data, 6) ? "Transfers" : "Does not transfer");
+			logerror("%s:                                 TIE=%d, START=%d, TAG=%04x\n", machine().describe_context(), BIT(data, 7), BIT(data, 8), data >> 16);
+			COMBINE_DATA(&m_dmac_d5_chcr);
 			break;
 		case 0xc010/8: /* D5_MADR */
 			logerror("%s: dmac_channel_w: D5_MADR = %08x\n", machine().describe_context(), data);
@@ -875,11 +918,87 @@ void ps2sony_state::check_irq0()
 	m_maincpu->set_input_line(MIPS3_IRQ0, (m_istat & m_imask) ? ASSERT_LINE : CLEAR_LINE);
 }
 
+void ps2sony_state::check_iop_irq()
+{
+	bool active = (m_iop_ienable && (m_iop_istat & m_iop_imask));
+	logerror("%s: check_iop_irq: %d\n", machine().describe_context(), active ? 1 : 0);
+	m_iop->set_input_line(R3000_IRQ0, active ? ASSERT_LINE : CLEAR_LINE);
+}
+
 void ps2sony_state::raise_interrupt(int line)
 {
-	printf("raise_interrupt: %d\n", (1 << line));
 	m_istat |= (1 << line);
 	check_irq0();
+}
+
+void ps2sony_state::raise_iop_interrupt(int line)
+{
+	logerror("%s: raise_iop_interrupt: %d\n", machine().describe_context(), line);
+	m_iop_istat |= (1 << line);
+	check_iop_irq();
+}
+
+WRITE_LINE_MEMBER(ps2sony_state::iop_timer_irq)
+{
+	logerror("%s: iop_timer_irq: %d\n", machine().describe_context(), state);
+	if (state)
+		raise_iop_interrupt(16);
+}
+
+WRITE32_MEMBER(ps2sony_state::iop_debug_w)
+{
+	//printf("%08x ", data);
+}
+
+READ32_MEMBER(ps2sony_state::iop_intc_r)
+{
+	uint32_t ret = 0;
+	switch (offset)
+	{
+		case 0: // I_STAT
+			ret = m_iop_istat;
+			logerror("%s: iop_intc_r: I_STAT %08x\n", machine().describe_context(), ret);
+			break;
+		case 1: // I_MASK
+			ret = m_iop_imask;
+			logerror("%s: iop_intc_r: I_MASK %08x\n", machine().describe_context(), ret);
+			break;
+		case 2: // I_ENABLE
+			ret = m_iop_ienable;
+			m_iop_ienable = 0;
+			check_iop_irq();
+			logerror("%s: iop_intc_r: I_ENABLE %08x\n", machine().describe_context(), ret);
+			break;
+		default:
+			logerror("%s: iop_intc_r: Unknown offset %08x\n", machine().describe_context(), 0x1f801070 + (offset << 2));
+			break;
+	}
+	return ret;
+}
+
+WRITE32_MEMBER(ps2sony_state::iop_intc_w)
+{
+	switch (offset)
+	{
+		case 0: // I_STAT
+			logerror("%s: iop_intc_w: I_STAT = %08x\n", machine().describe_context(), data);
+			m_iop_istat &= data;
+			check_iop_irq();
+			break;
+		case 1: // I_MASK
+			logerror("%s: iop_intc_w: I_MASK = %08x\n", machine().describe_context(), data);
+			m_iop_imask = data;
+			check_iop_irq();
+			break;
+		case 2: // I_ENABLE
+			logerror("%s: iop_intc_w: I_ENABLE = %08x\n", machine().describe_context(), data);
+			m_iop_ienable = BIT(data, 0);
+			check_iop_irq();
+			break;
+		default:
+			logerror("%s: iop_intc_w: Unknown offset %08x = %08x\n", machine().describe_context(), 0x1f801070 + (offset << 2), data);
+			break;
+	}
 }
 
 READ32_MEMBER(ps2sony_state::intc_r)
@@ -887,7 +1006,7 @@ READ32_MEMBER(ps2sony_state::intc_r)
 	switch (offset)
 	{
 		case 0: // I_STAT
-			logerror("%s: intc_r: I_STAT %08x\n", machine().describe_context(), m_istat);
+			//logerror("%s: intc_r: I_STAT %08x\n", machine().describe_context(), m_istat);
 			return m_istat;
 		case 2: // I_MASK
 			logerror("%s: intc_r: I_MASK %08x\n", machine().describe_context(), m_imask);
@@ -909,7 +1028,7 @@ WRITE32_MEMBER(ps2sony_state::intc_w)
 			break;
 		case 2: // I_MASK
 			logerror("%s: intc_w: I_MASK = %08x\n", machine().describe_context(), data);
-			COMBINE_DATA(&m_imask);
+			m_imask ^= data & 0x7fff;
 			check_irq0();
 			break;
 		default:
@@ -918,26 +1037,162 @@ WRITE32_MEMBER(ps2sony_state::intc_w)
 	}
 }
 
-READ32_MEMBER(ps2sony_state::sif_smflg_r)
+READ32_MEMBER(ps2sony_state::iop_sif_r)
 {
-	uint32_t ret = 0x00010000;
-	logerror("%s: sif_smflg_r (%08x)\n", machine().describe_context(), ret);
+	uint32_t ret = 0;
+	switch (offset)
+	{
+		case 0:
+			ret = m_sif_ms_mailbox;
+			logerror("%s: iop_sif_r: SIF master->slave mailbox (%08x)\n", machine().describe_context(), ret);
+			break;
+		case 4:
+			ret = m_sif_sm_mailbox;
+			logerror("%s: iop_sif_r: SIF slave->master mailbox (%08x)\n", machine().describe_context(), ret);
+			break;
+		case 8:
+			ret = m_sif_ms_flag;
+			logerror("%s: iop_sif_r: SIF master->slave flag (%08x)\n", machine().describe_context(), ret);
+			break;
+		case 12:
+			ret = m_sif_sm_flag;
+			logerror("%s: iop_sif_r: SIF slave->master flag (%08x)\n", machine().describe_context(), ret);
+			break;
+		case 16:
+			ret = m_sif_ctrl | 0xf0000002;
+			logerror("%s: iop_sif_r: SIF control register (%08x)\n", machine().describe_context(), ret);
+			break;
+		default:
+			logerror("%s: iop_sif_r: Unknown read (%08x)\n", machine().describe_context(), 0x1d000000 + (offset << 2));
+			break;
+	}
 	return ret;
 }
 
-WRITE32_MEMBER(ps2sony_state::sif_smflg_w)
+WRITE32_MEMBER(ps2sony_state::iop_sif_w)
 {
-	logerror("%s: sif_smflg_w = %08x\n", machine().describe_context(), data);
+	switch (offset)
+	{
+		case 4:
+			logerror("%s: iop_sif_w: SIF set slave->master mailbox (%08x)\n", machine().describe_context(), data);
+			m_sif_sm_mailbox = data;
+			break;
+		case 12:
+			if (m_sif_sm_flag == 0 && data != 0)
+			{
+				//raise_interrupt(INT_SBUS);
+			}
+			logerror("%s: iop_sif_w: SIF set slave->master flag (%08x)\n", machine().describe_context(), data);
+			m_sif_sm_flag |= data;
+			break;
+		default:
+			logerror("%s: iop_sif_w: Unknown write %08x = %08x\n", machine().describe_context(), 0x1d000000 + (offset << 2), data);
+			break;
+	}
+}
+
+READ32_MEMBER(ps2sony_state::sif_r)
+{
+	uint32_t ret = 0;
+	switch (offset)
+	{
+		case 0:
+			ret = m_sif_ms_mailbox;
+			logerror("%s: sif_r: SIF master->slave mailbox (%08x)\n", machine().describe_context(), ret);
+			break;
+		case 2:
+			ret = m_sif_sm_mailbox;
+			logerror("%s: sif_r: SIF slave->master mailbox (%08x)\n", machine().describe_context(), ret);
+			break;
+		case 4:
+			ret = m_sif_ms_flag;
+			logerror("%s: sif_r: SIF master->slave flag (%08x)\n", machine().describe_context(), ret);
+			break;
+		case 6:
+			ret = m_sif_sm_flag;
+			logerror("%s: sif_r: SIF slave->master flag (%08x)\n", machine().describe_context(), ret);
+			break;
+		case 8:
+			ret = m_sif_ctrl;
+			logerror("%s: sif_r: SIF control (%08x)\n", machine().describe_context(), ret);
+			break;
+		default:
+			logerror("%s: sif_r: Unknown (%08x)\n", machine().describe_context(), 0x1000f200 + (offset << 3));
+			break;
+	}
+	return ret;
+}
+
+WRITE32_MEMBER(ps2sony_state::sif_w)
+{
+	switch (offset)
+	{
+		case 0:
+			logerror("%s: sif_w: SIF set master->slave mailbox (%08x)\n", machine().describe_context(), data);
+			m_sif_ms_mailbox |= data;
+			break;
+		case 4:
+			logerror("%s: sif_w: SIF set master->slave flag (%08x)\n", machine().describe_context(), data);
+			m_sif_ms_flag |= data;
+			break;
+		case 6:
+			logerror("%s: sif_w: SIF clear slave->master flag (%08x)\n", machine().describe_context(), data);
+			m_sif_sm_flag &= ~data;
+			break;
+		case 8:
+			logerror("%s: sif_w: SIF control = %08x\n", machine().describe_context(), data);
+			m_sif_ctrl = data; // ??
+			break;
+		default:
+			logerror("%s: sif_w: Unknown %08x = %08x\n", machine().describe_context(), 0x1000f200 + (offset << 3), data);
+			break;
+	}
 }
 
 void ps2sony_state::machine_start()
 {
+    save_item(NAME(m_gs_base_regs));
+    save_item(NAME(m_gs_csr));
+    save_item(NAME(m_gs_imr));
+    save_item(NAME(m_gs_busdir));
+    save_item(NAME(m_gs_sig_label_id));
+
+	save_item(NAME(m_unk_f430_reg));
+	save_item(NAME(m_unk_f440_counter));
+	save_item(NAME(m_unk_f440_reg));
+	save_item(NAME(m_unk_f440_ret));
+
+	save_item(NAME(m_ipu_ctrl));
+	save_item(NAME(m_ipu_in_fifo));
+	save_item(NAME(m_ipu_in_fifo_index));
+	save_item(NAME(m_ipu_out_fifo));
+	save_item(NAME(m_ipu_out_fifo_index));
+
+	save_item(NAME(m_sif_ms_flag));
+	save_item(NAME(m_sif_sm_flag));
+	save_item(NAME(m_sif_ctrl));
+
+	save_item(NAME(m_dmac_d5_chcr));
+
+	save_item(NAME(m_istat));
+	save_item(NAME(m_imask));
+
+	save_item(NAME(m_iop_istat));
+	save_item(NAME(m_iop_imask));
+	save_item(NAME(m_iop_ienable));
+
 	if (!m_vblank_timer)
 		m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ps2sony_state::vblank), this));
 }
 
 void ps2sony_state::machine_reset()
 {
+	m_istat = 0;
+	m_imask = 0;
+
+	m_iop_istat = 0;
+	m_iop_imask = 0;
+
 	m_unk_f430_reg = 0;
 	m_unk_f440_reg = 0;
 	m_unk_f440_ret = 0;
@@ -956,6 +1211,14 @@ void ps2sony_state::machine_reset()
     m_gs_sig_label_id = 0ULL;
 
     m_vblank_timer->adjust(m_screen->time_until_pos(480), 1);
+
+	m_sif_ms_mailbox = 0;
+	m_sif_sm_mailbox = 0;
+	m_sif_ms_flag = 0;
+	m_sif_sm_flag = 0;
+	m_sif_ctrl = 0;
+
+	m_dmac_d5_chcr = 0;
 }
 
 TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
@@ -963,15 +1226,15 @@ TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
 	if (param)
 	{
 		// VBlank enter
-		printf("1 ");
 		raise_interrupt(INT_VB_ON);
+		raise_iop_interrupt(0);
 		m_vblank_timer->adjust(m_screen->time_until_pos(0), 0);
 	}
 	else
 	{
-		printf("0 ");
 		// VBlank exit
 		raise_interrupt(INT_VB_OFF);
+		raise_iop_interrupt(11);
 		m_vblank_timer->adjust(m_screen->time_until_pos(480), 1);
 	}
 }
@@ -979,6 +1242,28 @@ TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
 WRITE8_MEMBER(ps2sony_state::debug_w)
 {
     printf("%c", (char)data);
+}
+
+WRITE64_MEMBER(ps2sony_state::ee_iop_ram_w)
+{
+	const uint32_t offset_hi = (offset << 1);
+	const uint32_t offset_lo = (offset << 1) + 1;
+	const uint32_t mask_hi = (uint32_t)(mem_mask >> 32);
+	const uint32_t mask_lo = (uint32_t)mem_mask;
+	m_iop_ram[offset_hi] &= ~mask_hi;
+	m_iop_ram[offset_hi] |= (uint32_t)(data >> 32) & mask_hi;
+	m_iop_ram[offset_lo] &= ~mask_lo;
+	m_iop_ram[offset_lo] |= (uint32_t)data & mask_lo;
+}
+
+READ64_MEMBER(ps2sony_state::ee_iop_ram_r)
+{
+	return ((uint64_t)m_iop_ram[offset << 1] << 32) | m_iop_ram[(offset << 1) + 1];
+}
+
+READ64_MEMBER(ps2sony_state::board_id_r)
+{
+	return 0x1234;
 }
 
 READ32_MEMBER(ps2sony_state::unk_f520_r)
@@ -1182,7 +1467,7 @@ void ps2sony_state::mem_map(address_map &map)
     map(0x1000f000, 0x1000f017).rw(FUNC(ps2sony_state::intc_r), FUNC(ps2sony_state::intc_w)).umask64(0x00000000ffffffff);
     map(0x1000f130, 0x1000f137).nopr();
     map(0x1000f180, 0x1000f187).w(FUNC(ps2sony_state::debug_w)).umask64(0x00000000000000ff);
-    map(0x1000f230, 0x1000f237).rw(FUNC(ps2sony_state::sif_smflg_r), FUNC(ps2sony_state::sif_smflg_w)).umask64(0x00000000ffffffff);
+    map(0x1000f200, 0x1000f24f).rw(FUNC(ps2sony_state::sif_r), FUNC(ps2sony_state::sif_w)).umask64(0x00000000ffffffff);
     map(0x1000f430, 0x1000f437).rw(FUNC(ps2sony_state::unk_f430_r), FUNC(ps2sony_state::unk_f430_w)).umask64(0x00000000ffffffff); // Unknown
     map(0x1000f440, 0x1000f447).rw(FUNC(ps2sony_state::unk_f440_r), FUNC(ps2sony_state::unk_f440_w)).umask64(0x00000000ffffffff); // Unknown
     map(0x1000f520, 0x1000f527).r(FUNC(ps2sony_state::unk_f520_r)).umask64(0x00000000ffffffff); // Unknown
@@ -1192,7 +1477,8 @@ void ps2sony_state::mem_map(address_map &map)
     map(0x1100c000, 0x1100ffff).ram().share(m_vu1_dmem);
     map(0x12000000, 0x120003ff).mirror(0xc00).rw(FUNC(ps2sony_state::gs_regs0_r), FUNC(ps2sony_state::gs_regs0_w));
     map(0x12001000, 0x120013ff).mirror(0xc00).rw(FUNC(ps2sony_state::gs_regs1_r), FUNC(ps2sony_state::gs_regs1_w));
-    map(0x1c000000, 0x1c1fffff).ram().share(m_iop_ram); // IOP has 2MB EDO RAM per Wikipedia, and writes go up to this point
+    map(0x1c000000, 0x1c1fffff).rw(FUNC(ps2sony_state::ee_iop_ram_r), FUNC(ps2sony_state::ee_iop_ram_w)); // IOP has 2MB EDO RAM per Wikipedia, and writes go up to this point
+    map(0x1f803800, 0x1f803807).r(FUNC(ps2sony_state::board_id_r));
     map(0x1fc00000, 0x1fffffff).rom().region("bios", 0);
 
     map(0x70000000, 0x70003fff).ram().share(m_sp_ram); // 16KB Scratchpad RAM
@@ -1201,29 +1487,44 @@ void ps2sony_state::mem_map(address_map &map)
 void ps2sony_state::iop_map(address_map &map)
 {
     map(0x00000000, 0x001fffff).ram().share(m_iop_ram);
-    map(0x1f802070, 0x1f802073).noprw();
-    map(0x1fc00000, 0x1fdfffff).rom().region("bios", 0);
-
+    map(0x1d000000, 0x1d00004f).rw(FUNC(ps2sony_state::iop_sif_r), FUNC(ps2sony_state::iop_sif_w));
+    map(0x1f402004, 0x1f402007).nopr();
+    map(0x1f801070, 0x1f80107b).rw(FUNC(ps2sony_state::iop_intc_r), FUNC(ps2sony_state::iop_intc_w));
+    map(0x1f8010f0, 0x1f8010f7).rw(m_iop_dma, FUNC(iop_dma_device::ctrl0_r), FUNC(iop_dma_device::ctrl0_w));
+    map(0x1f801450, 0x1f801453).noprw();
+    map(0x1f8014a0, 0x1f8014af).rw(m_iop_timer, FUNC(iop_timer_device::read), FUNC(iop_timer_device::write));
+    map(0x1f801570, 0x1f801577).rw(m_iop_dma, FUNC(iop_dma_device::ctrl1_r), FUNC(iop_dma_device::ctrl1_w));
+    map(0x1f801578, 0x1f80157b).noprw();
+    map(0x1f802070, 0x1f802073).w(FUNC(ps2sony_state::iop_debug_w)).nopr();
+    map(0x1fc00000, 0x1fffffff).rom().region("bios", 0);
+    map(0x1ffe0130, 0x1ffe0133).nopw();
 }
 
 static INPUT_PORTS_START( ps2sony )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ps2sony_state::ps2sony)
-	MCFG_DEVICE_ADD("maincpu", R5900LE, 294'912'000)
+	MCFG_DEVICE_ADD(m_maincpu, R5900LE, 294'912'000)
 	MCFG_CPU_FORCE_NO_DRC()
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD("iop", SONYPS2_IOP, XTAL(67'737'600)/2)
+	MCFG_DEVICE_ADD(m_iop, SONYPS2_IOP, XTAL(67'737'600)/2)
 	MCFG_DEVICE_PROGRAM_MAP(iop_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("iop")
+
 	MCFG_DEVICE_ADD(m_timer[0], SONYPS2_TIMER, 294912000/2, true)
 	MCFG_DEVICE_ADD(m_timer[1], SONYPS2_TIMER, 294912000/2, true)
 	MCFG_DEVICE_ADD(m_timer[2], SONYPS2_TIMER, 294912000/2, false)
 	MCFG_DEVICE_ADD(m_timer[3], SONYPS2_TIMER, 294912000/2, false)
+
+	MCFG_DEVICE_ADD(m_iop_timer, SONYIOP_TIMER, XTAL(67'737'600)/2)
+	MCFG_IOP_TIMER_IRQ_CALLBACK(WRITELINE(*this, ps2sony_state, iop_timer_irq))
+
+	MCFG_DEVICE_ADD(m_iop_dma, SONYIOP_DMA, XTAL(67'737'600)/2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
