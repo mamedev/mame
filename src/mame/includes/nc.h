@@ -107,7 +107,7 @@ protected: // HACK FOR MC6845
 	required_device<i8251_device> m_uart;
 	required_device<clock_device> m_uart_clock;
 	required_device<nvram_device> m_nvram;
-	required_device<upd765a_device> m_fdc;
+	optional_device<upd765a_device> m_fdc;
 
 	char m_memory_config[4];
 	emu_timer *m_keyboard_timer;
