@@ -34,6 +34,10 @@ public:
 		m_cvram(*this, "cvram"),
 		m_charram(4*1024)
 	{ }
+
+	void olypeopl(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<pic8259_device> m_pic_1;
@@ -63,10 +67,9 @@ public:
 	void floppy_unload(floppy_image_device *dev);
 
 	uint8_t m_dma0pg;
-	void olypeopl(machine_config &config);
 	void peoplepc_io(address_map &map);
 	void peoplepc_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };

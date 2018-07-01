@@ -52,6 +52,9 @@ public:
 		m_last_state(0)
 	{ }
 
+	void pv2000(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
@@ -70,7 +73,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
-	void pv2000(machine_config &config);
 	void pv2000_io_map(address_map &map);
 	void pv2000_map(address_map &map);
 };

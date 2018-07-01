@@ -47,13 +47,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void pmi80(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
-	void pmi80(machine_config &config);
 	void pmi80_io(address_map &map);
 	void pmi80_mem(address_map &map);
-private:
+
 	uint8_t m_keyrow;
 	bool m_ledready;
 	virtual void machine_reset() override;

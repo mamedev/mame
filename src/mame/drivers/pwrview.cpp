@@ -30,6 +30,9 @@ public:
 		m_vram(64*1024)
 	{ }
 
+	void pwrview(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(bank0_r);
 	DECLARE_WRITE16_MEMBER(bank0_w);
 	DECLARE_READ8_MEMBER(unk1_r);
@@ -55,16 +58,15 @@ public:
 	DECLARE_READ8_MEMBER(err_r);
 	MC6845_UPDATE_ROW(update_row);
 
-	void pwrview(machine_config &config);
 	void bios_bank(address_map &map);
 	void pwrview_fetch_map(address_map &map);
 	void pwrview_io(address_map &map);
 	void pwrview_map(address_map &map);
-protected:
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-private:
+
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_memory_region m_bios;

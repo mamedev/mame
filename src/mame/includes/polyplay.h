@@ -36,6 +36,12 @@ public:
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void polyplay_zre(machine_config &config);
+	void polyplay_zrepp(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+
+private:
 	INTERRUPT_GEN_MEMBER(nmi_handler);
 
 	/* devices */
@@ -48,19 +54,15 @@ public:
 	DECLARE_READ8_MEMBER(pio_portb_r);
 	DECLARE_WRITE8_MEMBER(pio_portb_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 	DECLARE_WRITE8_MEMBER(polyplay_characterram_w);
 	DECLARE_PALETTE_INIT(polyplay);
 	uint32_t screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void polyplay_zre(machine_config &config);
-	void polyplay_zrepp(machine_config &config);
 	void polyplay_io_zre(address_map &map);
 	void polyplay_io_zrepp(address_map &map);
 	void polyplay_mem_zre(address_map &map);
 	void polyplay_mem_zrepp(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 

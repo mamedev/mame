@@ -79,6 +79,9 @@ public:
 		, m_serial(*this, "SERIAL")
 	{ }
 
+	void proteus3(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
 	DECLARE_WRITE8_MEMBER(video_w);
 	void kbd_put(u8 data);
@@ -106,9 +109,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER (write_f14_clock){ write_acia_clocks(mc14411_device::TIMER_F14, state); }
 	DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
 
-	void proteus3(machine_config &config);
 	void proteus3_mem(address_map &map);
-private:
+
 	uint8_t m_video_data;
 	uint8_t m_flashcnt;
 	uint16_t m_curs_pos;

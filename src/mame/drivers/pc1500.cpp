@@ -35,6 +35,9 @@ public:
 	{
 	}
 
+	void pc1500(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 
@@ -54,7 +57,6 @@ public:
 
 	DECLARE_READ8_MEMBER( pc1500_kb_r );
 	DECLARE_PALETTE_INIT(pc1500);
-	void pc1500(machine_config &config);
 	void pc1500_mem(address_map &map);
 	void pc1500_mem_io(address_map &map);
 };

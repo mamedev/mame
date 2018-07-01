@@ -84,15 +84,17 @@ public:
 	{
 	}
 
+	void pcm(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( pcm_85_r );
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
 	DECLARE_WRITE8_MEMBER( pcm_85_w );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pcm(machine_config &config);
 	void pcm_io(address_map &map);
 	void pcm_mem(address_map &map);
-private:
+
 	bool m_cone;
 	uint8_t m_85;
 	virtual void machine_reset() override;

@@ -55,7 +55,7 @@ public:
 	void init_quizshow();
 	void quizshow(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -76,7 +76,6 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<uint8_t> m_main_ram;
