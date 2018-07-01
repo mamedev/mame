@@ -83,6 +83,11 @@ public:
 		, m_videorambank(0)
 	{ }
 
+	void spider(machine_config &config);
+	void twins(machine_config &config);
+	void twinsa(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint16_t> m_paletteram;
 	required_device<palette_device> m_palette;
@@ -118,9 +123,6 @@ public:
 	uint16_t* m_rom16;
 	uint8_t* m_rom8;
 
-	void spider(machine_config &config);
-	void twins(machine_config &config);
-	void twinsa(machine_config &config);
 	void ramdac_map(address_map &map);
 	void spider_io(address_map &map);
 	void twins_io(address_map &map);

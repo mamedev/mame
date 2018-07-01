@@ -454,6 +454,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	void triforcegd(machine_config &config);
+	void triforce_base(machine_config &config);
+
+private:
 	DECLARE_READ64_MEMBER(gc_pi_r);
 	DECLARE_WRITE64_MEMBER(gc_pi_w);
 	DECLARE_READ64_MEMBER(gc_exi_r);
@@ -462,8 +466,6 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<ppc_device> m_maincpu;
-	void triforcegd(machine_config &config);
-	void triforce_base(machine_config &config);
 	void gc_map(address_map &map);
 };
 

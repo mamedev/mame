@@ -227,6 +227,11 @@ public:
 	{
 	}
 
+	void ti99_8(machine_config &config);
+	void ti99_8_60hz(machine_config &config);
+	void ti99_8_50hz(machine_config &config);
+
+private:
 	// Machine management
 	DECLARE_MACHINE_START(ti99_8);
 	DECLARE_MACHINE_RESET(ti99_8);
@@ -262,13 +267,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cassette_motor);
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
 
-	void ti99_8(machine_config &config);
-	void ti99_8_60hz(machine_config &config);
-	void ti99_8_50hz(machine_config &config);
 	void crumap(address_map &map);
 	void memmap(address_map &map);
 	void memmap_setoffset(address_map &map);
-private:
+
 	// Keyboard support
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;
