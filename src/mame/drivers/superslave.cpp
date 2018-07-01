@@ -61,7 +61,7 @@ public:
 
 	void superslave(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void superslave_io(address_map &map);
@@ -73,7 +73,6 @@ protected:
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( cmd_w );
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
 	required_device<ram_device> m_ram;

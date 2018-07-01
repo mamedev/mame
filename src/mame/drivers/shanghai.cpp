@@ -40,13 +40,15 @@ public:
 		m_screen(*this,"screen")
 		{ }
 
+	void shanghai(machine_config &config);
+	void shangha2(machine_config &config);
+	void kothello(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(shanghai_coin_w);
 	DECLARE_PALETTE_INIT(shanghai);
 	INTERRUPT_GEN_MEMBER(half_vblank_irq);
 
-	void shanghai(machine_config &config);
-	void shangha2(machine_config &config);
-	void kothello(machine_config &config);
 	void hd63484_map(address_map &map);
 	void kothello_map(address_map &map);
 	void kothello_sound_map(address_map &map);
@@ -54,7 +56,7 @@ public:
 	void shangha2_portmap(address_map &map);
 	void shanghai_map(address_map &map);
 	void shanghai_portmap(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 };

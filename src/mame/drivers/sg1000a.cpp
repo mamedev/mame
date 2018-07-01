@@ -286,13 +286,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
-	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
-	void init_sg1000a();
-	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void sderby2s(machine_config &config);
 	void sg1000ax(machine_config &config);
 	void sg1000a(machine_config &config);
+
+	void init_sg1000a();
+
+private:
+	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
+	required_device<cpu_device> m_maincpu;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void decrypted_opcodes_map(address_map &map);
 	void io_map(address_map &map);
 	void program_map(address_map &map);

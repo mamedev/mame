@@ -150,11 +150,13 @@ public:
 		m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	void init_jwildb52();
 	void jwildb52(machine_config &config);
 
-protected:
+	void init_jwildb52();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+
+private:
 	DECLARE_READ8_MEMBER(unk_f700_r);
 	DECLARE_READ8_MEMBER(unk_f760_r);
 	DECLARE_READ8_MEMBER(in0_r);
@@ -177,7 +179,6 @@ protected:
 	void jwildb52_map(address_map &map);
 	void sound_prog_map(address_map &map);
 
-private:
 	required_device<cpu_device>     m_maincpu;
 	required_device<cpu_device>     m_audiocpu;
 	required_device<ptm6840_device> m_6840ptm_2;

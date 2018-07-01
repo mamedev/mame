@@ -48,7 +48,7 @@ public:
 
 	void super6(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -71,7 +71,6 @@ protected:
 
 	void bankswitch();
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
