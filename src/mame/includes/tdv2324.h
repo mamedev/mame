@@ -59,6 +59,9 @@ public:
 			m_video_ram(*this, "video_ram")
 	{ }
 
+	void tdv2324(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_fdccpu;
@@ -80,7 +83,6 @@ public:
 
 	// video state
 	required_shared_ptr<uint8_t> m_video_ram;
-	void tdv2324(machine_config &config);
 	void tdv2324_fdc_mem(address_map &map);
 	void tdv2324_io(address_map &map);
 	void tdv2324_mem(address_map &map);
