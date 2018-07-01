@@ -42,19 +42,30 @@ public:
 	cpzodiac_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")
+		m_audiocpu(*this, "audiocpu"),
+		m_bank(*this, "databank")
 	{ }
 
 	void cpzodiac(machine_config &config);
 
 private:
+	virtual void machine_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_memory_bank m_bank;
 
 	void main_map(address_map &map);
 	void main_io_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+
+void cpzodiac_state::machine_start()
+{
+	m_bank->configure_entries(0, 0x10, memregion("maincpu")->base(), 0x2000);
+	m_bank->set_entry(0);
+}
 
 
 /***************************************************************************
@@ -65,7 +76,8 @@ private:
 
 void cpzodiac_state::main_map(address_map &map)
 {
-	map(0x0000, 0x9fff).rom();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("databank");
 	map(0xa000, 0xbfff).ram();
 	map(0xc000, 0xdfff).ram(); // video?
 	map(0xe000, 0xe00f).rw("io", FUNC(te7750_device::read), FUNC(te7750_device::write));
@@ -127,6 +139,12 @@ static INPUT_PORTS_START( cpzodiac )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P35") PORT_CODE(KEYCODE_6)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P36") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P37") PORT_CODE(KEYCODE_8)
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P40") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P41") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P42") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -151,10 +169,13 @@ MACHINE_CONFIG_START(cpzodiac_state::cpzodiac)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_DEVICE_ADD("io", TE7750, 0)
-	MCFG_TE7750_IOS_CB(CONSTANT(3))
+	MCFG_TE7750_IOS_CB(CONSTANT(4))
 	MCFG_TE7750_IN_PORT1_CB(IOPORT("IN1"))
 	MCFG_TE7750_IN_PORT2_CB(IOPORT("IN2"))
-	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN3")) // Code initializes latch to 0 by mistake?
+	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN3"))
+	MCFG_TE7750_IN_PORT4_CB(IOPORT("IN4"))
+	MCFG_TE7750_OUT_PORT8_CB(MEMBANK("databank")) MCFG_DEVCB_RSHIFT(-4)
+	// Code initializes Port 3 and 4 latches to 0 by mistake?
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 12_MHz_XTAL/2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
