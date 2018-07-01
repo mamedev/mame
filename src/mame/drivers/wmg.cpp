@@ -93,7 +93,13 @@ public:
 		, m_soundbank(*this, "soundbank")
 	{ }
 
+	void wmg(machine_config &config);
+
 	void init_wmg();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
+
+private:
 	DECLARE_READ8_MEMBER(wmg_nvram_r);
 	DECLARE_WRITE8_MEMBER(wmg_nvram_w);
 	DECLARE_READ8_MEMBER(wmg_pia_0_r);
@@ -103,18 +109,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(wmg_port_select_w);
 	DECLARE_WRITE8_MEMBER(wmg_sound_reset_w);
 	DECLARE_WRITE8_MEMBER(wmg_vram_select_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 
-	void wmg(machine_config &config);
 	void wmg_cpu1(address_map &map);
 	void wmg_cpu2(address_map &map);
 	void wmg_banked_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	uint8_t m_wmg_c400;
 	uint8_t m_wmg_d000;
 	uint8_t m_wmg_port_select;

@@ -39,6 +39,9 @@ public:
 	{
 	}
 
+	void zexall(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( output_ack_r );
 	DECLARE_READ8_MEMBER( output_req_r );
 	DECLARE_READ8_MEMBER( output_data_r );
@@ -46,9 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER( output_req_w );
 	DECLARE_WRITE8_MEMBER( output_data_w );
 
-	void zexall(machine_config &config);
 	void z80_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<uint8_t> m_main_ram;

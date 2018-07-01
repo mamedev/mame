@@ -87,6 +87,20 @@ public:
 	{
 	}
 
+	void z80net(machine_config &config);
+	void z80ne(machine_config &config);
+	void z80netb(machine_config &config);
+
+	void init_z80net();
+	void init_z80netb();
+	void init_z80ne();
+
+	DECLARE_INPUT_CHANGED_MEMBER(z80ne_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(z80ne_nmi);
+
+	DECLARE_READ8_MEMBER(lx388_mc6847_videoram_r);
+
+protected:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	optional_device<mc6847_base_device> m_vdg;
@@ -108,9 +122,6 @@ public:
 	DECLARE_READ_LINE_MEMBER(lx387_control_r);
 	DECLARE_READ8_MEMBER(lx387_data_r);
 	DECLARE_READ8_MEMBER(lx388_read_field_sync);
-	void init_z80net();
-	void init_z80netb();
-	void init_z80ne();
 	DECLARE_MACHINE_START(z80ne);
 	DECLARE_MACHINE_RESET(z80ne);
 	DECLARE_MACHINE_START(z80netb);
@@ -118,21 +129,16 @@ public:
 	DECLARE_MACHINE_START(z80net);
 	DECLARE_MACHINE_RESET(z80net);
 	DECLARE_MACHINE_RESET(z80ne_base);
-	DECLARE_INPUT_CHANGED_MEMBER(z80ne_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(z80ne_nmi);
+
 	TIMER_CALLBACK_MEMBER(z80ne_cassette_tc);
 	TIMER_CALLBACK_MEMBER(z80ne_kbd_scan);
-	DECLARE_READ8_MEMBER(lx388_mc6847_videoram_r);
 
-	void z80net(machine_config &config);
-	void z80ne(machine_config &config);
-	void z80netb(machine_config &config);
 	void z80ne_io(address_map &map);
 	void z80ne_mem(address_map &map);
 	void z80net_io(address_map &map);
 	void z80net_mem(address_map &map);
 	void z80netb_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
@@ -162,14 +168,6 @@ protected:
 
 class z80netf_state : public z80ne_state
 {
-	struct wd17xx_state_t
-	{
-		int drq;
-		int intrq;
-		uint8_t drive; /* current drive */
-		uint8_t head;  /* current head */
-	};
-
 public:
 	z80netf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: z80ne_state(mconfig, type, tag),
@@ -180,9 +178,19 @@ public:
 	{
 	}
 
-	void init_z80netf();
 	void z80netf(machine_config &config);
+
+	void init_z80netf();
+
 private:
+	struct wd17xx_state_t
+	{
+		int drq;
+		int intrq;
+		uint8_t drive; /* current drive */
+		uint8_t head;  /* current head */
+	};
+
 	void z80netf_io(address_map &map);
 	void z80netf_mem(address_map &map);
 

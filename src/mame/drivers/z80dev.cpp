@@ -36,7 +36,7 @@ public:
 
 	void z80dev(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER( display_w );
 	DECLARE_READ8_MEMBER( test_r );
 
@@ -45,7 +45,6 @@ protected:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	output_finder<6> m_digits;
 };

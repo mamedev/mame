@@ -50,7 +50,7 @@ public:
 
 	void wackygtr(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -76,7 +76,6 @@ protected:
 
 	void program_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<pit8253_device> m_pit8253_0;
