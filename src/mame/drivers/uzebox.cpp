@@ -43,6 +43,9 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
+	void uzebox(machine_config &config);
+
+private:
 	required_device<avr8_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
@@ -65,11 +68,10 @@ public:
 	uint32_t screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(uzebox_cart);
 
-	void uzebox(machine_config &config);
 	void uzebox_data_map(address_map &map);
 	void uzebox_io_map(address_map &map);
 	void uzebox_prg_map(address_map &map);
-private:
+
 	int             m_vpos;
 	uint64_t          m_line_start_cycles;
 	uint32_t          m_line_pos_cycles;

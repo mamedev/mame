@@ -44,6 +44,9 @@ public:
 		m_led_vram_hi(*this, "led_vrahi"),
 		m_maincpu(*this, "maincpu") { }
 
+	void timetrv(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_led_vram_lo;
 	required_shared_ptr<uint8_t> m_led_vram_hi;
 	DECLARE_READ8_MEMBER(test1_r);
@@ -52,7 +55,6 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void timetrv(machine_config &config);
 	void timetrv_io(address_map &map);
 	void timetrv_map(address_map &map);
 };

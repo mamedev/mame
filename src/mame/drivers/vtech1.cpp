@@ -77,9 +77,16 @@ public:
 	{
 	}
 
+	void laser310(machine_config &config);
+	void laser200(machine_config &config);
+	void laser310h(machine_config &config);
+	void laser110(machine_config &config);
+	void laser210(machine_config &config);
+
 	void init_vtech1();
 	void init_vtech1h();
 
+private:
 	DECLARE_READ8_MEMBER(vtech1_lightpen_r);
 	DECLARE_READ8_MEMBER(vtech1_keyboard_r);
 	DECLARE_WRITE8_MEMBER(vtech1_latch_w);
@@ -89,17 +96,12 @@ public:
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER( vtech1 );
 
-	void laser310(machine_config &config);
-	void laser200(machine_config &config);
-	void laser310h(machine_config &config);
-	void laser110(machine_config &config);
-	void laser210(machine_config &config);
 	void laser110_mem(address_map &map);
 	void laser210_mem(address_map &map);
 	void laser310_mem(address_map &map);
 	void vtech1_io(address_map &map);
 	void vtech1_shrg_io(address_map &map);
-private:
+
 	static const uint8_t VZ_BASIC = 0xf0;
 	static const uint8_t VZ_MCODE = 0xf1;
 

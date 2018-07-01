@@ -360,7 +360,14 @@ public:
 	{
 	}
 
-	required_device<segaxbd_state> m_mainpcb;
+	void sega_smgp_fd1094(machine_config &config);
+	void sega_lastsurv_fd1094(machine_config &config);
+	void sega_lastsurv(machine_config &config);
+	void sega_xboard(machine_config &config);
+	void sega_aburner2(machine_config &config);
+	void sega_xboard_fd1094(machine_config &config);
+	void sega_rascot(machine_config &config);
+	void sega_smgp(machine_config &config);
 
 	// game-specific driver init
 	void init_generic();
@@ -371,14 +378,8 @@ public:
 	void init_rascot();
 	void init_gprider();
 
-	void sega_smgp_fd1094(machine_config &config);
-	void sega_lastsurv_fd1094(machine_config &config);
-	void sega_lastsurv(machine_config &config);
-	void sega_xboard(machine_config &config);
-	void sega_aburner2(machine_config &config);
-	void sega_xboard_fd1094(machine_config &config);
-	void sega_rascot(machine_config &config);
-	void sega_smgp(machine_config &config);
+protected:
+	required_device<segaxbd_state> m_mainpcb;
 };
 
 class segaxbd_new_state_double : public segaxbd_new_state
@@ -396,6 +397,11 @@ public:
 		rampage2 = 0x0000;
 	}
 
+	void sega_xboard_fd1094_double(machine_config &config);
+
+	void init_gprider_double();
+
+private:
 	required_device<segaxbd_state> m_subpcb;
 
 	DECLARE_READ16_MEMBER(shareram1_r) {
@@ -429,12 +435,9 @@ public:
 		}
 	}
 
-	void init_gprider_double();
-
 	uint16_t shareram[0x800];
 	uint16_t rampage1;
 	uint16_t rampage2;
-	void sega_xboard_fd1094_double(machine_config &config);
 };
 
 //**************************************************************************

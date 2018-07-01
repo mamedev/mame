@@ -31,6 +31,10 @@ public:
 		m_pc0(*this, "PC0"),
 		m_charrom(*this, "charrom") { }
 
+	void scv(machine_config &config);
+	void scv_pal(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_READ8_MEMBER(portc_r);
@@ -45,10 +49,8 @@ public:
 	DECLARE_PALETTE_INIT(scv);
 	uint32_t screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void scv(machine_config &config);
-	void scv_pal(machine_config &config);
 	void scv_mem(address_map &map);
-protected:
+
 	enum
 	{
 		TIMER_VB

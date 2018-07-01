@@ -51,6 +51,15 @@ public:
 	{
 	}
 
+	void wwally(machine_config &config);
+	void system18(machine_config &config);
+	void lghost_fd1094(machine_config &config);
+	void wwally_fd1094(machine_config &config);
+	void system18_fd1094(machine_config &config);
+	void system18_fd1094_i8751(machine_config &config);
+	void lghost(machine_config &config);
+	void system18_i8751(machine_config &config);
+
 	// driver init
 	void init_ddcrew();
 	void init_lghost();
@@ -60,6 +69,7 @@ public:
 	void init_generic_5987();
 	void init_hamaway();
 
+private:
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
 
@@ -95,21 +105,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(set_grayscale);
 	DECLARE_WRITE_LINE_MEMBER(set_vdp_enable);
 
-	void wwally(machine_config &config);
-	void system18(machine_config &config);
-	void lghost_fd1094(machine_config &config);
-	void wwally_fd1094(machine_config &config);
-	void system18_fd1094(machine_config &config);
-	void system18_fd1094_i8751(machine_config &config);
-	void lghost(machine_config &config);
-	void system18_i8751(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void mcu_io_map(address_map &map);
 	void pcm_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
 	void system18_map(address_map &map);
-protected:
+
 	// timer IDs
 	enum
 	{

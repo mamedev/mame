@@ -31,15 +31,16 @@ public:
 			m_subcpu(*this, "subcpu")
 	{ }
 
+	void m74(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void m74(machine_config &config);
 	void c68_map(address_map &map);
 	void sub_map(address_map &map);
-protected:
 
 	// devices
 	required_device<m37450_device> m_maincpu;

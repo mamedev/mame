@@ -97,6 +97,9 @@ public:
 		m_kbackctl(0)
 	{ }
 
+	void victor9k(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ieee488_device> m_ieee488;
 	required_device<pic8259_device> m_pic;
@@ -169,7 +172,7 @@ public:
 	int m_kbackctl;
 
 	void update_kback();
-	void victor9k(machine_config &config);
+
 	void victor9k_mem(address_map &map);
 };
 

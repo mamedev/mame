@@ -338,6 +338,46 @@ public:
 		m_lamps(*this, "lamp%u", 0U),
 		m_a2d_shift(0)
 	{ }
+
+	void vegascore(machine_config &config);
+	void vegas(machine_config &config);
+	void vegas250(machine_config &config);
+	void vegas32m(machine_config &config);
+	void vegasban(machine_config &config);
+	void vegasv3(machine_config &config);
+	void denver(machine_config &config);
+
+	void nbanfl(machine_config &config);
+	void sf2049te(machine_config &config);
+	void sf2049se(machine_config &config);
+	void nbashowt(machine_config &config);
+	void gauntdl(machine_config &config);
+	void sf2049(machine_config &config);
+	void gauntleg(machine_config &config);
+	void cartfury(machine_config &config);
+	void tenthdeg(machine_config &config);
+	void nbagold(machine_config &config);
+	void roadburn(machine_config &config);
+	void warfa(machine_config &config);
+
+	void init_gauntleg();
+	void init_cartfury();
+	void init_tenthdeg();
+	void init_nbashowt();
+	void init_nbagold();
+	void init_warfa();
+	void init_roadburn();
+	void init_sf2049te();
+	void init_gauntdl();
+	void init_nbanfl();
+	void init_sf2049();
+	void init_sf2049se();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
+
+private:
 	static constexpr unsigned SYSTEM_CLOCK = 100000000;
 
 	required_device<mips3_device> m_maincpu;
@@ -378,18 +418,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_cb);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
-	void init_gauntleg();
-	void init_cartfury();
-	void init_tenthdeg();
-	void init_nbashowt();
-	void init_nbagold();
-	void init_warfa();
-	void init_roadburn();
-	void init_sf2049te();
-	void init_gauntdl();
-	void init_nbanfl();
-	void init_sf2049();
-	void init_sf2049se();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -423,32 +452,11 @@ public:
 	DECLARE_WRITE8_MEMBER(parallel_w);
 	DECLARE_WRITE8_MEMBER(mpsreset_w);
 	DECLARE_WRITE32_MEMBER(i40_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
+
 	DECLARE_WRITE32_MEMBER(wheel_board_w);
 
 	std::string sioIRQString(uint8_t data);
-	void vegascore(machine_config &config);
-	void vegas(machine_config &config);
-	void vegas250(machine_config &config);
-	void vegas32m(machine_config &config);
-	void vegasban(machine_config &config);
-	void vegasv3(machine_config &config);
-	void denver(machine_config &config);
 
-	void nbanfl(machine_config &config);
-	void sf2049te(machine_config &config);
-	void sf2049se(machine_config &config);
-	void nbashowt(machine_config &config);
-	void gauntdl(machine_config &config);
-	void sf2049(machine_config &config);
-	void gauntleg(machine_config &config);
-	void cartfury(machine_config &config);
-	void tenthdeg(machine_config &config);
-	void nbagold(machine_config &config);
-	void roadburn(machine_config &config);
-	void warfa(machine_config &config);
 	void vegas_cs2_map(address_map &map);
 	void vegas_cs3_map(address_map &map);
 	void vegas_cs4_map(address_map &map);

@@ -28,17 +28,17 @@ public:
 		m_out_x(*this, "%u.%u", 0U, 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 	void tama(machine_config &config);
 
-protected:
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+
+private:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_PALETTE_INIT(tama);
 	E0C6S46_PIXEL_UPDATE(pixel_update);
 
 	virtual void machine_start() override;
 
-private:
 	required_device<e0c6s46_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	output_finder<16, 40> m_out_x;

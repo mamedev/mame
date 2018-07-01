@@ -44,7 +44,7 @@ public:
 
 	void tranz330(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -60,7 +60,6 @@ protected:
 	void tranz330_mem(address_map &map);
 	void tranz330_io(address_map &map);
 
-private:
 	required_device<z80_device>             m_cpu;
 	required_device<z80ctc_device>          m_ctc;
 	required_device<z80dart_device>         m_dart;

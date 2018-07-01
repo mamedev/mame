@@ -315,6 +315,14 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 		{ }
 
+	void babypkr(machine_config &config);
+	void videodad(machine_config &config);
+	void videopkr(machine_config &config);
+	void fortune1(machine_config &config);
+	void blckjack(machine_config &config);
+	void bpoker(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(videopkr_io_r);
 	DECLARE_WRITE8_MEMBER(videopkr_io_w);
 	DECLARE_READ8_MEMBER(videopkr_p1_data_r);
@@ -339,12 +347,7 @@ public:
 	uint32_t screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_t1_callback);
 	void count_7dig(unsigned long data, uint8_t index);
-	void babypkr(machine_config &config);
-	void videodad(machine_config &config);
-	void videopkr(machine_config &config);
-	void fortune1(machine_config &config);
-	void blckjack(machine_config &config);
-	void bpoker(machine_config &config);
+
 	void i8039_io_port(address_map &map);
 	void i8039_map(address_map &map);
 	void i8039_sound_mem(address_map &map);
@@ -354,7 +357,6 @@ public:
 	void i8751_io_port(address_map &map);
 	void i8751_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 

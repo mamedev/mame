@@ -47,6 +47,11 @@ public:
 		, m_led(*this, "led0")
 	{ }
 
+	void sage2(machine_config &config);
+
+	void init_sage2();
+
+private:
 	void update_fdc_int();
 
 	DECLARE_READ16_MEMBER(rom_r);
@@ -63,11 +68,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	void sage2(machine_config &config);
-	void sage2_mem(address_map &map);
-	void init_sage2();
 
-protected:
+	void sage2_mem(address_map &map);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

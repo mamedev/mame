@@ -42,6 +42,9 @@ public:
 	{
 	}
 
+	void tk80bs(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(ppi_custom_r);
 	DECLARE_WRITE8_MEMBER(ppi_custom_w);
 	void kbd_put(u8 data);
@@ -49,9 +52,8 @@ public:
 	DECLARE_READ8_MEMBER(port_b_r);
 	uint32_t screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
-	void tk80bs(machine_config &config);
 	void tk80bs_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;

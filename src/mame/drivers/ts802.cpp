@@ -39,7 +39,11 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void ts802(machine_config &config);
+
 	void init_ts802();
+
+private:
 	DECLARE_MACHINE_RESET(ts802);
 	DECLARE_READ8_MEMBER(port00_r) { return 0x80; };
 	DECLARE_READ8_MEMBER(port0c_r) { return 1; };
@@ -54,10 +58,9 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	void kbd_put(u8 data);
-	void ts802(machine_config &config);
 	void ts802_io(address_map &map);
 	void ts802_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	address_space *m_mem;
 	address_space *m_io;

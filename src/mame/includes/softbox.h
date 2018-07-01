@@ -33,6 +33,9 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void softbox(machine_config &config);
+
+private:
 	// device_ieee488_interface overrides
 	virtual void ieee488_ifc(int state);
 
@@ -51,12 +54,10 @@ public:
 		LED_READY
 	};
 
-	void softbox(machine_config &config);
 	void softbox_io(address_map &map);
 	void softbox_mem(address_map &map);
 	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
 
-protected:
 	virtual void machine_start() override;
 	virtual void device_reset_after_children() override;
 

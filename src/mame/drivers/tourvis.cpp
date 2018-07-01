@@ -200,6 +200,9 @@ public:
 		, m_cart(*this, "cartslot")
 	{ }
 
+	void tourvision(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_a_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_b_w);
@@ -208,11 +211,10 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tourvision_cart);
 
-	void tourvision(machine_config &config);
 	void pce_io(address_map &map);
 	void pce_mem(address_map &map);
 	void tourvision_8085_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;
 	uint32_t  m_rom_size;

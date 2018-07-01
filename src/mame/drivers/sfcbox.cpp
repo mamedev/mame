@@ -137,6 +137,9 @@ public:
 		, m_s3520cf(*this, "s3520cf")
 	{ }
 
+	void sfcbox(machine_config &config);
+
+private:
 	required_device<cpu_device> m_bios;
 	required_device<mb90082_device> m_mb90082;
 	required_device<s3520cf_device> m_s3520cf;
@@ -154,7 +157,6 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
-	void sfcbox(machine_config &config);
 	void sfcbox_io(address_map &map);
 	void sfcbox_map(address_map &map);
 	void snes_map(address_map &map);

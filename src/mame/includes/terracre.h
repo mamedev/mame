@@ -19,6 +19,14 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram") { }
 
+	void amazon_base(machine_config &config);
+	void ym2203(machine_config &config);
+	void ym3526(machine_config &config);
+
+protected:
+	void amazon_base_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -45,10 +53,7 @@ public:
 	DECLARE_PALETTE_INIT(terracre);
 	uint32_t screen_update_amazon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void amazon_base(machine_config &config);
-	void ym2203(machine_config &config);
-	void ym3526(machine_config &config);
-	void amazon_base_map(address_map &map);
+
 	void sound_2203_io_map(address_map &map);
 	void sound_3526_io_map(address_map &map);
 	void sound_map(address_map &map);

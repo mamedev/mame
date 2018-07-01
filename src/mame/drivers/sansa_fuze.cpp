@@ -21,8 +21,10 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	void sansa_fuze(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	void sansa_fuze_map(address_map &map);
 };
 

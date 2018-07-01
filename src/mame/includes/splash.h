@@ -31,6 +31,15 @@ public:
 		m_bitmap_mode(*this, "bitmap_mode")
 	{ }
 
+	void roldfrog(machine_config &config);
+	void splash(machine_config &config);
+
+	void init_splash10();
+	void init_roldfrog();
+	void init_splash();
+	void init_rebus();
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<msm5205_device> m_msm;
@@ -81,10 +90,6 @@ public:
 	//roldfrog and funystrp specific
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 
-	void init_splash10();
-	void init_roldfrog();
-	void init_splash();
-	void init_rebus();
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(splash);
 	DECLARE_MACHINE_START(roldfrog);
@@ -99,8 +104,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(roldfrog_interrupt);
 	void roldfrog_update_irq(  );
-	void roldfrog(machine_config &config);
-	void splash(machine_config &config);
+
 	void funystrp_sound_map(address_map &map);
 	void roldfrog_map(address_map &map);
 	void roldfrog_sound_io_map(address_map &map);
@@ -122,9 +126,9 @@ public:
 		m_funystrp_ff3cc8_val(0)
 	{ }
 
-	void init_funystrp();
-
 	void funystrp(machine_config &config);
+
+	void init_funystrp();
 
 protected:
 	virtual void machine_start() override;

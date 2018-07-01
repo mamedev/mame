@@ -61,6 +61,10 @@ public:
 		, m_ymsnd(*this, "ymsnd")
 	{ }
 
+	void unkm1(machine_config &config);
+	void segam1(machine_config &config);
+
+private:
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_WRITE8_MEMBER(sound_a0_bank_w);
 
@@ -75,8 +79,6 @@ public:
 	required_device<segas24_tile_device> m_tile;
 	required_device<segas24_mixer_device> m_mixer;
 	required_device<ym3438_device> m_ymsnd;
-	void unkm1(machine_config &config);
-	void segam1(machine_config &config);
 	void segam1_comms_map(address_map &map);
 	void segam1_map(address_map &map);
 	void segam1_sound_io_map(address_map &map);
