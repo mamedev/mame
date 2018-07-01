@@ -21,7 +21,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void prehisle(machine_config &config);
 
+private:
 	required_shared_ptr<uint16_t> m_tx_vram;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_fg_vram;
@@ -52,7 +54,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void prehisle(machine_config &config);
 	void prehisle_map(address_map &map);
 	void prehisle_sound_io_map(address_map &map);
 	void prehisle_sound_map(address_map &map);

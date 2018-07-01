@@ -218,11 +218,6 @@ A Note about Best Bet Products.
 class peplus_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_ASSERT_LP
-	};
-
 	peplus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -250,6 +245,22 @@ public:
 		m_sf000_ram(*this, "sf000_ram")
 	{
 	}
+
+	void peplus(machine_config &config);
+
+	void init_nonplus();
+	void init_peplus();
+	void init_peplussb();
+	void init_pepluss64();
+	void init_peplussbw();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(peplus_input_r);
+
+private:
+	enum
+	{
+		TIMER_ASSERT_LP
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<r6545_1_device> m_crtc;
@@ -320,17 +331,11 @@ public:
 	DECLARE_READ8_MEMBER(peplus_bgcolor_r);
 	DECLARE_READ8_MEMBER(peplus_dropdoor_r);
 	DECLARE_READ8_MEMBER(peplus_watchdog_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(peplus_input_r);
 	DECLARE_WRITE8_MEMBER(peplus_crtc_mode_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
 	DECLARE_READ8_MEMBER(peplus_input_bank_a_r);
 	DECLARE_READ8_MEMBER(peplus_input0_r);
-	void init_nonplus();
-	void init_peplus();
-	void init_peplussb();
-	void init_pepluss64();
-	void init_peplussbw();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	virtual void machine_reset() override;
@@ -340,10 +345,9 @@ public:
 	DECLARE_PALETTE_INIT(peplus);
 	void handle_lightpen();
 
-	void peplus(machine_config &config);
 	void peplus_iomap(address_map &map);
 	void peplus_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

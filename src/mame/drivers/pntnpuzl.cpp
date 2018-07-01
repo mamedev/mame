@@ -155,6 +155,13 @@ public:
 		m_via(*this, "via")
 	{ }
 
+	void pntnpuzl(machine_config &config);
+
+	void init_pip();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	uint16_t m_pntpzl_200000;
 	uint16_t m_serial;
 	uint16_t m_serial_out;
@@ -169,10 +176,7 @@ public:
 	DECLARE_READ16_MEMBER(irq1_ack_r);
 	DECLARE_READ16_MEMBER(irq2_ack_r);
 	DECLARE_READ16_MEMBER(irq4_ack_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	void init_pip();
 	required_device<via6522_device> m_via;
-	void pntnpuzl(machine_config &config);
 	void mcu_map(address_map &map);
 	void pntnpuzl_map(address_map &map);
 };

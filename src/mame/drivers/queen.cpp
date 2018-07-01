@@ -43,6 +43,9 @@ public:
 	{
 	}
 
+	void queen(machine_config &config);
+
+private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
 	uint8_t m_mtxc_config_reg[256];
@@ -54,7 +57,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
-	void queen(machine_config &config);
 	void queen_io(address_map &map);
 	void queen_map(address_map &map);
 

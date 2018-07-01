@@ -91,9 +91,14 @@ public:
 		, m_i8272(*this, "i8272")
 	{ }
 
+	void p8k(machine_config &config);
+	void p8k_16(machine_config &config);
+
+	void init_p8k();
+
+private:
 	DECLARE_READ8_MEMBER(p8k_port0_r);
 	DECLARE_WRITE8_MEMBER(p8k_port0_w);
-	void init_p8k();
 	DECLARE_MACHINE_RESET(p8k);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
@@ -105,14 +110,12 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 
-	void p8k(machine_config &config);
-	void p8k_16(machine_config &config);
 	void p8k_16_datamap(address_map &map);
 	void p8k_16_iomap(address_map &map);
 	void p8k_16_memmap(address_map &map);
 	void p8k_iomap(address_map &map);
 	void p8k_memmap(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<p8k_16_daisy_device> m_daisy;
 	optional_device<z80pio_device> m_pio2;

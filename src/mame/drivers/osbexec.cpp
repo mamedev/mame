@@ -48,6 +48,11 @@ public:
 		, m_floppy1(*this, "mb8877:1:525ssdd")
 	{ }
 
+	void osbexec(machine_config &config);
+
+	void init_osbexec();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mb8877_device>  m_mb8877;
@@ -115,7 +120,6 @@ public:
 	DECLARE_WRITE8_MEMBER(osbexec_c000_w);
 	DECLARE_READ8_MEMBER(osbexec_kbd_r);
 	DECLARE_READ8_MEMBER(osbexec_rtc_r);
-	void init_osbexec();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
 	DECLARE_READ8_MEMBER(osbexec_pia0_a_r);
@@ -129,7 +133,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(modem_dsr_w);
 	DECLARE_WRITE_LINE_MEMBER(modem_ri_w);
 	DECLARE_WRITE_LINE_MEMBER(comm_clk_a_w);
-	void osbexec(machine_config &config);
 	void osbexec_io(address_map &map);
 	void osbexec_mem(address_map &map);
 };

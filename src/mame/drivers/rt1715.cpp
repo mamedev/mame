@@ -36,6 +36,10 @@ public:
 	{
 	}
 
+	void rt1715(machine_config &config);
+	void rt1715w(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(rt1715_floppy_enable);
 	DECLARE_READ8_MEMBER(k7658_led1_r);
 	DECLARE_READ8_MEMBER(k7658_led2_r);
@@ -45,17 +49,14 @@ public:
 	DECLARE_PALETTE_INIT(rt1715);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
-	void rt1715(machine_config &config);
-	void rt1715w(machine_config &config);
 	void k7658_io(address_map &map);
 	void k7658_mem(address_map &map);
 	void rt1715_io(address_map &map);
 	void rt1715_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	int m_led1_val;
 	int m_led2_val;
 	required_device<cpu_device> m_maincpu;

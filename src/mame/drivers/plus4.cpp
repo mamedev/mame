@@ -76,6 +76,11 @@ public:
 		m_exp_irq(CLEAR_LINE)
 	{ }
 
+	void plus4(machine_config &config);
+
+	DECLARE_WRITE8_MEMBER( cpu_w );
+
+protected:
 	required_device<m7501_device> m_maincpu;
 	required_device<pla_device> m_pla;
 	required_device<mos7360_device> m_ted;
@@ -108,7 +113,6 @@ public:
 	DECLARE_READ8_MEMBER( ted_videoram_r );
 
 	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ted_irq_w );
 	DECLARE_READ8_MEMBER( ted_k_r );
@@ -155,7 +159,6 @@ public:
 	// keyboard state
 	uint8_t m_kb;
 
-	void plus4(machine_config &config);
 	void plus4_mem(address_map &map);
 	void ted_videoram_map(address_map &map);
 };
@@ -168,13 +171,15 @@ public:
 		: plus4_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( cpu_r );
 	void v364(machine_config &config);
 	void c16n(machine_config &config);
 	void c16p(machine_config &config);
 	void c232(machine_config &config);
 	void plus4p(machine_config &config);
 	void plus4n(machine_config &config);
+
+private:
+	DECLARE_READ8_MEMBER( cpu_r );
 };
 
 

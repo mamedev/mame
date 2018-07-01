@@ -47,7 +47,7 @@ public:
 
 	void rowamet(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(mute_w);
 	DECLARE_READ8_MEMBER(io_r);
@@ -57,7 +57,6 @@ protected:
 	void rowamet_sub_io(address_map &map);
 	void rowamet_sub_map(address_map &map);
 
-private:
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
 	uint8_t m_io[16];

@@ -64,6 +64,9 @@ public:
 			m_nvram(*this, "nvram")
 	{}
 
+	void rastersp(machine_config &config);
+
+private:
 	#define VIDEO_ADDR_MASK     0x3fffffff
 
 	enum tms_regs
@@ -146,11 +149,10 @@ public:
 	void    upload_palette(uint32_t word1, uint32_t word2);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void ncr53c700(device_t *device);
-	void rastersp(machine_config &config);
 	void cpu_map(address_map &map);
 	void dsp_map(address_map &map);
 	void io_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

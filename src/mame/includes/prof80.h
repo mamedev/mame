@@ -50,6 +50,9 @@ public:
 		, m_j5(*this, "J5")
 	{ }
 
+	void prof80(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<prof80_mmu_device> m_mmu;
 	required_device<upd1990a_device> m_rtc;
@@ -96,7 +99,6 @@ public:
 	// timers
 	emu_timer   *m_floppy_motor_off_timer;
 
-	void prof80(machine_config &config);
 	void prof80_io(address_map &map);
 	void prof80_mem(address_map &map);
 	void prof80_mmu(address_map &map);

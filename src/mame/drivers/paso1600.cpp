@@ -37,6 +37,9 @@ public:
 	{
 	}
 
+	void paso1600(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(paso1600_pcg_r);
 	DECLARE_WRITE8_MEMBER(paso1600_pcg_w);
 	DECLARE_WRITE8_MEMBER(paso1600_6845_address_w);
@@ -50,14 +53,13 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	uint32_t screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void paso1600(machine_config &config);
 	void paso1600_io(address_map &map);
 	void paso1600_map(address_map &map);
-private:
-	uint8_t m_crtc_vreg[0x100],m_crtc_index;
-	struct{
+
+	uint8_t m_crtc_vreg[0x100], m_crtc_index;
+	struct {
 		uint8_t portb;
-	}m_keyb;
+	} m_keyb;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

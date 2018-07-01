@@ -55,6 +55,24 @@ public:
 		m_bank1(*this, "bank1"),
 		m_screen(*this, "screen") { }
 
+	void mcu(machine_config &config);
+	void qix_base(machine_config &config);
+	void qix(machine_config &config);
+	void qix_video(machine_config &config);
+	void qix_audio(machine_config &config);
+	void zookeep(machine_config &config);
+	void zookeep_video(machine_config &config);
+	void kram3(machine_config &config);
+	void kram3_video(machine_config &config);
+	void slither(machine_config &config);
+	void slither_video(machine_config &config);
+	void slither_audio(machine_config &config);
+
+	void init_slither();
+	void init_zookeep();
+	void init_kram3();
+
+private:
 	/* devices */
 	required_device<m6809_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -111,9 +129,7 @@ public:
 	DECLARE_WRITE8_MEMBER(slither_addresslatch_w);
 	DECLARE_WRITE8_MEMBER(qix_paletteram_w);
 	DECLARE_WRITE8_MEMBER(qix_palettebank_w);
-	void init_slither();
-	void init_zookeep();
-	void init_kram3();
+
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(qixmcu);
 	DECLARE_VIDEO_START(qix);
@@ -146,18 +162,7 @@ public:
 	int kram3_decrypt(int address, int value);
 	DECLARE_WRITE_LINE_MEMBER(kram3_lic_maincpu_changed);
 	DECLARE_WRITE_LINE_MEMBER(kram3_lic_videocpu_changed);
-	void mcu(machine_config &config);
-	void qix_base(machine_config &config);
-	void qix(machine_config &config);
-	void qix_video(machine_config &config);
-	void qix_audio(machine_config &config);
-	void zookeep(machine_config &config);
-	void zookeep_video(machine_config &config);
-	void kram3(machine_config &config);
-	void kram3_video(machine_config &config);
-	void slither(machine_config &config);
-	void slither_video(machine_config &config);
-	void slither_audio(machine_config &config);
+
 	void audio_map(address_map &map);
 	void kram3_main_map(address_map &map);
 	void kram3_video_map(address_map &map);

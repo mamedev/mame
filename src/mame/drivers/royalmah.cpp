@@ -122,7 +122,41 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void mjdiplob(machine_config &config);
+	void tahjong(machine_config &config);
+	void tontonb(machine_config &config);
+	void mjderngr(machine_config &config);
+	void mjyarou(machine_config &config);
+	void janoh(machine_config &config);
+	void mjtensin(machine_config &config);
+	void mjvegasa(machine_config &config);
+	void jansou(machine_config &config);
+	void cafetime(machine_config &config);
+	void seljan(machine_config &config);
+	void majs101b(machine_config &config);
+	void dondenmj(machine_config &config);
+	void daisyari(machine_config &config);
+	void mjdejavu(machine_config &config);
+	void mjapinky(machine_config &config);
+	void royalmah(machine_config &config);
+	void mjifb(machine_config &config);
+	void janptr96(machine_config &config);
+	void ippatsu(machine_config &config);
+	void suzume(machine_config &config);
+	void mjclub(machine_config &config);
+	void makaijan(machine_config &config);
+	void janyoup2(machine_config &config);
 
+	void init_tahjong();
+	void init_dynax();
+	void init_jansou();
+	void init_suzume();
+	void init_ippatsu();
+	void init_mjifb();
+	void init_tontonb();
+	void init_janptr96();
+
+private:
 	DECLARE_READ8_MEMBER(player_1_port_r);
 	DECLARE_READ8_MEMBER(player_2_port_r);
 	DECLARE_WRITE8_MEMBER(input_port_select_w);
@@ -207,14 +241,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mjvegasa_12400_w);
 	DECLARE_READ8_MEMBER(mjvegasa_12500_r);
 
-	void init_tahjong();
-	void init_dynax();
-	void init_jansou();
-	void init_suzume();
-	void init_ippatsu();
-	void init_mjifb();
-	void init_tontonb();
-	void init_janptr96();
 	DECLARE_PALETTE_INIT(royalmah);
 	DECLARE_PALETTE_INIT(mjderngr);
 
@@ -222,30 +248,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(suzume_irq);
 
-	void mjdiplob(machine_config &config);
-	void tahjong(machine_config &config);
-	void tontonb(machine_config &config);
-	void mjderngr(machine_config &config);
-	void mjyarou(machine_config &config);
-	void janoh(machine_config &config);
-	void mjtensin(machine_config &config);
-	void mjvegasa(machine_config &config);
-	void jansou(machine_config &config);
-	void cafetime(machine_config &config);
-	void seljan(machine_config &config);
-	void majs101b(machine_config &config);
-	void dondenmj(machine_config &config);
-	void daisyari(machine_config &config);
-	void mjdejavu(machine_config &config);
-	void mjapinky(machine_config &config);
-	void royalmah(machine_config &config);
-	void mjifb(machine_config &config);
-	void janptr96(machine_config &config);
-	void ippatsu(machine_config &config);
-	void suzume(machine_config &config);
-	void mjclub(machine_config &config);
-	void makaijan(machine_config &config);
-	void janyoup2(machine_config &config);
+
 	void cafetime_map(address_map &map);
 	void daisyari_iomap(address_map &map);
 	void dondenmj_iomap(address_map &map);
@@ -279,10 +282,9 @@ public:
 	void tahjong_iomap(address_map &map);
 	void tahjong_map(address_map &map);
 	void tontonb_iomap(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8910_device> m_ay;
 	required_shared_ptr<uint8_t> m_videoram;
