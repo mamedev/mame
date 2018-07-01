@@ -463,9 +463,14 @@ template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_
 template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_write_dispatch<HighBits, Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
 {
 	for(unsigned int i=0; i != COUNT; i++) {
-		m_dispatch[i]->unref();
+		if(m_dispatch[i]->is_dispatch()) {
+			m_dispatch[i]->detach(handlers);
+			continue;
+		}
+
 		if(!m_dispatch[i]->is_passthrough())
 			continue;
+
 		auto np = static_cast<handler_entry_write_passthrough<Width, AddrShift, Endian> *>(m_dispatch[i]);
 
 		if(handlers.find(np) != handlers.end()) {

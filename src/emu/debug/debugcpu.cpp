@@ -2908,8 +2908,10 @@ void device_debug::watchpoint::setEnabled(bool value)
 			install(read_or_write::READWRITE);
 		else
 		{
-			m_phr->remove();
-			m_phw->remove();
+			if(m_phr)
+				m_phr->remove();
+			if(m_phw)
+				m_phw->remove();
 		}
 	}
 }
