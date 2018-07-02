@@ -31,6 +31,7 @@ void nereid_device::device_start()
 	save_item(NAME(m_blue));
 	save_item(NAME(m_index));
 	save_item(NAME(m_palette));
+	save_item(NAME(m_plane_mask));
 }
 
 void nereid_device::device_reset()
