@@ -540,21 +540,36 @@ class taitotz_state : public driver_device
 public:
 	taitotz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_screen(*this, "screen"),
 		m_maincpu(*this, "maincpu"),
 		m_iocpu(*this, "iocpu"),
 		m_work_ram(*this, "work_ram"),
 		m_mbox_ram(*this, "mbox_ram"),
-		m_ata(*this, "ata"),
-		m_screen(*this, "screen")
+		m_ata(*this, "ata")
 	{
 	}
 
+	void taitotz(machine_config &config);
+	void landhigh(machine_config &config);
+
+	void init_batlgr2a();
+	void init_batlgr2();
+	void init_pwrshovl();
+	void init_batlgear();
+	void init_landhigh();
+	void init_landhigha();
+	void init_raizpin();
+	void init_raizpinj();
+	void init_styphp();
+
+	required_device<screen_device> m_screen;
+
+private:
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_iocpu;
 	required_shared_ptr<uint64_t> m_work_ram;
 	required_shared_ptr<uint16_t> m_mbox_ram;
 	required_device<ata_interface_device> m_ata;
-	required_device<screen_device> m_screen;
 
 	DECLARE_READ64_MEMBER(ppc_common_r);
 	DECLARE_WRITE64_MEMBER(ppc_common_w);
@@ -575,7 +590,7 @@ public:
 	uint32_t m_video_reg;
 	uint32_t m_scr_base;
 
-	uint64_t m_video_fifo_mem[4];
+	//uint64_t m_video_fifo_mem[4];
 
 	uint16_t m_io_share_ram[0x2000];
 
@@ -590,18 +605,9 @@ public:
 
 
 	uint32_t m_reg105;
-	int m_count;
 
 	std::unique_ptr<taitotz_renderer> m_renderer;
-	void init_batlgr2a();
-	void init_batlgr2();
-	void init_pwrshovl();
-	void init_batlgear();
-	void init_landhigh();
-	void init_landhigha();
-	void init_raizpin();
-	void init_raizpinj();
-	void init_styphp();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -617,8 +623,7 @@ public:
 	void video_reg_w(uint32_t reg, uint32_t data);
 	void init_taitotz_152();
 	void init_taitotz_111a();
-	void taitotz(machine_config &config);
-	void landhigh(machine_config &config);
+
 	void landhigh_tlcs900h_mem(address_map &map);
 	void ppc603e_mem(address_map &map);
 	void tlcs900h_mem(address_map &map);
@@ -2064,11 +2069,11 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 
 void taitotz_state::ppc603e_mem(address_map &map)
 {
-	map(0x00000000, 0x0000001f).rw(this, FUNC(taitotz_state::video_chip_r), FUNC(taitotz_state::video_chip_w));
-	map(0x10000000, 0x1000001f).rw(this, FUNC(taitotz_state::video_fifo_r), FUNC(taitotz_state::video_fifo_w));
+	map(0x00000000, 0x0000001f).rw(FUNC(taitotz_state::video_chip_r), FUNC(taitotz_state::video_chip_w));
+	map(0x10000000, 0x1000001f).rw(FUNC(taitotz_state::video_fifo_r), FUNC(taitotz_state::video_fifo_w));
 	map(0x40000000, 0x40ffffff).ram().share("work_ram");                // Work RAM
-	map(0xa4000000, 0xa40000ff).rw(this, FUNC(taitotz_state::ieee1394_r), FUNC(taitotz_state::ieee1394_w));       // IEEE1394 network
-	map(0xa8000000, 0xa8003fff).rw(this, FUNC(taitotz_state::ppc_common_r), FUNC(taitotz_state::ppc_common_w));   // Common RAM (with TLCS-900)
+	map(0xa4000000, 0xa40000ff).rw(FUNC(taitotz_state::ieee1394_r), FUNC(taitotz_state::ieee1394_w));       // IEEE1394 network
+	map(0xa8000000, 0xa8003fff).rw(FUNC(taitotz_state::ppc_common_r), FUNC(taitotz_state::ppc_common_w));   // Common RAM (with TLCS-900)
 	map(0xac000000, 0xac0fffff).rom().region("user1", 0);               // Apparently this should be flash ROM read/write access
 	map(0xfff00000, 0xffffffff).rom().region("user1", 0);
 }
@@ -2227,11 +2232,11 @@ void taitotz_state::tlcs900h_mem(address_map &map)
 {
 	map(0x010000, 0x02ffff).ram();                                                     // Work RAM
 	map(0x040000, 0x041fff).ram().share("nvram");                                   // Backup RAM
-	map(0x044000, 0x04400f).rw(this, FUNC(taitotz_state::tlcs_rtc_r), FUNC(taitotz_state::tlcs_rtc_w));
-	map(0x060000, 0x061fff).rw(this, FUNC(taitotz_state::tlcs_common_r), FUNC(taitotz_state::tlcs_common_w));
+	map(0x044000, 0x04400f).rw(FUNC(taitotz_state::tlcs_rtc_r), FUNC(taitotz_state::tlcs_rtc_w));
+	map(0x060000, 0x061fff).rw(FUNC(taitotz_state::tlcs_common_r), FUNC(taitotz_state::tlcs_common_w));
 	map(0x064000, 0x064fff).ram().share("mbox_ram");                                // MBox
-	map(0x068000, 0x06800f).w(m_ata, FUNC(ata_interface_device::write_cs0)).r(this, FUNC(taitotz_state::tlcs_ide0_r));
-	map(0x06c000, 0x06c00f).w(m_ata, FUNC(ata_interface_device::write_cs1)).r(this, FUNC(taitotz_state::tlcs_ide1_r));
+	map(0x068000, 0x06800f).w(m_ata, FUNC(ata_interface_device::cs0_w)).r(FUNC(taitotz_state::tlcs_ide0_r));
+	map(0x06c000, 0x06c00f).w(m_ata, FUNC(ata_interface_device::cs1_w)).r(FUNC(taitotz_state::tlcs_ide1_r));
 	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
 }
 
@@ -2239,11 +2244,11 @@ void taitotz_state::landhigh_tlcs900h_mem(address_map &map)
 {
 	map(0x200000, 0x21ffff).ram();                                                     // Work RAM
 	map(0x400000, 0x401fff).ram().share("nvram");                                   // Backup RAM
-	map(0x404000, 0x40400f).rw(this, FUNC(taitotz_state::tlcs_rtc_r), FUNC(taitotz_state::tlcs_rtc_w));
-	map(0x900000, 0x901fff).rw(this, FUNC(taitotz_state::tlcs_common_r), FUNC(taitotz_state::tlcs_common_w));
+	map(0x404000, 0x40400f).rw(FUNC(taitotz_state::tlcs_rtc_r), FUNC(taitotz_state::tlcs_rtc_w));
+	map(0x900000, 0x901fff).rw(FUNC(taitotz_state::tlcs_common_r), FUNC(taitotz_state::tlcs_common_w));
 	map(0x910000, 0x910fff).ram().share("mbox_ram");                                // MBox
-	map(0x908000, 0x90800f).w(m_ata, FUNC(ata_interface_device::write_cs0)).r(this, FUNC(taitotz_state::tlcs_ide0_r));
-	map(0x918000, 0x91800f).w(m_ata, FUNC(ata_interface_device::write_cs1)).r(this, FUNC(taitotz_state::tlcs_ide1_r));
+	map(0x908000, 0x90800f).w(m_ata, FUNC(ata_interface_device::cs0_w)).r(FUNC(taitotz_state::tlcs_ide0_r));
+	map(0x918000, 0x91800f).w(m_ata, FUNC(ata_interface_device::cs1_w)).r(FUNC(taitotz_state::tlcs_ide1_r));
 	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
 }
 

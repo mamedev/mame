@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert and unknown others
+// copyright-holders:Robbbert
 /***************************************************************************
 
     Acorn 6809
@@ -58,6 +58,7 @@ enter  show next address
 #include "video/mc6845.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -76,7 +77,7 @@ public:
 
 	void a6809(machine_config &config);
 
-protected:
+private:
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE8_MEMBER(a6809_address_w);
@@ -88,7 +89,6 @@ protected:
 
 	void a6809_mem(address_map &map);
 
-private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint16_t m_start_address;
 	uint16_t m_cursor_address;
@@ -108,8 +108,8 @@ void a6809_state::a6809_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x07ff).ram().share("videoram");
-	map(0x0800, 0x0800).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(a6809_state::a6809_address_w));
-	map(0x0801, 0x0801).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(a6809_state::a6809_register_w));
+	map(0x0800, 0x0800).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(a6809_state::a6809_address_w));
+	map(0x0801, 0x0801).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(a6809_state::a6809_register_w));
 	map(0x0900, 0x090f).mirror(0xf0).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xf000, 0xf7ff); // optional ROM
 	map(0xf800, 0xffff).rom().region("maincpu", 0);

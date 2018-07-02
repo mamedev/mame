@@ -15,9 +15,6 @@
 
 #include "machine/pci.h"
 
-#define MCFG_PCI9050_ADD(_tag) \
-	MCFG_PCI_DEVICE_ADD(_tag, PCI9050, 0x10b59050, 0x01, 0x06800000, 0x10b59050)
-
 #define MCFG_PCI9050_SET_MAP(id, map) \
 	downcast<pci9050_device *>(device)->set_map(id, address_map_constructor(&map, #map, this), this);
 

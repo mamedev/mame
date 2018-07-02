@@ -27,6 +27,7 @@ Debugging information:
 
 #include "emu.h"
 #include "cpu/hcd62121/hcd62121.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 
@@ -314,9 +315,9 @@ ROM_START(cfx9850)
 	ROM_REGION(0x80000, "bios", 0)
 	// Unknown yet which rom is which version.
 	ROM_SYSTEM_BIOS(0, "rom1", "rom1, version unknown")
-	ROMX_LOAD("cfx9850.bin", 0x00000, 0x80000, CRC(6c9bd903) SHA1(d5b6677ab4e0d3f84e5769e89e8f3d101f98f848), ROM_BIOS(1))
+	ROMX_LOAD("cfx9850.bin", 0x00000, 0x80000, CRC(6c9bd903) SHA1(d5b6677ab4e0d3f84e5769e89e8f3d101f98f848), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rom2", "rom2, version unknown")
-	ROMX_LOAD("cfx9850b.bin", 0x00000, 0x80000, CRC(cd3c497f) SHA1(1d1aa38205eec7aba3ed6bef7389767e38afe075), ROM_BIOS(2))
+	ROMX_LOAD("cfx9850b.bin", 0x00000, 0x80000, CRC(cd3c497f) SHA1(1d1aa38205eec7aba3ed6bef7389767e38afe075), ROM_BIOS(1))
 ROM_END
 
 

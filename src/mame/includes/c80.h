@@ -5,7 +5,7 @@
 #define MAME_INCLUDES_C80_H
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"

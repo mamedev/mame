@@ -29,7 +29,8 @@ Notes:
 To Do:
 
 Phoenix:
-- Emulate the different sound system used at least by phoenixc2 and griffono.
+- Emulate the different sound system used at least by phoenixc2, griffono,
+   and nextfase.
 - Better documentation of the bootlegs.
 
 Survival:
@@ -59,9 +60,9 @@ Pleiads:
 void phoenix_state::phoenix_memory_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).bankr("bank1").w(this, FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
-	map(0x5000, 0x53ff).w(this, FUNC(phoenix_state::phoenix_videoreg_w));
-	map(0x5800, 0x5bff).w(this, FUNC(phoenix_state::phoenix_scroll_w));
+	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x5000, 0x53ff).w(FUNC(phoenix_state::phoenix_videoreg_w));
+	map(0x5800, 0x5bff).w(FUNC(phoenix_state::phoenix_scroll_w));
 	map(0x6000, 0x63ff).w("cust", FUNC(phoenix_sound_device::control_a_w));
 	map(0x6800, 0x6bff).w("cust", FUNC(phoenix_sound_device::control_b_w));
 	map(0x7000, 0x73ff).portr("IN0");                            /* IN0 or IN1 */
@@ -71,9 +72,9 @@ void phoenix_state::phoenix_memory_map(address_map &map)
 void phoenix_state::pleiads_memory_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).bankr("bank1").w(this, FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
-	map(0x5000, 0x53ff).w(this, FUNC(phoenix_state::pleiads_videoreg_w));
-	map(0x5800, 0x5bff).w(this, FUNC(phoenix_state::phoenix_scroll_w));
+	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x5000, 0x53ff).w(FUNC(phoenix_state::pleiads_videoreg_w));
+	map(0x5800, 0x5bff).w(FUNC(phoenix_state::phoenix_scroll_w));
 	map(0x6000, 0x63ff).w(m_pleiads_custom, FUNC(pleiads_sound_device::control_a_w));
 	map(0x6800, 0x6bff).w(m_pleiads_custom, FUNC(pleiads_sound_device::control_b_w));
 	map(0x7000, 0x73ff).portr("IN0");                            /* IN0 or IN1 + protection */
@@ -83,12 +84,12 @@ void phoenix_state::pleiads_memory_map(address_map &map)
 void phoenix_state::survival_memory_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).bankr("bank1").w(this, FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
-	map(0x5000, 0x53ff).w(this, FUNC(phoenix_state::phoenix_videoreg_w));
-	map(0x5800, 0x5bff).w(this, FUNC(phoenix_state::phoenix_scroll_w));
+	map(0x4000, 0x4fff).bankr("bank1").w(FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x5000, 0x53ff).w(FUNC(phoenix_state::phoenix_videoreg_w));
+	map(0x5800, 0x5bff).w(FUNC(phoenix_state::phoenix_scroll_w));
 	map(0x6800, 0x68ff).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x6900, 0x69ff).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x7000, 0x73ff).r(this, FUNC(phoenix_state::survival_input_port_0_r));               /* IN0 or IN1 */
+	map(0x7000, 0x73ff).r(FUNC(phoenix_state::survival_input_port_0_r));               /* IN0 or IN1 */
 	map(0x7800, 0x7bff).portr("DSW0");                           /* DSW */
 }
 
@@ -423,12 +424,12 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( phoenix )
+static GFXDECODE_START( gfx_phoenix )
 	GFXDECODE_ENTRY( "bgtiles", 0, charlayout, 0, 32 )
 	GFXDECODE_ENTRY( "fgtiles", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( pleiads )
+static GFXDECODE_START( gfx_pleiads )
 	GFXDECODE_ENTRY( "bgtiles", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "fgtiles", 0, charlayout, 0, 64 )
 GFXDECODE_END
@@ -454,7 +455,7 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 	MCFG_SCREEN_UPDATE_DRIVER(phoenix_state, screen_update_phoenix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phoenix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phoenix)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,phoenix)
@@ -485,7 +486,7 @@ MACHINE_CONFIG_START(phoenix_state::pleiads)
 	MCFG_DEVICE_PROGRAM_MAP(pleiads_memory_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pleiads)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pleiads)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,pleiads)
@@ -528,7 +529,7 @@ MACHINE_CONFIG_START(phoenix_state::survival)
 	MCFG_SCREEN_UPDATE_DRIVER(phoenix_state, screen_update_phoenix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phoenix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phoenix)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,survival)
@@ -1244,6 +1245,10 @@ ROM_START( griffono )  // verified single PCB with piggyback sound PCB instead o
 	ROM_LOAD( "sn74s471n.11k",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
 ROM_END
 
+/*
+  There is no MN6221AA Melody-Alarm Generator.
+  There is a EPSON Electronics 7910CG Multi-Melody IC instead.
+*/
 ROM_START( nextfase )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nf01.bin",   0x0000, 0x0800, CRC(b31ce820) SHA1(dfdb17995a14b66d2571c2c8de481d2792f9ce6a) )

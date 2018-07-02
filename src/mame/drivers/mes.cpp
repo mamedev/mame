@@ -14,6 +14,7 @@ Schleicher MES
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -27,15 +28,17 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void mes(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port08_r);
 
-	void mes(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u8 m_term_data;
 	u8 m_port08;
 	virtual void machine_reset() override;
@@ -68,8 +71,8 @@ void mes_state::mem_map(address_map &map)
 void mes_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(mes_state::port00_r));
-	map(0x08, 0x08).r(this, FUNC(mes_state::port08_r));
+	map(0x00, 0x00).r(FUNC(mes_state::port00_r));
+	map(0x08, 0x08).r(FUNC(mes_state::port08_r));
 	map(0x0c, 0x0f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x18, 0x1b).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));

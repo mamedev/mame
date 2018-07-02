@@ -16,6 +16,7 @@
 #include "machine/z80sio.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -31,12 +32,14 @@ public:
 		, m_uart(*this, "uart")
 	{ }
 
+	void m79152pc(machine_config &config);
+
+private:
 	uint32_t screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void m79152pc(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_attributes;
@@ -120,7 +123,7 @@ static const gfx_layout m79152pc_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( m79152pc )
+static GFXDECODE_START( gfx_m79152pc )
 	GFXDECODE_ENTRY( "chargen", 0x0000, m79152pc_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -138,7 +141,7 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 300-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m79152pc_state, screen_update_m79152pc)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m79152pc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m79152pc)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)

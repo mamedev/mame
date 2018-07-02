@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class wc90b_state : public driver_device
 {
@@ -26,6 +27,9 @@ public:
 		m_scroll_x_lo(*this, "scroll_x_lo"),
 		m_spriteram(*this, "spriteram") { }
 
+	void wc90b(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
@@ -71,7 +75,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
-	void wc90b(machine_config &config);
+
 	void sound_cpu(address_map &map);
 	void wc90b_map1(address_map &map);
 	void wc90b_map2(address_map &map);

@@ -26,6 +26,7 @@ displayed.
 #include "video/hd63484.h"
 #include "audio/seibu.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -39,13 +40,15 @@ public:
 		m_screen(*this,"screen")
 		{ }
 
+	void shanghai(machine_config &config);
+	void shangha2(machine_config &config);
+	void kothello(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(shanghai_coin_w);
 	DECLARE_PALETTE_INIT(shanghai);
 	INTERRUPT_GEN_MEMBER(half_vblank_irq);
 
-	void shanghai(machine_config &config);
-	void shangha2(machine_config &config);
-	void kothello(machine_config &config);
 	void hd63484_map(address_map &map);
 	void kothello_map(address_map &map);
 	void kothello_sound_map(address_map &map);
@@ -53,7 +56,7 @@ public:
 	void shangha2_portmap(address_map &map);
 	void shanghai_map(address_map &map);
 	void shanghai_portmap(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 };
@@ -123,7 +126,7 @@ void shanghai_state::shanghai_portmap(address_map &map)
 	map(0x40, 0x41).portr("P1");
 	map(0x44, 0x45).portr("P2");
 	map(0x48, 0x49).portr("SYSTEM");
-	map(0x4c, 0x4c).w(this, FUNC(shanghai_state::shanghai_coin_w));
+	map(0x4c, 0x4c).w(FUNC(shanghai_state::shanghai_coin_w));
 }
 
 
@@ -135,7 +138,7 @@ void shanghai_state::shangha2_portmap(address_map &map)
 	map(0x30, 0x31).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
 	map(0x32, 0x33).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
 	map(0x40, 0x43).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
-	map(0x50, 0x50).w(this, FUNC(shanghai_state::shanghai_coin_w));
+	map(0x50, 0x50).w(FUNC(shanghai_state::shanghai_coin_w));
 }
 
 void shanghai_state::kothello_map(address_map &map)
@@ -475,6 +478,7 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)
 	MCFG_DEVICE_PROGRAM_MAP(kothello_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 

@@ -34,6 +34,9 @@ public:
 		: pk8000_base_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 
+	void photon(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(_80_porta_w);
 	DECLARE_READ8_MEMBER(_80_portb_r);
 	DECLARE_WRITE8_MEMBER(_80_portc_w);
@@ -48,7 +51,6 @@ public:
 	void set_bank(uint8_t data);
 
 	required_device<speaker_sound_device> m_speaker;
-	void photon(machine_config &config);
 	void pk8000_io(address_map &map);
 	void pk8000_mem(address_map &map);
 };
@@ -142,14 +144,14 @@ void photon_state::pk8000_io(address_map &map)
 	map.unmap_value_high();
 	map(0x80, 0x83).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x84, 0x87).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x88, 0x88).rw(this, FUNC(photon_state::video_color_r), FUNC(photon_state::video_color_w));
+	map(0x88, 0x88).rw(FUNC(photon_state::video_color_r), FUNC(photon_state::video_color_w));
 	map(0x8c, 0x8c).portr("JOY1");
 	map(0x8d, 0x8d).portr("JOY2");
-	map(0x90, 0x90).rw(this, FUNC(photon_state::text_start_r), FUNC(photon_state::text_start_w));
-	map(0x91, 0x91).rw(this, FUNC(photon_state::chargen_start_r), FUNC(photon_state::chargen_start_w));
-	map(0x92, 0x92).rw(this, FUNC(photon_state::video_start_r), FUNC(photon_state::video_start_w));
-	map(0x93, 0x93).rw(this, FUNC(photon_state::color_start_r), FUNC(photon_state::color_start_w));
-	map(0xa0, 0xbf).rw(this, FUNC(photon_state::color_r), FUNC(photon_state::color_w));
+	map(0x90, 0x90).rw(FUNC(photon_state::text_start_r), FUNC(photon_state::text_start_w));
+	map(0x91, 0x91).rw(FUNC(photon_state::chargen_start_r), FUNC(photon_state::chargen_start_w));
+	map(0x92, 0x92).rw(FUNC(photon_state::video_start_r), FUNC(photon_state::video_start_w));
+	map(0x93, 0x93).rw(FUNC(photon_state::color_start_r), FUNC(photon_state::color_start_w));
+	map(0xa0, 0xbf).rw(FUNC(photon_state::color_r), FUNC(photon_state::color_w));
 }
 
 static INPUT_PORTS_START( photon )

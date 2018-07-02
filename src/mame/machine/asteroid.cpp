@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/atari_vg.h"
 #include "video/avgdvg.h"
 #include "includes/asteroid.h"
 
@@ -19,21 +18,21 @@ INTERRUPT_GEN_MEMBER(asteroid_state::asteroid_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
 	if (!(ioport("IN0")->read() & 0x80))
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(asteroid_state::asterock_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
 	if ((ioport("IN0")->read() & 0x80))
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(asteroid_state::llander_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
 	if (ioport("IN0")->read() & 0x02)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(asteroid_state::cocktail_inv_w)
@@ -132,7 +131,9 @@ void asteroid_state::machine_start()
 
 void asteroid_state::machine_reset()
 {
-	m_dvg->reset_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	m_dvg->reset_w(machine().dummy_space(), 0, 0);
+	if (m_earom.found())
+		earom_control_w(machine().dummy_space(), 0, 0);
 
 	/* reset RAM banks if present */
 	if (m_ram1.target() != nullptr)

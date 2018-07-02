@@ -39,12 +39,12 @@ READ8_MEMBER( advision_state::rom_r )
 void advision_state::program_map(address_map &map)
 {
 	map(0x0000, 0x03ff).bankr("bank1");
-	map(0x0400, 0x0fff).r(this, FUNC(advision_state::rom_r));
+	map(0x0400, 0x0fff).r(FUNC(advision_state::rom_r));
 }
 
 void advision_state::io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(advision_state::ext_ram_r), FUNC(advision_state::ext_ram_w));
+	map(0x00, 0xff).rw(FUNC(advision_state::ext_ram_r), FUNC(advision_state::ext_ram_w));
 }
 
 /* Input Ports */

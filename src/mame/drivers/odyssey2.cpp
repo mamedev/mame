@@ -20,6 +20,7 @@
 
 #include "bus/odyssey2/slot.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -36,6 +37,16 @@ public:
 		m_keyboard(*this, "KEY.%u", 0),
 		m_joysticks(*this, "JOY.%u", 0) { }
 
+	void odyssey2_cartslot(machine_config &config);
+	void videopac(machine_config &config);
+	void odyssey2(machine_config &config);
+
+	void init_odyssey2();
+
+	uint32_t screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8244_device> m_i8244;
 	required_device<o2_cart_slot_device> m_cart;
@@ -44,29 +55,19 @@ public:
 	uint8_t m_p1;
 	uint8_t m_p2;
 	uint8_t m_lum;
-	DECLARE_READ8_MEMBER(io_read);
-	DECLARE_WRITE8_MEMBER(io_write);
-	DECLARE_READ8_MEMBER(bus_read);
-	DECLARE_WRITE8_MEMBER(bus_write);
-	DECLARE_READ8_MEMBER(p1_read);
-	DECLARE_WRITE8_MEMBER(p1_write);
-	DECLARE_READ8_MEMBER(p2_read);
-	DECLARE_WRITE8_MEMBER(p2_write);
+
+
 	DECLARE_READ_LINE_MEMBER(t1_read);
-	void init_odyssey2();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(odyssey2);
-	uint32_t screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
 
-	void odyssey2_cartslot(machine_config &config);
-	void videopac(machine_config &config);
-	void odyssey2(machine_config &config);
 	void odyssey2_io(address_map &map);
 	void odyssey2_mem(address_map &map);
-protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	/* constants */
 	static const uint8_t P1_BANK_LO_BIT          = 0x01;
 	static const uint8_t P1_BANK_HI_BIT          = 0x02;
@@ -79,6 +80,15 @@ protected:
 
 	required_ioport_array<6> m_keyboard;
 	required_ioport_array<2> m_joysticks;
+
+	DECLARE_READ8_MEMBER(io_read);
+	DECLARE_WRITE8_MEMBER(io_write);
+	DECLARE_READ8_MEMBER(bus_read);
+	DECLARE_WRITE8_MEMBER(bus_write);
+	DECLARE_READ8_MEMBER(p1_read);
+	DECLARE_WRITE8_MEMBER(p1_write);
+	DECLARE_READ8_MEMBER(p2_read);
+	DECLARE_WRITE8_MEMBER(p2_write);
 };
 
 class g7400_state : public odyssey2_state
@@ -90,6 +100,10 @@ public:
 		, m_ef9340_1(*this, "ef9340_1")
 	{ }
 
+	void g7400(machine_config &config);
+	void odyssey3(machine_config &config);
+
+private:
 	required_device<i8243_device> m_i8243;
 	required_device<ef9340_1_device> m_ef9340_1;
 
@@ -102,10 +116,8 @@ public:
 	DECLARE_WRITE8_MEMBER(i8243_port_w);
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
 
-	void g7400(machine_config &config);
-	void odyssey3(machine_config &config);
 	void g7400_io(address_map &map);
-protected:
+
 	uint8_t m_ic674_decode[8];
 	uint8_t m_ic678_decode[8];
 };
@@ -121,13 +133,13 @@ void odyssey2_state::odyssey2_mem(address_map &map)
 
 void odyssey2_state::odyssey2_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(odyssey2_state::io_read), FUNC(odyssey2_state::io_write));
+	map(0x00, 0xff).rw(FUNC(odyssey2_state::io_read), FUNC(odyssey2_state::io_write));
 }
 
 
 void g7400_state::g7400_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(g7400_state::io_read), FUNC(g7400_state::io_write));
+	map(0x00, 0xff).rw(FUNC(g7400_state::io_read), FUNC(g7400_state::io_write));
 }
 
 
@@ -654,7 +666,7 @@ static const gfx_layout odyssey2_spritelayout =
 };
 
 
-static GFXDECODE_START( odyssey2 )
+static GFXDECODE_START( gfx_odyssey2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_graphicslayout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_spritelayout, 0, 2 )
 GFXDECODE_END
@@ -689,7 +701,7 @@ MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
@@ -715,7 +727,7 @@ MACHINE_CONFIG_START(odyssey2_state::videopac)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
@@ -750,7 +762,7 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
@@ -791,7 +803,7 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
@@ -820,9 +832,9 @@ ROM_END
 ROM_START (videopac)
 	ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */
 	ROM_SYSTEM_BIOS( 0, "g7000", "g7000" )
-	ROMX_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee), ROM_BIOS(1))
+	ROMX_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "c52", "c52" )
-	ROMX_LOAD ("c52.bin", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e), ROM_BIOS(2))
+	ROMX_LOAD ("c52.bin", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e), ROM_BIOS(1))
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 

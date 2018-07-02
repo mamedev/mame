@@ -46,7 +46,7 @@ void ap34_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(electron_ap34_device::device_add_mconfig)
 	/* fdc */
-	MCFG_WD1770_ADD("fdc", 16_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("fdc", WD1770, 16_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ap34_floppies, "525qd", electron_ap34_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ap34_floppies, nullptr, electron_ap34_device::floppy_formats)

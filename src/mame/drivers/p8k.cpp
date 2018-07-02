@@ -47,7 +47,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/z8000/z8000.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
@@ -91,9 +91,14 @@ public:
 		, m_i8272(*this, "i8272")
 	{ }
 
+	void p8k(machine_config &config);
+	void p8k_16(machine_config &config);
+
+	void init_p8k();
+
+private:
 	DECLARE_READ8_MEMBER(p8k_port0_r);
 	DECLARE_WRITE8_MEMBER(p8k_port0_w);
-	void init_p8k();
 	DECLARE_MACHINE_RESET(p8k);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
@@ -105,14 +110,12 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 
-	void p8k(machine_config &config);
-	void p8k_16(machine_config &config);
 	void p8k_16_datamap(address_map &map);
 	void p8k_16_iomap(address_map &map);
 	void p8k_16_memmap(address_map &map);
 	void p8k_iomap(address_map &map);
 	void p8k_memmap(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<p8k_16_daisy_device> m_daisy;
 	optional_device<z80pio_device> m_pio2;
@@ -148,7 +151,7 @@ void p8k_state::p8k_memmap(address_map &map)
 void p8k_state::p8k_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x07).rw(this, FUNC(p8k_state::p8k_port0_r), FUNC(p8k_state::p8k_port0_w)); // MH7489
+	map(0x00, 0x07).rw(FUNC(p8k_state::p8k_port0_r), FUNC(p8k_state::p8k_port0_w)); // MH7489
 	map(0x08, 0x0b).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw("pio0", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x18, 0x1b).rw("pio1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
@@ -157,7 +160,7 @@ void p8k_state::p8k_iomap(address_map &map)
 	map(0x24, 0x27).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x28, 0x2b).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x2c, 0x2f).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x3c, 0x3c).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x3c, 0x3c).rw("dma", FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
 }
 
 

@@ -96,7 +96,7 @@ DEFINE_DEVICE_TYPE(TMS32032, tms32032_device, "tms32032", "Texas Instruments TMS
 // TODO: expand to cover all the standard internal peripherals
 void tms3203x_device::common_3203x(address_map &map)
 {
-	map(0x808064, 0x808064).rw(this, FUNC(tms3203x_device::primary_bus_control_r), FUNC(tms3203x_device::primary_bus_control_w));
+	map(0x808064, 0x808064).rw(FUNC(tms3203x_device::primary_bus_control_r), FUNC(tms3203x_device::primary_bus_control_w));
 }
 
 // internal memory maps
@@ -745,7 +745,6 @@ void tms3203x_device::execute_set_input(int inputnum, int state)
 	{
 		// switch between microcomputer/boot loader and microprocessor modes
 		m_mcbl_mode = (state == ASSERT_LINE);
-		m_cache->force_update();
 		return;
 	}
 

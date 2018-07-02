@@ -17,6 +17,7 @@ TODO:
 
 #include "includes/a2600.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -135,10 +136,10 @@ READ8_MEMBER(a2600_base_state::switch_A_r)
 	uint8_t val = 0;
 
 	// Left controller port PINs 1-4 ( 4321 )
-	val |= (m_joy1->joy_r() & 0x0f) << 4;
+	val |= (m_joy1->read_joy() & 0x0f) << 4;
 
 	// Right controller port PINs 1-4 ( 4321 )
-	val |= m_joy2->joy_r() & 0x0f;
+	val |= m_joy2->read_joy() & 0x0f;
 
 	return val;
 }
@@ -162,22 +163,22 @@ READ16_MEMBER(a2600_base_state::a2600_read_input_port)
 	switch (offset)
 	{
 	case 0: // Left controller port PIN 5
-		return m_joy1->pot_x_r();
+		return m_joy1->read_pot_x();
 
 	case 1: // Left controller port PIN 9
-		return m_joy1->pot_y_r();
+		return m_joy1->read_pot_y();
 
 	case 2: // Right controller port PIN 5
-		return m_joy2->pot_x_r();
+		return m_joy2->read_pot_x();
 
 	case 3: // Right controller port PIN 9
-		return m_joy2->pot_y_r();
+		return m_joy2->read_pot_y();
 
 	case 4: // Left controller port PIN 6
-		return (m_joy1->joy_r() & 0x20) ? 0xff : 0x7f;
+		return (m_joy1->read_joy() & 0x20) ? 0xff : 0x7f;
 
 	case 5: // Right controller port PIN 6
-		return (m_joy2->joy_r() & 0x20) ? 0xff : 0x7f;
+		return (m_joy2->read_joy() & 0x20) ? 0xff : 0x7f;
 	}
 	return 0xff;
 }
@@ -510,7 +511,7 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 	MCFG_DEVICE_PROGRAM_MAP(a2600_mem)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
+	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0, "tia")
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, a2600_state, a2600_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, a2600_state, a2600_get_databus_contents))
 	MCFG_TIA_VSYNC_CB(WRITE16(*this, a2600_state, a2600_tia_vsync_callback))
@@ -557,7 +558,7 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	MCFG_M6502_DISABLE_CACHE()
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
+	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0, "tia")
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, a2600_state, a2600_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, a2600_state, a2600_get_databus_contents))
 	MCFG_TIA_VSYNC_CB(WRITE16(*this, a2600_state, a2600_tia_vsync_callback_pal))

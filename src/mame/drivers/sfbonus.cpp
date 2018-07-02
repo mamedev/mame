@@ -277,6 +277,7 @@ MH86171 Color Palette RAMDAC
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -286,8 +287,8 @@ MH86171 Color Palette RAMDAC
 class sfbonus_state : public driver_device
 {
 public:
-	sfbonus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sfbonus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -297,47 +298,12 @@ public:
 		m_2801_regs(*this, "2801_regs"),
 		m_2c01_regs(*this, "2c01_regs"),
 		m_3000_regs(*this, "3000_regs"),
-		m_3800_regs(*this, "3800_regs")
-	{
-	}
+		m_3800_regs(*this, "3800_regs"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	void sfbonus(machine_config &config);
 
-	required_shared_ptr<uint8_t> m_nvram;
-	required_shared_ptr<uint8_t> m_1800_regs;
-	required_shared_ptr<uint8_t> m_vregs;
-	required_shared_ptr<uint8_t> m_2801_regs;
-	required_shared_ptr<uint8_t> m_2c01_regs;
-	required_shared_ptr<uint8_t> m_3000_regs;
-	required_shared_ptr<uint8_t> m_3800_regs;
-
-	std::unique_ptr<bitmap_ind16> m_temp_reel_bitmap;
-	tilemap_t *m_tilemap;
-	tilemap_t *m_reel_tilemap;
-	tilemap_t *m_reel2_tilemap;
-	tilemap_t *m_reel3_tilemap;
-	tilemap_t *m_reel4_tilemap;
-	std::unique_ptr<uint8_t[]> m_tilemap_ram;
-	std::unique_ptr<uint8_t[]> m_reel_ram;
-	std::unique_ptr<uint8_t[]> m_reel2_ram;
-	std::unique_ptr<uint8_t[]> m_reel3_ram;
-	std::unique_ptr<uint8_t[]> m_reel4_ram;
-	std::unique_ptr<uint8_t[]> m_videoram;
-
-	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_bank_w);
-	DECLARE_READ8_MEMBER(sfbonus_2800_r);
-	DECLARE_READ8_MEMBER(sfbonus_2801_r);
-	DECLARE_READ8_MEMBER(sfbonus_2c00_r);
-	DECLARE_READ8_MEMBER(sfbonus_2c01_r);
-	DECLARE_READ8_MEMBER(sfbonus_3800_r);
-	DECLARE_WRITE8_MEMBER(sfbonus_1800_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_3800_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_3000_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_2801_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_2c01_w);
 	void init_hldspin2d();
 	void init_ch2000v3();
 	void init_fb5v();
@@ -454,6 +420,21 @@ public:
 	void init_tighookv();
 	void init_robadv();
 	void init_pirpok2d();
+
+private:
+	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_bank_w);
+	DECLARE_READ8_MEMBER(sfbonus_2800_r);
+	DECLARE_READ8_MEMBER(sfbonus_2801_r);
+	DECLARE_READ8_MEMBER(sfbonus_2c00_r);
+	DECLARE_READ8_MEMBER(sfbonus_2c01_r);
+	DECLARE_READ8_MEMBER(sfbonus_3800_r);
+	DECLARE_WRITE8_MEMBER(sfbonus_1800_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_3800_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_3000_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_2801_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_2c01_w);
+
 	void sfbonus_bitswap(uint8_t xor0, uint8_t b00, uint8_t b01, uint8_t b02, uint8_t b03, uint8_t b04, uint8_t b05, uint8_t b06,uint8_t b07,
 						uint8_t xor1, uint8_t b10, uint8_t b11, uint8_t b12, uint8_t b13, uint8_t b14, uint8_t b15, uint8_t b16,uint8_t b17,
 						uint8_t xor2, uint8_t b20, uint8_t b21, uint8_t b22, uint8_t b23, uint8_t b24, uint8_t b25, uint8_t b26,uint8_t b27,
@@ -467,14 +448,42 @@ public:
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel3_tile_info);
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel4_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int category);
 	uint32_t screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sfbonus(machine_config &config);
+
 	void ramdac_map(address_map &map);
 	void sfbonus_io(address_map &map);
 	void sfbonus_map(address_map &map);
+
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_nvram;
+	required_shared_ptr<uint8_t> m_1800_regs;
+	required_shared_ptr<uint8_t> m_vregs;
+	required_shared_ptr<uint8_t> m_2801_regs;
+	required_shared_ptr<uint8_t> m_2c01_regs;
+	required_shared_ptr<uint8_t> m_3000_regs;
+	required_shared_ptr<uint8_t> m_3800_regs;
+
+	std::unique_ptr<bitmap_ind16> m_temp_reel_bitmap;
+	tilemap_t *m_tilemap;
+	tilemap_t *m_reel_tilemap;
+	tilemap_t *m_reel2_tilemap;
+	tilemap_t *m_reel3_tilemap;
+	tilemap_t *m_reel4_tilemap;
+	std::unique_ptr<uint8_t[]> m_tilemap_ram;
+	std::unique_ptr<uint8_t[]> m_reel_ram;
+	std::unique_ptr<uint8_t[]> m_reel2_ram;
+	std::unique_ptr<uint8_t[]> m_reel3_ram;
+	std::unique_ptr<uint8_t[]> m_reel4_ram;
+	std::unique_ptr<uint8_t[]> m_videoram;
+	output_finder<6> m_lamps;
 };
 
 
@@ -1189,22 +1198,22 @@ uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind1
 		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{
 		// based on pirpok2
-		output().set_lamp_value(0, (m_1800_regs[6] & 0x1) >> 0);
-		output().set_lamp_value(1, (m_1800_regs[6] & 0x4) >> 2);
-		output().set_lamp_value(2, (m_1800_regs[5] & 0x4) >> 2);
-		output().set_lamp_value(3, (m_1800_regs[5] & 0x1) >> 0);
-		output().set_lamp_value(4, (m_1800_regs[4] & 0x4) >> 2);
-		output().set_lamp_value(5, (m_1800_regs[4] & 0x1) >> 0);
+		m_lamps[0] = BIT(m_1800_regs[6], 0);
+		m_lamps[1] = BIT(m_1800_regs[6], 2);
+		m_lamps[2] = BIT(m_1800_regs[5], 2);
+		m_lamps[3] = BIT(m_1800_regs[5], 0);
+		m_lamps[4] = BIT(m_1800_regs[4], 2);
+		m_lamps[5] = BIT(m_1800_regs[4], 0);
 	}
 	else if ((ipt == INPUT_PORTS_NAME(amcoe1_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe1_reels4))
 		|| (ipt == INPUT_PORTS_NAME(amcoe1_poker)))
 	{
-		output().set_lamp_value(0, (m_1800_regs[0] & 0x2) >> 1);
-		output().set_lamp_value(1, (m_1800_regs[4] & 0x2) >> 1);
-		output().set_lamp_value(2, (m_1800_regs[3] & 0x2) >> 1);
-		output().set_lamp_value(3, (m_1800_regs[6] & 0x4) >> 2);
-		output().set_lamp_value(4, (m_1800_regs[4] & 0x4) >> 2);
-		output().set_lamp_value(5, (m_1800_regs[3] & 0x4) >> 2);
+		m_lamps[0] = BIT(m_1800_regs[0], 1);
+		m_lamps[1] = BIT(m_1800_regs[4], 1);
+		m_lamps[2] = BIT(m_1800_regs[3], 1);
+		m_lamps[3] = BIT(m_1800_regs[6], 2);
+		m_lamps[4] = BIT(m_1800_regs[4], 2);
+		m_lamps[5] = BIT(m_1800_regs[3], 2);
 	}
 
 	return 0;
@@ -1214,7 +1223,7 @@ uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind1
 
 void sfbonus_state::sfbonus_map(address_map &map)
 {
-	map(0x0000, 0xefff).bankr("bank1").w(this, FUNC(sfbonus_state::sfbonus_videoram_w));
+	map(0x0000, 0xefff).bankr("bank1").w(FUNC(sfbonus_state::sfbonus_videoram_w));
 	map(0xf000, 0xffff).ram().share("nvram");
 }
 
@@ -1301,21 +1310,21 @@ void sfbonus_state::sfbonus_io(address_map &map)
 	map(0x0c01, 0x0c01).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x0c02, 0x0c02).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x1800, 0x1807).w(this, FUNC(sfbonus_state::sfbonus_1800_w)).share("1800_regs"); // lamps and coin counters
+	map(0x1800, 0x1807).w(FUNC(sfbonus_state::sfbonus_1800_w)).share("1800_regs"); // lamps and coin counters
 
 	map(0x2400, 0x241f).ram().share("vregs");
 
-	map(0x2800, 0x2800).r(this, FUNC(sfbonus_state::sfbonus_2800_r));
-	map(0x2801, 0x2801).r(this, FUNC(sfbonus_state::sfbonus_2801_r)).w(this, FUNC(sfbonus_state::sfbonus_2801_w)).share("2801_regs");
+	map(0x2800, 0x2800).r(FUNC(sfbonus_state::sfbonus_2800_r));
+	map(0x2801, 0x2801).r(FUNC(sfbonus_state::sfbonus_2801_r)).w(FUNC(sfbonus_state::sfbonus_2801_w)).share("2801_regs");
 
-	map(0x2c00, 0x2c00).r(this, FUNC(sfbonus_state::sfbonus_2c00_r));
-	map(0x2c01, 0x2c01).r(this, FUNC(sfbonus_state::sfbonus_2c01_r)).w(this, FUNC(sfbonus_state::sfbonus_2c01_w)).share("2c01_regs");
+	map(0x2c00, 0x2c00).r(FUNC(sfbonus_state::sfbonus_2c00_r));
+	map(0x2c01, 0x2c01).r(FUNC(sfbonus_state::sfbonus_2c01_r)).w(FUNC(sfbonus_state::sfbonus_2c01_w)).share("2c01_regs");
 
-	map(0x3000, 0x3000).w(this, FUNC(sfbonus_state::sfbonus_3000_w)).share("3000_regs");
-	map(0x3400, 0x3400).w(this, FUNC(sfbonus_state::sfbonus_bank_w));
-	map(0x3800, 0x3800).r(this, FUNC(sfbonus_state::sfbonus_3800_r));
+	map(0x3000, 0x3000).w(FUNC(sfbonus_state::sfbonus_3000_w)).share("3000_regs");
+	map(0x3400, 0x3400).w(FUNC(sfbonus_state::sfbonus_bank_w));
+	map(0x3800, 0x3800).r(FUNC(sfbonus_state::sfbonus_3800_r));
 
-	map(0x3800, 0x3807).w(this, FUNC(sfbonus_state::sfbonus_3800_w)).share("3800_regs");
+	map(0x3800, 0x3807).w(FUNC(sfbonus_state::sfbonus_3800_w)).share("3800_regs");
 }
 
 
@@ -1347,7 +1356,7 @@ static const gfx_layout sfbonus32_layout =
 
 
 
-static GFXDECODE_START( sfbonus )
+static GFXDECODE_START( gfx_sfbonus )
 	GFXDECODE_ENTRY( "gfx1", 0, sfbonus_layout,   0x0, 2  )
 	GFXDECODE_ENTRY( "gfx2", 0, sfbonus32_layout,   0x0, 2  )
 GFXDECODE_END
@@ -1377,7 +1386,7 @@ MACHINE_CONFIG_START(sfbonus_state::sfbonus)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sfbonus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sfbonus)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -5859,29 +5868,29 @@ void sfbonus_state::init_sfbonus_common()
 {
 	m_tilemap_ram = std::make_unique<uint8_t[]>(0x4000);
 	memset(m_tilemap_ram.get(), 0xff, 0x4000);
-	save_pointer(NAME(m_tilemap_ram.get()), 0x4000);
+	save_pointer(NAME(m_tilemap_ram), 0x4000);
 
 	m_reel_ram = std::make_unique<uint8_t[]>(0x0800);
 	memset(m_reel_ram.get(), 0xff ,0x0800);
-	save_pointer(NAME(m_reel_ram.get()), 0x0800);
+	save_pointer(NAME(m_reel_ram), 0x0800);
 
 	m_reel2_ram = std::make_unique<uint8_t[]>(0x0800);
 	memset(m_reel2_ram.get(), 0xff, 0x0800);
-	save_pointer(NAME(m_reel2_ram.get()), 0x0800);
+	save_pointer(NAME(m_reel2_ram), 0x0800);
 
 	m_reel3_ram = std::make_unique<uint8_t[]>(0x0800);
 	memset(m_reel3_ram.get(), 0xff, 0x0800);
-	save_pointer(NAME(m_reel3_ram.get()), 0x0800);
+	save_pointer(NAME(m_reel3_ram), 0x0800);
 
 	m_reel4_ram = std::make_unique<uint8_t[]>(0x0800);
 	memset(m_reel4_ram.get(), 0xff, 0x0800);
-	save_pointer(NAME(m_reel4_ram.get()), 0x0800);
+	save_pointer(NAME(m_reel4_ram), 0x0800);
 
 	m_videoram = std::make_unique<uint8_t[]>(0x10000);
 
 	memset(m_videoram.get(), 0xff, 0x10000);
 
-	save_pointer(NAME(m_videoram.get()), 0x10000);
+	save_pointer(NAME(m_videoram), 0x10000);
 }
 
 void sfbonus_state::sfbonus_bitswap(

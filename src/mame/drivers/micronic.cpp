@@ -229,27 +229,27 @@ void micronic_state::micronic_io(address_map &map)
 	map.global_mask(0xff);
 
 	/* keypad */
-	map(0x00, 0x00).r(this, FUNC(micronic_state::keypad_r));
-	map(0x02, 0x02).w(this, FUNC(micronic_state::kp_matrix_w));
+	map(0x00, 0x00).r(FUNC(micronic_state::keypad_r));
+	map(0x02, 0x02).w(FUNC(micronic_state::kp_matrix_w));
 
 	/* hd61830 */
 	map(0x03, 0x03).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w));
 	map(0x23, 0x23).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
 
 	/* rtc-146818 */
-	map(0x08, 0x08).w(this, FUNC(micronic_state::rtc_address_w));
-	map(0x28, 0x28).rw(this, FUNC(micronic_state::rtc_data_r), FUNC(micronic_state::rtc_data_w));
+	map(0x08, 0x08).w(FUNC(micronic_state::rtc_address_w));
+	map(0x28, 0x28).rw(FUNC(micronic_state::rtc_data_r), FUNC(micronic_state::rtc_data_w));
 
 	/* sound */
-	map(0x2b, 0x2b).w(this, FUNC(micronic_state::beep_w));
+	map(0x2b, 0x2b).w(FUNC(micronic_state::beep_w));
 
 	/* basic machine */
-	map(0x05, 0x05).r(this, FUNC(micronic_state::irq_flag_r));
-	map(0x2c, 0x2c).w(this, FUNC(micronic_state::port_2c_w));
-	map(0x47, 0x47).w(this, FUNC(micronic_state::bank_select_w));
-	map(0x46, 0x46).w(this, FUNC(micronic_state::lcd_contrast_w));
-	map(0x48, 0x48).w(this, FUNC(micronic_state::status_flag_w));
-	map(0x49, 0x49).r(this, FUNC(micronic_state::status_flag_r));
+	map(0x05, 0x05).r(FUNC(micronic_state::irq_flag_r));
+	map(0x2c, 0x2c).w(FUNC(micronic_state::port_2c_w));
+	map(0x47, 0x47).w(FUNC(micronic_state::bank_select_w));
+	map(0x46, 0x46).w(FUNC(micronic_state::lcd_contrast_w));
+	map(0x48, 0x48).w(FUNC(micronic_state::status_flag_w));
+	map(0x49, 0x49).r(FUNC(micronic_state::status_flag_r));
 }
 
 /* Input ports */
@@ -346,13 +346,13 @@ void micronic_state::machine_reset()
 
 WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
 {
-	m_maincpu->set_input_line(0, !state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
 MACHINE_CONFIG_START(micronic_state::micronic)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(3'579'545))
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 3.579545_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(micronic_mem)
 	MCFG_DEVICE_IO_MAP(micronic_io)
 
@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(micronic_state, micronic)
 
-	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
+	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, 4.9152_MHz_XTAL / 2 / 2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", micronic_state, nvram_init)  // base ram
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram2", micronic_state, nvram_init)  // additional ram banks
 
-	MCFG_MC146818_ADD( MC146818_TAG, XTAL(32'768) )
+	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, micronic_state, mc146818_irq))
 MACHINE_CONFIG_END
 
@@ -391,10 +391,10 @@ MACHINE_CONFIG_END
 ROM_START( micronic )
 	ROM_REGION( 0x18000, Z80_TAG, 0 )
 	ROM_SYSTEM_BIOS(0, "v228", "Micronic 1000")
-	ROMX_LOAD( "micron1.bin", 0x0000, 0x8000, CRC(5632c8b7) SHA1(d1c9cf691848e9125f9ea352e4ffa41c288f3e29), ROM_BIOS(1))
-	ROMX_LOAD( "micron2.bin", 0x10000, 0x8000, CRC(dc8e7341) SHA1(927dddb3914a50bb051256d126a047a29eff7c65), ROM_BIOS(1))
+	ROMX_LOAD("micron1.bin", 0x0000, 0x8000, CRC(5632c8b7) SHA1(d1c9cf691848e9125f9ea352e4ffa41c288f3e29), ROM_BIOS(0))
+	ROMX_LOAD("micron2.bin", 0x10000, 0x8000, CRC(dc8e7341) SHA1(927dddb3914a50bb051256d126a047a29eff7c65), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "test", "Micronic 1000 LCD monitor")
-	ROMX_LOAD( "monitor2.bin", 0x0000, 0x8000, CRC(c6ae2bbf) SHA1(1f2e3a3d4720a8e1bb38b37f4ab9e0e32676d030), ROM_BIOS(2))
+	ROMX_LOAD("monitor2.bin", 0x0000, 0x8000, CRC(c6ae2bbf) SHA1(1f2e3a3d4720a8e1bb38b37f4ab9e0e32676d030), ROM_BIOS(1))
 ROM_END
 
 /* Driver */

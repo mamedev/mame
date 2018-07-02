@@ -51,7 +51,7 @@ private:
 	void line(int x_from, int y_from, int x_to, int y_to);
 	void bitblt(int dstx, int dsty, uint16_t srcaddr, int width, int height, int op);
 
-	uint16_t m_conf[11], m_input[2];
+	uint16_t m_conf[12], m_input[2];
 	int m_input_ptr, m_memory_ptr, m_conf_ptr;
 	int m_command, m_horiz_pix_total, m_vert_pix_total;
 

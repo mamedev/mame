@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class compgolf_state : public driver_device
 {
 public:

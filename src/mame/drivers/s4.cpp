@@ -59,6 +59,13 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void s4(machine_config &config);
+	void s4a(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+
+private:
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
@@ -80,15 +87,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
 	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s4);
 	DECLARE_MACHINE_RESET(s4a);
-	void s4(machine_config &config);
-	void s4a(machine_config &config);
 	void s4_audio_map(address_map &map);
 	void s4_main_map(address_map &map);
-private:
+
 	uint8_t m_t_c;
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -283,14 +286,14 @@ INPUT_CHANGED_MEMBER( s4_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( s4_state::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if ((newval==CLEAR_LINE) && !m_chimes)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER( s4_state::sol0_w )
@@ -493,7 +496,7 @@ MACHINE_CONFIG_START(s4_state::s4a)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(*this, s4_state, sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
 MACHINE_CONFIG_END

@@ -271,8 +271,8 @@ void vixen_state::vixen_mem(address_map &map)
 void vixen_state::bios_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xefff).r(this, FUNC(vixen_state::opram_r));
-	map(0xf000, 0xffff).r(this, FUNC(vixen_state::oprom_r));
+	map(0x0000, 0xefff).r(FUNC(vixen_state::opram_r));
+	map(0xf000, 0xffff).r(FUNC(vixen_state::oprom_r));
 }
 
 
@@ -285,16 +285,16 @@ void vixen_state::vixen_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
-	map(0x04, 0x04).mirror(0x03).rw(this, FUNC(vixen_state::status_r), FUNC(vixen_state::cmd_w));
+	map(0x04, 0x04).mirror(0x03).rw(FUNC(vixen_state::status_r), FUNC(vixen_state::cmd_w));
 	map(0x08, 0x08).mirror(0x01).rw(P8155H_TAG, FUNC(i8155_device::read), FUNC(i8155_device::write));
 	map(0x0c, 0x0d).w(P8155H_TAG, FUNC(i8155_device::ale_w));
 	map(0x10, 0x10).mirror(0x07).r(m_ieee488, FUNC(ieee488_device::dio_r));
-	map(0x18, 0x18).mirror(0x07).r(this, FUNC(vixen_state::ieee488_r));
+	map(0x18, 0x18).mirror(0x07).r(FUNC(vixen_state::ieee488_r));
 	map(0x20, 0x21).mirror(0x04).w(m_io_i8155, FUNC(i8155_device::ale_w));
 	map(0x28, 0x28).mirror(0x05).rw(m_io_i8155, FUNC(i8155_device::read), FUNC(i8155_device::write));
 	map(0x30, 0x30).mirror(0x06).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x31, 0x31).mirror(0x06).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x38, 0x38).mirror(0x07).r(this, FUNC(vixen_state::port3_r));
+	map(0x38, 0x38).mirror(0x07).r(FUNC(vixen_state::port3_r));
 //  AM_RANGE(0xf0, 0xff) Hard Disk?
 }
 
@@ -488,7 +488,7 @@ uint32_t vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 static DISCRETE_SOUND_START( vixen_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
-	DISCRETE_SQUAREWAVE(NODE_02, NODE_01, (XTAL(23'961'600)/15360).dvalue(), 100, 50, 0, 90)
+	DISCRETE_SQUAREWAVE(NODE_02, NODE_01, (23.9616_MHz_XTAL / 15360).dvalue(), 100, 50, 0, 90)
 	DISCRETE_OUTPUT(NODE_02, 2000)
 DISCRETE_SOUND_END
 
@@ -577,28 +577,28 @@ WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
 	*/
 
 	/* data valid */
-	m_ieee488->atn_w(BIT(data, 0));
+	m_ieee488->host_atn_w(BIT(data, 0));
 
 	/* end or identify */
-	m_ieee488->dav_w(BIT(data, 1));
+	m_ieee488->host_dav_w(BIT(data, 1));
 
 	/* remote enable */
-	m_ieee488->ndac_w(BIT(data, 2));
+	m_ieee488->host_ndac_w(BIT(data, 2));
 
 	/* attention */
-	m_ieee488->nrfd_w(BIT(data, 3));
+	m_ieee488->host_nrfd_w(BIT(data, 3));
 
 	/* interface clear */
-	m_ieee488->eoi_w(BIT(data, 4));
+	m_ieee488->host_eoi_w(BIT(data, 4));
 
 	/* service request */
-	m_ieee488->srq_w(BIT(data, 5));
+	m_ieee488->host_srq_w(BIT(data, 5));
 
 	/* not ready for data */
-	m_ieee488->ifc_w(BIT(data, 6));
+	m_ieee488->host_ifc_w(BIT(data, 6));
 
 	/* data not accepted */
-	m_ieee488->ren_w(BIT(data, 7));
+	m_ieee488->host_ren_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER( vixen_state::io_i8155_pc_w )
@@ -743,7 +743,7 @@ void vixen_state::machine_reset()
 
 MACHINE_CONFIG_START(vixen_state::vixen)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z8400A_TAG, Z80, XTAL(23'961'600)/6)
+	MCFG_DEVICE_ADD(m_maincpu, Z80, 23.9616_MHz_XTAL / 6)
 	MCFG_DEVICE_PROGRAM_MAP(vixen_mem)
 	MCFG_DEVICE_OPCODES_MAP(bios_mem)
 	MCFG_DEVICE_IO_MAP(vixen_io)
@@ -752,7 +752,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DRIVER(vixen_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(23'961'600)/2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
+	MCFG_SCREEN_RAW_PARAMS(23.9616_MHz_XTAL / 2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vsync", vixen_state, vsync_tick, SCREEN_TAG, 26*10, 27*10)
 
@@ -764,13 +764,13 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	// devices
-	MCFG_DEVICE_ADD(P8155H_TAG, I8155, XTAL(23'961'600)/6)
+	MCFG_DEVICE_ADD(P8155H_TAG, I8155, 23.9616_MHz_XTAL / 6)
 	MCFG_I8155_IN_PORTA_CB(READ8(*this, vixen_state, i8155_pa_r))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, vixen_state, i8155_pb_w))
 	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, vixen_state, i8155_pc_w))
 
-	MCFG_DEVICE_ADD(P8155H_IO_TAG, I8155, XTAL(23'961'600)/6)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_DEVICE_ADD(P8155H_IO_TAG, I8155, 23.9616_MHz_XTAL / 6)
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(m_ieee488, ieee488_device, host_dio_w))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, vixen_state, io_i8155_pb_w))
 	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, vixen_state, io_i8155_pc_w))
 	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, vixen_state, io_i8155_to_w))
@@ -786,7 +786,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(P8251A_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(P8251A_TAG, i8251_device, write_dsr))
 
-	MCFG_FD1797_ADD(FDC1797_TAG, XTAL(23'961'600)/24)
+	MCFG_DEVICE_ADD(FDC1797_TAG, FD1797, 23.9616_MHz_XTAL / 24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, vixen_state, fdc_intrq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

@@ -286,13 +286,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
-	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
-	void init_sg1000a();
-	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void sderby2s(machine_config &config);
 	void sg1000ax(machine_config &config);
 	void sg1000a(machine_config &config);
+
+	void init_sg1000a();
+
+private:
+	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
+	required_device<cpu_device> m_maincpu;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void decrypted_opcodes_map(address_map &map);
 	void io_map(address_map &map);
 	void program_map(address_map &map);
@@ -321,18 +324,18 @@ void sg1000a_state::decrypted_opcodes_map(address_map &map)
 void sg1000a_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::write));
-	map(0xbe, 0xbe).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0xbf, 0xbf).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::command_w));
+	map(0xbe, 0xbe).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0xbf, 0xbf).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 	map(0xdc, 0xdf).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 void sg1000a_state::sderby2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::write));
-	map(0xbe, 0xbe).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0xbf, 0xbf).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::command_w));
+	map(0xbe, 0xbe).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0xbf, 0xbf).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 	// AM_RANGE(0xc0, 0xc1) NEC D8251AC UART
 	map(0xc8, 0xcb).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)); // NEC D8255AC-2
 }

@@ -111,6 +111,7 @@ video z80
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "video/mb_vcu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -123,13 +124,59 @@ class mazerbla_state : public driver_device
 {
 public:
 	mazerbla_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
-		m_vcu(*this,"vcu"),
-		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "sub")
+		, m_vcu(*this,"vcu")
+		, m_screen(*this, "screen")
+		, m_soundlatch(*this, "soundlatch")
+		, m_leds(*this, "led%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
+	{ }
+
+	void greatgun(machine_config &config);
+	void mazerbla(machine_config &config);
+
+	void init_mazerbla();
+	void init_greatgun();
+
+private:
+	DECLARE_WRITE8_MEMBER(cfb_rom_bank_sel_w);
+	DECLARE_WRITE8_MEMBER(cfb_zpu_int_req_set_w);
+	DECLARE_READ8_MEMBER(cfb_zpu_int_req_clr);
+	DECLARE_READ8_MEMBER(ls670_0_r);
+	DECLARE_WRITE8_MEMBER(ls670_0_w);
+	DECLARE_READ8_MEMBER(ls670_1_r);
+	DECLARE_WRITE8_MEMBER(ls670_1_w);
+	DECLARE_WRITE8_MEMBER(zpu_bcd_decoder_w);
+	DECLARE_READ8_MEMBER(zpu_inputs_r);
+	DECLARE_WRITE8_MEMBER(zpu_led_w);
+	DECLARE_WRITE8_MEMBER(zpu_lamps_w);
+	DECLARE_WRITE8_MEMBER(zpu_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(cfb_led_w);
+	DECLARE_WRITE8_MEMBER(vsb_ls273_audio_control_w);
+	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
+	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
+	DECLARE_PALETTE_INIT(mazerbla);
+	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	INTERRUPT_GEN_MEMBER(sound_interrupt);
+	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
+	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+	void greatgun_cpu3_io_map(address_map &map);
+	void greatgun_io_map(address_map &map);
+	void greatgun_sound_map(address_map &map);
+	void mazerbla_cpu2_io_map(address_map &map);
+	void mazerbla_cpu2_map(address_map &map);
+	void mazerbla_cpu3_io_map(address_map &map);
+	void mazerbla_cpu3_map(address_map &map);
+	void mazerbla_io_map(address_map &map);
+	void mazerbla_map(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -137,6 +184,8 @@ public:
 	required_device<mb_vcu_device> m_vcu;
 	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	output_finder<3> m_leds;
+	output_finder<2> m_lamps;
 
 	uint8_t m_port02_status;
 	uint32_t m_gfx_rom_bank;  /* graphics ROMs are banked */
@@ -154,46 +203,6 @@ public:
 	uint8_t m_bcd_7445;
 
 	uint8_t m_vsb_ls273;
-
-	DECLARE_WRITE8_MEMBER(cfb_rom_bank_sel_w);
-	DECLARE_WRITE8_MEMBER(cfb_zpu_int_req_set_w);
-	DECLARE_READ8_MEMBER(cfb_zpu_int_req_clr);
-	DECLARE_READ8_MEMBER(ls670_0_r);
-	DECLARE_WRITE8_MEMBER(ls670_0_w);
-	DECLARE_READ8_MEMBER(ls670_1_r);
-	DECLARE_WRITE8_MEMBER(ls670_1_w);
-	DECLARE_WRITE8_MEMBER(zpu_bcd_decoder_w);
-	DECLARE_READ8_MEMBER(zpu_inputs_r);
-	DECLARE_WRITE8_MEMBER(zpu_led_w);
-	DECLARE_WRITE8_MEMBER(zpu_lamps_w);
-	DECLARE_WRITE8_MEMBER(zpu_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(cfb_led_w);
-	DECLARE_WRITE8_MEMBER(vsb_ls273_audio_control_w);
-	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
-	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
-	void init_mazerbla();
-	void init_greatgun();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mazerbla);
-	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	INTERRUPT_GEN_MEMBER(sound_interrupt);
-	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
-	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
-	IRQ_CALLBACK_MEMBER(irq_callback);
-	void greatgun(machine_config &config);
-	void mazerbla(machine_config &config);
-	void greatgun_cpu3_io_map(address_map &map);
-	void greatgun_io_map(address_map &map);
-	void greatgun_sound_map(address_map &map);
-	void mazerbla_cpu2_io_map(address_map &map);
-	void mazerbla_cpu2_map(address_map &map);
-	void mazerbla_cpu3_io_map(address_map &map);
-	void mazerbla_cpu3_map(address_map &map);
-	void mazerbla_io_map(address_map &map);
-	void mazerbla_map(address_map &map);
 };
 
 
@@ -396,7 +405,7 @@ WRITE8_MEMBER(mazerbla_state::zpu_led_w)
 {
 	/* 0x6e - reset (offset = 0)*/
 	/* 0x6f - set */
-	output().set_led_value(0, offset & 1);
+	m_leds[0] = BIT(offset, 0);
 }
 
 WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
@@ -404,8 +413,8 @@ WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
 	/* bit 4 = /LAMP0 */
 	/* bit 5 = /LAMP1 */
 
-	/*output().set_led_value(0, (data & 0x10) >> 4);*/
-	/*output().set_led_value(1, (data & 0x20) >> 4);*/
+	/*m_lamps[0] = BIT(data, 4);*/
+	/*m_lamps[1] = BIT(data, 5);*/
 }
 
 WRITE8_MEMBER(mazerbla_state::zpu_coin_counter_w)
@@ -417,13 +426,13 @@ WRITE8_MEMBER(mazerbla_state::zpu_coin_counter_w)
 WRITE8_MEMBER(mazerbla_state::cfb_led_w)
 {
 	/* bit 7 - led on */
-	output().set_led_value(2, BIT(data, 7));
+	m_leds[2] = BIT(data, 7);
 }
 
 WRITE8_MEMBER(mazerbla_state::gg_led_ctrl_w)
 {
 	/* bit 0, bit 1 - led on */
-	output().set_led_value(1, BIT(data, 0));
+	m_leds[1] = BIT(data, 0);
 }
 
 
@@ -438,7 +447,7 @@ WRITE8_MEMBER(mazerbla_state::vsb_ls273_audio_control_w)
 	m_vsb_ls273 = data;
 
 	/* bit 5 - led on */
-	output().set_led_value(1, BIT(data, 5));
+	m_leds[1] = BIT(data, 5);
 }
 
 WRITE8_MEMBER(mazerbla_state::sound_int_clear_w)
@@ -457,22 +466,22 @@ void mazerbla_state::mazerbla_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram().share("share1");
-	map(0xd800, 0xd800).r(this, FUNC(mazerbla_state::cfb_zpu_int_req_clr));
+	map(0xd800, 0xd800).r(FUNC(mazerbla_state::cfb_zpu_int_req_clr));
 	map(0xe000, 0xefff).ram().share("nvram");
 }
 
 void mazerbla_state::mazerbla_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x4c, 0x4f).rw(this, FUNC(mazerbla_state::ls670_1_r), FUNC(mazerbla_state::ls670_0_w));
-	map(0x60, 0x60).w(this, FUNC(mazerbla_state::zpu_bcd_decoder_w)); // AM_READ from protection pal, if populated
-	map(0x62, 0x62).r(this, FUNC(mazerbla_state::zpu_inputs_r));
+	map(0x4c, 0x4f).rw(FUNC(mazerbla_state::ls670_1_r), FUNC(mazerbla_state::ls670_0_w));
+	map(0x60, 0x60).w(FUNC(mazerbla_state::zpu_bcd_decoder_w)); // AM_READ from protection pal, if populated
+	map(0x62, 0x62).r(FUNC(mazerbla_state::zpu_inputs_r));
 	// 64 is some sort of output latch, unpopulated?
 	// 66 is some sort of output latch, unpopulated?
-	map(0x68, 0x68).w(this, FUNC(mazerbla_state::zpu_coin_counter_w));
-	map(0x6a, 0x6a).w(this, FUNC(mazerbla_state::zpu_lamps_w));
+	map(0x68, 0x68).w(FUNC(mazerbla_state::zpu_coin_counter_w));
+	map(0x6a, 0x6a).w(FUNC(mazerbla_state::zpu_lamps_w));
 	// 6c RW is a 6850 acia for communication with another cabinet or debug console? unpopulated?
-	map(0x6e, 0x6f).w(this, FUNC(mazerbla_state::zpu_led_w));
+	map(0x6e, 0x6f).w(FUNC(mazerbla_state::zpu_led_w));
 }
 
 void mazerbla_state::mazerbla_cpu2_map(address_map &map)
@@ -486,9 +495,9 @@ void mazerbla_state::mazerbla_cpu2_map(address_map &map)
 void mazerbla_state::mazerbla_cpu2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(mazerbla_state::vsb_ls273_audio_control_w));
+	map(0x00, 0x00).w(FUNC(mazerbla_state::vsb_ls273_audio_control_w));
 	map(0x40, 0x41).nopw();
-	map(0x80, 0x83).rw(this, FUNC(mazerbla_state::ls670_0_r), FUNC(mazerbla_state::ls670_1_w));
+	map(0x80, 0x83).rw(FUNC(mazerbla_state::ls670_0_r), FUNC(mazerbla_state::ls670_1_w));
 }
 
 void mazerbla_state::mazerbla_cpu3_map(address_map &map)
@@ -507,9 +516,9 @@ void mazerbla_state::mazerbla_cpu3_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x01, 0x01).w(m_vcu, FUNC(mb_vcu_device::background_color_w));
-	map(0x02, 0x02).r(m_vcu, FUNC(mb_vcu_device::status_r)).w(this, FUNC(mazerbla_state::cfb_led_w));
-	map(0x03, 0x03).w(this, FUNC(mazerbla_state::cfb_zpu_int_req_set_w));
-	map(0x04, 0x04).w(this, FUNC(mazerbla_state::cfb_rom_bank_sel_w));
+	map(0x02, 0x02).r(m_vcu, FUNC(mb_vcu_device::status_r)).w(FUNC(mazerbla_state::cfb_led_w));
+	map(0x03, 0x03).w(FUNC(mazerbla_state::cfb_zpu_int_req_set_w));
+	map(0x04, 0x04).w(FUNC(mazerbla_state::cfb_rom_bank_sel_w));
 	map(0x05, 0x05).w(m_vcu, FUNC(mb_vcu_device::vbank_w));
 }
 
@@ -524,11 +533,11 @@ void mazerbla_state::greatgun_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x4c, 0x4c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x60, 0x60).w(this, FUNC(mazerbla_state::zpu_bcd_decoder_w));
-	map(0x62, 0x62).r(this, FUNC(mazerbla_state::zpu_inputs_r));
+	map(0x60, 0x60).w(FUNC(mazerbla_state::zpu_bcd_decoder_w));
+	map(0x62, 0x62).r(FUNC(mazerbla_state::zpu_inputs_r));
 	map(0x66, 0x66).nopw();
 	map(0x68, 0x68).nopw();
-	map(0x6e, 0x6f).w(this, FUNC(mazerbla_state::zpu_led_w));
+	map(0x6e, 0x6f).w(FUNC(mazerbla_state::zpu_led_w));
 }
 
 void mazerbla_state::greatgun_sound_map(address_map &map)
@@ -538,7 +547,7 @@ void mazerbla_state::greatgun_sound_map(address_map &map)
 	map(0x4000, 0x4000).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x4000, 0x4001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x8000, 0x8000).w(this, FUNC(mazerbla_state::sound_int_clear_w));
+	map(0x8000, 0x8000).w(FUNC(mazerbla_state::sound_int_clear_w));
 	map(0xa000, 0xa000).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 }
 
@@ -921,6 +930,9 @@ INTERRUPT_GEN_MEMBER(mazerbla_state::sound_interrupt)
 
 void mazerbla_state::machine_start()
 {
+	m_leds.resolve();
+	m_lamps.resolve();
+
 	membank("bank1")->configure_entries(0, 256, memregion("sub2")->base() + 0x10000, 0x2000);
 
 	save_item(NAME(m_port02_status));

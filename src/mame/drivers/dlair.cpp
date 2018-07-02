@@ -37,7 +37,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/ldv1000.h"
 #include "machine/ldstub.h"
 #include "machine/watchdog.h"
@@ -45,6 +45,7 @@
 #include "machine/z80sio.h"
 #include "sound/ay8910.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "render.h"
 #include "speaker.h"
 
@@ -78,7 +79,7 @@ public:
 	void dleuro(machine_config &config);
 	void dlair_ldv1000(machine_config &config);
 
-protected:
+private:
 	void laserdisc_data_w(uint8_t data)
 	{
 		if (m_ldv1000 != nullptr) m_ldv1000->data_w(data);
@@ -134,7 +135,6 @@ protected:
 	void dleuro_map(address_map &map);
 	void dlus_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<gfxdecode_device> m_gfxdecode;
@@ -387,13 +387,13 @@ void dlair_state::dlus_map(address_map &map)
 	map(0xc000, 0xc000).mirror(0x1fc7).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xc008, 0xc008).mirror(0x1fc7).portr("P1");
 	map(0xc010, 0xc010).mirror(0x1fc7).portr("SYSTEM");
-	map(0xc020, 0xc020).mirror(0x1fc7).r(this, FUNC(dlair_state::laserdisc_r));
+	map(0xc020, 0xc020).mirror(0x1fc7).r(FUNC(dlair_state::laserdisc_r));
 	map(0xe000, 0xe000).mirror(0x1fc7).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0xe008, 0xe008).mirror(0x1fc7).w(this, FUNC(dlair_state::misc_w));
+	map(0xe008, 0xe008).mirror(0x1fc7).w(FUNC(dlair_state::misc_w));
 	map(0xe010, 0xe010).mirror(0x1fc7).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0xe020, 0xe020).mirror(0x1fc7).w(this, FUNC(dlair_state::laserdisc_w));
-	map(0xe030, 0xe037).mirror(0x1fc0).w(this, FUNC(dlair_state::led_den2_w));
-	map(0xe038, 0xe03f).mirror(0x1fc0).w(this, FUNC(dlair_state::led_den1_w));
+	map(0xe020, 0xe020).mirror(0x1fc7).w(FUNC(dlair_state::laserdisc_w));
+	map(0xe030, 0xe037).mirror(0x1fc0).w(FUNC(dlair_state::led_den2_w));
+	map(0xe038, 0xe03f).mirror(0x1fc0).w(FUNC(dlair_state::led_den1_w));
 }
 
 
@@ -412,16 +412,16 @@ void dlair_state::dleuro_map(address_map &map)
 	map(0xc000, 0xc7ff).mirror(0x1800).ram().share("videoram");
 	map(0xe000, 0xe000).mirror(0x1f47); // WT LED 1
 	map(0xe008, 0xe008).mirror(0x1f47); // WT LED 2
-	map(0xe010, 0xe010).mirror(0x1f47).w(this, FUNC(dlair_state::led_den1_w));         // WT EXT LED 1
-	map(0xe018, 0xe018).mirror(0x1f47).w(this, FUNC(dlair_state::led_den2_w));         // WT EXT LED 2
-	map(0xe020, 0xe020).mirror(0x1f47).w(this, FUNC(dlair_state::laserdisc_w));        // DISC WT
-	map(0xe028, 0xe028).mirror(0x1f47).w(this, FUNC(dlair_state::dleuro_misc_w));      // WT MISC
+	map(0xe010, 0xe010).mirror(0x1f47).w(FUNC(dlair_state::led_den1_w));         // WT EXT LED 1
+	map(0xe018, 0xe018).mirror(0x1f47).w(FUNC(dlair_state::led_den2_w));         // WT EXT LED 2
+	map(0xe020, 0xe020).mirror(0x1f47).w(FUNC(dlair_state::laserdisc_w));        // DISC WT
+	map(0xe028, 0xe028).mirror(0x1f47).w(FUNC(dlair_state::dleuro_misc_w));      // WT MISC
 	map(0xe030, 0xe030).mirror(0x1f47).w("watchdog", FUNC(watchdog_timer_device::reset_w));   // CLR WDOG
 	map(0xe080, 0xe080).mirror(0x1f47).portr("P1");           // CP A
 	map(0xe088, 0xe088).mirror(0x1f47).portr("SYSTEM");       // CP B
 	map(0xe090, 0xe090).mirror(0x1f47).portr("DSW1");         // OPT SW A
 	map(0xe098, 0xe098).mirror(0x1f47).portr("DSW2");         // OPT SW B
-	map(0xe0a0, 0xe0a0).mirror(0x1f47).r(this, FUNC(dlair_state::laserdisc_r));         // RD DISC DATA
+	map(0xe0a0, 0xe0a0).mirror(0x1f47).r(FUNC(dlair_state::laserdisc_r));         // RD DISC DATA
 }
 
 
@@ -718,7 +718,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( dlair )
+static GFXDECODE_START( gfx_dlair )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -791,7 +791,7 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dlair)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dlair)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_PALETTE_INIT_OWNER(dlair_state,dleuro)

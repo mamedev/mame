@@ -22,15 +22,17 @@ public:
 	{
 	}
 
+	void lft(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_WRITE16_MEMBER(term_w);
 	DECLARE_READ16_MEMBER(keyin_r);
 	DECLARE_READ16_MEMBER(status_r);
 
-	void lft(machine_config &config);
 	void lft_io(address_map &map);
 	void lft_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -50,7 +52,7 @@ void lft_state::lft_io(address_map &map)
 	map.global_mask(0xff);
 	// screen 1
 	map(0x00, 0x01).nopr();
-	map(0x04, 0x05).rw(this, FUNC(lft_state::keyin_r), FUNC(lft_state::term_w));
+	map(0x04, 0x05).rw(FUNC(lft_state::keyin_r), FUNC(lft_state::term_w));
 	// screen 2
 	map(0x02, 0x03).nopr();
 	map(0x06, 0x07).nopw();

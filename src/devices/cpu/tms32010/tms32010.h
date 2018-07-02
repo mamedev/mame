@@ -109,7 +109,7 @@ private:
 	int     m_addr_mask;
 
 	address_space *m_program;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
+	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
 	address_space *m_data;
 	address_space *m_io;
 

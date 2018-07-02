@@ -2,6 +2,7 @@
 // copyright-holders:Bryan McPhail
 
 #include "audio/seibu.h"
+#include "emupal.h"
 
 class dcon_state : public driver_device, protected seibu_sound_common
 {
@@ -18,6 +19,10 @@ public:
 		m_textram(*this, "textram"),
 		m_spriteram(*this, "spriteram") { }
 
+	void dcon(machine_config &config);
+	void sdgndmps(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<seibu_sound_device> m_seibu_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -59,8 +64,6 @@ public:
 	uint32_t screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void dcon(machine_config &config);
-	void sdgndmps(machine_config &config);
 	void dcon_map(address_map &map);
 	void sdgndmps_map(address_map &map);
 };

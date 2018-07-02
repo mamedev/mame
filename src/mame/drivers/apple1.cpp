@@ -80,6 +80,7 @@
 #include "bus/a1bus/a1cassette.h"
 #include "bus/a1bus/a1cffa.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -434,7 +435,7 @@ WRITE8_MEMBER(apple1_state::ram_w)
 
 void apple1_state::apple1_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rw(this, FUNC(apple1_state::ram_r), FUNC(apple1_state::ram_w));
+	map(0x0000, 0xbfff).rw(FUNC(apple1_state::ram_r), FUNC(apple1_state::ram_w));
 	map(0xd010, 0xd013).mirror(0x0fec).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xe000, 0xefff).ram().share(A1_BASICRAM_TAG);
 	map(0xff00, 0xffff).rom().region(A1_CPU_TAG, 0);
@@ -494,7 +495,7 @@ WRITE8_MEMBER(apple1_state::pia_display_w)
 // and to the display hardware
 WRITE_LINE_MEMBER(apple1_state::pia_display_gate_w)
 {
-	m_pia->portb_w((state << 7) ^ 0x80);
+	m_pia->write_portb((state << 7) ^ 0x80);
 
 	// falling edge means start the display timer
 	if (state == CLEAR_LINE)

@@ -278,11 +278,11 @@ void stfight_state::cpu1_map(address_map &map)
 	map(0xc202, 0xc202).portr("START");
 	map(0xc203, 0xc203).portr("DSW0");
 	map(0xc204, 0xc204).portr("DSW1");
-	map(0xc205, 0xc205).r(this, FUNC(stfight_state::stfight_coin_r));
-	map(0xc500, 0xc500).w(this, FUNC(stfight_state::stfight_fm_w));
-	map(0xc600, 0xc600).w(this, FUNC(stfight_state::stfight_mcu_w));
-	map(0xc700, 0xc700).w(this, FUNC(stfight_state::stfight_coin_w));
-	map(0xc804, 0xc804).w(this, FUNC(stfight_state::stfight_io_w));
+	map(0xc205, 0xc205).r(FUNC(stfight_state::stfight_coin_r));
+	map(0xc500, 0xc500).w(FUNC(stfight_state::stfight_fm_w));
+	map(0xc600, 0xc600).w(FUNC(stfight_state::stfight_mcu_w));
+	map(0xc700, 0xc700).w(FUNC(stfight_state::stfight_coin_w));
+	map(0xc804, 0xc804).w(FUNC(stfight_state::stfight_io_w));
 	map(0xc806, 0xc806).nopw();                    /* TBD */
 	map(0xe000, 0xefff).ram();
 }
@@ -306,7 +306,7 @@ void stfight_state::decrypted_opcodes_map(address_map &map)
 void stfight_state::cshooter_cpu1_map(address_map &map)
 {
 	cpu1_map(map);
-	map(0xc801, 0xc801).w(this, FUNC(stfight_state::stfight_bank_w));
+	map(0xc801, 0xc801).w(FUNC(stfight_state::stfight_bank_w));
 	map(0xd000, 0xd7ff).ram().w("airraid_vid", FUNC(airraid_video_device::txram_w)).share("txram");
 	map(0xd800, 0xd80f).ram().w("airraid_vid", FUNC(airraid_video_device::vregs_w)).share("vregs"); // wrong?
 	map(0xe000, 0xfdff).ram();
@@ -323,7 +323,7 @@ void stfight_state::cpu2_map(address_map &map)
 	map(0xd000, 0xd000).nopr();
 	map(0xd800, 0xd800).nopw();
 	map(0xe800, 0xe800).nopw();
-	map(0xf000, 0xf000).r(this, FUNC(stfight_state::stfight_fm_r));
+	map(0xf000, 0xf000).r(FUNC(stfight_state::stfight_fm_r));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -504,7 +504,7 @@ MACHINE_CONFIG_START(stfight_state::stfight)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_STFIGHT_VIDEO_ADD("stfight_vid")
+	MCFG_DEVICE_ADD("stfight_vid", STFIGHT_VIDEO, 0)
 MACHINE_CONFIG_END
 
 

@@ -23,6 +23,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,6 +39,9 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
+	void horse(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<4> m_inp_matrix;
@@ -53,7 +57,6 @@ public:
 
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void horse(machine_config &config);
 	void horse_io_map(address_map &map);
 	void horse_map(address_map &map);
 };
@@ -61,7 +64,7 @@ public:
 void horse_state::machine_start()
 {
 	m_colorram = std::make_unique<uint8_t []>(0x200);
-	save_pointer(NAME(m_colorram.get()), 0x200);
+	save_pointer(NAME(m_colorram), 0x200);
 	save_item(NAME(m_output));
 }
 
@@ -103,7 +106,7 @@ void horse_state::horse_map(address_map &map)
 	map(0x0000, 0x37ff).rom();
 	map(0x4000, 0x40ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x6000, 0x7fff).ram().share("vram");
-	map(0x8000, 0x87ff).mirror(0x0800).rw(this, FUNC(horse_state::colorram_r), FUNC(horse_state::colorram_w));
+	map(0x8000, 0x87ff).mirror(0x0800).rw(FUNC(horse_state::colorram_r), FUNC(horse_state::colorram_w));
 }
 
 void horse_state::horse_io_map(address_map &map)

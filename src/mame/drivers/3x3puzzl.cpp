@@ -43,6 +43,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -62,6 +63,9 @@ public:
 			m_screen(*this, "screen")
 	{ }
 
+	void _3x3puzzle(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram1;
 	required_shared_ptr<uint16_t> m_videoram2;
@@ -96,9 +100,8 @@ public:
 	DECLARE_WRITE16_MEMBER(tilemap1_scrollx_w);
 	DECLARE_WRITE16_MEMBER(tilemap1_scrolly_w);
 
-	void _3x3puzzle(machine_config &config);
 	void _3x3puzzle_map(address_map &map);
-protected:
+
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -218,13 +221,13 @@ void _3x3puzzle_state::_3x3puzzle_map(address_map &map)
 	map(0x202000, 0x202fff).ram().share("videoram3");
 	map(0x280000, 0x280001).portr("VBLANK");
 	map(0x300000, 0x3005ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x400000, 0x400001).w(this, FUNC(_3x3puzzle_state::tilemap1_scrollx_w));
-	map(0x480000, 0x480001).w(this, FUNC(_3x3puzzle_state::tilemap1_scrolly_w));
+	map(0x400000, 0x400001).w(FUNC(_3x3puzzle_state::tilemap1_scrollx_w));
+	map(0x480000, 0x480001).w(FUNC(_3x3puzzle_state::tilemap1_scrolly_w));
 	map(0x500000, 0x500001).portr("P1");
 	map(0x580000, 0x580001).portr("SYS");
 	map(0x600000, 0x600001).portr("DSW01");
 	map(0x700001, 0x700001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x800000, 0x800001).w(this, FUNC(_3x3puzzle_state::gfx_ctrl_w));
+	map(0x800000, 0x800001).w(FUNC(_3x3puzzle_state::gfx_ctrl_w));
 	map(0x880000, 0x880001).nopr(); // read, but no tested afterwards
 }
 
@@ -366,7 +369,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( _3x3puzzle )
+static GFXDECODE_START( gfx_3x3puzzle )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x8_layout,     0, 3 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,     0, 3 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout,     0, 3 )
@@ -400,7 +403,7 @@ MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", _3x3puzzle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_3x3puzzle)
 
 	MCFG_PALETTE_ADD("palette", 0x600/2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

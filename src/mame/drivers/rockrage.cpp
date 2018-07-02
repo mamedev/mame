@@ -109,10 +109,10 @@ void rockrage_state::rockrage_map(address_map &map)
 	map(0x2e02, 0x2e02).portr("P2");
 	map(0x2e03, 0x2e03).portr("DSW2");
 	map(0x2e40, 0x2e40).portr("DSW1");
-	map(0x2e80, 0x2e80).w(this, FUNC(rockrage_state::rockrage_sh_irqtrigger_w));                 /* cause interrupt on audio CPU */
+	map(0x2e80, 0x2e80).w(FUNC(rockrage_state::rockrage_sh_irqtrigger_w));                 /* cause interrupt on audio CPU */
 	map(0x2ec0, 0x2ec0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x2f00, 0x2f00).w(this, FUNC(rockrage_state::rockrage_vreg_w));                          /* ??? */
-	map(0x2f40, 0x2f40).w(this, FUNC(rockrage_state::rockrage_bankswitch_w));                    /* bankswitch control */
+	map(0x2f00, 0x2f00).w(FUNC(rockrage_state::rockrage_vreg_w));                          /* ??? */
+	map(0x2f40, 0x2f40).w(FUNC(rockrage_state::rockrage_bankswitch_w));                    /* bankswitch control */
 	map(0x4000, 0x5fff).ram();                                             /* RAM */
 	map(0x6000, 0x7fff).bankr("rombank");                              /* banked ROM */
 	map(0x8000, 0xffff).rom();                                             /* ROM */
@@ -121,8 +121,8 @@ void rockrage_state::rockrage_map(address_map &map)
 void rockrage_state::rockrage_sound_map(address_map &map)
 {
 	map(0x2000, 0x2000).w(m_vlm, FUNC(vlm5030_device::data_w));              /* VLM5030 */
-	map(0x3000, 0x3000).r(this, FUNC(rockrage_state::rockrage_VLM5030_busy_r));           /* VLM5030 */
-	map(0x4000, 0x4000).w(this, FUNC(rockrage_state::rockrage_speech_w));                /* VLM5030 */
+	map(0x3000, 0x3000).r(FUNC(rockrage_state::rockrage_VLM5030_busy_r));           /* VLM5030 */
+	map(0x4000, 0x4000).w(FUNC(rockrage_state::rockrage_speech_w));                /* VLM5030 */
 	map(0x5000, 0x5000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x6000, 0x6001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));         /* YM 2151 */
 	map(0x7000, 0x77ff).ram();                                             /* RAM */
@@ -223,7 +223,7 @@ static const gfx_layout spritelayout =
 	32*8            /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( rockrage )
+static GFXDECODE_START( gfx_rockrage )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 32 )  /* colors 00..31, using 2 lookup tables */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 512, 16 )  /* colors 32..47, using lookup table */
 GFXDECODE_END
@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	MCFG_K007420_CALLBACK_OWNER(rockrage_state, rockrage_sprite_callback)
 	MCFG_K007420_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rockrage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rockrage)
 	MCFG_PALETTE_ADD("palette", 16*16*3)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

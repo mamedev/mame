@@ -25,6 +25,9 @@ public:
 		m_screen(*this, "screen"),
 		m_ram(*this, "ram") { }
 
+	void tgtpanic(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
@@ -37,7 +40,6 @@ public:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void tgtpanic(machine_config &config);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
 };
@@ -111,7 +113,7 @@ void tgtpanic_state::prg_map(address_map &map)
 void tgtpanic_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w(this, FUNC(tgtpanic_state::color_w));
+	map(0x00, 0x00).portr("IN0").w(FUNC(tgtpanic_state::color_w));
 	map(0x01, 0x01).portr("IN1");
 }
 

@@ -249,8 +249,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 			/* NVIA versatile system interface */
 //  LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
 			{
-				via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-				return via_0->read(space, offset & 0xf);
+				return m_via0->read(space, offset & 0xf);
 			}
 
 		case 4:
@@ -363,8 +362,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 		case 3:
 			/* NVIA versatile system interface */
 			{
-				via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-				via_0->write(space, offset & 0xf, data);
+				m_via0->write(space, offset & 0xf, data);
 			}
 			break;
 

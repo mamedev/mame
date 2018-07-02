@@ -188,19 +188,19 @@ void drgnmst_state::drgnmst_main_map(address_map &map)
 	map(0x800018, 0x800019).portr("SYSTEM");
 	map(0x80001a, 0x80001b).portr("DSW1");
 	map(0x80001c, 0x80001d).portr("DSW2");
-	map(0x800030, 0x800031).w(this, FUNC(drgnmst_state::drgnmst_coin_w));
+	map(0x800030, 0x800031).w(FUNC(drgnmst_state::drgnmst_coin_w));
 	map(0x800100, 0x80011f).writeonly().share("vidregs");
 	map(0x800120, 0x800121).nopw();
 	map(0x80014a, 0x80014b).nopw();
 	map(0x800154, 0x800155).writeonly().share("vidregs2"); // seems to be priority control
 	map(0x800176, 0x800177).portr("EXTRA");
-	map(0x800180, 0x800181).w(this, FUNC(drgnmst_state::drgnmst_snd_command_w));
-	map(0x800188, 0x800189).w(this, FUNC(drgnmst_state::drgnmst_snd_flag_w));
+	map(0x800180, 0x800181).w(FUNC(drgnmst_state::drgnmst_snd_command_w));
+	map(0x800188, 0x800189).w(FUNC(drgnmst_state::drgnmst_snd_flag_w));
 	map(0x8001e0, 0x8001e1).nopw();
-	map(0x900000, 0x903fff).ram().w(this, FUNC(drgnmst_state::drgnmst_paletteram_w)).share("paletteram");
-	map(0x904000, 0x907fff).ram().w(this, FUNC(drgnmst_state::drgnmst_md_videoram_w)).share("md_videoram");
-	map(0x908000, 0x90bfff).ram().w(this, FUNC(drgnmst_state::drgnmst_bg_videoram_w)).share("bg_videoram");
-	map(0x90c000, 0x90ffff).ram().w(this, FUNC(drgnmst_state::drgnmst_fg_videoram_w)).share("fg_videoram");
+	map(0x900000, 0x903fff).ram().w(FUNC(drgnmst_state::drgnmst_paletteram_w)).share("paletteram");
+	map(0x904000, 0x907fff).ram().w(FUNC(drgnmst_state::drgnmst_md_videoram_w)).share("md_videoram");
+	map(0x908000, 0x90bfff).ram().w(FUNC(drgnmst_state::drgnmst_bg_videoram_w)).share("bg_videoram");
+	map(0x90c000, 0x90ffff).ram().w(FUNC(drgnmst_state::drgnmst_fg_videoram_w)).share("fg_videoram");
 	map(0x920000, 0x923fff).ram().share("rowscrollram"); // rowscroll ram
 	map(0x930000, 0x9307ff).ram().share("spriteram");   // Sprites
 	map(0xff0000, 0xffffff).ram();
@@ -344,7 +344,7 @@ static const gfx_layout drgnmst_char32x32_layout =
 };
 
 
-static GFXDECODE_START( drgnmst )
+static GFXDECODE_START( gfx_drgnmst )
 	GFXDECODE_ENTRY( "gfx1", 0, drgnmst_char16x16_layout,   0,      0x200  ) /* sprite tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, drgnmst_char8x8_layout,     0x200,  0x200  ) /* fg tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, drgnmst_char16x16_layout,   0x0400, 0x200  ) /* md tiles */
@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 	MCFG_PIC16C5x_READ_C_CB(READ8(*this, drgnmst_state, drgnmst_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, drgnmst_state, drgnmst_snd_control_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drgnmst)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drgnmst)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

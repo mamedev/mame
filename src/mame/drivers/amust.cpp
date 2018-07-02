@@ -90,6 +90,7 @@ ToDo:
 #include "machine/upd765.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -97,11 +98,6 @@ ToDo:
 class amust_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BEEP_OFF
-	};
-
 	amust_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
@@ -113,8 +109,17 @@ public:
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 	{ }
+	
+	void amust(machine_config &config);
 
 	void init_amust();
+
+private:
+	enum
+	{
+		TIMER_BEEP_OFF
+	};
+
 	DECLARE_MACHINE_RESET(amust);
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_WRITE8_MEMBER(port04_w);
@@ -131,10 +136,9 @@ public:
 	INTERRUPT_GEN_MEMBER(irq_vs);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void amust(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u8 m_port04;
 	u8 m_port06;
 	u8 m_port08;
@@ -191,7 +195,7 @@ void amust_state::io_map(address_map &map)
 	map(0x03, 0x03).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x04, 0x07).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x0d, 0x0d).nopr().w(this, FUNC(amust_state::port0d_w));
+	map(0x0d, 0x0d).nopr().w(FUNC(amust_state::port0d_w));
 	map(0x0e, 0x0e).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0f, 0x0f).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x10, 0x11).m(m_fdc, FUNC(upd765a_device::map));
@@ -320,7 +324,7 @@ static const gfx_layout amust_charlayout =
 	8*8                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( amust )
+static GFXDECODE_START( gfx_amust )
 	GFXDECODE_ENTRY( "chargen", 0x0000, amust_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -392,7 +396,7 @@ MACHINE_CONFIG_START(amust_state::amust)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amust)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amust)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

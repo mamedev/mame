@@ -19,6 +19,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -31,12 +32,14 @@ public:
 	tek4107a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	void tek4109a(machine_config &config);
+	void tek4107a(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void tek4109a(machine_config &config);
-	void tek4107a(machine_config &config);
 	void tek4107a_io(address_map &map);
 	void tek4107a_mem(address_map &map);
 };
@@ -80,7 +83,7 @@ static const gfx_layout tek4107a_charlayout =
 	16*8
 };
 
-static GFXDECODE_START( tek4107a )
+static GFXDECODE_START( gfx_tek4107a )
 	GFXDECODE_ENTRY( "chargen", 0x0000, tek4107a_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -107,7 +110,7 @@ MACHINE_CONFIG_START(tek4107a_state::tek4107a)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tek4107a)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tek4107a)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tek4107a_state::tek4109a)

@@ -59,6 +59,7 @@
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
 #include "machine/hd64610.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 
@@ -71,6 +72,9 @@ public:
 			m_maincpu(*this, "maincpu")
 		{}
 
+	void pda600(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void video_start() override;
@@ -78,7 +82,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t *     m_video_ram;
-	void pda600(machine_config &config);
 	void pda600_io(address_map &map);
 	void pda600_mem(address_map &map);
 };
@@ -192,7 +195,7 @@ static const gfx_layout pda600_charlayout_19a =
 	8*19
 };
 
-static GFXDECODE_START( pda600 )
+static GFXDECODE_START( gfx_pda600 )
 	GFXDECODE_ENTRY( "maincpu", 0x45cd, pda600_charlayout_19, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0x4892, pda600_charlayout_19a, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0x4d73, pda600_charlayout_8, 0, 1 )
@@ -216,7 +219,7 @@ MACHINE_CONFIG_START(pda600_state::pda600)
 	MCFG_SCREEN_UPDATE_DRIVER( pda600_state, screen_update )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pda600)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pda600)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

@@ -99,7 +99,7 @@ void amu880_state::amu880_io(address_map &map)
 //  AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_WRITE(power_off_w)
 //  AM_RANGE(0x04, 0x04) AM_MIRROR(0x02) AM_WRITE(tone_off_w)
 //  AM_RANGE(0x05, 0x05) AM_MIRROR(0x02) AM_WRITE(tone_on_w)
-	map(0x08, 0x09).mirror(0x02).r(this, FUNC(amu880_state::keyboard_r));
+	map(0x08, 0x09).mirror(0x02).r(FUNC(amu880_state::keyboard_r));
 	map(0x0c, 0x0f).rw(Z80PIO2_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x10, 0x13).rw(Z80PIO1_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x14, 0x17).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -306,7 +306,7 @@ static const gfx_layout amu880_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( amu880 )
+static GFXDECODE_START( gfx_amu880 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, amu880_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -325,7 +325,7 @@ MACHINE_CONFIG_START(amu880_state::amu880)
 	MCFG_SCREEN_UPDATE_DRIVER(amu880_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amu880)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amu880)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
@@ -361,12 +361,12 @@ ROM_START( amu880 )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v21" )
 	ROM_SYSTEM_BIOS( 0, "v21", "H.MON v2.1" )
-	ROMX_LOAD( "mon21a.bin", 0xf000, 0x0400, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "mon21b.bin", 0xf400, 0x0400, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "mon21c.bin", 0xf800, 0x0400, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "mon21.bin", 0xf000, 0x0bdf, BAD_DUMP CRC(ba905563) SHA1(1fa0aeab5428731756bdfa74efa3c664898bf083), ROM_BIOS(1) )
+	ROMX_LOAD( "mon21a.bin", 0xf000, 0x0400, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "mon21b.bin", 0xf400, 0x0400, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "mon21c.bin", 0xf800, 0x0400, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "mon21.bin", 0xf000, 0x0bdf, BAD_DUMP CRC(ba905563) SHA1(1fa0aeab5428731756bdfa74efa3c664898bf083), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v30", "H.MON v3.0" )
-	ROMX_LOAD( "mon30.bin", 0xf000, 0x1000, CRC(033f8112) SHA1(0c6ae7b9d310dec093652db6e8ae84f8ebfdcd29), ROM_BIOS(2) )
+	ROMX_LOAD( "mon30.bin", 0xf000, 0x1000, CRC(033f8112) SHA1(0c6ae7b9d310dec093652db6e8ae84f8ebfdcd29), ROM_BIOS(1) )
 
 	ROM_REGION( 0x4800, "hbasic", 0 )
 	ROM_LOAD( "mon30p_hbasic33p.bin", 0x0000, 0x4800, CRC(c927e7be) SHA1(2d1f3ff4d882c40438a1281872c6037b2f07fdf2) )

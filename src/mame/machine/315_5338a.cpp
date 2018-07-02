@@ -88,6 +88,8 @@ READ8_MEMBER( sega_315_5338a_device::read )
 			data = m_port_value[offset];
 		break;
 
+	case 0x08: data = m_port_config; break;
+
 	// serial data read back?
 	case 0x0a: data = m_serial_output; break;
 
@@ -124,11 +126,22 @@ WRITE8_MEMBER( sega_315_5338a_device::write )
 	case 0x05:
 	case 0x06:
 		m_port_value[offset] = data;
-		m_out_port_cb[offset](data);
+		if (BIT(m_port_config, offset) == 0)
+			m_out_port_cb[offset](data);
 		break;
 
 	// port direction register (0 = output, 1 = input)
-	case 0x08: m_port_config = data; break;
+	case 0x08:
+		// handle ports that were previously set to input and are now output
+		{
+			uint8_t changed = data ^ m_port_config;
+			for (unsigned i = 0; i < 7; i++)
+				if (BIT(changed, i) && BIT(data, i) == 0)
+					m_out_port_cb[i](m_port_value[i]);
+		}
+
+		m_port_config = data;
+		break;
 
 	// command register
 	case 0x09:

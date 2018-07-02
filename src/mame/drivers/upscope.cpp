@@ -44,6 +44,11 @@ public:
 	m_ppi(*this, "ppi")
 	{ }
 
+	void upscope(machine_config &config);
+
+	void init_upscope();
+
+private:
 	uint8_t m_nvram[0x100];
 	uint8_t m_prev_cia1_porta;
 	uint8_t m_parallel_data;
@@ -58,16 +63,13 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 
-	void init_upscope();
 
-	void upscope(machine_config &config);
 	void a500_mem(address_map &map);
 	void main_map(address_map &map);
 	void overlay_512kb_map(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 
-private:
 	required_device<i8255_device> m_ppi;
 };
 
@@ -218,12 +220,12 @@ void upscope_state::a500_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
-	map(0xa00000, 0xbfffff).rw(this, FUNC(upscope_state::cia_r), FUNC(upscope_state::cia_w));
-	map(0xc00000, 0xd7ffff).rw(this, FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
+	map(0xa00000, 0xbfffff).rw(FUNC(upscope_state::cia_r), FUNC(upscope_state::cia_w));
+	map(0xc00000, 0xd7ffff).rw(FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
 	map(0xd80000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(this, FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(this, FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
-	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(upscope_state::rom_mirror_r));
+	map(0xde0000, 0xdeffff).rw(FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(FUNC(upscope_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
 }
@@ -368,7 +370,7 @@ void upscope_state::init_upscope()
 	m_denise_id = DENISE;
 
 	// allocate nvram
-	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
+	subdevice<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 }
 
 

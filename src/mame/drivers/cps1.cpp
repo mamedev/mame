@@ -540,17 +540,17 @@ void cps_state::main_map(address_map &map)
 	map(0x000000, 0x3fffff).rom();
 	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
 	/* forgottn, willow, cawing, nemo, varth read from 800010. Probably debug input leftover from development */
-	map(0x800018, 0x80001f).r(this, FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
+	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
 	map(0x800020, 0x800021).nopr();                     /* ? Used by Rockman ? not mapped according to PAL */
-	map(0x800030, 0x800037).w(this, FUNC(cps_state::cps1_coinctrl_w));
+	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
 	/* Forgotten Worlds has dial controls on B-board mapped at 800040-80005f. See below */
-	map(0x800100, 0x80013f).w(this, FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
 	/* CPS-B custom is mapped by the PAL IOB2 on the B-board. SF2 revision "E" World and USA 910228 has it at a different
 	   address, see DRIVER_INIT */
-	map(0x800140, 0x80017f).rw(this, FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
-	map(0x800180, 0x800187).w(this, FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
-	map(0x800188, 0x80018f).w(this, FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
-	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800180, 0x800187).w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
+	map(0x800188, 0x80018f).w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
@@ -560,8 +560,8 @@ void cps_state::main_map(address_map &map)
 void cps_state::forgottn_map(address_map &map)
 {
 	main_map(map);
-	map(0x800041, 0x800041).w("upd4701", FUNC(upd4701_device::reset_x));
-	map(0x800049, 0x800049).w("upd4701", FUNC(upd4701_device::reset_y));
+	map(0x800041, 0x800041).w("upd4701", FUNC(upd4701_device::reset_x_w));
+	map(0x800049, 0x800049).w("upd4701", FUNC(upd4701_device::reset_y_w));
 	map(0x800052, 0x800055).r("upd4701", FUNC(upd4701_device::read_x)).umask16(0x00ff);
 	map(0x80005a, 0x80005d).r("upd4701", FUNC(upd4701_device::read_y)).umask16(0x00ff);
 }
@@ -596,8 +596,8 @@ void cps_state::sub_map(address_map &map)
 	map(0xd000, 0xd7ff).ram();
 	map(0xf000, 0xf001).rw("2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xf002, 0xf002).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xf004, 0xf004).w(this, FUNC(cps_state::cps1_snd_bankswitch_w));
-	map(0xf006, 0xf006).w(this, FUNC(cps_state::cps1_oki_pin7_w)); /* controls pin 7 of OKI chip */
+	map(0xf004, 0xf004).w(FUNC(cps_state::cps1_snd_bankswitch_w));
+	map(0xf006, 0xf006).w(FUNC(cps_state::cps1_oki_pin7_w)); /* controls pin 7 of OKI chip */
 	map(0xf008, 0xf008).r(m_soundlatch, FUNC(generic_latch_8_device::read)); /* Sound command */
 	map(0xf00a, 0xf00a).r(m_soundlatch2, FUNC(generic_latch_8_device::read)); /* Sound timer fade */
 }
@@ -606,18 +606,18 @@ void cps_state::qsound_main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
-	map(0x800018, 0x80001f).r(this, FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
-	map(0x800030, 0x800037).w(this, FUNC(cps_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(this, FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).rw(this, FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");    /* CPS-B custom (mapped by LWIO/IOB1 PAL on B-board) */
-	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
-	map(0xf00000, 0xf0ffff).r(this, FUNC(cps_state::qsound_rom_r));          /* Slammasters protection */
-	map(0xf18000, 0xf19fff).rw(this, FUNC(cps_state::qsound_sharedram1_r), FUNC(cps_state::qsound_sharedram1_w));  /* Q RAM */
+	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
+	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");    /* CPS-B custom (mapped by LWIO/IOB1 PAL on B-board) */
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
+	map(0xf00000, 0xf0ffff).r(FUNC(cps_state::qsound_rom_r));          /* Slammasters protection */
+	map(0xf18000, 0xf19fff).rw(FUNC(cps_state::qsound_sharedram1_r), FUNC(cps_state::qsound_sharedram1_w));  /* Q RAM */
 	map(0xf1c000, 0xf1c001).portr("IN2");            /* Player 3 controls (later games) */
 	map(0xf1c002, 0xf1c003).portr("IN3");            /* Player 4 controls ("Muscle Bombers") */
-	map(0xf1c004, 0xf1c005).w(this, FUNC(cps_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
+	map(0xf1c004, 0xf1c005).w(FUNC(cps_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
-	map(0xf1e000, 0xf1ffff).rw(this, FUNC(cps_state::qsound_sharedram2_r), FUNC(cps_state::qsound_sharedram2_w));  /* Q RAM */
+	map(0xf1e000, 0xf1ffff).rw(FUNC(cps_state::qsound_sharedram2_r), FUNC(cps_state::qsound_sharedram2_w));  /* Q RAM */
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
@@ -627,7 +627,7 @@ void cps_state::qsound_sub_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");    /* banked (contains music data) */
 	map(0xc000, 0xcfff).ram().share("qsound_ram1");
 	map(0xd000, 0xd002).w("qsound", FUNC(qsound_device::qsound_w));
-	map(0xd003, 0xd003).w(this, FUNC(cps_state::qsound_banksw_w));
+	map(0xd003, 0xd003).w(FUNC(cps_state::qsound_banksw_w));
 	map(0xd007, 0xd007).r("qsound", FUNC(qsound_device::qsound_r));
 	map(0xf000, 0xffff).ram().share("qsound_ram2");
 }
@@ -641,16 +641,16 @@ void cps_state::sf2m3_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x800010, 0x800011).portr("IN1");            /* Player input ports */
-	map(0x800028, 0x80002f).r(this, FUNC(cps_state::cps1_hack_dsw_r));            /* System input ports / Dip Switches */
-	map(0x800030, 0x800037).w(this, FUNC(cps_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(this, FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).rw(this, FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");   /* CPS-B custom */
-	map(0x800186, 0x800187).r(this, FUNC(cps_state::cps1_in2_r));            /* Buttons 4,5,6 for both players */
-	map(0x800190, 0x800197).w(this, FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
-	map(0x800198, 0x80019f).w(this, FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
-	map(0x8001a0, 0x8001c3).w(this, FUNC(cps_state::cps1_cps_a_w));
-	map(0x8001c4, 0x8001c5).w(this, FUNC(cps_state::sf2m3_layer_w));
-	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
+	map(0x800028, 0x80002f).r(FUNC(cps_state::cps1_hack_dsw_r));            /* System input ports / Dip Switches */
+	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");   /* CPS-B custom */
+	map(0x800186, 0x800187).r(FUNC(cps_state::cps1_in2_r));            /* Buttons 4,5,6 for both players */
+	map(0x800190, 0x800197).w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
+	map(0x800198, 0x80019f).w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
+	map(0x8001a0, 0x8001c3).w(FUNC(cps_state::cps1_cps_a_w));
+	map(0x8001c4, 0x8001c5).w(FUNC(cps_state::sf2m3_layer_w));
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0xff0000, 0xffffff).ram();
 }
 
@@ -658,18 +658,18 @@ void cps_state::sf2m10_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x800000, 0x800007).portr("IN1");
-	map(0x800018, 0x80001f).r(this, FUNC(cps_state::cps1_hack_dsw_r));
+	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_hack_dsw_r));
 	map(0x800020, 0x800021).nopr();
-	map(0x800030, 0x800037).w(this, FUNC(cps_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(this, FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");
-	map(0x800140, 0x80017f).rw(this, FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
-	map(0x800180, 0x800187).w(this, FUNC(cps_state::cps1_soundlatch_w));
-	map(0x800188, 0x80018f).w(this, FUNC(cps_state::cps1_soundlatch2_w));
-	map(0x8001a2, 0x8001b3).w(this, FUNC(cps_state::cps1_cps_a_w)); // make 8001b2 point at 800110
+	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800180, 0x800187).w(FUNC(cps_state::cps1_soundlatch_w));
+	map(0x800188, 0x80018f).w(FUNC(cps_state::cps1_soundlatch2_w));
+	map(0x8001a2, 0x8001b3).w(FUNC(cps_state::cps1_cps_a_w)); // make 8001b2 point at 800110
 	map(0x8001fe, 0x8001ff).nopw(); // writes FFFF here a lot
-	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0xe00000, 0xefffff).ram(); // it writes to the whole range at start
-	map(0xf1c000, 0xf1c001).r(this, FUNC(cps_state::cps1_in2_r));
+	map(0xf1c000, 0xf1c001).r(FUNC(cps_state::cps1_in2_r));
 	map(0xfeff00, 0xfeffff).ram(); // fix stack crash at start
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
@@ -1886,6 +1886,29 @@ static INPUT_PORTS_START( sf2hack )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Forward Kick") PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Roundhouse Kick") PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sf2level )
+	PORT_INCLUDE( sf2 )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0xf0, 0xf0, "Level" )  PORT_DIPLOCATION("SW(B):5,6,7,8")
+	PORT_DIPSETTING(    0xf0, "0" )
+	PORT_DIPSETTING(    0xe0, "1" )
+	PORT_DIPSETTING(    0xd0, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0xb0, "4" )
+	PORT_DIPSETTING(    0xa0, "5" )
+	PORT_DIPSETTING(    0x90, "6" )
+	PORT_DIPSETTING(    0x80, "7" )
+	PORT_DIPSETTING(    0x70, "8" )
+	PORT_DIPSETTING(    0x60, "9" )
+	PORT_DIPSETTING(    0x50, "10" )
+	PORT_DIPSETTING(    0x40, "11" )
+	PORT_DIPSETTING(    0x30, "12" )
+	PORT_DIPSETTING(    0x20, "13" )
+	PORT_DIPSETTING(    0x10, "14" )
+	PORT_DIPSETTING(    0x00, "15" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sf2m2 )
@@ -3319,7 +3342,7 @@ static const gfx_layout cps1_layout32x32 =
 	4*32*32
 };
 
-GFXDECODE_START( cps1 )
+GFXDECODE_START( gfx_cps1 )
 	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8,   0, 0x100 )
 	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8_2, 0, 0x100 )
 	GFXDECODE_ENTRY( "gfx", 0, cps1_layout16x16, 0, 0x100 )
@@ -3339,6 +3362,7 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cps_state,common)
 {
+	m_led_cboard.resolve();
 }
 
 MACHINE_START_MEMBER(cps_state,cps1)
@@ -3373,10 +3397,8 @@ MACHINE_CONFIG_START(cps_state::cps1_10MHz)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cps1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
-
-	MCFG_VIDEO_START_OVERRIDE(cps_state, cps1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3416,7 +3438,7 @@ MACHINE_CONFIG_START(cps_state::pang3)
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cps_state::ganbare)
@@ -3426,7 +3448,7 @@ MACHINE_CONFIG_START(cps_state::ganbare)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps_state, ganbare_interrupt, "screen", 0, 1) // need to investigate more
 
-	MCFG_M48T35_ADD("m48t35")
+	MCFG_DEVICE_ADD("m48t35", M48T35, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cps_state::qsound)
@@ -3445,7 +3467,7 @@ MACHINE_CONFIG_START(cps_state::qsound)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, qsound)
 
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("mono")
@@ -3466,7 +3488,7 @@ MACHINE_CONFIG_START(cps_state::wofhfh)
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cps_state::sf2m3)
@@ -8195,6 +8217,52 @@ ROM_START( kodr1 )
 ROM_END
 
 /* B-Board 90629B-3 */
+ROM_START( kodr2 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "kde_30.11e", 0x00000, 0x20000, CRC(f8dc4ce3) SHA1(3efc4ffd61b399235f27c97ffb6d556000d59b33) ) /* different CRC from kodr1, pcb verified */
+	ROM_LOAD16_BYTE( "kde_37.11f", 0x00001, 0x20000, CRC(d1276c1c) SHA1(1f70972eb5b854ef58c6d0eaccda6e12611cf763) ) /* different CRC from kodr1, pcb verified */
+	ROM_LOAD16_BYTE( "kde_31.12e", 0x40000, 0x20000, CRC(309debd8) SHA1(96aa498fe04c1b8f76dab1c0ab074eedd48053fa) ) /* different CRC from kodr1, pcb verified */
+	ROM_LOAD16_BYTE( "kde_38.12f", 0x40001, 0x20000, CRC(76cd5738) SHA1(cb81f8db8400c9972f05ace38530f040fb66f93e) ) /* different CRC from kodr1, pcb verified */
+	ROM_LOAD16_BYTE( "kd_28.9e",   0x80000, 0x20000, CRC(9367bcd9) SHA1(8243b4b9bb9756f3fa726717e19a166cb2f5b50a) )
+	ROM_LOAD16_BYTE( "kd_35.9f",   0x80001, 0x20000, CRC(4ca6a48a) SHA1(9d440ecd8d2d0e293fecf64ca3915252b94e7aef) )
+	ROM_LOAD16_BYTE( "kd_29.10e",  0xc0000, 0x20000, CRC(0360fa72) SHA1(274769c8717a874397cf37369e3ef80a682d9ef2) )
+	ROM_LOAD16_BYTE( "kd_36.10f",  0xc0001, 0x20000, CRC(3c66c32b) SHA1(16f15a266979acccede0ae0268d692797a2f33cd) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROMX_LOAD( "kd-5m.4a", 0x000000, 0x80000, CRC(e45b8701) SHA1(604e39e455e81695ee4f899f102d0bcd789cedd0) , ROM_GROUPWORD | ROM_SKIP(6) )  // in "2" socket
+	ROMX_LOAD( "kd-7m.6a", 0x000002, 0x80000, CRC(a7750322) SHA1(3c583496a53cd64edf377db35f7f40f02b59b7e7) , ROM_GROUPWORD | ROM_SKIP(6) )  // in "4" socket
+	ROMX_LOAD( "kd-1m.3a", 0x000004, 0x80000, CRC(5f74bf78) SHA1(b7c43eea9bf77a0fb571dcd53f8be719e6655fd9) , ROM_GROUPWORD | ROM_SKIP(6) )  // in "1" socket
+	ROMX_LOAD( "kd-3m.5a", 0x000006, 0x80000, CRC(5e5303bf) SHA1(d9f90b898ffdf4398b2bbeb48247f06f728e7c00) , ROM_GROUPWORD | ROM_SKIP(6) )  // in "3" socket
+	ROMX_LOAD( "kd-6m.4c", 0x200000, 0x80000, CRC(113358f3) SHA1(9d98eafa74a046f65bf3847fe1d88ea1b0c82b0c) , ROM_GROUPWORD | ROM_SKIP(6) )  // in "11" socket
+	ROMX_LOAD( "kd-8m.6c", 0x200002, 0x80000, CRC(38853c44) SHA1(a6e552fb0138a76a7878b90d202904e2b44ae7ec) , ROM_GROUPWORD | ROM_SKIP(6) )  // in "13" socket
+	ROMX_LOAD( "kd-2m.3c", 0x200004, 0x80000, CRC(9ef36604) SHA1(b42ca0a910b65e1e7bb6e7d734e853ce67e821bf) , ROM_GROUPWORD | ROM_SKIP(6) )  // in "10" socket
+	ROMX_LOAD( "kd-4m.5c", 0x200006, 0x80000, CRC(402b9b4f) SHA1(4c11976976eadf1ad293b31b0a4d047d05032b06) , ROM_GROUPWORD | ROM_SKIP(6) )  // in "12" socket
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "kd_9.12a",  0x00000, 0x08000, CRC(bac6ec26) SHA1(6cbb6d55660150ae3f5270e023328275ee1bbf50) )
+	ROM_CONTINUE(          0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "kd_18.11c", 0x00000, 0x20000, CRC(4c63181d) SHA1(270f27534a95cb0be3ff3f9ca71c502320d8090b) )
+	ROM_LOAD( "kd_19.12c", 0x20000, 0x20000, CRC(92941b80) SHA1(5fa7c2793e6febee54a83042d118ddd4f2b7d127) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "kd29b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "iob1.11d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+
+	ROM_REGION( 0x0200, "cboardplds", 0 )
+	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
+ROM_END
+
+/* B-Board 90629B-3 */
 ROM_START( kodu )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "kdu_30b.11e", 0x00000, 0x20000, CRC(825817f9) SHA1(250f61effcbe59f8b70baaf26eb8aef419fed66b) )
@@ -10279,6 +10347,35 @@ ROM_START( sf2dongb )
 	ROM_LOAD( "s92_19.12c",  0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
 ROM_END
 
+ROM_START( sf2level ) // program very similar to sf2dkot2
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "rj313.u196.800", 0x000000, 0x100000, CRC(435153d5) SHA1(3f6f318a9b3def8d62ee576dbaaef623d55c1c64) )
+	ROM_LOAD16_WORD_SWAP( "ci030.u10.400",  0x100000, 0x080000, CRC(ed4186bd) SHA1(f3dfe91d8f4384275190b0d86488843c1161d86f) )
+
+	ROM_REGION( 0x600000, "gfx", 0 ) // not dumped for this bootleg. Note from dumper: 'GFX is slightly different mask rom layout than others. (2x mask instead of a rack of 010's)'
+	ROMX_LOAD( "s92_01.3a",  0x000000, 0x80000, CRC(03b0d852) SHA1(f370f25c96ad2b94f8c53d6b7139100285a25bef) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_02.4a",  0x000002, 0x80000, CRC(840289ec) SHA1(2fb42a242f60ba7e74009b5a90eb26e035ba1e82) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_03.5a",  0x000004, 0x80000, CRC(cdb5f027) SHA1(4c7d944fef200fdfcaf57758b901b5511188ed2e) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_04.6a",  0x000006, 0x80000, CRC(e2799472) SHA1(27d3796429338d82a8de246a0ea06dd487a87768) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_05.7a",  0x200000, 0x80000, CRC(ba8a2761) SHA1(4b696d66c51611e43522bed752654314e76d33b6) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_06.8a",  0x200002, 0x80000, CRC(e584bfb5) SHA1(ebdf1f5e2638eed3a65dda82b1ed9151a355f4c9) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_07.9a",  0x200004, 0x80000, CRC(21e3f87d) SHA1(4a4961bb68c3a1ce15f9d393d9c03ecb2466cc29) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_08.10a", 0x200006, 0x80000, CRC(befc47df) SHA1(520390420da3a0271ba90b0a933e65143265e5cf) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_10.3c",  0x400000, 0x80000, CRC(960687d5) SHA1(2868c31121b1c7564e9767b9a19cdbf655c7ed1d) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_11.4c",  0x400002, 0x80000, CRC(978ecd18) SHA1(648a59706b93c84b4206a968ecbdc3e834c476f6) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_12.5c",  0x400004, 0x80000, CRC(d6ec9a0a) SHA1(ed6143f8737013b6ef1684e37c05e037e7a80dae) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "s92_13.6c",  0x400006, 0x80000, CRC(ed2c67f6) SHA1(0083c0ffaf6fe7659ff0cf822be4346cd6e61329) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x20000, "user1", 0 ) /* unknown (bootleg priority?) */
+	ROM_LOAD( "km6264-10.u133",    0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "km6264b-10.u191",  0x00000, 0x08000, CRC(6f07d2cb) SHA1(8ef1338d04c1a0b43e24303085105cfdced0bd5e) )
+	ROM_CONTINUE(            0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "km418c256z-80.u210",  0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
+ROM_END
 
 /* B-Board 89625B-1 */
 ROM_START( cworld2j )
@@ -12861,6 +12958,7 @@ GAME( 1991, 3wondersb,   3wonders, cps1_10MHz, 3wonders, cps_state, init_cps1,  
 GAME( 1991, 3wondersh,   3wonders, cps1_10MHz, 3wonders, cps_state, init_cps1,     ROT0,   "bootleg", "Three Wonders (hack)", MACHINE_SUPPORTS_SAVE ) // 910520 - based on World version
 GAME( 1991, kod,         0,        cps1_10MHz, kod,      cps_state, init_cps1,     ROT0,   "Capcom", "The King of Dragons (World 910805)", MACHINE_SUPPORTS_SAVE )    // "ETC"
 GAME( 1991, kodr1,       kod,      cps1_10MHz, kodr1,    cps_state, init_cps1,     ROT0,   "Capcom", "The King of Dragons (World 910711)", MACHINE_SUPPORTS_SAVE )    // "ETC"
+GAME( 1991, kodr2,       kod,      cps1_10MHz, kodr1,    cps_state, init_cps1,     ROT0,   "Capcom", "The King of Dragons (World 910731)", MACHINE_SUPPORTS_SAVE )    // "ETC"
 GAME( 1991, kodu,        kod,      cps1_10MHz, kod,      cps_state, init_cps1,     ROT0,   "Capcom", "The King of Dragons (USA 910910)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, kodj,        kod,      cps1_10MHz, kod,      cps_state, init_cps1,     ROT0,   "Capcom", "The King of Dragons (Japan 910805, B-Board 90629B-3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, kodja,       kod,      cps1_10MHz, kod,      cps_state, init_cps1,     ROT0,   "Capcom", "The King of Dragons (Japan 910805, B-Board 89625B-1)", MACHINE_SUPPORTS_SAVE )
@@ -12897,6 +12995,7 @@ GAME( 1992, sf2accp2,    sf2ce,    cps1_12MHz, sf2accp2, cps_state, init_cps1,  
 GAME( 1992, sf2amf,      sf2ce,    cps1_12MHz, sf2amf,   cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (Alpha Magic-F, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version
 GAME( 1992, sf2amf2,     sf2ce,    cps1_12MHz, sf2hack,  cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (L735 Test Rom, bootleg)", MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version
 GAME( 1992, sf2dkot2,    sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Double K.O. Turbo II, bootleg)", MACHINE_SUPPORTS_SAVE ) // 902140 !!! - based on USA version
+GAME( 1992, sf2level,    sf2ce,    sf2m3,      sf2level, cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (bootleg with level selection)", MACHINE_SUPPORTS_SAVE ) // 920322 - based on USA version
 GAME( 1992, sf2ceblp,    sf2ce,    cps1_10MHz, sf2,      cps_state, init_sf2ceblp, ROT0,   "bootleg", "Street Fighter II': Champion Edition (protected bootleg on non-dash board)", MACHINE_SUPPORTS_SAVE )          // 920313 - based on USA version
 GAME( 1992, sf2m2,       sf2ce,    cps1_12MHz, sf2m2,    cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M2, bootleg)", MACHINE_SUPPORTS_SAVE )               // 920313 - based on World version
 GAME( 1992, sf2m3,       sf2ce,    sf2m3,      sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (M3, bootleg)", MACHINE_SUPPORTS_SAVE )               // 920313 - based on USA version

@@ -18,6 +18,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -39,6 +40,11 @@ public:
 		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
+	void pasopia(machine_config &config);
+
+	void init_pasopia();
+
+private:
 	DECLARE_WRITE8_MEMBER(pasopia_ctrl_w);
 	DECLARE_WRITE8_MEMBER(vram_addr_lo_w);
 	DECLARE_WRITE8_MEMBER(vram_latch_w);
@@ -50,13 +56,11 @@ public:
 	DECLARE_READ8_MEMBER(keyb_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void init_pasopia();
 	TIMER_CALLBACK_MEMBER(pio_timer);
 
-	void pasopia(machine_config &config);
 	void pasopia_io(address_map &map);
 	void pasopia_map(address_map &map);
-private:
+
 	uint8_t m_hblank;
 	uint16_t m_vram_addr;
 	uint8_t m_vram_latch;
@@ -143,7 +147,7 @@ void pasopia_state::pasopia_io(address_map &map)
 	map(0x28, 0x2b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x30, 0x33).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 //  0x38 printer
-	map(0x3c, 0x3c).w(this, FUNC(pasopia_state::pasopia_ctrl_w));
+	map(0x3c, 0x3c).w(FUNC(pasopia_state::pasopia_ctrl_w));
 }
 
 /* Input ports */
@@ -254,7 +258,7 @@ static const gfx_layout p7_chars_8x8 =
 	8*8
 };
 
-static GFXDECODE_START( pasopia )
+static GFXDECODE_START( gfx_pasopia )
 	GFXDECODE_ENTRY( "chargen", 0x0000, p7_chars_8x8, 0, 4 )
 GFXDECODE_END
 
@@ -296,7 +300,7 @@ MACHINE_CONFIG_START(pasopia_state::pasopia)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */

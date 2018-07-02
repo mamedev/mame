@@ -80,44 +80,28 @@ READ8_MEMBER( bw2_state::read )
 	if (offset < 0x8000)
 	{
 		if (!rom)
-		{
 			data = m_rom->base()[offset & 0x3fff];
-		}
 
 		if (!vram)
-		{
 			data = m_video_ram[offset & 0x3fff];
-		}
 
 		if (!ram1)
-		{
 			data = m_ram->pointer()[offset];
-		}
 
 		if (!ram2 && HAS_KB_OF_RAM(96))
-		{
 			data = m_ram->pointer()[0x10000 | offset];
-		}
 
 		if (!ram3 && HAS_KB_OF_RAM(128))
-		{
 			data = m_ram->pointer()[0x18000 | offset];
-		}
 
 		if (!ram4 && HAS_KB_OF_RAM(160))
-		{
 			data = m_ram->pointer()[0x20000 | offset];
-		}
 
 		if (!ram5 && HAS_KB_OF_RAM(192))
-		{
 			data = m_ram->pointer()[0x28000 | offset];
-		}
 
 		if (!ram6 && HAS_KB_OF_RAM(224))
-		{
 			data = m_ram->pointer()[0x30000 | offset];
-		}
 	}
 	else
 	{
@@ -150,39 +134,25 @@ WRITE8_MEMBER( bw2_state::write )
 	if (offset < 0x8000)
 	{
 		if (!vram)
-		{
 			m_video_ram[offset & 0x3fff] = data;
-		}
 
 		if (!ram1)
-		{
 			m_ram->pointer()[offset] = data;
-		}
 
 		if (!ram2 && HAS_KB_OF_RAM(96))
-		{
 			m_ram->pointer()[0x10000 | offset] = data;
-		}
 
 		if (!ram3 && HAS_KB_OF_RAM(128))
-		{
 			m_ram->pointer()[0x18000 | offset] = data;
-		}
 
 		if (!ram4 && HAS_KB_OF_RAM(160))
-		{
 			m_ram->pointer()[0x20000 | offset] = data;
-		}
 
 		if (!ram5 && HAS_KB_OF_RAM(192))
-		{
 			m_ram->pointer()[0x28000 | offset] = data;
-		}
 
 		if (!ram6 && HAS_KB_OF_RAM(224))
-		{
 			m_ram->pointer()[0x30000 | offset] = data;
-		}
 	}
 	else
 	{
@@ -205,7 +175,7 @@ WRITE8_MEMBER( bw2_state::write )
 void bw2_state::bw2_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(bw2_state::read), FUNC(bw2_state::write));
+	map(0x0000, 0xffff).rw(FUNC(bw2_state::read), FUNC(bw2_state::write));
 }
 
 
@@ -223,7 +193,7 @@ void bw2_state::bw2_io(address_map &map)
 	map(0x30, 0x3f).rw(m_exp, FUNC(bw2_expansion_slot_device::slot_r), FUNC(bw2_expansion_slot_device::slot_w));
 	map(0x40, 0x40).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x41, 0x41).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x60, 0x63).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write));
 	map(0x70, 0x7f).rw(m_exp, FUNC(bw2_expansion_slot_device::modsel_r), FUNC(bw2_expansion_slot_device::modsel_w));
 }
@@ -575,7 +545,7 @@ void bw2_state::machine_start()
 
 MACHINE_CONFIG_START(bw2_state::bw2)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(bw2_mem)
 	MCFG_DEVICE_IO_MAP(bw2_io)
 
@@ -591,12 +561,12 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_PALETTE_INIT_OWNER(bw2_state, bw2)
 
 	// devices
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'000'000)/4) // 8251 USART TXC, RXC
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251_TAG, i8251_device, write_rxc))
+	MCFG_DEVICE_ADD(m_pit, PIT8253, 0)
+	MCFG_PIT8253_CLK0(16_MHz_XTAL / 4) // 8251 USART TXC, RXC
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_uart, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_uart, i8251_device, write_rxc))
 	MCFG_PIT8253_CLK1(11000) // LCD controller
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(I8253_TAG, pit8253_device, write_clk2))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_pit, pit8253_device, write_clk2))
 	MCFG_PIT8253_CLK2(0) // Floppy /MTRON
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, bw2_state, mtron_w))
 
@@ -606,31 +576,31 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, bw2_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, bw2_state, ppi_pc_w))
 
-	MCFG_DEVICE_ADD(MSM6255_TAG, MSM6255, XTAL(16'000'000))
+	MCFG_DEVICE_ADD(MSM6255_TAG, MSM6255, 16_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, lcdc_map)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, bw2_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
+	MCFG_DEVICE_ADD(m_uart, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, i8251_device, write_dsr))
 
-	MCFG_WD2797_ADD(WD2797_TAG, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 16_MHz_XTAL / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bw2_state, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, nullptr,   bw2_state::floppy_formats)
-	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, XTAL(16'000'000), bw2_expansion_cards, nullptr)
+	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, 16_MHz_XTAL, bw2_expansion_cards, nullptr)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")
@@ -655,9 +625,9 @@ ROM_START( bw2 )
 	ROM_REGION( 0x1000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v20" )
 	ROM_SYSTEM_BIOS( 0, "v12", "BW 2 v1.2" )
-	ROMX_LOAD( "bw2-12.ic8", 0x0000, 0x1000, CRC(0ab42d10) SHA1(430b232631eee9b715151b8d191b7eb9449ac513), ROM_BIOS(1) )
+	ROMX_LOAD( "bw2-12.ic8", 0x0000, 0x1000, CRC(0ab42d10) SHA1(430b232631eee9b715151b8d191b7eb9449ac513), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v20", "BW 2 v2.0" )
-	ROMX_LOAD( "bw2-20.ic8", 0x0000, 0x1000, CRC(86f36471) SHA1(a3e2ba4edd50ff8424bb0675bdbb3b9f13c04c9d), ROM_BIOS(2) )
+	ROMX_LOAD( "bw2-20.ic8", 0x0000, 0x1000, CRC(86f36471) SHA1(a3e2ba4edd50ff8424bb0675bdbb3b9f13c04c9d), ROM_BIOS(1) )
 ROM_END
 
 

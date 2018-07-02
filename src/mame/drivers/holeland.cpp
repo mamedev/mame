@@ -36,8 +36,8 @@ void holeland_state::holeland_map(address_map &map)
 	map(0xa000, 0xbfff).rom();
 	map(0xa000, 0xa000).w("speech", FUNC(sp0256_device::ald_w));
 	map(0xc000, 0xc007).w(m_latch, FUNC(ls259_device::write_d0)).nopr();
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(holeland_state::colorram_w)).share("colorram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(holeland_state::videoram_w)).share("videoram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(holeland_state::colorram_w)).share("colorram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(holeland_state::videoram_w)).share("videoram");
 	map(0xf000, 0xf3ff).ram().share("spriteram");
 }
 
@@ -45,10 +45,10 @@ void holeland_state::crzrally_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram().share("nvram");
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(holeland_state::colorram_w)).share("colorram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(holeland_state::videoram_w)).share("videoram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(holeland_state::colorram_w)).share("colorram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(holeland_state::videoram_w)).share("videoram");
 	map(0xe800, 0xebff).ram().share("spriteram");
-	map(0xf000, 0xf000).w(this, FUNC(holeland_state::scroll_w));
+	map(0xf000, 0xf000).w(FUNC(holeland_state::scroll_w));
 	map(0xf800, 0xf807).w(m_latch, FUNC(ls259_device::write_d0));
 }
 
@@ -263,12 +263,12 @@ static const gfx_layout crzrally_spritelayout =
 	8*16
 };
 
-static GFXDECODE_START( holeland )
+static GFXDECODE_START( gfx_holeland )
 	GFXDECODE_ENTRY( "gfx1", 0, holeland_charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, holeland_spritelayout, 0, 256 )
 GFXDECODE_END
 
-static GFXDECODE_START( crzrally )
+static GFXDECODE_START( gfx_crzrally )
 	GFXDECODE_ENTRY( "gfx1", 0, crzrally_charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, crzrally_spritelayout, 0, 256 )
 GFXDECODE_END
@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(holeland_state::holeland)
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_holeland)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", holeland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_holeland)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,holeland)
 
@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(holeland_state::crzrally)
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_crzrally)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crzrally)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crzrally)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,crzrally)
 

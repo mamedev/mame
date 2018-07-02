@@ -43,6 +43,9 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
+	void uzebox(machine_config &config);
+
+private:
 	required_device<avr8_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
@@ -65,11 +68,10 @@ public:
 	uint32_t screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(uzebox_cart);
 
-	void uzebox(machine_config &config);
 	void uzebox_data_map(address_map &map);
 	void uzebox_io_map(address_map &map);
 	void uzebox_prg_map(address_map &map);
-private:
+
 	int             m_vpos;
 	uint64_t          m_line_start_cycles;
 	uint32_t          m_line_pos_cycles;
@@ -211,10 +213,10 @@ void uzebox_state::uzebox_data_map(address_map &map)
 
 void uzebox_state::uzebox_io_map(address_map &map)
 {
-	map(AVR8_REG_A, AVR8_REG_A).rw(this, FUNC(uzebox_state::port_a_r), FUNC(uzebox_state::port_a_w));
-	map(AVR8_REG_B, AVR8_REG_B).rw(this, FUNC(uzebox_state::port_b_r), FUNC(uzebox_state::port_b_w));
-	map(AVR8_REG_C, AVR8_REG_C).rw(this, FUNC(uzebox_state::port_c_r), FUNC(uzebox_state::port_c_w));
-	map(AVR8_REG_D, AVR8_REG_D).rw(this, FUNC(uzebox_state::port_d_r), FUNC(uzebox_state::port_d_w));
+	map(AVR8_REG_A, AVR8_REG_A).rw(FUNC(uzebox_state::port_a_r), FUNC(uzebox_state::port_a_w));
+	map(AVR8_REG_B, AVR8_REG_B).rw(FUNC(uzebox_state::port_b_r), FUNC(uzebox_state::port_b_w));
+	map(AVR8_REG_C, AVR8_REG_C).rw(FUNC(uzebox_state::port_c_r), FUNC(uzebox_state::port_c_w));
+	map(AVR8_REG_D, AVR8_REG_D).rw(FUNC(uzebox_state::port_d_r), FUNC(uzebox_state::port_d_w));
 }
 
 /****************************************************\

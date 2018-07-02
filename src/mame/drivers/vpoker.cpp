@@ -101,6 +101,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -114,6 +115,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void vpoker(machine_config &config);
+
+private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t m_blit_ram[8];
 	DECLARE_READ8_MEMBER(blitter_r);
@@ -124,7 +128,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void vpoker(machine_config &config);
 	void main_map(address_map &map);
 };
 
@@ -187,7 +190,7 @@ void vpoker_state::main_map(address_map &map)
 	map.global_mask(0x3fff);
 	map(0x0000, 0x01ff).ram();     /* vpoker has 0x100, 5acespkr has 0x200 */
 	map(0x0400, 0x0407).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
-	map(0x0800, 0x0807).r(this, FUNC(vpoker_state::blitter_r)).w(this, FUNC(vpoker_state::blitter_w));
+	map(0x0800, 0x0807).r(FUNC(vpoker_state::blitter_r)).w(FUNC(vpoker_state::blitter_w));
 	map(0x2000, 0x3fff).rom();
 }
 
@@ -621,7 +624,7 @@ static const gfx_layout charlayout =
 	16*16
 };
 
-static GFXDECODE_START( vpoker )
+static GFXDECODE_START( gfx_vpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -647,7 +650,7 @@ MACHINE_CONFIG_START(vpoker_state::vpoker)
 	MCFG_SCREEN_UPDATE_DRIVER(vpoker_state, screen_update_vpoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vpoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vpoker)
 
 	MCFG_PALETTE_ADD_3BIT_GBR("palette")
 

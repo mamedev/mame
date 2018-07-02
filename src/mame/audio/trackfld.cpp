@@ -16,6 +16,8 @@ DEFINE_DEVICE_TYPE(TRACKFLD_AUDIO, trackfld_audio_device, "trackfld_audio", "Tra
 trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TRACKFLD_AUDIO, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_audiocpu(*this, finder_base::DUMMY_TAG)
+	, m_vlm(*this, finder_base::DUMMY_TAG)
 	, m_last_addr(0)
 	, m_last_irq(0)
 {
@@ -27,9 +29,6 @@ trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, cons
 
 void trackfld_audio_device::device_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
-	m_vlm = machine().device<vlm5030_device>("vlm");
-
 	/* sound */
 	save_item(NAME(m_last_addr));
 	save_item(NAME(m_last_irq));
@@ -58,7 +57,7 @@ void trackfld_audio_device::device_reset()
 
 READ8_MEMBER( trackfld_audio_device::trackfld_sh_timer_r )
 {
-	uint32_t clock = machine().device<cpu_device>("audiocpu")->total_cycles() / TIMER_RATE;
+	uint32_t clock = m_audiocpu->total_cycles() / TIMER_RATE;
 
 	return clock & 0xF;
 }

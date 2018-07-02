@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 class btime_state : public driver_device

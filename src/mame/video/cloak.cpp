@@ -172,9 +172,9 @@ void cloak_state::video_start()
 	save_item(NAME(m_bitmap_videoram_address_x));
 	save_item(NAME(m_bitmap_videoram_address_y));
 	save_item(NAME(m_bitmap_videoram_selected));
-	save_pointer(NAME(m_bitmap_videoram1.get()), 256*256);
-	save_pointer(NAME(m_bitmap_videoram2.get()), 256*256);
-	save_pointer(NAME(m_palette_ram.get()), NUM_PENS);
+	save_pointer(NAME(m_bitmap_videoram1), 256*256);
+	save_pointer(NAME(m_bitmap_videoram2), 256*256);
+	save_pointer(NAME(m_palette_ram), NUM_PENS);
 	machine().save().register_postload(save_prepost_delegate(FUNC(cloak_state::set_current_bitmap_videoram_pointer), this));
 }
 

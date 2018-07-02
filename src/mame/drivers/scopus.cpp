@@ -26,6 +26,7 @@
 #include "machine/i8257.h"
 #include "machine/i8212.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
@@ -40,15 +41,18 @@ public:
 		m_dma8257(*this, "dma"),
 		m_maincpu(*this, "maincpu"){ }
 
+	void sagitta180(machine_config &config);
+
 	void init_sagitta180();
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
-	void sagitta180(machine_config &config);
 	void maincpu_io_map(address_map &map);
 	void maincpu_map(address_map &map);
-private:
+
 	/* devices */
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
@@ -58,7 +62,6 @@ private:
 	// Character generator
 	const uint8_t *m_chargen;
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -84,7 +87,7 @@ const gfx_layout sagitta180_charlayout =
 	8*16                /* space between characters */
 };
 
-static GFXDECODE_START( sagitta180 )
+static GFXDECODE_START( gfx_sagitta180 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sagitta180_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -209,7 +212,7 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*5, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*5-1, 0, 25*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sagitta180 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sagitta180 )
 
 	MCFG_DEVICE_ADD("crtc", I8275, 12480000 / 8) /* guessed xtal */
 	MCFG_I8275_CHARACTER_WIDTH(8)

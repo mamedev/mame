@@ -16,6 +16,7 @@ Espirit3: 2x R6551AP, HD46850P (6850), R6502BP, R6545-1AP, R6522AP, 1.8432, 17.9
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class esprit_state : public driver_device
@@ -29,14 +30,17 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	MC6845_UPDATE_ROW(crtc_update_row);
-	void init_init();
-
 	void esprit(machine_config &config);
 	void esprit3(machine_config &config);
+
+	void init_init();
+
+private:
+	MC6845_UPDATE_ROW(crtc_update_row);
+
 	void mem3_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;
@@ -106,7 +110,7 @@ static const gfx_layout esprit_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( esprit )
+static GFXDECODE_START( gfx_esprit )
 	GFXDECODE_ENTRY( "chargen", 0x0000, esprit_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -129,7 +133,7 @@ MACHINE_CONFIG_START(esprit_state::esprit)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprit)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */

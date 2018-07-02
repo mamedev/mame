@@ -36,20 +36,22 @@ public:
 		: novagbase_state(mconfig, type, tag)
 	{ }
 
+	void delta1(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+private:
 	u8 m_io[2]; // F8 CPU I/O ports
 	F3853_INTERRUPT_REQ_CB(f3853_interrupt);
 
 	// Delta-1
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	DECLARE_WRITE8_MEMBER(delta1_io0_w);
 	DECLARE_WRITE8_MEMBER(delta1_io1_w);
 	DECLARE_READ8_MEMBER(delta1_io0_r);
 	DECLARE_READ8_MEMBER(delta1_io1_r);
 	void delta1_io(address_map &map);
 	void delta1_map(address_map &map);
-	void delta1(machine_config &config);
 
-protected:
 	virtual void machine_start() override;
 };
 
@@ -128,8 +130,8 @@ void novagf8_state::delta1_map(address_map &map)
 
 void novagf8_state::delta1_io(address_map &map)
 {
-	map(0x0, 0x0).rw(this, FUNC(novagf8_state::delta1_io0_r), FUNC(novagf8_state::delta1_io0_w));
-	map(0x1, 0x1).rw(this, FUNC(novagf8_state::delta1_io1_r), FUNC(novagf8_state::delta1_io1_w));
+	map(0x0, 0x0).rw(FUNC(novagf8_state::delta1_io0_r), FUNC(novagf8_state::delta1_io0_w));
+	map(0x1, 0x1).rw(FUNC(novagf8_state::delta1_io1_r), FUNC(novagf8_state::delta1_io1_w));
 	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 

@@ -36,6 +36,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void ampex(machine_config &config);
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(read_5840);
@@ -54,9 +57,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(so_w);
 	DECLARE_WRITE_LINE_MEMBER(dav_w);
 
-	void ampex(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_start() override;
 
 	u8 m_page;
@@ -162,14 +164,14 @@ void ampex_state::mem_map(address_map &map)
 	map(0x0000, 0x2fff).rom().region("roms", 0);
 	map(0x4000, 0x43ff).ram(); // main RAM
 	map(0x4400, 0x57ff).ram(); // expansion RAM
-	map(0x5840, 0x5840).rw(this, FUNC(ampex_state::read_5840), FUNC(ampex_state::write_5840));
-	map(0x5841, 0x5841).rw(this, FUNC(ampex_state::read_5841), FUNC(ampex_state::write_5841));
-	map(0x5842, 0x5842).r(this, FUNC(ampex_state::read_5842)).w(m_uart, FUNC(ay31015_device::transmit));
-	map(0x5843, 0x5843).r(m_uart, FUNC(ay31015_device::receive)).w(this, FUNC(ampex_state::write_5843));
-	map(0x5846, 0x5846).r(this, FUNC(ampex_state::read_5846));
-	map(0x5847, 0x5847).r(this, FUNC(ampex_state::read_5847));
+	map(0x5840, 0x5840).rw(FUNC(ampex_state::read_5840), FUNC(ampex_state::write_5840));
+	map(0x5841, 0x5841).rw(FUNC(ampex_state::read_5841), FUNC(ampex_state::write_5841));
+	map(0x5842, 0x5842).r(FUNC(ampex_state::read_5842)).w(m_uart, FUNC(ay31015_device::transmit));
+	map(0x5843, 0x5843).r(m_uart, FUNC(ay31015_device::receive)).w(FUNC(ampex_state::write_5843));
+	map(0x5846, 0x5846).r(FUNC(ampex_state::read_5846));
+	map(0x5847, 0x5847).r(FUNC(ampex_state::read_5847));
 	map(0x5c00, 0x5c0f).rw("vtac", FUNC(crt5037_device::read), FUNC(crt5037_device::write));
-	map(0x8000, 0x97ff).rw(this, FUNC(ampex_state::page_r), FUNC(ampex_state::page_w));
+	map(0x8000, 0x97ff).rw(FUNC(ampex_state::page_r), FUNC(ampex_state::page_w));
 	map(0xc000, 0xcfff).ram(); // video RAM
 }
 
@@ -187,8 +189,8 @@ void ampex_state::machine_start()
 	m_uart->write_swe(0);
 
 	// Are rates hardwired to DIP switches? They don't seem to be software-controlled...
-	m_dbrg->str_w(0xe);
-	m_dbrg->stt_w(0xe);
+	m_dbrg->write_str(0xe);
+	m_dbrg->write_stt(0xe);
 
 	// Make up some settings for the UART (probably also actually controlled by DIP switches)
 	m_uart->write_nb1(1);
@@ -202,7 +204,7 @@ void ampex_state::machine_start()
 	save_item(NAME(m_attr));
 	save_item(NAME(m_attr_readback));
 	save_item(NAME(m_uart_loopback));
-	save_pointer(NAME(m_paged_ram.get()), 0x1800 * 4);
+	save_pointer(NAME(m_paged_ram), 0x1800 * 4);
 }
 
 MACHINE_CONFIG_START(ampex_state::ampex)

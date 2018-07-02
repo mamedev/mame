@@ -36,7 +36,7 @@ ToDo:
 #include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
@@ -61,15 +61,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void gp_2(machine_config &config);
+
 	void init_gp_2();
+
+private:
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
-	void gp_2(machine_config &config);
 	void gp_2_io(address_map &map);
 	void gp_2_map(address_map &map);
-private:
+
 	uint8_t m_u14;
 	uint8_t m_digit;
 	uint8_t m_segment[16];

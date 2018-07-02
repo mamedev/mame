@@ -66,6 +66,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void instruct(machine_config &config);
+
+private:
+
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_READ8_MEMBER(portfc_r);
 	DECLARE_READ8_MEMBER(portfd_r);
@@ -78,11 +82,10 @@ public:
 	DECLARE_WRITE8_MEMBER(portfa_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(instruct);
 	INTERRUPT_GEN_MEMBER(t2l_int);
-	void instruct(machine_config &config);
 	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	uint16_t m_lar;
@@ -225,7 +228,7 @@ void instruct_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0ffe).ram().share("mainram");
-	map(0x0fff, 0x0fff).rw(this, FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
+	map(0x0fff, 0x0fff).rw(FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
 	map(0x1780, 0x17ff).ram().share("smiram");
 	map(0x1800, 0x1fff).rom().region("roms", 0);
 	map(0x2000, 0x7fff).ram().share("extram");
@@ -234,19 +237,19 @@ void instruct_state::mem_map(address_map &map)
 void instruct_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x07, 0x07).rw(this, FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
-	map(0xf8, 0xf8).w(this, FUNC(instruct_state::portf8_w));
-	map(0xf9, 0xf9).w(this, FUNC(instruct_state::portf9_w));
-	map(0xfa, 0xfa).w(this, FUNC(instruct_state::portfa_w));
-	map(0xfc, 0xfc).r(this, FUNC(instruct_state::portfc_r));
-	map(0xfd, 0xfd).r(this, FUNC(instruct_state::portfd_r));
-	map(0xfe, 0xfe).r(this, FUNC(instruct_state::portfe_r));
+	map(0x07, 0x07).rw(FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
+	map(0xf8, 0xf8).w(FUNC(instruct_state::portf8_w));
+	map(0xf9, 0xf9).w(FUNC(instruct_state::portf9_w));
+	map(0xfa, 0xfa).w(FUNC(instruct_state::portfa_w));
+	map(0xfc, 0xfc).r(FUNC(instruct_state::portfc_r));
+	map(0xfd, 0xfd).r(FUNC(instruct_state::portfd_r));
+	map(0xfe, 0xfe).r(FUNC(instruct_state::portfe_r));
 }
 
 void instruct_state::data_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
 }
 
 /* Input ports */

@@ -20,6 +20,7 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -35,6 +36,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void sm1800(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<i8255_device> m_ppi;
@@ -50,7 +54,6 @@ public:
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
-	void sm1800(machine_config &config);
 	void sm1800_io(address_map &map);
 	void sm1800_mem(address_map &map);
 };
@@ -153,7 +156,7 @@ static const gfx_layout sm1800_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( sm1800 )
+static GFXDECODE_START( gfx_sm1800 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sm1800_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -176,7 +179,7 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(sm1800_state, sm1800)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sm1800)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm1800)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("i8255", I8255, 0)

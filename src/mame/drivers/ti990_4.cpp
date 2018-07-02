@@ -55,6 +55,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_fd800(*this, "fd800") { }
 
+	void ti990_4v(machine_config &config);
+	void ti990_4(machine_config &config);
+
+	void init_ti990_4();
+	void init_ti990_4v();
+
+private:
 	DECLARE_READ8_MEMBER( panel_read );
 	DECLARE_WRITE8_MEMBER( panel_write );
 	DECLARE_WRITE8_MEMBER( external_operation );
@@ -64,17 +71,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vdtkey_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( line_interrupt );
 
-	void init_ti990_4();
-	void init_ti990_4v();
-
 	DECLARE_MACHINE_RESET(ti990_4);
 
-	void ti990_4v(machine_config &config);
-	void ti990_4(machine_config &config);
 	void cru_map(address_map &map);
 	void cru_map_v(address_map &map);
 	void memmap(address_map &map);
-private:
+
 	void        hold_load();
 	void        device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	int         m_intlines;
@@ -252,8 +254,8 @@ void ti990_4_state::cru_map(address_map &map)
 	map(0x08, 0x0b).r(m_fd800, FUNC(fd800_legacy_device::cru_r));
 	map(0x40, 0x5f).w(m_fd800, FUNC(fd800_legacy_device::cru_w));
 
-	map(0x1fe, 0x1ff).r(this, FUNC(ti990_4_state::panel_read));
-	map(0xff0, 0xfff).w(this, FUNC(ti990_4_state::panel_write));
+	map(0x1fe, 0x1ff).r(FUNC(ti990_4_state::panel_read));
+	map(0xff0, 0xfff).w(FUNC(ti990_4_state::panel_write));
 }
 
 void ti990_4_state::cru_map_v(address_map &map)
@@ -264,8 +266,8 @@ void ti990_4_state::cru_map_v(address_map &map)
 	map(0x08, 0x0b).r(m_fd800, FUNC(fd800_legacy_device::cru_r));
 	map(0x40, 0x5f).w(m_fd800, FUNC(fd800_legacy_device::cru_w));
 
-	map(0x1fe, 0x1ff).r(this, FUNC(ti990_4_state::panel_read));
-	map(0xff0, 0xfff).w(this, FUNC(ti990_4_state::panel_write));
+	map(0x1fe, 0x1ff).r(FUNC(ti990_4_state::panel_read));
+	map(0xff0, 0xfff).w(FUNC(ti990_4_state::panel_write));
 }
 
 

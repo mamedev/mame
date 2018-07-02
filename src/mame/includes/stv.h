@@ -1,5 +1,9 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
+#ifndef MAME_INCLUDES_STV_H
+#define MAME_INCLUDES_STV_H
+
+#pragma once
 
 #include "includes/saturn.h"
 #include "audio/rax.h"
@@ -22,6 +26,15 @@ public:
 		m_hopper(*this, "hopper")
 	{
 	}
+
+	void stv_slot(machine_config &config);
+	void stv_cartslot(machine_config &config);
+	void stv(machine_config &config);
+	void hopper(machine_config &config);
+	void batmanfr(machine_config &config);
+	void stv_5838(machine_config &config);
+	void stv_5881(machine_config &config);
+	void stvcd(machine_config &config);
 
 	void init_astrass();
 	void init_batmanfr();
@@ -70,6 +83,7 @@ public:
 	void init_mausuke();
 	void init_hopper();
 
+private:
 	DECLARE_READ8_MEMBER(stv_ioga_r);
 	DECLARE_WRITE8_MEMBER(stv_ioga_w);
 	DECLARE_READ8_MEMBER(critcrsh_ioga_r);
@@ -140,14 +154,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pdr2_output_w);
 	void stv_select_game(int gameno);
 	uint8_t     m_prev_gamebank_select;
-	void stv_slot(machine_config &config);
-	void stv_cartslot(machine_config &config);
-	void stv(machine_config &config);
-	void hopper(machine_config &config);
-	void batmanfr(machine_config &config);
-	void stv_5838(machine_config &config);
-	void stv_5881(machine_config &config);
-	void stvcd(machine_config &config);
+
 	void sound_mem(address_map &map);
 	void stv_mem(address_map &map);
 	void stvcd_mem(address_map &map);
@@ -170,4 +177,6 @@ public:
 #define STV_VDP1_VBE  ((STV_VDP1_TVMR & 0x0008) >> 3)
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
-GFXDECODE_EXTERN( stv );
+extern gfx_decode_entry const gfx_stv[];
+
+#endif // MAME_INCLUDES_STV_H

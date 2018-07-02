@@ -103,10 +103,10 @@ uint8_t a2bus_ssprite_device::read_c0nx(uint8_t offset)
 		case 1:
 			return m_tms->register_read();
 		case 2:
-			return 0x1f | m_tms5220->status_r(); // copied this line from a2echoii.cpp
+			return 0x1f | m_tms5220->read_status(); // copied this line from a2echoii.cpp
 		case 14:
 		case 15:
-			return m_ay->data_r();
+			return m_ay->read_data();
 	}
 
 	return 0xff;
@@ -123,15 +123,15 @@ void a2bus_ssprite_device::write_c0nx(uint8_t offset, uint8_t data)
 			m_tms->register_write(data);
 			break;
 		case 2:
-			m_tms5220->data_w(data);
+			m_tms5220->write_data(data);
 			break;
 		case 12:
 		case 13:
-			m_ay->data_w(data);
+			m_ay->write_data(data);
 			break;
 		case 14:
 		case 15:
-			m_ay->address_w(data);
+			m_ay->write_address(data);
 			break;
 	}
 }
@@ -139,11 +139,7 @@ void a2bus_ssprite_device::write_c0nx(uint8_t offset, uint8_t data)
 WRITE_LINE_MEMBER( a2bus_ssprite_device::tms_irq_w )
 {
 	if (state)
-	{
 		raise_slot_irq();
-	}
 	else
-	{
 		lower_slot_irq();
-	}
 }

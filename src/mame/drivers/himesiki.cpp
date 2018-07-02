@@ -118,7 +118,7 @@ WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /****************************************************************************/
@@ -130,7 +130,7 @@ void himesiki_state::himesiki_prm0(address_map &map)
 	map(0xa000, 0xa0ff).ram().share("spriteram");
 	map(0xa100, 0xa7ff).ram().share("sprram_p103a"); // not on Android
 	map(0xa800, 0xafff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xb000, 0xbfff).ram().w(this, FUNC(himesiki_state::himesiki_bg_ram_w)).share("bg_ram");
+	map(0xb000, 0xbfff).ram().w(FUNC(himesiki_state::himesiki_bg_ram_w)).share("bg_ram");
 	map(0xc000, 0xffff).bankr("bank1");
 }
 
@@ -139,9 +139,9 @@ void himesiki_state::himesiki_iom0(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)); // inputs
 	map(0x04, 0x07).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // dips + rombank
-	map(0x08, 0x08).w(this, FUNC(himesiki_state::himesiki_scrolly_w));
-	map(0x09, 0x0a).w(this, FUNC(himesiki_state::himesiki_scrollx_w));
-	map(0x0b, 0x0b).w(this, FUNC(himesiki_state::himesiki_sound_w));
+	map(0x08, 0x08).w(FUNC(himesiki_state::himesiki_scrolly_w));
+	map(0x09, 0x0a).w(FUNC(himesiki_state::himesiki_scrollx_w));
+	map(0x0b, 0x0b).w(FUNC(himesiki_state::himesiki_sound_w));
 }
 
 
@@ -397,7 +397,7 @@ static const gfx_layout layout_spr =
 	16*16*4
 };
 
-static GFXDECODE_START( himesiki )
+static GFXDECODE_START( gfx_himesiki )
 	GFXDECODE_ENTRY( "bgtiles",   0, layout_bg, 0x000, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_spr, 0x200, 16 )
 	GFXDECODE_ENTRY( "spr_p103a", 0, layout_p103a, 0x200, 16 )
@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(himesiki_state::himesiki)
 	MCFG_SCREEN_UPDATE_DRIVER(himesiki_state, screen_update_himesiki)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", himesiki)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_himesiki)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

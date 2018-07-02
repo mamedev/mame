@@ -233,28 +233,36 @@ class omegrace_state : public driver_device
 {
 public:
 	omegrace_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_dvg(*this, "dvg"),
-		m_soundlatch(*this, "soundlatch") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_dvg(*this, "dvg")
+		, m_soundlatch(*this, "soundlatch")
+		, m_leds(*this, "led%u", 0U)
+	{ }
+
+	void omegrace(machine_config &config);
+
+	void init_omegrace();
+
+private:
+	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
+	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
+	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
+	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
+	void main_map(address_map &map);
+	void port_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_port(address_map &map);
+
+	virtual void machine_start() override { m_leds.resolve(); }
+	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dvg_device> m_dvg;
 	required_device<generic_latch_8_device> m_soundlatch;
-
-	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
-	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
-	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
-	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
-	void init_omegrace();
-	virtual void machine_reset() override;
-	void omegrace(machine_config &config);
-	void main_map(address_map &map);
-	void port_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_port(address_map &map);
+	output_finder<4> m_leds;
 };
 
 
@@ -337,10 +345,10 @@ WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bits 2 to 5 are the start leds (4 and 5 cocktail only) */
-	output().set_led_value(0,~data & 0x04);
-	output().set_led_value(1,~data & 0x08);
-	output().set_led_value(2,~data & 0x10);
-	output().set_led_value(3,~data & 0x20);
+	m_leds[0] = BIT(~data, 2);
+	m_leds[1] = BIT(~data, 3);
+	m_leds[2] = BIT(~data, 4);
+	m_leds[3] = BIT(~data, 5);
 
 	/* bit 6 flips screen (not supported) */
 }
@@ -373,7 +381,7 @@ void omegrace_state::main_map(address_map &map)
 void omegrace_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x08, 0x08).r(this, FUNC(omegrace_state::omegrace_vg_go_r));
+	map(0x08, 0x08).r(FUNC(omegrace_state::omegrace_vg_go_r));
 	map(0x09, 0x09).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x0a, 0x0a).w(m_dvg, FUNC(dvg_device::reset_w));
 	map(0x0b, 0x0b).portr("AVGDVG");             /* vg_halt */
@@ -381,9 +389,9 @@ void omegrace_state::port_map(address_map &map)
 	map(0x17, 0x17).portr("DSW2");               /* DIP SW C6 */
 	map(0x11, 0x11).portr("IN0");                /* Player 1 input */
 	map(0x12, 0x12).portr("IN1");                /* Player 2 input */
-	map(0x13, 0x13).w(this, FUNC(omegrace_state::omegrace_leds_w));          /* coin counters, leds, flip screen */
-	map(0x14, 0x14).w(this, FUNC(omegrace_state::omegrace_soundlatch_w));    /* Sound command */
-	map(0x15, 0x15).r(this, FUNC(omegrace_state::omegrace_spinner1_r));       /* 1st controller */
+	map(0x13, 0x13).w(FUNC(omegrace_state::omegrace_leds_w));          /* coin counters, leds, flip screen */
+	map(0x14, 0x14).w(FUNC(omegrace_state::omegrace_soundlatch_w));    /* Sound command */
+	map(0x15, 0x15).r(FUNC(omegrace_state::omegrace_spinner1_r));       /* 1st controller */
 	map(0x16, 0x16).portr("SPIN1");              /* 2nd controller (cocktail) */
 }
 

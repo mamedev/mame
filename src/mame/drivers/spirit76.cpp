@@ -33,6 +33,9 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu") { }
 
+	void spirit76(machine_config &config);
+
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
@@ -40,9 +43,8 @@ public:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_READ8_MEMBER(unk_r);
-	void spirit76(machine_config &config);
 	void maincpu_map(address_map &map);
-private:
+
 	u8 m_t_c;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -54,8 +56,8 @@ void spirit76_state::maincpu_map(address_map &map)
 //  ADDRESS_MAP_GLOBAL_MASK(0xfff) // this could most likely go in once the memory map is sorted
 	map(0x0000, 0x00ff).ram(); // 2x 2112
 	map(0x2200, 0x2203).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // 6820
-	map(0x2400, 0x2400).r(this, FUNC(spirit76_state::unk_r));
-	map(0x2401, 0x2401).w(this, FUNC(spirit76_state::unk_w));
+	map(0x2400, 0x2400).r(FUNC(spirit76_state::unk_r));
+	map(0x2401, 0x2401).w(FUNC(spirit76_state::unk_w));
 	map(0x0600, 0x0fff).rom().region("roms", 0);
 	map(0xfe00, 0xffff).rom().region("roms", 0x800);
 }

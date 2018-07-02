@@ -35,6 +35,7 @@ Lower board (MGP_01):
 #include "machine/timer.h"
 //#include "video/dp8350.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "monzagp.lh"
@@ -60,6 +61,9 @@ public:
 		m_digits(*this, "digit%u%u", 0U, 0U)
 		{ }
 
+	void monzagp(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_WRITE8_MEMBER(port1_w);
@@ -84,10 +88,9 @@ public:
 	required_ioport m_dsw;
 	output_finder<4, 7> m_digits;
 
-	void monzagp(machine_config &config);
 	void monzagp_io(address_map &map);
 	void monzagp_map(address_map &map);
-private:
+
 	uint8_t m_p1;
 	uint8_t m_p2;
 	uint8_t m_video_ctrl[2][8];
@@ -155,8 +158,8 @@ void monzagp_state::machine_start()
 	m_mycar_pos = 0;
 	m_collisions_ff = 0;
 	m_collisions_clk = 0;
-	save_pointer(NAME(m_vram.get()), 0x800);
-	save_pointer(NAME(m_score_ram.get()), 0x100);
+	save_pointer(NAME(m_vram), 0x800);
+	save_pointer(NAME(m_score_ram), 0x100);
 
 	m_nvram->set_base(m_score_ram.get(), 0x100);
 
@@ -412,7 +415,7 @@ WRITE8_MEMBER(monzagp_state::port2_w)
 
 void monzagp_state::monzagp_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(monzagp_state::port_r), FUNC(monzagp_state::port_w));
+	map(0x00, 0xff).rw(FUNC(monzagp_state::port_r), FUNC(monzagp_state::port_w));
 }
 
 static INPUT_PORTS_START( monzagp )
@@ -487,7 +490,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( monzagp )
+static GFXDECODE_START( gfx_monzagp )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, char_layout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, sprite_layout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,   0, 8 )
@@ -516,7 +519,7 @@ MACHINE_CONFIG_START(monzagp_state::monzagp)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(monzagp_state, monzagp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", monzagp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_monzagp)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("time_tick_timer", monzagp_state, time_tick_timer, attotime::from_hz(4))
 

@@ -611,7 +611,8 @@ void nscsi_full_device::scsi_message()
 int nscsi_full_device::get_lun(int def)
 {
 	if(scsi_identify & 0x80)
-		return scsi_identify & 0x7f;
+		// lower 3 bits contain LUNTRN
+		return scsi_identify & 0x07;
 	return def;
 }
 

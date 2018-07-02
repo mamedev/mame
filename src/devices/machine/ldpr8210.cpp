@@ -150,7 +150,7 @@ static const uint8_t text_bitmap[0x40][7] =
 
 void pioneer_pr8210_device::pr8210_portmap(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(pioneer_pr8210_device::i8049_pia_r), FUNC(pioneer_pr8210_device::i8049_pia_w));
+	map(0x00, 0xff).rw(FUNC(pioneer_pr8210_device::i8049_pia_r), FUNC(pioneer_pr8210_device::i8049_pia_w));
 }
 
 ROM_START( pr8210 )
@@ -840,7 +840,7 @@ void pioneer_pr8210_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, 
 
 void simutrek_special_device::simutrek_portmap(address_map &map)
 {
-	map(0x00, 0xff).r(this, FUNC(simutrek_special_device::i8748_data_r));
+	map(0x00, 0xff).r(FUNC(simutrek_special_device::i8748_data_r));
 }
 
 

@@ -26,6 +26,7 @@
 #include "sound/okim6295.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -42,15 +43,15 @@ public:
 		m_spritegen(*this, "spritegen")
 	{ }
 
-	void init_madmotor();
 	void madmotor(machine_config &config);
 
-protected:
+	void init_madmotor();
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void madmotor_map(address_map &map);
 	void sound_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 
@@ -233,7 +234,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( madmotor )
+static GFXDECODE_START( gfx_madmotor )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   512, 16 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout2,  768, 16 ) /* Tiles 16x16 */
@@ -279,7 +280,7 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_SCREEN_UPDATE_DRIVER(madmotor_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madmotor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_madmotor)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

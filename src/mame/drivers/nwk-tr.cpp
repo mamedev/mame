@@ -259,6 +259,7 @@ Thrill Drive 713A13  -       713A14  -
 #include "sound/k056800.h"
 #include "video/voodoo.h"
 #include "video/k001604.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -277,6 +278,7 @@ public:
 		m_k001604(*this, "k001604"),
 		m_konppc(*this, "konppc"),
 		m_adc12138(*this, "adc12138"),
+		m_voodoo(*this, "voodoo%u", 0U),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
@@ -289,6 +291,12 @@ public:
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram") { }
 
+	void thrilld(machine_config &config);
+	void nwktr(machine_config &config);
+
+	void init_nwktr();
+
+private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
 
@@ -303,6 +311,7 @@ public:
 	required_device<k001604_device> m_k001604;
 	required_device<konppc_device> m_konppc;
 	required_device<adc12138_device> m_adc12138;
+	required_device_array<voodoo_device, 2> m_voodoo;
 	required_ioport m_in0, m_in1, m_in2, m_dsw, m_analog1, m_analog2, m_analog3, m_analog4, m_analog5;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
@@ -332,14 +341,13 @@ public:
 	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
-	void init_nwktr();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void lanc2_init();
-	void thrilld(machine_config &config);
-	void nwktr(machine_config &config);
+
 	void nwktr_map(address_map &map);
 	void sharc0_map(address_map &map);
 	void sharc1_map(address_map &map);
@@ -365,32 +373,32 @@ WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_1)
 }
 
 
-uint32_t nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nwktr_state::screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	if (strcmp(screen.tag(), ":lscreen") == 0)
-	{
-		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
+	m_voodoo[0]->voodoo_update(bitmap, cliprect);
 
-		voodoo->voodoo_update(bitmap, cliprect);
+	const rectangle &visarea = screen.visible_area();
+	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
 
-		const rectangle &visarea = screen.visible_area();
-		const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
+	m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
 
-		m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
-	}
-	else if (strcmp(screen.tag(), ":rscreen") == 0)
-	{
-		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo1");
+	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
+	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
+	return 0;
+}
 
-		voodoo->voodoo_update(bitmap, cliprect);
+uint32_t nwktr_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->pen(0), cliprect);
 
-		const rectangle &visarea = screen.visible_area();
-		const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
+	m_voodoo[1]->voodoo_update(bitmap, cliprect);
 
-		m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
-	}
+	const rectangle &visarea = screen.visible_area();
+	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y + 16, visarea.max_y);
+
+	m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
@@ -661,17 +669,17 @@ void nwktr_state::nwktr_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("work_ram");        /* Work RAM */
 	map(0x74000000, 0x740000ff).rw(m_k001604, FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
-	map(0x74010000, 0x74017fff).ram().w(this, FUNC(nwktr_state::paletteram32_w)).share("paletteram");
+	map(0x74010000, 0x74017fff).ram().w(FUNC(nwktr_state::paletteram32_w)).share("paletteram");
 	map(0x74020000, 0x7403ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	map(0x74040000, 0x7407ffff).rw(m_k001604, FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7d000000, 0x7d00ffff).r(this, FUNC(nwktr_state::sysreg_r));
-	map(0x7d010000, 0x7d01ffff).w(this, FUNC(nwktr_state::sysreg_w));
+	map(0x7d000000, 0x7d00ffff).r(FUNC(nwktr_state::sysreg_r));
+	map(0x7d010000, 0x7d01ffff).w(FUNC(nwktr_state::sysreg_w));
 	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));  /* M48T58Y RTC/NVRAM */
 	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
-	map(0x7d040000, 0x7d04ffff).rw(this, FUNC(nwktr_state::lanc1_r), FUNC(nwktr_state::lanc1_w));
-	map(0x7d050000, 0x7d05ffff).rw(this, FUNC(nwktr_state::lanc2_r), FUNC(nwktr_state::lanc2_w));
+	map(0x7d040000, 0x7d04ffff).rw(FUNC(nwktr_state::lanc1_r), FUNC(nwktr_state::lanc1_w));
+	map(0x7d050000, 0x7d05ffff).rw(FUNC(nwktr_state::lanc2_r), FUNC(nwktr_state::lanc2_w));
 	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0);   /* Data ROM */
 	map(0x7f000000, 0x7f1fffff).rom().share("share2");
 	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0).share("share2");    /* Program ROM */
@@ -685,8 +693,8 @@ void nwktr_state::sound_memmap(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x200000, 0x200fff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));      /* Ricoh RF5C400 */
 	map(0x300000, 0x30001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
-	map(0x500000, 0x500001).w(this, FUNC(nwktr_state::soundtimer_en_w)).nopr();
-	map(0x600000, 0x600001).w(this, FUNC(nwktr_state::soundtimer_count_w)).nopr();
+	map(0x500000, 0x500001).w(FUNC(nwktr_state::soundtimer_en_w)).nopr();
+	map(0x600000, 0x600001).w(FUNC(nwktr_state::soundtimer_count_w)).nopr();
 }
 
 /*****************************************************************************/
@@ -715,7 +723,7 @@ WRITE32_MEMBER(nwktr_state::dsp_dataram1_w)
 void nwktr_state::sharc0_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x0500000, 0x05fffff).rw(this, FUNC(nwktr_state::dsp_dataram0_r), FUNC(nwktr_state::dsp_dataram0_w));
+	map(0x0500000, 0x05fffff).rw(FUNC(nwktr_state::dsp_dataram0_r), FUNC(nwktr_state::dsp_dataram0_w));
 	map(0x1400000, 0x14fffff).ram();
 	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r), FUNC(konppc_device::nwk_voodoo_0_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
@@ -726,7 +734,7 @@ void nwktr_state::sharc0_map(address_map &map)
 void nwktr_state::sharc1_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
-	map(0x0500000, 0x05fffff).rw(this, FUNC(nwktr_state::dsp_dataram1_r), FUNC(nwktr_state::dsp_dataram1_w));
+	map(0x0500000, 0x05fffff).rw(FUNC(nwktr_state::dsp_dataram1_r), FUNC(nwktr_state::dsp_dataram1_w));
 	map(0x1400000, 0x14fffff).ram();
 	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r), FUNC(konppc_device::nwk_voodoo_0_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
@@ -841,7 +849,7 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(9000))
 
-	MCFG_M48T58_ADD( "m48t58" )
+	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 
 	MCFG_DEVICE_ADD("adc12138", ADC12138, 0)
 	MCFG_ADC1213X_IPT_CONVERT_CB(nwktr_state, adc12138_input_callback)
@@ -871,13 +879,13 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_nwktr)
+	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_lscreen)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_nwktr)
+	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_rscreen)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
@@ -919,8 +927,8 @@ MACHINE_CONFIG_END
 
 void nwktr_state::init_nwktr()
 {
-	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
-	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank6", memregion("user5")->base());
+	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
+	m_konppc->set_cgboard_texture_bank(0, "bank6", memregion("user5")->base());
 
 	m_sharc0_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);
 	m_sharc1_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);

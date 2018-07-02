@@ -25,9 +25,9 @@ DEFINE_DEVICE_TYPE(SV806, sv806_device, "sv806", "SV-806 80 Column Cartridge")
 ROM_START( sv806 )
 	ROM_REGION(0x1000, "gfx", 0)
 	ROM_SYSTEM_BIOS(0, "en", "English Character Set")
-	ROMX_LOAD("sv806.ic27",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(1))
+	ROMX_LOAD("sv806.ic27",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "se", "Swedish Character Set")
-	ROMX_LOAD("sv806se.ic27", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
+	ROMX_LOAD("sv806se.ic27", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(1))
 ROM_END
 
 const tiny_rom_entry *sv806_device::device_rom_region() const
@@ -81,7 +81,7 @@ void sv806_device::device_start()
 {
 	// register for savestates
 	save_item(NAME(m_ram_enabled));
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 }
 
 

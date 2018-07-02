@@ -135,12 +135,12 @@ void mainsnk_state::main_map(address_map &map)
 	map(0xc300, 0xc300).portr("IN3");
 	map(0xc400, 0xc400).portr("DSW1");
 	map(0xc500, 0xc500).portr("DSW2");
-	map(0xc600, 0xc600).w(this, FUNC(mainsnk_state::c600_w));
+	map(0xc600, 0xc600).w(FUNC(mainsnk_state::c600_w));
 	map(0xc700, 0xc700).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xd800, 0xdbff).ram().w(this, FUNC(mainsnk_state::bgram_w)).share("bgram");
+	map(0xd800, 0xdbff).ram().w(FUNC(mainsnk_state::bgram_w)).share("bgram");
 	map(0xdc00, 0xe7ff).ram();
 	map(0xe800, 0xefff).ram().share("spriteram");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(mainsnk_state::fgram_w)).share("fgram");    // + work RAM
+	map(0xf000, 0xf7ff).ram().w(FUNC(mainsnk_state::fgram_w)).share("fgram");    // + work RAM
 }
 
 void mainsnk_state::sound_map(address_map &map)
@@ -157,7 +157,7 @@ void mainsnk_state::sound_map(address_map &map)
 void mainsnk_state::sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(mainsnk_state::sound_ack_r));
+	map(0x00, 0x00).r(FUNC(mainsnk_state::sound_ack_r));
 }
 
 
@@ -368,7 +368,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( mainsnk )
+static GFXDECODE_START( gfx_mainsnk )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,   0x100, 0x080>>4 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0x000, 0x080>>3 )
 GFXDECODE_END
@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 	MCFG_SCREEN_UPDATE_DRIVER(mainsnk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mainsnk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mainsnk)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_INIT_OWNER(mainsnk_state, mainsnk)
 	MCFG_PALETTE_ENABLE_SHADOWS()

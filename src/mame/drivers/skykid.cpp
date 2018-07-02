@@ -62,8 +62,8 @@ READ8_MEMBER(skykid_state::inputport_r)
 
 WRITE8_MEMBER(skykid_state::skykid_led_w)
 {
-	output().set_led_value(0,data & 0x08);
-	output().set_led_value(1,data & 0x10);
+	m_leds[0] = BIT(data, 3);
+	m_leds[1] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(skykid_state::skykid_subreset_w)
@@ -95,6 +95,8 @@ WRITE8_MEMBER(skykid_state::skykid_irq_2_ctrl_w)
 
 void skykid_state::machine_start()
 {
+	m_leds.resolve();
+
 	/* configure the banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 
@@ -106,18 +108,18 @@ void skykid_state::machine_start()
 void skykid_state::skykid_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr("bank1");                /* banked ROM */
-	map(0x2000, 0x2fff).rw(this, FUNC(skykid_state::skykid_videoram_r), FUNC(skykid_state::skykid_videoram_w)).share("videoram");/* Video RAM (background) */
-	map(0x4000, 0x47ff).rw(this, FUNC(skykid_state::skykid_textram_r), FUNC(skykid_state::skykid_textram_w)).share("textram");    /* video RAM (text layer) */
+	map(0x2000, 0x2fff).rw(FUNC(skykid_state::skykid_videoram_r), FUNC(skykid_state::skykid_videoram_w)).share("videoram");/* Video RAM (background) */
+	map(0x4000, 0x47ff).rw(FUNC(skykid_state::skykid_textram_r), FUNC(skykid_state::skykid_textram_w)).share("textram");    /* video RAM (text layer) */
 	map(0x4800, 0x5fff).ram().share("spriteram");   /* RAM + Sprite RAM */
-	map(0x6000, 0x60ff).w(this, FUNC(skykid_state::skykid_scroll_y_w));        /* Y scroll register map */
-	map(0x6200, 0x63ff).w(this, FUNC(skykid_state::skykid_scroll_x_w));        /* X scroll register map */
+	map(0x6000, 0x60ff).w(FUNC(skykid_state::skykid_scroll_y_w));        /* Y scroll register map */
+	map(0x6200, 0x63ff).w(FUNC(skykid_state::skykid_scroll_x_w));        /* X scroll register map */
 	map(0x6800, 0x6bff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
-	map(0x7000, 0x7fff).w(this, FUNC(skykid_state::skykid_irq_1_ctrl_w));      /* IRQ control */
+	map(0x7000, 0x7fff).w(FUNC(skykid_state::skykid_irq_1_ctrl_w));      /* IRQ control */
 	map(0x7800, 0x7fff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x8000, 0xffff).rom();                 /* ROM */
-	map(0x8000, 0x8fff).w(this, FUNC(skykid_state::skykid_subreset_w));        /* MCU control */
-	map(0x9000, 0x9fff).w(this, FUNC(skykid_state::skykid_bankswitch_w));      /* Bankswitch control */
-	map(0xa000, 0xa001).w(this, FUNC(skykid_state::skykid_flipscreen_priority_w)); /* flip screen & priority */
+	map(0x8000, 0x8fff).w(FUNC(skykid_state::skykid_subreset_w));        /* MCU control */
+	map(0x9000, 0x9fff).w(FUNC(skykid_state::skykid_bankswitch_w));      /* Bankswitch control */
+	map(0xa000, 0xa001).w(FUNC(skykid_state::skykid_flipscreen_priority_w)); /* flip screen & priority */
 }
 
 void skykid_state::mcu_map(address_map &map)
@@ -126,7 +128,7 @@ void skykid_state::mcu_map(address_map &map)
 	map(0x0080, 0x00ff).ram();
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
 	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     /* watchdog? */
-	map(0x4000, 0x7fff).w(this, FUNC(skykid_state::skykid_irq_2_ctrl_w));
+	map(0x4000, 0x7fff).w(FUNC(skykid_state::skykid_irq_2_ctrl_w));
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xf000, 0xffff).rom();
@@ -140,10 +142,10 @@ READ8_MEMBER(skykid_state::readFF)
 
 void skykid_state::mcu_port_map(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).r(this, FUNC(skykid_state::inputport_r));         /* input ports read */
-	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(skykid_state::inputport_select_w)); /* input port select */
-	map(M6801_PORT2, M6801_PORT2).r(this, FUNC(skykid_state::readFF));  /* leds won't work otherwise */
-	map(M6801_PORT2, M6801_PORT2).w(this, FUNC(skykid_state::skykid_led_w));           /* lamps */
+	map(M6801_PORT1, M6801_PORT1).r(FUNC(skykid_state::inputport_r));         /* input ports read */
+	map(M6801_PORT1, M6801_PORT1).w(FUNC(skykid_state::inputport_select_w)); /* input port select */
+	map(M6801_PORT2, M6801_PORT2).r(FUNC(skykid_state::readFF));  /* leds won't work otherwise */
+	map(M6801_PORT2, M6801_PORT2).w(FUNC(skykid_state::skykid_led_w));           /* lamps */
 }
 
 
@@ -416,7 +418,7 @@ static const gfx_layout sprite_layout =
 	64*8
 };
 
-static GFXDECODE_START( skykid )
+static GFXDECODE_START( gfx_skykid )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   64*4, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 64*4+128*4, 64 )
@@ -457,7 +459,7 @@ MACHINE_CONFIG_START(skykid_state::skykid)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, skykid_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skykid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skykid)
 	MCFG_PALETTE_ADD("palette", 64*4+128*4+64*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(skykid_state, skykid)

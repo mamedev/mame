@@ -209,7 +209,7 @@ public:
 
 	void mpu5(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ32_MEMBER(mpu5_mem_r);
 	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
 
@@ -224,7 +224,6 @@ protected:
 	virtual void machine_start() override;
 	void mpu5_map(address_map &map);
 
-private:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 	SEC sec;
@@ -532,7 +531,7 @@ WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 
 void mpu5_state::mpu5_map(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(mpu5_state::mpu5_mem_r), FUNC(mpu5_state::mpu5_mem_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(mpu5_state::mpu5_mem_r), FUNC(mpu5_state::mpu5_mem_w));
 }
 
 INPUT_PORTS_START(  mpu5 )

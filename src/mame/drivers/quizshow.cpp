@@ -19,6 +19,7 @@ TODO:
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "quizshow.lh"
@@ -45,7 +46,8 @@ public:
 		m_dac(*this, "dac"),
 		m_main_ram(*this, "main_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(tape_headpos_r);
@@ -53,7 +55,8 @@ public:
 	void init_quizshow();
 	void quizshow(machine_config &config);
 
-protected:
+private:
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void mem_map(address_map &map);
@@ -73,12 +76,12 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<uint8_t> m_main_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+	output_finder<11> m_lamps;
 
 	tilemap_t *m_tilemap;
 	uint32_t m_clocks;
@@ -143,7 +146,7 @@ WRITE8_MEMBER(quizshow_state::lamps1_w)
 {
 	// d0-d3: P1 answer button lamps
 	for (int i = 0; i < 4; i++)
-		output().set_lamp_value(i, data >> i & 1);
+		m_lamps[i] = BIT(data, i);
 
 	// d4-d7: N/C
 }
@@ -152,7 +155,7 @@ WRITE8_MEMBER(quizshow_state::lamps2_w)
 {
 	// d0-d3: P2 answer button lamps
 	for (int i = 0; i < 4; i++)
-		output().set_lamp_value(i + 4, data >> i & 1);
+		m_lamps[i + 4] = BIT(data, i);
 
 	// d4-d7: N/C
 }
@@ -160,8 +163,8 @@ WRITE8_MEMBER(quizshow_state::lamps2_w)
 WRITE8_MEMBER(quizshow_state::lamps3_w)
 {
 	// d0-d1: start button lamps
-	output().set_lamp_value(8, data >> 0 & 1);
-	output().set_lamp_value(9, data >> 1 & 1);
+	m_lamps[8] = BIT(data, 0);
+	m_lamps[9] = BIT(data, 1);
 
 	// d2-d3: unused? (chip is shared with tape_control_w)
 	// d4-d7: N/C
@@ -170,7 +173,7 @@ WRITE8_MEMBER(quizshow_state::lamps3_w)
 WRITE8_MEMBER(quizshow_state::tape_control_w)
 {
 	// d2: enable user category select (changes tape head position)
-	output().set_lamp_value(10, data >> 2 & 1);
+	m_lamps[10] = BIT(data, 2);
 	m_category_enable = (data & 0xc) == 0xc;
 
 	// d3: tape motor
@@ -236,18 +239,18 @@ void quizshow_state::mem_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x0bff).rom();
-	map(0x1802, 0x1802).w(this, FUNC(quizshow_state::audio_w));
-	map(0x1804, 0x1804).w(this, FUNC(quizshow_state::lamps1_w));
-	map(0x1808, 0x1808).w(this, FUNC(quizshow_state::lamps2_w));
-	map(0x1810, 0x1810).w(this, FUNC(quizshow_state::lamps3_w));
-	map(0x1820, 0x1820).w(this, FUNC(quizshow_state::tape_control_w));
-	map(0x1840, 0x1840).w(this, FUNC(quizshow_state::video_disable_w));
+	map(0x1802, 0x1802).w(FUNC(quizshow_state::audio_w));
+	map(0x1804, 0x1804).w(FUNC(quizshow_state::lamps1_w));
+	map(0x1808, 0x1808).w(FUNC(quizshow_state::lamps2_w));
+	map(0x1810, 0x1810).w(FUNC(quizshow_state::lamps3_w));
+	map(0x1820, 0x1820).w(FUNC(quizshow_state::tape_control_w));
+	map(0x1840, 0x1840).w(FUNC(quizshow_state::video_disable_w));
 	map(0x1881, 0x1881).portr("IN0");
 	map(0x1882, 0x1882).portr("IN1");
 	map(0x1884, 0x1884).portr("IN2");
 	map(0x1888, 0x1888).portr("IN3");
-	map(0x1900, 0x1900).r(this, FUNC(quizshow_state::timing_r));
-	map(0x1e00, 0x1fff).ram().w(this, FUNC(quizshow_state::main_ram_w)).share("main_ram");
+	map(0x1900, 0x1900).r(FUNC(quizshow_state::timing_r));
+	map(0x1e00, 0x1fff).ram().w(FUNC(quizshow_state::main_ram_w)).share("main_ram");
 }
 
 
@@ -363,7 +366,7 @@ static const gfx_layout tile_layout =
 	8*16
 };
 
-static GFXDECODE_START( quizshow )
+static GFXDECODE_START( gfx_quizshow )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 4 )
 GFXDECODE_END
 
@@ -401,7 +404,7 @@ MACHINE_CONFIG_START(quizshow_state::quizshow)
 	MCFG_SCREEN_UPDATE_DRIVER(quizshow_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizshow)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizshow)
 	MCFG_PALETTE_ADD("palette", 8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(2)
 	MCFG_PALETTE_INIT_OWNER(quizshow_state, quizshow)
@@ -433,7 +436,7 @@ ROM_START( quizshow )
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x0200, "user1", 0 ) // gfx1
-	ROM_LOAD_NIB_HIGH( "005466-01.m2", 0x0000, 0x0200, BAD_DUMP CRC(03017820) SHA1(fd118aa706bdc6976e527ed63388fad01e66270e) ) // from Atari's source archive, may have some bad bits
+	ROM_LOAD_NIB_HIGH( "005466-01.m2", 0x0000, 0x0200, CRC(03017820) SHA1(fd118aa706bdc6976e527ed63388fad01e66270e) )
 	ROM_LOAD_NIB_LOW ( "005466-02.n2", 0x0000, 0x0200, CRC(cd554367) SHA1(04da83eb6e2f86f88a3495072b98fbdaca485ae8) )
 
 	ROM_REGION( 0x0200, "proms", 0 )

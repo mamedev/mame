@@ -14,11 +14,12 @@
  *       reg6 : IER  DSR  AMR  RDR  ---  TDR  CCR  SPR(L)  MTR(L)  EOR/EIR
  *       reg7 : ---  DNR  ADR  ---  ---  ---  CDR  SPR(H)  MTR(H)  ---
  */
-
-#ifndef DEVICES_MACHINE_YM3802_H
-#define DEVICES_MACHINE_YM3802_H
+#ifndef MAME_MACHINE_YM3802_H
+#define MAME_MACHINE_YM3802_H
 
 #pragma once
+
+#include "diserial.h"
 
 #include <queue>
 
@@ -168,4 +169,4 @@ private:
 
 DECLARE_DEVICE_TYPE(YM3802, ym3802_device)
 
-#endif // DEVICES_MACHINE_YM3802_H
+#endif // MAME_MACHINE_YM3802_H

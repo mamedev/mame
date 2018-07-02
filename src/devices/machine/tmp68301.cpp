@@ -24,17 +24,17 @@ DEFINE_DEVICE_TYPE(TMP68301, tmp68301_device, "tmp68301", "Toshiba TMP68301")
 void tmp68301_device::tmp68301_regs(address_map &map)
 {
 //  AM_RANGE(0x000,0x3ff) AM_RAM
-	map(0x080, 0x093).rw(this, FUNC(tmp68301_device::icr_r), FUNC(tmp68301_device::icr_w)).umask16(0x00ff);
+	map(0x080, 0x093).rw(FUNC(tmp68301_device::icr_r), FUNC(tmp68301_device::icr_w)).umask16(0x00ff);
 
-	map(0x094, 0x095).rw(this, FUNC(tmp68301_device::imr_r), FUNC(tmp68301_device::imr_w));
-	map(0x098, 0x099).rw(this, FUNC(tmp68301_device::iisr_r), FUNC(tmp68301_device::iisr_w));
+	map(0x094, 0x095).rw(FUNC(tmp68301_device::imr_r), FUNC(tmp68301_device::imr_w));
+	map(0x098, 0x099).rw(FUNC(tmp68301_device::iisr_r), FUNC(tmp68301_device::iisr_w));
 
 	/* Parallel Port */
-	map(0x100, 0x101).rw(this, FUNC(tmp68301_device::pdir_r), FUNC(tmp68301_device::pdir_w));
-	map(0x10a, 0x10b).rw(this, FUNC(tmp68301_device::pdr_r), FUNC(tmp68301_device::pdr_w));
+	map(0x100, 0x101).rw(FUNC(tmp68301_device::pdir_r), FUNC(tmp68301_device::pdir_w));
+	map(0x10a, 0x10b).rw(FUNC(tmp68301_device::pdr_r), FUNC(tmp68301_device::pdr_w));
 
 	/* Serial Port */
-	map(0x18e, 0x18f).rw(this, FUNC(tmp68301_device::scr_r), FUNC(tmp68301_device::scr_w));
+	map(0x18e, 0x18f).rw(FUNC(tmp68301_device::scr_r), FUNC(tmp68301_device::scr_w));
 }
 
 // IRQ Mask register, 0x94

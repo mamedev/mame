@@ -25,6 +25,7 @@
 #include "sound/ay8910.h"
 #include "sound/spkrdev.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 class vector06_state : public driver_device
@@ -54,6 +55,9 @@ public:
 		m_reset(*this, "RESET")
 	{ }
 
+	void vector06(machine_config &config);
+
+private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_READ8_MEMBER(vector06_8255_portb_r);
@@ -79,10 +83,9 @@ public:
 	TIMER_CALLBACK_MEMBER(reset_check_callback);
 	IRQ_CALLBACK_MEMBER(vector06_irq_callback);
 
-	void vector06(machine_config &config);
 	void vector06_io(address_map &map);
 	void vector06_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;

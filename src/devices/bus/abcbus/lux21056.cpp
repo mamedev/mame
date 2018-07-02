@@ -105,17 +105,17 @@ ROM_START( luxor_55_21056 )
 	ROM_REGION( 0x2000, Z80_TAG, 0 )
 	// ABC 850
 	ROM_SYSTEM_BIOS( 0, "ro202", "Rodime RO202 (CHS: 321,4,32,256)" )
-	ROMX_LOAD( "rodi202.bin", 0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf), ROM_BIOS(1) ) // Rodime RO202 (http://stason.org/TULARC/pc/hard-drives-hdd/rodime/RO202-11MB-5-25-FH-MFM-ST506.html)
+	ROMX_LOAD( "rodi202.bin", 0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf), ROM_BIOS(0) ) // Rodime RO202 (http://stason.org/TULARC/pc/hard-drives-hdd/rodime/RO202-11MB-5-25-FH-MFM-ST506.html)
 	ROM_SYSTEM_BIOS( 1, "basf6186", "BASF 6186 (CHS: 440,4,32,256)" )
-	ROMX_LOAD( "basf6186.bin", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(2) ) // BASF 6186 (http://stason.org/TULARC/pc/hard-drives-hdd/basf-magnetics/6186-14MB-5-25-FH-MFM-ST412.html)
+	ROMX_LOAD( "basf6186.bin", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1) ) // BASF 6186 (http://stason.org/TULARC/pc/hard-drives-hdd/basf-magnetics/6186-14MB-5-25-FH-MFM-ST412.html)
 	// ABC 852
 	ROM_SYSTEM_BIOS( 2, "basf6185", "BASF 6185 (CHS: 440,6,32,256)" )
-	ROMX_LOAD( "basf6185.bin", 0x0000, 0x0800, CRC(06f8fe2e) SHA1(e81f2a47c854e0dbb096bee3428d79e63591059d), ROM_BIOS(3) ) // BASF 6185 (http://stason.org/TULARC/pc/hard-drives-hdd/basf-magnetics/6185-22MB-5-25-FH-MFM-ST412.html)
+	ROMX_LOAD( "basf6185.bin", 0x0000, 0x0800, CRC(06f8fe2e) SHA1(e81f2a47c854e0dbb096bee3428d79e63591059d), ROM_BIOS(2) ) // BASF 6185 (http://stason.org/TULARC/pc/hard-drives-hdd/basf-magnetics/6185-22MB-5-25-FH-MFM-ST412.html)
 	ROM_SYSTEM_BIOS( 3, "nec5126", "NEC 5126 (CHS: 615,4,32,256)" )
-	ROMX_LOAD( "nec5126.bin", 0x0000, 0x1000, CRC(17c247e7) SHA1(7339738b87751655cb4d6414422593272fe72f5d), ROM_BIOS(4) ) // NEC 5126 (http://stason.org/TULARC/pc/hard-drives-hdd/nec/D5126-20MB-5-25-HH-MFM-ST506.html)
+	ROMX_LOAD( "nec5126.bin", 0x0000, 0x1000, CRC(17c247e7) SHA1(7339738b87751655cb4d6414422593272fe72f5d), ROM_BIOS(3) ) // NEC 5126 (http://stason.org/TULARC/pc/hard-drives-hdd/nec/D5126-20MB-5-25-HH-MFM-ST506.html)
 	// ABC 856
 	ROM_SYSTEM_BIOS( 4, "micr1325", "Micropolis 1325 (CHS: 1024,8,32,256)" )
-	ROMX_LOAD( "micr1325.bin", 0x0000, 0x0800, CRC(084af409) SHA1(342b8e214a8c4c2b014604e53c45ef1bd1c69ea3), ROM_BIOS(5) ) // Micropolis 1325 (http://stason.org/TULARC/pc/hard-drives-hdd/micropolis/1325-69MB-5-25-FH-MFM-ST506.html)
+	ROMX_LOAD( "micr1325.bin", 0x0000, 0x0800, CRC(084af409) SHA1(342b8e214a8c4c2b014604e53c45ef1bd1c69ea3), ROM_BIOS(4) ) // Micropolis 1325 (http://stason.org/TULARC/pc/hard-drives-hdd/micropolis/1325-69MB-5-25-FH-MFM-ST506.html)
 ROM_END
 
 
@@ -150,15 +150,15 @@ void luxor_55_21056_device::luxor_55_21056_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xf8);
-	map(0x00, 0x00).mirror(0xf0).rw(Z80DMA_TAG, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
-	map(0x08, 0x08).r(this, FUNC(luxor_55_21056_device::sasi_status_r));
-	map(0x18, 0x18).w(this, FUNC(luxor_55_21056_device::stat_w));
-	map(0x28, 0x28).r(this, FUNC(luxor_55_21056_device::out_r));
-	map(0x38, 0x38).w(this, FUNC(luxor_55_21056_device::inp_w));
-	map(0x48, 0x48).rw(this, FUNC(luxor_55_21056_device::sasi_data_r), FUNC(luxor_55_21056_device::sasi_data_w));
-	map(0x58, 0x58).rw(this, FUNC(luxor_55_21056_device::rdy_reset_r), FUNC(luxor_55_21056_device::rdy_reset_w));
-	map(0x68, 0x68).rw(this, FUNC(luxor_55_21056_device::sasi_sel_r), FUNC(luxor_55_21056_device::sasi_sel_w));
-	map(0x78, 0x78).rw(this, FUNC(luxor_55_21056_device::sasi_rst_r), FUNC(luxor_55_21056_device::sasi_rst_w));
+	map(0x00, 0x00).mirror(0xf0).rw(Z80DMA_TAG, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x08, 0x08).r(FUNC(luxor_55_21056_device::sasi_status_r));
+	map(0x18, 0x18).w(FUNC(luxor_55_21056_device::stat_w));
+	map(0x28, 0x28).r(FUNC(luxor_55_21056_device::out_r));
+	map(0x38, 0x38).w(FUNC(luxor_55_21056_device::inp_w));
+	map(0x48, 0x48).rw(FUNC(luxor_55_21056_device::sasi_data_r), FUNC(luxor_55_21056_device::sasi_data_w));
+	map(0x58, 0x58).rw(FUNC(luxor_55_21056_device::rdy_reset_r), FUNC(luxor_55_21056_device::rdy_reset_w));
+	map(0x68, 0x68).rw(FUNC(luxor_55_21056_device::sasi_sel_r), FUNC(luxor_55_21056_device::sasi_sel_w));
+	map(0x78, 0x78).rw(FUNC(luxor_55_21056_device::sasi_rst_r), FUNC(luxor_55_21056_device::sasi_rst_w));
 }
 
 

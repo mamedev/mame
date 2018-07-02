@@ -61,6 +61,7 @@ check more info and photo from cjdh2.zip!!!
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/igs036crypt.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -71,18 +72,21 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	uint32_t screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void igs_m036_tt(machine_config &config);
+	void igs_m036(machine_config &config);
+
 	void init_igs_m036();
 	void init_cjdh2();
 	void init_cjddzsp();
 	void init_igsm312();
 
+private:
+	uint32_t screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	required_device<cpu_device> m_maincpu;
 
 	void pgm_create_dummy_internal_arm_region(void);
 
-	void igs_m036_tt(machine_config &config);
-	void igs_m036(machine_config &config);
 	void igs_m036_map(address_map &map);
 };
 

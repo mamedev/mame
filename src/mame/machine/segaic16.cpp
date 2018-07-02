@@ -621,6 +621,7 @@ void sega_315_5195_mapper_device::update_mapping()
 	if (LOG_MEMORY_MAP) osd_printf_debug("----\nRemapping:\n");
 
 	// first reset everything back to the beginning
+	m_space->unmap_readwrite(0x000000, 0xffffff);
 	m_space->install_readwrite_handler(0x000000, 0xffffff, read8_delegate(FUNC(sega_315_5195_mapper_device::read), this), write8_delegate(FUNC(sega_315_5195_mapper_device::write), this), 0x00ff);
 
 	// loop over the regions
@@ -974,30 +975,50 @@ void sega_315_5249_divider_device::execute(int mode)
 
 sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, tag, owner, clock)
-	, m_sound_write(*this)
+	, m_68kint_callback(*this)
+	, m_zint_callback(*this)
+	, m_exck(false)
 {
 }
 
 
 //-------------------------------------------------
-//  clock - clock the timer
+//  exck_w - clock the timer
 //-------------------------------------------------
 
-bool sega_315_5250_compare_timer_device::clock()
+WRITE_LINE_MEMBER(sega_315_5250_compare_timer_device::exck_w)
 {
+	if (m_exck == bool(state))
+		return;
+
+	// update on rising edge
+	m_exck = bool(state);
+	if (!m_exck)
+		return;
+
 	// if we're enabled, clock the upcounter
 	int old_counter = m_counter;
 	if (m_regs[10] & 1)
 		m_counter++;
 
 	// regardless of the enable, a value of 0xfff will generate the IRQ
-	bool result = false;
 	if (old_counter == 0xfff)
 	{
-		result = true;
+		if (!m_68kint_callback.isnull())
+			m_68kint_callback(ASSERT_LINE);
 		m_counter = m_regs[8] & 0xfff;
 	}
-	return result;
+}
+
+
+//-------------------------------------------------
+//  interrupt_ack - acknowledge timer interrupt
+//-------------------------------------------------
+
+void sega_315_5250_compare_timer_device::interrupt_ack()
+{
+	if (!m_68kint_callback.isnull())
+		m_68kint_callback(CLEAR_LINE);
 }
 
 
@@ -1005,7 +1026,7 @@ bool sega_315_5250_compare_timer_device::clock()
 //  read - read the registers
 //-------------------------------------------------
 
-READ16_MEMBER( sega_315_5250_compare_timer_device::read )
+READ16_MEMBER(sega_315_5250_compare_timer_device::read)
 {
 	if (LOG_COMPARE) logerror("compare_r(%X) = %04X\n", offset, m_regs[offset]);
 	switch (offset & 15)
@@ -1019,7 +1040,7 @@ READ16_MEMBER( sega_315_5250_compare_timer_device::read )
 		case 0x6:   return m_regs[2];
 		case 0x7:   return m_regs[7];
 		case 0x9:
-		case 0xd:   interrupt_ack(); break;
+		case 0xd:   if (!machine().side_effects_disabled()) interrupt_ack(); break;
 	}
 	return 0xffff;
 }
@@ -1029,7 +1050,7 @@ READ16_MEMBER( sega_315_5250_compare_timer_device::read )
 //  write - write to the registers
 //-------------------------------------------------
 
-WRITE16_MEMBER( sega_315_5250_compare_timer_device::write )
+WRITE16_MEMBER(sega_315_5250_compare_timer_device::write)
 {
 	if (LOG_COMPARE) logerror("compare_w(%X) = %04X\n", offset, data);
 	switch (offset & 15)
@@ -1047,9 +1068,7 @@ WRITE16_MEMBER( sega_315_5250_compare_timer_device::write )
 		case 0xe:   COMBINE_DATA(&m_regs[10]); break;
 		case 0xb:
 		case 0xf:
-			COMBINE_DATA(&m_regs[11]);
-			if (!m_sound_write.isnull())
-				m_sound_write(m_regs[11]);
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(sega_315_5250_compare_timer_device::write_to_sound), this), data & 0xff);
 			break;
 	}
 }
@@ -1062,13 +1081,14 @@ WRITE16_MEMBER( sega_315_5250_compare_timer_device::write )
 void sega_315_5250_compare_timer_device::device_start()
 {
 	// bind our handlers
-	m_timer_ack.bind_relative_to(*owner());
-	m_sound_write.resolve();
+	m_68kint_callback.resolve();
+	m_zint_callback.resolve();
 
 	// save states
 	save_item(NAME(m_regs));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_bit));
+	save_item(NAME(m_exck));
 }
 
 
@@ -1081,6 +1101,35 @@ void sega_315_5250_compare_timer_device::device_reset()
 	memset(m_regs, 0, sizeof(m_regs));
 	m_counter = 0;
 	m_bit = 0;
+
+	interrupt_ack();
+	if (!m_zint_callback.isnull())
+		m_zint_callback(CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
+//  write_to_sound - write data for the sound CPU
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(sega_315_5250_compare_timer_device::write_to_sound)
+{
+	m_regs[11] = param;
+	if (!m_zint_callback.isnull())
+		m_zint_callback(ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
+//  zread - read data from sound CPU bus
+//-------------------------------------------------
+
+READ8_MEMBER(sega_315_5250_compare_timer_device::zread)
+{
+	if (!m_zint_callback.isnull() && !machine().side_effects_disabled())
+		m_zint_callback(CLEAR_LINE);
+
+	return m_regs[11];
 }
 
 

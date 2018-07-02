@@ -33,6 +33,9 @@ public:
 		, m_soundbank(*this, "soundbank")
 	{ }
 
+	void mephisto(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(shift_load_w);
 	DECLARE_READ8_MEMBER(ay8910_read);
 	DECLARE_WRITE8_MEMBER(ay8910_write);
@@ -41,12 +44,11 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_inputs_r);
 	DECLARE_WRITE8_MEMBER(sound_rombank_w);
 
-	void mephisto(machine_config &config);
 	void mephisto_8051_io(address_map &map);
 	void mephisto_8051_map(address_map &map);
 	void mephisto_map(address_map &map);
 	void sport2k_8051_io(address_map &map);
-private:
+
 	u8 m_ay8910_data;
 	bool m_ay8910_bdir;
 	bool m_ay8910_bc1;
@@ -112,7 +114,7 @@ void mephisto_pinball_state::mephisto_map(address_map &map)
 	map(0x13800, 0x13807).rw("ic20", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x14000, 0x140ff).rw("ic9", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x14800, 0x14807).rw("ic9", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0x16000, 0x16000).w(this, FUNC(mephisto_pinball_state::shift_load_w));
+	map(0x16000, 0x16000).w(FUNC(mephisto_pinball_state::shift_load_w));
 	map(0x17000, 0x17001).nopw(); //???
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
@@ -126,8 +128,8 @@ void mephisto_pinball_state::mephisto_8051_map(address_map &map)
 void mephisto_pinball_state::mephisto_8051_io(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0800).w(this, FUNC(mephisto_pinball_state::sound_rombank_w));
-	map(0x1000, 0x1000).w("dac", FUNC(dac08_device::write));
+	map(0x0800, 0x0800).w(FUNC(mephisto_pinball_state::sound_rombank_w));
+	map(0x1000, 0x1000).w("dac", FUNC(dac08_device::data_w));
 }
 
 #ifdef UNUSED_DEFINITION

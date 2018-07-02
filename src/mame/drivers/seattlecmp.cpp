@@ -47,12 +47,14 @@ public:
 		, m_pic(*this, "pic%u", 1)
 	{ }
 
+	void seattle(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(pic_slave_ack);
 
-	void seattle(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pic8259_device, 2> m_pic;
 };

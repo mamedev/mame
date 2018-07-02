@@ -8,6 +8,7 @@
 
 #include "sound/flt_rc.h"
 #include "sound/vlm5030.h"
+#include "emupal.h"
 
 class ddribble_state : public driver_device
 {
@@ -28,6 +29,9 @@ public:
 		m_filter3(*this, "filter3"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void ddribble(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_fg_videoram;
 	required_shared_ptr<uint8_t> m_spriteram_1;
@@ -77,7 +81,6 @@ public:
 	uint32_t screen_update_ddribble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int lenght, int gfxset, int flipscreen );
-	void ddribble(machine_config &config);
 	void cpu0_map(address_map &map);
 	void cpu1_map(address_map &map);
 	void cpu2_map(address_map &map);

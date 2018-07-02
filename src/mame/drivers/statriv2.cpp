@@ -76,6 +76,7 @@ quaquiz2 - no inputs, needs NVRAM
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/tms9927.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -93,6 +94,21 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+
+	void statriv2(machine_config &config);
+	void funcsino(machine_config &config);
+	void statriv2v(machine_config &config);
+
+	void init_addr_xlh();
+	void init_addr_lhx();
+	void init_addr_lmh();
+	void init_addr_lmhe();
+	void init_addr_xhl();
+	void init_laserdisc();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_tms;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -107,14 +123,8 @@ public:
 	uint8_t m_last_coin;
 	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
 	DECLARE_READ8_MEMBER(question_data_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
-	void init_addr_xlh();
-	void init_addr_lhx();
-	void init_addr_lmh();
-	void init_addr_lmhe();
-	void init_addr_xhl();
-	void init_laserdisc();
+
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
 	virtual void video_start() override;
@@ -122,9 +132,7 @@ public:
 	DECLARE_VIDEO_START(vertical);
 	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
-	void statriv2(machine_config &config);
-	void funcsino(machine_config &config);
-	void statriv2v(machine_config &config);
+
 	void statriv2_io_map(address_map &map);
 	void statriv2_map(address_map &map);
 };
@@ -291,13 +299,13 @@ void statriv2_state::statriv2_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram();
 	map(0x4800, 0x48ff).ram().share("nvram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(statriv2_state::statriv2_videoram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(statriv2_state::statriv2_videoram_w)).share("videoram");
 }
 
 void statriv2_state::statriv2_io_map(address_map &map)
 {
 	map(0x20, 0x23).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x28, 0x2b).r(this, FUNC(statriv2_state::question_data_r)).writeonly().share("question_offset");
+	map(0x28, 0x2b).r(FUNC(statriv2_state::question_data_r)).writeonly().share("question_offset");
 	map(0xb0, 0xb1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xb1, 0xb1).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xc0, 0xcf).rw(m_tms, FUNC(tms9927_device::read), FUNC(tms9927_device::write));
@@ -570,7 +578,7 @@ static const gfx_layout horizontal_tiles_layout =
 	16*8
 };
 
-static GFXDECODE_START( horizontal )
+static GFXDECODE_START( gfx_horizontal )
 	GFXDECODE_ENTRY( "tiles", 0, horizontal_tiles_layout, 0, 64 )
 GFXDECODE_END
 
@@ -586,7 +594,7 @@ static const gfx_layout vertical_tiles_layout =
 	8*8
 };
 
-static GFXDECODE_START( vertical )
+static GFXDECODE_START( gfx_vertical )
 	GFXDECODE_ENTRY( "tiles", 0, vertical_tiles_layout, 0, 64 )
 GFXDECODE_END
 
@@ -625,7 +633,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/2/8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", horizontal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_horizontal)
 	MCFG_PALETTE_ADD("palette", 2*64)
 	MCFG_PALETTE_INIT_OWNER(statriv2_state, statriv2)
 
@@ -645,7 +653,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2v)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
 
 	MCFG_VIDEO_START_OVERRIDE(statriv2_state, vertical)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", vertical)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_vertical)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(statriv2_state::funcsino)

@@ -61,10 +61,17 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void ltd4(machine_config &config);
+	void ltd3(machine_config &config);
+
 	void init_atla_ltd();
 	void init_bhol_ltd();
 	void init_zephy();
 	void init_ltd();
+
+	DECLARE_INPUT_CHANGED_MEMBER(ficha);
+
+private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(port1_r);
@@ -72,14 +79,11 @@ public:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_WRITE8_MEMBER(count_reset_w);
-	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
-	void ltd4(machine_config &config);
-	void ltd3(machine_config &config);
 	void ltd3_map(address_map &map);
 	void ltd4_io(address_map &map);
 	void ltd4_map(address_map &map);
-private:
+
 	bool m_timer_r;
 	bool m_clear;
 	uint8_t m_counter;
@@ -98,8 +102,8 @@ private:
 void ltd_state::ltd3_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram().share("nvram"); // internal to the cpu
-	map(0x0080, 0x0087).mirror(0x78).r(this, FUNC(ltd_state::io_r));
-	map(0x0800, 0x2fff).w(this, FUNC(ltd_state::io_w));
+	map(0x0080, 0x0087).mirror(0x78).r(FUNC(ltd_state::io_r));
+	map(0x0800, 0x2fff).w(FUNC(ltd_state::io_w));
 	map(0xc000, 0xcfff).rom().mirror(0x3000).region("roms", 0);
 }
 
@@ -108,7 +112,7 @@ void ltd_state::ltd4_map(address_map &map)
 	map(0x0000, 0x001f).ram(); // internal to the cpu
 	map(0x0080, 0x00ff).ram();
 	map(0x0100, 0x01ff).ram().share("nvram");
-	map(0x0800, 0x0800).w(this, FUNC(ltd_state::count_reset_w));
+	map(0x0800, 0x0800).w(FUNC(ltd_state::count_reset_w));
 	map(0x0c00, 0x0c00).w("aysnd_1", FUNC(ay8910_device::reset_w));
 	map(0x1000, 0x1000).w("aysnd_0", FUNC(ay8910_device::address_w));
 	map(0x1400, 0x1400).w("aysnd_0", FUNC(ay8910_device::reset_w));
@@ -121,8 +125,8 @@ void ltd_state::ltd4_map(address_map &map)
 
 void ltd_state::ltd4_io(address_map &map)
 {
-	map(0x0100, 0x0100).rw(this, FUNC(ltd_state::port1_r), FUNC(ltd_state::port1_w));
-	map(0x0101, 0x0101).rw(this, FUNC(ltd_state::port2_r), FUNC(ltd_state::port2_w));
+	map(0x0100, 0x0100).rw(FUNC(ltd_state::port1_r), FUNC(ltd_state::port1_w));
+	map(0x0101, 0x0101).rw(FUNC(ltd_state::port2_r), FUNC(ltd_state::port2_w));
 }
 
 // bits 6,7 not connected to data bus
@@ -249,7 +253,7 @@ INPUT_PORTS_END
 INPUT_CHANGED_MEMBER( ltd_state::ficha )
 {
 	if(newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 // switches

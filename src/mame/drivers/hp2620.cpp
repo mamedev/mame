@@ -23,6 +23,9 @@ public:
 		, m_nvram(*this, "nvram")
 	{ }
 
+	void hp2622(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(nvram_r);
 	DECLARE_WRITE8_MEMBER(nvram_w);
 	DECLARE_READ8_MEMBER(keystat_r);
@@ -32,10 +35,9 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void hp2622(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_nvram;
@@ -84,13 +86,13 @@ void hp2620_state::mem_map(address_map &map)
 void hp2620_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x7f).rw(this, FUNC(hp2620_state::nvram_r), FUNC(hp2620_state::nvram_w)).share("nvram");
-	map(0x80, 0x80).r(this, FUNC(hp2620_state::keystat_r));
-	map(0x90, 0x90).r(this, FUNC(hp2620_state::sysstat_r));
+	map(0x00, 0x7f).rw(FUNC(hp2620_state::nvram_r), FUNC(hp2620_state::nvram_w)).share("nvram");
+	map(0x80, 0x80).r(FUNC(hp2620_state::keystat_r));
+	map(0x90, 0x90).r(FUNC(hp2620_state::sysstat_r));
 	map(0xa0, 0xa3).w("acia", FUNC(mos6551_device::write));
 	map(0xa4, 0xa7).r("acia", FUNC(mos6551_device::read));
-	map(0xa8, 0xa8).w(this, FUNC(hp2620_state::modem_w));
-	map(0xb8, 0xb8).w(this, FUNC(hp2620_state::keydisp_w));
+	map(0xa8, 0xa8).w(FUNC(hp2620_state::modem_w));
+	map(0xb8, 0xb8).w(FUNC(hp2620_state::keydisp_w));
 }
 
 static INPUT_PORTS_START( hp2622 )

@@ -62,15 +62,15 @@ void mbc55x_state::mbc55x_mem(address_map &map)
 void mbc55x_state::mbc55x_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x0003).rw(this, FUNC(mbc55x_state::mbcpic8259_r), FUNC(mbc55x_state::mbcpic8259_w));
-	map(0x0008, 0x000F).rw(this, FUNC(mbc55x_state::mbc55x_disk_r), FUNC(mbc55x_state::mbc55x_disk_w));
-	map(0x0010, 0x0010).rw(this, FUNC(mbc55x_state::vram_page_r), FUNC(mbc55x_state::vram_page_w));
-	map(0x0018, 0x001F).rw(this, FUNC(mbc55x_state::ppi8255_r), FUNC(mbc55x_state::ppi8255_w));
-	map(0x0020, 0x0027).rw(this, FUNC(mbc55x_state::mbcpit8253_r), FUNC(mbc55x_state::mbcpit8253_w));
-	map(0x0028, 0x002B).rw(this, FUNC(mbc55x_state::mbc55x_usart_r), FUNC(mbc55x_state::mbc55x_usart_w));
+	map(0x0000, 0x0003).rw(FUNC(mbc55x_state::mbcpic8259_r), FUNC(mbc55x_state::mbcpic8259_w));
+	map(0x0008, 0x000F).rw(FUNC(mbc55x_state::mbc55x_disk_r), FUNC(mbc55x_state::mbc55x_disk_w));
+	map(0x0010, 0x0010).rw(FUNC(mbc55x_state::vram_page_r), FUNC(mbc55x_state::vram_page_w));
+	map(0x0018, 0x001F).rw(FUNC(mbc55x_state::ppi8255_r), FUNC(mbc55x_state::ppi8255_w));
+	map(0x0020, 0x0027).rw(FUNC(mbc55x_state::mbcpit8253_r), FUNC(mbc55x_state::mbcpit8253_w));
+	map(0x0028, 0x002B).rw(FUNC(mbc55x_state::mbc55x_usart_r), FUNC(mbc55x_state::mbc55x_usart_w));
 	map(0x0030, 0x0031).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0032, 0x0033).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0038, 0x003B).rw(this, FUNC(mbc55x_state::mbc55x_kb_usart_r), FUNC(mbc55x_state::mbc55x_kb_usart_w));
+	map(0x0038, 0x003B).rw(FUNC(mbc55x_state::mbc55x_kb_usart_r), FUNC(mbc55x_state::mbc55x_kb_usart_w));
 }
 
 static INPUT_PORTS_START( mbc55x )
@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181),896,0,300,262,0,200)
+	MCFG_SCREEN_RAW_PARAMS(14.318181_MHz_XTAL, 896, 0, 300, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DEVICE(VID_MC6845_NAME, mc6845_device, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mbc55x_state, screen_vblank_mbc55x))
 
@@ -290,7 +290,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, mbc55x_state, mbc55x_ppi_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mbc55x_state, mbc55x_ppi_portc_w))
 
-	MCFG_MC6845_ADD(VID_MC6845_NAME, MC6845, SCREEN_TAG, XTAL(14'318'181)/8)
+	MCFG_MC6845_ADD(VID_MC6845_NAME, MC6845, SCREEN_TAG, 14.318181_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbc55x_state, crtc_update_row)
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, mbc55x_state, vid_vsync_changed))
 
 	/* Backing storage */
-	MCFG_FD1793_ADD(FDC_TAG, XTAL(1'000'000))
+	MCFG_DEVICE_ADD(FDC_TAG, FD1793, 1_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
@@ -314,7 +314,7 @@ ROM_START( mbc55x )
 	ROM_REGION( 0x4000, MAINCPU_TAG, 0 )
 
 	ROM_SYSTEM_BIOS(0, "v120", "mbc55x BIOS v1.20 (1983)")
-	ROMX_LOAD("mbc55x-v120.rom", 0x0000, 0x2000, CRC(b439b4b8) SHA1(6e8df0f3868e3fd0229a5c2720d6c01e46815cab), ROM_BIOS(1)  )
+	ROMX_LOAD("mbc55x-v120.rom", 0x0000, 0x2000, CRC(b439b4b8) SHA1(6e8df0f3868e3fd0229a5c2720d6c01e46815cab), ROM_BIOS(0)  )
 ROM_END
 
 

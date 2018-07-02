@@ -23,8 +23,8 @@ http://segaretro.org/
 <!--
 Dreamcast serial labels
 
-	WORLD
-	=====
+    WORLD
+    =====
 
 Prefixes
 ======
@@ -139,8 +139,8 @@ Developer
 
 
 
-	EUROPE
-	======
+    EUROPE
+    ======
 
 Region
 ======
@@ -175,46 +175,46 @@ Region
  **-*****-B9 : France
 
  610-****    : Appears to be serials for Japanese demos and pack-ins as well as very early European pack-ins (e.g. DreamKey 1.0)
-				 Found on both discs and covers for Japanese games, and only on covers for European games.
-				 On European releases, these seem to only be a supplemental serial to the common 832-****-** serial.
+                 Found on both discs and covers for Japanese games, and only on covers for European games.
+                 On European releases, these seem to only be a supplemental serial to the common 832-****-** serial.
 
  673-*****   : Appears to be serials for Japanese games, demos and pack-ins as well as very early European pack-ins (e.g. DreamKey 1.0)
-				 Found on discs and covers.
-				 Never the same for different parts of same game. (E.g. disc: 673-01243 / cover: 673-01244)
+                 Found on discs and covers.
+                 Never the same for different parts of same game. (E.g. disc: 673-01243 / cover: 673-01244)
 
  820-****-** : Appears to be a Sega part number for printed, non-disc media.
-				 Found on front and back cover of box.
-				 Never the same for different parts of same game. (E.g. front cover: 820-0343-50 / back cover: 820-0344-05)
+                 Found on front and back cover of box.
+                 Never the same for different parts of same game. (E.g. front cover: 820-0343-50 / back cover: 820-0344-05)
 
  830-****-** : Appears to be a Sega part number for retail discs.
-				 Found on discs only.
-				 Never the same for different discs of same game. (E.g. disc 1: 830-0134-05 / disc 2: 830-0139-05)
+                 Found on discs only.
+                 Never the same for different discs of same game. (E.g. disc 1: 830-0134-05 / disc 2: 830-0139-05)
 
  832-****-** : Appears to be serials for first-part pack-ins (E.g. Dream On, DreamKey).
-				 Found on discs and covers.
+                 Found on discs and covers.
 
  833-****-** : Appears to be a Sega part number for first-party pack-in discs (E.g. Dream On, DreamKey).
-				 Found on discs only.
+                 Found on discs only.
 
  835-****-** : Appears to be a Sega part number for demo discs.
-				 Found on discs only.
+                 Found on discs only.
 
  950-****-** : Appears to be a Sega part number for promo discs.
-				 Found on "white label" promo discs.
+                 Found on "white label" promo discs.
 
  952-****-** : Serials for "white label" promos.
-				 Found on "white label" discs and promo covers.
+                 Found on "white label" discs and promo covers.
 
    D-****-** : Appears to be serials for demos.
-				Found on discs only.
+                Found on discs only.
 
 P830-****-** : Appears to be a Sega part number for promo discs.
-				Found on discs only.
+                Found on discs only.
 
 
 
-	USA
-	===
+    USA
+    ===
 
   IGN**      : ?
   SDC-*****  : Demos?
@@ -223,19 +223,19 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 
 
-	JAPAN
-	=====
+    JAPAN
+    =====
 
  HDR-****    : The HDR prefix indicates a first party-developed game.
 
  670-*****   : Appears to be a Sega part number for Japanese games.
-				 Found on cover of box, disc and obi.
-				 Never the same for different parts of same game. (E.g. disc: 670-13724 / obi: 670-13725 / cover: 670-13726)
+                 Found on cover of box, disc and obi.
+                 Never the same for different parts of same game. (E.g. disc: 670-13724 / obi: 670-13725 / cover: 670-13726)
 
 
 
-	BRAZIL
-	======
+    BRAZIL
+    ======
 
 197***       : All Brazilian games' serials start with 197.
 -->
@@ -8926,17 +8926,17 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Dreamon Volume 10 (France) (Track 4).bin" size="22402800" crc="017fbcf5" md5="cc57453dec248f3c4b083dfc5d478315" sha1="9f62eb28ca822dcbbfd3a95334394beb7248ed43"/>
 		<rom name="Dreamon Volume 10 (France) (Track 5).bin" size="1012425456" crc="bdef571c" md5="78660cde3b2c97846c0e2d09a01438b3" sha1="adbf7f77f732a0e886aa384199b4d0175ce8ae80"/>
 		-->
-	    <description>DreamOn Volume 10 (Fra)</description>
-	    <year>2000</year>
-	    <publisher>Sega</publisher>
-	    <info name="serial" value="832-0031-09"/>
-	    <info name="release" value="200007xx" />
+		<description>DreamOn Volume 10 (Fra)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="832-0031-09"/>
+		<info name="release" value="200007xx" />
 		<info name="ring_code" value="832-0031-0233SS EMI CD HOLLAND   @ 1"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="dreamon volume 10 (fra)" sha1="c74d3cb406df16e3cf3cda2b6ad8648ee9869677"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dreamon volume 10 (fra)" sha1="c74d3cb406df16e3cf3cda2b6ad8648ee9869677"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!--
@@ -10137,18 +10137,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Dreamcast Promotion Disk (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
 		<rom name="Dreamcast Promotion Disk (Japan) (Track 3).bin" size="1185760800" crc="4d5b3c4d" md5="2b876aa52b973da81d538e7ed0b3dac6" sha1="0c8bd9e71a1eff946af80d00f4370c23bbf2f5d1"/>
 		-->
-	    <description>Dreamcast Promotion Disk (Jpn)</description>
-	    <year>1999</year>
-	    <publisher>Sega</publisher>
-	    <info name="serial" value="610-7124"/>
-	    <info name="release" value="19990402" />
-	    <info name="alt_title" value="ドリームキャスト プロモーションディスク" />
+		<description>Dreamcast Promotion Disk (Jpn)</description>
+		<year>1999</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-7124"/>
+		<info name="release" value="19990402" />
+		<info name="alt_title" value="ドリームキャスト プロモーションディスク" />
 		<info name="ring_code" value="610-7124-0056 MT   B04"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="dreamcast promotion disk (jpn)" sha1="48c3d90c4e0b272ccb8f9ada7a1feb3758d83061"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dreamcast promotion disk (jpn)" sha1="48c3d90c4e0b272ccb8f9ada7a1feb3758d83061"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!--
@@ -11422,18 +11422,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Eldorado Gate Dai-7-kan (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
 		<rom name="Eldorado Gate Dai-7-kan (Japan) (Track 3).bin" size="1185760800" crc="d7f306ed" md5="0ac6668aaa26de6bc84e549f531142c8" sha1="353a0c1c3c9a4266c640ee780946f12c8d3aa6ea"/>
 		-->
-	    <description>Eldorado Gate Dai-7-kan (Jpn)</description>
-	    <year>2001</year>
-	    <publisher>Capcom</publisher>
-	    <info name="serial" value="T-1229M"/>
-	    <info name="release" value="20011010" />
-	    <info name="alt_title" value="エルドラドゲート 第7巻" />
+		<description>Eldorado Gate Dai-7-kan (Jpn)</description>
+		<year>2001</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="T-1229M"/>
+		<info name="release" value="20011010" />
+		<info name="alt_title" value="エルドラドゲート 第7巻" />
 		<info name="ring_code" value="&lt;T-1229M-0768&gt;HL916B"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="eldorado gate dai-7-kan (jpn)" sha1="f21855a78f2511c2faa4c679bd3d9b031d896654"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="eldorado gate dai-7-kan (jpn)" sha1="f21855a78f2511c2faa4c679bd3d9b031d896654"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="egg">
@@ -11503,18 +11503,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Erde - Nezu no Ki no Shita de (Japan) (Track 2).bin" size="2302608" crc="a9684d33" md5="3a23931b29da109b04737c79cbcc18fc" sha1="1312a9ce85a306e731945dc0e97a047b2a7c6187"/>
 		<rom name="Erde - Nezu no Ki no Shita de (Japan) (Track 3).bin" size="1185760800" crc="aa2515a5" md5="fda9c5bd8344ed8caef70e5e5288d490" sha1="06a2f7c28b790617170c5cc30fc5f4b7617e148b"/>
 		-->
-	    <description>Erde: Nezu no Ki no Shita de (Jpn)</description>
-	    <year>2003</year>
-	    <publisher>KID</publisher>
-	    <info name="serial" value="T-19720M"/>
-	    <info name="release" value="20030807" />
-	    <info name="alt_title" value="Erde 〜ネズの樹の下で〜" />
+		<description>Erde: Nezu no Ki no Shita de (Jpn)</description>
+		<year>2003</year>
+		<publisher>KID</publisher>
+		<info name="serial" value="T-19720M"/>
+		<info name="release" value="20030807" />
+		<info name="alt_title" value="Erde 〜ネズの樹の下で〜" />
 		<info name="ring_code" value="T-19720M-0887 MT   B08"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="erde nezu no ki no shita de (jpn)" sha1="e12bc896c2fc1f7d1bae56e5e28f89734edfb2d7"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="erde nezu no ki no shita de (jpn)" sha1="e12bc896c2fc1f7d1bae56e5e28f89734edfb2d7"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="es">
@@ -11534,31 +11534,31 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Es (Japan) (Disc 3) (Track 2).bin" size="2234400" crc="92d6f316" md5="4056064873cbca333866a4de028a210a" sha1="3ccca0b2e0dc33bed46a7bf3780f11d7fefd7d9e"/>
 		<rom name="Es (Japan) (Disc 3) (Track 3).bin" size="1185760800" crc="0a036cb1" md5="d916dd5c6064bbcc061d5a1ade72bf99" sha1="1c9725805ed9ca365f653b9d978fcc3434790a5e"/>
 		-->
-	    <description>Es (Jpn)</description>
-	    <year>2001</year>
-	    <publisher>TV Asahi</publisher>
-	    <info name="serial" value="T-45501M"/>
-	    <info name="release" value="20010405" />
-	    <info name="alt_title" value="エス" />
+		<description>Es (Jpn)</description>
+		<year>2001</year>
+		<publisher>TV Asahi</publisher>
+		<info name="serial" value="T-45501M"/>
+		<info name="release" value="20010405" />
+		<info name="alt_title" value="エス" />
 		<info name="ring_code" value="T-45501M-0661   2MM1   C   12 (Disc 1), T-45501M-0662   1MM1   C   12 (Disc 2), T-45501M-0663   1MM1   C   12 (Disc 3)"/>
-	    <part interface="cdrom" name="cdrom1">
-	        <feature name="part_id" value="Disc 1"/>
-	        <diskarea name="cdrom">
-	            <disk name="es (jpn) (disc 1)" sha1="6715ff835ceb413c4b52609e078fac1401c69e93"/>
-	        </diskarea>
-	    </part>
-	    <part interface="cdrom" name="cdrom2">
-	        <feature name="part_id" value="Disc 2"/>
-	        <diskarea name="cdrom">
-	            <disk name="es (jpn) (disc 2)" sha1="b0d04e113e15db3b76f5ad78f712ac85ba10a980"/>
-	        </diskarea>
-	    </part>
-	    <part interface="cdrom" name="cdrom3">
-	        <feature name="part_id" value="Disc 3"/>
-	        <diskarea name="cdrom">
-	            <disk name="es (jpn) (disc 3)" sha1="5f01bb4d23c2f95e2064b91917ffbf5db31e02b7"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom1">
+			<feature name="part_id" value="Disc 1"/>
+			<diskarea name="cdrom">
+				<disk name="es (jpn) (disc 1)" sha1="6715ff835ceb413c4b52609e078fac1401c69e93"/>
+			</diskarea>
+		</part>
+		<part interface="cdrom" name="cdrom2">
+			<feature name="part_id" value="Disc 2"/>
+			<diskarea name="cdrom">
+				<disk name="es (jpn) (disc 2)" sha1="b0d04e113e15db3b76f5ad78f712ac85ba10a980"/>
+			</diskarea>
+		</part>
+		<part interface="cdrom" name="cdrom3">
+			<feature name="part_id" value="Disc 3"/>
+			<diskarea name="cdrom">
+				<disk name="es (jpn) (disc 3)" sha1="5f01bb4d23c2f95e2064b91917ffbf5db31e02b7"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!--
@@ -11715,18 +11715,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Ever 17 - The Out of Infinity (Japan) (Track 2).bin" size="25643856" crc="681d7fd2" md5="b642c54624318a1855df820d7e91a2fe" sha1="96ef565d10f7493ea09e5a5eaa56a68199c42a97"/>
 		<rom name="Ever 17 - The Out of Infinity (Japan) (Track 3).bin" size="1185760800" crc="353e9240" md5="0859af8d147e531674ff47b1c386fe10" sha1="ad005d5259ac9544edee0695366bf0ec256cdf2c"/>
 		-->
-	    <description>Ever 17: The Out of Infinity (Jpn)</description>
-	    <year>2002</year>
-	    <publisher>KID</publisher>
-	    <info name="serial" value="T-19716M"/>
-	    <info name="release" value="20020829" />
-	    <info name="alt_title" value="エバー·セブンチィーン -the out of infinity-" />
+		<description>Ever 17: The Out of Infinity (Jpn)</description>
+		<year>2002</year>
+		<publisher>KID</publisher>
+		<info name="serial" value="T-19716M"/>
+		<info name="release" value="20020829" />
+		<info name="alt_title" value="エバー·セブンチィーン -the out of infinity-" />
 		<info name="ring_code" value="T-19716M-0843   1M1   C   27"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="ever 17 the out of infinity (jpn)" sha1="0f73c51638e72f419ca1a52ca258297c57801499"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ever 17 the out of infinity (jpn)" sha1="0f73c51638e72f419ca1a52ca258297c57801499"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
@@ -13041,18 +13041,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Fire Pro Wrestling D (Japan) (Track 49).bin" size="26300064" crc="edea7222" md5="7769bc3eca25af86f6affeec5a345292" sha1="043fa811a343abd00db5430c8a5bbfe6c1e01feb"/>
 		<rom name="Fire Pro Wrestling D (Japan) (Track 50).bin" size="112009296" crc="c0114432" md5="cdb057a6920290c017f6bd970d4bcace" sha1="c6037b763e59b801101b9538cbf3ec406e14490b"/>
 		-->
-	    <description>Fire Pro Wrestling D (Jpn)</description>
-	    <year>2001</year>
-	    <publisher>Spike</publisher>
-	    <info name="serial" value="T-18804M, T-18805M"/>
-	    <info name="release" value="20010301" />
-	    <info name="alt_title" value="ファイヤープロレスリングD" />
+		<description>Fire Pro Wrestling D (Jpn)</description>
+		<year>2001</year>
+		<publisher>Spike</publisher>
+		<info name="serial" value="T-18804M, T-18805M"/>
+		<info name="release" value="20010301" />
+		<info name="alt_title" value="ファイヤープロレスリングD" />
 		<info name="ring_code" value="&lt;T-18805M-0642&gt;HL209C, &lt;T-18805M-0642&gt;HL209D"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="fire pro wrestling d (jpn)" sha1="cc87da492ad9339b1e76eb8fd52d1fc846fc1e8a"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fire pro wrestling d (jpn)" sha1="cc87da492ad9339b1e76eb8fd52d1fc846fc1e8a"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="frstkiss2">
@@ -13067,25 +13067,25 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="First Kiss Story II - Anata ga Iru kara (Japan) (Disc 2) (Track 2).bin" size="18990048" crc="b2007c18" md5="b0d850df48defeda26044ccb16a7607b" sha1="4121df1c0c8c31820d770b1583c6161ef69ffd74"/>
 		<rom name="First Kiss Story II - Anata ga Iru kara (Japan) (Disc 2) (Track 3).bin" size="1185760800" crc="3418c330" md5="cd3a9520b5710dc8b37dc8bd5b6ac7b3" sha1="598e0bd12e3121b3e9bc73164262caebab064fe9"/>
 		-->
-	    <description>First Kiss Story II: Anata ga Iru kara (Jpn)</description>
-	    <year>2002</year>
-	    <publisher>Broccoli</publisher>
-	    <info name="serial" value="T-46305M"/>
-	    <info name="release" value="20020808" />
-	    <info name="alt_title" value="ファーストKiss☆物語II 〜あなたがいるから〜" />
+		<description>First Kiss Story II: Anata ga Iru kara (Jpn)</description>
+		<year>2002</year>
+		<publisher>Broccoli</publisher>
+		<info name="serial" value="T-46305M"/>
+		<info name="release" value="20020808" />
+		<info name="alt_title" value="ファーストKiss☆物語II 〜あなたがいるから〜" />
 		<info name="ring_code" value="T-46305M-0845   2M1   C   27 (Disc 1), T-46305M-0847   2M1   C   27, T-46305M-0847   2M2   C   27 (Disc 2)"/>
-	    <part interface="cdrom" name="cdrom1">
-	        <feature name="part_id" value="Disc 1"/>
-	        <diskarea name="cdrom">
-	            <disk name="first kiss story ii anata ga iru kara (jpn) (disc 1)" sha1="fb04ed48d61fe558335df7631149c99c1654a670"/>
-	        </diskarea>
-	    </part>
-	    <part interface="cdrom" name="cdrom2">
-	        <feature name="part_id" value="Disc 2"/>
-	        <diskarea name="cdrom">
-	            <disk name="first kiss story ii anata ga iru kara (jpn) (disc 2)" sha1="2fdbc76f083c0d1a58e15b8224ba62f4e8a21d89"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom1">
+			<feature name="part_id" value="Disc 1"/>
+			<diskarea name="cdrom">
+				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 1)" sha1="fb04ed48d61fe558335df7631149c99c1654a670"/>
+			</diskarea>
+		</part>
+		<part interface="cdrom" name="cdrom2">
+			<feature name="part_id" value="Disc 2"/>
+			<diskarea name="cdrom">
+				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 2)" sha1="2fdbc76f083c0d1a58e15b8224ba62f4e8a21d89"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!--
@@ -13115,37 +13115,37 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="First Kiss Story (Japan) (Disc 2) (Track 3).bin" size="1185760800" crc="b5bfbdf7" md5="b7947d8a1871ec511004b2617987a7de" sha1="efb592c57ae098f33c11b3c939ab47f02041ed70"/>
 
 		-->
-	    <description>First Kiss Story II: Anata ga Iru kara - Tokubetsu Genteiban (Jpn)</description>
-	    <year>2002</year>
-	    <publisher>Broccoli</publisher>
-	    <info name="serial" value="T-46304M"/>
-	    <info name="release" value="20020808" />
-	    <info name="alt_title" value="ファーストKiss☆物語II 〜あなたがいるから〜, ファーストKiss☆物語 (Bonus Game)" />
+		<description>First Kiss Story II: Anata ga Iru kara - Tokubetsu Genteiban (Jpn)</description>
+		<year>2002</year>
+		<publisher>Broccoli</publisher>
+		<info name="serial" value="T-46304M"/>
+		<info name="release" value="20020808" />
+		<info name="alt_title" value="ファーストKiss☆物語II 〜あなたがいるから〜, ファーストKiss☆物語 (Bonus Game)" />
 		<info name="ring_code" value="T-46305M-0845   2M1   C   27 (Disc 1), T-46305M-0847   2M1   C   27, T-46305M-0847   2M2   C   27 (Disc 2), T-46304M-0846   1M1   C   27 (Bonus Disc 1), T-46304M-0848   1M1   C   26 (Bonus Disc 2)"/>
-	    <part interface="cdrom" name="cdrom1">
-	        <feature name="part_id" value="First Kiss Story II: Anata ga Iru kara - Disc 1"/>
-	        <diskarea name="cdrom">
-	            <disk name="first kiss story ii anata ga iru kara (jpn) (disc 1)" sha1="fb04ed48d61fe558335df7631149c99c1654a670"/>
-	        </diskarea>
-	    </part>
-	    <part interface="cdrom" name="cdrom2">
-	        <feature name="part_id" value="First Kiss Story II: Anata ga Iru kara - Disc 2"/>
-	        <diskarea name="cdrom">
-	            <disk name="first kiss story ii anata ga iru kara (jpn) (disc 2)" sha1="2fdbc76f083c0d1a58e15b8224ba62f4e8a21d89"/>
-	        </diskarea>
-	    </part>
-	    <part interface="cdrom" name="cdrom3">
-	        <feature name="part_id" value="First Kiss Story - Disc 1"/>
-	        <diskarea name="cdrom">
-	            <disk name="first kiss story (jpn) (disc 1)" sha1="12c0921eecbf28c00b1e9b35b1a132250c786d55"/>
-	        </diskarea>
-	    </part>
-	    <part interface="cdrom" name="cdrom4">
-	        <feature name="part_id" value="First Kiss Story - Disc 2"/>
-	        <diskarea name="cdrom">
-	            <disk name="first kiss story (jpn) (disc 2)" sha1="25c02a1de0790767237920e2b8b9ae31d257ad46"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom1">
+			<feature name="part_id" value="First Kiss Story II: Anata ga Iru kara - Disc 1"/>
+			<diskarea name="cdrom">
+				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 1)" sha1="fb04ed48d61fe558335df7631149c99c1654a670"/>
+			</diskarea>
+		</part>
+		<part interface="cdrom" name="cdrom2">
+			<feature name="part_id" value="First Kiss Story II: Anata ga Iru kara - Disc 2"/>
+			<diskarea name="cdrom">
+				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 2)" sha1="2fdbc76f083c0d1a58e15b8224ba62f4e8a21d89"/>
+			</diskarea>
+		</part>
+		<part interface="cdrom" name="cdrom3">
+			<feature name="part_id" value="First Kiss Story - Disc 1"/>
+			<diskarea name="cdrom">
+				<disk name="first kiss story (jpn) (disc 1)" sha1="12c0921eecbf28c00b1e9b35b1a132250c786d55"/>
+			</diskarea>
+		</part>
+		<part interface="cdrom" name="cdrom4">
+			<feature name="part_id" value="First Kiss Story - Disc 2"/>
+			<diskarea name="cdrom">
+				<disk name="first kiss story (jpn) (disc 2)" sha1="25c02a1de0790767237920e2b8b9ae31d257ad46"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="flgtoflg">
@@ -13377,18 +13377,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Fragrance Tale (Japan) (Track 2).bin" size="2149728" crc="36ff9d8b" md5="b4fe1617ffcde03b7f568f0b46d0c220" sha1="9bbbf4ccfc62522b75dbaef65fcd946042f216d3"/>
 		<rom name="Fragrance Tale (Japan) (Track 3).bin" size="1185760800" crc="a364aa63" md5="927f3e50b4873aaec032ec4cd90de693" sha1="5823e591db3c3ee8e757bc8e7c674a46695d1f76"/>
 		-->
-	    <description>Fragrance Tale (Jpn)</description>
-	    <year>2001</year>
-	    <publisher>Takuyo</publisher>
-	    <info name="serial" value="T-37904M"/>
-	    <info name="release" value="20010726" />
-	    <info name="alt_title" value="フレグランス・テイル" />
+		<description>Fragrance Tale (Jpn)</description>
+		<year>2001</year>
+		<publisher>Takuyo</publisher>
+		<info name="serial" value="T-37904M"/>
+		<info name="release" value="20010726" />
+		<info name="alt_title" value="フレグランス・テイル" />
 		<info name="ring_code" value="T-37905M-0732 MT   B02"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="fragrance tale (jpn)" sha1="a6061b180e70725d3d44c8a63ca8f7c5b0948238"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fragrance tale (jpn)" sha1="a6061b180e70725d3d44c8a63ca8f7c5b0948238"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="framgrid">
@@ -14596,18 +14596,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Godzilla Generations (Japan) (Track 23).bin" size="29726928" crc="f86697b5" md5="94c6ae0296e10c2b9d7b9c3984089084" sha1="e9f26e9934419eb5b34b5c696243d2b12c85313e"/>
 		<rom name="Godzilla Generations (Japan) (Track 24).bin" size="584095680" crc="b58f1c48" md5="8fe65c3a8ae48eede04a407e993be4b9" sha1="e9ad57e7359d7f84568bbdf66524cf03c9a29502"/>
 		-->
-	    <description>Godzilla Generations (Jpn)</description>
-	    <year>1998</year>
-	    <publisher>Sega</publisher>
-	    <info name="serial" value="HDR-0004"/>
-	    <info name="release" value="19981127" />
-	    <info name="alt_title" value="ゴジラ・ジェネレーションズ" />
+		<description>Godzilla Generations (Jpn)</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0004"/>
+		<info name="release" value="19981127" />
+		<info name="alt_title" value="ゴジラ・ジェネレーションズ" />
 		<info name="ring_code" value="HDR-0004-0010   1MM1   C   8Y"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="godzilla generations (jpn)" sha1="562f2a2c8e77f9e89b09a4f497f04c386fc169e5"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="godzilla generations (jpn)" sha1="562f2a2c8e77f9e89b09a4f497f04c386fc169e5"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="godzilla2">
@@ -14637,18 +14637,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Golem no Maigo (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
 		<rom name="Golem no Maigo (Japan) (Track 3).bin" size="1185760800" crc="b98f842b" md5="bd857a72ea9e87f0642d8a5dfaf6c74a" sha1="a4ad17a776f3b8ab068236b6f991daff8cb42a55"/>
 		-->
-	    <description>Golem no Maigo (Jpn)</description>
-	    <year>2000</year>
-	    <publisher>CaramelPot</publisher>
-	    <info name="serial" value="T-41501M"/>
-	    <info name="release" value="20000224" />
-	    <info name="alt_title" value="ゴーレムのまいご" />
+		<description>Golem no Maigo (Jpn)</description>
+		<year>2000</year>
+		<publisher>CaramelPot</publisher>
+		<info name="serial" value="T-41501M"/>
+		<info name="release" value="20000224" />
+		<info name="alt_title" value="ゴーレムのまいご" />
 		<info name="ring_code" value="T-41501M-0317 MT   B01"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="golem no maigo (jpn)" sha1="6b28518eaca82598ee5f9801d67ec0e4eb3d19dd"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="golem no maigo (jpn)" sha1="6b28518eaca82598ee5f9801d67ec0e4eb3d19dd"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="golfscd">
@@ -14756,7 +14756,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <year>2000</year>
 	    <publisher>Bottom Up</publisher>
 	    <info name="serial" value="T-40901M"/>
-		<info name="release" value="19991209" />
+	    <info name="release" value="19991209" />
 	    <info name="alt_title" value="ゴルフしようよ" />
 	    <part interface="cdrom" name="cdrom">
 	        <diskarea name="cdrom">
@@ -14792,17 +14792,17 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Golf Shiyou yo (Japan) (Rev B) (Track 2).bin" size="15904224" crc="73a29dd3" md5="94801204d825ce7f13236c5bb3268e7a" sha1="99fec046c7ddc0fad012116d016914352f0ecdff"/>
 		<rom name="Golf Shiyou yo (Japan) (Rev B) (Track 3).bin" size="1185760800" crc="9eafc931" md5="2b90e9e21f7981fd424ad4010bc9fa31" sha1="237ffb4e8a630ce74c60eed0e8ad73c7406aecac"/>
 		-->
-	    <description>Golf Shiyou yo (Jpn, Rev. 2)</description>
-	    <year>2000</year>
-	    <publisher>Bottom Up</publisher>
-	    <info name="serial" value="T-40901M"/>
-	    <info name="alt_title" value="ゴルフしようよ" />
+		<description>Golf Shiyou yo (Jpn, Rev. 2)</description>
+		<year>2000</year>
+		<publisher>Bottom Up</publisher>
+		<info name="serial" value="T-40901M"/>
+		<info name="alt_title" value="ゴルフしようよ" />
 		<info name="ring_code" value="T-40901M-0211B 2"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="golf shiyou yo (jpn, rev. 2)" sha1="0217870cba891b71c9c183ba5c1b600c9ad2db75"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="golf shiyou yo (jpn, rev. 2)" sha1="0217870cba891b71c9c183ba5c1b600c9ad2db75"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!--
@@ -15104,18 +15104,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Grauen no Torikago - Kapitel 1 - Keiyaku (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
 		<rom name="Grauen no Torikago - Kapitel 1 - Keiyaku (Japan) (Track 3).bin" size="1185760800" crc="10b59a91" md5="4f7cef0f61644ce6ad7b7bf89b0fdb28" sha1="2263567cdf04905d8f503a1468076197545d3cbf"/>
 		-->
-	    <description>Grauen no Torikago Kapitel 1: Keiyaku (Jpn)</description>
-	    <year>1999</year>
-	    <publisher>Sega</publisher>
-	    <info name="serial" value="HDR-0033"/>
-	    <info name="release" value="19990930" />
-	    <info name="alt_title" value="グラウエンの鳥籠 Kapitel 1 「契約」" />
+		<description>Grauen no Torikago Kapitel 1: Keiyaku (Jpn)</description>
+		<year>1999</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0033"/>
+		<info name="release" value="19990930" />
+		<info name="alt_title" value="グラウエンの鳥籠 Kapitel 1 「契約」" />
 		<info name="ring_code" value="&lt;HDR-0033-0166&gt;HJ909C"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="grauen no torikago kapitel 1 keiyaku (jpn)" sha1="f25cb58adf8f36d16acb3942edf992fb4ce1dacc"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="grauen no torikago kapitel 1 keiyaku (jpn)" sha1="f25cb58adf8f36d16acb3942edf992fb4ce1dacc"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="grauen2">
@@ -15125,18 +15125,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Grauen no Torikago - Kapitel 2 - Torikago (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
 		<rom name="Grauen no Torikago - Kapitel 2 - Torikago (Japan) (Track 3).bin" size="1185760800" crc="bbf3245d" md5="9c5527a457da355984de553faf12c3b4" sha1="e29f8b4e434102723a6dae6a8b071c0ceb7915c2"/>
 		-->
-	    <description>Grauen no Torikago Kapitel 2: Torikago (Jpn)</description>
-	    <year>1999</year>
-	    <publisher>Sega</publisher>
-	    <info name="serial" value="HDR-0034"/>
-	    <info name="release" value="19991125" />
-	    <info name="alt_title" value="グラウエンの鳥籠 Kapitel 2 「鳥籠」" />
+		<description>Grauen no Torikago Kapitel 2: Torikago (Jpn)</description>
+		<year>1999</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0034"/>
+		<info name="release" value="19991125" />
+		<info name="alt_title" value="グラウエンの鳥籠 Kapitel 2 「鳥籠」" />
 		<info name="ring_code" value="&lt;HDR-0034-0222&gt;HJB04A"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="grauen no torikago kapitel 2 torikago (jpn)" sha1="4a59503585f4e903f90e15c4417eddc56275d605"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="grauen no torikago kapitel 2 torikago (jpn)" sha1="4a59503585f4e903f90e15c4417eddc56275d605"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="grauen3">
@@ -15146,18 +15146,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Grauen no Torikago - Kapitel 3 - Kansei (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
 		<rom name="Grauen no Torikago - Kapitel 3 - Kansei (Japan) (Track 3).bin" size="1185760800" crc="e8013a67" md5="67eb36793b94b82865aedce0cbbc15b7" sha1="660ee49a4cb661ba5a285ad03390bdeb8c6229e3"/>
 		-->
-	    <description>Grauen no Torikago Kapitel 3: Kansei (Jpn)</description>
-	    <year>2000</year>
-	    <publisher>Sega</publisher>
-	    <info name="serial" value="HDR-0035"/>
-	    <info name="release" value="20000127" />
-	    <info name="alt_title" value="グラウエンの鳥籠 Kapitel 3 「陥穽」" />
+		<description>Grauen no Torikago Kapitel 3: Kansei (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0035"/>
+		<info name="release" value="20000127" />
+		<info name="alt_title" value="グラウエンの鳥籠 Kapitel 3 「陥穽」" />
 		<info name="ring_code" value="&lt;HDR-0035-0299&gt;HJC28B"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="grauen no torikago kapitel 3 kansei (jpn)" sha1="8f23594115b06bf82f54a41e1af56b6190b3826c"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="grauen no torikago kapitel 3 kansei (jpn)" sha1="8f23594115b06bf82f54a41e1af56b6190b3826c"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="grauen4">
@@ -15167,18 +15167,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Grauen no Torikago - Kapitel 4 - Kaikou (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
 		<rom name="Grauen no Torikago - Kapitel 4 - Kaikou (Japan) (Track 3).bin" size="1185760800" crc="94f705c1" md5="6166066319e9c89dbda0a42b3089b283" sha1="9bd3e2a5db86d1aaae31d3abe2c91414461cef71"/>
 		-->
-	    <description>Grauen no Torikago Kapitel 4: Kaikou (Jpn)</description>
-	    <year>2000</year>
-	    <publisher>Sega</publisher>
-	    <info name="serial" value="HDR-0036"/>
-	    <info name="release" value="20000330" />
-	    <info name="alt_title" value="グラウエンの鳥籠 Kapitel 4 「邂逅」" />
+		<description>Grauen no Torikago Kapitel 4: Kaikou (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0036"/>
+		<info name="release" value="20000330" />
+		<info name="alt_title" value="グラウエンの鳥籠 Kapitel 4 「邂逅」" />
 		<info name="ring_code" value="&lt;HDR-0036-0327&gt;HK211C"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="grauen no torikago kapitel 4 kaikou (jpn)" sha1="6f544532f0847a5bbd554d9a792de9d9ed773c62"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="grauen no torikago kapitel 4 kaikou (jpn)" sha1="6f544532f0847a5bbd554d9a792de9d9ed773c62"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!--
@@ -15501,18 +15501,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Gundam Side Story 0079 - Rise from the Ashes - Special Edition (Japan) (Track 2).bin" size="2149728" crc="36ff9d8b" md5="b4fe1617ffcde03b7f568f0b46d0c220" sha1="9bbbf4ccfc62522b75dbaef65fcd946042f216d3"/>
 		<rom name="Gundam Side Story 0079 - Rise from the Ashes - Special Edition (Japan) (Track 3).bin" size="1185760800" crc="0150bc54" md5="c23118fdfcd9aacf870d6048d5549edc" sha1="9470aab344485c98030773dc4ec1fde5a25db1fe"/>
 		-->
-	    <description>Kidou Senshi Gundam Gaiden: Colony no Ochita Chi de... - Tokubetsuban (Jpn)</description>
-	    <year>2001</year>
-	    <publisher>Bandai</publisher>
-	    <info name="serial" value="T-13303M"/>
-	    <info name="release" value="20010628" />
-	    <info name="alt_title" value="機動戦士ガンダム外伝 コロニーの落ちた地で... 特別版" />
+		<description>Kidou Senshi Gundam Gaiden: Colony no Ochita Chi de... - Tokubetsuban (Jpn)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-13303M"/>
+		<info name="release" value="20010628" />
+		<info name="alt_title" value="機動戦士ガンダム外伝 コロニーの落ちた地で... 特別版" />
 		<info name="ring_code" value="T-13303M-0250   3MM1   C   9Y"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="kidou senshi gundam gaiden colony no ochita chi de... - tokubetsuban (jpn)" sha1="64b3fbf8cd6012f6ed28fd8a4d0928f9025b945b"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="kidou senshi gundam gaiden colony no ochita chi de... - tokubetsuban (jpn)" sha1="64b3fbf8cd6012f6ed28fd8a4d0928f9025b945b"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="gundamsspd">
@@ -15695,18 +15695,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Happy Breeding (Japan) (Track 2).bin" size="28402752" crc="39b5bb05" md5="126cfe3f9b03a9e1e003b4d95f7e506f" sha1="e2f569c41f994256c61651fb10f5d1d36f209821"/>
 		<rom name="Happy Breeding (Japan) (Track 3).bin" size="1185760800" crc="4383fb93" md5="c0b5278870b3705b3303b1fb83e63020" sha1="89f9ded35e05ab90057bbfabc709f30bfe73e5f2"/>
 		-->
-	    <description>Happy Breeding (Jpn)</description>
-	    <year>2003</year>
-	    <publisher>Princess Soft</publisher>
-	    <info name="serial" value="T-46512M"/>
-	    <info name="release" value="20030227" />
-	    <info name="alt_title" value="はっぴーぶりーでぃんぐ" />
+		<description>Happy Breeding (Jpn)</description>
+		<year>2003</year>
+		<publisher>Princess Soft</publisher>
+		<info name="serial" value="T-46512M"/>
+		<info name="release" value="20030227" />
+		<info name="alt_title" value="はっぴーぶりーでぃんぐ" />
 		<info name="ring_code" value="&lt;T-46512M-0870&gt;HN202A"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="happy breeding (jpn)" sha1="a6a9dba133f5e8717fd2d2fcde80605025ed128e"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="happy breeding (jpn)" sha1="a6a9dba133f5e8717fd2d2fcde80605025ed128e"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
@@ -15864,18 +15864,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Heavy Metal - Geomatrix (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
 		<rom name="Heavy Metal - Geomatrix (Japan) (Track 3).bin" size="1185760800" crc="920c9032" md5="97ea61694c4ebc4442232c823c13a7bb" sha1="1e2f0c2bb8ddf6b9edcd6a3a8d3a31d0ef48be57"/>
 		-->
-	    <description>Heavy Metal: Geomatrix (Jpn)</description>
-	    <year>2001</year>
-	    <publisher>Capcom</publisher>
-	    <info name="serial" value="T-1246M"/>
-	    <info name="release" value="20010712" />
-	    <info name="alt_title" value="ヘビーメタルジオマトリックス" />
+		<description>Heavy Metal: Geomatrix (Jpn)</description>
+		<year>2001</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="T-1246M"/>
+		<info name="release" value="20010712" />
+		<info name="alt_title" value="ヘビーメタルジオマトリックス" />
 		<info name="ring_code" value="T-1246M-0705A 1"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="heavy metal geomatrix (jpn)" sha1="45ebb2df3d15a8a60d9f40d67b0f6db98011d738"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="heavy metal geomatrix (jpn)" sha1="45ebb2df3d15a8a60d9f40d67b0f6db98011d738"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!-- The Mic Device Doukon-ban shares the same discs as the regular edition but includes a Dreamcast microphone. -->
@@ -15900,18 +15900,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Heisei Mahjong-sou (Japan) (Track 16).bin" size="32053056" crc="9826096d" md5="2662c964ad7acee1e1b7e487fc60c2d0" sha1="37b036988c4e10aa50fcb582b918489a661aabc6"/>
 		<rom name="Heisei Mahjong-sou (Japan) (Track 17).bin" size="111785856" crc="d7b11cf1" md5="516d934b14bf2f75b877f91562d0fb43" sha1="b61cb1945dbeaacc2af0a4179d7a5d45b0abfe32"/>
 		-->
-	    <description>Heisei Mahjong-sou (Jpn)</description>
-	    <year>2000</year>
-	    <publisher>Capcom</publisher>
-	    <info name="serial" value="T-2202M"/>
-	    <info name="release" value="20001026" />
-	    <info name="alt_title" value="平成麻雀荘" />
+		<description>Heisei Mahjong-sou (Jpn)</description>
+		<year>2000</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="T-2202M"/>
+		<info name="release" value="20001026" />
+		<info name="alt_title" value="平成麻雀荘" />
 		<info name="ring_code" value="T-2202M-0540   2MM1   C   09"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="heisei mahjong-sou (jpn)" sha1="501b56e244082e5cf43efdce3800b9c8cf910f58"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="heisei mahjong-sou (jpn)" sha1="501b56e244082e5cf43efdce3800b9c8cf910f58"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!--
@@ -16120,18 +16120,18 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Himitsu - Yui ga Ita Natsu (Japan) (Track 2).bin" size="37206288" crc="234dc3e4" md5="e74b42e4d34ad63c4734a072ab83bde6" sha1="7690917bb5946c06a2897da50ff670e87f9c60dd"/>
 		<rom name="Himitsu - Yui ga Ita Natsu (Japan) (Track 3).bin" size="1185760800" crc="7fc74ac2" md5="0cb15cb522d955d9497ef503944e6bf0" sha1="0173e2e270ffc6a05c9406d0aa3cf1c1177f2fb5"/>
 		-->
-	    <description>Himitsu: Yui ga Ita Natsu (Jpn)</description>
-	    <year>2001</year>
-	    <publisher>Starfish-SD</publisher>
-	    <info name="serial" value="T-46101M"/>
-	    <info name="release" value="20010726" />
-	    <info name="alt_title" value="秘密 〜唯がいた夏〜" />
+		<description>Himitsu: Yui ga Ita Natsu (Jpn)</description>
+		<year>2001</year>
+		<publisher>Starfish-SD</publisher>
+		<info name="serial" value="T-46101M"/>
+		<info name="release" value="20010726" />
+		<info name="alt_title" value="秘密 〜唯がいた夏〜" />
 		<info name="ring_code" value="T-46101M-0730 1"/>
-	    <part interface="cdrom" name="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="himitsu yui ga ita natsu (jpn)" sha1="a0ed3fbac2dd23c6038165d9238e091705f822c2"/>
-	        </diskarea>
-	    </part>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="himitsu yui ga ita natsu (jpn)" sha1="a0ed3fbac2dd23c6038165d9238e091705f822c2"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!--
@@ -17585,17 +17585,17 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="kaenseibo">
-		<description>Kaenseibo: The Virgin on Megiddo (Jpn)</description>
-		<year>2001</year>
-		<publisher>Kobi</publisher>
-		<info name="serial" value="T-42802M"/>
-		<info name="release" value="20010802" />
-		<info name="alt_title" value="火焔聖母 〜The Virgin on Megiddo〜" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kaenseibo the virgin on megiddo (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kaenseibo: The Virgin on Megiddo (Jpn)</description>
+	    <year>2001</year>
+	    <publisher>Kobi</publisher>
+	    <info name="serial" value="T-42802M"/>
+	    <info name="release" value="20010802" />
+	    <info name="alt_title" value="火焔聖母 〜The Virgin on Megiddo〜" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kaenseibo the virgin on megiddo (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -17621,17 +17621,17 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="kanon">
-		<description>Kanon (Jpn)</description>
-		<year>2000</year>
-		<publisher>NEC Interchannel</publisher>
-		<info name="serial" value="T-20105M"/>
-		<info name="release" value="20000914" />
-		<info name="alt_title" value="カノン" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kanon (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kanon (Jpn)</description>
+	    <year>2000</year>
+	    <publisher>NEC Interchannel</publisher>
+	    <info name="serial" value="T-20105M"/>
+	    <info name="release" value="20000914" />
+	    <info name="alt_title" value="カノン" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kanon (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -17830,79 +17830,79 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="kazeuta">
-		<description>Kaze no Uta (Jpn)</description>
-		<year>2004</year>
-		<publisher>Rain Software</publisher>
-		<info name="serial" value="T-47501M"/>
-		<info name="release" value="20040415" />
-		<info name="alt_title" value="風ノ唄" />
-		<part interface="cdrom" name="cdrom1">
+	    <description>Kaze no Uta (Jpn)</description>
+	    <year>2004</year>
+	    <publisher>Rain Software</publisher>
+	    <info name="serial" value="T-47501M"/>
+	    <info name="release" value="20040415" />
+	    <info name="alt_title" value="風ノ唄" />
+	    <part interface="cdrom" name="cdrom1">
 	        <feature name="part_id" value="Kaze no Uta"/>
-			<diskarea name="cdrom">
-				<disk name="kaze no uta (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
-		<part interface="cdrom" name="cdrom2">
+	        <diskarea name="cdrom">
+	            <disk name="kaze no uta (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
+	    <part interface="cdrom" name="cdrom2">
 	        <feature name="part_id" value="Original Drama CD"/>
-			<diskarea name="cdrom">
-				<disk name="kaze no uta (jpn) (original drama cd)" status="nodump"/>
-			</diskarea>
-		</part>
+	        <diskarea name="cdrom">
+	            <disk name="kaze no uta (jpn) (original drama cd)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
 	<!--
 	<software name="ksnntm">
-		<description>Kidou Senkan Nadesico: Nadesico the Mission (Jpn)</description>
-		<year>1999</year>
-		<publisher>Kadokawa Shoten</publisher>
-		<info name="serial" value="T-27901M"/>
-		<info name="release" value="19990826" />
-		<info name="alt_title" value="機動戦艦ナデシコ NADESICO THE MISSION" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kidou senkan nadesico nadesico the mission (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kidou Senkan Nadesico: Nadesico the Mission (Jpn)</description>
+	    <year>1999</year>
+	    <publisher>Kadokawa Shoten</publisher>
+	    <info name="serial" value="T-27901M"/>
+	    <info name="release" value="19990826" />
+	    <info name="alt_title" value="機動戦艦ナデシコ NADESICO THE MISSION" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kidou senkan nadesico nadesico the mission (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="ksnntmsd" cloneof="nadesico">
-		<description>Kidou Senkan Nadesico: Nadesico the Mission - Special Disc (Jpn)</description>
-		<year>????</year>
-		<publisher>Kadokawa Shoten</publisher>
-		<info name="serial" value="610-7183"/>
-		<info name="alt_title" value="機動戦艦ナデシコ NADESICO THE MISSION スペシャルディスク" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kidou senkan nadesico nadesico the mission - special disc (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kidou Senkan Nadesico: Nadesico the Mission - Special Disc (Jpn)</description>
+	    <year>????</year>
+	    <publisher>Kadokawa Shoten</publisher>
+	    <info name="serial" value="610-7183"/>
+	    <info name="alt_title" value="機動戦艦ナデシコ NADESICO THE MISSION スペシャルディスク" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kidou senkan nadesico nadesico the mission - special disc (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="gundznk">
-		<description>Kidou Senshi Gundam: Giren no Yabou - Zeon no Keifu (Jpn)</description>
-		<year>2000</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="T-13305M"/>
-		<info name="release" value="20000629" />
-		<info name="alt_title" value="機動戦士ガンダム ギレンの野望 ジオンの系譜" />
-		<part interface="cdrom" name="cdrom1">
+	    <description>Kidou Senshi Gundam: Giren no Yabou - Zeon no Keifu (Jpn)</description>
+	    <year>2000</year>
+	    <publisher>Bandai</publisher>
+	    <info name="serial" value="T-13305M"/>
+	    <info name="release" value="20000629" />
+	    <info name="alt_title" value="機動戦士ガンダム ギレンの野望 ジオンの系譜" />
+	    <part interface="cdrom" name="cdrom1">
 	        <feature name="part_id" value="Earth Federation Disc"/>
-			<diskarea name="cdrom">
-				<disk name="kidou senshi gundam giren no yabou - zeon no keifu (jpn) (earth federation disc)" status="nodump"/>
-			</diskarea>
-		</part>
-		<part interface="cdrom" name="cdrom2">
+	        <diskarea name="cdrom">
+	            <disk name="kidou senshi gundam giren no yabou - zeon no keifu (jpn) (earth federation disc)" status="nodump"/>
+	        </diskarea>
+	    </part>
+	    <part interface="cdrom" name="cdrom2">
 	        <feature name="part_id" value="Zeon Disc"/>
-			<diskarea name="cdrom">
-				<disk name="kidou senshi gundam giren no yabou - zeon no keifu (jpn) (zeon disc)" status="nodump"/>
-			</diskarea>
-		</part>
+	        <diskarea name="cdrom">
+	            <disk name="kidou senshi gundam giren no yabou - zeon no keifu (jpn) (zeon disc)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -17940,62 +17940,62 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="tvshop1">
-		<description>Kikan Genteiban Internet TV Denwa Shopping Ver. 1.0 (Jpn)</description>
-		<year>2000</year>
-		<publisher>CSK Corporation</publisher>
-		<info name="alt_title" value="期間限定版　インターネットテレビ電話ショッピング　Ver.1.0" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kikan genteiban internet tv denwa shopping ver. 1.0 (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kikan Genteiban Internet TV Denwa Shopping Ver. 1.0 (Jpn)</description>
+	    <year>2000</year>
+	    <publisher>CSK Corporation</publisher>
+	    <info name="alt_title" value="期間限定版　インターネットテレビ電話ショッピング　Ver.1.0" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kikan genteiban internet tv denwa shopping ver. 1.0 (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="tvshop2">
-		<description>Kikan Genteiban Internet TV Denwa Shopping Ver. 2.0 (Jpn)</description>
-		<year>2000</year>
-		<publisher>CSK Corporation</publisher>
-		<info name="alt_title" value="期間限定版　インターネットテレビ電話ショッピング　Ver.2.0" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kikan genteiban internet tv denwa shopping ver. 2.0 (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kikan Genteiban Internet TV Denwa Shopping Ver. 2.0 (Jpn)</description>
+	    <year>2000</year>
+	    <publisher>CSK Corporation</publisher>
+	    <info name="alt_title" value="期間限定版　インターネットテレビ電話ショッピング　Ver.2.0" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kikan genteiban internet tv denwa shopping ver. 2.0 (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="kiminozo">
-		<description>Kimi ga Nozomu Eien (Jpn)</description>
-		<year>2002</year>
-		<publisher>Alchemist</publisher>
-		<info name="serial" value="T-47101M"/>
-		<info name="release" value="20020926" />
-		<info name="alt_title" value="君が望む永遠" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kimi ga nozomu eien (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kimi ga Nozomu Eien (Jpn)</description>
+	    <year>2002</year>
+	    <publisher>Alchemist</publisher>
+	    <info name="serial" value="T-47101M"/>
+	    <info name="release" value="20020926" />
+	    <info name="alt_title" value="君が望む永遠" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kimi ga nozomu eien (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!-- The Limited Edition (T-47102M) includes a calendar. -->
 	<!--
 	<software name="kiminozosg" cloneof="kiminozo">
-		<description>Kimi ga Nozomu Eien - Shokai Genteiban (Jpn)</description>
-		<year>2002</year>
-		<publisher>Alchemist</publisher>
-		<info name="serial" value="T-47102M"/>
-		<info name="release" value="20020926" />
-		<info name="alt_title" value="君が望む永遠 初回限定版" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kimi ga nozomu eien - shokai genteiban (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kimi ga Nozomu Eien - Shokai Genteiban (Jpn)</description>
+	    <year>2002</year>
+	    <publisher>Alchemist</publisher>
+	    <info name="serial" value="T-47102M"/>
+	    <info name="release" value="20020926" />
+	    <info name="alt_title" value="君が望む永遠 初回限定版" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kimi ga nozomu eien - shokai genteiban (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -18099,49 +18099,49 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="kitaepm">
-		<description>Kita e. Photo Memories (Jpn)</description>
-		<year>1999</year>
-		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="T-14306M"/>
-		<info name="release" value="19990805" />
-		<info name="alt_title" value="北へ。Photo Memories" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kita e. photo memories (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kita e. Photo Memories (Jpn)</description>
+	    <year>1999</year>
+	    <publisher>Hudson Soft</publisher>
+	    <info name="serial" value="T-14306M"/>
+	    <info name="release" value="19990805" />
+	    <info name="alt_title" value="北へ。Photo Memories" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kita e. photo memories (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="kitaewi">
-		<description>Kita e. White Illumination (Jpn)</description>
-		<year>1999</year>
-		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="T-14301M"/>
-		<info name="release" value="19990318" />
-		<info name="alt_title" value="北へ。White Illumination" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kita e. white illumination (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kita e. White Illumination (Jpn)</description>
+	    <year>1999</year>
+	    <publisher>Hudson Soft</publisher>
+	    <info name="serial" value="T-14301M"/>
+	    <info name="release" value="19990318" />
+	    <info name="alt_title" value="北へ。White Illumination" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kita e. white illumination (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="kitaewipsp">
-		<description>Kita e. White Illumination - Pure Songs and Pictures (Jpn)</description>
-		<year>1999</year>
-		<publisher>Media Factory</publisher>
-		<info name="serial" value="ZMCZ-656"/>
-		<info name="release" value="19990625" />
-		<info name="alt_title" value="北へ。White Illumination PURE SONGS and PICTURES" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kita e. white illumination - pure songs and pictures (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kita e. White Illumination - Pure Songs and Pictures (Jpn)</description>
+	    <year>1999</year>
+	    <publisher>Media Factory</publisher>
+	    <info name="serial" value="ZMCZ-656"/>
+	    <info name="release" value="19990625" />
+	    <info name="alt_title" value="北へ。White Illumination PURE SONGS and PICTURES" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kita e. white illumination - pure songs and pictures (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -18200,16 +18200,16 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="kobepass">
-		<description>Kobe Passport TV Denwa-ban (Jpn)</description>
-		<year>2000</year>
-		<publisher>CSK Corporation</publisher>
-		<info name="serial" value="610-7880"/>
-		<info name="alt_title" value="神戸パスポート TV電話版" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kobe passport tv denwa-ban (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kobe Passport TV Denwa-ban (Jpn)</description>
+	    <year>2000</year>
+	    <publisher>CSK Corporation</publisher>
+	    <info name="serial" value="610-7880"/>
+	    <info name="alt_title" value="神戸パスポート TV電話版" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kobe passport tv denwa-ban (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -18259,17 +18259,17 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="kizuna1" cloneof="kizuna">
-		<description>Kuon no Kizuna: Sairinshou (Jpn)</description>
-		<year>2000</year>
-		<publisher>FOG</publisher>
-		<info name="serial" value="T-36701M"/>
-		<info name="release" value="20000518" />
-		<info name="alt_title" value="久遠の絆 再臨詔" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kuon no kizuna sairinshou (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kuon no Kizuna: Sairinshou (Jpn)</description>
+	    <year>2000</year>
+	    <publisher>FOG</publisher>
+	    <info name="serial" value="T-36701M"/>
+	    <info name="release" value="20000518" />
+	    <info name="alt_title" value="久遠の絆 再臨詔" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kuon no kizuna sairinshou (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -18294,15 +18294,15 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="kyotei">
-		<description>Kyotei for Dreamcast (Jpn)</description>
-		<year>2000</year>
-		<publisher>Kyotei</publisher>
-		<info name="serial" value="T-42601M"/>
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kyotei for dreamcast (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Kyotei for Dreamcast (Jpn)</description>
+	    <year>2000</year>
+	    <publisher>Kyotei</publisher>
+	    <info name="serial" value="T-42601M"/>
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kyotei for dreamcast (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 </softwarelist>

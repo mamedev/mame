@@ -334,16 +334,16 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::seawolf_erase_input_r)
 void mw8080bw_state::seawolf_io_map(address_map &map)
 {
 	map.global_mask(0x7);
-	map(0x00, 0x00).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x00, 0x00).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
 	map(0x01, 0x01).mirror(0x04).portr("IN0");
 	map(0x02, 0x02).mirror(0x04).portr("IN1");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::seawolf_explosion_lamp_w));
-	map(0x02, 0x02).w(this, FUNC(mw8080bw_state::seawolf_periscope_lamp_w));
+	map(0x01, 0x01).w(FUNC(mw8080bw_state::seawolf_explosion_lamp_w));
+	map(0x02, 0x02).w(FUNC(mw8080bw_state::seawolf_periscope_lamp_w));
 	map(0x03, 0x03).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::seawolf_audio_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::seawolf_audio_w));
 }
 
 
@@ -454,7 +454,7 @@ void mw8080bw_state::gunfight_io_map(address_map &map)
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	/* no decoder, just 3 AND gates */
-	map(0x00, 0x07).w(this, FUNC(mw8080bw_state::gunfight_io_w));
+	map(0x00, 0x07).w(FUNC(mw8080bw_state::gunfight_io_w));
 }
 
 
@@ -650,7 +650,7 @@ void mw8080bw_state::tornbase_io_map(address_map &map)
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	/* no decoder, just 3 AND gates */
-	map(0x00, 0x07).w(this, FUNC(mw8080bw_state::tornbase_io_w));
+	map(0x00, 0x07).w(FUNC(mw8080bw_state::tornbase_io_w));
 }
 
 
@@ -771,10 +771,10 @@ void mw8080bw_state::zzzap_io_map(address_map &map)
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	map(0x02, 0x02).w(this, FUNC(mw8080bw_state::zzzap_audio_1_w));
+	map(0x02, 0x02).w(FUNC(mw8080bw_state::zzzap_audio_1_w));
 	map(0x03, 0x03).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::zzzap_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::zzzap_audio_2_w));
 	map(0x07, 0x07).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -930,7 +930,7 @@ void mw8080bw_state::maze_io_map(address_map &map)
 	map(0x01, 0x01).portr("IN1");
 
 	/* no decoder, just a couple of AND gates */
-	map(0x00, 0x03).w(this, FUNC(mw8080bw_state::maze_io_w));
+	map(0x00, 0x03).w(FUNC(mw8080bw_state::maze_io_w));
 }
 
 
@@ -1001,14 +1001,14 @@ void mw8080bw_state::boothill_io_map(address_map &map)
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
-	map(0x03, 0x03).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
+	map(0x03, 0x03).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
 
-	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
+	map(0x01, 0x01).w(FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::boothill_audio_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::boothill_audio_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
 }
 
 
@@ -1100,7 +1100,7 @@ void mw8080bw_state::checkmat_io_map(address_map &map)
 	map(0x03, 0x03).portr("IN3");
 
 	/* no decoder, just a couple of AND gates */
-	map(0x00, 0x03).w(this, FUNC(mw8080bw_state::checkmat_io_w));
+	map(0x00, 0x03).w(FUNC(mw8080bw_state::checkmat_io_w));
 }
 
 
@@ -1230,18 +1230,18 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_dip_sw_0_1_r)
 void mw8080bw_state::desertgu_io_map(address_map &map)
 {
 	map.global_mask(0x7);
-	map(0x00, 0x00).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x00, 0x00).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
 	map(0x01, 0x01).mirror(0x04).portr("IN0");
 	map(0x02, 0x02).mirror(0x04).portr("IN1");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::desertgu_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::desertgu_audio_1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
-	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::desertgu_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x07, 0x07).w(FUNC(mw8080bw_state::desertgu_audio_2_w));
 }
 
 
@@ -1363,10 +1363,10 @@ void mw8080bw_state::dplay_io_map(address_map &map)
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::dplay_audio_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::dplay_audio_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
 }
 
 
@@ -1539,15 +1539,15 @@ void mw8080bw_state::gmissile_io_map(address_map &map)
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
-	map(0x03, 0x03).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
+	map(0x03, 0x03).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
 
-	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
+	map(0x01, 0x01).w(FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::gmissile_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::gmissile_audio_1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::gmissile_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::gmissile_audio_2_w));
 	/* also writes 0x00 to 0x06, but it is not connected */
-	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::gmissile_audio_3_w));
+	map(0x07, 0x07).w(FUNC(mw8080bw_state::gmissile_audio_3_w));
 }
 
 
@@ -1637,13 +1637,13 @@ void mw8080bw_state::m4_io_map(address_map &map)
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
-	map(0x03, 0x03).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
+	map(0x03, 0x03).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
 
-	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
+	map(0x01, 0x01).w(FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::m4_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::m4_audio_1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::m4_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::m4_audio_2_w));
 }
 
 
@@ -1758,11 +1758,11 @@ void mw8080bw_state::clowns_io_map(address_map &map)
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::clowns_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::clowns_audio_1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
-	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::clowns_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x07, 0x07).w(FUNC(mw8080bw_state::clowns_audio_2_w));
 }
 
 
@@ -1900,11 +1900,11 @@ void mw8080bw_state::spacwalk_io_map(address_map &map)
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::spacwalk_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::spacwalk_audio_1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
-	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::spacwalk_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x07, 0x07).w(FUNC(mw8080bw_state::spacwalk_audio_2_w));
 }
 
 static INPUT_PORTS_START( spacwalk )
@@ -1992,7 +1992,7 @@ void mw8080bw_state::shuffle_io_map(address_map &map)
 	map.global_mask(0xf);    /* yes, 4, and no mirroring on the read handlers */
 	map(0x01, 0x01).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 	map(0x02, 0x02).portr("IN0");
-	map(0x03, 0x03).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x03, 0x03).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
 	map(0x04, 0x04).portr("IN1");
 	map(0x05, 0x05).portr("IN2");
 	map(0x06, 0x06).portr("IN3");
@@ -2000,8 +2000,8 @@ void mw8080bw_state::shuffle_io_map(address_map &map)
 	map(0x01, 0x01).mirror(0x08).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).mirror(0x08).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).mirror(0x08).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).mirror(0x08).w(this, FUNC(mw8080bw_state::shuffle_audio_1_w));
-	map(0x06, 0x06).mirror(0x08).w(this, FUNC(mw8080bw_state::shuffle_audio_2_w));
+	map(0x05, 0x05).mirror(0x08).w(FUNC(mw8080bw_state::shuffle_audio_1_w));
+	map(0x06, 0x06).mirror(0x08).w(FUNC(mw8080bw_state::shuffle_audio_2_w));
 }
 
 
@@ -2081,10 +2081,10 @@ void mw8080bw_state::dogpatch_io_map(address_map &map)
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::dogpatch_audio_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::dogpatch_audio_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
 }
 
 
@@ -2232,7 +2232,7 @@ void mw8080bw_state::spcenctr_io_map(address_map &map)
 	map(0x03, 0x03).mirror(0xfc).nopr();
 
 	/* complicated addressing logic */
-	map(0x00, 0xff).w(this, FUNC(mw8080bw_state::spcenctr_io_w));
+	map(0x00, 0xff).w(FUNC(mw8080bw_state::spcenctr_io_w));
 }
 
 
@@ -2335,7 +2335,7 @@ MACHINE_START_MEMBER(mw8080bw_state,phantom2)
 void mw8080bw_state::phantom2_io_map(address_map &map)
 {
 	map.global_mask(0x7);
-	map(0x00, 0x00).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x00, 0x00).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
 	map(0x01, 0x01).mirror(0x04).portr("IN0");
 	map(0x02, 0x02).mirror(0x04).portr("IN1");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
@@ -2343,8 +2343,8 @@ void mw8080bw_state::phantom2_io_map(address_map &map)
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::phantom2_audio_1_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::phantom2_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::phantom2_audio_1_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::phantom2_audio_2_w));
 }
 
 
@@ -2464,9 +2464,9 @@ WRITE8_MEMBER(mw8080bw_state::bowler_lights_2_w)
 void mw8080bw_state::bowler_io_map(address_map &map)
 {
 	map.global_mask(0xf);  /* no masking on the reads, all 4 bits are decoded */
-	map(0x01, 0x01).r(this, FUNC(mw8080bw_state::bowler_shift_result_r));
+	map(0x01, 0x01).r(FUNC(mw8080bw_state::bowler_shift_result_r));
 	map(0x02, 0x02).portr("IN0");
-	map(0x03, 0x03).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x03, 0x03).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
 	map(0x04, 0x04).portr("IN1");
 	map(0x05, 0x05).portr("IN2");
 	map(0x06, 0x06).portr("IN3");
@@ -2474,14 +2474,14 @@ void mw8080bw_state::bowler_io_map(address_map &map)
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::bowler_audio_1_w));
-	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::bowler_audio_2_w));
-	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::bowler_lights_1_w));
-	map(0x08, 0x08).w(this, FUNC(mw8080bw_state::bowler_audio_3_w));
-	map(0x09, 0x09).w(this, FUNC(mw8080bw_state::bowler_audio_4_w));
-	map(0x0a, 0x0a).w(this, FUNC(mw8080bw_state::bowler_audio_5_w));
-	map(0x0e, 0x0e).w(this, FUNC(mw8080bw_state::bowler_lights_2_w));
-	map(0x0f, 0x0f).w(this, FUNC(mw8080bw_state::bowler_audio_6_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::bowler_audio_1_w));
+	map(0x06, 0x06).w(FUNC(mw8080bw_state::bowler_audio_2_w));
+	map(0x07, 0x07).w(FUNC(mw8080bw_state::bowler_lights_1_w));
+	map(0x08, 0x08).w(FUNC(mw8080bw_state::bowler_audio_3_w));
+	map(0x09, 0x09).w(FUNC(mw8080bw_state::bowler_audio_4_w));
+	map(0x0a, 0x0a).w(FUNC(mw8080bw_state::bowler_audio_5_w));
+	map(0x0e, 0x0e).w(FUNC(mw8080bw_state::bowler_lights_2_w));
+	map(0x0f, 0x0f).w(FUNC(mw8080bw_state::bowler_audio_6_w));
 }
 
 
@@ -2658,9 +2658,9 @@ void mw8080bw_state::invaders_io_map(address_map &map)
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::invaders_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::invaders_audio_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::invaders_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::invaders_audio_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -2787,14 +2787,14 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::blueshrk_coin_input_r)
 void mw8080bw_state::blueshrk_io_map(address_map &map)
 {
 	map.global_mask(0x7);
-	map(0x00, 0x00).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x00, 0x00).mirror(0x04).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
 	map(0x01, 0x01).mirror(0x04).portr("IN0");
 	map(0x02, 0x02).mirror(0x04).portr("IN1");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::blueshrk_audio_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::blueshrk_audio_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -2876,13 +2876,13 @@ void mw8080bw_state::invad2ct_io_map(address_map &map)
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::invad2ct_audio_3_w));
+	map(0x01, 0x01).w(FUNC(mw8080bw_state::invad2ct_audio_3_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::invad2ct_audio_1_w));
+	map(0x03, 0x03).w(FUNC(mw8080bw_state::invad2ct_audio_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::invad2ct_audio_2_w));
+	map(0x05, 0x05).w(FUNC(mw8080bw_state::invad2ct_audio_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::invad2ct_audio_4_w));
+	map(0x07, 0x07).w(FUNC(mw8080bw_state::invad2ct_audio_4_w));
 }
 
 

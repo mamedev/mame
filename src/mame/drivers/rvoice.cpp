@@ -80,15 +80,18 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
+	void rvoicepc(machine_config &config);
+
+	void init_rvoicepc();
+
+private:
 	hd63701y0_t m_hd63701y0;
 	rvoicepc_t m_rvoicepc;
 	DECLARE_READ8_MEMBER(main_hd63701_internal_registers_r);
 	DECLARE_WRITE8_MEMBER(main_hd63701_internal_registers_w);
-	void init_rvoicepc();
 	virtual void machine_reset() override;
 	void null_kbd_put(u8 data);
 	required_device<cpu_device> m_maincpu;
-	void rvoicepc(machine_config &config);
 	void hd63701_main_io(address_map &map);
 	void hd63701_main_mem(address_map &map);
 };
@@ -337,7 +340,7 @@ WRITE8_MEMBER(rvoice_state::main_hd63701_internal_registers_w)
 void rvoice_state::hd63701_main_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0027).rw(this, FUNC(rvoice_state::main_hd63701_internal_registers_r), FUNC(rvoice_state::main_hd63701_internal_registers_w)); // INTERNAL REGS
+	map(0x0000, 0x0027).rw(FUNC(rvoice_state::main_hd63701_internal_registers_r), FUNC(rvoice_state::main_hd63701_internal_registers_w)); // INTERNAL REGS
 	map(0x0040, 0x005f).ram(); // INTERNAL RAM (overlaps acia)
 	map(0x0060, 0x007f).rw("acia65c51", FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // ACIA 65C51
 	map(0x0080, 0x013f).ram(); // INTERNAL RAM (overlaps acia)

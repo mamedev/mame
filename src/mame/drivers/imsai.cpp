@@ -34,15 +34,17 @@ public:
 		, m_pit(*this, "pit")
 	{ }
 
+	void imsai(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 
-	void imsai(machine_config &config);
 	void imsai_io(address_map &map);
 	void imsai_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -64,15 +66,15 @@ void imsai_state::imsai_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x02, 0x02).r(this, FUNC(imsai_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
-	map(0x03, 0x03).r(this, FUNC(imsai_state::status_r));
+	map(0x02, 0x02).r(FUNC(imsai_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x03, 0x03).r(FUNC(imsai_state::status_r));
 	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x12, 0x12).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x13, 0x13).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x14, 0x14).r(this, FUNC(imsai_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
-	map(0x15, 0x15).r(this, FUNC(imsai_state::status_r));
-	map(0xf3, 0xf3).w(this, FUNC(imsai_state::control_w));
+	map(0x14, 0x14).r(FUNC(imsai_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x15, 0x15).r(FUNC(imsai_state::status_r));
+	map(0xf3, 0xf3).w(FUNC(imsai_state::control_w));
 }
 
 /* Input ports */

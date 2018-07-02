@@ -82,7 +82,7 @@ private:
 void clpoker_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xdfff).ram().w(this, FUNC(clpoker_state::videoram_w)).share("videoram");
+	map(0xc000, 0xdfff).ram().w(FUNC(clpoker_state::videoram_w)).share("videoram");
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xf000, 0xf000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0xf001, 0xf001).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -248,7 +248,7 @@ static const gfx_layout gfx_layout =
 };
 
 
-static GFXDECODE_START( clpoker )
+static GFXDECODE_START( gfx_clpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_layout,   0x0, 1 )
 GFXDECODE_END
 
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(clpoker_state::clpoker)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HM86171
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", clpoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_clpoker)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

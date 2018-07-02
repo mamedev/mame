@@ -51,8 +51,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 	// adpcmata is latched after vclk_interrupt callback
-	void data_w(int data);
-	DECLARE_WRITE8_MEMBER(data_w);
+	void write_data(int data);
+	DECLARE_WRITE8_MEMBER(data_w) { write_data(data); }
 
 	// VCLK slave mode option
 	// if VCLK and reset or data is changed at the same time,

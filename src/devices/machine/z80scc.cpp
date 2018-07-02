@@ -90,7 +90,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #define LOG_DCD     (1U <<  8)
 #define LOG_SYNC    (1U <<  9)
 
-//#define VERBOSE (LOG_TX)
+//#define VERBOSE (LOG_GENERAL|LOG_SETUP|LOG_READ|LOG_INT|LOG_CMD|LOG_TX|LOG_RCV|LOG_CTS|LOG_DCD|LOG_SYNC)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -357,7 +357,6 @@ enum : uint8_t
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-DEFINE_DEVICE_TYPE(Z80SCC,         z80scc_device,   "z80scc",         "Z80 SCC")
 DEFINE_DEVICE_TYPE(Z80SCC_CHANNEL, z80scc_channel,  "z80scc_channel", "Z80 SCC Channel")
 DEFINE_DEVICE_TYPE(SCC8030,        scc8030_device,  "scc8030",        "Zilog Z8030 SCC")
 DEFINE_DEVICE_TYPE(SCC80C30,       scc80c30_device, "scc80c30",       "Zilog Z80C30 SCC")
@@ -422,11 +421,6 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
-}
-
-z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, Z80SCC, tag, owner, clock, TYPE_Z80SCC)
-{
 }
 
 scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -635,7 +629,7 @@ int z80scc_device::z80daisy_irq_ack()
 	if (ret == -1 && m_cputag != nullptr)
 	{
 		// default irq vector is -1 for 68000 but 0 for z80 for example...
-		ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector();
+		ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector(INPUT_LINE_IRQ0);
 		LOGINT(" - failed to find an interrupt to ack, returning default IRQ vector: %02x\n", ret );
 		logerror("z80sio_irq_ack: failed to find an interrupt to ack!\n");
 	}
@@ -2526,6 +2520,7 @@ uint8_t z80scc_channel::data_read()
 				LOGRCV("Rx FIFO empty, resetting status and interrupt state");
 				m_uart->m_int_state[INT_RECEIVE_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
 				m_uart->m_chanA->m_rr3 &= ~(1 << (INT_RECEIVE_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0)));
+				m_uart->check_interrupts();
 			}
 		}
 	}
@@ -2652,10 +2647,31 @@ void z80scc_channel::data_write(uint8_t data)
 		{
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
 		}
+		/*
+			RB July 1, 2018: This breaks the Apple IIgs SCC MIDI driver.  The driver does this with interrupts off:
+
+			sta SCCdata,x           ; send the byte
+			lda SCCcommand,x        ; try to do another character
+			bit #$04                ; transmitter empty?
+			beq done                ; if not, don't do this
+			jsl getNextByte         ; get the next byte to send
+			bcs nochar              ; there isn't one?
+			sta SCCdata,x           ; send a second byte
+
+			The first byte write with this behavior raises a TX_BUFFER_EMPTY interrupt, but interrupts are off here.
+			Because TX_BUFFER_EMPTY is asserted at the "try to do another character" it sends a second byte.  The second 
+			byte turns OFF the TX_BUFFER_EMPTY flag, so when interrupts are re-enabled and the interrupt fires, the
+			code has no idea why it fired and the system locks up.
+
+			Also, this behavior contradicted the comment above: we are an NMOS/CMOS part and on the first write
+			the transmit buffer is not full, so this interrupt should not be raised here.
+		*/
+		#if 0
 		else if(m_rr0 & RR0_TX_BUFFER_EMPTY)  // Check TBE bit and interrupt if one or more FIFO slots available
 		{
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
 		}
+		#endif
 	}
 }
 

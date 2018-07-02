@@ -65,28 +65,28 @@ void zx_state::zx81_map(address_map &map)
 
 void zx_state::ula_map(address_map &map)
 {
-	map(0x0000, 0x7fff).r(this, FUNC(zx_state::ula_low_r));
-	map(0x8000, 0xffff).r(this, FUNC(zx_state::ula_high_r));
+	map(0x0000, 0x7fff).r(FUNC(zx_state::ula_low_r));
+	map(0x8000, 0xffff).r(FUNC(zx_state::ula_high_r));
 }
 
 void zx_state::zx80_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(zx_state::zx80_io_r), FUNC(zx_state::zx80_io_w));
+	map(0x0000, 0xffff).rw(FUNC(zx_state::zx80_io_r), FUNC(zx_state::zx80_io_w));
 }
 
 void zx_state::zx81_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(zx_state::zx81_io_r), FUNC(zx_state::zx81_io_w));
+	map(0x0000, 0xffff).rw(FUNC(zx_state::zx81_io_r), FUNC(zx_state::zx81_io_w));
 }
 
 void zx_state::pc8300_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(zx_state::pc8300_io_r), FUNC(zx_state::zx81_io_w));
+	map(0x0000, 0xffff).rw(FUNC(zx_state::pc8300_io_r), FUNC(zx_state::zx81_io_w));
 }
 
 void zx_state::pow3000_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(zx_state::pow3000_io_r), FUNC(zx_state::zx81_io_w));
+	map(0x0000, 0xffff).rw(FUNC(zx_state::pow3000_io_r), FUNC(zx_state::zx81_io_w));
 }
 
 
@@ -429,23 +429,23 @@ MACHINE_CONFIG_END
 ROM_START(zx80)
 	ROM_REGION( 0x1000, "maincpu",0 )
 	ROM_SYSTEM_BIOS(0, "default", "BASIC")
-	ROMX_LOAD( "zx80.rom",   0x0000, 0x1000, CRC(4c7fc597) SHA1(b6769a3197c77009e0933e038c15b43cf4c98c7a), ROM_BIOS(1) )
+	ROMX_LOAD( "zx80.rom",   0x0000, 0x1000, CRC(4c7fc597) SHA1(b6769a3197c77009e0933e038c15b43cf4c98c7a), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "aszmic", "ASZMIC")
-	ROMX_LOAD( "aszmic.rom", 0x0000, 0x1000, CRC(6c123536) SHA1(720867cbfafafc8c7438bbc325a77eaef571e5c0), ROM_BIOS(2) )
+	ROMX_LOAD( "aszmic.rom", 0x0000, 0x1000, CRC(6c123536) SHA1(720867cbfafafc8c7438bbc325a77eaef571e5c0), ROM_BIOS(1) )
 ROM_END
 
 ROM_START(zx81)
 	ROM_REGION( 0x2000, "maincpu",0 )
 	ROM_SYSTEM_BIOS(0, "3rd", "3rd rev.")
-	ROMX_LOAD( "zx81b.rom",   0x0000, 0x2000, CRC(522c37b8) SHA1(c6d8e06cb936989f6e1cc7a56d1f092da854a515), ROM_BIOS(1) )
+	ROMX_LOAD( "zx81b.rom",   0x0000, 0x2000, CRC(522c37b8) SHA1(c6d8e06cb936989f6e1cc7a56d1f092da854a515), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "1st", "1st rev.")
-	ROMX_LOAD( "zx81.rom",    0x0000, 0x2000, CRC(fcbbd617) SHA1(a0ade36540561cc1691bb6f0c42ceae12484a102), ROM_BIOS(2) )
+	ROMX_LOAD( "zx81.rom",    0x0000, 0x2000, CRC(fcbbd617) SHA1(a0ade36540561cc1691bb6f0c42ceae12484a102), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "2nd", "2nd rev.")
-	ROMX_LOAD( "zx81a.rom",   0x0000, 0x2000, CRC(4b1dd6eb) SHA1(7b143ee964e9ada89d1f9e88f0bd48d919184cfc), ROM_BIOS(3) )
+	ROMX_LOAD( "zx81a.rom",   0x0000, 0x2000, CRC(4b1dd6eb) SHA1(7b143ee964e9ada89d1f9e88f0bd48d919184cfc), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "hforth", "Forth by David Husband")
-	ROMX_LOAD( "h4th.rom",    0x0000, 0x2000, CRC(257d5a32) SHA1(03809a6b464609ff924f7e55a85eef875cd47ae8), ROM_BIOS(4) )
+	ROMX_LOAD( "h4th.rom",    0x0000, 0x2000, CRC(257d5a32) SHA1(03809a6b464609ff924f7e55a85eef875cd47ae8), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(4, "tforth", "Forth by Tree Systems")
-	ROMX_LOAD( "tree4th.rom", 0x0000, 0x2000, CRC(71616238) SHA1(3ee15779e03482b10fc59eb4df2446376c56b00d), ROM_BIOS(5) )
+	ROMX_LOAD( "tree4th.rom", 0x0000, 0x2000, CRC(71616238) SHA1(3ee15779e03482b10fc59eb4df2446376c56b00d), ROM_BIOS(4) )
 ROM_END
 
 ROM_START(ts1000)

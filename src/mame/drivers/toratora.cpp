@@ -63,6 +63,9 @@ public:
 		m_pia_u2(*this, "pia_u2"),
 		m_pia_u3(*this, "pia_u3") { }
 
+	void toratora(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -93,7 +96,6 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(toratora_timer);
-	void toratora(machine_config &config);
 	void main_map(address_map &map);
 };
 
@@ -199,7 +201,7 @@ INTERRUPT_GEN_MEMBER(toratora_state::toratora_timer)
 	if (m_timer & 0x100)
 		popmessage("watchdog!");
 
-	m_pia_u1->porta_w(ioport("INPUT")->read() & 0x0f);
+	m_pia_u1->write_porta(ioport("INPUT")->read() & 0x0f);
 	m_pia_u1->ca1_w(ioport("INPUT")->read() & 0x10);
 	m_pia_u1->ca2_w(ioport("INPUT")->read() & 0x20);
 }
@@ -323,8 +325,8 @@ void toratora_state::main_map(address_map &map)
 	map(0x8000, 0x9fff).ram().share("videoram");
 	map(0xa000, 0xf047).noprw();
 	map(0xf048, 0xf049).noprw();
-	map(0xf04a, 0xf04a).w(this, FUNC(toratora_state::clear_tv_w));   /* the read is mark *LEDEN, but not used */
-	map(0xf04b, 0xf04b).rw(this, FUNC(toratora_state::timer_r), FUNC(toratora_state::clear_timer_w));
+	map(0xf04a, 0xf04a).w(FUNC(toratora_state::clear_tv_w));   /* the read is mark *LEDEN, but not used */
+	map(0xf04b, 0xf04b).rw(FUNC(toratora_state::timer_r), FUNC(toratora_state::clear_timer_w));
 	map(0xf04c, 0xf09f).noprw();
 	map(0xf0a0, 0xf0a3).rw(m_pia_u1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xf0a4, 0xf0a7).rw(m_pia_u2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));

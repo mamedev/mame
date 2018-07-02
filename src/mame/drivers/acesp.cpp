@@ -29,15 +29,16 @@ public:
 	{ }
 
 	void ace_sp(machine_config &config);
+
+	void init_ace_sp();
+	void init_ace_cr();
+
+private:
 	void ace_sp_map(address_map &map);
 	void ace_sp_portmap(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-public:
-	void init_ace_sp();
-	void init_ace_cr();
 };
 
 

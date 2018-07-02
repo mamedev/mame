@@ -58,6 +58,14 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void s9(machine_config &config);
+
+	void init_s9();
+
+	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+
+private:
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
@@ -75,14 +83,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s9);
-	void init_s9();
-	void s9(machine_config &config);
+
 	void s9_audio_map(address_map &map);
 	void s9_main_map(address_map &map);
-private:
+
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
 	uint8_t m_kbdrow;
@@ -107,7 +112,7 @@ void s9_state::s9_main_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x2100, 0x2103).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).w(this, FUNC(s9_state::sol3_w)); // solenoids
+	map(0x2200, 0x2200).w(FUNC(s9_state::sol3_w)); // solenoids
 	map(0x2400, 0x2403).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x3000, 0x3003).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
@@ -206,14 +211,14 @@ INPUT_CHANGED_MEMBER( s9_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER( s9_state::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER( s9_state::sound_w )
@@ -379,7 +384,7 @@ MACHINE_CONFIG_START(s9_state::s9)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(*this, s9_state, sound_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE("hc55516", hc55516_device, clock_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE("hc55516", hc55516_device, digit_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))

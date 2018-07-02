@@ -38,7 +38,7 @@ To Do:
 #include "cpu/z8000/z8000.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
-//#include "cpu/z80/z80daisy.h"
+//#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -63,8 +63,6 @@ public:
 		, m_pio2(*this, "pio2")
 	{ }
 
-	DECLARE_MACHINE_RESET(c8002);
-
 	void c8002(machine_config &config);
 	void c5000(machine_config &config);
 	void c5000_io(address_map &map);
@@ -74,6 +72,8 @@ public:
 	void subio(address_map &map);
 	void submem(address_map &map);
 private:
+	DECLARE_MACHINE_RESET(c8002);
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<z80sio_device> m_sio1, m_sio2, m_sio3, m_sio4, m_sio5;
 	optional_device<z80ctc_device> m_ctc1, m_ctc2, m_ctc3;

@@ -151,24 +151,24 @@ WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
 
 WRITE8_MEMBER(gberet_state::gberet_sound_w)
 {
-	m_sn->write(space, 0, *m_soundlatch);
+	m_sn->write(*m_soundlatch);
 }
 
 void gberet_state::gberet_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(gberet_state::gberet_colorram_w)).share("colorram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(gberet_state::gberet_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(gberet_state::gberet_colorram_w)).share("colorram");
+	map(0xc800, 0xcfff).ram().w(FUNC(gberet_state::gberet_videoram_w)).share("videoram");
 	map(0xd000, 0xd0ff).ram().share("spriteram2");
 	map(0xd100, 0xd1ff).ram().share("spriteram");
 	map(0xd200, 0xdfff).ram();
-	map(0xe000, 0xe03f).ram().w(this, FUNC(gberet_state::gberet_scroll_w)).share("scrollram");
+	map(0xe000, 0xe03f).ram().w(FUNC(gberet_state::gberet_scroll_w)).share("scrollram");
 	map(0xe040, 0xe042).nopw(); // ???
-	map(0xe043, 0xe043).w(this, FUNC(gberet_state::gberet_sprite_bank_w));
-	map(0xe044, 0xe044).w(this, FUNC(gberet_state::gberet_flipscreen_w));
-	map(0xf000, 0xf000).w(this, FUNC(gberet_state::gberet_coin_counter_w));
+	map(0xe043, 0xe043).w(FUNC(gberet_state::gberet_sprite_bank_w));
+	map(0xe044, 0xe044).w(FUNC(gberet_state::gberet_flipscreen_w));
+	map(0xf000, 0xf000).w(FUNC(gberet_state::gberet_coin_counter_w));
 	map(0xf200, 0xf200).portr("DSW2").writeonly().share("soundlatch");
-	map(0xf400, 0xf400).portr("DSW3").w(this, FUNC(gberet_state::gberet_sound_w));
+	map(0xf400, 0xf400).portr("DSW3").w(FUNC(gberet_state::gberet_sound_w));
 	map(0xf600, 0xf600).portr("DSW1").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xf601, 0xf601).portr("P2");
 	map(0xf602, 0xf602).portr("P1");
@@ -178,18 +178,18 @@ void gberet_state::gberet_map(address_map &map)
 void gberet_state::mrgoemon_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(gberet_state::gberet_colorram_w)).share("colorram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(gberet_state::gberet_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(gberet_state::gberet_colorram_w)).share("colorram");
+	map(0xc800, 0xcfff).ram().w(FUNC(gberet_state::gberet_videoram_w)).share("videoram");
 	map(0xd000, 0xd0ff).ram().share("spriteram2");
 	map(0xd100, 0xd1ff).ram().share("spriteram");
 	map(0xd200, 0xdfff).ram();
-	map(0xe000, 0xe03f).ram().w(this, FUNC(gberet_state::gberet_scroll_w)).share("scrollram");
+	map(0xe000, 0xe03f).ram().w(FUNC(gberet_state::gberet_scroll_w)).share("scrollram");
 	map(0xe040, 0xe042).nopw(); // ???
-	map(0xe043, 0xe043).w(this, FUNC(gberet_state::gberet_sprite_bank_w));
-	map(0xe044, 0xe044).w(this, FUNC(gberet_state::gberet_flipscreen_w));
-	map(0xf000, 0xf000).w(this, FUNC(gberet_state::mrgoemon_coin_counter_w));
+	map(0xe043, 0xe043).w(FUNC(gberet_state::gberet_sprite_bank_w));
+	map(0xe044, 0xe044).w(FUNC(gberet_state::gberet_flipscreen_w));
+	map(0xf000, 0xf000).w(FUNC(gberet_state::mrgoemon_coin_counter_w));
 	map(0xf200, 0xf200).portr("DSW2").writeonly().share("soundlatch");
-	map(0xf400, 0xf400).portr("DSW3").w(this, FUNC(gberet_state::gberet_sound_w));
+	map(0xf400, 0xf400).portr("DSW3").w(FUNC(gberet_state::gberet_sound_w));
 	map(0xf600, 0xf600).portr("DSW1").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xf601, 0xf601).portr("P2");
 	map(0xf602, 0xf602).portr("P1");
@@ -217,23 +217,23 @@ WRITE8_MEMBER(gberet_state::gberetb_nmi_ack_w)
 void gberet_state::gberetb_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(gberet_state::gberet_colorram_w)).share("colorram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(gberet_state::gberet_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(gberet_state::gberet_colorram_w)).share("colorram");
+	map(0xc800, 0xcfff).ram().w(FUNC(gberet_state::gberet_videoram_w)).share("videoram");
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xe03f).ram();
 	map(0xe040, 0xe043).nopw(); // ???
-	map(0xe044, 0xe044).w(this, FUNC(gberet_state::gberetb_flipscreen_w)); // did hw even support flipscreen?
+	map(0xe044, 0xe044).w(FUNC(gberet_state::gberetb_flipscreen_w)); // did hw even support flipscreen?
 	map(0xe800, 0xe8ff).ram();
 	map(0xe900, 0xe9ff).ram().share("spriteram");
 	map(0xf000, 0xf000).nopw(); // coin counter not supported
 	map(0xf200, 0xf200).portr("DSW2");
-	map(0xf400, 0xf400).w(m_sn, FUNC(sn76489a_device::write));
+	map(0xf400, 0xf400).w(m_sn, FUNC(sn76489a_device::command_w));
 	map(0xf600, 0xf600).portr("P2");
 	map(0xf601, 0xf601).portr("DSW1");
 	map(0xf602, 0xf602).portr("P1");
 	map(0xf603, 0xf603).portr("SYSTEM");
-	map(0xf800, 0xf800).rw(this, FUNC(gberet_state::gberetb_irq_ack_r), FUNC(gberet_state::gberetb_nmi_ack_w));
-	map(0xf900, 0xf901).w(this, FUNC(gberet_state::gberetb_scroll_w));
+	map(0xf800, 0xf800).rw(FUNC(gberet_state::gberetb_irq_ack_r), FUNC(gberet_state::gberetb_nmi_ack_w));
+	map(0xf900, 0xf901).w(FUNC(gberet_state::gberetb_scroll_w));
 }
 
 
@@ -377,12 +377,12 @@ static const gfx_layout gberetb_spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( gberet )
+static GFXDECODE_START( gfx_gberet )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( gberetb )
+static GFXDECODE_START( gfx_gberetb )
 	GFXDECODE_ENTRY( "gfx1", 0, gberetb_charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, gberetb_spritelayout, 16*16, 16 )
 GFXDECODE_END
@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(gberet_state::gberet)
 	MCFG_SCREEN_UPDATE_DRIVER(gberet_state, screen_update_gberet)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gberet)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gberet)
 	MCFG_PALETTE_ADD("palette", 2*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gberet_state,gberet)
@@ -469,7 +469,7 @@ MACHINE_CONFIG_START(gberet_state::gberetb)
 	MCFG_SCREEN_UPDATE_DRIVER(gberet_state, screen_update_gberetb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gberetb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gberetb)
 	MCFG_PALETTE_ADD("palette", 2*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gberet_state,gberet)

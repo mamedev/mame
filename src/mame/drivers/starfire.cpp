@@ -193,9 +193,9 @@ READ8_MEMBER(starfire_state::fireone_input_r)
 void starfire_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).rw(this, FUNC(starfire_state::starfire_scratch_r), FUNC(starfire_state::starfire_scratch_w));
-	map(0xa000, 0xbfff).rw(this, FUNC(starfire_state::starfire_colorram_r), FUNC(starfire_state::starfire_colorram_w)).share("colorram");
-	map(0xc000, 0xffff).rw(this, FUNC(starfire_state::starfire_videoram_r), FUNC(starfire_state::starfire_videoram_w)).share("videoram");
+	map(0x8000, 0x9fff).rw(FUNC(starfire_state::starfire_scratch_r), FUNC(starfire_state::starfire_scratch_w));
+	map(0xa000, 0xbfff).rw(FUNC(starfire_state::starfire_colorram_r), FUNC(starfire_state::starfire_colorram_w)).share("colorram");
+	map(0xc000, 0xffff).rw(FUNC(starfire_state::starfire_videoram_r), FUNC(starfire_state::starfire_videoram_w)).share("videoram");
 }
 
 
@@ -324,7 +324,7 @@ INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
 {
 	// starfire has a jumper for disabling NMI, used to do a complete RAM test
 	if (m_nmi.read_safe(0x01))
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

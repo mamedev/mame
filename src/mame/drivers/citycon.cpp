@@ -19,6 +19,17 @@ Dip locations added from dip listing at crazykong.com
 #include "screen.h"
 #include "speaker.h"
 
+#define MASTER_CLOCK (20_MHz_XTAL)
+#define PIXEL_CLOCK  (MASTER_CLOCK/4) // guess
+#define CPU_CLOCK    (8_MHz_XTAL)
+
+/* also a guess, need to extract PAL equations to get further answers */
+#define HTOTAL       (320)
+#define HBEND        (8)
+#define HBSTART      (248)
+#define VTOTAL       (262)
+#define VBEND        (16)
+#define VBSTART      (240)
 
 READ8_MEMBER(citycon_state::citycon_in_r)
 {
@@ -35,14 +46,14 @@ READ8_MEMBER(citycon_state::citycon_irq_ack_r)
 void citycon_state::citycon_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1fff).ram().w(this, FUNC(citycon_state::citycon_videoram_w)).share("videoram");
-	map(0x2000, 0x20ff).ram().w(this, FUNC(citycon_state::citycon_linecolor_w)).share("linecolor").mirror(0x0700);
+	map(0x1000, 0x1fff).ram().w(FUNC(citycon_state::citycon_videoram_w)).share("videoram");
+	map(0x2000, 0x20ff).ram().w(FUNC(citycon_state::citycon_linecolor_w)).share("linecolor").mirror(0x0700);
 	map(0x2800, 0x28ff).ram().share("spriteram").mirror(0x0700); //0x2900-0x2fff cleared at post but unused
-	map(0x3000, 0x3000).r(this, FUNC(citycon_state::citycon_in_r)).w(this, FUNC(citycon_state::citycon_background_w));   /* player 1 & 2 inputs multiplexed */
+	map(0x3000, 0x3000).r(FUNC(citycon_state::citycon_in_r)).w(FUNC(citycon_state::citycon_background_w));   /* player 1 & 2 inputs multiplexed */
 	map(0x3001, 0x3001).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x3002, 0x3002).portr("DSW2").w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0x3004, 0x3005).nopr().writeonly().share("scroll");
-	map(0x3007, 0x3007).r(this, FUNC(citycon_state::citycon_irq_ack_r));
+	map(0x3007, 0x3007).r(FUNC(citycon_state::citycon_irq_ack_r));
 	map(0x3800, 0x3cff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x4000, 0xffff).rom();
 }
@@ -157,7 +168,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( citycon )
+static GFXDECODE_START( gfx_citycon )
 //  GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 512, 32 ) /* colors 512-639 */
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 640, 32 ) /* colors 512-639 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0, 16 ) /* colors 0-255 */
@@ -190,24 +201,21 @@ void citycon_state::machine_reset()
 MACHINE_CONFIG_START(citycon_state::citycon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(8'000'000)) // HD68B09P
+	MCFG_DEVICE_ADD("maincpu", MC6809, CPU_CLOCK) // HD68B09P
 	MCFG_DEVICE_PROGRAM_MAP(citycon_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(20'000'000) / 32) // schematics allow for either a 6809 or 6809E; HD68A09EP found on one actual PCB
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 32) // schematics allow for either a 6809 or 6809E; HD68A09EP found on one actual PCB
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_hold) //actually unused, probably it was during development
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_hold) // actually unused, probably it was during development
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(citycon_state, screen_update_citycon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", citycon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_citycon)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 640+1024)   /* 640 real palette + 1024 virtual palette */
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -217,10 +225,10 @@ MACHINE_CONFIG_START(citycon_state::citycon)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(20'000'000) / 16) // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK / 16) // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(20'000'000) / 16)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 16)
 	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch2", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)

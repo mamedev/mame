@@ -166,18 +166,18 @@ void xyonix_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xffff).ram().w(this, FUNC(xyonix_state::vidram_w)).share("vidram");
+	map(0xe000, 0xffff).ram().w(FUNC(xyonix_state::vidram_w)).share("vidram");
 }
 
 void xyonix_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x20, 0x20).nopr().w("sn1", FUNC(sn76496_device::write));   /* SN76496 ready signal */
-	map(0x21, 0x21).nopr().w("sn2", FUNC(sn76496_device::write));
-	map(0x40, 0x40).w(this, FUNC(xyonix_state::nmiack_w));
-	map(0x50, 0x50).w(this, FUNC(xyonix_state::irqack_w));
+	map(0x20, 0x20).nopr().w("sn1", FUNC(sn76496_device::command_w));   /* SN76496 ready signal */
+	map(0x21, 0x21).nopr().w("sn2", FUNC(sn76496_device::command_w));
+	map(0x40, 0x40).w(FUNC(xyonix_state::nmiack_w));
+	map(0x50, 0x50).w(FUNC(xyonix_state::irqack_w));
 	map(0x60, 0x61).nopw();        /* mc6845 */
-	map(0xe0, 0xe0).rw(this, FUNC(xyonix_state::io_r), FUNC(xyonix_state::io_w));
+	map(0xe0, 0xe0).rw(FUNC(xyonix_state::io_r), FUNC(xyonix_state::io_w));
 }
 
 /* Inputs Ports **************************************************************/
@@ -238,7 +238,7 @@ static const gfx_layout charlayout =
 	4*16
 };
 
-static GFXDECODE_START( xyonix )
+static GFXDECODE_START( gfx_xyonix )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(xyonix_state::xyonix)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xyonix_state, nmiclk_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xyonix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xyonix)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(xyonix_state, xyonix)
 

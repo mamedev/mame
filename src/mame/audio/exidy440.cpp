@@ -13,6 +13,8 @@
 #include "audio/exidy440.h"
 #include "includes/exidy440.h"
 
+#include "cpu/m6809/m6809.h"
+
 
 #define SOUND_LOG       0
 #define FADE_TO_ZERO    1
@@ -41,11 +43,35 @@ static const int channel_bits[4] =
 };
 
 
+/*************************************
+ *
+ *  Audio CPU memory map
+ *
+ *************************************/
+
+void exidy440_sound_device::exidy440_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).noprw();
+	map(0x8000, 0x801f).mirror(0x03e0).rw(FUNC(exidy440_sound_device::m6844_r), FUNC(exidy440_sound_device::m6844_w));
+	map(0x8400, 0x840f).mirror(0x03f0).rw(FUNC(exidy440_sound_device::sound_volume_r), FUNC(exidy440_sound_device::sound_volume_w));
+	map(0x8800, 0x8800).mirror(0x03ff).r(FUNC(exidy440_sound_device::sound_command_r)).nopw();
+	map(0x8c00, 0x93ff).noprw();
+	map(0x9400, 0x9403).mirror(0x03fc).nopr().w(FUNC(exidy440_sound_device::sound_banks_w));
+	map(0x9800, 0x9800).mirror(0x03ff).nopr().w(FUNC(exidy440_sound_device::sound_interrupt_clear_w));
+	map(0x9c00, 0x9fff).noprw();
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdfff).noprw();
+	map(0xe000, 0xffff).rom().region("audiocpu", 0);
+}
+
+
 DEFINE_DEVICE_TYPE(EXIDY440, exidy440_sound_device, "exidy440_sound", "Exidy 440 CVSD")
 
 exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EXIDY440, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
+		m_audiocpu(*this, "audiocpu"),
+		m_samples(*this, "samples"),
 		m_sound_command(0),
 		m_sound_command_ack(0),
 		m_mixer_buffer_left(nullptr),
@@ -67,6 +93,27 @@ exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, cons
 		elem.remaining = 0;
 	}
 }
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_START(exidy440_sound_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, EXIDY440_AUDIO_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(exidy440_audio_map)
+
+//  MCFG_DEVICE_ADD("cvsd1", MC3418, EXIDY440_MC3418_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+
+//  MCFG_DEVICE_ADD("cvsd2", MC3418, EXIDY440_MC3418_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+//  MCFG_DEVICE_ADD("cvsd3", MC3417, EXIDY440_MC3417_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+
+//  MCFG_DEVICE_ADD("cvsd4", MC3417, EXIDY440_MC3417_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -105,7 +152,7 @@ void exidy440_sound_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
 
 	/* allocate the sample cache */
-	length = machine().root_device().memregion("cvsd")->bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
+	length = m_samples.bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
 	m_sound_cache = (sound_cache_entry *)auto_alloc_array_clear(machine(), uint8_t, length);
 
 	/* determine the hard end of the cache and reset */
@@ -207,10 +254,10 @@ void exidy440_sound_device::mix_to_16(int length, stream_sample_t *dest_left, st
  *
  *************************************/
 
-READ8_MEMBER( exidy440_sound_device::sound_command_r )
+READ8_MEMBER(exidy440_sound_device::sound_command_r)
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
-	machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
+	m_audiocpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	m_sound_command_ack = 1;
 
 	return m_sound_command;
@@ -221,7 +268,7 @@ void exidy440_sound_device::exidy440_sound_command(uint8_t param)
 {
 	m_sound_command = param;
 	m_sound_command_ack = 0;
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	m_audiocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -238,12 +285,12 @@ uint8_t exidy440_sound_device::exidy440_sound_command_ack()
  *
  *************************************/
 
-READ8_MEMBER( exidy440_sound_device::sound_volume_r )
+READ8_MEMBER(exidy440_sound_device::sound_volume_r)
 {
 	return m_sound_volume[offset];
 }
 
-WRITE8_MEMBER( exidy440_sound_device::sound_volume_w )
+WRITE8_MEMBER(exidy440_sound_device::sound_volume_w)
 {
 	if (SOUND_LOG && m_debuglog)
 		fprintf(m_debuglog, "Volume %02X=%02X\n", offset, data);
@@ -263,9 +310,20 @@ WRITE8_MEMBER( exidy440_sound_device::sound_volume_w )
  *
  *************************************/
 
-WRITE8_MEMBER( exidy440_sound_device::sound_interrupt_clear_w )
+WRITE_LINE_MEMBER(exidy440_sound_device::sound_interrupt_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	if (state)
+		m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(exidy440_sound_device::sound_interrupt_clear_w)
+{
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(exidy440_sound_device::sound_reset_w)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
 
@@ -305,7 +363,7 @@ void exidy440_sound_device::m6844_finished(m6844_channel_data *channel)
  *
  *************************************/
 
-READ8_MEMBER( exidy440_sound_device::m6844_r )
+READ8_MEMBER(exidy440_sound_device::m6844_r)
 {
 	m6844_channel_data *m6844_channel = m_m6844_channel;
 	int result = 0;
@@ -390,7 +448,7 @@ READ8_MEMBER( exidy440_sound_device::m6844_r )
 }
 
 
-WRITE8_MEMBER( exidy440_sound_device::m6844_w )
+WRITE8_MEMBER(exidy440_sound_device::m6844_w)
 {
 	m6844_channel_data *m6844_channel = m_m6844_channel;
 	int i;
@@ -542,7 +600,7 @@ int16_t *exidy440_sound_device::find_or_add_to_sound_cache(int address, int leng
 		if (current->address == address && current->length == length && current->bits == bits && current->frequency == frequency)
 			return current->data;
 
-	return add_to_sound_cache(&machine().root_device().memregion("cvsd")->base()[address], address, length, bits, frequency);
+	return add_to_sound_cache(&m_samples[address], address, length, bits, frequency);
 }
 
 
@@ -775,7 +833,7 @@ void exidy440_sound_device::decode_and_filter_cvsd(uint8_t *input, int bytes, in
 }
 
 
-WRITE8_MEMBER( exidy440_sound_device::sound_banks_w )
+WRITE8_MEMBER(exidy440_sound_device::sound_banks_w)
 {
 	m_sound_banks[offset] = data;
 }

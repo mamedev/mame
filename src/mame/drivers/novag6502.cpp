@@ -79,10 +79,23 @@ class novag6502_state : public novagbase_state
 public:
 	novag6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: novagbase_state(mconfig, type, tag),
-		m_hlcd0538(*this, "hlcd0538")
+		m_hlcd0538(*this, "hlcd0538"),
+		m_rombank(*this, "rombank")
 	{ }
 
+	void supercon(machine_config &config);
+	void cforte(machine_config &config);
+	void sforte_map(address_map &map);
+	void sexpert(machine_config &config);
+	void sforte(machine_config &config);
+
+	void init_sexpert();
+
+	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
+
+private:
 	optional_device<hlcd0538_device> m_hlcd0538;
+	optional_memory_bank m_rombank;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
@@ -93,7 +106,6 @@ public:
 	DECLARE_READ8_MEMBER(supercon_input1_r);
 	DECLARE_READ8_MEMBER(supercon_input2_r);
 	void supercon_map(address_map &map);
-	void supercon(machine_config &config);
 
 	// Constellation Forte
 	void cforte_prepare_display();
@@ -101,7 +113,6 @@ public:
 	DECLARE_WRITE8_MEMBER(cforte_mux_w);
 	DECLARE_WRITE8_MEMBER(cforte_control_w);
 	void cforte_map(address_map &map);
-	void cforte(machine_config &config);
 
 	// Super Expert
 	DECLARE_WRITE8_MEMBER(sexpert_leds_w);
@@ -111,17 +122,12 @@ public:
 	DECLARE_READ8_MEMBER(sexpert_input1_r);
 	DECLARE_READ8_MEMBER(sexpert_input2_r);
 	DECLARE_MACHINE_RESET(sexpert);
-	void init_sexpert();
-	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
 	void sexpert_map(address_map &map);
 	void sexpert_set_cpu_freq();
-	void sexpert(machine_config &config);
 
 	// Super Forte
 	DECLARE_WRITE8_MEMBER(sforte_lcd_control_w);
 	DECLARE_WRITE8_MEMBER(sforte_lcd_data_w);
-	void sforte_map(address_map &map);
-	void sforte(machine_config &config);
 };
 
 
@@ -423,7 +429,7 @@ WRITE8_MEMBER(novag6502_state::sexpert_leds_w)
 WRITE8_MEMBER(novag6502_state::sexpert_mux_w)
 {
 	// d0: rom bankswitch
-	membank("bank1")->set_entry(data & 1);
+	m_rombank->set_entry(data & 1);
 
 	// d3: enable beeper
 	m_beeper->set_state(data >> 3 & 1);
@@ -458,12 +464,12 @@ MACHINE_RESET_MEMBER(novag6502_state, sexpert)
 	novagbase_state::machine_reset();
 
 	sexpert_set_cpu_freq();
-	membank("bank1")->set_entry(0);
+	m_rombank->set_entry(0);
 }
 
 void novag6502_state::init_sexpert()
 {
-	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
+	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
 }
 
 
@@ -475,7 +481,7 @@ void novag6502_state::init_sexpert()
 WRITE8_MEMBER(novag6502_state::sforte_lcd_control_w)
 {
 	// d3: rom bankswitch
-	membank("bank1")->set_entry(data >> 3 & 1);
+	m_rombank->set_entry(data >> 3 & 1);
 
 	// assume same as sexpert
 	sexpert_lcd_control_w(space, 0, data);
@@ -514,16 +520,16 @@ void novag6502_state::supercon_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("nvram");
 	map(0x1c00, 0x1c00).nopw(); // printer/clock?
 	map(0x1d00, 0x1d00).nopw(); // printer/clock?
-	map(0x1e00, 0x1e00).rw(this, FUNC(novag6502_state::supercon_input2_r), FUNC(novag6502_state::supercon_mux_w));
-	map(0x1f00, 0x1f00).rw(this, FUNC(novag6502_state::supercon_input1_r), FUNC(novag6502_state::supercon_control_w));
+	map(0x1e00, 0x1e00).rw(FUNC(novag6502_state::supercon_input2_r), FUNC(novag6502_state::supercon_mux_w));
+	map(0x1f00, 0x1f00).rw(FUNC(novag6502_state::supercon_input1_r), FUNC(novag6502_state::supercon_control_w));
 	map(0x2000, 0xffff).rom();
 }
 
 void novag6502_state::cforte_map(address_map &map)
 {
 	supercon_map(map);
-	map(0x1e00, 0x1e00).rw(this, FUNC(novag6502_state::supercon_input2_r), FUNC(novag6502_state::cforte_mux_w));
-	map(0x1f00, 0x1f00).rw(this, FUNC(novag6502_state::supercon_input1_r), FUNC(novag6502_state::cforte_control_w));
+	map(0x1e00, 0x1e00).rw(FUNC(novag6502_state::supercon_input2_r), FUNC(novag6502_state::cforte_mux_w));
+	map(0x1f00, 0x1f00).rw(FUNC(novag6502_state::supercon_input1_r), FUNC(novag6502_state::cforte_control_w));
 }
 
 
@@ -532,24 +538,24 @@ void novag6502_state::cforte_map(address_map &map)
 void novag6502_state::sforte_map(address_map &map)
 {
 	map(0x0000, 0x1fef).ram().share("nvram"); // 8KB RAM, but RAM CE pin is deactivated on $1ff0-$1fff
-	map(0x1ff0, 0x1ff0).r(this, FUNC(novag6502_state::sexpert_input1_r));
-	map(0x1ff1, 0x1ff1).r(this, FUNC(novag6502_state::sexpert_input2_r));
+	map(0x1ff0, 0x1ff0).r(FUNC(novag6502_state::sexpert_input1_r));
+	map(0x1ff1, 0x1ff1).r(FUNC(novag6502_state::sexpert_input2_r));
 	map(0x1ff2, 0x1ff2).nopw(); // printer
 	map(0x1ff3, 0x1ff3).nopw(); // printer
-	map(0x1ff6, 0x1ff6).w(this, FUNC(novag6502_state::sforte_lcd_control_w));
-	map(0x1ff7, 0x1ff7).w(this, FUNC(novag6502_state::sforte_lcd_data_w));
+	map(0x1ff6, 0x1ff6).w(FUNC(novag6502_state::sforte_lcd_control_w));
+	map(0x1ff7, 0x1ff7).w(FUNC(novag6502_state::sforte_lcd_data_w));
 	map(0x1ffc, 0x1fff).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x2000, 0x7fff).rom();
-	map(0x8000, 0xffff).bankr("bank1");
+	map(0x8000, 0xffff).bankr("rombank");
 }
 
 void novag6502_state::sexpert_map(address_map &map)
 {
 	sforte_map(map);
-	map(0x1ff4, 0x1ff4).w(this, FUNC(novag6502_state::sexpert_leds_w));
-	map(0x1ff5, 0x1ff5).w(this, FUNC(novag6502_state::sexpert_mux_w));
-	map(0x1ff6, 0x1ff6).w(this, FUNC(novag6502_state::sexpert_lcd_control_w));
-	map(0x1ff7, 0x1ff7).w(this, FUNC(novag6502_state::sexpert_lcd_data_w));
+	map(0x1ff4, 0x1ff4).w(FUNC(novag6502_state::sexpert_leds_w));
+	map(0x1ff5, 0x1ff5).w(FUNC(novag6502_state::sexpert_mux_w));
+	map(0x1ff6, 0x1ff6).w(FUNC(novag6502_state::sexpert_lcd_control_w));
+	map(0x1ff7, 0x1ff7).w(FUNC(novag6502_state::sexpert_lcd_data_w));
 }
 
 

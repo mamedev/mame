@@ -39,6 +39,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -77,6 +78,9 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
+	void ms0515(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(ms0515);
 	uint32_t screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
@@ -102,9 +106,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq9_w);
 	DECLARE_WRITE_LINE_MEMBER(irq11_w);
 
-	void ms0515(machine_config &config);
 	void ms0515_mem(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 
 	void irq_encoder(int irq, int state);
@@ -121,7 +124,6 @@ protected:
 	required_device<pit8253_device> m_pit8253;
 	required_device<speaker_sound_device> m_speaker;
 
-private:
 	uint8_t *m_video_ram;
 	uint8_t m_sysrega, m_sysregc;
 	uint16_t m_bankreg, m_haltreg;
@@ -143,7 +145,7 @@ void ms0515_state::ms0515_mem(address_map &map)
 
 	map(0160000, 0177377).rom().nopw();
 
-	map(0177400, 0177437).w(this, FUNC(ms0515_state::ms0515_bank_w)); // Register for RAM expansion
+	map(0177400, 0177437).w(FUNC(ms0515_state::ms0515_bank_w)); // Register for RAM expansion
 
 	map(0177440, 0177440).r(m_i8251kbd, FUNC(i8251_device::data_r));
 	map(0177442, 0177442).rw(m_i8251kbd, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -171,7 +173,7 @@ void ms0515_state::ms0515_mem(address_map &map)
 	map(0177720, 0177720).w(m_i8251line, FUNC(i8251_device::data_w));
 	map(0177722, 0177722).w(m_i8251line, FUNC(i8251_device::control_w));
 
-	map(0177770, 0177771).rw(this, FUNC(ms0515_state::ms0515_halt_r), FUNC(ms0515_state::ms0515_halt_w)); // read/write -- halt and system timer
+	map(0177770, 0177771).rw(FUNC(ms0515_state::ms0515_halt_r), FUNC(ms0515_state::ms0515_halt_w)); // read/write -- halt and system timer
 }
 
 /*
@@ -596,11 +598,11 @@ ROM_START( ms0515 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "b" )
 	ROM_SYSTEM_BIOS( 0, "a", "Version A" )
-	ROMX_LOAD( "7004l.bin", 0xc000, 0x2000, CRC(b08b3b73) SHA1(c12fd4672598cdf499656dcbb4118d787769d589), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "7004h.bin", 0xc001, 0x2000, CRC(515dcf99) SHA1(edd34300fd642c89ce321321e1b12493cd16b7a5), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "7004l.bin", 0xc000, 0x2000, CRC(b08b3b73) SHA1(c12fd4672598cdf499656dcbb4118d787769d589), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "7004h.bin", 0xc001, 0x2000, CRC(515dcf99) SHA1(edd34300fd642c89ce321321e1b12493cd16b7a5), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "b", "Version B" )
-	ROMX_LOAD( "0515l.rf4", 0xc000, 0x2000, CRC(85b608a4) SHA1(5b1bb0586d8f7a8a21de69200b08e0b28a318999), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "0515h.rf4", 0xc001, 0x2000, CRC(e3ff6da9) SHA1(3febccf40abc2e3ca7db3f6f3884be117722dd8b), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "0515l.rf4", 0xc000, 0x2000, CRC(85b608a4) SHA1(5b1bb0586d8f7a8a21de69200b08e0b28a318999), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "0515h.rf4", 0xc001, 0x2000, CRC(e3ff6da9) SHA1(3febccf40abc2e3ca7db3f6f3884be117722dd8b), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 /* Driver */

@@ -49,20 +49,20 @@ READ8_MEMBER(mrdo_state::mrdo_SECRE_r)
 void mrdo_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().w(this, FUNC(mrdo_state::mrdo_bgvideoram_w)).share("bgvideoram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(mrdo_state::mrdo_fgvideoram_w)).share("fgvideoram");
+	map(0x8000, 0x87ff).ram().w(FUNC(mrdo_state::mrdo_bgvideoram_w)).share("bgvideoram");
+	map(0x8800, 0x8fff).ram().w(FUNC(mrdo_state::mrdo_fgvideoram_w)).share("fgvideoram");
 	map(0x9000, 0x90ff).writeonly().share("spriteram");
-	map(0x9800, 0x9800).w(this, FUNC(mrdo_state::mrdo_flipscreen_w));    /* screen flip + playfield priority */
-	map(0x9801, 0x9801).w("u8106_1", FUNC(u8106_device::write));
-	map(0x9802, 0x9802).w("u8106_2", FUNC(u8106_device::write));
-	map(0x9803, 0x9803).r(this, FUNC(mrdo_state::mrdo_SECRE_r));
+	map(0x9800, 0x9800).w(FUNC(mrdo_state::mrdo_flipscreen_w));    /* screen flip + playfield priority */
+	map(0x9801, 0x9801).w("u8106_1", FUNC(u8106_device::command_w));
+	map(0x9802, 0x9802).w("u8106_2", FUNC(u8106_device::command_w));
+	map(0x9803, 0x9803).r(FUNC(mrdo_state::mrdo_SECRE_r));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
 	map(0xa002, 0xa002).portr("DSW1");
 	map(0xa003, 0xa003).portr("DSW2");
 	map(0xe000, 0xefff).ram();
-	map(0xf000, 0xf7ff).w(this, FUNC(mrdo_state::mrdo_scrollx_w));
-	map(0xf800, 0xffff).w(this, FUNC(mrdo_state::mrdo_scrolly_w));
+	map(0xf000, 0xf7ff).w(FUNC(mrdo_state::mrdo_scrollx_w));
+	map(0xf800, 0xffff).w(FUNC(mrdo_state::mrdo_scrolly_w));
 }
 
 
@@ -164,7 +164,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( mrdo )
+static GFXDECODE_START( gfx_mrdo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 64 )    /* colors 0-255 directly mapped */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,      0, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 4*64, 16 )
@@ -184,7 +184,7 @@ MACHINE_CONFIG_START(mrdo_state::mrdo)
 	MCFG_SCREEN_UPDATE_DRIVER(mrdo_state, screen_update_mrdo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrdo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrdo)
 	MCFG_PALETTE_ADD("palette", 64*4+16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(mrdo_state, mrdo)

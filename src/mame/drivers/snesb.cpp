@@ -156,8 +156,23 @@ class snesb_state : public snes_state
 {
 public:
 	snesb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: snes_state(mconfig, type, tag) { }
+		: snes_state(mconfig, type, tag)
+	{ }
 
+	void mk3snes(machine_config &config);
+	void ffight2b(machine_config &config);
+	void kinstb(machine_config &config);
+
+	void init_iron();
+	void init_denseib();
+	void init_kinstb();
+	void init_sblast2b();
+	void init_ffight2b();
+	void init_endless();
+	void init_mk3snes();
+	void init_legendsb();
+
+private:
 	std::unique_ptr<int8_t[]> m_shared_ram;
 	uint8_t m_cnt;
 	std::unique_ptr<int8_t[]> m_shared_ram2;
@@ -176,18 +191,7 @@ public:
 	DECLARE_READ8_MEMBER(snesb_coin_r);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
-	void init_iron();
-	void init_denseib();
-	void init_kinstb();
-	void init_sblast2b();
-	void init_ffight2b();
-	void init_endless();
-	void init_mk3snes();
-	void init_legendsb();
 	DECLARE_MACHINE_RESET(ffight2b);
-	void mk3snes(machine_config &config);
-	void ffight2b(machine_config &config);
-	void kinstb(machine_config &config);
 	void mcu_io_map(address_map &map);
 	void snesb_map(address_map &map);
 	void spc_mem(address_map &map);
@@ -299,9 +303,9 @@ READ8_MEMBER(snesb_state::snesb_coin_r)
 
 void snesb_state::snesb_map(address_map &map)
 {
-	map(0x000000, 0x7dffff).rw(this, FUNC(snesb_state::snes_r_bank1), FUNC(snesb_state::snes_w_bank1));
+	map(0x000000, 0x7dffff).rw(FUNC(snesb_state::snes_r_bank1), FUNC(snesb_state::snes_w_bank1));
 	map(0x7e0000, 0x7fffff).ram();                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	map(0x800000, 0xffffff).rw(this, FUNC(snesb_state::snes_r_bank2), FUNC(snesb_state::snes_w_bank2));    /* Mirror and ROM */
+	map(0x800000, 0xffffff).rw(FUNC(snesb_state::snes_r_bank2), FUNC(snesb_state::snes_w_bank2));    /* Mirror and ROM */
 }
 
 READ8_MEMBER(snesb_state::spc_ram_100_r)
@@ -318,7 +322,7 @@ void snesb_state::spc_mem(address_map &map)
 {
 	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
 	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
-	map(0x0100, 0xffff).rw(this, FUNC(snesb_state::spc_ram_100_r), FUNC(snesb_state::spc_ram_100_w));
+	map(0x0100, 0xffff).rw(FUNC(snesb_state::spc_ram_100_r), FUNC(snesb_state::spc_ram_100_w));
 }
 
 static INPUT_PORTS_START( snes_common )
@@ -713,7 +717,7 @@ MACHINE_CONFIG_START(snesb_state::kinstb)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
 	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snesb_state, snes_open_bus_r))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */

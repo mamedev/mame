@@ -60,6 +60,7 @@ ksm|DVK KSM,
 #include "machine/ms7004.h"
 #include "machine/pic8259.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -106,6 +107,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 		{ }
 
+	void ksm(machine_config &config);
+
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 
 	virtual void machine_reset() override;
@@ -123,10 +127,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ksm_ppi_porta_w);
 	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
 
-	void ksm(machine_config &config);
 	void ksm_io(address_map &map);
 	void ksm_mem(address_map &map);
-private:
+
 	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
 	rectangle m_tmpclip;
 	bitmap_ind16 m_tmpbmp;
@@ -411,7 +414,7 @@ static const gfx_layout ksm_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( ksm )
+static GFXDECODE_START( gfx_ksm )
 	GFXDECODE_ENTRY("chargen", 0x0000, ksm_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -431,7 +434,7 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ksm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksm)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)

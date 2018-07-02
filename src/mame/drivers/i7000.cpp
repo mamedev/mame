@@ -50,6 +50,7 @@
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -59,13 +60,18 @@ class i7000_state : public driver_device
 {
 public:
 	i7000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_card(*this, "cardslot"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_videoram(*this, "videoram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_card(*this, "cardslot")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_videoram(*this, "videoram")
 	{ }
 
+	void i7000(machine_config &config);
+
+	void init_i7000();
+
+private:
 	void video_start() override;
 	void machine_start() override;
 
@@ -74,19 +80,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_videoram;
 	uint32_t screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint8_t *m_char_rom;
 	uint8_t m_row;
 	tilemap_t *m_bg_tilemap;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	void init_i7000();
 	DECLARE_PALETTE_INIT(i7000);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
 
 	DECLARE_READ8_MEMBER(i7000_kbd_r);
 	DECLARE_WRITE8_MEMBER(i7000_scanlines_w);
-	void i7000(machine_config &config);
 	void i7000_io(address_map &map);
 	void i7000_mem(address_map &map);
 };
@@ -306,7 +309,7 @@ static const gfx_layout i7000_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( i7000 )
+static GFXDECODE_START( gfx_i7000 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, i7000_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -353,7 +356,7 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_SCREEN_UPDATE_DRIVER(i7000_state, screen_update_i7000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i7000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_i7000)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(i7000_state, i7000)
 

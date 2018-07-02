@@ -45,13 +45,13 @@ public:
 
 	void map(address_map &map);
 
-	void configure_device(const char *tag, bool is_master)
+	template <class T> void configure_device(T &&tag, bool is_master)
 	{
-		m_hostcpu_tag = tag;
+		m_hostcpu.set_tag(std::forward<T>(tag));
 		m_hostcpu_master = is_master;
 	}
 
-	void link_c148_device(const char *tag) { m_linked_c148_tag = tag; }
+	template <class T> void link_c148_device(T &&tag) { m_linked_c148.set_tag(std::forward<T>(tag)); }
 
 	template <class Object> devcb_base &set_out_ext1_callback(Object &&cb) { return m_out_ext1_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_ext2_callback(Object &&cb) { return m_out_ext2_cb.set_callback(std::forward<Object>(cb)); }
@@ -103,16 +103,13 @@ public:
 protected:
 	void cpu_irq_trigger();
 	// device-level overrides
-//  virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_validity_check(validity_checker &valid) const override;
 private:
-	cpu_device *m_hostcpu;              /**< reference to the host cpu */
-	namco_c148_device *m_linked_c148;   /**< reference to linked master/slave c148 */
-	const char *m_hostcpu_tag;      /**< host cpu tag name */
-	const char *m_linked_c148_tag;  /**< other c148 tag name */
-	bool        m_hostcpu_master;   /**< define if host cpu is master */
+	required_device<cpu_device> m_hostcpu;              // reference to the host cpu
+	optional_device<namco_c148_device> m_linked_c148;   // reference to linked master/slave c148
+	bool        m_hostcpu_master;                       // define if host cpu is master
+
 	struct{
 		uint8_t cpu;
 		uint8_t ex;

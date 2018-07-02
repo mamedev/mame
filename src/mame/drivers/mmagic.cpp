@@ -50,6 +50,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "speaker.h"
 #include "screen.h"
 
@@ -83,6 +84,9 @@ public:
 		m_audio(0x00)
 	{}
 
+	void mmagic(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(ball_x_w);
 	DECLARE_WRITE8_MEMBER(ball_y_w);
@@ -91,13 +95,11 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mmagic(machine_config &config);
 	void mmagic_io(address_map &map);
 	void mmagic_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -123,16 +125,16 @@ void mmagic_state::mmagic_mem(address_map &map)
 	map(0x0000, 0x17ff).rom();
 	map(0x2000, 0x21ff).ram();
 	map(0x3000, 0x31ff).ram().share("vram");
-	map(0x8002, 0x8002).w(this, FUNC(mmagic_state::ball_x_w));
-	map(0x8003, 0x8003).w(this, FUNC(mmagic_state::ball_y_w));
-	map(0x8004, 0x8004).r(this, FUNC(mmagic_state::vblank_r));
+	map(0x8002, 0x8002).w(FUNC(mmagic_state::ball_x_w));
+	map(0x8003, 0x8003).w(FUNC(mmagic_state::ball_y_w));
+	map(0x8004, 0x8004).r(FUNC(mmagic_state::vblank_r));
 }
 
 void mmagic_state::mmagic_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x80, 0x80).w(this, FUNC(mmagic_state::color_w));
-	map(0x81, 0x81).w(this, FUNC(mmagic_state::audio_w));
+	map(0x80, 0x80).w(FUNC(mmagic_state::color_w));
+	map(0x81, 0x81).w(FUNC(mmagic_state::audio_w));
 	map(0x85, 0x85).portr("paddle");
 	map(0x86, 0x86).portr("buttons");
 	map(0x87, 0x87).portr("dipswitch");

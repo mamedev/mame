@@ -114,9 +114,9 @@ WRITE8_MEMBER( cidelsa_state::altair_out1_w )
 	    7   CONT. M1
 	*/
 
-	output().set_led_value(0, data & 0x08); // 1P
-	output().set_led_value(1, data & 0x10); // 2P
-	output().set_led_value(2, data & 0x20); // FIRE
+	m_leds[0] = BIT(data, 3); // 1P
+	m_leds[1] = BIT(data, 4); // 2P
+	m_leds[2] = BIT(data, 5); // FIRE
 }
 
 WRITE8_MEMBER( draco_state::out1_w )
@@ -159,9 +159,9 @@ void cidelsa_state::destryera_map(address_map &map)
 
 void cidelsa_state::destryer_io_map(address_map &map)
 {
-	map(0x01, 0x01).portr("IN0").w(this, FUNC(cidelsa_state::destryer_out1_w));
+	map(0x01, 0x01).portr("IN0").w(FUNC(cidelsa_state::destryer_out1_w));
 	map(0x02, 0x02).portr("IN1");
-	map(0x03, 0x07).w(this, FUNC(cidelsa_state::cdp1869_w));
+	map(0x03, 0x07).w(FUNC(cidelsa_state::cdp1869_w));
 }
 
 // Altair
@@ -179,7 +179,7 @@ void cidelsa_state::altair_io_map(address_map &map)
 	map(0x01, 0x01).r("ic23", FUNC(cdp1852_device::read)).w("ic26", FUNC(cdp1852_device::write));
 	map(0x02, 0x02).r("ic24", FUNC(cdp1852_device::read));
 	map(0x04, 0x04).r("ic25", FUNC(cdp1852_device::read));
-	map(0x03, 0x07).w(this, FUNC(cidelsa_state::cdp1869_w));
+	map(0x03, 0x07).w(FUNC(cidelsa_state::cdp1869_w));
 }
 
 // Draco
@@ -197,7 +197,7 @@ void draco_state::draco_io_map(address_map &map)
 	map(0x01, 0x01).r("ic29", FUNC(cdp1852_device::read)).w("ic32", FUNC(cdp1852_device::write));
 	map(0x02, 0x02).r("ic30", FUNC(cdp1852_device::read));
 	map(0x04, 0x04).r("ic31", FUNC(cdp1852_device::read));
-	map(0x03, 0x07).w(this, FUNC(draco_state::cdp1869_w));
+	map(0x03, 0x07).w(FUNC(draco_state::cdp1869_w));
 }
 
 void draco_state::draco_sound_map(address_map &map)
@@ -370,18 +370,21 @@ void cidelsa_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void cidelsa_state::machine_start()
 {
+	m_leds.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_reset));
 }
 
 void draco_state::machine_start()
 {
+	cidelsa_state::machine_start();
+
 	/* setup COP402 memory banking */
 	membank("bank1")->configure_entries(0, 2, memregion(COP402N_TAG)->base(), 0x400);
 	membank("bank1")->set_entry(0);
 
 	/* register for state saving */
-	save_item(NAME(m_reset));
 	save_item(NAME(m_sound));
 	save_item(NAME(m_psg_latch));
 }

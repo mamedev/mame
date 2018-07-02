@@ -17,6 +17,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -95,7 +96,7 @@ void buster_state::mainmap(address_map &map)
 	map(0x7c8a, 0x7c8a).portr("IN5");
 	map(0x7c8c, 0x7c8c).portr("IN6");
 	map(0x7c8e, 0x7c8e).portr("IN7");
-	map(0x7cb0, 0x7cb7).w(this, FUNC(buster_state::coin_output_w));
+	map(0x7cb0, 0x7cb7).w(FUNC(buster_state::coin_output_w));
 	map(0x8800, 0x8fff).ram().share("wram"); // ???
 	map(0xa000, 0xa0ff).ram(); // nvram?
 }
@@ -315,7 +316,7 @@ static const gfx_layout tiles8x8_layout =
 	8*4
 };
 
-static GFXDECODE_START( buster )
+static GFXDECODE_START( gfx_buster )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -339,7 +340,7 @@ MACHINE_CONFIG_START(buster_state::buster)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", buster)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_buster)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 

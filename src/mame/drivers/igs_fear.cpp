@@ -7,6 +7,7 @@
 #include "machine/nvram.h"
 #include "machine/pgmcrypt.h"
 #include "sound/ics2115.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -20,9 +21,12 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void igs_fear(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	void init_igs_fear();
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	//virtual void video_start();
 	virtual void video_start_igs_fear();
 	uint32_t screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -30,7 +34,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void igs_fear(machine_config &config);
 	void igs_igs_fear_map(address_map &map);
 };
 
@@ -64,7 +67,7 @@ static const gfx_layout fearlayout =
 };
 
 
-static GFXDECODE_START( igs_fear )
+static GFXDECODE_START( gfx_igs_fear )
 	GFXDECODE_ENTRY( "gfx1", 0, fearlayout,   0, 16  )
 	GFXDECODE_ENTRY( "gfx2", 0, fearlayout,   0, 16  )
 	GFXDECODE_ENTRY( "gfx3", 0, fearlayout,   0, 16  )
@@ -94,7 +97,7 @@ MACHINE_CONFIG_START(igs_fear_state::igs_fear)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs_fear)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs_fear)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

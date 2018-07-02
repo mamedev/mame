@@ -43,14 +43,14 @@ void exedexes_state::exedexes_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW0");
 	map(0xc004, 0xc004).portr("DSW1");
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(this, FUNC(exedexes_state::exedexes_c804_w));                              /* coin counters + text layer enable */
+	map(0xc804, 0xc804).w(FUNC(exedexes_state::exedexes_c804_w));                              /* coin counters + text layer enable */
 	map(0xc806, 0xc806).nopw();                                            /* Watchdog ?? */
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(exedexes_state::exedexes_videoram_w)).share("videoram"); /* Video RAM */
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(exedexes_state::exedexes_colorram_w)).share("colorram"); /* Color RAM */
+	map(0xd000, 0xd3ff).ram().w(FUNC(exedexes_state::exedexes_videoram_w)).share("videoram"); /* Video RAM */
+	map(0xd400, 0xd7ff).ram().w(FUNC(exedexes_state::exedexes_colorram_w)).share("colorram"); /* Color RAM */
 	map(0xd800, 0xd801).writeonly().share("nbg_yscroll");
 	map(0xd802, 0xd803).writeonly().share("nbg_xscroll");
 	map(0xd804, 0xd805).writeonly().share("bg_scroll");
-	map(0xd807, 0xd807).w(this, FUNC(exedexes_state::exedexes_gfxctrl_w));                           /* layer enables */
+	map(0xd807, 0xd807).w(FUNC(exedexes_state::exedexes_gfxctrl_w));                           /* layer enables */
 	map(0xe000, 0xefff).ram();                                                 /* Work RAM */
 	map(0xf000, 0xffff).ram().share("spriteram");   /* Sprite RAM */
 }
@@ -63,8 +63,8 @@ void exedexes_state::sound_map(address_map &map)
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x8002, 0x8002).w("sn1", FUNC(sn76489_device::write));
-	map(0x8003, 0x8003).w("sn2", FUNC(sn76489_device::write));
+	map(0x8002, 0x8002).w("sn1", FUNC(sn76489_device::command_w));
+	map(0x8003, 0x8003).w("sn2", FUNC(sn76489_device::command_w));
 }
 
 
@@ -195,7 +195,7 @@ static const gfx_layout tilelayout =
 
 
 
-static GFXDECODE_START( exedexes )
+static GFXDECODE_START( gfx_exedexes )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,              0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           64*4, 64 ) /* 32x32 Tiles */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,       2*64*4, 16 ) /* 16x16 Tiles */
@@ -243,7 +243,7 @@ MACHINE_CONFIG_START(exedexes_state::exedexes)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exedexes)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exedexes)
 
 	MCFG_PALETTE_ADD("palette", 64*4+64*4+16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)

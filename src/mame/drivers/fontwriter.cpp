@@ -33,6 +33,9 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void fontwriter(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -43,10 +46,8 @@ public:
 		m_vbl ^= 0xff;
 		return m_vbl;
 	}
-	void fontwriter(machine_config &config);
 	void io_map(address_map &map);
 	void main_map(address_map &map);
-protected:
 
 	// devices
 	required_device<m37720s1_device> m_maincpu;
@@ -85,7 +86,7 @@ void fontwriter_state::main_map(address_map &map)
 
 void fontwriter_state::io_map(address_map &map)
 {
-	map(M37710_PORT6, M37710_PORT6).r(this, FUNC(fontwriter_state::vbl_r));
+	map(M37710_PORT6, M37710_PORT6).r(FUNC(fontwriter_state::vbl_r));
 }
 
 static INPUT_PORTS_START( fontwriter )

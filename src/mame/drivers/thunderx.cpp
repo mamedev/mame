@@ -404,11 +404,11 @@ WRITE8_MEMBER(thunderx_state::k052109_051960_w)
 
 void thunderx_state::scontra_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(this, FUNC(thunderx_state::k052109_051960_r), FUNC(thunderx_state::k052109_051960_w));       /* video RAM + sprite RAM */
+	map(0x0000, 0x3fff).rw(FUNC(thunderx_state::k052109_051960_r), FUNC(thunderx_state::k052109_051960_w));       /* video RAM + sprite RAM */
 
-	map(0x1f80, 0x1f80).w(this, FUNC(thunderx_state::scontra_bankswitch_w)); /* bankswitch control + coin counters */
+	map(0x1f80, 0x1f80).w(FUNC(thunderx_state::scontra_bankswitch_w)); /* bankswitch control + coin counters */
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x1f88, 0x1f88).w(this, FUNC(thunderx_state::sh_irqtrigger_w));     /* cause interrupt on audio CPU */
+	map(0x1f88, 0x1f88).w(FUNC(thunderx_state::sh_irqtrigger_w));     /* cause interrupt on audio CPU */
 	map(0x1f8c, 0x1f8c).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x1f90, 0x1f90).portr("SYSTEM");
 	map(0x1f91, 0x1f91).portr("P1");
@@ -416,7 +416,7 @@ void thunderx_state::scontra_map(address_map &map)
 	map(0x1f93, 0x1f93).portr("DSW3");
 	map(0x1f94, 0x1f94).portr("DSW1");
 	map(0x1f95, 0x1f95).portr("DSW2");
-	map(0x1f98, 0x1f98).rw(this, FUNC(thunderx_state::_1f98_r), FUNC(thunderx_state::scontra_1f98_w));
+	map(0x1f98, 0x1f98).rw(FUNC(thunderx_state::_1f98_r), FUNC(thunderx_state::scontra_1f98_w));
 
 	map(0x4000, 0x57ff).ram();
 	map(0x5800, 0x5fff).m(m_bank5800, FUNC(address_map_bank_device::amap8));  /* palette + work RAM + PMC */
@@ -427,14 +427,14 @@ void thunderx_state::scontra_map(address_map &map)
 void thunderx_state::thunderx_map(address_map &map)
 {
 	scontra_map(map);
-	map(0x1f80, 0x1f80).w(this, FUNC(thunderx_state::thunderx_videobank_w));
-	map(0x1f98, 0x1f98).rw(this, FUNC(thunderx_state::_1f98_r), FUNC(thunderx_state::thunderx_1f98_w)); /* registers */
+	map(0x1f80, 0x1f80).w(FUNC(thunderx_state::thunderx_videobank_w));
+	map(0x1f98, 0x1f98).rw(FUNC(thunderx_state::_1f98_r), FUNC(thunderx_state::thunderx_1f98_w)); /* registers */
 }
 
 void thunderx_state::gbusters_map(address_map &map)
 {
 	scontra_map(map);
-	map(0x1f80, 0x1f80).w(this, FUNC(thunderx_state::gbusters_videobank_w));
+	map(0x1f80, 0x1f80).w(FUNC(thunderx_state::gbusters_videobank_w));
 }
 
 
@@ -448,7 +448,7 @@ void thunderx_state::thunderx_bank5800_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x0800, 0x0fff).ram();
-	map(0x1000, 0x17ff).rw(this, FUNC(thunderx_state::pmc_r), FUNC(thunderx_state::pmc_w)).share("pmcram");
+	map(0x1000, 0x17ff).rw(FUNC(thunderx_state::pmc_r), FUNC(thunderx_state::pmc_w)).share("pmcram");
 }
 
 
@@ -464,7 +464,7 @@ void thunderx_state::scontra_sound_map(address_map &map)
 {
 	thunderx_sound_map(map);
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
-	map(0xf000, 0xf000).w(this, FUNC(thunderx_state::k007232_bankswitch_w));
+	map(0xf000, 0xf000).w(FUNC(thunderx_state::k007232_bankswitch_w));
 }
 
 /***************************************************************************

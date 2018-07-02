@@ -29,13 +29,14 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -57,16 +58,18 @@ public:
 	{
 	}
 
+	void z9001(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(port88_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void z9001(machine_config &config);
 	void z9001_io(address_map &map);
 	void z9001_mem(address_map &map);
-private:
+
 	uint8_t m_framecnt;
 	bool m_cassbit;
 	virtual void machine_reset() override;
@@ -198,7 +201,7 @@ void z9001_state::kbd_put(u8 data)
 	m_maincpu->space(AS_PROGRAM).write_byte(0x0025, data);
 }
 
-static GFXDECODE_START( z9001 )
+static GFXDECODE_START( gfx_z9001 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, z9001_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -219,7 +222,7 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	MCFG_SCREEN_UPDATE_DRIVER(z9001_state, screen_update_z9001)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", z9001)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z9001)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	/* Sound */
@@ -251,11 +254,11 @@ MACHINE_CONFIG_END
 ROM_START( z9001 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "orig", "Original" )
-	ROMX_LOAD( "os____f0.851", 0xf000, 0x1000, CRC(9fe60a92) SHA1(553609631f5eaa7d6758a73f56c613e280a5b310), ROM_BIOS(1))
+	ROMX_LOAD( "os____f0.851", 0xf000, 0x1000, CRC(9fe60a92) SHA1(553609631f5eaa7d6758a73f56c613e280a5b310), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "rb20", "ROM-Bank System without menu" )
-	ROMX_LOAD( "os_rb20.rom",  0xf000, 0x1000, CRC(c783124d) SHA1(c2893ce5bb23b280ba4e982e860586d21de2469b), ROM_BIOS(2))
+	ROMX_LOAD( "os_rb20.rom",  0xf000, 0x1000, CRC(c783124d) SHA1(c2893ce5bb23b280ba4e982e860586d21de2469b), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "rb21", "ROM-Bank System with menu" )
-	ROMX_LOAD( "os_rb21.rom",  0xf000, 0x1000, CRC(11eec2dd) SHA1(5dbb661bdf4daf92d6c4ffbbdec674e57917e9eb), ROM_BIOS(3))
+	ROMX_LOAD( "os_rb21.rom",  0xf000, 0x1000, CRC(11eec2dd) SHA1(5dbb661bdf4daf92d6c4ffbbdec674e57917e9eb), ROM_BIOS(2))
 
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "chargen.851", 0x0000, 0x0800, CRC(dd9c0f4e) SHA1(2e4928ba7161f5cce7173b7d2ded3d6596ae2aa2))
@@ -269,11 +272,11 @@ ROM_END
 ROM_START( kc87_10 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "orig", "Original" )
-	ROMX_LOAD( "os____f0.851", 0xf000, 0x1000, CRC(9fe60a92) SHA1(553609631f5eaa7d6758a73f56c613e280a5b310), ROM_BIOS(1))
+	ROMX_LOAD( "os____f0.851", 0xf000, 0x1000, CRC(9fe60a92) SHA1(553609631f5eaa7d6758a73f56c613e280a5b310), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "rb20", "ROM-Bank System without menu" )
-	ROMX_LOAD( "os_rb20.rom",  0xf000, 0x1000, CRC(c783124d) SHA1(c2893ce5bb23b280ba4e982e860586d21de2469b), ROM_BIOS(2))
+	ROMX_LOAD( "os_rb20.rom",  0xf000, 0x1000, CRC(c783124d) SHA1(c2893ce5bb23b280ba4e982e860586d21de2469b), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "rb21", "ROM-Bank System with menu" )
-	ROMX_LOAD( "os_rb21.rom",  0xf000, 0x1000, CRC(11eec2dd) SHA1(5dbb661bdf4daf92d6c4ffbbdec674e57917e9eb), ROM_BIOS(3))
+	ROMX_LOAD( "os_rb21.rom",  0xf000, 0x1000, CRC(11eec2dd) SHA1(5dbb661bdf4daf92d6c4ffbbdec674e57917e9eb), ROM_BIOS(2))
 
 	ROM_LOAD( "basic_c0.87a", 0xc000, 0x2800, CRC(c508d45e) SHA1(ea85b53e21429c4cb85cdb81b92f278a8f4eb574))
 
@@ -289,11 +292,11 @@ ROM_END
 ROM_START( kc87_20 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "orig", "Original" )
-	ROMX_LOAD( "os____f0.87b", 0xf000, 0x1000, CRC(a357d093) SHA1(b1df6b499517c8366a0795030ee800e8a258e938), ROM_BIOS(1))
+	ROMX_LOAD( "os____f0.87b", 0xf000, 0x1000, CRC(a357d093) SHA1(b1df6b499517c8366a0795030ee800e8a258e938), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "rb20", "ROM-Bank System without menu" )
-	ROMX_LOAD( "os_rb20.rom",  0xf000, 0x1000, CRC(c783124d) SHA1(c2893ce5bb23b280ba4e982e860586d21de2469b), ROM_BIOS(2))
+	ROMX_LOAD( "os_rb20.rom",  0xf000, 0x1000, CRC(c783124d) SHA1(c2893ce5bb23b280ba4e982e860586d21de2469b), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "rb21", "ROM-Bank System with menu" )
-	ROMX_LOAD( "os_rb21.rom",  0xf000, 0x1000, CRC(11eec2dd) SHA1(5dbb661bdf4daf92d6c4ffbbdec674e57917e9eb), ROM_BIOS(3))
+	ROMX_LOAD( "os_rb21.rom",  0xf000, 0x1000, CRC(11eec2dd) SHA1(5dbb661bdf4daf92d6c4ffbbdec674e57917e9eb), ROM_BIOS(2))
 
 	ROM_LOAD( "basic_c0.87b", 0xc000, 0x2800, CRC(9e8f6380) SHA1(8ffecc64ba35c953c93738f8568c83dc6af1ae72))
 

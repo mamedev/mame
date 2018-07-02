@@ -315,12 +315,9 @@ GND  8A 8B GND
 
 class systeme_state : public driver_device
 {
-protected:
-	virtual void machine_start() override;
-
 public:
-	systeme_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	systeme_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vdp1(*this, "vdp1"),
 		m_vdp2(*this, "vdp2"),
@@ -328,18 +325,9 @@ public:
 		m_maincpu_region(*this, "maincpu"),
 		m_bank1(*this, "bank1"),
 		m_bank0d(*this, "bank0d"),
-		m_bank1d(*this, "bank1d") { }
-
-	DECLARE_WRITE8_MEMBER(bank_write);
-	DECLARE_WRITE8_MEMBER(coin_counters_write);
-
-	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
-	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
-
-	void init_opaopa();
-	void init_fantzn2();
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+		m_bank1d(*this, "bank1d"),
+		m_lamp(*this, "lamp0")
+	{ }
 
 	void systemex_315_5177(machine_config &config);
 	void systemex(machine_config &config);
@@ -347,13 +335,29 @@ public:
 	void hangonjr(machine_config &config);
 	void systeme(machine_config &config);
 	void systemeb(machine_config &config);
+
+	void init_opaopa();
+	void init_fantzn2();
+
+private:
+	DECLARE_WRITE8_MEMBER(bank_write);
+	DECLARE_WRITE8_MEMBER(coin_counters_write);
+
+	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
+	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
+
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void banked_decrypted_opcodes_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void io_map(address_map &map);
 	void systeme_map(address_map &map);
 	void vdp1_map(address_map &map);
 	void vdp2_map(address_map &map);
-private:
+
+	virtual void machine_start() override;
+
 	// Devices
 	required_device<cpu_device>          m_maincpu;
 	required_device<sega315_5124_device> m_vdp1;
@@ -364,6 +368,7 @@ private:
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
+	output_finder<> m_lamp;
 
 	// Analog input related
 	uint8_t m_port_select;
@@ -404,8 +409,8 @@ void systeme_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x7b, 0x7b).w("sn1", FUNC(segapsg_device::write));
-	map(0x7e, 0x7f).w("sn2", FUNC(segapsg_device::write));
+	map(0x7b, 0x7b).w("sn1", FUNC(segapsg_device::command_w));
+	map(0x7e, 0x7f).w("sn2", FUNC(segapsg_device::command_w));
 	map(0x7e, 0x7e).r(m_vdp1, FUNC(sega315_5124_device::vcount_read));
 	map(0xba, 0xba).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
 	map(0xbb, 0xbb).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
@@ -416,7 +421,7 @@ void systeme_state::io_map(address_map &map)
 	map(0xe2, 0xe2).portr("e2");
 	map(0xf2, 0xf2).portr("f2");
 	map(0xf3, 0xf3).portr("f3");
-	map(0xf7, 0xf7).w(this, FUNC(systeme_state::bank_write));
+	map(0xf7, 0xf7).w(FUNC(systeme_state::bank_write));
 	map(0xf8, 0xfb).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -447,12 +452,13 @@ WRITE8_MEMBER(systeme_state::coin_counters_write)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // only one counter used in most games?
-	machine().output().set_lamp_value(0, BIT(data, 2)); // used only by hangonjr?
+	m_lamp = BIT(data, 2); // used only by hangonjr?
 }
 
 
 void systeme_state::machine_start()
 {
+	m_lamp.resolve();
 	membank("vdp1_bank")->configure_entries(0, 2, m_vram[0], 0x4000);
 	membank("vdp2_bank")->configure_entries(0, 2, m_vram[1], 0x4000);
 	m_bank1->configure_entries(0, 16, m_maincpu_region->base() + 0x10000, 0x4000);

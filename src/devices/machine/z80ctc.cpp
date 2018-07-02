@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "z80ctc.h"
-#include "cpu/z80/z80daisy.h"
 
 
 
@@ -519,6 +518,7 @@ TIMER_CALLBACK_MEMBER(z80ctc_channel_device::timer_callback)
 	}
 
 	// generate the clock pulse
+	// FIXME: should only be cleared after one cycle of the channel input clock
 	m_device->m_zc_cb[m_index](1);
 	m_device->m_zc_cb[m_index](0);
 

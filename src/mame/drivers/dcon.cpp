@@ -43,13 +43,13 @@ void dcon_state::dcon_map(address_map &map)
 	map(0x00000, 0x7ffff).rom();
 	map(0x80000, 0x8bfff).ram();
 
-	map(0x8c000, 0x8c7ff).ram().w(this, FUNC(dcon_state::background_w)).share("back_data");
-	map(0x8c800, 0x8cfff).ram().w(this, FUNC(dcon_state::foreground_w)).share("fore_data");
-	map(0x8d000, 0x8d7ff).ram().w(this, FUNC(dcon_state::midground_w)).share("mid_data");
-	map(0x8d800, 0x8e7ff).ram().w(this, FUNC(dcon_state::text_w)).share("textram");
+	map(0x8c000, 0x8c7ff).ram().w(FUNC(dcon_state::background_w)).share("back_data");
+	map(0x8c800, 0x8cfff).ram().w(FUNC(dcon_state::foreground_w)).share("fore_data");
+	map(0x8d000, 0x8d7ff).ram().w(FUNC(dcon_state::midground_w)).share("mid_data");
+	map(0x8d800, 0x8e7ff).ram().w(FUNC(dcon_state::text_w)).share("textram");
 	map(0x8e800, 0x8f7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x8f800, 0x8ffff).ram().share("spriteram");
-	map(0x9d000, 0x9d7ff).w(this, FUNC(dcon_state::gfxbank_w));
+	map(0x9d000, 0x9d7ff).w(FUNC(dcon_state::gfxbank_w));
 
 	map(0xa0000, 0xa000d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0xc0000, 0xc004f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
@@ -63,7 +63,7 @@ void dcon_state::dcon_map(address_map &map)
 void dcon_state::sdgndmps_map(address_map &map)
 {
 	dcon_map(map);
-	map(0xa0000, 0xa000d).r(this, FUNC(dcon_state::sdgndmps_sound_comms_r)).umask16(0x00ff);
+	map(0xa0000, 0xa000d).r(FUNC(dcon_state::sdgndmps_sound_comms_r)).umask16(0x00ff);
 }
 
 /******************************************************************************/
@@ -255,7 +255,7 @@ static const gfx_layout dcon_tilelayout =
 	1024
 };
 
-static GFXDECODE_START( dcon )
+static GFXDECODE_START( gfx_dcon )
 	GFXDECODE_ENTRY( "gfx1", 0, dcon_charlayout,    1024+768, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, dcon_tilelayout,    1024+0,   16 )
 	GFXDECODE_ENTRY( "gfx3", 0, dcon_tilelayout,    1024+512, 16 )
@@ -284,6 +284,7 @@ MACHINE_CONFIG_START(dcon_state::dcon)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* Perhaps 14318180/4? */
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -298,7 +299,7 @@ MACHINE_CONFIG_START(dcon_state::dcon)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, dcon_state, layer_en_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, dcon_state, layer_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dcon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -328,6 +329,7 @@ MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -342,7 +344,7 @@ MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, dcon_state, layer_en_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, dcon_state, layer_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dcon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

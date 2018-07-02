@@ -9,6 +9,7 @@
 #include "video/315_5124.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
+#include "sound/sn76496.h"
 
 
 #define MCFG_SEGA315_5313_IS_PAL(_bool) \
@@ -50,21 +51,28 @@
 	downcast<sega315_5313_device &>(*device).set_md_32x_scanline_helper(sega315_5313_device::md_32x_scanline_helper_delegate(&_class::_method, #_class "::" #_method, this));
 
 
-class sega315_5313_device : public sega315_5124_device
+class sega315_5313_device : public sega315_5124_device, public device_mixer_interface
 {
 public:
+	template <typename T>
+	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: sega315_5313_device(mconfig, tag, owner, clock)
+	{
+		m_cpu68k.set_tag(std::forward<T>(cpu_tag));
+	}
+
+	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	typedef device_delegate<void (int x, uint32_t priority, uint16_t &lineptr)> md_32x_scanline_delegate;
 	typedef device_delegate<void (int scanline, int irq6)> md_32x_interrupt_delegate;
 	typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
-
-	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_sndirqline_callback(Object &&cb) { return m_sndirqline_callback.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_lv6irqline_callback(Object &&cb) { return m_lv6irqline_callback.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_lv4irqline_callback(Object &&cb) { return m_lv4irqline_callback.set_callback(std::forward<Object>(cb)); }
 	void set_alt_timing(int use_alt_timing) { m_use_alt_timing = use_alt_timing; }
 	void set_palwrite_base(int palwrite_base) { m_palwrite_base = palwrite_base; }
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	template <typename Object> void set_md_32x_scanline(Object &&cb) { m_32x_scanline_func = std::forward<Object>(cb); }
 	template <typename Object> void set_md_32x_interrupt(Object &&cb) { m_32x_interrupt_func = std::forward<Object>(cb); }
@@ -215,7 +223,8 @@ private:
 	std::unique_ptr<uint16_t[]> m_palette_lookup_highlight;
 
 	address_space *m_space68k;
-	m68000_base_device* m_cpu68k;
+	required_device<m68000_base_device> m_cpu68k;
+	required_device<sn76496_base_device> m_snsnd;
 };
 
 

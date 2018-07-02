@@ -37,8 +37,8 @@
 class elwro800_state : public spectrum_state
 {
 public:
-	elwro800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_state(mconfig, type, tag),
+	elwro800_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spectrum_state(mconfig, type, tag),
 		m_i8251(*this, "i8251"),
 		m_i8255(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
@@ -50,6 +50,9 @@ public:
 	{
 	}
 
+	void elwro800(machine_config &config);
+
+private:
 	/* for elwro800 */
 	/* RAM mapped at 0 */
 	uint8_t m_ram_at_0000;
@@ -67,13 +70,12 @@ public:
 	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
-	void elwro800(machine_config &config);
 	void elwro800_bank1(address_map &map);
 	void elwro800_bank2(address_map &map);
 	void elwro800_io(address_map &map);
 	void elwro800_m1(address_map &map);
 	void elwro800_mem(address_map &map);
-protected:
+
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;
 	required_device<centronics_device> m_centronics;
@@ -378,13 +380,13 @@ void elwro800_state::elwro800_mem(address_map &map)
 
 void elwro800_state::elwro800_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(elwro800_state::elwro800jr_io_r), FUNC(elwro800_state::elwro800jr_io_w));
+	map(0x0000, 0xffff).rw(FUNC(elwro800_state::elwro800jr_io_r), FUNC(elwro800_state::elwro800jr_io_w));
 }
 
 void elwro800_state::elwro800_m1(address_map &map)
 {
 	map(0x0000, 0x1fff).m(m_bank1, FUNC(address_map_bank_device::amap8));
-	map(0x0066, 0x0066).r(this, FUNC(elwro800_state::nmi_r));
+	map(0x0066, 0x0066).r(FUNC(elwro800_state::nmi_r));
 	map(0x2000, 0x3fff).m(m_bank2, FUNC(address_map_bank_device::amap8));
 	map(0x4000, 0xffff).bankrw("rambank3");
 }
@@ -561,7 +563,7 @@ static const gfx_layout elwro800_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( elwro800 )
+static GFXDECODE_START( gfx_elwro800 )
 	GFXDECODE_ENTRY( "maincpu", 0x3c00, elwro800_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -589,7 +591,7 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(elwro800_state, spectrum )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", elwro800)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_elwro800)
 
 	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum )
 
@@ -597,13 +599,13 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("JOY"))
-	MCFG_I8255_IN_PORTB_CB(READ8("cent_data_in", input_buffer_device, read))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTB_CB(READ8("cent_data_in", input_buffer_device, bus_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, elwro800_state, i8255_port_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, elwro800_state, i8255_port_c_w))
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, elwro800_state, write_centronics_ack))
 

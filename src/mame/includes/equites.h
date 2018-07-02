@@ -17,6 +17,7 @@
 #include "sound/samples.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"
+#include "emupal.h"
 #include "screen.h"
 
 

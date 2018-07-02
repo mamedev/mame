@@ -16,6 +16,14 @@
 #include "emu.h"
 #include "machine/pc_fdc.h"
 
+//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
+
+//#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+
 DEFINE_DEVICE_TYPE(PC_FDC_XT, pc_fdc_xt_device, "pc_fdc_xt", "PC FDC (XT)")
 DEFINE_DEVICE_TYPE(PC_FDC_AT, pc_fdc_at_device, "pc_fdc_at", "PC FDC (AT)")
 
@@ -26,10 +34,10 @@ void pc_fdc_family_device::map(address_map &map)
 // The schematics show address decoding is minimal
 void pc_fdc_xt_device::map(address_map &map)
 {
-	map(0x0, 0x0).r("upd765", FUNC(upd765a_device::msr_r)).w(this, FUNC(pc_fdc_xt_device::dor_w));
-	map(0x1, 0x1).r("upd765", FUNC(upd765a_device::fifo_r)).w(this, FUNC(pc_fdc_xt_device::dor_fifo_w));
-	map(0x2, 0x2).w(this, FUNC(pc_fdc_xt_device::dor_w));
-	map(0x3, 0x3).w(this, FUNC(pc_fdc_xt_device::dor_w));
+	map(0x0, 0x0).r("upd765", FUNC(upd765a_device::msr_r)).w(FUNC(pc_fdc_xt_device::dor_w));
+	map(0x1, 0x1).r("upd765", FUNC(upd765a_device::fifo_r)).w(FUNC(pc_fdc_xt_device::dor_fifo_w));
+	map(0x2, 0x2).w(FUNC(pc_fdc_xt_device::dor_w));
+	map(0x3, 0x3).w(FUNC(pc_fdc_xt_device::dor_w));
 	map(0x4, 0x5).m("upd765", FUNC(upd765a_device::map));
 }
 
@@ -37,9 +45,9 @@ void pc_fdc_xt_device::map(address_map &map)
 // Decoding is through a PAL, so presumably complete
 void pc_fdc_at_device::map(address_map &map)
 {
-	map(0x2, 0x2).rw(this, FUNC(pc_fdc_at_device::dor_r), FUNC(pc_fdc_at_device::dor_w));
+	map(0x2, 0x2).rw(FUNC(pc_fdc_at_device::dor_r), FUNC(pc_fdc_at_device::dor_w));
 	map(0x4, 0x5).m("upd765", FUNC(upd765a_device::map));
-	map(0x7, 0x7).rw(this, FUNC(pc_fdc_at_device::dir_r), FUNC(pc_fdc_at_device::ccr_w));
+	map(0x7, 0x7).rw(FUNC(pc_fdc_at_device::dir_r), FUNC(pc_fdc_at_device::ccr_w));
 }
 
 pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
@@ -101,7 +109,7 @@ void pc_fdc_family_device::device_reset()
 
 WRITE8_MEMBER( pc_fdc_family_device::dor_w )
 {
-	logerror("%s: dor = %02x\n", tag(), data);
+	LOG("dor = %02x\n", data);
 	uint8_t pdor = dor;
 	dor = data;
 
@@ -134,7 +142,7 @@ READ8_MEMBER( pc_fdc_family_device::dir_r )
 WRITE8_MEMBER( pc_fdc_family_device::ccr_w )
 {
 	static const int rates[4] = { 500000, 300000, 250000, 1000000 };
-	logerror("%s: ccr = %02x\n", tag(), data);
+	LOG("ccr = %02x\n", data);
 	fdc->set_rate(rates[data & 3]);
 }
 
@@ -168,7 +176,7 @@ void pc_fdc_family_device::check_irq()
 	bool pirq = irq;
 	irq = fdc_irq && (dor & 4) && (dor & 8);
 	if(irq != pirq && !intrq_cb.isnull()) {
-		logerror("%s: pc_irq = %d\n", tag(), irq);
+		LOG("pc_irq = %d\n", irq);
 		intrq_cb(irq);
 	}
 }

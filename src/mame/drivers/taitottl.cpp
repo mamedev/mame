@@ -40,7 +40,6 @@
  Speed Race Twin (04/1976)                                                          UNKNOWN
  Speed Race GP-5 (03/1980)                                                          UNKNOWN
  Super Block (02/1978)                                                              UNKNOWN
- Super High-Way (10/1977)?                                                          UNKNOWN
  Super Speed Race (12/1977)                                                         UNKNOWN
  Super Speed Race V (07/1978)                                                       UNKNOWN
  Super Speed Race GP-V (??/1980)                                                    UNKNOWN
@@ -95,21 +94,18 @@ public:
 	{
 	}
 
+	void taitottl(machine_config &config);
+
+private:
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-
-	void taitottl(machine_config &config);
-protected:
-
+	
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-
-private:
-
 };
 
 

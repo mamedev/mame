@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER(starshp1_state::mux_w)
 
 WRITE_LINE_MEMBER(starshp1_state::led_w)
 {
-	output().set_led_value(0, !state);
+	m_led = state ? 0 : 1;
 }
 
 
@@ -161,20 +161,26 @@ void starshp1_state::starshp1_map(address_map &map)
 	map(0x2c00, 0x3fff).rom();
 	map(0xa000, 0xa000).portr("SYSTEM");
 	map(0xb000, 0xb000).portr("VBLANK");
-	map(0xc300, 0xc3ff).w(this, FUNC(starshp1_state::starshp1_sspic_w)); /* spaceship picture */
+	map(0xc300, 0xc3ff).w(FUNC(starshp1_state::starshp1_sspic_w)); /* spaceship picture */
 	map(0xc400, 0xc400).portr("COINAGE");
-	map(0xc400, 0xc4ff).w(this, FUNC(starshp1_state::starshp1_ssadd_w)); /* spaceship address */
-	map(0xc800, 0xc9ff).ram().w(this, FUNC(starshp1_state::starshp1_playfield_w)).share("playfield_ram");
+	map(0xc400, 0xc4ff).w(FUNC(starshp1_state::starshp1_ssadd_w)); /* spaceship address */
+	map(0xc800, 0xc9ff).ram().w(FUNC(starshp1_state::starshp1_playfield_w)).share("playfield_ram");
 	map(0xcc00, 0xcc0f).writeonly().share("hpos_ram");
 	map(0xd000, 0xd00f).writeonly().share("vpos_ram");
 	map(0xd400, 0xd40f).writeonly().share("obj_ram");
-	map(0xd800, 0xd800).r(this, FUNC(starshp1_state::starshp1_rng_r));
-	map(0xd800, 0xd80f).w(this, FUNC(starshp1_state::starshp1_collision_reset_w));
+	map(0xd800, 0xd800).r(FUNC(starshp1_state::starshp1_rng_r));
+	map(0xd800, 0xd80f).w(FUNC(starshp1_state::starshp1_collision_reset_w));
 	map(0xdc00, 0xdc07).mirror(0x0008).w("misclatch", FUNC(f9334_device::write_d0));
-	map(0xdd00, 0xdd0f).w(this, FUNC(starshp1_state::starshp1_analog_in_w));
+	map(0xdd00, 0xdd0f).w(FUNC(starshp1_state::starshp1_analog_in_w));
 	map(0xde00, 0xde07).mirror(0x0008).w("audiolatch", FUNC(f9334_device::write_d0));
-	map(0xdf00, 0xdf0f).w(this, FUNC(starshp1_state::starshp1_analog_out_w));
+	map(0xdf00, 0xdf0f).w(FUNC(starshp1_state::starshp1_analog_out_w));
 	map(0xf000, 0xffff).rom();
+}
+
+
+void starshp1_state::machine_start()
+{
+	m_led.resolve();
 }
 
 
@@ -281,7 +287,7 @@ static const gfx_layout shiplayout =
 };
 
 
-static GFXDECODE_START( starshp1 )
+static GFXDECODE_START( gfx_starshp1 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 2, 2 )
 	GFXDECODE_ENTRY( "gfx3", 0, shiplayout,   6, 2 )
@@ -315,7 +321,7 @@ MACHINE_CONFIG_START(starshp1_state::starshp1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, starshp1_state, screen_vblank_starshp1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", starshp1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_starshp1)
 	MCFG_PALETTE_ADD("palette", 19)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(starshp1_state, starshp1)

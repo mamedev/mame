@@ -33,6 +33,7 @@ ToDo: (both)
 #include "bus/rs232/rs232.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MCM6571AP_TAG   "vid125_6c"
@@ -53,11 +54,13 @@ public:
 		, m_acia1(*this, "acia1")
 	{ }
 
+	void jupiter2(machine_config &config);
+
 	void init_jupiter2();
 
-	void jupiter2(machine_config &config);
-	void jupiter2_mem(address_map &map);
 private:
+	void jupiter2_mem(address_map &map);
+
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia0;
@@ -74,18 +77,21 @@ public:
 		, m_p_ram(*this, "ram")
 		, m_p_chargen(*this, "chargen")
 	{ }
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	void jupiter3(machine_config &config);
+		
 	void init_jupiter3();
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(ff_r);
 
-	void jupiter3(machine_config &config);
 	void jupiter3_io(address_map &map);
 	void jupiter3_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -149,9 +155,9 @@ void jupiter3_state::jupiter3_mem(address_map &map)
 void jupiter3_state::jupiter3_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xa1, 0xa4).r(this, FUNC(jupiter3_state::ff_r));
-	map(0xb0, 0xb0).r(this, FUNC(jupiter3_state::status_r));
-	map(0xb2, 0xb2).r(this, FUNC(jupiter3_state::key_r));
+	map(0xa1, 0xa4).r(FUNC(jupiter3_state::ff_r));
+	map(0xb0, 0xb0).r(FUNC(jupiter3_state::status_r));
+	map(0xb2, 0xb2).r(FUNC(jupiter3_state::key_r));
 }
 
 READ8_MEMBER( jupiter3_state::ff_r )
@@ -431,6 +437,6 @@ void jupiter3_state::init_jupiter3()
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT        COMPANY      FULLNAME       FLAGS
-COMP( 1976, jupiter2, 0,      0,      jupiter2, jupiter, jupiter2_state, empty_init, "Wave Mate", "Jupiter II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1976, jupiter3, 0,      0,      jupiter3, jupiter, jupiter3_state, empty_init, "Wave Mate", "Jupiter III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT           COMPANY      FULLNAME       FLAGS
+COMP( 1976, jupiter2, 0,      0,      jupiter2, jupiter, jupiter2_state, init_jupiter2, "Wave Mate", "Jupiter II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1976, jupiter3, 0,      0,      jupiter3, jupiter, jupiter3_state, init_jupiter3, "Wave Mate", "Jupiter III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

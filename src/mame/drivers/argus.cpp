@@ -35,6 +35,7 @@ System specs :
              Text   : 256 colors
    Others : Brightness controller  (Emulated)
             Half transparent color (Not emulated)
+   Reference : https://youtu.be/aSgRfAgd7yU
 
  Valtric
  ---------------------------------------------------------------
@@ -190,16 +191,16 @@ void argus_state::argus_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
 	map(0xc200, 0xc200).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc201, 0xc201).w(this, FUNC(argus_state::flipscreen_w));
-	map(0xc202, 0xc202).w(this, FUNC(argus_state::bankselect_w));
+	map(0xc201, 0xc201).w(FUNC(argus_state::flipscreen_w));
+	map(0xc202, 0xc202).w(FUNC(argus_state::bankselect_w));
 	map(0xc300, 0xc301).ram().share("bg0_scrollx");
 	map(0xc302, 0xc303).ram().share("bg0_scrolly");
 	map(0xc308, 0xc309).ram().share("bg1_scrollx");
 	map(0xc30a, 0xc30b).ram().share("bg1_scrolly");
-	map(0xc30c, 0xc30c).w(this, FUNC(argus_state::argus_bg_status_w));
-	map(0xc400, 0xcfff).ram().w(this, FUNC(argus_state::argus_paletteram_w)).share("paletteram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(argus_state::txram_w)).share("txram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(argus_state::bg1ram_w)).share("bg1ram");
+	map(0xc30c, 0xc30c).w(FUNC(argus_state::argus_bg_status_w));
+	map(0xc400, 0xcfff).ram().w(FUNC(argus_state::argus_paletteram_w)).share("paletteram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(argus_state::txram_w)).share("txram");
+	map(0xd800, 0xdfff).ram().w(FUNC(argus_state::bg1ram_w)).share("bg1ram");
 	map(0xe000, 0xf1ff).ram();
 	map(0xf200, 0xf7ff).ram().share("spriteram");
 	map(0xf800, 0xffff).ram();
@@ -215,16 +216,16 @@ void argus_state::valtric_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
 	map(0xc200, 0xc200).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc201, 0xc201).w(this, FUNC(argus_state::flipscreen_w));
-	map(0xc202, 0xc202).w(this, FUNC(argus_state::bankselect_w));
-	map(0xc300, 0xc300).w(this, FUNC(argus_state::valtric_unknown_w));
+	map(0xc201, 0xc201).w(FUNC(argus_state::flipscreen_w));
+	map(0xc202, 0xc202).w(FUNC(argus_state::bankselect_w));
+	map(0xc300, 0xc300).w(FUNC(argus_state::valtric_unknown_w));
 	map(0xc308, 0xc309).ram().share("bg1_scrollx");
 	map(0xc30a, 0xc30b).ram().share("bg1_scrolly");
-	map(0xc30c, 0xc30c).w(this, FUNC(argus_state::valtric_bg_status_w));
-	map(0xc30d, 0xc30d).w(this, FUNC(argus_state::valtric_mosaic_w));
-	map(0xc400, 0xcfff).ram().w(this, FUNC(argus_state::valtric_paletteram_w)).share("paletteram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(argus_state::txram_w)).share("txram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(argus_state::bg1ram_w)).share("bg1ram");
+	map(0xc30c, 0xc30c).w(FUNC(argus_state::valtric_bg_status_w));
+	map(0xc30d, 0xc30d).w(FUNC(argus_state::valtric_mosaic_w));
+	map(0xc400, 0xcfff).ram().w(FUNC(argus_state::valtric_paletteram_w)).share("paletteram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(argus_state::txram_w)).share("txram");
+	map(0xd800, 0xdfff).ram().w(FUNC(argus_state::bg1ram_w)).share("bg1ram");
 	map(0xe000, 0xf1ff).ram();
 	map(0xf200, 0xf7ff).ram().share("spriteram");
 	map(0xf800, 0xffff).ram();
@@ -239,20 +240,20 @@ void argus_state::butasan_map(address_map &map)
 	map(0xc002, 0xc002).portr("P2");
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
-	map(0xc100, 0xc100).w(this, FUNC(argus_state::butasan_unknown_w));
+	map(0xc100, 0xc100).w(FUNC(argus_state::butasan_unknown_w));
 	map(0xc200, 0xc200).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc201, 0xc201).w(this, FUNC(argus_state::flipscreen_w));
-	map(0xc202, 0xc202).w(this, FUNC(argus_state::bankselect_w));
-	map(0xc203, 0xc203).w(this, FUNC(argus_state::butasan_pageselect_w));
+	map(0xc201, 0xc201).w(FUNC(argus_state::flipscreen_w));
+	map(0xc202, 0xc202).w(FUNC(argus_state::bankselect_w));
+	map(0xc203, 0xc203).w(FUNC(argus_state::butasan_pageselect_w));
 	map(0xc300, 0xc301).ram().share("bg0_scrollx");
 	map(0xc302, 0xc303).ram().share("bg0_scrolly");
-	map(0xc304, 0xc304).w(this, FUNC(argus_state::butasan_bg0_status_w));
+	map(0xc304, 0xc304).w(FUNC(argus_state::butasan_bg0_status_w));
 	map(0xc308, 0xc309).ram().share("bg1_scrollx");
 	map(0xc30a, 0xc30b).ram().share("bg1_scrolly");
-	map(0xc30c, 0xc30c).w(this, FUNC(argus_state::butasan_bg1_status_w));
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(argus_state::butasan_bg1ram_w)).share("butasan_bg1ram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(argus_state::butasan_paletteram_w)).share("paletteram");
-	map(0xd000, 0xdfff).rw(this, FUNC(argus_state::butasan_pagedram_r), FUNC(argus_state::butasan_pagedram_w));
+	map(0xc30c, 0xc30c).w(FUNC(argus_state::butasan_bg1_status_w));
+	map(0xc400, 0xc7ff).ram().w(FUNC(argus_state::butasan_bg1ram_w)).share("butasan_bg1ram");
+	map(0xc800, 0xcfff).ram().w(FUNC(argus_state::butasan_paletteram_w)).share("paletteram");
+	map(0xd000, 0xdfff).rw(FUNC(argus_state::butasan_pagedram_r), FUNC(argus_state::butasan_pagedram_w));
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xf67f).ram().share("spriteram");
 	map(0xf680, 0xffff).ram();
@@ -461,20 +462,20 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( argus )
+static GFXDECODE_START( gfx_argus )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  8*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 24*16, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, charlayout, 40*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( valtric )
+static GFXDECODE_START( gfx_valtric )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout, 32*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( butasan )
+static GFXDECODE_START( gfx_butasan )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 12*16, 16 )
@@ -503,7 +504,7 @@ MACHINE_CONFIG_START(argus_state::argus)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_argus)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", argus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_argus)
 	MCFG_PALETTE_ADD("palette", 896)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
@@ -545,7 +546,7 @@ MACHINE_CONFIG_START(argus_state::valtric)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_valtric)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", valtric)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_valtric)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
@@ -593,7 +594,7 @@ MACHINE_CONFIG_START(argus_state::butasan)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_butasan)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", butasan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_butasan)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)

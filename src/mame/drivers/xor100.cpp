@@ -157,12 +157,6 @@ READ8_MEMBER( xor100_state::prom_disable_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( xor100_state::baud_w )
-{
-	m_dbrg->str_w(data & 0x0f);
-	m_dbrg->stt_w(data >> 4);
-}
-
 READ8_MEMBER( xor100_state::fdc_r )
 {
 	return m_fdc->gen_r(offset) ^ 0xff;
@@ -277,14 +271,14 @@ void xor100_state::xor100_io(address_map &map)
 	map(0x02, 0x02).rw(m_uart_b, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x03, 0x03).rw(m_uart_b, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x04, 0x07).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x08, 0x08).w(this, FUNC(xor100_state::mmu_w));
-	map(0x09, 0x09).w(this, FUNC(xor100_state::prom_toggle_w));
-	map(0x0a, 0x0a).r(this, FUNC(xor100_state::prom_disable_r));
-	map(0x0b, 0x0b).portr("DSW0").w(this, FUNC(xor100_state::baud_w));
+	map(0x08, 0x08).w(FUNC(xor100_state::mmu_w));
+	map(0x09, 0x09).w(FUNC(xor100_state::prom_toggle_w));
+	map(0x0a, 0x0a).r(FUNC(xor100_state::prom_disable_r));
+	map(0x0b, 0x0b).portr("DSW0").w(COM5016_TAG, FUNC(com8116_device::stt_str_w));
 	map(0x0c, 0x0f).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0xf8, 0xfb).rw(this, FUNC(xor100_state::fdc_r), FUNC(xor100_state::fdc_w));
-	map(0xfc, 0xfc).rw(this, FUNC(xor100_state::fdc_wait_r), FUNC(xor100_state::fdc_dcont_w));
-	map(0xfd, 0xfd).w(this, FUNC(xor100_state::fdc_dsel_w));
+	map(0xf8, 0xfb).rw(FUNC(xor100_state::fdc_r), FUNC(xor100_state::fdc_w));
+	map(0xfc, 0xfc).rw(FUNC(xor100_state::fdc_wait_r), FUNC(xor100_state::fdc_dcont_w));
+	map(0xfd, 0xfd).w(FUNC(xor100_state::fdc_dsel_w));
 }
 
 /* Input Ports */
@@ -509,12 +503,12 @@ void xor100_state::post_load()
 
 MACHINE_CONFIG_START(xor100_state::xor100)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 8_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(xor100_mem)
 	MCFG_DEVICE_IO_MAP(xor100_io)
 
 	/* devices */
-	MCFG_DEVICE_ADD(I8251_A_TAG, I8251, 0/*XTAL(8'000'000)/2,*/)
+	MCFG_DEVICE_ADD(I8251_A_TAG, I8251, 0/*8_MHz_XTAL / 2,*/)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -523,7 +517,7 @@ MACHINE_CONFIG_START(xor100_state::xor100)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_A_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_A_TAG, i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD(I8251_B_TAG, I8251, 0/*XTAL(8'000'000)/2,*/)
+	MCFG_DEVICE_ADD(I8251_B_TAG, I8251, 0/*8_MHz_XTAL / 2,*/)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
@@ -534,30 +528,30 @@ MACHINE_CONFIG_START(xor100_state::xor100)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251_B_TAG, i8251_device, write_cts))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD(COM5016_TAG, COM8116, XTAL(5'068'800))
+	MCFG_DEVICE_ADD(COM5016_TAG, COM8116, 5.0688_MHz_XTAL)
 	MCFG_COM8116_FR_HANDLER(WRITELINE(I8251_A_TAG, i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251_A_TAG, i8251_device, write_rxc))
 	MCFG_COM8116_FT_HANDLER(WRITELINE(I8251_B_TAG, i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251_B_TAG, i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITELINE(m_centronics, centronics_device, write_strobe))
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, xor100_state, i8255_pc_r))
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 8_MHz_XTAL / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, xor100_state, ctc_z0_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, xor100_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, xor100_state, ctc_z2_w))
 
-	MCFG_FD1795_ADD(WD1795_TAG, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD(WD1795_TAG, FD1795, 8_MHz_XTAL / 4)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":0", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":1", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":2", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":3", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(I8255A_TAG, i8255_device, pc4_w))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, xor100_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, xor100_state, write_centronics_select))
@@ -565,7 +559,7 @@ MACHINE_CONFIG_START(xor100_state::xor100)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// S-100
-	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, 8_MHz_XTAL / 4)
 	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
 	MCFG_S100_SLOT_ADD(S100_TAG ":1", xor100_s100_cards, nullptr)
 	MCFG_S100_SLOT_ADD(S100_TAG ":2", xor100_s100_cards, nullptr)
@@ -589,7 +583,7 @@ MACHINE_CONFIG_END
 ROM_START( xor100 )
 	ROM_REGION( 0x800, Z80_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "v185", "v1.85" )
-	ROMX_LOAD( "xp 185.8b", 0x000, 0x800, CRC(0d0bda8d) SHA1(11c83f7cd7e6a570641b44a2f2cc5737a7dd8ae3), ROM_BIOS(1) )
+	ROMX_LOAD( "xp 185.8b", 0x000, 0x800, CRC(0d0bda8d) SHA1(11c83f7cd7e6a570641b44a2f2cc5737a7dd8ae3), ROM_BIOS(0) )
 ROM_END
 
 /* System Drivers */

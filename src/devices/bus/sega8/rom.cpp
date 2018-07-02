@@ -715,7 +715,7 @@ WRITE8_MEMBER(sega8_eeprom_device::write_mapper)
 }
 
 MACHINE_CONFIG_START(sega8_eeprom_device::device_add_mconfig)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 

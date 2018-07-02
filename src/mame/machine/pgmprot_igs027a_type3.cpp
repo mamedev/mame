@@ -133,9 +133,9 @@ void pgm_arm_type3_state::svg_68k_mem(address_map &map)
 	pgm_mem(map);
 	map(0x100000, 0x1fffff).bankr("bank1");  /* Game ROM */
 
-	map(0x500000, 0x50ffff).rw(this, FUNC(pgm_arm_type3_state::svg_m68k_ram_r), FUNC(pgm_arm_type3_state::svg_m68k_ram_w));    /* ARM7 Shared RAM */
-	map(0x5c0000, 0x5c0001).rw(this, FUNC(pgm_arm_type3_state::svg_68k_nmi_r), FUNC(pgm_arm_type3_state::svg_68k_nmi_w));      /* ARM7 FIQ */
-	map(0x5c0300, 0x5c0301).rw(this, FUNC(pgm_arm_type3_state::svg_latch_68k_r), FUNC(pgm_arm_type3_state::svg_latch_68k_w)); /* ARM7 Latch */
+	map(0x500000, 0x50ffff).rw(FUNC(pgm_arm_type3_state::svg_m68k_ram_r), FUNC(pgm_arm_type3_state::svg_m68k_ram_w));    /* ARM7 Shared RAM */
+	map(0x5c0000, 0x5c0001).rw(FUNC(pgm_arm_type3_state::svg_68k_nmi_r), FUNC(pgm_arm_type3_state::svg_68k_nmi_w));      /* ARM7 FIQ */
+	map(0x5c0300, 0x5c0301).rw(FUNC(pgm_arm_type3_state::svg_latch_68k_r), FUNC(pgm_arm_type3_state::svg_latch_68k_w)); /* ARM7 Latch */
 }
 
 
@@ -145,9 +145,9 @@ void pgm_arm_type3_state::_55857G_arm7_map(address_map &map)
 	map(0x08000000, 0x087fffff).rom().region("user1", 0);
 	map(0x10000000, 0x100003ff).ram().share("arm_ram2");
 	map(0x18000000, 0x1803ffff).ram().share("arm_ram");
-	map(0x38000000, 0x3800ffff).rw(this, FUNC(pgm_arm_type3_state::svg_arm7_shareram_r), FUNC(pgm_arm_type3_state::svg_arm7_shareram_w));
-	map(0x48000000, 0x48000003).rw(this, FUNC(pgm_arm_type3_state::svg_latch_arm_r), FUNC(pgm_arm_type3_state::svg_latch_arm_w)); /* 68k Latch */
-	map(0x40000018, 0x4000001b).w(this, FUNC(pgm_arm_type3_state::svg_arm7_ram_sel_w)); /* RAM SEL */
+	map(0x38000000, 0x3800ffff).rw(FUNC(pgm_arm_type3_state::svg_arm7_shareram_r), FUNC(pgm_arm_type3_state::svg_arm7_shareram_w));
+	map(0x48000000, 0x48000003).rw(FUNC(pgm_arm_type3_state::svg_latch_arm_r), FUNC(pgm_arm_type3_state::svg_latch_arm_w)); /* 68k Latch */
+	map(0x40000018, 0x4000001b).w(FUNC(pgm_arm_type3_state::svg_arm7_ram_sel_w)); /* RAM SEL */
 	map(0x50000000, 0x500003ff).ram();
 }
 
@@ -214,8 +214,8 @@ void pgm_arm_type3_state::svg_basic_init()
 	m_svg_shareram[1] = std::make_unique<uint32_t[]>(0x20000 / 4);
 	m_svg_ram_sel = 0;
 
-	save_pointer(NAME(m_svg_shareram[0].get()), 0x20000 / 4);
-	save_pointer(NAME(m_svg_shareram[1].get()), 0x20000 / 4);
+	save_pointer(NAME(m_svg_shareram[0]), 0x20000 / 4);
+	save_pointer(NAME(m_svg_shareram[1]), 0x20000 / 4);
 	save_item(NAME(m_svg_ram_sel));
 }
 

@@ -32,6 +32,7 @@ http://www.dragons-lair-project.com/tech/pages/dl2.asp
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -46,6 +47,9 @@ public:
 	{
 	}
 
+	void dlair2(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
@@ -55,10 +59,9 @@ public:
 	INTERRUPT_GEN_MEMBER(dlair2_timer_irq);
 	DECLARE_PALETTE_INIT(dlair2);
 
-	void dlair2(machine_config &config);
 	void dlair2_io(address_map &map);
 	void dlair2_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -158,7 +161,7 @@ static const gfx_layout charlayout =
     8*8
 };
 
-static GFXDECODE_START( dlair2 )
+static GFXDECODE_START( gfx_dlair2 )
     GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 */
@@ -197,7 +200,7 @@ MACHINE_CONFIG_START(dlair2_state::dlair2)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", dlair2)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dlair2)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(dlair2_state, dlair2)

@@ -200,8 +200,8 @@ WRITE8_MEMBER(sidepckt_state::i8751_w)
 void sidepckt_state::sidepckt_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x13ff).mirror(0x400).ram().w(this, FUNC(sidepckt_state::videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).mirror(0x400).ram().w(this, FUNC(sidepckt_state::colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).mirror(0x400).ram().w(FUNC(sidepckt_state::videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).mirror(0x400).ram().w(FUNC(sidepckt_state::colorram_w)).share("colorram");
 	map(0x2000, 0x20ff).ram().share("spriteram");
 	map(0x2100, 0x24ff).nopw(); // ??? (Unused spriteram? The game writes some values at boot, but never read)
 	map(0x3000, 0x3000).portr("P1");
@@ -209,9 +209,9 @@ void sidepckt_state::sidepckt_map(address_map &map)
 	map(0x3002, 0x3002).portr("DSW1");
 	map(0x3003, 0x3003).portr("DSW2");
 	map(0x3004, 0x3004).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x300c, 0x300c).rw(this, FUNC(sidepckt_state::scroll_y_r), FUNC(sidepckt_state::scroll_y_w));
-	map(0x3014, 0x3014).r(this, FUNC(sidepckt_state::i8751_r));
-	map(0x3018, 0x3018).w(this, FUNC(sidepckt_state::i8751_w));
+	map(0x300c, 0x300c).rw(FUNC(sidepckt_state::scroll_y_r), FUNC(sidepckt_state::scroll_y_w));
+	map(0x3014, 0x3014).r(FUNC(sidepckt_state::i8751_r));
+	map(0x3018, 0x3018).w(FUNC(sidepckt_state::i8751_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -353,7 +353,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( sidepckt )
+static GFXDECODE_START( gfx_sidepckt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   128,  4 ) /* colors 128-159 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 ) /* colors   0-127 */
 GFXDECODE_END
@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sidepckt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sidepckt)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(sidepckt_state, sidepckt)
 

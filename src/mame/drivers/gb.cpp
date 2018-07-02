@@ -406,80 +406,78 @@ WRITE8_MEMBER(megaduck_state::bank2_w)
 void gb_state::gameboy_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).rw(this, FUNC(gb_state::gb_cart_r), FUNC(gb_state::gb_bank_w));
+	map(0x0000, 0x7fff).rw(FUNC(gb_state::gb_cart_r), FUNC(gb_state::gb_bank_w));
 	map(0x8000, 0x9fff).rw(m_ppu, FUNC(dmg_ppu_device::vram_r), FUNC(dmg_ppu_device::vram_w));          /* 8k VRAM */
-	map(0xa000, 0xbfff).rw(this, FUNC(gb_state::gb_ram_r), FUNC(gb_state::gb_ram_w));                                /* 8k switched RAM bank (cartridge) */
+	map(0xa000, 0xbfff).rw(FUNC(gb_state::gb_ram_r), FUNC(gb_state::gb_ram_w));                                /* 8k switched RAM bank (cartridge) */
 	map(0xc000, 0xdfff).ram();                                                          /* 8k low RAM */
-	map(0xe000, 0xfdff).rw(this, FUNC(gb_state::gb_echo_r), FUNC(gb_state::gb_echo_w));
+	map(0xe000, 0xfdff).rw(FUNC(gb_state::gb_echo_r), FUNC(gb_state::gb_echo_w));
 	map(0xfe00, 0xfeff).rw(m_ppu, FUNC(dmg_ppu_device::oam_r), FUNC(dmg_ppu_device::oam_w));            /* OAM RAM */
-	map(0xff00, 0xff0f).rw(this, FUNC(gb_state::gb_io_r), FUNC(gb_state::gb_io_w));                                  /* I/O */
+	map(0xff00, 0xff0f).rw(FUNC(gb_state::gb_io_r), FUNC(gb_state::gb_io_w));                                  /* I/O */
 	map(0xff10, 0xff26).rw(m_apu, FUNC(gameboy_sound_device::sound_r), FUNC(gameboy_sound_device::sound_w));  /* sound registers */
 	map(0xff27, 0xff2f).noprw();                                                          /* unused */
 	map(0xff30, 0xff3f).rw(m_apu, FUNC(gameboy_sound_device::wave_r), FUNC(gameboy_sound_device::wave_w));    /* Wave ram */
-	map(0xff40, 0xff7f).r(m_ppu, FUNC(dmg_ppu_device::video_r)).w(this, FUNC(gb_state::gb_io2_w));   /* Video controller & BIOS flip-flop */
+	map(0xff40, 0xff7f).r(m_ppu, FUNC(dmg_ppu_device::video_r)).w(FUNC(gb_state::gb_io2_w));   /* Video controller & BIOS flip-flop */
 	map(0xff80, 0xfffe).ram();                                                          /* High RAM */
-	map(0xffff, 0xffff).rw(this, FUNC(gb_state::gb_ie_r), FUNC(gb_state::gb_ie_w));                                  /* Interrupt enable register */
+	map(0xffff, 0xffff).rw(FUNC(gb_state::gb_ie_r), FUNC(gb_state::gb_ie_w));                                  /* Interrupt enable register */
 }
 
 void gb_state::sgb_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).rw(this, FUNC(gb_state::gb_cart_r), FUNC(gb_state::gb_bank_w));
+	map(0x0000, 0x7fff).rw(FUNC(gb_state::gb_cart_r), FUNC(gb_state::gb_bank_w));
 	map(0x8000, 0x9fff).rw(m_ppu, FUNC(sgb_ppu_device::vram_r), FUNC(sgb_ppu_device::vram_w));          /* 8k VRAM */
-	map(0xa000, 0xbfff).rw(this, FUNC(gb_state::gb_ram_r), FUNC(gb_state::gb_ram_w));                                /* 8k switched RAM bank (cartridge) */
+	map(0xa000, 0xbfff).rw(FUNC(gb_state::gb_ram_r), FUNC(gb_state::gb_ram_w));                                /* 8k switched RAM bank (cartridge) */
 	map(0xc000, 0xdfff).ram();                                                          /* 8k low RAM */
-	map(0xe000, 0xfdff).rw(this, FUNC(gb_state::gb_echo_r), FUNC(gb_state::gb_echo_w));
+	map(0xe000, 0xfdff).rw(FUNC(gb_state::gb_echo_r), FUNC(gb_state::gb_echo_w));
 	map(0xfe00, 0xfeff).rw(m_ppu, FUNC(sgb_ppu_device::oam_r), FUNC(sgb_ppu_device::oam_w));            /* OAM RAM */
-	map(0xff00, 0xff0f).rw(this, FUNC(gb_state::gb_io_r), FUNC(gb_state::sgb_io_w));                                 /* I/O */
+	map(0xff00, 0xff0f).rw(FUNC(gb_state::gb_io_r), FUNC(gb_state::sgb_io_w));                                 /* I/O */
 	map(0xff10, 0xff26).rw(m_apu, FUNC(gameboy_sound_device::sound_r), FUNC(gameboy_sound_device::sound_w));  /* sound registers */
 	map(0xff27, 0xff2f).noprw();                                                          /* unused */
 	map(0xff30, 0xff3f).rw(m_apu, FUNC(gameboy_sound_device::wave_r), FUNC(gameboy_sound_device::wave_w));    /* Wave RAM */
-	map(0xff40, 0xff7f).r(m_ppu, FUNC(sgb_ppu_device::video_r)).w(this, FUNC(gb_state::gb_io2_w));   /* Video controller & BIOS flip-flop */
+	map(0xff40, 0xff7f).r(m_ppu, FUNC(sgb_ppu_device::video_r)).w(FUNC(gb_state::gb_io2_w));   /* Video controller & BIOS flip-flop */
 	map(0xff80, 0xfffe).ram();                                                          /* High RAM */
-	map(0xffff, 0xffff).rw(this, FUNC(gb_state::gb_ie_r), FUNC(gb_state::gb_ie_w));                                  /* Interrupt enable register */
+	map(0xffff, 0xffff).rw(FUNC(gb_state::gb_ie_r), FUNC(gb_state::gb_ie_w));                                  /* Interrupt enable register */
 }
 
 void gb_state::gbc_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).rw(this, FUNC(gb_state::gbc_cart_r), FUNC(gb_state::gb_bank_w));
+	map(0x0000, 0x7fff).rw(FUNC(gb_state::gbc_cart_r), FUNC(gb_state::gb_bank_w));
 	map(0x8000, 0x9fff).rw(m_ppu, FUNC(cgb_ppu_device::vram_r), FUNC(cgb_ppu_device::vram_w));          /* 8k banked VRAM */
-	map(0xa000, 0xbfff).rw(this, FUNC(gb_state::gb_ram_r), FUNC(gb_state::gb_ram_w));                                /* 8k switched RAM bank (cartridge) */
+	map(0xa000, 0xbfff).rw(FUNC(gb_state::gb_ram_r), FUNC(gb_state::gb_ram_w));                                /* 8k switched RAM bank (cartridge) */
 	map(0xc000, 0xcfff).ram();                                                          /* 4k fixed RAM bank */
 	map(0xd000, 0xdfff).bankrw("cgb_ram");                                           /* 4k switched RAM bank */
-	map(0xe000, 0xfdff).rw(this, FUNC(gb_state::gb_echo_r), FUNC(gb_state::gb_echo_w));
+	map(0xe000, 0xfdff).rw(FUNC(gb_state::gb_echo_r), FUNC(gb_state::gb_echo_w));
 	map(0xfe00, 0xfeff).rw(m_ppu, FUNC(cgb_ppu_device::oam_r), FUNC(cgb_ppu_device::oam_w));            /* OAM RAM */
-	map(0xff00, 0xff0f).rw(this, FUNC(gb_state::gb_io_r), FUNC(gb_state::gbc_io_w));                                 /* I/O */
+	map(0xff00, 0xff0f).rw(FUNC(gb_state::gb_io_r), FUNC(gb_state::gbc_io_w));                                 /* I/O */
 	map(0xff10, 0xff26).rw(m_apu, FUNC(gameboy_sound_device::sound_r), FUNC(gameboy_sound_device::sound_w));  /* sound controller */
 	map(0xff27, 0xff2f).noprw();                                                          /* unused */
 	map(0xff30, 0xff3f).rw(m_apu, FUNC(gameboy_sound_device::wave_r), FUNC(gameboy_sound_device::wave_w));    /* Wave RAM */
-	map(0xff40, 0xff7f).rw(this, FUNC(gb_state::gbc_io2_r), FUNC(gb_state::gbc_io2_w));                              /* Other I/O and video controller */
+	map(0xff40, 0xff7f).rw(FUNC(gb_state::gbc_io2_r), FUNC(gb_state::gbc_io2_w));                              /* Other I/O and video controller */
 	map(0xff80, 0xfffe).ram();                                                          /* high RAM */
-	map(0xffff, 0xffff).rw(this, FUNC(gb_state::gb_ie_r), FUNC(gb_state::gb_ie_w));                                  /* Interrupt enable register */
+	map(0xffff, 0xffff).rw(FUNC(gb_state::gb_ie_r), FUNC(gb_state::gb_ie_w));                                  /* Interrupt enable register */
 }
 
 void megaduck_state::megaduck_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).rw(this, FUNC(megaduck_state::cart_r), FUNC(megaduck_state::bank1_w));
+	map(0x0000, 0x7fff).rw(FUNC(megaduck_state::cart_r), FUNC(megaduck_state::bank1_w));
 	map(0x8000, 0x9fff).rw(m_ppu, FUNC(dmg_ppu_device::vram_r), FUNC(dmg_ppu_device::vram_w));          /* 8k VRAM */
 	map(0xa000, 0xafff).noprw();                                                          /* unused? */
-	map(0xb000, 0xb000).w(this, FUNC(megaduck_state::bank2_w));
+	map(0xb000, 0xb000).w(FUNC(megaduck_state::bank2_w));
 	map(0xb001, 0xbfff).noprw();                                                          /* unused? */
 	map(0xc000, 0xfdff).ram();                                                          /* 8k/16k? RAM */
 	map(0xfe00, 0xfeff).rw(m_ppu, FUNC(dmg_ppu_device::oam_r), FUNC(dmg_ppu_device::oam_w));            /* OAM RAM */
-	map(0xff00, 0xff0f).rw(this, FUNC(megaduck_state::gb_io_r), FUNC(megaduck_state::gb_io_w));                                  /* I/O */
-	map(0xff10, 0xff1f).rw(this, FUNC(megaduck_state::megaduck_video_r), FUNC(megaduck_state::megaduck_video_w));                /* video controller */
-	map(0xff20, 0xff2f).rw(this, FUNC(megaduck_state::megaduck_sound_r1), FUNC(megaduck_state::megaduck_sound_w1));              /* sound controller pt1 */
+	map(0xff00, 0xff0f).rw(FUNC(megaduck_state::gb_io_r), FUNC(megaduck_state::gb_io_w));                                  /* I/O */
+	map(0xff10, 0xff1f).rw(FUNC(megaduck_state::megaduck_video_r), FUNC(megaduck_state::megaduck_video_w));                /* video controller */
+	map(0xff20, 0xff2f).rw(FUNC(megaduck_state::megaduck_sound_r1), FUNC(megaduck_state::megaduck_sound_w1));              /* sound controller pt1 */
 	map(0xff30, 0xff3f).rw(m_apu, FUNC(gameboy_sound_device::wave_r), FUNC(gameboy_sound_device::wave_w));    /* wave ram */
-	map(0xff40, 0xff46).rw(this, FUNC(megaduck_state::megaduck_sound_r2), FUNC(megaduck_state::megaduck_sound_w2));              /* sound controller pt2 */
+	map(0xff40, 0xff46).rw(FUNC(megaduck_state::megaduck_sound_r2), FUNC(megaduck_state::megaduck_sound_w2));              /* sound controller pt2 */
 	map(0xff47, 0xff7f).noprw();                                                          /* unused */
 	map(0xff80, 0xfffe).ram();                                                          /* high RAM */
-	map(0xffff, 0xffff).rw(this, FUNC(megaduck_state::gb_ie_r), FUNC(megaduck_state::gb_ie_w));                                  /* interrupt enable register */
+	map(0xffff, 0xffff).rw(FUNC(megaduck_state::gb_ie_r), FUNC(megaduck_state::gb_ie_w));                                  /* interrupt enable register */
 }
 
-static GFXDECODE_START( gb )
-GFXDECODE_END
 
 static INPUT_PORTS_START( gameboy )
 	PORT_START("INPUTS")
@@ -630,11 +628,11 @@ MACHINE_CONFIG_START(gb_state::gameboy)
 	MCFG_SCREEN_SIZE( 458, 154 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gb)
 
-	MCFG_DMG_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", DMG_PPU, "maincpu")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -672,11 +670,11 @@ MACHINE_CONFIG_START(gb_state::supergb)
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
-	MCFG_SGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", SGB_PPU, "maincpu")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -714,7 +712,7 @@ MACHINE_CONFIG_START(gb_state::supergb2)
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
 	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_SGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", SGB_PPU, "maincpu")
 MACHINE_CONFIG_END
 
 
@@ -726,7 +724,7 @@ MACHINE_CONFIG_START(gb_state::gbpocket)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbp)
 
 	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_MGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", MGB_PPU, "maincpu")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gb_state::gbcolor)
@@ -751,12 +749,12 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 	MCFG_SCREEN_SIZE( 458, 154 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbc)
 
-	MCFG_CGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", CGB_PPU, "maincpu")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -798,12 +796,12 @@ MACHINE_CONFIG_START(megaduck_state::megaduck)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(megaduck_state,megaduck)
 
-	MCFG_DMG_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", DMG_PPU, "maincpu")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -826,9 +824,9 @@ MACHINE_CONFIG_END
 ROM_START(gameboy)
 	ROM_REGION(0x0100, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "dmg", "DMG vX")
-	ROMX_LOAD("dmg_boot.bin", 0x0000, 0x0100, CRC(59c8598e) SHA1(4ed31ec6b0b175bb109c0eb5fd3d193da823339f), ROM_BIOS(1))
+	ROMX_LOAD("dmg_boot.bin", 0x0000, 0x0100, CRC(59c8598e) SHA1(4ed31ec6b0b175bb109c0eb5fd3d193da823339f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "dmg_v0", "DMG v0")
-	ROMX_LOAD("dmg_v0.rom", 0x0000, 0x0100, CRC(c2f5cc97) SHA1(8bd501e31921e9601788316dbd3ce9833a97bcbc), ROM_BIOS(2))
+	ROMX_LOAD("dmg_v0.rom", 0x0000, 0x0100, CRC(c2f5cc97) SHA1(8bd501e31921e9601788316dbd3ce9833a97bcbc), ROM_BIOS(1))
 ROM_END
 
 ROM_START(supergb)

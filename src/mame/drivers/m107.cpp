@@ -100,7 +100,7 @@ void m107_state::main_map(address_map &map)
 {
 	map(0x00000, 0x9ffff).rom();
 	map(0xa0000, 0xbffff).bankr("bank1");
-	map(0xd0000, 0xdffff).ram().w(this, FUNC(m107_state::vram_w)).share("vram_data");
+	map(0xd0000, 0xdffff).ram().w(FUNC(m107_state::vram_w)).share("vram_data");
 	map(0xe0000, 0xeffff).ram(); /* System ram */
 	map(0xf8000, 0xf8fff).ram().share("spriteram");
 	map(0xf9000, 0xf9fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -115,20 +115,20 @@ void m107_state::main_portmap(address_map &map)
 	map(0x06, 0x07).portr("P3_P4");
 	map(0x08, 0x08).r("soundlatch2", FUNC(generic_latch_8_device::read));   // answer from sound CPU
 	map(0x00, 0x00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x02, 0x02).w(this, FUNC(m107_state::coincounter_w));
+	map(0x02, 0x02).w(FUNC(m107_state::coincounter_w));
 	map(0x04, 0x05).nopw(); /* ??? 0008 */
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x9f).w(this, FUNC(m107_state::control_w));
+	map(0x80, 0x9f).w(FUNC(m107_state::control_w));
 	map(0xa0, 0xaf).nopw(); /* Written with 0's in interrupt */
-	map(0xb0, 0xb1).w(this, FUNC(m107_state::spritebuffer_w));
+	map(0xb0, 0xb1).w(FUNC(m107_state::spritebuffer_w));
 	map(0xc0, 0xc3).nopr(); /* Only wpksoc: ticket related? */
-	map(0xc0, 0xc1).w(this, FUNC(m107_state::sound_reset_w));
+	map(0xc0, 0xc1).w(FUNC(m107_state::sound_reset_w));
 }
 
 void m107_state::dsoccr94_io_map(address_map &map)
 {
 	main_portmap(map);
-	map(0x06, 0x06).w(this, FUNC(m107_state::bankswitch_w));
+	map(0x06, 0x06).w(FUNC(m107_state::bankswitch_w));
 }
 
 /* same as M107 but with an extra i/o board */
@@ -153,7 +153,7 @@ void m107_state::wpksoc_map(address_map &map)
 void m107_state::wpksoc_io_map(address_map &map)
 {
 	main_portmap(map);
-	map(0x22, 0x23).w(this, FUNC(m107_state::wpksoc_output_w));
+	map(0x22, 0x23).w(FUNC(m107_state::wpksoc_output_w));
 	map(0xc0, 0xc1).portr("WPK_IN0");
 	map(0xc2, 0xc3).portr("WPK_IN1");
 }
@@ -705,12 +705,12 @@ static const gfx_layout spritelayout2 =
 	32*8
 };
 
-static GFXDECODE_START( m107 )
+static GFXDECODE_START( gfx_m107 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( firebarr )
+static GFXDECODE_START( gfx_firebarr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2,0, 128 )
 GFXDECODE_END
@@ -743,7 +743,7 @@ MACHINE_CONFIG_START(m107_state::firebarr)
 	MCFG_SCREEN_UPDATE_DRIVER(m107_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firebarr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firebarr)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -781,7 +781,7 @@ MACHINE_CONFIG_START(m107_state::dsoccr94)
 	MCFG_V25_CONFIG(dsoccr94_decryption_table)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_m107)
 MACHINE_CONFIG_END
 
 
@@ -797,7 +797,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m107_state::airass)
 	firebarr(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_m107)
 
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(gunforce_decryption_table)

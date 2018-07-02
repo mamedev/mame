@@ -354,6 +354,7 @@ Super Missile Attack Board Layout
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -361,22 +362,55 @@ class missile_state : public driver_device
 {
 public:
 	missile_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_videoram(*this, "videoram"),
-		m_watchdog(*this, "watchdog"),
-		m_pokey(*this, "pokey"),
-		m_in0(*this, "IN0"),
-		m_in1(*this, "IN1"),
-		m_r10(*this, "R10"),
-		m_r8(*this, "R8"),
-		m_track0_x(*this, "TRACK0_X"),
-		m_track0_y(*this, "TRACK0_Y"),
-		m_track1_x(*this, "TRACK1_X"),
-		m_track1_y(*this, "TRACK1_Y"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_videoram(*this, "videoram")
+		, m_watchdog(*this, "watchdog")
+		, m_pokey(*this, "pokey")
+		, m_in0(*this, "IN0")
+		, m_in1(*this, "IN1")
+		, m_r10(*this, "R10")
+		, m_r8(*this, "R8")
+		, m_track0_x(*this, "TRACK0_X")
+		, m_track0_y(*this, "TRACK0_Y")
+		, m_track1_x(*this, "TRACK1_X")
+		, m_track1_y(*this, "TRACK1_Y")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_leds(*this, "led%u", 0U)
 	{ }
+
+	void missileb(machine_config &config);
+	void missile(machine_config &config);
+	void missilea(machine_config &config);
+
+	void init_missilem();
+	void init_suprmatk();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+
+private:
+	DECLARE_WRITE8_MEMBER(missile_w);
+	DECLARE_READ8_MEMBER(missile_r);
+	DECLARE_WRITE8_MEMBER(bootleg_w);
+	DECLARE_READ8_MEMBER(bootleg_r);
+	uint32_t screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	inline int scanline_to_v(int scanline);
+	inline int v_to_scanline(int v);
+	inline void schedule_next_irq(int curv);
+	inline bool get_madsel();
+	inline offs_t get_bit3_addr(offs_t pixaddr);
+	void write_vram(address_space &space, offs_t address, uint8_t data);
+	uint8_t read_vram(address_space &space, offs_t address);
+
+	TIMER_CALLBACK_MEMBER(clock_irq);
+	TIMER_CALLBACK_MEMBER(adjust_cpu_speed);
+	void bootleg_main_map(address_map &map);
+	void main_map(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	required_device<m6502_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -392,6 +426,7 @@ public:
 	required_ioport m_track1_y;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	output_finder<2> m_leds;
 
 	const uint8_t *m_mainrom;
 	const uint8_t *m_writeprom;
@@ -401,33 +436,6 @@ public:
 	uint8_t m_ctrld;
 	uint8_t m_flipscreen;
 	uint64_t m_madsel_lastcycles;
-
-	DECLARE_WRITE8_MEMBER(missile_w);
-	DECLARE_READ8_MEMBER(missile_r);
-	DECLARE_WRITE8_MEMBER(bootleg_w);
-	DECLARE_READ8_MEMBER(bootleg_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
-	void init_missilem();
-	void init_suprmatk();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	uint32_t screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	inline int scanline_to_v(int scanline);
-	inline int v_to_scanline(int v);
-	inline void schedule_next_irq(int curv);
-	inline bool get_madsel();
-	inline offs_t get_bit3_addr(offs_t pixaddr);
-	void write_vram(address_space &space, offs_t address, uint8_t data);
-	uint8_t read_vram(address_space &space, offs_t address);
-
-	TIMER_CALLBACK_MEMBER(clock_irq);
-	TIMER_CALLBACK_MEMBER(adjust_cpu_speed);
-	void missileb(machine_config &config);
-	void missile(machine_config &config);
-	void missilea(machine_config &config);
-	void bootleg_main_map(address_map &map);
-	void main_map(address_map &map);
 };
 
 
@@ -529,6 +537,8 @@ TIMER_CALLBACK_MEMBER(missile_state::adjust_cpu_speed)
 
 void missile_state::machine_start()
 {
+	m_leds.resolve();
+
 	/* initialize globals */
 	m_mainrom = memregion("maincpu")->base();
 	m_writeprom = memregion("proms")->base();
@@ -742,8 +752,8 @@ WRITE8_MEMBER(missile_state::missile_w)
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);
 		machine().bookkeeping().coin_counter_w(1, data & 0x10);
 		machine().bookkeeping().coin_counter_w(2, data & 0x08);
-		output().set_led_value(1, ~data & 0x04);
-		output().set_led_value(0, ~data & 0x02);
+		m_leds[1] = BIT(~data, 2);
+		m_leds[0] = BIT(~data, 1);
 		m_ctrld = data & 1;
 	}
 
@@ -855,8 +865,8 @@ WRITE8_MEMBER(missile_state::bootleg_w)
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);
 		machine().bookkeeping().coin_counter_w(1, data & 0x10);
 		machine().bookkeeping().coin_counter_w(2, data & 0x08);
-		output().set_led_value(1, ~data & 0x04);
-		output().set_led_value(0, ~data & 0x02);
+		m_leds[1] = BIT(~data, 2);
+		m_leds[0] = BIT(~data, 1);
 		m_ctrld = data & 1;
 	}
 
@@ -948,13 +958,13 @@ READ8_MEMBER(missile_state::bootleg_r)
 /* complete memory map derived from schematics (implemented above) */
 void missile_state::main_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(missile_state::missile_r), FUNC(missile_state::missile_w)).share("videoram");
+	map(0x0000, 0xffff).rw(FUNC(missile_state::missile_r), FUNC(missile_state::missile_w)).share("videoram");
 }
 
 /* adjusted from the above to get the bootlegs to boot */
 void missile_state::bootleg_main_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(missile_state::bootleg_r), FUNC(missile_state::bootleg_w)).share("videoram");
+	map(0x0000, 0xffff).rw(FUNC(missile_state::bootleg_r), FUNC(missile_state::bootleg_w)).share("videoram");
 }
 
 /*************************************
@@ -1015,9 +1025,9 @@ static INPUT_PORTS_START( missile )
 	PORT_DIPNAME( 0x04, 0x04, "Bonus Credit for 4 Coins" ) PORT_DIPLOCATION("R8:!3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Trackball Size" ) PORT_DIPLOCATION("R8:!4")
-	PORT_DIPSETTING(    0x00, "Large" )
-	PORT_DIPSETTING(    0x08, "Mini" )
+	PORT_DIPNAME( 0x08, 0x08, "Trackball Size" ) PORT_DIPLOCATION("R8:!4")
+	PORT_DIPSETTING(    0x00, "Mini" ) // Faster Cursor Speed
+	PORT_DIPSETTING(    0x08, "Large" ) // Slower Cursor Speed
 	PORT_DIPNAME( 0x70, 0x70, "Bonus City" ) PORT_DIPLOCATION("R8:!5,!6,!7")
 	PORT_DIPSETTING(    0x10, "8000" )
 	PORT_DIPSETTING(    0x70, "10000" )
@@ -1105,9 +1115,9 @@ static INPUT_PORTS_START( suprmatk )
 	PORT_DIPNAME( 0x04, 0x04, "Bonus Credit for 4 Coins" ) PORT_DIPLOCATION("R8:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Trackball Size" ) PORT_DIPLOCATION("R8:4")
-	PORT_DIPSETTING(    0x00, "Large" )
-	PORT_DIPSETTING(    0x08, "Mini" )
+	PORT_DIPNAME( 0x08, 0x08, "Trackball Size" ) PORT_DIPLOCATION("R8:4")
+	PORT_DIPSETTING(    0x00, "Mini" ) // Faster Cursor Speed
+	PORT_DIPSETTING(    0x08, "Large" ) // Slower Cursor Speed
 	PORT_DIPNAME( 0x70, 0x70, "Bonus City" ) PORT_DIPLOCATION("R8:5,6,7")
 	PORT_DIPSETTING(    0x10, "8000" )
 	PORT_DIPSETTING(    0x70, "10000" )

@@ -42,7 +42,7 @@ public:
 		m_samples(*this, "oki"),
 		m_alligator(*this, "alligator%u", 0U),
 		m_digit(*this, "digit%u", 0U),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(alligators_rear_sensors_r);
@@ -50,7 +50,7 @@ public:
 
 	void wackygtr(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -72,11 +72,10 @@ protected:
 	DECLARE_WRITE8_MEMBER(irq_ack_w)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
 	DECLARE_WRITE8_MEMBER(firq_ack_w)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 
 	void program_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<pit8253_device> m_pit8253_0;
@@ -85,7 +84,7 @@ private:
 	required_memory_region m_samples;
 	output_finder<5> m_alligator;
 	output_finder<8> m_digit;
-	output_finder<32> m_lamp;
+	output_finder<32> m_lamps;
 
 	int     m_adpcm_sel;
 	uint16_t  m_adpcm_pos;
@@ -185,7 +184,7 @@ void wackygtr_state::machine_start()
 {
 	m_alligator.resolve();
 	m_digit.resolve();
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_adpcm_sel));
 	save_item(NAME(m_adpcm_pos));
@@ -211,7 +210,7 @@ void wackygtr_state::set_digits(int p, uint8_t value)
 void wackygtr_state::set_lamps(int p, uint8_t value)
 {
 	for (int i=0; i<8; i++)
-		m_lamp[p + i] = BIT(value, i);
+		m_lamps[p + i] = BIT(value, i);
 }
 
 static INPUT_PORTS_START( wackygtr )
@@ -255,7 +254,7 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 	if (!(m_adpcm_ctrl & 0x80))
 	{
 		uint8_t data = m_samples->base()[m_adpcm_pos & 0xffff];
-		m_msm->data_w((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
+		m_msm->write_data((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
 		m_adpcm_pos += m_adpcm_sel;
 		m_adpcm_sel ^= 1;
 	}
@@ -263,13 +262,13 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 
 void wackygtr_state::program_map(address_map &map)
 {
-	map(0x0200, 0x0200).nopr().w(this, FUNC(wackygtr_state::irq_ack_w));
-	map(0x0400, 0x0400).nopr().w(this, FUNC(wackygtr_state::firq_ack_w));
-	map(0x0600, 0x0600).w(this, FUNC(wackygtr_state::disp_w<0>));
-	map(0x0800, 0x0800).w(this, FUNC(wackygtr_state::disp_w<1>));
-	map(0x0a00, 0x0a00).w(this, FUNC(wackygtr_state::disp_w<2>));
-	map(0x0c00, 0x0c00).w(this, FUNC(wackygtr_state::disp_w<3>));
-	map(0x0e00, 0x0e00).w(this, FUNC(wackygtr_state::sample_ctrl_w));
+	map(0x0200, 0x0200).nopr().w(FUNC(wackygtr_state::irq_ack_w));
+	map(0x0400, 0x0400).nopr().w(FUNC(wackygtr_state::firq_ack_w));
+	map(0x0600, 0x0600).w(FUNC(wackygtr_state::disp_w<0>));
+	map(0x0800, 0x0800).w(FUNC(wackygtr_state::disp_w<1>));
+	map(0x0a00, 0x0a00).w(FUNC(wackygtr_state::disp_w<2>));
+	map(0x0c00, 0x0c00).w(FUNC(wackygtr_state::disp_w<3>));
+	map(0x0e00, 0x0e00).w(FUNC(wackygtr_state::sample_ctrl_w));
 
 	map(0x1000, 0x1001).w("ymsnd", FUNC(ym2413_device::write));
 

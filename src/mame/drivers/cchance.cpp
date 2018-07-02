@@ -96,8 +96,8 @@ void cchance_state::main_map(address_map &map)
 	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
 
 	map(0xf000, 0xf000).nopr().nopw(); //???
-	map(0xf001, 0xf001).r(this, FUNC(cchance_state::input_1_r)).w(this, FUNC(cchance_state::output_0_w));
-	map(0xf002, 0xf002).portr("IN0").w(this, FUNC(cchance_state::output_1_w));
+	map(0xf001, 0xf001).r(FUNC(cchance_state::input_1_r)).w(FUNC(cchance_state::output_0_w));
+	map(0xf002, 0xf002).portr("IN0").w(FUNC(cchance_state::output_1_w));
 	map(0xf800, 0xf801).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xf801, 0xf801).r("aysnd", FUNC(ay8910_device::data_r));
 }
@@ -195,7 +195,7 @@ static const gfx_layout cchance_layout =
 
 
 
-static GFXDECODE_START( cchance )
+static GFXDECODE_START( gfx_cchance )
 	GFXDECODE_ENTRY( "gfx1", 0, cchance_layout,   0x0, 32  )
 GFXDECODE_END
 
@@ -218,7 +218,7 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cchance_state,  irq0_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cchance)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cchance)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")

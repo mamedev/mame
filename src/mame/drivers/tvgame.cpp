@@ -14,6 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -28,12 +29,14 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
+	void tvgame(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tvgame(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<uint8_t> m_p_videoram;

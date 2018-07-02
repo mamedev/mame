@@ -153,6 +153,14 @@ public:
 			m_nvram_loaded = false;
 		}
 
+	void ngp_common(machine_config &config);
+	void ngp(machine_config &config);
+	void ngpc(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
+
+private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -196,19 +204,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ngp_hblank_pin_w );
 	DECLARE_WRITE8_MEMBER( ngp_tlcs900_porta );
 	uint32_t screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
 	TIMER_CALLBACK_MEMBER(ngp_seconds_callback);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ngp_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ngp_cart );
 
-	void ngp_common(machine_config &config);
-	void ngp(machine_config &config);
-	void ngpc(machine_config &config);
 	void ngp_mem(address_map &map);
 	void z80_io(address_map &map);
 	void z80_mem(address_map &map);
-protected:
+
 	bool m_nvram_loaded;
 	required_ioport m_io_controls;
 	required_ioport m_io_power;
@@ -321,7 +325,7 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 		break;
 
 	case 0x3a:  /* Trigger Z80 NMI */
-		m_z80->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+		m_z80->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		break;
 	}
 	m_io_reg[offset] = data;
@@ -553,12 +557,12 @@ WRITE8_MEMBER( ngp_state::flash1_w )
 
 void ngp_state::ngp_mem(address_map &map)
 {
-	map(0x000080, 0x0000bf).rw(this, FUNC(ngp_state::ngp_io_r), FUNC(ngp_state::ngp_io_w));                        /* ngp/c specific i/o */
+	map(0x000080, 0x0000bf).rw(FUNC(ngp_state::ngp_io_r), FUNC(ngp_state::ngp_io_w));                        /* ngp/c specific i/o */
 	map(0x004000, 0x006fff).ram().share("mainram");                              /* work ram */
 	map(0x007000, 0x007fff).ram().share("share1");                               /* shared with sound cpu */
 	map(0x008000, 0x00bfff).rw(m_k1ge, FUNC(k1ge_device::read), FUNC(k1ge_device::write));       /* video chip */
-	map(0x200000, 0x3fffff).w(this, FUNC(ngp_state::flash0_w));   /* cart area #1 */
-	map(0x800000, 0x9fffff).w(this, FUNC(ngp_state::flash1_w));   /* cart area #2 */
+	map(0x200000, 0x3fffff).w(FUNC(ngp_state::flash0_w));   /* cart area #1 */
+	map(0x800000, 0x9fffff).w(FUNC(ngp_state::flash1_w));   /* cart area #2 */
 	map(0xff0000, 0xffffff).rom().region("maincpu", 0);                          /* system rom */
 }
 
@@ -585,8 +589,8 @@ void ngp_state::z80_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");                       /* shared with tlcs900 */
 	map(0x4000, 0x4001).w(m_t6w28, FUNC(t6w28_device::write));      /* sound chip (right, left) */
-	map(0x8000, 0x8000).rw(this, FUNC(ngp_state::ngp_z80_comm_r), FUNC(ngp_state::ngp_z80_comm_w));  /* main-sound communication */
-	map(0xc000, 0xc000).w(this, FUNC(ngp_state::ngp_z80_signal_main_w));               /* signal irq to main cpu */
+	map(0x8000, 0x8000).rw(FUNC(ngp_state::ngp_z80_comm_r), FUNC(ngp_state::ngp_z80_comm_w));  /* main-sound communication */
+	map(0xc000, 0xc000).w(FUNC(ngp_state::ngp_z80_signal_main_w));               /* signal irq to main cpu */
 }
 
 
@@ -601,7 +605,7 @@ WRITE8_MEMBER( ngp_state::ngp_z80_clear_irq )
 
 void ngp_state::z80_io(address_map &map)
 {
-	map(0x0000, 0xffff).w(this, FUNC(ngp_state::ngp_z80_clear_irq));
+	map(0x0000, 0xffff).w(FUNC(ngp_state::ngp_z80_clear_irq));
 }
 
 

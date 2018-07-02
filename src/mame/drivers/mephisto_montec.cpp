@@ -41,9 +41,18 @@ public:
 		, m_beeper(*this, "beeper")
 		, m_keys(*this, "KEY.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
+		, m_low_leds(*this, "led%u", 0U)
+		, m_high_leds(*this, "led%u", 100U)
 	{ }
 
+	void smondial(machine_config &config);
+	void mondial2(machine_config &config);
+	void smondial2(machine_config &config);
+	void montec(machine_config &config);
+	void monteciv(machine_config &config);
+	void megaiv(machine_config &config);
 
+private:
 	DECLARE_READ8_MEMBER(montec_input_r);
 	DECLARE_READ8_MEMBER(montec_nmi_ack_r);
 	DECLARE_WRITE8_MEMBER(montec_nmi_ack_w);
@@ -64,27 +73,21 @@ public:
 	DECLARE_WRITE8_MEMBER(mondial2_input_mux_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(refresh_leds);
 
-	void smondial(machine_config &config);
-	void mondial2(machine_config &config);
-	void smondial2(machine_config &config);
-	void montec(machine_config &config);
-	void monteciv(machine_config &config);
-	void megaiv(machine_config &config);
 	void megaiv_mem(address_map &map);
 	void mondial2_mem(address_map &map);
 	void montec_mem(address_map &map);
 	void smondial2_mem(address_map &map);
 	void smondial_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
 	required_device<beep_device> m_beeper;
 	optional_ioport_array<2> m_keys;
 	output_finder<8> m_digits;
+	output_finder<16> m_low_leds, m_high_leds;
 
 	uint8_t m_lcd_mux;
 	uint8_t m_input_mux;
@@ -104,6 +107,8 @@ private:
 void mephisto_montec_state::machine_start()
 {
 	m_digits.resolve();
+	m_low_leds.resolve();
+	m_high_leds.resolve();
 
 	save_item(NAME(m_lcd_mux));
 	save_item(NAME(m_input_mux));
@@ -133,7 +138,7 @@ WRITE8_MEMBER(mephisto_montec_state::montec_led_w)
 	for(int i=0; i<4; i++)
 		for(int j=0; j<4; j++)
 			if (BIT(data, i))
-				output().set_led_value(100 + i * 4 + j, BIT(data, 4 + j) ? 0 : 1);
+				m_high_leds[(i << 2) | j] = BIT(~data, 4 + j);
 }
 
 
@@ -228,9 +233,9 @@ WRITE8_MEMBER(mephisto_montec_state::megaiv_led_w)
 		{
 			if (!BIT(m_leds_mux, i))
 			{
-				output().set_led_value(100 + i, BIT(data, 0) | BIT(data, 1));
-				output().set_led_value(0 + i, BIT(data, 2) | BIT(data, 3));
-				output().set_led_value(8 + i, BIT(data, 4) | BIT(data, 5));
+				m_high_leds[i] = BIT(data, 0) | BIT(data, 1);
+				m_low_leds[0 + i] = BIT(data, 2) | BIT(data, 3);
+				m_low_leds[8 + i] = BIT(data, 4) | BIT(data, 5);
 			}
 		}
 	}
@@ -252,31 +257,31 @@ READ8_MEMBER(mephisto_montec_state::megaiv_input_r)
 void mephisto_montec_state::montec_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2400, 0x2400).r(this, FUNC(mephisto_montec_state::montec_input_r));
+	map(0x2400, 0x2400).r(FUNC(mephisto_montec_state::montec_input_r));
 	map(0x2800, 0x2800).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0x2c00, 0x2c00).w(m_board, FUNC(mephisto_board_device::led_w));
-	map(0x3400, 0x3400).w(this, FUNC(mephisto_montec_state::montec_led_w));
-	map(0x3000, 0x3001).w(this, FUNC(mephisto_montec_state::montec_mux_w));
-	map(0x3002, 0x3002).w(this, FUNC(mephisto_montec_state::montec_beeper_w));
-	map(0x3004, 0x3004).w(this, FUNC(mephisto_montec_state::montec_lcd_data_w));
-	map(0x3005, 0x3005).w(this, FUNC(mephisto_montec_state::montec_ldc_cs1_w));
-	map(0x3006, 0x3006).w(this, FUNC(mephisto_montec_state::montec_lcd_clk_w));
-	map(0x3007, 0x3007).w(this, FUNC(mephisto_montec_state::montec_ldc_cs0_w));
-	map(0x2000, 0x2000).rw(this, FUNC(mephisto_montec_state::montec_nmi_ack_r), FUNC(mephisto_montec_state::montec_nmi_ack_w));
+	map(0x3400, 0x3400).w(FUNC(mephisto_montec_state::montec_led_w));
+	map(0x3000, 0x3001).w(FUNC(mephisto_montec_state::montec_mux_w));
+	map(0x3002, 0x3002).w(FUNC(mephisto_montec_state::montec_beeper_w));
+	map(0x3004, 0x3004).w(FUNC(mephisto_montec_state::montec_lcd_data_w));
+	map(0x3005, 0x3005).w(FUNC(mephisto_montec_state::montec_ldc_cs1_w));
+	map(0x3006, 0x3006).w(FUNC(mephisto_montec_state::montec_lcd_clk_w));
+	map(0x3007, 0x3007).w(FUNC(mephisto_montec_state::montec_ldc_cs0_w));
+	map(0x2000, 0x2000).rw(FUNC(mephisto_montec_state::montec_nmi_ack_r), FUNC(mephisto_montec_state::montec_nmi_ack_w));
 	map(0x8000, 0xffff).rom();
 }
 
 void mephisto_montec_state::megaiv_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2400, 0x2400).w(this, FUNC(mephisto_montec_state::megaiv_led_w));
+	map(0x2400, 0x2400).w(FUNC(mephisto_montec_state::megaiv_led_w));
 	map(0x2800, 0x2800).w(m_board, FUNC(mephisto_board_device::mux_w));
-	map(0x2c00, 0x2c03).w(this, FUNC(mephisto_montec_state::montec_mux_w)).nopr();
-	map(0x2c04, 0x2c04).w(this, FUNC(mephisto_montec_state::montec_lcd_data_w));
-	map(0x2c05, 0x2c05).w(this, FUNC(mephisto_montec_state::montec_ldc_cs1_w));
-	map(0x2c06, 0x2c06).w(this, FUNC(mephisto_montec_state::montec_lcd_clk_w));
-	map(0x2c07, 0x2c07).w(this, FUNC(mephisto_montec_state::montec_ldc_cs0_w));
-	map(0x3000, 0x3007).r(this, FUNC(mephisto_montec_state::megaiv_input_r));
+	map(0x2c00, 0x2c03).w(FUNC(mephisto_montec_state::montec_mux_w)).nopr();
+	map(0x2c04, 0x2c04).w(FUNC(mephisto_montec_state::montec_lcd_data_w));
+	map(0x2c05, 0x2c05).w(FUNC(mephisto_montec_state::montec_ldc_cs1_w));
+	map(0x2c06, 0x2c06).w(FUNC(mephisto_montec_state::montec_lcd_clk_w));
+	map(0x2c07, 0x2c07).w(FUNC(mephisto_montec_state::montec_ldc_cs0_w));
+	map(0x3000, 0x3007).r(FUNC(mephisto_montec_state::megaiv_input_r));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -299,9 +304,9 @@ WRITE8_MEMBER(mephisto_montec_state::smondial_board_mux_w)
 
 	for (int i=0; i<8; i++)
 	{
-		if (m_leds_mux & 0x03)      output().set_led_value(100 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
-		if (m_leds_mux & 0x0c)      output().set_led_value(  8 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
-		if (m_leds_mux & 0x30)      output().set_led_value(  0 + i, BIT(m_smondial_board_mux, i) ? 0 : 1);
+		if (m_leds_mux & 0x03) m_high_leds[i] = BIT(~m_smondial_board_mux, i);
+		if (m_leds_mux & 0x0c) m_low_leds[8 + i] = BIT(~m_smondial_board_mux, i);
+		if (m_leds_mux & 0x30) m_low_leds[0 + i] = BIT(~m_smondial_board_mux, i);
 	}
 }
 
@@ -318,14 +323,14 @@ WRITE8_MEMBER(mephisto_montec_state::smondial_led_data_w)
 void mephisto_montec_state::smondial_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x4000, 0x4007).r(this, FUNC(mephisto_montec_state::megaiv_input_r));
-	map(0x6400, 0x6407).w(this, FUNC(mephisto_montec_state::smondial_led_data_w));
-	map(0x6800, 0x6807).w(this, FUNC(mephisto_montec_state::smondial_board_mux_w));
-	map(0x6c00, 0x6c03).w(this, FUNC(mephisto_montec_state::montec_mux_w));
-	map(0x6c04, 0x6c04).w(this, FUNC(mephisto_montec_state::montec_lcd_data_w));
-	map(0x6c05, 0x6c05).w(this, FUNC(mephisto_montec_state::montec_ldc_cs1_w));
-	map(0x6c06, 0x6c06).w(this, FUNC(mephisto_montec_state::montec_lcd_clk_w));
-	map(0x6c07, 0x6c07).w(this, FUNC(mephisto_montec_state::montec_ldc_cs0_w));
+	map(0x4000, 0x4007).r(FUNC(mephisto_montec_state::megaiv_input_r));
+	map(0x6400, 0x6407).w(FUNC(mephisto_montec_state::smondial_led_data_w));
+	map(0x6800, 0x6807).w(FUNC(mephisto_montec_state::smondial_board_mux_w));
+	map(0x6c00, 0x6c03).w(FUNC(mephisto_montec_state::montec_mux_w));
+	map(0x6c04, 0x6c04).w(FUNC(mephisto_montec_state::montec_lcd_data_w));
+	map(0x6c05, 0x6c05).w(FUNC(mephisto_montec_state::montec_ldc_cs1_w));
+	map(0x6c06, 0x6c06).w(FUNC(mephisto_montec_state::montec_lcd_clk_w));
+	map(0x6c07, 0x6c07).w(FUNC(mephisto_montec_state::montec_ldc_cs0_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -336,9 +341,9 @@ WRITE8_MEMBER(mephisto_montec_state::mondial2_input_mux_w)
 	{
 		if (!BIT(leds_data, i))
 		{
-			if (data & 0x10)    output().set_led_value(100 + i, 1);
-			if (data & 0x20)    output().set_led_value(  8 + i, 1);
-			if (data & 0x40)    output().set_led_value(  0 + i, 1);
+			if (data & 0x10) m_high_leds[i] = 1;
+			if (data & 0x20) m_low_leds[8 + i] = 1;
+			if (data & 0x40) m_low_leds[0 + i] = 1;
 		}
 	}
 
@@ -350,9 +355,9 @@ WRITE8_MEMBER(mephisto_montec_state::mondial2_input_mux_w)
 void mephisto_montec_state::mondial2_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
-	map(0x2000, 0x2000).w(this, FUNC(mephisto_montec_state::mondial2_input_mux_w));
+	map(0x2000, 0x2000).w(FUNC(mephisto_montec_state::mondial2_input_mux_w));
 	map(0x2800, 0x2800).w(m_board, FUNC(mephisto_board_device::mux_w));
-	map(0x3000, 0x3007).r(this, FUNC(mephisto_montec_state::megaiv_input_r));
+	map(0x3000, 0x3007).r(FUNC(mephisto_montec_state::megaiv_input_r));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -360,9 +365,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_montec_state::refresh_leds)
 {
 	for (int i=0; i<8; i++)
 	{
-		output().set_led_value(0 + i, 0);
-		output().set_led_value(8 + i, 0);
-		output().set_led_value(100 + i, 0);
+		m_low_leds[0 + i] = 0;
+		m_low_leds[8 + i] = 0;
+		m_high_leds[i] = 0;
 	}
 }
 

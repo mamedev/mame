@@ -2,6 +2,7 @@
 // copyright-holders:Zsolt Vasvari
 
 #include "machine/watchdog.h"
+#include "emupal.h"
 
 
 class funkybee_state : public driver_device
@@ -16,6 +17,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void funkybee(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -43,7 +47,6 @@ public:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void funkybee(machine_config &config);
 	void funkybee_map(address_map &map);
 	void io_map(address_map &map);
 };

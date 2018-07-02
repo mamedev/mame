@@ -90,8 +90,8 @@ WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
 	if (data & 0x04)   logerror("           SCREEN ROTATE\n");
 	if (data & 0x08)   logerror("           SHADE BRIGHTER TO LEFT\n");
 
-	output().set_led_value(1, data & 0x10);  /* lamp 1 */
-	output().set_led_value(2, data & 0x20);  /* lamp 2 */
+	m_lamps[0] = BIT(data, 4);  /* lamp 1 */
+	m_lamps[1] = BIT(data, 5);  /* lamp 2 */
 
 	if (data & 0x40)   logerror("           SHADE BRIGHTER TO BOTTOM\n");
 	if (data & 0x80)   logerror("           SHADE BRIGHTER TO TOP\n");

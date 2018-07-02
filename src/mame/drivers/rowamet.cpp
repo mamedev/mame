@@ -45,16 +45,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void rowamet(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(mute_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void rowamet(machine_config &config);
 	void rowamet_map(address_map &map);
 	void rowamet_sub_io(address_map &map);
 	void rowamet_sub_map(address_map &map);
-private:
+
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
 	uint8_t m_io[16];
@@ -81,7 +83,7 @@ void rowamet_state::rowamet_map(address_map &map)
 	map(0x2808, 0x2808).portr("X8");
 	map(0x4000, 0x407f).ram();
 	map(0x4080, 0x408f).ram().share("ram");
-	map(0x4090, 0x409f).rw(this, FUNC(rowamet_state::io_r), FUNC(rowamet_state::io_w));
+	map(0x4090, 0x409f).rw(FUNC(rowamet_state::io_r), FUNC(rowamet_state::io_w));
 	map(0x40a0, 0x40ff).ram();
 }
 
@@ -94,8 +96,8 @@ void rowamet_state::rowamet_sub_map(address_map &map)
 void rowamet_state::rowamet_sub_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(rowamet_state::sound_r), FUNC(rowamet_state::mute_w));
-	map(0x01, 0x01).w("dac", FUNC(dac_byte_interface::write));
+	map(0x00, 0x00).rw(FUNC(rowamet_state::sound_r), FUNC(rowamet_state::mute_w));
+	map(0x01, 0x01).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 static INPUT_PORTS_START( rowamet )
@@ -196,7 +198,7 @@ WRITE8_MEMBER( rowamet_state::io_w )
 		if (cmd != m_sndcmd)
 		{
 			m_sndcmd = cmd;
-			m_cpu2->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_cpu2->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 }

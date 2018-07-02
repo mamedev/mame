@@ -28,6 +28,7 @@
 #include "machine/ripple_counter.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -445,9 +446,9 @@ MACHINE_CONFIG_END
 ROM_START( compclr2 )
 	ROM_REGION( 0x4000, I8080_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "678", "v6.78" )
-	ROMX_LOAD( "v678.rom", 0x0000, 0x4000, BAD_DUMP CRC(5e559469) SHA1(fe308774aae1294c852fe24017e58d892d880cd3), ROM_BIOS(1) )
+	ROMX_LOAD( "v678.rom", 0x0000, 0x4000, BAD_DUMP CRC(5e559469) SHA1(fe308774aae1294c852fe24017e58d892d880cd3), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "879", "v8.79" )
-	ROMX_LOAD( "v879.rom", 0x0000, 0x4000, BAD_DUMP CRC(4de8e652) SHA1(e5c55da3ac893b8a5a99c8795af3ca72b1645f3f), ROM_BIOS(2) )
+	ROMX_LOAD( "v879.rom", 0x0000, 0x4000, BAD_DUMP CRC(4de8e652) SHA1(e5c55da3ac893b8a5a99c8795af3ca72b1645f3f), ROM_BIOS(1) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "chargen.uf6", 0x000, 0x400, BAD_DUMP CRC(7eef135a) SHA1(be488ef32f54c6e5f551fb84ab12b881aef72dd9) )

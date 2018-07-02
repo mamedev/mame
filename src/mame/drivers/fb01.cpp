@@ -16,6 +16,7 @@
 #include "sound/ym2151.h"
 #include "video/hd44780.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -37,6 +38,9 @@ public:
 	{
 	}
 
+	void fb01(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
 	DECLARE_WRITE_LINE_MEMBER(midi_in);
 	DECLARE_WRITE_LINE_MEMBER(ym2164_irq_w);
@@ -49,10 +53,9 @@ public:
 	DECLARE_PALETTE_INIT(fb01);
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
 
-	void fb01(machine_config &config);
 	void fb01_io(address_map &map);
 	void fb01_mem(address_map &map);
-private:
+
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_upd71051;
 	required_device<midi_port_device> m_midi_thru;

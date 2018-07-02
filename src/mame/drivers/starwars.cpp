@@ -34,8 +34,6 @@
 #include "machine/watchdog.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
-#include "sound/tms5220.h"
-#include "machine/x2212.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -50,7 +48,7 @@ WRITE8_MEMBER(starwars_state::quad_pokeyn_w)
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
 
-	m_pokey[pokey_num]->write(pokey_reg, data);
+	m_pokey[pokey_num]->write(space, pokey_reg, data);
 }
 
 /*************************************
@@ -139,20 +137,20 @@ void starwars_state::main_map(address_map &map)
 	map(0x4380, 0x439f).r("adc", FUNC(adc0809_device::data_r));
 	map(0x4400, 0x4400).r(m_mainlatch, FUNC(generic_latch_8_device::read));
 	map(0x4400, 0x4400).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x4401, 0x4401).r(this, FUNC(starwars_state::starwars_main_ready_flag_r));
+	map(0x4401, 0x4401).r(FUNC(starwars_state::starwars_main_ready_flag_r));
 	map(0x4500, 0x45ff).rw("x2212", FUNC(x2212_device::read), FUNC(x2212_device::write));
 	map(0x4600, 0x461f).w("avg", FUNC(avg_starwars_device::go_w));
 	map(0x4620, 0x463f).w("avg", FUNC(avg_starwars_device::reset_w));
 	map(0x4640, 0x465f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x4660, 0x467f).w(this, FUNC(starwars_state::irq_ack_w));
+	map(0x4660, 0x467f).w(FUNC(starwars_state::irq_ack_w));
 	map(0x4680, 0x4687).nopr().mirror(0x0018).w("outlatch", FUNC(ls259_device::write_d7));
-	map(0x46a0, 0x46bf).w(this, FUNC(starwars_state::starwars_nstore_w));
+	map(0x46a0, 0x46bf).w(FUNC(starwars_state::starwars_nstore_w));
 	map(0x46c0, 0x46c3).w("adc", FUNC(adc0809_device::address_offset_start_w));
-	map(0x46e0, 0x46e0).w(this, FUNC(starwars_state::starwars_soundrst_w));
-	map(0x4700, 0x4707).w(this, FUNC(starwars_state::starwars_math_w));
-	map(0x4700, 0x4700).r(this, FUNC(starwars_state::starwars_div_reh_r));
-	map(0x4701, 0x4701).r(this, FUNC(starwars_state::starwars_div_rel_r));
-	map(0x4703, 0x4703).r(this, FUNC(starwars_state::starwars_prng_r));           /* pseudo random number generator */
+	map(0x46e0, 0x46e0).w(FUNC(starwars_state::starwars_soundrst_w));
+	map(0x4700, 0x4707).w(FUNC(starwars_state::starwars_math_w));
+	map(0x4700, 0x4700).r(FUNC(starwars_state::starwars_div_reh_r));
+	map(0x4701, 0x4701).r(FUNC(starwars_state::starwars_div_rel_r));
+	map(0x4703, 0x4703).r(FUNC(starwars_state::starwars_prng_r));           /* pseudo random number generator */
 	map(0x4800, 0x4fff).ram();                             /* CPU and Math RAM */
 	map(0x5000, 0x5fff).ram().share("mathram"); /* CPU and Math RAM */
 	map(0x6000, 0x7fff).bankr("bank1");                        /* banked ROM */
@@ -162,7 +160,7 @@ void starwars_state::main_map(address_map &map)
 void starwars_state::esb_main_map(address_map &map)
 {
 	main_map(map);
-	map(0x8000, 0x9fff).rw(this, FUNC(starwars_state::esb_slapstic_r), FUNC(starwars_state::esb_slapstic_w));
+	map(0x8000, 0x9fff).rw(FUNC(starwars_state::esb_slapstic_r), FUNC(starwars_state::esb_slapstic_w));
 	map(0xa000, 0xffff).bankr("bank2");
 }
 
@@ -179,7 +177,7 @@ void starwars_state::sound_map(address_map &map)
 	map(0x0800, 0x0fff).r(m_soundlatch, FUNC(generic_latch_8_device::read)); /* SIN Read */
 	map(0x1000, 0x107f).ram();                         /* 6532 ram */
 	map(0x1080, 0x109f).rw(m_riot, FUNC(riot6532_device::read), FUNC(riot6532_device::write));
-	map(0x1800, 0x183f).w(this, FUNC(starwars_state::quad_pokeyn_w));
+	map(0x1800, 0x183f).w(FUNC(starwars_state::quad_pokeyn_w));
 	map(0x2000, 0x27ff).ram();                         /* program RAM */
 	map(0x4000, 0x7fff).rom();                         /* sound roms */
 	map(0xb000, 0xffff).rom();                         /* more sound roms */
@@ -316,7 +314,7 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK / 16) // designated as "137243-001" on parts list and "157249-120" on schematics
 	MCFG_ADC0808_IN0_CB(IOPORT("STICKY")) // pitch
 	MCFG_ADC0808_IN1_CB(IOPORT("STICKX")) // yaw
-	MCFG_ADC0808_IN2_CB(GND) // thrust (unused)
+	MCFG_ADC0808_IN2_CB(CONSTANT(0)) // thrust (unused)
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK / 8)
 	MCFG_RIOT6532_IN_PA_CB(READ8(*this, starwars_state, r6532_porta_r))
@@ -381,7 +379,7 @@ MACHINE_CONFIG_START(starwars_state::esb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(esb_main_map)
 
-	MCFG_SLAPSTIC_ADD("slapstic", 101)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 101, false)
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1"))
@@ -517,7 +515,7 @@ ROM_START( esb )
 	ROM_CONTINUE(              0x10000, 0x2000 )
 	/* $8000 - $9fff : slapstic page */
 	ROM_LOAD( "136031-102.1jk",0xa000, 0x2000, CRC(62ce5c12) SHA1(976256acf4499dc396542a117910009a8808f448) )
-	ROM_CONTINUE(              0xc000, 0x2000 )
+	ROM_CONTINUE(              0x1c000, 0x2000 )
 	ROM_LOAD( "136031-203.1kl",0xc000, 0x2000, CRC(27b0889b) SHA1(a13074e83f0f57d65096d7f49ae78f33ab00c479) )
 	ROM_CONTINUE(              0x1e000, 0x2000 )
 	ROM_LOAD( "136031-104.1m", 0xe000, 0x2000, CRC(fd5c725e) SHA1(541cfd004b1736b6cec13836dfa813f00eedeed0) )

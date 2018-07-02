@@ -36,8 +36,12 @@ public:
 			m_start_output(*this, "start")
 	{ }
 
+	void icecold(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
 	DECLARE_CUSTOM_INPUT_MEMBER( motors_limit_r );
+
+private:
 	DECLARE_WRITE8_MEMBER( scanlines_w );
 	DECLARE_WRITE8_MEMBER( digit_w );
 	DECLARE_READ8_MEMBER( kbd_r );
@@ -82,7 +86,6 @@ public:
 	int     m_lmotor;           // left motor position (0-100)
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
-	void icecold(machine_config &config);
 	void icecold_map(address_map &map);
 };
 
@@ -93,7 +96,7 @@ void icecold_state::icecold_map(address_map &map)
 	map(0x4020, 0x4023).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4040, 0x4043).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));   // not used
 	map(0x4080, 0x4081).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x4100, 0x4100).w(this, FUNC(icecold_state::motors_w));
+	map(0x4100, 0x4100).w(FUNC(icecold_state::motors_w));
 	map(0xa000, 0xffff).rom();
 }
 

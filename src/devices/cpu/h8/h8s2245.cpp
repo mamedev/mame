@@ -84,8 +84,8 @@ void h8s2245_device::map(address_map &map)
 	map(0xffff2f, 0xffff2f).rw("intc", FUNC(h8s_intc_device::isr_r), FUNC(h8s_intc_device::isr_w));
 	map(0xffff30, 0xffff35).rw("dtc", FUNC(h8_dtc_device::dtcer_r), FUNC(h8_dtc_device::dtcer_w));
 	map(0xffff37, 0xffff37).rw("dtc", FUNC(h8_dtc_device::dtvecr_r), FUNC(h8_dtc_device::dtvecr_w));
-	map(0xffff39, 0xffff39).rw(this, FUNC(h8s2245_device::syscr_r), FUNC(h8s2245_device::syscr_w));
-	map(0xffff3c, 0xffff3d).rw(this, FUNC(h8s2245_device::mstpcr_r), FUNC(h8s2245_device::mstpcr_w));
+	map(0xffff39, 0xffff39).rw(FUNC(h8s2245_device::syscr_r), FUNC(h8s2245_device::syscr_w));
+	map(0xffff3c, 0xffff3d).rw(FUNC(h8s2245_device::mstpcr_r), FUNC(h8s2245_device::mstpcr_w));
 
 	map(0xffff50, 0xffff50).r("port1", FUNC(h8_port_device::port_r));
 	map(0xffff51, 0xffff51).r("port2", FUNC(h8_port_device::port_r));

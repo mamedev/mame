@@ -33,6 +33,9 @@ public:
 		: radio86_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 
+	void apogee(machine_config &config);
+
+private:
 	uint8_t m_out0;
 	uint8_t m_out1;
 	uint8_t m_out2;
@@ -42,7 +45,6 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	required_device<speaker_sound_device> m_speaker;
-	void apogee(machine_config &config);
 	void apogee_mem(address_map &map);
 };
 
@@ -179,8 +181,6 @@ I8275_DRAW_CHARACTER_MEMBER(apogee_state::display_pixels)
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	const uint8_t *charmap = m_charmap + (gpa & 1) * 0x400;
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if(linecount == 8)
-		pixels = 0;
 	if (vsp) {
 		pixels = 0;
 	}
@@ -209,7 +209,7 @@ static const gfx_layout apogee_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( apogee )
+static GFXDECODE_START( gfx_apogee )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apogee_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apogee)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apogee)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(apogee_state,radio86)
 

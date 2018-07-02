@@ -334,13 +334,13 @@ void meadows_state::meadows_main_map(address_map &map)
 	map(0x0000, 0x0bff).rom();
 	map(0x0c00, 0x0c00).portr("INPUTS");
 	map(0x0c01, 0x0c01).portr("STICK");
-	map(0x0c02, 0x0c02).r(this, FUNC(meadows_state::hsync_chain_r));
+	map(0x0c02, 0x0c02).r(FUNC(meadows_state::hsync_chain_r));
 	map(0x0c03, 0x0c03).portr("DSW");
-	map(0x0c00, 0x0c03).w(this, FUNC(meadows_state::meadows_audio_w));
-	map(0x0d00, 0x0d0f).w(this, FUNC(meadows_state::meadows_spriteram_w)).share("spriteram");
+	map(0x0c00, 0x0c03).w(FUNC(meadows_state::meadows_audio_w));
+	map(0x0d00, 0x0d0f).w(FUNC(meadows_state::meadows_spriteram_w)).share("spriteram");
 	map(0x0e00, 0x0eff).ram();
 	map(0x1000, 0x1bff).rom();
-	map(0x1c00, 0x1fff).ram().w(this, FUNC(meadows_state::meadows_videoram_w)).share("videoram");
+	map(0x1c00, 0x1fff).ram().w(FUNC(meadows_state::meadows_videoram_w)).share("videoram");
 }
 
 void meadows_state::bowl3d_main_map(address_map &map)
@@ -348,26 +348,26 @@ void meadows_state::bowl3d_main_map(address_map &map)
 	map(0x0000, 0x0bff).rom();
 	map(0x0c00, 0x0c00).portr("INPUTS1");
 	map(0x0c01, 0x0c01).portr("INPUTS2");
-	map(0x0c02, 0x0c02).r(this, FUNC(meadows_state::hsync_chain_r));
+	map(0x0c02, 0x0c02).r(FUNC(meadows_state::hsync_chain_r));
 	map(0x0c03, 0x0c03).portr("DSW");
-	map(0x0c00, 0x0c03).w(this, FUNC(meadows_state::meadows_audio_w));
-	map(0x0d00, 0x0d0f).w(this, FUNC(meadows_state::meadows_spriteram_w)).share("spriteram");
+	map(0x0c00, 0x0c03).w(FUNC(meadows_state::meadows_audio_w));
+	map(0x0d00, 0x0d0f).w(FUNC(meadows_state::meadows_spriteram_w)).share("spriteram");
 	map(0x0e00, 0x0eff).ram();
 	map(0x1000, 0x1bff).rom();
-	map(0x1c00, 0x1fff).ram().w(this, FUNC(meadows_state::meadows_videoram_w)).share("videoram");
+	map(0x1c00, 0x1fff).ram().w(FUNC(meadows_state::meadows_videoram_w)).share("videoram");
 }
 
 void meadows_state::minferno_main_map(address_map &map)
 {
 	map(0x0000, 0x0bff).rom();
-	map(0x1c00, 0x1eff).ram().w(this, FUNC(meadows_state::meadows_videoram_w)).share("videoram");
+	map(0x1c00, 0x1eff).ram().w(FUNC(meadows_state::meadows_videoram_w)).share("videoram");
 	map(0x1f00, 0x1f00).portr("JOY1");
 	map(0x1f01, 0x1f01).portr("JOY2");
 	map(0x1f02, 0x1f02).portr("BUTTONS");
 	map(0x1f03, 0x1f03).portr("DSW1");
-	map(0x1f00, 0x1f03).w(this, FUNC(meadows_state::meadows_audio_w));
-	map(0x1f04, 0x1f04).r(this, FUNC(meadows_state::vsync_chain_hi_r));
-	map(0x1f05, 0x1f05).r(this, FUNC(meadows_state::vsync_chain_lo_r));
+	map(0x1f00, 0x1f03).w(FUNC(meadows_state::meadows_audio_w));
+	map(0x1f04, 0x1f04).r(FUNC(meadows_state::vsync_chain_hi_r));
+	map(0x1f05, 0x1f05).r(FUNC(meadows_state::vsync_chain_lo_r));
 }
 
 
@@ -387,7 +387,7 @@ void meadows_state::minferno_data_map(address_map &map)
 void meadows_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x0bff).rom();
-	map(0x0c00, 0x0c03).rw(this, FUNC(meadows_state::audio_hardware_r), FUNC(meadows_state::audio_hardware_w));
+	map(0x0c00, 0x0c03).rw(FUNC(meadows_state::audio_hardware_r), FUNC(meadows_state::audio_hardware_w));
 	map(0x0e00, 0x0eff).ram();
 }
 
@@ -582,7 +582,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( meadows )
+static GFXDECODE_START( gfx_meadows )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 1 )     /* character generator */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 1 )        /* sprite prom 1 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0, 1 )        /* sprite prom 2 */
@@ -591,7 +591,7 @@ static GFXDECODE_START( meadows )
 GFXDECODE_END
 
 
-static GFXDECODE_START( minferno )
+static GFXDECODE_START( gfx_minferno )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 4 )
 GFXDECODE_END
 
@@ -642,7 +642,7 @@ MACHINE_CONFIG_START(meadows_state::meadows)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meadows_state, meadows_vblank_irq)) // one interrupt per frame!?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", meadows)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_meadows)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* audio hardware */
@@ -674,7 +674,7 @@ MACHINE_CONFIG_START(meadows_state::minferno)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meadows_state, minferno_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", minferno)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_minferno)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* audio hardware */
@@ -703,7 +703,7 @@ MACHINE_CONFIG_START(meadows_state::bowl3d)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meadows_state, meadows_vblank_irq)) // one interrupt per frame!?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", meadows)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_meadows)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* audio hardware */

@@ -62,13 +62,15 @@ public:
 		, m_iopit(*this, "iopit")
 	{ }
 
+	void konin(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(picu_b_w);
 	DECLARE_WRITE_LINE_MEMBER(picu_r3_w);
 
-	void konin(machine_config &config);
 	void konin_io(address_map &map);
 	void konin_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8214_device> m_picu;
@@ -102,7 +104,7 @@ void konin_state::konin_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x24, 0x24).w(this, FUNC(konin_state::picu_b_w));
+	map(0x24, 0x24).w(FUNC(konin_state::picu_b_w));
 	map(0x80, 0x83).lrw8("ioppi_rw",
 						 [this](address_space &space, offs_t offset, u8 mem_mask) {
 							 return m_ioppi->read(space, offset^3, mem_mask);

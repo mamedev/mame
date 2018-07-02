@@ -978,7 +978,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 // cabinet lamps for type 1 games
 WRITE32_MEMBER(konamigx_state::type1_cablamps_w)
 {
-	output().set_led_value(0, (data>>24)&1);
+	m_lamp = BIT(data, 24);
 }
 
 /**********************************************************************************/
@@ -996,7 +996,7 @@ void konamigx_state::gx_base_memmap(address_map &map)
 	map(0xd21000, 0xd21fff).ram(); // second bank of sprite RAM, accessed thru ESC
 	map(0xd22000, 0xd23fff).ram(); // extra bank checked at least by sexyparo, pending further investigation.
 	map(0xd40000, 0xd4003f).w(m_k056832, FUNC(k056832_device::long_w));
-	map(0xd44000, 0xd4400f).w(this, FUNC(konamigx_state::konamigx_tilebank_w));
+	map(0xd44000, 0xd4400f).w(FUNC(konamigx_state::konamigx_tilebank_w));
 	map(0xd48000, 0xd48007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
 	map(0xd4a000, 0xd4a00f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 	map(0xd4a010, 0xd4a01f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));
@@ -1004,8 +1004,8 @@ void konamigx_state::gx_base_memmap(address_map &map)
 	map(0xd4e000, 0xd4e01f).nopw(); // left-over for "secondary" CCU, apparently (used by type 3/4 for slave screen?)
 	map(0xd50000, 0xd500ff).w(m_k055555, FUNC(k055555_device::K055555_long_w));
 	map(0xd52000, 0xd5201f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w)).umask32(0xff00ff00);
-	map(0xd56000, 0xd56003).w(this, FUNC(konamigx_state::eeprom_w));
-	map(0xd58000, 0xd58003).w(this, FUNC(konamigx_state::control_w));
+	map(0xd56000, 0xd56003).w(FUNC(konamigx_state::eeprom_w));
+	map(0xd58000, 0xd58003).w(FUNC(konamigx_state::control_w));
 	map(0xd5a000, 0xd5a003).portr("SYSTEM_DSW");
 	map(0xd5c000, 0xd5c003).portr("INPUTS");
 	map(0xd5e000, 0xd5e003).portr("SERVICE");
@@ -1022,14 +1022,14 @@ void konamigx_state::gx_type1_map(address_map &map)
 	map(0xdd0000, 0xdd00ff).nopr().nopw(); // LAN board
 	map(0xdda000, 0xddafff).portw("ADC-WRPORT");
 	map(0xddc000, 0xddcfff).portr("ADC-RDPORT");
-	map(0xdde000, 0xdde003).w(this, FUNC(konamigx_state::type1_cablamps_w));
+	map(0xdde000, 0xdde003).w(FUNC(konamigx_state::type1_cablamps_w));
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
 	map(0xe20000, 0xe2000f).nopw();
 	map(0xe40000, 0xe40003).nopw();
 	map(0xe80000, 0xe81fff).ram().share("k053936_0_line");  // chips 21L+19L / S
-	map(0xec0000, 0xedffff).ram().w(this, FUNC(konamigx_state::konamigx_t1_psacmap_w)).share("psacram");  // chips 20J+23J+18J / S
-	map(0xf00000, 0xf3ffff).r(this, FUNC(konamigx_state::type1_roz_r1));  // ROM readback
-	map(0xf40000, 0xf7ffff).r(this, FUNC(konamigx_state::type1_roz_r2));  // ROM readback
+	map(0xec0000, 0xedffff).ram().w(FUNC(konamigx_state::konamigx_t1_psacmap_w)).share("psacram");  // chips 20J+23J+18J / S
+	map(0xf00000, 0xf3ffff).r(FUNC(konamigx_state::type1_roz_r1));  // ROM readback
+	map(0xf40000, 0xf7ffff).r(FUNC(konamigx_state::type1_roz_r2));  // ROM readback
 	map(0xf80000, 0xf80fff).ram(); // chip 21Q / S
 	map(0xfc0000, 0xfc00ff).ram(); // chip 22N / S
 }
@@ -1037,7 +1037,7 @@ void konamigx_state::gx_type1_map(address_map &map)
 void konamigx_state::gx_type2_map(address_map &map)
 {
 	gx_base_memmap(map);
-	map(0xcc0000, 0xcc0003).w(this, FUNC(konamigx_state::esc_w));
+	map(0xcc0000, 0xcc0003).w(FUNC(konamigx_state::esc_w));
 	map(0xd90000, 0xd97fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 }
 
@@ -1048,18 +1048,18 @@ void konamigx_state::gx_type3_map(address_map &map)
 	//AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
 	//AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
-	map(0xe40000, 0xe40003).w(this, FUNC(konamigx_state::konamigx_type3_psac2_bank_w)).share("psac2_bank");
+	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::konamigx_type3_psac2_bank_w)).share("psac2_bank");
 	map(0xe60000, 0xe60fff).ram().share("k053936_0_line");
 	map(0xe80000, 0xe83fff).ram().share("paletteram");  // main monitor palette
 	map(0xea0000, 0xea3fff).ram().share("subpaletteram");
-	map(0xec0000, 0xec0003).r(this, FUNC(konamigx_state::type3_sync_r));
+	map(0xec0000, 0xec0003).r(FUNC(konamigx_state::type3_sync_r));
 	//AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 }
 
 void konamigx_state::gx_type4_map(address_map &map)
 {
 	gx_base_memmap(map);
-	map(0xcc0000, 0xcc0007).w(this, FUNC(konamigx_state::type4_prot_w));
+	map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
 	map(0xd90000, 0xd97fff).ram();
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
 	map(0xe20000, 0xe20003).nopw();
@@ -1067,8 +1067,8 @@ void konamigx_state::gx_type4_map(address_map &map)
 	map(0xe60000, 0xe60fff).ram().share("k053936_0_line");  // 29C & 29G (PSAC2 line control)
 	map(0xe80000, 0xe87fff).ram().share("paletteram"); // 11G/13G/15G (main screen palette RAM)
 	map(0xea0000, 0xea7fff).ram().share("subpaletteram"); // 5G/7G/9G (sub screen palette RAM)
-	map(0xec0000, 0xec0003).r(this, FUNC(konamigx_state::type3_sync_r));      // type 4 polls this too
-	map(0xf00000, 0xf07fff).ram().w(this, FUNC(konamigx_state::konamigx_t4_psacmap_w)).share("psacram");    // PSAC2 tilemap
+	map(0xec0000, 0xec0003).r(FUNC(konamigx_state::type3_sync_r));      // type 4 polls this too
+	map(0xf00000, 0xf07fff).ram().w(FUNC(konamigx_state::konamigx_t4_psacmap_w)).share("psacram");    // PSAC2 tilemap
 //  AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 }
 
@@ -1115,9 +1115,9 @@ void konamigx_state::gxsndmap(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x200000, 0x2004ff).rw(m_k054539_1, FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0xff00);
 	map(0x200000, 0x2004ff).rw(m_k054539_2, FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0x00ff);
-	map(0x300000, 0x300001).rw(this, FUNC(konamigx_state::tms57002_data_word_r), FUNC(konamigx_state::tms57002_data_word_w));
+	map(0x300000, 0x300001).rw(FUNC(konamigx_state::tms57002_data_word_r), FUNC(konamigx_state::tms57002_data_word_w));
 	map(0x400000, 0x40001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
-	map(0x500000, 0x500001).rw(this, FUNC(konamigx_state::tms57002_status_word_r), FUNC(konamigx_state::tms57002_control_word_w));
+	map(0x500000, 0x500001).rw(FUNC(konamigx_state::tms57002_status_word_r), FUNC(konamigx_state::tms57002_control_word_w));
 	map(0x580000, 0x580001).nopw(); // 'NRES' - D2: K056602 /RESET
 }
 
@@ -1579,22 +1579,22 @@ static const gfx_layout t1_charlayout8 =
 };
 
 /* type 1 (opengolf + racinfrc) use 6 and 8 bpp planar layouts for the 53936 */
-static GFXDECODE_START( opengolf )
+static GFXDECODE_START( gfx_opengolf )
 	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout8, 0x0000, 8 )
 	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( racinfrc )
+static GFXDECODE_START( gfx_racinfrc )
 	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout6, 0x0000, 8 )
 	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
 GFXDECODE_END
 
 /* type 3 & 4 games use a simple 8bpp decode for the 53936 */
-static GFXDECODE_START( type3 )
+static GFXDECODE_START( gfx_type3 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1000, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( type4 )
+static GFXDECODE_START( gfx_type4 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
 GFXDECODE_END
 
@@ -1633,7 +1633,7 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_MACHINE_START_OVERRIDE(konamigx_state,konamigx)
 	MCFG_MACHINE_RESET_OVERRIDE(konamigx_state,konamigx)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1655,14 +1655,13 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(konamigx_state, type2_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0)
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K055555_ADD("k055555")
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
-	MCFG_K054338_MIXER("k055555")
-	MCFG_K054338_SET_SCREEN("screen")
+	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
+	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_K054338_ALPHAINV(1)
 
 	MCFG_DEVICE_ADD("k055673", K055673, 0)
@@ -1703,7 +1702,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(konamigx_state::konamigx_bios)
 	konamigx(config);
 	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 0, 0, "k055555")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 0, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamigx_state::gokuparo)
@@ -1724,7 +1723,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(konamigx_state::tbyahhoo)
 	konamigx(config);
 	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0, "k055555")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamigx_state::dragoonj)
@@ -1736,7 +1735,7 @@ MACHINE_CONFIG_START(konamigx_state::dragoonj)
 	MCFG_K053252_OFFSETS(24+16, 16)
 
 	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 1, 0)
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(konamigx_state, dragoonj_sprite_callback)
@@ -1749,7 +1748,7 @@ MACHINE_CONFIG_START(konamigx_state::le2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type2_scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0)
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(konamigx_state, le2_sprite_callback)
@@ -1761,7 +1760,7 @@ MACHINE_CONFIG_START(konamigx_state::konamigx_6bpp)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_6bpp)
 
 	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 0)
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -46, -23)
@@ -1770,7 +1769,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(konamigx_state::salmndr2)
 	konamigx(config);
 	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 1, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 1, 0)
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(konamigx_state, salmndr2_sprite_callback)
@@ -1783,7 +1782,7 @@ MACHINE_CONFIG_START(konamigx_state::opengolf)
 	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", opengolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_opengolf)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, opengolf)
 
 	MCFG_DEVICE_MODIFY("k055673")
@@ -1802,14 +1801,14 @@ MACHINE_CONFIG_START(konamigx_state::racinfrc)
 	//MCFG_SCREEN_RAW_PARAMS(6000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	//MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", racinfrc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_racinfrc)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, racinfrc)
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(24-8+16, 0)
 
 	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 0)
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -53, -23)
@@ -1830,7 +1829,7 @@ MACHINE_CONFIG_START(konamigx_state::gxtype3)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", type3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_type3)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type3)
 
 	MCFG_DEVICE_MODIFY("k053252")
@@ -1838,7 +1837,7 @@ MACHINE_CONFIG_START(konamigx_state::gxtype3)
 	MCFG_K053252_SET_SLAVE_SCREEN("screen2")
 
 	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 2, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 2)
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -132, -23)
@@ -1889,7 +1888,7 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", type4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_type4)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4)
 
 	MCFG_DEVICE_MODIFY("k053252")
@@ -1898,7 +1897,7 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4)
 
 
 	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 0, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 0)
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -79, -24) // -23 looks better in intro
@@ -1923,7 +1922,7 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4_vsn)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_vsn)
 
 	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 2, "none")   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 2)   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -132, -23)
@@ -1947,7 +1946,7 @@ MACHINE_CONFIG_START(konamigx_state::winspike)
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CB(konamigx_state, alpha_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 2, "none")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 2)
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_LE2, -53, -23)
@@ -3727,6 +3726,8 @@ ROM_END
 
 MACHINE_START_MEMBER(konamigx_state,konamigx)
 {
+	m_lamp.resolve();
+
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_intck));
 

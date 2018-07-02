@@ -184,8 +184,8 @@ WRITE8_MEMBER(speedatk_state::key_matrix_status_w)
 void speedatk_state::speedatk_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8000).rw(this, FUNC(speedatk_state::key_matrix_r), FUNC(speedatk_state::key_matrix_w));
-	map(0x8001, 0x8001).rw(this, FUNC(speedatk_state::key_matrix_status_r), FUNC(speedatk_state::key_matrix_status_w));
+	map(0x8000, 0x8000).rw(FUNC(speedatk_state::key_matrix_r), FUNC(speedatk_state::key_matrix_w));
+	map(0x8001, 0x8001).rw(FUNC(speedatk_state::key_matrix_status_r), FUNC(speedatk_state::key_matrix_status_w));
 	map(0x8800, 0x8fff).ram();
 	map(0xa000, 0xa3ff).ram().share("videoram");
 	map(0xb000, 0xb3ff).ram().share("colorram");
@@ -195,7 +195,7 @@ void speedatk_state::speedatk_mem(address_map &map)
 void speedatk_state::speedatk_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(speedatk_state::m6845_w)); //h46505 address / data routing
+	map(0x00, 0x01).w(FUNC(speedatk_state::m6845_w)); //h46505 address / data routing
 	map(0x24, 0x24).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
@@ -293,7 +293,7 @@ static const gfx_layout charlayout_3bpp =
 };
 
 
-static GFXDECODE_START( speedatk )
+static GFXDECODE_START( gfx_speedatk )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_3bpp,   0, 32 )
 GFXDECODE_END
@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(speedatk_state::speedatk)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedatk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speedatk)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(speedatk_state, speedatk)

@@ -6,6 +6,8 @@
 
 #include "cpu/sh/sh2.h"
 
+#include "emupal.h"
+
 
 struct hit_t
 {
@@ -44,6 +46,36 @@ public:
 		m_main_ram(*this, "main_ram"),
 		m_cache_ram(*this, "cache_ram") { }
 
+	void sknsk(machine_config &config);
+	void sknsu(machine_config &config);
+	void sknsa(machine_config &config);
+	void sknsj(machine_config &config);
+	void sknse(machine_config &config);
+	void skns(machine_config &config);
+
+	void init_sengekis();
+	void init_cyvern();
+	void init_puzzloopa();
+	void init_teljan();
+	void init_panicstr();
+	void init_puzzloope();
+	void init_sengekij();
+	void init_puzzloopj();
+	void init_sarukani();
+	void init_gutsn();
+	void init_jjparad2();
+	void init_galpans3();
+	void init_jjparads();
+	void init_galpans2();
+	void init_galpanis();
+	void init_puzzloopu();
+	void init_senknow();
+	void init_galpani4();
+	void init_ryouran();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(paddle_r);
+
+private:
 	required_device<sh2_device> m_maincpu;
 	required_device<sknsspr_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -120,27 +152,6 @@ public:
 	DECLARE_READ32_MEMBER(sengekis_speedup_r);
 	DECLARE_READ32_MEMBER(sengekij_speedup_r);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(paddle_r);
-
-	void init_sengekis();
-	void init_cyvern();
-	void init_puzzloopa();
-	void init_teljan();
-	void init_panicstr();
-	void init_puzzloope();
-	void init_sengekij();
-	void init_puzzloopj();
-	void init_sarukani();
-	void init_gutsn();
-	void init_jjparad2();
-	void init_galpans3();
-	void init_jjparads();
-	void init_galpans2();
-	void init_galpanis();
-	void init_puzzloopu();
-	void init_senknow();
-	void init_galpani4();
-	void init_ryouran();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -164,11 +175,6 @@ public:
 	void hit_recalc();
 	void init_drc();
 	void set_drc_pcflush(uint32_t addr);
-	void sknsk(machine_config &config);
-	void sknsu(machine_config &config);
-	void sknsa(machine_config &config);
-	void sknsj(machine_config &config);
-	void sknse(machine_config &config);
-	void skns(machine_config &config);
+
 	void skns_map(address_map &map);
 };

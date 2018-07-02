@@ -63,6 +63,13 @@
 
 #define SH_FLAGS   (SH_M|SH_Q|SH_I|SH_S|SH_T)
 
+/* SR shift values */
+#define T_SHIFT 0
+#define S_SHIFT 1
+#define I_SHIFT 4
+#define Q_SHIFT 8
+#define M_SHIFT 9
+
 #define REGFLAG_R(n)                    (1 << (n))
 
 /* register flags 1 */
@@ -167,6 +174,9 @@ public:
 	virtual void WB(offs_t A, uint8_t V) = 0;
 	virtual void WW(offs_t A, uint16_t V) = 0;
 	virtual void WL(offs_t A, uint32_t V) = 0;
+
+	virtual void set_frt_input(int state) = 0;
+	void pulse_frt_input() { set_frt_input(ASSERT_LINE); set_frt_input(CLEAR_LINE); }
 
 protected:
 	// compilation boundaries -- how far back/forward does the analysis extend?

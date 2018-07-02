@@ -79,6 +79,7 @@
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "cpu/adsp2100/adsp2100.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -93,25 +94,25 @@ class wms_state : public driver_device
 {
 public:
 	wms_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
-	void init_wms();
-	DECLARE_READ8_MEMBER(test_r);
-		uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void wms(machine_config &config);
 
-		void wms(machine_config &config);
-		void adsp_data_map(address_map &map);
-		void adsp_program_map(address_map &map);
-		void wms_io(address_map &map);
-		void wms_map(address_map &map);
-protected:
+	void init_wms();
+
+private:
+	DECLARE_READ8_MEMBER(test_r);
+	uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void adsp_data_map(address_map &map);
+	void adsp_program_map(address_map &map);
+	void wms_io(address_map &map);
+	void wms_map(address_map &map);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-
-private:
 };
 
 uint32_t wms_state::screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -136,7 +137,7 @@ READ8_MEMBER(wms_state::test_r)
 
 void wms_state::wms_io(address_map &map)
 {
-	map(0x1207, 0x1207).r(this, FUNC(wms_state::test_r));
+	map(0x1207, 0x1207).r(FUNC(wms_state::test_r));
 }
 
 
@@ -172,7 +173,7 @@ static const gfx_layout gfxlayout =
 	8*8
 };
 
-static GFXDECODE_START( wms )
+static GFXDECODE_START( gfx_wms )
 	GFXDECODE_ENTRY( "maincpu", 0x00000, gfxlayout,   0, 1 )
 GFXDECODE_END
 
@@ -196,7 +197,7 @@ MACHINE_CONFIG_START(wms_state::wms)
 	MCFG_SCREEN_UPDATE_DRIVER(wms_state, screen_update_wms)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wms)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wms)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 

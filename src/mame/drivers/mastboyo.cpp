@@ -11,6 +11,7 @@ this is Gaelco's first game, although there should be a 1986 release too, likely
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/nvram.h"
@@ -107,9 +108,9 @@ void mastboyo_state::mastboyo_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("nvram");
-	map(0x5000, 0x53ff).ram().w(this, FUNC(mastboyo_state::fgram_w)).share("fgram");
-	map(0x5400, 0x57ff).ram().w(this, FUNC(mastboyo_state::fgram2_w)).share("fgram2");
-	map(0x6000, 0x6000).w(this, FUNC(mastboyo_state::rombank_w));
+	map(0x5000, 0x53ff).ram().w(FUNC(mastboyo_state::fgram_w)).share("fgram");
+	map(0x5400, 0x57ff).ram().w(FUNC(mastboyo_state::fgram2_w)).share("fgram2");
+	map(0x6000, 0x6000).w(FUNC(mastboyo_state::rombank_w));
 //  map(0x7000, 0x7000).portr("UNK"); // possible watchdog? or IRQ ack?
 	map(0x8000, 0xffff).bankr("bank1");
 }
@@ -160,7 +161,7 @@ static const gfx_layout tiles8x8_layout =
 	32*8
 };
 
-static GFXDECODE_START( mastboyo )
+static GFXDECODE_START( gfx_mastboyo )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -202,7 +203,7 @@ MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 	MCFG_SCREEN_UPDATE_DRIVER(mastboyo_state, screen_update_mastboyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastboyo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastboyo)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(mastboyo_state, mastboyo)

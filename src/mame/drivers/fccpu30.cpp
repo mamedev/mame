@@ -249,6 +249,28 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	{
 	}
 
+	void cpu30(machine_config &config);
+	void cpu30x(machine_config &config);
+	void cpu30zbe(machine_config &config);
+	void cpu30be8(machine_config &config);
+	void cpu30za(machine_config &config);
+	void cpu30lite4(machine_config &config);
+	void cpu30xa(machine_config &config);
+	void cpu33(machine_config &config);
+	void cpu30lite8(machine_config &config);
+	void cpu30be16(machine_config &config);
+
+	void init_cpu30x();
+	void init_cpu30xa();
+	void init_cpu30za();
+	void init_cpu30zbe();
+	void init_cpu30be8();
+	void init_cpu30be16();
+	void init_cpu30lite4();
+	void init_cpu30lite8();
+	void init_cpu33();
+
+private:
 	DECLARE_WRITE8_MEMBER (fdc_w);
 	DECLARE_READ8_MEMBER (fdc_r);
 	DECLARE_WRITE8_MEMBER (scsi_w);
@@ -283,29 +305,9 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	//DECLARE_WRITE16_MEMBER (vme_a16_w);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
-	void init_cpu30x();
-	void init_cpu30xa();
-	void init_cpu30za();
-	void init_cpu30zbe();
-	void init_cpu30be8();
-	void init_cpu30be16();
-	void init_cpu30lite4();
-	void init_cpu30lite8();
-	void init_cpu33();
-	void cpu30(machine_config &config);
-	void cpu30x(machine_config &config);
-	void cpu30zbe(machine_config &config);
-	void cpu30be8(machine_config &config);
-	void cpu30za(machine_config &config);
-	void cpu30lite4(machine_config &config);
-	void cpu30xa(machine_config &config);
-	void cpu33(machine_config &config);
-	void cpu30lite8(machine_config &config);
-	void cpu30be16(machine_config &config);
-	void cpu30_mem(address_map &map);
-protected:
 
-private:
+	void cpu30_mem(address_map &map);
+
 	required_device<m68000_base_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
@@ -331,8 +333,8 @@ private:
 void cpu30_state::cpu30_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000000, 0x00000007).ram().w(this, FUNC(cpu30_state::bootvect_w));   /* After first write we act as RAM */
-	map(0x00000000, 0x00000007).rom().r(this, FUNC(cpu30_state::bootvect_r));   /* ROM mirror just during reset */
+	map(0x00000000, 0x00000007).ram().w(FUNC(cpu30_state::bootvect_w));   /* After first write we act as RAM */
+	map(0x00000000, 0x00000007).rom().r(FUNC(cpu30_state::bootvect_r));   /* ROM mirror just during reset */
 //  AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* RAM  installed in machine start */
 	map(0xff000000, 0xff7fffff).rom().region("roms", 0x000000);
 	map(0xff800c00, 0xff800dff).rw(m_pit1, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
@@ -341,10 +343,10 @@ void cpu30_state::cpu30_mem(address_map &map)
 	map(0xff802200, 0xff8023ff).rw("duscc2", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)); /* Port 3&4 - Dual serial port DUSCC   */
 	map(0xff803000, 0xff8031ff).rw(m_rtc, FUNC(rtc72423_device::read), FUNC(rtc72423_device::write));
 //  AM_RANGE (0xff803400, 0xff8035ff) AM_DEVREADWRITE8("scsi", mb87033_device, read, write, 0xffffffff) /* TODO: implement MB87344 SCSI device */
-	map(0xff803400, 0xff8035ff).rw(this, FUNC(cpu30_state::scsi_r), FUNC(cpu30_state::scsi_w)).umask32(0x000000ff); /* mock driver to log calls to device */
+	map(0xff803400, 0xff8035ff).rw(FUNC(cpu30_state::scsi_r), FUNC(cpu30_state::scsi_w)).umask32(0x000000ff); /* mock driver to log calls to device */
 //  AM_RANGE (0xff803800, 0xff80397f) AM_DEVREADWRITE8("fdc", wd37c65c_device, read, write, 0xffffffff) /* TODO: implement WD3/C65C fdc controller */
-	map(0xff803800, 0xff80397f).rw(this, FUNC(cpu30_state::fdc_r), FUNC(cpu30_state::fdc_w)).umask32(0x000000ff); /* mock driver to log calls to device */
-	map(0xff803980, 0xff8039ff).r(this, FUNC(cpu30_state::slot1_status_r)).umask32(0x000000ff);
+	map(0xff803800, 0xff80397f).rw(FUNC(cpu30_state::fdc_r), FUNC(cpu30_state::fdc_w)).umask32(0x000000ff); /* mock driver to log calls to device */
+	map(0xff803980, 0xff8039ff).r(FUNC(cpu30_state::slot1_status_r)).umask32(0x000000ff);
 	map(0xffc00000, 0xffcfffff).ram().share("nvram"); /* On-board SRAM with battery backup (nvram) */
 	map(0xffd00000, 0xffdfffff).rw(m_fga002, FUNC(fga002_device::read), FUNC(fga002_device::write));  /* FGA-002 Force Gate Array */
 	map(0xffe00000, 0xffefffff).rom().region("roms", 0x800000);

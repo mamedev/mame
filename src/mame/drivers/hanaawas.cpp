@@ -104,18 +104,18 @@ void hanaawas_state::hanaawas_map(address_map &map)
 	map(0x0000, 0x2fff).rom();
 	map(0x4000, 0x4fff).rom();
 	map(0x6000, 0x6fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(hanaawas_state::hanaawas_videoram_w)).share("videoram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(hanaawas_state::hanaawas_colorram_w)).share("colorram");
+	map(0x8000, 0x83ff).ram().w(FUNC(hanaawas_state::hanaawas_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(hanaawas_state::hanaawas_colorram_w)).share("colorram");
 	map(0x8800, 0x8bff).ram();
-	map(0xb000, 0xb000).w(this, FUNC(hanaawas_state::irq_ack_w));
+	map(0xb000, 0xb000).w(FUNC(hanaawas_state::irq_ack_w));
 }
 
 
 void hanaawas_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(hanaawas_state::hanaawas_input_port_0_r), FUNC(hanaawas_state::hanaawas_inputs_mux_w));
-	map(0x01, 0x01).nopr().w(this, FUNC(hanaawas_state::key_matrix_status_w)); /* r bit 1: status ready, presumably of the input mux device / w = configure device? */
+	map(0x00, 0x00).rw(FUNC(hanaawas_state::hanaawas_input_port_0_r), FUNC(hanaawas_state::hanaawas_inputs_mux_w));
+	map(0x01, 0x01).nopr().w(FUNC(hanaawas_state::key_matrix_status_w)); /* r bit 1: status ready, presumably of the input mux device / w = configure device? */
 	map(0x10, 0x10).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x10, 0x11).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xc0, 0xc0).nopw(); // watchdog
@@ -197,7 +197,7 @@ static const gfx_layout name =                      \
 GFX( charlayout_1bpp, 0x2000*8+4, 0x2000*8+4, 0x2000*8+4 )
 GFX( charlayout_3bpp, 0x2000*8,   0,          4          )
 
-static GFXDECODE_START( hanaawas )
+static GFXDECODE_START( gfx_hanaawas )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp, 0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_3bpp, 0, 32 )
 GFXDECODE_END
@@ -233,7 +233,7 @@ MACHINE_CONFIG_START(hanaawas_state::hanaawas)
 	MCFG_SCREEN_UPDATE_DRIVER(hanaawas_state, screen_update_hanaawas)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hanaawas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hanaawas)
 	MCFG_PALETTE_ADD("palette", 32*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(hanaawas_state, hanaawas)

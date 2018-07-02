@@ -140,14 +140,14 @@ The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or l
 
 void wrally_state::mcu_hostmem_map(address_map &map)
 {
-	map(0x0000, 0xffff).mask(0x3fff).rw(this, FUNC(wrally_state::shareram_r), FUNC(wrally_state::shareram_w)); // shared RAM with the main CPU
+	map(0x0000, 0xffff).mask(0x3fff).rw(FUNC(wrally_state::shareram_r), FUNC(wrally_state::shareram_w)); // shared RAM with the main CPU
 }
 
 
 void wrally_state::wrally_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                         /* ROM */
-	map(0x100000, 0x103fff).ram().w(this, FUNC(wrally_state::vram_w)).share("videoram");   /* encrypted Video RAM */
+	map(0x100000, 0x103fff).ram().w(FUNC(wrally_state::vram_w)).share("videoram");   /* encrypted Video RAM */
 	map(0x108000, 0x108007).ram().share("vregs");                                   /* Video Registers */
 	map(0x10800c, 0x10800d).nopw();                                                /* CLR INT Video */
 	map(0x200000, 0x203fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
@@ -160,7 +160,7 @@ void wrally_state::wrally_map(address_map &map)
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
 												 });
-	map(0x70000c, 0x70000d).w(this, FUNC(wrally_state::okim6295_bankswitch_w));                                /* OKI6295 bankswitch */
+	map(0x70000c, 0x70000d).w(FUNC(wrally_state::okim6295_bankswitch_w));                                /* OKI6295 bankswitch */
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  /* OKI6295 status/data register */
 	map(0xfec000, 0xfeffff).ram().share("shareram");                                        /* Work RAM (shared with DS5002FP) */
 }
@@ -260,7 +260,7 @@ static const gfx_layout wrally_tilelayout16 =
 	64*8
 };
 
-static GFXDECODE_START( wrally )
+static GFXDECODE_START( gfx_wrally )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, wrally_tilelayout16, 0, 64*8 )
 GFXDECODE_END
 
@@ -283,7 +283,7 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 	MCFG_SCREEN_UPDATE_DRIVER(wrally_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wrally)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wrally)
 	MCFG_PALETTE_ADD("palette", 1024*8)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 

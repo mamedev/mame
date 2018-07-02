@@ -28,7 +28,7 @@ class er2055_device :   public device_t,
 {
 public:
 	// construction/destruction
-	er2055_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	er2055_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// I/O operations
 	uint8_t data() const { return m_data; }

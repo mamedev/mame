@@ -26,30 +26,11 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_M48T02_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, M48T02, 0)
-
-#define MCFG_M48T35_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, M48T35, 0)
-
-#define MCFG_M48T37_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, M48T37, 0)
-
 #define MCFG_M48T37_RESET_HANDLER(_devcb) \
 	devcb = &downcast<timekeeper_device &>(*device).set_reset_handler(DEVCB_##_devcb);
 
 #define MCFG_M48T37_IRQ_HANDLER(_devcb) \
 	devcb = &downcast<timekeeper_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_M48T58_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, M48T58, 0)
-
-#define MCFG_MK48T08_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MK48T08, 0)
-
-#define MCFG_MK48T12_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MK48T12, 0)
-
 
 
 //**************************************************************************

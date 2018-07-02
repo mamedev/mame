@@ -40,6 +40,7 @@
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "sbrkout.lh"
@@ -60,7 +61,7 @@ public:
 
 	void sbrkout(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	virtual DECLARE_READ8_MEMBER(switches_r);
 	DECLARE_WRITE_LINE_MEMBER(pot_mask1_w);
@@ -84,7 +85,6 @@ protected:
 	void update_nmi_state();
 	void main_map(address_map &map);
 
-private:
 	required_shared_ptr<uint8_t> m_videoram;
 	emu_timer *m_scanline_timer;
 	emu_timer *m_pot_timer;
@@ -400,16 +400,16 @@ void sbrkout_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x007f).mirror(0x380).bankrw("bank1");
-	map(0x0400, 0x07ff).ram().w(this, FUNC(sbrkout_state::sbrkout_videoram_w)).share("videoram");
-	map(0x0800, 0x083f).r(this, FUNC(sbrkout_state::switches_r));
+	map(0x0400, 0x07ff).ram().w(FUNC(sbrkout_state::sbrkout_videoram_w)).share("videoram");
+	map(0x0800, 0x083f).r(FUNC(sbrkout_state::switches_r));
 	map(0x0840, 0x0840).mirror(0x003f).portr("COIN");
 	map(0x0880, 0x0880).mirror(0x003f).portr("START");
 	map(0x08c0, 0x08c0).mirror(0x003f).portr("SERVICE");
-	map(0x0c00, 0x0c00).mirror(0x03ff).r(this, FUNC(sbrkout_state::sync_r));
-	map(0x0c00, 0x0c7f).w(this, FUNC(sbrkout_state::output_latch_w));
+	map(0x0c00, 0x0c00).mirror(0x03ff).r(FUNC(sbrkout_state::sync_r));
+	map(0x0c00, 0x0c7f).w(FUNC(sbrkout_state::output_latch_w));
 	map(0x0c80, 0x0c80).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0e00, 0x0e00).mirror(0x007f).w(this, FUNC(sbrkout_state::irq_ack_w));
-	map(0x1000, 0x1000).mirror(0x03ff).r(this, FUNC(sbrkout_state::sync2_r));
+	map(0x0e00, 0x0e00).mirror(0x007f).w(FUNC(sbrkout_state::irq_ack_w));
+	map(0x1000, 0x1000).mirror(0x03ff).r(FUNC(sbrkout_state::sync2_r));
 	map(0x2800, 0x3fff).rom();
 }
 
@@ -543,7 +543,7 @@ static const gfx_layout balllayout =
 };
 
 
-static GFXDECODE_START( sbrkout )
+static GFXDECODE_START( gfx_sbrkout )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, balllayout, 0, 1 )
 GFXDECODE_END
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbrkout)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbrkout)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224)

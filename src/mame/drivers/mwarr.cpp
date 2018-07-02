@@ -43,6 +43,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -71,6 +72,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void mwarr(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_mlow_videoram;
@@ -114,7 +118,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void mwarr(machine_config &config);
 	void mwarr_map(address_map &map);
 	void oki2_map(address_map &map);
 };
@@ -215,10 +218,10 @@ WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
 void mwarr_state::mwarr_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x1007ff).ram().w(this, FUNC(mwarr_state::bg_videoram_w)).share("bg_videoram");
-	map(0x100800, 0x100fff).ram().w(this, FUNC(mwarr_state::mlow_videoram_w)).share("mlow_videoram");
-	map(0x101000, 0x1017ff).ram().w(this, FUNC(mwarr_state::mhigh_videoram_w)).share("mhigh_videoram");
-	map(0x101800, 0x1027ff).ram().w(this, FUNC(mwarr_state::tx_videoram_w)).share("tx_videoram");
+	map(0x100000, 0x1007ff).ram().w(FUNC(mwarr_state::bg_videoram_w)).share("bg_videoram");
+	map(0x100800, 0x100fff).ram().w(FUNC(mwarr_state::mlow_videoram_w)).share("mlow_videoram");
+	map(0x101000, 0x1017ff).ram().w(FUNC(mwarr_state::mhigh_videoram_w)).share("mhigh_videoram");
+	map(0x101800, 0x1027ff).ram().w(FUNC(mwarr_state::tx_videoram_w)).share("tx_videoram");
 	map(0x103000, 0x1033ff).ram().share("bg_scrollram");
 	map(0x103400, 0x1037ff).ram().share("mlow_scrollram");
 	map(0x103800, 0x103bff).ram().share("mhigh_scrollram");
@@ -229,9 +232,9 @@ void mwarr_state::mwarr_map(address_map &map)
 	map(0x110000, 0x110001).portr("P1_P2");
 	map(0x110002, 0x110003).portr("SYSTEM");
 	map(0x110004, 0x110005).portr("DSW");
-	map(0x110010, 0x110011).w(this, FUNC(mwarr_state::oki1_bank_w));
-	map(0x110014, 0x110015).w(this, FUNC(mwarr_state::mwarr_brightness_w));
-	map(0x110016, 0x110017).w(this, FUNC(mwarr_state::sprites_commands_w));
+	map(0x110010, 0x110011).w(FUNC(mwarr_state::oki1_bank_w));
+	map(0x110014, 0x110015).w(FUNC(mwarr_state::mwarr_brightness_w));
+	map(0x110016, 0x110017).w(FUNC(mwarr_state::sprites_commands_w));
 	map(0x180001, 0x180001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x190001, 0x190001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
@@ -365,7 +368,7 @@ static const gfx_layout mwarr_6bpp_sprites =
 	32*8
 };
 
-static GFXDECODE_START( mwarr )
+static GFXDECODE_START( gfx_mwarr )
 	GFXDECODE_ENTRY( "gfx1", 0, mwarr_6bpp_sprites,  1024, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, mwarr_tile8_layout,  384,  8 )
 	GFXDECODE_ENTRY( "gfx3", 0, mwarr_tile16_layout,  256,  8 )
@@ -584,7 +587,7 @@ MACHINE_CONFIG_START(mwarr_state::mwarr)
 	MCFG_SCREEN_UPDATE_DRIVER(mwarr_state, screen_update_mwarr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mwarr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mwarr)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

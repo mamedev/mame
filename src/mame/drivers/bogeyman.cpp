@@ -51,14 +51,14 @@ WRITE8_MEMBER(bogeyman_state::ay8910_control_w)
 void bogeyman_state::bogeyman_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
-	map(0x1800, 0x1bff).ram().w(this, FUNC(bogeyman_state::videoram2_w)).share("videoram2");
-	map(0x1c00, 0x1fff).ram().w(this, FUNC(bogeyman_state::colorram2_w)).share("colorram2");
-	map(0x2000, 0x20ff).ram().w(this, FUNC(bogeyman_state::videoram_w)).share("videoram");
-	map(0x2100, 0x21ff).ram().w(this, FUNC(bogeyman_state::colorram_w)).share("colorram");
+	map(0x1800, 0x1bff).ram().w(FUNC(bogeyman_state::videoram2_w)).share("videoram2");
+	map(0x1c00, 0x1fff).ram().w(FUNC(bogeyman_state::colorram2_w)).share("colorram2");
+	map(0x2000, 0x20ff).ram().w(FUNC(bogeyman_state::videoram_w)).share("videoram");
+	map(0x2100, 0x21ff).ram().w(FUNC(bogeyman_state::colorram_w)).share("colorram");
 	map(0x2800, 0x2bff).ram().share("spriteram");
 	map(0x3000, 0x300f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x3800, 0x3800).portr("P1").w(this, FUNC(bogeyman_state::ay8910_control_w));
-	map(0x3801, 0x3801).portr("P2").w(this, FUNC(bogeyman_state::ay8910_latch_w));
+	map(0x3800, 0x3800).portr("P1").w(FUNC(bogeyman_state::ay8910_control_w));
+	map(0x3801, 0x3801).portr("P2").w(FUNC(bogeyman_state::ay8910_latch_w));
 	map(0x3802, 0x3802).portr("DSW1");
 	map(0x3803, 0x3803).portr("DSW2").nopw(); // ??? sound
 	map(0x4000, 0xffff).rom();
@@ -192,7 +192,7 @@ static const gfx_layout sprites =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( bogeyman )
+static GFXDECODE_START( gfx_bogeyman )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout1,     16, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout2,     16, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,          0,  2 )
@@ -248,7 +248,7 @@ MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bogeyman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bogeyman)
 	MCFG_PALETTE_ADD("palette", 16+256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 	MCFG_PALETTE_INIT_OWNER(bogeyman_state, bogeyman)

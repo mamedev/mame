@@ -469,7 +469,7 @@ void n8080_state::n8080_sound_cpu_map(address_map &map)
 
 void n8080_state::helifire_sound_io_map(address_map &map)
 {
-	map(0x00, 0x7f).r(this, FUNC(n8080_state::helifire_8035_external_ram_r));
+	map(0x00, 0x7f).r(FUNC(n8080_state::helifire_8035_external_ram_r));
 }
 
 
@@ -563,7 +563,7 @@ MACHINE_CONFIG_START(n8080_state::helifire_sound)
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, n8080_state, helifire_8035_t0_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, n8080_state, helifire_8035_t1_r))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, n8080_state, helifire_8035_p2_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("helifire_dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("helifire_dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, n8080_state, helifire_sound_ctrl_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("helifire_dac_volume_timer", n8080_state, helifire_dac_volume_timer, attotime::from_hz(1000))

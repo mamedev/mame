@@ -746,6 +746,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/busmouse.h,MACHINES["BUSMOUSE"] = true
+---------------------------------------------------
+
+if (MACHINES["BUSMOUSE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/busmouse.cpp",
+		MAME_DIR .. "src/devices/machine/busmouse.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/cdp1852.h,MACHINES["CDP1852"] = true
 ---------------------------------------------------
 
@@ -2244,6 +2256,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pxa255.h,MACHINES["PXA255"] = true
+---------------------------------------------------
+
+if (MACHINES["PXA255"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pxa255.cpp",
+		MAME_DIR .. "src/devices/machine/pxa255.h",
+		MAME_DIR .. "src/devices/machine/pxa255defs.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/r10696.h,MACHINES["R10696"] = true
 ---------------------------------------------------
 
@@ -3516,3 +3541,31 @@ if (MACHINES["OUTPUT_LATCH"]~=null) then
 		MAME_DIR .. "src/devices/machine/output_latch.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/z80daisy.h,MACHINES["Z80DAISY"] = true
+---------------------------------------------------
+
+if (MACHINES["Z80DAISY"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/z80daisy.cpp",
+		MAME_DIR .. "src/devices/machine/z80daisy.h",
+		MAME_DIR .. "src/devices/machine/z80daisy_generic.cpp",
+		MAME_DIR .. "src/devices/machine/z80daisy_generic.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/i8291a.h,MACHINES["I8291A"] = true
+---------------------------------------------------
+
+if (MACHINES["I8291A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i8291a.cpp",
+		MAME_DIR .. "src/devices/machine/i8291a.h",
+	}
+end
+
+

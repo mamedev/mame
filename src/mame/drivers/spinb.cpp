@@ -40,6 +40,7 @@ ToDo:
 #include "machine/i8255.h"
 #include "sound/msm5205.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -62,6 +63,15 @@ public:
 		, m_switches(*this, "SW.%u", 0)
 	{ }
 
+	void jolypark(machine_config &config);
+	void vrnwrld(machine_config &config);
+	void spinb(machine_config &config);
+
+	void init_game0();
+	void init_game1();
+	void init_game2();
+
+private:
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p3_r);
 	DECLARE_WRITE8_MEMBER(p3_w);
@@ -89,21 +99,17 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
-	void init_game0();
-	void init_game1();
-	void init_game2();
 	DECLARE_PALETTE_INIT(spinb);
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void jolypark(machine_config &config);
-	void vrnwrld(machine_config &config);
-	void spinb(machine_config &config);
+
 	void dmd_io(address_map &map);
 	void dmd_mem(address_map &map);
 	void spinb_audio_map(address_map &map);
 	void spinb_map(address_map &map);
 	void spinb_music_map(address_map &map);
 	void vrnwrld_map(address_map &map);
-private:
+
 	bool m_pc0a;
 	bool m_pc0m;
 	uint8_t m_game;
@@ -149,9 +155,9 @@ void spinb_state::spinb_map(address_map &map)
 	map(0x6400, 0x6403).mirror(0x13fc).rw("ppi64", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x6800, 0x6803).mirror(0x13fc).rw("ppi68", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x6c00, 0x6c03).mirror(0x131c).rw("ppi6c", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x6c20, 0x6c3f).mirror(0x1300).w(this, FUNC(spinb_state::sndcmd_w));
-	map(0x6c40, 0x6c45).mirror(0x1300).w(this, FUNC(spinb_state::lamp1_w));
-	map(0x6c60, 0x6c60).mirror(0x1300).w(this, FUNC(spinb_state::disp_w));
+	map(0x6c20, 0x6c3f).mirror(0x1300).w(FUNC(spinb_state::sndcmd_w));
+	map(0x6c40, 0x6c45).mirror(0x1300).w(FUNC(spinb_state::lamp1_w));
+	map(0x6c60, 0x6c60).mirror(0x1300).w(FUNC(spinb_state::disp_w));
 	map(0x6ce0, 0x6ce0).nopw();
 }
 
@@ -163,9 +169,9 @@ void spinb_state::vrnwrld_map(address_map &map)
 	map(0xc400, 0xc403).mirror(0x13fc).rw("ppi64", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc800, 0xc803).mirror(0x13fc).rw("ppi68", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xcc00, 0xcc03).mirror(0x131c).rw("ppi6c", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xcc20, 0xcc3f).mirror(0x1300).w(this, FUNC(spinb_state::sndcmd_w));
-	map(0xcc40, 0xcc45).mirror(0x1300).w(this, FUNC(spinb_state::lamp1_w));
-	map(0xcc60, 0xcc60).mirror(0x1300).w(this, FUNC(spinb_state::disp_w));
+	map(0xcc20, 0xcc3f).mirror(0x1300).w(FUNC(spinb_state::sndcmd_w));
+	map(0xcc40, 0xcc45).mirror(0x1300).w(FUNC(spinb_state::lamp1_w));
+	map(0xcc60, 0xcc60).mirror(0x1300).w(FUNC(spinb_state::disp_w));
 	map(0xcce0, 0xcce0).nopw();
 }
 
@@ -174,8 +180,8 @@ void spinb_state::spinb_audio_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram(); // 6164
 	map(0x4000, 0x4003).mirror(0x1ffc).rw("ppia", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x6000, 0x6000).w(this, FUNC(spinb_state::sndbank_a_w));
-	map(0x8000, 0x8000).r(this, FUNC(spinb_state::sndcmd_r));
+	map(0x6000, 0x6000).w(FUNC(spinb_state::sndbank_a_w));
+	map(0x8000, 0x8000).r(FUNC(spinb_state::sndcmd_r));
 }
 
 void spinb_state::spinb_music_map(address_map &map)
@@ -183,9 +189,9 @@ void spinb_state::spinb_music_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram(); // 6164
 	map(0x4000, 0x4003).mirror(0x1ffc).rw("ppim", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x6000, 0x6000).w(this, FUNC(spinb_state::sndbank_m_w));
-	map(0x8000, 0x8000).r(this, FUNC(spinb_state::sndcmd_r));
-	map(0xA000, 0xA000).w(this, FUNC(spinb_state::volume_w));
+	map(0x6000, 0x6000).w(FUNC(spinb_state::sndbank_m_w));
+	map(0x8000, 0x8000).r(FUNC(spinb_state::sndcmd_r));
+	map(0xA000, 0xA000).w(FUNC(spinb_state::volume_w));
 }
 
 void spinb_state::dmd_mem(address_map &map)
@@ -195,8 +201,8 @@ void spinb_state::dmd_mem(address_map &map)
 
 void spinb_state::dmd_io(address_map &map)
 {
-	map(0x0000, 0x1fff).w(this, FUNC(spinb_state::dmdram_w));
-	map(0x0000, 0xffff).r(this, FUNC(spinb_state::dmdram_r));
+	map(0x0000, 0x1fff).w(FUNC(spinb_state::dmdram_w));
+	map(0x0000, 0xffff).r(FUNC(spinb_state::dmdram_r));
 }
 
 static INPUT_PORTS_START( spinb )
@@ -453,17 +459,17 @@ WRITE8_MEMBER( spinb_state::sndbank_m_w )
 void spinb_state::update_sound_a()
 {
 	if (m_sndbank_a != 0xff)
-		m_ic14a->ba_w(m_p_audio[m_sound_addr_a]);
+		m_ic14a->write_ba(m_p_audio[m_sound_addr_a]);
 	else
-		m_ic14a->ba_w(0);
+		m_ic14a->write_ba(0);
 }
 
 void spinb_state::update_sound_m()
 {
 	if (m_sndbank_m != 0xff)
-		m_ic14m->ba_w(m_p_music[m_sound_addr_m]);
+		m_ic14m->write_ba(m_p_music[m_sound_addr_m]);
 	else
-		m_ic14m->ba_w(0);
+		m_ic14m->write_ba(0);
 }
 
 WRITE_LINE_MEMBER( spinb_state::ic5a_w )

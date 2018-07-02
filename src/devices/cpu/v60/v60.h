@@ -99,6 +99,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 1; }
 	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -150,7 +151,6 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	offs_t              m_fetch_xor;
 	offs_t              m_start_pc;
 	uint32_t              m_reg[68];
 	struct {

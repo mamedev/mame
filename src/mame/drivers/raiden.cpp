@@ -93,11 +93,11 @@ void raiden_state::main_map(address_map &map)
 	map(0x07000, 0x07fff).ram().share("spriteram");
 	map(0x08000, 0x08fff).ram().share("shared_ram");
 	map(0x0a000, 0x0a00d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
-	map(0x0c000, 0x0c7ff).w(this, FUNC(raiden_state::raiden_text_w)).share("videoram");
+	map(0x0c000, 0x0c7ff).w(FUNC(raiden_state::raiden_text_w)).share("videoram");
 	map(0x0e000, 0x0e001).portr("P1_P2");
 	map(0x0e002, 0x0e003).portr("DSW");
 	map(0x0e004, 0x0e005).nopw(); // watchdog?
-	map(0x0e006, 0x0e006).w(this, FUNC(raiden_state::raiden_control_w));
+	map(0x0e006, 0x0e006).w(FUNC(raiden_state::raiden_control_w));
 	map(0x0f000, 0x0f03f).writeonly().share("scroll_ram");
 	map(0xa0000, 0xfffff).rom();
 }
@@ -105,8 +105,8 @@ void raiden_state::main_map(address_map &map)
 void raiden_state::sub_map(address_map &map)
 {
 	map(0x00000, 0x01fff).ram();
-	map(0x02000, 0x027ff).ram().w(this, FUNC(raiden_state::raiden_background_w)).share("back_data");
-	map(0x02800, 0x02fff).ram().w(this, FUNC(raiden_state::raiden_foreground_w)).share("fore_data");
+	map(0x02000, 0x027ff).ram().w(FUNC(raiden_state::raiden_background_w)).share("back_data");
+	map(0x02800, 0x02fff).ram().w(FUNC(raiden_state::raiden_foreground_w)).share("fore_data");
 	map(0x03000, 0x03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x04000, 0x04fff).ram().share("shared_ram");
 	map(0x07ffe, 0x07fff).nopw(); // ?
@@ -127,8 +127,8 @@ void raiden_state::raidenu_main_map(address_map &map)
 	map(0x0b000, 0x0b001).portr("P1_P2");
 	map(0x0b002, 0x0b003).portr("DSW");
 	map(0x0b004, 0x0b005).nopw(); // watchdog?
-	map(0x0b006, 0x0b006).w(this, FUNC(raiden_state::raiden_control_w));
-	map(0x0c000, 0x0c7ff).w(this, FUNC(raiden_state::raiden_text_w)).share("videoram");
+	map(0x0b006, 0x0b006).w(FUNC(raiden_state::raiden_control_w));
+	map(0x0c000, 0x0c7ff).w(FUNC(raiden_state::raiden_text_w)).share("videoram");
 	map(0x0d000, 0x0d00d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0xa0000, 0xfffff).rom();
 }
@@ -136,8 +136,8 @@ void raiden_state::raidenu_main_map(address_map &map)
 void raiden_state::raidenu_sub_map(address_map &map)
 {
 	map(0x00000, 0x05fff).ram();
-	map(0x06000, 0x067ff).ram().w(this, FUNC(raiden_state::raiden_background_w)).share("back_data");
-	map(0x06800, 0x06fff).ram().w(this, FUNC(raiden_state::raiden_foreground_w)).share("fore_data");
+	map(0x06000, 0x067ff).ram().w(FUNC(raiden_state::raiden_background_w)).share("back_data");
+	map(0x06800, 0x06fff).ram().w(FUNC(raiden_state::raiden_foreground_w)).share("fore_data");
 	map(0x07000, 0x07fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08000, 0x08fff).ram().share("shared_ram");
 	map(0x0a000, 0x0a001).nopw(); // ?
@@ -156,8 +156,8 @@ void raiden_state::raidenb_main_map(address_map &map)
 	map(0x0b000, 0x0b001).portr("P1_P2");
 	map(0x0b002, 0x0b003).portr("DSW");
 	map(0x0b004, 0x0b005).nopw(); // watchdog?
-	map(0x0b006, 0x0b006).w(this, FUNC(raiden_state::raidenb_control_w));
-	map(0x0c000, 0x0c7ff).w(this, FUNC(raiden_state::raiden_text_w)).share("videoram");
+	map(0x0b006, 0x0b006).w(FUNC(raiden_state::raidenb_control_w));
+	map(0x0c000, 0x0c7ff).w(FUNC(raiden_state::raiden_text_w)).share("videoram");
 	map(0x0d000, 0x0d00d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0x0d040, 0x0d08f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0xa0000, 0xfffff).rom();
@@ -315,7 +315,7 @@ static const gfx_layout raiden_spritelayout =
 	1024
 };
 
-static GFXDECODE_START( raiden )
+static GFXDECODE_START( gfx_raiden )
 	GFXDECODE_ENTRY( "gfx1", 0, raiden_charlayout,   768, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, raiden_spritelayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, raiden_spritelayout, 256, 16 )
@@ -345,6 +345,7 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -361,7 +362,7 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, raiden_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -481,6 +482,10 @@ ROM_START( raiden ) /* from a board with 2 daughter cards, no official board #s?
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
+	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
+	ROM_LOAD( "rd003b.u0168", 0x0000, 0x0884, NO_DUMP )
+	ROM_LOAD( "rd006b.u0365", 0x1000, 0x0884, NO_DUMP )
+
 	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
 	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
 	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
@@ -517,6 +522,10 @@ ROM_START( raidena )
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
+	ROM_LOAD( "rd003b.u0168", 0x0000, 0x0884, NO_DUMP )
+	ROM_LOAD( "rd006b.u0365", 0x1000, 0x0884, NO_DUMP )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
 	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
@@ -555,6 +564,10 @@ ROM_START( raident )
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
+	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
+	ROM_LOAD( "rd003b.u0168", 0x0000, 0x0884, NO_DUMP )
+	ROM_LOAD( "rd006b.u0365", 0x1000, 0x0884, NO_DUMP )
+
 	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
 	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
 	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
@@ -592,6 +605,10 @@ ROM_START( raidenu )
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
+	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
+	ROM_LOAD( "rd003b.u0168", 0x0000, 0x0884, NO_DUMP )
+	ROM_LOAD( "rd006b.u0365", 0x1000, 0x0884, NO_DUMP )
+
 	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
 	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
 	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
@@ -628,6 +645,10 @@ ROM_START( raidenk ) /* Same board as above. Not sure why the sound CPU would be
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
+	ROM_LOAD( "rd003b.u0168", 0x0000, 0x0884, NO_DUMP )
+	ROM_LOAD( "rd006b.u0365", 0x1000, 0x0884, NO_DUMP )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
 	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
@@ -712,9 +733,8 @@ ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
-	ROM_REGION( 0x2000, "plds", 0 )
-	ROM_LOAD( "ep910pc-1.bin", 0x0000, 0x0884, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "ep910pc-2.bin", 0x1000, 0x0884, NO_DUMP ) /* PAL is read protected */
+	ROM_REGION( 0x0100, "proms", 0 ) // N82S135N bipolar PROM
+	ROM_LOAD( "jj3010.u0116", 0x0000, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( raidenua )/* Different hardware, Main, Sub & sound CPU code not encrypted. */

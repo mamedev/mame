@@ -190,7 +190,7 @@ INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 	if (m_irq_enable_data != 0)
 	{
 		if (m_6ff8)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 

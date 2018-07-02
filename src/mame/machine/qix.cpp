@@ -257,7 +257,7 @@ WRITE8_MEMBER(qix_state::qix_coinctl_w)
 WRITE8_MEMBER(qix_state::slither_76489_0_w)
 {
 	/* write to the sound chip */
-	m_sn1->write(generic_space(), 0, data);
+	m_sn1->write(data);
 
 	/* clock the ready line going back into CB1 */
 	m_pia1->cb1_w(0);
@@ -268,7 +268,7 @@ WRITE8_MEMBER(qix_state::slither_76489_0_w)
 WRITE8_MEMBER(qix_state::slither_76489_1_w)
 {
 	/* write to the sound chip */
-	m_sn2->write(generic_space(), 0, data);
+	m_sn2->write(data);
 
 	/* clock the ready line going back into CB1 */
 	m_pia2->cb1_w(0);

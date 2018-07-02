@@ -51,6 +51,7 @@ TODO:
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
 //#include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -66,6 +67,9 @@ public:
 			m_filecpu(*this, "filecpu")
 	{ }
 
+	void molecula(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_filecpu;
 
@@ -93,12 +97,11 @@ public:
 
 	DECLARE_PALETTE_INIT(molecula);
 
-	void molecula(machine_config &config);
 	void molecula_app_io(address_map &map);
 	void molecula_app_map(address_map &map);
 	void molecula_file_io(address_map &map);
 	void molecula_file_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -177,26 +180,26 @@ WRITE8_MEMBER( molecula_state::sio_w)
 
 void molecula_state::molecula_file_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(molecula_state::file_r), FUNC(molecula_state::file_w));
+	map(0x0000, 0xffff).rw(FUNC(molecula_state::file_r), FUNC(molecula_state::file_w));
 }
 
 void molecula_state::molecula_file_io(address_map &map)
 {
 	map.global_mask(0xff);
 //  AM_RANGE(0x40, 0x43) AM_READWRITE(sio_r,sio_w)
-	map(0x72, 0x73).w(this, FUNC(molecula_state::file_output_w)); // unknown
+	map(0x72, 0x73).w(FUNC(molecula_state::file_output_w)); // unknown
 }
 
 void molecula_state::molecula_app_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(molecula_state::app_r), FUNC(molecula_state::app_w));
+	map(0x0000, 0xffff).rw(FUNC(molecula_state::app_r), FUNC(molecula_state::app_w));
 }
 
 void molecula_state::molecula_app_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).w(this, FUNC(molecula_state::app_output_w));
-	map(0x60, 0x63).rw(this, FUNC(molecula_state::sio_r), FUNC(molecula_state::sio_w));
+	map(0x10, 0x10).w(FUNC(molecula_state::app_output_w));
+	map(0x60, 0x63).rw(FUNC(molecula_state::sio_r), FUNC(molecula_state::sio_w));
 }
 
 static INPUT_PORTS_START( molecula )
@@ -268,7 +271,7 @@ static const gfx_layout charlayout =
 };
 #endif
 
-static GFXDECODE_START( molecula )
+static GFXDECODE_START( gfx_molecula )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -319,7 +322,7 @@ MACHINE_CONFIG_START(molecula_state::molecula)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", molecula)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_molecula)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(molecula_state, molecula)

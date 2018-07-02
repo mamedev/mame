@@ -68,14 +68,18 @@ mae(forward), migi(right), ushiro(back), hidari(left)
 class kungfur_state : public driver_device
 {
 public:
-	kungfur_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kungfur_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_adpcm1(*this, "adpcm1"),
 		m_adpcm2(*this, "adpcm2"),
-		m_digits(*this, "digit%u", 0U)
+		m_digits(*this, "digit%u", 0U),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void kungfur(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(kungfur_output_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch1_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch2_w);
@@ -86,10 +90,8 @@ public:
 	INTERRUPT_GEN_MEMBER(kungfur_irq);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm1_int);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm2_int);
-	void kungfur(machine_config &config);
 	void kungfur_map(address_map &map);
 
-private:
 	uint8_t m_latch[3];
 	uint8_t m_control;
 	uint32_t m_adpcm_pos[2];
@@ -101,6 +103,7 @@ private:
 	required_device<msm5205_device> m_adpcm1;
 	required_device<msm5205_device> m_adpcm2;
 	output_finder<14> m_digits;
+	output_finder<8> m_lamps;
 };
 
 
@@ -137,13 +140,13 @@ WRITE8_MEMBER(kungfur_state::kungfur_output_w)
 	if ((data & 7) == 6)
 	{
 		for (u8 i = 0; i < 5; i++)
-			output().set_lamp_value(i, BIT(m_latch[2], i));
+			m_lamps[i] = BIT(m_latch[2], i);
 	}
 
 	// d7: game-over lamp, d3-d4: marquee lamps
-	output().set_lamp_value(5, BIT(data, 7));
-	output().set_lamp_value(6, BIT(data, 3));
-	output().set_lamp_value(7, BIT(data, 4));
+	m_lamps[5] = BIT(data, 7);
+	m_lamps[6] = BIT(data, 3);
+	m_lamps[7] = BIT(data, 4);
 
 	// d5: N/C?
 	// d6: coincounter
@@ -210,7 +213,7 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm1_int)
 	uint8_t *ROM = memregion("adpcm1")->base();
 	uint8_t data = ROM[m_adpcm_pos[0] & 0x1ffff];
 
-	m_adpcm1->data_w(m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
+	m_adpcm1->write_data(m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
 	m_adpcm_pos[0] += m_adpcm_sel[0];
 	m_adpcm_sel[0] ^= 1;
 }
@@ -220,7 +223,7 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm2_int)
 	uint8_t *ROM = memregion("adpcm2")->base();
 	uint8_t data = ROM[m_adpcm_pos[1] & 0x3ffff];
 
-	m_adpcm2->data_w(m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);
+	m_adpcm2->write_data(m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);
 	m_adpcm_pos[1] += m_adpcm_sel[1];
 	m_adpcm_sel[1] ^= 1;
 }
@@ -229,8 +232,8 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm2_int)
 void kungfur_state::kungfur_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x4000, 0x4000).w(this, FUNC(kungfur_state::kungfur_adpcm1_w));
-	map(0x4004, 0x4004).w(this, FUNC(kungfur_state::kungfur_adpcm2_w));
+	map(0x4000, 0x4000).w(FUNC(kungfur_state::kungfur_adpcm1_w));
+	map(0x4004, 0x4004).w(FUNC(kungfur_state::kungfur_adpcm2_w));
 	map(0x4008, 0x400b).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x400c, 0x400f).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc000, 0xffff).rom();
@@ -278,6 +281,7 @@ INPUT_PORTS_END
 void kungfur_state::machine_start()
 {
 	m_digits.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_latch));

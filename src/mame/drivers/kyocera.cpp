@@ -594,32 +594,32 @@ void kc85_state::kc85_io(address_map &map)
 //  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) optional modem
 	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0xc0, 0xc0).mirror(0x0f).rw(m_uart, FUNC(im6402_device::read), FUNC(im6402_device::write));
-	map(0xd0, 0xd0).mirror(0x0f).rw(this, FUNC(kc85_state::uart_status_r), FUNC(kc85_state::uart_ctrl_w));
-	map(0xe0, 0xe0).mirror(0x0f).rw(this, FUNC(kc85_state::keyboard_r), FUNC(kc85_state::ctrl_w));
-	map(0xf0, 0xf1).mirror(0x0e).rw(this, FUNC(kc85_state::lcd_r), FUNC(kc85_state::lcd_w));
+	map(0xd0, 0xd0).mirror(0x0f).rw(FUNC(kc85_state::uart_status_r), FUNC(kc85_state::uart_ctrl_w));
+	map(0xe0, 0xe0).mirror(0x0f).rw(FUNC(kc85_state::keyboard_r), FUNC(kc85_state::ctrl_w));
+	map(0xf0, 0xf1).mirror(0x0e).rw(FUNC(kc85_state::lcd_r), FUNC(kc85_state::lcd_w));
 }
 
 void kc85_state::trsm100_io(address_map &map)
 {
 	kc85_io(map);
-	map(0xa0, 0xa0).mirror(0x0f).w(this, FUNC(kc85_state::modem_w));
+	map(0xa0, 0xa0).mirror(0x0f).w(FUNC(kc85_state::modem_w));
 }
 
 void pc8201_state::pc8201_io(address_map &map)
 {
 	map.unmap_value_high();
 //  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional video interface 8255
-	map(0x80, 0x80).mirror(0x03).w(this, FUNC(pc8201_state::romah_w));
-	map(0x84, 0x84).mirror(0x03).w(this, FUNC(pc8201_state::romal_w));
-	map(0x88, 0x88).mirror(0x03).w(this, FUNC(pc8201_state::romam_w));
-	map(0x8c, 0x8c).mirror(0x03).r(this, FUNC(pc8201_state::romrd_r));
-	map(0x90, 0x90).mirror(0x0f).w(this, FUNC(pc8201_state::scp_w));
-	map(0xa0, 0xa0).mirror(0x0f).rw(this, FUNC(pc8201_state::bank_r), FUNC(pc8201_state::bank_w));
+	map(0x80, 0x80).mirror(0x03).w(FUNC(pc8201_state::romah_w));
+	map(0x84, 0x84).mirror(0x03).w(FUNC(pc8201_state::romal_w));
+	map(0x88, 0x88).mirror(0x03).w(FUNC(pc8201_state::romam_w));
+	map(0x8c, 0x8c).mirror(0x03).r(FUNC(pc8201_state::romrd_r));
+	map(0x90, 0x90).mirror(0x0f).w(FUNC(pc8201_state::scp_w));
+	map(0xa0, 0xa0).mirror(0x0f).rw(FUNC(pc8201_state::bank_r), FUNC(pc8201_state::bank_w));
 	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0xc0, 0xc0).mirror(0x0f).rw(m_uart, FUNC(im6402_device::read), FUNC(im6402_device::write));
-	map(0xd0, 0xd0).mirror(0x0f).r(this, FUNC(pc8201_state::uart_status_r)).w(this, FUNC(pc8201_state::uart_ctrl_w));
-	map(0xe0, 0xe0).mirror(0x0f).r(this, FUNC(pc8201_state::keyboard_r));
-	map(0xf0, 0xf1).mirror(0x0e).rw(this, FUNC(pc8201_state::lcd_r), FUNC(pc8201_state::lcd_w));
+	map(0xd0, 0xd0).mirror(0x0f).r(FUNC(pc8201_state::uart_status_r)).w(FUNC(pc8201_state::uart_ctrl_w));
+	map(0xe0, 0xe0).mirror(0x0f).r(FUNC(pc8201_state::keyboard_r));
+	map(0xf0, 0xf1).mirror(0x0e).rw(FUNC(pc8201_state::lcd_r), FUNC(pc8201_state::lcd_w));
 }
 
 void tandy200_state::tandy200_io(address_map &map)
@@ -630,8 +630,8 @@ void tandy200_state::tandy200_io(address_map &map)
 	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0xc0, 0xc0).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xc1, 0xc1).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xd0, 0xd0).mirror(0x0f).rw(this, FUNC(tandy200_state::bank_r), FUNC(tandy200_state::bank_w));
-	map(0xe0, 0xe0).mirror(0x0f).rw(this, FUNC(tandy200_state::stbk_r), FUNC(tandy200_state::stbk_w));
+	map(0xd0, 0xd0).mirror(0x0f).rw(FUNC(tandy200_state::bank_r), FUNC(tandy200_state::bank_w));
+	map(0xe0, 0xe0).mirror(0x0f).rw(FUNC(tandy200_state::stbk_r), FUNC(tandy200_state::stbk_w));
 	map(0xf0, 0xf0).mirror(0x0e).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w));
 	map(0xf1, 0xf1).mirror(0x0e).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
 }
@@ -1085,7 +1085,7 @@ WRITE8_MEMBER( tandy200_state::i8155_pa_w )
 
 	*/
 
-	m_cent_data_out->write(space, 0, data);
+	m_cent_data_out->write(data);
 
 	m_keylatch = (m_keylatch & 0x100) | data;
 }
@@ -1376,7 +1376,7 @@ MACHINE_CONFIG_START(kc85_state::kc85)
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(IM6402_TAG, im6402_device, write_rri))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kc85_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, kc85_state, write_centronics_select))
 
@@ -1426,7 +1426,7 @@ MACHINE_CONFIG_START(pc8201_state::pc8201)
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(IM6402_TAG, im6402_device, write_rri))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kc85_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, kc85_state, write_centronics_select))
 
@@ -1487,7 +1487,7 @@ MACHINE_CONFIG_START(trsm100_state::trsm100)
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(IM6402_TAG, im6402_device, write_rri))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
@@ -1552,7 +1552,7 @@ MACHINE_CONFIG_START(tandy200_state::tandy200)
 	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL(1'000'000))
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tandy200_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, tandy200_state, write_centronics_select))
 

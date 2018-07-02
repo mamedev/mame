@@ -324,6 +324,7 @@
 #include "sound/k056800.h"
 #include "video/voodoo.h"
 #include "video/k037122.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -344,10 +345,11 @@ public:
 		m_dsp(*this, "dsp"),
 		m_dsp2(*this, "dsp2"),
 		m_k037122_1(*this, "k037122_1"),
-		m_k037122_2(*this, "k037122_2" ),
+		m_k037122_2(*this, "k037122_2"),
 		m_adc12138(*this, "adc12138"),
 		m_konppc(*this, "konppc"),
 		m_lan_eeprom(*this, "lan_eeprom"),
+		m_voodoo(*this, "voodoo%u", 0U),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
@@ -361,6 +363,19 @@ public:
 		m_watchdog(*this, "watchdog")
 	{ }
 
+	void terabrst(machine_config &config);
+	void sscope2(machine_config &config);
+	void hornet_2board(machine_config &config);
+	void hornet_2board_v2(machine_config &config);
+	void hornet(machine_config &config);
+
+	void init_hornet();
+	void init_hornet_2board();
+	void init_gradius4();
+	void init_nbapbp();
+	void init_terabrst();
+
+private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2800;
 
@@ -378,6 +393,7 @@ public:
 	required_device<adc12138_device> m_adc12138;
 	required_device<konppc_device> m_konppc;
 	optional_device<eeprom_serial_93cxx_device> m_lan_eeprom;
+	optional_device_array<voodoo_device, 2> m_voodoo;
 	required_ioport m_in0, m_in1, m_in2, m_dsw;
 	optional_ioport m_eepromout, m_analog1, m_analog2;
 	optional_region_ptr<uint8_t> m_user3_ptr;
@@ -423,25 +439,15 @@ public:
 	DECLARE_READ8_MEMBER(comm_eeprom_r);
 	DECLARE_WRITE8_MEMBER(comm_eeprom_w);
 
-	void init_hornet();
-	void init_hornet_2board();
-	void init_gradius4();
-	void init_nbapbp();
-	void init_terabrst();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(hornet_2board);
-	uint32_t screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_irq);
 	int jvs_encode_data(uint8_t *in, int length);
 	int jvs_decode_data(uint8_t *in, uint8_t *out, int length);
 	void jamma_jvs_cmd_exec();
-	void terabrst(machine_config &config);
-	void sscope2(machine_config &config);
-	void hornet_2board(machine_config &config);
-	void hornet_2board_v2(machine_config &config);
-	void hornet(machine_config &config);
 	void gn680_memmap(address_map &map);
 	void hornet_map(address_map &map);
 	void sharc0_map(address_map &map);
@@ -496,13 +502,12 @@ WRITE_LINE_MEMBER(hornet_state::voodoo_vblank_0)
 
 WRITE_LINE_MEMBER(hornet_state::voodoo_vblank_1)
 {
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state);
 }
 
-uint32_t hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hornet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	voodoo_device* voodoo = (voodoo_device*)machine().device("voodoo0");
-
-	voodoo->voodoo_update(bitmap, cliprect);
+	m_voodoo[0]->voodoo_update(bitmap, cliprect);
 
 	m_k037122_1->tile_draw(screen, bitmap, cliprect);
 
@@ -511,24 +516,11 @@ uint32_t hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-uint32_t hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hornet_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (strcmp(screen.tag(), ":lscreen") == 0)
-	{
-		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
-		voodoo->voodoo_update(bitmap, cliprect);
+	m_voodoo[1]->voodoo_update(bitmap, cliprect);
 
-		/* TODO: tilemaps per screen */
-		m_k037122_1->tile_draw(screen, bitmap, cliprect);
-	}
-	else if (strcmp(screen.tag(), ":rscreen") == 0)
-	{
-		voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo1");
-		voodoo->voodoo_update(bitmap, cliprect);
-
-		/* TODO: tilemaps per screen */
-		m_k037122_2->tile_draw(screen, bitmap, cliprect);
-	}
+	m_k037122_2->tile_draw(screen, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
@@ -748,21 +740,21 @@ WRITE16_MEMBER(hornet_state::soundtimer_count_w)
 void hornet_state::hornet_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("workram");     /* Work RAM */
-	map(0x74000000, 0x740000ff).rw(this, FUNC(hornet_state::hornet_k037122_reg_r), FUNC(hornet_state::hornet_k037122_reg_w));
-	map(0x74020000, 0x7403ffff).rw(this, FUNC(hornet_state::hornet_k037122_sram_r), FUNC(hornet_state::hornet_k037122_sram_w));
-	map(0x74040000, 0x7407ffff).rw(this, FUNC(hornet_state::hornet_k037122_char_r), FUNC(hornet_state::hornet_k037122_char_w));
-	map(0x74080000, 0x7408000f).rw(this, FUNC(hornet_state::gun_r), FUNC(hornet_state::gun_w));
+	map(0x74000000, 0x740000ff).rw(FUNC(hornet_state::hornet_k037122_reg_r), FUNC(hornet_state::hornet_k037122_reg_w));
+	map(0x74020000, 0x7403ffff).rw(FUNC(hornet_state::hornet_k037122_sram_r), FUNC(hornet_state::hornet_k037122_sram_w));
+	map(0x74040000, 0x7407ffff).rw(FUNC(hornet_state::hornet_k037122_char_r), FUNC(hornet_state::hornet_k037122_char_w));
+	map(0x74080000, 0x7408000f).rw(FUNC(hornet_state::gun_r), FUNC(hornet_state::gun_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7d000000, 0x7d00ffff).r(this, FUNC(hornet_state::sysreg_r));
-	map(0x7d010000, 0x7d01ffff).w(this, FUNC(hornet_state::sysreg_w));
+	map(0x7d000000, 0x7d00ffff).r(FUNC(hornet_state::sysreg_r));
+	map(0x7d010000, 0x7d01ffff).w(FUNC(hornet_state::sysreg_w));
 	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));  /* M48T58Y RTC/NVRAM */
 	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
-	map(0x7d040004, 0x7d040007).rw(this, FUNC(hornet_state::comm_eeprom_r), FUNC(hornet_state::comm_eeprom_w));
+	map(0x7d040004, 0x7d040007).rw(FUNC(hornet_state::comm_eeprom_r), FUNC(hornet_state::comm_eeprom_w));
 	map(0x7d042000, 0x7d043fff).ram();             /* COMM BOARD 0 */
-	map(0x7d044000, 0x7d044007).r(this, FUNC(hornet_state::comm0_unk_r));
-	map(0x7d048000, 0x7d048003).w(this, FUNC(hornet_state::comm1_w));
-	map(0x7d04a000, 0x7d04a003).w(this, FUNC(hornet_state::comm_rombank_w));
+	map(0x7d044000, 0x7d044007).r(FUNC(hornet_state::comm0_unk_r));
+	map(0x7d048000, 0x7d048003).w(FUNC(hornet_state::comm1_w));
+	map(0x7d04a000, 0x7d04a003).w(FUNC(hornet_state::comm_rombank_w));
 	map(0x7d050000, 0x7d05ffff).bankr("bank1");        /* COMM BOARD 1 */
 	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0);       /* Data ROM */
 	map(0x7f000000, 0x7f3fffff).rom().share("share2");
@@ -779,8 +771,8 @@ void hornet_state::sound_memmap(address_map &map)
 	map(0x300000, 0x30001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
 	map(0x480000, 0x480001).nopw();
 	map(0x4c0000, 0x4c0001).nopw();
-	map(0x500000, 0x500001).w(this, FUNC(hornet_state::soundtimer_en_w)).nopr();
-	map(0x600000, 0x600001).w(this, FUNC(hornet_state::soundtimer_count_w)).nopr();
+	map(0x500000, 0x500001).w(FUNC(hornet_state::soundtimer_en_w)).nopr();
+	map(0x600000, 0x600001).w(FUNC(hornet_state::soundtimer_count_w)).nopr();
 }
 
 /*****************************************************************************/
@@ -817,9 +809,9 @@ void hornet_state::gn680_memmap(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x200000, 0x203fff).ram();
-	map(0x300000, 0x300001).w(this, FUNC(hornet_state::gn680_sysctrl));
+	map(0x300000, 0x300001).w(FUNC(hornet_state::gn680_sysctrl));
 	map(0x314000, 0x317fff).ram();
-	map(0x400000, 0x400003).rw(this, FUNC(hornet_state::gn680_latch_r), FUNC(hornet_state::gn680_latch_w));
+	map(0x400000, 0x400003).rw(FUNC(hornet_state::gn680_latch_r), FUNC(hornet_state::gn680_latch_w));
 	map(0x400008, 0x400009).nopw();    // writes 0001 00fe each time IRQ 6 triggers
 }
 
@@ -848,7 +840,7 @@ WRITE32_MEMBER(hornet_state::dsp_dataram1_w)
 void hornet_state::sharc0_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x0500000, 0x05fffff).rw(this, FUNC(hornet_state::dsp_dataram0_r), FUNC(hornet_state::dsp_dataram0_w)).share("sharc_dataram0");
+	map(0x0500000, 0x05fffff).rw(FUNC(hornet_state::dsp_dataram0_r), FUNC(hornet_state::dsp_dataram0_w)).share("sharc_dataram0");
 	map(0x1400000, 0x14fffff).ram();
 	map(0x2400000, 0x27fffff).rw("voodoo0", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
@@ -859,7 +851,7 @@ void hornet_state::sharc0_map(address_map &map)
 void hornet_state::sharc1_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
-	map(0x0500000, 0x05fffff).rw(this, FUNC(hornet_state::dsp_dataram1_r), FUNC(hornet_state::dsp_dataram1_w)).share("sharc_dataram1");
+	map(0x0500000, 0x05fffff).rw(FUNC(hornet_state::dsp_dataram1_r), FUNC(hornet_state::dsp_dataram1_w)).share("sharc_dataram1");
 	map(0x1400000, 0x14fffff).ram();
 	map(0x2400000, 0x27fffff).rw("voodoo1", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
@@ -904,6 +896,36 @@ static INPUT_PORTS_START( hornet )
 	PORT_DIPNAME( 0x80, 0x00, "Test Mode" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Unknown" ) PORT_DIPLOCATION("SW:2")  // Having this on disables the gun in terabrst and sscope
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Unknown" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Unknown" ) PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "Unknown" ) PORT_DIPLOCATION("SW:5")
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Unknown" ) PORT_DIPLOCATION("SW:6")
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Unknown" ) PORT_DIPLOCATION("SW:7")
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "Unknown" ) PORT_DIPLOCATION("SW:8")
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x01, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gradius4 )
+	PORT_INCLUDE( hornet )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x80, 0x00, "Test Mode" ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Screen Flip (H)" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -925,6 +947,29 @@ static INPUT_PORTS_START( hornet )
 	PORT_DIPNAME( 0x01, 0x01, "Monitor Type" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING( 0x01, "24KHz" )
 	PORT_DIPSETTING( 0x00, "15KHz" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(nbapbp) //Need to add inputs for player 3 and 4.
+	PORT_INCLUDE(gradius4)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME(0x02, 0x02, "Cabinet Type") PORT_DIPLOCATION("SW:7")
+	PORT_DIPSETTING(0x02, "2 Player")
+	PORT_DIPSETTING(0x00, "4 Player")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(terabrst) //Uses a ccd camera and sensor for gun inputs much similar to thunderh. Need to hook that up as well as the gun board.
+	PORT_INCLUDE(hornet)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P1 Trigger")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("P1 Bomb")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Bomb")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sscope )
@@ -980,7 +1025,7 @@ void hornet_state::machine_start()
 
 	save_item(NAME(m_led_reg0));
 	save_item(NAME(m_led_reg1));
-	save_pointer(NAME(m_jvs_sdata.get()), 1024);
+	save_pointer(NAME(m_jvs_sdata), 1024);
 	save_item(NAME(m_jvs_sdata_ptr));
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hornet_state::sound_irq), this));
@@ -1024,7 +1069,6 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
 	MCFG_DEVICE_PROGRAM_MAP(hornet_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(hornet_state, irq1_line_assert,  1000)
 
 	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
@@ -1038,7 +1082,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 //  PCB description at top doesn't mention any EEPROM on the base board...
-//  MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+//  MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
@@ -1055,7 +1099,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 48*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_hornet)
+	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
@@ -1072,7 +1116,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_M48T58_ADD( "m48t58" )
+	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
 
 	MCFG_DEVICE_ADD("adc12138", ADC12138, 0)
 	MCFG_ADC1213X_IPT_CONVERT_CB(hornet_state, adc12138_input_callback)
@@ -1126,13 +1170,13 @@ MACHINE_CONFIG_START(hornet_state::hornet_2board)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_hornet_2board)
+	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_hornet_2board)
+	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_rscreen)
 
 	MCFG_DEVICE_REMOVE("konppc")
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
@@ -1169,8 +1213,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hornet_state::sscope2)
 	hornet_2board_v2(config);
 
-	MCFG_DS2401_ADD("lan_serial_id")
-	MCFG_EEPROM_SERIAL_93C46_ADD("lan_eeprom")
+	MCFG_DEVICE_ADD("lan_serial_id", DS2401)
+	MCFG_DEVICE_ADD("lan_eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 
@@ -1611,11 +1655,11 @@ ROM_END
 
 /*************************************************************************/
 
-GAME(  1998, gradius4,  0,        hornet,        hornet,  hornet_state, init_gradius4,      ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbp,    0,        hornet,        hornet,  hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpa,   nbapbp,   hornet,        hornet,  hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, terabrst,  0,        terabrst,      hornet,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, terabrsta, terabrst, terabrst,      hornet,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4,  0,        hornet,        gradius4,hornet_state, init_gradius4,      ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbp,    0,        hornet,        nbapbp,  hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpa,   nbapbp,   hornet,        nbapbp,  hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, terabrst,  0,        terabrst,      terabrst,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, terabrsta, terabrst, terabrst,      terabrst,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // The region comes from the Timekeeper NVRAM, without a valid default all sets except 'xxD, Ver 1.33' will init their NVRAM to UAx versions, the xxD set seems to incorrectly init it to JXD, which isn't a valid
 // version, and thus can't be booted.  If you copy the NVRAM from another already initialized set, it will boot as UAD.

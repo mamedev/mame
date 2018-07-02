@@ -103,7 +103,7 @@ void efo_zsu_device::zsu_io(address_map &map)
 	map(0x00, 0x03).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x04, 0x07).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
-	map(0x08, 0x08).w(this, FUNC(efo_zsu_device::adpcm_fifo_w));
+	map(0x08, 0x08).w(FUNC(efo_zsu_device::adpcm_fifo_w));
 
 	map(0x0c, 0x0c).w("aysnd0", FUNC(ay8910_device::address_w));
 	map(0x0d, 0x0d).w("aysnd0", FUNC(ay8910_device::data_w));
@@ -233,7 +233,7 @@ MACHINE_CONFIG_START(efo_zsu_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("fifo", CD40105, 0)
 	MCFG_40105_DATA_OUT_READY_CB(WRITELINE(*this, efo_zsu_device, fifo_dor_w))
-	MCFG_40105_DATA_OUT_CB(WRITELINE("adpcm", msm5205_device, data_w))
+	MCFG_40105_DATA_OUT_CB(WRITE8("adpcm", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("adpcm", MSM5205, 4000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

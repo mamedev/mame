@@ -51,7 +51,7 @@ void tv965_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x01fff).ram().share("nvram");
 	map(0x02000, 0x02007).rw("crtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
-	map(0x04000, 0x04000).r(this, FUNC(tv965_state::ga_hack_r));
+	map(0x04000, 0x04000).r(FUNC(tv965_state::ga_hack_r));
 	map(0x06200, 0x06203).rw("acia1", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x06400, 0x06403).rw("acia2", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x08000, 0x09fff).ram().mirror(0x2000).share("charram");
@@ -78,8 +78,8 @@ MACHINE_CONFIG_START(tv965_state::tv965)
 	MCFG_NVRAM_ADD_0FILL("nvram") // CXK5864BP-10L + battery
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(26.9892_MHz_XTAL, 1020, 0, 800, 378, 0, 350)
-	//MCFG_SCREEN_RAW_PARAMS(44.4528_MHz_XTAL, 1680, 0, 1320, 378, 0, 350)
+	MCFG_SCREEN_RAW_PARAMS(26.9892_MHz_XTAL, 1020, 0, 800, 441, 0, 416)
+	//MCFG_SCREEN_RAW_PARAMS(44.4528_MHz_XTAL, 1680, 0, 1320, 441, 0, 416)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2672_device, screen_update)
 
 	MCFG_DEVICE_ADD("crtc", SCN2672, 26.9892_MHz_XTAL / 10)

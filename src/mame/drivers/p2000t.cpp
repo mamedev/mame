@@ -39,15 +39,15 @@ Philips P2000 1 Memory map
 void p2000t_state::p2000t_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).r(this, FUNC(p2000t_state::p2000t_port_000f_r));
-	map(0x10, 0x1f).w(this, FUNC(p2000t_state::p2000t_port_101f_w));
-	map(0x20, 0x2f).r(this, FUNC(p2000t_state::p2000t_port_202f_r));
-	map(0x30, 0x3f).w(this, FUNC(p2000t_state::p2000t_port_303f_w));
-	map(0x50, 0x5f).w(this, FUNC(p2000t_state::p2000t_port_505f_w));
-	map(0x70, 0x7f).w(this, FUNC(p2000t_state::p2000t_port_707f_w));
-	map(0x88, 0x8b).w(this, FUNC(p2000t_state::p2000t_port_888b_w));
-	map(0x8c, 0x90).w(this, FUNC(p2000t_state::p2000t_port_8c90_w));
-	map(0x94, 0x94).w(this, FUNC(p2000t_state::p2000t_port_9494_w));
+	map(0x00, 0x0f).r(FUNC(p2000t_state::p2000t_port_000f_r));
+	map(0x10, 0x1f).w(FUNC(p2000t_state::p2000t_port_101f_w));
+	map(0x20, 0x2f).r(FUNC(p2000t_state::p2000t_port_202f_r));
+	map(0x30, 0x3f).w(FUNC(p2000t_state::p2000t_port_303f_w));
+	map(0x50, 0x5f).w(FUNC(p2000t_state::p2000t_port_505f_w));
+	map(0x70, 0x7f).w(FUNC(p2000t_state::p2000t_port_707f_w));
+	map(0x88, 0x8b).w(FUNC(p2000t_state::p2000t_port_888b_w));
+	map(0x8c, 0x90).w(FUNC(p2000t_state::p2000t_port_8c90_w));
+	map(0x94, 0x94).w(FUNC(p2000t_state::p2000t_port_9494_w));
 }
 
 /* Memory w/r functions */
@@ -91,7 +91,7 @@ PALETTE_INIT_MEMBER(p2000m_state,p2000m)
 	palette.set_pen_color(3,rgb_t::white()); /* white */
 }
 
-static GFXDECODE_START( p2000m )
+static GFXDECODE_START( gfx_p2000m )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, p2000m_charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(p2000m_state::p2000m)
 	MCFG_SCREEN_UPDATE_DRIVER(p2000m_state, screen_update_p2000m)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", p2000m)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_p2000m)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(p2000m_state,p2000m)
 

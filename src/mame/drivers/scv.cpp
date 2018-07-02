@@ -11,6 +11,7 @@
 #include "sound/upd1771.h"
 #include "bus/scv/slot.h"
 #include "bus/scv/rom.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -30,6 +31,10 @@ public:
 		m_pc0(*this, "PC0"),
 		m_charrom(*this, "charrom") { }
 
+	void scv(machine_config &config);
+	void scv_pal(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_READ8_MEMBER(portc_r);
@@ -44,10 +49,8 @@ public:
 	DECLARE_PALETTE_INIT(scv);
 	uint32_t screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void scv(machine_config &config);
-	void scv_pal(machine_config &config);
 	void scv_mem(address_map &map);
-protected:
+
 	enum
 	{
 		TIMER_VB
@@ -61,7 +64,6 @@ protected:
 	required_ioport m_pc0;
 	required_memory_region m_charrom;
 
-	ioport_port *m_key[8];
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	inline void plot_sprite_part( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t pat, uint8_t col, uint8_t screen_sprite_start_line );
@@ -642,7 +644,7 @@ static const gfx_layout scv_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( scv )
+static GFXDECODE_START( gfx_scv )
 	GFXDECODE_ENTRY( "charrom", 0x0000, scv_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -673,7 +675,7 @@ MACHINE_CONFIG_START(scv_state::scv)
 	MCFG_SCREEN_UPDATE_DRIVER(scv_state, screen_update_scv)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scv)
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(scv_state, scv)
 

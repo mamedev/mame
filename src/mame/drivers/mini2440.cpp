@@ -32,6 +32,13 @@ public:
 		m_penx(*this, "PENX"),
 		m_peny(*this, "PENY") { }
 
+	void mini2440(machine_config &config);
+
+	void init_mini2440();
+
+	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2440_device> m_s3c2440;
 	required_device<nand_device> m_nand;
@@ -41,10 +48,8 @@ public:
 	required_ioport m_peny;
 
 	uint32_t m_port[9];
-	void init_mini2440();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	DECLARE_READ32_MEMBER(s3c2440_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c2440_gpio_port_w);
@@ -56,7 +61,6 @@ public:
 	DECLARE_WRITE16_MEMBER(s3c2440_i2s_data_w );
 	DECLARE_READ32_MEMBER(s3c2440_adc_data_r );
 
-	void mini2440(machine_config &config);
 	void mini2440_map(address_map &map);
 };
 
@@ -279,11 +283,11 @@ INPUT_PORTS_END
 ROM_START( mini2440 )
 	ROM_REGION( 0x8400000, "nand", 0 )
 	ROM_SYSTEM_BIOS( 0, "linux", "Linux 2.6.29.4-FriendlyARM + Qtopia 2.2.0 (2009/07/08)" )
-	ROMX_LOAD( "linux.bin", 0, 0x8400000, CRC(7c98b249) SHA1(7c2e76edcbbcbfc3f3b0e53fb42d3e5c96e9a9fb), ROM_BIOS(1) )
+	ROMX_LOAD( "linux.bin", 0, 0x8400000, CRC(7c98b249) SHA1(7c2e76edcbbcbfc3f3b0e53fb42d3e5c96e9a9fb), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "wince", "Windows Embedded CE 6.00 (2011/03/14)" )
-	ROMX_LOAD( "wince.bin", 0, 0x8400000, CRC(6acd56b8) SHA1(d039968820348fb1169827fa12b38b94e80a076f), ROM_BIOS(2) )
+	ROMX_LOAD( "wince.bin", 0, 0x8400000, CRC(6acd56b8) SHA1(d039968820348fb1169827fa12b38b94e80a076f), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "android", "Android 1.5 (2009/05/13)" )
-	ROMX_LOAD( "android.bin", 0, 0x8400000, CRC(4721837d) SHA1(88fcf553b106d9fc624c9615d9c1da9c705ccb46), ROM_BIOS(3) )
+	ROMX_LOAD( "android.bin", 0, 0x8400000, CRC(4721837d) SHA1(88fcf553b106d9fc624c9615d9c1da9c705ccb46), ROM_BIOS(2) )
 ROM_END
 
 COMP(2009, mini2440, 0, 0, mini2440, mini2440, mini2440_state, init_mini2440, "FriendlyARM", "Mini2440", 0)

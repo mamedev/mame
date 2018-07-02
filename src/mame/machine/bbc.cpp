@@ -677,7 +677,6 @@ void bbc_state::bbcb_IC32_initialise(bbc_state *state)
 void bbc_state::MC146818_set(address_space &space)
 {
 	//logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",m_MC146818_WR,m_MC146818_DS,m_MC146818_AS,m_MC146818_CE);
-	//mc146818_device *rtc = machine().device<mc146818_device>("rtc");
 
 	// if chip enabled
 	if (m_MC146818_CE)
@@ -715,7 +714,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_porta)
 	if (m_b0_sound == 0)
 	{
 		//logerror("Doing an unsafe write to the sound chip %d \n",data);
-		if (m_sn) m_sn->write(space, 0, m_via_system_porta);
+		if (m_sn) m_sn->write(m_via_system_porta);
 	}
 	if (m_b1_speech_read == 0)
 	{
@@ -834,7 +833,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			if (m_b0_sound == 1)
 			{
 				m_b0_sound = 0;
-				if (m_sn) m_sn->write(space, 0, m_via_system_porta);
+				if (m_sn) m_sn->write(m_via_system_porta);
 			}
 			break;
 		case 1:

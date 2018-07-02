@@ -15,26 +15,23 @@
 #include "machine/ioc2.h"
 #include "machine/wd33c93.h"
 
-#define MCFG_SGI_HPC3_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, SGI_HPC3, 0)
-
-#define MCFG_HPC3_CPU_TAG(cpu_tag) \
-	downcast<hpc3_device &>(*device).set_cpu_tag(cpu_tag);
-
-#define MCFG_HPC3_SCSI_TAG(scsi_tag) \
-	downcast<hpc3_device &>(*device).set_scsi_tag(scsi_tag);
-
-#define MCFG_HPC3_IOC2_TAG(ioc2_tag) \
-	downcast<hpc3_device &>(*device).set_ioc2_tag(ioc2_tag);
-
 class hpc3_device : public device_t
 {
 public:
-	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_scsi_tag(T &&tag) { m_wd33c93.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_ioc2_tag(T &&tag) { m_ioc2.set_tag(std::forward<T>(tag)); }
 
-	void set_cpu_tag(const char *tag) { m_maincpu.set_tag(tag); }
-	void set_scsi_tag(const char *tag) { m_wd33c93.set_tag(tag); }
-	void set_ioc2_tag(const char *tag) { m_ioc2.set_tag(tag); }
+	template <typename T, typename U, typename V>
+	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&scsi_tag, V &&ioc2_tag)
+		: hpc3_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_scsi_tag(std::forward<U>(scsi_tag));
+		set_ioc2_tag(std::forward<V>(ioc2_tag));
+	}
+
+	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ32_MEMBER(hd_enet_r);
 	DECLARE_WRITE32_MEMBER(hd_enet_w);

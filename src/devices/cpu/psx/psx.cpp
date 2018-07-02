@@ -1727,35 +1727,35 @@ int psxcpu_device::store_data_address_breakpoint( uint32_t address )
 void psxcpu_device::psxcpu_internal_map(address_map &map)
 {
 	map(0x1f800000, 0x1f8003ff).noprw(); /* scratchpad */
-	map(0x1f800400, 0x1f800fff).rw(this, FUNC(psxcpu_device::berr_r), FUNC(psxcpu_device::berr_w));
-	map(0x1f801000, 0x1f801003).rw(this, FUNC(psxcpu_device::exp_base_r), FUNC(psxcpu_device::exp_base_w));
+	map(0x1f800400, 0x1f800fff).rw(FUNC(psxcpu_device::berr_r), FUNC(psxcpu_device::berr_w));
+	map(0x1f801000, 0x1f801003).rw(FUNC(psxcpu_device::exp_base_r), FUNC(psxcpu_device::exp_base_w));
 	map(0x1f801004, 0x1f801007).ram();
-	map(0x1f801008, 0x1f80100b).rw(this, FUNC(psxcpu_device::exp_config_r), FUNC(psxcpu_device::exp_config_w));
+	map(0x1f801008, 0x1f80100b).rw(FUNC(psxcpu_device::exp_config_r), FUNC(psxcpu_device::exp_config_w));
 	map(0x1f80100c, 0x1f80100f).ram();
-	map(0x1f801010, 0x1f801013).rw(this, FUNC(psxcpu_device::rom_config_r), FUNC(psxcpu_device::rom_config_w));
+	map(0x1f801010, 0x1f801013).rw(FUNC(psxcpu_device::rom_config_r), FUNC(psxcpu_device::rom_config_w));
 	map(0x1f801014, 0x1f80101f).ram();
 	/* 1f801014 spu delay */
 	/* 1f801018 dv delay */
-	map(0x1f801020, 0x1f801023).rw(this, FUNC(psxcpu_device::com_delay_r), FUNC(psxcpu_device::com_delay_w));
+	map(0x1f801020, 0x1f801023).rw(FUNC(psxcpu_device::com_delay_r), FUNC(psxcpu_device::com_delay_w));
 	map(0x1f801024, 0x1f80102f).ram();
 	map(0x1f801040, 0x1f80104f).rw("sio0", FUNC(psxsio_device::read), FUNC(psxsio_device::write));
 	map(0x1f801050, 0x1f80105f).rw("sio1", FUNC(psxsio_device::read), FUNC(psxsio_device::write));
-	map(0x1f801060, 0x1f801063).rw(this, FUNC(psxcpu_device::ram_config_r), FUNC(psxcpu_device::ram_config_w));
+	map(0x1f801060, 0x1f801063).rw(FUNC(psxcpu_device::ram_config_r), FUNC(psxcpu_device::ram_config_w));
 	map(0x1f801064, 0x1f80106f).ram();
 	map(0x1f801070, 0x1f801077).rw("irq", FUNC(psxirq_device::read), FUNC(psxirq_device::write));
 	map(0x1f801080, 0x1f8010ff).rw("dma", FUNC(psxdma_device::read), FUNC(psxdma_device::write));
 	map(0x1f801100, 0x1f80112f).rw("rcnt", FUNC(psxrcnt_device::read), FUNC(psxrcnt_device::write));
-	map(0x1f801800, 0x1f801803).rw(this, FUNC(psxcpu_device::cd_r), FUNC(psxcpu_device::cd_w));
-	map(0x1f801810, 0x1f801817).rw(this, FUNC(psxcpu_device::gpu_r), FUNC(psxcpu_device::gpu_w));
+	map(0x1f801800, 0x1f801803).rw(FUNC(psxcpu_device::cd_r), FUNC(psxcpu_device::cd_w));
+	map(0x1f801810, 0x1f801817).rw(FUNC(psxcpu_device::gpu_r), FUNC(psxcpu_device::gpu_w));
 	map(0x1f801820, 0x1f801827).rw("mdec", FUNC(psxmdec_device::read), FUNC(psxmdec_device::write));
-	map(0x1f801c00, 0x1f801dff).rw(this, FUNC(psxcpu_device::spu_r), FUNC(psxcpu_device::spu_w));
+	map(0x1f801c00, 0x1f801dff).rw(FUNC(psxcpu_device::spu_r), FUNC(psxcpu_device::spu_w));
 	map(0x1f802020, 0x1f802033).ram(); /* ?? */
 	/* 1f802030 int 2000 */
 	/* 1f802040 dip switches */
 	map(0x1f802040, 0x1f802043).nopw();
-	map(0x20000000, 0x7fffffff).rw(this, FUNC(psxcpu_device::berr_r), FUNC(psxcpu_device::berr_w));
-	map(0xc0000000, 0xfffdffff).rw(this, FUNC(psxcpu_device::berr_r), FUNC(psxcpu_device::berr_w));
-	map(0xfffe0130, 0xfffe0133).rw(this, FUNC(psxcpu_device::biu_r), FUNC(psxcpu_device::biu_w));
+	map(0x20000000, 0x7fffffff).rw(FUNC(psxcpu_device::berr_r), FUNC(psxcpu_device::berr_w));
+	map(0xc0000000, 0xfffdffff).rw(FUNC(psxcpu_device::berr_r), FUNC(psxcpu_device::berr_w));
+	map(0xfffe0130, 0xfffe0133).rw(FUNC(psxcpu_device::biu_r), FUNC(psxcpu_device::biu_w));
 }
 
 

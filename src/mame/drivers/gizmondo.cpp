@@ -53,12 +53,17 @@ public:
 		m_gf4500(*this, "gf4500")
 		{ }
 
+	void gizmondo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
+
+	void init_gizmondo();
+
+private:
 	uint32_t m_port[9];
 	required_device<s3c2440_device> m_s3c2440;
-	void init_gizmondo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<cpu_device> m_maincpu;
 	required_device<gf4500_device> m_gf4500;
@@ -66,7 +71,6 @@ public:
 	DECLARE_WRITE32_MEMBER(s3c2440_gpio_port_w);
 
 	bitmap_rgb32 m_bitmap;
-	void gizmondo(machine_config &config);
 	void gizmondo_map(address_map &map);
 };
 
@@ -248,7 +252,7 @@ INPUT_PORTS_END
 ROM_START( gizmondo )
 	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "fboot", "fboot" )
-	ROMX_LOAD( "fboot.bin", 0, 0x800, CRC(28887c29) SHA1(e625caaa63b9db74cb6d7499dce12ac758c5fe76), ROM_BIOS(1) )
+	ROMX_LOAD( "fboot.bin", 0, 0x800, CRC(28887c29) SHA1(e625caaa63b9db74cb6d7499dce12ac758c5fe76), ROM_BIOS(0) )
 ROM_END
 
 CONS(2005, gizmondo, 0, 0, gizmondo, gizmondo, gizmondo_state, init_gizmondo, "Tiger Telematics", "Gizmondo", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

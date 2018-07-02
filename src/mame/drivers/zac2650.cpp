@@ -28,15 +28,15 @@
 void zac2650_state::main_map(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
-	map(0x1800, 0x1bff).ram().w(this, FUNC(zac2650_state::tinvader_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(zac2650_state::tinvader_videoram_w)).share("videoram");
 	map(0x1c00, 0x1cff).ram();
 	map(0x1d00, 0x1dff).ram();
-	map(0x1e80, 0x1e80).r(this, FUNC(zac2650_state::tinvader_port_0_r)).w(this, FUNC(zac2650_state::tinvader_sound_w));
+	map(0x1e80, 0x1e80).r(FUNC(zac2650_state::tinvader_port_0_r)).w(FUNC(zac2650_state::tinvader_sound_w));
 	map(0x1e81, 0x1e81).portr("1E81");
 	map(0x1e82, 0x1e82).portr("1E82");
 	map(0x1e85, 0x1e85).portr("1E85");                   /* Dodgem Only */
 	map(0x1e86, 0x1e86).portr("1E86").nopw();       /* Dodgem Only */
-	map(0x1f00, 0x1fff).rw(this, FUNC(zac2650_state::zac_s2636_r), FUNC(zac2650_state::zac_s2636_w)).share("s2636_0_ram");
+	map(0x1f00, 0x1fff).rw(FUNC(zac2650_state::zac_s2636_r), FUNC(zac2650_state::zac_s2636_w)).share("s2636_0_ram");
 }
 
 static INPUT_PORTS_START( tinvader )
@@ -224,7 +224,7 @@ static const gfx_layout s2636_character =
 	8*8
 };
 
-static GFXDECODE_START( tinvader )
+static GFXDECODE_START( gfx_tinvader )
 	GFXDECODE_SCALE( "gfx1", 0, tinvader_character,   0, 2, 3, 3 )
 	GFXDECODE_SCALE( nullptr,   0x1F00, s2636_character, 0, 2, 4, 3 )  /* dynamic */
 	GFXDECODE_SCALE( nullptr,   0x1F00, s2636_character, 0, 2, 8, 6 )  /* dynamic */
@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(zac2650_state::tinvader)
 	MCFG_SCREEN_UPDATE_DRIVER(zac2650_state, screen_update_tinvader)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tinvader)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tinvader)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(zac2650_state, zac2650)
 

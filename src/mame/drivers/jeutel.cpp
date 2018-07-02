@@ -40,18 +40,20 @@ public:
 	{ }
 
 	void init_jeutel();
+	void jeutel(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(ppi0a_w);
 	DECLARE_WRITE8_MEMBER(ppi0b_w);
 	DECLARE_WRITE8_MEMBER(sndcmd_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void jeutel(machine_config &config);
 	void jeutel_cpu2(address_map &map);
 	void jeutel_cpu3(address_map &map);
 	void jeutel_cpu3_io(address_map &map);
 	void jeutel_map(address_map &map);
-private:
+
 	bool m_timer_a;
 	uint8_t m_sndcmd;
 	uint8_t m_digit;
@@ -89,7 +91,7 @@ void jeutel_state::jeutel_cpu3(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom().region("roms", 0x3000);
 	map(0x4000, 0x43ff).ram();
-	map(0x8000, 0x8000).w(this, FUNC(jeutel_state::sndcmd_w));
+	map(0x8000, 0x8000).w(FUNC(jeutel_state::sndcmd_w));
 }
 
 void jeutel_state::jeutel_cpu3_io(address_map &map)
@@ -189,7 +191,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( jeutel_state::timer_a )
 	m_timer_a ^= 1;
 	m_cpu2->set_input_line(0, (m_timer_a) ? ASSERT_LINE : CLEAR_LINE);
 	if (m_cpu2->state_int(Z80_HALT))
-		m_cpu2->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_cpu2->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void jeutel_state::init_jeutel()

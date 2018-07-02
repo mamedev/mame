@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
@@ -23,9 +23,11 @@ public:
 	{ }
 
 	void haze(machine_config &config);
+
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 

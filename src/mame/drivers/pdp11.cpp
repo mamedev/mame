@@ -105,6 +105,11 @@ public:
 	{
 	}
 
+	void pdp11ub2(machine_config &config);
+	void pdp11(machine_config &config);
+	void pdp11qb(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( teletype_ctrl_r );
@@ -116,9 +121,6 @@ public:
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
-	void pdp11ub2(machine_config &config);
-	void pdp11(machine_config &config);
-	void pdp11qb(machine_config &config);
 	void pdp11_mem(address_map &map);
 	void pdp11qb_mem(address_map &map);
 };
@@ -166,7 +168,7 @@ void pdp11_state::pdp11_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xdfff).ram();  // RAM
 	map(0xea00, 0xfeff).rom();
-	map(0xff70, 0xff77).rw(this, FUNC(pdp11_state::teletype_ctrl_r), FUNC(pdp11_state::teletype_ctrl_w));
+	map(0xff70, 0xff77).rw(FUNC(pdp11_state::teletype_ctrl_r), FUNC(pdp11_state::teletype_ctrl_w));
 
 	map(0xfe78, 0xfe7b).w("rx01", FUNC(rx01_device::write));
 }

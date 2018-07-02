@@ -131,6 +131,7 @@ public:
 		, m_io_mouse0(*this, "MOUSE0")
 		, m_io_mouse1(*this, "MOUSE1")
 		, m_io_key(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5"})
+		, m_leds(*this, "led%u", 1U)
 		, m_psg_b(0)
 		, m_rtc_latch(0)
 		, m_kanji_latch(0)
@@ -157,51 +158,6 @@ public:
 			elem = CLEAR_LINE;
 		}
 	}
-
-	// static configuration helpers
-	static void install_slot_pages(device_t &owner, uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, device_t *device);
-
-	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	DECLARE_WRITE8_MEMBER(msx_sec_slot_w);
-	DECLARE_READ8_MEMBER(msx_sec_slot_r);
-	DECLARE_READ8_MEMBER(msx_kanji_r);
-	DECLARE_WRITE8_MEMBER(msx_kanji_w);
-	DECLARE_WRITE8_MEMBER(msx_ppi_port_a_w);
-	DECLARE_WRITE8_MEMBER(msx_ppi_port_c_w);
-	DECLARE_READ8_MEMBER(msx_ppi_port_b_r);
-	DECLARE_READ8_MEMBER(msx_rtc_reg_r);
-	DECLARE_WRITE8_MEMBER(msx_rtc_reg_w);
-	DECLARE_WRITE8_MEMBER(msx_rtc_latch_w);
-	DECLARE_READ8_MEMBER(msx_mem_read);
-	DECLARE_WRITE8_MEMBER(msx_mem_write);
-	DECLARE_READ8_MEMBER(msx_switched_r);
-	DECLARE_WRITE8_MEMBER(msx_switched_w);
-	DECLARE_WRITE_LINE_MEMBER(turbo_w);
-
-	void msx_memory_map_all();
-	void msx_memory_map_page(uint8_t page);
-	void msx_memory_reset();
-
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
-	DECLARE_READ8_MEMBER(msx_psg_port_a_r);
-	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
-	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
-	DECLARE_WRITE8_MEMBER(msx_psg_port_b_w);
-	INTERRUPT_GEN_MEMBER(msx_interrupt);
-	DECLARE_WRITE8_MEMBER(msx_ay8910_w);
-	void msx_memory_init();
-	void post_load();
-
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source0) { msx_irq_source(0, state); }  // usually tms9918/v9938/v9958
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source1) { msx_irq_source(1, state); }  // usually first cartridge slot
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source2) { msx_irq_source(2, state); }  // usually second cartridge slot
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source3) { msx_irq_source(3, state); }  // sometimes expansion slot
-
-	std::vector<msx_switched_interface *> m_switched;
 
 	void mpc25fd(machine_config &config);
 	void hc6(machine_config &config);
@@ -416,6 +372,7 @@ public:
 	void hx10s(machine_config &config);
 	void piopx7uk(machine_config &config);
 	void hc5(machine_config &config);
+	void dgnmsx(machine_config &config);
 	void fdpc200(machine_config &config);
 	void hx22(machine_config &config);
 	void fs1300(machine_config &config);
@@ -477,11 +434,58 @@ public:
 	void msx_2_35_dd_drive(machine_config &config);
 	void msx_ym2413(machine_config &config);
 	void msx2_64kb_vram(machine_config &config);
+
+private:
+	// static configuration helpers
+	static void install_slot_pages(device_t &owner, uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, device_t *device);
+
+	virtual void driver_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_WRITE8_MEMBER(msx_sec_slot_w);
+	DECLARE_READ8_MEMBER(msx_sec_slot_r);
+	DECLARE_READ8_MEMBER(msx_kanji_r);
+	DECLARE_WRITE8_MEMBER(msx_kanji_w);
+	DECLARE_WRITE8_MEMBER(msx_ppi_port_a_w);
+	DECLARE_WRITE8_MEMBER(msx_ppi_port_c_w);
+	DECLARE_READ8_MEMBER(msx_ppi_port_b_r);
+	DECLARE_READ8_MEMBER(msx_rtc_reg_r);
+	DECLARE_WRITE8_MEMBER(msx_rtc_reg_w);
+	DECLARE_WRITE8_MEMBER(msx_rtc_latch_w);
+	DECLARE_READ8_MEMBER(msx_mem_read);
+	DECLARE_WRITE8_MEMBER(msx_mem_write);
+	DECLARE_READ8_MEMBER(msx_switched_r);
+	DECLARE_WRITE8_MEMBER(msx_switched_w);
+	DECLARE_WRITE_LINE_MEMBER(turbo_w);
+
+	void msx_memory_map_all();
+	void msx_memory_map_page(uint8_t page);
+	void msx_memory_reset();
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	DECLARE_READ8_MEMBER(msx_psg_port_a_r);
+	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
+	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
+	DECLARE_WRITE8_MEMBER(msx_psg_port_b_w);
+	INTERRUPT_GEN_MEMBER(msx_interrupt);
+	DECLARE_WRITE8_MEMBER(msx_ay8910_w);
+	void msx_memory_init();
+	void post_load();
+
+	DECLARE_WRITE_LINE_MEMBER(msx_irq_source0) { msx_irq_source(0, state); }  // usually tms9918/v9938/v9958
+	DECLARE_WRITE_LINE_MEMBER(msx_irq_source1) { msx_irq_source(1, state); }  // usually first cartridge slot
+	DECLARE_WRITE_LINE_MEMBER(msx_irq_source2) { msx_irq_source(2, state); }  // usually second cartridge slot
+	DECLARE_WRITE_LINE_MEMBER(msx_irq_source3) { msx_irq_source(3, state); }  // sometimes expansion slot
+
+	std::vector<msx_switched_interface *> m_switched;
+
 	void msx2_io_map(address_map &map);
 	void msx2p_io_map(address_map &map);
 	void msx_io_map(address_map &map);
 	void msx_memory_map(address_map &map);
-private:
+
 	required_device<z80_device> m_maincpu;
 	optional_device<v9938_device> m_v9938;
 	optional_device<v9958_device> m_v9958;
@@ -497,6 +501,7 @@ private:
 	required_ioport m_io_mouse0;
 	required_ioport m_io_mouse1;
 	required_ioport_array<6> m_io_key;
+	output_finder<2> m_leds;
 
 	/* PSG */
 	int m_psg_b;

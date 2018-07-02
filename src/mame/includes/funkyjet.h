@@ -26,6 +26,11 @@ public:
 		, m_deco_tilegen(*this, "tilegen")
 	{ }
 
+	void funkyjet(machine_config &config);
+
+	void init_funkyjet();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<deco146_device> m_deco146;
@@ -36,12 +41,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen;
-	void init_funkyjet();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( funkyjet_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( funkyjet_protection_region_0_146_w );
-	void funkyjet(machine_config &config);
 	void funkyjet_map(address_map &map);
 	void sound_map(address_map &map);
 };

@@ -79,12 +79,12 @@ void marineb_state::marineb_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).ram().w(this, FUNC(marineb_state::marineb_videoram_w)).share("videoram");
+	map(0x8800, 0x8bff).ram().w(FUNC(marineb_state::marineb_videoram_w)).share("videoram");
 	map(0x8c00, 0x8c3f).ram().share("spriteram");  /* Hoccer only */
-	map(0x9000, 0x93ff).ram().w(this, FUNC(marineb_state::marineb_colorram_w)).share("colorram");
-	map(0x9800, 0x9800).w(this, FUNC(marineb_state::marineb_column_scroll_w));
-	map(0x9a00, 0x9a00).w(this, FUNC(marineb_state::marineb_palette_bank_0_w));
-	map(0x9c00, 0x9c00).w(this, FUNC(marineb_state::marineb_palette_bank_1_w));
+	map(0x9000, 0x93ff).ram().w(FUNC(marineb_state::marineb_colorram_w)).share("colorram");
+	map(0x9800, 0x9800).w(FUNC(marineb_state::marineb_column_scroll_w));
+	map(0x9a00, 0x9a00).w(FUNC(marineb_state::marineb_palette_bank_0_w));
+	map(0x9c00, 0x9c00).w(FUNC(marineb_state::marineb_palette_bank_1_w));
 	map(0xa000, 0xa007).w("outlatch", FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P2");
 	map(0xa800, 0xa800).portr("P1");
@@ -497,30 +497,30 @@ static const gfx_layout changes_big_spritelayout =
 };
 
 
-static GFXDECODE_START( marineb )
+static GFXDECODE_START( gfx_marineb )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, marineb_charlayout,          0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_small_spritelayout,  0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( wanted )
+static GFXDECODE_START( gfx_wanted )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, wanted_charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_small_spritelayout,  0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( changes )
+static GFXDECODE_START( gfx_changes )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, marineb_charlayout,          0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, changes_small_spritelayout,  0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x1000, changes_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( hoccer )
+static GFXDECODE_START( gfx_hoccer )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, marineb_charlayout,          0, 16 )   /* no palette banks */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, changes_small_spritelayout,  0, 16 )   /* no palette banks */
 GFXDECODE_END
 
-static GFXDECODE_START( hopprobo )
+static GFXDECODE_START( gfx_hopprobo )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, hopprobo_charlayout,         0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_small_spritelayout,  0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_big_spritelayout,    0, 64 )
@@ -529,7 +529,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(marineb_state::marineb_vblank_irq)
 {
 	if (state && m_irq_mask)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(marineb_state::wanted_vblank_irq)
@@ -561,7 +561,7 @@ MACHINE_CONFIG_START(marineb_state::marineb)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, marineb_state, marineb_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marineb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marineb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(marineb_state, marineb)
 
@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(marineb_state::changes)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", changes)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_changes)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_changes)
 MACHINE_CONFIG_END
@@ -604,7 +604,7 @@ MACHINE_CONFIG_START(marineb_state::hoccer)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", hoccer)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_hoccer)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_hoccer)
 MACHINE_CONFIG_END
@@ -621,7 +621,7 @@ MACHINE_CONFIG_START(marineb_state::wanted)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, marineb_state, irq_mask_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", wanted)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wanted)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_springer)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, marineb_state, wanted_vblank_irq))
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(marineb_state::hopprobo)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", hopprobo)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_hopprobo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_hopprobo)
 MACHINE_CONFIG_END

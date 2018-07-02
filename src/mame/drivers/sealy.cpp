@@ -30,6 +30,7 @@ Notes:
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -45,6 +46,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void sealy(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -52,7 +56,6 @@ public:
 	// screen updates
 	DECLARE_PALETTE_INIT(sealy);
 	uint32_t screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void sealy(machine_config &config);
 	void sealy_map(address_map &map);
 };
 
@@ -92,7 +95,7 @@ static const gfx_layout gfxlayout_8x8x16 =
 };
 
 
-static GFXDECODE_START( sealy )
+static GFXDECODE_START( gfx_sealy )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x16, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_8x8x16, 0, 1 )
 GFXDECODE_END
@@ -112,7 +115,7 @@ MACHINE_CONFIG_START(sealy_state::sealy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sealy_state, screen_update_sealy)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sealy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sealy)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(sealy_state, sealy)
 

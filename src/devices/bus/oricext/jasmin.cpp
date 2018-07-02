@@ -28,11 +28,11 @@ INPUT_PORTS_END
 void jasmin_device::map(address_map &map)
 {
 	map(0x3f4, 0x3f7).rw("fdc", FUNC(wd1770_device::read), FUNC(wd1770_device::write));
-	map(0x3f8, 0x3f8).w(this, FUNC(jasmin_device::side_sel_w));
-	map(0x3f9, 0x3f9).w(this, FUNC(jasmin_device::fdc_reset_w));
-	map(0x3fa, 0x3fa).w(this, FUNC(jasmin_device::ram_access_w));
-	map(0x3fb, 0x3fb).w(this, FUNC(jasmin_device::rom_access_w));
-	map(0x3fc, 0x3ff).w(this, FUNC(jasmin_device::select_w));
+	map(0x3f8, 0x3f8).w(FUNC(jasmin_device::side_sel_w));
+	map(0x3f9, 0x3f9).w(FUNC(jasmin_device::fdc_reset_w));
+	map(0x3fa, 0x3fa).w(FUNC(jasmin_device::ram_access_w));
+	map(0x3fb, 0x3fb).w(FUNC(jasmin_device::rom_access_w));
+	map(0x3fc, 0x3ff).w(FUNC(jasmin_device::select_w));
 }
 
 jasmin_device::jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -73,7 +73,7 @@ const tiny_rom_entry *jasmin_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(jasmin_device::device_add_mconfig)
-	MCFG_WD1770_ADD("fdc", XTAL(8'000'000))
+	MCFG_DEVICE_ADD("fdc", WD1770, 8_MHz_XTAL)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, oricext_device, irq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", jasmin_floppies, "3dsdd", jasmin_device::floppy_formats)

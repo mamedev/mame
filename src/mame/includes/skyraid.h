@@ -6,6 +6,7 @@
 #pragma once
 
 #include "sound/discrete.h"
+#include "emupal.h"
 
 class skyraid_state : public driver_device
 {
@@ -24,7 +25,7 @@ public:
 
 	void skyraid(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(skyraid_port_0_r);
 	DECLARE_WRITE8_MEMBER(skyraid_range_w);
 	DECLARE_WRITE8_MEMBER(skyraid_offset_w);
@@ -42,7 +43,6 @@ protected:
 
 	void skyraid_map(address_map &map);
 
-private:
 	int m_analog_range;
 	int m_analog_offset;
 

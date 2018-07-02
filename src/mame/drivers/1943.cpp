@@ -111,17 +111,17 @@ void _1943_state::c1943_map(address_map &map)
 	map(0xc002, 0xc002).portr("P2");
 	map(0xc003, 0xc003).portr("DSWA");
 	map(0xc004, 0xc004).portr("DSWB");
-	map(0xc007, 0xc007).r(this, FUNC(_1943_state::c1943_protection_r));
+	map(0xc007, 0xc007).r(FUNC(_1943_state::c1943_protection_r));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(this, FUNC(_1943_state::c1943_c804_w)); // ROM bank switch, screen flip
+	map(0xc804, 0xc804).w(FUNC(_1943_state::c1943_c804_w)); // ROM bank switch, screen flip
 	map(0xc806, 0xc806).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xc807, 0xc807).w(this, FUNC(_1943_state::c1943_protection_w));
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(_1943_state::c1943_videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(_1943_state::c1943_colorram_w)).share("colorram");
+	map(0xc807, 0xc807).w(FUNC(_1943_state::c1943_protection_w));
+	map(0xd000, 0xd3ff).ram().w(FUNC(_1943_state::c1943_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(_1943_state::c1943_colorram_w)).share("colorram");
 	map(0xd800, 0xd801).ram().share("scrollx");
 	map(0xd802, 0xd802).ram().share("scrolly");
 	map(0xd803, 0xd804).ram().share("bgscrollx");
-	map(0xd806, 0xd806).w(this, FUNC(_1943_state::c1943_d806_w)); // sprites, bg1, bg2 enable
+	map(0xd806, 0xd806).w(FUNC(_1943_state::c1943_d806_w)); // sprites, bg1, bg2 enable
 	map(0xd808, 0xd808).nopw(); // ???
 	map(0xd868, 0xd868).nopw(); // ???
 	map(0xd888, 0xd888).nopw(); // ???
@@ -287,7 +287,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Info */
 
-static GFXDECODE_START( 1943 )
+static GFXDECODE_START( gfx_1943 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,                  0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,               32*4, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, bgtilelayout,       32*4+16*16, 16 )
@@ -333,7 +333,7 @@ MACHINE_CONFIG_START(_1943_state::_1943)
 	MCFG_SCREEN_UPDATE_DRIVER(_1943_state, screen_update_1943)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1943)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1943)
 	MCFG_PALETTE_ADD("palette", 32*4+16*16+16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(_1943_state, 1943)

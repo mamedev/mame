@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, R. Belmont
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 class silkroad_state : public driver_device
 {
@@ -18,6 +19,9 @@ public:
 		m_sprram(*this, "sprram"),
 		m_regs(*this, "regs") { }
 
+	void silkroad(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki1;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -49,6 +53,5 @@ public:
 
 	uint32_t screen_update_silkroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void silkroad(machine_config &config);
 	void cpu_map(address_map &map);
 };

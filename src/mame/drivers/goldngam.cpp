@@ -236,6 +236,7 @@
 #include "machine/6850acia.h"
 #include "machine/mc68681.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -246,9 +247,6 @@
 
 class goldngam_state : public driver_device
 {
-	static constexpr int MOVIECRD_DUART1_IRQ = M68K_IRQ_2;
-	static constexpr int MOVIECRD_DUART2_IRQ = M68K_IRQ_4;
-
 public:
 	goldngam_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
@@ -259,6 +257,9 @@ public:
 	void swisspkr(machine_config &config);
 	void moviecrd(machine_config &config);
 private:
+	static constexpr int MOVIECRD_DUART1_IRQ = M68K_IRQ_2;
+	static constexpr int MOVIECRD_DUART2_IRQ = M68K_IRQ_4;
+
 	DECLARE_READ8_MEMBER(unk_r);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(goldngam);
@@ -335,7 +336,7 @@ void goldngam_state::swisspkr_map(address_map &map)
 	map(0x500208, 0x500209).nopr(); //?
 	map(0x50020c, 0x50020d).nopr(); //?
 	map(0x500300, 0x500301).nopr(); //?
-	map(0x50030f, 0x50030f).r(this, FUNC(goldngam_state::unk_r));
+	map(0x50030f, 0x50030f).r(FUNC(goldngam_state::unk_r));
 	map(0x501500, 0x501501).nopw(); //?
 	map(0x503000, 0x503001).ram(); //int ack ?
 	map(0x503002, 0x503003).ram(); //int ack ?
@@ -582,7 +583,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( goldngam )
+static GFXDECODE_START( gfx_goldngam )
 	GFXDECODE_ENTRY( "maincpu", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -613,7 +614,7 @@ MACHINE_CONFIG_START(goldngam_state::swisspkr)
 	MCFG_SCREEN_UPDATE_DRIVER(goldngam_state, screen_update_goldngam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldngam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldngam)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(goldngam_state, goldngam)

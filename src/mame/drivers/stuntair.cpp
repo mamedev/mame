@@ -86,6 +86,7 @@ Bprom dump by f205v
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -106,6 +107,9 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void stuntair(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<uint8_t> m_fgram;
@@ -143,7 +147,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(stuntair);
-	void stuntair(machine_config &config);
 	void stuntair_map(address_map &map);
 	void stuntair_sound_map(address_map &map);
 	void stuntair_sound_portmap(address_map &map);
@@ -324,17 +327,17 @@ void stuntair_state::stuntair_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xc000, 0xc7ff).ram().share("nvram");
-	map(0xc800, 0xcbff).ram().w(this, FUNC(stuntair_state::stuntair_bgattrram_w)).share("bgattrram");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(stuntair_state::stuntair_bgram_w)).share("bgram");
+	map(0xc800, 0xcbff).ram().w(FUNC(stuntair_state::stuntair_bgattrram_w)).share("bgattrram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(stuntair_state::stuntair_bgram_w)).share("bgram");
 	map(0xd800, 0xdfff).ram().share("sprram");
-	map(0xe000, 0xe000).portr("DSWB").w(this, FUNC(stuntair_state::stuntair_coin_w));
-	map(0xe800, 0xe800).portr("DSWA").w(this, FUNC(stuntair_state::stuntair_bgxscroll_w));
+	map(0xe000, 0xe000).portr("DSWB").w(FUNC(stuntair_state::stuntair_coin_w));
+	map(0xe800, 0xe800).portr("DSWA").w(FUNC(stuntair_state::stuntair_bgxscroll_w));
 	map(0xf000, 0xf000).portr("IN2");
 	map(0xf002, 0xf002).portr("IN3");
 	map(0xf003, 0xf003).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xf000, 0xf007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xf800, 0xfbff).ram().w(this, FUNC(stuntair_state::stuntair_fgram_w)).share("fgram");
-	map(0xfc03, 0xfc03).w(this, FUNC(stuntair_state::stuntair_sound_w));
+	map(0xf800, 0xfbff).ram().w(FUNC(stuntair_state::stuntair_fgram_w)).share("fgram");
+	map(0xfc03, 0xfc03).w(FUNC(stuntair_state::stuntair_sound_w));
 }
 
 // sound Z80
@@ -463,7 +466,7 @@ static const gfx_layout tiles16x8x2_layout =
 };
 
 
-static GFXDECODE_START( stuntair )
+static GFXDECODE_START( gfx_stuntair )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x100, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x2_layout, 0xe0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x8x2_layout, 0xe0, 8 )
@@ -548,7 +551,7 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, stuntair_state, stuntair_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stuntair)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stuntair)
 	MCFG_PALETTE_ADD("palette", 0x100+2)
 
 	MCFG_PALETTE_INIT_OWNER(stuntair_state, stuntair)

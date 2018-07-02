@@ -95,6 +95,7 @@ protected:
 	bool m_status;
 	bool m_power;
 	emu_timer *m_timer;
+	output_finder<> m_output;
 };
 
 #endif // MAME_MACHINE_TICKET_H

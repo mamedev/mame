@@ -36,6 +36,9 @@ public:
 	{
 	}
 
+	void h89(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_WRITE8_MEMBER( port_f2_w );
@@ -43,7 +46,6 @@ public:
 	uint8_t m_port_f2;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
-	void h89(machine_config &config);
 	void h89_io(address_map &map);
 	void h89_mem(address_map &map);
 };
@@ -84,7 +86,7 @@ void h89_state::h89_io(address_map &map)
 																								 // the H19 code could be connected and ran
 																								 // as a separate thread.
 //  AM_RANGE(0xf0, 0xf1)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
-	map(0xf2, 0xf2).w(this, FUNC(h89_state::port_f2_w)).portr("SW501");
+	map(0xf2, 0xf2).w(FUNC(h89_state::port_f2_w)).portr("SW501");
 //  AM_RANGE(0xf3, 0xf3)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
 }
 

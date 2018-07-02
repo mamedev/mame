@@ -192,6 +192,11 @@ private:
 	void ioasic_register_state();
 	void update_ioasic_irq();
 
+	required_ioport m_io_dips;
+	required_ioport m_io_system;
+	required_ioport m_io_in1;
+	required_ioport m_io_in2;
+
 	devcb_write8    m_serial_tx_cb;
 	devcb_write32   m_aux_output_cb;
 
@@ -215,8 +220,8 @@ private:
 	uint16_t  m_fifo_bytes;
 	offs_t  m_fifo_force_buffer_empty_pc;
 
-	atari_cage_device *m_cage;
-	dcs_audio_device *m_dcs;
+	optional_device<atari_cage_device> m_cage;
+	optional_device<dcs_audio_device> m_dcs;
 };
 
 
