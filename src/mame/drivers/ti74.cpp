@@ -95,6 +95,12 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void ti74(machine_config &config);
+	void ti95(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
+
+private:
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_battery_status(int state);
 
@@ -103,19 +109,14 @@ public:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 
 	DECLARE_PALETTE_INIT(ti74);
-	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
-	void ti74(machine_config &config);
-	void ti95(machine_config &config);
 	void main_map(address_map &map);
 
-protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-private:
 	required_device<tms70c46_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;

@@ -35,6 +35,9 @@ public:
 			m_analog_x(*this, "ANALOGX"),
 			m_analog_y(*this, "ANALOGY") { }
 
+	void xtheball(machine_config &config);
+
+private:
 	required_device<tms34010_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tlc34076_device> m_tlc34076;
@@ -57,7 +60,6 @@ public:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-	void xtheball(machine_config &config);
 	void main_map(address_map &map);
 };
 

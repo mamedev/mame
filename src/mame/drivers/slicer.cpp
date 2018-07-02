@@ -24,13 +24,15 @@ public:
 	{
 	}
 
+	void slicer(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(sio_out_w);
 	template<unsigned int drive> DECLARE_WRITE_LINE_MEMBER(drive_sel_w);
 
-	void slicer(machine_config &config);
 	void slicer_io(address_map &map);
 	void slicer_map(address_map &map);
-protected:
+
 	required_device<fd1797_device> m_fdc;
 	required_device<scsi_port_device> m_sasi;
 };

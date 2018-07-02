@@ -34,6 +34,9 @@ public:
 		: pk8000_base_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 
+	void photon(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(_80_porta_w);
 	DECLARE_READ8_MEMBER(_80_portb_r);
 	DECLARE_WRITE8_MEMBER(_80_portc_w);
@@ -48,7 +51,6 @@ public:
 	void set_bank(uint8_t data);
 
 	required_device<speaker_sound_device> m_speaker;
-	void photon(machine_config &config);
 	void pk8000_io(address_map &map);
 	void pk8000_mem(address_map &map);
 };

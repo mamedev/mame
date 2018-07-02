@@ -38,8 +38,7 @@ public:
 		, m_rtc(*this, UPD1990A_TAG)
 		, m_fdc(*this, UPD765_TAG)
 		, m_ram(*this, RAM_TAG)
-		, m_floppy0(*this, UPD765_TAG":0")
-		, m_floppy1(*this, UPD765_TAG":1")
+		, m_floppy(*this, UPD765_TAG":%u", 0U)
 		, m_ecb(*this, ECBBUS_TAG)
 		, m_rs232a(*this, "rs232a")
 		, m_rs232b(*this, "rs232b")
@@ -50,13 +49,15 @@ public:
 		, m_j5(*this, "J5")
 	{ }
 
+	void prof80(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<prof80_mmu_device> m_mmu;
 	required_device<upd1990a_device> m_rtc;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<ecbbus_device> m_ecb;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
@@ -96,7 +97,6 @@ public:
 	// timers
 	emu_timer   *m_floppy_motor_off_timer;
 
-	void prof80(machine_config &config);
 	void prof80_io(address_map &map);
 	void prof80_mem(address_map &map);
 	void prof80_mmu(address_map &map);

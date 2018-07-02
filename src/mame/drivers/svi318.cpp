@@ -71,6 +71,12 @@ public:
 		m_keyboard_row(0)
 	{}
 
+	void svi328n(machine_config &config);
+	void svi318(machine_config &config);
+	void svi318n(machine_config &config);
+	void svi328(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( ppi_port_a_r );
 	DECLARE_READ8_MEMBER( ppi_port_b_r );
 	DECLARE_WRITE8_MEMBER( ppi_port_c_w );
@@ -91,18 +97,13 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 
-	void svi328n(machine_config &config);
-	void svi318(machine_config &config);
-	void svi318n(machine_config &config);
-	void svi328(machine_config &config);
 	void svi3x8_io(address_map &map);
 	void svi3x8_io_bank(address_map &map);
 	void svi3x8_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_io;

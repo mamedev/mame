@@ -124,6 +124,19 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void grancapi(machine_config &config);
+	void tv_ncf(machine_config &config);
+	void ciclone(machine_config &config);
+	void nyjoker(machine_config &config);
+	void magicbom(machine_config &config);
+	void brasil(machine_config &config);
+	void fashion(machine_config &config);
+	void newmcard(machine_config &config);
+	void record(machine_config &config);
+	void tv_tcf(machine_config &config);
+	void tv_vcf(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_blit_ram;
 	optional_memory_bank m_mainbank;
 
@@ -162,17 +175,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_okim6376;
 	required_device<palette_device> m_palette;
-	void grancapi(machine_config &config);
-	void tv_ncf(machine_config &config);
-	void ciclone(machine_config &config);
-	void nyjoker(machine_config &config);
-	void magicbom(machine_config &config);
-	void brasil(machine_config &config);
-	void fashion(machine_config &config);
-	void newmcard(machine_config &config);
-	void record(machine_config &config);
-	void tv_tcf(machine_config &config);
-	void tv_vcf(machine_config &config);
+
 	void brasil_io(address_map &map);
 	void brasil_map(address_map &map);
 	void ciclone_io(address_map &map);

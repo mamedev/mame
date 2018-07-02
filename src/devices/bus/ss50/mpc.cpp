@@ -191,5 +191,3 @@ WRITE_LINE_MEMBER(ss50_mpc_device::f300_w)
 
 // device type definition
 DEFINE_DEVICE_TYPE_PRIVATE(SS50_MPC, ss50_card_interface, ss50_mpc_device, "ss50_mpc", "MP-C Serial Control Interface")
-template class device_finder<ss50_card_interface, false>;
-template class device_finder<ss50_card_interface, true>;

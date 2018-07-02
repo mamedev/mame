@@ -107,6 +107,9 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
+	void gp32(machine_config &config);
+
+private:
 	virtual void video_start() override;
 
 	required_shared_ptr<uint32_t> m_s3c240x_ram;
@@ -187,9 +190,8 @@ public:
 	TIMER_CALLBACK_MEMBER(s3c240x_dma_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_iic_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_iis_timer_exp);
-	void gp32(machine_config &config);
 	void gp32_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<smartmedia_image_device> m_smartmedia;
 	required_device<dac_word_interface> m_ldac;

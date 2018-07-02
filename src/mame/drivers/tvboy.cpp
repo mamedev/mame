@@ -29,7 +29,7 @@ public:
 
 	void tvboyii(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -38,7 +38,6 @@ protected:
 	void rom_map(address_map &map);
 	void tvboy_mem(address_map &map);
 
-private:
 	required_memory_bank m_crom;
 	required_region_ptr<uint8_t> m_rom;
 };

@@ -49,9 +49,13 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_seta001(*this, "spritegen"),
 		m_palette(*this, "palette"),
+		m_iox_io(*this, "IOX"),
 		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void thedealr(machine_config &config);
+
+private:
 	// IOX
 	DECLARE_READ8_MEMBER(iox_r);
 	DECLARE_WRITE8_MEMBER(iox_w);
@@ -70,20 +74,19 @@ public:
 	DECLARE_PALETTE_INIT(thedealr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	void thedealr(machine_config &config);
+
 	void thedealr(address_map &map);
 	void thedealr_sub(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
+	optional_ioport m_iox_io;
 	output_finder<8> m_leds;
 };
 
@@ -202,7 +205,7 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 		{
 			case 0x01:  // inputs?
 			{
-				uint16_t buttons = ioport("IOX")->read();
+				uint16_t buttons = m_iox_io->read();
 				m_iox_ret = 0;
 				for (int i = 0; i < 16; ++i)
 				{

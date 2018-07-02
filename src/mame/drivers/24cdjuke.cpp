@@ -71,6 +71,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void midcoin24cdjuke(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
@@ -88,10 +91,9 @@ public:
 
 	DECLARE_READ8_MEMBER(unknown_r) { return machine().rand(); }
 
-	void midcoin24cdjuke(machine_config &config);
 	void midcoin24cdjuke_io(address_map &map);
 	void midcoin24cdjuke_map(address_map &map);
-private:
+
 	uint8_t m_kb_col;
 };
 

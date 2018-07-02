@@ -37,6 +37,11 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_acia(*this, "acia") { }
 
+	void f1gp2(machine_config &config);
+	void f1gpb(machine_config &config);
+	void f1gp(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_sharedram;
 	optional_shared_ptr<uint16_t> m_spr1vram;
@@ -102,9 +107,6 @@ public:
 	uint32_t screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void f1gpb_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect );
-	void f1gp2(machine_config &config);
-	void f1gpb(machine_config &config);
-	void f1gp(machine_config &config);
 	void f1gp2_cpu1_map(address_map &map);
 	void f1gp_cpu1_map(address_map &map);
 	void f1gp_cpu2_map(address_map &map);

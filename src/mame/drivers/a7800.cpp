@@ -157,7 +157,6 @@ protected:
 	int m_p2_one_button;
 	int m_bios_enabled;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tia_device> m_tia;
 	required_device<atari_maria_device> m_maria;

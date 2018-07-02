@@ -40,6 +40,9 @@ public:
 		, m_key_row(*this, "ROW%u", 0)
 	{ }
 
+	void v100(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(earom_r);
 	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -52,10 +55,9 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void v100(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;

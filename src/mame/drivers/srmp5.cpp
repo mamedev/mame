@@ -77,6 +77,12 @@ public:
 		, m_chrbank(0)
 	{
 	}
+
+	void srmp5(machine_config &config);
+
+	void init_srmp5();
+
+private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
@@ -120,12 +126,9 @@ public:
 	DECLARE_READ8_MEMBER(cmd2_r);
 	DECLARE_READ8_MEMBER(cmd_stat8_r);
 	virtual void machine_start() override;
-	void init_srmp5();
 	uint32_t screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
-	void srmp5(machine_config &config);
 	void srmp5_mem(address_map &map);
 	void st0016_io(address_map &map);
 	void st0016_mem(address_map &map);

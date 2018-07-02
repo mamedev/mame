@@ -49,14 +49,16 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void microkit(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(ram_r);
 
-	void microkit(machine_config &config);
 	void microkit_io(address_map &map);
 	void microkit_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	uint8_t m_resetcnt;
 	uint8_t m_ram_data;

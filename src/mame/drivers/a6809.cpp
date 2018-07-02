@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert and unknown others
+// copyright-holders:Robbbert
 /***************************************************************************
 
     Acorn 6809
@@ -77,7 +77,7 @@ public:
 
 	void a6809(machine_config &config);
 
-protected:
+private:
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE8_MEMBER(a6809_address_w);
@@ -89,7 +89,6 @@ protected:
 
 	void a6809_mem(address_map &map);
 
-private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint16_t m_start_address;
 	uint16_t m_cursor_address;

@@ -32,6 +32,10 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_z80bank(*this, "z80bank") { }
 
+	void warriorb(machine_config &config);
+	void darius2d(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0140syt_device> m_tc0140syt;
@@ -67,8 +71,7 @@ public:
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs );
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip);
-	void warriorb(machine_config &config);
-	void darius2d(machine_config &config);
+
 	void darius2d_map(address_map &map);
 	void warriorb_map(address_map &map);
 	void z80_sound_map(address_map &map);

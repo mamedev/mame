@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, ???
+// copyright-holders:David Haywood, Pierpaolo Prazzoli
 /***************************************************************************
 
  GX545 Scooter Shooter - (c) 1985 Konami

@@ -33,6 +33,9 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void fontwriter(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -43,10 +46,8 @@ public:
 		m_vbl ^= 0xff;
 		return m_vbl;
 	}
-	void fontwriter(machine_config &config);
 	void io_map(address_map &map);
 	void main_map(address_map &map);
-protected:
 
 	// devices
 	required_device<m37720s1_device> m_maincpu;

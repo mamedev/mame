@@ -32,11 +32,13 @@ public:
 		: radio86_state(mconfig, type, tag)
 	{ }
 
+	void mikrosha(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_MACHINE_RESET(mikrosha);
 
-	void mikrosha(machine_config &config);
 	void mikrosha_io(address_map &map);
 	void mikrosha_mem(address_map &map);
 };

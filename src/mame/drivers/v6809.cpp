@@ -82,6 +82,9 @@ public:
 	{
 	}
 
+	void v6809(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(pb_r);
@@ -94,9 +97,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	void v6809(machine_config &config);
 	void v6809_mem(address_map &map);
-private:
+
 	uint16_t m_video_address;
 	bool m_speaker_en;
 	uint8_t m_video_index;

@@ -60,12 +60,16 @@ public:
 		m_cart(*this, "cartslot"),
 		m_ctrls(*this, "CTRLS"){}
 
+	void unichamp(machine_config &config);
+
+	void init_unichamp();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gic_device> m_gic;
 	required_device<generic_slot_device> m_cart;
 
 	uint8_t m_ram[256];
-	void init_unichamp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(unichamp);
@@ -82,9 +86,8 @@ public:
 
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void unichamp(machine_config &config);
 	void unichamp_mem(address_map &map);
-protected:
+
 	required_ioport m_ctrls;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -83,8 +83,11 @@ public:
 		m_dac4(*this, "dac4"),
 		m_dac5(*this, "dac5"),
 		m_dac6(*this, "dac6")
-		  { }
+	{ }
 
+	void laserbas(machine_config &config);
+
+private:
 	/* misc */
 	int m_dac_data;
 	int m_counter[6];
@@ -126,7 +129,6 @@ public:
 	required_device<dac_byte_interface> m_dac4;
 	required_device<dac_byte_interface> m_dac5;
 	required_device<dac_byte_interface> m_dac6;
-	void laserbas(machine_config &config);
 	void laserbas_io(address_map &map);
 	void laserbas_memory(address_map &map);
 };

@@ -63,6 +63,15 @@ public:
 		, m_switches(*this, "SW.%u", 0)
 	{ }
 
+	void jolypark(machine_config &config);
+	void vrnwrld(machine_config &config);
+	void spinb(machine_config &config);
+
+	void init_game0();
+	void init_game1();
+	void init_game2();
+
+private:
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p3_r);
 	DECLARE_WRITE8_MEMBER(p3_w);
@@ -90,21 +99,17 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
-	void init_game0();
-	void init_game1();
-	void init_game2();
 	DECLARE_PALETTE_INIT(spinb);
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void jolypark(machine_config &config);
-	void vrnwrld(machine_config &config);
-	void spinb(machine_config &config);
+
 	void dmd_io(address_map &map);
 	void dmd_mem(address_map &map);
 	void spinb_audio_map(address_map &map);
 	void spinb_map(address_map &map);
 	void spinb_music_map(address_map &map);
 	void vrnwrld_map(address_map &map);
-private:
+
 	bool m_pc0a;
 	bool m_pc0m;
 	uint8_t m_game;

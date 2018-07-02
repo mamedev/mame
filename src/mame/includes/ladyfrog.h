@@ -24,6 +24,10 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void toucheme(machine_config &config);
+	void ladyfrog(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	std::unique_ptr<uint8_t[]>    m_spriteram;
@@ -78,8 +82,6 @@ public:
 	uint32_t screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void toucheme(machine_config &config);
-	void ladyfrog(machine_config &config);
 	void ladyfrog_map(address_map &map);
 	void ladyfrog_sound_map(address_map &map);
 };

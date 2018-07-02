@@ -71,9 +71,16 @@ private:
 	optional_device<nvram_device> m_e1_nvram;
 	required_device<scc85c30_device> m_scc1;
 	required_device<screen_device> m_screen;
+	required_device<device_execute_interface> m_cpu;
+	required_ioport m_io_system;
+	required_ioport m_io_in1;
+	required_ioport m_io_sw5;
+	optional_ioport m_io_trackx;
+	optional_ioport m_io_tracky;
+	optional_ioport m_io_gunx;
+	optional_ioport m_io_guny;
 
 	emu_timer *     m_timer;
-	required_device<device_execute_interface> m_cpu;
 	int m_irq_num;
 	int m_serial_irq_num;
 

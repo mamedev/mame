@@ -66,6 +66,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void eacc(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER( eacc_cb1_r );
 	DECLARE_READ_LINE_MEMBER( eacc_distance_r );
 	DECLARE_READ_LINE_MEMBER( eacc_fuel_sensor_r );
@@ -75,9 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER( eacc_segment_w );
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
-	void eacc(machine_config &config);
 	void eacc_mem(address_map &map);
-private:
 	uint8_t m_digit;
 	bool m_cb1;
 	bool m_cb2;

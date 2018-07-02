@@ -37,8 +37,9 @@ public:
 
 	void v550(machine_config &config);
 
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 private:
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
+
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 	void pvtc_map(address_map &map);

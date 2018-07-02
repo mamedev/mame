@@ -67,6 +67,9 @@ public:
 		m_vram(*this, "vram")
 	{}
 
+	void tek4404(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -74,7 +77,6 @@ public:
 	required_device<m6502_device> m_fdccpu;
 	required_shared_ptr<uint16_t> m_mainram;
 	required_shared_ptr<uint16_t> m_vram;
-	void tek4404(machine_config &config);
 	void fdccpu_map(address_map &map);
 	void maincpu_map(address_map &map);
 };

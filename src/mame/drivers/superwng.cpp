@@ -57,6 +57,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void superwng(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<uint8_t> m_videoram_bg;
@@ -98,7 +101,7 @@ public:
 	uint32_t screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
-	void superwng(machine_config &config);
+
 	void superwng_map(address_map &map);
 	void superwng_sound_map(address_map &map);
 };

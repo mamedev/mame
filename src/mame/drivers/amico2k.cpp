@@ -45,6 +45,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void amico2k(machine_config &config);
+
+private:
 	void machine_start() override;
 
 	DECLARE_READ8_MEMBER( ppi_pa_r );
@@ -55,9 +58,8 @@ public:
 	// timers
 	emu_timer *m_led_refresh_timer;
 	TIMER_CALLBACK_MEMBER(led_refresh);
-	void amico2k(machine_config &config);
 	void amico2k_mem(address_map &map);
-private:
+
 	int m_ls145_p;
 	uint8_t m_segment;
 	required_device<cpu_device> m_maincpu;

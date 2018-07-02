@@ -33,7 +33,13 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void gts80a(machine_config &config);
+	void gts80a_s(machine_config &config);
+	void gts80a_ss(machine_config &config);
+
 	void init_gts80a();
+
+private:
 	DECLARE_READ8_MEMBER(port1a_r);
 	DECLARE_READ8_MEMBER(port2a_r);
 	DECLARE_WRITE8_MEMBER(port1b_w);
@@ -41,11 +47,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port2b_w);
 	DECLARE_WRITE8_MEMBER(port3a_w);
 	DECLARE_WRITE8_MEMBER(port3b_w);
-	void gts80a(machine_config &config);
-	void gts80a_s(machine_config &config);
-	void gts80a_ss(machine_config &config);
 	void gts80a_map(address_map &map);
-private:
+
 	uint8_t m_port2;
 	uint8_t m_segment;
 	uint8_t m_lamprow;

@@ -111,6 +111,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void taitopjc(machine_config &config);
+
+	void init_optiger();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_iocpu;
 	required_device<cpu_device> m_soundcpu;
@@ -148,8 +153,6 @@ public:
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer0);
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer1);
 
-	void init_optiger();
-
 	uint16_t m_dsp_ram[0x1000];
 	uint16_t m_io_share_ram[0x2000];
 
@@ -161,7 +164,7 @@ public:
 	uint32_t m_video_address;
 
 	uint32_t m_dsp_rom_address;
-	void taitopjc(machine_config &config);
+
 	void mn10200_map(address_map &map);
 	void ppc603e_mem(address_map &map);
 	void tlcs900h_mem(address_map &map);

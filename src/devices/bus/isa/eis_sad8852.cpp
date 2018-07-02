@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Joakim Larsson Edström
+// copyright-holders:Joakim Larsson Edstrom
 /***********************************************************************************************************
  *
  *   Ericsson Information Systems/Nokia Data/ICL, SAD 8852 IBM 3270/5250 terminal emulation adapter

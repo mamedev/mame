@@ -48,6 +48,12 @@ public:
 			m_beep(*this, "beeper"),
 			m_palette(*this, "palette")  { }
 
+
+	void esh(machine_config &config);
+
+	void init_esh();
+
+private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_tile_ram;
@@ -58,7 +64,6 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_write);
 	DECLARE_WRITE8_MEMBER(led_writes);
 	DECLARE_WRITE8_MEMBER(nmi_line_w);
-	void init_esh();
 	bool m_nmi_enable;
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(esh);
@@ -70,7 +75,6 @@ public:
 	required_device<beep_device> m_beep;
 	required_device<palette_device> m_palette;
 
-	void esh(machine_config &config);
 	void z80_0_io(address_map &map);
 	void z80_0_mem(address_map &map);
 protected:

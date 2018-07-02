@@ -65,9 +65,11 @@ public:
 	su2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag){ }
 
-		void su2000(machine_config &config);
-		void pcat_io(address_map &map);
-		void pcat_map(address_map &map);
+	void su2000(machine_config &config);
+
+private:
+	void pcat_io(address_map &map);
+	void pcat_map(address_map &map);
 };
 
 

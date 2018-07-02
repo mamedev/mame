@@ -93,8 +93,12 @@ public:
 	{
 	}
 
-	required_device<m68000_base_device> m_maincpu;
+	void symbolics(machine_config &config);
+
 	void init_symbolics();
+
+private:
+	required_device<m68000_base_device> m_maincpu;
 	DECLARE_READ16_MEMBER(buserror_r);
 	DECLARE_READ16_MEMBER(fep_paddle_id_prom_r);
 	//DECLARE_READ16_MEMBER(ram_parity_hack_r);
@@ -105,10 +109,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void symbolics(machine_config &config);
 	void m68k_mem(address_map &map);
-//protected:
-//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 READ16_MEMBER(symbolics_state::buserror_r)

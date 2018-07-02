@@ -125,6 +125,18 @@ public:
 		m_p2(*this, "P2"),
 		m_dsw(*this, "DSW") { }
 
+	void multigam(machine_config &config);
+	void supergm3(machine_config &config);
+	void multigmt(machine_config &config);
+	void multigm3(machine_config &config);
+
+	void init_multigmt();
+	void init_multigam();
+	void init_multigm3();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(multigam_inputs_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 	required_ioport m_p1;
@@ -165,7 +177,6 @@ public:
 	int m_vrom4k;
 	uint8_t m_supergm3_prg_bank;
 	uint8_t m_supergm3_chr_bank;
-	DECLARE_CUSTOM_INPUT_MEMBER(multigam_inputs_r);
 	DECLARE_WRITE8_MEMBER(multigam_nt_w);
 	DECLARE_READ8_MEMBER(multigam_nt_r);
 	DECLARE_WRITE8_MEMBER(sprite_dma_w);
@@ -184,9 +195,6 @@ public:
 	DECLARE_WRITE8_MEMBER(supergm3_prg_bank_w);
 	DECLARE_WRITE8_MEMBER(supergm3_chr_bank_w);
 	void set_mirroring(int mirroring);
-	void init_multigmt();
-	void init_multigam();
-	void init_multigm3();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -203,10 +211,6 @@ public:
 	void supergm3_set_bank();
 	void multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* decode_nibble);
 	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
-	void multigam(machine_config &config);
-	void supergm3(machine_config &config);
-	void multigmt(machine_config &config);
-	void multigm3(machine_config &config);
 	void multigam_map(address_map &map);
 	void multigm3_map(address_map &map);
 	void multigmt_map(address_map &map);

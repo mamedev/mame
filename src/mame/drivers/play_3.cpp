@@ -73,6 +73,11 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void sklflite(machine_config &config);
+	void play_3(machine_config &config);
+	void megaaton(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_WRITE8_MEMBER(megaaton_port01_w);
 	DECLARE_WRITE8_MEMBER(port02_w);
@@ -92,16 +97,13 @@ public:
 	DECLARE_READ8_MEMBER(port02_a_r);
 	DECLARE_READ_LINE_MEMBER(clear_a_r);
 
-	void sklflite(machine_config &config);
-	void play_3(machine_config &config);
-	void megaaton(machine_config &config);
 	void megaaton_io(address_map &map);
 	void play_3_audio_io(address_map &map);
 	void play_3_audio_map(address_map &map);
 	void play_3_io(address_map &map);
 	void play_3_map(address_map &map);
 	void sklflite_io(address_map &map);
-private:
+
 	u16 m_clockcnt;
 	u16 m_resetcnt;
 	u16 m_resetcnt_a;

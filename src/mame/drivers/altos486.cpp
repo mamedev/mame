@@ -26,7 +26,7 @@ public:
 
 	void altos486(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(read_rmx_ack);
 
 	DECLARE_READ16_MEMBER(mmu_ram_r);
@@ -40,7 +40,6 @@ protected:
 	void altos486_z80_io(address_map &map);
 	void altos486_z80_mem(address_map &map);
 
-private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_ram;
 	required_memory_region m_rom;

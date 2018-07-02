@@ -44,6 +44,11 @@ public:
 		m_videoram(*this, "videoram")
 	{ }
 
+	void suprgolf(machine_config &config);
+
+	void init_suprgolf();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -86,13 +91,11 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void init_suprgolf();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void suprgolf(machine_config &config);
 	void io_map(address_map &map);
 	void suprgolf_map(address_map &map);
 };

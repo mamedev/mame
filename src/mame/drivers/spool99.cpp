@@ -113,6 +113,12 @@ public:
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram") { }
 
+	void vcarn(machine_config &config);
+	void spool99(machine_config &config);
+
+	void init_spool99();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_oki;
@@ -132,13 +138,10 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_clockline_w);
 	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
 
-	void init_spool99();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void vcarn(machine_config &config);
-	void spool99(machine_config &config);
 	void spool99_map(address_map &map);
 	void vcarn_map(address_map &map);
 };

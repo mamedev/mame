@@ -274,7 +274,7 @@ public:
 	void twinklei(machine_config &config);
 	void twinkle(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(twinkle_io_w);
@@ -304,7 +304,6 @@ protected:
 	void rf5c400_map(address_map &map);
 	void sound_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<am53cf96_device> m_am53cf96;

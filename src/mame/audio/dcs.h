@@ -251,6 +251,7 @@ protected:
 	int m_dram_in_mb;
 
 	optional_shared_ptr<uint16_t> m_iram;
+	optional_device<device_execute_interface> m_maincpu;
 };
 
 

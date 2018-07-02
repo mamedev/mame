@@ -64,6 +64,9 @@ public:
 			m_nvram(*this, "nvram")
 	{}
 
+	void rastersp(machine_config &config);
+
+private:
 	#define VIDEO_ADDR_MASK     0x3fffffff
 
 	enum tms_regs
@@ -133,7 +136,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	std::unique_ptr<uint8_t[]>   m_nvram8;
-	uint8_t   m_io_reg;
 	uint8_t   m_irq_status;
 	uint32_t  m_dpyaddr;
 	std::unique_ptr<uint16_t[]> m_paletteram;
@@ -146,11 +148,10 @@ public:
 	void    upload_palette(uint32_t word1, uint32_t word2);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void ncr53c700(device_t *device);
-	void rastersp(machine_config &config);
 	void cpu_map(address_map &map);
 	void dsp_map(address_map &map);
 	void io_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

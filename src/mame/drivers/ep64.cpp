@@ -193,6 +193,10 @@ public:
 		m_y(*this, "Y%u", 0)
 	{ }
 
+	void ep128(machine_config &config);
+	void ep64(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dave_device> m_dave;
 	required_device<nick_device> m_nick;
@@ -217,8 +221,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
-	void ep128(machine_config &config);
-	void ep64(machine_config &config);
 	void dave_128k_mem(address_map &map);
 	void dave_64k_mem(address_map &map);
 	void dave_io(address_map &map);

@@ -35,10 +35,14 @@ public:
 	indiana_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, M68K_TAG) { }
+
+	void indiana(machine_config &config);
+
 	void init_indiana();
+
+private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	void indiana(machine_config &config);
 	void indiana_mem(address_map &map);
 };
 

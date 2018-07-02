@@ -325,6 +325,7 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)

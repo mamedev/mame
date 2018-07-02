@@ -52,6 +52,9 @@ public:
 	m_speaker(*this, "speaker")
 	{ }
 
+	void lcmate2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<rp5c15_device> m_rtc;
@@ -63,7 +66,6 @@ public:
 	DECLARE_WRITE8_MEMBER( speaker_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 	DECLARE_PALETTE_INIT(lcmate2);
-	void lcmate2(machine_config &config);
 	void lcmate2_io(address_map &map);
 	void lcmate2_mem(address_map &map);
 };

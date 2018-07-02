@@ -51,6 +51,10 @@ public:
 		, m_req_hack(nullptr)
 	{ }
 
+	void pcx(machine_config &config);
+	void pcd(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( irq_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( timer0_tick );
 	DECLARE_WRITE_LINE_MEMBER( i186_timer1_w );
@@ -80,18 +84,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_msg);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_req);
 
-	void pcx(machine_config &config);
-	void pcd(machine_config &config);
 	void pcd_io(address_map &map);
 	void pcd_map(address_map &map);
 	void pcx_io(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;

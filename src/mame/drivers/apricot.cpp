@@ -68,6 +68,10 @@ public:
 		m_bus_locked(0)
 	{ }
 
+	void apricot(machine_config &config);
+	void apricotxi(machine_config &config);
+
+private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_WRITE_LINE_MEMBER(i8086_lock_w);
@@ -90,14 +94,11 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void apricot(machine_config &config);
-	void apricotxi(machine_config &config);
 	void apricot_io(address_map &map);
 	void apricot_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_device<i8086_cpu_device> m_cpu;
 	required_device<i8089_device> m_iop;
 	required_device<ram_device> m_ram;
