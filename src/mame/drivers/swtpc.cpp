@@ -56,12 +56,14 @@ public:
 		, m_brg(*this, "brg")
 	{ }
 
-	virtual void machine_start() override;
-
 	void swtpcm(machine_config &config);
 	void swtpc(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	virtual void machine_start() override;
+
+	void mem_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<mc14411_device> m_brg;

@@ -51,7 +51,11 @@ public:
 		, m_matrix(*this, "matrix.%u", 0)
 	{ }
 
+	void ssystem3(machine_config &config);
+
 	void init_ssystem3();
+
+private:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ssystem3);
 	uint32_t screen_update_ssystem3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -68,9 +72,8 @@ public:
 	void ssystem3_playfield_write(int reset, int signal);
 	void ssystem3_playfield_read(int *on, int *ready);
 
-	void ssystem3(machine_config &config);
 	void ssystem3_map(address_map &map);
-private:
+
 	uint8_t m_porta;
 	std::unique_ptr<uint8_t[]> m_videoram;
 	playfield_t m_playfield;

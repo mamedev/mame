@@ -293,6 +293,14 @@ public:
 			m_maincpu(*this, "v20hl")
 		{}
 
+	void nakajies210(machine_config &config);
+	void nakajies220(machine_config &config);
+	void nakajies250(machine_config &config);
+	void dator3k(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
@@ -324,7 +332,6 @@ public:
 	uint8_t   m_irq_active;
 
 	uint8_t   m_lcd_memory_start;
-	uint8_t*  m_ram_base1;
 
 	uint8_t   m_matrix;
 
@@ -340,12 +347,7 @@ public:
 	uint8_t   m_bank[8];
 	uint8_t   *m_bank_base[8];
 	DECLARE_PALETTE_INIT(nakajies);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
-	void nakajies210(machine_config &config);
-	void nakajies220(machine_config &config);
-	void nakajies250(machine_config &config);
-	void dator3k(machine_config &config);
 	void nakajies_io_map(address_map &map);
 	void nakajies_map(address_map &map);
 };

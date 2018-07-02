@@ -530,6 +530,7 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(7'159'090)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	// video hardware
 
@@ -577,6 +578,7 @@ MACHINE_CONFIG_START(bloodbro_state::weststry)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_CLOCK(XTAL(20'000'000)/4) /* 5MHz - verified on PCB */
 	MCFG_DEVICE_PROGRAM_MAP(weststry_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_REMOVE()
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_weststry)
 	MCFG_PALETTE_MODIFY("palette")

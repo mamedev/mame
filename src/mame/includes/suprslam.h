@@ -30,6 +30,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void suprslam(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_screen_videoram;
 	required_shared_ptr<uint16_t> m_bg_videoram;
@@ -65,7 +68,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void suprslam(machine_config &config);
+
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
 	void suprslam_map(address_map &map);

@@ -29,12 +29,13 @@ public:
 		m_videoram(*this, "videoram")
 	{ }
 
+	void sprint4(machine_config &config);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(get_lever);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_wheel);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_collision);
-	void sprint4(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(wram_r);
 	DECLARE_READ8_MEMBER(analog_r);
 	DECLARE_READ8_MEMBER(coin_r);
@@ -64,7 +65,6 @@ protected:
 
 	void sprint4_cpu_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_device> m_discrete;

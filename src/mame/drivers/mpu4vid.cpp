@@ -233,25 +233,11 @@ public:
 	{
 	}
 
-	required_device<m68000_base_device> m_videocpu;
-	optional_device<scn2674_device> m_scn2674;
-	optional_shared_ptr<uint16_t> m_vid_vidram;
-	optional_shared_ptr<uint16_t> m_vid_mainram;
-	required_device<acia6850_device> m_acia_0;
-	required_device<acia6850_device> m_acia_1;
-	required_device<ptm6840_device> m_ptm;
-	optional_ioport m_trackx_port;
-	optional_ioport m_tracky_port;
-	required_device<gfxdecode_device> m_gfxdecode;
-
-	struct bt471_t m_bt471;
-
-	//Video
-	uint8_t m_m6840_irq_state;
-	uint8_t m_m6850_irq_state;
-	int m_gfx_index;
-	int8_t m_cur[2];
-
+	void mpu4_vid(machine_config &config);
+	void bwbvid(machine_config &config);
+	void crmaze(machine_config &config);
+	void bwbvid5(machine_config &config);
+	void mating(machine_config &config);
 
 	void init_crmazea();
 	void init_v4barqst2();
@@ -274,6 +260,27 @@ public:
 	void init_skiltrek();
 	void init_crmaze3();
 	void init_cybcas();
+
+private:
+	required_device<m68000_base_device> m_videocpu;
+	optional_device<scn2674_device> m_scn2674;
+	optional_shared_ptr<uint16_t> m_vid_vidram;
+	optional_shared_ptr<uint16_t> m_vid_mainram;
+	required_device<acia6850_device> m_acia_0;
+	required_device<acia6850_device> m_acia_1;
+	required_device<ptm6840_device> m_ptm;
+	optional_ioport m_trackx_port;
+	optional_ioport m_tracky_port;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	struct bt471_t m_bt471;
+
+	//Video
+	uint8_t m_m6840_irq_state;
+	uint8_t m_m6850_irq_state;
+	int m_gfx_index;
+	int8_t m_cur[2];
+
 	DECLARE_MACHINE_START(mpu4_vid);
 	DECLARE_MACHINE_RESET(mpu4_vid);
 	DECLARE_VIDEO_START(mpu4_vid);
@@ -297,11 +304,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
 	DECLARE_WRITE8_MEMBER( vram_w );
 	DECLARE_READ8_MEMBER( vram_r );
-	void mpu4_vid(machine_config &config);
-	void bwbvid(machine_config &config);
-	void crmaze(machine_config &config);
-	void bwbvid5(machine_config &config);
-	void mating(machine_config &config);
+
 	void bwbvid5_68k_map(address_map &map);
 	void bwbvid_68k_map(address_map &map);
 	void mpu4_68k_map(address_map &map);

@@ -733,6 +733,10 @@ void px8_state::machine_start()
 	save_item(NAME(m_bk2));
 	save_item(NAME(m_sio));
 	save_item(NAME(m_ksc));
+
+	// not used yet
+	(void)m_icr;
+	(void)m_frc;
 }
 
 void px8_state::machine_reset()

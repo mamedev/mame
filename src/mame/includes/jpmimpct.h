@@ -81,6 +81,10 @@ public:
 		, m_lamp_output(*this, "lamp%u", 0U)
 	{ }
 
+	void impctawp(machine_config &config);
+	void jpmimpct(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
 	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
@@ -121,13 +125,10 @@ public:
 	DECLARE_MACHINE_START(impctawp);
 	DECLARE_MACHINE_RESET(impctawp);
 	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_timer_event);
-	void impctawp(machine_config &config);
-	void jpmimpct(machine_config &config);
 	void awp68k_program_map(address_map &map);
 	void m68k_program_map(address_map &map);
 	void tms_program_map(address_map &map);
 
-private:
 	uint8_t m_tms_irq;
 	uint8_t m_duart_1_irq;
 	struct duart_t m_duart_1;

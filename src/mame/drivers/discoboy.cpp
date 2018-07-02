@@ -70,6 +70,11 @@ public:
 		m_ram_1(*this, "ram_1"),
 		m_ram_2(*this, "ram_2") { }
 
+	void discoboy(machine_config &config);
+
+	void init_discoboy();
+
+private:
 	/* video-related */
 	uint8_t    m_gfxbank;
 	uint8_t    m_port_00;
@@ -102,13 +107,11 @@ public:
 	DECLARE_WRITE8_MEMBER(rambank2_w);
 	DECLARE_READ8_MEMBER(port_06_r);
 	DECLARE_WRITE8_MEMBER(yunsung8_sound_bankswitch_w);
-	void init_discoboy();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
-	void discoboy(machine_config &config);
 	void discoboy_map(address_map &map);
 	void io_map(address_map &map);
 	void rambank1_map(address_map &map);

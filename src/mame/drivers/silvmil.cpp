@@ -48,7 +48,13 @@ public:
 			m_fg_videoram(*this, "fg_videoram"),
 			m_spriteram(*this, "spriteram") { }
 
+	void puzzlovek(machine_config &config);
+	void puzzlove(machine_config &config);
+	void silvmil(machine_config &config);
 
+	void init_silvmil();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -124,7 +130,6 @@ public:
 	}
 
 
-	void init_silvmil();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
@@ -133,9 +138,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
-	void puzzlovek(machine_config &config);
-	void puzzlove(machine_config &config);
-	void silvmil(machine_config &config);
+
 	void silvmil_map(address_map &map);
 	void silvmil_sound_map(address_map &map);
 };

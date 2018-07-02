@@ -1444,6 +1444,7 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
 	MCFG_DEVICE_PROGRAM_MAP(raiden2_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1519,6 +1520,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
 	MCFG_DEVICE_PROGRAM_MAP(zeroteam_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

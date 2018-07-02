@@ -75,6 +75,9 @@ public:
 		, m_floppy(nullptr)
 	{ }
 
+	void proteus(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -93,12 +96,10 @@ public:
 	DECLARE_WRITE8_MEMBER(enable_z80_w);
 	DECLARE_WRITE8_MEMBER(enable_6809_w);
 
-	void proteus(machine_config &config);
 	void proteus_6809_mem(address_map &map);
 	void proteus_z80_mem(address_map &map);
 	void proteus_z80_io(address_map &map);
 
-protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_z80;
 	required_device<mc6854_device> m_adlc;

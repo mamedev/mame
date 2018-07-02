@@ -39,6 +39,9 @@ public:
 			m_ram(*this, RAM_TAG)
 	{ }
 
+	void ob68k1a(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
 	required_device<acia6850_device> m_acia0;
@@ -54,7 +57,6 @@ public:
 
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
-	void ob68k1a(machine_config &config);
 	void ob68k1a_mem(address_map &map);
 };
 

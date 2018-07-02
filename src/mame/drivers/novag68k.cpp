@@ -47,6 +47,10 @@ public:
 		: novagbase_state(mconfig, type, tag)
 	{ }
 
+	void diablo68k(machine_config &config);
+	void scorpio68k(machine_config &config);
+
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); }
 
@@ -57,12 +61,10 @@ public:
 	DECLARE_READ8_MEMBER(diablo68k_input1_r);
 	DECLARE_READ8_MEMBER(diablo68k_input2_r);
 	void diablo68k_map(address_map &map);
-	void diablo68k(machine_config &config);
 
 	// Scorpio 68000
 	DECLARE_WRITE8_MEMBER(scorpio68k_control_w);
 	void scorpio68k_map(address_map &map);
-	void scorpio68k(machine_config &config);
 };
 
 

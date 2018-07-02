@@ -593,12 +593,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(peribox_genmod_device::device_add_mconfig)
 	MCFG_PERIBOX_SLOT_ADD_DEF( PEBSLOT2, peribox_slotg, "memex" )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slotv )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slotv )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slotv )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slotv )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slotv )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slotv )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slotg )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slotg )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slotg )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slotg )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slotg )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slotg )
 MACHINE_CONFIG_END
 
 /****************************************************************************

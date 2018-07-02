@@ -17,6 +17,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_s2636_0_ram(*this, "s2636_0_ram") { }
 
+	void tinvader(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<s2636_device> m_s2636;
@@ -45,6 +48,6 @@ public:
 	uint32_t screen_update_tinvader(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int SpriteCollision(int first,int second);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tinvader(machine_config &config);
+
 	void main_map(address_map &map);
 };

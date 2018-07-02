@@ -28,6 +28,9 @@ public:
 		m_ram(*this, RAM_TAG)
 	{ }
 
+	void fk1(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
@@ -63,7 +66,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_callback);
 	IRQ_CALLBACK_MEMBER(fk1_irq_callback);
-	void fk1(machine_config &config);
 	void fk1_io(address_map &map);
 	void fk1_mem(address_map &map);
 };

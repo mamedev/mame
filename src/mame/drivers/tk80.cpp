@@ -69,7 +69,7 @@ public:
 	void nd80z(machine_config &config);
 	void tk85(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(key_matrix_r);
@@ -87,7 +87,6 @@ protected:
 	void tk80_mem(address_map &map);
 	void tk85_mem(address_map &map);
 
-private:
 	uint8_t m_term_data;
 	uint8_t m_keyb_press;
 	uint8_t m_keyb_press_flag;

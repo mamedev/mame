@@ -51,11 +51,13 @@ public:
 		, m_clock(*this, "acia_clock")
 	{ }
 
+	void votrtnt(machine_config &config);
+
+private:
 	DECLARE_MACHINE_RESET(votrtnt);
 
-	void votrtnt(machine_config &config);
 	void _6802_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<votrax_sc01_device> m_votrax;
 	required_device<clock_device> m_clock;

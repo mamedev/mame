@@ -15,6 +15,17 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram")  { }
 
+	void raiders5(machine_config &config);
+	void ninjakun(machine_config &config);
+	void nova2001(machine_config &config);
+	void pkunwar(machine_config &config);
+
+	void init_raiders5();
+	void init_pkunwar();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -39,10 +50,6 @@ public:
 	DECLARE_WRITE8_MEMBER(nova2001_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(pkunwar_flipscreen_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
-
-	void init_raiders5();
-	void init_pkunwar();
 	DECLARE_VIDEO_START(nova2001);
 	DECLARE_PALETTE_INIT(nova2001);
 	DECLARE_PALETTE_DECODER(BBGGRRII);
@@ -66,10 +73,6 @@ public:
 	void nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void lineswap_gfx_roms(const char *region, const int bit);
-	void raiders5(machine_config &config);
-	void ninjakun(machine_config &config);
-	void nova2001(machine_config &config);
-	void pkunwar(machine_config &config);
 	void ninjakun_cpu1_map(address_map &map);
 	void ninjakun_cpu2_map(address_map &map);
 	void nova2001_map(address_map &map);

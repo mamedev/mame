@@ -94,6 +94,9 @@ public:
 			m_rombank(*this, "rombank"),
 			m_in0(*this, "IN0"){ }
 
+	void magtouch(machine_config &config);
+
+private:
 	required_device<isa8_device> m_isabus;
 	required_memory_bank m_rombank;
 	required_ioport m_in0;
@@ -103,7 +106,6 @@ public:
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
 	virtual void machine_start() override;
 	static void magtouch_sb_conf(device_t *device);
-	void magtouch(machine_config &config);
 	void magtouch_io(address_map &map);
 	void magtouch_map(address_map &map);
 };

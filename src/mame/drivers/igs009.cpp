@@ -59,6 +59,15 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void gp98(machine_config &config);
+	void jingbell(machine_config &config);
+
+	void init_jingbell();
+	void init_jingbelli();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+
+private:
 	DECLARE_WRITE8_MEMBER(reel1_ram_w);
 	DECLARE_WRITE8_MEMBER(reel2_ram_w);
 	DECLARE_WRITE8_MEMBER(reel3_ram_w);
@@ -73,7 +82,6 @@ public:
 	DECLARE_READ8_MEMBER(magic_r);
 
 	void show_out();
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	TILE_GET_INFO_MEMBER(get_jingbell_reel1_tile_info);
@@ -87,19 +95,14 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	void decrypt_jingbell();
-	void init_jingbell();
-	void init_jingbelli();
 
 	DECLARE_VIDEO_START(gp98);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gp98(machine_config &config);
-	void jingbell(machine_config &config);
 	void gp98_portmap(address_map &map);
 	void jingbell_map(address_map &map);
 	void jingbell_portmap(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

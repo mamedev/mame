@@ -15,12 +15,6 @@
 class dcheese_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BLITTER_SCANLINE,
-		TIMER_SIGNAL_IRQ
-	};
-
 	dcheese_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -28,6 +22,18 @@ public:
 		m_screen(*this, "screen"),
 		m_bsmt(*this, "bsmt"),
 		m_soundlatch(*this, "soundlatch") { }
+
+	void fredmem(machine_config &config);
+	void dcheese(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(sound_latch_state_r);
+
+private:
+	enum
+	{
+		TIMER_BLITTER_SCANLINE,
+		TIMER_SIGNAL_IRQ
+	};
 
 	/* video-related */
 	uint16_t   m_blitter_color[2];
@@ -61,7 +67,6 @@ public:
 	DECLARE_WRITE16_MEMBER(madmax_blitter_vidparam_w);
 	DECLARE_WRITE16_MEMBER(madmax_blitter_unknown_w);
 	DECLARE_READ16_MEMBER(madmax_blitter_vidparam_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_latch_state_r);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dcheese);
@@ -74,11 +79,9 @@ public:
 	void do_clear(  );
 	void do_blit(  );
 
-	void fredmem(machine_config &config);
-	void dcheese(machine_config &config);
 	void main_cpu_map(address_map &map);
 	void sound_cpu_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

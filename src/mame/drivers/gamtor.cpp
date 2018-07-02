@@ -44,12 +44,11 @@ public:
 	void init_gaminator();
 	void gaminator(machine_config &config);
 
-protected:
+private:
 	void gaminator_map(address_map &map);
 
 	DECLARE_WRITE32_MEMBER(gamtor_unk_w);
 
-private:
 	required_device<cpu_device> m_maincpu;
 };
 

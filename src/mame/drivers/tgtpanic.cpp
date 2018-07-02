@@ -25,6 +25,9 @@ public:
 		m_screen(*this, "screen"),
 		m_ram(*this, "ram") { }
 
+	void tgtpanic(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
@@ -37,7 +40,6 @@ public:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void tgtpanic(machine_config &config);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
 };

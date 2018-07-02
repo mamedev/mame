@@ -38,7 +38,7 @@ public:
 
 	void altos2(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(video_mode_w);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -47,7 +47,6 @@ protected:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<x2210_device> m_novram;
 	required_region_ptr<u8> m_p_chargen;

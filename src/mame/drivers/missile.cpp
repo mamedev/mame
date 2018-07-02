@@ -380,13 +380,20 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void missileb(machine_config &config);
+	void missile(machine_config &config);
+	void missilea(machine_config &config);
+
+	void init_missilem();
+	void init_suprmatk();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+
+private:
 	DECLARE_WRITE8_MEMBER(missile_w);
 	DECLARE_READ8_MEMBER(missile_r);
 	DECLARE_WRITE8_MEMBER(bootleg_w);
 	DECLARE_READ8_MEMBER(bootleg_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
-	void init_missilem();
-	void init_suprmatk();
 	uint32_t screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	inline int scanline_to_v(int scanline);
@@ -399,13 +406,9 @@ public:
 
 	TIMER_CALLBACK_MEMBER(clock_irq);
 	TIMER_CALLBACK_MEMBER(adjust_cpu_speed);
-	void missileb(machine_config &config);
-	void missile(machine_config &config);
-	void missilea(machine_config &config);
 	void bootleg_main_map(address_map &map);
 	void main_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

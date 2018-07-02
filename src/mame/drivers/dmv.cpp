@@ -73,6 +73,9 @@ public:
 		, m_leds(*this, "led%u", 1U)
 	{ }
 
+	void dmv(machine_config &config);
+
+private:
 	void update_halt_line();
 
 	DECLARE_WRITE8_MEMBER(leds_w);
@@ -142,16 +145,13 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
-	void dmv(machine_config &config);
 	void dmv_io(address_map &map);
 	void dmv_mem(address_map &map);
 	void upd7220_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc;

@@ -25,12 +25,6 @@ TODO:
 class destroyr_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_DESTROYR_DIAL,
-		TIMER_DESTROYR_FRAME
-	};
-
 	destroyr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -45,7 +39,14 @@ public:
 
 	void destroyr(machine_config &config);
 
-protected:
+private:
+
+	enum
+	{
+		TIMER_DESTROYR_DIAL,
+		TIMER_DESTROYR_FRAME
+	};
+
 	DECLARE_WRITE8_MEMBER(misc_w);
 	DECLARE_WRITE8_MEMBER(cursor_load_w);
 	DECLARE_WRITE8_MEMBER(interrupt_ack_w);
@@ -64,7 +65,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void destroyr_map(address_map &map);
 
-private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;

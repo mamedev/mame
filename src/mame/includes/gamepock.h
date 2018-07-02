@@ -26,6 +26,9 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
+	void gamepock(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 
 	uint8_t m_port_a;
@@ -45,7 +48,6 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_cart;
 	DECLARE_WRITE_LINE_MEMBER(gamepock_to_w);
-	void gamepock(machine_config &config);
 	void gamepock_mem(address_map &map);
 };
 

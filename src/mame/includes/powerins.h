@@ -18,7 +18,11 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_okibank(*this, "okibank") { }
 
+	void powerinsa(machine_config &config);
+	void powerinsb(machine_config &config);
+	void powerins(machine_config &config);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -53,9 +57,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void powerinsa(machine_config &config);
-	void powerinsb(machine_config &config);
-	void powerins(machine_config &config);
 	void powerins_map(address_map &map);
 	void powerins_sound_io_map(address_map &map);
 	void powerins_sound_map(address_map &map);

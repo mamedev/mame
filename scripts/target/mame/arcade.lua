@@ -1257,8 +1257,6 @@ files {
 	MAME_DIR .. "src/mame/video/xybots.cpp",
 	MAME_DIR .. "src/mame/machine/asic65.cpp",
 	MAME_DIR .. "src/mame/machine/asic65.h",
-	MAME_DIR .. "src/mame/machine/atari_vg.cpp",
-	MAME_DIR .. "src/mame/machine/atari_vg.h",
 	MAME_DIR .. "src/mame/machine/atarigen.cpp",
 	MAME_DIR .. "src/mame/machine/atarigen.h",
 	MAME_DIR .. "src/mame/machine/mathbox.cpp",

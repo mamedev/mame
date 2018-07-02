@@ -345,6 +345,7 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 

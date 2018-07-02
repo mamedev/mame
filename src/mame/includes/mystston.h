@@ -35,6 +35,12 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void mystston(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
+
 	/* machine state */
 	required_device_array<ay8910_device, 2> m_ay8910;
 	required_shared_ptr<uint8_t> m_ay8910_data;
@@ -53,7 +59,6 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_clear_w);
 	DECLARE_WRITE8_MEMBER(mystston_ay8910_select_w);
 	DECLARE_WRITE8_MEMBER(mystston_video_control_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_VIDEO_START(mystston);
@@ -67,7 +72,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void mystston(machine_config &config);
 	void mystston_video(machine_config &config);
 	void main_map(address_map &map);
 };

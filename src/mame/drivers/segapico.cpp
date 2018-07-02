@@ -139,6 +139,11 @@ public:
 		m_io_peny(*this, "PENY")
 	{ }
 
+	void init_pico();
+	void init_picou();
+	void init_picoj();
+
+protected:
 	optional_device<sega_315_5641_pcm_device> m_sega_315_5641_pcm;
 
 	required_ioport m_io_page;
@@ -153,9 +158,6 @@ public:
 	DECLARE_WRITE16_MEMBER(pico_68k_io_write);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
 
-	void init_pico();
-	void init_picou();
-	void init_picoj();
 	void pico_mem(address_map &map);
 };
 
@@ -166,10 +168,12 @@ public:
 		: pico_base_state(mconfig, type, tag),
 	m_picocart(*this, "picoslot") { }
 
-	required_device<pico_cart_slot_device> m_picocart;
-	DECLARE_MACHINE_START(pico);
 	void pico(machine_config &config);
 	void picopal(machine_config &config);
+
+private:
+	required_device<pico_cart_slot_device> m_picocart;
+	DECLARE_MACHINE_START(pico);
 };
 
 

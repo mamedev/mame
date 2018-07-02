@@ -59,13 +59,15 @@ public:
 		, m_usart_r(*this, I8251_R_TAG)
 		{ }
 
-	DECLARE_READ8_MEMBER(ff_r);
-
 	void horizon(machine_config &config);
 	void horizon2mhz(machine_config &config);
+
+private:
+	DECLARE_READ8_MEMBER(ff_r);
+
 	void horizon_io(address_map &map);
 	void horizon_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart_l;

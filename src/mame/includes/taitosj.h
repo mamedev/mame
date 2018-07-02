@@ -47,6 +47,20 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void mcu(machine_config &config);
+	void nomcu(machine_config &config);
+	void kikstart(machine_config &config);
+
+	void init_alpinea();
+	void init_alpine();
+	void init_taitosj();
+	void init_junglhbr();
+	void init_spacecr();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(input_port_4_f0_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kikstart_gear_r);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram_1;
 	required_shared_ptr<uint8_t> m_videoram_2;
 	required_shared_ptr<uint8_t> m_videoram_3;
@@ -120,16 +134,11 @@ public:
 	DECLARE_WRITE8_MEMBER(taitosj_characterram_w);
 	DECLARE_WRITE8_MEMBER(junglhbr_characterram_w);
 	DECLARE_WRITE8_MEMBER(taitosj_collision_reg_clear_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(input_port_4_f0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kikstart_gear_r);
+
 	DECLARE_WRITE8_MEMBER(taitosj_sndnmi_msk_w);
 	DECLARE_WRITE8_MEMBER(input_port_4_f0_w);
 	DECLARE_WRITE8_MEMBER(taitosj_dacvol_w);
-	void init_alpinea();
-	void init_alpine();
-	void init_taitosj();
-	void init_junglhbr();
-	void init_spacecr();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -154,9 +163,7 @@ public:
 	void copy_layer(bitmap_ind16 &bitmap, const rectangle &cliprect,copy_layer_func_t copy_layer_func, int which, int *sprites_on, rectangle *sprite_areas);
 	void copy_layers(bitmap_ind16 &bitmap, const rectangle &cliprect,copy_layer_func_t copy_layer_func, int *sprites_on, rectangle *sprite_areas);
 	int video_update_common(bitmap_ind16 &bitmap, const rectangle &cliprect, copy_layer_func_t copy_layer_func);
-	void mcu(machine_config &config);
-	void nomcu(machine_config &config);
-	void kikstart(machine_config &config);
+
 	void kikstart_main_map(address_map &map);
 	void taitosj_audio_map(address_map &map);
 	void taitosj_main_mcu_map(address_map &map);

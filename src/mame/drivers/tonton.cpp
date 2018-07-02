@@ -41,6 +41,9 @@ public:
 		m_hopper(*this, "hopper")
 	{ }
 
+	void tonton(machine_config &config);
+
+private:
 	required_device<v9938_device> m_v9938;
 	DECLARE_WRITE8_MEMBER(tonton_outport_w);
 	DECLARE_WRITE8_MEMBER(hopper_w);
@@ -50,7 +53,6 @@ public:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
-	void tonton(machine_config &config);
 	void tonton_io(address_map &map);
 	void tonton_map(address_map &map);
 };

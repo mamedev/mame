@@ -154,6 +154,33 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void sigmab98(machine_config &config);
+	void pyenaget(machine_config &config);
+	void dodghero(machine_config &config);
+	void dashhero(machine_config &config);
+	void gegege(machine_config &config);
+	void haekaka(machine_config &config);
+	void gocowboy(machine_config &config);
+	void tdoboon(machine_config &config);
+	void animalc(machine_config &config);
+	void sammymdl(machine_config &config);
+	void itazuram(machine_config &config);
+
+	void init_dodghero();
+	void init_b3rinsya();
+	void init_tbeastw2();
+	void init_dashhero();
+	void init_gegege();
+	void init_pepsiman();
+	void init_itazuram();
+	void init_animalc();
+	void init_ucytokyu();
+	void init_haekaka();
+	void init_gocowboy();
+
+	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
 	DECLARE_WRITE8_MEMBER(gegege_regs_w);
 	DECLARE_READ8_MEMBER(gegege_regs_r);
 	DECLARE_WRITE8_MEMBER(gegege_regs2_w);
@@ -232,38 +259,14 @@ public:
 	DECLARE_READ8_MEMBER(sammymdl_eeprom_r);
 	DECLARE_WRITE8_MEMBER(sammymdl_eeprom_w);
 
-	void init_dodghero();
-	void init_b3rinsya();
-	void init_tbeastw2();
-	void init_dashhero();
-	void init_gegege();
-	void init_pepsiman();
-	void init_itazuram();
-	void init_animalc();
-	void init_ucytokyu();
-	void init_haekaka();
-	void init_gocowboy();
-
 	DECLARE_MACHINE_RESET(sigmab98);
 	DECLARE_MACHINE_RESET(sammymdl);
 
-	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sammymdl);
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
 
-	void sigmab98(machine_config &config);
-	void pyenaget(machine_config &config);
-	void dodghero(machine_config &config);
-	void dashhero(machine_config &config);
-	void gegege(machine_config &config);
-	void haekaka(machine_config &config);
-	void gocowboy(machine_config &config);
-	void tdoboon(machine_config &config);
-	void animalc(machine_config &config);
-	void sammymdl(machine_config &config);
-	void itazuram(machine_config &config);
 	void animalc_io(address_map &map);
 	void animalc_map(address_map &map);
 	void dashhero_io_map(address_map &map);
@@ -281,7 +284,6 @@ public:
 	void tdoboon_io(address_map &map);
 	void tdoboon_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void video_start() override;
 

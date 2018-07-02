@@ -86,6 +86,10 @@ public:
 	{
 	}
 
+	void ivg09(machine_config &config);
+	void cpu09(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER(ca1_r);
 	DECLARE_READ8_MEMBER(pa_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
@@ -98,11 +102,9 @@ public:
 	DECLARE_MACHINE_RESET(ivg09);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void ivg09(machine_config &config);
-	void cpu09(machine_config &config);
 	void cpu09_mem(address_map &map);
 	void ivg09_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	uint8_t m_pa;
 	optional_shared_ptr<uint8_t> m_p_videoram;

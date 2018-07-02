@@ -125,6 +125,26 @@ public:
 			m_kb_empty(true)
 	{ }
 
+	void attache(machine_config &config);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER(pio_portA_r);
+	DECLARE_READ8_MEMBER(pio_portB_r);
+	DECLARE_WRITE8_MEMBER(pio_portA_w);
+	DECLARE_WRITE8_MEMBER(pio_portB_w);
+
+	DECLARE_READ8_MEMBER(dma_mem_r);
+	DECLARE_WRITE8_MEMBER(dma_mem_w);
+
+	DECLARE_READ8_MEMBER(fdc_dma_r);
+	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+
+	DECLARE_WRITE_LINE_MEMBER(hreq_w);
+	DECLARE_WRITE_LINE_MEMBER(eop_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
+
+protected:
 	// PIO port B operation select
 	enum
 	{
@@ -152,39 +172,30 @@ public:
 	};
 
 	// overrides
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void driver_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_WRITE8_MEMBER(rom_w);
-	DECLARE_READ8_MEMBER(pio_portA_r);
-	DECLARE_READ8_MEMBER(pio_portB_r);
-	DECLARE_WRITE8_MEMBER(pio_portA_w);
-	DECLARE_WRITE8_MEMBER(pio_portB_w);
+
 	DECLARE_WRITE8_MEMBER(display_command_w);
 	DECLARE_READ8_MEMBER(display_data_r);
 	DECLARE_WRITE8_MEMBER(display_data_w);
 	DECLARE_READ8_MEMBER(dma_mask_r);
 	DECLARE_WRITE8_MEMBER(dma_mask_w);
-	DECLARE_READ8_MEMBER(fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+
 	DECLARE_READ8_MEMBER(memmap_r);
 	DECLARE_WRITE8_MEMBER(memmap_w);
-	DECLARE_READ8_MEMBER(dma_mem_r);
-	DECLARE_WRITE8_MEMBER(dma_mem_w);
-	DECLARE_WRITE_LINE_MEMBER(hreq_w);
-	DECLARE_WRITE_LINE_MEMBER(eop_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
+
 	void operation_strobe(address_space& space,uint8_t data);
 	void keyboard_clock_w(bool state);
 	uint8_t keyboard_data_r();
 	uint16_t get_key();
-	void attache(machine_config &config);
+
 	void attache_io(address_map &map);
 	void attache_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_rom;
 	required_device<ram_device> m_ram;
@@ -248,6 +259,9 @@ public:
 		  m_z80_tx_ready(false)
 	{ }
 
+	void attache816(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(x86_comms_w);
 	DECLARE_READ8_MEMBER(x86_comms_r);
 	DECLARE_WRITE8_MEMBER(x86_irq_enable);
@@ -261,11 +275,10 @@ public:
 
 	virtual void machine_reset() override;
 
-	void attache816(machine_config &config);
 	void attache816_io(address_map &map);
 	void attache_x86_io(address_map &map);
 	void attache_x86_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_extcpu;
 	required_device<i8255_device> m_ppi;
 

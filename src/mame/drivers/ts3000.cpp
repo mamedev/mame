@@ -23,11 +23,10 @@ public:
 
 	void ts3000(machine_config &config);
 
-protected:
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-private:
 //  required_device<cpu_device> m_maincpu;
 };
 

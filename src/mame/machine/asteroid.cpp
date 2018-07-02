@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/atari_vg.h"
 #include "video/avgdvg.h"
 #include "includes/asteroid.h"
 
@@ -132,7 +131,9 @@ void asteroid_state::machine_start()
 
 void asteroid_state::machine_reset()
 {
-	m_dvg->reset_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	m_dvg->reset_w(machine().dummy_space(), 0, 0);
+	if (m_earom.found())
+		earom_control_w(machine().dummy_space(), 0, 0);
 
 	/* reset RAM banks if present */
 	if (m_ram1.target() != nullptr)

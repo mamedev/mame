@@ -29,11 +29,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ice_bozo(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
-	void ice_bozo(machine_config &config);
 	void ice_bozo_map(address_map &map);
 };
 
