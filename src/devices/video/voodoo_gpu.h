@@ -32,7 +32,7 @@ using DirectX::XMFLOAT4;
 #define NUM_TEX 2
 
 // Number of textures for use by TMUs
-#define MAX_TEX 256
+#define MAX_TEX 1024
 
 // Dither Texture t and s register offset
 #define DITH_TEX_OFFSET 0
@@ -287,7 +287,7 @@ private:
 	ID3D11ShaderResourceView*       m_texRV[MAX_TEX];
 	ID3D11SamplerState*             m_texSampler[MAX_TEX];
 	std::map<uint32_t, Tex_Map_List_Struct> m_texMap;
-	std::queue<uint32_t> m_texHist;
+	std::deque<uint32_t> m_texHist;
 
 	ID3D11Texture2D* m_depthBuffer;
 	ID3D11DepthStencilState* m_depthState;

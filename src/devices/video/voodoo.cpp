@@ -1918,7 +1918,7 @@ uint32_t voodoo_device::cmdfifo_execute(voodoo_device *vd, cmdfifo_info *f)
 
 					uint32_t addr = target * 4;
 					// Check for texture updates
-					if (USE_GPU)
+					if (USE_GPU & !(addr & 0xf))
 						vd->m_gpu.FlagTexture(addr);
 					for (i=0; i < count; i++)
 					{

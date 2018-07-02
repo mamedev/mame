@@ -320,8 +320,7 @@ bool voodoo_gpu::InitRenderBuffers(int sizeX, int sizeY, int fbiWidth)
 			SAFE_RELEASE((*ii).second.texSampler);
 		}
 		m_texMap.clear();
-		while (!m_texHist.empty())
-			m_texHist.pop();
+		m_texHist.clear();
 	}
 
 	// ViewPort
@@ -1728,21 +1727,27 @@ void voodoo_gpu::CopyBufferComp(uint16_t *dst)
 void voodoo_gpu::FlagTexture(uint32_t &offset)
 {
 	if (!m_texHist.empty()) {
-		if (m_texMap.find(offset) != m_texMap.end())
-		{
-			//printf("voodoo_gpu::FlagTexture: Write to offset 0x%08X .  Wiping out %d current textures\n", offset, INT32(m_texHist.size()));
-			//m_texMap.erase(mapIndex);
-			//m_texHist
-			// Nuke everything
-			for (std::map<uint32_t, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
+		for (int index = 0; index < 2; index++) {
+			uint32_t mapIndex = offset + index;
+			std::map<uint32_t, Tex_Map_List_Struct>::iterator ii = m_texMap.find(mapIndex);
+			if (ii != m_texMap.end())
 			{
+				//printf("voodoo_gpu::FlagTexture: LFB write to offset 0x%08X mapIndex: %08x. %d current textures\n", offset, mapIndex, INT32(m_texHist.size()));
 				SAFE_RELEASE((*ii).second.texTexture);
 				SAFE_RELEASE((*ii).second.texRV);
 				SAFE_RELEASE((*ii).second.texSampler);
+				m_texMap.erase(mapIndex);
+				m_texHist.erase(std::remove(m_texHist.begin(), m_texHist.end(), mapIndex), m_texHist.end());
+				//// Nuke everything
+				//for (std::map<uint32_t, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
+				//{
+				//	SAFE_RELEASE((*ii).second.texTexture);
+				//	SAFE_RELEASE((*ii).second.texRV);
+				//	SAFE_RELEASE((*ii).second.texSampler);
+				//}
+				//m_texMap.clear();
+				//m_texHist.clear();
 			}
-			m_texMap.clear();
-			while (!m_texHist.empty())
-				m_texHist.pop();
 		}
 	}
 }
@@ -1752,21 +1757,25 @@ void voodoo_gpu::FlagTexture(int index, uint32_t *texBase, uint32_t &texLod)
 	if (!m_texHist.empty()) {
 		uint32_t minLod = ((texLod >> 0) & 0x3f) >> 2;
 		uint32_t mapIndex = texBase[minLod] + index;
-		if (m_texMap.find(mapIndex) != m_texMap.end())
+		std::map<uint32_t, Tex_Map_List_Struct>::iterator ii = m_texMap.find(mapIndex);
+		if (ii != m_texMap.end())
 		{
-			//printf("voodoo_gpu::FlagTexture: Write to mapIndex 0x%08X .  Wiping out all %d current textures\n", mapIndex, INT32(m_texHist.size()));
-			//m_texMap.erase(mapIndex);
-			//m_texHist
+			//printf("voodoo_gpu::FlagTexture(%d): Write to mapIndex 0x%08X .  %d current textures\n", index, mapIndex, INT32(m_texHist.size()));
+			SAFE_RELEASE((*ii).second.texTexture);
+			SAFE_RELEASE((*ii).second.texRV);
+			SAFE_RELEASE((*ii).second.texSampler);
+			m_texMap.erase(mapIndex);
+			m_texHist.erase(std::remove(m_texHist.begin(), m_texHist.end(), mapIndex), m_texHist.end());
 			// Nuke everything
-			for (std::map<uint32_t, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
-			{
-				SAFE_RELEASE((*ii).second.texTexture);
-				SAFE_RELEASE((*ii).second.texRV);
-				SAFE_RELEASE((*ii).second.texSampler);
-			}
-			m_texMap.clear();
-			while (!m_texHist.empty())
-				m_texHist.pop();
+			//for (std::map<uint32_t, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
+			//{
+			//	SAFE_RELEASE((*ii).second.texTexture);
+			//	SAFE_RELEASE((*ii).second.texRV);
+			//	SAFE_RELEASE((*ii).second.texSampler);
+			//}
+			//m_texMap.clear();
+			//while (!m_texHist.empty())
+			//	m_texHist.pop();
 		}
 	}
 }
@@ -1805,7 +1814,7 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 			SAFE_RELEASE(old_map.texRV);
 			SAFE_RELEASE(old_map.texSampler);
 			m_texMap.erase(m_texHist.front());
-			m_texHist.pop();
+			m_texHist.pop_front();
 		}
 		// Create the new entries
 		// Create gpu texture
@@ -1903,11 +1912,10 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, uint32_t &texMod
 			m_context->UpdateSubresource(new_map.texTexture, mipLevel, NULL, srcBuff, width * 4, 0);
 			delete[] srcBuff;
 		}
-
 		// Add the new data to the map
 		m_texMap[mapIndex] = new_map;
-		m_texHist.push(mapIndex);
-
+		m_texHist.push_back(mapIndex);
+		//printf("New texture(%d): base: %08x lod: %08x count: %d\n", index, desc.texBase[minLod], texLod, int(m_texHist.size()));
 	}
 
 	// Update cb tex control
