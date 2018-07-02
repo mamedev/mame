@@ -40,8 +40,8 @@
 
 void prof80_state::motor(int mon)
 {
-	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(mon);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(mon);
+	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(mon);
+	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(mon);
 
 	m_motor = mon;
 }
@@ -71,7 +71,7 @@ WRITE_LINE_MEMBER(prof80_state::motor_w)
 		// trigger floppy motor off NE555 timer
 		int t = 110 * RES_M(10) * CAP_U(6.8); // t = 1.1 * R8 * C6
 
-		timer_set(attotime::from_msec(t), TIMER_ID_MOTOR);
+		m_floppy_motor_off_timer->adjust(attotime::from_msec(t));
 	}
 	else
 	{
@@ -79,7 +79,7 @@ WRITE_LINE_MEMBER(prof80_state::motor_w)
 		motor(0);
 
 		// reset floppy motor off NE555 timer
-		timer_set(attotime::never, TIMER_ID_MOTOR);
+		m_floppy_motor_off_timer->adjust(attotime::never);
 	}
 }
 
@@ -114,7 +114,7 @@ WRITE_LINE_MEMBER(prof80_state::mstop_w)
 		motor(1);
 
 		// reset floppy motor off NE555 timer
-		timer_set(attotime::never, TIMER_ID_MOTOR);
+		m_floppy_motor_off_timer->adjust(attotime::never);
 	}
 }
 
@@ -176,7 +176,7 @@ READ8_MEMBER( prof80_state::status_r )
 	data |= m_rs232b->cts_r() << 7;
 
 	// floppy index
-	data |= (m_floppy0->get_device() ? m_floppy0->get_device()->idx_r() : m_floppy1->get_device() ? m_floppy1->get_device()->idx_r() : 1) << 5;
+	data |= (m_floppy[0]->get_device() ? m_floppy[0]->get_device()->idx_r() : m_floppy[1]->get_device() ? m_floppy[1]->get_device()->idx_r() : 1) << 5;
 
 	return data;
 }
@@ -430,6 +430,9 @@ void prof80_state::machine_start()
 	// initialize RTC
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
+
+	// create timer
+	m_floppy_motor_off_timer = timer_alloc(TIMER_ID_MOTOR);
 
 	// register for state saving
 	save_item(NAME(m_motor));

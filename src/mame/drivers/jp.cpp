@@ -47,7 +47,7 @@ public:
 	void jp(machine_config &config);
 	void jps(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(out1_w);
@@ -67,7 +67,6 @@ protected:
 	void jp_map(address_map &map);
 	void jp_sound_map(address_map &map);
 
-private:
 	void update_display();
 
 	uint32_t m_disp_data;

@@ -53,7 +53,7 @@ public:
 
 	void att4425(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port14_w);
 	DECLARE_READ8_MEMBER(port14_r);
@@ -69,7 +69,6 @@ protected:
 	void att4425_io(address_map &map);
 	void att4425_mem(address_map &map);
 
-private:
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_i8251;
 	required_device<z80sio_device> m_sio;

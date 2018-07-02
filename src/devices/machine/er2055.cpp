@@ -4,7 +4,10 @@
 
     er2055.c
 
-    GI 512 bit electrically alterable read-only memory.
+    GI 64 word x 8 bit electrically alterable read-only memory.
+
+    Atari often called this part "137161-001" on their technical manuals,
+    but their schematics usually called it by its proper ER-2055 name.
 
 ***************************************************************************/
 

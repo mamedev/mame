@@ -112,15 +112,6 @@ static uint8_t prom16a[256] = {
 
 class hp9k_state : public driver_device
 {
-private:
-
-	int crtc_curreg;
-	int crtc_addrStartHi;
-	int crtc_addrStartLow;
-
-	void calc_prom_crc(uint8_t* prom);
-	void putChar(uint8_t thec,int x,int y,bitmap_ind16 &bitmap);
-
 public:
 	hp9k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
@@ -136,6 +127,19 @@ public:
 		calc_prom_crc(prom16a);
 	}
 
+	void hp9k(machine_config &config);
+
+	void init_hp9k();
+
+private:
+
+	int crtc_curreg;
+	int crtc_addrStartHi;
+	int crtc_addrStartLow;
+
+	void calc_prom_crc(uint8_t* prom);
+	void putChar(uint8_t thec,int x,int y,bitmap_ind16 &bitmap);
+
 	uint8_t kbdBit;
 
 	required_device<cpu_device> m_maincpu;
@@ -144,8 +148,6 @@ public:
 
 	uint8_t m_videoram[0x4000];
 	uint8_t m_screenram[0x800];
-
-	void init_hp9k();
 
 	DECLARE_READ16_MEMBER(buserror_r);
 	DECLARE_WRITE16_MEMBER(buserror_w);
@@ -167,7 +169,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<gfxdecode_device> m_gfxdecode;
-	void hp9k(machine_config &config);
 	void hp9k_mem(address_map &map);
 };
 

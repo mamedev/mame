@@ -214,8 +214,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_MULTIPAK, device_cococart_interface, coco_multipak_device, "coco_multipack", "CoCo Multi-Pak Interface")
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;
 
 
 

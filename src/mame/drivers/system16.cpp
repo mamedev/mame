@@ -133,7 +133,7 @@ READ8_MEMBER(segas1x_bootleg_state::sound_command_irq_r)
 
 WRITE8_MEMBER(segas1x_bootleg_state::soundbank_msm_w)
 {
-	m_soundbank->set_entry(data & 7);
+	m_soundbank->set_entry((data & 7) ^ 6); // probably wrong
 	m_msm->reset_w(BIT(data, 3));
 }
 

@@ -112,6 +112,10 @@ public:
 		, m_via(*this, "via")
 		, m_overlay(1)
 	{ }
+
+	void lwriter(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(bankedarea_r);
 	DECLARE_WRITE16_MEMBER(bankedarea_w);
 	DECLARE_WRITE8_MEMBER(led_out_w);
@@ -127,9 +131,8 @@ public:
 	//DECLARE_WRITE_LINE_MEMBER(scc_int);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
-	void lwriter(machine_config &config);
 	void maincpu_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;
 

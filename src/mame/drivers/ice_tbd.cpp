@@ -30,9 +30,11 @@ public:
 	{ }
 
 	void ice_tbd(machine_config &config);
+
+private:
 	void ice_tbd_io_map(address_map &map);
 	void ice_tbd_map(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

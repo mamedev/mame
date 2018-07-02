@@ -69,20 +69,24 @@ public:
 		m_samples(*this,"samples")
 		{ }
 
+	void tattack(machine_config &config);
+
+	void init_tattack();
+
+private:
 	DECLARE_WRITE8_MEMBER(paddle_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
 	DECLARE_WRITE8_MEMBER(brick_dma_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
-	void init_tattack();
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_PALETTE_INIT(tattack);
 
 	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tattack(machine_config &config);
 	void tattack_map(address_map &map);
-protected:
+
 	virtual void video_start() override;
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_videoram;

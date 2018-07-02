@@ -180,7 +180,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
-protected:
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 

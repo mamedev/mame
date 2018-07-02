@@ -19,6 +19,15 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoreg(*this, "videoreg")  { }
 
+	void dynamski(machine_config &config);
+	void chinhero(machine_config &config);
+	void shangkid(machine_config &config);
+
+	void init_dynamski();
+	void init_shangkid();
+	void init_chinhero();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_bbx;
@@ -58,9 +67,6 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void init_dynamski();
-	void init_shangkid();
-	void init_chinhero();
 	DECLARE_VIDEO_START(shangkid);
 	DECLARE_PALETTE_INIT(dynamski);
 	DECLARE_MACHINE_RESET(shangkid);
@@ -71,9 +77,7 @@ public:
 	void shangkid_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dynamski_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	void dynamski_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void dynamski(machine_config &config);
-	void chinhero(machine_config &config);
-	void shangkid(machine_config &config);
+
 	void chinhero_bbx_map(address_map &map);
 	void chinhero_bbx_portmap(address_map &map);
 	void chinhero_main_map(address_map &map);

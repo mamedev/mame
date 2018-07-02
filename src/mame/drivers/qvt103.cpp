@@ -24,12 +24,14 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void qvt103(machine_config &config);
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void qvt103(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };

@@ -48,7 +48,11 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void spyhuntertec(machine_config &config);
 
+	void init_spyhuntertec();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<timer_device> m_analog_timer;
@@ -69,8 +73,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-
-
 	uint8_t m_spyhunt_sprite_color_mask;
 	int16_t m_spyhunt_scroll_offset;
 	int16_t m_spyhunt_scrollx;
@@ -81,8 +83,8 @@ public:
 	tilemap_t *m_alpha_tilemap;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(spyhuntertec_paletteram_w);
-	void init_spyhuntertec();
-//  DECLARE_VIDEO_START(spyhuntertec);
+
+	//  DECLARE_VIDEO_START(spyhuntertec);
 //  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_portf0_w);
@@ -112,7 +114,6 @@ public:
 
 	uint8_t m_analog_select;
 	uint8_t m_analog_count;
-	void spyhuntertec(machine_config &config);
 	void spyhuntertec_map(address_map &map);
 	void spyhuntertec_portmap(address_map &map);
 	void spyhuntertec_sound_map(address_map &map);

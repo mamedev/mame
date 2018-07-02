@@ -36,12 +36,15 @@ public:
 	ertictac_state(const machine_config &mconfig, device_type type, const char *tag)
 		: archimedes_state(mconfig, type, tag) { }
 
-	DECLARE_READ32_MEMBER(ertictac_podule_r);
+	void ertictac(machine_config &config);
+
 	void init_ertictac();
+
+private:
+	DECLARE_READ32_MEMBER(ertictac_podule_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
-	void ertictac(machine_config &config);
 	void ertictac_map(address_map &map);
 };
 

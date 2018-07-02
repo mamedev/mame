@@ -247,9 +247,6 @@
 
 class goldngam_state : public driver_device
 {
-	static constexpr int MOVIECRD_DUART1_IRQ = M68K_IRQ_2;
-	static constexpr int MOVIECRD_DUART2_IRQ = M68K_IRQ_4;
-
 public:
 	goldngam_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
@@ -260,6 +257,9 @@ public:
 	void swisspkr(machine_config &config);
 	void moviecrd(machine_config &config);
 private:
+	static constexpr int MOVIECRD_DUART1_IRQ = M68K_IRQ_2;
+	static constexpr int MOVIECRD_DUART2_IRQ = M68K_IRQ_4;
+
 	DECLARE_READ8_MEMBER(unk_r);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(goldngam);

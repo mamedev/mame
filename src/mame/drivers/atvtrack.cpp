@@ -117,6 +117,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu") { }
 
+	void atvtrack(machine_config &config);
+
+protected:
 	DECLARE_READ64_MEMBER(control_r);
 	DECLARE_WRITE64_MEMBER(control_w);
 	DECLARE_READ64_MEMBER(nand_data_r);
@@ -145,12 +148,12 @@ public:
 	u16 gpu_irq_mask;
 	void gpu_irq_test();
 	void gpu_irq_set(int);
-	void atvtrack(machine_config &config);
+
 	void atvtrack_main_map(address_map &map);
 	void atvtrack_main_port(address_map &map);
 	void atvtrack_sub_map(address_map &map);
 	void atvtrack_sub_port(address_map &map);
-protected:
+
 	bool m_slaverun;
 };
 
@@ -161,9 +164,12 @@ public:
 	smashdrv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atvtrack_state(mconfig, type, tag) { }
 
+	void smashdrv(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void smashdrv(machine_config &config);
+
 	void smashdrv_main_map(address_map &map);
 	void smashdrv_main_port(address_map &map);
 };

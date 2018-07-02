@@ -38,6 +38,9 @@ public:
 			m_ram(*this, RAM_TAG),
 		m_video_ram(*this, "video_ram"){ }
 
+	void px8(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
@@ -81,7 +84,6 @@ public:
 	/* keyboard state */
 	int m_ksc;              /* keyboard scan column */
 	DECLARE_PALETTE_INIT(px8);
-	void px8(machine_config &config);
 	void px8_io(address_map &map);
 	void px8_mem(address_map &map);
 	void px8_slave_io(address_map &map);

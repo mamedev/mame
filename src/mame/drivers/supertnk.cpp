@@ -118,10 +118,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void init_supertnk();
 	void supertnk(machine_config &config);
 
-protected:
+	void init_supertnk();
+
+private:
 	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_0_w);
 	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_1_w);
 	DECLARE_WRITE8_MEMBER(supertnk_interrupt_ack_w);
@@ -138,7 +139,6 @@ protected:
 	void supertnk_io_map(address_map &map);
 	void supertnk_map(address_map &map);
 
-private:
 	std::unique_ptr<uint8_t[]> m_videoram[3];
 	uint8_t m_rom_bank;
 	uint8_t m_bitplane_select;

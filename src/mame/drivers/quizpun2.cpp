@@ -112,6 +112,10 @@ public:
 		m_bg_ram(*this, "bg_ram")
 	{ }
 
+	void quizpun(machine_config &config);
+	void quizpun2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -164,8 +168,6 @@ public:
 	bool m_mcu_pending;
 	bool m_mcu_written;
 	bool m_mcu_repeat;
-	void quizpun(machine_config &config);
-	void quizpun2(machine_config &config);
 	void quizpun2_cop_map(address_map &map);
 	void quizpun2_io_map(address_map &map);
 	void quizpun2_map(address_map &map);

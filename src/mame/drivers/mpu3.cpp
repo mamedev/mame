@@ -195,10 +195,11 @@ public:
 		, m_ptm2(*this, "ptm_ic2")
 	{ }
 
-	void init_m3hprvpr();
 	void mpu3base(machine_config &config);
 
-protected:
+	void init_m3hprvpr();
+
+private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	DECLARE_WRITE8_MEMBER(characteriser_w);
@@ -238,7 +239,6 @@ protected:
 	virtual void machine_reset() override;
 	void mpu3_basemap(address_map &map);
 
-private:
 	int m_triac_ic3;
 	int m_triac_ic4;
 	int m_triac_ic5;

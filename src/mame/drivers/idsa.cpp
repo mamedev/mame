@@ -46,6 +46,10 @@ public:
 		, m_ppi(*this, "ppi%u", 1)
 		{ }
 
+	void bsktbllp(machine_config &config);
+	void idsa(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	DECLARE_READ8_MEMBER(portb0_r);
 	DECLARE_WRITE8_MEMBER(port80_w);
@@ -63,11 +67,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_a_w);
 	DECLARE_WRITE8_MEMBER(ay2_b_w);
 
-	void bsktbllp(machine_config &config);
-	void idsa(machine_config &config);
 	void maincpu_io_map(address_map &map);
 	void maincpu_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 
 	uint16_t m_irqcnt;

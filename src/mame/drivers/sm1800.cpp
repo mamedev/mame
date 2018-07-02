@@ -36,6 +36,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void sm1800(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<i8255_device> m_ppi;
@@ -51,7 +54,6 @@ public:
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
-	void sm1800(machine_config &config);
 	void sm1800_io(address_map &map);
 	void sm1800_mem(address_map &map);
 };

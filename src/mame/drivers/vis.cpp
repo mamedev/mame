@@ -18,6 +18,7 @@ class vis_audio_device : public device_t,
 {
 public:
 	vis_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	DECLARE_READ8_MEMBER(pcm_r);
 	DECLARE_WRITE8_MEMBER(pcm_w);
 protected:
@@ -698,6 +699,12 @@ public:
 		m_pic2(*this, "mb:pic8259_slave"),
 		m_pad(*this, "PAD")
 		{ }
+
+	void vis(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(update);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
@@ -713,13 +720,11 @@ public:
 	DECLARE_WRITE16_MEMBER(pad_w);
 	DECLARE_READ8_MEMBER(unk1_r);
 	DECLARE_WRITE8_MEMBER(unk1_w);
-	DECLARE_INPUT_CHANGED_MEMBER(update);
-	void vis(machine_config &config);
 	void at16_io(address_map &map);
 	void at16_map(address_map &map);
-protected:
+
 	void machine_reset() override;
-private:
+
 	uint8_t m_sysctl;
 	uint8_t m_unkidx;
 	uint8_t m_unk[16];

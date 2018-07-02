@@ -51,6 +51,10 @@ public:
 			, m_cartslot(*this, "snsslot")
 	{ }
 
+	void snespal(machine_config &config);
+	void snes(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( snes20_hi_r );
 	DECLARE_WRITE8_MEMBER( snes20_hi_w );
 	DECLARE_READ8_MEMBER( snes20_lo_r );
@@ -106,8 +110,7 @@ public:
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
 	optional_device<sns_cart_slot_device> m_cartslot;
-	void snespal(machine_config &config);
-	void snes(machine_config &config);
+
 	void snes_map(address_map &map);
 	void spc_map(address_map &map);
 };
@@ -1350,7 +1353,7 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
 	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_console_state, snes_open_bus_r))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SNES_CONTROL_PORT_ADD("ctrl1", snes_control_port_devices, "joypad")

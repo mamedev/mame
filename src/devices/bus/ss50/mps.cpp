@@ -180,5 +180,3 @@ WRITE_LINE_MEMBER(ss50_mps_device::acia_irq_w)
 
 // device type definition
 DEFINE_DEVICE_TYPE_PRIVATE(SS50_MPS, ss50_card_interface, ss50_mps_device, "ss50_mps", "MP-S Serial Interface")
-template class device_finder<ss50_card_interface, false>;
-template class device_finder<ss50_card_interface, true>;

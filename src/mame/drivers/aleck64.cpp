@@ -193,7 +193,12 @@ public:
 			m_e90_pal(*this,"e90pal"),
 			m_dip_read_offset(0) { }
 
+	void aleck64(machine_config &config);
+	void a64_e90(machine_config &config);
+
 	void init_aleck64();
+
+private:
 	DECLARE_WRITE32_MEMBER(aleck_dips_w);
 	DECLARE_READ32_MEMBER(aleck_dips_r);
 	DECLARE_READ16_MEMBER(e90_prot_r);
@@ -201,16 +206,12 @@ public:
 
 	uint32_t screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void aleck64(machine_config &config);
-	void a64_e90(machine_config &config);
 	void e90_map(address_map &map);
 	void n64_map(address_map &map);
 	void rsp_map(address_map &map);
-protected:
 	optional_shared_ptr<uint32_t> m_e90_vram;
 	optional_shared_ptr<uint32_t> m_e90_pal;
 
-private:
 	uint32_t m_dip_read_offset;
 };
 

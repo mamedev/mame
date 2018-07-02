@@ -408,6 +408,30 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	void ns10_konotako(machine_config &config);
+	void ns10_mrdrilr2(machine_config &config);
+	void ns10_knpuzzle(machine_config &config);
+	void ns10_chocovdr(machine_config &config);
+	void ns10_startrgn(machine_config &config);
+	void namcos10_memm(machine_config &config);
+	void namcos10_memn(machine_config &config);
+	void ns10_gjspace(machine_config &config);
+	void ns10_nflclsfb(machine_config &config);
+	void ns10_gamshara(machine_config &config);
+
+	void init_knpuzzle();
+	void init_panikuru();
+	void init_mrdrilr2();
+	void init_startrgn();
+	void init_gunbalna();
+	void init_nflclsfb();
+	void init_gjspace();
+	void init_gamshara();
+	void init_mrdrilrg();
+	void init_chocovdr();
+	void init_konotako();
+
+private:
 	// memm variant interface
 	DECLARE_WRITE16_MEMBER(crypto_switch_w);
 	DECLARE_READ16_MEMBER(range_r);
@@ -437,20 +461,10 @@ public:
 	uint8_t *nand_base;
 	void nand_copy( uint32_t *dst, uint32_t address, int len );
 
-	void ns10_konotako(machine_config &config);
-	void ns10_mrdrilr2(machine_config &config);
-	void ns10_knpuzzle(machine_config &config);
-	void ns10_chocovdr(machine_config &config);
-	void ns10_startrgn(machine_config &config);
-	void namcos10_memm(machine_config &config);
-	void namcos10_memn(machine_config &config);
-	void ns10_gjspace(machine_config &config);
-	void ns10_nflclsfb(machine_config &config);
-	void ns10_gamshara(machine_config &config);
 	void namcos10_map(address_map &map);
 	void namcos10_memm_map(address_map &map);
 	void namcos10_memn_map(address_map &map);
-private:
+
 	enum {
 		I2CP_IDLE,
 		I2CP_RECIEVE_BYTE,
@@ -473,18 +487,7 @@ private:
 	uint16_t nand_read2( uint32_t address );
 
 	void i2c_update();
-public:
-	void init_knpuzzle();
-	void init_panikuru();
-	void init_mrdrilr2();
-	void init_startrgn();
-	void init_gunbalna();
-	void init_nflclsfb();
-	void init_gjspace();
-	void init_gamshara();
-	void init_mrdrilrg();
-	void init_chocovdr();
-	void init_konotako();
+
 	DECLARE_MACHINE_RESET(namcos10);
 	void memn_driver_init(  );
 	required_device<cpu_device> m_maincpu;

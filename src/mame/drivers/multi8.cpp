@@ -45,6 +45,9 @@ public:
 		, m_aysnd(*this, "aysnd")
 	{ }
 
+	void multi8(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(key_input_r);
 	DECLARE_READ8_MEMBER(key_status_r);
 	DECLARE_READ8_MEMBER(vram_r);
@@ -62,10 +65,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void multi8(machine_config &config);
 	void multi8_io(address_map &map);
 	void multi8_mem(address_map &map);
-private:
+
 	uint8_t *m_p_vram;
 	uint8_t *m_p_wram;
 	uint8_t *m_p_kanji;

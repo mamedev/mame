@@ -48,6 +48,9 @@ public:
 		, m_rom(*this, Z80_TAG)
 	{ }
 
+	void xor100(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER( mmu_w );
 	DECLARE_WRITE8_MEMBER( prom_toggle_w );
 	DECLARE_READ8_MEMBER( prom_disable_r );
@@ -66,10 +69,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 
-	void xor100(machine_config &config);
 	void xor100_io(address_map &map);
 	void xor100_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

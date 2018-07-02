@@ -16,6 +16,20 @@ public:
 		m_bank1(*this, "bank1"),
 		m_bank1d(*this, "bank1d") { }
 
+	void base(machine_config &config);
+	void oigas(machine_config &config);
+	void pbillrd(machine_config &config);
+	void gigas(machine_config &config);
+	void gigasm(machine_config &config);
+	void pbillrdm(machine_config &config);
+	void omega(machine_config &config);
+	void freekick(machine_config &config);
+
+	void init_gigas();
+	void init_gigasb();
+	void init_pbillrds();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -50,9 +64,6 @@ public:
 	DECLARE_WRITE8_MEMBER(snd_rom_addr_l_w);
 	DECLARE_WRITE8_MEMBER(snd_rom_addr_h_w);
 	DECLARE_READ8_MEMBER(snd_rom_r);
-	void init_gigas();
-	void init_gigasb();
-	void init_pbillrds();
 	TILE_GET_INFO_MEMBER(get_freek_tile_info);
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(pbillrd);
@@ -71,14 +82,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_memory_bank m_bank1, m_bank1d;
-	void base(machine_config &config);
-	void oigas(machine_config &config);
-	void pbillrd(machine_config &config);
-	void gigas(machine_config &config);
-	void gigasm(machine_config &config);
-	void pbillrdm(machine_config &config);
-	void omega(machine_config &config);
-	void freekick(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void freekick_io_map(address_map &map);
 	void freekick_map(address_map &map);

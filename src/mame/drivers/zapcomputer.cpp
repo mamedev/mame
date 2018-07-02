@@ -40,13 +40,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void zapcomp(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(display_7seg_w);
 
-	void zapcomp(machine_config &config);
 	void zapcomp_io(address_map &map);
 	void zapcomp_mem(address_map &map);
-private:
+
 	uint8_t decode7seg(uint8_t data);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;

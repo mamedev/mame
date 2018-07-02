@@ -21,6 +21,9 @@ public:
 			m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void zerozone(machine_config &config);
+
+private:
 	// in drivers/zerozone.c
 	DECLARE_WRITE16_MEMBER(sound_w);
 
@@ -45,10 +48,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void zerozone(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
-protected:
 
 	// driver_device overrides
 	virtual void machine_start() override;

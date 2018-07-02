@@ -249,6 +249,28 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	{
 	}
 
+	void cpu30(machine_config &config);
+	void cpu30x(machine_config &config);
+	void cpu30zbe(machine_config &config);
+	void cpu30be8(machine_config &config);
+	void cpu30za(machine_config &config);
+	void cpu30lite4(machine_config &config);
+	void cpu30xa(machine_config &config);
+	void cpu33(machine_config &config);
+	void cpu30lite8(machine_config &config);
+	void cpu30be16(machine_config &config);
+
+	void init_cpu30x();
+	void init_cpu30xa();
+	void init_cpu30za();
+	void init_cpu30zbe();
+	void init_cpu30be8();
+	void init_cpu30be16();
+	void init_cpu30lite4();
+	void init_cpu30lite8();
+	void init_cpu33();
+
+private:
 	DECLARE_WRITE8_MEMBER (fdc_w);
 	DECLARE_READ8_MEMBER (fdc_r);
 	DECLARE_WRITE8_MEMBER (scsi_w);
@@ -283,29 +305,9 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	//DECLARE_WRITE16_MEMBER (vme_a16_w);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
-	void init_cpu30x();
-	void init_cpu30xa();
-	void init_cpu30za();
-	void init_cpu30zbe();
-	void init_cpu30be8();
-	void init_cpu30be16();
-	void init_cpu30lite4();
-	void init_cpu30lite8();
-	void init_cpu33();
-	void cpu30(machine_config &config);
-	void cpu30x(machine_config &config);
-	void cpu30zbe(machine_config &config);
-	void cpu30be8(machine_config &config);
-	void cpu30za(machine_config &config);
-	void cpu30lite4(machine_config &config);
-	void cpu30xa(machine_config &config);
-	void cpu33(machine_config &config);
-	void cpu30lite8(machine_config &config);
-	void cpu30be16(machine_config &config);
-	void cpu30_mem(address_map &map);
-protected:
 
-private:
+	void cpu30_mem(address_map &map);
+
 	required_device<m68000_base_device> m_maincpu;
 	required_device<ram_device> m_ram;
 

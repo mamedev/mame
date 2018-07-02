@@ -44,6 +44,30 @@ public:
 		m_eeprom(*this, "eeprom", 16),
 		m_mainbank(*this, "mainbank") { }
 
+	void m92(machine_config &config);
+	void m92_banked(machine_config &config);
+	void inthunt(machine_config &config);
+	void lethalth(machine_config &config);
+	void ppan(machine_config &config);
+	void hook(machine_config &config);
+	void psoldier(machine_config &config);
+	void rtypeleo(machine_config &config);
+	void gunforc2(machine_config &config);
+	void nbbatman2bl(machine_config &config);
+	void bmaster(machine_config &config);
+	void nbbatman(machine_config &config);
+	void uccops(machine_config &config);
+	void dsoccr94j(machine_config &config);
+	void gunforce(machine_config &config);
+	void majtitl2(machine_config &config);
+	void majtitl2a(machine_config &config);
+	void mysticri(machine_config &config);
+
+	void init_bank();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(m92_sprite_busy_r);
+
+private:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<uint16_t> m_vram_data;
 	required_shared_ptr<uint16_t> m_spritecontrol;
@@ -80,9 +104,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_w);
 	template<int Layer> DECLARE_WRITE16_MEMBER(pf_control_w);
 	DECLARE_WRITE16_MEMBER(master_control_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(m92_sprite_busy_r);
 	DECLARE_WRITE16_MEMBER(oki_bank_w);
-	void init_bank();
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	DECLARE_MACHINE_RESET(m92);
 	DECLARE_VIDEO_START(m92);
@@ -95,24 +117,6 @@ public:
 	void m92_update_scroll_positions();
 	void m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 
-	void m92(machine_config &config);
-	void m92_banked(machine_config &config);
-	void inthunt(machine_config &config);
-	void lethalth(machine_config &config);
-	void ppan(machine_config &config);
-	void hook(machine_config &config);
-	void psoldier(machine_config &config);
-	void rtypeleo(machine_config &config);
-	void gunforc2(machine_config &config);
-	void nbbatman2bl(machine_config &config);
-	void bmaster(machine_config &config);
-	void nbbatman(machine_config &config);
-	void uccops(machine_config &config);
-	void dsoccr94j(machine_config &config);
-	void gunforce(machine_config &config);
-	void majtitl2(machine_config &config);
-	void majtitl2a(machine_config &config);
-	void mysticri(machine_config &config);
 	void lethalth_map(address_map &map);
 	void m92_map(address_map &map);
 	void m92_banked_map(address_map &map);
@@ -122,6 +126,6 @@ public:
 	void majtitl2_map(address_map &map);
 	void ppan_portmap(address_map &map);
 	void sound_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -105,6 +105,9 @@ public:
 			m_video_ram(*this, "video_ram")
 	{ }
 
+	void fp(machine_config &config);
+
+private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<cpu_device> m_maincpu;
@@ -155,7 +158,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
-	void fp(machine_config &config);
+
 	void fp_io(address_map &map);
 	void fp_mem(address_map &map);
 	void sound_io(address_map &map);

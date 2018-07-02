@@ -236,6 +236,13 @@ public:
 		m_ram(*this, RAM_TAG)
 		{ }
 
+	void sun3(machine_config &config);
+	void sun3e(machine_config &config);
+	void sun3_60(machine_config &config);
+	void sun3200(machine_config &config);
+	void sun3_50(machine_config &config);
+
+private:
 	required_device<m68020_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
@@ -267,18 +274,13 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun3_timer);
 
-	void sun3(machine_config &config);
-	void sun3e(machine_config &config);
-	void sun3_60(machine_config &config);
-	void sun3200(machine_config &config);
-	void sun3_50(machine_config &config);
 	void sun3_mem(address_map &map);
 	void vmetype0space_map(address_map &map);
 	void vmetype0space_novram_map(address_map &map);
 	void vmetype1space_map(address_map &map);
 	void vmetype2space_map(address_map &map);
 	void vmetype3space_map(address_map &map);
-private:
+
 	uint32_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
 	uint32_t m_enable, m_diag, m_dvma_enable, m_parregs[8], m_irqctrl, m_ecc[4];

@@ -147,12 +147,15 @@ public:
 	{
 	}
 
+	void wardner(machine_config &config);
+
+	void init_wardner();
+
+private:
 	required_device<address_map_bank_device> m_membank;
 
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
-	void init_wardner();
 
-	void wardner(machine_config &config);
 	void DSP_io_map(address_map &map);
 	void DSP_program_map(address_map &map);
 	void main_bank_map(address_map &map);
@@ -160,7 +163,7 @@ public:
 	void main_program_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_program_map(address_map &map);
-protected:
+
 	virtual void driver_start() override;
 	virtual void machine_reset() override;
 };

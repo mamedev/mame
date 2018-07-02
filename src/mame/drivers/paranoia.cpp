@@ -55,6 +55,9 @@ public:
 	paranoia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pce_common_state(mconfig, type, tag) { }
 
+	void paranoia(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(i8085_d000_w);
 	DECLARE_READ8_MEMBER(z80_io_01_r);
 	DECLARE_READ8_MEMBER(z80_io_02_r);
@@ -64,7 +67,6 @@ public:
 	DECLARE_WRITE8_MEMBER(i8155_b_w);
 	DECLARE_WRITE8_MEMBER(i8155_c_w);
 	DECLARE_WRITE_LINE_MEMBER(i8155_timer_out);
-	void paranoia(machine_config &config);
 	void paranoia_8085_io_map(address_map &map);
 	void paranoia_8085_map(address_map &map);
 	void paranoia_z80_io_map(address_map &map);

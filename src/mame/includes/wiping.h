@@ -16,6 +16,9 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram") { }
 
+	void wiping(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -42,7 +45,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
-	void wiping(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

@@ -37,18 +37,19 @@ public:
 	{
 	}
 
+	void anes(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(vram_offset_w);
 	DECLARE_WRITE8_MEMBER(blit_trigger_w);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void anes(machine_config &config);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	uint8_t m_vram_offset[3];
 };
 

@@ -40,14 +40,14 @@ public:
 		, m_oki(*this, "oki")
 	{ }
 
+	void ggconnie(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(lamp_w);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
-	void ggconnie(machine_config &config);
-
 	void sgx_io(address_map &map);
 	void sgx_mem(address_map &map);
-private:
 	required_device <msm6242_device> m_rtc;
 	required_device <okim6295_device> m_oki;
 };

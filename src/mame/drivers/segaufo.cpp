@@ -92,7 +92,7 @@ public:
 	void newufo(machine_config &config);
 	void ufo800(machine_config &config);
 
-protected:
+private:
 	void motor_tick(int p, int m);
 
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
@@ -126,7 +126,6 @@ protected:
 	void ex_ufo21_portmap(address_map &map);
 	void ex_ufo800_portmap(address_map &map);
 
-private:
 	struct Player
 	{
 		struct Motor

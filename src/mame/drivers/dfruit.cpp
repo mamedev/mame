@@ -37,6 +37,9 @@ public:
 		, m_mainbank(*this, "mainbank")
 	{ }
 
+	void dfruit(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
 
@@ -62,7 +65,6 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dfruit_irq_scanline);
-	void dfruit(machine_config &config);
 	void dfruit_map(address_map &map);
 	void tc0091lvc_map(address_map &map);
 };

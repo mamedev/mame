@@ -14,6 +14,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
+	void hexion(machine_config &config);
+	void hexionb(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k053252_device> m_k053252;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -47,8 +51,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *ram);
-	void hexion(machine_config &config);
-	void hexionb(machine_config &config);
 	void hexion_map(address_map &map);
 	void hexionb_map(address_map &map);
 };

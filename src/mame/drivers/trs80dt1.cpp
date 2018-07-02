@@ -55,6 +55,9 @@ public:
 		, m_7474(*this, "7474")
 		{ }
 
+	void trs80dt1(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(dma_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(store_w);
@@ -62,10 +65,9 @@ public:
 	DECLARE_WRITE8_MEMBER(port3_w);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
 
-	void trs80dt1(machine_config &config);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
-private:
+
 	bool m_bow;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

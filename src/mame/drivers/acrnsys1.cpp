@@ -72,7 +72,7 @@ public:
 
 	void acrnsys1(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	DECLARE_READ8_MEMBER(ins8154_b1_port_a_r);
 	DECLARE_WRITE8_MEMBER(ins8154_b1_port_a_w);
@@ -81,7 +81,6 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_p);
 	void acrnsys1_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_ttl74145;
 	required_device<cassette_image_device> m_cass;

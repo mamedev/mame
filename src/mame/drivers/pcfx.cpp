@@ -20,16 +20,18 @@
 class pcfx_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_PAD_FUNC
-	};
-
 	pcfx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_huc6261(*this, "huc6261") { }
 
+	void pcfx(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_PAD_FUNC
+	};
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( irq_read );
@@ -49,15 +51,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq15_w );
 	TIMER_CALLBACK_MEMBER(pad_func);
 
-	void pcfx(machine_config &config);
 	void pcfx_io(address_map &map);
 	void pcfx_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void machine_reset() override;
 
-private:
 	// Interrupt controller (component unknown)
 	uint16_t m_irq_mask;
 	uint16_t m_irq_pending;

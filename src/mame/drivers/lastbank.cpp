@@ -39,6 +39,13 @@ public:
 		, m_mainbank(*this, "mainbank")
 	{ }
 
+	void lastbank(machine_config &config);
+
+	void init_lastbank();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
 	required_device<okim6295_device> m_oki;
@@ -63,7 +70,6 @@ public:
 	DECLARE_READ8_MEMBER(mux_0_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(sound_flags_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r);
 
 	DECLARE_READ8_MEMBER(rom_bank_r);
 	DECLARE_WRITE8_MEMBER(rom_bank_w);
@@ -75,7 +81,6 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
-	void lastbank(machine_config &config);
 	void lastbank_audio_io(address_map &map);
 	void lastbank_audio_map(address_map &map);
 	void lastbank_map(address_map &map);

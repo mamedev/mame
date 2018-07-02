@@ -42,6 +42,19 @@ public:
 	{
 	}
 
+	void yboard_deluxe(machine_config &config);
+	void yboard_link(machine_config &config);
+	void yboard(machine_config &config);
+
+	// game-specific driver init
+	void init_generic();
+	void init_pdrift();
+	void init_r360();
+	void init_gforce2();
+	void init_rchase();
+	void init_gloc();
+
+private:
 	// main CPU read/write handlers
 	DECLARE_WRITE8_MEMBER(output1_w);
 	DECLARE_WRITE8_MEMBER(misc_output_w);
@@ -68,20 +81,9 @@ public:
 	void pdrift_output_cb2(uint16_t data);
 	void rchase_output_cb2(uint16_t data);
 
-	// game-specific driver init
-	void init_generic();
-	void init_pdrift();
-	void init_r360();
-	void init_gforce2();
-	void init_rchase();
-	void init_gloc();
-
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void yboard_deluxe(machine_config &config);
-	void yboard_link(machine_config &config);
-	void yboard(machine_config &config);
 	void link_map(address_map &map);
 	void link_portmap(address_map &map);
 	void main_map(address_map &map);
@@ -91,7 +93,7 @@ public:
 	void sound_portmap(address_map &map);
 	void subx_map(address_map &map);
 	void suby_map(address_map &map);
-protected:
+
 	// internal types
 	typedef delegate<void (uint16_t)> output_delegate;
 

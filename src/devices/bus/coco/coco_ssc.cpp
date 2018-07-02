@@ -146,8 +146,6 @@ namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_SSC, device_cococart_interface, coco_ssc_device, "coco_ssc", "CoCo S/SC PAK");
 DEFINE_DEVICE_TYPE(COCOSSC_SAC, cocossc_sac_device, "cocossc_sac", "CoCo SSC Sound Activity Circuit");
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;
 
 
 //**************************************************************************

@@ -47,6 +47,9 @@ public:
 		, m_keyboard(*this, "LINE%u", 0)
 	{ }
 
+	void pk8000(machine_config &config);
+
+private:
 	uint8_t m_keyboard_line;
 
 	DECLARE_READ8_MEMBER(joy_1_r);
@@ -64,10 +67,9 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	void pk8000(machine_config &config);
 	void pk8000_io(address_map &map);
 	void pk8000_mem(address_map &map);
-protected:
+
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;

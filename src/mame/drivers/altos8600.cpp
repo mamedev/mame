@@ -35,7 +35,7 @@ public:
 
 	void altos8600(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ16_MEMBER(cpuram_r);
 	DECLARE_WRITE16_MEMBER(cpuram_w);
 	DECLARE_READ16_MEMBER(stkram_r);
@@ -82,7 +82,6 @@ protected:
 	void extra_mem(address_map &map);
 	void stack_mem(address_map &map);
 
-private:
 	u16 xlate_r(address_space &space, offs_t offset, u16 mem_mask, int permbit);
 	void xlate_w(address_space &space, offs_t offset, u16 data, u16 mem_mask, int permbit);
 	void seterr(offs_t offset, u16 mem_mask, u16 err_mask);

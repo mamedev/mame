@@ -214,7 +214,9 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void _4enlinea(machine_config &config);
 
+private:
 	required_device<ay8910_device> m_ay;
 
 	DECLARE_READ8_MEMBER(serial_r);
@@ -233,7 +235,6 @@ public:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 
-	void _4enlinea(machine_config &config);
 	void audio_map(address_map &map);
 	void audio_portmap(address_map &map);
 	void main_map(address_map &map);

@@ -46,6 +46,9 @@ public:
 		, m_fdc(*this, "fdc")
 	{ }
 
+	void asst128(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_fdc_xt_device> m_fdc;
 
@@ -53,7 +56,6 @@ public:
 	DECLARE_WRITE8_MEMBER(asst128_fdc_dor_w);
 
 	void machine_start() override;
-	void asst128(machine_config &config);
 	void asst128_io(address_map &map);
 	void asst128_map(address_map &map);
 };

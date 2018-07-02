@@ -114,7 +114,10 @@ public:
 		m_quart1(*this, "quart1")
 	{ }
 
+	void igt_gameking(machine_config &config);
+	void igt_ms72c(machine_config &config);
 
+private:
 	virtual void video_start() override;
 	uint32_t screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -138,12 +141,10 @@ public:
 	DECLARE_READ8_MEMBER(timer_r);
 	DECLARE_READ16_MEMBER(version_r);
 
-	void igt_gameking(machine_config &config);
-	void igt_ms72c(machine_config &config);
 	void igt_gameking_map(address_map &map);
 	void igt_ms72c_map(address_map &map);
 	void ramdac_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;

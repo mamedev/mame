@@ -410,6 +410,10 @@ public:
 		m_bank1(*this, "bank1")
 	{ }
 
+	void ppj(machine_config &config);
+	void kurukuru(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<v9938_device> m_v9938;
@@ -431,8 +435,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
-	void ppj(machine_config &config);
-	void kurukuru(machine_config &config);
 	void kurukuru_audio_io(address_map &map);
 	void kurukuru_audio_map(address_map &map);
 	void kurukuru_io(address_map &map);

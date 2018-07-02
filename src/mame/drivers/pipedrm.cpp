@@ -180,17 +180,20 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void pipedrm(machine_config &config);
+	void hatris(machine_config &config);
+
+	void init_pipedrm();
+	void init_hatris();
+
+private:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_MACHINE_START(pipedrm);
 	DECLARE_MACHINE_RESET(pipedrm);
-	void init_pipedrm();
-	void init_hatris();
 	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
 	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
 	DECLARE_READ8_MEMBER( pending_command_r );
-	void pipedrm(machine_config &config);
-	void hatris(machine_config &config);
 	void hatris_sound_portmap(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
