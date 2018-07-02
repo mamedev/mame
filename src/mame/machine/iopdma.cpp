@@ -9,6 +9,7 @@
 *
 */
 
+#include "emu.h"
 #include "iopdma.h"
 
 DEFINE_DEVICE_TYPE(SONYIOP_DMA, iop_dma_device, "iopdma", "Sony IOP DMA")

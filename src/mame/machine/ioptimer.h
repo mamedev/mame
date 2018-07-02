@@ -14,7 +14,6 @@
 
 #pragma once
 
-#include "emu.h"
 
 #define MCFG_IOP_TIMER_IRQ_CALLBACK(_write) \
 	devcb = &downcast<iop_timer_device &>(*device).set_int_cb(DEVCB_##_write);

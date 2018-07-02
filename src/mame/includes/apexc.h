@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/apexc/apexc.h"
 #include "machine/apexc.h"
 #include "emupal.h"
