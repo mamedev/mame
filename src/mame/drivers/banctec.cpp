@@ -36,7 +36,7 @@ public:
 
 	void banctec(machine_config &config);
 
-protected:
+private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -45,7 +45,6 @@ protected:
 	void banctec_mcu_mem(address_map &map);
 	void banctec_mem(address_map &map);
 
-private:
 	required_device<palette_device> m_palette;
 	u8 m_video_address;
 	required_device<cpu_device> m_maincpu;

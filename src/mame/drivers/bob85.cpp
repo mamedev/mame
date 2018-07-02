@@ -41,6 +41,8 @@ public:
 		{ }
 
 	void bob85(machine_config &config);
+
+private:
 	void bob85_io(address_map &map);
 	void bob85_mem(address_map &map);
 	DECLARE_READ8_MEMBER(bob85_keyboard_r);
@@ -48,7 +50,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	DECLARE_READ_LINE_MEMBER(sid_r);
 
-private:
 	uint8_t m_prev_key;
 	uint8_t m_count_key;
 	virtual void machine_reset() override;

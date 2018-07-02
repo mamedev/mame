@@ -47,10 +47,9 @@ public:
 
 	void blocktax(machine_config &config);
 
-protected:
+private:
 	virtual void video_start() override;
 
-private:
 	uint32_t screen_update_blocktax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blocktax_map(address_map &map);
 	required_device<cpu_device> m_maincpu;

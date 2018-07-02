@@ -51,6 +51,13 @@ public:
 			m_palette(*this, "palette")
 	{ }
 
+	void aquarius(machine_config &config);
+
+	void init_aquarius();
+
+	DECLARE_INPUT_CHANGED_MEMBER(aquarius_reset);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
@@ -85,13 +92,12 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(scrambler_w);
 	DECLARE_READ8_MEMBER(cartridge_r);
-	void init_aquarius();
+
 	TILE_GET_INFO_MEMBER(aquarius_gettileinfo);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(aquarius);
 	uint32_t screen_update_aquarius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(aquarius_reset);
-	void aquarius(machine_config &config);
+
 	void aquarius_io(address_map &map);
 	void aquarius_mem(address_map &map);
 };

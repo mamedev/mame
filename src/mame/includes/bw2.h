@@ -47,6 +47,9 @@ public:
 		m_video_ram(*this, "videoram")
 	{ }
 
+	void bw2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<wd2797_device> m_fdc;
@@ -92,7 +95,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
-	void bw2(machine_config &config);
+
 	void bw2_io(address_map &map);
 	void bw2_mem(address_map &map);
 	void lcdc_map(address_map &map);

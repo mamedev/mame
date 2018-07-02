@@ -16,14 +16,14 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void init_ad5();
 	void bfm_ad5(machine_config &config);
 
-protected:
+	void init_ad5();
+
+private:
 	INTERRUPT_GEN_MEMBER(ad5_fake_timer_int);
 	void ad5_map(address_map &map);
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 };

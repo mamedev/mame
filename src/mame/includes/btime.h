@@ -37,6 +37,33 @@ public:
 	{
 	}
 
+	void lnc(machine_config &config);
+	void disco(machine_config &config);
+	void mmonkey(machine_config &config);
+	void bnj(machine_config &config);
+	void cookrace(machine_config &config);
+	void wtennis(machine_config &config);
+	void sdtennis(machine_config &config);
+	void tisland(machine_config &config);
+	void zoar(machine_config &config);
+	void btime(machine_config &config);
+
+	void init_btime();
+	void init_tisland();
+	void init_cookrace();
+	void init_zoar();
+	void init_sdtennis();
+	void init_wtennis();
+	void init_bnj();
+	void init_protennb();
+	void init_disco();
+	void init_lnc();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_hi);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_lo);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi_lo);
+
+protected:
 	/* memory pointers */
 	optional_shared_ptr<uint8_t> m_rambase;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -94,21 +121,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bnj_video_control_w);
 	DECLARE_WRITE8_MEMBER(zoar_video_control_w);
 	DECLARE_WRITE8_MEMBER(disco_video_control_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_hi);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_lo);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi_lo);
+
 	DECLARE_WRITE8_MEMBER(ay_audio_nmi_enable_w);
 
-	void init_btime();
-	void init_tisland();
-	void init_cookrace();
-	void init_zoar();
-	void init_sdtennis();
-	void init_wtennis();
-	void init_bnj();
-	void init_protennb();
-	void init_disco();
-	void init_lnc();
 	DECLARE_MACHINE_START(btime);
 	DECLARE_MACHINE_RESET(btime);
 	DECLARE_PALETTE_INIT(btime);
@@ -126,30 +141,20 @@ public:
 	uint32_t screen_update_zoar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_disco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(audio_nmi_gen);
-	void draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t transparency, uint8_t color, int priority );
-	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* tmap, uint8_t color );
+	void draw_chars(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t transparency, uint8_t color, int priority);
+	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* tmap, uint8_t color);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t color,
-							uint8_t sprite_y_adjust, uint8_t sprite_y_adjust_flip_screen,
-							uint8_t *sprite_ram, offs_t interleave );
+		uint8_t sprite_y_adjust, uint8_t sprite_y_adjust_flip_screen,
+		uint8_t *sprite_ram, offs_t interleave);
 
-							void lnc(machine_config &config);
-							void disco(machine_config &config);
-							void mmonkey(machine_config &config);
-							void bnj(machine_config &config);
-							void cookrace(machine_config &config);
-							void wtennis(machine_config &config);
-							void sdtennis(machine_config &config);
-							void tisland(machine_config &config);
-							void zoar(machine_config &config);
-							void btime(machine_config &config);
-							void audio_map(address_map &map);
-							void bnj_map(address_map &map);
-							void btime_map(address_map &map);
-							void cookrace_map(address_map &map);
-							void disco_audio_map(address_map &map);
-							void disco_map(address_map &map);
-							void lnc_map(address_map &map);
-							void mmonkey_map(address_map &map);
-							void tisland_map(address_map &map);
-							void zoar_map(address_map &map);
+	void audio_map(address_map &map);
+	void bnj_map(address_map &map);
+	void btime_map(address_map &map);
+	void cookrace_map(address_map &map);
+	void disco_audio_map(address_map &map);
+	void disco_map(address_map &map);
+	void lnc_map(address_map &map);
+	void mmonkey_map(address_map &map);
+	void tisland_map(address_map &map);
+	void zoar_map(address_map &map);
 };

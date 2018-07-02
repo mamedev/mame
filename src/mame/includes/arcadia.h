@@ -52,10 +52,11 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	void init_arcadia();
 	void arcadia(machine_config &config);
 
-protected:
+	void init_arcadia();
+
+private:
 	DECLARE_READ_LINE_MEMBER(vsync_r);
 	DECLARE_READ8_MEMBER(video_r);
 	DECLARE_WRITE8_MEMBER(video_w);
@@ -72,7 +73,6 @@ protected:
 	int sprite_collision(int n1, int n2);
 	void draw_sprites();
 
-private:
 	int m_line;
 	int m_charline;
 	int m_shift;

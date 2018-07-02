@@ -33,14 +33,12 @@ public:
 
 	void apexc(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void check_inputs();
-
-private:
 
 	DECLARE_PALETTE_INIT(apexc);
 	uint32_t screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -34,6 +34,15 @@ public:
 		m_cage(*this, "cage")
 	{ }
 
+	void atarigt(machine_config &config);
+	void tmek(machine_config &config);
+	void primrage20(machine_config &config);
+	void primrage(machine_config &config);
+
+	void init_primrage();
+	void init_tmek();
+
+private:
 	bool           m_is_primrage;
 	required_shared_ptr<uint16_t> m_colorram;
 
@@ -87,8 +96,7 @@ public:
 
 	void atarigt_colorram_w(offs_t address, uint16_t data, uint16_t mem_mask);
 	uint16_t atarigt_colorram_r(offs_t address);
-	void init_primrage();
-	void init_tmek();
+
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarigt_playfield_scan);
@@ -96,12 +104,9 @@ public:
 	DECLARE_MACHINE_RESET(atarigt);
 	DECLARE_VIDEO_START(atarigt);
 	uint32_t screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void atarigt(machine_config &config);
-	void tmek(machine_config &config);
-	void primrage20(machine_config &config);
-	void primrage(machine_config &config);
+
 	void main_map(address_map &map);
-private:
+
 	void tmek_update_mode(offs_t offset);
 	void tmek_protection_w(address_space &space, offs_t offset, uint16_t data);
 	void tmek_protection_r(address_space &space, offs_t offset, uint16_t *data);

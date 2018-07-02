@@ -26,11 +26,6 @@
 class bebox_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_GET_DEVICES
-	};
-
 	bebox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_ppc1(*this, "ppc1")
@@ -48,6 +43,19 @@ public:
 	{
 	}
 
+	void bebox(machine_config &config);
+	void bebox2(machine_config &config);
+
+	void init_bebox();
+
+	int m_dma_channel;
+
+private:
+	enum
+	{
+		TIMER_GET_DEVICES
+	};
+
 	required_device<cpu_device> m_ppc1;
 	required_device<cpu_device> m_ppc2;
 	required_device<lsi53c810_device> m_lsi53c810;
@@ -63,11 +71,11 @@ public:
 	uint32_t m_cpu_imask[2];
 	uint32_t m_interrupts;
 	uint32_t m_crossproc_interrupts;
-	int m_dma_channel;
+
 	uint16_t m_dma_offset[2][4];
 	uint8_t m_at_pages[0x10];
 	uint32_t m_scsi53c810_data[0x100 / 4];
-	void init_bebox();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_master_set_int_line);
@@ -121,11 +129,10 @@ public:
 	void bebox_update_interrupts();
 
 	static void mpc105_config(device_t *device);
-	void bebox(machine_config &config);
-	void bebox2(machine_config &config);
+
 	void bebox_mem(address_map &map);
 	void bebox_slave_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 #ifdef UNUSED_LEGACY_CODE

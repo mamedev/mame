@@ -101,6 +101,9 @@ public:
 		m_oki1bank(*this, "oki1bank")
 		{ }
 
+	void blackt96(machine_config &config);
+
+private:
 	// read/write handlers
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
@@ -122,16 +125,14 @@ public:
 	uint32_t screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tile_callback(int &tile, int& fx, int& fy, int& region);
 
-	void blackt96(machine_config &config);
 	void blackt96_map(address_map &map);
 	void oki1_map(address_map &map);
-protected:
+
 	// overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	// driver variables
 	uint8_t m_soundcmd;
 	uint8_t m_soundcmd_ready;

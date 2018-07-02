@@ -36,12 +36,17 @@ public:
 		, m_pic(*this, "pic8259")
 	{ }
 
+	void b2mrom(machine_config &config);
+	void b2m(machine_config &config);
+
+	void init_b2m();
+
+private:
 	DECLARE_READ8_MEMBER(b2m_keyboard_r);
 	DECLARE_WRITE8_MEMBER(b2m_palette_w);
 	DECLARE_READ8_MEMBER(b2m_palette_r);
 	DECLARE_WRITE8_MEMBER(b2m_localmachine_w);
 	DECLARE_READ8_MEMBER(b2m_localmachine_r);
-	void init_b2m();
 
 	DECLARE_PALETTE_INIT(b2m);
 	uint32_t screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -58,12 +63,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(b2m_fdc_drq);
 	DECLARE_FLOPPY_FORMATS( b2m_floppy_formats );
 
-	void b2mrom(machine_config &config);
-	void b2m(machine_config &config);
 	void b2m_io(address_map &map);
 	void b2m_mem(address_map &map);
 	void b2m_rom_io(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

@@ -27,12 +27,6 @@
 class boxer_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_POT_INTERRUPT,
-		TIMER_PERIODIC
-	};
-
 	boxer_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_tile_ram(*this, "tile_ram"),
@@ -46,7 +40,13 @@ public:
 
 	void boxer(machine_config &config);
 
-protected:
+private:
+	enum
+	{
+		TIMER_POT_INTERRUPT,
+		TIMER_PERIODIC
+	};
+
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(misc_r);
 	DECLARE_WRITE8_MEMBER(bell_w);
@@ -67,7 +67,6 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;

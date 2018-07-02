@@ -17,6 +17,9 @@ public:
 	{
 	}
 
+	void bosco(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_bosco_radarattr;
 
 	required_shared_ptr<uint8_t> m_bosco_starcontrol;
@@ -43,7 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER( bosco_scrollx_w );
 	DECLARE_WRITE8_MEMBER( bosco_scrolly_w );
 	DECLARE_WRITE8_MEMBER( bosco_starclr_w );
-	void bosco(machine_config &config);
+
 	void bosco_map(address_map &map);
 };
 

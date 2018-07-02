@@ -40,13 +40,15 @@ public:
 	{
 	}
 
+	void besta(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( mpcc_reg_r );
 	DECLARE_WRITE8_MEMBER( mpcc_reg_w );
 	void kbd_put(u8 data);
 
-	void besta(machine_config &config);
 	void besta_mem(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 
 	uint8_t m_term_data;

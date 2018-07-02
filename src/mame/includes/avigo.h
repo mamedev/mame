@@ -48,6 +48,14 @@ public:
 			m_nvram(*this, "nvram")
 		{ }
 
+	void avigo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(pen_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(pen_move_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(power_down_irq);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;
@@ -83,11 +91,6 @@ public:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(port_04_r);
 
-	DECLARE_INPUT_CHANGED_MEMBER(pen_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(pen_move_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(power_down_irq);
-
 	// defined in video/avigo.c
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -112,7 +115,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( avigo);
-	void avigo(machine_config &config);
+
 	void avigo_banked_map(address_map &map);
 	void avigo_io(address_map &map);
 	void avigo_mem(address_map &map);

@@ -120,15 +120,9 @@ struct asic_t
 class amstrad_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_PC2_LOW,
-		TIMER_VIDEO_UPDATE,
-		TIMER_SET_RESOLUTION
-	};
-
 	amstrad_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_exp(*this, "exp"),
 		m_maincpu(*this, "maincpu"),
 		m_ay(*this, "ay"),
 		m_fdc(*this, "upd765"),
@@ -139,7 +133,6 @@ public:
 		m_cassette(*this, "cassette"),
 		m_cart(*this, "cartslot"),
 		m_ram(*this, RAM_TAG),
-		m_exp(*this, "exp"),
 		m_rtc(*this, "rtc"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_user1(*this, "user1"),
@@ -170,6 +163,28 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void cpcplus_cartslot(machine_config &config);
+	void amstrad_base(machine_config &config);
+	void cpc664(machine_config &config);
+	void cpcplus(machine_config &config);
+	void gx4000(machine_config &config);
+	void cpc6128(machine_config &config);
+	void aleste(machine_config &config);
+	void kccomp(machine_config &config);
+	void cpc464(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(cpc_monitor_changed);
+
+	optional_device<cpc_expansion_slot_device> m_exp; // not on a GX4000
+
+private:
+	enum
+	{
+		TIMER_PC2_LOW,
+		TIMER_VIDEO_UPDATE,
+		TIMER_SET_RESOLUTION
+	};
+
 	required_device<z80_device> m_maincpu;
 	required_device<ay8910_device> m_ay;
 	optional_device<upd765_family_device> m_fdc;  // not on a GX4000
@@ -180,7 +195,6 @@ public:
 	optional_device<cassette_image_device> m_cassette; // not on a GX4000, (or technically, the 6128+)
 	optional_device<generic_slot_device> m_cart;  // only on 664+, 6128+ and GX4000
 	required_device<ram_device> m_ram;
-	optional_device<cpc_expansion_slot_device> m_exp; // not on a GX4000
 	optional_device<mc146818_device> m_rtc;  // Aleste 520EX only
 
 	int m_system_type;
@@ -233,7 +247,7 @@ public:
 	DECLARE_PALETTE_INIT(aleste);
 	uint32_t screen_update_amstrad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_amstrad);
-	DECLARE_INPUT_CHANGED_MEMBER(cpc_monitor_changed);
+
 	TIMER_CALLBACK_MEMBER(amstrad_pc2_low);
 	TIMER_CALLBACK_MEMBER(amstrad_video_update_timer);
 	TIMER_CALLBACK_MEMBER(cb_set_resolution);
@@ -263,18 +277,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
-	void cpcplus_cartslot(machine_config &config);
-	void amstrad_base(machine_config &config);
-	void cpc664(machine_config &config);
-	void cpcplus(machine_config &config);
-	void gx4000(machine_config &config);
-	void cpc6128(machine_config &config);
-	void aleste(machine_config &config);
-	void kccomp(machine_config &config);
-	void cpc464(machine_config &config);
 	void amstrad_io(address_map &map);
 	void amstrad_mem(address_map &map);
-protected:
+
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_user1;
 	required_memory_bank m_bank1;

@@ -46,13 +46,15 @@ public:
 		, m_buttons(*this, "BUTTONS.%u", 0)
 	{ }
 
+	void bbcbc(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(input_select_w);
 
-	void bbcbc(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t m_input_select;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

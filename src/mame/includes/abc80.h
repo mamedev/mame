@@ -95,6 +95,10 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
+	void abc80(machine_config &config);
+	void abc80_video(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<sn76477_device> m_csg;
@@ -187,8 +191,7 @@ public:
 	emu_timer *m_blink_timer;
 	emu_timer *m_vsync_on_timer;
 	emu_timer *m_vsync_off_timer;
-	void abc80(machine_config &config);
-	void abc80_video(machine_config &config);
+
 	void abc80_io(address_map &map);
 	void abc80_mem(address_map &map);
 };

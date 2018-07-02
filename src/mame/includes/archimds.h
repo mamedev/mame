@@ -61,6 +61,12 @@ public:
 		m_dac(*this, { "dac0", "dac1", "dac2", "dac3", "dac4", "dac5", "dac6", "dac7" })
 		{ }
 
+	DECLARE_WRITE_LINE_MEMBER( a310_kart_rx_w );
+	DECLARE_WRITE_LINE_MEMBER( a310_kart_tx_w );
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+protected:
 	optional_device<aakart_device> m_kart;
 	void archimedes_init();
 	void archimedes_reset();
@@ -83,8 +89,6 @@ public:
 	DECLARE_WRITE32_MEMBER(archimedes_ioc_w);
 	DECLARE_READ32_MEMBER(archimedes_vidc_r);
 	DECLARE_WRITE32_MEMBER(archimedes_vidc_w);
-	DECLARE_WRITE_LINE_MEMBER( a310_kart_rx_w );
-	DECLARE_WRITE_LINE_MEMBER( a310_kart_tx_w );
 
 	uint8_t m_i2c_clk;
 	int16_t m_memc_pages[0x2000]; // the logical RAM area is 32 megs, and the smallest page size is 4k
@@ -95,10 +99,8 @@ public:
 	uint8_t m_vidc_interlace;
 	uint16_t m_vidc_vblank_time;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<i2cmem_device> m_i2cmem;
 	optional_device<wd1772_device> m_fdc;

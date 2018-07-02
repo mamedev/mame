@@ -36,7 +36,7 @@ public:
 
 	void bsktball(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE_LINE_MEMBER(nmion_w);
 	DECLARE_WRITE_LINE_MEMBER(ld1_w);
 	DECLARE_WRITE_LINE_MEMBER(ld2_w);
@@ -50,13 +50,11 @@ protected:
 	DECLARE_WRITE8_MEMBER(bsktball_note_w);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void main_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_motion;

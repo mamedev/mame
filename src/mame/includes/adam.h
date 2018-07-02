@@ -51,6 +51,9 @@ public:
 		m_spindis(1)
 	{ }
 
+	void adam(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<m6801_cpu_device> m_netcpu;
 	required_device<tms9928a_device> m_vdc;
@@ -112,7 +115,7 @@ public:
 
 	// video state
 	int m_vdp_nmi;
-	void adam(machine_config &config);
+
 	void adam_io(address_map &map);
 	void adam_mem(address_map &map);
 	void m6801_io(address_map &map);

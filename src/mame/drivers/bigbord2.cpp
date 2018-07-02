@@ -111,6 +111,11 @@ public:
 	{
 	}
 
+	void bigbord2(machine_config &config);
+
+	void init_bigbord2();
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(side_select_w);
 	DECLARE_WRITE_LINE_MEMBER(smc1_w);
 	DECLARE_WRITE_LINE_MEMBER(smc2_w);
@@ -126,17 +131,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdya_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	void init_bigbord2();
+
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void bigbord2(machine_config &config);
 	void bigbord2_io(address_map &map);
 	void bigbord2_mem(address_map &map);
-private:
+
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, bool ac_curs);
 	u8 m_term_data;
 	u8 m_term_status;

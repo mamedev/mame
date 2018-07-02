@@ -32,13 +32,15 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void buster(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(coin_output_w);
 	uint32_t screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void buster(machine_config &config);
 	void mainmap(address_map &map);
-protected:
+
 	virtual void video_start() override;
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;

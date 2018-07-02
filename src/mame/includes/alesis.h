@@ -138,7 +138,7 @@ public:
 	void hr16(machine_config &config);
 	void sr16(machine_config &config);
 
-protected:
+private:
 	DECLARE_PALETTE_INIT(alesis);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -163,7 +163,6 @@ protected:
 	void sr16_io(address_map &map);
 	void sr16_mem(address_map &map);
 
-private:
 	uint8_t       m_kb_matrix;
 	uint8_t       m_leds;
 	uint8_t       m_lcd_digits[5];

@@ -43,8 +43,12 @@ public:
 		m_coin_latch(0), m_coin_inserted(0)
 	{ }
 
+	void blockade(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
+
+private:
 	DECLARE_WRITE8_MEMBER(coin_latch_w);
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -55,15 +59,13 @@ public:
 	DECLARE_WRITE8_MEMBER(env_on_w);
 	DECLARE_WRITE8_MEMBER(env_off_w);
 
-	void blockade(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;

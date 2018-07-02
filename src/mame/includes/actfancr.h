@@ -25,6 +25,10 @@ public:
 		m_spritegen(*this, "spritegen"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void triothep(machine_config &config);
+	void actfancr(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_main_ram;
 	uint16_t m_spriteram16[0x800/2]; // a 16-bit copy of spriteram for use with the MXC06 code
@@ -46,8 +50,7 @@ public:
 	DECLARE_MACHINE_START(triothep);
 	DECLARE_MACHINE_RESET(triothep);
 	uint32_t screen_update_actfancr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void triothep(machine_config &config);
-	void actfancr(machine_config &config);
+
 	void actfan_map(address_map &map);
 	void dec0_s_map(address_map &map);
 	void triothep_map(address_map &map);

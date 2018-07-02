@@ -100,6 +100,50 @@ public:
 		m_bbcconfig(*this, "BBCCONFIG")
 	{ }
 
+	void bbc_eprom_sockets(machine_config &config);
+	void discmon(machine_config &config);
+	void discmate(machine_config &config);
+	void reutapm(machine_config &config);
+	void bbcbp(machine_config &config);
+	void abc310(machine_config &config);
+	void bbcmc(machine_config &config);
+	void bbcmt(machine_config &config);
+	void bbcm(machine_config &config);
+	void ltmpm(machine_config &config);
+	void bbcmet(machine_config &config);
+	void cfa3000(machine_config &config);
+	void bbcbp128(machine_config &config);
+	void pro128s(machine_config &config);
+	void bbcm512(machine_config &config);
+	void bbcmarm(machine_config &config);
+	void abc110(machine_config &config);
+	void ltmpbp(machine_config &config);
+	void bbcb_de(machine_config &config);
+	void bbcb(machine_config &config);
+	void bbcmaiv(machine_config &config);
+	void bbca(machine_config &config);
+	void bbcb_us(machine_config &config);
+	void econx25(machine_config &config);
+	void acw443(machine_config &config);
+
+	void init_bbc();
+
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
+
+	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	DECLARE_WRITE_LINE_MEMBER(side_w);
+	
+	DECLARE_MACHINE_RESET(torch);
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats_bbc);
+
+protected:
+	void bbcb_mem(address_map &map);
+
+private:
 	enum machine_type_t
 	{
 		MODELA,
@@ -116,8 +160,6 @@ public:
 		GREEN = 2,
 		AMBER = 3
 	};
-
-	DECLARE_FLOPPY_FORMATS(floppy_formats_bbc);
 
 	DECLARE_WRITE8_MEMBER(page_selecta_w);
 	DECLARE_WRITE8_MEMBER(page_selectb_w);
@@ -145,14 +187,13 @@ public:
 	DECLARE_WRITE8_MEMBER(bbc_videoULA_w);
 	DECLARE_READ8_MEMBER(bbc_fe_r);
 
-	void init_bbc();
 	DECLARE_VIDEO_START(bbc);
 
 	DECLARE_MACHINE_START(bbca);
 	DECLARE_MACHINE_RESET(bbca);
 	DECLARE_MACHINE_START(bbcb);
 	DECLARE_MACHINE_RESET(bbcb);
-	DECLARE_MACHINE_RESET(torch);
+
 	DECLARE_MACHINE_START(bbcbp);
 	DECLARE_MACHINE_RESET(bbcbp);
 	DECLARE_MACHINE_START(bbcm);
@@ -177,7 +218,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bbc_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_de_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
+
 	void update_acia_rxd();
 	void update_acia_dcd();
 	void update_acia_cts();
@@ -186,11 +227,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_rxd_serial);
 	DECLARE_WRITE_LINE_MEMBER(write_dcd_serial);
 	DECLARE_WRITE_LINE_MEMBER(write_cts_serial);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(side_w);
 
 	UPD7002_GET_ANALOGUE(BBC_get_analogue_input);
 	UPD7002_EOC(BBC_uPD7002_EOC);
@@ -210,34 +246,10 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void bbc_eprom_sockets(machine_config &config);
-	void discmon(machine_config &config);
-	void discmate(machine_config &config);
-	void reutapm(machine_config &config);
-	void bbcbp(machine_config &config);
-	void abc310(machine_config &config);
-	void bbcmc(machine_config &config);
-	void bbcmt(machine_config &config);
-	void bbcm(machine_config &config);
-	void ltmpm(machine_config &config);
-	void bbcmet(machine_config &config);
-	void cfa3000(machine_config &config);
-	void bbcbp128(machine_config &config);
-	void pro128s(machine_config &config);
-	void bbcm512(machine_config &config);
-	void bbcmarm(machine_config &config);
-	void abc110(machine_config &config);
-	void ltmpbp(machine_config &config);
-	void bbcb_de(machine_config &config);
-	void bbcb(machine_config &config);
-	void bbcmaiv(machine_config &config);
-	void bbca(machine_config &config);
-	void bbcb_us(machine_config &config);
-	void econx25(machine_config &config);
-	void acw443(machine_config &config);
+
 	void bbc_base(address_map &map);
 	void bbca_mem(address_map &map);
-	void bbcb_mem(address_map &map);
+
 	void bbcb_nofdc_mem(address_map &map);
 	void bbcbp128_mem(address_map &map);
 	void bbcbp_mem(address_map &map);
@@ -246,7 +258,6 @@ public:
 	void bbcm_fetch(address_map &map);
 	void reutapm_mem(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<hd6845_device> m_hd6845;
@@ -255,7 +266,7 @@ private:
 	optional_device<sn76489_device> m_sn;
 	optional_device<samples_device> m_samples;
 	required_ioport_array<13> m_keyboard;
-public: // HACK FOR MC6845
+
 	optional_device<saa5050_device> m_trom;
 	optional_device<tms5220_device> m_tms;
 	optional_device<cassette_image_device> m_cassette;

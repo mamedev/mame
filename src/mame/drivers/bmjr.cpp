@@ -36,6 +36,11 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void bmjr(machine_config &config);
+
+	void init_bmjr();
+
+private:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(ff_r);
@@ -45,12 +50,10 @@ public:
 	DECLARE_READ8_MEMBER(tape_stop_r);
 	DECLARE_READ8_MEMBER(tape_start_r);
 	DECLARE_WRITE8_MEMBER(xor_display_w);
-	void init_bmjr();
 	u32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bmjr(machine_config &config);
 	void bmjr_mem(address_map &map);
-private:
+
 	bool m_tape_switch;
 	u8 m_xor_display;
 	u8 m_key_mux;

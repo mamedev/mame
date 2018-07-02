@@ -47,7 +47,7 @@ public:
 
 	void babbage(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(pio2_a_r);
 	DECLARE_WRITE8_MEMBER(pio1_b_w);
 	DECLARE_WRITE8_MEMBER(pio2_b_w);
@@ -59,7 +59,6 @@ protected:
 	void babbage_io(address_map &map);
 	void babbage_map(address_map &map);
 
-private:
 	uint8_t m_segment;
 	uint8_t m_key;
 	uint8_t m_prev_key;

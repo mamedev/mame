@@ -12,11 +12,6 @@
 class artmagic_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_IRQ_OFF
-	};
-
 	artmagic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -28,6 +23,24 @@ public:
 		, m_vram0(*this, "vram0")
 		, m_vram1(*this, "vram1")
 	{ }
+
+	void cheesech(machine_config &config);
+	void artmagic(machine_config &config);
+	void shtstar(machine_config &config);
+	void stonebal(machine_config &config);
+
+	void init_shtstar();
+	void init_cheesech();
+	void init_ultennis();
+	void init_stonebal();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
+
+private:
+	enum
+	{
+		TIMER_IRQ_OFF
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -71,11 +84,7 @@ public:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
-	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
-	void init_shtstar();
-	void init_cheesech();
-	void init_ultennis();
-	void init_stonebal();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -85,10 +94,6 @@ public:
 	void update_irq_state();
 	inline uint16_t *address_to_vram(offs_t *address);
 
-	void cheesech(machine_config &config);
-	void artmagic(machine_config &config);
-	void shtstar(machine_config &config);
-	void stonebal(machine_config &config);
 	void main_map(address_map &map);
 	void shtstar_guncpu_io_map(address_map &map);
 	void shtstar_guncpu_map(address_map &map);
@@ -97,6 +102,6 @@ public:
 	void stonebal_map(address_map &map);
 	void stonebal_tms_map(address_map &map);
 	void tms_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

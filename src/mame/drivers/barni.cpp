@@ -30,11 +30,13 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu") { }
 
-		void barni(machine_config &config);
-		void audiocpu_map(address_map &map);
-		void maincpu_map(address_map &map);
-		void subcpu_map(address_map &map);
+	void barni(machine_config &config);
+
 private:
+	void audiocpu_map(address_map &map);
+	void maincpu_map(address_map &map);
+	void subcpu_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 };
 

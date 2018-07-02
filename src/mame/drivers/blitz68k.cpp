@@ -79,6 +79,38 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void hermit(machine_config &config);
+	void bankrob(machine_config &config);
+	void cjffruit(machine_config &config);
+	void steaser(machine_config &config);
+	void deucesw2(machine_config &config);
+	void ilpag(machine_config &config);
+	void maxidbl(machine_config &config);
+	void dualgame(machine_config &config);
+	void bankroba(machine_config &config);
+	void bankrob_map(address_map &map);
+	void bankroba_map(address_map &map);
+	void cjffruit_map(address_map &map);
+	void deucesw2_map(address_map &map);
+	void dualgame_map(address_map &map);
+	void hermit_map(address_map &map);
+	void ilpag_map(address_map &map);
+	void maxidbl_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void steaser_map(address_map &map);
+
+	void init_bankrob();
+	void init_cjffruit();
+	void init_deucesw2();
+	void init_megadble();
+	void init_bankroba();
+	void init_maxidbl();
+	void init_cj3play();
+	void init_megadblj();
+	void init_hermit();
+	void init_dualgame();
+
+private:
 	DECLARE_WRITE16_MEMBER(blit_copy_w);
 	DECLARE_READ8_MEMBER(blit_status_r);
 	DECLARE_WRITE8_MEMBER(blit_x_w);
@@ -157,43 +189,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq1);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq3);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq5);
-	void init_bankrob();
-	void init_cjffruit();
-	void init_deucesw2();
-	void init_megadble();
-	void init_bankroba();
-	void init_maxidbl();
-	void init_cj3play();
-	void init_megadblj();
-	void init_hermit();
-	void init_dualgame();
+
 	DECLARE_VIDEO_START(blitz68k);
 	DECLARE_VIDEO_START(blitz68k_addr_factor1);
 	uint32_t screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(steaser_mcu_sim);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	void hermit(machine_config &config);
-	void bankrob(machine_config &config);
-	void cjffruit(machine_config &config);
-	void steaser(machine_config &config);
-	void deucesw2(machine_config &config);
-	void ilpag(machine_config &config);
-	void maxidbl(machine_config &config);
-	void dualgame(machine_config &config);
-	void bankroba(machine_config &config);
-	void bankrob_map(address_map &map);
-	void bankroba_map(address_map &map);
-	void cjffruit_map(address_map &map);
-	void deucesw2_map(address_map &map);
-	void dualgame_map(address_map &map);
-	void hermit_map(address_map &map);
-	void ilpag_map(address_map &map);
-	void maxidbl_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void steaser_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_leds.resolve(); }
 
 	optional_shared_ptr<uint16_t> m_nvram;

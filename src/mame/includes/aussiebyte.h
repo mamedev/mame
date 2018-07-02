@@ -69,7 +69,7 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(aussiebyte);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
@@ -111,7 +111,6 @@ protected:
 	void aussiebyte_io(address_map &map);
 	void aussiebyte_map(address_map &map);
 
-private:
 	uint8_t crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, uint16_t ac_cnt, bool ac_curs);
 	bool m_port15; // rom switched in (0), out (1)
 	uint8_t m_port17;

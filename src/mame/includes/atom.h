@@ -68,6 +68,12 @@ public:
 			m_video_ram(*this, "video_ram")
 	{ }
 
+	void atombb(machine_config &config);
+	void atom(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cassette_image_device> m_cassette;
@@ -95,7 +101,6 @@ public:
 	DECLARE_READ8_MEMBER( ppi_pc_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_READ8_MEMBER( vdg_videoram_r );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_WRITE_LINE_MEMBER( atom_8271_interrupt_callback );
 	DECLARE_WRITE_LINE_MEMBER( motor_w );
 
@@ -118,8 +123,7 @@ public:
 	image_init_result load_cart(device_image_interface &image, generic_slot_device &slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, *m_cart); }
 	DECLARE_QUICKLOAD_LOAD_MEMBER(atom_atm);
-	void atombb(machine_config &config);
-	void atom(machine_config &config);
+
 	void atom_mem(address_map &map);
 	void atombb_mem(address_map &map);
 	void prophet_mem(address_map &map);
@@ -136,6 +140,9 @@ public:
 	{
 	}
 
+	void atomeb(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(eprom_r);
@@ -153,7 +160,7 @@ public:
 	template<int I> DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ext_load) { return load_cart(image, *m_ext[I]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e0_load) { return load_cart(image, *m_e0); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e1_load) { return load_cart(image, *m_e1); }
-	void atomeb(machine_config &config);
+
 	void atomeb_mem(address_map &map);
 };
 

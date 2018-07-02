@@ -26,6 +26,9 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_rombank(*this, "rombank") { }
 
+	void aliens(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -48,7 +51,7 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
-	void aliens(machine_config &config);
+
 	void aliens_map(address_map &map);
 	void aliens_sound_map(address_map &map);
 	void bank0000_map(address_map &map);

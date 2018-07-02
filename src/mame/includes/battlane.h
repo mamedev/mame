@@ -20,6 +20,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void battlane(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_tileram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -53,6 +56,6 @@ public:
 	INTERRUPT_GEN_MEMBER(battlane_cpu1_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg_bitmap( bitmap_ind16 &bitmap );
-	void battlane(machine_config &config);
+
 	void battlane_map(address_map &map);
 };

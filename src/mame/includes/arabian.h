@@ -21,6 +21,9 @@ public:
 		m_mcu(*this, "mcu"),
 		m_palette(*this, "palette") { }
 
+	void arabian(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_custom_cpu_ram;
 	required_shared_ptr<uint8_t> m_blitter;
@@ -60,7 +63,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<palette_device> m_palette;
-	void arabian(machine_config &config);
+
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
 };

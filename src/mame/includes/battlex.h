@@ -19,6 +19,14 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void dodgeman(machine_config &config);
+	void battlex(machine_config &config);
+
+	void init_battlex();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(battlex_in0_b4_r);
+
+private:
 	uint8_t m_in0_b4;
 
 	/* memory pointers */
@@ -36,8 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(battlex_scroll_starfield_w);
 	DECLARE_WRITE8_MEMBER(battlex_videoram_w);
 	DECLARE_WRITE8_MEMBER(battlex_flipscreen_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(battlex_in0_b4_r);
-	void init_battlex();
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -51,8 +58,7 @@ public:
 
 	DECLARE_VIDEO_START(dodgeman);
 	TILE_GET_INFO_MEMBER(get_dodgeman_bg_tile_info);
-	void dodgeman(machine_config &config);
-	void battlex(machine_config &config);
+
 	void battlex_map(address_map &map);
 	void dodgeman_io_map(address_map &map);
 	void io_map(address_map &map);

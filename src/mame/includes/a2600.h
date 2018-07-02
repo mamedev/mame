@@ -51,6 +51,7 @@ protected:
 		m_swb(*this, "SWB")
 	{ }
 
+protected:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(switch_A_w);
@@ -96,7 +97,7 @@ public:
 	void a2600(machine_config &config);
 	void a2600p(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(cart_over_tia_w);
@@ -108,7 +109,6 @@ protected:
 
 	void a2600_cartslot(machine_config &config);
 
-private:
 	required_device<vcs_cart_slot_device> m_cart;
 };
 

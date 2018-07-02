@@ -43,6 +43,15 @@ public:
 			m_mob(*this, "mob")
 			{ }
 
+	void badlands(machine_config &config);
+
+	void init_badlands();
+
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	DECLARE_VIDEO_START(badlands);
+	DECLARE_MACHINE_START(badlands);
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<atari_sound_comm_device> m_soundcomm;
@@ -57,11 +66,8 @@ public:
 	DECLARE_READ16_MEMBER(pedal_1_r);
 	DECLARE_READ8_MEMBER(audio_io_r);
 	DECLARE_WRITE8_MEMBER(audio_io_w);
-	void init_badlands();
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_MACHINE_START(badlands);
+
 	DECLARE_MACHINE_RESET(badlands);
-	DECLARE_VIDEO_START(badlands);
 	uint32_t screen_update_badlands(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	DECLARE_WRITE16_MEMBER(video_int_ack_w);
@@ -69,11 +75,10 @@ public:
 	DECLARE_WRITE16_MEMBER( badlands_pf_bank_w );
 
 	static const atari_motion_objects_config s_mob_config;
-	void badlands(machine_config &config);
+
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 
-private:
 	uint8_t           m_pedal_value[2];
 	uint8_t           m_playfield_tile_bank;
 };
@@ -87,6 +92,9 @@ public:
 		  m_spriteram(*this, "spriteram")
 	{}
 
+	void badlandsb(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(bootleg_shared_r);
 	DECLARE_WRITE8_MEMBER(bootleg_shared_w);
 	DECLARE_WRITE8_MEMBER(bootleg_main_irq_w);
@@ -94,15 +102,12 @@ public:
 	DECLARE_READ8_MEMBER(sound_response_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(bootleg_sound_scanline);
 
-	void badlandsb(machine_config &config);
 	void bootleg_map(address_map &map);
 	void bootleg_audio_map(address_map &map);
 	uint32_t screen_update_badlandsbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-protected:
 	virtual void machine_reset() override;
 
-private:
 	required_shared_ptr<uint8_t> m_b_sharedram;
 	required_shared_ptr<uint16_t> m_spriteram;
 

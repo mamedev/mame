@@ -62,10 +62,11 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	void beta(machine_config &config);
 
-protected:
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
+private:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( riot_pa_r );
@@ -80,7 +81,6 @@ protected:
 
 	void beta_mem(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_eprom;

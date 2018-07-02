@@ -26,11 +26,6 @@
 class asuka_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_CADASH_INTERRUPT5
-	};
-
 	asuka_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_cadash_shared_ram(*this, "sharedram")
@@ -48,6 +43,20 @@ public:
 		, m_audiobank(*this, "audiobank")
 	{ }
 
+	void mofflott(machine_config &config);
+	void asuka(machine_config &config);
+	void cadash(machine_config &config);
+	void eto(machine_config &config);
+	void bonzeadv(machine_config &config);
+
+	void init_cadash();
+
+private:
+	enum
+	{
+		TIMER_CADASH_INTERRUPT5
+	};
+
 	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(asuka_msm5205_address_w);
@@ -63,17 +72,12 @@ public:
 	uint32_t screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_asuka);
 	INTERRUPT_GEN_MEMBER(cadash_interrupt);
-	void init_cadash();
+
 	INTERRUPT_GEN_MEMBER(bonze_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
 	DECLARE_WRITE_LINE_MEMBER(asuka_msm5205_vck);
 
-	void mofflott(machine_config &config);
-	void asuka(machine_config &config);
-	void cadash(machine_config &config);
-	void eto(machine_config &config);
-	void bonzeadv(machine_config &config);
 	void asuka_map(address_map &map);
 	void bonzeadv_map(address_map &map);
 	void bonzeadv_z80_map(address_map &map);
@@ -83,7 +87,7 @@ public:
 	void cadash_z80_map(address_map &map);
 	void eto_map(address_map &map);
 	void z80_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	/* video-related */

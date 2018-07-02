@@ -23,6 +23,9 @@ public:
 		m_nvram(*this, "nvram") ,
 		m_vectorram(*this, "vectorram") { }
 
+	void aztarac(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<vector_device> m_vector;
@@ -52,7 +55,7 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	inline void read_vectorram(uint16_t *vectorram, int addr, int *x, int *y, int *c);
-	void aztarac(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

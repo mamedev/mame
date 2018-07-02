@@ -254,16 +254,19 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void bingoman(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(bingoman);
-	void bingoman(machine_config &config);
+
 	void bingoman_io_map(address_map &map);
 	void bingoman_prg_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

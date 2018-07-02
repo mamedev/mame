@@ -29,6 +29,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void ajax(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 	DECLARE_READ8_MEMBER(ls138_f10_r);
 	DECLARE_WRITE8_MEMBER(ls138_f10_w);
@@ -42,12 +45,11 @@ public:
 	K051316_CB_MEMBER(zoom_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	void ajax(machine_config &config);
+
 	void ajax_main_map(address_map &map);
 	void ajax_sound_map(address_map &map);
 	void ajax_sub_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

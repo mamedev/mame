@@ -43,6 +43,10 @@ public:
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram") { }
 
+	void bestleag(machine_config &config);
+	void bestleaw(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -73,8 +77,7 @@ public:
 	uint32_t screen_update_bestleag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bestleaw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void bestleag(machine_config &config);
-	void bestleaw(machine_config &config);
+
 	void bestleag_map(address_map &map);
 };
 

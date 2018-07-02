@@ -88,6 +88,12 @@ public:
 	{
 	}
 
+	void bml3mk2(machine_config &config);
+	void bml3mk5(machine_config &config);
+	void bml3(machine_config &config);
+	void bml3_common(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(bml3_6845_r);
 	DECLARE_WRITE8_MEMBER(bml3_6845_w);
 	DECLARE_READ8_MEMBER(bml3_keyboard_r);
@@ -130,14 +136,10 @@ public:
 	DECLARE_READ8_MEMBER(bml3_ym2203_r);
 	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
 
-	void bml3mk2(machine_config &config);
-	void bml3mk5(machine_config &config);
-	void bml3(machine_config &config);
-	void bml3_common(machine_config &config);
 	void bml3_mem(address_map &map);
 	void bml3mk2_mem(address_map &map);
 	void bml3mk5_mem(address_map &map);
-private:
+
 	u8 m_hres_reg;
 	u8 m_crtc_vreg[0x100];
 	u8 m_psg_latch;

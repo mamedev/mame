@@ -22,9 +22,10 @@ public:
 	{ }
 
 	void bgt(machine_config &config);
+
+private:
 	void bgt_io(address_map &map);
 	void bgt_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;

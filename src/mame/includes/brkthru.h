@@ -23,6 +23,14 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void brkthru(machine_config &config);
+	void darwin(machine_config &config);
+
+	void init_brkthru();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_fg_videoram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -48,8 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(brkthru_bgram_w);
 	DECLARE_WRITE8_MEMBER(brkthru_fgram_w);
 	DECLARE_WRITE8_MEMBER(brkthru_1800_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	void init_brkthru();
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
@@ -59,8 +66,7 @@ public:
 	uint32_t screen_update_brkthru(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int prio );
-	void brkthru(machine_config &config);
-	void darwin(machine_config &config);
+
 	void brkthru_map(address_map &map);
 	void darwin_map(address_map &map);
 	void sound_map(address_map &map);

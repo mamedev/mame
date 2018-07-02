@@ -33,6 +33,25 @@ public:
 		, m_okibank(*this, "okibank")
 	{ }
 
+	void spinlbrk(machine_config &config);
+	void aerofgt(machine_config &config);
+	void karatblz(machine_config &config);
+	void pspikesb(machine_config &config);
+	void aerfboo2(machine_config &config);
+	void pspikes(machine_config &config);
+	void wbbc97(machine_config &config);
+	void aerfboot(machine_config &config);
+	void pspikesc(machine_config &config);
+	void karatblzbl(machine_config &config);
+	void spikes91(machine_config &config);
+	void aerofgtb(machine_config &config);
+	void turbofrc(machine_config &config);
+	void kickball(machine_config &config);
+
+	void init_banked_oki();
+	void init_kickball();
+
+private:
 	/* memory pointers */
 	optional_shared_ptr_array<uint16_t, 2> m_vram;
 	optional_shared_ptr<uint16_t> m_rasterram;
@@ -113,8 +132,7 @@ public:
 	DECLARE_VIDEO_START(spinlbrk);
 	DECLARE_VIDEO_START(turbofrc);
 	DECLARE_VIDEO_START(wbbc97);
-	void init_banked_oki();
-	void init_kickball();
+
 	uint32_t screen_update_pspikes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spikes91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -132,20 +150,7 @@ public:
 	void spikes91_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void aerfboot_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void wbbc97_draw_bitmap( bitmap_rgb32 &bitmap );
-	void spinlbrk(machine_config &config);
-	void aerofgt(machine_config &config);
-	void karatblz(machine_config &config);
-	void pspikesb(machine_config &config);
-	void aerfboo2(machine_config &config);
-	void pspikes(machine_config &config);
-	void wbbc97(machine_config &config);
-	void aerfboot(machine_config &config);
-	void pspikesc(machine_config &config);
-	void karatblzbl(machine_config &config);
-	void spikes91(machine_config &config);
-	void aerofgtb(machine_config &config);
-	void turbofrc(machine_config &config);
-	void kickball(machine_config &config);
+
 	void aerfboo2_map(address_map &map);
 	void aerfboot_map(address_map &map);
 	void aerfboot_sound_map(address_map &map);

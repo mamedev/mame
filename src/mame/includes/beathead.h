@@ -31,7 +31,7 @@ public:
 
 	void beathead(machine_config &config);
 
-protected:
+private:
 	// in drivers/beathead.c
 	virtual void update_interrupts() override;
 	DECLARE_WRITE32_MEMBER( interrupt_control_w );
@@ -57,7 +57,6 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-private:
 	required_device<atari_jsa_iii_device> m_jsa;
 	required_device<timer_device> m_scan_timer;
 

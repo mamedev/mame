@@ -20,7 +20,6 @@ class bladestl_state : public driver_device
 public:
 	bladestl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007342(*this, "k007342"),
@@ -36,6 +35,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void bladestl(machine_config &config);
+
+private:
 	/* devices */
 	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE8_MEMBER(bladestl_bankswitch_w);
@@ -47,11 +49,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bladestl_scanline);
 	K007342_CALLBACK_MEMBER(bladestl_tile_callback);
 	K007420_CALLBACK_MEMBER(bladestl_sprite_callback);
-	void bladestl(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

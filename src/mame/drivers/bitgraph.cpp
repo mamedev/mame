@@ -112,6 +112,11 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
+	void bg_motherboard(machine_config &config);
+	void bitgrpha(machine_config &config);
+	void bitgrphb(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(pia_r);
 	DECLARE_WRITE8_MEMBER(pia_w);
 	DECLARE_READ8_MEMBER(pia_pa_r);
@@ -140,13 +145,10 @@ public:
 	DECLARE_WRITE8_MEMBER(ppu_write);
 	DECLARE_WRITE8_MEMBER(ppu_i8243_w);
 
-	void bg_motherboard(machine_config &config);
-	void bitgrpha(machine_config &config);
-	void bitgrphb(machine_config &config);
 	void bitgrapha_mem(address_map &map);
 	void bitgraphb_mem(address_map &map);
 	void ppu_io(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
