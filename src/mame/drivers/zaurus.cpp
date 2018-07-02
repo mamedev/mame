@@ -1505,7 +1505,7 @@ void zaurus_state::machine_reset()
 /* TODO: Hack */
 TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 {
-	#if 0
+#if 0
 	m_rtc_tick++;
 	m_rtc_tick&=1;
 
@@ -1513,7 +1513,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 		pxa255_set_irq_line(PXA255_INT_RTC_HZ,1);
 	else
 		pxa255_set_irq_line(PXA255_INT_RTC_HZ,0);
-	#endif
+#else
+	(void)m_rtc_tick;
+#endif
 }
 
 // TODO: main CPU differs greatly between versions!
