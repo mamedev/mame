@@ -62,6 +62,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void cb2001(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_vram_fg;
 	required_shared_ptr<uint16_t> m_vram_bg;
 	int m_videobank;
@@ -85,7 +88,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void cb2001(machine_config &config);
+	
 	void cb2001_io(address_map &map);
 	void cb2001_map(address_map &map);
 };

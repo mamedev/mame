@@ -45,6 +45,9 @@ public:
 		, m_opt(0)
 	{ }
 
+	void cfx9850(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(kol_w);
 	DECLARE_WRITE8_MEMBER(koh_w);
 	DECLARE_WRITE8_MEMBER(port_w);
@@ -56,13 +59,11 @@ public:
 	DECLARE_PALETTE_INIT(cfx9850);
 	u32 screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void cfx9850(machine_config &config);
 	void cfx9850(address_map &map);
-protected:
+
 	required_ioport_array<12> m_ko_port;
 	required_device<cpu_device> m_maincpu;
 
-private:
 	u16 m_ko;   // KO lines KO1 - KO14
 	u8 m_port;  // PORT lines PORT0 - PORT7 (serial I/O)
 	u8 m_opt;   // OPT lines OPT0 - OPT7 (contrast)

@@ -102,6 +102,12 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
+	void caloriee(machine_config &config);
+	void calorie(machine_config &config);
+
+	void init_calorieb();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_fg_ram;
 	required_shared_ptr<uint8_t> m_sprites;
@@ -115,7 +121,7 @@ public:
 	DECLARE_WRITE8_MEMBER(calorie_flipscreen_w);
 	DECLARE_READ8_MEMBER(calorie_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(bogus_w);
-	void init_calorieb();
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
@@ -127,8 +133,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
-	void caloriee(machine_config &config);
-	void calorie(machine_config &config);
+
 	void calorie_map(address_map &map);
 	void calorie_sound_io_map(address_map &map);
 	void calorie_sound_map(address_map &map);

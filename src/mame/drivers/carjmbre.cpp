@@ -63,6 +63,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void carjmbre(machine_config &config);
+
+private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -86,11 +89,10 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void carjmbre(machine_config &config);
 	void main_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void video_start() override;
 };

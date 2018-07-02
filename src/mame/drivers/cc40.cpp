@@ -105,6 +105,11 @@ public:
 		m_sysram[1] = nullptr;
 	}
 
+	void cc40(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
+
+private:
 	void postload();
 	void init_sysram(int chip, u16 size);
 	void update_lcd_indicator(u8 y, u8 x, int state);
@@ -124,17 +129,15 @@ public:
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 
 	DECLARE_PALETTE_INIT(cc40);
-	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
 	HD44780_PIXEL_UPDATE(cc40_pixel_update);
-	void cc40(machine_config &config);
+
 	void main_map(address_map &map);
 
-protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-private:
 	required_device<tms70c20_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;

@@ -9,20 +9,21 @@ class by68701_state : public driver_device
 public:
 	by68701_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void by68701(machine_config &config);
+
+	void init_by68701();
+
+private:
 	void by68701_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	void init_by68701();
 };
 
 

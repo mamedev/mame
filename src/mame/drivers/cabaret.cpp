@@ -47,6 +47,11 @@ public:
 		, m_led(*this, "led6")
 	{ }
 
+	void cabaret(machine_config &config);
+
+	void init_cabaret();
+
+private:
 	DECLARE_WRITE8_MEMBER(bg_scroll_w);
 	DECLARE_WRITE8_MEMBER(bg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
@@ -55,16 +60,15 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi2_b_w);
 	DECLARE_WRITE8_MEMBER(ppi2_c_w);
 	void show_out();
-	void init_cabaret();
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cabaret_interrupt);
-	void cabaret(machine_config &config);
+
 	void cabaret_map(address_map &map);
 	void cabaret_portmap(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_led.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;

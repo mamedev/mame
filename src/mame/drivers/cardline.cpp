@@ -48,6 +48,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void cardline(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(attr_w);
 	DECLARE_WRITE8_MEMBER(video_w);
@@ -65,11 +68,9 @@ public:
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void cardline(machine_config &config);
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 
 	required_shared_ptr<uint8_t> m_videoram;

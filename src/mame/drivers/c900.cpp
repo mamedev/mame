@@ -43,15 +43,17 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void c900(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(key_r);
 	DECLARE_READ16_MEMBER(stat_r);
 	void kbd_put(u8 data);
 
-	void c900(machine_config &config);
 	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;

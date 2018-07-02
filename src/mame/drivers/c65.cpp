@@ -55,6 +55,12 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void c65(machine_config &config);
+
+	void init_c65();
+	void init_c65pal();
+
+private:
 	// devices
 	required_device<m4510_device> m_maincpu;
 	required_device<mos6526_device> m_cia0;
@@ -95,19 +101,17 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(c65);
-	void init_c65();
-	void init_c65pal();
 
 	INTERRUPT_GEN_MEMBER(vic3_vblank_irq);
-	void c65(machine_config &config);
+
 	void c65_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-private:
+
 	uint8_t m_VIC2_IRQPend, m_VIC2_IRQMask;
 	/* 0x20: border color (TODO: different thread?) */
 	uint8_t m_VIC2_EXTColor;

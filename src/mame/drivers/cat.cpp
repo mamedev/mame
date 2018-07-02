@@ -240,12 +240,6 @@ ToDo:
 class cat_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_KEYBOARD,
-		TIMER_COUNTER_6MS
-	};
-
 	cat_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -266,6 +260,17 @@ public:
 		m_y7(*this, "Y7"),
 		m_dipsw(*this, "DIPSW1")
 	{ }
+
+	void cat(machine_config &config);
+
+	void init_cat();
+
+private:
+	enum
+	{
+		TIMER_KEYBOARD,
+		TIMER_COUNTER_6MS
+	};
 
 	required_device<cpu_device> m_maincpu;
 	//optional_device<nvram_device> m_nvram;
@@ -290,7 +295,6 @@ public:
 	DECLARE_MACHINE_START(cat);
 	DECLARE_MACHINE_RESET(cat);
 	DECLARE_VIDEO_START(cat);
-	void init_cat();
 
 	uint32_t screen_update_cat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -357,9 +361,8 @@ public:
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
 	IRQ_CALLBACK_MEMBER(cat_int_ack);
 
-	void cat(machine_config &config);
 	void cat_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

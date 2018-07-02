@@ -49,6 +49,9 @@ public:
 	cchance_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tnzs_base_state(mconfig, type, tag) { }
 
+	void cchance(machine_config &config);
+
+private:
 	void machine_reset() override;
 	void machine_start() override;
 
@@ -57,7 +60,6 @@ public:
 	DECLARE_WRITE8_MEMBER(output_0_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_WRITE8_MEMBER(output_1_w);
-	void cchance(machine_config &config);
 	void main_map(address_map &map);
 };
 

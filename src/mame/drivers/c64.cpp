@@ -79,6 +79,52 @@ public:
 		m_exp_nmi(CLEAR_LINE)
 	{ }
 
+	void pal(machine_config &config);
+	void ntsc(machine_config &config);
+	void pet64(machine_config &config);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_WRITE_LINE_MEMBER( write_restore );
+	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( exp_nmi_w );
+	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
+	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
+
+	DECLARE_READ8_MEMBER( vic_videoram_r );
+	DECLARE_READ8_MEMBER( vic_colorram_r );
+	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
+
+	DECLARE_WRITE_LINE_MEMBER( cia1_irq_w );
+	DECLARE_READ8_MEMBER( cia1_pa_r );
+	DECLARE_WRITE8_MEMBER( cia1_pa_w );
+	DECLARE_READ8_MEMBER( cia1_pb_r );
+	DECLARE_WRITE8_MEMBER( cia1_pb_w );
+
+	DECLARE_WRITE_LINE_MEMBER( cia2_irq_w );
+	DECLARE_READ8_MEMBER( cia2_pa_r );
+	DECLARE_WRITE8_MEMBER( cia2_pa_w );
+
+	DECLARE_READ8_MEMBER( cia2_pb_r );
+	DECLARE_WRITE8_MEMBER( cia2_pb_w );
+
+	DECLARE_READ8_MEMBER( sid_potx_r );
+	DECLARE_READ8_MEMBER( sid_poty_r );
+
+	DECLARE_WRITE_LINE_MEMBER( write_user_pa2 ) { m_user_pa2 = state; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb0 ) { if (state) m_user_pb |= 1; else m_user_pb &= ~1; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb1 ) { if (state) m_user_pb |= 2; else m_user_pb &= ~2; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb2 ) { if (state) m_user_pb |= 4; else m_user_pb &= ~4; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb3 ) { if (state) m_user_pb |= 8; else m_user_pb &= ~8; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb4 ) { if (state) m_user_pb |= 16; else m_user_pb &= ~16; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb5 ) { if (state) m_user_pb |= 32; else m_user_pb &= ~32; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb6 ) { if (state) m_user_pb |= 64; else m_user_pb &= ~64; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb7 ) { if (state) m_user_pb |= 128; else m_user_pb &= ~128; }
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
+
+protected:
 	// ROM
 	uint8_t *m_basic;
 	uint8_t *m_kernal;
@@ -109,49 +155,8 @@ public:
 	uint8_t read_memory(address_space &space, offs_t offset, offs_t va, int aec, int ba);
 	void write_memory(address_space &space, offs_t offset, uint8_t data, int aec, int ba);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-
-	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
-	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
-
-	DECLARE_READ8_MEMBER( sid_potx_r );
-	DECLARE_READ8_MEMBER( sid_poty_r );
-
-	DECLARE_WRITE_LINE_MEMBER( cia1_irq_w );
-	DECLARE_READ8_MEMBER( cia1_pa_r );
-	DECLARE_WRITE8_MEMBER( cia1_pa_w );
-	DECLARE_READ8_MEMBER( cia1_pb_r );
-	DECLARE_WRITE8_MEMBER( cia1_pb_w );
-
-	DECLARE_WRITE_LINE_MEMBER( cia2_irq_w );
-	DECLARE_READ8_MEMBER( cia2_pa_r );
-	DECLARE_WRITE8_MEMBER( cia2_pa_w );
-
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
-
-	DECLARE_WRITE_LINE_MEMBER( write_restore );
-	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( exp_nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
-	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
-
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
-
-	DECLARE_READ8_MEMBER( cia2_pb_r );
-	DECLARE_WRITE8_MEMBER( cia2_pb_w );
-
-	DECLARE_WRITE_LINE_MEMBER( write_user_pa2 ) { m_user_pa2 = state; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb0 ) { if (state) m_user_pb |= 1; else m_user_pb &= ~1; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb1 ) { if (state) m_user_pb |= 2; else m_user_pb &= ~2; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb2 ) { if (state) m_user_pb |= 4; else m_user_pb &= ~4; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb3 ) { if (state) m_user_pb |= 8; else m_user_pb &= ~8; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb4 ) { if (state) m_user_pb |= 16; else m_user_pb &= ~16; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb5 ) { if (state) m_user_pb |= 32; else m_user_pb &= ~32; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb6 ) { if (state) m_user_pb |= 64; else m_user_pb &= ~64; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb7 ) { if (state) m_user_pb |= 128; else m_user_pb &= ~128; }
 
 	// memory state
 	int m_loram;
@@ -173,9 +178,7 @@ public:
 
 	int m_user_pa2;
 	int m_user_pb;
-	void pal(machine_config &config);
-	void ntsc(machine_config &config);
-	void pet64(machine_config &config);
+
 	void c64_mem(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);
@@ -189,11 +192,13 @@ public:
 		: c64_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
 	void ntsc_sx(machine_config &config);
 	void ntsc_dx(machine_config &config);
 	void pal_sx(machine_config &config);
+
+private:
+	DECLARE_READ8_MEMBER( cpu_r );
+	DECLARE_WRITE8_MEMBER( cpu_w );
 };
 
 
@@ -215,12 +220,14 @@ public:
 		: c64c_state(mconfig, type, tag)
 	{ }
 
+	void pal_gs(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
 
 	DECLARE_READ8_MEMBER( cia1_pa_r );
 	DECLARE_READ8_MEMBER( cia1_pb_r );
-	void pal_gs(machine_config &config);
 };
 
 

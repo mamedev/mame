@@ -76,14 +76,20 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	DECLARE_READ8_MEMBER(sound_data_r);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_READ8_MEMBER(m6803_port2_r);
-	DECLARE_WRITE8_MEMBER(m6803_port2_w);
+	void babypac(machine_config &config);
+	void granny(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER(video_test);
 	DECLARE_INPUT_CHANGED_MEMBER(sound_test);
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
+private:
+	DECLARE_READ8_MEMBER(sound_data_r);
+	DECLARE_WRITE8_MEMBER(sound_data_w);
+	DECLARE_READ8_MEMBER(m6803_port2_r);
+	DECLARE_WRITE8_MEMBER(m6803_port2_w);
+
 	DECLARE_READ8_MEMBER(u7_a_r);
 	DECLARE_WRITE8_MEMBER(u7_a_w);
 	DECLARE_READ8_MEMBER(u7_b_r);
@@ -106,14 +112,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	DECLARE_WRITE8_MEMBER(granny_crtc_w);
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void babypac(machine_config &config);
-	void granny(machine_config &config);
+
 	void granny_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
 	void video_map(address_map &map);
-private:
+
 	uint8_t m_mpu_to_vid;
 	uint8_t m_vid_to_mpu;
 	uint8_t m_u7_a;

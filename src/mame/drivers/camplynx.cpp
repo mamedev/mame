@@ -187,6 +187,18 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
+	void lynx_common(machine_config &config);
+	void lynx_disk(machine_config &config);
+	void lynx128k(machine_config &config);
+	void lynx48k(machine_config &config);
+	void lynx96k(machine_config &config);
+
+	void init_lynx48k();
+	void init_lynx128k();
+
+	DECLARE_INPUT_CHANGED_MEMBER(brk_key);
+
+private:
 	DECLARE_WRITE8_MEMBER(bank1_w);
 	DECLARE_WRITE8_MEMBER(bank6_w);
 	DECLARE_WRITE8_MEMBER(port58_w); // drive select etc
@@ -196,26 +208,21 @@ public:
 	DECLARE_READ8_MEMBER(port82_r); // cassin for 128k
 	DECLARE_WRITE8_MEMBER(port82_w); // banking 128k
 	DECLARE_WRITE8_MEMBER(port84_w); // dac port 48k
-	DECLARE_INPUT_CHANGED_MEMBER(brk_key);
+
 	DECLARE_MACHINE_RESET(lynx48k);
 	DECLARE_MACHINE_RESET(lynx128k);
-	void init_lynx48k();
-	void init_lynx128k();
+
 	DECLARE_FLOPPY_FORMATS(camplynx_floppy_formats);
 	MC6845_UPDATE_ROW(lynx48k_update_row);
 	MC6845_UPDATE_ROW(lynx128k_update_row);
 	required_device<palette_device> m_palette;
-	void lynx_common(machine_config &config);
-	void lynx_disk(machine_config &config);
-	void lynx128k(machine_config &config);
-	void lynx48k(machine_config &config);
-	void lynx96k(machine_config &config);
+
 	void lynx128k_io(address_map &map);
 	void lynx128k_mem(address_map &map);
 	void lynx48k_io(address_map &map);
 	void lynx48k_mem(address_map &map);
 	void lynx96k_io(address_map &map);
-private:
+
 	uint8_t m_port58;
 	uint8_t m_port80;
 	uint8_t m_bankdata;

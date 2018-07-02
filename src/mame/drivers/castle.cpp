@@ -57,11 +57,11 @@ public:
 
 	void castle_V1rvE(machine_config &config);
 	void castle_V2rvA(machine_config &config);
+
+private:
 	void V1rvE_mastermap(address_map &map);
 	void V1rvE_slavemap(address_map &map);
 	void V2rvA_map(address_map &map);
-protected:
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 };

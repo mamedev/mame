@@ -146,6 +146,10 @@ public:
 		,m_acia(*this, "acia")
 		,m_banksel(1)
 	{ }
+
+	void can09t(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_start() override;
 	DECLARE_READ8_MEMBER (read);
@@ -156,9 +160,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( syspia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER( usrpia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER (write_acia_clock);
-	void can09t(machine_config &config);
+
 	void can09t_map(address_map &map);
-protected:
+
 	required_device<pia6821_device> m_syspia;
 	required_device<pia6821_device> m_usrpia;
 	required_device<pia6821_device> m_pia3;
@@ -173,7 +177,7 @@ protected:
 	uint8_t m_ram0[1024 *  8]; // IC3
 	uint8_t m_ram1[1024 * 32]; // IC4
 	uint8_t m_ram2[1024 *  8]; // IC5
-private:
+
 	enum {
 		PLA_EPROM = 0x80,
 		PLA_IO1   = 0x40,

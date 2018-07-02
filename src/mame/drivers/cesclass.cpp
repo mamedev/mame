@@ -42,17 +42,18 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void cesclassic(machine_config &config);
+
+private:
 	DECLARE_WRITE16_MEMBER(irq2_ack_w);
 	DECLARE_WRITE16_MEMBER(irq3_ack_w);
 	DECLARE_WRITE16_MEMBER(lamps_w);
 	DECLARE_WRITE16_MEMBER(outputs_w);
 
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(cesclassic);
-	void cesclassic(machine_config &config);
+
 	void cesclassic_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
