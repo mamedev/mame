@@ -26,6 +26,12 @@ public:
 		m_tracky(*this, "P%uY", 1U)
 	{ }
 
+	void recordbr(machine_config &config);
+	void syvalion(machine_config &config);
+	void dleague(machine_config &config);
+	void tetristh(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -50,10 +56,6 @@ public:
 	void recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void taitoh_log_vram();
-	void recordbr(machine_config &config);
-	void syvalion(machine_config &config);
-	void dleague(machine_config &config);
-	void tetristh(machine_config &config);
 	void dleague_map(address_map &map);
 	void recordbr_map(address_map &map);
 	void sound_map(address_map &map);

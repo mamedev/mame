@@ -26,6 +26,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")  { }
 
+	void galaxygame(machine_config &config);
+
+	void init_galaxygame();
+
+private:
 	uint16_t m_clk;
 
 	uint16_t m_x;
@@ -50,14 +55,12 @@ public:
 	DECLARE_READ16_MEMBER(y_r);
 	DECLARE_WRITE16_MEMBER(y_w);
 	DECLARE_WRITE16_MEMBER(clk_w);
-	void init_galaxygame();
 	virtual void machine_reset() override;
 	uint32_t screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxygame_irq);
 	IRQ_CALLBACK_MEMBER(galaxygame_irq_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	void galaxygame(machine_config &config);
 	void galaxygame_map(address_map &map);
 };
 

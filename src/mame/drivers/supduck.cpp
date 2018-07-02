@@ -49,6 +49,9 @@ public:
 			m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void supduck(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<z80_device> m_audiocpu;
@@ -82,11 +85,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(okibank_w);
 
-	void supduck(machine_config &config);
 	void main_map(address_map &map);
 	void oki_map(address_map &map);
 	void sound_map(address_map &map);
-protected:
 
 	// driver_device overrides
 	virtual void machine_start() override;

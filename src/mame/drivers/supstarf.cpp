@@ -27,6 +27,9 @@ public:
 	{
 	}
 
+	void supstarf(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(psg_latch_r);
 	DECLARE_WRITE8_MEMBER(psg_latch_w);
 	DECLARE_WRITE8_MEMBER(port1_w);
@@ -38,15 +41,13 @@ public:
 	DECLARE_WRITE8_MEMBER(lights_a_w);
 	DECLARE_WRITE8_MEMBER(lights_b_w);
 
-	void supstarf(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device_array<ay8910_device, 2> m_psg;

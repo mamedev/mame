@@ -122,6 +122,9 @@ class hp2645_state : public driver_device
 public:
 	hp2645_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp2645(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -152,10 +155,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
 
-	void hp2645(machine_config &config);
 	void cpu_io_map(address_map &map);
 	void cpu_mem_map(address_map &map);
-protected:
+
 	required_device<i8080a_cpu_device> m_cpu;
 	required_device<timer_device> m_timer_10ms;
 	required_ioport_array<4> m_io_key;

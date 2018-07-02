@@ -61,7 +61,7 @@ public:
 
 	virtual void yumefuda(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -80,7 +80,6 @@ protected:
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_cus_ram;
 	required_shared_ptr<uint8_t> m_videoram;

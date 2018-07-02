@@ -49,6 +49,9 @@ public:
 	{
 	}
 
+	void ettrivia(machine_config &config);
+
+private:
 	int m_palreg;
 	int m_gfx_bank;
 	int m_question_bank;
@@ -76,7 +79,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<ay8912_device, 3> m_ay;
-	void ettrivia(machine_config &config);
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
 };

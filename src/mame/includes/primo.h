@@ -48,7 +48,7 @@ public:
 	void primoc64(machine_config &config);
 	void primoa48(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(primo_be_1_r);
 	DECLARE_READ8_MEMBER(primo_be_2_r);
 	DECLARE_WRITE8_MEMBER(primo_ki_1_w);
@@ -74,7 +74,6 @@ protected:
 	void primoa_port(address_map &map);
 	void primob_port(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cbm_iec_device> m_iec;
 	required_device<speaker_sound_device> m_speaker;

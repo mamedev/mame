@@ -217,6 +217,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void jubileep(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
 	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
@@ -224,11 +227,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
-	void jubileep(machine_config &config);
 	void jubileep_cru_map(address_map &map);
 	void jubileep_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 

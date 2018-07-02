@@ -273,7 +273,17 @@ public:
 	{
 	}
 
+	void thunderh(machine_config &config);
+	void hangplt(machine_config &config);
+	void slrasslt(machine_config &config);
+	void gticlub(machine_config &config);
 
+	void init_hangplt_common();
+	void init_hangplt();
+	void init_hangpltu();
+	void init_gticlub();
+
+private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
 
@@ -320,10 +330,6 @@ public:
 	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 
-	void init_hangplt_common();
-	void init_hangplt();
-	void init_hangpltu();
-	void init_gticlub();
 	DECLARE_MACHINE_START(gticlub);
 	DECLARE_MACHINE_RESET(gticlub);
 	DECLARE_MACHINE_RESET(hangplt);
@@ -337,17 +343,13 @@ public:
 	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void thunderh(machine_config &config);
-	void hangplt(machine_config &config);
-	void slrasslt(machine_config &config);
-	void gticlub(machine_config &config);
 	void gticlub_map(address_map &map);
 	void hangplt_map(address_map &map);
 	void hangplt_sharc0_map(address_map &map);
 	void hangplt_sharc1_map(address_map &map);
 	void sharc_map(address_map &map);
 	void sound_memmap(address_map &map);
-private:
+
 	void gticlub_led_setreg(int offset, uint8_t data);
 
 	uint8_t m_gticlub_led_reg[2];

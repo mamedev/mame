@@ -22,15 +22,17 @@ public:
 	{
 	}
 
+	void lft(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_WRITE16_MEMBER(term_w);
 	DECLARE_READ16_MEMBER(keyin_r);
 	DECLARE_READ16_MEMBER(status_r);
 
-	void lft(machine_config &config);
 	void lft_io(address_map &map);
 	void lft_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

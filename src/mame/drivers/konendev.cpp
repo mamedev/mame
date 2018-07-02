@@ -59,7 +59,7 @@ public:
 
 	void konendev(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ32_MEMBER(mcu2_r);
 	DECLARE_READ32_MEMBER(ifu2_r);
 	DECLARE_READ32_MEMBER(ctrl0_r);
@@ -80,7 +80,6 @@ protected:
 
 	void konendev_map(address_map &map);
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<k057714_device> m_gcu;

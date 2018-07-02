@@ -77,6 +77,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void kungfur(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(kungfur_output_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch1_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch2_w);
@@ -87,10 +90,8 @@ public:
 	INTERRUPT_GEN_MEMBER(kungfur_irq);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm1_int);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm2_int);
-	void kungfur(machine_config &config);
 	void kungfur_map(address_map &map);
 
-private:
 	uint8_t m_latch[3];
 	uint8_t m_control;
 	uint32_t m_adpcm_pos[2];

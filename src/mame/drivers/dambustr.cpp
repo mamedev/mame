@@ -66,12 +66,15 @@ public:
 		: galaxold_state(mconfig, type, tag),
 		m_custom(*this, "cust") { }
 
+	void dambustr(machine_config &config);
+
+	void init_dambustr();
+
+private:
 	required_device<galaxian_sound_device> m_custom;
 
 	int m_noise_data;
 	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
-	void init_dambustr();
-	void dambustr(machine_config &config);
 	void dambustr_map(address_map &map);
 };
 

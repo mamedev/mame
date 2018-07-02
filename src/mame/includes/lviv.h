@@ -39,7 +39,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
-protected:
+private:
 	virtual void machine_reset() override;
 
 	DECLARE_PALETTE_INIT(lviv);

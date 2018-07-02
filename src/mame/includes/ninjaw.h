@@ -31,6 +31,10 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_z80bank(*this, "z80bank") { }
 
+	void darius2(machine_config &config);
+	void ninjaw(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -70,8 +74,6 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs );
 	void parse_control(  );
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip);
-	void darius2(machine_config &config);
-	void ninjaw(machine_config &config);
 	void darius2_master_map(address_map &map);
 	void darius2_slave_map(address_map &map);
 	void ninjaw_master_map(address_map &map);

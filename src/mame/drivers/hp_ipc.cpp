@@ -392,6 +392,11 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
+	void hp_ipc_base(machine_config &config);
+	void hp_ipc(machine_config &config);
+	void hp9808a(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -418,17 +423,12 @@ public:
 
 	emu_timer *m_bus_error_timer;
 
-	void hp_ipc_base(machine_config &config);
-	void hp_ipc(machine_config &config);
-
 	void hp_ipc_mem_inner_base(address_map &map);
 	void hp_ipc_mem_inner_9807a(address_map &map);
 	void hp_ipc_mem_outer(address_map &map);
 
-	void hp9808a(machine_config &config);
 	void hp_ipc_mem_inner_9808a(address_map &map);
 
-private:
 	required_device<m68000_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<wd2797_device> m_fdc;
@@ -446,7 +446,6 @@ private:
 		return (m_mmu[(m_maincpu->get_fc() >> 1) & 3] + offset) & 0x3FFFFF;
 	}
 
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
 	bool m_bus_error;

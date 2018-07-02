@@ -35,16 +35,19 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void rgum(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(rgum_heartbeat_r);
+
+private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 	uint8_t m_hbeat;
-	DECLARE_CUSTOM_INPUT_MEMBER(rgum_heartbeat_r);
 	virtual void video_start() override;
 	uint32_t screen_update_royalgum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void rgum(machine_config &config);
 	void rgum_map(address_map &map);
 };
 

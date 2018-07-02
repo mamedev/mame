@@ -75,6 +75,13 @@ public:
 	{
 	}
 
+	void vt100(machine_config &config);
+	void vt100ac(machine_config &config);
+	void vt101(machine_config &config);
+	void vt102(machine_config &config);
+	void vt180(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
 	required_device<vt100_keyboard_device> m_keyboard;
@@ -97,11 +104,6 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(vt102_irq_callback);
-	void vt100(machine_config &config);
-	void vt100ac(machine_config &config);
-	void vt101(machine_config &config);
-	void vt102(machine_config &config);
-	void vt180(machine_config &config);
 	void vt100_mem(address_map &map);
 	void vt100_io(address_map &map);
 	void vt102_io(address_map &map);

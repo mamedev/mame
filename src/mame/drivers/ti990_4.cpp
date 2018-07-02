@@ -55,6 +55,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_fd800(*this, "fd800") { }
 
+	void ti990_4v(machine_config &config);
+	void ti990_4(machine_config &config);
+
+	void init_ti990_4();
+	void init_ti990_4v();
+
+private:
 	DECLARE_READ8_MEMBER( panel_read );
 	DECLARE_WRITE8_MEMBER( panel_write );
 	DECLARE_WRITE8_MEMBER( external_operation );
@@ -64,17 +71,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vdtkey_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( line_interrupt );
 
-	void init_ti990_4();
-	void init_ti990_4v();
-
 	DECLARE_MACHINE_RESET(ti990_4);
 
-	void ti990_4v(machine_config &config);
-	void ti990_4(machine_config &config);
 	void cru_map(address_map &map);
 	void cru_map_v(address_map &map);
 	void memmap(address_map &map);
-private:
+
 	void        hold_load();
 	void        device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	int         m_intlines;

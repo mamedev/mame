@@ -52,6 +52,9 @@ public:
 	{
 	}
 
+	void ht68k(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<wd1770_device> m_fdc;
@@ -65,7 +68,6 @@ public:
 	DECLARE_WRITE8_MEMBER(duart_output);
 	required_shared_ptr<uint16_t> m_p_ram;
 	virtual void machine_reset() override;
-	void ht68k(machine_config &config);
 	void ht68k_mem(address_map &map);
 };
 

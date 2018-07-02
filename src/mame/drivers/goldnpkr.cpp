@@ -1299,9 +1299,9 @@ class goldnpkr_state : public driver_device
 public:
 	goldnpkr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
 		m_ay8910(*this, "ay8910"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -1309,23 +1309,19 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
-	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
-	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
-	DECLARE_READ8_MEMBER(pottnpkr_mux_port_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(mux_port_w);
-	DECLARE_WRITE8_MEMBER(wcfalcon_snd_w);
-	DECLARE_WRITE8_MEMBER(lamps_a_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(pia0_a_w);
-	DECLARE_WRITE8_MEMBER(pia0_b_w);
-	DECLARE_WRITE8_MEMBER(pia1_a_w);
-	DECLARE_WRITE8_MEMBER(pia1_b_w);
-	DECLARE_READ8_MEMBER(pia0_a_r);
-	DECLARE_READ8_MEMBER(pia0_b_r);
-	DECLARE_READ8_MEMBER(pia1_a_r);
-	DECLARE_READ8_MEMBER(pia1_b_r);
+	void goldnpkr_base(machine_config &config);
+	void wildcard(machine_config &config);
+	void wildcrdb(machine_config &config);
+	void witchcrd(machine_config &config);
+	void mondial(machine_config &config);
+	void bchancep(machine_config &config);
+	void wcfalcon(machine_config &config);
+	void geniea(machine_config &config);
+	void genie(machine_config &config);
+	void pottnpkr(machine_config &config);
+	void goldnpkr(machine_config &config);
+	void wcrdxtnd(machine_config &config);
+
 	void init_vkdlswwh();
 	void init_icp1db();
 	void init_flcnw();
@@ -1346,29 +1342,44 @@ public:
 	void init_vkdlswwr();
 	void init_vkdlswwv();
 	void init_bchancep();
+
+	DECLARE_READ8_MEMBER(pottnpkr_mux_port_r);
+	DECLARE_WRITE8_MEMBER(lamps_a_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(mux_w);
+
+	DECLARE_PALETTE_INIT(witchcrd);
+
+	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+
+	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
+	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
+
+private:
+	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
+	DECLARE_WRITE8_MEMBER(mux_port_w);
+	DECLARE_WRITE8_MEMBER(wcfalcon_snd_w);
+	DECLARE_WRITE8_MEMBER(pia0_a_w);
+	DECLARE_WRITE8_MEMBER(pia0_b_w);
+	DECLARE_WRITE8_MEMBER(pia1_a_w);
+	DECLARE_WRITE8_MEMBER(pia1_b_w);
+	DECLARE_READ8_MEMBER(pia0_a_r);
+	DECLARE_READ8_MEMBER(pia0_b_r);
+	DECLARE_READ8_MEMBER(pia1_a_r);
+	DECLARE_READ8_MEMBER(pia1_b_r);
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(goldnpkr);
-	DECLARE_PALETTE_INIT(witchcrd);
 	DECLARE_VIDEO_START(wcrdxtnd);
 	DECLARE_PALETTE_INIT(wcrdxtnd);
 	DECLARE_MACHINE_START(mondial);
 	DECLARE_MACHINE_RESET(mondial);
-	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void goldnpkr_base(machine_config &config);
-	void wildcard(machine_config &config);
-	void wildcrdb(machine_config &config);
-	void witchcrd(machine_config &config);
-	void mondial(machine_config &config);
-	void bchancep(machine_config &config);
-	void wcfalcon(machine_config &config);
-	void geniea(machine_config &config);
-	void genie(machine_config &config);
-	void pottnpkr(machine_config &config);
-	void goldnpkr(machine_config &config);
-	void wcrdxtnd(machine_config &config);
 	void bchancep_map(address_map &map);
 	void genie_map(address_map &map);
 	void goldnpkr_map(address_map &map);
@@ -1382,13 +1393,11 @@ public:
 	void witchcrd_falcon_map(address_map &map);
 	void witchcrd_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	required_device<cpu_device> m_maincpu;
 	optional_device<discrete_device> m_discrete;
 	optional_device<ay8910_device> m_ay8910;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -1412,15 +1421,16 @@ public:
 		m_portc_data(0x0f)
 	{ }
 
+	void megadpkr(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(cpubank_decrypt_r);
 	DECLARE_WRITE8_MEMBER(mcu_command_w);
 	DECLARE_WRITE8_MEMBER(mcu_portb_w);
 	DECLARE_WRITE8_MEMBER(mcu_portc_w);
-	void megadpkr(machine_config &config);
 	void megadpkr_banked_map(address_map &map);
 	void megadpkr_map(address_map &map);
 
-private:
 	required_region_ptr<uint8_t> m_cpubank;
 
 	required_device<m68705p_device> m_mcu;

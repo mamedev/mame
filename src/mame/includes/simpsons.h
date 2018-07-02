@@ -9,12 +9,6 @@
 class simpsons_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_NMI,
-		TIMER_DMAEND
-	};
-
 	simpsons_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -24,6 +18,15 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251") { }
+
+	void simpsons(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_NMI,
+		TIMER_DMAEND
+	};
 
 	/* memory pointers */
 	std::unique_ptr<uint16_t[]>   m_spriteram;
@@ -64,11 +67,10 @@ public:
 	DECLARE_WRITE8_MEMBER(banking_callback);
 	K053246_CB_MEMBER(sprite_callback);
 
-	void simpsons(machine_config &config);
 	void bank0000_map(address_map &map);
 	void bank2000_map(address_map &map);
 	void main_map(address_map &map);
 	void z80_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

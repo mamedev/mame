@@ -85,6 +85,9 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void acommand(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 	DECLARE_WRITE16_MEMBER(output_7seg0_w);
 	DECLARE_WRITE16_MEMBER(output_7seg1_w);
@@ -101,13 +104,10 @@ public:
 	uint32_t screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
 
-
-	void acommand(machine_config &config);
 	void acommand_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki1;

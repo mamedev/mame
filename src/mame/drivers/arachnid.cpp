@@ -86,6 +86,9 @@ public:
 			m_speaker(*this, SPEAKER_TAG)
 	{ }
 
+	void arachnid(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_u4;
 	required_device<pia6821_device> m_pia_u17;
@@ -109,7 +112,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
 
 	uint8_t read_keyboard(int pa);
-	void arachnid(machine_config &config);
 	void arachnid_map(address_map &map);
 };
 

@@ -23,6 +23,7 @@ public:
 
 	void init_m79amb();
 
+private:
 	DECLARE_WRITE8_MEMBER(ramtek_videoram_w);
 	DECLARE_READ8_MEMBER(gray5bit_controller0_r);
 	DECLARE_READ8_MEMBER(gray5bit_controller1_r);
@@ -32,7 +33,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(m79amb_interrupt);
 
-protected:
 	void machine_start() override;
 
 	uint32_t screen_update_ramtek(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

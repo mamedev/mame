@@ -24,6 +24,9 @@ public:
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1") { }
 
+	void parentj(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -40,6 +43,5 @@ public:
 	uint32_t screen_update_parentj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(parentj_interrupt);
 	void parentj_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
-	void parentj(machine_config &config);
 	void parentj_map(address_map &map);
 };

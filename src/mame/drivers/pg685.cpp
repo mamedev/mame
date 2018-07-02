@@ -113,6 +113,13 @@ public:
 		m_floppy1(*this, "fdc:1")
 		{ }
 
+	void pg685_backplane(machine_config &config);
+	void pg685_module(machine_config &config);
+	void pg685(machine_config &config);
+	void pg675(machine_config &config);
+	void pg685oua12(machine_config &config);
+
+private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_oua12);
 
@@ -130,15 +137,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 
-	void pg685_backplane(machine_config &config);
-	void pg685_module(machine_config &config);
-	void pg685(machine_config &config);
-	void pg675(machine_config &config);
-	void pg685oua12(machine_config &config);
 	void pg675_mem(address_map &map);
 	void pg685_mem(address_map &map);
 	void pg685oua12_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;

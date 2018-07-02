@@ -50,6 +50,9 @@ public:
 		, m_linec(*this, "LINEC")
 	{ }
 
+	void nanos(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER( nanos_tc_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
@@ -62,10 +65,9 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void nanos(machine_config &config);
 	void nanos_io(address_map &map);
 	void nanos_mem(address_map &map);
-private:
+
 	uint8_t m_key_command;
 	uint8_t m_last_code;
 	uint8_t m_key_pressed;

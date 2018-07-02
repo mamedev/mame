@@ -37,12 +37,14 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void sys9002(machine_config &config);
+
+private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void sys9002(machine_config &config);
 	void sys9002_io(address_map &map);
 	void sys9002_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<palette_device> m_palette;

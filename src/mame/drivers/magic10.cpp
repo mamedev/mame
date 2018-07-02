@@ -123,6 +123,20 @@ public:
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void magic102(machine_config &config);
+	void magic10a(machine_config &config);
+	void magic10(machine_config &config);
+	void hotslot(machine_config &config);
+	void sgsafari(machine_config &config);
+
+	void init_sgsafari();
+	void init_suprpool();
+	void init_magic102();
+	void init_magic10();
+	void init_hotslot();
+	void init_altaten();
+
+private:
 	DECLARE_WRITE16_MEMBER(layer0_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer1_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer2_videoram_w);
@@ -130,28 +144,16 @@ public:
 	DECLARE_READ16_MEMBER(hotslot_copro_r);
 	DECLARE_WRITE16_MEMBER(hotslot_copro_w);
 	DECLARE_WRITE16_MEMBER(magic10_out_w);
-	void init_sgsafari();
-	void init_suprpool();
-	void init_magic102();
-	void init_magic10();
-	void init_hotslot();
-	void init_altaten();
 	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
 	uint32_t screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void magic102(machine_config &config);
-	void magic10a(machine_config &config);
-	void magic10(machine_config &config);
-	void hotslot(machine_config &config);
-	void sgsafari(machine_config &config);
 	void hotslot_map(address_map &map);
 	void magic102_map(address_map &map);
 	void magic10_map(address_map &map);
 	void magic10a_map(address_map &map);
 	void sgsafari_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 

@@ -708,7 +708,6 @@ TODO:
 
 #include "cpu/mb88xx/mb88xx.h"
 #include "cpu/z80/z80.h"
-#include "machine/atari_vg.h"
 #include "machine/namco06.h"
 #include "machine/namco50.h"
 #include "machine/namco51.h"
@@ -757,8 +756,6 @@ WRITE_LINE_MEMBER(galaga_state::nmion_w)
 {
 	m_sub2_nmi_mask = !state;
 }
-
-CUSTOM_INPUT_MEMBER(digdug_state::shifted_port_r){ return ioport((const char *)param)->read() >> 4; }
 
 WRITE8_MEMBER(galaga_state::out_0)
 {
@@ -810,6 +807,25 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 }
 
 
+READ8_MEMBER(digdug_state::earom_read)
+{
+	return m_earom->data();
+}
+
+WRITE8_MEMBER(digdug_state::earom_write)
+{
+	m_earom->set_address(offset & 0x3f);
+	m_earom->set_data(data);
+}
+
+WRITE8_MEMBER(digdug_state::earom_control_w)
+{
+	// CK = DB0, C1 = /DB1, C2 = DB2, CS1 = DB3, /CS2 = GND
+	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 1), BIT(data, 2));
+	m_earom->set_clk(BIT(data, 0));
+}
+
+
 void galaga_state::machine_start()
 {
 	m_leds.resolve();
@@ -818,6 +834,12 @@ void galaga_state::machine_start()
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_sub2_nmi_mask));
+}
+
+void digdug_state::machine_start()
+{
+	galaga_state::machine_start();
+	earom_control_w(machine().dummy_space(), 0, 0);
 }
 
 void galaga_state::machine_reset()
@@ -919,8 +941,8 @@ void digdug_state::digdug_map(address_map &map)
 	map(0x9000, 0x93ff).ram().share("digdug_posram");   /* work RAM + sprite registers */
 	map(0x9800, 0x9bff).ram().share("digdug_flpram");   /* work RAM + sprite registers */
 	map(0xa000, 0xa007).nopr().w(m_videolatch, FUNC(ls259_device::write_d0));   /* video latches (spurious reads when setting latch bits) */
-	map(0xb800, 0xb83f).rw("earom", FUNC(atari_vg_earom_device::read), FUNC(atari_vg_earom_device::write));   /* non volatile memory data */
-	map(0xb840, 0xb840).w("earom", FUNC(atari_vg_earom_device::ctrl_w));                    /* non volatile memory control */
+	map(0xb800, 0xb83f).rw(FUNC(digdug_state::earom_read), FUNC(digdug_state::earom_write));   /* non volatile memory data */
+	map(0xb840, 0xb840).w(FUNC(digdug_state::earom_control_w));                    /* non volatile memory control */
 }
 
 
@@ -1347,9 +1369,6 @@ static INPUT_PORTS_START( digdug )
 	PORT_DIPSETTING(    0x80, "3" ) // factory default = "3"
 	PORT_DIPSETTING(    0xc0, "5" )
 
-	PORT_START("DSWA_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, digdug_state,shifted_port_r, "DSWA")
-
 	PORT_START("DSWB") // reverse order against SWA
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
@@ -1373,9 +1392,6 @@ static INPUT_PORTS_START( digdug )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-
-	PORT_START("DSWB_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, digdug_state,shifted_port_r, "DSWB")
 INPUT_PORTS_END
 
 /*
@@ -1906,10 +1922,10 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	MCFG_DEVCB_CHAIN_INPUT(READLINE("misclatch", ls259_device, q6_r)) MCFG_DEVCB_BIT(2) // MOD 1 = K2
 	MCFG_DEVCB_CHAIN_INPUT(READLINE("misclatch", ls259_device, q5_r)) MCFG_DEVCB_BIT(1) // MOD 0 = K1
 	// K0 is left unconnected
-	MCFG_NAMCO_53XX_INPUT_0_CB(IOPORT("DSWA"))
-	MCFG_NAMCO_53XX_INPUT_1_CB(IOPORT("DSWA_HI"))
-	MCFG_NAMCO_53XX_INPUT_2_CB(IOPORT("DSWB"))
-	MCFG_NAMCO_53XX_INPUT_3_CB(IOPORT("DSWB_HI"))
+	MCFG_NAMCO_53XX_INPUT_0_CB(IOPORT("DSWA")) MCFG_DEVCB_MASK(0x0f)
+	MCFG_NAMCO_53XX_INPUT_1_CB(IOPORT("DSWA")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_NAMCO_53XX_INPUT_2_CB(IOPORT("DSWB")) MCFG_DEVCB_MASK(0x0f)
+	MCFG_NAMCO_53XX_INPUT_3_CB(IOPORT("DSWB")) MCFG_DEVCB_RSHIFT(4)
 
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
@@ -1927,7 +1943,7 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
-	MCFG_ATARIVGEAROM_ADD("earom")
+	MCFG_DEVICE_ADD("earom", ER2055)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

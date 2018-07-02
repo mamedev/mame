@@ -69,6 +69,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void smc777(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_READ8_MEMBER(attr_r);
@@ -105,15 +108,13 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(smc777);
 
-	void smc777(machine_config &config);
 	void smc777_io(address_map &map);
 	void smc777_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;

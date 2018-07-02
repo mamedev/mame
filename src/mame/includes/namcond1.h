@@ -23,6 +23,10 @@ public:
 		m_zpr2(*this, "zpr2"),
 		m_shared_ram(*this, "shared_ram") { }
 
+	void abcheck(machine_config &config);
+	void namcond1(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<ygv608_device> m_ygv608;
@@ -46,8 +50,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vblank_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( raster_irq_w );
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
-	void abcheck(machine_config &config);
-	void namcond1(machine_config &config);
 	void abcheck_map(address_map &map);
 	void namcond1_map(address_map &map);
 	void nd1h8iomap(address_map &map);

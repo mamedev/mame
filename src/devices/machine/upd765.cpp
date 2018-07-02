@@ -21,7 +21,9 @@
 #define VERBOSE (LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
-#include <iomanip>      // std::setw
+
+#include <iomanip>
+#include <sstream>
 
 #define LOGWARN(...)     LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGSHIFT(...)    LOGMASKED(LOG_SHIFT, __VA_ARGS__)
@@ -759,7 +761,7 @@ void upd765_family_device::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			LOGSHIFT("%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+			LOGSHIFT("%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -775,7 +777,7 @@ void upd765_family_device::live_run(attotime limit)
 				cur_live.data_separator_phase = false;
 				cur_live.bit_counter = 0;
 				cur_live.state = READ_HEADER_BLOCK_HEADER;
-				LOGLIVE("%s: Found A1\n", tts(cur_live.tm).c_str());
+				LOGLIVE("%s: Found A1\n", tts(cur_live.tm));
 			}
 
 			if(!mfm && cur_live.shift_reg == 0xf57e) {
@@ -783,7 +785,7 @@ void upd765_family_device::live_run(attotime limit)
 				cur_live.data_separator_phase = false;
 				cur_live.bit_counter = 0;
 				cur_live.state = READ_ID_BLOCK;
-				LOGLIVE("%s: Found IDAM\n", tts(cur_live.tm).c_str());
+				LOGLIVE("%s: Found IDAM\n", tts(cur_live.tm));
 			}
 			break;
 
@@ -791,7 +793,7 @@ void upd765_family_device::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			LOGSHIFT("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+			LOGSHIFT("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -811,11 +813,11 @@ void upd765_family_device::live_run(attotime limit)
 				if(cur_live.shift_reg != 0x4489)
 					cur_live.state = SEARCH_ADDRESS_MARK_HEADER;
 				else
-					LOGLIVE("%s: Found A1\n", tts(cur_live.tm).c_str());
+					LOGLIVE("%s: Found A1\n", tts(cur_live.tm));
 				break;
 			}
 			if(cur_live.data_reg != 0xfe) {
-				LOGLIVE("%s: No ident byte found after triple-A1, continue search\n", tts(cur_live.tm).c_str());
+				LOGLIVE("%s: No ident byte found after triple-A1, continue search\n", tts(cur_live.tm));
 				cur_live.state = SEARCH_ADDRESS_MARK_HEADER;
 				break;
 			}
@@ -833,7 +835,7 @@ void upd765_family_device::live_run(attotime limit)
 				break;
 			int slot = (cur_live.bit_counter >> 4)-1;
 
-			LOGLIVE("%s: slot=%d data=%02x crc=%04x\n", tts(cur_live.tm).c_str(), slot, cur_live.data_reg, cur_live.crc);
+			LOGLIVE("%s: slot=%d data=%02x crc=%04x\n", tts(cur_live.tm), slot, cur_live.data_reg, cur_live.crc);
 			cur_live.idbuf[slot] = cur_live.data_reg;
 			if(slot == 5) {
 				live_delay(IDLE);
@@ -846,7 +848,7 @@ void upd765_family_device::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			LOGSHIFT("%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+			LOGSHIFT("%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -891,7 +893,7 @@ void upd765_family_device::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			LOGSHIFT("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+			LOGSHIFT("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -1202,7 +1204,7 @@ void upd765_family_device::live_run(attotime limit)
 			break;
 
 		default:
-			LOGWARN("%s: Unknown live state %d\n", tts(cur_live.tm).c_str(), cur_live.state);
+			LOGWARN("%s: Unknown live state %d\n", tts(cur_live.tm), cur_live.state);
 			return;
 		}
 	}
@@ -1832,7 +1834,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			return;
 
 		default:
-			LOGWARN("%s: read sector unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			LOGWARN("%s: read sector unknown sub-state %d\n", ttsn(), fi.sub_state);
 			return;
 		}
 	}
@@ -1970,7 +1972,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 			return;
 
 		default:
-			LOGWARN("%s: write sector unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			LOGWARN("%s: write sector unknown sub-state %d\n", ttsn(), fi.sub_state);
 			return;
 		}
 	}
@@ -2156,7 +2158,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			return;
 
 		default:
-			LOGWARN("%s: read track unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			LOGWARN("%s: read track unknown sub-state %d\n", ttsn(), fi.sub_state);
 			return;
 		}
 	}
@@ -2237,7 +2239,7 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 			return;
 
 		default:
-			LOGWARN("%s: format track unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			LOGWARN("%s: format track unknown sub-state %d\n", ttsn(), fi.sub_state);
 			return;
 		}
 	}
@@ -2327,7 +2329,7 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 			return;
 
 		default:
-			LOGWARN("%s: read id unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			LOGWARN("%s: read id unknown sub-state %d\n", ttsn(), fi.sub_state);
 			return;
 		}
 	}
@@ -2351,33 +2353,31 @@ bool upd765_family_device::get_irq() const
 
 std::string upd765_family_device::tts(attotime t)
 {
-	char buf[256];
 	const char *sign = "";
 	if(t.seconds() < 0) {
-		t = attotime::zero-t;
+		t = attotime::zero - t;
 		sign = "-";
 	}
-	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
-	sprintf(buf, "%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
-	return buf;
+	int const nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
+	return util::string_format("%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
 }
 
-std::string upd765_family_device::results()
+std::string upd765_family_device::results() const
 {
-	std::stringstream stream;
+	std::ostringstream stream;
 	stream << "results=(";
-	if (result_pos==0) stream << "none";
+	if (!result_pos) stream << "none";
 	else
-		for (int i=0; i < result_pos; i++)
-		{
-			stream << std::hex << std::setw(2) << std::setfill('0') << (int)result[i];
-			if (i < result_pos-1) stream << ',';
-		}
+	{
+		stream << std::hex << std::setfill('0') << std::setw(2) << unsigned(result[0]);
+		for (int i=1; i < result_pos; i++)
+			stream << ',' << std::setw(2) << unsigned(result[i]);
+	}
 	stream << ')';
 	return stream.str();
 }
 
-std::string upd765_family_device::ttsn()
+std::string upd765_family_device::ttsn() const
 {
 	return tts(machine().time());
 }
@@ -2428,7 +2428,7 @@ void upd765_family_device::run_drive_ready_polling()
 void upd765_family_device::index_callback(floppy_image_device *floppy, int state)
 {
 	LOGSTATE("Index pulse %d\n", state);
-	LOGLIVE("%s: Pulse %d\n", ttsn().c_str(), state);
+	LOGLIVE("%s: Pulse %d\n", ttsn(), state);
 	for(floppy_info & fi : flopi) {
 		if(fi.dev != floppy)
 			continue;
@@ -2472,7 +2472,7 @@ void upd765_family_device::index_callback(floppy_image_device *floppy, int state
 			break;
 
 		default:
-			LOGWARN("%s: Index pulse on unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			LOGWARN("%s: Index pulse on unknown sub-state %d\n", ttsn(), fi.sub_state);
 			break;
 		}
 
@@ -2520,7 +2520,7 @@ void upd765_family_device::general_continue(floppy_info &fi)
 		break;
 
 	default:
-		LOGWARN("%s: general_continue on unknown main-state %d\n", ttsn().c_str(), fi.main_state);
+		LOGWARN("%s: general_continue on unknown main-state %d\n", ttsn(), fi.main_state);
 		break;
 	}
 }
@@ -2561,7 +2561,7 @@ bool upd765_family_device::write_one_bit(const attotime &limit)
 
 void upd765_family_device::live_write_raw(uint16_t raw)
 {
-	LOGLIVE("%s: write %04x %04x\n", tts(cur_live.tm).c_str(), raw, cur_live.crc);
+	LOGLIVE("%s: write %04x %04x\n", tts(cur_live.tm), raw, cur_live.crc);
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = raw & 1;
 }
@@ -2581,7 +2581,7 @@ void upd765_family_device::live_write_mfm(uint8_t mfm)
 	cur_live.data_reg = mfm;
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = context;
-	LOGLIVE("%s: write %02x   %04x %04x\n", tts(cur_live.tm).c_str(), mfm, cur_live.crc, raw);
+	LOGLIVE("%s: write %02x   %04x %04x\n", tts(cur_live.tm), mfm, cur_live.crc, raw);
 }
 
 void upd765_family_device::live_write_fm(uint8_t fm)
@@ -2593,7 +2593,7 @@ void upd765_family_device::live_write_fm(uint8_t fm)
 	cur_live.data_reg = fm;
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = fm & 1;
-	LOGLIVE("%s: write %02x   %04x %04x\n", tts(cur_live.tm).c_str(), fm, cur_live.crc, raw);
+	LOGLIVE("%s: write %02x   %04x %04x\n", tts(cur_live.tm), fm, cur_live.crc, raw);
 }
 
 bool upd765_family_device::sector_matches() const

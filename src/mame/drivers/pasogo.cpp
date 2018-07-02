@@ -130,6 +130,11 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void pasogo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(contrast);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_device<address_map_bank_device> m_ems;
@@ -170,12 +175,10 @@ public:
 	uint32_t screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg230_timer);
-	DECLARE_INPUT_CHANGED_MEMBER(contrast);
 
 	memory_region *m_cart_rom;
 	uint8_t m_ems_index;
 	uint16_t m_ems_bank[28];
-	void pasogo(machine_config &config);
 	void emsbank_map(address_map &map);
 	void pasogo_io(address_map &map);
 	void pasogo_mem(address_map &map);

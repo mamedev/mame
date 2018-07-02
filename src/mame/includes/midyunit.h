@@ -39,12 +39,6 @@ struct dma_state_t
 class midyunit_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_DMA,
-		TIMER_AUTOERASE_LINE
-	};
-
 	midyunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -64,6 +58,41 @@ public:
 	{
 	}
 
+	void term2(machine_config &config);
+	void yunit_cvsd_4bit_fast(machine_config &config);
+	void yunit_adpcm_6bit_fast(machine_config &config);
+	void yunit_cvsd_6bit_slow(machine_config &config);
+	void yunit_cvsd_4bit_slow(machine_config &config);
+	void mkyawdim(machine_config &config);
+	void yunit_core(machine_config &config);
+	void zunit(machine_config &config);
+	void yunit_adpcm_6bit_faster(machine_config &config);
+
+	void init_smashtv();
+	void init_strkforc();
+	void init_narc();
+	void init_term2();
+	void init_term2la1();
+	void init_term2la3();
+	void init_mkyunit();
+	void init_trog();
+	void init_totcarn();
+	void init_mkyawdim();
+	void init_shimpact();
+	void init_hiimpact();
+	void init_mkyturbo();
+	void init_term2la2();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_strobe_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(adpcm_irq_state_r);
+
+private:
+	enum
+	{
+		TIMER_DMA,
+		TIMER_AUTOERASE_LINE
+	};
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -122,27 +151,10 @@ public:
 	DECLARE_WRITE16_MEMBER(midyunit_paletteram_w);
 	DECLARE_READ16_MEMBER(midyunit_dma_r);
 	DECLARE_WRITE16_MEMBER(midyunit_dma_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_strobe_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(adpcm_irq_state_r);
 	DECLARE_WRITE8_MEMBER(yawdim_oki_bank_w);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
-	void init_smashtv();
-	void init_strkforc();
-	void init_narc();
-	void init_term2();
-	void init_term2la1();
-	void init_term2la3();
-	void init_mkyunit();
-	void init_trog();
-	void init_totcarn();
-	void init_mkyawdim();
-	void init_shimpact();
-	void init_hiimpact();
-	void init_mkyturbo();
-	void init_term2la2();
 	DECLARE_MACHINE_RESET(midyunit);
 	DECLARE_VIDEO_START(midzunit);
 	DECLARE_VIDEO_START(midyunit_4bit);
@@ -152,18 +164,9 @@ public:
 	TIMER_CALLBACK_MEMBER(dma_callback);
 	TIMER_CALLBACK_MEMBER(autoerase_line);
 
-	void term2(machine_config &config);
-	void yunit_cvsd_4bit_fast(machine_config &config);
-	void yunit_adpcm_6bit_fast(machine_config &config);
-	void yunit_cvsd_6bit_slow(machine_config &config);
-	void yunit_cvsd_4bit_slow(machine_config &config);
-	void mkyawdim(machine_config &config);
-	void yunit_core(machine_config &config);
-	void zunit(machine_config &config);
-	void yunit_adpcm_6bit_faster(machine_config &config);
 	void main_map(address_map &map);
 	void yawdim_sound_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void dma_draw(uint16_t command);
 	void init_generic(int bpp, int sound, int prot_start, int prot_end);

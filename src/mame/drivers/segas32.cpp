@@ -2685,8 +2685,18 @@ public:
 		, m_slavepcb(*this, "slavepcb")
 	{ }
 
-	required_device<segas32_state> m_mainpcb;
-	optional_device<segas32_state> m_slavepcb;
+	void sega_multi32(machine_config &config);
+	void sega_system32(machine_config &config);
+	void sega_multi32_analog(machine_config &config);
+	void sega_multi32_6p(machine_config &config);
+	void sega_system32_dual_direct_upd7725(machine_config &config);
+	void sega_system32_dual_direct(machine_config &config);
+	void sega_system32_track(machine_config &config);
+	void sega_system32_ga2(machine_config &config);
+	void sega_system32_cd(machine_config &config);
+	void sega_system32_arf(machine_config &config);
+	void sega_system32_analog(machine_config &config);
+	void sega_system32_4p(machine_config &config);
 
 	void init_titlef();
 	void init_slipstrm();
@@ -2712,25 +2722,15 @@ public:
 	void init_f1lap();
 	void init_orunners();
 
+private:
+	required_device<segas32_state> m_mainpcb;
+	optional_device<segas32_state> m_slavepcb;
+
 	std::unique_ptr<uint16_t[]> m_dual_pcb_comms;
 	DECLARE_WRITE16_MEMBER(dual_pcb_comms_w);
 	DECLARE_READ16_MEMBER(dual_pcb_comms_r);
 	DECLARE_READ16_MEMBER(dual_pcb_masterslave);
 	DECLARE_READ16_MEMBER(dual_pcb_slave);
-
-
-	void sega_multi32(machine_config &config);
-	void sega_system32(machine_config &config);
-	void sega_multi32_analog(machine_config &config);
-	void sega_multi32_6p(machine_config &config);
-	void sega_system32_dual_direct_upd7725(machine_config &config);
-	void sega_system32_dual_direct(machine_config &config);
-	void sega_system32_track(machine_config &config);
-	void sega_system32_ga2(machine_config &config);
-	void sega_system32_cd(machine_config &config);
-	void sega_system32_arf(machine_config &config);
-	void sega_system32_analog(machine_config &config);
-	void sega_system32_4p(machine_config &config);
 };
 
 

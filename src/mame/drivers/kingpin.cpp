@@ -51,15 +51,16 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(sound_nmi_w);
 	void kingpin(machine_config &config);
+	void dealracl(machine_config &config);
+
+private:
+	DECLARE_WRITE8_MEMBER(sound_nmi_w);
 	void kingpin_io_map(address_map &map);
 	void kingpin_program_map(address_map &map);
 	void kingpin_sound_map(address_map &map);
-	void dealracl(machine_config &config);
 	void dealracl_program_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;

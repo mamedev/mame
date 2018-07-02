@@ -111,27 +111,8 @@ public:
 	{
 	}
 
-	// for Print Club only
-	int m_cam_data;
-
-	int m_segac2_enable_display;
-
-	required_shared_ptr<uint16_t> m_paletteram;
-	optional_memory_region m_upd_region;
-
-	/* protection-related tracking */
-	segac2_prot_delegate m_prot_func;     /* emulation of protection chip */
-	uint8_t       m_prot_write_buf;       /* remembers what was written */
-	uint8_t       m_prot_read_buf;        /* remembers what was returned */
-
-	/* palette-related variables */
-	uint8_t       m_segac2_alt_palette_mode;
-	uint8_t       m_palbank;
-	uint8_t       m_bg_palbase;
-	uint8_t       m_sp_palbase;
-
-	/* sound-related variables */
-	uint8_t       m_sound_banks;      /* number of sound banks */
+	void segac2(machine_config &config);
+	void segac(machine_config &config);
 
 	void init_c2boot();
 	void init_bloxeedc();
@@ -159,6 +140,30 @@ public:
 	void init_pclubjv2();
 	void init_pclubjv4();
 	void init_pclubjv5();
+
+private:
+	// for Print Club only
+	int m_cam_data;
+
+	int m_segac2_enable_display;
+
+	required_shared_ptr<uint16_t> m_paletteram;
+	optional_memory_region m_upd_region;
+
+	/* protection-related tracking */
+	segac2_prot_delegate m_prot_func;     /* emulation of protection chip */
+	uint8_t       m_prot_write_buf;       /* remembers what was written */
+	uint8_t       m_prot_read_buf;        /* remembers what was returned */
+
+	/* palette-related variables */
+	uint8_t       m_segac2_alt_palette_mode;
+	uint8_t       m_palbank;
+	uint8_t       m_bg_palbase;
+	uint8_t       m_sp_palbase;
+
+	/* sound-related variables */
+	uint8_t       m_sound_banks;      /* number of sound banks */
+
 	void segac2_common_init(segac2_prot_delegate prot_func);
 	DECLARE_VIDEO_START(segac2_new);
 	DECLARE_MACHINE_START(segac2);
@@ -214,8 +219,7 @@ public:
 	int prot_func_pclubjv2(int in);
 	int prot_func_pclubjv4(int in);
 	int prot_func_pclubjv5(int in);
-	void segac2(machine_config &config);
-	void segac(machine_config &config);
+
 	void main_map(address_map &map);
 };
 

@@ -72,7 +72,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
-	DECLARE_WRITE8_MEMBER(set_gromlines);
+
+	void set_gromlines(line_state mline, line_state moline, line_state gsq);
 
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
@@ -217,16 +218,18 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER(cruwrite);
 
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
-	virtual DECLARE_WRITE8_MEMBER(set_gromlines);
+	virtual void set_gromlines(line_state mline, line_state moline, line_state gsq);
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
-	DECLARE_READ8Z_MEMBER(gromreadz);
-	DECLARE_WRITE8_MEMBER(gromwrite);
+	void gromreadz(uint8_t* value);
+	void gromwrite(uint8_t data);
+
 	inline void         set_grom_pointer(int number, device_t *dev);
 	void                set_cartridge(ti99_cartridge_device *cart);
 	const char*         tag() { return m_tag; }
 	void                set_tag(const char* tag) { m_tag = tag; }
 	bool                is_grom_idle() { return m_grom_idle; }
+	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const { m_cart->logerror(fmt, args...); }
 
 	ti99_cartridge_device*  m_cart;
 	tmc0430_device*     m_grom[5];
@@ -361,7 +364,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(gromemureadz);
 	DECLARE_WRITE8_MEMBER(gromemuwrite);
-	DECLARE_WRITE8_MEMBER(set_gromlines) override;
+	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
 
 private:
 	bool    m_waddr_LSB;

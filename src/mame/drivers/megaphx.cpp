@@ -99,6 +99,16 @@ public:
 		m_pic_to_ppi_clock(0), m_pic_to_ppi_data(0)
 	{ }
 
+	void megaphx(machine_config &config);
+
+	void init_megaphx();
+
+protected:
+	virtual void machine_reset() override;
+
+	required_device<inder_vid_device> m_indervid;
+
+private:
 	DECLARE_READ8_MEMBER(pic_porta_r);
 	DECLARE_WRITE8_MEMBER(pic_porta_w);
 	DECLARE_READ8_MEMBER(pic_portb_r);
@@ -107,15 +117,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(dsw_w);
 
-	void init_megaphx();
-
-	void megaphx(machine_config &config);
 	void megaphx_68k_map(address_map &map);
 
-protected:
-	virtual void machine_reset() override;
-	required_device<inder_vid_device> m_indervid;
-private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_mainram;
 	required_device<inder_sb_device> m_indersb;

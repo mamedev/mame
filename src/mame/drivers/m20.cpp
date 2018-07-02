@@ -79,6 +79,9 @@ public:
 	{
 	}
 
+	void m20(machine_config &config);
+
+private:
 	required_device<z8001_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<i8251_device> m_kbdi8251;
@@ -106,16 +109,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	MC6845_UPDATE_ROW(update_row);
 
-	void m20(machine_config &config);
 	void m20_data_mem(address_map &map);
 	void m20_io(address_map &map);
 	void m20_program_mem(address_map &map);
-private:
+
 	offs_t m_memsize;
 	uint8_t m_port21;
 	void install_memory();
 
-public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	IRQ_CALLBACK_MEMBER(m20_irq_callback);
 };

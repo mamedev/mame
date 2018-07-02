@@ -139,6 +139,11 @@ public:
 		m_qimi_extint(CLEAR_LINE)
 	{ }
 
+	void ql_ntsc(machine_config &config);
+	void opd(machine_config &config);
+	void ql(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_ipc;
 	required_device<zx8301_device> m_zx8301;
@@ -194,9 +199,7 @@ public:
 	// QIMI
 	bool m_qimi_enabled;
 	int m_qimi_extint;
-	void ql_ntsc(machine_config &config);
-	void opd(machine_config &config);
-	void ql(machine_config &config);
+
 	void ipc_io(address_map &map);
 	void ql_mem(address_map &map);
 };

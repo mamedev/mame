@@ -48,17 +48,20 @@ public:
 		, m_ctc(*this, "ctc")
 	{ }
 
+	void dms86(machine_config &config);
+
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+
+private:
 	DECLARE_WRITE8_MEMBER(m1_ack_w);
 
 	DECLARE_READ16_MEMBER(port9a_r);
 	DECLARE_READ16_MEMBER(port9c_r);
 	void kbd_put(u8 data);
 
-	void dms86(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u8 m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

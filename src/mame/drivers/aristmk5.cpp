@@ -483,6 +483,19 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	 { }
 
+	void aristmk5(machine_config &config);
+	void aristmk5_touch(machine_config &config);
+	void aristmk5_usa(machine_config &config);
+	void aristmk5_usa_touch(machine_config &config);
+
+	void init_aristmk5();
+
+	INPUT_CHANGED_MEMBER(coin_start);
+	CUSTOM_INPUT_MEMBER(coin_r);
+	CUSTOM_INPUT_MEMBER(coin_usa_r);
+	CUSTOM_INPUT_MEMBER(hopper_r);
+
+private:
 	DECLARE_WRITE32_MEMBER(Ns5w48);
 	DECLARE_READ32_MEMBER(Ns5x58);
 	DECLARE_READ32_MEMBER(Ns5r50);
@@ -507,18 +520,6 @@ public:
 	DECLARE_READ8_MEMBER(spi_data_r);
 	DECLARE_WRITE_LINE_MEMBER(uart_irq_callback);
 
-	void init_aristmk5();
-	void aristmk5(machine_config &config);
-	void aristmk5_touch(machine_config &config);
-	void aristmk5_usa(machine_config &config);
-	void aristmk5_usa_touch(machine_config &config);
-
-	INPUT_CHANGED_MEMBER(coin_start);
-	CUSTOM_INPUT_MEMBER(coin_r);
-	CUSTOM_INPUT_MEMBER(coin_usa_r);
-	CUSTOM_INPUT_MEMBER(hopper_r);
-
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(mk5_VSYNC_callback);
@@ -535,7 +536,6 @@ protected:
 	uint64_t        m_coin_start_cycles;
 	uint8_t         m_coin_div;
 
-private:
 	required_device_array<eeprom_serial_93cxx_device, 2> m_eeprom;
 	required_device<ds1302_device> m_rtc;
 	required_device<nvram_device> m_nvram;

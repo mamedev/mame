@@ -55,13 +55,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void sdk85(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-	void sdk85(machine_config &config);
 	void sdk85_io(address_map &map);
 	void sdk85_mem(address_map &map);
-private:
+
 	u8 m_digit;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }

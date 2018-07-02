@@ -38,6 +38,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		{ }
 
+	void mc8030(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(zve_write_protect_w);
 	DECLARE_WRITE8_MEMBER(vis_w);
 	DECLARE_WRITE8_MEMBER(eprom_prog_w);
@@ -51,10 +54,9 @@ public:
 	DECLARE_WRITE8_MEMBER(asp_port_b_w);
 	uint32_t screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mc8030(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_region_ptr<u8> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 };

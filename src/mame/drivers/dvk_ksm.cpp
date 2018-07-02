@@ -107,6 +107,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 		{ }
 
+	void ksm(machine_config &config);
+
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 
 	virtual void machine_reset() override;
@@ -124,10 +127,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ksm_ppi_porta_w);
 	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
 
-	void ksm(machine_config &config);
 	void ksm_io(address_map &map);
 	void ksm_mem(address_map &map);
-private:
+
 	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
 	rectangle m_tmpclip;
 	bitmap_ind16 m_tmpbmp;

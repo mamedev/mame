@@ -2518,7 +2518,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/pc8001.cpp",
 	MAME_DIR .. "src/mame/includes/pc8001.h",
 	MAME_DIR .. "src/mame/drivers/pc8801.cpp",
+	MAME_DIR .. "src/mame/includes/pc8801.h",
 	MAME_DIR .. "src/mame/drivers/pc88va.cpp",
+	MAME_DIR .. "src/mame/includes/pc88va.h",
 	MAME_DIR .. "src/mame/drivers/pc100.cpp",
 	MAME_DIR .. "src/mame/drivers/pc9801.cpp",
 	MAME_DIR .. "src/mame/includes/pc9801.h",
@@ -2984,6 +2986,7 @@ files {
 	MAME_DIR .. "src/mame/video/x1.cpp",
 	MAME_DIR .. "src/mame/drivers/x1twin.cpp",
 	MAME_DIR .. "src/mame/drivers/mz2500.cpp",
+	MAME_DIR .. "src/mame/includes/mz2500.h",
 	MAME_DIR .. "src/mame/drivers/mz3500.cpp",
 	MAME_DIR .. "src/mame/drivers/pce220.cpp",
 	MAME_DIR .. "src/mame/machine/pce220_ser.cpp",
@@ -3058,6 +3061,12 @@ files {
 	MAME_DIR .. "src/mame/drivers/pve500.cpp",
 	MAME_DIR .. "src/mame/drivers/smc777.cpp",
 	MAME_DIR .. "src/mame/drivers/ps2sony.cpp",
+	MAME_DIR .. "src/mame/machine/ps2timer.cpp",
+	MAME_DIR .. "src/mame/machine/ps2timer.h",
+	MAME_DIR .. "src/mame/machine/ioptimer.cpp",
+	MAME_DIR .. "src/mame/machine/ioptimer.h",
+	MAME_DIR .. "src/mame/machine/iopdma.cpp",
+	MAME_DIR .. "src/mame/machine/iopdma.h",
 }
 
 createMESSProjects(_target, _subtarget, "sord")

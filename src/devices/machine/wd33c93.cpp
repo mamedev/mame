@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "wd33c93.h"
 
-//#define VERBOSE 1
+#define VERBOSE 1
 #include "logmacro.h"
 
 

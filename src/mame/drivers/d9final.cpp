@@ -45,6 +45,9 @@ public:
 		m_hi_vram(*this, "hi_vram"),
 		m_cram(*this, "cram") { }
 
+	void d9final(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -66,7 +69,6 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void d9final(machine_config &config);
 	void d9final_io(address_map &map);
 	void d9final_map(address_map &map);
 };

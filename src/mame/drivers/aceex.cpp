@@ -56,10 +56,13 @@ public:
 		: driver_device(mconfig, type, tag)
 		,m_maincpu(*this, "maincpu")
 	{ }
+
+	void aceex2814(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	void aceex2814(machine_config &config);
 	void aceex2814_map(address_map &map);
 };
 
