@@ -22,7 +22,10 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram") { }
 
+	void crzrally(machine_config &config);
+	void holeland(machine_config &config);
 
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -57,8 +60,6 @@ public:
 	uint32_t screen_update_crzrally(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void holeland_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void crzrally_draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
-	void crzrally(machine_config &config);
-	void holeland(machine_config &config);
 	void crzrally_map(address_map &map);
 	void holeland_map(address_map &map);
 	void io_map(address_map &map);

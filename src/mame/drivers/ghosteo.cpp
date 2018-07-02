@@ -99,6 +99,14 @@ public:
 	{
 	}
 
+	void ghosteo(machine_config &config);
+	void touryuu(machine_config &config);
+	void bballoon(machine_config &config);
+
+	void init_touryuu();
+	void init_bballoon();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<s3c2410_device> m_s3c2410;
@@ -117,8 +125,6 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	int m_rom_pagesize;
-	void init_touryuu();
-	void init_bballoon();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
@@ -131,9 +137,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_scl_w );
 	DECLARE_READ_LINE_MEMBER(s3c2410_i2c_sda_r );
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_sda_w );
-	void ghosteo(machine_config &config);
-	void touryuu(machine_config &config);
-	void bballoon(machine_config &config);
 	void bballoon_map(address_map &map);
 	void touryuu_map(address_map &map);
 };

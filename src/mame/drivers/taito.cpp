@@ -70,7 +70,16 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void taito2(machine_config &config);
+	void taito6(machine_config &config);
+	void taito(machine_config &config);
+	void shock(machine_config &config);
+	void taito4(machine_config &config);
+	void taito5(machine_config &config);
+
 	void init_taito();
+
+private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(pia_pb_r);
@@ -78,12 +87,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(votrax_request);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void taito2(machine_config &config);
-	void taito6(machine_config &config);
-	void taito(machine_config &config);
-	void shock(machine_config &config);
-	void taito4(machine_config &config);
-	void taito5(machine_config &config);
 	void taito_ay_audio(machine_config &config);
 	void shock_map(address_map &map);
 	void shock_sub_map(address_map &map);
@@ -91,7 +94,7 @@ public:
 	void taito_sub_map(address_map &map);
 	void taito_sub_map2(address_map &map);
 	void taito_sub_map5(address_map &map);
-private:
+
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
 	uint8_t m_votrax_cmd;

@@ -69,6 +69,9 @@ public:
 			m_maincpu(*this, "maincpu")
 		{ }
 
+	void hyperscan(machine_config &config);
+
+private:
 	required_device<score7_cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
@@ -88,9 +91,8 @@ public:
 	void spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
 	void spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
 
-	void hyperscan(machine_config &config);
 	void spg290_mem(address_map &map);
-private:
+
 	static const device_timer_id TIMER_SPG290 = 0;
 	static const device_timer_id TIMER_I2C = 1;
 

@@ -37,23 +37,6 @@
 class x68k_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_X68K_LED,
-		TIMER_X68K_SCC_ACK,
-		TIMER_MD_6BUTTON_PORT1_TIMEOUT,
-		TIMER_MD_6BUTTON_PORT2_TIMEOUT,
-		TIMER_X68K_BUS_ERROR,
-		TIMER_X68K_NET_IRQ,
-		TIMER_X68K_CRTC_OPERATION_END,
-		TIMER_X68K_HSYNC,
-		TIMER_X68K_CRTC_RASTER_END,
-		TIMER_X68K_CRTC_RASTER_IRQ,
-		TIMER_X68K_CRTC_VBLANK_IRQ,
-		TIMER_X68K_FDC_TC,
-		TIMER_X68K_ADPCM
-	};
-
 	x68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -91,6 +74,33 @@ public:
 		, m_gvram(0x80000/sizeof(uint16_t))
 		, m_spritereg(0x8000/sizeof(uint16_t), 0)
 	{ }
+
+	void x68kxvi(machine_config &config);
+	void x68ksupr(machine_config &config);
+	void x68030(machine_config &config);
+	void x68000(machine_config &config);
+
+	void init_x68kxvi();
+	void init_x68030();
+	void init_x68000();
+
+private:
+	enum
+	{
+		TIMER_X68K_LED,
+		TIMER_X68K_SCC_ACK,
+		TIMER_MD_6BUTTON_PORT1_TIMEOUT,
+		TIMER_MD_6BUTTON_PORT2_TIMEOUT,
+		TIMER_X68K_BUS_ERROR,
+		TIMER_X68K_NET_IRQ,
+		TIMER_X68K_CRTC_OPERATION_END,
+		TIMER_X68K_HSYNC,
+		TIMER_X68K_CRTC_RASTER_END,
+		TIMER_X68K_CRTC_RASTER_IRQ,
+		TIMER_X68K_CRTC_VBLANK_IRQ,
+		TIMER_X68K_FDC_TC,
+		TIMER_X68K_ADPCM
+	};
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<okim6258_device> m_okim6258;
@@ -266,9 +276,7 @@ public:
 	int m_sprite_shift;
 	int m_oddscanline;
 	bool m_is_32bit;
-	void init_x68kxvi();
-	void init_x68030();
-	void init_x68000();
+
 	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile);
 	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile);
 	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile_16);
@@ -349,11 +357,6 @@ public:
 	DECLARE_WRITE16_MEMBER(x68k_tvram_w);
 	DECLARE_READ16_MEMBER(x68k_tvram_r);
 	IRQ_CALLBACK_MEMBER(x68k_int_ack);
-
-	void x68kxvi(machine_config &config);
-	void x68ksupr(machine_config &config);
-	void x68030(machine_config &config);
-	void x68000(machine_config &config);
 
 	void x68030_map(address_map &map);
 	void x68k_map(address_map &map);

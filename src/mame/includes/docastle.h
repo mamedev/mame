@@ -29,6 +29,11 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void dorunrun(machine_config &config);
+	void idsoccer(machine_config &config);
+	void docastle(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
@@ -81,9 +86,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(stx_on_w);
 	DECLARE_WRITE_LINE_MEMBER(stx_off_w);
 	DECLARE_WRITE_LINE_MEMBER(idsoccer_adpcm_int);
-	void dorunrun(machine_config &config);
-	void idsoccer(machine_config &config);
-	void docastle(machine_config &config);
 	void docastle_io_map(address_map &map);
 	void docastle_map(address_map &map);
 	void docastle_map2(address_map &map);

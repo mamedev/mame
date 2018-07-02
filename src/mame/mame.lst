@@ -1018,6 +1018,7 @@ maddog2_100                     // (c) 1992
 maddog2_110                     // (c) 1992
 maddog2_202                     // (c) 1992
 maddoga                         // (c) 1990
+marvice							// (c) 1994
 spacepir                        // (c) 1992
 spacepir_14                     // (c) 1992
 wsjr                            // (c) 1991
@@ -9663,6 +9664,7 @@ chessmsta                       //
 chessmstdm                      //
 
 @source:chesstrv.cpp
+boris                           //
 borisdpl                        //
 chesstrv                        //
 
@@ -10768,6 +10770,7 @@ pinkswts                        // (c) 2006 Cave (AMI license) - 2006/04/06 MAST
 pinkswtsa                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER...
 pinkswtsb                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER.
 pinkswtsx                       // (c) 2006 Cave (AMI license) - 2006/xx/xx MASTER VER.
+pinkswtssc                      // bootleg
 
 @source:cvicny.cpp
 cvicny                          //

@@ -29,16 +29,7 @@ public:
 			out(*this, "out")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(firq_src_r);
-	DECLARE_READ8_MEMBER(zc_r);
-	DECLARE_READ8_MEMBER(dcs_data_r);
-	DECLARE_WRITE8_MEMBER(dcs_data_w);
-	DECLARE_READ8_MEMBER(dcs_ctrl_r);
-	DECLARE_WRITE8_MEMBER(dcs_reset_w);
-	DECLARE_READ8_MEMBER(rtc_r);
+	void wpc_95(machine_config &config);
 
 	void init();
 	void init_tf95();
@@ -57,12 +48,23 @@ public:
 	void init_cp();
 	void init_ttt();
 
+private:
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_WRITE8_MEMBER(watchdog_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_READ8_MEMBER(firq_src_r);
+	DECLARE_READ8_MEMBER(zc_r);
+	DECLARE_READ8_MEMBER(dcs_data_r);
+	DECLARE_WRITE8_MEMBER(dcs_data_w);
+	DECLARE_READ8_MEMBER(dcs_ctrl_r);
+	DECLARE_WRITE8_MEMBER(dcs_reset_w);
+	DECLARE_READ8_MEMBER(rtc_r);
+
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
-	void wpc_95(machine_config &config);
 	void wpc_95_map(address_map &map);
-protected:
+
 	// devices
 	required_device<cpu_device> maincpu;
 	required_device<dcs_audio_wpc_device> dcs;

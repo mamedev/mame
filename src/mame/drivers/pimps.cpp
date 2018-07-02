@@ -83,10 +83,12 @@ public:
 	{ }
 
 	void pimps(machine_config &config);
+
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
 	virtual void machine_reset() override;
+
 	required_device<cpu_device> m_maincpu;
 };
 

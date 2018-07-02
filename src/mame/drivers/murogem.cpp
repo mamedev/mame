@@ -127,6 +127,9 @@ public:
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram") { }
 
+	void murogem(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -138,7 +141,6 @@ public:
 	DECLARE_PALETTE_INIT(murogem);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void murogem(machine_config &config);
 	void murogem_map(address_map &map);
 };
 

@@ -109,17 +109,7 @@ public:
 		m_mb(*this, "mb"),
 		m_ram(*this, RAM_TAG)
 	{ }
-	required_device<cpu_device> m_maincpu;
-	required_device<at_mb_device> m_mb;
-	required_device<ram_device> m_ram;
-	void init_at();
-	void init_atpci();
-	DECLARE_READ16_MEMBER(ps1_unk_r);
-	DECLARE_WRITE16_MEMBER(ps1_unk_w);
-	DECLARE_READ8_MEMBER(ps1_portb_r);
 
-	void init_at_common(int xmsbase);
-	uint16_t m_ps1_reg[2];
 	void pc30iii(machine_config &config);
 	void k286i(machine_config &config);
 	void ibm5170(machine_config &config);
@@ -140,6 +130,20 @@ public:
 	void atvga(machine_config &config);
 	void at386(machine_config &config);
 	void ews286(machine_config &config);
+
+	void init_at();
+	void init_atpci();
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<at_mb_device> m_mb;
+	required_device<ram_device> m_ram;
+	DECLARE_READ16_MEMBER(ps1_unk_r);
+	DECLARE_WRITE16_MEMBER(ps1_unk_w);
+	DECLARE_READ8_MEMBER(ps1_portb_r);
+
+	void init_at_common(int xmsbase);
+	uint16_t m_ps1_reg[2];
 
 	static void cfg_single_360K(device_t *device);
 	static void cfg_single_1200K(device_t *device);
@@ -180,22 +184,23 @@ public:
 		m_speaker(*this, "speaker")
 	{ }
 
-public:
+	void megapcpl(machine_config &config);
+	void megapc(machine_config &config);
+
+	void init_megapc();
+	void init_megapcpl();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<wd7600_device> m_wd7600;
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
-
-	void init_megapc();
-	void init_megapcpl();
 
 	DECLARE_READ16_MEMBER( wd7600_ior );
 	DECLARE_WRITE16_MEMBER( wd7600_iow );
 	DECLARE_WRITE_LINE_MEMBER( wd7600_hold );
 	DECLARE_WRITE8_MEMBER( wd7600_tc ) { m_isabus->eop_w(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( wd7600_spkr ) { m_speaker->level_w(state); }
-	void megapcpl(machine_config &config);
-	void megapc(machine_config &config);
 	void megapc_io(address_map &map);
 	void megapc_map(address_map &map);
 	void megapcpl_io(address_map &map);

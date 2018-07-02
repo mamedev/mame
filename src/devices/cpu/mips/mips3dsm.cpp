@@ -799,11 +799,13 @@ uint32_t ee_disassembler::dasm_extra_base(uint32_t pc, uint32_t op, std::ostream
 uint32_t ee_disassembler::dasm_extra_special(uint32_t pc, uint32_t op, std::ostream &stream)
 {
 	const int rs = (op >> 21) & 31;
+	const int rd = (op >> 11) & 31;
 
 	switch (op & 63)
 	{
-		case 0x29: util::stream_format(stream, "mtsa      %s", reg[rs]);            break;
-		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);    break;
+		case 0x28: util::stream_format(stream, "mfsa      %s", reg[rd]);			break;
+		case 0x29: util::stream_format(stream, "mtsa      %s", reg[rs]);			break;
+		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);	break;
 	}
 	return 0;
 }

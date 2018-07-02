@@ -39,10 +39,8 @@ public:
 		m_igs017_igs031(*this, "igs017_igs031")
 	{ }
 
-	optional_shared_ptr<uint32_t> m_igs_mainram;
-	required_device<cpu_device> m_maincpu;
-	required_device<igs017_igs031_device> m_igs017_igs031;
-
+	void igs_majhong(machine_config &config);
+	void amazonia(machine_config &config);
 
 	void init_sdwx();
 	void init_chessc2();
@@ -59,14 +57,17 @@ public:
 	void init_amazonia();
 	void init_amazoni2();
 
+private:
+	optional_shared_ptr<uint32_t> m_igs_mainram;
+	required_device<cpu_device> m_maincpu;
+	required_device<igs017_igs031_device> m_igs017_igs031;
+
 	virtual void video_start() override;
 	uint32_t screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void sdwx_gfx_decrypt();
 	void pgm_create_dummy_internal_arm_region();
-	void igs_majhong(machine_config &config);
-	void amazonia(machine_config &config);
 	void igs_majhong_map(address_map &map);
 };
 

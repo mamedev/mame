@@ -44,17 +44,20 @@ public:
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
+	void ampro(machine_config &config);
+
 	void init_ampro();
+
+private:
 	DECLARE_MACHINE_RESET(ampro);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 
-	void ampro(machine_config &config);
 	void ampro_io(address_map &map);
 	void ampro_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
 	required_device<z80ctc_device> m_ctc;

@@ -49,16 +49,18 @@ public:
 		, m_io_row3(*this, "ROW3")
 	{ }
 
+	void myvision(machine_config &config);
+
+private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
 	DECLARE_READ8_MEMBER( ay_port_a_r );
 	DECLARE_READ8_MEMBER( ay_port_b_r );
 	DECLARE_WRITE8_MEMBER( ay_port_a_w );
 	DECLARE_WRITE8_MEMBER( ay_port_b_w );
 
-	void myvision(machine_config &config);
 	void myvision_io(address_map &map);
 	void myvision_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

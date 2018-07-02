@@ -59,6 +59,9 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
+	void sothello(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(subcpu_halt_set);
 	DECLARE_READ8_MEMBER(subcpu_halt_clear);
@@ -73,17 +76,15 @@ public:
 	DECLARE_WRITE8_MEMBER(msm_cfg_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
-	void sothello(machine_config &config);
 	void maincpu_io_map(address_map &map);
 	void maincpu_mem_map(address_map &map);
 	void soundcpu_io_map(address_map &map);
 	void soundcpu_mem_map(address_map &map);
 	void subcpu_mem_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	int m_subcpu_status;
 	int m_soundcpu_busy;
 	int m_msm_data;

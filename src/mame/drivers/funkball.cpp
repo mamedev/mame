@@ -94,6 +94,9 @@ public:
 		, m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	void funkball(machine_config &config);
+
+private:
 	uint8_t m_funkball_config_reg_sel;
 	uint8_t m_funkball_config_regs[256];
 	uint32_t m_cx5510_regs[256/4];
@@ -138,7 +141,6 @@ public:
 	DECLARE_WRITE8_MEMBER(io20_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void funkball(machine_config &config);
 	void flashbank_map(address_map &map);
 	void funkball_io(address_map &map);
 	void funkball_map(address_map &map);

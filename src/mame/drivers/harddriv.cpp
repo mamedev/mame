@@ -514,13 +514,6 @@ public:
 		, m_rightpcb(*this, "rightpcb")
 	{ }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(hack_timer);
-	DECLARE_WRITE_LINE_MEMBER(tx_a);
-
-	required_device<harddriv_state> m_mainpcb;
-	optional_device<harddriv_state> m_leftpcb;
-	optional_device<harddriv_state> m_rightpcb;
-
 	void steeltal1_machine(machine_config &config);
 	void harddriv_machine(machine_config &config);
 	void hdrivairp_machine(machine_config &config);
@@ -535,6 +528,14 @@ public:
 	void steeltalp_machine(machine_config &config);
 	void racedrivc_machine(machine_config &config);
 	void stunrun_machine(machine_config &config);
+
+private:
+	TIMER_DEVICE_CALLBACK_MEMBER(hack_timer);
+	DECLARE_WRITE_LINE_MEMBER(tx_a);
+
+	required_device<harddriv_state> m_mainpcb;
+	optional_device<harddriv_state> m_leftpcb;
+	optional_device<harddriv_state> m_rightpcb;
 };
 
 

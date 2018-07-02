@@ -46,18 +46,21 @@ public:
 		, m_floppy(nullptr)
 	{ }
 
+	void microdec(machine_config &config);
+
+	void init_microdec();
+
+private:
 	DECLARE_READ8_MEMBER(portf5_r);
 	DECLARE_READ8_MEMBER(portf6_r);
 	DECLARE_WRITE8_MEMBER(portf6_w);
 	DECLARE_READ8_MEMBER(portf7_r);
 	DECLARE_WRITE8_MEMBER(portf7_w);
 	DECLARE_WRITE8_MEMBER(portf8_w);
-	void init_microdec();
 
-	void microdec(machine_config &config);
 	void microdec_io(address_map &map);
 	void microdec_mem(address_map &map);
-private:
+
 	uint8_t m_portf8;
 	bool m_fdc_rdy;
 	virtual void machine_reset() override;

@@ -96,14 +96,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void tm990_189_v(machine_config &config);
+	void tm990_189(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
+
+private:
 	DECLARE_READ8_MEMBER(video_vdp_r);
 	DECLARE_WRITE8_MEMBER(video_vdp_w);
 	DECLARE_READ8_MEMBER(video_joy_r);
 	DECLARE_WRITE8_MEMBER(video_joy_w);
 
 	DECLARE_WRITE8_MEMBER( external_operation );
-
-	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led0_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led1_w);
@@ -138,13 +142,8 @@ public:
 	DECLARE_MACHINE_START(tm990_189_v);
 	DECLARE_MACHINE_RESET(tm990_189_v);
 
-	void tm990_189_v(machine_config &config);
-	void tm990_189(machine_config &config);
-
-protected:
 	emu_timer *m_rs232_input_timer;
 
-private:
 	void tm990_189_cru_map(address_map &map);
 	void tm990_189_memmap(address_map &map);
 	void tm990_189_v_memmap(address_map &map);

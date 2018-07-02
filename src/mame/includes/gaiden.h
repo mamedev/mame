@@ -34,6 +34,20 @@ public:
 		m_adpcm_select(*this, "adpcm_select%u", 1)
 		{ }
 
+	void raiga(machine_config &config);
+	void drgnbowl(machine_config &config);
+	void mastninj(machine_config &config);
+	void shadoww(machine_config &config);
+	void wildfang(machine_config &config);
+
+	void init_raiga();
+	void init_drgnbowl();
+	void init_drgnbowla();
+	void init_mastninj();
+	void init_shadoww();
+	void init_wildfang();
+
+private:
 	/* memory pointers */
 	required_shared_ptr_array<uint16_t, 3> m_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -100,12 +114,6 @@ public:
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(tx_videoram_w);
-	void init_raiga();
-	void init_drgnbowl();
-	void init_drgnbowla();
-	void init_mastninj();
-	void init_shadoww();
-	void init_wildfang();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info_raiga);
@@ -120,11 +128,7 @@ public:
 	void drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void descramble_drgnbowl(int descramble_cpu);
 	void descramble_mastninj_gfx(uint8_t* src);
-	void raiga(machine_config &config);
-	void drgnbowl(machine_config &config);
-	void mastninj(machine_config &config);
-	void shadoww(machine_config &config);
-	void wildfang(machine_config &config);
+
 	void drgnbowl_map(address_map &map);
 	void drgnbowl_sound_map(address_map &map);
 	void drgnbowl_sound_port_map(address_map &map);

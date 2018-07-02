@@ -54,7 +54,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(in5);
 	DECLARE_INPUT_CHANGED_MEMBER(in6);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(io_40_w);
 
 	DECLARE_READ8_MEMBER(io_60_r);
@@ -66,7 +66,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(io_d0_w);
 	DECLARE_WRITE8_MEMBER(io_e0_w);
 	DECLARE_WRITE8_MEMBER(io_f0_w);
-
 
 	DECLARE_READ_LINE_MEMBER(sid_read);
 
@@ -87,7 +86,6 @@ protected:
 	void fastinvaders_6845_io(address_map &map);
 	void fastinvaders_8275_io(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_videoram;

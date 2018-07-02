@@ -76,6 +76,11 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void pve500(machine_config &config);
+
+	void init_pve500();
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(mb8421_intl);
 	DECLARE_WRITE_LINE_MEMBER(mb8421_intr);
 	DECLARE_WRITE_LINE_MEMBER(GPI_w);
@@ -89,13 +94,11 @@ public:
 	DECLARE_WRITE8_MEMBER(io_sel_w);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
-	void init_pve500();
-	void pve500(machine_config &config);
 	void maincpu_io(address_map &map);
 	void maincpu_prg(address_map &map);
 	void subcpu_io(address_map &map);
 	void subcpu_prg(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<tmpz84c015_device> m_maincpu;

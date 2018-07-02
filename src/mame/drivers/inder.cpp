@@ -60,6 +60,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void inder(machine_config &config);
+	void brvteam(machine_config &config);
+	void canasta(machine_config &config);
+	void lapbylap(machine_config &config);
+
+	void init_inder();
+	void init_inder1();
+
+private:
 	DECLARE_READ8_MEMBER(ppic_r);
 	DECLARE_WRITE8_MEMBER(ppia_w);
 	DECLARE_WRITE8_MEMBER(ppib_w);
@@ -81,19 +90,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
 	DECLARE_WRITE_LINE_MEMBER(q9a_w);
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
-	void init_inder();
-	void init_inder1();
-	void inder(machine_config &config);
-	void brvteam(machine_config &config);
-	void canasta(machine_config &config);
-	void lapbylap(machine_config &config);
 	void brvteam_map(address_map &map);
 	void canasta_map(address_map &map);
 	void inder_map(address_map &map);
 	void inder_sub_map(address_map &map);
 	void lapbylap_map(address_map &map);
 	void lapbylap_sub_map(address_map &map);
-private:
+
 	void update_mus();
 	bool m_pc0;
 	uint8_t m_game;

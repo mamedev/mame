@@ -93,6 +93,20 @@ public:
 		m_alphabug(*this, "ALPHABUG")
 	{ }
 
+	void ti99_4(machine_config &config);
+	void ti99_4_50hz(machine_config &config);
+	void ti99_4ev_60hz(machine_config &config);
+	void ti99_4qi(machine_config &config);
+	void ti99_4qi_60hz(machine_config &config);
+	void ti99_4a_50hz(machine_config &config);
+	void ti99_4a_60hz(machine_config &config);
+	void ti99_4a(machine_config &config);
+	void ti99_4_60hz(machine_config &config);
+
+	// Interrupt triggers
+	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
+
+private:
 	// Machine management
 	DECLARE_MACHINE_START(ti99_4);
 	DECLARE_MACHINE_START(ti99_4a);
@@ -141,25 +155,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cs2_motor);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
 
-	// Interrupt triggers
-	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
-
 	// Used by EVPC
 	DECLARE_WRITE_LINE_MEMBER( video_interrupt_evpc_in );
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	void ti99_4(machine_config &config);
-	void ti99_4_50hz(machine_config &config);
-	void ti99_4ev_60hz(machine_config &config);
-	void ti99_4qi(machine_config &config);
-	void ti99_4qi_60hz(machine_config &config);
-	void ti99_4a_50hz(machine_config &config);
-	void ti99_4a_60hz(machine_config &config);
-	void ti99_4a(machine_config &config);
-	void ti99_4_60hz(machine_config &config);
 	void cru_map(address_map &map);
 	void memmap(address_map &map);
-private:
+	void memmap_setoffset(address_map &map);
+
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;
 	int     m_check_alphalock;
@@ -228,7 +231,13 @@ enum
 void ti99_4x_state::memmap(address_map &map)
 {
 	map.global_mask(0xffff);
-	map(0x0000, 0xffff).rw(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::read), FUNC(bus::ti99::internal::datamux_device::write)).setoffset(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::setoffset));
+	map(0x0000, 0xffff).rw(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::read), FUNC(bus::ti99::internal::datamux_device::write));
+}
+
+void ti99_4x_state::memmap_setoffset(address_map &map)
+{
+	map.global_mask(0xffff);
+	map(0x0000, 0xffff).r(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::setoffset));
 }
 
 /*
@@ -850,6 +859,7 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
 MACHINE_CONFIG_START(ti99_4x_state::ti99_4)
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
+	MCFG_DEVICE_ADDRESS_MAP(tms99xx_device::AS_SETOFFSET, memmap_setoffset)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti99_4x_state, external_operation) )
 	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti99_4x_state, interrupt_level) )
 	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4x_state, clock_out) )
@@ -968,6 +978,7 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
 MACHINE_CONFIG_START(ti99_4x_state::ti99_4a)
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
+	MCFG_DEVICE_ADDRESS_MAP(tms99xx_device::AS_SETOFFSET, memmap_setoffset)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti99_4x_state, external_operation) )
 	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti99_4x_state, interrupt_level) )
 	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4x_state, clock_out) )
@@ -1128,6 +1139,7 @@ MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
 MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
+	MCFG_DEVICE_ADDRESS_MAP(tms99xx_device::AS_SETOFFSET, memmap_setoffset)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti99_4x_state, external_operation) )
 	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti99_4x_state, interrupt_level) )
 	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4x_state, clock_out) )

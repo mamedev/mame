@@ -319,6 +319,9 @@ public:
 		m_y7(*this, "Y7")*/
 	{ }
 
+	void swyft(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<centronics_device> m_ctx;
 	optional_device<output_latch_device> m_ctx_data_out;
@@ -368,12 +371,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
-	uint8_t m_keyboard_line;
-	uint8_t m_floppy_control;
-
-	void swyft(machine_config &config);
 	void swyft_mem(address_map &map);
-//protected:
+
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 

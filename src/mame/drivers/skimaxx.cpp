@@ -58,6 +58,9 @@ public:
 		m_fg_buffer(*this, "fg_buffer")
 	{ }
 
+	void skimaxx(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<tms34010_device> m_tms;
@@ -92,7 +95,6 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void skimaxx(machine_config &config);
 	void m68030_1_map(address_map &map);
 	void m68030_2_map(address_map &map);
 	void tms_program_map(address_map &map);

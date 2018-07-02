@@ -59,6 +59,12 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void play_2(machine_config &config);
+	void zira(machine_config &config);
+
+	void init_zira();
+
+private:
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_WRITE8_MEMBER(port02_w);
 	DECLARE_WRITE8_MEMBER(port03_w);
@@ -78,14 +84,11 @@ public:
 	DECLARE_READ8_MEMBER(psg_r);
 	DECLARE_WRITE8_MEMBER(psg_w);
 	DECLARE_READ8_MEMBER(sound_in_r);
-	void init_zira();
 
-	void play_2(machine_config &config);
-	void zira(machine_config &config);
 	void play_2_io(address_map &map);
 	void play_2_map(address_map &map);
 	void zira_sound_map(address_map &map);
-private:
+
 	uint16_t m_clockcnt;
 	uint16_t m_resetcnt;
 	uint8_t m_kbdrow;

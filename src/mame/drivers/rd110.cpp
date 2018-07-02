@@ -62,6 +62,9 @@ public:
 		, m_midi_timer(*this, "midi_timer")
 		, m_maincpu(*this, "maincpu") { }
 
+	void d110(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(so_w);
 	DECLARE_WRITE16_MEMBER(midi_w);
@@ -74,10 +77,8 @@ public:
 	DECLARE_PALETTE_INIT(d110);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void d110(machine_config &config);
 	void d110_io(address_map &map);
 	void d110_map(address_map &map);
-private:
 
 	uint8_t  m_lcd_data_buffer[256];
 	int      m_lcd_data_buffer_pos;

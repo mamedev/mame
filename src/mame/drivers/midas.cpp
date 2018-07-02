@@ -78,6 +78,12 @@ public:
 		m_zoomram(*this, "zoomtable")
 	{ }
 
+	void hammer(machine_config &config);
+	void livequiz(machine_config &config);
+
+	void init_livequiz();
+
+private:
 	DECLARE_READ16_MEMBER(ret_ffff);
 	DECLARE_WRITE16_MEMBER(midas_gfxregs_w);
 	DECLARE_WRITE16_MEMBER(livequiz_coin_w);
@@ -86,7 +92,6 @@ public:
 	DECLARE_WRITE16_MEMBER(hammer_motor_w);
 	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
 	DECLARE_WRITE16_MEMBER(midas_zoomtable_w);
-	void init_livequiz();
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -105,8 +110,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_midas);
 
-	void hammer(machine_config &config);
-	void livequiz(machine_config &config);
 	void hammer_map(address_map &map);
 	void livequiz_map(address_map &map);
 };

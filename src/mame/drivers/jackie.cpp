@@ -75,6 +75,13 @@ public:
 		, m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void jackie(machine_config &config);
+
+	void init_jackie();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+
+private:
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
 	DECLARE_WRITE8_MEMBER(bg_scroll_w);
@@ -97,22 +104,18 @@ public:
 	void unk_reg_hi_w( int offset, uint8_t data, int reg );
 	void show_out();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
 
-	void init_jackie();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	void jackie(machine_config &config);
 	void jackie_io_map(address_map &map);
 	void jackie_prg_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

@@ -41,6 +41,9 @@ public:
 		m_539x_2(*this, MAC_539X_2_TAG)
 		{ }
 
+	void pippin(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via1;
 	optional_device<awacs_device> m_awacs;
@@ -139,16 +142,13 @@ public:
 	DECLARE_READ64_MEMBER ( unk2_r );
 
 	void init_pippin();
-	void pippin(machine_config &config);
 	void pippin_mem(address_map &map);
-private:
 	// wait states for accessing the VIA
 	int m_via_cycles;
 
 	// hack
 	uint16_t m_unk1_test;
 
-public:
 	emu_timer *m_scanline_timer;
 	uint32_t screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);

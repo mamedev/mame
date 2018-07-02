@@ -112,5 +112,3 @@ const tiny_rom_entry *coco_rs232_device::device_rom_region() const
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_RS232, device_cococart_interface, coco_rs232_device, "coco_rs232", "CoCo Deluxe RS-232 PAK")
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;

@@ -52,9 +52,11 @@ public:
 	{ }
 
 	void zsbc3(machine_config &config);
+
+private:
 	void zsbc3_io(address_map &map);
 	void zsbc3_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 

@@ -192,6 +192,12 @@ public:
 		m_nvram(*this, "nvram")
 	{ }
 
+	void wildpkr(machine_config &config);
+	void tabpkr(machine_config &config);
+
+	void init_wildpkr();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	optional_device<ds2401_device> m_id;
@@ -202,7 +208,6 @@ public:
 
 	u16 m_clock_rate;
 
-	void init_wildpkr();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wildpkr);
@@ -218,8 +223,6 @@ public:
 	DECLARE_WRITE16_MEMBER(clock_rate_w);
 	DECLARE_WRITE16_MEMBER(unknown_trigger_w);
 	IRQ_CALLBACK_MEMBER(tabpkr_irq_ack);
-	void wildpkr(machine_config &config);
-	void tabpkr(machine_config &config);
 	void hd63484_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void tabpkr_map(address_map &map);

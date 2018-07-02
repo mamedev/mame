@@ -84,6 +84,9 @@ public:
 		, m_kbspecial(*this, "keyb_special")
 	{ }
 
+	void laser3k(machine_config &config);
+
+private:
 	required_device<m6502_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
@@ -114,10 +117,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 
-	void laser3k(machine_config &config);
 	void banks_map(address_map &map);
 	void laser3k_map(address_map &map);
-private:
+
 	uint8_t m_bank0val, m_bank1val, m_bank2val, m_bank3val;
 	int m_flash;
 	int m_speaker_state;

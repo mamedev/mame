@@ -25,7 +25,7 @@ public:
 	}
 
 	void tricep(machine_config &config);
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(pci_mux_w);
 	DECLARE_READ8_MEMBER(pci_r);
 	DECLARE_WRITE8_MEMBER(pci_w);

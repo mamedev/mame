@@ -33,6 +33,11 @@ public:
 		, m_paletteram_ext(*this, "palette_ext")
 	{ }
 
+	void vaportra(machine_config &config);
+
+	void init_vaportra();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
@@ -54,7 +59,6 @@ public:
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_WRITE16_MEMBER(palette_ext_w);
 
-	void init_vaportra();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -62,7 +66,7 @@ public:
 	void update_palette( int offset );
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
-	void vaportra(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

@@ -64,11 +64,6 @@ Usage of terminal:
 class okean240_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_OKEAN_BOOT
-	};
-
 	okean240_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_term_data(0)
@@ -79,6 +74,18 @@ public:
 		, m_io_modifiers(*this, "MODIFIERS")
 		, m_maincpu(*this, "maincpu")
 	{ }
+
+	void okean240a(machine_config &config);
+	void okean240t(machine_config &config);
+	void okean240(machine_config &config);
+
+	void init_okean240();
+
+private:
+	enum
+	{
+		TIMER_OKEAN_BOOT
+	};
 
 	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
 	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
@@ -92,17 +99,13 @@ public:
 	DECLARE_READ8_MEMBER(okean240a_port42_r);
 	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(scroll_w);
-	void init_okean240();
 	uint32_t screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void okean240a(machine_config &config);
-	void okean240t(machine_config &config);
-	void okean240(machine_config &config);
 	void okean240_io(address_map &map);
 	void okean240_mem(address_map &map);
 	void okean240a_io(address_map &map);
 	void okean240t_io(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

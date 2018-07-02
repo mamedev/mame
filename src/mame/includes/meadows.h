@@ -28,6 +28,16 @@ public:
 	{
 	}
 
+	void bowl3d(machine_config &config);
+	void meadows(machine_config &config);
+	void minferno(machine_config &config);
+
+	void init_minferno();
+	void init_gypsyjug();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	required_device<s2650_device> m_maincpu;
 	optional_device<s2650_device> m_audiocpu;
 	optional_device<dac_8bit_r2r_device> m_dac;
@@ -60,9 +70,6 @@ public:
 	DECLARE_READ8_MEMBER(audio_hardware_r);
 	DECLARE_WRITE8_MEMBER(meadows_videoram_w);
 	DECLARE_WRITE8_MEMBER(meadows_spriteram_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	void init_minferno();
-	void init_gypsyjug();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_meadows(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -72,9 +79,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip);
 	void meadows_sh_update();
 	SAMPLES_START_CB_MEMBER(meadows_sh_start);
-	void bowl3d(machine_config &config);
-	void meadows(machine_config &config);
-	void minferno(machine_config &config);
 	void audio_map(address_map &map);
 	void bowl3d_main_map(address_map &map);
 	void meadows_main_map(address_map &map);

@@ -67,7 +67,8 @@ snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mco
 	m_novram(nullptr),
 	m_video(*this, TI_VDP_TAG),
 	m_sound(*this, TI_SOUNDCHIP_TAG),
-	m_colorbus(*this, COLORBUS_TAG)
+	m_colorbus(*this, COLORBUS_TAG),
+	m_console_conn(*this, ":" TI99_EVPC_CONN_TAG)
 {
 }
 
@@ -392,7 +393,6 @@ void snug_enhanced_video_device::device_start()
 {
 	m_dsrrom = memregion(TI99_DSRROM)->base();
 	m_novram = std::make_unique<uint8_t[]>(NOVRAM_SIZE);
-	m_console_conn = downcast<bus::ti99::internal::evpc_clock_connector*>(machine().device(TI99_EVPC_CONN_TAG));
 	save_item(NAME(m_address));
 	save_item(NAME(m_dsr_page));
 	save_item(NAME(m_inDsrArea));

@@ -34,6 +34,14 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void rpc700(machine_config &config);
+	void rpc600(machine_config &config);
+	void sarpc(machine_config &config);
+	void sarpc_j233(machine_config &config);
+	void a7000(machine_config &config);
+	void a7000p(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -70,12 +78,7 @@ public:
 	TIMER_CALLBACK_MEMBER(IOMD_timer0_callback);
 	TIMER_CALLBACK_MEMBER(IOMD_timer1_callback);
 	TIMER_CALLBACK_MEMBER(flyback_timer_callback);
-	void rpc700(machine_config &config);
-	void rpc600(machine_config &config);
-	void sarpc(machine_config &config);
-	void sarpc_j233(machine_config &config);
-	void a7000(machine_config &config);
-	void a7000p(machine_config &config);
+
 	void a7000_mem(address_map &map);
 };
 

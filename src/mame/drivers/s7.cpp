@@ -86,6 +86,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void s7(machine_config &config);
+
+	void init_s7();
+
+	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
+
+private:
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
@@ -112,15 +121,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
 	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
 	DECLARE_MACHINE_RESET(s7);
-	void init_s7();
-	void s7(machine_config &config);
 	void s7_audio_map(address_map &map);
 	void s7_main_map(address_map &map);
-private:
+
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
 	uint8_t m_kbdrow;

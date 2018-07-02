@@ -152,12 +152,15 @@ public:
 		m_alpha(*this, "ALPHA")
 	{ }
 
+	void ti99_4p_60hz(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
 	DECLARE_WRITE_LINE_MEMBER( extint );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
 	DECLARE_READ8_MEMBER( interrupt_level );
 
-	DECLARE_SETOFFSET_MEMBER( setoffset );
+	DECLARE_READ8_MEMBER( setoffset );
 	DECLARE_READ16_MEMBER( memread );
 	DECLARE_WRITE16_MEMBER( memwrite );
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
@@ -186,10 +189,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
 
-	void ti99_4p_60hz(machine_config &config);
 	void cru_map(address_map &map);
 	void memmap(address_map &map);
-private:
+	void memmap_setoffset(address_map &map);
+
 	void    datamux_clock_in(int clock);
 
 	// Devices
@@ -291,7 +294,12 @@ enum
 
 void ti99_4p_state::memmap(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(ti99_4p_state::memread), FUNC(ti99_4p_state::memwrite)).setoffset(FUNC(ti99_4p_state::setoffset));
+	map(0x0000, 0xffff).rw(FUNC(ti99_4p_state::memread), FUNC(ti99_4p_state::memwrite));
+}
+
+void ti99_4p_state::memmap_setoffset(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(ti99_4p_state::setoffset));
 }
 
 void ti99_4p_state::cru_map(address_map &map)
@@ -427,9 +435,9 @@ int ti99_4p_state::decode_address(int address)
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-SETOFFSET_MEMBER( ti99_4p_state::setoffset )
+READ8_MEMBER( ti99_4p_state::setoffset )
 {
-	m_addr_buf = offset << 1;
+	m_addr_buf = offset;
 	m_waitcount = 0;
 
 	if (TRACE_ADDRESS) logerror("set address %04x\n", m_addr_buf);
@@ -453,6 +461,8 @@ SETOFFSET_MEMBER( ti99_4p_state::setoffset )
 	}
 
 	ready_join();
+
+	return 0;
 }
 
 READ16_MEMBER( ti99_4p_state::memread )
@@ -1002,6 +1012,7 @@ MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
+	MCFG_DEVICE_ADDRESS_MAP(tms99xx_device::AS_SETOFFSET, memmap_setoffset)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti99_4p_state, external_operation) )
 	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti99_4p_state, interrupt_level) )
 	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4p_state, clock_out) )

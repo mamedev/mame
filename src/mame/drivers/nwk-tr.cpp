@@ -291,6 +291,12 @@ public:
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram") { }
 
+	void thrilld(machine_config &config);
+	void nwktr(machine_config &config);
+
+	void init_nwktr();
+
+private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
 
@@ -335,15 +341,13 @@ public:
 	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
-	void init_nwktr();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void lanc2_init();
-	void thrilld(machine_config &config);
-	void nwktr(machine_config &config);
+
 	void nwktr_map(address_map &map);
 	void sharc0_map(address_map &map);
 	void sharc1_map(address_map &map);

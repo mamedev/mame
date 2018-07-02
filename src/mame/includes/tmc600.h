@@ -46,6 +46,10 @@ public:
 		m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"})
 	{ }
 
+	void tmc600(machine_config &config);
+	void tmc600_video(machine_config &config);
+
+private:
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_vis;
 	required_device<cdp1852_device> m_bwio;
@@ -85,8 +89,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
 	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
-	void tmc600(machine_config &config);
-	void tmc600_video(machine_config &config);
+
 	void cdp1869_page_ram(address_map &map);
 	void tmc600_io_map(address_map &map);
 	void tmc600_map(address_map &map);

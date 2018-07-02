@@ -219,6 +219,14 @@ public:
 			m_screen(*this, "screen")
 	{ }
 
+	void studio2_cartslot(machine_config &config);
+	void studio2(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
+
+	DECLARE_READ8_MEMBER( cart_400 );
+
+protected:
 	required_device<cosmac_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	optional_device<cdp1861_device> m_vdc;
@@ -231,7 +239,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( cart_400 );
 	DECLARE_READ8_MEMBER( cart_a00 );
 	DECLARE_READ8_MEMBER( cart_e00 );
 	DECLARE_READ8_MEMBER( dispon_r );
@@ -241,13 +248,11 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( studio2_cart_load );
 
 	/* keyboard state */
 	uint8_t m_keylatch;
-	void studio2_cartslot(machine_config &config);
-	void studio2(machine_config &config);
+
 	void studio2_io_map(address_map &map);
 	void studio2_map(address_map &map);
 };
@@ -261,13 +266,15 @@ public:
 			m_color1_ram(*this, "color1_ram")
 	{ }
 
+	void visicom(machine_config &config);
+
+private:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_shared_ptr<uint8_t> m_color0_ram;
 	required_shared_ptr<uint8_t> m_color1_ram;
 
 	DECLARE_WRITE8_MEMBER( dma_w );
-	void visicom(machine_config &config);
 	void visicom_io_map(address_map &map);
 	void visicom_map(address_map &map);
 };
@@ -281,6 +288,9 @@ public:
 			m_color_ram(*this, "color_ram")
 	{ }
 
+	void mpt02(machine_config &config);
+
+private:
 	required_device<cdp1864_device> m_cti;
 
 	virtual void machine_start() override;
@@ -295,7 +305,6 @@ public:
 	/* video state */
 	required_shared_ptr<uint8_t> m_color_ram;
 	uint8_t m_color;
-	void mpt02(machine_config &config);
 	void mpt02_io_map(address_map &map);
 	void mpt02_map(address_map &map);
 };

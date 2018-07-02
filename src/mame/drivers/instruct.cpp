@@ -66,6 +66,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void instruct(machine_config &config);
+
+private:
+
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_READ8_MEMBER(portfc_r);
 	DECLARE_READ8_MEMBER(portfd_r);
@@ -78,11 +82,10 @@ public:
 	DECLARE_WRITE8_MEMBER(portfa_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(instruct);
 	INTERRUPT_GEN_MEMBER(t2l_int);
-	void instruct(machine_config &config);
 	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	uint16_t m_lar;

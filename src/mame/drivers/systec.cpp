@@ -49,9 +49,11 @@ public:
 	{ }
 
 	void systec(machine_config &config);
+
+private:
 	void systec_io(address_map &map);
 	void systec_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };

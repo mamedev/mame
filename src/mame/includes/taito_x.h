@@ -23,6 +23,13 @@ public:
 		m_in_io(*this, "IN%u", 0U)
 	{ }
 
+	void superman(machine_config &config);
+	void ballbros(machine_config &config);
+	void kyustrkr(machine_config &config);
+	void gigandes(machine_config &config);
+	void daisenpu(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(superman_dsw_input_r);
 	DECLARE_WRITE8_MEMBER(superman_counters_w);
 	DECLARE_READ16_MEMBER(daisenpu_input_r);
@@ -34,11 +41,6 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
-	void superman(machine_config &config);
-	void ballbros(machine_config &config);
-	void kyustrkr(machine_config &config);
-	void gigandes(machine_config &config);
-	void daisenpu(machine_config &config);
 	void ballbros_map(address_map &map);
 	void daisenpu_map(address_map &map);
 	void daisenpu_sound_map(address_map &map);
@@ -48,7 +50,6 @@ public:
 	void superman_map(address_map &map);
 	void taito_x_base_map(address_map &map);
 
-private:
 	optional_device<taito_cchip_device> m_cchip;
 	optional_device<timer_device> m_cchip_irq_clear;
 	required_memory_bank m_z80bank;

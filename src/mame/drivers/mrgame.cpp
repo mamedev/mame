@@ -64,8 +64,12 @@ public:
 		, m_io_x1(*this, "X1")
 	{ }
 
-	DECLARE_PALETTE_INIT(mrgame);
+	void mrgame(machine_config &config);
+
 	void init_mrgame();
+
+private:
+	DECLARE_PALETTE_INIT(mrgame);
 	DECLARE_WRITE8_MEMBER(ack1_w);
 	DECLARE_WRITE8_MEMBER(ack2_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
@@ -86,14 +90,13 @@ public:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_objectram;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void mrgame(machine_config &config);
 	void audio1_io(address_map &map);
 	void audio1_map(address_map &map);
 	void audio2_io(address_map &map);
 	void audio2_map(address_map &map);
 	void main_map(address_map &map);
 	void video_map(address_map &map);
-private:
+
 	bool m_ack1;
 	bool m_ack2;
 	bool m_ackv;

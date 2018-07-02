@@ -182,6 +182,21 @@ public:
 		, m_mdout(*this, "mdout")
 	{ }
 
+	void sq1(machine_config &config);
+	void vfx(machine_config &config);
+	void vfxsd(machine_config &config);
+	void eps(machine_config &config);
+	void vfx32(machine_config &config);
+	
+	void init_eps();
+	void init_common();
+	void init_sq1();
+	void init_denib();
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
+	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
+
+private:
 	required_device<m68000_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<es5510_device> m_esp;
@@ -218,27 +233,13 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void sq1(machine_config &config);
-	void vfx(machine_config &config);
-	void vfxsd(machine_config &config);
-	void eps(machine_config &config);
-	void vfx32(machine_config &config);
 	void eps_map(address_map &map);
 	void sq1_map(address_map &map);
 	void vfx_map(address_map &map);
 	void vfxsd_map(address_map &map);
-private:
+
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
-
-public:
-	void init_eps();
-	void init_common();
-	void init_sq1();
-	void init_denib();
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
-	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
 
 	//dmac
 	DECLARE_WRITE8_MEMBER(dma_end);

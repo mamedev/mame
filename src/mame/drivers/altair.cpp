@@ -43,14 +43,13 @@ public:
 
 	void altair(machine_config &config);
 
-protected:
+private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
 
 	virtual void machine_reset() override;
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
 };

@@ -38,6 +38,9 @@ public:
 	{
 	}
 
+	void rotaryf(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<sn76477_device> m_sn;
@@ -57,7 +60,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
-	void rotaryf(machine_config &config);
 	void rotaryf_io_map(address_map &map);
 	void rotaryf_map(address_map &map);
 };

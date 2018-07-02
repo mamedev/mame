@@ -34,6 +34,9 @@ public:
 	{
 	}
 
+	void ondra(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(ondra_keyboard_r);
 	DECLARE_WRITE8_MEMBER(ondra_port_03_w);
 	DECLARE_WRITE8_MEMBER(ondra_port_09_w);
@@ -42,10 +45,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(nmi_check_callback);
 
-	void ondra(machine_config &config);
 	void ondra_io(address_map &map);
 	void ondra_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

@@ -79,6 +79,9 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::KEYBOARD; }
 
+	void sm7238(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(sm7238);
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -90,11 +93,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sm7238(machine_config &config);
 	void sm7238_io(address_map &map);
 	void sm7238_mem(address_map &map);
 	void videobank_map(address_map &map);
-private:
+
 	void recompute_parameters();
 
 	struct

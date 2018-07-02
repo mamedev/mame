@@ -59,6 +59,9 @@ public:
 			m_floppy_connector(*this, "upd765a:%u", 0U)
 	{ }
 
+	void mz3500(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
@@ -105,14 +108,13 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
-	void mz3500(machine_config &config);
 	void mz3500_master_io(address_map &map);
 	void mz3500_master_map(address_map &map);
 	void mz3500_slave_io(address_map &map);
 	void mz3500_slave_map(address_map &map);
 	void upd7220_1_map(address_map &map);
 	void upd7220_2_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

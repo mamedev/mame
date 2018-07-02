@@ -108,8 +108,8 @@ class tx1_state : public driver_device
 public:
 	tx1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "main_cpu"),
 			m_mathcpu(*this, "math_cpu"),
+			m_maincpu(*this, "main_cpu"),
 			m_math_ram(*this, "math_ram"),
 			m_vram(*this, "vram"),
 			m_objram(*this, "objram"),
@@ -124,8 +124,18 @@ public:
 			m_sound(*this, "soundbrd")
 		{ }
 
-	required_device<cpu_device> m_maincpu;
+	void tx1(machine_config &config);
+	void tx1j(machine_config &config);
+	void buggyboy(machine_config &config);
+	void buggybjr(machine_config &config);
+
+	math_t m_math;
+	sn74s516_t m_sn74s516;
+
 	required_device<cpu_device> m_mathcpu;
+
+private:
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_math_ram;
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint16_t> m_objram;
@@ -142,9 +152,6 @@ public:
 	required_device<tx1_sound_device> m_sound;
 
 	emu_timer *m_interrupt_timer;
-
-	math_t m_math;
-	sn74s516_t m_sn74s516;
 
 	vregs_t m_vregs;
 	std::unique_ptr<uint8_t[]> m_chr_bmp;
@@ -214,10 +221,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tx1);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_buggyboy);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
-	void tx1(machine_config &config);
-	void tx1j(machine_config &config);
-	void buggyboy(machine_config &config);
-	void buggybjr(machine_config &config);
+
 	void buggybjr_main(address_map &map);
 	void buggyboy_main(address_map &map);
 	void buggyboy_math(address_map &map);

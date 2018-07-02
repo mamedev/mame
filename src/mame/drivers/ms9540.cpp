@@ -38,11 +38,11 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
-	void kbd_put(u8 data);
-
 	void ms9540(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	void kbd_put(u8 data);
+	void mem_map(address_map &map);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;

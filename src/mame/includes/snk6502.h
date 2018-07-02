@@ -29,6 +29,16 @@ public:
 		m_charram(*this, "charram")
 	{ }
 
+	void satansat(machine_config &config);
+	void vanguard(machine_config &config);
+	void sasuke(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(sasuke_count_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+	DECLARE_VIDEO_START(pballoon);
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -58,9 +68,6 @@ public:
 	DECLARE_WRITE8_MEMBER(satansat_b002_w);
 	DECLARE_WRITE8_MEMBER(satansat_backcolor_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sasuke_count_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(satansat_get_bg_tile_info);
@@ -72,7 +79,6 @@ public:
 	DECLARE_PALETTE_INIT(satansat);
 	DECLARE_VIDEO_START(snk6502);
 	DECLARE_PALETTE_INIT(snk6502);
-	DECLARE_VIDEO_START(pballoon);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -82,9 +88,7 @@ public:
 
 	void sasuke_start_counter();
 	void postload();
-	void satansat(machine_config &config);
-	void vanguard(machine_config &config);
-	void sasuke(machine_config &config);
+
 	void sasuke_map(address_map &map);
 	void satansat_map(address_map &map);
 	void vanguard_map(address_map &map);
@@ -103,13 +107,12 @@ public:
 	void nibbler(machine_config &config);
 	void pballoon(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(fantasy_flipscreen_w);
 
 	void fantasy_map(address_map &map);
 	void pballoon_map(address_map &map);
 
-private:
 	required_device<fantasy_sound_device> m_sound;
 };
 

@@ -5,6 +5,11 @@
     Kyuukoukabakugekitai - Dive Bomber Squad
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_DIVEBOMB_H
+#define MAME_INCLUDES_DIVEBOMB_H
+
+#pragma once
+
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -22,7 +27,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_spritecpu(*this, "spritecpu")
 		, m_fgcpu(*this, "fgcpu")
-		, m_rozcpucpu(*this, "rozcpu")
+		, m_rozcpu(*this, "rozcpu")
 		, m_rozbank(*this, "rozbank")
 		, m_fgram(*this, "fgram")
 		, m_spriteram(*this, "spriteram")
@@ -35,9 +40,12 @@ public:
 	{
 	}
 
+	void divebomb(machine_config &config);
+
+private:
 	required_device<cpu_device> m_spritecpu;
 	required_device<cpu_device> m_fgcpu;
-	required_device<cpu_device> m_rozcpucpu;
+	required_device<cpu_device> m_rozcpu;
 	required_memory_bank m_rozbank;
 	required_shared_ptr<uint8_t> m_fgram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -76,7 +84,6 @@ public:
 	template<int Chip> DECLARE_WRITE8_MEMBER(rozcpu_wrap_enable_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(rozcpu_enable_w);
 	DECLARE_WRITE8_MEMBER(rozcpu_pal_w);
-	void divebomb(machine_config &config);
 	void divebomb_fgcpu_iomap(address_map &map);
 	void divebomb_fgcpu_map(address_map &map);
 	void divebomb_rozcpu_iomap(address_map &map);
@@ -84,3 +91,5 @@ public:
 	void divebomb_spritecpu_iomap(address_map &map);
 	void divebomb_spritecpu_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DIVEBOMB_H

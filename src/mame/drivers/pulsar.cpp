@@ -58,7 +58,12 @@ public:
 		, m_rtc(*this, "rtc")
 		{ }
 
+
+	void pulsar(machine_config &config);
+
 	void init_pulsar();
+
+private:
 	DECLARE_MACHINE_RESET(pulsar);
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
@@ -66,10 +71,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_pc_w);
 	DECLARE_READ8_MEMBER(ppi_pc_r);
 
-	void pulsar(machine_config &config);
 	void pulsar_io(address_map &map);
 	void pulsar_mem(address_map &map);
-private:
+
 	floppy_image_device *m_floppy;
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1797_device> m_fdc;

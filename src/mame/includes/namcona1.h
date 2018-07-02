@@ -38,6 +38,18 @@ public:
 		m_maskrom(*this, "maskrom")
 	{ }
 
+	void namcona1(machine_config &config);
+
+	void init_bkrtmaq();
+	void init_fa();
+	void init_cgangpzl();
+	void init_tinklpit();
+	void init_swcourt();
+	void init_exvania();
+	void init_emeraldj();
+	void init_swcourtb();
+
+protected:
 	DECLARE_READ16_MEMBER(custom_key_r);
 	DECLARE_WRITE16_MEMBER(custom_key_w);
 	DECLARE_WRITE16_MEMBER(vreg_w);
@@ -64,25 +76,14 @@ public:
 	DECLARE_READ16_MEMBER(snd_r);
 	DECLARE_WRITE16_MEMBER(snd_w);
 
-	void init_bkrtmaq();
-	void init_fa();
-	void init_cgangpzl();
-	void init_tinklpit();
-	void init_swcourt();
-	void init_exvania();
-	void init_emeraldj();
-	void init_swcourtb();
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void namcona1(machine_config &config);
-
 	void namcona1_main_map(address_map &map);
 	void namcona1_mcu_io_map(address_map &map);
 	void namcona1_mcu_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -104,8 +105,6 @@ protected:
 	};
 
 	int m_gametype;
-
-private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
@@ -172,12 +171,12 @@ public:
 		: namcona1_state(mconfig, type, tag)
 	{}
 
+	void namcona2(machine_config &config);
+
 	void init_knckhead();
 	void init_emeralda();
 	void init_numanath();
 	void init_quiztou();
-
-	void namcona2(machine_config &config);
 };
 
 class xday2_namcona2_state : public namcona2_state
@@ -190,12 +189,15 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
 
+	void xday2(machine_config &config);
+
+	void init_xday2();
+
+private:
 	required_device <msm6242_device> m_rtc;
 
 	DECLARE_READ8_MEMBER(printer_r);
 	DECLARE_WRITE8_MEMBER(printer_w);
 
-	void init_xday2();
-	void xday2(machine_config &config);
 	void xday2_main_map(address_map &map);
 };

@@ -61,7 +61,7 @@ public:
 
 	void sbrkout(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	virtual DECLARE_READ8_MEMBER(switches_r);
 	DECLARE_WRITE_LINE_MEMBER(pot_mask1_w);
@@ -85,7 +85,6 @@ protected:
 	void update_nmi_state();
 	void main_map(address_map &map);
 
-private:
 	required_shared_ptr<uint8_t> m_videoram;
 	emu_timer *m_scanline_timer;
 	emu_timer *m_pot_timer;

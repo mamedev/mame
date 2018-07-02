@@ -64,6 +64,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void hitpoker(machine_config &config);
+
+	void init_hitpoker();
+
+private:
 	required_shared_ptr<uint8_t> m_sys_regs;
 
 	uint8_t m_pic_data;
@@ -87,13 +92,11 @@ public:
 	DECLARE_WRITE8_MEMBER(hitpoker_pic_w);
 	DECLARE_WRITE_LINE_MEMBER(hitpoker_irq);
 	DECLARE_READ8_MEMBER(irq_clear_r);
-	void init_hitpoker();
 	virtual void video_start() override;
 	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void hitpoker(machine_config &config);
 	void hitpoker_io(address_map &map);
 	void hitpoker_map(address_map &map);
 };
