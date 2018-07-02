@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_DEVICE_ADD("adc", ADC0809, 1000000) // unknown clock (needs to >640khz or the wait loop is too fast)
-	MCFG_ADC0808_IN0_CB(NOOP) // unknown
+	MCFG_ADC0808_IN0_CB(CONSTANT(0)) // unknown
 	MCFG_ADC0808_IN1_CB(IOPORT("PEDAL"))
 	MCFG_ADC0808_IN2_CB(IOPORT("STICKX"))
 	MCFG_ADC0808_IN3_CB(IOPORT("STICKY"))

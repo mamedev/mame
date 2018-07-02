@@ -766,7 +766,7 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
-	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(*this, g7400_state,i8243_port_w))
+	MCFG_I8243_ADD( "i8243", CONSTANT(0), WRITE8(*this, g7400_state,i8243_port_w))
 
 	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
 
@@ -807,7 +807,7 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
-	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(*this, g7400_state,i8243_port_w))
+	MCFG_I8243_ADD( "i8243", CONSTANT(0), WRITE8(*this, g7400_state,i8243_port_w))
 
 	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
 
