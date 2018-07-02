@@ -57,7 +57,7 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 	}
 
 	// save state
-	parent.save_pointer(NAME(m_3dfifo.get()), 0x10000);
+	parent.save_pointer(NAME(m_3dfifo), 0x10000);
 	parent.save_item(NAME(m_3dfifo_ptr));
 	parent.save_item(NAME(*m_fb[0]));
 	parent.save_item(NAME(*m_fb[1]));
@@ -1210,9 +1210,9 @@ void k001005_device::device_start()
 
 	m_renderer = auto_alloc(machine(), k001005_renderer(*this, screen(), m_k001006));
 
-	save_pointer(NAME(m_ram[0].get()), 0x140000);
-	save_pointer(NAME(m_ram[1].get()), 0x140000);
-	save_pointer(NAME(m_fifo.get()), 0x800);
+	save_pointer(NAME(m_ram[0]), 0x140000);
+	save_pointer(NAME(m_ram[1]), 0x140000);
+	save_pointer(NAME(m_fifo), 0x800);
 	save_item(NAME(m_status));
 	save_item(NAME(m_ram_ptr));
 	save_item(NAME(m_fifo_read_ptr));

@@ -95,6 +95,9 @@ public:
 	{
 	}
 
+	void pipeline(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(vram2_w);
 	DECLARE_WRITE8_MEMBER(vram1_w);
 	DECLARE_WRITE8_MEMBER(mcu_portA_w);
@@ -113,11 +116,10 @@ public:
 
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
 
-	void pipeline(machine_config &config);
 	void cpu0_mem(address_map &map);
 	void cpu1_mem(address_map &map);
 	void sound_port(address_map &map);
-protected:
+
 	required_device<cpu_device>         m_maincpu;
 	required_device<m68705r_device>     m_mcu;
 	required_device<gfxdecode_device>   m_gfxdecode;
@@ -167,7 +169,7 @@ void pipeline_state::video_start()
 	m_tilemap2->set_transparent_pen(0);
 
 	save_item(NAME(m_vidctrl));
-	save_pointer(NAME(m_palram.get()), 0x1000);
+	save_pointer(NAME(m_palram), 0x1000);
 }
 
 u32 pipeline_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -12,6 +12,7 @@
 #include "validity.h"
 
 #include "emuopts.h"
+#include "romload.h"
 #include "video/rgbutil.h"
 
 #include <ctype.h>

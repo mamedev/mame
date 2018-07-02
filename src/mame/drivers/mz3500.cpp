@@ -55,9 +55,13 @@ public:
 			m_beeper(*this, "beeper"),
 			m_palette(*this, "palette"),
 			m_system_dsw(*this, "SYSTEM_DSW"),
-			m_fd_dsw(*this, "FD_DSW")
+			m_fd_dsw(*this, "FD_DSW"),
+			m_floppy_connector(*this, "upd765a:%u", 0U)
 	{ }
 
+	void mz3500(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
@@ -104,14 +108,13 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
-	void mz3500(machine_config &config);
 	void mz3500_master_io(address_map &map);
 	void mz3500_master_map(address_map &map);
 	void mz3500_slave_io(address_map &map);
 	void mz3500_slave_map(address_map &map);
 	void upd7220_1_map(address_map &map);
 	void upd7220_2_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -121,7 +124,7 @@ protected:
 private:
 	required_ioport m_system_dsw;
 	required_ioport m_fd_dsw;
-	floppy_connector *m_floppy_connector[4];
+	required_device_array<floppy_connector, 4> m_floppy_connector;
 };
 
 void mz3500_state::video_start()
@@ -757,13 +760,6 @@ void mz3500_state::machine_start()
 	m_char_rom = memregion("gfx1")->base();
 	m_work_ram = make_unique_clear<uint8_t[]>(0x40000);
 	m_shared_ram = make_unique_clear<uint8_t[]>(0x800);
-
-	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
-
-	for (int i = 0; i < 4; i++)
-	{
-		m_floppy_connector[i] = machine().device<floppy_connector>(m_fddnames[i]);
-	}
 }
 
 void mz3500_state::machine_reset()
@@ -777,10 +773,7 @@ void mz3500_state::machine_reset()
 	//m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_srdy = 0;
 
-	upd765a_device *fdc;
-	fdc = machine().device<upd765a_device>(":upd765a");
-
-	if (fdc)
+	if (m_fdc.found())
 	{
 		m_fdd_sel = 0;
 		{
@@ -790,7 +783,7 @@ void mz3500_state::machine_reset()
 				elem->get_device()->set_rpm(300);
 			}
 
-			machine().device<upd765a_device>("upd765a")->set_rate(250000);
+			m_fdc->set_rate(250000);
 		}
 	}
 

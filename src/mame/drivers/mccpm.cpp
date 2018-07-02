@@ -44,9 +44,11 @@ public:
 	{ }
 
 	void mccpm(machine_config &config);
+
+private:
 	void mccpm_io(address_map &map);
 	void mccpm_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;

@@ -46,7 +46,13 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
+	void gameking(machine_config &config);
+	void gameking3(machine_config &config);
+	void gameking1(machine_config &config);
+
 	void init_gameking();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(gameking);
@@ -70,11 +76,8 @@ public:
 		uint8_t bank8000_cart; //34 bit 7; bits 0,1,.. a15,a16,..
 		uint8_t res2[0x4c];
 	};
-	void gameking(machine_config &config);
-	void gameking3(machine_config &config);
-	void gameking1(machine_config &config);
 	void gameking_mem(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_io_joy;

@@ -19,6 +19,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void maddonna(machine_config &config);
+	void oneshot(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_sprites;
 	required_shared_ptr<uint16_t> m_bg_videoram;
@@ -64,8 +68,6 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void maddonna(machine_config &config);
-	void oneshot(machine_config &config);
 	void oneshot_map(address_map &map);
 	void oneshot_sound_map(address_map &map);
 };

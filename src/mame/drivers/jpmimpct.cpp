@@ -259,8 +259,7 @@ READ16_MEMBER(jpmimpct_state::duart_1_r)
 		case 0xe:
 		{
 			attotime rate = attotime::from_hz(MC68681_1_CLOCK) * (16 * duart_1.CT);
-			timer_device *duart_timer = machine().device<timer_device>("duart_1_timer");
-			duart_timer->adjust(rate, 0, rate);
+			m_duart_1_timer->adjust(rate, 0, rate);
 			break;
 		}
 		case 0xf:

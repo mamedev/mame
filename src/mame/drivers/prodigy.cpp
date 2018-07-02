@@ -148,6 +148,9 @@ public:
 #endif
 	{ }
 
+	void prodigy(machine_config &config);
+
+private:
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit0_cb);
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit1_cb);
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit2_cb);
@@ -165,9 +168,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 
-	void prodigy(machine_config &config);
 	void maincpu_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_74145;
 	uint8_t m_segments;

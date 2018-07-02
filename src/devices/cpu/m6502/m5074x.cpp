@@ -109,6 +109,13 @@ void m5074x_device::device_start()
 }
 
 
+device_memory_interface::space_config_vector m5074x_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------

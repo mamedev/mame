@@ -109,6 +109,14 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
+	void stepone(machine_config &config);
+	void jb3000(machine_config &config);
+	void myb3k(machine_config &config);
+
+	/* Monitor */
+	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
+
+private:
 	/* Interrupt controller */
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 
@@ -158,23 +166,15 @@ public:
 	/* Video Controller */
 	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
 
-	/* Monitor */
-	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
-
 	/* Status bits */
 	DECLARE_READ8_MEMBER(myb3k_io_status_r);
 
-	void stepone(machine_config &config);
-	void jb3000(machine_config &config);
-	void myb3k(machine_config &config);
-
 	void myb3k_io(address_map &map);
 	void myb3k_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	/* Interrupt Controller */
 	void pic_ir5_w(int source, int state);
 	void pic_ir7_w(int source, int state);
@@ -1004,7 +1004,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", stepone_isa_cards, nullptr, false)
 
 	/* Centronics */
-	MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD (m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (*this, myb3k_state, centronics_ack_w))
 	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (*this, myb3k_state, centronics_busy_w))
 	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (*this, myb3k_state, centronics_perror_w))

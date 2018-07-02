@@ -38,12 +38,13 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	void init_altos5();
 	void altos5(machine_config &config);
+
+	void init_altos5();
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altos5);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
@@ -59,7 +60,6 @@ protected:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-private:
 	uint8_t m_port08;
 	uint8_t m_port09;
 	uint8_t *m_p_prom;

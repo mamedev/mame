@@ -50,7 +50,7 @@ public:
 
 	void wildfire(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(write_d);
@@ -66,7 +66,6 @@ protected:
 	void write_a12(int state);
 	void sound_update();
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<timer_device> m_a12_decay_timer;

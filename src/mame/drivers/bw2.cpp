@@ -80,44 +80,28 @@ READ8_MEMBER( bw2_state::read )
 	if (offset < 0x8000)
 	{
 		if (!rom)
-		{
 			data = m_rom->base()[offset & 0x3fff];
-		}
 
 		if (!vram)
-		{
 			data = m_video_ram[offset & 0x3fff];
-		}
 
 		if (!ram1)
-		{
 			data = m_ram->pointer()[offset];
-		}
 
 		if (!ram2 && HAS_KB_OF_RAM(96))
-		{
 			data = m_ram->pointer()[0x10000 | offset];
-		}
 
 		if (!ram3 && HAS_KB_OF_RAM(128))
-		{
 			data = m_ram->pointer()[0x18000 | offset];
-		}
 
 		if (!ram4 && HAS_KB_OF_RAM(160))
-		{
 			data = m_ram->pointer()[0x20000 | offset];
-		}
 
 		if (!ram5 && HAS_KB_OF_RAM(192))
-		{
 			data = m_ram->pointer()[0x28000 | offset];
-		}
 
 		if (!ram6 && HAS_KB_OF_RAM(224))
-		{
 			data = m_ram->pointer()[0x30000 | offset];
-		}
 	}
 	else
 	{
@@ -150,39 +134,25 @@ WRITE8_MEMBER( bw2_state::write )
 	if (offset < 0x8000)
 	{
 		if (!vram)
-		{
 			m_video_ram[offset & 0x3fff] = data;
-		}
 
 		if (!ram1)
-		{
 			m_ram->pointer()[offset] = data;
-		}
 
 		if (!ram2 && HAS_KB_OF_RAM(96))
-		{
 			m_ram->pointer()[0x10000 | offset] = data;
-		}
 
 		if (!ram3 && HAS_KB_OF_RAM(128))
-		{
 			m_ram->pointer()[0x18000 | offset] = data;
-		}
 
 		if (!ram4 && HAS_KB_OF_RAM(160))
-		{
 			m_ram->pointer()[0x20000 | offset] = data;
-		}
 
 		if (!ram5 && HAS_KB_OF_RAM(192))
-		{
 			m_ram->pointer()[0x28000 | offset] = data;
-		}
 
 		if (!ram6 && HAS_KB_OF_RAM(224))
-		{
 			m_ram->pointer()[0x30000 | offset] = data;
-		}
 	}
 	else
 	{
@@ -591,12 +561,12 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_PALETTE_INIT_OWNER(bw2_state, bw2)
 
 	// devices
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
+	MCFG_DEVICE_ADD(m_pit, PIT8253, 0)
 	MCFG_PIT8253_CLK0(16_MHz_XTAL / 4) // 8251 USART TXC, RXC
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251_TAG, i8251_device, write_rxc))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_uart, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_uart, i8251_device, write_rxc))
 	MCFG_PIT8253_CLK1(11000) // LCD controller
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(I8253_TAG, pit8253_device, write_clk2))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_pit, pit8253_device, write_clk2))
 	MCFG_PIT8253_CLK2(0) // Floppy /MTRON
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, bw2_state, mtron_w))
 
@@ -610,19 +580,19 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_DEVICE_ADDRESS_MAP(0, lcdc_map)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, bw2_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
+	MCFG_DEVICE_ADD(m_uart, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, i8251_device, write_dsr))
 
 	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 16_MHz_XTAL / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

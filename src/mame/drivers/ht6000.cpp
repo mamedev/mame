@@ -33,11 +33,10 @@ public:
 
 	void ht6000(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_memory_region m_rom2;
 	required_ioport_array<16> m_switches;
 

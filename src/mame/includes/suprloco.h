@@ -18,6 +18,11 @@ public:
 		m_scrollram(*this, "scrollram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
+	void suprloco(machine_config &config);
+
+	void init_suprloco();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -40,13 +45,11 @@ public:
 
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(suprloco);
-	void init_suprloco();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void draw_pixel(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip);
 	void draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect,int spr_number);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void suprloco(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);

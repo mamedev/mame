@@ -101,7 +101,7 @@ void phoenix_sound_device::device_start()
 	save_item(NAME(m_noise_state.polyoffs));
 	save_item(NAME(m_noise_state.lowpass_counter));
 	save_item(NAME(m_noise_state.lowpass_polybit));
-	save_pointer(NAME(m_poly18.get()), (1ul << (18-5)));
+	save_pointer(NAME(m_poly18), (1ul << (18-5)));
 }
 
 int phoenix_sound_device::update_c24(int samplerate)

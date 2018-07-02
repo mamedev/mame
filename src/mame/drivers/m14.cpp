@@ -70,6 +70,12 @@ public:
 		m_samples(*this,"samples")
 		{ }
 
+	void m14(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -88,9 +94,6 @@ public:
 	DECLARE_WRITE8_MEMBER(paddle_x_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
-
 	TILE_GET_INFO_MEMBER(m14_get_tile_info);
 	void draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
@@ -100,10 +103,9 @@ public:
 	uint32_t screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m14_irq);
 
-	void m14(machine_config &config);
 	void m14_io_map(address_map &map);
 	void m14_map(address_map &map);
-private:
+
 	/* video-related */
 	tilemap_t  *m_m14_tilemap;
 

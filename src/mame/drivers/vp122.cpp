@@ -25,13 +25,15 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void vp122(machine_config &config);
+
+private:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void vp122(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	void vram_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_region_ptr<u8> m_p_chargen;

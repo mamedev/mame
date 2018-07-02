@@ -56,6 +56,9 @@ public:
 		, m_keyboard(*this, "LINE.%u", 0)
 	{ }
 
+	void tvc(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<tvc_sound_device> m_sound;
@@ -110,7 +113,7 @@ public:
 	uint8_t       m_cassette_ff;
 	uint8_t       m_centronics_ff;
 	DECLARE_PALETTE_INIT(tvc);
-	void tvc(machine_config &config);
+
 	void tvc_io(address_map &map);
 	void tvc_mem(address_map &map);
 };
@@ -797,7 +800,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_TVC_SOUND_SNDINT_CALLBACK(WRITELINE(*this, tvc_state, int_ff_set))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tvc_state, centronics_ack))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

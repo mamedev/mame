@@ -29,14 +29,16 @@ public:
 		m_maincpu(*this, "maincpu")
 	{}
 
+	void attckufo(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_READ8_MEMBER( vic_colorram_r );
 
-	void attckufo(machine_config &config);
 	void cpu_map(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 

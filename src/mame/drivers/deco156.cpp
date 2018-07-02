@@ -45,7 +45,7 @@ public:
 	void hvysmsh(machine_config &config);
 	void wcvol95(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE32_MEMBER(hvysmsh_eeprom_w);
 	DECLARE_READ32_MEMBER(pf1_rowscroll_r);
 	DECLARE_READ32_MEMBER(pf2_rowscroll_r);
@@ -64,7 +64,6 @@ protected:
 	void hvysmsh_map(address_map &map);
 	void wcvol95_map(address_map &map);
 
-private:
 	/* devices */
 	required_device<arm_cpu_device> m_maincpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
@@ -87,7 +86,7 @@ void deco156_state::video_start()
 	/* and register the allocated ram so that save states still work */
 	save_item(NAME(m_pf1_rowscroll));
 	save_item(NAME(m_pf2_rowscroll));
-	save_pointer(NAME(m_spriteram.get()), 0x2000/2);
+	save_pointer(NAME(m_spriteram), 0x2000/2);
 }
 
 

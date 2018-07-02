@@ -34,11 +34,6 @@
 class tank8_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_COLLISION
-	};
-
 	tank8_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -53,10 +48,16 @@ public:
 		m_team(*this, "team")
 	{ }
 
-	void init_decode();
 	void tank8(machine_config &config);
 
-protected:
+	void init_decode();
+
+private:
+	enum
+	{
+		TIMER_COLLISION
+	};
+
 	DECLARE_READ8_MEMBER(collision_r);
 	DECLARE_WRITE8_MEMBER(lockout_w);
 	DECLARE_WRITE8_MEMBER(int_reset_w);
@@ -86,7 +87,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void tank8_cpu_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;

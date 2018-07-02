@@ -32,15 +32,17 @@ public:
 
 	void jpmsru(machine_config &config);
 	void jpmsru_4(machine_config &config);
+
+	void init_jpmsru();
+
+private:
 	void jpmsru_4_map(address_map &map);
 	void jpmsru_io(address_map &map);
 	void jpmsru_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 public:
-	void init_jpmsru();
 };
 
 // blind guess

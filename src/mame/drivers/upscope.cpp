@@ -44,6 +44,11 @@ public:
 	m_ppi(*this, "ppi")
 	{ }
 
+	void upscope(machine_config &config);
+
+	void init_upscope();
+
+private:
 	uint8_t m_nvram[0x100];
 	uint8_t m_prev_cia1_porta;
 	uint8_t m_parallel_data;
@@ -58,16 +63,13 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 
-	void init_upscope();
 
-	void upscope(machine_config &config);
 	void a500_mem(address_map &map);
 	void main_map(address_map &map);
 	void overlay_512kb_map(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 
-private:
 	required_device<i8255_device> m_ppi;
 };
 

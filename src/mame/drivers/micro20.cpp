@@ -40,6 +40,9 @@ public:
 	{
 	}
 
+	void micro20(machine_config &config);
+
+private:
 	required_device<m68020_device> m_maincpu;
 	required_memory_region m_rom;
 	required_shared_ptr<uint32_t> m_mainram;
@@ -62,9 +65,8 @@ public:
 		m_maincpu->set_input_line(M68K_IRQ_4, state);
 	}
 
-	void micro20(machine_config &config);
 	void micro20_map(address_map &map);
-private:
+
 	u8 m_tin;
 	u8 m_h4;
 };

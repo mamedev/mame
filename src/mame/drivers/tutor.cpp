@@ -200,6 +200,10 @@ public:
 	{
 	}
 
+	void pyuutajr(machine_config &config);
+	void tutor(machine_config &config);
+
+private:
 	required_device<tms9995_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	optional_device<cassette_image_device> m_cass;
@@ -227,8 +231,6 @@ public:
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	void pyuutajr(machine_config &config);
-	void tutor(machine_config &config);
 	void pyuutajr_mem(address_map &map);
 	void tutor_io(address_map &map);
 	void tutor_memmap(address_map &map);
@@ -762,7 +764,7 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tutor_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

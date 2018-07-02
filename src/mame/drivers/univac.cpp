@@ -77,7 +77,7 @@ public:
 
 	void uts20(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -96,7 +96,6 @@ protected:
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;
 
-private:
 	required_device<cpu_device>     m_maincpu;
 	required_device<nvram_device>   m_nvram;
 	required_device<z80ctc_device>  m_ctc;
@@ -223,7 +222,7 @@ void univac_state::machine_start()
 	m_p_parity.reset(new u8[parity_bytes]);
 	std::fill_n(m_p_parity.get(), parity_bytes, 0);
 
-	save_pointer(NAME(m_p_parity.get()), parity_bytes);
+	save_pointer(NAME(m_p_parity), parity_bytes);
 	save_item(NAME(m_bank_mask));
 	save_item(NAME(m_parity_check));
 	save_item(NAME(m_parity_poison));

@@ -114,11 +114,15 @@ class jrpacman_state : public pacman_state
 public:
 	jrpacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag) { }
+
+	void jrpacman(machine_config &config);
+
+	void init_jrpacman();
+
+private:
 	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	void init_jrpacman();
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void jrpacman(machine_config &config);
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 };

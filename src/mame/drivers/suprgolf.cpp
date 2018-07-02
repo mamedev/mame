@@ -35,14 +35,20 @@
 class suprgolf_state : public driver_device
 {
 public:
-	suprgolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	suprgolf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
+	void suprgolf(machine_config &config);
+
+	void init_suprgolf();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -85,13 +91,11 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void init_suprgolf();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void suprgolf(machine_config &config);
 	void io_map(address_map &map);
 	void suprgolf_map(address_map &map);
 };
@@ -122,10 +126,10 @@ void suprgolf_state::video_start()
 	save_item(NAME(m_vreg_pen));
 	save_item(NAME(m_palette_switch));
 	save_item(NAME(m_bg_vreg_test));
-	save_pointer(NAME(m_paletteram.get()), 0x1000);
-	save_pointer(NAME(m_bg_vram.get()), 0x2000*0x20);
-	save_pointer(NAME(m_bg_fb.get()), 0x2000*0x20);
-	save_pointer(NAME(m_fg_fb.get()), 0x2000*0x20);
+	save_pointer(NAME(m_paletteram), 0x1000);
+	save_pointer(NAME(m_bg_vram), 0x2000*0x20);
+	save_pointer(NAME(m_bg_fb), 0x2000*0x20);
+	save_pointer(NAME(m_fg_fb), 0x2000*0x20);
 }
 
 uint32_t suprgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -461,12 +465,12 @@ WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
 	m_toggle ^= 1;
 	if(m_toggle)
 	{
-		m_msm->data_w((m_msm5205next & 0xf0) >> 4);
+		m_msm->write_data((m_msm5205next & 0xf0) >> 4);
 		if(m_msm_nmi_mask) { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 	}
 	else
 	{
-		m_msm->data_w((m_msm5205next & 0x0f) >> 0);
+		m_msm->write_data((m_msm5205next & 0x0f) >> 0);
 	}
 }
 

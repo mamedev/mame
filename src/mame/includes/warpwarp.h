@@ -29,6 +29,22 @@ public:
 		m_ports(*this, { { "SW0", "SW1", "DSW2", "PLACEHOLDER" } }) // "IN1" & "IN2" are read separately when offset==3
 	{ }
 
+	void warpwarp(machine_config &config);
+	void geebee(machine_config &config);
+	void navarone(machine_config &config);
+	void kaitei(machine_config &config);
+	void bombbee(machine_config &config);
+	void geebeeb(machine_config &config);
+
+	void init_navarone();
+	void init_geebee();
+	void init_kaitein();
+	void init_warpwarp();
+	void init_sos();
+	void init_kaitei();
+	void init_bombbee();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -76,13 +92,7 @@ public:
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(kaitei);
-	void init_navarone();
-	void init_geebee();
-	void init_kaitein();
-	void init_warpwarp();
-	void init_sos();
-	void init_kaitei();
-	void init_bombbee();
+
 	DECLARE_VIDEO_START(geebee);
 	DECLARE_PALETTE_INIT(geebee);
 	DECLARE_VIDEO_START(warpwarp);
@@ -100,12 +110,7 @@ public:
 	void draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void warpwarp(machine_config &config);
-	void geebee(machine_config &config);
-	void navarone(machine_config &config);
-	void kaitei(machine_config &config);
-	void bombbee(machine_config &config);
-	void geebeeb(machine_config &config);
+
 	void bombbee_map(address_map &map);
 	void geebee_map(address_map &map);
 	void geebee_port_map(address_map &map);

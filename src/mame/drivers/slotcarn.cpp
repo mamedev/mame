@@ -47,6 +47,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen") { }
 
+	void slotcarn(machine_config &config);
+
+private:
 	pen_t m_pens[NUM_PENS];
 	required_shared_ptr<uint8_t> m_backup_ram;
 	required_shared_ptr<uint8_t> m_ram_attr;
@@ -60,7 +63,6 @@ public:
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	void slotcarn(machine_config &config);
 	void slotcarn_map(address_map &map);
 	void spielbud_io_map(address_map &map);
 };
@@ -534,7 +536,7 @@ GFXDECODE_END
 void slotcarn_state::machine_start()
 {
 	m_ram_palette = std::make_unique<uint8_t[]>(RAM_PALETTE_SIZE);
-	save_pointer(NAME(m_ram_palette.get()), RAM_PALETTE_SIZE);
+	save_pointer(NAME(m_ram_palette), RAM_PALETTE_SIZE);
 }
 
 /***********************************

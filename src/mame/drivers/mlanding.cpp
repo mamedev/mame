@@ -70,13 +70,6 @@
 class mlanding_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_DMA_COMPLETE
-	};
-
-	static const uint32_t c_dma_bank_words = 0x2000;
-
 	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -97,6 +90,16 @@ public:
 		m_power_ram(*this, "power_ram"),
 		m_palette(*this, "palette")
 	{ }
+
+	void mlanding(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_DMA_COMPLETE
+	};
+
+	static const uint32_t c_dma_bank_words = 0x2000;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -165,7 +168,6 @@ public:
 	uint32_t exec_dma();
 	void msm5205_update(int chip);
 
-	void mlanding(machine_config &config);
 	void audio_map_io(address_map &map);
 	void audio_map_prog(address_map &map);
 	void dsp_map_data(address_map &map);
@@ -173,7 +175,7 @@ public:
 	void main_map(address_map &map);
 	void mecha_map_prog(address_map &map);
 	void sub_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -192,7 +194,7 @@ void mlanding_state::machine_start()
 	m_dma_bank->configure_entries(0, 2, m_dma_ram.get(), c_dma_bank_words * 2);
 
 	// Register state for saving
-	save_pointer(NAME(m_dma_ram.get()), c_dma_bank_words * 2);
+	save_pointer(NAME(m_dma_ram), c_dma_bank_words * 2);
 	save_item(NAME(m_dma_cpu_bank));
 	save_item(NAME(m_dma_busy));
 	save_item(NAME(m_dsp_hold_signal));
@@ -577,7 +579,7 @@ void mlanding_state::msm5205_update(int chip)
 	uint8_t data = rom[m_msm_pos[chip]];
 	msm5205_device *msm = chip ? m_msm2 : m_msm1;
 
-	msm->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
+	msm->write_data((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
 
 	if (m_msm_nibble[chip])
 		++m_msm_pos[chip];

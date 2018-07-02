@@ -58,16 +58,18 @@ public:
 	{
 	}
 
+	void z9001(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(port88_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void z9001(machine_config &config);
 	void z9001_io(address_map &map);
 	void z9001_mem(address_map &map);
-private:
+
 	uint8_t m_framecnt;
 	bool m_cassbit;
 	virtual void machine_reset() override;

@@ -45,6 +45,12 @@ public:
 		m_keyboard(*this, "pc_keyboard")
 	{ }
 
+	void ibmpcjx(machine_config &config);
+	void ibmpcjr(machine_config &config);
+
+	void init_pcjr();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
 	required_device<pit8253_device> m_pit8253;
@@ -105,9 +111,6 @@ public:
 	};
 
 	void machine_reset() override;
-	void init_pcjr();
-	void ibmpcjx(machine_config &config);
-	void ibmpcjr(machine_config &config);
 	void ibmpcjr_io(address_map &map);
 	void ibmpcjr_map(address_map &map);
 	void ibmpcjx_io(address_map &map);
@@ -400,7 +403,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
 		m_fdc->set_floppy(nullptr);
 
 	if((pdor^m_pcjr_dor) & 0x80)
-		m_fdc->reset();
+		m_fdc->soft_reset();
 
 	if(m_pcjr_dor & 0x20) {
 		if((pdor & 0x40) && !(m_pcjr_dor & 0x40))

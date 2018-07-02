@@ -183,7 +183,8 @@ void tms9980a_device::mem_read()
 	case 1:
 		m_pass = 4;         // make the CPU visit this method more than once
 		if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
-		m_prgspace->set_address(m_address & m_prgaddr_mask & ~1);
+		if (m_sospace)
+			m_sospace->read_byte(m_address & m_prgaddr_mask & ~1);
 		if (TRACE_ADDRESSBUS) logerror("tms9980a: set address bus %04x\n", m_address & m_prgaddr_mask & ~1);
 		m_check_ready = true;
 		break;
@@ -194,7 +195,8 @@ void tms9980a_device::mem_read()
 		m_current_value = (value << 8) & 0xff00;
 		break;
 	case 3:
-		m_prgspace->set_address((m_address & m_prgaddr_mask) | 1);
+		if (m_sospace)
+			m_sospace->read_byte((m_address & m_prgaddr_mask) | 1);
 		if (TRACE_ADDRESSBUS) logerror("tms9980a: set address bus %04x\n", (m_address & m_prgaddr_mask) | 1);
 		break;
 	case 4:
@@ -216,7 +218,8 @@ void tms9980a_device::mem_write()
 	case 1:
 		m_pass = 4;         // make the CPU visit this method once more
 		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
-		m_prgspace->set_address(m_address & m_prgaddr_mask & ~1);
+		if (m_sospace)
+			m_sospace->read_byte(m_address & m_prgaddr_mask & ~1);
 		if (TRACE_ADDRESSBUS) logerror("tms9980a: set address bus %04x\n", m_address & m_prgaddr_mask & ~1);
 		m_prgspace->write_byte(m_address & 0x3ffe & ~1, (m_current_value >> 8)&0xff);
 		if (TRACE_MEM) logerror("tms9980a: memory write high byte %04x <- %02x\n", m_address & m_prgaddr_mask & ~1, (m_current_value >> 8)&0xff);
@@ -226,7 +229,8 @@ void tms9980a_device::mem_write()
 		// no action here, just wait for READY
 		break;
 	case 3:
-		m_prgspace->set_address((m_address & m_prgaddr_mask) | 1);
+		if (m_sospace)
+			m_sospace->read_byte((m_address & m_prgaddr_mask) | 1);
 		if (TRACE_ADDRESSBUS) logerror("tms9980a: set address bus %04x\n", (m_address & m_prgaddr_mask) | 1);
 		m_prgspace->write_byte((m_address & m_prgaddr_mask) | 1, m_current_value & 0xff);
 		if (TRACE_MEM) logerror("tms9980a: memory write low byte %04x <- %02x\n", (m_address & m_prgaddr_mask) | 1,  m_current_value & 0xff);

@@ -531,11 +531,11 @@ VIDEO_START_MEMBER(raiden2_state,raiden2)
 	m_palette_data = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_palette->basemem().set(m_palette_data.get(), 0x1000/2 * sizeof(uint16_t), 16, ENDIANNESS_LITTLE, 2);
 
-	save_pointer(NAME(m_back_data.get()), 0x800/2);
-	save_pointer(NAME(m_fore_data.get()), 0x800/2);
-	save_pointer(NAME(m_mid_data.get()), 0x800/2);
-	save_pointer(NAME(m_text_data.get()), 0x1000/2);
-	save_pointer(NAME(m_palette_data.get()), 0x1000/2);
+	save_pointer(NAME(m_back_data), 0x800/2);
+	save_pointer(NAME(m_fore_data), 0x800/2);
+	save_pointer(NAME(m_mid_data), 0x800/2);
+	save_pointer(NAME(m_text_data), 0x1000/2);
+	save_pointer(NAME(m_palette_data), 0x1000/2);
 
 	text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
 	background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
@@ -1444,6 +1444,7 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
 	MCFG_DEVICE_PROGRAM_MAP(raiden2_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1519,6 +1520,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
 	MCFG_DEVICE_PROGRAM_MAP(zeroteam_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

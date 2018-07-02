@@ -26,14 +26,15 @@ public:
 		, m_p_ram(*this, "ram")
 	{ }
 
+	void dual68(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_WRITE16_MEMBER(terminal_w);
 
-	void dual68(machine_config &config);
 	void dual68_mem(address_map &map);
 	void sio4_io(address_map &map);
 	void sio4_mem(address_map &map);
-private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;

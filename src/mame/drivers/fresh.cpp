@@ -44,6 +44,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void fresh(machine_config &config);
+
+private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_2_tilemap;
 
@@ -52,14 +55,12 @@ public:
 	required_shared_ptr<uint16_t> m_attr_videoram;
 	required_shared_ptr<uint16_t> m_attr_2_videoram;
 
-
 	DECLARE_WRITE16_MEMBER(fresh_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(fresh_attr_videoram_w);
 	TILE_GET_INFO_MEMBER(get_fresh_bg_tile_info);
 	DECLARE_WRITE16_MEMBER(fresh_bg_2_videoram_w);
 	DECLARE_WRITE16_MEMBER(fresh_attr_2_videoram_w);
 	TILE_GET_INFO_MEMBER(get_fresh_bg_2_tile_info);
-
 
 	uint16_t m_d30000_value;
 
@@ -102,7 +103,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void fresh(machine_config &config);
 	void fresh_map(address_map &map);
 };
 

@@ -22,6 +22,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"){ }
 
+	void dribling(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -53,7 +56,6 @@ public:
 	DECLARE_PALETTE_INIT(dribling);
 	uint32_t screen_update_dribling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dribling_irq_gen);
-	void dribling(machine_config &config);
 	void dribling_map(address_map &map);
 	void io_map(address_map &map);
 };

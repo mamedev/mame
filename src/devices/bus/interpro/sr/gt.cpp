@@ -409,8 +409,8 @@ void gt_device_base::device_start()
 		gt.buffer.reset(new u8[GT_BUFFER_SIZE * 2]);
 		gt.mask.reset(new u8[GT_BUFFER_SIZE * 2]);
 
-		save_pointer(gt.buffer.get(), util::string_format("buffer%i", i).c_str(), GT_BUFFER_SIZE * 2);
-		save_pointer(gt.mask.get(), util::string_format("mask%i", i).c_str(), GT_BUFFER_SIZE * 2);
+		save_pointer(NAME(gt.buffer), GT_BUFFER_SIZE * 2, i);
+		save_pointer(NAME(gt.mask), GT_BUFFER_SIZE * 2, i);
 	}
 
 	// allocate timers

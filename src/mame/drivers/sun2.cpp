@@ -158,6 +158,10 @@ public:
 		, m_bw2_vram(*this, "bw2_vram")
 	{ }
 
+	void sun2mbus(machine_config &config);
+	void sun2vme(machine_config &config);
+
+private:
 	required_device<m68010_device> m_maincpu;
 	required_memory_region m_rom, m_idprom;
 	required_device<ram_device> m_ram;
@@ -176,8 +180,6 @@ public:
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void sun2mbus(machine_config &config);
-	void sun2vme(machine_config &config);
 	void mbustype0space_map(address_map &map);
 	void mbustype1space_map(address_map &map);
 	void mbustype2space_map(address_map &map);
@@ -187,7 +189,7 @@ public:
 	void vmetype1space_map(address_map &map);
 	void vmetype2space_map(address_map &map);
 	void vmetype3space_map(address_map &map);
-private:
+
 	uint16_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
 	uint16_t m_diagreg, m_sysenable, m_buserror;

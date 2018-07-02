@@ -37,8 +37,8 @@
 class elwro800_state : public spectrum_state
 {
 public:
-	elwro800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_state(mconfig, type, tag),
+	elwro800_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spectrum_state(mconfig, type, tag),
 		m_i8251(*this, "i8251"),
 		m_i8255(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
@@ -50,6 +50,9 @@ public:
 	{
 	}
 
+	void elwro800(machine_config &config);
+
+private:
 	/* for elwro800 */
 	/* RAM mapped at 0 */
 	uint8_t m_ram_at_0000;
@@ -67,13 +70,12 @@ public:
 	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
-	void elwro800(machine_config &config);
 	void elwro800_bank1(address_map &map);
 	void elwro800_bank2(address_map &map);
 	void elwro800_io(address_map &map);
 	void elwro800_m1(address_map &map);
 	void elwro800_mem(address_map &map);
-protected:
+
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;
 	required_device<centronics_device> m_centronics;
@@ -603,7 +605,7 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, elwro800_state, i8255_port_c_w))
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, elwro800_state, write_centronics_ack))
 

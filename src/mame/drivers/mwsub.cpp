@@ -32,7 +32,7 @@ public:
 
 	void submar(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(submar_sensor0_r);

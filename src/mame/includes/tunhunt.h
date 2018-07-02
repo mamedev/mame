@@ -26,7 +26,7 @@ public:
 
 	void tunhunt(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(button_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -50,7 +50,6 @@ protected:
 	int hposition,int vstart,int vstop,int vstretch,int hstretch);
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

@@ -92,7 +92,7 @@ ioport_constructor electron_plus1_device::device_input_ports() const
 
 MACHINE_CONFIG_START(electron_plus1_device::device_add_mconfig)
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, electron_plus1_device, busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -130,9 +130,9 @@ const tiny_rom_entry *electron_plus1_device::device_rom_region() const
 //  electron_plus1_device - constructor
 //-------------------------------------------------
 
-electron_plus1_device::electron_plus1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELECTRON_PLUS1, tag, owner, clock),
-		device_electron_expansion_interface(mconfig, *this),
+electron_plus1_device::electron_plus1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ELECTRON_PLUS1, tag, owner, clock),
+	device_electron_expansion_interface(mconfig, *this),
 	m_exp_rom(*this, "exp_rom"),
 	m_cart_sk1(*this, "cart_sk1"),
 	m_cart_sk2(*this, "cart_sk2"),

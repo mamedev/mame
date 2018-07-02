@@ -18,6 +18,7 @@
 
 #include "emuopts.h"
 #include "harddisk.h"
+#include "romload.h"
 
 
 OPTION_GUIDE_START(hd_option_guide)

@@ -61,7 +61,7 @@ public:
 
 	void peyper(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(sw_r);
 	DECLARE_WRITE8_MEMBER(col_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
@@ -79,7 +79,6 @@ protected:
 	void peyper_io(address_map &map);
 	void peyper_map(address_map &map);
 
-private:
 	uint8_t m_digit;
 	uint8_t m_disp_layout[36];
 	required_device<cpu_device> m_maincpu;

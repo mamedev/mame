@@ -82,6 +82,11 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
+	void lastfght(machine_config &config);
+
+	void init_lastfght();
+
+private:
 	/* memory */
 	DECLARE_WRITE16_MEMBER(hi_w);
 	DECLARE_WRITE16_MEMBER(x_w);
@@ -100,18 +105,15 @@ public:
 	DECLARE_WRITE16_MEMBER(c00006_w);
 	DECLARE_READ16_MEMBER(sound_r);
 	DECLARE_WRITE16_MEMBER(sound_w);
-	void init_lastfght();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void lastfght(machine_config &config);
 	void lastfght_map(address_map &map);
 	void ramdac_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	/* video-related */
 	bitmap_ind16 m_bitmap[2];
 	int m_dest;

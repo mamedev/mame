@@ -69,6 +69,9 @@ public:
 		m_joykeymap(*this, "JOYKEYMAP%u", 0)
 	{ }
 
+	void mc1000(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	optional_device<mc6845_device> m_crtc;
@@ -122,7 +125,6 @@ public:
 
 	void init_mc1000();
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tick);
-	void mc1000(machine_config &config);
 	void mc1000_banking_mem(address_map &map);
 	void mc1000_io(address_map &map);
 	void mc1000_mem(address_map &map);
@@ -474,7 +476,7 @@ void mc1000_state::machine_start()
 	bankswitch();
 
 	/* register for state saving */
-	save_pointer(NAME(m_banked_ram.get()), 0xc000);
+	save_pointer(NAME(m_banked_ram), 0xc000);
 	save_item(NAME(m_rom0000));
 	save_item(NAME(m_mc6845_bank));
 	save_item(NAME(m_mc6847_bank));
@@ -579,7 +581,7 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc1000_cass")
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, mc1000_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

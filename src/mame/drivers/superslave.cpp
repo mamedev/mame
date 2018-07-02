@@ -61,7 +61,7 @@ public:
 
 	void superslave(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void superslave_io(address_map &map);
@@ -69,12 +69,10 @@ protected:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( baud_w );
 	DECLARE_WRITE8_MEMBER( memctrl_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( cmd_w );
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
 	required_device<ram_device> m_ram;
@@ -151,17 +149,6 @@ WRITE8_MEMBER( superslave_state::write )
 	{
 		m_ram->pointer()[offset] = data;
 	}
-}
-
-
-//-------------------------------------------------
-//  baud_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( superslave_state::baud_w )
-{
-	m_dbrg->write_str(data & 0x0f);
-	m_dbrg->write_stt(data >> 4);
 }
 
 
@@ -272,7 +259,7 @@ void superslave_state::superslave_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(Z80DART_0_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x0c, 0x0f).rw(Z80DART_1_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
-	map(0x10, 0x10).mirror(0x03).w(FUNC(superslave_state::baud_w));
+	map(0x10, 0x10).mirror(0x03).w(BR1941_TAG, FUNC(com8116_device::stt_str_w));
 	map(0x14, 0x17).rw(Z80PIO_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x18, 0x18).mirror(0x02).rw(AM9519_TAG, FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
 	map(0x19, 0x19).mirror(0x02).rw(AM9519_TAG, FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
@@ -317,11 +304,6 @@ INPUT_PORTS_END
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  COM8116_INTERFACE( dbrg_intf )
-//-------------------------------------------------
-
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )

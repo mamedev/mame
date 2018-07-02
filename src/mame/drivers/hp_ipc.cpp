@@ -392,6 +392,11 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
+	void hp_ipc_base(machine_config &config);
+	void hp_ipc(machine_config &config);
+	void hp9808a(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -418,17 +423,12 @@ public:
 
 	emu_timer *m_bus_error_timer;
 
-	void hp_ipc_base(machine_config &config);
-	void hp_ipc(machine_config &config);
-
 	void hp_ipc_mem_inner_base(address_map &map);
 	void hp_ipc_mem_inner_9807a(address_map &map);
 	void hp_ipc_mem_outer(address_map &map);
 
-	void hp9808a(machine_config &config);
 	void hp_ipc_mem_inner_9808a(address_map &map);
 
-private:
 	required_device<m68000_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<wd2797_device> m_fdc;
@@ -446,7 +446,6 @@ private:
 		return (m_mmu[(m_maincpu->get_fc() >> 1) & 3] + offset) & 0x3FFFFF;
 	}
 
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
 	bool m_bus_error;
@@ -764,15 +763,15 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 
 	MCFG_DEVICE_ADD("hpib", TMS9914, 4_MHz_XTAL)
 	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, hp_ipc_state, irq_3))
-	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG , ieee488_device , dio_r) , WRITE8(IEEE488_TAG , ieee488_device , dio_w))
-	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , eoi_w))
-	MCFG_TMS9914_DAV_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , dav_w))
-	MCFG_TMS9914_NRFD_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , nrfd_w))
-	MCFG_TMS9914_NDAC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , ndac_w))
-	MCFG_TMS9914_IFC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , ifc_w))
-	MCFG_TMS9914_SRQ_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , srq_w))
-	MCFG_TMS9914_ATN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , atn_w))
-	MCFG_TMS9914_REN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , ren_w))
+	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG , ieee488_device , dio_r) , WRITE8(IEEE488_TAG , ieee488_device , host_dio_w))
+	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_eoi_w))
+	MCFG_TMS9914_DAV_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_dav_w))
+	MCFG_TMS9914_NRFD_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_nrfd_w))
+	MCFG_TMS9914_NDAC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ndac_w))
+	MCFG_TMS9914_IFC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ifc_w))
+	MCFG_TMS9914_SRQ_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_srq_w))
+	MCFG_TMS9914_ATN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_atn_w))
+	MCFG_TMS9914_REN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ren_w))
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_EOI_CALLBACK(WRITELINE("hpib" , tms9914_device , eoi_w))
 	MCFG_IEEE488_DAV_CALLBACK(WRITELINE("hpib" , tms9914_device , dav_w))

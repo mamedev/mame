@@ -60,8 +60,10 @@ public:
 	{ }
 
 	void ax80(machine_config &config);
-	void ax80_map(address_map &map);
+
 private:
+	void ax80_map(address_map &map);
+
 	virtual void machine_reset() override;
 	required_device<upd7810_device> m_maincpu;
 };

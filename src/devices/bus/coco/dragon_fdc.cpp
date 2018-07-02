@@ -86,9 +86,6 @@
 #define WD2797_TAG              "wd2797"
 
 
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;
-
 
 /***************************************************************************
     TYPE DEFINITIONS

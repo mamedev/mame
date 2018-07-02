@@ -69,6 +69,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void smc777(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_READ8_MEMBER(attr_r);
@@ -105,15 +108,13 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(smc777);
 
-	void smc777(machine_config &config);
 	void smc777_io(address_map &map);
 	void smc777_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
@@ -971,11 +972,11 @@ void smc777_state::machine_start()
 	m_gvram = make_unique_clear<uint8_t[]>(0x8000);
 	m_pcg = make_unique_clear<uint8_t[]>(0x800);
 
-	save_pointer(NAME(m_work_ram.get()), 0x10000);
-	save_pointer(NAME(m_vram.get()), 0x800);
-	save_pointer(NAME(m_attr.get()), 0x800);
-	save_pointer(NAME(m_gvram.get()), 0x8000);
-	save_pointer(NAME(m_pcg.get()), 0x800);
+	save_pointer(NAME(m_work_ram), 0x10000);
+	save_pointer(NAME(m_vram), 0x800);
+	save_pointer(NAME(m_attr), 0x800);
+	save_pointer(NAME(m_gvram), 0x8000);
+	save_pointer(NAME(m_pcg), 0x800);
 
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, smc777_charlayout, m_pcg.get(), 0, 8, 0));
 }

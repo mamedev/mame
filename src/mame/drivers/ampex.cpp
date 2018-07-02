@@ -36,6 +36,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void ampex(machine_config &config);
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(read_5840);
@@ -54,9 +57,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(so_w);
 	DECLARE_WRITE_LINE_MEMBER(dav_w);
 
-	void ampex(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_start() override;
 
 	u8 m_page;
@@ -202,7 +204,7 @@ void ampex_state::machine_start()
 	save_item(NAME(m_attr));
 	save_item(NAME(m_attr_readback));
 	save_item(NAME(m_uart_loopback));
-	save_pointer(NAME(m_paged_ram.get()), 0x1800 * 4);
+	save_pointer(NAME(m_paged_ram), 0x1800 * 4);
 }
 
 MACHINE_CONFIG_START(ampex_state::ampex)

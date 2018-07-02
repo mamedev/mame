@@ -35,6 +35,11 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void ts816(machine_config &config);
+
+	void init_ts816();
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
@@ -42,12 +47,10 @@ public:
 	DECLARE_WRITE8_MEMBER(port78_w);
 	DECLARE_WRITE8_MEMBER(porte0_w);
 	DECLARE_WRITE8_MEMBER(portf0_w);
-	void init_ts816();
 
-	void ts816(machine_config &config);
 	void ts816_io(address_map &map);
 	void ts816_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	uint8_t m_status;
 	bool m_2ndbank;

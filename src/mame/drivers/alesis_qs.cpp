@@ -25,8 +25,10 @@ public:
 	{ }
 
 	void qs7(machine_config &config);
+
+private:
 	void qs7_prog_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 };
 

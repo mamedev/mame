@@ -60,7 +60,7 @@ public:
 
 	void accomm(machine_config &config);
 
-protected:
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(ch00switch_w);
@@ -98,7 +98,6 @@ protected:
 	inline uint8_t read_vram( uint16_t addr );
 	inline void plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 
-private:
 	bool m_ch00rom_enabled;
 
 	/* ULA context */
@@ -893,7 +892,7 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END

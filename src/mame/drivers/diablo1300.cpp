@@ -144,12 +144,13 @@ public:
 		, m_maincpu(*this, "maincpu")
   { }
 
+	void diablo1300(machine_config &config);
+
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-public:
-	void diablo1300(machine_config &config);
+
 	void diablo1300_map(address_map &map);
 	void diablo1300_data_map(address_map &map);
 };

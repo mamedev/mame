@@ -50,18 +50,20 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void selz80(machine_config &config);
+	void dagz80(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 	DECLARE_MACHINE_RESET(dagz80);
 	DECLARE_MACHINE_RESET(selz80);
 
-	void selz80(machine_config &config);
-	void dagz80(machine_config &config);
 	void dagz80_mem(address_map &map);
 	void selz80_io(address_map &map);
 	void selz80_mem(address_map &map);
-private:
+
 	uint8_t m_digit;
 	void setup_baud();
 	required_device<cpu_device> m_maincpu;

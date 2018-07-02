@@ -35,7 +35,7 @@ public:
 
 	void altos8600(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ16_MEMBER(cpuram_r);
 	DECLARE_WRITE16_MEMBER(cpuram_w);
 	DECLARE_READ16_MEMBER(stkram_r);
@@ -82,7 +82,6 @@ protected:
 	void extra_mem(address_map &map);
 	void stack_mem(address_map &map);
 
-private:
 	u16 xlate_r(address_space &space, offs_t offset, u16 mem_mask, int permbit);
 	void xlate_w(address_space &space, offs_t offset, u16 data, u16 mem_mask, int permbit);
 	void seterr(offs_t offset, u16 mem_mask, u16 err_mask);
@@ -798,8 +797,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("ics", ACS8600_ICS, 0)
-	MCFG_ACS8600_ICS_MAINCPU(":dmac") // TODO: fixme
+	MCFG_DEVICE_ADD("ics", ACS8600_ICS, "dmac")
 	MCFG_ACS8600_ICS_IRQ1(WRITELINE("pic8259_1", pic8259_device, ir5_w))
 	MCFG_ACS8600_ICS_IRQ2(WRITELINE("pic8259_1", pic8259_device, ir6_w))
 

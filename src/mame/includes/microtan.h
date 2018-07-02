@@ -41,12 +41,16 @@ public:
 		m_led(*this, "led1")
 	{ }
 
+	void microtan(machine_config &config);
+
+	void init_microtan();
+
+private:
 	DECLARE_READ8_MEMBER(microtan_sound_r);
 	DECLARE_WRITE8_MEMBER(microtan_sound_w);
 	DECLARE_READ8_MEMBER(microtan_bffx_r);
 	DECLARE_WRITE8_MEMBER(microtan_bffx_w);
 	DECLARE_WRITE8_MEMBER(microtan_videoram_w);
-	void init_microtan();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_microtan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(microtan_interrupt);
@@ -74,9 +78,8 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER( microtan );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( microtan );
 
-	void microtan(machine_config &config);
 	void microtan_map(address_map &map);
-protected:
+
 	virtual void machine_start() override { m_led.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;

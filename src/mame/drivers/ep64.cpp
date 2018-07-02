@@ -193,6 +193,10 @@ public:
 		m_y(*this, "Y%u", 0)
 	{ }
 
+	void ep128(machine_config &config);
+	void ep64(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dave_device> m_dave;
 	required_device<nick_device> m_nick;
@@ -217,8 +221,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
-	void ep128(machine_config &config);
-	void ep64(machine_config &config);
 	void dave_128k_mem(address_map &map);
 	void dave_64k_mem(address_map &map);
 	void dave_io(address_map &map);
@@ -589,7 +591,7 @@ MACHINE_CONFIG_START(ep64_state::ep64)
 	MCFG_EP64_EXPANSION_BUS_SLOT_NMI_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_NMI))
 	MCFG_EP64_EXPANSION_BUS_SLOT_WAIT_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, ep64_state, write_centronics_busy))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 

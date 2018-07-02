@@ -114,8 +114,8 @@ VIDEO_START_MEMBER(psikyo_state,psikyo)
 	m_spritebuf[0] = std::make_unique<uint32_t[]>(0x2000 / 4);
 	m_spritebuf[1] = std::make_unique<uint32_t[]>(0x2000 / 4);
 
-	save_pointer(NAME(m_spritebuf[0].get()), 0x2000 / 4, 0);
-	save_pointer(NAME(m_spritebuf[1].get()), 0x2000 / 4, 1);
+	save_pointer(NAME(m_spritebuf[0]), 0x2000 / 4, 0);
+	save_pointer(NAME(m_spritebuf[1]), 0x2000 / 4, 1);
 	save_item(NAME(m_old_linescroll));
 }
 

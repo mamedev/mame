@@ -28,6 +28,9 @@ public:
 			m_floppy2(*this, FDC9266_TAG ":2:35dd"),
 			m_floppy3(*this, FDC9266_TAG ":3:35dd") { }
 
+	void tim011(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_tim011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -44,7 +47,6 @@ public:
 	required_device<floppy_image_device> m_floppy1;
 	required_device<floppy_image_device> m_floppy2;
 	required_device<floppy_image_device> m_floppy3;
-	void tim011(machine_config &config);
 	void tim011_io(address_map &map);
 	void tim011_mem(address_map &map);
 };

@@ -174,6 +174,9 @@ class hp64k_state : public driver_device
 public:
 	hp64k_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp64k(machine_config &config);
+
+private:
 	virtual void driver_start() override;
 	//virtual void machine_start();
 	virtual void video_start() override;
@@ -237,10 +240,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
 
 	DECLARE_WRITE_LINE_MEMBER(hp64k_baud_clk_w);
-	void hp64k(machine_config &config);
 	void cpu_io_map(address_map &map);
 	void cpu_mem_map(address_map &map);
-private:
+
 	required_device<hp_5061_3011_cpu_device> m_cpu;
 	required_device<i8275_device> m_crtc;
 	required_device<palette_device> m_palette;
@@ -1461,15 +1463,15 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_PHI_INT_WRITE_CB(WRITELINE(*this, hp64k_state , hp64k_phi_int_w))
 	MCFG_PHI_DMARQ_WRITE_CB(WRITELINE("cpu" , hp_5061_3011_cpu_device , halt_w))
 	MCFG_PHI_SYS_CNTRL_READ_CB(READLINE(*this, hp64k_state , hp64k_phi_sys_ctrl_r))
-	MCFG_PHI_DIO_READWRITE_CB(READ8(IEEE488_TAG , ieee488_device , dio_r) , WRITE8(IEEE488_TAG , ieee488_device , dio_w))
-	MCFG_PHI_EOI_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , eoi_w))
-	MCFG_PHI_DAV_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , dav_w))
-	MCFG_PHI_NRFD_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , nrfd_w))
-	MCFG_PHI_NDAC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , ndac_w))
-	MCFG_PHI_IFC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , ifc_w))
-	MCFG_PHI_SRQ_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , srq_w))
-	MCFG_PHI_ATN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , atn_w))
-	MCFG_PHI_REN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , ren_w))
+	MCFG_PHI_DIO_READWRITE_CB(READ8(IEEE488_TAG , ieee488_device , dio_r) , WRITE8(IEEE488_TAG , ieee488_device , host_dio_w))
+	MCFG_PHI_EOI_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_eoi_w))
+	MCFG_PHI_DAV_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_dav_w))
+	MCFG_PHI_NRFD_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_nrfd_w))
+	MCFG_PHI_NDAC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ndac_w))
+	MCFG_PHI_IFC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ifc_w))
+	MCFG_PHI_SRQ_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_srq_w))
+	MCFG_PHI_ATN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_atn_w))
+	MCFG_PHI_REN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ren_w))
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_EOI_CALLBACK(WRITELINE("phi" , phi_device , eoi_w))
 	MCFG_IEEE488_DAV_CALLBACK(WRITELINE("phi" , phi_device , dav_w))

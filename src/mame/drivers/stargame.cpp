@@ -29,15 +29,17 @@ public:
 		, m_ctc(*this, "ctc")
 		{ }
 
+	void stargame(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(rint_w);
 	DECLARE_MACHINE_RESET(stargame);
 
-	void stargame(machine_config &config);
 	void audiocpu_io(address_map &map);
 	void audiocpu_map(address_map &map);
 	void maincpu_io(address_map &map);
 	void maincpu_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<z80ctc_device> m_ctc;

@@ -35,7 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite);
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
-	DECLARE_WRITE8_MEMBER(set_gromlines); // Combined GROM select lines
+	void set_gromlines(line_state mline, line_state moline, line_state gsq);
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
 	void set_mask(int mask) { m_mask = mask; }
@@ -72,7 +72,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(romgq_line) = 0;
-	virtual DECLARE_WRITE8_MEMBER(set_gromlines) = 0;
+	virtual void set_gromlines(line_state mline, line_state moline, line_state gsq) =0;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(gclock_in) = 0;
 

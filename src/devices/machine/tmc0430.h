@@ -17,11 +17,6 @@
 
 DECLARE_DEVICE_TYPE(TMC0430, tmc0430_device)
 
-#ifndef READ8Z_MEMBER
-#define DECLARE_READ8Z_MEMBER(name)     void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value, ATTR_UNUSED uint8_t mem_mask = 0xff)
-#define READ8Z_MEMBER(name)             void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value, ATTR_UNUSED uint8_t mem_mask)
-#endif
-
 enum
 {
 	GROM_M_LINE = 1,
@@ -35,16 +30,14 @@ public:
 
 	template <class Object> devcb_base &set_ready_wr_callback(Object &&cb) { return m_gromready.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	void readz(uint8_t *value);
+	void write(uint8_t data);
+	void set_lines(line_state mline, line_state moline, line_state gsq);
 
 	DECLARE_WRITE_LINE_MEMBER(m_line);
 	DECLARE_WRITE_LINE_MEMBER(mo_line);
 	DECLARE_WRITE_LINE_MEMBER(gsq_line);
-
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
-
-	DECLARE_WRITE8_MEMBER( set_lines );
 
 	void set_region_and_ident(const char *regionname, int offset, int ident)
 	{

@@ -140,8 +140,8 @@ It's a very rare computer. It has 2 processors, Z80 and 8088, so it can run both
 class octopus_state : public driver_device
 {
 public:
-	octopus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	octopus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_crtc(*this, "crtc"),
@@ -170,6 +170,9 @@ public:
 		m_z80_active(false)
 		{ }
 
+	void octopus(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -224,16 +227,14 @@ public:
 		BEEP_TIMER = 100
 	};
 
-	void octopus(machine_config &config);
 	void octopus_io(address_map &map);
 	void octopus_mem(address_map &map);
 	void octopus_sub_io(address_map &map);
 	void octopus_sub_mem(address_map &map);
 	void octopus_vram(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<scn2674_device> m_crtc;
@@ -942,7 +943,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, octopus_state,gpo_w))
 
 	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic_slave",pic8259_device, ir2_w)) MCFG_DEVCB_INVERT
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic_slave",pic8259_device, ir2_w))
 
 	// Keyboard UART
 	MCFG_DEVICE_ADD("keyboard", I8251, 0)
@@ -991,7 +992,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("serial",z80sio_device, ctsb_w)) MCFG_DEVCB_INVERT
 	//MCFG_RS232_RI_HANDLER(WRITELINE("serial",z80sio_device, rib_w)) MCFG_DEVCB_INVERT
 
-	MCFG_CENTRONICS_ADD("parallel", octopus_centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_parallel, CENTRONICS, octopus_centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, octopus_state, parallel_busy_w))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, octopus_state, parallel_slctout_w))
 	// TODO: Winchester HD controller (Xebec/SASI compatible? uses TTL logic)

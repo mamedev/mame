@@ -57,7 +57,7 @@ public:
 
 	void z88(machine_config &config);
 
-protected:
+private:
 	enum
 	{
 		Z88_BANK_ROM = 1,
@@ -94,7 +94,6 @@ protected:
 	void z88_io(address_map &map);
 	void z88_mem(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_bios_region;
 	required_device<ram_device> m_ram;
@@ -113,9 +112,9 @@ private:
 		uint8_t page;
 	} m_bank[4];
 
-	int			m_bank_type[4];
-	uint8_t *	m_bios;
-	uint8_t *	m_ram_base;
+	int         m_bank_type[4];
+	uint8_t *   m_bios;
+	uint8_t *   m_ram_base;
 };
 
 #endif /* MAME_INCLUDES_Z88_H */

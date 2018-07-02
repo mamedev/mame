@@ -484,6 +484,11 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void majorpkr(machine_config &config);
+
+	void init_majorpkr();
+
+private:
 	DECLARE_WRITE8_MEMBER(rom_bank_w);
 	DECLARE_WRITE8_MEMBER(palette_bank_w);
 	DECLARE_WRITE8_MEMBER(vram_bank_w);
@@ -496,17 +501,14 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_a_w);
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	DECLARE_WRITE8_MEMBER(pulses_w);
-	void init_majorpkr();
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void majorpkr(machine_config &config);
 	void map(address_map &map);
 	void palettebanks(address_map &map);
 	void portmap(address_map &map);
 	void vrambanks(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 

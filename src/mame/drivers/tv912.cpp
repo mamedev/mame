@@ -91,6 +91,11 @@ public:
 		, m_baudgen_timer(nullptr)
 	{ }
 
+	void tv912(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
+
+private:
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_WRITE8_MEMBER(p2_w);
@@ -102,13 +107,10 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
-
-	void tv912(machine_config &config);
 	void bank_map(address_map &map);
 	void io_map(address_map &map);
 	void prog_map(address_map &map);
-private:
+
 	enum
 	{
 		TIMER_BAUDGEN
@@ -338,7 +340,7 @@ void tv912_state::machine_start()
 	save_item(NAME(m_lpt_select));
 	save_item(NAME(m_4hz_flasher));
 	save_item(NAME(m_keyboard_scan));
-	save_pointer(NAME(m_dispram.get()), 0x1000);
+	save_pointer(NAME(m_dispram), 0x1000);
 }
 
 void tv912_state::machine_reset()

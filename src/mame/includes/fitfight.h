@@ -22,6 +22,15 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void bbprot(machine_config &config);
+	void fitfight(machine_config &config);
+	
+	void init_hotmindff();
+	void init_fitfight();
+	void init_histryma();
+	void init_bbprot();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_fof_100000;
 	required_shared_ptr<uint16_t> m_fof_600000;
@@ -57,10 +66,6 @@ public:
 	DECLARE_WRITE16_MEMBER(fof_txt_tileram_w);
 
 	DECLARE_READ16_MEMBER( hotmindff_unk_r );
-	void init_hotmindff();
-	void init_fitfight();
-	void init_histryma();
-	void init_bbprot();
 	TILE_GET_INFO_MEMBER(get_fof_bak_tile_info);
 	TILE_GET_INFO_MEMBER(get_fof_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fof_txt_tile_info);
@@ -73,8 +78,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void bbprot(machine_config &config);
-	void fitfight(machine_config &config);
 	void bbprot_main_map(address_map &map);
 	void fitfight_main_map(address_map &map);
 	void snd_mem(address_map &map);

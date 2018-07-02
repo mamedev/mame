@@ -22,6 +22,10 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void meteors(machine_config &config);
+	void spcforce(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(SN76496_latch_w);
 	DECLARE_READ8_MEMBER(SN76496_select_r);
 	DECLARE_WRITE8_MEMBER(SN76496_select_w);
@@ -40,12 +44,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void meteors(machine_config &config);
-	void spcforce(machine_config &config);
+
 	void spcforce_map(address_map &map);
 	void spcforce_sound_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;

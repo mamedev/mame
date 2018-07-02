@@ -114,7 +114,12 @@ public:
 		m_rtc(*this, "rtc"),
 		m_io_analog(*this, "AN.%u", 0)
 	{ }
+
+	void mwskins(machine_config &config);
+
 	void init_mwskins();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -183,7 +188,7 @@ public:
 
 	DECLARE_READ8_MEMBER(parallel_r);
 	DECLARE_WRITE8_MEMBER(parallel_w);
-	void mwskins(machine_config &config);
+
 	void map0(address_map &map);
 	void map1(address_map &map);
 	void map2(address_map &map);

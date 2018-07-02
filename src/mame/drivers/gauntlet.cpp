@@ -550,25 +550,25 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gauntlet_state::gauntlet)
 	gauntlet_base(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 104)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 104, true)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(gauntlet_state::gaunt2p)
 	gauntlet_base(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 107)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, true)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(gauntlet_state::gauntlet2)
 	gauntlet_base(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 106)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 106, true)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(gauntlet_state::vindctr2)
 	gauntlet_base(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 118)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 118, true)
 MACHINE_CONFIG_END
 
 

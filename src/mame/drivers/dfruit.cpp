@@ -36,6 +36,9 @@ public:
 		m_vdp(*this, "tc0091lvc")
 	{ }
 
+	void dfruit(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
 
@@ -71,7 +74,6 @@ public:
 	uint8_t ram_bank_r(uint16_t offset, uint8_t bank_num);
 	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
 	TIMER_DEVICE_CALLBACK_MEMBER(dfruit_irq_scanline);
-	void dfruit(machine_config &config);
 	void dfruit_map(address_map &map);
 	void tc0091lvc_map(address_map &map);
 };
@@ -146,14 +148,12 @@ WRITE8_MEMBER(dfruit_state::dfruit_ram_bank_w)
 
 uint8_t dfruit_state::ram_bank_r(uint16_t offset, uint8_t bank_num)
 {
-	address_space &vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
-	return vdp_space.read_byte(offset + (m_ram_bank[bank_num]) * 0x1000);;
+	return m_vdp->space().read_byte(offset + (m_ram_bank[bank_num]) * 0x1000);;
 }
 
 void dfruit_state::ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num)
 {
-	address_space &vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
-	vdp_space.write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
+	m_vdp->space().write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
 }
 
 READ8_MEMBER(dfruit_state::dfruit_ram_0_r) { return ram_bank_r(offset, 0); }

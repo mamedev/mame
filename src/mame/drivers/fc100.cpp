@@ -68,6 +68,11 @@ public:
 		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
+	void fc100(machine_config &config);
+
+	void init_fc100();
+
+private:
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_WRITE8_MEMBER(port31_w);
@@ -76,7 +81,6 @@ public:
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	void init_fc100();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
@@ -85,10 +89,9 @@ public:
 	{
 		return m_p_chargen[(ch * 16 + line) & 0xfff];
 	}
-	void fc100(machine_config &config);
 	void fc100_io(address_map &map);
 	void fc100_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -556,7 +559,7 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fc100_cart")
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

@@ -75,6 +75,9 @@ public:
 		, m_floppy(nullptr)
 	{ }
 
+	void proteus(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -93,12 +96,10 @@ public:
 	DECLARE_WRITE8_MEMBER(enable_z80_w);
 	DECLARE_WRITE8_MEMBER(enable_6809_w);
 
-	void proteus(machine_config &config);
 	void proteus_6809_mem(address_map &map);
 	void proteus_z80_mem(address_map &map);
 	void proteus_z80_io(address_map &map);
 
-protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_z80;
 	required_device<mc6854_device> m_adlc;
@@ -365,7 +366,7 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE("irqs", input_merger_device, in_w<3>))
 
-	MCFG_CENTRONICS_ADD("parallel", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("parallel", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("pia", pia6821_device, ca1_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "parallel")
 

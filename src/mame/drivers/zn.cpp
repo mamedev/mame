@@ -76,6 +76,39 @@ public:
 		std::fill(std::begin(m_cat702_dataout), std::end(m_cat702_dataout), 1);
 	}
 
+	void zn1_1mb_vram(machine_config &config);
+	void zn1_2mb_vram(machine_config &config);
+	void zn2(machine_config &config);
+	void jdredd(machine_config &config);
+	void coh1002msnd(machine_config &config);
+	void coh1002tb(machine_config &config);
+	void coh1000a(machine_config &config);
+	void coh1000tb(machine_config &config);
+	void coh1002m(machine_config &config);
+	void coh1002ml(machine_config &config);
+	void coh1001l(machine_config &config);
+	void bam2(machine_config &config);
+	void beastrzrb(machine_config &config);
+	void glpracr(machine_config &config);
+	void coh1000ta(machine_config &config);
+	void coh1002v(machine_config &config);
+	void nbajamex(machine_config &config);
+	void coh1000c(machine_config &config);
+	void coh1000w(machine_config &config);
+	void coh1002e(machine_config &config);
+	void coh3002c(machine_config &config);
+	void coh1002c(machine_config &config);
+
+	void init_coh1000tb();
+	void init_nbajamex();
+	void init_bam2();
+	void init_jdredd();
+	void init_coh1000w();
+	void init_primrag2();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(sio0_sck){ m_cat702[0]->write_clock(state);  m_cat702[1]->write_clock(state); m_znmcu->write_clock(state); }
 	DECLARE_WRITE_LINE_MEMBER(sio0_txd){ m_cat702[0]->write_datain(state);  m_cat702[1]->write_datain(state); }
 	template<int Chip> DECLARE_WRITE_LINE_MEMBER(cat702_dataout){ m_cat702_dataout[Chip] = state; update_sio0_rxd(); }
@@ -83,7 +116,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(znmcu_dsrout){ m_znmcu_dsrout = state; update_sio0_dsr(); }
 	void update_sio0_rxd(){ m_sio0->write_rxd(m_cat702_dataout[0] && m_cat702_dataout[1] && m_znmcu_dataout); }
 	void update_sio0_dsr(){ m_sio0->write_dsr(m_znmcu_dsrout); }
-	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
 	DECLARE_READ8_MEMBER(znsecsel_r);
 	DECLARE_WRITE8_MEMBER(znsecsel_w);
 	DECLARE_READ8_MEMBER(boardconfig_r);
@@ -118,12 +150,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vt83c461_16_w);
 	DECLARE_READ16_MEMBER(vt83c461_32_r);
 	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
-	void init_coh1000tb();
-	void init_nbajamex();
-	void init_bam2();
-	void init_jdredd();
-	void init_coh1000w();
-	void init_primrag2();
+
 	DECLARE_MACHINE_START(coh1000c);
 	DECLARE_MACHINE_START(coh1000ta);
 	DECLARE_MACHINE_START(coh1002e);
@@ -146,28 +173,6 @@ public:
 	void atpsx_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void jdredd_vblank(screen_device &screen, bool vblank_state);
 
-	void zn1_1mb_vram(machine_config &config);
-	void zn1_2mb_vram(machine_config &config);
-	void zn2(machine_config &config);
-	void jdredd(machine_config &config);
-	void coh1002msnd(machine_config &config);
-	void coh1002tb(machine_config &config);
-	void coh1000a(machine_config &config);
-	void coh1000tb(machine_config &config);
-	void coh1002m(machine_config &config);
-	void coh1002ml(machine_config &config);
-	void coh1001l(machine_config &config);
-	void bam2(machine_config &config);
-	void beastrzrb(machine_config &config);
-	void glpracr(machine_config &config);
-	void coh1000ta(machine_config &config);
-	void coh1002v(machine_config &config);
-	void nbajamex(machine_config &config);
-	void coh1000c(machine_config &config);
-	void coh1000w(machine_config &config);
-	void coh1002e(machine_config &config);
-	void coh3002c(machine_config &config);
-	void coh1002c(machine_config &config);
 	void atlus_snd_map(address_map &map);
 	void bam2_map(address_map &map);
 	void beastrzrb_snd_map(address_map &map);
@@ -194,10 +199,9 @@ public:
 	void qsound_map(address_map &map);
 	void qsound_portmap(address_map &map);
 	void zn_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	inline void psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, uint16_t n_data );
 
@@ -1185,7 +1189,7 @@ void zn_state::init_coh1000tb()
 	m_fx1b_fram = std::make_unique<uint8_t[]>(0x200);
 	subdevice<nvram_device>("fm1208s")->set_base(m_fx1b_fram.get(), 0x200);
 
-	save_pointer(NAME(m_fx1b_fram.get()), 0x200);
+	save_pointer(NAME(m_fx1b_fram), 0x200);
 }
 
 MACHINE_CONFIG_START(zn_state::coh1000tb)
@@ -2149,7 +2153,7 @@ void zn_state::init_nbajamex()
 	m_nbajamex_sram = std::make_unique<uint8_t[]>(0x8000);
 	subdevice<nvram_device>("71256")->set_base(m_nbajamex_sram.get(), 0x8000);
 
-	save_pointer(NAME(m_nbajamex_sram.get()), 0x8000);
+	save_pointer(NAME(m_nbajamex_sram), 0x8000);
 
 	save_item(NAME(m_nbajamex_rombank));
 }

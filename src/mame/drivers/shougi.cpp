@@ -102,7 +102,7 @@ public:
 
 	void shougi(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(semaphore_r);
 
@@ -116,7 +116,6 @@ protected:
 	void readport_sub(address_map &map);
 	void sub_map(address_map &map);
 
-private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;

@@ -40,6 +40,11 @@ public:
 		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
+	void pasopia(machine_config &config);
+
+	void init_pasopia();
+
+private:
 	DECLARE_WRITE8_MEMBER(pasopia_ctrl_w);
 	DECLARE_WRITE8_MEMBER(vram_addr_lo_w);
 	DECLARE_WRITE8_MEMBER(vram_latch_w);
@@ -51,13 +56,11 @@ public:
 	DECLARE_READ8_MEMBER(keyb_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void init_pasopia();
 	TIMER_CALLBACK_MEMBER(pio_timer);
 
-	void pasopia(machine_config &config);
 	void pasopia_io(address_map &map);
 	void pasopia_map(address_map &map);
-private:
+
 	uint8_t m_hblank;
 	uint16_t m_vram_addr;
 	uint8_t m_vram_latch;

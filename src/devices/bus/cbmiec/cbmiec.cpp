@@ -319,8 +319,8 @@ void cbm_iec_device::device_start()
 
 void cbm_iec_device::device_reset()
 {
-	reset_w(0);
-	reset_w(1);
+	host_reset_w(0);
+	host_reset_w(1);
 }
 
 

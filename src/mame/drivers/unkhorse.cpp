@@ -39,6 +39,9 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
+	void horse(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<4> m_inp_matrix;
@@ -54,7 +57,6 @@ public:
 
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void horse(machine_config &config);
 	void horse_io_map(address_map &map);
 	void horse_map(address_map &map);
 };
@@ -62,7 +64,7 @@ public:
 void horse_state::machine_start()
 {
 	m_colorram = std::make_unique<uint8_t []>(0x200);
-	save_pointer(NAME(m_colorram.get()), 0x200);
+	save_pointer(NAME(m_colorram), 0x200);
 	save_item(NAME(m_output));
 }
 

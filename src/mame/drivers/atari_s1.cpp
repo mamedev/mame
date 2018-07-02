@@ -78,7 +78,8 @@ public:
 	void midearth(machine_config &config);
 	void atari_s1(machine_config &config);
 	void atarians(machine_config &config);
-protected:
+
+private:
 	DECLARE_READ8_MEMBER(m1080_r);
 	DECLARE_WRITE8_MEMBER(m1080_w);
 	DECLARE_READ8_MEMBER(m1084_r);
@@ -97,7 +98,7 @@ protected:
 	void atari_s1_map(address_map &map);
 	void atarians_map(address_map &map);
 	void midearth_map(address_map &map);
-private:
+
 	bool m_audiores;
 	uint8_t m_timer_s[3];
 	uint8_t m_vol;

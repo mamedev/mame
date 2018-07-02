@@ -101,7 +101,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/mc146818.h"   // for NC200 real time clock
 #include "machine/rp5c01.h"     // for NC100 real time clock
-#include "machine/upd765.h"     // for NC200 disk drive interface
 #include "formats/pc_dsk.h"     // for NC200 disk image
 #include "rendlay.h"
 #include "screen.h"
@@ -677,7 +676,7 @@ WRITE8_MEMBER(nc_state::nc_uart_control_w)
 		/* changed uart from off to on */
 		if ((data & (1<<3))==0)
 		{
-			machine().device("uart")->reset();
+			m_uart->reset();
 		}
 	}
 
@@ -1228,13 +1227,12 @@ WRITE8_MEMBER(nc200_state::nc200_uart_control_w)
 
 WRITE8_MEMBER(nc200_state::nc200_memory_card_wait_state_w)
 {
-	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 	LOGDEBUG("nc200 memory card wait state: PC: %04x %02x\n", m_maincpu->pc(), data);
 #if 0
 	floppy_drive_set_motor_state(0, 1);
 	floppy_drive_set_ready_state(0, 1, 1);
 #endif
-	fdc->tc_w(data & 0x01);
+	m_fdc->tc_w(data & 0x01);
 }
 
 /* bit 2: backlight: 1=off, 0=on */
@@ -1405,7 +1403,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, nc_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
