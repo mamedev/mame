@@ -51,9 +51,17 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void st_mp201(machine_config &config);
+	void st_mp200(machine_config &config);
+
 	void init_st_mp200();
 	void init_st_mp201();
 	void init_st_mp202();
+
+	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
+	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
+private:
 	DECLARE_READ8_MEMBER(u10_a_r);
 	DECLARE_WRITE8_MEMBER(u10_a_w);
 	DECLARE_READ8_MEMBER(u10_b_r);
@@ -65,14 +73,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
-	void st_mp201(machine_config &config);
-	void st_mp200(machine_config &config);
+
 	void st_mp200_map(address_map &map);
-private:
+
 	uint8_t m_u10a;
 	uint8_t m_u10b;
 	uint8_t m_u11a;

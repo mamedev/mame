@@ -58,9 +58,11 @@ public:
 	{ }
 
 	void isbc8030(machine_config &config);
+
+private:
 	void isbc8030_io(address_map &map);
 	void isbc8030_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
 	required_device<i8255_device> m_ppi;

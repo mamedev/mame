@@ -114,6 +114,13 @@
 #include "multiconn.h"
 #include "gkracker.h"
 
+#define LOG_WARN         (1U<<1)   // Warnings
+#define LOG_READ         (1U<<2)   // Reading
+#define LOG_WRITE        (1U<<3)   // Writing
+
+#define VERBOSE ( LOG_WARN )
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::gromport, gromport_device, "gromport", "TI-99 Cartridge port")
 
 namespace bus { namespace ti99 { namespace gromport {
@@ -139,7 +146,7 @@ READ8Z_MEMBER(gromport_device::readz)
 	if (m_connector != nullptr)
 	{
 		m_connector->readz(space, offset & m_mask, value);
-		if (TRACE_READ) if (m_romgq) logerror("Read %04x -> %02x\n", offset | 0x6000, *value);
+		if (m_romgq) LOGMASKED(LOG_READ, "Read %04x -> %02x\n", offset | 0x6000, *value);
 	}
 }
 
@@ -151,7 +158,7 @@ WRITE8_MEMBER(gromport_device::write)
 {
 	if (m_connector != nullptr)
 	{
-		if (TRACE_WRITE) if (m_romgq) logerror("Write %04x <- %02x\n", offset | 0x6000, data);
+		if (m_romgq) LOGMASKED(LOG_WRITE, "Write %04x <- %02x\n", offset | 0x6000, data);
 		m_connector->write(space, offset & m_mask, data);
 	}
 }
@@ -192,10 +199,10 @@ WRITE_LINE_MEMBER(gromport_device::gclock_in)
 /*
     Combined GROM control lines.
 */
-WRITE8_MEMBER( gromport_device::set_gromlines )
+void gromport_device::set_gromlines(line_state mline, line_state moline, line_state gsq)
 {
 	if (m_connector != nullptr)
-		m_connector->set_gromlines(space, offset, data);
+		m_connector->set_gromlines(mline, moline, gsq);
 }
 
 void gromport_device::device_start()

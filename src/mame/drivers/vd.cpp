@@ -34,17 +34,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void vd(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(ack_r);
 	DECLARE_WRITE8_MEMBER(col_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
 	DECLARE_WRITE8_MEMBER(sol_w) { };
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	void vd(machine_config &config);
 	void vd_io(address_map &map);
 	void vd_map(address_map &map);
 
-private:
 	uint8_t m_t_c;
 	uint8_t segment[5];
 	virtual void machine_reset() override;

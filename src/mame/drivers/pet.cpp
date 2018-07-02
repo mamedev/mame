@@ -222,6 +222,61 @@ public:
 		m_user_diag(1)
 	{ }
 
+	void _4k(machine_config &config);
+	void _8k(machine_config &config);
+	void _16k(machine_config &config);
+	void _32k(machine_config &config);
+	void pet(machine_config &config);
+	void pet2001n(machine_config &config);
+	void pet2001n8(machine_config &config);
+	void cbm3032(machine_config &config);
+	void pet20018(machine_config &config);
+	void pet2001n16(machine_config &config);
+	void cbm3016(machine_config &config);
+	void cbm3000(machine_config &config);
+	void cbm4000(machine_config &config);
+	void cbm4032f(machine_config &config);
+	void cbm4032(machine_config &config);
+	void cbm4016(machine_config &config);
+	void cbm3008(machine_config &config);
+	void pet2001(machine_config &config);
+	void pet2001n32(machine_config &config);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
+	DECLARE_WRITE8_MEMBER( via_pa_w );
+	DECLARE_READ8_MEMBER( via_pb_r );
+	DECLARE_WRITE8_MEMBER( via_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
+	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
+
+	DECLARE_WRITE_LINE_MEMBER( pia1_irqa_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_irqb_w );
+	DECLARE_READ8_MEMBER( pia1_pa_r );
+	DECLARE_READ8_MEMBER( pia1_pb_r );
+	DECLARE_WRITE8_MEMBER( pia1_pa_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
+
+	DECLARE_WRITE_LINE_MEMBER( pia2_irqa_w );
+	DECLARE_WRITE_LINE_MEMBER( pia2_irqb_w );
+
+	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
+
+	MC6845_BEGIN_UPDATE( pet_begin_update );
+	MC6845_UPDATE_ROW( pet40_update_row );
+
+	TIMER_DEVICE_CALLBACK_MEMBER( sync_tick );
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_pet );
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_MACHINE_START( pet40 );
+	DECLARE_MACHINE_RESET( pet40 );
+
+protected:
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via;
 	required_device<pia6821_device> m_pia1;
@@ -247,42 +302,10 @@ public:
 	DECLARE_MACHINE_START( pet );
 	DECLARE_MACHINE_START( pet2001 );
 	DECLARE_MACHINE_RESET( pet );
-	DECLARE_MACHINE_START( pet40 );
-	DECLARE_MACHINE_RESET( pet40 );
 
-	MC6845_BEGIN_UPDATE( pet_begin_update );
-	MC6845_UPDATE_ROW( pet40_update_row );
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void check_interrupts();
 	void update_speaker();
-
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-
-	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
-	DECLARE_WRITE8_MEMBER( via_pa_w );
-	DECLARE_READ8_MEMBER( via_pb_r );
-	DECLARE_WRITE8_MEMBER( via_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
-
-	DECLARE_WRITE_LINE_MEMBER( pia1_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_irqb_w );
-	DECLARE_READ8_MEMBER( pia1_pa_r );
-	DECLARE_READ8_MEMBER( pia1_pb_r );
-	DECLARE_WRITE8_MEMBER( pia1_pa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
-
-	DECLARE_WRITE_LINE_MEMBER( pia2_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia2_irqb_w );
-
-	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
-
-	TIMER_DEVICE_CALLBACK_MEMBER( sync_tick );
-
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_pet );
 
 	enum
 	{
@@ -327,25 +350,6 @@ public:
 	int m_pia2b_irq;
 	int m_exp_irq;
 	int m_user_diag;
-	void _4k(machine_config &config);
-	void _8k(machine_config &config);
-	void _16k(machine_config &config);
-	void _32k(machine_config &config);
-	void pet(machine_config &config);
-	void pet2001n(machine_config &config);
-	void pet2001n8(machine_config &config);
-	void cbm3032(machine_config &config);
-	void pet20018(machine_config &config);
-	void pet2001n16(machine_config &config);
-	void cbm3016(machine_config &config);
-	void cbm3000(machine_config &config);
-	void cbm4000(machine_config &config);
-	void cbm4032f(machine_config &config);
-	void cbm4032(machine_config &config);
-	void cbm4016(machine_config &config);
-	void cbm3008(machine_config &config);
-	void pet2001(machine_config &config);
-	void pet2001n32(machine_config &config);
 	void pet2001_mem(address_map &map);
 };
 
@@ -357,7 +361,6 @@ public:
 		pet_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( pia1_pb_r );
 	void pet2001b(machine_config &config);
 	void pet2001b32(machine_config &config);
 	void pet4000(machine_config &config);
@@ -372,6 +375,10 @@ public:
 	void cbm4032b(machine_config &config);
 	void pet2001b8(machine_config &config);
 	void pet4016(machine_config &config);
+
+protected:
+	DECLARE_READ8_MEMBER( pia1_pb_r );
+
 };
 
 
@@ -382,13 +389,16 @@ public:
 		pet2001b_state(mconfig, type, tag)
 	{ }
 
+	void pet80(machine_config &config);
+	void pet8032(machine_config &config);
+
 	DECLARE_MACHINE_START( pet80 );
 	DECLARE_MACHINE_RESET( pet80 );
 
-	MC6845_UPDATE_ROW( pet80_update_row );
 	MC6845_UPDATE_ROW( cbm8296_update_row );
-	void pet80(machine_config &config);
-	void pet8032(machine_config &config);
+
+protected:
+	MC6845_UPDATE_ROW( pet80_update_row );
 };
 
 
@@ -425,6 +435,10 @@ public:
 		m_pla2(*this, PLA2_TAG)
 	{ }
 
+	void cbm8296d(machine_config &config);
+	void cbm8296(machine_config &config);
+
+private:
 	required_memory_region m_basic_rom;
 	required_memory_region m_editor_rom;
 	required_memory_region m_ue5_rom;
@@ -447,8 +461,6 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	uint8_t m_cr;
-	void cbm8296d(machine_config &config);
-	void cbm8296(machine_config &config);
 	void cbm8296_mem(address_map &map);
 };
 

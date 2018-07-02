@@ -42,8 +42,9 @@ public:
 	{ }
 
 	void c68ksbc(machine_config &config);
-	void c68ksbc_mem(address_map &map);
+
 private:
+	void c68ksbc_mem(address_map &map);
 	required_device<cpu_device> m_maincpu;
 };
 

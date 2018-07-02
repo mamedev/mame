@@ -77,7 +77,7 @@ public:
 
 	void uts20(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -96,7 +96,6 @@ protected:
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;
 
-private:
 	required_device<cpu_device>     m_maincpu;
 	required_device<nvram_device>   m_nvram;
 	required_device<z80ctc_device>  m_ctc;

@@ -80,15 +80,18 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
+	void rvoicepc(machine_config &config);
+
+	void init_rvoicepc();
+
+private:
 	hd63701y0_t m_hd63701y0;
 	rvoicepc_t m_rvoicepc;
 	DECLARE_READ8_MEMBER(main_hd63701_internal_registers_r);
 	DECLARE_WRITE8_MEMBER(main_hd63701_internal_registers_w);
-	void init_rvoicepc();
 	virtual void machine_reset() override;
 	void null_kbd_put(u8 data);
 	required_device<cpu_device> m_maincpu;
-	void rvoicepc(machine_config &config);
 	void hd63701_main_io(address_map &map);
 	void hd63701_main_mem(address_map &map);
 };

@@ -41,6 +41,9 @@ public:
 	{
 	}
 
+	void photoply(machine_config &config);
+
+private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	required_region_ptr<uint8_t> m_main_bios;
@@ -54,11 +57,10 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 
 	uint16_t m_pci_shadow_reg;
-	void photoply(machine_config &config);
 
 	void photoply_io(address_map &map);
 	void photoply_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

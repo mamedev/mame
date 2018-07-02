@@ -146,20 +146,22 @@ public:
 			m_psg(*this, "sn"),
 			m_meters(*this, "meters")
 	{ }
+
+	void jpmmps(machine_config &config);
+
+private:
 	uint8_t m_sound_buffer;
 	uint8_t m_psg_latch;
 	virtual void machine_reset() override;
 
-	void jpmmps(machine_config &config);
 	void jpmmps_io_map(address_map &map);
 	void jpmmps_map(address_map &map);
-protected:
 
 	// devices
 	required_device<tms9995_device> m_maincpu;
 	required_device<sn76489_device> m_psg;
 	required_device<meters_device> m_meters;
-public:
+
 	DECLARE_WRITE8_MEMBER(jpmmps_meters_w);
 	DECLARE_WRITE8_MEMBER(jpmmps_psg_buf_w);
 	DECLARE_WRITE8_MEMBER(jpmmps_ic22_portc_w);

@@ -61,6 +61,12 @@ public:
 	m_spriteram(*this,"spriteram")
 	{ }
 
+	void piratesh(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(helm_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(battery_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	required_device<k053250ps_device> m_k053250;
@@ -97,8 +103,6 @@ public:
 	DECLARE_WRITE16_MEMBER(k053247_scattered_word_w);
 	DECLARE_READ16_MEMBER(k053247_martchmp_word_r);
 	DECLARE_WRITE16_MEMBER(k053247_martchmp_word_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(helm_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(battery_r);
 
 	DECLARE_MACHINE_START(piratesh);
 	DECLARE_MACHINE_RESET(piratesh);
@@ -108,7 +112,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(piratesh_interrupt);
 	K056832_CB_MEMBER(piratesh_tile_callback);
 	K055673_CB_MEMBER(piratesh_sprite_callback);
-	void piratesh(machine_config &config);
 	void piratesh_map(address_map &map);
 };
 

@@ -1435,6 +1435,16 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void timecrs2v4a(machine_config &config);
+	void ss23e2(machine_config &config);
+	void gorgon(machine_config &config);
+	void ss23(machine_config &config);
+	void s23(machine_config &config);
+	void gmen(machine_config &config);
+	void timecrs2(machine_config &config);
+
+	void init_s23();
+	
 	render_t m_render;
 	const uint16_t *m_tmlrom;
 	const uint8_t *m_tmhrom;
@@ -1442,6 +1452,7 @@ public:
 	uint32_t m_tileid_mask;
 	uint32_t m_tile_mask;
 
+private:
 	void update_main_interrupts(uint32_t cause);
 	void update_mixer();
 
@@ -1491,7 +1502,7 @@ public:
 	DECLARE_READ16_MEMBER(iob_analog_r);
 	DECLARE_WRITE16_MEMBER(c435_state_pio_w);
 	DECLARE_WRITE16_MEMBER(c435_state_reset_w);
-	void init_s23();
+
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 	DECLARE_VIDEO_START(s23);
 	DECLARE_MACHINE_RESET(gmen);
@@ -1530,13 +1541,7 @@ public:
 	void render_project(poly_vertex &pv);
 	void render_one_model(const namcos23_render_entry *re);
 	void render_run(bitmap_rgb32 &bitmap);
-	void timecrs2v4a(machine_config &config);
-	void ss23e2(machine_config &config);
-	void gorgon(machine_config &config);
-	void ss23(machine_config &config);
-	void s23(machine_config &config);
-	void gmen(machine_config &config);
-	void timecrs2(machine_config &config);
+
 	void gmen_mips_map(address_map &map);
 	void gmen_sh2_map(address_map &map);
 	void gorgon_map(address_map &map);
@@ -1547,7 +1552,6 @@ public:
 	void s23iobrdmap(address_map &map);
 	void timecrs2iobrdmap(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

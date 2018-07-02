@@ -76,8 +76,9 @@ public:
 	}
 
 	void sun1(machine_config &config);
+
+private:
 	void sun1_mem(address_map &map);
-protected:
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;

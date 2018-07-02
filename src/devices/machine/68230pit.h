@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Joakim Larsson Edstr??m
+// copyright-holders:Joakim Larsson Edstrom
 /**********************************************************************
 *
 *   Motorola MC68230 PI/T Parallel Interface and Timer

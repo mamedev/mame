@@ -449,6 +449,10 @@ public:
 		, m_palette(*this, "palette")
 		{ }
 
+	void avtnfl(machine_config &config);
+	void avt(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(avt_6845_address_w);
 	DECLARE_WRITE8_MEMBER(avt_6845_data_w);
 	DECLARE_READ8_MEMBER( avt_6845_data_r );
@@ -460,11 +464,9 @@ public:
 	DECLARE_PALETTE_INIT(avt);
 	uint32_t screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void avtnfl(machine_config &config);
-	void avt(machine_config &config);
 	void avt_map(address_map &map);
 	void avt_portmap(address_map &map);
-private:
+
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	virtual void video_start() override;

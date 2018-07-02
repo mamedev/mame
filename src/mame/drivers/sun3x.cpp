@@ -171,6 +171,10 @@ public:
 		m_bw2_vram(*this, "bw2_vram")
 	{ }
 
+	void sun3_80(machine_config &config);
+	void sun3_460(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
@@ -211,11 +215,9 @@ public:
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void sun3_80(machine_config &config);
-	void sun3_460(machine_config &config);
 	void sun3_460_mem(address_map &map);
 	void sun3_80_mem(address_map &map);
-private:
+
 	uint32_t m_enable, m_buserr, m_diag, m_printer, m_irqctrl, m_memreg, m_memerraddr;
 	uint32_t m_iommu[0x800];
 	bool m_bInBusErr;

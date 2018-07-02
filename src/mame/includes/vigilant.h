@@ -16,6 +16,11 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram") { }
 
+	void vigilant(machine_config &config);
+	void kikcubic(machine_config &config);
+	void buccanrs(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -58,9 +63,7 @@ public:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void vigilant_postload();
-	void vigilant(machine_config &config);
-	void kikcubic(machine_config &config);
-	void buccanrs(machine_config &config);
+
 	void buccanrs_sound_io_map(address_map &map);
 	void kikcubic_io_map(address_map &map);
 	void kikcubic_map(address_map &map);

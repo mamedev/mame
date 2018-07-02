@@ -53,6 +53,9 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(pending_r);
 
+	DECLARE_READ8_MEMBER( acknowledge_r );
+	DECLARE_WRITE8_MEMBER( acknowledge_w );
+
 protected:
 	// construction/destruction
 	generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -88,9 +91,6 @@ public:
 	DECLARE_WRITE8_MEMBER( clear_w );
 	DECLARE_WRITE_LINE_MEMBER( preset );
 	DECLARE_WRITE_LINE_MEMBER( clear );
-
-	DECLARE_READ8_MEMBER( acknowledge_r );
-	DECLARE_WRITE8_MEMBER( acknowledge_w );
 
 	void preset_w(u8 value) { m_latched_value = value; }
 

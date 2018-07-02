@@ -168,6 +168,17 @@ public:
 		}
 	}
 
+	void kenseim(machine_config &config);
+
+	void init_kenseim();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_1234_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_5678_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_9_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_req_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_LVm_r);
+
+private:
 	void mole_up(int side, int mole)
 	{
 		if (side == 0)
@@ -201,10 +212,8 @@ public:
 		}
 	}
 
-
 	/* kenseim */
 	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
-	void init_kenseim();
 
 	// certain
 
@@ -224,20 +233,11 @@ public:
 	WRITE8_MEMBER(mb8936_portb_w); // maybe molesb output? (6-bits?)
 	WRITE8_MEMBER(mb8936_portf_w); // maybe strobe output?
 
-
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_1234_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_5678_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_9_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_req_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_LVm_r);
-
 	void set_leds(uint32_t ledstates);
 
-	void kenseim(machine_config &config);
 	void kenseim_io_map(address_map &map);
 	void kenseim_map(address_map &map);
 
-private:
 	uint8_t m_to_68k_cmd_low;
 	uint8_t m_to_68k_cmd_d9;
 	uint8_t m_to_68k_cmd_req;

@@ -59,7 +59,7 @@ public:
 
 	void tomcat(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(adcon_w);
 	DECLARE_READ16_MEMBER(tomcat_inputs_r);
 	DECLARE_WRITE16_MEMBER(main_latch_w);
@@ -81,7 +81,6 @@ protected:
 	void sound_map(address_map &map);
 	void tomcat_map(address_map &map);
 
-private:
 	required_device<tms5220_device> m_tms;
 	required_shared_ptr<uint16_t> m_shared_ram;
 	uint8_t m_nvram[0x800];

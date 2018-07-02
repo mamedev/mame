@@ -73,6 +73,11 @@ public:
 		, m_io_dsw(*this, "DSW")
 		{ }
 
+	void ts803(machine_config &config);
+
+	void init_ts803();
+
+private:
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_READ8_MEMBER(porta0_r);
@@ -82,13 +87,11 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 	DECLARE_WRITE8_MEMBER( crtc_controlreg_w );
-	void init_ts803();
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ts803(machine_config &config);
 	void ts803_io(address_map &map);
 	void ts803_mem(address_map &map);
-private:
+
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_56kram;
 	bool m_graphics_mode;

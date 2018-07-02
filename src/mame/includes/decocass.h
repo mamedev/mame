@@ -26,8 +26,8 @@ public:
 	decocass_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
 			m_mcu(*this, "mcu"),
+			m_audiocpu(*this, "audiocpu"),
 			m_watchdog(*this, "watchdog"),
 			m_cassette(*this, "cassette"),
 			m_gfxdecode(*this, "gfxdecode"),
@@ -45,10 +45,30 @@ public:
 	{
 	}
 
+	void decocass(machine_config &config);
+
+	void init_decocass();
+	void init_decocrom();
+	void init_cdsteljn();
+
+protected:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	required_device<upi41_cpu_device> m_mcu;
+
+	/* dongles-related */
+	read8_delegate    m_dongle_r;
+	write8_delegate   m_dongle_w;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	int32_t     m_firsttime;
+	uint8_t     m_latch1;
+
+private:
+	/* devices */
+	required_device<cpu_device> m_audiocpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<decocass_tape_device> m_cassette;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -95,8 +115,6 @@ public:
 	uint8_t     m_audio_nmi_state;
 
 	/* misc */
-	int32_t     m_firsttime;
-	uint8_t     m_latch1;
 	uint8_t     m_decocass_reset;
 	int32_t     m_de0091_enable;  /* DE-0091xx daughter board enable */
 	uint8_t     m_quadrature_decoder[4];  /* four inputs from the quadrature decoder (H1, V1, H2, V2) */
@@ -110,23 +128,14 @@ public:
 	int       m_i8041_p2_write_latch;
 	int       m_i8041_p2_read_latch;
 
-	/* dongles-related */
-	read8_delegate    m_dongle_r;
-	write8_delegate   m_dongle_w;
-
 	/* DS Telejan */
 	uint8_t     m_mux_data;
 
-	void init_decocass();
-	void init_decocrom();
-	void init_cdsteljn();
 	TILEMAP_MAPPER_MEMBER(fgvideoram_scan_cols);
 	TILEMAP_MAPPER_MEMBER(bgvideoram_scan_cols);
 	TILE_GET_INFO_MEMBER(get_bg_l_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_r_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(decocass);
 
@@ -192,10 +201,9 @@ public:
 	DECLARE_READ8_MEMBER(cdsteljn_input_r);
 	DECLARE_WRITE8_MEMBER(cdsteljn_mux_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(decocass_audio_nmi_gen);
-	void decocass(machine_config &config);
 	void decocass_map(address_map &map);
 	void decocass_sound_map(address_map &map);
-private:
+
 	void draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, bool opaque);
 	void draw_special_priority(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect);
 	void draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -220,6 +228,25 @@ public:
 		m_type1_map = nullptr;
 	}
 
+	void cprogolfj(machine_config &config);
+	void cfboy0a1(machine_config &config);
+	void cdsteljn(machine_config &config);
+	void csuperas(machine_config &config);
+	void clocknch(machine_config &config);
+	void cterrani(machine_config &config);
+	void chwy(machine_config &config);
+	void ctisland3(machine_config &config);
+	void cocean1a(machine_config &config);
+	void cluckypo(machine_config &config);
+	void cexplore(machine_config &config);
+	void cmanhat(machine_config &config);
+	void clocknchj(machine_config &config);
+	void cprogolf(machine_config &config);
+	void ctsttape(machine_config &config);
+	void castfant(machine_config &config);
+	void ctisland(machine_config &config);
+
+private:
 	DECLARE_MACHINE_RESET(ctsttape);
 	DECLARE_MACHINE_RESET(chwy);
 	DECLARE_MACHINE_RESET(cdsteljn);
@@ -238,29 +265,8 @@ public:
 	DECLARE_MACHINE_RESET(cfboy0a1); /* 12 */
 	DECLARE_MACHINE_RESET(clocknchj); /* 11 */
 
-	void cprogolfj(machine_config &config);
-	void cfboy0a1(machine_config &config);
-	void cdsteljn(machine_config &config);
-	void csuperas(machine_config &config);
-	void clocknch(machine_config &config);
-	void cterrani(machine_config &config);
-	void chwy(machine_config &config);
-	void ctisland3(machine_config &config);
-	void cocean1a(machine_config &config);
-	void cluckypo(machine_config &config);
-	void cexplore(machine_config &config);
-	void cmanhat(machine_config &config);
-	void clocknchj(machine_config &config);
-	void cprogolf(machine_config &config);
-	void ctsttape(machine_config &config);
-	void castfant(machine_config &config);
-	void ctisland(machine_config &config);
-protected:
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-private:
 
 	DECLARE_READ8_MEMBER(decocass_type1_r);
 
@@ -279,12 +285,9 @@ public:
 	{
 	}
 
-protected:
-
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-private:
 
 	DECLARE_READ8_MEMBER(decocass_type2_r);
 	DECLARE_WRITE8_MEMBER(decocass_type2_w);
@@ -304,20 +307,6 @@ public:
 	{
 	}
 
-	DECLARE_MACHINE_RESET(cfishing);
-	DECLARE_MACHINE_RESET(cbtime);
-	DECLARE_MACHINE_RESET(cburnrub);
-	DECLARE_MACHINE_RESET(cgraplop);
-	DECLARE_MACHINE_RESET(cgraplop2);
-	DECLARE_MACHINE_RESET(clapapa);
-	DECLARE_MACHINE_RESET(cskater);
-	DECLARE_MACHINE_RESET(cprobowl);
-	DECLARE_MACHINE_RESET(cnightst);
-	DECLARE_MACHINE_RESET(cpsoccer);
-	DECLARE_MACHINE_RESET(csdtenis);
-	DECLARE_MACHINE_RESET(czeroize);
-	DECLARE_MACHINE_RESET(cppicf);
-	DECLARE_MACHINE_RESET(cfghtice);
 
 	void csdtenis(machine_config &config);
 	void cburnrub(machine_config &config);
@@ -333,12 +322,25 @@ public:
 	void clapapa(machine_config &config);
 	void cfishing(machine_config &config);
 	void czeroize(machine_config &config);
-protected:
+
+private:
+	DECLARE_MACHINE_RESET(cfishing);
+	DECLARE_MACHINE_RESET(cbtime);
+	DECLARE_MACHINE_RESET(cburnrub);
+	DECLARE_MACHINE_RESET(cgraplop);
+	DECLARE_MACHINE_RESET(cgraplop2);
+	DECLARE_MACHINE_RESET(clapapa);
+	DECLARE_MACHINE_RESET(cskater);
+	DECLARE_MACHINE_RESET(cprobowl);
+	DECLARE_MACHINE_RESET(cnightst);
+	DECLARE_MACHINE_RESET(cpsoccer);
+	DECLARE_MACHINE_RESET(csdtenis);
+	DECLARE_MACHINE_RESET(czeroize);
+	DECLARE_MACHINE_RESET(cppicf);
+	DECLARE_MACHINE_RESET(cfghtice);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-private:
 
 	DECLARE_READ8_MEMBER(decocass_type3_r);
 	DECLARE_WRITE8_MEMBER(decocass_type3_w);
@@ -360,12 +362,10 @@ public:
 	{
 	}
 
-protected:
+private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-private:
 
 	DECLARE_READ8_MEMBER(decocass_type4_r);
 	DECLARE_WRITE8_MEMBER(decocass_type4_w);
@@ -384,12 +384,10 @@ public:
 	{
 	}
 
-protected:
+private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-private:
 
 	DECLARE_READ8_MEMBER(decocass_type5_r);
 	DECLARE_WRITE8_MEMBER(decocass_type5_w);
@@ -407,12 +405,11 @@ public:
 	{
 	}
 
-protected:
+private:
 
 	//virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	DECLARE_READ8_MEMBER(decocass_nodong_r);
 };
 
@@ -425,12 +422,11 @@ public:
 	{
 	}
 
-protected:
+private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 
 	DECLARE_READ8_MEMBER(decocass_widel_r);
 	DECLARE_WRITE8_MEMBER(decocass_widel_w);

@@ -77,18 +77,23 @@ class pengo_state : public pacman_state
 {
 public:
 	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pacman_state(mconfig, type, tag), m_decrypted_opcodes(*this, "decrypted_opcodes") { }
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	void init_penta();
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+		: pacman_state(mconfig, type, tag), m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void jrpacmbl(machine_config &config);
 	void pengoe(machine_config &config);
 	void pengou(machine_config &config);
 	void pengo(machine_config &config);
+
+	void init_penta();
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void decrypted_opcodes_map(address_map &map);
 	void jrpacmbl_map(address_map &map);
 	void pengo_map(address_map &map);

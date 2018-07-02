@@ -13,11 +13,6 @@
 class rollerg_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_NMI
-	};
-
 	rollerg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -26,6 +21,14 @@ public:
 		m_k051316(*this, "k051316"),
 		m_k053252(*this, "k053252")
 		{ }
+
+	void rollerg(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_NMI
+	};
 
 	/* misc */
 	int        m_readzoomroms;
@@ -50,9 +53,8 @@ public:
 	K051316_CB_MEMBER(zoom_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
-	void rollerg(machine_config &config);
 	void rollerg_map(address_map &map);
 	void rollerg_sound_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

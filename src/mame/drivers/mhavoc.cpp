@@ -189,7 +189,6 @@
 #include "includes/mhavoc.h"
 
 #include "cpu/m6502/m6502.h"
-#include "machine/atari_vg.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
 #include "machine/eeprompar.h"

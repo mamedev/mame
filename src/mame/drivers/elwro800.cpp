@@ -50,6 +50,9 @@ public:
 	{
 	}
 
+	void elwro800(machine_config &config);
+
+private:
 	/* for elwro800 */
 	/* RAM mapped at 0 */
 	uint8_t m_ram_at_0000;
@@ -67,13 +70,12 @@ public:
 	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
-	void elwro800(machine_config &config);
 	void elwro800_bank1(address_map &map);
 	void elwro800_bank2(address_map &map);
 	void elwro800_io(address_map &map);
 	void elwro800_m1(address_map &map);
 	void elwro800_mem(address_map &map);
-protected:
+
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;
 	required_device<centronics_device> m_centronics;

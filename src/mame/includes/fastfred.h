@@ -20,6 +20,19 @@ public:
 			m_background_color(*this, "bgcolor"),
 			m_imago_fg_videoram(*this, "imago_fg_vram") { }
 
+	void jumpcoas(machine_config &config);
+	void imago(machine_config &config);
+	void fastfred(machine_config &config);
+
+	void init_fastfred();
+	void init_flyboy();
+	void init_flyboyb();
+	void init_imago();
+	void init_boggy84();
+	void init_jumpcoas();
+	void init_boggy84b();
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_attributesram;
@@ -61,14 +74,6 @@ public:
 	DECLARE_WRITE8_MEMBER(imago_fg_videoram_w);
 	DECLARE_WRITE_LINE_MEMBER(imago_charbank_w);
 
-	void init_fastfred();
-	void init_flyboy();
-	void init_flyboyb();
-	void init_imago();
-	void init_boggy84();
-	void init_jumpcoas();
-	void init_boggy84b();
-
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_fg);
@@ -86,9 +91,6 @@ public:
 	uint32_t screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void jumpcoas(machine_config &config);
-	void imago(machine_config &config);
-	void fastfred(machine_config &config);
 	void fastfred_map(address_map &map);
 	void imago_map(address_map &map);
 	void jumpcoas_map(address_map &map);

@@ -171,6 +171,10 @@ public:
 	{
 	}
 
+	void fccpu1_eprom_sockets(machine_config &config);
+	void fccpu1(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER (bootvect_r);
 	DECLARE_READ16_MEMBER (vme_a24_r);
 	DECLARE_WRITE16_MEMBER (vme_a24_w);
@@ -202,10 +206,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
 	DECLARE_READ16_MEMBER (read16_rom);
 
-	void fccpu1_eprom_sockets(machine_config &config);
-	void fccpu1(machine_config &config);
 	void force68k_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<mm58167_device> m_rtc;
 	required_device<pit68230_device> m_pit;

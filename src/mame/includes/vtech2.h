@@ -31,10 +31,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	void init_laser();
 	void laser350(machine_config &config);
 	void laser700(machine_config &config);
 	void laser500(machine_config &config);
+
+	void init_laser();
 
 private:
 	DECLARE_WRITE8_MEMBER(laser_bank_select_w);

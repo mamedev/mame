@@ -44,13 +44,6 @@ struct cass_data_t {
 class sorcerer_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_SERIAL,
-		TIMER_CASSETTE,
-		TIMER_RESET
-	};
-
 	sorcerer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -68,25 +61,37 @@ public:
 		, m_iop_x(*this, "X.%u", 0)
 	{ }
 
+	void sorcerer(machine_config &config);
+	void sorcererd(machine_config &config);
+
+	void init_sorcerer();
+
+private:
+	enum
+	{
+		TIMER_SERIAL,
+		TIMER_CASSETTE,
+		TIMER_RESET
+	};
+
 	DECLARE_READ8_MEMBER(sorcerer_fd_r);
 	DECLARE_READ8_MEMBER(sorcerer_fe_r);
 	DECLARE_WRITE8_MEMBER(sorcerer_fd_w);
 	DECLARE_WRITE8_MEMBER(sorcerer_fe_w);
 	DECLARE_WRITE8_MEMBER(sorcerer_ff_w);
 	DECLARE_MACHINE_START(sorcererd);
-	void init_sorcerer();
+
 	TIMER_CALLBACK_MEMBER(sorcerer_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sorcerer_serial_tc);
 	TIMER_CALLBACK_MEMBER(sorcerer_reset);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( sorcerer );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( sorcerer);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sorcerer(machine_config &config);
-	void sorcererd(machine_config &config);
+
 	void sorcerer_io(address_map &map);
 	void sorcerer_mem(address_map &map);
 	void sorcererd_mem(address_map &map);
-private:
+
 	uint8_t m_fe;
 	uint8_t m_keyboard_line;
 	const uint8_t *m_p_videoram;

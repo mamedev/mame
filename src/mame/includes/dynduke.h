@@ -20,6 +20,10 @@ public:
 		m_back_data(*this, "back_data"),
 		m_fore_data(*this, "fore_data") { }
 
+	void dynduke(machine_config &config);
+	void dbldyn(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
 	required_device<seibu_sound_device> m_seibu_sound;
@@ -61,8 +65,6 @@ public:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void dynduke(machine_config &config);
-	void dbldyn(machine_config &config);
 	void master_map(address_map &map);
 	void masterj_map(address_map &map);
 	void sei80bu_encrypted_full_map(address_map &map);

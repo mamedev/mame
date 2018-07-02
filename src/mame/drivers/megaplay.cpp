@@ -61,8 +61,14 @@ public:
 		m_bioscpu(*this, "mtbios")
 	{ }
 
+	void megaplay(machine_config &config);
+
+	void init_megaplay();
+
 	DECLARE_READ_LINE_MEMBER(start1_r);
 	DECLARE_READ_LINE_MEMBER(start2_r);
+
+private:
 
 	DECLARE_READ16_MEMBER(extra_ram_r);
 	DECLARE_WRITE16_MEMBER(extra_ram_w);
@@ -83,15 +89,12 @@ public:
 	DECLARE_WRITE8_MEMBER(game_w);
 	DECLARE_READ8_MEMBER(vdp1_count_r);
 
-	void init_megaplay();
 	DECLARE_VIDEO_START(megplay);
 	DECLARE_MACHINE_RESET(megaplay);
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void megaplay(machine_config &config);
 	void megaplay_bios_io_map(address_map &map);
 	void megaplay_bios_map(address_map &map);
-private:
 
 	uint32_t m_bios_mode;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
 

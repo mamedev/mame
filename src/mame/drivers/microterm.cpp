@@ -23,19 +23,21 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void mt420(machine_config &config);
+	void mt5510(machine_config &config);
+
+private:
 	u32 mt5510_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(c000_r);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void mt420(machine_config &config);
-	void mt5510(machine_config &config);
 	void mt420_io_map(address_map &map);
 	void mt420_mem_map(address_map &map);
 	void mt420_vram_map(address_map &map);
 	void mt5510_io_map(address_map &map);
 	void mt5510_mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	optional_region_ptr<u8> m_p_chargen;
 };

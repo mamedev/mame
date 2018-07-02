@@ -26,6 +26,9 @@ public:
 		m_palette(*this, "palette"),
 		m_ay1(*this, "ay1") { }
 
+	void dday(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_textvideoram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
@@ -69,6 +72,5 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ay8910_device> m_ay1;
-	void dday(machine_config &config);
 	void dday_map(address_map &map);
 };

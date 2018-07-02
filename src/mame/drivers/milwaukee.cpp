@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: TODO
 /***********************************************************************************************************************************
 
 2017-11-20 Skeleton
@@ -29,13 +29,13 @@ public:
 		//, m_p_chargen(*this, "chargen")
 	{ }
 
-		void milwaukee(machine_config &config);
-		void mem_map(address_map &map);
+	void milwaukee(machine_config &config);
+
 private:
+	void mem_map(address_map &map);
 	required_device<cpu_device> m_maincpu;
 	//required_region_ptr<u8> m_p_chargen;
 };
-
 void milwaukee_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xf7ff).ram();

@@ -56,6 +56,9 @@ public:
 		, m_keyboard(*this, "LINE.%u", 0)
 	{ }
 
+	void tvc(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<tvc_sound_device> m_sound;
@@ -110,7 +113,7 @@ public:
 	uint8_t       m_cassette_ff;
 	uint8_t       m_centronics_ff;
 	DECLARE_PALETTE_INIT(tvc);
-	void tvc(machine_config &config);
+
 	void tvc_io(address_map &map);
 	void tvc_mem(address_map &map);
 };

@@ -76,19 +76,21 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void thegrid(machine_config &config);
+	void crusnexo(machine_config &config);
+	void midzeus2(machine_config &config);
+
+	void init_crusnexo();
+	void init_thegrid();
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
 	DECLARE_READ32_MEMBER(zeus2_timekeeper_r);
 	DECLARE_WRITE32_MEMBER(zeus2_timekeeper_w);
 	DECLARE_READ32_MEMBER(crusnexo_leds_r);
 	DECLARE_WRITE32_MEMBER(crusnexo_leds_w);
-	void thegrid(machine_config &config);
-	void crusnexo(machine_config &config);
-	void midzeus2(machine_config &config);
 	void zeus2_map(address_map &map);
-	void init_crusnexo();
-	void init_thegrid();
 
-protected:
 	virtual void machine_start() override
 	{
 		MACHINE_START_CALL_MEMBER(midzeus);
@@ -96,7 +98,6 @@ protected:
 		m_lamps.resolve();
 	}
 
-private:
 	required_device<zeus2_device> m_zeus;
 	output_finder<32> m_leds;
 	output_finder<8> m_lamps;

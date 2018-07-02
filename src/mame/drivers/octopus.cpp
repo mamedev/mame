@@ -170,6 +170,9 @@ public:
 		m_z80_active(false)
 		{ }
 
+	void octopus(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -224,16 +227,14 @@ public:
 		BEEP_TIMER = 100
 	};
 
-	void octopus(machine_config &config);
 	void octopus_io(address_map &map);
 	void octopus_mem(address_map &map);
 	void octopus_sub_io(address_map &map);
 	void octopus_sub_mem(address_map &map);
 	void octopus_vram(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<scn2674_device> m_crtc;

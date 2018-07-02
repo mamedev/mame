@@ -69,15 +69,8 @@ class address_map_entry
 	struct is_addrmap_method { static constexpr bool value = std::is_constructible<address_map_constructor, Ret (T::*)(Params...), const char *, T*>::value; };
 
 	template <typename T, typename Ret, typename... Params>
-	struct is_setoffset_method { static constexpr bool value = std::is_constructible<setoffset_delegate, Ret (T::*)(Params...), const char *, const char *, T *>::value; };
-
-	template <typename T, typename Ret, typename... Params>
 	static std::enable_if_t<is_addrmap_method<T, Ret, Params...>::value, address_map_constructor> make_delegate(Ret (T::*func)(Params...), const char *name, T *obj)
 	{ return address_map_constructor(func, name, obj); }
-
-	template <typename T, typename Ret, typename... Params>
-	static std::enable_if_t<is_setoffset_method<T, Ret, Params...>::value, setoffset_delegate> make_delegate(Ret (T::*func)(Params...), const char *name, const char *tag, T *obj)
-	{ return setoffset_delegate(func, name, tag, obj); }
 
 	template <typename T, typename U>
 	static std::enable_if_t<std::is_convertible<std::add_pointer_t<U>, std::add_pointer_t<T> >::value, T *> make_pointer(U &obj)
@@ -167,9 +160,6 @@ public:
 		return bankrw(target.second);
 	}
 
-	// set offset handler (only one version, since there is no data width to consider)
-	address_map_entry &setoffset(setoffset_delegate func);
-
 	// type setters
 	address_map_entry &set_read_type(map_handler_type _type) { m_read.m_type = _type; return *this; }
 	address_map_entry &set_write_type(map_handler_type _type) { m_write.m_type = _type; return *this; }
@@ -196,10 +186,6 @@ public:
 	address_map_entry &m(Ret (T::*map)(Params...), const char *map_name)
 	{ return m(&m_devbase, make_delegate(map, map_name, make_pointer<T>(m_devbase))); }
 
-	template <typename T, typename Ret, typename... Params>
-	address_map_entry &setoffset(Ret (T::*so)(Params...), const char *so_name)
-	{ return setoffset(make_delegate(so, so_name, m_devbase.tag(), make_pointer<T>(m_devbase))); }
-
 
 	// device tag -> delegate converter
 	template <typename T, typename Ret, typename... Params>
@@ -218,10 +204,6 @@ public:
 	address_map_entry &m(const char *tag, Ret (T::*map)(Params...), const char *map_name)
 	{ return m(tag, make_delegate(map, map_name, static_cast<T *>(nullptr))); }
 
-	template <typename T, typename Ret, typename... Params>
-	address_map_entry &setoffset(const char *tag, Ret (T::*so)(Params...), const char *so_name)
-	{ return setoffset(make_delegate(so, so_name, tag, static_cast<T *>(nullptr))); }
-
 
 	// device reference -> delegate converter
 	template <typename T, typename U, typename Ret, typename... Params>
@@ -239,10 +221,6 @@ public:
 	template <typename T, typename U, typename Ret, typename... Params>
 	address_map_entry &m(T &obj, Ret (U::*map)(Params...), const char *map_name)
 	{ return m(make_pointer<device_t>(obj), make_delegate(map, map_name, make_pointer<U>(obj))); }
-
-	template <typename T, typename U, typename Ret, typename... Params>
-	address_map_entry &setoffset(T &obj, Ret (U::*so)(Params...), const char *so_name)
-	{ return w(make_delegate(so, so_name, get_tag(obj), make_pointer<U>(obj))); }
 
 
 	// device finder -> delegate converter
@@ -277,14 +255,6 @@ public:
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
 	address_map_entry &m(const device_finder<T, Reqd> &finder, Ret (U::*map)(Params...), const char *map_name)
 	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return m(make_delegate(map, map_name, make_pointer<U>(device))); }
-
-	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &setoffset(device_finder<T, Reqd> &finder, Ret (U::*so)(Params...), const char *so_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return setoffset(make_delegate(so, so_name, device.tag(), make_pointer<U>(device))); }
-
-	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &setoffset(const device_finder<T, Reqd> &finder, Ret (U::*so)(Params...), const char *so_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return setoffset(make_delegate(so, so_name, device.tag(), make_pointer<U>(device))); }
 
 
 	// lambda -> delegate converter
@@ -351,7 +321,6 @@ public:
 	int                     m_cswidth;              // chip select width override
 	map_handler_data        m_read;                 // data for read handler
 	map_handler_data        m_write;                // data for write handler
-	map_handler_data        m_setoffsethd;          // data for setoffset handler
 	const char *            m_share;                // tag of a shared memory block
 	const char *            m_region;               // tag of region containing the memory backing this entry
 	offs_t                  m_rgnoffs;              // offset within the region
@@ -366,7 +335,6 @@ public:
 	write32_delegate        m_wproto32;             // 32-bit write proto-delegate
 	write64_delegate        m_wproto64;             // 64-bit write proto-delegate
 
-	setoffset_delegate      m_soproto;              // set offset proto-delegate
 	device_t               *m_submap_device;
 	address_map_constructor m_submap_delegate;
 

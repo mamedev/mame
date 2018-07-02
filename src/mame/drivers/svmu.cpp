@@ -39,6 +39,9 @@ public:
 			m_bios(*this, "bios")
 		{ }
 
+	void svmu(machine_config &config);
+
+private:
 	required_device<lc8670_cpu_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;
 	required_device<speaker_sound_device> m_speaker;
@@ -55,10 +58,9 @@ public:
 	DECLARE_READ8_MEMBER(p7_r);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
 
-	void svmu(machine_config &config);
 	void svmu_io_mem(address_map &map);
 	void svmu_mem(address_map &map);
-private:
+
 	uint8_t       m_page;
 };
 

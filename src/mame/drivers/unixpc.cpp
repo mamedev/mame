@@ -46,7 +46,7 @@ public:
 
 	void unixpc(machine_config &config);
 
-protected:
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;

@@ -126,7 +126,7 @@ public:
 
 	DECLARE_READ8_MEMBER( readm );
 	DECLARE_WRITE8_MEMBER( writem );
-	DECLARE_SETOFFSET_MEMBER( setoffset );
+	DECLARE_READ8_MEMBER( setoffset );
 
 	DECLARE_INPUT_CHANGED_MEMBER( settings_changed );
 

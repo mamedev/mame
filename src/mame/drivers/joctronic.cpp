@@ -28,6 +28,11 @@ public:
 		, m_soundbank(*this, "soundbank")
 	{ }
 
+	void slalom03(machine_config &config);
+	void joctronic(machine_config &config);
+	void bldyrolr(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(csin_r);
 	DECLARE_WRITE8_MEMBER(control_port_w);
 	DECLARE_WRITE8_MEMBER(display_1_w);
@@ -59,9 +64,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void slalom03(machine_config &config);
-	void joctronic(machine_config &config);
-	void bldyrolr(machine_config &config);
 	void bldyrolr_maincpu_map(address_map &map);
 	void joctronic_sound_io_map(address_map &map);
 	void joctronic_sound_map(address_map &map);
@@ -70,7 +72,7 @@ public:
 	void slalom03_maincpu_map(address_map &map);
 	void slalom03_sound_io_map(address_map &map);
 	void slalom03_sound_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<msm5205_device> m_oki;

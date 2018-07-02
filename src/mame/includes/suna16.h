@@ -25,6 +25,14 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void uballoon(machine_config &config);
+	void sunaq(machine_config &config);
+	void bssoccer(machine_config &config);
+	void bestbest(machine_config &config);
+
+	void init_uballoon();
+
+private:
 	// common
 	DECLARE_WRITE16_MEMBER(soundlatch_w);
 	DECLARE_READ16_MEMBER(paletteram_r);
@@ -51,7 +59,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(bssoccer_interrupt);
 
-	void init_uballoon();
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(bestbest);
 	DECLARE_MACHINE_START(bssoccer);
@@ -61,10 +68,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bestbest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t *sprites, int gfx);
-	void uballoon(machine_config &config);
-	void sunaq(machine_config &config);
-	void bssoccer(machine_config &config);
-	void bestbest(machine_config &config);
+
 	void bestbest_map(address_map &map);
 	void bestbest_pcm_1_iomap(address_map &map);
 	void bestbest_pcm_1_map(address_map &map);
@@ -82,7 +86,6 @@ public:
 	void uballoon_pcm_1_map(address_map &map);
 	void uballoon_sound_map(address_map &map);
 
-protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_pcm1;
 	optional_device<cpu_device> m_pcm2;

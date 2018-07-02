@@ -50,6 +50,42 @@ public:
 		, m_okibank(*this, "okibank")
 	{ }
 
+	void dogyuun(machine_config &config);
+	void othldrby(machine_config &config);
+	void snowbro2(machine_config &config);
+	void bgareggabl(machine_config &config);
+	void pwrkick(machine_config &config);
+	void mahoudai(machine_config &config);
+	void tekipaki(machine_config &config);
+	void bbakraid(machine_config &config);
+	void fixeightbl(machine_config &config);
+	void fixeight(machine_config &config);
+	void ghox(machine_config &config);
+	void bgaregga(machine_config &config);
+	void batrider(machine_config &config);
+	void shippumd(machine_config &config);
+	void kbash(machine_config &config);
+	void pipibibs(machine_config &config);
+	void pipibibsbl(machine_config &config);
+	void batsugun(machine_config &config);
+	void enmadaio(machine_config &config);
+	void truxton2(machine_config &config);
+	void vfive(machine_config &config);
+	void kbash2(machine_config &config);
+
+	void init_bbakraid();
+	void init_pipibibsbl();
+	void init_dogyuun();
+	void init_fixeight();
+	void init_bgaregga();
+	void init_fixeightbl();
+	void init_vfive();
+	void init_batrider();
+	void init_enmadaio();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
+
+private:
 	optional_shared_ptr<uint8_t> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_tx_videoram;
@@ -119,18 +155,10 @@ public:
 	DECLARE_WRITE16_MEMBER(batrider_textdata_dma_w);
 	DECLARE_WRITE16_MEMBER(batrider_pal_text_dma_w);
 	DECLARE_WRITE8_MEMBER(batrider_objectbank_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
+
 	template<int Chip> DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(enmadaio_oki_bank_w);
-	void init_bbakraid();
-	void init_pipibibsbl();
-	void init_dogyuun();
-	void init_fixeight();
-	void init_bgaregga();
-	void init_fixeightbl();
-	void init_vfive();
-	void init_batrider();
-	void init_enmadaio();
+
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(toaplan2);
@@ -161,28 +189,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
-	void dogyuun(machine_config &config);
-	void othldrby(machine_config &config);
-	void snowbro2(machine_config &config);
-	void bgareggabl(machine_config &config);
-	void pwrkick(machine_config &config);
-	void mahoudai(machine_config &config);
-	void tekipaki(machine_config &config);
-	void bbakraid(machine_config &config);
-	void fixeightbl(machine_config &config);
-	void fixeight(machine_config &config);
-	void ghox(machine_config &config);
-	void bgaregga(machine_config &config);
-	void batrider(machine_config &config);
-	void shippumd(machine_config &config);
-	void kbash(machine_config &config);
-	void pipibibs(machine_config &config);
-	void pipibibsbl(machine_config &config);
-	void batsugun(machine_config &config);
-	void enmadaio(machine_config &config);
-	void truxton2(machine_config &config);
-	void vfive(machine_config &config);
-	void kbash2(machine_config &config);
+	
+
 	void batrider_68k_mem(address_map &map);
 	void batrider_dma_mem(address_map &map);
 	void batrider_sound_z80_mem(address_map &map);

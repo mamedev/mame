@@ -27,6 +27,27 @@
 class lynx_state : public driver_device
 {
 public:
+	lynx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_mem_0000(*this, "mem_0000"),
+		m_mem_fc00(*this, "mem_fc00"),
+		m_mem_fd00(*this, "mem_fd00"),
+		m_mem_fe00(*this, "mem_fe00"),
+		m_mem_fffa(*this, "mem_fffa"),
+		m_maincpu(*this, "maincpu"),
+		m_sound(*this, "custom"),
+		m_cart(*this, "cartslot"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_bank_fc00(*this, "bank_fc00"),
+		m_bank_fd00(*this, "bank_fd00"),
+		m_bank_fe00(*this, "bank_fe00"),
+		m_bank_fffa(*this, "bank_fffa")
+	{ }
+
+	void lynx(machine_config &config);
+
+private:
 	struct BLITTER
 	{
 		// global
@@ -110,33 +131,11 @@ public:
 		TIMER_UART
 	};
 
-	lynx_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_mem_0000(*this, "mem_0000"),
-		m_mem_fc00(*this, "mem_fc00"),
-		m_mem_fd00(*this, "mem_fd00"),
-		m_mem_fe00(*this, "mem_fe00"),
-		m_mem_fffa(*this, "mem_fffa"),
-		m_maincpu(*this, "maincpu"),
-		m_sound(*this, "custom"),
-		m_cart(*this, "cartslot"),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen"),
-		m_bank_fc00(*this, "bank_fc00"),
-		m_bank_fd00(*this, "bank_fd00"),
-		m_bank_fe00(*this, "bank_fe00"),
-		m_bank_fffa(*this, "bank_fffa")
-	{ }
-
-	void lynx(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_shared_ptr<uint8_t> m_mem_0000;
 	required_shared_ptr<uint8_t> m_mem_fc00;
 	required_shared_ptr<uint8_t> m_mem_fd00;

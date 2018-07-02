@@ -70,7 +70,7 @@ public:
 	void flagrall(machine_config &config);
 	void k3(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE16_MEMBER(bgram_w);
 	DECLARE_WRITE16_MEMBER(scrollx_w);
 	DECLARE_WRITE16_MEMBER(scrolly_w);
@@ -88,7 +88,6 @@ protected:
 	void flagrall_map(address_map &map);
 	void k3_base_map(address_map &map);
 
-private:
 	/* devices */
 	optional_device_array<okim6295_device, 2> m_oki;
 	/* memory pointers */

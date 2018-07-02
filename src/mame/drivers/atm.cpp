@@ -29,25 +29,26 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
+	void atm(machine_config &config);
+	void atmtb2(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
 	DECLARE_READ8_MEMBER(beta_neutral_r);
 	DECLARE_READ8_MEMBER(beta_enable_r);
 	DECLARE_READ8_MEMBER(beta_disable_r);
 	DECLARE_MACHINE_RESET(atm);
 
-	void atm(machine_config &config);
-	void atmtb2(machine_config &config);
 	void atm_io(address_map &map);
 	void atm_mem(address_map &map);
 	void atm_switch(address_map &map);
-protected:
+
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
 
-private:
 	address_space *m_program;
 	uint8_t *m_p_ram;
 	void atm_update_memory();

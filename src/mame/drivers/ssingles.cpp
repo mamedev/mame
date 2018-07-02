@@ -164,6 +164,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	void ssingles(machine_config &config);
+	void atamanot(machine_config &config);
+
+	void init_ssingles();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
+
+private:
 	uint8_t m_videoram[VMEM_SIZE];
 	uint8_t m_colorram[VMEM_SIZE];
 	uint8_t m_prot_data;
@@ -177,15 +185,12 @@ public:
 	DECLARE_WRITE8_MEMBER(c001_w);
 	DECLARE_READ8_MEMBER(atamanot_prot_r);
 	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
-	void init_ssingles();
+
 	virtual void video_start() override;
 	DECLARE_WRITE_LINE_MEMBER(atamanot_irq);
 	MC6845_UPDATE_ROW(ssingles_update_row);
 	MC6845_UPDATE_ROW(atamanot_update_row);
 	required_device<cpu_device> m_maincpu;
-	void ssingles(machine_config &config);
-	void atamanot(machine_config &config);
 	void atamanot_io_map(address_map &map);
 	void atamanot_map(address_map &map);
 	void ssingles_io_map(address_map &map);

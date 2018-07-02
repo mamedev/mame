@@ -25,7 +25,7 @@ public:
 
 	void lb186(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(sio_out_w);
 	DECLARE_WRITE8_MEMBER(drive_sel_w);
 	DECLARE_READ8_MEMBER(scsi_dack_r);
@@ -35,7 +35,6 @@ protected:
 	void lb186_io(address_map &map);
 	void lb186_map(address_map &map);
 
-private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;
 	required_device<ncr5380n_device> m_scsi;

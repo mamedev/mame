@@ -35,6 +35,9 @@ public:
 			m_mapram(*this, "mapram")
 	{ }
 
+	void miniframe(machine_config &config);
+
+private:
 	required_device<m68010_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<wd2797_device> m_wd2797;
@@ -56,10 +59,9 @@ public:
 
 	required_shared_ptr<uint16_t> m_mapram;
 
-	void miniframe(machine_config &config);
 	void miniframe_mem(address_map &map);
 	void ramrombank_map(address_map &map);
-private:
+
 	uint16_t *m_ramptr;
 	uint32_t m_ramsize;
 	uint16_t m_diskdmasize;

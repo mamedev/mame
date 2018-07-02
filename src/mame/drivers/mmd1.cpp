@@ -160,6 +160,12 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void mmd1(machine_config &config);
+	void mmd2(machine_config &config);
+
+	void init_mmd2();
+
+private:
 	DECLARE_WRITE8_MEMBER(mmd1_port0_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port1_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port2_w);
@@ -171,17 +177,13 @@ public:
 	DECLARE_WRITE8_MEMBER(mmd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mmd2_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
-	void init_mmd2();
 	DECLARE_MACHINE_RESET(mmd1);
 	DECLARE_MACHINE_RESET(mmd2);
-	void mmd1(machine_config &config);
-	void mmd2(machine_config &config);
 	void mmd1_io(address_map &map);
 	void mmd1_mem(address_map &map);
 	void mmd2_io(address_map &map);
 	void mmd2_mem(address_map &map);
 
-private:
 	uint8_t m_return_code;
 	uint8_t m_digit;
 	virtual void machine_start() override { m_digits.resolve(); }
