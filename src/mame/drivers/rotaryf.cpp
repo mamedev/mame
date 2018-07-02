@@ -38,6 +38,9 @@ public:
 	{
 	}
 
+	void rotaryf(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<sn76477_device> m_sn;
@@ -57,7 +60,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
-	void rotaryf(machine_config &config);
 	void rotaryf_io_map(address_map &map);
 	void rotaryf_map(address_map &map);
 };
@@ -211,7 +213,7 @@ void rotaryf_state::rotaryf_io_map(address_map &map)
 	map(0x21, 0x21).portr("COIN").nopw();
 	map(0x26, 0x26).portr("DSW");
 	map(0x28, 0x2b).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x30, 0x30).w(this, FUNC(rotaryf_state::port30_w));
+	map(0x30, 0x30).w(FUNC(rotaryf_state::port30_w));
 }
 
 

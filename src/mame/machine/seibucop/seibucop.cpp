@@ -170,7 +170,8 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	m_LEGACY_r1(0),
 
 	m_videoramout_cb(*this),
-	m_palette(*this, ":palette")
+	m_paletteramout_cb(*this),
+	m_host_cpu(*this, finder_base::DUMMY_TAG)
 {
 	memset(cop_func_trigger, 0, sizeof(uint16_t)*(0x100/8));
 	memset(cop_func_value, 0, sizeof(uint16_t)*(0x100/8));
@@ -279,8 +280,8 @@ void raiden2cop_device::device_start()
 	save_item(NAME(m_LEGACY_r1));
 
 	m_videoramout_cb.resolve_safe();
-	// TODO: tag parameter in device
-	m_host_cpu = machine().device<cpu_device>("maincpu");
+	m_paletteramout_cb.resolve_safe();
+
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 	m_host_endian = m_host_space->endianness() == ENDIANNESS_BIG; // m_cpu_is_68k
 

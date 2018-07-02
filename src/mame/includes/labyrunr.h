@@ -8,6 +8,7 @@
 
 #include "video/k007121.h"
 #include "video/k051733.h"
+#include "emupal.h"
 #include "screen.h"
 
 class labyrunr_state : public driver_device
@@ -25,6 +26,9 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void labyrunr(machine_config &config);
+
+private:
 	/* devices */
 	required_device<k007121_device> m_k007121;
 
@@ -56,6 +60,5 @@ public:
 	uint32_t screen_update_labyrunr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(labyrunr_timer_interrupt);
-	void labyrunr(machine_config &config);
 	void labyrunr_map(address_map &map);
 };

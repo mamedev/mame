@@ -27,6 +27,7 @@ Cart sizes: 1MB, 2MB, 4MB
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -40,6 +41,9 @@ public:
 		, m_cart(*this, "cartslot")
 	{ }
 
+	void pockchalv1(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -48,7 +52,6 @@ public:
 	required_device<generic_slot_device> m_cart;
 	uint32_t  m_rom_size;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pockchalv1_cart);
-	void pockchalv1(machine_config &config);
 	void pockchalv1_map(address_map &map);
 };
 

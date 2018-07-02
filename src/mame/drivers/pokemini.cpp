@@ -15,6 +15,7 @@ The LCD is likely to be a SSD1828 LCD.
 #include "sound/spkrdev.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -64,6 +65,9 @@ public:
 		, m_inputs(*this, "INPUTS")
 	{ }
 
+	void pokemini(machine_config &config);
+
+private:
 	uint8_t m_pm_reg[0x100];
 	PRC m_prc;
 	TIMERS m_timers;
@@ -78,9 +82,8 @@ public:
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
 
-	void pokemini(machine_config &config);
 	void pokemini_mem_map(address_map &map);
-protected:
+
 	enum
 	{
 		TIMER_SECONDS,
@@ -129,8 +132,8 @@ void pokemini_state::pokemini_mem_map(address_map &map)
 {
 	map(0x000000, 0x000fff).rom();                            /* bios */
 	map(0x001000, 0x001fff).ram().share("p_ram");          /* VRAM/RAM */
-	map(0x002000, 0x0020ff).rw(this, FUNC(pokemini_state::hwreg_r), FUNC(pokemini_state::hwreg_w));    /* hardware registers */
-	map(0x002100, 0x1fffff).r(this, FUNC(pokemini_state::rom_r));                    /* cartridge area */
+	map(0x002000, 0x0020ff).rw(FUNC(pokemini_state::hwreg_r), FUNC(pokemini_state::hwreg_w));    /* hardware registers */
+	map(0x002100, 0x1fffff).r(FUNC(pokemini_state::rom_r));                    /* cartridge area */
 }
 
 

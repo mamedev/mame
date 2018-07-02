@@ -26,6 +26,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tk80bs_state : public driver_device
@@ -41,6 +42,9 @@ public:
 	{
 	}
 
+	void tk80bs(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(ppi_custom_r);
 	DECLARE_WRITE8_MEMBER(ppi_custom_w);
 	void kbd_put(u8 data);
@@ -48,9 +52,8 @@ public:
 	DECLARE_READ8_MEMBER(port_b_r);
 	uint32_t screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
-	void tk80bs(machine_config &config);
 	void tk80bs_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
@@ -114,7 +117,7 @@ void tk80bs_state::tk80bs_mem(address_map &map)
 	map(0x0000, 0x07ff).rom();
 //  AM_RANGE(0x0c00, 0x7bff) AM_ROM // ext
 	map(0x7df8, 0x7df9).noprw(); // i8251 sio
-	map(0x7dfc, 0x7dff).rw(this, FUNC(tk80bs_state::ppi_custom_r), FUNC(tk80bs_state::ppi_custom_w));
+	map(0x7dfc, 0x7dff).rw(FUNC(tk80bs_state::ppi_custom_r), FUNC(tk80bs_state::ppi_custom_w));
 	map(0x7e00, 0x7fff).ram().share("videoram"); // video ram
 	map(0x8000, 0xcfff).ram(); // RAM
 	map(0xd000, 0xefff).rom(); // BASIC

@@ -21,6 +21,7 @@
 #include "bus/generic/carts.h"
 #include "bus/nasbus/nasbus.h"
 
+#include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 
@@ -49,19 +50,36 @@ public:
 	nascom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
 		m_hd6402(*this, "hd6402"),
 		m_cassette(*this, "cassette"),
-		m_ram(*this, RAM_TAG),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
+	void nascom(machine_config &config);
+
+	void init_nascom();
+
+protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+
+	virtual void machine_reset() override;
+
+	DECLARE_READ8_MEMBER(nascom1_port_00_r);
+	DECLARE_WRITE8_MEMBER(nascom1_port_00_w);
+	DECLARE_READ8_MEMBER(nascom1_port_01_r);
+	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
+	DECLARE_READ8_MEMBER(nascom1_port_02_r);
+
+	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
+
+private:
 	required_device<ay31015_device> m_hd6402;
 	required_device<cassette_image_device> m_cassette;
-	required_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -72,24 +90,11 @@ public:
 	int m_tape_index;
 	nascom1_portstat_t m_portstat;
 
-	DECLARE_READ8_MEMBER(nascom1_port_00_r);
-	DECLARE_WRITE8_MEMBER(nascom1_port_00_w);
-	DECLARE_READ8_MEMBER(nascom1_port_01_r);
-	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
-	DECLARE_READ8_MEMBER(nascom1_port_02_r);
-	void init_nascom();
-	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
 	DECLARE_READ_LINE_MEMBER(nascom1_hd6402_si);
 	DECLARE_WRITE_LINE_MEMBER(nascom1_hd6402_so);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
 	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
-
-	void nascom(machine_config &config);
-protected:
-	virtual void machine_reset() override;
-
-private:
 
 };
 
@@ -100,12 +105,13 @@ public:
 		nascom_state(mconfig, type, tag)
 	{ }
 
+	void nascom1(machine_config &config);
+
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void nascom1(machine_config &config);
+private:
 	void nascom1_io(address_map &map);
 	void nascom1_mem(address_map &map);
-private:
 };
 
 class nascom2_state : public nascom_state
@@ -119,25 +125,27 @@ public:
 		m_lsw1(*this, "lsw1")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
-	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
+	void nascom2(machine_config &config);
+	void nascom2c(machine_config &config);
+
 	void init_nascom2();
 	void init_nascom2c();
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
+	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
 
-	void nascom2(machine_config &config);
-	void nascom2c(machine_config &config);
 	void nascom2_io(address_map &map);
 	void nascom2_mem(address_map &map);
 	void nascom2c_mem(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 
-private:
 	required_device<nasbus_device> m_nasbus;
 	required_device<generic_slot_device> m_socket1;
 	required_device<generic_slot_device> m_socket2;
@@ -483,9 +491,9 @@ void nascom1_state::nascom1_mem(address_map &map)
 void nascom1_state::nascom1_io(address_map &map)
 {
 	map.global_mask(0x0f);
-	map(0x00, 0x00).rw(this, FUNC(nascom1_state::nascom1_port_00_r), FUNC(nascom1_state::nascom1_port_00_w));
-	map(0x01, 0x01).rw(this, FUNC(nascom1_state::nascom1_port_01_r), FUNC(nascom1_state::nascom1_port_01_w));
-	map(0x02, 0x02).r(this, FUNC(nascom1_state::nascom1_port_02_r));
+	map(0x00, 0x00).rw(FUNC(nascom1_state::nascom1_port_00_r), FUNC(nascom1_state::nascom1_port_00_w));
+	map(0x01, 0x01).rw(FUNC(nascom1_state::nascom1_port_01_r), FUNC(nascom1_state::nascom1_port_01_w));
+	map(0x02, 0x02).r(FUNC(nascom1_state::nascom1_port_02_r));
 	map(0x04, 0x07).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
@@ -500,9 +508,9 @@ void nascom2_state::nascom2_mem(address_map &map)
 void nascom2_state::nascom2_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(nascom2_state::nascom1_port_00_r), FUNC(nascom2_state::nascom1_port_00_w));
-	map(0x01, 0x01).rw(this, FUNC(nascom2_state::nascom1_port_01_r), FUNC(nascom2_state::nascom1_port_01_w));
-	map(0x02, 0x02).r(this, FUNC(nascom2_state::nascom1_port_02_r));
+	map(0x00, 0x00).rw(FUNC(nascom2_state::nascom1_port_00_r), FUNC(nascom2_state::nascom1_port_00_w));
+	map(0x01, 0x01).rw(FUNC(nascom2_state::nascom1_port_01_r), FUNC(nascom2_state::nascom1_port_01_w));
+	map(0x02, 0x02).r(FUNC(nascom2_state::nascom1_port_02_r));
 	map(0x04, 0x07).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 

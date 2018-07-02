@@ -73,6 +73,11 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void sklflite(machine_config &config);
+	void play_3(machine_config &config);
+	void megaaton(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_WRITE8_MEMBER(megaaton_port01_w);
 	DECLARE_WRITE8_MEMBER(port02_w);
@@ -92,16 +97,13 @@ public:
 	DECLARE_READ8_MEMBER(port02_a_r);
 	DECLARE_READ_LINE_MEMBER(clear_a_r);
 
-	void sklflite(machine_config &config);
-	void play_3(machine_config &config);
-	void megaaton(machine_config &config);
 	void megaaton_io(address_map &map);
 	void play_3_audio_io(address_map &map);
 	void play_3_audio_map(address_map &map);
 	void play_3_io(address_map &map);
 	void play_3_map(address_map &map);
 	void sklflite_io(address_map &map);
-private:
+
 	u16 m_clockcnt;
 	u16 m_resetcnt;
 	u16 m_resetcnt_a;
@@ -134,25 +136,25 @@ void play_3_state::play_3_map(address_map &map)
 
 void play_3_state::play_3_io(address_map &map)
 {
-	map(0x01, 0x01).w(this, FUNC(play_3_state::port01_w)); // digits, scan-lines
-	map(0x02, 0x02).w(this, FUNC(play_3_state::port02_w)); // sound code
-	map(0x03, 0x03).w(this, FUNC(play_3_state::port03_w)); //
-	map(0x04, 0x04).r(this, FUNC(play_3_state::port04_r)); // switches
-	map(0x05, 0x05).r(this, FUNC(play_3_state::port05_r)); // more switches
-	map(0x06, 0x06).w(this, FUNC(play_3_state::port06_w)); // segments
-	map(0x07, 0x07).w(this, FUNC(play_3_state::port07_w)); // flipflop clear
+	map(0x01, 0x01).w(FUNC(play_3_state::port01_w)); // digits, scan-lines
+	map(0x02, 0x02).w(FUNC(play_3_state::port02_w)); // sound code
+	map(0x03, 0x03).w(FUNC(play_3_state::port03_w)); //
+	map(0x04, 0x04).r(FUNC(play_3_state::port04_r)); // switches
+	map(0x05, 0x05).r(FUNC(play_3_state::port05_r)); // more switches
+	map(0x06, 0x06).w(FUNC(play_3_state::port06_w)); // segments
+	map(0x07, 0x07).w(FUNC(play_3_state::port07_w)); // flipflop clear
 }
 
 void play_3_state::megaaton_io(address_map &map)
 {
 	play_3_io(map);
-	map(0x01, 0x01).w(this, FUNC(play_3_state::megaaton_port01_w)); // digits, scan-lines
+	map(0x01, 0x01).w(FUNC(play_3_state::megaaton_port01_w)); // digits, scan-lines
 }
 
 void play_3_state::sklflite_io(address_map &map)
 {
 	play_3_io(map);
-	map(0x03, 0x03).w(this, FUNC(play_3_state::sklflite_port03_w)); //
+	map(0x03, 0x03).w(FUNC(play_3_state::sklflite_port03_w)); //
 }
 
 void play_3_state::play_3_audio_map(address_map &map)
@@ -165,8 +167,8 @@ void play_3_state::play_3_audio_map(address_map &map)
 
 void play_3_state::play_3_audio_io(address_map &map)
 {
-	map(0x01, 0x01).w(this, FUNC(play_3_state::port01_a_w)); // irq counter
-	map(0x02, 0x02).r(this, FUNC(play_3_state::port02_a_r)); // sound code
+	map(0x01, 0x01).w(FUNC(play_3_state::port01_a_w)); // irq counter
+	map(0x02, 0x02).r(FUNC(play_3_state::port02_a_r)); // sound code
 }
 
 

@@ -29,6 +29,7 @@ always false - counter was reloaded and incremented before interrupt occurs
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -36,11 +37,6 @@ always false - counter was reloaded and incremented before interrupt occurs
 class tugboat_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTERRUPT
-	};
-
 	tugboat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -48,6 +44,14 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ram(*this, "ram") { }
+
+	void tugboat(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_INTERRUPT
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -75,12 +79,10 @@ public:
 	DECLARE_PALETTE_INIT(tugboat);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
-		int addr,int gfx0,int gfx1,int transparency);
+	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int addr, int gfx0, int gfx1, int transparency);
 
-		void tugboat(machine_config &config);
-		void main_map(address_map &map);
-protected:
+	void main_map(address_map &map);
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -238,12 +240,12 @@ void tugboat_state::main_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x01ff).ram().share("ram");
 	map(0x1060, 0x1061).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x10a0, 0x10a1).w(this, FUNC(tugboat_state::hd46505_0_w));  /* scrolling is performed changing the start_addr register (0C/0D) */
-	map(0x10c0, 0x10c1).w(this, FUNC(tugboat_state::hd46505_1_w));
+	map(0x10a0, 0x10a1).w(FUNC(tugboat_state::hd46505_0_w));  /* scrolling is performed changing the start_addr register (0C/0D) */
+	map(0x10c0, 0x10c1).w(FUNC(tugboat_state::hd46505_1_w));
 	map(0x11e4, 0x11e7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x11e8, 0x11eb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	//AM_RANGE(0x1700, 0x1fff) AM_RAM
-	map(0x18e0, 0x18ef).w(this, FUNC(tugboat_state::score_w));
+	map(0x18e0, 0x18ef).w(FUNC(tugboat_state::score_w));
 	map(0x2000, 0x2fff).ram(); /* tilemap RAM */
 	map(0x4000, 0x7fff).rom();
 }

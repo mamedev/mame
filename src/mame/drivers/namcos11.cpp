@@ -323,19 +323,6 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(rom8_w);
-	DECLARE_WRITE16_MEMBER(rom8_64_upper_w);
-	DECLARE_WRITE16_MEMBER(rom8_64_w);
-	DECLARE_WRITE16_MEMBER(lightgun_w);
-	DECLARE_READ16_MEMBER(lightgun_r);
-	DECLARE_READ16_MEMBER(c76_shared_r);
-	DECLARE_WRITE16_MEMBER(c76_shared_w);
-	DECLARE_READ16_MEMBER(c76_speedup_r);
-	DECLARE_WRITE16_MEMBER(c76_speedup_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
-
 	void coh110(machine_config &config);
 	void coh100(machine_config &config);
 	void myangel3(machine_config &config);
@@ -350,16 +337,30 @@ public:
 	void souledge(machine_config &config);
 	void tekken(machine_config &config);
 	void tekken2(machine_config &config);
+
+private:
+	DECLARE_WRITE16_MEMBER(rom8_w);
+	DECLARE_WRITE16_MEMBER(rom8_64_upper_w);
+	DECLARE_WRITE16_MEMBER(rom8_64_w);
+	DECLARE_WRITE16_MEMBER(lightgun_w);
+	DECLARE_READ16_MEMBER(lightgun_r);
+	DECLARE_READ16_MEMBER(c76_shared_r);
+	DECLARE_WRITE16_MEMBER(c76_shared_w);
+	DECLARE_READ16_MEMBER(c76_speedup_r);
+	DECLARE_WRITE16_MEMBER(c76_speedup_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
+
 	void c76_io_map(address_map &map);
 	void c76_map(address_map &map);
 	void namcos11_map(address_map &map);
 	void ptblank2ua_map(address_map &map);
 	void rom8_64_map(address_map &map);
 	void rom8_map(address_map &map);
-protected:
+
 	virtual void driver_start() override;
 
-private:
 	required_shared_ptr<uint16_t> m_sharedram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
@@ -472,7 +473,7 @@ WRITE16_MEMBER( namcos11_state::c76_shared_w )
 
 void namcos11_state::namcos11_map(address_map &map)
 {
-	map(0x1fa04000, 0x1fa0ffff).rw(this, FUNC(namcos11_state::c76_shared_r), FUNC(namcos11_state::c76_shared_w)); /* shared ram with C76 */
+	map(0x1fa04000, 0x1fa0ffff).rw(FUNC(namcos11_state::c76_shared_r), FUNC(namcos11_state::c76_shared_w)); /* shared ram with C76 */
 	map(0x1fa20000, 0x1fa2001f).rw("keycus", FUNC(ns11_keycus_device::read), FUNC(ns11_keycus_device::write));
 	map(0x1fa30000, 0x1fa30fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x00ff00ff); /* eeprom */
 	map(0x1fb00000, 0x1fb00003).nopw(); /* ?? */
@@ -491,7 +492,7 @@ void namcos11_state::rom8_map(address_map &map)
 	map(0x1f500000, 0x1f5fffff).bankr("bank6");
 	map(0x1f600000, 0x1f6fffff).bankr("bank7");
 	map(0x1f700000, 0x1f7fffff).bankr("bank8");
-	map(0x1fa10020, 0x1fa1002f).w(this, FUNC(namcos11_state::rom8_w));
+	map(0x1fa10020, 0x1fa1002f).w(FUNC(namcos11_state::rom8_w));
 }
 
 void namcos11_state::rom8_64_map(address_map &map)
@@ -506,16 +507,16 @@ void namcos11_state::rom8_64_map(address_map &map)
 	map(0x1f500000, 0x1f5fffff).bankr("bank6");
 	map(0x1f600000, 0x1f6fffff).bankr("bank7");
 	map(0x1f700000, 0x1f7fffff).bankr("bank8");
-	map(0x1f080000, 0x1f080003).w(this, FUNC(namcos11_state::rom8_64_upper_w));
-	map(0x1fa10020, 0x1fa1002f).nopr().w(this, FUNC(namcos11_state::rom8_64_w));
+	map(0x1f080000, 0x1f080003).w(FUNC(namcos11_state::rom8_64_upper_w));
+	map(0x1fa10020, 0x1fa1002f).nopr().w(FUNC(namcos11_state::rom8_64_w));
 }
 
 void namcos11_state::ptblank2ua_map(address_map &map)
 {
 	rom8_64_map(map);
 
-	map(0x1f780000, 0x1f78000f).r(this, FUNC(namcos11_state::lightgun_r));
-	map(0x1f788000, 0x1f788003).w(this, FUNC(namcos11_state::lightgun_w));
+	map(0x1f780000, 0x1f78000f).r(FUNC(namcos11_state::lightgun_r));
+	map(0x1f788000, 0x1f788003).w(FUNC(namcos11_state::lightgun_w));
 }
 
 void namcos11_state::c76_map(address_map &map)

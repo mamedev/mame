@@ -152,12 +152,6 @@ INPUT_PORTS_END
 class mu100_state : public driver_device
 {
 public:
-	enum {
-		P2_LCD_RS     = 0x01,
-		P2_LCD_RW     = 0x02,
-		P2_LCD_ENABLE = 0x04
-	};
-
 	mu100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
@@ -165,6 +159,18 @@ public:
 			m_ioport_p7(*this, "P7"),
 			m_ioport_p8(*this, "P8")
 	{ }
+
+	void mu100(machine_config &config);
+
+protected:
+	virtual DECLARE_READ16_MEMBER(adc7_r);
+
+private:
+	enum {
+		P2_LCD_RS     = 0x01,
+		P2_LCD_RW     = 0x02,
+		P2_LCD_ENABLE = 0x04
+	};
 
 	required_device<h8s2655_device> m_maincpu;
 	required_device<hd44780_device> m_lcd;
@@ -179,7 +185,6 @@ public:
 	DECLARE_READ16_MEMBER(adc2_r);
 	DECLARE_READ16_MEMBER(adc4_r);
 	DECLARE_READ16_MEMBER(adc6_r);
-	virtual DECLARE_READ16_MEMBER(adc7_r);
 
 	DECLARE_WRITE16_MEMBER(p1_w);
 	DECLARE_READ16_MEMBER(p1_r);
@@ -199,7 +204,6 @@ public:
 	float lightlevel(const uint8_t *src, const uint8_t *render);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
-	void mu100(machine_config &config);
 	void mu100_iomap(address_map &map);
 	void mu100_map(address_map &map);
 };
@@ -210,6 +214,7 @@ public:
 		: mu100_state(mconfig, type, tag)
 	{ }
 
+private:
 	virtual DECLARE_READ16_MEMBER(adc7_r) override;
 };
 
@@ -272,7 +277,7 @@ void mu100_state::mu100_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
 	map(0x200000, 0x21ffff).ram(); // 128K work RAM
-	map(0x400000, 0x401fff).rw(this, FUNC(mu100_state::snd_r), FUNC(mu100_state::snd_w));
+	map(0x400000, 0x401fff).rw(FUNC(mu100_state::snd_r), FUNC(mu100_state::snd_w));
 }
 
 READ16_MEMBER(mu100_state::snd_r)
@@ -421,19 +426,19 @@ WRITE16_MEMBER(mu100_state::pg_w)
 
 void mu100_state::mu100_iomap(address_map &map)
 {
-	map(h8_device::PORT_1, h8_device::PORT_1).rw(this, FUNC(mu100_state::p1_r), FUNC(mu100_state::p1_w));
-	map(h8_device::PORT_2, h8_device::PORT_2).w(this, FUNC(mu100_state::p2_w));
-	map(h8_device::PORT_3, h8_device::PORT_3).w(this, FUNC(mu100_state::p3_w));
-	map(h8_device::PORT_5, h8_device::PORT_5).w(this, FUNC(mu100_state::p5_w));
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(this, FUNC(mu100_state::p6_r), FUNC(mu100_state::p6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(mu100_state::pa_r), FUNC(mu100_state::pa_w));
-	map(h8_device::PORT_F, h8_device::PORT_F).w(this, FUNC(mu100_state::pf_w));
-	map(h8_device::PORT_G, h8_device::PORT_G).w(this, FUNC(mu100_state::pg_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(this, FUNC(mu100_state::adc0_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(this, FUNC(mu100_state::adc2_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(this, FUNC(mu100_state::adc4_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(this, FUNC(mu100_state::adc6_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(this, FUNC(mu100_state::adc7_r));
+	map(h8_device::PORT_1, h8_device::PORT_1).rw(FUNC(mu100_state::p1_r), FUNC(mu100_state::p1_w));
+	map(h8_device::PORT_2, h8_device::PORT_2).w(FUNC(mu100_state::p2_w));
+	map(h8_device::PORT_3, h8_device::PORT_3).w(FUNC(mu100_state::p3_w));
+	map(h8_device::PORT_5, h8_device::PORT_5).w(FUNC(mu100_state::p5_w));
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu100_state::p6_r), FUNC(mu100_state::p6_w));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r), FUNC(mu100_state::pa_w));
+	map(h8_device::PORT_F, h8_device::PORT_F).w(FUNC(mu100_state::pf_w));
+	map(h8_device::PORT_G, h8_device::PORT_G).w(FUNC(mu100_state::pg_w));
+	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc0_r));
+	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc2_r));
+	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc4_r));
+	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc6_r));
+	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc7_r));
 }
 
 MACHINE_CONFIG_START(mu100_state::mu100)

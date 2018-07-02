@@ -28,6 +28,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -45,6 +46,9 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scrollram(*this, "scrollram") { }
 
+	void skyarmy(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -73,7 +77,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(nmi_source);
-	void skyarmy(machine_config &config);
 	void skyarmy_io_map(address_map &map);
 	void skyarmy_map(address_map &map);
 };
@@ -214,8 +217,8 @@ void skyarmy_state::skyarmy_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8fff).ram().w(this, FUNC(skyarmy_state::videoram_w)).share("videoram"); /* Video RAM */
-	map(0x9000, 0x93ff).ram().w(this, FUNC(skyarmy_state::colorram_w)).share("colorram"); /* Color RAM */
+	map(0x8800, 0x8fff).ram().w(FUNC(skyarmy_state::videoram_w)).share("videoram"); /* Video RAM */
+	map(0x9000, 0x93ff).ram().w(FUNC(skyarmy_state::colorram_w)).share("colorram"); /* Color RAM */
 	map(0x9800, 0x983f).ram().share("spriteram"); /* Sprites */
 	map(0x9840, 0x985f).ram().share("scrollram");  /* Scroll RAM */
 	map(0xa000, 0xa000).portr("DSW");

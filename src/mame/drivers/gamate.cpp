@@ -32,8 +32,11 @@ public:
 		, m_bios(*this, "bios")
 	{ }
 
-	DECLARE_PALETTE_INIT(gamate);
+	void gamate(machine_config &config);
 
+	void init_gamate();
+
+private:
 	DECLARE_READ8_MEMBER(card_available_check);
 	DECLARE_READ8_MEMBER(card_available_set);
 	DECLARE_WRITE8_MEMBER(card_reset);
@@ -44,16 +47,11 @@ public:
 	DECLARE_WRITE8_MEMBER(write_cart);
 	DECLARE_READ8_MEMBER(read_cart);
 
-	void init_gamate();
-
-	uint32_t screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	TIMER_CALLBACK_MEMBER(gamate_timer);
 	TIMER_CALLBACK_MEMBER(gamate_timer2);
 
-	void gamate(machine_config &config);
 	void gamate_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -119,14 +117,14 @@ READ8_MEMBER(gamate_state::read_cart)
 void gamate_state::gamate_mem(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x1c00).ram();
-	map(0x4000, 0x400f).mirror(0x03f0).rw(this, FUNC(gamate_state::sound_r), FUNC(gamate_state::sound_w));
+	map(0x4000, 0x400f).mirror(0x03f0).rw(FUNC(gamate_state::sound_r), FUNC(gamate_state::sound_w));
 	map(0x4400, 0x4400).mirror(0x03ff).portr("JOY");
-	map(0x4800, 0x4800).mirror(0x03ff).r(this, FUNC(gamate_state::gamate_nmi_r));
+	map(0x4800, 0x4800).mirror(0x03ff).r(FUNC(gamate_state::gamate_nmi_r));
 	map(0x5000, 0x5007).mirror(0x03f8).m("video", FUNC(gamate_video_device::regs_map));
-	map(0x5800, 0x5800).r(this, FUNC(gamate_state::card_available_set));
-	map(0x5900, 0x5900).w(this, FUNC(gamate_state::card_reset));
-	map(0x5a00, 0x5a00).r(this, FUNC(gamate_state::card_available_check));
-	map(0x6000, 0xdfff).rw(this, FUNC(gamate_state::read_cart), FUNC(gamate_state::write_cart));
+	map(0x5800, 0x5800).r(FUNC(gamate_state::card_available_set));
+	map(0x5900, 0x5900).w(FUNC(gamate_state::card_reset));
+	map(0x5a00, 0x5a00).r(FUNC(gamate_state::card_available_check));
+	map(0x6000, 0xdfff).rw(FUNC(gamate_state::read_cart), FUNC(gamate_state::write_cart));
 
 	map(0xe000, 0xefff).mirror(0x1000).rom().share("bios").region("maincpu", 0);
 }

@@ -21,6 +21,7 @@ ToDo:
 #include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mc8020_state : public driver_device
@@ -33,15 +34,17 @@ public:
 		, m_keyboard(*this, "X%u", 0)
 		{ }
 
+	void mc8020(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_WRITE8_MEMBER(port_a_w);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mc8020(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u8 m_row;
 	required_shared_ptr<u8> m_p_videoram;
 	required_device<cpu_device> m_maincpu;

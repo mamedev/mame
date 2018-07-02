@@ -109,6 +109,7 @@ Eproms are 27512,27010,274001
 #include "emu.h"
 #include "cpu/m6502/n2a03.h"
 #include "video/ppu2c0x.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -124,6 +125,18 @@ public:
 		m_p2(*this, "P2"),
 		m_dsw(*this, "DSW") { }
 
+	void multigam(machine_config &config);
+	void supergm3(machine_config &config);
+	void multigmt(machine_config &config);
+	void multigm3(machine_config &config);
+
+	void init_multigmt();
+	void init_multigam();
+	void init_multigm3();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(multigam_inputs_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 	required_ioport m_p1;
@@ -164,7 +177,6 @@ public:
 	int m_vrom4k;
 	uint8_t m_supergm3_prg_bank;
 	uint8_t m_supergm3_chr_bank;
-	DECLARE_CUSTOM_INPUT_MEMBER(multigam_inputs_r);
 	DECLARE_WRITE8_MEMBER(multigam_nt_w);
 	DECLARE_READ8_MEMBER(multigam_nt_r);
 	DECLARE_WRITE8_MEMBER(sprite_dma_w);
@@ -183,9 +195,6 @@ public:
 	DECLARE_WRITE8_MEMBER(supergm3_prg_bank_w);
 	DECLARE_WRITE8_MEMBER(supergm3_chr_bank_w);
 	void set_mirroring(int mirroring);
-	void init_multigmt();
-	void init_multigam();
-	void init_multigm3();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -202,10 +211,6 @@ public:
 	void supergm3_set_bank();
 	void multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* decode_nibble);
 	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
-	void multigam(machine_config &config);
-	void supergm3(machine_config &config);
-	void multigmt(machine_config &config);
-	void multigm3(machine_config &config);
 	void multigam_map(address_map &map);
 	void multigm3_map(address_map &map);
 	void multigmt_map(address_map &map);
@@ -405,16 +410,16 @@ void multigam_state::multigam_map(address_map &map)
 	map(0x0000, 0x07ff).ram(); /* NES RAM */
 	map(0x0800, 0x0fff).ram(); /* additional RAM */
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(this, FUNC(multigam_state::sprite_dma_w));
-	map(0x4016, 0x4016).rw(this, FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
-	map(0x4017, 0x4017).r(this, FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
+	map(0x4014, 0x4014).w(FUNC(multigam_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
 	map(0x5000, 0x5ffe).rom();
 	map(0x5002, 0x5002).nopw();
 	map(0x5fff, 0x5fff).portr("IN0");
 	map(0x6000, 0x7fff).rom();
-	map(0x6fff, 0x6fff).w(this, FUNC(multigam_state::multigam_switch_prg_rom));
-	map(0x7fff, 0x7fff).w(this, FUNC(multigam_state::multigam_switch_gfx_rom));
-	map(0x8000, 0xffff).rom().w(this, FUNC(multigam_state::multigam_mapper2_w));
+	map(0x6fff, 0x6fff).w(FUNC(multigam_state::multigam_switch_prg_rom));
+	map(0x7fff, 0x7fff).w(FUNC(multigam_state::multigam_switch_gfx_rom));
+	map(0x8000, 0xffff).rom().w(FUNC(multigam_state::multigam_mapper2_w));
 }
 
 void multigam_state::multigmt_map(address_map &map)
@@ -422,16 +427,16 @@ void multigam_state::multigmt_map(address_map &map)
 	map(0x0000, 0x07ff).ram(); /* NES RAM */
 	map(0x0800, 0x0fff).ram(); /* additional RAM */
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x3000, 0x3000).w(this, FUNC(multigam_state::multigam_switch_prg_rom));
-	map(0x3fff, 0x3fff).w(this, FUNC(multigam_state::multigam_switch_gfx_rom));
-	map(0x4014, 0x4014).w(this, FUNC(multigam_state::sprite_dma_w));
-	map(0x4016, 0x4016).rw(this, FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
-	map(0x4017, 0x4017).r(this, FUNC(multigam_state::multigam_IN1_r));     /* IN1 - input port 2 / PSG second control register */
+	map(0x3000, 0x3000).w(FUNC(multigam_state::multigam_switch_prg_rom));
+	map(0x3fff, 0x3fff).w(FUNC(multigam_state::multigam_switch_gfx_rom));
+	map(0x4014, 0x4014).w(FUNC(multigam_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(FUNC(multigam_state::multigam_IN1_r));     /* IN1 - input port 2 / PSG second control register */
 	map(0x5000, 0x5ffe).rom();
 	map(0x5002, 0x5002).nopw();
 	map(0x5fff, 0x5fff).portr("IN0");
 	map(0x6000, 0x7fff).rom();
-	map(0x8000, 0xffff).rom().w(this, FUNC(multigam_state::multigam_mapper2_w));
+	map(0x8000, 0xffff).rom().w(FUNC(multigam_state::multigam_mapper2_w));
 }
 
 /******************************************************
@@ -448,7 +453,7 @@ void multigam_state::multigam3_mmc3_scanline_cb( int scanline, int vblank, int b
 		if (--m_multigam3_mmc3_scanline_counter == -1)
 		{
 			m_multigam3_mmc3_scanline_counter = m_multigam3_mmc3_scanline_latch;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 }
@@ -590,7 +595,7 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 		break;
 
 		case 0x6000: /* disable irqs */
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
 		break;
 
@@ -686,17 +691,17 @@ void multigam_state::multigm3_map(address_map &map)
 	map(0x0000, 0x07ff).ram(); /* NES RAM */
 	map(0x0800, 0x0fff).ram(); /* additional RAM */
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(this, FUNC(multigam_state::sprite_dma_w));
-	map(0x4016, 0x4016).rw(this, FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
-	map(0x4017, 0x4017).r(this, FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
-	map(0x5001, 0x5001).w(this, FUNC(multigam_state::multigm3_switch_prg_rom));
+	map(0x4014, 0x4014).w(FUNC(multigam_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
+	map(0x5001, 0x5001).w(FUNC(multigam_state::multigm3_switch_prg_rom));
 	map(0x5002, 0x5002).nopw();
-	map(0x5003, 0x5003).w(this, FUNC(multigam_state::multigm3_switch_gfx_rom));
+	map(0x5003, 0x5003).w(FUNC(multigam_state::multigm3_switch_gfx_rom));
 	map(0x5000, 0x5ffe).rom();
 	map(0x5fff, 0x5fff).portr("IN0");
 	map(0x6000, 0x7fff).bankrw("bank10");
 	map(0x6fff, 0x6fff).nopw(); /* 0x00 in attract mode, 0xff during play */
-	map(0x8000, 0xffff).rom().w(this, FUNC(multigam_state::multigm3_mapper2_w));
+	map(0x8000, 0xffff).rom().w(FUNC(multigam_state::multigm3_mapper2_w));
 }
 
 /******************************************************
@@ -987,14 +992,14 @@ void multigam_state::supergm3_map(address_map &map)
 	map(0x0000, 0x07ff).ram(); /* NES RAM */
 	map(0x0800, 0x0fff).ram(); /* additional RAM */
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(this, FUNC(multigam_state::sprite_dma_w));
-	map(0x4016, 0x4016).rw(this, FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
-	map(0x4017, 0x4017).r(this, FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
+	map(0x4014, 0x4014).w(FUNC(multigam_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
 	map(0x4fff, 0x4fff).portr("IN0");
 	map(0x5000, 0x5fff).rom();
 	map(0x5000, 0x5000).nopw();
-	map(0x5001, 0x5001).w(this, FUNC(multigam_state::supergm3_prg_bank_w));
-	map(0x5002, 0x5002).w(this, FUNC(multigam_state::supergm3_chr_bank_w));
+	map(0x5001, 0x5001).w(FUNC(multigam_state::supergm3_prg_bank_w));
+	map(0x5002, 0x5002).w(FUNC(multigam_state::supergm3_chr_bank_w));
 	map(0x5fff, 0x5fff).nopw();
 	map(0x6000, 0x7fff).bankrw("bank10");
 	map(0x8000, 0xffff).rom();

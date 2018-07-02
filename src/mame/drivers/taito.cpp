@@ -70,7 +70,16 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void taito2(machine_config &config);
+	void taito6(machine_config &config);
+	void taito(machine_config &config);
+	void shock(machine_config &config);
+	void taito4(machine_config &config);
+	void taito5(machine_config &config);
+
 	void init_taito();
+
+private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(pia_pb_r);
@@ -78,12 +87,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(votrax_request);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void taito2(machine_config &config);
-	void taito6(machine_config &config);
-	void taito(machine_config &config);
-	void shock(machine_config &config);
-	void taito4(machine_config &config);
-	void taito5(machine_config &config);
 	void taito_ay_audio(machine_config &config);
 	void shock_map(address_map &map);
 	void shock_sub_map(address_map &map);
@@ -91,7 +94,7 @@ public:
 	void taito_sub_map(address_map &map);
 	void taito_sub_map2(address_map &map);
 	void taito_sub_map5(address_map &map);
-private:
+
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
 	uint8_t m_votrax_cmd;
@@ -129,7 +132,7 @@ void taito_state::taito_map(address_map &map)
 	map(0x283f, 0x283f).mirror(0x0080).portr("X7");
 	map(0x4000, 0x407f).ram();
 	map(0x4080, 0x408f).ram().share("ram");
-	map(0x4090, 0x409f).rw(this, FUNC(taito_state::io_r), FUNC(taito_state::io_w));
+	map(0x4090, 0x409f).rw(FUNC(taito_state::io_r), FUNC(taito_state::io_w));
 	map(0x40a0, 0x40ff).ram();
 	map(0x4800, 0x48ff).rom().region("roms", 0x2000);
 }
@@ -171,7 +174,7 @@ void taito_state::shock_map(address_map &map)
 	map.global_mask(0x1fff);
 	map(0x0000, 0x0fff).rom().region("roms", 0);
 	map(0x1000, 0x100f).ram().share("ram");
-	map(0x1010, 0x101f).rw(this, FUNC(taito_state::io_r), FUNC(taito_state::io_w));
+	map(0x1010, 0x101f).rw(FUNC(taito_state::io_r), FUNC(taito_state::io_w));
 	map(0x1020, 0x10ff).ram();
 	map(0x1400, 0x1400).portr("X0");
 	map(0x1401, 0x1401).portr("X1");
@@ -368,7 +371,7 @@ MACHINE_CONFIG_START(taito_state::taito)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	//MCFG_PIA_READPA_HANDLER(READ8(*this, taito_state, pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_READPB_HANDLER(READ8(*this, taito_state, pia_pb_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, taito_state, pia_pb_w))
 	//MCFG_PIA_CA2_HANDLER(WRITELINE(*this, taito_state, pia_ca2_w))

@@ -96,6 +96,7 @@ Displaywriter System Manual S544-2023-0 (?) -- mentioned in US patents 4648071 a
 #include "machine/ram.h"
 #include "machine/upd765.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #include "ibm6580.lh"
@@ -149,6 +150,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void ibm6580(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(ibm6580);
 
 	DECLARE_WRITE16_MEMBER(pic_latch_w);
@@ -182,10 +186,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ibm6580(machine_config &config);
 	void ibm6580_io(address_map &map);
 	void ibm6580_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -683,7 +686,7 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 void ibm6580_state::ibm6580_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x90000, 0x90001).w(this, FUNC(ibm6580_state::unk_latch_w));
+	map(0x90000, 0x90001).w(FUNC(ibm6580_state::unk_latch_w));
 	map(0xef000, 0xeffff).ram().share("videoram");  // 66-line vram starts at 0xec000
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
 }
@@ -692,10 +695,10 @@ void ibm6580_state::ibm6580_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0007).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x0008, 0x000f).w(this, FUNC(ibm6580_state::pic_latch_w));
+	map(0x0008, 0x000f).w(FUNC(ibm6580_state::pic_latch_w));
 	map(0x0010, 0x0017).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0020, 0x003f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write)).umask16(0x00ff);
-	map(0x0040, 0x005f).rw(this, FUNC(ibm6580_state::p40_r), FUNC(ibm6580_state::p40_w)).umask16(0x00ff);
+	map(0x0040, 0x005f).rw(FUNC(ibm6580_state::p40_r), FUNC(ibm6580_state::p40_w)).umask16(0x00ff);
 	map(0x0070, 0x007f).unmaprw();
 	map(0x0120, 0x0127).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x0140, 0x0140).rw("upd8251a", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
@@ -706,10 +709,10 @@ void ibm6580_state::ibm6580_io(address_map &map)
 	map(0x5000, 0x500f).unmaprw();
 	map(0x6000, 0x601f).unmaprw();
 	map(0x8060, 0x807f).unmaprw();
-	map(0x8150, 0x815f).rw(this, FUNC(ibm6580_state::floppy_r), FUNC(ibm6580_state::floppy_w)).umask16(0x00ff);  // HLE of floppy board
+	map(0x8150, 0x815f).rw(FUNC(ibm6580_state::floppy_r), FUNC(ibm6580_state::floppy_w)).umask16(0x00ff);  // HLE of floppy board
 	map(0x81a0, 0x81af).unmaprw();
 	map(0xc000, 0xc00f).unmaprw();
-	map(0xe000, 0xe02f).rw(this, FUNC(ibm6580_state::video_r), FUNC(ibm6580_state::video_w)).umask16(0x00ff);
+	map(0xe000, 0xe02f).rw(FUNC(ibm6580_state::video_r), FUNC(ibm6580_state::video_w)).umask16(0x00ff);
 }
 
 

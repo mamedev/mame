@@ -189,10 +189,11 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
-	void init_sfkick();
 	void sfkick(machine_config &config);
 
-protected:
+	void init_sfkick();
+
+private:
 	DECLARE_WRITE8_MEMBER(page0_w);
 	DECLARE_WRITE8_MEMBER(page1_w);
 	DECLARE_WRITE8_MEMBER(page2_w);
@@ -209,7 +210,6 @@ protected:
 	void sfkick_sound_io_map(address_map &map);
 	void sfkick_sound_map(address_map &map);
 
-private:
 	std::unique_ptr<uint8_t[]> m_main_mem;
 	int m_bank_cfg;
 	int m_bank[8];
@@ -475,10 +475,10 @@ void sfkick_state::sfkick_map(address_map &map)
 	map(0xa000, 0xbfff).bankr("bank6");
 	map(0xc000, 0xdfff).bankr("bank7");
 	map(0xe000, 0xffff).bankr("bank8");
-	map(0x0000, 0x3fff).w(this, FUNC(sfkick_state::page0_w));
-	map(0x4000, 0x7fff).w(this, FUNC(sfkick_state::page1_w));
-	map(0x8000, 0xbfff).w(this, FUNC(sfkick_state::page2_w));
-	map(0xc000, 0xffff).w(this, FUNC(sfkick_state::page3_w));
+	map(0x0000, 0x3fff).w(FUNC(sfkick_state::page0_w));
+	map(0x4000, 0x7fff).w(FUNC(sfkick_state::page1_w));
+	map(0x8000, 0xbfff).w(FUNC(sfkick_state::page2_w));
+	map(0xc000, 0xffff).w(FUNC(sfkick_state::page3_w));
 }
 
 void sfkick_state::sfkick_io_map(address_map &map)

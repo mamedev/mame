@@ -55,14 +55,14 @@ void n8080_state::main_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2");
-	map(0x03, 0x03).r(this, FUNC(n8080_state::n8080_shift_r));
+	map(0x03, 0x03).r(FUNC(n8080_state::n8080_shift_r));
 	map(0x04, 0x04).portr("IN3");
 
-	map(0x02, 0x02).w(this, FUNC(n8080_state::n8080_shift_bits_w));
-	map(0x03, 0x03).w(this, FUNC(n8080_state::n8080_shift_data_w));
-	map(0x04, 0x04).w(this, FUNC(n8080_state::n8080_sound_1_w));
-	map(0x05, 0x05).w(this, FUNC(n8080_state::n8080_sound_2_w));
-	map(0x06, 0x06).w(this, FUNC(n8080_state::n8080_video_control_w));
+	map(0x02, 0x02).w(FUNC(n8080_state::n8080_shift_bits_w));
+	map(0x03, 0x03).w(FUNC(n8080_state::n8080_shift_data_w));
+	map(0x04, 0x04).w(FUNC(n8080_state::n8080_sound_1_w));
+	map(0x05, 0x05).w(FUNC(n8080_state::n8080_sound_2_w));
+	map(0x06, 0x06).w(FUNC(n8080_state::n8080_video_control_w));
 }
 
 

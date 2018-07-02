@@ -12,6 +12,7 @@
 #include "cpu/i8085/i8085.h"
 #include "video/i8275.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -26,6 +27,9 @@ public:
 	{
 	}
 
+	void ipds(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8275_device> m_crtc;
 	required_device<palette_device> m_palette;
@@ -37,7 +41,6 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	void ipds(machine_config &config);
 	void ipds_io(address_map &map);
 	void ipds_mem(address_map &map);
 };
@@ -74,9 +77,9 @@ void ipds_state::ipds_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xb0, 0xb0).r(this, FUNC(ipds_state::ipds_b0_r));
-	map(0xb1, 0xb1).rw(this, FUNC(ipds_state::ipds_b1_r), FUNC(ipds_state::ipds_b1_w));
-	map(0xc0, 0xc0).r(this, FUNC(ipds_state::ipds_c0_r));
+	map(0xb0, 0xb0).r(FUNC(ipds_state::ipds_b0_r));
+	map(0xb1, 0xb1).rw(FUNC(ipds_state::ipds_b1_r), FUNC(ipds_state::ipds_b1_w));
+	map(0xc0, 0xc0).r(FUNC(ipds_state::ipds_c0_r));
 }
 
 /* Input ports */

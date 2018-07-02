@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
-
 #ifndef MAME_INCLUDES_CGC7900_H
 #define MAME_INCLUDES_CGC7900_H
+
+#pragma once
 
 
 #include "bus/rs232/rs232.h"
@@ -17,6 +17,7 @@
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #define M68000_TAG      "uh8"
@@ -33,28 +34,27 @@ class cgc7900_state : public driver_device
 {
 public:
 	cgc7900_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, M68000_TAG),
-			m_palette(*this, "palette"),
-			m_screen(*this, "screen"),
-			m_char_rom(*this, "gfx1"),
-			m_chrom_ram(*this, "chrom_ram"),
-			m_plane_ram(*this, "plane_ram"),
-			m_clut_ram(*this, "clut_ram"),
-			m_overlay_ram(*this, "overlay_ram"),
-			m_roll_bitmap(*this, "roll_bitmap"),
-			m_pan_x(*this, "pan_x"),
-			m_pan_y(*this, "pan_y"),
-			m_zoom(*this, "zoom"),
-			m_blink_select(*this, "blink_select"),
-			m_plane_select(*this, "plane_select"),
-			m_plane_switch(*this, "plane_switch"),
-			m_color_status_fg(*this, "color_status_fg"),
-			m_color_status_bg(*this, "color_status_bg"),
-			m_roll_overlay(*this, "roll_overlay"),
-			m_i8251_0(*this, INS8251_0_TAG),
-			m_i8251_1(*this, INS8251_1_TAG),
-			m_dbrg(*this, K1135A_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, M68000_TAG)
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+		, m_char_rom(*this, "gfx1")
+		, m_chrom_ram(*this, "chrom_ram")
+		, m_plane_ram(*this, "plane_ram")
+		, m_clut_ram(*this, "clut_ram")
+		, m_overlay_ram(*this, "overlay_ram")
+		, m_roll_bitmap(*this, "roll_bitmap")
+		, m_pan_x(*this, "pan_x")
+		, m_pan_y(*this, "pan_y")
+		, m_zoom(*this, "zoom")
+		, m_blink_select(*this, "blink_select")
+		, m_plane_select(*this, "plane_select")
+		, m_plane_switch(*this, "plane_switch")
+		, m_color_status_fg(*this, "color_status_fg")
+		, m_color_status_bg(*this, "color_status_bg")
+		, m_roll_overlay(*this, "roll_overlay")
+		, m_i8251_0(*this, INS8251_0_TAG)
+		, m_i8251_1(*this, INS8251_1_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -77,7 +77,6 @@ public:
 	required_shared_ptr<uint16_t> m_roll_overlay;
 	required_device<i8251_device> m_i8251_0;
 	required_device<i8251_device> m_i8251_1;
-	required_device<com8116_device> m_dbrg;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -99,10 +98,6 @@ public:
 	DECLARE_READ16_MEMBER( unmapped_r );
 
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { irq_encoder(N, state); }
-
-	DECLARE_WRITE8_MEMBER(baud_write);
-	DECLARE_WRITE_LINE_MEMBER(write_rs232_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_rs449_clock);
 
 	void update_clut();
 	void draw_bitmap(screen_device *screen, bitmap_rgb32 &bitmap);

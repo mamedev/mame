@@ -44,8 +44,10 @@ public:
 	gammagic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag) { }
 
-	virtual void machine_start() override;
 	void gammagic(machine_config &config);
+
+private:
+	virtual void machine_start() override;
 	void gammagic_io(address_map &map);
 	void gammagic_map(address_map &map);
 };

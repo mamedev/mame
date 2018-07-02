@@ -19,6 +19,7 @@
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 
 // expansion slots
 #include "bus/dmv/dmvbus.h"
@@ -72,6 +73,9 @@ public:
 		, m_leds(*this, "led%u", 1U)
 	{ }
 
+	void dmv(machine_config &config);
+
+private:
 	void update_halt_line();
 
 	DECLARE_WRITE8_MEMBER(leds_w);
@@ -141,16 +145,13 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
-	void dmv(machine_config &config);
 	void dmv_io(address_map &map);
 	void dmv_mem(address_map &map);
 	void upd7220_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc;
@@ -562,32 +563,32 @@ uint8_t dmv_state::program_read(address_space &space, int cas, offs_t offset)
 void dmv_state::dmv_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(dmv_state::program_r), FUNC(dmv_state::program_w));
+	map(0x0000, 0xffff).rw(FUNC(dmv_state::program_r), FUNC(dmv_state::program_w));
 }
 
 void dmv_state::dmv_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(dmv_state::leds_w));
-	map(0x10, 0x10).rw(this, FUNC(dmv_state::ramsel_r), FUNC(dmv_state::ramsel_w));
-	map(0x11, 0x11).rw(this, FUNC(dmv_state::romsel_r), FUNC(dmv_state::romsel_w));
-	map(0x12, 0x12).w(this, FUNC(dmv_state::tc_set_w));
-	map(0x13, 0x13).r(this, FUNC(dmv_state::sys_status_r));
-	map(0x14, 0x14).w(this, FUNC(dmv_state::fdd_motor_w));
+	map(0x00, 0x00).w(FUNC(dmv_state::leds_w));
+	map(0x10, 0x10).rw(FUNC(dmv_state::ramsel_r), FUNC(dmv_state::ramsel_w));
+	map(0x11, 0x11).rw(FUNC(dmv_state::romsel_r), FUNC(dmv_state::romsel_w));
+	map(0x12, 0x12).w(FUNC(dmv_state::tc_set_w));
+	map(0x13, 0x13).r(FUNC(dmv_state::sys_status_r));
+	map(0x14, 0x14).w(FUNC(dmv_state::fdd_motor_w));
 	map(0x20, 0x2f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x40, 0x41).rw("kb_ctrl_mcu", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 	map(0x50, 0x51).m(m_fdc, FUNC(i8272a_device::map));
 	map(0x80, 0x83).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xa0, 0xa1).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-	map(0xd0, 0xd7).w(this, FUNC(dmv_state::switch16_w));
-	map(0xe0, 0xe7).w(this, FUNC(dmv_state::rambank_w));
+	map(0xd0, 0xd7).w(FUNC(dmv_state::switch16_w));
+	map(0xe0, 0xe7).w(FUNC(dmv_state::rambank_w));
 
-	map(0x60, 0x6f).rw(this, FUNC(dmv_state::ifsel0_r), FUNC(dmv_state::ifsel0_w));
-	map(0x70, 0x7f).rw(this, FUNC(dmv_state::ifsel1_r), FUNC(dmv_state::ifsel1_w));
-	map(0x30, 0x3f).rw(this, FUNC(dmv_state::ifsel2_r), FUNC(dmv_state::ifsel2_w));
-	map(0xb0, 0xbf).rw(this, FUNC(dmv_state::ifsel3_r), FUNC(dmv_state::ifsel3_w));
-	map(0xc0, 0xcf).rw(this, FUNC(dmv_state::ifsel4_r), FUNC(dmv_state::ifsel4_w));
+	map(0x60, 0x6f).rw(FUNC(dmv_state::ifsel0_r), FUNC(dmv_state::ifsel0_w));
+	map(0x70, 0x7f).rw(FUNC(dmv_state::ifsel1_r), FUNC(dmv_state::ifsel1_w));
+	map(0x30, 0x3f).rw(FUNC(dmv_state::ifsel2_r), FUNC(dmv_state::ifsel2_w));
+	map(0xb0, 0xbf).rw(FUNC(dmv_state::ifsel3_r), FUNC(dmv_state::ifsel3_w));
+	map(0xc0, 0xcf).rw(FUNC(dmv_state::ifsel4_r), FUNC(dmv_state::ifsel4_w));
 }
 
 READ8_MEMBER(dmv_state::kb_mcu_port1_r)

@@ -27,6 +27,7 @@
 #include "bus/tvc/tvc.h"
 #include "bus/tvc/hbf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -55,6 +56,9 @@ public:
 		, m_keyboard(*this, "LINE.%u", 0)
 	{ }
 
+	void tvc(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<tvc_sound_device> m_sound;
@@ -109,7 +113,7 @@ public:
 	uint8_t       m_cassette_ff;
 	uint8_t       m_centronics_ff;
 	DECLARE_PALETTE_INIT(tvc);
-	void tvc(machine_config &config);
+
 	void tvc_io(address_map &map);
 	void tvc_mem(address_map &map);
 };
@@ -365,24 +369,24 @@ void tvc_state::tvc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(tvc_state::border_color_w));
-	map(0x01, 0x01).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x02, 0x02).w(this, FUNC(tvc_state::bank_w));
-	map(0x03, 0x03).w(this, FUNC(tvc_state::keyboard_w));
-	map(0x04, 0x06).w(this, FUNC(tvc_state::sound_w));
-	map(0x07, 0x07).w(this, FUNC(tvc_state::flipflop_w));
-	map(0x0f, 0x0f).w(this, FUNC(tvc_state::vram_bank_w));
+	map(0x00, 0x00).w(FUNC(tvc_state::border_color_w));
+	map(0x01, 0x01).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x02, 0x02).w(FUNC(tvc_state::bank_w));
+	map(0x03, 0x03).w(FUNC(tvc_state::keyboard_w));
+	map(0x04, 0x06).w(FUNC(tvc_state::sound_w));
+	map(0x07, 0x07).w(FUNC(tvc_state::flipflop_w));
+	map(0x0f, 0x0f).w(FUNC(tvc_state::vram_bank_w));
 	map(0x10, 0x1f).rw("exp1", FUNC(tvcexp_slot_device::io_read), FUNC(tvcexp_slot_device::io_write));
 	map(0x20, 0x2f).rw("exp2", FUNC(tvcexp_slot_device::io_read), FUNC(tvcexp_slot_device::io_write));
 	map(0x30, 0x3f).rw("exp3", FUNC(tvcexp_slot_device::io_read), FUNC(tvcexp_slot_device::io_write));
 	map(0x40, 0x4f).rw("exp4", FUNC(tvcexp_slot_device::io_read), FUNC(tvcexp_slot_device::io_write));
-	map(0x50, 0x50).w(this, FUNC(tvc_state::cassette_w));
-	map(0x58, 0x58).r(this, FUNC(tvc_state::keyboard_r));
-	map(0x59, 0x59).r(this, FUNC(tvc_state::int_state_r));
-	map(0x5a, 0x5a).r(this, FUNC(tvc_state::exp_id_r));
-	map(0x5b, 0x5b).r(this, FUNC(tvc_state::_5b_r));
-	map(0x58, 0x5b).w(this, FUNC(tvc_state::expint_ack_w));
-	map(0x60, 0x63).w(this, FUNC(tvc_state::palette_w));
+	map(0x50, 0x50).w(FUNC(tvc_state::cassette_w));
+	map(0x58, 0x58).r(FUNC(tvc_state::keyboard_r));
+	map(0x59, 0x59).r(FUNC(tvc_state::int_state_r));
+	map(0x5a, 0x5a).r(FUNC(tvc_state::exp_id_r));
+	map(0x5b, 0x5b).r(FUNC(tvc_state::_5b_r));
+	map(0x58, 0x5b).w(FUNC(tvc_state::expint_ack_w));
+	map(0x60, 0x63).w(FUNC(tvc_state::palette_w));
 	map(0x70, 0x70).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x71, 0x71).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
@@ -796,7 +800,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_TVC_SOUND_SNDINT_CALLBACK(WRITELINE(*this, tvc_state, int_ff_set))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tvc_state, centronics_ack))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

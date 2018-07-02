@@ -35,6 +35,9 @@ public:
 			m_mapram(*this, "mapram")
 	{ }
 
+	void miniframe(machine_config &config);
+
+private:
 	required_device<m68010_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<wd2797_device> m_wd2797;
@@ -56,10 +59,9 @@ public:
 
 	required_shared_ptr<uint16_t> m_mapram;
 
-	void miniframe(machine_config &config);
 	void miniframe_mem(address_map &map);
 	void ramrombank_map(address_map &map);
-private:
+
 	uint16_t *m_ramptr;
 	uint32_t m_ramsize;
 	uint16_t m_diskdmasize;
@@ -192,7 +194,7 @@ void miniframe_state::miniframe_mem(address_map &map)
 {
 	map(0x000000, 0x3fffff).m(m_ramrombank, FUNC(address_map_bank_device::amap16));
 	map(0x400000, 0x4007ff).ram().share("mapram");
-	map(0x450000, 0x450001).w(this, FUNC(miniframe_state::general_ctrl_w));
+	map(0x450000, 0x450001).w(FUNC(miniframe_state::general_ctrl_w));
 	map(0x800000, 0x81ffff).rom().region("bootrom", 0);
 	map(0xc00000, 0xc00007).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xc40000, 0xc40007).rw("baudgen", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
@@ -202,7 +204,7 @@ void miniframe_state::miniframe_mem(address_map &map)
 void miniframe_state::ramrombank_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom().region("bootrom", 0);
-	map(0x400000, 0x7fffff).rw(this, FUNC(miniframe_state::ram_mmu_r), FUNC(miniframe_state::ram_mmu_w));
+	map(0x400000, 0x7fffff).rw(FUNC(miniframe_state::ram_mmu_r), FUNC(miniframe_state::ram_mmu_w));
 }
 
 /***************************************************************************

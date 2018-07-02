@@ -24,6 +24,11 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
+	void scorpion(machine_config &config);
+	void profi(machine_config &config);
+	void quorum(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(beta_neutral_r);
 	DECLARE_READ8_MEMBER(beta_enable_r);
 	DECLARE_READ8_MEMBER(beta_disable_r);
@@ -33,19 +38,17 @@ public:
 	DECLARE_MACHINE_START(scorpion);
 	DECLARE_MACHINE_RESET(scorpion);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
-	void scorpion(machine_config &config);
-	void profi(machine_config &config);
-	void quorum(machine_config &config);
+
 	void scorpion_io(address_map &map);
 	void scorpion_mem(address_map &map);
 	void scorpion_switch(address_map &map);
-protected:
+
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
-private:
+
 	address_space *m_program;
 	uint8_t *m_p_ram;
 	void scorpion_update_memory();
@@ -178,7 +181,7 @@ READ8_MEMBER(scorpion_state::beta_disable_r)
 
 void scorpion_state::scorpion_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bank1").w(this, FUNC(scorpion_state::scorpion_0000_w));
+	map(0x0000, 0x3fff).bankr("bank1").w(FUNC(scorpion_state::scorpion_0000_w));
 	map(0x4000, 0x7fff).bankrw("bank2");
 	map(0x8000, 0xbfff).bankrw("bank3");
 	map(0xc000, 0xffff).bankrw("bank4");
@@ -191,19 +194,19 @@ void scorpion_state::scorpion_io(address_map &map)
 	map(0x003f, 0x003f).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w)).mirror(0xff00);
 	map(0x005f, 0x005f).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w)).mirror(0xff00);
 	map(0x007f, 0x007f).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w)).mirror(0xff00);
-	map(0x00fe, 0x00fe).rw(this, FUNC(scorpion_state::spectrum_port_fe_r), FUNC(scorpion_state::spectrum_port_fe_w)).select(0xff00);
+	map(0x00fe, 0x00fe).rw(FUNC(scorpion_state::spectrum_port_fe_r), FUNC(scorpion_state::spectrum_port_fe_w)).select(0xff00);
 	map(0x00ff, 0x00ff).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w)).mirror(0xff00);
-	map(0x4021, 0x4021).w(this, FUNC(scorpion_state::scorpion_port_7ffd_w)).mirror(0x3fdc);
+	map(0x4021, 0x4021).w(FUNC(scorpion_state::scorpion_port_7ffd_w)).mirror(0x3fdc);
 	map(0x8021, 0x8021).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3fdc);
 	map(0xc021, 0xc021).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3fdc);
-	map(0x0021, 0x0021).w(this, FUNC(scorpion_state::scorpion_port_1ffd_w)).mirror(0x3fdc);
+	map(0x0021, 0x0021).w(FUNC(scorpion_state::scorpion_port_1ffd_w)).mirror(0x3fdc);
 }
 
 void scorpion_state::scorpion_switch(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(scorpion_state::beta_neutral_r)); // Overlap with previous because we want real addresses on the 3e00-3fff range
-	map(0x3d00, 0x3dff).r(this, FUNC(scorpion_state::beta_enable_r));
-	map(0x4000, 0xffff).r(this, FUNC(scorpion_state::beta_disable_r));
+	map(0x0000, 0x3fff).r(FUNC(scorpion_state::beta_neutral_r)); // Overlap with previous because we want real addresses on the 3e00-3fff range
+	map(0x3d00, 0x3dff).r(FUNC(scorpion_state::beta_enable_r));
+	map(0x4000, 0xffff).r(FUNC(scorpion_state::beta_disable_r));
 }
 
 MACHINE_RESET_MEMBER(scorpion_state,scorpion)

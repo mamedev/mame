@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "video/kan_pand.h"
+#include "emupal.h"
 
 #define PROT_OUTPUT_BUFFER_SIZE 8
 
@@ -38,6 +39,12 @@ public:
 	{
 	}
 
+	void djboy(machine_config &config);
+
+	void init_djboy();
+	void init_djboyj();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_paletteram;
@@ -95,8 +102,6 @@ public:
 	DECLARE_WRITE8_MEMBER(djboy_scrolly_w);
 	DECLARE_WRITE8_MEMBER(djboy_videoram_w);
 	DECLARE_WRITE8_MEMBER(djboy_paletteram_w);
-	void init_djboy();
-	void init_djboyj();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -104,7 +109,6 @@ public:
 	uint32_t screen_update_djboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_djboy);
 	TIMER_DEVICE_CALLBACK_MEMBER(djboy_scanline);
-	void djboy(machine_config &config);
 	void mastercpu_am(address_map &map);
 	void mastercpu_port_am(address_map &map);
 	void slavecpu_am(address_map &map);

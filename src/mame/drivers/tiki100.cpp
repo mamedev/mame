@@ -296,13 +296,13 @@ WRITE8_MEMBER( tiki100_state::system_w )
 void tiki100_state::tiki100_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(tiki100_state::mrq_r), FUNC(tiki100_state::mrq_w));
+	map(0x0000, 0xffff).rw(FUNC(tiki100_state::mrq_r), FUNC(tiki100_state::mrq_w));
 }
 
 void tiki100_state::tiki100_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(tiki100_state::iorq_r), FUNC(tiki100_state::iorq_w));
+	map(0x0000, 0xffff).rw(FUNC(tiki100_state::iorq_r), FUNC(tiki100_state::iorq_w));
 }
 
 /* Input Ports */
@@ -735,8 +735,8 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 8_MHz_XTAL / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8("cent_data_in", input_buffer_device, read))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_IN_PA_CB(READ8("cent_data_in", input_buffer_device, bus_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(*this, tiki100_state, pio_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, tiki100_state, pio_pb_w))
 
@@ -758,7 +758,7 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tiki100_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tiki100_state, write_centronics_busy))

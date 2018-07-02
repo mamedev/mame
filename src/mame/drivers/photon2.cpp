@@ -25,6 +25,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,6 +39,9 @@ public:
 		m_speaker(*this, "speaker"),
 		m_spectrum_video_ram(*this, "spectrum_vram") { }
 
+	void photon2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 
@@ -61,7 +65,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
-	void photon2(machine_config &config);
 	void spectrum_io(address_map &map);
 	void spectrum_mem(address_map &map);
 };
@@ -269,11 +272,11 @@ void photon2_state::spectrum_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x1f, 0x1f).portr("JOY");
-	map(0x5b, 0x5b).portr("COIN").w(this, FUNC(photon2_state::misc_w));
-	map(0x7a, 0x7a).w(this, FUNC(photon2_state::membank_w));
+	map(0x5b, 0x5b).portr("COIN").w(FUNC(photon2_state::misc_w));
+	map(0x7a, 0x7a).w(FUNC(photon2_state::membank_w));
 	map(0x7b, 0x7b).nopw(); // unknown write
-	map(0x7e, 0x7e).w(this, FUNC(photon2_state::membank_w));
-	map(0xfe, 0xfe).rw(this, FUNC(photon2_state::fe_r), FUNC(photon2_state::fe_w));
+	map(0x7e, 0x7e).w(FUNC(photon2_state::membank_w));
+	map(0xfe, 0xfe).rw(FUNC(photon2_state::fe_r), FUNC(photon2_state::fe_w));
 }
 
 /*************************************

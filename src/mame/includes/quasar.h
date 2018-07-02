@@ -14,6 +14,9 @@ public:
 	quasar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cvs_state(mconfig, type, tag) { }
 
+	void quasar(machine_config &config);
+
+private:
 	std::unique_ptr<uint8_t[]>    m_effectram;
 	uint8_t      m_effectcontrol;
 	uint8_t      m_page;
@@ -32,7 +35,6 @@ public:
 	DECLARE_PALETTE_INIT(quasar);
 	uint32_t screen_update_quasar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(quasar_interrupt);
-	void quasar(machine_config &config);
 	void quasar(address_map &map);
 	void quasar_data(address_map &map);
 	void quasar_io(address_map &map);

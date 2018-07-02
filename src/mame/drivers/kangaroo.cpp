@@ -254,13 +254,13 @@ WRITE8_MEMBER(kangaroo_state::kangaroo_coin_counter_w)
 void kangaroo_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x8000, 0xbfff).w(this, FUNC(kangaroo_state::kangaroo_videoram_w));
+	map(0x8000, 0xbfff).w(FUNC(kangaroo_state::kangaroo_videoram_w));
 	map(0xc000, 0xdfff).bankr("bank1");
 	map(0xe000, 0xe3ff).ram();
 	map(0xe400, 0xe400).mirror(0x03ff).portr("DSW0");
-	map(0xe800, 0xe80a).mirror(0x03f0).w(this, FUNC(kangaroo_state::kangaroo_video_control_w)).share("video_control");
+	map(0xe800, 0xe80a).mirror(0x03f0).w(FUNC(kangaroo_state::kangaroo_video_control_w)).share("video_control");
 	map(0xec00, 0xec00).mirror(0x00ff).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xed00, 0xed00).mirror(0x00ff).portr("IN1").w(this, FUNC(kangaroo_state::kangaroo_coin_counter_w));
+	map(0xed00, 0xed00).mirror(0x00ff).portr("IN1").w(FUNC(kangaroo_state::kangaroo_coin_counter_w));
 	map(0xee00, 0xee00).mirror(0x00ff).portr("IN2");
 }
 

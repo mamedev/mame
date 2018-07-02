@@ -6,6 +6,7 @@
 #include "cpu/m6502/xavix.h"
 #include "cpu/m6502/xavix2000.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
@@ -37,12 +38,17 @@ public:
 		m_lowbus(*this, "lowbus")
 	{ }
 
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void xavix(machine_config &config);
 	void xavixp(machine_config &config);
 	void xavix2000(machine_config &config);
+
+	void init_xavix();
+	void init_taitons1();
+	void init_rad_box();
+
+private:
+	// screen updates
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void xavix_map(address_map &map);
 	void xavix_lowbus_map(address_map &map);
@@ -50,18 +56,11 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
-	void init_xavix();
-	void init_taitons1();
-	void init_rad_box();
-
-protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-
-private:
 
 	DECLARE_READ8_MEMBER(main_r);
 	DECLARE_WRITE8_MEMBER(main_w);

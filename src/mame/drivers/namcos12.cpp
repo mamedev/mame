@@ -1106,8 +1106,8 @@ class namcos12_state : public driver_device
 public:
 	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, "maincpu:ram")
+		, m_maincpu(*this, "maincpu")
 		, m_sub(*this, "sub")
 		, m_adc(*this, "sub:adc")
 		, m_rtc(*this, "rtc")
@@ -1121,8 +1121,38 @@ public:
 	{
 	}
 
-	required_device<psxcpu_device> m_maincpu;
+	void coh700(machine_config &config);
+	void coh716(machine_config &config);
+	void namcos12_mobo(machine_config &config);
+
+	void init_namcos12();
+	void init_ptblank2();
+	void init_technodr();
+	void init_golgo13();
+
+protected:
+	virtual void machine_reset() override;
+
+	void golgo13_h8iomap(address_map &map);
+	void jvsiomap(address_map &map);
+	void jvsmap(address_map &map);
+	void namcos12_map(address_map &map);
+	void plarailjvsiomap(address_map &map);
+	void plarailjvsmap(address_map &map);
+	void ptblank2_map(address_map &map);
+	void s12h8iomap(address_map &map);
+	void s12h8jvsiomap(address_map &map);
+	void s12h8railiomap(address_map &map);
+	void s12h8rwjvsmap(address_map &map);
+	void s12h8rwmap(address_map &map);
+	void tdjvsiomap(address_map &map);
+	void tdjvsmap(address_map &map);
+	void tektagt_map(address_map &map);
+
 	required_device<ram_device> m_ram;
+
+private:
+	required_device<psxcpu_device> m_maincpu;
 	required_device<h83002_device> m_sub;
 	required_device<h8_adc_device> m_adc;
 	required_device<rtc4543_device> m_rtc;
@@ -1175,34 +1205,9 @@ public:
 	DECLARE_READ16_MEMBER(s12_mcu_gun_h_r);
 	DECLARE_READ16_MEMBER(s12_mcu_gun_v_r);
 
-	void init_namcos12();
-	void init_ptblank2();
-	void init_technodr();
-	void init_golgo13();
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
-
-	void coh700(machine_config &config);
-	void coh716(machine_config &config);
-	void namcos12_mobo(machine_config &config);
-	void golgo13_h8iomap(address_map &map);
-	void jvsiomap(address_map &map);
-	void jvsmap(address_map &map);
-	void namcos12_map(address_map &map);
-	void plarailjvsiomap(address_map &map);
-	void plarailjvsmap(address_map &map);
-	void ptblank2_map(address_map &map);
-	void s12h8iomap(address_map &map);
-	void s12h8jvsiomap(address_map &map);
-	void s12h8railiomap(address_map &map);
-	void s12h8rwjvsmap(address_map &map);
-	void s12h8rwmap(address_map &map);
-	void tdjvsiomap(address_map &map);
-	void tdjvsmap(address_map &map);
-	void tektagt_map(address_map &map);
-protected:
-	virtual void machine_reset() override;
 };
 
 
@@ -1217,7 +1222,7 @@ public:
 	void truckk(machine_config &config);
 	void tektagt(machine_config &config);
 	void ptblank2(machine_config &config);
-protected:
+private:
 	virtual void machine_reset() override;
 };
 
@@ -1352,15 +1357,15 @@ void namcos12_state::namcos12_sub_irq( screen_device &screen, bool vblank_state 
 void namcos12_state::namcos12_map(address_map &map)
 {
 	map(0x1f000000, 0x1f000003).nopr();
-	map(0x1f000000, 0x1f000001).w(this, FUNC(namcos12_state::bankoffset_w));          /* banking */
-	map(0x1f080000, 0x1f083fff).rw(this, FUNC(namcos12_state::sharedram_r), FUNC(namcos12_state::sharedram_w)); /* shared ram?? */
+	map(0x1f000000, 0x1f000001).w(FUNC(namcos12_state::bankoffset_w));          /* banking */
+	map(0x1f080000, 0x1f083fff).rw(FUNC(namcos12_state::sharedram_r), FUNC(namcos12_state::sharedram_w)); /* shared ram?? */
 	map(0x1f140000, 0x1f140fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x00ff00ff); /* eeprom */
 	map(0x1f1bff08, 0x1f1bff0f).nopw();    /* ?? */
-	map(0x1f700000, 0x1f70ffff).w(this, FUNC(namcos12_state::dmaoffset_w));  /* dma */
+	map(0x1f700000, 0x1f70ffff).w(FUNC(namcos12_state::dmaoffset_w));  /* dma */
 	/* Network area */
-//  map(0x1f780000, 0x1f78ffff).rw(this, FUNC(namcos12_state::link_sharedram_r), FUNC(namcos12_state::link_sharedram_w)); /* H8 link CPU code */
-//  map(0x1f796002, 0x1f796003).w(this, FUNC(namcos12_state::linkcpu_enable_w));
-//  map(0x1f796022, 0x1f796023).w(this, FUNC(namcos12_state::linkcpu_disable_w));
+//  map(0x1f780000, 0x1f78ffff).rw(FUNC(namcos12_state::link_sharedram_r), FUNC(namcos12_state::link_sharedram_w)); /* H8 link CPU code */
+//  map(0x1f796002, 0x1f796003).w(FUNC(namcos12_state::linkcpu_enable_w));
+//  map(0x1f796022, 0x1f796023).w(FUNC(namcos12_state::linkcpu_disable_w));
 
 	map(0x1fa00000, 0x1fbfffff).bankr("mainbank"); /* banked roms */
 }
@@ -1369,17 +1374,17 @@ void namcos12_state::ptblank2_map(address_map &map)
 {
 	namcos12_map(map);
 
-	map(0x1f780000, 0x1f78000f).r(this, FUNC(namcos12_state::system11gun_r));
-	map(0x1f788000, 0x1f788003).w(this, FUNC(namcos12_state::system11gun_w));
+	map(0x1f780000, 0x1f78000f).r(FUNC(namcos12_state::system11gun_r));
+	map(0x1f788000, 0x1f788003).w(FUNC(namcos12_state::system11gun_w));
 }
 
 void namcos12_state::tektagt_map(address_map &map)
 {
 	namcos12_map(map);
 
-	map(0x1fb00000, 0x1fb00003).rw(this, FUNC(namcos12_state::tektagt_protection_1_r), FUNC(namcos12_state::tektagt_protection_1_w));
-	map(0x1fb80000, 0x1fb80003).rw(this, FUNC(namcos12_state::tektagt_protection_2_r), FUNC(namcos12_state::tektagt_protection_2_w));
-	map(0x1f700000, 0x1f700003).r(this, FUNC(namcos12_state::tektagt_protection_3_r));
+	map(0x1fb00000, 0x1fb00003).rw(FUNC(namcos12_state::tektagt_protection_1_r), FUNC(namcos12_state::tektagt_protection_1_w));
+	map(0x1fb80000, 0x1fb80003).rw(FUNC(namcos12_state::tektagt_protection_2_r), FUNC(namcos12_state::tektagt_protection_2_w));
+	map(0x1f700000, 0x1f700003).r(FUNC(namcos12_state::tektagt_protection_3_r));
 }
 
 WRITE16_MEMBER(namcos12_state::system11gun_w)
@@ -1622,11 +1627,11 @@ READ16_MEMBER(namcos12_state::s12_mcu_jvs_p8_r)
 
 void namcos12_state::s12h8iomap(address_map &map)
 {
-	map(h8_device::PORT_6, h8_device::PORT_6).r(this, FUNC(namcos12_state::s12_mcu_p6_r));
+	map(h8_device::PORT_6, h8_device::PORT_6).r(FUNC(namcos12_state::s12_mcu_p6_r));
 	map(h8_device::PORT_7, h8_device::PORT_7).portr("DSW");
-	map(h8_device::PORT_8, h8_device::PORT_8).r(this, FUNC(namcos12_state::s12_mcu_p8_r)).nopw();
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(namcos12_state::s12_mcu_pa_r), FUNC(namcos12_state::s12_mcu_pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(this, FUNC(namcos12_state::s12_mcu_portB_r), FUNC(namcos12_state::s12_mcu_portB_w));
+	map(h8_device::PORT_8, h8_device::PORT_8).r(FUNC(namcos12_state::s12_mcu_p8_r)).nopw();
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcos12_state::s12_mcu_pa_r), FUNC(namcos12_state::s12_mcu_pa_w));
+	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(namcos12_state::s12_mcu_portB_r), FUNC(namcos12_state::s12_mcu_portB_w));
 	map(h8_device::ADC_0, h8_device::ADC_0).noprw();
 	map(h8_device::ADC_1, h8_device::ADC_1).noprw();
 	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
@@ -1635,11 +1640,11 @@ void namcos12_state::s12h8iomap(address_map &map)
 
 void namcos12_state::s12h8jvsiomap(address_map &map)
 {
-	map(h8_device::PORT_6, h8_device::PORT_6).r(this, FUNC(namcos12_state::s12_mcu_p6_r));
+	map(h8_device::PORT_6, h8_device::PORT_6).r(FUNC(namcos12_state::s12_mcu_p6_r));
 	map(h8_device::PORT_7, h8_device::PORT_7).portr("DSW");
-	map(h8_device::PORT_8, h8_device::PORT_8).r(this, FUNC(namcos12_state::s12_mcu_jvs_p8_r)).nopw();
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(namcos12_state::s12_mcu_pa_r), FUNC(namcos12_state::s12_mcu_pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(this, FUNC(namcos12_state::s12_mcu_portB_r), FUNC(namcos12_state::s12_mcu_portB_w));
+	map(h8_device::PORT_8, h8_device::PORT_8).r(FUNC(namcos12_state::s12_mcu_jvs_p8_r)).nopw();
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcos12_state::s12_mcu_pa_r), FUNC(namcos12_state::s12_mcu_pa_w));
+	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(namcos12_state::s12_mcu_portB_r), FUNC(namcos12_state::s12_mcu_portB_w));
 	map(h8_device::ADC_0, h8_device::ADC_0).noprw();
 	map(h8_device::ADC_1, h8_device::ADC_1).noprw();
 	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
@@ -1648,11 +1653,11 @@ void namcos12_state::s12h8jvsiomap(address_map &map)
 
 void namcos12_state::s12h8railiomap(address_map &map)
 {
-	map(h8_device::PORT_6, h8_device::PORT_6).r(this, FUNC(namcos12_state::s12_mcu_p6_r));
+	map(h8_device::PORT_6, h8_device::PORT_6).r(FUNC(namcos12_state::s12_mcu_p6_r));
 	map(h8_device::PORT_7, h8_device::PORT_7).portr("DSW");
-	map(h8_device::PORT_8, h8_device::PORT_8).r(this, FUNC(namcos12_state::s12_mcu_jvs_p8_r)).nopw();
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(namcos12_state::s12_mcu_pa_r), FUNC(namcos12_state::s12_mcu_pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(this, FUNC(namcos12_state::s12_mcu_portB_r), FUNC(namcos12_state::s12_mcu_portB_w));
+	map(h8_device::PORT_8, h8_device::PORT_8).r(FUNC(namcos12_state::s12_mcu_jvs_p8_r)).nopw();
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcos12_state::s12_mcu_pa_r), FUNC(namcos12_state::s12_mcu_pa_w));
+	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(namcos12_state::s12_mcu_portB_r), FUNC(namcos12_state::s12_mcu_portB_w));
 	map(h8_device::ADC_0, h8_device::ADC_0).portr("LEVER");
 	map(h8_device::ADC_1, h8_device::ADC_1).noprw();
 	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
@@ -1675,8 +1680,8 @@ void namcos12_state::golgo13_h8iomap(address_map &map)
 {
 	s12h8iomap(map);
 
-	map(h8_device::ADC_1, h8_device::ADC_1).r(this, FUNC(namcos12_state::s12_mcu_gun_h_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(this, FUNC(namcos12_state::s12_mcu_gun_v_r));
+	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(namcos12_state::s12_mcu_gun_h_r));
+	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(namcos12_state::s12_mcu_gun_v_r));
 }
 
 void namcos12_state::init_namcos12()
@@ -1869,8 +1874,8 @@ void namcos12_state::tdjvsmap(address_map &map)
 
 void namcos12_state::tdjvsiomap(address_map &map)
 {
-	map(h8_device::PORT_4, h8_device::PORT_4).rw(this, FUNC(namcos12_state::iob_p4_r), FUNC(namcos12_state::iob_p4_w));
-	map(h8_device::PORT_6, h8_device::PORT_6).r(this, FUNC(namcos12_state::iob_p6_r));
+	map(h8_device::PORT_4, h8_device::PORT_4).rw(FUNC(namcos12_state::iob_p4_r), FUNC(namcos12_state::iob_p4_w));
+	map(h8_device::PORT_6, h8_device::PORT_6).r(FUNC(namcos12_state::iob_p6_r));
 	map(h8_device::ADC_0, h8_device::ADC_0).portr("STEER");
 	map(h8_device::ADC_1, h8_device::ADC_1).portr("BRAKE");
 	map(h8_device::ADC_2, h8_device::ADC_2).portr("GAS");
@@ -1886,7 +1891,7 @@ void namcos12_state::plarailjvsmap(address_map &map)
 
 void namcos12_state::plarailjvsiomap(address_map &map)
 {
-	map(h8_device::PORT_4, h8_device::PORT_4).rw(this, FUNC(namcos12_state::iob_p4_r), FUNC(namcos12_state::iob_p4_w));
+	map(h8_device::PORT_4, h8_device::PORT_4).rw(FUNC(namcos12_state::iob_p4_r), FUNC(namcos12_state::iob_p4_w));
 	map(h8_device::PORT_6, h8_device::PORT_6).portr("SERVICE");
 	map(h8_device::ADC_0, h8_device::ADC_0).noprw();
 	map(h8_device::ADC_1, h8_device::ADC_1).noprw();

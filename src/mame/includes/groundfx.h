@@ -3,6 +3,7 @@
 
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
+#include "emupal.h"
 
 struct gfx_tempsprite
 {

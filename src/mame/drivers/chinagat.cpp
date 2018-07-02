@@ -292,7 +292,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
 
 		if (((m_i8748_P2 & 0xc) >= 8) && ((data & 0xc) == 4))
 		{
-			m_adpcm->data_w(m_pcm_nibble);
+			m_adpcm->write_data(m_pcm_nibble);
 			logerror("Writing %02x to m5205\n", m_pcm_nibble);
 		}
 		logerror("$ROM=%08x  P1=%02x  P2=%02x  Prev_P2=%02x  Nibble=%1x  PCM_data=%02x\n", m_adpcm_addr, m_i8748_P1, data, m_i8748_P2, m_pcm_shift, m_pcm_nibble);
@@ -337,16 +337,16 @@ WRITE_LINE_MEMBER(chinagat_state::saiyugoub1_m5205_irq_w)
 void chinagat_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("share1");
-	map(0x2000, 0x27ff).ram().w(this, FUNC(chinagat_state::ddragon_fgvideoram_w)).share("fgvideoram");
-	map(0x2800, 0x2fff).ram().w(this, FUNC(chinagat_state::ddragon_bgvideoram_w)).share("bgvideoram");
+	map(0x2000, 0x27ff).ram().w(FUNC(chinagat_state::ddragon_fgvideoram_w)).share("fgvideoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(chinagat_state::ddragon_bgvideoram_w)).share("bgvideoram");
 	map(0x3000, 0x317f).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x3400, 0x357f).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x3800, 0x397f).bankw("bank3").share("spriteram");
-	map(0x3e00, 0x3e04).w(this, FUNC(chinagat_state::interrupt_w));
+	map(0x3e00, 0x3e04).w(FUNC(chinagat_state::interrupt_w));
 	map(0x3e06, 0x3e06).writeonly().share("scrolly_lo");
 	map(0x3e07, 0x3e07).writeonly().share("scrollx_lo");
-	map(0x3f00, 0x3f00).w(this, FUNC(chinagat_state::video_ctrl_w));
-	map(0x3f01, 0x3f01).w(this, FUNC(chinagat_state::bankswitch_w));
+	map(0x3f00, 0x3f00).w(FUNC(chinagat_state::video_ctrl_w));
+	map(0x3f01, 0x3f01).w(FUNC(chinagat_state::bankswitch_w));
 	map(0x3f00, 0x3f00).portr("SYSTEM");
 	map(0x3f01, 0x3f01).portr("DSW1");
 	map(0x3f02, 0x3f02).portr("DSW2");
@@ -359,8 +359,8 @@ void chinagat_state::main_map(address_map &map)
 void chinagat_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("share1");
-	map(0x2000, 0x2000).w(this, FUNC(chinagat_state::sub_bankswitch_w));
-	map(0x2800, 0x2800).w(this, FUNC(chinagat_state::sub_irq_ack_w)); /* Called on CPU start and after return from jump table */
+	map(0x2000, 0x2000).w(FUNC(chinagat_state::sub_bankswitch_w));
+	map(0x2800, 0x2800).w(FUNC(chinagat_state::sub_irq_ack_w)); /* Called on CPU start and after return from jump table */
 //  AM_RANGE(0x2a2b, 0x2a2b) AM_READNOP /* What lives here? */
 //  AM_RANGE(0x2a30, 0x2a30) AM_READNOP /* What lives here? */
 	map(0x4000, 0x7fff).bankr("bank4");
@@ -400,7 +400,7 @@ void chinagat_state::saiyugoub1_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x9800, 0x9800).w(this, FUNC(chinagat_state::saiyugoub1_mcu_command_w));
+	map(0x9800, 0x9800).w(FUNC(chinagat_state::saiyugoub1_mcu_command_w));
 	map(0xA000, 0xA000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 

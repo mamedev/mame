@@ -261,6 +261,21 @@ public:
 		m_cart(*this, "cartleft"),
 		m_cart2(*this, "cartright") { }
 
+	void atari_common_nodac(machine_config &config);
+	void atari_common(machine_config &config);
+	void a800pal(machine_config &config);
+	void a400pal(machine_config &config);
+	void a5200(machine_config &config);
+	void a800(machine_config &config);
+	void a1200xl(machine_config &config);
+	void a800xlpal(machine_config &config);
+	void a130xe(machine_config &config);
+	void a800xl(machine_config &config);
+	void a600xl(machine_config &config);
+	void xegs(machine_config &config);
+	void a400(machine_config &config);
+
+private:
 	DECLARE_MACHINE_START(a400);
 	DECLARE_MACHINE_START(a800);
 	DECLARE_MACHINE_START(a800xl);
@@ -300,19 +315,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
 
-	void atari_common_nodac(machine_config &config);
-	void atari_common(machine_config &config);
-	void a800pal(machine_config &config);
-	void a400pal(machine_config &config);
-	void a5200(machine_config &config);
-	void a800(machine_config &config);
-	void a1200xl(machine_config &config);
-	void a800xlpal(machine_config &config);
-	void a130xe(machine_config &config);
-	void a800xl(machine_config &config);
-	void a600xl(machine_config &config);
-	void xegs(machine_config &config);
-	void a400(machine_config &config);
 	void a1200xl_mem(address_map &map);
 	void a130xe_mem(address_map &map);
 	void a400_mem(address_map &map);
@@ -320,7 +322,7 @@ public:
 	void a600xl_mem(address_map &map);
 	void a800xl_mem(address_map &map);
 	void xegs_mem(address_map &map);
-protected:
+
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<ram_device> m_ram;
 	required_device<pia6821_device> m_pia;
@@ -575,7 +577,7 @@ void a400_state::a400_mem(address_map &map)
 void a400_state::a600xl_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	map(0x5000, 0x57ff).r(this, FUNC(a400_state::a600xl_low_r));    // self test or NOP
+	map(0x5000, 0x57ff).r(FUNC(a400_state::a600xl_low_r));    // self test or NOP
 	map(0xa000, 0xbfff).rom(); // BASIC
 	map(0xc000, 0xcfff).rom(); // OS
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
@@ -590,53 +592,53 @@ void a400_state::a600xl_mem(address_map &map)
 
 void a400_state::a1200xl_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(this, FUNC(a400_state::a1200xl_low_r), FUNC(a400_state::xegs_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a400_state::a1200xl_low_r), FUNC(a400_state::xegs_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(this, FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
 }
 
 
 void a400_state::a800xl_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(this, FUNC(a400_state::a800xl_low_r), FUNC(a400_state::a800xl_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a400_state::a800xl_low_r), FUNC(a400_state::a800xl_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(this, FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
 }
 
 
 void a400_state::a130xe_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(this, FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a800xl_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a800xl_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(this, FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
 }
 
 
 void a400_state::xegs_mem(address_map &map)
 {
-	map(0x0000, 0xcfff).rw(this, FUNC(a400_state::xegs_low_r), FUNC(a400_state::xegs_low_w));
+	map(0x0000, 0xcfff).rw(FUNC(a400_state::xegs_low_r), FUNC(a400_state::xegs_low_w));
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
 	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
-	map(0xd800, 0xffff).rw(this, FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+	map(0xd800, 0xffff).rw(FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
 }
 
 
@@ -2012,8 +2014,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a5200_interrupt )
 
 MACHINE_RESET_MEMBER( a400_state, a400 )
 {
-	pokey_device *pokey = machine().device<pokey_device>("pokey");
-	pokey->write(15,0);
+	subdevice<pokey_device>("pokey")->write(machine().dummy_space(), 15, 0);
 }
 
 
@@ -2376,7 +2377,7 @@ MACHINE_CONFIG_START(a400_state::a5200)
 
 	// FIXME: should there be anything connected where other system have the fdc?
 	MCFG_DEVICE_MODIFY("pokey")
-	MCFG_POKEY_SERIN_R_CB(NOOP)
+	MCFG_POKEY_SERIN_R_CB(CONSTANT(0))
 	MCFG_POKEY_SEROUT_W_CB(NOOP)
 	MCFG_POKEY_KEYBOARD_CB(a400_state, a5200_keypads)
 	MCFG_POKEY_INTERRUPT_CB(a400_state, interrupt_cb)
@@ -2390,8 +2391,8 @@ MACHINE_CONFIG_START(a400_state::a5200)
 	MCFG_ANTIC_GTIA("gtia")
 
 	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_READPA_HANDLER(NOOP) // FIXME: is there anything connected here
-	MCFG_PIA_READPB_HANDLER(NOOP) // FIXME: is there anything connected here
+	MCFG_PIA_READPA_HANDLER(CONSTANT(0)) // FIXME: is there anything connected here
+	MCFG_PIA_READPB_HANDLER(CONSTANT(0)) // FIXME: is there anything connected here
 	MCFG_PIA_CB2_HANDLER(NOOP) // FIXME: is there anything connected here
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )

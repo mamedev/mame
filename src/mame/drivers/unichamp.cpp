@@ -44,6 +44,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -59,12 +60,16 @@ public:
 		m_cart(*this, "cartslot"),
 		m_ctrls(*this, "CTRLS"){}
 
+	void unichamp(machine_config &config);
+
+	void init_unichamp();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gic_device> m_gic;
 	required_device<generic_slot_device> m_cart;
 
 	uint8_t m_ram[256];
-	void init_unichamp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(unichamp);
@@ -81,9 +86,8 @@ public:
 
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void unichamp(machine_config &config);
 	void unichamp_mem(address_map &map);
-protected:
+
 	required_ioport m_ctrls;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -109,8 +113,8 @@ PALETTE_INIT_MEMBER(unichamp_state, unichamp)
 void unichamp_state::unichamp_mem(address_map &map)
 {
 	map.global_mask(0x1FFF); //B13/B14/B15 are grounded!
-	map(0x0000, 0x00FF).rw(this, FUNC(unichamp_state::unichamp_gicram_r), FUNC(unichamp_state::unichamp_gicram_w)).umask16(0x00ff);
-	map(0x0100, 0x07FF).rw(this, FUNC(unichamp_state::unichamp_trapl_r), FUNC(unichamp_state::unichamp_trapl_w));
+	map(0x0000, 0x00FF).rw(FUNC(unichamp_state::unichamp_gicram_r), FUNC(unichamp_state::unichamp_gicram_w)).umask16(0x00ff);
+	map(0x0100, 0x07FF).rw(FUNC(unichamp_state::unichamp_trapl_r), FUNC(unichamp_state::unichamp_trapl_w));
 	map(0x0800, 0x0FFF).rom().region("maincpu", 0);   // Carts and EXE ROM, 10-bits wide
 }
 

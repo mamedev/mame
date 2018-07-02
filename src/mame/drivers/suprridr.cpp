@@ -147,21 +147,21 @@ void suprridr_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).ram().w(this, FUNC(suprridr_state::bgram_w)).share("bgram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(suprridr_state::fgram_w)).share("fgram");
+	map(0x8800, 0x8bff).ram().w(FUNC(suprridr_state::bgram_w)).share("bgram");
+	map(0x9000, 0x97ff).ram().w(FUNC(suprridr_state::fgram_w)).share("fgram");
 	map(0x9800, 0x983f).ram();
 	map(0x9840, 0x987f).ram().share("spriteram");
 	map(0x9880, 0x9bff).ram();
 	map(0xa000, 0xa000).portr("INPUTS");
 	map(0xa800, 0xa800).portr("SYSTEM");
-	map(0xb000, 0xb000).portr("DSW").w(this, FUNC(suprridr_state::nmi_enable_w));
-	map(0xb002, 0xb003).w(this, FUNC(suprridr_state::coin_lock_w));
-	map(0xb006, 0xb006).w(this, FUNC(suprridr_state::flipx_w));
-	map(0xb007, 0xb007).w(this, FUNC(suprridr_state::flipy_w));
+	map(0xb000, 0xb000).portr("DSW").w(FUNC(suprridr_state::nmi_enable_w));
+	map(0xb002, 0xb003).w(FUNC(suprridr_state::coin_lock_w));
+	map(0xb006, 0xb006).w(FUNC(suprridr_state::flipx_w));
+	map(0xb007, 0xb007).w(FUNC(suprridr_state::flipy_w));
 	map(0xb800, 0xb800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xc801, 0xc801).w(this, FUNC(suprridr_state::fgdisable_w));
-	map(0xc802, 0xc802).w(this, FUNC(suprridr_state::fgscrolly_w));
-	map(0xc804, 0xc804).w(this, FUNC(suprridr_state::bgscrolly_w));
+	map(0xc801, 0xc801).w(FUNC(suprridr_state::fgdisable_w));
+	map(0xc802, 0xc802).w(FUNC(suprridr_state::fgscrolly_w));
+	map(0xc804, 0xc804).w(FUNC(suprridr_state::bgscrolly_w));
 	map(0xc000, 0xefff).rom();
 }
 

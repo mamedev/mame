@@ -61,7 +61,7 @@ public:
 
 	void peyper(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(sw_r);
 	DECLARE_WRITE8_MEMBER(col_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
@@ -79,7 +79,6 @@ protected:
 	void peyper_io(address_map &map);
 	void peyper_map(address_map &map);
 
-private:
 	uint8_t m_digit;
 	uint8_t m_disp_layout[36];
 	required_device<cpu_device> m_maincpu;
@@ -223,12 +222,12 @@ void peyper_state::peyper_io(address_map &map)
 	map(0x08, 0x08).w("ay2", FUNC(ay8910_device::address_w));
 	map(0x09, 0x09).r("ay2", FUNC(ay8910_device::data_r)); // never actually read?
 	map(0x0a, 0x0a).w("ay2", FUNC(ay8910_device::data_w));
-	map(0x0c, 0x0c).w(this, FUNC(peyper_state::sol_w));
-	map(0x10, 0x18).w(this, FUNC(peyper_state::lamp_w));
+	map(0x0c, 0x0c).w(FUNC(peyper_state::sol_w));
+	map(0x10, 0x18).w(FUNC(peyper_state::lamp_w));
 	map(0x20, 0x20).portr("DSW0");
 	map(0x24, 0x24).portr("DSW1");
 	map(0x28, 0x28).portr("SYSTEM");
-	map(0x2c, 0x2c).w(this, FUNC(peyper_state::lamp7_w));
+	map(0x2c, 0x2c).w(FUNC(peyper_state::lamp7_w));
 }
 
 static INPUT_PORTS_START( pbsonic_generic )

@@ -35,6 +35,7 @@
 #include "sound/spkrdev.h"
 #include "video/cgapal.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -79,6 +80,11 @@ public:
 		, m_kbdio(*this, "Y%u", 1)
 	{ }
 
+	void poisk1(machine_config &config);
+
+	void init_poisk1();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
 	required_device<pit8253_device> m_pit8253;
@@ -93,7 +99,6 @@ public:
 
 	required_ioport_array<8> m_kbdio;
 
-	void init_poisk1();
 	DECLARE_MACHINE_START(poisk1);
 	DECLARE_MACHINE_RESET(poisk1);
 
@@ -141,7 +146,6 @@ public:
 	DECLARE_WRITE8_MEMBER(p1_ppi2_portb_w);
 	DECLARE_READ8_MEMBER(p1_ppi2_portc_r);
 	const char *m_cputag;
-	void poisk1(machine_config &config);
 	void poisk1_io(address_map &map);
 	void poisk1_map(address_map &map);
 };
@@ -629,12 +633,12 @@ void p1_state::poisk1_map(address_map &map)
 void p1_state::poisk1_io(address_map &map)
 {
 	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x0028, 0x002B).rw(this, FUNC(p1_state::p1_trap_r), FUNC(p1_state::p1_trap_w));
+	map(0x0028, 0x002B).rw(FUNC(p1_state::p1_trap_r), FUNC(p1_state::p1_trap_w));
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	// can't use regular AM_DEVREADWRITE, because THIS IS SPARTA!
 	// 1st PPI occupies ports 60, 69, 6A and 6B; 2nd PPI -- 68, 61, 62 and 63.
-	map(0x0060, 0x006F).rw(this, FUNC(p1_state::p1_ppi_r), FUNC(p1_state::p1_ppi_w));
-	map(0x03D0, 0x03DF).rw(this, FUNC(p1_state::p1_cga_r), FUNC(p1_state::p1_cga_w));
+	map(0x0060, 0x006F).rw(FUNC(p1_state::p1_ppi_r), FUNC(p1_state::p1_ppi_w));
+	map(0x03D0, 0x03DF).rw(FUNC(p1_state::p1_cga_r), FUNC(p1_state::p1_cga_w));
 }
 
 static INPUT_PORTS_START( poisk1 )

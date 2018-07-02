@@ -37,6 +37,7 @@
 // Features
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 
 //**************************************************************************
@@ -148,15 +149,15 @@ public:
 		,m_io_line7(*this, "LINE7")
 		,m_io_line8(*this, "LINE8")
 		,m_io_line9(*this, "LINE9")
-		,m_line0(0)
-		,m_line1(0)
-		,m_line2(0)
-		,m_line3(0)
 		,m_pia1(*this, PIA1_TAG)
 		,m_pia2(*this, PIA2_TAG)
 		,m_pia1_B(0)
 		,m_50hz(0)
 		{ }
+
+	void e100(machine_config &config);
+
+private:
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_kbd_74145;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -178,9 +179,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
-	void e100(machine_config &config);
 	void e100_map(address_map &map);
-protected:
+
 	required_ioport m_io_line0;
 	required_ioport m_io_line1;
 	required_ioport m_io_line2;
@@ -191,10 +191,6 @@ protected:
 	required_ioport m_io_line7;
 	required_ioport m_io_line8;
 	required_ioport m_io_line9;
-	uint8_t m_line0;
-	uint8_t m_line1;
-	uint8_t m_line2;
-	uint8_t m_line3;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	uint8_t m_pia1_B;
@@ -428,7 +424,7 @@ void e100_state::e100_map(address_map &map)
 	map(0x0000, 0x1fff).ram();
 	map(0x8000, 0x87ff).rom().region("roms", 0);
 	map(0xc000, 0xc3ff).ram().share("videoram");
-	map(0xc800, 0xc81f).rw(this, FUNC(e100_state::pia_r), FUNC(e100_state::pia_w)).mirror(0x07e0);
+	map(0xc800, 0xc81f).rw(FUNC(e100_state::pia_r), FUNC(e100_state::pia_w)).mirror(0x07e0);
 	map(0xd000, 0xffff).rom().region("roms", 0x1000);
 }
 

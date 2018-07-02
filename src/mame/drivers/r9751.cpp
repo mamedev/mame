@@ -97,6 +97,11 @@ public:
 	{
 	}
 
+	void r9751(machine_config &config);
+
+	void init_r9751();
+
+private:
 	void kbd_put(u8 data);
 
 	DECLARE_READ32_MEMBER(r9751_mmio_5ff_r);
@@ -111,11 +116,8 @@ public:
 	DECLARE_READ8_MEMBER(pdc_dma_r);
 	DECLARE_WRITE8_MEMBER(pdc_dma_w);
 
-	void init_r9751();
-
-	void r9751(machine_config &config);
 	void r9751_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<pdc_device> m_pdc;
 	required_device<smioc_device> m_smioc;
@@ -624,10 +626,10 @@ void r9751_state::r9751_mem(address_map &map)
 	//ADDRESS_MAP_UNMAP_HIGH
 	map(0x00000000, 0x00ffffff).ram().share("main_ram"); // 16MB
 	map(0x08000000, 0x0800ffff).rom().region("prom", 0);
-	map(0x5FF00000, 0x5FFFFFFF).rw(this, FUNC(r9751_state::r9751_mmio_5ff_r), FUNC(r9751_state::r9751_mmio_5ff_w));
-	map(0xFF010000, 0xFF01FFFF).rw(this, FUNC(r9751_state::r9751_mmio_ff01_r), FUNC(r9751_state::r9751_mmio_ff01_w));
-	map(0xFF050000, 0xFF06FFFF).rw(this, FUNC(r9751_state::r9751_mmio_ff05_r), FUNC(r9751_state::r9751_mmio_ff05_w));
-	map(0xFFF80000, 0xFFF8FFFF).rw(this, FUNC(r9751_state::r9751_mmio_fff8_r), FUNC(r9751_state::r9751_mmio_fff8_w));
+	map(0x5FF00000, 0x5FFFFFFF).rw(FUNC(r9751_state::r9751_mmio_5ff_r), FUNC(r9751_state::r9751_mmio_5ff_w));
+	map(0xFF010000, 0xFF01FFFF).rw(FUNC(r9751_state::r9751_mmio_ff01_r), FUNC(r9751_state::r9751_mmio_ff01_w));
+	map(0xFF050000, 0xFF06FFFF).rw(FUNC(r9751_state::r9751_mmio_ff05_r), FUNC(r9751_state::r9751_mmio_ff05_w));
+	map(0xFFF80000, 0xFFF8FFFF).rw(FUNC(r9751_state::r9751_mmio_fff8_r), FUNC(r9751_state::r9751_mmio_fff8_w));
 	//AM_RANGE(0xffffff00,0xffffffff) AM_RAM // Unknown area
 }
 

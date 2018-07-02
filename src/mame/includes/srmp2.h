@@ -2,6 +2,7 @@
 // copyright-holders:Yochizo, Takahiro Nogi
 #include "sound/msm5205.h"
 #include "video/seta001.h"
+#include "emupal.h"
 
 struct iox_t
 {
@@ -14,15 +15,26 @@ struct iox_t
 class srmp2_state : public driver_device
 {
 public:
-	srmp2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	srmp2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_seta001(*this, "spritegen"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_adpcm_rom(*this, "adpcm"),
+		m_mainbank(*this, "mainbank")
+	{ }
 
+	void mjyuugi(machine_config &config);
+	void srmp2(machine_config &config);
+	void rmgoldyh(machine_config &config);
+	void srmp3(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<seta001_device> m_seta001;
 	required_device<msm5205_device> m_msm;
+	required_region_ptr<uint8_t> m_adpcm_rom;
+	optional_memory_bank m_mainbank;
 
 	int m_color_bank;
 	int m_gfx_bank;
@@ -74,10 +86,7 @@ public:
 	SETA001_SPRITE_GFXBANK_CB_MEMBER(srmp3_gfxbank_callback);
 
 	uint8_t iox_key_matrix_calc(uint8_t p_side);
-	void mjyuugi(machine_config &config);
-	void srmp2(machine_config &config);
-	void rmgoldyh(machine_config &config);
-	void srmp3(machine_config &config);
+
 	void mjyuugi_map(address_map &map);
 	void rmgoldyh_io_map(address_map &map);
 	void rmgoldyh_map(address_map &map);

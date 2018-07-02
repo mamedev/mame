@@ -92,8 +92,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::merlinmm_interrupt)
 void pingpong_state::pingpong_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(pingpong_state::pingpong_colorram_w)).share("colorram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(pingpong_state::pingpong_videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).ram().w(FUNC(pingpong_state::pingpong_colorram_w)).share("colorram");
+	map(0x8400, 0x87ff).ram().w(FUNC(pingpong_state::pingpong_videoram_w)).share("videoram");
 	map(0x9000, 0x9002).ram();
 	map(0x9003, 0x9052).ram().share("spriteram");
 	map(0x9053, 0x97ff).ram();
@@ -101,9 +101,9 @@ void pingpong_state::pingpong_map(address_map &map)
 	map(0xa880, 0xa880).portr("INPUTS");
 	map(0xa900, 0xa900).portr("DSW1");
 	map(0xa980, 0xa980).portr("DSW2");
-	map(0xa000, 0xa000).w(this, FUNC(pingpong_state::coin_w));   /* coin counters + irq enables */
+	map(0xa000, 0xa000).w(FUNC(pingpong_state::coin_w));   /* coin counters + irq enables */
 	map(0xa200, 0xa200).nopw();        /* SN76496 data latch */
-	map(0xa400, 0xa400).w("snsnd", FUNC(sn76496_device::write));    /* trigger read */
+	map(0xa400, 0xa400).w("snsnd", FUNC(sn76496_device::command_w));    /* trigger read */
 	map(0xa600, 0xa600).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -114,18 +114,18 @@ void pingpong_state::merlinmm_map(address_map &map)
 	map(0x5400, 0x57ff).ram();
 	map(0x6000, 0x6007).nopw(); /* solenoid writes */
 	map(0x7000, 0x7000).portr("IN4");
-	map(0x8000, 0x83ff).ram().w(this, FUNC(pingpong_state::pingpong_colorram_w)).share("colorram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(pingpong_state::pingpong_videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).ram().w(FUNC(pingpong_state::pingpong_colorram_w)).share("colorram");
+	map(0x8400, 0x87ff).ram().w(FUNC(pingpong_state::pingpong_videoram_w)).share("videoram");
 	map(0x9000, 0x9002).ram();
 	map(0x9003, 0x9052).ram().share("spriteram");
 	map(0x9053, 0x97ff).ram();
-	map(0xa000, 0xa000).w(this, FUNC(pingpong_state::coin_w));   /* irq enables */
+	map(0xa000, 0xa000).w(FUNC(pingpong_state::coin_w));   /* irq enables */
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa080, 0xa080).portr("IN1");
 	map(0xa100, 0xa100).portr("IN2");
 	map(0xa180, 0xa180).portr("IN3");
 	map(0xa200, 0xa200).nopw();        /* SN76496 data latch */
-	map(0xa400, 0xa400).w("snsnd", FUNC(sn76496_device::write));    /* trigger read */
+	map(0xa400, 0xa400).w("snsnd", FUNC(sn76496_device::command_w));    /* trigger read */
 	map(0xa600, 0xa600).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 

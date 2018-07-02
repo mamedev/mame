@@ -48,6 +48,7 @@
 #include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -71,6 +72,11 @@ public:
 		m_color_bank(0)
 	{ }
 
+	void mariobl(machine_config &config);
+	void ambush(machine_config &config);
+	void dkong3abl(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(ambush);
 	DECLARE_PALETTE_INIT(mario);
 	DECLARE_PALETTE_INIT(dkong3);
@@ -95,13 +101,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(output_latches_w);
 
-	void mariobl(machine_config &config);
-	void ambush(machine_config &config);
-	void dkong3abl(machine_config &config);
 	void bootleg_map(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
-private:
+
 	void register_save_states();
 
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -126,13 +129,13 @@ void ambush_state::main_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xc000, 0xc07f).ram();
-	map(0xc080, 0xc09f).ram().w(this, FUNC(ambush_state::scroll_ram_w)).share("scroll_ram");  // 1 byte for each column
+	map(0xc080, 0xc09f).ram().w(FUNC(ambush_state::scroll_ram_w)).share("scroll_ram");  // 1 byte for each column
 	map(0xc0a0, 0xc0ff).ram();
 	map(0xc100, 0xc1ff).ram().share("attribute_ram");  // 1 line corresponds to 4 in the video ram
 	map(0xc200, 0xc3ff).ram().share("sprite_ram");
 	map(0xc400, 0xc7ff).ram().share("video_ram");
 	map(0xc800, 0xc800).portr("sw1");
-	map(0xcc00, 0xcc07).w(this, FUNC(ambush_state::output_latches_w));
+	map(0xcc00, 0xcc07).w(FUNC(ambush_state::output_latches_w));
 }
 
 void ambush_state::main_portmap(address_map &map)

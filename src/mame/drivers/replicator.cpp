@@ -29,6 +29,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -161,6 +162,11 @@ public:
 	{
 	}
 
+	void replicator(machine_config &config);
+
+	void init_replicator();
+
+private:
 	virtual void machine_start() override;
 
 	uint8_t m_port_a;
@@ -183,10 +189,8 @@ public:
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
-	void init_replicator();
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(replicator);
-	void replicator(machine_config &config);
 	void replicator_data_map(address_map &map);
 	void replicator_io_map(address_map &map);
 	void replicator_prg_map(address_map &map);
@@ -544,7 +548,7 @@ void replicator_state::replicator_data_map(address_map &map)
 
 void replicator_state::replicator_io_map(address_map &map)
 {
-	map(AVR8_IO_PORTA, AVR8_IO_PORTL).rw(this, FUNC(replicator_state::port_r), FUNC(replicator_state::port_w));
+	map(AVR8_IO_PORTA, AVR8_IO_PORTL).rw(FUNC(replicator_state::port_r), FUNC(replicator_state::port_w));
 }
 
 /****************************************************\

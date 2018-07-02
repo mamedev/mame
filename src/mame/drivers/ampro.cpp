@@ -44,17 +44,20 @@ public:
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
+	void ampro(machine_config &config);
+
 	void init_ampro();
+
+private:
 	DECLARE_MACHINE_RESET(ampro);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 
-	void ampro(machine_config &config);
 	void ampro_io(address_map &map);
 	void ampro_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
 	required_device<z80ctc_device> m_ctc;
@@ -107,13 +110,13 @@ void ampro_state::ampro_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(ampro_state::port00_w)); // system
+	map(0x00, 0x00).w(FUNC(ampro_state::port00_w)); // system
 	//AM_RANGE(0x01, 0x01) AM_WRITE(port01_w) // printer data
 	//AM_RANGE(0x02, 0x03) AM_WRITE(port02_w) // printer strobe
 	//AM_RANGE(0x20, 0x27) AM_READWRITE() // scsi chip
 	//AM_RANGE(0x28, 0x28) AM_WRITE(port28_w) // scsi control
 	//AM_RANGE(0x29, 0x29) AM_READ(port29_r) // ID port
-	map(0x40, 0x8f).rw(this, FUNC(ampro_state::io_r), FUNC(ampro_state::io_w));
+	map(0x40, 0x8f).rw(FUNC(ampro_state::io_r), FUNC(ampro_state::io_w));
 	map(0xc0, 0xc3).w(m_fdc, FUNC(wd1772_device::write));
 	map(0xc4, 0xc7).r(m_fdc, FUNC(wd1772_device::read));
 }

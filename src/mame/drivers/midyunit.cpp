@@ -180,16 +180,16 @@ CUSTOM_INPUT_MEMBER(midyunit_state::adpcm_irq_state_r)
 
 void midyunit_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).rw(this, FUNC(midyunit_state::midyunit_vram_r), FUNC(midyunit_state::midyunit_vram_w));
+	map(0x00000000, 0x001fffff).rw(FUNC(midyunit_state::midyunit_vram_r), FUNC(midyunit_state::midyunit_vram_w));
 	map(0x01000000, 0x010fffff).ram().share("mainram");
-	map(0x01400000, 0x0140ffff).rw(this, FUNC(midyunit_state::midyunit_cmos_r), FUNC(midyunit_state::midyunit_cmos_w));
-	map(0x01800000, 0x0181ffff).ram().w(this, FUNC(midyunit_state::midyunit_paletteram_w)).share("paletteram");
-	map(0x01a00000, 0x01a0009f).mirror(0x00080000).rw(this, FUNC(midyunit_state::midyunit_dma_r), FUNC(midyunit_state::midyunit_dma_w));
-	map(0x01c00000, 0x01c0005f).r(this, FUNC(midyunit_state::midyunit_input_r));
-	map(0x01c00060, 0x01c0007f).rw(this, FUNC(midyunit_state::midyunit_protection_r), FUNC(midyunit_state::midyunit_cmos_enable_w));
-	map(0x01e00000, 0x01e0001f).w(this, FUNC(midyunit_state::midyunit_sound_w));
-	map(0x01f00000, 0x01f0001f).w(this, FUNC(midyunit_state::midyunit_control_w));
-	map(0x02000000, 0x05ffffff).r(this, FUNC(midyunit_state::midyunit_gfxrom_r)).share("gfx_rom");
+	map(0x01400000, 0x0140ffff).rw(FUNC(midyunit_state::midyunit_cmos_r), FUNC(midyunit_state::midyunit_cmos_w));
+	map(0x01800000, 0x0181ffff).ram().w(FUNC(midyunit_state::midyunit_paletteram_w)).share("paletteram");
+	map(0x01a00000, 0x01a0009f).mirror(0x00080000).rw(FUNC(midyunit_state::midyunit_dma_r), FUNC(midyunit_state::midyunit_dma_w));
+	map(0x01c00000, 0x01c0005f).r(FUNC(midyunit_state::midyunit_input_r));
+	map(0x01c00060, 0x01c0007f).rw(FUNC(midyunit_state::midyunit_protection_r), FUNC(midyunit_state::midyunit_cmos_enable_w));
+	map(0x01e00000, 0x01e0001f).w(FUNC(midyunit_state::midyunit_sound_w));
+	map(0x01f00000, 0x01f0001f).w(FUNC(midyunit_state::midyunit_control_w));
+	map(0x02000000, 0x05ffffff).r(FUNC(midyunit_state::midyunit_gfxrom_r)).share("gfx_rom");
 	map(0xc0000000, 0xc00001ff).rw("maincpu", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffffffff).rom().region("user1", 0);
 }
@@ -199,7 +199,7 @@ void midyunit_state::yawdim_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x97ff).w(this, FUNC(midyunit_state::yawdim_oki_bank_w));
+	map(0x9000, 0x97ff).w(FUNC(midyunit_state::yawdim_oki_bank_w));
 	map(0x9800, 0x9fff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa7ff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }

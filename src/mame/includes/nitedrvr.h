@@ -12,6 +12,7 @@
 
 #include "machine/timer.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 
 /* Discrete Sound Input Nodes */
 #define NITEDRVR_BANG_DATA  NODE_01
@@ -38,7 +39,7 @@ public:
 
 	void nitedrvr(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(nitedrvr_steering_reset_r);
 	DECLARE_WRITE8_MEMBER(nitedrvr_steering_reset_w);
 	DECLARE_READ8_MEMBER(nitedrvr_in0_r);
@@ -57,7 +58,6 @@ protected:
 	int nitedrvr_steering();
 	void nitedrvr_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_hvc;

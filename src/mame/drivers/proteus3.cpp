@@ -58,6 +58,7 @@
 
 #include "bus/rs232/rs232.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -78,6 +79,9 @@ public:
 		, m_serial(*this, "SERIAL")
 	{ }
 
+	void proteus3(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
 	DECLARE_WRITE8_MEMBER(video_w);
 	void kbd_put(u8 data);
@@ -105,9 +109,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER (write_f14_clock){ write_acia_clocks(mc14411_device::TIMER_F14, state); }
 	DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
 
-	void proteus3(machine_config &config);
 	void proteus3_mem(address_map &map);
-private:
+
 	uint8_t m_video_data;
 	uint8_t m_flashcnt;
 	uint16_t m_curs_pos;
@@ -176,7 +179,7 @@ void proteus3_state::kbd_put(u8 data)
 {
 	if (data == 0x08)
 		data = 0x0f; // take care of backspace (bios 1 and 2)
-	m_pia->portb_w(data);
+	m_pia->write_portb(data);
 	m_pia->cb1_w(1);
 	m_pia->cb1_w(0);
 }

@@ -31,14 +31,16 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void evmbug(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(rs232_r);
 	DECLARE_WRITE8_MEMBER(rs232_w);
 	void kbd_put(u8 data);
 
-	void evmbug(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
 	uint8_t m_term_out;
@@ -59,8 +61,8 @@ void evmbug_state::io_map(address_map &map)
 	map.unmap_value_high();
 	//AM_RANGE(0x0000, 0x0003) AM_DEVREAD("uart1", tms9902_device, cruread)
 	//AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("uart1", tms9902_device, cruwrite)
-	map(0x0000, 0x0003).r(this, FUNC(evmbug_state::rs232_r));
-	map(0x0000, 0x001f).w(this, FUNC(evmbug_state::rs232_w));
+	map(0x0000, 0x0003).r(FUNC(evmbug_state::rs232_r));
+	map(0x0000, 0x001f).w(FUNC(evmbug_state::rs232_w));
 }
 
 /* Input ports */

@@ -38,7 +38,7 @@ public:
 	void liberat2(machine_config &config);
 	void liberatr(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -66,7 +66,6 @@ protected:
 	void liberat2_map(address_map &map);
 	void liberatr_map(address_map &map);
 
-protected:
 	// The following structure describes the (up to 32) line segments
 	// that make up one horizontal line (latitude) for one display frame of the planet.
 	// Note: this and the following structure is only used to collect the

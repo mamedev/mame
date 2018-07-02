@@ -283,15 +283,15 @@ void acclaim_rax_device::adsp_data_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).bankrw("databank");
 	map(0x2000, 0x3fdf).ram(); // Internal RAM
-	map(0x3fe0, 0x3fff).rw(this, FUNC(acclaim_rax_device::adsp_control_r), FUNC(acclaim_rax_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(acclaim_rax_device::adsp_control_r), FUNC(acclaim_rax_device::adsp_control_w));
 }
 
 void acclaim_rax_device::adsp_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0000).w(this, FUNC(acclaim_rax_device::ram_bank_w));
-	map(0x0001, 0x0001).w(this, FUNC(acclaim_rax_device::rom_bank_w));
-	map(0x0003, 0x0003).rw(this, FUNC(acclaim_rax_device::host_r), FUNC(acclaim_rax_device::host_w));
+	map(0x0000, 0x0000).w(FUNC(acclaim_rax_device::ram_bank_w));
+	map(0x0001, 0x0001).w(FUNC(acclaim_rax_device::rom_bank_w));
+	map(0x0003, 0x0003).rw(FUNC(acclaim_rax_device::host_r), FUNC(acclaim_rax_device::host_w));
 }
 
 

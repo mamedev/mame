@@ -109,6 +109,13 @@ void m5074x_device::device_start()
 }
 
 
+device_memory_interface::space_config_vector m5074x_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
@@ -485,8 +492,8 @@ WRITE8_MEMBER(m5074x_device::tmrirq_w)
 void m50740_device::m50740_map(address_map &map)
 {
 	map(0x0000, 0x005f).ram();
-	map(0x00e0, 0x00e9).rw(this, FUNC(m50740_device::ports_r), FUNC(m50740_device::ports_w));
-	map(0x00f9, 0x00ff).rw(this, FUNC(m50740_device::tmrirq_r), FUNC(m50740_device::tmrirq_w));
+	map(0x00e0, 0x00e9).rw(FUNC(m50740_device::ports_r), FUNC(m50740_device::ports_w));
+	map(0x00f9, 0x00ff).rw(FUNC(m50740_device::tmrirq_r), FUNC(m50740_device::tmrirq_w));
 	map(0x1400, 0x1fff).rom().region(M5074X_INTERNAL_ROM_REGION, 0);
 }
 
@@ -504,8 +511,8 @@ m50740_device::m50740_device(const machine_config &mconfig, device_type type, co
 void m50741_device::m50741_map(address_map &map)
 {
 	map(0x0000, 0x005f).ram();
-	map(0x00e0, 0x00e9).rw(this, FUNC(m50741_device::ports_r), FUNC(m50741_device::ports_w));
-	map(0x00f9, 0x00ff).rw(this, FUNC(m50741_device::tmrirq_r), FUNC(m50741_device::tmrirq_w));
+	map(0x00e0, 0x00e9).rw(FUNC(m50741_device::ports_r), FUNC(m50741_device::ports_w));
+	map(0x00f9, 0x00ff).rw(FUNC(m50741_device::tmrirq_r), FUNC(m50741_device::tmrirq_w));
 	map(0x1000, 0x1fff).rom().region("internal", 0);
 }
 

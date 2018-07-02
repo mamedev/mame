@@ -91,19 +91,6 @@
 
 /*************************************
  *
- *  NVRAM handler
- *
- *************************************/
-
-WRITE8_MEMBER(irobot_state::irobot_nvram_w)
-{
-	m_nvram[offset] = data & 0x0f;
-}
-
-
-
-/*************************************
- *
  *  IRQ acknowledgement
  *
  *************************************/
@@ -126,7 +113,7 @@ READ8_MEMBER(irobot_state::quad_pokeyn_r)
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
 
-	return m_pokey[pokey_num]->read(pokey_reg);
+	return m_pokey[pokey_num]->read(space, pokey_reg);
 }
 
 WRITE8_MEMBER(irobot_state::quad_pokeyn_w)
@@ -135,7 +122,7 @@ WRITE8_MEMBER(irobot_state::quad_pokeyn_w)
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
 
-	m_pokey[pokey_num]->write(pokey_reg, data);
+	m_pokey[pokey_num]->write(space, pokey_reg, data);
 }
 
 
@@ -151,21 +138,21 @@ void irobot_state::irobot_map(address_map &map)
 	map(0x0800, 0x0fff).bankrw("bank2");
 	map(0x1000, 0x103f).portr("IN0");
 	map(0x1040, 0x1040).portr("IN1");
-	map(0x1080, 0x1080).r(this, FUNC(irobot_state::irobot_status_r));
+	map(0x1080, 0x1080).r(FUNC(irobot_state::irobot_status_r));
 	map(0x10c0, 0x10c0).portr("DSW1");
-	map(0x1100, 0x1100).w(this, FUNC(irobot_state::irobot_clearirq_w));
-	map(0x1140, 0x1140).w(this, FUNC(irobot_state::irobot_statwr_w));
-	map(0x1180, 0x1180).w(this, FUNC(irobot_state::irobot_out0_w));
-	map(0x11c0, 0x11c0).w(this, FUNC(irobot_state::irobot_rom_banksel_w));
-	map(0x1200, 0x12ff).ram().w(this, FUNC(irobot_state::irobot_nvram_w)).share("nvram");
+	map(0x1100, 0x1100).w(FUNC(irobot_state::irobot_clearirq_w));
+	map(0x1140, 0x1140).w(FUNC(irobot_state::irobot_statwr_w));
+	map(0x1180, 0x1180).w(FUNC(irobot_state::irobot_out0_w));
+	map(0x11c0, 0x11c0).w(FUNC(irobot_state::irobot_rom_banksel_w));
+	map(0x1200, 0x12ff).rw("nvram", FUNC(x2212_device::read), FUNC(x2212_device::write));
 	map(0x1300, 0x1300).mirror(0xff).r("adc", FUNC(adc0809_device::data_r));
-	map(0x1400, 0x143f).rw(this, FUNC(irobot_state::quad_pokeyn_r), FUNC(irobot_state::quad_pokeyn_w));
-	map(0x1800, 0x18ff).w(this, FUNC(irobot_state::irobot_paletteram_w));
+	map(0x1400, 0x143f).rw(FUNC(irobot_state::quad_pokeyn_r), FUNC(irobot_state::quad_pokeyn_w));
+	map(0x1800, 0x18ff).w(FUNC(irobot_state::irobot_paletteram_w));
 	map(0x1900, 0x19ff).writeonly();            /* Watchdog reset */
-	map(0x1a00, 0x1a00).w(this, FUNC(irobot_state::irobot_clearfirq_w));
+	map(0x1a00, 0x1a00).w(FUNC(irobot_state::irobot_clearfirq_w));
 	map(0x1b00, 0x1b03).mirror(0xfc).w("adc", FUNC(adc0809_device::address_offset_start_w));
 	map(0x1c00, 0x1fff).ram().share("videoram");
-	map(0x2000, 0x3fff).rw(this, FUNC(irobot_state::irobot_sharedmem_r), FUNC(irobot_state::irobot_sharedmem_w));
+	map(0x2000, 0x3fff).rw(FUNC(irobot_state::irobot_sharedmem_r), FUNC(irobot_state::irobot_sharedmem_w));
 	map(0x4000, 0x5fff).bankr("bank1");
 	map(0x6000, 0xffff).rom();
 }
@@ -305,7 +292,7 @@ MACHINE_CONFIG_START(irobot_state::irobot)
 	MCFG_ADC0808_IN0_CB(IOPORT("AN0"))
 	MCFG_ADC0808_IN1_CB(IOPORT("AN1"))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_X2212_ADD_AUTOSAVE("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -46,6 +46,7 @@ ToDo:
 #include "sound/wave.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -71,6 +72,9 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
+	void excali64(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(excali64);
 	DECLARE_WRITE8_MEMBER(ppib_w);
 	DECLARE_READ8_MEMBER(ppic_r);
@@ -95,10 +99,9 @@ public:
 	DECLARE_MACHINE_RESET(excali64);
 	required_device<palette_device> m_palette;
 
-	void excali64(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t *m_p_videoram;
 	uint8_t *m_p_hiresram;
 	uint8_t m_sys_status;
@@ -132,19 +135,19 @@ void excali64_state::mem_map(address_map &map)
 void excali64_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).r(this, FUNC(excali64_state::port00_r));
+	map(0x00, 0x0f).r(FUNC(excali64_state::port00_r));
 	map(0x10, 0x10).mirror(0x0e).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x11, 0x11).mirror(0x0e).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x20, 0x23).mirror(0x0c).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x30).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x31, 0x31).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x50, 0x5f).r(this, FUNC(excali64_state::port50_r));
+	map(0x50, 0x5f).r(FUNC(excali64_state::port50_r));
 	map(0x60, 0x63).mirror(0x0c).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x70, 0x7f).w(this, FUNC(excali64_state::port70_w));
-	map(0xe0, 0xe3).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
-	map(0xe4, 0xe7).w(this, FUNC(excali64_state::porte4_w));
-	map(0xe8, 0xeb).r(this, FUNC(excali64_state::porte8_r));
-	map(0xec, 0xef).w(this, FUNC(excali64_state::portec_w));
+	map(0x70, 0x7f).w(FUNC(excali64_state::port70_w));
+	map(0xe0, 0xe3).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0xe4, 0xe7).w(FUNC(excali64_state::porte4_w));
+	map(0xe8, 0xeb).r(FUNC(excali64_state::porte8_r));
+	map(0xec, 0xef).w(FUNC(excali64_state::portec_w));
 	map(0xf0, 0xf3).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 }
 
@@ -569,7 +572,7 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	//MCFG_PIT8253_CLK2(16_MHz_XTAL / 16) /* Timer 2: not used */
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write)) // parallel port
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w)) // parallel port
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, excali64_state, ppib_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, excali64_state, ppic_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, excali64_state, ppic_w))
@@ -622,7 +625,7 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, excali64_state, motor_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, excali64_state, cent_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END

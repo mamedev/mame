@@ -166,7 +166,7 @@ void st_state::fdc_dma_transfer()
 		if (m_fdc_fifo_msb)
 		{
 			// write LSB to disk
-			m_fdc->data_w(data & 0xff);
+			m_fdc->write_data(data & 0xff);
 
 			if (LOG) logerror("DMA Write to FDC %02x\n", data & 0xff);
 
@@ -175,7 +175,7 @@ void st_state::fdc_dma_transfer()
 		else
 		{
 			// write MSB to disk
-			m_fdc->data_w(data >> 8);
+			m_fdc->write_data(data >> 8);
 
 			if (LOG) logerror("DMA Write to FDC %02x\n", data >> 8);
 		}
@@ -199,7 +199,7 @@ void st_state::fdc_dma_transfer()
 	else
 	{
 		// read from controller to FIFO
-		uint8_t data = m_fdc->data_r();
+		uint8_t data = m_fdc->read_data();
 
 		m_fdc_fifo_empty[m_fdc_fifo_sel] = 0;
 
@@ -1217,10 +1217,10 @@ void st_state::ikbd_map(address_map &map)
 
 void st_state::ikbd_io_map(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).r(this, FUNC(st_state::ikbd_port1_r));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(st_state::ikbd_port2_r), FUNC(st_state::ikbd_port2_w));
-	map(M6801_PORT3, M6801_PORT3).w(this, FUNC(st_state::ikbd_port3_w));
-	map(M6801_PORT4, M6801_PORT4).rw(this, FUNC(st_state::ikbd_port4_r), FUNC(st_state::ikbd_port4_w));
+	map(M6801_PORT1, M6801_PORT1).r(FUNC(st_state::ikbd_port1_r));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(st_state::ikbd_port2_r), FUNC(st_state::ikbd_port2_w));
+	map(M6801_PORT3, M6801_PORT3).w(FUNC(st_state::ikbd_port3_w));
+	map(M6801_PORT4, M6801_PORT4).rw(FUNC(st_state::ikbd_port4_r), FUNC(st_state::ikbd_port4_w));
 }
 
 
@@ -1231,36 +1231,36 @@ void st_state::ikbd_io_map(address_map &map)
 void st_state::st_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x000007).rom().region(M68000_TAG, 0).w(this, FUNC(st_state::berr_w));
+	map(0x000000, 0x000007).rom().region(M68000_TAG, 0).w(FUNC(st_state::berr_w));
 	map(0x000008, 0x1fffff).ram();
 	map(0x200000, 0x3fffff).ram();
-	map(0x400000, 0xf9ffff).rw(this, FUNC(st_state::berr_r), FUNC(st_state::berr_w));
+	map(0x400000, 0xf9ffff).rw(FUNC(st_state::berr_r), FUNC(st_state::berr_w));
 	//AM_RANGE(0xfa0000, 0xfbffff)      // mapped by the cartslot
-	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(this, FUNC(st_state::berr_w));
-	map(0xff8001, 0xff8001).rw(this, FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
-	map(0xff8200, 0xff8203).rw(this, FUNC(st_state::shifter_base_r), FUNC(st_state::shifter_base_w)).umask16(0x00ff);
-	map(0xff8204, 0xff8209).r(this, FUNC(st_state::shifter_counter_r)).umask16(0x00ff);
-	map(0xff820a, 0xff820a).rw(this, FUNC(st_state::shifter_sync_r), FUNC(st_state::shifter_sync_w));
-	map(0xff8240, 0xff825f).rw(this, FUNC(st_state::shifter_palette_r), FUNC(st_state::shifter_palette_w));
-	map(0xff8260, 0xff8260).rw(this, FUNC(st_state::shifter_mode_r), FUNC(st_state::shifter_mode_w));
-	map(0xff8604, 0xff8605).rw(this, FUNC(st_state::fdc_data_r), FUNC(st_state::fdc_data_w));
-	map(0xff8606, 0xff8607).rw(this, FUNC(st_state::dma_status_r), FUNC(st_state::dma_mode_w));
-	map(0xff8608, 0xff860d).rw(this, FUNC(st_state::dma_counter_r), FUNC(st_state::dma_base_w)).umask16(0x00ff);
+	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(FUNC(st_state::berr_w));
+	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
+	map(0xff8200, 0xff8203).rw(FUNC(st_state::shifter_base_r), FUNC(st_state::shifter_base_w)).umask16(0x00ff);
+	map(0xff8204, 0xff8209).r(FUNC(st_state::shifter_counter_r)).umask16(0x00ff);
+	map(0xff820a, 0xff820a).rw(FUNC(st_state::shifter_sync_r), FUNC(st_state::shifter_sync_w));
+	map(0xff8240, 0xff825f).rw(FUNC(st_state::shifter_palette_r), FUNC(st_state::shifter_palette_w));
+	map(0xff8260, 0xff8260).rw(FUNC(st_state::shifter_mode_r), FUNC(st_state::shifter_mode_w));
+	map(0xff8604, 0xff8605).rw(FUNC(st_state::fdc_data_r), FUNC(st_state::fdc_data_w));
+	map(0xff8606, 0xff8607).rw(FUNC(st_state::dma_status_r), FUNC(st_state::dma_mode_w));
+	map(0xff8608, 0xff860d).rw(FUNC(st_state::dma_counter_r), FUNC(st_state::dma_base_w)).umask16(0x00ff);
 	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0xfc);
 	map(0xff8802, 0xff8802).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xfc);
 #if 0
-	map(0xff8a00, 0xff8a1f).rw(this, FUNC(st_state::blitter_halftone_r), FUNC(st_state::blitter_halftone_w));
-	map(0xff8a20, 0xff8a21).rw(this, FUNC(st_state::blitter_src_inc_x_r), FUNC(st_state::blitter_src_inc_x_w));
-	map(0xff8a22, 0xff8a23).rw(this, FUNC(st_state::blitter_src_inc_y_r), FUNC(st_state::blitter_src_inc_y_w));
-	map(0xff8a24, 0xff8a27).rw(this, FUNC(st_state::blitter_src_r), FUNC(st_state::blitter_src_w));
-	map(0xff8a28, 0xff8a2d).rw(this, FUNC(st_state::blitter_end_mask_r), FUNC(st_state::blitter_end_mask_w));
-	map(0xff8a2e, 0xff8a2f).rw(this, FUNC(st_state::blitter_dst_inc_x_r), FUNC(st_state::blitter_dst_inc_x_w));
-	map(0xff8a30, 0xff8a31).rw(this, FUNC(st_state::blitter_dst_inc_y_r), FUNC(st_state::blitter_dst_inc_y_w));
-	map(0xff8a32, 0xff8a35).rw(this, FUNC(st_state::blitter_dst_r), FUNC(st_state::blitter_dst_w));
-	map(0xff8a36, 0xff8a37).rw(this, FUNC(st_state::blitter_count_x_r), FUNC(st_state::blitter_count_x_w));
-	map(0xff8a38, 0xff8a39).rw(this, FUNC(st_state::blitter_count_y_r), FUNC(st_state::blitter_count_y_w));
-	map(0xff8a3a, 0xff8a3b).rw(this, FUNC(st_state::blitter_op_r), FUNC(st_state::blitter_op_w));
-	map(0xff8a3c, 0xff8a3d).rw(this, FUNC(st_state::blitter_ctrl_r), FUNC(st_state::blitter_ctrl_w));
+	map(0xff8a00, 0xff8a1f).rw(FUNC(st_state::blitter_halftone_r), FUNC(st_state::blitter_halftone_w));
+	map(0xff8a20, 0xff8a21).rw(FUNC(st_state::blitter_src_inc_x_r), FUNC(st_state::blitter_src_inc_x_w));
+	map(0xff8a22, 0xff8a23).rw(FUNC(st_state::blitter_src_inc_y_r), FUNC(st_state::blitter_src_inc_y_w));
+	map(0xff8a24, 0xff8a27).rw(FUNC(st_state::blitter_src_r), FUNC(st_state::blitter_src_w));
+	map(0xff8a28, 0xff8a2d).rw(FUNC(st_state::blitter_end_mask_r), FUNC(st_state::blitter_end_mask_w));
+	map(0xff8a2e, 0xff8a2f).rw(FUNC(st_state::blitter_dst_inc_x_r), FUNC(st_state::blitter_dst_inc_x_w));
+	map(0xff8a30, 0xff8a31).rw(FUNC(st_state::blitter_dst_inc_y_r), FUNC(st_state::blitter_dst_inc_y_w));
+	map(0xff8a32, 0xff8a35).rw(FUNC(st_state::blitter_dst_r), FUNC(st_state::blitter_dst_w));
+	map(0xff8a36, 0xff8a37).rw(FUNC(st_state::blitter_count_x_r), FUNC(st_state::blitter_count_x_w));
+	map(0xff8a38, 0xff8a39).rw(FUNC(st_state::blitter_count_y_r), FUNC(st_state::blitter_count_y_w));
+	map(0xff8a3a, 0xff8a3b).rw(FUNC(st_state::blitter_op_r), FUNC(st_state::blitter_op_w));
+	map(0xff8a3c, 0xff8a3d).rw(FUNC(st_state::blitter_ctrl_r), FUNC(st_state::blitter_ctrl_w));
 #endif
 	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0xfffc00, 0xfffc03).rw(m_acia0, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
@@ -1280,32 +1280,32 @@ void megast_state::megast_map(address_map &map)
 	map(0x200000, 0x3fffff).ram();
 	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
-//  map(0xff7f30, 0xff7f31).rw(this, FUNC(megast_state::blitter_dst_inc_y_r), FUNC(megast_state::blitter_dst_inc_y_w) // for TOS 1.02
-	map(0xff8001, 0xff8001).rw(this, FUNC(megast_state::mmu_r), FUNC(megast_state::mmu_w));
-	map(0xff8200, 0xff8203).rw(this, FUNC(megast_state::shifter_base_r), FUNC(megast_state::shifter_base_w)).umask16(0x00ff);
-	map(0xff8204, 0xff8209).r(this, FUNC(megast_state::shifter_counter_r)).umask16(0x00ff);
-	map(0xff820a, 0xff820a).rw(this, FUNC(megast_state::shifter_sync_r), FUNC(megast_state::shifter_sync_w));
-	map(0xff8240, 0xff825f).rw(this, FUNC(megast_state::shifter_palette_r), FUNC(megast_state::shifter_palette_w));
-	map(0xff8260, 0xff8260).rw(this, FUNC(megast_state::shifter_mode_r), FUNC(megast_state::shifter_mode_w));
-	map(0xff8604, 0xff8605).rw(this, FUNC(megast_state::fdc_data_r), FUNC(megast_state::fdc_data_w));
-	map(0xff8606, 0xff8607).rw(this, FUNC(megast_state::dma_status_r), FUNC(megast_state::dma_mode_w));
-	map(0xff8608, 0xff860d).rw(this, FUNC(megast_state::dma_counter_r), FUNC(megast_state::dma_base_w)).umask16(0x00ff);
+//  map(0xff7f30, 0xff7f31).rw(FUNC(megast_state::blitter_dst_inc_y_r), FUNC(megast_state::blitter_dst_inc_y_w) // for TOS 1.02
+	map(0xff8001, 0xff8001).rw(FUNC(megast_state::mmu_r), FUNC(megast_state::mmu_w));
+	map(0xff8200, 0xff8203).rw(FUNC(megast_state::shifter_base_r), FUNC(megast_state::shifter_base_w)).umask16(0x00ff);
+	map(0xff8204, 0xff8209).r(FUNC(megast_state::shifter_counter_r)).umask16(0x00ff);
+	map(0xff820a, 0xff820a).rw(FUNC(megast_state::shifter_sync_r), FUNC(megast_state::shifter_sync_w));
+	map(0xff8240, 0xff825f).rw(FUNC(megast_state::shifter_palette_r), FUNC(megast_state::shifter_palette_w));
+	map(0xff8260, 0xff8260).rw(FUNC(megast_state::shifter_mode_r), FUNC(megast_state::shifter_mode_w));
+	map(0xff8604, 0xff8605).rw(FUNC(megast_state::fdc_data_r), FUNC(megast_state::fdc_data_w));
+	map(0xff8606, 0xff8607).rw(FUNC(megast_state::dma_status_r), FUNC(megast_state::dma_mode_w));
+	map(0xff8608, 0xff860d).rw(FUNC(megast_state::dma_counter_r), FUNC(megast_state::dma_base_w)).umask16(0x00ff);
 	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0xff8802, 0xff8802).w(YM2149_TAG, FUNC(ay8910_device::data_w));
-	map(0xff8a00, 0xff8a1f).rw(this, FUNC(megast_state::blitter_halftone_r), FUNC(megast_state::blitter_halftone_w));
-	map(0xff8a20, 0xff8a21).rw(this, FUNC(megast_state::blitter_src_inc_x_r), FUNC(megast_state::blitter_src_inc_x_w));
-	map(0xff8a22, 0xff8a23).rw(this, FUNC(megast_state::blitter_src_inc_y_r), FUNC(megast_state::blitter_src_inc_y_w));
-	map(0xff8a24, 0xff8a27).rw(this, FUNC(megast_state::blitter_src_r), FUNC(megast_state::blitter_src_w));
-	map(0xff8a28, 0xff8a2d).rw(this, FUNC(megast_state::blitter_end_mask_r), FUNC(megast_state::blitter_end_mask_w));
-	map(0xff8a2e, 0xff8a2f).rw(this, FUNC(megast_state::blitter_dst_inc_x_r), FUNC(megast_state::blitter_dst_inc_x_w));
-	map(0xff8a30, 0xff8a31).rw(this, FUNC(megast_state::blitter_dst_inc_y_r), FUNC(megast_state::blitter_dst_inc_y_w));
-	map(0xff8a32, 0xff8a35).rw(this, FUNC(megast_state::blitter_dst_r), FUNC(megast_state::blitter_dst_w));
-	map(0xff8a36, 0xff8a37).rw(this, FUNC(megast_state::blitter_count_x_r), FUNC(megast_state::blitter_count_x_w));
-	map(0xff8a38, 0xff8a39).rw(this, FUNC(megast_state::blitter_count_y_r), FUNC(megast_state::blitter_count_y_w));
-	map(0xff8a3a, 0xff8a3b).rw(this, FUNC(megast_state::blitter_op_r), FUNC(megast_state::blitter_op_w));
-	map(0xff8a3c, 0xff8a3d).rw(this, FUNC(megast_state::blitter_ctrl_r), FUNC(megast_state::blitter_ctrl_w));
+	map(0xff8a00, 0xff8a1f).rw(FUNC(megast_state::blitter_halftone_r), FUNC(megast_state::blitter_halftone_w));
+	map(0xff8a20, 0xff8a21).rw(FUNC(megast_state::blitter_src_inc_x_r), FUNC(megast_state::blitter_src_inc_x_w));
+	map(0xff8a22, 0xff8a23).rw(FUNC(megast_state::blitter_src_inc_y_r), FUNC(megast_state::blitter_src_inc_y_w));
+	map(0xff8a24, 0xff8a27).rw(FUNC(megast_state::blitter_src_r), FUNC(megast_state::blitter_src_w));
+	map(0xff8a28, 0xff8a2d).rw(FUNC(megast_state::blitter_end_mask_r), FUNC(megast_state::blitter_end_mask_w));
+	map(0xff8a2e, 0xff8a2f).rw(FUNC(megast_state::blitter_dst_inc_x_r), FUNC(megast_state::blitter_dst_inc_x_w));
+	map(0xff8a30, 0xff8a31).rw(FUNC(megast_state::blitter_dst_inc_y_r), FUNC(megast_state::blitter_dst_inc_y_w));
+	map(0xff8a32, 0xff8a35).rw(FUNC(megast_state::blitter_dst_r), FUNC(megast_state::blitter_dst_w));
+	map(0xff8a36, 0xff8a37).rw(FUNC(megast_state::blitter_count_x_r), FUNC(megast_state::blitter_count_x_w));
+	map(0xff8a38, 0xff8a39).rw(FUNC(megast_state::blitter_count_y_r), FUNC(megast_state::blitter_count_y_w));
+	map(0xff8a3a, 0xff8a3b).rw(FUNC(megast_state::blitter_op_r), FUNC(megast_state::blitter_op_w));
+	map(0xff8a3c, 0xff8a3d).rw(FUNC(megast_state::blitter_ctrl_r), FUNC(megast_state::blitter_ctrl_w));
 	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
-	map(0xfffa40, 0xfffa57).rw(this, FUNC(megast_state::fpu_r), FUNC(megast_state::fpu_w));
+	map(0xfffa40, 0xfffa57).rw(FUNC(megast_state::fpu_r), FUNC(megast_state::fpu_w));
 	map(0xfffc00, 0xfffc03).rw(m_acia0, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0xfffc04, 0xfffc07).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0xfffc20, 0xfffc3f).rw(RP5C15_TAG, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
@@ -2050,7 +2050,7 @@ MACHINE_CONFIG_START(st_state::st)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, st_state, psg_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
@@ -2061,7 +2061,7 @@ MACHINE_CONFIG_START(st_state::st)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -2140,7 +2140,7 @@ MACHINE_CONFIG_START(megast_state::megast)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, st_state, psg_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
@@ -2152,7 +2152,7 @@ MACHINE_CONFIG_START(megast_state::megast)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -2233,7 +2233,7 @@ MACHINE_CONFIG_START(ste_state::ste)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, st_state, psg_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 /*
@@ -2251,7 +2251,7 @@ MACHINE_CONFIG_START(ste_state::ste)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -2348,7 +2348,7 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, stbook_state, psg_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, U517/8)
@@ -2365,7 +2365,7 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

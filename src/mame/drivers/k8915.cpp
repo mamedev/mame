@@ -16,6 +16,7 @@ When it says DIAGNOSTIC RAZ P, press enter.
 #include "machine/z80sio.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 
 class k8915_state : public driver_device
@@ -28,14 +29,17 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(k8915_a8_w);
+	void k8915(machine_config &config);
+
 	void init_k8915();
+
+private:
+	DECLARE_WRITE8_MEMBER(k8915_a8_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void k8915(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t m_framecnt;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -66,7 +70,7 @@ void k8915_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x50, 0x53).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x58, 0x5b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0xa8, 0xa8).w(this, FUNC(k8915_state::k8915_a8_w));
+	map(0xa8, 0xa8).w(FUNC(k8915_state::k8915_a8_w));
 }
 
 /* Input ports */

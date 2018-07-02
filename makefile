@@ -166,6 +166,12 @@ endif
 ifneq ($(filter powerpc,$(UNAME_P)),)
 PLATFORM := powerpc
 endif
+ifneq ($(filter riscv64%,$(UNAME_M)),)
+PLATFORM := riscv64
+endif
+ifneq ($(filter riscv64%,$(UNAME_P)),)
+PLATFORM := riscv64
+endif
 ifneq ($(filter mips64%,$(UNAME_M)),)
 ifeq ($(shell getconf LONG_BIT),64)
 PLATFORM := mips64
@@ -344,6 +350,13 @@ endif
 endif
 
 ifeq ($(findstring s390x,$(UNAME)),s390x)
+ifndef NOASM
+	NOASM := 1
+endif
+endif
+
+ifeq ($(findstring riscv64,$(UNAME)),riscv64)
+ARCHITECTURE :=
 ifndef NOASM
 	NOASM := 1
 endif
@@ -1571,14 +1584,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.198"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.199"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc
-	@echo #define BARE_BUILD_VERSION "0.198" > $@
+	@echo #define BARE_BUILD_VERSION "0.199" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@

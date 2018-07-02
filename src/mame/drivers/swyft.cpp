@@ -261,6 +261,7 @@ ToDo:
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -298,8 +299,8 @@ ToDo:
 class swyft_state : public driver_device
 {
 public:
-	swyft_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	swyft_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ctx(*this, "ctx"),
 		m_ctx_data_out(*this, "ctx_data_out"),
@@ -316,8 +317,11 @@ public:
 		m_y5(*this, "Y5"),
 		m_y6(*this, "Y6"),
 		m_y7(*this, "Y7")*/
-		{ }
+	{ }
 
+	void swyft(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<centronics_device> m_ctx;
 	optional_device<output_latch_device> m_ctx_data_out;
@@ -367,12 +371,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
-	uint8_t m_keyboard_line;
-	uint8_t m_floppy_control;
-
-	void swyft(machine_config &config);
 	void swyft_mem(address_map &map);
-//protected:
+
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
@@ -567,10 +567,10 @@ void swyft_state::swyft_mem(address_map &map)
 	map.global_mask(0xfffff);
 	map(0x000000, 0x00ffff).rom(); // 64 KB ROM
 	map(0x040000, 0x07ffff).ram().share("p_swyft_vram"); // 256 KB RAM
-	map(0x0d0000, 0x0d000f).r(this, FUNC(swyft_state::swyft_d0000)); // status of something? reads from d0000, d0004, d0008, d000a, d000e
+	map(0x0d0000, 0x0d000f).r(FUNC(swyft_state::swyft_d0000)); // status of something? reads from d0000, d0004, d0008, d000a, d000e
 	map(0x0e1000, 0x0e1000).w(m_acia6850, FUNC(acia6850_device::control_w)); // 6850 ACIA lives here
-	map(0x0e2000, 0x0e2fff).rw(this, FUNC(swyft_state::swyft_via0_r), FUNC(swyft_state::swyft_via0_w)); // io area with selector on a9 a8 a7 a6?
-	map(0x0e4000, 0x0e4fff).rw(this, FUNC(swyft_state::swyft_via1_r), FUNC(swyft_state::swyft_via1_w));
+	map(0x0e2000, 0x0e2fff).rw(FUNC(swyft_state::swyft_via0_r), FUNC(swyft_state::swyft_via0_w)); // io area with selector on a9 a8 a7 a6?
+	map(0x0e4000, 0x0e4fff).rw(FUNC(swyft_state::swyft_via1_r), FUNC(swyft_state::swyft_via1_w));
 }
 
 MACHINE_START_MEMBER(swyft_state,swyft)

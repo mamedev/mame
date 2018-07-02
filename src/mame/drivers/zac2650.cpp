@@ -28,15 +28,15 @@
 void zac2650_state::main_map(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
-	map(0x1800, 0x1bff).ram().w(this, FUNC(zac2650_state::tinvader_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(zac2650_state::tinvader_videoram_w)).share("videoram");
 	map(0x1c00, 0x1cff).ram();
 	map(0x1d00, 0x1dff).ram();
-	map(0x1e80, 0x1e80).r(this, FUNC(zac2650_state::tinvader_port_0_r)).w(this, FUNC(zac2650_state::tinvader_sound_w));
+	map(0x1e80, 0x1e80).r(FUNC(zac2650_state::tinvader_port_0_r)).w(FUNC(zac2650_state::tinvader_sound_w));
 	map(0x1e81, 0x1e81).portr("1E81");
 	map(0x1e82, 0x1e82).portr("1E82");
 	map(0x1e85, 0x1e85).portr("1E85");                   /* Dodgem Only */
 	map(0x1e86, 0x1e86).portr("1E86").nopw();       /* Dodgem Only */
-	map(0x1f00, 0x1fff).rw(this, FUNC(zac2650_state::zac_s2636_r), FUNC(zac2650_state::zac_s2636_w)).share("s2636_0_ram");
+	map(0x1f00, 0x1fff).rw(FUNC(zac2650_state::zac_s2636_r), FUNC(zac2650_state::zac_s2636_w)).share("s2636_0_ram");
 }
 
 static INPUT_PORTS_START( tinvader )

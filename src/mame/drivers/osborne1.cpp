@@ -102,17 +102,17 @@ static constexpr XTAL MAIN_CLOCK = 15.9744_MHz_XTAL;
 
 void osborne1_state::osborne1_mem(address_map &map)
 {
-	map(0x0000, 0x0FFF).bankr("bank_0xxx").w(this, FUNC(osborne1_state::bank_0xxx_w));
-	map(0x1000, 0x1FFF).bankr("bank_1xxx").w(this, FUNC(osborne1_state::bank_1xxx_w));
-	map(0x2000, 0x3FFF).rw(this, FUNC(osborne1_state::bank_2xxx_3xxx_r), FUNC(osborne1_state::bank_2xxx_3xxx_w));
+	map(0x0000, 0x0FFF).bankr(m_bank_0xxx).w(FUNC(osborne1_state::bank_0xxx_w));
+	map(0x1000, 0x1FFF).bankr(m_bank_1xxx).w(FUNC(osborne1_state::bank_1xxx_w));
+	map(0x2000, 0x3FFF).rw(FUNC(osborne1_state::bank_2xxx_3xxx_r), FUNC(osborne1_state::bank_2xxx_3xxx_w));
 	map(0x4000, 0xEFFF).ram();
-	map(0xF000, 0xFFFF).bankr("bank_fxxx").w(this, FUNC(osborne1_state::videoram_w));
+	map(0xF000, 0xFFFF).bankr(m_bank_fxxx).w(FUNC(osborne1_state::videoram_w));
 }
 
 
 void osborne1_state::osborne1_op(address_map &map)
 {
-	map(0x0000, 0xFFFF).r(this, FUNC(osborne1_state::opcode_r));
+	map(0x0000, 0xFFFF).r(FUNC(osborne1_state::opcode_r));
 }
 
 
@@ -121,7 +121,7 @@ void osborne1_state::osborne1_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 
-	map(0x00, 0x03).mirror(0xfc).w(this, FUNC(osborne1_state::bankswitch_w));
+	map(0x00, 0x03).mirror(0xfc).w(FUNC(osborne1_state::bankswitch_w));
 }
 
 void osborne1_state::osborne1nv_io(address_map &map)
@@ -129,7 +129,7 @@ void osborne1_state::osborne1nv_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 
-	map( 0x00, 0x03 ).w(this, FUNC(osborne1_state::bankswitch_w));
+	map( 0x00, 0x03 ).w(FUNC(osborne1_state::bankswitch_w));
 	map( 0x04, 0x04 ).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map( 0x05, 0x05 ).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	// seems to be something at 0x06 as well, but no idea what - BIOS writes 0x07 on boot
@@ -304,10 +304,10 @@ MACHINE_CONFIG_START(osborne1_state::osborne1)
 	MCFG_DEVICE_ADD(m_pia0, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(m_ieee, ieee488_device, dio_r))
 	MCFG_PIA_READPB_HANDLER(READ8(*this, osborne1_state, ieee_pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(m_ieee, ieee488_device, dio_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(m_ieee, ieee488_device, host_dio_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, osborne1_state, ieee_pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(m_ieee, ieee488_device, ifc_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(m_ieee, ieee488_device, ren_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(m_ieee, ieee488_device, host_ifc_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(m_ieee, ieee488_device, host_ren_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, osborne1_state, ieee_pia_irq_a_func))
 
 	MCFG_IEEE488_BUS_ADD()

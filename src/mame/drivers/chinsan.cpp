@@ -26,6 +26,7 @@
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -37,14 +38,14 @@
 class chinsan_state : public driver_device
 {
 public:
-	chinsan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	chinsan_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_video_ram(*this, "video_ram"), m_color_ram(*this, "color_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_adpcm(*this, "adpcm"),
-		m_inputs_p1{ {*this, "p1_0"}, {*this, "p1_1"}, {*this, "p1_2"}, {*this, "p1_3"}, {*this, "p1_4"} },
-		m_inputs_p2{ {*this, "p2_0"}, {*this, "p2_1"}, {*this, "p2_2"}, {*this, "p2_3"}, {*this, "p2_4"} },
+		m_inputs_p1(*this, "p1_%u", 0U),
+		m_inputs_p2(*this, "p2_%u", 0U),
 		m_bank1(*this, "bank1"), m_bank0d(*this, "bank0d"), m_bank1d(*this, "bank1d"),
 		m_tilemap(nullptr),
 		m_int_enabled(false),
@@ -82,8 +83,8 @@ private:
 	required_shared_ptr<uint8_t> m_color_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<msm5205_device> m_adpcm;
-	required_ioport m_inputs_p1[5];
-	required_ioport m_inputs_p2[5];
+	required_ioport_array<5> m_inputs_p1;
+	required_ioport_array<5> m_inputs_p2;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
@@ -125,14 +126,14 @@ void chinsan_state::chinsan_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x11).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x20, 0x20).w(this, FUNC(chinsan_state::adpcm_w));
-	map(0x30, 0x30).w(this, FUNC(chinsan_state::ctrl_w));
+	map(0x20, 0x20).w(FUNC(chinsan_state::adpcm_w));
+	map(0x30, 0x30).w(FUNC(chinsan_state::ctrl_w));
 }
 
 void chinsan_state::mayumi_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x30, 0x30).portr("extra").w(this, FUNC(chinsan_state::ctrl_w));
+	map(0x30, 0x30).portr("extra").w(FUNC(chinsan_state::ctrl_w));
 	map(0xc0, 0xc3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xd0, 0xd1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
@@ -418,7 +419,7 @@ WRITE_LINE_MEMBER( chinsan_state::adpcm_int_w )
 		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
-		m_adpcm->data_w(m_adpcm_data & 0xf);
+		m_adpcm->write_data(m_adpcm_data & 0xf);
 		m_trigger ^= 1;
 		if (m_trigger == 0)
 		{

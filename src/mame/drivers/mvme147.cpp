@@ -197,7 +197,10 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 		, m_sccterm2(*this, "scc2")
 	{
 	}
+	
+	void mvme147(machine_config &config);
 
+private:
 	DECLARE_READ32_MEMBER (bootvect_r);
 	DECLARE_WRITE32_MEMBER (bootvect_w);
 	/* PCC - Peripheral Channel Controller */
@@ -215,11 +218,8 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 	//DECLARE_WRITE16_MEMBER (vme_a16_w);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
-	void mvme147(machine_config &config);
 	void mvme147_mem(address_map &map);
-protected:
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<scc85c30_device> m_sccterm;
 	required_device<scc85c30_device> m_sccterm2;
@@ -238,8 +238,8 @@ private:
 void mvme147_state::mvme147_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000000, 0x00000007).ram().w(this, FUNC(mvme147_state::bootvect_w));       /* After first write we act as RAM */
-	map(0x00000000, 0x00000007).rom().r(this, FUNC(mvme147_state::bootvect_r));       /* ROM mirror just during reset */
+	map(0x00000000, 0x00000007).ram().w(FUNC(mvme147_state::bootvect_w));       /* After first write we act as RAM */
+	map(0x00000000, 0x00000007).rom().r(FUNC(mvme147_state::bootvect_r));       /* ROM mirror just during reset */
 	map(0x00000008, 0x003fffff).ram(); /* 4 Mb RAM */
 	map(0xff800000, 0xff9fffff).rom().region("roms", 0x800000); //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 1 - 147bug */
 	map(0xffa00000, 0xffbfffff).rom().region("roms", 0xa00000); //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 2 - unpopulated */
@@ -248,9 +248,9 @@ void mvme147_state::mvme147_mem(address_map &map)
 	map(0xfffe0000, 0xfffe0fff).rw("m48t18", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 
 		//AM_RANGE (0xfffe1000, 0xfffe100f) AM_READWRITE32(pcc32_r, pcc32_w, 0xffffffff) /* PCC 32 bits registers  - needs U64 cast defined to work */
-	map(0xfffe1010, 0xfffe1017).rw(this, FUNC(mvme147_state::pcc16_r), FUNC(mvme147_state::pcc16_w)); /* PCC 16 bits registers */
-	map(0xfffe1018, 0xfffe102f).rw(this, FUNC(mvme147_state::pcc8_r), FUNC(mvme147_state::pcc8_w)); /* PCC 8 bits registers */
-	map(0xfffe2000, 0xfffe201b).rw(this, FUNC(mvme147_state::vmechip_r), FUNC(mvme147_state::vmechip_w)).umask32(0x00ff00ff); /* VMEchip 8 bits registers on odd adresses */
+	map(0xfffe1010, 0xfffe1017).rw(FUNC(mvme147_state::pcc16_r), FUNC(mvme147_state::pcc16_w)); /* PCC 16 bits registers */
+	map(0xfffe1018, 0xfffe102f).rw(FUNC(mvme147_state::pcc8_r), FUNC(mvme147_state::pcc8_w)); /* PCC 8 bits registers */
+	map(0xfffe2000, 0xfffe201b).rw(FUNC(mvme147_state::vmechip_r), FUNC(mvme147_state::vmechip_w)).umask32(0x00ff00ff); /* VMEchip 8 bits registers on odd adresses */
 
 	map(0xfffe3000, 0xfffe3003).rw(m_sccterm, FUNC(scc85c30_device::ba_cd_inv_r), FUNC(scc85c30_device::ba_cd_inv_w)); /* Port 1&2 - Dual serial port Z80-SCC */
 	map(0xfffe3800, 0xfffe3803).rw(m_sccterm2, FUNC(scc85c30_device::ba_cd_inv_r), FUNC(scc85c30_device::ba_cd_inv_w)); /* Port 3&4 - Dual serial port Z80-SCC */

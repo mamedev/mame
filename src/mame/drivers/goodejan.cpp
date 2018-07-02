@@ -77,6 +77,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "video/seibu_crtc.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -96,6 +97,10 @@ public:
 		m_sc3_vram(*this, "sc3_vram"),
 		m_spriteram16(*this, "sprite_ram") { }
 
+	void totmejan(machine_config &config);
+	void goodejan(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -138,8 +143,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void totmejan(machine_config &config);
-	void goodejan(machine_config &config);
 	void common_io_map(address_map &map);
 	void goodejan_io_map(address_map &map);
 	void goodejan_map(address_map &map);
@@ -440,12 +443,12 @@ WRITE16_MEMBER(goodejan_state::mahjong_panel_w)
 void goodejan_state::goodejan_map(address_map &map)
 {
 	map(0x00000, 0x0afff).ram();
-	map(0x0c000, 0x0c7ff).ram().w(this, FUNC(goodejan_state::seibucrtc_sc0vram_w)).share("sc0_vram");
-	map(0x0c800, 0x0cfff).ram().w(this, FUNC(goodejan_state::seibucrtc_sc3vram_w)).share("sc3_vram");
+	map(0x0c000, 0x0c7ff).ram().w(FUNC(goodejan_state::seibucrtc_sc0vram_w)).share("sc0_vram");
+	map(0x0c800, 0x0cfff).ram().w(FUNC(goodejan_state::seibucrtc_sc3vram_w)).share("sc3_vram");
 	map(0x0d000, 0x0dfff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	/*Guess: these two aren't used/initialized at all.*/
-	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(goodejan_state::seibucrtc_sc1vram_w)).share("sc1_vram");
-	map(0x0e800, 0x0efff).ram().w(this, FUNC(goodejan_state::seibucrtc_sc2vram_w)).share("sc2_vram");
+	map(0x0e000, 0x0e7ff).ram().w(FUNC(goodejan_state::seibucrtc_sc1vram_w)).share("sc1_vram");
+	map(0x0e800, 0x0efff).ram().w(FUNC(goodejan_state::seibucrtc_sc2vram_w)).share("sc2_vram");
 	map(0x0f800, 0x0ffff).ram().share("sprite_ram");
 	map(0xc0000, 0xfffff).rom();
 }
@@ -453,12 +456,12 @@ void goodejan_state::goodejan_map(address_map &map)
 /* totmejan CRTC is at 8000-804f,goodejan is at 8000-807f */
 void goodejan_state::common_io_map(address_map &map)
 {
-	map(0x9000, 0x9001).w(this, FUNC(goodejan_state::gfxbank_w));
+	map(0x9000, 0x9001).w(FUNC(goodejan_state::gfxbank_w));
 	map(0xb000, 0xb003).nopw();
-	map(0xb004, 0xb005).w(this, FUNC(goodejan_state::mahjong_panel_w));
+	map(0xb004, 0xb005).w(FUNC(goodejan_state::mahjong_panel_w));
 
 	map(0xc000, 0xc001).portr("DSW1");
-	map(0xc002, 0xc003).r(this, FUNC(goodejan_state::mahjong_panel_r));
+	map(0xc002, 0xc003).r(FUNC(goodejan_state::mahjong_panel_r));
 	map(0xc004, 0xc005).portr("DSW2"); // switches
 	map(0xd000, 0xd00f).rw("seibu_sound", FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 }
@@ -658,6 +661,7 @@ MACHINE_CONFIG_START(goodejan_state::goodejan)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, GOODEJAN_MHZ1/2)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

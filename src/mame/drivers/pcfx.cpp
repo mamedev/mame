@@ -20,16 +20,18 @@
 class pcfx_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_PAD_FUNC
-	};
-
 	pcfx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_huc6261(*this, "huc6261") { }
 
+	void pcfx(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_PAD_FUNC
+	};
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( irq_read );
@@ -49,15 +51,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq15_w );
 	TIMER_CALLBACK_MEMBER(pad_func);
 
-	void pcfx(machine_config &config);
 	void pcfx_io(address_map &map);
 	void pcfx_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void machine_reset() override;
 
-private:
 	// Interrupt controller (component unknown)
 	uint16_t m_irq_mask;
 	uint16_t m_irq_pending;
@@ -188,7 +188,7 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 
 void pcfx_state::pcfx_io(address_map &map)
 {
-	map(0x00000000, 0x000000FF).rw(this, FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
+	map(0x00000000, 0x000000FF).rw(FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
 	map(0x00000100, 0x000001FF).noprw();   /* HuC6230 */
 	map(0x00000200, 0x000002FF).m("huc6271", FUNC(huc6271_device::regs)).umask32(0x0000ffff);   /* HuC6271 */
 	map(0x00000300, 0x000003FF).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
@@ -196,7 +196,7 @@ void pcfx_state::pcfx_io(address_map &map)
 	map(0x00000500, 0x000005FF).rw("huc6270_b", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-B */
 	map(0x00000600, 0x000006FF).rw("huc6272", FUNC(huc6272_device::read), FUNC(huc6272_device::write));    /* HuC6272 */
 	map(0x00000C80, 0x00000C83).noprw();
-	map(0x00000E00, 0x00000EFF).rw(this, FUNC(pcfx_state::irq_read), FUNC(pcfx_state::irq_write)).umask32(0x0000ffff);    /* Interrupt controller */
+	map(0x00000E00, 0x00000EFF).rw(FUNC(pcfx_state::irq_read), FUNC(pcfx_state::irq_write)).umask32(0x0000ffff);    /* Interrupt controller */
 	map(0x00000F00, 0x00000FFF).noprw();
 //  AM_RANGE( 0x00600000, 0x006FFFFF ) AM_READ(scsi_ctrl_r)
 	map(0x00780000, 0x007FFFFF).rom().region("scsi_rom", 0);

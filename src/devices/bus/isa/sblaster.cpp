@@ -5,7 +5,6 @@
   ISA 8/16 bit Creative Labs Sound Blaster Sound Card
 
   TODO:
-  - implement DAC
   - DSP type is a MCS-51 family, it has an internal ROM that needs decapping;
   - implement jumpers DIP-SWs;
 
@@ -327,6 +326,8 @@ void sb_device::process_fifo(uint8_t cmd)
 		switch(cmd)
 		{
 			case 0x10:  // Direct DAC
+				m_ldac->write(m_dsp.fifo[1] << 8);
+				m_rdac->write(m_dsp.fifo[1] << 8);
 				break;
 
 			case 0x14:  // 8-bit DMA, no autoinit

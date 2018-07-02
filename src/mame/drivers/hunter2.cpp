@@ -29,6 +29,7 @@
 #include "machine/nvram.h"
 #include "sound/spkrdev.h"
 #include "video/hd61830.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -50,6 +51,11 @@ public:
 		, m_bank3(*this, "bank3")
 	{ }
 
+	void hunter2(machine_config &config);
+
+	void init_hunter2();
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_READ8_MEMBER(serial_dsr_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
@@ -63,17 +69,16 @@ public:
 	DECLARE_WRITE8_MEMBER(irqctrl_w);
 	DECLARE_WRITE8_MEMBER(memmap_w);
 	DECLARE_PALETTE_INIT(hunter2);
-	void init_hunter2();
+
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
 	DECLARE_WRITE_LINE_MEMBER(timer1_out);
 	DECLARE_WRITE_LINE_MEMBER(cts_w);
 	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 
-	void hunter2(machine_config &config);
 	void hunter2_banked_mem(address_map &map);
 	void hunter2_io(address_map &map);
 	void hunter2_mem(address_map &map);
-private:
+
 	uint8_t m_keydata;
 	uint8_t m_irq_mask;
 	virtual void machine_reset() override;
@@ -113,14 +118,14 @@ void hunter2_state::hunter2_io(address_map &map)
 	map(0x21, 0x21).rw("lcdc", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
 	map(0x3e, 0x3e).r("lcdc", FUNC(hd61830_device::data_r));
 	map(0x40, 0x4f).rw("rtc", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
-	map(0x60, 0x60).w(this, FUNC(hunter2_state::display_ctrl_w));
-	map(0x80, 0x80).w(this, FUNC(hunter2_state::port80_w));
-	map(0x81, 0x81).w(this, FUNC(hunter2_state::serial_tx_w));
-	map(0x82, 0x82).w(this, FUNC(hunter2_state::serial_dtr_w));
-	map(0x84, 0x84).w(this, FUNC(hunter2_state::serial_rts_w));
-	map(0x86, 0x86).w(this, FUNC(hunter2_state::speaker_w));
-	map(0xbb, 0xbb).w(this, FUNC(hunter2_state::irqctrl_w));
-	map(0xe0, 0xe0).w(this, FUNC(hunter2_state::memmap_w));
+	map(0x60, 0x60).w(FUNC(hunter2_state::display_ctrl_w));
+	map(0x80, 0x80).w(FUNC(hunter2_state::port80_w));
+	map(0x81, 0x81).w(FUNC(hunter2_state::serial_tx_w));
+	map(0x82, 0x82).w(FUNC(hunter2_state::serial_dtr_w));
+	map(0x84, 0x84).w(FUNC(hunter2_state::serial_rts_w));
+	map(0x86, 0x86).w(FUNC(hunter2_state::speaker_w));
+	map(0xbb, 0xbb).w(FUNC(hunter2_state::irqctrl_w));
+	map(0xe0, 0xe0).w(FUNC(hunter2_state::memmap_w));
 }
 
 

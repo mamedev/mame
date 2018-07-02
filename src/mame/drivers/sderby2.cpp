@@ -35,6 +35,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "speaker.h"
 #include "screen.h"
 #include "video/resnet.h"
@@ -51,11 +52,15 @@ public:
 		m_proms(*this, "proms"),
 		m_palette(*this, "palette") { }
 
+	void sderby2(machine_config &config);
+
+	void init_sderby2();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	void init_sderby2();
 	DECLARE_PALETTE_INIT(sderby2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -78,7 +83,6 @@ public:
 	uint8_t sub_data;
 	uint8_t main_data;
 	uint8_t host_io_40;
-	void sderby2(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_program_map(address_map &map);
 	void sub_io_map(address_map &map);
@@ -198,10 +202,10 @@ void sderby2_state::main_program_map(address_map &map)
 void sderby2_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).r(this, FUNC(sderby2_state::host_r));
-	map(0x20, 0x20).w(this, FUNC(sderby2_state::sub_nmi));
+	map(0x10, 0x10).r(FUNC(sderby2_state::host_r));
+	map(0x20, 0x20).w(FUNC(sderby2_state::sub_nmi));
 	map(0x30, 0x30).nopw(); // Written with 0x12 byte sequence at start
-	map(0x40, 0x40).w(this, FUNC(sderby2_state::host_io_40_w)); // Occasionally written
+	map(0x40, 0x40).w(FUNC(sderby2_state::host_io_40_w)); // Occasionally written
 }
 
 
@@ -228,9 +232,9 @@ void sderby2_state::sub_program_map(address_map &map)
 void sderby2_state::sub_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(sderby2_state::sub_io_0_r));
-	map(0x20, 0x20).r(this, FUNC(sderby2_state::sub_r));
-	map(0x40, 0x40).w(this, FUNC(sderby2_state::main_nmi));
+	map(0x00, 0x00).r(FUNC(sderby2_state::sub_io_0_r));
+	map(0x20, 0x20).r(FUNC(sderby2_state::sub_r));
+	map(0x40, 0x40).w(FUNC(sderby2_state::main_nmi));
 	map(0x60, 0x60).nopw(); // Written with 0x12 byte sequence at start
 }
 

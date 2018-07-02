@@ -332,11 +332,6 @@ void sn76496_base_device::write(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( sn76496_base_device::write )
-{
-	write(data);
-}
-
 inline bool sn76496_base_device::in_noise_mode()
 {
 	return ((m_register[6] & 4)!=0);

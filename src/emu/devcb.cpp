@@ -815,7 +815,7 @@ void devcb_write_base::write_output_adapter(address_space &space, offs_t offset,
 void devcb_write_base::write_logged_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
 	if (unshift_mask_xor(data) != 0)
-		m_owner.logerror("%s: %s\n", m_owner.machine().describe_context(), m_base.get().subtag(m_target_tag));
+		m_owner.logerror("%s: %s\n", m_owner.machine().describe_context(), m_target_tag);
 }
 
 

@@ -38,6 +38,7 @@
 #include "machine/isbc_215g.h"
 #include "machine/keyboard.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -66,6 +67,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void a7150(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -103,7 +107,7 @@ public:
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
-	void a7150(machine_config &config);
+
 	void a7150_io(address_map &map);
 	void a7150_mem(address_map &map);
 	void k7070_cpu_banked(address_map &map);
@@ -324,7 +328,7 @@ void a7150_state::a7150_io(address_map &map)
 	map(0x00d0, 0x00d7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x0200, 0x0203).rw(this, FUNC(a7150_state::a7150_kgs_r), FUNC(a7150_state::a7150_kgs_w)).umask16(0x00ff); // ABS/KGS board
+	map(0x0200, 0x0203).rw(FUNC(a7150_state::a7150_kgs_r), FUNC(a7150_state::a7150_kgs_w)).umask16(0x00ff); // ABS/KGS board
 	map(0x0300, 0x031f).unmaprw(); // ASP board #1
 	map(0x0320, 0x033f).unmaprw(); // ASP board #2
 }
@@ -362,7 +366,7 @@ void a7150_state::k7070_cpu_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x0000, 0x0003).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0008, 0x000b).rw(Z80SIO_TAG, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-	map(0x0010, 0x0017).rw(this, FUNC(a7150_state::kgs_host_r), FUNC(a7150_state::kgs_host_w)); // p. 11 of KGS-K7070.pdf
+	map(0x0010, 0x0017).rw(FUNC(a7150_state::kgs_host_r), FUNC(a7150_state::kgs_host_w)); // p. 11 of KGS-K7070.pdf
 
 	map(0x0020, 0x0021).noprw(); // address register
 	map(0x0022, 0x0022).noprw(); // function register (p. 6 of ABG-K7072.pdf)
@@ -481,8 +485,8 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 
 	// IFSP port on processor card
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-//  MCFG_I8255_IN_PORTA_CB(READ8("cent_status_in", input_buffer_device, read))
-//  MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, write))
+//  MCFG_I8255_IN_PORTA_CB(READ8("cent_status_in", input_buffer_device, bus_r))
+//  MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, a7150_state, ppi_c_w))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
@@ -506,7 +510,7 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
 
-	MCFG_ISBC_215_ADD("isbc_215g", 0x4a, "maincpu")
+	MCFG_DEVICE_ADD("isbc_215g", ISBC_215G, 0x4a, "maincpu")
 	MCFG_ISBC_215_IRQ(WRITELINE("pic8259", pic8259_device, ir5_w))
 
 	// KGS K7070 graphics terminal controlling ABG K7072 framebuffer

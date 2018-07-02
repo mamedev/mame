@@ -11,6 +11,7 @@
 #pragma once
 
 #include "audio/exidy440.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define EXIDY440_MASTER_CLOCK       (XTAL(12'979'200))

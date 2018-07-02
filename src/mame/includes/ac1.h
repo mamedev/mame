@@ -11,6 +11,7 @@
 
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
+#include "emupal.h"
 
 class ac1_state : public driver_device
 {

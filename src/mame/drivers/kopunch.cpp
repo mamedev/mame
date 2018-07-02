@@ -76,8 +76,8 @@ void kopunch_state::kopunch_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x6000, 0x63ff).ram().w(this, FUNC(kopunch_state::vram_fg_w)).share("vram_fg");
-	map(0x7000, 0x70ff).ram().w(this, FUNC(kopunch_state::vram_bg_w)).share("vram_bg");
+	map(0x6000, 0x63ff).ram().w(FUNC(kopunch_state::vram_fg_w)).share("vram_fg");
+	map(0x7000, 0x70ff).ram().w(FUNC(kopunch_state::vram_bg_w)).share("vram_bg");
 	map(0x7100, 0x73ff).ram(); // unused vram
 	map(0x7400, 0x7bff).ram(); // more unused vram? or accidental writes?
 }

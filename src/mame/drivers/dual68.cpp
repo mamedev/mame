@@ -26,14 +26,15 @@ public:
 		, m_p_ram(*this, "ram")
 	{ }
 
+	void dual68(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_WRITE16_MEMBER(terminal_w);
 
-	void dual68(machine_config &config);
 	void dual68_mem(address_map &map);
 	void sio4_io(address_map &map);
 	void sio4_mem(address_map &map);
-private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -53,7 +54,7 @@ void dual68_state::dual68_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000ffff).ram().share("ram");
 	map(0x00080000, 0x00081fff).rom().region("user1", 0);
-	map(0x007f0000, 0x007f0001).w(this, FUNC(dual68_state::terminal_w));
+	map(0x007f0000, 0x007f0001).w(FUNC(dual68_state::terminal_w));
 	map(0x00800000, 0x00801fff).rom().region("user1", 0);
 }
 

@@ -18,6 +18,7 @@ class vis_audio_device : public device_t,
 {
 public:
 	vis_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	DECLARE_READ8_MEMBER(pcm_r);
 	DECLARE_WRITE8_MEMBER(pcm_w);
 protected:
@@ -211,11 +212,10 @@ WRITE8_MEMBER(vis_audio_device::pcm_w)
 	}
 	if((m_mode & 0x10) && (m_mode ^ oldmode))
 	{
-		const int rates[] = {44100, 22050, 11025, 5512};
 		m_samples = 0;
 		m_sample_byte = 0;
 		m_isa->drq7_w(ASSERT_LINE);
-		attotime rate = attotime::from_hz(rates[(m_mode >> 5) & 3]);
+		attotime rate = attotime::from_ticks((double)(1 << ((m_mode >> 5) & 3)), 44100.0); // TODO : Unknown clock
 		m_pcm->adjust(rate, 0, rate);
 	}
 	else if(!(m_mode & 0x10))
@@ -699,6 +699,12 @@ public:
 		m_pic2(*this, "mb:pic8259_slave"),
 		m_pad(*this, "PAD")
 		{ }
+
+	void vis(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(update);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
@@ -714,13 +720,11 @@ public:
 	DECLARE_WRITE16_MEMBER(pad_w);
 	DECLARE_READ8_MEMBER(unk1_r);
 	DECLARE_WRITE8_MEMBER(unk1_w);
-	DECLARE_INPUT_CHANGED_MEMBER(update);
-	void vis(machine_config &config);
 	void at16_io(address_map &map);
 	void at16_map(address_map &map);
-protected:
+
 	void machine_reset() override;
-private:
+
 	uint8_t m_sysctl;
 	uint8_t m_unkidx;
 	uint8_t m_unk[16];
@@ -845,18 +849,18 @@ void vis_state::at16_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x001f).rw("mb:dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x003f).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x0026, 0x0027).rw(this, FUNC(vis_state::unk_r), FUNC(vis_state::unk_w));
+	map(0x0026, 0x0027).rw(FUNC(vis_state::unk_r), FUNC(vis_state::unk_w));
 	map(0x0040, 0x005f).rw("mb:pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0065).rw("kbdc", FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
-	map(0x006a, 0x006a).r(this, FUNC(vis_state::unk2_r));
+	map(0x006a, 0x006a).r(FUNC(vis_state::unk2_r));
 	map(0x0080, 0x009f).rw("mb", FUNC(at_mb_device::page8_r), FUNC(at_mb_device::page8_w));
-	map(0x0092, 0x0092).rw(this, FUNC(vis_state::sysctl_r), FUNC(vis_state::sysctl_w));
+	map(0x0092, 0x0092).rw(FUNC(vis_state::sysctl_r), FUNC(vis_state::sysctl_w));
 	map(0x00a0, 0x00bf).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw("mb:dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
 	map(0x00e0, 0x00e1).noprw();
-	map(0x023c, 0x023f).rw(this, FUNC(vis_state::unk1_r), FUNC(vis_state::unk1_w));
-	map(0x0268, 0x026f).rw(this, FUNC(vis_state::pad_r), FUNC(vis_state::pad_w));
-	map(0x031a, 0x031a).r(this, FUNC(vis_state::unk3_r));
+	map(0x023c, 0x023f).rw(FUNC(vis_state::unk1_r), FUNC(vis_state::unk1_w));
+	map(0x0268, 0x026f).rw(FUNC(vis_state::pad_r), FUNC(vis_state::pad_w));
+	map(0x031a, 0x031a).r(FUNC(vis_state::unk3_r));
 }
 
 static void vis_cards(device_slot_interface &device)

@@ -40,6 +40,7 @@ K051649 (sound)
 #include "video/k054156_k054157_k056832.h"
 #include "video/k052109.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -56,6 +57,11 @@ public:
 		m_oki(*this, "oki")
 	{ }
 
+	void shuriboy(machine_config &config);
+	void ddboy(machine_config &config);
+	void tsukande(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(konmedal);
 	DECLARE_MACHINE_START(shuriboy);
 
@@ -85,18 +91,14 @@ public:
 	DECLARE_READ8_MEMBER(shuri_irq_r);
 	DECLARE_WRITE8_MEMBER(shuri_irq_w);
 
-	void shuriboy(machine_config &config);
-	void ddboy(machine_config &config);
-	void tsukande(machine_config &config);
 	void ddboy_main(address_map &map);
 	void medal_main(address_map &map);
 	void shuriboy_main(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<k056832_device> m_k056832;
 	optional_device<k052109_device> m_k052109;
@@ -232,17 +234,17 @@ void konmedal_state::medal_main(address_map &map)
 	map(0xa000, 0xafff).ram(); // work RAM?
 	map(0xb800, 0xbfff).ram(); // stack goes here
 	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
-	map(0xc100, 0xc100).w(this, FUNC(konmedal_state::control2_w));
-	map(0xc400, 0xc400).w(this, FUNC(konmedal_state::bankswitch_w));
+	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
+	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
 	map(0xc500, 0xc500).noprw(); // read to reset watchdog
 	map(0xc700, 0xc700).portr("DSW2");
 	map(0xc701, 0xc701).portr("DSW1");
 	map(0xc702, 0xc702).portr("IN1");
 	map(0xc703, 0xc703).portr("IN2");
 	map(0xc800, 0xc80f).w(m_k056832, FUNC(k056832_device::b_w));
-	map(0xc80f, 0xc80f).r(this, FUNC(konmedal_state::magic_r));
+	map(0xc80f, 0xc80f).r(FUNC(konmedal_state::magic_r));
 	map(0xd000, 0xd001).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
-	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
+	map(0xe000, 0xffff).rw(FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
 }
 
 void konmedal_state::ddboy_main(address_map &map)
@@ -251,17 +253,17 @@ void konmedal_state::ddboy_main(address_map &map)
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).ram(); // work RAM
 	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
-	map(0xc100, 0xc100).w(this, FUNC(konmedal_state::control2_w));
-	map(0xc400, 0xc400).w(this, FUNC(konmedal_state::bankswitch_w));
+	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
+	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
 	map(0xc500, 0xc500).noprw(); // read to reset watchdog
 	map(0xc702, 0xc702).portr("IN1");
 	map(0xc703, 0xc703).portr("IN2");
 	map(0xc800, 0xc80f).w(m_k056832, FUNC(k056832_device::b_w));
-	map(0xc80f, 0xc80f).r(this, FUNC(konmedal_state::magic_r));
+	map(0xc80f, 0xc80f).r(FUNC(konmedal_state::magic_r));
 	map(0xcc00, 0xcc00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xd000, 0xd000).nopw();    // ???  writes 00 and 3f every frame
 	map(0xd800, 0xd8ff).m("k051649", FUNC(k051649_device::scc_map));
-	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
+	map(0xe000, 0xffff).rw(FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
 }
 
 void konmedal_state::shuriboy_main(address_map &map)
@@ -273,15 +275,15 @@ void konmedal_state::shuriboy_main(address_map &map)
 	map(0x8802, 0x8802).portr("DSW1");
 	map(0x8803, 0x8803).portr("DSW2");
 	map(0x8b00, 0x8b00).nopw();    // watchdog?
-	map(0x8c00, 0x8c00).w(this, FUNC(konmedal_state::shuri_bank_w));
+	map(0x8c00, 0x8c00).w(FUNC(konmedal_state::shuri_bank_w));
 	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xdbff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
-	map(0xdd00, 0xdd00).rw(this, FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
-	map(0xdd80, 0xdd80).w(this, FUNC(konmedal_state::shuri_control_w));
-	map(0xde00, 0xde00).w(this, FUNC(konmedal_state::shuri_vrom_addr_w));
-	map(0xdf00, 0xdf00).w(this, FUNC(konmedal_state::shuri_vrom_bank_w));
-	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::shuri_video_r), FUNC(konmedal_state::shuri_video_w));
+	map(0xdd00, 0xdd00).rw(FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
+	map(0xdd80, 0xdd80).w(FUNC(konmedal_state::shuri_control_w));
+	map(0xde00, 0xde00).w(FUNC(konmedal_state::shuri_vrom_addr_w));
+	map(0xdf00, 0xdf00).w(FUNC(konmedal_state::shuri_vrom_bank_w));
+	map(0xe000, 0xffff).rw(FUNC(konmedal_state::shuri_video_r), FUNC(konmedal_state::shuri_video_w));
 }
 
 static INPUT_PORTS_START( konmedal )

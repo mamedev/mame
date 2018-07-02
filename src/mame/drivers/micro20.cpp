@@ -40,6 +40,9 @@ public:
 	{
 	}
 
+	void micro20(machine_config &config);
+
+private:
 	required_device<m68020_device> m_maincpu;
 	required_memory_region m_rom;
 	required_shared_ptr<uint32_t> m_mainram;
@@ -62,9 +65,8 @@ public:
 		m_maincpu->set_input_line(M68K_IRQ_4, state);
 	}
 
-	void micro20(machine_config &config);
 	void micro20_map(address_map &map);
-private:
+
 	u8 m_tin;
 	u8 m_h4;
 };
@@ -143,7 +145,7 @@ READ32_MEMBER(micro20_state::buserror_r)
 void micro20_state::micro20_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("mainram");
-	map(0x00200000, 0x002fffff).r(this, FUNC(micro20_state::buserror_r));
+	map(0x00200000, 0x002fffff).r(FUNC(micro20_state::buserror_r));
 	map(0x00800000, 0x0083ffff).rom().region("bootrom", 0);
 	map(0xffff8000, 0xffff8000).rw(FDC_TAG, FUNC(wd1772_device::status_r), FUNC(wd1772_device::cmd_w));
 	map(0xffff8001, 0xffff8001).rw(FDC_TAG, FUNC(wd1772_device::track_r), FUNC(wd1772_device::track_w));

@@ -30,7 +30,9 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void sc2(machine_config &config);
 
+private:
 	DECLARE_READ8_MEMBER(pio_port_a_r);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
@@ -44,7 +46,6 @@ public:
 	void sc2_update_display();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void sc2(machine_config &config);
 	void sc2_io(address_map &map);
 	void sc2_mem(address_map &map);
 
@@ -72,7 +73,7 @@ void sc2_state::sc2_mem(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x13ff).ram();
 	map(0x2000, 0x33ff).rom();
-	map(0x3c00, 0x3c00).r(this, FUNC(sc2_state::sc2_beep));
+	map(0x3c00, 0x3c00).r(FUNC(sc2_state::sc2_beep));
 }
 
 void sc2_state::sc2_io(address_map &map)

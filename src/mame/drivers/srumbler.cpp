@@ -85,15 +85,15 @@ void srumbler_state::srumbler_map(address_map &map)
 {
 	map(0x0000, 0x1dff).ram();  /* RAM (of 1 sort or another) */
 	map(0x1e00, 0x1fff).ram().share("spriteram");
-	map(0x2000, 0x3fff).ram().w(this, FUNC(srumbler_state::background_w)).share("backgroundram");
-	map(0x4008, 0x4008).portr("SYSTEM").w(this, FUNC(srumbler_state::bankswitch_w));
-	map(0x4009, 0x4009).portr("P1").w(this, FUNC(srumbler_state::_4009_w));
+	map(0x2000, 0x3fff).ram().w(FUNC(srumbler_state::background_w)).share("backgroundram");
+	map(0x4008, 0x4008).portr("SYSTEM").w(FUNC(srumbler_state::bankswitch_w));
+	map(0x4009, 0x4009).portr("P1").w(FUNC(srumbler_state::_4009_w));
 	map(0x400a, 0x400a).portr("P2");
 	map(0x400b, 0x400b).portr("DSW1");
 	map(0x400c, 0x400c).portr("DSW2");
-	map(0x400a, 0x400d).w(this, FUNC(srumbler_state::scroll_w));
+	map(0x400a, 0x400d).w(FUNC(srumbler_state::scroll_w));
 	map(0x400e, 0x400e).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x5000, 0x5fff).bankr("5000").w(this, FUNC(srumbler_state::foreground_w)).share("foregroundram"); /* Banked ROM */
+	map(0x5000, 0x5fff).bankr("5000").w(FUNC(srumbler_state::foreground_w)).share("foregroundram"); /* Banked ROM */
 	map(0x6000, 0x6fff).bankr("6000"); /* Banked ROM */
 	map(0x6000, 0x6fff).nopw();        /* Video RAM 2 ??? (not used) */
 	map(0x7000, 0x7fff).bankr("7000"); /* Banked ROM */

@@ -50,6 +50,7 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -63,6 +64,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void giclassic(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
 	required_device<palette_device> m_palette;
@@ -80,9 +84,8 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(vrom_r);
 
-	void giclassic(machine_config &config);
 	void satellite_main(address_map &map);
-private:
+
 	uint8_t m_control;
 };
 
@@ -150,8 +153,8 @@ void giclassic_state::satellite_main(address_map &map)
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x800000, 0x801fff).ram().rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x900000, 0x90003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
-	map(0xb00000, 0xb01fff).r(this, FUNC(giclassic_state::vrom_r));
-	map(0xc00000, 0xc00001).w(this, FUNC(giclassic_state::control_w));
+	map(0xb00000, 0xb01fff).r(FUNC(giclassic_state::vrom_r));
+	map(0xc00000, 0xc00001).w(FUNC(giclassic_state::control_w));
 	map(0xd00000, 0xd0003f).ram(); // these must read/write or 26S (LCD controller) fails
 	map(0xe00000, 0xe0001f).w(m_k056832, FUNC(k056832_device::b_w)).umask16(0xff00);
 	map(0xf00000, 0xf00001).noprw().nopw(); // watchdog reset
@@ -279,7 +282,7 @@ void giclassicsvr_state::server_main(address_map &map)
 	map(0x320000, 0x32001f).rw("k053252a", FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); // CRTC 1
 	map(0x320000, 0x32001f).rw("k053252b", FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0xff00); // CRTC 2
 	map(0x380000, 0x380001).nopw();    // watchdog reset
-	map(0x398000, 0x398001).rw(this, FUNC(giclassicsvr_state::control_r), FUNC(giclassicsvr_state::control_w));
+	map(0x398000, 0x398001).rw(FUNC(giclassicsvr_state::control_r), FUNC(giclassicsvr_state::control_w));
 	map(0x400000, 0x41ffff).ram();
 }
 

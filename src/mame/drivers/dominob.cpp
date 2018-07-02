@@ -65,6 +65,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -80,6 +81,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void dominob(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -96,7 +100,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void dominob(machine_config &config);
 	void memmap(address_map &map);
 	void portmap(address_map &map);
 };
@@ -186,7 +189,7 @@ void dominob_state::memmap(address_map &map)
 
 	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xd001, 0xd001).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0xd008, 0xd008).w(this, FUNC(dominob_state::dominob_d008_w));
+	map(0xd008, 0xd008).w(FUNC(dominob_state::dominob_d008_w));
 	map(0xd00c, 0xd00c).portr("IN0");
 	map(0xd010, 0xd010).portr("IN1").nopw();
 	map(0xd018, 0xd018).portr("IN2").nopw();
@@ -209,7 +212,7 @@ READ8_MEMBER(dominob_state::dominob_unk_port02_r)
 void dominob_state::portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x02, 0x02).r(this, FUNC(dominob_state::dominob_unk_port02_r));
+	map(0x02, 0x02).r(FUNC(dominob_state::dominob_unk_port02_r));
 }
 
 

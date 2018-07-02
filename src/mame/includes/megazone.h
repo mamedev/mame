@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+
 class megazone_state : public driver_device
 {
 public:
@@ -24,6 +26,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void megazone(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_scrolly;
 	required_shared_ptr<uint8_t> m_scrollx;
@@ -62,7 +67,6 @@ public:
 	DECLARE_PALETTE_INIT(megazone);
 	uint32_t screen_update_megazone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void megazone(machine_config &config);
 	void megazone_i8039_io_map(address_map &map);
 	void megazone_i8039_map(address_map &map);
 	void megazone_map(address_map &map);

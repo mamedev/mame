@@ -104,6 +104,7 @@
 #include "machine/mos6530n.h"
 #include "video/maria.h"
 #include "bus/a7800/a78_carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -156,7 +157,6 @@ protected:
 	int m_p2_one_button;
 	int m_bios_enabled;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tia_device> m_tia;
 	required_device<atari_maria_device> m_maria;
@@ -303,7 +303,7 @@ READ8_MEMBER(a7800_state::bios_or_cart_r)
 
 void a7800_state::a7800_mem(address_map &map)
 {
-	map(0x0000, 0x001f).mirror(0x300).rw(this, FUNC(a7800_state::tia_r), FUNC(a7800_state::tia_w));
+	map(0x0000, 0x001f).mirror(0x300).rw(FUNC(a7800_state::tia_r), FUNC(a7800_state::tia_w));
 	map(0x0020, 0x003f).mirror(0x300).rw(m_maria, FUNC(atari_maria_device::read), FUNC(atari_maria_device::write));
 	map(0x0040, 0x00ff).bankrw("zpmirror"); // mirror of 0x2040-0x20ff, for zero page
 	map(0x0140, 0x01ff).bankrw("spmirror"); // mirror of 0x2140-0x21ff, for stack page
@@ -319,7 +319,7 @@ void a7800_state::a7800_mem(address_map &map)
 								// and even then with inconsistent and unreliable results.
 	map(0x4000, 0xffff).w(m_cart, FUNC(a78_cart_slot_device::write_40xx));
 	map(0x4000, 0xbfff).r(m_cart, FUNC(a78_cart_slot_device::read_40xx));
-	map(0xc000, 0xffff).r(this, FUNC(a7800_state::bios_or_cart_r));    // here also the BIOS can be accessed
+	map(0xc000, 0xffff).r(FUNC(a7800_state::bios_or_cart_r));    // here also the BIOS can be accessed
 }
 
 

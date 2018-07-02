@@ -51,12 +51,15 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	void init_gen32();
 	void alm32(machine_config &config);
 	void van32(machine_config &config);
 	void van16(machine_config &config);
 	void alm16(machine_config &config);
 	void gen32(machine_config &config);
+
+	void init_gen32();
+
+private:
 	void alm16_mem(address_map &map);
 	void alm32_mem(address_map &map);
 	void gen32_mem(address_map &map);
@@ -74,11 +77,13 @@ public:
 		, m_keys(*this, "KEY")
 	{ }
 
+	void berlinp(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(berlinp_input_r);
 
-	void berlinp(machine_config &config);
 	void berlinp_mem(address_map &map);
-private:
+
 	required_device<mephisto_board_device> m_board;
 	required_ioport m_keys;
 };
@@ -176,7 +181,7 @@ void berlinp_state::berlinp_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0x800000, 0x800000).r(this, FUNC(berlinp_state::berlinp_input_r));
+	map(0x800000, 0x800000).r(FUNC(berlinp_state::berlinp_input_r));
 	map(0x900000, 0x900000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xa00000, 0xa00000).w(m_board, FUNC(mephisto_board_device::led_w));
 	map(0xb00000, 0xb00000).w("display", FUNC(mephisto_display_modul_device::io_w));

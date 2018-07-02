@@ -165,6 +165,7 @@ Notes: (All IC's listed for completeness)
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "video/sed1200.h"
+#include "emupal.h"
 #include "screen.h"
 
 static INPUT_PORTS_START( mt32 )
@@ -191,12 +192,15 @@ INPUT_PORTS_END
 class mt32_state : public driver_device
 {
 public:
+	mt32_state(const machine_config &mconfig, device_type type, const char *tag);
+
+	void mt32(machine_config &config);
+
+private:
 	required_device<i8x9x_device> cpu;
 	required_device<ram_device> ram;
 	optional_device<sed1200d0a_device> lcd;
 	required_device<timer_device> midi_timer;
-
-	mt32_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -216,10 +220,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
-	void mt32(machine_config &config);
 	void mt32_io(address_map &map);
 	void mt32_map(address_map &map);
-private:
+
 	uint8_t lcd_data_buffer[256];
 	int lcd_data_buffer_pos;
 	uint8_t midi;
@@ -334,12 +337,12 @@ PALETTE_INIT_MEMBER(mt32_state, mt32)
 
 void mt32_state::mt32_map(address_map &map)
 {
-	map(0x0100, 0x0100).w(this, FUNC(mt32_state::bank_w));
-	map(0x0200, 0x0200).w(this, FUNC(mt32_state::so_w));
+	map(0x0100, 0x0100).w(FUNC(mt32_state::bank_w));
+	map(0x0200, 0x0200).w(FUNC(mt32_state::so_w));
 	map(0x021a, 0x021a).portr("SC0");
 	map(0x021c, 0x021c).portr("SC1");
-	map(0x0300, 0x0300).w(this, FUNC(mt32_state::lcd_data_w));
-	map(0x0380, 0x0380).rw(this, FUNC(mt32_state::lcd_ctrl_r), FUNC(mt32_state::lcd_ctrl_w));
+	map(0x0300, 0x0300).w(FUNC(mt32_state::lcd_data_w));
+	map(0x0380, 0x0380).rw(FUNC(mt32_state::lcd_ctrl_r), FUNC(mt32_state::lcd_ctrl_w));
 	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
 	map(0x8000, 0xbfff).bankrw("bank");
 	map(0xc000, 0xffff).bankrw("fixed");
@@ -348,8 +351,8 @@ void mt32_state::mt32_map(address_map &map)
 void mt32_state::mt32_io(address_map &map)
 {
 	map(i8x9x_device::A7, i8x9x_device::A7).portr("A7");
-	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(this, FUNC(mt32_state::midi_w));
-	map(i8x9x_device::P0, i8x9x_device::P0).r(this, FUNC(mt32_state::port0_r));
+	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(FUNC(mt32_state::midi_w));
+	map(i8x9x_device::P0, i8x9x_device::P0).r(FUNC(mt32_state::port0_r));
 }
 
 MACHINE_CONFIG_START(mt32_state::mt32)

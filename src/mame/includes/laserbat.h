@@ -16,6 +16,7 @@
 #include "sound/sn76477.h"
 #include "sound/tms3615.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

@@ -52,6 +52,7 @@ modified by Hau
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -67,6 +68,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void safarir(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_shared_ptr<uint8_t> m_ram;
@@ -91,7 +95,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(safarir);
 	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void safarir(machine_config &config);
 	void safarir_audio(machine_config &config);
 	void main_map(address_map &map);
 };
@@ -327,8 +330,8 @@ void safarir_state::machine_start()
 	m_port_last2 = 0;
 
 	/* setup for save states */
-	save_pointer(NAME(m_ram_1.get()), m_ram.bytes());
-	save_pointer(NAME(m_ram_2.get()), m_ram.bytes());
+	save_pointer(NAME(m_ram_1), m_ram.bytes());
+	save_pointer(NAME(m_ram_2), m_ram.bytes());
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_port_last));
 	save_item(NAME(m_port_last2));
@@ -345,10 +348,10 @@ void safarir_state::machine_start()
 void safarir_state::main_map(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
-	map(0x2000, 0x27ff).rw(this, FUNC(safarir_state::ram_r), FUNC(safarir_state::ram_w)).share("ram");
-	map(0x2800, 0x2800).mirror(0x03ff).nopr().w(this, FUNC(safarir_state::ram_bank_w));
+	map(0x2000, 0x27ff).rw(FUNC(safarir_state::ram_r), FUNC(safarir_state::ram_w)).share("ram");
+	map(0x2800, 0x2800).mirror(0x03ff).nopr().w(FUNC(safarir_state::ram_bank_w));
 	map(0x2c00, 0x2c00).mirror(0x03ff).nopr().writeonly().share("bg_scroll");
-	map(0x3000, 0x3000).mirror(0x03ff).w(this, FUNC(safarir_state::safarir_audio_w));    /* goes to SN76477 */
+	map(0x3000, 0x3000).mirror(0x03ff).w(FUNC(safarir_state::safarir_audio_w));    /* goes to SN76477 */
 	map(0x3400, 0x3400).mirror(0x03ff).nopw();  /* cleared at the beginning */
 	map(0x3800, 0x3800).mirror(0x03ff).portr("INPUTS").nopw();
 	map(0x3c00, 0x3c00).mirror(0x03ff).portr("DSW").nopw();

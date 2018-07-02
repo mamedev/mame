@@ -82,6 +82,7 @@
 #include "cpu/i86/i86.h"
 #include "sound/ay8910.h"
 #include "video/tms9927.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -124,6 +125,26 @@ public:
 			m_kb_empty(true)
 	{ }
 
+	void attache(machine_config &config);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER(pio_portA_r);
+	DECLARE_READ8_MEMBER(pio_portB_r);
+	DECLARE_WRITE8_MEMBER(pio_portA_w);
+	DECLARE_WRITE8_MEMBER(pio_portB_w);
+
+	DECLARE_READ8_MEMBER(dma_mem_r);
+	DECLARE_WRITE8_MEMBER(dma_mem_w);
+
+	DECLARE_READ8_MEMBER(fdc_dma_r);
+	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+
+	DECLARE_WRITE_LINE_MEMBER(hreq_w);
+	DECLARE_WRITE_LINE_MEMBER(eop_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
+
+protected:
 	// PIO port B operation select
 	enum
 	{
@@ -151,39 +172,30 @@ public:
 	};
 
 	// overrides
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void driver_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_WRITE8_MEMBER(rom_w);
-	DECLARE_READ8_MEMBER(pio_portA_r);
-	DECLARE_READ8_MEMBER(pio_portB_r);
-	DECLARE_WRITE8_MEMBER(pio_portA_w);
-	DECLARE_WRITE8_MEMBER(pio_portB_w);
+
 	DECLARE_WRITE8_MEMBER(display_command_w);
 	DECLARE_READ8_MEMBER(display_data_r);
 	DECLARE_WRITE8_MEMBER(display_data_w);
 	DECLARE_READ8_MEMBER(dma_mask_r);
 	DECLARE_WRITE8_MEMBER(dma_mask_w);
-	DECLARE_READ8_MEMBER(fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+
 	DECLARE_READ8_MEMBER(memmap_r);
 	DECLARE_WRITE8_MEMBER(memmap_w);
-	DECLARE_READ8_MEMBER(dma_mem_r);
-	DECLARE_WRITE8_MEMBER(dma_mem_w);
-	DECLARE_WRITE_LINE_MEMBER(hreq_w);
-	DECLARE_WRITE_LINE_MEMBER(eop_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
+
 	void operation_strobe(address_space& space,uint8_t data);
 	void keyboard_clock_w(bool state);
 	uint8_t keyboard_data_r();
 	uint16_t get_key();
-	void attache(machine_config &config);
+
 	void attache_io(address_map &map);
 	void attache_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_rom;
 	required_device<ram_device> m_ram;
@@ -247,6 +259,9 @@ public:
 		  m_z80_tx_ready(false)
 	{ }
 
+	void attache816(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(x86_comms_w);
 	DECLARE_READ8_MEMBER(x86_comms_r);
 	DECLARE_WRITE8_MEMBER(x86_irq_enable);
@@ -260,11 +275,10 @@ public:
 
 	virtual void machine_reset() override;
 
-	void attache816(machine_config &config);
 	void attache816_io(address_map &map);
 	void attache_x86_io(address_map &map);
 	void attache_x86_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_extcpu;
 	required_device<i8255_device> m_ppi;
 
@@ -915,29 +929,29 @@ void attache_state::attache_map(address_map &map)
 void attache_state::attache_io(address_map &map)
 {
 	map(0xe0, 0xed).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).mirror(0xff00);
-	map(0xee, 0xee).w(this, FUNC(attache_state::display_command_w)).mirror(0xff00);
-	map(0xef, 0xef).rw(this, FUNC(attache_state::dma_mask_r), FUNC(attache_state::dma_mask_w)).mirror(0xff00);
+	map(0xee, 0xee).w(FUNC(attache_state::display_command_w)).mirror(0xff00);
+	map(0xef, 0xef).rw(FUNC(attache_state::dma_mask_r), FUNC(attache_state::dma_mask_w)).mirror(0xff00);
 	map(0xf0, 0xf1).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).mirror(0xff00);
 	map(0xf4, 0xf7).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).mirror(0xff00);
 	map(0xf8, 0xfb).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).mirror(0xff00);
 	map(0xfc, 0xfd).m(m_fdc, FUNC(upd765a_device::map)).mirror(0xff00);
-	map(0xfe, 0xfe).rw(this, FUNC(attache_state::display_data_r), FUNC(attache_state::display_data_w)).select(0xff00);
-	map(0xff, 0xff).rw(this, FUNC(attache_state::memmap_r), FUNC(attache_state::memmap_w)).mirror(0xff00);
+	map(0xfe, 0xfe).rw(FUNC(attache_state::display_data_r), FUNC(attache_state::display_data_w)).select(0xff00);
+	map(0xff, 0xff).rw(FUNC(attache_state::memmap_r), FUNC(attache_state::memmap_w)).mirror(0xff00);
 }
 
 void attache816_state::attache816_io(address_map &map)
 {
-	map(0xb8, 0xb8).rw(this, FUNC(attache816_state::z80_comms_status_r), FUNC(attache816_state::z80_comms_ctrl_w)).mirror(0xff00);
-	map(0xb9, 0xb9).rw(this, FUNC(attache816_state::z80_comms_r), FUNC(attache816_state::z80_comms_w)).mirror(0xff00);
+	map(0xb8, 0xb8).rw(FUNC(attache816_state::z80_comms_status_r), FUNC(attache816_state::z80_comms_ctrl_w)).mirror(0xff00);
+	map(0xb9, 0xb9).rw(FUNC(attache816_state::z80_comms_r), FUNC(attache816_state::z80_comms_w)).mirror(0xff00);
 	map(0xe0, 0xed).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).mirror(0xff00);
-	map(0xee, 0xee).w(this, FUNC(attache816_state::display_command_w)).mirror(0xff00);
-	map(0xef, 0xef).rw(this, FUNC(attache816_state::dma_mask_r), FUNC(attache816_state::dma_mask_w)).mirror(0xff00);
+	map(0xee, 0xee).w(FUNC(attache816_state::display_command_w)).mirror(0xff00);
+	map(0xef, 0xef).rw(FUNC(attache816_state::dma_mask_r), FUNC(attache816_state::dma_mask_w)).mirror(0xff00);
 	map(0xf0, 0xf1).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).mirror(0xff00);
 	map(0xf4, 0xf7).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).mirror(0xff00);
 	map(0xf8, 0xfb).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).mirror(0xff00);
 	map(0xfc, 0xfd).m(m_fdc, FUNC(upd765a_device::map)).mirror(0xff00);
-	map(0xfe, 0xfe).rw(this, FUNC(attache816_state::display_data_r), FUNC(attache816_state::display_data_w)).select(0xff00);
-	map(0xff, 0xff).rw(this, FUNC(attache816_state::memmap_r), FUNC(attache816_state::memmap_w)).mirror(0xff00);
+	map(0xfe, 0xfe).rw(FUNC(attache816_state::display_data_r), FUNC(attache816_state::display_data_w)).select(0xff00);
+	map(0xff, 0xff).rw(FUNC(attache816_state::memmap_r), FUNC(attache816_state::memmap_w)).mirror(0xff00);
 }
 
 void attache816_state::attache_x86_map(address_map &map)
@@ -950,7 +964,7 @@ void attache816_state::attache_x86_map(address_map &map)
 void attache816_state::attache_x86_io(address_map &map)
 {
 	map(0x100, 0x107).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x108, 0x10d).w(this, FUNC(attache816_state::x86_iobf_enable_w));
+	map(0x108, 0x10d).w(FUNC(attache816_state::x86_iobf_enable_w));
 // 0x140/2/4/6 - Z8530 SCC serial
 // 0x180/2/4/6/8/a/c/e - GPIB (TMS9914A)
 }

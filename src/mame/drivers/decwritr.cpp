@@ -32,8 +32,8 @@ class decwriter_state : public driver_device
 {
 public:
 	// constructor
-	decwriter_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	decwriter_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "beeper"),
 		m_usart(*this, "usart"),
@@ -235,11 +235,11 @@ void decwriter_state::la120_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x27ff).rom();
-	map(0x3000, 0x301f).rw(this, FUNC(decwriter_state::la120_KBD_r), FUNC(decwriter_state::la120_LED_w)).mirror(0xFE0); // keyboard read, write to status and 7seg LEDS
+	map(0x3000, 0x301f).rw(FUNC(decwriter_state::la120_KBD_r), FUNC(decwriter_state::la120_LED_w)).mirror(0xFE0); // keyboard read, write to status and 7seg LEDS
 	map(0x4000, 0x43ff).mirror(0x0c00).ram(); // 1k 'low ram'
 	map(0x5000, 0x53ff).mirror(0x0c00).ram(); // 1k 'high ram'
-	map(0x6000, 0x67ff) /*.mirror(0x08fe)*/ .mirror(0x800).rw(this, FUNC(decwriter_state::la120_NVR_r), FUNC(decwriter_state::la120_NVR_w)); // ER1400 EAROM; a10,9,8 are c3,2,1, a0 is clk, data i/o on d7, d0 always reads as 0 (there may have once been a second er1400 with data i/o on d0, sharing same address controls as the d7 one, not populated on shipping boards), d1-d6 read open bus
-	map(0x7000, 0x7003).mirror(0x0ffc).rw(this, FUNC(decwriter_state::la120_DC305_r), FUNC(decwriter_state::la120_DC305_w)); // DC305 printer controller ASIC stuff; since this can generate interrupts (dot interrupt, lf interrupt, 2.5ms interrupt) this needs to be split to its own device.
+	map(0x6000, 0x67ff) /*.mirror(0x08fe)*/ .mirror(0x800).rw(FUNC(decwriter_state::la120_NVR_r), FUNC(decwriter_state::la120_NVR_w)); // ER1400 EAROM; a10,9,8 are c3,2,1, a0 is clk, data i/o on d7, d0 always reads as 0 (there may have once been a second er1400 with data i/o on d0, sharing same address controls as the d7 one, not populated on shipping boards), d1-d6 read open bus
+	map(0x7000, 0x7003).mirror(0x0ffc).rw(FUNC(decwriter_state::la120_DC305_r), FUNC(decwriter_state::la120_DC305_w)); // DC305 printer controller ASIC stuff; since this can generate interrupts (dot interrupt, lf interrupt, 2.5ms interrupt) this needs to be split to its own device.
 	// 8000-ffff is reserved for expansion (i.e. unused, open bus)
 }
 
@@ -414,6 +414,7 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
 	MCFG_DEVICE_PROGRAM_MAP(la120_mem)
 	MCFG_DEVICE_IO_MAP(la120_io)
+	//MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("prtlsi", dc305_device, inta_cb)
 
 	/* video hardware */
 	//TODO: no actual screen! has 8 leds above the keyboard (similar to vt100/vk100) and has 4 7segment leds for showing an error code.
@@ -424,6 +425,9 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_SCREEN_REFRESH_RATE(30)
 
 	//MCFG_DEVICE_ADD("prtlsi", DC305, XTAL(18'000'000) / 9)
+	//MCFG_DC305_OUT_RXC_CB(WRITELINE("usart", i8251_device, write_rxc))
+	//MCFG_DC305_OUT_TXC_CB(WRITELINE("usart", i8251_device, write_txc))
+	//MCFG_DC305_OUT_INT_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("ledlatch", LS259, 0) // E2 on keyboard
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // ON LINE
@@ -448,14 +452,14 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainint", input_merger_device, in_w<1>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("usart", i8251_device, write_dsr))
-
-	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE("usart", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("usart", i8251_device, write_txc))
 	*/
 
 	MCFG_DEVICE_ADD("nvm", ER1400, 0)

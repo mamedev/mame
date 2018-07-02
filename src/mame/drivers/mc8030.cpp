@@ -20,6 +20,7 @@ The asp ctc needs at least 2 triggers. The purpose of the zve pio is unknown.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
+#include "emupal.h"
 #include "screen.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
@@ -37,6 +38,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		{ }
 
+	void mc8030(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(zve_write_protect_w);
 	DECLARE_WRITE8_MEMBER(vis_w);
 	DECLARE_WRITE8_MEMBER(eprom_prog_w);
@@ -50,10 +54,9 @@ public:
 	DECLARE_WRITE8_MEMBER(asp_port_b_w);
 	uint32_t screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mc8030(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_region_ptr<u8> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 };
@@ -76,12 +79,12 @@ void mc8030_state::io_map(address_map &map)
 	map(0x30, 0x3f).mirror(0xff00).noprw(); //"mass storage"
 	map(0x80, 0x83).mirror(0xff00).rw("zve_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // user CTC
 	map(0x84, 0x87).mirror(0xff00).rw("zve_pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // PIO unknown usage
-	map(0x88, 0x8f).mirror(0xff00).w(this, FUNC(mc8030_state::zve_write_protect_w));
-	map(0xc0, 0xcf).select(0xff00).w(this, FUNC(mc8030_state::vis_w));
+	map(0x88, 0x8f).mirror(0xff00).w(FUNC(mc8030_state::zve_write_protect_w));
+	map(0xc0, 0xcf).select(0xff00).w(FUNC(mc8030_state::vis_w));
 	map(0xd0, 0xd3).mirror(0xff00).rw("asp_sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // keyboard & IFSS?
 	map(0xd4, 0xd7).mirror(0xff00).rw("asp_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // sio bauds, KMBG? and kbd
 	map(0xd8, 0xdb).mirror(0xff00).rw("asp_pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // external bus
-	map(0xe0, 0xef).mirror(0xff00).w(this, FUNC(mc8030_state::eprom_prog_w));
+	map(0xe0, 0xef).mirror(0xff00).w(FUNC(mc8030_state::eprom_prog_w));
 }
 
 /* Input ports */

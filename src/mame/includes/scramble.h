@@ -4,8 +4,10 @@
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "includes/galaxold.h"
-#include "sound/tms5110.h"
 #include "sound/digitalk.h"
+#include "sound/flt_rc.h"
+#include "sound/tms5110.h"
+#include "emupal.h"
 
 class scramble_state : public galaxold_state
 {
@@ -41,8 +43,6 @@ public:
 	DECLARE_READ8_MEMBER(hustler_portB_r);
 	DECLARE_WRITE8_MEMBER(hotshock_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(hotshock_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(scramble_filter_w);
-	DECLARE_WRITE8_MEMBER(frogger_filter_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_0_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_1_w);
 	DECLARE_WRITE8_MEMBER(ad2083_tms5110_ctrl_w);
@@ -131,6 +131,7 @@ public:
 	void scramble_sound_map(address_map &map);
 	void triplep_io_map(address_map &map);
 	void triplep_map(address_map &map);
+
 private:
 	void cavelon_banksw();
 	inline int bit(int i,int n);

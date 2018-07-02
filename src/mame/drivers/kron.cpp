@@ -101,6 +101,7 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/pckeybrd.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define VERBOSE 2
@@ -127,35 +128,38 @@
 class kron180_state : public driver_device
 {
 public:
-kron180_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device (mconfig, type, tag)
-	,m_maincpu (*this, "maincpu")
-	,m_videoram(*this, "videoram")
-	,m_keyboard(*this, "pc_keyboard")
+	kron180_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_videoram(*this, "videoram")
+		, m_keyboard(*this, "pc_keyboard")
 	{ }
-	uint8_t *m_char_ptr;
+
+	void kron180(machine_config &config);
+
+private:
+	uint8_t * m_char_ptr;
 	uint8_t *m_vram;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
-	DECLARE_WRITE8_MEMBER( sn74259_w ){     LOGIO(("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0)); }
-	DECLARE_WRITE8_MEMBER( ap5_w ){         LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_READ8_MEMBER( ap5_r ){          LOGIO(("%s() %02x = %02x\n",  FUNCNAME, offset, 1)); return 1; }
-	DECLARE_WRITE8_MEMBER( wkb_w ){         LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_WRITE8_MEMBER( sn74299_w ){     LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_READ8_MEMBER( sn74299_r ){      LOGIO(("%s() %02x = %02x\n", FUNCNAME, offset, 1)); return 1; }
-	DECLARE_WRITE8_MEMBER( txen_w ){        LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_WRITE8_MEMBER( kbd_reset_w ){   LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_WRITE8_MEMBER( dreq_w ){        LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	void kron180(machine_config &config);
+	DECLARE_WRITE8_MEMBER(sn74259_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0)); }
+	DECLARE_WRITE8_MEMBER(ap5_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_READ8_MEMBER(ap5_r) { LOGIO(("%s() %02x = %02x\n", FUNCNAME, offset, 1)); return 1; }
+	DECLARE_WRITE8_MEMBER(wkb_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_WRITE8_MEMBER(sn74299_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_READ8_MEMBER(sn74299_r) { LOGIO(("%s() %02x = %02x\n", FUNCNAME, offset, 1)); return 1; }
+	DECLARE_WRITE8_MEMBER(txen_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_WRITE8_MEMBER(kbd_reset_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_WRITE8_MEMBER(dreq_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
 	void kron180_iomap(address_map &map);
 	void kron180_mem(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<pc_keyboard_device> m_keyboard;
 	uint8_t m_kbd_data;
-private:
-	virtual void machine_start () override;
+
+	virtual void machine_start() override;
 };
 
 void kron180_state::kron180_mem(address_map &map)
@@ -200,14 +204,14 @@ void kron180_state::kron180_mem(address_map &map)
 void kron180_state::kron180_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x000f).w(this, FUNC(kron180_state::sn74259_w));
-	map(0x0010, 0x001f).rw(this, FUNC(kron180_state::ap5_r), FUNC(kron180_state::ap5_w));
-	map(0x0020, 0x002f).w(this, FUNC(kron180_state::wkb_w));
-	map(0x0030, 0x003f).r(this, FUNC(kron180_state::sn74299_r));
-	map(0x0040, 0x004f).w(this, FUNC(kron180_state::sn74299_w));
-	map(0x0050, 0x005f).w(this, FUNC(kron180_state::txen_w));
-	map(0x0060, 0x006f).w(this, FUNC(kron180_state::kbd_reset_w));
-	map(0x0070, 0x007f).w(this, FUNC(kron180_state::dreq_w));
+	map(0x0000, 0x000f).w(FUNC(kron180_state::sn74259_w));
+	map(0x0010, 0x001f).rw(FUNC(kron180_state::ap5_r), FUNC(kron180_state::ap5_w));
+	map(0x0020, 0x002f).w(FUNC(kron180_state::wkb_w));
+	map(0x0030, 0x003f).r(FUNC(kron180_state::sn74299_r));
+	map(0x0040, 0x004f).w(FUNC(kron180_state::sn74299_w));
+	map(0x0050, 0x005f).w(FUNC(kron180_state::txen_w));
+	map(0x0060, 0x006f).w(FUNC(kron180_state::kbd_reset_w));
+	map(0x0070, 0x007f).w(FUNC(kron180_state::dreq_w));
 }
 
 /* Input ports */

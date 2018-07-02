@@ -46,6 +46,7 @@
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -71,6 +72,10 @@ public:
 		, m_io_shift(*this, "SHIFT")
 		{ }
 
+
+	void d6800(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( d6800_cassette_r );
 	DECLARE_WRITE8_MEMBER( d6800_cassette_w );
 	DECLARE_READ8_MEMBER( d6800_keyboard_r );
@@ -81,9 +86,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
 
-	void d6800(machine_config &config);
 	void d6800_map(address_map &map);
-private:
+
 	uint8_t m_rtc;
 	bool m_cb2;
 	bool m_cassold;

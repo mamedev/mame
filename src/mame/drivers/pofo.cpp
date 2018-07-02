@@ -43,6 +43,7 @@
 #include "sound/pcd3311.h"
 #include "video/hd61830.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -92,7 +93,7 @@ public:
 
 	void portfolio(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -148,7 +149,6 @@ protected:
 	DECLARE_READ8_MEMBER(hd61830_rd_r);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
 	required_device<pcd3311_device> m_dtmf;
@@ -783,7 +783,7 @@ WRITE8_MEMBER( portfolio_state::io_w )
 
 void portfolio_state::portfolio_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(portfolio_state::mem_r), FUNC(portfolio_state::mem_w));
+	map(0x00000, 0xfffff).rw(FUNC(portfolio_state::mem_r), FUNC(portfolio_state::mem_w));
 }
 
 
@@ -793,7 +793,7 @@ void portfolio_state::portfolio_mem(address_map &map)
 
 void portfolio_state::portfolio_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(portfolio_state::io_r), FUNC(portfolio_state::io_w));
+	map(0x0000, 0xffff).rw(FUNC(portfolio_state::io_r), FUNC(portfolio_state::io_w));
 }
 
 

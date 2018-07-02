@@ -102,6 +102,7 @@ Lower PCB is plugged in with components facing up.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -120,6 +121,9 @@ public:
 	{
 	}
 
+	void marinedt(machine_config &config);
+
+private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(marinedt);
@@ -134,17 +138,15 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void marinedt(machine_config &config);
 	void marinedt_io(address_map &map);
 	void marinedt_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -442,24 +444,24 @@ void marinedt_state::marinedt_map(address_map &map)
 	map.global_mask(0x7fff); /* A15 is not decoded */
 	map(0x0000, 0x3fff).rom().region("ipl", 0);
 	map(0x4000, 0x43ff).mirror(0x0400).ram();
-	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(marinedt_state::vram_w)).share("vram");
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(marinedt_state::vram_w)).share("vram");
 }
 
 void marinedt_state::marinedt_io(address_map &map)
 {
 	map.global_mask(0x0f);
 	map(0x00, 0x00).portr("DSW1");
-	map(0x01, 0x01).r(this, FUNC(marinedt_state::trackball_r));
-	map(0x02, 0x02).select(0xc).r(this, FUNC(marinedt_state::pc3259_r));
-	map(0x02, 0x04).w(this, FUNC(marinedt_state::obj_0_w));
+	map(0x01, 0x01).r(FUNC(marinedt_state::trackball_r));
+	map(0x02, 0x02).select(0xc).r(FUNC(marinedt_state::pc3259_r));
+	map(0x02, 0x04).w(FUNC(marinedt_state::obj_0_w));
 	map(0x03, 0x03).portr("SYSTEM");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x05, 0x05).w(this, FUNC(marinedt_state::bgm_w));
-	map(0x06, 0x06).w(this, FUNC(marinedt_state::sfx_w));
-	map(0x08, 0x0b).w(this, FUNC(marinedt_state::obj_1_w));
-	map(0x0d, 0x0d).w(this, FUNC(marinedt_state::layer_enable_w));
+	map(0x05, 0x05).w(FUNC(marinedt_state::bgm_w));
+	map(0x06, 0x06).w(FUNC(marinedt_state::sfx_w));
+	map(0x08, 0x0b).w(FUNC(marinedt_state::obj_1_w));
+	map(0x0d, 0x0d).w(FUNC(marinedt_state::layer_enable_w));
 	map(0x0e, 0x0e).nopw(); // watchdog
-	map(0x0f, 0x0f).w(this, FUNC(marinedt_state::output_w));
+	map(0x0f, 0x0f).w(FUNC(marinedt_state::output_w));
 }
 
 static INPUT_PORTS_START( marinedt )

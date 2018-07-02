@@ -15,6 +15,7 @@
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -27,6 +28,9 @@ public:
 		m_ram(*this, RAM_TAG)
 	{ }
 
+	void fk1(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
@@ -62,7 +66,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_callback);
 	IRQ_CALLBACK_MEMBER(fk1_irq_callback);
-	void fk1(machine_config &config);
 	void fk1_io(address_map &map);
 	void fk1_mem(address_map &map);
 };
@@ -324,12 +327,12 @@ void fk1_state::fk1_io(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x20, 0x23).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x30, 0x30).rw(this, FUNC(fk1_state::fk1_bank_ram_r), FUNC(fk1_state::fk1_intr_w));
+	map(0x30, 0x30).rw(FUNC(fk1_state::fk1_bank_ram_r), FUNC(fk1_state::fk1_intr_w));
 	map(0x40, 0x40).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x41, 0x41).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x50, 0x50).rw(this, FUNC(fk1_state::fk1_bank_rom_r), FUNC(fk1_state::fk1_disk_w));
+	map(0x50, 0x50).rw(FUNC(fk1_state::fk1_bank_rom_r), FUNC(fk1_state::fk1_disk_w));
 	map(0x60, 0x63).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x70, 0x70).rw(this, FUNC(fk1_state::fk1_mouse_r), FUNC(fk1_state::fk1_reset_int_w));
+	map(0x70, 0x70).rw(FUNC(fk1_state::fk1_mouse_r), FUNC(fk1_state::fk1_reset_int_w));
 }
 
 /* Input ports */

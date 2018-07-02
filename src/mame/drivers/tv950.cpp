@@ -65,6 +65,9 @@ public:
 		, m_gfx(*this, "graphics")
 	{ }
 
+	void tv950(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(via_a_w);
 	DECLARE_WRITE8_MEMBER(via_b_w);
 	DECLARE_READ8_MEMBER(via_b_r);
@@ -75,9 +78,8 @@ public:
 	DECLARE_WRITE8_MEMBER(row_addr_w);
 	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
 
-	void tv950(machine_config &config);
 	void tv950_mem(address_map &map);
-private:
+
 	uint8_t m_via_row;
 	uint8_t m_attr_row;
 	uint8_t m_attr_screen;
@@ -99,7 +101,7 @@ void tv950_state::tv950_mem(address_map &map)
 	map(0x2000, 0x3fff).ram().share("vram"); // VRAM
 	map(0x8100, 0x8100).rw(m_crtc, FUNC(r6545_1_device::status_r), FUNC(r6545_1_device::address_w));
 	map(0x8101, 0x8101).rw(m_crtc, FUNC(r6545_1_device::register_r), FUNC(r6545_1_device::register_w));
-	map(0x9000, 0x9000).w(this, FUNC(tv950_state::row_addr_w));
+	map(0x9000, 0x9000).w(FUNC(tv950_state::row_addr_w));
 	map(0x9300, 0x9303).rw(ACIA1_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x9500, 0x9503).rw(ACIA2_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x9900, 0x9903).rw(ACIA3_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));

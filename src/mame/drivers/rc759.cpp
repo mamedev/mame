@@ -65,6 +65,9 @@ public:
 		m_centronics_data(0xff)
 	{ }
 
+	void rc759(machine_config &config);
+
+private:
 	void keyb_put(u8 data);
 	DECLARE_READ8_MEMBER(keyboard_r);
 
@@ -104,15 +107,13 @@ public:
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_READ8_MEMBER(irq_callback);
 
-	void rc759(machine_config &config);
 	void rc759_io(address_map &map);
 	void rc759_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<nvram_device> m_nvram;
@@ -478,25 +479,25 @@ void rc759_state::rc759_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000, 0x003).mirror(0x0c).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x020, 0x020).r(this, FUNC(rc759_state::keyboard_r));
+	map(0x020, 0x020).r(FUNC(rc759_state::keyboard_r));
 	map(0x056, 0x057).noprw(); // in reality, access to sound and rtc is a bit more involved
-	map(0x05a, 0x05a).w(m_snd, FUNC(sn76489a_device::write));
-	map(0x05c, 0x05c).rw(this, FUNC(rc759_state::rtc_r), FUNC(rc759_state::rtc_w));
+	map(0x05a, 0x05a).w(m_snd, FUNC(sn76489a_device::command_w));
+	map(0x05c, 0x05c).rw(FUNC(rc759_state::rtc_r), FUNC(rc759_state::rtc_w));
 //  AM_RANGE(0x060, 0x06f) AM_WRITE8(crt_control_w, 0x00ff)
 	map(0x070, 0x077).mirror(0x08).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x080, 0x0ff).rw(this, FUNC(rc759_state::nvram_r), FUNC(rc759_state::nvram_w)).umask16(0x00ff);
+	map(0x080, 0x0ff).rw(FUNC(rc759_state::nvram_r), FUNC(rc759_state::nvram_w)).umask16(0x00ff);
 //  AM_RANGE(0x100, 0x101) net
-	map(0x180, 0x1bf).rw(this, FUNC(rc759_state::palette_r), FUNC(rc759_state::palette_w)).umask16(0x00ff);
-	map(0x230, 0x231).w(this, FUNC(rc759_state::txt_irst_w));
-	map(0x240, 0x241).w(this, FUNC(rc759_state::txt_ca_w));
-	map(0x250, 0x250).rw(this, FUNC(rc759_state::centronics_data_r), FUNC(rc759_state::centronics_data_w));
-	map(0x260, 0x260).rw(this, FUNC(rc759_state::centronics_control_r), FUNC(rc759_state::centronics_control_w));
+	map(0x180, 0x1bf).rw(FUNC(rc759_state::palette_r), FUNC(rc759_state::palette_w)).umask16(0x00ff);
+	map(0x230, 0x231).w(FUNC(rc759_state::txt_irst_w));
+	map(0x240, 0x241).w(FUNC(rc759_state::txt_ca_w));
+	map(0x250, 0x250).rw(FUNC(rc759_state::centronics_data_r), FUNC(rc759_state::centronics_data_w));
+	map(0x260, 0x260).rw(FUNC(rc759_state::centronics_control_r), FUNC(rc759_state::centronics_control_w));
 	map(0x280, 0x287).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
-	map(0x288, 0x288).w(this, FUNC(rc759_state::floppy_control_w));
+	map(0x288, 0x288).w(FUNC(rc759_state::floppy_control_w));
 //  AM_RANGE(0x28a, 0x28b) external printer data
 //  AM_RANGE(0x28d, 0x28d) external printer control
-	map(0x28e, 0x28e).rw(this, FUNC(rc759_state::floppy_ack_r), FUNC(rc759_state::floppy_reserve_w));
-	map(0x290, 0x290).w(this, FUNC(rc759_state::floppy_release_w));
+	map(0x28e, 0x28e).rw(FUNC(rc759_state::floppy_ack_r), FUNC(rc759_state::floppy_reserve_w));
+	map(0x290, 0x290).w(FUNC(rc759_state::floppy_release_w));
 //  AM_RANGE(0x292, 0x293) AM_READWRITE8(printer_ack_r, printer_reserve_w, 0x00ff)
 //  AM_RANGE(0x294, 0x295) AM_WRITE8(printer_release_w, 0x00ff)
 	map(0x300, 0x30f).rw(m_isbx, FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
@@ -581,7 +582,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// internal centronics
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, rc759_state, centronics_busy_w))
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, rc759_state, centronics_ack_w))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, rc759_state, centronics_fault_w))

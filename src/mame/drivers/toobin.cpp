@@ -94,18 +94,18 @@ void toobin_state::main_map(address_map &map)
 	map(0xc00000, 0xc07fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0xc08000, 0xc097ff).mirror(0x046000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 	map(0xc09800, 0xc09fff).mirror(0x046000).ram().share("mob");
-	map(0xc10000, 0xc107ff).mirror(0x047800).ram().w(this, FUNC(toobin_state::paletteram_w)).share("paletteram");
+	map(0xc10000, 0xc107ff).mirror(0x047800).ram().w(FUNC(toobin_state::paletteram_w)).share("paletteram");
 	map(0x826000, 0x826001).mirror(0x4500fe).nopr();     /* who knows? read at controls time */
 	map(0x828000, 0x828001).mirror(0x4500fe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x828101, 0x828101).mirror(0x4500fe).w(m_jsa, FUNC(atari_jsa_i_device::main_command_w));
-	map(0x828300, 0x828301).mirror(0x45003e).w(this, FUNC(toobin_state::intensity_w));
-	map(0x828340, 0x828341).mirror(0x45003e).w(this, FUNC(toobin_state::interrupt_scan_w)).share("interrupt_scan");
-	map(0x828380, 0x828381).mirror(0x45003e).ram().w(this, FUNC(toobin_state::slip_w)).share("mob:slip");
-	map(0x8283c0, 0x8283c1).mirror(0x45003e).w(this, FUNC(toobin_state::scanline_int_ack_w));
+	map(0x828300, 0x828301).mirror(0x45003e).w(FUNC(toobin_state::intensity_w));
+	map(0x828340, 0x828341).mirror(0x45003e).w(FUNC(toobin_state::interrupt_scan_w)).share("interrupt_scan");
+	map(0x828380, 0x828381).mirror(0x45003e).ram().w(FUNC(toobin_state::slip_w)).share("mob:slip");
+	map(0x8283c0, 0x8283c1).mirror(0x45003e).w(FUNC(toobin_state::scanline_int_ack_w));
 	map(0x828400, 0x828401).mirror(0x4500fe).w(m_jsa, FUNC(atari_jsa_i_device::sound_reset_w));
 	map(0x828500, 0x828501).mirror(0x4500fe).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0x828600, 0x828601).mirror(0x4500fe).w(this, FUNC(toobin_state::xscroll_w)).share("xscroll");
-	map(0x828700, 0x828701).mirror(0x4500fe).w(this, FUNC(toobin_state::yscroll_w)).share("yscroll");
+	map(0x828600, 0x828601).mirror(0x4500fe).w(FUNC(toobin_state::xscroll_w)).share("xscroll");
+	map(0x828700, 0x828701).mirror(0x4500fe).w(FUNC(toobin_state::yscroll_w)).share("yscroll");
 	map(0x828800, 0x828801).mirror(0x4507fe).portr("FF8800");
 	map(0x829000, 0x829001).mirror(0x4507fe).portr("FF9000");
 	map(0x829801, 0x829801).mirror(0x4507fe).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r));

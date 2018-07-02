@@ -58,6 +58,11 @@ public:
 		m_lock(*this, "LOCK")
 	{ }
 
+	void ntsc(machine_config &config);
+	void pal(machine_config &config);
+	void vic20(machine_config &config);
+
+private:
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
@@ -146,9 +151,7 @@ public:
 		IO2 = 6,
 		IO3 = 7
 	};
-	void ntsc(machine_config &config);
-	void pal(machine_config &config);
-	void vic20(machine_config &config);
+
 	void vic20_mem(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);
@@ -361,7 +364,7 @@ READ8_MEMBER( vic20_state::vic_videoram_r )
 
 void vic20_state::vic20_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(vic20_state::read), FUNC(vic20_state::write));
+	map(0x0000, 0xffff).rw(FUNC(vic20_state::read), FUNC(vic20_state::write));
 }
 
 
@@ -371,7 +374,7 @@ void vic20_state::vic20_mem(address_map &map)
 
 void vic20_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(vic20_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(vic20_state::vic_videoram_r));
 }
 
 
@@ -556,7 +559,7 @@ READ8_MEMBER( vic20_state::via1_pa_r )
 	data |= m_iec->data_r() << 1;
 
 	// joystick / user port
-	uint8_t joy = m_joy->joy_r();
+	uint8_t joy = m_joy->read_joy();
 
 	data |= (m_user_joy0 && BIT(joy, 0)) << 2;
 	data |= (m_user_joy1 && BIT(joy, 1)) << 3;
@@ -592,7 +595,7 @@ WRITE8_MEMBER( vic20_state::via1_pa_w )
 
 	// serial attention out
 	m_user->write_9(!BIT(data, 7));
-	m_iec->atn_w(!BIT(data, 7));
+	m_iec->host_atn_w(!BIT(data, 7));
 }
 
 WRITE8_MEMBER( vic20_state::via1_pb_w )
@@ -654,7 +657,7 @@ READ8_MEMBER( vic20_state::via2_pb_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy = m_joy->joy_r();
+	uint8_t joy = m_joy->read_joy();
 
 	data &= BIT(joy, 3) << 7;
 
@@ -688,13 +691,13 @@ WRITE8_MEMBER( vic20_state::via2_pb_w )
 WRITE_LINE_MEMBER( vic20_state::via2_ca2_w )
 {
 	// serial clock out
-	m_iec->clk_w(!state);
+	m_iec->host_clk_w(!state);
 }
 
 WRITE_LINE_MEMBER( vic20_state::via2_cb2_w )
 {
 	// serial data out
-	m_iec->data_w(!state);
+	m_iec->host_data_w(!state);
 }
 
 
@@ -805,7 +808,7 @@ MACHINE_CONFIG_START(vic20_state::vic20)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(*this, vic20_state, write_light_pen))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, vic20_user_port_cards, nullptr)
+	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, vic20_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, vic20_state, exp_reset_w))
 	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(*this, vic20_state, write_user_joy0))
 	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(*this, vic20_state, write_user_joy1))

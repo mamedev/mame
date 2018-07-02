@@ -100,6 +100,7 @@ Chips:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -123,25 +124,27 @@ public:
 		m_duart(*this, "duart68681")
 	{ }
 
+	void tm(machine_config &config);
+	void tmds1204(machine_config &config);
+
+	DECLARE_READ_LINE_MEMBER(read_rand);
+
+	DECLARE_WRITE_LINE_MEMBER(write_oki_bank0);
+	DECLARE_WRITE_LINE_MEMBER(write_oki_bank1);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(blitter_irq_callback);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_WRITE_LINE_MEMBER(write_oki_bank0);
-	DECLARE_WRITE_LINE_MEMBER(write_oki_bank1);
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 
 	DECLARE_READ16_MEMBER(rtc_r);
 	DECLARE_WRITE16_MEMBER(rtc_w);
 
-	DECLARE_READ_LINE_MEMBER(read_rand);
-
-	void tm(machine_config &config);
-	void tmds1204(machine_config &config);
 	void tmaster_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -262,7 +265,7 @@ void tmaster_state::tmaster_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x27ffff).ram();
 	map(0x280000, 0x28ffef).ram().share("nvram");
-	map(0x28fff0, 0x28ffff).rw(this, FUNC(tmaster_state::rtc_r), FUNC(tmaster_state::rtc_w));
+	map(0x28fff0, 0x28ffff).rw(FUNC(tmaster_state::rtc_r), FUNC(tmaster_state::rtc_w));
 
 	map(0x300010, 0x300011).portr("COIN");
 

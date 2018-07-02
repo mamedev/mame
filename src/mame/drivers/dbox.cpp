@@ -435,32 +435,36 @@
 
 class dbox_state : public driver_device
 {
- public:
- dbox_state(const machine_config &mconfig, device_type type, const char *tag)
-   : driver_device(mconfig, type, tag)
-   , m_maincpu(*this, "maincpu")
-   , m_display(*this, "display")
-   , m_ip16_74259(*this, "hct259.ip16")
-  { }
+public:
+	dbox_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_display(*this, "display")
+		, m_ip16_74259(*this, "hct259.ip16")
+	{ }
+
+	void dbox(machine_config &config);
+
+	void init_dbox();
+
+private:
 	required_device<m68340_cpu_device> m_maincpu;
 	required_device<sda5708_device> m_display;
 	required_device<latch8_device> m_ip16_74259;
 
 	virtual void machine_reset() override;
-	virtual void machine_start () override;
-	void init_dbox();
+	virtual void machine_start() override;
 	DECLARE_WRITE8_MEMBER(sda5708_reset);
 	DECLARE_WRITE8_MEMBER(sda5708_clk);
 	DECLARE_WRITE8_MEMBER(write_pa);
 
-	void dbox(machine_config &config);
 	void dbox_map(address_map &map);
 
 #if LOCALFLASH
-	DECLARE_READ16_MEMBER (sysflash_r);
-	DECLARE_WRITE16_MEMBER (sysflash_w);
+	DECLARE_READ16_MEMBER(sysflash_r);
+	DECLARE_WRITE16_MEMBER(sysflash_w);
 private:
-	uint16_t *m_sysflash;
+	uint16_t * m_sysflash;
 	uint32_t m_sf_mode;
 	uint32_t m_sf_state;
 #endif
@@ -574,8 +578,8 @@ void dbox_state::dbox_map(address_map &map)
 // 008004ee Address mask CS0 00000040, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
 // 008004f8 Base address CS0 00000044, 0000005b (ffffffff) - Base: 00000000 BFC:05 WP:1 FTE:0 NCS:1 Valid: Yes
 #if LOCALFLASH
-	map(0x000000, 0x3fffff).rom().r(this, FUNC(dbox_state::sysflash_r)).region("flash", 0);
-	map(0x000000, 0x3fffff).w(this, FUNC(dbox_state::sysflash_w));
+	map(0x000000, 0x3fffff).rom().r(FUNC(dbox_state::sysflash_r)).region("flash", 0);
+	map(0x000000, 0x3fffff).w(FUNC(dbox_state::sysflash_w));
 #else
 	map(0x000000, 0x3fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 #endif
@@ -587,8 +591,8 @@ void dbox_state::dbox_map(address_map &map)
 // 000000aa Address mask CS3 00000058, 000007f2 (ffffffff) - Mask: 00000700 FCM:0f DD:0 PS: 8-bit
 // 000000b2 Base address CS3 0000005c, 00780003 (ffffffff) - Base: 00780000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
 	// AM_RANGE(0x780000, 0x7807ff)
-	map(0x780100, 0x7801ff).w(this, FUNC(dbox_state::sda5708_reset));
-	map(0x780600, 0x7806ff).w(this, FUNC(dbox_state::sda5708_clk));
+	map(0x780100, 0x7801ff).w(FUNC(dbox_state::sda5708_reset));
+	map(0x780600, 0x7806ff).w(FUNC(dbox_state::sda5708_clk));
 // CS1 - RAM area
 // 0000008a Address mask CS1 00000048, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
 // 00000092 Base address CS1 0000004c, 00800003 (ffffffff) - Base: 00800000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes

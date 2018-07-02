@@ -84,6 +84,7 @@ PROM  : Type MB7051
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -101,7 +102,7 @@ public:
 
 	void shougi(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(semaphore_r);
 
@@ -115,7 +116,6 @@ protected:
 	void readport_sub(address_map &map);
 	void sub_map(address_map &map);
 
-private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -283,7 +283,7 @@ void shougi_state::sub_map(address_map &map)
 void shougi_state::readport_sub(address_map &map)
 {
 	map.global_mask(0x00ff);
-	map(0x00, 0x00).r(this, FUNC(shougi_state::semaphore_r));
+	map(0x00, 0x00).r(FUNC(shougi_state::semaphore_r));
 }
 
 

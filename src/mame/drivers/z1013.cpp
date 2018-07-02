@@ -55,6 +55,7 @@ Due to no input checking, misuse of commands can crash the system.
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -70,6 +71,10 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void z1013k76(machine_config &config);
+	void z1013(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(z1013_keyboard_w);
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_WRITE8_MEMBER(port_b_w);
@@ -77,11 +82,9 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER(z1013);
 	uint32_t screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void z1013k76(machine_config &config);
-	void z1013(machine_config &config);
 	void z1013_io(address_map &map);
 	void z1013_mem(address_map &map);
-private:
+
 	uint8_t m_keyboard_line;
 	bool m_keyboard_part;
 	virtual void machine_reset() override;
@@ -104,7 +107,7 @@ void z1013_state::z1013_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("z80pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0x08, 0x08).w(this, FUNC(z1013_state::z1013_keyboard_w));
+	map(0x08, 0x08).w(FUNC(z1013_state::z1013_keyboard_w));
 }
 
 /* Input ports */

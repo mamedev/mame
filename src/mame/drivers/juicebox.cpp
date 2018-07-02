@@ -14,6 +14,7 @@
 #include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -42,6 +43,13 @@ public:
 		, m_smartmedia(*this, "smartmedia")
 	{ }
 
+	void juicebox(machine_config &config);
+
+	void init_juicebox();
+
+	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c44b0_device> m_s3c44b0;
 	required_device<smartmedia_image_device> m_smartmedia;
@@ -53,10 +61,8 @@ public:
 	#endif
 	DECLARE_READ32_MEMBER(juicebox_nand_r);
 	DECLARE_WRITE32_MEMBER(juicebox_nand_w);
-	void init_juicebox();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	void smc_reset();
 	void smc_init();
@@ -65,7 +71,6 @@ public:
 	DECLARE_READ32_MEMBER(s3c44b0_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c44b0_gpio_port_w);
 	DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
-	void juicebox(machine_config &config);
 	void juicebox_map(address_map &map);
 };
 
@@ -291,7 +296,7 @@ void juicebox_state::machine_reset()
 void juicebox_state::juicebox_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).rom();
-	map(0x04000000, 0x04ffffff).rw(this, FUNC(juicebox_state::juicebox_nand_r), FUNC(juicebox_state::juicebox_nand_w));
+	map(0x04000000, 0x04ffffff).rw(FUNC(juicebox_state::juicebox_nand_r), FUNC(juicebox_state::juicebox_nand_w));
 	map(0x0c000000, 0x0c1fffff).ram().mirror(0x00600000);
 }
 
@@ -327,7 +332,7 @@ MACHINE_CONFIG_START(juicebox_state::juicebox)
 	MCFG_DEVICE_ADD("s3c44b0", S3C44B0, 10000000)
 	MCFG_S3C44B0_GPIO_PORT_R_CB(READ32(*this, juicebox_state, s3c44b0_gpio_port_r))
 	MCFG_S3C44B0_GPIO_PORT_W_CB(WRITE32(*this, juicebox_state, s3c44b0_gpio_port_w))
-	MCFG_S3C44B0_I2S_DATA_W_CB(WRITE16("dac", dac_word_interface, write))
+	MCFG_S3C44B0_I2S_DATA_W_CB(WRITE16("dac", dac_word_interface, data_w))
 
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 

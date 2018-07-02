@@ -17,6 +17,7 @@
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -45,7 +46,7 @@ public:
 protected:
 	DECLARE_READ32_MEMBER(p1000_r);
 	DECLARE_WRITE32_MEMBER(p1000_w);
-	DECLARE_READ32_MEMBER(disable_boot_rom);
+	DECLARE_READ32_MEMBER(disable_boot_rom_r);
 	TIMER_CALLBACK_MEMBER(disable_boot_rom);
 
 	virtual void machine_start() override;
@@ -268,7 +269,7 @@ WRITE32_MEMBER(risc2500_state::p1000_w)
 	m_p1000 = data;
 }
 
-READ32_MEMBER(risc2500_state::disable_boot_rom)
+READ32_MEMBER(risc2500_state::disable_boot_rom_r)
 {
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(10), timer_expired_delegate(FUNC(risc2500_state::disable_boot_rom), this));
 	return 0;
@@ -305,8 +306,8 @@ void risc2500_state::machine_reset()
 void risc2500_state::risc2500_mem(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).ram();
-	map(0x01800000, 0x01800003).r(this, FUNC(risc2500_state::disable_boot_rom));
-	map(0x01000000, 0x01000003).rw(this, FUNC(risc2500_state::p1000_r), FUNC(risc2500_state::p1000_w));
+	map(0x01800000, 0x01800003).r(FUNC(risc2500_state::disable_boot_rom_r));
+	map(0x01000000, 0x01000003).rw(FUNC(risc2500_state::p1000_r), FUNC(risc2500_state::p1000_w));
 	map(0x02000000, 0x0203ffff).rom().region("maincpu", 0);
 }
 

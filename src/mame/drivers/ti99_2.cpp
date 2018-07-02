@@ -204,6 +204,11 @@ public:
 		m_first_ram_page(0)
 		{ }
 
+	void ti99_2(machine_config &config);
+	void ti99_224(machine_config &config);
+	void ti99_232(machine_config &config);
+
+private:
 	DECLARE_MACHINE_START( ti99_224 );
 	DECLARE_MACHINE_START( ti99_232 );
 	DECLARE_MACHINE_RESET( ti99_2 );
@@ -223,11 +228,6 @@ public:
 	void crumap(address_map &map);
 	void memmap(address_map &map);
 
-	void ti99_2(machine_config &config);
-	void ti99_224(machine_config &config);
-	void ti99_232(machine_config &config);
-
-private:
 	required_device<tms9995_device> m_maincpu;
 	required_device<bus::ti99::internal::video992_device> m_videoctrl;
 	required_device<bus::ti99::internal::io992_device>    m_io992;
@@ -281,7 +281,7 @@ void ti99_2_state::memmap(address_map &map)
 	// 3 or 4 ROMs of 8 KiB. The 32K version has two ROMs mapped into 4000-5fff
 	// Part of the ROM is accessed by the video controller for the
 	// character definitions (1c00-1fff)
-	map(0x0000, 0xffff).rw(this, FUNC(ti99_2_state::mem_read), FUNC(ti99_2_state::mem_write));
+	map(0x0000, 0xffff).rw(FUNC(ti99_2_state::mem_read), FUNC(ti99_2_state::mem_write));
 }
 
 /*
@@ -297,7 +297,7 @@ void ti99_2_state::crumap(address_map &map)
 
 	// Mirror of CPU-internal flags (1ee0-1efe). Don't read. Write is OK.
 	map(0x01ee, 0x01ef).nopr();
-	map(0x0f70, 0x0f7f).w(this, FUNC(ti99_2_state::intflag_write));
+	map(0x0f70, 0x0f7f).w(FUNC(ti99_2_state::intflag_write));
 }
 
 /*

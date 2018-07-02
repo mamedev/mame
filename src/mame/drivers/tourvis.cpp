@@ -200,6 +200,9 @@ public:
 		, m_cart(*this, "cartslot")
 	{ }
 
+	void tourvision(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_a_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_b_w);
@@ -208,11 +211,10 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tourvision_cart);
 
-	void tourvision(machine_config &config);
 	void pce_io(address_map &map);
 	void pce_mem(address_map &map);
 	void tourvision_8085_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;
 	uint32_t  m_rom_size;
@@ -341,7 +343,7 @@ void tourvision_state::pce_mem(address_map &map)
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
 	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
-	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(tourvision_state::pce_joystick_r), FUNC(tourvision_state::pce_joystick_w));
+	map(0x1FF000, 0x1FF3FF).rw(FUNC(tourvision_state::pce_joystick_r), FUNC(tourvision_state::pce_joystick_w));
 	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 }
 
@@ -364,7 +366,7 @@ void tourvision_state::tourvision_8085_map(address_map &map)
 	map(0xa000, 0xa000).portr("DSW2");
 	map(0xb000, 0xb000).nopr(); // unknown (must NOT be == 0x03 ? code at 0x1154)
 	map(0xc000, 0xc000).portr("SYSTEM");
-	map(0xd000, 0xd000).w(this, FUNC(tourvision_state::tourvision_8085_d000_w));
+	map(0xd000, 0xd000).w(FUNC(tourvision_state::tourvision_8085_d000_w));
 	map(0xe000, 0xe1ff).ram();
 	map(0xf000, 0xf000).nopr(); // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
 }

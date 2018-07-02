@@ -40,6 +40,9 @@ public:
 	{
 	}
 
+	void skeetsht(machine_config &config);
+
+private:
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<uint16_t> m_tms_vram;
 	uint8_t m_porta_latch;
@@ -60,7 +63,6 @@ public:
 	required_device<cpu_device> m_68hc11;
 	required_device<ay8910_device> m_ay;
 	required_device<tms34010_device> m_tms;
-	void skeetsht(machine_config &config);
 	void hc11_io_map(address_map &map);
 	void hc11_pgm_map(address_map &map);
 	void tms_program_map(address_map &map);
@@ -191,14 +193,14 @@ WRITE8_MEMBER(skeetsht_state::ay8910_w)
 void skeetsht_state::hc11_pgm_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom().region("68hc11", 0);
-	map(0x1800, 0x1800).w(this, FUNC(skeetsht_state::ay8910_w));
-	map(0x2800, 0x2807).rw(this, FUNC(skeetsht_state::tms_r), FUNC(skeetsht_state::tms_w));
+	map(0x1800, 0x1800).w(FUNC(skeetsht_state::ay8910_w));
+	map(0x2800, 0x2807).rw(FUNC(skeetsht_state::tms_r), FUNC(skeetsht_state::tms_w));
 	map(0xb600, 0xbdff).ram(); //internal EEPROM
 }
 
 void skeetsht_state::hc11_io_map(address_map &map)
 {
-	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(this, FUNC(skeetsht_state::hc11_porta_r), FUNC(skeetsht_state::hc11_porta_w));
+	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(FUNC(skeetsht_state::hc11_porta_r), FUNC(skeetsht_state::hc11_porta_w));
 }
 
 
@@ -211,7 +213,7 @@ void skeetsht_state::hc11_io_map(address_map &map)
 void skeetsht_state::tms_program_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("tms_vram");
-	map(0x00440000, 0x004fffff).rw(this, FUNC(skeetsht_state::ramdac_r), FUNC(skeetsht_state::ramdac_w));
+	map(0x00440000, 0x004fffff).rw(FUNC(skeetsht_state::ramdac_r), FUNC(skeetsht_state::ramdac_w));
 	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffbfffff).rom().mirror(0x00400000).region("tms", 0);
 }

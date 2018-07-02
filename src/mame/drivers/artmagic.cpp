@@ -419,8 +419,8 @@ void artmagic_state::main_map(address_map &map)
 	map(0x300006, 0x300007).portr("300006");
 	map(0x300008, 0x300009).portr("300008");
 	map(0x30000a, 0x30000b).portr("30000a");
-	map(0x300000, 0x300003).w(this, FUNC(artmagic_state::control_w)).share("control");
-	map(0x300004, 0x300007).w(this, FUNC(artmagic_state::protection_bit_w));
+	map(0x300000, 0x300003).w(FUNC(artmagic_state::control_w)).share("control");
+	map(0x300004, 0x300007).w(FUNC(artmagic_state::protection_bit_w));
 	map(0x360001, 0x360001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 }
@@ -439,8 +439,8 @@ void artmagic_state::stonebal_map(address_map &map)
 	map(0x30000a, 0x30000b).portr("30000a");
 	map(0x30000c, 0x30000d).portr("30000c");
 	map(0x30000e, 0x30000f).portr("30000e");
-	map(0x300000, 0x300003).w(this, FUNC(artmagic_state::control_w)).share("control");
-	map(0x300004, 0x300007).w(this, FUNC(artmagic_state::protection_bit_w));
+	map(0x300000, 0x300003).w(FUNC(artmagic_state::control_w)).share("control");
+	map(0x300004, 0x300007).w(FUNC(artmagic_state::protection_bit_w));
 	map(0x340001, 0x340001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 }
@@ -453,8 +453,8 @@ void artmagic_state::shtstar_map(address_map &map)
 	map(0x280000, 0x280fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 
 	map(0x300000, 0x300001).nopr(); //AM_READ_PORT("300000")
-	map(0x300000, 0x300003).w(this, FUNC(artmagic_state::control_w)).share("control");
-	map(0x300004, 0x300007).w(this, FUNC(artmagic_state::protection_bit_w));
+	map(0x300000, 0x300003).w(FUNC(artmagic_state::control_w)).share("control");
+	map(0x300004, 0x300007).w(FUNC(artmagic_state::protection_bit_w));
 	map(0x340001, 0x340001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 	map(0x3c0000, 0x3c001f).rw("mainduart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -471,7 +471,7 @@ void artmagic_state::tms_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("vram0");
 	map(0x00400000, 0x005fffff).ram().share("vram1");
-	map(0x00800000, 0x0080007f).rw(this, FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
+	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
 	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).ram();
@@ -482,7 +482,7 @@ void artmagic_state::stonebal_tms_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("vram0");
 	map(0x00400000, 0x005fffff).ram().share("vram1");
-	map(0x00800000, 0x0080007f).rw(this, FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
+	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
 	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffc00000, 0xffffffff).ram();
@@ -910,30 +910,30 @@ ROM_START( cheesech )
 	ROM_LOAD( "u151", 0x00000, 0x80000, CRC(65d5ebdb) SHA1(0d905b9a60b86e51de3bdcf6eeb059fe29606431) )
 ROM_END
 
-
+/* There is known to exist an Ultimate Tennis with ROMs labeled  A&M001C1293 13B and A&M001C1293 12B, it not known if they are the same data as below */
 ROM_START( ultennis )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
-	ROM_LOAD16_BYTE( "utu102.bin", 0x00000, 0x40000, CRC(ec31385e) SHA1(244e78619c549712d5541fb252656afeba639bb7) )
-	ROM_LOAD16_BYTE( "utu101.bin", 0x00001, 0x40000, CRC(08a7f655) SHA1(b8a4265472360b68bed71d6c175fc54dff088c1d) )
+	ROM_LOAD16_BYTE( "a+m001b1093_13b_u102.u102", 0x00000, 0x40000, CRC(ec31385e) SHA1(244e78619c549712d5541fb252656afeba639bb7) ) /* labeled  A&M001B1093  13B  U102 */
+	ROM_LOAD16_BYTE( "a+m001b1093_12b_u101.u101", 0x00001, 0x40000, CRC(08a7f655) SHA1(b8a4265472360b68bed71d6c175fc54dff088c1d) ) /* labeled  A&M001B1093  12B  U101 */
 
 	ROM_REGION16_LE( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "utu133.bin", 0x000000, 0x200000, CRC(29d9204d) SHA1(0b2b77a55b8c2877c2e31b63156505584d4ee1f0) )
+	ROM_LOAD( "a+m-001-01-a.ic133", 0x000000, 0x200000, CRC(29d9204d) SHA1(0b2b77a55b8c2877c2e31b63156505584d4ee1f0) ) /* mask ROM labeled as  A&M-001-01-A  (C)1993 ART & MAGIC */
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "utu151.bin", 0x00000,  0x40000, CRC(4e19ca89) SHA1(ac7e17631ec653f83c4912df6f458b0e1df88096) )
+	ROM_LOAD( "a+m001b1093_14a_u151.u151", 0x00000,  0x40000, CRC(4e19ca89) SHA1(ac7e17631ec653f83c4912df6f458b0e1df88096) ) /* labeled  A&M001B1093  14A  U151 */
 ROM_END
 
 
 ROM_START( ultennisj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
-	ROM_LOAD16_BYTE( "a+m001d0194-13c-u102-japan.u102", 0x00000, 0x40000, CRC(65cee452) SHA1(49259e8faf289d6d80769f6d44e9d61d15e431c6) )
-	ROM_LOAD16_BYTE( "a+m001d0194-12c-u101-japan.u101", 0x00001, 0x40000, CRC(5f4b0ca0) SHA1(57e9ed60cc0e53eeb4e08c4003138d3bdaec3de7) )
+	ROM_LOAD16_BYTE( "a+m001d0194-13c-u102-japan.u102", 0x00000, 0x40000, CRC(65cee452) SHA1(49259e8faf289d6d80769f6d44e9d61d15e431c6) ) /* labeled  A&M001D0194  13C  U102 */
+	ROM_LOAD16_BYTE( "a+m001d0194-12c-u101-japan.u101", 0x00001, 0x40000, CRC(5f4b0ca0) SHA1(57e9ed60cc0e53eeb4e08c4003138d3bdaec3de7) ) /* labeled  A&M001D0194  12C  U101 */
 
 	ROM_REGION16_LE( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "a+m-001-01-a.ic133", 0x000000, 0x200000, CRC(29d9204d) SHA1(0b2b77a55b8c2877c2e31b63156505584d4ee1f0) )
+	ROM_LOAD( "a+m-001-01-a.ic133", 0x000000, 0x200000, CRC(29d9204d) SHA1(0b2b77a55b8c2877c2e31b63156505584d4ee1f0) ) /* mask ROM labeled as  A&M-001-01-A  (C)1993 ART & MAGIC */
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "a+m001c1293-14a-u151.u151", 0x00000,  0x40000, CRC(4e19ca89) SHA1(ac7e17631ec653f83c4912df6f458b0e1df88096) )
+	ROM_LOAD( "a+m001c1293-14a-u151.u151", 0x00000,  0x40000, CRC(4e19ca89) SHA1(ac7e17631ec653f83c4912df6f458b0e1df88096) ) /* labeled  A&M001C1293  14A  U151 */
 ROM_END
 
 

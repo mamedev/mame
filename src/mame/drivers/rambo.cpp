@@ -37,6 +37,11 @@ public:
 	{
 	}
 
+	void rambo(machine_config &config);
+
+	void init_rambo();
+
+private:
 	uint8_t m_port_a;
 	uint8_t m_port_b;
 	uint8_t m_port_c;
@@ -53,10 +58,8 @@ public:
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
 
-	void init_rambo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void rambo(machine_config &config);
 	void rambo_data_map(address_map &map);
 	void rambo_io_map(address_map &map);
 	void rambo_prg_map(address_map &map);
@@ -119,7 +122,7 @@ void rambo_state::rambo_data_map(address_map &map)
 
 void rambo_state::rambo_io_map(address_map &map)
 {
-	map(AVR8_IO_PORTA, AVR8_IO_PORTL).rw(this, FUNC(rambo_state::port_r), FUNC(rambo_state::port_w));
+	map(AVR8_IO_PORTA, AVR8_IO_PORTL).rw(FUNC(rambo_state::port_r), FUNC(rambo_state::port_w));
 }
 
 /****************************************************\

@@ -48,7 +48,7 @@ public:
 	void atari_s2(machine_config &config);
 	void atari_s3(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(sound0_w);
 	DECLARE_WRITE8_MEMBER(sound1_w);
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
@@ -62,7 +62,6 @@ protected:
 	void atari_s2_map(address_map &map);
 	void atari_s3_map(address_map &map);
 
-private:
 	bool m_timer_sb;
 	uint8_t m_timer_s[5];
 	uint8_t m_sound0;
@@ -93,14 +92,14 @@ void atari_s2_state::atari_s2_map(address_map &map)
 	map(0x1005, 0x1005).mirror(0x07F8).portr("SWITCH.5");
 	map(0x1006, 0x1006).mirror(0x07F8).portr("SWITCH.6");
 	map(0x1007, 0x1007).mirror(0x07F8).portr("SWITCH.7");
-	map(0x1800, 0x1800).mirror(0x071F).w(this, FUNC(atari_s2_state::sound0_w));
-	map(0x1820, 0x1820).mirror(0x071F).w(this, FUNC(atari_s2_state::sound1_w));
-	map(0x1840, 0x1847).mirror(0x0718).w(this, FUNC(atari_s2_state::display_w));
-	map(0x1860, 0x1867).mirror(0x0718).w(this, FUNC(atari_s2_state::lamp_w));
-	map(0x1880, 0x1880).mirror(0x071F).w(this, FUNC(atari_s2_state::sol0_w));
-	map(0x18a0, 0x18a7).mirror(0x0718).w(this, FUNC(atari_s2_state::sol1_w));
+	map(0x1800, 0x1800).mirror(0x071F).w(FUNC(atari_s2_state::sound0_w));
+	map(0x1820, 0x1820).mirror(0x071F).w(FUNC(atari_s2_state::sound1_w));
+	map(0x1840, 0x1847).mirror(0x0718).w(FUNC(atari_s2_state::display_w));
+	map(0x1860, 0x1867).mirror(0x0718).w(FUNC(atari_s2_state::lamp_w));
+	map(0x1880, 0x1880).mirror(0x071F).w(FUNC(atari_s2_state::sol0_w));
+	map(0x18a0, 0x18a7).mirror(0x0718).w(FUNC(atari_s2_state::sol1_w));
 	map(0x18c0, 0x18c0).mirror(0x071F).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x18e0, 0x18e0).mirror(0x071F).w(this, FUNC(atari_s2_state::intack_w));
+	map(0x18e0, 0x18e0).mirror(0x071F).w(FUNC(atari_s2_state::intack_w));
 	map(0x2000, 0x2000).mirror(0x07FC).portr("DSW0");
 	map(0x2001, 0x2001).mirror(0x07FC).portr("DSW1");
 	map(0x2002, 0x2002).mirror(0x07FC).portr("DSW2");
@@ -121,14 +120,14 @@ void atari_s2_state::atari_s3_map(address_map &map)
 	map(0x1005, 0x1005).mirror(0x07F8).portr("SWITCH.5");
 	map(0x1006, 0x1006).mirror(0x07F8).portr("SWITCH.6");
 	map(0x1007, 0x1007).mirror(0x07F8).portr("SWITCH.7");
-	map(0x1800, 0x1800).mirror(0x071F).w(this, FUNC(atari_s2_state::sound0_w));
-	map(0x1820, 0x1820).mirror(0x071F).w(this, FUNC(atari_s2_state::sound1_w));
-	map(0x1840, 0x1847).mirror(0x0718).w(this, FUNC(atari_s2_state::display_w));
-	map(0x1860, 0x1867).mirror(0x0718).w(this, FUNC(atari_s2_state::lamp_w));
-	map(0x1880, 0x1880).mirror(0x071F).w(this, FUNC(atari_s2_state::sol0_w));
-	map(0x18a0, 0x18a7).mirror(0x0718).w(this, FUNC(atari_s2_state::sol1_w));
+	map(0x1800, 0x1800).mirror(0x071F).w(FUNC(atari_s2_state::sound0_w));
+	map(0x1820, 0x1820).mirror(0x071F).w(FUNC(atari_s2_state::sound1_w));
+	map(0x1840, 0x1847).mirror(0x0718).w(FUNC(atari_s2_state::display_w));
+	map(0x1860, 0x1867).mirror(0x0718).w(FUNC(atari_s2_state::lamp_w));
+	map(0x1880, 0x1880).mirror(0x071F).w(FUNC(atari_s2_state::sol0_w));
+	map(0x18a0, 0x18a7).mirror(0x0718).w(FUNC(atari_s2_state::sol1_w));
 	map(0x18c0, 0x18c0).mirror(0x071F).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x18e0, 0x18e0).mirror(0x071F).w(this, FUNC(atari_s2_state::intack_w));
+	map(0x18e0, 0x18e0).mirror(0x071F).w(FUNC(atari_s2_state::intack_w));
 	map(0x2000, 0x2000).mirror(0x07F4).portr("DSW0");
 	map(0x2001, 0x2001).mirror(0x07F4).portr("DSW1");
 	map(0x2002, 0x2002).mirror(0x07F4).portr("DSW2");

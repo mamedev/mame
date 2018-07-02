@@ -51,6 +51,7 @@ E I1     Vectored interrupt error
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -78,6 +79,9 @@ public:
 	{
 	}
 
+	void m20(machine_config &config);
+
+private:
 	required_device<z8001_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<i8251_device> m_kbdi8251;
@@ -105,16 +109,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	MC6845_UPDATE_ROW(update_row);
 
-	void m20(machine_config &config);
 	void m20_data_mem(address_map &map);
 	void m20_io(address_map &map);
 	void m20_program_mem(address_map &map);
-private:
+
 	offs_t m_memsize;
 	uint8_t m_port21;
 	void install_memory();
 
-public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	IRQ_CALLBACK_MEMBER(m20_irq_callback);
 };
@@ -707,7 +709,7 @@ void m20_state::m20_io(address_map &map)
 
 	map(0x00, 0x07).rw(m_fd1797, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0x00ff);
 
-	map(0x20, 0x21).rw(this, FUNC(m20_state::port21_r), FUNC(m20_state::port21_w));
+	map(0x20, 0x21).rw(FUNC(m20_state::port21_r), FUNC(m20_state::port21_w));
 
 	map(0x61, 0x61).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x62, 0x62).w("crtc", FUNC(mc6845_device::address_w)); // FIXME
@@ -724,7 +726,7 @@ void m20_state::m20_io(address_map &map)
 
 	map(0x120, 0x127).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 
-	map(0x140, 0x143).rw(this, FUNC(m20_state::m20_i8259_r), FUNC(m20_state::m20_i8259_w));
+	map(0x140, 0x143).rw(FUNC(m20_state::m20_i8259_r), FUNC(m20_state::m20_i8259_w));
 
 	map(0x3ffa, 0x3ffd).w(m_apb, FUNC(m20_8086_device::handshake_w));
 }
@@ -848,7 +850,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_2", i8251_device, write_rxd))
 
-	MCFG_DEVICE_ADD("apb", M20_8086, 0)
+	MCFG_DEVICE_ADD("apb", M20_8086, "maincpu", "i8259", RAM_TAG)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","m20")
 MACHINE_CONFIG_END

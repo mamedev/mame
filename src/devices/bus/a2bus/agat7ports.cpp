@@ -53,11 +53,11 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(a2bus_agat7_ports_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("d9", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, a2bus_agat7_ports_device, write_portb))
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, a2bus_agat7_ports_device, read_portc))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, a2bus_agat7_ports_device, write_centronics_busy))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 

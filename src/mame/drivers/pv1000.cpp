@@ -10,6 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -144,6 +145,9 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
+	void pv1000(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(gfxram_w);
@@ -173,7 +177,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void pv1000(machine_config &config);
 	void pv1000(address_map &map);
 	void pv1000_io(address_map &map);
 };
@@ -183,14 +186,14 @@ void pv1000_state::pv1000(address_map &map)
 {
 	//AM_RANGE(0x0000, 0x7fff)      // mapped by the cartslot
 	map(0xb800, 0xbbff).ram().share("videoram");
-	map(0xbc00, 0xbfff).ram().w(this, FUNC(pv1000_state::gfxram_w)).region("gfxram", 0);
+	map(0xbc00, 0xbfff).ram().w(FUNC(pv1000_state::gfxram_w)).region("gfxram", 0);
 }
 
 
 void pv1000_state::pv1000_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf8, 0xff).rw(this, FUNC(pv1000_state::io_r), FUNC(pv1000_state::io_w));
+	map(0xf8, 0xff).rw(FUNC(pv1000_state::io_r), FUNC(pv1000_state::io_w));
 }
 
 

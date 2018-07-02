@@ -608,26 +608,23 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	MCFG_SEGA315_5313_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
 	MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
 	MCFG_SEGA315_5313_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0, m_maincpu, m_scan_timer)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
-	// we need to remove and re-add the sound system because the balance is different
+	// we need to remove and re-add the YM because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_REMOVE("snsnd")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
-
-	/* sound hardware */
-	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
 	MCFG_GENERIC_EXTENSIONS("32x,bin")
@@ -649,8 +646,11 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	MCFG_SEGA315_5313_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
 	MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
 	MCFG_SEGA315_5313_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0, m_maincpu, m_scan_timer)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
@@ -659,16 +659,10 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_REMOVE("snsnd")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
-
-	/* sound hardware */
-	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
 	MCFG_GENERIC_EXTENSIONS("32x,bin")
@@ -690,8 +684,11 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	MCFG_SEGA315_5313_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
 	MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
 	MCFG_SEGA315_5313_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0)
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0, m_maincpu, m_scan_timer)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
@@ -700,16 +697,10 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_REMOVE("snsnd")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
-
-	/* sound hardware */
-	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
 	MCFG_GENERIC_EXTENSIONS("32x,bin")

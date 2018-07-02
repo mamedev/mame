@@ -97,13 +97,15 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void d6809(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( term_r );
 	DECLARE_WRITE8_MEMBER( term_w );
 	void kbd_put(u8 data);
 
-	void d6809(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -129,7 +131,7 @@ void d6809_state::mem_map(address_map &map)
 	// 00-FF is for various devices.
 	map(0x0000, 0x0003).rw("acia1", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x0004, 0x0007).rw("acia2", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x00ff, 0x00ff).rw(this, FUNC(d6809_state::term_r), FUNC(d6809_state::term_w));
+	map(0x00ff, 0x00ff).rw(FUNC(d6809_state::term_r), FUNC(d6809_state::term_w));
 	map(0x1000, 0xdfff).ram();
 	map(0xe000, 0xffff).rom().region("roms", 0);
 }

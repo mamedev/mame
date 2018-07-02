@@ -634,17 +634,17 @@ void tumbleb_state::tumblepopb_main_map(address_map &map)
 #if TUMBLEP_HACK
 	map(0x000000, 0x07ffff).writeonly();   /* To write levels modifications */
 #endif
-	map(0x100000, 0x100001).rw(this, FUNC(tumbleb_state::tumblepb_prot_r), FUNC(tumbleb_state::tumblepb_oki_w));
+	map(0x100000, 0x100001).rw(FUNC(tumbleb_state::tumblepb_prot_r), FUNC(tumbleb_state::tumblepb_oki_w));
 	map(0x120000, 0x123fff).ram().share("mainram");
 	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram"); /* Bootleg sprite buffer */
 	map(0x160800, 0x160807).writeonly(); /* writes past the end of spriteram */
-	map(0x180000, 0x18000f).r(this, FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x18000c, 0x18000d).nopw();
 	map(0x1a0000, 0x1a07ff).ram();
-	map(0x300000, 0x30000f).w(this, FUNC(tumbleb_state::tumblepb_control_0_w));
-	map(0x320000, 0x320fff).w(this, FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
-	map(0x322000, 0x322fff).w(this, FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
+	map(0x300000, 0x30000f).w(FUNC(tumbleb_state::tumblepb_control_0_w));
+	map(0x320000, 0x320fff).w(FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
+	map(0x322000, 0x322fff).w(FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
 	map(0x340000, 0x3401ff).nopw(); /* Unused row scroll */
 	map(0x340400, 0x34047f).nopw(); /* Unused col scroll */
 	map(0x342000, 0x3421ff).nopw();
@@ -662,12 +662,12 @@ void tumbleb_state::fncywld_main_map(address_map &map)
 	map(0x140000, 0x140fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram"); /* sprites */
 	map(0x160800, 0x16080f).writeonly(); /* goes slightly past the end of spriteram? */
-	map(0x180000, 0x18000f).r(this, FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x18000c, 0x18000d).nopw();
 	map(0x1a0000, 0x1a07ff).ram();
-	map(0x300000, 0x30000f).w(this, FUNC(tumbleb_state::tumblepb_control_0_w));
-	map(0x320000, 0x321fff).ram().w(this, FUNC(tumbleb_state::fncywld_pf1_data_w)).share("pf1_data");
-	map(0x322000, 0x323fff).ram().w(this, FUNC(tumbleb_state::fncywld_pf2_data_w)).share("pf2_data");
+	map(0x300000, 0x30000f).w(FUNC(tumbleb_state::tumblepb_control_0_w));
+	map(0x320000, 0x321fff).ram().w(FUNC(tumbleb_state::fncywld_pf1_data_w)).share("pf1_data");
+	map(0x322000, 0x323fff).ram().w(FUNC(tumbleb_state::fncywld_pf2_data_w)).share("pf2_data");
 	map(0x340000, 0x3401ff).nopw(); /* Unused row scroll */
 	map(0x340400, 0x34047f).nopw(); /* Unused col scroll */
 	map(0x342000, 0x3421ff).nopw();
@@ -684,18 +684,18 @@ READ16_MEMBER(tumbleb_state::semibase_unknown_r)
 void tumbleb_state::htchctch_main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x10000f).r(this, FUNC(tumbleb_state::semibase_unknown_r));
-	map(0x100000, 0x100001).w(this, FUNC(tumbleb_state::semicom_soundcmd_w));
-	map(0x100002, 0x100003).w(this, FUNC(tumbleb_state::bcstory_tilebank_w));
+	map(0x100000, 0x10000f).r(FUNC(tumbleb_state::semibase_unknown_r));
+	map(0x100000, 0x100001).w(FUNC(tumbleb_state::semicom_soundcmd_w));
+	map(0x100002, 0x100003).w(FUNC(tumbleb_state::bcstory_tilebank_w));
 	map(0x120000, 0x123fff).ram().share("mainram");
 	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x160fff).ram().share("spriteram"); /* Bootleg sprite buffer */
-	map(0x180000, 0x18000f).r(this, FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x18000c, 0x18000d).nopw();
 	map(0x1a0000, 0x1a0fff).ram();
-	map(0x300000, 0x30000f).w(this, FUNC(tumbleb_state::tumblepb_control_0_w));
-	map(0x320000, 0x321fff).w(this, FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
-	map(0x322000, 0x322fff).w(this, FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
+	map(0x300000, 0x30000f).w(FUNC(tumbleb_state::tumblepb_control_0_w));
+	map(0x320000, 0x321fff).w(FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
+	map(0x322000, 0x322fff).w(FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
 	map(0x323000, 0x331fff).noprw(); // metal saver writes there when clearing the above tilemaps, flaw in the program routine
 	map(0x341000, 0x342fff).ram();             // Extra ram?
 }
@@ -713,13 +713,13 @@ void tumbleb_state::suprtrio_main_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x700000, 0x700fff).ram().share("spriteram");
 	map(0xa00000, 0xa0000f).ram().share("control");
-	map(0xa20000, 0xa20fff).ram().w(this, FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
-	map(0xa22000, 0xa22fff).ram().w(this, FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
+	map(0xa20000, 0xa20fff).ram().w(FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
+	map(0xa22000, 0xa22fff).ram().w(FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
 	map(0xcf0000, 0xcf05ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xe00000, 0xe00001).portr("PLAYERS").w(this, FUNC(tumbleb_state::suprtrio_tilebank_w));
+	map(0xe00000, 0xe00001).portr("PLAYERS").w(FUNC(tumbleb_state::suprtrio_tilebank_w));
 	map(0xe40000, 0xe40001).portr("SYSTEM");
 	map(0xe80002, 0xe80003).portr("DSW");
-	map(0xec0000, 0xec0001).w(this, FUNC(tumbleb_state::semicom_soundcmd_w));
+	map(0xec0000, 0xec0001).w(FUNC(tumbleb_state::semicom_soundcmd_w));
 	map(0xf00000, 0xf07fff).ram();
 }
 
@@ -730,11 +730,11 @@ void tumbleb_state::pangpang_main_map(address_map &map)
 	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram"); /* Bootleg sprite buffer */
 	map(0x160800, 0x160807).writeonly(); // writes past the end of spriteram
-	map(0x180000, 0x18000f).r(this, FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x1a0000, 0x1a07ff).ram();
-	map(0x300000, 0x30000f).w(this, FUNC(tumbleb_state::tumblepb_control_0_w));
-	map(0x320000, 0x321fff).ram().w(this, FUNC(tumbleb_state::pangpang_pf1_data_w)).share("pf1_data");
-	map(0x340000, 0x341fff).ram().w(this, FUNC(tumbleb_state::pangpang_pf2_data_w)).share("pf2_data");
+	map(0x300000, 0x30000f).w(FUNC(tumbleb_state::tumblepb_control_0_w));
+	map(0x320000, 0x321fff).ram().w(FUNC(tumbleb_state::pangpang_pf1_data_w)).share("pf1_data");
+	map(0x340000, 0x341fff).ram().w(FUNC(tumbleb_state::pangpang_pf2_data_w)).share("pf2_data");
 }
 
 
@@ -766,7 +766,7 @@ void tumbleb_state::semicom_sound_map(address_map &map)
 	map(0xf002, 0xf002).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//AM_RANGE(0xf006, 0xf006) ??
 	map(0xf008, 0xf008).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xf00e, 0xf00e).w(this, FUNC(tumbleb_state::oki_sound_bank_w));
+	map(0xf00e, 0xf00e).w(FUNC(tumbleb_state::oki_sound_bank_w));
 }
 
 void tumbleb_state::suprtrio_sound_map(address_map &map)
@@ -776,7 +776,7 @@ void tumbleb_state::suprtrio_sound_map(address_map &map)
 	map(0xf002, 0xf002).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//AM_RANGE(0xf006, 0xf006) ??
 	map(0xf008, 0xf008).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xf00e, 0xf00e).w(this, FUNC(tumbleb_state::oki_sound_bank_w));
+	map(0xf00e, 0xf00e).w(FUNC(tumbleb_state::oki_sound_bank_w));
 }
 
 /* Jump Kids */
@@ -784,17 +784,17 @@ void tumbleb_state::suprtrio_sound_map(address_map &map)
 void tumbleb_state::jumpkids_main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x100001).w(this, FUNC(tumbleb_state::jumpkids_sound_w));
+	map(0x100000, 0x100001).w(FUNC(tumbleb_state::jumpkids_sound_w));
 	map(0x120000, 0x123fff).ram().share("mainram");
 	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram"); /* Bootleg sprite buffer */
 	map(0x160800, 0x160807).writeonly(); /* writes past the end of spriteram */
-	map(0x180000, 0x18000f).r(this, FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x18000c, 0x18000d).nopw();
 	map(0x1a0000, 0x1a07ff).ram();
-	map(0x300000, 0x30000f).w(this, FUNC(tumbleb_state::tumblepb_control_0_w));
-	map(0x320000, 0x320fff).w(this, FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
-	map(0x322000, 0x322fff).w(this, FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
+	map(0x300000, 0x30000f).w(FUNC(tumbleb_state::tumblepb_control_0_w));
+	map(0x320000, 0x320fff).w(FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
+	map(0x322000, 0x322fff).w(FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
 	map(0x340000, 0x3401ff).nopw(); /* Unused row scroll */
 	map(0x340400, 0x34047f).nopw(); /* Unused col scroll */
 	map(0x342000, 0x3421ff).nopw();
@@ -814,7 +814,7 @@ void tumbleb_state::jumpkids_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(tumbleb_state::jumpkids_oki_bank_w));
+	map(0x9000, 0x9000).w(FUNC(tumbleb_state::jumpkids_oki_bank_w));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -2262,7 +2262,7 @@ MACHINE_CONFIG_START(tumbleb_state::cookbib_mcu)
 	htchctch(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("protection", I8052, 16000000)  // AT89C52
+	MCFG_DEVICE_ADD("protection", AT89C52, 16000000)
 	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, tumbleb_state, prot_p0_w))
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, tumbleb_state, prot_p1_w))
 	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, tumbleb_state, prot_p2_w))

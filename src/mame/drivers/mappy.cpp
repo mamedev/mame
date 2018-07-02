@@ -644,9 +644,9 @@ WRITE_LINE_MEMBER(mappy_state::vblank_irq)
 
 void mappy_state::superpac_cpu1_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(this, FUNC(mappy_state::superpac_videoram_w)).share("videoram"); /* video RAM */
+	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram"); /* video RAM */
 	map(0x0800, 0x1fff).ram().share("spriteram");       /* work RAM with embedded sprite RAM */
-	map(0x2000, 0x2000).rw(this, FUNC(mappy_state::superpac_flipscreen_r), FUNC(mappy_state::superpac_flipscreen_w));
+	map(0x2000, 0x2000).rw(FUNC(mappy_state::superpac_flipscreen_r), FUNC(mappy_state::superpac_flipscreen_w));
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));  /* shared RAM with the sound CPU */
 	map(0x4800, 0x480f).rw("namcoio_1", FUNC(namcoio_device::read), FUNC(namcoio_device::write));      /* custom I/O chips interface */
 	map(0x4810, 0x481f).rw("namcoio_2", FUNC(namcoio_device::read), FUNC(namcoio_device::write));      /* custom I/O chips interface */
@@ -657,7 +657,7 @@ void mappy_state::superpac_cpu1_map(address_map &map)
 
 void mappy_state::phozon_cpu1_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(this, FUNC(mappy_state::superpac_videoram_w)).share("videoram"); /* video RAM */
+	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram"); /* video RAM */
 	map(0x0800, 0x1fff).ram().share("spriteram"); /* shared RAM with CPU #2/sprite RAM*/
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));  /* shared RAM with the sound CPU */
 	map(0x4800, 0x480f).rw("namcoio_1", FUNC(namcoio_device::read), FUNC(namcoio_device::write));      /* custom I/O chips interface */
@@ -669,9 +669,9 @@ void mappy_state::phozon_cpu1_map(address_map &map)
 
 void mappy_state::mappy_cpu1_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(this, FUNC(mappy_state::mappy_videoram_w)).share("videoram");        /* video RAM */
+	map(0x0000, 0x0fff).ram().w(FUNC(mappy_state::mappy_videoram_w)).share("videoram");        /* video RAM */
 	map(0x1000, 0x27ff).ram().share("spriteram");       /* work RAM with embedded sprite RAM */
-	map(0x3800, 0x3fff).w(this, FUNC(mappy_state::mappy_scroll_w));               /* scroll */
+	map(0x3800, 0x3fff).w(FUNC(mappy_state::mappy_scroll_w));               /* scroll */
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));  /* shared RAM with the sound CPU */
 	map(0x4800, 0x480f).rw("namcoio_1", FUNC(namcoio_device::read), FUNC(namcoio_device::write));      /* custom I/O chips interface */
 	map(0x4810, 0x481f).rw("namcoio_2", FUNC(namcoio_device::read), FUNC(namcoio_device::write));      /* custom I/O chips interface */
@@ -704,7 +704,7 @@ void mappy_state::mappy_cpu2_map(address_map &map)
 /* extra CPU only present in Phozon */
 void mappy_state::phozon_cpu3_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(this, FUNC(mappy_state::superpac_videoram_w)).share("videoram"); /* video RAM */
+	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram"); /* video RAM */
 	map(0x0800, 0x1fff).ram().share("spriteram");           /* shared RAM with CPU #2/sprite RAM*/
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));  /* shared RAM with CPU #2 */
 	map(0xa000, 0xa7ff).ram();                         /* RAM */
@@ -2079,7 +2079,7 @@ void mappy_state::init_grobda()
 	   However, removing the 15XX from the board causes sound to disappear completely, so
 	   the 15XX may still play some part in conveying speech to the DAC.
 	  */
-	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::write), (dac_byte_interface *)m_dac));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::data_w), (dac_byte_interface *)m_dac));
 }
 
 

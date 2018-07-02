@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
 
+#include "emupal.h"
+
 class timelimt_state : public driver_device
 {
 public:
@@ -14,6 +16,9 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram") { }
 
+	void timelimt(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -49,7 +54,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(irq);
-	void timelimt(machine_config &config);
+
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_io_map(address_map &map);

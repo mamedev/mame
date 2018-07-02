@@ -140,7 +140,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
-
+#include "emupal.h"
 #include "speaker.h"
 
 #include <cstdio>
@@ -176,16 +176,33 @@ public:
 		, m_esp(*this, "esp")
 		, m_pump(*this, "pump")
 		, m_fdc(*this, "wd1772")
+		, m_floppy_connector(*this, "wd1772:0")
 		, m_panel(*this, "panel")
 		, m_dmac(*this, "mc68450")
 		, m_mdout(*this, "mdout")
 	{ }
 
+	void sq1(machine_config &config);
+	void vfx(machine_config &config);
+	void vfxsd(machine_config &config);
+	void eps(machine_config &config);
+	void vfx32(machine_config &config);
+	
+	void init_eps();
+	void init_common();
+	void init_sq1();
+	void init_denib();
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
+	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
+
+private:
 	required_device<m68000_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<es5510_device> m_esp;
 	required_device<esq_5505_5510_pump_device> m_pump;
 	optional_device<wd1772_device> m_fdc;
+	optional_device<floppy_connector> m_floppy_connector;
 	required_device<esqpanel_device> m_panel;
 	optional_device<hd63450_device> m_dmac;
 	required_device<midi_port_device> m_mdout;
@@ -216,33 +233,17 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void sq1(machine_config &config);
-	void vfx(machine_config &config);
-	void vfxsd(machine_config &config);
-	void eps(machine_config &config);
-	void vfx32(machine_config &config);
 	void eps_map(address_map &map);
 	void sq1_map(address_map &map);
 	void vfx_map(address_map &map);
 	void vfxsd_map(address_map &map);
-private:
+
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
-
-public:
-	void init_eps();
-	void init_common();
-	void init_sq1();
-	void init_denib();
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
-	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
 
 	//dmac
 	DECLARE_WRITE8_MEMBER(dma_end);
 	DECLARE_WRITE8_MEMBER(dma_error);
-	DECLARE_READ8_MEMBER(fdc_read_byte);
-	DECLARE_WRITE8_MEMBER(fdc_write_byte);
 };
 
 FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
@@ -256,7 +257,8 @@ static void ensoniq_floppies(device_slot_interface &device)
 
 IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
 {
-	switch(irqline) {
+	switch(irqline)
+	{
 	case 1:
 		return M68K_INT_ACK_AUTOVECTOR;
 	case 2:
@@ -281,8 +283,7 @@ void esq5505_state::machine_start()
 
 void esq5505_state::machine_reset()
 {
-	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : nullptr;
+	floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
 
 	// Default analog values: all values are 10 bits, left-justified within 16 bits.
 	m_analog_values[0] = 0x7fc0; // pitch mod: start in the center
@@ -295,7 +296,7 @@ void esq5505_state::machine_reset()
 	m_analog_values[7] = 0x5540; // vRef to check battery.
 
 	// on VFX, bit 0 is 1 for 'cartridge present'.
-	// on VFX-SD and later, bit 0 is 1 for floppy present, bit 1 is 1 for cartridge present
+	// on VFX-SD and later, bit 0 is2 1 for floppy present, bit 1 is 1 for cartridge present
 	if (core_stricmp(machine().system().name, "vfx") == 0)
 	{
 		// todo: handle VFX cart-in when we support cartridges
@@ -316,21 +317,29 @@ void esq5505_state::machine_reset()
 	}
 }
 
-void esq5505_state::update_irq_to_maincpu() {
+void esq5505_state::update_irq_to_maincpu()
+{
 	// printf("updating IRQ state: have OTIS=%d, DMAC=%d, DUART=%d\n", otis_irq_state, dmac_irq_state, duart_irq_state);
-	if (duart_irq_state) {
+	if (duart_irq_state)
+	{
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, duart_irq_vector);
-	} else if (dmac_irq_state) {
+	}
+	else if (dmac_irq_state)
+	{
 		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, dmac_irq_vector);
-	} else if (otis_irq_state) {
+	}
+	else if (otis_irq_state)
+	{
 		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
-	} else {
+	}
+	else
+	{
 		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
@@ -381,7 +390,7 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 
 void esq5505_state::vfx_map(address_map &map)
 {
-	map(0x000000, 0x007fff).rw(this, FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
+	map(0x000000, 0x007fff).rw(FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
 	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
 	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
@@ -391,7 +400,7 @@ void esq5505_state::vfx_map(address_map &map)
 
 void esq5505_state::vfxsd_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).rw(this, FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
+	map(0x000000, 0x00ffff).rw(FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
 	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
 	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
@@ -403,7 +412,7 @@ void esq5505_state::vfxsd_map(address_map &map)
 
 void esq5505_state::eps_map(address_map &map)
 {
-	map(0x000000, 0x007fff).rw(this, FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
+	map(0x000000, 0x007fff).rw(FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
 	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
 	map(0x240000, 0x2400ff).rw(m_dmac, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
 	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -415,7 +424,7 @@ void esq5505_state::eps_map(address_map &map)
 
 void esq5505_state::sq1_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rw(this, FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
+	map(0x000000, 0x03ffff).rw(FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
 	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
 	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
 	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -458,8 +467,7 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 
 WRITE8_MEMBER(esq5505_state::duart_output)
 {
-	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : nullptr;
+	floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
 
 	m_duart_io = data;
 
@@ -480,13 +488,18 @@ WRITE8_MEMBER(esq5505_state::duart_output)
 	    bit 7 = SACK (?)
 	*/
 
-	if (data & 0x40) {
-		if (!m_pump->get_esp_halted()) {
+	if (data & 0x40)
+	{
+		if (!m_pump->get_esp_halted())
+		{
 			logerror("ESQ5505: Asserting ESPHALT\n");
 			m_pump->set_esp_halted(true);
 		}
-	} else {
-		if (m_pump->get_esp_halted()) {
+	}
+	else
+	{
+		if (m_pump->get_esp_halted())
+		{
 			logerror("ESQ5505: Clearing ESPHALT\n");
 			m_pump->set_esp_halted(false);
 		}
@@ -549,16 +562,6 @@ WRITE8_MEMBER(esq5505_state::dma_error)
 	}
 
 	update_irq_to_maincpu();
-}
-
-READ8_MEMBER(esq5505_state::fdc_read_byte)
-{
-	return m_fdc->data_r();
-}
-
-WRITE8_MEMBER(esq5505_state::fdc_write_byte)
-{
-	m_fdc->data_w(data & 0xff);
 }
 
 #if KEYBOARD_HACK
@@ -667,22 +670,25 @@ MACHINE_CONFIG_START(esq5505_state::eps)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(eps_map)
 
+	MCFG_DEVICE_MODIFY("duart")
+	MCFG_DEVICE_CLOCK(10_MHz_XTAL / 2)
+
 	MCFG_ESQPANEL2X40_VFX_REMOVE("panel")
 	MCFG_ESQPANEL1X22_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(*this, esq5505_state, analog_w))
 
-	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 
-	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible
-	MCFG_HD63450_CPU("maincpu") // CPU - 68000
+	MCFG_DEVICE_ADD("mc68450", HD63450, 10_MHz_XTAL)   // MC68450 compatible
+	MCFG_HD63450_CPU("maincpu")
 	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
 	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
 	MCFG_HD63450_DMA_END_CB(WRITE8(*this, esq5505_state, dma_end))
 	MCFG_HD63450_DMA_ERROR_CB(WRITE8(*this, esq5505_state, dma_error))
-	MCFG_HD63450_DMA_READ_0_CB(READ8(*this, esq5505_state, fdc_read_byte))  // ch 0 = fdc, ch 1 = 340001 (ADC?)
-	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(*this, esq5505_state, fdc_write_byte))
+	MCFG_HD63450_DMA_READ_0_CB(READ8(m_fdc, wd1772_device, data_r))  // ch 0 = fdc, ch 1 = 340001 (ADC?)
+	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(m_fdc, wd1772_device, data_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esq5505_state::vfxsd)
@@ -989,8 +995,7 @@ void esq5505_state::init_common()
 	m_system_type = GENERIC;
 	m_duart_io = 0;
 
-	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : nullptr;
+	floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
 	if (floppy)
 	{
 		m_fdc->set_floppy(floppy);

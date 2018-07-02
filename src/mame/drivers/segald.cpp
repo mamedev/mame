@@ -22,6 +22,7 @@ Todo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ldv1000.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #define SCHEMATIC_CLOCK (20000000)
@@ -41,6 +42,11 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void astron(machine_config &config);
+
+	void init_astron();
+
+private:
 	uint8_t m_nmi_enable;
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
@@ -62,7 +68,6 @@ public:
 	DECLARE_WRITE8_MEMBER(astron_COLOR_write);
 	DECLARE_WRITE8_MEMBER(astron_FIX_write);
 	DECLARE_WRITE8_MEMBER(astron_io_bankswitch_w);
-	void init_astron();
 	virtual void machine_start() override;
 	uint32_t screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect);
@@ -70,7 +75,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void astron(machine_config &config);
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
 };
@@ -259,15 +263,15 @@ void segald_state::mainmem(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 
-	map(0xc000, 0xc7ff).rw(this, FUNC(segald_state::astron_OBJ_read), FUNC(segald_state::astron_OBJ_write)).share("obj_ram");    /* OBJ according to the schematics (sprite) */
-	map(0xc800, 0xcfff).rw(this, FUNC(segald_state::astron_DISC_read), FUNC(segald_state::astron_DISC_write));                  /* DISC interface according to schematics */
+	map(0xc000, 0xc7ff).rw(FUNC(segald_state::astron_OBJ_read), FUNC(segald_state::astron_OBJ_write)).share("obj_ram");    /* OBJ according to the schematics (sprite) */
+	map(0xc800, 0xcfff).rw(FUNC(segald_state::astron_DISC_read), FUNC(segald_state::astron_DISC_write));                  /* DISC interface according to schematics */
 	map(0xd000, 0xd000).portr("DSWA");                               /* SW bank 2 (DIPs) */
 	map(0xd001, 0xd001).portr("DSWB");                               /* SW bank 3 (DIPs) */
 	map(0xd002, 0xd002).portr("IN0");                                /* SW bank 0 (IO) */
 	map(0xd003, 0xd003).portr("IN1");                                /* SW bank 1 (IO) */
-	map(0xd800, 0xd803).rw(this, FUNC(segald_state::astron_OUT_read), FUNC(segald_state::astron_OUT_write)).share("out_ram");    /* OUT according to schematics (output port) */
-	map(0xe000, 0xe1ff).rw(this, FUNC(segald_state::astron_COLOR_read), FUNC(segald_state::astron_COLOR_write)).share("color_ram"); /* COLOR according to the schematics */
-	map(0xf000, 0xf7ff).w(this, FUNC(segald_state::astron_FIX_write)).share("fix_ram");                     /* FIX according to schematics (characters) */
+	map(0xd800, 0xd803).rw(FUNC(segald_state::astron_OUT_read), FUNC(segald_state::astron_OUT_write)).share("out_ram");    /* OUT according to schematics (output port) */
+	map(0xe000, 0xe1ff).rw(FUNC(segald_state::astron_COLOR_read), FUNC(segald_state::astron_COLOR_write)).share("color_ram"); /* COLOR according to the schematics */
+	map(0xf000, 0xf7ff).w(FUNC(segald_state::astron_FIX_write)).share("fix_ram");                     /* FIX according to schematics (characters) */
 	map(0xf800, 0xffff).ram();                                                             /* RAM according to schematics */
 }
 
@@ -276,7 +280,7 @@ void segald_state::mainmem(address_map &map)
 void segald_state::mainport(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(segald_state::astron_io_bankswitch_w));
+	map(0x00, 0x01).w(FUNC(segald_state::astron_io_bankswitch_w));
 }
 
 

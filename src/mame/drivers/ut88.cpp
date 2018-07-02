@@ -43,7 +43,7 @@ void ut88_state::ut88mini_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).rom();  // System ROM
 	map(0xc000, 0xc3ff).ram();  // RAM
-	map(0x9000, 0x9fff).w(this, FUNC(ut88_state::ut88mini_write_led)); // 7seg LED
+	map(0x9000, 0x9fff).w(FUNC(ut88_state::ut88mini_write_led)); // 7seg LED
 }
 
 void ut88_state::ut88_mem(address_map &map)
@@ -58,14 +58,14 @@ void ut88_state::ut88_mem(address_map &map)
 
 void ut88_state::ut88mini_io(address_map &map)
 {
-	map(0xA0, 0xA0).r(this, FUNC(ut88_state::ut88mini_keyboard_r));
-	map(0xA1, 0xA1).r(this, FUNC(ut88_state::ut88_tape_r));
+	map(0xA0, 0xA0).r(FUNC(ut88_state::ut88mini_keyboard_r));
+	map(0xA1, 0xA1).r(FUNC(ut88_state::ut88_tape_r));
 }
 
 void ut88_state::ut88_io(address_map &map)
 {
-	map(0x04, 0x07).rw(this, FUNC(ut88_state::ut88_keyboard_r), FUNC(ut88_state::ut88_keyboard_w));
-	map(0xA1, 0xA1).rw(this, FUNC(ut88_state::ut88_tape_r), FUNC(ut88_state::ut88_sound_w));
+	map(0x04, 0x07).rw(FUNC(ut88_state::ut88_keyboard_r), FUNC(ut88_state::ut88_keyboard_w));
+	map(0xA1, 0xA1).rw(FUNC(ut88_state::ut88_tape_r), FUNC(ut88_state::ut88_sound_w));
 }
 
 /* Input ports */

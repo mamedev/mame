@@ -23,19 +23,21 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void mt420(machine_config &config);
+	void mt5510(machine_config &config);
+
+private:
 	u32 mt5510_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(c000_r);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void mt420(machine_config &config);
-	void mt5510(machine_config &config);
 	void mt420_io_map(address_map &map);
 	void mt420_mem_map(address_map &map);
 	void mt420_vram_map(address_map &map);
 	void mt5510_io_map(address_map &map);
 	void mt5510_mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	optional_region_ptr<u8> m_p_chargen;
 };
@@ -54,7 +56,7 @@ void microterm_state::mt420_mem_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x9000, 0x9000).nopw();
-	map(0xc000, 0xc000).r(this, FUNC(microterm_state::c000_r)).nopw();
+	map(0xc000, 0xc000).r(FUNC(microterm_state::c000_r)).nopw();
 	map(0xe000, 0xefff).ram();
 	map(0xeff8, 0xefff).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
 	map(0xf000, 0xf7ff).ram();
@@ -105,7 +107,7 @@ MACHINE_CONFIG_START(microterm_state::mt420)
 
 	MCFG_DEVICE_ADD("aci", MC2661, XTAL(3'686'400)) // SCN2641
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_EEPROM_SERIAL_DO_CALLBACK(WRITELINE("duart", scn2681_device, ip6_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -135,10 +137,10 @@ MACHINE_CONFIG_START(microterm_state::mt5510)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom1", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(3)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom2", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(3)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom1")
+	MCFG_DEVICE_ADD("eeprom1", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_EEPROM_SERIAL_DO_CALLBACK(WRITELINE("duart", scn2681_device, ip6_w))
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom2")
+	MCFG_DEVICE_ADD("eeprom2", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_EEPROM_SERIAL_DO_CALLBACK(WRITELINE("duart", scn2681_device, ip5_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)

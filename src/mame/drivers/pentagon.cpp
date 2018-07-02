@@ -17,11 +17,6 @@
 class pentagon_state : public spectrum_state
 {
 public:
-	enum
-	{
-		TIMER_IRQ_ON,
-		TIMER_IRQ_OFF
-	};
 	pentagon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_state(mconfig, type, tag)
 		, m_bank1(*this, "bank1")
@@ -30,6 +25,16 @@ public:
 		, m_bank4(*this, "bank4")
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
+
+	void pent1024(machine_config &config);
+	void pentagon(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_IRQ_ON,
+		TIMER_IRQ_OFF
+	};
 
 	DECLARE_WRITE8_MEMBER(pentagon_port_7ffd_w);
 	DECLARE_WRITE8_MEMBER(pentagon_scr_w);
@@ -42,19 +47,17 @@ public:
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_on);
 	TIMER_CALLBACK_MEMBER(irq_off);
-	void pent1024(machine_config &config);
-	void pentagon(machine_config &config);
 	void pentagon_io(address_map &map);
 	void pentagon_mem(address_map &map);
 	void pentagon_switch(address_map &map);
-protected:
+
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-private:
+
 	address_space *m_program;
 	uint8_t *m_p_ram;
 	void pentagon_update_memory();
@@ -192,12 +195,12 @@ void pentagon_state::pentagon_mem(address_map &map)
 void pentagon_state::pentagon_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0000).w(this, FUNC(pentagon_state::pentagon_port_7ffd_w)).mirror(0x7ffd);  // (A15 | A1) == 0
+	map(0x0000, 0x0000).w(FUNC(pentagon_state::pentagon_port_7ffd_w)).mirror(0x7ffd);  // (A15 | A1) == 0
 	map(0x001f, 0x001f).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w)).mirror(0xff00);
 	map(0x003f, 0x003f).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w)).mirror(0xff00);
 	map(0x005f, 0x005f).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w)).mirror(0xff00);
 	map(0x007f, 0x007f).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w)).mirror(0xff00);
-	map(0x00fe, 0x00fe).rw(this, FUNC(pentagon_state::spectrum_port_fe_r), FUNC(pentagon_state::spectrum_port_fe_w)).select(0xff00);
+	map(0x00fe, 0x00fe).rw(FUNC(pentagon_state::spectrum_port_fe_r), FUNC(pentagon_state::spectrum_port_fe_w)).select(0xff00);
 	map(0x00ff, 0x00ff).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w)).mirror(0xff00);
 	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
 	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
@@ -205,9 +208,9 @@ void pentagon_state::pentagon_io(address_map &map)
 
 void pentagon_state::pentagon_switch(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(pentagon_state::beta_neutral_r)); // Overlap with next because we want real addresses on the 3e00-3fff range
-	map(0x3d00, 0x3dff).r(this, FUNC(pentagon_state::beta_enable_r));
-	map(0x4000, 0xffff).r(this, FUNC(pentagon_state::beta_disable_r));
+	map(0x0000, 0x3fff).r(FUNC(pentagon_state::beta_neutral_r)); // Overlap with next because we want real addresses on the 3e00-3fff range
+	map(0x3d00, 0x3dff).r(FUNC(pentagon_state::beta_enable_r));
+	map(0x4000, 0xffff).r(FUNC(pentagon_state::beta_disable_r));
 }
 
 MACHINE_RESET_MEMBER(pentagon_state,pentagon)

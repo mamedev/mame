@@ -359,7 +359,6 @@ void pgm2_state::video_start()
 
 	int ramsize = m_sp_videoram.bytes() / 4;
 	m_spritebufferram = make_unique_clear<uint32_t[]>(ramsize);
-
-	save_pointer(NAME(m_spritebufferram.get()), ramsize);
+	save_pointer(NAME(m_spritebufferram), ramsize);
 }
 

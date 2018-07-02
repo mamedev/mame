@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, Angelo Salese
 #include "emu.h"
 #include "includes/tatsumi.h"
 #include "sound/okim6295.h"
@@ -123,11 +123,11 @@ WRITE16_MEMBER(apache3_state::apache3_rotate_w)
 READ16_MEMBER(roundup5_state::roundup_v30_z80_r)
 {
 	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
-		
+
 	/* Each Z80 byte maps to a V30 word */
 	if (m_control_word & 0x20)
 		offset += 0x8000; /* Upper half */
-	
+
 	return 0xff00 | targetspace.read_byte(offset);
 }
 
@@ -147,7 +147,7 @@ WRITE16_MEMBER(roundup5_state::roundup_v30_z80_w)
 
 
 WRITE16_MEMBER(roundup5_state::roundup5_control_w)
-{	
+{
 	COMBINE_DATA(&m_control_word);
 
 	if (m_control_word & 0x10)
@@ -173,9 +173,9 @@ WRITE16_MEMBER(roundup5_state::roundup5_control_w)
 
 	    0x0040  :   Z80 rom (lower half) mapped to 0x10000
 	    0x0060  :   Z80 rom (upper half) mapped to 0x10000
-        
-		0x0080  :   enabled when showing map screen after a play 
-		            (switches video priority between text layer and sprites)
+
+	    0x0080  :   enabled when showing map screen after a play
+	                (switches video priority between text layer and sprites)
 
 	    0x0100  :   watchdog.
 
@@ -209,12 +209,12 @@ WRITE16_MEMBER(roundup5_state::roundup5_control_w)
 
 WRITE16_MEMBER(roundup5_state::road_vregs_w)
 {
-	/*  
+	/*
 	    ---- ---x ---- ---- enabled when there's a road slope of any kind, unknown purpose
-		---- ---- -xx- ---- enables alternatively in tunnels sometimes, color mods?
-		---- ---- ---x ---- road bank select
-		---- ---- ---- xxxx various values written during POST while accessing road pixel ram, 
-		                    otherwise 0xb at the start of irq service
+	    ---- ---- -xx- ---- enables alternatively in tunnels sometimes, color mods?
+	    ---- ---- ---x ---- road bank select
+	    ---- ---- ---- xxxx various values written during POST while accessing road pixel ram,
+	                        otherwise 0xb at the start of irq service
 	*/
 
 	COMBINE_DATA(&m_road_vregs[offset]);
@@ -316,9 +316,18 @@ READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
 	return r;
 }
 
-READ8_MEMBER(tatsumi_state::tatsumi_hack_oki_r)
+READ8_MEMBER(cyclwarr_state::oki_status_xor_r)
 {
-	int r=m_oki->read(space,0);
+	int r = m_oki->read(space,0);
+
+	// Cycle Warriors and Big Fight access this with reversed activeness.
+	// this is particularly noticeable with the "We got em" sample played in CW at stage clear:
+	// gets cut too early with the old hack below.
+	// fwiw returning normal oki status doesn't work at all, both games don't make any sound.
+	// TODO: verify with HW
+	return (r ^ 0xff);
+	#ifdef UNUSED_FUNCTION
+	// old hack left for reference
 
 	if (m_audiocpu->pc()==0x2b70 || m_audiocpu->pc()==0x2bb5
 		|| m_audiocpu->pc()==0x2acc
@@ -330,4 +339,5 @@ READ8_MEMBER(tatsumi_state::tatsumi_hack_oki_r)
 		|| m_audiocpu->pc()==0x1cac) // BigFight
 		return 0;
 	return r;
+	#endif
 }

@@ -535,8 +535,8 @@ public:
 	ioport_port *ioport(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;
-	template<class DeviceClass> inline DeviceClass *subdevice(const char *tag) const { return downcast<DeviceClass *>(subdevice(tag)); }
-	template<class DeviceClass> inline DeviceClass *siblingdevice(const char *tag) const { return downcast<DeviceClass *>(siblingdevice(tag)); }
+	template<class DeviceClass> DeviceClass *subdevice(const char *tag) const { return downcast<DeviceClass *>(subdevice(tag)); }
+	template<class DeviceClass> DeviceClass *siblingdevice(const char *tag) const { return downcast<DeviceClass *>(siblingdevice(tag)); }
 	std::string parameter(const char *tag) const;
 
 	// configuration helpers
@@ -571,15 +571,15 @@ public:
 
 	// state saving interfaces
 	template<typename ItemType>
-	void ATTR_COLD save_item(ItemType &value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, value, valname); }
+	void ATTR_COLD save_item(ItemType &&value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, std::forward<ItemType>(value), valname); }
 	template<typename ItemType>
-	void ATTR_COLD save_pointer(ItemType *value, const char *valname, u32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
+	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), valname, count); }
 
 	// debugging
 	device_debug *debug() const { return m_debug.get(); }
 
 	void set_system_bios(u8 bios) { m_system_bios = bios; }
-	bool findit(bool pre_map, bool isvalidation) const;
+	bool findit(bool isvalidation) const;
 
 	// misc
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;

@@ -22,6 +22,7 @@
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -35,6 +36,10 @@ public:
 	{
 	}
 
+	void rt1715(machine_config &config);
+	void rt1715w(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(rt1715_floppy_enable);
 	DECLARE_READ8_MEMBER(k7658_led1_r);
 	DECLARE_READ8_MEMBER(k7658_led2_r);
@@ -44,17 +49,14 @@ public:
 	DECLARE_PALETTE_INIT(rt1715);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
-	void rt1715(machine_config &config);
-	void rt1715w(machine_config &config);
 	void k7658_io(address_map &map);
 	void k7658_mem(address_map &map);
 	void rt1715_io(address_map &map);
 	void rt1715_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	int m_led1_val;
 	int m_led2_val;
 	required_device<cpu_device> m_maincpu;
@@ -204,21 +206,21 @@ void rt1715_state::rt1715_io(address_map &map)
 	map(0x08, 0x0b).rw("a30", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw("a29", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x18, 0x19).rw("a26", FUNC(i8275_device::read), FUNC(i8275_device::write));
-	map(0x20, 0x20).w(this, FUNC(rt1715_state::rt1715_floppy_enable));
-	map(0x28, 0x28).w(this, FUNC(rt1715_state::rt1715_rom_disable));
+	map(0x20, 0x20).w(FUNC(rt1715_state::rt1715_floppy_enable));
+	map(0x28, 0x28).w(FUNC(rt1715_state::rt1715_rom_disable));
 }
 
 void rt1715_state::k7658_mem(address_map &map)
 {
-	map(0x0000, 0xffff).w(this, FUNC(rt1715_state::k7658_data_w));
+	map(0x0000, 0xffff).w(FUNC(rt1715_state::k7658_data_w));
 	map(0x0000, 0x07ff).mirror(0xf800).rom();
 }
 
 void rt1715_state::k7658_io(address_map &map)
 {
-	map(0x2000, 0x2000).mirror(0x8000).r(this, FUNC(rt1715_state::k7658_led1_r));
-	map(0x4000, 0x4000).mirror(0x8000).r(this, FUNC(rt1715_state::k7658_led2_r));
-	map(0x8000, 0x9fff).r(this, FUNC(rt1715_state::k7658_data_r));
+	map(0x2000, 0x2000).mirror(0x8000).r(FUNC(rt1715_state::k7658_led1_r));
+	map(0x4000, 0x4000).mirror(0x8000).r(FUNC(rt1715_state::k7658_led2_r));
+	map(0x8000, 0x9fff).r(FUNC(rt1715_state::k7658_data_r));
 }
 
 

@@ -139,6 +139,11 @@ public:
 		m_qimi_extint(CLEAR_LINE)
 	{ }
 
+	void ql_ntsc(machine_config &config);
+	void opd(machine_config &config);
+	void ql(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_ipc;
 	required_device<zx8301_device> m_zx8301;
@@ -194,9 +199,7 @@ public:
 	// QIMI
 	bool m_qimi_enabled;
 	int m_qimi_extint;
-	void ql_ntsc(machine_config &config);
-	void opd(machine_config &config);
-	void ql(machine_config &config);
+
 	void ipc_io(address_map &map);
 	void ql_mem(address_map &map);
 };
@@ -498,7 +501,7 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 
 void ql_state::ql_mem(address_map &map)
 {
-	map(0x000000, 0x0fffff).rw(this, FUNC(ql_state::read), FUNC(ql_state::write));
+	map(0x000000, 0x0fffff).rw(FUNC(ql_state::read), FUNC(ql_state::write));
 }
 
 
@@ -508,7 +511,7 @@ void ql_state::ql_mem(address_map &map)
 
 void ql_state::ipc_io(address_map &map)
 {
-	map(0x00, 0x7f).w(this, FUNC(ql_state::ipc_w));
+	map(0x00, 0x7f).w(FUNC(ql_state::ipc_w));
 	map(0x27, 0x28).nopr(); // IPC reads these to set P0 (bus) to Hi-Z mode
 }
 

@@ -252,6 +252,7 @@ cosmic.cpp
 cps1.cpp
 cps2.cpp
 cps3.cpp
+cpzodiac.cpp
 crbaloon.cpp
 crgolf.cpp
 crimfght.cpp
@@ -312,6 +313,7 @@ divebomb.cpp
 diverboy.cpp
 djboy.cpp
 djmain.cpp
+dkmb.cpp
 dkong.cpp
 dlair.cpp
 dlair2.cpp
@@ -340,6 +342,7 @@ ecoinf1.cpp
 ecoinf2.cpp
 ecoinf3.cpp
 ecoinfr.cpp
+efdt.cpp
 egghunt.cpp
 electra.cpp
 embargo.cpp
@@ -831,6 +834,7 @@ neptunp2.cpp
 news.cpp
 nexus3d.cpp
 nibble.cpp
+nichild.cpp
 nightgal.cpp
 ninjakd2.cpp
 ninjaw.cpp

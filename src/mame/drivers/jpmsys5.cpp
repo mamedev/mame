@@ -286,33 +286,33 @@ void jpmsys5_state::jpm_sys5_common_map(address_map &map)
 	map(0x046080, 0x046083).rw("acia6850_1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0x04608c, 0x04608f).rw("acia6850_2", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0x0460c0, 0x0460c1).nopw();
-	map(0x048000, 0x04801f).rw(this, FUNC(jpmsys5_state::coins_r), FUNC(jpmsys5_state::coins_w));
-	map(0x04c000, 0x04c0ff).r(this, FUNC(jpmsys5_state::mux_r)).w(this, FUNC(jpmsys5_state::mux_w));
+	map(0x048000, 0x04801f).rw(FUNC(jpmsys5_state::coins_r), FUNC(jpmsys5_state::coins_w));
+	map(0x04c000, 0x04c0ff).r(FUNC(jpmsys5_state::mux_r)).w(FUNC(jpmsys5_state::mux_w));
 }
 
 void jpmsys5_state::m68000_awp_map(address_map &map)
 {
 	jpm_sys5_common_map(map);
 	map(0x0460a0, 0x0460a3).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x04c100, 0x04c105).rw(this, FUNC(jpmsys5_state::jpm_upd7759_r), FUNC(jpmsys5_state::jpm_upd7759_w));
+	map(0x04c100, 0x04c105).rw(FUNC(jpmsys5_state::jpm_upd7759_r), FUNC(jpmsys5_state::jpm_upd7759_w));
 }
 
 void jpmsys5_state::m68000_awp_map_saa(address_map &map)
 {
 	jpm_sys5_common_map(map);
 	map(0x0460a0, 0x0460a3).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
-	map(0x04c100, 0x04c105).rw(this, FUNC(jpmsys5_state::jpm_upd7759_r), FUNC(jpmsys5_state::jpm_upd7759_w)); // do the SAA boards have the UPD?
+	map(0x04c100, 0x04c105).rw(FUNC(jpmsys5_state::jpm_upd7759_r), FUNC(jpmsys5_state::jpm_upd7759_w)); // do the SAA boards have the UPD?
 }
 
 void jpmsys5v_state::m68000_map(address_map &map)
 {
 	jpm_sys5_common_map(map);
-	map(0x01fffe, 0x01ffff).w(this, FUNC(jpmsys5v_state::rombank_w)); // extra on video system (rom board?) (although regular games do write here?)
+	map(0x01fffe, 0x01ffff).w(FUNC(jpmsys5v_state::rombank_w)); // extra on video system (rom board?) (although regular games do write here?)
 	map(0x020000, 0x03ffff).bankr("bank1"); // extra on video system (rom board?)
 	map(0x0460a0, 0x0460a3).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x0460e0, 0x0460e5).w(this, FUNC(jpmsys5v_state::ramdac_w));  // extra on video system (rom board?)
-	map(0x04c100, 0x04c105).rw(this, FUNC(jpmsys5v_state::jpm_upd7759_r), FUNC(jpmsys5v_state::jpm_upd7759_w));
-	map(0x800000, 0xcfffff).rw(this, FUNC(jpmsys5v_state::sys5_tms34061_r), FUNC(jpmsys5v_state::sys5_tms34061_w)); // extra on video system (rom board?)
+	map(0x0460e0, 0x0460e5).w(FUNC(jpmsys5v_state::ramdac_w));  // extra on video system (rom board?)
+	map(0x04c100, 0x04c105).rw(FUNC(jpmsys5v_state::jpm_upd7759_r), FUNC(jpmsys5v_state::jpm_upd7759_w));
+	map(0x800000, 0xcfffff).rw(FUNC(jpmsys5v_state::sys5_tms34061_r), FUNC(jpmsys5v_state::sys5_tms34061_w)); // extra on video system (rom board?)
 }
 
 

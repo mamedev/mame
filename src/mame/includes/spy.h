@@ -9,6 +9,7 @@
 #include "video/k052109.h"
 #include "video/k051960.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 
 class spy_state : public driver_device
 {
@@ -24,6 +25,9 @@ public:
 		m_k051960(*this, "k051960"),
 		m_palette(*this, "palette") { }
 
+	void spy(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_ram;
 	uint8_t      m_pmcram[0x800];
@@ -60,7 +64,7 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_callback1);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	void spy(machine_config &config);
+
 	void spy_map(address_map &map);
 	void spy_sound_map(address_map &map);
 };

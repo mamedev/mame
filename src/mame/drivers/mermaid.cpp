@@ -163,21 +163,21 @@ void mermaid_state::mermaid_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xcbff).ram().w(this, FUNC(mermaid_state::mermaid_videoram2_w)).share("videoram2");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(mermaid_state::mermaid_videoram_w)).share("videoram");
-	map(0xd800, 0xd81f).ram().w(this, FUNC(mermaid_state::mermaid_bg_scroll_w)).share("bg_scrollram");
-	map(0xd840, 0xd85f).ram().w(this, FUNC(mermaid_state::mermaid_fg_scroll_w)).share("fg_scrollram");
+	map(0xc800, 0xcbff).ram().w(FUNC(mermaid_state::mermaid_videoram2_w)).share("videoram2");
+	map(0xd000, 0xd3ff).ram().w(FUNC(mermaid_state::mermaid_videoram_w)).share("videoram");
+	map(0xd800, 0xd81f).ram().w(FUNC(mermaid_state::mermaid_bg_scroll_w)).share("bg_scrollram");
+	map(0xd840, 0xd85f).ram().w(FUNC(mermaid_state::mermaid_fg_scroll_w)).share("fg_scrollram");
 	map(0xd880, 0xd8bf).ram().share("spriteram");
-	map(0xdc00, 0xdfff).ram().w(this, FUNC(mermaid_state::mermaid_colorram_w)).share("colorram");
+	map(0xdc00, 0xdfff).ram().w(FUNC(mermaid_state::mermaid_colorram_w)).share("colorram");
 	map(0xe000, 0xe000).portr("DSW");
 	map(0xe000, 0xe007).w("latch1", FUNC(ls259_device::write_d0));
 	map(0xe800, 0xe800).portr("P1");
 	map(0xe800, 0xe807).w("latch2", FUNC(ls259_device::write_d0));
 	map(0xf000, 0xf000).portr("P2");
-	map(0xf800, 0xf800).r(this, FUNC(mermaid_state::mermaid_collision_r));
+	map(0xf800, 0xf800).r(FUNC(mermaid_state::mermaid_collision_r));
 	map(0xf802, 0xf802).nopw();    // ???
-	map(0xf806, 0xf806).w(this, FUNC(mermaid_state::mermaid_ay8910_write_port_w));
-	map(0xf807, 0xf807).w(this, FUNC(mermaid_state::mermaid_ay8910_control_port_w));
+	map(0xf806, 0xf806).w(FUNC(mermaid_state::mermaid_ay8910_write_port_w));
+	map(0xf807, 0xf807).w(FUNC(mermaid_state::mermaid_ay8910_control_port_w));
 }
 
 WRITE_LINE_MEMBER(mermaid_state::rougien_sample_rom_lo_w)
@@ -401,7 +401,7 @@ void mermaid_state::machine_reset()
 WRITE8_MEMBER(mermaid_state::adpcm_data_w)
 {
 	m_adpcm_data = data;
-	m_adpcm->data_w(m_adpcm_trigger ? (data & 0x0f) : (data & 0xf0) >> 4);
+	m_adpcm->write_data(m_adpcm_trigger ? (data & 0x0f) : (data & 0xf0) >> 4);
 }
 
 WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
@@ -410,7 +410,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 		return;
 
 	m_adpcm_trigger ^= 1;
-	m_adpcm->data_w(m_adpcm_trigger ? (m_adpcm_data & 0x0f) : (m_adpcm_data & 0xf0) >> 4);
+	m_adpcm->write_data(m_adpcm_trigger ? (m_adpcm_data & 0x0f) : (m_adpcm_data & 0xf0) >> 4);
 	m_adpcm_counter->clock_w(m_adpcm_trigger);
 	if (m_adpcm_trigger == 0 && m_adpcm_counter->count() == 0)
 	{

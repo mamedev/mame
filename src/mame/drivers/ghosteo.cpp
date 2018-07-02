@@ -64,6 +64,7 @@ ToDo: verify QS1000 hook-up
 //#include "machine/smartmed.h"
 #include "machine/i2cmem.h"
 #include "sound/qs1000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -98,6 +99,14 @@ public:
 	{
 	}
 
+	void ghosteo(machine_config &config);
+	void touryuu(machine_config &config);
+	void bballoon(machine_config &config);
+
+	void init_touryuu();
+	void init_bballoon();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<s3c2410_device> m_s3c2410;
@@ -116,8 +125,6 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	int m_rom_pagesize;
-	void init_touryuu();
-	void init_bballoon();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
@@ -130,9 +137,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_scl_w );
 	DECLARE_READ_LINE_MEMBER(s3c2410_i2c_sda_r );
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_sda_w );
-	void ghosteo(machine_config &config);
-	void touryuu(machine_config &config);
-	void bballoon(machine_config &config);
 	void bballoon_map(address_map &map);
 	void touryuu_map(address_map &map);
 };
@@ -427,7 +431,7 @@ void ghosteo_state::bballoon_map(address_map &map)
 
 void ghosteo_state::touryuu_map(address_map &map)
 {
-	map(0x10000000, 0x10000003).r(this, FUNC(ghosteo_state::touryuu_port_10000000_r));
+	map(0x10000000, 0x10000003).r(FUNC(ghosteo_state::touryuu_port_10000000_r));
 	map(0x10100000, 0x10100003).portr("10100000");
 	map(0x10200000, 0x10200003).portr("10200000");
 	map(0x10300000, 0x10300000).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);

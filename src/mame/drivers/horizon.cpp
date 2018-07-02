@@ -59,13 +59,15 @@ public:
 		, m_usart_r(*this, I8251_R_TAG)
 		{ }
 
-	DECLARE_READ8_MEMBER(ff_r);
-
 	void horizon(machine_config &config);
 	void horizon2mhz(machine_config &config);
+
+private:
+	DECLARE_READ8_MEMBER(ff_r);
+
 	void horizon_io(address_map &map);
 	void horizon_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart_l;
@@ -90,7 +92,7 @@ void horizon_state::horizon_mem(address_map &map)
 	map(0xea11, 0xea11);
 	map(0xea21, 0xea21);
 	map(0xea31, 0xea31);
-	map(0xeb10, 0xeb17).r(this, FUNC(horizon_state::ff_r));
+	map(0xeb10, 0xeb17).r(FUNC(horizon_state::ff_r));
 	map(0xeb20, 0xeb20);
 	map(0xeb35, 0xeb35);
 	map(0xeb40, 0xeb40);

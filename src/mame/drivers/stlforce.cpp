@@ -95,10 +95,10 @@ WRITE8_MEMBER(stlforce_state::oki_bank_w)
 void stlforce_state::stlforce_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x1007ff).ram().w(this, FUNC(stlforce_state::bg_videoram_w)).share("bg_videoram");
-	map(0x100800, 0x100fff).ram().w(this, FUNC(stlforce_state::mlow_videoram_w)).share("mlow_videoram");
-	map(0x101000, 0x1017ff).ram().w(this, FUNC(stlforce_state::mhigh_videoram_w)).share("mhigh_videoram");
-	map(0x101800, 0x1027ff).ram().w(this, FUNC(stlforce_state::tx_videoram_w)).share("tx_videoram");
+	map(0x100000, 0x1007ff).ram().w(FUNC(stlforce_state::bg_videoram_w)).share("bg_videoram");
+	map(0x100800, 0x100fff).ram().w(FUNC(stlforce_state::mlow_videoram_w)).share("mlow_videoram");
+	map(0x101000, 0x1017ff).ram().w(FUNC(stlforce_state::mhigh_videoram_w)).share("mhigh_videoram");
+	map(0x101800, 0x1027ff).ram().w(FUNC(stlforce_state::tx_videoram_w)).share("tx_videoram");
 	map(0x102800, 0x102fff).ram(); /* unknown / ram */
 	map(0x103000, 0x1033ff).ram().share("bg_scrollram");
 	map(0x103400, 0x1037ff).ram().share("mlow_scrollram");
@@ -110,8 +110,8 @@ void stlforce_state::stlforce_map(address_map &map)
 	map(0x109000, 0x11ffff).ram();
 	map(0x400000, 0x400001).portr("INPUT");
 	map(0x400002, 0x400003).portr("SYSTEM");
-	map(0x400011, 0x400011).w(this, FUNC(stlforce_state::eeprom_w));
-	map(0x400012, 0x400012).w(this, FUNC(stlforce_state::oki_bank_w));
+	map(0x400011, 0x400011).w(FUNC(stlforce_state::eeprom_w));
+	map(0x400012, 0x400012).w(FUNC(stlforce_state::oki_bank_w));
 	map(0x40001e, 0x40001f).nopw(); // sprites buffer commands
 	map(0x410001, 0x410001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(stlforce_state::stlforce)
 	MCFG_DEVICE_PROGRAM_MAP(stlforce_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stlforce_state, irq4_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -21,6 +21,7 @@
 
 #include "formats/nanos_dsk.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -49,6 +50,9 @@ public:
 		, m_linec(*this, "LINEC")
 	{ }
 
+	void nanos(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER( nanos_tc_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
@@ -61,10 +65,9 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void nanos(machine_config &config);
 	void nanos_io(address_map &map);
 	void nanos_mem(address_map &map);
-private:
+
 	uint8_t m_key_command;
 	uint8_t m_last_code;
 	uint8_t m_key_pressed;
@@ -154,7 +157,7 @@ void nanos_state::nanos_io(address_map &map)
 	map(0x8C, 0x8F).rw(m_ctc_0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
 	/* FDC card */
-	map(0x92, 0x92).w(this, FUNC(nanos_state::nanos_tc_w));
+	map(0x92, 0x92).w(FUNC(nanos_state::nanos_tc_w));
 	map(0x94, 0x95).m(m_fdc, FUNC(upd765a_device::map));
 	/* V24+IFSS card */
 	map(0xA0, 0xA3).rw(m_sio_0, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));

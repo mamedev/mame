@@ -52,6 +52,7 @@
 #include "machine/timer.h"
 #include "video/ef9345.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -92,6 +93,9 @@ public:
 		{
 		}
 
+	void minitel2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ts9347_device> m_ts9347;
 	required_device<palette_device> m_palette;
@@ -109,10 +113,9 @@ public:
 	DECLARE_READ8_MEMBER ( ts9347_io_r );
 	DECLARE_WRITE8_MEMBER ( ts9347_io_w );
 
-	void minitel2(machine_config &config);
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
-protected:
+
 	required_ioport_array<16> m_io_kbd;
 	virtual void machine_start() override;
 
@@ -284,9 +287,9 @@ void minitel_state::mem_prg(address_map &map)
 
 void minitel_state::mem_io(address_map &map)
 {
-	map(0x2000, 0x3fff).rw(this, FUNC(minitel_state::dev_keyb_ser_r), FUNC(minitel_state::dev_crtl_reg_w));
+	map(0x2000, 0x3fff).rw(FUNC(minitel_state::dev_keyb_ser_r), FUNC(minitel_state::dev_crtl_reg_w));
 	/* ts9347 */
-	map(0x4000, 0x5ffF).rw(this, FUNC(minitel_state::ts9347_io_r), FUNC(minitel_state::ts9347_io_w));
+	map(0x4000, 0x5ffF).rw(FUNC(minitel_state::ts9347_io_r), FUNC(minitel_state::ts9347_io_w));
 }
 
 /* Input ports */

@@ -128,13 +128,16 @@ com5016_013_device::com5016_013_device(const machine_config &mconfig, const char
 void com8116_device::device_start()
 {
 	// resolve callbacks
-	m_fx4_handler.resolve_safe();
+	m_fx4_handler.resolve();
 	m_fr_handler.resolve_safe();
 	m_ft_handler.resolve_safe();
 
 	// allocate timers
-	m_fx4_timer = timer_alloc(TIMER_FX4);
-	m_fx4_timer->adjust(attotime::from_hz((clock() / 4) * 2), 0, attotime::from_hz((clock() / 4)) * 2);
+	if (!m_fx4_handler.isnull())
+	{
+		m_fx4_timer = timer_alloc(TIMER_FX4);
+		m_fx4_timer->adjust(attotime::from_hz((clock() / 4) * 2), 0, attotime::from_hz((clock() / 4)) * 2);
+	}
 	m_fr_timer = timer_alloc(TIMER_FR);
 	m_ft_timer = timer_alloc(TIMER_FT);
 
@@ -190,7 +193,7 @@ void com8116_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  str_w -
 //-------------------------------------------------
 
-void com8116_device::str_w(uint8_t data)
+void com8116_device::write_str(uint8_t data)
 {
 	int fr_divider = data & 0x0f;
 	int fr_clock = clock() / m_divisors[fr_divider];
@@ -200,17 +203,12 @@ void com8116_device::str_w(uint8_t data)
 	m_fr_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(fr_clock * 2));
 }
 
-WRITE8_MEMBER( com8116_device::str_w )
-{
-	str_w(data);
-}
-
 
 //-------------------------------------------------
 //  stt_w -
 //-------------------------------------------------
 
-void com8116_device::stt_w(uint8_t data)
+void com8116_device::write_stt(uint8_t data)
 {
 	int ft_divider = data & 0x0f;
 	int ft_clock = clock() / m_divisors[ft_divider];
@@ -220,7 +218,24 @@ void com8116_device::stt_w(uint8_t data)
 	m_ft_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(ft_clock * 2));
 }
 
-WRITE8_MEMBER( com8116_device::stt_w )
+
+//-------------------------------------------------
+//  str_stt_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER(com8116_device::str_stt_w)
 {
-	stt_w(data);
+	write_str(data >> 4);
+	write_stt(data & 0x0f);
+}
+
+
+//-------------------------------------------------
+//  stt_str_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER(com8116_device::stt_str_w)
+{
+	write_stt(data >> 4);
+	write_str(data & 0x0f);
 }

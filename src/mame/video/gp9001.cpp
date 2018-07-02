@@ -167,9 +167,9 @@ WRITE16_MEMBER(gp9001vdp_device::tmap_w)
 
 void gp9001vdp_device::map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(this, FUNC(gp9001vdp_device::tmap_w<0>)).share("vram_0");
-	map(0x1000, 0x1fff).ram().w(this, FUNC(gp9001vdp_device::tmap_w<1>)).share("vram_1");
-	map(0x2000, 0x2fff).ram().w(this, FUNC(gp9001vdp_device::tmap_w<2>)).share("vram_2");
+	map(0x0000, 0x0fff).ram().w(FUNC(gp9001vdp_device::tmap_w<0>)).share("vram_0");
+	map(0x1000, 0x1fff).ram().w(FUNC(gp9001vdp_device::tmap_w<1>)).share("vram_1");
+	map(0x2000, 0x2fff).ram().w(FUNC(gp9001vdp_device::tmap_w<2>)).share("vram_2");
 	map(0x3000, 0x37ff).ram().share("spriteram").mirror(0x0800);
 //  map(0x3800, 0x3fff).ram(); // sprite mirror?
 }
@@ -263,7 +263,7 @@ void gp9001vdp_device::device_start()
 
 	m_raise_irq_timer = timer_alloc(TIMER_RAISE_IRQ);
 
-	save_pointer(NAME(sp.vram16_buffer.get()), SPRITERAM_SIZE/2);
+	save_pointer(NAME(sp.vram16_buffer), SPRITERAM_SIZE/2);
 
 	save_item(NAME(gp9001_scroll_reg));
 	save_item(NAME(gp9001_voffs));

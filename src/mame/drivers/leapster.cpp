@@ -223,13 +223,16 @@ public:
 		m_cart(*this, "cartslot")
 		{ }
 
+	void leapster(machine_config &config);
 
+	void init_leapster();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
-	void init_leapster();
 
 	DECLARE_READ32_MEMBER(leapster_random_r)
 	{
@@ -241,10 +244,9 @@ public:
 		printf("leapster_aux004b_w %04x\n", data);
 	}
 
-	void leapster(machine_config &config);
 	void leapster_aux(address_map &map);
 	void leapster_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 
@@ -295,7 +297,7 @@ void leapster_state::machine_reset()
 void leapster_state::leapster_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).rom().mirror(0x40000000); // pointers in the bios region seem to be to the 40xxxxxx region, either we mirror there or something (real bios?) is acutally missing
-	map(0x0180D800, 0x0180D803).r(this, FUNC(leapster_state::leapster_random_r));
+	map(0x0180D800, 0x0180D803).r(FUNC(leapster_state::leapster_random_r));
 	map(0x03000000, 0x030007ff).ram(); // puts stack here, writes a pointer @ 0x03000000 on startup
 	map(0x3c000000, 0x3c1fffff).ram(); // really ram, or has our code execution gone wrong?
 //  AM_RANGE(0x80000000, 0x807fffff) AM_ROMBANK("cartrom") // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
@@ -303,7 +305,7 @@ void leapster_state::leapster_map(address_map &map)
 
 void leapster_state::leapster_aux(address_map &map)
 {
-	map(0x00000004b, 0x00000004b).w(this, FUNC(leapster_state::leapster_aux004b_w)); // this address isn't used by ARC internal stuff afaik, so probably leapster specific
+	map(0x00000004b, 0x00000004b).w(FUNC(leapster_state::leapster_aux004b_w)); // this address isn't used by ARC internal stuff afaik, so probably leapster specific
 }
 
 MACHINE_CONFIG_START(leapster_state::leapster)

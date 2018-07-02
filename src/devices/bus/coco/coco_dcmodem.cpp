@@ -101,8 +101,6 @@ ROM_START(coco_dcmodem)
 ROM_END
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_DCMODEM, device_cococart_interface, coco_dc_modem_device, "coco_dcmodem", "CoCo Direct Connect Modem PAK")
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;
 
 
 //-------------------------------------------------

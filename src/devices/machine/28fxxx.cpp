@@ -75,7 +75,7 @@ void base_28fxxx_device::device_start()
 	m_data = std::make_unique<u8[]>(m_size);
 
 	save_item(NAME(m_program_power));
-	save_pointer(NAME(m_data.get()), m_size);
+	save_pointer(NAME(m_data), m_size);
 
 	save_item(NAME(m_state));
 	save_item(NAME(m_address_latch));

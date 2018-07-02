@@ -92,6 +92,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void ravens(machine_config &config);
+	void ravens2(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_READ8_MEMBER(port17_r);
 	DECLARE_WRITE8_MEMBER(port1b_w);
@@ -104,12 +108,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
 
-	void ravens(machine_config &config);
-	void ravens2(machine_config &config);
 	void ravens2_io(address_map &map);
 	void ravens_io(address_map &map);
 	void ravens_mem(address_map &map);
-private:
+
 	uint8_t m_term_char;
 	uint8_t m_term_data;
 	virtual void machine_start() override { m_digits.resolve(); }
@@ -220,17 +222,17 @@ void ravens_state::ravens_mem(address_map &map)
 void ravens_state::ravens_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x09, 0x09).w(this, FUNC(ravens_state::leds_w)); // LED output port
-	map(0x10, 0x15).w(this, FUNC(ravens_state::display_w)); // 6-led display
-	map(0x17, 0x17).r(this, FUNC(ravens_state::port17_r)); // pushbuttons
+	map(0x09, 0x09).w(FUNC(ravens_state::leds_w)); // LED output port
+	map(0x10, 0x15).w(FUNC(ravens_state::display_w)); // 6-led display
+	map(0x17, 0x17).r(FUNC(ravens_state::port17_r)); // pushbuttons
 }
 
 void ravens_state::ravens2_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x07, 0x07).r(this, FUNC(ravens_state::port07_r));
-	map(0x1b, 0x1b).w(this, FUNC(ravens_state::port1b_w));
-	map(0x1c, 0x1c).w(this, FUNC(ravens_state::port1c_w));
+	map(0x07, 0x07).r(FUNC(ravens_state::port07_r));
+	map(0x1b, 0x1b).w(FUNC(ravens_state::port1b_w));
+	map(0x1c, 0x1c).w(FUNC(ravens_state::port1c_w));
 }
 
 /* Input ports */

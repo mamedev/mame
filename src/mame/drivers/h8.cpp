@@ -72,6 +72,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void h8(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(portf0_r);
 	DECLARE_WRITE8_MEMBER(portf0_w);
 	DECLARE_WRITE8_MEMBER(portf1_w);
@@ -82,10 +85,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_p);
 
-	void h8(machine_config &config);
 	void h8_io(address_map &map);
 	void h8_mem(address_map &map);
-private:
+
 	uint8_t m_digit;
 	uint8_t m_segment;
 	uint8_t m_irq_ctl;
@@ -193,8 +195,8 @@ void h8_state::h8_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).rw(this, FUNC(h8_state::portf0_r), FUNC(h8_state::portf0_w));
-	map(0xf1, 0xf1).w(this, FUNC(h8_state::portf1_w));
+	map(0xf0, 0xf0).rw(FUNC(h8_state::portf0_r), FUNC(h8_state::portf0_w));
+	map(0xf1, 0xf1).w(FUNC(h8_state::portf1_w));
 	map(0xf8, 0xf8).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf9, 0xf9).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// optional connection to a serial terminal @ 600 baud

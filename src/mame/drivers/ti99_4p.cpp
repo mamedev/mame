@@ -147,15 +147,20 @@ public:
 		m_peribox(*this, TI_PERIBOX_TAG),
 		m_joyport(*this, TI_JOYPORT_TAG),
 		m_scratchpad(*this, TI99_PADRAM_TAG),
-		m_amsram(*this, TI99_AMSRAM_TAG)
+		m_amsram(*this, TI99_AMSRAM_TAG),
+		m_keyboard(*this, "COL%u", 0U),
+		m_alpha(*this, "ALPHA")
 	{ }
 
+	void ti99_4p_60hz(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
 	DECLARE_WRITE_LINE_MEMBER( extint );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
 	DECLARE_READ8_MEMBER( interrupt_level );
 
-	DECLARE_SETOFFSET_MEMBER( setoffset );
+	DECLARE_READ8_MEMBER( setoffset );
 	DECLARE_READ16_MEMBER( memread );
 	DECLARE_WRITE16_MEMBER( memwrite );
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
@@ -184,10 +189,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
 
-	void ti99_4p_60hz(machine_config &config);
 	void cru_map(address_map &map);
 	void memmap(address_map &map);
-private:
+	void memmap_setoffset(address_map &map);
+
 	void    datamux_clock_in(int clock);
 
 	// Devices
@@ -198,6 +203,9 @@ private:
 	required_device<bus::ti99::joyport::joyport_device>   m_joyport;
 	required_device<ram_device> m_scratchpad;
 	required_device<ram_device> m_amsram;
+
+	required_ioport_array<6> m_keyboard;
+	required_ioport m_alpha;
 
 	int decode_address(int address);
 	DECLARE_READ16_MEMBER( debugger_read );
@@ -286,15 +294,20 @@ enum
 
 void ti99_4p_state::memmap(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(ti99_4p_state::memread), FUNC(ti99_4p_state::memwrite)).setoffset(this, FUNC(ti99_4p_state::setoffset));
+	map(0x0000, 0xffff).rw(FUNC(ti99_4p_state::memread), FUNC(ti99_4p_state::memwrite));
+}
+
+void ti99_4p_state::memmap_setoffset(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(ti99_4p_state::setoffset));
 }
 
 void ti99_4p_state::cru_map(address_map &map)
 {
-	map(0x0000, 0x01ff).r(this, FUNC(ti99_4p_state::cruread));
+	map(0x0000, 0x01ff).r(FUNC(ti99_4p_state::cruread));
 	map(0x0000, 0x003f).r(m_tms9901, FUNC(tms9901_device::read));
 
-	map(0x0000, 0x0fff).w(this, FUNC(ti99_4p_state::cruwrite));
+	map(0x0000, 0x0fff).w(FUNC(ti99_4p_state::cruwrite));
 	map(0x0000, 0x01ff).w(m_tms9901, FUNC(tms9901_device::write));
 }
 
@@ -422,9 +435,9 @@ int ti99_4p_state::decode_address(int address)
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-SETOFFSET_MEMBER( ti99_4p_state::setoffset )
+READ8_MEMBER( ti99_4p_state::setoffset )
 {
-	m_addr_buf = offset << 1;
+	m_addr_buf = offset;
 	m_waitcount = 0;
 
 	if (TRACE_ADDRESS) logerror("set address %04x\n", m_addr_buf);
@@ -448,6 +461,8 @@ SETOFFSET_MEMBER( ti99_4p_state::setoffset )
 	}
 
 	ready_join();
+
+	return 0;
 }
 
 READ16_MEMBER( ti99_4p_state::memread )
@@ -725,7 +740,6 @@ READ8_MEMBER( ti99_4p_state::cruread )
 /***************************************************************************
     Keyboard/tape control
 ****************************************************************************/
-static const char *const column[] = { "COL0", "COL1", "COL2", "COL3", "COL4", "COL5" };
 
 READ8_MEMBER( ti99_4p_state::read_by_9901 )
 {
@@ -747,11 +761,11 @@ READ8_MEMBER( ti99_4p_state::read_by_9901 )
 		}
 		else
 		{
-			answer = ioport(column[m_keyboard_column])->read();
+			answer = m_keyboard[m_keyboard_column]->read();
 		}
 		if (m_check_alphalock)
 		{
-			answer &= ~(ioport("ALPHA")->read());
+			answer &= ~(m_alpha->read());
 		}
 		answer = (answer << 3) | m_9901_int;
 		break;
@@ -764,7 +778,7 @@ READ8_MEMBER( ti99_4p_state::read_by_9901 )
 
 		// |1|1|1|1|0|K|K|K|
 		if (m_keyboard_column >= m_firstjoy) answer = 0x07;
-		else answer = ((ioport(column[m_keyboard_column])->read())>>5) & 0x07;
+		else answer = ((m_keyboard[m_keyboard_column]->read())>>5) & 0x07;
 		answer |= 0xf0;
 		break;
 
@@ -998,6 +1012,7 @@ MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
+	MCFG_DEVICE_ADDRESS_MAP(tms99xx_device::AS_SETOFFSET, memmap_setoffset)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti99_4p_state, external_operation) )
 	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti99_4p_state, interrupt_level) )
 	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4p_state, clock_out) )

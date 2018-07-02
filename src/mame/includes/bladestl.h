@@ -13,6 +13,7 @@
 #include "video/k007342.h"
 #include "video/k007420.h"
 #include "video/k051733.h"
+#include "emupal.h"
 
 class bladestl_state : public driver_device
 {

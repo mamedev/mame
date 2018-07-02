@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -50,6 +51,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void jr200(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 	required_shared_ptr<uint8_t> m_mn1271_ram;
@@ -75,9 +79,8 @@ public:
 	uint32_t screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_d_callback);
 
-	void jr200(machine_config &config);
 	void jr200_mem(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	required_memory_region m_pcg;
@@ -384,15 +387,15 @@ void jr200_state::jr200_mem(address_map &map)
 
 	map(0xa000, 0xbfff).rom();
 
-	map(0xc000, 0xc0ff).rw(this, FUNC(jr200_state::jr200_pcg_1_r), FUNC(jr200_state::jr200_pcg_1_w)); //PCG area (1)
+	map(0xc000, 0xc0ff).rw(FUNC(jr200_state::jr200_pcg_1_r), FUNC(jr200_state::jr200_pcg_1_w)); //PCG area (1)
 	map(0xc100, 0xc3ff).ram().share("vram");
-	map(0xc400, 0xc4ff).rw(this, FUNC(jr200_state::jr200_pcg_2_r), FUNC(jr200_state::jr200_pcg_2_w)); //PCG area (2)
+	map(0xc400, 0xc4ff).rw(FUNC(jr200_state::jr200_pcg_2_r), FUNC(jr200_state::jr200_pcg_2_w)); //PCG area (2)
 	map(0xc500, 0xc7ff).ram().share("cram");
 
 //  0xc800 - 0xcfff I / O area
-	map(0xc800, 0xcfff).rw(this, FUNC(jr200_state::mn1271_io_r), FUNC(jr200_state::mn1271_io_w)).share("mn1271_ram");
+	map(0xc800, 0xcfff).rw(FUNC(jr200_state::mn1271_io_r), FUNC(jr200_state::mn1271_io_w)).share("mn1271_ram");
 
-	map(0xd000, 0xd7ff).rw(this, FUNC(jr200_state::jr200_bios_char_r), FUNC(jr200_state::jr200_bios_char_w)); //BIOS PCG RAM area
+	map(0xd000, 0xd7ff).rw(FUNC(jr200_state::jr200_bios_char_r), FUNC(jr200_state::jr200_bios_char_w)); //BIOS PCG RAM area
 	map(0xd800, 0xdfff).rom(); // cart space (header 0x7e)
 	map(0xe000, 0xffff).rom();
 }

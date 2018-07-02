@@ -29,25 +29,26 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
+	void atm(machine_config &config);
+	void atmtb2(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
 	DECLARE_READ8_MEMBER(beta_neutral_r);
 	DECLARE_READ8_MEMBER(beta_enable_r);
 	DECLARE_READ8_MEMBER(beta_disable_r);
 	DECLARE_MACHINE_RESET(atm);
 
-	void atm(machine_config &config);
-	void atmtb2(machine_config &config);
 	void atm_io(address_map &map);
 	void atm_mem(address_map &map);
 	void atm_switch(address_map &map);
-protected:
+
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
 
-private:
 	address_space *m_program;
 	uint8_t *m_p_ram;
 	void atm_update_memory();
@@ -126,18 +127,18 @@ void atm_state::atm_io(address_map &map)
 	map(0x003f, 0x003f).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w)).mirror(0xff00);
 	map(0x005f, 0x005f).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w)).mirror(0xff00);
 	map(0x007f, 0x007f).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w)).mirror(0xff00);
-	map(0x00fe, 0x00fe).rw(this, FUNC(atm_state::spectrum_port_fe_r), FUNC(atm_state::spectrum_port_fe_w)).select(0xff00);
+	map(0x00fe, 0x00fe).rw(FUNC(atm_state::spectrum_port_fe_r), FUNC(atm_state::spectrum_port_fe_w)).select(0xff00);
 	map(0x00ff, 0x00ff).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w)).mirror(0xff00);
-	map(0x4000, 0x4000).w(this, FUNC(atm_state::atm_port_7ffd_w)).mirror(0x3ffd);
+	map(0x4000, 0x4000).w(FUNC(atm_state::atm_port_7ffd_w)).mirror(0x3ffd);
 	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
 	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
 }
 
 void atm_state::atm_switch(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(atm_state::beta_neutral_r)); // Overlap with previous because we want real addresses on the 3e00-3fff range
-	map(0x3d00, 0x3dff).r(this, FUNC(atm_state::beta_enable_r));
-	map(0x4000, 0xffff).r(this, FUNC(atm_state::beta_disable_r));
+	map(0x0000, 0x3fff).r(FUNC(atm_state::beta_neutral_r)); // Overlap with previous because we want real addresses on the 3e00-3fff range
+	map(0x3d00, 0x3dff).r(FUNC(atm_state::beta_enable_r));
+	map(0x4000, 0xffff).r(FUNC(atm_state::beta_disable_r));
 }
 
 MACHINE_RESET_MEMBER(atm_state,atm)

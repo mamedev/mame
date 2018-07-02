@@ -9,6 +9,7 @@
 #include "machine/taitoio.h"
 #include "machine/taitoio_yoke.h"
 #include "video/tc0080vco.h"
+#include "emupal.h"
 #include "screen.h"
 
 enum { TAITOAIR_FRAC_SHIFT = 16, TAITOAIR_POLY_MAX_PT = 16 };
@@ -46,6 +47,9 @@ public:
 			m_palette(*this, "palette")
 			{ }
 
+	void airsys(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_m68000_mainram;
 	required_shared_ptr<uint16_t> m_line_ram;
@@ -135,7 +139,7 @@ public:
 
 	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t header, int32_t x1, int32_t x2, int32_t sl1, int32_t sl2, int32_t y1, int32_t y2, int32_t *nx1, int32_t *nx2 );
 	void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q );
-	void airsys(machine_config &config);
+
 	void DSP_map_data(address_map &map);
 	void DSP_map_program(address_map &map);
 	void airsys_map(address_map &map);

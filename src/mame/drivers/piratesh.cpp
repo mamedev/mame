@@ -61,6 +61,12 @@ public:
 	m_spriteram(*this,"spriteram")
 	{ }
 
+	void piratesh(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(helm_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(battery_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	required_device<k053250ps_device> m_k053250;
@@ -97,8 +103,6 @@ public:
 	DECLARE_WRITE16_MEMBER(k053247_scattered_word_w);
 	DECLARE_READ16_MEMBER(k053247_martchmp_word_r);
 	DECLARE_WRITE16_MEMBER(k053247_martchmp_word_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(helm_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(battery_r);
 
 	DECLARE_MACHINE_START(piratesh);
 	DECLARE_MACHINE_RESET(piratesh);
@@ -108,7 +112,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(piratesh_interrupt);
 	K056832_CB_MEMBER(piratesh_tile_callback);
 	K055673_CB_MEMBER(piratesh_sprite_callback);
-	void piratesh(machine_config &config);
 	void piratesh_map(address_map &map);
 };
 
@@ -408,10 +411,10 @@ void piratesh_state::piratesh_map(address_map &map)
 	map(0x400004, 0x400005).portr("DSW1");
 	map(0x400006, 0x400007).portr("DSW2");
 	map(0x400008, 0x400009).portr("SPECIAL");
-	map(0x40000c, 0x40000d).w(this, FUNC(piratesh_state::control1_w));
-	map(0x400010, 0x400011).w(this, FUNC(piratesh_state::control2_w));
-	map(0x400014, 0x400015).w(this, FUNC(piratesh_state::control3_w));
-	map(0x500000, 0x50ffff).r(this, FUNC(piratesh_state::K056832_rom_r)); // VRAM ROM
+	map(0x40000c, 0x40000d).w(FUNC(piratesh_state::control1_w));
+	map(0x400010, 0x400011).w(FUNC(piratesh_state::control2_w));
+	map(0x400014, 0x400015).w(FUNC(piratesh_state::control3_w));
+	map(0x500000, 0x50ffff).r(FUNC(piratesh_state::K056832_rom_r)); // VRAM ROM
 	map(0x580000, 0x581fff).r(m_k053250, FUNC(k053250ps_device::rom_r)); // LVC ROM access
 	map(0x600000, 0x6004ff).rw("k054539", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0xff00); // SOUND
 	map(0x680000, 0x681fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // TILEMAP

@@ -102,8 +102,13 @@ public:
 		, m_isa(*this, ISABUS_TAG)
 		, m_speaker(*this, SPEAKER_TAG)
 		, m_wdfdc(*this, WDFDC_TAG)
+		, m_floppy_connector(*this, WDFDC_TAG":%u", 0U)
 	{ }
 
+	void pt68k2(machine_config &config);
+	void pt68k4(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(hiram_r);
 	DECLARE_WRITE8_MEMBER(hiram_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -124,11 +129,9 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void pt68k2(machine_config &config);
-	void pt68k4(machine_config &config);
 	void pt68k2_mem(address_map &map);
 	void pt68k4_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
@@ -138,6 +141,7 @@ private:
 	required_device<isa8_device> m_isa;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<wd1772_device> m_wdfdc;
+	optional_device_array<floppy_connector, 2> m_floppy_connector;
 
 	void irq5_update();
 
@@ -210,10 +214,8 @@ READ8_MEMBER(pt68k4_state::pia_stub_r)
 
 WRITE8_MEMBER(pt68k4_state::fdc_select_w)
 {
-	floppy_connector *con = machine().device<floppy_connector>(WDFDC_TAG":0");
-	floppy_connector *con2 = machine().device<floppy_connector>(WDFDC_TAG":1");
-	floppy_image_device *floppy = con ? con->get_device() : nullptr;
-	floppy_image_device *floppy2 = con2 ? con2->get_device() : nullptr;
+	floppy_image_device *floppy = m_floppy_connector[0] ? m_floppy_connector[0]->get_device() : nullptr;
+	floppy_image_device *floppy2 = m_floppy_connector[1] ? m_floppy_connector[1]->get_device() : nullptr;
 	int drive = data & 3;
 
 	if (drive != m_lastdrive)
@@ -260,11 +262,11 @@ void pt68k4_state::pt68k2_mem(address_map &map)
 	map(0xfa0000, 0xfbffff).rw(m_isa, FUNC(isa8_device::io_r), FUNC(isa8_device::io_w)).umask16(0x00ff);
 	map(0xfe0000, 0xfe001f).rw(m_duart1, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xfe0040, 0xfe005f).rw(m_duart2, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0xfe0080, 0xfe00bf).r(this, FUNC(pt68k4_state::pia_stub_r)).umask16(0x00ff);
-	map(0xfe00c0, 0xfe00ff).w(this, FUNC(pt68k4_state::fdc_select_w)).umask16(0x00ff);
+	map(0xfe0080, 0xfe00bf).r(FUNC(pt68k4_state::pia_stub_r)).umask16(0x00ff);
+	map(0xfe00c0, 0xfe00ff).w(FUNC(pt68k4_state::fdc_select_w)).umask16(0x00ff);
 	map(0xfe0100, 0xfe013f).rw(m_wdfdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0xfe01c0, 0xfe01c3).rw(this, FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
-	map(0xff0000, 0xff0fff).rw(this, FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
+	map(0xfe01c0, 0xfe01c3).rw(FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
+	map(0xff0000, 0xff0fff).rw(FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
 	map(0xff0000, 0xff0fff).rw(TIMEKEEPER_TAG, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0x00ff);
 }
 
@@ -277,8 +279,8 @@ void pt68k4_state::pt68k4_mem(address_map &map)
 	map(0xfa0000, 0xfbffff).rw(m_isa, FUNC(isa8_device::io_r), FUNC(isa8_device::io_w)).umask16(0x00ff);
 	map(0xfe0000, 0xfe001f).rw(m_duart1, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xfe0040, 0xfe005f).rw(m_duart2, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0xfe01c0, 0xfe01c3).rw(this, FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
-	map(0xff0000, 0xff0fff).rw(this, FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
+	map(0xfe01c0, 0xfe01c3).rw(FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
+	map(0xff0000, 0xff0fff).rw(FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
 	map(0xff0000, 0xff0fff).rw(TIMEKEEPER_TAG, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0x00ff);
 }
 
@@ -350,8 +352,7 @@ void pt68k4_state::machine_reset()
 
 	if (m_wdfdc)
 	{
-		floppy_connector *con = machine().device<floppy_connector>(WDFDC_TAG":0");
-		floppy_image_device *floppy = con ? con->get_device() : nullptr;
+		floppy_image_device *floppy = m_floppy_connector[0] ? m_floppy_connector[0]->get_device() : nullptr;
 
 		m_wdfdc->set_floppy(floppy);
 		floppy->ss_w(0);
@@ -421,8 +422,8 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
 
 	MCFG_DEVICE_ADD(WDFDC_TAG, WD1772, 16_MHz_XTAL / 2)
-	MCFG_FLOPPY_DRIVE_ADD(WDFDC_TAG":0", pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WDFDC_TAG":1", pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[0], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[1], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 
 	MCFG_DEVICE_ADD(ISABUS_TAG, ISA8, 0)
 	MCFG_ISA8_CPU(M68K_TAG)

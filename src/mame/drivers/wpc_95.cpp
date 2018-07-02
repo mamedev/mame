@@ -29,16 +29,7 @@ public:
 			out(*this, "out")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(firq_src_r);
-	DECLARE_READ8_MEMBER(zc_r);
-	DECLARE_READ8_MEMBER(dcs_data_r);
-	DECLARE_WRITE8_MEMBER(dcs_data_w);
-	DECLARE_READ8_MEMBER(dcs_ctrl_r);
-	DECLARE_WRITE8_MEMBER(dcs_reset_w);
-	DECLARE_READ8_MEMBER(rtc_r);
+	void wpc_95(machine_config &config);
 
 	void init();
 	void init_tf95();
@@ -57,12 +48,23 @@ public:
 	void init_cp();
 	void init_ttt();
 
+private:
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_WRITE8_MEMBER(watchdog_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_READ8_MEMBER(firq_src_r);
+	DECLARE_READ8_MEMBER(zc_r);
+	DECLARE_READ8_MEMBER(dcs_data_r);
+	DECLARE_WRITE8_MEMBER(dcs_data_w);
+	DECLARE_READ8_MEMBER(dcs_ctrl_r);
+	DECLARE_WRITE8_MEMBER(dcs_reset_w);
+	DECLARE_READ8_MEMBER(rtc_r);
+
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
-	void wpc_95(machine_config &config);
 	void wpc_95_map(address_map &map);
-protected:
+
 	// devices
 	required_device<cpu_device> maincpu;
 	required_device<dcs_audio_wpc_device> dcs;
@@ -132,8 +134,8 @@ void wpc_95_state::wpc_95_map(address_map &map)
 
 	map(0x3fb8, 0x3fbf).m("dmd", FUNC(wpc_dmd_device::registers));
 
-	map(0x3fdc, 0x3fdc).rw(this, FUNC(wpc_95_state::dcs_data_r), FUNC(wpc_95_state::dcs_data_w));
-	map(0x3fdd, 0x3fdd).rw(this, FUNC(wpc_95_state::dcs_ctrl_r), FUNC(wpc_95_state::dcs_reset_w));
+	map(0x3fdc, 0x3fdc).rw(FUNC(wpc_95_state::dcs_data_r), FUNC(wpc_95_state::dcs_data_w));
+	map(0x3fdd, 0x3fdd).rw(FUNC(wpc_95_state::dcs_ctrl_r), FUNC(wpc_95_state::dcs_reset_w));
 
 	map(0x3fe0, 0x3fe3).w(out, FUNC(wpc_out_device::out_w));
 	map(0x3fe4, 0x3fe4).nopr().w(lamp, FUNC(wpc_lamp_device::row_w));
@@ -148,13 +150,13 @@ void wpc_95_state::wpc_95_map(address_map &map)
 	map(0x3fef, 0x3fef).portr("FLIPPERS");
 
 	map(0x3ff2, 0x3ff2).w(out, FUNC(wpc_out_device::led_w));
-	map(0x3ff3, 0x3ff3).nopr().w(this, FUNC(wpc_95_state::irq_ack_w));
+	map(0x3ff3, 0x3ff3).nopr().w(FUNC(wpc_95_state::irq_ack_w));
 	map(0x3ff4, 0x3ff7).m("shift", FUNC(wpc_shift_device::registers));
-	map(0x3ff8, 0x3ff8).r(this, FUNC(wpc_95_state::firq_src_r)).nopw(); // ack?
-	map(0x3ffa, 0x3ffb).r(this, FUNC(wpc_95_state::rtc_r));
-	map(0x3ffc, 0x3ffc).w(this, FUNC(wpc_95_state::bank_w));
+	map(0x3ff8, 0x3ff8).r(FUNC(wpc_95_state::firq_src_r)).nopw(); // ack?
+	map(0x3ffa, 0x3ffb).r(FUNC(wpc_95_state::rtc_r));
+	map(0x3ffc, 0x3ffc).w(FUNC(wpc_95_state::bank_w));
 	map(0x3ffd, 0x3ffe).noprw(); // memory protection stuff?
-	map(0x3fff, 0x3fff).rw(this, FUNC(wpc_95_state::zc_r), FUNC(wpc_95_state::watchdog_w));
+	map(0x3fff, 0x3fff).rw(FUNC(wpc_95_state::zc_r), FUNC(wpc_95_state::watchdog_w));
 	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x8000, 0xffff).rom().region("maincpu", 0xf8000);
 }

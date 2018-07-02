@@ -179,6 +179,7 @@ Notes:
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -192,7 +193,12 @@ public:
 			m_e90_pal(*this,"e90pal"),
 			m_dip_read_offset(0) { }
 
+	void aleck64(machine_config &config);
+	void a64_e90(machine_config &config);
+
 	void init_aleck64();
+
+private:
 	DECLARE_WRITE32_MEMBER(aleck_dips_w);
 	DECLARE_READ32_MEMBER(aleck_dips_r);
 	DECLARE_READ16_MEMBER(e90_prot_r);
@@ -200,16 +206,12 @@ public:
 
 	uint32_t screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void aleck64(machine_config &config);
-	void a64_e90(machine_config &config);
 	void e90_map(address_map &map);
 	void n64_map(address_map &map);
 	void rsp_map(address_map &map);
-protected:
 	optional_shared_ptr<uint32_t> m_e90_vram;
 	optional_shared_ptr<uint32_t> m_e90_pal;
 
-private:
 	uint32_t m_dip_read_offset;
 };
 
@@ -336,7 +338,7 @@ void aleck64_state::n64_map(address_map &map)
 
 	map(0xc0000000, 0xc07fffff).ram(); // SDRAM, Aleck 64 specific
 
-	map(0xc0800000, 0xc0800fff).rw(this, FUNC(aleck64_state::aleck_dips_r), FUNC(aleck64_state::aleck_dips_w));
+	map(0xc0800000, 0xc0800fff).rw(FUNC(aleck64_state::aleck_dips_r), FUNC(aleck64_state::aleck_dips_w));
 }
 
 /*
@@ -375,7 +377,7 @@ void aleck64_state::e90_map(address_map &map)
 	n64_map(map);
 	map(0xd0000000, 0xd0000fff).ram().share("e90vram");// x/y offsets
 	map(0xd0010000, 0xd0010fff).ram().share("e90pal");// RGB555 palette
-	map(0xd0030000, 0xd003001f).rw(this, FUNC(aleck64_state::e90_prot_r), FUNC(aleck64_state::e90_prot_w));
+	map(0xd0030000, 0xd003001f).rw(FUNC(aleck64_state::e90_prot_r), FUNC(aleck64_state::e90_prot_w));
 }
 
 void aleck64_state::rsp_map(address_map &map)

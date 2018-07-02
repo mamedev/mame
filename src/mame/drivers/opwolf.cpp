@@ -349,16 +349,16 @@ WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
 void opwolf_state::opwolf_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x0f0000, 0x0f07ff).mirror(0xf000).r(this, FUNC(opwolf_state::opwolf_cchip_data_r));
-	map(0x0f0802, 0x0f0803).mirror(0xf000).r(this, FUNC(opwolf_state::opwolf_cchip_status_r));
-	map(0x0ff000, 0x0ff7ff).w(this, FUNC(opwolf_state::opwolf_cchip_data_w));
-	map(0x0ff802, 0x0ff803).w(this, FUNC(opwolf_state::opwolf_cchip_status_w));
-	map(0x0ffc00, 0x0ffc01).w(this, FUNC(opwolf_state::opwolf_cchip_bank_w));
+	map(0x0f0000, 0x0f07ff).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_data_r));
+	map(0x0f0802, 0x0f0803).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_status_r));
+	map(0x0ff000, 0x0ff7ff).w(FUNC(opwolf_state::opwolf_cchip_data_w));
+	map(0x0ff802, 0x0ff803).w(FUNC(opwolf_state::opwolf_cchip_status_w));
+	map(0x0ffc00, 0x0ffc01).w(FUNC(opwolf_state::opwolf_cchip_bank_w));
 	map(0x100000, 0x107fff).ram();
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x380000, 0x380003).r(this, FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
-	map(0x380000, 0x380003).w(this, FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
-	map(0x3a0000, 0x3a0003).r(this, FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 */
+	map(0x380000, 0x380003).r(FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
+	map(0x380000, 0x380003).w(FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
+	map(0x3a0000, 0x3a0003).r(FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 */
 	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -375,13 +375,13 @@ void opwolf_state::opwolf_map(address_map &map)
 void opwolf_state::opwolfb_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x0f0008, 0x0f000b).r(this, FUNC(opwolf_state::opwolf_in_r));           /* coins and buttons */
-	map(0x0ff000, 0x0fffff).rw(this, FUNC(opwolf_state::cchip_r), FUNC(opwolf_state::cchip_w));
+	map(0x0f0008, 0x0f000b).r(FUNC(opwolf_state::opwolf_in_r));           /* coins and buttons */
+	map(0x0ff000, 0x0fffff).rw(FUNC(opwolf_state::cchip_r), FUNC(opwolf_state::cchip_w));
 	map(0x100000, 0x107fff).ram();
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x380000, 0x380003).r(this, FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
-	map(0x380000, 0x380003).w(this, FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
-	map(0x3a0000, 0x3a0003).r(this, FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 */
+	map(0x380000, 0x380003).r(FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
+	map(0x380000, 0x380003).w(FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
+	map(0x3a0000, 0x3a0003).r(FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 */
 	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -400,9 +400,9 @@ void opwolf_state::opwolfp_map(address_map &map)
 	map(0x100000, 0x107fff).ram();
 
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x380000, 0x380003).r(this, FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
-	map(0x380000, 0x380003).w(this, FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
-	map(0x3a0000, 0x3a0003).r(this, FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 (AND INPUTS) */
+	map(0x380000, 0x380003).r(FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
+	map(0x380000, 0x380003).w(FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
+	map(0x3a0000, 0x3a0003).r(FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 (AND INPUTS) */
 	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -423,9 +423,9 @@ void opwolf_state::opwolfp_map(address_map &map)
 void opwolf_state::opwolfb_sub_z80_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8800, 0x8800).r(this, FUNC(opwolf_state::z80_input1_r));  /* read at PC=$637: poked to $c004 */
+	map(0x8800, 0x8800).r(FUNC(opwolf_state::z80_input1_r));  /* read at PC=$637: poked to $c004 */
 	map(0x9000, 0x9000).nopw();            /* unknown write, 0 then 1 each interrupt */
-	map(0x9800, 0x9800).r(this, FUNC(opwolf_state::z80_input2_r));  /* read at PC=$631: poked to $c005 */
+	map(0x9800, 0x9800).r(FUNC(opwolf_state::z80_input2_r));  /* read at PC=$631: poked to $c005 */
 	map(0xa000, 0xa000).nopw();    /* IRQ acknowledge (unimplemented) */
 	map(0xc000, 0xc7ff).ram().share("cchip_ram");
 }
@@ -476,7 +476,7 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 {
 	if (m_adpcm_data[chip] != -1)
 	{
-		device->data_w(m_adpcm_data[chip] & 0x0f);
+		device->write_data(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 		if (m_adpcm_pos[chip] == m_adpcm_end[chip])
 		{
@@ -488,7 +488,7 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 	{
 		m_adpcm_data[chip] = memregion("adpcm")->base()[m_adpcm_pos[chip]];
 		m_adpcm_pos[chip] = (m_adpcm_pos[chip] + 1) & 0x7ffff;
-		device->data_w(m_adpcm_data[chip] >> 4);
+		device->write_data(m_adpcm_data[chip] >> 4);
 	}
 }
 WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_1)
@@ -566,10 +566,10 @@ void opwolf_state::opwolf_sound_z80_map(address_map &map)
 	map(0x9002, 0x9100).nopr();
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xb000, 0xb006).w(this, FUNC(opwolf_state::opwolf_adpcm_b_w));
-	map(0xc000, 0xc006).w(this, FUNC(opwolf_state::opwolf_adpcm_c_w));
-	map(0xd000, 0xd000).w(this, FUNC(opwolf_state::opwolf_adpcm_d_w));
-	map(0xe000, 0xe000).w(this, FUNC(opwolf_state::opwolf_adpcm_e_w));
+	map(0xb000, 0xb006).w(FUNC(opwolf_state::opwolf_adpcm_b_w));
+	map(0xc000, 0xc006).w(FUNC(opwolf_state::opwolf_adpcm_c_w));
+	map(0xd000, 0xd000).w(FUNC(opwolf_state::opwolf_adpcm_d_w));
+	map(0xe000, 0xe000).w(FUNC(opwolf_state::opwolf_adpcm_e_w));
 }
 
 /***********************************************************

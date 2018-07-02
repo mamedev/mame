@@ -119,6 +119,7 @@
 
 #include "video/dl1416.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -875,12 +876,12 @@ READ16_MEMBER( cmi_state::midi_dma_r )
 /* The maps are dynamically populated */
 void cmi_state::maincpu1_map(address_map &map)
 {
-	map(0xfffe, 0xffff).r(this, FUNC(cmi_state::vector_r<0>));
+	map(0xfffe, 0xffff).r(FUNC(cmi_state::vector_r<0>));
 }
 
 void cmi_state::maincpu2_map(address_map &map)
 {
-	map(0xfffe, 0xffff).r(this, FUNC(cmi_state::vector_r<1>));
+	map(0xfffe, 0xffff).r(FUNC(cmi_state::vector_r<1>));
 }
 
 void cmi_state::muskeys_map(address_map &map)
@@ -908,7 +909,7 @@ void cmi_state::alphakeys_map(address_map &map)
 void cmi_state::midicpu_map(address_map &map)
 {
 	map(0x000000, 0x003fff).rom();
-	map(0x040000, 0x05ffff).rw(this, FUNC(cmi_state::midi_dma_r), FUNC(cmi_state::midi_dma_w));
+	map(0x040000, 0x05ffff).rw(FUNC(cmi_state::midi_dma_r), FUNC(cmi_state::midi_dma_w));
 //  AM_RANGE(0x060000, 0x06001f) TIMERS
 //  AM_RANGE(0x060050, 0x06005f) ACIA
 //  AM_RANGE(0x060070, 0x06007f) SMPTE
@@ -1358,10 +1359,10 @@ WRITE8_MEMBER( cmi_state::fdc_w )
 			case 0x6: m_fdc_dma_cnt.b.l = data;     break;
 			case 0x8: m_fdc_dma_cnt.b.h = data;     break;
 			case 0xa: dma_fdc_rom();                break;
-			case 0xc: m_wd1791->cmd_w(data ^ 0xff);        break;
-			case 0xd: m_wd1791->track_w(data ^ 0xff);      break;
-			case 0xe: m_wd1791->sector_w(data ^ 0xff);     break;
-			case 0xf: m_wd1791->data_w(data ^ 0xff);       break;
+			case 0xc: m_wd1791->write_cmd(data ^ 0xff);        break;
+			case 0xd: m_wd1791->write_track(data ^ 0xff);      break;
+			case 0xe: m_wd1791->write_sector(data ^ 0xff);     break;
+			case 0xf: m_wd1791->write_data(data ^ 0xff);       break;
 			default: printf("fdc_w: Invalid access (%x with %x)", m_fdc_addr, data);
 		}
 	}
@@ -1378,10 +1379,10 @@ READ8_MEMBER( cmi_state::fdc_r )
 	{
 		switch (m_fdc_addr)
 		{
-			case 0xc: { return m_wd1791->status_r() ^ 0xff; }
-			case 0xd: { return m_wd1791->track_r() ^ 0xff; }
-			case 0xe: { return m_wd1791->sector_r() ^ 0xff; }
-			case 0xf: { return m_wd1791->data_r() ^ 0xff; }
+			case 0xc: { return m_wd1791->read_status() ^ 0xff; }
+			case 0xd: { return m_wd1791->read_track() ^ 0xff; }
+			case 0xe: { return m_wd1791->read_sector() ^ 0xff; }
+			case 0xf: { return m_wd1791->read_data() ^ 0xff; }
 			default:  return 0;
 		}
 	}
@@ -1413,7 +1414,7 @@ void cmi_state::fdc_dma_transfer()
 	if (!BIT(m_fdc_ctrl, 4))
 	{
 		/* Read a byte at a time */
-		uint8_t data = m_wd1791->data_r() ^ 0xff;
+		uint8_t data = m_wd1791->read_data() ^ 0xff;
 
 		if (m_fdc_dma_cnt.w.l == 0xffff)
 			return;
@@ -1445,7 +1446,7 @@ void cmi_state::fdc_dma_transfer()
 		if (phys_page & 0x80)
 			data = m_q256_ram[i][((phys_page & 0x7f) * PAGE_SIZE) + (m_fdc_dma_addr.w.l & PAGE_MASK)];
 
-		m_wd1791->data_w(data ^ 0xff);
+		m_wd1791->write_data(data ^ 0xff);
 
 		if (!BIT(m_fdc_ctrl, 3))
 			m_fdc_dma_addr.w.l++;

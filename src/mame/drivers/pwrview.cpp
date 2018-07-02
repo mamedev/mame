@@ -30,6 +30,9 @@ public:
 		m_vram(64*1024)
 	{ }
 
+	void pwrview(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(bank0_r);
 	DECLARE_WRITE16_MEMBER(bank0_w);
 	DECLARE_READ8_MEMBER(unk1_r);
@@ -55,16 +58,15 @@ public:
 	DECLARE_READ8_MEMBER(err_r);
 	MC6845_UPDATE_ROW(update_row);
 
-	void pwrview(machine_config &config);
 	void bios_bank(address_map &map);
 	void pwrview_fetch_map(address_map &map);
 	void pwrview_io(address_map &map);
 	void pwrview_map(address_map &map);
-protected:
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-private:
+
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_memory_region m_bios;
@@ -340,61 +342,61 @@ READ8_MEMBER(pwrview_state::pitclock_r)
 void pwrview_state::bios_bank(address_map &map)
 {
 	map(0x00000, 0x07fff).rom().region("bios", 0);
-	map(0x00000, 0x07fff).w(this, FUNC(pwrview_state::nmimem_w));
+	map(0x00000, 0x07fff).w(FUNC(pwrview_state::nmimem_w));
 
-	map(0x08000, 0x0ffff).w(this, FUNC(pwrview_state::nmimem_w));
+	map(0x08000, 0x0ffff).w(FUNC(pwrview_state::nmimem_w));
 	map(0x0be00, 0x0be7f).bankrw("vram1");
-	map(0x0befe, 0x0beff).rw(this, FUNC(pwrview_state::vram1_r), FUNC(pwrview_state::vram1_w));
+	map(0x0befe, 0x0beff).rw(FUNC(pwrview_state::vram1_r), FUNC(pwrview_state::vram1_w));
 	map(0x0bf00, 0x0bf7f).bankrw("vram2");
-	map(0x0bffe, 0x0bfff).rw(this, FUNC(pwrview_state::vram2_r), FUNC(pwrview_state::vram2_w));
+	map(0x0bffe, 0x0bfff).rw(FUNC(pwrview_state::vram2_r), FUNC(pwrview_state::vram2_w));
 	map(0x0c000, 0x0ffff).rom().region("bios", 0x4000);
 
 	map(0x10000, 0x17fff).ram();
 
-	map(0x18000, 0x1ffff).w(this, FUNC(pwrview_state::nmimem_w));
+	map(0x18000, 0x1ffff).w(FUNC(pwrview_state::nmimem_w));
 
 	map(0x1be00, 0x1be7f).bankrw("vram1");
-	map(0x1befe, 0x1beff).rw(this, FUNC(pwrview_state::vram1_r), FUNC(pwrview_state::vram1_w));
+	map(0x1befe, 0x1beff).rw(FUNC(pwrview_state::vram1_r), FUNC(pwrview_state::vram1_w));
 	map(0x1bf00, 0x1bf7f).bankrw("vram2");
-	map(0x1bffe, 0x1bfff).rw(this, FUNC(pwrview_state::vram2_r), FUNC(pwrview_state::vram2_w));
+	map(0x1bffe, 0x1bfff).rw(FUNC(pwrview_state::vram2_r), FUNC(pwrview_state::vram2_w));
 	map(0x1c000, 0x1ffff).rom().region("bios", 0x4000);
 }
 
 void pwrview_state::pwrview_map(address_map &map)
 {
 	map(0x00000, 0xf7fff).ram().share("ram");
-	map(0x00000, 0x003ff).rw(this, FUNC(pwrview_state::bank0_r), FUNC(pwrview_state::bank0_w));
+	map(0x00000, 0x003ff).rw(FUNC(pwrview_state::bank0_r), FUNC(pwrview_state::bank0_w));
 	map(0xf8000, 0xfffff).m(m_biosbank, FUNC(address_map_bank_device::amap16));
 }
 
 void pwrview_state::pwrview_fetch_map(address_map &map)
 {
 	map(0x00000, 0xf7fff).ram().share("ram");
-	map(0x00000, 0x003ff).r(this, FUNC(pwrview_state::bank0_r));
-	map(0xf8000, 0xfffff).r(this, FUNC(pwrview_state::fbios_r));
+	map(0x00000, 0x003ff).r(FUNC(pwrview_state::bank0_r));
+	map(0xf8000, 0xfffff).r(FUNC(pwrview_state::fbios_r));
 }
 
 void pwrview_state::pwrview_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(pwrview_state::nmiio_r), FUNC(pwrview_state::nmiio_w));
-	map(0xc001, 0xc001).rw(this, FUNC(pwrview_state::unk1_r), FUNC(pwrview_state::unk1_w));
-	map(0xc002, 0xc005).rw(this, FUNC(pwrview_state::led_r), FUNC(pwrview_state::led_w)).umask16(0xff00);
-	map(0xc007, 0xc007).r(this, FUNC(pwrview_state::rotary_r));
-	map(0xc009, 0xc009).rw(this, FUNC(pwrview_state::unk2_r), FUNC(pwrview_state::unk2_w));
-	map(0xc00b, 0xc00b).r(this, FUNC(pwrview_state::err_r));
+	map(0x0000, 0xffff).rw(FUNC(pwrview_state::nmiio_r), FUNC(pwrview_state::nmiio_w));
+	map(0xc001, 0xc001).rw(FUNC(pwrview_state::unk1_r), FUNC(pwrview_state::unk1_w));
+	map(0xc002, 0xc005).rw(FUNC(pwrview_state::led_r), FUNC(pwrview_state::led_w)).umask16(0xff00);
+	map(0xc007, 0xc007).r(FUNC(pwrview_state::rotary_r));
+	map(0xc009, 0xc009).rw(FUNC(pwrview_state::unk2_r), FUNC(pwrview_state::unk2_w));
+	map(0xc00b, 0xc00b).r(FUNC(pwrview_state::err_r));
 	map(0xc00c, 0xc00d).ram();
-	map(0xc080, 0xc080).rw(this, FUNC(pwrview_state::unk4_r), FUNC(pwrview_state::unk4_w));
+	map(0xc080, 0xc080).rw(FUNC(pwrview_state::unk4_r), FUNC(pwrview_state::unk4_w));
 	map(0xc088, 0xc088).w("crtc", FUNC(hd6845_device::address_w));
 	map(0xc08a, 0xc08a).rw("crtc", FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
-	map(0xc280, 0xc287).rw(this, FUNC(pwrview_state::unk3_r), FUNC(pwrview_state::unk3_w)).umask16(0x00ff);
+	map(0xc280, 0xc287).rw(FUNC(pwrview_state::unk3_r), FUNC(pwrview_state::unk3_w)).umask16(0x00ff);
 	map(0xc288, 0xc28f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xc2a0, 0xc2a7).rw("sio", FUNC(z80sio2_device::cd_ba_r), FUNC(z80sio2_device::cd_ba_w)).umask16(0x00ff);
 	map(0xc2c0, 0xc2c0).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xc2c2, 0xc2c2).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xc2e0, 0xc2e3).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0xc2e4, 0xc2e5).ram();
-	map(0xc2e6, 0xc2e6).r(this, FUNC(pwrview_state::pitclock_r));
+	map(0xc2e6, 0xc2e6).r(FUNC(pwrview_state::pitclock_r));
 }
 
 static void pwrview_floppies(device_slot_interface &device)

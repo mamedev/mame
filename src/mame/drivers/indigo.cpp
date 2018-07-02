@@ -27,17 +27,13 @@
 #include "machine/eepromser.h"
 #include "machine/sgi.h"
 #include "machine/wd33c93.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class indigo_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_RTC
-	};
-
 	indigo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -46,6 +42,15 @@ public:
 		, m_eeprom(*this, "eeprom")
 	{
 	}
+
+	void indigo4k(machine_config &config);
+	void indigo3k(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_RTC
+	};
 
 	DECLARE_READ32_MEMBER(hpc_r);
 	DECLARE_WRITE32_MEMBER(hpc_w);
@@ -59,12 +64,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static void cdrom_config(device_t *device);
-	void indigo4k(machine_config &config);
-	void indigo3k(machine_config &config);
 	void indigo3k_map(address_map &map);
 	void indigo4k_map(address_map &map);
 	void indigo_map(address_map &map);
-private:
+
 	struct hpc_t
 	{
 		uint8_t m_misc_status;
@@ -94,7 +97,6 @@ private:
 
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -475,8 +477,8 @@ void indigo_state::indigo_map(address_map &map)
 	map(0x0c000000, 0x0c7fffff).ram().share("share8");
 	map(0x10000000, 0x107fffff).ram().share("share9");
 	map(0x18000000, 0x187fffff).ram().share("share1");
-	map(0x1fb80000, 0x1fb8ffff).rw(this, FUNC(indigo_state::hpc_r), FUNC(indigo_state::hpc_w));
-	map(0x1fbd9000, 0x1fbd903f).rw(this, FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
+	map(0x1fb80000, 0x1fb8ffff).rw(FUNC(indigo_state::hpc_r), FUNC(indigo_state::hpc_w));
+	map(0x1fbd9000, 0x1fbd903f).rw(FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
 }
 
 void indigo_state::indigo3k_map(address_map &map)
@@ -611,7 +613,7 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_WD33C93_IRQ_CB(WRITELINE(*this, indigo_state, scsi_irq))      /* command completion IRQ */
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(indigo_state::indigo4k)

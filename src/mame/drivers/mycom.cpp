@@ -58,6 +58,7 @@
 #include "sound/sn76496.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -83,6 +84,11 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void mycom(machine_config &config);
+
+	void init_mycom();
+
+private:
 	DECLARE_READ8_MEMBER(mycom_upper_r);
 	DECLARE_WRITE8_MEMBER(mycom_upper_w);
 	DECLARE_READ8_MEMBER(vram_data_r);
@@ -94,15 +100,13 @@ public:
 	DECLARE_READ8_MEMBER(mycom_05_r);
 	DECLARE_READ8_MEMBER(mycom_06_r);
 	DECLARE_READ8_MEMBER(mycom_08_r);
-	void init_mycom();
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void mycom(machine_config &config);
 	void mycom_io(address_map &map);
 	void mycom_map(address_map &map);
-private:
+
 	uint8_t m_0a;
 	uint16_t m_i_videoram;
 	uint8_t m_keyb_press;
@@ -221,14 +225,14 @@ void mycom_state::mycom_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).bankrw("boot");
 	map(0x1000, 0xbfff).ram();
-	map(0xc000, 0xffff).rw(this, FUNC(mycom_state::mycom_upper_r), FUNC(mycom_state::mycom_upper_w));
+	map(0xc000, 0xffff).rw(FUNC(mycom_state::mycom_upper_r), FUNC(mycom_state::mycom_upper_w));
 }
 
 void mycom_state::mycom_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(mycom_state::mycom_00_w));
-	map(0x01, 0x01).rw(this, FUNC(mycom_state::vram_data_r), FUNC(mycom_state::vram_data_w));
+	map(0x00, 0x00).w(FUNC(mycom_state::mycom_00_w));
+	map(0x01, 0x01).rw(FUNC(mycom_state::vram_data_r), FUNC(mycom_state::vram_data_w));
 	map(0x02, 0x02).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x03, 0x03).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x04, 0x07).rw(m_ppi0, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -412,7 +416,7 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
 
 	// if WE & CE are low, pass sound command to audio chip
 	if ((data & 0x30)==0)
-		m_audio->write(space, 0, m_sn_we);
+		m_audio->write(m_sn_we);
 }
 
 WRITE8_MEMBER(mycom_state::mycom_rtc_w)

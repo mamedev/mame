@@ -153,7 +153,7 @@ WRITE_LINE_MEMBER(tiamc1_state::pit8253_2_w)
 
 void tiamc1_state::tiamc1_map(address_map &map)
 {
-	map(0xb000, 0xb7ff).w(this, FUNC(tiamc1_state::tiamc1_videoram_w));
+	map(0xb000, 0xb7ff).w(FUNC(tiamc1_state::tiamc1_videoram_w));
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xffff).ram();
 }
@@ -162,21 +162,21 @@ void tiamc1_state::kotrybolov_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xf000, 0xf3ff).w(this, FUNC(tiamc1_state::kot_videoram_w));
+	map(0xf000, 0xf3ff).w(FUNC(tiamc1_state::kot_videoram_w));
 }
 
 void tiamc1_state::tiamc1_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x4f).w(this, FUNC(tiamc1_state::tiamc1_sprite_y_w)); /* sprites Y */
-	map(0x50, 0x5f).w(this, FUNC(tiamc1_state::tiamc1_sprite_x_w)); /* sprites X */
-	map(0x60, 0x6f).w(this, FUNC(tiamc1_state::tiamc1_sprite_n_w)); /* sprites # */
-	map(0x70, 0x7f).w(this, FUNC(tiamc1_state::tiamc1_sprite_a_w)); /* sprites attributes */
-	map(0xa0, 0xaf).w(this, FUNC(tiamc1_state::tiamc1_palette_w));  /* color ram */
-	map(0xbc, 0xbc).w(this, FUNC(tiamc1_state::tiamc1_bg_vshift_w));/* background V scroll */
-	map(0xbd, 0xbd).w(this, FUNC(tiamc1_state::tiamc1_bg_hshift_w));/* background H scroll */
-	map(0xbe, 0xbe).w(this, FUNC(tiamc1_state::tiamc1_bankswitch_w)); /* VRAM selector */
-	map(0xbf, 0xbf).w(this, FUNC(tiamc1_state::tiamc1_bg_bplctrl_w)); /* charset control */
+	map(0x40, 0x4f).w(FUNC(tiamc1_state::tiamc1_sprite_y_w)); /* sprites Y */
+	map(0x50, 0x5f).w(FUNC(tiamc1_state::tiamc1_sprite_x_w)); /* sprites X */
+	map(0x60, 0x6f).w(FUNC(tiamc1_state::tiamc1_sprite_n_w)); /* sprites # */
+	map(0x70, 0x7f).w(FUNC(tiamc1_state::tiamc1_sprite_a_w)); /* sprites attributes */
+	map(0xa0, 0xaf).w(FUNC(tiamc1_state::tiamc1_palette_w));  /* color ram */
+	map(0xbc, 0xbc).w(FUNC(tiamc1_state::tiamc1_bg_vshift_w));/* background V scroll */
+	map(0xbd, 0xbd).w(FUNC(tiamc1_state::tiamc1_bg_hshift_w));/* background H scroll */
+	map(0xbe, 0xbe).w(FUNC(tiamc1_state::tiamc1_bankswitch_w)); /* VRAM selector */
+	map(0xbf, 0xbf).w(FUNC(tiamc1_state::tiamc1_bg_bplctrl_w)); /* charset control */
 	map(0xc0, 0xc3).w("2x8253", FUNC(tiamc1_sound_device::tiamc1_timer0_w));   /* timer 0 */
 	map(0xd0, 0xd3).rw("kr580vv55a", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* input ports + coin counters & lockout */
 	map(0xd4, 0xd7).w("2x8253", FUNC(tiamc1_sound_device::tiamc1_timer1_w));   /* timer 1 */
@@ -186,14 +186,14 @@ void tiamc1_state::tiamc1_io_map(address_map &map)
 void tiamc1_state::kotrybolov_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).w(this, FUNC(tiamc1_state::tiamc1_sprite_y_w));    // sprites Y
-	map(0x10, 0x1f).w(this, FUNC(tiamc1_state::tiamc1_sprite_x_w));    // sprites X
-	map(0x20, 0x2f).w(this, FUNC(tiamc1_state::tiamc1_sprite_n_w));    // sprites #
-	map(0x30, 0x3f).w(this, FUNC(tiamc1_state::tiamc1_sprite_a_w));    // sprites attributes
-	map(0xe0, 0xef).w(this, FUNC(tiamc1_state::tiamc1_palette_w));     // color ram
-	map(0xf0, 0xf0).w(this, FUNC(tiamc1_state::tiamc1_bg_vshift_w));   // background V scroll
-	map(0xf4, 0xf4).w(this, FUNC(tiamc1_state::tiamc1_bg_hshift_w));   // background H scroll
-	map(0xf8, 0xf8).w(this, FUNC(tiamc1_state::kot_bankswitch_w));     // character rom offset
+	map(0x00, 0x0f).w(FUNC(tiamc1_state::tiamc1_sprite_y_w));    // sprites Y
+	map(0x10, 0x1f).w(FUNC(tiamc1_state::tiamc1_sprite_x_w));    // sprites X
+	map(0x20, 0x2f).w(FUNC(tiamc1_state::tiamc1_sprite_n_w));    // sprites #
+	map(0x30, 0x3f).w(FUNC(tiamc1_state::tiamc1_sprite_a_w));    // sprites attributes
+	map(0xe0, 0xef).w(FUNC(tiamc1_state::tiamc1_palette_w));     // color ram
+	map(0xf0, 0xf0).w(FUNC(tiamc1_state::tiamc1_bg_vshift_w));   // background V scroll
+	map(0xf4, 0xf4).w(FUNC(tiamc1_state::tiamc1_bg_hshift_w));   // background H scroll
+	map(0xf8, 0xf8).w(FUNC(tiamc1_state::kot_bankswitch_w));     // character rom offset
 	map(0xc0, 0xc3).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xd0, 0xd3).rw("kr580vv55a", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* input ports + coin counters & lockout */
 }

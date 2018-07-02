@@ -50,7 +50,7 @@ WRITE8_MEMBER(pcktgal_state::sound_w)
 
 WRITE_LINE_MEMBER(pcktgal_state::adpcm_int)
 {
-	m_msm->data_w(m_msm5205next >> 4);
+	m_msm->write_data(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle = 1 - m_toggle;
@@ -80,8 +80,8 @@ void pcktgal_state::pcktgal_map(address_map &map)
 	map(0x1800, 0x1807).w(m_tilegen1, FUNC(deco_bac06_device::pf_control0_8bit_w));
 	map(0x1810, 0x181f).rw(m_tilegen1, FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
 
-	map(0x1a00, 0x1a00).portr("P2").w(this, FUNC(pcktgal_state::sound_w));
-	map(0x1c00, 0x1c00).portr("DSW").w(this, FUNC(pcktgal_state::bank_w));
+	map(0x1a00, 0x1a00).portr("P2").w(FUNC(pcktgal_state::sound_w));
+	map(0x1c00, 0x1c00).portr("DSW").w(FUNC(pcktgal_state::bank_w));
 	map(0x4000, 0x5fff).bankr("bank1");
 	map(0x6000, 0x7fff).bankr("bank2");
 	map(0x8000, 0xffff).rom();
@@ -95,10 +95,10 @@ void pcktgal_state::pcktgal_sound_map(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
 	map(0x1000, 0x1001).w("ym2", FUNC(ym3812_device::write));
-	map(0x1800, 0x1800).w(this, FUNC(pcktgal_state::adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
-	map(0x2000, 0x2000).w(this, FUNC(pcktgal_state::sound_bank_w));
+	map(0x1800, 0x1800).w(FUNC(pcktgal_state::adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
+	map(0x2000, 0x2000).w(FUNC(pcktgal_state::sound_bank_w));
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x3400, 0x3400).r(this, FUNC(pcktgal_state::adpcm_reset_r)); /* ? not sure */
+	map(0x3400, 0x3400).r(FUNC(pcktgal_state::adpcm_reset_r)); /* ? not sure */
 	map(0x4000, 0x7fff).bankr("bank3");
 	map(0x8000, 0xffff).rom();
 }

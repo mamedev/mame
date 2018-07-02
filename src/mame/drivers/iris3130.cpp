@@ -62,6 +62,11 @@ public:
 	{
 	}
 
+	void sgi_ip2(machine_config &config);
+
+	void init_sgi_ip2();
+
+private:
 	DECLARE_READ8_MEMBER(sgi_ip2_m_but_r);
 	DECLARE_WRITE8_MEMBER(sgi_ip2_m_but_w);
 	DECLARE_READ16_MEMBER(sgi_ip2_m_quad_r);
@@ -89,20 +94,18 @@ public:
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stkbase_w);
 	DECLARE_READ16_MEMBER(sgi_ip2_stklmt_r);
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stklmt_w);
-	void init_sgi_ip2();
 	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
 	required_device<cpu_device> m_maincpu;
-	void sgi_ip2(machine_config &config);
 	void sgi_ip2_map(address_map &map);
-protected:
+
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<mc68681_device> m_duarta;
 	required_device<mc68681_device> m_duartb;
 	required_shared_ptr<uint32_t> m_bss;
 	required_shared_ptr<uint32_t> m_ptmap;
 	required_device<mc146818_device> m_rtc;
-private:
+
 	uint8_t m_mbut;
 	uint16_t m_mquad;
 	uint16_t m_tdbase;
@@ -379,23 +382,23 @@ void sgi_ip2_state::sgi_ip2_map(address_map &map)
 	map(0x00000000, 0x00ffffff).ram().share("mainram");
 	map(0x02100000, 0x0210ffff).ram().share("bss"); // ??? I don't understand the need for this...
 	map(0x30000000, 0x30017fff).rom().region("maincpu", 0);
-	map(0x30800000, 0x30800003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_m_but_r), FUNC(sgi_ip2_state::sgi_ip2_m_but_w));
-	map(0x31000000, 0x31000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_m_quad_r), FUNC(sgi_ip2_state::sgi_ip2_m_quad_w));
-	map(0x31800000, 0x31800003).r(this, FUNC(sgi_ip2_state::sgi_ip2_swtch_r));
+	map(0x30800000, 0x30800003).rw(FUNC(sgi_ip2_state::sgi_ip2_m_but_r), FUNC(sgi_ip2_state::sgi_ip2_m_but_w));
+	map(0x31000000, 0x31000003).rw(FUNC(sgi_ip2_state::sgi_ip2_m_quad_r), FUNC(sgi_ip2_state::sgi_ip2_m_quad_w));
+	map(0x31800000, 0x31800003).r(FUNC(sgi_ip2_state::sgi_ip2_swtch_r));
 	map(0x32000000, 0x3200000f).rw(m_duarta, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
 	map(0x32800000, 0x3280000f).rw(m_duartb, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
 	map(0x33000000, 0x330007ff).ram();
-	map(0x34000000, 0x34000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_clock_ctl_r), FUNC(sgi_ip2_state::sgi_ip2_clock_ctl_w));
-	map(0x35000000, 0x35000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_clock_data_r), FUNC(sgi_ip2_state::sgi_ip2_clock_data_w));
-	map(0x36000000, 0x36000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_os_base_r), FUNC(sgi_ip2_state::sgi_ip2_os_base_w));
-	map(0x38000000, 0x38000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_status_r), FUNC(sgi_ip2_state::sgi_ip2_status_w));
-	map(0x39000000, 0x39000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_parctl_r), FUNC(sgi_ip2_state::sgi_ip2_parctl_w));
-	map(0x3a000000, 0x3a000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_mbp_r), FUNC(sgi_ip2_state::sgi_ip2_mbp_w));
-	map(0x3b000000, 0x3b003fff).rw(this, FUNC(sgi_ip2_state::sgi_ip2_ptmap_r), FUNC(sgi_ip2_state::sgi_ip2_ptmap_w)).share("ptmap");
-	map(0x3c000000, 0x3c000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_tdbase_r), FUNC(sgi_ip2_state::sgi_ip2_tdbase_w));
-	map(0x3d000000, 0x3d000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_tdlmt_r), FUNC(sgi_ip2_state::sgi_ip2_tdlmt_w));
-	map(0x3e000000, 0x3e000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_stkbase_r), FUNC(sgi_ip2_state::sgi_ip2_stkbase_w));
-	map(0x3f000000, 0x3f000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_stklmt_r), FUNC(sgi_ip2_state::sgi_ip2_stklmt_w));
+	map(0x34000000, 0x34000003).rw(FUNC(sgi_ip2_state::sgi_ip2_clock_ctl_r), FUNC(sgi_ip2_state::sgi_ip2_clock_ctl_w));
+	map(0x35000000, 0x35000003).rw(FUNC(sgi_ip2_state::sgi_ip2_clock_data_r), FUNC(sgi_ip2_state::sgi_ip2_clock_data_w));
+	map(0x36000000, 0x36000003).rw(FUNC(sgi_ip2_state::sgi_ip2_os_base_r), FUNC(sgi_ip2_state::sgi_ip2_os_base_w));
+	map(0x38000000, 0x38000003).rw(FUNC(sgi_ip2_state::sgi_ip2_status_r), FUNC(sgi_ip2_state::sgi_ip2_status_w));
+	map(0x39000000, 0x39000003).rw(FUNC(sgi_ip2_state::sgi_ip2_parctl_r), FUNC(sgi_ip2_state::sgi_ip2_parctl_w));
+	map(0x3a000000, 0x3a000003).rw(FUNC(sgi_ip2_state::sgi_ip2_mbp_r), FUNC(sgi_ip2_state::sgi_ip2_mbp_w));
+	map(0x3b000000, 0x3b003fff).rw(FUNC(sgi_ip2_state::sgi_ip2_ptmap_r), FUNC(sgi_ip2_state::sgi_ip2_ptmap_w)).share("ptmap");
+	map(0x3c000000, 0x3c000003).rw(FUNC(sgi_ip2_state::sgi_ip2_tdbase_r), FUNC(sgi_ip2_state::sgi_ip2_tdbase_w));
+	map(0x3d000000, 0x3d000003).rw(FUNC(sgi_ip2_state::sgi_ip2_tdlmt_r), FUNC(sgi_ip2_state::sgi_ip2_tdlmt_w));
+	map(0x3e000000, 0x3e000003).rw(FUNC(sgi_ip2_state::sgi_ip2_stkbase_r), FUNC(sgi_ip2_state::sgi_ip2_stkbase_w));
+	map(0x3f000000, 0x3f000003).rw(FUNC(sgi_ip2_state::sgi_ip2_stklmt_r), FUNC(sgi_ip2_state::sgi_ip2_stklmt_w));
 }
 
 /***************************************************************************

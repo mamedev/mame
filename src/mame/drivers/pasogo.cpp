@@ -109,6 +109,7 @@ TODO:
 #include "machine/bankdev.h"
 #include "machine/genpc.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -129,6 +130,11 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void pasogo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(contrast);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_device<address_map_bank_device> m_ems;
@@ -169,12 +175,10 @@ public:
 	uint32_t screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg230_timer);
-	DECLARE_INPUT_CHANGED_MEMBER(contrast);
 
 	memory_region *m_cart_rom;
 	uint8_t m_ems_index;
 	uint16_t m_ems_bank[28];
-	void pasogo(machine_config &config);
 	void emsbank_map(address_map &map);
 	void pasogo_io(address_map &map);
 	void pasogo_mem(address_map &map);
@@ -451,7 +455,7 @@ void pasogo_state::emsbank_map(address_map &map)
 
 void pasogo_state::pasogo_mem(address_map &map)
 {
-	map(0x80000, 0xeffff).rw(this, FUNC(pasogo_state::emsram_r), FUNC(pasogo_state::emsram_w));
+	map(0x80000, 0xeffff).rw(FUNC(pasogo_state::emsram_r), FUNC(pasogo_state::emsram_w));
 	map(0xb8000, 0xbffff).ram().share("vram");
 	map(0xf0000, 0xfffff).bankr("bank27");
 }
@@ -460,8 +464,8 @@ void pasogo_state::pasogo_mem(address_map &map)
 void pasogo_state::pasogo_io(address_map &map)
 {
 	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-	map(0x0026, 0x0027).rw(this, FUNC(pasogo_state::vg230_io_r), FUNC(pasogo_state::vg230_io_w));
-	map(0x006c, 0x006f).rw(this, FUNC(pasogo_state::ems_r), FUNC(pasogo_state::ems_w));
+	map(0x0026, 0x0027).rw(FUNC(pasogo_state::vg230_io_r), FUNC(pasogo_state::vg230_io_w));
+	map(0x006c, 0x006f).rw(FUNC(pasogo_state::ems_r), FUNC(pasogo_state::ems_w));
 }
 
 

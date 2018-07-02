@@ -82,6 +82,17 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_vram_bank(0) { }
 
+	void tandy1000_common(machine_config &config);
+	void tandy1000_90key(machine_config &config);
+	void tandy1000_101key(machine_config &config);
+	void t1000tl(machine_config &config);
+	void t1000sx(machine_config &config);
+	void t1000rl(machine_config &config);
+	void t1000sl2(machine_config &config);
+	void t1000hx(machine_config &config);
+	void t1000tx(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 // Memory regions for the machines that support rom banking
@@ -131,15 +142,7 @@ public:
 	uint8_t m_vram_bank;
 	static void cfg_fdc_35(device_t *device);
 	static void cfg_fdc_525(device_t *device);
-	void tandy1000_common(machine_config &config);
-	void tandy1000_90key(machine_config &config);
-	void tandy1000_101key(machine_config &config);
-	void t1000tl(machine_config &config);
-	void t1000sx(machine_config &config);
-	void t1000rl(machine_config &config);
-	void t1000sl2(machine_config &config);
-	void t1000hx(machine_config &config);
-	void t1000tx(machine_config &config);
+
 	void biosbank_map(address_map &map);
 	void tandy1000_16_io(address_map &map);
 	void tandy1000_286_map(address_map &map);
@@ -559,11 +562,11 @@ void tandy1000_state::tandy1000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(t1000_mb_device::map));
-	map(0x0060, 0x0063).rw(this, FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
-	map(0x00a0, 0x00a0).w(this, FUNC(tandy1000_state::nmi_vram_bank_w));
-	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr7496_device::write));
+	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
+	map(0x00a0, 0x00a0).w(FUNC(tandy1000_state::nmi_vram_bank_w));
+	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr7496_device::command_w));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
-	map(0x0378, 0x037f).rw(this, FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
+	map(0x0378, 0x037f).rw(FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
 	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
 }
 
@@ -585,28 +588,28 @@ void tandy1000_state::tandy1000_16_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(t1000_mb_device::map));
-	map(0x0060, 0x0063).rw(this, FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
-	map(0x0065, 0x0065).w(this, FUNC(tandy1000_state::devctrl_w));
-	map(0x00a0, 0x00a0).r(this, FUNC(tandy1000_state::unk_r));
-	map(0x00c0, 0x00c1).w("sn76496", FUNC(ncr7496_device::write));
+	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
+	map(0x0065, 0x0065).w(FUNC(tandy1000_state::devctrl_w));
+	map(0x00a0, 0x00a0).r(FUNC(tandy1000_state::unk_r));
+	map(0x00c0, 0x00c1).w("sn76496", FUNC(ncr7496_device::command_w));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
-	map(0x0378, 0x037f).rw(this, FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
+	map(0x0378, 0x037f).rw(FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
 	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
-	map(0xffe8, 0xffe8).w(this, FUNC(tandy1000_state::vram_bank_w));
+	map(0xffe8, 0xffe8).w(FUNC(tandy1000_state::vram_bank_w));
 }
 
 void tandy1000_state::tandy1000_bank_io(address_map &map)
 {
 	map.unmap_value_high();
 	tandy1000_16_io(map);
-	map(0xffea, 0xffeb).rw(this, FUNC(tandy1000_state::tandy1000_bank_r), FUNC(tandy1000_state::tandy1000_bank_w));
+	map(0xffea, 0xffeb).rw(FUNC(tandy1000_state::tandy1000_bank_r), FUNC(tandy1000_state::tandy1000_bank_w));
 }
 
 void tandy1000_state::tandy1000tx_io(address_map &map)
 {
 	map.unmap_value_high();
 	tandy1000_16_io(map);
-	map(0x00a0, 0x00a0).w(this, FUNC(tandy1000_state::nmi_vram_bank_w));
+	map(0x00a0, 0x00a0).w(FUNC(tandy1000_state::nmi_vram_bank_w));
 }
 
 void tandy1000_state::tandy1000_286_map(address_map &map)

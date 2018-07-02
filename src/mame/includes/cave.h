@@ -16,6 +16,7 @@
 #include "machine/nmk112.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 
 class cave_state : public driver_device
@@ -68,6 +69,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
+		, m_startup(*this, "startup")
 		, m_led_outputs(*this, "led%u", 0U)
 	{ }
 
@@ -315,6 +317,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_16_device> m_soundlatch;
+	optional_device<timer_device> m_startup;
 	output_finder<9> m_led_outputs;
 
 	int m_rasflag;

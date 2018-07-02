@@ -58,6 +58,7 @@ Notes:
 #include "machine/timer.h"
 #include "video/igs017_igs031.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1580,7 +1581,7 @@ void igs017_state::iqblocka_io(address_map &map)
 
 	map(0x0000, 0x003f).ram(); // internal regs
 
-	map(0x2010, 0x2011).w(this, FUNC(igs017_state::iqblocka_remap_addr_w));
+	map(0x2010, 0x2011).w(FUNC(igs017_state::iqblocka_remap_addr_w));
 
 	map(0x8000, 0x8000).w ("igs_bitswap", FUNC(igs_bitswap_device::address_w));
 	map(0x8001, 0x8001).rw("igs_bitswap", FUNC(igs_bitswap_device::data_r), FUNC(igs_bitswap_device::data_w));
@@ -1852,7 +1853,7 @@ void igs017_state::mgcs(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x300000, 0x303fff).ram();
-	map(0x49c000, 0x49c003).w(this, FUNC(igs017_state::mgcs_magic_w)).r(this, FUNC(igs017_state::mgcs_magic_r));
+	map(0x49c000, 0x49c003).w(FUNC(igs017_state::mgcs_magic_w)).r(FUNC(igs017_state::mgcs_magic_r));
 
 	map(0xa00000, 0xa0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -1939,8 +1940,8 @@ void igs017_state::sdmg2(address_map &map)
 	map(0x200000, 0x20ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
 	map(0x210001, 0x210001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x300000, 0x300003).w(this, FUNC(igs017_state::sdmg2_magic_w));
-	map(0x300002, 0x300003).r(this, FUNC(igs017_state::sdmg2_magic_r));
+	map(0x300000, 0x300003).w(FUNC(igs017_state::sdmg2_magic_w));
+	map(0x300002, 0x300003).r(FUNC(igs017_state::sdmg2_magic_r));
 }
 
 
@@ -2048,8 +2049,8 @@ void igs017_state::mgdha_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x600000, 0x603fff).ram();
-	map(0x876000, 0x876003).w(this, FUNC(igs017_state::mgdha_magic_w));
-	map(0x876002, 0x876003).r(this, FUNC(igs017_state::mgdha_magic_r));
+	map(0x876000, 0x876003).w(FUNC(igs017_state::mgdha_magic_w));
+	map(0x876002, 0x876003).r(FUNC(igs017_state::mgdha_magic_r));
 
 	map(0xa00000, 0xa0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -2112,8 +2113,8 @@ READ8_MEMBER(igs017_state::tjsb_input_r)
 void igs017_state::tjsb_map(address_map &map)
 {
 	map(0x00000, 0x0dfff).rom();
-	map(0x0e000, 0x0e000).w(this, FUNC(igs017_state::input_select_w));
-	map(0x0e001, 0x0e001).rw(this, FUNC(igs017_state::tjsb_input_r), FUNC(igs017_state::tjsb_output_w));
+	map(0x0e000, 0x0e000).w(FUNC(igs017_state::input_select_w));
+	map(0x0e001, 0x0e001).rw(FUNC(igs017_state::tjsb_input_r), FUNC(igs017_state::tjsb_output_w));
 	map(0x0e002, 0x0efff).ram();
 	map(0x0f000, 0x0ffff).ram();
 	map(0x10000, 0x3ffff).rom();
@@ -2173,8 +2174,8 @@ void igs017_state::spkrform_io(address_map &map)
 	map(0xa000, 0xa000).portr("A000");   // Game selection
 	map(0xa001, 0xa001).portr("A001");
 
-	map(0xb000, 0xb000).w(this, FUNC(igs017_state::input_select_w));
-	map(0xb001, 0xb001).r(this, FUNC(igs017_state::spkrform_input_r));
+	map(0xb000, 0xb000).w(FUNC(igs017_state::input_select_w));
+	map(0xb001, 0xb001).r(FUNC(igs017_state::spkrform_input_r));
 }
 
 
@@ -2242,8 +2243,8 @@ void igs017_state::lhzb2(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x500000, 0x503fff).ram();
-	map(0x910000, 0x910003).w(this, FUNC(igs017_state::lhzb2_magic_w));
-	map(0x910002, 0x910003).r(this, FUNC(igs017_state::lhzb2_magic_r));
+	map(0x910000, 0x910003).w(FUNC(igs017_state::lhzb2_magic_w));
+	map(0x910002, 0x910003).r(FUNC(igs017_state::lhzb2_magic_r));
 
 	map(0xb00000, 0xb0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -2349,7 +2350,7 @@ void igs017_state::lhzb2a(address_map &map)
 	map(0xb00000, 0xb0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
 	map(0xb10001, 0xb10001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xb12000, 0xb12001).w(this, FUNC(igs017_state::lhzb2a_input_select_w));
+	map(0xb12000, 0xb12001).w(FUNC(igs017_state::lhzb2a_input_select_w));
 
 	//  Inputs dynamically mapped at xx8000, protection at xx4000 (xx = f0 initially). xx written to xxc000
 }
@@ -2408,8 +2409,8 @@ void igs017_state::slqz2(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram();
-	map(0x602000, 0x602003).w(this, FUNC(igs017_state::slqz2_magic_w));
-	map(0x602002, 0x602003).r(this, FUNC(igs017_state::slqz2_magic_r));
+	map(0x602000, 0x602003).w(FUNC(igs017_state::slqz2_magic_w));
+	map(0x602002, 0x602003).r(FUNC(igs017_state::slqz2_magic_r));
 
 	map(0x900000, 0x90ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 

@@ -306,11 +306,11 @@ void bublbobl_state::bublbobl_maincpu_map(address_map &map)
 {
 	common_maincpu_map(map);
 	map(0xfa00, 0xfa00).mirror(0x007c).r(m_sound_to_main, FUNC(generic_latch_8_device::read)).w(m_main_to_sound, FUNC(generic_latch_8_device::write));
-	map(0xfa01, 0xfa01).mirror(0x007c).r(this, FUNC(bublbobl_state::common_sound_semaphores_r));
-	map(0xfa03, 0xfa03).mirror(0x007c).w(this, FUNC(bublbobl_state::bublbobl_soundcpu_reset_w));
+	map(0xfa01, 0xfa01).mirror(0x007c).r(FUNC(bublbobl_state::common_sound_semaphores_r));
+	map(0xfa03, 0xfa03).mirror(0x007c).w(FUNC(bublbobl_state::bublbobl_soundcpu_reset_w));
 	map(0xfa80, 0xfa80).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xfb00, 0xfb00).mirror(0x003f).w(this, FUNC(bublbobl_state::bublbobl_nmitrigger_w));
-	map(0xfb40, 0xfb40).mirror(0x003f).w(this, FUNC(bublbobl_state::bublbobl_bankswitch_w));
+	map(0xfb00, 0xfb00).mirror(0x003f).w(FUNC(bublbobl_state::bublbobl_nmitrigger_w));
+	map(0xfb40, 0xfb40).mirror(0x003f).w(FUNC(bublbobl_state::bublbobl_bankswitch_w));
 	map(0xfc00, 0xffff).ram().share("mcu_sharedram");
 }
 
@@ -353,21 +353,21 @@ void bublbobl_state::sound_map(address_map &map)
 	map(0x9000, 0x9001).mirror(0x0ffe).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa000, 0xa001).mirror(0x0ffe).rw("ym2", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 	map(0xb000, 0xb000).mirror(0x0ffc).r(m_main_to_sound, FUNC(generic_latch_8_device::read)).w(m_sound_to_main, FUNC(generic_latch_8_device::write));
-	map(0xb001, 0xb001).mirror(0x0ffc).r(this, FUNC(bublbobl_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
+	map(0xb001, 0xb001).mirror(0x0ffc).r(FUNC(bublbobl_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
 	map(0xb002, 0xb002).mirror(0x0ffc).w(m_soundnmi, FUNC(input_merger_device::in_clear<0>));
 	map(0xe000, 0xffff).rom(); // space for diagnostic ROM?
 }
 
 void bublbobl_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x0000).rw(this, FUNC(bublbobl_state::bublbobl_mcu_ddr1_r), FUNC(bublbobl_state::bublbobl_mcu_ddr1_w));
-	map(0x0001, 0x0001).rw(this, FUNC(bublbobl_state::bublbobl_mcu_ddr2_r), FUNC(bublbobl_state::bublbobl_mcu_ddr2_w));
-	map(0x0002, 0x0002).rw(this, FUNC(bublbobl_state::bublbobl_mcu_port1_r), FUNC(bublbobl_state::bublbobl_mcu_port1_w));
-	map(0x0003, 0x0003).rw(this, FUNC(bublbobl_state::bublbobl_mcu_port2_r), FUNC(bublbobl_state::bublbobl_mcu_port2_w));
-	map(0x0004, 0x0004).rw(this, FUNC(bublbobl_state::bublbobl_mcu_ddr3_r), FUNC(bublbobl_state::bublbobl_mcu_ddr3_w));
-	map(0x0005, 0x0005).rw(this, FUNC(bublbobl_state::bublbobl_mcu_ddr4_r), FUNC(bublbobl_state::bublbobl_mcu_ddr4_w));
-	map(0x0006, 0x0006).rw(this, FUNC(bublbobl_state::bublbobl_mcu_port3_r), FUNC(bublbobl_state::bublbobl_mcu_port3_w));
-	map(0x0007, 0x0007).rw(this, FUNC(bublbobl_state::bublbobl_mcu_port4_r), FUNC(bublbobl_state::bublbobl_mcu_port4_w));
+	map(0x0000, 0x0000).rw(FUNC(bublbobl_state::bublbobl_mcu_ddr1_r), FUNC(bublbobl_state::bublbobl_mcu_ddr1_w));
+	map(0x0001, 0x0001).rw(FUNC(bublbobl_state::bublbobl_mcu_ddr2_r), FUNC(bublbobl_state::bublbobl_mcu_ddr2_w));
+	map(0x0002, 0x0002).rw(FUNC(bublbobl_state::bublbobl_mcu_port1_r), FUNC(bublbobl_state::bublbobl_mcu_port1_w));
+	map(0x0003, 0x0003).rw(FUNC(bublbobl_state::bublbobl_mcu_port2_r), FUNC(bublbobl_state::bublbobl_mcu_port2_w));
+	map(0x0004, 0x0004).rw(FUNC(bublbobl_state::bublbobl_mcu_ddr3_r), FUNC(bublbobl_state::bublbobl_mcu_ddr3_w));
+	map(0x0005, 0x0005).rw(FUNC(bublbobl_state::bublbobl_mcu_ddr4_r), FUNC(bublbobl_state::bublbobl_mcu_ddr4_w));
+	map(0x0006, 0x0006).rw(FUNC(bublbobl_state::bublbobl_mcu_port3_r), FUNC(bublbobl_state::bublbobl_mcu_port3_w));
+	map(0x0007, 0x0007).rw(FUNC(bublbobl_state::bublbobl_mcu_port4_r), FUNC(bublbobl_state::bublbobl_mcu_port4_w));
 	map(0x0040, 0x00ff).ram();
 	map(0xf000, 0xffff).rom();
 }
@@ -376,16 +376,16 @@ void bublbobl_state::bootleg_map(address_map &map)
 {
 	common_maincpu_map(map);
 	map(0xfa00, 0xfa00).mirror(0x007c).r(m_sound_to_main, FUNC(generic_latch_8_device::read)).w(m_main_to_sound, FUNC(generic_latch_8_device::write));
-	map(0xfa01, 0xfa01).mirror(0x007c).r(this, FUNC(bublbobl_state::common_sound_semaphores_r));
-	map(0xfa03, 0xfa03).mirror(0x007c).w(this, FUNC(bublbobl_state::bublbobl_soundcpu_reset_w));
+	map(0xfa01, 0xfa01).mirror(0x007c).r(FUNC(bublbobl_state::common_sound_semaphores_r));
+	map(0xfa03, 0xfa03).mirror(0x007c).w(FUNC(bublbobl_state::bublbobl_soundcpu_reset_w));
 	map(0xfa80, 0xfa80).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xfb00, 0xfb00).mirror(0x003f).w(this, FUNC(bublbobl_state::bublbobl_nmitrigger_w));
-	map(0xfb40, 0xfb40).mirror(0x003f).w(this, FUNC(bublbobl_state::bublbobl_bankswitch_w));
+	map(0xfb00, 0xfb00).mirror(0x003f).w(FUNC(bublbobl_state::bublbobl_nmitrigger_w));
+	map(0xfb40, 0xfb40).mirror(0x003f).w(FUNC(bublbobl_state::bublbobl_bankswitch_w));
 	// above here is identical to non-bootleg
 	map(0xfc00, 0xfcff).ram();
 	map(0xfd00, 0xfdff).ram();
-	map(0xfe00, 0xfe03).rw(this, FUNC(bublbobl_state::boblbobl_ic43_a_r), FUNC(bublbobl_state::boblbobl_ic43_a_w));
-	map(0xfe80, 0xfe83).rw(this, FUNC(bublbobl_state::boblbobl_ic43_b_r), FUNC(bublbobl_state::boblbobl_ic43_b_w));
+	map(0xfe00, 0xfe03).rw(FUNC(bublbobl_state::boblbobl_ic43_a_r), FUNC(bublbobl_state::boblbobl_ic43_a_w));
+	map(0xfe80, 0xfe83).rw(FUNC(bublbobl_state::boblbobl_ic43_b_r), FUNC(bublbobl_state::boblbobl_ic43_b_w));
 	map(0xff00, 0xff00).portr("DSW0");
 	map(0xff01, 0xff01).portr("DSW1");
 	map(0xff02, 0xff02).portr("IN0");
@@ -404,9 +404,9 @@ void bublbobl_state::tokio_map(address_map &map)
 	map(0xfa05, 0xfa05).portr("IN0");
 	map(0xfa06, 0xfa06).portr("IN1");
 	map(0xfa07, 0xfa07).portr("IN2");
-	map(0xfa80, 0xfa80).w(this, FUNC(bublbobl_state::tokio_bankswitch_w));
-	map(0xfb00, 0xfb00).w(this, FUNC(bublbobl_state::tokio_videoctrl_w));
-	map(0xfb80, 0xfb80).w(this, FUNC(bublbobl_state::bublbobl_nmitrigger_w));
+	map(0xfa80, 0xfa80).w(FUNC(bublbobl_state::tokio_bankswitch_w));
+	map(0xfb00, 0xfb00).w(FUNC(bublbobl_state::tokio_videoctrl_w));
+	map(0xfb80, 0xfb80).w(FUNC(bublbobl_state::bublbobl_nmitrigger_w));
 	map(0xfc00, 0xfc00).r(m_sound_to_main, FUNC(generic_latch_8_device::read)).w(m_main_to_sound, FUNC(generic_latch_8_device::write));
 }
 
@@ -419,7 +419,7 @@ void bublbobl_state::tokio_map_mcu(address_map &map)
 void bublbobl_state::tokio_map_bootleg(address_map &map)
 {
 	tokio_map(map);
-	map(0xfe00, 0xfe00).r(this, FUNC(bublbobl_state::tokiob_mcu_r));
+	map(0xfe00, 0xfe00).r(FUNC(bublbobl_state::tokiob_mcu_r));
 }
 
 
@@ -434,7 +434,7 @@ void bublbobl_state::tokio_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
 	map(0x9000, 0x9000).r(m_main_to_sound, FUNC(generic_latch_8_device::read)).w(m_sound_to_main, FUNC(generic_latch_8_device::write));
-	map(0x9800, 0x9800).r(this, FUNC(bublbobl_state::common_sound_semaphores_r));
+	map(0x9800, 0x9800).r(FUNC(bublbobl_state::common_sound_semaphores_r));
 	map(0xa000, 0xa000).w(m_soundnmi, FUNC(input_merger_device::in_clear<0>));
 	map(0xa800, 0xa800).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
 	map(0xb000, 0xb001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));

@@ -36,7 +36,7 @@ WRITE8_MEMBER(m68307_cpu_device::m68307_internal_serial_w)
 
 void m68307_cpu_device::m68307_internal_map(address_map &map)
 {
-	map(0x000000f0, 0x000000ff).rw(this, FUNC(m68307_cpu_device::m68307_internal_base_r), FUNC(m68307_cpu_device::m68307_internal_base_w));
+	map(0x000000f0, 0x000000ff).rw(FUNC(m68307_cpu_device::m68307_internal_base_r), FUNC(m68307_cpu_device::m68307_internal_base_w));
 }
 
 

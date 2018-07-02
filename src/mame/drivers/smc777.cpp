@@ -27,6 +27,7 @@
 #include "sound/beep.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "imagedev/snapquik.h"
@@ -68,6 +69,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void smc777(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_READ8_MEMBER(attr_r);
@@ -104,15 +108,13 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(smc777);
 
-	void smc777(machine_config &config);
 	void smc777_io(address_map &map);
 	void smc777_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
@@ -663,46 +665,46 @@ WRITE8_MEMBER(smc777_state::irq_mask_w)
 void smc777_state::smc777_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(smc777_state::smc777_mem_r), FUNC(smc777_state::smc777_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(smc777_state::smc777_mem_r), FUNC(smc777_state::smc777_mem_w));
 }
 
 void smc777_state::smc777_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x07).select(0xff00).rw(this, FUNC(smc777_state::vram_r), FUNC(smc777_state::vram_w));
-	map(0x08, 0x0f).select(0xff00).rw(this, FUNC(smc777_state::attr_r), FUNC(smc777_state::attr_w));
-	map(0x10, 0x17).select(0xff00).rw(this, FUNC(smc777_state::pcg_r), FUNC(smc777_state::pcg_w));
-	map(0x18, 0x19).mirror(0xff00).w(this, FUNC(smc777_state::mc6845_w));
-	map(0x1a, 0x1b).mirror(0xff00).rw(this, FUNC(smc777_state::key_r), FUNC(smc777_state::key_w));
-	map(0x1c, 0x1c).mirror(0xff00).rw(this, FUNC(smc777_state::system_input_r), FUNC(smc777_state::system_output_w));
+	map(0x00, 0x07).select(0xff00).rw(FUNC(smc777_state::vram_r), FUNC(smc777_state::vram_w));
+	map(0x08, 0x0f).select(0xff00).rw(FUNC(smc777_state::attr_r), FUNC(smc777_state::attr_w));
+	map(0x10, 0x17).select(0xff00).rw(FUNC(smc777_state::pcg_r), FUNC(smc777_state::pcg_w));
+	map(0x18, 0x19).mirror(0xff00).w(FUNC(smc777_state::mc6845_w));
+	map(0x1a, 0x1b).mirror(0xff00).rw(FUNC(smc777_state::key_r), FUNC(smc777_state::key_w));
+	map(0x1c, 0x1c).mirror(0xff00).rw(FUNC(smc777_state::system_input_r), FUNC(smc777_state::system_output_w));
 //  AM_RANGE(0x1d, 0x1d) system and control read, printer strobe write
 //  AM_RANGE(0x1e, 0x1f) rs232 irq control
-	map(0x20, 0x20).mirror(0xff00).rw(this, FUNC(smc777_state::display_reg_r), FUNC(smc777_state::display_reg_w));
-	map(0x21, 0x21).mirror(0xff00).rw(this, FUNC(smc777_state::irq_mask_r), FUNC(smc777_state::irq_mask_w));
+	map(0x20, 0x20).mirror(0xff00).rw(FUNC(smc777_state::display_reg_r), FUNC(smc777_state::display_reg_w));
+	map(0x21, 0x21).mirror(0xff00).rw(FUNC(smc777_state::irq_mask_r), FUNC(smc777_state::irq_mask_w));
 //  AM_RANGE(0x22, 0x22) printer output data
-	map(0x23, 0x23).mirror(0xff00).w(this, FUNC(smc777_state::border_col_w));
+	map(0x23, 0x23).mirror(0xff00).w(FUNC(smc777_state::border_col_w));
 //  AM_RANGE(0x24, 0x24) rtc write address
 //  AM_RANGE(0x25, 0x25) rtc read
 //  AM_RANGE(0x26, 0x26) rs232 #1
 //  AM_RANGE(0x28, 0x2c) fdc #2
 //  AM_RANGE(0x2d, 0x2f) rs232 #2
-	map(0x30, 0x33).mirror(0xff00).rw(this, FUNC(smc777_state::fdc_r), FUNC(smc777_state::fdc_w));
-	map(0x34, 0x34).mirror(0xff00).rw(this, FUNC(smc777_state::fdc_request_r), FUNC(smc777_state::floppy_select_w));
+	map(0x30, 0x33).mirror(0xff00).rw(FUNC(smc777_state::fdc_r), FUNC(smc777_state::fdc_w));
+	map(0x34, 0x34).mirror(0xff00).rw(FUNC(smc777_state::fdc_request_r), FUNC(smc777_state::floppy_select_w));
 //  AM_RANGE(0x35, 0x37) rs232 #3
 //  AM_RANGE(0x38, 0x3b) cache disk unit
 //  AM_RANGE(0x3c, 0x3d) rgb superimposer
 //  AM_RANGE(0x40, 0x47) ieee-488
 //  AM_RANGE(0x48, 0x4f) hdd (winchester)
-	map(0x51, 0x51).mirror(0xff00).portr("JOY_1P").w(this, FUNC(smc777_state::color_mode_w));
-	map(0x52, 0x52).select(0xff00).w(this, FUNC(smc777_state::ramdac_w));
-	map(0x53, 0x53).mirror(0xff00).w("sn1", FUNC(sn76489a_device::write));
+	map(0x51, 0x51).mirror(0xff00).portr("JOY_1P").w(FUNC(smc777_state::color_mode_w));
+	map(0x52, 0x52).select(0xff00).w(FUNC(smc777_state::ramdac_w));
+	map(0x53, 0x53).mirror(0xff00).w("sn1", FUNC(sn76489a_device::command_w));
 //  AM_RANGE(0x54, 0x59) vrt controller
 //  AM_RANGE(0x5a, 0x5b) ram banking
 //  AM_RANGE(0x70, 0x70) auto-start rom
 //  AM_RANGE(0x74, 0x74) ieee-488 rom
 //  AM_RANGE(0x75, 0x75) vrt controller rom
 //  AM_RANGE(0x7e, 0x7f) kanji rom
-	map(0x80, 0xff).select(0xff00).rw(this, FUNC(smc777_state::fbuf_r), FUNC(smc777_state::fbuf_w));
+	map(0x80, 0xff).select(0xff00).rw(FUNC(smc777_state::fbuf_r), FUNC(smc777_state::fbuf_w));
 }
 
 /* Input ports */
@@ -970,11 +972,11 @@ void smc777_state::machine_start()
 	m_gvram = make_unique_clear<uint8_t[]>(0x8000);
 	m_pcg = make_unique_clear<uint8_t[]>(0x800);
 
-	save_pointer(NAME(m_work_ram.get()), 0x10000);
-	save_pointer(NAME(m_vram.get()), 0x800);
-	save_pointer(NAME(m_attr.get()), 0x800);
-	save_pointer(NAME(m_gvram.get()), 0x8000);
-	save_pointer(NAME(m_pcg.get()), 0x800);
+	save_pointer(NAME(m_work_ram), 0x10000);
+	save_pointer(NAME(m_vram), 0x800);
+	save_pointer(NAME(m_attr), 0x800);
+	save_pointer(NAME(m_gvram), 0x8000);
+	save_pointer(NAME(m_pcg), 0x800);
 
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, smc777_charlayout, m_pcg.get(), 0, 8, 0));
 }

@@ -433,7 +433,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 
 void spectrum_state::spectrum_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(this, FUNC(spectrum_state::spectrum_rom_r), FUNC(spectrum_state::spectrum_rom_w));
+	map(0x0000, 0x3fff).rw(FUNC(spectrum_state::spectrum_rom_r), FUNC(spectrum_state::spectrum_rom_w));
 	map(0x4000, 0x5aff).ram().share("video_ram");
 //  AM_RANGE(0x5b00, 0x7fff) AM_RAM
 //  AM_RANGE(0x8000, 0xffff) AM_RAM
@@ -443,8 +443,8 @@ void spectrum_state::spectrum_mem(address_map &map)
 The function decodes the ports appropriately */
 void spectrum_state::spectrum_io(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0x01, 0x01).r(this, FUNC(spectrum_state::spectrum_port_ula_r)).mirror(0xfffe);
+	map(0x00, 0x00).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0x01, 0x01).r(FUNC(spectrum_state::spectrum_port_ula_r)).mirror(0xfffe);
 }
 
 /* Input ports */
@@ -651,7 +651,7 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	case TIMER_SCANLINE:
-		timer_set(m_maincpu->cycles_to_attotime(m_CyclesPerLine), TIMER_SCANLINE);
+		m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
 		spectrum_UpdateScreenBitmap();
 		break;
 	default:
@@ -661,8 +661,8 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 {
-	m_maincpu->set_input_line(0, HOLD_LINE);
-	timer_set(attotime::from_ticks(32, m_maincpu->clock()), TIMER_IRQ_OFF, 0);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 }
 
 MACHINE_CONFIG_START(spectrum_state::spectrum_common)

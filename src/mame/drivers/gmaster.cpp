@@ -12,6 +12,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -28,6 +29,11 @@ public:
 		, m_cart(*this, "cartslot")
 	{ }
 
+	void gmaster(machine_config &config);
+
+	void init_gmaster() { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
+
+private:
 	DECLARE_PALETTE_INIT(gmaster);
 	DECLARE_READ8_MEMBER(gmaster_io_r);
 	DECLARE_WRITE8_MEMBER(gmaster_io_w);
@@ -40,12 +46,9 @@ public:
 	DECLARE_WRITE8_MEMBER(gmaster_portc_w);
 	DECLARE_WRITE8_MEMBER(gmaster_portd_w);
 	DECLARE_WRITE8_MEMBER(gmaster_portf_w);
-	void init_gmaster() { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
 	uint32_t screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void gmaster(machine_config &config);
 	void gmaster_mem(address_map &map);
-private:
 	virtual void machine_start() override;
 
 	struct
@@ -240,7 +243,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_portf_w)
 void gmaster_state::gmaster_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).rw(this, FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
+	map(0x4000, 0x7fff).rw(FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
 	//AM_RANGE(0x8000, 0xfeff)      // mapped by the cartslot
 }
 

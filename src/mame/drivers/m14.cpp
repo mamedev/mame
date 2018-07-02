@@ -50,6 +50,7 @@ Dumped by Chackn
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 #include "sound/samples.h"
 #include "speaker.h"
@@ -69,6 +70,12 @@ public:
 		m_samples(*this,"samples")
 		{ }
 
+	void m14(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -87,9 +94,6 @@ public:
 	DECLARE_WRITE8_MEMBER(paddle_x_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
-
 	TILE_GET_INFO_MEMBER(m14_get_tile_info);
 	void draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
@@ -99,10 +103,9 @@ public:
 	uint32_t screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m14_irq);
 
-	void m14(machine_config &config);
 	void m14_io_map(address_map &map);
 	void m14_map(address_map &map);
-private:
+
 	/* video-related */
 	tilemap_t  *m_m14_tilemap;
 
@@ -304,18 +307,18 @@ void m14_state::m14_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(m14_state::m14_vram_w)).share("video_ram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(m14_state::m14_cram_w)).share("color_ram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(m14_state::m14_vram_w)).share("video_ram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(m14_state::m14_cram_w)).share("color_ram");
 }
 
 void m14_state::m14_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf8, 0xf8).portr("AN_PADDLE").w(this, FUNC(m14_state::ball_x_w));
-	map(0xf9, 0xf9).portr("IN0").w(this, FUNC(m14_state::ball_y_w));
-	map(0xfa, 0xfa).r(this, FUNC(m14_state::m14_rng_r)).w(this, FUNC(m14_state::paddle_x_w));
-	map(0xfb, 0xfb).portr("DSW").w(this, FUNC(m14_state::output_w));
-	map(0xfc, 0xfc).w(this, FUNC(m14_state::sound_w));
+	map(0xf8, 0xf8).portr("AN_PADDLE").w(FUNC(m14_state::ball_x_w));
+	map(0xf9, 0xf9).portr("IN0").w(FUNC(m14_state::ball_y_w));
+	map(0xfa, 0xfa).r(FUNC(m14_state::m14_rng_r)).w(FUNC(m14_state::paddle_x_w));
+	map(0xfb, 0xfb).portr("DSW").w(FUNC(m14_state::output_w));
+	map(0xfc, 0xfc).w(FUNC(m14_state::sound_w));
 }
 
 /*************************************

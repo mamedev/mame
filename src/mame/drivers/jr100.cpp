@@ -22,6 +22,7 @@
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -50,6 +51,9 @@ public:
 		m_line8(*this, "LINE8") ,
 		m_maincpu(*this, "maincpu") { }
 
+	void jr100(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_pcg;
 	required_shared_ptr<uint8_t> m_vram;
@@ -72,9 +76,8 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(jr100);
 
 
-	void jr100(machine_config &config);
 	void jr100_mem(address_map &map);
-protected:
+
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
@@ -136,7 +139,7 @@ void jr100_state::jr100_mem(address_map &map)
 	map(0x0000, 0x3fff).ram().share("ram");
 	map(0xc000, 0xc0ff).ram().share("pcg");
 	map(0xc100, 0xc3ff).ram().share("vram");
-	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(this, FUNC(jr100_state::jr100_via_w));
+	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(FUNC(jr100_state::jr100_via_w));
 	map(0xe000, 0xffff).rom();
 }
 

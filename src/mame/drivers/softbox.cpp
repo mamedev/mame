@@ -103,17 +103,6 @@
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-//-------------------------------------------------
-//  dbrg_w - baud rate selection
-//-------------------------------------------------
-
-WRITE8_MEMBER( softbox_state::dbrg_w )
-{
-	m_dbrg->str_w(data & 0x0f);
-	m_dbrg->stt_w(data >> 4);
-}
-
-
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -139,7 +128,7 @@ void softbox_state::softbox_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x08, 0x08).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x09, 0x09).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x0c, 0x0c).w(this, FUNC(softbox_state::dbrg_w));
+	map(0x0c, 0x0c).w(COM8116_TAG, FUNC(com8116_device::stt_str_w));
 	map(0x10, 0x13).rw(I8255_0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x14, 0x17).rw(I8255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x18, 0x18).rw(m_hdc, FUNC(corvus_hdc_device::read), FUNC(corvus_hdc_device::write));
@@ -182,12 +171,12 @@ INPUT_PORTS_END
 
 READ8_MEMBER( softbox_state::ppi0_pa_r )
 {
-	return m_ieee->dio_r() ^ 0xff;
+	return m_ieee->read_dio() ^ 0xff;
 }
 
 WRITE8_MEMBER( softbox_state::ppi0_pb_w )
 {
-	m_ieee->dio_w(data ^ 0xff);
+	m_ieee->write_dio(data ^ 0xff);
 }
 
 //-------------------------------------------------
@@ -242,14 +231,14 @@ WRITE8_MEMBER( softbox_state::ppi1_pb_w )
 
 	*/
 
-	m_ieee->atn_w(!BIT(data, 0));
-	m_ieee->dav_w(!BIT(data, 1));
-	m_ieee->ndac_w(!BIT(data, 2));
-	m_ieee->nrfd_w(!BIT(data, 3));
-	m_ieee->eoi_w(!BIT(data, 4));
-	m_ieee->srq_w(!BIT(data, 5));
-	m_ieee->ren_w(!BIT(data, 6));
-	m_ieee->ifc_w(!BIT(data, 7));
+	m_ieee->host_atn_w(!BIT(data, 0));
+	m_ieee->host_dav_w(!BIT(data, 1));
+	m_ieee->host_ndac_w(!BIT(data, 2));
+	m_ieee->host_nrfd_w(!BIT(data, 3));
+	m_ieee->host_eoi_w(!BIT(data, 4));
+	m_ieee->host_srq_w(!BIT(data, 5));
+	m_ieee->host_ren_w(!BIT(data, 6));
+	m_ieee->host_ifc_w(!BIT(data, 7));
 }
 
 READ8_MEMBER( softbox_state::ppi1_pc_r )

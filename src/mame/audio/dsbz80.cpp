@@ -24,11 +24,11 @@ void dsbz80_device::dsbz80_map(address_map &map)
 void dsbz80_device::dsbz80io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xe0, 0xe0).w(this, FUNC(dsbz80_device::mpeg_trigger_w));
-	map(0xe2, 0xe4).rw(this, FUNC(dsbz80_device::mpeg_pos_r), FUNC(dsbz80_device::mpeg_start_w));
-	map(0xe5, 0xe7).w(this, FUNC(dsbz80_device::mpeg_end_w));
-	map(0xe8, 0xe8).w(this, FUNC(dsbz80_device::mpeg_volume_w));
-	map(0xe9, 0xe9).w(this, FUNC(dsbz80_device::mpeg_stereo_w));
+	map(0xe0, 0xe0).w(FUNC(dsbz80_device::mpeg_trigger_w));
+	map(0xe2, 0xe4).rw(FUNC(dsbz80_device::mpeg_pos_r), FUNC(dsbz80_device::mpeg_start_w));
+	map(0xe5, 0xe7).w(FUNC(dsbz80_device::mpeg_end_w));
+	map(0xe8, 0xe8).w(FUNC(dsbz80_device::mpeg_volume_w));
+	map(0xe9, 0xe9).w(FUNC(dsbz80_device::mpeg_stereo_w));
 	map(0xf0, 0xf0).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf1, 0xf1).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 }

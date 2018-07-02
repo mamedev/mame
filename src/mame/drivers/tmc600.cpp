@@ -133,9 +133,9 @@ void tmc600_state::tmc600_io_map(address_map &map)
 {
 	map(0x03, 0x03).w(m_bwio, FUNC(cdp1852_device::write));
 	map(0x04, 0x04).w(CDP1852_TMC700_TAG, FUNC(cdp1852_device::write));
-	map(0x05, 0x05).rw(this, FUNC(tmc600_state::rtc_r), FUNC(tmc600_state::vismac_data_w));
+	map(0x05, 0x05).rw(FUNC(tmc600_state::rtc_r), FUNC(tmc600_state::vismac_data_w));
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
-	map(0x07, 0x07).w(this, FUNC(tmc600_state::vismac_register_w));
+	map(0x07, 0x07).w(FUNC(tmc600_state::vismac_register_w));
 }
 
 /* Input Ports */
@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 	MCFG_CDP1852_DO_CALLBACK(WRITE8(*this, tmc600_state, printer_w))
 
 	// printer connector
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, nullptr)
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(CDP1802_TAG, cosmac_device, ef4_w)) MCFG_DEVCB_XOR(1)
 
 	// cassette

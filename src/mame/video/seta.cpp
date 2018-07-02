@@ -217,124 +217,79 @@ static const game_offset game_offsets[] =
 };
 
 
-/*  ---- 3---       Coin #1 Lock Out
-    ---- -2--       Coin #0 Lock Out
-    ---- --1-       Coin #1 Counter
-    ---- ---0       Coin #0 Counter     */
+/*      76-- ----
+        --5- ----     Sound Enable
+        ---4 ----     toggled in IRQ1 by many games, irq acknowledge?
+                      [original comment for the above: ?? 1 in oisipuzl, sokonuke (layers related)]
+        ---- 3---     Coin #1 Lock Out
+        ---- -2--     Coin #0 Lock Out
+        ---- --1-     Coin #1 Counter
+        ---- ---0     Coin #0 Counter     */
 
-void seta_state::seta_coin_lockout_w(int data)
+// some games haven't the coin lockout device (blandia, eightfrc, extdwnhl, gundhara, kamenrid, magspeed, sokonuke, zingzip, zombraid)
+WRITE8_MEMBER(seta_state::seta_coin_counter_w)
 {
-	static const char *const seta_nolockout[] =
-	{ "blandia", "eightfrc", "extdwnhl", "gundhara", "kamenrid", "magspeed", "sokonuke", "zingzip", "zombraid", "zombraidp", "zombraidpj"};
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
-	/* Only compute seta_coin_lockout when confronted with a new gamedrv */
-	if (!m_coin_lockout_initialized)
-	{
-		m_coin_lockout_initialized = true;
-		int i;
+	if (m_x1.found())
+		m_x1->enable_w(BIT(data, 6));
+}
 
-		m_coin_lockout = 1;
-		for (i=0; i<ARRAY_LENGTH(seta_nolockout); i++)
-		{
-			if (strcmp(machine().system().name, seta_nolockout[i]) == 0 ||
-				strcmp(machine().system().parent, seta_nolockout[i]) == 0)
-			{
-				m_coin_lockout = 0;
-				break;
-			}
-		}
-	}
+WRITE8_MEMBER(seta_state::seta_coin_lockout_w)
+{
+	seta_coin_counter_w(space, 0, data);
 
-	machine().bookkeeping().coin_counter_w(0, (( data) >> 0) & 1 );
-	machine().bookkeeping().coin_counter_w(1, (( data) >> 1) & 1 );
-
-	/* some games haven't the coin lockout device */
-	if (    !m_coin_lockout )
-		return;
-	machine().bookkeeping().coin_lockout_w(0, ((~data) >> 2) & 1 );
-	machine().bookkeeping().coin_lockout_w(1, ((~data) >> 3) & 1 );
+	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 2));
+	machine().bookkeeping().coin_lockout_w(1, !BIT(data, 3));
 }
 
 
-WRITE16_MEMBER(seta_state::seta_vregs_w)
+WRITE8_MEMBER(seta_state::seta_vregs_w)
 {
-	COMBINE_DATA(&m_vregs[offset]);
-	switch (offset)
+	m_vregs = data;
+
+	/* Partly handled in vh_screenrefresh:
+
+	        76-- ----
+	        --54 3---     Samples Bank (in blandia, eightfrc, zombraid)
+	        ---- -2--
+	        ---- --1-     Sprites Above Frontmost Layer
+	        ---- ---0     Layer 0 Above Layer 1
+	*/
+
+	int new_bank = (data >> 3) & 0x7;
+
+	if (new_bank != m_samples_bank)
 	{
-		case 0/2:
+		if (!m_x1.found()) // triplfun no longer has the hardware, but still writes here
+			return;
 
-/*      fedc ba98 76-- ----
-        ---- ---- --5- ----     Sound Enable
-        ---- ---- ---4 ----     toggled in IRQ1 by many games, irq acknowledge?
-                                [original comment for the above: ?? 1 in oisipuzl, sokonuke (layers related)]
-        ---- ---- ---- 3---     Coin #1 Lock Out
-        ---- ---- ---- -2--     Coin #0 Lock Out
-        ---- ---- ---- --1-     Coin #1 Counter
-        ---- ---- ---- ---0     Coin #0 Counter     */
-			if (ACCESSING_BITS_0_7)
-			{
-				seta_coin_lockout_w (data & 0x0f);
-				if (m_x1 != nullptr)
-					m_x1->enable_w (data & 0x20);
-				machine().bookkeeping().coin_counter_w(0,data & 0x01);
-				machine().bookkeeping().coin_counter_w(1,data & 0x02);
-			}
-			break;
+		uint8_t *rom = memregion("x1snd")->base();
+		int samples_len = memregion("x1snd")->bytes();
+		int addr;
 
-		case 2/2:
-			if (ACCESSING_BITS_0_7)
-			{
-				int new_bank;
+		m_samples_bank = new_bank;
 
-				/* Partly handled in vh_screenrefresh:
+		if (samples_len == 0x240000)    /* blandia, eightfrc */
+		{
+			addr = 0x40000 * new_bank;
+			if (new_bank >= 3)  addr += 0x40000;
 
-				        fedc ba98 76-- ----
-				        ---- ---- --54 3---     Samples Bank (in blandia, eightfrc, zombraid)
-				        ---- ---- ---- -2--
-				        ---- ---- ---- --1-     Sprites Above Frontmost Layer
-				        ---- ---- ---- ---0     Layer 0 Above Layer 1
-				*/
+			if ( (samples_len > 0x100000) && ((addr+0x40000) <= samples_len) )
+				memcpy(&rom[0xc0000],&rom[addr],0x40000);
+			else
+				logerror("PC %06X - Invalid samples bank %02X !\n", m_maincpu->pc(), new_bank);
+		}
+		else if (samples_len == 0x480000)   /* zombraid */
+		{
+			/* bank 1 is never explicitly selected, 0 is used in its place */
+			if (new_bank == 0) new_bank = 1;
+			addr = 0x80000 * new_bank;
+			if (new_bank > 0) addr += 0x80000;
 
-				new_bank = (data >> 3) & 0x7;
-
-				if (new_bank != m_samples_bank)
-				{
-					if (memregion("x1snd") == nullptr) // triplfun no longer has the hardware, but still writes here
-						break;
-
-					uint8_t *rom = memregion("x1snd")->base();
-					int samples_len = memregion("x1snd")->bytes();
-					int addr;
-
-					m_samples_bank = new_bank;
-
-					if (samples_len == 0x240000)    /* blandia, eightfrc */
-					{
-						addr = 0x40000 * new_bank;
-						if (new_bank >= 3)  addr += 0x40000;
-
-						if ( (samples_len > 0x100000) && ((addr+0x40000) <= samples_len) )
-							memcpy(&rom[0xc0000],&rom[addr],0x40000);
-						else
-							logerror("PC %06X - Invalid samples bank %02X !\n", m_maincpu->pc(), new_bank);
-					}
-					else if (samples_len == 0x480000)   /* zombraid */
-					{
-						/* bank 1 is never explicitly selected, 0 is used in its place */
-						if (new_bank == 0) new_bank = 1;
-						addr = 0x80000 * new_bank;
-						if (new_bank > 0) addr += 0x80000;
-
-						memcpy(&rom[0x80000],&rom[addr],0x80000);
-					}
-				}
-
-			}
-			break;
-
-
-		case 4/2:   // ?
-			break;
+			memcpy(&rom[0x80000],&rom[addr],0x80000);
+		}
 	}
 }
 
@@ -430,7 +385,7 @@ VIDEO_START_MEMBER(seta_state,seta_2_layers)
 	m_tilemap[0] = &machine().tilemap().create(
 			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info<0>), this), TILEMAP_SCAN_ROWS,
 			16,16, 64,32 );
-	
+
 	/* layer 1 */
 	m_tilemap[1] = &machine().tilemap().create(
 			*m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info<1>), this), TILEMAP_SCAN_ROWS,
@@ -531,6 +486,9 @@ VIDEO_START_MEMBER(seta_state,seta_no_layers)
 	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
 	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 	save_item(NAME(m_rambank));
+
+	m_vregs = 0;
+	save_item(NAME(m_vregs));
 }
 
 VIDEO_START_MEMBER(seta_state,kyustrkr_no_layers)
@@ -880,15 +838,15 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 		if (msk != 0) layers_ctrl &= msk;
 
 		if (m_tilemap[1])
-			popmessage("VR:%04X-%04X-%04X L0:%04X L1:%04X",
-				m_vregs[0], m_vregs[1], m_vregs[2], m_vctrl[0][4/2], m_vctrl[1][4/2]);
+			popmessage("VR:%02X L0:%04X L1:%04X",
+				m_vregs, m_vctrl[0][4/2], m_vctrl[1][4/2]);
 		else if (m_tilemap[0])    popmessage("L0:%04X", m_vctrl[0][4/2]);
 	}
 #endif
 
 	bitmap.fill(0, cliprect);
 
-	int const order = m_tilemap[1] ? m_vregs[ 2/2 ] : 0;
+	int const order = m_tilemap[1] ? m_vregs : 0;
 	if (order & 1)  // swap the layers?
 	{
 		if (m_tilemap[1])

@@ -61,7 +61,7 @@ private:
 
 void astrocde_mess_state::astrocade_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).rom().w(this, FUNC(astrocde_mess_state::astrocade_funcgen_w));
+	map(0x0000, 0x0fff).rom().w(FUNC(astrocde_mess_state::astrocade_funcgen_w));
 	map(0x1000, 0x3fff).rom(); /* Star Fortress writes in here?? */
 	map(0x4000, 0x4fff).ram().share("videoram"); /* ASG */
 	//AM_RANGE(0x5000, 0xffff) AM_DEVREADWRITE("exp", astrocade_exp_device, read, write)
@@ -70,10 +70,10 @@ void astrocde_mess_state::astrocade_mem(address_map &map)
 
 void astrocde_mess_state::astrocade_io(address_map &map)
 {
-	map(0x00, 0x0f).select(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
+	map(0x00, 0x0f).select(0xff00).rw(FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
 	map(0x10, 0x1f).select(0xff00).r("astrocade1", FUNC(astrocade_io_device::read));
 	map(0x10, 0x18).select(0xff00).w("astrocade1", FUNC(astrocade_io_device::write));
-	map(0x19, 0x19).mirror(0xff00).w(this, FUNC(astrocde_state::expand_register_w));
+	map(0x19, 0x19).mirror(0xff00).w(FUNC(astrocde_state::expand_register_w));
 }
 
 /*************************************

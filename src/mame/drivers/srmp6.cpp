@@ -71,6 +71,7 @@ Dumped 06/15/2000
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/nile.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -88,6 +89,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void srmp6(machine_config &config);
+private:
 	std::unique_ptr<uint16_t[]> m_tileram;
 	required_shared_ptr<uint16_t> m_sprram;
 	required_shared_ptr<uint16_t> m_chrram;
@@ -102,6 +105,9 @@ public:
 	unsigned short m_lastb;
 	unsigned short m_lastb2;
 	int m_destl;
+
+	void init_INIT();
+
 	DECLARE_WRITE16_MEMBER(srmp6_input_select_w);
 	DECLARE_READ16_MEMBER(srmp6_inputs_r);
 	DECLARE_WRITE16_MEMBER(video_regs_w);
@@ -111,7 +117,6 @@ public:
 	DECLARE_WRITE16_MEMBER(tileram_w);
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(srmp6_irq_ack_r);
-	void init_INIT();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -120,7 +125,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void srmp6(machine_config &config);
 	void srmp6_map(address_map &map);
 };
 
@@ -560,18 +564,18 @@ void srmp6_state::srmp6_map(address_map &map)
 	map(0x600000, 0x7fffff).bankr("bank1");    // banked ROM (used by ROM check)
 	map(0x800000, 0x9fffff).rom().region("user1", 0);
 
-	map(0x300000, 0x300005).rw(this, FUNC(srmp6_state::srmp6_inputs_r), FUNC(srmp6_state::srmp6_input_select_w));     // inputs
-	map(0x480000, 0x480fff).ram().w(this, FUNC(srmp6_state::paletteram_w)).share("palette");
-	map(0x4d0000, 0x4d0001).r(this, FUNC(srmp6_state::srmp6_irq_ack_r));
+	map(0x300000, 0x300005).rw(FUNC(srmp6_state::srmp6_inputs_r), FUNC(srmp6_state::srmp6_input_select_w));     // inputs
+	map(0x480000, 0x480fff).ram().w(FUNC(srmp6_state::paletteram_w)).share("palette");
+	map(0x4d0000, 0x4d0001).r(FUNC(srmp6_state::srmp6_irq_ack_r));
 
 	// OBJ RAM: checked [$400000-$47dfff]
 	map(0x400000, 0x47ffff).ram().share("sprram");
 
 	// CHR RAM: checked [$500000-$5fffff]
-	map(0x500000, 0x5fffff).rw(this, FUNC(srmp6_state::tileram_r), FUNC(srmp6_state::tileram_w)).share("chrram");
+	map(0x500000, 0x5fffff).rw(FUNC(srmp6_state::tileram_r), FUNC(srmp6_state::tileram_w)).share("chrram");
 	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE(dma_w) AM_SHARE("dmaram")
 
-	map(0x4c0000, 0x4c006f).rw(this, FUNC(srmp6_state::video_regs_r), FUNC(srmp6_state::video_regs_w)).share("video_regs");    // ? gfx regs ST-0026 NiLe
+	map(0x4c0000, 0x4c006f).rw(FUNC(srmp6_state::video_regs_r), FUNC(srmp6_state::video_regs_w)).share("video_regs");    // ? gfx regs ST-0026 NiLe
 	map(0x4e0000, 0x4e00ff).rw("nile", FUNC(nile_device::nile_snd_r), FUNC(nile_device::nile_snd_w));
 	map(0x4e0100, 0x4e0101).rw("nile", FUNC(nile_device::nile_sndctrl_r), FUNC(nile_device::nile_sndctrl_w));
 	//AM_RANGE(0x4e0110, 0x4e0111) AM_NOP // ? accessed once ($268dc, written $b.w)

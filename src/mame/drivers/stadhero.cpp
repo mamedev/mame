@@ -28,6 +28,7 @@
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -56,14 +57,14 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 void stadhero_state::main_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
-	map(0x200000, 0x2007ff).ram().w(this, FUNC(stadhero_state::stadhero_pf1_data_w)).share("pf1_data");
+	map(0x200000, 0x2007ff).ram().w(FUNC(stadhero_state::stadhero_pf1_data_w)).share("pf1_data");
 	map(0x240000, 0x240007).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_0_w));                          /* text layer */
 	map(0x240010, 0x240017).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_1_w));
 	map(0x260000, 0x261fff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 	map(0x30c000, 0x30c001).portr("INPUTS");
 	map(0x30c002, 0x30c003).portr("COIN");
 	map(0x30c004, 0x30c005).portr("DSW");
-	map(0x30c000, 0x30c00b).w(this, FUNC(stadhero_state::stadhero_control_w));
+	map(0x30c000, 0x30c00b).w(FUNC(stadhero_state::stadhero_control_w));
 	map(0x310000, 0x3107ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xff8000, 0xffbfff).ram(); /* Main ram */
 	map(0xffc000, 0xffc7ff).mirror(0x000800).ram().share("spriteram");

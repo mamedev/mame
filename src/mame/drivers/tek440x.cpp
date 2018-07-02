@@ -49,6 +49,7 @@
 #include "machine/mos6551.h"    // debug tty
 #include "machine/mc146818.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -66,6 +67,9 @@ public:
 		m_vram(*this, "vram")
 	{}
 
+	void tek4404(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -73,7 +77,6 @@ public:
 	required_device<m6502_device> m_fdccpu;
 	required_shared_ptr<uint16_t> m_mainram;
 	required_shared_ptr<uint16_t> m_vram;
-	void tek4404(machine_config &config);
 	void fdccpu_map(address_map &map);
 	void maincpu_map(address_map &map);
 };
@@ -156,7 +159,7 @@ void tek440x_state::maincpu_map(address_map &map)
 	map(0x780000, 0x781fff).ram(); // map registers
 	// 782000-783fff: video address registers
 	// 784000-785fff: video control registers
-	map(0x788000, 0x788000).w("snsnd", FUNC(sn76496_device::write));
+	map(0x788000, 0x788000).w("snsnd", FUNC(sn76496_device::command_w));
 	// 78a000-78bfff: NS32081 FPU
 	map(0x78c000, 0x78c007).rw("aica", FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	// 7b1000-7b2fff: diagnostic registers

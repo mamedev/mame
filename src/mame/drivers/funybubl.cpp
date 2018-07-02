@@ -85,7 +85,7 @@ void funybubl_state::funybubl_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank2"); // banked port 1?
-	map(0xc400, 0xcfff).ram().w(this, FUNC(funybubl_state::funybubl_paldatawrite)).share("paletteram"); // palette
+	map(0xc400, 0xcfff).ram().w(FUNC(funybubl_state::funybubl_paldatawrite)).share("paletteram"); // palette
 	map(0xd000, 0xdfff).bankrw("bank1"); // banked port 0?
 	map(0xe000, 0xffff).ram();
 }
@@ -93,10 +93,10 @@ void funybubl_state::funybubl_map(address_map &map)
 void funybubl_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("SYSTEM").w(this, FUNC(funybubl_state::funybubl_vidram_bank_w));    // vidram bank
-	map(0x01, 0x01).portr("P1").w(this, FUNC(funybubl_state::funybubl_cpurombank_w));     // rom bank?
+	map(0x00, 0x00).portr("SYSTEM").w(FUNC(funybubl_state::funybubl_vidram_bank_w));    // vidram bank
+	map(0x01, 0x01).portr("P1").w(FUNC(funybubl_state::funybubl_cpurombank_w));     // rom bank?
 	map(0x02, 0x02).portr("P2");
-	map(0x03, 0x03).portr("DSW").w(this, FUNC(funybubl_state::funybubl_soundcommand_w));
+	map(0x03, 0x03).portr("DSW").w(FUNC(funybubl_state::funybubl_soundcommand_w));
 	map(0x06, 0x06).nopr();     /* Nothing is done with the data read */
 	map(0x06, 0x06).nopw();        /* Written directly after IO port 0 */
 	map(0x07, 0x07).nopw();        /* Reset something on startup - Sound CPU ?? */
@@ -108,7 +108,7 @@ void funybubl_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(funybubl_state::funybubl_oki_bank_sw));
+	map(0x9000, 0x9000).w(FUNC(funybubl_state::funybubl_oki_bank_sw));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }

@@ -45,6 +45,7 @@
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -70,6 +71,12 @@ public:
 		, m_io_keyboard(*this, "KEY.%u", 0)
 	{ }
 
+	void pegasusm(machine_config &config);
+	void pegasus(machine_config &config);
+
+	void init_pegasus();
+
+private:
 	DECLARE_READ8_MEMBER(pegasus_keyboard_r);
 	DECLARE_READ8_MEMBER(pegasus_protection_r);
 	DECLARE_READ8_MEMBER(pegasus_pcg_r);
@@ -81,7 +88,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pegasus_cassette_w);
 	DECLARE_WRITE_LINE_MEMBER(pegasus_firq_clr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void init_pegasus();
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
@@ -90,11 +96,9 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0c_load) { return load_cart(image, m_exp_0c, "c000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0d_load) { return load_cart(image, m_exp_0d, "d000"); }
 
-	void pegasusm(machine_config &config);
-	void pegasus(machine_config &config);
 	void pegasus_mem(address_map &map);
 	void pegasusm_mem(address_map &map);
-private:
+
 	uint8_t m_kbd_row;
 	bool m_kbd_irq;
 	uint8_t m_control_bits;
@@ -200,8 +204,8 @@ void pegasus_state::pegasus_mem(address_map &map)
 	map(0xb000, 0xbdff).ram();
 	map(0xbe00, 0xbfff).ram().share("videoram");
 	//AM_RANGE(0xc000, 0xdfff)      // mapped by the cartslots 4-5
-	map(0xe000, 0xe1ff).r(this, FUNC(pegasus_state::pegasus_protection_r));
-	map(0xe200, 0xe3ff).rw(this, FUNC(pegasus_state::pegasus_pcg_r), FUNC(pegasus_state::pegasus_pcg_w));
+	map(0xe000, 0xe1ff).r(FUNC(pegasus_state::pegasus_protection_r));
+	map(0xe200, 0xe3ff).rw(FUNC(pegasus_state::pegasus_pcg_r), FUNC(pegasus_state::pegasus_pcg_w));
 	map(0xe400, 0xe403).mirror(0x1fc).rw(m_pia_u, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xe600, 0xe603).mirror(0x1fc).rw(m_pia_s, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xf000, 0xffff).rom();

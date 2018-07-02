@@ -26,6 +26,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/keyboard.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -52,7 +53,7 @@ public:
 
 	void att4425(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port14_w);
 	DECLARE_READ8_MEMBER(port14_r);
@@ -68,7 +69,6 @@ protected:
 	void att4425_io(address_map &map);
 	void att4425_mem(address_map &map);
 
-private:
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_i8251;
 	required_device<z80sio_device> m_sio;
@@ -112,9 +112,9 @@ void att4425_state::att4425_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x01, 0x01).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x10, 0x10).w(this, FUNC(att4425_state::port10_w));
-	map(0x14, 0x14).rw(this, FUNC(att4425_state::port14_r), FUNC(att4425_state::port14_w));
-	map(0x15, 0x15).r(this, FUNC(att4425_state::port15_r));
+	map(0x10, 0x10).w(FUNC(att4425_state::port10_w));
+	map(0x14, 0x14).rw(FUNC(att4425_state::port14_r), FUNC(att4425_state::port14_w));
+	map(0x15, 0x15).r(FUNC(att4425_state::port15_r));
 	map(0x18, 0x1b).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x1c, 0x1f).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 }

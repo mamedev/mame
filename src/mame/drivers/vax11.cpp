@@ -82,6 +82,9 @@ public:
 	{
 	}
 
+	void vax11(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( term_r );
@@ -91,7 +94,6 @@ public:
 	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	uint16_t m_term_status;
-	void vax11(machine_config &config);
 	void vax11_mem(address_map &map);
 };
 
@@ -124,10 +126,10 @@ void vax11_state::vax11_mem(address_map &map)
 
 	map(0xfe78, 0xfe7b).rw("rx01", FUNC(rx01_device::read), FUNC(rx01_device::write));
 
-	map(0xff70, 0xff71).r(this, FUNC(vax11_state::term_rx_status_r));
-	map(0xff72, 0xff73).r(this, FUNC(vax11_state::term_r));
-	map(0xff74, 0xff75).r(this, FUNC(vax11_state::term_tx_status_r));
-	map(0xff76, 0xff77).w(this, FUNC(vax11_state::term_w));
+	map(0xff70, 0xff71).r(FUNC(vax11_state::term_rx_status_r));
+	map(0xff72, 0xff73).r(FUNC(vax11_state::term_r));
+	map(0xff74, 0xff75).r(FUNC(vax11_state::term_tx_status_r));
+	map(0xff76, 0xff77).w(FUNC(vax11_state::term_w));
 }
 
 /* Input ports */

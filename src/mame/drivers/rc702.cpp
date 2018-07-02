@@ -34,6 +34,7 @@ Issues:
 #include "sound/beep.h"
 #include "video/i8275.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -57,7 +58,11 @@ public:
 	{
 	}
 
+	void rc702(machine_config &config);
+
 	void init_rc702();
+
+private:
 	DECLARE_MACHINE_RESET(rc702);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
@@ -74,10 +79,9 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	void kbd_put(u8 data);
 
-	void rc702(machine_config &config);
 	void rc702_io(address_map &map);
 	void rc702_mem(address_map &map);
-private:
+
 	bool m_q_state;
 	bool m_qbar_state;
 	bool m_drq_state;
@@ -112,9 +116,9 @@ void rc702_state::rc702_io(address_map &map)
 	map(0x08, 0x0b).rw("sio1", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w)); // boot sequence doesn't program this
 	map(0x0c, 0x0f).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x14, 0x17).portr("DSW").w(this, FUNC(rc702_state::port14_w)); // motors
-	map(0x18, 0x1b).w(this, FUNC(rc702_state::port18_w)); // memory banking
-	map(0x1c, 0x1f).w(this, FUNC(rc702_state::port1c_w)); // sound
+	map(0x14, 0x17).portr("DSW").w(FUNC(rc702_state::port14_w)); // motors
+	map(0x18, 0x1b).w(FUNC(rc702_state::port18_w)); // memory banking
+	map(0x1c, 0x1f).w(FUNC(rc702_state::port1c_w)); // sound
 	map(0xf0, 0xff).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }
 

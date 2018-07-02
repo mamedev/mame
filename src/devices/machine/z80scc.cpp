@@ -90,7 +90,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #define LOG_DCD     (1U <<  8)
 #define LOG_SYNC    (1U <<  9)
 
-//#define VERBOSE (LOG_TX)
+//#define VERBOSE (LOG_GENERAL|LOG_SETUP|LOG_READ|LOG_INT|LOG_CMD|LOG_TX|LOG_RCV|LOG_CTS|LOG_DCD|LOG_SYNC)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -2520,6 +2520,7 @@ uint8_t z80scc_channel::data_read()
 				LOGRCV("Rx FIFO empty, resetting status and interrupt state");
 				m_uart->m_int_state[INT_RECEIVE_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
 				m_uart->m_chanA->m_rr3 &= ~(1 << (INT_RECEIVE_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0)));
+				m_uart->check_interrupts();
 			}
 		}
 	}
@@ -2646,10 +2647,31 @@ void z80scc_channel::data_write(uint8_t data)
 		{
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
 		}
+		/*
+			RB July 1, 2018: This breaks the Apple IIgs SCC MIDI driver.  The driver does this with interrupts off:
+
+			sta SCCdata,x           ; send the byte
+			lda SCCcommand,x        ; try to do another character
+			bit #$04                ; transmitter empty?
+			beq done                ; if not, don't do this
+			jsl getNextByte         ; get the next byte to send
+			bcs nochar              ; there isn't one?
+			sta SCCdata,x           ; send a second byte
+
+			The first byte write with this behavior raises a TX_BUFFER_EMPTY interrupt, but interrupts are off here.
+			Because TX_BUFFER_EMPTY is asserted at the "try to do another character" it sends a second byte.  The second 
+			byte turns OFF the TX_BUFFER_EMPTY flag, so when interrupts are re-enabled and the interrupt fires, the
+			code has no idea why it fired and the system locks up.
+
+			Also, this behavior contradicted the comment above: we are an NMOS/CMOS part and on the first write
+			the transmit buffer is not full, so this interrupt should not be raised here.
+		*/
+		#if 0
 		else if(m_rr0 & RR0_TX_BUFFER_EMPTY)  // Check TBE bit and interrupt if one or more FIFO slots available
 		{
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
 		}
+		#endif
 	}
 }
 

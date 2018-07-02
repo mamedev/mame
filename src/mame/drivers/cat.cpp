@@ -246,8 +246,8 @@ public:
 		TIMER_COUNTER_6MS
 	};
 
-	cat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		//m_nvram(*this, "nvram"), // merge with svram?
 		m_duart(*this, "duartn68681"),
@@ -265,7 +265,7 @@ public:
 		m_y6(*this, "Y6"),
 		m_y7(*this, "Y7"),
 		m_dipsw(*this, "DIPSW1")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	//optional_device<nvram_device> m_nvram;
@@ -292,7 +292,7 @@ public:
 	DECLARE_VIDEO_START(cat);
 	void init_cat();
 
-	uint32_t screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
@@ -763,25 +763,25 @@ void cat_state::cat_mem(address_map &map)
 	map(0x040000, 0x043fff).ram().share("svram").mirror(0x18C000);// SRAM powered by battery
 	map(0x200000, 0x27ffff).rom().region("svrom", 0x0000).mirror(0x180000); // SV ROM
 	map(0x400000, 0x47ffff).ram().share("p_cat_vram").mirror(0x180000); // 512 KB RAM
-	map(0x600000, 0x67ffff).rw(this, FUNC(cat_state::cat_2e80_r), FUNC(cat_state::cat_video_control_w)).mirror(0x180000); // Gate Array #1: Video Addressing and Timing, dram refresh timing, dram /cs and /wr (ga2 does the actual video invert/display and access to the dram data bus)
-	map(0x800000, 0x800001).rw(this, FUNC(cat_state::cat_floppy_control_r), FUNC(cat_state::cat_floppy_control_w)).mirror(0x18FFE0); // floppy control lines and readback
-	map(0x800002, 0x800003).rw(this, FUNC(cat_state::cat_0080_r), FUNC(cat_state::cat_keyboard_w)).mirror(0x18FFE0); // keyboard col write
-	map(0x800004, 0x800005).rw(this, FUNC(cat_state::cat_0080_r), FUNC(cat_state::cat_printer_data_w)).mirror(0x18FFE0); // Centronics Printer Data
-	map(0x800006, 0x800007).rw(this, FUNC(cat_state::cat_floppy_data_r), FUNC(cat_state::cat_floppy_data_w)).mirror(0x18FFE0); // floppy data read/write
-	map(0x800008, 0x800009).r(this, FUNC(cat_state::cat_floppy_status_r)).mirror(0x18FFE0); // floppy status lines
-	map(0x80000a, 0x80000b).r(this, FUNC(cat_state::cat_keyboard_r)).mirror(0x18FFE0); // keyboard row read
-	map(0x80000c, 0x80000d).r(this, FUNC(cat_state::cat_0080_r)).mirror(0x18FFE0); // Open bus?
-	map(0x80000e, 0x80000f).rw(this, FUNC(cat_state::cat_battery_r), FUNC(cat_state::cat_printer_control_w)).mirror(0x18FFE0); // Centronics Printer Control, keyboard led and country code enable
-	map(0x800010, 0x80001f).r(this, FUNC(cat_state::cat_0080_r)).mirror(0x18FFE0); // Open bus?
+	map(0x600000, 0x67ffff).rw(FUNC(cat_state::cat_2e80_r), FUNC(cat_state::cat_video_control_w)).mirror(0x180000); // Gate Array #1: Video Addressing and Timing, dram refresh timing, dram /cs and /wr (ga2 does the actual video invert/display and access to the dram data bus)
+	map(0x800000, 0x800001).rw(FUNC(cat_state::cat_floppy_control_r), FUNC(cat_state::cat_floppy_control_w)).mirror(0x18FFE0); // floppy control lines and readback
+	map(0x800002, 0x800003).rw(FUNC(cat_state::cat_0080_r), FUNC(cat_state::cat_keyboard_w)).mirror(0x18FFE0); // keyboard col write
+	map(0x800004, 0x800005).rw(FUNC(cat_state::cat_0080_r), FUNC(cat_state::cat_printer_data_w)).mirror(0x18FFE0); // Centronics Printer Data
+	map(0x800006, 0x800007).rw(FUNC(cat_state::cat_floppy_data_r), FUNC(cat_state::cat_floppy_data_w)).mirror(0x18FFE0); // floppy data read/write
+	map(0x800008, 0x800009).r(FUNC(cat_state::cat_floppy_status_r)).mirror(0x18FFE0); // floppy status lines
+	map(0x80000a, 0x80000b).r(FUNC(cat_state::cat_keyboard_r)).mirror(0x18FFE0); // keyboard row read
+	map(0x80000c, 0x80000d).r(FUNC(cat_state::cat_0080_r)).mirror(0x18FFE0); // Open bus?
+	map(0x80000e, 0x80000f).rw(FUNC(cat_state::cat_battery_r), FUNC(cat_state::cat_printer_control_w)).mirror(0x18FFE0); // Centronics Printer Control, keyboard led and country code enable
+	map(0x800010, 0x80001f).r(FUNC(cat_state::cat_0080_r)).mirror(0x18FFE0); // Open bus?
 	map(0x810000, 0x81001f).rw("duartn68681", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff).mirror(0x18FFE0);
-	map(0x820000, 0x82003f).rw(this, FUNC(cat_state::cat_modem_r), FUNC(cat_state::cat_modem_w)).mirror(0x18FFC0); // AMI S35213 Modem Chip, all access is on bit 7
-	map(0x830000, 0x830001).r(this, FUNC(cat_state::cat_6ms_counter_r)).mirror(0x18FFFE); // 16bit 6ms counter clocked by output of another 16bit counter clocked at 10mhz
-	map(0x840000, 0x840001).rw(this, FUNC(cat_state::cat_2e80_r), FUNC(cat_state::cat_opr_w)).mirror(0x18FFFE); // GA2 Output port register (video enable, invert, watchdog reset, phone relays)
-	map(0x850000, 0x850001).r(this, FUNC(cat_state::cat_wdt_r)).mirror(0x18FFFE); // watchdog and power fail state read
-	map(0x860000, 0x860001).rw(this, FUNC(cat_state::cat_0000_r), FUNC(cat_state::cat_tcb_w)).mirror(0x18FFFE); // Test mode
-	map(0x870000, 0x870001).r(this, FUNC(cat_state::cat_2e80_r)).mirror(0x18FFFE); // Open bus?
-	map(0xA00000, 0xA00001).r(this, FUNC(cat_state::cat_2e80_r)).mirror(0x1FFFFE); // Open bus/dtack? The 0xA00000-0xA3ffff area is ram used for shadow rom storage on cat developer machines, which is either banked over top of, or jumped to instead of the normal rom
-	map(0xC00000, 0xC00001).r(this, FUNC(cat_state::cat_2e80_r)).mirror(0x3FFFFE); // Open bus/vme?
+	map(0x820000, 0x82003f).rw(FUNC(cat_state::cat_modem_r), FUNC(cat_state::cat_modem_w)).mirror(0x18FFC0); // AMI S35213 Modem Chip, all access is on bit 7
+	map(0x830000, 0x830001).r(FUNC(cat_state::cat_6ms_counter_r)).mirror(0x18FFFE); // 16bit 6ms counter clocked by output of another 16bit counter clocked at 10mhz
+	map(0x840000, 0x840001).rw(FUNC(cat_state::cat_2e80_r), FUNC(cat_state::cat_opr_w)).mirror(0x18FFFE); // GA2 Output port register (video enable, invert, watchdog reset, phone relays)
+	map(0x850000, 0x850001).r(FUNC(cat_state::cat_wdt_r)).mirror(0x18FFFE); // watchdog and power fail state read
+	map(0x860000, 0x860001).rw(FUNC(cat_state::cat_0000_r), FUNC(cat_state::cat_tcb_w)).mirror(0x18FFFE); // Test mode
+	map(0x870000, 0x870001).r(FUNC(cat_state::cat_2e80_r)).mirror(0x18FFFE); // Open bus?
+	map(0xA00000, 0xA00001).r(FUNC(cat_state::cat_2e80_r)).mirror(0x1FFFFE); // Open bus/dtack? The 0xA00000-0xA3ffff area is ram used for shadow rom storage on cat developer machines, which is either banked over top of, or jumped to instead of the normal rom
+	map(0xC00000, 0xC00001).r(FUNC(cat_state::cat_2e80_r)).mirror(0x3FFFFE); // Open bus/vme?
 }
 
 /* Input ports */
@@ -931,7 +931,7 @@ MACHINE_START_MEMBER(cat_state,cat)
 	m_video_enable = 1;
 	m_video_invert = 0;
 	m_6ms_timer = timer_alloc(TIMER_COUNTER_6MS);
-	machine().device<nvram_device>("nvram")->set_base(m_svram, 0x4000);
+	subdevice<nvram_device>("nvram")->set_base(m_svram, 0x4000);
 }
 
 MACHINE_RESET_MEMBER(cat_state,cat)
@@ -946,29 +946,29 @@ VIDEO_START_MEMBER(cat_state,cat)
 {
 }
 
-uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t code;
-	int y, x, b;
+	const rgb_t on_color = m_video_invert ? rgb_t::black() : rgb_t::white();
+	const rgb_t off_color = m_video_invert ? rgb_t::white() : rgb_t::black();
 
 	int addr = 0;
 	if (m_video_enable == 1)
 	{
-		for (y = 0; y < 344; y++)
+		for (int y = 0; y < 344; y++)
 		{
 			int horpos = 0;
-			for (x = 0; x < 42; x++)
+			for (int x = 0; x < 42; x++)
 			{
-				code = m_p_cat_videoram[addr++];
-				for (b = 15; b >= 0; b--)
+				uint16_t code = m_p_cat_videoram[addr++];
+				for (int b = 15; b >= 0; b--)
 				{
-					bitmap.pix16(y, horpos++) = ((code >> b) & 0x01) ^ m_video_invert;
+					bitmap.pix32(y, horpos++) = BIT(code, b) ? on_color : off_color;
 				}
 			}
 		}
 	} else {
 		const rectangle black_area(0, 672 - 1, 0, 344 - 1);
-		bitmap.fill(0, black_area);
+		bitmap.fill(rgb_t::black(), black_area);
 	}
 	return 0;
 }
@@ -1071,9 +1071,6 @@ MACHINE_CONFIG_START(cat_state::cat)
 	MCFG_SCREEN_SIZE(672, 344)
 	MCFG_SCREEN_VISIBLE_AREA(0, 672-1, 0, 344-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cat_state, screen_update_cat)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
@@ -1083,7 +1080,7 @@ MACHINE_CONFIG_START(cat_state::cat)
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, cat_state, cat_duart_txb))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, cat_state, cat_duart_output))
 
-	MCFG_CENTRONICS_ADD("ctx", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_ctx, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, cat_state, prn_ack_ff))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("duartn68681", mc68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")

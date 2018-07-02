@@ -22,6 +22,7 @@
 #include "machine/clock.h"
 #include "machine/ms7004.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -67,6 +68,9 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
+	void kcgd(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -94,13 +98,12 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_index_w);
 	DECLARE_WRITE8_MEMBER(palette_data_w);
 
-	emu_timer *m_vsync_on_timer;
-	emu_timer *m_vsync_off_timer;
+	//emu_timer *m_vsync_on_timer;
+	//emu_timer *m_vsync_off_timer;
 	emu_timer *m_500hz_timer;
 
-	void kcgd(machine_config &config);
 	void kcgd_mem(address_map &map);
-private:
+
 	void draw_scanline(uint16_t *p, uint16_t offset);
 	rectangle m_tmpclip;
 	bitmap_ind16 m_tmpbmp;
@@ -113,7 +116,6 @@ private:
 	} m_video;
 	std::unique_ptr<uint32_t[]> m_videoram;
 
-protected:
 	required_device<cpu_device> m_maincpu;
 //  required_device<ms7004_device> m_ms7004;
 	required_device<palette_device> m_palette;
@@ -123,13 +125,13 @@ protected:
 void kcgd_state::kcgd_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0000000, 0077777).rw(this, FUNC(kcgd_state::vram_mmap_r), FUNC(kcgd_state::vram_mmap_w));
+	map(0000000, 0077777).rw(FUNC(kcgd_state::vram_mmap_r), FUNC(kcgd_state::vram_mmap_w));
 	map(0100000, 0157777).rom();
-	map(0160000, 0160001).mirror(03774).rw(this, FUNC(kcgd_state::vram_addr_r), FUNC(kcgd_state::vram_addr_w));
-	map(0160002, 0160003).mirror(03774).rw(this, FUNC(kcgd_state::vram_data_r), FUNC(kcgd_state::vram_data_w));
-	map(0167770, 0167771).rw(this, FUNC(kcgd_state::status_r), FUNC(kcgd_state::status_w));
-	map(0167772, 0167772).rw(this, FUNC(kcgd_state::palette_index_r), FUNC(kcgd_state::palette_index_w)); // reads always return 0
-	map(0167773, 0167773).rw(this, FUNC(kcgd_state::palette_data_r), FUNC(kcgd_state::palette_data_w));
+	map(0160000, 0160001).mirror(03774).rw(FUNC(kcgd_state::vram_addr_r), FUNC(kcgd_state::vram_addr_w));
+	map(0160002, 0160003).mirror(03774).rw(FUNC(kcgd_state::vram_data_r), FUNC(kcgd_state::vram_data_w));
+	map(0167770, 0167771).rw(FUNC(kcgd_state::status_r), FUNC(kcgd_state::status_w));
+	map(0167772, 0167772).rw(FUNC(kcgd_state::palette_index_r), FUNC(kcgd_state::palette_index_w)); // reads always return 0
+	map(0167773, 0167773).rw(FUNC(kcgd_state::palette_data_r), FUNC(kcgd_state::palette_data_w));
 //  map(0176560, 0176567).ram();  // USART2 -- host
 //  map(0177560, 0177567).ram();  // USART3 -- keyboard
 }
@@ -160,8 +162,6 @@ void kcgd_state::machine_reset()
 
 void kcgd_state::video_start()
 {
-//  screen_device *screen = machine().device<screen_device>("screen");
-
 	// 64 kwords, word size is 17 bits
 	m_videoram = std::make_unique<uint32_t[]>(65536);
 
@@ -169,10 +169,10 @@ void kcgd_state::video_start()
 	m_tmpbmp.allocate(KCGD_DISP_HORZ, KCGD_DISP_VERT);
 /*
     m_vsync_on_timer = timer_alloc(TIMER_ID_VSYNC_ON);
-    m_vsync_on_timer->adjust(screen->time_until_pos(0, 0), 0, screen->frame_period());
+    m_vsync_on_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->frame_period());
 
     m_vsync_off_timer = timer_alloc(TIMER_ID_VSYNC_OFF);
-    m_vsync_off_timer->adjust(screen->time_until_pos(16, 0), 0, screen->frame_period());
+    m_vsync_off_timer->adjust(m_screen->time_until_pos(16, 0), 0, m_screen->frame_period());
 */
 	m_500hz_timer = timer_alloc(TIMER_ID_500HZ);
 	m_500hz_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));

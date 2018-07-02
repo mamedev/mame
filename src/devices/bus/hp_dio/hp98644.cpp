@@ -138,8 +138,6 @@ ioport_constructor dio16_98644_device::device_input_ports() const
 
 void dio16_98644_device::device_start()
 {
-	// set_nubus_device makes m_slot valid
-	set_dio_device();
 	m_installed_io = false;
 }
 
@@ -154,7 +152,7 @@ void dio16_98644_device::device_reset()
 
 	if (!m_installed_io)
 	{
-		m_dio->install_memory(
+		dio().install_memory(
 				0x600000 + (code * 0x10000),
 				0x6007ff + (code * 0x10000),
 				read16_delegate(FUNC(dio16_98644_device::io_r), this),

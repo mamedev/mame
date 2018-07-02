@@ -9,6 +9,7 @@
 #define MIDZEUS_VIDEO_CLOCK     XTAL(66'666'700)
 
 #include "machine/timekpr.h"
+#include "emupal.h"
 #include "screen.h"
 
 class midzeus_state : public driver_device

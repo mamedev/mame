@@ -21,6 +21,7 @@ Notes:
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tim100_state : public driver_device
@@ -34,14 +35,16 @@ public:
 		, m_crtc(*this, "crtc")
 	{ }
 
+	void tim100(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
-	void tim100(machine_config &config);
 	void tim100_io(address_map &map);
 	void tim100_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	uint8_t *m_charmap;
 	uint16_t m_dma_adr;

@@ -14,6 +14,7 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -24,11 +25,6 @@
 class mjsister_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_DAC
-	};
-
 	mjsister_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -36,6 +32,14 @@ public:
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac"),
 		m_rombank(*this, "bank1") { }
+
+	void mjsister(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_DAC
+	};
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap0;
@@ -91,10 +95,9 @@ public:
 	void plot0( int offset, uint8_t data );
 	void plot1( int offset, uint8_t data );
 
-	void mjsister(machine_config &config);
 	void mjsister_io_map(address_map &map);
 	void mjsister_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	emu_timer *m_dac_timer;
@@ -320,7 +323,7 @@ void mjsister_state::mjsister_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("bank1").w(this, FUNC(mjsister_state::videoram_w));
+	map(0x8000, 0xffff).bankr("bank1").w(FUNC(mjsister_state::videoram_w));
 }
 
 void mjsister_state::mjsister_io_map(address_map &map)
@@ -330,14 +333,14 @@ void mjsister_state::mjsister_io_map(address_map &map)
 	map(0x10, 0x10).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x11, 0x11).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x12, 0x12).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x20, 0x20).r(this, FUNC(mjsister_state::keys_r));
+	map(0x20, 0x20).r(FUNC(mjsister_state::keys_r));
 	map(0x21, 0x21).portr("IN0");
 	map(0x30, 0x30).w("mainlatch1", FUNC(ls259_device::write_nibble_d0));
 	map(0x31, 0x31).w("mainlatch2", FUNC(ls259_device::write_nibble_d0));
-	map(0x32, 0x32).w(this, FUNC(mjsister_state::input_sel1_w));
-	map(0x33, 0x33).w(this, FUNC(mjsister_state::input_sel2_w));
-	map(0x34, 0x34).w(this, FUNC(mjsister_state::dac_adr_s_w));
-	map(0x35, 0x35).w(this, FUNC(mjsister_state::dac_adr_e_w));
+	map(0x32, 0x32).w(FUNC(mjsister_state::input_sel1_w));
+	map(0x33, 0x33).w(FUNC(mjsister_state::input_sel2_w));
+	map(0x34, 0x34).w(FUNC(mjsister_state::dac_adr_s_w));
+	map(0x35, 0x35).w(FUNC(mjsister_state::dac_adr_e_w));
 }
 
 

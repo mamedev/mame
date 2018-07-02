@@ -32,8 +32,8 @@ DEFINE_DEVICE_TYPE(CGENIE_FDC, cgenie_fdc_device, "cgenie_fdc", "Colour Genie FD
 
 void cgenie_fdc_device::mmio(address_map &map)
 {
-	map(0xe0, 0xe3).mirror(0x10).rw(this, FUNC(cgenie_fdc_device::irq_r), FUNC(cgenie_fdc_device::select_w));
-	map(0xec, 0xec).mirror(0x10).r("fd1793", FUNC(fd1793_device::status_r)).w(this, FUNC(cgenie_fdc_device::command_w));
+	map(0xe0, 0xe3).mirror(0x10).rw(FUNC(cgenie_fdc_device::irq_r), FUNC(cgenie_fdc_device::select_w));
+	map(0xec, 0xec).mirror(0x10).r("fd1793", FUNC(fd1793_device::status_r)).w(FUNC(cgenie_fdc_device::command_w));
 	map(0xed, 0xed).mirror(0x10).rw("fd1793", FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
 	map(0xee, 0xee).mirror(0x10).rw("fd1793", FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
 	map(0xef, 0xef).mirror(0x10).rw("fd1793", FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
@@ -219,5 +219,5 @@ WRITE8_MEMBER( cgenie_fdc_device::command_w )
 		m_fdc->dden_w(!BIT(data, 0));
 
 	// forward to the controller
-	m_fdc->cmd_w(data);
+	m_fdc->write_cmd(data);
 }

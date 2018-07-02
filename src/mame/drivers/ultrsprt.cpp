@@ -13,6 +13,7 @@
 #include "machine/upd4701.h"
 #include "sound/k054539.h"
 #include "sound/k056800.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -31,6 +32,9 @@ public:
 		m_upd(*this, "upd%u", 1),
 		m_service(*this, "SERVICE") { }
 
+	void ultrsprt(machine_config &config);
+
+private:
 	static const uint32_t VRAM_PAGES      = 2;
 	static const uint32_t VRAM_PAGE_BYTES = 512 * 1024;
 
@@ -52,14 +56,12 @@ public:
 
 	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ultrsprt(machine_config &config);
 	void sound_map(address_map &map);
 	void ultrsprt_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint32_t m_cpu_vram_page;
 };
@@ -151,12 +153,12 @@ READ16_MEMBER(ultrsprt_state::upd2_r)
 void ultrsprt_state::ultrsprt_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).bankrw("vram");
-	map(0x70000000, 0x70000000).rw(this, FUNC(ultrsprt_state::eeprom_r), FUNC(ultrsprt_state::eeprom_w));
-	map(0x70000020, 0x70000023).r(this, FUNC(ultrsprt_state::upd1_r));
-	map(0x70000040, 0x70000043).r(this, FUNC(ultrsprt_state::upd2_r));
+	map(0x70000000, 0x70000000).rw(FUNC(ultrsprt_state::eeprom_r), FUNC(ultrsprt_state::eeprom_w));
+	map(0x70000020, 0x70000023).r(FUNC(ultrsprt_state::upd1_r));
+	map(0x70000040, 0x70000043).r(FUNC(ultrsprt_state::upd2_r));
 	map(0x70000080, 0x7000008f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x700000c0, 0x700000cf).nopw(); // Written following DMA interrupt - unused int ack?
-	map(0x700000e0, 0x700000e3).w(this, FUNC(ultrsprt_state::int_ack_w));
+	map(0x700000e0, 0x700000e3).w(FUNC(ultrsprt_state::int_ack_w));
 	map(0x7f000000, 0x7f01ffff).ram().share("workram");
 	map(0x7f700000, 0x7f703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x7f800000, 0x7f9fffff).mirror(0x00600000).rom().region("program", 0);
@@ -219,7 +221,7 @@ void ultrsprt_state::machine_start()
 
 	membank("vram")->configure_entries(0, VRAM_PAGES, m_vram.get(), VRAM_PAGE_BYTES);
 
-	save_pointer(NAME(m_vram.get()), VRAM_PAGE_BYTES * VRAM_PAGES);
+	save_pointer(NAME(m_vram), VRAM_PAGE_BYTES * VRAM_PAGES);
 	save_item(NAME(m_cpu_vram_page));
 }
 
@@ -243,7 +245,7 @@ MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	MCFG_DEVICE_ADD("audiocpu", M68000, 8000000) // Unconfirmed
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("P1X")

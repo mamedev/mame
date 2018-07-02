@@ -33,6 +33,7 @@
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,23 +55,24 @@ public:
 	};
 
 	oric_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_palette(*this, "palette"),
-			m_psg(*this, "ay8912"),
-			m_centronics(*this, "centronics"),
-			m_cent_data_out(*this, "cent_data_out"),
-			m_cassette(*this, "cassette"),
-			m_via(*this, "via6522"),
-			m_ram(*this, "ram"),
-			m_rom(*this, "maincpu"),
-			m_bank_c000_r(*this, "bank_c000_r"),
-			m_bank_e000_r(*this, "bank_e000_r"),
-			m_bank_f800_r(*this, "bank_f800_r"),
-			m_bank_c000_w(*this, "bank_c000_w"),
-			m_bank_e000_w(*this, "bank_e000_w"),
-			m_bank_f800_w(*this, "bank_f800_w"),
-			m_config(*this, "CONFIG") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
+		, m_psg(*this, "ay8912")
+		, m_centronics(*this, "centronics")
+		, m_cent_data_out(*this, "cent_data_out")
+		, m_cassette(*this, "cassette")
+		, m_via(*this, "via6522")
+		, m_ram(*this, "ram")
+		, m_rom(*this, "maincpu")
+		, m_bank_c000_r(*this, "bank_c000_r")
+		, m_bank_e000_r(*this, "bank_e000_r")
+		, m_bank_f800_r(*this, "bank_f800_r")
+		, m_bank_c000_w(*this, "bank_c000_w")
+		, m_bank_e000_w(*this, "bank_e000_w")
+		, m_bank_f800_w(*this, "bank_f800_w")
+		, m_config(*this, "CONFIG")
+	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_pressed);
 	DECLARE_WRITE8_MEMBER(via_a_w);
@@ -207,8 +209,8 @@ void telestrat_state::telestrat_mem(address_map &map)
 	map(0x0000, 0xffff).ram().share("ram");
 	map(0x0300, 0x030f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0x0310, 0x0313).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0x0314, 0x0314).rw(this, FUNC(telestrat_state::port_314_r), FUNC(telestrat_state::port_314_w));
-	map(0x0318, 0x0318).r(this, FUNC(telestrat_state::port_318_r));
+	map(0x0314, 0x0314).rw(FUNC(telestrat_state::port_314_r), FUNC(telestrat_state::port_314_w));
+	map(0x0318, 0x0318).r(FUNC(telestrat_state::port_318_r));
 	map(0x031c, 0x031f).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x0320, 0x032f).rw(m_via2, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xc000, 0xffff).bankr("bank_c000_r").bankw("bank_c000_w");
@@ -320,7 +322,7 @@ INPUT_CHANGED_MEMBER(oric_state::nmi_pressed)
 WRITE8_MEMBER(oric_state::via_a_w)
 {
 	m_via_a = data;
-	m_cent_data_out->write(space, 0, m_via_a);
+	m_cent_data_out->write(m_via_a);
 	update_psg(space);
 }
 
@@ -798,7 +800,7 @@ MACHINE_CONFIG_START(oric_state::oric)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 

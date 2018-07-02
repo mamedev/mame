@@ -23,6 +23,7 @@
 #include "sound/spkrdev.h"
 #include "sound/beep.h"
 #include "imagedev/snapquik.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 
@@ -67,8 +68,11 @@ public:
 		m_8n5(0),
 		m_400_460(0)
 	{ }
+	
+	void mk83(machine_config &config);
+	void xerox820(machine_config &config);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(xerox820);
 
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
@@ -80,16 +84,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_QUICKLOAD_LOAD_MEMBER(xerox820);
+
+protected:
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 
-	void mk83(machine_config &config);
-	void xerox820(machine_config &config);
 	void mk83_mem(address_map &map);
 	void xerox820_io(address_map &map);
 	void xerox820_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

@@ -41,6 +41,7 @@ so it could be by them instead
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,6 +55,9 @@ public:
 		m_palette(*this, "palette"),
 		m_vram(*this, "vram")  { }
 
+	void hotblock(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -77,7 +81,6 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void hotblock(machine_config &config);
 	void hotblock_io(address_map &map);
 	void hotblock_map(address_map &map);
 };
@@ -133,14 +136,14 @@ WRITE8_MEMBER(hotblock_state::video_write)
 void hotblock_state::hotblock_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram();
-	map(0x10000, 0x1ffff).rw(this, FUNC(hotblock_state::video_read), FUNC(hotblock_state::video_write)).share("vram");
+	map(0x10000, 0x1ffff).rw(FUNC(hotblock_state::video_read), FUNC(hotblock_state::video_write)).share("vram");
 	map(0x20000, 0xfffff).rom();
 }
 
 void hotblock_state::hotblock_io(address_map &map)
 {
-	map(0x0000, 0x0000).w(this, FUNC(hotblock_state::port0_w));
-	map(0x0004, 0x0004).rw(this, FUNC(hotblock_state::port4_r), FUNC(hotblock_state::port4_w));
+	map(0x0000, 0x0000).w(FUNC(hotblock_state::port0_w));
+	map(0x0004, 0x0004).rw(FUNC(hotblock_state::port4_r), FUNC(hotblock_state::port4_w));
 	map(0x8000, 0x8001).w("aysnd", FUNC(ym2149_device::address_data_w));
 	map(0x8001, 0x8001).r("aysnd", FUNC(ym2149_device::data_r));
 }

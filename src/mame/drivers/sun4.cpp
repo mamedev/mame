@@ -552,6 +552,14 @@ public:
 	{
 	}
 
+	void sun4c(machine_config &config);
+	void sun4(machine_config &config);
+
+	void init_sun4();
+	void init_sun4c();
+	void init_ss2();
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -583,23 +591,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( scc1_int );
 	DECLARE_WRITE_LINE_MEMBER( scc2_int );
 
-	void init_sun4();
-	void init_sun4c();
-	void init_ss2();
-
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void ncr5390(device_t *device);
-	void sun4c(machine_config &config);
-	void sun4(machine_config &config);
+
 	void sun4_mem(address_map &map);
 	void sun4c_mem(address_map &map);
 	void type0space_map(address_map &map);
 	void type1space_map(address_map &map);
 	void type1space_s4_map(address_map &map);
-protected:
+
 	required_device<mb86901_device> m_maincpu;
 
 	required_device<mk48t12_device> m_timekpr;
@@ -626,7 +629,6 @@ protected:
 	uint32_t m_dma_pack_register;
 	int m_scsi_irq;
 
-private:
 	uint32_t *m_ram_ptr;
 	uint8_t m_segmap[16][4096];
 	uint32_t m_pagemap[16384];
@@ -1333,12 +1335,12 @@ void sun4_state::fcodes_command(int ref, const std::vector<std::string> &params)
 
 void sun4_state::sun4_mem(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(sun4_state::sun4_mmu_r), FUNC(sun4_state::sun4_mmu_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(sun4_state::sun4_mmu_r), FUNC(sun4_state::sun4_mmu_w));
 }
 
 void sun4_state::sun4c_mem(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(sun4_state::sun4c_mmu_r), FUNC(sun4_state::sun4c_mmu_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(sun4_state::sun4c_mmu_r), FUNC(sun4_state::sun4c_mmu_w));
 }
 
 /* Input ports */
@@ -1464,7 +1466,7 @@ WRITE32_MEMBER( sun4_state::ram_w )
 
 void sun4_state::type0space_map(address_map &map)
 {
-	map(0x00000000, 0x03ffffff).rw(this, FUNC(sun4_state::ram_r), FUNC(sun4_state::ram_w));
+	map(0x00000000, 0x03ffffff).rw(FUNC(sun4_state::ram_r), FUNC(sun4_state::ram_w));
 }
 
 void sun4_state::type1space_map(address_map &map)
@@ -1472,14 +1474,14 @@ void sun4_state::type1space_map(address_map &map)
 	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
 	map(0x01000000, 0x0100000f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
 	map(0x02000000, 0x020007ff).rw(m_timekpr, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
-	map(0x03000000, 0x0300000f).rw(this, FUNC(sun4_state::timer_r), FUNC(sun4_state::timer_w)).mirror(0xfffff0);
-	map(0x05000000, 0x05000003).rw(this, FUNC(sun4_state::irq_r), FUNC(sun4_state::irq_w));
+	map(0x03000000, 0x0300000f).rw(FUNC(sun4_state::timer_r), FUNC(sun4_state::timer_w)).mirror(0xfffff0);
+	map(0x05000000, 0x05000003).rw(FUNC(sun4_state::irq_r), FUNC(sun4_state::irq_w));
 	map(0x06000000, 0x0607ffff).rom().region("user1", 0);
-	map(0x07200000, 0x07200003).rw(this, FUNC(sun4_state::fdc_r), FUNC(sun4_state::fdc_w));
-	map(0x08000000, 0x08000003).r(this, FUNC(sun4_state::ss1_sl0_id));    // slot 0 contains SCSI/DMA/Ethernet
-	map(0x08400000, 0x0840000f).rw(this, FUNC(sun4_state::dma_r), FUNC(sun4_state::dma_w));
+	map(0x07200000, 0x07200003).rw(FUNC(sun4_state::fdc_r), FUNC(sun4_state::fdc_w));
+	map(0x08000000, 0x08000003).r(FUNC(sun4_state::ss1_sl0_id));    // slot 0 contains SCSI/DMA/Ethernet
+	map(0x08400000, 0x0840000f).rw(FUNC(sun4_state::dma_r), FUNC(sun4_state::dma_w));
 	map(0x08800000, 0x0880001f).m(m_scsi, FUNC(ncr5390_device::map)).umask32(0xff000000);
-	map(0x0e000000, 0x0e000003).r(this, FUNC(sun4_state::ss1_sl3_id));    // slot 3 contains video board
+	map(0x0e000000, 0x0e000003).r(FUNC(sun4_state::ss1_sl3_id));    // slot 3 contains video board
 	map(0x0e800000, 0x0e8fffff).ram().share("bw2_vram");
 }
 

@@ -33,6 +33,7 @@
 #include "machine/keyboard.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -52,7 +53,11 @@ public:
 	{
 	}
 
+	void phunsy(machine_config &config);
+
 	void init_phunsy();
+
+private:
 	DECLARE_READ8_MEMBER(phunsy_data_r);
 	DECLARE_WRITE8_MEMBER(phunsy_ctrl_w);
 	DECLARE_WRITE8_MEMBER(phunsy_data_w);
@@ -63,11 +68,10 @@ public:
 	DECLARE_PALETTE_INIT(phunsy);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void phunsy(machine_config &config);
 	void phunsy_data(address_map &map);
 	void phunsy_io(address_map &map);
 	void phunsy_mem(address_map &map);
-private:
+
 	uint8_t       m_data_out;
 	uint8_t       m_keyboard_input;
 	virtual void machine_reset() override;
@@ -107,8 +111,8 @@ void phunsy_state::phunsy_io(address_map &map)
 void phunsy_state::phunsy_data(address_map &map)
 {
 	map.unmap_value_high();
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(this, FUNC(phunsy_state::phunsy_ctrl_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(phunsy_state::phunsy_data_r), FUNC(phunsy_state::phunsy_data_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(phunsy_state::phunsy_ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(phunsy_state::phunsy_data_r), FUNC(phunsy_state::phunsy_data_w));
 }
 
 

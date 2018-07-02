@@ -8,6 +8,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -25,6 +26,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void mogura(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_ldac;
 	required_device<dac_byte_interface> m_rdac;
@@ -41,7 +45,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mogura);
 	uint32_t screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mogura(machine_config &config);
 	void mogura_io_map(address_map &map);
 	void mogura_map(address_map &map);
 };
@@ -141,8 +144,8 @@ void mogura_state::mogura_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xdfff).ram(); // main ram
-	map(0xe000, 0xefff).ram().w(this, FUNC(mogura_state::mogura_gfxram_w)).share("gfxram"); // ram based characters
-	map(0xf000, 0xffff).ram().w(this, FUNC(mogura_state::mogura_tileram_w)).share("tileram"); // tilemap
+	map(0xe000, 0xefff).ram().w(FUNC(mogura_state::mogura_gfxram_w)).share("gfxram"); // ram based characters
+	map(0xf000, 0xffff).ram().w(FUNC(mogura_state::mogura_tileram_w)).share("tileram"); // tilemap
 }
 
 void mogura_state::mogura_io_map(address_map &map)
@@ -155,7 +158,7 @@ void mogura_state::mogura_io_map(address_map &map)
 	map(0x0e, 0x0e).portr("P3");
 	map(0x0f, 0x0f).portr("P4");
 	map(0x10, 0x10).portr("SERVICE");
-	map(0x14, 0x14).w(this, FUNC(mogura_state::mogura_dac_w)); /* 4 bit DAC x 2. MSB = left, LSB = right */
+	map(0x14, 0x14).w(FUNC(mogura_state::mogura_dac_w)); /* 4 bit DAC x 2. MSB = left, LSB = right */
 }
 
 static INPUT_PORTS_START( mogura )

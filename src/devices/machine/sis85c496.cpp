@@ -22,12 +22,12 @@ DEFINE_DEVICE_TYPE(SIS85C496, sis85c496_host_device, "sis85c496", "SiS 85C496/49
 void sis85c496_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
-	map(0x40, 0x40).rw(this, FUNC(sis85c496_host_device::dram_config_r), FUNC(sis85c496_host_device::dram_config_w));
-	map(0x44, 0x45).rw(this, FUNC(sis85c496_host_device::shadow_config_r), FUNC(sis85c496_host_device::shadow_config_w));
-	map(0x5a, 0x5a).rw(this, FUNC(sis85c496_host_device::smram_ctrl_r), FUNC(sis85c496_host_device::smram_ctrl_w));
-	map(0xc8, 0xcb).rw(this, FUNC(sis85c496_host_device::mailbox_r), FUNC(sis85c496_host_device::mailbox_w));
-	map(0xd0, 0xd0).rw(this, FUNC(sis85c496_host_device::bios_config_r), FUNC(sis85c496_host_device::bios_config_w));
-	map(0xd1, 0xd1).rw(this, FUNC(sis85c496_host_device::isa_decoder_r), FUNC(sis85c496_host_device::isa_decoder_w));
+	map(0x40, 0x40).rw(FUNC(sis85c496_host_device::dram_config_r), FUNC(sis85c496_host_device::dram_config_w));
+	map(0x44, 0x45).rw(FUNC(sis85c496_host_device::shadow_config_r), FUNC(sis85c496_host_device::shadow_config_w));
+	map(0x5a, 0x5a).rw(FUNC(sis85c496_host_device::smram_ctrl_r), FUNC(sis85c496_host_device::smram_ctrl_w));
+	map(0xc8, 0xcb).rw(FUNC(sis85c496_host_device::mailbox_r), FUNC(sis85c496_host_device::mailbox_w));
+	map(0xd0, 0xd0).rw(FUNC(sis85c496_host_device::bios_config_r), FUNC(sis85c496_host_device::bios_config_w));
+	map(0xd1, 0xd1).rw(FUNC(sis85c496_host_device::isa_decoder_r), FUNC(sis85c496_host_device::isa_decoder_w));
 }
 
 void sis85c496_host_device::internal_io_map(address_map &map)
@@ -36,12 +36,12 @@ void sis85c496_host_device::internal_io_map(address_map &map)
 	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x003f).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-	map(0x0060, 0x0063).rw(this, FUNC(sis85c496_host_device::at_keybc_r), FUNC(sis85c496_host_device::at_keybc_w));
+	map(0x0060, 0x0063).rw(FUNC(sis85c496_host_device::at_keybc_r), FUNC(sis85c496_host_device::at_keybc_w));
 	map(0x0064, 0x0067).rw("keybc", FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
 	map(0x0070, 0x007f).rw("rtc", FUNC(ds12885_device::read), FUNC(ds12885_device::write));
-	map(0x0080, 0x009f).rw(this, FUNC(sis85c496_host_device::at_page8_r), FUNC(sis85c496_host_device::at_page8_w));
+	map(0x0080, 0x009f).rw(FUNC(sis85c496_host_device::at_page8_r), FUNC(sis85c496_host_device::at_page8_w));
 	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x00c0, 0x00df).rw(this, FUNC(sis85c496_host_device::at_dma8237_2_r), FUNC(sis85c496_host_device::at_dma8237_2_w));
+	map(0x00c0, 0x00df).rw(FUNC(sis85c496_host_device::at_dma8237_2_r), FUNC(sis85c496_host_device::at_dma8237_2_w));
 	map(0x00e0, 0x00ef).noprw();
 }
 
@@ -88,7 +88,7 @@ MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, sis85c496_host_device, pc_dack7_w))
 
 	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(":maincpu", 0))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, sis85c496_host_device, cpu_int_w))
 	MCFG_PIC8259_IN_SP_CB(VCC)
 	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, sis85c496_host_device, get_slave_ack))
 
@@ -97,8 +97,8 @@ MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
-	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
-	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
+	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(WRITELINE(*this, sis85c496_host_device, cpu_reset_w))
+	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(WRITELINE(*this, sis85c496_host_device, cpu_a20_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("pic8259_master", pic8259_device, ir1_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(WRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
 	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(WRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
@@ -120,7 +120,7 @@ MACHINE_CONFIG_END
 
 sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, SIS85C496, tag, owner, clock),
-	m_maincpu(*this, ":maincpu"),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_pic8259_master(*this, "pic8259_master"),
 	m_pic8259_slave(*this, "pic8259_slave"),
 	m_dma8237_1(*this, "dma8237_1"),
@@ -134,9 +134,9 @@ sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, cons
 {
 }
 
-void sis85c496_host_device::set_cpu_tag(const char *_cpu_tag)
+void sis85c496_host_device::set_cpu_tag(const char *cpu_tag)
 {
-	cpu_tag = _cpu_tag;
+	m_maincpu.set_tag(cpu_tag);
 }
 
 void sis85c496_host_device::set_ram_size(int _ram_size)
@@ -148,9 +148,8 @@ void sis85c496_host_device::device_start()
 {
 	pci_host_device::device_start();
 
-	cpu = machine().device<cpu_device>(cpu_tag);
-	memory_space = &cpu->space(AS_PROGRAM);
-	io_space = &cpu->space(AS_IO);
+	memory_space = &m_maincpu->space(AS_PROGRAM);
+	io_space = &m_maincpu->space(AS_IO);
 
 	memory_window_start = 0;
 	memory_window_end   = 0xffffffff;
@@ -581,6 +580,21 @@ WRITE8_MEMBER( sis85c496_host_device::write_rtc )
 	else {
 		m_ds12885->write(space,offset,data);
 	}
+}
+
+WRITE_LINE_MEMBER(sis85c496_host_device::cpu_int_w)
+{
+	m_maincpu->set_input_line(0, state);
+}
+
+WRITE_LINE_MEMBER(sis85c496_host_device::cpu_a20_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_A20, state);
+}
+
+WRITE_LINE_MEMBER(sis85c496_host_device::cpu_reset_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
 /*

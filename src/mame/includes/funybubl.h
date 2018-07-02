@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 class funybubl_state : public driver_device
 {
@@ -17,6 +18,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void funybubl(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_paletteram;
 
@@ -39,7 +43,6 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_funybubl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void funybubl(machine_config &config);
 	void funybubl_map(address_map &map);
 	void io_map(address_map &map);
 	void sound_map(address_map &map);

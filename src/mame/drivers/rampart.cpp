@@ -143,7 +143,7 @@ void rampart_state::main_map(address_map &map)
 	map(0x480000, 0x480003).mirror(0x019ffc).w(m_ym2413, FUNC(ym2413_device::write)).umask16(0xff00);
 	map(0x500000, 0x500fff).mirror(0x019000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x5a6000, 0x5a6001).mirror(0x019ffe).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0x640000, 0x640001).mirror(0x019ffe).w(this, FUNC(rampart_state::latch_w));
+	map(0x640000, 0x640001).mirror(0x019ffe).w(FUNC(rampart_state::latch_w));
 	map(0x640000, 0x640001).mirror(0x019ffc).portr("IN0");
 	map(0x640002, 0x640003).mirror(0x019ffc).portr("IN1");
 	map(0x6c0000, 0x6c0001).mirror(0x019ff8).portr("TRACK0");
@@ -151,7 +151,7 @@ void rampart_state::main_map(address_map &map)
 	map(0x6c0004, 0x6c0005).mirror(0x019ff8).portr("TRACK2");
 	map(0x6c0006, 0x6c0007).mirror(0x019ff8).portr("TRACK3");
 	map(0x726000, 0x726001).mirror(0x019ffe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x7e6000, 0x7e6001).mirror(0x019ffe).w(this, FUNC(rampart_state::scanline_int_ack_w));
+	map(0x7e6000, 0x7e6001).mirror(0x019ffe).w(FUNC(rampart_state::scanline_int_ack_w));
 }
 
 
@@ -343,7 +343,7 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_SLAPSTIC_ADD("slapstic", 118)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 118, true)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)

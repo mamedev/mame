@@ -11,7 +11,7 @@
 #include "speaker.h"
 
 
-DEFINE_DEVICE_TYPE(AD1848, ad1848_device, "ad1848", "Analog Device AD1848")
+DEFINE_DEVICE_TYPE(AD1848, ad1848_device, "ad1848", "AD1848 16-bit SoundPort Stereo Codec")
 
 ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AD1848, tag, owner, clock),

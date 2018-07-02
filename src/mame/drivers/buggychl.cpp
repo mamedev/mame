@@ -203,19 +203,19 @@ void buggychl_state::buggychl_map(address_map &map)
 	map(0x4000, 0x7fff).rom(); /* A22-05 (22) */
 	map(0x8000, 0x87ff).ram(); /* 6116 SRAM (36) */
 	map(0x8800, 0x8fff).ram(); /* 6116 SRAM (35) */
-	map(0x9000, 0x9fff).w(this, FUNC(buggychl_state::buggychl_sprite_lookup_w));
-	map(0xa000, 0xbfff).bankr("bank1").w(this, FUNC(buggychl_state::buggychl_chargen_w)).share("charram");
+	map(0x9000, 0x9fff).w(FUNC(buggychl_state::buggychl_sprite_lookup_w));
+	map(0xa000, 0xbfff).bankr("bank1").w(FUNC(buggychl_state::buggychl_chargen_w)).share("charram");
 	map(0xc800, 0xcfff).ram().share("videoram");
 	map(0xd000, 0xd000).nopw(); // ???
-	map(0xd100, 0xd100).mirror(0x00ff).w(this, FUNC(buggychl_state::buggychl_ctrl_w));
-	map(0xd200, 0xd200).mirror(0x00ff).w(this, FUNC(buggychl_state::bankswitch_w));
+	map(0xd100, 0xd100).mirror(0x00ff).w(FUNC(buggychl_state::buggychl_ctrl_w));
+	map(0xd200, 0xd200).mirror(0x00ff).w(FUNC(buggychl_state::bankswitch_w));
 	map(0xd300, 0xd300).mirror(0x00f8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	// d301 = flp stuff, unused?
 	// d302 = mcu reset latched d0
-	map(0xd303, 0xd303).mirror(0x00f8).w(this, FUNC(buggychl_state::buggychl_sprite_lookup_bank_w));
+	map(0xd303, 0xd303).mirror(0x00f8).w(FUNC(buggychl_state::buggychl_sprite_lookup_bank_w));
 	map(0xd304, 0xd307).nopw(); // d304-d307 is SCCON, which seems to be for a bezel mounted 7seg score/time display like Grand Champion has
 	map(0xd400, 0xd400).mirror(0x00fc).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0xd401, 0xd401).mirror(0x00fc).r(this, FUNC(buggychl_state::mcu_status_r));
+	map(0xd401, 0xd401).mirror(0x00fc).r(FUNC(buggychl_state::mcu_status_r));
 	map(0xd500, 0xd57f).writeonly().share("spriteram");
 	map(0xd600, 0xd600).mirror(0x00e4).portr("DSW1");
 	map(0xd601, 0xd601).mirror(0x00e4).portr("DSW2");
@@ -226,7 +226,7 @@ void buggychl_state::buggychl_map(address_map &map)
 //  AM_RANGE(0xd60a, 0xd60a) AM_MIRROR(0x00e4) // other inputs, not used?
 //  AM_RANGE(0xd60b, 0xd60b) AM_MIRROR(0x00e4) // other inputs, not used?
 	map(0xd610, 0xd610).mirror(0x00e4).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xd611, 0xd611).mirror(0x00e4).r(this, FUNC(buggychl_state::sound_status_main_r));
+	map(0xd611, 0xd611).mirror(0x00e4).r(FUNC(buggychl_state::sound_status_main_r));
 //  AM_RANGE(0xd613, 0xd613) AM_MIRROR(0x00e4) AM_WRITE(sound_reset_w)
 	map(0xd618, 0xd618).mirror(0x00e7).nopw();    /* accelerator clear; TODO: should we emulate the proper quadrature counter here? */
 	map(0xd700, 0xd7ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -234,7 +234,7 @@ void buggychl_state::buggychl_map(address_map &map)
 	map(0xd840, 0xd85f).writeonly().share("scrollv");
 	map(0xdb00, 0xdbff).writeonly().share("scrollh");
 	map(0xdc04, 0xdc04).writeonly(); /* should be fg scroll */
-	map(0xdc06, 0xdc06).w(this, FUNC(buggychl_state::buggychl_bg_scrollx_w));
+	map(0xdc06, 0xdc06).w(FUNC(buggychl_state::buggychl_bg_scrollx_w));
 }
 
 /* The schematics for buggy challenge has the wrong sound board schematic attached to it.
@@ -248,12 +248,12 @@ void buggychl_state::sound_map(address_map &map)
 	map(0x4800, 0x4801).w(m_ay1, FUNC(ay8910_device::address_data_w));
 	map(0x4802, 0x4803).w(m_ay2, FUNC(ay8910_device::address_data_w));
 	map(0x4810, 0x481d).w(m_msm, FUNC(msm5232_device::write));
-	map(0x4820, 0x4820).w(this, FUNC(buggychl_state::ta7630_volbal_msm_w)); /* VOL/BAL   for the 7630 on the MSM5232 output */
+	map(0x4820, 0x4820).w(FUNC(buggychl_state::ta7630_volbal_msm_w)); /* VOL/BAL   for the 7630 on the MSM5232 output */
 	map(0x4830, 0x4830).ram(); /* TRBL/BASS for the 7630 on the MSM5232 output */
 	map(0x5000, 0x5000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
-	map(0x5001, 0x5001).r(this, FUNC(buggychl_state::sound_status_sound_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<1>));
+	map(0x5001, 0x5001).r(FUNC(buggychl_state::sound_status_sound_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<1>));
 	map(0x5002, 0x5002).w(m_soundnmi, FUNC(input_merger_device::in_clear<1>));
-	map(0x5003, 0x5003).w(this, FUNC(buggychl_state::sound_enable_w)); // unclear what this actually controls
+	map(0x5003, 0x5003).w(FUNC(buggychl_state::sound_enable_w)); // unclear what this actually controls
 	map(0xe000, 0xefff).rom(); /* space for diagnostics ROM */
 }
 
@@ -513,24 +513,24 @@ void buggychl_state::machine_reset()
 MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(48'000'000)/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
+	MCFG_DEVICE_ADD("maincpu", Z80, 48_MHz_XTAL/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
 	MCFG_DEVICE_PROGRAM_MAP(buggychl_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", buggychl_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* 4 MHz according to schematics */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL/2) /* 4 MHz according to schematics */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, ((((XTAL(8'000'000)/2)/2)/256)/64)) // timer irq
-	//MCFG_TIMER_DEVICE_ADD_PERIODIC("soundirq", "audiocpu",  irq0_line_hold, ((((XTAL_8MHz/2)/2)/256)/64))
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, 8_MHz_XTAL/2/2/256/64) // timer irq
+	//MCFG_TIMER_DEVICE_ADD_PERIODIC("soundirq", "audiocpu",  irq0_line_hold, 8_MHz_XTAL/2/2/256/64)
 	// The schematics (which are at least partly for the wrong sound board) show a configurable timer with rates of
-	// 61.035Hz ((((XTAL_8MHz/2)/2)/256)/128)
-	// or 122.0Hz ((((XTAL_8MHz/2)/2)/256)/64)
+	// 61.035Hz (8_MHz_XTAL/2/2/256/128)
+	// or 122.0Hz (8_MHz_XTAL/2/2/256/64)
 	// similar to flstory.cpp and other Taito MSM5232 based games.
 	// The real sound pcb probably lacks the latch for this configurable timer, but does have a jumper which likely has a similar function.
 	// The game code implies the timer int is enable/disabled by one of the "sound_enable_w" bits?
 	// TODO: actually hook this up?
 	/* audiocpu nmi is caused by (main->sound semaphore)&&(sound_nmi_enabled), identical to bubble bobble. */
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, (XTAL(48'000'000)/8)/2)  /* CPUspeed/2 MHz according to schematics, so 3MHz if cpu is jumpered for 6MHz */
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 48_MHz_XTAL/8/2)  /* CPUspeed/2 MHz according to schematics, so 3MHz if cpu is jumpered for 6MHz */
 
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -543,7 +543,7 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	// derived from ladyfrog.cpp, causes glitches?
-//  MCFG_SCREEN_RAW_PARAMS( XTAL(8'000'000), 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
+//  MCFG_SCREEN_RAW_PARAMS( 8_MHz_XTAL, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(buggychl_state, screen_update_buggychl)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -566,17 +566,17 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_DEVICE_ADD("ay1", YM2149, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("ay1", YM2149, 8_MHz_XTAL/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggychl_state, ta7630_volbal_ay1_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggychl_state, port_b_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("ay2", YM2149, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("ay2", YM2149, 8_MHz_XTAL/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggychl_state, ta7630_volbal_ay2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggychl_state, port_b_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("msm", MSM5232, 8_MHz_XTAL/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1

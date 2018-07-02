@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+
+#include "emupal.h"
+
 class thepit_state : public driver_device
 {
 public:
@@ -13,6 +16,15 @@ public:
 		m_attributesram(*this, "attributesram"),
 		m_spriteram(*this, "spriteram") { }
 
+	void suprmous(machine_config &config);
+	void desertdn(machine_config &config);
+	void intrepid(machine_config &config);
+	void thepit(machine_config &config);
+	void fitter(machine_config &config);
+
+	void init_rtriv();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -51,7 +63,6 @@ public:
 	TILE_GET_INFO_MEMBER(solid_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void init_rtriv();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(thepit);
@@ -62,11 +73,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void suprmous(machine_config &config);
-	void desertdn(machine_config &config);
-	void intrepid(machine_config &config);
-	void thepit(machine_config &config);
-	void fitter(machine_config &config);
+
 	void audio_io_map(address_map &map);
 	void audio_map(address_map &map);
 	void desertdan_main_map(address_map &map);

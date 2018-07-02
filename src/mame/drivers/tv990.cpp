@@ -37,6 +37,7 @@
 #include "machine/nvram.h"
 #include "machine/pc_lpt.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -64,6 +65,11 @@ public:
 	{
 	}
 
+	void tv990(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(color);
+
+private:
 	required_device<m68000_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint16_t> m_fontram;
@@ -90,10 +96,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
 
 	INTERRUPT_GEN_MEMBER(vblank);
-	DECLARE_INPUT_CHANGED_MEMBER(color);
-	void tv990(machine_config &config);
 	void tv990_mem(address_map &map);
-private:
+
 	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
 	int m_rowh, m_width, m_height;
@@ -315,11 +319,11 @@ void tv990_state::tv990_mem(address_map &map)
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x060000, 0x06ffff).ram().share("vram"); // character/attribute RAM
 	map(0x080000, 0x087fff).ram().share("fontram"); // font RAM
-	map(0x090000, 0x0900ff).rw(this, FUNC(tv990_state::tvi1111_r), FUNC(tv990_state::tvi1111_w));
+	map(0x090000, 0x0900ff).rw(FUNC(tv990_state::tvi1111_r), FUNC(tv990_state::tvi1111_w));
 	map(0x0a0000, 0x0a000f).rw(m_uart0, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask16(0x00ff);
 	map(0x0a0010, 0x0a001f).rw(UART1_TAG, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask16(0x00ff);
 	map(0x0a0028, 0x0a002d).rw(LPT_TAG, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
-	map(0x0b0000, 0x0b0003).rw(this, FUNC(tv990_state::kbdc_r), FUNC(tv990_state::kbdc_w)).umask16(0x00ff);
+	map(0x0b0000, 0x0b0003).rw(FUNC(tv990_state::kbdc_r), FUNC(tv990_state::kbdc_w)).umask16(0x00ff);
 	map(0x0c0000, 0x0c7fff).ram().share("nvram");// work RAM
 }
 

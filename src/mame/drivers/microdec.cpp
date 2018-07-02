@@ -46,18 +46,21 @@ public:
 		, m_floppy(nullptr)
 	{ }
 
+	void microdec(machine_config &config);
+
+	void init_microdec();
+
+private:
 	DECLARE_READ8_MEMBER(portf5_r);
 	DECLARE_READ8_MEMBER(portf6_r);
 	DECLARE_WRITE8_MEMBER(portf6_w);
 	DECLARE_READ8_MEMBER(portf7_r);
 	DECLARE_WRITE8_MEMBER(portf7_w);
 	DECLARE_WRITE8_MEMBER(portf8_w);
-	void init_microdec();
 
-	void microdec(machine_config &config);
 	void microdec_io(address_map &map);
 	void microdec_mem(address_map &map);
-private:
+
 	uint8_t m_portf8;
 	bool m_fdc_rdy;
 	virtual void machine_reset() override;
@@ -133,10 +136,10 @@ void microdec_state::microdec_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf5, 0xf5).r(this, FUNC(microdec_state::portf5_r));
-	map(0xf6, 0xf6).rw(this, FUNC(microdec_state::portf6_r), FUNC(microdec_state::portf6_w));
-	map(0xf7, 0xf7).rw(this, FUNC(microdec_state::portf7_r), FUNC(microdec_state::portf7_w));
-	map(0xf8, 0xf8).w(this, FUNC(microdec_state::portf8_w));
+	map(0xf5, 0xf5).r(FUNC(microdec_state::portf5_r));
+	map(0xf6, 0xf6).rw(FUNC(microdec_state::portf6_r), FUNC(microdec_state::portf6_w));
+	map(0xf7, 0xf7).rw(FUNC(microdec_state::portf7_r), FUNC(microdec_state::portf7_w));
+	map(0xf8, 0xf8).w(FUNC(microdec_state::portf8_w));
 	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xfc, 0xfc).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xfd, 0xfd).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));

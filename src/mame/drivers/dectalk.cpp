@@ -252,11 +252,6 @@ dgc (dg(no!spam)cx@mac.com)
 class dectalk_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_OUTFIFO_READ
-	};
-
 	dectalk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -266,6 +261,14 @@ public:
 		m_dac(*this, "dac")
 	{
 	}
+
+	void dectalk(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_OUTFIFO_READ
+	};
 
 	// input fifo, between m68k and tms32010
 	uint16_t m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
@@ -321,11 +324,10 @@ public:
 	uint16_t dsp_outfifo_r();
 	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
-	void dectalk(machine_config &config);
 	void m68k_mem(address_map &map);
 	void tms32010_io(address_map &map);
 	void tms32010_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -797,14 +799,14 @@ void dectalk_state::m68k_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).mirror(0x740000).rom(); /* ROM */
 	map(0x080000, 0x093fff).mirror(0x760000).ram(); /* RAM */
-	map(0x094000, 0x0943ff).mirror(0x763c00).w(this, FUNC(dectalk_state::led_write)).umask16(0x00ff);  /* LED array */
+	map(0x094000, 0x0943ff).mirror(0x763c00).w(FUNC(dectalk_state::led_write)).umask16(0x00ff);  /* LED array */
 	map(0x094000, 0x0941ff).mirror(0x763c00).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0xff00); /* Xicor X2212 NVRAM */
-	map(0x094200, 0x0943ff).mirror(0x763c00).rw(this, FUNC(dectalk_state::nvram_recall), FUNC(dectalk_state::nvram_store)).umask16(0xff00); /* Xicor X2212 NVRAM */
+	map(0x094200, 0x0943ff).mirror(0x763c00).rw(FUNC(dectalk_state::nvram_recall), FUNC(dectalk_state::nvram_store)).umask16(0xff00); /* Xicor X2212 NVRAM */
 	map(0x098000, 0x09801f).mirror(0x763fe0).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff); /* DUART */
-	map(0x09c000, 0x09c001).mirror(0x763ff8).rw(this, FUNC(dectalk_state::m68k_spcflags_r), FUNC(dectalk_state::m68k_spcflags_w)); /* SPC flags reg */
-	map(0x09c002, 0x09c003).mirror(0x763ff8).w(this, FUNC(dectalk_state::m68k_infifo_w)); /* SPC fifo reg */
-	map(0x09c004, 0x09c005).mirror(0x763ff8).rw(this, FUNC(dectalk_state::m68k_tlcflags_r), FUNC(dectalk_state::m68k_tlcflags_w)); /* telephone status flags */
-	map(0x09c006, 0x09c007).mirror(0x763ff8).r(this, FUNC(dectalk_state::m68k_tlc_dtmf_r)); /* telephone dtmf read */
+	map(0x09c000, 0x09c001).mirror(0x763ff8).rw(FUNC(dectalk_state::m68k_spcflags_r), FUNC(dectalk_state::m68k_spcflags_w)); /* SPC flags reg */
+	map(0x09c002, 0x09c003).mirror(0x763ff8).w(FUNC(dectalk_state::m68k_infifo_w)); /* SPC fifo reg */
+	map(0x09c004, 0x09c005).mirror(0x763ff8).rw(FUNC(dectalk_state::m68k_tlcflags_r), FUNC(dectalk_state::m68k_tlcflags_w)); /* telephone status flags */
+	map(0x09c006, 0x09c007).mirror(0x763ff8).r(FUNC(dectalk_state::m68k_tlc_dtmf_r)); /* telephone dtmf read */
 }
 
 void dectalk_state::tms32010_mem(address_map &map)
@@ -814,8 +816,8 @@ void dectalk_state::tms32010_mem(address_map &map)
 
 void dectalk_state::tms32010_io(address_map &map)
 {
-	map(0, 0).w(this, FUNC(dectalk_state::spc_latch_outfifo_error_stats)); // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
-	map(1, 1).rw(this, FUNC(dectalk_state::spc_infifo_data_r), FUNC(dectalk_state::spc_outfifo_data_w)); //read from input fifo, write to sound fifo
+	map(0, 0).w(FUNC(dectalk_state::spc_latch_outfifo_error_stats)); // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
+	map(1, 1).rw(FUNC(dectalk_state::spc_infifo_data_r), FUNC(dectalk_state::spc_outfifo_data_w)); //read from input fifo, write to sound fifo
 	//AM_RANGE(8, 8) //the newer firmware seems to want something mapped here?
 }
 

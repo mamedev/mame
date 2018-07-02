@@ -150,6 +150,7 @@ ROM sockets:  UA3   2K or 4K character
 */
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -221,6 +222,61 @@ public:
 		m_user_diag(1)
 	{ }
 
+	void _4k(machine_config &config);
+	void _8k(machine_config &config);
+	void _16k(machine_config &config);
+	void _32k(machine_config &config);
+	void pet(machine_config &config);
+	void pet2001n(machine_config &config);
+	void pet2001n8(machine_config &config);
+	void cbm3032(machine_config &config);
+	void pet20018(machine_config &config);
+	void pet2001n16(machine_config &config);
+	void cbm3016(machine_config &config);
+	void cbm3000(machine_config &config);
+	void cbm4000(machine_config &config);
+	void cbm4032f(machine_config &config);
+	void cbm4032(machine_config &config);
+	void cbm4016(machine_config &config);
+	void cbm3008(machine_config &config);
+	void pet2001(machine_config &config);
+	void pet2001n32(machine_config &config);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
+	DECLARE_WRITE8_MEMBER( via_pa_w );
+	DECLARE_READ8_MEMBER( via_pb_r );
+	DECLARE_WRITE8_MEMBER( via_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
+	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
+
+	DECLARE_WRITE_LINE_MEMBER( pia1_irqa_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_irqb_w );
+	DECLARE_READ8_MEMBER( pia1_pa_r );
+	DECLARE_READ8_MEMBER( pia1_pb_r );
+	DECLARE_WRITE8_MEMBER( pia1_pa_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
+
+	DECLARE_WRITE_LINE_MEMBER( pia2_irqa_w );
+	DECLARE_WRITE_LINE_MEMBER( pia2_irqb_w );
+
+	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
+
+	MC6845_BEGIN_UPDATE( pet_begin_update );
+	MC6845_UPDATE_ROW( pet40_update_row );
+
+	TIMER_DEVICE_CALLBACK_MEMBER( sync_tick );
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_pet );
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_MACHINE_START( pet40 );
+	DECLARE_MACHINE_RESET( pet40 );
+
+protected:
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via;
 	required_device<pia6821_device> m_pia1;
@@ -246,42 +302,10 @@ public:
 	DECLARE_MACHINE_START( pet );
 	DECLARE_MACHINE_START( pet2001 );
 	DECLARE_MACHINE_RESET( pet );
-	DECLARE_MACHINE_START( pet40 );
-	DECLARE_MACHINE_RESET( pet40 );
 
-	MC6845_BEGIN_UPDATE( pet_begin_update );
-	MC6845_UPDATE_ROW( pet40_update_row );
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void check_interrupts();
 	void update_speaker();
-
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-
-	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
-	DECLARE_WRITE8_MEMBER( via_pa_w );
-	DECLARE_READ8_MEMBER( via_pb_r );
-	DECLARE_WRITE8_MEMBER( via_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
-
-	DECLARE_WRITE_LINE_MEMBER( pia1_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_irqb_w );
-	DECLARE_READ8_MEMBER( pia1_pa_r );
-	DECLARE_READ8_MEMBER( pia1_pb_r );
-	DECLARE_WRITE8_MEMBER( pia1_pa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
-
-	DECLARE_WRITE_LINE_MEMBER( pia2_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia2_irqb_w );
-
-	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
-
-	TIMER_DEVICE_CALLBACK_MEMBER( sync_tick );
-
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_pet );
 
 	enum
 	{
@@ -326,25 +350,6 @@ public:
 	int m_pia2b_irq;
 	int m_exp_irq;
 	int m_user_diag;
-	void _4k(machine_config &config);
-	void _8k(machine_config &config);
-	void _16k(machine_config &config);
-	void _32k(machine_config &config);
-	void pet(machine_config &config);
-	void pet2001n(machine_config &config);
-	void pet2001n8(machine_config &config);
-	void cbm3032(machine_config &config);
-	void pet20018(machine_config &config);
-	void pet2001n16(machine_config &config);
-	void cbm3016(machine_config &config);
-	void cbm3000(machine_config &config);
-	void cbm4000(machine_config &config);
-	void cbm4032f(machine_config &config);
-	void cbm4032(machine_config &config);
-	void cbm4016(machine_config &config);
-	void cbm3008(machine_config &config);
-	void pet2001(machine_config &config);
-	void pet2001n32(machine_config &config);
 	void pet2001_mem(address_map &map);
 };
 
@@ -356,7 +361,6 @@ public:
 		pet_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( pia1_pb_r );
 	void pet2001b(machine_config &config);
 	void pet2001b32(machine_config &config);
 	void pet4000(machine_config &config);
@@ -371,6 +375,10 @@ public:
 	void cbm4032b(machine_config &config);
 	void pet2001b8(machine_config &config);
 	void pet4016(machine_config &config);
+
+protected:
+	DECLARE_READ8_MEMBER( pia1_pb_r );
+
 };
 
 
@@ -381,13 +389,16 @@ public:
 		pet2001b_state(mconfig, type, tag)
 	{ }
 
+	void pet80(machine_config &config);
+	void pet8032(machine_config &config);
+
 	DECLARE_MACHINE_START( pet80 );
 	DECLARE_MACHINE_RESET( pet80 );
 
-	MC6845_UPDATE_ROW( pet80_update_row );
 	MC6845_UPDATE_ROW( cbm8296_update_row );
-	void pet80(machine_config &config);
-	void pet8032(machine_config &config);
+
+protected:
+	MC6845_UPDATE_ROW( pet80_update_row );
 };
 
 
@@ -424,6 +435,10 @@ public:
 		m_pla2(*this, PLA2_TAG)
 	{ }
 
+	void cbm8296d(machine_config &config);
+	void cbm8296(machine_config &config);
+
+private:
 	required_memory_region m_basic_rom;
 	required_memory_region m_editor_rom;
 	required_memory_region m_ue5_rom;
@@ -446,8 +461,6 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	uint8_t m_cr;
-	void cbm8296d(machine_config &config);
-	void cbm8296(machine_config &config);
 	void cbm8296_mem(address_map &map);
 };
 
@@ -886,7 +899,7 @@ WRITE8_MEMBER( cbm8296_state::write )
 
 void pet_state::pet2001_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(pet_state::read), FUNC(pet_state::write));
+	map(0x0000, 0xffff).rw(FUNC(pet_state::read), FUNC(pet_state::write));
 }
 
 
@@ -896,7 +909,7 @@ void pet_state::pet2001_mem(address_map &map)
 
 void cbm8296_state::cbm8296_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(cbm8296_state::read), FUNC(cbm8296_state::write));
+	map(0x0000, 0xffff).rw(FUNC(cbm8296_state::read), FUNC(cbm8296_state::write));
 }
 
 
@@ -1229,8 +1242,8 @@ WRITE8_MEMBER( pet_state::via_pb_w )
 	*/
 
 	// IEEE-488
-	m_ieee->nrfd_w(BIT(data, 1));
-	m_ieee->atn_w(BIT(data, 2));
+	m_ieee->host_nrfd_w(BIT(data, 1));
+	m_ieee->host_atn_w(BIT(data, 2));
 
 	// cassette
 	m_cassette->write(BIT(data, 3));
@@ -1370,7 +1383,7 @@ READ8_MEMBER( pet2001b_state::pia1_pb_r )
 
 WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
 {
-	m_ieee->eoi_w(state);
+	m_ieee->host_eoi_w(state);
 
 	m_blanktv = state;
 }
@@ -1658,7 +1671,7 @@ MACHINE_RESET_MEMBER( pet_state, pet )
 
 	m_exp->reset();
 
-	m_ieee->ren_w(0);
+	m_ieee->host_ren_w(0);
 }
 
 
@@ -1818,9 +1831,9 @@ MACHINE_CONFIG_START(pet_state::pet)
 
 	MCFG_DEVICE_ADD(M6520_2_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, dio_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, dav_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, pet_state, pia2_irqa_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, pet_state, pia2_irqb_w))
 
@@ -1832,7 +1845,7 @@ MACHINE_CONFIG_START(pet_state::pet)
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL(8'000'000)/8, pet_expansion_cards, nullptr)
 	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(*this, pet_state, read), WRITE8(*this, pet_state, write))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, pet_user_port_cards, nullptr)
+	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, pet_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(*this, pet_state, user_diag_w))
 	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa0))
@@ -2282,9 +2295,9 @@ MACHINE_CONFIG_START(pet80_state::pet80)
 
 	MCFG_DEVICE_ADD(M6520_2_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, dio_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, dav_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, pet_state, pia2_irqa_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, pet_state, pia2_irqb_w))
 
@@ -2296,7 +2309,7 @@ MACHINE_CONFIG_START(pet80_state::pet80)
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL(16'000'000)/16, pet_expansion_cards, nullptr)
 	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(*this, pet_state, read), WRITE8(*this, pet_state, write))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, pet_user_port_cards, nullptr)
+	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, pet_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa0))
 	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(M6522_TAG, via6522_device, write_pa1))

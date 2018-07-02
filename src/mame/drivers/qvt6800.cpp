@@ -26,13 +26,15 @@ public:
 		, m_videoram(*this, "videoram")
 	{ }
 
-	MC6845_UPDATE_ROW(update_row);
-
 	void qvt190(machine_config &config);
 	void qvt102(machine_config &config);
+
+private:
+	MC6845_UPDATE_ROW(update_row);
+
 	void qvt102_mem_map(address_map &map);
 	void qvt190_mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_videoram;

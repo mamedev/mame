@@ -53,6 +53,12 @@ public:
 	{
 	}
 
+	void pc200(machine_config &config);
+	void pc2086(machine_config &config);
+	void ppc640(machine_config &config);
+	void ppc512(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<pc_keyboard_device> m_keyboard;
@@ -86,10 +92,7 @@ public:
 
 	int m_dipstate;
 	static void cfg_com(device_t *device);
-	void pc200(machine_config &config);
-	void pc2086(machine_config &config);
-	void ppc640(machine_config &config);
-	void ppc512(machine_config &config);
+
 	void pc200_io(address_map &map);
 	void pc2086_map(address_map &map);
 	void ppc512_io(address_map &map);
@@ -110,13 +113,13 @@ void amstrad_pc_state::pc2086_map(address_map &map)
 void amstrad_pc_state::pc200_io(address_map &map)
 {
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
-	map(0x0060, 0x0065).rw(this, FUNC(amstrad_pc_state::pc1640_port60_r), FUNC(amstrad_pc_state::pc1640_port60_w));
-	map(0x0078, 0x0079).rw(this, FUNC(amstrad_pc_state::pc1640_mouse_x_r), FUNC(amstrad_pc_state::pc1640_mouse_x_w));
-	map(0x007a, 0x007b).rw(this, FUNC(amstrad_pc_state::pc1640_mouse_y_r), FUNC(amstrad_pc_state::pc1640_mouse_y_w));
+	map(0x0060, 0x0065).rw(FUNC(amstrad_pc_state::pc1640_port60_r), FUNC(amstrad_pc_state::pc1640_port60_w));
+	map(0x0078, 0x0079).rw(FUNC(amstrad_pc_state::pc1640_mouse_x_r), FUNC(amstrad_pc_state::pc1640_mouse_x_w));
+	map(0x007a, 0x007b).rw(FUNC(amstrad_pc_state::pc1640_mouse_y_r), FUNC(amstrad_pc_state::pc1640_mouse_y_w));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
-	map(0x0278, 0x027b).r(this, FUNC(amstrad_pc_state::pc200_port278_r));
+	map(0x0278, 0x027b).r(FUNC(amstrad_pc_state::pc200_port278_r));
 	map(0x0278, 0x027b).w(m_lpt2, FUNC(pc_lpt_device::write)).umask16(0x00ff);
-	map(0x0378, 0x037b).r(this, FUNC(amstrad_pc_state::pc200_port378_r));
+	map(0x0378, 0x037b).r(FUNC(amstrad_pc_state::pc200_port378_r));
 	map(0x0378, 0x037b).w(m_lpt1, FUNC(pc_lpt_device::write)).umask16(0x00ff);
 	map(0x03bc, 0x03bf).rw("lpt_0", FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
 }

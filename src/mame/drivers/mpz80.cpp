@@ -534,15 +534,15 @@ WRITE8_MEMBER( mpz80_state::disp_col_w )
 
 void mpz80_state::mpz80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(mpz80_state::mmu_r), FUNC(mpz80_state::mmu_w));
+	map(0x0000, 0xffff).rw(FUNC(mpz80_state::mmu_r), FUNC(mpz80_state::mmu_w));
 /*
     Task 0 Segment 0 map:
 
     map(0x0000, 0x03ff).ram();
-    map(0x0400, 0x0400).rw(this, FUNC(mpz80_state::trap_addr_r), FUNC(mpz80_state::disp_seg_w));
-    map(0x0401, 0x0401).rw(this, FUNC(mpz80_state::keyboard_r), FUNC(mpz80_state::disp_col_w));
-    map(0x0402, 0x0402).rw(this, FUNC(mpz80_state::switch_r), FUNC(mpz80_state::task_w));
-    map(0x0403, 0x0403).rw(this, FUNC(mpz80_state::status_r), FUNC(mpz80_state::mask_w));
+    map(0x0400, 0x0400).rw(FUNC(mpz80_state::trap_addr_r), FUNC(mpz80_state::disp_seg_w));
+    map(0x0401, 0x0401).rw(FUNC(mpz80_state::keyboard_r), FUNC(mpz80_state::disp_col_w));
+    map(0x0402, 0x0402).rw(FUNC(mpz80_state::switch_r), FUNC(mpz80_state::task_w));
+    map(0x0403, 0x0403).rw(FUNC(mpz80_state::status_r), FUNC(mpz80_state::mask_w));
     map(0x0600, 0x07ff).ram().share("map_ram");
     map(0x0800, 0x0bff).rom().region(Z80_TAG, 0);
     map(0x0c00, 0x0c00).rw(AM9512_TAG, FUNC(am9512_device::read), FUNC(am9512_device::write));
@@ -555,7 +555,7 @@ void mpz80_state::mpz80_mem(address_map &map)
 
 void mpz80_state::mpz80_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(mpz80_state::mmu_io_r), FUNC(mpz80_state::mmu_io_w));
+	map(0x0000, 0xffff).rw(FUNC(mpz80_state::mmu_io_r), FUNC(mpz80_state::mmu_io_w));
 }
 
 

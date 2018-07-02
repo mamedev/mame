@@ -72,8 +72,12 @@ public:
 		, m_bram(*this, "bram")
 		{ }
 
-	DECLARE_MACHINE_RESET(tosh1000);
+	void tosh1000(machine_config &config);
+
 	void init_tosh1000();
+
+private:
+	DECLARE_MACHINE_RESET(tosh1000);
 
 	DECLARE_WRITE8_MEMBER(romdos_bank_w);
 	DECLARE_READ8_MEMBER(romdos_bank_r);
@@ -82,16 +86,14 @@ public:
 	DECLARE_READ8_MEMBER(bram_r);
 
 	static void cfg_fdc_35(device_t *device);
-	void tosh1000(machine_config &config);
 	void tosh1000_io(address_map &map);
 	void tosh1000_map(address_map &map);
 	void tosh1000_romdos(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<tosh1000_bram_device> m_bram;
 
-private:
 	enum {
 		IDLE, READ_DATA, WRITE_DATA
 	};
@@ -239,8 +241,8 @@ void tosh1000_state::tosh1000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-	map(0x00c0, 0x00c3).rw(this, FUNC(tosh1000_state::bram_r), FUNC(tosh1000_state::bram_w));
-	map(0x00c8, 0x00c8).w(this, FUNC(tosh1000_state::romdos_bank_w));    // ROM-DOS page select [p. B-15]
+	map(0x00c0, 0x00c3).rw(FUNC(tosh1000_state::bram_r), FUNC(tosh1000_state::bram_w));
+	map(0x00c8, 0x00c8).w(FUNC(tosh1000_state::romdos_bank_w));    // ROM-DOS page select [p. B-15]
 	map(0x02c0, 0x02df).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
 }
 

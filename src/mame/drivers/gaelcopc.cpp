@@ -26,6 +26,7 @@ motherboard bioses.
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -37,11 +38,12 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void gaelcopc(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void gaelcopc(machine_config &config);
 	void gaelcopc_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;

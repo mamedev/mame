@@ -5,7 +5,6 @@
 
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
-#include "sound/tms5110.h"
 #include "speaker.h"
 
 
@@ -1199,11 +1198,10 @@ Addresses found at @0x510, cpu2
 
 */
 
-WRITE8_MEMBER(dkong_state::M58817_command_w)
+WRITE8_MEMBER(dkong_state::m58817_command_w)
 {
-	m58817_device *m58817 = machine().device<m58817_device>("tms");
-	m58817->ctl_w(space, 0, data & 0x0f);
-	m58817->pdc_w((data>>4) & 0x01);
+	m_m58817->ctl_w(space, 0, data & 0x0f);
+	m_m58817->pdc_w((data>>4) & 0x01);
 	/* FIXME 0x20 is CS */
 }
 
@@ -1232,7 +1230,6 @@ READ8_MEMBER(dkong_state::dkong_voice_status_r)
 
 READ8_MEMBER(dkong_state::dkong_tune_r)
 {
-	latch8_device *m_ls175_3d = machine().device<latch8_device>("ls175.3d");
 	uint8_t page = m_dev_vp2->read(space, 0) & 0x47;
 
 	if ( page & 0x40 )
@@ -1280,7 +1277,7 @@ void dkong_state::dkong_sound_map(address_map &map)
 
 void dkong_state::dkong_sound_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(dkong_state::dkong_tune_r), FUNC(dkong_state::dkong_voice_w));
+	map(0x00, 0xff).rw(FUNC(dkong_state::dkong_tune_r), FUNC(dkong_state::dkong_voice_w));
 }
 
 void dkong_state::dkongjr_sound_io_map(address_map &map)
@@ -1291,7 +1288,7 @@ void dkong_state::dkongjr_sound_io_map(address_map &map)
 void dkong_state::radarscp1_sound_io_map(address_map &map)
 {
 	map(0x00, 0x00).mirror(0xff).r("ls175.3d", FUNC(latch8_device::read));
-	map(0x00, 0xff).w(this, FUNC(dkong_state::dkong_p1_w)); /* DAC here */
+	map(0x00, 0xff).w(FUNC(dkong_state::dkong_p1_w)); /* DAC here */
 }
 
 void dkong_state::dkong3_sound1_map(address_map &map)
@@ -1371,7 +1368,7 @@ MACHINE_CONFIG_START(dkong_state::radarscp1_audio)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_IO_MAP(radarscp1_sound_io_map)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8("virtual_p1", latch8_device, read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dkong_state, M58817_command_w))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dkong_state, m58817_command_w))
 	MCFG_MCS48_PORT_P2_IN_CB(NOOP)
 
 	/* virtual_p2 is not read -see memory map-, all bits are output bits */

@@ -162,7 +162,7 @@ WRITE_LINE_MEMBER(fromance_state::fromance_adpcm_int)
 	/* clock the data through */
 	if (m_vclk_left)
 	{
-		m_msm->data_w(m_adpcm_data >> 4);
+		m_msm->write_data(m_adpcm_data >> 4);
 		m_adpcm_data <<= 4;
 		m_vclk_left--;
 	}
@@ -229,10 +229,10 @@ void fromance_state::nekkyoku_main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
-	map(0xf000, 0xf000).portr("SERVICE").w(this, FUNC(fromance_state::fromance_portselect_w));
-	map(0xf001, 0xf001).r(this, FUNC(fromance_state::fromance_keymatrix_r)).nopw();
-	map(0xf002, 0xf002).portr("COIN").w(this, FUNC(fromance_state::fromance_coinctr_w));
-	map(0xf003, 0xf003).r(this, FUNC(fromance_state::fromance_busycheck_main_r)).w(m_sublatch, FUNC(generic_latch_8_device::write));
+	map(0xf000, 0xf000).portr("SERVICE").w(FUNC(fromance_state::fromance_portselect_w));
+	map(0xf001, 0xf001).r(FUNC(fromance_state::fromance_keymatrix_r)).nopw();
+	map(0xf002, 0xf002).portr("COIN").w(FUNC(fromance_state::fromance_coinctr_w));
+	map(0xf003, 0xf003).r(FUNC(fromance_state::fromance_busycheck_main_r)).w(m_sublatch, FUNC(generic_latch_8_device::write));
 	map(0xf004, 0xf004).portr("DSW2");
 	map(0xf005, 0xf005).portr("DSW1");
 }
@@ -242,10 +242,10 @@ void fromance_state::fromance_main_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xdfff).ram();
 	map(0x9e89, 0x9e89).nopr();         // unknown (idolmj)
-	map(0xe000, 0xe000).portr("SERVICE").w(this, FUNC(fromance_state::fromance_portselect_w));
-	map(0xe001, 0xe001).r(this, FUNC(fromance_state::fromance_keymatrix_r));
-	map(0xe002, 0xe002).portr("COIN").w(this, FUNC(fromance_state::fromance_coinctr_w));
-	map(0xe003, 0xe003).r(this, FUNC(fromance_state::fromance_busycheck_main_r)).w(m_sublatch, FUNC(generic_latch_8_device::write));
+	map(0xe000, 0xe000).portr("SERVICE").w(FUNC(fromance_state::fromance_portselect_w));
+	map(0xe001, 0xe001).r(FUNC(fromance_state::fromance_keymatrix_r));
+	map(0xe002, 0xe002).portr("COIN").w(FUNC(fromance_state::fromance_coinctr_w));
+	map(0xe003, 0xe003).r(FUNC(fromance_state::fromance_busycheck_main_r)).w(m_sublatch, FUNC(generic_latch_8_device::write));
 	map(0xe004, 0xe004).portr("DSW2");
 	map(0xe005, 0xe005).portr("DSW1");
 }
@@ -262,9 +262,9 @@ void fromance_state::nekkyoku_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xefff).rw(this, FUNC(fromance_state::fromance_videoram_r), FUNC(fromance_state::fromance_videoram_w));
+	map(0xc000, 0xefff).rw(FUNC(fromance_state::fromance_videoram_r), FUNC(fromance_state::fromance_videoram_w));
 	map(0xf000, 0xf7ff).ram();
-	map(0xf800, 0xffff).rw(this, FUNC(fromance_state::fromance_paletteram_r), FUNC(fromance_state::fromance_paletteram_w));
+	map(0xf800, 0xffff).rw(FUNC(fromance_state::fromance_paletteram_r), FUNC(fromance_state::fromance_paletteram_w));
 }
 
 void fromance_state::fromance_sub_map(address_map &map)
@@ -272,8 +272,8 @@ void fromance_state::fromance_sub_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xcfff).rw(this, FUNC(fromance_state::fromance_paletteram_r), FUNC(fromance_state::fromance_paletteram_w));
-	map(0xd000, 0xffff).rw(this, FUNC(fromance_state::fromance_videoram_r), FUNC(fromance_state::fromance_videoram_w));
+	map(0xc800, 0xcfff).rw(FUNC(fromance_state::fromance_paletteram_r), FUNC(fromance_state::fromance_paletteram_w));
+	map(0xd000, 0xffff).rw(FUNC(fromance_state::fromance_videoram_r), FUNC(fromance_state::fromance_videoram_w));
 }
 
 
@@ -289,12 +289,12 @@ void fromance_state::nekkyoku_sub_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x11).w(m_gga, FUNC(vsystem_gga_device::write));
 	map(0x12, 0x12).nopr();             // unknown
-	map(0xe0, 0xe0).w(this, FUNC(fromance_state::fromance_rombank_w));
-	map(0xe1, 0xe1).r(this, FUNC(fromance_state::fromance_busycheck_sub_r)).w(this, FUNC(fromance_state::fromance_gfxreg_w));
-	map(0xe2, 0xe5).w(this, FUNC(fromance_state::fromance_scroll_w));
+	map(0xe0, 0xe0).w(FUNC(fromance_state::fromance_rombank_w));
+	map(0xe1, 0xe1).r(FUNC(fromance_state::fromance_busycheck_sub_r)).w(FUNC(fromance_state::fromance_gfxreg_w));
+	map(0xe2, 0xe5).w(FUNC(fromance_state::fromance_scroll_w));
 	map(0xe6, 0xe6).rw(m_sublatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
-	map(0xe7, 0xe7).w(this, FUNC(fromance_state::fromance_adpcm_reset_w));
-	map(0xe8, 0xe8).w(this, FUNC(fromance_state::fromance_adpcm_w));
+	map(0xe7, 0xe7).w(FUNC(fromance_state::fromance_adpcm_reset_w));
+	map(0xe8, 0xe8).w(FUNC(fromance_state::fromance_adpcm_w));
 	map(0xe9, 0xea).w("aysnd", FUNC(ay8910_device::data_address_w));
 }
 
@@ -303,12 +303,12 @@ void fromance_state::idolmj_sub_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x11).w(m_gga, FUNC(vsystem_gga_device::write));
 	map(0x12, 0x12).nopr();             // unknown
-	map(0x20, 0x20).w(this, FUNC(fromance_state::fromance_rombank_w));
-	map(0x21, 0x21).r(this, FUNC(fromance_state::fromance_busycheck_sub_r)).w(this, FUNC(fromance_state::fromance_gfxreg_w));
-	map(0x22, 0x25).w(this, FUNC(fromance_state::fromance_scroll_w));
+	map(0x20, 0x20).w(FUNC(fromance_state::fromance_rombank_w));
+	map(0x21, 0x21).r(FUNC(fromance_state::fromance_busycheck_sub_r)).w(FUNC(fromance_state::fromance_gfxreg_w));
+	map(0x22, 0x25).w(FUNC(fromance_state::fromance_scroll_w));
 	map(0x26, 0x26).rw(m_sublatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
-	map(0x27, 0x27).w(this, FUNC(fromance_state::fromance_adpcm_reset_w));
-	map(0x28, 0x28).w(this, FUNC(fromance_state::fromance_adpcm_w));
+	map(0x27, 0x27).w(FUNC(fromance_state::fromance_adpcm_reset_w));
+	map(0x28, 0x28).w(FUNC(fromance_state::fromance_adpcm_w));
 	map(0x29, 0x2a).w("aysnd", FUNC(ym2149_device::data_address_w));
 }
 
@@ -317,12 +317,12 @@ void fromance_state::fromance_sub_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x11).w(m_gga, FUNC(vsystem_gga_device::write));
 	map(0x12, 0x12).nopr();             // unknown
-	map(0x20, 0x20).w(this, FUNC(fromance_state::fromance_rombank_w));
-	map(0x21, 0x21).r(this, FUNC(fromance_state::fromance_busycheck_sub_r)).w(this, FUNC(fromance_state::fromance_gfxreg_w));
-	map(0x22, 0x25).w(this, FUNC(fromance_state::fromance_scroll_w));
+	map(0x20, 0x20).w(FUNC(fromance_state::fromance_rombank_w));
+	map(0x21, 0x21).r(FUNC(fromance_state::fromance_busycheck_sub_r)).w(FUNC(fromance_state::fromance_gfxreg_w));
+	map(0x22, 0x25).w(FUNC(fromance_state::fromance_scroll_w));
 	map(0x26, 0x26).rw(m_sublatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
-	map(0x27, 0x27).w(this, FUNC(fromance_state::fromance_adpcm_reset_w));
-	map(0x28, 0x28).w(this, FUNC(fromance_state::fromance_adpcm_w));
+	map(0x27, 0x27).w(FUNC(fromance_state::fromance_adpcm_reset_w));
+	map(0x28, 0x28).w(FUNC(fromance_state::fromance_adpcm_w));
 	map(0x2a, 0x2b).w("ymsnd", FUNC(ym2413_device::write));
 }
 

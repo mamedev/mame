@@ -65,10 +65,10 @@ void adam_digital_data_pack_device::adam_ddp_mem(address_map &map)
 
 void adam_digital_data_pack_device::adam_ddp_io(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(adam_digital_data_pack_device::p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(adam_digital_data_pack_device::p2_r), FUNC(adam_digital_data_pack_device::p2_w));
+	map(M6801_PORT1, M6801_PORT1).w(FUNC(adam_digital_data_pack_device::p1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_digital_data_pack_device::p2_r), FUNC(adam_digital_data_pack_device::p2_w));
 	map(M6801_PORT3, M6801_PORT3).noprw(); // Multiplexed Address/Data
-	map(M6801_PORT4, M6801_PORT4).r(this, FUNC(adam_digital_data_pack_device::p4_r)).nopw();
+	map(M6801_PORT4, M6801_PORT4).r(FUNC(adam_digital_data_pack_device::p4_r)).nopw();
 }
 
 static const struct CassetteOptions adam_cassette_options =

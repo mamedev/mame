@@ -8,6 +8,7 @@
 
 #include "machine/74157.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class yunsung8_state : public driver_device
 {
@@ -23,6 +24,9 @@ public:
 	{
 	}
 
+	void yunsung8(machine_config &config);
+
+private:
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_fg_tilemap;
@@ -62,7 +66,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void yunsung8(machine_config &config);
+
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 	void sound_map(address_map &map);

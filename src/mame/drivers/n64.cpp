@@ -18,6 +18,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "imagedev/harddriv.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -29,6 +30,10 @@ public:
 		: n64_state(mconfig, type, tag)
 		{ }
 
+	void n64(machine_config &config);
+	void n64dd(machine_config &config);
+
+private:
 	DECLARE_READ32_MEMBER(dd_null_r);
 	DECLARE_MACHINE_START(n64dd);
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
@@ -38,8 +43,6 @@ public:
 	void disk_unload(device_image_interface &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( n64dd );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( n64dd );
-	void n64(machine_config &config);
-	void n64dd(machine_config &config);
 	void n64_map(address_map &map);
 	void n64dd_map(address_map &map);
 	void rsp_map(address_map &map);
@@ -64,7 +67,7 @@ void n64_mess_state::n64_map(address_map &map)
 	map(0x04600000, 0x046fffff).rw("rcp", FUNC(n64_periphs::pi_reg_r), FUNC(n64_periphs::pi_reg_w));    // Peripheral Interface
 	map(0x04700000, 0x047fffff).rw("rcp", FUNC(n64_periphs::ri_reg_r), FUNC(n64_periphs::ri_reg_w));    // RDRAM Interface
 	map(0x04800000, 0x048fffff).rw("rcp", FUNC(n64_periphs::si_reg_r), FUNC(n64_periphs::si_reg_w));    // Serial Interface
-	map(0x05000508, 0x0500050b).r(this, FUNC(n64_mess_state::dd_null_r));
+	map(0x05000508, 0x0500050b).r(FUNC(n64_mess_state::dd_null_r));
 	map(0x08000000, 0x0801ffff).ram().share("sram");                                        // Cartridge SRAM
 	map(0x10000000, 0x13ffffff).rom().region("user2", 0);                                   // Cartridge
 	map(0x1fc00000, 0x1fc007bf).rom().region("user1", 0);                                   // PIF ROM

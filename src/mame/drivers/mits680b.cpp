@@ -35,11 +35,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void mits680b(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(status_check_r);
 
-	void mits680b(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -54,7 +56,7 @@ void mits680b_state::mem_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram(); // 1024 bytes RAM
 	map(0xf000, 0xf001).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xf002, 0xf002).r(this, FUNC(mits680b_state::status_check_r));
+	map(0xf002, 0xf002).r(FUNC(mits680b_state::status_check_r));
 	map(0xff00, 0xffff).rom().region("roms", 0);
 }
 

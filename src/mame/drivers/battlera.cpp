@@ -143,10 +143,10 @@ READ8_MEMBER(battlera_state::control_data_r)
 void battlera_state::battlera_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x1e0800, 0x1e0801).w(this, FUNC(battlera_state::sound_w));
+	map(0x1e0800, 0x1e0801).w(FUNC(battlera_state::sound_w));
 	map(0x1e1000, 0x1e13ff).rw(m_huc6260, FUNC(huc6260_device::palette_direct_read), FUNC(huc6260_device::palette_direct_write)).share("paletteram");
 	map(0x1f0000, 0x1f1fff).bankrw("bank8"); /* Main ram */
-	map(0x1ff000, 0x1ff001).rw(this, FUNC(battlera_state::control_data_r), FUNC(battlera_state::control_data_w));
+	map(0x1ff000, 0x1ff001).rw(FUNC(battlera_state::control_data_r), FUNC(battlera_state::control_data_w));
 
 	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
@@ -165,7 +165,7 @@ void battlera_state::battlera_portmap(address_map &map)
 
 WRITE_LINE_MEMBER(battlera_state::adpcm_int)
 {
-	m_msm->data_w(m_msm5205next >> 4);
+	m_msm->write_data(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle = 1 - m_toggle;
@@ -187,10 +187,10 @@ void battlera_state::sound_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x040000, 0x040001).w("ymsnd", FUNC(ym2203_device::write));
-	map(0x080000, 0x080001).w(this, FUNC(battlera_state::adpcm_data_w));
+	map(0x080000, 0x080001).w(FUNC(battlera_state::adpcm_data_w));
 	map(0x1fe800, 0x1fe80f).w("c6280", FUNC(c6280_device::c6280_w));
 	map(0x1f0000, 0x1f1fff).bankrw("bank7"); /* Main ram */
-	map(0x1ff000, 0x1ff001).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(battlera_state::adpcm_reset_w));
+	map(0x1ff000, 0x1ff001).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(battlera_state::adpcm_reset_w));
 	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
 }
 

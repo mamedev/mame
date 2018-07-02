@@ -193,6 +193,8 @@ Notes:
 #include "cpu/powerpc/ppc.h"
 #include "imagedev/chd_cd.h"
 #include "machine/terminal.h"
+#include "emupal.h"
+#include "romload.h"
 #include "softlist.h"
 #include "screen.h"
 
@@ -218,6 +220,12 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub") { }
 
+	void m2(machine_config &config);
+	void _3do_m2(machine_config &config);
+
+	void init_m2();
+
+private:
 	required_shared_ptr<uint64_t> m_main_ram;
 	required_device<generic_terminal_device> m_terminal;
 	required_ioport m_in_country;
@@ -268,7 +276,6 @@ public:
 	DECLARE_READ8_MEMBER(id6_r);
 	DECLARE_READ8_MEMBER(id7_r);
 
-	void init_m2();
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -279,8 +286,6 @@ public:
 	void cde_dma_transfer(address_space &space, int channel, int next);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	void m2(machine_config &config);
-	void _3do_m2(machine_config &config);
 	void _3do_m2_main(address_map &map);
 	void _3do_m2_main_m(address_map &map);
 	void _3do_m2_main_s(address_map &map);
@@ -1173,35 +1178,35 @@ READ8_MEMBER(konamim2_state::id7_r)
 void konamim2_state::m2_main(address_map &map)
 {
 	map(0x00000000, 0x0000007f).ram(); // ???
-	map(0x00010040, 0x00010047).rw(this, FUNC(konamim2_state::irq_enable_r), FUNC(konamim2_state::irq_enable_w));
-	map(0x00010050, 0x00010057).r(this, FUNC(konamim2_state::irq_active_r));
-	map(0x00020000, 0x00020007).rw(this, FUNC(konamim2_state::unk4_r), FUNC(konamim2_state::unk4_w));
+	map(0x00010040, 0x00010047).rw(FUNC(konamim2_state::irq_enable_r), FUNC(konamim2_state::irq_enable_w));
+	map(0x00010050, 0x00010057).r(FUNC(konamim2_state::irq_active_r));
+	map(0x00020000, 0x00020007).rw(FUNC(konamim2_state::unk4_r), FUNC(konamim2_state::unk4_w));
 	map(0x00020400, 0x000207ff).ram(); // ???
 	map(0x00020800, 0x00020807).ram(); // ???
-	map(0x00030000, 0x00030007).r(this, FUNC(konamim2_state::unk30000_r));
-	map(0x00030010, 0x00030017).w(this, FUNC(konamim2_state::video_w));
-	map(0x00030030, 0x00030037).r(this, FUNC(konamim2_state::unk30030_r));
-	map(0x00030404, 0x00030407).w(this, FUNC(konamim2_state::video_irq_ack_w));
+	map(0x00030000, 0x00030007).r(FUNC(konamim2_state::unk30000_r));
+	map(0x00030010, 0x00030017).w(FUNC(konamim2_state::video_w));
+	map(0x00030030, 0x00030037).r(FUNC(konamim2_state::unk30030_r));
+	map(0x00030404, 0x00030407).w(FUNC(konamim2_state::video_irq_ack_w));
 
-	map(0x01000000, 0x01000fff).rw(this, FUNC(konamim2_state::cde_r), FUNC(konamim2_state::cde_w));
+	map(0x01000000, 0x01000fff).rw(FUNC(konamim2_state::cde_r), FUNC(konamim2_state::cde_w));
 
-	map(0x02000000, 0x02000fff).r(this, FUNC(konamim2_state::device2_r));
+	map(0x02000000, 0x02000fff).r(FUNC(konamim2_state::device2_r));
 
-	map(0x03000001, 0x03000001).r(this, FUNC(konamim2_state::id3_r));
+	map(0x03000001, 0x03000001).r(FUNC(konamim2_state::id3_r));
 
-	map(0x04000001, 0x04000001).r(this, FUNC(konamim2_state::id4_r));
-	map(0x04000017, 0x04000017).w(this, FUNC(konamim2_state::serial_w));
-	map(0x04000018, 0x0400001f).r(this, FUNC(konamim2_state::unk1_r)); // serial status
-	map(0x04000020, 0x04000027).w(this, FUNC(konamim2_state::reset_w));
-	map(0x04000418, 0x0400041f).w(this, FUNC(konamim2_state::unk4000418_w)); // serial status ack
-	map(0x04000208, 0x0400020f).r(this, FUNC(konamim2_state::unk3_r));
-	map(0x04000280, 0x04000287).r(this, FUNC(konamim2_state::unk4000280_r));
+	map(0x04000001, 0x04000001).r(FUNC(konamim2_state::id4_r));
+	map(0x04000017, 0x04000017).w(FUNC(konamim2_state::serial_w));
+	map(0x04000018, 0x0400001f).r(FUNC(konamim2_state::unk1_r)); // serial status
+	map(0x04000020, 0x04000027).w(FUNC(konamim2_state::reset_w));
+	map(0x04000418, 0x0400041f).w(FUNC(konamim2_state::unk4000418_w)); // serial status ack
+	map(0x04000208, 0x0400020f).r(FUNC(konamim2_state::unk3_r));
+	map(0x04000280, 0x04000287).r(FUNC(konamim2_state::unk4000280_r));
 
-	map(0x05000001, 0x05000001).r(this, FUNC(konamim2_state::id5_r));
+	map(0x05000001, 0x05000001).r(FUNC(konamim2_state::id5_r));
 
-	map(0x06000001, 0x06000001).r(this, FUNC(konamim2_state::id6_r));
+	map(0x06000001, 0x06000001).r(FUNC(konamim2_state::id6_r));
 
-	map(0x07000001, 0x07000001).r(this, FUNC(konamim2_state::id7_r));
+	map(0x07000001, 0x07000001).r(FUNC(konamim2_state::id7_r));
 
 	map(0x10000008, 0x10001007).noprw();     // ???
 
@@ -1213,13 +1218,13 @@ void konamim2_state::m2_main(address_map &map)
 void konamim2_state::m2_main_m(address_map &map)
 {
 	m2_main(map);
-	map(0x10000000, 0x10000007).r(this, FUNC(konamim2_state::cpu_r<true>));
+	map(0x10000000, 0x10000007).r(FUNC(konamim2_state::cpu_r<true>));
 }
 
 void konamim2_state::m2_main_s(address_map &map)
 {
 	m2_main(map);
-	map(0x10000000, 0x10000007).r(this, FUNC(konamim2_state::cpu_r<false>));
+	map(0x10000000, 0x10000007).r(FUNC(konamim2_state::cpu_r<false>));
 }
 
 void konamim2_state::_3do_m2_main(address_map &map)
@@ -1233,13 +1238,13 @@ void konamim2_state::_3do_m2_main(address_map &map)
 void konamim2_state::_3do_m2_main_m(address_map &map)
 {
 	_3do_m2_main(map);
-	map(0x10000000, 0x10000007).r(this, FUNC(konamim2_state::cpu_r<true>));
+	map(0x10000000, 0x10000007).r(FUNC(konamim2_state::cpu_r<true>));
 }
 
 void konamim2_state::_3do_m2_main_s(address_map &map)
 {
 	_3do_m2_main(map);
-	map(0x10000000, 0x10000007).r(this, FUNC(konamim2_state::cpu_r<false>));
+	map(0x10000000, 0x10000007).r(FUNC(konamim2_state::cpu_r<false>));
 }
 
 

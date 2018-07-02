@@ -163,6 +163,7 @@ NOTES (2016-06-06)
 
 #include "emu.h"
 #include "includes/sorcerer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -199,10 +200,10 @@ void sorcerer_state::sorcerer_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0xfc, 0xfc).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0xfd, 0xfd).rw(this, FUNC(sorcerer_state::sorcerer_fd_r), FUNC(sorcerer_state::sorcerer_fd_w));
-	map(0xfe, 0xfe).rw(this, FUNC(sorcerer_state::sorcerer_fe_r), FUNC(sorcerer_state::sorcerer_fe_w));
-	map(0xff, 0xff).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0xff, 0xff).w(this, FUNC(sorcerer_state::sorcerer_ff_w));
+	map(0xfd, 0xfd).rw(FUNC(sorcerer_state::sorcerer_fd_r), FUNC(sorcerer_state::sorcerer_fd_w));
+	map(0xfe, 0xfe).rw(FUNC(sorcerer_state::sorcerer_fe_r), FUNC(sorcerer_state::sorcerer_fe_w));
+	map(0xff, 0xff).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0xff, 0xff).w(FUNC(sorcerer_state::sorcerer_ff_w));
 }
 
 static INPUT_PORTS_START(sorcerer)
@@ -448,7 +449,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "covox")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "covox")
 
 	/* The use of the parallel port as a general purpose port is not emulated.
 	Currently the only use is to read the printer status in the Centronics CENDRV bios routine. */

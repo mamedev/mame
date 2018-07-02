@@ -46,7 +46,11 @@ public:
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
+	void dmax8000(machine_config &config);
+
 	void init_dmax8000();
+
+private:
 	DECLARE_MACHINE_RESET(dmax8000);
 	DECLARE_WRITE8_MEMBER(port0c_w);
 	DECLARE_WRITE8_MEMBER(port0d_w);
@@ -54,10 +58,9 @@ public:
 	DECLARE_WRITE8_MEMBER(port40_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	void dmax8000(machine_config &config);
 	void dmax8000_io(address_map &map);
 	void dmax8000_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -113,11 +116,11 @@ void dmax8000_state::dmax8000_io(address_map &map)
 	map(0x08, 0x0b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw("pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // fdd controls
 	map(0x10, 0x13).rw("pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // centronics & parallel ports
-	map(0x14, 0x17).w(this, FUNC(dmax8000_state::port14_w)); // control lines for the centronics & parallel ports
+	map(0x14, 0x17).w(FUNC(dmax8000_state::port14_w)); // control lines for the centronics & parallel ports
 	//AM_RANGE(0x18, 0x19) AM_MIRROR(2) AM_DEVREADWRITE("am9511", am9512_device, read, write) // optional numeric coprocessor
 	//AM_RANGE(0x1c, 0x1d) AM_MIRROR(2)  // optional hard disk controller (1C=status, 1D=data)
 	map(0x20, 0x23).rw("dart2", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
-	map(0x40, 0x40).w(this, FUNC(dmax8000_state::port40_w)); // memory bank control
+	map(0x40, 0x40).w(FUNC(dmax8000_state::port40_w)); // memory bank control
 	//AM_RANGE(0x60, 0x67) // optional IEEE488 GPIB
 	map(0x70, 0x7f).rw("rtc", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)); // optional RTC
 }

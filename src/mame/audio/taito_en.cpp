@@ -105,8 +105,8 @@ void taito_en_device::en_sound_map(address_map &map)
 	map(0x200000, 0x20001f).rw("ensoniq", FUNC(es5505_device::read), FUNC(es5505_device::write));
 	map(0x260000, 0x2601ff).rw("esp", FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
 	map(0x280000, 0x28001f).rw("duart68681", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0x300000, 0x30003f).w(this, FUNC(taito_en_device::en_es5505_bank_w));
-	map(0x340000, 0x340003).w(this, FUNC(taito_en_device::en_volume_w)).umask16(0xff00);
+	map(0x300000, 0x30003f).w(FUNC(taito_en_device::en_es5505_bank_w));
+	map(0x340000, 0x340003).w(FUNC(taito_en_device::en_volume_w)).umask16(0xff00);
 	map(0xc00000, 0xc1ffff).bankr("cpubank1");
 	map(0xc20000, 0xc3ffff).bankr("cpubank2");
 	map(0xc40000, 0xc7ffff).bankr("cpubank3");

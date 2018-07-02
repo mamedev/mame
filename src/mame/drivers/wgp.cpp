@@ -615,17 +615,17 @@ void wgp_state::main_map(address_map &map)
 	map(0x100000, 0x10ffff).ram();     /* main CPUA ram */
 	map(0x140000, 0x143fff).ram().share("sharedram");
 	map(0x180000, 0x18000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
-	map(0x1c0000, 0x1c0001).w(this, FUNC(wgp_state::cpua_ctrl_w));
-	map(0x200000, 0x20000f).rw(this, FUNC(wgp_state::adinput_r), FUNC(wgp_state::adinput_w));
+	map(0x1c0000, 0x1c0001).w(FUNC(wgp_state::cpua_ctrl_w));
+	map(0x200000, 0x20000f).rw(FUNC(wgp_state::adinput_r), FUNC(wgp_state::adinput_w));
 	map(0x300000, 0x30ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));            /* tilemaps */
 	map(0x320000, 0x32000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
 	map(0x400000, 0x40bfff).ram().share("spritemap");   /* sprite tilemaps */
 	map(0x40c000, 0x40dfff).ram().share("spriteram");   /* sprite ram */
 	map(0x40fff0, 0x40fff1).nopw();    /* ?? (writes 0x8000 and 0 alternately - Wgp2 just 0) */
 	map(0x500000, 0x501fff).ram();                 /* unknown/unused */
-	map(0x502000, 0x517fff).ram().w(this, FUNC(wgp_state::pivram_word_w)).share("pivram"); /* piv tilemaps */
-	map(0x520000, 0x52001f).ram().w(this, FUNC(wgp_state::piv_ctrl_word_w)).share("piv_ctrlram");
-	map(0x600000, 0x600003).w(this, FUNC(wgp_state::rotate_port_w));    /* rotation control ? */
+	map(0x502000, 0x517fff).ram().w(FUNC(wgp_state::pivram_word_w)).share("pivram"); /* piv tilemaps */
+	map(0x520000, 0x52001f).ram().w(FUNC(wgp_state::piv_ctrl_word_w)).share("piv_ctrlram");
+	map(0x600000, 0x600003).w(FUNC(wgp_state::rotate_port_w));    /* rotation control ? */
 	map(0x700000, 0x701fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
@@ -638,7 +638,7 @@ void wgp_state::cpu2_map(address_map &map)
 	map(0x200003, 0x200003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 //  AM_RANGE(0x380000, 0x383fff) AM_READONLY       // LAN RAM
 //  AM_RANGE(0x380000, 0x383fff) AM_WRITEONLY    // LAN RAM
-	map(0x380000, 0x380001).r(this, FUNC(wgp_state::lan_status_r));  // ??
+	map(0x380000, 0x380001).r(FUNC(wgp_state::lan_status_r));  // ??
 	// a lan input area is read somewhere above the status
 	// (make the status return 0 and log)...
 }
@@ -658,7 +658,7 @@ void wgp_state::z80_sound_map(address_map &map)
 	map(0xea00, 0xea00).nopr();
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
-	map(0xf200, 0xf200).w(this, FUNC(wgp_state::sound_bankswitch_w));
+	map(0xf200, 0xf200).w(FUNC(wgp_state::sound_bankswitch_w));
 }
 
 

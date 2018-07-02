@@ -236,6 +236,7 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "video/k001006.h"
 #include "video/k001604.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "speaker.h"
 
@@ -272,7 +273,17 @@ public:
 	{
 	}
 
+	void thunderh(machine_config &config);
+	void hangplt(machine_config &config);
+	void slrasslt(machine_config &config);
+	void gticlub(machine_config &config);
 
+	void init_hangplt_common();
+	void init_hangplt();
+	void init_hangpltu();
+	void init_gticlub();
+
+private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
 
@@ -319,10 +330,6 @@ public:
 	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 
-	void init_hangplt_common();
-	void init_hangplt();
-	void init_hangpltu();
-	void init_gticlub();
 	DECLARE_MACHINE_START(gticlub);
 	DECLARE_MACHINE_RESET(gticlub);
 	DECLARE_MACHINE_RESET(hangplt);
@@ -336,17 +343,13 @@ public:
 	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void thunderh(machine_config &config);
-	void hangplt(machine_config &config);
-	void slrasslt(machine_config &config);
-	void gticlub(machine_config &config);
 	void gticlub_map(address_map &map);
 	void hangplt_map(address_map &map);
 	void hangplt_sharc0_map(address_map &map);
 	void hangplt_sharc1_map(address_map &map);
 	void sharc_map(address_map &map);
 	void sound_memmap(address_map &map);
-private:
+
 	void gticlub_led_setreg(int offset, uint8_t data);
 
 	uint8_t m_gticlub_led_reg[2];
@@ -521,15 +524,15 @@ MACHINE_START_MEMBER(gticlub_state,gticlub)
 void gticlub_state::gticlub_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share("work_ram");        /* Work RAM */
-	map(0x74000000, 0x740000ff).rw(this, FUNC(gticlub_state::gticlub_k001604_reg_r), FUNC(gticlub_state::gticlub_k001604_reg_w));
-	map(0x74010000, 0x7401ffff).ram().w(this, FUNC(gticlub_state::paletteram32_w)).share("paletteram");
-	map(0x74020000, 0x7403ffff).rw(this, FUNC(gticlub_state::gticlub_k001604_tile_r), FUNC(gticlub_state::gticlub_k001604_tile_w));
-	map(0x74040000, 0x7407ffff).rw(this, FUNC(gticlub_state::gticlub_k001604_char_r), FUNC(gticlub_state::gticlub_k001604_char_w));
+	map(0x74000000, 0x740000ff).rw(FUNC(gticlub_state::gticlub_k001604_reg_r), FUNC(gticlub_state::gticlub_k001604_reg_w));
+	map(0x74010000, 0x7401ffff).ram().w(FUNC(gticlub_state::paletteram32_w)).share("paletteram");
+	map(0x74020000, 0x7403ffff).rw(FUNC(gticlub_state::gticlub_k001604_tile_r), FUNC(gticlub_state::gticlub_k001604_tile_w));
+	map(0x74040000, 0x7407ffff).rw(FUNC(gticlub_state::gticlub_k001604_char_r), FUNC(gticlub_state::gticlub_k001604_char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x78080000, 0x7808000f).rw(m_k001006_2, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7e000000, 0x7e003fff).rw(this, FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
+	map(0x7e000000, 0x7e003fff).rw(FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
 	map(0x7e008000, 0x7e009fff).rw("k056230", FUNC(k056230_device::read), FUNC(k056230_device::write));
 	map(0x7e00a000, 0x7e00bfff).rw("k056230", FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
@@ -541,13 +544,13 @@ void gticlub_state::gticlub_map(address_map &map)
 void gticlub_state::hangplt_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share("work_ram");        /* Work RAM */
-	map(0x74000000, 0x740000ff).rw(this, FUNC(gticlub_state::gticlub_k001604_reg_r), FUNC(gticlub_state::gticlub_k001604_reg_w));
-	map(0x74010000, 0x7401ffff).ram().w(this, FUNC(gticlub_state::paletteram32_w)).share("paletteram");
-	map(0x74020000, 0x7403ffff).rw(this, FUNC(gticlub_state::gticlub_k001604_tile_r), FUNC(gticlub_state::gticlub_k001604_tile_w));
-	map(0x74040000, 0x7407ffff).rw(this, FUNC(gticlub_state::gticlub_k001604_char_r), FUNC(gticlub_state::gticlub_k001604_char_w));
+	map(0x74000000, 0x740000ff).rw(FUNC(gticlub_state::gticlub_k001604_reg_r), FUNC(gticlub_state::gticlub_k001604_reg_w));
+	map(0x74010000, 0x7401ffff).ram().w(FUNC(gticlub_state::paletteram32_w)).share("paletteram");
+	map(0x74020000, 0x7403ffff).rw(FUNC(gticlub_state::gticlub_k001604_tile_r), FUNC(gticlub_state::gticlub_k001604_tile_w));
+	map(0x74040000, 0x7407ffff).rw(FUNC(gticlub_state::gticlub_k001604_char_r), FUNC(gticlub_state::gticlub_k001604_char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
-	map(0x7e000000, 0x7e003fff).rw(this, FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
+	map(0x7e000000, 0x7e003fff).rw(FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
 	map(0x7e008000, 0x7e009fff).rw("k056230", FUNC(k056230_device::read), FUNC(k056230_device::write));
 	map(0x7e00a000, 0x7e00bfff).rw("k056230", FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
@@ -564,8 +567,8 @@ void gticlub_state::sound_memmap(address_map &map)
 	map(0x200000, 0x20ffff).ram();
 	map(0x300000, 0x30001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
 	map(0x400000, 0x400fff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));      /* Ricoh RF5C400 */
-	map(0x500000, 0x500001).w(this, FUNC(gticlub_state::soundtimer_en_w)).nopr();
-	map(0x600000, 0x600001).w(this, FUNC(gticlub_state::soundtimer_count_w)).nopr();
+	map(0x500000, 0x500001).w(FUNC(gticlub_state::soundtimer_en_w)).nopr();
+	map(0x600000, 0x600001).w(FUNC(gticlub_state::soundtimer_count_w)).nopr();
 }
 
 /*****************************************************************************/
@@ -593,7 +596,7 @@ WRITE32_MEMBER(gticlub_state::dsp_dataram1_w)
 void gticlub_state::sharc_map(address_map &map)
 {
 	map(0x400000, 0x41ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x500000, 0x5fffff).rw(this, FUNC(gticlub_state::dsp_dataram0_r), FUNC(gticlub_state::dsp_dataram0_w));
+	map(0x500000, 0x5fffff).rw(FUNC(gticlub_state::dsp_dataram0_r), FUNC(gticlub_state::dsp_dataram0_w));
 	map(0x600000, 0x6fffff).rw(m_k001005, FUNC(k001005_device::read), FUNC(k001005_device::write));
 	map(0x700000, 0x7000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
 }
@@ -601,7 +604,7 @@ void gticlub_state::sharc_map(address_map &map)
 void gticlub_state::hangplt_sharc0_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x0500000, 0x05fffff).rw(this, FUNC(gticlub_state::dsp_dataram0_r), FUNC(gticlub_state::dsp_dataram0_w));
+	map(0x0500000, 0x05fffff).rw(FUNC(gticlub_state::dsp_dataram0_r), FUNC(gticlub_state::dsp_dataram0_w));
 	map(0x1400000, 0x14fffff).ram();
 	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r)).w("voodoo0", FUNC(voodoo_device::voodoo_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
@@ -613,7 +616,7 @@ void gticlub_state::hangplt_sharc0_map(address_map &map)
 void gticlub_state::hangplt_sharc1_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
-	map(0x0500000, 0x05fffff).rw(this, FUNC(gticlub_state::dsp_dataram1_r), FUNC(gticlub_state::dsp_dataram1_w));
+	map(0x0500000, 0x05fffff).rw(FUNC(gticlub_state::dsp_dataram1_r), FUNC(gticlub_state::dsp_dataram1_w));
 	map(0x1400000, 0x14fffff).ram();
 	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_1_r)).w("voodoo1", FUNC(voodoo_device::voodoo_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
@@ -971,7 +974,7 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
@@ -1083,7 +1086,7 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)

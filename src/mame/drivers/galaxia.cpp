@@ -150,7 +150,7 @@ void galaxia_state::galaxia_mem_map(address_map &map)
 	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636_0, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1600, 0x16ff).mirror(0x6000).rw(m_s2636_1, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1700, 0x17ff).mirror(0x6000).rw(m_s2636_2, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1800, 0x1bff).mirror(0x6000).r(this, FUNC(galaxia_state::cvs_video_or_color_ram_r)).w(this, FUNC(galaxia_state::galaxia_video_w)).share("video_ram");
+	map(0x1800, 0x1bff).mirror(0x6000).r(FUNC(galaxia_state::cvs_video_or_color_ram_r)).w(FUNC(galaxia_state::galaxia_video_w)).share("video_ram");
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 	map(0x2000, 0x33ff).rom();
 	map(0x7214, 0x7214).portr("IN0");
@@ -161,7 +161,7 @@ void galaxia_state::astrowar_mem_map(address_map &map)
 	map(0x0000, 0x13ff).rom();
 	map(0x1400, 0x14ff).mirror(0x6000).ram();
 	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636_0, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1800, 0x1bff).mirror(0x6000).r(this, FUNC(galaxia_state::cvs_video_or_color_ram_r)).w(this, FUNC(galaxia_state::galaxia_video_w)).share("video_ram");
+	map(0x1800, 0x1bff).mirror(0x6000).r(FUNC(galaxia_state::cvs_video_or_color_ram_r)).w(FUNC(galaxia_state::galaxia_video_w)).share("video_ram");
 	map(0x1c00, 0x1cff).mirror(0x6000).ram().share("bullet_ram");
 	map(0x2000, 0x33ff).rom();
 }
@@ -169,7 +169,7 @@ void galaxia_state::astrowar_mem_map(address_map &map)
 void galaxia_state::galaxia_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).w(this, FUNC(galaxia_state::galaxia_scroll_w)).portr("IN0");
+	map(0x00, 0x00).w(FUNC(galaxia_state::galaxia_scroll_w)).portr("IN0");
 	map(0x02, 0x02).portr("IN1");
 	map(0x05, 0x05).nopr();
 	map(0x06, 0x06).portr("DSW0");
@@ -179,8 +179,8 @@ void galaxia_state::galaxia_io_map(address_map &map)
 
 void galaxia_state::galaxia_data_map(address_map &map)
 {
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(galaxia_state::galaxia_collision_r), FUNC(galaxia_state::galaxia_ctrlport_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(galaxia_state::galaxia_collision_clear), FUNC(galaxia_state::galaxia_dataport_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(galaxia_state::galaxia_collision_r), FUNC(galaxia_state::galaxia_ctrlport_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(galaxia_state::galaxia_collision_clear), FUNC(galaxia_state::galaxia_dataport_w));
 }
 
 

@@ -107,6 +107,7 @@ $8000 - $ffff   ROM
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/3526intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -159,12 +160,12 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 	{
 		m_msm->reset_w(1);
 		m_adpcm_playing = false;
-		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 	{
 		uint8_t const data = m_adpcmrom[m_adpcm_pos / 2];
-		m_msm->data_w(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
+		m_msm->write_data(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
 		m_adpcm_pos++;
 	}
 }
@@ -237,18 +238,18 @@ WRITE8_MEMBER(renegade_state::coincounter_w)
 void renegade_state::renegade_nomcu_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
-	map(0x1800, 0x1fff).ram().w(this, FUNC(renegade_state::fg_videoram_w)).share("fg_videoram");
+	map(0x1800, 0x1fff).ram().w(FUNC(renegade_state::fg_videoram_w)).share("fg_videoram");
 	map(0x2000, 0x27ff).ram().share("spriteram");
-	map(0x2800, 0x2fff).ram().w(this, FUNC(renegade_state::bg_videoram_w)).share("bg_videoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(renegade_state::bg_videoram_w)).share("bg_videoram");
 	map(0x3000, 0x30ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x3100, 0x31ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0x3800, 0x3800).portr("IN0").w(this, FUNC(renegade_state::scroll_lsb_w));       /* Player#1 controls, P1,P2 start */
-	map(0x3801, 0x3801).portr("IN1").w(this, FUNC(renegade_state::scroll_msb_w));       /* Player#2 controls, coin triggers */
+	map(0x3800, 0x3800).portr("IN0").w(FUNC(renegade_state::scroll_lsb_w));       /* Player#1 controls, P1,P2 start */
+	map(0x3801, 0x3801).portr("IN1").w(FUNC(renegade_state::scroll_msb_w));       /* Player#2 controls, coin triggers */
 	map(0x3802, 0x3802).portr("DSW2").w(m_soundlatch, FUNC(generic_latch_8_device::write)); /* DIP2  various IO ports */
-	map(0x3803, 0x3803).portr("DSW1").w(this, FUNC(renegade_state::flipscreen_w));   /* DIP1 */
-	map(0x3805, 0x3805).nopr().w(this, FUNC(renegade_state::bankswitch_w));
+	map(0x3803, 0x3803).portr("DSW1").w(FUNC(renegade_state::flipscreen_w));   /* DIP1 */
+	map(0x3805, 0x3805).nopr().w(FUNC(renegade_state::bankswitch_w));
 	map(0x3806, 0x3806).nopw(); // ?? watchdog
-	map(0x3807, 0x3807).w(this, FUNC(renegade_state::coincounter_w));
+	map(0x3807, 0x3807).w(FUNC(renegade_state::coincounter_w));
 	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x8000, 0xffff).rom();
 }
@@ -257,17 +258,17 @@ void renegade_state::renegade_map(address_map &map)
 {
 	renegade_nomcu_map(map);
 	map(0x3804, 0x3804).rw(m_mcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0x3805, 0x3805).r(this, FUNC(renegade_state::mcu_reset_r));
+	map(0x3805, 0x3805).r(FUNC(renegade_state::mcu_reset_r));
 }
 
 void renegade_state::renegade_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1800, 0x1800).w(this, FUNC(renegade_state::adpcm_start_w));
-	map(0x2000, 0x2000).w(this, FUNC(renegade_state::adpcm_addr_w));
+	map(0x1800, 0x1800).w(FUNC(renegade_state::adpcm_start_w));
+	map(0x2000, 0x2000).w(FUNC(renegade_state::adpcm_addr_w));
 	map(0x2800, 0x2801).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
-	map(0x3000, 0x3000).w(this, FUNC(renegade_state::adpcm_stop_w));
+	map(0x3000, 0x3000).w(FUNC(renegade_state::adpcm_stop_w));
 	map(0x8000, 0xffff).rom();
 }
 

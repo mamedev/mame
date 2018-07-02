@@ -164,7 +164,7 @@ void olyboss_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void olyboss_state::olyboss_mem(address_map &map)
 {
-	map(0x0000, 0x7ff).rw(this, FUNC(olyboss_state::rom_r), FUNC(olyboss_state::rom_w)).share("lowram");
+	map(0x0000, 0x7ff).rw(FUNC(olyboss_state::rom_r), FUNC(olyboss_state::rom_w)).share("lowram");
 	map(0x800, 0xffff).ram();
 }
 
@@ -179,10 +179,10 @@ void olyboss_state::olyboss_io(address_map &map)
 	map(0x31, 0x31).rw(m_uic, FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
 	map(0x40, 0x43).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	//AM_RANGE(0x50, 0x53) COM2651
-	map(0x60, 0x60).rw(this, FUNC(olyboss_state::fdcctrl_r), FUNC(olyboss_state::fdcctrl_w));
+	map(0x60, 0x60).rw(FUNC(olyboss_state::fdcctrl_r), FUNC(olyboss_state::fdcctrl_w));
 	map(0x80, 0x81).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
-	map(0x82, 0x84).w(this, FUNC(olyboss_state::vchrmap_w));
-	map(0x90, 0x9f).w(this, FUNC(olyboss_state::vchrram_w));
+	map(0x82, 0x84).w(FUNC(olyboss_state::vchrmap_w));
+	map(0x90, 0x9f).w(FUNC(olyboss_state::vchrram_w));
 }
 
 void olyboss_state::olyboss85_io(address_map &map)
@@ -193,9 +193,9 @@ void olyboss_state::olyboss85_io(address_map &map)
 	map(0x10, 0x11).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x20, 0x21).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
 	map(0x30, 0x31).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x42, 0x42).r(this, FUNC(olyboss_state::keyboard_read));
-	map(0x42, 0x44).w(this, FUNC(olyboss_state::vchrram85_w));
-	map(0x45, 0x45).w(this, FUNC(olyboss_state::fdcctrl85_w));
+	map(0x42, 0x42).r(FUNC(olyboss_state::keyboard_read));
+	map(0x42, 0x44).w(FUNC(olyboss_state::vchrram85_w));
+	map(0x45, 0x45).w(FUNC(olyboss_state::fdcctrl85_w));
 }
 
 static INPUT_PORTS_START( olyboss )

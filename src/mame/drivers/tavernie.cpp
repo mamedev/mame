@@ -63,6 +63,7 @@ Z - more scan lines per row (cursor is bigger)
 #include "sound/wave.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -85,6 +86,10 @@ public:
 	{
 	}
 
+	void ivg09(machine_config &config);
+	void cpu09(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER(ca1_r);
 	DECLARE_READ8_MEMBER(pa_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
@@ -97,11 +102,9 @@ public:
 	DECLARE_MACHINE_RESET(ivg09);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void ivg09(machine_config &config);
-	void cpu09(machine_config &config);
 	void cpu09_mem(address_map &map);
 	void ivg09_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	uint8_t m_pa;
 	optional_shared_ptr<uint8_t> m_p_videoram;
@@ -135,7 +138,7 @@ void tavernie_state::ivg09_mem(address_map &map)
 	map(0x2080, 0x2080).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2081, 0x2081).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xe000, 0xe003).rw(m_fdc, FUNC(fd1795_device::read), FUNC(fd1795_device::write));
-	map(0xe080, 0xe080).w(this, FUNC(tavernie_state::ds_w));
+	map(0xe080, 0xe080).w(FUNC(tavernie_state::ds_w));
 	map(0xeb00, 0xeb03).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xeb04, 0xeb05).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xeb08, 0xeb0f).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));

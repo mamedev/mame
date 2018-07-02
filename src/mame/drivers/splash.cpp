@@ -86,7 +86,7 @@ void splash_state::splash_map(address_map &map)
 													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
 												 });
 	map(0x84000f, 0x84000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x880000, 0x8817ff).ram().w(this, FUNC(splash_state::vram_w)).share("videoram");   /* Video RAM */
+	map(0x880000, 0x8817ff).ram().w(FUNC(splash_state::vram_w)).share("videoram");   /* Video RAM */
 	map(0x881800, 0x881803).ram().share("vregs");                           /* Scroll registers */
 	map(0x881804, 0x881fff).ram();                                                 /* Work RAM */
 	map(0x8c0000, 0x8c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");/* Palette is xRRRRxGGGGxBBBBx */
@@ -106,15 +106,15 @@ WRITE8_MEMBER(splash_state::splash_adpcm_control_w)
 
 WRITE_LINE_MEMBER(splash_state::splash_msm5205_int)
 {
-	m_msm->data_w(m_adpcm_data >> 4);
+	m_msm->write_data(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
 }
 
 void splash_state::splash_sound_map(address_map &map)
 {
 	map(0x0000, 0xd7ff).rom();                                     /* ROM */
-	map(0xd800, 0xd800).w(this, FUNC(splash_state::splash_adpcm_data_w));              /* ADPCM data for the MSM5205 chip */
-	map(0xe000, 0xe000).w(this, FUNC(splash_state::splash_adpcm_control_w));
+	map(0xd800, 0xd800).w(FUNC(splash_state::splash_adpcm_data_w));              /* ADPCM data for the MSM5205 chip */
+	map(0xe000, 0xe000).w(FUNC(splash_state::splash_adpcm_control_w));
 	map(0xe800, 0xe800).r(m_soundlatch, FUNC(generic_latch_8_device::read));  /* Sound latch */
 	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write)); /* YM3812 */
 	map(0xf800, 0xffff).ram();                                     /* RAM */
@@ -169,11 +169,11 @@ void splash_state::roldfrog_map(address_map &map)
 													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
 												 });
 	map(0x84000f, 0x84000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x880000, 0x8817ff).ram().w(this, FUNC(splash_state::vram_w)).share("videoram");   /* Video RAM */
+	map(0x880000, 0x8817ff).ram().w(FUNC(splash_state::vram_w)).share("videoram");   /* Video RAM */
 	map(0x881800, 0x881803).ram().share("vregs");                           /* Scroll registers */
 	map(0x881804, 0x881fff).ram();                                                 /* Work RAM */
 	map(0x8c0000, 0x8c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");/* Palette is xRRRRxGGGGxBBBBx */
-	map(0xa00000, 0xa00001).r(this, FUNC(splash_state::roldfrog_bombs_r));
+	map(0xa00000, 0xa00001).r(FUNC(splash_state::roldfrog_bombs_r));
 	map(0xd00000, 0xd00fff).ram().share("spriteram");                       /* Sprite RAM */
 	map(0xe00000, 0xe00001).writeonly().share("bitmap_mode");           /* Bitmap Mode? */
 	map(0xffc000, 0xffffff).ram();                                                 /* Work RAM */
@@ -196,12 +196,12 @@ void splash_state::roldfrog_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x11).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x31, 0x31).w(this, FUNC(splash_state::sound_bank_w));
-	map(0x37, 0x37).w(this, FUNC(splash_state::roldfrog_vblank_ack_w));
+	map(0x31, 0x31).w(FUNC(splash_state::sound_bank_w));
+	map(0x37, 0x37).w(FUNC(splash_state::roldfrog_vblank_ack_w));
 	map(0x40, 0x40).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x70, 0x70).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
-	map(0x20, 0x23).r(this, FUNC(splash_state::roldfrog_unk_r));
+	map(0x20, 0x23).r(FUNC(splash_state::roldfrog_unk_r));
 }
 
 READ16_MEMBER(funystrp_state::spr_read)
@@ -233,13 +233,13 @@ void funystrp_state::funystrp_map(address_map &map)
 	map(0x840006, 0x840007).portr("P2");
 	map(0x840008, 0x840009).portr("SYSTEM");
 	map(0x84000a, 0x84000b).nopr();
-	map(0x84000a, 0x84000a).w(this, FUNC(funystrp_state::eeprom_w));
+	map(0x84000a, 0x84000a).w(FUNC(funystrp_state::eeprom_w));
 	map(0x84000e, 0x84000e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x880000, 0x8817ff).ram().w(this, FUNC(funystrp_state::vram_w)).share("videoram");   /* Video RAM */
+	map(0x880000, 0x8817ff).ram().w(FUNC(funystrp_state::vram_w)).share("videoram");   /* Video RAM */
 	map(0x881800, 0x881803).ram().share("vregs");                           /* Scroll registers */
 	map(0x881804, 0x881fff).ram();
 	map(0x8c0000, 0x8c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");/* Palette is xRRRRxGGGGxBBBBx */
-	map(0xd00000, 0xd01fff).rw(this, FUNC(funystrp_state::spr_read), FUNC(funystrp_state::spr_write)).share("spriteram");        /* Sprite RAM */
+	map(0xd00000, 0xd01fff).rw(FUNC(funystrp_state::spr_read), FUNC(funystrp_state::spr_write)).share("spriteram");        /* Sprite RAM */
 	map(0xfe0000, 0xfeffff).ram().mirror(0x10000); /* there's fe0000 <-> ff0000 compare */                /* Work RAM */
 }
 
@@ -282,13 +282,13 @@ WRITE8_MEMBER(funystrp_state::msm2_data_w)
 void funystrp_state::funystrp_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(funystrp_state::msm1_data_w));
-	map(0x01, 0x01).w(this, FUNC(funystrp_state::msm2_data_w));
-	map(0x02, 0x02).w(this, FUNC(funystrp_state::sound_bank_w));
+	map(0x00, 0x00).w(FUNC(funystrp_state::msm1_data_w));
+	map(0x01, 0x01).w(FUNC(funystrp_state::msm2_data_w));
+	map(0x02, 0x02).w(FUNC(funystrp_state::sound_bank_w));
 	map(0x03, 0x03).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x04, 0x04).r(this, FUNC(funystrp_state::int_source_r));
-	map(0x06, 0x06).w(this, FUNC(funystrp_state::msm1_interrupt_w));
-	map(0x07, 0x07).w(this, FUNC(funystrp_state::msm2_interrupt_w));
+	map(0x04, 0x04).r(FUNC(funystrp_state::int_source_r));
+	map(0x06, 0x06).w(FUNC(funystrp_state::msm1_interrupt_w));
+	map(0x07, 0x07).w(FUNC(funystrp_state::msm2_interrupt_w));
 }
 
 
@@ -600,7 +600,7 @@ WRITE_LINE_MEMBER(funystrp_state::adpcm_int1)
 {
 	if (m_snd_interrupt_enable1  || m_msm_toggle1 == 1)
 	{
-		m_msm1->data_w(m_msm_data1 >> 4);
+		m_msm1->write_data(m_msm_data1 >> 4);
 		m_msm_data1 <<= 4;
 		m_msm_toggle1 ^= 1;
 		if (m_msm_toggle1 == 0)
@@ -615,7 +615,7 @@ WRITE_LINE_MEMBER(funystrp_state::adpcm_int2)
 {
 	if (m_snd_interrupt_enable2 || m_msm_toggle2 == 1)
 	{
-		m_msm2->data_w(m_msm_data2 >> 4);
+		m_msm2->write_data(m_msm_data2 >> 4);
 		m_msm_data2 <<= 4;
 		m_msm_toggle2 ^= 1;
 		if (m_msm_toggle2 == 0)
@@ -652,7 +652,7 @@ MACHINE_CONFIG_START(funystrp_state::funystrp)
 	MCFG_DEVICE_PROGRAM_MAP(funystrp_sound_map)
 	MCFG_DEVICE_IO_MAP(funystrp_sound_io_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -328,6 +328,7 @@
 #include "machine/mc146818.h" // DALLAS1287 is functionally compatible.
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -370,6 +371,13 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void aristmk4_poker(machine_config &config);
+	void aristmk4(machine_config &config);
+	void _86lions(machine_config &config);
+
+	void init_aristmk4();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
 	required_device<ay8910_device> m_ay1;
@@ -430,7 +438,7 @@ public:
 	DECLARE_READ8_MEMBER(pa1_r);
 	DECLARE_READ8_MEMBER(pb1_r);
 	DECLARE_READ8_MEMBER(pc1_r);
-	void init_aristmk4();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -442,9 +450,7 @@ public:
 	TIMER_CALLBACK_MEMBER(hopper_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_pf);
 	inline void uBackgroundColour();
-	void aristmk4_poker(machine_config &config);
-	void aristmk4(machine_config &config);
-	void _86lions(machine_config &config);
+
 	void aristmk4_map(address_map &map);
 	void aristmk4_poker_map(address_map &map);
 };
@@ -1016,28 +1022,28 @@ void aristmk4_state::aristmk4_map(address_map &map)
 	map(0x0800, 0x17ff).ram();
 	map(0x1800, 0x1800).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x1801, 0x1801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x1c00, 0x1cff).w(this, FUNC(aristmk4_state::mk4_printer_w));
-	map(0x1900, 0x19ff).r(this, FUNC(aristmk4_state::mk4_printer_r));
+	map(0x1c00, 0x1cff).w(FUNC(aristmk4_state::mk4_printer_w));
+	map(0x1900, 0x19ff).r(FUNC(aristmk4_state::mk4_printer_r));
 	map(0x2000, 0x3fff).rom();  // graphics rom map
 	map(0x4000, 0x4fff).bankrw("bank1").share("nvram");
 
-	map(0x5000, 0x5000).w(this, FUNC(aristmk4_state::u3_p0));
-	map(0x5002, 0x5002).r(this, FUNC(aristmk4_state::u3_p2));
-	map(0x5003, 0x5003).r(this, FUNC(aristmk4_state::u3_p3));
-	map(0x5005, 0x5005).r(this, FUNC(aristmk4_state::ldsw));
+	map(0x5000, 0x5000).w(FUNC(aristmk4_state::u3_p0));
+	map(0x5002, 0x5002).r(FUNC(aristmk4_state::u3_p2));
+	map(0x5003, 0x5003).r(FUNC(aristmk4_state::u3_p3));
+	map(0x5005, 0x5005).r(FUNC(aristmk4_state::ldsw));
 	map(0x500d, 0x500d).portr("500d");
 	map(0x500e, 0x500e).portr("500e");
 	map(0x500f, 0x500f).portr("500f");
 	map(0x5010, 0x501f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x5200, 0x5200).r(this, FUNC(aristmk4_state::cashcade_r));
+	map(0x5200, 0x5200).r(FUNC(aristmk4_state::cashcade_r));
 	map(0x5201, 0x5201).portr("5201");
-	map(0x52c0, 0x52c0).r(this, FUNC(aristmk4_state::bv_p0));
-	map(0x52c1, 0x52c1).r(this, FUNC(aristmk4_state::bv_p1));
+	map(0x52c0, 0x52c0).r(FUNC(aristmk4_state::bv_p0));
+	map(0x52c1, 0x52c1).r(FUNC(aristmk4_state::bv_p1));
 	map(0x527f, 0x5281).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5300, 0x5300).portr("5300");
 	map(0x5380, 0x5383).rw("pia6821_0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // RTC data - PORT A , mechanical meters - PORTB ??
-	map(0x5440, 0x5440).w(this, FUNC(aristmk4_state::mlamps)); // take win and gamble lamps
-	map(0x5468, 0x5468).rw(this, FUNC(aristmk4_state::cgdrr), FUNC(aristmk4_state::cgdrw)); // 4020 ripple counter outputs
+	map(0x5440, 0x5440).w(FUNC(aristmk4_state::mlamps)); // take win and gamble lamps
+	map(0x5468, 0x5468).rw(FUNC(aristmk4_state::cgdrr), FUNC(aristmk4_state::cgdrw)); // 4020 ripple counter outputs
 	map(0x6000, 0xffff).rom();  // game roms
 }
 
@@ -1061,27 +1067,27 @@ void aristmk4_state::aristmk4_poker_map(address_map &map)
 	map(0x0800, 0x17ff).ram();
 	map(0x1800, 0x1800).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x1801, 0x1801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x1c00, 0x1cff).w(this, FUNC(aristmk4_state::mk4_printer_w));
-	map(0x1900, 0x19ff).r(this, FUNC(aristmk4_state::mk4_printer_r));
+	map(0x1c00, 0x1cff).w(FUNC(aristmk4_state::mk4_printer_w));
+	map(0x1900, 0x19ff).r(FUNC(aristmk4_state::mk4_printer_r));
 	map(0x4000, 0x4fff).bankrw("bank1").share("nvram");
 
-	map(0x5000, 0x5000).w(this, FUNC(aristmk4_state::u3_p0));
-	map(0x5002, 0x5002).r(this, FUNC(aristmk4_state::u3_p2));
+	map(0x5000, 0x5000).w(FUNC(aristmk4_state::u3_p0));
+	map(0x5002, 0x5002).r(FUNC(aristmk4_state::u3_p2));
 	map(0x5003, 0x5003).portr("5003");
-	map(0x5005, 0x5005).r(this, FUNC(aristmk4_state::ldsw));
+	map(0x5005, 0x5005).r(FUNC(aristmk4_state::ldsw));
 	map(0x500d, 0x500d).portr("500d");
 	map(0x500e, 0x500e).portr("500e");
 	map(0x500f, 0x500f).portr("500f");
 	map(0x5010, 0x501f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x5200, 0x5200).r(this, FUNC(aristmk4_state::cashcade_r));
+	map(0x5200, 0x5200).r(FUNC(aristmk4_state::cashcade_r));
 	map(0x5201, 0x5201).portr("5201");
-	map(0x52c0, 0x52c0).r(this, FUNC(aristmk4_state::bv_p0));
-	map(0x52c1, 0x52c1).r(this, FUNC(aristmk4_state::bv_p1));
+	map(0x52c0, 0x52c0).r(FUNC(aristmk4_state::bv_p0));
+	map(0x52c1, 0x52c1).r(FUNC(aristmk4_state::bv_p1));
 	map(0x527f, 0x5281).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5300, 0x5300).portr("5300");
 	map(0x5380, 0x5383).rw("pia6821_0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // RTC data - PORT A , mechanical meters - PORTB ??
-	map(0x5440, 0x5440).w(this, FUNC(aristmk4_state::mlamps)); // take win and gamble lamps
-	map(0x5468, 0x5468).rw(this, FUNC(aristmk4_state::cgdrr), FUNC(aristmk4_state::cgdrw)); // 4020 ripple counter outputs
+	map(0x5440, 0x5440).w(FUNC(aristmk4_state::mlamps)); // take win and gamble lamps
+	map(0x5468, 0x5468).rw(FUNC(aristmk4_state::cgdrr), FUNC(aristmk4_state::cgdrw)); // 4020 ripple counter outputs
 	map(0x6000, 0x7fff).rom();  // graphics rom map
 	map(0x8000, 0xffff).rom();  // game roms
 }
@@ -1721,7 +1727,7 @@ void aristmk4_state::init_aristmk4()
 
 void aristmk4_state::machine_start()
 {
-	save_pointer(NAME(m_nvram.get()), 0x1000); // m_nvram
+	save_pointer(NAME(m_nvram), 0x1000); // m_nvram
 	m_credit_spend_meter.resolve();
 	m_credit_out_meter.resolve();
 	m_hopper_motor_out.resolve();

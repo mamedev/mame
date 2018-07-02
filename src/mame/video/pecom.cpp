@@ -88,7 +88,7 @@ void pecom_state::video_start()
 	/* register for state saving */
 	save_item(NAME(m_reset));
 	save_item(NAME(m_dma));
-	save_pointer(NAME(m_charram.get()), PECOM_CHAR_RAM_SIZE);
+	save_pointer(NAME(m_charram), PECOM_CHAR_RAM_SIZE);
 }
 
 MACHINE_CONFIG_START(pecom_state::pecom_video)

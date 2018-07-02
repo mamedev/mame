@@ -29,6 +29,7 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -52,6 +53,11 @@ public:
 		m_vram(*this, "vram")
 		{ }
 
+	void kongambl(machine_config &config);
+
+	void init_kingtut();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k053252_device> m_k053252;
 	required_device<k055673_device> m_k055673;
@@ -69,7 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
 	DECLARE_READ32_MEMBER(test_r);
 	// DECLARE_READ32_MEMBER(rng_r);
-	void init_kingtut();
+
 	DECLARE_VIDEO_START(kongambl);
 	uint8_t m_irq_mask;
 
@@ -80,7 +86,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
-	void kongambl(machine_config &config);
+
 	void kongamaud_map(address_map &map);
 	void kongambl_map(address_map &map);
 };
@@ -244,21 +250,21 @@ void kongambl_state::kongambl_map(address_map &map)
 
 	map(0x4cc000, 0x4cc00f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 
-	map(0x4d0000, 0x4d0000).w(this, FUNC(kongambl_state::kongambl_ff_w));
+	map(0x4d0000, 0x4d0000).w(FUNC(kongambl_state::kongambl_ff_w));
 
 	map(0x500000, 0x5007ff).ram();
-	map(0x500380, 0x500383).r(this, FUNC(kongambl_state::test_r));
+	map(0x500380, 0x500383).r(FUNC(kongambl_state::test_r));
 //  AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
 //  AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
 //  AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
-	map(0x580000, 0x580007).r(this, FUNC(kongambl_state::test_r));
+	map(0x580000, 0x580007).r(FUNC(kongambl_state::test_r));
 
-	map(0x600000, 0x60000f).r(this, FUNC(kongambl_state::test_r));
+	map(0x600000, 0x60000f).r(FUNC(kongambl_state::test_r));
 
-	map(0x700000, 0x700003).r(this, FUNC(kongambl_state::eeprom_r));
+	map(0x700000, 0x700003).r(FUNC(kongambl_state::eeprom_r));
 	map(0x700004, 0x700007).portr("IN1");
 	map(0x700008, 0x70000b).portr("IN3");
-	map(0x780000, 0x780003).w(this, FUNC(kongambl_state::eeprom_w));
+	map(0x780000, 0x780003).w(FUNC(kongambl_state::eeprom_w));
 	//AM_RANGE(0x780004, 0x780007) AM_WRITENOP
 }
 
@@ -654,7 +660,7 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, kongambl_state, hblank_irq_ack_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223) // fake, they'll be changed by CCU anyway, TBD

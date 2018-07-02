@@ -12,6 +12,7 @@
 #include "cpu/mcs51/mcs51.h"
 //#include "machine/mc68681.h"
 #include "machine/ram.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -23,14 +24,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rom(*this, "maincpu") { }
 
+	void vt520(machine_config &config);
+	void vt420(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(vt520_some_r);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<uint8_t> m_rom;
-	void vt520(machine_config &config);
-	void vt420(machine_config &config);
 	void vt520_io(address_map &map);
 	void vt520_mem(address_map &map);
 };
@@ -57,7 +60,7 @@ READ8_MEMBER( vt520_state::vt520_some_r )
 void vt520_state::vt520_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x7ffb, 0x7ffb).r(this, FUNC(vt520_state::vt520_some_r));
+	map(0x7ffb, 0x7ffb).r(FUNC(vt520_state::vt520_some_r));
 }
 
 /* Input ports */

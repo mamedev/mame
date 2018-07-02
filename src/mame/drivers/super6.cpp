@@ -242,32 +242,6 @@ WRITE8_MEMBER( super6_state::fdc_w )
 }
 
 
-//-------------------------------------------------
-//  baud_w - baud rate
-//-------------------------------------------------
-
-WRITE8_MEMBER( super6_state::baud_w )
-{
-	/*
-
-	    bit     description
-
-	    0       SIO channel A baud bit A
-	    1       SIO channel A baud bit B
-	    2       SIO channel A baud bit C
-	    3       SIO channel A baud bit D
-	    4       SIO channel B baud bit A
-	    5       SIO channel B baud bit B
-	    6       SIO channel B baud bit C
-	    7       SIO channel B baud bit D
-
-	*/
-
-	m_brg->str_w(data & 0x0f);
-	m_brg->stt_w(data >> 4);
-}
-
-
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -293,12 +267,12 @@ void super6_state::super6_io(address_map &map)
 	map(0x04, 0x07).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
-	map(0x10, 0x10).mirror(0x03).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
-	map(0x14, 0x14).rw(this, FUNC(super6_state::fdc_r), FUNC(super6_state::fdc_w));
-	map(0x15, 0x15).portr("J7").w(this, FUNC(super6_state::s100_w));
-	map(0x16, 0x16).w(this, FUNC(super6_state::bank0_w));
-	map(0x17, 0x17).w(this, FUNC(super6_state::bank1_w));
-	map(0x18, 0x18).mirror(0x03).w(this, FUNC(super6_state::baud_w));
+	map(0x10, 0x10).mirror(0x03).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x14, 0x14).rw(FUNC(super6_state::fdc_r), FUNC(super6_state::fdc_w));
+	map(0x15, 0x15).portr("J7").w(FUNC(super6_state::s100_w));
+	map(0x16, 0x16).w(FUNC(super6_state::bank0_w));
+	map(0x17, 0x17).w(FUNC(super6_state::bank1_w));
+	map(0x18, 0x18).mirror(0x03).w(BR1945_TAG, FUNC(com8116_device::stt_str_w));
 //  AM_RANGE(0x40, 0x40) ?
 //  AM_RANGE(0xe0, 0xe7) HDC?
 }
@@ -464,8 +438,8 @@ void super6_state::machine_reset()
 
 	uint8_t baud = m_j7->read();
 
-	m_brg->str_w(baud & 0x0f);
-	m_brg->stt_w((baud >> 4) & 0x07);
+	m_brg->write_str(baud & 0x0f);
+	m_brg->write_stt((baud >> 4) & 0x07);
 }
 
 

@@ -21,6 +21,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -37,6 +38,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void fp6000(machine_config &config);
+
+private:
 	uint8_t *m_char_rom;
 	required_shared_ptr<uint16_t> m_gvram;
 	required_shared_ptr<uint16_t> m_vram;
@@ -62,7 +66,6 @@ public:
 	required_device<mc6845_device>m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void fp6000(machine_config &config);
 	void fp6000_io(address_map &map);
 	void fp6000_map(address_map &map);
 };
@@ -182,7 +185,7 @@ void fp6000_state::fp6000_map(address_map &map)
 	map(0x00000, 0xbffff).ram();
 	map(0xc0000, 0xdffff).ram().share("gvram");//gvram
 	map(0xe0000, 0xe0fff).ram().share("vram");
-	map(0xe7000, 0xe7fff).rw(this, FUNC(fp6000_state::fp6000_pcg_r), FUNC(fp6000_state::fp6000_pcg_w));
+	map(0xe7000, 0xe7fff).rw(FUNC(fp6000_state::fp6000_pcg_r), FUNC(fp6000_state::fp6000_pcg_w));
 	map(0xf0000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -230,14 +233,14 @@ READ16_MEMBER(fp6000_state::pit_r)
 void fp6000_state::fp6000_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x08, 0x09).r(this, FUNC(fp6000_state::ex_board_r)); // BIOS of some sort ...
+	map(0x08, 0x09).r(FUNC(fp6000_state::ex_board_r)); // BIOS of some sort ...
 	map(0x0a, 0x0b).portr("DSW"); // installed RAM id?
 	map(0x10, 0x11).nopr();
-	map(0x20, 0x23).rw(this, FUNC(fp6000_state::fp6000_key_r), FUNC(fp6000_state::fp6000_key_w)).umask16(0x00ff);
-	map(0x38, 0x39).r(this, FUNC(fp6000_state::pit_r)); // pit?
-	map(0x70, 0x70).w(this, FUNC(fp6000_state::fp6000_6845_address_w));
-	map(0x72, 0x72).w(this, FUNC(fp6000_state::fp6000_6845_data_w));
-	map(0x74, 0x75).r(this, FUNC(fp6000_state::unk_r)); //bit 6 busy flag
+	map(0x20, 0x23).rw(FUNC(fp6000_state::fp6000_key_r), FUNC(fp6000_state::fp6000_key_w)).umask16(0x00ff);
+	map(0x38, 0x39).r(FUNC(fp6000_state::pit_r)); // pit?
+	map(0x70, 0x70).w(FUNC(fp6000_state::fp6000_6845_address_w));
+	map(0x72, 0x72).w(FUNC(fp6000_state::fp6000_6845_data_w));
+	map(0x74, 0x75).r(FUNC(fp6000_state::unk_r)); //bit 6 busy flag
 }
 
 /* Input ports */

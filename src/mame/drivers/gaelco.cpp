@@ -28,6 +28,7 @@ Year   Game                PCB            NOTES
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -109,7 +110,7 @@ WRITE16_MEMBER(gaelco_state::thoop_encrypted_w)
 void gaelco_state::bigkarnk_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                         /* ROM */
-	map(0x100000, 0x101fff).ram().w(this, FUNC(gaelco_state::gaelco_vram_w)).share("videoram");               /* Video RAM */
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::gaelco_vram_w)).share("videoram");               /* Video RAM */
 	map(0x102000, 0x103fff).ram();                                                         /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_DEVWRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
@@ -141,7 +142,7 @@ void gaelco_state::bigkarnk_snd_map(address_map &map)
 void gaelco_state::maniacsq_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                         /* ROM */
-	map(0x100000, 0x101fff).ram().w(this, FUNC(gaelco_state::gaelco_vram_w)).share("videoram");               /* Video RAM */
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::gaelco_vram_w)).share("videoram");               /* Video RAM */
 	map(0x102000, 0x103fff).ram();                                                         /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
@@ -151,7 +152,7 @@ void gaelco_state::maniacsq_map(address_map &map)
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
-	map(0x70000d, 0x70000d).w(this, FUNC(gaelco_state::OKIM6295_bankswitch_w));
+	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::OKIM6295_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                      /* OKI6295 status register */
 	map(0xff0000, 0xffffff).ram();                                                         /* Work RAM */
 }
@@ -159,8 +160,8 @@ void gaelco_state::maniacsq_map(address_map &map)
 void gaelco_state::squash_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                         /* ROM */
-	map(0x100000, 0x101fff).ram().w(this, FUNC(gaelco_state::gaelco_vram_encrypted_w)).share("videoram");         /* Video RAM */
-	map(0x102000, 0x103fff).ram().w(this, FUNC(gaelco_state::gaelco_encrypted_w)).share("screenram");                /* Screen RAM */
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::gaelco_vram_encrypted_w)).share("videoram");         /* Video RAM */
+	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::gaelco_encrypted_w)).share("screenram");                /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
@@ -173,7 +174,7 @@ void gaelco_state::squash_map(address_map &map)
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
 												 });
-	map(0x70000d, 0x70000d).w(this, FUNC(gaelco_state::OKIM6295_bankswitch_w));
+	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::OKIM6295_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                      /* OKI6295 status register */
 	map(0xff0000, 0xffffff).ram();                                                         /* Work RAM */
 }
@@ -181,8 +182,8 @@ void gaelco_state::squash_map(address_map &map)
 void gaelco_state::thoop_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                         /* ROM */
-	map(0x100000, 0x101fff).ram().w(this, FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram");          /* Video RAM */
-	map(0x102000, 0x103fff).ram().w(this, FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");             /* Screen RAM */
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram");          /* Video RAM */
+	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");             /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                     /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");        /* Palette */
@@ -195,7 +196,7 @@ void gaelco_state::thoop_map(address_map &map)
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
 												 });
-	map(0x70000d, 0x70000d).w(this, FUNC(gaelco_state::OKIM6295_bankswitch_w));
+	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::OKIM6295_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                      /* OKI6295 status register */
 	map(0xff0000, 0xffffff).ram();                                                         /* Work RAM */
 }

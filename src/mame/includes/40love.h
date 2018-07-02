@@ -6,6 +6,7 @@
 #include "sound/msm5232.h"
 #include "sound/ay8910.h"
 #include "sound/ta7630.h"
+#include "emupal.h"
 
 class fortyl_state : public driver_device
 {
@@ -44,7 +45,7 @@ public:
 	void sound_map(address_map &map);
 	void undoukai_map(address_map &map);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

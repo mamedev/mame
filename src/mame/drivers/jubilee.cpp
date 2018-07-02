@@ -197,6 +197,7 @@
 #include "cpu/tms9900/tms9980a.h"
 #include "machine/nvram.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MASTER_CLOCK    XTAL(6'000'000)              /* confirmed */
@@ -216,6 +217,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void jubileep(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
 	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
@@ -223,11 +227,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
-	void jubileep(machine_config &config);
 	void jubileep_cru_map(address_map &map);
 	void jubileep_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
@@ -312,8 +314,8 @@ void jubilee_state::jubileep_map(address_map &map)
     Working RAM = 3400-37FF
     Color RAM =   3800-3BFF (lower 4-bits)
 */
-	map(0x3000, 0x37ff).ram().w(this, FUNC(jubilee_state::jubileep_videoram_w)).share("videoworkram");  /* TC5517AP battery backed RAM */
-	map(0x3800, 0x3bff).ram().w(this, FUNC(jubilee_state::jubileep_colorram_w)).share("colorram");      /* Whole 2114 RAM */
+	map(0x3000, 0x37ff).ram().w(FUNC(jubilee_state::jubileep_videoram_w)).share("videoworkram");  /* TC5517AP battery backed RAM */
+	map(0x3800, 0x3bff).ram().w(FUNC(jubilee_state::jubileep_colorram_w)).share("colorram");      /* Whole 2114 RAM */
 
 /*  CRTC *is* mapped here. Read 00-01 and then write on them.
     Then does the same for 02-03. Initialization seems incomplete since
@@ -578,8 +580,8 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 
 void jubilee_state::jubileep_cru_map(address_map &map)
 {
-	map(0x00c8, 0x00c8).r(this, FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
-	map(0x0000, 0x07ff).w(this, FUNC(jubilee_state::unk_w));
+	map(0x00c8, 0x00c8).r(FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
+	map(0x0000, 0x07ff).w(FUNC(jubilee_state::unk_w));
 }
 
 /* I/O byte R/W

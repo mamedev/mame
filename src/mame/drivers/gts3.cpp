@@ -48,16 +48,20 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void gts3(machine_config &config);
+
 	void init_gts3();
+
+	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
+
+private:
 	DECLARE_WRITE8_MEMBER(segbank_w);
 	DECLARE_READ8_MEMBER(u4a_r);
 	DECLARE_READ8_MEMBER(u4b_r);
 	DECLARE_WRITE8_MEMBER(u4b_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
-	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
-	void gts3(machine_config &config);
 	void gts3_map(address_map &map);
-private:
+
 	bool m_dispclk;
 	bool m_lampclk;
 	uint8_t m_digit;
@@ -79,7 +83,7 @@ void gts3_state::gts3_map(address_map &map)
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x200f).rw(m_u4, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0x2010, 0x201f).rw(m_u5, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x2020, 0x2023).mirror(0x0c).w(this, FUNC(gts3_state::segbank_w));
+	map(0x2020, 0x2023).mirror(0x0c).w(FUNC(gts3_state::segbank_w));
 	map(0x4000, 0xffff).rom();
 }
 

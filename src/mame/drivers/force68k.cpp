@@ -171,6 +171,10 @@ public:
 	{
 	}
 
+	void fccpu1_eprom_sockets(machine_config &config);
+	void fccpu1(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER (bootvect_r);
 	DECLARE_READ16_MEMBER (vme_a24_r);
 	DECLARE_WRITE16_MEMBER (vme_a24_w);
@@ -202,10 +206,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
 	DECLARE_READ16_MEMBER (read16_rom);
 
-	void fccpu1_eprom_sockets(machine_config &config);
-	void fccpu1(machine_config &config);
 	void force68k_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<mm58167_device> m_rtc;
 	required_device<pit68230_device> m_pit;
@@ -236,7 +238,7 @@ private:
 void force68k_state::force68k_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x000007).rom().r(this, FUNC(force68k_state::bootvect_r));       /* Vectors mapped from System EPROM */
+	map(0x000000, 0x000007).rom().r(FUNC(force68k_state::bootvect_r));       /* Vectors mapped from System EPROM */
 	map(0x000008, 0x01ffff).ram(); /* DRAM CPU-1B */
 //AM_RANGE (0x020000, 0x07ffff) AM_RAM /* Additional DRAM CPU-1D */
 	map(0x080000, 0x083fff).rom(); /* System EPROM Area 16Kb DEBUGGER supplied as default on CPU-1B/D     */
@@ -248,8 +250,8 @@ void force68k_state::force68k_mem(address_map &map)
 	map(0x0c0400, 0x0c042f).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0e0035).rw(m_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
 //AM_RANGE(0x0e0200, 0x0e0380) AM_READWRITE(fpu_r, fpu_w) /* optional FPCP 68881 FPU interface */
-	map(0x100000, 0xfeffff).rw(this, FUNC(force68k_state::vme_a24_r), FUNC(force68k_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) */
-	map(0xff0000, 0xffffff).rw(this, FUNC(force68k_state::vme_a16_r), FUNC(force68k_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) */
+	map(0x100000, 0xfeffff).rw(FUNC(force68k_state::vme_a24_r), FUNC(force68k_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) */
+	map(0xff0000, 0xffffff).rw(FUNC(force68k_state::vme_a16_r), FUNC(force68k_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) */
 }
 
 /* Input ports */
@@ -441,22 +443,26 @@ READ16_MEMBER (force68k_state::bootvect_r){
  */
 
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (force68k_state::vme_a24_r){
-		LOG("%s\n", FUNCNAME);
-		return (uint16_t) 0;
+READ16_MEMBER (force68k_state::vme_a24_r)
+{
+	LOG("%s\n", FUNCNAME);
+	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a24_w){
-		LOG("%s\n", FUNCNAME);
+WRITE16_MEMBER (force68k_state::vme_a24_w)
+{
+	LOG("%s\n", FUNCNAME);
 }
 
-READ16_MEMBER (force68k_state::vme_a16_r){
-		LOG("%s\n", FUNCNAME);
-		return (uint16_t) 0;
+READ16_MEMBER (force68k_state::vme_a16_r)
+{
+	LOG("%s\n", FUNCNAME);
+	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a16_w){
-		LOG("%s\n", FUNCNAME);
+WRITE16_MEMBER (force68k_state::vme_a16_w)
+{
+	LOG("%s\n", FUNCNAME);
 }
 
 /*
@@ -587,11 +593,11 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 
 	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
 	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL(16'000'000) / 2)
-	MCFG_PIT68230_PA_OUTPUT_CB (WRITE8 ("cent_data_out", output_latch_device, write))
-	MCFG_PIT68230_H2_CB (WRITELINE ("centronics", centronics_device, write_strobe))
+	MCFG_PIT68230_PA_OUTPUT_CB (WRITE8 ("cent_data_out", output_latch_device, bus_w))
+	MCFG_PIT68230_H2_CB (WRITELINE (m_centronics, centronics_device, write_strobe))
 
 	// Centronics
-	MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD (m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (*this, force68k_state, centronics_ack_w))
 	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (*this, force68k_state, centronics_busy_w))
 	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (*this, force68k_state, centronics_perror_w))

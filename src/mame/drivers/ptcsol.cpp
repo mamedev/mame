@@ -121,6 +121,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -144,12 +145,6 @@ struct cass_data_t {
 class sol20_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_SOL20_CASSETTE_TC,
-		TIMER_SOL20_BOOT
-	};
-
 	sol20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -168,6 +163,17 @@ public:
 		, m_iop_s4(*this, "S4")
 	{ }
 
+	void sol20(machine_config &config);
+
+	void init_sol20();
+
+private:
+	enum
+	{
+		TIMER_SOL20_CASSETTE_TC,
+		TIMER_SOL20_BOOT
+	};
+
 	DECLARE_READ8_MEMBER( sol20_f8_r );
 	DECLARE_READ8_MEMBER( sol20_fa_r );
 	DECLARE_READ8_MEMBER( sol20_fc_r );
@@ -177,15 +183,13 @@ public:
 	DECLARE_WRITE8_MEMBER( sol20_fd_w );
 	DECLARE_WRITE8_MEMBER( sol20_fe_w );
 	void kbd_put(u8 data);
-	void init_sol20();
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sol20_boot);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sol20(machine_config &config);
 	void sol20_io(address_map &map);
 	void sol20_mem(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_sol20_fa;
 	virtual void machine_reset() override;
@@ -438,13 +442,13 @@ void sol20_state::sol20_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf8, 0xf8).rw(this, FUNC(sol20_state::sol20_f8_r), FUNC(sol20_state::sol20_f8_w));
+	map(0xf8, 0xf8).rw(FUNC(sol20_state::sol20_f8_r), FUNC(sol20_state::sol20_f8_w));
 	map(0xf9, 0xf9).rw(m_uart_s, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
-	map(0xfa, 0xfa).rw(this, FUNC(sol20_state::sol20_fa_r), FUNC(sol20_state::sol20_fa_w));
+	map(0xfa, 0xfa).rw(FUNC(sol20_state::sol20_fa_r), FUNC(sol20_state::sol20_fa_w));
 	map(0xfb, 0xfb).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
-	map(0xfc, 0xfc).r(this, FUNC(sol20_state::sol20_fc_r));
-	map(0xfd, 0xfd).rw(this, FUNC(sol20_state::sol20_fd_r), FUNC(sol20_state::sol20_fd_w));
-	map(0xfe, 0xfe).w(this, FUNC(sol20_state::sol20_fe_w));
+	map(0xfc, 0xfc).r(FUNC(sol20_state::sol20_fc_r));
+	map(0xfd, 0xfd).rw(FUNC(sol20_state::sol20_fd_r), FUNC(sol20_state::sol20_fd_w));
+	map(0xfe, 0xfe).w(FUNC(sol20_state::sol20_fe_w));
 	map(0xff, 0xff).portr("S2");
 /*  map(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
     map(0xf9, 0xf9) serial data in, out

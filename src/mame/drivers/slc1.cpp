@@ -68,7 +68,7 @@ public:
 
 	void slc1(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 
@@ -78,7 +78,6 @@ protected:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-private:
 	uint8_t m_digit = 0;
 	bool m_kbd_type = false;
 
@@ -205,7 +204,7 @@ void slc1_state::mem_map(address_map &map)
 void slc1_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
+	map(0x0000, 0xffff).rw(FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
 }
 
 

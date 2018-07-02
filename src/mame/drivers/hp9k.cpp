@@ -42,6 +42,7 @@ TODO: boot tests fail
 #include "video/mc6845.h"
 #include "machine/terminal.h"
 //#include "machine/ins8250.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define HP9816_CHDIMX 8
@@ -111,15 +112,6 @@ static uint8_t prom16a[256] = {
 
 class hp9k_state : public driver_device
 {
-private:
-
-	int crtc_curreg;
-	int crtc_addrStartHi;
-	int crtc_addrStartLow;
-
-	void calc_prom_crc(uint8_t* prom);
-	void putChar(uint8_t thec,int x,int y,bitmap_ind16 &bitmap);
-
 public:
 	hp9k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
@@ -135,6 +127,19 @@ public:
 		calc_prom_crc(prom16a);
 	}
 
+	void hp9k(machine_config &config);
+
+	void init_hp9k();
+
+private:
+
+	int crtc_curreg;
+	int crtc_addrStartHi;
+	int crtc_addrStartLow;
+
+	void calc_prom_crc(uint8_t* prom);
+	void putChar(uint8_t thec,int x,int y,bitmap_ind16 &bitmap);
+
 	uint8_t kbdBit;
 
 	required_device<cpu_device> m_maincpu;
@@ -143,8 +148,6 @@ public:
 
 	uint8_t m_videoram[0x4000];
 	uint8_t m_screenram[0x800];
-
-	void init_hp9k();
 
 	DECLARE_READ16_MEMBER(buserror_r);
 	DECLARE_WRITE16_MEMBER(buserror_w);
@@ -166,7 +169,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<gfxdecode_device> m_gfxdecode;
-	void hp9k(machine_config &config);
 	void hp9k_mem(address_map &map);
 };
 
@@ -310,18 +312,18 @@ void hp9k_state::hp9k_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x000909).rom().region("bootrom", 0);
-	map(0x00090a, 0x00090d).rw(this, FUNC(hp9k_state::leds_r), FUNC(hp9k_state::leds_w));
+	map(0x00090a, 0x00090d).rw(FUNC(hp9k_state::leds_r), FUNC(hp9k_state::leds_w));
 	map(0x00090e, 0x00ffff).rom().region("bootrom", 0x90e);
-	map(0x010000, 0x427fff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
-	map(0x428000, 0x428fff).rw(this, FUNC(hp9k_state::keyboard_r), FUNC(hp9k_state::keyboard_w));
-	map(0x429000, 0x50ffff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
-	map(0x510000, 0x51ffff).rw(this, FUNC(hp9k_state::hp9k_videoram_r), FUNC(hp9k_state::hp9k_videoram_w));
-	map(0x520000, 0x52ffff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x010000, 0x427fff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x428000, 0x428fff).rw(FUNC(hp9k_state::keyboard_r), FUNC(hp9k_state::keyboard_w));
+	map(0x429000, 0x50ffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x510000, 0x51ffff).rw(FUNC(hp9k_state::hp9k_videoram_r), FUNC(hp9k_state::hp9k_videoram_w));
+	map(0x520000, 0x52ffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
 	map(0x530000, 0x53ffff).ram(); // graphic memory
-	map(0x540000, 0x5effff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
-	map(0x5f0000, 0x5f3fff).rw(this, FUNC(hp9k_state::hp9k_prom_r), FUNC(hp9k_state::hp9k_prom_w));
+	map(0x540000, 0x5effff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x5f0000, 0x5f3fff).rw(FUNC(hp9k_state::hp9k_prom_r), FUNC(hp9k_state::hp9k_prom_w));
 	//AM_RANGE(0x5f0000, 0x5f3fff) AM_READWRITE(buserror_r,buserror_w)
-	map(0x5f4000, 0xfbffff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x5f4000, 0xfbffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
 	map(0xFC0000, 0xffffff).ram(); // system ram
 }
 

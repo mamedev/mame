@@ -424,6 +424,7 @@
 #include "video/mc6845.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -448,6 +449,10 @@ public:
 		, m_palette(*this, "palette")
 		{ }
 
+	void avtnfl(machine_config &config);
+	void avt(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(avt_6845_address_w);
 	DECLARE_WRITE8_MEMBER(avt_6845_data_w);
 	DECLARE_READ8_MEMBER( avt_6845_data_r );
@@ -459,11 +464,9 @@ public:
 	DECLARE_PALETTE_INIT(avt);
 	uint32_t screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void avtnfl(machine_config &config);
-	void avt(machine_config &config);
 	void avt_map(address_map &map);
 	void avt_portmap(address_map &map);
-private:
+
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	virtual void video_start() override;
@@ -651,8 +654,8 @@ void avt_state::avt_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x7fff).ram();
 	map(0x8000, 0x9fff).ram(); // AM_SHARE("nvram")
-	map(0xa000, 0xa7ff).ram().w(this, FUNC(avt_state::avt_videoram_w)).share("videoram");
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(avt_state::avt_colorram_w)).share("colorram");
+	map(0xa000, 0xa7ff).ram().w(FUNC(avt_state::avt_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(avt_state::avt_colorram_w)).share("colorram");
 }
 
 void avt_state::avt_portmap(address_map &map)
@@ -663,8 +666,8 @@ void avt_state::avt_portmap(address_map &map)
 	map(0x0c, 0x0f).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x21, 0x21).w("aysnd", FUNC(ay8910_device::data_w));     /* AY8910 data */
 	map(0x23, 0x23).w("aysnd", FUNC(ay8910_device::address_w));      /* AY8910 control */
-	map(0x28, 0x28).w(this, FUNC(avt_state::avt_6845_address_w));
-	map(0x29, 0x29).rw(this, FUNC(avt_state::avt_6845_data_r), FUNC(avt_state::avt_6845_data_w));
+	map(0x28, 0x28).w(FUNC(avt_state::avt_6845_address_w));
+	map(0x29, 0x29).rw(FUNC(avt_state::avt_6845_data_r), FUNC(avt_state::avt_6845_data_w));
 }
 
 /* I/O byte R/W

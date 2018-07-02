@@ -178,8 +178,8 @@ void xerox820_state::xerox820_io(address_map &map)
 	map(0x04, 0x07).mirror(0xff00).rw(m_sio, FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
 	map(0x08, 0x0b).mirror(0xff00).rw(Z80PIO_GP_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x0c, 0x0c).mirror(0xff03).w(COM8116_TAG, FUNC(com8116_device::stt_w));
-	map(0x10, 0x13).mirror(0xff00).rw(this, FUNC(xerox820_state::fdc_r), FUNC(xerox820_state::fdc_w));
-	map(0x14, 0x14).mirror(0x0003).select(0xff00).w(this, FUNC(xerox820_state::scroll_w));
+	map(0x10, 0x13).mirror(0xff00).rw(FUNC(xerox820_state::fdc_r), FUNC(xerox820_state::fdc_w));
+	map(0x14, 0x14).mirror(0x0003).select(0xff00).w(FUNC(xerox820_state::scroll_w));
 	map(0x18, 0x1b).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x1c, 0x1f).mirror(0xff00).rw(m_kbpio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
@@ -194,11 +194,11 @@ void xerox820ii_state::xerox820ii_mem(address_map &map)
 void xerox820ii_state::xerox820ii_io(address_map &map)
 {
 	xerox820_io(map);
-	map(0x28, 0x29).mirror(0xff00).w(this, FUNC(xerox820ii_state::bell_w));
-	map(0x30, 0x31).mirror(0xff00).w(this, FUNC(xerox820ii_state::slden_w));
-	map(0x34, 0x35).mirror(0xff00).w(this, FUNC(xerox820ii_state::chrom_w));
-	map(0x36, 0x36).mirror(0xff00).w(this, FUNC(xerox820ii_state::lowlite_w));
-	map(0x68, 0x69).mirror(0xff00).w(this, FUNC(xerox820ii_state::sync_w));
+	map(0x28, 0x29).mirror(0xff00).w(FUNC(xerox820ii_state::bell_w));
+	map(0x30, 0x31).mirror(0xff00).w(FUNC(xerox820ii_state::slden_w));
+	map(0x34, 0x35).mirror(0xff00).w(FUNC(xerox820ii_state::chrom_w));
+	map(0x36, 0x36).mirror(0xff00).w(FUNC(xerox820ii_state::lowlite_w));
+	map(0x68, 0x69).mirror(0xff00).w(FUNC(xerox820ii_state::sync_w));
 }
 
 void xerox820ii_state::xerox168_mem(address_map &map)
@@ -711,10 +711,10 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 
 	MCFG_DEVICE_ADD(Z80PIO_RD_TAG, Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8("sasi_data_in", input_buffer_device, read))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("sasi_data_out", output_latch_device, write))
+	MCFG_Z80PIO_IN_PA_CB(READ8("sasi_data_in", input_buffer_device, bus_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8("sasi_data_out", output_latch_device, bus_w))
 	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, xerox820ii_state, rdpio_pardy_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8("sasi_ctrl_in", input_buffer_device, read))
+	MCFG_Z80PIO_IN_PB_CB(READ8("sasi_ctrl_in", input_buffer_device, bus_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, xerox820ii_state, rdpio_pb_w))
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 16_MHz_XTAL / 4)

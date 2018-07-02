@@ -19,23 +19,36 @@ DEFINE_DEVICE_TYPE(ITEAGLE_FPGA, iteagle_fpga_device, "iteagle_fpga", "ITEagle F
 
 void iteagle_fpga_device::fpga_map(address_map &map)
 {
-	map(0x000, 0x01f).rw(this, FUNC(iteagle_fpga_device::fpga_r), FUNC(iteagle_fpga_device::fpga_w));
+	map(0x000, 0x01f).rw(FUNC(iteagle_fpga_device::fpga_r), FUNC(iteagle_fpga_device::fpga_w));
 }
 
 void iteagle_fpga_device::rtc_map(address_map &map)
 {
-	map(0x000, 0x7ff).rw(this, FUNC(iteagle_fpga_device::rtc_r), FUNC(iteagle_fpga_device::rtc_w));
+	map(0x000, 0x7ff).rw(FUNC(iteagle_fpga_device::rtc_r), FUNC(iteagle_fpga_device::rtc_w));
 }
 
 void iteagle_fpga_device::ram_map(address_map &map)
 {
-	map(0x00000, 0x3f).rw(this, FUNC(iteagle_fpga_device::e1_nvram_r), FUNC(iteagle_fpga_device::e1_nvram_w));
-	map(0x10000, 0x1ffff).rw(this, FUNC(iteagle_fpga_device::e1_ram_r), FUNC(iteagle_fpga_device::e1_ram_w));
+	map(0x00000, 0x3f).rw(FUNC(iteagle_fpga_device::e1_nvram_r), FUNC(iteagle_fpga_device::e1_nvram_w));
+	map(0x10000, 0x1ffff).rw(FUNC(iteagle_fpga_device::e1_ram_r), FUNC(iteagle_fpga_device::e1_ram_w));
 }
 
-iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, ITEAGLE_FPGA, tag, owner, clock)
-	, m_rtc(*this, "eagle2_rtc"), m_e1_nvram(*this, "eagle1_bram"), m_scc1(*this, AM85C30_TAG), m_screen(*this, finder_base::DUMMY_TAG), m_cpu(*this, finder_base::DUMMY_TAG), m_version(0), m_seq_init(0)
+iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pci_device(mconfig, ITEAGLE_FPGA, tag, owner, clock),
+	m_rtc(*this, "eagle2_rtc"),
+	m_e1_nvram(*this, "eagle1_bram"),
+	m_scc1(*this, AM85C30_TAG),
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_io_system(*this, ":SYSTEM"),
+	m_io_in1(*this, ":IN1"),
+	m_io_sw5(*this, ":SW5"),
+	m_io_trackx(*this, ":TRACKX1"),
+	m_io_tracky(*this, ":TRACKY1"),
+	m_io_gunx(*this, ":GUNX1"),
+	m_io_guny(*this, ":GUNY1"),
+	m_version(0),
+	m_seq_init(0)
 {
 	set_ids(0x55cc33aa, 0xaa, 0xaaaaaa, 0x00);
 }
@@ -205,8 +218,8 @@ WRITE_LINE_MEMBER(iteagle_fpga_device::vblank_update)
 		if (1 || (m_fpga_regs[0x14 / 4] & 0x01)) {
 			// Set the gun timer to first fire
 			const rectangle &visarea = m_screen->visible_area();
-			m_gun_x = machine().root_device().ioport("GUNX1")->read() * (visarea.width() - 14) / 512;
-			m_gun_y = machine().root_device().ioport("GUNY1")->read() * visarea.height() / 512;
+			m_gun_x = m_io_gunx->read() * (visarea.width() - 14) / 512;
+			m_gun_y = m_io_guny->read() * visarea.height() / 512;
 			m_timer->adjust(attotime::zero);
 			//m_timer->adjust(m_screen->time_until_pos(std::max(0, m_gun_y - BEAM_DY), std::max(0, m_gun_x - BEAM_DX)));
 			//printf("w: %d h: %d x: %d y: %d\n", visarea.width(), visarea.height(), m_gun_x, m_gun_y);
@@ -241,17 +254,17 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 
 	switch (offset) {
 		case 0x00/4:
-			result = ((machine().root_device().ioport("SYSTEM")->read()&0xffff)<<16) | (machine().root_device().ioport("IN1")->read()&0xffff);
+			result = ((m_io_system->read()&0xffff)<<16) | (m_io_in1->read()&0xffff);
 			if (LOG_FPGA && m_prev_reg!=offset)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x04/4:
-			result = (result & 0xFF0FFFFF) | ((machine().root_device().ioport("SW5")->read()&0xf)<<20);
+			result = (result & 0xFF0FFFFF) | ((m_io_sw5->read()&0xf)<<20);
 			if (0 && LOG_FPGA && !ACCESSING_BITS_0_7)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x08/4:
-			result = ((machine().root_device().ioport("TRACKY1")->read()&0xff)<<8) | (machine().root_device().ioport("TRACKX1")->read()&0xff);
+			result = ((m_io_tracky->read()&0xff)<<8) | (m_io_trackx->read()&0xff);
 			if (LOG_FPGA && m_prev_reg!=offset)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
@@ -647,11 +660,11 @@ DEFINE_DEVICE_TYPE(ITEAGLE_EEPROM, iteagle_eeprom_device, "iteagle_eeprom", "ITE
 
 void iteagle_eeprom_device::eeprom_map(address_map &map)
 {
-	map(0x0000, 0x000F).rw(this, FUNC(iteagle_eeprom_device::eeprom_r), FUNC(iteagle_eeprom_device::eeprom_w));
+	map(0x0000, 0x000F).rw(FUNC(iteagle_eeprom_device::eeprom_r), FUNC(iteagle_eeprom_device::eeprom_w));
 }
 
 MACHINE_CONFIG_START(iteagle_eeprom_device::device_add_mconfig)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -774,7 +787,7 @@ DEFINE_DEVICE_TYPE(ITEAGLE_PERIPH, iteagle_periph_device, "iteagle_periph", "ITE
 
 void iteagle_periph_device::ctrl_map(address_map &map)
 {
-	map(0x000, 0x0cf).rw(this, FUNC(iteagle_periph_device::ctrl_r), FUNC(iteagle_periph_device::ctrl_w));
+	map(0x000, 0x0cf).rw(FUNC(iteagle_periph_device::ctrl_r), FUNC(iteagle_periph_device::ctrl_w));
 }
 
 iteagle_periph_device::iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

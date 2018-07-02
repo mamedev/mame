@@ -33,6 +33,11 @@ public:
 	{
 	}
 
+	void vega(machine_config &config);
+
+	void init_vegaeo();
+
+private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport m_system_io;
 
@@ -47,11 +52,9 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
-	void init_vegaeo();
 	DECLARE_VIDEO_START(vega);
 
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vega(machine_config &config);
 	void vega_map(address_map &map);
 };
 
@@ -105,13 +108,13 @@ READ32_MEMBER(vegaeo_state::vegaeo_custom_read)
 void vegaeo_state::vega_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram();
-	map(0x80000000, 0x80013fff).rw(this, FUNC(vegaeo_state::vram_r), FUNC(vegaeo_state::vram_w));
+	map(0x80000000, 0x80013fff).rw(FUNC(vegaeo_state::vram_r), FUNC(vegaeo_state::vram_w));
 	map(0xfc000000, 0xfc0000ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x000000ff);
 	map(0xfc200000, 0xfc2003ff).rw("palette", FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0xfc400000, 0xfc40005b).nopw(); // crt registers ?
 	map(0xfc600000, 0xfc600003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
-	map(0xfca00000, 0xfca00003).w(this, FUNC(vegaeo_state::vega_misc_w));
-	map(0xfcc00000, 0xfcc00003).r(this, FUNC(vegaeo_state::vegaeo_custom_read));
+	map(0xfca00000, 0xfca00003).w(FUNC(vegaeo_state::vega_misc_w));
+	map(0xfcc00000, 0xfcc00003).r(FUNC(vegaeo_state::vegaeo_custom_read));
 	map(0xfce00000, 0xfce00003).portr("P1_P2");
 	map(0xfd000000, 0xfeffffff).rom().region("maindata", 0);
 	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0);
@@ -153,7 +156,7 @@ INPUT_PORTS_END
 VIDEO_START_MEMBER(vegaeo_state,vega)
 {
 	m_vram = std::make_unique<uint8_t[]>(0x14000*2);
-	save_pointer(NAME(m_vram.get()), 0x14000*2);
+	save_pointer(NAME(m_vram), 0x14000*2);
 	save_item(NAME(m_vbuffer));
 }
 

@@ -81,7 +81,7 @@ WRITE8_MEMBER(hnayayoi_state::keyboard_w)
 
 WRITE8_MEMBER(hnayayoi_state::adpcm_data_w)
 {
-	m_msm->data_w(data);
+	m_msm->write_data(data);
 }
 
 
@@ -119,18 +119,18 @@ void hnayayoi_state::hnayayoi_io_map(address_map &map)
 	map(0x00, 0x01).w("ymsnd", FUNC(ym2203_device::write));
 	map(0x02, 0x03).r("ymsnd", FUNC(ym2203_device::read));
 	map(0x04, 0x04).portr("DSW3");
-	map(0x06, 0x06).w(this, FUNC(hnayayoi_state::adpcm_data_w));
+	map(0x06, 0x06).w(FUNC(hnayayoi_state::adpcm_data_w));
 	map(0x08, 0x08).w("crtc", FUNC(hd6845_device::address_w));
 	map(0x09, 0x09).w("crtc", FUNC(hd6845_device::register_w));
-	map(0x0a, 0x0a).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
-	map(0x0c, 0x0c).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
+	map(0x0a, 0x0a).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
+	map(0x0c, 0x0c).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
 	map(0x20, 0x27).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x40, 0x40).w(this, FUNC(hnayayoi_state::keyboard_w));
-	map(0x41, 0x41).r(this, FUNC(hnayayoi_state::keyboard_0_r));
-	map(0x42, 0x42).r(this, FUNC(hnayayoi_state::keyboard_1_r));
+	map(0x40, 0x40).w(FUNC(hnayayoi_state::keyboard_w));
+	map(0x41, 0x41).r(FUNC(hnayayoi_state::keyboard_0_r));
+	map(0x42, 0x42).r(FUNC(hnayayoi_state::keyboard_1_r));
 	map(0x43, 0x43).portr("COIN");
-	map(0x60, 0x61).w(this, FUNC(hnayayoi_state::hnayayoi_palbank_w));
-	map(0x62, 0x67).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
+	map(0x60, 0x61).w(FUNC(hnayayoi_state::hnayayoi_palbank_w));
+	map(0x62, 0x67).w(FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
 }
 
 void hnayayoi_state::hnfubuki_map(address_map &map)
@@ -141,18 +141,18 @@ void hnayayoi_state::hnfubuki_map(address_map &map)
 	map(0xff00, 0xff01).w("ymsnd", FUNC(ym2203_device::write));
 	map(0xff02, 0xff03).r("ymsnd", FUNC(ym2203_device::read));
 	map(0xff04, 0xff04).portr("DSW3");
-	map(0xff06, 0xff06).w(this, FUNC(hnayayoi_state::adpcm_data_w));
+	map(0xff06, 0xff06).w(FUNC(hnayayoi_state::adpcm_data_w));
 	map(0xff08, 0xff08).w("crtc", FUNC(hd6845_device::address_w));
 	map(0xff09, 0xff09).w("crtc", FUNC(hd6845_device::register_w));
-	map(0xff0a, 0xff0a).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
-	map(0xff0c, 0xff0c).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
+	map(0xff0a, 0xff0a).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
+	map(0xff0c, 0xff0c).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
 	map(0xff20, 0xff27).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xff40, 0xff40).w(this, FUNC(hnayayoi_state::keyboard_w));
-	map(0xff41, 0xff41).r(this, FUNC(hnayayoi_state::keyboard_0_r));
-	map(0xff42, 0xff42).r(this, FUNC(hnayayoi_state::keyboard_1_r));
+	map(0xff40, 0xff40).w(FUNC(hnayayoi_state::keyboard_w));
+	map(0xff41, 0xff41).r(FUNC(hnayayoi_state::keyboard_0_r));
+	map(0xff42, 0xff42).r(FUNC(hnayayoi_state::keyboard_1_r));
 	map(0xff43, 0xff43).portr("COIN");
-	map(0xff60, 0xff61).w(this, FUNC(hnayayoi_state::hnayayoi_palbank_w));
-	map(0xff62, 0xff67).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
+	map(0xff60, 0xff61).w(FUNC(hnayayoi_state::hnayayoi_palbank_w));
+	map(0xff62, 0xff67).w(FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
 }
 
 void hnayayoi_state::untoucha_map(address_map &map)
@@ -168,15 +168,15 @@ void hnayayoi_state::untoucha_io_map(address_map &map)
 	map(0x10, 0x10).w("ymsnd", FUNC(ym2203_device::control_port_w));
 	map(0x11, 0x11).r("ymsnd", FUNC(ym2203_device::status_port_r));
 	map(0x12, 0x12).w("crtc", FUNC(hd6845_device::address_w));
-	map(0x13, 0x13).w(this, FUNC(hnayayoi_state::adpcm_data_w));
+	map(0x13, 0x13).w(FUNC(hnayayoi_state::adpcm_data_w));
 	map(0x14, 0x14).portr("COIN");
-	map(0x15, 0x15).r(this, FUNC(hnayayoi_state::keyboard_1_r));
-	map(0x16, 0x16).r(this, FUNC(hnayayoi_state::keyboard_0_r));  // bit 7 = blitter busy flag
-	map(0x17, 0x17).w(this, FUNC(hnayayoi_state::keyboard_w));
-	map(0x18, 0x19).w(this, FUNC(hnayayoi_state::hnayayoi_palbank_w));
-	map(0x1a, 0x1f).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
-	map(0x20, 0x20).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
-	map(0x28, 0x28).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
+	map(0x15, 0x15).r(FUNC(hnayayoi_state::keyboard_1_r));
+	map(0x16, 0x16).r(FUNC(hnayayoi_state::keyboard_0_r));  // bit 7 = blitter busy flag
+	map(0x17, 0x17).w(FUNC(hnayayoi_state::keyboard_w));
+	map(0x18, 0x19).w(FUNC(hnayayoi_state::hnayayoi_palbank_w));
+	map(0x1a, 0x1f).w(FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
+	map(0x20, 0x20).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
+	map(0x28, 0x28).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
 	map(0x30, 0x37).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x50, 0x50).w("ymsnd", FUNC(ym2203_device::write_port_w));
 	map(0x51, 0x51).r("ymsnd", FUNC(ym2203_device::read_port_r));

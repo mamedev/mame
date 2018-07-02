@@ -672,7 +672,7 @@ READ8_MEMBER( c128_state::vic_colorram_r )
 
 void c128_state::z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c128_state::z80_r), FUNC(c128_state::z80_w));
+	map(0x0000, 0xffff).rw(FUNC(c128_state::z80_r), FUNC(c128_state::z80_w));
 }
 
 
@@ -682,7 +682,7 @@ void c128_state::z80_mem(address_map &map)
 
 void c128_state::z80_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c128_state::z80_io_r), FUNC(c128_state::z80_io_w));
+	map(0x0000, 0xffff).rw(FUNC(c128_state::z80_io_r), FUNC(c128_state::z80_io_w));
 }
 
 
@@ -692,7 +692,7 @@ void c128_state::z80_io(address_map &map)
 
 void c128_state::m8502_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c128_state::read), FUNC(c128_state::write));
+	map(0x0000, 0xffff).rw(FUNC(c128_state::read), FUNC(c128_state::write));
 }
 
 
@@ -702,7 +702,7 @@ void c128_state::m8502_mem(address_map &map)
 
 void c128_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(c128_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(c128_state::vic_videoram_r));
 }
 
 
@@ -712,7 +712,7 @@ void c128_state::vic_videoram_map(address_map &map)
 
 void c128_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(this, FUNC(c128_state::vic_colorram_r));
+	map(0x000, 0x3ff).r(FUNC(c128_state::vic_colorram_r));
 }
 
 
@@ -1139,22 +1139,22 @@ READ8_MEMBER( c128_state::sid_potx_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->pa_r() >> 6)
+	switch (m_cia1->read_pa() >> 6)
 	{
-	case 1: data = m_joy1->pot_x_r(); break;
-	case 2: data = m_joy2->pot_x_r(); break;
+	case 1: data = m_joy1->read_pot_x(); break;
+	case 2: data = m_joy2->read_pot_x(); break;
 	case 3:
 		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
 		{
-			data = 1 / (1 / m_joy1->pot_x_r() + 1 / m_joy2->pot_x_r());
+			data = 1 / (1 / m_joy1->read_pot_x() + 1 / m_joy2->read_pot_x());
 		}
 		else if (m_joy1->has_pot_x())
 		{
-			data = m_joy1->pot_x_r();
+			data = m_joy1->read_pot_x();
 		}
 		else if (m_joy2->has_pot_x())
 		{
-			data = m_joy2->pot_x_r();
+			data = m_joy2->read_pot_x();
 		}
 		break;
 	}
@@ -1166,22 +1166,22 @@ READ8_MEMBER( c128_state::sid_poty_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->pa_r() >> 6)
+	switch (m_cia1->read_pa() >> 6)
 	{
-	case 1: data = m_joy1->pot_y_r(); break;
-	case 2: data = m_joy2->pot_y_r(); break;
+	case 1: data = m_joy1->read_pot_y(); break;
+	case 2: data = m_joy2->read_pot_y(); break;
 	case 3:
 		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
 		{
-			data = 1 / (1 / m_joy1->pot_y_r() + 1 / m_joy2->pot_y_r());
+			data = 1 / (1 / m_joy1->read_pot_y() + 1 / m_joy2->read_pot_y());
 		}
 		else if (m_joy1->has_pot_y())
 		{
-			data = m_joy1->pot_y_r();
+			data = m_joy1->read_pot_y();
 		}
 		else if (m_joy2->has_pot_y())
 		{
-			data = m_joy2->pot_y_r();
+			data = m_joy2->read_pot_y();
 		}
 		break;
 	}
@@ -1221,13 +1221,13 @@ READ8_MEMBER( c128_state::cia1_pa_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy_b = m_joy2->joy_r();
+	uint8_t joy_b = m_joy2->read_joy();
 
 	data &= (0xf0 | (joy_b & 0x0f));
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pb = m_cia1->pb_r();
+	uint8_t cia1_pb = m_cia1->read_pb();
 	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
@@ -1289,13 +1289,13 @@ READ8_MEMBER( c128_state::cia1_pb_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy_a = m_joy1->joy_r();
+	uint8_t joy_a = m_joy1->read_joy();
 
 	data &= (0xf0 | (joy_a & 0x0f));
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pa = m_cia1->pa_r();
+	uint8_t cia1_pa = m_cia1->read_pa();
 
 	if (!BIT(cia1_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia1_pa, 6)) data &= m_row[6]->read();
@@ -1417,8 +1417,8 @@ WRITE8_MEMBER( c128_state::cia2_pa_w )
 	m_user->write_m(BIT(data, 2));
 
 	// IEC bus
-	m_iec->atn_w(!BIT(data, 3));
-	m_iec->clk_w(!BIT(data, 4));
+	m_iec->host_atn_w(!BIT(data, 3));
+	m_iec->host_clk_w(!BIT(data, 4));
 	m_iec_data_out = BIT(data, 5);
 
 	update_iec();
@@ -1519,7 +1519,7 @@ inline void c128_state::update_iec()
 
 	if (fsdir) data_out &= m_sp1;
 
-	m_iec->data_w(data_out);
+	m_iec->host_data_w(data_out);
 
 	// fast serial clock in
 	int srq_in = m_iec->srq_r();
@@ -1531,7 +1531,7 @@ inline void c128_state::update_iec()
 
 	if (fsdir) srq_out &= m_cnt1;
 
-	m_iec->srq_w(srq_out);
+	m_iec->host_srq_w(srq_out);
 }
 
 WRITE_LINE_MEMBER( c128_state::iec_srq_w )
@@ -1730,7 +1730,7 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS8564_TAG, mos8564_device, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, MOS8563_TAG":palette", gfx_c128)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, MOS8563_TAG, gfx_c128)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -1778,13 +1778,13 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, c128_state, exp_dma_cd_w))
 	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(*this, c128_state, exp_dma_w))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, nullptr)
+	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, c64_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, c128_state, exp_reset_w))
 	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
 	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
 	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
 	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, atn_w))
+	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, host_atn_w))
 	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
 	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(*this, c128_state, write_user_pb0))
 	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(*this, c128_state, write_user_pb1))
@@ -1904,7 +1904,7 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS8566_TAG, mos8566_device, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, MOS8563_TAG":palette", gfx_c128)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, MOS8563_TAG, gfx_c128)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -1952,13 +1952,13 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, c128_state, exp_dma_cd_w))
 	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(*this, c128_state, exp_dma_w))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, nullptr)
+	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, c64_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, c128_state, exp_reset_w))
 	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
 	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
 	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
 	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, atn_w))
+	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, host_atn_w))
 	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
 	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(*this, c128_state, write_user_pb0))
 	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(*this, c128_state, write_user_pb1))

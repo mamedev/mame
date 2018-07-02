@@ -47,6 +47,10 @@ public:
 		: novagbase_state(mconfig, type, tag)
 	{ }
 
+	void diablo68k(machine_config &config);
+	void scorpio68k(machine_config &config);
+
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); }
 
@@ -57,12 +61,10 @@ public:
 	DECLARE_READ8_MEMBER(diablo68k_input1_r);
 	DECLARE_READ8_MEMBER(diablo68k_input2_r);
 	void diablo68k_map(address_map &map);
-	void diablo68k(machine_config &config);
 
 	// Scorpio 68000
 	DECLARE_WRITE8_MEMBER(scorpio68k_control_w);
 	void scorpio68k_map(address_map &map);
-	void scorpio68k(machine_config &config);
 };
 
 
@@ -155,17 +157,17 @@ void novag68k_state::diablo68k_map(address_map &map)
 	map(0x280000, 0x28ffff).ram();
 	map(0x300000, 0x300007).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	map(0x380000, 0x380001).nopr();
-	map(0x380000, 0x380000).w(this, FUNC(novag68k_state::diablo68k_leds_w));
-	map(0x3a0000, 0x3a0000).w(this, FUNC(novag68k_state::diablo68k_lcd_data_w));
-	map(0x3c0000, 0x3c0000).rw(this, FUNC(novag68k_state::diablo68k_input2_r), FUNC(novag68k_state::diablo68k_control_w));
-	map(0x3e0000, 0x3e0000).r(this, FUNC(novag68k_state::diablo68k_input1_r));
+	map(0x380000, 0x380000).w(FUNC(novag68k_state::diablo68k_leds_w));
+	map(0x3a0000, 0x3a0000).w(FUNC(novag68k_state::diablo68k_lcd_data_w));
+	map(0x3c0000, 0x3c0000).rw(FUNC(novag68k_state::diablo68k_input2_r), FUNC(novag68k_state::diablo68k_control_w));
+	map(0x3e0000, 0x3e0000).r(FUNC(novag68k_state::diablo68k_input1_r));
 	map(0xff8000, 0xffbfff).ram().share("nvram");
 }
 
 void novag68k_state::scorpio68k_map(address_map &map)
 {
 	diablo68k_map(map);
-	map(0x380000, 0x380000).w(this, FUNC(novag68k_state::scorpio68k_control_w));
+	map(0x380000, 0x380000).w(FUNC(novag68k_state::scorpio68k_control_w));
 	map(0x3c0000, 0x3c0001).nopw();
 }
 

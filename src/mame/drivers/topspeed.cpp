@@ -165,6 +165,7 @@ From JP manual
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -269,7 +270,7 @@ void topspeed_state::msm5205_update(int chip)
 
 	uint8_t data = m_msm_rom[chip][m_msm_pos[chip]];
 
-	m_msm[chip]->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
+	m_msm[chip]->write_data((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
 
 	if (m_msm_nibble[chip])
 		++m_msm_pos[chip];
@@ -377,7 +378,7 @@ void topspeed_state::cpua_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x400000, 0x40ffff).ram().share("sharedram");
 	map(0x500000, 0x503fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x600002, 0x600003).w(this, FUNC(topspeed_state::cpua_ctrl_w));
+	map(0x600002, 0x600003).w(FUNC(topspeed_state::cpua_ctrl_w));
 	map(0x7e0000, 0x7e0001).nopr();
 	map(0x7e0001, 0x7e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x7e0003, 0x7e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
@@ -400,9 +401,9 @@ void topspeed_state::cpub_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x400000, 0x40ffff).ram().share("sharedram");
-	map(0x880001, 0x880001).r(this, FUNC(topspeed_state::input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
+	map(0x880001, 0x880001).r(FUNC(topspeed_state::input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x880003, 0x880003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::port_r), FUNC(tc0040ioc_device::port_w));
-	map(0x900000, 0x9003ff).rw(this, FUNC(topspeed_state::motor_r), FUNC(topspeed_state::motor_w));
+	map(0x900000, 0x9003ff).rw(FUNC(topspeed_state::motor_r), FUNC(topspeed_state::motor_w));
 }
 
 
@@ -416,8 +417,8 @@ void topspeed_state::z80_prg(address_map &map)
 	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xb000, 0xcfff).w(this, FUNC(topspeed_state::msm5205_command_w));
-	map(0xd000, 0xdfff).w(this, FUNC(topspeed_state::volume_w));
+	map(0xb000, 0xcfff).w(FUNC(topspeed_state::msm5205_command_w));
+	map(0xd000, 0xdfff).w(FUNC(topspeed_state::volume_w));
 }
 
 void topspeed_state::z80_io(address_map &map)

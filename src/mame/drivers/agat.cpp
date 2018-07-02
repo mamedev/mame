@@ -106,6 +106,9 @@ public:
 		, m_upperbank(*this, A7_UPPERBANK_TAG)
 	{ }
 
+	void agat7(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
@@ -160,10 +163,9 @@ public:
 	DECLARE_READ8_MEMBER(controller_strobe_r);
 	DECLARE_WRITE8_MEMBER(controller_strobe_w);
 
-	void agat7(machine_config &config);
 	void agat7_map(address_map &map);
 	void inhbank_map(address_map &map);
-private:
+
 	int m_speaker_state;
 	int m_cassette_state;
 
@@ -320,11 +322,6 @@ void agat7_state::machine_start()
 	save_item(NAME(m_an2));
 	save_item(NAME(m_an3));
 	save_item(NAME(m_anykeydown));
-
-	// setup video pointers
-	m_video->m_ram_dev = machine().device<ram_device>(RAM_TAG);
-	m_video->m_char_ptr = memregion("gfx1")->base();
-	m_video->m_char_size = memregion("gfx1")->bytes();
 }
 
 void agat7_state::machine_reset()
@@ -692,27 +689,27 @@ WRITE8_MEMBER(agat7_state::agat7_ram_w)
 void agat7_state::agat7_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xbfff).rw(this, FUNC(agat7_state::agat7_ram_r), FUNC(agat7_state::agat7_ram_w));
-	map(0xc000, 0xc000).mirror(0xf).r(this, FUNC(agat7_state::keyb_data_r)).nopw();
-	map(0xc010, 0xc010).mirror(0xf).rw(this, FUNC(agat7_state::keyb_strobe_r), FUNC(agat7_state::keyb_strobe_w));
-	map(0xc020, 0xc020).mirror(0xf).rw(this, FUNC(agat7_state::cassette_toggle_r), FUNC(agat7_state::cassette_toggle_w));
-	map(0xc030, 0xc030).mirror(0xf).rw(this, FUNC(agat7_state::speaker_toggle_r), FUNC(agat7_state::speaker_toggle_w));
-	map(0xc040, 0xc040).mirror(0xf).rw(this, FUNC(agat7_state::interrupts_on_r), FUNC(agat7_state::interrupts_on_w));
-	map(0xc050, 0xc050).mirror(0xf).rw(this, FUNC(agat7_state::interrupts_off_r), FUNC(agat7_state::interrupts_off_w));
-	map(0xc060, 0xc067).mirror(0x8).r(this, FUNC(agat7_state::flags_r)).nopw();
-	map(0xc070, 0xc070).mirror(0xf).rw(this, FUNC(agat7_state::controller_strobe_r), FUNC(agat7_state::controller_strobe_w));
-	map(0xc080, 0xc0ef).rw(this, FUNC(agat7_state::c080_r), FUNC(agat7_state::c080_w));
-	map(0xc0f0, 0xc0ff).rw(this, FUNC(agat7_state::agat7_membank_r), FUNC(agat7_state::agat7_membank_w));
-	map(0xc100, 0xc6ff).rw(this, FUNC(agat7_state::c100_r), FUNC(agat7_state::c100_w));
+	map(0x0000, 0xbfff).rw(FUNC(agat7_state::agat7_ram_r), FUNC(agat7_state::agat7_ram_w));
+	map(0xc000, 0xc000).mirror(0xf).r(FUNC(agat7_state::keyb_data_r)).nopw();
+	map(0xc010, 0xc010).mirror(0xf).rw(FUNC(agat7_state::keyb_strobe_r), FUNC(agat7_state::keyb_strobe_w));
+	map(0xc020, 0xc020).mirror(0xf).rw(FUNC(agat7_state::cassette_toggle_r), FUNC(agat7_state::cassette_toggle_w));
+	map(0xc030, 0xc030).mirror(0xf).rw(FUNC(agat7_state::speaker_toggle_r), FUNC(agat7_state::speaker_toggle_w));
+	map(0xc040, 0xc040).mirror(0xf).rw(FUNC(agat7_state::interrupts_on_r), FUNC(agat7_state::interrupts_on_w));
+	map(0xc050, 0xc050).mirror(0xf).rw(FUNC(agat7_state::interrupts_off_r), FUNC(agat7_state::interrupts_off_w));
+	map(0xc060, 0xc067).mirror(0x8).r(FUNC(agat7_state::flags_r)).nopw();
+	map(0xc070, 0xc070).mirror(0xf).rw(FUNC(agat7_state::controller_strobe_r), FUNC(agat7_state::controller_strobe_w));
+	map(0xc080, 0xc0ef).rw(FUNC(agat7_state::c080_r), FUNC(agat7_state::c080_w));
+	map(0xc0f0, 0xc0ff).rw(FUNC(agat7_state::agat7_membank_r), FUNC(agat7_state::agat7_membank_w));
+	map(0xc100, 0xc6ff).rw(FUNC(agat7_state::c100_r), FUNC(agat7_state::c100_w));
 	map(0xc700, 0xc7ff).rw("a7video", FUNC(agat7video_device::read), FUNC(agat7video_device::write));
-	map(0xc800, 0xcfff).rw(this, FUNC(agat7_state::c800_r), FUNC(agat7_state::c800_w));
+	map(0xc800, 0xcfff).rw(FUNC(agat7_state::c800_r), FUNC(agat7_state::c800_w));
 	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }
 
 void agat7_state::inhbank_map(address_map &map)
 {
-	map(0x0000, 0x2fff).rom().region("maincpu", 0x1000).w(this, FUNC(agat7_state::inh_w));
-	map(0x3000, 0x5fff).rw(this, FUNC(agat7_state::inh_r), FUNC(agat7_state::inh_w));
+	map(0x0000, 0x2fff).rom().region("maincpu", 0x1000).w(FUNC(agat7_state::inh_w));
+	map(0x3000, 0x5fff).rw(FUNC(agat7_state::inh_r), FUNC(agat7_state::inh_w));
 }
 
 /***************************************************************************
@@ -1083,15 +1080,15 @@ static void agat7_cards(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(agat7_state::agat7)
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(14'300'000) / 14)
+	MCFG_DEVICE_ADD(m_maincpu, M6502, XTAL(14'300'000) / 14)
 	MCFG_DEVICE_PROGRAM_MAP(agat7_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", agat7_state, timer_irq, A7_VIDEO_TAG ":a7screen", 0, 1)
 
-	MCFG_DEVICE_ADD(A7_VIDEO_TAG, AGAT7VIDEO, 0)
+	MCFG_DEVICE_ADD(m_video, AGAT7VIDEO, RAM_TAG, "gfx1")
 
-	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_ADD(m_ram)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 //  MCFG_RAM_EXTRA_OPTIONS("64K,128K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
@@ -1102,14 +1099,14 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* /INH banking */
-	MCFG_DEVICE_ADD(A7_UPPERBANK_TAG, ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_ADD(m_upperbank, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
 
 	/* keyboard controller -- XXX must be replaced */
-	MCFG_DEVICE_ADD(A7_KBDC_TAG, AY3600, 0)
+	MCFG_DEVICE_ADD(m_ay3600, AY3600, 0)
 	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
 	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
 	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
@@ -1142,7 +1139,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	A2BUS_SLOT(config, "sl5", m_a2bus, agat7_cards, nullptr);
 	A2BUS_SLOT(config, "sl6", m_a2bus, agat7_cards, "a7ram");
 
-	MCFG_CASSETTE_ADD(A7_CASSETTE_TAG)
+	MCFG_CASSETTE_ADD(m_cassette)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 MACHINE_CONFIG_END
 

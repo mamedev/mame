@@ -55,6 +55,7 @@ PAGE SEL bit in PORT0 set to 1:
 #include "machine/wd_fdc.h"
 #include "machine/z80sti.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -72,6 +73,11 @@ public:
 		, m_io_dsw(*this, "DSW")
 		{ }
 
+	void ts803(machine_config &config);
+
+	void init_ts803();
+
+private:
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_READ8_MEMBER(porta0_r);
@@ -81,13 +87,11 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 	DECLARE_WRITE8_MEMBER( crtc_controlreg_w );
-	void init_ts803();
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ts803(machine_config &config);
 	void ts803_io(address_map &map);
 	void ts803_mem(address_map &map);
-private:
+
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_56kram;
 	bool m_graphics_mode;
@@ -137,15 +141,15 @@ void ts803_state::ts803_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x00, 0x0f).portr("DSW");
-	map(0x10, 0x1f).rw(this, FUNC(ts803_state::port10_r), FUNC(ts803_state::port10_w));
+	map(0x10, 0x1f).rw(FUNC(ts803_state::port10_r), FUNC(ts803_state::port10_w));
 	map(0x20, 0x2f).rw("sti", FUNC(z80sti_device::read), FUNC(z80sti_device::write));
 	map(0x30, 0x33).rw("dart", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x80, 0x83).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0x90, 0x9f).rw(this, FUNC(ts803_state::disk_0_control_r), FUNC(ts803_state::disk_0_control_w));
-	map(0xa0, 0xbf).rw(this, FUNC(ts803_state::porta0_r), FUNC(ts803_state::porta0_w));
+	map(0x90, 0x9f).rw(FUNC(ts803_state::disk_0_control_r), FUNC(ts803_state::disk_0_control_w));
+	map(0xa0, 0xbf).rw(FUNC(ts803_state::porta0_r), FUNC(ts803_state::porta0_w));
 	map(0xc0, 0xc0).rw("crtc", FUNC(sy6545_1_device::status_r), FUNC(sy6545_1_device::address_w));
 	map(0xc2, 0xc2).rw("crtc", FUNC(sy6545_1_device::register_r), FUNC(sy6545_1_device::register_w));
-	map(0xc4, 0xc4).w(this, FUNC(ts803_state::crtc_controlreg_w));
+	map(0xc4, 0xc4).w(FUNC(ts803_state::crtc_controlreg_w));
 }
 
 /* Input ports */
@@ -373,8 +377,8 @@ Bit 2 = 0 alpha memory access (round off)
 void ts803_state::machine_start()
 {
 	//save these 2 so we can examine them in the debugger
-	save_pointer(NAME(m_videoram.get()), 0x8000);
-	save_pointer(NAME(m_56kram.get()), 0xc000);
+	save_pointer(NAME(m_videoram), 0x8000);
+	save_pointer(NAME(m_56kram), 0xc000);
 }
 
 void ts803_state::machine_reset()

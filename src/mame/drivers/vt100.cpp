@@ -67,7 +67,6 @@ public:
 		m_keyboard(*this, "keyboard"),
 		m_kbduart(*this, "kbduart"),
 		m_pusart(*this, "pusart"),
-		m_dbrg(*this, "dbrg"),
 		m_nvr(*this, "nvr"),
 		m_rstbuf(*this, "rstbuf"),
 		m_rs232(*this, RS232_TAG),
@@ -76,12 +75,18 @@ public:
 	{
 	}
 
+	void vt100(machine_config &config);
+	void vt100ac(machine_config &config);
+	void vt101(machine_config &config);
+	void vt102(machine_config &config);
+	void vt180(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
 	required_device<vt100_keyboard_device> m_keyboard;
 	required_device<ay31015_device> m_kbduart;
 	required_device<i8251_device> m_pusart;
-	required_device<com8116_device> m_dbrg;
 	required_device<er1400_device> m_nvr;
 	required_device<rst_pos_buffer_device> m_rstbuf;
 	required_device<rs232_port_device> m_rs232;
@@ -99,11 +104,6 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(vt102_irq_callback);
-	void vt100(machine_config &config);
-	void vt100ac(machine_config &config);
-	void vt101(machine_config &config);
-	void vt102(machine_config &config);
-	void vt180(machine_config &config);
 	void vt100_mem(address_map &map);
 	void vt100_io(address_map &map);
 	void vt102_io(address_map &map);
@@ -161,12 +161,6 @@ READ8_MEMBER(vt100_state::flags_r)
 	return ret;
 }
 
-WRITE8_MEMBER(vt100_state::baud_rate_w)
-{
-	m_dbrg->str_w(data & 0x0f);
-	m_dbrg->stt_w(data >> 4);
-}
-
 READ8_MEMBER(vt100_state::modem_r)
 {
 	uint8_t ret = 0x0f;
@@ -201,15 +195,15 @@ void vt100_state::vt100_io(address_map &map)
 	map(0x00, 0x00).rw("pusart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x01, 0x01).rw("pusart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// 0x02 Baud rate generator
-	map(0x02, 0x02).w(this, FUNC(vt100_state::baud_rate_w));
+	map(0x02, 0x02).w("dbrg", FUNC(com8116_device::stt_str_w));
 	// 0x22 Modem buffer
-	map(0x22, 0x22).r(this, FUNC(vt100_state::modem_r));
+	map(0x22, 0x22).r(FUNC(vt100_state::modem_r));
 	// 0x42 Flags buffer
-	map(0x42, 0x42).r(this, FUNC(vt100_state::flags_r));
+	map(0x42, 0x42).r(FUNC(vt100_state::flags_r));
 	// 0x42 Brightness D/A latch
 	map(0x42, 0x42).w(m_crtc, FUNC(vt100_video_device::brightness_w));
 	// 0x62 NVR latch
-	map(0x62, 0x62).w(this, FUNC(vt100_state::nvr_latch_w));
+	map(0x62, 0x62).w(FUNC(vt100_state::nvr_latch_w));
 	// 0x82 Keyboard UART data
 	map(0x82, 0x82).rw("kbduart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	// 0xA2 Video processor DC012
@@ -233,8 +227,8 @@ WRITE8_MEMBER(vt100_state::printer_w)
 void vt100_state::vt102_io(address_map &map)
 {
 	vt100_io(map);
-	map(0x03, 0x03).select(0x1c).r(this, FUNC(vt100_state::printer_r));
-	map(0x23, 0x23).select(0x1c).w (this, FUNC(vt100_state::printer_w));
+	map(0x03, 0x03).select(0x1c).r(FUNC(vt100_state::printer_r));
+	map(0x23, 0x23).select(0x1c).w(FUNC(vt100_state::printer_w));
 }
 
 /* Input ports */

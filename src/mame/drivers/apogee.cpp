@@ -33,6 +33,9 @@ public:
 		: radio86_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 
+	void apogee(machine_config &config);
+
+private:
 	uint8_t m_out0;
 	uint8_t m_out1;
 	uint8_t m_out2;
@@ -42,7 +45,6 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	required_device<speaker_sound_device> m_speaker;
-	void apogee(machine_config &config);
 	void apogee_mem(address_map &map);
 };
 

@@ -12,6 +12,7 @@
 #include "video/mc6845.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 class peoplepc_state : public driver_device
@@ -33,6 +34,10 @@ public:
 		m_cvram(*this, "cvram"),
 		m_charram(4*1024)
 	{ }
+
+	void olypeopl(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<pic8259_device> m_pic_1;
@@ -62,10 +67,9 @@ public:
 	void floppy_unload(floppy_image_device *dev);
 
 	uint8_t m_dma0pg;
-	void olypeopl(machine_config &config);
 	void peoplepc_io(address_map &map);
 	void peoplepc_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -196,7 +200,7 @@ void peoplepc_state::peoplepc_map(address_map &map)
 	map(0x00000, 0x7ffff).ram();
 	map(0xc0000, 0xdffff).ram().share("gvram");
 	map(0xe0000, 0xe3fff).ram().share("cvram");
-	map(0xe4000, 0xe5fff).w(this, FUNC(peoplepc_state::charram_w));
+	map(0xe4000, 0xe5fff).w(FUNC(peoplepc_state::charram_w));
 	map(0xfe000, 0xfffff).rom().region("maincpu", 0);
 }
 
@@ -215,7 +219,7 @@ void peoplepc_state::peoplepc_io(address_map &map)
 	map(0x0064, 0x0067).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0x006c, 0x006c).w("h46505", FUNC(mc6845_device::address_w));
 	map(0x006e, 0x006e).rw("h46505", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0070, 0x0070).w(this, FUNC(peoplepc_state::dmapg_w));
+	map(0x0070, 0x0070).w(FUNC(peoplepc_state::dmapg_w));
 }
 
 static void peoplepc_floppies(device_slot_interface &device)

@@ -37,6 +37,7 @@ It means we probably would have to emulate a modem device for it to treat commun
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 
@@ -50,15 +51,18 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
+	void ti630(machine_config &config);
+
+	void init_ti630();
+
+private:
 	DECLARE_WRITE8_MEMBER(i80c31_p1_w);
 	DECLARE_WRITE8_MEMBER(i80c31_p3_w);
 	DECLARE_READ8_MEMBER(i80c31_p1_r);
-	void init_ti630();
 	DECLARE_PALETTE_INIT(ti630);
-	void ti630(machine_config &config);
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

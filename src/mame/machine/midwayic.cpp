@@ -644,6 +644,10 @@ DEFINE_DEVICE_TYPE(MIDWAY_IOASIC, midway_ioasic_device, "midway_ioasic", "Midway
 
 midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	midway_serial_pic2_device(mconfig, MIDWAY_IOASIC, tag, owner, clock),
+	m_io_dips(*this, ":DIPS"),
+	m_io_system(*this, ":SYSTEM"),
+	m_io_in1(*this, ":IN1"),
+	m_io_in2(*this, ":IN2"),
 	m_serial_tx_cb(*this),
 	m_aux_output_cb(*this),
 	m_has_dcs(0),
@@ -778,9 +782,9 @@ WRITE8_MEMBER(midway_ioasic_device::cage_irq_handler)
 {
 	logerror("CAGE irq handler: %d\n", data);
 	m_sound_irq_state = 0;
-	if (data & CAGE_IRQ_REASON_DATA_READY)
+	if (data & atari_cage_device::CAGE_IRQ_REASON_DATA_READY)
 		m_sound_irq_state |= 0x0040;
-	if (data & CAGE_IRQ_REASON_BUFFER_EMPTY)
+	if (data & atari_cage_device::CAGE_IRQ_REASON_BUFFER_EMPTY)
 		m_sound_irq_state |= 0x0080;
 	update_ioasic_irq();
 }
@@ -962,20 +966,20 @@ READ32_MEMBER( midway_ioasic_device::read )
 				result = 0x2001;
 			}
 			else {
-				result = machine().root_device().ioport("DIPS")->read();
+				result = m_io_dips->read();
 			}
 			break;
 
 		case IOASIC_PORT1:
-			result = machine().root_device().ioport("SYSTEM")->read();
+			result = m_io_system->read();
 			break;
 
 		case IOASIC_PORT2:
-			result = machine().root_device().ioport("IN1")->read();
+			result = m_io_in1->read();
 			break;
 
 		case IOASIC_PORT3:
-			result = machine().root_device().ioport("IN2")->read();
+			result = m_io_in2->read();
 			break;
 
 		case IOASIC_UARTIN:

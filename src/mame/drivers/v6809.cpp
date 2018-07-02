@@ -59,6 +59,7 @@ ToDo:
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -81,6 +82,9 @@ public:
 	{
 	}
 
+	void v6809(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(pb_r);
@@ -93,9 +97,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	void v6809(machine_config &config);
 	void v6809_mem(address_map &map);
-private:
+
 	uint16_t m_video_address;
 	bool m_speaker_en;
 	uint8_t m_video_index;
@@ -117,9 +120,9 @@ void v6809_state::v6809_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xefff).ram();
-	map(0xf000, 0xf000).mirror(0xfe).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(v6809_state::v6809_address_w));
-	map(0xf001, 0xf001).mirror(0xfe).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(v6809_state::v6809_register_w));
-	map(0xf200, 0xf200).mirror(0xff).w(this, FUNC(v6809_state::videoram_w));
+	map(0xf000, 0xf000).mirror(0xfe).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(v6809_state::v6809_address_w));
+	map(0xf001, 0xf001).mirror(0xfe).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(v6809_state::v6809_register_w));
+	map(0xf200, 0xf200).mirror(0xff).w(FUNC(v6809_state::videoram_w));
 	map(0xf500, 0xf501).mirror(0x36).rw("acia0", FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // modem
 	map(0xf508, 0xf509).mirror(0x36).rw("acia1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // printer
 	map(0xf600, 0xf603).mirror(0x3c).rw(m_fdc, FUNC(mb8876_device::read), FUNC(mb8876_device::write));

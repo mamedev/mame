@@ -48,14 +48,16 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void sdk86(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 
-	void sdk86(machine_config &config);
 	void sdk86_io(address_map &map);
 	void sdk86_mem(address_map &map);
-private:
+
 	uint8_t m_digit;
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;

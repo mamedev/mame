@@ -95,7 +95,7 @@ WRITE_LINE_MEMBER(tecmo_state::adpcm_int)
 		m_msm->reset_w(1);
 	else if (m_adpcm_data != -1)
 	{
-		m_msm->data_w(m_adpcm_data & 0x0f);
+		m_msm->write_data(m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
@@ -103,7 +103,7 @@ WRITE_LINE_MEMBER(tecmo_state::adpcm_int)
 		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ROM[m_adpcm_pos++];
-		m_msm->data_w(m_adpcm_data >> 4);
+		m_msm->write_data(m_adpcm_data >> 4);
 	}
 }
 
@@ -141,9 +141,9 @@ void tecmo_state::rygar_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(tecmo_state::txvideoram_w)).share("txvideoram");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(tecmo_state::fgvideoram_w)).share("fgvideoram");
-	map(0xdc00, 0xdfff).ram().w(this, FUNC(tecmo_state::bgvideoram_w)).share("bgvideoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(tecmo_state::txvideoram_w)).share("txvideoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(tecmo_state::fgvideoram_w)).share("fgvideoram");
+	map(0xdc00, 0xdfff).ram().w(FUNC(tecmo_state::bgvideoram_w)).share("bgvideoram");
 	map(0xe000, 0xe7ff).ram().share("spriteram");
 	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf000, 0xf7ff).bankr("bank1");
@@ -153,16 +153,16 @@ void tecmo_state::rygar_map(address_map &map)
 	map(0xf803, 0xf803).portr("BUTTONS2");
 	map(0xf804, 0xf804).portr("SYS_0");
 	map(0xf805, 0xf805).portr("SYS_1");
-	map(0xf806, 0xf806).r(this, FUNC(tecmo_state::dswa_l_r));
-	map(0xf807, 0xf807).r(this, FUNC(tecmo_state::dswa_h_r));
-	map(0xf808, 0xf808).r(this, FUNC(tecmo_state::dswb_l_r));
-	map(0xf809, 0xf809).r(this, FUNC(tecmo_state::dswb_h_r));
+	map(0xf806, 0xf806).r(FUNC(tecmo_state::dswa_l_r));
+	map(0xf807, 0xf807).r(FUNC(tecmo_state::dswa_h_r));
+	map(0xf808, 0xf808).r(FUNC(tecmo_state::dswb_l_r));
+	map(0xf809, 0xf809).r(FUNC(tecmo_state::dswb_h_r));
 	map(0xf80f, 0xf80f).portr("SYS_2");
-	map(0xf800, 0xf802).w(this, FUNC(tecmo_state::fgscroll_w));
-	map(0xf803, 0xf805).w(this, FUNC(tecmo_state::bgscroll_w));
+	map(0xf800, 0xf802).w(FUNC(tecmo_state::fgscroll_w));
+	map(0xf803, 0xf805).w(FUNC(tecmo_state::bgscroll_w));
 	map(0xf806, 0xf806).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xf807, 0xf807).w(this, FUNC(tecmo_state::flipscreen_w));
-	map(0xf808, 0xf808).w(this, FUNC(tecmo_state::bankswitch_w));
+	map(0xf807, 0xf807).w(FUNC(tecmo_state::flipscreen_w));
+	map(0xf808, 0xf808).w(FUNC(tecmo_state::bankswitch_w));
 	map(0xf80b, 0xf80b).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -170,9 +170,9 @@ void tecmo_state::gemini_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(tecmo_state::txvideoram_w)).share("txvideoram");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(tecmo_state::fgvideoram_w)).share("fgvideoram");
-	map(0xdc00, 0xdfff).ram().w(this, FUNC(tecmo_state::bgvideoram_w)).share("bgvideoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(tecmo_state::txvideoram_w)).share("txvideoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(tecmo_state::fgvideoram_w)).share("fgvideoram");
+	map(0xdc00, 0xdfff).ram().w(FUNC(tecmo_state::bgvideoram_w)).share("bgvideoram");
 	map(0xe000, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe800, 0xefff).ram().share("spriteram");
 	map(0xf000, 0xf7ff).bankr("bank1");
@@ -182,25 +182,25 @@ void tecmo_state::gemini_map(address_map &map)
 	map(0xf803, 0xf803).portr("BUTTONS2");
 	map(0xf804, 0xf804).portr("SYS_0");
 	map(0xf805, 0xf805).portr("SYS_1");
-	map(0xf806, 0xf806).r(this, FUNC(tecmo_state::dswa_l_r));
-	map(0xf807, 0xf807).r(this, FUNC(tecmo_state::dswa_h_r));
-	map(0xf808, 0xf808).r(this, FUNC(tecmo_state::dswb_l_r));
-	map(0xf809, 0xf809).r(this, FUNC(tecmo_state::dswb_h_r));
+	map(0xf806, 0xf806).r(FUNC(tecmo_state::dswa_l_r));
+	map(0xf807, 0xf807).r(FUNC(tecmo_state::dswa_h_r));
+	map(0xf808, 0xf808).r(FUNC(tecmo_state::dswb_l_r));
+	map(0xf809, 0xf809).r(FUNC(tecmo_state::dswb_h_r));
 	map(0xf80f, 0xf80f).portr("SYS_2");
-	map(0xf800, 0xf802).w(this, FUNC(tecmo_state::fgscroll_w));
-	map(0xf803, 0xf805).w(this, FUNC(tecmo_state::bgscroll_w));
+	map(0xf800, 0xf802).w(FUNC(tecmo_state::fgscroll_w));
+	map(0xf803, 0xf805).w(FUNC(tecmo_state::bgscroll_w));
 	map(0xf806, 0xf806).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xf807, 0xf807).w(this, FUNC(tecmo_state::flipscreen_w));
-	map(0xf808, 0xf808).w(this, FUNC(tecmo_state::bankswitch_w));
+	map(0xf807, 0xf807).w(FUNC(tecmo_state::flipscreen_w));
+	map(0xf808, 0xf808).w(FUNC(tecmo_state::bankswitch_w));
 	map(0xf80b, 0xf80b).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
 void tecmo_state::silkworm_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc3ff).ram().w(this, FUNC(tecmo_state::bgvideoram_w)).share("bgvideoram");
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(tecmo_state::fgvideoram_w)).share("fgvideoram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(tecmo_state::txvideoram_w)).share("txvideoram");
+	map(0xc000, 0xc3ff).ram().w(FUNC(tecmo_state::bgvideoram_w)).share("bgvideoram");
+	map(0xc400, 0xc7ff).ram().w(FUNC(tecmo_state::fgvideoram_w)).share("fgvideoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(tecmo_state::txvideoram_w)).share("txvideoram");
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xe7ff).ram().share("spriteram");
 	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -211,17 +211,17 @@ void tecmo_state::silkworm_map(address_map &map)
 	map(0xf803, 0xf803).portr("BUTTONS2");
 	map(0xf804, 0xf804).portr("SYS_0");
 	map(0xf805, 0xf805).portr("SYS_1");
-	map(0xf806, 0xf806).r(this, FUNC(tecmo_state::dswa_l_r));
-	map(0xf807, 0xf807).r(this, FUNC(tecmo_state::dswa_h_r));
-	map(0xf808, 0xf808).r(this, FUNC(tecmo_state::dswb_l_r));
-	map(0xf809, 0xf809).r(this, FUNC(tecmo_state::dswb_h_r));
+	map(0xf806, 0xf806).r(FUNC(tecmo_state::dswa_l_r));
+	map(0xf807, 0xf807).r(FUNC(tecmo_state::dswa_h_r));
+	map(0xf808, 0xf808).r(FUNC(tecmo_state::dswb_l_r));
+	map(0xf809, 0xf809).r(FUNC(tecmo_state::dswb_h_r));
 	map(0xf80e, 0xf80e).portr("SYS_3");
 	map(0xf80f, 0xf80f).portr("SYS_2");
-	map(0xf800, 0xf802).w(this, FUNC(tecmo_state::fgscroll_w));
-	map(0xf803, 0xf805).w(this, FUNC(tecmo_state::bgscroll_w));
+	map(0xf800, 0xf802).w(FUNC(tecmo_state::fgscroll_w));
+	map(0xf803, 0xf805).w(FUNC(tecmo_state::bgscroll_w));
 	map(0xf806, 0xf806).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xf807, 0xf807).w(this, FUNC(tecmo_state::flipscreen_w));
-	map(0xf808, 0xf808).w(this, FUNC(tecmo_state::bankswitch_w));
+	map(0xf807, 0xf807).w(FUNC(tecmo_state::flipscreen_w));
+	map(0xf808, 0xf808).w(FUNC(tecmo_state::bankswitch_w));
 	map(0xf809, 0xf809).nopw();    /* ? */
 	map(0xf80b, 0xf80b).nopw();    /* ? if mapped to watchdog like in the others, causes reset */
 }
@@ -231,9 +231,9 @@ void tecmo_state::rygar_sound_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0x8001).w("ymsnd", FUNC(ym3526_device::write));
-	map(0xc000, 0xc000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(tecmo_state::adpcm_start_w));
-	map(0xd000, 0xd000).w(this, FUNC(tecmo_state::adpcm_end_w));
-	map(0xe000, 0xe000).w(this, FUNC(tecmo_state::adpcm_vol_w));
+	map(0xc000, 0xc000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(tecmo_state::adpcm_start_w));
+	map(0xd000, 0xd000).w(FUNC(tecmo_state::adpcm_end_w));
+	map(0xe000, 0xe000).w(FUNC(tecmo_state::adpcm_vol_w));
 	map(0xf000, 0xf000).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 }
 
@@ -244,9 +244,9 @@ void tecmo_state::tecmo_sound_map(address_map &map)
 												/* writes code to this area */
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa001).w("ymsnd", FUNC(ym3812_device::write));
-	map(0xc000, 0xc000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(tecmo_state::adpcm_start_w));
-	map(0xc400, 0xc400).w(this, FUNC(tecmo_state::adpcm_end_w));
-	map(0xc800, 0xc800).w(this, FUNC(tecmo_state::adpcm_vol_w));
+	map(0xc000, 0xc000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(tecmo_state::adpcm_start_w));
+	map(0xc400, 0xc400).w(FUNC(tecmo_state::adpcm_end_w));
+	map(0xc800, 0xc800).w(FUNC(tecmo_state::adpcm_vol_w));
 	map(0xcc00, 0xcc00).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 }
 

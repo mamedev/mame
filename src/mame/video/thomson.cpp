@@ -890,7 +890,7 @@ void thomson_state::thom_floppy_active( int write )
 	/* update icon */
 	fnew = FLOP_STATE;
 	if ( fold != fnew )
-		m_floppy = fnew;
+		m_floppy_led = fnew;
 }
 
 
@@ -1041,7 +1041,7 @@ WRITE_LINE_MEMBER(thomson_state::thom_vblank)
 			m_thom_floppy_rcount--;
 		fnew = FLOP_STATE;
 		if ( fnew != fold )
-			m_floppy = fnew;
+			m_floppy_led = fnew;
 
 		/* prepare state for next frame */
 		for ( i = 0; i <= THOM_TOTAL_HEIGHT; i++ )
@@ -1160,7 +1160,7 @@ VIDEO_START_MEMBER( thomson_state, thom )
 	m_thom_floppy_wcount = 0;
 	save_item(NAME(m_thom_floppy_wcount));
 	save_item(NAME(m_thom_floppy_rcount));
-	m_floppy.resolve();
+	m_floppy_led.resolve();
 
 	m_thom_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 

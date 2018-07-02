@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "includes/channelf.h"
+
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -127,10 +128,10 @@ void channelf_state::channelf_map(address_map &map)
 
 void channelf_state::channelf_io(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(channelf_state::port_0_r), FUNC(channelf_state::port_0_w)); /* Front panel switches */
-	map(0x01, 0x01).rw(this, FUNC(channelf_state::port_1_r), FUNC(channelf_state::port_1_w)); /* Right controller     */
-	map(0x04, 0x04).rw(this, FUNC(channelf_state::port_4_r), FUNC(channelf_state::port_4_w)); /* Left controller      */
-	map(0x05, 0x05).rw(this, FUNC(channelf_state::port_5_r), FUNC(channelf_state::port_5_w));
+	map(0x00, 0x00).rw(FUNC(channelf_state::port_0_r), FUNC(channelf_state::port_0_w)); /* Front panel switches */
+	map(0x01, 0x01).rw(FUNC(channelf_state::port_1_r), FUNC(channelf_state::port_1_w)); /* Right controller     */
+	map(0x04, 0x04).rw(FUNC(channelf_state::port_4_r), FUNC(channelf_state::port_4_w)); /* Left controller      */
+	map(0x05, 0x05).rw(FUNC(channelf_state::port_5_r), FUNC(channelf_state::port_5_w));
 }
 
 

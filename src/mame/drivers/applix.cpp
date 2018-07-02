@@ -49,6 +49,7 @@
 #include "sound/wave.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -59,8 +60,8 @@
 class applix_state : public driver_device
 {
 public:
-	applix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	applix_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_base(*this, "base"),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "crtc"),
@@ -100,6 +101,11 @@ public:
 		m_expansion(*this, "expansion"),
 		m_palette(*this, "palette"){ }
 
+	void applix(machine_config &config);
+
+	void init_applix();
+
+private:
 	DECLARE_READ16_MEMBER(applix_inputs_r);
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_WRITE16_MEMBER(analog_latch_w);
@@ -134,7 +140,7 @@ public:
 	DECLARE_READ8_MEMBER( p3_read );
 	DECLARE_WRITE8_MEMBER( p3_write );
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
-	void init_applix();
+
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t m_video_latch;
 	uint8_t m_pa;
@@ -143,13 +149,13 @@ public:
 	DECLARE_PALETTE_INIT(applix);
 	uint8_t m_palette_latch[4];
 	required_shared_ptr<uint16_t> m_base;
-	void applix(machine_config &config);
+
 	void applix_mem(address_map &map);
 	void keytronic_pc3270_io(address_map &map);
 	void keytronic_pc3270_program(address_map &map);
 	void subcpu_io(address_map &map);
 	void subcpu_mem(address_map &map);
-private:
+
 	uint8_t m_pb;
 	uint8_t m_analog_latch;
 	uint8_t m_dac_latch;
@@ -204,7 +210,7 @@ private:
 	required_ioport m_io_k3b0;
 	required_ioport m_io_k0b;
 	required_shared_ptr<uint16_t> m_expansion;
-public:
+
 	required_device<palette_device> m_palette;
 };
 
@@ -244,7 +250,7 @@ WRITE16_MEMBER( applix_state::palette_w )
 	offset >>= 4;
 	if (ACCESSING_BITS_0_7)
 	{
-		m_cent_data_out->write(space, 0, data);
+		m_cent_data_out->write(data);
 	}
 	else
 		m_palette_latch[offset] = (data >> 8) & 15;
@@ -451,19 +457,19 @@ void applix_state::applix_mem(address_map &map)
 	map(0x000000, 0x3fffff).ram().share("expansion"); // Expansion
 	map(0x400000, 0x47ffff).ram().mirror(0x80000).share("base"); // Main ram
 	map(0x500000, 0x51ffff).rom().region("maincpu", 0);
-	map(0x600000, 0x60007f).w(this, FUNC(applix_state::palette_w));
-	map(0x600080, 0x6000ff).w(this, FUNC(applix_state::dac_latch_w));
-	map(0x600100, 0x60017f).w(this, FUNC(applix_state::video_latch_w)); //video latch (=border colour, high nybble; video base, low nybble) (odd)
-	map(0x600180, 0x6001ff).w(this, FUNC(applix_state::analog_latch_w));
+	map(0x600000, 0x60007f).w(FUNC(applix_state::palette_w));
+	map(0x600080, 0x6000ff).w(FUNC(applix_state::dac_latch_w));
+	map(0x600100, 0x60017f).w(FUNC(applix_state::video_latch_w)); //video latch (=border colour, high nybble; video base, low nybble) (odd)
+	map(0x600180, 0x6001ff).w(FUNC(applix_state::analog_latch_w));
 	//AM_RANGE(0x700000, 0x700007) z80-scc (ch b control, ch b data, ch a control, ch a data) on even addresses
-	map(0x700080, 0x7000ff).r(this, FUNC(applix_state::applix_inputs_r));
+	map(0x700080, 0x7000ff).r(FUNC(applix_state::applix_inputs_r));
 	map(0x700100, 0x70011f).mirror(0x60).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0xff00);
 	map(0x700180, 0x700180).mirror(0x7c).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x700182, 0x700182).mirror(0x7c).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xffffc0, 0xffffc1).rw(this, FUNC(applix_state::fdc_data_r), FUNC(applix_state::fdc_data_w));
+	map(0xffffc0, 0xffffc1).rw(FUNC(applix_state::fdc_data_r), FUNC(applix_state::fdc_data_w));
 	//AM_RANGE(0xffffc2, 0xffffc3) AM_READWRITE(fdc_int_r,fdc_int_w) // optional
-	map(0xffffc8, 0xffffcd).r(this, FUNC(applix_state::fdc_stat_r));
-	map(0xffffd0, 0xffffd1).w(this, FUNC(applix_state::fdc_cmd_w));
+	map(0xffffc8, 0xffffcd).r(FUNC(applix_state::fdc_stat_r));
+	map(0xffffd0, 0xffffd1).w(FUNC(applix_state::fdc_cmd_w));
 	//600000, 6FFFFF  io ports and latches
 	//700000, 7FFFFF  peripheral chips and devices
 	//800000, FFC000  optional roms
@@ -480,13 +486,13 @@ void applix_state::subcpu_mem(address_map &map)
 void applix_state::subcpu_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x07).r(this, FUNC(applix_state::port00_r)); //PORTR
-	map(0x08, 0x0f).rw(this, FUNC(applix_state::port08_r), FUNC(applix_state::port08_w)); //Disk select
-	map(0x10, 0x17).rw(this, FUNC(applix_state::port10_r), FUNC(applix_state::port10_w)); //IRQ
-	map(0x18, 0x1f).rw(this, FUNC(applix_state::port18_r), FUNC(applix_state::port18_w)); //data&command
-	map(0x20, 0x27).mirror(0x18).rw(this, FUNC(applix_state::port20_r), FUNC(applix_state::port20_w)); //SCSI NCR5380
+	map(0x00, 0x07).r(FUNC(applix_state::port00_r)); //PORTR
+	map(0x08, 0x0f).rw(FUNC(applix_state::port08_r), FUNC(applix_state::port08_w)); //Disk select
+	map(0x10, 0x17).rw(FUNC(applix_state::port10_r), FUNC(applix_state::port10_w)); //IRQ
+	map(0x18, 0x1f).rw(FUNC(applix_state::port18_r), FUNC(applix_state::port18_w)); //data&command
+	map(0x20, 0x27).mirror(0x18).rw(FUNC(applix_state::port20_r), FUNC(applix_state::port20_w)); //SCSI NCR5380
 	map(0x40, 0x43).mirror(0x1c).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)); //FDC
-	map(0x60, 0x63).mirror(0x1c).rw(this, FUNC(applix_state::port60_r), FUNC(applix_state::port60_w)); //anotherZ80SCC
+	map(0x60, 0x63).mirror(0x1c).rw(FUNC(applix_state::port60_r), FUNC(applix_state::port60_w)); //anotherZ80SCC
 }
 
 void applix_state::keytronic_pc3270_program(address_map &map)
@@ -496,7 +502,7 @@ void applix_state::keytronic_pc3270_program(address_map &map)
 
 void applix_state::keytronic_pc3270_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(applix_state::internal_data_read), FUNC(applix_state::internal_data_write));
+	map(0x0000, 0xffff).rw(FUNC(applix_state::internal_data_read), FUNC(applix_state::internal_data_write));
 }
 
 // io priorities:
@@ -896,7 +902,7 @@ MACHINE_CONFIG_START(applix_state::applix)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, applix_state, applix_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("via6522", via6522_device, write_pa0))
 

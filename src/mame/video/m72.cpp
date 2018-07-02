@@ -106,7 +106,7 @@ void m72_state::register_savestate()
 	save_item(NAME(m_scrolly1));
 	save_item(NAME(m_scrollx2));
 	save_item(NAME(m_scrolly2));
-	save_pointer(NAME(m_buffered_spriteram.get()), m_spriteram.bytes()/2);
+	save_pointer(NAME(m_buffered_spriteram), m_spriteram.bytes()/2);
 }
 
 
