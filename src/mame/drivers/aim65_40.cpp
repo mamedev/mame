@@ -74,10 +74,12 @@ class aim65_40_state : public driver_device
 public:
 	aim65_40_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		{ }
+	{ }
 
-		void aim65_40(machine_config &config);
-		void aim65_40_mem(address_map &map);
+	void aim65_40(machine_config &config);
+
+private:
+	void aim65_40_mem(address_map &map);
 	// devices
 	//device_t *m_via0;
 	//device_t *m_via1;

@@ -16,6 +16,11 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram") { }
 
+	void xorworld(machine_config &config);
+
+	void init_xorworld();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -32,12 +37,11 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void init_xorworld();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(xorworld);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void xorworld(machine_config &config);
+
 	void xorworld_map(address_map &map);
 };

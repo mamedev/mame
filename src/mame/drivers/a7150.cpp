@@ -67,6 +67,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void a7150(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -104,7 +107,7 @@ public:
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
-	void a7150(machine_config &config);
+
 	void a7150_io(address_map &map);
 	void a7150_mem(address_map &map);
 	void k7070_cpu_banked(address_map &map);

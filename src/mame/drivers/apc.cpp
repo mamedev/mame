@@ -95,6 +95,13 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void apc(machine_config &config);
+
+	void init_apc();
+
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc1;
@@ -144,7 +151,6 @@ public:
 		uint8_t sig; //switch signal port
 		uint8_t sh; //shift switches
 	}m_keyb;
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(apc_dma_hrq_changed);
@@ -158,20 +164,17 @@ public:
 	DECLARE_READ8_MEMBER(apc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
 
-	void init_apc();
-
 	int m_dack;
 	uint8_t m_dma_offset[4];
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
-	void apc(machine_config &config);
 	void apc_io(address_map &map);
 	void apc_map(address_map &map);
 	void upd7220_1_map(address_map &map);
 	void upd7220_2_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

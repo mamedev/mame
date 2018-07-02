@@ -50,6 +50,11 @@ public:
 		: taito_f3_state(mconfig, type, tag),
 		m_in0(*this, "IN0") { }
 
+	void drill(machine_config &config);
+
+	void init_drill();
+
+private:
 	/* input-related */
 	required_ioport m_in0;
 	uint8_t         m_defender_sensor;
@@ -63,7 +68,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sensors_w);
 	DECLARE_READ16_MEMBER(drill_irq_r);
 	DECLARE_WRITE16_MEMBER(drill_irq_w);
-	void init_drill();
+
 	DECLARE_MACHINE_START(drill);
 	DECLARE_MACHINE_RESET(drill);
 	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
@@ -71,7 +76,6 @@ public:
 	void tile_decode();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
-	void drill(machine_config &config);
 	void drill_map(address_map &map);
 
 	#ifdef UNUSED_FUNCTION

@@ -21,6 +21,9 @@ public:
 		m_decodmd(*this, "decodmd")
 	{ }
 
+	void whitestar(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	//required_device<cpu_device> m_dmdcpu;
 	//required_device<mc6845_device> m_mc6845;
@@ -39,7 +42,6 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_w);
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);
-	void whitestar(machine_config &config);
 	void whitestar_map(address_map &map);
 };
 

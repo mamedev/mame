@@ -471,6 +471,11 @@ public:
 	{
 	}
 
+	void fclown(machine_config &config);
+
+	void init_fclown();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<ay8910_device> m_ay8910;
@@ -501,13 +506,12 @@ public:
 	DECLARE_READ8_MEMBER(pia0_b_r);
 	DECLARE_READ8_MEMBER(pia1_b_r);
 	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
-	void init_fclown();
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(_5clown);
 	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void fclown(machine_config &config);
+
 	void fcaudio_map(address_map &map);
 	void fclown_map(address_map &map);
 };

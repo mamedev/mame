@@ -31,10 +31,13 @@ public:
 		: x1_state(mconfig, type, tag)
 	{ }
 
-	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void x1twin(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
-	void x1twin(machine_config &config);
+
+private:
+	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void pce_io(address_map &map);
 	void pce_mem(address_map &map);
 	void x1_io(address_map &map);

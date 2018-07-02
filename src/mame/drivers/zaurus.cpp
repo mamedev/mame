@@ -1425,6 +1425,9 @@ public:
 		, m_ram(*this, "ram")
 	{ }
 
+	void zaurus(machine_config &config);
+
+private:
 	// devices
 	required_device<pxa255_periphs_device> m_pxa_periphs;
 	required_device<cpu_device> m_maincpu;
@@ -1438,9 +1441,8 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void zaurus(machine_config &config);
 	void zaurus_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
