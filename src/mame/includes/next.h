@@ -33,6 +33,27 @@ public:
 			fdc(*this, "fdc"),
 			vram(*this, "vram") { }
 
+	void next_base(machine_config &config);
+	void next_fdc_base(machine_config &config);
+	void nextst(machine_config &config);
+	void nextsc(machine_config &config);
+	void nextct(machine_config &config);
+	void nexts2(machine_config &config);
+	void nextctc(machine_config &config);
+	void next(machine_config &config);
+	void nextstc(machine_config &config);
+	void nexts(machine_config &config);
+
+	void init_nexts2();
+	void init_next();
+	void init_nextsc();
+	void init_nextst();
+	void init_nextct();
+	void init_nextstc();
+	void init_nextctc();
+	void init_nexts();
+
+private:
 	required_device<cpu_device> maincpu;
 	required_device<mccs1850_device> rtc;
 	required_device<scc8530_t> scc;
@@ -115,16 +136,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	void ncr5390(device_t *device);
-	void next_base(machine_config &config);
-	void next_fdc_base(machine_config &config);
-	void nextst(machine_config &config);
-	void nextsc(machine_config &config);
-	void nextct(machine_config &config);
-	void nexts2(machine_config &config);
-	void nextctc(machine_config &config);
-	void next(machine_config &config);
-	void nextstc(machine_config &config);
-	void nexts(machine_config &config);
 	void next_0b_m_mem(address_map &map);
 	void next_0b_m_nofdc_mem(address_map &map);
 	void next_0c_c_mem(address_map &map);
@@ -132,7 +143,7 @@ public:
 	void next_2c_c_mem(address_map &map);
 	void next_fdc_mem(address_map &map);
 	void next_mem(address_map &map);
-protected:
+
 	struct dma_slot {
 		uint32_t start, limit, chain_start, chain_limit, current;
 		uint8_t state;
@@ -186,16 +197,6 @@ protected:
 	void dma_check_update(int slot);
 	void dma_check_end(int slot, bool eof);
 	void dma_end(int slot);
-
-public:
-	void init_nexts2();
-	void init_next();
-	void init_nextsc();
-	void init_nextst();
-	void init_nextct();
-	void init_nextstc();
-	void init_nextctc();
-	void init_nexts();
 };
 
 #endif

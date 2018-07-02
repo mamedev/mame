@@ -61,18 +61,18 @@ void tbowl_state::_6206B_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xbfff).ram().w(this, FUNC(tbowl_state::bg2videoram_w)).share("bg2videoram");
-	map(0xc000, 0xdfff).ram().w(this, FUNC(tbowl_state::bgvideoram_w)).share("bgvideoram");
-	map(0xe000, 0xefff).ram().w(this, FUNC(tbowl_state::txvideoram_w)).share("txvideoram");
+	map(0xa000, 0xbfff).ram().w(FUNC(tbowl_state::bg2videoram_w)).share("bg2videoram");
+	map(0xc000, 0xdfff).ram().w(FUNC(tbowl_state::bgvideoram_w)).share("bgvideoram");
+	map(0xe000, 0xefff).ram().w(FUNC(tbowl_state::txvideoram_w)).share("txvideoram");
 //  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write) * written during start-up, not again */
 	map(0xf000, 0xf7ff).bankr("mainbank");
 	map(0xf800, 0xfbff).ram().share("shared_ram"); /* check */
-	map(0xfc00, 0xfc00).portr("P1").w(this, FUNC(tbowl_state::boardb_bankswitch_w));
+	map(0xfc00, 0xfc00).portr("P1").w(FUNC(tbowl_state::boardb_bankswitch_w));
 	map(0xfc01, 0xfc01).portr("P2");
 //  AM_RANGE(0xfc01, 0xfc01) AM_WRITE(unknown_write) /* written during start-up, not again */
 	map(0xfc02, 0xfc02).portr("P3");
 //  AM_RANGE(0xfc02, 0xfc02) AM_WRITE(unknown_write) /* written during start-up, not again */
-	map(0xfc03, 0xfc03).portr("P4").w(this, FUNC(tbowl_state::coincounter_w));
+	map(0xfc03, 0xfc03).portr("P4").w(FUNC(tbowl_state::coincounter_w));
 //  AM_RANGE(0xfc05, 0xfc05) AM_WRITE(unknown_write) /* no idea */
 //  AM_RANGE(0xfc06, 0xfc06) AM_READ(dummy_r)        /* Read During NMI */
 	map(0xfc07, 0xfc07).portr("SYSTEM");
@@ -82,14 +82,14 @@ void tbowl_state::_6206B_map(address_map &map)
 	map(0xfc0a, 0xfc0a).portr("DSW3");
 //  AM_RANGE(0xfc0a, 0xfc0a) AM_WRITE(unknown_write) /* hardly used .. */
 	map(0xfc0d, 0xfc0d).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xfc10, 0xfc10).w(this, FUNC(tbowl_state::bg2xscroll_lo));
-	map(0xfc11, 0xfc11).w(this, FUNC(tbowl_state::bg2xscroll_hi));
-	map(0xfc12, 0xfc12).w(this, FUNC(tbowl_state::bg2yscroll_lo));
-	map(0xfc13, 0xfc13).w(this, FUNC(tbowl_state::bg2yscroll_hi));
-	map(0xfc14, 0xfc14).w(this, FUNC(tbowl_state::bgxscroll_lo));
-	map(0xfc15, 0xfc15).w(this, FUNC(tbowl_state::bgxscroll_hi));
-	map(0xfc16, 0xfc16).w(this, FUNC(tbowl_state::bgyscroll_lo));
-	map(0xfc17, 0xfc17).w(this, FUNC(tbowl_state::bgyscroll_hi));
+	map(0xfc10, 0xfc10).w(FUNC(tbowl_state::bg2xscroll_lo));
+	map(0xfc11, 0xfc11).w(FUNC(tbowl_state::bg2xscroll_hi));
+	map(0xfc12, 0xfc12).w(FUNC(tbowl_state::bg2yscroll_lo));
+	map(0xfc13, 0xfc13).w(FUNC(tbowl_state::bg2yscroll_hi));
+	map(0xfc14, 0xfc14).w(FUNC(tbowl_state::bgxscroll_lo));
+	map(0xfc15, 0xfc15).w(FUNC(tbowl_state::bgxscroll_hi));
+	map(0xfc16, 0xfc16).w(FUNC(tbowl_state::bgyscroll_lo));
+	map(0xfc17, 0xfc17).w(FUNC(tbowl_state::bgyscroll_hi));
 }
 
 /* Board C */
@@ -108,9 +108,9 @@ void tbowl_state::_6206C_map(address_map &map)
 	map(0xe000, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // 2x palettes, one for each monitor?
 	map(0xf000, 0xf7ff).bankr("subbank");
 	map(0xf800, 0xfbff).ram().share("shared_ram");
-	map(0xfc00, 0xfc00).w(this, FUNC(tbowl_state::boardc_bankswitch_w));
+	map(0xfc00, 0xfc00).w(FUNC(tbowl_state::boardc_bankswitch_w));
 	map(0xfc01, 0xfc01).nopw(); /* ? */
-	map(0xfc02, 0xfc02).w(this, FUNC(tbowl_state::trigger_nmi)); /* ? */
+	map(0xfc02, 0xfc02).w(FUNC(tbowl_state::trigger_nmi)); /* ? */
 	map(0xfc03, 0xfc03).nopw(); /* ? */
 	map(0xfc06, 0xfc06).nopw(); /* ? */
 }
@@ -142,7 +142,7 @@ void tbowl_state::adpcm_int( msm5205_device *device, int num )
 		device->reset_w(1);
 	else if (m_adpcm_data[num] != -1)
 	{
-		device->data_w(m_adpcm_data[num] & 0x0f);
+		device->write_data(m_adpcm_data[num] & 0x0f);
 		m_adpcm_data[num] = -1;
 	}
 	else
@@ -150,7 +150,7 @@ void tbowl_state::adpcm_int( msm5205_device *device, int num )
 		uint8_t *ROM = memregion("adpcm")->base() + 0x10000 * num;
 
 		m_adpcm_data[num] = ROM[m_adpcm_pos[num]++];
-		device->data_w(m_adpcm_data[num] >> 4);
+		device->write_data(m_adpcm_data[num] >> 4);
 	}
 }
 
@@ -170,9 +170,9 @@ void tbowl_state::_6206A_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd001).w("ym1", FUNC(ym3812_device::write));
 	map(0xd800, 0xd801).w("ym2", FUNC(ym3812_device::write));
-	map(0xe000, 0xe001).w(this, FUNC(tbowl_state::adpcm_end_w));
-	map(0xe002, 0xe003).w(this, FUNC(tbowl_state::adpcm_start_w));
-	map(0xe004, 0xe005).w(this, FUNC(tbowl_state::adpcm_vol_w));
+	map(0xe000, 0xe001).w(FUNC(tbowl_state::adpcm_end_w));
+	map(0xe002, 0xe003).w(FUNC(tbowl_state::adpcm_start_w));
+	map(0xe004, 0xe005).w(FUNC(tbowl_state::adpcm_vol_w));
 	map(0xe006, 0xe006).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 	map(0xe007, 0xe007).nopw(); // sound watchdog
 	map(0xe010, 0xe010).r(m_soundlatch, FUNC(generic_latch_8_device::read));

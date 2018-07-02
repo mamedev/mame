@@ -179,6 +179,7 @@ Common game codes:
 #include "sound/ymz770.h"
 #include "video/epic12.h"
 
+#include "emupal.h"
 #include "profiler.h"
 #include "screen.h"
 #include "speaker.h"
@@ -345,9 +346,9 @@ void cv1k_state::cv1k_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw().share("rombase"); // mmmbanc writes here on startup for some reason..
 	map(0x0c000000, 0x0c7fffff).ram().share("mainram");// work RAM
-	map(0x10000000, 0x10000007).rw(this, FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
+	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
-	map(0x10C00000, 0x10C00007).rw(this, FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
+	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
@@ -356,9 +357,9 @@ void cv1k_state::cv1k_d_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw().share("rombase"); // mmmbanc writes here on startup for some reason..
 	map(0x0c000000, 0x0cffffff).ram().share("mainram"); // work RAM
-	map(0x10000000, 0x10000007).rw(this, FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
+	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
-	map(0x10C00000, 0x10C00007).rw(this, FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
+	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
@@ -367,7 +368,7 @@ void cv1k_state::cv1k_port(address_map &map)
 {
 	map(SH3_PORT_C, SH3_PORT_C+7).portr("PORT_C");
 	map(SH3_PORT_D, SH3_PORT_D+7).portr("PORT_D");
-	map(SH3_PORT_E, SH3_PORT_E+7).r(this, FUNC(cv1k_state::flash_port_e_r));
+	map(SH3_PORT_E, SH3_PORT_E+7).r(FUNC(cv1k_state::flash_port_e_r));
 	map(SH3_PORT_F, SH3_PORT_F+7).portr("PORT_F");
 	map(SH3_PORT_L, SH3_PORT_L+7).portr("PORT_L");
 	map(SH3_PORT_J, SH3_PORT_J+7).rw(m_blitter, FUNC(epic12_device::fpga_r), FUNC(epic12_device::fpga_w));
@@ -809,6 +810,20 @@ ROM_START( pinkswtsx )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(e93f0627) SHA1(6f5ec0ade87f7fc42a58a8f125557a4d1f3f187d) )
 ROM_END
 
+// bootleg/hack based on 2006/04/06 MASTER VER....
+ROM_START( pinkswtssc )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "suicideclub.u4", 0x0000, 0x200000, CRC(5e03662f) SHA1(b974204b8dcd55fc1b7775f7c1806150919caff3) ) // (2017/10/31 SUICIDECLUB VER.)
+	ROM_RELOAD(0x200000,0x200000)
+
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD( "suicideclub.u2", 0x000000, 0x8400000, CRC(32324608) SHA1(cec1416c943520cb3f91eb295e2ba864a0db7d45) )
+
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4b82d250) SHA1(ee98dbc3f791efb6d58f3945bcb2044667ae7978) )
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(e93f0627) SHA1(6f5ec0ade87f7fc42a58a8f125557a4d1f3f187d) )
+ROM_END
+
 ROM_START( ddpdfk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "ddpdfk_u4", 0x0000, 0x400000, CRC(9976d699) SHA1(9dfe9d1daf6f638cafce8cdc5230209e2bcb7522) ) /* (2008/06/23  MASTER VER 1.5) */
@@ -959,6 +974,7 @@ GAME( 2006, pinkswts,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT27
 GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",          GAME_FLAGS )
 GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",            GAME_FLAGS )
 GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/xx/xx MASTER VER.)",            GAME_FLAGS ) // defaults to freeplay, possibly bootlegged from show/dev version?
+GAME( 2006, pinkswtssc, pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "bootleg",            "Pink Sweets: Suicide Club (2017/10/31 SUICIDECLUB VER., bootleg)",GAME_FLAGS )
 
 // CA015  Mushihime-Sama Futari
 GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",     GAME_FLAGS )

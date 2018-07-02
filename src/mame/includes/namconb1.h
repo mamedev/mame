@@ -46,6 +46,21 @@ public:
 		m_tilebank32(*this, "tilebank32"),
 		m_namconb_shareram(*this, "namconb_share") { }
 
+	void namconb1(machine_config &config);
+	void namconb2(machine_config &config);
+
+	void init_sws95();
+	void init_machbrkr();
+	void init_sws97();
+	void init_sws96();
+	void init_vshoot();
+	void init_nebulray();
+	void init_gunbulet();
+	void init_gslgr94j();
+	void init_outfxies();
+	void init_gslgr94u();
+
+private:
 	required_device<namco_c116_device> m_c116;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
 	required_ioport m_p1;
@@ -92,16 +107,6 @@ public:
 	DECLARE_READ8_MEMBER(dac0_r);
 
 	virtual void machine_start() override;
-	void init_sws95();
-	void init_machbrkr();
-	void init_sws97();
-	void init_sws96();
-	void init_vshoot();
-	void init_nebulray();
-	void init_gunbulet();
-	void init_gslgr94j();
-	void init_outfxies();
-	void init_gslgr94u();
 	DECLARE_MACHINE_RESET(namconb);
 	DECLARE_VIDEO_START(namconb1);
 	DECLARE_VIDEO_START(machbrkr);
@@ -123,10 +128,6 @@ public:
 	void NB2TilemapCB_outfxies(uint16_t code, int *tile, int *mask);
 	void NB2RozCB_machbrkr(uint16_t code, int *tile, int *mask);
 	void NB2RozCB_outfxies(uint16_t code, int *tile, int *mask);
-	void namconb1(machine_config &config);
-	void namconb2(machine_config &config);
-	void machbrkr(machine_config &config);
-	void outfxies(machine_config &config);
 	void namcoc75_am(address_map &map);
 	void namcoc75_io(address_map &map);
 	void namconb1_am(address_map &map);

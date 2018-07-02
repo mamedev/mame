@@ -53,13 +53,13 @@ public:
 		, m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
+	void segajw(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
 
-	void segajw(machine_config &config);
-
-protected:
+private:
 	DECLARE_READ8_MEMBER(coin_counter_r);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(hopper_w);
@@ -77,7 +77,6 @@ protected:
 	void segajw_hd63484_map(address_map &map);
 	void segajw_map(address_map &map);
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

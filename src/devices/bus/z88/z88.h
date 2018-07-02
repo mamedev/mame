@@ -90,8 +90,7 @@ class z88cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~z88cart_slot_device();
+	z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <class Object> devcb_base &set_out_flp_callback(Object &&cb) { return m_out_flp_cb.set_callback(std::forward<Object>(cb)); }
 
@@ -125,9 +124,9 @@ protected:
 private:
 	static constexpr device_timer_id TIMER_FLP_CLEAR = 0;
 
-	devcb_write_line               m_out_flp_cb;
-	device_z88cart_interface*       m_cart;
-	emu_timer *                     m_flp_timer;
+	devcb_write_line            m_out_flp_cb;
+	device_z88cart_interface*   m_cart;
+	emu_timer *                 m_flp_timer;
 };
 
 

@@ -57,6 +57,7 @@ DD10 DD14  DD18     H5            DD21
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -76,6 +77,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void dderby(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_scroll_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_shared_ptr<uint8_t> m_dderby_vidchars;
@@ -98,7 +102,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void dderby(machine_config &config);
 	void dderby_sound_map(address_map &map);
 	void memmap(address_map &map);
 };
@@ -149,13 +152,13 @@ void dmndrby_state::memmap(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x8000, 0x8fff).ram().share("nvram");
-	map(0xc000, 0xc007).r(this, FUNC(dmndrby_state::input_r));
-	map(0xc000, 0xc007).w(this, FUNC(dmndrby_state::output_w));
+	map(0xc000, 0xc007).r(FUNC(dmndrby_state::input_r));
+	map(0xc000, 0xc007).w(FUNC(dmndrby_state::output_w));
 	map(0xc802, 0xc802).portr("DSW1");
 	map(0xc803, 0xc803).portr("DSW2");
 	map(0xca00, 0xca00).nopw();//(vblank_irq_w) //???
 	map(0xca01, 0xca01).nopw(); //watchdog
-	map(0xca02, 0xca02).ram().w(this, FUNC(dmndrby_state::dderby_sound_w));
+	map(0xca02, 0xca02).ram().w(FUNC(dmndrby_state::dderby_sound_w));
 	map(0xca03, 0xca03).nopw();//(timer_irq_w) //???
 	map(0xcc00, 0xcc05).ram().share("scroll_ram");
 	map(0xce08, 0xce1f).ram().share("sprite_ram"); // horse sprites

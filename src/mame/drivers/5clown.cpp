@@ -448,6 +448,7 @@
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -470,6 +471,11 @@ public:
 	{
 	}
 
+	void fclown(machine_config &config);
+
+	void init_fclown();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<ay8910_device> m_ay8910;
@@ -500,13 +506,12 @@ public:
 	DECLARE_READ8_MEMBER(pia0_b_r);
 	DECLARE_READ8_MEMBER(pia1_b_r);
 	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
-	void init_fclown();
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(_5clown);
 	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void fclown(machine_config &config);
+
 	void fcaudio_map(address_map &map);
 	void fclown_map(address_map &map);
 };
@@ -763,12 +768,12 @@ void _5clown_state::fclown_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(_5clown_state::fclown_videoram_w)).share("videoram");   /* Init'ed at $2042 */
-	map(0x1800, 0x1bff).ram().w(this, FUNC(_5clown_state::fclown_colorram_w)).share("colorram");   /* Init'ed at $2054 */
+	map(0x1000, 0x13ff).ram().w(FUNC(_5clown_state::fclown_videoram_w)).share("videoram");   /* Init'ed at $2042 */
+	map(0x1800, 0x1bff).ram().w(FUNC(_5clown_state::fclown_colorram_w)).share("colorram");   /* Init'ed at $2054 */
 	map(0x2000, 0x7fff).rom();                 /* ROM space */
 
-	map(0xc048, 0xc048).w(this, FUNC(_5clown_state::cpu_c048_w));
-	map(0xd800, 0xd800).w(this, FUNC(_5clown_state::cpu_d800_w));
+	map(0xc048, 0xc048).w(FUNC(_5clown_state::cpu_c048_w));
+	map(0xd800, 0xd800).w(FUNC(_5clown_state::cpu_d800_w));
 
 	map(0xc400, 0xc400).portr("SW1");    /* DIP Switches bank */
 	map(0xcc00, 0xcc00).portr("SW2");    /* DIP Switches bank */
@@ -835,11 +840,11 @@ void _5clown_state::fclown_map(address_map &map)
 void _5clown_state::fcaudio_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0800).w(this, FUNC(_5clown_state::snd_800_w));
-	map(0x0a02, 0x0a02).w(this, FUNC(_5clown_state::snd_a02_w));
+	map(0x0800, 0x0800).w(FUNC(_5clown_state::snd_800_w));
+	map(0x0a02, 0x0a02).w(FUNC(_5clown_state::snd_a02_w));
 	map(0x0c04, 0x0c04).w("oki6295", FUNC(okim6295_device::write));
 	map(0x0c06, 0x0c06).r("oki6295", FUNC(okim6295_device::read));
-	map(0x0e06, 0x0e06).r(this, FUNC(_5clown_state::snd_e06_r));
+	map(0x0e06, 0x0e06).r(FUNC(_5clown_state::snd_e06_r));
 	map(0xe000, 0xffff).rom();                 /* ROM space */
 }
 

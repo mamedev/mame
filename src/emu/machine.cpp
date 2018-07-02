@@ -82,6 +82,7 @@
 #include "dirtc.h"
 #include "image.h"
 #include "network.h"
+#include "romload.h"
 #include "ui/uimain.h"
 #include <time.h>
 #include <rapidjson/writer.h>
@@ -1320,7 +1321,7 @@ WRITE8_MEMBER(dummy_space_device::write)
 
 void dummy_space_device::dummy(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(dummy_space_device::read), FUNC(dummy_space_device::write));
+	map(0x00000000, 0xffffffff).rw(FUNC(dummy_space_device::read), FUNC(dummy_space_device::write));
 }
 
 DEFINE_DEVICE_TYPE(DUMMY_SPACE, dummy_space_device, "dummy_space", "Dummy Space")

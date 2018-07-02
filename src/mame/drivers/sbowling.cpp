@@ -46,6 +46,7 @@ PROMs : NEC B406 (1kx4) x2
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -59,6 +60,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void sbowling(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -87,7 +91,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
-	void sbowling(machine_config &config);
+
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 };
@@ -250,7 +254,7 @@ READ8_MEMBER(sbowling_state::controls_r)
 void sbowling_state::main_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-	map(0x8000, 0xbfff).ram().w(this, FUNC(sbowling_state::videoram_w)).share("videoram");
+	map(0x8000, 0xbfff).ram().w(FUNC(sbowling_state::videoram_w)).share("videoram");
 	map(0xf800, 0xf801).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xf801, 0xf801).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xfc00, 0xffff).ram();
@@ -260,11 +264,11 @@ void sbowling_state::main_map(address_map &map)
 void sbowling_state::port_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0").w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x01, 0x01).rw(this, FUNC(sbowling_state::controls_r), FUNC(sbowling_state::pix_data_w));
-	map(0x02, 0x02).rw(this, FUNC(sbowling_state::pix_data_r), FUNC(sbowling_state::pix_shift_w));
+	map(0x01, 0x01).rw(FUNC(sbowling_state::controls_r), FUNC(sbowling_state::pix_data_w));
+	map(0x02, 0x02).rw(FUNC(sbowling_state::pix_data_r), FUNC(sbowling_state::pix_shift_w));
 	map(0x03, 0x03).portr("IN1").nopw();
-	map(0x04, 0x04).portr("DSW0").w(this, FUNC(sbowling_state::system_w));
-	map(0x05, 0x05).portr("DSW1").w(this, FUNC(sbowling_state::graph_control_w));
+	map(0x04, 0x04).portr("DSW0").w(FUNC(sbowling_state::system_w));
+	map(0x05, 0x05).portr("DSW1").w(FUNC(sbowling_state::graph_control_w));
 }
 
 

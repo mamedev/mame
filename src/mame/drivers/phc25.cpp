@@ -131,8 +131,8 @@ void phc25_state::phc25_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x40, 0x40).rw(this, FUNC(phc25_state::port40_r), FUNC(phc25_state::port40_w));
+	map(0x00, 0x00).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).rw(FUNC(phc25_state::port40_r), FUNC(phc25_state::port40_w));
 	map(0x80, 0x80).portr("KEY0");
 	map(0x81, 0x81).portr("KEY1");
 	map(0x82, 0x82).portr("KEY2");
@@ -328,7 +328,7 @@ MACHINE_CONFIG_START(phc25_state::phc25)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("phc25_cass")
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, phc25_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

@@ -56,6 +56,11 @@ public:
 		m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void sym1(machine_config &config);
+
+	void init_sym1();
+
+private:
 	required_shared_ptr<uint8_t> m_ram_1k;
 	required_shared_ptr<uint8_t> m_ram_2k;
 	required_shared_ptr<uint8_t> m_ram_3k;
@@ -64,7 +69,6 @@ public:
 	uint8_t m_riot_port_a;
 	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
-	void init_sym1();
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_CALLBACK_MEMBER(led_refresh);
@@ -80,9 +84,8 @@ public:
 	DECLARE_WRITE8_MEMBER(riot_b_w);
 	DECLARE_WRITE8_MEMBER(via3_a_w);
 
-	void sym1(machine_config &config);
 	void sym1_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<ttl74145_device> m_ttl74145;
@@ -383,9 +386,9 @@ MACHINE_CONFIG_END
 ROM_START( sym1 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "ver10",  "Version 1.0")
-	ROMX_LOAD("symon1_0.bin", 0x8000, 0x1000, CRC(97928583) SHA1(6ac52c54adb7a086d51bc7f6d55dd30ab3a0a331), ROM_BIOS(1))
+	ROMX_LOAD("symon1_0.bin", 0x8000, 0x1000, CRC(97928583) SHA1(6ac52c54adb7a086d51bc7f6d55dd30ab3a0a331), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ver11",  "Version 1.1")
-	ROMX_LOAD("symon1_1.bin", 0x8000, 0x1000, CRC(7a4b1e12) SHA1(cebdf815105592658cfb7af262f2101d2aeab786), ROM_BIOS(2))
+	ROMX_LOAD("symon1_1.bin", 0x8000, 0x1000, CRC(7a4b1e12) SHA1(cebdf815105592658cfb7af262f2101d2aeab786), ROM_BIOS(1))
 	ROM_LOAD("rae_b000", 0xb000, 0x1000, CRC(f6429326) SHA1(6f2f10649b54f54217bb35c8c453b5d05434bd86) )
 	ROM_LOAD("bas_c000", 0xc000, 0x1000, CRC(c168fe70) SHA1(7447a5e229140cbbde4cf90886966a5d93aa24e1) )
 	ROM_LOAD("bas_d000", 0xd000, 0x1000, CRC(8375a978) SHA1(240301bf8bb8ddb99b65a585f17895e1ad872631) )

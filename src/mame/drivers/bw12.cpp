@@ -108,7 +108,7 @@ void bw12_state::set_floppy_motor_off_timer()
 	}
 }
 
-void bw12_state::ls259_w(int address, int data)
+void bw12_state::write_ls259(int address, int data)
 {
 	switch (address)
 	{
@@ -156,7 +156,7 @@ WRITE8_MEMBER( bw12_state::ls259_w )
 	int d = BIT(offset, 0);
 	int a = (offset >> 1) & 0x07;
 
-	ls259_w(a, d);
+	write_ls259(a, d);
 }
 
 READ8_MEMBER( bw12_state::ls259_r )
@@ -178,13 +178,13 @@ void bw12_state::bw12_mem(address_map &map)
 void bw12_state::bw12_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).rw(this, FUNC(bw12_state::ls259_r), FUNC(bw12_state::ls259_w));
+	map(0x00, 0x0f).rw(FUNC(bw12_state::ls259_r), FUNC(bw12_state::ls259_w));
 	map(0x10, 0x10).mirror(0x0e).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x11, 0x11).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x20, 0x21).mirror(0x0e).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x30, 0x33).mirror(0x0c).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x40, 0x43).mirror(0x0c).rw(m_sio, FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
-	map(0x50, 0x50).mirror(0x0f).w("dac", FUNC(dac_byte_interface::write));
+	map(0x50, 0x50).mirror(0x0f).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x60, 0x63).mirror(0x0c).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 }
 
@@ -506,7 +506,7 @@ void bw12_state::machine_reset()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		ls259_w(i, 0);
+		write_ls259(i, 0);
 	}
 }
 
@@ -583,7 +583,7 @@ MACHINE_CONFIG_START(bw12_state::common)
 
 	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(*this, bw12_state, pia_pa_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, bw12_state, pia_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
@@ -631,7 +631,7 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, ctsb_w))
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(PIA6821_TAG, pia6821_device, ca1_w))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, bw12_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, bw12_state, write_centronics_fault))

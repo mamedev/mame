@@ -86,6 +86,7 @@ Notes:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -108,6 +109,17 @@ public:
 		, m_bank5(*this, "bank5")
 	{ }
 
+	void prestige_base(machine_config &config);
+	void princ(machine_config &config);
+	void gl6000sl(machine_config &config);
+	void gjmovie(machine_config &config);
+	void snotec(machine_config &config);
+	void glmcolor(machine_config &config);
+	void glcolor(machine_config &config);
+	void prestige(machine_config &config);
+	void gl7007sl(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<generic_slot_device> m_cart;
@@ -153,15 +165,7 @@ public:
 	DECLARE_PALETTE_INIT(glcolor);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	IRQ_CALLBACK_MEMBER(prestige_int_ack);
-	void prestige_base(machine_config &config);
-	void princ(machine_config &config);
-	void gl6000sl(machine_config &config);
-	void gjmovie(machine_config &config);
-	void snotec(machine_config &config);
-	void glmcolor(machine_config &config);
-	void glcolor(machine_config &config);
-	void prestige(machine_config &config);
-	void gl7007sl(machine_config &config);
+
 	void glcolor_io(address_map &map);
 	void prestige_io(address_map &map);
 	void prestige_mem(address_map &map);
@@ -336,21 +340,21 @@ void prestige_state::prestige_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x04, 0x05).rw(this, FUNC(prestige_state::mouse_r), FUNC(prestige_state::mouse_w));
-	map(0x30, 0x3f).w(this, FUNC(prestige_state::lcdc_w));
-	map(0x40, 0x40).w(this, FUNC(prestige_state::kb_w));
-	map(0x41, 0x42).r(this, FUNC(prestige_state::kb_r));
-	map(0x50, 0x56).rw(this, FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
+	map(0x04, 0x05).rw(FUNC(prestige_state::mouse_r), FUNC(prestige_state::mouse_w));
+	map(0x30, 0x3f).w(FUNC(prestige_state::lcdc_w));
+	map(0x40, 0x40).w(FUNC(prestige_state::kb_w));
+	map(0x41, 0x42).r(FUNC(prestige_state::kb_r));
+	map(0x50, 0x56).rw(FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
 }
 
 void prestige_state::glcolor_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x30, 0x3f).w(this, FUNC(prestige_state::lcdc_w));
-	map(0x40, 0x40).w(this, FUNC(prestige_state::kb_w));
-	map(0x41, 0x42).r(this, FUNC(prestige_state::kb_r));
-	map(0x50, 0x56).rw(this, FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
+	map(0x30, 0x3f).w(FUNC(prestige_state::lcdc_w));
+	map(0x40, 0x40).w(FUNC(prestige_state::kb_w));
+	map(0x41, 0x42).r(FUNC(prestige_state::kb_r));
+	map(0x50, 0x56).rw(FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
 }
 
 /* Input ports */

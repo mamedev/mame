@@ -96,6 +96,9 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_colorram(*this, "colorram") { }
 
+	void sliver(machine_config &config);
+
+private:
 	uint16_t m_io_offset;
 	uint16_t m_io_reg[IO_SIZE];
 	uint16_t m_fifo[FIFO_SIZE];
@@ -139,7 +142,7 @@ public:
 	void render_jpeg();
 
 	void postload();
-	void sliver(machine_config &config);
+
 	void oki_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void sliver_map(address_map &map);
@@ -362,20 +365,20 @@ void sliver_state::sliver_map(address_map &map)
 
 	map(0x300002, 0x300003).noprw(); // bit 0 tested, writes 0xe0 and 0xc0 - both r and w at the end of interrupt code
 
-	map(0x300004, 0x300005).w(this, FUNC(sliver_state::io_offset_w)); //unknown i/o device
-	map(0x300006, 0x300007).w(this, FUNC(sliver_state::io_data_w));
+	map(0x300004, 0x300005).w(FUNC(sliver_state::io_offset_w)); //unknown i/o device
+	map(0x300006, 0x300007).w(FUNC(sliver_state::io_data_w));
 
 	map(0x400000, 0x400001).portr("P1_P2");
 	map(0x400002, 0x400003).portr("SYSTEM");
 	map(0x400004, 0x400005).portr("DSW");
-	map(0x400006, 0x400007).w(this, FUNC(sliver_state::fifo_data_w));
-	map(0x400008, 0x400009).w(this, FUNC(sliver_state::fifo_clear_w));
-	map(0x40000a, 0x40000b).w(this, FUNC(sliver_state::fifo_flush_w));
-	map(0x40000c, 0x40000d).w(this, FUNC(sliver_state::jpeg1_w));
-	map(0x40000e, 0x40000f).w(this, FUNC(sliver_state::jpeg2_w));
+	map(0x400006, 0x400007).w(FUNC(sliver_state::fifo_data_w));
+	map(0x400008, 0x400009).w(FUNC(sliver_state::fifo_clear_w));
+	map(0x40000a, 0x40000b).w(FUNC(sliver_state::fifo_flush_w));
+	map(0x40000c, 0x40000d).w(FUNC(sliver_state::jpeg1_w));
+	map(0x40000e, 0x40000f).w(FUNC(sliver_state::jpeg2_w));
 
 	map(0x400010, 0x400015).nopw(); //unknown
-	map(0x400016, 0x400017).w(this, FUNC(sliver_state::sound_w));
+	map(0x400016, 0x400017).w(FUNC(sliver_state::sound_w));
 	map(0x400018, 0x400019).nopw(); //unknown
 
 	map(0xff0000, 0xffffff).ram();

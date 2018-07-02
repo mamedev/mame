@@ -20,6 +20,7 @@
 #include "machine/gen_latch.h"
 #include "machine/seicopbl.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -45,6 +46,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void cupsocbl(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -74,17 +78,15 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc3_tileinfo);
 
-	void cupsocbl(machine_config &config);
 	void cupsocbl_mem(address_map &map);
 	void cupsocbl_sound_mem(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	uint16_t m_layer_disable;
 };
@@ -343,7 +345,7 @@ void seicupbl_state::cupsocbl_mem(address_map &map)
 //  AM_IMPORT_FROM( legionna_cop_mem )
 	map(0x000000, 0x0fffff).rom();
 	map(0x100400, 0x1005ff).rw("seibucop_boot", FUNC(seibu_cop_bootleg_device::read), FUNC(seibu_cop_bootleg_device::write));
-	map(0x10065c, 0x10065d).w(this, FUNC(seicupbl_state::layer_disable_w));
+	map(0x10065c, 0x10065d).w(FUNC(seicupbl_state::layer_disable_w));
 	map(0x100660, 0x10066f).ram().share("vregs");
 	map(0x100700, 0x100701).portr("DSW1");
 	map(0x100704, 0x100705).portr("PLAYERS12");
@@ -351,10 +353,10 @@ void seicupbl_state::cupsocbl_mem(address_map &map)
 	map(0x10070c, 0x10070d).portr("SYSTEM");
 	map(0x10071c, 0x10071d).portr("DSW2");
 	map(0x100741, 0x100741).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x100800, 0x100fff).ram().w(this, FUNC(seicupbl_state::vram_sc0_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram().w(this, FUNC(seicupbl_state::vram_sc2_w)).share("fore_data");
-	map(0x101800, 0x101fff).ram().w(this, FUNC(seicupbl_state::vram_sc1_w)).share("mid_data");
-	map(0x102000, 0x102fff).ram().w(this, FUNC(seicupbl_state::vram_sc3_w)).share("textram");
+	map(0x100800, 0x100fff).ram().w(FUNC(seicupbl_state::vram_sc0_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram().w(FUNC(seicupbl_state::vram_sc2_w)).share("fore_data");
+	map(0x101800, 0x101fff).ram().w(FUNC(seicupbl_state::vram_sc1_w)).share("mid_data");
+	map(0x102000, 0x102fff).ram().w(FUNC(seicupbl_state::vram_sc3_w)).share("textram");
 	map(0x103000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x104000, 0x106fff).ram();
 	map(0x107000, 0x1077ff).ram().share("spriteram");
@@ -372,7 +374,7 @@ void seicupbl_state::cupsocbl_sound_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(seicupbl_state::okim_rombank_w));
+	map(0x9000, 0x9000).w(FUNC(seicupbl_state::okim_rombank_w));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -562,7 +564,7 @@ MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 	MCFG_DEVICE_PROGRAM_MAP(cupsocbl_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seicupbl_state,  irq4_line_hold) /* VBL */
 
-	MCFG_DEVICE_SEIBUCOP_BOOTLEG_ADD("seibucop_boot")
+	MCFG_DEVICE_ADD("seibucop_boot", SEIBU_COP_BOOTLEG, "maincpu")
 
 	/*Different Sound hardware*/
 	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)

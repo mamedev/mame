@@ -1190,22 +1190,22 @@ void atarigx2_state::main_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x07ffff).rom();
 	map(0xc80000, 0xc80fff).ram();
-	map(0xd00000, 0xd0000f).r(this, FUNC(atarigx2_state::a2d_data_r)).umask32(0xff00ff00);
+	map(0xd00000, 0xd0000f).r(FUNC(atarigx2_state::a2d_data_r)).umask32(0xff00ff00);
 	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0xd40000, 0xd40fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xd70000, 0xd7ffff).ram();
 	map(0xd72000, 0xd75fff).w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
 	map(0xd76000, 0xd76fff).w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
 	map(0xd78000, 0xd78fff).ram().share("rle");
-	map(0xd7a200, 0xd7a203).w(this, FUNC(atarigx2_state::mo_command_w)).share("mo_command");
+	map(0xd7a200, 0xd7a203).w(FUNC(atarigx2_state::mo_command_w)).share("mo_command");
 	map(0xd80000, 0xd9ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
 	map(0xe06000, 0xe06000).w(m_jsa, FUNC(atari_jsa_iiis_device::main_command_w));
-	map(0xe08000, 0xe08003).w(this, FUNC(atarigx2_state::latch_w));
-	map(0xe0c000, 0xe0c003).w(this, FUNC(atarigx2_state::video_int_ack_w));
+	map(0xe08000, 0xe08003).w(FUNC(atarigx2_state::latch_w));
+	map(0xe0c000, 0xe0c003).w(FUNC(atarigx2_state::video_int_ack_w));
 	map(0xe0e000, 0xe0e003).nopw();//watchdog_reset_w },
 	map(0xe80000, 0xe80003).portr("P1_P2");
-	map(0xe82000, 0xe82003).r(this, FUNC(atarigx2_state::special_port2_r));
-	map(0xe82004, 0xe82007).r(this, FUNC(atarigx2_state::special_port3_r));
+	map(0xe82000, 0xe82003).r(FUNC(atarigx2_state::special_port2_r));
+	map(0xe82004, 0xe82007).r(FUNC(atarigx2_state::special_port3_r));
 	map(0xe86000, 0xe86000).r(m_jsa, FUNC(atari_jsa_iiis_device::main_response_r));
 	map(0xff8000, 0xffffff).ram();
 }

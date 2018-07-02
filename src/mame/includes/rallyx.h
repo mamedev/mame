@@ -3,6 +3,7 @@
 #include "audio/timeplt.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
+#include "emupal.h"
 
 struct jungler_star
 {

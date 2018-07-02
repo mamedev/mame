@@ -11,6 +11,7 @@
 #include "video/bufsprite.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
+#include "emupal.h"
 
 class cbuster_state : public driver_device
 {

@@ -47,6 +47,11 @@ public:
 		m_display_maxx(0)
 	{ }
 
+	void k28(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(power_on);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<tms6100_device> m_tms6100;
@@ -89,12 +94,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_p2_w);
 	DECLARE_WRITE_LINE_MEMBER(mcu_prog_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 	void power_off();
 
-	void k28(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };

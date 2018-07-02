@@ -17,6 +17,8 @@
 #ifndef MAME_EMU_DIMEMORY_H
 #define MAME_EMU_DIMEMORY_H
 
+#include <type_traits>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -72,6 +74,11 @@ constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MAS
 class device_memory_interface : public device_interface
 {
 	friend class device_scheduler;
+	template <typename T, typename U> struct is_related_class { static constexpr bool value = std::is_convertible<std::add_pointer_t<T>, std::add_pointer_t<U> >::value; };
+	template <typename T, typename U> struct is_related_device { static constexpr bool value = emu::detail::is_device_implementation<T>::value && is_related_class<T, U>::value; };
+	template <typename T, typename U> struct is_related_interface { static constexpr bool value = emu::detail::is_device_interface<T>::value && is_related_class<T, U>::value; };
+	template <typename T, typename U> struct is_unrelated_device { static constexpr bool value = emu::detail::is_device_implementation<T>::value && !is_related_class<T, U>::value; };
+	template <typename T, typename U> struct is_unrelated_interface { static constexpr bool value = emu::detail::is_device_interface<T>::value && !is_related_class<T, U>::value; };
 
 public:
 	// construction/destruction
@@ -83,7 +90,19 @@ public:
 	const address_space_config *space_config(int spacenum = 0) const { return spacenum >= 0 && spacenum < int(m_address_config.size()) ? m_address_config[spacenum] : nullptr; }
 	int max_space_count() const { return m_address_config.size(); }
 
-	// static inline configuration helpers
+	// configuration helpers
+	template <typename T, typename U, typename Ret, typename... Params>
+	std::enable_if_t<is_related_device<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.tag(), &downcast<U &>(obj))); }
+	template <typename T, typename U, typename Ret, typename... Params>
+	std::enable_if_t<is_related_interface<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.device().tag(), &downcast<U &>(obj))); }
+	template <typename T, typename U, typename Ret, typename... Params>
+	std::enable_if_t<is_unrelated_device<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.tag(), &dynamic_cast<U &>(obj))); }
+	template <typename T, typename U, typename Ret, typename... Params>
+	std::enable_if_t<is_unrelated_interface<T, U>::value> set_addrmap(int spacenum, T &obj, Ret (U::*func)(Params...)) { set_addrmap(spacenum, address_map_constructor(func, obj.device().tag(), &dynamic_cast<U &>(obj))); }
+	template <typename T, typename Ret, typename... Params>
+	std::enable_if_t<is_related_class<device_t, T>::value> set_addrmap(int spacenum, Ret (T::*func)(Params...));
+	template <typename T, typename Ret, typename... Params>
+	std::enable_if_t<!is_related_class<device_t, T>::value> set_addrmap(int spacenum, Ret (T::*func)(Params...));
 	void set_addrmap(int spacenum, address_map_constructor map);
 
 	// basic information getters
@@ -104,16 +123,13 @@ public:
 		assert((0 <= spacenum) && (max_space_count() > spacenum));
 		m_addrspace.resize(std::max<std::size_t>(m_addrspace.size(), spacenum + 1));
 		assert(!m_addrspace[spacenum]);
-		m_addrspace[spacenum] = std::make_unique<Space>(manager, *this, spacenum);
+		m_addrspace[spacenum] = std::make_unique<Space>(manager, *this, spacenum, space_config(spacenum)->addr_width());
 	}
 	void prepare_maps() { for (auto const &space : m_addrspace) { if (space) { space->prepare_map(); } } }
 	void populate_from_maps() { for (auto const &space : m_addrspace) { if (space) { space->populate_from_map(); } } }
 	void allocate_memory() { for (auto const &space : m_addrspace) { if (space) { space->allocate_memory(); } } }
 	void locate_memory() { for (auto const &space : m_addrspace) { if (space) { space->locate_memory(); } } }
 	void set_log_unmap(bool log) { for (auto const &space : m_addrspace) { if (space) { space->set_log_unmap(log); } } }
-
-	// diagnostic functions
-	void dump(FILE *file) const;
 
 protected:
 	using space_config_vector = std::vector<std::pair<int, const address_space_config *>>;

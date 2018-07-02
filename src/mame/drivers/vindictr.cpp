@@ -78,15 +78,15 @@ void vindictr_state::main_map(address_map &map)
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(this, FUNC(vindictr_state::port1_r));
+	map(0x260010, 0x26001f).r(FUNC(vindictr_state::port1_r));
 	map(0x260020, 0x26002f).portr("260020");
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x360000, 0x360001).w(this, FUNC(vindictr_state::scanline_int_ack_w));
+	map(0x360000, 0x360001).w(FUNC(vindictr_state::scanline_int_ack_w));
 	map(0x360010, 0x360011).nopw();
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_i_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_i_device::main_command_w));
-	map(0x3e0000, 0x3e0fff).ram().w(this, FUNC(vindictr_state::vindictr_paletteram_w)).share("paletteram");
+	map(0x3e0000, 0x3e0fff).ram().w(FUNC(vindictr_state::vindictr_paletteram_w)).share("paletteram");
 	map(0x3f0000, 0x3f1fff).mirror(0x8000).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x3f2000, 0x3f3fff).mirror(0x8000).ram().share("mob");
 	map(0x3f4000, 0x3f4f7f).mirror(0x8000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");

@@ -155,6 +155,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -171,7 +172,13 @@ public:
 		, m_airraid_video(*this,"airraid_vid")
 	{ }
 
+	void airraid(machine_config &config);
+	void airraid_crypt(machine_config &config);
 
+	void init_cshootere();
+	void init_cshooter();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
 	optional_shared_ptr<uint8_t> m_mainram;
@@ -184,12 +191,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cshooter_c500_w);
 	DECLARE_WRITE8_MEMBER(cshooter_c700_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
-	void init_cshootere();
-	void init_cshooter();
 	DECLARE_MACHINE_RESET(cshooter);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
-	void airraid(machine_config &config);
-	void airraid_crypt(machine_config &config);
+
 	void airraid_map(address_map &map);
 	void airraid_sound_decrypted_opcodes_map(address_map &map);
 	void airraid_sound_map(address_map &map);
@@ -253,16 +257,16 @@ void airraid_state::airraid_map(address_map &map)
 	map(0xc002, 0xc002).portr("IN2");
 	map(0xc003, 0xc003).portr("DSW2");
 	map(0xc004, 0xc004).portr("DSW1");
-	map(0xc500, 0xc500).w(this, FUNC(airraid_state::cshooter_c500_w));
+	map(0xc500, 0xc500).w(FUNC(airraid_state::cshooter_c500_w));
 //  AM_RANGE(0xc600, 0xc600) AM_WRITE(cshooter_c600_w)            // see notes
-	map(0xc700, 0xc700).w(this, FUNC(airraid_state::cshooter_c700_w));
+	map(0xc700, 0xc700).w(FUNC(airraid_state::cshooter_c700_w));
 //  AM_RANGE(0xc801, 0xc801) AM_WRITE(cshooter_c801_w)            // see notes
 	map(0xd000, 0xd7ff).ram().w(m_airraid_video, FUNC(airraid_video_device::txram_w)).share("txram");
 	map(0xd800, 0xd8ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xda00, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xdc00, 0xdc0f).ram().w(m_airraid_video, FUNC(airraid_video_device::vregs_w)).share("vregs");
 //  AM_RANGE(0xdc10, 0xdc10) AM_RAM
-	map(0xdc11, 0xdc11).w(this, FUNC(airraid_state::bank_w));
+	map(0xdc11, 0xdc11).w(FUNC(airraid_state::bank_w));
 //  AM_RANGE(0xdc19, 0xdc19) AM_RAM
 //  AM_RANGE(0xdc1e, 0xdc1e) AM_RAM
 //  AM_RANGE(0xdc1f, 0xdc1f) AM_RAM
@@ -395,6 +399,7 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(airraid_sound_map)
 	MCFG_DEVICE_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 

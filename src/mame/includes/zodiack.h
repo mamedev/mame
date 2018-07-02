@@ -3,6 +3,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class zodiack_state : public driver_device
 {
@@ -21,6 +22,12 @@ public:
 			m_bulletsram(*this, "bulletsram")
 	{ }
 
+	void zodiack(machine_config &config);
+
+	void init_zodiack();
+	void init_percuss();
+
+private:
 	// in drivers/zodiack.c
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
@@ -63,14 +70,12 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	void init_zodiack();
-	void init_percuss();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_PALETTE_INIT(zodiack);
 	INTERRUPT_GEN_MEMBER(zodiack_sound_nmi_gen);
 	INTERRUPT_GEN_MEMBER(zodiack_main_nmi_gen);
-	void zodiack(machine_config &config);
+
 	void io_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);

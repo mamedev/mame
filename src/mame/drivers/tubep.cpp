@@ -135,7 +135,7 @@ void tubep_state::tubep_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xa000, 0xa7ff).ram();
-	map(0xc000, 0xc7ff).w(this, FUNC(tubep_state::tubep_textram_w)).share("textram");  /* RAM on GFX PCB @B13 */
+	map(0xc000, 0xc7ff).w(FUNC(tubep_state::tubep_textram_w)).share("textram");  /* RAM on GFX PCB @B13 */
 	map(0xe000, 0xe7ff).writeonly().share("share1");
 	map(0xe800, 0xebff).writeonly().share("backgroundram");             /* row of 8 x 2147 RAMs on main PCB */
 }
@@ -165,9 +165,9 @@ void tubep_state::tubep_main_portmap(address_map &map)
 	map(0xc0, 0xc0).portr("P2");
 	map(0xd0, 0xd0).portr("P1");
 
-	map(0x80, 0x80).w(this, FUNC(tubep_state::main_cpu_irq_line_clear_w));
+	map(0x80, 0x80).w(FUNC(tubep_state::main_cpu_irq_line_clear_w));
 	map(0xb0, 0xb7).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xd0, 0xd0).w(this, FUNC(tubep_state::tubep_soundlatch_w));
+	map(0xd0, 0xd0).w(FUNC(tubep_state::tubep_soundlatch_w));
 }
 
 
@@ -189,8 +189,8 @@ WRITE8_MEMBER(tubep_state::second_cpu_irq_line_clear_w)
 void tubep_state::tubep_second_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xa000, 0xa000).w(this, FUNC(tubep_state::tubep_background_a000_w));
-	map(0xc000, 0xc000).w(this, FUNC(tubep_state::tubep_background_c000_w));
+	map(0xa000, 0xa000).w(FUNC(tubep_state::tubep_background_a000_w));
+	map(0xc000, 0xc000).w(FUNC(tubep_state::tubep_background_c000_w));
 	map(0xe000, 0xe7ff).ram().share("share1");                              /* 6116 #1 */
 	map(0xe800, 0xebff).writeonly().share("backgroundram"); /* row of 8 x 2147 RAMs on main PCB */
 	map(0xf000, 0xf3ff).writeonly().share("sprite_color");                      /* sprites color lookup table */
@@ -201,7 +201,7 @@ void tubep_state::tubep_second_map(address_map &map)
 void tubep_state::tubep_second_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w(this, FUNC(tubep_state::second_cpu_irq_line_clear_w));
+	map(0x7f, 0x7f).w(FUNC(tubep_state::second_cpu_irq_line_clear_w));
 }
 
 
@@ -231,7 +231,7 @@ WRITE8_MEMBER(tubep_state::tubep_sound_unknown)
 void tubep_state::tubep_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0xd000, 0xd000).r(this, FUNC(tubep_state::tubep_sound_irq_ack));
+	map(0xd000, 0xd000).r(FUNC(tubep_state::tubep_sound_irq_ack));
 	map(0xe000, 0xe7ff).ram();     /* 6116 #3 */
 }
 
@@ -242,8 +242,8 @@ void tubep_state::tubep_sound_portmap(address_map &map)
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x04, 0x05).w("ay3", FUNC(ay8910_device::address_data_w));
-	map(0x06, 0x06).r(this, FUNC(tubep_state::tubep_soundlatch_r));
-	map(0x07, 0x07).w(this, FUNC(tubep_state::tubep_sound_unknown));
+	map(0x06, 0x06).r(FUNC(tubep_state::tubep_soundlatch_r));
+	map(0x07, 0x07).w(FUNC(tubep_state::tubep_sound_unknown));
 }
 
 
@@ -372,7 +372,7 @@ void tubep_state::nsc_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram().share("sprite_color");
 	map(0x0800, 0x0fff).ram().share("share2");
-	map(0x2000, 0x2009).w(this, FUNC(tubep_state::tubep_sprite_control_w));
+	map(0x2000, 0x2009).w(FUNC(tubep_state::tubep_sprite_control_w));
 	map(0x200a, 0x200b).nopw(); /* not used by the games - perhaps designed for debugging */
 	map(0xc000, 0xffff).rom();
 }
@@ -389,7 +389,7 @@ void tubep_state::rjammer_main_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xa000, 0xa7ff).ram();                                 /* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
-	map(0xc000, 0xc7ff).w(this, FUNC(tubep_state::tubep_textram_w)).share("textram");/* RAM on GFX PCB @B13 */
+	map(0xc000, 0xc7ff).w(FUNC(tubep_state::tubep_textram_w)).share("textram");/* RAM on GFX PCB @B13 */
 	map(0xe000, 0xe7ff).ram().share("share1");                      /* MB8416 SRAM on daughterboard (the one on the right) */
 }
 
@@ -405,7 +405,7 @@ void tubep_state::rjammer_main_portmap(address_map &map)
 	map(0xc0, 0xc0).portr("P2");
 
 	map(0xd0, 0xd7).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xe0, 0xe0).w(this, FUNC(tubep_state::main_cpu_irq_line_clear_w));    /* clear IRQ interrupt */
+	map(0xe0, 0xe0).w(FUNC(tubep_state::main_cpu_irq_line_clear_w));    /* clear IRQ interrupt */
 	map(0xf0, 0xf0).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -423,8 +423,8 @@ void tubep_state::rjammer_second_map(address_map &map)
 void tubep_state::rjammer_second_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xb0, 0xb0).w(this, FUNC(tubep_state::rjammer_background_page_w));
-	map(0xd0, 0xd0).w(this, FUNC(tubep_state::rjammer_background_LS377_w));
+	map(0xb0, 0xb0).w(FUNC(tubep_state::rjammer_background_page_w));
+	map(0xd0, 0xd0).w(FUNC(tubep_state::rjammer_background_LS377_w));
 }
 
 
@@ -537,12 +537,12 @@ WRITE_LINE_MEMBER(tubep_state::rjammer_adpcm_vck)
 
 	if (m_ls74 == 1)
 	{
-		m_msm->data_w((m_ls377 >> 0) & 15);
+		m_msm->write_data((m_ls377 >> 0) & 15);
 		m_soundcpu->set_input_line(0, ASSERT_LINE);
 	}
 	else
 	{
-		m_msm->data_w((m_ls377 >> 4) & 15);
+		m_msm->write_data((m_ls377 >> 4) & 15);
 	}
 
 }
@@ -584,13 +584,13 @@ void tubep_state::rjammer_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x10, 0x10).w(this, FUNC(tubep_state::rjammer_voice_startstop_w));
-	map(0x18, 0x18).w(this, FUNC(tubep_state::rjammer_voice_frequency_select_w));
-	map(0x80, 0x80).w(this, FUNC(tubep_state::rjammer_voice_input_w));
+	map(0x10, 0x10).w(FUNC(tubep_state::rjammer_voice_startstop_w));
+	map(0x18, 0x18).w(FUNC(tubep_state::rjammer_voice_frequency_select_w));
+	map(0x80, 0x80).w(FUNC(tubep_state::rjammer_voice_input_w));
 	map(0x90, 0x91).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x92, 0x93).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x94, 0x95).w("ay3", FUNC(ay8910_device::address_data_w));
-	map(0x96, 0x96).w(this, FUNC(tubep_state::rjammer_voice_intensity_control_w));
+	map(0x96, 0x96).w(FUNC(tubep_state::rjammer_voice_intensity_control_w));
 }
 
 

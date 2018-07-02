@@ -161,7 +161,7 @@ READ8_MEMBER( towns_state::towns_gfx_r )
 	uint8_t ret = 0;
 
 	if(m_towns_mainmem_enable != 0)
-		return m_messram->pointer()[offset+0xc0000];
+		return m_ram->pointer()[offset+0xc0000];
 
 	offset = offset << 2;
 
@@ -184,7 +184,7 @@ WRITE8_MEMBER( towns_state::towns_gfx_w )
 {
 	if(m_towns_mainmem_enable != 0)
 	{
-		m_messram->pointer()[offset+0xc0000] = data;
+		m_ram->pointer()[offset+0xc0000] = data;
 		return;
 	}
 	offset = offset << 2;
@@ -350,7 +350,7 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_w )
 READ8_MEMBER( towns_state::towns_video_cff80_mem_r )
 {
 	if(m_towns_mainmem_enable != 0)
-		return m_messram->pointer()[offset+0xcff80];
+		return m_ram->pointer()[offset+0xcff80];
 
 	return towns_video_cff80_r(space,offset);
 }
@@ -359,7 +359,7 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_mem_w )
 {
 	if(m_towns_mainmem_enable != 0)
 	{
-		m_messram->pointer()[offset+0xcff80] = data;
+		m_ram->pointer()[offset+0xcff80] = data;
 		return;
 	}
 	towns_video_cff80_w(space,offset,data);
@@ -662,7 +662,7 @@ READ8_MEMBER(towns_state::towns_video_unknown_r)
  */
 READ8_MEMBER(towns_state::towns_spriteram_low_r)
 {
-	uint8_t* RAM = m_messram->pointer();
+	uint8_t* RAM = m_ram->pointer();
 	uint8_t* ROM = m_user->base();
 
 	if(offset < 0x1000)
@@ -700,7 +700,7 @@ READ8_MEMBER(towns_state::towns_spriteram_low_r)
 
 WRITE8_MEMBER(towns_state::towns_spriteram_low_w)
 {
-	uint8_t* RAM = m_messram->pointer();
+	uint8_t* RAM = m_ram->pointer();
 
 	if(offset < 0x1000)
 	{  // 0xc8000-0xc8fff

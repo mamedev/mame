@@ -50,6 +50,7 @@
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -72,12 +73,13 @@ public:
 			m_palette(*this, "palette")
 	{ }
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void mnumber(machine_config &config);
 	void itgamble(machine_config &config);
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void itgamble_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;

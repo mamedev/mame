@@ -2,6 +2,7 @@
 // copyright-holders:BUT
 #include "sound/namco.h"
 #include "video/c45.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tceptor_state : public driver_device
@@ -25,6 +26,9 @@ public:
 		m_shutter(*this, "shutter")
 	{ }
 
+	void tceptor(machine_config &config);
+
+private:
 	uint8_t m_m6809_irq_enable;
 	uint8_t m_m68k_irq_enable;
 	uint8_t m_mcu_irq_enable;
@@ -97,7 +101,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
 	inline uint8_t fix_input0(uint8_t in1, uint8_t in2);
 	inline uint8_t fix_input1(uint8_t in1, uint8_t in2);
-	void tceptor(machine_config &config);
+
 	void m6502_a_map(address_map &map);
 	void m6502_b_map(address_map &map);
 	void m6809_map(address_map &map);

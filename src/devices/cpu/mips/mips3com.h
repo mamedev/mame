@@ -72,8 +72,8 @@
 #define MIPS3_MAX_PADDR_SHIFT       32
 
 /* cycle parameters */
-#define MIPS3_COUNT_READ_CYCLES     250
-#define MIPS3_CAUSE_READ_CYCLES     250
+#define MIPS3_COUNT_READ_CYCLES     1
+#define MIPS3_CAUSE_READ_CYCLES     1
 
 /* TLB bits */
 #define TLB_GLOBAL              0x01

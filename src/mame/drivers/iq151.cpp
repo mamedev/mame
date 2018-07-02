@@ -63,6 +63,7 @@ ToDo:
 #include "bus/iq151/video32.h"
 #include "bus/iq151/video64.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -216,7 +217,7 @@ WRITE8_MEMBER(iq151_state::cartslot_io_w)
 void iq151_state::iq151_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(iq151_state::cartslot_r), FUNC(iq151_state::cartslot_w));
+	map(0x0000, 0xffff).rw(FUNC(iq151_state::cartslot_r), FUNC(iq151_state::cartslot_w));
 
 	map(0x0000, 0x07ff).bankrw("boot");
 	map(0x0800, 0x7fff).ram();
@@ -227,9 +228,9 @@ void iq151_state::iq151_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(iq151_state::cartslot_io_r), FUNC(iq151_state::cartslot_io_w));
+	map(0x00, 0xff).rw(FUNC(iq151_state::cartslot_io_r), FUNC(iq151_state::cartslot_io_w));
 
-	map(0x80, 0x80).w(this, FUNC(iq151_state::boot_bank_w));
+	map(0x80, 0x80).w(FUNC(iq151_state::boot_bank_w));
 	map(0x84, 0x87).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x88, 0x89).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 }
@@ -478,13 +479,13 @@ ROM_START( iq151 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE )
 	/* A number of bios versions here. The load address is shown for each */
 	ROM_SYSTEM_BIOS( 0, "orig", "Original" )
-	ROMX_LOAD( "iq151_monitor_orig.rom", 0xf000, 0x1000, CRC(acd10268) SHA1(4d75c73f155ed4dc2ac51a9c22232f869cca95e2),ROM_BIOS(1))
+	ROMX_LOAD( "iq151_monitor_orig.rom", 0xf000, 0x1000, CRC(acd10268) SHA1(4d75c73f155ed4dc2ac51a9c22232f869cca95e2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "disasm", "Disassembler" )
-	ROMX_LOAD( "iq151_monitor_disasm.rom", 0xf000, 0x1000, CRC(45c2174e) SHA1(703e3271a124c3ef9330ae399308afd903316ab9),ROM_BIOS(2))
+	ROMX_LOAD( "iq151_monitor_disasm.rom", 0xf000, 0x1000, CRC(45c2174e) SHA1(703e3271a124c3ef9330ae399308afd903316ab9), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "cpm", "CPM" )
-	ROMX_LOAD( "iq151_monitor_cpm.rom", 0xf000, 0x1000, CRC(26f57013) SHA1(4df396edc375dd2dd3c82c4d2affb4f5451066f1),ROM_BIOS(3))
+	ROMX_LOAD( "iq151_monitor_cpm.rom", 0xf000, 0x1000, CRC(26f57013) SHA1(4df396edc375dd2dd3c82c4d2affb4f5451066f1), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "cpmold", "CPM (old)" )
-	ROMX_LOAD( "iq151_monitor_cpm_old.rom", 0xf000, 0x1000, CRC(6743e1b7) SHA1(ae4f3b1ba2511a1f91c4e8afdfc0e5aeb0fb3a42),ROM_BIOS(4))
+	ROMX_LOAD( "iq151_monitor_cpm_old.rom", 0xf000, 0x1000, CRC(6743e1b7) SHA1(ae4f3b1ba2511a1f91c4e8afdfc0e5aeb0fb3a42), ROM_BIOS(3))
 ROM_END
 
 /* Driver */

@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "video/tecmo_spr.h"
+#include "emupal.h"
 
 class tbowl_state : public driver_device
 {
@@ -24,6 +25,9 @@ public:
 		m_spriteram(*this, "spriteram")
 		{ }
 
+	void tbowl(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm1;
@@ -82,7 +86,7 @@ public:
 	void adpcm_int(msm5205_device *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_2);
-	void tbowl(machine_config &config);
+
 	void _6206A_map(address_map &map);
 	void _6206B_map(address_map &map);
 	void _6206C_map(address_map &map);

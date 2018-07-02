@@ -118,12 +118,12 @@ uint8_t c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t of
 	if (!roml)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		data = m_flash_roml->read(addr);
+		data = m_flash_roml->read(space, addr);
 	}
 	else if (!romh)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		data = m_flash_romh->read(addr);
+		data = m_flash_romh->read(space, addr);
 	}
 	else if (!io2)
 	{
@@ -143,12 +143,12 @@ void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 	if (!roml)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		m_flash_roml->write(addr, data);
+		m_flash_roml->write(space, addr, data);
 	}
 	else if (!romh)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		m_flash_romh->write(addr, data);
+		m_flash_romh->write(space, addr, data);
 	}
 	else if (!io1)
 	{

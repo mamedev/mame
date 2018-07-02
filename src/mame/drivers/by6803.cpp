@@ -103,8 +103,8 @@ void by6803_state::by6803_map(address_map &map)
 
 void by6803_state::by6803_io(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(by6803_state::port1_r), FUNC(by6803_state::port1_w)); // P10-P17
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(by6803_state::port2_r), FUNC(by6803_state::port2_w)); // P20-P24
+	map(M6801_PORT1, M6801_PORT1).rw(FUNC(by6803_state::port1_r), FUNC(by6803_state::port1_w)); // P10-P17
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(by6803_state::port2_r), FUNC(by6803_state::port2_w)); // P20-P24
 }
 
 static INPUT_PORTS_START( by6803 )

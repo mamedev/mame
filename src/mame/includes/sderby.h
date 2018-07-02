@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Roberto Fresca
+
+#include "emupal.h"
+
 class sderby_state : public driver_device
 {
 public:
@@ -15,6 +18,14 @@ public:
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void spacewin(machine_config &config);
+	void sderbya(machine_config &config);
+	void pmroulet(machine_config &config);
+	void shinygld(machine_config &config);
+	void sderby(machine_config &config);
+	void luckboom(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(sderby_input_r);
 	DECLARE_READ16_MEMBER(sderbya_input_r);
 	DECLARE_READ16_MEMBER(roulette_input_r);
@@ -33,12 +44,6 @@ public:
 	uint32_t screen_update_sderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pmroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int codeshift);
-	void spacewin(machine_config &config);
-	void sderbya(machine_config &config);
-	void pmroulet(machine_config &config);
-	void shinygld(machine_config &config);
-	void sderby(machine_config &config);
-	void luckboom(machine_config &config);
 	void luckboom_map(address_map &map);
 	void roulette_map(address_map &map);
 	void sderby_map(address_map &map);
@@ -46,7 +51,6 @@ public:
 	void shinygld_map(address_map &map);
 	void spacewin_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 

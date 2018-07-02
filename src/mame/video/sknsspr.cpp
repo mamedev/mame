@@ -33,7 +33,7 @@ void sknsspr_device::device_start()
 {
 	m_decodebuffer = make_unique_clear<uint8_t[]>(SUPRNOVA_DECODE_BUFFER_SIZE);
 
-	save_pointer(NAME(m_decodebuffer.get()), SUPRNOVA_DECODE_BUFFER_SIZE);
+	save_pointer(NAME(m_decodebuffer), SUPRNOVA_DECODE_BUFFER_SIZE);
 	//printf("sknsspr_device::device_start()\n");
 }
 

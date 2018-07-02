@@ -28,7 +28,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(MACHINE_CDI68070, cdi68070_device, "cdi68070", "CDI68070")
+DEFINE_DEVICE_TYPE(CDI_68070, cdi68070_device, "cdi68070", "CDI68070")
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
@@ -56,7 +56,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 //-------------------------------------------------
 
 cdi68070_device::cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MACHINE_CDI68070, tag, owner, clock)
+	: device_t(mconfig, CDI_68070, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 {
 }

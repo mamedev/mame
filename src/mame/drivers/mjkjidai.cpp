@@ -48,7 +48,7 @@ WRITE_LINE_MEMBER(mjkjidai_state::adpcm_int)
 	else
 	{
 		uint8_t const data = m_adpcmrom[m_adpcm_pos / 2];
-		m_msm->data_w(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
+		m_msm->write_data(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
 		m_adpcm_pos++;
 	}
 }
@@ -86,7 +86,7 @@ void mjkjidai_state::mjkjidai_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("nvram");   // cleared and initialized on startup if bit 6 of port 00 is 0
-	map(0xe000, 0xf7ff).ram().w(this, FUNC(mjkjidai_state::mjkjidai_videoram_w)).share("videoram");
+	map(0xe000, 0xf7ff).ram().w(FUNC(mjkjidai_state::mjkjidai_videoram_w)).share("videoram");
 }
 
 void mjkjidai_state::mjkjidai_io_map(address_map &map)
@@ -94,9 +94,9 @@ void mjkjidai_state::mjkjidai_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::write));
-	map(0x30, 0x30).w("sn2", FUNC(sn76489_device::write));
-	map(0x40, 0x40).w(this, FUNC(mjkjidai_state::adpcm_w));
+	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::command_w));
+	map(0x30, 0x30).w("sn2", FUNC(sn76489_device::command_w));
+	map(0x40, 0x40).w(FUNC(mjkjidai_state::adpcm_w));
 }
 
 

@@ -98,19 +98,19 @@ void pbaction_state::pbaction_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram().share("work_ram");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(pbaction_state::pbaction_videoram2_w)).share("videoram2");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(pbaction_state::pbaction_colorram2_w)).share("colorram2");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(pbaction_state::pbaction_videoram_w)).share("videoram");
-	map(0xdc00, 0xdfff).ram().w(this, FUNC(pbaction_state::pbaction_colorram_w)).share("colorram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(pbaction_state::pbaction_videoram2_w)).share("videoram2");
+	map(0xd400, 0xd7ff).ram().w(FUNC(pbaction_state::pbaction_colorram2_w)).share("colorram2");
+	map(0xd800, 0xdbff).ram().w(FUNC(pbaction_state::pbaction_videoram_w)).share("videoram");
+	map(0xdc00, 0xdfff).ram().w(FUNC(pbaction_state::pbaction_colorram_w)).share("colorram");
 	map(0xe000, 0xe07f).ram().share("spriteram");
 	map(0xe400, 0xe5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xe600, 0xe600).portr("P1").w(this, FUNC(pbaction_state::nmi_mask_w));
+	map(0xe600, 0xe600).portr("P1").w(FUNC(pbaction_state::nmi_mask_w));
 	map(0xe601, 0xe601).portr("P2");
 	map(0xe602, 0xe602).portr("SYSTEM");
-	map(0xe604, 0xe604).portr("DSW1").w(this, FUNC(pbaction_state::pbaction_flipscreen_w));
+	map(0xe604, 0xe604).portr("DSW1").w(FUNC(pbaction_state::pbaction_flipscreen_w));
 	map(0xe605, 0xe605).portr("DSW2");
-	map(0xe606, 0xe606).nopr() /* ??? */ .w(this, FUNC(pbaction_state::pbaction_scroll_w));
-	map(0xe800, 0xe800).w(this, FUNC(pbaction_state::pbaction_sh_command_w));
+	map(0xe606, 0xe606).nopr() /* ??? */ .w(FUNC(pbaction_state::pbaction_scroll_w));
+	map(0xe800, 0xe800).w(FUNC(pbaction_state::pbaction_sh_command_w));
 }
 
 void pbaction_state::decrypted_opcodes_map(address_map &map)
@@ -137,8 +137,8 @@ void pbaction_state::pbaction_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x8000, 0x8000).r(this, FUNC(pbaction_state::sound_data_r));
-	map(0xffff, 0xffff).w(this, FUNC(pbaction_state::sound_irq_ack_w));
+	map(0x8000, 0x8000).r(FUNC(pbaction_state::sound_data_r));
+	map(0xffff, 0xffff).w(FUNC(pbaction_state::sound_irq_ack_w));
 }
 
 void pbaction_state::pbaction2_sound_map(address_map &map)

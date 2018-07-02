@@ -71,6 +71,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void midcoin24cdjuke(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
@@ -88,10 +91,9 @@ public:
 
 	DECLARE_READ8_MEMBER(unknown_r) { return machine().rand(); }
 
-	void midcoin24cdjuke(machine_config &config);
 	void midcoin24cdjuke_io(address_map &map);
 	void midcoin24cdjuke_map(address_map &map);
-private:
+
 	uint8_t m_kb_col;
 };
 
@@ -130,7 +132,7 @@ WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 void midcoin24cdjuke_state::midcoin24cdjuke_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x7800, 0x780f).w(this, FUNC(midcoin24cdjuke_state::digit_w));
+	map(0x7800, 0x780f).w(FUNC(midcoin24cdjuke_state::digit_w));
 	map(0x8000, 0xffff).ram();
 }
 
@@ -141,7 +143,7 @@ void midcoin24cdjuke_state::midcoin24cdjuke_io(address_map &map)
 	map(0x04, 0x07).rw("ic11", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ic25", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0c, 0x0c).nopw();
-	map(0x10, 0x1f).r(this, FUNC(midcoin24cdjuke_state::unknown_r));
+	map(0x10, 0x1f).r(FUNC(midcoin24cdjuke_state::unknown_r));
 }
 
 static INPUT_PORTS_START( midcoin24cdjuke )

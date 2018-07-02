@@ -260,11 +260,11 @@ void smsbootleg_state::sms_supergame_io(address_map &map)
 	map.unmap_value_high();
 
 	map(0x04, 0x04).nopr(); //AM_READ_PORT("IN0") // these
-	map(0x08, 0x08).w(this, FUNC(smsbootleg_state::port08_w));
+	map(0x08, 0x08).w(FUNC(smsbootleg_state::port08_w));
 	map(0x14, 0x14).nopr(); //AM_READ_PORT("IN1") // seem to be from a coinage / timer MCU, changing them directly changes the credits / time value
-	map(0x18, 0x18).w(this, FUNC(smsbootleg_state::port18_w));
+	map(0x18, 0x18).w(FUNC(smsbootleg_state::port18_w));
 
-	map(0x40, 0x7f).rw(this, FUNC(smsbootleg_state::sms_count_r), FUNC(smsbootleg_state::sms_psg_w));
+	map(0x40, 0x7f).rw(FUNC(smsbootleg_state::sms_count_r), FUNC(smsbootleg_state::sms_psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
 

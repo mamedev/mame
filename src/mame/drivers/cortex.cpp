@@ -62,7 +62,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_beep(*this, "beeper")
 		, m_io_dsw(*this, "DSW")
-		{ }
+	{ }
 
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_ack_w);
@@ -90,8 +90,8 @@ void cortex_state::mem_map(address_map &map)
 	map(0x0000, 0x7fff).bankr("bankr0").bankw("bankw0");
 	map(0x8000, 0xefff).ram();
 	map(0xf100, 0xf11f).ram(); // memory mapping unit
-	map(0xf120, 0xf120).rw("crtc", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0xf121, 0xf121).rw("crtc", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0xf120, 0xf120).rw("crtc", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0xf121, 0xf121).rw("crtc", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 	//AM_RANGE(0xf140, 0xf147) // fdc tms9909
 }
 
@@ -99,8 +99,8 @@ void cortex_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0007).mirror(0x18).w("control", FUNC(ls259_device::write_d0));
-	map(0x0000, 0x0000).r(this, FUNC(cortex_state::pio_r));
-	map(0x0001, 0x0001).r(this, FUNC(cortex_state::keyboard_r));
+	map(0x0000, 0x0000).r(FUNC(cortex_state::pio_r));
+	map(0x0001, 0x0001).r(FUNC(cortex_state::keyboard_r));
 	//AM_RANGE(0x0040, 0x005f) AM_DEVWRITE("uart1", tms9902_device, cruwrite) // RS232 (r12 = 80-bf)
 	//AM_RANGE(0x0008, 0x000b) AM_DEVREAD("uart1", tms9902_device, cruread) // RS232
 	//AM_RANGE(0x00c0, 0x00df) AM_DEVWRITE("uart2", tms9902_device, cruwrite) // Cassette (r12 = 180-1bf)
@@ -219,12 +219,12 @@ MACHINE_CONFIG_END
 ROM_START( cortex )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "basic", "Cortex Bios")
-	ROMX_LOAD( "cortex.ic47", 0x10000, 0x2000, CRC(bdb8c7bd) SHA1(340829dcb7a65f2e830fd5aff82a312e3ed7918f), ROM_BIOS(1))
-	ROMX_LOAD( "cortex.ic46", 0x12000, 0x2000, CRC(4de459ea) SHA1(00a42fe556d4ffe1f85b2ce369f544b07fbd06d9), ROM_BIOS(1))
-	ROMX_LOAD( "cortex.ic45", 0x14000, 0x2000, CRC(b0c9b6e8) SHA1(4e20c3f0b7546b803da4805cd3b8616f96c3d923), ROM_BIOS(1))
+	ROMX_LOAD( "cortex.ic47", 0x10000, 0x2000, CRC(bdb8c7bd) SHA1(340829dcb7a65f2e830fd5aff82a312e3ed7918f), ROM_BIOS(0))
+	ROMX_LOAD( "cortex.ic46", 0x12000, 0x2000, CRC(4de459ea) SHA1(00a42fe556d4ffe1f85b2ce369f544b07fbd06d9), ROM_BIOS(0))
+	ROMX_LOAD( "cortex.ic45", 0x14000, 0x2000, CRC(b0c9b6e8) SHA1(4e20c3f0b7546b803da4805cd3b8616f96c3d923), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "forth", "FIG-Forth")
-	ROMX_LOAD( "forth.ic47",  0x10000, 0x2000, CRC(999034be) SHA1(0dcc7404c38aa0ae913101eb0aa98da82104b5d4), ROM_BIOS(2))
-	ROMX_LOAD( "forth.ic46",  0x12000, 0x2000, CRC(8eca54cc) SHA1(0f1680e941ef60bb9bde9a4b843b78f30dff3202), ROM_BIOS(2))
+	ROMX_LOAD( "forth.ic47",  0x10000, 0x2000, CRC(999034be) SHA1(0dcc7404c38aa0ae913101eb0aa98da82104b5d4), ROM_BIOS(1))
+	ROMX_LOAD( "forth.ic46",  0x12000, 0x2000, CRC(8eca54cc) SHA1(0f1680e941ef60bb9bde9a4b843b78f30dff3202), ROM_BIOS(1))
 ROM_END
 
 /* Driver */

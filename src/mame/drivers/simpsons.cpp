@@ -106,6 +106,7 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/k053260.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -128,9 +129,9 @@ void simpsons_state::main_map(address_map &map)
 	map(0x1f93, 0x1f93).portr("P4");
 	map(0x1fa0, 0x1fa7).w(m_k053246, FUNC(k053247_device::k053246_w));
 	map(0x1fb0, 0x1fbf).w(m_k053251, FUNC(k053251_device::write));
-	map(0x1fc0, 0x1fc0).w(this, FUNC(simpsons_state::simpsons_coin_counter_w));
-	map(0x1fc2, 0x1fc2).w(this, FUNC(simpsons_state::simpsons_eeprom_w));
-	map(0x1fc4, 0x1fc4).r(this, FUNC(simpsons_state::simpsons_sound_interrupt_r));
+	map(0x1fc0, 0x1fc0).w(FUNC(simpsons_state::simpsons_coin_counter_w));
+	map(0x1fc2, 0x1fc2).w(FUNC(simpsons_state::simpsons_eeprom_w));
+	map(0x1fc4, 0x1fc4).r(FUNC(simpsons_state::simpsons_sound_interrupt_r));
 	map(0x1fc6, 0x1fc7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
 	map(0x1fc8, 0x1fc9).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x1fca, 0x1fca).r("watchdog", FUNC(watchdog_timer_device::reset_r));
@@ -147,8 +148,8 @@ void simpsons_state::bank0000_map(address_map &map)
 
 void simpsons_state::bank2000_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(this, FUNC(simpsons_state::simpsons_k052109_r), FUNC(simpsons_state::simpsons_k052109_w));
-	map(0x2000, 0x2fff).rw(this, FUNC(simpsons_state::simpsons_k053247_r), FUNC(simpsons_state::simpsons_k053247_w));
+	map(0x0000, 0x1fff).rw(FUNC(simpsons_state::simpsons_k052109_r), FUNC(simpsons_state::simpsons_k052109_w));
+	map(0x2000, 0x2fff).rw(FUNC(simpsons_state::simpsons_k053247_r), FUNC(simpsons_state::simpsons_k053247_w));
 	map(0x3000, 0x3fff).ram();
 }
 
@@ -195,9 +196,9 @@ void simpsons_state::z80_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank2");
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xfa00, 0xfa00).w(this, FUNC(simpsons_state::z80_arm_nmi_w));
+	map(0xfa00, 0xfa00).w(FUNC(simpsons_state::z80_arm_nmi_w));
 	map(0xfc00, 0xfc2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
-	map(0xfe00, 0xfe00).w(this, FUNC(simpsons_state::z80_bankswitch_w));
+	map(0xfe00, 0xfe00).w(FUNC(simpsons_state::z80_bankswitch_w));
 }
 
 /***************************************************************************
@@ -346,7 +347,7 @@ MACHINE_CONFIG_START(simpsons_state::simpsons)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

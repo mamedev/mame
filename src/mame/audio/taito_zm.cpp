@@ -59,7 +59,7 @@ void taito_zoom_device::device_start()
 	// register for savestates
 	save_item(NAME(m_reg_address));
 	save_item(NAME(m_tms_ctrl));
-	save_pointer(NAME(m_snd_shared_ram.get()), 0x100);
+	save_pointer(NAME(m_snd_shared_ram), 0x100);
 }
 
 //-------------------------------------------------
@@ -118,7 +118,7 @@ void taito_zoom_device::taitozoom_mn_map(address_map &map)
 	map(0x400000, 0x41ffff).ram();
 	map(0x800000, 0x8007ff).rw("zsg2", FUNC(zsg2_device::read), FUNC(zsg2_device::write));
 	map(0xc00000, 0xc00001).ram(); // TMS57002 comms
-	map(0xe00000, 0xe000ff).rw(this, FUNC(taito_zoom_device::shared_ram_r), FUNC(taito_zoom_device::shared_ram_w)); // M66220FP for comms with maincpu
+	map(0xe00000, 0xe000ff).rw(FUNC(taito_zoom_device::shared_ram_r), FUNC(taito_zoom_device::shared_ram_w)); // M66220FP for comms with maincpu
 }
 
 

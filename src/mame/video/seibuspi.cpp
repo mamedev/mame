@@ -842,7 +842,7 @@ void seibuspi_state::register_video_state()
 	save_item(NAME(m_midl_layer_d14));
 	save_item(NAME(m_fore_layer_d14));
 
-	if (m_tilemap_ram != nullptr) save_pointer(NAME(m_tilemap_ram.get()), m_tilemap_ram_size/4);
-	save_pointer(NAME(m_palette_ram.get()), m_palette_ram_size/4);
-	save_pointer(NAME(m_sprite_ram.get()), m_sprite_ram_size/4);
+	if (m_tilemap_ram != nullptr) save_pointer(NAME(m_tilemap_ram), m_tilemap_ram_size/4);
+	save_pointer(NAME(m_palette_ram), m_palette_ram_size/4);
+	save_pointer(NAME(m_sprite_ram), m_sprite_ram_size/4);
 }

@@ -11,16 +11,12 @@
 #pragma once
 
 #include "sound/s14001a.h"
+#include "emupal.h"
 #include "screen.h"
 
 class wolfpack_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_PERIODIC
-	};
-
 	wolfpack_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_alpha_num_ram(*this, "alpha_num_ram"),
@@ -32,10 +28,16 @@ public:
 		m_led(*this, "led0")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
 	void wolfpack(machine_config &config);
 
-protected:
+	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+
+private:
+	enum
+	{
+		TIMER_PERIODIC
+	};
+
 	DECLARE_READ8_MEMBER(misc_r);
 	DECLARE_WRITE8_MEMBER(high_explo_w);
 	DECLARE_WRITE8_MEMBER(sonar_ping_w);
@@ -81,7 +83,6 @@ protected:
 
 	void main_map(address_map &map);
 
-private:
 	// devices, pointers
 	required_shared_ptr<uint8_t> m_alpha_num_ram;
 	required_device<cpu_device> m_maincpu;

@@ -24,6 +24,7 @@
 #include "machine/ldv1000.h"
 #include "sound/sn76496.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -35,12 +36,16 @@ class superdq_state : public driver_device
 public:
 	superdq_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc") ,
+		m_laserdisc(*this, "laserdisc"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
+	void superdq(machine_config &config);
+
+private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	uint8_t m_ld_in_latch;
 	uint8_t m_ld_out_latch;
@@ -62,7 +67,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void superdq(machine_config &config);
 	void superdq_io(address_map &map);
 	void superdq_map(address_map &map);
 };
@@ -212,18 +216,18 @@ void superdq_state::superdq_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x5c00, 0x5fff).ram().w(this, FUNC(superdq_state::superdq_videoram_w)).share("videoram");
+	map(0x5c00, 0x5fff).ram().w(FUNC(superdq_state::superdq_videoram_w)).share("videoram");
 }
 
 void superdq_state::superdq_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w(this, FUNC(superdq_state::superdq_ld_w));
+	map(0x00, 0x00).portr("IN0").w(FUNC(superdq_state::superdq_ld_w));
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("DSW1");
 	map(0x03, 0x03).portr("DSW2");
-	map(0x04, 0x04).r(this, FUNC(superdq_state::superdq_ld_r)).w("snsnd", FUNC(sn76496_device::write));
-	map(0x08, 0x08).w(this, FUNC(superdq_state::superdq_io_w));
+	map(0x04, 0x04).r(FUNC(superdq_state::superdq_ld_r)).w("snsnd", FUNC(sn76496_device::command_w));
+	map(0x08, 0x08).w(FUNC(superdq_state::superdq_io_w));
 	map(0x0c, 0x0d).noprw(); /* HD46505S */
 }
 

@@ -184,7 +184,7 @@ WRITE_LINE_MEMBER(rastan_state::rastan_msm5205_vck)
 
 	if (m_adpcm_ff)
 	{
-		m_adpcm_sel->ba_w(m_adpcm_data[m_adpcm_pos]);
+		m_adpcm_sel->write_ba(m_adpcm_data[m_adpcm_pos]);
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
 	}
 }
@@ -214,7 +214,7 @@ void rastan_state::rastan_map(address_map &map)
 	map(0x10c000, 0x10ffff).ram();
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x350008, 0x350009).nopw();    /* 0 only (often) ? */
-	map(0x380000, 0x380001).w(this, FUNC(rastan_state::rastan_spritectrl_w));  /* sprite palette bank, coin counters & lockout */
+	map(0x380000, 0x380001).w(FUNC(rastan_state::rastan_spritectrl_w));  /* sprite palette bank, coin counters & lockout */
 	map(0x390000, 0x390001).portr("P1");
 	map(0x390002, 0x390003).portr("P2");
 	map(0x390004, 0x390005).portr("SPECIAL");
@@ -241,9 +241,9 @@ void rastan_state::rastan_s_map(address_map &map)
 	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xb000, 0xb000).w(this, FUNC(rastan_state::rastan_msm5205_address_w));
-	map(0xc000, 0xc000).w(this, FUNC(rastan_state::rastan_msm5205_start_w));
-	map(0xd000, 0xd000).w(this, FUNC(rastan_state::rastan_msm5205_stop_w));
+	map(0xb000, 0xb000).w(FUNC(rastan_state::rastan_msm5205_address_w));
+	map(0xc000, 0xc000).w(FUNC(rastan_state::rastan_msm5205_start_w));
+	map(0xd000, 0xd000).w(FUNC(rastan_state::rastan_msm5205_stop_w));
 }
 
 

@@ -459,7 +459,7 @@ public:
 	void lantutor(machine_config &config);
 	void k28m2(machine_config &config);
 
-protected:
+private:
 	virtual void power_off() override;
 	void prepare_display();
 	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
@@ -488,7 +488,6 @@ protected:
 
 	virtual void machine_start() override;
 
-private:
 	// devices
 	required_device<tms5110_device> m_tms5100;
 	required_device<tms6100_device> m_tms6100;

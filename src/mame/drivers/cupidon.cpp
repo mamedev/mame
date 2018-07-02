@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "machine/68340.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -84,7 +85,7 @@ void cupidon_state::cupidon_map(address_map &map)
 	map(0x0000000, 0x07fffff).rom().mirror(0x1000000);
 
 	map(0x1000000, 0x100ffff).ram();
-	map(0x1800000, 0x1800003).r(this, FUNC(cupidon_state::cupidon_return_ffffffff));
+	map(0x1800000, 0x1800003).r(FUNC(cupidon_state::cupidon_return_ffffffff));
 	map(0x2000074, 0x2000077).ram(); // port
 
 //  AM_RANGE(0x2000040, 0x200004f) AM_RAM

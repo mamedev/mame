@@ -470,6 +470,7 @@ octopus.cpp
 odyssey2.cpp
 okean240.cpp
 olyboss.cpp
+olytext.cpp
 ondra.cpp
 onyx.cpp
 orao.cpp
@@ -750,6 +751,7 @@ ut88.cpp
 uzebox.cpp
 v100.cpp
 v102.cpp
+v550.cpp
 v1050.cpp
 v6809.cpp
 vax11.cpp
@@ -819,6 +821,9 @@ zx.cpp
 //3do.cpp
 -3dobios
 -orbatak
+-alg3do
+-md23do
+-sht3do
 //cps1.cpp
 +wofch
 +sfzch

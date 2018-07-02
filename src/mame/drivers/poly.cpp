@@ -40,29 +40,29 @@ void poly_state::poly_bank(address_map &map)
 {
 	map.unmap_value_high();
 	/* System mode */
-	map(0x00000, 0x0ffff).rw(this, FUNC(poly_state::logical_mem_r), FUNC(poly_state::logical_mem_w)); // Logical Memory
+	map(0x00000, 0x0ffff).rw(FUNC(poly_state::logical_mem_r), FUNC(poly_state::logical_mem_w)); // Logical Memory
 	map(0x0e000, 0x0e003).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));      // Video control PIA 6821
 	map(0x0e004, 0x0e005).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));      // Optional RS232 Interface
-	map(0x0e006, 0x0e006).w(this, FUNC(poly_state::baud_rate_w));                                     // Baud rate controller
+	map(0x0e006, 0x0e006).w(FUNC(poly_state::baud_rate_w));                                     // Baud rate controller
 	map(0x0e00c, 0x0e00f).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));      // Keyboard PIA 6821
 	map(0x0e020, 0x0e027).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));         // Timer 6840
-	map(0x0e030, 0x0e036).rw(this, FUNC(poly_state::network_r), FUNC(poly_state::network_w));         // Data Link Controller 6854
-	map(0x0e040, 0x0e040).w(this, FUNC(poly_state::set_protect_w));                                   // Set protect flip-flop after 1 E-cycle
+	map(0x0e030, 0x0e036).rw(FUNC(poly_state::network_r), FUNC(poly_state::network_w));         // Data Link Controller 6854
+	map(0x0e040, 0x0e040).w(FUNC(poly_state::set_protect_w));                                   // Set protect flip-flop after 1 E-cycle
 	map(0x0e050, 0x0e05f).ram().share("dat");                                                         // Dynamic Address Translator
-	map(0x0e060, 0x0e060).rw(this, FUNC(poly_state::select_map_r), FUNC(poly_state::select_map1_w));  // Select Map 1
-	map(0x0e070, 0x0e070).rw(this, FUNC(poly_state::select_map_r), FUNC(poly_state::select_map2_w));  // Select Map 2
+	map(0x0e060, 0x0e060).rw(FUNC(poly_state::select_map_r), FUNC(poly_state::select_map1_w));  // Select Map 1
+	map(0x0e070, 0x0e070).rw(FUNC(poly_state::select_map_r), FUNC(poly_state::select_map2_w));  // Select Map 2
 	map(0x0e800, 0x0efff).ram().share("videoram");                                                    // Teletext screens and System data
 	map(0x0f000, 0x0ffff).rom().region("system", 0);                                                  // System Program ROM
 	/* User mode */
-	map(0x10000, 0x1ffff).rw(this, FUNC(poly_state::logical_mem_r), FUNC(poly_state::logical_mem_w)); // Logical Memory
-	map(0x1fff0, 0x1ffff).r(this, FUNC(poly_state::vector_r));                                        // Vector fetch (interrupt and reset)
+	map(0x10000, 0x1ffff).rw(FUNC(poly_state::logical_mem_r), FUNC(poly_state::logical_mem_w)); // Logical Memory
+	map(0x1fff0, 0x1ffff).r(FUNC(poly_state::vector_r));                                        // Vector fetch (interrupt and reset)
 }
 
 void polydev_state::poly_bank(address_map &map)
 {
 	poly_state::poly_bank(map);
-	map(0x0e014, 0x0e014).rw(this, FUNC(polydev_state::drive_register_r), FUNC(polydev_state::drive_register_w)); // Drive register
-	map(0x0e018, 0x0e01b).rw(this, FUNC(polydev_state::fdc_inv_r), FUNC(polydev_state::fdc_inv_w));               // Floppy controller
+	map(0x0e014, 0x0e014).rw(FUNC(polydev_state::drive_register_r), FUNC(polydev_state::drive_register_w)); // Drive register
+	map(0x0e018, 0x0e01b).rw(FUNC(polydev_state::fdc_inv_r), FUNC(polydev_state::fdc_inv_w));               // Floppy controller
 }
 
 void poly_state::poly_mem(address_map &map)
@@ -370,7 +370,7 @@ MACHINE_CONFIG_START(polydev_state::polydev)
 	poly(config);
 
 	/* fdc */
-	MCFG_FD1771_ADD("fdc", 12.0_MHz_XTAL / 12)
+	MCFG_DEVICE_ADD("fdc", FD1771, 12.0_MHz_XTAL / 12)
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, polydev_state, motor_w))
 	MCFG_WD_FDC_FORCE_READY
 
@@ -389,58 +389,59 @@ MACHINE_CONFIG_END
 ROM_START( poly1 )
 	ROM_REGION( 0x20000, "user", 0 )
 	ROM_SYSTEM_BIOS(0, "bas34", "PolyBASIC 3.4")
-	ROMX_LOAD( "bas1.u92",       0xc000, 0x1000, CRC(04d96d81) SHA1(8d2d0980afb8c447cf235325e4dc15ed2a200f16), ROM_BIOS(1) )
-	ROMX_LOAD( "bas2.u91",       0xd000, 0x1000, CRC(3e12f823) SHA1(0b37f2dfa241fac1bf06ca93b19e44a660c7758e), ROM_BIOS(1) )
-	ROMX_LOAD( "bas3.u90",       0xe000, 0x1000, CRC(22759a84) SHA1(d22edea312567596b4ef92290ffe52a25de01487), ROM_BIOS(1) )
-	ROMX_LOAD( "bas4.u89",       0xf000, 0x1000, CRC(30650d92) SHA1(4e41ea2ec127b9ed277f5a62d52cb3432d64aa84), ROM_BIOS(1) )
+	ROMX_LOAD( "bas1.u92",       0xc000, 0x1000, CRC(04d96d81) SHA1(8d2d0980afb8c447cf235325e4dc15ed2a200f16), ROM_BIOS(0) )
+	ROMX_LOAD( "bas2.u91",       0xd000, 0x1000, CRC(3e12f823) SHA1(0b37f2dfa241fac1bf06ca93b19e44a660c7758e), ROM_BIOS(0) )
+	ROMX_LOAD( "bas3.u90",       0xe000, 0x1000, CRC(22759a84) SHA1(d22edea312567596b4ef92290ffe52a25de01487), ROM_BIOS(0) )
+	ROMX_LOAD( "bas4.u89",       0xf000, 0x1000, CRC(30650d92) SHA1(4e41ea2ec127b9ed277f5a62d52cb3432d64aa84), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, "system", 0 )
-	ROMX_LOAD( "bios.u86",       0x0000, 0x1000, CRC(fc97cc6a) SHA1(103dce01a86a47e7e235c9d2f820fa1501ab9800), ROM_BIOS(1) )
+	ROMX_LOAD( "bios.u86",       0x0000, 0x1000, CRC(fc97cc6a) SHA1(103dce01a86a47e7e235c9d2f820fa1501ab9800), ROM_BIOS(0) )
 ROM_END
 
 ROM_START( poly1e )
 	ROM_REGION( 0x20000, "user", 0 )
 	ROM_SYSTEM_BIOS(0, "bas23", "PolyBASIC 2.3")
-	ROMX_LOAD( "v3bas1.u92",     0xc000, 0x1000, CRC(ee25fe89) SHA1(af1a73434c9f5524c5a1a5e19d06500ad1b643d1), ROM_BIOS(1) )
-	ROMX_LOAD( "v3bas2.u91",     0xd000, 0x1000, CRC(6ca4a8b5) SHA1(54e71e34b55a5ee41a9e0da05d9c9cbcb2fb80c2), ROM_BIOS(1) )
-	ROMX_LOAD( "v3bas3.u90",     0xe000, 0x1000, CRC(6021fc00) SHA1(214aab19e096ddfd417993d48c11f81ec139fef3), ROM_BIOS(1) )
-	ROMX_LOAD( "v3bas4.u89",     0xf000, 0x1000, CRC(df071e52) SHA1(41482517a5dfc64f3728732b3907cee636674de4), ROM_BIOS(1) )
+	ROMX_LOAD( "v3bas1.u92",     0xc000, 0x1000, CRC(ee25fe89) SHA1(af1a73434c9f5524c5a1a5e19d06500ad1b643d1), ROM_BIOS(0) )
+	ROMX_LOAD( "v3bas2.u91",     0xd000, 0x1000, CRC(6ca4a8b5) SHA1(54e71e34b55a5ee41a9e0da05d9c9cbcb2fb80c2), ROM_BIOS(0) )
+	ROMX_LOAD( "v3bas3.u90",     0xe000, 0x1000, CRC(6021fc00) SHA1(214aab19e096ddfd417993d48c11f81ec139fef3), ROM_BIOS(0) )
+	ROMX_LOAD( "v3bas4.u89",     0xf000, 0x1000, CRC(df071e52) SHA1(41482517a5dfc64f3728732b3907cee636674de4), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, "system", 0 )
-	ROMX_LOAD( "plrt16v3e9.u86", 0x0000, 0x1000, CRC(f7e3aa86) SHA1(b642c281e54ad9698cfaec19508ae8b4df50c296), ROM_BIOS(1) )
+	ROMX_LOAD( "plrt16v3e9.u86", 0x0000, 0x1000, CRC(f7e3aa86) SHA1(b642c281e54ad9698cfaec19508ae8b4df50c296), ROM_BIOS(0) )
 ROM_END
 
 ROM_START( poly2 )
-	ROM_REGION( 0x20000, "user", 0 )
 	ROM_DEFAULT_BIOS("bas31")
 	ROM_SYSTEM_BIOS(0, "bas31", "PolyBASIC 3.1")
-	ROMX_LOAD( "bas1.u92",           0xc000, 0x1000, CRC(340b7d75) SHA1(330d31b5c90c82c08c62e2df40669ca62c8fffed), ROM_BIOS(1) )
-	ROMX_LOAD( "bas2.u91",           0xd000, 0x1000, CRC(45152d26) SHA1(7da2663f253031a587705b9db9a18e93ba4db2cf), ROM_BIOS(1) )
-	ROMX_LOAD( "bas3.u90",           0xe000, 0x1000, CRC(a6f70e62) SHA1(7912a9da29d682bb5922f3adf6136b4efc0494dc), ROM_BIOS(1) )
-	ROMX_LOAD( "bas4.u89",           0xf000, 0x1000, CRC(72d21cea) SHA1(d413490d043845ce4a9cf5cc70bd92ddc931c837), ROM_BIOS(1) )
-
 	ROM_SYSTEM_BIOS(1, "bas30", "PolyBASIC 3.0")
-	ROMX_LOAD( "bas1-12-12-84.u92",  0xc000, 0x1000, CRC(a3791342) SHA1(e801db28419eedf6eebdbb5a7eb551ba36c43cd6), ROM_BIOS(2) )
-	ROMX_LOAD( "bas2-12-12-84.u91",  0xd000, 0x1000, CRC(3bb5849e) SHA1(71c47a0d3dba096a6a79300edf56ffedce276ac6), ROM_BIOS(2) )
-	ROMX_LOAD( "bas3-12-12-84.u90",  0xe000, 0x1000, CRC(a6f70e62) SHA1(7912a9da29d682bb5922f3adf6136b4efc0494dc), ROM_BIOS(2) )
-	ROMX_LOAD( "bas4-12-12-84.u89",  0xf000, 0x1000, CRC(8f736cee) SHA1(3ec5cc49a426fc921bbadb2bcc1b86b4768627fa), ROM_BIOS(2) )
+
+	ROM_REGION( 0x20000, "user", 0 )
+	ROMX_LOAD( "bas1.u92",           0xc000, 0x1000, CRC(340b7d75) SHA1(330d31b5c90c82c08c62e2df40669ca62c8fffed), ROM_BIOS(0) )
+	ROMX_LOAD( "bas2.u91",           0xd000, 0x1000, CRC(45152d26) SHA1(7da2663f253031a587705b9db9a18e93ba4db2cf), ROM_BIOS(0) )
+	ROMX_LOAD( "bas3.u90",           0xe000, 0x1000, CRC(a6f70e62) SHA1(7912a9da29d682bb5922f3adf6136b4efc0494dc), ROM_BIOS(0) )
+	ROMX_LOAD( "bas4.u89",           0xf000, 0x1000, CRC(72d21cea) SHA1(d413490d043845ce4a9cf5cc70bd92ddc931c837), ROM_BIOS(0) )
+
+	ROMX_LOAD( "bas1-12-12-84.u92",  0xc000, 0x1000, CRC(a3791342) SHA1(e801db28419eedf6eebdbb5a7eb551ba36c43cd6), ROM_BIOS(1) )
+	ROMX_LOAD( "bas2-12-12-84.u91",  0xd000, 0x1000, CRC(3bb5849e) SHA1(71c47a0d3dba096a6a79300edf56ffedce276ac6), ROM_BIOS(1) )
+	ROMX_LOAD( "bas3-12-12-84.u90",  0xe000, 0x1000, CRC(a6f70e62) SHA1(7912a9da29d682bb5922f3adf6136b4efc0494dc), ROM_BIOS(1) )
+	ROMX_LOAD( "bas4-12-12-84.u89",  0xf000, 0x1000, CRC(8f736cee) SHA1(3ec5cc49a426fc921bbadb2bcc1b86b4768627fa), ROM_BIOS(1) )
 
 
 	ROM_REGION( 0x1000, "system", 0 )
-	ROMX_LOAD( "sys31.u86",          0x0000, 0x1000, CRC(fb54c36e) SHA1(934f84a7a99a76b0a017379a6ecd8a8e444cd085), ROM_BIOS(1) )
-	ROMX_LOAD( "plrt17-5-11-84.u86", 0x0000, 0x1000, CRC(896165dd) SHA1(005584310f1c689a9b1bb549989c5fedabead6c4), ROM_BIOS(2) )
+	ROMX_LOAD( "sys31.u86",          0x0000, 0x1000, CRC(fb54c36e) SHA1(934f84a7a99a76b0a017379a6ecd8a8e444cd085), ROM_BIOS(0) )
+	ROMX_LOAD( "plrt17-5-11-84.u86", 0x0000, 0x1000, CRC(896165dd) SHA1(005584310f1c689a9b1bb549989c5fedabead6c4), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( polydev )
 	ROM_REGION( 0x20000, "user", 0 )
 	ROM_SYSTEM_BIOS(0, "bas34", "PolyBASIC 3.4")
-	ROMX_LOAD( "v2bas1.bin",         0xc000, 0x1000, CRC(04d96d81) SHA1(8d2d0980afb8c447cf235325e4dc15ed2a200f16), ROM_BIOS(1) )
-	ROMX_LOAD( "v2bas2.bin",         0xd000, 0x1000, CRC(3e12f823) SHA1(0b37f2dfa241fac1bf06ca93b19e44a660c7758e), ROM_BIOS(1) )
-	ROMX_LOAD( "v2bas3.bin",         0xe000, 0x1000, CRC(22759a84) SHA1(d22edea312567596b4ef92290ffe52a25de01487), ROM_BIOS(1) )
-	ROMX_LOAD( "v2bas4.bin",         0xf000, 0x1000, CRC(30650d92) SHA1(4e41ea2ec127b9ed277f5a62d52cb3432d64aa84), ROM_BIOS(1) )
+	ROMX_LOAD( "v2bas1.bin",         0xc000, 0x1000, CRC(04d96d81) SHA1(8d2d0980afb8c447cf235325e4dc15ed2a200f16), ROM_BIOS(0) )
+	ROMX_LOAD( "v2bas2.bin",         0xd000, 0x1000, CRC(3e12f823) SHA1(0b37f2dfa241fac1bf06ca93b19e44a660c7758e), ROM_BIOS(0) )
+	ROMX_LOAD( "v2bas3.bin",         0xe000, 0x1000, CRC(22759a84) SHA1(d22edea312567596b4ef92290ffe52a25de01487), ROM_BIOS(0) )
+	ROMX_LOAD( "v2bas4.bin",         0xf000, 0x1000, CRC(30650d92) SHA1(4e41ea2ec127b9ed277f5a62d52cb3432d64aa84), ROM_BIOS(0) )
 
 	ROM_REGION( 0x1000, "system", 0 )
-	ROMX_LOAD( "slrt15_00f9.bin",    0x0000, 0x1000, CRC(046a9aef) SHA1(c5c74b0f66e8969c12db03899244e18228be38eb), ROM_BIOS(1) )
+	ROMX_LOAD( "slrt15_00f9.bin",    0x0000, 0x1000, CRC(046a9aef) SHA1(c5c74b0f66e8969c12db03899244e18228be38eb), ROM_BIOS(0) )
 ROM_END
 
 /* Driver */

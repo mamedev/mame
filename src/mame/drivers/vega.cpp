@@ -80,6 +80,7 @@ TODO:
 #include "machine/i8255.h"
 #include "machine/ins8154.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -114,6 +115,11 @@ public:
 	{
 	}
 
+	void vega(machine_config &config);
+
+	void init_vega();
+
+private:
 	required_device<cpu_device>     m_maincpu;
 	required_device<i8255_device>   m_i8255;
 	required_device<ins8154_device> m_ins8154;
@@ -160,15 +166,11 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_pb_r);
 	DECLARE_WRITE8_MEMBER(ay8910_pb_w);
 
-	void init_vega();
-
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(vega);
 	void draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vega(machine_config &config);
 	void vega_io_map(address_map &map);
 	void vega_map(address_map &map);
 };
@@ -396,7 +398,7 @@ void vega_state::vega_map(address_map &map)
 
 void vega_state::vega_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(vega_state::extern_r), FUNC(vega_state::extern_w));
+	map(0x00, 0xff).rw(FUNC(vega_state::extern_r), FUNC(vega_state::extern_w));
 }
 
 

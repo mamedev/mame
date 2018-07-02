@@ -77,18 +77,23 @@ class pengo_state : public pacman_state
 {
 public:
 	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pacman_state(mconfig, type, tag), m_decrypted_opcodes(*this, "decrypted_opcodes") { }
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	void init_penta();
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+		: pacman_state(mconfig, type, tag), m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void jrpacmbl(machine_config &config);
 	void pengoe(machine_config &config);
 	void pengou(machine_config &config);
 	void pengo(machine_config &config);
+
+	void init_penta();
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void decrypted_opcodes_map(address_map &map);
 	void jrpacmbl_map(address_map &map);
 	void pengo_map(address_map &map);
@@ -142,8 +147,8 @@ WRITE_LINE_MEMBER(pengo_state::irq_mask_w)
 void pengo_state::pengo_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(pengo_state::pacman_videoram_w)).share("videoram"); /* video and color RAM, scratchpad RAM, sprite codes */
-	map(0x8400, 0x87ff).ram().w(this, FUNC(pengo_state::pacman_colorram_w)).share("colorram");
+	map(0x8000, 0x83ff).ram().w(FUNC(pengo_state::pacman_videoram_w)).share("videoram"); /* video and color RAM, scratchpad RAM, sprite codes */
+	map(0x8400, 0x87ff).ram().w(FUNC(pengo_state::pacman_colorram_w)).share("colorram");
 	map(0x8800, 0x8fef).ram().share("mainram");
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
 	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
@@ -168,12 +173,12 @@ void pengo_state::decrypted_opcodes_map(address_map &map)
 void pengo_state::jrpacmbl_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().w(this, FUNC(pengo_state::jrpacman_videoram_w)).share("videoram");
+	map(0x8000, 0x87ff).ram().w(FUNC(pengo_state::jrpacman_videoram_w)).share("videoram");
 	map(0x8800, 0x8fef).ram();
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
 	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
-	map(0x9030, 0x9030).w(this, FUNC(pengo_state::jrpacman_scroll_w));
+	map(0x9030, 0x9030).w(FUNC(pengo_state::jrpacman_scroll_w));
 	map(0x9040, 0x904f).portr("DSW");
 	map(0x9040, 0x9047).w("latch", FUNC(ls259_device::write_d0));
 	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));

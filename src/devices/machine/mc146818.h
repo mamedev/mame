@@ -21,9 +21,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MC146818_ADD(_tag, _xtal) \
-	MCFG_DEVICE_ADD(_tag, MC146818, _xtal)
-
 #define MCFG_MC146818_IRQ_HANDLER(_irq) \
 	devcb = &downcast<mc146818_device &>(*device).set_irq_callback(DEVCB_##_irq);
 

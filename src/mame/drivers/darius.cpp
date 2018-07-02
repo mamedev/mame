@@ -196,7 +196,7 @@ void darius_state::darius_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
 	map(0x080000, 0x08ffff).ram();                                             /* main RAM */
-	map(0x0a0000, 0x0a0001).w(this, FUNC(darius_state::cpua_ctrl_w));
+	map(0x0a0000, 0x0a0001).w(FUNC(darius_state::cpua_ctrl_w));
 	map(0x0b0000, 0x0b0001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 	map(0xc00000, 0xc00001).nopr();
 	map(0xc00001, 0xc00001).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -204,10 +204,10 @@ void darius_state::darius_map(address_map &map)
 	map(0xc00008, 0xc00009).portr("P1");
 	map(0xc0000a, 0xc0000b).portr("P2");
 	map(0xc0000c, 0xc0000d).portr("SYSTEM");
-	map(0xc0000e, 0xc0000f).r(this, FUNC(darius_state::coin_r));
+	map(0xc0000e, 0xc0000f).r(FUNC(darius_state::coin_r));
 	map(0xc00010, 0xc00011).portr("DSW");
 	map(0xc00050, 0xc00051).noprw(); // unknown, written by both cpus - always 0?
-	map(0xc00060, 0xc00061).w(this, FUNC(darius_state::coin_w));
+	map(0xc00060, 0xc00061).w(FUNC(darius_state::coin_w));
 	map(0xd00000, 0xd0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));  /* tilemaps */
 	map(0xd20000, 0xd20003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
 	map(0xd40000, 0xd40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
@@ -215,7 +215,7 @@ void darius_state::darius_map(address_map &map)
 	map(0xd80000, 0xd80fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");/* palette */
 	map(0xe00100, 0xe00fff).ram().share("spriteram");
 	map(0xe01000, 0xe02fff).ram().share("share2");
-	map(0xe08000, 0xe0ffff).ram().w(this, FUNC(darius_state::darius_fg_layer_w)).share("fg_ram");
+	map(0xe08000, 0xe0ffff).ram().w(FUNC(darius_state::darius_fg_layer_w)).share("fg_ram");
 	map(0xe10000, 0xe10fff).ram();                                             /* ??? */
 }
 
@@ -227,7 +227,7 @@ void darius_state::darius_cpub_map(address_map &map)
 	map(0xd80000, 0xd80fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xe00100, 0xe00fff).ram().share("spriteram");
 	map(0xe01000, 0xe02fff).ram().share("share2");
-	map(0xe08000, 0xe0ffff).ram().w(this, FUNC(darius_state::darius_fg_layer_w)).share("fg_ram");
+	map(0xe08000, 0xe0ffff).ram().w(FUNC(darius_state::darius_fg_layer_w)).share("fg_ram");
 }
 
 
@@ -430,14 +430,14 @@ void darius_state::darius_sound_map(address_map &map)
 	map(0xa000, 0xa001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xb000, 0xb000).nopr().w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xb001, 0xb001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xc000, 0xc000).w(this, FUNC(darius_state::darius_fm0_pan));
-	map(0xc400, 0xc400).w(this, FUNC(darius_state::darius_fm1_pan));
-	map(0xc800, 0xc800).w(this, FUNC(darius_state::darius_psg0_pan));
-	map(0xcc00, 0xcc00).w(this, FUNC(darius_state::darius_psg1_pan));
-	map(0xd000, 0xd000).w(this, FUNC(darius_state::darius_da_pan));
-	map(0xd400, 0xd400).w(this, FUNC(darius_state::adpcm_command_w));  /* ADPCM command for second Z80 to read from port 0x00 */
+	map(0xc000, 0xc000).w(FUNC(darius_state::darius_fm0_pan));
+	map(0xc400, 0xc400).w(FUNC(darius_state::darius_fm1_pan));
+	map(0xc800, 0xc800).w(FUNC(darius_state::darius_psg0_pan));
+	map(0xcc00, 0xcc00).w(FUNC(darius_state::darius_psg1_pan));
+	map(0xd000, 0xd000).w(FUNC(darius_state::darius_da_pan));
+	map(0xd400, 0xd400).w(FUNC(darius_state::adpcm_command_w));  /* ADPCM command for second Z80 to read from port 0x00 */
 //  AM_RANGE(0xd800, 0xd800) AM_WRITE(display_value)    /* ??? */
-	map(0xdc00, 0xdc00).w(this, FUNC(darius_state::sound_bankswitch_w));
+	map(0xdc00, 0xdc00).w(FUNC(darius_state::sound_bankswitch_w));
 }
 
 void darius_state::darius_sound2_map(address_map &map)
@@ -483,17 +483,17 @@ WRITE8_MEMBER(darius_state::adpcm_nmi_enable)
 
 WRITE8_MEMBER(darius_state::adpcm_data_w)
 {
-	m_msm->data_w(data);
+	m_msm->write_data(data);
 	m_msm->reset_w(!(data & 0x20));    /* my best guess, but it could be output enable as well */
 }
 
 void darius_state::darius_sound2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(darius_state::adpcm_command_read), FUNC(darius_state::adpcm_nmi_disable));
-	map(0x01, 0x01).w(this, FUNC(darius_state::adpcm_nmi_enable));
-	map(0x02, 0x02).r(this, FUNC(darius_state::readport2)).w(this, FUNC(darius_state::adpcm_data_w));  /* readport2 ??? */
-	map(0x03, 0x03).r(this, FUNC(darius_state::readport3)); /* ??? */
+	map(0x00, 0x00).rw(FUNC(darius_state::adpcm_command_read), FUNC(darius_state::adpcm_nmi_disable));
+	map(0x01, 0x01).w(FUNC(darius_state::adpcm_nmi_enable));
+	map(0x02, 0x02).r(FUNC(darius_state::readport2)).w(FUNC(darius_state::adpcm_data_w));  /* readport2 ??? */
+	map(0x03, 0x03).r(FUNC(darius_state::readport3)); /* ??? */
 }
 
 

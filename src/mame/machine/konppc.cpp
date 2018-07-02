@@ -49,13 +49,13 @@ void konppc_device::device_start()
 		save_item(NAME(dsp_comm_ppc[i]), i);
 		save_item(NAME(dsp_comm_sharc[i]), i);
 		save_item(NAME(dsp_shared_ram_bank[i]), i);
-		save_pointer(NAME(dsp_shared_ram[i].get()), DSP_BANK_SIZE * 2 / sizeof(dsp_shared_ram[i][0]), i);
+		save_pointer(NAME(dsp_shared_ram[i]), DSP_BANK_SIZE * 2 / sizeof(dsp_shared_ram[i][0]), i);
 		save_item(NAME(dsp_state[i]), i);
 		save_item(NAME(nwk_device_sel[i]), i);
 		save_item(NAME(nwk_fifo_read_ptr[i]), i);
 		save_item(NAME(nwk_fifo_write_ptr[i]), i);
-		save_pointer(NAME(nwk_fifo[i].get()), 0x800, i);
-		save_pointer(NAME(nwk_ram[i].get()), 0x2000, i);
+		save_pointer(NAME(nwk_fifo[i]), 0x800, i);
+		save_pointer(NAME(nwk_ram[i]), 0x2000, i);
 	}
 	save_item(NAME(cgboard_id));
 

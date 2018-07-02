@@ -27,6 +27,7 @@
 #include "machine/pic8259.h"
 #include "machine/km035.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -78,6 +79,9 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::KEYBOARD; }
 
+	void sm7238(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(sm7238);
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -89,11 +93,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sm7238(machine_config &config);
 	void sm7238_io(address_map &map);
 	void sm7238_mem(address_map &map);
 	void videobank_map(address_map &map);
-private:
+
 	void recompute_parameters();
 
 	struct
@@ -131,8 +134,8 @@ void sm7238_state::sm7238_mem(address_map &map)
 	map(0x0000, 0x9fff).rom();
 	map(0xa000, 0xa7ff).ram();
 	map(0xb000, 0xb3ff).ram().share("nvram");
-	map(0xb800, 0xb800).w(this, FUNC(sm7238_state::text_control_w));
-	map(0xbc00, 0xbc00).w(this, FUNC(sm7238_state::control_w));
+	map(0xb800, 0xb800).w(FUNC(sm7238_state::text_control_w));
+	map(0xbc00, 0xbc00).w(FUNC(sm7238_state::control_w));
 	map(0xc000, 0xcfff).ram(); // chargen
 	map(0xe000, 0xffff).m(m_videobank, FUNC(address_map_bank_device::amap8));
 }
@@ -140,7 +143,7 @@ void sm7238_state::sm7238_mem(address_map &map)
 void sm7238_state::videobank_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("videoram");
-	map(0x2000, 0x2fff).mirror(0x1000).w(this, FUNC(sm7238_state::vmem_w));
+	map(0x2000, 0x2fff).mirror(0x1000).w(FUNC(sm7238_state::vmem_w));
 }
 
 void sm7238_state::sm7238_io(address_map &map)

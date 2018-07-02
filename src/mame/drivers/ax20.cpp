@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "bus/isa/fdc.h"
 #include "cpu/i86/i86.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ax20_state : public driver_device
@@ -32,6 +33,9 @@ public:
 		m_palette(*this, "palette"),
 		m_fdc(*this, "fdc")  { }
 
+	void ax20(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -44,7 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(tc_w);
 	DECLARE_WRITE8_MEMBER(ctl_w);
-	void ax20(machine_config &config);
+
 	void ax20_io(address_map &map);
 	void ax20_map(address_map &map);
 };
@@ -92,9 +96,9 @@ void ax20_state::ax20_map(address_map &map)
 void ax20_state::ax20_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xffc0, 0xffc0).w(this, FUNC(ax20_state::tc_w));
-	map(0xffd0, 0xffd0).w(this, FUNC(ax20_state::ctl_w));
-	map(0xffe0, 0xffe0).r(this, FUNC(ax20_state::unk_r));
+	map(0xffc0, 0xffc0).w(FUNC(ax20_state::tc_w));
+	map(0xffd0, 0xffd0).w(FUNC(ax20_state::ctl_w));
+	map(0xffe0, 0xffe0).r(FUNC(ax20_state::unk_r));
 	map(0xff80, 0xff81).m(m_fdc, FUNC(i8272a_device::map));
 }
 

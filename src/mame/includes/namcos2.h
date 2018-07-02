@@ -14,6 +14,7 @@
 #include "video/c45.h"
 
 #include "cpu/m6502/m3745x.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* CPU reference numbers */
@@ -103,12 +104,12 @@ public:
 		driver_device(mconfig, type, tag),
 		m_dspmaster(*this, "dspmaster"),
 		m_dspslave(*this, "dspslave"),
+		m_gametype(0),
 		m_c68(*this, "c68"),
 		m_master_intc(*this, "master_intc"),
 		m_slave_intc(*this, "slave_intc"),
 		m_sci(*this, "sci"),
 		m_gpu(*this, "gpu"),
-		m_gametype(0),
 		m_c169_roz_videoram(*this, "rozvideoram", 0),
 		m_c169_roz_gfxbank(0),
 		m_c169_roz_mask(nullptr),
@@ -124,6 +125,10 @@ public:
 
 	optional_device<cpu_device> m_dspmaster;
 	optional_device<cpu_device> m_dspslave;
+
+	int m_gametype;
+
+protected:
 	optional_device<m37450_device> m_c68;
 	optional_device<namco_c148_device> m_master_intc;
 	optional_device<namco_c148_device> m_slave_intc;
@@ -132,7 +137,6 @@ public:
 
 	// game type helpers
 	bool is_system21();
-	int m_gametype;
 
 	int m_mcu_analog_ctrl;
 	int m_mcu_analog_data;
@@ -147,7 +151,6 @@ public:
 
 	// C123 Tilemap Emulation
 	// TODO: merge with namcos1.cpp implementation and convert to device
-public:
 	DECLARE_WRITE16_MEMBER( c123_tilemap_videoram_w );
 	DECLARE_READ16_MEMBER( c123_tilemap_videoram_r );
 	DECLARE_WRITE16_MEMBER( c123_tilemap_control_w );
@@ -185,7 +188,6 @@ public:
 	c123_mTilemapInfo m_c123_TilemapInfo;
 
 	// C169 ROZ Layer Emulation
-public:
 	typedef delegate<void (uint16_t, int*, int*, int)> c169_tilemap_delegate;
 	void c169_roz_init(int gfxbank, const char *maskregion, c169_tilemap_delegate tilemap_cb);
 	void c169_roz_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
@@ -197,7 +199,6 @@ public:
 	DECLARE_WRITE16_MEMBER( c169_roz_videoram_w );
 
 	c169_tilemap_delegate m_c169_cb;
-protected:
 	struct roz_parameters
 	{
 		uint32_t left, top, size;
@@ -221,7 +222,6 @@ protected:
 	uint8_t *m_c169_roz_mask;
 
 	// C355 Motion Object Emulation
-public:
 	typedef delegate<int (int)> c355_obj_code2tile_delegate;
 	// for pal_xor, supply either 0x0 (normal) or 0xf (palette mapping reversed)
 	void c355_obj_init(int gfxbank, int pal_xor, c355_obj_code2tile_delegate code2tile);
@@ -234,7 +234,7 @@ public:
 	DECLARE_WRITE16_MEMBER( c355_obj_position_w );
 	DECLARE_MACHINE_START(namcos2);
 	DECLARE_MACHINE_RESET(namcos2);
-protected:
+
 	// C355 Motion Object internals
 	template<class _BitmapClass>
 	void c355_obj_draw_sprite(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, const uint16_t *pSource, int pri, int zpos);
@@ -250,7 +250,6 @@ protected:
 	uint8_t m_player_mux;
 	inline void namcoic_get_tile_info(tile_data &tileinfo,int tile_index,uint16_t *vram);
 
-public:
 	// general
 	void zdrawgfxzoom(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
 	void zdrawgfxzoom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
@@ -288,13 +287,19 @@ public:
 		m_c45_road(*this, "c45_road")
 	{ }
 
-	DECLARE_READ8_MEMBER(c68_p5_r);
-	DECLARE_WRITE8_MEMBER(c68_p3_w);
-	DECLARE_READ16_MEMBER(dpram_word_r);
-	DECLARE_WRITE16_MEMBER(dpram_word_w);
-	DECLARE_READ8_MEMBER(dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(dpram_byte_w);
-	DECLARE_READ8_MEMBER(ack_mcu_vbl_r);
+	void configure_c148_standard(machine_config &config);
+	void metlhawk(machine_config &config);
+	void gollygho(machine_config &config);
+	void assaultp(machine_config &config);
+	void sgunner2(machine_config &config);
+	void base2(machine_config &config);
+	void finallap(machine_config &config);
+	void finalap2(machine_config &config);
+	void luckywld(machine_config &config);
+	void base3(machine_config &config);
+	void sgunner(machine_config &config);
+	void base(machine_config &config);
+
 	void init_cosmogng();
 	void init_sgunner2();
 	void init_kyukaidk();
@@ -329,6 +334,15 @@ public:
 	void init_ordyne();
 	void init_marvland();
 	void init_rthun2();
+
+private:
+	DECLARE_READ8_MEMBER(c68_p5_r);
+	DECLARE_WRITE8_MEMBER(c68_p3_w);
+	DECLARE_READ16_MEMBER(dpram_word_r);
+	DECLARE_WRITE16_MEMBER(dpram_word_w);
+	DECLARE_READ8_MEMBER(dpram_byte_r);
+	DECLARE_WRITE8_MEMBER(dpram_byte_w);
+	DECLARE_READ8_MEMBER(ack_mcu_vbl_r);
 
 	virtual void video_start() override;
 	void video_start_finallap();
@@ -388,18 +402,6 @@ public:
 	void RozCB_luckywld(uint16_t code, int *tile, int *mask, int which);
 	void RozCB_metlhawk(uint16_t code, int *tile, int *mask, int which);
 
-	void configure_c148_standard(machine_config &config);
-	void metlhawk(machine_config &config);
-	void gollygho(machine_config &config);
-	void assaultp(machine_config &config);
-	void sgunner2(machine_config &config);
-	void base2(machine_config &config);
-	void finallap(machine_config &config);
-	void finalap2(machine_config &config);
-	void luckywld(machine_config &config);
-	void base3(machine_config &config);
-	void sgunner(machine_config &config);
-	void base(machine_config &config);
 	void c68_default_am(address_map &map);
 	void common_default_am(address_map &map);
 	void common_finallap_am(address_map &map);

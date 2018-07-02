@@ -220,6 +220,7 @@ U145        1Brown          PAL14H4CN
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -234,6 +235,10 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void sureshot(machine_config &config);
+	void sms(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(link_r);
 	DECLARE_WRITE8_MEMBER(link_w);
@@ -246,13 +251,10 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi0_b_w);
 	DECLARE_MACHINE_START(sureshot);
 	uint32_t screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sureshot(machine_config &config);
-	void sms(machine_config &config);
 	void sms_map(address_map &map);
 	void sub_map(address_map &map);
 	void sureshot_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -494,10 +496,10 @@ void smsmfg_state::sms_map(address_map &map)
 {
 	map(0x00000, 0x007ff).ram().share("nvram");
 	map(0x00800, 0x00803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x01000, 0x01007).w(this, FUNC(smsmfg_state::video_w));
-	map(0x01800, 0x01803).rw(this, FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
+	map(0x01000, 0x01007).w(FUNC(smsmfg_state::video_w));
+	map(0x01800, 0x01803).rw(FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
 	map(0x04000, 0x07fff).bankr("bank1");
-	map(0x04000, 0x04000).w(this, FUNC(smsmfg_state::bankswitch_w));
+	map(0x04000, 0x04000).w(FUNC(smsmfg_state::bankswitch_w));
 	map(0x08000, 0x0ffff).rom();
 	map(0xf8000, 0xfffff).rom(); // mirror for vectors
 }
@@ -505,9 +507,9 @@ void smsmfg_state::sms_map(address_map &map)
 void smsmfg_state::sureshot_map(address_map &map)
 {
 	map(0x00000, 0x007ff).ram().share("nvram");
-	map(0x02000, 0x02007).w(this, FUNC(smsmfg_state::video_w));
+	map(0x02000, 0x02007).w(FUNC(smsmfg_state::video_w));
 	map(0x03000, 0x03003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x03800, 0x03803).rw(this, FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
+	map(0x03800, 0x03803).rw(FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
 	map(0x08000, 0x0ffff).rom();
 	map(0xf8000, 0xfffff).rom(); // mirror for vectors
 }
@@ -518,8 +520,8 @@ void smsmfg_state::sub_map(address_map &map)
 	map(0x2000, 0x27ff).ram();
 	map(0x3100, 0x3103).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x3381, 0x3382).w("aysnd", FUNC(ay8910_device::data_address_w));
-	map(0x3400, 0x3400).r(this, FUNC(smsmfg_state::z80_8088_r));
-	map(0x3500, 0x3501).rw(this, FUNC(smsmfg_state::p03_r), FUNC(smsmfg_state::p03_w));
+	map(0x3400, 0x3400).r(FUNC(smsmfg_state::z80_8088_r));
+	map(0x3500, 0x3501).rw(FUNC(smsmfg_state::p03_r), FUNC(smsmfg_state::p03_w));
 }
 
 /*************************************

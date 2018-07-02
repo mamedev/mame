@@ -273,7 +273,7 @@ VIDEO_START_MEMBER(gameplan_state,common)
 	m_via_0_ca1_timer = timer_alloc(TIMER_VIA_0_CAL);
 
 	/* register for save states */
-	save_pointer(NAME(m_videoram.get()), m_videoram_size);
+	save_pointer(NAME(m_videoram), m_videoram_size);
 }
 
 

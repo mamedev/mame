@@ -252,41 +252,41 @@ void ygv608_device::regs_map(address_map &map)
 {
 
 	// address pointers
-	map(0, 0).rw(this, FUNC(ygv608_device::pattern_name_table_y_r), FUNC(ygv608_device::pattern_name_table_y_w));
-	map(1, 1).rw(this, FUNC(ygv608_device::pattern_name_table_x_r), FUNC(ygv608_device::pattern_name_table_x_w));
+	map(0, 0).rw(FUNC(ygv608_device::pattern_name_table_y_r), FUNC(ygv608_device::pattern_name_table_y_w));
+	map(1, 1).rw(FUNC(ygv608_device::pattern_name_table_x_r), FUNC(ygv608_device::pattern_name_table_x_w));
 
-	map(2, 2).rw(this, FUNC(ygv608_device::ram_access_ctrl_r), FUNC(ygv608_device::ram_access_ctrl_w));
+	map(2, 2).rw(FUNC(ygv608_device::ram_access_ctrl_r), FUNC(ygv608_device::ram_access_ctrl_w));
 
-	map(3, 3).rw(this, FUNC(ygv608_device::sprite_address_r), FUNC(ygv608_device::sprite_address_w));
-	map(4, 4).rw(this, FUNC(ygv608_device::scroll_address_r), FUNC(ygv608_device::scroll_address_w));
-	map(5, 5).rw(this, FUNC(ygv608_device::palette_address_r), FUNC(ygv608_device::palette_address_w));
-	map(6, 6).rw(this, FUNC(ygv608_device::sprite_bank_r), FUNC(ygv608_device::sprite_bank_w));
+	map(3, 3).rw(FUNC(ygv608_device::sprite_address_r), FUNC(ygv608_device::sprite_address_w));
+	map(4, 4).rw(FUNC(ygv608_device::scroll_address_r), FUNC(ygv608_device::scroll_address_w));
+	map(5, 5).rw(FUNC(ygv608_device::palette_address_r), FUNC(ygv608_device::palette_address_w));
+	map(6, 6).rw(FUNC(ygv608_device::sprite_bank_r), FUNC(ygv608_device::sprite_bank_w));
 
 	// screen control
-	map(7, 7).rw(this, FUNC(ygv608_device::screen_ctrl_7_r), FUNC(ygv608_device::screen_ctrl_7_w));
-	map(8, 8).rw(this, FUNC(ygv608_device::screen_ctrl_8_r), FUNC(ygv608_device::screen_ctrl_8_w));
-	map(9, 9).rw(this, FUNC(ygv608_device::screen_ctrl_9_r), FUNC(ygv608_device::screen_ctrl_9_w));
-	map(10, 10).rw(this, FUNC(ygv608_device::screen_ctrl_10_r), FUNC(ygv608_device::screen_ctrl_10_w));
-	map(11, 11).rw(this, FUNC(ygv608_device::screen_ctrl_11_r), FUNC(ygv608_device::screen_ctrl_11_w));
-	map(12, 12).rw(this, FUNC(ygv608_device::screen_ctrl_12_r), FUNC(ygv608_device::screen_ctrl_12_w));
+	map(7, 7).rw(FUNC(ygv608_device::screen_ctrl_7_r), FUNC(ygv608_device::screen_ctrl_7_w));
+	map(8, 8).rw(FUNC(ygv608_device::screen_ctrl_8_r), FUNC(ygv608_device::screen_ctrl_8_w));
+	map(9, 9).rw(FUNC(ygv608_device::screen_ctrl_9_r), FUNC(ygv608_device::screen_ctrl_9_w));
+	map(10, 10).rw(FUNC(ygv608_device::screen_ctrl_10_r), FUNC(ygv608_device::screen_ctrl_10_w));
+	map(11, 11).rw(FUNC(ygv608_device::screen_ctrl_11_r), FUNC(ygv608_device::screen_ctrl_11_w));
+	map(12, 12).rw(FUNC(ygv608_device::screen_ctrl_12_r), FUNC(ygv608_device::screen_ctrl_12_w));
 
-	map(13, 13).w(this, FUNC(ygv608_device::border_color_w));
+	map(13, 13).w(FUNC(ygv608_device::border_color_w));
 	// interrupt section
-	map(14, 14).rw(this, FUNC(ygv608_device::irq_mask_r), FUNC(ygv608_device::irq_mask_w));
-	map(15, 16).rw(this, FUNC(ygv608_device::irq_ctrl_r), FUNC(ygv608_device::irq_ctrl_w));
+	map(14, 14).rw(FUNC(ygv608_device::irq_mask_r), FUNC(ygv608_device::irq_mask_w));
+	map(15, 16).rw(FUNC(ygv608_device::irq_ctrl_r), FUNC(ygv608_device::irq_ctrl_w));
 	// base address
-	map(17, 24).w(this, FUNC(ygv608_device::base_address_w));
+	map(17, 24).w(FUNC(ygv608_device::base_address_w));
 
 	// ROZ parameters
-	map(25, 27).w(this, FUNC(ygv608_device::roz_ax_w));
-	map(28, 29).w(this, FUNC(ygv608_device::roz_dx_w));
-	map(30, 31).w(this, FUNC(ygv608_device::roz_dxy_w));
-	map(32, 34).w(this, FUNC(ygv608_device::roz_ay_w));
-	map(35, 36).w(this, FUNC(ygv608_device::roz_dy_w));
-	map(37, 38).w(this, FUNC(ygv608_device::roz_dyx_w));
+	map(25, 27).w(FUNC(ygv608_device::roz_ax_w));
+	map(28, 29).w(FUNC(ygv608_device::roz_dx_w));
+	map(30, 31).w(FUNC(ygv608_device::roz_dxy_w));
+	map(32, 34).w(FUNC(ygv608_device::roz_ay_w));
+	map(35, 36).w(FUNC(ygv608_device::roz_dy_w));
+	map(37, 38).w(FUNC(ygv608_device::roz_dyx_w));
 
 	// CRTC
-	map(39, 46).w(this, FUNC(ygv608_device::crtc_w));
+	map(39, 46).w(FUNC(ygv608_device::crtc_w));
 //  47-48 ROM transfer control - DMA source address
 //  49 ROM transfer control - DMA size
 }
@@ -299,14 +299,14 @@ void ygv608_device::regs_map(address_map &map)
 
 void ygv608_device::port_map(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(ygv608_device::pattern_name_table_r), FUNC(ygv608_device::pattern_name_table_w));
-	map(0x01, 0x01).rw(this, FUNC(ygv608_device::sprite_data_r), FUNC(ygv608_device::sprite_data_w));
-	map(0x02, 0x02).rw(this, FUNC(ygv608_device::scroll_data_r), FUNC(ygv608_device::scroll_data_w));
-	map(0x03, 0x03).rw(this, FUNC(ygv608_device::palette_data_r), FUNC(ygv608_device::palette_data_w));
-	map(0x04, 0x04).rw(this, FUNC(ygv608_device::register_data_r), FUNC(ygv608_device::register_data_w));
-	map(0x05, 0x05).nopr().w(this, FUNC(ygv608_device::register_select_w));
-	map(0x06, 0x06).rw(this, FUNC(ygv608_device::status_port_r), FUNC(ygv608_device::status_port_w));
-	map(0x07, 0x07).rw(this, FUNC(ygv608_device::system_control_r), FUNC(ygv608_device::system_control_w));
+	map(0x00, 0x00).rw(FUNC(ygv608_device::pattern_name_table_r), FUNC(ygv608_device::pattern_name_table_w));
+	map(0x01, 0x01).rw(FUNC(ygv608_device::sprite_data_r), FUNC(ygv608_device::sprite_data_w));
+	map(0x02, 0x02).rw(FUNC(ygv608_device::scroll_data_r), FUNC(ygv608_device::scroll_data_w));
+	map(0x03, 0x03).rw(FUNC(ygv608_device::palette_data_r), FUNC(ygv608_device::palette_data_w));
+	map(0x04, 0x04).rw(FUNC(ygv608_device::register_data_r), FUNC(ygv608_device::register_data_w));
+	map(0x05, 0x05).nopr().w(FUNC(ygv608_device::register_select_w));
+	map(0x06, 0x06).rw(FUNC(ygv608_device::status_port_r), FUNC(ygv608_device::status_port_w));
+	map(0x07, 0x07).rw(FUNC(ygv608_device::system_control_r), FUNC(ygv608_device::system_control_w));
 }
 
 

@@ -54,18 +54,20 @@ public:
 		, m_usart_clock_state(0)
 	{ }
 
+	void isbc8010b(machine_config &config);
+	void isbc8010a(machine_config &config);
+	void isbc8010(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER( usart_clock_tick );
 
-	void isbc8010b(machine_config &config);
-	void isbc8010a(machine_config &config);
-	void isbc8010(machine_config &config);
 	void isbc8010_io(address_map &map);
 	void isbc8010_mem(address_map &map);
 	void isbc8010a_mem(address_map &map);
 	void isbc8010b_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
 	required_device<i8255_device> m_ppi_0;
@@ -252,14 +254,14 @@ ROM_START( isbc8010 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mon11")
 	ROM_SYSTEM_BIOS( 0, "mon11", "80/10 Monitor v1.1" )
-	ROMX_LOAD( "sbc80p.a23", 0x0000, 0x0400, CRC(bd49a7d6) SHA1(3b2f18abf35efe05f38eb08bf0c6d0f45fa7ae0a), ROM_BIOS(1))
-	ROMX_LOAD( "sbc80p.a24", 0x0400, 0x0400, CRC(18131631) SHA1(6fb29df38e056c966dcc95885bc59c2a3caf4baf), ROM_BIOS(1))
+	ROMX_LOAD( "sbc80p.a23", 0x0000, 0x0400, CRC(bd49a7d6) SHA1(3b2f18abf35efe05f38eb08bf0c6d0f45fa7ae0a), ROM_BIOS(0))
+	ROMX_LOAD( "sbc80p.a24", 0x0400, 0x0400, CRC(18131631) SHA1(6fb29df38e056c966dcc95885bc59c2a3caf4baf), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "bas80", "BASIC-80" )
-	ROMX_LOAD( "basic_blc_1.a24", 0x0000, 0x0400, CRC(b5e75aee) SHA1(6bd1eb9586d72544e8afb4ae43ecedcefa14da33), ROM_BIOS(2))
-	ROMX_LOAD( "basic_blc_2.a25", 0x0400, 0x0400, CRC(0a9ad1ed) SHA1(92c47eadcf8b18eeedcccaa3deb9f1518aaceeae), ROM_BIOS(2))
-	ROMX_LOAD( "basic_blc_3.a26", 0x0800, 0x0400, CRC(bc898e4b) SHA1(adc000534db0f736a75fbceed360dc220e02c30d), ROM_BIOS(2))
-	ROMX_LOAD( "basic_blc_4.a27", 0x0c00, 0x0400, CRC(568e8b6d) SHA1(22960193d3b0ae1b5d876d8c3b3f3b40db01358c), ROM_BIOS(2))
+	ROMX_LOAD( "basic_blc_1.a24", 0x0000, 0x0400, CRC(b5e75aee) SHA1(6bd1eb9586d72544e8afb4ae43ecedcefa14da33), ROM_BIOS(1))
+	ROMX_LOAD( "basic_blc_2.a25", 0x0400, 0x0400, CRC(0a9ad1ed) SHA1(92c47eadcf8b18eeedcccaa3deb9f1518aaceeae), ROM_BIOS(1))
+	ROMX_LOAD( "basic_blc_3.a26", 0x0800, 0x0400, CRC(bc898e4b) SHA1(adc000534db0f736a75fbceed360dc220e02c30d), ROM_BIOS(1))
+	ROMX_LOAD( "basic_blc_4.a27", 0x0c00, 0x0400, CRC(568e8b6d) SHA1(22960193d3b0ae1b5d876d8c3b3f3b40db01358c), ROM_BIOS(1))
 
 	/* 512-byte Signetics 2513 character generator ROM at location D2-D3 */
 	ROM_REGION(0x0200, "gfx1",0)

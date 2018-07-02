@@ -56,6 +56,15 @@ midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char
 
 
 //-------------------------------------------------
+//  suspend_cpu
+//-------------------------------------------------
+
+void midway_ssio_device::suspend_cpu()
+{
+	m_cpu->suspend(SUSPEND_REASON_DISABLE, 1);
+}
+
+//-------------------------------------------------
 //  read - return the status value
 //-------------------------------------------------
 
@@ -349,16 +358,16 @@ void midway_ssio_device::ssio_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x83ff).mirror(0x0c00).ram();
-	map(0x9000, 0x9003).mirror(0x0ffc).r(this, FUNC(midway_ssio_device::data_r));
+	map(0x9000, 0x9003).mirror(0x0ffc).r(FUNC(midway_ssio_device::data_r));
 	map(0xa000, 0xa000).mirror(0x0ffc).w("ay0", FUNC(ay8910_device::address_w));
 	map(0xa001, 0xa001).mirror(0x0ffc).r("ay0", FUNC(ay8910_device::data_r));
 	map(0xa002, 0xa002).mirror(0x0ffc).w("ay0", FUNC(ay8910_device::data_w));
 	map(0xb000, 0xb000).mirror(0x0ffc).w("ay1", FUNC(ay8910_device::address_w));
 	map(0xb001, 0xb001).mirror(0x0ffc).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xb002, 0xb002).mirror(0x0ffc).w("ay1", FUNC(ay8910_device::data_w));
-	map(0xc000, 0xcfff).nopr().w(this, FUNC(midway_ssio_device::status_w));
+	map(0xc000, 0xcfff).nopr().w(FUNC(midway_ssio_device::status_w));
 	map(0xd000, 0xdfff).nopw();    // low bit controls yellow LED
-	map(0xe000, 0xefff).r(this, FUNC(midway_ssio_device::irq_clear));
+	map(0xe000, 0xefff).r(FUNC(midway_ssio_device::irq_clear));
 	map(0xf000, 0xffff).portr("DIP");    // 6 DIP switches
 }
 
@@ -622,7 +631,7 @@ void midway_sounds_good_device::device_reset()
 
 void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_pia->portb_w((param >> 1) & 0x0f);
+	m_pia->write_portb((param >> 1) & 0x0f);
 	m_pia->ca1_w(~param & 0x01);
 
 	// oftentimes games will write one nibble at a time; the sync on this is very
@@ -777,7 +786,7 @@ void midway_turbo_cheap_squeak_device::device_reset()
 
 void midway_turbo_cheap_squeak_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_pia->portb_w((param >> 1) & 0x0f);
+	m_pia->write_portb((param >> 1) & 0x0f);
 	m_pia->ca1_w(~param & 0x01);
 
 	// oftentimes games will write one nibble at a time; the sync on this is very
@@ -880,7 +889,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 	// read strobe -- read the current status from the TMS5200
 	else if (((data ^ m_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		m_pia1->porta_w(m_tms5200->status_r(space, offset));
+		m_pia1->write_porta(m_tms5200->status_r(space, offset));
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
 		m_pia1->ca2_w(1);
@@ -916,7 +925,7 @@ void midway_squawk_n_talk_device::squawkntalk_map(address_map &map)
 	map(0x0000, 0x007f).ram();     // internal RAM
 	map(0x0080, 0x0083).mirror(0x4f6c).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).mirror(0x4f6c).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x1fff).mirror(0x4000).w(this, FUNC(midway_squawk_n_talk_device::dac_w));
+	map(0x1000, 0x1fff).mirror(0x4000).w(FUNC(midway_squawk_n_talk_device::dac_w));
 	map(0x8000, 0xbfff).mirror(0x4000).rom();
 }
 
@@ -929,7 +938,7 @@ void midway_squawk_n_talk_device::squawkntalk_alt_map(address_map &map)
 	map(0x0000, 0x007f).ram();     // internal RAM
 	map(0x0080, 0x0083).mirror(0x676c).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).mirror(0x676c).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0800, 0x0fff).mirror(0x6000).w(this, FUNC(midway_squawk_n_talk_device::dac_w));
+	map(0x0800, 0x0fff).mirror(0x6000).w(FUNC(midway_squawk_n_talk_device::dac_w));
 	map(0x8000, 0x9fff).mirror(0x6000).rom();
 }
 #endif
@@ -989,6 +998,6 @@ void midway_squawk_n_talk_device::device_reset()
 
 void midway_squawk_n_talk_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_pia0->porta_w(~param & 0x0f);
-	m_pia0->cb1_w(~param & 0x10);
+	m_pia0->write_porta(~param & 0x0f);
+	m_pia0->cb1_w(BIT(~param, 4));
 }

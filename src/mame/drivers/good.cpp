@@ -35,6 +35,7 @@ voice.rom - VOICE ROM
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -51,10 +52,12 @@ public:
 	{
 	}
 
+	void good(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_fg_tilemapram;
 	required_shared_ptr<uint16_t> m_bg_tilemapram;
-	uint16_t *  m_sprites;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -67,7 +70,6 @@ public:
 	uint32_t screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void good(machine_config &config);
 	void good_map(address_map &map);
 };
 
@@ -127,8 +129,8 @@ void good_state::good_map(address_map &map)
 
 	map(0x800000, 0x8007ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 
-	map(0x820000, 0x820fff).ram().w(this, FUNC(good_state::fg_tilemapram_w)).share("fg_tilemapram");
-	map(0x822000, 0x822fff).ram().w(this, FUNC(good_state::bg_tilemapram_w)).share("bg_tilemapram");
+	map(0x820000, 0x820fff).ram().w(FUNC(good_state::fg_tilemapram_w)).share("fg_tilemapram");
+	map(0x822000, 0x822fff).ram().w(FUNC(good_state::bg_tilemapram_w)).share("bg_tilemapram");
 
 	map(0xff0000, 0xffefff).ram();
 }

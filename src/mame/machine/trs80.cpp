@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert,FSanches and unknown others
+// copyright-holders:Juergen Buchmueller, Robbbert
 /***************************************************************************
 
   machine.c
@@ -705,7 +705,7 @@ READ8_MEMBER( trs80_state::trs80_printer_r )
 
 WRITE8_MEMBER( trs80_state::trs80_printer_w )
 {
-	m_cent_data_out->write(space, 0, data);
+	m_cent_data_out->write(data);
 	m_centronics->write_strobe(0);
 	m_centronics->write_strobe(1);
 }

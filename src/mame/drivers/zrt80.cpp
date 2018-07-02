@@ -22,17 +22,13 @@
 #include "machine/ins8250.h"
 #include "machine/keyboard.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class zrt80_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BEEP_OFF
-	};
-
 	zrt80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
@@ -45,16 +41,23 @@ public:
 	{
 	}
 
+	void zrt80(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_BEEP_OFF
+	};
+
 	DECLARE_READ8_MEMBER(zrt80_10_r);
 	DECLARE_WRITE8_MEMBER(zrt80_30_w);
 	DECLARE_WRITE8_MEMBER(zrt80_38_w);
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void zrt80(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -118,11 +121,11 @@ void zrt80_state::io_map(address_map &map)
 	map(0x00, 0x07).rw(m_8250, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x08, 0x08).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x09, 0x09).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x10, 0x17).r(this, FUNC(zrt80_state::zrt80_10_r));
+	map(0x10, 0x17).r(FUNC(zrt80_state::zrt80_10_r));
 	map(0x18, 0x1F).portr("DIPSW2");
 	map(0x20, 0x27).portr("DIPSW3");
-	map(0x30, 0x37).w(this, FUNC(zrt80_state::zrt80_30_w));
-	map(0x38, 0x3F).w(this, FUNC(zrt80_state::zrt80_38_w));
+	map(0x30, 0x37).w(FUNC(zrt80_state::zrt80_30_w));
+	map(0x38, 0x3F).w(FUNC(zrt80_state::zrt80_38_w));
 }
 
 /* Input ports */

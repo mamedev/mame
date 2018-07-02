@@ -226,19 +226,19 @@ void edge1_device_base::map(address_map &map)
 	 * 110 mapping (W/O)
 	 * 114 attention
 	 */
-	map(0x000, 0x003).rw(this, FUNC(edge1_device_base::reg0_r), FUNC(edge1_device_base::reg0_w));
+	map(0x000, 0x003).rw(FUNC(edge1_device_base::reg0_r), FUNC(edge1_device_base::reg0_w));
 
 	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
 
-	map(0x100, 0x103).rw(this, FUNC(edge1_device_base::control_r), FUNC(edge1_device_base::control_w));
-	map(0x104, 0x107).rw(this, FUNC(edge1_device_base::status_r), FUNC(edge1_device_base::status_w));
-	map(0x108, 0x10b).rw(this, FUNC(edge1_device_base::fifo_r), FUNC(edge1_device_base::fifo_w));
-	map(0x10c, 0x10f).rw(this, FUNC(edge1_device_base::kernel_r), FUNC(edge1_device_base::kernel_w));
+	map(0x100, 0x103).rw(FUNC(edge1_device_base::control_r), FUNC(edge1_device_base::control_w));
+	map(0x104, 0x107).rw(FUNC(edge1_device_base::status_r), FUNC(edge1_device_base::status_w));
+	map(0x108, 0x10b).rw(FUNC(edge1_device_base::fifo_r), FUNC(edge1_device_base::fifo_w));
+	map(0x10c, 0x10f).rw(FUNC(edge1_device_base::kernel_r), FUNC(edge1_device_base::kernel_w));
 
-	map(0x114, 0x117).rw(this, FUNC(edge1_device_base::attention_r), FUNC(edge1_device_base::attention_w));
+	map(0x114, 0x117).rw(FUNC(edge1_device_base::attention_r), FUNC(edge1_device_base::attention_w));
 
-	map(0x130, 0x133).w(this, FUNC(edge1_device_base::ififo_lwm_w));
-	map(0x134, 0x137).w(this, FUNC(edge1_device_base::ififo_hwm_w));
+	map(0x130, 0x133).w(FUNC(edge1_device_base::ififo_lwm_w));
+	map(0x134, 0x137).w(FUNC(edge1_device_base::ififo_hwm_w));
 }
 
 void edge1_device_base::map_dynamic(address_map &map)
@@ -291,19 +291,19 @@ void edge2plus_processor_device_base::map(address_map &map)
 {
 	srx_card_device_base::map(map);
 
-	map(0x000, 0x003).rw(this, FUNC(edge2plus_processor_device_base::reg0_r), FUNC(edge2plus_processor_device_base::reg0_w));
+	map(0x000, 0x003).rw(FUNC(edge2plus_processor_device_base::reg0_r), FUNC(edge2plus_processor_device_base::reg0_w));
 
 	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
 
-	map(0x100, 0x103).rw(this, FUNC(edge2plus_processor_device_base::control_r), FUNC(edge2plus_processor_device_base::control_w));
-	map(0x104, 0x107).rw(this, FUNC(edge2plus_processor_device_base::status_r), FUNC(edge2plus_processor_device_base::status_w));
+	map(0x100, 0x103).rw(FUNC(edge2plus_processor_device_base::control_r), FUNC(edge2plus_processor_device_base::control_w));
+	map(0x104, 0x107).rw(FUNC(edge2plus_processor_device_base::status_r), FUNC(edge2plus_processor_device_base::status_w));
 
-	map(0x10c, 0x10f).rw(this, FUNC(edge2plus_processor_device_base::kernel_r), FUNC(edge2plus_processor_device_base::kernel_w));
-	map(0x110, 0x113).w(this, FUNC(edge2plus_processor_device_base::mapping_w));
-	map(0x114, 0x117).rw(this, FUNC(edge2plus_processor_device_base::attention_r), FUNC(edge2plus_processor_device_base::attention_w));
+	map(0x10c, 0x10f).rw(FUNC(edge2plus_processor_device_base::kernel_r), FUNC(edge2plus_processor_device_base::kernel_w));
+	map(0x110, 0x113).w(FUNC(edge2plus_processor_device_base::mapping_w));
+	map(0x114, 0x117).rw(FUNC(edge2plus_processor_device_base::attention_r), FUNC(edge2plus_processor_device_base::attention_w));
 
-	map(0x130, 0x133).w(this, FUNC(edge2plus_processor_device_base::ififo_lwm_w));
-	map(0x134, 0x137).w(this, FUNC(edge2plus_processor_device_base::ififo_hwm_w));
+	map(0x130, 0x133).w(FUNC(edge2plus_processor_device_base::ififo_lwm_w));
+	map(0x134, 0x137).w(FUNC(edge2plus_processor_device_base::ififo_hwm_w));
 
 	// 0x300 fifo
 
@@ -325,14 +325,14 @@ void edge2plus_framebuffer_device_base::map_dynamic(address_map &map)
 		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_vram->read(offset); },
 		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write(offset, data); });
 
-	map(0x02028088, 0x0202808b).w(this, FUNC(edge2plus_framebuffer_device_base::select_w));
+	map(0x02028088, 0x0202808b).w(FUNC(edge2plus_framebuffer_device_base::select_w));
 
 	map(0x02028200, 0x0202827f).lr32("idprom",
 		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_select == 0 ? memregion("idprom")->as_u32(offset) : space.unmap(); });
 
-	map(0x02028290, 0x02028293).w(this, FUNC(edge2plus_framebuffer_device_base::lut_select_w));
-	map(0x02028300, 0x02028303).w(this, FUNC(edge2plus_framebuffer_device_base::unk_300_w));
-	map(0x02028304, 0x02028307).r(this, FUNC(edge2plus_framebuffer_device_base::unk_304_r));
+	map(0x02028290, 0x02028293).w(FUNC(edge2plus_framebuffer_device_base::lut_select_w));
+	map(0x02028300, 0x02028303).w(FUNC(edge2plus_framebuffer_device_base::unk_300_w));
+	map(0x02028304, 0x02028307).r(FUNC(edge2plus_framebuffer_device_base::unk_304_r));
 }
 
 void edge2_framebuffer_device_base::map(address_map &map)
@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(mpcb828_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("ramdac", BT458, 83'020'800)
 
-	MCFG_SCC8530_ADD("scc", 4.9152_MHz_XTAL, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("scc", SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(DEVICE_SELF, mpcb828_device, scc_irq))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("kbd", interpro_keyboard_port_device, write_txd))
 
@@ -440,7 +440,7 @@ MACHINE_CONFIG_START(mpcb849_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("ramdac", BT458, 0) // unconfirmed clock
 
-	MCFG_SCC8530_ADD("scc", 4.9152_MHz_XTAL, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("scc", SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(DEVICE_SELF, mpcb849_device, scc_irq))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("kbd", interpro_keyboard_port_device, write_txd))
 
@@ -486,7 +486,7 @@ MACHINE_CONFIG_START(msmt094_device::device_add_mconfig)
 	//MCFG_DEVICE_ADD("dsp3", TMS32030, 40_MHz_XTAL)
 
 	// FIXME: actually Z0853006VSC
-	MCFG_SCC8530_ADD("scc", 4.9152_MHz_XTAL, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("scc", SCC8530N, 4.9152_MHz_XTAL)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(DEVICE_SELF, msmt094_device, scc_irq))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("kbd", interpro_keyboard_port_device, write_txd))
 

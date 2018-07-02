@@ -37,7 +37,7 @@ public:
 
 	void ecoinf2_oxo(machine_config &config);
 
-protected:
+private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	DECLARE_WRITE8_MEMBER(ox_port5c_out_w);
@@ -204,7 +204,6 @@ protected:
 	void oxo_memmap(address_map &map);
 	void oxo_portmap(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reels;
 	required_device<meters_device> m_meters;
@@ -532,13 +531,13 @@ MACHINE_CONFIG_START(ecoinf2_state::ecoinf2_oxo)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic13_write_b_strobedat1))
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf2_state, ppi8255_ic13_read_c_panel))
 
-	MCFG_ECOIN_200STEP_ADD("reel0")
+	MCFG_DEVICE_ADD("reel0", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<0>))
-	MCFG_ECOIN_200STEP_ADD("reel1")
+	MCFG_DEVICE_ADD("reel1", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<1>))
-	MCFG_ECOIN_200STEP_ADD("reel2")
+	MCFG_DEVICE_ADD("reel2", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<2>))
-	MCFG_ECOIN_200STEP_ADD("reel3")
+	MCFG_DEVICE_ADD("reel3", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<3>))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)

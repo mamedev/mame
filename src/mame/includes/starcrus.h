@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo
 #include "sound/samples.h"
+#include "emupal.h"
+
 class starcrus_state : public driver_device
 {
 public:
@@ -15,6 +17,7 @@ public:
 
 	void starcrus(machine_config &config);
 
+private:
 	DECLARE_WRITE8_MEMBER(s1_x_w);
 	DECLARE_WRITE8_MEMBER(s1_y_w);
 	DECLARE_WRITE8_MEMBER(s2_x_w);
@@ -29,11 +32,9 @@ public:
 	DECLARE_WRITE8_MEMBER(proj_parm_2_w);
 	DECLARE_READ8_MEMBER(coll_det_r);
 
-protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;

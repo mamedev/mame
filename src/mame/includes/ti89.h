@@ -11,6 +11,7 @@
 
 #include "machine/intelfsh.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 class ti68k_state : public driver_device
 {
@@ -30,6 +31,15 @@ public:
 			m_io_bit7(*this, "BIT7")
 		{ }
 
+	void v200(machine_config &config);
+	void ti92(machine_config &config);
+	void ti89(machine_config &config);
+	void ti92p(machine_config &config);
+	void ti89t(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(ti68k_on_key);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<sharp_unk128mbit_device> m_flash;
 	required_region_ptr<uint16_t> m_rom_base;
@@ -83,13 +93,9 @@ public:
 	DECLARE_READ16_MEMBER ( flash_r );
 	uint64_t m_timer;
 	DECLARE_PALETTE_INIT(ti68k);
-	DECLARE_INPUT_CHANGED_MEMBER(ti68k_on_key);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(ti68k_timer_callback);
-	void v200(machine_config &config);
-	void ti92(machine_config &config);
-	void ti89(machine_config &config);
-	void ti92p(machine_config &config);
-	void ti89t(machine_config &config);
+
 	void ti89_mem(address_map &map);
 	void ti89t_mem(address_map &map);
 	void ti92_mem(address_map &map);

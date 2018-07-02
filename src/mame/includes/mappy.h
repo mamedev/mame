@@ -3,6 +3,7 @@
 #include "machine/namcoio.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mappy_state : public driver_device
@@ -29,6 +30,21 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void mappy_common(machine_config &config);
+	void mappy(machine_config &config);
+	void phozon(machine_config &config);
+	void motos(machine_config &config);
+	void grobda(machine_config &config);
+	void digdug2(machine_config &config);
+	void pacnpal(machine_config &config);
+	void superpac_common(machine_config &config);
+	void superpac(machine_config &config);
+	void todruaga(machine_config &config);
+
+	void init_grobda();
+	void init_digdug2();
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
@@ -78,21 +94,9 @@ public:
 	uint32_t screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mappy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void init_grobda();
-	void init_digdug2();
 	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 
-	void mappy_common(machine_config &config);
-	void mappy(machine_config &config);
-	void phozon(machine_config &config);
-	void motos(machine_config &config);
-	void grobda(machine_config &config);
-	void digdug2(machine_config &config);
-	void pacnpal(machine_config &config);
-	void superpac_common(machine_config &config);
-	void superpac(machine_config &config);
-	void todruaga(machine_config &config);
 	void mappy_cpu1_map(address_map &map);
 	void mappy_cpu2_map(address_map &map);
 	void phozon_cpu1_map(address_map &map);

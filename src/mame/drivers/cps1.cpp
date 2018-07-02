@@ -540,17 +540,17 @@ void cps_state::main_map(address_map &map)
 	map(0x000000, 0x3fffff).rom();
 	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
 	/* forgottn, willow, cawing, nemo, varth read from 800010. Probably debug input leftover from development */
-	map(0x800018, 0x80001f).r(this, FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
+	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
 	map(0x800020, 0x800021).nopr();                     /* ? Used by Rockman ? not mapped according to PAL */
-	map(0x800030, 0x800037).w(this, FUNC(cps_state::cps1_coinctrl_w));
+	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
 	/* Forgotten Worlds has dial controls on B-board mapped at 800040-80005f. See below */
-	map(0x800100, 0x80013f).w(this, FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
 	/* CPS-B custom is mapped by the PAL IOB2 on the B-board. SF2 revision "E" World and USA 910228 has it at a different
 	   address, see DRIVER_INIT */
-	map(0x800140, 0x80017f).rw(this, FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
-	map(0x800180, 0x800187).w(this, FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
-	map(0x800188, 0x80018f).w(this, FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
-	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800180, 0x800187).w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
+	map(0x800188, 0x80018f).w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
@@ -560,8 +560,8 @@ void cps_state::main_map(address_map &map)
 void cps_state::forgottn_map(address_map &map)
 {
 	main_map(map);
-	map(0x800041, 0x800041).w("upd4701", FUNC(upd4701_device::reset_x));
-	map(0x800049, 0x800049).w("upd4701", FUNC(upd4701_device::reset_y));
+	map(0x800041, 0x800041).w("upd4701", FUNC(upd4701_device::reset_x_w));
+	map(0x800049, 0x800049).w("upd4701", FUNC(upd4701_device::reset_y_w));
 	map(0x800052, 0x800055).r("upd4701", FUNC(upd4701_device::read_x)).umask16(0x00ff);
 	map(0x80005a, 0x80005d).r("upd4701", FUNC(upd4701_device::read_y)).umask16(0x00ff);
 }
@@ -596,8 +596,8 @@ void cps_state::sub_map(address_map &map)
 	map(0xd000, 0xd7ff).ram();
 	map(0xf000, 0xf001).rw("2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xf002, 0xf002).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xf004, 0xf004).w(this, FUNC(cps_state::cps1_snd_bankswitch_w));
-	map(0xf006, 0xf006).w(this, FUNC(cps_state::cps1_oki_pin7_w)); /* controls pin 7 of OKI chip */
+	map(0xf004, 0xf004).w(FUNC(cps_state::cps1_snd_bankswitch_w));
+	map(0xf006, 0xf006).w(FUNC(cps_state::cps1_oki_pin7_w)); /* controls pin 7 of OKI chip */
 	map(0xf008, 0xf008).r(m_soundlatch, FUNC(generic_latch_8_device::read)); /* Sound command */
 	map(0xf00a, 0xf00a).r(m_soundlatch2, FUNC(generic_latch_8_device::read)); /* Sound timer fade */
 }
@@ -606,18 +606,18 @@ void cps_state::qsound_main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
-	map(0x800018, 0x80001f).r(this, FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
-	map(0x800030, 0x800037).w(this, FUNC(cps_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(this, FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).rw(this, FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");    /* CPS-B custom (mapped by LWIO/IOB1 PAL on B-board) */
-	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
-	map(0xf00000, 0xf0ffff).r(this, FUNC(cps_state::qsound_rom_r));          /* Slammasters protection */
-	map(0xf18000, 0xf19fff).rw(this, FUNC(cps_state::qsound_sharedram1_r), FUNC(cps_state::qsound_sharedram1_w));  /* Q RAM */
+	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
+	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");    /* CPS-B custom (mapped by LWIO/IOB1 PAL on B-board) */
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
+	map(0xf00000, 0xf0ffff).r(FUNC(cps_state::qsound_rom_r));          /* Slammasters protection */
+	map(0xf18000, 0xf19fff).rw(FUNC(cps_state::qsound_sharedram1_r), FUNC(cps_state::qsound_sharedram1_w));  /* Q RAM */
 	map(0xf1c000, 0xf1c001).portr("IN2");            /* Player 3 controls (later games) */
 	map(0xf1c002, 0xf1c003).portr("IN3");            /* Player 4 controls ("Muscle Bombers") */
-	map(0xf1c004, 0xf1c005).w(this, FUNC(cps_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
+	map(0xf1c004, 0xf1c005).w(FUNC(cps_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
-	map(0xf1e000, 0xf1ffff).rw(this, FUNC(cps_state::qsound_sharedram2_r), FUNC(cps_state::qsound_sharedram2_w));  /* Q RAM */
+	map(0xf1e000, 0xf1ffff).rw(FUNC(cps_state::qsound_sharedram2_r), FUNC(cps_state::qsound_sharedram2_w));  /* Q RAM */
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
@@ -627,7 +627,7 @@ void cps_state::qsound_sub_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");    /* banked (contains music data) */
 	map(0xc000, 0xcfff).ram().share("qsound_ram1");
 	map(0xd000, 0xd002).w("qsound", FUNC(qsound_device::qsound_w));
-	map(0xd003, 0xd003).w(this, FUNC(cps_state::qsound_banksw_w));
+	map(0xd003, 0xd003).w(FUNC(cps_state::qsound_banksw_w));
 	map(0xd007, 0xd007).r("qsound", FUNC(qsound_device::qsound_r));
 	map(0xf000, 0xffff).ram().share("qsound_ram2");
 }
@@ -641,16 +641,16 @@ void cps_state::sf2m3_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x800010, 0x800011).portr("IN1");            /* Player input ports */
-	map(0x800028, 0x80002f).r(this, FUNC(cps_state::cps1_hack_dsw_r));            /* System input ports / Dip Switches */
-	map(0x800030, 0x800037).w(this, FUNC(cps_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(this, FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).rw(this, FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");   /* CPS-B custom */
-	map(0x800186, 0x800187).r(this, FUNC(cps_state::cps1_in2_r));            /* Buttons 4,5,6 for both players */
-	map(0x800190, 0x800197).w(this, FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
-	map(0x800198, 0x80019f).w(this, FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
-	map(0x8001a0, 0x8001c3).w(this, FUNC(cps_state::cps1_cps_a_w));
-	map(0x8001c4, 0x8001c5).w(this, FUNC(cps_state::sf2m3_layer_w));
-	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
+	map(0x800028, 0x80002f).r(FUNC(cps_state::cps1_hack_dsw_r));            /* System input ports / Dip Switches */
+	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");   /* CPS-B custom */
+	map(0x800186, 0x800187).r(FUNC(cps_state::cps1_in2_r));            /* Buttons 4,5,6 for both players */
+	map(0x800190, 0x800197).w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
+	map(0x800198, 0x80019f).w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
+	map(0x8001a0, 0x8001c3).w(FUNC(cps_state::cps1_cps_a_w));
+	map(0x8001c4, 0x8001c5).w(FUNC(cps_state::sf2m3_layer_w));
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0xff0000, 0xffffff).ram();
 }
 
@@ -658,18 +658,18 @@ void cps_state::sf2m10_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x800000, 0x800007).portr("IN1");
-	map(0x800018, 0x80001f).r(this, FUNC(cps_state::cps1_hack_dsw_r));
+	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_hack_dsw_r));
 	map(0x800020, 0x800021).nopr();
-	map(0x800030, 0x800037).w(this, FUNC(cps_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(this, FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");
-	map(0x800140, 0x80017f).rw(this, FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
-	map(0x800180, 0x800187).w(this, FUNC(cps_state::cps1_soundlatch_w));
-	map(0x800188, 0x80018f).w(this, FUNC(cps_state::cps1_soundlatch2_w));
-	map(0x8001a2, 0x8001b3).w(this, FUNC(cps_state::cps1_cps_a_w)); // make 8001b2 point at 800110
+	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800180, 0x800187).w(FUNC(cps_state::cps1_soundlatch_w));
+	map(0x800188, 0x80018f).w(FUNC(cps_state::cps1_soundlatch2_w));
+	map(0x8001a2, 0x8001b3).w(FUNC(cps_state::cps1_cps_a_w)); // make 8001b2 point at 800110
 	map(0x8001fe, 0x8001ff).nopw(); // writes FFFF here a lot
-	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0xe00000, 0xefffff).ram(); // it writes to the whole range at start
-	map(0xf1c000, 0xf1c001).r(this, FUNC(cps_state::cps1_in2_r));
+	map(0xf1c000, 0xf1c001).r(FUNC(cps_state::cps1_in2_r));
 	map(0xfeff00, 0xfeffff).ram(); // fix stack crash at start
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
@@ -3438,7 +3438,7 @@ MACHINE_CONFIG_START(cps_state::pang3)
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cps_state::ganbare)
@@ -3448,7 +3448,7 @@ MACHINE_CONFIG_START(cps_state::ganbare)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps_state, ganbare_interrupt, "screen", 0, 1) // need to investigate more
 
-	MCFG_M48T35_ADD("m48t35")
+	MCFG_DEVICE_ADD("m48t35", M48T35, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cps_state::qsound)
@@ -3467,7 +3467,7 @@ MACHINE_CONFIG_START(cps_state::qsound)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, qsound)
 
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("mono")
@@ -3488,7 +3488,7 @@ MACHINE_CONFIG_START(cps_state::wofhfh)
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cps_state::sf2m3)

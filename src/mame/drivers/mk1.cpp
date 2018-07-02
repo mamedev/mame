@@ -58,18 +58,18 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void mk1(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mk1_f8_r);
 	DECLARE_WRITE8_MEMBER(mk1_f8_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
 	F3853_INTERRUPT_REQ_CB(mk1_interrupt);
-	void mk1(machine_config &config);
 	void mk1_io(address_map &map);
 	void mk1_mem(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 
-private:
 	uint8_t m_f8[2];
 	uint8_t m_led_data[4];
 	required_device<cpu_device> m_maincpu;
@@ -126,7 +126,7 @@ void mk1_state::mk1_mem(address_map &map)
 
 void mk1_state::mk1_io(address_map &map)
 {
-	map(0x0, 0x1).rw(this, FUNC(mk1_state::mk1_f8_r), FUNC(mk1_state::mk1_f8_w));
+	map(0x0, 0x1).rw(FUNC(mk1_state::mk1_f8_r), FUNC(mk1_state::mk1_f8_w));
 	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 

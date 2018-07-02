@@ -103,6 +103,7 @@ TODO:
 #include "emu.h"
 #include "cpu/sh/sh4.h"
 #include "debugger.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -116,6 +117,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu") { }
 
+	void atvtrack(machine_config &config);
+
+protected:
 	DECLARE_READ64_MEMBER(control_r);
 	DECLARE_WRITE64_MEMBER(control_w);
 	DECLARE_READ64_MEMBER(nand_data_r);
@@ -144,12 +148,12 @@ public:
 	u16 gpu_irq_mask;
 	void gpu_irq_test();
 	void gpu_irq_set(int);
-	void atvtrack(machine_config &config);
+
 	void atvtrack_main_map(address_map &map);
 	void atvtrack_main_port(address_map &map);
 	void atvtrack_sub_map(address_map &map);
 	void atvtrack_sub_port(address_map &map);
-protected:
+
 	bool m_slaverun;
 };
 
@@ -160,9 +164,12 @@ public:
 	smashdrv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atvtrack_state(mconfig, type, tag) { }
 
+	void smashdrv(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void smashdrv(machine_config &config);
+
 	void smashdrv_main_map(address_map &map);
 	void smashdrv_main_port(address_map &map);
 };
@@ -510,17 +517,17 @@ void smashdrv_state::machine_reset()
 void atvtrack_state::atvtrack_main_map(address_map &map)
 {
 	map(0x00000000, 0x000003ff).ram().share("sharedmem");
-	map(0x00020000, 0x00020007).rw(this, FUNC(atvtrack_state::control_r), FUNC(atvtrack_state::control_w)); // control registers
+	map(0x00020000, 0x00020007).rw(FUNC(atvtrack_state::control_r), FUNC(atvtrack_state::control_w)); // control registers
 //  AM_RANGE(0x00020040, 0x0002007f) // audio DAC buffer
-	map(0x14000000, 0x14000007).rw(this, FUNC(atvtrack_state::nand_data_r), FUNC(atvtrack_state::nand_data_w));
-	map(0x14100000, 0x14100007).w(this, FUNC(atvtrack_state::nand_cmd_w));
-	map(0x14200000, 0x14200007).w(this, FUNC(atvtrack_state::nand_addr_w));
+	map(0x14000000, 0x14000007).rw(FUNC(atvtrack_state::nand_data_r), FUNC(atvtrack_state::nand_data_w));
+	map(0x14100000, 0x14100007).w(FUNC(atvtrack_state::nand_cmd_w));
+	map(0x14200000, 0x14200007).w(FUNC(atvtrack_state::nand_addr_w));
 	map(0x0c000000, 0x0c7fffff).ram();
 }
 
 void atvtrack_state::atvtrack_main_port(address_map &map)
 {
-	map(0x00, 0x1f).rw(this, FUNC(atvtrack_state::ioport_r), FUNC(atvtrack_state::ioport_w));
+	map(0x00, 0x1f).rw(FUNC(atvtrack_state::ioport_r), FUNC(atvtrack_state::ioport_w));
 }
 
 // Smashing Drive
@@ -530,7 +537,7 @@ void smashdrv_state::smashdrv_main_map(address_map &map)
 	map(0x00000000, 0x03ffffff).rom();
 	map(0x0c000000, 0x0c7fffff).ram();
 	map(0x10000000, 0x100003ff).ram().share("sharedmem");
-	map(0x10000400, 0x10000407).rw(this, FUNC(smashdrv_state::control_r), FUNC(smashdrv_state::control_w)); // control registers
+	map(0x10000400, 0x10000407).rw(FUNC(smashdrv_state::control_r), FUNC(smashdrv_state::control_w)); // control registers
 
 // 0x10000400 - 0x1000043F control registers
 // 0x10000440 - 0x1000047F Audio DAC buffer
@@ -539,7 +546,7 @@ void smashdrv_state::smashdrv_main_map(address_map &map)
 
 void smashdrv_state::smashdrv_main_port(address_map &map)
 {
-	map(0x00, 0x1f).rw(this, FUNC(smashdrv_state::ioport_r), FUNC(smashdrv_state::ioport_w));
+	map(0x00, 0x1f).rw(FUNC(smashdrv_state::ioport_r), FUNC(smashdrv_state::ioport_w));
 }
 
 // Sub CPU (same for both games)
@@ -548,7 +555,7 @@ void atvtrack_state::atvtrack_sub_map(address_map &map)
 {
 	map(0x00000000, 0x000003ff).ram().share("sharedmem");
 	map(0x0c000000, 0x0cffffff).ram();
-	map(0x14000000, 0x14003fff).rw(this, FUNC(atvtrack_state::gpu_r), FUNC(atvtrack_state::gpu_w));
+	map(0x14000000, 0x14003fff).rw(FUNC(atvtrack_state::gpu_r), FUNC(atvtrack_state::gpu_w));
 // 0x14004xxx GPU PCI CONFIG registers
 	map(0x18000000, 0x19ffffff).ram();
 // 0x18000000 - 0x19FFFFFF GPU RAM (32MB)

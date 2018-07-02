@@ -30,6 +30,7 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -47,7 +48,13 @@ public:
 			m_fg_videoram(*this, "fg_videoram"),
 			m_spriteram(*this, "spriteram") { }
 
+	void puzzlovek(machine_config &config);
+	void puzzlove(machine_config &config);
+	void silvmil(machine_config &config);
 
+	void init_silvmil();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -123,7 +130,6 @@ public:
 	}
 
 
-	void init_silvmil();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
@@ -132,9 +138,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
-	void puzzlovek(machine_config &config);
-	void puzzlove(machine_config &config);
-	void silvmil(machine_config &config);
+
 	void silvmil_map(address_map &map);
 	void silvmil_sound_map(address_map &map);
 };
@@ -187,18 +191,18 @@ void silvmil_state::silvmil_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 
-	map(0x100000, 0x100001).w(this, FUNC(silvmil_state::silvmil_tilebank1_w));
-	map(0x100002, 0x100003).w(this, FUNC(silvmil_state::silvmil_fg_scrollx_w));
-	map(0x100004, 0x100005).w(this, FUNC(silvmil_state::silvmil_fg_scrolly_w));
-	map(0x100006, 0x100007).w(this, FUNC(silvmil_state::silvmil_bg_scrollx_w));
-	map(0x100008, 0x100009).w(this, FUNC(silvmil_state::silvmil_bg_scrolly_w));
-	map(0x10000e, 0x10000f).w(this, FUNC(silvmil_state::silvmil_tilebank_w));
+	map(0x100000, 0x100001).w(FUNC(silvmil_state::silvmil_tilebank1_w));
+	map(0x100002, 0x100003).w(FUNC(silvmil_state::silvmil_fg_scrollx_w));
+	map(0x100004, 0x100005).w(FUNC(silvmil_state::silvmil_fg_scrolly_w));
+	map(0x100006, 0x100007).w(FUNC(silvmil_state::silvmil_bg_scrollx_w));
+	map(0x100008, 0x100009).w(FUNC(silvmil_state::silvmil_bg_scrolly_w));
+	map(0x10000e, 0x10000f).w(FUNC(silvmil_state::silvmil_tilebank_w));
 
-	map(0x120000, 0x120fff).ram().w(this, FUNC(silvmil_state::silvmil_fg_videoram_w)).share("fg_videoram");
-	map(0x122000, 0x122fff).ram().w(this, FUNC(silvmil_state::silvmil_bg_videoram_w)).share("bg_videoram");
+	map(0x120000, 0x120fff).ram().w(FUNC(silvmil_state::silvmil_fg_videoram_w)).share("fg_videoram");
+	map(0x122000, 0x122fff).ram().w(FUNC(silvmil_state::silvmil_bg_videoram_w)).share("bg_videoram");
 	map(0x200000, 0x2005ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x210000, 0x2107ff).ram().share("spriteram");
-	map(0x270000, 0x270001).w(this, FUNC(silvmil_state::silvmil_soundcmd_w));
+	map(0x270000, 0x270001).w(FUNC(silvmil_state::silvmil_soundcmd_w));
 	map(0x280000, 0x280001).portr("P1_P2");
 	map(0x280002, 0x280003).portr("COIN");
 	map(0x280004, 0x280005).portr("DSW");

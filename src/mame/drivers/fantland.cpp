@@ -131,11 +131,11 @@ void fantland_state::fantland_map(address_map &map)
 
 	map(0xa2000, 0xa21ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	map(0xa3000, 0xa3001).portr("a3000").w(this, FUNC(fantland_state::fantland_nmi_enable_16_w));
-	map(0xa3002, 0xa3003).portr("a3002").w(this, FUNC(fantland_state::fantland_soundlatch_16_w));
+	map(0xa3000, 0xa3001).portr("a3000").w(FUNC(fantland_state::fantland_nmi_enable_16_w));
+	map(0xa3002, 0xa3003).portr("a3002").w(FUNC(fantland_state::fantland_soundlatch_16_w));
 
-	map(0xa4000, 0xa67ff).rw(this, FUNC(fantland_state::spriteram_16_r), FUNC(fantland_state::spriteram_16_w)).share("spriteram");
-	map(0xc0000, 0xcffff).rw(this, FUNC(fantland_state::spriteram2_16_r), FUNC(fantland_state::spriteram2_16_w)).share("spriteram2");
+	map(0xa4000, 0xa67ff).rw(FUNC(fantland_state::spriteram_16_r), FUNC(fantland_state::spriteram_16_w)).share("spriteram");
+	map(0xc0000, 0xcffff).rw(FUNC(fantland_state::spriteram2_16_r), FUNC(fantland_state::spriteram2_16_w)).share("spriteram2");
 
 	map(0xe0000, 0xfffff).rom();
 }
@@ -152,9 +152,9 @@ void fantland_state::galaxygn_map(address_map &map)
 
 	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	map(0x53000, 0x53000).portr("P1").w(this, FUNC(fantland_state::fantland_nmi_enable_w));
+	map(0x53000, 0x53000).portr("P1").w(FUNC(fantland_state::fantland_nmi_enable_w));
 	map(0x53001, 0x53001).portr("P2");
-	map(0x53002, 0x53002).portr("DSW1").w(this, FUNC(fantland_state::fantland_soundlatch_w));
+	map(0x53002, 0x53002).portr("DSW1").w(FUNC(fantland_state::fantland_soundlatch_w));
 	map(0x53003, 0x53003).portr("DSW2");
 
 	map(0x54000, 0x567ff).ram().share("spriteram");
@@ -244,8 +244,8 @@ void fantland_state::borntofi_map(address_map &map)
 	map(0x10000, 0x2ffff).rom();
 
 	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x53000, 0x53001).rw(this, FUNC(fantland_state::borntofi_inputs_r), FUNC(fantland_state::borntofi_nmi_enable_w));
-	map(0x53002, 0x53002).portr("DSW").w(this, FUNC(fantland_state::fantland_soundlatch_w));
+	map(0x53000, 0x53001).rw(FUNC(fantland_state::borntofi_inputs_r), FUNC(fantland_state::borntofi_nmi_enable_w));
+	map(0x53002, 0x53002).portr("DSW").w(FUNC(fantland_state::fantland_soundlatch_w));
 	map(0x53003, 0x53003).portr("Controls");
 
 	map(0x54000, 0x567ff).ram().share("spriteram");
@@ -275,9 +275,9 @@ void fantland_state::wheelrun_map(address_map &map)
 
 	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	map(0x53000, 0x53000).portr("53000").w(this, FUNC(fantland_state::borntofi_nmi_enable_w));
+	map(0x53000, 0x53000).portr("53000").w(FUNC(fantland_state::borntofi_nmi_enable_w));
 	map(0x53001, 0x53001).portr("53001");
-	map(0x53002, 0x53002).portr("53002").w(this, FUNC(fantland_state::fantland_soundlatch_w));
+	map(0x53002, 0x53002).portr("53002").w(FUNC(fantland_state::fantland_soundlatch_w));
 	map(0x53003, 0x53003).portr("53003").nopw();
 
 	map(0x54000, 0x567ff).ram().share("spriteram");
@@ -305,7 +305,7 @@ void fantland_state::fantland_sound_iomap(address_map &map)
 {
 	map(0x0080, 0x0080).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x0100, 0x0101).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x0180, 0x0180).w("dac", FUNC(dac_byte_interface::write));
+	map(0x0180, 0x0180).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 void fantland_state::galaxygn_sound_iomap(address_map &map)
@@ -396,7 +396,7 @@ void fantland_state::borntofi_adpcm_int( msm5205_device *device, int voice )
 	}
 	else
 	{
-		device->data_w(rom[start / 2] >> ((start & 1) * 4));
+		device->write_data(rom[start / 2] >> ((start & 1) * 4));
 		m_adpcm_nibble[voice]++;
 	}
 }
@@ -411,7 +411,7 @@ void fantland_state::borntofi_sound_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram();
 	map(0x04000, 0x04000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x04000, 0x0401f).w(this, FUNC(fantland_state::borntofi_msm5205_w));
+	map(0x04000, 0x0401f).w(FUNC(fantland_state::borntofi_msm5205_w));
 	map(0x08000, 0x0ffff).rom();
 	map(0xf8000, 0xfffff).rom();
 }

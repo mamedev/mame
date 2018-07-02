@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
 #include "machine/tmp68301.h"
+#include "emupal.h"
 #include "screen.h"
 
 class realbrk_state : public driver_device
@@ -23,6 +24,12 @@ public:
 		m_vram_0ras(*this, "vram_0ras"),
 		m_vram_1ras(*this, "vram_1ras") { }
 
+	void pkgnsh(machine_config &config);
+	void dai2kaku(machine_config &config);
+	void realbrk(machine_config &config);
+	void pkgnshdx(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -76,10 +83,6 @@ public:
 	void dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void pkgnsh(machine_config &config);
-	void dai2kaku(machine_config &config);
-	void realbrk(machine_config &config);
-	void pkgnshdx(machine_config &config);
 	void base_mem(address_map &map);
 	void dai2kaku_mem(address_map &map);
 	void pkgnsh_mem(address_map &map);

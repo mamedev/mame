@@ -129,14 +129,14 @@ void inufuku_state::inufuku_map(address_map &map)
 
 	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");                        // palette ram
 	map(0x380000, 0x3801ff).writeonly().share("bg_rasterram");                                  // bg raster ram
-	map(0x400000, 0x401fff).rw(this, FUNC(inufuku_state::inufuku_bg_videoram_r), FUNC(inufuku_state::inufuku_bg_videoram_w)).share("bg_videoram");     // bg ram
-	map(0x402000, 0x403fff).rw(this, FUNC(inufuku_state::inufuku_tx_videoram_r), FUNC(inufuku_state::inufuku_tx_videoram_w)).share("tx_videoram");     // text ram
+	map(0x400000, 0x401fff).rw(FUNC(inufuku_state::inufuku_bg_videoram_r), FUNC(inufuku_state::inufuku_bg_videoram_w)).share("bg_videoram");     // bg ram
+	map(0x402000, 0x403fff).rw(FUNC(inufuku_state::inufuku_tx_videoram_r), FUNC(inufuku_state::inufuku_tx_videoram_w)).share("tx_videoram");     // text ram
 	map(0x404000, 0x40ffff).ram(); // ?? mirror (3on3dunk)
 	map(0x580000, 0x581fff).ram().share("spriteram1");                          // sprite table + sprite attribute
 	map(0x600000, 0x61ffff).ram().share("spriteram2");                                          // cell table
 
-	map(0x780000, 0x780013).w(this, FUNC(inufuku_state::inufuku_palettereg_w)); // bg & text palettebank register
-	map(0x7a0000, 0x7a0023).w(this, FUNC(inufuku_state::inufuku_scrollreg_w));  // bg & text scroll register
+	map(0x780000, 0x780013).w(FUNC(inufuku_state::inufuku_palettereg_w)); // bg & text palettebank register
+	map(0x7a0000, 0x7a0023).w(FUNC(inufuku_state::inufuku_scrollreg_w));  // bg & text scroll register
 //  AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP                    // ?
 
 	map(0x800000, 0xbfffff).rom(); // data rom
@@ -160,7 +160,7 @@ void inufuku_state::inufuku_sound_map(address_map &map)
 void inufuku_state::inufuku_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(inufuku_state::inufuku_soundrombank_w));
+	map(0x00, 0x00).w(FUNC(inufuku_state::inufuku_soundrombank_w));
 	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 								/* IRQs are triggered by the YM2610 */
 
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

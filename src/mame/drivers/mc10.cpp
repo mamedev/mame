@@ -37,6 +37,11 @@ class mc10_state : public driver_device
 public:
 	mc10_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void alice90(machine_config &config);
+	void alice32(machine_config &config);
+	void mc10(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mc10_bfff_r);
 	DECLARE_WRITE8_MEMBER(mc10_bfff_w);
 	DECLARE_READ8_MEMBER(mc10_port1_r);
@@ -49,18 +54,14 @@ public:
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
 
-	void alice90(machine_config &config);
-	void alice32(machine_config &config);
-	void mc10(machine_config &config);
 	void alice32_mem(address_map &map);
 	void alice90_mem(address_map &map);
 	void mc10_io(address_map &map);
 	void mc10_mem(address_map &map);
-protected:
+
 	// device-level overrides
 	virtual void driver_start() override;
 
-private:
 	//printer state
 	enum class printer_state : uint8_t
 	{
@@ -301,14 +302,14 @@ void mc10_state::mc10_mem(address_map &map)
 	map(0x4000, 0x4fff).bankrw("bank1"); /* 4k internal ram */
 	map(0x5000, 0x8fff).bankrw("bank2"); /* 16k memory expansion */
 	map(0x9000, 0xbffe).noprw(); /* unused */
-	map(0xbfff, 0xbfff).rw(this, FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::mc10_bfff_w));
+	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::mc10_bfff_w));
 	map(0xe000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
 }
 
 void mc10_state::mc10_io(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(mc10_state::mc10_port1_r), FUNC(mc10_state::mc10_port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(mc10_state::mc10_port2_r), FUNC(mc10_state::mc10_port2_w));
+	map(M6801_PORT1, M6801_PORT1).rw(FUNC(mc10_state::mc10_port1_r), FUNC(mc10_state::mc10_port1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(mc10_state::mc10_port2_r), FUNC(mc10_state::mc10_port2_w));
 }
 
 void mc10_state::alice32_mem(address_map &map)
@@ -318,7 +319,7 @@ void mc10_state::alice32_mem(address_map &map)
 	map(0x5000, 0x8fff).bankrw("bank2"); /* 16k memory expansion */
 	map(0x9000, 0xafff).noprw(); /* unused */
 	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
-	map(0xbfff, 0xbfff).rw(this, FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::alice32_bfff_w));
+	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::alice32_bfff_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
 }
 
@@ -327,7 +328,7 @@ void mc10_state::alice90_mem(address_map &map)
 	map(0x0100, 0x2fff).noprw(); /* unused */
 	map(0x3000, 0xafff).bankrw("bank1");    /* 32k internal ram */
 	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
-	map(0xbfff, 0xbfff).rw(this, FUNC(mc10_state::alice90_bfff_r), FUNC(mc10_state::alice32_bfff_w));
+	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::alice90_bfff_r), FUNC(mc10_state::alice32_bfff_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
 }
 

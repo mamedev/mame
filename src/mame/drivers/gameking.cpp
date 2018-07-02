@@ -29,6 +29,7 @@
 #include "cpu/m6502/r65c02.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -45,7 +46,13 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
+	void gameking(machine_config &config);
+	void gameking3(machine_config &config);
+	void gameking1(machine_config &config);
+
 	void init_gameking();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(gameking);
@@ -69,11 +76,8 @@ public:
 		uint8_t bank8000_cart; //34 bit 7; bits 0,1,.. a15,a16,..
 		uint8_t res2[0x4c];
 	};
-	void gameking(machine_config &config);
-	void gameking3(machine_config &config);
-	void gameking1(machine_config &config);
 	void gameking_mem(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_io_joy;
@@ -150,11 +154,11 @@ READ8_MEMBER(gameking_state::lcd_r)
 
 void gameking_state::gameking_mem(address_map &map)
 {
-	map(0x0000, 0x007f).rw(this, FUNC(gameking_state::io_r), FUNC(gameking_state::io_w));
+	map(0x0000, 0x007f).rw(FUNC(gameking_state::io_r), FUNC(gameking_state::io_w));
 	map(0x0080, 0x01ff).ram();
 	map(0x0200, 0x03ff).ram(); // lcd 2nd copy
 
-	map(0x0600, 0x077f).rw(this, FUNC(gameking_state::lcd_r), FUNC(gameking_state::lcd_w));
+	map(0x0600, 0x077f).rw(FUNC(gameking_state::lcd_r), FUNC(gameking_state::lcd_w));
 	map(0x0d00, 0x0fff).ram(); // d00, e00, f00 prooved on handheld
 //  AM_RANGE(0x1000, 0x1fff) AM_RAM    // sthero writes to $19xx
 

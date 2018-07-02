@@ -23,6 +23,7 @@
 #include "machine/tc009xlvc.h"
 #include "machine/timer.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -35,6 +36,9 @@ public:
 		m_vdp(*this, "tc0091lvc")
 	{ }
 
+	void dfruit(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
 
@@ -70,7 +74,6 @@ public:
 	uint8_t ram_bank_r(uint16_t offset, uint8_t bank_num);
 	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
 	TIMER_DEVICE_CALLBACK_MEMBER(dfruit_irq_scanline);
-	void dfruit(machine_config &config);
 	void dfruit_map(address_map &map);
 	void tc0091lvc_map(address_map &map);
 };
@@ -145,14 +148,12 @@ WRITE8_MEMBER(dfruit_state::dfruit_ram_bank_w)
 
 uint8_t dfruit_state::ram_bank_r(uint16_t offset, uint8_t bank_num)
 {
-	address_space &vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
-	return vdp_space.read_byte(offset + (m_ram_bank[bank_num]) * 0x1000);;
+	return m_vdp->space().read_byte(offset + (m_ram_bank[bank_num]) * 0x1000);;
 }
 
 void dfruit_state::ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num)
 {
-	address_space &vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
-	vdp_space.write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
+	m_vdp->space().write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
 }
 
 READ8_MEMBER(dfruit_state::dfruit_ram_0_r) { return ram_bank_r(offset, 0); }
@@ -167,20 +168,20 @@ WRITE8_MEMBER(dfruit_state::dfruit_ram_3_w) { ram_bank_w(offset, data, 3); }
 void dfruit_state::tc0091lvc_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x7fff).r(this, FUNC(dfruit_state::dfruit_rom_r));
+	map(0x6000, 0x7fff).r(FUNC(dfruit_state::dfruit_rom_r));
 
 	map(0x8000, 0x9fff).ram();
 
-	map(0xc000, 0xcfff).rw(this, FUNC(dfruit_state::dfruit_ram_0_r), FUNC(dfruit_state::dfruit_ram_0_w));
-	map(0xd000, 0xdfff).rw(this, FUNC(dfruit_state::dfruit_ram_1_r), FUNC(dfruit_state::dfruit_ram_1_w));
-	map(0xe000, 0xefff).rw(this, FUNC(dfruit_state::dfruit_ram_2_r), FUNC(dfruit_state::dfruit_ram_2_w));
-	map(0xf000, 0xfdff).rw(this, FUNC(dfruit_state::dfruit_ram_3_r), FUNC(dfruit_state::dfruit_ram_3_w));
+	map(0xc000, 0xcfff).rw(FUNC(dfruit_state::dfruit_ram_0_r), FUNC(dfruit_state::dfruit_ram_0_w));
+	map(0xd000, 0xdfff).rw(FUNC(dfruit_state::dfruit_ram_1_r), FUNC(dfruit_state::dfruit_ram_1_w));
+	map(0xe000, 0xefff).rw(FUNC(dfruit_state::dfruit_ram_2_r), FUNC(dfruit_state::dfruit_ram_2_w));
+	map(0xf000, 0xfdff).rw(FUNC(dfruit_state::dfruit_ram_3_r), FUNC(dfruit_state::dfruit_ram_3_w));
 
 	map(0xfe00, 0xfeff).rw(m_vdp, FUNC(tc0091lvc_device::vregs_r), FUNC(tc0091lvc_device::vregs_w));
-	map(0xff00, 0xff02).rw(this, FUNC(dfruit_state::dfruit_irq_vector_r), FUNC(dfruit_state::dfruit_irq_vector_w));
-	map(0xff03, 0xff03).rw(this, FUNC(dfruit_state::dfruit_irq_enable_r), FUNC(dfruit_state::dfruit_irq_enable_w));
-	map(0xff04, 0xff07).rw(this, FUNC(dfruit_state::dfruit_ram_bank_r), FUNC(dfruit_state::dfruit_ram_bank_w));
-	map(0xff08, 0xff08).rw(this, FUNC(dfruit_state::dfruit_rom_bank_r), FUNC(dfruit_state::dfruit_rom_bank_w));
+	map(0xff00, 0xff02).rw(FUNC(dfruit_state::dfruit_irq_vector_r), FUNC(dfruit_state::dfruit_irq_vector_w));
+	map(0xff03, 0xff03).rw(FUNC(dfruit_state::dfruit_irq_enable_r), FUNC(dfruit_state::dfruit_irq_enable_w));
+	map(0xff04, 0xff07).rw(FUNC(dfruit_state::dfruit_ram_bank_r), FUNC(dfruit_state::dfruit_ram_bank_w));
+	map(0xff08, 0xff08).rw(FUNC(dfruit_state::dfruit_rom_bank_r), FUNC(dfruit_state::dfruit_rom_bank_w));
 }
 
 

@@ -34,6 +34,7 @@ TODO:
 #include "sound/volt_reg.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -71,7 +72,16 @@ public:
 		m_palette(*this, "palette"),
 		m_blitter(*this, "blitter") { }
 
+	void ngalsumr(machine_config &config);
+	void sexygal(machine_config &config);
+	void sweetgal(machine_config &config);
+	void sgaltrop(machine_config &config);
+	void royalqn(machine_config &config);
 
+	void init_ngalsumr();
+	void init_royalqn();
+
+private:
 	emu_timer *m_z80_wait_ack_timer;
 
 	required_shared_ptr<uint8_t> m_comms_ram;
@@ -99,8 +109,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sexygal_audioff_w);
 	DECLARE_WRITE8_MEMBER(sexygal_audionmi_w);
 
-	void init_ngalsumr();
-	void init_royalqn();
 	DECLARE_WRITE8_MEMBER(ngalsumr_prot_latch_w);
 	DECLARE_READ8_MEMBER(ngalsumr_prot_value_r);
 	virtual void machine_start() override;
@@ -109,11 +117,6 @@ public:
 	DECLARE_PALETTE_INIT(nightgal);
 	uint32_t screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ngalsumr(machine_config &config);
-	void sexygal(machine_config &config);
-	void sweetgal(machine_config &config);
-	void sgaltrop(machine_config &config);
-	void royalqn(machine_config &config);
 	void common_nsc_map(address_map &map);
 	void common_sexygal_io(address_map &map);
 	void royalqn_io(address_map &map);
@@ -126,7 +129,7 @@ public:
 	void sgaltrop_io(address_map &map);
 	void sgaltrop_nsc_map(address_map &map);
 	void sweetgal_map(address_map &map);
-protected:
+
 	required_ioport m_io_cr_clear;
 	required_ioport m_io_coins;
 	required_ioport m_io_pl1_1;
@@ -152,7 +155,6 @@ protected:
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 
-private:
 	/* video-related */
 	uint8_t m_blit_raw_data[3];
 
@@ -375,7 +377,7 @@ void nightgal_state::common_nsc_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram();
 	map(0x0080, 0x0080).portr("BLIT_PORT");
-	map(0x0081, 0x0083).r(this, FUNC(nightgal_state::royalqn_nsc_blit_r));
+	map(0x0081, 0x0083).r(FUNC(nightgal_state::royalqn_nsc_blit_r));
 	map(0x00a0, 0x00af).w(m_blitter, FUNC(jangou_blitter_device::vregs_w));
 	map(0x00b0, 0x00b0).w(m_blitter, FUNC(jangou_blitter_device::bltflip_w));
 }
@@ -421,25 +423,25 @@ void nightgal_state::sweetgal_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x807f).ram().share("sound_ram");
-	map(0xe000, 0xefff).rw(this, FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
+	map(0xe000, 0xefff).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
 	map(0xf000, 0xffff).ram();
 }
 
 void nightgal_state::sexygal_map(address_map &map)
 {
 	sweetgal_map(map);
-	map(0x8000, 0x807f).r(this, FUNC(nightgal_state::sexygal_soundram_r));
-	map(0xa000, 0xa000).w(this, FUNC(nightgal_state::sexygal_audioff_w));
+	map(0x8000, 0x807f).r(FUNC(nightgal_state::sexygal_soundram_r));
+	map(0xa000, 0xa000).w(FUNC(nightgal_state::sexygal_audioff_w));
 }
 
 void nightgal_state::common_sexygal_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).portr("DSWA").w(this, FUNC(nightgal_state::output_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(nightgal_state::mux_w));
-	map(0x12, 0x12).mirror(0xe8).portr("DSWB").w(this, FUNC(nightgal_state::royalqn_blitter_0_w));
-	map(0x13, 0x13).mirror(0xe8).portr("DSWC").w(this, FUNC(nightgal_state::royalqn_blitter_1_w));
-	map(0x14, 0x14).mirror(0xe8).nopr().w(this, FUNC(nightgal_state::royalqn_blitter_2_w));
+	map(0x10, 0x10).portr("DSWA").w(FUNC(nightgal_state::output_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(nightgal_state::mux_w));
+	map(0x12, 0x12).mirror(0xe8).portr("DSWB").w(FUNC(nightgal_state::royalqn_blitter_0_w));
+	map(0x13, 0x13).mirror(0xe8).portr("DSWC").w(FUNC(nightgal_state::royalqn_blitter_1_w));
+	map(0x14, 0x14).mirror(0xe8).nopr().w(FUNC(nightgal_state::royalqn_blitter_2_w));
 }
 
 void nightgal_state::sexygal_io(address_map &map)
@@ -463,7 +465,7 @@ void nightgal_state::sexygal_nsc_map(address_map &map)
 {
 	common_nsc_map(map);
 	map(0x0080, 0x0086).m(m_blitter, FUNC(jangou_blitter_device::blit_v2_regs));
-	map(0x1000, 0x13ff).mirror(0x2c00).rw(this, FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
+	map(0x1000, 0x13ff).mirror(0x2c00).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
 	map(0xc000, 0xdfff).mirror(0x2000).rom().region("subrom", 0);
 }
 
@@ -472,7 +474,7 @@ void nightgal_state::sgaltrop_nsc_map(address_map &map)
 	common_nsc_map(map);
 
 	map(0x0080, 0x0086).m(m_blitter, FUNC(jangou_blitter_device::blit_v2_regs));
-	map(0x1000, 0x13ff).mirror(0x2c00).rw(this, FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
+	map(0x1000, 0x13ff).mirror(0x2c00).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
 	map(0xc000, 0xffff).rom().region("subrom", 0);
 }
 
@@ -481,10 +483,10 @@ void nightgal_state::sgaltrop_nsc_map(address_map &map)
 void nightgal_state::sexygal_audio_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram();
-	map(0x0080, 0x0080).r(this, FUNC(nightgal_state::sexygal_unknown_sound_r));
-	map(0x1000, 0x1000).w("dac", FUNC(dac_byte_interface::write));
+	map(0x0080, 0x0080).r(FUNC(nightgal_state::sexygal_unknown_sound_r));
+	map(0x1000, 0x1000).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x2000, 0x207f).ram().share("sound_ram");
-	map(0x3000, 0x3000).w(this, FUNC(nightgal_state::sexygal_audionmi_w));
+	map(0x3000, 0x3000).w(FUNC(nightgal_state::sexygal_audionmi_w));
 	map(0x4000, 0xbfff).rom().region("samples", 0);
 	map(0xc000, 0xffff).rom().region("audiorom", 0);
 }
@@ -498,7 +500,7 @@ void nightgal_state::royalqn_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).noprw();
-	map(0xc000, 0xdfff).rw(this, FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
+	map(0xc000, 0xdfff).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
 	map(0xe000, 0xffff).ram();
 }
 
@@ -507,11 +509,11 @@ void nightgal_state::royalqn_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).mirror(0xec).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).mirror(0xec).w("aysnd", FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).mirror(0xe8).portr("DSWA").w(this, FUNC(nightgal_state::output_w));
-	map(0x11, 0x11).mirror(0xe8).portr("SYSTEM").w(this, FUNC(nightgal_state::mux_w));
-	map(0x12, 0x12).mirror(0xe8).portr("DSWB").w(this, FUNC(nightgal_state::royalqn_blitter_0_w));
-	map(0x13, 0x13).mirror(0xe8).portr("DSWC").w(this, FUNC(nightgal_state::royalqn_blitter_1_w));
-	map(0x14, 0x14).mirror(0xe8).nopr().w(this, FUNC(nightgal_state::royalqn_blitter_2_w));
+	map(0x10, 0x10).mirror(0xe8).portr("DSWA").w(FUNC(nightgal_state::output_w));
+	map(0x11, 0x11).mirror(0xe8).portr("SYSTEM").w(FUNC(nightgal_state::mux_w));
+	map(0x12, 0x12).mirror(0xe8).portr("DSWB").w(FUNC(nightgal_state::royalqn_blitter_0_w));
+	map(0x13, 0x13).mirror(0xe8).portr("DSWC").w(FUNC(nightgal_state::royalqn_blitter_1_w));
+	map(0x14, 0x14).mirror(0xe8).nopr().w(FUNC(nightgal_state::royalqn_blitter_2_w));
 	map(0x15, 0x15).mirror(0xe8).noprw();
 	map(0x16, 0x16).mirror(0xe8).noprw();
 	map(0x17, 0x17).mirror(0xe8).noprw();
@@ -522,7 +524,7 @@ void nightgal_state::royalqn_nsc_map(address_map &map)
 	common_nsc_map(map);
 
 	map(0x0080, 0x0086).m(m_blitter, FUNC(jangou_blitter_device::blit_v1_regs));
-	map(0x1000, 0x13ff).mirror(0x2c00).rw(this, FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w));
+	map(0x1000, 0x13ff).mirror(0x2c00).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w));
 	map(0x4000, 0x4000).noprw();
 	map(0x8000, 0x8000).noprw(); //open bus or protection check
 	map(0xc000, 0xdfff).mirror(0x2000).rom().region("subrom", 0);

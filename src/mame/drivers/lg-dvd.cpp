@@ -18,8 +18,10 @@ public:
 	{ }
 
 	void lg(machine_config &config);
+
+private:
 	void lg_dvd_map(address_map &map);
-protected:
+
 	required_device<i80c52_device> m_maincpu;
 };
 
@@ -39,9 +41,9 @@ MACHINE_CONFIG_END
 ROM_START( lggp40 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "bios0", "1.00" )
-	ROMX_LOAD( "firm-1.00.bin", 0x000000, 0x100000, CRC(c7f24f3b) SHA1(c2ce96c02ab419fb7e0b38703cdaeeccb2b7f34b), ROM_BIOS(1) )
+	ROMX_LOAD( "firm-1.00.bin", 0x000000, 0x100000, CRC(c7f24f3b) SHA1(c2ce96c02ab419fb7e0b38703cdaeeccb2b7f34b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "bios1", "1.01" )
-	ROMX_LOAD( "firm-1.01.bin", 0x000000, 0x100000, CRC(28820e0c) SHA1(c5f2c1e14e6cff2e57c5196cabcebfaaff7284ce), ROM_BIOS(2) )
+	ROMX_LOAD( "firm-1.01.bin", 0x000000, 0x100000, CRC(28820e0c) SHA1(c5f2c1e14e6cff2e57c5196cabcebfaaff7284ce), ROM_BIOS(1) )
 ROM_END
 
 SYST( 2011, lggp40, 0, 0, lg, lg, lg_dvd_state, empty_init, "LG", "GP40NW10 dvd writer", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW )

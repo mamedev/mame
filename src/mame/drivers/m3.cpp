@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: TODO
 /***********************************************************************************************************************************
 
 2017-11-20 Skeleton
@@ -14,6 +14,7 @@ From disassembly: chips: Z80, 6845, 8251, 2x 8255, Z80CTC
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class m3_state : public driver_device
@@ -27,12 +28,14 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void m3(machine_config &config);
+
+private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void m3(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;

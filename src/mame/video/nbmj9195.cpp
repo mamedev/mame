@@ -401,8 +401,8 @@ VIDEO_START_MEMBER(nbmj9195_state,_1layer)
 	save_item(NAME(m_gfxdraw_mode));
 	save_item(NAME(m_nb19010_busyctr));
 	save_item(NAME(m_nb19010_busyflag));
-	save_pointer(NAME(m_videoram[0].get()), width * height);
-	save_pointer(NAME(m_clut[0].get()), 0x1000);
+	save_pointer(NAME(m_videoram[0]), width * height);
+	save_pointer(NAME(m_clut[0]), 0x1000);
 	save_item(NAME(m_flipscreen_old));
 	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj9195_state::postload), this));
 }
@@ -444,10 +444,10 @@ void nbmj9195_state::video_start()
 	save_item(NAME(m_gfxdraw_mode));
 	save_item(NAME(m_nb19010_busyctr));
 	save_item(NAME(m_nb19010_busyflag));
-	save_pointer(NAME(m_videoram[0].get()), width * height);
-	save_pointer(NAME(m_videoram[1].get()), width * height);
-	save_pointer(NAME(m_clut[0].get()), 0x1000);
-	save_pointer(NAME(m_clut[1].get()), 0x1000);
+	save_pointer(NAME(m_videoram[0]), width * height);
+	save_pointer(NAME(m_videoram[1]), width * height);
+	save_pointer(NAME(m_clut[0]), 0x1000);
+	save_pointer(NAME(m_clut[1]), 0x1000);
 	save_item(NAME(m_flipscreen_old));
 	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj9195_state::postload), this));
 }
@@ -467,8 +467,8 @@ VIDEO_START_MEMBER(nbmj9195_state,nb22090)
 	m_videoworkram[0] = make_unique_clear<uint16_t[]>(width * height);
 	m_videoworkram[1] = make_unique_clear<uint16_t[]>(width * height);
 
-	save_pointer(NAME(m_videoworkram[0].get()), width * height);
-	save_pointer(NAME(m_videoworkram[1].get()), width * height);
+	save_pointer(NAME(m_videoworkram[0]), width * height);
+	save_pointer(NAME(m_videoworkram[1]), width * height);
 
 	m_gfxdraw_mode = 2;
 }

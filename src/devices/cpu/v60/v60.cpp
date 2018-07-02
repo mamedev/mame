@@ -94,7 +94,6 @@ v60_device::v60_device(const machine_config &mconfig, device_type type, const ch
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, databits, addrbits, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 24, 0)
-	, m_fetch_xor(BYTE4_XOR_LE(0))
 	, m_start_pc(0xfffffff0)
 {
 	m_reg[45] = pir;
@@ -428,7 +427,6 @@ void v60_device::device_start()
 
 	m_io = &space(AS_IO);
 
-	save_item(NAME(m_fetch_xor));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_irq_line));
 	save_item(NAME(m_nmi_line));

@@ -110,6 +110,9 @@ WRITE8_MEMBER(buggychl_state::bankswitch_w)
 
 WRITE8_MEMBER(buggychl_state::sound_enable_w)
 {
+	// does this really only control the sound irq 'timer' enable state, rather than the entire sound system?
+	// this would be more in line with the (admittedly incorrect) schematic...
+	//logerror("Sound_enable_w written with data of %02x\n", data);
 	machine().sound().system_enable(data & 1);
 }
 
@@ -200,19 +203,19 @@ void buggychl_state::buggychl_map(address_map &map)
 	map(0x4000, 0x7fff).rom(); /* A22-05 (22) */
 	map(0x8000, 0x87ff).ram(); /* 6116 SRAM (36) */
 	map(0x8800, 0x8fff).ram(); /* 6116 SRAM (35) */
-	map(0x9000, 0x9fff).w(this, FUNC(buggychl_state::buggychl_sprite_lookup_w));
-	map(0xa000, 0xbfff).bankr("bank1").w(this, FUNC(buggychl_state::buggychl_chargen_w)).share("charram");
+	map(0x9000, 0x9fff).w(FUNC(buggychl_state::buggychl_sprite_lookup_w));
+	map(0xa000, 0xbfff).bankr("bank1").w(FUNC(buggychl_state::buggychl_chargen_w)).share("charram");
 	map(0xc800, 0xcfff).ram().share("videoram");
 	map(0xd000, 0xd000).nopw(); // ???
-	map(0xd100, 0xd100).mirror(0x00ff).w(this, FUNC(buggychl_state::buggychl_ctrl_w));
-	map(0xd200, 0xd200).mirror(0x00ff).w(this, FUNC(buggychl_state::bankswitch_w));
+	map(0xd100, 0xd100).mirror(0x00ff).w(FUNC(buggychl_state::buggychl_ctrl_w));
+	map(0xd200, 0xd200).mirror(0x00ff).w(FUNC(buggychl_state::bankswitch_w));
 	map(0xd300, 0xd300).mirror(0x00f8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	// d301 = flp stuff, unused?
 	// d302 = mcu reset latched d0
-	map(0xd303, 0xd303).mirror(0x00f8).w(this, FUNC(buggychl_state::buggychl_sprite_lookup_bank_w));
+	map(0xd303, 0xd303).mirror(0x00f8).w(FUNC(buggychl_state::buggychl_sprite_lookup_bank_w));
 	map(0xd304, 0xd307).nopw(); // d304-d307 is SCCON, which seems to be for a bezel mounted 7seg score/time display like Grand Champion has
 	map(0xd400, 0xd400).mirror(0x00fc).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0xd401, 0xd401).mirror(0x00fc).r(this, FUNC(buggychl_state::mcu_status_r));
+	map(0xd401, 0xd401).mirror(0x00fc).r(FUNC(buggychl_state::mcu_status_r));
 	map(0xd500, 0xd57f).writeonly().share("spriteram");
 	map(0xd600, 0xd600).mirror(0x00e4).portr("DSW1");
 	map(0xd601, 0xd601).mirror(0x00e4).portr("DSW2");
@@ -223,7 +226,7 @@ void buggychl_state::buggychl_map(address_map &map)
 //  AM_RANGE(0xd60a, 0xd60a) AM_MIRROR(0x00e4) // other inputs, not used?
 //  AM_RANGE(0xd60b, 0xd60b) AM_MIRROR(0x00e4) // other inputs, not used?
 	map(0xd610, 0xd610).mirror(0x00e4).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xd611, 0xd611).mirror(0x00e4).r(this, FUNC(buggychl_state::sound_status_main_r));
+	map(0xd611, 0xd611).mirror(0x00e4).r(FUNC(buggychl_state::sound_status_main_r));
 //  AM_RANGE(0xd613, 0xd613) AM_MIRROR(0x00e4) AM_WRITE(sound_reset_w)
 	map(0xd618, 0xd618).mirror(0x00e7).nopw();    /* accelerator clear; TODO: should we emulate the proper quadrature counter here? */
 	map(0xd700, 0xd7ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -231,7 +234,7 @@ void buggychl_state::buggychl_map(address_map &map)
 	map(0xd840, 0xd85f).writeonly().share("scrollv");
 	map(0xdb00, 0xdbff).writeonly().share("scrollh");
 	map(0xdc04, 0xdc04).writeonly(); /* should be fg scroll */
-	map(0xdc06, 0xdc06).w(this, FUNC(buggychl_state::buggychl_bg_scrollx_w));
+	map(0xdc06, 0xdc06).w(FUNC(buggychl_state::buggychl_bg_scrollx_w));
 }
 
 /* The schematics for buggy challenge has the wrong sound board schematic attached to it.
@@ -245,14 +248,71 @@ void buggychl_state::sound_map(address_map &map)
 	map(0x4800, 0x4801).w(m_ay1, FUNC(ay8910_device::address_data_w));
 	map(0x4802, 0x4803).w(m_ay2, FUNC(ay8910_device::address_data_w));
 	map(0x4810, 0x481d).w(m_msm, FUNC(msm5232_device::write));
-	map(0x4820, 0x4820).w(this, FUNC(buggychl_state::ta7630_volbal_msm_w)); /* VOL/BAL   for the 7630 on the MSM5232 output */
+	map(0x4820, 0x4820).w(FUNC(buggychl_state::ta7630_volbal_msm_w)); /* VOL/BAL   for the 7630 on the MSM5232 output */
 	map(0x4830, 0x4830).ram(); /* TRBL/BASS for the 7630 on the MSM5232 output */
 	map(0x5000, 0x5000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
-	map(0x5001, 0x5001).r(this, FUNC(buggychl_state::sound_status_sound_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<1>));
+	map(0x5001, 0x5001).r(FUNC(buggychl_state::sound_status_sound_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<1>));
 	map(0x5002, 0x5002).w(m_soundnmi, FUNC(input_merger_device::in_clear<1>));
-	map(0x5003, 0x5003).w(this, FUNC(buggychl_state::sound_enable_w)); // unclear what this actually controls
+	map(0x5003, 0x5003).w(FUNC(buggychl_state::sound_enable_w)); // unclear what this actually controls
 	map(0xe000, 0xefff).rom(); /* space for diagnostics ROM */
 }
+
+/* Here is the memory maps from the 'wrong' sound schematic
+THIS DOES NOT MATCH THE ACTUAL HARDWARE, but seems to be of the hardware from
+which the final sound board design was derived from (as well as flstory/40love and msisaac hw, and possibly retofinv).
+Sound Master CPU (SMCPU)
+           |           |           |
+15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+ *  *  *                                          R  74LS138 @ ic17
+ 0  0  0  *  *  *  *  *  *  *  *  *  *  *  *  *   R  2764 ROM (ic11)
+ 0  0  1  *  *  *  *  *  *  *  *  *  *  *  *  *   R  2764 ROM (ic19)
+ 0  1  0  *  *  *  *  *  *  *  *  *  *  *  *  *   R  2764 ROM (ic4)
+ 0  1  1                                          SM-6 /CS
+ 0  1  1  0  *  *                                 RW 74ls155 @ ic14
+ 0  1  1  0  0  0  x  x  x  x  x  x  x  x  x  x   R  Read sound latch from maincpu, clear semaphore
+ 0  1  1  0  0  0  x  x  x  x  x  x  x  x  x  x   W  Enable sound NMI from sound latch semaphore
+ 0  1  1  0  0  1  x  x  x  x  x  x  x  x  x  x   R  Read sound semaphores
+ 0  1  1  0  0  1  x  x  x  x  x  x  x  x  x  x   W  Disable sound NMI from sound latch semaphore
+ 0  1  1  0  1  0  x  x  x  x  x  x  x  x  x  x   R  Read 3 ?debug? bits from edge connector pins in d0-d2
+ 0  1  1  0  1  0  x  x  x  x  x  x  x  x  x  x   W  SM-INT CTL:
+                                                     D0: if 0, enable SM CPU INT on timer (((soundclock(4MHz)/2)/256)/(128 or 256)) = 60hz or 30hz (or 120hz?)
+                                                     D1: switch speed of timer: 0 = 30.51757hz, 1 = 61.0351hz (or is this 61/122hz?)
+                                                     D2: if 0, enable SS CPU int to SM CPU
+                                                     D3: connects to SS CPU /RESET
+                                                     D4: not used
+                                                     D5: not used
+                                                     D6: gate ay2 to left channels
+                                                     D7: gate ay2 to right channels
+ 0  1  1  0  1  1  x  x  x  x  x  x  x  x  x  x   R  OPEN BUS
+ 0  1  1  0  1  1  x  x  x  x  x  x  x  x  x  x   W  Write to sound latch 2 to maincpu, set semaphore
+ 0  1  1  1  *  *  *                              W  74LS138 @ ic23
+ 0  1  1  1  0  0  0  x  x  x  x  x  x  x  x  x   W  Slave Sound CPU IntReq
+ 0  1  1  1  0  0  1  x  x  x  x  x  x  x  x  x   W  OPEN BUS
+ 0  1  1  1  0  1  0  x  x  x  x  x  x  x  x  x   W  Main VR Control voltage DAC
+ 0  1  1  1  0  1  1  x  x  x  x  x  x  x  x  x   W  OPEN BUS
+ 0  1  1  1  1  0  0  x  x  x  x  x  x  x  x  x   W  CHA Level (selectively gate the 4 dac bits for 2x 4bit r2r dac, one on d7-4, one d3-0, for front right)
+ 0  1  1  1  1  0  1  x  x  x  x  x  x  x  x  x   W  CHB Level (selectively gate the 4 dac bits for 2x 4bit r2r dac, one on d7-4, one d3-0, for rear right)
+ 0  1  1  1  1  1  0  x  x  x  x  x  x  x  x  x   W  CHC Level (selectively gate the 4 dac bits for 2x 4bit r2r dac, one on d7-4, one d3-0, for front left)
+ 0  1  1  1  1  1  1  x  x  x  x  x  x  x  x  x   W  CHD Level (selectively gate the 4 dac bits for 2x 4bit r2r dac, one on d7-4, one d3-0, for rear left)
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  *  *  *   SM-8 /CS (inject ?4? SM waitstates cycles)
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  0  0  x   W  OPEN BUS
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  0  1  0   W  AY #1 @ic42 Address write
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  0  1  1   W  AY #1 @ic42 Data write
+                                                     AY #1 IOB7-4 connect to an r2r dac+opamp controlling ay1 TA7630P Treble
+                                                     AY #1 IOB3-0 connect to an r2r dac+opamp controlling ay1 TA7630P Bass
+                                                     AY #1 IOA7-4 connect to an r2r dac+opamp controlling ay1 TA7630P Volume
+                                                     AY #1 IOA3-0 connect to an r2r dac+opamp controlling ay1 TA7630P Balance
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  1  0  0   W  AY #2 @ic41 Address write
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  1  0  1   W  AY #2 @ic41 Data write
+                                                     AY #2 IOB7-4 connect to an r2r dac+opamp controlling ay2 TA7630P Treble
+                                                     AY #2 IOB3-0 connect to an r2r dac+opamp controlling ay2 TA7630P Bass
+                                                     AY #2 IOA7-4 connect to an r2r dac+opamp controlling ay2 TA7630P Volume
+                                                     AY #2 IOA3-0 connect to an r2r dac+opamp controlling ay2 TA7630P Balance
+ 1  0  0  x  x  x  x  x  x  x  x  x  x  1  1  x   W  OPEN BUS
+ 1  0  1  *  *  *  *  *  *  *  *  *  *  *  *  *   RW SM-A /CS (read or write to slave cpu address space 0000-1fff; slave cpu is held in waitstate during this)
+ 1  1  0  x  x  *  *  *  *  *  *  *  *  *  *  *   RW SRAM (ic3)
+ 1  1  1  x  x  x  x  x  x  x  x  x  x  x  x  x   OPEN BUS (diag rom may map here?)
+*/
 
 /******************************************************************************/
 
@@ -453,20 +513,24 @@ void buggychl_state::machine_reset()
 MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(48'000'000)/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
+	MCFG_DEVICE_ADD("maincpu", Z80, 48_MHz_XTAL/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
 	MCFG_DEVICE_PROGRAM_MAP(buggychl_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", buggychl_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* 4 MHz according to schematics */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL/2) /* 4 MHz according to schematics */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, ((((XTAL(8'000'000)/2)/2)/256)/64)) // timer irq
-	// schematics shows a 61.035 (x2?) Hz, similar to flstory.cpp and other Taito MSM5232 based games.
-	// apparently schematics also shows a switch for the timer irq that makes it to run at half speed, no idea where this is located.
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, 8_MHz_XTAL/2/2/256/64) // timer irq
+	//MCFG_TIMER_DEVICE_ADD_PERIODIC("soundirq", "audiocpu",  irq0_line_hold, 8_MHz_XTAL/2/2/256/64)
+	// The schematics (which are at least partly for the wrong sound board) show a configurable timer with rates of
+	// 61.035Hz (8_MHz_XTAL/2/2/256/128)
+	// or 122.0Hz (8_MHz_XTAL/2/2/256/64)
+	// similar to flstory.cpp and other Taito MSM5232 based games.
+	// The real sound pcb probably lacks the latch for this configurable timer, but does have a jumper which likely has a similar function.
+	// The game code implies the timer int is enable/disabled by one of the "sound_enable_w" bits?
+	// TODO: actually hook this up?
 	/* audiocpu nmi is caused by (main->sound semaphore)&&(sound_nmi_enabled), identical to bubble bobble. */
 
-	// schematics show a secondary sound z80 cpu as well, running at the same speed as the audiocpu; unclear if actually populated, or if it only existed on a certain hardware release (cocktail deluxe version?)
-
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,8000000/2)  /* 4 MHz */
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 48_MHz_XTAL/8/2)  /* CPUspeed/2 MHz according to schematics, so 3MHz if cpu is jumpered for 6MHz */
 
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -479,7 +543,7 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	// derived from ladyfrog.cpp, causes glitches?
-//  MCFG_SCREEN_RAW_PARAMS( XTAL(8'000'000), 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
+//  MCFG_SCREEN_RAW_PARAMS( 8_MHz_XTAL, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(buggychl_state, screen_update_buggychl)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -502,17 +566,17 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_DEVICE_ADD("ay1", YM2149, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("ay1", YM2149, 8_MHz_XTAL/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggychl_state, ta7630_volbal_ay1_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggychl_state, port_b_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("ay2", YM2149, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("ay2", YM2149, 8_MHz_XTAL/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggychl_state, ta7630_volbal_ay2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggychl_state, port_b_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("msm", MSM5232, 8_MHz_XTAL/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1

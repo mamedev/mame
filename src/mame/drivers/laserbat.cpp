@@ -180,20 +180,20 @@ void laserbat_state_base::laserbat_map(address_map &map)
 	map(0x1500, 0x15ff).mirror(0x6000).rw(m_pvi1, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1600, 0x16ff).mirror(0x6000).rw(m_pvi2, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1700, 0x17ff).mirror(0x6000).rw(m_pvi3, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1800, 0x1bff).mirror(0x6000).w(this, FUNC(laserbat_state_base::videoram_w));
+	map(0x1800, 0x1bff).mirror(0x6000).w(FUNC(laserbat_state_base::videoram_w));
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 }
 
 void laserbat_state_base::laserbat_io_map(address_map &map)
 {
-	map(0x00, 0x00).r(this, FUNC(laserbat_state_base::rhsc_r)).w(this, FUNC(laserbat_state_base::cnt_eff_w));
-	map(0x01, 0x01) /* RBALL */ .w(this, FUNC(laserbat_state_base::cnt_nav_w));
-	map(0x02, 0x02).r(this, FUNC(laserbat_state_base::rrowx_r)).w(this, FUNC(laserbat_state_base::csound1_w));
-	map(0x03, 0x03).w(this, FUNC(laserbat_state_base::whsc_w));
-	map(0x04, 0x04).w(this, FUNC(laserbat_state_base::wcoh_w));
-	map(0x05, 0x05).w(this, FUNC(laserbat_state_base::wcov_w));
-	map(0x06, 0x06).w(this, FUNC(laserbat_state_base::ct_io_w));
-	map(0x07, 0x07).w(this, FUNC(laserbat_state_base::csound2_w));
+	map(0x00, 0x00).r(FUNC(laserbat_state_base::rhsc_r)).w(FUNC(laserbat_state_base::cnt_eff_w));
+	map(0x01, 0x01) /* RBALL */ .w(FUNC(laserbat_state_base::cnt_nav_w));
+	map(0x02, 0x02).r(FUNC(laserbat_state_base::rrowx_r)).w(FUNC(laserbat_state_base::csound1_w));
+	map(0x03, 0x03).w(FUNC(laserbat_state_base::whsc_w));
+	map(0x04, 0x04).w(FUNC(laserbat_state_base::wcoh_w));
+	map(0x05, 0x05).w(FUNC(laserbat_state_base::wcov_w));
+	map(0x06, 0x06).w(FUNC(laserbat_state_base::ct_io_w));
+	map(0x07, 0x07).w(FUNC(laserbat_state_base::csound2_w));
 }
 
 

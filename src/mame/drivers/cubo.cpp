@@ -431,8 +431,8 @@ void cubo_state::cubo_mem(address_map &map)
 	map(0x800010, 0x800013).portr("DIPSW2");
 	map(0xa80000, 0xb7ffff).noprw();
 	map(0xb80000, 0xb8003f).rw("akiko", FUNC(akiko_device::read), FUNC(akiko_device::write));
-	map(0xbf0000, 0xbfffff).rw(this, FUNC(cubo_state::cia_r), FUNC(cubo_state::gayle_cia_w));
-	map(0xc00000, 0xdfffff).rw(this, FUNC(cubo_state::custom_chip_r), FUNC(cubo_state::custom_chip_w));
+	map(0xbf0000, 0xbfffff).rw(FUNC(cubo_state::cia_r), FUNC(cubo_state::gayle_cia_w));
+	map(0xc00000, 0xdfffff).rw(FUNC(cubo_state::custom_chip_r), FUNC(cubo_state::custom_chip_w));
 	map(0xe00000, 0xe7ffff).rom().region("kickstart", 0x80000);
 	map(0xe80000, 0xf7ffff).noprw();
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -1104,7 +1104,7 @@ MACHINE_CONFIG_END
 
 
 
-#define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1))
+#define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define CD32_BIOS \
 	ROM_REGION32_BE(0x100000, "kickstart", 0 ) \
@@ -1192,14 +1192,14 @@ ROM_END
 
 void cubo_state::chip_ram_w8_hack(offs_t byteoffs, uint8_t data)
 {
-	uint16_t word = chip_ram_r(byteoffs);
+	uint16_t word = read_chip_ram(byteoffs);
 
 	if (byteoffs & 1)
 		word = (word & 0xff00) | data;
 	else
 		word = (word & 0x00ff) | (((uint16_t)data) << 8);
 
-	chip_ram_w(byteoffs, word);
+	write_chip_ram(byteoffs, word);
 }
 
 void cubo_state::cndypuzl_input_hack()
@@ -1207,7 +1207,7 @@ void cubo_state::cndypuzl_input_hack()
 	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
-		chip_ram_w(r_A5 - 0x7ebe, 0x0000);
+		write_chip_ram(r_A5 - 0x7ebe, 0x0000);
 	}
 }
 
@@ -1222,7 +1222,7 @@ void cubo_state::haremchl_input_hack()
 	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
-		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7f00 + 0) << 16) | (chip_ram_r(r_A5 - 0x7f00 + 2));
+		uint32_t r_A2 = (read_chip_ram(r_A5 - 0x7f00 + 0) << 16) | (read_chip_ram(r_A5 - 0x7f00 + 2));
 		chip_ram_w8_hack(r_A2 + 0x1f, 0x00);
 	}
 }
@@ -1238,7 +1238,7 @@ void cubo_state::lsrquiz_input_hack()
 	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
-		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fe0 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fe0 + 2));
+		uint32_t r_A2 = (read_chip_ram(r_A5 - 0x7fe0 + 0) << 16) | (read_chip_ram(r_A5 - 0x7fe0 + 2));
 		chip_ram_w8_hack(r_A2 + 0x13, 0x00);
 	}
 }
@@ -1255,7 +1255,7 @@ void cubo_state::lsrquiz2_input_hack()
 	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
-		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fdc + 0) << 16) | (chip_ram_r(r_A5 - 0x7fdc + 2));
+		uint32_t r_A2 = (read_chip_ram(r_A5 - 0x7fdc + 0) << 16) | (read_chip_ram(r_A5 - 0x7fdc + 2));
 		chip_ram_w8_hack(r_A2 + 0x17, 0x00);
 	}
 }
@@ -1271,7 +1271,7 @@ void cubo_state::lasstixx_input_hack()
 	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
-		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fa2 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fa2 + 2));
+		uint32_t r_A2 = (read_chip_ram(r_A5 - 0x7fa2 + 0) << 16) | (read_chip_ram(r_A5 - 0x7fa2 + 2));
 		chip_ram_w8_hack(r_A2 + 0x24, 0x00);
 	}
 }
@@ -1287,7 +1287,7 @@ void cubo_state::mgnumber_input_hack()
 	if (m_maincpu->pc() < m_chip_ram.bytes())
 	{
 		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
-		chip_ram_w(r_A5 - 0x7ed8, 0x0000);
+		write_chip_ram(r_A5 - 0x7ed8, 0x0000);
 	}
 }
 

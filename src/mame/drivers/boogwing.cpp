@@ -127,7 +127,7 @@ void boogwing_state::boogwing_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram();
 
-	map(0x220000, 0x220001).w(this, FUNC(boogwing_state::priority_w));
+	map(0x220000, 0x220001).w(FUNC(boogwing_state::priority_w));
 	map(0x220002, 0x22000f).noprw();
 
 	map(0x240000, 0x240001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write));
@@ -138,7 +138,7 @@ void boogwing_state::boogwing_map(address_map &map)
 //  map(0x24e6c0, 0x24e6c1).portr("DSW");
 //  map(0x24e138, 0x24e139).portr("SYSTEM");
 //  map(0x24e344, 0x24e345).portr("INPUTS");
-	map(0x24e000, 0x24efff).rw(this, FUNC(boogwing_state::boogwing_protection_region_0_104_r), FUNC(boogwing_state::boogwing_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
+	map(0x24e000, 0x24efff).rw(FUNC(boogwing_state::boogwing_protection_region_0_104_r), FUNC(boogwing_state::boogwing_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
 	map(0x260000, 0x26000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
 	map(0x264000, 0x265fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DECO104_ADD("ioprot")
+	MCFG_DEVICE_ADD("ioprot", DECO104PROT, 0)
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))

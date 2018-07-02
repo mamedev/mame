@@ -53,15 +53,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void minicom(machine_config &config);
+
+	void init_minicom();
+
+private:
 	DECLARE_WRITE8_MEMBER(i87c52_p0_w);
 	DECLARE_WRITE8_MEMBER(i87c52_p1_w);
 	DECLARE_WRITE8_MEMBER(i87c52_p2_w);
 	DECLARE_WRITE8_MEMBER(i87c52_p3_w);
 	DECLARE_READ8_MEMBER(i87c52_p1_r);
 	DECLARE_READ8_MEMBER(i87c52_p2_r);
-	void init_minicom();
-	void minicom(machine_config &config);
-private:
+
 	uint8_t m_p[4];
 	uint16_t m_display_data;
 	int m_digit_index;

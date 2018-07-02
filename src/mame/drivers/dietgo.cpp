@@ -29,6 +29,7 @@ PAL16R6A 11H
 #include "machine/decocrpt.h"
 #include "machine/deco102.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -61,7 +62,7 @@ void dietgo_state::dietgo_map(address_map &map)
 	map(0x222000, 0x2227ff).writeonly().share("pf2_rowscroll");
 	map(0x280000, 0x2807ff).ram().share("spriteram");
 	map(0x300000, 0x300bff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x340000, 0x343fff).rw(this, FUNC(dietgo_state::dietgo_protection_region_0_104_r), FUNC(dietgo_state::dietgo_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
+	map(0x340000, 0x343fff).rw(FUNC(dietgo_state::dietgo_protection_region_0_104_r), FUNC(dietgo_state::dietgo_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 	map(0x380000, 0x38ffff).ram(); // mainram
 }
 

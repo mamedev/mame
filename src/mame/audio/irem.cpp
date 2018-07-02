@@ -227,12 +227,12 @@ WRITE8_MEMBER( irem_audio_device::m52_adpcm_w )
 {
 	if (offset & 1)
 	{
-		m_adpcm1->data_w(data);
+		m_adpcm1->write_data(data);
 	}
 	if (offset & 2)
 	{
 		if (m_adpcm2 != nullptr)
-			m_adpcm2->data_w(data);
+			m_adpcm2->write_data(data);
 	}
 }
 
@@ -241,7 +241,7 @@ WRITE8_MEMBER( irem_audio_device::m62_adpcm_w )
 {
 	msm5205_device *adpcm = (offset & 1) ? m_adpcm2.target() : m_adpcm1.target();
 	if (adpcm != nullptr)
-		adpcm->data_w(data);
+		adpcm->write_data(data);
 }
 
 
@@ -361,15 +361,15 @@ DISCRETE_SOUND_END
 void irem_audio_device::m52_small_sound_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x0fff).w(this, FUNC(irem_audio_device::m52_adpcm_w));
-	map(0x1000, 0x1fff).w(this, FUNC(irem_audio_device::sound_irq_ack_w));
+	map(0x0000, 0x0fff).w(FUNC(irem_audio_device::m52_adpcm_w));
+	map(0x1000, 0x1fff).w(FUNC(irem_audio_device::sound_irq_ack_w));
 	map(0x2000, 0x7fff).rom();
 }
 
 void irem_audio_device::m52_large_sound_map(address_map &map)
 {
-	map(0x0000, 0x1fff).w(this, FUNC(irem_audio_device::m52_adpcm_w));
-	map(0x2000, 0x3fff).w(this, FUNC(irem_audio_device::sound_irq_ack_w));
+	map(0x0000, 0x1fff).w(FUNC(irem_audio_device::m52_adpcm_w));
+	map(0x2000, 0x3fff).w(FUNC(irem_audio_device::sound_irq_ack_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -377,16 +377,16 @@ void irem_audio_device::m52_large_sound_map(address_map &map)
 /* complete address map verified from Kid Niki schematics */
 void irem_audio_device::m62_sound_map(address_map &map)
 {
-	map(0x0800, 0x0800).mirror(0xf7fc).w(this, FUNC(irem_audio_device::sound_irq_ack_w));
-	map(0x0801, 0x0802).mirror(0xf7fc).w(this, FUNC(irem_audio_device::m62_adpcm_w));
+	map(0x0800, 0x0800).mirror(0xf7fc).w(FUNC(irem_audio_device::sound_irq_ack_w));
+	map(0x0801, 0x0802).mirror(0xf7fc).w(FUNC(irem_audio_device::m62_adpcm_w));
 	map(0x4000, 0xffff).rom();
 }
 
 
 void irem_audio_device::irem_sound_portmap(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(irem_audio_device::m6803_port1_r), FUNC(irem_audio_device::m6803_port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(irem_audio_device::m6803_port2_r), FUNC(irem_audio_device::m6803_port2_w));
+	map(M6801_PORT1, M6801_PORT1).rw(FUNC(irem_audio_device::m6803_port1_r), FUNC(irem_audio_device::m6803_port1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(FUNC(irem_audio_device::m6803_port2_r), FUNC(irem_audio_device::m6803_port2_w));
 }
 
 /*

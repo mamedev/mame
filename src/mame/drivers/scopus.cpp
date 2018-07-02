@@ -26,6 +26,7 @@
 #include "machine/i8257.h"
 #include "machine/i8212.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
@@ -40,15 +41,18 @@ public:
 		m_dma8257(*this, "dma"),
 		m_maincpu(*this, "maincpu"){ }
 
+	void sagitta180(machine_config &config);
+
 	void init_sagitta180();
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
-	void sagitta180(machine_config &config);
 	void maincpu_io_map(address_map &map);
 	void maincpu_map(address_map &map);
-private:
+
 	/* devices */
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
@@ -58,7 +62,6 @@ private:
 	// Character generator
 	const uint8_t *m_chargen;
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };

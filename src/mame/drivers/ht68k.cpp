@@ -52,6 +52,9 @@ public:
 	{
 	}
 
+	void ht68k(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<wd1770_device> m_fdc;
@@ -65,7 +68,6 @@ public:
 	DECLARE_WRITE8_MEMBER(duart_output);
 	required_shared_ptr<uint16_t> m_p_ram;
 	virtual void machine_reset() override;
-	void ht68k(machine_config &config);
 	void ht68k_mem(address_map &map);
 };
 
@@ -129,11 +131,11 @@ static void ht68k_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(ht68k_state::ht68k)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(8'000'000))
+	MCFG_DEVICE_ADD("maincpu", M68000, 8_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(ht68k_mem)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "duart68681", MC68681, XTAL(8'000'000) / 2 )
+	MCFG_DEVICE_ADD("duart68681", MC68681, 8_MHz_XTAL / 2)
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, ht68k_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
@@ -143,7 +145,7 @@ MACHINE_CONFIG_START(ht68k_state::ht68k)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("duart68681", mc68681_device, rx_a_w))
 
-	MCFG_WD1770_ADD("wd1770", XTAL(8'000'000) )
+	MCFG_DEVICE_ADD("wd1770", WD1770, 8_MHz_XTAL)
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)

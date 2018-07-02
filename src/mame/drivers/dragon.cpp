@@ -189,7 +189,7 @@ static void dragon_alpha_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(XTAL(14'218'000) / 16)
+	MCFG_DEVICE_CLOCK(14.218_MHz_XTAL / 16)
 
 	// basic machine hardware
 	MCFG_DEVICE_ADD("maincpu", MC6809E, DERIVED_CLOCK(1, 1))
@@ -214,7 +214,7 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia1_firq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia1_firq_b))
 
-	MCFG_SAM6883_ADD(SAM_TAG, XTAL(14'218'000), MAINCPU_TAG, AS_PROGRAM)
+	MCFG_DEVICE_ADD(SAM_TAG, SAM6883, 14.218_MHz_XTAL, MAINCPU_TAG)
 	MCFG_SAM6883_RES_CALLBACK(READ8(*this, dragon_state, sam_read))
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	// video hardware
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, VDG_TAG)
 
-	MCFG_DEVICE_ADD(VDG_TAG, MC6847_PAL, XTAL(4'433'619))
+	MCFG_DEVICE_ADD(VDG_TAG, MC6847_PAL, 4.433619_MHz_XTAL)
 	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, dragon_state, horizontal_sync))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, dragon_state, field_sync))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(SAM_TAG, sam6883_device, display_read))
@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(dragon64_state::dragon64)
 
 	// acia
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("dragon_flex_list", "dragon_flex")
@@ -307,7 +307,7 @@ MACHINE_CONFIG_START(d64plus_state::d64plus)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// crtc
-	MCFG_MC6845_ADD("crtc", HD6845, "plus_screen", XTAL(14'218'000)/4/2)
+	MCFG_MC6845_ADD("crtc", HD6845, "plus_screen", 14.218_MHz_XTAL / 4 / 2)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(d64plus_state, crtc_update_row)
@@ -327,10 +327,10 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 
 	// acia
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 
 	// floppy
-	MCFG_WD2797_ADD(WD2797_TAG, XTAL(1'000'000))
+	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 1_MHz_XTAL)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dragon_alpha_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dragon_alpha_state, fdc_drq_w))
 
@@ -364,7 +364,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragon64_state::tanodr64)
 	dragon64(config);
 	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(XTAL(14'318'181) / 4)
+	MCFG_DEVICE_CLOCK(14.318181_MHz_XTAL / 4)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
@@ -435,9 +435,9 @@ ROM_START(dgnalpha)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_DEFAULT_BIOS("boot10")
 	ROM_SYSTEM_BIOS(0, "boot10", "Boot v1.0")
-	ROMX_LOAD("alpha_bt_10.rom", 0x2000,  0x2000, CRC(c3dab585) SHA1(4a5851aa66eb426e9bb0bba196f1e02d48156068), ROM_BIOS(1))
+	ROMX_LOAD("alpha_bt_10.rom", 0x2000,  0x2000, CRC(c3dab585) SHA1(4a5851aa66eb426e9bb0bba196f1e02d48156068), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "boot04", "Boot v0.4")
-	ROMX_LOAD("alpha_bt_04.rom", 0x2000,  0x2000, CRC(d6172b56) SHA1(69ea376dbc7418f69e9e809b448d22a4de012344), ROM_BIOS(2))
+	ROMX_LOAD("alpha_bt_04.rom", 0x2000,  0x2000, CRC(d6172b56) SHA1(69ea376dbc7418f69e9e809b448d22a4de012344), ROM_BIOS(1))
 	ROM_LOAD("alpha_ba.rom",    0x8000,  0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
 ROM_END
 

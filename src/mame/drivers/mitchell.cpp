@@ -320,19 +320,19 @@ void mitchell_state::mgakuen_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8));   /* palette RAM */
-	map(0xc800, 0xcfff).rw(this, FUNC(mitchell_state::pang_colorram_r), FUNC(mitchell_state::pang_colorram_w)).share("colorram"); /* Attribute RAM */
-	map(0xd000, 0xdfff).rw(this, FUNC(mitchell_state::mgakuen_videoram_r), FUNC(mitchell_state::mgakuen_videoram_w)).share("videoram"); /* char RAM */
+	map(0xc800, 0xcfff).rw(FUNC(mitchell_state::pang_colorram_r), FUNC(mitchell_state::pang_colorram_w)).share("colorram"); /* Attribute RAM */
+	map(0xd000, 0xdfff).rw(FUNC(mitchell_state::mgakuen_videoram_r), FUNC(mitchell_state::mgakuen_videoram_w)).share("videoram"); /* char RAM */
 	map(0xe000, 0xefff).ram(); /* Work RAM */
-	map(0xf000, 0xffff).rw(this, FUNC(mitchell_state::mgakuen_objram_r), FUNC(mitchell_state::mgakuen_objram_w));   /* OBJ RAM */
+	map(0xf000, 0xffff).rw(FUNC(mitchell_state::mgakuen_objram_r), FUNC(mitchell_state::mgakuen_objram_w));   /* OBJ RAM */
 }
 
 void mitchell_state::mitchell_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc7ff).rw(this, FUNC(mitchell_state::pang_paletteram_r), FUNC(mitchell_state::pang_paletteram_w)); /* Banked palette RAM */
-	map(0xc800, 0xcfff).rw(this, FUNC(mitchell_state::pang_colorram_r), FUNC(mitchell_state::pang_colorram_w)).share("colorram"); /* Attribute RAM */
-	map(0xd000, 0xdfff).rw(this, FUNC(mitchell_state::pang_videoram_r), FUNC(mitchell_state::pang_videoram_w)).share("videoram");/* Banked char / OBJ RAM */
+	map(0xc000, 0xc7ff).rw(FUNC(mitchell_state::pang_paletteram_r), FUNC(mitchell_state::pang_paletteram_w)); /* Banked palette RAM */
+	map(0xc800, 0xcfff).rw(FUNC(mitchell_state::pang_colorram_r), FUNC(mitchell_state::pang_colorram_w)).share("colorram"); /* Attribute RAM */
+	map(0xd000, 0xdfff).rw(FUNC(mitchell_state::pang_videoram_r), FUNC(mitchell_state::pang_videoram_w)).share("videoram");/* Banked char / OBJ RAM */
 	map(0xe000, 0xffff).ram().share("nvram"); /* Work RAM */
 }
 
@@ -346,18 +346,18 @@ void mitchell_state::decrypted_opcodes_map(address_map &map)
 void mitchell_state::mitchell_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(mitchell_state::pang_gfxctrl_w));   /* Palette bank, layer enable, coin counters, more */
-	map(0x00, 0x02).r(this, FUNC(mitchell_state::input_r));           /* The Mahjong games and Block Block need special input treatment */
-	map(0x01, 0x01).w(this, FUNC(mitchell_state::input_w));
-	map(0x02, 0x02).w(this, FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
+	map(0x00, 0x00).w(FUNC(mitchell_state::pang_gfxctrl_w));   /* Palette bank, layer enable, coin counters, more */
+	map(0x00, 0x02).r(FUNC(mitchell_state::input_r));           /* The Mahjong games and Block Block need special input treatment */
+	map(0x01, 0x01).w(FUNC(mitchell_state::input_w));
+	map(0x02, 0x02).w(FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
 	map(0x03, 0x03).w("ymsnd", FUNC(ym2413_device::data_port_w));
 	map(0x04, 0x04).w("ymsnd", FUNC(ym2413_device::register_port_w));
-	map(0x05, 0x05).r(this, FUNC(mitchell_state::pang_port5_r)).w(m_oki, FUNC(okim6295_device::write));
+	map(0x05, 0x05).r(FUNC(mitchell_state::pang_port5_r)).w(m_oki, FUNC(okim6295_device::write));
 	map(0x06, 0x06).noprw();                     /* watchdog? IRQ ack? video buffering? */
-	map(0x07, 0x07).w(this, FUNC(mitchell_state::pang_video_bank_w));    /* Video RAM bank register */
-	map(0x08, 0x08).w(this, FUNC(mitchell_state::eeprom_cs_w));
-	map(0x10, 0x10).w(this, FUNC(mitchell_state::eeprom_clock_w));
-	map(0x18, 0x18).w(this, FUNC(mitchell_state::eeprom_serial_w));
+	map(0x07, 0x07).w(FUNC(mitchell_state::pang_video_bank_w));    /* Video RAM bank register */
+	map(0x08, 0x08).w(FUNC(mitchell_state::eeprom_cs_w));
+	map(0x10, 0x10).w(FUNC(mitchell_state::eeprom_clock_w));
+	map(0x18, 0x18).w(FUNC(mitchell_state::eeprom_serial_w));
 }
 
 /* spangbl */
@@ -365,25 +365,25 @@ void mitchell_state::spangbl_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1").nopw();
-	map(0xc000, 0xc7ff).rw(this, FUNC(mitchell_state::pang_paletteram_r), FUNC(mitchell_state::pang_paletteram_w)); /* Banked palette RAM */
-	map(0xc800, 0xcfff).rw(this, FUNC(mitchell_state::pang_colorram_r), FUNC(mitchell_state::pang_colorram_w)).share("colorram");/* Attribute RAM */
-	map(0xd000, 0xdfff).rw(this, FUNC(mitchell_state::pang_videoram_r), FUNC(mitchell_state::pang_videoram_w)).share("videoram"); /* Banked char / OBJ RAM */
+	map(0xc000, 0xc7ff).rw(FUNC(mitchell_state::pang_paletteram_r), FUNC(mitchell_state::pang_paletteram_w)); /* Banked palette RAM */
+	map(0xc800, 0xcfff).rw(FUNC(mitchell_state::pang_colorram_r), FUNC(mitchell_state::pang_colorram_w)).share("colorram");/* Attribute RAM */
+	map(0xd000, 0xdfff).rw(FUNC(mitchell_state::pang_videoram_r), FUNC(mitchell_state::pang_videoram_w)).share("videoram"); /* Banked char / OBJ RAM */
 	map(0xe000, 0xffff).ram().share("nvram");     /* Work RAM */
 }
 
 void mitchell_state::spangbl_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x02).r(this, FUNC(mitchell_state::input_r));
-	map(0x00, 0x00).w(this, FUNC(mitchell_state::pangbl_gfxctrl_w));    /* Palette bank, layer enable, coin counters, more */
-	map(0x02, 0x02).w(this, FUNC(mitchell_state::pang_bankswitch_w));      /* Code bank register */
+	map(0x00, 0x02).r(FUNC(mitchell_state::input_r));
+	map(0x00, 0x00).w(FUNC(mitchell_state::pangbl_gfxctrl_w));    /* Palette bank, layer enable, coin counters, more */
+	map(0x02, 0x02).w(FUNC(mitchell_state::pang_bankswitch_w));      /* Code bank register */
 	map(0x03, 0x03).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x05, 0x05).portr("SYS0");
 	map(0x06, 0x06).nopw();    /* watchdog? irq ack? */
-	map(0x07, 0x07).w(this, FUNC(mitchell_state::pang_video_bank_w));      /* Video RAM bank register */
-	map(0x08, 0x08).w(this, FUNC(mitchell_state::eeprom_cs_w));
-	map(0x10, 0x10).w(this, FUNC(mitchell_state::eeprom_clock_w));
-	map(0x18, 0x18).w(this, FUNC(mitchell_state::eeprom_serial_w));
+	map(0x07, 0x07).w(FUNC(mitchell_state::pang_video_bank_w));      /* Video RAM bank register */
+	map(0x08, 0x08).w(FUNC(mitchell_state::eeprom_cs_w));
+	map(0x10, 0x10).w(FUNC(mitchell_state::eeprom_clock_w));
+	map(0x18, 0x18).w(FUNC(mitchell_state::eeprom_serial_w));
 }
 
 WRITE8_MEMBER(mitchell_state::sound_bankswitch_w)
@@ -397,7 +397,7 @@ void mitchell_state::spangbl_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("soundbank");
-	map(0xe000, 0xe000).w(this, FUNC(mitchell_state::sound_bankswitch_w));
+	map(0xe000, 0xe000).w(FUNC(mitchell_state::sound_bankswitch_w));
 	map(0xe400, 0xe400).w(m_adpcm_select, FUNC(ls157_device::ba_w));
 	map(0xec00, 0xec01).w("ymsnd", FUNC(ym2413_device::write));
 	map(0xf000, 0xf4ff).ram();
@@ -408,7 +408,7 @@ void mitchell_state::pangba_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("soundbank");
-	map(0xe000, 0xe000).w(this, FUNC(mitchell_state::sound_bankswitch_w));
+	map(0xe000, 0xe000).w(FUNC(mitchell_state::sound_bankswitch_w));
 	map(0xe400, 0xe400).w(m_adpcm_select, FUNC(ls157_device::ba_w));
 	map(0xec00, 0xec01).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xf000, 0xf4ff).ram();
@@ -426,7 +426,7 @@ void mitchell_state::mstworld_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(mitchell_state::oki_banking_w));
+	map(0x9000, 0x9000).w(FUNC(mitchell_state::oki_banking_w));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -440,15 +440,15 @@ WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
 void mitchell_state::mstworld_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w(this, FUNC(mitchell_state::mstworld_gfxctrl_w));   /* Palette bank, layer enable, coin counters, more */
+	map(0x00, 0x00).portr("IN0").w(FUNC(mitchell_state::mstworld_gfxctrl_w));   /* Palette bank, layer enable, coin counters, more */
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).portr("IN2").w(this, FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
-	map(0x03, 0x03).portr("DSW0").w(this, FUNC(mitchell_state::mstworld_sound_w));    /* write to sound cpu */
+	map(0x02, 0x02).portr("IN2").w(FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
+	map(0x03, 0x03).portr("DSW0").w(FUNC(mitchell_state::mstworld_sound_w));    /* write to sound cpu */
 	map(0x04, 0x04).portr("DSW1");   /* dips? */
 	map(0x05, 0x05).portr("SYS0");   /* special? */
 	map(0x06, 0x06).portr("DSW2");   /* dips? */
 	map(0x06, 0x06).nopw();        /* watchdog? irq ack? */
-	map(0x07, 0x07).w(this, FUNC(mitchell_state::mstworld_video_bank_w));    /* Video RAM bank register */
+	map(0x07, 0x07).w(FUNC(mitchell_state::mstworld_video_bank_w));    /* Video RAM bank register */
 }
 
 
@@ -1172,7 +1172,7 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1213,7 +1213,7 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1368,7 +1368,7 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1423,7 +1423,7 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

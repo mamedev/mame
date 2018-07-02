@@ -9,6 +9,7 @@
 #define MAME_INCLUDES_SUBS_H
 
 #include "sound/discrete.h"
+#include "emupal.h"
 
 /* Discrete Sound Input Nodes */
 #define SUBS_SONAR1_EN          NODE_01
@@ -23,15 +24,19 @@
 class subs_state : public driver_device
 {
 public:
-	subs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	subs_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_discrete(*this, "discrete"),
 		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
+	void subs(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -66,7 +71,7 @@ public:
 
 	int steering_1();
 	int steering_2();
-	void subs(machine_config &config);
+
 	void main_map(address_map &map);
 };
 

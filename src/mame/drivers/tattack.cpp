@@ -50,6 +50,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 #include "sound/samples.h"
 #include "speaker.h"
@@ -68,20 +69,24 @@ public:
 		m_samples(*this,"samples")
 		{ }
 
+	void tattack(machine_config &config);
+
+	void init_tattack();
+
+private:
 	DECLARE_WRITE8_MEMBER(paddle_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
 	DECLARE_WRITE8_MEMBER(brick_dma_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
-	void init_tattack();
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_PALETTE_INIT(tattack);
 
 	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tattack(machine_config &config);
 	void tattack_map(address_map &map);
-protected:
+
 	virtual void video_start() override;
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -272,11 +277,11 @@ void tattack_state::tattack_map(address_map &map)
 	map(0x6000, 0x6000).portr("DSW2");
 	map(0x7000, 0x73ff).ram().share("colorram");    // color map ? something else .. only bits 1-3 are used
 	map(0xa000, 0xa000).portr("DSW1");       // dsw ? something else ?
-	map(0xc000, 0xc000).portr("INPUTS").w(this, FUNC(tattack_state::sound_w)); // sound
-	map(0xc001, 0xc001).w(this, FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
+	map(0xc000, 0xc000).portr("INPUTS").w(FUNC(tattack_state::sound_w)); // sound
+	map(0xc001, 0xc001).w(FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
 	map(0xc002, 0xc002).nopw(); // same as sound port, outputs?
-	map(0xc005, 0xc005).w(this, FUNC(tattack_state::paddle_w));
-	map(0xc006, 0xc007).w(this, FUNC(tattack_state::ball_w));
+	map(0xc005, 0xc005).w(FUNC(tattack_state::paddle_w));
+	map(0xc006, 0xc007).w(FUNC(tattack_state::ball_w));
 	map(0xe000, 0xe3ff).ram().share("ram");
 }
 

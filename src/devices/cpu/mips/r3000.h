@@ -87,7 +87,8 @@ protected:
 		CHIP_TYPE_R3051,
 		CHIP_TYPE_R3052,
 		CHIP_TYPE_R3071,
-		CHIP_TYPE_R3081
+		CHIP_TYPE_R3081,
+		CHIP_TYPE_IOP
 	};
 
 	r3000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, chip_type chiptype);
@@ -291,12 +292,25 @@ public:
 };
 
 
+// ======================> iop_device
+
+class iop_device : public r3000_device
+{
+public:
+	iop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override;
+};
+
+
 // device type definition
 
-DECLARE_DEVICE_TYPE(R3041, r3041_device)
-DECLARE_DEVICE_TYPE(R3051, r3051_device)
-DECLARE_DEVICE_TYPE(R3052, r3052_device)
-DECLARE_DEVICE_TYPE(R3071, r3071_device)
-DECLARE_DEVICE_TYPE(R3081, r3081_device)
+DECLARE_DEVICE_TYPE(R3041,       r3041_device)
+DECLARE_DEVICE_TYPE(R3051,       r3051_device)
+DECLARE_DEVICE_TYPE(R3052,       r3052_device)
+DECLARE_DEVICE_TYPE(R3071,       r3071_device)
+DECLARE_DEVICE_TYPE(R3081,       r3081_device)
+DECLARE_DEVICE_TYPE(SONYPS2_IOP, iop_device)
 
 #endif // MAME_CPU_MIPS_R3000_H

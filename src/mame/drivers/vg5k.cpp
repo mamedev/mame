@@ -79,6 +79,11 @@ public:
 		, m_ram(*this, RAM_TAG)
 	{ }
 
+	void vg5k(machine_config &config);
+
+	void init_vg5k();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ef9345_device> m_ef9345;
 	required_device<dac_bit_interface> m_dac;
@@ -98,11 +103,9 @@ public:
 	DECLARE_WRITE8_MEMBER ( ef9345_io_w );
 	DECLARE_READ8_MEMBER ( cassette_r );
 	DECLARE_WRITE8_MEMBER ( cassette_w );
-	void init_vg5k();
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
-	void vg5k(machine_config &config);
 	void vg5k_io(address_map &map);
 	void vg5k_mem(address_map &map);
 };
@@ -177,8 +180,8 @@ void vg5k_state::vg5k_io(address_map &map)
 	map(0x08, 0x08).portr("JOY1");
 
 	/* printer */
-	map(0x10, 0x10).r(this, FUNC(vg5k_state::printer_r));
-	map(0x11, 0x11).w(this, FUNC(vg5k_state::printer_w));
+	map(0x10, 0x10).r(FUNC(vg5k_state::printer_r));
+	map(0x11, 0x11).w(FUNC(vg5k_state::printer_w));
 
 	/* keyboard */
 	map(0x80, 0x80).portr("ROW1");
@@ -191,11 +194,11 @@ void vg5k_state::vg5k_io(address_map &map)
 	map(0x87, 0x87).portr("ROW8");
 
 	/* EF9345 */
-	map(0x8f, 0x8f).w(this, FUNC(vg5k_state::ef9345_offset_w));
-	map(0xcf, 0xcf).rw(this, FUNC(vg5k_state::ef9345_io_r), FUNC(vg5k_state::ef9345_io_w));
+	map(0x8f, 0x8f).w(FUNC(vg5k_state::ef9345_offset_w));
+	map(0xcf, 0xcf).rw(FUNC(vg5k_state::ef9345_io_r), FUNC(vg5k_state::ef9345_io_w));
 
 	/* cassette */
-	map(0xaf, 0xaf).rw(this, FUNC(vg5k_state::cassette_r), FUNC(vg5k_state::cassette_w));
+	map(0xaf, 0xaf).rw(FUNC(vg5k_state::cassette_r), FUNC(vg5k_state::cassette_w));
 }
 
 /* Input ports */
@@ -418,9 +421,9 @@ MACHINE_CONFIG_END
 ROM_START( vg5k )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v11", "BASIC v1.1")
-	ROMX_LOAD( "vg5k11.bin", 0x0000, 0x4000, CRC(a6f4a0ea) SHA1(58eccce33cc21fc17bc83921018f531b8001eda3), ROM_BIOS(1) )  // dumped from a Philips VG-5000.
+	ROMX_LOAD( "vg5k11.bin", 0x0000, 0x4000, CRC(a6f4a0ea) SHA1(58eccce33cc21fc17bc83921018f531b8001eda3), ROM_BIOS(0) )  // dumped from a Philips VG-5000.
 	ROM_SYSTEM_BIOS(1, "v10", "BASIC v1.0")
-	ROMX_LOAD( "vg5k10.bin", 0x0000, 0x4000, BAD_DUMP CRC(57983260) SHA1(5ad1787a6a597b5c3eedb7c3704b649faa9be4ca), ROM_BIOS(2) )
+	ROMX_LOAD( "vg5k10.bin", 0x0000, 0x4000, BAD_DUMP CRC(57983260) SHA1(5ad1787a6a597b5c3eedb7c3704b649faa9be4ca), ROM_BIOS(1) )
 
 	ROM_REGION( 0x4000, "ef9345", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )                // from dcvg5k

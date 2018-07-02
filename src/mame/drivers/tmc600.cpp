@@ -133,9 +133,9 @@ void tmc600_state::tmc600_io_map(address_map &map)
 {
 	map(0x03, 0x03).w(m_bwio, FUNC(cdp1852_device::write));
 	map(0x04, 0x04).w(CDP1852_TMC700_TAG, FUNC(cdp1852_device::write));
-	map(0x05, 0x05).rw(this, FUNC(tmc600_state::rtc_r), FUNC(tmc600_state::vismac_data_w));
+	map(0x05, 0x05).rw(FUNC(tmc600_state::rtc_r), FUNC(tmc600_state::vismac_data_w));
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
-	map(0x07, 0x07).w(this, FUNC(tmc600_state::vismac_register_w));
+	map(0x07, 0x07).w(FUNC(tmc600_state::vismac_register_w));
 }
 
 /* Input Ports */
@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 	MCFG_CDP1852_DO_CALLBACK(WRITE8(*this, tmc600_state, printer_w))
 
 	// printer connector
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, nullptr)
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(CDP1802_TAG, cosmac_device, ef4_w)) MCFG_DEVCB_XOR(1)
 
 	// cassette
@@ -306,10 +306,10 @@ ROM_START( tmc600s1 )
 	ROM_LOAD( "sb22",       0x2000, 0x1000, NO_DUMP )
 	ROM_LOAD( "sb23",       0x3000, 0x1000, NO_DUMP )
 	ROM_SYSTEM_BIOS( 0, "sb040282", "SB040282" )
-	ROMX_LOAD( "190482",    0x4000, 0x1000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "190482",    0x4000, 0x1000, NO_DUMP, ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "sbdos", "SBDOS" )
-	ROMX_LOAD( "190482_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "190482_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "190482_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "190482_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )
@@ -323,10 +323,10 @@ ROM_START( tmc600s2 )
 	ROM_LOAD( "sb32",       0x2000, 0x1000, CRC(dd58a128) SHA1(be9bdb0fc5e0cc3dcc7f2fb7ccab69bf5b043803) )
 	ROM_LOAD( "sb33",       0x3000, 0x1000, CRC(b7d241fa) SHA1(6f3eadf86c4e3aaf93d123e302a18dc4d9db964b) )
 	ROM_SYSTEM_BIOS( 0, "sb040282", "SB040282" )
-	ROMX_LOAD( "151182",    0x4000, 0x1000, CRC(c1a8d9d8) SHA1(4552e1f06d0e338ba7b0f1c3a20b8a51c27dafde), ROM_BIOS(1) )
+	ROMX_LOAD( "151182",    0x4000, 0x1000, CRC(c1a8d9d8) SHA1(4552e1f06d0e338ba7b0f1c3a20b8a51c27dafde), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "sbdos", "SBDOS" )
-	ROMX_LOAD( "151182_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "151182_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "151182_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "151182_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )

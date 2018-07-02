@@ -6,6 +6,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h"
 #include "machine/z80scc.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -18,12 +19,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rtc(*this, "rtc") { }
 
+	void hotstuff(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_bitmapram;
 	virtual void video_start() override;
 	uint32_t screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
-	void hotstuff(machine_config &config);
 	void hotstuff_map(address_map &map);
 };
 

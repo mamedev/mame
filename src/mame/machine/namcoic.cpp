@@ -53,7 +53,7 @@ void namcos2_shared_state::c123_tilemap_init( int gfxbank, void *maskBaseAddr, c
 		}
 
 	save_item(NAME(m_c123_TilemapInfo.control));
-	save_pointer(NAME(m_c123_TilemapInfo.videoram.get()), 0x10000);
+	save_pointer(NAME(m_c123_TilemapInfo.videoram), 0x10000);
 }
 
 void namcos2_shared_state::c123_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )

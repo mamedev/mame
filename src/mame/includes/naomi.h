@@ -46,10 +46,15 @@ class naomi_state : public dc_state
 		m_rombase(*this, "rombase")
 		{ }
 
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_shared_ptr<uint64_t> m_rombase;
+	void naomi_base(machine_config &config);
+	void naomim2(machine_config &config);
+	void naomim2_kb(machine_config &config);
+	void naomi(machine_config &config);
+	void naomim1(machine_config &config);
+	void naomigd(machine_config &config);
+	void naomigd_kb(machine_config &config);
+	void naomim4(machine_config &config);
 
-	DECLARE_MACHINE_RESET(naomi);
 	void init_naomigd();
 	void init_ggxx();
 	void init_ggxxrl();
@@ -60,37 +65,38 @@ class naomi_state : public dc_state
 	void init_hotd2();
 	void init_naomi_mp();
 
+	DECLARE_CUSTOM_INPUT_MEMBER(naomi_mp_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(naomi_kb_r);
+	DECLARE_INPUT_CHANGED_MEMBER(naomi_mp_w);
+
+	DECLARE_READ64_MEMBER( naomi2_biose_idle_skip_r );
+
+protected:
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_shared_ptr<uint64_t> m_rombase;
+
+	DECLARE_MACHINE_RESET(naomi);
+
 	DECLARE_READ16_MEMBER( naomi_g2bus_r );
 	DECLARE_READ64_MEMBER( eeprom_93c46a_r );
 	DECLARE_WRITE64_MEMBER( eeprom_93c46a_w );
 
 	uint8_t m_mp_mux;
-	DECLARE_CUSTOM_INPUT_MEMBER(naomi_mp_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(naomi_kb_r);
-	DECLARE_INPUT_CHANGED_MEMBER(naomi_mp_w);
 
 	uint8_t asciihex_to_dec(uint8_t in);
 	void create_pic_from_retdat();
 
 	DECLARE_READ64_MEMBER( naomi_biose_idle_skip_r );
 	DECLARE_READ64_MEMBER( naomi_biosh_idle_skip_r );
-	DECLARE_READ64_MEMBER( naomi2_biose_idle_skip_r );
 	DECLARE_READ64_MEMBER( naomigd_ggxxsla_idle_skip_r );
 	DECLARE_READ64_MEMBER( naomigd_ggxx_idle_skip_r );
 	DECLARE_READ64_MEMBER( naomigd_ggxxrl_idle_skip_r );
 	DECLARE_READ64_MEMBER( naomigd_sfz3ugd_idle_skip_r );
 	DECLARE_READ64_MEMBER( hotd2_idle_skip_r );
-	void naomi_base(machine_config &config);
-	void naomim2(machine_config &config);
-	void naomim2_kb(machine_config &config);
-	void naomi(machine_config &config);
-	void naomim1(machine_config &config);
-	void naomigd(machine_config &config);
-	void naomigd_kb(machine_config &config);
-	void naomim4(machine_config &config);
+
 	void naomi_map(address_map &map);
 	void naomi_port(address_map &map);
-protected:
+
 	void set_drc_options();
 };
 
@@ -104,17 +110,20 @@ public:
 		m_elan_ram(*this, "elan_ram"),
 		m_powervr2_slave(*this, "powervr2_slave") { }
 
+	void naomi2_base(machine_config &config);
+	void naomi2m2(machine_config &config);
+	void naomi2gd(machine_config &config);
+	void naomi2m1(machine_config &config);
+
+	void init_naomi2();
+
+private:
 	required_shared_ptr<uint64_t> m_pvr2_texture_ram;
 	required_shared_ptr<uint64_t> m_pvr2_framebuffer_ram;
 	required_shared_ptr<uint64_t> m_elan_ram;
 	required_device<powervr2_device> m_powervr2_slave;
 
-	void init_naomi2();
 	DECLARE_WRITE32_MEMBER(both_pvr2_ta_w);
-	void naomi2_base(machine_config &config);
-	void naomi2m2(machine_config &config);
-	void naomi2gd(machine_config &config);
-	void naomi2m1(machine_config &config);
 	void naomi2_map(address_map &map);
 };
 
@@ -126,6 +135,14 @@ public:
 		m_awflash(*this, "awflash")
 	   { }
 
+	void aw_base(machine_config &config);
+	void aw1c(machine_config &config);
+	void aw2c(machine_config &config);
+
+	void init_atomiswave();
+	void init_xtrmhnt2();
+
+private:
 	required_device<macronix_29l001mc_device> m_awflash;
 
 	DECLARE_READ64_MEMBER( aw_flash_r );
@@ -133,17 +150,11 @@ public:
 	DECLARE_READ64_MEMBER( aw_modem_r );
 	DECLARE_WRITE64_MEMBER( aw_modem_w );
 
-	void init_atomiswave();
-	void init_xtrmhnt2();
-
 	DECLARE_READ64_MEMBER( xtrmhnt2_hack_r );
 
-	void aw_base(machine_config &config);
-	void aw1c(machine_config &config);
-	void aw2c(machine_config &config);
 	void aw_map(address_map &map);
 	void aw_port(address_map &map);
-protected:
+
 	uint8_t aw_ctrl_type;
 	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 };

@@ -40,12 +40,6 @@ struct ssi263_t
 class thayers_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTRQ_TICK,
-		TIMER_SSI263_PHONEME_TICK
-	};
-
 	thayers_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_pr7820(*this, "laserdisc")
@@ -55,6 +49,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{
 	}
+
+	void thayers(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
+
+private:
+	enum
+	{
+		TIMER_INTRQ_TICK,
+		TIMER_SSI263_PHONEME_TICK
+	};
 
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
@@ -97,8 +103,7 @@ public:
 	DECLARE_WRITE8_MEMBER(den2_w);
 	DECLARE_WRITE8_MEMBER(ssi263_register_w);
 	DECLARE_READ8_MEMBER(ssi263_register_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void check_interrupt();
@@ -106,10 +111,9 @@ public:
 	required_ioport_array<10> m_row;
 	output_finder<16> m_digits;
 
-	void thayers(machine_config &config);
 	void thayers_io_map(address_map &map);
 	void thayers_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -629,20 +633,20 @@ void thayers_state::thayers_map(address_map &map)
 void thayers_state::thayers_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x07).rw(this, FUNC(thayers_state::ssi263_register_r), FUNC(thayers_state::ssi263_register_w));
-	map(0x20, 0x20).w(this, FUNC(thayers_state::control_w));
-	map(0x40, 0x40).rw(this, FUNC(thayers_state::irqstate_r), FUNC(thayers_state::control2_w));
-	map(0x80, 0x80).rw(this, FUNC(thayers_state::cop_data_r), FUNC(thayers_state::cop_data_w));
-	map(0xa0, 0xa0).w(this, FUNC(thayers_state::timer_int_ack_w));
-	map(0xc0, 0xc0).w(this, FUNC(thayers_state::data_rdy_int_ack_w));
-	map(0xf0, 0xf0).r(this, FUNC(thayers_state::laserdsc_data_r));
-	map(0xf1, 0xf1).r(this, FUNC(thayers_state::dsw_b_r));
+	map(0x00, 0x07).rw(FUNC(thayers_state::ssi263_register_r), FUNC(thayers_state::ssi263_register_w));
+	map(0x20, 0x20).w(FUNC(thayers_state::control_w));
+	map(0x40, 0x40).rw(FUNC(thayers_state::irqstate_r), FUNC(thayers_state::control2_w));
+	map(0x80, 0x80).rw(FUNC(thayers_state::cop_data_r), FUNC(thayers_state::cop_data_w));
+	map(0xa0, 0xa0).w(FUNC(thayers_state::timer_int_ack_w));
+	map(0xc0, 0xc0).w(FUNC(thayers_state::data_rdy_int_ack_w));
+	map(0xf0, 0xf0).r(FUNC(thayers_state::laserdsc_data_r));
+	map(0xf1, 0xf1).r(FUNC(thayers_state::dsw_b_r));
 	map(0xf2, 0xf2).portr("DSWA");
-	map(0xf3, 0xf3).w(this, FUNC(thayers_state::intrq_w));
-	map(0xf4, 0xf4).w(this, FUNC(thayers_state::laserdsc_data_w));
-	map(0xf5, 0xf5).w(this, FUNC(thayers_state::laserdsc_control_w));
-	map(0xf6, 0xf6).w(this, FUNC(thayers_state::den1_w));
-	map(0xf7, 0xf7).w(this, FUNC(thayers_state::den2_w));
+	map(0xf3, 0xf3).w(FUNC(thayers_state::intrq_w));
+	map(0xf4, 0xf4).w(FUNC(thayers_state::laserdsc_data_w));
+	map(0xf5, 0xf5).w(FUNC(thayers_state::laserdsc_control_w));
+	map(0xf6, 0xf6).w(FUNC(thayers_state::den1_w));
+	map(0xf7, 0xf7).w(FUNC(thayers_state::den2_w));
 }
 
 /* Input Ports */

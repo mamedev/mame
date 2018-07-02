@@ -13,6 +13,7 @@
 #include "video/k053244_k053245.h"
 #include "video/k054000.h"
 #include "machine/k054321.h"
+#include "emupal.h"
 
 class lethal_state : public driver_device
 {
@@ -27,6 +28,10 @@ public:
 		m_k054321(*this, "k054321"),
 		m_palette(*this, "palette") { }
 
+	void lethalej(machine_config &config);
+	void lethalen(machine_config &config);
+
+private:
 	/* video-related */
 	int        m_layer_colorbase[4];
 	int        m_sprite_colorbase;
@@ -58,8 +63,6 @@ public:
 	INTERRUPT_GEN_MEMBER(lethalen_interrupt);
 	K05324X_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);
-	void lethalej(machine_config &config);
-	void lethalen(machine_config &config);
 	void bank4000_map(address_map &map);
 	void le_main(address_map &map);
 	void le_sound(address_map &map);

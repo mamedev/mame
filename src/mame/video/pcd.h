@@ -9,6 +9,7 @@
 #include "machine/pic8259.h"
 #include "machine/timer.h"
 #include "video/scn2674.h"
+#include "emupal.h"
 
 #include "diserial.h"
 

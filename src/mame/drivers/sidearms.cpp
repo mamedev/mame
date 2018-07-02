@@ -84,17 +84,17 @@ void sidearms_state::sidearms_map(address_map &map)
 	map(0xc000, 0xc3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xc400, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xc800, 0xc800).portr("SYSTEM").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc801, 0xc801).portr("P1").w(this, FUNC(sidearms_state::bankswitch_w));
+	map(0xc801, 0xc801).portr("P1").w(FUNC(sidearms_state::bankswitch_w));
 	map(0xc802, 0xc802).portr("P2").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xc803, 0xc803).portr("DSW0");
-	map(0xc804, 0xc804).portr("DSW1").w(this, FUNC(sidearms_state::c804_w));
-	map(0xc805, 0xc805).portr("DSW2").w(this, FUNC(sidearms_state::star_scrollx_w));
-	map(0xc806, 0xc806).w(this, FUNC(sidearms_state::star_scrolly_w));
+	map(0xc804, 0xc804).portr("DSW1").w(FUNC(sidearms_state::c804_w));
+	map(0xc805, 0xc805).portr("DSW2").w(FUNC(sidearms_state::star_scrollx_w));
+	map(0xc806, 0xc806).w(FUNC(sidearms_state::star_scrolly_w));
 	map(0xc808, 0xc809).writeonly().share("bg_scrollx");
 	map(0xc80a, 0xc80b).writeonly().share("bg_scrolly");
-	map(0xc80c, 0xc80c).w(this, FUNC(sidearms_state::gfxctrl_w));   /* background and sprite enable */
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(sidearms_state::videoram_w)).share("videoram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(sidearms_state::colorram_w)).share("colorram");
+	map(0xc80c, 0xc80c).w(FUNC(sidearms_state::gfxctrl_w));   /* background and sprite enable */
+	map(0xd000, 0xd7ff).ram().w(FUNC(sidearms_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(sidearms_state::colorram_w)).share("colorram");
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xffff).ram().share("spriteram");
 }
@@ -107,18 +107,18 @@ void sidearms_state::turtship_map(address_map &map)
 	map(0xd000, 0xdfff).ram().share("spriteram");
 	map(0xe000, 0xe3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe400, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xe800, 0xe807).r(this, FUNC(sidearms_state::turtship_ports_r));
+	map(0xe800, 0xe807).r(FUNC(sidearms_state::turtship_ports_r));
 	map(0xe800, 0xe800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xe801, 0xe801).w(this, FUNC(sidearms_state::bankswitch_w));
+	map(0xe801, 0xe801).w(FUNC(sidearms_state::bankswitch_w));
 	map(0xe802, 0xe802).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xe804, 0xe804).w(this, FUNC(sidearms_state::c804_w));
-	map(0xe805, 0xe805).w(this, FUNC(sidearms_state::star_scrollx_w));
-	map(0xe806, 0xe806).w(this, FUNC(sidearms_state::star_scrolly_w));
+	map(0xe804, 0xe804).w(FUNC(sidearms_state::c804_w));
+	map(0xe805, 0xe805).w(FUNC(sidearms_state::star_scrollx_w));
+	map(0xe806, 0xe806).w(FUNC(sidearms_state::star_scrolly_w));
 	map(0xe808, 0xe809).writeonly().share("bg_scrollx");
 	map(0xe80a, 0xe80b).writeonly().share("bg_scrolly");
-	map(0xe80c, 0xe80c).w(this, FUNC(sidearms_state::gfxctrl_w));   /* background and sprite enable */
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(sidearms_state::videoram_w)).share("videoram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(sidearms_state::colorram_w)).share("colorram");
+	map(0xe80c, 0xe80c).w(FUNC(sidearms_state::gfxctrl_w));   /* background and sprite enable */
+	map(0xf000, 0xf7ff).ram().w(FUNC(sidearms_state::videoram_w)).share("videoram");
+	map(0xf800, 0xffff).ram().w(FUNC(sidearms_state::colorram_w)).share("colorram");
 }
 
 void sidearms_state::sidearms_sound_map(address_map &map)
@@ -152,21 +152,21 @@ void sidearms_state::whizz_map(address_map &map)
 	map(0xc000, 0xc3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xc400, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xc800, 0xc800).portr("DSW0").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc801, 0xc801).portr("DSW1").w(this, FUNC(sidearms_state::whizz_bankswitch_w));
+	map(0xc801, 0xc801).portr("DSW1").w(FUNC(sidearms_state::whizz_bankswitch_w));
 	map(0xc802, 0xc802).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xc803, 0xc803).portr("IN0").nopw();
-	map(0xc804, 0xc804).portr("IN1").w(this, FUNC(sidearms_state::c804_w));
+	map(0xc804, 0xc804).portr("IN1").w(FUNC(sidearms_state::c804_w));
 	map(0xc805, 0xc805).portr("IN2").nopw();
 	map(0xc806, 0xc806).portr("IN3");
 	map(0xc807, 0xc807).portr("IN4");
 	map(0xc808, 0xc809).writeonly().share("bg_scrollx");
 	map(0xc80a, 0xc80b).writeonly().share("bg_scrolly");
-	map(0xc80c, 0xc80c).w(this, FUNC(sidearms_state::gfxctrl_w));
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(sidearms_state::videoram_w)).share("videoram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(sidearms_state::colorram_w)).share("colorram");
+	map(0xc80c, 0xc80c).w(FUNC(sidearms_state::gfxctrl_w));
+	map(0xd000, 0xd7ff).ram().w(FUNC(sidearms_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(sidearms_state::colorram_w)).share("colorram");
 	map(0xe000, 0xefff).ram();
-	map(0xe805, 0xe805).w(this, FUNC(sidearms_state::star_scrollx_w));
-	map(0xe806, 0xe806).w(this, FUNC(sidearms_state::star_scrolly_w));
+	map(0xe805, 0xe805).w(FUNC(sidearms_state::star_scrollx_w));
+	map(0xe806, 0xe806).w(FUNC(sidearms_state::star_scrolly_w));
 	map(0xf000, 0xffff).ram().share("spriteram");
 }
 

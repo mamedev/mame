@@ -50,7 +50,7 @@ mach32_device::mach32_device(const machine_config &mconfig, device_type type, co
 MACHINE_CONFIG_START(mach32_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("8514a", ATIMACH32_8514A, 0)
 	downcast<ibm8514a_device*>(device)->set_vga(DEVICE_SELF);
-	MCFG_EEPROM_SERIAL_93C56_ADD("ati_eeprom")
+	MCFG_DEVICE_ADD("ati_eeprom", EEPROM_SERIAL_93C56_16BIT)
 MACHINE_CONFIG_END
 
 void mach32_8514a_device::device_start()
@@ -336,7 +336,7 @@ mach64_device::mach64_device(const machine_config &mconfig, device_type type, co
 MACHINE_CONFIG_START(mach64_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("8514a", ATIMACH64_8514A, 0)
 	downcast<ibm8514a_device*>(device)->set_vga(DEVICE_SELF);
-	MCFG_EEPROM_SERIAL_93C56_ADD("ati_eeprom")
+	MCFG_DEVICE_ADD("ati_eeprom", EEPROM_SERIAL_93C56_16BIT)
 MACHINE_CONFIG_END
 
 void mach64_8514a_device::device_start()

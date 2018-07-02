@@ -51,15 +51,16 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(sound_nmi_w);
 	void kingpin(machine_config &config);
+	void dealracl(machine_config &config);
+
+private:
+	DECLARE_WRITE8_MEMBER(sound_nmi_w);
 	void kingpin_io_map(address_map &map);
 	void kingpin_program_map(address_map &map);
 	void kingpin_sound_map(address_map &map);
-	void dealracl(machine_config &config);
 	void dealracl_program_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -90,9 +91,9 @@ void kingpin_state::kingpin_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x20, 0x20).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0x21, 0x21).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
-	map(0x60, 0x60).w(this, FUNC(kingpin_state::sound_nmi_w));
+	map(0x20, 0x20).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x21, 0x21).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x60, 0x60).w(FUNC(kingpin_state::sound_nmi_w));
 	//AM_RANGE(0x30, 0x30) AM_WRITENOP // lamps?
 	//AM_RANGE(0x40, 0x40) AM_WRITENOP // lamps?
 	//AM_RANGE(0x50, 0x50) AM_WRITENOP // ?

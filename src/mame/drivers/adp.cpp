@@ -164,6 +164,7 @@ Quick Jack administration/service mode:
 #include "sound/ay8910.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -180,6 +181,14 @@ public:
 		m_in0(*this, "IN0")
 	{ }
 
+	void skattv(machine_config &config);
+	void quickjac(machine_config &config);
+	void fashiong(machine_config &config);
+	void fstation(machine_config &config);
+	void funland(machine_config &config);
+	void skattva(machine_config &config);
+
+private:
 	required_device<microtouch_device> m_microtouch;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
@@ -199,12 +208,7 @@ public:
 	IRQ_CALLBACK_MEMBER(duart_iack_handler);
 	//INTERRUPT_GEN_MEMBER(adp_int);
 	void skattva_nvram_init(nvram_device &nvram, void *base, size_t size);
-	void skattv(machine_config &config);
-	void quickjac(machine_config &config);
-	void fashiong(machine_config &config);
-	void fstation(machine_config &config);
-	void funland(machine_config &config);
-	void skattva(machine_config &config);
+
 	void adp_hd63484_map(address_map &map);
 	void fashiong_hd63484_map(address_map &map);
 	void fstation_hd63484_map(address_map &map);
@@ -309,7 +313,7 @@ void adp_state::skattv_mem(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x800080, 0x800081).rw("acrtc", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
 	map(0x800082, 0x800083).rw("acrtc", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
-	map(0x800100, 0x800101).rw(this, FUNC(adp_state::input_r), FUNC(adp_state::input_w));
+	map(0x800100, 0x800101).rw(FUNC(adp_state::input_r), FUNC(adp_state::input_w));
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xffc000, 0xffffff).ram().share("nvram");
@@ -359,7 +363,7 @@ void adp_state::fstation_mem(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x800080, 0x800081).rw("acrtc", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
 	map(0x800082, 0x800083).rw("acrtc", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
-	map(0x800100, 0x800101).rw(this, FUNC(adp_state::input_r), FUNC(adp_state::input_w));
+	map(0x800100, 0x800101).rw(FUNC(adp_state::input_r), FUNC(adp_state::input_w));
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xfc0000, 0xffffff).ram().share("nvram");

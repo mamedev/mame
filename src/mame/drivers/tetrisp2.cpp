@@ -307,27 +307,27 @@ void tetrisp2_state::tetrisp2_map(address_map &map)
 	map(0x100000, 0x103fff).ram().share("spriteram");           // Object RAM
 	map(0x104000, 0x107fff).ram();                                                         // Spare Object RAM
 	map(0x108000, 0x10ffff).ram();                                                         // Work RAM
-	map(0x200000, 0x23ffff).rw(this, FUNC(tetrisp2_state::tetrisp2_priority_r), FUNC(tetrisp2_state::tetrisp2_priority_w));
-	map(0x300000, 0x31ffff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_palette_w)).share("paletteram");        // Palette
-	map(0x400000, 0x403fff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_fg_w)).share("vram_fg");   // Foreground
-	map(0x404000, 0x407fff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_bg_w)).share("vram_bg");   // Background
+	map(0x200000, 0x23ffff).rw(FUNC(tetrisp2_state::tetrisp2_priority_r), FUNC(tetrisp2_state::tetrisp2_priority_w));
+	map(0x300000, 0x31ffff).ram().w(FUNC(tetrisp2_state::tetrisp2_palette_w)).share("paletteram");        // Palette
+	map(0x400000, 0x403fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_fg_w)).share("vram_fg");   // Foreground
+	map(0x404000, 0x407fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_bg_w)).share("vram_bg");   // Background
 	map(0x408000, 0x409fff).ram();                                                         // ???
 	map(0x500000, 0x50ffff).ram();                                                         // Line
-	map(0x600000, 0x60ffff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_rot_w)).share("vram_rot"); // Rotation
-	map(0x650000, 0x651fff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_rot_w));                              // Rotation (mirror)
+	map(0x600000, 0x60ffff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_rot_w)).share("vram_rot"); // Rotation
+	map(0x650000, 0x651fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_rot_w));                              // Rotation (mirror)
 	map(0x800000, 0x800003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);   // Sound
-	map(0x900000, 0x903fff).r(this, FUNC(tetrisp2_state::tetrisp2_nvram_r)).w(this, FUNC(tetrisp2_state::tetrisp2_nvram_w)).share("nvram"); // NVRAM
-	map(0x904000, 0x907fff).r(this, FUNC(tetrisp2_state::tetrisp2_nvram_r)).w(this, FUNC(tetrisp2_state::tetrisp2_nvram_w));               // NVRAM (mirror)
-	map(0xb00000, 0xb00001).w(this, FUNC(tetrisp2_state::tetrisp2_coincounter_w));                               // Coin Counter
+	map(0x900000, 0x903fff).r(FUNC(tetrisp2_state::tetrisp2_nvram_r)).w(FUNC(tetrisp2_state::tetrisp2_nvram_w)).share("nvram"); // NVRAM
+	map(0x904000, 0x907fff).r(FUNC(tetrisp2_state::tetrisp2_nvram_r)).w(FUNC(tetrisp2_state::tetrisp2_nvram_w));               // NVRAM (mirror)
+	map(0xb00000, 0xb00001).w(FUNC(tetrisp2_state::tetrisp2_coincounter_w));                               // Coin Counter
 	map(0xb20000, 0xb20001).nopw();                                                    // ???
 	map(0xb40000, 0xb4000b).writeonly().share("scroll_fg");                     // Foreground Scrolling
 	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");                     // Background Scrolling
 	map(0xb4003e, 0xb4003f).nopw();                                                    // scr_size
 	map(0xb60000, 0xb6002f).writeonly().share("rotregs");                       // Rotation Registers
-	map(0xba0000, 0xba001f).w(this, FUNC(tetrisp2_state::tetrisp2_systemregs_w));                                // system param
+	map(0xba0000, 0xba001f).w(FUNC(tetrisp2_state::tetrisp2_systemregs_w));                                // system param
 	map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
 	map(0xbe0002, 0xbe0003).portr("PLAYERS");                                        // Inputs
-	map(0xbe0004, 0xbe0005).r(this, FUNC(tetrisp2_state::tetrisp2_ip_1_word_r));                                  // Inputs & protection
+	map(0xbe0004, 0xbe0005).r(FUNC(tetrisp2_state::tetrisp2_ip_1_word_r));                                  // Inputs & protection
 	map(0xbe0008, 0xbe0009).portr("DSW");                                            // Inputs
 	map(0xbe000a, 0xbe000b).r("watchdog", FUNC(watchdog_timer_device::reset16_r));       // Watchdog
 }
@@ -363,23 +363,23 @@ void tetrisp2_state::nndmseal_map(address_map &map)
 	map(0x100000, 0x103fff).ram().share("spriteram");   // Object RAM
 	map(0x104000, 0x107fff).ram(); // Spare Object RAM
 	map(0x108000, 0x10ffff).ram(); // Work RAM
-	map(0x200000, 0x23ffff).rw(this, FUNC(tetrisp2_state::tetrisp2_priority_r), FUNC(tetrisp2_state::tetrisp2_priority_w));
-	map(0x300000, 0x31ffff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_palette_w)).share("paletteram");    // Palette
-	map(0x400000, 0x403fff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_fg_w)).share("vram_fg");   // Foreground
-	map(0x404000, 0x407fff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_bg_w)).share("vram_bg");   // Background
+	map(0x200000, 0x23ffff).rw(FUNC(tetrisp2_state::tetrisp2_priority_r), FUNC(tetrisp2_state::tetrisp2_priority_w));
+	map(0x300000, 0x31ffff).ram().w(FUNC(tetrisp2_state::tetrisp2_palette_w)).share("paletteram");    // Palette
+	map(0x400000, 0x403fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_fg_w)).share("vram_fg");   // Foreground
+	map(0x404000, 0x407fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_bg_w)).share("vram_bg");   // Background
 
 	map(0x408000, 0x409fff).ram(); // ???
 	map(0x500000, 0x50ffff).ram(); // Line
 
-	map(0x600000, 0x60ffff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_rot_w)).share("vram_rot"); // Rotation
-	map(0x650000, 0x651fff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_rot_w));  // Rotation (mirror)
+	map(0x600000, 0x60ffff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_rot_w)).share("vram_rot"); // Rotation
+	map(0x650000, 0x651fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_rot_w));  // Rotation (mirror)
 
 	map(0x800000, 0x800003).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff); // Sound
 
-	map(0x900000, 0x903fff).rw(this, FUNC(tetrisp2_state::tetrisp2_nvram_r), FUNC(tetrisp2_state::tetrisp2_nvram_w)).share("nvram"); // NVRAM
+	map(0x900000, 0x903fff).rw(FUNC(tetrisp2_state::tetrisp2_nvram_r), FUNC(tetrisp2_state::tetrisp2_nvram_w)).share("nvram"); // NVRAM
 
-	map(0xb00000, 0xb00001).w(this, FUNC(tetrisp2_state::nndmseal_coincounter_w));   // Coin Counter
-	map(0xb20000, 0xb20001).w(this, FUNC(tetrisp2_state::nndmseal_b20000_w));        // ???
+	map(0xb00000, 0xb00001).w(FUNC(tetrisp2_state::nndmseal_coincounter_w));   // Coin Counter
+	map(0xb20000, 0xb20001).w(FUNC(tetrisp2_state::nndmseal_b20000_w));        // ???
 
 	map(0xb40000, 0xb4000b).writeonly().share("scroll_fg"); // Foreground Scrolling
 	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg"); // Background Scrolling
@@ -387,9 +387,9 @@ void tetrisp2_state::nndmseal_map(address_map &map)
 
 	map(0xb60000, 0xb6002f).writeonly().share("rotregs");   // Rotation Registers
 
-	map(0xb80000, 0xb80001).w(this, FUNC(tetrisp2_state::nndmseal_sound_bank_w));
+	map(0xb80000, 0xb80001).w(FUNC(tetrisp2_state::nndmseal_sound_bank_w));
 
-	map(0xba0000, 0xba001f).w(this, FUNC(tetrisp2_state::rockn_systemregs_w));   // system param
+	map(0xba0000, 0xba001f).w(FUNC(tetrisp2_state::rockn_systemregs_w));   // system param
 
 	map(0xbe0000, 0xbe0001).nopr(); // INT-level1 dummy read
 	map(0xbe0002, 0xbe0003).portr("BUTTONS");   // Inputs
@@ -407,25 +407,25 @@ void tetrisp2_state::rockn1_map(address_map &map)
 	map(0x100000, 0x103fff).ram().share("spriteram");           // Object RAM
 	map(0x104000, 0x107fff).ram();                                                         // Spare Object RAM
 	map(0x108000, 0x10ffff).ram();                                                         // Work RAM
-	map(0x200000, 0x23ffff).rw(this, FUNC(tetrisp2_state::tetrisp2_priority_r), FUNC(tetrisp2_state::tetrisp2_priority_w));
-	map(0x300000, 0x31ffff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_palette_w)).share("paletteram");        // Palette
-	map(0x400000, 0x403fff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_fg_w)).share("vram_fg");   // Foreground
-	map(0x404000, 0x407fff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_bg_w)).share("vram_bg");   // Background
+	map(0x200000, 0x23ffff).rw(FUNC(tetrisp2_state::tetrisp2_priority_r), FUNC(tetrisp2_state::tetrisp2_priority_w));
+	map(0x300000, 0x31ffff).ram().w(FUNC(tetrisp2_state::tetrisp2_palette_w)).share("paletteram");        // Palette
+	map(0x400000, 0x403fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_fg_w)).share("vram_fg");   // Foreground
+	map(0x404000, 0x407fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_bg_w)).share("vram_bg");   // Background
 	map(0x408000, 0x409fff).ram();                                                         // ???
 	map(0x500000, 0x50ffff).ram();                                                         // Line
-	map(0x600000, 0x60ffff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_rot_w)).share("vram_rot"); // Rotation
-	map(0x900000, 0x903fff).r(this, FUNC(tetrisp2_state::rockn_nvram_r)).w(this, FUNC(tetrisp2_state::tetrisp2_nvram_w)).share("nvram");    // NVRAM
-	map(0xa30000, 0xa30001).rw(this, FUNC(tetrisp2_state::rockn_soundvolume_r), FUNC(tetrisp2_state::rockn_soundvolume_w));         // Sound Volume
+	map(0x600000, 0x60ffff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_rot_w)).share("vram_rot"); // Rotation
+	map(0x900000, 0x903fff).r(FUNC(tetrisp2_state::rockn_nvram_r)).w(FUNC(tetrisp2_state::tetrisp2_nvram_w)).share("nvram");    // NVRAM
+	map(0xa30000, 0xa30001).rw(FUNC(tetrisp2_state::rockn_soundvolume_r), FUNC(tetrisp2_state::rockn_soundvolume_w));         // Sound Volume
 	map(0xa40000, 0xa40003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);   // Sound
-	map(0xa44000, 0xa44001).rw(this, FUNC(tetrisp2_state::rockn_adpcmbank_r), FUNC(tetrisp2_state::rockn_adpcmbank_w));             // Sound Bank
+	map(0xa44000, 0xa44001).rw(FUNC(tetrisp2_state::rockn_adpcmbank_r), FUNC(tetrisp2_state::rockn_adpcmbank_w));             // Sound Bank
 	map(0xa48000, 0xa48001).noprw();                                                         // YMZ280 Reset
-	map(0xb00000, 0xb00001).w(this, FUNC(tetrisp2_state::tetrisp2_coincounter_w));                               // Coin Counter
+	map(0xb00000, 0xb00001).w(FUNC(tetrisp2_state::tetrisp2_coincounter_w));                               // Coin Counter
 	map(0xb20000, 0xb20001).noprw();                                                         // ???
 	map(0xb40000, 0xb4000b).writeonly().share("scroll_fg");                     // Foreground Scrolling
 	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");                     // Background Scrolling
 	map(0xb4003e, 0xb4003f).nopw();                                                    // scr_size
 	map(0xb60000, 0xb6002f).writeonly().share("rotregs");                       // Rotation Registers
-	map(0xba0000, 0xba001f).w(this, FUNC(tetrisp2_state::rockn_systemregs_w));                                   // system param
+	map(0xba0000, 0xba001f).w(FUNC(tetrisp2_state::rockn_systemregs_w));                                   // system param
 	map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
 	map(0xbe0002, 0xbe0003).portr("PLAYERS");                                        // Inputs
 	map(0xbe0004, 0xbe0005).portr("SYSTEM");                                         // Inputs
@@ -440,25 +440,25 @@ void tetrisp2_state::rockn2_map(address_map &map)
 	map(0x100000, 0x103fff).ram().share("spriteram");           // Object RAM
 	map(0x104000, 0x107fff).ram();                                                         // Spare Object RAM
 	map(0x108000, 0x10ffff).ram();                                                         // Work RAM
-	map(0x200000, 0x23ffff).rw(this, FUNC(tetrisp2_state::tetrisp2_priority_r), FUNC(tetrisp2_state::tetrisp2_priority_w));
-	map(0x300000, 0x31ffff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_palette_w)).share("paletteram");        // Palette
+	map(0x200000, 0x23ffff).rw(FUNC(tetrisp2_state::tetrisp2_priority_r), FUNC(tetrisp2_state::tetrisp2_priority_w));
+	map(0x300000, 0x31ffff).ram().w(FUNC(tetrisp2_state::tetrisp2_palette_w)).share("paletteram");        // Palette
 	map(0x500000, 0x50ffff).ram();                                                         // Line
-	map(0x600000, 0x60ffff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_rot_w)).share("vram_rot"); // Rotation
-	map(0x800000, 0x803fff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_fg_w)).share("vram_fg");   // Foreground
-	map(0x804000, 0x807fff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_bg_w)).share("vram_bg");   // Background
+	map(0x600000, 0x60ffff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_rot_w)).share("vram_rot"); // Rotation
+	map(0x800000, 0x803fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_fg_w)).share("vram_fg");   // Foreground
+	map(0x804000, 0x807fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_bg_w)).share("vram_bg");   // Background
 	map(0x808000, 0x809fff).ram();                                                         // ???
-	map(0x900000, 0x903fff).r(this, FUNC(tetrisp2_state::rockn_nvram_r)).w(this, FUNC(tetrisp2_state::tetrisp2_nvram_w)).share("nvram");    // NVRAM
-	map(0xa30000, 0xa30001).rw(this, FUNC(tetrisp2_state::rockn_soundvolume_r), FUNC(tetrisp2_state::rockn_soundvolume_w));         // Sound Volume
+	map(0x900000, 0x903fff).r(FUNC(tetrisp2_state::rockn_nvram_r)).w(FUNC(tetrisp2_state::tetrisp2_nvram_w)).share("nvram");    // NVRAM
+	map(0xa30000, 0xa30001).rw(FUNC(tetrisp2_state::rockn_soundvolume_r), FUNC(tetrisp2_state::rockn_soundvolume_w));         // Sound Volume
 	map(0xa40000, 0xa40003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);   // Sound
-	map(0xa44000, 0xa44001).rw(this, FUNC(tetrisp2_state::rockn_adpcmbank_r), FUNC(tetrisp2_state::rockn2_adpcmbank_w));            // Sound Bank
+	map(0xa44000, 0xa44001).rw(FUNC(tetrisp2_state::rockn_adpcmbank_r), FUNC(tetrisp2_state::rockn2_adpcmbank_w));            // Sound Bank
 	map(0xa48000, 0xa48001).nopw();                                                    // YMZ280 Reset
-	map(0xb00000, 0xb00001).w(this, FUNC(tetrisp2_state::tetrisp2_coincounter_w));                               // Coin Counter
+	map(0xb00000, 0xb00001).w(FUNC(tetrisp2_state::tetrisp2_coincounter_w));                               // Coin Counter
 	map(0xb20000, 0xb20001).nopw();                                                    // ???
 	map(0xb40000, 0xb4000b).writeonly().share("scroll_fg");                 // Foreground Scrolling
 	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");                 // Background Scrolling
 	map(0xb4003e, 0xb4003f).nopw();                                                    // scr_size
 	map(0xb60000, 0xb6002f).writeonly().share("rotregs");                   // Rotation Registers
-	map(0xba0000, 0xba001f).w(this, FUNC(tetrisp2_state::rockn_systemregs_w));                                   // system param
+	map(0xba0000, 0xba001f).w(FUNC(tetrisp2_state::rockn_systemregs_w));                                   // system param
 	map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
 	map(0xbe0002, 0xbe0003).portr("PLAYERS");                                        // Inputs
 	map(0xbe0004, 0xbe0005).portr("SYSTEM");                                         // Inputs
@@ -473,26 +473,26 @@ void tetrisp2_state::rocknms_main_map(address_map &map)
 	map(0x100000, 0x103fff).ram().share("spriteram");           // Object RAM
 	map(0x104000, 0x107fff).ram();                                                         // Spare Object RAM
 	map(0x108000, 0x10ffff).ram();                                                         // Work RAM
-	map(0x200000, 0x23ffff).rw(this, FUNC(tetrisp2_state::tetrisp2_priority_r), FUNC(tetrisp2_state::tetrisp2_priority_w));
-	map(0x300000, 0x31ffff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_palette_w)).share("paletteram");        // Palette
+	map(0x200000, 0x23ffff).rw(FUNC(tetrisp2_state::tetrisp2_priority_r), FUNC(tetrisp2_state::tetrisp2_priority_w));
+	map(0x300000, 0x31ffff).ram().w(FUNC(tetrisp2_state::tetrisp2_palette_w)).share("paletteram");        // Palette
 //  map(0x500000, 0x50ffff).ram();                                                         // Line
-	map(0x600000, 0x60ffff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_rot_w)).share("vram_rot"); // Rotation
-	map(0x800000, 0x803fff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_fg_w)).share("vram_fg");   // Foreground
-	map(0x804000, 0x807fff).ram().w(this, FUNC(tetrisp2_state::tetrisp2_vram_bg_w)).share("vram_bg");   // Background
+	map(0x600000, 0x60ffff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_rot_w)).share("vram_rot"); // Rotation
+	map(0x800000, 0x803fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_fg_w)).share("vram_fg");   // Foreground
+	map(0x804000, 0x807fff).ram().w(FUNC(tetrisp2_state::tetrisp2_vram_bg_w)).share("vram_bg");   // Background
 //  map(0x808000, 0x809fff).ram();                                                         // ???
-	map(0x900000, 0x903fff).r(this, FUNC(tetrisp2_state::rockn_nvram_r)).w(this, FUNC(tetrisp2_state::tetrisp2_nvram_w)).share("nvram");    // NVRAM
-	map(0xa30000, 0xa30001).rw(this, FUNC(tetrisp2_state::rockn_soundvolume_r), FUNC(tetrisp2_state::rockn_soundvolume_w));         // Sound Volume
+	map(0x900000, 0x903fff).r(FUNC(tetrisp2_state::rockn_nvram_r)).w(FUNC(tetrisp2_state::tetrisp2_nvram_w)).share("nvram");    // NVRAM
+	map(0xa30000, 0xa30001).rw(FUNC(tetrisp2_state::rockn_soundvolume_r), FUNC(tetrisp2_state::rockn_soundvolume_w));         // Sound Volume
 	map(0xa40000, 0xa40003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);   // Sound
-	map(0xa44000, 0xa44001).rw(this, FUNC(tetrisp2_state::rockn_adpcmbank_r), FUNC(tetrisp2_state::rockn_adpcmbank_w));             // Sound Bank
+	map(0xa44000, 0xa44001).rw(FUNC(tetrisp2_state::rockn_adpcmbank_r), FUNC(tetrisp2_state::rockn_adpcmbank_w));             // Sound Bank
 	map(0xa48000, 0xa48001).nopw();                                                    // YMZ280 Reset
-	map(0xa00000, 0xa00001).w(this, FUNC(tetrisp2_state::rocknms_main2sub_w));                                   // MAIN -> SUB Communication
-	map(0xb00000, 0xb00001).w(this, FUNC(tetrisp2_state::tetrisp2_coincounter_w));                               // Coin Counter
+	map(0xa00000, 0xa00001).w(FUNC(tetrisp2_state::rocknms_main2sub_w));                                   // MAIN -> SUB Communication
+	map(0xb00000, 0xb00001).w(FUNC(tetrisp2_state::tetrisp2_coincounter_w));                               // Coin Counter
 	map(0xb20000, 0xb20001).nopw();                                                    // ???
 	map(0xb40000, 0xb4000b).writeonly().share("scroll_fg");                     // Foreground Scrolling
 	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");                     // Background Scrolling
 	map(0xb4003e, 0xb4003f).nopw();                                                    // scr_size
 	map(0xb60000, 0xb6002f).writeonly().share("rotregs");                       // Rotation Registers
-	map(0xba0000, 0xba001f).w(this, FUNC(tetrisp2_state::rockn_systemregs_w));                                   // system param
+	map(0xba0000, 0xba001f).w(FUNC(tetrisp2_state::rockn_systemregs_w));                                   // system param
 	map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
 	map(0xbe0002, 0xbe0003).portr("PLAYERS");
 	map(0xbe0004, 0xbe0005).portr("SYSTEM");                                         // Inputs
@@ -507,27 +507,27 @@ void tetrisp2_state::rocknms_sub_map(address_map &map)
 	map(0x100000, 0x103fff).ram().share("spriteram2");      // Object RAM
 	map(0x104000, 0x107fff).ram();                                                         // Spare Object RAM
 	map(0x108000, 0x10ffff).ram();                                                         // Work RAM
-	map(0x200000, 0x23ffff).ram().w(this, FUNC(tetrisp2_state::rocknms_sub_priority_w)).share("sub_priority"); // Priority
-	map(0x300000, 0x31ffff).ram().w(this, FUNC(tetrisp2_state::rocknms_sub_palette_w)).share("sub_paletteram");    // Palette
+	map(0x200000, 0x23ffff).ram().w(FUNC(tetrisp2_state::rocknms_sub_priority_w)).share("sub_priority"); // Priority
+	map(0x300000, 0x31ffff).ram().w(FUNC(tetrisp2_state::rocknms_sub_palette_w)).share("sub_paletteram");    // Palette
 //  map(0x500000, 0x50ffff).ram();                                                         // Line
-	map(0x600000, 0x60ffff).ram().w(this, FUNC(tetrisp2_state::rocknms_sub_vram_rot_w)).share("sub_vram_rot"); // Rotation
-	map(0x800000, 0x803fff).ram().w(this, FUNC(tetrisp2_state::rocknms_sub_vram_fg_w)).share("sub_vram_fg"); // Foreground
-	map(0x804000, 0x807fff).ram().w(this, FUNC(tetrisp2_state::rocknms_sub_vram_bg_w)).share("sub_vram_bg"); // Background
+	map(0x600000, 0x60ffff).ram().w(FUNC(tetrisp2_state::rocknms_sub_vram_rot_w)).share("sub_vram_rot"); // Rotation
+	map(0x800000, 0x803fff).ram().w(FUNC(tetrisp2_state::rocknms_sub_vram_fg_w)).share("sub_vram_fg"); // Foreground
+	map(0x804000, 0x807fff).ram().w(FUNC(tetrisp2_state::rocknms_sub_vram_bg_w)).share("sub_vram_bg"); // Background
 //  map(0x808000, 0x809fff).ram();                                                         // ???
 	map(0x900000, 0x907fff).ram();                                                         // NVRAM
-	map(0xa30000, 0xa30001).w(this, FUNC(tetrisp2_state::rockn_soundvolume_w));                                  // Sound Volume
+	map(0xa30000, 0xa30001).w(FUNC(tetrisp2_state::rockn_soundvolume_w));                                  // Sound Volume
 	map(0xa40000, 0xa40003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff);             // Sound
-	map(0xa44000, 0xa44001).w(this, FUNC(tetrisp2_state::rockn_adpcmbank_w));                                    // Sound Bank
+	map(0xa44000, 0xa44001).w(FUNC(tetrisp2_state::rockn_adpcmbank_w));                                    // Sound Bank
 	map(0xa48000, 0xa48001).nopw();                                                    // YMZ280 Reset
-	map(0xb00000, 0xb00001).w(this, FUNC(tetrisp2_state::rocknms_sub2main_w));                                   // MAIN <- SUB Communication
+	map(0xb00000, 0xb00001).w(FUNC(tetrisp2_state::rocknms_sub2main_w));                                   // MAIN <- SUB Communication
 	map(0xb20000, 0xb20001).nopw();                                                    // ???
 	map(0xb40000, 0xb4000b).writeonly().share("sub_scroll_fg");                 // Foreground Scrolling
 	map(0xb40010, 0xb4001b).writeonly().share("sub_scroll_bg");                 // Background Scrolling
 	map(0xb4003e, 0xb4003f).nopw();                                                    // scr_size
 	map(0xb60000, 0xb6002f).writeonly().share("sub_rotregs");                       // Rotation Registers
-	map(0xba0000, 0xba001f).w(this, FUNC(tetrisp2_state::rocknms_sub_systemregs_w));                             // system param
+	map(0xba0000, 0xba001f).w(FUNC(tetrisp2_state::rocknms_sub_systemregs_w));                             // system param
 //  map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
-	map(0xbe0002, 0xbe0003).rw(this, FUNC(tetrisp2_state::rocknms_main2sub_r), FUNC(tetrisp2_state::rocknms_sub2main_w));           // MAIN <-> SUB Communication
+	map(0xbe0002, 0xbe0003).rw(FUNC(tetrisp2_state::rocknms_main2sub_r), FUNC(tetrisp2_state::rocknms_sub2main_w));           // MAIN <-> SUB Communication
 	map(0xbe000a, 0xbe000b).r("watchdog", FUNC(watchdog_timer_device::reset16_r));       // Watchdog
 }
 
@@ -655,36 +655,36 @@ void stepstag_state::stepstag_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x103fff).ram().share("spriteram");                                   // Object RAM
 	map(0x108000, 0x10ffff).ram();                                                         // Work RAM
-	map(0x200000, 0x23ffff).rw(this, FUNC(stepstag_state::tetrisp2_priority_r), FUNC(stepstag_state::tetrisp2_priority_w));
-	map(0x300000, 0x31ffff).ram().w(this, FUNC(stepstag_state::tetrisp2_palette_w)).share("paletteram");        // Palette
-	map(0x400000, 0x403fff).ram().w(this, FUNC(stepstag_state::tetrisp2_vram_fg_w)).share("vram_fg");           // Foreground
-	map(0x404000, 0x407fff).ram().w(this, FUNC(stepstag_state::tetrisp2_vram_bg_w)).share("vram_bg");           // Background
+	map(0x200000, 0x23ffff).rw(FUNC(stepstag_state::tetrisp2_priority_r), FUNC(stepstag_state::tetrisp2_priority_w));
+	map(0x300000, 0x31ffff).ram().w(FUNC(stepstag_state::tetrisp2_palette_w)).share("paletteram");        // Palette
+	map(0x400000, 0x403fff).ram().w(FUNC(stepstag_state::tetrisp2_vram_fg_w)).share("vram_fg");           // Foreground
+	map(0x404000, 0x407fff).ram().w(FUNC(stepstag_state::tetrisp2_vram_bg_w)).share("vram_bg");           // Background
 //  map(0x408000, 0x409fff).ram();                                                         // ???
 	map(0x500000, 0x50ffff).ram();                                                         // Line
-	map(0x600000, 0x60ffff).ram().w(this, FUNC(stepstag_state::tetrisp2_vram_rot_w)).share("vram_rot");         // Rotation
-	map(0x900000, 0x903fff).rw(this, FUNC(stepstag_state::rockn_nvram_r), FUNC(stepstag_state::tetrisp2_nvram_w)).share("nvram"); // NVRAM
-//  map(0x904000, 0x907fff).rw(this, FUNC(stepstag_state::rockn_nvram_r), FUNC(stepstag_state::tetrisp2_nvram_w);                 // NVRAM (mirror)
-	map(0xa00000, 0xa00001).nopr().w(this, FUNC(stepstag_state::stepstag_neon_w));  // Neon??
-	map(0xa10000, 0xa10001).portr("RHYTHM").w(this, FUNC(stepstag_state::stepstag_step_leds_w));          // I/O
-	map(0xa20000, 0xa20001).nopr().w(this, FUNC(stepstag_state::stepstag_button_leds_w));                    // I/O
-	map(0xa30000, 0xa30001).rw(this, FUNC(stepstag_state::rockn_soundvolume_r), FUNC(stepstag_state::rockn_soundvolume_w));         // Sound Volume
-	map(0xa42000, 0xa42001).r(this, FUNC(stepstag_state::stepstag_pc2main_r));
+	map(0x600000, 0x60ffff).ram().w(FUNC(stepstag_state::tetrisp2_vram_rot_w)).share("vram_rot");         // Rotation
+	map(0x900000, 0x903fff).rw(FUNC(stepstag_state::rockn_nvram_r), FUNC(stepstag_state::tetrisp2_nvram_w)).share("nvram"); // NVRAM
+//  map(0x904000, 0x907fff).rw(FUNC(stepstag_state::rockn_nvram_r), FUNC(stepstag_state::tetrisp2_nvram_w);                 // NVRAM (mirror)
+	map(0xa00000, 0xa00001).nopr().w(FUNC(stepstag_state::stepstag_neon_w));  // Neon??
+	map(0xa10000, 0xa10001).portr("RHYTHM").w(FUNC(stepstag_state::stepstag_step_leds_w));          // I/O
+	map(0xa20000, 0xa20001).nopr().w(FUNC(stepstag_state::stepstag_button_leds_w));                    // I/O
+	map(0xa30000, 0xa30001).rw(FUNC(stepstag_state::rockn_soundvolume_r), FUNC(stepstag_state::rockn_soundvolume_w));         // Sound Volume
+	map(0xa42000, 0xa42001).r(FUNC(stepstag_state::stepstag_pc2main_r));
 	map(0xa44000, 0xa44001).nopr();     // watchdog
-	map(0xa48000, 0xa48001).w(this, FUNC(stepstag_state::stepstag_main2pc_w));                                   // PC Comm
+	map(0xa48000, 0xa48001).w(FUNC(stepstag_state::stepstag_main2pc_w));                                   // PC Comm
 //  map(0xa4c000, 0xa4c001).nopw();    // PC?
-	map(0xa50000, 0xa50001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(this, FUNC(stepstag_state::stepstag_soundlatch_word_w));
+	map(0xa50000, 0xa50001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(FUNC(stepstag_state::stepstag_soundlatch_word_w));
 	map(0xa60000, 0xa60003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff);             // Sound
 
-	map(0xb00000, 0xb00001).w(this, FUNC(stepstag_state::stepstag_b00000_w));                                    // init xilinx uploading??
-	map(0xb20000, 0xb20001).w(this, FUNC(stepstag_state::stepstag_b20000_w));                                    // 98343 interface board xilinx uploading?
+	map(0xb00000, 0xb00001).w(FUNC(stepstag_state::stepstag_b00000_w));                                    // init xilinx uploading??
+	map(0xb20000, 0xb20001).w(FUNC(stepstag_state::stepstag_b20000_w));                                    // 98343 interface board xilinx uploading?
 	map(0xb40000, 0xb4000b).writeonly().share("scroll_fg");                             // Foreground Scrolling
 	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");                             // Background Scrolling
 	map(0xb4003e, 0xb4003f).ram();                                                         // scr_size
 	map(0xb60000, 0xb6002f).writeonly().share("rotregs");                               // Rotation Registers
-	map(0xba0000, 0xba001f).w(this, FUNC(stepstag_state::rockn_systemregs_w));                                   // System param
+	map(0xba0000, 0xba001f).w(FUNC(stepstag_state::rockn_systemregs_w));                                   // System param
 	map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
 	map(0xbe0002, 0xbe0003).portr("BUTTONS");                                        // Inputs
-	map(0xbe0004, 0xbe0005).r(this, FUNC(stepstag_state::stepstag_coins_r));                                      // Inputs & protection
+	map(0xbe0004, 0xbe0005).r(FUNC(stepstag_state::stepstag_coins_r));                                      // Inputs & protection
 	map(0xbe0008, 0xbe0009).portr("DSW");                                            // Inputs
 	map(0xbe000a, 0xbe000b).r("watchdog", FUNC(watchdog_timer_device::reset16_r));       // Watchdog
 }
@@ -696,11 +696,11 @@ void stepstag_state::stepstag_sub_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();
 
 	// scrambled palettes?
-	map(0x300000, 0x33ffff).ram() /* .w(this, FUNC(stepstag_sub_map::stepstag_palette_w))*/ .share("paletteram1");
+	map(0x300000, 0x33ffff).ram().w(FUNC(stepstag_state::stepstag_palette_left_w)).share("paletteram1");
 
-	map(0x400000, 0x43ffff).ram() /* .w(this, FUNC(stepstag_sub_map::stepstag_palette_w))*/ .share("paletteram2");
+	map(0x400000, 0x43ffff).ram().w(FUNC(stepstag_state::stepstag_palette_mid_w)).share("paletteram2");
 
-	map(0x500000, 0x53ffff).ram() /* .w(this, FUNC(stepstag_sub_map::stepstag_palette_w))*/ .share("paletteram3");
+	map(0x500000, 0x53ffff).ram().w(FUNC(stepstag_state::stepstag_palette_right_w)).share("paletteram3");
 
 	// rgb brightness?
 	map(0x700000, 0x700001).nopw(); // 0-f
@@ -728,10 +728,10 @@ void stepstag_state::stepstag_sub_map(address_map &map)
 
 	map(0xb00000, 0xb00001).rw(m_soundlatch, FUNC(generic_latch_16_device::read), FUNC(generic_latch_16_device::write));
 
-	map(0xc00000, 0xc00001).r(this, FUNC(stepstag_state::unknown_read_0xc00000)).nopw(); //??
+	map(0xc00000, 0xc00001).r(FUNC(stepstag_state::unknown_read_0xc00000)).nopw(); //??
 	map(0xd00000, 0xd00001).nopr(); // watchdog
 	map(0xf00000, 0xf00001).nopw(); //??
-	map(0xffff00, 0xffff01).r(this, FUNC(stepstag_state::unknown_read_0xffff00));
+	map(0xffff00, 0xffff01).r(FUNC(stepstag_state::unknown_read_0xffff00));
 }
 
 
@@ -1903,7 +1903,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_SCREEN_SIZE(0x160, 0xf0)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_left)
-//  MCFG_SCREEN_PALETTE("lpalette")
+//	MCFG_SCREEN_PALETTE("lpalette")
 
 	MCFG_SCREEN_ADD("mscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1911,7 +1911,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_SCREEN_SIZE(0x160, 0xf0)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_mid)
-//  MCFG_SCREEN_PALETTE("palette")
+//	MCFG_SCREEN_PALETTE("mpalette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30)
@@ -2661,7 +2661,10 @@ ROM_START( vjdash )
 	ROM_REGION( 0x100000, "sub", ROMREGION_ERASE ) // 68000
 	ROM_LOAD16_BYTE( "vjdash4_ver1.2.11", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "vjdash4_ver1.2.14", 0x00001, 0x80000, NO_DUMP )
-
+	ROM_FILL( 6, 1, 0x01 )
+	ROM_FILL( 0x100, 1, 0x60 )
+	ROM_FILL( 0x101, 1, 0xfe )
+	
 	ROM_REGION( 0x0c00000, "sprites_left", ROMREGION_ERASE )    // left screen sprites
 	ROM_LOAD( "vjdash-01", 0x000000, 0x400000, NO_DUMP )
 	ROM_LOAD( "vjdash-02", 0x400000, 0x400000, NO_DUMP )
@@ -2764,7 +2767,10 @@ ROM_START( step3 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 ) // 68000
 	ROM_LOAD16_BYTE( "vj98344_step3.4", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "vj98344_step3.1", 0x00001, 0x80000, NO_DUMP )
-
+	ROM_FILL( 6, 1, 0x01 )
+	ROM_FILL( 0x100, 1, 0x60 )
+	ROM_FILL( 0x101, 1, 0xfe )
+	
 	ROM_REGION( 0x100000, "sub", 0 ) // 68000
 	ROM_LOAD16_BYTE( "vj98348_step3_11_v1.1", 0x00000, 0x80000, CRC(9c36aef5) SHA1(bbac48c2c7949a6f8a6ec83515e94a343c88d1b6) )
 	ROM_LOAD16_BYTE( "vj98348_step3_14_v1.1", 0x00001, 0x80000, CRC(b86be557) SHA1(49dbd6ef1c50adcf3386d5423da8ae7685649c46) )

@@ -49,14 +49,16 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void microkit(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(ram_r);
 
-	void microkit(machine_config &config);
 	void microkit_io(address_map &map);
 	void microkit_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	uint8_t m_resetcnt;
 	uint8_t m_ram_data;
@@ -67,7 +69,7 @@ private:
 
 void microkit_state::microkit_mem(address_map &map)
 {
-	map(0x0000, 0x0000).rw(this, FUNC(microkit_state::ram_r), FUNC(microkit_state::ram_w));
+	map(0x0000, 0x0000).rw(FUNC(microkit_state::ram_r), FUNC(microkit_state::ram_w));
 	map(0x8000, 0x81ff).rom().region("maincpu", 0);
 	map(0x8200, 0x83ff).ram();
 }

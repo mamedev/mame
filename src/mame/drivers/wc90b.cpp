@@ -144,13 +144,13 @@ void wc90b_state::wc90b_map1(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram(); /* Main RAM */
-	map(0xa000, 0xafff).ram().w(this, FUNC(wc90b_state::fgvideoram_w)).share("fgvideoram");
-	map(0xc000, 0xcfff).ram().w(this, FUNC(wc90b_state::bgvideoram_w)).share("bgvideoram");
-	map(0xe000, 0xefff).ram().w(this, FUNC(wc90b_state::txvideoram_w)).share("txvideoram");
+	map(0xa000, 0xafff).ram().w(FUNC(wc90b_state::fgvideoram_w)).share("fgvideoram");
+	map(0xc000, 0xcfff).ram().w(FUNC(wc90b_state::bgvideoram_w)).share("bgvideoram");
+	map(0xe000, 0xefff).ram().w(FUNC(wc90b_state::txvideoram_w)).share("txvideoram");
 	map(0xf000, 0xf7ff).bankr("mainbank");
 	map(0xf800, 0xfbff).ram().share("share1");
-	map(0xfc00, 0xfc00).w(this, FUNC(wc90b_state::bankswitch_w));
-	map(0xfd00, 0xfd00).w(this, FUNC(wc90b_state::sound_command_w));
+	map(0xfc00, 0xfc00).w(FUNC(wc90b_state::bankswitch_w));
+	map(0xfd00, 0xfd00).w(FUNC(wc90b_state::sound_command_w));
 	map(0xfd04, 0xfd04).writeonly().share("scroll1y");
 	map(0xfd06, 0xfd06).writeonly().share("scroll1x");
 	map(0xfd08, 0xfd08).writeonly().share("scroll2y");
@@ -160,7 +160,7 @@ void wc90b_state::wc90b_map1(address_map &map)
 	map(0xfd02, 0xfd02).portr("P2");
 	map(0xfd06, 0xfd06).portr("DSW1");
 	map(0xfd08, 0xfd08).portr("DSW2");
-	map(0xfd0c, 0xfd0c).r(this, FUNC(wc90b_state::master_irq_ack_r));
+	map(0xfd0c, 0xfd0c).r(FUNC(wc90b_state::master_irq_ack_r));
 }
 
 void wc90b_state::wc90b_map2(address_map &map)
@@ -173,16 +173,16 @@ void wc90b_state::wc90b_map2(address_map &map)
 	map(0xe800, 0xefff).rom();
 	map(0xf000, 0xf7ff).bankr("subbank");
 	map(0xf800, 0xfbff).ram().share("share1");
-	map(0xfc00, 0xfc00).w(this, FUNC(wc90b_state::bankswitch1_w));
-	map(0xfd0c, 0xfd0c).w(this, FUNC(wc90b_state::slave_irq_ack_w));
+	map(0xfc00, 0xfc00).w(FUNC(wc90b_state::bankswitch1_w));
+	map(0xfd0c, 0xfd0c).w(FUNC(wc90b_state::slave_irq_ack_w));
 }
 
 void wc90b_state::sound_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("audiobank");
-	map(0xe000, 0xe000).w(this, FUNC(wc90b_state::adpcm_control_w));
-	map(0xe400, 0xe400).w(this, FUNC(wc90b_state::adpcm_data_w));
+	map(0xe000, 0xe000).w(FUNC(wc90b_state::adpcm_control_w));
+	map(0xe400, 0xe400).w(FUNC(wc90b_state::adpcm_data_w));
 	map(0xe800, 0xe801).rw("ymsnd1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xec00, 0xec01).rw("ymsnd2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf000, 0xf7ff).ram();
@@ -335,11 +335,11 @@ WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
 	m_toggle ^= 1;
 	if(m_toggle)
 	{
-		m_msm->data_w((m_msm5205next & 0xf0) >> 4);
+		m_msm->write_data((m_msm5205next & 0xf0) >> 4);
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
-		m_msm->data_w((m_msm5205next & 0x0f) >> 0);
+		m_msm->write_data((m_msm5205next & 0x0f) >> 0);
 }
 
 void wc90b_state::machine_start()

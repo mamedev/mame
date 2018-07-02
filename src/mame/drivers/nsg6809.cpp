@@ -52,10 +52,9 @@ public:
 
 	void pitchhit(machine_config &config);
 
-protected:
+private:
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 };
 

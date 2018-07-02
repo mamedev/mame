@@ -67,6 +67,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -84,6 +85,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void roul(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_latch_w);
@@ -92,17 +96,14 @@ public:
 	DECLARE_PALETTE_INIT(roul);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void roul(machine_config &config);
 	void roul_cpu_io_map(address_map &map);
 	void roul_map(address_map &map);
 	void sound_cpu_io_map(address_map &map);
 	void sound_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -220,13 +221,13 @@ void roul_state::roul_map(address_map &map)
 void roul_state::roul_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf4).w(this, FUNC(roul_state::blitter_cmd_w));
-	map(0xf5, 0xf5).r(this, FUNC(roul_state::blitter_status_r));
+	map(0xf0, 0xf4).w(FUNC(roul_state::blitter_cmd_w));
+	map(0xf5, 0xf5).r(FUNC(roul_state::blitter_status_r));
 	map(0xf8, 0xf8).portr("DSW");
-	map(0xf9, 0xf9).w(this, FUNC(roul_state::ball_w));
+	map(0xf9, 0xf9).w(FUNC(roul_state::ball_w));
 	map(0xfa, 0xfa).portr("IN0");
 	map(0xfd, 0xfd).portr("IN1");
-	map(0xfe, 0xfe).w(this, FUNC(roul_state::sound_latch_w));
+	map(0xfe, 0xfe).w(FUNC(roul_state::sound_latch_w));
 }
 
 void roul_state::sound_map(address_map &map)
@@ -247,7 +248,7 @@ void roul_state::video_start()
 	m_videobuf = make_unique_clear<uint8_t[]>(VIDEOBUF_SIZE);
 
 	save_item(NAME(m_reg));
-	save_pointer(NAME(m_videobuf.get()), VIDEOBUF_SIZE);
+	save_pointer(NAME(m_videobuf), VIDEOBUF_SIZE);
 	save_item(NAME(m_lamp_old));
 }
 

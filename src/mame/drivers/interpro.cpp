@@ -176,9 +176,9 @@
  *   U324  Intel 82586-10            Ethernet controller
  *   U303  CICD84607 TC110G75CY
  *   U311  NCR 53C90A                SCSI controller
- *   U336  27C010 (MPRGG360F)        128Kx8 Boot EPROM ?SB
+ *   U336  27C010 (MPRGG360F)        128Kx8 Boot EPROM MSB
  *   U341  Dallas DS1287             RTC and NVRAM
- *   U349  27C010 (MPRGG350F)        128Kx8 Boot EPROM ?SB
+ *   U349  27C010 (MPRGG350F)        128Kx8 Boot EPROM LSB
  *   U347  Intel 82072               Floppy drive controller
  *
  * 6400 (SMT046 rev B, SMT082)
@@ -385,12 +385,12 @@ void interpro_state::interpro_common_map(address_map &map)
 	map(0x4f007e00, 0x4f007eff).m(m_sga, FUNC(interpro_sga_device::map));
 
 	map(0x7f000100, 0x7f00011f).m(m_fdc, FUNC(upd765_family_device::map)).umask32(0x000000ff);
-	map(0x7f000300, 0x7f000301).r(this, FUNC(interpro_state::sreg_error_r));
-	map(0x7f000304, 0x7f000305).rw(this, FUNC(interpro_state::sreg_status_r), FUNC(interpro_state::sreg_led_w));
-	map(0x7f000308, 0x7f000309).rw(this, FUNC(interpro_state::sreg_ctrl1_r), FUNC(interpro_state::sreg_ctrl1_w));
-	map(0x7f00030c, 0x7f00030d).rw(this, FUNC(interpro_state::sreg_ctrl2_r), FUNC(interpro_state::sreg_ctrl2_w));
+	map(0x7f000300, 0x7f000301).r(FUNC(interpro_state::sreg_error_r));
+	map(0x7f000304, 0x7f000305).rw(FUNC(interpro_state::sreg_status_r), FUNC(interpro_state::sreg_led_w));
+	map(0x7f000308, 0x7f000309).rw(FUNC(interpro_state::sreg_ctrl1_r), FUNC(interpro_state::sreg_ctrl1_w));
+	map(0x7f00030c, 0x7f00030d).rw(FUNC(interpro_state::sreg_ctrl2_r), FUNC(interpro_state::sreg_ctrl2_w));
 
-	map(0x7f00031c, 0x7f00031d).rw(this, FUNC(interpro_state::sreg_ctrl3_r), FUNC(interpro_state::sreg_ctrl3_w));
+	map(0x7f00031c, 0x7f00031d).rw(FUNC(interpro_state::sreg_ctrl3_r), FUNC(interpro_state::sreg_ctrl3_w));
 
 	map(0x7f000400, 0x7f00040f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
 	map(0x7f000410, 0x7f00041f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
@@ -429,7 +429,7 @@ void emerald_state::emerald_base_map(address_map &map)
 	map(0x7f000229, 0x7f000229).w(m_scsi, FUNC(ncr53c90a_device::test_w));
 	map(0x7f00022d, 0x7f00022d).rw(m_scsi, FUNC(ncr53c90a_device::conf2_r), FUNC(ncr53c90a_device::conf2_w));
 
-	map(0x7f000300, 0x7f000300).w(this, FUNC(emerald_state::sreg_error_w));
+	map(0x7f000300, 0x7f000300).w(FUNC(emerald_state::sreg_error_w));
 
 	map(0x7f000600, 0x7f00067f).rom().region(INTERPRO_NODEID_TAG, 0);
 }
@@ -462,7 +462,7 @@ void turquoise_state::turquoise_base_map(address_map &map)
 	map(0x7f000229, 0x7f000229).w(m_scsi, FUNC(ncr53c90a_device::test_w));
 	map(0x7f00022d, 0x7f00022d).rw(m_scsi, FUNC(ncr53c90a_device::conf2_r), FUNC(ncr53c90a_device::conf2_w));
 
-	map(0x7f000300, 0x7f000300).w(this, FUNC(turquoise_state::sreg_error_w));
+	map(0x7f000300, 0x7f000300).w(FUNC(turquoise_state::sreg_error_w));
 
 	map(0x7f000600, 0x7f00067f).rom().region(INTERPRO_NODEID_TAG, 0);
 }
@@ -482,7 +482,7 @@ void sapphire_state::sapphire_base_map(address_map &map)
 	map(0x40000000, 0x4000004f).m(INTERPRO_MCGA_TAG, FUNC(interpro_fmcc_device::map));
 	map(0x7f000200, 0x7f0002ff).m(m_arbga, FUNC(interpro_arbga_device::map));
 
-	map(0x7f000600, 0x7f00060f).r(this, FUNC(sapphire_state::nodeid_r)).umask32(0x000000ff);
+	map(0x7f000600, 0x7f00060f).r(FUNC(sapphire_state::nodeid_r)).umask32(0x000000ff);
 
 	// scsi registers have unusual address mapping
 	map(0x7f001001, 0x7f001001).rw(m_scsi, FUNC(ncr53c94_device::tcounter_lo_r), FUNC(ncr53c94_device::tcount_lo_w));
@@ -503,7 +503,7 @@ void sapphire_state::sapphire_base_map(address_map &map)
 
 void sapphire_state::sapphire_main_map(address_map &map)
 {
-	//map(0x00000000, 0xffffffff).rw(this, FUNC(sapphire_state::unmapped_r), FUNC(sapphire_state::unmapped_w));
+	//map(0x00000000, 0xffffffff).rw(FUNC(sapphire_state::unmapped_r), FUNC(sapphire_state::unmapped_w));
 
 	sapphire_base_map(map);
 
@@ -536,7 +536,7 @@ void turquoise_state::turquoise_io_map(address_map &map)
 
 void sapphire_state::sapphire_io_map(address_map &map)
 {
-	//map(0x00000000, 0xffffffff).rw(this, FUNC(sapphire_state::unmapped_r), FUNC(sapphire_state::unmapped_w));
+	//map(0x00000000, 0xffffffff).rw(FUNC(sapphire_state::unmapped_r), FUNC(sapphire_state::unmapped_w));
 
 	sapphire_base_map(map);
 
@@ -637,7 +637,7 @@ void interpro_state::interpro_scsi_adapter(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
-	MCFG_DEVICE_CLOCK(XTAL(24'000'000))
+	MCFG_DEVICE_CLOCK(24_MHz_XTAL)
 	MCFG_NCR5390_IRQ_HANDLER(WRITELINE(":" INTERPRO_IOGA_TAG, interpro_ioga_device, ir0_w))
 	MCFG_NCR5390_DRQ_HANDLER(WRITELINE(":" INTERPRO_IOGA_TAG, interpro_ioga_device, drq_scsi))
 }
@@ -681,7 +681,7 @@ MACHINE_CONFIG_START(interpro_state::interpro)
 	// serial
 
 	// real-time clock/non-volatile memory
-	MCFG_MC146818_ADD(INTERPRO_RTC_TAG, XTAL(32'768))
+	MCFG_DEVICE_ADD(INTERPRO_RTC_TAG, MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_UTC(true)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir9_w))
 
@@ -714,7 +714,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(emerald_state::emerald)
 	interpro(config);
 
-	MCFG_DEVICE_ADD(INTERPRO_CPU_TAG, CLIPPER_C300, XTAL(12'500'000))
+	MCFG_DEVICE_ADD(INTERPRO_CPU_TAG, CLIPPER_C300, 12.5_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, emerald_main_map)
 	MCFG_DEVICE_ADDRESS_MAP(1, emerald_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
@@ -735,7 +735,8 @@ MACHINE_CONFIG_START(emerald_state::emerald)
 	MCFG_DEVICE_ADD(INTERPRO_MCGA_TAG, INTERPRO_MCGA, 0)
 
 	// floppy controller
-	MCFG_I82072_ADD(INTERPRO_FDC_TAG, false)
+	// FIXME: not sure this should really be ready connected, but prevents crash at startup
+	MCFG_I82072_ADD(INTERPRO_FDC_TAG, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir1_w))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_floppy))
 
@@ -743,13 +744,13 @@ MACHINE_CONFIG_START(emerald_state::emerald)
 	MCFG_DEVICE_ADD("fdc:0", FLOPPY_CONNECTOR, 0)
 	MCFG_DEVICE_ADD("fdc:1", FLOPPY_CONNECTOR, 0)
 	MCFG_DEVICE_ADD("fdc:2", FLOPPY_CONNECTOR, 0)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", interpro_floppies, "525hd", interpro_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", interpro_floppies, "35hd", interpro_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(false)
 
 	// serial controllers and ports
-	MCFG_SCC85C30_ADD(INTERPRO_SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(INTERPRO_SCC1_TAG, SCC85C30, 4.9152_MHz_XTAL)
 	interpro_scc1(config);
-	MCFG_SCC85C30_ADD(INTERPRO_SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(INTERPRO_SCC2_TAG, SCC85C30, 4.9152_MHz_XTAL)
 	interpro_scc2(config);
 
 	// scsi controller
@@ -769,7 +770,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(turquoise_state::turquoise)
 	interpro(config);
-	MCFG_DEVICE_ADD(INTERPRO_CPU_TAG, CLIPPER_C300, XTAL(12'500'000))
+	MCFG_DEVICE_ADD(INTERPRO_CPU_TAG, CLIPPER_C300, 12.5_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, turquoise_main_map)
 	MCFG_DEVICE_ADDRESS_MAP(1, turquoise_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
@@ -802,9 +803,9 @@ MACHINE_CONFIG_START(turquoise_state::turquoise)
 	MCFG_FLOPPY_DRIVE_SOUND(false)
 
 	// serial controllers and ports
-	MCFG_SCC85C30_ADD(INTERPRO_SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(INTERPRO_SCC1_TAG, SCC85C30, 4.9152_MHz_XTAL)
 	interpro_scc1(config);
-	MCFG_SCC85C30_ADD(INTERPRO_SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(INTERPRO_SCC2_TAG, SCC85C30, 4.9152_MHz_XTAL)
 	interpro_scc2(config);
 
 	// scsi controller
@@ -834,7 +835,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sapphire_state::sapphire)
 	interpro(config);
-	MCFG_DEVICE_ADD(INTERPRO_CPU_TAG, CLIPPER_C400, XTAL(12'500'000))
+	MCFG_DEVICE_ADD(INTERPRO_CPU_TAG, CLIPPER_C400, 12.5_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, sapphire_main_map)
 	MCFG_DEVICE_ADDRESS_MAP(1, sapphire_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
@@ -861,9 +862,9 @@ MACHINE_CONFIG_START(sapphire_state::sapphire)
 	MCFG_DEVICE_ADD(INTERPRO_ARBGA_TAG, INTERPRO_ARBGA, 0)
 
 	// serial controllers and ports
-	MCFG_SCC85230_ADD(INTERPRO_SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(INTERPRO_SCC1_TAG, SCC85230, 4.9152_MHz_XTAL)
 	interpro_scc1(config);
-	MCFG_SCC85C30_ADD(INTERPRO_SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(INTERPRO_SCC2_TAG, SCC85C30, 4.9152_MHz_XTAL)
 	interpro_scc2(config);
 
 	// scsi controller
@@ -871,7 +872,7 @@ MACHINE_CONFIG_START(sapphire_state::sapphire)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
 
 	// ethernet controller
-	MCFG_DEVICE_ADD(INTERPRO_ETH_TAG, I82596_LE16, XTAL(20'000'000))
+	MCFG_DEVICE_ADD(INTERPRO_ETH_TAG, I82596_LE16, 20_MHz_XTAL)
 	MCFG_I82586_IRQ_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir12_w))
 	MCFG_DEVICE_ADDRESS_MAP(0, interpro_82596_map)
 
@@ -888,7 +889,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(turquoise_state::ip2000)
 	turquoise(config);
 	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
-	//MCFG_DEVICE_CLOCK(XTAL(40'000'000))
+	//MCFG_DEVICE_CLOCK(40_MHz_XTAL)
 
 	// GT graphics (2020)
 	MCFG_DEVICE_MODIFY(INTERPRO_SLOT_TAG ":0")
@@ -900,7 +901,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sapphire_state::ip2400)
 	sapphire(config);
 	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
-	//MCFG_DEVICE_CLOCK(XTAL(50'000'000))
+	//MCFG_DEVICE_CLOCK(50_MHz_XTAL)
 
 	MCFG_DEVICE_MODIFY(INTERPRO_MMU_TAG)
 	MCFG_CAMMU_ID(cammu_c4i_device::CID_C4IR0)
@@ -986,10 +987,16 @@ MACHINE_CONFIG_START(emerald_state::ip6000)
 	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
 	//MCFG_DEVICE_CLOCK(80_MHz_XTAL / 2)
 
+	// EDGE systems use graphics keyboard
+	MCFG_DEVICE_MODIFY(INTERPRO_KEYBOARD_PORT_TAG)
+	MCFG_SLOT_DEFAULT_OPTION(nullptr)
+
 	// srx and slots (default to 6040 with EDGE-1 graphics)
 	MCFG_DEVICE_ADD(INTERPRO_SLOT_TAG, SRX, 0)
 	MCFG_SRX_MEMORY(INTERPRO_CPU_TAG, 0, 1)
-	MCFG_SRX_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir6_w))
+	MCFG_SRX_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir3_w))
+	MCFG_SRX_OUT_IRQ1_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir4_w))
+	MCFG_SRX_OUT_IRQ2_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir5_w))
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":1", srx_cards, "mpcb828", false)
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":2", srx_cards, nullptr, false)
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":3", srx_cards, nullptr, false)
@@ -1001,7 +1008,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sapphire_state::ip6400)
 	sapphire(config);
 	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
-	//MCFG_DEVICE_CLOCK(XTAL(36'000'000))
+	//MCFG_DEVICE_CLOCK(36_MHz_XTAL)
 
 	MCFG_DEVICE_MODIFY(INTERPRO_MMU_TAG)
 	MCFG_CAMMU_ID(cammu_c4i_device::CID_C4IR0)
@@ -1009,7 +1016,9 @@ MACHINE_CONFIG_START(sapphire_state::ip6400)
 	// srx and slots (default to 6450 with GT II graphics)
 	MCFG_DEVICE_ADD(INTERPRO_SLOT_TAG, SRX, 0)
 	MCFG_SRX_MEMORY(INTERPRO_CPU_TAG, 0, 1)
-	MCFG_SRX_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir6_w))
+	MCFG_SRX_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir3_w))
+	MCFG_SRX_OUT_IRQ1_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir4_w))
+	MCFG_SRX_OUT_IRQ2_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir5_w))
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":1", srx_cards, "mpcbb92", false)
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":2", srx_cards, nullptr, false)
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":3", srx_cards, nullptr, false)
@@ -1034,7 +1043,9 @@ MACHINE_CONFIG_START(sapphire_state::ip6700)
 	// srx and slots (default to 6780 with EDGE-2 Plus graphics)
 	MCFG_DEVICE_ADD(INTERPRO_SLOT_TAG, SRX, 0)
 	MCFG_SRX_MEMORY(INTERPRO_CPU_TAG, 0, 1)
-	MCFG_SRX_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir6_w))
+	MCFG_SRX_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir3_w))
+	MCFG_SRX_OUT_IRQ1_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir4_w))
+	MCFG_SRX_OUT_IRQ2_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir5_w))
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":1", srx_cards, "msmt094", false)
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":2", srx_cards, "mpcb896", false)
 	MCFG_SRX_SLOT_ADD(INTERPRO_SLOT_TAG, INTERPRO_SLOT_TAG ":3", srx_cards, nullptr, false)
@@ -1079,8 +1090,8 @@ ROM_START(ip2000)
 
 	ROM_REGION(0x40000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip2000", "InterPro 2000 EPROM")
-	ROMX_LOAD("mprgm530e__26_apr_91k.u171", 0x00001, 0x20000, CRC(e4c470cb) SHA1(ff1917bfa963988d739a9dbf0b8f034fe49f2f8c), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("mprgm540e__06_may_91k.u172", 0x00000, 0x20000, CRC(03225843) SHA1(03cfcd5b8ae0057240ef808a40108cb5d082eb63), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("mprgm530e__26_apr_91k.u171", 0x00001, 0x20000, CRC(e4c470cb) SHA1(ff1917bfa963988d739a9dbf0b8f034fe49f2f8c), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("mprgm540e__06_may_91k.u172", 0x00000, 0x20000, CRC(03225843) SHA1(03cfcd5b8ae0057240ef808a40108cb5d082eb63), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 ROM_START(ip2400)
@@ -1089,7 +1100,7 @@ ROM_START(ip2400)
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip2400", "InterPro 2400 EPROM")
-	ROMX_LOAD("mprgw510b__05_16_92.u35", 0x00000, 0x20000, CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(1))
+	ROMX_LOAD("mprgw510b__05_16_92.u35", 0x00000, 0x20000, CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
 	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
@@ -1104,7 +1115,7 @@ ROM_START(ip2500)
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip2500", "InterPro 2500 EPROM")
-	ROMX_LOAD("ip2500_eprom.bin", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(1))
+	ROMX_LOAD("ip2500_eprom.bin", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
 	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
@@ -1119,7 +1130,7 @@ ROM_START(ip2700)
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip2700", "InterPro 2700 EPROM")
-	ROMX_LOAD("mprgz530a__9405181.u35", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(1))
+	ROMX_LOAD("mprgz530a__9405181.u35", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
 	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
@@ -1134,7 +1145,7 @@ ROM_START(ip2800)
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip2800", "InterPro 2800 EPROM")
-	ROMX_LOAD("ip2800_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(1))
+	ROMX_LOAD("ip2800_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
 	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
@@ -1148,12 +1159,12 @@ ROM_START(ip6000)
 	ROM_LOAD32_BYTE("nodeid.bin", 0x0, 0x20, CRC(a38397a6) SHA1(9f45fb932bbe231c95b3d5470dcd1fa1c846486f))
 
 	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
-	ROM_LOAD32_BYTE("mpcb765b.bin", 0x0, 0x20, CRC(d81bda5c) SHA1(27e6baffb13fa9f3118b7ff539c7e11b7e778416))
+	ROM_LOAD32_BYTE("mpcb765b.bin", 0x0, 0x20, CRC(100f4f94) SHA1(64242eadd40ce5b9d12625db8707a07ff9e4d05c))
 
 	ROM_REGION(0x40000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip6000", "InterPro 6000 EPROM")
-	ROMX_LOAD("ip6000_lo.bin", 0x00001, 0x20000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("ip6000_hi.bin", 0x00000, 0x20000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("mprgg360f__04_may_90v.u336", 0x00001, 0x20000, CRC(9e8b798b) SHA1(54412e26a468e038fb44ffa322ed3ddfae423c17), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("mprgg350f__04_may_90v.u349", 0x00000, 0x20000, CRC(32ab99fd) SHA1(202a6082bade8a084b8cd25109daff8443f6a5c7), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 ROM_START(ip6400)
@@ -1163,7 +1174,7 @@ ROM_START(ip6400)
 	// FIXME: use 2400 eprom until we have a 6400 dump
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip6400", "InterPro 6400 EPROM")
-	ROMX_LOAD("ip6400_eprom.bin", 0x00000, 0x20000, BAD_DUMP CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(1))
+	ROMX_LOAD("ip6400_eprom.bin", 0x00000, 0x20000, BAD_DUMP CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
 	ROM_LOAD_OPTIONAL("flash.lo", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
@@ -1178,7 +1189,7 @@ ROM_START(ip6700)
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip6700", "InterPro 6700 EPROM")
-	ROMX_LOAD("mprgz530a.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(1))
+	ROMX_LOAD("mprgz530a.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
 	ROM_LOAD_OPTIONAL("y225.u117", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
@@ -1193,7 +1204,7 @@ ROM_START(ip6800)
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip6800", "InterPro 6800 EPROM")
-	ROMX_LOAD("mprgz530a__9406270.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(1))
+	ROMX_LOAD("mprgz530a__9406270.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
 	ROM_LOAD_OPTIONAL("y225.u117", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
@@ -1203,12 +1214,12 @@ ROM_START(ip6800)
 ROM_END
 
 /*    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS           INIT        COMPANY        FULLNAME         FLAGS */
-COMP( 1990,  ip2000,  0,      0,      ip2000,  interpro, turquoise_state,init_common,"Intergraph",  "InterPro 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1992,  ip2400,  0,      0,      ip2400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1993,  ip2500,  0,      0,      ip2500,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1993,  ip2700,  0,      0,      ip2700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1994,  ip2800,  0,      0,      ip2800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990,  ip6000,  0,      0,      ip6000,  interpro, emerald_state,  init_common,"Intergraph",  "InterPro 6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1992,  ip6400,  0,      0,      ip6400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1993,  ip6700,  0,      0,      ip6700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1993,  ip6800,  0,      0,      ip6800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1990,  ip2000,  0,      0,      ip2000,  interpro, turquoise_state,init_common,"Intergraph",  "InterPro 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1992,  ip2400,  0,      0,      ip2400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip2500,  0,      0,      ip2500,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip2700,  0,      0,      ip2700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1994,  ip2800,  0,      0,      ip2800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1990,  ip6000,  0,      0,      ip6000,  interpro, emerald_state,  init_common,"Intergraph",  "InterPro 6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1992,  ip6400,  0,      0,      ip6400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip6700,  0,      0,      ip6700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip6800,  0,      0,      ip6800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

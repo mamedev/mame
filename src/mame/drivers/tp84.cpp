@@ -180,7 +180,7 @@ void tp84_state::tp84_cpu1_map(address_map &map)
 	map(0x2860, 0x2860).portr("DSW1");
 	map(0x3000, 0x3000).portr("DSW2");
 	map(0x3000, 0x3007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x3800, 0x3800).w(this, FUNC(tp84_state::tp84_sh_irqtrigger_w));
+	map(0x3800, 0x3800).w(FUNC(tp84_state::tp84_sh_irqtrigger_w));
 	map(0x3a00, 0x3a00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x3c00, 0x3c00).writeonly().share("scroll_x");
 	map(0x3e00, 0x3e00).writeonly().share("scroll_y");
@@ -206,7 +206,7 @@ void tp84_state::tp84b_cpu1_map(address_map &map)
 	map(0x1a60, 0x1a60).portr("DSW1");
 	map(0x1c00, 0x1c00).portr("DSW2");
 	map(0x1c00, 0x1c07).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x1e00, 0x1e00).w(this, FUNC(tp84_state::tp84_sh_irqtrigger_w));
+	map(0x1e00, 0x1e00).w(FUNC(tp84_state::tp84_sh_irqtrigger_w));
 	map(0x1e80, 0x1e80).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x1f00, 0x1f00).writeonly().share("scroll_x");
 	map(0x1f80, 0x1f80).writeonly().share("scroll_y");
@@ -225,10 +225,10 @@ WRITE8_MEMBER(tp84_state::sub_irq_mask_w)
 void tp84_state::cpu2_map(address_map &map)
 {
 //  AM_RANGE(0x0000, 0x0000) AM_RAM /* Watch dog ?*/
-	map(0x2000, 0x2000).r(this, FUNC(tp84_state::tp84_scanline_r)); /* beam position */
-	map(0x4000, 0x4000).w(this, FUNC(tp84_state::sub_irq_mask_w));
+	map(0x2000, 0x2000).r(FUNC(tp84_state::tp84_scanline_r)); /* beam position */
+	map(0x4000, 0x4000).w(FUNC(tp84_state::sub_irq_mask_w));
 	map(0x6000, 0x679f).ram();
-	map(0x67a0, 0x67ff).ram().w(this, FUNC(tp84_state::tp84_spriteram_w)).share("spriteram");
+	map(0x67a0, 0x67ff).ram().w(FUNC(tp84_state::tp84_spriteram_w)).share("spriteram");
 	map(0x8000, 0x87ff).ram().share("share1");
 	map(0xe000, 0xffff).rom();
 }
@@ -239,12 +239,12 @@ void tp84_state::audio_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8000, 0x8000).r(this, FUNC(tp84_state::tp84_sh_timer_r));
-	map(0xa000, 0xa1ff).w(this, FUNC(tp84_state::tp84_filter_w));
+	map(0x8000, 0x8000).r(FUNC(tp84_state::tp84_sh_timer_r));
+	map(0xa000, 0xa1ff).w(FUNC(tp84_state::tp84_filter_w));
 	map(0xc000, 0xc000).nopw();
-	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::write));
-	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::write));
-	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::write));
+	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::command_w));
+	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::command_w));
+	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::command_w));
 }
 
 

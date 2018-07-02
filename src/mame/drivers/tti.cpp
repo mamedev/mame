@@ -31,11 +31,13 @@ public:
 		, m_mfp(*this, "mfp")
 	{ }
 
+	void tti(machine_config &config);
+
+private:
 	IRQ_CALLBACK_MEMBER(intack);
 
-	void tti(machine_config &config);
 	void prg_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68901_device> m_mfp;
 };
@@ -71,7 +73,7 @@ MACHINE_CONFIG_START(tti_state::tti)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("mfp", mc68901_device, write_rx))
 
-	MCFG_EEPROM_SERIAL_X24C44_ADD("novram")
+	MCFG_DEVICE_ADD("novram", EEPROM_SERIAL_X24C44_16BIT)
 	MCFG_EEPROM_SERIAL_DO_CALLBACK(WRITELINE("mfp", mc68901_device, i0_w))
 
 	MCFG_DEVICE_ADD("bitlatch", LS259, 0) // U17

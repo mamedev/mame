@@ -40,6 +40,7 @@ Dumped: 06/04/2009 f205v
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,6 +55,9 @@ public:
 		m_palette(*this, "palette"),
 		m_video(*this, "video") { }
 
+	void murogmbl(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -64,7 +68,6 @@ public:
 	DECLARE_PALETTE_INIT(murogmbl);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void murogmbl(machine_config &config);
 	void murogmbl_map(address_map &map);
 };
 
@@ -78,6 +81,9 @@ public:
 		m_palette(*this, "palette"),
 		m_video(*this, "video") { }
 
+	void slotunbl(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -88,7 +94,6 @@ public:
 	DECLARE_PALETTE_INIT(slotunbl);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void slotunbl(machine_config &config);
 	void slotunbl_map(address_map &map);
 };
 
@@ -154,7 +159,7 @@ void murogmbl_state::murogmbl_map(address_map &map)
 	map(0x6000, 0x6000).portr("IN0");
 	map(0x6800, 0x6800).portr("DSW");
 	map(0x7000, 0x7000).portr("IN1");
-	map(0x7800, 0x7800).nopr().w("dac", FUNC(dac_byte_interface::write)); /* read is always discarded */
+	map(0x7800, 0x7800).nopr().w("dac", FUNC(dac_byte_interface::data_w)); /* read is always discarded */
 }
 
 void slotunbl_state::slotunbl_map(address_map &map)
@@ -167,7 +172,7 @@ void slotunbl_state::slotunbl_map(address_map &map)
 	map(0x6000, 0x6000).portr("IN0");
 	map(0x6800, 0x6800).portr("DSW");
 	map(0x7000, 0x7000).portr("IN1");
-	map(0x7800, 0x7800).nopr().w("dac", FUNC(dac_byte_interface::write)); /* read is always discarded */
+	map(0x7800, 0x7800).nopr().w("dac", FUNC(dac_byte_interface::data_w)); /* read is always discarded */
 }
 
 void murogmbl_state::video_start()

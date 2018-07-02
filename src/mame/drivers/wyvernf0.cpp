@@ -39,6 +39,7 @@ TODO:
 #include "sound/msm5232.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -46,8 +47,8 @@ TODO:
 class wyvernf0_state : public driver_device
 {
 public:
-	wyvernf0_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wyvernf0_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bgram(*this,"bgram"),
 		m_fgram(*this,"fgram"),
 		m_scrollram(*this,"scrollram"),
@@ -57,8 +58,12 @@ public:
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
+	void wyvernf0(machine_config &config);
+
+private:
 	// memory pointers
 	required_shared_ptr<uint8_t> m_bgram;
 	required_shared_ptr<uint8_t> m_fgram;
@@ -107,7 +112,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void wyvernf0(machine_config &config);
+
 	void sound_map(address_map &map);
 	void wyvernf0_map(address_map &map);
 };
@@ -394,17 +399,17 @@ void wyvernf0_state::wyvernf0_map(address_map &map)
 
 	map(0xa000, 0xbfff).bankr("rombank");
 
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(wyvernf0_state::fgram_w)).share("fgram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(wyvernf0_state::bgram_w)).share("bgram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(wyvernf0_state::fgram_w)).share("fgram");
+	map(0xc800, 0xcfff).ram().w(FUNC(wyvernf0_state::bgram_w)).share("bgram");
 
 	map(0xd000, 0xd000).nopw(); // d000 write (02)
-	map(0xd100, 0xd100).w(this, FUNC(wyvernf0_state::rambank_w));
-	map(0xd200, 0xd200).w(this, FUNC(wyvernf0_state::rombank_w));
+	map(0xd100, 0xd100).w(FUNC(wyvernf0_state::rambank_w));
+	map(0xd200, 0xd200).w(FUNC(wyvernf0_state::rombank_w));
 
 	map(0xd300, 0xd303).ram().share("scrollram");
 
-	map(0xd400, 0xd400).rw(this, FUNC(wyvernf0_state::fake_mcu_r), FUNC(wyvernf0_state::fake_mcu_w));
-	map(0xd401, 0xd401).r(this, FUNC(wyvernf0_state::fake_status_r));
+	map(0xd400, 0xd400).rw(FUNC(wyvernf0_state::fake_mcu_r), FUNC(wyvernf0_state::fake_mcu_w));
+	map(0xd401, 0xd401).r(FUNC(wyvernf0_state::fake_status_r));
 
 	map(0xd500, 0xd5ff).ram().share("spriteram");
 
@@ -417,7 +422,7 @@ void wyvernf0_state::wyvernf0_map(address_map &map)
 	map(0xd606, 0xd606).portr("JOY2");
 	map(0xd607, 0xd607).portr("FIRE2");
 
-	map(0xd610, 0xd610).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(wyvernf0_state::sound_command_w));
+	map(0xd610, 0xd610).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(wyvernf0_state::sound_command_w));
 	// d613 write (FF -> 00 at boot)
 
 	map(0xd800, 0xdbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -436,9 +441,9 @@ void wyvernf0_state::sound_map(address_map &map)
 	// cb00 write
 	// cc00 write
 	map(0xd000, 0xd000).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
-	map(0xd200, 0xd200).w(this, FUNC(wyvernf0_state::nmi_enable_w));
-	map(0xd400, 0xd400).w(this, FUNC(wyvernf0_state::nmi_disable_w));
-	map(0xd600, 0xd600).w("dac", FUNC(dac_byte_interface::write));
+	map(0xd200, 0xd200).w(FUNC(wyvernf0_state::nmi_enable_w));
+	map(0xd400, 0xd400).w(FUNC(wyvernf0_state::nmi_disable_w));
+	map(0xd600, 0xd600).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe000, 0xefff).rom(); // space for diagnostics ROM
 }
 
@@ -620,7 +625,7 @@ MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 
 	// sprite codes lookup in banked RAM
 	m_objram = std::make_unique<uint8_t[]>(0x1000 * 2);
-	save_pointer(NAME(m_objram.get()), 0x1000 * 2);
+	save_pointer(NAME(m_objram), 0x1000 * 2);
 	membank("rambank")->configure_entries(0, 2, m_objram.get(), 0x1000);
 
 	save_item(NAME(m_sound_nmi_enable));

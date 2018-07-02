@@ -124,6 +124,7 @@ Dip locations verified for:
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -148,6 +149,14 @@ public:
 	{
 	}
 
+	void atomboy(machine_config &config);
+	void m63(machine_config &config);
+	void fghtbskt(machine_config &config);
+
+	void init_wilytowr();
+	void init_fghtbskt();
+
+private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scrollram;
 	required_shared_ptr<uint8_t> m_videoram2;
@@ -198,8 +207,6 @@ public:
 	DECLARE_WRITE8_MEMBER(fghtbskt_samples_w);
 	SAMPLES_START_CB_MEMBER(fghtbskt_sh_start);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	void init_wilytowr();
-	void init_fghtbskt();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_MACHINE_START(m63);
@@ -210,9 +217,6 @@ public:
 	INTERRUPT_GEN_MEMBER(snd_irq);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void atomboy(machine_config &config);
-	void m63(machine_config &config);
-	void fghtbskt(machine_config &config);
 	void fghtbskt_map(address_map &map);
 	void i8039_map(address_map &map);
 	void i8039_port_map(address_map &map);
@@ -479,14 +483,14 @@ void m63_state::m63_map(address_map &map)
 	map(0xe000, 0xe1ff).ram();
 	map(0xe200, 0xe2ff).ram().share("spriteram");
 	map(0xe300, 0xe3ff).ram().share("scrollram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(m63_state::m63_videoram2_w)).share("videoram2");
-	map(0xe800, 0xebff).ram().w(this, FUNC(m63_state::m63_videoram_w)).share("videoram");
-	map(0xec00, 0xefff).ram().w(this, FUNC(m63_state::m63_colorram_w)).share("colorram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(m63_state::m63_videoram2_w)).share("videoram2");
+	map(0xe800, 0xebff).ram().w(FUNC(m63_state::m63_videoram_w)).share("videoram");
+	map(0xec00, 0xefff).ram().w(FUNC(m63_state::m63_colorram_w)).share("colorram");
 	map(0xf000, 0xf007).w("outlatch", FUNC(ls259_device::write_d0));
 	map(0xf800, 0xf800).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf801, 0xf801).portr("P2").nopw(); /* continues game when in stop mode (cleared by NMI handler) */
 	map(0xf802, 0xf802).portr("DSW1");
-	map(0xf803, 0xf803).w(this, FUNC(m63_state::snd_irq_w));
+	map(0xf803, 0xf803).w(FUNC(m63_state::snd_irq_w));
 	map(0xf806, 0xf806).portr("DSW2");
 }
 
@@ -498,18 +502,18 @@ void m63_state::fghtbskt_map(address_map &map)
 	map(0xd000, 0xd1ff).ram();
 	map(0xd200, 0xd2ff).ram().share("spriteram");
 	map(0xd300, 0xd3ff).ram().share("scrollram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(m63_state::m63_videoram2_w)).share("videoram2");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(m63_state::m63_videoram_w)).share("videoram");
-	map(0xdc00, 0xdfff).ram().w(this, FUNC(m63_state::m63_colorram_w)).share("colorram");
-	map(0xf000, 0xf000).r(this, FUNC(m63_state::snd_status_r));
+	map(0xd400, 0xd7ff).ram().w(FUNC(m63_state::m63_videoram2_w)).share("videoram2");
+	map(0xd800, 0xdbff).ram().w(FUNC(m63_state::m63_videoram_w)).share("videoram");
+	map(0xdc00, 0xdfff).ram().w(FUNC(m63_state::m63_colorram_w)).share("colorram");
+	map(0xf000, 0xf000).r(FUNC(m63_state::snd_status_r));
 	map(0xf001, 0xf001).portr("P1");
 	map(0xf002, 0xf002).portr("P2");
 	map(0xf003, 0xf003).portr("DSW");
-	map(0xf000, 0xf000).w(this, FUNC(m63_state::snd_irq_w));
+	map(0xf000, 0xf000).w(FUNC(m63_state::snd_irq_w));
 	map(0xf001, 0xf001).nopw();
 	map(0xf002, 0xf002).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf800, 0xf807).w("outlatch", FUNC(ls259_device::write_d0));
-	map(0xf807, 0xf807).w(this, FUNC(m63_state::fghtbskt_samples_w)); // FIXME
+	map(0xf807, 0xf807).w(FUNC(m63_state::fghtbskt_samples_w)); // FIXME
 }
 
 void m63_state::i8039_map(address_map &map)
@@ -520,7 +524,7 @@ void m63_state::i8039_map(address_map &map)
 
 void m63_state::i8039_port_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(m63_state::snddata_r), FUNC(m63_state::snddata_w));
+	map(0x00, 0xff).rw(FUNC(m63_state::snddata_r), FUNC(m63_state::snddata_w));
 }
 
 
@@ -711,7 +715,7 @@ SAMPLES_START_CB_MEMBER(m63_state::fghtbskt_sh_start)
 	uint8_t *ROM = memregion("samples")->base();
 
 	m_samplebuf = std::make_unique<int16_t[]>(len);
-	save_pointer(NAME(m_samplebuf.get()), len);
+	save_pointer(NAME(m_samplebuf), len);
 
 	for(i = 0; i < len; i++)
 		m_samplebuf[i] = ((int8_t)(ROM[i] ^ 0x80)) * 256;

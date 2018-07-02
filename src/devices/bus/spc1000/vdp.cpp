@@ -80,9 +80,9 @@ READ8_MEMBER(spc1000_vdp_exp_device::read)
 		return 0xff;
 
 	if (offset & 1)
-		return m_vdp->register_read(space, offset);
+		return m_vdp->register_read();
 	else
-		return m_vdp->vram_read(space, offset);
+		return m_vdp->vram_read();
 }
 
 //-------------------------------------------------
@@ -94,8 +94,8 @@ WRITE8_MEMBER(spc1000_vdp_exp_device::write)
 	if (offset & 0x800)
 	{
 		if (offset & 1)
-			m_vdp->register_write(space, offset, data);
+			m_vdp->register_write(data);
 		else
-			m_vdp->vram_write(space, offset, data);
+			m_vdp->vram_write(data);
 	}
 }

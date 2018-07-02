@@ -194,7 +194,7 @@ void gyruss_state::main_cpu1_map(address_map &map)
 	map(0x9000, 0x9fff).ram();
 	map(0xa000, 0xa7ff).ram().share("share1");
 	map(0xc000, 0xc000).portr("DSW2").nopw();   /* watchdog reset */
-	map(0xc080, 0xc080).portr("SYSTEM").w(this, FUNC(gyruss_state::gyruss_sh_irqtrigger_w));
+	map(0xc080, 0xc080).portr("SYSTEM").w(FUNC(gyruss_state::gyruss_sh_irqtrigger_w));
 	map(0xc0a0, 0xc0a0).portr("P1");
 	map(0xc0c0, 0xc0c0).portr("P2");
 	map(0xc0e0, 0xc0e0).portr("DSW1");
@@ -204,10 +204,10 @@ void gyruss_state::main_cpu1_map(address_map &map)
 
 void gyruss_state::main_cpu2_map(address_map &map)
 {
-	map(0x0000, 0x0000).r(this, FUNC(gyruss_state::gyruss_scanline_r));
-	map(0x2000, 0x2000).w(this, FUNC(gyruss_state::slave_irq_mask_w)).nopr();
+	map(0x0000, 0x0000).r(FUNC(gyruss_state::gyruss_scanline_r));
+	map(0x2000, 0x2000).w(FUNC(gyruss_state::slave_irq_mask_w)).nopr();
 	map(0x4000, 0x403f).ram();
-	map(0x4040, 0x40ff).ram().w(this, FUNC(gyruss_state::gyruss_spriteram_w)).share("spriteram");
+	map(0x4040, 0x40ff).ram().w(FUNC(gyruss_state::gyruss_spriteram_w)).share("spriteram");
 	map(0x4100, 0x47ff).ram();
 	map(0x6000, 0x67ff).ram().share("share1");
 	map(0xe000, 0xffff).rom();
@@ -238,7 +238,7 @@ void gyruss_state::audio_cpu1_io_map(address_map &map)
 	map(0x10, 0x10).w("ay5", FUNC(ay8910_device::address_w));
 	map(0x11, 0x11).r("ay5", FUNC(ay8910_device::data_r));
 	map(0x12, 0x12).w("ay5", FUNC(ay8910_device::data_w));
-	map(0x14, 0x14).w(this, FUNC(gyruss_state::gyruss_i8039_irq_w));
+	map(0x14, 0x14).w(FUNC(gyruss_state::gyruss_i8039_irq_w));
 	map(0x18, 0x18).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 

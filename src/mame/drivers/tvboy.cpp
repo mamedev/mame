@@ -29,7 +29,7 @@ public:
 
 	void tvboyii(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -38,7 +38,6 @@ protected:
 	void rom_map(address_map &map);
 	void tvboy_mem(address_map &map);
 
-private:
 	required_memory_bank m_crom;
 	required_region_ptr<uint8_t> m_rom;
 };
@@ -71,7 +70,7 @@ void tvboy_state::tvboy_mem(address_map &map)
 #else
 	map(0x0280, 0x029f).mirror(0x0d00).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 #endif
-	map(0x1000, 0x1fff).w(this, FUNC(tvboy_state::bank_write));
+	map(0x1000, 0x1fff).w(FUNC(tvboy_state::bank_write));
 	map(0x1000, 0x1fff).bankr("crom");
 }
 
@@ -84,7 +83,7 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	MCFG_M6502_DISABLE_CACHE()
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
+	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0, "tia")
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, tvboy_state, a2600_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, tvboy_state, a2600_get_databus_contents))
 	MCFG_TIA_VSYNC_CB(WRITE16(*this, tvboy_state, a2600_tia_vsync_callback_pal))

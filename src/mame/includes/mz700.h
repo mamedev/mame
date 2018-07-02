@@ -20,6 +20,7 @@
 #include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mz_state : public driver_device
@@ -42,6 +43,13 @@ public:
 		, m_cursor_timer(*this, "cursor")
 	{ }
 
+	void mz800(machine_config &config);
+	void mz700(machine_config &config);
+
+	void init_mz800();
+	void init_mz700();
+
+private:
 	DECLARE_READ8_MEMBER(mz700_e008_r);
 	DECLARE_WRITE8_MEMBER(mz700_e008_w);
 	DECLARE_READ8_MEMBER(mz800_bank_0_r);
@@ -64,8 +72,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mz800_ramaddr_w);
 	DECLARE_WRITE8_MEMBER(mz800_palette_w);
 	DECLARE_WRITE8_MEMBER(mz800_cgram_w);
-	void init_mz800();
-	void init_mz700();
 	DECLARE_MACHINE_RESET(mz700);
 	DECLARE_MACHINE_RESET(mz800);
 	virtual void machine_start() override;
@@ -85,8 +91,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
-	void mz800(machine_config &config);
-	void mz700(machine_config &config);
 	void mz700_banke(address_map &map);
 	void mz700_io(address_map &map);
 	void mz700_mem(address_map &map);
@@ -94,7 +98,6 @@ public:
 	void mz800_io(address_map &map);
 	void mz800_mem(address_map &map);
 
-private:
 	int m_mz700;                /* 1 if running on an mz700 */
 
 	int m_cursor_bit;

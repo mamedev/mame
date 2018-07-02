@@ -2,6 +2,7 @@
 // copyright-holders:Pierpaolo Prazzoli, Bryan McPhail
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class tryout_state : public driver_device
 {
@@ -18,6 +19,11 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_gfx_control(*this, "gfx_control") { }
 
+	void tryout(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -45,8 +51,6 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(get_fg_memory_offset);
@@ -58,7 +62,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void tryout(machine_config &config);
+
 	void main_cpu(address_map &map);
 	void sound_cpu(address_map &map);
 };

@@ -217,6 +217,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "mgames.lh"
@@ -234,6 +235,9 @@ public:
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void mgames(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mixport_r);
 	DECLARE_WRITE8_MEMBER(outport0_w);
 	DECLARE_WRITE8_MEMBER(outport1_w);
@@ -245,10 +249,8 @@ public:
 	DECLARE_WRITE8_MEMBER(outport7_w);
 	DECLARE_PALETTE_INIT(mgames);
 	uint32_t screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mgames(machine_config &config);
 	void main_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
@@ -538,17 +540,17 @@ void mgames_state::main_map(address_map &map)
 	map(0x3800, 0x38ff).ram().share("nvram");   /* NVRAM = 2x SCM5101E */
 	map(0x4000, 0x47ff).ram().share("video");   /* 4x MM2114N-3 */
 	map(0x8000, 0x8000).portr("SW1");
-	map(0x8001, 0x8001).r(this, FUNC(mgames_state::mixport_r)); /* DIP switch bank 2 + a sort of watchdog */
+	map(0x8001, 0x8001).r(FUNC(mgames_state::mixport_r)); /* DIP switch bank 2 + a sort of watchdog */
 	map(0x8002, 0x8002).portr("IN1");
 	map(0x8003, 0x8003).portr("IN2");
-	map(0x8000, 0x8000).w(this, FUNC(mgames_state::outport0_w));
-	map(0x8001, 0x8001).w(this, FUNC(mgames_state::outport1_w));
-	map(0x8002, 0x8002).w(this, FUNC(mgames_state::outport2_w));
-	map(0x8003, 0x8003).w(this, FUNC(mgames_state::outport3_w));
-	map(0x8004, 0x8004).w(this, FUNC(mgames_state::outport4_w));
-	map(0x8005, 0x8005).w(this, FUNC(mgames_state::outport5_w));
-	map(0x8006, 0x8006).w(this, FUNC(mgames_state::outport6_w));
-	map(0x8007, 0x8007).w(this, FUNC(mgames_state::outport7_w));
+	map(0x8000, 0x8000).w(FUNC(mgames_state::outport0_w));
+	map(0x8001, 0x8001).w(FUNC(mgames_state::outport1_w));
+	map(0x8002, 0x8002).w(FUNC(mgames_state::outport2_w));
+	map(0x8003, 0x8003).w(FUNC(mgames_state::outport3_w));
+	map(0x8004, 0x8004).w(FUNC(mgames_state::outport4_w));
+	map(0x8005, 0x8005).w(FUNC(mgames_state::outport5_w));
+	map(0x8006, 0x8006).w(FUNC(mgames_state::outport6_w));
+	map(0x8007, 0x8007).w(FUNC(mgames_state::outport7_w));
 }
 
 

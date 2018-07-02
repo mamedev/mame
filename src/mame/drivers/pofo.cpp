@@ -43,6 +43,7 @@
 #include "sound/pcd3311.h"
 #include "video/hd61830.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -92,7 +93,7 @@ public:
 
 	void portfolio(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -148,7 +149,6 @@ protected:
 	DECLARE_READ8_MEMBER(hd61830_rd_r);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
 	required_device<pcd3311_device> m_dtmf;
@@ -783,7 +783,7 @@ WRITE8_MEMBER( portfolio_state::io_w )
 
 void portfolio_state::portfolio_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(portfolio_state::mem_r), FUNC(portfolio_state::mem_w));
+	map(0x00000, 0xfffff).rw(FUNC(portfolio_state::mem_r), FUNC(portfolio_state::mem_w));
 }
 
 
@@ -793,7 +793,7 @@ void portfolio_state::portfolio_mem(address_map &map)
 
 void portfolio_state::portfolio_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(portfolio_state::io_r), FUNC(portfolio_state::io_w));
+	map(0x0000, 0xffff).rw(FUNC(portfolio_state::io_r), FUNC(portfolio_state::io_w));
 }
 
 
@@ -1085,8 +1085,8 @@ MACHINE_CONFIG_END
 ROM_START( pofo )
 	ROM_REGION( 0x40000, M80C88A_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "dip1072", "DIP DOS 1.072" )
-	ROMX_LOAD( "rom b.u4", 0x00000, 0x20000, BAD_DUMP CRC(c9852766) SHA1(c74430281bc717bd36fd9b5baec1cc0f4489fe82), ROM_BIOS(1) ) // dumped with debug.com
-	ROMX_LOAD( "rom a.u3", 0x20000, 0x20000, BAD_DUMP CRC(b8fb730d) SHA1(1b9d82b824cab830256d34912a643a7d048cd401), ROM_BIOS(1) ) // dumped with debug.com
+	ROMX_LOAD( "rom b.u4", 0x00000, 0x20000, BAD_DUMP CRC(c9852766) SHA1(c74430281bc717bd36fd9b5baec1cc0f4489fe82), ROM_BIOS(0) ) // dumped with debug.com
+	ROMX_LOAD( "rom a.u3", 0x20000, 0x20000, BAD_DUMP CRC(b8fb730d) SHA1(1b9d82b824cab830256d34912a643a7d048cd401), ROM_BIOS(0) ) // dumped with debug.com
 
 	ROM_REGION( 0x8000, HD61830_TAG, 0 )
 	ROM_LOAD( "hd61830 external character generator", 0x000, 0x800, BAD_DUMP CRC(747a1db3) SHA1(a4b29678fdb43791a8ce4c1ec778f3231bb422c5) ) // typed in from manual

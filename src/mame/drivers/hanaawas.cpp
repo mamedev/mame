@@ -104,18 +104,18 @@ void hanaawas_state::hanaawas_map(address_map &map)
 	map(0x0000, 0x2fff).rom();
 	map(0x4000, 0x4fff).rom();
 	map(0x6000, 0x6fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(hanaawas_state::hanaawas_videoram_w)).share("videoram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(hanaawas_state::hanaawas_colorram_w)).share("colorram");
+	map(0x8000, 0x83ff).ram().w(FUNC(hanaawas_state::hanaawas_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(hanaawas_state::hanaawas_colorram_w)).share("colorram");
 	map(0x8800, 0x8bff).ram();
-	map(0xb000, 0xb000).w(this, FUNC(hanaawas_state::irq_ack_w));
+	map(0xb000, 0xb000).w(FUNC(hanaawas_state::irq_ack_w));
 }
 
 
 void hanaawas_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(hanaawas_state::hanaawas_input_port_0_r), FUNC(hanaawas_state::hanaawas_inputs_mux_w));
-	map(0x01, 0x01).nopr().w(this, FUNC(hanaawas_state::key_matrix_status_w)); /* r bit 1: status ready, presumably of the input mux device / w = configure device? */
+	map(0x00, 0x00).rw(FUNC(hanaawas_state::hanaawas_input_port_0_r), FUNC(hanaawas_state::hanaawas_inputs_mux_w));
+	map(0x01, 0x01).nopr().w(FUNC(hanaawas_state::key_matrix_status_w)); /* r bit 1: status ready, presumably of the input mux device / w = configure device? */
 	map(0x10, 0x10).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x10, 0x11).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xc0, 0xc0).nopw(); // watchdog

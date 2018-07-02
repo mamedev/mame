@@ -30,9 +30,9 @@ void segam1audio_device::segam1audio_map(address_map &map)
 	map(0xc20003, 0xc20003).rw(UART_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xc40000, 0xc40007).rw(MULTIPCM_1_TAG, FUNC(multipcm_device::read), FUNC(multipcm_device::write)).umask16(0x00ff);
 	map(0xc40012, 0xc40013).nopw();
-	map(0xc50000, 0xc50001).w(this, FUNC(segam1audio_device::m1_snd_mpcm_bnk1_w));
+	map(0xc50000, 0xc50001).w(FUNC(segam1audio_device::m1_snd_mpcm_bnk1_w));
 	map(0xc60000, 0xc60007).rw(MULTIPCM_2_TAG, FUNC(multipcm_device::read), FUNC(multipcm_device::write)).umask16(0x00ff);
-	map(0xc70000, 0xc70001).w(this, FUNC(segam1audio_device::m1_snd_mpcm_bnk2_w));
+	map(0xc70000, 0xc70001).w(FUNC(segam1audio_device::m1_snd_mpcm_bnk2_w));
 	map(0xd00000, 0xd00007).rw(YM3438_TAG, FUNC(ym3438_device::read), FUNC(ym3438_device::write)).umask16(0x00ff);
 	map(0xf00000, 0xf0ffff).ram();
 }

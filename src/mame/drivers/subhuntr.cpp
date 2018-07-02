@@ -21,6 +21,7 @@ QTY     Type    position
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/s2636.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -36,7 +37,7 @@ public:
 
 	void subhuntr(machine_config &config);
 
-protected:
+private:
 	INTERRUPT_GEN_MEMBER(subhuntr_interrupt);
 
 	virtual void machine_start() override;
@@ -49,7 +50,6 @@ protected:
 	void subhuntr_io_map(address_map &map);
 	void subhuntr_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 };
 

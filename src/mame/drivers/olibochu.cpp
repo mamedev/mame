@@ -58,6 +58,7 @@ $7004 writes, related to $7000 reads
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -75,6 +76,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void olibochu(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -104,7 +108,6 @@ public:
 	uint32_t screen_update_olibochu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(olibochu_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void olibochu(machine_config &config);
 	void olibochu_map(address_map &map);
 	void olibochu_sound_map(address_map &map);
 };
@@ -273,8 +276,8 @@ WRITE8_MEMBER(olibochu_state::sound_command_w)
 void olibochu_state::olibochu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(olibochu_state::olibochu_videoram_w)).share("videoram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(olibochu_state::olibochu_colorram_w)).share("colorram");
+	map(0x8000, 0x83ff).ram().w(FUNC(olibochu_state::olibochu_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(olibochu_state::olibochu_colorram_w)).share("colorram");
 	map(0x9000, 0x903f).ram(); //???
 	map(0x9800, 0x983f).ram(); //???
 	map(0xa000, 0xa000).portr("IN0");
@@ -283,8 +286,8 @@ void olibochu_state::olibochu_map(address_map &map)
 	map(0xa003, 0xa003).portr("DSW0");
 	map(0xa004, 0xa004).portr("DSW1");
 	map(0xa005, 0xa005).portr("DSW2");
-	map(0xa800, 0xa801).w(this, FUNC(olibochu_state::sound_command_w));
-	map(0xa802, 0xa802).w(this, FUNC(olibochu_state::olibochu_flipscreen_w));    /* bit 6 = enable sound? */
+	map(0xa800, 0xa801).w(FUNC(olibochu_state::sound_command_w));
+	map(0xa802, 0xa802).w(FUNC(olibochu_state::olibochu_flipscreen_w));    /* bit 6 = enable sound? */
 	map(0xf000, 0xffff).ram();
 	map(0xf400, 0xf41f).ram().share("spriteram");
 	map(0xf440, 0xf47f).ram().share("spriteram2");

@@ -51,6 +51,7 @@
 //#include "cpu/tms9900/tms9900.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -66,6 +67,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void nibble(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE16_MEMBER(nibble_videoram_w);
@@ -79,7 +83,6 @@ public:
 	INTERRUPT_GEN_MEMBER(nibble_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void nibble(machine_config &config);
 	void nibble_cru_map(address_map &map);
 	void nibble_map(address_map &map);
 };
@@ -156,7 +159,7 @@ void nibble_state::nibble_map(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc3ff).w(this, FUNC(nibble_state::nibble_videoram_w)).share("videoram");   // placeholder
+	map(0xc000, 0xc3ff).w(FUNC(nibble_state::nibble_videoram_w)).share("videoram");   // placeholder
 //  AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("crtc", mc6845_device, address_w)
 //  AM_RANGE(0xff02, 0xff03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 }

@@ -35,6 +35,12 @@ public:
 		m_wheel(*this, "WHEEL"),
 		m_shareram(*this, "shareram", 32) { }
 
+	void namcofl(machine_config &config);
+
+	void init_speedrcr();
+	void init_finalapr();
+
+private:
 	required_device<namco_c116_device> m_c116;
 	required_ioport m_in0;
 	required_ioport m_in1;
@@ -69,8 +75,6 @@ public:
 	DECLARE_READ8_MEMBER(dac1_r);
 	DECLARE_READ8_MEMBER(dac0_r);
 	DECLARE_WRITE32_MEMBER(namcofl_spritebank_w);
-	void init_speedrcr();
-	void init_finalapr();
 	DECLARE_MACHINE_START(namcofl);
 	DECLARE_MACHINE_RESET(namcofl);
 	DECLARE_VIDEO_START(namcofl);
@@ -85,7 +89,6 @@ public:
 	int FLobjcode2tile(int code);
 	void TilemapCB(uint16_t code, int *tile, int *mask);
 	void RozCB(uint16_t code, int *tile, int *mask, int which);
-	void namcofl(machine_config &config);
 	void namcoc75_am(address_map &map);
 	void namcoc75_io(address_map &map);
 	void namcofl_mem(address_map &map);

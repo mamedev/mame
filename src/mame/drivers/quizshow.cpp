@@ -19,6 +19,7 @@ TODO:
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "quizshow.lh"
@@ -54,7 +55,7 @@ public:
 	void init_quizshow();
 	void quizshow(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -75,7 +76,6 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<uint8_t> m_main_ram;
@@ -239,18 +239,18 @@ void quizshow_state::mem_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x0bff).rom();
-	map(0x1802, 0x1802).w(this, FUNC(quizshow_state::audio_w));
-	map(0x1804, 0x1804).w(this, FUNC(quizshow_state::lamps1_w));
-	map(0x1808, 0x1808).w(this, FUNC(quizshow_state::lamps2_w));
-	map(0x1810, 0x1810).w(this, FUNC(quizshow_state::lamps3_w));
-	map(0x1820, 0x1820).w(this, FUNC(quizshow_state::tape_control_w));
-	map(0x1840, 0x1840).w(this, FUNC(quizshow_state::video_disable_w));
+	map(0x1802, 0x1802).w(FUNC(quizshow_state::audio_w));
+	map(0x1804, 0x1804).w(FUNC(quizshow_state::lamps1_w));
+	map(0x1808, 0x1808).w(FUNC(quizshow_state::lamps2_w));
+	map(0x1810, 0x1810).w(FUNC(quizshow_state::lamps3_w));
+	map(0x1820, 0x1820).w(FUNC(quizshow_state::tape_control_w));
+	map(0x1840, 0x1840).w(FUNC(quizshow_state::video_disable_w));
 	map(0x1881, 0x1881).portr("IN0");
 	map(0x1882, 0x1882).portr("IN1");
 	map(0x1884, 0x1884).portr("IN2");
 	map(0x1888, 0x1888).portr("IN3");
-	map(0x1900, 0x1900).r(this, FUNC(quizshow_state::timing_r));
-	map(0x1e00, 0x1fff).ram().w(this, FUNC(quizshow_state::main_ram_w)).share("main_ram");
+	map(0x1900, 0x1900).r(FUNC(quizshow_state::timing_r));
+	map(0x1e00, 0x1fff).ram().w(FUNC(quizshow_state::main_ram_w)).share("main_ram");
 }
 
 
@@ -436,7 +436,7 @@ ROM_START( quizshow )
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x0200, "user1", 0 ) // gfx1
-	ROM_LOAD_NIB_HIGH( "005466-01.m2", 0x0000, 0x0200, BAD_DUMP CRC(03017820) SHA1(fd118aa706bdc6976e527ed63388fad01e66270e) ) // from Atari's source archive, may have some bad bits
+	ROM_LOAD_NIB_HIGH( "005466-01.m2", 0x0000, 0x0200, CRC(03017820) SHA1(fd118aa706bdc6976e527ed63388fad01e66270e) )
 	ROM_LOAD_NIB_LOW ( "005466-02.n2", 0x0000, 0x0200, CRC(cd554367) SHA1(04da83eb6e2f86f88a3495072b98fbdaca485ae8) )
 
 	ROM_REGION( 0x0200, "proms", 0 )

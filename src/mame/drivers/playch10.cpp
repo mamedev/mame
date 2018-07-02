@@ -354,10 +354,10 @@ void playch10_state::bios_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram(); // 8V
-	map(0x8800, 0x8fff).rw(this, FUNC(playch10_state::ram_8w_r), FUNC(playch10_state::ram_8w_w)).share("ram_8w");    // 8W
-	map(0x9000, 0x97ff).ram().w(this, FUNC(playch10_state::playch10_videoram_w)).share("videoram");
+	map(0x8800, 0x8fff).rw(FUNC(playch10_state::ram_8w_r), FUNC(playch10_state::ram_8w_w)).share("ram_8w");    // 8W
+	map(0x9000, 0x97ff).ram().w(FUNC(playch10_state::playch10_videoram_w)).share("videoram");
 	map(0xc000, 0xdfff).rom();
-	map(0xe000, 0xffff).rw(this, FUNC(playch10_state::pc10_prot_r), FUNC(playch10_state::pc10_prot_w));
+	map(0xe000, 0xffff).rw(FUNC(playch10_state::pc10_prot_r), FUNC(playch10_state::pc10_prot_w));
 }
 
 void playch10_state::bios_io_map(address_map &map)
@@ -366,19 +366,19 @@ void playch10_state::bios_io_map(address_map &map)
 	map(0x00, 0x00).portr("BIOS");
 	map(0x01, 0x01).portr("SW1");
 	map(0x02, 0x02).portr("SW2");
-	map(0x03, 0x03).r(this, FUNC(playch10_state::pc10_detectclr_r));
+	map(0x03, 0x03).r(FUNC(playch10_state::pc10_detectclr_r));
 	map(0x00, 0x07).w("outlatch1", FUNC(ls259_device::write_d0));
 	map(0x08, 0x0f).w("outlatch2", FUNC(ls259_device::write_d0));
-	map(0x10, 0x13).w(this, FUNC(playch10_state::time_w));
+	map(0x10, 0x13).w(FUNC(playch10_state::time_w));
 }
 
 void playch10_state::cart_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().mirror(0x1800).share("work_ram");
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(this, FUNC(playch10_state::sprite_dma_w));
-	map(0x4016, 0x4016).rw(this, FUNC(playch10_state::pc10_in0_r), FUNC(playch10_state::pc10_in0_w));
-	map(0x4017, 0x4017).r(this, FUNC(playch10_state::pc10_in1_r));  /* IN1 - input port 2 / PSG second control register */
+	map(0x4014, 0x4014).w(FUNC(playch10_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(playch10_state::pc10_in0_r), FUNC(playch10_state::pc10_in0_w));
+	map(0x4017, 0x4017).r(FUNC(playch10_state::pc10_in1_r));  /* IN1 - input port 2 / PSG second control register */
 	map(0x8000, 0xffff).rom();
 }
 
@@ -716,7 +716,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define BIOS_CPU                                            \
 	ROM_REGION( 0x10000, "maincpu", 0 )                     \

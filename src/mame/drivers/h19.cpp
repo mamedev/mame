@@ -56,6 +56,7 @@ Address   Description
 #include "machine/mm5740.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -98,6 +99,9 @@ public:
 	{
 	}
 
+	void h19(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(h19_keyclick_w);
 	DECLARE_WRITE8_MEMBER(h19_bell_w);
 	DECLARE_READ8_MEMBER(kbd_key_r);
@@ -108,10 +112,9 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void h19(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
 
@@ -173,10 +176,10 @@ void h19_state::io_map(address_map &map)
 	map(0x40, 0x47).mirror(0x18).rw(m_ace, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x60, 0x60).mirror(0x1E).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x61, 0x61).mirror(0x1E).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x80, 0x80).mirror(0x1f).r(this, FUNC(h19_state::kbd_key_r));
-	map(0xA0, 0xA0).mirror(0x1f).r(this, FUNC(h19_state::kbd_flags_r));
-	map(0xC0, 0xC0).mirror(0x1f).w(this, FUNC(h19_state::h19_keyclick_w));
-	map(0xE0, 0xE0).mirror(0x1f).w(this, FUNC(h19_state::h19_bell_w));
+	map(0x80, 0x80).mirror(0x1f).r(FUNC(h19_state::kbd_key_r));
+	map(0xA0, 0xA0).mirror(0x1f).r(FUNC(h19_state::kbd_flags_r));
+	map(0xC0, 0xC0).mirror(0x1f).w(FUNC(h19_state::h19_keyclick_w));
+	map(0xE0, 0xE0).mirror(0x1f).w(FUNC(h19_state::h19_bell_w));
 }
 
 /* Input ports */

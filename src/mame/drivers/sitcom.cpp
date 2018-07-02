@@ -66,9 +66,9 @@ public:
 	{
 	}
 
-	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
-
 	void sitcom(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
 
 protected:
 	template <unsigned D> DECLARE_WRITE16_MEMBER(update_ds) { m_digits[(D << 2) | offset] = data; }

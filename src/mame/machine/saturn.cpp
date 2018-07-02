@@ -379,8 +379,8 @@ WRITE_LINE_MEMBER(saturn_state::dot_select_w)
 {
 	const XTAL &xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
 
-	machine().device("maincpu")->set_unscaled_clock(xtal/2);
-	machine().device("slave")->set_unscaled_clock(xtal/2);
+	m_maincpu->set_unscaled_clock(xtal/2);
+	m_slave->set_unscaled_clock(xtal/2);
 
 	m_vdp2.dotsel = state ^ 1;
 	stv_vdp2_dynamic_res_change();

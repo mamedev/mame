@@ -6,7 +6,7 @@
 
         2009-12-09 Skeleton driver.
 
-        Chips used: i8275, AM9513, i8085, i8237, i8255, 2x 2651. XTAL 20MHz
+        Chips used: i8275, AM9513, AM8085A-2, i8237, i8255, 2x 2651. XTAL 20MHz
 
 ****************************************************************************/
 
@@ -14,6 +14,8 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/am9513.h"
 #include "machine/i8255.h"
+#include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -26,13 +28,14 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	DECLARE_PALETTE_INIT(unistar);
-	uint32_t screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void unistar(machine_config &config);
+private:
+	DECLARE_PALETTE_INIT(unistar);
+	I8275_DRAW_CHARACTER_MEMBER(draw_character);
+
 	void unistar_io(address_map &map);
 	void unistar_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -50,14 +53,21 @@ void unistar_state::unistar_io(address_map &map)
 {
 	//ADDRESS_MAP_UNMAP_HIGH
 	map.global_mask(0xff);
+	map(0x84, 0x84).portr("CONFIG");
 	map(0x8c, 0x8d).rw("stc", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
 	map(0x94, 0x97).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x98, 0x99).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
 	// ports used: 00,02,03(W),08(RW),09,0A,0B,0D,0F(W),80,81(R),82,83(W),84(R),8C,8D(W),94(R),97,98(W),99(RW)
 	// if nonzero returned from port 94, it goes into test mode.
 }
 
 /* Input ports */
 static INPUT_PORTS_START( unistar )
+	PORT_START("CONFIG")
+	PORT_DIPNAME(0x01, 0x01, "Screen Refresh Rate")
+	PORT_DIPSETTING(0x01, "50 Hz")
+	PORT_DIPSETTING(0x00, "60 Hz")
+	PORT_BIT(0xfe, 0xfe, IPT_UNKNOWN)
 INPUT_PORTS_END
 
 
@@ -72,9 +82,8 @@ PALETTE_INIT_MEMBER( unistar_state, unistar )
 	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
 }
 
-uint32_t unistar_state::screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+I8275_DRAW_CHARACTER_MEMBER(unistar_state::draw_character)
 {
-	return 0;
 }
 
 /* F4 Character Displayer */
@@ -97,11 +106,11 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(unistar_state::unistar)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(2'000'000))
+	MCFG_DEVICE_ADD("maincpu", I8085A, 20_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(unistar_mem)
 	MCFG_DEVICE_IO_MAP(unistar_io)
 
-	MCFG_DEVICE_ADD("stc", AM9513, XTAL(8'000'000))
+	MCFG_DEVICE_ADD("stc", AM9513, 8_MHz_XTAL)
 	MCFG_AM9513_FOUT_CALLBACK(WRITELINE("stc", am9513_device, source1_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
@@ -112,8 +121,11 @@ MACHINE_CONFIG_START(unistar_state::unistar)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(unistar_state, screen_update_unistar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
+
+	MCFG_DEVICE_ADD("crtc", I8275, 20_MHz_XTAL / 8.5) // clock is probably wrong
+	MCFG_I8275_CHARACTER_WIDTH(8)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(unistar_state, draw_character)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unistar)
 	MCFG_PALETTE_ADD("palette", 3)

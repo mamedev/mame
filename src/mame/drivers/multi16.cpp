@@ -10,6 +10,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -18,13 +19,16 @@ class multi16_state : public driver_device
 public:
 	multi16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pic(*this, "pic8259"),
-	m_crtc(*this, "crtc"),
-		m_palette(*this, "palette")
-	,
-		m_p_vram(*this, "p_vram"){ }
+		m_maincpu(*this, "maincpu"),
+		m_pic(*this, "pic8259"),
+		m_crtc(*this, "crtc"),
+		m_palette(*this, "palette"),
+		m_p_vram(*this, "p_vram")
+	{ }
 
+	void multi16(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<mc6845_device> m_crtc;
@@ -32,12 +36,11 @@ public:
 	DECLARE_WRITE8_MEMBER(multi16_6845_address_w);
 	DECLARE_WRITE8_MEMBER(multi16_6845_data_w);
 	required_shared_ptr<uint16_t> m_p_vram;
-	uint8_t m_crtc_vreg[0x100],m_crtc_index;
+	uint8_t m_crtc_vreg[0x100], m_crtc_index;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_multi16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void multi16(machine_config &config);
 	void multi16_io(address_map &map);
 	void multi16_map(address_map &map);
 };
@@ -117,8 +120,8 @@ void multi16_state::multi16_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x02, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)); // i8259
-	map(0x40, 0x40).w(this, FUNC(multi16_state::multi16_6845_address_w));
-	map(0x41, 0x41).w(this, FUNC(multi16_state::multi16_6845_data_w));
+	map(0x40, 0x40).w(FUNC(multi16_state::multi16_6845_address_w));
+	map(0x41, 0x41).w(FUNC(multi16_state::multi16_6845_data_w));
 }
 
 /* Input ports */

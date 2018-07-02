@@ -55,20 +55,20 @@ void goal92_state::goal92_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x1007ff).ram();
-	map(0x100800, 0x100fff).ram().w(this, FUNC(goal92_state::goal92_background_w)).share("bg_data");
-	map(0x101000, 0x1017ff).ram().w(this, FUNC(goal92_state::goal92_foreground_w)).share("fg_data");
+	map(0x100800, 0x100fff).ram().w(FUNC(goal92_state::goal92_background_w)).share("bg_data");
+	map(0x101000, 0x1017ff).ram().w(FUNC(goal92_state::goal92_foreground_w)).share("fg_data");
 	map(0x101800, 0x101fff).ram(); // it has tiles for clouds, but they aren't used
-	map(0x102000, 0x102fff).ram().w(this, FUNC(goal92_state::goal92_text_w)).share("tx_data");
+	map(0x102000, 0x102fff).ram().w(FUNC(goal92_state::goal92_text_w)).share("tx_data");
 	map(0x103000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x104000, 0x13ffff).ram();
 	map(0x140000, 0x1407ff).ram().share("spriteram");
 	map(0x140800, 0x140801).nopw();
 	map(0x140802, 0x140803).nopw();
-	map(0x180000, 0x18000f).r(this, FUNC(goal92_state::goal92_inputs_r));
-	map(0x180008, 0x180009).w(this, FUNC(goal92_state::goal92_sound_command_w));
+	map(0x180000, 0x18000f).r(FUNC(goal92_state::goal92_inputs_r));
+	map(0x180008, 0x180009).w(FUNC(goal92_state::goal92_sound_command_w));
 	map(0x18000a, 0x18000b).nopw();
 	map(0x180010, 0x180017).writeonly().share("scrollram");
-	map(0x18001c, 0x18001d).rw(this, FUNC(goal92_state::goal92_fg_bank_r), FUNC(goal92_state::goal92_fg_bank_w));
+	map(0x18001c, 0x18001d).rw(FUNC(goal92_state::goal92_fg_bank_r), FUNC(goal92_state::goal92_fg_bank_w));
 }
 
 /* Sound CPU */
@@ -89,8 +89,8 @@ void goal92_state::sound_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xe000, 0xe000).w(this, FUNC(goal92_state::adpcm_control_w));
-	map(0xe400, 0xe400).w(this, FUNC(goal92_state::adpcm_data_w));
+	map(0xe000, 0xe000).w(FUNC(goal92_state::adpcm_control_w));
+	map(0xe400, 0xe400).w(FUNC(goal92_state::adpcm_data_w));
 	map(0xe800, 0xe801).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xec00, 0xec01).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf000, 0xf7ff).ram();
@@ -223,7 +223,7 @@ WRITE_LINE_MEMBER(goal92_state::irqhandler)
 
 WRITE_LINE_MEMBER(goal92_state::goal92_adpcm_int)
 {
-	m_msm->data_w(m_msm5205next);
+	m_msm->write_data(m_msm5205next);
 	m_msm5205next >>= 4;
 	m_adpcm_toggle^= 1;
 

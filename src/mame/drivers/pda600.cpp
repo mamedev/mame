@@ -59,6 +59,7 @@
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
 #include "machine/hd64610.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 
@@ -71,6 +72,9 @@ public:
 			m_maincpu(*this, "maincpu")
 		{}
 
+	void pda600(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void video_start() override;
@@ -78,7 +82,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t *     m_video_ram;
-	void pda600(machine_config &config);
 	void pda600_io(address_map &map);
 	void pda600_mem(address_map &map);
 };

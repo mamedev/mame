@@ -24,6 +24,7 @@
 #include "bus/neogeo/carts.h"
 #include "bus/neogeo_ctrl/ctrl.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 

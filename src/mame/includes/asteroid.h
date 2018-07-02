@@ -9,6 +9,7 @@
 #include "sound/discrete.h"
 #include "video/avgdvg.h"
 #include "machine/74153.h"
+#include "machine/er2055.h"
 
 class asteroid_state : public driver_device
 {
@@ -17,6 +18,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dvg(*this, "dvg"),
+		m_earom(*this, "earom"),
 		m_discrete(*this, "discrete"),
 		m_dsw1(*this, "DSW1"),
 		m_dsw_sel(*this, "dsw_sel"),
@@ -27,6 +29,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<dvg_device> m_dvg;
+	optional_device<er2055_device> m_earom;
 	required_device<discrete_device> m_discrete;
 	required_ioport m_dsw1;
 	required_device<ttl153_device> m_dsw_sel;
@@ -48,6 +51,10 @@ public:
 	DECLARE_WRITE8_MEMBER(asteroid_noise_reset_w);
 	DECLARE_WRITE8_MEMBER(llander_snd_reset_w);
 	DECLARE_WRITE8_MEMBER(llander_sounds_w);
+
+	DECLARE_READ8_MEMBER(earom_read);
+	DECLARE_WRITE8_MEMBER(earom_write);
+	DECLARE_WRITE8_MEMBER(earom_control_w);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 

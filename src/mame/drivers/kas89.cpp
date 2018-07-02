@@ -226,6 +226,11 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void kas89(machine_config &config);
+
+	void init_kas89();
+
+private:
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -233,17 +238,13 @@ public:
 	DECLARE_WRITE8_MEMBER(int_ack_w);
 	DECLARE_WRITE8_MEMBER(led_mux_data_w);
 	DECLARE_WRITE8_MEMBER(led_mux_select_w);
-	void init_kas89();
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
-	void kas89(machine_config &config);
 	void audio_io(address_map &map);
 	void audio_map(address_map &map);
 	void kas89_io(address_map &map);
 	void kas89_map(address_map &map);
 
-
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -537,12 +538,12 @@ void kas89_state::kas89_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x40, 0x43).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
-	map(0x80, 0x80).w(this, FUNC(kas89_state::mux_w));
-	map(0x81, 0x81).r(this, FUNC(kas89_state::mux_r));
-	map(0x82, 0x82).w(this, FUNC(kas89_state::control_w));    /* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
-	map(0x83, 0x83).w(this, FUNC(kas89_state::led_mux_data_w));
-	map(0x84, 0x84).w(this, FUNC(kas89_state::led_mux_select_w));
-	map(0x85, 0x85).w(this, FUNC(kas89_state::sound_comm_w));
+	map(0x80, 0x80).w(FUNC(kas89_state::mux_w));
+	map(0x81, 0x81).r(FUNC(kas89_state::mux_r));
+	map(0x82, 0x82).w(FUNC(kas89_state::control_w));    /* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
+	map(0x83, 0x83).w(FUNC(kas89_state::led_mux_data_w));
+	map(0x84, 0x84).w(FUNC(kas89_state::led_mux_select_w));
+	map(0x85, 0x85).w(FUNC(kas89_state::sound_comm_w));
 }
 
 /*
@@ -592,7 +593,7 @@ void kas89_state::audio_map(address_map &map)
 void kas89_state::audio_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(kas89_state::int_ack_w));    // comm out (1st Z80). seems to write here the value previously read through soundlatch (port 0x02).
+	map(0x00, 0x00).w(FUNC(kas89_state::int_ack_w));    // comm out (1st Z80). seems to write here the value previously read through soundlatch (port 0x02).
 	map(0x02, 0x02).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x04, 0x04).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x04, 0x05).w("aysnd", FUNC(ay8910_device::data_address_w));

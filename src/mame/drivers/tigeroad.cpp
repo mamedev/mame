@@ -68,7 +68,7 @@ WRITE16_MEMBER(tigeroad_state::tigeroad_soundcmd_w)
 WRITE8_MEMBER(tigeroad_state::msm5205_w)
 {
 	m_msm->reset_w(BIT(data, 7));
-	m_msm->data_w(data);
+	m_msm->write_data(data);
 	m_msm->vclk_w(1);
 	m_msm->vclk_w(0);
 }
@@ -117,12 +117,12 @@ void tigeroad_state::main_map(address_map &map)
 
 	map(0xfe0800, 0xfe0cff).ram().share("spriteram");
 	map(0xfe0d00, 0xfe1807).ram();     /* still part of OBJ RAM */
-	map(0xfe4000, 0xfe4001).portr("P1_P2").w(this, FUNC(tigeroad_state::tigeroad_videoctrl_w));   /* char bank, coin counters, + ? */
-	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(this, FUNC(tigeroad_state::tigeroad_soundcmd_w)); /* AM_WRITE(tigeroad_soundcmd_w) is replaced in init for for f1dream protection */
+	map(0xfe4000, 0xfe4001).portr("P1_P2").w(FUNC(tigeroad_state::tigeroad_videoctrl_w));   /* char bank, coin counters, + ? */
+	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(FUNC(tigeroad_state::tigeroad_soundcmd_w)); /* AM_WRITE(tigeroad_soundcmd_w) is replaced in init for for f1dream protection */
 	map(0xfe4004, 0xfe4005).portr("DSW");
-	map(0xfe8000, 0xfe8003).w(this, FUNC(tigeroad_state::tigeroad_scroll_w));
+	map(0xfe8000, 0xfe8003).w(FUNC(tigeroad_state::tigeroad_scroll_w));
 	map(0xfe800e, 0xfe800f).writeonly();    /* fe800e = watchdog or IRQ acknowledge */
-	map(0xfec000, 0xfec7ff).ram().w(this, FUNC(tigeroad_state::tigeroad_videoram_w)).share("videoram");
+	map(0xfec000, 0xfec7ff).ram().w(FUNC(tigeroad_state::tigeroad_videoram_w)).share("videoram");
 
 	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffc000, 0xffffff).ram().share("ram16");
@@ -143,12 +143,12 @@ WRITE8_MEMBER(f1dream_state::mcu_shared_w)
 void f1dream_state::f1dream_map(address_map &map)
 {
 	main_map(map);
-	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(this, FUNC(f1dream_state::blktiger_to_mcu_w));
+	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(FUNC(f1dream_state::blktiger_to_mcu_w));
 }
 
 void f1dream_state::f1dream_mcu_io(address_map &map)
 {
-	map(0x7f0, 0x7ff).rw(this, FUNC(f1dream_state::mcu_shared_r), FUNC(f1dream_state::mcu_shared_w));
+	map(0x7f0, 0x7ff).rw(FUNC(f1dream_state::mcu_shared_r), FUNC(f1dream_state::mcu_shared_w));
 }
 
 
@@ -156,24 +156,24 @@ void pushman_state::pushman_map(address_map &map)
 {
 	main_map(map);
 
-	map(0x060000, 0x060007).r(this, FUNC(pushman_state::mcu_comm_r));
-	map(0x060000, 0x060003).w(this, FUNC(pushman_state::pushman_mcu_comm_w));
+	map(0x060000, 0x060007).r(FUNC(pushman_state::mcu_comm_r));
+	map(0x060000, 0x060003).w(FUNC(pushman_state::pushman_mcu_comm_w));
 }
 
 void pushman_state::bballs_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	map(0x00000, 0x3ffff).rom();
-	map(0x60000, 0x60007).r(this, FUNC(pushman_state::mcu_comm_r));
-	map(0x60000, 0x60001).w(this, FUNC(pushman_state::bballs_mcu_comm_w));
+	map(0x60000, 0x60007).r(FUNC(pushman_state::mcu_comm_r));
+	map(0x60000, 0x60001).w(FUNC(pushman_state::bballs_mcu_comm_w));
 	// are these mirror addresses or does this PCB have a different addressing?
 	map(0xe0800, 0xe17ff).ram().share("spriteram");
-	map(0xe4000, 0xe4001).portr("P1_P2").w(this, FUNC(pushman_state::tigeroad_videoctrl_w));
-	map(0xe4002, 0xe4003).portr("SYSTEM").w(this, FUNC(pushman_state::tigeroad_soundcmd_w));
+	map(0xe4000, 0xe4001).portr("P1_P2").w(FUNC(pushman_state::tigeroad_videoctrl_w));
+	map(0xe4002, 0xe4003).portr("SYSTEM").w(FUNC(pushman_state::tigeroad_soundcmd_w));
 	map(0xe4004, 0xe4005).portr("DSW");
-	map(0xe8000, 0xe8003).w(this, FUNC(pushman_state::tigeroad_scroll_w));
+	map(0xe8000, 0xe8003).w(FUNC(pushman_state::tigeroad_scroll_w));
 	map(0xe800e, 0xe800f).nopw(); /* ? */
-	map(0xec000, 0xec7ff).ram().w(this, FUNC(pushman_state::tigeroad_videoram_w)).share("videoram");
+	map(0xec000, 0xec7ff).ram().w(FUNC(pushman_state::tigeroad_videoram_w)).share("videoram");
 
 	map(0xf8000, 0xf87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfc000, 0xfffff).ram().share("ram16");
@@ -205,7 +205,7 @@ void tigeroad_state::sample_port_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));
-	map(0x01, 0x01).w(this, FUNC(tigeroad_state::msm5205_w));
+	map(0x01, 0x01).w(FUNC(tigeroad_state::msm5205_w));
 }
 
 /* Pushman / Bouncing Balls */

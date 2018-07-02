@@ -61,6 +61,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -125,7 +126,7 @@ void binbug_state::binbug_mem(address_map &map)
 void binbug_state::binbug_data(address_map &map)
 {
 	map.unmap_value_high();
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(this, FUNC(binbug_state::binbug_ctrl_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(binbug_state::binbug_ctrl_w));
 }
 
 /* Input ports */
@@ -454,7 +455,7 @@ void dg680_state::dg680_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x04, 0x07).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x08, 0x08).rw(this, FUNC(dg680_state::port08_r), FUNC(dg680_state::port08_w)); //SWP Control and Status
+	map(0x08, 0x08).rw(FUNC(dg680_state::port08_r), FUNC(dg680_state::port08_w)); //SWP Control and Status
 	//AM_RANGE(0x09,0x09) parallel input port
 	// Optional AM9519 Programmable Interrupt Controller (port c = data, port d = control)
 	//AM_RANGE(0x0c,0x0d) AM_DEVREADWRITE("am9519", am9519_device, read, write)

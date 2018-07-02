@@ -65,6 +65,13 @@ public:
 		, m_vdp(*this, "vdp")
 	{ }
 
+	void magerror(machine_config &config);
+	void hyprduel(machine_config &config);
+
+	void init_magerror();
+	void init_hyprduel();
+
+private:
 	DECLARE_READ16_MEMBER(irq_cause_r);
 	DECLARE_WRITE16_MEMBER(irq_cause_w);
 	DECLARE_WRITE16_MEMBER(subcpu_control_w);
@@ -72,25 +79,21 @@ public:
 	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger1_w);
 	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger2_r);
 	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger2_w);
-	void init_magerror();
-	void init_hyprduel();
 	DECLARE_MACHINE_START(hyprduel);
 	DECLARE_MACHINE_START(magerror);
 	TIMER_CALLBACK_MEMBER(vblank_end_callback);
 	DECLARE_WRITE_LINE_MEMBER(vdp_blit_end_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void magerror(machine_config &config);
-	void hyprduel(machine_config &config);
 	void i4220_config(machine_config &config);
+
 	void hyprduel_map(address_map &map);
 	void hyprduel_map2(address_map &map);
 	void magerror_map(address_map &map);
 	void magerror_map2(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_irq_enable;
 	required_shared_ptr_array<uint16_t, 3> m_sharedram;
@@ -261,9 +264,9 @@ void hyprduel_state::hyprduel_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x400000, 0x47ffff).m(m_vdp, FUNC(imagetek_i4220_device::v2_map));
-	map(0x4788a2, 0x4788a3).rw(this, FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause,Acknowledge */
+	map(0x4788a2, 0x4788a3).rw(FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause,Acknowledge */
 	map(0x4788a4, 0x4788a5).ram().share("irq_enable");      /* IRQ Enable */
-	map(0x800000, 0x800001).w(this, FUNC(hyprduel_state::subcpu_control_w));
+	map(0x800000, 0x800001).w(FUNC(hyprduel_state::subcpu_control_w));
 	map(0xc00000, 0xc07fff).ram().share("sharedram1");
 	map(0xe00000, 0xe00001).portr("SERVICE").nopw();
 	map(0xe00002, 0xe00003).portr("DSW");
@@ -291,9 +294,9 @@ void hyprduel_state::hyprduel_map2(address_map &map)
 void hyprduel_state::magerror_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x400000, 0x400001).w(this, FUNC(hyprduel_state::subcpu_control_w));
+	map(0x400000, 0x400001).w(FUNC(hyprduel_state::subcpu_control_w));
 	map(0x800000, 0x87ffff).m(m_vdp, FUNC(imagetek_i4220_device::v2_map));
-	map(0x8788a2, 0x8788a3).rw(this, FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause, Acknowledge */
+	map(0x8788a2, 0x8788a3).rw(FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause, Acknowledge */
 	map(0x8788a4, 0x8788a5).ram().share("irq_enable");      /* IRQ Enable */
 	map(0xc00000, 0xc1ffff).ram().share("sharedram1");
 	map(0xe00000, 0xe00001).portr("SERVICE").nopw();

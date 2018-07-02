@@ -137,7 +137,7 @@ void big10_state::main_map(address_map &map)
 void big10_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(big10_state::mux_r));         /* present in test mode */
+	map(0x00, 0x00).r(FUNC(big10_state::mux_r));         /* present in test mode */
 	map(0x02, 0x02).portr("SYSTEM"); /* coins and service */
 	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));

@@ -68,6 +68,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -95,20 +96,20 @@ void gotcha_state::gotcha_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x100002, 0x100003).w(this, FUNC(gotcha_state::gotcha_lamps_w));
-	map(0x100004, 0x100004).w(this, FUNC(gotcha_state::gotcha_oki_bank_w));
+	map(0x100002, 0x100003).w(FUNC(gotcha_state::gotcha_lamps_w));
+	map(0x100004, 0x100004).w(FUNC(gotcha_state::gotcha_oki_bank_w));
 	map(0x120000, 0x12ffff).ram();
 	map(0x140000, 0x1405ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram");
 	map(0x180000, 0x180001).portr("INPUTS");
 	map(0x180002, 0x180003).portr("SYSTEM");
 	map(0x180004, 0x180005).portr("DSW");
-	map(0x300000, 0x300001).w(this, FUNC(gotcha_state::gotcha_gfxbank_select_w));
-	map(0x300002, 0x300009).w(this, FUNC(gotcha_state::gotcha_scroll_w));
+	map(0x300000, 0x300001).w(FUNC(gotcha_state::gotcha_gfxbank_select_w));
+	map(0x300002, 0x300009).w(FUNC(gotcha_state::gotcha_scroll_w));
 //  { 0x30000c, 0x30000d,
-	map(0x30000e, 0x30000f).w(this, FUNC(gotcha_state::gotcha_gfxbank_w));
-	map(0x320000, 0x320fff).w(this, FUNC(gotcha_state::gotcha_fgvideoram_w)).share("fgvideoram");
-	map(0x322000, 0x322fff).w(this, FUNC(gotcha_state::gotcha_bgvideoram_w)).share("bgvideoram");
+	map(0x30000e, 0x30000f).w(FUNC(gotcha_state::gotcha_gfxbank_w));
+	map(0x320000, 0x320fff).w(FUNC(gotcha_state::gotcha_fgvideoram_w)).share("fgvideoram");
+	map(0x322000, 0x322fff).w(FUNC(gotcha_state::gotcha_bgvideoram_w)).share("bgvideoram");
 }
 
 

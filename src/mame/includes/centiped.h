@@ -5,28 +5,36 @@
     Atari Centipede hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CENTIPED_H
+#define MAME_INCLUDES_CENTIPED_H
+
+#pragma once
 
 #include "machine/eepromser.h"
+#include "machine/er2055.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 class centiped_state : public driver_device
 {
 public:
-	centiped_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	centiped_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
 		m_bullsdrt_tiles_bankram(*this, "bullsdrt_bank"),
 		m_maincpu(*this, "maincpu"),
+		m_earom(*this, "earom"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_aysnd(*this, "aysnd") { }
+		m_aysnd(*this, "aysnd")
+	{ }
 
 	void centiped_base(machine_config &config);
 	void milliped(machine_config &config);
@@ -51,6 +59,7 @@ private:
 	optional_shared_ptr<uint8_t> m_bullsdrt_tiles_bankram;
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<er2055_device> m_earom;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -83,6 +92,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_center_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	DECLARE_WRITE_LINE_MEMBER(bullsdrt_coin_count_w);
+	DECLARE_READ8_MEMBER(earom_read);
+	DECLARE_WRITE8_MEMBER(earom_write);
+	DECLARE_WRITE8_MEMBER(earom_control_w);
 	DECLARE_READ8_MEMBER(caterplr_unknown_r);
 	DECLARE_WRITE8_MEMBER(caterplr_AY8910_w);
 	DECLARE_READ8_MEMBER(caterplr_AY8910_r);
@@ -134,3 +146,5 @@ private:
 	void multiped_map(address_map &map);
 	void warlords_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CENTIPED_H

@@ -30,6 +30,7 @@ Other outs:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -42,6 +43,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_video_ram(*this, "video_ram") { }
 
+	void headonb(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -56,7 +60,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void headonb(machine_config &config);
 	void headonb_io_map(address_map &map);
 	void headonb_map(address_map &map);
 };
@@ -101,7 +104,7 @@ WRITE8_MEMBER(headonb_state::video_ram_w)
 void headonb_state::headonb_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().mirror(0x4000);
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(headonb_state::video_ram_w)).share("video_ram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(headonb_state::video_ram_w)).share("video_ram");
 	map(0xff00, 0xffff).ram();
 }
 

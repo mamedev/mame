@@ -30,6 +30,7 @@ Todo:
 #include "machine/ldv1000.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -47,6 +48,12 @@ public:
 			m_beep(*this, "beeper"),
 			m_palette(*this, "palette")  { }
 
+
+	void esh(machine_config &config);
+
+	void init_esh();
+
+private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_tile_ram;
@@ -57,7 +64,6 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_write);
 	DECLARE_WRITE8_MEMBER(led_writes);
 	DECLARE_WRITE8_MEMBER(nmi_line_w);
-	void init_esh();
 	bool m_nmi_enable;
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(esh);
@@ -69,7 +75,6 @@ public:
 	required_device<beep_device> m_beep;
 	required_device<palette_device> m_palette;
 
-	void esh(machine_config &config);
 	void z80_0_io(address_map &map);
 	void z80_0_mem(address_map &map);
 protected:
@@ -227,10 +232,10 @@ void esh_state::z80_0_io(address_map &map)
 	map(0xf1, 0xf1).portr("IN1");
 	map(0xf2, 0xf2).portr("IN2");
 	map(0xf3, 0xf3).portr("IN3");
-	map(0xf4, 0xf4).rw(this, FUNC(esh_state::ldp_read), FUNC(esh_state::ldp_write));
-	map(0xf5, 0xf5).w(this, FUNC(esh_state::misc_write));    /* Continuously writes repeating patterns */
-	map(0xf8, 0xfd).w(this, FUNC(esh_state::led_writes));
-	map(0xfe, 0xfe).w(this, FUNC(esh_state::nmi_line_w));    /* Both 0xfe and 0xff flip quickly between 0 and 1 */
+	map(0xf4, 0xf4).rw(FUNC(esh_state::ldp_read), FUNC(esh_state::ldp_write));
+	map(0xf5, 0xf5).w(FUNC(esh_state::misc_write));    /* Continuously writes repeating patterns */
+	map(0xf8, 0xfd).w(FUNC(esh_state::led_writes));
+	map(0xfe, 0xfe).w(FUNC(esh_state::nmi_line_w));    /* Both 0xfe and 0xff flip quickly between 0 and 1 */
 	map(0xff, 0xff).noprw();                  /*   (they're probably not NMI enables - likely LED's like their neighbors :) */
 }                                 /*   (someday 0xf8-0xff will probably be a single handler) */
 

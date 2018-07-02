@@ -21,6 +21,7 @@ Debug cheats:
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "debugger.h"
@@ -50,6 +51,9 @@ public:
 	{
 	}
 
+	void ron(machine_config &config);
+
+private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(ron);
@@ -66,12 +70,11 @@ public:
 	DECLARE_READ_LINE_MEMBER(audio_T1_r);
 	DECLARE_WRITE8_MEMBER(ay_pa_w);
 
-	void ron(machine_config &config);
 	void ron_audio_io(address_map &map);
 	void ron_audio_map(address_map &map);
 	void ron_io(address_map &map);
 	void ron_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -91,7 +94,7 @@ protected:
 	required_ioport m_in1;
 	required_ioport m_in2;
 	required_ioport m_in3;
-private:
+
 	bool m_nmi_enable;
 	uint8_t m_mux_data;
 	uint8_t read_mux(bool which,bool side);
@@ -210,11 +213,11 @@ void ron_state::ron_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x01).r(this, FUNC(ron_state::p1_mux_r));
-	map(0x02, 0x03).r(this, FUNC(ron_state::p2_mux_r));
-	map(0x03, 0x03).w(this, FUNC(ron_state::mux_w));
-	map(0x07, 0x07).w(this, FUNC(ron_state::sound_cmd_w));
-	map(0x0a, 0x0a).w(this, FUNC(ron_state::output_w));
+	map(0x00, 0x01).r(FUNC(ron_state::p1_mux_r));
+	map(0x02, 0x03).r(FUNC(ron_state::p2_mux_r));
+	map(0x03, 0x03).w(FUNC(ron_state::mux_w));
+	map(0x07, 0x07).w(FUNC(ron_state::sound_cmd_w));
+	map(0x0a, 0x0a).w(FUNC(ron_state::output_w));
 }
 
 void ron_state::ron_audio_map(address_map &map)

@@ -131,6 +131,7 @@ Dumped by Chackn
 #include "machine/segacrp2_device.h"
 #include "sound/2203intf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -170,19 +171,19 @@ void angelkds_state::main_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(angelkds_state::angelkds_bgtopvideoram_w)).share("bgtopvideoram"); /* Top Half of Screen */
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(angelkds_state::angelkds_bgbotvideoram_w)).share("bgbotvideoram"); /* Bottom Half of Screen */
-	map(0xe800, 0xebff).ram().w(this, FUNC(angelkds_state::angelkds_txvideoram_w)).share("txvideoram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(angelkds_state::angelkds_bgtopvideoram_w)).share("bgtopvideoram"); /* Top Half of Screen */
+	map(0xe400, 0xe7ff).ram().w(FUNC(angelkds_state::angelkds_bgbotvideoram_w)).share("bgbotvideoram"); /* Bottom Half of Screen */
+	map(0xe800, 0xebff).ram().w(FUNC(angelkds_state::angelkds_txvideoram_w)).share("txvideoram");
 	map(0xec00, 0xecff).ram().share("spriteram");
 	map(0xed00, 0xedff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xee00, 0xeeff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xef00, 0xefff).ram();
-	map(0xf000, 0xf000).w(this, FUNC(angelkds_state::angelkds_bgtopbank_write));
-	map(0xf001, 0xf001).w(this, FUNC(angelkds_state::angelkds_bgtopscroll_write));
-	map(0xf002, 0xf002).w(this, FUNC(angelkds_state::angelkds_bgbotbank_write));
-	map(0xf003, 0xf003).w(this, FUNC(angelkds_state::angelkds_bgbotscroll_write));
-	map(0xf004, 0xf004).w(this, FUNC(angelkds_state::angelkds_txbank_write));
-	map(0xf005, 0xf005).w(this, FUNC(angelkds_state::angelkds_layer_ctrl_write));
+	map(0xf000, 0xf000).w(FUNC(angelkds_state::angelkds_bgtopbank_write));
+	map(0xf001, 0xf001).w(FUNC(angelkds_state::angelkds_bgtopscroll_write));
+	map(0xf002, 0xf002).w(FUNC(angelkds_state::angelkds_bgbotbank_write));
+	map(0xf003, 0xf003).w(FUNC(angelkds_state::angelkds_bgbotscroll_write));
+	map(0xf004, 0xf004).w(FUNC(angelkds_state::angelkds_txbank_write));
+	map(0xf005, 0xf005).w(FUNC(angelkds_state::angelkds_layer_ctrl_write));
 }
 
 void angelkds_state::decrypted_opcodes_map(address_map &map)
@@ -199,7 +200,7 @@ void angelkds_state::main_portmap(address_map &map)
 	map(0x40, 0x43).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x80, 0x83).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-	map(0xc0, 0xc3).rw(this, FUNC(angelkds_state::angelkds_main_sound_r), FUNC(angelkds_state::angelkds_main_sound_w)); // 02 various points
+	map(0xc0, 0xc3).rw(FUNC(angelkds_state::angelkds_main_sound_r), FUNC(angelkds_state::angelkds_main_sound_w)); // 02 various points
 }
 
 
@@ -222,7 +223,7 @@ void angelkds_state::sub_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x40, 0x41).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x80, 0x83).rw(this, FUNC(angelkds_state::angelkds_sub_sound_r), FUNC(angelkds_state::angelkds_sub_sound_w)); // spcpostn
+	map(0x80, 0x83).rw(FUNC(angelkds_state::angelkds_sub_sound_r), FUNC(angelkds_state::angelkds_sub_sound_w)); // spcpostn
 }
 
 

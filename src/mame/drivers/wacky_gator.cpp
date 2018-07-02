@@ -50,7 +50,7 @@ public:
 
 	void wackygtr(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -76,7 +76,6 @@ protected:
 
 	void program_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<pit8253_device> m_pit8253_0;
@@ -255,7 +254,7 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 	if (!(m_adpcm_ctrl & 0x80))
 	{
 		uint8_t data = m_samples->base()[m_adpcm_pos & 0xffff];
-		m_msm->data_w((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
+		m_msm->write_data((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
 		m_adpcm_pos += m_adpcm_sel;
 		m_adpcm_sel ^= 1;
 	}
@@ -263,13 +262,13 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 
 void wackygtr_state::program_map(address_map &map)
 {
-	map(0x0200, 0x0200).nopr().w(this, FUNC(wackygtr_state::irq_ack_w));
-	map(0x0400, 0x0400).nopr().w(this, FUNC(wackygtr_state::firq_ack_w));
-	map(0x0600, 0x0600).w(this, FUNC(wackygtr_state::disp_w<0>));
-	map(0x0800, 0x0800).w(this, FUNC(wackygtr_state::disp_w<1>));
-	map(0x0a00, 0x0a00).w(this, FUNC(wackygtr_state::disp_w<2>));
-	map(0x0c00, 0x0c00).w(this, FUNC(wackygtr_state::disp_w<3>));
-	map(0x0e00, 0x0e00).w(this, FUNC(wackygtr_state::sample_ctrl_w));
+	map(0x0200, 0x0200).nopr().w(FUNC(wackygtr_state::irq_ack_w));
+	map(0x0400, 0x0400).nopr().w(FUNC(wackygtr_state::firq_ack_w));
+	map(0x0600, 0x0600).w(FUNC(wackygtr_state::disp_w<0>));
+	map(0x0800, 0x0800).w(FUNC(wackygtr_state::disp_w<1>));
+	map(0x0a00, 0x0a00).w(FUNC(wackygtr_state::disp_w<2>));
+	map(0x0c00, 0x0c00).w(FUNC(wackygtr_state::disp_w<3>));
+	map(0x0e00, 0x0e00).w(FUNC(wackygtr_state::sample_ctrl_w));
 
 	map(0x1000, 0x1001).w("ymsnd", FUNC(ym2413_device::write));
 

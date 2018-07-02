@@ -53,6 +53,7 @@ Other things...
 #include "cpu/z80/z80.h"
 #include "video/tms9927.h"
 //#include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/ay31015.h"
@@ -72,7 +73,11 @@ public:
 		, m_crtc(*this, "crtc")
 	{ }
 
+	void micral(machine_config &config);
+
 	void init_micral();
+
+private:
 	DECLARE_MACHINE_RESET(micral);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
@@ -81,11 +86,10 @@ public:
 	DECLARE_WRITE8_MEMBER(video_w);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void micral(machine_config &config);
 	void io_kbd(address_map &map);
 	void mem_kbd(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u16 s_curpos;
 	u8 s_command;
 	u8 s_data;
@@ -154,10 +158,10 @@ void micral_state::mem_map(address_map &map)
 	map(0xf800, 0xfeff).rom();
 	map(0xff00, 0xffef).ram();
 	map(0xfff6, 0xfff7); // AM_WRITENOP // unknown ports
-	map(0xfff8, 0xfff9).rw(this, FUNC(micral_state::video_r), FUNC(micral_state::video_w));
-	map(0xfffa, 0xfffa).r(this, FUNC(micral_state::keyin_r));
-	map(0xfffb, 0xfffb).r(this, FUNC(micral_state::unk_r));
-	map(0xfffc, 0xfffc).r(this, FUNC(micral_state::status_r));
+	map(0xfff8, 0xfff9).rw(FUNC(micral_state::video_r), FUNC(micral_state::video_w));
+	map(0xfffa, 0xfffa).r(FUNC(micral_state::keyin_r));
+	map(0xfffb, 0xfffb).r(FUNC(micral_state::unk_r));
+	map(0xfffc, 0xfffc).r(FUNC(micral_state::status_r));
 	map(0xfffd, 0xffff); // more unknown ports
 }
 

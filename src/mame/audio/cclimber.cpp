@@ -16,7 +16,7 @@ SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
 	if (m_samples_region)
 	{
 		m_sample_buf = std::make_unique<int16_t[]>(2 * m_samples_region.bytes());
-		save_pointer(NAME(m_sample_buf.get()), 2 * m_samples_region.bytes());
+		save_pointer(NAME(m_sample_buf), 2 * m_samples_region.bytes());
 	}
 }
 
@@ -85,7 +85,7 @@ WRITE8_MEMBER(cclimber_audio_device::sample_volume_w)
 	m_sample_volume = data & 0x1f;    /* range 0-31 */
 }
 
-WRITE_LINE_MEMBER(cclimber_audio_device::sample_trigger_w)
+WRITE_LINE_MEMBER(cclimber_audio_device::sample_trigger)
 {
 	if (state == 0)
 		return;
@@ -95,7 +95,7 @@ WRITE_LINE_MEMBER(cclimber_audio_device::sample_trigger_w)
 
 WRITE8_MEMBER(cclimber_audio_device::sample_trigger_w)
 {
-	sample_trigger_w(data != 0);
+	sample_trigger(data != 0);
 }
 
 

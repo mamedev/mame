@@ -7,6 +7,7 @@
 #pragma once
 
 #include "sound/flt_rc.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tp84_state : public driver_device
@@ -30,6 +31,10 @@ public:
 		m_palette(*this, "palette"),
 		m_filter(*this, "filter%u", 1U) { }
 
+	void tp84(machine_config &config);
+	void tp84b(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
@@ -72,8 +77,7 @@ public:
 	uint32_t screen_update_tp84(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tp84(machine_config &config);
-	void tp84b(machine_config &config);
+
 	void audio_map(address_map &map);
 	void cpu2_map(address_map &map);
 	void tp84_cpu1_map(address_map &map);

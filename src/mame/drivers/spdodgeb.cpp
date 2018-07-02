@@ -68,7 +68,7 @@ void spdodgeb_state::spd_adpcm_int( msm5205_device *device, int chip )
 	}
 	else if (m_adpcm_data[chip] != -1)
 	{
-		device->data_w(m_adpcm_data[chip] & 0x0f);
+		device->write_data(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 	}
 	else
@@ -76,7 +76,7 @@ void spdodgeb_state::spd_adpcm_int( msm5205_device *device, int chip )
 		uint8_t *ROM = memregion("adpcm")->base() + 0x10000 * chip;
 
 		m_adpcm_data[chip] = ROM[m_adpcm_pos[chip]++];
-		device->data_w(m_adpcm_data[chip] >> 4);
+		device->write_data(m_adpcm_data[chip] >> 4);
 	}
 }
 
@@ -240,16 +240,16 @@ void spdodgeb_state::spdodgeb_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x10ff).writeonly().share("spriteram");
-	map(0x2000, 0x2fff).ram().w(this, FUNC(spdodgeb_state::videoram_w)).share("videoram");
+	map(0x2000, 0x2fff).ram().w(FUNC(spdodgeb_state::videoram_w)).share("videoram");
 	map(0x3000, 0x3000).portr("IN0"); //AM_WRITENOP
 	map(0x3001, 0x3001).portr("DSW"); //AM_WRITENOP
 	map(0x3002, 0x3002).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 //  AM_RANGE(0x3003, 0x3003) AM_WRITENOP
-	map(0x3004, 0x3004).w(this, FUNC(spdodgeb_state::scrollx_lo_w));
+	map(0x3004, 0x3004).w(FUNC(spdodgeb_state::scrollx_lo_w));
 //  AM_RANGE(0x3005, 0x3005) AM_WRITENOP         /* mcu63701_output_w */
-	map(0x3006, 0x3006).w(this, FUNC(spdodgeb_state::ctrl_w));  /* scroll hi, flip screen, bank switch, palette select */
-	map(0x3800, 0x3800).w(this, FUNC(spdodgeb_state::mcu63701_w));
-	map(0x3801, 0x3805).r(this, FUNC(spdodgeb_state::mcu63701_r));
+	map(0x3006, 0x3006).w(FUNC(spdodgeb_state::ctrl_w));  /* scroll hi, flip screen, bank switch, palette select */
+	map(0x3800, 0x3800).w(FUNC(spdodgeb_state::mcu63701_w));
+	map(0x3801, 0x3805).r(FUNC(spdodgeb_state::mcu63701_r));
 	map(0x4000, 0x7fff).bankr("mainbank");
 	map(0x8000, 0xffff).rom();
 }
@@ -259,7 +259,7 @@ void spdodgeb_state::spdodgeb_sound_map(address_map &map)
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x2800, 0x2801).w("ymsnd", FUNC(ym3812_device::write));
-	map(0x3800, 0x3807).w(this, FUNC(spdodgeb_state::spd_adpcm_w));
+	map(0x3800, 0x3807).w(FUNC(spdodgeb_state::spd_adpcm_w));
 	map(0x8000, 0xffff).rom().region("audiocpu", 0);
 }
 

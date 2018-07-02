@@ -42,6 +42,7 @@ to prevent disabling inputs.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,6 +59,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void koikoi(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -82,7 +86,6 @@ public:
 	uint32_t screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void koikoi(machine_config &config);
 	void koikoi_io_map(address_map &map);
 	void koikoi_map(address_map &map);
 };
@@ -236,9 +239,9 @@ void koikoi_state::koikoi_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x6000, 0x67ff).ram();
-	map(0x7000, 0x77ff).ram().w(this, FUNC(koikoi_state::vram_w)).share("videoram");
+	map(0x7000, 0x77ff).ram().w(FUNC(koikoi_state::vram_w)).share("videoram");
 	map(0x8000, 0x8000).portr("DSW");
-	map(0x9000, 0x9007).rw(this, FUNC(koikoi_state::io_r), FUNC(koikoi_state::io_w));
+	map(0x9000, 0x9007).rw(FUNC(koikoi_state::io_r), FUNC(koikoi_state::io_w));
 }
 
 void koikoi_state::koikoi_io_map(address_map &map)

@@ -27,7 +27,7 @@
     512Kbyte/1Mega main RAM
 
  Games dumped
-  1998 - Hidden Catch (pcb ver 3.03)
+  1998 - Hidden Catch (pcb ver 3.03 and 3.02)
   1998 - Iron Fortress
   1998 - Puzzle King (Dance & Puzzle)
   1998 - Raccoon World
@@ -43,7 +43,6 @@
   2001 - Fortress 2 Blue Arcade (v. 1.00 / pcb ver 3.05)
 
  Known games not dumped
- - Hidden Catch (pcb ver 3.02)
  - Fortress 2 Blue Arcade (v. 1.02)
  - Ribbon (Step1. Mild Mind) (c) 1999 - Alt title Penfan girls is dumped
 
@@ -226,9 +225,9 @@ void eolith_state::eolith_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram(); // fort2b wants ram here
 	map(0x40000000, 0x401fffff).ram();
-	map(0x90000000, 0x9003ffff).rw(this, FUNC(eolith_state::eolith_vram_r), FUNC(eolith_state::eolith_vram_w));
-	map(0xfc000000, 0xfc000003).r(this, FUNC(eolith_state::eolith_custom_r));
-	map(0xfc400000, 0xfc400003).w(this, FUNC(eolith_state::systemcontrol_w));
+	map(0x90000000, 0x9003ffff).rw(FUNC(eolith_state::eolith_vram_r), FUNC(eolith_state::eolith_vram_w));
+	map(0xfc000000, 0xfc000003).r(FUNC(eolith_state::eolith_custom_r));
+	map(0xfc400000, 0xfc400003).w(FUNC(eolith_state::systemcontrol_w));
 	map(0xfc800000, 0xfc800003).w("soundlatch", FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
 	map(0xfca00000, 0xfca00003).portr("DSW1");
 	map(0xfcc00000, 0xfcc0005b).nopw(); // crt registers ?
@@ -241,8 +240,8 @@ void eolith_state::hidctch3_map(address_map &map)
 	eolith_map(map);
 	map(0xfc200000, 0xfc200003).nopw(); // this generates pens vibration
 	// It is not clear why the first reads are needed too
-	map(0xfce00000, 0xfce00003).mirror(0x00080000).r(this, FUNC(eolith_state::hidctch3_pen_r<0>));
-	map(0xfcf00000, 0xfcf00003).mirror(0x00080000).r(this, FUNC(eolith_state::hidctch3_pen_r<1>));
+	map(0xfce00000, 0xfce00003).mirror(0x00080000).r(FUNC(eolith_state::hidctch3_pen_r<0>));
+	map(0xfcf00000, 0xfcf00003).mirror(0x00080000).r(FUNC(eolith_state::hidctch3_pen_r<1>));
 }
 
 
@@ -552,7 +551,7 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
-	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_8BIT)
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(250))
 	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(250))
 
@@ -750,6 +749,33 @@ ROM_END
 ROM_START( hidnctch )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "hc_u43.bin", 0x00000, 0x80000, CRC(635b4478) SHA1(31ea4a9725e0c329447c7d221c22494c905f6940) )
+
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_LOAD32_WORD_SWAP( "hc0_u39.bin", 0x0000000, 0x400000, CRC(eefb6add) SHA1(a0f6f2cf86699a666be0647274d8c9381782640d) )
+	ROM_LOAD32_WORD_SWAP( "hc1_u34.bin", 0x0000002, 0x400000, CRC(482f3e52) SHA1(7a527c6af4c80e10cc25219a04ccf7c7ea1b23af) )
+	ROM_LOAD32_WORD_SWAP( "hc2_u40.bin", 0x0800000, 0x400000, CRC(914a1544) SHA1(683cb007ace50d1ba88253da6ad71dc3a395299d) )
+	ROM_LOAD32_WORD_SWAP( "hc3_u35.bin", 0x0800002, 0x400000, CRC(80c59133) SHA1(66ca4c2c014c4a1c87c46a3971732f0a2be95408) )
+	ROM_LOAD32_WORD_SWAP( "hc4_u41.bin", 0x1000000, 0x400000, CRC(9a9e2203) SHA1(a90f5842b63696753e6c16114b1893bbeb91e45c) )
+	ROM_LOAD32_WORD_SWAP( "hc5_u36.bin", 0x1000002, 0x400000, CRC(74b1719d) SHA1(fe2325259117598ad7c23217426ac9c28440e3a0) )
+	// 0x1800000 - 0x1ffffff empty
+
+	ROM_REGION( 0x008000, "soundcpu", 0 )  /* Sound (80c301) CPU Code */
+	ROM_LOAD( "hc_u111.bin", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )
+
+	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
+	ROM_LOAD( "hc_u108.bin", 0x00000, 0x80000, CRC(2bae46cb) SHA1(7c43f1002dfc20b9c1bb1647f7261dfa7ed2b4f9) )
+
+	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
+	ROM_LOAD( "hc_u107.bin", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
+
+	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
+	ROM_LOAD( "hc_u97.bin",  0x00000, 0x80000, CRC(ebf9f77b) SHA1(5d472aeb84fc011e19b9e61d34aeddfe7d6ac216) )
+	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+ROM_END
+
+ROM_START( hidnctcha )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "3.02.u43", 0x00000, 0x80000, CRC(9bb260a8) SHA1(d58982ca0cf4cbb064e10c144ac6098d6567b880) )
 
 	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "hc0_u39.bin", 0x0000000, 0x400000, CRC(eefb6add) SHA1(a0f6f2cf86699a666be0647274d8c9381782640d) )
@@ -1628,11 +1654,12 @@ static const struct
 
 } eolith_speedup_table[] =
 {
-	/* eolith.c */
+	/* eolith.cpp */
 	{ "linkypip", 0x4000825c, -1,/*0x4000ABAE,*/ 240 }, // 2nd address is used on the planet cutscene between but idle skipping between levels, but seems too aggressive
 	{ "ironfort", 0x40020854, -1, 240 },
 	{ "ironfortc",0x40020234, -1, 240 },
 	{ "hidnctch", 0x4000bba0, -1, 240 },
+	{ "hidnctcha",0x4000bba0, -1, 240 },
 	{ "raccoon",  0x40008204, -1, 240 },
 	{ "puzzlekg", 0x40029458, -1, 240 },
 	{ "hidctch2", 0x40009524, -1, 240 },
@@ -1648,9 +1675,9 @@ static const struct
 	{ "penfana",  0x4001FAb6, -1, 240 },
 	{ "candy",    0x4001990C, -1, 240 },
 	{ "hidnc2k",  0x40016824, -1, 240 },
-	/* eolith16.c */
+	/* eolith16.cpp */
 	{ "klondkp",  0x0001a046, -1, 240 },
-	/* vegaeo.c */
+	/* vegaeo.cpp */
 	{ "crazywar", 0x00008cf8, -1, 240 },
 	{ nullptr, 0, 0 }
 };
@@ -1730,6 +1757,7 @@ GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith_state, init_eolith,
 GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith_state, init_eolith,   ROT0, "Eolith", "Iron Fortress", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, ironfortc, ironfort, ironfort, ironfortc, eolith_state, init_eolith,   ROT0, "Eolith (Excellent Competence Ltd. license)", "Gongtit Jiucoi Iron Fortress (Hong Kong)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Licensed/Distributed to Hong Kong company Excellent Competence Ltd.
 GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
+GAME( 1998, hidnctcha, hidnctch, eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
 GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith_state, init_eolith,   ROT0, "Eolith", "Raccoon World", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith_state, init_eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, candy,     0,        eolith50, candy,     eolith_state, init_eolith,   ROT0, "Eolith", "Candy Candy",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

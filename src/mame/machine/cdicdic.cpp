@@ -27,11 +27,12 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "cdrom.h"
+#include "romload.h"
 #include "sound/cdda.h"
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(MACHINE_CDICDIC, cdicdic_device, "cdicdic", "CDICDIC")
+DEFINE_DEVICE_TYPE(CDI_CDIC, cdicdic_device, "cdicdic", "CDICDIC")
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
@@ -1157,7 +1158,7 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 //-------------------------------------------------
 
 cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MACHINE_CDICDIC, tag, owner, clock)
+	: device_t(mconfig, CDI_CDIC, tag, owner, clock)
 	, m_maincpu(*this, ":maincpu")
 	, m_dmadac(*this, ":dac%u", 1U)
 	, m_scc(*this, ":scc68070")

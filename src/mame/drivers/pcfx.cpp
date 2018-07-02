@@ -20,16 +20,18 @@
 class pcfx_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_PAD_FUNC
-	};
-
 	pcfx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_huc6261(*this, "huc6261") { }
 
+	void pcfx(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_PAD_FUNC
+	};
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( irq_read );
@@ -49,15 +51,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq15_w );
 	TIMER_CALLBACK_MEMBER(pad_func);
 
-	void pcfx(machine_config &config);
 	void pcfx_io(address_map &map);
 	void pcfx_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void machine_reset() override;
 
-private:
 	// Interrupt controller (component unknown)
 	uint16_t m_irq_mask;
 	uint16_t m_irq_pending;
@@ -188,7 +188,7 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 
 void pcfx_state::pcfx_io(address_map &map)
 {
-	map(0x00000000, 0x000000FF).rw(this, FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
+	map(0x00000000, 0x000000FF).rw(FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
 	map(0x00000100, 0x000001FF).noprw();   /* HuC6230 */
 	map(0x00000200, 0x000002FF).m("huc6271", FUNC(huc6271_device::regs)).umask32(0x0000ffff);   /* HuC6271 */
 	map(0x00000300, 0x000003FF).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
@@ -196,7 +196,7 @@ void pcfx_state::pcfx_io(address_map &map)
 	map(0x00000500, 0x000005FF).rw("huc6270_b", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-B */
 	map(0x00000600, 0x000006FF).rw("huc6272", FUNC(huc6272_device::read), FUNC(huc6272_device::write));    /* HuC6272 */
 	map(0x00000C80, 0x00000C83).noprw();
-	map(0x00000E00, 0x00000EFF).rw(this, FUNC(pcfx_state::irq_read), FUNC(pcfx_state::irq_write)).umask32(0x0000ffff);    /* Interrupt controller */
+	map(0x00000E00, 0x00000EFF).rw(FUNC(pcfx_state::irq_read), FUNC(pcfx_state::irq_write)).umask32(0x0000ffff);    /* Interrupt controller */
 	map(0x00000F00, 0x00000FFF).noprw();
 //  AM_RANGE( 0x00600000, 0x006FFFFF ) AM_READ(scsi_ctrl_r)
 	map(0x00780000, 0x007FFFFF).rom().region("scsi_rom", 0);
@@ -450,9 +450,9 @@ MACHINE_CONFIG_END
 ROM_START( pcfx )
 	ROM_REGION( 0x100000, "ipl", 0 )
 	ROM_SYSTEM_BIOS( 0, "v100", "BIOS v1.00 - 2 Sep 1994" )
-	ROMX_LOAD( "pcfxbios.bin", 0x000000, 0x100000, CRC(76ffb97a) SHA1(1a77fd83e337f906aecab27a1604db064cf10074), ROM_BIOS(1) )
+	ROMX_LOAD( "pcfxbios.bin", 0x000000, 0x100000, CRC(76ffb97a) SHA1(1a77fd83e337f906aecab27a1604db064cf10074), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v101", "BIOS v1.01 - 5 Dec 1994" )
-	ROMX_LOAD( "pcfxv101.bin", 0x000000, 0x100000, CRC(236102c9) SHA1(8b662f7548078be52a871565e19511ccca28c5c8), ROM_BIOS(2) )
+	ROMX_LOAD( "pcfxv101.bin", 0x000000, 0x100000, CRC(236102c9) SHA1(8b662f7548078be52a871565e19511ccca28c5c8), ROM_BIOS(1) )
 
 	ROM_REGION( 0x80000, "scsi_rom", 0 )
 	ROM_LOAD( "fx-scsi.rom", 0x00000, 0x80000, CRC(f3e60e5e) SHA1(65482a23ac5c10a6095aee1db5824cca54ead6e5) )

@@ -63,7 +63,7 @@ const tiny_rom_entry *iskr_1030_keyboard_device::device_rom_region() const
 
 void iskr_1030_keyboard_device::iskr_1030_keyboard_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(iskr_1030_keyboard_device::ram_r), FUNC(iskr_1030_keyboard_device::ram_w));
+	map(0x00, 0xff).rw(FUNC(iskr_1030_keyboard_device::ram_r), FUNC(iskr_1030_keyboard_device::ram_w));
 }
 
 

@@ -366,28 +366,28 @@ void vcombat_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram();
-	map(0x300000, 0x30ffff).w(this, FUNC(vcombat_state::main_video_write));
+	map(0x300000, 0x30ffff).w(FUNC(vcombat_state::main_video_write));
 
 	map(0x400000, 0x43ffff).ram().share("vid_0_ram");   /* First i860 shared RAM */
 	map(0x440000, 0x440003).ram().share("share6");      /* M0->P0 i860 #1 com 1 */
 	map(0x480000, 0x480003).ram().share("share7");      /* M0<-P0 i860 #1 com 2 */
-	map(0x4c0000, 0x4c0003).w(this, FUNC(vcombat_state::wiggle_i860p0_pins_w)); /* i860 #1 stop/start/reset */
+	map(0x4c0000, 0x4c0003).w(FUNC(vcombat_state::wiggle_i860p0_pins_w)); /* i860 #1 stop/start/reset */
 
 	map(0x500000, 0x53ffff).ram().share("vid_1_ram");   /* Second i860 shared RAM */
 	map(0x540000, 0x540003).ram().share("share8");      /* M0->P1 i860 #2 com 1 */
 	map(0x580000, 0x580003).ram().share("share9");      /* M0<-P1 i860 #2 com 2 */
-	map(0x5c0000, 0x5c0003).w(this, FUNC(vcombat_state::wiggle_i860p1_pins_w)); /* i860 #2 stop/start/reset */
+	map(0x5c0000, 0x5c0003).w(FUNC(vcombat_state::wiggle_i860p1_pins_w)); /* i860 #2 stop/start/reset */
 
-	map(0x600000, 0x600001).r(this, FUNC(vcombat_state::control_1_r));   /* IN0 port */
+	map(0x600000, 0x600001).r(FUNC(vcombat_state::control_1_r));   /* IN0 port */
 	map(0x600004, 0x600005).ram().share("share5");      /* M0<-M1 */
-	map(0x600008, 0x600009).r(this, FUNC(vcombat_state::control_2_r));   /* IN1 port */
+	map(0x600008, 0x600009).r(FUNC(vcombat_state::control_2_r));   /* IN1 port */
 	map(0x60001c, 0x60001d).noprw();
 
-	map(0x60000c, 0x60000d).w(this, FUNC(vcombat_state::crtc_w));
+	map(0x60000c, 0x60000d).w(FUNC(vcombat_state::crtc_w));
 	map(0x600010, 0x600011).ram().share("fb_control");
 	map(0x700000, 0x7007ff).ram().share("nvram");
-	map(0x701000, 0x701001).r(this, FUNC(vcombat_state::main_irqiack_r));
-	map(0x702000, 0x702001).r(this, FUNC(vcombat_state::control_3_r));
+	map(0x701000, 0x701001).r(FUNC(vcombat_state::main_irqiack_r));
+	map(0x702000, 0x702001).r(FUNC(vcombat_state::control_3_r));
 	map(0x705000, 0x705001).ram().share("share4");      /* M1->M0 */
 
 	//AM_RANGE(0x703000, 0x703001)      /* Headset rotation axis? */
@@ -400,7 +400,7 @@ void vcombat_state::main_map(address_map &map)
 /* The first i860 - middle board */
 void vcombat_state::vid_0_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).ram().w(this, FUNC(vcombat_state::v0_fb_w));      /* Shared framebuffer - half of the bits lost to 32-bit bus */
+	map(0x00000000, 0x0001ffff).ram().w(FUNC(vcombat_state::v0_fb_w));      /* Shared framebuffer - half of the bits lost to 32-bit bus */
 	map(0x20000000, 0x20000007).ram().share("share6");      /* M0<-P0 com 1 (0x440000 in 68k-land) */
 	map(0x40000000, 0x401fffff).rom().region("gfx", 0);
 	map(0x80000000, 0x80000007).ram().share("share7");      /* M0->P0 com 2 (0x480000 in 68k-land) */
@@ -412,7 +412,7 @@ void vcombat_state::vid_0_map(address_map &map)
 /* The second i860 - top board */
 void vcombat_state::vid_1_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).ram().w(this, FUNC(vcombat_state::v1_fb_w));      /* Half of the bits lost to 32-bit bus */
+	map(0x00000000, 0x0001ffff).ram().w(FUNC(vcombat_state::v1_fb_w));      /* Half of the bits lost to 32-bit bus */
 	map(0x20000000, 0x20000007).ram().share("share8");      /* M0->P1 com 1 (0x540000 in 68k-land) */
 	map(0x40000000, 0x401fffff).rom().region("gfx", 0);
 	map(0x80000000, 0x80000007).ram().share("share9");          /* M0<-P1 com 2      (0x580000 in 68k-land) */
@@ -426,8 +426,8 @@ void vcombat_state::sound_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x08ffff).ram();
-	map(0x0c0000, 0x0c0001).w(this, FUNC(vcombat_state::vcombat_dac_w));
-	map(0x140000, 0x140001).r(this, FUNC(vcombat_state::sound_resetmain_r));   /* Ping M0's reset line */
+	map(0x0c0000, 0x0c0001).w(FUNC(vcombat_state::vcombat_dac_w));
+	map(0x140000, 0x140001).r(FUNC(vcombat_state::sound_resetmain_r));   /* Ping M0's reset line */
 	map(0x180000, 0x180001).ram().share("share4");   /* M1<-M0 */
 	map(0x1c0000, 0x1c0001).ram().share("share5");   /* M1->M0 */
 	map(0x200000, 0x37ffff).rom().region("samples", 0);

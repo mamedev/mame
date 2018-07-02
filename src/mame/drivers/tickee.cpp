@@ -36,13 +36,6 @@
 class tickee_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_TRIGGER_GUN_INTERRUPT,
-		TIMER_CLEAR_GUN_INTERRUPT,
-		TIMER_SETUP_GUN_INTERRUPTS
-	};
-
 	tickee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -52,6 +45,19 @@ public:
 		m_ticket(*this, "ticket%u", 1),
 		m_vram(*this, "vram"),
 		m_control(*this, "control") { }
+
+	void rapidfir(machine_config &config);
+	void ghoshunt(machine_config &config);
+	void tickee(machine_config &config);
+	void mouseatk(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_TRIGGER_GUN_INTERRUPT,
+		TIMER_CLEAR_GUN_INTERRUPT,
+		TIMER_SETUP_GUN_INTERRUPTS
+	};
 
 	required_device<tms34010_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
@@ -91,15 +97,11 @@ public:
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(rapidfir_scanline_update);
 
-	void rapidfir(machine_config &config);
-	void ghoshunt(machine_config &config);
-	void tickee(machine_config &config);
-	void mouseatk(machine_config &config);
 	void ghoshunt_map(address_map &map);
 	void mouseatk_map(address_map &map);
 	void rapidfir_map(address_map &map);
 	void tickee_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -450,7 +452,7 @@ void tickee_state::tickee_map(address_map &map)
 	map(0x04200000, 0x0420001f).w("ym1", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04200100, 0x0420010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04200100, 0x0420011f).w("ym2", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
-	map(0x04400000, 0x0440007f).w(this, FUNC(tickee_state::tickee_control_w)).share("control");
+	map(0x04400000, 0x0440007f).w(FUNC(tickee_state::tickee_control_w)).share("control");
 	map(0x04400040, 0x0440004f).portr("IN2");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
@@ -469,7 +471,7 @@ void tickee_state::ghoshunt_map(address_map &map)
 	map(0x04300000, 0x0430001f).w("ym1", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04300100, 0x0430010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04300100, 0x0430011f).w("ym2", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
-	map(0x04500000, 0x0450007f).w(this, FUNC(tickee_state::tickee_control_w)).share("control");
+	map(0x04500000, 0x0450007f).w(FUNC(tickee_state::tickee_control_w)).share("control");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
 	map(0xff000000, 0xffffffff).rom().region("user1", 0);
@@ -485,7 +487,7 @@ void tickee_state::mouseatk_map(address_map &map)
 	map(0x04200000, 0x0420000f).r("ym", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04200000, 0x0420000f).w("ym", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04200100, 0x0420010f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x04400000, 0x0440007f).w(this, FUNC(tickee_state::tickee_control_w)).share("control");
+	map(0x04400000, 0x0440007f).w(FUNC(tickee_state::tickee_control_w)).share("control");
 	map(0x04400040, 0x0440004f).portr("IN2"); // ?
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
@@ -497,14 +499,14 @@ void tickee_state::mouseatk_map(address_map &map)
 void tickee_state::rapidfir_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).ram().share("vram");
-	map(0x02000000, 0x027fffff).rw(this, FUNC(tickee_state::rapidfir_transparent_r), FUNC(tickee_state::rapidfir_transparent_w));
+	map(0x02000000, 0x027fffff).rw(FUNC(tickee_state::rapidfir_transparent_r), FUNC(tickee_state::rapidfir_transparent_w));
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
-	map(0xfc000000, 0xfc00000f).r(this, FUNC(tickee_state::rapidfir_gun1_r));
-	map(0xfc000100, 0xfc00010f).r(this, FUNC(tickee_state::rapidfir_gun2_r));
-	map(0xfc000400, 0xfc00040f).r(this, FUNC(tickee_state::ffff_r));
+	map(0xfc000000, 0xfc00000f).r(FUNC(tickee_state::rapidfir_gun1_r));
+	map(0xfc000100, 0xfc00010f).r(FUNC(tickee_state::rapidfir_gun2_r));
+	map(0xfc000400, 0xfc00040f).r(FUNC(tickee_state::ffff_r));
 	map(0xfc000500, 0xfc00050f).noprw();
-	map(0xfc000600, 0xfc00060f).w(this, FUNC(tickee_state::rapidfir_control_w));
-	map(0xfc000700, 0xfc00070f).w(this, FUNC(tickee_state::sound_bank_w));
+	map(0xfc000600, 0xfc00060f).w(FUNC(tickee_state::rapidfir_control_w));
+	map(0xfc000700, 0xfc00070f).w(FUNC(tickee_state::sound_bank_w));
 	map(0xfc000800, 0xfc00080f).portr("IN0");
 	map(0xfc000900, 0xfc00090f).portr("IN1");
 	map(0xfc000a00, 0xfc000a0f).portr("IN2");
@@ -514,7 +516,7 @@ void tickee_state::rapidfir_map(address_map &map)
 	map(0xfc100000, 0xfc1000ff).mirror(0x80000).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 	map(0xfc200000, 0xfc207fff).ram().share("nvram");
 	map(0xfc300000, 0xfc30000f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0xfc400010, 0xfc40001f).rw(this, FUNC(tickee_state::ff7f_r), FUNC(tickee_state::ff7f_w));
+	map(0xfc400010, 0xfc40001f).rw(FUNC(tickee_state::ff7f_r), FUNC(tickee_state::ff7f_w));
 	map(0xfe000000, 0xffffffff).rom().region("user1", 0);
 }
 

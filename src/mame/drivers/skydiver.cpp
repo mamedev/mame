@@ -175,9 +175,9 @@ INTERRUPT_GEN_MEMBER(skydiver_state::interrupt)
 void skydiver_state::skydiver_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x007f).mirror(0x4300).rw(this, FUNC(skydiver_state::wram_r), FUNC(skydiver_state::wram_w));
+	map(0x0000, 0x007f).mirror(0x4300).rw(FUNC(skydiver_state::wram_r), FUNC(skydiver_state::wram_w));
 	map(0x0080, 0x00ff).mirror(0x4000).ram();       /* RAM B1 */
-	map(0x0400, 0x07ff).mirror(0x4000).ram().w(this, FUNC(skydiver_state::videoram_w)).share("videoram");       /* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */
+	map(0x0400, 0x07ff).mirror(0x4000).ram().w(FUNC(skydiver_state::videoram_w)).share("videoram");       /* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */
 	map(0x0800, 0x080f).mirror(0x47f0).w("latch1", FUNC(f9334_device::write_a0));
 	map(0x1000, 0x100f).mirror(0x47f0).w("latch2", FUNC(f9334_device::write_a0));
 	map(0x1800, 0x1800).mirror(0x47e0).portr("IN0");
@@ -194,7 +194,7 @@ void skydiver_state::skydiver_map(address_map &map)
 	map(0x180b, 0x180b).mirror(0x47e4).portr("IN11");
 	map(0x1810, 0x1810).mirror(0x47e4).portr("IN12");
 	map(0x1811, 0x1811).mirror(0x47e4).portr("IN13");
-	map(0x2000, 0x201f).mirror(0x47e0).r(m_watchdog, FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(skydiver_state::latch3_watchdog_w));
+	map(0x2000, 0x201f).mirror(0x47e0).r(m_watchdog, FUNC(watchdog_timer_device::reset_r)).w(FUNC(skydiver_state::latch3_watchdog_w));
 	map(0x2800, 0x2fff).mirror(0x4000).rom();
 	map(0x3000, 0x37ff).mirror(0x4000).rom();
 	map(0x3800, 0x3fff).rom();

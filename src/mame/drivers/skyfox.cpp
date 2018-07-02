@@ -59,7 +59,7 @@ void skyfox_state::skyfox_map(address_map &map)
 	map(0xe000, 0xe000).portr("INPUTS");
 	map(0xe001, 0xe001).portr("DSW0");
 	map(0xe002, 0xe002).portr("DSW1");
-	map(0xe008, 0xe00f).w(this, FUNC(skyfox_state::skyfox_vregs_w));
+	map(0xe008, 0xe00f).w(FUNC(skyfox_state::skyfox_vregs_w));
 	map(0xf001, 0xf001).portr("DSW2");
 }
 

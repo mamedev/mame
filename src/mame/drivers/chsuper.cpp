@@ -26,6 +26,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -214,7 +215,7 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 void chsuper_state::chsuper_prg_map(address_map &map)
 {
 	map(0x00000, 0x0efff).rom();
-	map(0x00000, 0x01fff).w(this, FUNC(chsuper_state::chsuper_vram_w));
+	map(0x00000, 0x01fff).w(FUNC(chsuper_state::chsuper_vram_w));
 	map(0x0f000, 0x0ffff).ram().region("maincpu", 0xf000);
 	map(0xfb000, 0xfbfff).ram().share("nvram");
 }
@@ -228,13 +229,13 @@ void chsuper_state::chsuper_portmap(address_map &map)
 	map(0x00e9, 0x00e9).portr("IN1");
 	map(0x00ea, 0x00ea).portr("DSW");
 	map(0x00ed, 0x00ed).nopw(); // mirror of EFh, but with bit0 active...
-	map(0x00ee, 0x00ee).w(this, FUNC(chsuper_state::chsuper_outporta_w));
-	map(0x00ef, 0x00ef).w(this, FUNC(chsuper_state::chsuper_outportb_w));
+	map(0x00ee, 0x00ee).w(FUNC(chsuper_state::chsuper_outporta_w));
+	map(0x00ef, 0x00ef).w(FUNC(chsuper_state::chsuper_outportb_w));
 	map(0x00fc, 0x00fc).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x00fd, 0x00fd).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x00fe, 0x00fe).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x8300, 0x8300).portr("IN2");  // valid input port present in test mode.
-	map(0xff20, 0xff3f).w("dac", FUNC(dac_byte_interface::write)); // unk writes
+	map(0xff20, 0xff3f).w("dac", FUNC(dac_byte_interface::data_w)); // unk writes
 }
 
 /* About Sound...

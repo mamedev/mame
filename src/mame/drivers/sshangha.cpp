@@ -180,31 +180,31 @@ void sshangha_state::sshangha_map(address_map &map)
 	map(0x206000, 0x2067ff).ram().share("pf2_rowscroll");
 	map(0x206800, 0x207fff).ram();
 	map(0x300000, 0x30000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x320001).w(this, FUNC(sshangha_state::sshangha_video_w));
+	map(0x320000, 0x320001).w(FUNC(sshangha_state::sshangha_video_w));
 	map(0x320002, 0x320005).nopw();
 	map(0x320006, 0x320007).nopr(); //irq ack
 
 	map(0x340000, 0x340fff).ram().share("spriteram2");
-	map(0x350000, 0x350001).r(this, FUNC(sshangha_state::deco_71_r));
+	map(0x350000, 0x350001).r(FUNC(sshangha_state::deco_71_r));
 	map(0x350000, 0x350007).nopw();
 	map(0x360000, 0x360fff).ram().share("spriteram");
-	map(0x370000, 0x370001).r(this, FUNC(sshangha_state::deco_71_r));
+	map(0x370000, 0x370001).r(FUNC(sshangha_state::deco_71_r));
 	map(0x370000, 0x370007).nopw();
 
-	map(0x380000, 0x3803ff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites_w)).share("sprite_palram");
-	map(0x380400, 0x3807ff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)).share("tile_palram2");
-	map(0x380800, 0x380bff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)).share("sprite_palram2");
-	map(0x380c00, 0x380fff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)).share("tile_palram1");
+	map(0x380000, 0x3803ff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites_w)).share("sprite_palram");
+	map(0x380400, 0x3807ff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)).share("tile_palram2");
+	map(0x380800, 0x380bff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)).share("sprite_palram2");
+	map(0x380c00, 0x380fff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)).share("tile_palram1");
 	map(0x381000, 0x383fff).ram(); // unused palette area
-	map(0x3e0000, 0x3e3fff).rw(this, FUNC(sshangha_state::sshangha_protection_region_8_146_r), FUNC(sshangha_state::sshangha_protection_region_8_146_w));
+	map(0x3e0000, 0x3e3fff).rw(FUNC(sshangha_state::sshangha_protection_region_8_146_r), FUNC(sshangha_state::sshangha_protection_region_8_146_w));
 	map(0x3ec000, 0x3f3fff).ram();
-	map(0x3f4000, 0x3f7fff).rw(this, FUNC(sshangha_state::sshangha_protection_region_d_146_r), FUNC(sshangha_state::sshangha_protection_region_d_146_w)).share("prot_data");
+	map(0x3f4000, 0x3f7fff).rw(FUNC(sshangha_state::sshangha_protection_region_d_146_r), FUNC(sshangha_state::sshangha_protection_region_d_146_w)).share("prot_data");
 }
 
 void sshangha_state::sshanghb_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x084000, 0x0847ff).r(this, FUNC(sshangha_state::sshanghb_protection16_r));
+	map(0x084000, 0x0847ff).r(FUNC(sshangha_state::sshanghb_protection16_r));
 	map(0x101000, 0x10100f).ram().share("sound_shared"); /* the bootleg writes here */
 
 	map(0x200000, 0x201fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
@@ -213,16 +213,16 @@ void sshangha_state::sshanghb_map(address_map &map)
 	map(0x206000, 0x2067ff).ram().share("pf2_rowscroll");
 	map(0x206800, 0x207fff).ram();
 	map(0x300000, 0x30000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x320001).w(this, FUNC(sshangha_state::sshangha_video_w));
+	map(0x320000, 0x320001).w(FUNC(sshangha_state::sshangha_video_w));
 	map(0x320002, 0x320005).nopw();
 	map(0x320006, 0x320007).nopr(); //irq ack
 
 	map(0x340000, 0x340fff).ram(); // original spriteram
 
-	map(0x380000, 0x3803ff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites_w)).share("sprite_palram");
-	map(0x380400, 0x3807ff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)).share("tile_palram2");
-	map(0x380800, 0x380bff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)).share("sprite_palram2");
-	map(0x380c00, 0x380fff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)).share("tile_palram1");
+	map(0x380000, 0x3803ff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites_w)).share("sprite_palram");
+	map(0x380400, 0x3807ff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)).share("tile_palram2");
+	map(0x380800, 0x380bff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)).share("sprite_palram2");
+	map(0x380c00, 0x380fff).ram().w(FUNC(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)).share("tile_palram1");
 	map(0x381000, 0x383fff).ram(); // unused palette area
 
 	map(0x3c0000, 0x3c0fff).ram().share("spriteram"); // bootleg spriteram
@@ -250,7 +250,7 @@ void sshangha_state::sshangha_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xc200, 0xc201).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xf800, 0xf807).rw(this, FUNC(sshangha_state::sshangha_sound_shared_r), FUNC(sshangha_state::sshangha_sound_shared_w));
+	map(0xf800, 0xf807).rw(FUNC(sshangha_state::sshangha_sound_shared_r), FUNC(sshangha_state::sshangha_sound_shared_w));
 	map(0xf808, 0xffff).ram();
 }
 

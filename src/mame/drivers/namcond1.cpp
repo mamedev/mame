@@ -190,6 +190,7 @@ Some logic, resistors/caps/transistors, some connectors etc.
 #include "cpu/m68000/m68000.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -202,7 +203,7 @@ void namcond1_state::namcond1_map(address_map &map)
 	map(0x400000, 0x40ffff).ram().share("shared_ram");
 	map(0x800000, 0x80000f).m(m_ygv608, FUNC(ygv608_device::port_map)).umask16(0xff00);
 	map(0xa00000, 0xa00fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask16(0xff00);
-	map(0xc3ff00, 0xc3ffff).rw(this, FUNC(namcond1_state::cuskey_r), FUNC(namcond1_state::cuskey_w));
+	map(0xc3ff00, 0xc3ffff).rw(FUNC(namcond1_state::cuskey_r), FUNC(namcond1_state::cuskey_w));
 }
 
 void namcond1_state::abcheck_map(address_map &map)
@@ -213,10 +214,10 @@ void namcond1_state::abcheck_map(address_map &map)
 	map(0x608000, 0x60ffff).ram().share("zpr2");
 	map(0x700000, 0x700001).nopw();
 	map(0x740000, 0x740001).nopw();
-	map(0x780000, 0x780001).r(this, FUNC(namcond1_state::printer_r));
+	map(0x780000, 0x780001).r(FUNC(namcond1_state::printer_r));
 	map(0x800000, 0x80000f).m(m_ygv608, FUNC(ygv608_device::port_map)).umask16(0xff00);
 	map(0xa00000, 0xa00fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask16(0xff00);
-	map(0xc3ff00, 0xc3ffff).rw(this, FUNC(namcond1_state::cuskey_r), FUNC(namcond1_state::cuskey_w));
+	map(0xc3ff00, 0xc3ffff).rw(FUNC(namcond1_state::cuskey_r), FUNC(namcond1_state::cuskey_w));
 }
 
 READ16_MEMBER(namcond1_state::printer_r)
@@ -316,8 +317,8 @@ void namcond1_state::nd1h8rwmap(address_map &map)
 
 void namcond1_state::nd1h8iomap(address_map &map)
 {
-	map(h8_device::PORT_7, h8_device::PORT_7).r(this, FUNC(namcond1_state::mcu_p7_read));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(namcond1_state::mcu_pa_read), FUNC(namcond1_state::mcu_pa_write));
+	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(namcond1_state::mcu_p7_read));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcond1_state::mcu_pa_read), FUNC(namcond1_state::mcu_pa_write));
 	map(h8_device::ADC_0, h8_device::ADC_3).noprw(); // MCU reads these, but the games have no analog controls
 	map(0x14, 0x17).nopr();         // abcheck
 }
@@ -361,9 +362,8 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-
-	MCFG_YGV608_ADD("ygv608")
-	MCFG_YGV608_PALETTE("palette")
+	MCFG_DEVICE_ADD("ygv608", YGV608, 0)
+	MCFG_GFX_PALETTE("palette")
 	MCFG_YGV608_VBLANK_HANDLER(WRITELINE(*this, namcond1_state, vblank_irq_w))
 	MCFG_YGV608_RASTER_HANDLER(WRITELINE(*this, namcond1_state, raster_irq_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
@@ -384,15 +384,13 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C352_ADD("c352", XTAL(49'152'000)/2, 288)
+	MCFG_DEVICE_ADD("c352", C352, XTAL(49'152'000)/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_AT28C16_ADD( "at28c16", nullptr )
-
-
+	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcond1_state::abcheck)

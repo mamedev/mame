@@ -45,16 +45,16 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_z80snd(*this,"genesis_snd_z80"),
 		m_ymsnd(*this,"ymsnd"),
+		m_scan_timer(*this, "md_scan_timer"),
 		m_vdp(*this,"gen_vdp"),
-		m_snsnd(*this, "snsnd"),
 		m_megadrive_ram(*this,"megadrive_ram"),
 		m_io_reset(*this, "RESET")
 	{ }
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
 	optional_device<ym2612_device> m_ymsnd;
+	optional_device<timer_device> m_scan_timer;
 	required_device<sega315_5313_device> m_vdp;
-	required_device<sn76496_base_device> m_snsnd;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
 
 

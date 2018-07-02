@@ -271,9 +271,9 @@ void atom_state::atom_mem(address_map &map)
 void atomeb_state::atomeb_mem(address_map &map)
 {
 	atom_mem(map);
-	map(0xa000, 0xafff).r(this, FUNC(atomeb_state::ext_r));
-	map(0xbfff, 0xbfff).rw(this, FUNC(atomeb_state::eprom_r), FUNC(atomeb_state::eprom_w));
-	map(0xe000, 0xefff).r(this, FUNC(atomeb_state::dos_r));
+	map(0xa000, 0xafff).r(FUNC(atomeb_state::ext_r));
+	map(0xbfff, 0xbfff).rw(FUNC(atomeb_state::eprom_r), FUNC(atomeb_state::eprom_w));
+	map(0xe000, 0xefff).r(FUNC(atomeb_state::dos_r));
 }
 
 /*-------------------------------------------------
@@ -662,8 +662,8 @@ void atom_state::machine_start()
 	m_baseram[0x0a] = machine().rand() & 0x0ff;
 	m_baseram[0x0b] = machine().rand() & 0x0ff;
 
-	if (m_cart && m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xafff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+	if (m_cart.found() && m_cart->exists())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xafff, read8_delegate(FUNC(generic_slot_device::read_rom), &*m_cart));
 }
 
 /*-------------------------------------------------
@@ -679,9 +679,9 @@ void atomeb_state::machine_start()
     MACHINE DRIVERS
 ***************************************************************************/
 
-image_init_result atom_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+image_init_result atom_state::load_cart(device_image_interface &image, generic_slot_device &slot)
 {
-	uint32_t size = slot->common_get_size("rom");
+	uint32_t size = slot.common_get_size("rom");
 
 	if (size > 0x1000)
 	{
@@ -689,8 +689,8 @@ image_init_result atom_state::load_cart(device_image_interface &image, generic_s
 		return image_init_result::FAIL;
 	}
 
-	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	slot->common_load_rom(slot->get_rom_base(), size, "rom");
+	slot.rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	slot.common_load_rom(slot.get_rom_base(), size, "rom");
 
 	return image_init_result::PASS;
 }
@@ -728,8 +728,8 @@ MACHINE_CONFIG_START(atom_state::atom)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_centronics, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
@@ -746,7 +746,7 @@ MACHINE_CONFIG_START(atom_state::atom)
 	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_pa7))
 
@@ -793,22 +793,22 @@ MACHINE_CONFIG_START(atomeb_state::atomeb)
 	/* cartridges */
 	MCFG_DEVICE_REMOVE("cartslot")
 
-	MCFG_ATOM_ROM_ADD("rom_a0", a0_load)
-	MCFG_ATOM_ROM_ADD("rom_a1", a1_load)
-	MCFG_ATOM_ROM_ADD("rom_a2", a2_load)
-	MCFG_ATOM_ROM_ADD("rom_a3", a3_load)
-	MCFG_ATOM_ROM_ADD("rom_a4", a4_load)
-	MCFG_ATOM_ROM_ADD("rom_a5", a5_load)
-	MCFG_ATOM_ROM_ADD("rom_a6", a6_load)
-	MCFG_ATOM_ROM_ADD("rom_a7", a7_load)
-	MCFG_ATOM_ROM_ADD("rom_a8", a8_load)
-	MCFG_ATOM_ROM_ADD("rom_a9", a9_load)
-	MCFG_ATOM_ROM_ADD("rom_aa", aa_load)
-	MCFG_ATOM_ROM_ADD("rom_ab", ab_load)
-	MCFG_ATOM_ROM_ADD("rom_ac", ac_load)
-	MCFG_ATOM_ROM_ADD("rom_ad", ad_load)
-	MCFG_ATOM_ROM_ADD("rom_ae", ae_load)
-	MCFG_ATOM_ROM_ADD("rom_af", af_load)
+	MCFG_ATOM_ROM_ADD("rom_a0", ext_load<0x0>)
+	MCFG_ATOM_ROM_ADD("rom_a1", ext_load<0x1>)
+	MCFG_ATOM_ROM_ADD("rom_a2", ext_load<0x2>)
+	MCFG_ATOM_ROM_ADD("rom_a3", ext_load<0x3>)
+	MCFG_ATOM_ROM_ADD("rom_a4", ext_load<0x4>)
+	MCFG_ATOM_ROM_ADD("rom_a5", ext_load<0x5>)
+	MCFG_ATOM_ROM_ADD("rom_a6", ext_load<0x6>)
+	MCFG_ATOM_ROM_ADD("rom_a7", ext_load<0x7>)
+	MCFG_ATOM_ROM_ADD("rom_a8", ext_load<0x8>)
+	MCFG_ATOM_ROM_ADD("rom_a9", ext_load<0x9>)
+	MCFG_ATOM_ROM_ADD("rom_aa", ext_load<0xa>)
+	MCFG_ATOM_ROM_ADD("rom_ab", ext_load<0xb>)
+	MCFG_ATOM_ROM_ADD("rom_ac", ext_load<0xc>)
+	MCFG_ATOM_ROM_ADD("rom_ad", ext_load<0xd>)
+	MCFG_ATOM_ROM_ADD("rom_ae", ext_load<0xe>)
+	MCFG_ATOM_ROM_ADD("rom_af", ext_load<0xf>)
 
 	MCFG_ATOM_ROM_ADD("rom_e0", e0_load)
 	MCFG_ATOM_ROM_ADD("rom_e1", e1_load)
@@ -838,8 +838,8 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_centronics, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
@@ -848,7 +848,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, atom_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, atom_state, ppi_pc_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_pa7))
 
@@ -974,17 +974,6 @@ ROM_END
 //  ROM_LOAD( "atommc2-2.9-a000.rom", 0x2000, 0x1000, CRC(ba73e36c) SHA1(ea9739e96f3283c90b5306288c796fc01144b771) )
 //ROM_END
 
-void atomeb_state::init_atomeb()
-{
-	// these have to be set here, so that we can pass m_ext[*] to device_image_load!
-	char str[8];
-	for (int i = 0; i < 16; i++)
-	{
-		sprintf(str,"rom_a%x", i);
-		m_ext[i] = machine().device<generic_slot_device>(str);
-	}
-}
-
 
 /***************************************************************************
     SYSTEM DRIVERS
@@ -992,7 +981,7 @@ void atomeb_state::init_atomeb()
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS          INIT         COMPANY          FULLNAME               FLAGS */
 COMP( 1979, atom,     0,      0,      atom,     atom,  atom_state,    empty_init,  "Acorn",         "Atom",                0)
-COMP( 1979, atomeb,   atom,   0,      atomeb,   atom,  atomeb_state,  init_atomeb, "Acorn",         "Atom with Eprom Box", 0)
+COMP( 1979, atomeb,   atom,   0,      atomeb,   atom,  atomeb_state,  empty_init,  "Acorn",         "Atom with Eprom Box", 0)
 COMP( 1982, atombb,   atom,   0,      atombb,   atom,  atom_state,    empty_init,  "Acorn",         "Atom with BBC Basic", 0)
 //COMP( 1983, prophet2, atom,   0,      prophet2, atom,  driver_device, empty_init,  "Busicomputers", "Prophet 2",           0)
 //COMP( 1983, prophet3, atom,   0,      prophet3, atom,  driver_device, empty_init,  "Busicomputers", "Prophet 3",           0)

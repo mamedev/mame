@@ -40,6 +40,7 @@ Unknown 28 pin protection chip (possibly a PIC) at 5A (UC02 as silkscreened on P
 
 #include "cpu/z180/z180.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -121,8 +122,8 @@ void mosaic_state::mosaic_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).rom();
 	map(0x20000, 0x21fff).ram();
-	map(0x22000, 0x22fff).ram().w(this, FUNC(mosaic_state::bgvideoram_w)).share("bgvideoram");
-	map(0x23000, 0x23fff).ram().w(this, FUNC(mosaic_state::fgvideoram_w)).share("fgvideoram");
+	map(0x22000, 0x22fff).ram().w(FUNC(mosaic_state::bgvideoram_w)).share("bgvideoram");
+	map(0x23000, 0x23fff).ram().w(FUNC(mosaic_state::fgvideoram_w)).share("fgvideoram");
 	map(0x24000, 0x241ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 }
 
@@ -130,8 +131,8 @@ void mosaic_state::gfire2_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).rom();
 	map(0x10000, 0x17fff).ram();
-	map(0x22000, 0x22fff).ram().w(this, FUNC(mosaic_state::bgvideoram_w)).share("bgvideoram");
-	map(0x23000, 0x23fff).ram().w(this, FUNC(mosaic_state::fgvideoram_w)).share("fgvideoram");
+	map(0x22000, 0x22fff).ram().w(FUNC(mosaic_state::bgvideoram_w)).share("bgvideoram");
+	map(0x23000, 0x23fff).ram().w(FUNC(mosaic_state::fgvideoram_w)).share("fgvideoram");
 	map(0x24000, 0x241ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 }
 
@@ -141,7 +142,7 @@ void mosaic_state::mosaic_io_map(address_map &map)
 	map(0x00, 0x3f).nopw();    /* Z180 internal registers */
 	map(0x30, 0x30).nopr(); /* Z180 internal registers */
 	map(0x70, 0x71).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x72, 0x72).rw(this, FUNC(mosaic_state::protection_r), FUNC(mosaic_state::protection_w));
+	map(0x72, 0x72).rw(FUNC(mosaic_state::protection_r), FUNC(mosaic_state::protection_w));
 	map(0x74, 0x74).portr("P1");
 	map(0x76, 0x76).portr("P2");
 }
@@ -152,7 +153,7 @@ void mosaic_state::gfire2_io_map(address_map &map)
 	map(0x00, 0x3f).nopw();    /* Z180 internal registers */
 	map(0x30, 0x30).nopr(); /* Z180 internal registers */
 	map(0x70, 0x71).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x72, 0x72).rw(this, FUNC(mosaic_state::gfire2_protection_r), FUNC(mosaic_state::gfire2_protection_w));
+	map(0x72, 0x72).rw(FUNC(mosaic_state::gfire2_protection_r), FUNC(mosaic_state::gfire2_protection_w));
 	map(0x74, 0x74).portr("P1");
 	map(0x76, 0x76).portr("P2");
 }

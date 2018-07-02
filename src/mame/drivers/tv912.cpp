@@ -91,6 +91,11 @@ public:
 		, m_baudgen_timer(nullptr)
 	{ }
 
+	void tv912(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
+
+private:
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_WRITE8_MEMBER(p2_w);
@@ -102,13 +107,10 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
-
-	void tv912(machine_config &config);
 	void bank_map(address_map &map);
 	void io_map(address_map &map);
 	void prog_map(address_map &map);
-private:
+
 	enum
 	{
 		TIMER_BAUDGEN
@@ -338,7 +340,7 @@ void tv912_state::machine_start()
 	save_item(NAME(m_lpt_select));
 	save_item(NAME(m_4hz_flasher));
 	save_item(NAME(m_keyboard_scan));
-	save_pointer(NAME(m_dispram.get()), 0x1000);
+	save_pointer(NAME(m_dispram), 0x1000);
 }
 
 void tv912_state::machine_reset()
@@ -365,12 +367,12 @@ void tv912_state::io_map(address_map &map)
 void tv912_state::bank_map(address_map &map)
 {
 	map(0x000, 0x0ff).mirror(0x300).ram();
-	map(0x400, 0x403).mirror(0x3c0).select(0x030).rw(this, FUNC(tv912_state::crtc_r), FUNC(tv912_state::crtc_w));
+	map(0x400, 0x403).mirror(0x3c0).select(0x030).rw(FUNC(tv912_state::crtc_r), FUNC(tv912_state::crtc_w));
 	map(0x404, 0x404).mirror(0x3f3).r(m_uart, FUNC(ay51013_device::receive));
-	map(0x408, 0x40b).mirror(0x3f0).r(this, FUNC(tv912_state::uart_status_r));
+	map(0x408, 0x40b).mirror(0x3f0).r(FUNC(tv912_state::uart_status_r));
 	map(0x408, 0x408).mirror(0x3f3).w(m_uart, FUNC(ay51013_device::transmit));
-	map(0x40c, 0x40f).mirror(0x3f0).r(this, FUNC(tv912_state::keyboard_r));
-	map(0x40c, 0x40c).mirror(0x3f3).w(this, FUNC(tv912_state::output_40c));
+	map(0x40c, 0x40f).mirror(0x3f0).r(FUNC(tv912_state::keyboard_r));
+	map(0x40c, 0x40c).mirror(0x3f3).w(FUNC(tv912_state::output_40c));
 	map(0x800, 0xfff).bankrw("dispram");
 }
 

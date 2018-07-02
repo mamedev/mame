@@ -329,23 +329,26 @@ public:
 		m_lamp(*this, "lamp0")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bank_write);
-	DECLARE_WRITE8_MEMBER(coin_counters_write);
-
-	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
-	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
-
-	void init_opaopa();
-	void init_fantzn2();
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	void systemex_315_5177(machine_config &config);
 	void systemex(machine_config &config);
 	void ridleofp(machine_config &config);
 	void hangonjr(machine_config &config);
 	void systeme(machine_config &config);
 	void systemeb(machine_config &config);
+
+	void init_opaopa();
+	void init_fantzn2();
+
+private:
+	DECLARE_WRITE8_MEMBER(bank_write);
+	DECLARE_WRITE8_MEMBER(coin_counters_write);
+
+	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
+	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
+
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void banked_decrypted_opcodes_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void io_map(address_map &map);
@@ -353,10 +356,8 @@ public:
 	void vdp1_map(address_map &map);
 	void vdp2_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 
-private:
 	// Devices
 	required_device<cpu_device>          m_maincpu;
 	required_device<sega315_5124_device> m_vdp1;
@@ -408,8 +409,8 @@ void systeme_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x7b, 0x7b).w("sn1", FUNC(segapsg_device::write));
-	map(0x7e, 0x7f).w("sn2", FUNC(segapsg_device::write));
+	map(0x7b, 0x7b).w("sn1", FUNC(segapsg_device::command_w));
+	map(0x7e, 0x7f).w("sn2", FUNC(segapsg_device::command_w));
 	map(0x7e, 0x7e).r(m_vdp1, FUNC(sega315_5124_device::vcount_read));
 	map(0xba, 0xba).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
 	map(0xbb, 0xbb).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
@@ -420,7 +421,7 @@ void systeme_state::io_map(address_map &map)
 	map(0xe2, 0xe2).portr("e2");
 	map(0xf2, 0xf2).portr("f2");
 	map(0xf3, 0xf3).portr("f3");
-	map(0xf7, 0xf7).w(this, FUNC(systeme_state::bank_write));
+	map(0xf7, 0xf7).w(FUNC(systeme_state::bank_write));
 	map(0xf8, 0xfb).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 

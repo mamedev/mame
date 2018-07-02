@@ -16,6 +16,7 @@ Espirit3: 2x R6551AP, HD46850P (6850), R6502BP, R6545-1AP, R6522AP, 1.8432, 17.9
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class esprit_state : public driver_device
@@ -29,14 +30,17 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	MC6845_UPDATE_ROW(crtc_update_row);
-	void init_init();
-
 	void esprit(machine_config &config);
 	void esprit3(machine_config &config);
+
+	void init_init();
+
+private:
+	MC6845_UPDATE_ROW(crtc_update_row);
+
 	void mem3_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;

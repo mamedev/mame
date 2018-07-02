@@ -173,7 +173,7 @@ public:
 
 	void jankenmn(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(lamps3_w);
@@ -183,7 +183,6 @@ protected:
 	void jankenmn_map(address_map &map);
 	void jankenmn_port_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	output_finder<2> m_digits;
 	output_finder<16> m_lamps;
@@ -399,7 +398,7 @@ MACHINE_CONFIG_START(jankenmn_state::jankenmn)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 	/* (20-23) Mode 0 - Ports A, B, high C & low C set as output. */
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jankenmn_state, lamps1_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jankenmn_state, lamps2_w))
 

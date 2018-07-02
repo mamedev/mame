@@ -19,6 +19,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
+#include "emupal.h"
 
 class amu880_state : public driver_device
 {
@@ -38,6 +39,9 @@ public:
 		, m_key_a8(1)
 	{ }
 
+	void amu880(machine_config &config);
+
+private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<z80dart_device> m_z80sio;
 	required_device<palette_device> m_palette;
@@ -68,7 +72,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	DECLARE_WRITE_LINE_MEMBER(cassette_w);
-	void amu880(machine_config &config);
 	void amu880_io(address_map &map);
 	void amu880_mem(address_map &map);
 };

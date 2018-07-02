@@ -46,6 +46,7 @@ MR_01-.3A    [a0b758aa]
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -66,7 +67,11 @@ public:
 		m_sprgen(*this, "spritegen")
 	{ }
 
+	void mirage(machine_config &config);
 
+	void init_mirage();
+
+private:
 	/* misc */
 	uint8_t m_mux_data;
 
@@ -86,13 +91,11 @@ public:
 	DECLARE_READ16_MEMBER(mjmux_r);
 	DECLARE_WRITE16_MEMBER(okim1_rombank_w);
 	DECLARE_WRITE16_MEMBER(okim0_rombank_w);
-	void init_mirage();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
-	void mirage(machine_config &config);
 	void mirage_map(address_map &map);
 };
 
@@ -174,10 +177,10 @@ void miragemj_state::mirage_map(address_map &map)
 	map(0x160000, 0x160001).nopw();
 	map(0x168000, 0x16800f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
 	map(0x16a000, 0x16a001).nopw();
-	map(0x16c000, 0x16c001).w(this, FUNC(miragemj_state::okim1_rombank_w));
-	map(0x16c002, 0x16c003).w(this, FUNC(miragemj_state::okim0_rombank_w));
-	map(0x16c004, 0x16c005).w(this, FUNC(miragemj_state::mjmux_w));
-	map(0x16c006, 0x16c007).r(this, FUNC(miragemj_state::mjmux_r));
+	map(0x16c000, 0x16c001).w(FUNC(miragemj_state::okim1_rombank_w));
+	map(0x16c002, 0x16c003).w(FUNC(miragemj_state::okim0_rombank_w));
+	map(0x16c004, 0x16c005).w(FUNC(miragemj_state::mjmux_w));
+	map(0x16c006, 0x16c007).r(FUNC(miragemj_state::mjmux_r));
 	map(0x16e000, 0x16e001).nopw();
 	map(0x16e002, 0x16e003).portr("SYSTEM_IN");
 	map(0x170000, 0x173fff).ram();
@@ -295,7 +298,7 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", miragemj_state,  irq6_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93C45
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)  // 93C45
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)

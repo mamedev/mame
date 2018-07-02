@@ -77,6 +77,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void kungfur(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(kungfur_output_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch1_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch2_w);
@@ -87,10 +90,8 @@ public:
 	INTERRUPT_GEN_MEMBER(kungfur_irq);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm1_int);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm2_int);
-	void kungfur(machine_config &config);
 	void kungfur_map(address_map &map);
 
-private:
 	uint8_t m_latch[3];
 	uint8_t m_control;
 	uint32_t m_adpcm_pos[2];
@@ -212,7 +213,7 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm1_int)
 	uint8_t *ROM = memregion("adpcm1")->base();
 	uint8_t data = ROM[m_adpcm_pos[0] & 0x1ffff];
 
-	m_adpcm1->data_w(m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
+	m_adpcm1->write_data(m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
 	m_adpcm_pos[0] += m_adpcm_sel[0];
 	m_adpcm_sel[0] ^= 1;
 }
@@ -222,7 +223,7 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm2_int)
 	uint8_t *ROM = memregion("adpcm2")->base();
 	uint8_t data = ROM[m_adpcm_pos[1] & 0x3ffff];
 
-	m_adpcm2->data_w(m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);
+	m_adpcm2->write_data(m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);
 	m_adpcm_pos[1] += m_adpcm_sel[1];
 	m_adpcm_sel[1] ^= 1;
 }
@@ -231,8 +232,8 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm2_int)
 void kungfur_state::kungfur_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x4000, 0x4000).w(this, FUNC(kungfur_state::kungfur_adpcm1_w));
-	map(0x4004, 0x4004).w(this, FUNC(kungfur_state::kungfur_adpcm2_w));
+	map(0x4000, 0x4000).w(FUNC(kungfur_state::kungfur_adpcm1_w));
+	map(0x4004, 0x4004).w(FUNC(kungfur_state::kungfur_adpcm2_w));
 	map(0x4008, 0x400b).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x400c, 0x400f).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc000, 0xffff).rom();

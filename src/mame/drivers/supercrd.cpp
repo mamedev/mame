@@ -166,6 +166,7 @@
 #include "machine/nvram.h"
 #include "video/mc6845.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -183,6 +184,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void supercrd(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
@@ -194,7 +198,6 @@ public:
 	uint32_t screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void supercrd(machine_config &config);
 	void supercrd_map(address_map &map);
 };
 
@@ -290,8 +293,8 @@ uint32_t supercrd_state::screen_update_supercrd(screen_device &screen, bitmap_in
 void supercrd_state::supercrd_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().w(this, FUNC(supercrd_state::supercrd_videoram_w)).share("videoram"); // wrong
-	map(0xd000, 0xdfff).ram().w(this, FUNC(supercrd_state::supercrd_colorram_w)).share("colorram"); // wrong
+	map(0xc000, 0xcfff).ram().w(FUNC(supercrd_state::supercrd_videoram_w)).share("videoram"); // wrong
+	map(0xd000, 0xdfff).ram().w(FUNC(supercrd_state::supercrd_colorram_w)).share("colorram"); // wrong
 //  AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("nvram")
 //  AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 //  AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)

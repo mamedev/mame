@@ -57,26 +57,26 @@ void mtx_state::mtx_mem(address_map &map)
 void mtx_state::mtx_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(mtx_state::mtx_strobe_r), FUNC(mtx_state::mtx_bankswitch_w));
-	map(0x01, 0x01).rw("tms9929a", FUNC(tms9929a_device::vram_read), FUNC(tms9929a_device::vram_write));
-	map(0x02, 0x02).rw("tms9929a", FUNC(tms9929a_device::register_read), FUNC(tms9929a_device::register_write));
-	map(0x03, 0x03).rw(this, FUNC(mtx_state::mtx_sound_strobe_r), FUNC(mtx_state::mtx_cst_w));
-	map(0x04, 0x04).r(this, FUNC(mtx_state::mtx_prt_r)).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x05, 0x05).rw(this, FUNC(mtx_state::mtx_key_lo_r), FUNC(mtx_state::mtx_sense_w));
-	map(0x06, 0x06).rw(this, FUNC(mtx_state::mtx_key_hi_r), FUNC(mtx_state::mtx_sound_latch_w));
+	map(0x00, 0x00).rw(FUNC(mtx_state::mtx_strobe_r), FUNC(mtx_state::mtx_bankswitch_w));
+	map(0x01, 0x01).rw("tms9929a", FUNC(tms9929a_device::vram_r), FUNC(tms9929a_device::vram_w));
+	map(0x02, 0x02).rw("tms9929a", FUNC(tms9929a_device::register_r), FUNC(tms9929a_device::register_w));
+	map(0x03, 0x03).rw(FUNC(mtx_state::mtx_sound_strobe_r), FUNC(mtx_state::mtx_cst_w));
+	map(0x04, 0x04).r(FUNC(mtx_state::mtx_prt_r)).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x05, 0x05).rw(FUNC(mtx_state::mtx_key_lo_r), FUNC(mtx_state::mtx_sense_w));
+	map(0x06, 0x06).rw(FUNC(mtx_state::mtx_key_hi_r), FUNC(mtx_state::mtx_sound_latch_w));
 //  map(0x07, 0x07) PIO
 	map(0x08, 0x0b).rw(m_z80ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x1f, 0x1f).w(this, FUNC(mtx_state::mtx_cst_motor_w));
-	map(0x30, 0x31).w(this, FUNC(mtx_state::hrx_address_w));
-	map(0x32, 0x32).rw(this, FUNC(mtx_state::hrx_data_r), FUNC(mtx_state::hrx_data_w));
-	map(0x33, 0x33).rw(this, FUNC(mtx_state::hrx_attr_r), FUNC(mtx_state::hrx_attr_w));
+	map(0x1f, 0x1f).w(FUNC(mtx_state::mtx_cst_motor_w));
+	map(0x30, 0x31).w(FUNC(mtx_state::hrx_address_w));
+	map(0x32, 0x32).rw(FUNC(mtx_state::hrx_data_r), FUNC(mtx_state::hrx_data_w));
+	map(0x33, 0x33).rw(FUNC(mtx_state::hrx_attr_r), FUNC(mtx_state::hrx_attr_w));
 //  map(0x38, 0x38).w(MC6845_TAG, FUNC(mc6845_device::address_w));
 //  map(0x39, 0x39).rw(MC6845_TAG, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 /*  map(0x40, 0x43).rw(FD1791_TAG, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
-    map(0x44, 0x44).rw(this, FUNC(mtx_state::fdx_status_r), FUNC(mtx_state::fdx_control_w));
-    map(0x45, 0x45).w(this, FUNC(mtx_state::fdx_drv_sel_w));
-    map(0x46, 0x46).w(this, FUNC(mtx_state::fdx_dma_lo_w));
-    map(0x47, 0x47).w(this, FUNC(mtx_state::fdx_dma_hi_w);*/
+    map(0x44, 0x44).rw(FUNC(mtx_state::fdx_status_r), FUNC(mtx_state::fdx_control_w));
+    map(0x45, 0x45).w(FUNC(mtx_state::fdx_drv_sel_w));
+    map(0x46, 0x46).w(FUNC(mtx_state::fdx_dma_lo_w));
+    map(0x47, 0x47).w(FUNC(mtx_state::fdx_dma_hi_w);*/
 }
 
 /*-------------------------------------------------
@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_timer", mtx_state, ctc_tick, attotime::from_hz(XTAL(4'000'000)/13))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, mtx_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, mtx_state, write_centronics_fault))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, mtx_state, write_centronics_perror))
@@ -403,9 +403,9 @@ ROM_START( mtx512 )
 	ROM_DEFAULT_BIOS("us")
 	ROM_SYSTEM_BIOS( 0, "us", "U.S.A." )
 	ROM_SYSTEM_BIOS( 1, "dk", "Denmark" )
-	ROMX_LOAD( "danish.rom",  0xe000, 0x2000, CRC(9c1b3fae) SHA1(82bc021660d88eebcf0c4d3856558ee9acc1c348), ROM_BIOS(2) )
+	ROMX_LOAD( "danish.rom",  0xe000, 0x2000, CRC(9c1b3fae) SHA1(82bc021660d88eebcf0c4d3856558ee9acc1c348), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "fi", "Finland" )
-	ROMX_LOAD( "finnish.rom", 0xe000, 0x2000, CRC(9b96cf72) SHA1(b46d1a733e0e635ccdaf4752cc370d793c3b5c55), ROM_BIOS(3) )
+	ROMX_LOAD( "finnish.rom", 0xe000, 0x2000, CRC(9b96cf72) SHA1(b46d1a733e0e635ccdaf4752cc370d793c3b5c55), ROM_BIOS(2) )
 
 	ROM_REGION( 0x2000, "sdx", 0 )
 	ROM_LOAD( "sdx", 0x0000, 0x2000, NO_DUMP )

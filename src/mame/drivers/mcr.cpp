@@ -699,7 +699,7 @@ void mcr_state::cpu_90009_map(address_map &map)
 	map(0xf000, 0xf1ff).mirror(0x0200).ram().share("spriteram");
 	map(0xf400, 0xf41f).mirror(0x03e0).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf800, 0xf81f).mirror(0x03e0).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xfc00, 0xffff).ram().w(this, FUNC(mcr_state::mcr_90009_videoram_w)).share("videoram");
+	map(0xfc00, 0xffff).ram().w(FUNC(mcr_state::mcr_90009_videoram_w)).share("videoram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -728,7 +728,7 @@ void mcr_state::cpu_90010_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).mirror(0x1800).ram().share("nvram");
 	map(0xe000, 0xe1ff).mirror(0x1600).ram().share("spriteram");
-	map(0xe800, 0xefff).mirror(0x1000).ram().w(this, FUNC(mcr_state::mcr_90010_videoram_w)).share("videoram");
+	map(0xe800, 0xefff).mirror(0x1000).ram().w(FUNC(mcr_state::mcr_90010_videoram_w)).share("videoram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -757,8 +757,8 @@ void mcr_state::cpu_91490_map(address_map &map)
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xe800, 0xe9ff).mirror(0x0200).ram().share("spriteram");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(mcr_state::mcr_91490_videoram_w)).share("videoram");
-	map(0xf800, 0xf87f).mirror(0x0780).w(this, FUNC(mcr_state::mcr_paletteram9_w)).share("paletteram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(mcr_state::mcr_91490_videoram_w)).share("videoram");
+	map(0xf800, 0xf87f).mirror(0x0780).w(FUNC(mcr_state::mcr_paletteram9_w)).share("paletteram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -797,8 +797,8 @@ void mcr_nflfoot_state::ipu_91695_portmap(address_map &map)
 	map(0x04, 0x07).mirror(0xe0).rw(m_ipu_sio, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x08, 0x0b).mirror(0xe0).rw(m_ipu_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).mirror(0xe0).rw(m_ipu_pio1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x10, 0x13).mirror(0xe0).w(this, FUNC(mcr_nflfoot_state::ipu_laserdisk_w));
-	map(0x1c, 0x1f).mirror(0xe0).rw(this, FUNC(mcr_nflfoot_state::ipu_watchdog_r), FUNC(mcr_nflfoot_state::ipu_watchdog_w));
+	map(0x10, 0x13).mirror(0xe0).w(FUNC(mcr_nflfoot_state::ipu_laserdisk_w));
+	map(0x1c, 0x1f).mirror(0xe0).rw(FUNC(mcr_nflfoot_state::ipu_watchdog_r), FUNC(mcr_nflfoot_state::ipu_watchdog_w));
 }
 
 
@@ -2964,7 +2964,7 @@ void mcr_state::init_demoderb()
 	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::demoderb_op4_w),this));
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	machine().device<cpu_device>("ssio:cpu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	m_ssio->suspend_cpu();
 }
 
 

@@ -39,24 +39,41 @@ void radio86_state::init_radioram()
 	m_radio_ram_disk = std::make_unique<uint8_t[]>(0x20000);
 	memset(m_radio_ram_disk.get(),0,0x20000);
 }
+
 READ8_MEMBER(radio86_state::radio86_8255_portb_r2)
 {
 	uint8_t key = 0xff;
-	if ((m_keyboard_mask & 0x01)!=0) { key &= m_io_line0->read(); }
-	if ((m_keyboard_mask & 0x02)!=0) { key &= m_io_line1->read(); }
-	if ((m_keyboard_mask & 0x04)!=0) { key &= m_io_line2->read(); }
-	if ((m_keyboard_mask & 0x08)!=0) { key &= m_io_line3->read(); }
-	if ((m_keyboard_mask & 0x10)!=0) { key &= m_io_line4->read(); }
-	if ((m_keyboard_mask & 0x20)!=0) { key &= m_io_line5->read(); }
-	if ((m_keyboard_mask & 0x40)!=0) { key &= m_io_line6->read(); }
-	if ((m_keyboard_mask & 0x80)!=0) { key &= m_io_line7->read(); }
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_keyboard_mask, i)) {
+			key &= m_io_line[i]->read();
+		}
+	}
+	return key;
+}
+
+READ8_MEMBER(radio86_state::kr03_8255_portb_r2)
+{
+	uint8_t key = 0xff;
+	uint16_t data;
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_keyboard_mask, i))
+		{
+			data = m_io_line[i]->read();
+			if (!BIT(data, 8)) data &= ~3;
+			if (!BIT(data, 9)) data &= ~5;
+			if (!BIT(data, 10)) data &= ~7;
+			key &= data;
+		}
+	}
 	return key;
 }
 
 READ8_MEMBER(radio86_state::radio86_8255_portc_r2)
 {
 	double level = m_cassette->input();
-	uint8_t dat = m_io_line8->read();
+	uint8_t dat = m_io_line[8]->read();
 	if (level <  0) {
 		dat ^= m_tape_value;
 	}
@@ -78,14 +95,12 @@ READ8_MEMBER(radio86_state::rk7007_8255_portc_r)
 {
 	double level = m_cassette->input();
 	uint8_t key = 0xff;
-	if ((m_keyboard_mask & 0x01)!=0) { key &= m_io_cline0->read(); }
-	if ((m_keyboard_mask & 0x02)!=0) { key &= m_io_cline1->read(); }
-	if ((m_keyboard_mask & 0x04)!=0) { key &= m_io_cline2->read(); }
-	if ((m_keyboard_mask & 0x08)!=0) { key &= m_io_cline3->read(); }
-	if ((m_keyboard_mask & 0x10)!=0) { key &= m_io_cline4->read(); }
-	if ((m_keyboard_mask & 0x20)!=0) { key &= m_io_cline5->read(); }
-	if ((m_keyboard_mask & 0x40)!=0) { key &= m_io_cline6->read(); }
-	if ((m_keyboard_mask & 0x80)!=0) { key &= m_io_cline7->read(); }
+	for (int i = 0; i < 8; i++)
+	{
+		if ((m_keyboard_mask & (1 << i))!=0) {
+			key &= m_io_cline[i]->read();
+		}
+	}
 	key &= 0xe0;
 	if (level <  0) {
 		key ^= m_tape_value;

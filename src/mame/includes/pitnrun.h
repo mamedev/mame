@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Pierpaolo Prazzoli
+
+#include "emupal.h"
+
 class pitnrun_state : public driver_device
 {
 public:
@@ -13,6 +16,10 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_spriteram(*this, "spriteram") { }
 
+	void pitnrun_mcu(machine_config &config);
+	void pitnrun(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -78,8 +85,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void spotlights();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void pitnrun_mcu(machine_config &config);
-	void pitnrun(machine_config &config);
 	void pitnrun_map(address_map &map);
 	void pitnrun_map_mcu(address_map &map);
 	void pitnrun_sound_io_map(address_map &map);

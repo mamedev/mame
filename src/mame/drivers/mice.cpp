@@ -47,11 +47,12 @@ public:
 
 	void mice2(machine_config &config);
 	void mice(machine_config &config);
+
+private:
 	void mice2_io(address_map &map);
 	void mice2_mem(address_map &map);
 	void mice_io(address_map &map);
 	void mice_mem(address_map &map);
-private:
 	required_device<cpu_device> m_maincpu;
 };
 

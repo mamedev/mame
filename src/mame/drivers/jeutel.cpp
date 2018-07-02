@@ -42,7 +42,7 @@ public:
 	void init_jeutel();
 	void jeutel(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(ppi0a_w);
@@ -54,7 +54,6 @@ protected:
 	void jeutel_cpu3_io(address_map &map);
 	void jeutel_map(address_map &map);
 
-private:
 	bool m_timer_a;
 	uint8_t m_sndcmd;
 	uint8_t m_digit;
@@ -92,7 +91,7 @@ void jeutel_state::jeutel_cpu3(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom().region("roms", 0x3000);
 	map(0x4000, 0x43ff).ram();
-	map(0x8000, 0x8000).w(this, FUNC(jeutel_state::sndcmd_w));
+	map(0x8000, 0x8000).w(FUNC(jeutel_state::sndcmd_w));
 }
 
 void jeutel_state::jeutel_cpu3_io(address_map &map)

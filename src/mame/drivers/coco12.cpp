@@ -403,7 +403,7 @@ MACHINE_CONFIG_END
 
 void coco_state::coco_floating_map(address_map &map)
 {
-	map(0x0000, 0xFFFF).r(this, FUNC(coco_state::floating_bus_read));
+	map(0x0000, 0xFFFF).r(FUNC(coco_state::floating_bus_r));
 }
 
 
@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, coco_state, pia1_firq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, coco_state, pia1_firq_b))
 
-	MCFG_SAM6883_ADD(SAM_TAG, XTAL(14'318'181), MAINCPU_TAG, AS_PROGRAM)
+	MCFG_DEVICE_ADD(SAM_TAG, SAM6883, XTAL(14'318'181), MAINCPU_TAG)
 	MCFG_SAM6883_RES_CALLBACK(READ8(*this, coco12_state, sam_read))
 
 	// Becker Port device
@@ -654,15 +654,15 @@ ROM_END
 
 ROM_START(cd6809)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-		ROM_DEFAULT_BIOS("84")
+	ROM_DEFAULT_BIOS("84")
 
-		ROM_SYSTEM_BIOS( 0, "83", "1983" )
-	ROMX_LOAD("cd6809bas83.rom",    0x2000, 0x2000, CRC(f8e64142) SHA1(c0fd689119e2619ec226a2d67aeeb32070c14e38), ROM_BIOS(1))
-	ROMX_LOAD("cd6809extbas83.rom", 0x0000, 0x2000, CRC(e5d5aa15) SHA1(0cd4a3d9e4af1d0176964e35e3d15a9fa0e68ac4), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 0, "83", "1983" )
+	ROMX_LOAD("cd6809bas83.rom",    0x2000, 0x2000, CRC(f8e64142) SHA1(c0fd689119e2619ec226a2d67aeeb32070c14e38), ROM_BIOS(0))
+	ROMX_LOAD("cd6809extbas83.rom", 0x0000, 0x2000, CRC(e5d5aa15) SHA1(0cd4a3d9e4af1d0176964e35e3d15a9fa0e68ac4), ROM_BIOS(0))
 
-		ROM_SYSTEM_BIOS( 1, "84", "1984" )
-	ROMX_LOAD("cd6809bas84.rom",    0x2000, 0x2000, CRC(8a9971da) SHA1(5cb5f1ffc983a85ba92af68b1d571b270f6db559), ROM_BIOS(2))
-	ROMX_LOAD("cd6809extbas84.rom", 0x0000, 0x2000, CRC(8dc853e2) SHA1(d572ce4497c115af53d2b0feeb52d3c7a7fec175), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 1, "84", "1984" )
+	ROMX_LOAD("cd6809bas84.rom",    0x2000, 0x2000, CRC(8a9971da) SHA1(5cb5f1ffc983a85ba92af68b1d571b270f6db559), ROM_BIOS(1))
+	ROMX_LOAD("cd6809extbas84.rom", 0x0000, 0x2000, CRC(8dc853e2) SHA1(d572ce4497c115af53d2b0feeb52d3c7a7fec175), ROM_BIOS(1))
 ROM_END
 
 #define rom_cocoh rom_coco

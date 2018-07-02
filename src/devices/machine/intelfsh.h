@@ -111,9 +111,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class intelfsh_device;
-
-
 // ======================> intelfsh_device
 
 class intelfsh_device : public device_t,
@@ -209,8 +206,6 @@ class intelfsh8_device : public intelfsh_device
 {
 public:
 	// public interface
-	uint8_t read(offs_t offset) { return read_full(offset); }
-	void write(offs_t offset, uint8_t data) { write_full(offset, data); }
 	DECLARE_READ8_MEMBER(read) { return read_full(offset); }
 	DECLARE_WRITE8_MEMBER(write) { write_full(offset, data); }
 
@@ -229,8 +224,6 @@ class intelfsh16_device : public intelfsh_device
 {
 public:
 	// public interface
-	uint16_t read(offs_t offset) { return read_full(offset); }
-	void write(offs_t offset, uint16_t data) { write_full(offset, data); }
 	DECLARE_READ16_MEMBER(read) { return read_full(offset); }
 	DECLARE_WRITE16_MEMBER(write) { write_full(offset, data); }
 

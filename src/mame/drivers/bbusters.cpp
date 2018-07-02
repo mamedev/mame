@@ -202,6 +202,7 @@ foreground and not behind the moving elevator layer.
 #include "machine/nvram.h"
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -328,13 +329,13 @@ void bbusters_state::bbusters_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x08ffff).ram().share("ram");
-	map(0x090000, 0x090fff).ram().w(this, FUNC(bbusters_state::video_w)).share("videoram");
+	map(0x090000, 0x090fff).ram().w(FUNC(bbusters_state::video_w)).share("videoram");
 	map(0x0a0000, 0x0a0fff).ram().share("spriteram");
 	map(0x0a1000, 0x0a7fff).ram();     /* service mode */
 	map(0x0a8000, 0x0a8fff).ram().share("spriteram2");
 	map(0x0a9000, 0x0affff).ram();     /* service mode */
-	map(0x0b0000, 0x0b1fff).ram().w(this, FUNC(bbusters_state::pf1_w)).share("pf1_data");
-	map(0x0b2000, 0x0b3fff).ram().w(this, FUNC(bbusters_state::pf2_w)).share("pf2_data");
+	map(0x0b0000, 0x0b1fff).ram().w(FUNC(bbusters_state::pf1_w)).share("pf1_data");
+	map(0x0b2000, 0x0b3fff).ram().w(FUNC(bbusters_state::pf2_w)).share("pf2_data");
 	map(0x0b4000, 0x0b5fff).ram();     /* service mode */
 	map(0x0b8000, 0x0b8003).writeonly().share("pf1_scroll_data");
 	map(0x0b8008, 0x0b800b).writeonly().share("pf2_scroll_data");
@@ -344,13 +345,13 @@ void bbusters_state::bbusters_map(address_map &map)
 	map(0x0e0004, 0x0e0005).portr("IN1");    /* Player 3 */
 	map(0x0e0008, 0x0e0009).portr("DSW1");   /* Dip 1 */
 	map(0x0e000a, 0x0e000b).portr("DSW2");   /* Dip 2 */
-	map(0x0e0018, 0x0e0019).r(this, FUNC(bbusters_state::sound_status_r));
-	map(0x0e8000, 0x0e8001).rw(this, FUNC(bbusters_state::kludge_r), FUNC(bbusters_state::gun_select_w));
-	map(0x0e8002, 0x0e8003).r(this, FUNC(bbusters_state::control_3_r));
+	map(0x0e0018, 0x0e0019).r(FUNC(bbusters_state::sound_status_r));
+	map(0x0e8000, 0x0e8001).rw(FUNC(bbusters_state::kludge_r), FUNC(bbusters_state::gun_select_w));
+	map(0x0e8002, 0x0e8003).r(FUNC(bbusters_state::control_3_r));
 	/* AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP */
-	map(0x0f0008, 0x0f0009).w(this, FUNC(bbusters_state::three_gun_output_w));
-	map(0x0f0018, 0x0f0019).w(this, FUNC(bbusters_state::sound_cpu_w));
-	map(0x0f8000, 0x0f80ff).r(this, FUNC(bbusters_state::eprom_r)).writeonly().share("eeprom"); /* Eeprom */
+	map(0x0f0008, 0x0f0009).w(FUNC(bbusters_state::three_gun_output_w));
+	map(0x0f0018, 0x0f0019).w(FUNC(bbusters_state::sound_cpu_w));
+	map(0x0f8000, 0x0f80ff).r(FUNC(bbusters_state::eprom_r)).writeonly().share("eeprom"); /* Eeprom */
 }
 
 /*******************************************************************************/
@@ -359,20 +360,20 @@ void bbusters_state::mechatt_map(address_map &map)
 {
 	map(0x000000, 0x06ffff).rom();
 	map(0x070000, 0x07ffff).ram().share("ram");
-	map(0x090000, 0x090fff).ram().w(this, FUNC(bbusters_state::video_w)).share("videoram");
+	map(0x090000, 0x090fff).ram().w(FUNC(bbusters_state::video_w)).share("videoram");
 	map(0x0a0000, 0x0a0fff).ram().share("spriteram");
 	map(0x0a1000, 0x0a7fff).nopw();
-	map(0x0b0000, 0x0b3fff).ram().w(this, FUNC(bbusters_state::pf1_w)).share("pf1_data");
+	map(0x0b0000, 0x0b3fff).ram().w(FUNC(bbusters_state::pf1_w)).share("pf1_data");
 	map(0x0b8000, 0x0b8003).writeonly().share("pf1_scroll_data");
-	map(0x0c0000, 0x0c3fff).ram().w(this, FUNC(bbusters_state::pf2_w)).share("pf2_data");
+	map(0x0c0000, 0x0c3fff).ram().w(FUNC(bbusters_state::pf2_w)).share("pf2_data");
 	map(0x0c8000, 0x0c8003).writeonly().share("pf2_scroll_data");
 	map(0x0d0000, 0x0d07ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x0e0000, 0x0e0001).portr("IN0");
 	map(0x0e0002, 0x0e0003).portr("DSW1");
-	map(0x0e0004, 0x0e0007).r(this, FUNC(bbusters_state::mechatt_gun_r));
+	map(0x0e0004, 0x0e0007).r(FUNC(bbusters_state::mechatt_gun_r));
 	/* AM_RANGE(0x0e4002, 0x0e4003) AM_WRITENOP  Gun force feedback? */
-	map(0x0e4002, 0x0e4003).w(this, FUNC(bbusters_state::two_gun_output_w));
-	map(0x0e8000, 0x0e8001).rw(this, FUNC(bbusters_state::sound_status_r), FUNC(bbusters_state::sound_cpu_w));
+	map(0x0e4002, 0x0e4003).w(FUNC(bbusters_state::two_gun_output_w));
+	map(0x0e8000, 0x0e8001).rw(FUNC(bbusters_state::sound_status_r), FUNC(bbusters_state::sound_cpu_w));
 }
 
 /******************************************************************************/
@@ -381,7 +382,7 @@ void bbusters_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf7ff).ram();
-	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(bbusters_state::sound_status_w));
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(bbusters_state::sound_status_w));
 }
 
 void bbusters_state::sound_portmap(address_map &map)
