@@ -46,16 +46,19 @@ public:
 	{
 	}
 
+	void chaos(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port1e_r);
 	DECLARE_WRITE8_MEMBER(port1f_w);
 	DECLARE_READ8_MEMBER(port90_r);
 	DECLARE_READ8_MEMBER(port91_r);
 	void kbd_put(u8 data);
-	void chaos(machine_config &config);
+
 	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<generic_terminal_device> m_terminal;

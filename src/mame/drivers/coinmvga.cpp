@@ -243,9 +243,13 @@ public:
 		m_palette(*this, "palette"),
 		m_palette2(*this, "palette2") { }
 
-	required_shared_ptr<uint16_t> m_vram;
+	void coinmvga(machine_config &config);
+
 	void init_colorama();
 	void init_cmrltv75();
+
+private:
+	required_shared_ptr<uint16_t> m_vram;
 	virtual void video_start() override;
 	uint32_t screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -254,7 +258,6 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_palette2;
 
-	void coinmvga(machine_config &config);
 	void coinmvga_io_map(address_map &map);
 	void coinmvga_map(address_map &map);
 	void ramdac2_map(address_map &map);

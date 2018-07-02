@@ -176,6 +176,10 @@ public:
 		m_fakex(*this, "FAKEX"),
 		m_fakey(*this, "FAKEY") { }
 
+	void champbwl(machine_config &config);
+	void doraemon(machine_config &config);
+
+private:
 	int      m_screenflip;
 
 	required_device<cpu_device> m_maincpu;
@@ -201,8 +205,7 @@ public:
 	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_champbwl);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_doraemon);
-	void champbwl(machine_config &config);
-	void doraemon(machine_config &config);
+
 	void champbwl_map(address_map &map);
 	void doraemon_map(address_map &map);
 };

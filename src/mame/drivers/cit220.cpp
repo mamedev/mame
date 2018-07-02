@@ -27,14 +27,16 @@ public:
 		//, m_p_chargen(*this, "chargen")
 	{ }
 
+	void cit220p(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void cit220p(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	void vram_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	//required_region_ptr<u8> m_p_chargen;

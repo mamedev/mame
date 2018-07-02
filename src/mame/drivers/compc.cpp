@@ -21,6 +21,10 @@ public:
 		m_keyboard(*this, "pc_keyboard")
 	{ }
 
+	void compc(machine_config &config);
+	void pc10iii(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<pc_keyboard_device> m_keyboard;
@@ -32,12 +36,10 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_w);
 	DECLARE_READ8_MEMBER(pio_r);
 
-	void compc(machine_config &config);
-	void pc10iii(machine_config &config);
 	void compc_io(address_map &map);
 	void compc_map(address_map &map);
 	void compciii_io(address_map &map);
-private:
+
 	u8 m_portb, m_dips;
 };
 

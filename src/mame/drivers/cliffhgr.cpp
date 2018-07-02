@@ -104,6 +104,11 @@ public:
 		, m_led(*this, "led0")
 	{ }
 
+	void cliffhgr(machine_config &config);
+
+	void init_cliff();
+
+private:
 	DECLARE_WRITE8_MEMBER(cliff_test_led_w);
 	DECLARE_WRITE8_MEMBER(cliff_port_bank_w);
 	DECLARE_READ8_MEMBER(cliff_port_r);
@@ -113,17 +118,15 @@ public:
 	DECLARE_READ8_MEMBER(cliff_irq_ack_r);
 	DECLARE_WRITE8_MEMBER(cliff_ldwire_w);
 	DECLARE_WRITE8_MEMBER(cliff_sound_overlay_w);
-	void init_cliff();
+
 	TIMER_CALLBACK_MEMBER(cliff_irq_callback);
-	void cliffhgr(machine_config &config);
+
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<pioneer_pr8210_device> m_laserdisc;
 
 	int m_port_bank;

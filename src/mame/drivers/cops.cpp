@@ -60,6 +60,12 @@ public:
 		, m_irq(0)
 	{ }
 
+	void revlatns(machine_config &config);
+	void cops(machine_config &config);
+
+	void init_cops();
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76489_device> m_sn;
@@ -68,18 +74,15 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void revlatns(machine_config &config);
-	void cops(machine_config &config);
 	void cops_map(address_map &map);
 	void revlatns_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-public:
 	DECLARE_WRITE8_MEMBER(io1_w);
 	DECLARE_READ8_MEMBER(io1_r);
 	DECLARE_READ8_MEMBER(io1_lm_r);
@@ -99,7 +102,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cdrom_data_w);
 	DECLARE_WRITE8_MEMBER(cdrom_ctrl_w);
 	DECLARE_READ8_MEMBER(cdrom_data_r);
-	void init_cops();
+
 	int m_irq;
 
 	uint8_t m_lcd_addr_l, m_lcd_addr_h;

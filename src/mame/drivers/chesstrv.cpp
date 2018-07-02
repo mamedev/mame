@@ -25,6 +25,7 @@ protected:
 	{
 	}
 
+protected:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(ram_addr_r);

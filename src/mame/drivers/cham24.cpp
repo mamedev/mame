@@ -71,6 +71,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu") { }
 
+	void cham24(machine_config &config);
+
+	void init_cham24();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
@@ -87,12 +92,10 @@ public:
 	DECLARE_WRITE8_MEMBER(cham24_IN0_w);
 	DECLARE_READ8_MEMBER(cham24_IN1_r);
 	DECLARE_WRITE8_MEMBER(cham24_mapper_w);
-	void init_cham24();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void cham24_set_mirroring( int mirroring );
-	void cham24(machine_config &config);
 	void cham24_map(address_map &map);
 };
 

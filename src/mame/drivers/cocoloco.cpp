@@ -202,6 +202,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
 
+	void cocoloco(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
@@ -214,13 +219,11 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_clear_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cocoloco);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cocoloco(machine_config &config);
+
 	void cocoloco_map(address_map &map);
 };
 

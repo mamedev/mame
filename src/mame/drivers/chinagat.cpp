@@ -93,8 +93,15 @@ public:
 		: ddragon_state(mconfig, type, tag),
 		m_adpcm(*this, "adpcm") { };
 
-	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
+	void saiyugoub2(machine_config &config);
+	void saiyugoub1(machine_config &config);
+	void chinagat(machine_config &config);
+
 	void init_chinagat();
+
+private:
+	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
+
 	DECLARE_MACHINE_START(chinagat);
 	DECLARE_MACHINE_RESET(chinagat);
 	DECLARE_VIDEO_START(chinagat);
@@ -111,9 +118,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(saiyugoub1_m5205_irq_r);
 	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
 	optional_device<msm5205_device> m_adpcm;
-	void saiyugoub2(machine_config &config);
-	void saiyugoub1(machine_config &config);
-	void chinagat(machine_config &config);
+
 	void i8748_map(address_map &map);
 	void main_map(address_map &map);
 	void saiyugoub1_sound_map(address_map &map);

@@ -102,6 +102,10 @@ public:
 		m_s8(*this, "S8")
 	{ }
 
+	void compis(machine_config &config);
+	void compis2(machine_config &config);
+
+private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i80130_device> m_osp;
 	required_device<pit8253_device> m_pit;
@@ -156,8 +160,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 
 	int m_tmr0;
-	void compis(machine_config &config);
-	void compis2(machine_config &config);
+
 	void compis2_mem(address_map &map);
 	void compis_io(address_map &map);
 	void compis_mem(address_map &map);

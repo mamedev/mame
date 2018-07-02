@@ -72,6 +72,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"){ }
 
+	void chanbara(machine_config &config);
+
+	void init_chanbara();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -96,7 +101,7 @@ public:
 	DECLARE_WRITE8_MEMBER(chanbara_colorram2_w);
 	DECLARE_WRITE8_MEMBER(chanbara_ay_out_0_w);
 	DECLARE_WRITE8_MEMBER(chanbara_ay_out_1_w);
-	void init_chanbara();
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	virtual void machine_start() override;
@@ -105,7 +110,7 @@ public:
 	DECLARE_PALETTE_INIT(chanbara);
 	uint32_t screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void chanbara(machine_config &config);
+
 	void chanbara_map(address_map &map);
 };
 

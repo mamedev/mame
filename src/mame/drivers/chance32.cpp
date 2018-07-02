@@ -41,6 +41,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void chance32(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(chance32_fgram_w)
 	{
 		m_fgram[offset] = data;
@@ -60,11 +63,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void chance32(machine_config &config);
+
 	void chance32_map(address_map &map);
 	void chance32_portmap(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

@@ -196,14 +196,13 @@ public:
 		: pcat_base_state(mconfig, type, tag)
 	{ }
 
+	void comebaby(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void comebaby(machine_config &config);
 	void comebaby_io(address_map &map);
 	void comebaby_map(address_map &map);
-protected:
-
-	// devices
 
 	// driver_device overrides
 	virtual void video_start() override;

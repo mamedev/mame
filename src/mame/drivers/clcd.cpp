@@ -76,6 +76,9 @@ public:
 	{
 	}
 
+	void clcd(machine_config &config);
+
+private:
 	virtual void driver_start() override
 	{
 		m_mmu_mode = MMU_MODE_TEST;
@@ -552,10 +555,9 @@ public:
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
-	void clcd(machine_config &config);
 	void clcd_banked_mem(address_map &map);
 	void clcd_mem(address_map &map);
-private:
+
 	required_device<m65c02_device> m_maincpu;
 	required_device<mos6551_device> m_acia;
 	required_device<via6522_device> m_via0;

@@ -27,8 +27,10 @@ public:
 	{ }
 
 	void codata(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	void mem_map(address_map &map);
+
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;

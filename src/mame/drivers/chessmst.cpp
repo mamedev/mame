@@ -50,7 +50,7 @@ public:
 	void chessmsta(machine_config &config);
 	void chessmstdm(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -67,7 +67,6 @@ protected:
 	void chessmstdm(address_map &map);
 	void chessmstdm_io(address_map &map);
 
-private:
 	void update_display();
 
 	required_device<cpu_device> m_maincpu;

@@ -53,6 +53,12 @@ public:
 		m_adpcm_pos(0), m_adpcm_idle(1), m_adpcm_data(0), m_trigger(0)
 	{ }
 
+	void chinsan(machine_config &config);
+	void mayumi(machine_config &config);
+
+	void init_chinsan();
+
+private:
 	DECLARE_WRITE8_MEMBER(input_select_w);
 	DECLARE_READ8_MEMBER(input_p2_r);
 	DECLARE_READ8_MEMBER(input_p1_r);
@@ -65,19 +71,15 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
-	void init_chinsan();
 
-	void chinsan(machine_config &config);
-	void mayumi(machine_config &config);
 	void chinsan_io_map(address_map &map);
 	void chinsan_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void mayumi_io_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<z80_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_shared_ptr<uint8_t> m_color_ram;
