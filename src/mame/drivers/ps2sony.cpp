@@ -158,9 +158,13 @@ iLinkSGUID=0x--------
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
-#include "machine/ps2timer.h"
 #include "machine/ioptimer.h"
 #include "machine/iopdma.h"
+#include "machine/iopintc.h"
+#include "machine/ps2timer.h"
+#include "machine/ps2dma.h"
+#include "machine/ps2intc.h"
+#include "machine/ps2sif.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -172,9 +176,14 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_iop(*this, "iop")
 		, m_timer(*this, "timer%u", 0U)
+		, m_dmac(*this, "dmac")
+		, m_intc(*this, "intc")
+		, m_sif(*this, "sif")
 		, m_iop_timer(*this, "iop_timer")
 		, m_iop_dma(*this, "iop_dma")
+		, m_iop_intc(*this, "iop_intc")
 		, m_screen(*this, "screen")
+		, m_ram(*this, "ram")
 		, m_iop_ram(*this, "iop_ram")
         , m_sp_ram(*this, "sp_ram")
         , m_vu0_imem(*this, "vu0imem")
@@ -209,14 +218,6 @@ protected:
     DECLARE_WRITE64_MEMBER(gif_fifo_w);
     DECLARE_READ64_MEMBER(ipu_fifo_r);
     DECLARE_WRITE64_MEMBER(ipu_fifo_w);
-    DECLARE_READ32_MEMBER(dmac_channel_r);
-    DECLARE_WRITE32_MEMBER(dmac_channel_w);
-    DECLARE_READ32_MEMBER(dmac_r);
-    DECLARE_WRITE32_MEMBER(dmac_w);
-    DECLARE_READ32_MEMBER(intc_r);
-    DECLARE_WRITE32_MEMBER(intc_w);
-    DECLARE_READ32_MEMBER(sif_r);
-    DECLARE_WRITE32_MEMBER(sif_w);
     DECLARE_WRITE8_MEMBER(debug_w);
     DECLARE_READ32_MEMBER(unk_f430_r);
     DECLARE_WRITE32_MEMBER(unk_f430_w);
@@ -227,23 +228,11 @@ protected:
 
     DECLARE_WRITE64_MEMBER(ee_iop_ram_w);
     DECLARE_READ64_MEMBER(ee_iop_ram_r);
-    DECLARE_READ32_MEMBER(iop_intc_r);
-    DECLARE_WRITE32_MEMBER(iop_intc_w);
-    DECLARE_READ32_MEMBER(iop_sif_r);
-    DECLARE_WRITE32_MEMBER(iop_sif_w);
-    DECLARE_READ32_MEMBER(iop_dma_ctrl0_r);
-    DECLARE_WRITE32_MEMBER(iop_dma_ctrl0_w);
-    DECLARE_READ32_MEMBER(iop_dma_ctrl1_r);
-    DECLARE_WRITE32_MEMBER(iop_dma_ctrl1_w);
     DECLARE_WRITE32_MEMBER(iop_debug_w);
+	DECLARE_READ32_MEMBER(unk_iop_r);
+	DECLARE_WRITE32_MEMBER(unk_iop_w);
 
 	DECLARE_WRITE_LINE_MEMBER(iop_timer_irq);
-
-	void check_irq0();
-	void raise_interrupt(int line);
-
-	void check_iop_irq();
-	void raise_iop_interrupt(int line);
 
     void mem_map(address_map &map);
     void iop_map(address_map &map);
@@ -251,9 +240,14 @@ protected:
 	required_device<cpu_device>		m_maincpu;
 	required_device<iop_device>		m_iop;
 	required_device_array<ps2_timer_device, 4> m_timer;
+	required_device<ps2_dmac_device> m_dmac;
+	required_device<ps2_intc_device> m_intc;
+	required_device<ps2_sif_device>	m_sif;
 	required_device<iop_timer_device> m_iop_timer;
 	required_device<iop_dma_device> m_iop_dma;
+	required_device<iop_intc_device> m_iop_intc;
 	required_device<screen_device>	m_screen;
+	required_shared_ptr<uint64_t>	m_ram;
 	required_shared_ptr<uint32_t>	m_iop_ram;
     required_shared_ptr<uint64_t>	m_sp_ram;
 	required_shared_ptr<uint64_t>	m_vu0_imem;
@@ -284,34 +278,6 @@ protected:
 	uint32_t m_sif_sm_flag;
 	uint32_t m_sif_ctrl;
 
-	uint32_t m_dmac_d5_chcr;
-
-	enum
-	{
-		INT_GS = 0,
-		INT_SBUS,
-		INT_VB_ON,
-		INT_VB_OFF,
-		INT_VIF0,
-		INT_VIF1,
-		INT_VU0,
-		INT_VU1,
-		INT_IPU,
-		INT_TIMER0,
-		INT_TIMER1,
-		INT_TIMER2,
-		INT_TIMER3,
-		INT_SFIFO,
-		INT_VU0WD
-	};
-
-	uint32_t m_istat;
-	uint32_t m_imask;
-
-	uint32_t m_iop_istat;
-	uint32_t m_iop_imask;
-	uint32_t m_iop_ienable;
-
 	emu_timer *m_vblank_timer;
 };
 
@@ -321,371 +287,16 @@ protected:
  *
  */
 
-READ32_MEMBER(ps2sony_state::dmac_r)
-{
-	uint32_t ret = 0;
-	switch (offset)
-	{
-		case 0: /* D_CTRL */
-			logerror("%s: dmac_r: D_CTRL (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 2: /* D_STAT */
-			logerror("%s: dmac_r: D_STAT (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 4: /* D_PCR */
-			logerror("%s: dmac_r: D_PCR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 6: /* D_SQWC */
-			logerror("%s: dmac_r: D_SQWC (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 8: /* D_RBSR */
-			logerror("%s: dmac_r: D_RBSR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 10: /* D_RBOR */
-			logerror("%s: dmac_r: D_RBOR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 12: /* D_STADR */
-			logerror("%s: dmac_r: D_STADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		default:
-			logerror("%s: dmac_r: Unknown offset %08x\n", machine().describe_context(), 0x1000e000 + (offset << 3));
-			break;
-	}
-	return ret;
-}
-
-WRITE32_MEMBER(ps2sony_state::dmac_w)
-{
-	switch (offset)
-	{
-		case 0: /* D_CTRL */
-			logerror("%s: dmac_w: D_CTRL = %08x\n", machine().describe_context(), data);
-			break;
-		case 2: /* D_STAT */
-			logerror("%s: dmac_w: D_STAT = %08x\n", machine().describe_context(), data);
-			break;
-		case 4: /* D_PCR */
-			logerror("%s: dmac_w: D_PCR = %08x\n", machine().describe_context(), data);
-			break;
-		case 6: /* D_SQWC */
-			logerror("%s: dmac_w: D_SQWC = %08x\n", machine().describe_context(), data);
-			break;
-		case 8: /* D_RBSR */
-			logerror("%s: dmac_w: D_RBSR = %08x\n", machine().describe_context(), data);
-			break;
-		case 10: /* D_RBOR */
-			logerror("%s: dmac_w: D_RBOR = %08x\n", machine().describe_context(), data);
-			break;
-		case 12: /* D_STADR */
-			logerror("%s: dmac_w: D_STADR = %08x\n", machine().describe_context(), data);
-			break;
-		default:
-			logerror("%s: dmac_w: Unknown offset %08x = %08X\n", machine().describe_context(), 0x1000e000 + (offset << 3), data);
-			break;
-	}
-}
-
-READ32_MEMBER(ps2sony_state::dmac_channel_r)
-{
-	uint32_t ret = 0;
-	switch (offset + 0x8000/8)
-	{
-		case 0x8000/8: /* D0_CHCR */
-			logerror("%s: dmac_channel_r: D0_CHCR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0x8010/8: /* D0_MADR */
-			logerror("%s: dmac_channel_r: D0_MADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0x8020/8: /* D0_QWC */
-			logerror("%s: dmac_channel_r: D0_QWC (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0x8030/8: /* D0_TADR */
-			logerror("%s: dmac_channel_r: D0_TADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0x8040/8: /* D0_ASR0 */
-			logerror("%s: dmac_channel_r: D0_ASR0 (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0x8050/8: /* D0_ASR1 */
-			logerror("%s: dmac_channel_r: D0_ASR1 (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0x9000/8: /* D1_CHCR */
-			logerror("%s: dmac_channel_r: D1_CHCR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0x9010/8: /* D1_MADR */
-			logerror("%s: dmac_channel_r: D1_MADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0x9020/8: /* D1_QWC */
-			logerror("%s: dmac_channel_r: D1_QWC (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0x9030/8: /* D1_TADR */
-			logerror("%s: dmac_channel_r: D1_TADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0x9040/8: /* D1_ASR0 */
-			logerror("%s: dmac_channel_r: D1_ASR0 (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0x9050/8: /* D1_ASR1 */
-			logerror("%s: dmac_channel_r: D1_ASR1 (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xa000/8: /* D2_CHCR */
-			logerror("%s: dmac_channel_r: D2_CHCR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xa010/8: /* D2_MADR */
-			logerror("%s: dmac_channel_r: D2_MADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xa020/8: /* D2_QWC */
-			logerror("%s: dmac_channel_r: D2_QWC (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xa030/8: /* D2_TADR */
-			logerror("%s: dmac_channel_r: D2_TADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xa040/8: /* D2_ASR0 */
-			logerror("%s: dmac_channel_r: D2_ASR0 (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xa050/8: /* D2_ASR1 */
-			logerror("%s: dmac_channel_r: D2_ASR1 (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xb000/8: /* D3_CHCR */
-			logerror("%s: dmac_channel_r: D3_CHCR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xb010/8: /* D3_MADR */
-			logerror("%s: dmac_channel_r: D3_MADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xb020/8: /* D3_QWC */
-			logerror("%s: dmac_channel_r: D3_QWC (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xb400/8: /* D4_CHCR */
-			logerror("%s: dmac_channel_r: D4_CHCR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xb410/8: /* D4_MADR */
-			logerror("%s: dmac_channel_r: D4_MADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xb420/8: /* D4_QWC */
-			logerror("%s: dmac_channel_r: D4_QWC (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xb430/8: /* D4_TADR */
-			logerror("%s: dmac_channel_r: D4_TADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xc000/8: /* D5_CHCR */
-			ret = m_dmac_d5_chcr;
-			logerror("%s: dmac_channel_r: D5_CHCR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xc010/8: /* D5_MADR */
-			logerror("%s: dmac_channel_r: D5_MADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xc020/8: /* D5_QWC */
-			logerror("%s: dmac_channel_r: D5_QWC (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xc400/8: /* D6_CHCR */
-			logerror("%s: dmac_channel_r: D6_CHCR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xc410/8: /* D6_MADR */
-			logerror("%s: dmac_channel_r: D6_MADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xc420/8: /* D6_QWC */
-			logerror("%s: dmac_channel_r: D6_QWC (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xc430/8: /* D6_TADR */
-			logerror("%s: dmac_channel_r: D6_TADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xc800/8: /* D7_CHCR */
-			logerror("%s: dmac_channel_r: D7_CHCR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xc810/8: /* D7_MADR */
-			logerror("%s: dmac_channel_r: D7_MADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xc820/8: /* D7_QWC */
-			logerror("%s: dmac_channel_r: D7_QWC (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xd000/8: /* D8_CHCR */
-			logerror("%s: dmac_channel_r: D8_CHCR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xd010/8: /* D8_MADR */
-			logerror("%s: dmac_channel_r: D8_MADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xd020/8: /* D8_QWC */
-			logerror("%s: dmac_channel_r: D8_QWC (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xd080/8: /* D8_SADR */
-			logerror("%s: dmac_channel_r: D8_SADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xd400/8: /* D9_CHCR */
-			logerror("%s: dmac_channel_r: D9_CHCR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xd410/8: /* D9_MADR */
-			logerror("%s: dmac_channel_r: D9_MADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xd420/8: /* D9_QWC */
-			logerror("%s: dmac_channel_r: D9_QWC (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xd430/8: /* D9_TADR */
-			logerror("%s: dmac_channel_r: D9_TADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 0xd480/8: /* D9_SADR */
-			logerror("%s: dmac_channel_r: D9_SADR (%08x)\n", machine().describe_context(), ret);
-			break;
-		default:
-			logerror("%s: dmac_channel_r: Unknown offset %08x\n", machine().describe_context(), 0x10008000 + (offset << 3));
-			break;
-	}
-	return ret;
-}
-
-WRITE32_MEMBER(ps2sony_state::dmac_channel_w)
-{
-	static const char* mode_strings[4] = { "Normal", "Chain", "Interleave", "Undefined" };
-
-	switch (offset + 0x8000/8)
-	{
-		case 0x8000/8: /* D0_CHCR */
-			logerror("%s: dmac_channel_w: D0_CHCR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0x8010/8: /* D0_MADR */
-			logerror("%s: dmac_channel_w: D0_MADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0x8020/8: /* D0_QWC */
-			logerror("%s: dmac_channel_w: D0_QWC = %08x\n", machine().describe_context(), data);
-			break;
-		case 0x8030/8: /* D0_TADR */
-			logerror("%s: dmac_channel_w: D0_TADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0x8040/8: /* D0_ASR0 */
-			logerror("%s: dmac_channel_w: D0_ASR0 = %08x\n", machine().describe_context(), data);
-			break;
-		case 0x8050/8: /* D0_ASR1 */
-			logerror("%s: dmac_channel_w: D0_ASR1 = %08x\n", machine().describe_context(), data);
-			break;
-		case 0x9000/8: /* D1_CHCR */
-			logerror("%s: dmac_channel_w: D1_CHCR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0x9010/8: /* D1_MADR */
-			logerror("%s: dmac_channel_w: D1_MADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0x9020/8: /* D1_QWC */
-			logerror("%s: dmac_channel_w: D1_QWC = %08x\n", machine().describe_context(), data);
-			break;
-		case 0x9030/8: /* D1_TADR */
-			logerror("%s: dmac_channel_w: D1_TADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0x9040/8: /* D1_ASR0 */
-			logerror("%s: dmac_channel_w: D1_ASR0 = %08x\n", machine().describe_context(), data);
-			break;
-		case 0x9050/8: /* D1_ASR1 */
-			logerror("%s: dmac_channel_w: D1_ASR1 = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xa000/8: /* D2_CHCR */
-			logerror("%s: dmac_channel_w: D2_CHCR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xa010/8: /* D2_MADR */
-			logerror("%s: dmac_channel_w: D2_MADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xa020/8: /* D2_QWC */
-			logerror("%s: dmac_channel_w: D2_QWC = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xa030/8: /* D2_TADR */
-			logerror("%s: dmac_channel_w: D2_TADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xa040/8: /* D2_ASR0 */
-			logerror("%s: dmac_channel_w: D2_ASR0 = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xa050/8: /* D2_ASR1 */
-			logerror("%s: dmac_channel_w: D2_ASR1 = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xb000/8: /* D3_CHCR */
-			logerror("%s: dmac_channel_w: D3_CHCR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xb010/8: /* D3_MADR */
-			logerror("%s: dmac_channel_w: D3_MADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xb020/8: /* D3_QWC */
-			logerror("%s: dmac_channel_w: D3_QWC = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xb400/8: /* D4_CHCR */
-			logerror("%s: dmac_channel_w: D4_CHCR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xb410/8: /* D4_MADR */
-			logerror("%s: dmac_channel_w: D4_MADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xb420/8: /* D4_QWC */
-			logerror("%s: dmac_channel_w: D4_QWC = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xb430/8: /* D4_TADR */
-			logerror("%s: dmac_channel_w: D4_TADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xc000/8: /* D5_CHCR */
-			logerror("%s: dmac_channel_w: D5_CHCR = %08x (DIR=%s Memory, MOD=%s, ASP=%d, TTE=%s DMAtag, \n", machine().describe_context(), data, BIT(data, 0) ? "From" : "To", mode_strings[(data >> 1) & 3], (data >> 3) & 3, BIT(data, 6) ? "Transfers" : "Does not transfer");
-			logerror("%s:                                 TIE=%d, START=%d, TAG=%04x\n", machine().describe_context(), BIT(data, 7), BIT(data, 8), data >> 16);
-			COMBINE_DATA(&m_dmac_d5_chcr);
-			break;
-		case 0xc010/8: /* D5_MADR */
-			logerror("%s: dmac_channel_w: D5_MADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xc020/8: /* D5_QWC */
-			logerror("%s: dmac_channel_w: D5_QWC = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xc400/8: /* D6_CHCR */
-			logerror("%s: dmac_channel_w: D6_CHCR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xc410/8: /* D6_MADR */
-			logerror("%s: dmac_channel_w: D6_MADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xc420/8: /* D6_QWC */
-			logerror("%s: dmac_channel_w: D6_QWC = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xc430/8: /* D6_TADR */
-			logerror("%s: dmac_channel_w: D6_TADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xc800/8: /* D7_CHCR */
-			logerror("%s: dmac_channel_w: D7_CHCR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xc810/8: /* D7_MADR */
-			logerror("%s: dmac_channel_w: D7_MADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xc820/8: /* D7_QWC */
-			logerror("%s: dmac_channel_w: D7_QWC = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xd000/8: /* D8_CHCR */
-			logerror("%s: dmac_channel_w: D8_CHCR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xd010/8: /* D8_MADR */
-			logerror("%s: dmac_channel_w: D8_MADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xd020/8: /* D8_QWC */
-			logerror("%s: dmac_channel_w: D8_QWC = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xd080/8: /* D8_SADR */
-			logerror("%s: dmac_channel_w: D8_SADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xd400/8: /* D9_CHCR */
-			logerror("%s: dmac_channel_w: D9_CHCR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xd410/8: /* D9_MADR */
-			logerror("%s: dmac_channel_w: D9_MADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xd420/8: /* D9_QWC */
-			logerror("%s: dmac_channel_w: D9_QWC = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xd430/8: /* D9_TADR */
-			logerror("%s: dmac_channel_w: D9_TADR = %08x\n", machine().describe_context(), data);
-			break;
-		case 0xd480/8: /* D9_SADR */
-			logerror("%s: dmac_channel_w: D9_SADR = %08x\n", machine().describe_context(), data);
-			break;
-		default:
-			logerror("%s: dmac_channel_w: Unknown offset %08x = %08x\n", machine().describe_context(), 0x10008000 + (offset << 3), data);
-			break;
-	}
-}
-
 READ64_MEMBER(ps2sony_state::vif0_fifo_r)
 {
 	uint64_t ret = 0ULL;
 	if (offset)
 	{
-		logerror("%s: vif0_fifo_r [127..64]: (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+		logerror("%s: vif0_fifo_r [127..64]: (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 	else
 	{
-		logerror("%s: vif0_fifo_r [63..0]: (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+		logerror("%s: vif0_fifo_r [63..0]: (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 	return ret;
 }
@@ -694,11 +305,11 @@ WRITE64_MEMBER(ps2sony_state::vif0_fifo_w)
 {
 	if (offset)
 	{
-		logerror("%s: vif0_fifo_w [127..64]: %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+		logerror("%s: vif0_fifo_w [127..64]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 	else
 	{
-		logerror("%s: vif0_fifo_w [63..0]: %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+		logerror("%s: vif0_fifo_w [63..0]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 }
 
@@ -707,11 +318,11 @@ READ64_MEMBER(ps2sony_state::vif1_fifo_r)
 	uint64_t ret = 0ULL;
 	if (offset)
 	{
-		logerror("%s: vif1_fifo_r [127..64]: (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+		logerror("%s: vif1_fifo_r [127..64]: (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 	else
 	{
-		logerror("%s: vif1_fifo_r [63..0]: (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+		logerror("%s: vif1_fifo_r [63..0]: (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 	return ret;
 }
@@ -720,11 +331,11 @@ WRITE64_MEMBER(ps2sony_state::vif1_fifo_w)
 {
 	if (offset)
 	{
-		logerror("%s: vif1_fifo_w [127..64]: %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+		logerror("%s: vif1_fifo_w [127..64]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 	else
 	{
-		logerror("%s: vif1_fifo_w [63..0]: %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+		logerror("%s: vif1_fifo_w [63..0]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 }
 
@@ -733,11 +344,11 @@ READ64_MEMBER(ps2sony_state::gif_fifo_r)
 	uint64_t ret = 0ULL;
 	if (offset)
 	{
-		logerror("%s: gif_fifo_r [127..64]: (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+		logerror("%s: gif_fifo_r [127..64]: (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 	else
 	{
-		logerror("%s: gif_fifo_r [63..0]: (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+		logerror("%s: gif_fifo_r [63..0]: (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 	return ret;
 }
@@ -746,11 +357,11 @@ WRITE64_MEMBER(ps2sony_state::gif_fifo_w)
 {
 	if (offset)
 	{
-		logerror("%s: gif_fifo_w [127..64]: %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+		logerror("%s: gif_fifo_w [127..64]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 	else
 	{
-		logerror("%s: gif_fifo_w [63..0]: %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+		logerror("%s: gif_fifo_w [63..0]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 }
 
@@ -760,21 +371,21 @@ READ32_MEMBER(ps2sony_state::ipu_r)
 	switch (offset)
 	{
 		case 0: /* IPU_CMD */
-			logerror("%s: ipu_r: IPU_CMD (%08x)\n", machine().describe_context(), ret);
+			logerror("%s: ipu_r: IPU_CMD (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 2: /* IPU_CTRL */
 			ret = m_ipu_in_fifo_index | (m_ipu_out_fifo_index << 4);
-			logerror("%s: ipu_r: IPU_CTRL (%08x)\n", machine().describe_context(), ret);
+			logerror("%s: ipu_r: IPU_CTRL (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 4: /* IPU_BP */
 			ret = m_ipu_in_fifo_index << 8;
-			logerror("%s: ipu_r: IPU_BP (%08x)\n", machine().describe_context(), ret);
+			logerror("%s: ipu_r: IPU_BP (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 6: /* IPU_TOP */
-			logerror("%s: ipu_r: IPU_TOP (%08x)\n", machine().describe_context(), ret);
+			logerror("%s: ipu_r: IPU_TOP (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		default:
-			logerror("%s: ipu_r: Unknown offset %08x\n", machine().describe_context(), 0x10002000 + (offset << 3));
+			logerror("%s: ipu_r: Unknown offset %08x & %08x\n", machine().describe_context(), 0x10002000 + (offset << 3), mem_mask);
 			break;
 	}
 	return ret;
@@ -785,20 +396,20 @@ WRITE32_MEMBER(ps2sony_state::ipu_w)
 	switch (offset)
 	{
 		case 0: /* IPU_CMD */
-			logerror("%s: ipu_w: IPU_CMD = %08x\n", machine().describe_context(), data);
+			logerror("%s: ipu_w: IPU_CMD = %08x\n", machine().describe_context(), data, mem_mask);
 			switch ((data >> 28) & 0xf)
 			{
 				case 0x00: /* BCLR */
 					m_ipu_in_fifo_index = 0;
-					logerror("%s: IPU command: BCLR (%08x)\n", machine().describe_context(), data);
+					logerror("%s: IPU command: BCLR (%08x)\n", machine().describe_context(), data, mem_mask);
 					break;
 				case 0x01: /* IDEC */
-					logerror("%s: IPU command: IDEC (%08x)\n", machine().describe_context(), data);
+					logerror("%s: IPU command: IDEC (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 					logerror("%s:              FB:%d QSC:%d DT_DECODE:%d SGN:%d DITHER:%d OFM:%s\n", machine().describe_context(),
 						data & 0x3f, (data >> 16) & 0x1f, BIT(data, 24), BIT(data, 25), BIT(data, 26), BIT(data, 27) ? "RGB16" : "RGB32");
 					break;
 				case 0x02: /* BDEC */
-					logerror("%s: IPU command: BDEC (%08x)\n", machine().describe_context(), data);
+					logerror("%s: IPU command: BDEC (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 					logerror("%s:              FB:%d QSC:%d DT:%d DCR:%d MBI:%d\n", machine().describe_context(),
 						data & 0x3f, (data >> 16) & 0x1f, BIT(data, 25), BIT(data, 26), BIT(data, 27));
 					break;
@@ -811,40 +422,40 @@ WRITE32_MEMBER(ps2sony_state::ipu_w)
 						"Motion Code",
 						"DMVector"
 					};
-					logerror("%s: IPU command: VDEC (%08x)\n", machine().describe_context(), data);
+					logerror("%s: IPU command: VDEC (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 					logerror("%s:              FB:%d TBL:%s\n", machine().describe_context(), data & 0x3f, vlc[(data >> 26) & 3]);
 					break;
 				}
 				case 0x04: /* FDEC */
-					logerror("%s: IPU command: FDEC (%08x)\n", machine().describe_context(), data);
+					logerror("%s: IPU command: FDEC (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 					logerror("%s:              FB:%d\n", machine().describe_context(), data & 0x3f);
 					break;
 				case 0x05: /* SETIQ */
-					logerror("%s: IPU command: SETIQ (%08x)\n", machine().describe_context(), data);
+					logerror("%s: IPU command: SETIQ (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 					logerror("%s:              FB:%d IQM:%s quantization matrix\n", machine().describe_context(), data & 0x3f, BIT(data, 27) ? "Non-intra" : "Intra");
 					break;
 				case 0x06: /* SETVQ */
-					logerror("%s: IPU command: SETVQ (%08x)\n", machine().describe_context(), data);
+					logerror("%s: IPU command: SETVQ (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 					break;
 				case 0x07: /* CSC */
-					logerror("%s: IPU command: CSC (%08x)\n", machine().describe_context(), data);
+					logerror("%s: IPU command: CSC (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 					logerror("%s:              MBC:%d DTE:%d OFM:%s\n", machine().describe_context(), data & 0x3ff, BIT(data, 26), BIT(data, 27) ? "RGB16" : "RGB32");
 					break;
 				case 0x08: /* PACK */
-					logerror("%s: IPU command: PACK (%08x)\n", machine().describe_context(), data);
+					logerror("%s: IPU command: PACK (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 					logerror("%s:              DITHER:%d OFM:%s\n", machine().describe_context(), BIT(data, 26), BIT(data, 27) ? "RGB16" : "INDX4");
 					break;
 				case 0x09: /* SETTH */
-					logerror("%s: IPU command: SETTH (%08x)\n", machine().describe_context(), data);
+					logerror("%s: IPU command: SETTH (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 					logerror("%s:              TH0:%d TH1:%s\n", machine().describe_context(), data & 0x1ff, (data >> 16) & 0x1ff);
 					break;
 				default:
-					logerror("%s: Unknown IPU command: %08x\n", machine().describe_context(), data);
+					logerror("%s: Unknown IPU command: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 					break;
 			}
 			break;
 		case 2: /* IPU_CTRL */
-			logerror("%s: ipu_w: IPU_CTRL = %08x\n", machine().describe_context(), data);
+			logerror("%s: ipu_w: IPU_CTRL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			if (BIT(data, 30))
 			{
 				m_ipu_in_fifo_index = 0;
@@ -853,10 +464,10 @@ WRITE32_MEMBER(ps2sony_state::ipu_w)
 			}
 			break;
 		case 4: /* IPU_BP */
-			logerror("%s: ipu_w: IPU_BP = %08x (Not Valid!)\n", machine().describe_context(), data);
+			logerror("%s: ipu_w: IPU_BP = %08x & %08x (Not Valid!)\n", machine().describe_context(), data, mem_mask);
 			break;
 		case 6: /* IPU_TOP */
-			logerror("%s: ipu_w: IPU_TOP = %08x\n", machine().describe_context(), data);
+			logerror("%s: ipu_w: IPU_TOP & %08x = %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		default:
 			logerror("%s: ipu_w: Unknown offset %08x = %08x\n", machine().describe_context(), 0x10002000 + (offset << 3), data);
@@ -870,19 +481,19 @@ READ64_MEMBER(ps2sony_state::ipu_fifo_r)
 	switch (offset)
 	{
 		case 0:
-			logerror("%s: ipu_fifo_r: IPU_OUT_FIFO[127..64] (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+			logerror("%s: ipu_fifo_r: IPU_OUT_FIFO[127..64] (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 			break;
 		case 1:
-			logerror("%s: ipu_fifo_r: IPU_OUT_FIFO[63..0] (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+			logerror("%s: ipu_fifo_r: IPU_OUT_FIFO[63..0] (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 			break;
 		case 2:
-			logerror("%s: ipu_fifo_r: IPU_IN_FIFO[127..64] (Not Valid!)\n", machine().describe_context());
+			logerror("%s: ipu_fifo_r: IPU_IN_FIFO[127..64] & %08x%08x (Not Valid!)\n", machine().describe_context(), (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 			break;
 		case 3:
-			logerror("%s: ipu_fifo_r: IPU_IN_FIFO[63..0] (Not Valid!)\n", machine().describe_context());
+			logerror("%s: ipu_fifo_r: IPU_IN_FIFO[63..0] & %08x%08x (Not Valid!)\n", machine().describe_context(), (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 			break;
 		default:
-			logerror("%s: ipu_fifo_r: Unknown offset %08x\n", machine().describe_context(), 0x10007000 + (offset << 1));
+			logerror("%s: ipu_fifo_r: Unknown offset %08x\n", machine().describe_context(), 0x10007000 + (offset << 1), (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 			break;
 	}
 	return ret;
@@ -893,56 +504,31 @@ WRITE64_MEMBER(ps2sony_state::ipu_fifo_w)
 	switch (offset)
 	{
 		case 0:
-			logerror("%s: ipu_fifo_w: IPU_OUT_FIFO[127..64] = %08x%08x (Not Valid!)\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+			logerror("%s: ipu_fifo_w: IPU_OUT_FIFO[127..64] = %08x%08x & %08x%08x (Not Valid!)\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 			break;
 		case 1:
-			logerror("%s: ipu_fifo_w: IPU_OUT_FIFO[63..0] = %08x%08x (Not Valid!)\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+			logerror("%s: ipu_fifo_w: IPU_OUT_FIFO[63..0] = %08x%08x & %08x%08x (Not Valid!)\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 			break;
 		case 2:
-			logerror("%s: ipu_fifo_w: IPU_IN_FIFO[127..64] = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+			logerror("%s: ipu_fifo_w: IPU_IN_FIFO[127..64] = %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 			m_ipu_in_fifo[m_ipu_in_fifo_index] = data;
 			m_ipu_in_fifo_index++;
 			m_ipu_in_fifo_index &= 0xf;
 			break;
 		case 3:
-			logerror("%s: ipu_fifo_w: IPU_IN_FIFO[63..0] = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+			logerror("%s: ipu_fifo_w: IPU_IN_FIFO[63..0] = %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 			break;
 		default:
-			logerror("%s: ipu_fifo_w: Unknown offset %08x = %08x%08x\n", machine().describe_context(), 0x10007000 + (offset << 1), (uint32_t)(data >> 32), (uint32_t)data);
+			logerror("%s: ipu_fifo_w: Unknown offset %08x = %08x%08x & %08x%08x\n", machine().describe_context(), 0x10007000 + (offset << 1), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 			break;
 	}
-}
-
-void ps2sony_state::check_irq0()
-{
-	m_maincpu->set_input_line(MIPS3_IRQ0, (m_istat & m_imask) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void ps2sony_state::check_iop_irq()
-{
-	bool active = (m_iop_ienable && (m_iop_istat & m_iop_imask));
-	logerror("%s: check_iop_irq: %d\n", machine().describe_context(), active ? 1 : 0);
-	m_iop->set_input_line(R3000_IRQ0, active ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void ps2sony_state::raise_interrupt(int line)
-{
-	m_istat |= (1 << line);
-	check_irq0();
-}
-
-void ps2sony_state::raise_iop_interrupt(int line)
-{
-	logerror("%s: raise_iop_interrupt: %d\n", machine().describe_context(), line);
-	m_iop_istat |= (1 << line);
-	check_iop_irq();
 }
 
 WRITE_LINE_MEMBER(ps2sony_state::iop_timer_irq)
 {
 	logerror("%s: iop_timer_irq: %d\n", machine().describe_context(), state);
 	if (state)
-		raise_iop_interrupt(16);
+		m_iop_intc->raise_interrupt(iop_intc_device::INT_TIMER);
 }
 
 WRITE32_MEMBER(ps2sony_state::iop_debug_w)
@@ -950,203 +536,26 @@ WRITE32_MEMBER(ps2sony_state::iop_debug_w)
 	//printf("%08x ", data);
 }
 
-READ32_MEMBER(ps2sony_state::iop_intc_r)
+READ32_MEMBER(ps2sony_state::unk_iop_r)
 {
 	uint32_t ret = 0;
 	switch (offset)
 	{
-		case 0: // I_STAT
-			ret = m_iop_istat;
-			logerror("%s: iop_intc_r: I_STAT %08x\n", machine().describe_context(), ret);
-			break;
-		case 1: // I_MASK
-			ret = m_iop_imask;
-			logerror("%s: iop_intc_r: I_MASK %08x\n", machine().describe_context(), ret);
-			break;
-		case 2: // I_ENABLE
-			ret = m_iop_ienable;
-			m_iop_ienable = 0;
-			check_iop_irq();
-			logerror("%s: iop_intc_r: I_ENABLE %08x\n", machine().describe_context(), ret);
+		case 1:
+			if (mem_mask & 0xff00)
+				ret |= 0x4000;
+			logerror("%s; unk_iop_r: Unknown read: %08x = %08x & %08x\n", machine().describe_context(), 0x1f402000 + (offset << 2), ret, mem_mask);
 			break;
 		default:
-			logerror("%s: iop_intc_r: Unknown offset %08x\n", machine().describe_context(), 0x1f801070 + (offset << 2));
+			logerror("%s; unk_iop_r: Unknown read: %08x & %08x\n", machine().describe_context(), 0x1f402000 + (offset << 2), mem_mask);
 			break;
 	}
 	return ret;
 }
 
-WRITE32_MEMBER(ps2sony_state::iop_intc_w)
+WRITE32_MEMBER(ps2sony_state::unk_iop_w)
 {
-	switch (offset)
-	{
-		case 0: // I_STAT
-			logerror("%s: iop_intc_w: I_STAT = %08x\n", machine().describe_context(), data);
-			m_iop_istat &= data;
-			check_iop_irq();
-			break;
-		case 1: // I_MASK
-			logerror("%s: iop_intc_w: I_MASK = %08x\n", machine().describe_context(), data);
-			m_iop_imask = data;
-			check_iop_irq();
-			break;
-		case 2: // I_ENABLE
-			logerror("%s: iop_intc_w: I_ENABLE = %08x\n", machine().describe_context(), data);
-			m_iop_ienable = BIT(data, 0);
-			check_iop_irq();
-			break;
-		default:
-			logerror("%s: iop_intc_w: Unknown offset %08x = %08x\n", machine().describe_context(), 0x1f801070 + (offset << 2), data);
-			break;
-	}
-}
-
-READ32_MEMBER(ps2sony_state::intc_r)
-{
-	switch (offset)
-	{
-		case 0: // I_STAT
-			//logerror("%s: intc_r: I_STAT %08x\n", machine().describe_context(), m_istat);
-			return m_istat;
-		case 2: // I_MASK
-			logerror("%s: intc_r: I_MASK %08x\n", machine().describe_context(), m_imask);
-			return m_imask;
-		default:
-			logerror("%s: intc_r: Unknown offset %08x\n", machine().describe_context(), 0x1000f000 + (offset << 2));
-			return 0;
-	}
-}
-
-WRITE32_MEMBER(ps2sony_state::intc_w)
-{
-	switch (offset)
-	{
-		case 0: // I_STAT
-			logerror("%s: intc_w: I_STAT = %08x\n", machine().describe_context(), data);
-			m_istat &= ~data;
-			check_irq0();
-			break;
-		case 2: // I_MASK
-			logerror("%s: intc_w: I_MASK = %08x\n", machine().describe_context(), data);
-			m_imask ^= data & 0x7fff;
-			check_irq0();
-			break;
-		default:
-			logerror("%s: intc_w: Unknown offset %08x = %08x\n", machine().describe_context(), 0x1000f000 + (offset << 2), data);
-			break;
-	}
-}
-
-READ32_MEMBER(ps2sony_state::iop_sif_r)
-{
-	uint32_t ret = 0;
-	switch (offset)
-	{
-		case 0:
-			ret = m_sif_ms_mailbox;
-			logerror("%s: iop_sif_r: SIF master->slave mailbox (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 4:
-			ret = m_sif_sm_mailbox;
-			logerror("%s: iop_sif_r: SIF slave->master mailbox (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 8:
-			ret = m_sif_ms_flag;
-			logerror("%s: iop_sif_r: SIF master->slave flag (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 12:
-			ret = m_sif_sm_flag;
-			logerror("%s: iop_sif_r: SIF slave->master flag (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 16:
-			ret = m_sif_ctrl | 0xf0000002;
-			logerror("%s: iop_sif_r: SIF control register (%08x)\n", machine().describe_context(), ret);
-			break;
-		default:
-			logerror("%s: iop_sif_r: Unknown read (%08x)\n", machine().describe_context(), 0x1d000000 + (offset << 2));
-			break;
-	}
-	return ret;
-}
-
-WRITE32_MEMBER(ps2sony_state::iop_sif_w)
-{
-	switch (offset)
-	{
-		case 4:
-			logerror("%s: iop_sif_w: SIF set slave->master mailbox (%08x)\n", machine().describe_context(), data);
-			m_sif_sm_mailbox = data;
-			break;
-		case 12:
-			if (m_sif_sm_flag == 0 && data != 0)
-			{
-				//raise_interrupt(INT_SBUS);
-			}
-			logerror("%s: iop_sif_w: SIF set slave->master flag (%08x)\n", machine().describe_context(), data);
-			m_sif_sm_flag |= data;
-			break;
-		default:
-			logerror("%s: iop_sif_w: Unknown write %08x = %08x\n", machine().describe_context(), 0x1d000000 + (offset << 2), data);
-			break;
-	}
-}
-
-READ32_MEMBER(ps2sony_state::sif_r)
-{
-	uint32_t ret = 0;
-	switch (offset)
-	{
-		case 0:
-			ret = m_sif_ms_mailbox;
-			logerror("%s: sif_r: SIF master->slave mailbox (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 2:
-			ret = m_sif_sm_mailbox;
-			logerror("%s: sif_r: SIF slave->master mailbox (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 4:
-			ret = m_sif_ms_flag;
-			logerror("%s: sif_r: SIF master->slave flag (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 6:
-			ret = m_sif_sm_flag;
-			logerror("%s: sif_r: SIF slave->master flag (%08x)\n", machine().describe_context(), ret);
-			break;
-		case 8:
-			ret = m_sif_ctrl;
-			logerror("%s: sif_r: SIF control (%08x)\n", machine().describe_context(), ret);
-			break;
-		default:
-			logerror("%s: sif_r: Unknown (%08x)\n", machine().describe_context(), 0x1000f200 + (offset << 3));
-			break;
-	}
-	return ret;
-}
-
-WRITE32_MEMBER(ps2sony_state::sif_w)
-{
-	switch (offset)
-	{
-		case 0:
-			logerror("%s: sif_w: SIF set master->slave mailbox (%08x)\n", machine().describe_context(), data);
-			m_sif_ms_mailbox |= data;
-			break;
-		case 4:
-			logerror("%s: sif_w: SIF set master->slave flag (%08x)\n", machine().describe_context(), data);
-			m_sif_ms_flag |= data;
-			break;
-		case 6:
-			logerror("%s: sif_w: SIF clear slave->master flag (%08x)\n", machine().describe_context(), data);
-			m_sif_sm_flag &= ~data;
-			break;
-		case 8:
-			logerror("%s: sif_w: SIF control = %08x\n", machine().describe_context(), data);
-			m_sif_ctrl = data; // ??
-			break;
-		default:
-			logerror("%s: sif_w: Unknown %08x = %08x\n", machine().describe_context(), 0x1000f200 + (offset << 3), data);
-			break;
-	}
+	logerror("%s; unk_iop_w: Unknown write: %08x = %08x & %08x\n", machine().describe_context(), 0x1f402000 + (offset << 2), data, mem_mask);
 }
 
 void ps2sony_state::machine_start()
@@ -1168,31 +577,12 @@ void ps2sony_state::machine_start()
 	save_item(NAME(m_ipu_out_fifo));
 	save_item(NAME(m_ipu_out_fifo_index));
 
-	save_item(NAME(m_sif_ms_flag));
-	save_item(NAME(m_sif_sm_flag));
-	save_item(NAME(m_sif_ctrl));
-
-	save_item(NAME(m_dmac_d5_chcr));
-
-	save_item(NAME(m_istat));
-	save_item(NAME(m_imask));
-
-	save_item(NAME(m_iop_istat));
-	save_item(NAME(m_iop_imask));
-	save_item(NAME(m_iop_ienable));
-
 	if (!m_vblank_timer)
 		m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ps2sony_state::vblank), this));
 }
 
 void ps2sony_state::machine_reset()
 {
-	m_istat = 0;
-	m_imask = 0;
-
-	m_iop_istat = 0;
-	m_iop_imask = 0;
-
 	m_unk_f430_reg = 0;
 	m_unk_f440_reg = 0;
 	m_unk_f440_ret = 0;
@@ -1217,8 +607,6 @@ void ps2sony_state::machine_reset()
 	m_sif_ms_flag = 0;
 	m_sif_sm_flag = 0;
 	m_sif_ctrl = 0;
-
-	m_dmac_d5_chcr = 0;
 }
 
 TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
@@ -1226,15 +614,15 @@ TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
 	if (param)
 	{
 		// VBlank enter
-		raise_interrupt(INT_VB_ON);
-		raise_iop_interrupt(0);
+		m_intc->raise_interrupt(ps2_intc_device::INT_VB_ON);
+		m_iop_intc->raise_interrupt(iop_intc_device::INT_VB_ON);
 		m_vblank_timer->adjust(m_screen->time_until_pos(0), 0);
 	}
 	else
 	{
 		// VBlank exit
-		raise_interrupt(INT_VB_OFF);
-		raise_iop_interrupt(11);
+		m_intc->raise_interrupt(ps2_intc_device::INT_VB_OFF);
+		m_iop_intc->raise_interrupt(iop_intc_device::INT_VB_OFF);
 		m_vblank_timer->adjust(m_screen->time_until_pos(480), 1);
 	}
 }
@@ -1264,12 +652,6 @@ READ64_MEMBER(ps2sony_state::ee_iop_ram_r)
 READ64_MEMBER(ps2sony_state::board_id_r)
 {
 	return 0x1234;
-}
-
-READ32_MEMBER(ps2sony_state::unk_f520_r)
-{
-	// Unknown purpose - BIOS seems to expect this value initially
-	return 0x1201;
 }
 
 READ32_MEMBER(ps2sony_state::unk_f430_r)
@@ -1452,7 +834,7 @@ uint32_t ps2sony_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void ps2sony_state::mem_map(address_map &map)
 {
-	map(0x00000000, 0x01ffffff).mirror(0xe000000).ram(); // 32 MB RAM
+	map(0x00000000, 0x01ffffff).mirror(0xe000000).ram().share(m_ram); // 32 MB RAM
     map(0x10000000, 0x100007ff).rw(m_timer[0], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
     map(0x10000800, 0x10000fff).rw(m_timer[1], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
     map(0x10001000, 0x100017ff).rw(m_timer[2], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
@@ -1462,15 +844,16 @@ void ps2sony_state::mem_map(address_map &map)
     map(0x10005000, 0x1000500f).mirror(0xff0).rw(FUNC(ps2sony_state::vif1_fifo_r), FUNC(ps2sony_state::vif1_fifo_w));
     map(0x10006000, 0x1000600f).mirror(0xff0).rw(FUNC(ps2sony_state::gif_fifo_r), FUNC(ps2sony_state::gif_fifo_w));
     map(0x10007000, 0x1000701f).mirror(0xfe0).rw(FUNC(ps2sony_state::ipu_fifo_r), FUNC(ps2sony_state::ipu_fifo_w));
-    map(0x10008000, 0x1000dfff).rw(FUNC(ps2sony_state::dmac_channel_r), FUNC(ps2sony_state::dmac_channel_w)).umask64(0x00000000ffffffff);;
-    map(0x1000e000, 0x1000efff).rw(FUNC(ps2sony_state::dmac_r), FUNC(ps2sony_state::dmac_w)).umask64(0x00000000ffffffff);
-    map(0x1000f000, 0x1000f017).rw(FUNC(ps2sony_state::intc_r), FUNC(ps2sony_state::intc_w)).umask64(0x00000000ffffffff);
+    map(0x10008000, 0x1000dfff).rw(m_dmac, FUNC(ps2_dmac_device::channel_r), FUNC(ps2_dmac_device::channel_w)).umask64(0x00000000ffffffff);;
+    map(0x1000e000, 0x1000efff).rw(m_dmac, FUNC(ps2_dmac_device::read), FUNC(ps2_dmac_device::write)).umask64(0x00000000ffffffff);
+    map(0x1000f000, 0x1000f017).rw(m_intc, FUNC(ps2_intc_device::read), FUNC(ps2_intc_device::write)).umask64(0x00000000ffffffff);
     map(0x1000f130, 0x1000f137).nopr();
     map(0x1000f180, 0x1000f187).w(FUNC(ps2sony_state::debug_w)).umask64(0x00000000000000ff);
-    map(0x1000f200, 0x1000f24f).rw(FUNC(ps2sony_state::sif_r), FUNC(ps2sony_state::sif_w)).umask64(0x00000000ffffffff);
+    map(0x1000f200, 0x1000f24f).rw(m_sif, FUNC(ps2_sif_device::ee_r), FUNC(ps2_sif_device::ee_w)).umask64(0x00000000ffffffff);
     map(0x1000f430, 0x1000f437).rw(FUNC(ps2sony_state::unk_f430_r), FUNC(ps2sony_state::unk_f430_w)).umask64(0x00000000ffffffff); // Unknown
     map(0x1000f440, 0x1000f447).rw(FUNC(ps2sony_state::unk_f440_r), FUNC(ps2sony_state::unk_f440_w)).umask64(0x00000000ffffffff); // Unknown
-    map(0x1000f520, 0x1000f527).r(FUNC(ps2sony_state::unk_f520_r)).umask64(0x00000000ffffffff); // Unknown
+    map(0x1000f520, 0x1000f523).r(m_dmac, FUNC(ps2_dmac_device::disable_mask_r)).umask64(0x00000000ffffffff);
+    map(0x1000f590, 0x1000f593).w(m_dmac, FUNC(ps2_dmac_device::disable_mask_w)).umask64(0x00000000ffffffff);
     map(0x11000000, 0x11000fff).mirror(0x3000).ram().share(m_vu0_imem);
     map(0x11004000, 0x11004fff).mirror(0x3000).ram().share(m_vu0_dmem);
     map(0x11008000, 0x1100bfff).ram().share(m_vu1_imem);
@@ -1487,13 +870,14 @@ void ps2sony_state::mem_map(address_map &map)
 void ps2sony_state::iop_map(address_map &map)
 {
     map(0x00000000, 0x001fffff).ram().share(m_iop_ram);
-    map(0x1d000000, 0x1d00004f).rw(FUNC(ps2sony_state::iop_sif_r), FUNC(ps2sony_state::iop_sif_w));
-    map(0x1f402004, 0x1f402007).nopr();
-    map(0x1f801070, 0x1f80107b).rw(FUNC(ps2sony_state::iop_intc_r), FUNC(ps2sony_state::iop_intc_w));
-    map(0x1f8010f0, 0x1f8010f7).rw(m_iop_dma, FUNC(iop_dma_device::ctrl0_r), FUNC(iop_dma_device::ctrl0_w));
+    map(0x1d000000, 0x1d00004f).rw(m_sif, FUNC(ps2_sif_device::iop_r), FUNC(ps2_sif_device::iop_w));
+    map(0x1e000000, 0x1e003fff).nopr();
+    map(0x1f402000, 0x1f40200f).rw(FUNC(ps2sony_state::unk_iop_r), FUNC(ps2sony_state::unk_iop_w));
+    map(0x1f801070, 0x1f80107b).rw(m_iop_intc, FUNC(iop_intc_device::read), FUNC(iop_intc_device::write));
+    map(0x1f801080, 0x1f8010f7).rw(m_iop_dma, FUNC(iop_dma_device::bank0_r), FUNC(iop_dma_device::bank0_w));
     map(0x1f801450, 0x1f801453).noprw();
     map(0x1f8014a0, 0x1f8014af).rw(m_iop_timer, FUNC(iop_timer_device::read), FUNC(iop_timer_device::write));
-    map(0x1f801570, 0x1f801577).rw(m_iop_dma, FUNC(iop_dma_device::ctrl1_r), FUNC(iop_dma_device::ctrl1_w));
+    map(0x1f801500, 0x1f801577).rw(m_iop_dma, FUNC(iop_dma_device::bank1_r), FUNC(iop_dma_device::bank1_w));
     map(0x1f801578, 0x1f80157b).noprw();
     map(0x1f802070, 0x1f802073).w(FUNC(ps2sony_state::iop_debug_w)).nopr();
     map(0x1fc00000, 0x1fffffff).rom().region("bios", 0);
@@ -1510,21 +894,26 @@ MACHINE_CONFIG_START(ps2sony_state::ps2sony)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
+	MCFG_DEVICE_ADD(m_timer[0], SONYPS2_TIMER, 294912000/2, true)
+	MCFG_DEVICE_ADD(m_timer[1], SONYPS2_TIMER, 294912000/2, true)
+	MCFG_DEVICE_ADD(m_timer[2], SONYPS2_TIMER, 294912000/2, false)
+	MCFG_DEVICE_ADD(m_timer[3], SONYPS2_TIMER, 294912000/2, false)
+
+	MCFG_DEVICE_ADD(m_intc, SONYPS2_INTC, m_maincpu)
+	MCFG_DEVICE_ADD(m_dmac, SONYPS2_DMAC, 294912000/2, m_maincpu, m_ram, m_sif)
+	MCFG_DEVICE_ADD(m_sif, SONYPS2_SIF, m_intc)
+
 	MCFG_DEVICE_ADD(m_iop, SONYPS2_IOP, XTAL(67'737'600)/2)
 	MCFG_DEVICE_PROGRAM_MAP(iop_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_QUANTUM_PERFECT_CPU("iop")
 
-	MCFG_DEVICE_ADD(m_timer[0], SONYPS2_TIMER, 294912000/2, true)
-	MCFG_DEVICE_ADD(m_timer[1], SONYPS2_TIMER, 294912000/2, true)
-	MCFG_DEVICE_ADD(m_timer[2], SONYPS2_TIMER, 294912000/2, false)
-	MCFG_DEVICE_ADD(m_timer[3], SONYPS2_TIMER, 294912000/2, false)
-
+	MCFG_DEVICE_ADD(m_iop_intc, SONYIOP_INTC, m_iop)
 	MCFG_DEVICE_ADD(m_iop_timer, SONYIOP_TIMER, XTAL(67'737'600)/2)
 	MCFG_IOP_TIMER_IRQ_CALLBACK(WRITELINE(*this, ps2sony_state, iop_timer_irq))
 
-	MCFG_DEVICE_ADD(m_iop_dma, SONYIOP_DMA, XTAL(67'737'600)/2)
+	MCFG_DEVICE_ADD(m_iop_dma, SONYIOP_DMA, XTAL(67'737'600)/2, m_iop_intc, m_iop_ram, m_sif)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

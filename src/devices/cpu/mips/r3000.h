@@ -150,7 +150,7 @@ protected:
 	void writecache_le_dword(offs_t offset, uint32_t data);
 
 	// interrupts
-	void generate_exception(int exception);
+	void generate_exception(int exception, bool backup);
 	void check_irqs();
 	void set_irq_line(int irqline, int state);
 	void invalid_instruction();
