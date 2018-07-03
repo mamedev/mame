@@ -28,6 +28,13 @@ public:
 			m_cart(*this, "cartslot")
 	{ }
 
+	void channelf_cart(machine_config &config);
+	void channelf(machine_config &config);
+	void sabavpl2(machine_config &config);
+	void sabavdpl(machine_config &config);
+	void channlf2(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port_0_r);
 	DECLARE_READ8_MEMBER(port_1_r);
 	DECLARE_READ8_MEMBER(port_4_r);
@@ -50,11 +57,7 @@ public:
 	required_device<channelf_sound_device> m_custom;
 	required_device<channelf_cart_slot_device> m_cart;
 	int recalc_palette_offset(int reg1, int reg2);
-	void channelf_cart(machine_config &config);
-	void channelf(machine_config &config);
-	void sabavpl2(machine_config &config);
-	void sabavdpl(machine_config &config);
-	void channlf2(machine_config &config);
+
 	void channelf_io(address_map &map);
 	void channelf_map(address_map &map);
 };

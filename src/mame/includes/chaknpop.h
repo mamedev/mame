@@ -17,6 +17,9 @@ public:
 		m_attr_ram(*this, "attr_ram"),
 		m_spr_ram(*this, "spr_ram") { }
 
+	void chaknpop(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<taito68705_mcu_device> m_bmcu;
@@ -59,7 +62,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mcu_update_seed(uint8_t data);
-	void chaknpop(machine_config &config);
 	void chaknpop_map(address_map &map);
 };

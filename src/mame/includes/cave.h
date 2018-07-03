@@ -22,28 +22,6 @@
 class cave_state : public driver_device
 {
 public:
-	enum
-	{
-		MAX_PRIORITY        = 4,
-		MAX_SPRITE_NUM      = 0x400
-	};
-
-	struct sprite_cave
-	{
-		sprite_cave() { }
-
-		int priority = 0, flags = 0;
-
-		const uint8_t *pen_data = nullptr;  /* points to top left corner of tile data */
-		int line_offset = 0;
-
-		pen_t base_pen = 0;
-		int tile_width = 0, tile_height = 0;
-		int total_width = 0, total_height = 0;  /* in screen coordinates */
-		int x = 0, y = 0, xcount0 = 0, ycount0 = 0;
-		int zoomx_re = 0, zoomy_re = 0;
-	};
-
 	cave_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_videoregs(*this, "videoregs.%u", 0)
@@ -72,6 +50,72 @@ public:
 		, m_startup(*this, "startup")
 		, m_led_outputs(*this, "led%u", 0U)
 	{ }
+
+	void uopoko(machine_config &config);
+	void sailormn(machine_config &config);
+	void paceight(machine_config &config);
+	void pacslot(machine_config &config);
+	void hotdogst(machine_config &config);
+	void crusherm(machine_config &config);
+	void donpachi(machine_config &config);
+	void tekkencw(machine_config &config);
+	void korokoro(machine_config &config);
+	void esprade(machine_config &config);
+	void mazinger(machine_config &config);
+	void tjumpman(machine_config &config);
+	void tekkenbs(machine_config &config);
+	void gaia(machine_config &config);
+	void metmqstr(machine_config &config);
+	void ppsatan(machine_config &config);
+	void guwange(machine_config &config);
+	void dfeveron(machine_config &config);
+	void ddonpach(machine_config &config);
+	void pwrinst2(machine_config &config);
+
+	void init_uopoko();
+	void init_donpachi();
+	void init_mazinger();
+	void init_gaia();
+	void init_pwrinst2();
+	void init_ddonpach();
+	void init_agallet();
+	void init_hotdogst();
+	void init_tjumpman();
+	void init_korokoro();
+	void init_esprade();
+	void init_pwrinst2j();
+	void init_guwange();
+	void init_feversos();
+	void init_sailormn();
+	void init_dfeveron();
+	void init_metmqstr();
+	void init_ppsatan();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(korokoro_hopper_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tjumpman_hopper_r);
+
+private:
+	enum
+	{
+		MAX_PRIORITY        = 4,
+		MAX_SPRITE_NUM      = 0x400
+	};
+
+	struct sprite_cave
+	{
+		sprite_cave() { }
+
+		int priority = 0, flags = 0;
+
+		const uint8_t *pen_data = nullptr;  /* points to top left corner of tile data */
+		int line_offset = 0;
+
+		pen_t base_pen = 0;
+		int tile_width = 0, tile_height = 0;
+		int total_width = 0, total_height = 0;  /* in screen coordinates */
+		int x = 0, y = 0, xcount0 = 0, ycount0 = 0;
+		int zoomx_re = 0, zoomy_re = 0;
+	};
 
 	struct
 	{
@@ -106,8 +150,7 @@ public:
 	template<int Mask> DECLARE_WRITE8_MEMBER(oki2_bank_w);
 	template<int Chip> DECLARE_WRITE16_MEMBER(vram_w);
 	template<int Chip> DECLARE_WRITE16_MEMBER(vram_8x8_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(korokoro_hopper_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tjumpman_hopper_r);
+
 	DECLARE_WRITE16_MEMBER(cave_eeprom_msb_w);
 	DECLARE_WRITE16_MEMBER(sailormn_eeprom_msb_w);
 	DECLARE_WRITE16_MEMBER(hotdogst_eeprom_msb_w);
@@ -122,24 +165,7 @@ public:
 	DECLARE_READ16_MEMBER(ppsatan_touch2_r);
 	DECLARE_WRITE16_MEMBER(ppsatan_out_w);
 	uint16_t ppsatan_touch_r(int player);
-	void init_uopoko();
-	void init_donpachi();
-	void init_mazinger();
-	void init_gaia();
-	void init_pwrinst2();
-	void init_ddonpach();
-	void init_agallet();
-	void init_hotdogst();
-	void init_tjumpman();
-	void init_korokoro();
-	void init_esprade();
-	void init_pwrinst2j();
-	void init_guwange();
-	void init_feversos();
-	void init_sailormn();
-	void init_dfeveron();
-	void init_metmqstr();
-	void init_ppsatan();
+
 	TILE_GET_INFO_MEMBER(sailormn_get_tile_info_2);
 	template<int Chip> TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_MACHINE_RESET(cave);
@@ -180,26 +206,6 @@ public:
 	void esprade_unpack_sprites(int chip);
 	void sailormn_unpack_tiles(int chip);
 
-	void uopoko(machine_config &config);
-	void sailormn(machine_config &config);
-	void paceight(machine_config &config);
-	void pacslot(machine_config &config);
-	void hotdogst(machine_config &config);
-	void crusherm(machine_config &config);
-	void donpachi(machine_config &config);
-	void tekkencw(machine_config &config);
-	void korokoro(machine_config &config);
-	void esprade(machine_config &config);
-	void mazinger(machine_config &config);
-	void tjumpman(machine_config &config);
-	void tekkenbs(machine_config &config);
-	void gaia(machine_config &config);
-	void metmqstr(machine_config &config);
-	void ppsatan(machine_config &config);
-	void guwange(machine_config &config);
-	void dfeveron(machine_config &config);
-	void ddonpach(machine_config &config);
-	void pwrinst2(machine_config &config);
 	void crusherm_map(address_map &map);
 	void ddonpach_map(address_map &map);
 	void dfeveron_map(address_map &map);
@@ -232,7 +238,7 @@ public:
 	void tekkencw_map(address_map &map);
 	void tjumpman_map(address_map &map);
 	void uopoko_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
 	/* memory pointers */
@@ -323,7 +329,6 @@ protected:
 	int m_rasflag;
 	int m_old_rasflag;
 
-private:
 	inline void tilemap_draw( int chip, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t priority, uint32_t priority2, int GFX );
 	void set_pens(int chip);
 	void cave_vh_start( int num );

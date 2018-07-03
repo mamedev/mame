@@ -25,12 +25,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_planea(*this, "planea")
 		, m_planeb(*this, "planeb")
+		, m_scc(*this, "scc68070")
+		, m_slave_hle(*this, "slave_hle")
 		, m_input1(*this, "INPUT1")
 		, m_input2(*this, "INPUT2")
-		, m_slave_hle(*this, "slave_hle")
 		, m_servo(*this, "servo")
 		, m_slave(*this, "slave")
-		, m_scc(*this, "scc68070")
 		, m_cdic(*this, "cdic")
 		, m_cdda(*this, "cdda")
 		, m_mcd212(*this, "mcd212")
@@ -38,6 +38,27 @@ public:
 		, m_dmadac(*this, "dac%u", 1U)
 	{ }
 
+	void cdimono1(machine_config &config);
+	void cdimono2(machine_config &config);
+	void quizard4(machine_config &config);
+	void cdimono1_base(machine_config &config);
+	void cdi910(machine_config &config);
+	void quizard2(machine_config &config);
+	void quizard3(machine_config &config);
+	void quizard1(machine_config &config);
+	void quizard(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(mcu_input);
+
+	bitmap_rgb32 m_lcdbitmap;
+
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint16_t> m_planea;
+	required_shared_ptr<uint16_t> m_planeb;
+	required_device<cdi68070_device> m_scc;
+	optional_device<cdislave_device> m_slave_hle;
+
+private:
 	enum m68hc05eg_io_reg_t
 	{
 		PORT_A_DATA = 0x00,
@@ -74,15 +95,11 @@ public:
 		INV_CADDYSWITCH_IN = (1 << 7)
 	};
 
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint16_t> m_planea;
-	required_shared_ptr<uint16_t> m_planeb;
 	optional_ioport m_input1;
 	optional_ioport m_input2;
-	optional_device<cdislave_device> m_slave_hle;
+
 	optional_device<cpu_device> m_servo;
 	optional_device<cpu_device> m_slave;
-	required_device<cdi68070_device> m_scc;
 	optional_device<cdicdic_device> m_cdic;
 	required_device<cdda_device> m_cdda;
 	required_device<mcd212_device> m_mcd212;
@@ -97,10 +114,6 @@ public:
 
 	uint8_t m_timer_set;
 	emu_timer *m_test_timer;
-
-	bitmap_rgb32 m_lcdbitmap;
-
-	DECLARE_INPUT_CHANGED_MEMBER(mcu_input);
 
 	virtual void machine_start() override { }
 	virtual void video_start() override;
@@ -120,15 +133,7 @@ public:
 
 	uint32_t screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void cdimono1(machine_config &config);
-	void cdimono2(machine_config &config);
-	void quizard4(machine_config &config);
-	void cdimono1_base(machine_config &config);
-	void cdi910(machine_config &config);
-	void quizard2(machine_config &config);
-	void quizard3(machine_config &config);
-	void quizard1(machine_config &config);
-	void quizard(machine_config &config);
+
 	void cdi910_mem(address_map &map);
 	void cdimono1_mem(address_map &map);
 	void cdimono2_mem(address_map &map);

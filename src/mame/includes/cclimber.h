@@ -33,6 +33,28 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
+	void root(machine_config &config);
+	void swimmer(machine_config &config);
+	void guzzler(machine_config &config);
+	void toprollr(machine_config &config);
+	void cannonb(machine_config &config);
+	void yamato(machine_config &config);
+	void bagmanf(machine_config &config);
+	void cclimber(machine_config &config);
+	void cclimberx(machine_config &config);
+	void ckongb(machine_config &config);
+
+	void init_cclimber();
+	void init_yamato();
+	void init_ckongb();
+	void init_toprollr();
+	void init_cclimberj();
+	void init_cannonb2();
+	void init_cannonb();
+	void init_dking();
+	void init_rpatrol();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -80,15 +102,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 
 	virtual void machine_start() override;
-	void init_cclimber();
-	void init_yamato();
-	void init_ckongb();
-	void init_toprollr();
-	void init_cclimberj();
-	void init_cannonb2();
-	void init_cannonb();
-	void init_dking();
-	void init_rpatrol();
+
 	DECLARE_VIDEO_START(cclimber);
 	DECLARE_PALETTE_INIT(cclimber);
 	DECLARE_VIDEO_START(swimmer);
@@ -119,16 +133,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(bagmanf_vblank_irq);
-	void root(machine_config &config);
-	void swimmer(machine_config &config);
-	void guzzler(machine_config &config);
-	void toprollr(machine_config &config);
-	void cannonb(machine_config &config);
-	void yamato(machine_config &config);
-	void bagmanf(machine_config &config);
-	void cclimber(machine_config &config);
-	void cclimberx(machine_config &config);
-	void ckongb(machine_config &config);
+
 	void bagmanf_map(address_map &map);
 	void cannonb_map(address_map &map);
 	void cclimber_map(address_map &map);

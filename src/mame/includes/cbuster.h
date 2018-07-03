@@ -30,6 +30,11 @@ public:
 		, m_paletteram_ext(*this, "palette_ext")
 	{ }
 
+	void twocrude(machine_config &config);
+
+	void init_twocrude();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
@@ -50,16 +55,16 @@ public:
 
 	DECLARE_WRITE16_MEMBER(twocrude_control_w);
 	DECLARE_READ16_MEMBER(twocrude_control_r);
-	void init_twocrude();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
 	uint32_t screen_update_twocrude(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_WRITE16_MEMBER(palette_ext_w);
 	void update_palette(int offset);
-	void twocrude(machine_config &config);
+
 	void sound_map(address_map &map);
 	void twocrude_map(address_map &map);
 };

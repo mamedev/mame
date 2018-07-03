@@ -22,6 +22,14 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram") { }
 
+	void cabalt(machine_config &config);
+	void cabalbl2(machine_config &config);
+	void cabal(machine_config &config);
+	void cabalbl(machine_config &config);
+
+	void init_cabal();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
@@ -58,7 +66,6 @@ public:
 	DECLARE_WRITE8_MEMBER(cabalbl_1_adpcm_w);
 	DECLARE_WRITE8_MEMBER(cabalbl_2_adpcm_w);
 
-	void init_cabal();
 	DECLARE_MACHINE_START(cabalbl);
 	DECLARE_MACHINE_RESET(cabalbl);
 	virtual void video_start() override;
@@ -68,10 +75,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cabalt(machine_config &config);
-	void cabalbl2(machine_config &config);
-	void cabal(machine_config &config);
-	void cabalbl(machine_config &config);
+
 	void cabalbl2_predecrypted_opcodes_map(address_map &map);
 	void cabalbl2_sound_map(address_map &map);
 	void cabalbl_main_map(address_map &map);

@@ -36,6 +36,11 @@ public:
 		m_soundlatch4(*this, "soundlatch4"),
 		m_ram(*this, "ram") { }
 
+	void cchasm(machine_config &config);
+
+	INPUT_CHANGED_MEMBER(set_coin_flag);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<cpu_device> m_audiocpu;
@@ -68,17 +73,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_timer_1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_timer_2_w);
 
-	INPUT_CHANGED_MEMBER(set_coin_flag);
-
 	virtual void video_start() override;
 	virtual void sound_start() override;
 
 	void refresh();
 
-	void cchasm(machine_config &config);
 	void memmap(address_map &map);
 	void sound_memmap(address_map &map);
 	void sound_portmap(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
