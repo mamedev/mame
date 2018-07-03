@@ -456,7 +456,7 @@ cassette_image::error cassette_get_samples(cassette_image *cassette, int channel
 
 		/* and write out the result */
 		dest_ptr = (uint8_t*)samples;
-		dest_ptr += waveform_bytes_per_sample(waveform_flags) * sample_index * cassette->channels;
+		dest_ptr += sample_bytes * sample_index;
 		switch(waveform_bytes_per_sample(waveform_flags))
 		{
 			case 1:
