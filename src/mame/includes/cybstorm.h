@@ -29,10 +29,11 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 	{ }
 
-	void init_cybstorm();
 	void cybstorm(machine_config &config);
 
-protected:
+	void init_cybstorm();
+
+private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -50,7 +51,6 @@ protected:
 	void main_map(address_map &map);
 	void vadbank_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<atari_jsa_iiis_device> m_jsa;
 	required_device<atari_vad_device> m_vad;

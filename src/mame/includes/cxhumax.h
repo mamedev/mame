@@ -42,6 +42,9 @@ public:
 	{
 	}
 
+	void cxhumax(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<intel_28f320j3d_device> m_flash;
 	required_shared_ptr<uint32_t> m_ram;
@@ -166,7 +169,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_tick);
-	void cxhumax(machine_config &config);
+
 	void cxhumax_map(address_map &map);
 };
 

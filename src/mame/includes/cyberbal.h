@@ -29,6 +29,7 @@ protected:
 		m_mob(*this, "mob")
 	{ }
 
+protected:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 
@@ -62,7 +63,7 @@ public:
 
 	void cyberbal2p(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ16_MEMBER(sound_state_r);
 
 	virtual void update_interrupts() override;
@@ -74,7 +75,6 @@ protected:
 	// memory maps
 	void cyberbal2p_map(address_map &map);
 
-private:
 	required_device<atari_jsa_ii_device> m_jsa;
 };
 
@@ -98,11 +98,12 @@ public:
 		m_rscreen(*this, "rscreen")
 	{ }
 
-	void init_cyberbalt();
 	void cyberbal(machine_config &config);
 	void cyberbalt(machine_config &config);
 
-protected:
+	void init_cyberbalt();
+
+private:
 	DECLARE_WRITE16_MEMBER(p2_reset_w);
 	TILE_GET_INFO_MEMBER(get_alpha2_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
@@ -135,7 +136,6 @@ protected:
 	void sound_map(address_map &map);
 	void sound_68k_map(address_map &map);
 
-private:
 	required_device<m6502_device> m_audiocpu;
 	required_device<cpu_device> m_extracpu;
 	required_device<cpu_device> m_daccpu;

@@ -332,14 +332,7 @@ public:
 	m_cdda(*this, "cdda")
 	{ }
 
-	void handle_joystick_cia(uint8_t pra, uint8_t dra);
-	uint16_t handle_joystick_potgor(uint16_t potgor);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
-	DECLARE_CUSTOM_INPUT_MEMBER(cd32_sel_mirror_input);
-
-	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
-	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
+	void cubo(machine_config &config);
 
 	void init_cubo();
 	void init_mgprem11();
@@ -351,20 +344,29 @@ public:
 	void init_lasstixx();
 	void init_lsrquiz();
 
+	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
+	DECLARE_CUSTOM_INPUT_MEMBER(cd32_sel_mirror_input);
+
+private:
+	void handle_joystick_cia(uint8_t pra, uint8_t dra);
+	uint16_t handle_joystick_potgor(uint16_t potgor);
+
+
+	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
+	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
+
 	optional_ioport_array<2> m_player_ports;
 
 	int m_oldstate[2];
 	int m_cd32_shifter[2];
 	uint16_t m_potgo_value;
 
-	void cubo(machine_config &config);
 	void cubo_mem(address_map &map);
 	void overlay_2mb_map32(address_map &map);
-protected:
+
 	virtual void rs232_tx(int state) override;
 	virtual void potgo_w(uint16_t data) override;
 
-private:
 	required_device<microtouch_device> m_microtouch;
 	required_device<cdda_device> m_cdda;
 

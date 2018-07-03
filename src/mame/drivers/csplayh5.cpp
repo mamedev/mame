@@ -56,23 +56,7 @@ public:
 		m_region_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<tmp68301_device> m_tmp68301;
-	required_device<v9958_device> m_v9958;
-	required_device<nichisnd_device> m_nichisnd;
-	required_ioport_array<5> m_key;
-	required_memory_region m_region_maincpu;
-
-	uint16_t m_mux_data;
-
-	DECLARE_READ16_MEMBER(csplayh5_mux_r);
-	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
-	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
-
-	#if USE_H8
-	DECLARE_READ16_MEMBER(test_r);
-	DECLARE_WRITE_LINE_MEMBER(ide_irq);
-	#endif
+	void csplayh5(machine_config &config);
 
 	void init_csplayh1();
 
@@ -97,12 +81,31 @@ public:
 	void init_torarech();
 	void init_tsuwaku();
 
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<tmp68301_device> m_tmp68301;
+	required_device<v9958_device> m_v9958;
+	required_device<nichisnd_device> m_nichisnd;
+	required_ioport_array<5> m_key;
+	required_memory_region m_region_maincpu;
+
+	uint16_t m_mux_data;
+
+	DECLARE_READ16_MEMBER(csplayh5_mux_r);
+	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
+	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
+
+	#if USE_H8
+	DECLARE_READ16_MEMBER(test_r);
+	DECLARE_WRITE_LINE_MEMBER(ide_irq);
+	#endif
+
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
 
 	void general_init(int patchaddress, int patchvalue);
-	void csplayh5(machine_config &config);
+
 	void csplayh5_map(address_map &map);
 	void csplayh5_sub_io_map(address_map &map);
 	void csplayh5_sub_map(address_map &map);

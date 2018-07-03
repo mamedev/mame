@@ -257,6 +257,19 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
+	void crospuzl(machine_config &config);
+	void crystal(machine_config &config);
+	void crzyddz2(machine_config &config);
+	void trivrus(machine_config &config);
+
+	void init_topbladv();
+	void init_officeye();
+	void init_crysking();
+	void init_evosocc();
+	void init_donghaer();
+	void init_psattack();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_sysregs;
 	required_shared_ptr<uint32_t> m_workram;
@@ -309,12 +322,6 @@ public:
 	DECLARE_WRITE32_MEMBER(DMA0_w);
 	DECLARE_READ32_MEMBER(DMA1_r);
 	DECLARE_WRITE32_MEMBER(DMA1_w);
-	void init_topbladv();
-	void init_officeye();
-	void init_crysking();
-	void init_evosocc();
-	void init_donghaer();
-	void init_psattack();
 
 	DECLARE_READ32_MEMBER(trivrus_input_r);
 	DECLARE_WRITE32_MEMBER(trivrus_input_w);
@@ -338,10 +345,7 @@ public:
 	void PatchReset(  );
 	uint16_t GetVidReg( address_space &space, uint16_t reg );
 	void SetVidReg( address_space &space, uint16_t reg, uint16_t val );
-	void crospuzl(machine_config &config);
-	void crystal(machine_config &config);
-	void crzyddz2(machine_config &config);
-	void trivrus(machine_config &config);
+
 	void crospuzl_mem(address_map &map);
 	void crystal_mem(address_map &map);
 	void crzyddz2_mem(address_map &map);

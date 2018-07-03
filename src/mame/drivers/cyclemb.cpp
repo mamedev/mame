@@ -99,6 +99,13 @@ public:
 		m_obj3_ram(*this, "obj3_ram")
 	{ }
 
+	void cyclemb(machine_config &config);
+	void skydest(machine_config &config);
+
+	void init_skydest();
+	void init_cyclemb();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -132,8 +139,6 @@ public:
 	DECLARE_WRITE8_MEMBER(skydest_i8741_1_w);
 //  DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
-	void init_skydest();
-	void init_cyclemb();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(cyclemb);
@@ -145,8 +150,7 @@ public:
 	void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_i8741_reset();
-	void cyclemb(machine_config &config);
-	void skydest(machine_config &config);
+
 	void cyclemb_io(address_map &map);
 	void cyclemb_map(address_map &map);
 	void cyclemb_sound_io(address_map &map);

@@ -25,29 +25,28 @@ class cupidon_state : public driver_device
 public:
 	cupidon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_gfxram(*this, "gfxram")
+		m_maincpu(*this, "maincpu"),
+		m_gfxram(*this, "gfxram")
 	{ }
 
+	void cupidon(machine_config &config);
+
+	void init_cupidon();
+	void init_funnyfm();
+
+private:
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_gfxram;
 
 	uint32_t screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void init_cupidon();
-	void init_funnyfm();
-
-	DECLARE_READ32_MEMBER( cupidon_return_ffffffff )
+	DECLARE_READ32_MEMBER(cupidon_return_ffffffff)
 	{
 		return -1; // or it hits an illegal opcode (sleep on the 68340?)
 	};
 
-		void cupidon(machine_config &config);
-		void cupidon_map(address_map &map);
-protected:
-
-
+	void cupidon_map(address_map &map);
 };
 
 uint32_t cupidon_state::screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

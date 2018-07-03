@@ -41,6 +41,9 @@ public:
 		m_bg2_regs_y(*this, "bg2_regs_y")
 	{ }
 
+	void cultures(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -79,7 +82,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cultures_interrupt);
-	void cultures(machine_config &config);
+
 	void cultures_io_map(address_map &map);
 	void cultures_map(address_map &map);
 	void oki_map(address_map &map);

@@ -40,6 +40,9 @@ public:
 		m_speaker(*this, "speaker")
 	{ }
 
+	void ct486(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cs4031_device> m_cs4031;
 	required_device<isa16_device> m_isabus;
@@ -52,7 +55,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cs4031_hold );
 	DECLARE_WRITE8_MEMBER( cs4031_tc ) { m_isabus->eop_w(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( cs4031_spkr ) { m_speaker->level_w(state); }
-	void ct486(machine_config &config);
+
 	void ct486_io(address_map &map);
 	void ct486_map(address_map &map);
 };

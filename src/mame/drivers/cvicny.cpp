@@ -47,11 +47,13 @@ public:
 		{ }
 
 	void cvicny(machine_config &config);
+
+private:
 	void cvicny_mem(address_map &map);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(segment_w );
-private:
+
 	uint8_t m_digit;
 	uint8_t m_digit_last;
 	virtual void machine_start() override { m_digits.resolve(); }

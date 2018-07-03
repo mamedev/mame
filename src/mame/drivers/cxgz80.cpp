@@ -51,6 +51,9 @@ public:
 		m_display_maxx(0)
 	{ }
 
+	void ch2001(machine_config &config);
+
+private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
@@ -89,10 +92,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ch2001_speaker_on_w);
 	DECLARE_WRITE8_MEMBER(ch2001_leds_w);
 	DECLARE_READ8_MEMBER(ch2001_input_r);
-	void ch2001_map(address_map &map);
-	void ch2001(machine_config &config);
 
-protected:
+	void ch2001_map(address_map &map);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
