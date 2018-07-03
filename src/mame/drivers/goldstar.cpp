@@ -1338,6 +1338,39 @@ void goldstar_state::bonusch_portmap(address_map &map)
 	map(0x60, 0x60).portr("IN3");
 }
 
+void unkch_state::feverch_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+
+	map(0xc000, 0xc7ff).ram().w(FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xc800, 0xcfff).ram();
+	map(0xd000, 0xd7ff).ram().w(FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
+
+	// placeholders to appease validation, should be 0x200 each.
+	map(0xe000, 0xe000).ram().w(FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe200, 0xe200).ram().w(FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe400, 0xf400).ram().w(FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
+
+	// placeholders to appease validation, should be 0x40 each.
+	map(0xe640, 0xe640).ram().share("reel1_scroll");
+	map(0xe680, 0xe680).ram().share("reel2_scroll");
+	map(0xe700, 0xe700).ram().share("reel3_scroll");
+
+	// placeholders to appease validation, should be 0x200 each.
+	map(0xe800, 0xe800).ram().w(FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xea00, 0xea00).ram().w(FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xec00, 0xec00).ram().w(FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+
+	map(0xf800, 0xffff).ram();
+}
+
+void goldstar_state::feverch_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 static INPUT_PORTS_START( cmv4_player )
 	PORT_START("IN0")
@@ -9199,7 +9232,46 @@ MACHINE_CONFIG_START(unkch_state::bonusch)
 
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(unkch_state::feverch)
 
+	MCFG_DEVICE_ADD("maincpu", Z80, 12'000'000 / 2) // clock not verified
+	MCFG_DEVICE_PROGRAM_MAP(feverch_map)
+	MCFG_DEVICE_IO_MAP(feverch_portmap)
+
+	 // multiplexed inputs? put dip 2:7 on for port test
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(unkch_state, screen_update_unkch)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
+
+	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
+
+	SPEAKER(config, "mono").front_center();
+
+	MCFG_DEVICE_ADD("sn1", SN76489A, 12'000'000 / 12) // actually SN76489AN, clock not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MCFG_DEVICE_ADD("sn2", SN76489A, 12'000'000 / 12) // actually SN76489AN, clock not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -14538,6 +14610,45 @@ ROM_START( bonusch )
 
 ROM_END
 
+/*
+Fever Chance
+Wing 19?? (1986 in ROM).
+
+Wing license seal but Eagle labeled ROMs
+
+1 x Z80
+3 x I8255A
+2 x SN76489AN
+1 x unknown at 8d (possibly battery backed RAM)
+*/
+
+ROM_START( feverch )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w9.c11", 0x00000, 0x8000, CRC(4dda18ef) SHA1(9a98a2f6996903b58d53e10b7b68c6ed1c34967a) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "cf18.7h", 0x00000, 0x08000, CRC(c63924fe) SHA1(7471d05c8688ba1fa6c0c3444de8883595c21776) )
+	ROM_LOAD( "cf19.8h", 0x08000, 0x08000, CRC(f0229490) SHA1(665d335cc030a0cbec0c11c685a6f1e2f9706989) )
+	ROM_LOAD( "cf20.10h", 0x10000, 0x08000, CRC(1d831a06) SHA1(42d235b8dd894d38579886940a3e13adb843e00d) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "cf1.1h", 0x00000, 0x02000, CRC(5f022073) SHA1(2e154837834cc9db452279b4933900234b568565) ) // 1st and 2nd half identical
+	ROM_CONTINUE(0x00000, 0x02000)
+	ROM_LOAD( "cf2.2h", 0x02000, 0x02000, CRC(e8f927b9) SHA1(29dec2f21a1bea250a4a2d75fab8d03a1fc70bcd) ) // 1st and 2nd half identical
+	ROM_CONTINUE(0x02000, 0x02000)
+	ROM_LOAD( "cf3.4h", 0x04000, 0x02000, CRC(79b06e00) SHA1(18f73527714914edb57e22909c95f2c764223900) ) // 1st and 2nd half identical
+	ROM_CONTINUE(0x04000, 0x02000)
+	ROM_LOAD( "cf4.5h", 0x06000, 0x02000, CRC(7f73744e) SHA1(7c07095f7ec4302a4839a279c755979ec10e0715) ) // 1st and 2nd half identical
+	ROM_CONTINUE(0x06000, 0x02000)
+
+	// PROMs not dumped, taken from lucky8
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12",   0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "prom4", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+ROM_END
 
 /*
   Win Cherry (ver 0.16 - 19990219)
@@ -16374,6 +16485,7 @@ GAME(  199?, fl7_tw,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7
 
 // --- Wing W-8 hardware ---
 GAME(  1990, bonusch,   0,        bonusch,  bonusch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8)",                                       MACHINE_NOT_WORKING )  // M80C51F MCU
+GAME(  19??, feverch,   0,        feverch,  bonusch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance",                                             MACHINE_NOT_WORKING )
 
 
 // --- Magical Odds hardware ---
