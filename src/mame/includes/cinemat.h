@@ -39,6 +39,42 @@ public:
 		, m_pressed(*this, "pressed%u", 0U)
 	{ }
 
+	void ripoff(machine_config &config);
+	void wotw(machine_config &config);
+	void speedfrk(machine_config &config);
+	void starcas(machine_config &config);
+	void spacewar(machine_config &config);
+	void tailg(machine_config &config);
+	void warrior(machine_config &config);
+	void starhawk(machine_config &config);
+	void barrier(machine_config &config);
+	void armora(machine_config &config);
+
+	void init_speedfrk();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+	WRITE_LINE_MEMBER(mux_select_w);
+
+protected:
+	void cinemat_nojmi_4k(machine_config &config);
+	void cinemat_jmi_4k(machine_config &config);
+	void cinemat_nojmi_8k(machine_config &config);
+	void cinemat_jmi_8k(machine_config &config);
+	void cinemat_jmi_16k(machine_config &config);
+	void cinemat_jmi_32k(machine_config &config);
+
+	void spacewar_sound(machine_config &config);
+	void barrier_sound(machine_config &config);
+	void speedfrk_sound(machine_config &config);
+	void starhawk_sound(machine_config &config);
+	void tailg_sound(machine_config &config);
+	void warrior_sound(machine_config &config);
+	void armora_sound(machine_config &config);
+	void ripoff_sound(machine_config &config);
+	void starcas_sound(machine_config &config);
+	void wotw_sound(machine_config &config);
+
 	required_device<ccpu_cpu_device> m_maincpu;
 	optional_device<ay8910_device> m_ay1;
 	required_device<ls259_device> m_outlatch;
@@ -74,28 +110,16 @@ public:
 	DECLARE_READ8_MEMBER(switches_r);
 	DECLARE_READ8_MEMBER(coin_input_r);
 	WRITE_LINE_MEMBER(coin_reset_w);
-	WRITE_LINE_MEMBER(mux_select_w);
+
 	DECLARE_READ8_MEMBER(speedfrk_wheel_r);
 	DECLARE_READ8_MEMBER(speedfrk_gear_r);
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w);
 	DECLARE_READ8_MEMBER(joystick_read);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	void init_speedfrk();
+
 	uint32_t screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, int16_t ey, uint8_t shift);
-	void ripoff(machine_config &config);
-	void wotw(machine_config &config);
-	void speedfrk(machine_config &config);
-	void starcas(machine_config &config);
-	void spacewar(machine_config &config);
-	void tailg(machine_config &config);
-	void warrior(machine_config &config);
-	void starhawk(machine_config &config);
-	void barrier(machine_config &config);
-	void armora(machine_config &config);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void sound_start() override;
@@ -144,24 +168,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound2_w);
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound3_w);
 	DECLARE_WRITE_LINE_MEMBER(wotw_sound4_w);
-
-	void cinemat_nojmi_4k(machine_config &config);
-	void cinemat_jmi_4k(machine_config &config);
-	void cinemat_nojmi_8k(machine_config &config);
-	void cinemat_jmi_8k(machine_config &config);
-	void cinemat_jmi_16k(machine_config &config);
-	void cinemat_jmi_32k(machine_config &config);
-
-	void spacewar_sound(machine_config &config);
-	void barrier_sound(machine_config &config);
-	void speedfrk_sound(machine_config &config);
-	void starhawk_sound(machine_config &config);
-	void tailg_sound(machine_config &config);
-	void warrior_sound(machine_config &config);
-	void armora_sound(machine_config &config);
-	void ripoff_sound(machine_config &config);
-	void starcas_sound(machine_config &config);
-	void wotw_sound(machine_config &config);
 
 	void program_map_4k(address_map &map);
 	void program_map_8k(address_map &map);

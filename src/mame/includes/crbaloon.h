@@ -25,8 +25,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sn(*this, "snsnd"),
 		m_discrete(*this, "discrete"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
+	void crbaloon(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(pc3092_r);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -45,7 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_sound_w);
 	DECLARE_WRITE8_MEMBER(crbaloon_videoram_w);
 	DECLARE_WRITE8_MEMBER(crbaloon_colorram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(pc3092_r);
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -64,7 +70,7 @@ public:
 	void crbaloon_audio_set_explosion_enable(int enabled);
 	void crbaloon_audio_set_breath_enable(int enabled);
 	void crbaloon_audio_set_appear_enable(int enabled);
-	void crbaloon(machine_config &config);
+
 	void crbaloon_audio(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);

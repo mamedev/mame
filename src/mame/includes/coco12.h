@@ -43,11 +43,6 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER( sam_read );
-
-	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
-	DECLARE_WRITE_LINE_MEMBER( field_sync );
-
 	void coco2bh(machine_config &config);
 	void coco2h(machine_config &config);
 	void cocoeh(machine_config &config);
@@ -59,16 +54,23 @@ public:
 	void cp400(machine_config &config);
 	void cocoe(machine_config &config);
 	void coco(machine_config &config);
+
 protected:
+	DECLARE_READ8_MEMBER( sam_read );
+
+	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
+	DECLARE_WRITE_LINE_MEMBER( field_sync );
+
 	virtual void device_start() override;
-	virtual void update_cart_base(uint8_t *cart_base) override;
+
+	sam6883_device &sam() { return *m_sam; }
 
 	// PIA1
 	virtual void pia1_pb_changed(uint8_t data) override;
 
-	sam6883_device &sam() { return *m_sam; }
-
 private:
+	virtual void update_cart_base(uint8_t *cart_base) override;
+
 	void configure_sam(void);
 
 	required_device<sam6883_device> m_sam;

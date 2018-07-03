@@ -22,6 +22,12 @@ public:
 		m_vregs(*this, "vregs")
 	{ }
 
+	void firebatl(machine_config &config);
+	void clshroad(machine_config &config);
+
+	void init_firebatl();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -52,7 +58,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_fb1);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 
-	void init_firebatl();
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(firebatl);
 	DECLARE_PALETTE_INIT(firebatl);
@@ -63,8 +68,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
-	void firebatl(machine_config &config);
-	void clshroad(machine_config &config);
+
 	void clshroad_map(address_map &map);
 	void clshroad_sound_map(address_map &map);
 };

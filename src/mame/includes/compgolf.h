@@ -20,6 +20,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void compgolf(machine_config &config);
+
+	void init_compgolf();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_bg_ram;
@@ -40,7 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(compgolf_back_w);
 	DECLARE_WRITE8_MEMBER(compgolf_scrollx_lo_w);
 	DECLARE_WRITE8_MEMBER(compgolf_scrolly_lo_w);
-	void init_compgolf();
+
 	TILE_GET_INFO_MEMBER(get_text_info);
 	TILEMAP_MAPPER_MEMBER(back_scan);
 	TILE_GET_INFO_MEMBER(get_back_info);
@@ -54,6 +59,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void compgolf(machine_config &config);
+
 	void compgolf_map(address_map &map);
 };

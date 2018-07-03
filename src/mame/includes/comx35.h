@@ -44,6 +44,14 @@ public:
 			m_modifiers(*this, "MODIFIERS")
 	{ }
 
+	void pal(machine_config &config);
+	void ntsc(machine_config &config);
+	void comx35_pal_video(machine_config &config);
+	void comx35_ntsc_video(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
+private:
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_vis;
 	required_device<cdp1871_device> m_kbe;
@@ -80,17 +88,12 @@ public:
 	DECLARE_WRITE8_MEMBER( sc_w );
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( prd_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
 	DECLARE_QUICKLOAD_LOAD_MEMBER( comx35_comx );
 	void image_fread_memory(device_image_interface &image, uint16_t addr, uint32_t count);
 	CDP1869_CHAR_RAM_READ_MEMBER(comx35_charram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(comx35_charram_w);
 	CDP1869_PCB_READ_MEMBER(comx35_pcb_r);
-
-	void pal(machine_config &config);
-	void ntsc(machine_config &config);
-	void comx35_pal_video(machine_config &config);
-	void comx35_ntsc_video(machine_config &config);
 
 	void cdp1869_page_ram(address_map &map);
 	void comx35_io(address_map &map);

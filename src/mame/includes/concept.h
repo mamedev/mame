@@ -41,6 +41,9 @@ public:
 		m_a2bus(*this, "a2bus"),
 		m_videoram(*this,"videoram") { }
 
+	void concept(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6551_device> m_acia0;
 	required_device<mos6551_device> m_acia1;
@@ -68,7 +71,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(via_irq_func);
 	void concept_set_interrupt(int level, int state);
-	void concept(machine_config &config);
+
 	void concept_memmap(address_map &map);
 };
 
