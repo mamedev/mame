@@ -732,8 +732,8 @@ TIMER_CALLBACK_MEMBER(norautp_state::ppi2_ack)
 	m_ppi8255[2]->pc6_w(param);
 	if (param == 0)
 	{
-		uint8_t np_addr = m_ppi8255[2]->pb_r();
-		uint8_t vram_data = m_ppi8255[2]->pa_r();
+		uint8_t const np_addr = m_ppi8255[2]->read_pb();
+		uint8_t const vram_data = m_ppi8255[2]->read_pa();
 		m_np_vram[np_addr] = vram_data;
 	}
 }

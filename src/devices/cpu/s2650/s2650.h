@@ -36,7 +36,7 @@ DECLARE_DEVICE_TYPE(S2650, s2650_device)
 #define MCFG_S2650_INTACK_HANDLER(_devcb) \
 	devcb = &downcast<s2650_device &>(*device).set_intack_handler(DEVCB_##_devcb);
 
-	class s2650_device : public cpu_device, public s2650_disassembler::config
+class s2650_device : public cpu_device, public s2650_disassembler::config
 {
 public:
 	// construction/destruction

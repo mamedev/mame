@@ -55,7 +55,7 @@ WRITE16_MEMBER(drgnmst_state::coin_w)
 
 WRITE8_MEMBER(drgnmst_state::snd_command_w)
 {
-	m_snd_command = (data & 0xff);
+	m_snd_command = data;
 	m_maincpu->yield();
 }
 

@@ -704,7 +704,7 @@ MACHINE_CONFIG_START(monsterb_sound_device::device_add_mconfig)
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 
 	MCFG_DEVICE_ADD(m_i8243, I8243, 0)
-	MCFG_I8243_READHANDLER(NOOP)
+	MCFG_I8243_READHANDLER(CONSTANT(0))
 	MCFG_I8243_WRITEHANDLER(WRITE8(*this, monsterb_sound_device, n7751_rom_control_w))
 
 	MCFG_DEVICE_ADD(m_samples, SAMPLES)
