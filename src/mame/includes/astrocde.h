@@ -25,6 +25,12 @@
 class astrocde_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_INTERRUPT_OFF,
+		TIMER_SCANLINE
+	};
+
 	astrocde_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -40,45 +46,6 @@ public:
 		m_handle(*this, "P%uHANDLE", 1U),
 		m_interrupt_scanline(0xff)
 	{ }
-
-	void astrocade_base(machine_config &config);
-	void astrocade_16color_base(machine_config &config);
-	void astrocade_mono_sound(machine_config &config);
-	void astrocade_stereo_sound(machine_config &config);
-	void spacezap(machine_config &config);
-	void gorf(machine_config &config);
-	void profpac(machine_config &config);
-	void robby(machine_config &config);
-	void wow(machine_config &config);
-
-	void init_profpac();
-	void init_spacezap();
-	void init_robby();
-	void init_wow();
-	void init_tenpindx();
-	void init_seawolf2();
-	void init_demndrgn();
-	void init_ebases();
-	void init_gorf();
-	void init_astrocde();
-
-	DECLARE_READ8_MEMBER(video_register_r);
-	DECLARE_WRITE8_MEMBER(video_register_w);
-	DECLARE_WRITE8_MEMBER(expand_register_w);
-	DECLARE_WRITE8_MEMBER(astrocade_funcgen_w);
-
-	uint32_t screen_update_astrocde(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(astrocde);
-
-	CUSTOM_INPUT_MEMBER( votrax_speech_status_r );
-	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
-
-protected:
-	enum
-	{
-		TIMER_INTERRUPT_OFF,
-		TIMER_SCANLINE
-	};
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
@@ -146,17 +113,32 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(gorf_sound_switch_w);
 	DECLARE_WRITE8_MEMBER(profpac_banksw_w);
 	DECLARE_WRITE8_MEMBER(demndrgn_banksw_w);
-
+	DECLARE_READ8_MEMBER(video_register_r);
+	DECLARE_WRITE8_MEMBER(video_register_w);
+	DECLARE_WRITE8_MEMBER(astrocade_funcgen_w);
+	DECLARE_WRITE8_MEMBER(expand_register_w);
 	DECLARE_WRITE8_MEMBER(astrocade_pattern_board_w);
 	DECLARE_WRITE8_MEMBER(profpac_page_select_w);
 	DECLARE_READ8_MEMBER(profpac_intercept_r);
 	DECLARE_WRITE8_MEMBER(profpac_screenram_ctrl_w);
 	DECLARE_READ8_MEMBER(profpac_videoram_r);
 	DECLARE_WRITE8_MEMBER(profpac_videoram_w);
-
+	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
+	void init_profpac();
+	void init_spacezap();
+	void init_robby();
+	void init_wow();
+	void init_tenpindx();
+	void init_seawolf2();
+	void init_demndrgn();
+	void init_ebases();
+	void init_gorf();
+	void init_astrocde();
 	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(astrocde);
 	DECLARE_VIDEO_START(profpac);
 	DECLARE_PALETTE_INIT(profpac);
+	uint32_t screen_update_astrocde(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_profpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	inline int mame_vpos_to_astrocade_vpos(int scanline);
@@ -169,7 +151,17 @@ protected:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(votrax_speech_w);
+	CUSTOM_INPUT_MEMBER( votrax_speech_status_r );
 
+	void astrocade_base(machine_config &config);
+	void astrocade_16color_base(machine_config &config);
+	void astrocade_mono_sound(machine_config &config);
+	void astrocade_stereo_sound(machine_config &config);
+	void spacezap(machine_config &config);
+	void gorf(machine_config &config);
+	void profpac(machine_config &config);
+	void robby(machine_config &config);
+	void wow(machine_config &config);
 	void bank4000_map(address_map &map);
 	void demndrgn_map(address_map &map);
 	void port_map(address_map &map);
@@ -183,7 +175,7 @@ protected:
 	void seawolf2_map(address_map &map);
 	void spacezap_map(address_map &map);
 	void wow_map(address_map &map);
-
+protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
