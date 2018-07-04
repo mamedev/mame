@@ -3,7 +3,7 @@
 #ifndef MAME_INCLUDES_UNDRFIRE_H
 #define MAME_INCLUDES_UNDRFIRE_H
 
-#pragma
+#pragma once
 
 #include "machine/eepromser.h"
 #include "video/tc0100scn.h"
