@@ -152,7 +152,6 @@ public:
 		m_adbmicro(*this, A2GS_ADBMCU_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, "maincpu"),
-		m_docram(*this, A2GS_DOC_TAG),
 		m_nvram(*this, "nvram"),
 		m_video(*this, A2GS_VIDEO_TAG),
 		m_a2bus(*this, A2GS_BUS_TAG),
@@ -207,7 +206,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<m5074x_device> m_adbmicro;
 	required_device<ram_device> m_ram;
-	required_memory_region m_rom, m_docram;
+	required_memory_region m_rom;
 	required_device<nvram_device> m_nvram;
 	required_device<a2_video_device> m_video;
 	required_device<a2bus_device> m_a2bus;
@@ -383,6 +382,7 @@ public:
 	void rb0800bank_map(address_map &map);
 	void rb2000bank_map(address_map &map);
 	void rb4000bank_map(address_map &map);
+	void a2gs_es5503_map(address_map &map);
 
 	// temp old IWM hookup
 	int apple2_fdc_has_35();
@@ -463,6 +463,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
 	DECLARE_READ8_MEMBER(doc_adc_read);
 	DECLARE_READ8_MEMBER(apple2gs_read_vector);
+	DECLARE_READ8_MEMBER(es5503_sample_r);
 
 #if !RUN_ADB_MICRO
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
@@ -529,7 +530,7 @@ private:
 	bool m_glu_mcu_read_kgs, m_glu_816_read_dstat, m_glu_mouse_read_stat;
 	int m_glu_kbd_y;
 
-	uint8_t *m_ram_ptr, *m_rom_ptr, *m_docram_ptr;
+	uint8_t *m_ram_ptr, *m_rom_ptr;
 	int m_ram_size;
 
 	int m_inh_bank;
@@ -605,6 +606,8 @@ private:
 	void update_speed();
 	int get_vpos();
 	void process_clock();
+
+	uint8_t m_docram[64*1024];
 };
 
 // FF6ACF is speed test routine in ROM 3
@@ -1179,7 +1182,6 @@ void apple2gs_state::machine_start()
 	m_ram_ptr = m_ram->pointer();
 	m_ram_size = m_ram->size();
 	m_rom_ptr = m_rom->base();
-	m_docram_ptr = m_docram->base();
 	m_speaker_state = 0;
 	m_speaker->level_w(m_speaker_state);
 	m_upperbank->set_bank(0);
@@ -1318,6 +1320,8 @@ void apple2gs_state::machine_start()
 	save_item(m_mouse_y, "MY");
 	save_item(m_mouse_dx, "MDX");
 	save_item(m_mouse_dy, "MDY");
+
+	save_item(NAME(m_docram));
 }
 
 void apple2gs_state::machine_reset()
@@ -2244,7 +2248,7 @@ READ8_MEMBER(apple2gs_state::c000_r)
 
 			if (m_sndglu_ctrl & 0x40)    // docram access
 			{
-				m_sndglu_dummy_read = m_docram_ptr[m_sndglu_addr];
+				m_sndglu_dummy_read = m_docram[m_sndglu_addr];
 			}
 			else
 			{
@@ -2573,7 +2577,7 @@ WRITE8_MEMBER(apple2gs_state::c000_w)
 		case 0x3d:  // SOUNDDATA
 			if (m_sndglu_ctrl & 0x40)    // docram access
 			{
-				m_docram_ptr[m_sndglu_addr] = data;
+				m_docram[m_sndglu_addr] = data;
 			}
 			else
 			{
@@ -3493,6 +3497,11 @@ WRITE8_MEMBER(apple2gs_state::bank1_0000_sh_w)
 	}
 }
 
+READ8_MEMBER( apple2gs_state::es5503_sample_r )
+{
+	return m_docram[offset];
+}
+
 void apple2gs_state::apple2gs_map(address_map &map)
 {
 	/* "fast side" - runs 2.8 MHz minus RAM refresh, banks 00 and 01 usually have writes shadowed to E0/E1 where I/O lives */
@@ -3681,6 +3690,12 @@ void apple2gs_state::rb4000bank_map(address_map &map)
 	map(0x08000, 0x0ffff).rw(FUNC(apple2gs_state::b1ram4000_r), FUNC(apple2gs_state::b0ram4000_w));
 	map(0x10000, 0x17fff).rw(FUNC(apple2gs_state::b0ram4000_r), FUNC(apple2gs_state::b1ram4000_w));
 	map(0x18000, 0x1ffff).rw(FUNC(apple2gs_state::b1ram4000_r), FUNC(apple2gs_state::b1ram4000_w));
+}
+
+void apple2gs_state::a2gs_es5503_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).r(FUNC(apple2gs_state::es5503_sample_r));
+	map(0x10000, 0x1ffff).r(FUNC(apple2gs_state::es5503_sample_r));	// IIgs only has 64K, top bank mirrors lower bank
 }
 
 /***************************************************************************
@@ -4586,6 +4601,7 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	SPEAKER(config, "rspeaker").front_right();
 	MCFG_ES5503_ADD(A2GS_DOC_TAG, A2GS_7M)
 	MCFG_ES5503_OUTPUT_CHANNELS(2)
+	MCFG_DEVICE_ADDRESS_MAP(0, a2gs_es5503_map)
 	MCFG_ES5503_IRQ_FUNC(WRITELINE(*this, apple2gs_state, doc_irq_w))
 	MCFG_ES5503_ADC_FUNC(READ8(*this, apple2gs_state, doc_adc_read))
 
@@ -4829,8 +4845,6 @@ ROM_START(apple2gs)
 	ROM_LOAD("341-0748", 0x30000, 0x10000, CRC(18190283) SHA1(c70576869deec92ca82c78438b1d5c686eac7480) ) /* 341-0748: IIgs ROM03 FE-FF */
 	ROM_CONTINUE ( 0x20000, 0x10000) /* high address line is inverted on PCB? */
 
-	ROM_REGION(0x20000, A2GS_DOC_TAG, ROMREGION_ERASE00)
-
 	// temporary: use IIe enhanced keyboard decode ROM
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
@@ -4851,8 +4865,6 @@ ROM_START(apple2gsr3p)
 	ROM_LOAD("341-0728", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0728: IIgs ROM03 prototype FC-FD - 28 pin MASK rom */
 	ROM_LOAD("341-0729", 0x20000, 0x20000, NO_DUMP) /* 341-0729: IIgs ROM03 prototype FE-FF */
 
-	ROM_REGION(0x20000, A2GS_DOC_TAG, ROMREGION_ERASE00)
-
 	// temporary: use IIe enhanced keyboard decode ROM
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
@@ -4871,8 +4883,6 @@ ROM_START(apple2gsr1)
 
 	ROM_REGION(0x40000,"maincpu",0)
 	ROM_LOAD("342-0077-b", 0x20000, 0x20000, CRC(42f124b0) SHA1(e4fc7560b69d062cb2da5b1ffbe11cd1ca03cc37)) /* 342-0077-B: IIgs ROM01 */
-
-	ROM_REGION(0x20000, A2GS_DOC_TAG, ROMREGION_ERASE00)
 
 	// temporary: use IIe enhanced keyboard decode ROM
 	ROM_REGION( 0x800, "keyboard", 0 )
@@ -4893,8 +4903,6 @@ ROM_START(apple2gsr0)
 	ROM_REGION(0x40000,"maincpu",0)
 	ROM_LOAD("342-0077-a", 0x20000, 0x20000, CRC(dfbdd97b) SHA1(ff0c245dd0732ec4413a934fd80efc2defd8a8e3) ) /* 342-0077-A: IIgs ROM00 */
 
-	ROM_REGION(0x20000, A2GS_DOC_TAG, ROMREGION_ERASE00)
-
 	// temporary: use IIe enhanced keyboard decode ROM
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
@@ -4914,8 +4922,6 @@ ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 	ROM_REGION(0x40000,"maincpu",0)
 	ROM_LOAD( "rombf.bin",    0x020000, 0x020000, CRC(ab04fedf) SHA1(977589a17553956d583a21020080a39dd396df5c) )
 
-	ROM_REGION(0x20000, A2GS_DOC_TAG, ROMREGION_ERASE00)
-
 	// temporary: use IIe enhanced keyboard decode ROM
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
@@ -4934,8 +4940,6 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 
 	ROM_REGION(0x40000,"maincpu",0)
 	ROM_LOAD( "apple iigs alpha rom 2.0 19860310.bin", 0x020000, 0x020000, CRC(a47d275f) SHA1(c5836adcfc8be69c7351b84afa94c814e8d92b81) )
-
-	ROM_REGION(0x20000, A2GS_DOC_TAG, ROMREGION_ERASE00)
 
 	// temporary: use IIe enhanced keyboard decode ROM
 	ROM_REGION( 0x800, "keyboard", 0 )
