@@ -1370,6 +1370,10 @@ void goldstar_state::feverch_portmap(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::command_w));
+	map(0x28, 0x28).w("sn2", FUNC(sn76489_device::command_w));
+	map(0x30, 0x30).w("sn3", FUNC(sn76489_device::command_w));
+	//map(0x38, 0x3b)
 }
 
 static INPUT_PORTS_START( cmv4_player )
@@ -9431,6 +9435,8 @@ MACHINE_CONFIG_START(unkch_state::feverch)
 	MCFG_DEVICE_ADD("sn2", SN76489A, 12'000'000 / 12) // actually SN76489AN, clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
+	MCFG_DEVICE_ADD("sn3", SN76489A, 12'000'000 / 12) // actually SN76489AN, clock not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -14778,7 +14784,7 @@ Wing license seal but Eagle labeled ROMs
 
 1 x Z80
 3 x I8255A
-2 x SN76489AN
+3 x SN76489AN
 1 x unknown at 8d (possibly battery backed RAM)
 */
 
