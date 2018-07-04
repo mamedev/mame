@@ -85,6 +85,16 @@ void hp9122c_device::device_start()
 	save_item(NAME(m_index_int));
 	save_item(NAME(m_ds0));
 	save_item(NAME(m_ds1));
+
+	m_motor_timer = timer_alloc(0);
+}
+
+void hp9122c_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	floppy_image_device *floppy0 = m_floppy[0]->get_device();
+	floppy_image_device *floppy1 = m_floppy[1]->get_device();
+	floppy0->mon_w(1);
+	floppy1->mon_w(1);
 }
 
 void hp9122c_device::device_reset()
@@ -287,10 +297,14 @@ WRITE8_MEMBER(hp9122c_device::cmd_w)
 		 floppy0->mon_w(0);
 		 floppy0->ss_w(!(data & REG_CNTL_HEADSEL));
 		 m_fdc->set_floppy(floppy0);
+		 m_motor_timer->reset();
 	 } else if (m_ds1) {
 		 floppy1->mon_w(0);
 		 floppy1->ss_w(!(data & REG_CNTL_HEADSEL));
 		 m_fdc->set_floppy(floppy1);
+		 m_motor_timer->reset();
+	} else {
+		m_motor_timer->adjust(attotime::from_msec(2000));
 	}
 
 	if (data & REG_CNTL_CLOCK_SEL)
