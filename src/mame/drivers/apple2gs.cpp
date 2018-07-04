@@ -907,6 +907,9 @@ void apple2gs_state::adb_do_command()
 		case 0x13:  /* mystery command 0x13 */
 			break;
 
+		case 0x84:	// ACS demo disk #2 has a bug and writes this accidentally to $C026
+			break;
+
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
 		case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb:
@@ -1033,12 +1036,18 @@ void apple2gs_state::adb_write_datareg(uint8_t data)
 					/* ignore for now */
 					break;
 
+				case 0x84:	// ACS demo disk #2 has a bug and writes this accidentally to $C026
+					break;
+
 				case 0xb0: case 0xb1: case 0xb2: case 0xb3:
 				case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 				case 0xb8: case 0xb9: case 0xba: case 0xbb:
 				case 0xbc: case 0xbd: case 0xbe: case 0xbf:
 					/* send data to device */
 					m_adb_command_length = 2;
+					break;
+
+				case 0xe2:	// Jam Session sends this when starting a song
 					break;
 
 				case 0xf2:
