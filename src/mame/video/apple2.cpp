@@ -193,7 +193,48 @@ inline void apple2_state::apple2_plot_text_character(bitmap_ind16 &bitmap, int x
 	}
 }
 
+void a2_video_device::plot_text_characterGS(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
+	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
+{
+	int x, y, i;
+	const uint8_t *chardata;
+	uint16_t color;
 
+	if (!m_altcharset)
+	{
+		if ((code >= 0x40) && (code <= 0x7f))
+		{
+			code &= 0x3f;
+
+			if (m_flash)
+			{
+				i = fg;
+				fg = bg;
+				bg = i;
+			}
+		}
+	}
+	else
+	{
+		code |= 0x100;
+	}
+
+	/* look up the character data */
+	chardata = &textgfx_data[(code * 8)];
+
+	for (y = 0; y < 8; y++)
+	{
+		for (x = 0; x < 7; x++)
+		{
+			color = (chardata[y] & (1 << x)) ? bg : fg;
+
+			for (i = 0; i < xscale; i++)
+			{
+				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+			}
+		}
+	}
+}
 
 /*-------------------------------------------------
     apple2_text_draw - renders text (either 40
@@ -1637,3 +1678,263 @@ PALETTE_INIT_MEMBER(a2_video_device, apple2)
 {
 	palette.set_pen_colors(0, apple2_palette, ARRAY_LENGTH(apple2_palette));
 }
+
+uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	const uint8_t *vram;
+	uint32_t *scanline;
+	uint8_t scb, b;
+	int col, palette;
+	uint32_t last_pixel = 0, pixel;
+	int beamy;
+	uint16_t *a2pixel;
+
+	beamy = cliprect.min_y;
+
+	if (m_newvideo & 0x80)
+	{
+		// in top or bottom border?
+		if ((beamy < BORDER_TOP) || (beamy >= 200+BORDER_TOP))
+		{
+			// don't draw past the bottom border
+			if (beamy >= 231+BORDER_TOP)
+			{
+				return 0;
+			}
+
+			scanline = &bitmap.pix32(beamy);
+			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
+			{
+				scanline[col] = m_GSborder_colors[m_GSborder];
+			}
+		}
+		else    // regular screen area
+		{
+			int shrline = beamy - BORDER_TOP;
+
+			scb = m_aux_ptr[0x9D00 + shrline];
+			palette = ((scb & 0x0f) << 4);
+
+			vram = &m_aux_ptr[0x2000 + (shrline * 160)];
+			scanline = &bitmap.pix32(beamy);
+
+			// draw left and right borders
+			for (col = 0; col < BORDER_LEFT; col++)
+			{
+				scanline[col] = m_GSborder_colors[m_GSborder];
+				scanline[col+BORDER_LEFT+640] = m_GSborder_colors[m_GSborder];
+			}
+
+			if (scb & 0x80) // 640 mode
+			{
+				for (col = 0; col < 160; col++)
+				{
+					b = vram[col];
+					scanline[col * 4 + 0 + BORDER_LEFT] = m_shr_palette[palette +  0 + ((b >> 6) & 0x03)];
+					scanline[col * 4 + 1 + BORDER_LEFT] = m_shr_palette[palette +  4 + ((b >> 4) & 0x03)];
+					scanline[col * 4 + 2 + BORDER_LEFT] = m_shr_palette[palette +  8 + ((b >> 2) & 0x03)];
+					scanline[col * 4 + 3 + BORDER_LEFT] = m_shr_palette[palette + 12 + ((b >> 0) & 0x03)];
+				}
+			}
+			else        // 320 mode
+			{
+				for (col = 0; col < 160; col++)
+				{
+					b = vram[col];
+					pixel = (b >> 4) & 0x0f;
+
+					if ((scb & 0x20) && !pixel)
+						pixel = last_pixel;
+					else
+						last_pixel = pixel;
+					pixel += palette;
+					scanline[col * 4 + 0 + BORDER_LEFT] = m_shr_palette[pixel];
+					scanline[col * 4 + 1 + BORDER_LEFT] = m_shr_palette[pixel];
+
+					b = vram[col];
+					pixel = (b >> 0) & 0x0f;
+
+					if ((scb & 0x20) && !pixel)
+						pixel = last_pixel;
+					else
+						last_pixel = pixel;
+					pixel += palette;
+					scanline[col * 4 + 2 + BORDER_LEFT] = m_shr_palette[pixel];
+					scanline[col * 4 + 3 + BORDER_LEFT] = m_shr_palette[pixel];
+				}
+			}
+		}
+	}
+	else
+	{
+		/* call legacy Apple II video rendering at scanline 0 to draw into the off-screen buffer */
+		if (beamy == 0)
+		{
+			rectangle new_cliprect(0, 559, 0, 191);
+			screen_update_GS_8bit(screen, *m_8bit_graphics, new_cliprect);
+		}
+
+		if ((beamy < (BORDER_TOP+4)) || (beamy >= (192+4+BORDER_TOP)))
+		{
+			if (beamy >= (231+BORDER_TOP))
+			{
+				return 0;
+			}
+
+			scanline = &bitmap.pix32(beamy);
+			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
+			{
+				scanline[col] = m_GSborder_colors[m_GSborder];
+			}
+		}
+		else
+		{
+			scanline = &bitmap.pix32(beamy);
+
+			// draw left and right borders
+			for (col = 0; col < BORDER_LEFT + 40; col++)
+			{
+				scanline[col] = m_GSborder_colors[m_GSborder];
+				scanline[col+BORDER_LEFT+600] = m_GSborder_colors[m_GSborder];
+			}
+
+			a2pixel = &m_8bit_graphics->pix16(beamy-(BORDER_TOP+4));
+			for (int x = 0; x < 560; x++)
+			{
+				scanline[40 + BORDER_LEFT + x] = m_GSborder_colors[*a2pixel++];
+			}
+		}
+	}
+	return 0;
+}
+
+uint32_t a2_video_device::screen_update_GS_8bit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bool old_page2 = m_page2;
+
+	// don't display page2 if 80store is set (we just saved the previous value, don't worry)
+	if (m_80store)
+	{
+		m_page2 = false;
+	}
+
+	// always update the flash timer here so it's smooth regardless of mode switches
+	m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
+
+	if (m_graphics)
+	{
+		if (m_hires)
+		{
+			if (m_mix)
+			{
+				if ((m_dhires) && (m_80col))
+				{
+					dhgr_update(screen, bitmap, cliprect, 0, 159);
+				}
+				else
+				{
+					hgr_update(screen, bitmap, cliprect, 0, 159);
+				}
+				text_updateGS(screen, bitmap, cliprect, 160, 191);
+			}
+			else
+			{
+				if ((m_dhires) && (m_80col))
+				{
+					dhgr_update(screen, bitmap, cliprect, 0, 191);
+				}
+				else
+				{
+					hgr_update(screen, bitmap, cliprect, 0, 191);
+				}
+			}
+		}
+		else    // lo-res
+		{
+			if (m_mix)
+			{
+				if ((m_dhires) && (m_80col))
+				{
+					dlores_update(screen, bitmap, cliprect, 0, 159);
+				}
+				else
+				{
+					lores_update(screen, bitmap, cliprect, 0, 159);
+				}
+
+				text_updateGS(screen, bitmap, cliprect, 160, 191);
+			}
+			else
+			{
+				if ((m_dhires) && (m_80col))
+				{
+					dlores_update(screen, bitmap, cliprect, 0, 191);
+				}
+				else
+				{
+					lores_update(screen, bitmap, cliprect, 0, 191);
+				}
+			}
+		}
+	}
+	else
+	{
+		text_updateGS(screen, bitmap, cliprect, 0, 191);
+	}
+
+	m_page2 = old_page2;
+
+	return 0;
+}
+
+void a2_video_device::text_updateGS(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
+{
+	int row, col;
+	uint32_t start_address;
+	uint32_t address;
+	uint8_t *aux_page = m_ram_ptr;
+
+	if (m_80col)
+	{
+		start_address = 0x400;
+		if (m_aux_ptr)
+		{
+			aux_page = m_aux_ptr;
+		}
+	}
+	else
+	{
+		start_address = m_page2 ? 0x800 : 0x400;
+	}
+
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+
+	for (row = beginrow; row <= endrow; row += 8)
+	{
+		if (m_80col)
+		{
+			for (col = 0; col < 40; col++)
+			{
+				/* calculate address */
+				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+
+				plot_text_characterGS(bitmap, col * 14, row, 1, aux_page[address],
+					m_char_ptr, m_char_size, m_GSfg, m_GSbg);
+				plot_text_characterGS(bitmap, col * 14 + 7, row, 1, m_ram_ptr[address],
+					m_char_ptr, m_char_size, m_GSfg, m_GSbg);
+			}
+		}
+		else
+		{
+			for (col = 0; col < 40; col++)
+			{
+				/* calculate address */
+				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+				plot_text_characterGS(bitmap, col * 14, row, 2, m_ram_ptr[address],
+					m_char_ptr, m_char_size, m_GSfg, m_GSbg);
+			}
+		}
+	}
+}
+
