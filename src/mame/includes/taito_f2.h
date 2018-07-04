@@ -89,7 +89,7 @@ public:
 	void init_mjnquest();
 	void init_finalb();
 
-private:
+protected:
 	enum
 	{
 		TIMER_TAITOF2_INTERRUPT6

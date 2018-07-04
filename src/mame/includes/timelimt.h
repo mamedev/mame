@@ -18,7 +18,7 @@ public:
 
 	void timelimt(machine_config &config);
 
-private:
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
