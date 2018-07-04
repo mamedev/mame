@@ -23,27 +23,27 @@ class taitof2_state : public driver_device
 {
 public:
 	taitof2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_sprite_extension(*this, "sprite_ext"),
-			m_spriteram(*this, "spriteram"),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_cchip(*this, "cchip"),
-			m_cchip_irq_clear(*this, "cchip_irq_clear"),
-			m_oki(*this, "oki"),
-			m_tc0100scn(*this, "tc0100scn"),
-			m_tc0100scn_1(*this, "tc0100scn_1"),
-			m_tc0100scn_2(*this, "tc0100scn_2"),
-			m_tc0110pcr(*this, "tc0110pcr"),
-			m_tc0360pri(*this, "tc0360pri"),
-			m_tc0280grd(*this, "tc0280grd"),
-			m_tc0430grw(*this, "tc0430grw"),
-			m_tc0480scp(*this, "tc0480scp"),
-			m_tc0220ioc(*this, "tc0220ioc"),
-			m_tc0510nio(*this, "tc0510nio"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")
-			{ }
+		: driver_device(mconfig, type, tag)
+		, m_sprite_extension(*this, "sprite_ext")
+		, m_spriteram(*this, "spriteram")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_cchip(*this, "cchip")
+		, m_cchip_irq_clear(*this, "cchip_irq_clear")
+		, m_oki(*this, "oki")
+		, m_tc0100scn(*this, "tc0100scn")
+		, m_tc0100scn_1(*this, "tc0100scn_1")
+		, m_tc0100scn_2(*this, "tc0100scn_2")
+		, m_tc0110pcr(*this, "tc0110pcr")
+		, m_tc0360pri(*this, "tc0360pri")
+		, m_tc0280grd(*this, "tc0280grd")
+		, m_tc0430grw(*this, "tc0430grw")
+		, m_tc0480scp(*this, "tc0480scp")
+		, m_tc0220ioc(*this, "tc0220ioc")
+		, m_tc0510nio(*this, "tc0510nio")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+	{ }
 
 
 	void taito_f2_tc0220ioc(machine_config &config);

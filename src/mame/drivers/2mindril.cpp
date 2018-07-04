@@ -46,9 +46,10 @@ DAC               -26.6860Mhz
 class _2mindril_state : public taito_f3_state
 {
 public:
-	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag)
-		: taito_f3_state(mconfig, type, tag),
-		m_in0(*this, "IN0") { }
+	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag) :
+		taito_f3_state(mconfig, type, tag),
+		m_in0(*this, "IN0")
+	{ }
 
 	void drill(machine_config &config);
 
