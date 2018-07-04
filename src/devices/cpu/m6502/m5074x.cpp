@@ -517,7 +517,7 @@ void m50741_device::m50741_map(address_map &map)
 }
 
 m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m50741_device(mconfig, M50740, tag, owner, clock)
+	m50741_device(mconfig, M50741, tag, owner, clock)
 {
 }
 

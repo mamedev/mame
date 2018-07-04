@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_MAPPY_H
+#define MAME_INCLUDES_MAPPY_H
+
+#pragma once
+
 #include "machine/namcoio.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
@@ -107,3 +112,5 @@ private:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_MAPPY_H

@@ -321,7 +321,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 
-private:
+protected:
 	DECLARE_WRITE8_MEMBER(wdclr_w);
 	DECLARE_WRITE8_MEMBER(tempest_led_w);
 	DECLARE_WRITE8_MEMBER(tempest_coin_w);

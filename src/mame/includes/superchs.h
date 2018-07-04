@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
+#ifndef MAME_INCLUDES_SUPERCHS_H
+#define MAME_INCLUDES_SUPERCHS_H
+
+#pragma once
+
 #include "machine/eepromser.h"
 #include "video/tc0480scp.h"
 #include "emupal.h"
@@ -67,3 +72,5 @@ private:
 	void superchs_cpub_map(address_map &map);
 	void superchs_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SUPERCHS_H

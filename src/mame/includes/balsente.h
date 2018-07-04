@@ -7,6 +7,10 @@
     driver by Aaron Giles
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_BALSENTE_H
+#define MAME_INCLUDES_BALSENTE_H
+
+#pragma once
 
 #include "machine/6850acia.h"
 #include "machine/pit8253.h"
@@ -233,3 +237,5 @@ private:
 
 /*----------- defined in machine/balsente.c -----------*/
 void balsente_noise_gen(device_t *device, int count, short *buffer);
+
+#endif // MAME_INCLUDES_BALSENTE_H

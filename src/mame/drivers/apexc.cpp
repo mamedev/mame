@@ -8,6 +8,7 @@
     see cpu/apexc.c for background and tech info
 */
 
+#include "emu.h"
 #include "includes/apexc.h"
 
 /*static*/ const device_timer_id apexc_state::TIMER_POLL_INPUTS = 1;

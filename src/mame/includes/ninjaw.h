@@ -5,6 +5,10 @@
     Taito Triple Screen Games
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_NINJAW_H
+#define MAME_INCLUDES_NINJAW_H
+
+#pragma once
 
 #include "audio/taitosnd.h"
 #include "machine/taitoio.h"
@@ -29,7 +33,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
-		m_z80bank(*this, "z80bank") { }
+		m_z80bank(*this, "z80bank")
+	{ }
 
 	void darius2(machine_config &config);
 	void ninjaw(machine_config &config);
@@ -80,3 +85,5 @@ private:
 	void ninjaw_slave_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NINJAW_H

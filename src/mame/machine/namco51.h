@@ -37,7 +37,7 @@ class namco_51xx_device : public device_t
 public:
 	namco_51xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 	template <unsigned N, class Object> devcb_base &set_input_callback(Object &&cb) { return m_in[N].set_callback(std::forward<Object>(cb)); }
 	template <unsigned N, class Object> devcb_base &set_output_callback(Object &&cb) { return m_out[N].set_callback(std::forward<Object>(cb)); }
 

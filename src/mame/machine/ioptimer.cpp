@@ -9,6 +9,7 @@
 *
 */
 
+#include "emu.h"
 #include "ioptimer.h"
 
 DEFINE_DEVICE_TYPE(SONYIOP_TIMER, iop_timer_device, "ioptimer", "Sony IOP Timer")

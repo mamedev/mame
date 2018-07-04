@@ -89,10 +89,10 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_READ8_MEMBER( pa_r );
-	uint8_t pa_r();
+	uint8_t read_pa();
 
 	DECLARE_READ8_MEMBER( pb_r );
-	uint8_t pb_r();
+	uint8_t read_pb();
 
 	DECLARE_WRITE_LINE_MEMBER( pc2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc4_w );

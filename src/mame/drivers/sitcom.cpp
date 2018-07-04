@@ -261,7 +261,7 @@ WRITE8_MEMBER( sitcom_timer_state::update_pia_pa )
 WRITE8_MEMBER( sitcom_timer_state::update_pia_pb )
 {
 	if (!m_dac_cs && !BIT(data, 0))
-		update_dac(m_pia->pa_r());
+		update_dac(m_pia->read_pa());
 	m_dac_wr = BIT(data, 0);
 	m_dac_cs = BIT(data, 1);
 

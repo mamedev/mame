@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
+#ifndef MAME_INCLUDES_GUNBUSTR_H
+#define MAME_INCLUDES_GUNBUSTR_H
+
+#pragma once
+
 #include "machine/eepromser.h"
 #include "video/tc0480scp.h"
 #include "emupal.h"
@@ -79,3 +84,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_GUNBUSTR_H

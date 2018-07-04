@@ -9,6 +9,7 @@
 *
 */
 
+#include "emu.h"
 #include "ps2timer.h"
 
 DEFINE_DEVICE_TYPE(SONYPS2_TIMER, ps2_timer_device, "ps2timer", "EE Core Timer")

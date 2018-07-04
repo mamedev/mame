@@ -1728,7 +1728,7 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 							/* synchronization of the CPUs */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(galaga_state, screen_update_galaga)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaga_state, screen_vblank_galaga))
@@ -1832,7 +1832,7 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 							/* synchronization of the CPUs */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(xevious_state, screen_update_xevious)
 	MCFG_SCREEN_PALETTE("palette")
@@ -1948,7 +1948,7 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(digdug_state, screen_update_digdug)
 	MCFG_SCREEN_PALETTE("palette")

@@ -69,7 +69,7 @@ public:
 		, m_io_row3(*this, "ROW3")
 		, m_charset(*this, "charset")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
 	void midcoin24cdjuke(machine_config &config);
 

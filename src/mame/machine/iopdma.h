@@ -14,7 +14,6 @@
 
 #pragma once
 
-#include "emu.h"
 
 class iop_dma_device : public device_t
 {

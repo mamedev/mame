@@ -92,7 +92,6 @@
 
 #include "emu.h"
 #include "includes/mac.h"
-#include "machine/applefdc.h"
 #include "machine/sonydriv.h"
 
 #define AUDIO_IS_CLASSIC (m_model <= MODEL_MAC_CLASSIC)
@@ -1064,48 +1063,47 @@ WRITE_LINE_MEMBER(mac_state::drq_539x_1_w)
 
 void mac_state::scc_mouse_irq(int x, int y)
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	static int lasty = 0;
 	static int lastx = 0;
 
 	if (x && y)
 	{
 		if (m_last_was_x) {
-			scc->set_status(0x0a);
+			m_scc->set_status(0x0a);
 			if(x == 2) {
 				if(lastx) {
-					scc->set_reg_a(0, 0x04);
+					m_scc->set_reg_a(0, 0x04);
 					m_mouse_bit_x = 0;
 				} else {
-					scc->set_reg_a(0, 0x0C);
+					m_scc->set_reg_a(0, 0x0C);
 					m_mouse_bit_x = 1;
 				}
 			} else {
 				if(lastx) {
-					scc->set_reg_a(0, 0x04);
+					m_scc->set_reg_a(0, 0x04);
 					m_mouse_bit_x = 1;
 				} else {
-					scc->set_reg_a(0, 0x0C);
+					m_scc->set_reg_a(0, 0x0C);
 					m_mouse_bit_x = 0;
 				}
 			}
 			lastx = !lastx;
 		} else {
-			scc->set_status(0x02);
+			m_scc->set_status(0x02);
 			if(y == 2) {
 				if(lasty) {
-					scc->set_reg_b(0, 0x04);
+					m_scc->set_reg_b(0, 0x04);
 					m_mouse_bit_y = 0;
 				} else {
-					scc->set_reg_b(0, 0x0C);
+					m_scc->set_reg_b(0, 0x0C);
 					m_mouse_bit_y = 1;
 				}
 			} else {
 				if(lasty) {
-					scc->set_reg_b(0, 0x04);
+					m_scc->set_reg_b(0, 0x04);
 					m_mouse_bit_y = 1;
 				} else {
-					scc->set_reg_b(0, 0x0C);
+					m_scc->set_reg_b(0, 0x0C);
 					m_mouse_bit_y = 0;
 				}
 			}
@@ -1117,41 +1115,41 @@ void mac_state::scc_mouse_irq(int x, int y)
 	else
 	{
 		if (x) {
-			scc->set_status(0x0a);
+			m_scc->set_status(0x0a);
 			if(x == 2) {
 				if(lastx) {
-					scc->set_reg_a(0, 0x04);
+					m_scc->set_reg_a(0, 0x04);
 					m_mouse_bit_x = 0;
 				} else {
-					scc->set_reg_a(0, 0x0C);
+					m_scc->set_reg_a(0, 0x0C);
 					m_mouse_bit_x = 1;
 				}
 			} else {
 				if(lastx) {
-					scc->set_reg_a(0, 0x04);
+					m_scc->set_reg_a(0, 0x04);
 					m_mouse_bit_x = 1;
 				} else {
-					scc->set_reg_a(0, 0x0C);
+					m_scc->set_reg_a(0, 0x0C);
 					m_mouse_bit_x = 0;
 				}
 			}
 			lastx = !lastx;
 		} else {
-			scc->set_status(0x02);
+			m_scc->set_status(0x02);
 			if(y == 2) {
 				if(lasty) {
-					scc->set_reg_b(0, 0x04);
+					m_scc->set_reg_b(0, 0x04);
 					m_mouse_bit_y = 0;
 				} else {
-					scc->set_reg_b(0, 0x0C);
+					m_scc->set_reg_b(0, 0x0C);
 					m_mouse_bit_y = 1;
 				}
 			} else {
 				if(lasty) {
-					scc->set_reg_b(0, 0x04);
+					m_scc->set_reg_b(0, 0x04);
 					m_mouse_bit_y = 1;
 				} else {
-					scc->set_reg_b(0, 0x0C);
+					m_scc->set_reg_b(0, 0x0C);
 					m_mouse_bit_y = 0;
 				}
 			}
@@ -1166,10 +1164,9 @@ void mac_state::scc_mouse_irq(int x, int y)
 
 READ16_MEMBER ( mac_state::mac_scc_r )
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	uint16_t result;
 
-	result = scc->reg_r(space, offset);
+	result = m_scc->reg_r(space, offset);
 	return (result << 8) | result;
 }
 
@@ -1177,14 +1174,12 @@ READ16_MEMBER ( mac_state::mac_scc_r )
 
 WRITE16_MEMBER ( mac_state::mac_scc_w )
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
-	scc->reg_w(space, offset, data);
+	m_scc->reg_w(space, offset, data);
 }
 
 WRITE16_MEMBER ( mac_state::mac_scc_2_w )
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
-	scc->reg_w(space, offset, data >> 8);
+	m_scc->reg_w(space, offset, data >> 8);
 }
 
 /* ********************************** *
@@ -1201,10 +1196,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	 * this driver along
 	 */
 
-	uint16_t result = 0;
-	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
-
-	result = fdc->read(offset >> 8);
+	uint16_t result = m_fdc->read(offset >> 8);
 
 	if (LOG_MAC_IWM)
 		printf("%s mac_iwm_r: offset=0x%08x mem_mask %04x = %02x\n", machine().describe_context().c_str(), offset, mem_mask, result);
@@ -1214,15 +1206,13 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 
 WRITE16_MEMBER ( mac_state::mac_iwm_w )
 {
-	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
-
 	if (LOG_MAC_IWM)
 		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
-		fdc->write((offset >> 8), data & 0xff);
+		m_fdc->write((offset >> 8), data & 0xff);
 	else
-		fdc->write((offset >> 8), data>>8);
+		m_fdc->write((offset >> 8), data>>8);
 }
 
 WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
@@ -1451,12 +1441,11 @@ READ8_MEMBER(mac_state::mac_via_in_b_pmu)
 
 WRITE8_MEMBER(mac_state::mac_via_out_a)
 {
-	device_t *fdc = machine().device("fdc");
 //  printf("%s VIA1 OUT A: %02x\n", machine().describe_context().c_str(), data);
 
 	set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
-	sony_set_sel_line(fdc,(data & 0x20) >> 5);
+	sony_set_sel_line(m_fdc.target(), (data & 0x20) >> 5);
 	if (m_model == MODEL_MAC_SE)    // on SE this selects which floppy drive (0 = upper, 1 = lower)
 	{
 		m_drive_select = ((data & 0x10) >> 4);
@@ -1589,9 +1578,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_pmu)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
-	device_t *fdc = machine().device("fdc");
-
-	sony_set_sel_line(fdc,(data & 0x20) >> 5);
+	sony_set_sel_line(m_fdc.target(), (data & 0x20) >> 5);
 	m_drive_select = ((data & 0x10) >> 4);
 
 	if ((data & 1) && !(m_pm_req & 1))

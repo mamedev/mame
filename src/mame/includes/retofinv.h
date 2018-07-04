@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski, Andrea Mazzoleni
+#ifndef MAME_INCLUDES_RETOFINV_H
+#define MAME_INCLUDES_RETOFINV_H
+
+#pragma once
 
 #include "machine/taito68705interface.h"
 
@@ -84,3 +88,5 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 };
+
+#endif // MAME_INCLUDES_RETOFINV_H

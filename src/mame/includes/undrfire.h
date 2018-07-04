@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
+#ifndef MAME_INCLUDES_UNDRFIRE_H
+#define MAME_INCLUDES_UNDRFIRE_H
+
+#pragma once
 
 #include "machine/eepromser.h"
 #include "video/tc0100scn.h"
@@ -104,3 +108,5 @@ private:
 	void cbombers_cpub_map(address_map &map);
 	void undrfire_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_UNDRFIRE_H

@@ -1111,11 +1111,11 @@ WRITE_LINE_MEMBER(cclimber_state::bagmanf_vblank_irq)
 MACHINE_CONFIG_START(cclimber_state::root)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* 3.072 MHz */
+	MCFG_DEVICE_ADD(m_maincpu, Z80, MASTER_CLOCK/3/2)  /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(cclimber_map)
 	MCFG_DEVICE_IO_MAP(cclimber_portmap)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_DEVICE_ADD(m_mainlatch, LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cclimber_state, nmi_mask_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_x_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_y_w))
@@ -1194,7 +1194,7 @@ MACHINE_CONFIG_START(cclimber_state::yamato)
 	root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
+	MCFG_DEVICE_REPLACE(m_maincpu, SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(yamato_map)
 	MCFG_DEVICE_IO_MAP(yamato_portmap)
 	MCFG_DEVICE_OPCODES_MAP(yamato_decrypted_opcodes_map)
@@ -1225,7 +1225,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cclimber_state::toprollr)
 	cclimber(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
+	MCFG_DEVICE_REPLACE(m_maincpu, SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(toprollr_map)
 	MCFG_DEVICE_IO_MAP(cclimber_portmap)
 	MCFG_DEVICE_OPCODES_MAP(toprollr_decrypted_opcodes_map)
@@ -1252,10 +1252,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cclimber_state::swimmer)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)    /* verified on pcb */
+	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(18'432'000)/6)    /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(swimmer_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_DEVICE_ADD(m_mainlatch, LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cclimber_state, nmi_mask_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_x_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_y_w))

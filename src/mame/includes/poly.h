@@ -33,7 +33,6 @@
 #ifndef MAME_INCLUDES_POLY_H
 #define MAME_INCLUDES_POLY_H
 
-#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
