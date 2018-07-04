@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    video/apple2.h  - Video handling for 8-bit Apple IIs
+    video/apple2.h  - Video handling for Apple II and IIgs
 
 *********************************************************************/
 
