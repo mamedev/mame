@@ -99,8 +99,8 @@ protected:
 
 	void check_external_panel_server();
 
-	const std::string get_front_panel_html_file() const { return slashes_to_separators(get_front_panel_html_file_with_slashes()); }
-	const std::string get_front_panel_js_file() const { return slashes_to_separators(get_front_panel_js_file_with_slashes()); }
+	const std::string get_front_panel_html_file() const;
+	const std::string get_front_panel_js_file() const;
 
 	virtual const std::string get_front_panel_html_file_with_slashes() const { return ""; }
 	virtual const std::string get_front_panel_js_file_with_slashes() const { return ""; }
@@ -111,24 +111,6 @@ protected:
 	bool m_eps_mode;
 
 	esqpanel::external_panel_server *m_external_panel_server;
-
-	const std::string slashes_to_separators(const std::string s) const {
-		std::string t(s);
-		size_t start_pos = 0;
-		while (start_pos != std::string::npos) {
-			size_t slash = t.find('/', start_pos);
-			if (slash == std::string::npos) {
-				start_pos = slash;
-			} else {
-				t.replace(slash, 1, PATH_SEPARATOR);
-				start_pos = slash + 1;
-			}
-		}
-#if DEBUG_ESQPANEL
-		std::cerr << "slashes_to_separators: '" << s << "' -> '" << t << "'" << std::endl;
-#endif
-		return t;
-	}
 
 private:
 	static const int XMIT_RING_SIZE = 16;

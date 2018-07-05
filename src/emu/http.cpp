@@ -16,8 +16,10 @@ HTTP server handling
 #include <inttypes.h>
 #include <stdint.h>
 
-#undef DEBUG
-#define DEBUG 0
+#define LOG_DEBUG (1 << 1)
+#define LOG_OUTPUT_STREAM (std::cerr)
+//#define VERBOSE (LOG_DEBUG)
+#include "logmacro.h"
 
 const static struct mapping
 {
@@ -289,9 +291,8 @@ http_manager::http_manager(bool active, const char *address, short port, const c
 		auto request_impl = std::make_shared<http_request_impl>(request);
 		auto response_impl = std::make_shared<http_response_impl>(response);
 
-#if DEBUG
-		std::cerr << "default on_get() for '" << request_impl->get_resource() << "': returning 404 Not Found" << std::endl;
-#endif
+		LOG("default on_get() for '%s':  eturning 404 Not Found", request_impl->get_resource());
+
 		this->serve_document(request_impl, response_impl, "NotFound.html");
 
 		response_impl->send();
@@ -400,9 +401,7 @@ bool http_manager::read_file(std::ostream &os, const std::string &path) {
 	full_path.append(PATH_SEPARATOR);
 	full_path.append(path);
 
-#if DEBUG
-	std::cerr << "read_file(): m_root = '" << m_root << "', path = '" << path << "' => full_path = '" << full_path << "')" << std::endl;
-#endif
+	LOG("read_file(): m_root = '%s, path = '%s' => full_path = '%s')", m_root, path, full_path);
 
 	util::core_file::ptr f;
 	osd_file::error e = util::core_file::open(full_path, OPEN_FLAG_READ, f);
@@ -420,14 +419,10 @@ bool http_manager::read_file(std::ostream &os, const std::string &path) {
 void http_manager::serve_document(http_request_ptr request, http_response_ptr response, const std::string &filename) {
 	if (!m_active) return;
 
-#if DEBUG
-	std::cerr << "serve_document('" << filename << "')" << std::endl;
-#endif
+	LOG("serve_document('%s')", filename);
 
 	if (!is_path_safe(filename)) {
-#if DEBUG
-		std::cerr << "serve_document(): filename is not safe, serving NotFound" << std::endl;
-#endif
+		LOG("serve_document(): filename is not safe, serving NotFound");
 		this->serve_document(request, response, "NotFound.html");
 		return;
 	}
@@ -436,9 +431,9 @@ void http_manager::serve_document(http_request_ptr request, http_response_ptr re
 	if (read_file(os, filename))
 	{
 		std::size_t last_slash_pos = filename.find_last_of("/");
-		std::size_t last_dot_pos = filename.find_last_of(".");
+		std::size_t last_dot_pos = filename.find_last_of(".", last_slash_pos);
 		std::string extension;
-		if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos)
+		if (last_dot_pos != std::string::npos)
 		{
 			extension = filename.substr(last_dot_pos + 1);
 			response->set_content_type(extension_to_type(extension));
@@ -457,14 +452,10 @@ void http_manager::serve_template(http_request_ptr request, http_response_ptr re
 {
 	if (!m_active) return;
 
-#if DEBUG
-	std::cerr << "serve_template('" << filename << "')" << std::endl;
-#endif
+	LOG("serve_template('%s')", filename);
 
 	if (!is_path_safe(filename)) {
-#if DEBUG
-		std::cerr << "serve_template(): filename is not safe, serving NotFound" << std::endl;
-#endif
+		LOG("serve_template(): filename is not safe, serving NotFound");
 		this->serve_document(request, response, "NotFound.html");
 		return;
 	}
