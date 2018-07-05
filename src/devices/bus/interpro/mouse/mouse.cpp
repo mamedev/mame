@@ -96,7 +96,7 @@ INPUT_CHANGED_MEMBER(interpro_mouse_device::mouse_button)
 {
 	const ioport_value data = field.port().read();
 
-	LOG("mouse_button 0x%02x\n", data);
+	LOG("mouse_button 0x%08x\n", data);
 
 	state_w(machine().dummy_space(), 0, data & MOUSE_BUTTONS, MOUSE_BUTTONS);
 }
