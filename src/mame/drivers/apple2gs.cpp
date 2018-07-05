@@ -152,6 +152,7 @@ public:
 		m_adbmicro(*this, A2GS_ADBMCU_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, "maincpu"),
+		m_docram(*this, "docram"),
 		m_nvram(*this, "nvram"),
 		m_video(*this, A2GS_VIDEO_TAG),
 		m_a2bus(*this, A2GS_BUS_TAG),
@@ -206,7 +207,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<m5074x_device> m_adbmicro;
 	required_device<ram_device> m_ram;
-	required_memory_region m_rom;
+	required_region_ptr<uint8_t> m_rom;
+	required_shared_ptr<uint8_t> m_docram;
 	required_device<nvram_device> m_nvram;
 	required_device<a2_video_device> m_video;
 	required_device<a2bus_device> m_a2bus;
@@ -463,7 +465,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
 	DECLARE_READ8_MEMBER(doc_adc_read);
 	DECLARE_READ8_MEMBER(apple2gs_read_vector);
-	DECLARE_READ8_MEMBER(es5503_sample_r);
 
 #if !RUN_ADB_MICRO
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
@@ -530,7 +531,7 @@ private:
 	bool m_glu_mcu_read_kgs, m_glu_816_read_dstat, m_glu_mouse_read_stat;
 	int m_glu_kbd_y;
 
-	uint8_t *m_ram_ptr, *m_rom_ptr;
+	uint8_t *m_ram_ptr;
 	int m_ram_size;
 
 	int m_inh_bank;
@@ -606,8 +607,6 @@ private:
 	void update_speed();
 	int get_vpos();
 	void process_clock();
-
-	uint8_t m_docram[64*1024];
 };
 
 // FF6ACF is speed test routine in ROM 3
@@ -1181,7 +1180,6 @@ void apple2gs_state::machine_start()
 {
 	m_ram_ptr = m_ram->pointer();
 	m_ram_size = m_ram->size();
-	m_rom_ptr = m_rom->base();
 	m_speaker_state = 0;
 	m_speaker->level_w(m_speaker_state);
 	m_upperbank->set_bank(0);
@@ -1320,8 +1318,6 @@ void apple2gs_state::machine_start()
 	save_item(m_mouse_y, "MY");
 	save_item(m_mouse_dx, "MDX");
 	save_item(m_mouse_dy, "MDY");
-
-	save_item(NAME(m_docram));
 }
 
 void apple2gs_state::machine_reset()
@@ -2317,7 +2313,7 @@ READ8_MEMBER(apple2gs_state::c000_r)
 				m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
 			}
 
-			return m_rom_ptr[offset + 0x3c000];
+			return m_rom[offset + 0x3c000];
 			break;
 
 		default:
@@ -2811,7 +2807,7 @@ uint8_t apple2gs_state::read_int_rom(address_space &space, int slotbias, int off
 		update_slotrom_banks();
 	}
 
-	return m_rom_ptr[slotbias + offset];
+	return m_rom[slotbias + offset];
 }
 
 READ8_MEMBER(apple2gs_state::c100_r)  
@@ -2900,12 +2896,12 @@ READ8_MEMBER(apple2gs_state::c800_int_r)
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		update_slotrom_banks();
-		return m_rom_ptr[offset + 0x3c800];
+		return m_rom[offset + 0x3c800];
 	}
 	
 	if (m_cnxx_slot == CNXX_INTROM)
 	{
-		return m_rom_ptr[offset + 0x3c800];
+		return m_rom[offset + 0x3c800];
 	}
 	
 	return read_floatingbus();
@@ -3497,11 +3493,6 @@ WRITE8_MEMBER(apple2gs_state::bank1_0000_sh_w)
 	}
 }
 
-READ8_MEMBER( apple2gs_state::es5503_sample_r )
-{
-	return m_docram[offset];
-}
-
 void apple2gs_state::apple2gs_map(address_map &map)
 {
 	/* "fast side" - runs 2.8 MHz minus RAM refresh, banks 00 and 01 usually have writes shadowed to E0/E1 where I/O lives */
@@ -3694,8 +3685,7 @@ void apple2gs_state::rb4000bank_map(address_map &map)
 
 void apple2gs_state::a2gs_es5503_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).r(FUNC(apple2gs_state::es5503_sample_r));
-	map(0x10000, 0x1ffff).r(FUNC(apple2gs_state::es5503_sample_r));	// IIgs only has 64K, top bank mirrors lower bank
+	map(0x00000, 0x0ffff).mirror(0x10000).readonly().share("docram"); // IIgs only has 64K, top bank mirrors lower bank
 }
 
 /***************************************************************************
