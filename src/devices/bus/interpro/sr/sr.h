@@ -85,7 +85,8 @@ public:
 	void set_memory(const char *const tag, const int main_spacenum, const int io_spacenum);
 
 	static const u32 CBUS_BASE = 0x87000000;
-	static const u32 CBUS_SIZE = 0x08000000;
+	static const u32 CBUS_SIZE = 0x01000000;
+	static const u32 CBUS_STRIDE = 0x08000000;
 	static const int CBUS_COUNT = 16;
 
 	DECLARE_WRITE_LINE_MEMBER(irq0_w) { m_out_irq0_cb(state); }
@@ -100,7 +101,7 @@ public:
 		m_slot[m_slot_count] = &device;
 
 		// compute slot base address
-		offs_t start = CBUS_BASE + m_slot_count * CBUS_SIZE;
+		offs_t start = CBUS_BASE + m_slot_count * CBUS_STRIDE;
 		offs_t end = start + (CBUS_SIZE - 1);
 
 		// install the device address map
