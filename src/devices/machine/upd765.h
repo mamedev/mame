@@ -34,7 +34,7 @@
 	downcast<upd72065_device *>(device)->set_select_lines_connected(_select);
 
 #define MCFG_I82072_ADD(_tag, _ready)   \
-	MCFG_DEVICE_ADD(_tag, I82072, 0)    \
+	MCFG_DEVICE_ADD(_tag, I82072, 24_MHz_XTAL) \
 	downcast<i82072_device *>(device)->set_ready_line_connected(_ready);
 
 #define MCFG_SMC37C78_ADD(_tag) \
@@ -431,6 +431,9 @@ protected:
 
 	bool read_one_bit(const attotime &limit);
 	bool write_one_bit(const attotime &limit);
+
+	virtual u8 get_drive_busy() const { return 0; }
+	virtual void clr_drive_busy() { };
 };
 
 class upd765a_device : public upd765_family_device {
@@ -476,11 +479,16 @@ protected:
 	virtual void execute_command(int cmd) override;
 	virtual void command_end(floppy_info &fi, bool data_completion) override;
 	virtual void index_callback(floppy_image_device *floppy, int state) override;
+	virtual u8 get_drive_busy() const override { return drive_busy; };
+	virtual void clr_drive_busy() override { drive_busy = 0; };
 
 	void motor_control(int fid, bool start_motor);
 
+private:
 	u8 motor_off_counter;
 	u8 motor_on_counter;
+	u8 drive_busy;
+	int delayed_command;
 };
 
 class smc37c78_device : public upd765_family_device {
