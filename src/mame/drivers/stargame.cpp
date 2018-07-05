@@ -27,7 +27,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_ctc(*this, "ctc")
-		{ }
+	{ }
 
 	void stargame(machine_config &config);
 

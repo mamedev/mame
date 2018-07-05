@@ -60,11 +60,6 @@ READ8_MEMBER( decodmd_type1_device::status_r )
 	return (m_busy & 0x01) | (m_status << 1);
 }
 
-WRITE8_MEMBER( decodmd_type1_device::status_w )
-{
-	m_status = data;
-}
-
 // Z80 I/O ports not fully decoded.
 // if bit 7 = 0, then when bit 2 is 0 selects COCLK, and when bit 2 is 1 selects CLATCH
 READ8_MEMBER( decodmd_type1_device::dmd_port_r )
@@ -233,12 +228,12 @@ MACHINE_CONFIG_END
 
 
 decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECODMD1, tag, owner, clock),
-		m_cpu(*this, "dmdcpu"),
-		m_rombank1(*this, "dmdbank1"),
-		m_rombank2(*this, "dmdbank2"),
-		m_ram(*this, RAM_TAG),
-		m_bitlatch(*this, "bitlatch")
+	: device_t(mconfig, DECODMD1, tag, owner, clock)
+	, m_cpu(*this, "dmdcpu")
+	, m_rombank1(*this, "dmdbank1")
+	, m_rombank2(*this, "dmdbank2")
+	, m_ram(*this, RAM_TAG)
+	, m_bitlatch(*this, "bitlatch")
 {}
 
 void decodmd_type1_device::device_start()

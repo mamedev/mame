@@ -66,7 +66,7 @@ public:
 		PORT7
 	};
 
-	tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration helpers
 	template <unsigned N, class Object> devcb_base &set_read_port_callback(Object &&cb) { return m_read_port[N].set_callback(std::forward<Object>(cb)); }
@@ -98,7 +98,7 @@ protected:
 class tms1025_device : public tms1024_device
 {
 public:
-	tms1025_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1025_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 

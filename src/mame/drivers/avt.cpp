@@ -447,7 +447,7 @@ public:
 		, m_colorram(*this, "colorram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		{ }
+	{ }
 
 	void avtnfl(machine_config &config);
 	void avt(machine_config &config);

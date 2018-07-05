@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench, Yochizo, David Haywood
+#ifndef MAME_INCLUDES_TOAPLAN2_H
+#define MAME_INCLUDES_TOAPLAN2_H
 
-/**************** Machine stuff ******************/
-//#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "machine/bankdev.h"
@@ -15,6 +16,9 @@
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "screen.h"
+
+/**************** Machine stuff ******************/
+//#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
 // We encode priority with colour in the tilemaps, so need a larger palette
 #define T2PALETTE_LENGTH 0x10000
@@ -230,3 +234,5 @@ private:
 	void vfive_68k_mem(address_map &map);
 	void vfive_v25_mem(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TOAPLAN2_H
