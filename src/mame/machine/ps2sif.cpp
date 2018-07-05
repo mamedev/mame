@@ -97,7 +97,7 @@ WRITE32_MEMBER(ps2_sif_device::ee_w)
 			m_sm_flag &= ~data;
 			break;
 		case 8:
-			logerror("%s: ee_w: SIF control = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			logerror("%s: ee_w: SIF set control = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			if (BIT(data, 8))
 				m_ctrl |= (1 << 8);
 			else
@@ -151,6 +151,10 @@ WRITE32_MEMBER(ps2_sif_device::iop_w)
 			logerror("%s: iop_w: SIF slave->master mailbox (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 			m_sm_mailbox = data;
 			break;
+		case 8:
+			logerror("%s: iop_w: SIF clear master->slave flag (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+			m_ms_flag &= ~data;
+			break;
 		case 12:
 			logerror("%s: iop_w: SIF set slave->master flag (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 			m_sm_flag |= data;
@@ -158,6 +162,11 @@ WRITE32_MEMBER(ps2_sif_device::iop_w)
 		case 16:
 			logerror("%s: iop_w: SIF set control (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 			m_ctrl ^= data & 0xf0;
+			if (data & 0x80 || data & 0x20)
+			{
+				m_ctrl &= ~0xf000;
+				m_ctrl |= 0x2000;
+			}
 			break;
 		default:
 			logerror("%s: iop_w: Unknown write %08x = %08x & %08x\n", machine().describe_context(), 0x1d000000 + (offset << 2), data, mem_mask);
@@ -175,8 +184,10 @@ uint32_t ps2_sif_device::fifo_pop(uint32_t channel)
 {
 	assert(channel < 2);
 	assert(m_fifo_curr[channel] > 0);
+	uint32_t ret = m_fifo[channel][0];
 	m_fifo_curr[channel]--;
-	return m_fifo[channel][m_fifo_curr[channel]];
+	memcpy(&m_fifo[channel][0], &m_fifo[channel][1], sizeof(uint32_t) * m_fifo_curr[channel]);
+	return ret;
 }
 
 void ps2_sif_device::fifo_push(uint32_t channel, uint32_t value)

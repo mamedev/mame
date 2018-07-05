@@ -94,5 +94,6 @@ void iop_intc_device::raise_interrupt(uint32_t line)
 void iop_intc_device::update_interrupts()
 {
 	bool active = (m_enabled && (m_status & m_mask));
+	//printf("iop_intc: %d && (%08x & %08x) = %d\n", m_enabled, m_status, m_mask, active);
 	m_iop->set_input_line(R3000_IRQ0, active ? ASSERT_LINE : CLEAR_LINE);
 }

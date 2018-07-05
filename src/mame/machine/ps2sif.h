@@ -38,6 +38,8 @@ public:
 	void fifo_push(uint32_t channel, uint32_t value);
 	uint32_t fifo_pop(uint32_t channel);
 
+	static const size_t MAX_FIFO_DEPTH;
+
 protected:
     virtual void device_start() override;
     virtual void device_reset() override;
@@ -52,8 +54,6 @@ protected:
 
 	std::unique_ptr<uint32_t[]> m_fifo[2];
 	uint32_t m_fifo_curr[2];
-
-	static const size_t MAX_FIFO_DEPTH;
 };
 
 DECLARE_DEVICE_TYPE(SONYPS2_SIF, ps2_sif_device)

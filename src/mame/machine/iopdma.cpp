@@ -69,6 +69,7 @@ void iop_dma_device::device_reset()
 	m_dicr[0] = 0;
 	m_dicr[1] = 0;
 	m_last_serviced = 0;
+	m_running_mask = 0;
 }
 
 void iop_dma_device::execute_run()
@@ -89,6 +90,9 @@ void iop_dma_device::execute_run()
 			{
 				switch (channel)
 				{
+					case 10:
+						transfer_sif0(channel);
+						break;
 					case 11:
 						transfer_sif1(channel);
 						break;
@@ -104,6 +108,53 @@ void iop_dma_device::execute_run()
 	}
 }
 
+void iop_dma_device::transfer_sif0(uint32_t chan)
+{
+	channel_t &channel = m_channels[chan];
+	const uint32_t count = channel.count();
+	if (count)
+	{
+		if (m_sif->fifo_depth(0) < ps2_sif_device::MAX_FIFO_DEPTH)
+		{
+			const uint32_t addr = channel.addr();
+			m_sif->fifo_push(0, m_ram[addr >> 2]);
+			channel.set_addr(addr + 4);
+			channel.set_count(count - 1);
+		}
+	}
+	else
+	{
+		if (channel.end())
+		{
+			logerror("sif0.end\n");
+			transfer_finish(SIF0);
+		}
+		else if (m_sif->fifo_depth(0) < ps2_sif_device::MAX_FIFO_DEPTH - 2)
+		{
+			const uint32_t tag_addr_bytes = channel.tag_addr();
+			const uint32_t tag_addr = tag_addr_bytes >> 2;
+			const uint32_t iop_hi = m_ram[tag_addr];
+			const uint32_t iop_lo = m_ram[tag_addr + 1];
+			const uint32_t ee_hi = m_ram[tag_addr + 2];
+			const uint32_t ee_lo = m_ram[tag_addr + 3];
+
+			logerror("%s: following sif0 iop tag, full tag is %08x %08x %08x %08x\n", machine().describe_context(), iop_hi, iop_lo, ee_hi, ee_lo);
+			channel.set_addr(iop_hi & 0x00ffffff);
+			channel.set_count(iop_lo + 2);
+			channel.set_tag_addr(tag_addr_bytes + 0x10);
+
+			m_sif->fifo_push(0, ee_hi);
+			m_sif->fifo_push(0, ee_lo);
+
+			if (iop_hi & 0xc0000000)
+			{
+				logerror("%s: sif0 iop tag end\n", machine().describe_context());
+				channel.m_end = true;
+			}
+		}
+	}
+}
+
 void iop_dma_device::transfer_sif1(uint32_t chan)
 {
 	channel_t &channel = m_channels[chan];
@@ -111,8 +162,8 @@ void iop_dma_device::transfer_sif1(uint32_t chan)
 	{
 		if (m_sif->fifo_depth(1))
 		{
-			printf(".");
-			const uint64_t data = m_sif->fifo_pop(1);
+			const uint32_t data = m_sif->fifo_pop(1);
+			logerror("%s: sif1 pop value: %08x\n", machine().describe_context(), (uint32_t)data);
 			m_ram[channel.m_addr >> 2] = data;
 
 			channel.m_addr += 4;
@@ -123,34 +174,54 @@ void iop_dma_device::transfer_sif1(uint32_t chan)
 	{
 		if (channel.end())
 		{
-			channel.m_ctrl &= ~0x1000000;
-			channel.m_busy = false;
-			const uint32_t index = BIT(chan, 3);
-			const uint8_t subchan = chan & 7;
-			m_int_ctrl[index].m_status |= (1 << subchan);
-			m_dicr[index] |= 1 << (subchan + 24);
-			printf("channel.end\n");
-			if (m_int_ctrl[index].m_status & m_int_ctrl[index].m_mask)
-			{
-				printf("raising interrupt\n");
-				m_intc->raise_interrupt(iop_intc_device::INT_DMA);
-			}
+			logerror("sif1.end\n");
+			transfer_finish(SIF1);
 		}
 		else if (m_sif->fifo_depth(1) >= 4)
 		{
-			const uint32_t next_tag = m_sif->fifo_pop(1);
-			channel.m_addr = next_tag & 0x00ffffff;
-			channel.m_count = m_sif->fifo_pop(1);
+			const uint32_t iop_hi = m_sif->fifo_pop(1);
+			const uint32_t iop_lo = m_sif->fifo_pop(1);
+			m_sif->fifo_pop(1); // ee_hi - ignored
+			m_sif->fifo_pop(1); // ee_lo - ignored
+			logerror("%s: following sif1 iop tag, tag is %08x %08x\n", machine().describe_context(), iop_hi, iop_lo);
+			channel.set_addr(iop_hi & 0x00ffffff);
+			channel.set_count(iop_lo);
 
-			// ??
-			m_sif->fifo_pop(1);
-			m_sif->fifo_pop(1);
-
-			if (next_tag & 0xc0000000)
+			if (iop_hi & 0xc0000000)
 			{
+				logerror("%s: sif1 iop tag end\n", machine().describe_context());
 				channel.m_end = true;
 			}
 		}
+	}
+}
+
+void iop_dma_device::transfer_finish(uint32_t chan)
+{
+	channel_t &channel = m_channels[chan];
+	channel.m_ctrl &= ~0x1000000;
+	channel.m_busy = false;
+	channel.m_end = false;
+	const uint32_t index = BIT(chan, 3);
+	const uint8_t subchan = chan & 7;
+	m_int_ctrl[index].m_status |= (1 << subchan);
+	m_dicr[index] |= 1 << (subchan + 24);
+
+	if (m_int_ctrl[index].m_status & m_int_ctrl[index].m_mask)
+	{
+		m_intc->raise_interrupt(iop_intc_device::INT_DMA);
+		if (m_int_ctrl[index].m_enabled)
+		{
+			m_dicr[index] |= 0x80000000;
+		}
+		else
+		{
+			m_dicr[index] &= ~0x80000000;
+		}
+	}
+	else
+	{
+		m_dicr[index] &= ~0x80000000;
 	}
 }
 
@@ -285,7 +356,8 @@ void iop_dma_device::set_dpcr(uint32_t data, uint32_t index)
 
 void iop_dma_device::set_dicr(uint32_t data, uint32_t index)
 {
-	m_dicr[index] = data;
+	m_dicr[index] = (m_dicr[index] & (0x7f << 24)) | (data & ~(0x7f << 24));
+	m_dicr[index] &= ~(data & (0x7f << 24));
 	m_int_ctrl[index].m_mask = (data >> 16) & 0x7f;
 	m_int_ctrl[index].m_status &= ~((data >> 24) & 0x7f);
 	m_int_ctrl[index].m_enabled = BIT(data, 23);
@@ -294,30 +366,23 @@ void iop_dma_device::set_dicr(uint32_t data, uint32_t index)
 
 void iop_dma_device::channel_t::set_pri_ctrl(uint32_t pri_ctrl)
 {
+	bool was_enabled = m_enabled;
 	m_enabled = BIT(pri_ctrl, 3);
 	m_priority = pri_ctrl & 7;
-}
-
-void iop_dma_device::channel_t::set_addr(uint32_t addr)
-{
-	m_addr = addr;
+	if (!was_enabled && m_enabled)
+		m_end = false;
 }
 
 void iop_dma_device::channel_t::set_block(uint32_t block, uint32_t mem_mask)
 {
 	if (mem_mask & 0xffff)
-		m_count = (uint16_t)block;
+		m_size = (uint16_t)block;
 	if (mem_mask & 0xffff0000)
-		m_size = (uint16_t)(block >> 16);
+		m_count = (uint16_t)(block >> 16);
 }
 
 void iop_dma_device::channel_t::set_ctrl(uint32_t ctrl)
 {
 	m_ctrl = ctrl;
 	m_busy = BIT(ctrl, 24);
-}
-
-void iop_dma_device::channel_t::set_tag_addr(uint32_t tag_addr)
-{
-	m_tag_addr = tag_addr;
 }

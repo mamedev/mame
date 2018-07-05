@@ -76,10 +76,11 @@ protected:
 		}
 
 		void set_pri_ctrl(uint32_t pri_ctrl);
-		void set_addr(uint32_t addr);
+		void set_addr(uint32_t addr) { m_addr = addr; }
 		void set_block(uint32_t block, uint32_t mem_mask);
+		void set_count(uint32_t count) { m_count = count; }
 		void set_ctrl(uint32_t ctrl);
-		void set_tag_addr(uint32_t tag_addr);
+		void set_tag_addr(uint32_t tag_addr) { m_tag_addr = tag_addr; }
 
 		bool enabled() const { return m_enabled; }
 		bool busy() const { return m_busy; }
@@ -88,6 +89,7 @@ protected:
 		uint32_t ctrl() const { return m_ctrl; }
 		uint32_t tag_addr() const { return m_tag_addr; }
 		bool end() const { return m_end; }
+		uint32_t count() const { return m_count; }
 
 	protected:
 		uint8_t m_priority;
@@ -112,7 +114,9 @@ protected:
 	void set_dicr(uint32_t data, uint32_t index);
 	void update_interrupts();
 
+	void transfer_sif0(uint32_t chan);
 	void transfer_sif1(uint32_t chan);
+	void transfer_finish(uint32_t chan);
 
 	required_device<iop_intc_device> m_intc;
 	required_shared_ptr<uint32_t> m_ram;

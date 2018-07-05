@@ -1092,6 +1092,7 @@ void r3000_device::execute_run()
 			fflush(stdout);
 		}
 		*/
+
 		// instruction fetch
 		m_op = readop(m_pc);
 
