@@ -3058,10 +3058,18 @@ files {
 	MAME_DIR .. "src/mame/drivers/ps2sony.cpp",
 	MAME_DIR .. "src/mame/machine/ps2timer.cpp",
 	MAME_DIR .. "src/mame/machine/ps2timer.h",
-	MAME_DIR .. "src/mame/machine/ioptimer.cpp",
-	MAME_DIR .. "src/mame/machine/ioptimer.h",
+	MAME_DIR .. "src/mame/machine/ps2dma.cpp",
+	MAME_DIR .. "src/mame/machine/ps2dma.h",
+	MAME_DIR .. "src/mame/machine/ps2intc.cpp",
+	MAME_DIR .. "src/mame/machine/ps2intc.h",
+	MAME_DIR .. "src/mame/machine/ps2sif.cpp",
+	MAME_DIR .. "src/mame/machine/ps2sif.h",
 	MAME_DIR .. "src/mame/machine/iopdma.cpp",
 	MAME_DIR .. "src/mame/machine/iopdma.h",
+	MAME_DIR .. "src/mame/machine/iopintc.cpp",
+	MAME_DIR .. "src/mame/machine/iopintc.h",
+	MAME_DIR .. "src/mame/machine/ioptimer.cpp",
+	MAME_DIR .. "src/mame/machine/ioptimer.h",
 }
 
 createMESSProjects(_target, _subtarget, "sord")

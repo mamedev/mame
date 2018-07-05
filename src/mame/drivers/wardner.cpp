@@ -141,8 +141,8 @@ out:
 class wardner_state : public twincobr_state
 {
 public:
-	wardner_state(const machine_config &mconfig, device_type type, const char *tag)
-		: twincobr_state(mconfig, type, tag),
+	wardner_state(const machine_config &mconfig, device_type type, const char *tag) :
+		twincobr_state(mconfig, type, tag),
 		m_membank(*this, "membank")
 	{
 	}

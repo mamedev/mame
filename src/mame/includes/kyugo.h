@@ -5,14 +5,18 @@
     Kyugo hardware games
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_KYUGO_H
+#define MAME_INCLUDES_KYUGO_H
+
+#pragma once
 
 #include "emupal.h"
 
 class kyugo_state : public driver_device
 {
 public:
-	kyugo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kyugo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_bgattribram(*this, "bgattribram"),
@@ -22,7 +26,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void kyugo_base(machine_config &config);
 	void repulse(machine_config &config);
@@ -95,3 +100,5 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
+
+#endif // MAME_INCLUDES_KYUGO_H
