@@ -629,7 +629,7 @@ TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
 
 WRITE8_MEMBER(ps2sony_state::debug_w)
 {
-    printf("%c", (char)data);
+    //printf("%c", (char)data);
 }
 
 WRITE64_MEMBER(ps2sony_state::ee_iop_ram_w)
