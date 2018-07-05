@@ -613,8 +613,11 @@ void mappy_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 {
 	switch (id)
 	{
-		case TIMER_IO_RUN:
-			m_namcoio[param]->customio_run();
+		case TIMER_IO0_RUN:
+			m_namcoio[0]->customio_run();
+			break;
+		case TIMER_IO1_RUN:
+			m_namcoio[1]->customio_run();
 			break;
 		default:
 			assert_always(false, "Unknown id in mappy_state::device_timer");
@@ -630,10 +633,10 @@ WRITE_LINE_MEMBER(mappy_state::vblank_irq)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (!m_namcoio[0]->read_reset_line())        // give the cpu a tiny bit of time to write the command before processing it
-		timer_set(attotime::from_usec(50), TIMER_IO_RUN, 0);
+		m_namcoio_run_timer[0]->adjust(attotime::from_usec(50));
 
 	if (!m_namcoio[1]->read_reset_line())        // give the cpu a tiny bit of time to write the command before processing it
-		timer_set(attotime::from_usec(50), TIMER_IO_RUN, 1);
+		m_namcoio_run_timer[1]->adjust(attotime::from_usec(50));
 
 	if (m_sub_irq_mask)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
@@ -1311,6 +1314,9 @@ WRITE8_MEMBER(mappy_state::out_lamps)
 void mappy_state::machine_start()
 {
 	m_leds.resolve();
+
+	m_namcoio_run_timer[0] = timer_alloc(TIMER_IO0_RUN);
+	m_namcoio_run_timer[1] = timer_alloc(TIMER_IO1_RUN);
 
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
