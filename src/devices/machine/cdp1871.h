@@ -42,43 +42,43 @@
 //**************************************************************************
 
 #define MCFG_CDP1871_D1_CALLBACK(_read) \
-	devcb = &downcast<cdp1871_device &>(*device).set_d1_rd_callback(DEVCB_##_read);
+	downcast<cdp1871_device &>(*device).set_d1_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1871_D2_CALLBACK(_read) \
-	devcb = &downcast<cdp1871_device &>(*device).set_d2_rd_callback(DEVCB_##_read);
+	downcast<cdp1871_device &>(*device).set_d2_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1871_D3_CALLBACK(_read) \
-	devcb = &downcast<cdp1871_device &>(*device).set_d3_rd_callback(DEVCB_##_read);
+	downcast<cdp1871_device &>(*device).set_d3_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1871_D4_CALLBACK(_read) \
-	devcb = &downcast<cdp1871_device &>(*device).set_d4_rd_callback(DEVCB_##_read);
+	downcast<cdp1871_device &>(*device).set_d4_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1871_D5_CALLBACK(_read) \
-	devcb = &downcast<cdp1871_device &>(*device).set_d5_rd_callback(DEVCB_##_read);
+	downcast<cdp1871_device &>(*device).set_d5_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1871_D6_CALLBACK(_read) \
-	devcb = &downcast<cdp1871_device &>(*device).set_d6_rd_callback(DEVCB_##_read);
+	downcast<cdp1871_device &>(*device).set_d6_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1871_D7_CALLBACK(_read) \
-	devcb = &downcast<cdp1871_device &>(*device).set_d7_rd_callback(DEVCB_##_read);
+	downcast<cdp1871_device &>(*device).set_d7_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1871_D8_CALLBACK(_read) \
-	devcb = &downcast<cdp1871_device &>(*device).set_d8_rd_callback(DEVCB_##_read);
+	downcast<cdp1871_device &>(*device).set_d8_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1871_D9_CALLBACK(_read) \
-	devcb = &downcast<cdp1871_device &>(*device).set_d9_rd_callback(DEVCB_##_read);
+	downcast<cdp1871_device &>(*device).set_d9_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1871_D10_CALLBACK(_read) \
-	devcb = &downcast<cdp1871_device &>(*device).set_d10_rd_callback(DEVCB_##_read);
+	downcast<cdp1871_device &>(*device).set_d10_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1871_D11_CALLBACK(_read) \
-	devcb = &downcast<cdp1871_device &>(*device).set_d11_rd_callback(DEVCB_##_read);
+	downcast<cdp1871_device &>(*device).set_d11_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1871_DA_CALLBACK(_write) \
-	devcb = &downcast<cdp1871_device &>(*device).set_da_wr_callback(DEVCB_##_write);
+	downcast<cdp1871_device &>(*device).set_da_wr_callback(DEVCB_##_write);
 
 #define MCFG_CDP1871_RPT_CALLBACK(_write) \
-	devcb = &downcast<cdp1871_device &>(*device).set_rpt_wr_callback(DEVCB_##_write);
+	downcast<cdp1871_device &>(*device).set_rpt_wr_callback(DEVCB_##_write);
 
 
 

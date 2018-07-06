@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(3'570'000))
 	MCFG_DEVICE_PROGRAM_MAP(tmc600_map)
 	MCFG_DEVICE_IO_MAP(tmc600_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
 	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, tmc600_state, ef2_r))
 	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, tmc600_state, ef3_r))
 	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, tmc600_state, q_w))
@@ -269,20 +269,20 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 
 	// keyboard output latch
 	MCFG_DEVICE_ADD(CDP1852_KB_TAG, CDP1852, XTAL(3'570'000)/8) // clock is CDP1802 TPB
-	MCFG_CDP1852_MODE_CALLBACK(VCC)
+	MCFG_CDP1852_MODE_CALLBACK(CONSTANT(1))
 
 	// address bus demux for expansion bus
 	MCFG_DEVICE_ADD(CDP1852_BUS_TAG, CDP1852, 0) // clock is expansion bus TPA
-	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_MODE_CALLBACK(CONSTANT(0))
 
 	// printer output latch
 	MCFG_DEVICE_ADD(CDP1852_TMC700_TAG, CDP1852, XTAL(3'570'000)/8) // clock is CDP1802 TPB
-	MCFG_CDP1852_MODE_CALLBACK(VCC)
+	MCFG_CDP1852_MODE_CALLBACK(CONSTANT(1))
 	MCFG_CDP1852_DO_CALLBACK(WRITE8(*this, tmc600_state, printer_w))
 
 	// printer connector
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(CDP1802_TAG, cosmac_device, ef4_w)) MCFG_DEVCB_XOR(1)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(CDP1802_TAG, FUNC(cosmac_device::ef4_w)).exor(1);
 
 	// cassette
 	MCFG_CASSETTE_ADD("cassette")

@@ -75,7 +75,7 @@ void ti99_joystick_port_gen(device_slot_interface &device);
 DECLARE_DEVICE_TYPE_NS(TI99_JOYPORT, bus::ti99::joyport, joyport_device)
 
 #define MCFG_JOYPORT_INT_HANDLER( _intcallb ) \
-	devcb = &downcast<bus::ti99::joyport::joyport_device &>(*device).set_int_callback(DEVCB_##_intcallb);
+	downcast<bus::ti99::joyport::joyport_device &>(*device).set_int_callback(DEVCB_##_intcallb);
 
 #define MCFG_GENEVE_JOYPORT_ADD( _tag )  \
 	MCFG_DEVICE_ADD(_tag, TI99_JOYPORT, 0) \

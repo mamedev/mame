@@ -239,16 +239,16 @@ DECLARE_DEVICE_TYPE(MIDWAY_IOASIC, midway_ioasic_device)
 	downcast<midway_ioasic_device &>(*device).set_shuffle_default(_shuffle);
 
 #define MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(_write) \
-	devcb = &downcast<midway_ioasic_device &>(*device).set_irqhandler_callback(DEVCB_##_write);
+	downcast<midway_ioasic_device &>(*device).set_irqhandler_callback(DEVCB_##_write);
 
 #define MCFG_MIDWAY_IOASIC_AUTO_ACK(_ack) \
 	downcast<midway_ioasic_device &>(*device).set_auto_ack(_ack);
 
 #define MCFG_MIDWAY_IOASIC_OUT_TX_CB(_devcb) \
-	devcb = &downcast<midway_ioasic_device &>(*device).set_serial_tx_callback(DEVCB_##_devcb);
+	downcast<midway_ioasic_device &>(*device).set_serial_tx_callback(DEVCB_##_devcb);
 
 #define MCFG_MIDWAY_IOASIC_AUX_OUT_CB(_devcb) \
-	devcb = &downcast<midway_ioasic_device &>(*device).set_aux_output_callback(DEVCB_##_devcb);
+	downcast<midway_ioasic_device &>(*device).set_aux_output_callback(DEVCB_##_devcb);
 
 
 enum

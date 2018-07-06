@@ -30,10 +30,10 @@
 	downcast<es5506_device &>(*device).set_channels(_chan);
 
 #define MCFG_ES5506_IRQ_CB(_devcb) \
-	devcb = &downcast<es5506_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	downcast<es5506_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_ES5506_READ_PORT_CB(_devcb) \
-	devcb = &downcast<es5506_device &>(*device).set_read_port_callback(DEVCB_##_devcb);
+	downcast<es5506_device &>(*device).set_read_port_callback(DEVCB_##_devcb);
 
 
 #define MCFG_ES5505_REGION0(_region) \
@@ -46,10 +46,10 @@
 	downcast<es5505_device &>(*device).set_channels(_chan);
 
 #define MCFG_ES5505_IRQ_CB(_devcb) \
-	devcb = &downcast<es5505_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	downcast<es5505_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_ES5505_READ_PORT_CB(_devcb) \
-	devcb = &downcast<es5505_device &>(*device).set_read_port_callback(DEVCB_##_devcb);
+	downcast<es5505_device &>(*device).set_read_port_callback(DEVCB_##_devcb);
 
 
 class es550x_device : public device_t, public device_sound_interface

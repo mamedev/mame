@@ -10,7 +10,7 @@
 #pragma once
 
 #define MCFG_K007232_PORT_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<k007232_device &>(*device).set_port_write_handler(DEVCB_##_devcb);
+	downcast<k007232_device &>(*device).set_port_write_handler(DEVCB_##_devcb);
 
 
 class k007232_device : public device_t, public device_sound_interface

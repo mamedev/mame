@@ -9,16 +9,16 @@
 	downcast<mb8795_device *>(device)->set_drq_cb(_tx_drq, _rx_drq);
 
 #define MCFG_MB8795_TX_IRQ_CALLBACK(_write) \
-	devcb = &downcast<mb8795_device &>(*device).set_tx_irq_wr_callback(DEVCB_##_write);
+	downcast<mb8795_device &>(*device).set_tx_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_MB8795_RX_IRQ_CALLBACK(_write) \
-	devcb = &downcast<mb8795_device &>(*device).set_rx_irq_wr_callback(DEVCB_##_write);
+	downcast<mb8795_device &>(*device).set_rx_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_MB8795_TX_DRQ_CALLBACK(_write) \
-	devcb = &downcast<mb8795_device &>(*device).set_tx_drq_wr_callback(DEVCB_##_write);
+	downcast<mb8795_device &>(*device).set_tx_drq_wr_callback(DEVCB_##_write);
 
 #define MCFG_MB8795_RX_DRQ_CALLBACK(_write) \
-	devcb = &downcast<mb8795_device &>(*device).set_rx_drq_wr_callback(DEVCB_##_write);
+	downcast<mb8795_device &>(*device).set_rx_drq_wr_callback(DEVCB_##_write);
 
 class mb8795_device :   public device_t,
 						public device_network_interface

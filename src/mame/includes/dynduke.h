@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
+#ifndef MAME_INCLUDES_DYNDUKE_H
+#define MAME_INCLUDES_DYNDUKE_H
+
+#pragma once
+
 #include "audio/seibu.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
@@ -7,8 +12,8 @@
 class dynduke_state : public driver_device
 {
 public:
-	dynduke_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dynduke_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_slave(*this, "slave"),
 		m_seibu_sound(*this, "seibu_sound"),
@@ -18,7 +23,8 @@ public:
 		m_scroll_ram(*this, "scroll_ram"),
 		m_videoram(*this, "videoram"),
 		m_back_data(*this, "back_data"),
-		m_fore_data(*this, "fore_data") { }
+		m_fore_data(*this, "fore_data")
+	{ }
 
 	void dynduke(machine_config &config);
 	void dbldyn(machine_config &config);
@@ -72,3 +78,5 @@ private:
 	void sound_decrypted_opcodes_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DYNDUKE_H

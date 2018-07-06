@@ -13,40 +13,40 @@
 
 
 #define MCFG_HUC6202_NEXT_PIXEL_0_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_next_pixel_0_callback(DEVCB_##_devcb);
+	downcast<huc6202_device &>(*device).set_next_pixel_0_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6202_TIME_TIL_NEXT_EVENT_0_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_time_til_next_event_0_callback(DEVCB_##_devcb);
+	downcast<huc6202_device &>(*device).set_time_til_next_event_0_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6202_VSYNC_CHANGED_0_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_vsync_changed_0_callback(DEVCB_##_devcb);
+	downcast<huc6202_device &>(*device).set_vsync_changed_0_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6202_HSYNC_CHANGED_0_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_hsync_changed_0_callback(DEVCB_##_devcb);
+	downcast<huc6202_device &>(*device).set_hsync_changed_0_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6202_READ_0_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_read_0_callback(DEVCB_##_devcb);
+	downcast<huc6202_device &>(*device).set_read_0_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6202_WRITE_0_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_write_0_callback(DEVCB_##_devcb);
+	downcast<huc6202_device &>(*device).set_write_0_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6202_NEXT_PIXEL_1_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_next_pixel_1_callback(DEVCB_##_devcb);
+	downcast<huc6202_device &>(*device).set_next_pixel_1_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6202_TIME_TIL_NEXT_EVENT_1_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_time_til_next_event_1_callback(DEVCB_##_devcb);
+	downcast<huc6202_device &>(*device).set_time_til_next_event_1_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6202_VSYNC_CHANGED_1_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_vsync_changed_1_callback(DEVCB_##_devcb);
+	downcast<huc6202_device &>(*device).set_vsync_changed_1_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6202_HSYNC_CHANGED_1_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_hsync_changed_1_callback(DEVCB_##_devcb);
+	downcast<huc6202_device &>(*device).set_hsync_changed_1_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6202_READ_1_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_read_1_callback(DEVCB_##_devcb);
+	downcast<huc6202_device &>(*device).set_read_1_callback(DEVCB_##_devcb);
 
 #define MCFG_HUC6202_WRITE_1_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_write_1_callback(DEVCB_##_devcb);
+	downcast<huc6202_device &>(*device).set_write_1_callback(DEVCB_##_devcb);
 
 
 class huc6202_device : public device_t

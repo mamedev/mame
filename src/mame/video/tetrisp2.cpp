@@ -354,7 +354,7 @@ static void tetrisp2_draw_sprites(_BitmapClass &bitmap, bitmap_ind8 &bitmap_pri,
 
 		code    =   (color & 0x0fff);
 		// encoded to first word when YUV sprites are used
-		if(is_yuv == true)
+		if(is_yuv)
 			color   =   (attr & 0x7f00) >> 8;
 		else
 			color   =   (color >> 12) & 0xf;

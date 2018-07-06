@@ -49,7 +49,7 @@ enum
 	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::RC, _rc_clock); \
 	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::CF, _cf_clock);
 #define MCFG_LC8670_BANKSWITCH_CB(_devcb) \
-	devcb = &downcast<lc8670_cpu_device &>(*device).set_bankswitch_cb(DEVCB_##_devcb);
+	downcast<lc8670_cpu_device &>(*device).set_bankswitch_cb(DEVCB_##_devcb);
 
 #define MCFG_LC8670_LCD_UPDATE_CB(_cb) \
 	downcast<lc8670_cpu_device &>(*device).set_lcd_update_cb(_cb);

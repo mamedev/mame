@@ -919,27 +919,27 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
 
-	MCFG_DEVICE_ADD(m_user, PET_USER_PORT, plus4_user_port_cards, nullptr)
-	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p2)) // cassette sense
-	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p3))
-	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p4))
-	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p5))
-	MCFG_PET_USER_PORT_8_HANDLER(WRITELINE(m_acia, mos6551_device, write_rxc))
-	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p0))
-	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(m_acia, mos6551_device, write_rxd))
-	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p7))
-	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(m_acia, mos6551_device, write_dcd)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
-	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p6))
-	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p1))
-	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(m_acia, mos6551_device, write_dsr)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
+	PET_USER_PORT(config, m_user, plus4_user_port_cards, nullptr);
+	m_user->p4_handler().set(m_spi_user, FUNC(mos6529_device::write_p2)); // cassette sense
+	m_user->p5_handler().set(m_spi_user, FUNC(mos6529_device::write_p3));
+	m_user->p6_handler().set(m_spi_user, FUNC(mos6529_device::write_p4));
+	m_user->p7_handler().set(m_spi_user, FUNC(mos6529_device::write_p5));
+	m_user->p8_handler().set(m_acia, FUNC(mos6551_device::write_rxc));
+	m_user->pb_handler().set(m_spi_user, FUNC(mos6529_device::write_p0));
+	m_user->pc_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	m_user->pf_handler().set(m_spi_user, FUNC(mos6529_device::write_p7));
+	m_user->ph_handler().set(m_acia, FUNC(mos6551_device::write_dcd)).invert(); // TODO: add missing pull up before inverter
+	m_user->pj_handler().set(m_spi_user, FUNC(mos6529_device::write_p6));
+	m_user->pk_handler().set(m_spi_user, FUNC(mos6529_device::write_p1));
+	m_user->pl_handler().set(m_acia, FUNC(mos6551_device::write_dsr)).invert(); // TODO: add missing pull up before inverter
 
-	MCFG_DEVICE_ADD(m_acia, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_RXC_HANDLER(WRITELINE(m_user, pet_user_port_device, write_8))
-	MCFG_MOS6551_RTS_HANDLER(WRITELINE(m_user, pet_user_port_device, write_d)) MCFG_DEVCB_XOR(1)
-	MCFG_MOS6551_DTR_HANDLER(WRITELINE(m_user, pet_user_port_device, write_e)) MCFG_DEVCB_XOR(1)
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(m_user, pet_user_port_device, write_m))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, plus4_state, acia_irq_w))
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(1.8432_MHz_XTAL);
+	m_acia->rxc_handler().set(m_user, FUNC(pet_user_port_device::write_8));
+	m_acia->rts_handler().set(m_user, FUNC(pet_user_port_device::write_d)).invert();
+	m_acia->dtr_handler().set(m_user, FUNC(pet_user_port_device::write_e)).invert();
+	m_acia->txd_handler().set(m_user, FUNC(pet_user_port_device::write_m));
+	m_acia->irq_handler().set(FUNC(plus4_state::acia_irq_w));
 
 	MCFG_DEVICE_ADD(m_spi_user, MOS6529, 0)
 	MCFG_MOS6529_P0_HANDLER(WRITELINE(m_user, pet_user_port_device, write_b))

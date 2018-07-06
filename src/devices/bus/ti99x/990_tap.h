@@ -61,6 +61,6 @@ private:
 };
 
 #define MCFG_TI990_TAPE_INT_HANDLER( _intcallb )  \
-	devcb = &downcast<tap_990_device &>(*device).set_int_callback(DEVCB_##_intcallb);
+	downcast<tap_990_device &>(*device).set_int_callback(DEVCB_##_intcallb);
 
 #endif // MAME_BUS_TI99X_990_TAP_H

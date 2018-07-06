@@ -22,10 +22,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
 
 #define MCFG_BBC_FDC_SLOT_INTRQ_HANDLER(_devcb) \
-	devcb = &downcast<bbc_fdc_slot_device &>(*device).set_intrq_handler(DEVCB_##_devcb);
+	downcast<bbc_fdc_slot_device &>(*device).set_intrq_handler(DEVCB_##_devcb);
 
 #define MCFG_BBC_FDC_SLOT_DRQ_HANDLER(_devcb) \
-	devcb = &downcast<bbc_fdc_slot_device &>(*device).set_drq_handler(DEVCB_##_devcb);
+	downcast<bbc_fdc_slot_device &>(*device).set_drq_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

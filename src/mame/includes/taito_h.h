@@ -5,6 +5,11 @@
     Taito H system
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_TAITO_H_H
+#define MAME_INCLUDES_TAITO_H_H
+
+#pragma once
+
 #include "machine/taitoio.h"
 #include "video/tc0080vco.h"
 #include "emupal.h"
@@ -62,3 +67,5 @@ private:
 	void syvalion_map(address_map &map);
 	void tetristh_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TAITO_H_H

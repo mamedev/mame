@@ -15,55 +15,55 @@
 
 
 #define MCFG_CENTRONICS_STROBE_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_strobe_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_strobe_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_DATA0_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_data0_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_data0_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_DATA1_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_data1_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_data1_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_DATA2_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_data2_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_data2_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_DATA3_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_data3_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_data3_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_DATA4_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_data4_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_data4_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_DATA5_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_data5_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_data5_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_DATA6_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_data6_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_data6_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_DATA7_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_data7_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_data7_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_ACK_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_ack_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_ack_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_BUSY_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_busy_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_busy_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_PERROR_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_perror_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_perror_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_SELECT_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_select_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_select_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_AUTOFD_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_autofd_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_autofd_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_FAULT_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_fault_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_fault_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_INIT_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_init_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_init_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_SELECT_IN_HANDLER(_devcb) \
-	devcb = &downcast<centronics_device &>(*device).set_select_in_handler(DEVCB_##_devcb);
+	downcast<centronics_device &>(*device).set_select_in_handler(DEVCB_##_devcb);
 
 #define MCFG_CENTRONICS_OUTPUT_LATCH_ADD(_tag, _centronics_tag) \
 	MCFG_DEVICE_ADD(_tag, OUTPUT_LATCH, 0) \
@@ -124,6 +124,15 @@ public:
 	template <class Object> devcb_base &set_fault_handler(Object &&cb) { return m_fault_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_init_handler(Object &&cb) { return m_init_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_select_in_handler(Object &&cb) { return m_select_in_handler.set_callback(std::forward<Object>(cb)); }
+
+	auto ack_handler() { return m_ack_handler.bind(); }
+	auto busy_handler() { return m_busy_handler.bind(); }
+	auto perror_handler() { return m_perror_handler.bind(); }
+	auto select_handler() { return m_select_handler.bind(); }
+	auto autofd_handler() { return m_autofd_handler.bind(); }
+	auto fault_handler() { return m_fault_handler.bind(); }
+	auto init_handler() { return m_init_handler.bind(); }
+	auto select_in_handler() { return m_select_in_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_strobe );
 	DECLARE_WRITE_LINE_MEMBER( write_data0 );

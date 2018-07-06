@@ -23,7 +23,7 @@
 	downcast<z80daisy_generic_device &>(*device).set_vector(_vector); \
 
 #define MCFG_Z80DAISY_GENERIC_INT_CB(_devcb) \
-	devcb = &downcast<z80daisy_generic_device &>(*device).set_int_handler(DEVCB_##_devcb);
+	downcast<z80daisy_generic_device &>(*device).set_int_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

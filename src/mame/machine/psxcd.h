@@ -13,7 +13,7 @@
 //**************************************************************************
 
 #define MCFG_PSXCD_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<psxcd_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<psxcd_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 class psxcd_device : public cdrom_image_device
 {

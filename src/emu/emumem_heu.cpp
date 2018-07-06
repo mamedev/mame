@@ -13,6 +13,7 @@ template<int Width, int AddrShift, int Endian> handler_entry_read_units<Width, A
 {
 	const auto &entries = descriptor.get_entries_for_key(ukey);
 	fill(descriptor, entries);
+	std::sort(m_subunit_infos, m_subunit_infos + m_subunits, [](const subunit_info &a, const subunit_info &b) { return a.m_offset < b.m_offset; });
 }
 
 template<int Width, int AddrShift, int Endian> handler_entry_read_units<Width, AddrShift, Endian>::handler_entry_read_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, const handler_entry_read_units *src) :
@@ -32,6 +33,7 @@ template<int Width, int AddrShift, int Endian> handler_entry_read_units<Width, A
 		}
 
 	fill(descriptor, entries);
+	std::sort(m_subunit_infos, m_subunit_infos + m_subunits, [](const subunit_info &a, const subunit_info &b) { return a.m_offset < b.m_offset; });
 }
 
 template<int Width, int AddrShift, int Endian> handler_entry_read_units<Width, AddrShift, Endian>::~handler_entry_read_units()
@@ -126,6 +128,7 @@ template<int Width, int AddrShift, int Endian> handler_entry_write_units<Width, 
 {
 	const auto &entries = descriptor.get_entries_for_key(ukey);
 	fill(descriptor, entries);
+	std::sort(m_subunit_infos, m_subunit_infos + m_subunits, [](const subunit_info &a, const subunit_info &b) { return a.m_offset < b.m_offset; });
 }
 
 template<int Width, int AddrShift, int Endian> handler_entry_write_units<Width, AddrShift, Endian>::handler_entry_write_units(const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 ukey, const handler_entry_write_units<Width, AddrShift, Endian> *src) :
@@ -145,6 +148,7 @@ template<int Width, int AddrShift, int Endian> handler_entry_write_units<Width, 
 		}
 
 	fill(descriptor, entries);
+	std::sort(m_subunit_infos, m_subunit_infos + m_subunits, [](const subunit_info &a, const subunit_info &b) { return a.m_offset < b.m_offset; });
 }
 
 template<int Width, int AddrShift, int Endian> handler_entry_write_units<Width, AddrShift, Endian>::~handler_entry_write_units()

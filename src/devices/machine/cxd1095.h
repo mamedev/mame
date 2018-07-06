@@ -49,26 +49,26 @@
 //**************************************************************************
 
 #define MCFG_CXD1095_IN_PORTA_CB(_devcb) \
-	devcb = &downcast<cxd1095_device &>(*device).set_input_cb(0, DEVCB_##_devcb);
+	downcast<cxd1095_device &>(*device).set_input_cb(0, DEVCB_##_devcb);
 #define MCFG_CXD1095_IN_PORTB_CB(_devcb) \
-	devcb = &downcast<cxd1095_device &>(*device).set_input_cb(1, DEVCB_##_devcb);
+	downcast<cxd1095_device &>(*device).set_input_cb(1, DEVCB_##_devcb);
 #define MCFG_CXD1095_IN_PORTC_CB(_devcb) \
-	devcb = &downcast<cxd1095_device &>(*device).set_input_cb(2, DEVCB_##_devcb);
+	downcast<cxd1095_device &>(*device).set_input_cb(2, DEVCB_##_devcb);
 #define MCFG_CXD1095_IN_PORTD_CB(_devcb) \
-	devcb = &downcast<cxd1095_device &>(*device).set_input_cb(3, DEVCB_##_devcb);
+	downcast<cxd1095_device &>(*device).set_input_cb(3, DEVCB_##_devcb);
 #define MCFG_CXD1095_IN_PORTE_CB(_devcb) \
-	devcb = &downcast<cxd1095_device &>(*device).set_input_cb(4, DEVCB_##_devcb);
+	downcast<cxd1095_device &>(*device).set_input_cb(4, DEVCB_##_devcb);
 
 #define MCFG_CXD1095_OUT_PORTA_CB(_devcb) \
-	devcb = &downcast<cxd1095_device &>(*device).set_output_cb(0, DEVCB_##_devcb);
+	downcast<cxd1095_device &>(*device).set_output_cb(0, DEVCB_##_devcb);
 #define MCFG_CXD1095_OUT_PORTB_CB(_devcb) \
-	devcb = &downcast<cxd1095_device &>(*device).set_output_cb(1, DEVCB_##_devcb);
+	downcast<cxd1095_device &>(*device).set_output_cb(1, DEVCB_##_devcb);
 #define MCFG_CXD1095_OUT_PORTC_CB(_devcb) \
-	devcb = &downcast<cxd1095_device &>(*device).set_output_cb(2, DEVCB_##_devcb);
+	downcast<cxd1095_device &>(*device).set_output_cb(2, DEVCB_##_devcb);
 #define MCFG_CXD1095_OUT_PORTD_CB(_devcb) \
-	devcb = &downcast<cxd1095_device &>(*device).set_output_cb(3, DEVCB_##_devcb);
+	downcast<cxd1095_device &>(*device).set_output_cb(3, DEVCB_##_devcb);
 #define MCFG_CXD1095_OUT_PORTE_CB(_devcb) \
-	devcb = &downcast<cxd1095_device &>(*device).set_output_cb(4, DEVCB_##_devcb);
+	downcast<cxd1095_device &>(*device).set_output_cb(4, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

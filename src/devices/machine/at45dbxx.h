@@ -32,7 +32,7 @@
 	MCFG_DEVICE_ADD(_tag, AT45DB161, 0)
 
 #define MCFG_AT45DBXXX_SO_CALLBACK(_cb) \
-	devcb = &downcast<at45db041_device &>(*device).set_so_cb(DEVCB_##_cb);
+	downcast<at45db041_device &>(*device).set_so_cb(DEVCB_##_cb);
 
 
 // ======================> at45db041_device

@@ -46,25 +46,25 @@
 	MCFG_DEVICE_ADD(_tag, EI68C153, _clock)
 
 #define MCFG_BIM68153_OUT_INT_CB(_devcb) \
-	devcb = &downcast<bim68153_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
+	downcast<bim68153_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 // These callback sets INTAL0 and INTAL1 but is probably not needed as the
 // shorthand OUT_IACK0..OUT_IACK3 below embedd the channel information
 #define MCFG_BIM68153_OUT_INTAL0_CB(_devcb) \
-	devcb = &downcast<bim68153_device &>(*device).set_out_intal0_callback(DEVCB_##_devcb);
+	downcast<bim68153_device &>(*device).set_out_intal0_callback(DEVCB_##_devcb);
 
 #define MCFG_BIM68153_OUT_INTAL1_CB(_devcb) \
-	devcb = &downcast<bim68153_device &>(*device).set_out_intal1_callback(DEVCB_##_devcb);
+	downcast<bim68153_device &>(*device).set_out_intal1_callback(DEVCB_##_devcb);
 
 // LOCAL IACK callbacks emulating the INTAL0 and INTAL1 outputs for INTAE requesting a vector from a sub device
 #define MCFG_BIM68153_OUT_IACK0_CB(_devcb)                              \
-	devcb = &downcast<bim68153_device &>(*device).set_out_iack0_callback(DEVCB_##_devcb);
+	downcast<bim68153_device &>(*device).set_out_iack0_callback(DEVCB_##_devcb);
 #define MCFG_BIM68153_OUT_IACK1_CB(_devcb)                              \
-	devcb = &downcast<bim68153_device &>(*device).set_out_iack1_callback(DEVCB_##_devcb);
+	downcast<bim68153_device &>(*device).set_out_iack1_callback(DEVCB_##_devcb);
 #define MCFG_BIM68153_OUT_IACK2_CB(_devcb)                              \
-	devcb = &downcast<bim68153_device &>(*device).set_out_iack2_callback(DEVCB_##_devcb);
+	downcast<bim68153_device &>(*device).set_out_iack2_callback(DEVCB_##_devcb);
 #define MCFG_BIM68153_OUT_IACK3_CB(_devcb)                              \
-	devcb = &downcast<bim68153_device &>(*device).set_out_iack3_callback(DEVCB_##_devcb);
+	downcast<bim68153_device &>(*device).set_out_iack3_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

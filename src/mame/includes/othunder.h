@@ -5,6 +5,10 @@
     Operation Thunderbolt
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_OTHUNDER_H
+#define MAME_INCLUDES_OTHUNDER_H
+
+#pragma once
 
 #include "audio/taitosnd.h"
 #include "machine/eepromser.h"
@@ -18,8 +22,8 @@
 class othunder_state : public driver_device
 {
 public:
-	othunder_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	othunder_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this,"spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -35,7 +39,8 @@ public:
 		m_2610_2l(*this, "2610.2l"),
 		m_2610_2r(*this, "2610.2r"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void othunder(machine_config &config);
 
@@ -96,3 +101,5 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
+
+#endif // MAME_INCLUDES_OTHUNDER_H

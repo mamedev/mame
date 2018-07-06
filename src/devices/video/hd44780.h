@@ -22,7 +22,7 @@
 	downcast<hd44780_device &>(*device).set_lcd_size(_lines, _chars);
 
 #define MCFG_HD44780_PIXEL_UPDATE_CB(_class, _method) \
-	downcast<hd44780_device &>(*device).set_pixel_update_cb(hd44780_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<hd44780_device &>(*device).set_pixel_update_cb(&_class::_method, #_class "::" #_method, this);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -43,7 +43,7 @@ public:
 
 	// static configuration helpers
 	void set_lcd_size(int lines, int chars) { m_lines = lines; m_chars = chars; }
-	template <typename Object> void set_pixel_update_cb(Object &&cb) { m_pixel_update_cb = std::forward<Object>(cb); }
+	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb = pixel_update_delegate(std::forward<T>(args)...); }
 
 	// device interface
 	virtual DECLARE_WRITE8_MEMBER(write);

@@ -32,7 +32,7 @@ DECLARE_DEVICE_TYPE(GENERIC_LATCH_16, generic_latch_16_device)
 	MCFG_DEVICE_ADD(_tag, GENERIC_LATCH_16, 0)
 
 #define MCFG_GENERIC_LATCH_DATA_PENDING_CB(_devcb) \
-	devcb = &downcast<generic_latch_base_device &>(*device).set_data_pending_callback(DEVCB_##_devcb);
+	downcast<generic_latch_base_device &>(*device).set_data_pending_callback(DEVCB_##_devcb);
 
 #define MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(_ack) \
 	downcast<generic_latch_base_device &>(*device).set_separate_acknowledge(_ack);
@@ -49,6 +49,7 @@ class generic_latch_base_device : public device_t
 public:
 	// configuration
 	template <class Object> devcb_base &set_data_pending_callback(Object &&cb) { return m_data_pending_cb.set_callback(std::forward<Object>(cb)); }
+	auto data_pending_callback() { return m_data_pending_cb.bind(); }
 	void set_separate_acknowledge(bool ack) { m_separate_acknowledge = ack; }
 
 	DECLARE_READ_LINE_MEMBER(pending_r);

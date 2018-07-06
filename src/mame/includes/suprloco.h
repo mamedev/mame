@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+#ifndef MAME_INCLUDES_SUPRLOCO_H
+#define MAME_INCLUDES_SUPRLOCO_H
+
+#pragma once
 
 #include "machine/i8255.h"
 #include "emupal.h"
@@ -7,8 +11,8 @@
 class suprloco_state : public driver_device
 {
 public:
-	suprloco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	suprloco_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -16,7 +20,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_scrollram(*this, "scrollram"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	void suprloco(machine_config &config);
 
@@ -54,3 +59,5 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SUPRLOCO_H

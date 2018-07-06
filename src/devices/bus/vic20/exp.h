@@ -59,13 +59,13 @@
 
 
 #define MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &downcast<vic20_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<vic20_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(_write) \
-	devcb = &downcast<vic20_expansion_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
+	downcast<vic20_expansion_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(_write) \
-	devcb = &downcast<vic20_expansion_slot_device &>(*device).set_res_wr_callback(DEVCB_##_write);
+	downcast<vic20_expansion_slot_device &>(*device).set_res_wr_callback(DEVCB_##_write);
 
 
 

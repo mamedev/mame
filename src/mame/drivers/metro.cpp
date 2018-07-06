@@ -1146,7 +1146,7 @@ void metro_state::mouja_okimap(address_map &map)
 	MCFG_DEVICE_ADD(_tag, PUZZLET_IO, 0)
 
 #define MCFG_PUZZLET_IO_DATA_CALLBACK(_devcb) \
-	devcb = &puzzlet_io_device::set_data_cb(*device, DEVCB_##_devcb);
+	puzzlet_io_device::set_data_cb(*device, DEVCB_##_devcb);
 
 class puzzlet_io_device : public device_t {
 public:

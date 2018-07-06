@@ -5,6 +5,10 @@
     Bomb Jack
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_BOMBJACK_H
+#define MAME_INCLUDES_BOMBJACK_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -12,15 +16,16 @@
 class bombjack_state : public driver_device
 {
 public:
-	bombjack_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bombjack_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	DECLARE_READ8_MEMBER(soundlatch_read_and_clear);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
@@ -60,3 +65,5 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 };
+
+#endif // MAME_INCLUDES_BOMBJACK_H

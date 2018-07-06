@@ -43,16 +43,16 @@
 //**************************************************************************
 
 #define MCFG_T6721A_EOS_HANDLER(_eos) \
-	devcb = &downcast<t6721a_device *>(device)->set_eos_callback(DEVCB_##_eos);
+	downcast<t6721a_device *>(device)->set_eos_callback(DEVCB_##_eos);
 
 #define MCFG_T6721A_PHI2_HANDLER(_phi2) \
-	devcb = &downcast<t6721a_device *>(device)->set_phi2_callback(DEVCB_##_phi2);
+	downcast<t6721a_device *>(device)->set_phi2_callback(DEVCB_##_phi2);
 
 #define MCFG_T6721A_DTRD_HANDLER(_dtrd) \
-	devcb = &downcast<t6721a_device *>(device)->set_dtrd_callback(DEVCB_##_dtrd);
+	downcast<t6721a_device *>(device)->set_dtrd_callback(DEVCB_##_dtrd);
 
 #define MCFG_T6721A_APD_HANDLER(_apd) \
-	devcb = &downcast<t6721a_device *>(device)->set_apd_callback(DEVCB_##_apd);
+	downcast<t6721a_device *>(device)->set_apd_callback(DEVCB_##_apd);
 
 
 

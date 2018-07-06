@@ -37,7 +37,6 @@ public:
 
 protected:
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	template<int C> DECLARE_WRITE_LINE_MEMBER(ccounter_w);
 	DECLARE_READ8_MEMBER(leta_r);
 	DECLARE_WRITE8_MEMBER(nvram_recall_w);
 	DECLARE_WRITE_LINE_MEMBER(nvram_store_w);

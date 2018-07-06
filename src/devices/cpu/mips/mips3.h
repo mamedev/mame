@@ -544,6 +544,8 @@ private:
     virtual void handle_extra_base(uint32_t op);
     virtual void handle_extra_special(uint32_t op);
     virtual void handle_extra_regimm(uint32_t op);
+    virtual void handle_extra_cop0(uint32_t op);
+    virtual void handle_extra_cop1(uint32_t op);
     virtual void handle_extra_cop2(uint32_t op);
     virtual void handle_idt(uint32_t op);
     virtual void handle_ldc2(uint32_t op);
@@ -804,6 +806,8 @@ protected:
     void handle_extra_base(uint32_t op) override;
     void handle_extra_special(uint32_t op) override;
     void handle_extra_regimm(uint32_t op) override;
+    void handle_extra_cop0(uint32_t op) override;
+    void handle_extra_cop1(uint32_t op) override;
     void handle_extra_cop2(uint32_t op) override;
     void handle_idt(uint32_t op) override;
     void handle_mmi0(uint32_t op);
