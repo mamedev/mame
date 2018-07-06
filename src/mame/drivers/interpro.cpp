@@ -786,8 +786,7 @@ void interpro_state::interpro_scsi_adapter(device_t *device)
 
 void interpro_state::interpro_cdrom(device_t *device)
 {
-	// FIXME: enable when dependent code is committed
-	//downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
+	downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
 }
 
 MACHINE_CONFIG_START(interpro_state::ioga)
