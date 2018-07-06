@@ -53,10 +53,10 @@
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_ESQPANEL_TX_CALLBACK(_write) \
-	devcb = &downcast<esqpanel_device &>(*device).set_tx_wr_callback(DEVCB_##_write);
+	downcast<esqpanel_device &>(*device).set_tx_wr_callback(DEVCB_##_write);
 
 #define MCFG_ESQPANEL_ANALOG_CALLBACK(_write) \
-	devcb = &downcast<esqpanel_device &>(*device).set_analog_wr_callback(DEVCB_##_write);
+	downcast<esqpanel_device &>(*device).set_analog_wr_callback(DEVCB_##_write);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

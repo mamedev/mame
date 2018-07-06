@@ -1710,15 +1710,15 @@ MACHINE_CONFIG_START(model1_state::model1)
 
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
-	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("m1uart", i8251_device, write_rxd))
+	SEGAM1AUDIO(config, m_m1audio, 0);
+	m_m1audio->rxd_handler().set(m_m1uart, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("m1uart", I8251, 8000000) // uPD71051C, clock unknown
-	MCFG_I8251_TXD_HANDLER(WRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
+	I8251(config, m_m1uart, 8000000); // uPD71051C, clock unknown
+	m_m1uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
 
-	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("m1uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("m1uart", i8251_device, write_rxc))
+	clock_device &m1uart_clock(CLOCK(config, "m1uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	m1uart_clock.signal_handler().set(m_m1uart, FUNC(i8251_device::write_txc));
+	m1uart_clock.signal_handler().append(m_m1uart, FUNC(i8251_device::write_rxc));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model1_state::model1_hle)
@@ -1781,9 +1781,7 @@ MACHINE_CONFIG_START(model1_state::swa)
 	MCFG_SOUND_ROUTE(1, "dright", 1.0)
 
 	// Apparently m1audio has to filter out commands the DSB shouldn't see
-	MCFG_DEVICE_MODIFY(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("m1uart", i8251_device, write_rxd))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
+	m_m1audio->rxd_handler().append(m_dsbz80, FUNC(dsbz80_device::write_txd));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model1_state::wingwar)

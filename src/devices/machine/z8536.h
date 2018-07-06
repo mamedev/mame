@@ -65,25 +65,25 @@
 //**************************************************************************
 
 #define MCFG_Z8536_IRQ_CALLBACK(_write) \
-	devcb = &downcast<z8536_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<z8536_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_Z8536_PA_IN_CALLBACK(_read) \
-	devcb = &downcast<z8536_device &>(*device).set_pa_rd_callback(DEVCB_##_read);
+	downcast<z8536_device &>(*device).set_pa_rd_callback(DEVCB_##_read);
 
 #define MCFG_Z8536_PA_OUT_CALLBACK(_write) \
-	devcb = &downcast<z8536_device &>(*device).set_pa_wr_callback(DEVCB_##_write);
+	downcast<z8536_device &>(*device).set_pa_wr_callback(DEVCB_##_write);
 
 #define MCFG_Z8536_PB_IN_CALLBACK(_read) \
-	devcb = &downcast<z8536_device &>(*device).set_pb_rd_callback(DEVCB_##_read);
+	downcast<z8536_device &>(*device).set_pb_rd_callback(DEVCB_##_read);
 
 #define MCFG_Z8536_PB_OUT_CALLBACK(_write) \
-	devcb = &downcast<z8536_device &>(*device).set_pb_wr_callback(DEVCB_##_write);
+	downcast<z8536_device &>(*device).set_pb_wr_callback(DEVCB_##_write);
 
 #define MCFG_Z8536_PC_IN_CALLBACK(_read) \
-	devcb = &downcast<z8536_device &>(*device).set_pc_rd_callback(DEVCB_##_read);
+	downcast<z8536_device &>(*device).set_pc_rd_callback(DEVCB_##_read);
 
 #define MCFG_Z8536_PC_OUT_CALLBACK(_write) \
-	devcb = &downcast<z8536_device &>(*device).set_pc_wr_callback(DEVCB_##_write);
+	downcast<z8536_device &>(*device).set_pc_wr_callback(DEVCB_##_write);
 
 
 

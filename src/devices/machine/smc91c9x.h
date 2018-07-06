@@ -123,12 +123,12 @@ DECLARE_DEVICE_TYPE(SMC91C96, smc91c96_device)
 	MCFG_DEVICE_ADD((tag), SMC91C94, 0)
 
 #define MCFG_SMC91C94_IRQ_CALLBACK(write) \
-	devcb = &downcast<smc91c94_device &>(*device).set_irq_callback(DEVCB_##write);
+	downcast<smc91c94_device &>(*device).set_irq_callback(DEVCB_##write);
 
 #define MCFG_SMC91C96_ADD(tag) \
 	MCFG_DEVICE_ADD((tag), SMC91C96, 0)
 
 #define MCFG_SMC91C96_IRQ_CALLBACK(write) \
-	devcb = &downcast<smc91c96_device &>(*device).set_irq_callback(DEVCB_##write);
+	downcast<smc91c96_device &>(*device).set_irq_callback(DEVCB_##write);
 
 #endif // MAME_MACHINE_SMC91C9X_H

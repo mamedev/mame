@@ -19,13 +19,13 @@
 	downcast<scsp_device &>(*device).set_roffset(_offs);
 
 #define MCFG_SCSP_IRQ_CB(_devcb) \
-	devcb = &downcast<scsp_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	downcast<scsp_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_SCSP_MAIN_IRQ_CB(_devcb) \
-	devcb = &downcast<scsp_device &>(*device).set_main_irq_callback(DEVCB_##_devcb);
+	downcast<scsp_device &>(*device).set_main_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_SCSP_EXTS_CB(_devcb) \
-	devcb = &downcast<scsp_device &>(*device).set_exts_callback(DEVCB_##_devcb);
+	downcast<scsp_device &>(*device).set_exts_callback(DEVCB_##_devcb);
 
 
 class scsp_device : public device_t,

@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-
 #ifndef MAME_INCLUDES_PGM2_H
 #define MAME_INCLUDES_PGM2_H
 

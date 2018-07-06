@@ -125,31 +125,31 @@ DECLARE_DEVICE_TYPE(TPI6525, tpi6525_device)
 
 
 #define MCFG_TPI6525_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<tpi6525_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<tpi6525_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_TPI6525_IN_PA_CB(_devcb) \
-	devcb = &downcast<tpi6525_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
+	downcast<tpi6525_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_TPI6525_OUT_PA_CB(_devcb) \
-	devcb = &downcast<tpi6525_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
+	downcast<tpi6525_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_TPI6525_IN_PB_CB(_devcb) \
-	devcb = &downcast<tpi6525_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
+	downcast<tpi6525_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_TPI6525_OUT_PB_CB(_devcb) \
-	devcb = &downcast<tpi6525_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
+	downcast<tpi6525_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_TPI6525_IN_PC_CB(_devcb) \
-	devcb = &downcast<tpi6525_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
+	downcast<tpi6525_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_TPI6525_OUT_PC_CB(_devcb) \
-	devcb = &downcast<tpi6525_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
+	downcast<tpi6525_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_TPI6525_OUT_CA_CB(_devcb) \
-	devcb = &downcast<tpi6525_device &>(*device).set_out_ca_callback(DEVCB_##_devcb);
+	downcast<tpi6525_device &>(*device).set_out_ca_callback(DEVCB_##_devcb);
 
 #define MCFG_TPI6525_OUT_CB_CB(_devcb) \
-	devcb = &downcast<tpi6525_device &>(*device).set_out_cb_callback(DEVCB_##_devcb);
+	downcast<tpi6525_device &>(*device).set_out_cb_callback(DEVCB_##_devcb);
 
 
 #endif // MAME_MACHINE_6525TPI_H

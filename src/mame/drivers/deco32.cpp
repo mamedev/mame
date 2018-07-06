@@ -2004,12 +2004,12 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DECO146_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_DECO146_IN_PORTB_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
-	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
-	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
+	DECO146PROT(config, m_ioprot, 0);
+	m_ioprot->port_a_cb().set_ioport("IN0");
+	m_ioprot->port_b_cb().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(0);
+	m_ioprot->port_c_cb().set_ioport("IN1");
+	m_ioprot->set_interface_scramble_interleave();
+	m_ioprot->set_use_magic_read_address_xor(true);
 
 	MCFG_VIDEO_START_OVERRIDE(fghthist_state, fghthist)
 
@@ -2170,11 +2170,11 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "gun_speaker", 1.0)
 
 	MCFG_DEVICE_ADD("vol_main", LC7535)
-	MCFG_LC7535_SELECT_CB(VCC)
+	MCFG_LC7535_SELECT_CB(CONSTANT(1))
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_main_changed)
 
 	MCFG_DEVICE_ADD("vol_gun", LC7535)
-	MCFG_LC7535_SELECT_CB(GND)
+	MCFG_LC7535_SELECT_CB(CONSTANT(0))
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_gun_changed)
 MACHINE_CONFIG_END
 
@@ -2298,7 +2298,7 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 
 	MCFG_DEVICE_ADD("vol_main", LC7535)
-	MCFG_LC7535_SELECT_CB(VCC)
+	MCFG_LC7535_SELECT_CB(CONSTANT(1))
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_main_changed)
 MACHINE_CONFIG_END
 
@@ -2359,12 +2359,12 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_tattass)
 
-	MCFG_DECO104_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_DECO146_IN_PORTB_CB(READ16(*this, nslasher_state, port_b_tattass))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE(*this, nslasher_state, tattass_sound_irq_w))
-	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
+	DECO104PROT(config, m_ioprot, 0);
+	m_ioprot->port_a_cb().set_ioport("IN0");
+	m_ioprot->port_b_cb().set(FUNC(nslasher_state::port_b_tattass));
+	m_ioprot->port_c_cb().set_ioport("IN1");
+	m_ioprot->soundlatch_irq_cb().set(FUNC(nslasher_state::tattass_sound_irq_w));
+	m_ioprot->set_interface_scramble_interleave();
 
 	MCFG_VIDEO_START_OVERRIDE(nslasher_state,nslasher)
 
@@ -2440,12 +2440,12 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 
 	MCFG_VIDEO_START_OVERRIDE(nslasher_state, nslasher)
 
-	MCFG_DECO104_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_DECO146_IN_PORTB_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
+	DECO104PROT(config, m_ioprot, 0);
+	m_ioprot->port_a_cb().set_ioport("IN0");
+	m_ioprot->port_b_cb().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(0);
+	m_ioprot->port_c_cb().set_ioport("IN1");
+	m_ioprot->soundlatch_irq_cb().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
+	m_ioprot->set_interface_scramble_interleave();
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2469,19 +2469,16 @@ MACHINE_CONFIG_END
 // the US release uses a H6280 instead of a Z80, much like Lock 'n' Loaded
 MACHINE_CONFIG_START(nslasher_state::nslasheru)
 	nslasher(config);
+
 	MCFG_DEVICE_REPLACE("audiocpu", H6280, 32220000/8)
 	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
+
+	MCFG_DEVICE_REMOVE("sound_irq_merger")
 
 	MCFG_DEVICE_MODIFY("ymsnd")
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
 
-	MCFG_DEVICE_REMOVE("ioprot")
-	MCFG_DECO104_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_DECO146_IN_PORTB_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
-	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
+	m_ioprot->soundlatch_irq_cb().set_inputline("audiocpu", 0);
 MACHINE_CONFIG_END
 
 

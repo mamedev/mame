@@ -12,7 +12,7 @@ struct ssg_callbacks;
 
 
 #define MCFG_YM2608_IRQ_HANDLER(cb) \
-		devcb = &downcast<ym2608_device &>(*device).set_irq_handler(DEVCB_##cb);
+		downcast<ym2608_device &>(*device).set_irq_handler(DEVCB_##cb);
 
 class ym2608_device : public ay8910_device
 {

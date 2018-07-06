@@ -558,15 +558,15 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0+30, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(thedealr_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, thedealr_state, screen_vblank))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("subcpu", INPUT_LINE_NMI))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 384-1, 0+30, 256-1);
+	screen.set_screen_update(FUNC(thedealr_state::screen_update));
+	screen.screen_vblank().set(FUNC(thedealr_state::screen_vblank));
+	screen.screen_vblank().append_inputline(m_subcpu, INPUT_LINE_NMI);
+	screen.set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thedealr)
 	MCFG_PALETTE_ADD("palette", 512)

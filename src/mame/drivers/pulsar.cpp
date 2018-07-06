@@ -234,12 +234,12 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("dart", z80dart_device, ctsa_w))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("brg", COM8116, 5.0688_MHz_XTAL)
+	com8116_device &brg(COM8116(config, "brg", 5.0688_MHz_XTAL));
 	// Schematic has the labels for FT and FR the wrong way around, but the pin numbers are correct.
-	MCFG_COM8116_FR_HANDLER(WRITELINE("dart", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("dart", z80dart_device, txcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxcb_w))
+	brg.fr_handler().set("dart", FUNC(z80dart_device::txca_w));
+	brg.fr_handler().append("dart", FUNC(z80dart_device::rxca_w));
+	brg.ft_handler().set("dart", FUNC(z80dart_device::txcb_w));
+	brg.ft_handler().append("dart", FUNC(z80dart_device::rxcb_w));
 
 	MCFG_DEVICE_ADD("fdc", FD1797, 4_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)

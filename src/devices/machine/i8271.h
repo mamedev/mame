@@ -9,16 +9,16 @@
 #include "fdc_pll.h"
 
 #define MCFG_I8271_IRQ_CALLBACK(_write) \
-	devcb = &downcast<i8271_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
+	downcast<i8271_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8271_DRQ_CALLBACK(_write) \
-	devcb = &downcast<i8271_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
+	downcast<i8271_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8271_HDL_CALLBACK(_write) \
-	devcb = &downcast<i8271_device &>(*device).set_hdl_wr_callback(DEVCB_##_write);
+	downcast<i8271_device &>(*device).set_hdl_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8271_OPT_CALLBACK(_write) \
-	devcb = &downcast<i8271_device &>(*device).set_opt_wr_callback(DEVCB_##_write);
+	downcast<i8271_device &>(*device).set_opt_wr_callback(DEVCB_##_write);
 
 /***************************************************************************
     MACROS

@@ -790,12 +790,12 @@ void interpro_state::interpro_cdrom(device_t *device)
 }
 
 MACHINE_CONFIG_START(interpro_state::ioga)
-	MCFG_DEVICE_MODIFY(INTERPRO_IOGA_TAG)
-	MCFG_INTERPRO_IOGA_NMI_CB(INPUTLINE(m_maincpu, INPUT_LINE_NMI))
-	MCFG_INTERPRO_IOGA_IRQ_CB(INPUTLINE(m_maincpu, INPUT_LINE_IRQ0))
-	MCFG_INTERPRO_IOGA_IVEC_CB(WRITE8(m_maincpu, clipper_device, set_ivec))
+	m_ioga->out_nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_ioga->out_irq_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ioga->out_irq_vector_callback().set(m_maincpu, FUNC(clipper_device::set_ivec));
 
 	// ioga dma and serial dma channels
+	MCFG_DEVICE_MODIFY(INTERPRO_IOGA_TAG);
 	//MCFG_INTERPRO_IOGA_DMA_CB(0, unknown) // plotter
 	MCFG_INTERPRO_IOGA_DMA_CB(1, READ8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, mdma_r), WRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, mdma_w))
 	MCFG_INTERPRO_IOGA_DMA_CB(2, READ8(m_fdc, upd765_family_device, mdma_r), WRITE8(m_fdc, upd765_family_device, mdma_w))

@@ -197,9 +197,9 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 19218) // 19218 / 19222 ? guesses...
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 19218)); // 19218 / 19222 ? guesses...
+	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
 //  MCFG_DEVICE_ADD("intlatch", I8212, 0)
 //  MCFG_I8212_MD_CALLBACK(GND) // guessed !

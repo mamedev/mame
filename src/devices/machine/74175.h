@@ -49,46 +49,46 @@
 
 
 #define MCFG_74174_Q1_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q1_cb(DEVCB_##_devcb);
+	downcast<ttl741745_device &>(*device).set_q1_cb(DEVCB_##_devcb);
 
 #define MCFG_74174_Q2_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q2_cb(DEVCB_##_devcb);
+	downcast<ttl741745_device &>(*device).set_q2_cb(DEVCB_##_devcb);
 
 #define MCFG_74174_Q3_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q3_cb(DEVCB_##_devcb);
+	downcast<ttl741745_device &>(*device).set_q3_cb(DEVCB_##_devcb);
 
 #define MCFG_74174_Q4_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q4_cb(DEVCB_##_devcb);
+	downcast<ttl741745_device &>(*device).set_q4_cb(DEVCB_##_devcb);
 
 #define MCFG_74175_Q1_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q1_cb(DEVCB_##_devcb);
+	downcast<ttl741745_device &>(*device).set_q1_cb(DEVCB_##_devcb);
 
 #define MCFG_74175_Q2_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q2_cb(DEVCB_##_devcb);
+	downcast<ttl741745_device &>(*device).set_q2_cb(DEVCB_##_devcb);
 
 #define MCFG_74175_Q3_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q3_cb(DEVCB_##_devcb);
+	downcast<ttl741745_device &>(*device).set_q3_cb(DEVCB_##_devcb);
 
 #define MCFG_74175_Q4_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q4_cb(DEVCB_##_devcb);
+	downcast<ttl741745_device &>(*device).set_q4_cb(DEVCB_##_devcb);
 
 #define MCFG_74174_Q5_CB(_devcb) \
-	devcb = &downcast<ttl74174_device &>(*device).set_q5_cb(DEVCB_##_devcb);
+	downcast<ttl74174_device &>(*device).set_q5_cb(DEVCB_##_devcb);
 
 #define MCFG_74174_Q6_CB(_devcb) \
-	devcb = &downcast<ttl74174_device &>(*device).set_q6_cb(DEVCB_##_devcb);
+	downcast<ttl74174_device &>(*device).set_q6_cb(DEVCB_##_devcb);
 
 #define MCFG_74175_NOT_Q1_CB(_devcb) \
-	devcb = &downcast<ttl74175_device &>(*device).set_not_q1_cb(DEVCB_##_devcb);
+	downcast<ttl74175_device &>(*device).set_not_q1_cb(DEVCB_##_devcb);
 
 #define MCFG_74175_NOT_Q2_CB(_devcb) \
-	devcb = &downcast<ttl74175_device &>(*device).set_not_q2_cb(DEVCB_##_devcb);
+	downcast<ttl74175_device &>(*device).set_not_q2_cb(DEVCB_##_devcb);
 
 #define MCFG_74175_NOT_Q3_CB(_devcb) \
-	devcb = &downcast<ttl74175_device &>(*device).set_not_q3_cb(DEVCB_##_devcb);
+	downcast<ttl74175_device &>(*device).set_not_q3_cb(DEVCB_##_devcb);
 
 #define MCFG_74175_NOT_Q4_CB(_devcb) \
-	devcb = &downcast<ttl74175_device &>(*device).set_not_q1_cb(DEVCB_##_devcb);
+	downcast<ttl74175_device &>(*device).set_not_q1_cb(DEVCB_##_devcb);
 
 
 class ttl741745_device : public device_t

@@ -7,7 +7,7 @@
 #pragma once
 
 #define MCFG_INTERPRO_SGA_BERR_CB(_out_berr) \
-	devcb = &downcast<interpro_sga_device &>(*device).set_out_berr_callback(DEVCB_##_out_berr);
+	downcast<interpro_sga_device &>(*device).set_out_berr_callback(DEVCB_##_out_berr);
 
 class interpro_sga_device : public device_t
 {

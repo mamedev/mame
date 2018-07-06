@@ -7,7 +7,7 @@
 
 
 #define MCFG_SCN2672_INTR_CALLBACK(_intr) \
-	devcb = &downcast<scn2672_device &>(*device).set_intr_callback(DEVCB_##_intr);
+	downcast<scn2672_device &>(*device).set_intr_callback(DEVCB_##_intr);
 
 #define MCFG_SCN2672_CHARACTER_WIDTH(_value) \
 	downcast<scn2672_device &>(*device).set_character_width(_value);
@@ -19,7 +19,7 @@
 
 
 #define MCFG_SCN2674_INTR_CALLBACK(_intr) \
-	devcb = &downcast<scn2674_device &>(*device).set_intr_callback(DEVCB_##_intr);
+	downcast<scn2674_device &>(*device).set_intr_callback(DEVCB_##_intr);
 
 #define MCFG_SCN2674_CHARACTER_WIDTH(_value) \
 	downcast<scn2674_device &>(*device).set_character_width(_value);

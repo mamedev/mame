@@ -176,14 +176,14 @@ MACHINE_CONFIG_START(bebox_state::bebox)
 
 	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL(14'318'181)/3 )
 
-	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, bebox_state, bebox_pic8259_master_set_int_line))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, bebox_state, get_slave_ack))
+	PIC8259(config, m_pic8259_1, 0);
+	m_pic8259_1->out_int_callback().set(FUNC(bebox_state::bebox_pic8259_master_set_int_line));
+	m_pic8259_1->in_sp_callback().set_constant(1);
+	m_pic8259_1->read_slave_ack_callback().set(FUNC(bebox_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic8259_2", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, bebox_state, bebox_pic8259_slave_set_int_line))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	PIC8259(config, m_pic8259_2, 0);
+	m_pic8259_2->out_int_callback().set(FUNC(bebox_state::bebox_pic8259_slave_set_int_line));
+	m_pic8259_2->in_sp_callback().set_constant(0);
 
 	MCFG_DEVICE_ADD( "ns16550_0", NS16550, 0 )   /* TODO: Verify model */
 	MCFG_DEVICE_ADD( "ns16550_1", NS16550, 0 )   /* TODO: Verify model */

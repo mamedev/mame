@@ -9,7 +9,7 @@
 
 
 #define MCFG_SUNKBD_RXD_HANDLER(cb) \
-	devcb = &downcast<sun_keyboard_port_device &>(*device).set_rxd_handler(DEVCB_##cb);
+	downcast<sun_keyboard_port_device &>(*device).set_rxd_handler(DEVCB_##cb);
 
 
 class device_sun_keyboard_port_interface;

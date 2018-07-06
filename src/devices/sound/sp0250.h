@@ -50,6 +50,6 @@ private:
 DECLARE_DEVICE_TYPE(SP0250, sp0250_device)
 
 #define MCFG_SP0250_DRQ_CALLBACK(_write) \
-	devcb = &downcast<sp0250_device &>(*device).set_drq_callback(DEVCB_##_write);
+	downcast<sp0250_device &>(*device).set_drq_callback(DEVCB_##_write);
 
 #endif // MAME_SOUND_SP0250_H

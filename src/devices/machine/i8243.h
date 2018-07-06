@@ -24,9 +24,9 @@
 	MCFG_I8243_READHANDLER(_read) \
 	MCFG_I8243_WRITEHANDLER(_write)
 #define MCFG_I8243_READHANDLER(_devcb) \
-	devcb = &downcast<i8243_device &>(*device).set_read_handler(DEVCB_##_devcb);
+	downcast<i8243_device &>(*device).set_read_handler(DEVCB_##_devcb);
 #define MCFG_I8243_WRITEHANDLER(_devcb) \
-	devcb = &downcast<i8243_device &>(*device).set_write_handler(DEVCB_##_devcb);
+	downcast<i8243_device &>(*device).set_write_handler(DEVCB_##_devcb);
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/

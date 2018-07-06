@@ -446,11 +446,11 @@ MACHINE_CONFIG_START(vtech1_state::laser110)
 	// video hardware
 	MCFG_SCREEN_MC6847_PAL_ADD("screen", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, vtech1_state, mc6847_videoram_r))
-	MCFG_MC6847_BW(true)
-	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
+	MC6847_PAL(config, m_mc6847, XTAL(4'433'619));
+	m_mc6847->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
+	m_mc6847->input_callback().set(FUNC(vtech1_state::mc6847_videoram_r));
+	m_mc6847->set_black_and_white(true);
+	m_mc6847->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
 
@@ -476,16 +476,16 @@ MACHINE_CONFIG_START(vtech1_state::laser110)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "vz_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(vtech1_state::laser200)
+void vtech1_state::laser200(machine_config &config)
+{
 	laser110(config);
-	MCFG_DEVICE_REMOVE("mc6847")
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, vtech1_state, mc6847_videoram_r))
-	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
+	MC6847_PAL(config.replace(), m_mc6847, XTAL(4'433'619));
+	m_mc6847->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
+	m_mc6847->input_callback().set(FUNC(vtech1_state::mc6847_videoram_r));
+	m_mc6847->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(vtech1_state::laser210)
 	laser200(config);
@@ -505,11 +505,10 @@ MACHINE_CONFIG_START(vtech1_state::laser310h)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(vtech1_shrg_io)
 
-	MCFG_DEVICE_REMOVE("mc6847")
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, vtech1_state, mc6847_videoram_r))
-	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
+	MC6847_PAL(config.replace(), m_mc6847, XTAL(4'433'619));
+	m_mc6847->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
+	m_mc6847->input_callback().set(FUNC(vtech1_state::mc6847_videoram_r));
+	m_mc6847->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);
 	// INTEXT = GND
 	// other lines not connected
 MACHINE_CONFIG_END

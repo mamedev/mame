@@ -528,11 +528,11 @@ MACHINE_CONFIG_START(xor100_state::xor100)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251_B_TAG, i8251_device, write_cts))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD(COM5016_TAG, COM8116, 5.0688_MHz_XTAL)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(I8251_A_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251_A_TAG, i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(I8251_B_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251_B_TAG, i8251_device, write_rxc))
+	com8116_device &brg(COM8116(config, COM5016_TAG, 5.0688_MHz_XTAL));
+	brg.fr_handler().set(m_uart_a, FUNC(i8251_device::write_txc));
+	brg.fr_handler().append(m_uart_a, FUNC(i8251_device::write_rxc));
+	brg.ft_handler().set(m_uart_b, FUNC(i8251_device::write_txc));
+	brg.ft_handler().append(m_uart_b, FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))

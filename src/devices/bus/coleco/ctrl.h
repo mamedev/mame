@@ -27,7 +27,7 @@
 
 
 #define MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(_write) \
-	devcb = &downcast<colecovision_control_port_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<colecovision_control_port_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 
 

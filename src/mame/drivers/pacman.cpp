@@ -3781,10 +3781,10 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", S2650, MASTER_CLOCK/6/2)    /* 2H */
-	MCFG_DEVICE_PROGRAM_MAP(s2650games_map)
-	MCFG_DEVICE_DATA_MAP(s2650games_dataport)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT
+	s2650_device &maincpu(S2650(config.replace(), m_maincpu, MASTER_CLOCK/6/2));    /* 2H */
+	maincpu.set_addrmap(AS_PROGRAM, &pacman_state::s2650games_map);
+	maincpu.set_addrmap(AS_DATA, &pacman_state::s2650games_dataport);
+	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank)).invert();
 
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP)

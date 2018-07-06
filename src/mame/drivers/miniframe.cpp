@@ -248,24 +248,24 @@ MACHINE_CONFIG_START(miniframe_state::miniframe)
 	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	// 8263s
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(76800)
-	MCFG_PIT8253_CLK1(76800)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir4_w))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(76800);
+	pit8253.set_clk<1>(76800);
+	pit8253.out_handler<0>().set("pic8259", FUNC(pic8259_device::ir4_w)); // FIXME: fighting for IR4 - error, or needs input merger?
 	// chain clock 1 output into clock 2
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk2))
+	pit8253.out_handler<1>().set("pit8253", FUNC(pit8253_device::write_clk2));
 	// and ir4 on the PIC
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("pic8259", pic8259_device, ir4_w))
+	pit8253.out_handler<1>().append("pic8259", FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD("baudgen", PIT8253, 0)
-	MCFG_PIT8253_CLK0(1228800)
-	MCFG_PIT8253_CLK1(1228800)
-	MCFG_PIT8253_CLK2(1228800)
+	pit8253_device &baudgen(PIT8253(config, "baudgen", 0));
+	baudgen.set_clk<0>(1228800);
+	baudgen.set_clk<1>(1228800);
+	baudgen.set_clk<2>(1228800);
 
 	// PIC8259s
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
 MACHINE_CONFIG_END
 
 

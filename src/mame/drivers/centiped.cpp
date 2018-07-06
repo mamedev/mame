@@ -1749,12 +1749,12 @@ MACHINE_CONFIG_START(centiped_state::centiped_base)
 
 	MCFG_DEVICE_ADD("earom", ER2055)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, centiped_state, coin_counter_left_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, centiped_state, coin_counter_center_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, centiped_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // LED 1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // LED 2
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(centiped_state::coin_counter_left_w));
+	outlatch.q_out_cb<1>().set(FUNC(centiped_state::coin_counter_center_w));
+	outlatch.q_out_cb<2>().set(FUNC(centiped_state::coin_counter_right_w));
+	outlatch.q_out_cb<3>().set_output("led0").invert(); // LED 1
+	outlatch.q_out_cb<4>().set_output("led1").invert(); // LED 2
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1915,9 +1915,9 @@ MACHINE_CONFIG_START(centiped_state::warlords)
 	MCFG_DEVICE_REMOVE("earom")
 
 	// these extra LEDs also appear on Centipede schematics
-	MCFG_DEVICE_MODIFY("outlatch") // P9
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT // LED 3
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led3")) MCFG_DEVCB_INVERT // LED 4
+	ls259_device &outlatch(*subdevice<ls259_device>("outlatch")); // P9
+	outlatch.q_out_cb<5>().set_output("led2").invert(); // LED 3
+	outlatch.q_out_cb<6>().set_output("led3").invert(); // LED 4
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_warlords)
@@ -1966,11 +1966,11 @@ MACHINE_CONFIG_START(centiped_state::bullsdrt)
 
 	MCFG_DEVICE_ADD("earom", ER2055)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, centiped_state, bullsdrt_coin_count_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<1>().set(FUNC(centiped_state::bullsdrt_coin_count_w));
+	outlatch.q_out_cb<3>().set_output("led0").invert();
+	outlatch.q_out_cb<4>().set_output("led1").invert();
+	outlatch.q_out_cb<7>().set(FUNC(centiped_state::flip_screen_w));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

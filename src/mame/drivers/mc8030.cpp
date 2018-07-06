@@ -227,9 +227,9 @@ MACHINE_CONFIG_START(mc8030_state::mc8030)
 	// ZC1: to SIO CLK CH B
 	// ZC2: KMBG (??)
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("asp_sio", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("asp_sio", z80sio_device, rxca_w))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set("asp_sio", FUNC(z80sio_device::txca_w));
+	uart_clock.signal_handler().append("asp_sio", FUNC(z80sio_device::rxca_w));
 
 	MCFG_DEVICE_ADD("asp_sio", Z80SIO, 4800)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

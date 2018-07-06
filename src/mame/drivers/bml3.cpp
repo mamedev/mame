@@ -1007,9 +1007,9 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_rts_w))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_irq_w))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 9600) // 600 baud x 16(divider) = 9600
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 9'600)); // 600 baud x 16(divider) = 9600
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 

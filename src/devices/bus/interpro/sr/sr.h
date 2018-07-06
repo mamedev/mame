@@ -7,16 +7,16 @@
 #pragma once
 
 #define MCFG_CBUS_OUT_IRQ0_CB(_devcb) \
-	devcb = &downcast<cbus_device &>(*device).set_out_irq0_callback(DEVCB_##_devcb);
+	downcast<cbus_device &>(*device).set_out_irq0_callback(DEVCB_##_devcb);
 
 #define MCFG_CBUS_OUT_IRQ1_CB(_devcb) \
-	devcb = &downcast<cbus_device &>(*device).set_out_irq1_callback(DEVCB_##_devcb);
+	downcast<cbus_device &>(*device).set_out_irq1_callback(DEVCB_##_devcb);
 
 #define MCFG_CBUS_OUT_IRQ2_CB(_devcb) \
-	devcb = &downcast<cbus_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
+	downcast<cbus_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
 
 #define MCFG_CBUS_OUT_VBLANK_CB(_devcb) \
-	devcb = &downcast<cbus_device &>(*device).set_out_vblank_callback(DEVCB_##_devcb);
+	downcast<cbus_device &>(*device).set_out_vblank_callback(DEVCB_##_devcb);
 
 #define MCFG_CBUS_SLOT_ADD(_bus_tag, _slot_tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_slot_tag, CBUS_SLOT, 0) \
@@ -28,16 +28,16 @@
 
 
 #define MCFG_SRX_OUT_IRQ0_CB(_devcb) \
-	devcb = &downcast<srx_device &>(*device).set_out_irq0_callback(DEVCB_##_devcb);
+	downcast<srx_device &>(*device).set_out_irq0_callback(DEVCB_##_devcb);
 
 #define MCFG_SRX_OUT_IRQ1_CB(_devcb) \
-	devcb = &downcast<srx_device &>(*device).set_out_irq1_callback(DEVCB_##_devcb);
+	downcast<srx_device &>(*device).set_out_irq1_callback(DEVCB_##_devcb);
 
 #define MCFG_SRX_OUT_IRQ2_CB(_devcb) \
-	devcb = &downcast<srx_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
+	downcast<srx_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
 
 #define MCFG_SRX_OUT_VBLANK_CB(_devcb) \
-	devcb = &downcast<srx_device &>(*device).set_out_vblank_callback(DEVCB_##_devcb);
+	downcast<srx_device &>(*device).set_out_vblank_callback(DEVCB_##_devcb);
 
 #define MCFG_SRX_SLOT_ADD(_bus_tag, _slot_tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_slot_tag, SRX_SLOT, 0) \

@@ -8,13 +8,13 @@
 #include "machine/z80daisy.h"
 
 #define MCFG_Z80_SET_IRQACK_CALLBACK(_devcb) \
-	devcb = &downcast<z80_device &>(*device).set_irqack_cb(DEVCB_##_devcb);
+	downcast<z80_device &>(*device).set_irqack_cb(DEVCB_##_devcb);
 
 #define MCFG_Z80_SET_REFRESH_CALLBACK(_devcb) \
-	devcb = &downcast<z80_device &>(*device).set_refresh_cb(DEVCB_##_devcb);
+	downcast<z80_device &>(*device).set_refresh_cb(DEVCB_##_devcb);
 
 #define MCFG_Z80_SET_HALT_CALLBACK(_devcb) \
-	devcb = &downcast<z80_device &>(*device).set_halt_cb(DEVCB_##_devcb);
+	downcast<z80_device &>(*device).set_halt_cb(DEVCB_##_devcb);
 
 enum
 {

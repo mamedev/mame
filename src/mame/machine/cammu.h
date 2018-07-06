@@ -12,7 +12,7 @@
 	downcast<cammu_c4_device &>(*device).set_cammu_id(_id);
 
 #define MCFG_CAMMU_EXCEPTION_CB(_exceptioncb) \
-	devcb = &downcast<cammu_device &>(*device).set_exception_callback(DEVCB_##_exceptioncb);
+	downcast<cammu_device &>(*device).set_exception_callback(DEVCB_##_exceptioncb);
 
 #define MCFG_CAMMU_LINK(_tag) \
 	downcast<cammu_c3_device &>(*device).add_linked(_tag);

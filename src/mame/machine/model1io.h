@@ -23,52 +23,52 @@
 //**************************************************************************
 
 #define MCFG_MODEL1IO_READ_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_read_callback(DEVCB_##_devcb);
+	downcast<model1io_device &>(*device).set_read_callback(DEVCB_##_devcb);
 
 #define MCFG_MODEL1IO_WRITE_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_write_callback(DEVCB_##_devcb);
+	downcast<model1io_device &>(*device).set_write_callback(DEVCB_##_devcb);
 
 #define MCFG_MODEL1IO_IN0_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 0);
+	downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 0);
 
 #define MCFG_MODEL1IO_IN1_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 1);
+	downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 1);
 
 #define MCFG_MODEL1IO_IN2_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 2);
+	downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 2);
 
 #define MCFG_MODEL1IO_DRIVE_READ_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_drive_read_callback(DEVCB_##_devcb);
+	downcast<model1io_device &>(*device).set_drive_read_callback(DEVCB_##_devcb);
 
 #define MCFG_MODEL1IO_DRIVE_WRITE_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_drive_write_callback(DEVCB_##_devcb);
+	downcast<model1io_device &>(*device).set_drive_write_callback(DEVCB_##_devcb);
 
 #define MCFG_MODEL1IO_AN0_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 0);
+	downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 0);
 
 #define MCFG_MODEL1IO_AN1_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 1);
+	downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 1);
 
 #define MCFG_MODEL1IO_AN2_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 2);
+	downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 2);
 
 #define MCFG_MODEL1IO_AN3_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 3);
+	downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 3);
 
 #define MCFG_MODEL1IO_AN4_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 4);
+	downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 4);
 
 #define MCFG_MODEL1IO_AN5_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 5);
+	downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 5);
 
 #define MCFG_MODEL1IO_AN6_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 6);
+	downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 6);
 
 #define MCFG_MODEL1IO_AN7_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 7);
+	downcast<model1io_device &>(*device).set_an_callback(DEVCB_##_devcb, 7);
 
 #define MCFG_MODEL1IO_OUTPUT_CB(_devcb) \
-	devcb = &downcast<model1io_device &>(*device).set_output_callback(DEVCB_##_devcb);
+	downcast<model1io_device &>(*device).set_output_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

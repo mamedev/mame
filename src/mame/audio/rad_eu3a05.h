@@ -5,7 +5,7 @@
 #define MAME_AUDIO_RAD_EU3A05_H
 
 #define MCFG_RADICA6502_SOUND_SPACE_READ_CB(_devcb) \
-	devcb = &downcast<radica6502_sound_device &>(*device).set_space_read_callback(DEVCB_##_devcb);
+	downcast<radica6502_sound_device &>(*device).set_space_read_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

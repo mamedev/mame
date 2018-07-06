@@ -1905,9 +1905,9 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_cs3_map)
 	MCFG_GT64XX_SET_SIMM0(0x00800000)
 
-	MCFG_DEVICE_ADD(PCI_ID_IDE, IDE_PCI, 0, 0x100b0002, 0x01, 0x0)
-	MCFG_IDE_PCI_IRQ_HANDLER(INPUTLINE(m_maincpu, IDE_IRQ_NUM))
-	MCFG_IDE_PCI_SET_LEGACY_TOP(0x0a0)
+	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x100b0002, 0x01, 0x0));
+	ide.irq_handler().set_inputline(m_maincpu, IDE_IRQ_NUM);
+	ide.set_legacy_top(0x0a0);
 
 	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_1_PCI, 0, m_maincpu, m_screen)
 	MCFG_VOODOO_PCI_FBMEM(2)

@@ -1162,15 +1162,15 @@ MACHINE_CONFIG_START(attache_state::attache)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 8_MHz_XTAL / 2)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("sio", z80sio_device, rxtxcb_w))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
+	m_ctc->zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxca_w));
+	m_ctc->zc_callback<0>().append(m_sio, FUNC(z80sio_device::txca_w));
+	m_ctc->zc_callback<1>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("brc", CLOCK, 8_MHz_XTAL / 26) // 307.692 KHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
+	clock_device &brc(CLOCK(config, "brc", 8_MHz_XTAL / 26)); // 307.692 KHz
+	brc.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
+	brc.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
 
 	MCFG_DEVICE_ADD("dma", AM9517A, 8_MHz_XTAL / 4)
 	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, attache_state, hreq_w))
@@ -1181,11 +1181,11 @@ MACHINE_CONFIG_START(attache_state::attache)
 	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8(*this, attache_state, fdc_dma_w))
 	// MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(*this, attache_state, fdc_dack_w))
 
-	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("ctc", z80ctc_device, trg3))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq0_w)).invert();
+	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	MCFG_DEVICE_ADD("crtc", TMS9927, 12324000 / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
@@ -1246,22 +1246,22 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 8_MHz_XTAL / 2)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("sio", z80sio_device, rxtxcb_w))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
+	m_ctc->zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxca_w));
+	m_ctc->zc_callback<0>().append(m_sio, FUNC(z80sio_device::txca_w));
+	m_ctc->zc_callback<1>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("brc", CLOCK, 8_MHz_XTAL / 26) // 307.692 KHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
+	clock_device &brc(CLOCK(config, "brc", 8_MHz_XTAL / 26)); // 307.692 KHz
+	brc.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
+	brc.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, attache816_state, x86_comms_w))
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, attache816_state, x86_comms_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, attache816_state, x86_irq_enable))
-	MCFG_I8255_OUT_PORTC_CB(WRITELINE(*this, attache816_state, x86_dsr)) MCFG_DEVCB_BIT(0)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, attache816_state, ppi_irq)) MCFG_DEVCB_BIT(7) MCFG_DEVCB_INVERT
+	I8255A(config, m_ppi, 0);
+	m_ppi->out_pa_callback().set(FUNC(attache816_state::x86_comms_w));
+	m_ppi->in_pa_callback().set(FUNC(attache816_state::x86_comms_r));
+	m_ppi->out_pb_callback().set(FUNC(attache816_state::x86_irq_enable));
+	m_ppi->out_pc_callback().set(FUNC(attache816_state::x86_dsr)).bit(0);
+	m_ppi->out_pc_callback().append(FUNC(attache816_state::ppi_irq)).bit(7).invert();
 
 	MCFG_DEVICE_ADD("dma", AM9517A, 8_MHz_XTAL / 4)
 	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, attache_state, hreq_w))
@@ -1272,11 +1272,11 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8(*this, attache_state, fdc_dma_w))
 	// MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(*this, attache_state, fdc_dack_w))
 
-	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("ctc", z80ctc_device, trg3))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq0_w)).invert();
+	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	MCFG_DEVICE_ADD("crtc", TMS9927, 12324000)
 	MCFG_TMS9927_CHAR_WIDTH(8)

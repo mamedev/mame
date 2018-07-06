@@ -64,22 +64,22 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_EXPANSION_DMA1_HANDLER(_devcb) \
-	devcb = &downcast<apricot_expansion_bus_device &>(*device).set_dma1_handler(DEVCB_##_devcb);
+	downcast<apricot_expansion_bus_device &>(*device).set_dma1_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_DMA2_HANDLER(_devcb) \
-	devcb = &downcast<apricot_expansion_bus_device &>(*device).set_dma2_handler(DEVCB_##_devcb);
+	downcast<apricot_expansion_bus_device &>(*device).set_dma2_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_EXT1_HANDLER(_devcb) \
-	devcb = &downcast<apricot_expansion_bus_device &>(*device).set_ext1_handler(DEVCB_##_devcb);
+	downcast<apricot_expansion_bus_device &>(*device).set_ext1_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_EXT2_HANDLER(_devcb) \
-	devcb = &downcast<apricot_expansion_bus_device &>(*device).set_ext2_handler(DEVCB_##_devcb);
+	downcast<apricot_expansion_bus_device &>(*device).set_ext2_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_INT2_HANDLER(_devcb) \
-	devcb = &downcast<apricot_expansion_bus_device &>(*device).set_int2_handler(DEVCB_##_devcb);
+	downcast<apricot_expansion_bus_device &>(*device).set_int2_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_INT3_HANDLER(_devcb) \
-	devcb = &downcast<apricot_expansion_bus_device &>(*device).set_int3_handler(DEVCB_##_devcb);
+	downcast<apricot_expansion_bus_device &>(*device).set_int3_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

@@ -2445,13 +2445,13 @@ MACHINE_CONFIG_START(model2_state::model2_scsp)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-//  MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, model2_state, sound_ready_w))
-//  MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, model2_state, sound_ready_w))
+	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
+//  m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
+//  m_uart->txrdy_handler().set(FUNC(model2_state::sound_ready_w));
 
-	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 MACHINE_CONFIG_END
 
 /* original Model 2 */
@@ -2494,15 +2494,15 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 	model2_timers(config);
 	model2_screen(config);
 
-	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	SEGAM1AUDIO(config, m_m1audio, 0);
+	m_m1audio->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-	MCFG_I8251_TXD_HANDLER(WRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
+	I8251(config, m_uart, 8000000);  // uPD71051C, clock unknown
+	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
 
-	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
@@ -2544,14 +2544,14 @@ MACHINE_CONFIG_START(model2_state::sj25_0207_01)
 	MCFG_DEVICE_IO_MAP(drive_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", model2_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("driveio1", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, model2_state, driveio_port_w))
-	MCFG_315_5296_IN_PORTG_CB(READ8(*this, model2_state, driveio_portg_r))
-	MCFG_315_5296_IN_PORTH_CB(READ8(*this, model2_state, driveio_porth_r))
+	sega_315_5296_device &driveio1(SEGA_315_5296(config, "driveio1", 0)); // unknown clock
+	driveio1.out_pd_callback().set(FUNC(model2_state::driveio_port_w));
+	driveio1.in_pg_callback().set(FUNC(model2_state::driveio_portg_r));
+	driveio1.in_ph_callback().set(FUNC(model2_state::driveio_porth_r));
 
-	MCFG_DEVICE_ADD("driveio2", SEGA_315_5296, 0) // unknown clock
+	SEGA_315_5296(config, "driveio2", 0); // unknown clock
 
-	MCFG_DEVICE_ADD("driveadc", MSM6253, 0)
+	MSM6253(config, "driveadc", 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_state::daytona)
@@ -2665,11 +2665,11 @@ MACHINE_CONFIG_END
 // Includes a Model 1 Sound board for additional sounds - Deluxe version only
 MACHINE_CONFIG_START(model2a_state::manxttdx)
 	manxtt(config);
-	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
 
-	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_TXD_HANDLER(WRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
+	SEGAM1AUDIO(config, m_m1audio, 0);
+	m_m1audio->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
+
+	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( model2a_state::srallyc )
@@ -2901,8 +2901,7 @@ MACHINE_CONFIG_START( model2c_state::stcc )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_TXD_HANDLER(WRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
+	m_uart->txd_handler().set(m_dsbz80, FUNC(dsbz80_device::write_txd));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( model2c_state::waverunr )

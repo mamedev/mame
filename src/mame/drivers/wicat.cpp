@@ -827,15 +827,15 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart5",mc2661_device,dsr_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart5",mc2661_device,cts_w))
 
-	MCFG_DEVICE_ADD("ledlatch", LS259, 0) // U19 on I/O board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wicat_state, adir_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wicat_state, bdir_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // 0 = on, 1 = off
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led3")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led4")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led5")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led6")) MCFG_DEVCB_INVERT
+	ls259_device &ledlatch(LS259(config, "ledlatch")); // U19 on I/O board
+	ledlatch.q_out_cb<0>().set(FUNC(wicat_state::adir_w));
+	ledlatch.q_out_cb<1>().set(FUNC(wicat_state::bdir_w));
+	ledlatch.q_out_cb<2>().set_output("led1").invert(); // 0 = on, 1 = off
+	ledlatch.q_out_cb<3>().set_output("led2").invert();
+	ledlatch.q_out_cb<4>().set_output("led3").invert();
+	ledlatch.q_out_cb<5>().set_output("led4").invert();
+	ledlatch.q_out_cb<6>().set_output("led5").invert();
+	ledlatch.q_out_cb<7>().set_output("led6").invert();
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("videocpu", Z8002, 8_MHz_XTAL/2)  // AMD AMZ8002DC

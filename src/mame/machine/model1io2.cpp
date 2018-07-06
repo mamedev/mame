@@ -135,57 +135,57 @@ const tiny_rom_entry *model1io2_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
-	MCFG_DEVICE_ADD("iocpu", TMPZ84C015, 19.6608_MHz_XTAL / 2) // TMPZ84C015AF-12
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	tmpz84c015_device &iocpu(TMPZ84C015(config, "iocpu", 19.6608_MHz_XTAL / 2)); // TMPZ84C015AF-12
+	iocpu.set_addrmap(AS_PROGRAM, &model1io2_device::mem_map);
 
 	// SIO channel a baud rate adjusted by dsw1 1+2: 38400, 19200, 9600, 4800
-	MCFG_TMPZ84C015_ZC2_CB(WRITELINE("iocpu", tmpz84c015_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("iocpu", tmpz84c015_device, txca_w))
-	MCFG_TMPZ84C015_ZC3_CB(WRITELINE("iocpu", tmpz84c015_device, rxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("iocpu", tmpz84c015_device, txcb_w))
+	iocpu.zc_callback<2>().set("iocpu", FUNC(tmpz84c015_device::rxca_w));
+	iocpu.zc_callback<2>().append("iocpu", FUNC(tmpz84c015_device::txca_w));
+	iocpu.zc_callback<3>().set("iocpu", FUNC(tmpz84c015_device::rxcb_w));
+	iocpu.zc_callback<3>().append("iocpu", FUNC(tmpz84c015_device::txcb_w));
 
-	MCFG_TMPZ84C015_OUT_TXDA_CB(WRITELINE("cn7", rs232_port_device, write_txd))
-	MCFG_TMPZ84C015_OUT_RTSA_CB(WRITELINE("cn7", rs232_port_device, write_rts))
-	MCFG_TMPZ84C015_OUT_DTRA_CB(WRITELINE("cn7", rs232_port_device, write_dtr))
+	iocpu.out_txda_callback().set("cn7", FUNC(rs232_port_device::write_txd));
+	iocpu.out_rtsa_callback().set("cn7", FUNC(rs232_port_device::write_rts));
+	iocpu.out_dtra_callback().set("cn7", FUNC(rs232_port_device::write_dtr));
 
-	MCFG_TMPZ84C015_OUT_TXDB_CB(WRITELINE("cn8", rs232_port_device, write_txd))
-	MCFG_TMPZ84C015_OUT_RTSB_CB(WRITELINE("cn8", rs232_port_device, write_rts))
-	MCFG_TMPZ84C015_OUT_DTRB_CB(WRITELINE("cn8", rs232_port_device, write_dtr))
+	iocpu.out_txdb_callback().set("cn8", FUNC(rs232_port_device::write_txd));
+	iocpu.out_rtsb_callback().set("cn8", FUNC(rs232_port_device::write_rts));
+	iocpu.out_dtrb_callback().set("cn8", FUNC(rs232_port_device::write_dtr));
 
-	MCFG_TMPZ84C015_IN_PA_CB(IOPORT("dsw2"))
-	MCFG_TMPZ84C015_IN_PB_CB(IOPORT("dsw3"))
+	iocpu.in_pa_callback().set_ioport("dsw2");
+	iocpu.in_pb_callback().set_ioport("dsw3");
 
-	MCFG_DEVICE_ADD("cn7", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("iocpu", tmpz84c015_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("iocpu", tmpz84c015_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("iocpu", tmpz84c015_device, dcda_w))
+	rs232_port_device &cn7(RS232_PORT(config, "cn7", default_rs232_devices, nullptr));
+	cn7.rxd_handler().set("iocpu", FUNC(tmpz84c015_device::rxa_w));
+	cn7.cts_handler().set("iocpu", FUNC(tmpz84c015_device::ctsa_w));
+	cn7.dcd_handler().set("iocpu", FUNC(tmpz84c015_device::dcda_w));
 
-	MCFG_DEVICE_ADD("cn8", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("iocpu", tmpz84c015_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("iocpu", tmpz84c015_device, ctsb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("iocpu", tmpz84c015_device, dcdb_w))
+	rs232_port_device &cn8(RS232_PORT(config, "cn8", default_rs232_devices, nullptr));
+	cn8.rxd_handler().set("iocpu", FUNC(tmpz84c015_device::rxb_w));
+	cn8.cts_handler().set("iocpu", FUNC(tmpz84c015_device::ctsb_w));
+	cn8.dcd_handler().set("iocpu", FUNC(tmpz84c015_device::dcdb_w));
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 32_MHz_XTAL)
-	MCFG_315_5338A_READ_CB(READ8(*this, model1io2_device, io_r))
-	MCFG_315_5338A_WRITE_CB(WRITE8(*this, model1io2_device, io_w))
-	MCFG_315_5338A_IN_PA_CB(READ8(*this, model1io2_device, io_pa_r))
-	MCFG_315_5338A_IN_PB_CB(READ8(*this, model1io2_device, io_pb_r))
-	MCFG_315_5338A_IN_PC_CB(READ8(*this, model1io2_device, io_pc_r))
-	MCFG_315_5338A_OUT_PD_CB(WRITE8(*this, model1io2_device, io_pd_w))
-	MCFG_315_5338A_IN_PE_CB(READ8(*this, model1io2_device, io_pe_r))
-	MCFG_315_5338A_OUT_PE_CB(WRITE8(*this, model1io2_device, io_pe_w))
-	MCFG_315_5338A_OUT_PF_CB(WRITE8(*this, model1io2_device, io_pf_w))
-	MCFG_315_5338A_OUT_PG_CB(WRITE8(*this, model1io2_device, io_pg_w))
+	sega_315_5338a_device &io(SEGA_315_5338A(config, "io", 32_MHz_XTAL));
+	io.read_callback().set(FUNC(model1io2_device::io_r));
+	io.write_callback().set(FUNC(model1io2_device::io_w));
+	io.in_pa_callback().set(FUNC(model1io2_device::io_pa_r));
+	io.in_pb_callback().set(FUNC(model1io2_device::io_pb_r));
+	io.in_pc_callback().set(FUNC(model1io2_device::io_pc_r));
+	io.out_pd_callback().set(FUNC(model1io2_device::io_pd_w));
+	io.in_pe_callback().set(FUNC(model1io2_device::io_pe_r));
+	io.out_pe_callback().set(FUNC(model1io2_device::io_pe_w));
+	io.out_pf_callback().set(FUNC(model1io2_device::io_pf_w));
+	io.out_pg_callback().set(FUNC(model1io2_device::io_pg_w));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT) // 93C45
+	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom); // 93C45
 
-	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
+	MB3773(config, m_watchdog, 0);
 
-	MCFG_DEVICE_ADD("adc", MSM6253, 32_MHz_XTAL / 16 / 4)
-	MCFG_MSM6253_IN0_ANALOG_READ(model1io2_device, analog0_r)
-	MCFG_MSM6253_IN1_ANALOG_READ(model1io2_device, analog1_r)
-	MCFG_MSM6253_IN2_ANALOG_READ(model1io2_device, analog2_r)
-	MCFG_MSM6253_IN3_ANALOG_READ(model1io2_device, analog3_r)
+	msm6253_device &adc(MSM6253(config, "adc", 32_MHz_XTAL / 16 / 4));
+	adc.set_input_cb<0>(FUNC(model1io2_device::analog0_r), this);
+	adc.set_input_cb<1>(FUNC(model1io2_device::analog1_r), this);
+	adc.set_input_cb<2>(FUNC(model1io2_device::analog2_r), this);
+	adc.set_input_cb<3>(FUNC(model1io2_device::analog3_r), this);
 
 	// diagnostic lcd display
 	MCFG_SCREEN_ADD("screen", LCD)

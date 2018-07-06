@@ -47,13 +47,13 @@ DECLARE_DEVICE_TYPE(ATA_SLOT, ata_slot_device)
 ***************************************************************************/
 
 #define MCFG_ATA_INTERFACE_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<abstract_ata_interface_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<abstract_ata_interface_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_ATA_INTERFACE_DMARQ_HANDLER(_devcb) \
-	devcb = &downcast<abstract_ata_interface_device &>(*device).set_dmarq_handler(DEVCB_##_devcb);
+	downcast<abstract_ata_interface_device &>(*device).set_dmarq_handler(DEVCB_##_devcb);
 
 #define MCFG_ATA_INTERFACE_DASP_HANDLER(_devcb) \
-	devcb = &downcast<abstract_ata_interface_device &>(*device).set_dasp_handler(DEVCB_##_devcb);
+	downcast<abstract_ata_interface_device &>(*device).set_dasp_handler(DEVCB_##_devcb);
 
 void ata_devices(device_slot_interface &device);
 

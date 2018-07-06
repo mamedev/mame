@@ -30,7 +30,7 @@ enum
 #define Z8000_HALT      0x0100  /* halted flag  */
 
 #define MCFG_Z8000_MO(_devcb) \
-	devcb = &downcast<z8002_device &>(*device).set_mo_callback(DEVCB_##_devcb);
+	downcast<z8002_device &>(*device).set_mo_callback(DEVCB_##_devcb);
 
 class z8002_device : public cpu_device, public z8000_disassembler::config
 {

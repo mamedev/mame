@@ -11,19 +11,19 @@
 #include "screen.h"
 
 #define MCFG_K053252_INT1_EN_CB(_devcb) \
-	devcb = &downcast<k053252_device &>(*device).set_int1_en_callback(DEVCB_##_devcb);
+	downcast<k053252_device &>(*device).set_int1_en_callback(DEVCB_##_devcb);
 
 #define MCFG_K053252_INT2_EN_CB(_devcb) \
-	devcb = &downcast<k053252_device &>(*device).set_int2_en_callback(DEVCB_##_devcb);
+	downcast<k053252_device &>(*device).set_int2_en_callback(DEVCB_##_devcb);
 
 #define MCFG_K053252_INT1_ACK_CB(_devcb) \
-	devcb = &downcast<k053252_device &>(*device).set_int1_ack_callback(DEVCB_##_devcb);
+	downcast<k053252_device &>(*device).set_int1_ack_callback(DEVCB_##_devcb);
 
 #define MCFG_K053252_INT2_ACK_CB(_devcb) \
-	devcb = &downcast<k053252_device &>(*device).set_int2_ack_callback(DEVCB_##_devcb);
+	downcast<k053252_device &>(*device).set_int2_ack_callback(DEVCB_##_devcb);
 
 #define MCFG_K053252_INT_TIME_CB(_devcb) \
-	devcb = &downcast<k053252_device &>(*device).set_int_time_callback(DEVCB_##_devcb);
+	downcast<k053252_device &>(*device).set_int_time_callback(DEVCB_##_devcb);
 
 #define MCFG_K053252_OFFSETS(_offsx, _offsy) \
 	downcast<k053252_device &>(*device).set_offsets(_offsx, _offsy);

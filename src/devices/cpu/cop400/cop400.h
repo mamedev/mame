@@ -17,40 +17,40 @@
 
 // L pins: 8-bit bi-directional
 #define MCFG_COP400_READ_L_CB(_devcb) \
-	devcb = &downcast<cop400_cpu_device &>(*device).set_read_l_callback(DEVCB_##_devcb);
+	downcast<cop400_cpu_device &>(*device).set_read_l_callback(DEVCB_##_devcb);
 #define MCFG_COP400_WRITE_L_CB(_devcb) \
-	devcb = &downcast<cop400_cpu_device &>(*device).set_write_l_callback(DEVCB_##_devcb);
+	downcast<cop400_cpu_device &>(*device).set_write_l_callback(DEVCB_##_devcb);
 // output state when pins are in tri-state, default 0
 #define MCFG_COP400_READ_L_TRISTATE_CB(_devcb) \
-	devcb = &downcast<cop400_cpu_device &>(*device).set_read_l_tristate_callback(DEVCB_##_devcb);
+	downcast<cop400_cpu_device &>(*device).set_read_l_tristate_callback(DEVCB_##_devcb);
 
 // G pins: 4-bit bi-directional
 #define MCFG_COP400_READ_G_CB(_devcb) \
-	devcb = &downcast<cop400_cpu_device &>(*device).set_read_g_callback(DEVCB_##_devcb);
+	downcast<cop400_cpu_device &>(*device).set_read_g_callback(DEVCB_##_devcb);
 #define MCFG_COP400_WRITE_G_CB(_devcb) \
-	devcb = &downcast<cop400_cpu_device &>(*device).set_write_g_callback(DEVCB_##_devcb);
+	downcast<cop400_cpu_device &>(*device).set_write_g_callback(DEVCB_##_devcb);
 
 // D outputs: 4-bit general purpose output
 #define MCFG_COP400_WRITE_D_CB(_devcb) \
-	devcb = &downcast<cop400_cpu_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
+	downcast<cop400_cpu_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
 
 // IN inputs: 4-bit general purpose input
 #define MCFG_COP400_READ_IN_CB(_devcb) \
-	devcb = &downcast<cop400_cpu_device &>(*device).set_read_in_callback(DEVCB_##_devcb);
+	downcast<cop400_cpu_device &>(*device).set_read_in_callback(DEVCB_##_devcb);
 
 // SI/SO lines: serial in/out or counter/gen.purpose
 #define MCFG_COP400_READ_SI_CB(_devcb) \
-	devcb = &downcast<cop400_cpu_device &>(*device).set_read_si_callback(DEVCB_##_devcb);
+	downcast<cop400_cpu_device &>(*device).set_read_si_callback(DEVCB_##_devcb);
 #define MCFG_COP400_WRITE_SO_CB(_devcb) \
-	devcb = &downcast<cop400_cpu_device &>(*device).set_write_so_callback(DEVCB_##_devcb);
+	downcast<cop400_cpu_device &>(*device).set_write_so_callback(DEVCB_##_devcb);
 
 // SK output line: logic-controlled clock or gen.purpose
 #define MCFG_COP400_WRITE_SK_CB(_devcb) \
-	devcb = &downcast<cop400_cpu_device &>(*device).set_write_sk_callback(DEVCB_##_devcb);
+	downcast<cop400_cpu_device &>(*device).set_write_sk_callback(DEVCB_##_devcb);
 
 // CKI/CKO lines: only CKO input here
 #define MCFG_COP400_READ_CKO_CB(_devcb) \
-	devcb = &downcast<cop400_cpu_device &>(*device).set_read_cko_callback(DEVCB_##_devcb);
+	downcast<cop400_cpu_device &>(*device).set_read_cko_callback(DEVCB_##_devcb);
 
 
 /***************************************************************************

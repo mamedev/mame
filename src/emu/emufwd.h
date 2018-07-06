@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 
 //----------------------------------
 // 3rdparty
@@ -98,8 +100,8 @@ class symbol_table;
 class debugger_manager;
 
 // declared in devcb.h
-class devcb_read_base;
-class devcb_write_base;
+class devcb_base;
+template <typename Input, std::make_unsigned_t<Input> DefaultMask> class devcb_write;
 
 // declared in devfind.h
 class finder_base;

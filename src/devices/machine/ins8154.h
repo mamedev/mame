@@ -43,19 +43,19 @@
 ***************************************************************************/
 
 #define MCFG_INS8154_IN_A_CB(_devcb) \
-	devcb = &downcast<ins8154_device &>(*device).set_in_a_callback(DEVCB_##_devcb);
+	downcast<ins8154_device &>(*device).set_in_a_callback(DEVCB_##_devcb);
 
 #define MCFG_INS8154_OUT_A_CB(_devcb) \
-	devcb = &downcast<ins8154_device &>(*device).set_out_a_callback(DEVCB_##_devcb);
+	downcast<ins8154_device &>(*device).set_out_a_callback(DEVCB_##_devcb);
 
 #define MCFG_INS8154_IN_B_CB(_devcb) \
-	devcb = &downcast<ins8154_device &>(*device).set_in_b_callback(DEVCB_##_devcb);
+	downcast<ins8154_device &>(*device).set_in_b_callback(DEVCB_##_devcb);
 
 #define MCFG_INS8154_OUT_B_CB(_devcb) \
-	devcb = &downcast<ins8154_device &>(*device).set_out_b_callback(DEVCB_##_devcb);
+	downcast<ins8154_device &>(*device).set_out_b_callback(DEVCB_##_devcb);
 
 #define MCFG_INS8154_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<ins8154_device &>(*device).set_out_irq_callback(DEVCB_##_devcb); //currently unused
+	downcast<ins8154_device &>(*device).set_out_irq_callback(DEVCB_##_devcb); //currently unused
 
 /***************************************************************************
     TYPE DEFINITIONS
