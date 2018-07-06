@@ -14,7 +14,7 @@
 
 
 #define MCFG_VOTRAX_SC01_REQUEST_CB(_devcb) \
-	devcb = &downcast<votrax_sc01_device *>(device)->set_ar_callback(DEVCB_##_devcb);
+	downcast<votrax_sc01_device *>(device)->set_ar_callback(DEVCB_##_devcb);
 
 class votrax_sc01_device :  public device_t,
 							public device_sound_interface

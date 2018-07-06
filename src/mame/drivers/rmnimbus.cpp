@@ -188,8 +188,8 @@ MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_centronics, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(m_maincpu, i80186_cpu_device, int3_w))
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(VIA_TAG, via6522_device, write_ca1)) MCFG_DEVCB_INVERT
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(m_via, FUNC(via6522_device::write_ca1)).invert();
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 

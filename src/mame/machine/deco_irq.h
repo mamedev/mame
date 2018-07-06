@@ -23,22 +23,22 @@
 	downcast<deco_irq_device &>(*device).set_screen_tag(_screen_tag);
 
 #define MCFG_DECO_IRQ_LIGHTGUN1_CB(_devcb) \
-	devcb = &downcast<deco_irq_device &>(*device).set_lightgun1_callback(DEVCB_##_devcb);
+	downcast<deco_irq_device &>(*device).set_lightgun1_callback(DEVCB_##_devcb);
 
 #define MCFG_DECO_IRQ_LIGHTGUN2_CB(_devcb) \
-	devcb = &downcast<deco_irq_device &>(*device).set_lightgun2_callback(DEVCB_##_devcb);
+	downcast<deco_irq_device &>(*device).set_lightgun2_callback(DEVCB_##_devcb);
 
 #define MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(_devcb) \
-	devcb = &downcast<deco_irq_device &>(*device).set_lightgun_irq_callback(DEVCB_##_devcb);
+	downcast<deco_irq_device &>(*device).set_lightgun_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_DECO_IRQ_RASTER1_IRQ_CB(_devcb) \
-	devcb = &downcast<deco_irq_device &>(*device).set_raster1_irq_callback(DEVCB_##_devcb);
+	downcast<deco_irq_device &>(*device).set_raster1_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_DECO_IRQ_RASTER2_IRQ_CB(_devcb) \
-	devcb = &downcast<deco_irq_device &>(*device).set_raster2_irq_callback(DEVCB_##_devcb);
+	downcast<deco_irq_device &>(*device).set_raster2_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_DECO_IRQ_VBLANK_IRQ_CB(_devcb) \
-	devcb = &downcast<deco_irq_device &>(*device).set_vblank_irq_callback(DEVCB_##_devcb);
+	downcast<deco_irq_device &>(*device).set_vblank_irq_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

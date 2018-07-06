@@ -33,16 +33,16 @@
 	downcast<crtc_ega_device &>(*device).config_set_hpixels_per_column(_pix);
 
 #define MCFG_CRTC_EGA_RES_OUT_DE_CB(_devcb) \
-	devcb = &downcast<crtc_ega_device &>(*device).set_res_out_de_callback(DEVCB_##_devcb);
+	downcast<crtc_ega_device &>(*device).set_res_out_de_callback(DEVCB_##_devcb);
 
 #define MCFG_CRTC_EGA_RES_OUT_HSYNC_CB(_devcb) \
-	devcb = &downcast<crtc_ega_device &>(*device).set_res_out_hsync_callback(DEVCB_##_devcb);
+	downcast<crtc_ega_device &>(*device).set_res_out_hsync_callback(DEVCB_##_devcb);
 
 #define MCFG_CRTC_EGA_RES_OUT_VSYNC_CB(_devcb) \
-	devcb = &downcast<crtc_ega_device &>(*device).set_res_out_vsync_callback(DEVCB_##_devcb);
+	downcast<crtc_ega_device &>(*device).set_res_out_vsync_callback(DEVCB_##_devcb);
 
 #define MCFG_CRTC_EGA_RES_OUT_VBLANK_CB(_devcb) \
-	devcb = &downcast<crtc_ega_device &>(*device).set_res_out_vblank_callback(DEVCB_##_devcb);
+	downcast<crtc_ega_device &>(*device).set_res_out_vblank_callback(DEVCB_##_devcb);
 
 
 class crtc_ega_device : public device_t,

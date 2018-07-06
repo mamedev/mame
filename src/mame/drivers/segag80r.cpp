@@ -298,7 +298,7 @@ WRITE8_MEMBER(segag80r_state::coin_count_w)
 
 READ8_MEMBER(segag80r_state::sindbadm_sound_data_r)
 {
-	uint8_t result = m_ppi->pa_r();
+	uint8_t result = m_ppi->read_pa();
 	if (!machine().side_effects_disabled())
 	{
 		m_ppi->pc6_w(0);

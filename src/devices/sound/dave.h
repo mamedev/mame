@@ -33,13 +33,13 @@
 
 
 #define MCFG_DAVE_IRQ_CALLBACK(_write) \
-	devcb = &downcast<dave_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<dave_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_DAVE_LH_CALLBACK(_write) \
-	devcb = &downcast<dave_device &>(*device).set_lh_wr_callback(DEVCB_##_write);
+	downcast<dave_device &>(*device).set_lh_wr_callback(DEVCB_##_write);
 
 #define MCFG_DAVE_RH_CALLBACK(_write) \
-	devcb = &downcast<dave_device &>(*device).set_rh_wr_callback(DEVCB_##_write);
+	downcast<dave_device &>(*device).set_rh_wr_callback(DEVCB_##_write);
 
 
 

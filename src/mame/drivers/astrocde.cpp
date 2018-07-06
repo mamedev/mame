@@ -1266,23 +1266,23 @@ MACHINE_CONFIG_START(seawolf2_state::seawolf2)
 	MCFG_DEVICE_PROGRAM_MAP(seawolf2_map)
 	MCFG_DEVICE_IO_MAP(port_map_discrete)
 
-	MCFG_DEVICE_ADD("lamplatch1", OUTPUT_LATCH, 0) // 74174 on game board at N2
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(OUTPUT("lamp6")) // right player torpedo 4 available
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(OUTPUT("lamp5")) // right player torpedo 3 available
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(OUTPUT("lamp4")) // right player torpedo 2 available
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(OUTPUT("lamp3")) // right player torpedo 1 available
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(OUTPUT("lamp2")) // right player ready
-	MCFG_DEVCB_CHAIN_OUTPUT(OUTPUT("lamp1")) MCFG_DEVCB_INVERT // right player reload (active low)
-	MCFG_OUTPUT_LATCH_BIT5_HANDLER(OUTPUT("lamp0")) // right player explosion (hit)
+	output_latch_device &lamplatch1(OUTPUT_LATCH(config, "lamplatch1")); // 74174 on game board at N2
+	lamplatch1.bit_handler<0>().set_output("lamp6"); // right player torpedo 4 available
+	lamplatch1.bit_handler<1>().set_output("lamp5"); // right player torpedo 3 available
+	lamplatch1.bit_handler<2>().set_output("lamp4"); // right player torpedo 2 available
+	lamplatch1.bit_handler<3>().set_output("lamp3"); // right player torpedo 1 available
+	lamplatch1.bit_handler<4>().set_output("lamp2"); // right player ready
+	lamplatch1.bit_handler<4>().append_output("lamp1").invert(); // right player reload (active low)
+	lamplatch1.bit_handler<5>().set_output("lamp0"); // right player explosion (hit)
 
-	MCFG_DEVICE_ADD("lamplatch2", OUTPUT_LATCH, 0) // 74174 on game board at P2
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(OUTPUT("lamp13")) // left player torpedo 4 available
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(OUTPUT("lamp12")) // left player torpedo 3 available
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(OUTPUT("lamp11")) // left player torpedo 2 available
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(OUTPUT("lamp10")) // left player torpedo 1 available
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(OUTPUT("lamp9")) // left player ready
-	MCFG_DEVCB_CHAIN_OUTPUT(OUTPUT("lamp8")) MCFG_DEVCB_INVERT // left player reload (active low)
-	MCFG_OUTPUT_LATCH_BIT5_HANDLER(OUTPUT("lamp7")) // left player explosion (hit)
+	output_latch_device &lamplatch2(OUTPUT_LATCH(config, "lamplatch2")); // 74174 on game board at P2
+	lamplatch2.bit_handler<0>().set_output("lamp13"); // left player torpedo 4 available
+	lamplatch2.bit_handler<1>().set_output("lamp12"); // left player torpedo 3 available
+	lamplatch2.bit_handler<2>().set_output("lamp11"); // left player torpedo 2 available
+	lamplatch2.bit_handler<3>().set_output("lamp10"); // left player torpedo 1 available
+	lamplatch2.bit_handler<4>().set_output("lamp9"); // left player ready
+	lamplatch2.bit_handler<4>().append_output("lamp8").invert(); // left player reload (active low)
+	lamplatch2.bit_handler<5>().set_output("lamp7"); // left player explosion (hit)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

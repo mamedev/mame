@@ -1447,13 +1447,13 @@ enum
 	downcast<voodoo_device &>(*device).set_cpu_tag(_tag);
 
 #define MCFG_VOODOO_VBLANK_CB(_devcb) \
-	devcb = &downcast<voodoo_device &>(*device).set_vblank_callback(DEVCB_##_devcb);
+	downcast<voodoo_device &>(*device).set_vblank_callback(DEVCB_##_devcb);
 
 #define MCFG_VOODOO_STALL_CB(_devcb) \
-	devcb = &downcast<voodoo_device &>(*device).set_stall_callback(DEVCB_##_devcb);
+	downcast<voodoo_device &>(*device).set_stall_callback(DEVCB_##_devcb);
 
 #define MCFG_VOODOO_PCIINT_CB(_devcb) \
-	devcb = &downcast<voodoo_device &>(*device).set_pciint_callback(DEVCB_##_devcb);
+	downcast<voodoo_device &>(*device).set_pciint_callback(DEVCB_##_devcb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES

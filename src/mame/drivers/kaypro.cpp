@@ -226,25 +226,25 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
 
-	MCFG_DEVICE_ADD("kbd", KAYPRO_10_KEYBOARD, 0)
-	MCFG_KAYPRO10KBD_RXD_CB(WRITELINE("sio", z80sio_device, rxb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, syncb_w))
+	kaypro_10_keyboard_device &kbd(KAYPRO_10_KEYBOARD(config, "kbd"));
+	kbd.rxd_cb().set("sio", FUNC(z80sio_device::rxb_w));
+	kbd.rxd_cb().append("sio", FUNC(z80sio_device::syncb_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kaypro_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD("serial", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, synca_w)) // TODO: confirm this is connected
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio", z80sio_device, dcda_w))
+	rs232_port_device &serial(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
+	serial.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
+	serial.rxd_handler().append("sio", FUNC(z80sio_device::synca_w)); // TODO: confirm this is connected
+	serial.cts_handler().set("sio", FUNC(z80sio_device::ctsa_w));
+	serial.dcd_handler().set("sio", FUNC(z80sio_device::dcda_w));
 
-	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800)) // WD1943, SMC8116
-	MCFG_COM8116_FT_HANDLER(WRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, txca_w))
-	MCFG_COM8116_FR_HANDLER(WRITELINE("sio", z80sio_device, rxtxcb_w))
+	com8116_device &brg(COM8116(config, "brg", XTAL(5'068'800))); // WD1943, SMC8116
+	brg.ft_handler().set("sio", FUNC(z80sio_device::rxca_w));
+	brg.ft_handler().append("sio", FUNC(z80sio_device::txca_w));
+	brg.fr_handler().set("sio", FUNC(z80sio_device::rxtxcb_w));
 
 	MCFG_DEVICE_ADD("z80pio_g", Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -322,28 +322,27 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
 
-	MCFG_DEVICE_ADD("kbd", KAYPRO_10_KEYBOARD, 0)
-	MCFG_KAYPRO10KBD_RXD_CB(WRITELINE("sio_1", z80sio_device, rxb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio_1", z80sio_device, syncb_w))
+	kaypro_10_keyboard_device &kbd(KAYPRO_10_KEYBOARD(config, "kbd"));
+	kbd.rxd_cb().set("sio_1", FUNC(z80sio_device::rxb_w));
+	kbd.rxd_cb().append("sio_1", FUNC(z80sio_device::syncb_w));
 
-	MCFG_CLOCK_ADD("kbdtxrxc", 4800)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio_1", z80sio_device, rxtxcb_w))
+	CLOCK(config, "kbdtxrxc", 4800).signal_handler().set("sio_1", FUNC(z80sio_device::rxtxcb_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kaypro_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD("modem", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio_1", z80sio_device, rxa_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio_1", z80sio_device, synca_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio_1", z80sio_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio_1", z80sio_device, dcda_w))
+	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	modem.rxd_handler().set("sio_1", FUNC(z80sio_device::rxa_w));
+	modem.rxd_handler().append("sio_1", FUNC(z80sio_device::synca_w));
+	modem.cts_handler().set("sio_1", FUNC(z80sio_device::ctsa_w));
+	modem.dcd_handler().set("sio_1", FUNC(z80sio_device::dcda_w));
 
-	MCFG_DEVICE_ADD("serprn", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio_2", z80sio_device, rxa_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio_2", z80sio_device, synca_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio_2", z80sio_device, ctsa_w))
+	rs232_port_device &serprn(RS232_PORT(config, "serprn", default_rs232_devices, nullptr));
+	serprn.rxd_handler().set("sio_2", FUNC(z80sio_device::rxa_w));
+	serprn.rxd_handler().append("sio_2", FUNC(z80sio_device::synca_w));
+	serprn.cts_handler().set("sio_2", FUNC(z80sio_device::ctsa_w));
 
 	MCFG_DEVICE_ADD("sio_1", Z80SIO, 16_MHz_XTAL / 4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // FIXME: use a combiner
@@ -356,11 +355,11 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // FIXME: use a combiner
 	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("serprn", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800)) // WD1943, SMC8116
-	MCFG_COM8116_FR_HANDLER(WRITELINE("sio_1", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio_1", z80sio_device, txca_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("sio_2", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio_2", z80sio_device, txca_w))
+	com8116_device &brg(COM8116(config, "brg", XTAL(5'068'800))); // WD1943, SMC8116
+	brg.fr_handler().set("sio_1", FUNC(z80sio_device::rxca_w));
+	brg.fr_handler().append("sio_1", FUNC(z80sio_device::txca_w));
+	brg.ft_handler().set("sio_2", FUNC(z80sio_device::rxca_w));
+	brg.ft_handler().append("sio_2", FUNC(z80sio_device::txca_w));
 
 	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_intrq_w))

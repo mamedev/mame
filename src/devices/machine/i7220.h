@@ -43,10 +43,10 @@
 ///*************************************************************************
 
 #define MCFG_I7220_IRQ_CALLBACK(_write) \
-	devcb = &downcast<i7220_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
+	downcast<i7220_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_I7220_DRQ_CALLBACK(_write) \
-	devcb = &downcast<i7220_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
+	downcast<i7220_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 #define MCFG_I7220_DATA_SIZE(data_size) \
 	downcast<i7220_device &>(*device).set_data_size(data_size);

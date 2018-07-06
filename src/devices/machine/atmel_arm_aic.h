@@ -9,7 +9,7 @@
 DECLARE_DEVICE_TYPE(ARM_AIC, arm_aic_device)
 
 #define MCFG_IRQ_LINE_CB(_devcb) \
-	devcb = &downcast<arm_aic_device &>(*device).set_line_callback(DEVCB_##_devcb);
+	downcast<arm_aic_device &>(*device).set_line_callback(DEVCB_##_devcb);
 
 class arm_aic_device : public device_t
 {

@@ -24,13 +24,13 @@
 //**************************************************************************
 
 #define MCFG_C2040_SYNC_CALLBACK(_write) \
-	devcb = &downcast<c2040_fdc_device &>(*device).set_sync_wr_callback(DEVCB_##_write);
+	downcast<c2040_fdc_device &>(*device).set_sync_wr_callback(DEVCB_##_write);
 
 #define MCFG_C2040_READY_CALLBACK(_write) \
-	devcb = &downcast<c2040_fdc_device &>(*device).set_ready_wr_callback(DEVCB_##_write);
+	downcast<c2040_fdc_device &>(*device).set_ready_wr_callback(DEVCB_##_write);
 
 #define MCFG_C2040_ERROR_CALLBACK(_write) \
-	devcb = &downcast<c2040_fdc_device &>(*device).set_error_wr_callback(DEVCB_##_write);
+	downcast<c2040_fdc_device &>(*device).set_error_wr_callback(DEVCB_##_write);
 
 
 

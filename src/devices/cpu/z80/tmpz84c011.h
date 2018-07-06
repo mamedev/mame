@@ -25,46 +25,46 @@
 
 // CTC callbacks
 #define MCFG_TMPZ84C011_ZC0_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_zc0_callback(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_zc0_callback(DEVCB_##_devcb);
 
 #define MCFG_TMPZ84C011_ZC1_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_zc1_callback(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_zc1_callback(DEVCB_##_devcb);
 
 #define MCFG_TMPZ84C011_ZC2_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_zc2_callback(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_zc2_callback(DEVCB_##_devcb);
 
 
 // I/O callbacks
 #define MCFG_TMPZ84C011_PORTA_READ_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_inportsa_cb(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_inportsa_cb(DEVCB_##_devcb);
 
 #define MCFG_TMPZ84C011_PORTB_READ_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_inportsb_cb(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_inportsb_cb(DEVCB_##_devcb);
 
 #define MCFG_TMPZ84C011_PORTC_READ_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_inportsc_cb(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_inportsc_cb(DEVCB_##_devcb);
 
 #define MCFG_TMPZ84C011_PORTD_READ_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_inportsd_cb(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_inportsd_cb(DEVCB_##_devcb);
 
 #define MCFG_TMPZ84C011_PORTE_READ_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_inportse_cb(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_inportse_cb(DEVCB_##_devcb);
 
 
 #define MCFG_TMPZ84C011_PORTA_WRITE_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_outportsa_cb(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_outportsa_cb(DEVCB_##_devcb);
 
 #define MCFG_TMPZ84C011_PORTB_WRITE_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_outportsb_cb(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_outportsb_cb(DEVCB_##_devcb);
 
 #define MCFG_TMPZ84C011_PORTC_WRITE_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_outportsc_cb(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_outportsc_cb(DEVCB_##_devcb);
 
 #define MCFG_TMPZ84C011_PORTD_WRITE_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_outportsd_cb(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_outportsd_cb(DEVCB_##_devcb);
 
 #define MCFG_TMPZ84C011_PORTE_WRITE_CB(_devcb) \
-	devcb = &downcast<tmpz84c011_device &>(*device).set_outportse_cb(DEVCB_##_devcb);
+	downcast<tmpz84c011_device &>(*device).set_outportse_cb(DEVCB_##_devcb);
 
 
 /***************************************************************************

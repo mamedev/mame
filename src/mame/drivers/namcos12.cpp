@@ -1727,19 +1727,20 @@ void namcos12_state::init_golgo13()
 MACHINE_CONFIG_START(namcos12_state::namcos12_mobo)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("sub", H83002, 16934400) // frequency based on research (superctr)
+	MCFG_DEVICE_ADD(m_sub, H83002, 16934400) // frequency based on research (superctr)
 	MCFG_DEVICE_PROGRAM_MAP(s12h8rwmap)
 	MCFG_DEVICE_IO_MAP(s12h8iomap)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
+	MCFG_RTC4543_ADD(m_rtc, XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("sub:sci1", h8_sci_device, rx_w))
 
-	MCFG_DEVICE_MODIFY("sub:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namco_settings", namco_settings_device, clk_w))
+	// FIXME: need better syntax for configuring H8 onboard devices
+	h8_sci_device &sub_sci1(*m_sub->subdevice<h8_sci_device>("sci1"));
+	sub_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
+	sub_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	sub_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
 	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 

@@ -95,16 +95,16 @@ enum
 	downcast<tms3203x_device &>(*device).set_mcbl_mode(_mode);
 
 #define MCFG_TMS3203X_XF0_CB(_devcb) \
-	devcb = &downcast<tms3203x_device &>(*device).set_xf0_callback(DEVCB_##_devcb);
+	downcast<tms3203x_device &>(*device).set_xf0_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS3203X_XF1_CB(_devcb) \
-	devcb = &downcast<tms3203x_device &>(*device).set_xf1_callback(DEVCB_##_devcb);
+	downcast<tms3203x_device &>(*device).set_xf1_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS3203X_IACK_CB(_devcb) \
-	devcb = &downcast<tms3203x_device &>(*device).set_iack_callback(DEVCB_##_devcb);
+	downcast<tms3203x_device &>(*device).set_iack_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS3203X_HOLDA_CB(_devcb) \
-	devcb = &downcast<tms3203x_device &>(*device).set_holda_callback(DEVCB_##_devcb);
+	downcast<tms3203x_device &>(*device).set_holda_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -95,39 +95,39 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, at_mb_device, dack6_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, at_mb_device, dack7_w))
 
-	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(":maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, at_mb_device, get_slave_ack))
+	pic8259_device &pic8259_master(PIC8259(config, "pic8259_master", 0));
+	pic8259_master.out_int_callback().set_inputline(":maincpu", 0);
+	pic8259_master.in_sp_callback().set_constant(1);
+	pic8259_master.read_slave_ack_callback().set(FUNC(at_mb_device::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir2_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	PIC8259(config, m_pic8259_slave, 0);
+	m_pic8259_slave->out_int_callback().set("pic8259_master", FUNC(pic8259_device::ir2_w));
+	m_pic8259_slave->in_sp_callback().set_constant(0);
 
 	MCFG_DEVICE_ADD("isabus", ISA16, 0)
 	MCFG_ISA16_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259_slave",  pic8259_device, ir2_w)) // in place of irq 2 on at irq 9 is used
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(m_pic8259_slave,  pic8259_device, ir2_w)) // in place of irq 2 on at irq 9 is used
 	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259_master", pic8259_device, ir3_w))
 	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259_master", pic8259_device, ir4_w))
 	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259_master", pic8259_device, ir5_w))
 	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259_master", pic8259_device, ir6_w))
 	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_IRQ10_CB(WRITELINE("pic8259_slave", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ11_CB(WRITELINE("pic8259_slave", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ12_CB(WRITELINE("pic8259_slave", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ14_CB(WRITELINE("pic8259_slave", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ15_CB(WRITELINE("pic8259_slave", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ0_CB(WRITELINE("dma8237_1", am9517a_device, dreq0_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237_1", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237_1", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237_1", am9517a_device, dreq3_w))
-	MCFG_ISA_OUT_DRQ5_CB(WRITELINE("dma8237_2", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ6_CB(WRITELINE("dma8237_2", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ7_CB(WRITELINE("dma8237_2", am9517a_device, dreq3_w))
+	MCFG_ISA_OUT_IRQ10_CB(WRITELINE(m_pic8259_slave, pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ11_CB(WRITELINE(m_pic8259_slave, pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ12_CB(WRITELINE(m_pic8259_slave, pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ14_CB(WRITELINE(m_pic8259_slave, pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ15_CB(WRITELINE(m_pic8259_slave, pic8259_device, ir7_w))
+	MCFG_ISA_OUT_DRQ0_CB(WRITELINE(m_dma8237_1, am9517a_device, dreq0_w))
+	MCFG_ISA_OUT_DRQ1_CB(WRITELINE(m_dma8237_1, am9517a_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(WRITELINE(m_dma8237_1, am9517a_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(WRITELINE(m_dma8237_1, am9517a_device, dreq3_w))
+	MCFG_ISA_OUT_DRQ5_CB(WRITELINE(m_dma8237_2, am9517a_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ6_CB(WRITELINE(m_dma8237_2, am9517a_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ7_CB(WRITELINE(m_dma8237_2, am9517a_device, dreq3_w))
 
-	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	MC146818(config, m_mc146818, 32.768_kHz_XTAL);
+	m_mc146818->irq_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
+	m_mc146818->set_century_index(0x32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -18,7 +18,7 @@
 	MCFG_DEVICE_ADD((tag), K056800, (clock))
 
 #define MCFG_K056800_INT_HANDLER(cb) \
-	devcb = &downcast<k056800_device &>(*device).set_int_handler((DEVCB_##cb));
+	downcast<k056800_device &>(*device).set_int_handler((DEVCB_##cb));
 
 
 

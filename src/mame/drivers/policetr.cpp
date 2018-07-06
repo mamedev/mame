@@ -404,13 +404,13 @@ MACHINE_CONFIG_START(policetr_state::policetr)
 	EEPROM_SERIAL_93C66_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	device = &SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(400, 262);  /* needs to be verified */
 	m_screen->set_visarea(0, 393, 0, 239);
 	m_screen->set_palette(m_palette);
-	MCFG_SCREEN_UPDATE_DRIVER(policetr_state, screen_update_policetr);
+	m_screen->set_screen_update(FUNC(policetr_state::screen_update_policetr));
 
 	PALETTE(config, m_palette, 256);
 
@@ -424,10 +424,11 @@ MACHINE_CONFIG_START(policetr_state::policetr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(policetr_state::sshooter)
+void policetr_state::sshooter(machine_config &config)
+{
 	policetr(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::sshooter_map);
-MACHINE_CONFIG_END
+}
 
 
 

@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#ifndef MAME_INCLUDES_TAITO_L_H
+#define MAME_INCLUDES_TAITO_L_H
+
+#pragma once
+
 #include "machine/74157.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
@@ -251,3 +256,5 @@ public:
 	void horshoes(machine_config &config);
 	void horshoes_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TAITO_L_H

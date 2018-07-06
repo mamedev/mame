@@ -54,8 +54,6 @@ private:
 	DECLARE_READ8_MEMBER( bitmap_xy_r );
 	DECLARE_WRITE8_MEMBER( bitmap_xy_w );
 
-	DECLARE_WRITE_LINE_MEMBER(planet_select_w);
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// early raster EAROM interface

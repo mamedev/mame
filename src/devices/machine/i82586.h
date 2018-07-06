@@ -7,7 +7,7 @@
 #pragma once
 
 #define MCFG_I82586_IRQ_CB(_out_irq) \
-	devcb = &downcast<i82586_base_device &>(*device).set_out_irq_callback(DEVCB_##_out_irq);
+	downcast<i82586_base_device &>(*device).set_out_irq_callback(DEVCB_##_out_irq);
 
 class i82586_base_device :
 	public device_t,

@@ -19,7 +19,7 @@
 //**************************************************************************
 
 #define MCFG_QIMI_EXTINT_CALLBACK(_write) \
-	devcb = &downcast<qimi_device &>(*device).set_exting_wr_callback(DEVCB_##_write);
+	downcast<qimi_device &>(*device).set_exting_wr_callback(DEVCB_##_write);
 
 
 

@@ -344,15 +344,15 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4000))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tomcat_state, mres_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tomcat_state, sndres_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, tomcat_state, lnkmode_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tomcat_state, err_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, tomcat_state, ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, tomcat_state, txbuff_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set_output("led1").invert();
+	m_mainlatch->q_out_cb<1>().set_output("led2").invert();
+	m_mainlatch->q_out_cb<2>().set(FUNC(tomcat_state::mres_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(tomcat_state::sndres_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(tomcat_state::lnkmode_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(tomcat_state::err_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(tomcat_state::ack_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(tomcat_state::txbuff_w));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

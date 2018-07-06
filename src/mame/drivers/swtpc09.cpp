@@ -191,14 +191,14 @@ MACHINE_CONFIG_START(swtpc09_state::swtpc09_base)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, swtpc09_state, acia_interrupt))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_acia->irq_handler().set(FUNC(swtpc09_state::acia_interrupt));
 
-	MCFG_DEVICE_ADD("brg", MC14411, 1.8432_MHz_XTAL)
-	MCFG_MC14411_F1_CB(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	MC14411(config, m_brg, 1.8432_MHz_XTAL);
+	m_brg->out_f1_cb().set(m_acia, FUNC(acia6850_device::write_txc));
+	m_brg->out_f1_cb().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	MCFG_DEVICE_ADD("fdc", FD1793, 1_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)

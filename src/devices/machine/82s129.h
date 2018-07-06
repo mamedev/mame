@@ -47,34 +47,34 @@
 
 
 #define MCFG_82S126_OUTPUT_CB(_devcb) \
-	devcb = &downcast<prom82s129_base_device &>(*device).set_out_cb(DEVCB_##_devcb);
+	downcast<prom82s129_base_device &>(*device).set_out_cb(DEVCB_##_devcb);
 
 #define MCFG_82S126_O1_CB(_devcb) \
-	devcb = &downcast<prom82s129_base_device &>(*device).set_o1_cb(DEVCB_##_devcb);
+	downcast<prom82s129_base_device &>(*device).set_o1_cb(DEVCB_##_devcb);
 
 #define MCFG_82S126_O2_CB(_devcb) \
-	devcb = &downcast<prom82s129_base_device &>(*device).set_o2_cb(DEVCB_##_devcb);
+	downcast<prom82s129_base_device &>(*device).set_o2_cb(DEVCB_##_devcb);
 
 #define MCFG_82S126_O3_CB(_devcb) \
-	devcb = &downcast<prom82s129_base_device &>(*device).set_o3_cb(DEVCB_##_devcb);
+	downcast<prom82s129_base_device &>(*device).set_o3_cb(DEVCB_##_devcb);
 
 #define MCFG_82S126_O4_CB(_devcb) \
-	devcb = &downcast<prom82s129_base_device &>(*device).set_o4_cb(DEVCB_##_devcb);
+	downcast<prom82s129_base_device &>(*device).set_o4_cb(DEVCB_##_devcb);
 
 #define MCFG_82S129_OUTPUT_CB(_devcb) \
-	devcb = &downcast<prom82s129_base_device &>(*device).set_out_cb(DEVCB_##_devcb);
+	downcast<prom82s129_base_device &>(*device).set_out_cb(DEVCB_##_devcb);
 
 #define MCFG_82S129_O1_CB(_devcb) \
-	devcb = &downcast<prom82s129_base_device &>(*device).set_o1_cb(DEVCB_##_devcb);
+	downcast<prom82s129_base_device &>(*device).set_o1_cb(DEVCB_##_devcb);
 
 #define MCFG_82S129_O2_CB(_devcb) \
-	devcb = &downcast<prom82s129_base_device &>(*device).set_o2_cb(DEVCB_##_devcb);
+	downcast<prom82s129_base_device &>(*device).set_o2_cb(DEVCB_##_devcb);
 
 #define MCFG_82S129_O3_CB(_devcb) \
-	devcb = &downcast<prom82s129_base_device &>(*device).set_o3_cb(DEVCB_##_devcb);
+	downcast<prom82s129_base_device &>(*device).set_o3_cb(DEVCB_##_devcb);
 
 #define MCFG_82S129_O4_CB(_devcb) \
-	devcb = &downcast<prom82s129_base_device &>(*device).set_o4_cb(DEVCB_##_devcb);
+	downcast<prom82s129_base_device &>(*device).set_o4_cb(DEVCB_##_devcb);
 
 #define MCFG_82S129_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PROM82S129, 0)

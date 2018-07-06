@@ -357,15 +357,15 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cdc721_state, interrupt_mask_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cdc721_state, misc_w))
 
-	MCFG_DEVICE_ADD("ledlatch", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(OUTPUT("error")) MCFG_DEVCB_INVERT
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(OUTPUT("alert")) MCFG_DEVCB_INVERT
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(OUTPUT("lock")) MCFG_DEVCB_INVERT
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(OUTPUT("message")) MCFG_DEVCB_INVERT
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(OUTPUT("prog1")) MCFG_DEVCB_INVERT
-	MCFG_OUTPUT_LATCH_BIT5_HANDLER(OUTPUT("prog2")) MCFG_DEVCB_INVERT
-	MCFG_OUTPUT_LATCH_BIT6_HANDLER(OUTPUT("prog3")) MCFG_DEVCB_INVERT
-	MCFG_OUTPUT_LATCH_BIT7_HANDLER(OUTPUT("dsr")) MCFG_DEVCB_INVERT
+	output_latch_device &ledlatch(OUTPUT_LATCH(config, "ledlatch"));
+	ledlatch.bit_handler<0>().set_output("error").invert();
+	ledlatch.bit_handler<1>().set_output("alert").invert();
+	ledlatch.bit_handler<2>().set_output("lock").invert();
+	ledlatch.bit_handler<3>().set_output("message").invert();
+	ledlatch.bit_handler<4>().set_output("prog1").invert();
+	ledlatch.bit_handler<5>().set_output("prog2").invert();
+	ledlatch.bit_handler<6>().set_output("prog3").invert();
+	ledlatch.bit_handler<7>().set_output("dsr").invert();
 
 	MCFG_DEVICE_ADD("comuart", INS8250, 1.8432_MHz_XTAL)
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, cdc721_state, int_w<0>))

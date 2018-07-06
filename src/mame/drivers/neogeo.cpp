@@ -1921,17 +1921,17 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 	MCFG_DEVICE_ADD(m_sprgen, NEOGEO_SPRITE_OPTIMZIED, 0)
 
 	/* audio hardware */
-	MCFG_INPUT_MERGER_ALL_HIGH(m_audionmi)
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(m_audiocpu, INPUT_LINE_NMI));
+	INPUT_MERGER_ALL_HIGH(config, m_audionmi);
+	m_audionmi->output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(false)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE(m_audionmi, input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->set_separate_acknowledge(false);
+	m_soundlatch->data_pending_callback().set(m_audionmi, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch2)
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD(m_ym, YM2610, NEOGEO_YM2610_CLOCK)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE(m_audiocpu, 0))
+	YM2610(config, m_ym, NEOGEO_YM2610_CLOCK);
+	m_ym->irq_handler().set_inputline(m_audiocpu, 0);
 MACHINE_CONFIG_END
 
 

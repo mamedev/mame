@@ -15,7 +15,7 @@
 	MCFG_DEVICE_ADD(_tag, DSBZ80, 0)
 
 #define MCFG_DSBZ80_RXD_HANDLER(_devcb) \
-	devcb = &downcast<dsbz80_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
+	downcast<dsbz80_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

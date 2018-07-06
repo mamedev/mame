@@ -12,10 +12,10 @@
 #include "legscsi.h"
 
 #define MCFG_MB89352A_IRQ_CB(_devcb) \
-	devcb = &downcast<mb89352_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	downcast<mb89352_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89352A_DRQ_CB(_devcb) \
-	devcb = &downcast<mb89352_device &>(*device).set_drq_callback(DEVCB_##_devcb);
+	downcast<mb89352_device &>(*device).set_drq_callback(DEVCB_##_devcb);
 
 class mb89352_device : public legacy_scsi_host_adapter
 {

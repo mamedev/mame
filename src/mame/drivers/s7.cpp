@@ -505,15 +505,15 @@ MACHINE_CONFIG_START(s7_state::s7)
 	MCFG_DEVICE_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 1.00)
 
-	MCFG_DEVICE_ADD("pias", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, s7_state, sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_PIA_WRITEPB_HANDLER(NOOP)
-	MCFG_PIA_READCA1_HANDLER(VCC)
-	MCFG_PIA_CA2_HANDLER(WRITELINE("hc55516", hc55516_device, digit_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE("hc55516", hc55516_device, clock_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
+	PIA6821(config, m_pias, 0);
+	m_pias->readpb_handler().set(FUNC(s7_state::sound_r));
+	m_pias->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pias->writepb_handler().set_nop();
+	m_pias->readca1_handler().set_constant(1);
+	m_pias->ca2_handler().set(m_hc55516, FUNC(hc55516_device::digit_w));
+	m_pias->cb2_handler().set(m_hc55516, FUNC(hc55516_device::clock_w));
+	m_pias->irqa_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE); // FIXME: needs an input merger
+	m_pias->irqb_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
 MACHINE_CONFIG_END
 
 

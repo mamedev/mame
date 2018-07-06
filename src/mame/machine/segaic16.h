@@ -27,22 +27,15 @@
 #define MCFG_SEGA_315_5195_MAPPER_HANDLER(_class, _mapper) \
 	downcast<sega_315_5195_mapper_device &>(*device).set_mapper(sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr));
 #define MCFG_SEGA_315_5195_PBF_CALLBACK(_devcb) \
-	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_pbf_callback(DEVCB_##_devcb);
+	downcast<sega_315_5195_mapper_device &>(*device).set_pbf_callback(DEVCB_##_devcb);
 #define MCFG_SEGA_315_5195_MCU_INT_CALLBACK(_devcb) \
-	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_mcu_int_callback(DEVCB_##_devcb);
+	downcast<sega_315_5195_mapper_device &>(*device).set_mcu_int_callback(DEVCB_##_devcb);
 
 #define MCFG_SEGA_315_5248_MULTIPLIER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5248_MULTIPLIER, 0)
 
 #define MCFG_SEGA_315_5249_DIVIDER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5249_DIVIDER, 0)
-
-#define MCFG_SEGA_315_5250_COMPARE_TIMER_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_315_5250_COMPARE_TIMER, 0)
-#define MCFG_SEGA_315_5250_68KINT_CALLBACK(_devcb) \
-	devcb = &downcast<sega_315_5250_compare_timer_device &>(*device).set_68kint_callback(DEVCB_##_devcb);
-#define MCFG_SEGA_315_5250_ZINT_CALLBACK(_devcb) \
-	devcb = &downcast<sega_315_5250_compare_timer_device &>(*device).set_zint_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -252,8 +245,8 @@ public:
 	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template<class Object> devcb_base &set_68kint_callback(Object &&object) { return m_68kint_callback.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_zint_callback(Object &&object) { return m_zint_callback.set_callback(std::forward<Object>(object)); }
+	auto m68kint_callback() { return m_68kint_callback.bind(); }
+	auto zint_callback() { return m_zint_callback.bind(); }
 
 	// public interface
 	DECLARE_WRITE_LINE_MEMBER(exck_w);

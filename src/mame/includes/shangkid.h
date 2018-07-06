@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
+#ifndef MAME_INCLUDES_SHANGKID_H
+#define MAME_INCLUDES_SHANGKID_H
+
+#pragma once
 
 #include "sound/ay8910.h"
 #include "emupal.h"
@@ -7,8 +11,8 @@
 class shangkid_state : public driver_device
 {
 public:
-	shangkid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	shangkid_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bbx(*this, "bbx"),
@@ -17,7 +21,8 @@ public:
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_videoreg(*this, "videoreg")  { }
+		m_videoreg(*this, "videoreg")
+	{ }
 
 	void dynamski(machine_config &config);
 	void chinhero(machine_config &config);
@@ -90,3 +95,5 @@ private:
 	void shangkid_sound_map(address_map &map);
 	void sound_portmap(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SHANGKID_H

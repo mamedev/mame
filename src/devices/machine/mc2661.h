@@ -42,28 +42,28 @@
 	downcast<mc2661_device &>(*device).set_txc(_clock);
 
 #define MCFG_MC2661_TXD_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_txd_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_txd_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_RXRDY_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_rxrdy_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_rxrdy_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_TXRDY_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_txrdy_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_txrdy_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_RTS_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_rts_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_rts_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_DTR_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_dtr_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_dtr_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_TXEMT_DSCHG_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_txemt_dschg_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_txemt_dschg_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_BKDET_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_bkdet_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_bkdet_callback(DEVCB_##_write);
 
 #define MCFG_MC2661_XSYNC_HANDLER(_write) \
-	devcb = &downcast<mc2661_device &>(*device).set_xsync_callback(DEVCB_##_write);
+	downcast<mc2661_device &>(*device).set_xsync_callback(DEVCB_##_write);
 
 
 

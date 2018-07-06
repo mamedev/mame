@@ -5,6 +5,10 @@
   Nintendo Donkey Kong hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_DKONG_H
+#define MAME_INCLUDES_DKONG_H
+
+#pragma once
 
 #include "cpu/m6502/n2a03.h"
 #include "machine/eepromser.h"
@@ -349,3 +353,5 @@ private:
 	void radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 };
+
+#endif // MAME_INCLUDES_DKONG_H

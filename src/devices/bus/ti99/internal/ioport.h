@@ -99,9 +99,9 @@ void ti99_io_port_ev(device_slot_interface &device);
 	MCFG_DEVICE_SLOT_INTERFACE(ti99_io_port_ev, "peb", false)
 
 #define MCFG_IOPORT_EXTINT_HANDLER( _extint ) \
-	devcb = &downcast<bus::ti99::internal::ioport_device &>(*device).set_extint_callback(DEVCB_##_extint);
+	downcast<bus::ti99::internal::ioport_device &>(*device).set_extint_callback(DEVCB_##_extint);
 
 #define MCFG_IOPORT_READY_HANDLER( _ready ) \
-	devcb = &downcast<bus::ti99::internal::ioport_device &>(*device).set_ready_callback(DEVCB_##_ready);
+	downcast<bus::ti99::internal::ioport_device &>(*device).set_ready_callback(DEVCB_##_ready);
 
 #endif /* __TI99IOPORT__ */

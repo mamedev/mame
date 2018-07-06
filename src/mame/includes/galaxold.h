@@ -317,7 +317,7 @@ public:
 	void mooncrst_map(address_map &map);
 	void ozon1_io_map(address_map &map);
 	void ozon1_map(address_map &map);
-	void racknrol(address_map &map);
+	void racknrol_map(address_map &map);
 	void racknrol_io(address_map &map);
 	void rockclim_map(address_map &map);
 	void scramb2_map(address_map &map);

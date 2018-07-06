@@ -11,34 +11,34 @@
 
 
 #define MCFG_HD63450_DMA_END_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_end_callback(DEVCB_##_devcb);
+	downcast<hd63450_device &>(*device).set_dma_end_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_ERROR_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_error_callback(DEVCB_##_devcb);
+	downcast<hd63450_device &>(*device).set_dma_error_callback(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_0_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_read_callback<0>(DEVCB_##_devcb);
+	downcast<hd63450_device &>(*device).set_dma_read_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_1_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_read_callback<1>(DEVCB_##_devcb);
+	downcast<hd63450_device &>(*device).set_dma_read_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_2_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_read_callback<2>(DEVCB_##_devcb);
+	downcast<hd63450_device &>(*device).set_dma_read_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_3_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_read_callback<3>(DEVCB_##_devcb);
+	downcast<hd63450_device &>(*device).set_dma_read_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_0_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_write_callback<0>(DEVCB_##_devcb);
+	downcast<hd63450_device &>(*device).set_dma_write_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_1_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_write_callback<1>(DEVCB_##_devcb);
+	downcast<hd63450_device &>(*device).set_dma_write_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_2_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_write_callback<2>(DEVCB_##_devcb);
+	downcast<hd63450_device &>(*device).set_dma_write_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_3_CB(_devcb) \
-	devcb = &downcast<hd63450_device &>(*device).set_dma_write_callback<3>(DEVCB_##_devcb);
+	downcast<hd63450_device &>(*device).set_dma_write_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_HD63450_CPU(_tag) \
 	downcast<hd63450_device &>(*device).set_cpu_tag(_tag);

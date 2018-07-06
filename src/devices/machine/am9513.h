@@ -39,17 +39,17 @@
 //**************************************************************************
 
 #define MCFG_AM9513_OUT1_CALLBACK(_devcb) \
-	devcb = &downcast<am9513_device &>(*device).set_out_cb(0, DEVCB_##_devcb);
+	downcast<am9513_device &>(*device).set_out_cb(0, DEVCB_##_devcb);
 #define MCFG_AM9513_OUT2_CALLBACK(_devcb) \
-	devcb = &downcast<am9513_device &>(*device).set_out_cb(1, DEVCB_##_devcb);
+	downcast<am9513_device &>(*device).set_out_cb(1, DEVCB_##_devcb);
 #define MCFG_AM9513_OUT3_CALLBACK(_devcb) \
-	devcb = &downcast<am9513_device &>(*device).set_out_cb(2, DEVCB_##_devcb);
+	downcast<am9513_device &>(*device).set_out_cb(2, DEVCB_##_devcb);
 #define MCFG_AM9513_OUT4_CALLBACK(_devcb) \
-	devcb = &downcast<am9513_device &>(*device).set_out_cb(3, DEVCB_##_devcb);
+	downcast<am9513_device &>(*device).set_out_cb(3, DEVCB_##_devcb);
 #define MCFG_AM9513_OUT5_CALLBACK(_devcb) \
-	devcb = &downcast<am9513_device &>(*device).set_out_cb(4, DEVCB_##_devcb);
+	downcast<am9513_device &>(*device).set_out_cb(4, DEVCB_##_devcb);
 #define MCFG_AM9513_FOUT_CALLBACK(_devcb) \
-	devcb = &downcast<am9513_device &>(*device).set_fout_cb(DEVCB_##_devcb);
+	downcast<am9513_device &>(*device).set_fout_cb(DEVCB_##_devcb);
 
 
 
@@ -68,6 +68,12 @@ public:
 	// static configuration
 	template<class Object> devcb_base &set_out_cb(int c, Object &&cb) { assert(c >= 0 && c < 5); return m_out_cb[c].set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_fout_cb(Object &&cb) { return m_fout_cb.set_callback(std::forward<Object>(cb)); }
+	auto out1_cb() { return m_out_cb[0].bind(); }
+	auto out2_cb() { return m_out_cb[1].bind(); }
+	auto out3_cb() { return m_out_cb[2].bind(); }
+	auto out4_cb() { return m_out_cb[3].bind(); }
+	auto out5_cb() { return m_out_cb[4].bind(); }
+	auto fout_cb() { return m_fout_cb.bind(); }
 
 	// 8-bit data bus interface
 	DECLARE_READ8_MEMBER(read8);

@@ -181,16 +181,16 @@ enum
 //**************************************************************************
 
 #define MCFG_ADSP21XX_SPORT_RX_CB(_devcb) \
-	devcb = &downcast<adsp21xx_device &>(*device).set_sport_rx_callback(DEVCB_##_devcb);
+	downcast<adsp21xx_device &>(*device).set_sport_rx_callback(DEVCB_##_devcb);
 
 #define MCFG_ADSP21XX_SPORT_TX_CB(_devcb) \
-	devcb = &downcast<adsp21xx_device &>(*device).set_sport_tx_callback(DEVCB_##_devcb);
+	downcast<adsp21xx_device &>(*device).set_sport_tx_callback(DEVCB_##_devcb);
 
 #define MCFG_ADSP21XX_TIMER_FIRED_CB(_devcb) \
-	devcb = &downcast<adsp21xx_device &>(*device).set_timer_fired_callback(DEVCB_##_devcb);
+	downcast<adsp21xx_device &>(*device).set_timer_fired_callback(DEVCB_##_devcb);
 
 #define MCFG_ADSP21XX_DMOVLAY_CB(_devcb) \
-	devcb = &downcast<adsp21xx_device &>(*device).set_dmovlay_callback(DEVCB_##_devcb);
+	downcast<adsp21xx_device &>(*device).set_dmovlay_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

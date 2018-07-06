@@ -584,18 +584,18 @@ MACHINE_CONFIG_START(marineb_state::changes)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(marineb_state::springer)
+void marineb_state::springer(machine_config &config)
+{
 	marineb(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_y_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_x_w)) MCFG_DEVCB_INVERT
+	ls259_device &outlatch(*subdevice<ls259_device>("outlatch"));
+	outlatch.q_out_cb<1>().set(FUNC(marineb_state::flipscreen_y_w)).invert();
+	outlatch.q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w)).invert();
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_springer)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_springer));
+}
 
 
 MACHINE_CONFIG_START(marineb_state::hoccer)
@@ -647,14 +647,15 @@ MACHINE_CONFIG_START(marineb_state::hopprobo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(marineb_state::bcruzm12)
+void marineb_state::bcruzm12(machine_config &config)
+{
 	wanted(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_y_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_x_w)) MCFG_DEVCB_INVERT
-MACHINE_CONFIG_END
+	ls259_device &outlatch(*subdevice<ls259_device>("outlatch"));
+	outlatch.q_out_cb<1>().set(FUNC(marineb_state::flipscreen_y_w)).invert();
+	outlatch.q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w)).invert();
+}
 
 /***************************************************************************
 

@@ -156,9 +156,9 @@ MACHINE_CONFIG_START(votrtnt_state::votrtnt)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	CLOCK(config, m_clock, 153600);
+	m_clock->signal_handler().set("acia", FUNC(acia6850_device::write_txc));
+	m_clock->signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

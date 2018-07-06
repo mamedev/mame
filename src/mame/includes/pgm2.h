@@ -1,12 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-
 #ifndef MAME_INCLUDES_PGM2_H
 #define MAME_INCLUDES_PGM2_H
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/ymz770.h"

@@ -1376,7 +1376,7 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
+	MCFG_PALETTE_FORMAT_CLASS(1, hotsmash_state, BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(hotsmash_state, pbillian)
 
