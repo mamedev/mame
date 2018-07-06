@@ -115,9 +115,9 @@ void nscsi_cdrom_device::scsi_command()
 			scsi_cmdbuf[3] = 0x02; // response data format = SPC-3 standard
 			// some Konami games freak out if this isn't "Sony", so we'll lie
 			// this is the actual drive on my Nagano '98 board
-			strcpy((char *)&scsi_cmdbuf[8], "Sony");
-			strcpy((char *)&scsi_cmdbuf[16], "CDU-76S");
-			strcpy((char *)&scsi_cmdbuf[32], "1.0");
+			strncpy((char *)&scsi_cmdbuf[8], "Sony", 4);
+			strncpy((char *)&scsi_cmdbuf[16], "CDU-76S", 7);
+			strncpy((char *)&scsi_cmdbuf[32], "1.0", 3);
 			if(size > 148)
 				size = 148;
 			scsi_data_in(SBUF_MAIN, size);
@@ -251,7 +251,7 @@ void nscsi_cdrom_device::scsi_command()
 		break;
 
 	default:
-		LOG("unhandled command %02x\n", scsi_cmdbuf[0]);
+		logerror("unhandled command %02x\n", scsi_cmdbuf[0]);
 
 		nscsi_full_device::scsi_command();
 		break;
