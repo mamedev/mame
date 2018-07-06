@@ -297,7 +297,7 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 	MCFG_DEVICE_MODIFY("mb:dma8237")
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, m24_state, dma_hrq_w))
 	MCFG_DEVICE_MODIFY("mb:pic8259")
-	devcb = &downcast<pic8259_device &>(*device).set_out_int_callback(DEVCB_WRITELINE(*this, m24_state, int_w));
+	downcast<pic8259_device &>(*device).set_out_int_callback(DEVCB_WRITELINE(*this, m24_state, int_w));
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")

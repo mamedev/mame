@@ -1059,12 +1059,12 @@ MACHINE_CONFIG_START(abc800_state::common)
 	MCFG_DEVICE_OPCODES_MAP(abc800_m1)
 
 	// peripheral hardware
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, ABC800_X01/2/2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, abc800_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, abc800_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80DART_TAG, z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_TAG, z80dart_device, txca_w))
+	Z80CTC(config, m_ctc, ABC800_X01/2/2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(abc800_state::ctc_z0_w));
+	m_ctc->zc_callback<1>().set(FUNC(abc800_state::ctc_z1_w));
+	m_ctc->zc_callback<2>().set(m_dart, FUNC(z80dart_device::rxca_w));
+	m_ctc->zc_callback<2>().append(m_dart, FUNC(z80dart_device::txca_w));
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_CTC_TAG, abc800_state, ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, ABC800_X01/2/2)

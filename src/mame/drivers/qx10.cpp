@@ -769,12 +769,12 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 
 	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
 	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, qx10_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
 	MCFG_DEVICE_ADD("upd7201", UPD7201, MAIN_CLK/4) // channel b clock set by pit2 channel 2
 	// Channel A: Keyboard
@@ -809,9 +809,9 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir2_w))
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, qx10_state, qx10_upd765_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("8237dma_1", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(qx10_state::qx10_upd765_interrupt));
+	m_fdc->drq_wr_callback().set(m_dma_1, FUNC(am9517a_device::dreq0_w)).invert();
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 

@@ -36,10 +36,10 @@
 
 
 #define MCFG_ECONET_CLK_CALLBACK(_write) \
-	devcb = &downcast<econet_device &>(*device).set_clk_wr_callback(DEVCB_##_write);
+	downcast<econet_device &>(*device).set_clk_wr_callback(DEVCB_##_write);
 
 #define MCFG_ECONET_DATA_CALLBACK(_write) \
-	devcb = &downcast<econet_device &>(*device).set_data_wr_callback(DEVCB_##_write);
+	downcast<econet_device &>(*device).set_data_wr_callback(DEVCB_##_write);
 
 
 

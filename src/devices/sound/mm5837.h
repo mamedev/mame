@@ -32,7 +32,7 @@
 	downcast<mm5837_device &>(*device).set_vdd_voltage(_voltage);
 
 #define MCFG_MM5837_OUTPUT_CB(_devcb) \
-	devcb = &downcast<mm5837_device &>(*device).set_output_callback(DEVCB_##_devcb);
+	downcast<mm5837_device &>(*device).set_output_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

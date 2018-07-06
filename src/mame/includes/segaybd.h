@@ -5,6 +5,10 @@
     Sega Y-Board hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_SEGAYBD_H
+#define MAME_INCLUDES_SEGAYBD_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -138,3 +142,5 @@ private:
 	uint8_t           m_misc_io_data;
 	bitmap_ind16    m_tmp_bitmap;
 };
+
+#endif // MAME_INCLUDES_SEGAYBD_H

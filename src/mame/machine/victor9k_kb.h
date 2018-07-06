@@ -21,10 +21,10 @@
 //**************************************************************************
 
 #define MCFG_VICTOR9K_KBRDY_HANDLER(_devcb) \
-	devcb = &downcast<victor_9000_keyboard_device &>(*device).set_kbrdy_cb(DEVCB_##_devcb);
+	downcast<victor_9000_keyboard_device &>(*device).set_kbrdy_cb(DEVCB_##_devcb);
 
 #define MCFG_VICTOR9K_KBDATA_HANDLER(_devcb) \
-	devcb = &downcast<victor_9000_keyboard_device &>(*device).set_kbdata_cb(DEVCB_##_devcb);
+	downcast<victor_9000_keyboard_device &>(*device).set_kbdata_cb(DEVCB_##_devcb);
 
 
 //**************************************************************************

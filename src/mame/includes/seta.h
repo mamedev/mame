@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_SETA_H
+#define MAME_INCLUDES_SETA_H
+
+#pragma once
 
 /***************************************************************************
 
@@ -68,7 +72,8 @@ public:
 		m_gun_recoil(*this,"Player%u_Gun_Recoil", 1U),
 		m_leds(*this, "led%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void keroppij(machine_config &config);
 	void madshark(machine_config &config);
@@ -487,3 +492,5 @@ private:
 	void update_hoppers();
 	void show_outputs();
 };
+
+#endif // MAME_INCLUDES_SETA_H

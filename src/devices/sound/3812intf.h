@@ -5,7 +5,7 @@
 
 
 #define MCFG_YM3812_IRQ_HANDLER(cb) \
-		devcb = &downcast<ym3812_device &>(*device).set_irq_handler((DEVCB_##cb));
+		downcast<ym3812_device &>(*device).set_irq_handler((DEVCB_##cb));
 
 class ym3812_device : public device_t, public device_sound_interface
 {
@@ -14,6 +14,7 @@ public:
 
 	// configuration helpers
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

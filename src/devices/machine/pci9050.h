@@ -19,10 +19,10 @@
 	downcast<pci9050_device *>(device)->set_map(id, address_map_constructor(&map, #map, this), this);
 
 #define MCFG_PCI9050_USER_INPUT_CALLBACK(_write) \
-	devcb = &downcast<pci9050_device &>(*device).set_user_input_callback(DEVCB_##_write);
+	downcast<pci9050_device &>(*device).set_user_input_callback(DEVCB_##_write);
 
 #define MCFG_PCI9050_USER_OUTPUT_CALLBACK(_read) \
-	devcb = &downcast<pci9050_device &>(*device).set_user_output_callback(DEVCB_##_read);
+	downcast<pci9050_device &>(*device).set_user_output_callback(DEVCB_##_read);
 
 class pci9050_device : public pci_device
 {

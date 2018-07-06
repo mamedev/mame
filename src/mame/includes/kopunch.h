@@ -5,6 +5,10 @@
   Sega KO Punch
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_KOPUNCH_H
+#define MAME_INCLUDES_KOPUNCH_H
+
+#pragma once
 
 #include "emupal.h"
 
@@ -65,3 +69,5 @@ private:
 	uint8_t m_gfxbank;
 	uint8_t m_scrollx;
 };
+
+#endif // MAME_INCLUDES_KOPUNCH_H

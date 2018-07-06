@@ -414,9 +414,9 @@ MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("blink", ripple_counter_device, clock_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("blink", RIPPLE_COUNTER, 0) // 74LS393 at UG10
-	MCFG_RIPPLE_COUNTER_STAGES(8)
-	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITELINE(TMS5501_TAG, tms5501_device, sens_w)) MCFG_DEVCB_BIT(4)
+	ripple_counter_device &blink(RIPPLE_COUNTER(config, "blink", 0)); // 74LS393 at UG10
+	blink.set_stages(8);
+	blink.count_out_cb().set(m_mioc, FUNC(tms5501_device::sens_w)).bit(4);
 
 	// devices
 	MCFG_DEVICE_ADD(TMS5501_TAG, TMS5501, XTAL(17'971'200)/9)

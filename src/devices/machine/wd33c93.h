@@ -13,7 +13,7 @@
 #include "legscsi.h"
 
 #define MCFG_WD33C93_IRQ_CB(cb) \
-	devcb = &downcast<wd33c93_device &>(*device).set_irq_callback((DEVCB_##cb));
+	downcast<wd33c93_device &>(*device).set_irq_callback((DEVCB_##cb));
 
 class wd33c93_device : public legacy_scsi_host_adapter
 {

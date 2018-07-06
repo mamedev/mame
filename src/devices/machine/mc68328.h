@@ -389,76 +389,76 @@ DECLARE_DEVICE_TYPE(MC68328, mc68328_device)
 	downcast<mc68328_device &>(*device).set_cpu_tag(_tag);
 
 #define MCFG_MC68328_OUT_PORT_A_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_a_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_out_port_a_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_OUT_PORT_B_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_b_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_out_port_b_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_OUT_PORT_C_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_c_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_out_port_c_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_OUT_PORT_D_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_d_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_out_port_d_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_OUT_PORT_E_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_e_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_out_port_e_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_OUT_PORT_F_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_f_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_out_port_f_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_OUT_PORT_G_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_g_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_out_port_g_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_OUT_PORT_J_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_j_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_out_port_j_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_OUT_PORT_K_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_k_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_out_port_k_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_OUT_PORT_M_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_m_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_out_port_m_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_IN_PORT_A_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_a_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_in_port_a_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_IN_PORT_B_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_b_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_in_port_b_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_IN_PORT_C_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_c_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_in_port_c_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_IN_PORT_D_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_d_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_in_port_d_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_IN_PORT_E_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_e_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_in_port_e_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_IN_PORT_F_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_f_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_in_port_f_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_IN_PORT_G_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_g_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_in_port_g_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_IN_PORT_J_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_j_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_in_port_j_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_IN_PORT_K_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_k_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_in_port_k_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_IN_PORT_M_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_m_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_in_port_m_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_OUT_PWM_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_pwm_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_out_pwm_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_OUT_SPIM_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_spim_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_out_spim_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_IN_SPIM_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_spim_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_in_spim_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68328_SPIM_XCH_TRIGGER_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_spim_xch_trigger_callback(DEVCB_##_devcb);
+	downcast<mc68328_device &>(*device).set_spim_xch_trigger_callback(DEVCB_##_devcb);
 
 
 #endif // MAME_MACHINE_MC68328_H

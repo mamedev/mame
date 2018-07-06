@@ -121,26 +121,26 @@ DECLARE_DEVICE_TYPE(KCCART_SLOT, kccart_slot_device)
 ***************************************************************************/
 
 #define MCFG_KCEXP_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<kcexp_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<kcexp_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_KCEXP_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &downcast<kcexp_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
+	downcast<kcexp_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_KCEXP_SLOT_OUT_HALT_CB(_devcb) \
-	devcb = &downcast<kcexp_slot_device &>(*device).set_out_halt_callback(DEVCB_##_devcb);
+	downcast<kcexp_slot_device &>(*device).set_out_halt_callback(DEVCB_##_devcb);
 
 #define MCFG_KCEXP_SLOT_NEXT_SLOT(_next_slot_tag) \
 	downcast<kcexp_slot_device &>(*device).set_next_slot(_next_slot_tag);
 
 
 #define MCFG_KCCART_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<kccart_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<kccart_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_KCCART_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &downcast<kccart_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
+	downcast<kccart_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_KCCART_SLOT_OUT_HALT_CB(_devcb) \
-	devcb = &downcast<kccart_slot_device &>(*device).set_out_halt_callback(DEVCB_##_devcb);
+	downcast<kccart_slot_device &>(*device).set_out_halt_callback(DEVCB_##_devcb);
 
 #define MCFG_KCCART_SLOT_NEXT_SLOT(_next_slot_tag) \
 	downcast<kccart_slot_device &>(*device).set_next_slot(_next_slot_tag);

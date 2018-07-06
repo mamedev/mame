@@ -15,7 +15,7 @@
 
 
 #define MCFG_SAM6883_RES_CALLBACK(_read) \
-	devcb = &downcast<sam6883_device &>(*device).set_res_rd_callback(DEVCB_##_read);
+	downcast<sam6883_device &>(*device).set_res_rd_callback(DEVCB_##_read);
 
 
 //**************************************************************************

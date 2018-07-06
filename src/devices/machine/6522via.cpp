@@ -954,7 +954,7 @@ WRITE8_MEMBER( via6522_device::write )
 	}
 }
 
-void via6522_device::write_pa(int line, int state)
+void via6522_device::set_pa_line(int line, int state)
 {
 	if (state)
 		m_in_a |= (1 << line);
@@ -1020,7 +1020,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca2 )
 	}
 }
 
-void via6522_device::write_pb(int line, int state)
+void via6522_device::set_pb_line(int line, int state)
 {
 	if (state)
 		m_in_b |= (1 << line);

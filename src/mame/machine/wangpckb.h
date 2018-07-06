@@ -34,7 +34,7 @@
 	MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
 
 #define MCFG_WANGPCKB_TXD_HANDLER(_devcb) \
-	devcb = &downcast<wangpc_keyboard_device &>(*device).set_txd_handler(DEVCB_##_devcb);
+	downcast<wangpc_keyboard_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

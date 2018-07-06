@@ -30,10 +30,10 @@
 //**************************************************************************
 
 #define MCFG_TTL153_ZA_CB(_devcb) \
-	devcb = &downcast<ttl153_device &>(*device).set_za_callback(DEVCB_##_devcb);
+	downcast<ttl153_device &>(*device).set_za_callback(DEVCB_##_devcb);
 
 #define MCFG_TTL153_ZB_CB(_devcb) \
-	devcb = &downcast<ttl153_device &>(*device).set_zb_callback(DEVCB_##_devcb);
+	downcast<ttl153_device &>(*device).set_zb_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

@@ -331,9 +331,9 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
+	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tavernie_state::ivg09)

@@ -189,10 +189,10 @@ DECLARE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device)
 	downcast<seibu_sound_device &>(*device).set_rombank_tag(_banktag);
 
 #define MCFG_SEIBU_SOUND_YM_READ_CB(_devcb) \
-	devcb = &downcast<seibu_sound_device &>(*device).set_ym_read_callback(DEVCB_##_devcb);
+	downcast<seibu_sound_device &>(*device).set_ym_read_callback(DEVCB_##_devcb);
 
 #define MCFG_SEIBU_SOUND_YM_WRITE_CB(_devcb) \
-	devcb = &downcast<seibu_sound_device &>(*device).set_ym_write_callback(DEVCB_##_devcb);
+	downcast<seibu_sound_device &>(*device).set_ym_write_callback(DEVCB_##_devcb);
 
 /**************************************************************************/
 

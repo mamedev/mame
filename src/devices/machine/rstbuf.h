@@ -16,7 +16,7 @@
 //**************************************************************************
 
 #define MCFG_RST_BUFFER_INT_CALLBACK(_devcb) \
-	devcb = &downcast<rst_buffer_device &>(*device).set_int_callback(DEVCB_##_devcb);
+	downcast<rst_buffer_device &>(*device).set_int_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

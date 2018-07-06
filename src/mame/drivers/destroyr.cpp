@@ -472,9 +472,9 @@ MACHINE_CONFIG_START(destroyr_state::destroyr)
 	MCFG_DEVICE_PROGRAM_MAP(destroyr_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(destroyr_state, irq0_line_assert,  4*60)
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // F8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // LED 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // LED 2 (no second LED present on cab)
+	f9334_device &outlatch(F9334(config, "outlatch")); // F8
+	outlatch.q_out_cb<0>().set_output("led0").invert(); // LED 1
+	outlatch.q_out_cb<1>().set_output("led1").invert(); // LED 2 (no second LED present on cab)
 	// Q2 => songate
 	// Q3 => launch
 	// Q4 => explosion

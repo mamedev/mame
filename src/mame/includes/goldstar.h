@@ -64,6 +64,7 @@ public:
 	void goldstar(machine_config &config);
 	void goldstbl(machine_config &config);
 	void bonusch_portmap(address_map &map);
+	void feverch_portmap(address_map &map);
 	void cm_map(address_map &map);
 	void cmast91_portmap(address_map &map);
 	void flaming7_map(address_map &map);
@@ -352,7 +353,9 @@ public:
 	void megaline(machine_config &config);
 	void unkch(machine_config &config);
 	void bonusch(machine_config &config);
+	void feverch(machine_config &config);
 	void bonusch_map(address_map &map);
+	void feverch_map(address_map &map);
 	void megaline_map(address_map &map);
 	void unkch_map(address_map &map);
 	void unkch_portmap(address_map &map);

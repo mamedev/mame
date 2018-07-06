@@ -967,8 +967,7 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, gaelco3d_state, analog_port_latch_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(m_serial, gaelco_serial_device, unknown_w))
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_adsp, ADSP2115_IRQ2))
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_adsp, ADSP2115_IRQ2);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

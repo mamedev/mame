@@ -57,10 +57,6 @@ private:
 		TIMER_HIT
 	};
 
-	DECLARE_WRITE_LINE_MEMBER(ram_2_w);
-	DECLARE_WRITE_LINE_MEMBER(sprite_zoom_w);
-	DECLARE_WRITE_LINE_MEMBER(sprite_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(tape_control_w);
 

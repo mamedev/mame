@@ -3662,13 +3662,12 @@ MACHINE_CONFIG_START(royalmah_state::janptr96)
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, royalmah_state, janptr96_dswsel_w))
 	// internal CTC channels 0 & 1 have falling edge triggers
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_visarea(0, 255, 8, 255-8);
+	screen.screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg1)) MCFG_DEVCB_INVERT
+	MSM6242(config, m_rtc, 32.768_kHz_XTAL).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1)).invert();
 MACHINE_CONFIG_END
 
 
@@ -3722,8 +3721,7 @@ MACHINE_CONFIG_START(royalmah_state::mjtensin)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ1))
+	MSM6242(config, m_rtc, 32.768_kHz_XTAL).out_int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::cafetime)
@@ -3738,8 +3736,7 @@ MACHINE_CONFIG_START(royalmah_state::cafetime)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ1))
+	MSM6242(config, m_rtc, 32.768_kHz_XTAL).out_int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::mjvegasa)
@@ -3755,8 +3752,7 @@ MACHINE_CONFIG_START(royalmah_state::mjvegasa)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ1))
+	MSM6242(config, m_rtc, 32.768_kHz_XTAL).out_int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 MACHINE_CONFIG_END
 
 

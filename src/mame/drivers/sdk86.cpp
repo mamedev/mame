@@ -166,16 +166,16 @@ MACHINE_CONFIG_START(sdk86_state::sdk86)
 	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(14'745'600)/3/16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(I8251_TAG, i8251_device, write_rxc))
+	clock_device &usart_clock(CLOCK(config, "usart_clock", XTAL(14'745'600)/3/16));
+	usart_clock.signal_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
+	usart_clock.signal_handler().append(I8251_TAG, FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD("i8279", I8279, 2500000) // based on divider
 	MCFG_I8279_OUT_SL_CB(WRITE8(*this, sdk86_state, scanlines_w))          // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, sdk86_state, digit_w))            // display A&B
 	MCFG_I8279_IN_RL_CB(READ8(*this, sdk86_state, kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(GND)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(GND)
+	MCFG_I8279_IN_SHIFT_CB(CONSTANT(0))                                    // Shift key
+	MCFG_I8279_IN_CTRL_CB(CONSTANT(0))
 
 	MCFG_DEVICE_ADD("port1", I8255A, 0)
 	MCFG_DEVICE_ADD("port2", I8255A, 0)

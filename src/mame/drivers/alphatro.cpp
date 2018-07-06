@@ -746,9 +746,9 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_DEVICE_ADD("usart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, alphatro_state, txdata_callback))
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19218) // 19218 to load a real tape, 19222 to load a tape made by this driver
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("usart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("usart", i8251_device, write_rxc))
+	clock_device &usart_clock(CLOCK(config, "usart_clock", 19218)); // 19218 to load a real tape, 19222 to load a tape made by this driver
+	usart_clock.signal_handler().set(m_usart, FUNC(i8251_device::write_txc));
+	usart_clock.signal_handler().append(m_usart, FUNC(i8251_device::write_rxc));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)

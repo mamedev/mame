@@ -22,7 +22,7 @@
 	downcast<tms34061_device &>(*device).set_vram_size(_size);
 
 #define MCFG_TMS34061_INTERRUPT_CB(_devcb) \
-	devcb = &downcast<tms34061_device &>(*device).set_interrupt_callback(DEVCB_##_devcb);
+	downcast<tms34061_device &>(*device).set_interrupt_callback(DEVCB_##_devcb);
 
 
 

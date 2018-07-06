@@ -1553,15 +1553,15 @@ MACHINE_CONFIG_START(segac2_state::segac)
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
 	MCFG_NVRAM_ADD_1FILL("nvram") // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5296, XL2_CLOCK/6) // clock divider guessed
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_315_5296_IN_PORTC_CB(READ8(*this, segac2_state, io_portc_r))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segac2_state, io_portd_w))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("COINAGE"))
-	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segac2_state, io_porth_w))
+	sega_315_5296_device &io(SEGA_315_5296(config, "io", XL2_CLOCK/6)); // clock divider guessed
+	io.in_pa_callback().set_ioport("P1");
+	io.in_pb_callback().set_ioport("P2");
+	io.in_pc_callback().set(FUNC(segac2_state::io_portc_r));
+	io.out_pd_callback().set(FUNC(segac2_state::io_portd_w));
+	io.in_pe_callback().set_ioport("SERVICE");
+	io.in_pf_callback().set_ioport("COINAGE");
+	io.in_pg_callback().set_ioport("DSW");
+	io.out_ph_callback().set(FUNC(segac2_state::io_porth_w));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, XL2_CLOCK, "maincpu")
@@ -1596,17 +1596,16 @@ MACHINE_CONFIG_START(segac2_state::segac)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(segac2_state::segac2)
+void segac2_state::segac2(machine_config &config)
+{
 	segac(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE("upd", upd7759_device, reset_w))
+	subdevice<sega_315_5296_device>("io")->out_cnt1_callback().set(m_upd7759, FUNC(upd7759_device::reset_w));
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("upd", UPD7759, XL1_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759, XL1_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 

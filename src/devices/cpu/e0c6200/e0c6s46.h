@@ -16,7 +16,7 @@
 
 // 5 4-bit R output ports
 #define MCFG_E0C6S46_WRITE_R_CB(R, _devcb) \
-	devcb = &downcast<e0c6s46_device &>(*device).set_write_r##R##_callback(DEVCB_##_devcb);
+	downcast<e0c6s46_device &>(*device).set_write_r##R##_callback(DEVCB_##_devcb);
 
 enum
 {
@@ -29,9 +29,9 @@ enum
 
 // 4 4-bit P I/O ports
 #define MCFG_E0C6S46_READ_P_CB(R, _devcb) \
-	devcb = &downcast<hmcs40_cpu_device &>(*device).set_read_r##P##_callback(DEVCB_##_devcb);
+	downcast<hmcs40_cpu_device &>(*device).set_read_r##P##_callback(DEVCB_##_devcb);
 #define MCFG_E0C6S46_WRITE_P_CB(R, _devcb) \
-	devcb = &downcast<e0c6s46_device &>(*device).set_write_r##P##_callback(DEVCB_##_devcb);
+	downcast<e0c6s46_device &>(*device).set_write_r##P##_callback(DEVCB_##_devcb);
 
 enum
 {

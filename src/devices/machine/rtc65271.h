@@ -15,7 +15,7 @@
 //**************************************************************************
 
 #define MCFG_RTC65271_INTERRUPT_CB(cb) \
-	devcb = &downcast<rtc65271_device &>(*device).set_interrupt_callback(DEVCB_##cb);
+	downcast<rtc65271_device &>(*device).set_interrupt_callback(DEVCB_##cb);
 
 
 // ======================> rtc65271_device

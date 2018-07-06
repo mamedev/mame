@@ -18,7 +18,7 @@
 
 // LCD segment outputs: H1/2 as a0, O group as a1-a4, O data as d0-d3
 #define MCFG_SM500_WRITE_O_CB(_devcb) \
-	devcb = &downcast<sm500_device &>(*device).set_write_o_callback(DEVCB_##_devcb);
+	downcast<sm500_device &>(*device).set_write_o_callback(DEVCB_##_devcb);
 
 // see sm510.h for ACL, K, R, alpha, beta
 

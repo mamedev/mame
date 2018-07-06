@@ -384,19 +384,19 @@ MACHINE_CONFIG_START(segajw_state::segajw)
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
-	MCFG_DEVICE_ADD("io1a", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_OUT_PORTA_CB(WRITE8(*this, segajw_state, coin_counter_w))
-	MCFG_315_5296_OUT_PORTB_CB(WRITE8(*this, segajw_state, lamps1_w))
-	MCFG_315_5296_OUT_PORTC_CB(WRITE8(*this, segajw_state, lamps2_w))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segajw_state, hopper_w))
-	MCFG_315_5296_IN_PORTF_CB(READ8(*this, segajw_state, coin_counter_r))
+	sega_315_5296_device &io1a(SEGA_315_5296(config, "io1a", 0)); // unknown clock
+	io1a.out_pa_callback().set(FUNC(segajw_state::coin_counter_w));
+	io1a.out_pb_callback().set(FUNC(segajw_state::lamps1_w));
+	io1a.out_pc_callback().set(FUNC(segajw_state::lamps2_w));
+	io1a.out_pd_callback().set(FUNC(segajw_state::hopper_w));
+	io1a.in_pf_callback().set(FUNC(segajw_state::coin_counter_r));
 
-	MCFG_DEVICE_ADD("io1c", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_315_5296_IN_PORTD_CB(IOPORT("IN3"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, segajw_state, coinlockout_w))
+	sega_315_5296_device &io1c(SEGA_315_5296(config, "io1c", 0)); // unknown clock
+	io1c.in_pa_callback().set_ioport("IN0");
+	io1c.in_pb_callback().set_ioport("IN1");
+	io1c.in_pc_callback().set_ioport("IN2");
+	io1c.in_pd_callback().set_ioport("IN3");
+	io1c.out_pg_callback().set(FUNC(segajw_state::coinlockout_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

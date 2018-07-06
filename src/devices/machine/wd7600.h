@@ -27,31 +27,31 @@
 	downcast<wd7600_device &>(*device).set_keybctag(_keybctag);
 
 #define MCFG_WD7600_IOR(_ior) \
-	devcb = &downcast<wd7600_device *>(device)->set_ior_callback(DEVCB_##_ior);
+	downcast<wd7600_device *>(device)->set_ior_callback(DEVCB_##_ior);
 
 #define MCFG_WD7600_IOW(_iow) \
-	devcb = &downcast<wd7600_device *>(device)->set_iow_callback(DEVCB_##_iow);
+	downcast<wd7600_device *>(device)->set_iow_callback(DEVCB_##_iow);
 
 #define MCFG_WD7600_TC(_tc) \
-	devcb = &downcast<wd7600_device *>(device)->set_tc_callback(DEVCB_##_tc);
+	downcast<wd7600_device *>(device)->set_tc_callback(DEVCB_##_tc);
 
 #define MCFG_WD7600_HOLD(_hold) \
-	devcb = &downcast<wd7600_device *>(device)->set_hold_callback(DEVCB_##_hold);
+	downcast<wd7600_device *>(device)->set_hold_callback(DEVCB_##_hold);
 
 #define MCFG_WD7600_NMI(_nmi) \
-	devcb = &downcast<wd7600_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
+	downcast<wd7600_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
 
 #define MCFG_WD7600_INTR(_intr) \
-	devcb = &downcast<wd7600_device *>(device)->set_intr_callback(DEVCB_##_intr);
+	downcast<wd7600_device *>(device)->set_intr_callback(DEVCB_##_intr);
 
 #define MCFG_WD7600_CPURESET(_cpureset) \
-	devcb = &downcast<wd7600_device *>(device)->set_cpureset_callback(DEVCB_##_cpureset);
+	downcast<wd7600_device *>(device)->set_cpureset_callback(DEVCB_##_cpureset);
 
 #define MCFG_WD7600_A20M(_a20m) \
-	devcb = &downcast<wd7600_device *>(device)->set_a20m_callback(DEVCB_##_a20m);
+	downcast<wd7600_device *>(device)->set_a20m_callback(DEVCB_##_a20m);
 
 #define MCFG_WD7600_SPKR(_spkr) \
-	devcb = &downcast<wd7600_device *>(device)->set_spkr_callback(DEVCB_##_spkr);
+	downcast<wd7600_device *>(device)->set_spkr_callback(DEVCB_##_spkr);
 
 
 //**************************************************************************

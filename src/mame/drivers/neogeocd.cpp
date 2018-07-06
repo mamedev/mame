@@ -1041,8 +1041,7 @@ MACHINE_CONFIG_START(ngcd_state::neocd)
 	MCFG_DEVICE_PROGRAM_MAP(neocd_audio_map)
 	MCFG_DEVICE_IO_MAP(neocd_audio_io_map)
 
-	MCFG_DEVICE_MODIFY("systemlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(LOGGER("NeoCD: write to regular vector change address?")) // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
+	subdevice<hc259_device>("systemlatch")->q_out_cb<1>().set_log("NeoCD: write to regular vector change address?"); // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ngcd_state, screen_update_neocd)

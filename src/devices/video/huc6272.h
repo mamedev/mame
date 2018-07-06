@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_HUC6272_IRQ_CHANGED_CB(cb) \
-		devcb = &downcast<huc6272_device &>(*device).set_irq_changed_callback((DEVCB_##cb));
+		downcast<huc6272_device &>(*device).set_irq_changed_callback((DEVCB_##cb));
 
 #define MCFG_HUC6272_RAINBOW(tag) \
 		downcast<huc6272_device &>(*device).set_rainbow_tag((tag));

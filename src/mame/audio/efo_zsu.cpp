@@ -209,10 +209,10 @@ MACHINE_CONFIG_START(efo_zsu_device::device_add_mconfig)
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, efo_zsu_device, ctc1_z2_w))
 
 #if 0 // does nothing useful now
-	MCFG_DEVICE_ADD("ck1mhz", CLOCK, 4000000/4)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc1", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc1", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc1", z80ctc_device, trg2))
+	clock_device &ck1mhz(CLOCK(config, "ck1mhz", 4000000/4);
+	ck1mhz.signal_handler().set(m_ctc1, FUNC(z80ctc_device::trg0));
+	ck1mhz.signal_handler().append(m_ctc1, FUNC(z80ctc_device::trg1));
+	ck1mhz.signal_handler().append(m_ctc1, FUNC(z80ctc_device::trg2));
 #endif
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
@@ -223,13 +223,13 @@ MACHINE_CONFIG_START(efo_zsu_device::device_add_mconfig)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd0", AY8910, 4000000/2)
-	MCFG_AY8910_PORT_A_WRITE_CB(MEMBANK("rombank")) MCFG_DEVCB_MASK(0x03)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ay8910_device &aysnd0(AY8910(config, "aysnd0", 4000000/2));
+	aysnd0.port_a_write_callback().set_membank("rombank").mask(0x03);
+	aysnd0.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("aysnd1", AY8910, 4000000/2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, efo_zsu_device, ay1_porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", 4000000/2));
+	aysnd1.port_a_write_callback().set(FUNC(efo_zsu_device::ay1_porta_w));
+	aysnd1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	MCFG_DEVICE_ADD("fifo", CD40105, 0)
 	MCFG_40105_DATA_OUT_READY_CB(WRITELINE(*this, efo_zsu_device, fifo_dor_w))

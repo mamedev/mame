@@ -45,19 +45,19 @@
 //**************************************************************************
 
 #define MCFG_MSM58321_D0_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_d0_handler(DEVCB_##_devcb);
+	downcast<msm58321_device &>(*device).set_d0_handler(DEVCB_##_devcb);
 
 #define MCFG_MSM58321_D1_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_d1_handler(DEVCB_##_devcb);
+	downcast<msm58321_device &>(*device).set_d1_handler(DEVCB_##_devcb);
 
 #define MCFG_MSM58321_D2_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_d2_handler(DEVCB_##_devcb);
+	downcast<msm58321_device &>(*device).set_d2_handler(DEVCB_##_devcb);
 
 #define MCFG_MSM58321_D3_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_d3_handler(DEVCB_##_devcb);
+	downcast<msm58321_device &>(*device).set_d3_handler(DEVCB_##_devcb);
 
 #define MCFG_MSM58321_BUSY_HANDLER(_devcb) \
-	devcb = &downcast<msm58321_device &>(*device).set_busy_handler(DEVCB_##_devcb);
+	downcast<msm58321_device &>(*device).set_busy_handler(DEVCB_##_devcb);
 
 #define MCFG_MSM58321_YEAR0(_year0) \
 	downcast<msm58321_device &>(*device).set_year0(_year0);

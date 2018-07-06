@@ -48,51 +48,51 @@
 	downcast<z80scc_device &>(*device).configure_channels(_rxa, _txa, _rxb, _txb);
 
 #define MCFG_Z80SCC_OUT_INT_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 // Port A callbacks
 #define MCFG_Z80SCC_OUT_TXDA_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_txd_callback<0>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_txd_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_DTRA_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_dtr_callback<0>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_dtr_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_RTSA_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_rts_callback<0>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_rts_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_WREQA_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_wreq_callback<0>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_wreq_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_SYNCA_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_sync_callback<0>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_sync_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_RXDRQA_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_rxdrq_callback<0>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_rxdrq_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_TXDRQA_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_txdrq_callback<0>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_txdrq_callback<0>(DEVCB_##_devcb);
 
 // Port B callbacks
 #define MCFG_Z80SCC_OUT_TXDB_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_txd_callback<1>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_txd_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_DTRB_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_dtr_callback<1>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_dtr_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_RTSB_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_rts_callback<1>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_rts_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_WREQB_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_wreq_callback<1>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_wreq_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_SYNCB_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_sync_callback<1>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_sync_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_RXDRQB_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_rxdrq_callback<1>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_rxdrq_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_TXDRQB_CB(_devcb) \
-	devcb = &downcast<z80scc_device &>(*device).set_out_txdrq_callback<1>(DEVCB_##_devcb);
+	downcast<z80scc_device &>(*device).set_out_txdrq_callback<1>(DEVCB_##_devcb);
 
 
 //**************************************************************************
