@@ -784,7 +784,7 @@ private:
 		std::enable_if_t<is_read_method<T>::value, delegate_builder<delegate_type_t<T> > > set(U &obj, T &&func, char const *name)
 		{
 			set_used();
-			return delegate_builder<delegate_type_t<T> >(m_target, m_append, m_target.owner().mconfig().current_device(), devcb_read::cast_reference<delegate_device_class_t<T> >(obj), std::forward<T>(func), name);
+			return delegate_builder<delegate_type_t<T> >(m_target, m_append, m_target.owner(), devcb_read::cast_reference<delegate_device_class_t<T> >(obj), std::forward<T>(func), name);
 		}
 
 		template <typename T, typename U, bool R>
@@ -2141,7 +2141,7 @@ private:
 		std::enable_if_t<is_write_method<T>::value, delegate_builder<delegate_type_t<T> > > set(U &obj, T &&func, char const *name)
 		{
 			set_used();
-			return delegate_builder<delegate_type_t<T> >(m_target, m_append, m_target.owner().mconfig().current_device(), devcb_write::cast_reference<delegate_device_class_t<T> >(obj), std::forward<T>(func), name);
+			return delegate_builder<delegate_type_t<T> >(m_target, m_append, m_target.owner(), devcb_write::cast_reference<delegate_device_class_t<T> >(obj), std::forward<T>(func), name);
 		}
 
 		template <typename T, typename U, bool R>
