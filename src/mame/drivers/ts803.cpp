@@ -71,7 +71,7 @@ public:
 		, m_floppy1(*this, "fdc:1")
 		, m_p_chargen(*this, "chargen")
 		, m_io_dsw(*this, "DSW")
-		{ }
+	{ }
 
 	void ts803(machine_config &config);
 

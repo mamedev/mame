@@ -58,20 +58,20 @@ class olyboss_state : public driver_device
 {
 public:
 	olyboss_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_dma(*this, I8257_TAG),
-			m_crtc(*this,UPD3301_TAG),
-			m_fdc(*this, "fdc"),
-			m_uic(*this, "uic"),
-			m_pic(*this, "pic"),
-			m_ppi(*this, "ppi"),
-			m_fdd0(*this, "fdc:0"),
-			m_fdd1(*this, "fdc:1"),
-			m_rom(*this, "mainrom"),
-			m_lowram(*this, "lowram"),
-			m_char_rom(*this, UPD3301_TAG)
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_dma(*this, I8257_TAG)
+		, m_crtc(*this, UPD3301_TAG)
+		, m_fdc(*this, "fdc")
+		, m_uic(*this, "uic")
+		, m_pic(*this, "pic")
+		, m_ppi(*this, "ppi")
+		, m_fdd0(*this, "fdc:0")
+		, m_fdd1(*this, "fdc:1")
+		, m_rom(*this, "mainrom")
+		, m_lowram(*this, "lowram")
+		, m_char_rom(*this, UPD3301_TAG)
+	{ }
 
 public:
 	void bossa85(machine_config &config);

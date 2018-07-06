@@ -73,7 +73,8 @@ public:
 		, m_bankw0(*this, "bankw0")
 		, m_bank2(*this, "bank2")
 		, m_keyboard(*this, "X%u", 0)
-		{}
+	{
+	}
 
 	void sbrain(machine_config &config);
 

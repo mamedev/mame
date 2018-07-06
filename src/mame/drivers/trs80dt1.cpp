@@ -53,7 +53,7 @@ public:
 		, m_keyboard(*this, "X%u", 0)
 		, m_beep(*this, "beeper")
 		, m_7474(*this, "7474")
-		{ }
+	{ }
 
 	void trs80dt1(machine_config &config);
 

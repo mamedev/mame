@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese,Carl
-
-#pragma once
-
 #ifndef MAME_INCLUDES_PC9801_H
 #define MAME_INCLUDES_PC9801_H
+
+#pragma once
 
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i286.h"

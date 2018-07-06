@@ -34,12 +34,13 @@
 class sagitta180_state : public driver_device
 {
 public:
-	sagitta180_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sagitta180_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
 		m_crtc(*this, "crtc"),
 		m_dma8257(*this, "dma"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu")
+	{ }
 
 	void sagitta180(machine_config &config);
 

@@ -33,6 +33,8 @@
 #ifndef MAME_INCLUDES_POLY_H
 #define MAME_INCLUDES_POLY_H
 
+#pragma once
+
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
@@ -176,4 +178,4 @@ private:
 	floppy_image_device *m_current_floppy;
 };
 
-#endif /* MAME_INCLUDES_POLY_H */
+#endif // MAME_INCLUDES_POLY_H

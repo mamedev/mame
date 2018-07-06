@@ -26,13 +26,13 @@ class miniframe_state : public driver_device
 {
 public:
 	miniframe_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG),
-			m_wd2797(*this, "wd2797"),
-			m_floppy(*this, "wd2797:0:525dd"),
-			m_ramrombank(*this, "ramrombank"),
-			m_mapram(*this, "mapram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_wd2797(*this, "wd2797")
+		, m_floppy(*this, "wd2797:0:525dd")
+		, m_ramrombank(*this, "ramrombank")
+		, m_mapram(*this, "mapram")
 	{ }
 
 	void miniframe(machine_config &config);

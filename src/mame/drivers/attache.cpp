@@ -92,37 +92,37 @@ class attache_state : public driver_device
 {
 public:
 	attache_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this,"maincpu"),
-			m_rom(*this,"boot"),
-			m_ram(*this,RAM_TAG),
-			m_char_rom(*this,"video"),
-			m_rtc(*this,"rtc"),
-			m_psg(*this,"psg"),
-			m_fdc(*this,"fdc"),
-			m_sio(*this,"sio"),
-			m_pio(*this,"pio"),
-			m_ctc(*this,"ctc"),
-			m_crtc(*this,"crtc"),
-			m_dma(*this, "dma"),
-			m_palette(*this, "palette"),
-			m_floppy0(*this, "fdc:0:525dd"),
-			m_floppy1(*this, "fdc:1:525dd"),
-			m_kb_rows(*this, {"row0", "row1", "row2", "row3", "row4", "row5", "row6", "row7"}),
-			m_kb_mod(*this, "modifiers"),
-			m_membank1(*this, "bank1"),
-			m_membank2(*this, "bank2"),
-			m_membank3(*this, "bank3"),
-			m_membank4(*this, "bank4"),
-			m_membank5(*this, "bank5"),
-			m_membank6(*this, "bank6"),
-			m_membank7(*this, "bank7"),
-			m_membank8(*this, "bank8"),
-			m_nvram(*this, "nvram"),
-			m_rom_active(true),
-			m_gfx_enabled(false),
-			m_kb_clock(true),
-			m_kb_empty(true)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "boot")
+		, m_ram(*this, RAM_TAG)
+		, m_char_rom(*this, "video")
+		, m_rtc(*this, "rtc")
+		, m_psg(*this, "psg")
+		, m_fdc(*this, "fdc")
+		, m_sio(*this, "sio")
+		, m_pio(*this, "pio")
+		, m_ctc(*this, "ctc")
+		, m_crtc(*this, "crtc")
+		, m_dma(*this, "dma")
+		, m_palette(*this, "palette")
+		, m_floppy0(*this, "fdc:0:525dd")
+		, m_floppy1(*this, "fdc:1:525dd")
+		, m_kb_rows(*this, "row%u", 0U)
+		, m_kb_mod(*this, "modifiers")
+		, m_membank1(*this, "bank1")
+		, m_membank2(*this, "bank2")
+		, m_membank3(*this, "bank3")
+		, m_membank4(*this, "bank4")
+		, m_membank5(*this, "bank5")
+		, m_membank6(*this, "bank6")
+		, m_membank7(*this, "bank7")
+		, m_membank8(*this, "bank8")
+		, m_nvram(*this, "nvram")
+		, m_rom_active(true)
+		, m_gfx_enabled(false)
+		, m_kb_clock(true)
+		, m_kb_empty(true)
 	{ }
 
 	void attache(machine_config &config);
@@ -250,13 +250,13 @@ class attache816_state : public attache_state
 {
 public:
 	attache816_state(const machine_config &mconfig, device_type type, const char *tag)
-		: attache_state(mconfig, type, tag),
-		  m_extcpu(*this,"extcpu"),
-		  m_ppi(*this,"ppi"),
-		  m_comms_val(0),
-		  m_x86_irq_enable(0),
-		  m_z80_rx_ready(false),
-		  m_z80_tx_ready(false)
+		: attache_state(mconfig, type, tag)
+		, m_extcpu(*this,"extcpu")
+		, m_ppi(*this,"ppi")
+		, m_comms_val(0)
+		, m_x86_irq_enable(0)
+		, m_z80_rx_ready(false)
+		, m_z80_tx_ready(false)
 	{ }
 
 	void attache816(machine_config &config);

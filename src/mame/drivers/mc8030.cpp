@@ -36,7 +36,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
-		{ }
+	{ }
 
 	void mc8030(machine_config &config);
 

@@ -168,7 +168,7 @@ public:
 		m_speaker_active(false),
 		m_beep_active(false),
 		m_z80_active(false)
-		{ }
+	{ }
 
 	void octopus(machine_config &config);
 

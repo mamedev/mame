@@ -56,7 +56,7 @@ public:
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_rtc(*this, "rtc")
-		{ }
+	{ }
 
 
 	void pulsar(machine_config &config);

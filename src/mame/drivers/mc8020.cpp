@@ -32,7 +32,7 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_keyboard(*this, "X%u", 0)
-		{ }
+	{ }
 
 	void mc8020(machine_config &config);
 

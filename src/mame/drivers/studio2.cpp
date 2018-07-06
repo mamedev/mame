@@ -208,15 +208,15 @@ class studio2_state : public driver_device
 public:
 
 	studio2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, CDP1802_TAG),
-			m_beeper(*this, "beeper"),
-			m_vdc(*this, CDP1861_TAG),
-			m_cart(*this, "cartslot"),
-			m_clear(*this, "CLEAR"),
-			m_a(*this, "A"),
-			m_b(*this, "B"),
-			m_screen(*this, "screen")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, CDP1802_TAG)
+		, m_beeper(*this, "beeper")
+		, m_vdc(*this, CDP1861_TAG)
+		, m_cart(*this, "cartslot")
+		, m_clear(*this, "CLEAR")
+		, m_a(*this, "A")
+		, m_b(*this, "B")
+		, m_screen(*this, "screen")
 	{ }
 
 	void studio2_cartslot(machine_config &config);
