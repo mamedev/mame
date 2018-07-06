@@ -1270,7 +1270,7 @@ void clipper_device::execute_instruction()
 
 			// decrement sp after push to allow restart on exceptions
 			if (!m_exception)
-				m_r[15] -= 8 * (8 - m_info.subopcode & 0x7);
+				m_r[15] -= 8 * (8 - (m_info.subopcode & 0x7));
 			// TRAPS: A,P,W
 			break;
 		case 0x28: case 0x29: case 0x2a: case 0x2b:
@@ -1279,11 +1279,11 @@ void clipper_device::execute_instruction()
 
 			// load fi from sp + 8 * (i - N)
 			for (int i = m_info.subopcode & 0x7; i < 8 && !m_exception; i++)
-				get_dcammu().load<float64>(m_ssw, m_r[15] + 8 * (i - m_info.subopcode & 0x7), [this, i](float64 v) { set_fp(i, v, F_NONE); });
+				get_dcammu().load<float64>(m_ssw, m_r[15] + 8 * (i - (m_info.subopcode & 0x7)), [this, i](float64 v) { set_fp(i, v, F_NONE); });
 
 			// increment sp after pop to allow restart on exceptions
 			if (!m_exception)
-				m_r[15] += 8 * (8 - m_info.subopcode & 0x7);
+				m_r[15] += 8 * (8 - (m_info.subopcode & 0x7));
 			// TRAPS: C,U,A,P,R
 			break;
 		case 0x30:
