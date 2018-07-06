@@ -15,25 +15,25 @@ DECLARE_DEVICE_TYPE(TAITO_CCHIP, taito_cchip_device)
 	MCFG_DEVICE_ADD(_tag, TAITO_CCHIP, _clock)
 
 #define MCFG_CCHIP_IN_PORTA_CB(_devcb) \
-	devcb = &downcast<taito_cchip_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
+	downcast<taito_cchip_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_CCHIP_IN_PORTB_CB(_devcb) \
-	devcb = &downcast<taito_cchip_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
+	downcast<taito_cchip_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_CCHIP_IN_PORTC_CB(_devcb) \
-	devcb = &downcast<taito_cchip_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
+	downcast<taito_cchip_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_CCHIP_IN_PORTAD_CB(_devcb) \
-	devcb = &downcast<taito_cchip_device &>(*device).set_in_ad_callback(DEVCB_##_devcb);
+	downcast<taito_cchip_device &>(*device).set_in_ad_callback(DEVCB_##_devcb);
 
 #define MCFG_CCHIP_OUT_PORTA_CB(_devcb) \
-	devcb = &downcast<taito_cchip_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
+	downcast<taito_cchip_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_CCHIP_OUT_PORTB_CB(_devcb) \
-	devcb = &downcast<taito_cchip_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
+	downcast<taito_cchip_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_CCHIP_OUT_PORTC_CB(_devcb) \
-	devcb = &downcast<taito_cchip_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
+	downcast<taito_cchip_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
 
 
 class taito_cchip_device :  public device_t

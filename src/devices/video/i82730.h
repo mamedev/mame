@@ -24,7 +24,7 @@
 	downcast<i82730_device &>(*device).set_cpu_tag(_cpu_tag);
 
 #define MCFG_I82730_SINT_HANDLER(_devcb) \
-	devcb = &downcast<i82730_device &>(*device).set_sint_handler(DEVCB_##_devcb);
+	downcast<i82730_device &>(*device).set_sint_handler(DEVCB_##_devcb);
 
 #define MCFG_I82730_UPDATE_ROW_CB(_class, _method) \
 	downcast<i82730_device &>(*device).set_update_row_callback(i82730_device::update_row_delegate(&_class::_method, #_class "::" #_method, this));

@@ -16,7 +16,7 @@
 #define ENV_DIR_UP              1
 
 #define MCFG_CMI01A_IRQ_CALLBACK(_devcb) \
-	devcb = &downcast<cmi01a_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	downcast<cmi01a_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 class cmi01a_device : public device_t, public device_sound_interface {
 public:

@@ -727,9 +727,8 @@ MACHINE_CONFIG_START(kinst_state::kinst)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
 
-
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(INPUTLINE(m_maincpu, 1))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(INPUTLINE("maincpu", 1))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

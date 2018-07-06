@@ -90,9 +90,9 @@ MACHINE_CONFIG_START(systec_state::systec)
 	MCFG_DEVICE_PROGRAM_MAP(systec_mem)
 	MCFG_DEVICE_IO_MAP(systec_io)
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxca_w))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txca_w));
+	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxca_w));
 
 	/* Devices */
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))

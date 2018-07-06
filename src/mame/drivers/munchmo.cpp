@@ -352,8 +352,7 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE(m_audiocpu, 0))
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_audiocpu, 0, ASSERT_LINE);
 
 	/* AY clock speeds confirmed to match known recording */
 	MCFG_DEVICE_ADD(m_ay8910[0], AY8910, XTAL(15'000'000)/8)

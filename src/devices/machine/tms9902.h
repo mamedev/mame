@@ -190,15 +190,15 @@ private:
 ***************************************************************************/
 
 #define MCFG_TMS9902_INT_CB(cb) \
-	devcb = &downcast<tms9902_device &>(*device).set_int_callback((DEVCB_##cb));
+	downcast<tms9902_device &>(*device).set_int_callback((DEVCB_##cb));
 
 #define MCFG_TMS9902_RCV_CB(cb) \
-	devcb = &downcast<tms9902_device &>(*device).set_rcv_callback((DEVCB_##cb));
+	downcast<tms9902_device &>(*device).set_rcv_callback((DEVCB_##cb));
 
 #define MCFG_TMS9902_XMIT_CB(cb) \
-	devcb = &downcast<tms9902_device &>(*device).set_xmit_callback((DEVCB_##cb));
+	downcast<tms9902_device &>(*device).set_xmit_callback((DEVCB_##cb));
 
 #define MCFG_TMS9902_CTRL_CB(cb) \
-	devcb = &downcast<tms9902_device &>(*device).set_ctrl_callback((DEVCB_##cb));
+	downcast<tms9902_device &>(*device).set_ctrl_callback((DEVCB_##cb));
 
 #endif // MAME_MACHINE_TMS9902_H

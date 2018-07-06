@@ -1597,12 +1597,12 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	MCFG_DEVICE_ADD("sub2", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(bosco_map)
 
-	MCFG_DEVICE_ADD("misclatch", LS259, 0) // 3C on CPU board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, galaga_state, irq1_clear_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, galaga_state, irq2_clear_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, galaga_state, nmion_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	ls259_device &misclatch(LS259(config, "misclatch")); // 3C on CPU board
+	misclatch.q_out_cb<0>().set(FUNC(galaga_state::irq1_clear_w));
+	misclatch.q_out_cb<1>().set(FUNC(galaga_state::irq2_clear_w));
+	misclatch.q_out_cb<2>().set(FUNC(galaga_state::nmion_w));
+	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
+	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 
 	MCFG_NAMCO_50XX_ADD("50xx_1", MASTER_CLOCK/6/2) /* 1.536 MHz */
 	MCFG_NAMCO_50XX_ADD("50xx_2", MASTER_CLOCK/6/2) /* 1.536 MHz */
@@ -1643,11 +1643,11 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	MCFG_NAMCO_06XX_WRITE_0_CB(WRITE8("50xx_2", namco_50xx_device, write))
 	MCFG_NAMCO_06XX_WRITE_1_CB(WRITE8("52xx", namco_52xx_device, write))
 
-	MCFG_DEVICE_ADD("videolatch", LS259, 0) // 1B on video board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, galaga_state, flip_screen_w)) MCFG_DEVCB_INVERT
+	LS259(config, m_videolatch); // 1B on video board
+	m_videolatch->q_out_cb<0>().set(FUNC(galaga_state::flip_screen_w)).invert();
 	// Q4-Q5 to 05XX for starfield blink
-	//MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITE("50xx_2", namco_50xx_device, reset_w))
-	//MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITE("52xx", namco_52xx_device, reset_w))
+	//m_videolatch->q_out_cb<7>().set("50xx_2", FUNC(namco_50xx_device::reset_w));
+	//m_videolatch->q_out_cb<7>().append("52xx", FUNC(namco_52xx_device, reset_w));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -1655,12 +1655,12 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 							/* synchronization of the CPUs */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 16, 224+16)
-	MCFG_SCREEN_UPDATE_DRIVER(bosco_state, screen_update_bosco)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bosco_state, screen_vblank_bosco))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, galaga_state, vblank_irq))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 16, 224+16);
+	m_screen->set_screen_update(FUNC(bosco_state::screen_update_bosco));
+	m_screen->screen_vblank().set(FUNC(bosco_state::screen_vblank_bosco));
+	m_screen->screen_vblank().append(FUNC(galaga_state::vblank_irq));
+	m_screen->set_palette("palette");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bosco)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4+4+64)
@@ -1692,12 +1692,12 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	MCFG_DEVICE_ADD("sub2", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(galaga_map)
 
-	MCFG_DEVICE_ADD("misclatch", LS259, 0) // 3C on CPU board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, galaga_state, irq1_clear_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, galaga_state, irq2_clear_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, galaga_state, nmion_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	ls259_device &misclatch(LS259(config, "misclatch")); // 3C on CPU board
+	misclatch.q_out_cb<0>().set(FUNC(galaga_state::irq1_clear_w));
+	misclatch.q_out_cb<1>().set(FUNC(galaga_state::irq2_clear_w));
+	misclatch.q_out_cb<2>().set(FUNC(galaga_state::nmion_w));
+	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
+	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
 	MCFG_NAMCO_51XX_SCREEN("screen")
@@ -1718,9 +1718,9 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	MCFG_NAMCO_06XX_WRITE_0_CB(WRITE8("51xx", namco_51xx_device, write))
 	MCFG_NAMCO_06XX_WRITE_3_CB(WRITE8("54xx", namco_54xx_device, write))
 
-	MCFG_DEVICE_ADD("videolatch", LS259, 0) // 5K on video board
+	LS259(config, m_videolatch); // 5K on video board
 	// Q0-Q5 to 05XX for starfield control
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, galaga_state, flip_screen_w))
+	m_videolatch->q_out_cb<7>().set(FUNC(galaga_state::flip_screen_w));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -1728,12 +1728,12 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 							/* synchronization of the CPUs */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(galaga_state, screen_update_galaga)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaga_state, screen_vblank_galaga))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, galaga_state, vblank_irq))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
+	m_screen->set_screen_update(FUNC(galaga_state::screen_update_galaga));
+	m_screen->screen_vblank().set(FUNC(galaga_state::screen_vblank_galaga));
+	m_screen->screen_vblank().append(FUNC(galaga_state::vblank_irq));
+	m_screen->set_palette("palette");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaga)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4+64)
@@ -1795,12 +1795,12 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	MCFG_DEVICE_ADD("sub2", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(xevious_map)
 
-	MCFG_DEVICE_ADD("misclatch", LS259, 0) // 5K
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, galaga_state, irq1_clear_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, galaga_state, irq2_clear_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, galaga_state, nmion_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	ls259_device &misclatch(LS259(config, "misclatch")); // 5K
+	misclatch.q_out_cb<0>().set(FUNC(galaga_state::irq1_clear_w));
+	misclatch.q_out_cb<1>().set(FUNC(galaga_state::irq2_clear_w));
+	misclatch.q_out_cb<2>().set(FUNC(galaga_state::nmion_w));
+	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
+	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 
 	MCFG_NAMCO_50XX_ADD("50xx", MASTER_CLOCK/6/2)   /* 1.536 MHz */
 
@@ -1873,9 +1873,7 @@ MACHINE_CONFIG_START(battles_state::battles)
 	MCFG_DEVICE_ADD("sub3", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(battles_mem4)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaga_state, vblank_irq))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, battles_state, interrupt_4))
+	m_screen->screen_vblank().append(FUNC(battles_state::interrupt_4));
 
 	MCFG_TIMER_DRIVER_ADD("nmi", battles_state, nmi_generate)
 
@@ -1900,12 +1898,12 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	MCFG_DEVICE_ADD("sub2", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(digdug_map)
 
-	MCFG_DEVICE_ADD("misclatch", LS259, 0) // 8R
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, galaga_state, irq1_clear_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, galaga_state, irq2_clear_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, galaga_state, nmion_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	ls259_device &misclatch(LS259(config, "misclatch")); // 8R
+	misclatch.q_out_cb<0>().set(FUNC(galaga_state::irq1_clear_w));
+	misclatch.q_out_cb<1>().set(FUNC(galaga_state::irq2_clear_w));
+	misclatch.q_out_cb<2>().set(FUNC(galaga_state::nmion_w));
+	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
+	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 	// Q5-Q7 also used (see below)
 
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
@@ -1917,15 +1915,15 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	MCFG_NAMCO_51XX_OUTPUT_0_CB(WRITE8(*this, galaga_state,out_0))
 	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(*this, galaga_state,out_1))
 
-	MCFG_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
-	MCFG_NAMCO_53XX_K_CB(READLINE("misclatch", ls259_device, q7_r)) MCFG_DEVCB_BIT(3) // MOD 2 = K3
-	MCFG_DEVCB_CHAIN_INPUT(READLINE("misclatch", ls259_device, q6_r)) MCFG_DEVCB_BIT(2) // MOD 1 = K2
-	MCFG_DEVCB_CHAIN_INPUT(READLINE("misclatch", ls259_device, q5_r)) MCFG_DEVCB_BIT(1) // MOD 0 = K1
+	namco_53xx_device &n53xx(NAMCO_53XX(config, "53xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
+	n53xx.k_port_callback().set("misclatch", FUNC(ls259_device::q7_r)).lshift(3); // MOD 2 = K3
+	n53xx.k_port_callback().append("misclatch", FUNC(ls259_device::q6_r)).lshift(2); // MOD 1 = K2
+	n53xx.k_port_callback().append("misclatch", FUNC(ls259_device::q5_r)).lshift(1); // MOD 0 = K1
 	// K0 is left unconnected
-	MCFG_NAMCO_53XX_INPUT_0_CB(IOPORT("DSWA")) MCFG_DEVCB_MASK(0x0f)
-	MCFG_NAMCO_53XX_INPUT_1_CB(IOPORT("DSWA")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_NAMCO_53XX_INPUT_2_CB(IOPORT("DSWB")) MCFG_DEVCB_MASK(0x0f)
-	MCFG_NAMCO_53XX_INPUT_3_CB(IOPORT("DSWB")) MCFG_DEVCB_RSHIFT(4)
+	n53xx.input_callback<0>().set_ioport("DSWA").mask(0x0f);
+	n53xx.input_callback<1>().set_ioport("DSWA").rshift(4);
+	n53xx.input_callback<2>().set_ioport("DSWB").mask(0x0f);
+	n53xx.input_callback<3>().set_ioport("DSWB").rshift(4);
 
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
@@ -1934,11 +1932,11 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	MCFG_NAMCO_06XX_READ_1_CB(READ8("53xx", namco_53xx_device, read))
 	MCFG_NAMCO_06XX_READ_REQUEST_1_CB(WRITELINE("53xx", namco_53xx_device, read_request))
 
-	MCFG_DEVICE_ADD("videolatch", LS259, 0) // 5R
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, digdug_state, bg_select_w)) MCFG_DEVCB_MASK(0x33)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, digdug_state, tx_color_mode_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, digdug_state, bg_disable_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, digdug_state, flip_screen_w))
+	LS259(config, m_videolatch); // 5R
+	m_videolatch->parallel_out_cb().set(FUNC(digdug_state::bg_select_w)).mask(0x33);
+	m_videolatch->q_out_cb<2>().set(FUNC(digdug_state::tx_color_mode_w));
+	m_videolatch->q_out_cb<3>().set(FUNC(digdug_state::bg_disable_w));
+	m_videolatch->q_out_cb<7>().set(FUNC(digdug_state::flip_screen_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */

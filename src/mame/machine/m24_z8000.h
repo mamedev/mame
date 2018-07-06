@@ -11,7 +11,7 @@
 #include "machine/pic8259.h"
 
 #define MCFG_M24_Z8000_HALT(_devcb) \
-	devcb = &downcast<m24_z8000_device &>(*device).set_halt_callback(DEVCB_##_devcb);
+	downcast<m24_z8000_device &>(*device).set_halt_callback(DEVCB_##_devcb);
 
 class m24_z8000_device :  public device_t
 {

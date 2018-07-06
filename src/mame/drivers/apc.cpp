@@ -949,14 +949,14 @@ MACHINE_CONFIG_START(apc_state::apc)
 	MCFG_PIT8253_CLK1(MAIN_CLOCK) /* Memory Refresh */
 	MCFG_PIT8253_CLK2(MAIN_CLOCK) /* RS-232c */
 
-	MCFG_DEVICE_ADD(m_i8259_m, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(m_maincpu, 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, apc_state, get_slave_ack))
+	PIC8259(config, m_i8259_m, 0);
+	m_i8259_m->out_int_callback().set_inputline(m_maincpu, 0);
+	m_i8259_m->in_sp_callback().set_constant(1);
+	m_i8259_m->read_slave_ack_callback().set(FUNC(apc_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD(m_i8259_s, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(m_i8259_m, pic8259_device, ir7_w)) // TODO: check ir7_w
-	MCFG_PIC8259_IN_SP_CB(GND)
+	PIC8259(config, m_i8259_s, 0);
+	m_i8259_s->out_int_callback().set(m_i8259_m, FUNC(pic8259_device::ir7_w)); // TODO: check ir7_w
+	m_i8259_s->in_sp_callback().set_constant(0);
 
 	MCFG_DEVICE_ADD(m_dmac, AM9517A, MAIN_CLOCK)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, apc_state, apc_dma_hrq_changed))

@@ -252,10 +252,10 @@ MACHINE_CONFIG_START(dragon_state::dragon32)
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 
 	// cartridge
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_cart, "dragon_fdc")
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
-	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
+	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, "dragon_fdc"));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dragon64_state::dragon64)
@@ -265,10 +265,10 @@ MACHINE_CONFIG_START(dragon64_state::dragon64)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	// cartridge
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_cart, "dragon_fdc")
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
-	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
+	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, "dragon_fdc"));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
@@ -320,10 +320,10 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	// cartridge
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_cart, nullptr)
-	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(*this, coco_state, cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
-	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
+	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), dragon_cart, nullptr));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)

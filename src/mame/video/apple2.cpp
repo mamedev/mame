@@ -104,6 +104,15 @@ void a2_video_device::device_start()
 	save_item(NAME(m_dhires));
 	save_item(NAME(m_80col));
 	save_item(NAME(m_altcharset));
+	save_item(NAME(m_an2));
+	save_item(NAME(m_80store));
+	save_item(NAME(m_monohgr));	
+	save_item(NAME(m_GSfg));
+	save_item(NAME(m_GSbg));
+	save_item(NAME(m_GSborder));
+	save_item(NAME(m_newvideo));
+	save_item(NAME(m_monochrome));
+	save_item(NAME(m_shr_palette));
 }
 
 void a2_video_device::device_reset()
@@ -117,6 +126,10 @@ void a2_video_device::device_reset()
 	m_flash = false;
 	m_mix = false;
 	m_sysconfig = 0;
+	m_an2 = false;
+	m_80store = false;
+	m_monohgr = false;
+	m_newvideo = 0x01;
 }
 
 void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,

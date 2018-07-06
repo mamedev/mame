@@ -25,10 +25,10 @@
 	downcast<namco_c148_device &>(*device).link_c148_device(_tag);
 
 #define MCFG_NAMCO_C148_EXT1_CB(_cb) \
-	devcb = &downcast<namco_c148_device &>(*device).set_out_ext1_callback(DEVCB_##_cb);
+	downcast<namco_c148_device &>(*device).set_out_ext1_callback(DEVCB_##_cb);
 
 #define MCFG_NAMCO_C148_EXT2_CB(_cb) \
-	devcb = &downcast<namco_c148_device &>(*device).set_out_ext2_callback(DEVCB_##_cb);
+	downcast<namco_c148_device &>(*device).set_out_ext2_callback(DEVCB_##_cb);
 
 
 //**************************************************************************

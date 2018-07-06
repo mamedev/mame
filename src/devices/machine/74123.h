@@ -76,7 +76,7 @@
 	downcast<ttl74123_device &>(*device).set_clear_pin_value(_value);
 
 #define MCFG_TTL74123_OUTPUT_CHANGED_CB(_devcb) \
-	devcb = &downcast<ttl74123_device &>(*device).set_output_changed_callback(DEVCB_##_devcb);
+	downcast<ttl74123_device &>(*device).set_output_changed_callback(DEVCB_##_devcb);
 
 /* constants for the different ways the cap/res can be connected.
    This determines the formula for calculating the pulse width */

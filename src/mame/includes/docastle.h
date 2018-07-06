@@ -5,6 +5,10 @@
   Mr. Do's Castle hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_DOCASTLE_H
+#define MAME_INCLUDES_DOCASTLE_H
+
+#pragma once
 
 #include "machine/tms1024.h"
 #include "video/mc6845.h"
@@ -14,8 +18,8 @@
 class docastle_state : public driver_device
 {
 public:
-	docastle_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	docastle_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_slave(*this, "slave"),
 		m_cpu3(*this, "cpu3"),
@@ -94,3 +98,5 @@ private:
 	void dorunrun_map2(address_map &map);
 	void idsoccer_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DOCASTLE_H

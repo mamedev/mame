@@ -36,7 +36,7 @@
 //**************************************************************************
 
 #define MCFG_SAA5050_D_CALLBACK(_read) \
-	devcb = &downcast<saa5050_device &>(*device).set_d_rd_callback(DEVCB_##_read);
+	downcast<saa5050_device &>(*device).set_d_rd_callback(DEVCB_##_read);
 
 
 #define MCFG_SAA5050_SCREEN_SIZE(_cols, _rows, _size) \

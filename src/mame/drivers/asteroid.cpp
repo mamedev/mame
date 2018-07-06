@@ -740,17 +740,17 @@ MACHINE_CONFIG_START(asteroid_state::asteroid_base)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_DEVICE_ADD("dsw_sel", TTL153)
+	TTL153(config, m_dsw_sel);
 
-	MCFG_DEVICE_ADD("outlatch", OUTPUT_LATCH, 0) // LS174 at N11
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(OUTPUT("led1")) MCFG_DEVCB_INVERT // 2 PLYR START LAMP
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(OUTPUT("led0")) MCFG_DEVCB_INVERT // 1 PLYR START LAMP
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(MEMBANK("ram1")) // RAMSEL
-	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("ram2"))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, asteroid_state, cocktail_inv_w))
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(WRITELINE(*this, asteroid_state, coin_counter_left_w)) // COIN CNTRL
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(*this, asteroid_state, coin_counter_center_w)) // COIN CNTRC
-	MCFG_OUTPUT_LATCH_BIT5_HANDLER(WRITELINE(*this, asteroid_state, coin_counter_right_w)) // COIN CNTRR
+	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch")); // LS174 at N11
+	outlatch.bit_handler<0>().set_output("led1").invert(); // 2 PLYR START LAMP
+	outlatch.bit_handler<1>().set_output("led0").invert(); // 1 PLYR START LAMP
+	outlatch.bit_handler<2>().set_membank("ram1"); // RAMSEL
+	outlatch.bit_handler<2>().append_membank("ram2");
+	outlatch.bit_handler<2>().append(FUNC(asteroid_state::cocktail_inv_w));
+	outlatch.bit_handler<3>().set(FUNC(asteroid_state::coin_counter_left_w)); // COIN CNTRL
+	outlatch.bit_handler<4>().set(FUNC(asteroid_state::coin_counter_center_w)); // COIN CNTRC
+	outlatch.bit_handler<5>().set(FUNC(asteroid_state::coin_counter_right_w)); // COIN CNTRR
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -798,15 +798,15 @@ MACHINE_CONFIG_START(asteroid_state::astdelux)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_REMOVE("outlatch")
-	MCFG_DEVICE_MODIFY("audiolatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // START1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START2
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("ram1")) // RAMSEL
-	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("ram2"))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, asteroid_state, cocktail_inv_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, asteroid_state, coin_counter_left_w)) // LEFT COIN
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, asteroid_state, coin_counter_center_w)) // CENTER COIN
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, asteroid_state, coin_counter_right_w)) // RIGHT COIN
+	ls259_device &audiolatch(*subdevice<ls259_device>("audiolatch"));
+	audiolatch.q_out_cb<0>().set_output("led0").invert(); // START1
+	audiolatch.q_out_cb<1>().set_output("led1").invert(); // START2
+	audiolatch.q_out_cb<4>().set_membank("ram1"); // RAMSEL
+	audiolatch.q_out_cb<4>().append_membank("ram2");
+	audiolatch.q_out_cb<4>().append(FUNC(asteroid_state::cocktail_inv_w));
+	audiolatch.q_out_cb<5>().set(FUNC(asteroid_state::coin_counter_left_w)); // LEFT COIN
+	audiolatch.q_out_cb<6>().set(FUNC(asteroid_state::coin_counter_center_w)); // CENTER COIN
+	audiolatch.q_out_cb<7>().set(FUNC(asteroid_state::coin_counter_right_w)); // RIGHT COIN
 MACHINE_CONFIG_END
 
 

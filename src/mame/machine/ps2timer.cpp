@@ -201,23 +201,23 @@ READ32_MEMBER(ps2_timer_device::read)
             update_count();
             ret = m_count;
             if (old != m_count)
-                logerror("%s: PS2 timer read: COUNT (%08x)\n", machine().describe_context(), ret);
+                logerror("%s: PS2 timer read: COUNT (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
             break;
         }
 
         case 0x02:
             ret = m_mode;
-            logerror("%s: PS2 timer read: MODE (%08x)\n", machine().describe_context(), ret);
+            logerror("%s: PS2 timer read: MODE (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
             break;
 
         case 0x04:
             ret = m_compare;
-            logerror("%s: PS2 timer read: COMP (%08x)\n", machine().describe_context(), ret);
+            logerror("%s: PS2 timer read: COMP (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
             break;
 
         case 0x06:
             ret = m_hold;
-            logerror("%s: PS2 timer read: HOLD (%08x)\n", machine().describe_context(), ret);
+            logerror("%s: PS2 timer read: HOLD (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
             break;
 
         default:
@@ -232,7 +232,7 @@ WRITE32_MEMBER(ps2_timer_device::write)
     {
         case 0x00:
             m_count = data;
-            logerror("%s: PS2 timer write: COUNT = %08x\n", machine().describe_context(), data);
+            logerror("%s: PS2 timer write: COUNT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
             update_compare_timer();
             update_overflow_timer();
             break;
@@ -243,7 +243,7 @@ WRITE32_MEMBER(ps2_timer_device::write)
 
         case 0x04:
         {
-            logerror("%s: PS2 timer write: COMP = %08x\n", machine().describe_context(), data);
+            logerror("%s: PS2 timer write: COMP = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			if (m_compare == data)
 				break;
 
@@ -257,7 +257,7 @@ WRITE32_MEMBER(ps2_timer_device::write)
         	if (!m_can_hold)
         		break;
 
-            logerror("%s: PS2 timer write: HOLD = %08x\n", machine().describe_context(), data);
+            logerror("%s: PS2 timer write: HOLD = %08x & %08x\n", machine().describe_context(), data, mem_mask);
             if (m_hold == data)
             	break;
 

@@ -432,13 +432,13 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC72 - probably shared between CPUs
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, retofinv_state, irq0_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, retofinv_state, coinlockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("68705", taito68705_mcu_device, reset_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, retofinv_state, irq1_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC72 - probably shared between CPUs
+	mainlatch.q_out_cb<0>().set(FUNC(retofinv_state::irq0_ack_w));
+	mainlatch.q_out_cb<1>().set(FUNC(retofinv_state::coinlockout_w));
+	mainlatch.q_out_cb<2>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
+	mainlatch.q_out_cb<3>().set(m_68705, FUNC(taito68705_mcu_device::reset_w)).invert();
+	mainlatch.q_out_cb<4>().set(FUNC(retofinv_state::irq1_ack_w));
+	mainlatch.q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

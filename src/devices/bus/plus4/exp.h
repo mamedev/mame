@@ -67,16 +67,16 @@
 
 
 #define MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &downcast<plus4_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<plus4_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(_read) \
-	devcb = &downcast<plus4_expansion_slot_device &>(*device).set_cd_rd_callback(DEVCB_##_read);
+	downcast<plus4_expansion_slot_device &>(*device).set_cd_rd_callback(DEVCB_##_read);
 
 #define MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(_write) \
-	devcb = &downcast<plus4_expansion_slot_device &>(*device).set_cd_wr_callback(DEVCB_##_write);
+	downcast<plus4_expansion_slot_device &>(*device).set_cd_wr_callback(DEVCB_##_write);
 
 #define MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(_write) \
-	devcb = &downcast<plus4_expansion_slot_device &>(*device).set_aec_wr_callback(DEVCB_##_write);
+	downcast<plus4_expansion_slot_device &>(*device).set_aec_wr_callback(DEVCB_##_write);
 
 
 

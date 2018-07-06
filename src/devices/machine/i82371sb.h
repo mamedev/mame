@@ -25,10 +25,10 @@
 
 
 #define MCFG_I82371SB_SMI_CB(_devcb) \
-	devcb = &downcast<i82371sb_isa_device &>(*device).set_smi_callback(DEVCB_##_devcb);
+	downcast<i82371sb_isa_device &>(*device).set_smi_callback(DEVCB_##_devcb);
 
 #define MCFG_I82371SB_BOOT_STATE_HOOK(_devcb) \
-	devcb = &downcast<i82371sb_isa_device &>(*device).set_boot_state_hook(DEVCB_##_devcb);
+	downcast<i82371sb_isa_device &>(*device).set_boot_state_hook(DEVCB_##_devcb);
 
 class i82371sb_isa_device : public pci_device {
 public:
@@ -182,10 +182,10 @@ private:
 DECLARE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device)
 
 #define MCFG_I82371SB_IDE_IRQ_PRI_CB(_devcb) \
-	devcb = &downcast<i82371sb_ide_device &>(*device).set_irq_pri_callback(DEVCB_##_devcb);
+	downcast<i82371sb_ide_device &>(*device).set_irq_pri_callback(DEVCB_##_devcb);
 
 #define MCFG_I82371SB_IDE_IRQ_SEC_CB(_devcb) \
-	devcb = &downcast<i82371sb_ide_device &>(*device).set_irq_sec_callback(DEVCB_##_devcb);
+	downcast<i82371sb_ide_device &>(*device).set_irq_sec_callback(DEVCB_##_devcb);
 
 #define MCFG_I82371SB_IDE_INTERRUPTS(_tag, _dev, _irq_pri, _irq_sec) \
 	MCFG_I82371SB_IDE_IRQ_PRI_CB(WRITELINE(_tag, _dev, _irq_pri)) \

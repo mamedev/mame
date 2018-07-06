@@ -141,7 +141,7 @@ private:
 /******************************************************************************/
 
 #define MCFG_DMUX_READY_HANDLER( _intcallb ) \
-	devcb = &downcast<bus::ti99::internal::datamux_device &>(*device).set_ready_callback(DEVCB_##_intcallb);
+	downcast<bus::ti99::internal::datamux_device &>(*device).set_ready_callback(DEVCB_##_intcallb);
 
 } } } // end namespace bus::ti99::internal
 

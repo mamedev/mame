@@ -368,24 +368,24 @@ MACHINE_CONFIG_START(v100_state::v100)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000), 170 * CHAR_WIDTH, 0, 132 * CHAR_WIDTH, 312, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(v100_state, screen_update)
 
-	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(47'736'000) / CHAR_WIDTH)
-	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_TMS9927_HSYN_CALLBACK(WRITELINE(*this, v100_state, picu_r_w<7>)) MCFG_DEVCB_INVERT
-	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(*this, v100_state, picu_r_w<6>)) MCFG_DEVCB_INVERT
+	CRT5037(config, m_vtac, XTAL(47'736'000) / CHAR_WIDTH);
+	m_vtac->set_char_width(CHAR_WIDTH);
+	m_vtac->set_screen("screen");
+	m_vtac->hsyn_wr_callback().set(FUNC(v100_state::picu_r_w<7>)).invert();
+	m_vtac->vsyn_wr_callback().set(FUNC(v100_state::picu_r_w<6>)).invert();
 
-	MCFG_DEVICE_ADD("picu", I8214, XTAL(47'736'000) / 12)
-	MCFG_I8214_INT_CALLBACK(ASSERTLINE("maincpu", 0))
+	I8214(config, m_picu, XTAL(47'736'000) / 12);
+	m_picu->int_wr_callback().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, v100_state, ppi_porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITELINE("earom", er1400_device, c3_w)) MCFG_DEVCB_BIT(6) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("earom", er1400_device, c2_w)) MCFG_DEVCB_BIT(5) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("earom", er1400_device, c1_w)) MCFG_DEVCB_BIT(4) MCFG_DEVCB_INVERT
-	MCFG_I8255_OUT_PORTC_CB(WRITELINE("earom", er1400_device, data_w)) MCFG_DEVCB_BIT(6) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("earom", er1400_device, clock_w)) MCFG_DEVCB_BIT(0) MCFG_DEVCB_INVERT
+	i8255_device &ppi(I8255(config, "ppi", 0));
+	ppi.out_pa_callback().set(FUNC(v100_state::ppi_porta_w));
+	ppi.out_pb_callback().set(m_earom, FUNC(er1400_device::c3_w)).bit(6).invert();
+	ppi.out_pb_callback().append(m_earom, FUNC(er1400_device::c2_w)).bit(5).invert();
+	ppi.out_pb_callback().append(m_earom, FUNC(er1400_device::c1_w)).bit(4).invert();
+	ppi.out_pc_callback().set(m_earom, FUNC(er1400_device::data_w)).bit(6).invert();
+	ppi.out_pc_callback().append(m_earom, FUNC(er1400_device::clock_w)).bit(0).invert();
 
-	MCFG_DEVICE_ADD("earom", ER1400, 0)
+	ER1400(config, m_earom, 0);
 MACHINE_CONFIG_END
 
 

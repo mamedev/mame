@@ -14,16 +14,16 @@
 #pragma once
 
 #define MCFG_1MB5_IRL_HANDLER(_devcb)                                   \
-	devcb = &downcast<hp_1mb5_device &>(*device).set_irl_handler(DEVCB_##_devcb);
+	downcast<hp_1mb5_device &>(*device).set_irl_handler(DEVCB_##_devcb);
 
 #define MCFG_1MB5_HALT_HANDLER(_devcb)                                  \
-	devcb = &downcast<hp_1mb5_device &>(*device).set_halt_handler(DEVCB_##_devcb);
+	downcast<hp_1mb5_device &>(*device).set_halt_handler(DEVCB_##_devcb);
 
 #define MCFG_1MB5_RESET_HANDLER(_devcb)                                 \
-	devcb = &downcast<hp_1mb5_device &>(*device).set_reset_handler(DEVCB_##_devcb);
+	downcast<hp_1mb5_device &>(*device).set_reset_handler(DEVCB_##_devcb);
 
 #define MCFG_1MB5_INT_HANDLER(_devcb)                                   \
-	devcb = &downcast<hp_1mb5_device &>(*device).set_int_handler(DEVCB_##_devcb);
+	downcast<hp_1mb5_device &>(*device).set_int_handler(DEVCB_##_devcb);
 
 class hp_1mb5_device : public device_t
 {

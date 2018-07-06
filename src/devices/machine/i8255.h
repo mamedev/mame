@@ -40,29 +40,29 @@
 //**************************************************************************
 
 #define MCFG_I8255_IN_PORTA_CB(_devcb) \
-	devcb = &downcast<i8255_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
+	downcast<i8255_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_I8255_IN_PORTB_CB(_devcb) \
-	devcb = &downcast<i8255_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
+	downcast<i8255_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_I8255_IN_PORTC_CB(_devcb) \
-	devcb = &downcast<i8255_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
+	downcast<i8255_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_I8255_OUT_PORTA_CB(_devcb) \
-	devcb = &downcast<i8255_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
+	downcast<i8255_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_I8255_OUT_PORTB_CB(_devcb) \
-	devcb = &downcast<i8255_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
+	downcast<i8255_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_I8255_OUT_PORTC_CB(_devcb) \
-	devcb = &downcast<i8255_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
+	downcast<i8255_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
 
 // output state when pins are in tri-state, default 0xff
 #define MCFG_I8255_TRISTATE_PORTA_CB(_devcb) \
-	devcb = &downcast<i8255_device &>(*device).set_tri_pa_callback(DEVCB_##_devcb);
+	downcast<i8255_device &>(*device).set_tri_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_I8255_TRISTATE_PORTB_CB(_devcb) \
-	devcb = &downcast<i8255_device &>(*device).set_tri_pb_callback(DEVCB_##_devcb);
+	downcast<i8255_device &>(*device).set_tri_pb_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -84,6 +84,14 @@ public:
 	template <class Object> devcb_base &set_out_pc_callback(Object &&cb) { return m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_tri_pa_callback(Object &&cb) { return m_tri_pa_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_tri_pb_callback(Object &&cb) { return m_tri_pb_cb.set_callback(std::forward<Object>(cb)); }
+	auto in_pa_callback()  { return m_in_pa_cb.bind(); }
+	auto in_pb_callback()  { return m_in_pb_cb.bind(); }
+	auto in_pc_callback()  { return m_in_pc_cb.bind(); }
+	auto out_pa_callback() { return m_out_pa_cb.bind(); }
+	auto out_pb_callback() { return m_out_pb_cb.bind(); }
+	auto out_pc_callback() { return m_out_pc_cb.bind(); }
+	auto tri_pa_callback() { return m_tri_pa_cb.bind(); }
+	auto tri_pb_callback() { return m_tri_pb_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

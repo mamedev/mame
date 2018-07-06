@@ -358,19 +358,19 @@ MACHINE_CONFIG_START(taotaido_state::taotaido)
 	MCFG_DEVICE_IO_MAP(sound_port_map)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_DEVICE_ADD("io1", VS9209, 0)
-	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_VS9209_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
-	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
-	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
-	MCFG_VS9209_IN_PORTF_CB(IOPORT("DSW3"))
-	MCFG_VS9209_OUT_PORTG_CB(WRITE8(*this, taotaido_state, unknown_output_w))
-	MCFG_VS9209_IN_PORTH_CB(IOPORT("JP"))
+	vs9209_device &io1(VS9209(config, "io1", 0));
+	io1.porta_input_cb().set_ioport("P1");
+	io1.portb_input_cb().set_ioport("P2");
+	io1.portc_input_cb().set_ioport("SYSTEM");
+	io1.portd_input_cb().set_ioport("DSW1");
+	io1.porte_input_cb().set_ioport("DSW2");
+	io1.portf_input_cb().set_ioport("DSW3");
+	io1.portg_output_cb().set(FUNC(taotaido_state::unknown_output_w));
+	io1.porth_input_cb().set_ioport("JP");
 
-	MCFG_DEVICE_ADD("io2", VS9209, 0)
-	MCFG_VS9209_IN_PORTA_CB(IOPORT("P3"))                   // used only by taotaida
-	MCFG_VS9209_IN_PORTB_CB(IOPORT("P4"))                   // used only by taotaida
+	vs9209_device &io2(VS9209(config, "io2", 0));
+	io2.porta_input_cb().set_ioport("P3");                   // used only by taotaida
+	io2.portb_input_cb().set_ioport("P4");                   // used only by taotaida
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 

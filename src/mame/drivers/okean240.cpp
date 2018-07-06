@@ -533,10 +533,10 @@ MACHINE_CONFIG_START(okean240_state::okean240t)
 
 	MCFG_DEVICE_ADD("ppie", I8255, 0)
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK1(3072000) // artificial rate
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<1>(3072000); // artificial rate
+	pit.out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
+	pit.out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 

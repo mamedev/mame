@@ -24,7 +24,7 @@
 	devcb = downcast<mackbd_device &>(*device).set_clkout_handler(DEVCB_##_devcb);
 
 #define MCFG_MACKBD_DATAOUT_HANDLER(_devcb) \
-	devcb = &downcast<mackbd_device &>(*device).set_dataout_handler(DEVCB_##_devcb);
+	downcast<mackbd_device &>(*device).set_dataout_handler(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

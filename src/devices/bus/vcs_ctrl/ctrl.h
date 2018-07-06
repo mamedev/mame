@@ -27,7 +27,7 @@
 
 
 #define MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(_write) \
-	devcb = &downcast<vcs_control_port_device &>(*device).set_trigger_wr_callback(DEVCB_##_write);
+	downcast<vcs_control_port_device &>(*device).set_trigger_wr_callback(DEVCB_##_write);
 
 
 

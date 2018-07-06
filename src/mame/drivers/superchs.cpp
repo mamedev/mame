@@ -244,14 +244,14 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 	MCFG_ADC0808_IN1_CB(IOPORT("ACCEL"))
 	MCFG_ADC0808_IN2_CB(READ8(*this, superchs_state, volume_r))
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_1_CB(IOPORT("COINS"))
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("SWITCHES"))
-	MCFG_TC0510NIO_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_TC0510NIO_WRITE_3_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, superchs_state, coin_word_w))
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_1_callback().set_ioport("COINS");
+	tc0510nio.read_2_callback().set_ioport("SWITCHES");
+	tc0510nio.read_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
+	tc0510nio.write_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
+	tc0510nio.write_3_callback().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write)).bit(6);
+	tc0510nio.write_3_callback().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write)).bit(4);
+	tc0510nio.write_4_callback().set(FUNC(superchs_state::coin_word_w));
 	// there are 'vibration' control bits somewhere!
 
 	/* video hardware */

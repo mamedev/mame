@@ -80,13 +80,13 @@ MACHINE_CONFIG_START(segam1audio_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD(UART_TAG, I8251, 8000000) // T82C51, clock unknown
-	MCFG_I8251_RXRDY_HANDLER(INPUTLINE(M68000_TAG, M68K_IRQ_2))
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, segam1audio_device, output_txd))
+	I8251(config, m_uart, 8000000); // T82C51, clock unknown
+	m_uart->rxrdy_handler().set_inputline(m_audiocpu, M68K_IRQ_2);
+	m_uart->txd_handler().set(FUNC(segam1audio_device::output_txd));
 
-	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(UART_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(UART_TAG, i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 MACHINE_CONFIG_END
 
 //**************************************************************************

@@ -6,9 +6,6 @@
 
 #pragma once
 
-#define MCFG_GP9001_VINT_CALLBACK(_devcb) \
-	devcb = &downcast<gp9001vdp_device &>(*device).set_vint_out_cb(DEVCB_##_devcb);
-
 class gp9001vdp_device : public device_t,
 							public device_gfx_interface,
 							public device_video_interface,
@@ -22,14 +19,14 @@ class gp9001vdp_device : public device_t,
 public:
 	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class Object> devcb_base &set_vint_out_cb(Object &&obj) { return m_vint_out_cb.set_callback(std::forward<Object>(obj)); }
+	auto vint_out_cb() { return m_vint_out_cb.bind(); }
 
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t* primap );
-	void gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, int layer, const uint8_t* priremap, const uint8_t* pri_enable );
-	void gp9001_render_vdp( bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gp9001_screen_eof(void);
-	void create_tilemaps(void);
-	void init_scroll_regs(void);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t* primap);
+	void gp9001_draw_custom_tilemap(bitmap_ind16 &bitmap, int layer, const uint8_t* priremap, const uint8_t* pri_enable);
+	void gp9001_render_vdp(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void gp9001_screen_eof();
+	void create_tilemaps();
+	void init_scroll_regs();
 
 	bitmap_ind8 *custom_priority_bitmap;
 

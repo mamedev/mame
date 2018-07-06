@@ -65,7 +65,7 @@ enum
 ***************************************************************************/
 
 #define MCFG_JAGUAR_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<jaguar_cpu_device &>(*device).set_int_func(DEVCB_##_devcb);
+	downcast<jaguar_cpu_device &>(*device).set_int_func(DEVCB_##_devcb);
 
 
 /***************************************************************************

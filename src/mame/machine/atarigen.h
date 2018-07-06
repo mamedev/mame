@@ -35,7 +35,7 @@
 #define MCFG_ATARI_SOUND_COMM_ADD(_tag, _soundcpu, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_SOUND_COMM, 0) \
 	downcast<atari_sound_comm_device &>(*device).set_sound_cpu(_soundcpu); \
-	devcb = &downcast<atari_sound_comm_device &>(*device).set_main_int_cb(DEVCB_##_intcb);
+	downcast<atari_sound_comm_device &>(*device).set_main_int_cb(DEVCB_##_intcb);
 
 
 

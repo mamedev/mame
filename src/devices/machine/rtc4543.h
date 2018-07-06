@@ -24,7 +24,7 @@
 		MCFG_DEVICE_ADD((tag), RTC4543, (clock))
 
 #define MCFG_RTC4543_DATA_CALLBACK(cb) \
-		devcb = &downcast<rtc4543_device &>(*device).set_data_cb(DEVCB_##cb);
+		downcast<rtc4543_device &>(*device).set_data_cb(DEVCB_##cb);
 
 #define MCFG_JRC6355E_ADD(tag, clock) \
 		MCFG_DEVICE_ADD((tag), JRC6355E, (clock))

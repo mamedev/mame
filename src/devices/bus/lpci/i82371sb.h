@@ -67,9 +67,9 @@ private:
 DECLARE_DEVICE_TYPE(I82371SB, i82371sb_device)
 
 #define MCFG_I82371SB_SMI_CB(_devcb) \
-	devcb = &downcast<i82371sb_device &>(*device).set_smi_callback(DEVCB_##_devcb);
+	downcast<i82371sb_device &>(*device).set_smi_callback(DEVCB_##_devcb);
 
 #define MCFG_I82371SB_BOOT_STATE_HOOK(_devcb) \
-	devcb = &downcast<i82371sb_device &>(*device).set_boot_state_hook(DEVCB_##_devcb);
+	downcast<i82371sb_device &>(*device).set_boot_state_hook(DEVCB_##_devcb);
 
 #endif // MAME_BUS_LPCI_I82371SB_H

@@ -322,9 +322,9 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_DEVICE_ADD("scc", SCC8530N, 32_MHz_XTAL / 2 / 2)
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("monitor_drmath", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("monitor_drmath", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc", z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("scc", z80scc_device, dcdb_w)) MCFG_DEVCB_XOR(1)
+	rs232_port_device &monitor_drmath(RS232_PORT(config, "monitor_drmath", default_rs232_devices, nullptr));
+	monitor_drmath.rxd_handler().set("scc", FUNC(z80scc_device::rxb_w));
+	monitor_drmath.dcd_handler().set("scc", FUNC(z80scc_device::dcdb_w)).exor(1);
 
 	MCFG_DEVICE_ADD("audiocpu", I8051, 11.0592_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(soundmem_prg)
@@ -401,7 +401,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(micro3d_state::botss11)
 	micro3d(config);
 	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0844_CH1_CB(NOOP)
+	MCFG_ADC0844_CH1_CB(CONSTANT(0))
 MACHINE_CONFIG_END
 
 

@@ -22,8 +22,8 @@
  * Another reference: http://www.eecs.berkeley.edu/Pubs/TechRpts/1986/CSD-86-289.pdf
  *
  * TODO
+ *   - rework cammu addressing (to allow unaligned tlb access)
  *   - fault register values
- *   - c3 protection faults
  *   - hard-wired and dynamic tlb
  *   - cache
  *   - bus errors
@@ -250,17 +250,21 @@ bool cammu_device::memory_translate(const u32 ssw, const int spacenum, const int
 cammu_device::translated_t cammu_device::translate_address(const u32 ssw, const u32 virtual_address, const access_size size, const access_type mode)
 {
 	// get effective user/supervisor mode
-	const bool user = mode == EXECUTE ? ssw & SSW_U : ssw & (SSW_U | SSW_UU);
+	const bool user = (mode == EXECUTE) ? (ssw & SSW_U) : (ssw & (SSW_U | SSW_UU));
 
 	// check for alignment faults
 	if (!machine().side_effects_disabled() && get_alignment())
 	{
 		if ((mode == EXECUTE && (virtual_address & 0x1)) || (mode != EXECUTE && virtual_address & (size - 1)))
 		{
-			set_fault_address(virtual_address);
-			m_exception_func(mode == EXECUTE ? EXCEPTION_I_ALIGNMENT_FAULT : EXCEPTION_D_ALIGNMENT_FAULT);
+			// FIXME: tlb access is not aligned; this hack lets us ignore for now
+			if (mode == EXECUTE || user || (virtual_address & 0xfffff900) != 0x00004800)
+			{
+				set_fault_address(virtual_address);
+				m_exception_func(mode == EXECUTE ? EXCEPTION_I_ALIGNMENT_FAULT : EXCEPTION_D_ALIGNMENT_FAULT);
 
-			return { nullptr, 0 };
+				return { nullptr, 0 };
+			}
 		}
 	}
 
@@ -309,23 +313,44 @@ cammu_device::translated_t cammu_device::translate_address(const u32 ssw, const 
 	}
 
 	// check for protection level faults
-	if (!machine().side_effects_disabled() && !get_access(mode, pte.entry, ssw))
+	if (!machine().side_effects_disabled())
 	{
-		LOG("%s protection fault address 0x%08x ssw 0x%08x pte 0x%08x (%s)\n",
-			mode == EXECUTE ? "execute" : mode == READ ? "read" : "write",
-			virtual_address, ssw, pte.entry, machine().describe_context());
+		if ((mode == EXECUTE) && !get_access(mode, pte.entry, ssw))
+		{
+			LOGMASKED(LOG_ACCESS, "execute protection fault address 0x%08x ssw 0x%08x pte 0x%08x (%s)\n",
+				virtual_address, ssw, pte.entry, machine().describe_context());
 
-		set_fault_address(virtual_address);
-		m_exception_func(
-			mode == EXECUTE ? EXCEPTION_I_EXECUTE_PROTECT_FAULT :
-			mode == READ ? EXCEPTION_D_READ_PROTECT_FAULT :
-			EXCEPTION_D_WRITE_PROTECT_FAULT);
+			set_fault_address(virtual_address);
+			m_exception_func(EXCEPTION_I_EXECUTE_PROTECT_FAULT);
 
-		return { nullptr, 0 };
+			return { nullptr, 0 };
+		}
+
+		if ((mode & READ) && !get_access(READ, pte.entry, ssw))
+		{
+			LOGMASKED(LOG_ACCESS, "read protection fault address 0x%08x ssw 0x%08x pte 0x%08x (%s)\n",
+				virtual_address, ssw, pte.entry, machine().describe_context());
+
+			set_fault_address(virtual_address);
+			m_exception_func(EXCEPTION_D_READ_PROTECT_FAULT);
+
+			return { nullptr, 0 };
+		}
+
+		if ((mode & WRITE) && !get_access(WRITE, pte.entry, ssw))
+		{
+			LOGMASKED(LOG_ACCESS, "write protection fault address 0x%08x ssw 0x%08x pte 0x%08x (%s)\n",
+				virtual_address, ssw, pte.entry, machine().describe_context());
+
+			set_fault_address(virtual_address);
+			m_exception_func(EXCEPTION_D_WRITE_PROTECT_FAULT);
+
+			return { nullptr, 0 };
+		}
 	}
 
 	// set pte referenced and dirty flags
-	if (mode & WRITE && !(pte.entry & PTE_D))
+	if ((mode & WRITE) && !(pte.entry & PTE_D))
 		m_space[ST0]->write_dword(pte.address, pte.entry | PTE_D | PTE_R);
 	else if (!(pte.entry & PTE_R))
 		m_space[ST0]->write_dword(pte.address, pte.entry | PTE_R);
@@ -380,37 +405,25 @@ bool cammu_c4_device::get_access(const access_type mode, const u32 pte, const u3
 	{
 	case READ: return pte & 0x20;
 	case WRITE: return pte & 0x10;
-	case RMW: return (pte & 0x30) == 0x30;
 	case EXECUTE: return pte & 0x08;
-	}
 
-	return false;
+	default: return false;
+	}
 }
 
 bool cammu_c3_device::get_access(const access_type mode, const u32 pte, const u32 ssw) const
 {
-	// FIXME: logic is not correct yet
-	return true;
+	const u8 pl = (pte & PTE_PL) >> 3;
 
-	const u8 column = (mode == EXECUTE ? i_cammu_column : d_cammu_column)[(ssw & SSW_PL) >> 9];
-	const u8 access = cammu_matrix[column][(pte & PTE_PL) >> 3];
-
-	switch (mode)
-	{
-	case READ: return access & R;
-	case WRITE: return access & W;
-	case RMW: return (access & (R | W)) == (R | W);
-	case EXECUTE: return access & E;
-	}
-
-	return false;
+	// special case for user data mode
+	if ((mode != EXECUTE) && !(ssw & SSW_U) && (ssw & SSW_UU))
+		return protection_matrix[(ssw & SSW_KU) ? 2 : 3][pl] & mode;
+	else
+		return protection_matrix[((ssw ^ SSW_K) & (SSW_U | SSW_K)) >> 29][pl] & mode;
 }
 
 // C100/C300 CAMMU protection level matrix
-const u8 cammu_c3_device::i_cammu_column[] = { 1, 1, 0, 0, 1, 1, 0, 0, 3, 3, 2, 2, 3, 3, 2, 2 };
-const u8 cammu_c3_device::d_cammu_column[] = { 1, 1, 0, 0, 3, 2, 3, 2, 3, 3, 2, 2, 3, 3, 2, 2 };
-
-const cammu_c3_device::c3_access_t cammu_c3_device::cammu_matrix[][16] =
+const u8 cammu_c3_device::protection_matrix[4][16] =
 {
 	{ RW,  RW,  RW,  RW,  RW,  RW,  RW,  RWE, RE,  R,   R,   R,   N,   N,   N,   N },
 	{ N,   RW,  RW,  RW,  RW,  RW,  R,   RWE, N,   RE,  R,   R,   RE,  N,   N,   N },

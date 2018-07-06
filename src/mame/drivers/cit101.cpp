@@ -335,7 +335,7 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_I8085A_SID(GND) // used to time NVR reads
+	MCFG_I8085A_SID(CONSTANT(0)) // used to time NVR reads
 	MCFG_I8085A_SOD(WRITELINE(*this, cit101_state, blink_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -385,24 +385,24 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	// OUT2 might be used for an internal expansion similar to the VT100 STP.
 	// The output appears to be fixed to a 307.2 kHz rate; turning this off boosts driver performance.
 
-	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
-	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
-	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
-	MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("comuart", i8251_device, write_txc))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("comuart", i8251_device, write_rxc))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("kbduart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("kbduart", i8251_device, write_rxc))
+	pit8253_device &pit1(PIT8253(config, "pit1", 0));
+	pit1.set_clk<0>(6.144_MHz_XTAL / 4);
+	pit1.set_clk<1>(6.144_MHz_XTAL / 4);
+	pit1.set_clk<2>(6.144_MHz_XTAL / 4);
+	pit1.out_handler<0>().set("comuart", FUNC(i8251_device::write_txc));
+	pit1.out_handler<1>().set("comuart", FUNC(i8251_device::write_rxc));
+	pit1.out_handler<2>().set("kbduart", FUNC(i8251_device::write_txc));
+	pit1.out_handler<2>().append("kbduart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, cit101_state, nvr_address_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, cit101_state, nvr_data_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cit101_state, nvr_data_w))
-	MCFG_I8255_IN_PORTC_CB(READLINE("comm", rs232_port_device, cts_r)) MCFG_DEVCB_BIT(0)
-	MCFG_DEVCB_CHAIN_INPUT(READLINE("comm", rs232_port_device, dcd_r)) MCFG_DEVCB_BIT(1) // tied to DSR for loopback test
-	MCFG_DEVCB_CHAIN_INPUT(READLINE("comm", rs232_port_device, ri_r)) MCFG_DEVCB_BIT(2) // tied to CTS for loopback test
-	MCFG_DEVCB_CHAIN_INPUT(READLINE("comm", rs232_port_device, si_r)) MCFG_DEVCB_BIT(3) // tied to CTS for loopback test
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cit101_state, nvr_control_w))
+	i8255_device &ppi(I8255A(config, "ppi", 0));
+	ppi.out_pa_callback().set(FUNC(cit101_state::nvr_address_w));
+	ppi.in_pb_callback().set(FUNC(cit101_state::nvr_data_r));
+	ppi.out_pb_callback().set(FUNC(cit101_state::nvr_data_w));
+	ppi.in_pc_callback().set("comm", FUNC(rs232_port_device::cts_r)).lshift(0);
+	ppi.in_pc_callback().append("comm", FUNC(rs232_port_device::dcd_r)).lshift(1); // tied to DSR for loopback test
+	ppi.in_pc_callback().append("comm", FUNC(rs232_port_device::ri_r)).lshift(2); // tied to CTS for loopback test
+	ppi.in_pc_callback().append("comm", FUNC(rs232_port_device::si_r)).lshift(3); // tied to CTS for loopback test
+	ppi.out_pc_callback().set(FUNC(cit101_state::nvr_control_w));
 
 	MCFG_DEVICE_ADD("nvr", ER2055, 0)
 MACHINE_CONFIG_END

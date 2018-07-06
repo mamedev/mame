@@ -184,7 +184,7 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, mephisto_pinball_state, ay8910_read))
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, mephisto_pinball_state, ay8910_write))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, mephisto_pinball_state, t0_t1_w))
-	MCFG_MCS51_SERIAL_RX_CB(NOOP) // from MUART
+	MCFG_MCS51_SERIAL_RX_CB(CONSTANT(0)) // from MUART
 
 	SPEAKER(config, "mono").front_center();
 

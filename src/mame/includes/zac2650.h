@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Coates
+#ifndef MAME_INCLUDES_ZAC2650_H
+#define MAME_INCLUDES_ZAC2650_H
+
+#pragma once
+
 #include "machine/s2636.h"
 #include "emupal.h"
 #include "screen.h"
@@ -7,15 +12,16 @@
 class zac2650_state : public driver_device
 {
 public:
-	zac2650_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	zac2650_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_s2636(*this, "s2636"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
-		m_s2636_0_ram(*this, "s2636_0_ram") { }
+		m_s2636_0_ram(*this, "s2636_0_ram")
+	{ }
 
 	void tinvader(machine_config &config);
 
@@ -51,3 +57,5 @@ private:
 
 	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ZAC2650_H

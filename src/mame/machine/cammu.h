@@ -12,7 +12,7 @@
 	downcast<cammu_c4_device &>(*device).set_cammu_id(_id);
 
 #define MCFG_CAMMU_EXCEPTION_CB(_exceptioncb) \
-	devcb = &downcast<cammu_device &>(*device).set_exception_callback(DEVCB_##_exceptioncb);
+	downcast<cammu_device &>(*device).set_exception_callback(DEVCB_##_exceptioncb);
 
 #define MCFG_CAMMU_LINK(_tag) \
 	downcast<cammu_c3_device &>(*device).add_linked(_tag);
@@ -120,7 +120,7 @@ public:
 
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<T(T)>>::value, bool> modify(const u32 ssw, const u32 address, U &&apply)
 	{
-		translated_t t = translate_address(ssw, address, access_size(sizeof(T)), RMW);
+		translated_t t = translate_address(ssw, address, access_size(sizeof(T)), access_type(READ | WRITE));
 
 		if (t.space != nullptr)
 		{
@@ -145,7 +145,32 @@ public:
 			switch (sizeof(T))
 			{
 			case 2: apply(T(t.space->read_word(t.address))); break;
-			case 4: apply(T(t.space->read_dword_unaligned(t.address))); break;
+			case 4:
+				{
+					// check for unaligned access
+					if (address & 0x2)
+					{
+						// check for page span
+						if ((address & CAMMU_PAGE_MASK) == (CAMMU_PAGE_SIZE - 2))
+						{
+							translated_t u = translate_address(ssw, address + 2, access_size(sizeof(u16)), EXECUTE);
+							if (u.space != nullptr)
+							{
+								const u16 lsw = t.space->read_word(t.address);
+								const u16 msw = u.space->read_word(u.address);
+
+								apply((T(msw) << 16) | lsw);
+							}
+							else
+								return false;
+						}
+						else
+							apply(T(t.space->read_dword_unaligned(t.address)));
+					}
+					else
+						apply(T(t.space->read_dword(t.address)));
+				}
+			break;
 			default: fatalerror("unhandled fetch size %d\n", access_size(sizeof(T)));
 			}
 
@@ -177,8 +202,15 @@ protected:
 	{
 		READ    = 1,
 		WRITE   = 2,
-		RMW     = 3,
-		EXECUTE = 4
+		EXECUTE = 4,
+
+		// matrix abbreviations and combinations
+		N       = 0,
+		R       = READ,
+		W       = WRITE,
+		RW      = READ | WRITE,
+		RE      = READ | EXECUTE,
+		RWE     = READ | WRITE | EXECUTE,
 	};
 
 private:
@@ -512,20 +544,7 @@ protected:
 	virtual void set_fault_address(const u32 va) override { m_fault = va; }
 
 private:
-	enum c3_access_t : u8
-	{
-		N   = 0, // no access
-		R   = 1, // read permitted
-		W   = 2, // write permitted
-		RW  = 3, // read and write permitted
-		E   = 4, // execute permitted
-		RE  = 5, // read and execute permitted
-		RWE = 7  // read, write and execute permitted
-	};
-
-	static const u8 i_cammu_column[];
-	static const u8 d_cammu_column[];
-	static const c3_access_t cammu_matrix[][16];
+	static const u8 protection_matrix[4][16];
 
 	u32 m_s_pdo;
 	u32 m_u_pdo;
