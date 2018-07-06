@@ -29,6 +29,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void ashnojoe(machine_config &config);
+
+	void init_ashnojoe();
+
+private:
 	/* memory pointers */
 	uint16_t *    m_tileram_1;
 	required_shared_ptr<uint16_t> m_tileram_3;
@@ -74,7 +79,7 @@ public:
 	DECLARE_WRITE16_MEMBER(joe_tilemaps_yscroll_w);
 	DECLARE_WRITE8_MEMBER(ym2203_write_a);
 	DECLARE_WRITE8_MEMBER(ym2203_write_b);
-	void init_ashnojoe();
+
 	TILE_GET_INFO_MEMBER(get_joe_tile_info);
 	TILE_GET_INFO_MEMBER(get_joe_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_joe_tile_info_3);
@@ -87,7 +92,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_ashnojoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(ashnojoe_vclk_cb);
-	void ashnojoe(machine_config &config);
+
 	void ashnojoe_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);

@@ -714,6 +714,26 @@ public:
 	{
 	}
 
+	void cobra(machine_config &config);
+
+	void init_racjamdx();
+	void init_bujutsu();
+	void init_cobra();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+	uint8_t m_gfx_unk_flag;
+	uint32_t m_gfx_re_command_word1;
+	uint32_t m_gfx_re_command_word2;
+	int m_gfx_re_word_count;
+	int m_gfx_re_status;
+	uint32_t m_gfx_unk_status;
+	int m_gfx_fifo_loopback;
+
+	cobra_fifo *m_gfxfifo_in;
+	cobra_fifo *m_gfxfifo_out;
+
+private:
 	required_device<ppc_device> m_maincpu;
 	required_device<ppc4xx_device> m_subcpu;
 	required_device<ppc_device> m_gfxcpu;
@@ -777,8 +797,6 @@ public:
 
 	std::unique_ptr<cobra_renderer> m_renderer;
 
-	cobra_fifo *m_gfxfifo_in;
-	cobra_fifo *m_gfxfifo_out;
 	cobra_fifo *m_m2sfifo;
 	cobra_fifo *m_s2mfifo;
 
@@ -817,16 +835,9 @@ public:
 	int m_sub_psac_count;
 	uint32_t m_sub_interrupt;
 
-	uint8_t m_gfx_unk_flag;
-	uint32_t m_gfx_re_command_word1;
-	uint32_t m_gfx_re_command_word2;
-	int m_gfx_re_word_count;
-	int m_gfx_re_status;
-	uint32_t m_gfx_unk_status;
-
 	uint64_t m_gfx_fifo_mem[256];
 	int m_gfx_fifo_cache_addr;
-	int m_gfx_fifo_loopback;
+
 	int m_gfx_unknown_v1;
 	int m_gfx_status_byte;
 
@@ -836,10 +847,6 @@ public:
 	std::unique_ptr<int16_t[]> m_sound_dma_buffer_r;
 	uint32_t m_sound_dma_ptr;
 
-	void init_racjamdx();
-	void init_bujutsu();
-	void init_cobra();
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -847,7 +854,7 @@ public:
 	INTERRUPT_GEN_MEMBER(cobra_vblank);
 	void cobra_video_exit();
 	int decode_debug_state_value(int v);
-	void cobra(machine_config &config);
+
 	void cobra_gfx_map(address_map &map);
 	void cobra_main_map(address_map &map);
 	void cobra_sub_map(address_map &map);

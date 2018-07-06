@@ -44,7 +44,7 @@ public:
 
 	void bowltry(machine_config &config);
 
-protected:
+private:
 	void bowltry_map(address_map &map);
 
 	uint32_t screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

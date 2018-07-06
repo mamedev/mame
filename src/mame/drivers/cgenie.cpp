@@ -52,9 +52,14 @@ public:
 		m_rs232_dcd(1)
 	{}
 
+	void cgenie(machine_config &config);
+
 	void init_cgenie_eu();
 	void init_cgenie_nz();
 
+	DECLARE_INPUT_CHANGED_MEMBER(rst_callback);
+
+private:
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -67,18 +72,15 @@ public:
 	DECLARE_READ8_MEMBER(control_r);
 
 	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_INPUT_CHANGED_MEMBER(rst_callback);
 
 	DECLARE_WRITE_LINE_MEMBER(rs232_rx_w);
 	DECLARE_WRITE_LINE_MEMBER(rs232_dcd_w);
 
-	void cgenie(machine_config &config);
 	void cgenie_io(address_map &map);
 	void cgenie_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;

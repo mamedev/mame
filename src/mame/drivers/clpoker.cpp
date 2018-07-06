@@ -48,6 +48,9 @@ public:
 	{
 	}
 
+	void clpoker(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(output_a_w);
 	DECLARE_WRITE8_MEMBER(output_b_w);
 	DECLARE_WRITE8_MEMBER(output_c_w);
@@ -57,14 +60,12 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void clpoker(machine_config &config);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
 	void ramdac_map(address_map &map);
-protected:
+
 	virtual void video_start() override;
 
-private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 

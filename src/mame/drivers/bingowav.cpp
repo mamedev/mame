@@ -56,14 +56,15 @@ public:
 	{ }
 
 	void bingowav(machine_config &config);
+
+private:
 	void bingowav_audio_map(address_map &map);
 	void bingowav_control_map(address_map &map);
 	void bingowav_drive_map(address_map &map);
 	void bingowav_main_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 };
 

@@ -203,6 +203,18 @@ public:
 		m_idlepc(0)
 		{ }
 
+	void cv1k_d(machine_config &config);
+	void cv1k(machine_config &config);
+
+	void init_mushisam();
+	void init_ibara();
+	void init_espgal2();
+	void init_mushitam();
+	void init_pinkswts();
+	void init_deathsml();
+	void init_dpddfk();
+
+private:
 	required_device<sh34_base_device> m_maincpu;
 	required_device<epic12_device> m_blitter;
 	required_device<serflash_device> m_serflash;
@@ -223,13 +235,6 @@ public:
 
 	/* game specific */
 	DECLARE_READ64_MEMBER(speedup_r);
-	void init_mushisam();
-	void init_ibara();
-	void init_espgal2();
-	void init_mushitam();
-	void init_pinkswts();
-	void init_deathsml();
-	void init_dpddfk();
 
 	required_ioport m_blitrate;
 	required_ioport m_eepromout;
@@ -237,8 +242,7 @@ public:
 	uint32_t m_idleramoffs;
 	uint32_t m_idlepc;
 	void install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed);
-	void cv1k_d(machine_config &config);
-	void cv1k(machine_config &config);
+
 	void cv1k_d_map(address_map &map);
 	void cv1k_map(address_map &map);
 	void cv1k_port(address_map &map);

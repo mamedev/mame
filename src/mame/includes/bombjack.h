@@ -27,6 +27,9 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void bombjack(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(soundlatch_read_and_clear);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(bombjack_videoram_w);
@@ -43,12 +46,10 @@ public:
 	TIMER_CALLBACK_MEMBER(soundlatch_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	void bombjack(machine_config &config);
 	void audio_io_map(address_map &map);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
-private:
-	/* memory pointers */
+
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;

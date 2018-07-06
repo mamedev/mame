@@ -29,6 +29,9 @@ public:
 	{
 	}
 
+	void chqflag(machine_config &config);
+
+private:
 	template<int Chip> DECLARE_READ8_MEMBER(k051316_ramrom_r);
 	DECLARE_WRITE8_MEMBER(chqflag_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(chqflag_vreg_w);
@@ -43,14 +46,14 @@ public:
 	K051316_CB_MEMBER(zoom_callback_2);
 	K051960_CB_MEMBER(sprite_callback);
 	uint32_t screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void chqflag(machine_config &config);
+
 	void bank1000_map(address_map &map);
 	void chqflag_map(address_map &map);
 	void chqflag_sound_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-private:
+
 	/* misc */
 	int        m_k051316_readroms;
 	int        m_last_vreg;

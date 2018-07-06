@@ -25,11 +25,6 @@ constantly looking at.
 class c10_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_RESET
-	};
-
 	c10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -37,13 +32,21 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void c10(machine_config &config);
+
 	void init_c10();
 
-	void c10(machine_config &config);
+private:
+	enum
+	{
+		TIMER_RESET
+	};
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void c10_io(address_map &map);
 	void c10_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;

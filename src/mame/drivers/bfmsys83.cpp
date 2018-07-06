@@ -16,9 +16,11 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	void bfmsys83(machine_config &config);
+
+private:
 	uint8_t m_codec_data[256];
 	required_device<cpu_device> m_maincpu;
-	void bfmsys83(machine_config &config);
 	void memmap(address_map &map);
 };
 

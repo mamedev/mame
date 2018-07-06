@@ -54,6 +54,11 @@ public:
 		m_display_maxx(0)
 	{ }
 
+	void master(machine_config &config);
+
+	void init_master();
+
+private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_2bit_binary_weighted_ones_complement_device> m_dac;
@@ -90,14 +95,12 @@ public:
 	// Master
 	DECLARE_READ8_MEMBER(master_input_r);
 	DECLARE_WRITE8_MEMBER(master_control_w);
-	void init_master();
+
 	DECLARE_READ8_MEMBER(master_trampoline_r);
 	DECLARE_WRITE8_MEMBER(master_trampoline_w);
 	void master_map(address_map &map);
 	void master_trampoline(address_map &map);
-	void master(machine_config &config);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };

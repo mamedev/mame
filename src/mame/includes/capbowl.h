@@ -19,11 +19,6 @@
 class capbowl_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_UPDATE
-	};
-
 	capbowl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -34,6 +29,17 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_rowaddress(*this, "rowaddress")
 	{ }
+
+	void bowlrama(machine_config &config);
+	void capbowl(machine_config &config);
+
+	void init_capbowl();
+
+private:
+	enum
+	{
+		TIMER_UPDATE
+	};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -69,7 +75,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bowlrama_blitter_w);
 	DECLARE_READ8_MEMBER(bowlrama_blitter_r);
 
-	void init_capbowl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -79,12 +84,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline rgb_t pen_for_pixel( uint8_t const *src, uint8_t pix );
 
-	void bowlrama(machine_config &config);
-	void capbowl(machine_config &config);
 	void bowlrama_map(address_map &map);
 	void capbowl_map(address_map &map);
 	void sound_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

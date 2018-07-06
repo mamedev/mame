@@ -19,11 +19,6 @@
 class bublbobl_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_M68705_IRQ_ACK
-	};
-
 	bublbobl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_videoram(*this, "videoram")
@@ -43,6 +38,22 @@ public:
 		, m_main_to_sound(*this, "main_to_sound")
 		, m_sound_to_main(*this, "sound_to_main")
 	{ }
+
+	void tokio(machine_config &config);
+	void boblbobl(machine_config &config);
+	void bublbobl(machine_config &config);
+	void bublbobl_nomcu(machine_config &config);
+	void bublboblp(machine_config &config);
+	void tokiob(machine_config &config);
+
+	void init_dland();
+	void init_common();
+
+protected:
+	enum
+	{
+		TIMER_M68705_IRQ_ACK
+	};
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -119,8 +130,6 @@ public:
 	DECLARE_WRITE8_MEMBER(boblbobl_ic43_b_w);
 	DECLARE_READ8_MEMBER(boblbobl_ic43_b_r);
 
-	void init_dland();
-	void init_common();
 	DECLARE_MACHINE_START(tokio);
 	DECLARE_MACHINE_RESET(tokio);
 	DECLARE_MACHINE_START(bublbobl);
@@ -132,12 +141,6 @@ public:
 	uint32_t screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void configure_banks();
 
-	void tokio(machine_config &config);
-	void boblbobl(machine_config &config);
-	void bublbobl(machine_config &config);
-	void bublbobl_nomcu(machine_config &config);
-	void bublboblp(machine_config &config);
-	void tokiob(machine_config &config);
 	void bootleg_map(address_map &map);
 	void bublbobl_maincpu_map(address_map &map);
 	void common_maincpu_map(address_map &map);
@@ -149,7 +152,7 @@ public:
 	void tokio_map_mcu(address_map &map);
 	void tokio_sound_map(address_map &map);
 	void tokio_subcpu_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -168,6 +171,9 @@ public:
 	{
 	}
 
+	void bub68705(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(port_a_w);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 
@@ -176,8 +182,6 @@ public:
 	DECLARE_MACHINE_START(bub68705);
 	DECLARE_MACHINE_RESET(bub68705);
 
-	void bub68705(machine_config &config);
-protected:
 	required_device<m68705p_device> m_mcu;
 	required_ioport_array<4>        m_mux_ports;
 

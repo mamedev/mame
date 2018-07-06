@@ -29,7 +29,7 @@ public:
 
 	void cloak(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_l_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_r_w);
 	DECLARE_WRITE8_MEMBER(cloak_custom_w);
@@ -53,7 +53,6 @@ protected:
 	void master_map(address_map &map);
 	void slave_map(address_map &map);
 
-private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	int m_nvram_enabled;

@@ -53,12 +53,14 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void barata(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(fpga_w);
 	DECLARE_WRITE8_MEMBER(port0_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_READ8_MEMBER(port2_r);
-	void barata(machine_config &config);
-private:
+
 	unsigned char row_selection;
 	void fpga_send(unsigned char cmd);
 	virtual void machine_start() override { m_digits.resolve(); m_lamps.resolve(); }

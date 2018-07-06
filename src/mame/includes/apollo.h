@@ -135,6 +135,33 @@ public:
 		m_isa(*this, APOLLO_ISA_TAG)
 	{ }
 
+	void common(machine_config &config);
+	void apollo(machine_config &config);
+	void apollo_terminal(machine_config &config);
+	void apollo_graphics(machine_config &config);
+	void apollo_mono19i(machine_config &config);
+	void dn3500(machine_config &config);
+	void dn5500_19i(machine_config &config);
+	void dn3000(machine_config &config);
+	void dn3000_15i(machine_config &config);
+	void dn3000_19i(machine_config &config);
+	void dn3500_15i(machine_config &config);
+	void dsp3000(machine_config &config);
+	void dsp3500(machine_config &config);
+	void dsp5500(machine_config &config);
+	void dn5500(machine_config &config);
+	void dn5500_15i(machine_config &config);
+	void dn3500_19i(machine_config &config);
+
+	void init_dsp3000();
+	void init_dsp5500();
+	void init_dn3500();
+	void init_dn3000();
+	void init_dsp3500();
+	void init_dn5500();
+	void init_apollo();
+
+private:
 	required_device<m68000_base_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_messram_ptr;
 
@@ -196,13 +223,6 @@ public:
 	DECLARE_READ8_MEMBER(dn5500_11500_r);
 	DECLARE_WRITE8_MEMBER(dn5500_io_protection_map_w);
 	DECLARE_READ8_MEMBER(dn5500_io_protection_map_r);
-	void init_dsp3000();
-	void init_dsp5500();
-	void init_dn3500();
-	void init_dn3000();
-	void init_dsp3500();
-	void init_dn5500();
-	void init_apollo();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -255,30 +275,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(apollo_reset_instr_callback);
 	DECLARE_READ32_MEMBER(apollo_instruction_hook);
 
-	void common(machine_config &config);
-	void apollo(machine_config &config);
-	void apollo_terminal(machine_config &config);
-	void apollo_graphics(machine_config &config);
-	void apollo_mono19i(machine_config &config);
-	void dn3500(machine_config &config);
-	void dn5500_19i(machine_config &config);
-	void dn3000(machine_config &config);
-	void dn3000_15i(machine_config &config);
-	void dn3000_19i(machine_config &config);
-	void dn3500_15i(machine_config &config);
-	void dsp3000(machine_config &config);
-	void dsp3500(machine_config &config);
-	void dsp5500(machine_config &config);
-	void dn5500(machine_config &config);
-	void dn5500_15i(machine_config &config);
-	void dn3500_19i(machine_config &config);
 	void dn3000_map(address_map &map);
 	void dn3500_map(address_map &map);
 	void dn5500_map(address_map &map);
 	void dsp3000_map(address_map &map);
 	void dsp3500_map(address_map &map);
 	void dsp5500_map(address_map &map);
-private:
+
 	uint32_t ptm_counter;
 	uint8_t sio_output_data;
 	int m_dma_channel;

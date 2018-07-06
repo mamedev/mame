@@ -58,6 +58,22 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void cosmicos(machine_config &config);
+
+	void init_cosmicos();
+
+	DECLARE_INPUT_CHANGED_MEMBER( data );
+	DECLARE_INPUT_CHANGED_MEMBER( enter );
+	DECLARE_INPUT_CHANGED_MEMBER( single_step );
+	DECLARE_INPUT_CHANGED_MEMBER( run );
+	DECLARE_INPUT_CHANGED_MEMBER( load );
+	DECLARE_INPUT_CHANGED_MEMBER( cosmicos_pause );
+	DECLARE_INPUT_CHANGED_MEMBER( reset );
+	DECLARE_INPUT_CHANGED_MEMBER( clear_data );
+	DECLARE_INPUT_CHANGED_MEMBER( memory_protect );
+	DECLARE_INPUT_CHANGED_MEMBER( memory_disable );
+
+private:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( video_off_r );
@@ -80,26 +96,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 	DECLARE_READ8_MEMBER( dma_r );
 	DECLARE_WRITE8_MEMBER( sc_w );
-	DECLARE_INPUT_CHANGED_MEMBER( data );
-	DECLARE_INPUT_CHANGED_MEMBER( enter );
-	DECLARE_INPUT_CHANGED_MEMBER( single_step );
-	DECLARE_INPUT_CHANGED_MEMBER( run );
-	DECLARE_INPUT_CHANGED_MEMBER( load );
-	DECLARE_INPUT_CHANGED_MEMBER( cosmicos_pause );
-	DECLARE_INPUT_CHANGED_MEMBER( reset );
-	DECLARE_INPUT_CHANGED_MEMBER( clear_data );
-	DECLARE_INPUT_CHANGED_MEMBER( memory_protect );
-	DECLARE_INPUT_CHANGED_MEMBER( memory_disable );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cosmicos );
-	void init_cosmicos();
+
 	TIMER_DEVICE_CALLBACK_MEMBER(digit_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
-	void cosmicos(machine_config &config);
+
 	void cosmicos_io(address_map &map);
 	void cosmicos_mem(address_map &map);
 
-private:
 	void set_cdp1802_mode(int mode);
 	void clear_input_data();
 

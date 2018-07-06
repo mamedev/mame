@@ -36,6 +36,12 @@ public:
 	{
 	}
 
+	void airbustr(machine_config &config);
+	void airbustrb(machine_config &config);
+
+	void init_airbustr();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_devram;
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
@@ -72,7 +78,6 @@ public:
 	template<int Layer> DECLARE_WRITE8_MEMBER(videoram_w);
 	template<int Layer> DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_WRITE8_MEMBER(scrollregs_w);
-	void init_airbustr();
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -81,8 +86,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(slave_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(airbustr_scanline);
-	void airbustr(machine_config &config);
-	void airbustrb(machine_config &config);
+
 	void master_io_map(address_map &map);
 	void master_map(address_map &map);
 	void slave_io_map(address_map &map);

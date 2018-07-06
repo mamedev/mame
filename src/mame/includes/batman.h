@@ -27,10 +27,11 @@ public:
 		m_vad(*this, "vad")
 	{ }
 
-	void init_batman();
 	void batman(machine_config &config);
 
-protected:
+	void init_batman();
+
+private:
 	virtual void machine_start() override;
 	DECLARE_WRITE16_MEMBER(latch_w);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
@@ -40,7 +41,6 @@ protected:
 
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<atari_jsa_iii_device> m_jsa;

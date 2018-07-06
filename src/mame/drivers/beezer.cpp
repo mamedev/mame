@@ -68,6 +68,9 @@ public:
 		m_dac_data[0] = m_dac_data[1] = m_dac_data[2] = m_dac_data[3] = 0;
 	}
 
+	void beezer(machine_config &config);
+
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	uint32_t screen_update_beezer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(beezer);
@@ -91,16 +94,14 @@ public:
 	DECLARE_WRITE8_MEMBER(via_system_pb_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 
-	void beezer(machine_config &config);
 	void banked_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_sysbank;
 	required_memory_region m_banked_roms;

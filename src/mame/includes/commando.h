@@ -35,7 +35,7 @@ public:
 
 	void commando(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(commando_videoram_w);
 	DECLARE_WRITE8_MEMBER(commando_colorram_w);
 	DECLARE_WRITE8_MEMBER(commando_videoram2_w);
@@ -56,7 +56,6 @@ protected:
 	void decrypted_opcodes_map(address_map &map);
 	void sound_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram2;

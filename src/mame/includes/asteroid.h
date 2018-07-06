@@ -26,6 +26,21 @@ public:
 		m_ram1(*this, "ram1"),
 		m_ram2(*this, "ram2") { }
 
+	void asteroid_base(machine_config &config);
+	void asterock(machine_config &config);
+	void asteroid(machine_config &config);
+	void llander(machine_config &config);
+	void astdelux(machine_config &config);
+	void asteroid_sound(machine_config &config);
+	void astdelux_sound(machine_config &config);
+	void llander_sound(machine_config &config);
+
+	void init_asterock();
+	void init_asteroidb();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<dvg_device> m_dvg;
@@ -56,27 +71,15 @@ public:
 	DECLARE_WRITE8_MEMBER(earom_write);
 	DECLARE_WRITE8_MEMBER(earom_control_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-
 	INTERRUPT_GEN_MEMBER(asteroid_interrupt);
 	INTERRUPT_GEN_MEMBER(asterock_interrupt);
 	INTERRUPT_GEN_MEMBER(llander_interrupt);
 
 	DECLARE_WRITE_LINE_MEMBER(cocktail_inv_w);
 
-	void init_asterock();
-	void init_asteroidb();
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void asteroid_base(machine_config &config);
-	void asterock(machine_config &config);
-	void asteroid(machine_config &config);
-	void llander(machine_config &config);
-	void astdelux(machine_config &config);
-	void asteroid_sound(machine_config &config);
-	void astdelux_sound(machine_config &config);
-	void llander_sound(machine_config &config);
+
 	void astdelux_map(address_map &map);
 	void asteroid_map(address_map &map);
 	void llander_map(address_map &map);

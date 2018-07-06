@@ -19,6 +19,11 @@ public:
 	void sigma2k(machine_config &config);
 	void ampoker2(machine_config &config);
 
+	void init_rabbitpk();
+	void init_piccolop();
+
+private:
+
 	DECLARE_WRITE8_MEMBER(ampoker2_port30_w);
 	DECLARE_WRITE8_MEMBER(ampoker2_port31_w);
 	DECLARE_WRITE8_MEMBER(ampoker2_port32_w);
@@ -28,18 +33,14 @@ public:
 	DECLARE_WRITE8_MEMBER(ampoker2_port36_w);
 	DECLARE_WRITE8_MEMBER(ampoker2_watchdog_reset_w);
 	DECLARE_WRITE8_MEMBER(ampoker2_videoram_w);
-	void init_rabbitpk();
-	void init_piccolop();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(s2k_get_bg_tile_info);
 	DECLARE_PALETTE_INIT(ampoker2);
 	DECLARE_VIDEO_START(sigma2k);
 
-protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 
-private:
 	void ampoker2_io_map(address_map &map);
 	void ampoker2_map(address_map &map);
 

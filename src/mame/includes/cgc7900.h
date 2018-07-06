@@ -57,6 +57,10 @@ public:
 		, m_i8251_1(*this, INS8251_1_TAG)
 	{ }
 
+	void cgc7900(machine_config &config);
+	void cgc7900_video(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -114,11 +118,9 @@ public:
 
 	void kbd_put(u8 data);
 
-	void cgc7900(machine_config &config);
-	void cgc7900_video(machine_config &config);
 	void cgc7900_mem(address_map &map);
 	void keyboard_mem(address_map &map);
-private:
+
 	u16 kbd_mods;
 	u8 kbd_data;
 	bool kbd_ready;

@@ -22,6 +22,12 @@ public:
 		m_scroll_0(*this, "scroll_0"),
 		m_spriteram(*this, "spriteram") { }
 
+	void watrball(machine_config &config);
+	void blmbycar(machine_config &config);
+
+	void init_blmbycar();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -60,7 +66,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 
-	void init_blmbycar();
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(blmbycar);
 	DECLARE_MACHINE_RESET(blmbycar);
@@ -69,8 +74,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void watrball(machine_config &config);
-	void blmbycar(machine_config &config);
+
 	void blmbycar_map(address_map &map);
 	void blmbycar_oki_map(address_map &map);
 	void common_map(address_map &map);

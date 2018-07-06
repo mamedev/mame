@@ -27,6 +27,11 @@ public:
 		, m_vrom(*this, "vrom%u", 1U)
 	{ }
 
+	void valtric(machine_config &config);
+	void argus(machine_config &config);
+	void butasan(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -139,9 +144,7 @@ public:
 	// valtric specific
 	void valtric_draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void valtric_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void valtric(machine_config &config);
-	void argus(machine_config &config);
-	void butasan(machine_config &config);
+
 	void argus_map(address_map &map);
 	void butasan_map(address_map &map);
 	void sound_map_a(address_map &map);

@@ -21,6 +21,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_rombank(*this, "rombank") { }
 
+	void battlnts(machine_config &config);
+
+private:
 	/* video-related */
 	int m_spritebank;
 
@@ -41,7 +44,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	K007342_CALLBACK_MEMBER(battlnts_tile_callback);
 	K007420_CALLBACK_MEMBER(battlnts_sprite_callback);
-	void battlnts(machine_config &config);
+
 	void battlnts_map(address_map &map);
 	void battlnts_sound_map(address_map &map);
 };

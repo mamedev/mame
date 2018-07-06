@@ -69,6 +69,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void cmmb(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<at29c020_device> m_flash;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -99,7 +102,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void cmmb(machine_config &config);
+
 	void cmmb_map(address_map &map);
 };
 

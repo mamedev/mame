@@ -32,10 +32,11 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
 	void ccastles(machine_config &config);
 
-protected:
+	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+
+private:
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	template<int C> DECLARE_WRITE_LINE_MEMBER(ccounter_w);
 	DECLARE_READ8_MEMBER(leta_r);
@@ -61,7 +62,6 @@ protected:
 	inline void schedule_next_irq( int curscanline );
 	void main_map(address_map &map);
 
-private:
 	/* devices */
 	required_device<m6502_device> m_maincpu;
 	required_device<x2212_device> m_nvram_4b;

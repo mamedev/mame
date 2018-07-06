@@ -60,6 +60,11 @@ public:
 		, m_led(*this, "led0")
 	{ }
 
+	void common(machine_config &config);
+	void bw14(machine_config &config);
+	void bw12(machine_config &config);
+
+private:
 	void bankswitch();
 	void floppy_motor_off();
 	void set_floppy_motor_off_timer();
@@ -84,13 +89,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
-	void common(machine_config &config);
-	void bw14(machine_config &config);
-	void bw12(machine_config &config);
 	void bw12_io(address_map &map);
 	void bw12_mem(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

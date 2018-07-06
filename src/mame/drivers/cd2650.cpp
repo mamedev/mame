@@ -73,6 +73,9 @@ public:
 	{
 	}
 
+	void cd2650(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(keyin_r);
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(tape_deck_on_w);
@@ -81,11 +84,10 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(cd2650);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void cd2650(machine_config &config);
 	void cd2650_data(address_map &map);
 	void cd2650_io(address_map &map);
 	void cd2650_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

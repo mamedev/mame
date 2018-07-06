@@ -41,14 +41,13 @@ public:
 
 	void cz101(machine_config &config);
 
+private:
 	DECLARE_PALETTE_INIT(cz101);
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<upd7810_device> m_maincpu;
 	required_device<hd44780_device> m_hd44780;
 	required_ioport_array<16> m_keys;

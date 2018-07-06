@@ -30,6 +30,10 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen") { }
 
+	void bishi(machine_config &config);
+	void dobouchn(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(control_r);
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_WRITE16_MEMBER(control2_w);
@@ -39,14 +43,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
 	K056832_CB_MEMBER(tile_callback);
 
-	void bishi(machine_config &config);
-	void dobouchn(machine_config &config);
 	void main_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-private:
+
 	/* memory pointers */
 	uint8_t *    m_ram;
 

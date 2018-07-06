@@ -34,7 +34,7 @@ public:
 
 	void clayshoo(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(analog_reset_w);
 	DECLARE_READ8_MEMBER(analog_r);
 	DECLARE_WRITE8_MEMBER(input_port_select_w);
@@ -49,7 +49,6 @@ protected:
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 

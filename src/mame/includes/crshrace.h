@@ -31,6 +31,12 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void crshrace(machine_config &config);
+
+	void init_crshrace2();
+	void init_crshrace();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram1;
 	required_shared_ptr<uint16_t> m_videoram2;
@@ -61,8 +67,7 @@ public:
 	DECLARE_WRITE16_MEMBER(crshrace_videoram2_w);
 	DECLARE_WRITE16_MEMBER(crshrace_roz_bank_w);
 	DECLARE_WRITE16_MEMBER(crshrace_gfxctrl_w);
-	void init_crshrace2();
-	void init_crshrace();
+
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	virtual void machine_start() override;
@@ -71,7 +76,7 @@ public:
 	uint32_t screen_update_crshrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void crshrace(machine_config &config);
+
 	void crshrace_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);

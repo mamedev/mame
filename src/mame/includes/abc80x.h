@@ -99,6 +99,9 @@ public:
 		m_tape_ctr(4)
 	{ }
 
+protected:
+	void common(machine_config &config);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
@@ -150,7 +153,7 @@ public:
 
 	// timers
 	emu_timer *m_cassette_timer;
-	void common(machine_config &config);
+
 	void abc800_m1(address_map &map);
 	void abc800_io(address_map &map);
 	void abc800c_io(address_map &map);
@@ -172,6 +175,10 @@ public:
 		m_char_rom(*this, MC6845_TAG)
 	{ }
 
+	void abc800m(machine_config &config);
+	void abc800m_video(machine_config &config);
+
+private:
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_memory_region m_fgctl_prom;
@@ -182,8 +189,6 @@ public:
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	MC6845_UPDATE_ROW( abc800m_update_row );
-	void abc800m(machine_config &config);
-	void abc800m_video(machine_config &config);
 };
 
 
@@ -199,6 +204,10 @@ public:
 		m_fgctl_prom(*this, "hru2")
 	{ }
 
+	void abc800c(machine_config &config);
+	void abc800c_video(machine_config &config);
+
+private:
 	required_device<saa5052_device> m_trom;
 	required_device<palette_device> m_palette;
 	required_memory_region m_fgctl_prom;
@@ -210,8 +219,6 @@ public:
 	DECLARE_READ8_MEMBER( m1_r ) override;
 	DECLARE_READ8_MEMBER( char_ram_r );
 	DECLARE_PALETTE_INIT( abc800c );
-	void abc800c(machine_config &config);
-	void abc800c_video(machine_config &config);
 	void abc800c_mem(address_map &map);
 };
 
@@ -229,6 +236,10 @@ public:
 		m_config(*this, "CONFIG")
 	{ }
 
+	void abc802(machine_config &config);
+	void abc802_video(machine_config &config);
+
+private:
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_memory_region m_char_rom;
@@ -253,8 +264,6 @@ public:
 	int m_flshclk;              // flash clock
 	int m_80_40_mux;            // 40/80 column mode
 
-	void abc802(machine_config &config);
-	void abc802_video(machine_config &config);
 	void abc802_io(address_map &map);
 	void abc802_mem(address_map &map);
 };
@@ -276,6 +285,10 @@ public:
 		m_attr_ram(*this, "attr_ram")
 	{ }
 
+	void abc806(machine_config &config);
+	void abc806_video(machine_config &config);
+
+private:
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_device<e0516_device> m_rtc;
@@ -333,8 +346,6 @@ public:
 	int m_vsync;                // vertical sync
 	int m_d_vsync;              // delayed vertical sync
 
-	void abc806(machine_config &config);
-	void abc806_video(machine_config &config);
 	void abc806_io(address_map &map);
 	void abc806_mem(address_map &map);
 };

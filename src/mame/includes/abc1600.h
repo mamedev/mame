@@ -79,6 +79,9 @@ public:
 			m_bus2(*this, BUS2_TAG)
 	{ }
 
+	void abc1600(machine_config &config);
+
+private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<z80dma_device> m_dma0;
 	required_device<z80dma_device> m_dma1;
@@ -138,7 +141,6 @@ public:
 	uint8_t m_cause;
 	int m_partst;               // parity test
 
-	void abc1600(machine_config &config);
 	void abc1600_mem(address_map &map);
 	void mac_mem(address_map &map);
 	// peripherals

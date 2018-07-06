@@ -64,14 +64,17 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	void cavepc(machine_config &config);
 
 	void init_cavepc();
+
+private:
+	required_device<cpu_device> m_maincpu;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cavepc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cavepc(machine_config &config);
 	void cavepc_io(address_map &map);
 	void cavepc_map(address_map &map);
 };

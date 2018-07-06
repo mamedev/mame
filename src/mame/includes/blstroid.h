@@ -17,12 +17,6 @@
 class blstroid_state : public atarigen_state
 {
 public:
-	enum
-	{
-		TIMER_IRQ_OFF = TID_ATARIGEN_LAST,
-		TIMER_IRQ_ON
-	};
-
 	blstroid_state(const machine_config &mconfig, device_type type, const char *tag) :
 		atarigen_state(mconfig, type, tag),
 		m_playfield_tilemap(*this, "playfield"),
@@ -31,10 +25,17 @@ public:
 		m_priorityram(*this, "priorityram")
 	{ }
 
-	void init_blstroid();
 	void blstroid(machine_config &config);
 
-protected:
+	void init_blstroid();
+
+private:
+	enum
+	{
+		TIMER_IRQ_OFF = TID_ATARIGEN_LAST,
+		TIMER_IRQ_ON
+	};
+
 	virtual void machine_reset() override;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
@@ -47,7 +48,6 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<atari_jsa_i_device> m_jsa;
 	required_device<atari_motion_objects_device> m_mob;

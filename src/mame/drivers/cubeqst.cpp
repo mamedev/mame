@@ -53,6 +53,9 @@ public:
 	{
 	}
 
+	void cubeqst(machine_config &config);
+
+private:
 	std::unique_ptr<uint8_t[]> m_depth_buffer;
 	int m_video_field;
 	uint8_t m_io_latch;
@@ -88,7 +91,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
 	void swap_linecpu_banks();
-	void cubeqst(machine_config &config);
+
 	void line_sound_map(address_map &map);
 	void m68k_program_map(address_map &map);
 	void rotate_map(address_map &map);

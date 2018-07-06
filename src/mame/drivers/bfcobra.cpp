@@ -234,10 +234,11 @@ public:
 	{
 	}
 
-	void init_bfcobra();
 	void bfcobra(machine_config &config);
 
-protected:
+	void init_bfcobra();
+
+private:
 	DECLARE_READ8_MEMBER(chipset_r);
 	DECLARE_WRITE8_MEMBER(chipset_w);
 	DECLARE_WRITE8_MEMBER(rombank_w);
@@ -274,7 +275,6 @@ protected:
 	void z80_io_map(address_map &map);
 	void z80_prog_map(address_map &map);
 
-private:
 	uint8_t m_bank_data[4];
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_video_ram;

@@ -330,6 +330,13 @@ public:
 	{
 	}
 
+	void aquastge(machine_config &config);
+	void coolridr(machine_config &config);
+
+	void init_coolridr();
+	void init_aquastge();
+
+private:
 	// Blitter state
 	uint16_t m_textBytesToWrite;
 	int16_t  m_blitterSerialCount;
@@ -407,8 +414,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
 	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
-	void init_coolridr();
-	void init_aquastge();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -521,8 +527,7 @@ public:
 	};
 
 	objcachemanager decode[2];
-	void aquastge(machine_config &config);
-	void coolridr(machine_config &config);
+
 	void aquastge_h1_map(address_map &map);
 	void aquastge_submap(address_map &map);
 	void coolridr_submap(address_map &map);

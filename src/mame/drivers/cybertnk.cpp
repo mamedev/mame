@@ -200,6 +200,11 @@ public:
 		m_accel_io(*this, "ACCEL"),
 		m_handle_io(*this, "HANDLE")  { }
 
+	void cybertnk(machine_config &config);
+
+	void init_cybertnk();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -228,7 +233,7 @@ public:
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_WRITE8_MEMBER(cnt_w);
-	void init_cybertnk();
+
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri);
@@ -236,7 +241,7 @@ public:
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	uint32_t screen_update_cybertnk_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cybertnk(machine_config &config);
+
 	void master_mem(address_map &map);
 	void slave_mem(address_map &map);
 	void sound_mem(address_map &map);

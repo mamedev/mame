@@ -40,11 +40,6 @@
 class cidelsa_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_SET_CPU_MODE
-	};
-
 	cidelsa_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, CDP1802_TAG)
@@ -52,25 +47,33 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_WRITE8_MEMBER( cdp1869_w );
-	DECLARE_WRITE8_MEMBER( destryer_out1_w );
-	DECLARE_WRITE8_MEMBER( altair_out1_w );
-
-	DECLARE_READ_LINE_MEMBER( clear_r );
-
-	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE_LINE_MEMBER( prd_w );
-	DECLARE_READ_LINE_MEMBER( cdp1869_pcb_r );
-
-	CDP1869_CHAR_RAM_READ_MEMBER(cidelsa_charram_r);
-	CDP1869_CHAR_RAM_WRITE_MEMBER(cidelsa_charram_w);
-	CDP1869_PCB_READ_MEMBER(cidelsa_pcb_r);
-
 	void destryera(machine_config &config);
 	void altair(machine_config &config);
 	void destryer(machine_config &config);
 	void destryer_video(machine_config &config);
 	void altair_video(machine_config &config);
+
+	DECLARE_READ_LINE_MEMBER( cdp1869_pcb_r );
+	DECLARE_READ_LINE_MEMBER( clear_r );
+	DECLARE_WRITE_LINE_MEMBER( q_w );
+
+protected:
+	enum
+	{
+		TIMER_SET_CPU_MODE
+	};
+
+	DECLARE_WRITE8_MEMBER( cdp1869_w );
+	DECLARE_WRITE8_MEMBER( destryer_out1_w );
+	DECLARE_WRITE8_MEMBER( altair_out1_w );
+
+
+	DECLARE_WRITE_LINE_MEMBER( prd_w );
+
+	CDP1869_CHAR_RAM_READ_MEMBER(cidelsa_charram_r);
+	CDP1869_CHAR_RAM_WRITE_MEMBER(cidelsa_charram_w);
+	CDP1869_PCB_READ_MEMBER(cidelsa_pcb_r);
+
 	void altair_io_map(address_map &map);
 	void altair_map(address_map &map);
 	void cidelsa_page_ram(address_map &map);
@@ -78,7 +81,6 @@ public:
 	void destryer_map(address_map &map);
 	void destryera_map(address_map &map);
 
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -109,6 +111,10 @@ public:
 			m_psg(*this, AY8910_TAG)
 	{ }
 
+	void draco(machine_config &config);
+	void draco_video(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( sound_in_r );
 	DECLARE_READ8_MEMBER( psg_r );
 	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
@@ -121,14 +127,11 @@ public:
 	CDP1869_CHAR_RAM_WRITE_MEMBER(draco_charram_w);
 	CDP1869_PCB_READ_MEMBER(draco_pcb_r);
 
-	void draco(machine_config &config);
-	void draco_video(machine_config &config);
 	void draco_io_map(address_map &map);
 	void draco_map(address_map &map);
 	void draco_page_ram(address_map &map);
 	void draco_sound_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 
 	required_device<ay8910_device> m_psg;

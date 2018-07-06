@@ -25,6 +25,28 @@ public:
 		m_sn(*this, "snsnd"),
 		m_screen(*this, "screen") { }
 
+	void base(machine_config &config);
+	void astrof(machine_config &config);
+	void abattle(machine_config &config);
+	void spfghmk2(machine_config &config);
+	void tomahawk(machine_config &config);
+	void astrof_audio(machine_config &config);
+	void spfghmk2_audio(machine_config &config);
+	void tomahawk_audio(machine_config &config);
+
+	void init_afire();
+	void init_abattle();
+	void init_sstarbtl();
+	void init_acombat3();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(astrof_p1_controls_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(astrof_p2_controls_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tomahawk_controls_r);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(service_coin_inserted);
+
+private:
 	/* video-related */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -62,19 +84,12 @@ public:
 	DECLARE_READ8_MEMBER(abattle_coin_prot_r);
 	DECLARE_READ8_MEMBER(afire_coin_prot_r);
 	DECLARE_READ8_MEMBER(tomahawk_protection_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(astrof_p1_controls_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(astrof_p2_controls_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tomahawk_controls_r);
+
 	DECLARE_WRITE8_MEMBER(astrof_audio_1_w);
 	DECLARE_WRITE8_MEMBER(astrof_audio_2_w);
 	DECLARE_WRITE8_MEMBER(spfghmk2_audio_w);
 	DECLARE_WRITE8_MEMBER(tomahawk_audio_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(service_coin_inserted);
-	void init_afire();
-	void init_abattle();
-	void init_sstarbtl();
-	void init_acombat3();
+
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(astrof);
 	DECLARE_MACHINE_START(abattle);
@@ -91,14 +106,7 @@ public:
 	void spfghmk2_set_video_control_2( uint8_t data );
 	void tomahawk_set_video_control_2( uint8_t data );
 	void video_update_common( bitmap_rgb32 &bitmap, const rectangle &cliprect, pen_t *pens, int num_pens );
-	void base(machine_config &config);
-	void astrof(machine_config &config);
-	void abattle(machine_config &config);
-	void spfghmk2(machine_config &config);
-	void tomahawk(machine_config &config);
-	void astrof_audio(machine_config &config);
-	void spfghmk2_audio(machine_config &config);
-	void tomahawk_audio(machine_config &config);
+
 	void astrof_map(address_map &map);
 	void spfghmk2_map(address_map &map);
 	void tomahawk_map(address_map &map);

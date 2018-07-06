@@ -105,6 +105,62 @@ public:
 		: cps_state(mconfig, type, tag, 1)
 	{ }
 
+	void cawingbl(machine_config &config);
+	void sf2mdt(machine_config &config);
+	void sf2m1(machine_config &config);
+	void kodb(machine_config &config);
+	void varthb(machine_config &config);
+	void sgyxz(machine_config &config);
+	void wofabl(machine_config &config);
+	void punipic(machine_config &config);
+	void dinopic(machine_config &config);
+	void slampic(machine_config &config);
+	void sf2b(machine_config &config);
+	void knightsb(machine_config &config);
+	void fcrash(machine_config &config);
+	void sf2m10(machine_config &config);
+	void sf2m3(machine_config &config);
+	void forgottn(machine_config &config);
+	void ganbare(machine_config &config);
+	void qsound(machine_config &config);
+	void cps1_12MHz(machine_config &config);
+	void wofhfh(machine_config &config);
+	void cps1_10MHz(machine_config &config);
+	void pang3(machine_config &config);
+
+	void init_sf2rb();
+	void init_sf2rb2();
+	void init_sf2thndr();
+	void init_dinohunt();
+	void init_sf2hack();
+	void init_slammast();
+	void init_pang3b();
+	void init_pang3();
+	void init_sf2ee();
+	void init_sf2m8();
+	void init_cps1();
+	void init_dino();
+	void init_punisher();
+	void init_wof();
+	void init_ganbare();
+	void init_sf2dongb();
+	void init_sf2ceblp();
+
+	// fcrash
+	void init_kodb();
+	void init_cawingbl();
+	void init_dinopic();
+	void init_knightsb();
+	void init_punipic();
+	void init_punipic3();
+	void init_sf2m1();
+	void init_sf2mdt();
+	void init_sf2mdta();
+	void init_sf2mdtb();
+	void init_sf2b();
+	void init_slampic();
+	void init_wofabl();
+
 protected:
 	cps_state(const machine_config &mconfig, device_type type, const char *tag, int version)
 		: driver_device(mconfig, type, tag)
@@ -130,7 +186,6 @@ protected:
 		, m_led_cboard(*this, "led_cboard%u", 0U)
 	{ }
 
-public:
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
 	DECLARE_READ16_MEMBER(cps1_in1_r);
 	DECLARE_READ16_MEMBER(cps1_in2_r);
@@ -162,23 +217,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sf2m1_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2m3_layer_w);
 	DECLARE_READ16_MEMBER(dinohunt_sound_r);
-	void init_sf2rb();
-	void init_sf2rb2();
-	void init_sf2thndr();
-	void init_dinohunt();
-	void init_sf2hack();
-	void init_slammast();
-	void init_pang3b();
-	void init_pang3();
-	void init_sf2ee();
-	void init_sf2m8();
-	void init_cps1();
-	void init_dino();
-	void init_punisher();
-	void init_wof();
-	void init_ganbare();
-	void init_sf2dongb();
-	void init_sf2ceblp();
+
 	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap1_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap2_scan);
@@ -201,20 +240,6 @@ public:
 
 	void kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst));
 
-	/* fcrash handlers */
-	void init_kodb();
-	void init_cawingbl();
-	void init_dinopic();
-	void init_knightsb();
-	void init_punipic();
-	void init_punipic3();
-	void init_sf2m1();
-	void init_sf2mdt();
-	void init_sf2mdta();
-	void init_sf2mdtb();
-	void init_sf2b();
-	void init_slampic();
-	void init_wofabl();
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(cawingbl);
@@ -265,28 +290,7 @@ public:
 	/* cps2 driver */
 	DECLARE_WRITE_LINE_MEMBER(m5205_int1);
 	DECLARE_WRITE_LINE_MEMBER(m5205_int2);
-	void cawingbl(machine_config &config);
-	void sf2mdt(machine_config &config);
-	void sf2m1(machine_config &config);
-	void kodb(machine_config &config);
-	void varthb(machine_config &config);
-	void sgyxz(machine_config &config);
-	void wofabl(machine_config &config);
-	void punipic(machine_config &config);
-	void dinopic(machine_config &config);
-	void slampic(machine_config &config);
-	void sf2b(machine_config &config);
-	void knightsb(machine_config &config);
-	void fcrash(machine_config &config);
-	void sf2m10(machine_config &config);
-	void sf2m3(machine_config &config);
-	void forgottn(machine_config &config);
-	void ganbare(machine_config &config);
-	void qsound(machine_config &config);
-	void cps1_12MHz(machine_config &config);
-	void wofhfh(machine_config &config);
-	void cps1_10MHz(machine_config &config);
-	void pang3(machine_config &config);
+
 	void dinopic_map(address_map &map);
 	void fcrash_map(address_map &map);
 	void forgottn_map(address_map &map);
@@ -312,7 +316,6 @@ public:
 	void sub_map(address_map &map);
 	void varthb_map(address_map &map);
 
-protected:
 	/* memory pointers */
 	// cps1
 	optional_shared_ptr<uint16_t> m_mainram;
@@ -421,6 +424,7 @@ public:
 	void cps2(machine_config &config);
 	void gigaman2(machine_config &config);
 	void dead_cps2(machine_config &config);
+
 	void init_cps2_video();
 	void init_cps2();
 	void init_cps2nc();

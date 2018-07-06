@@ -107,57 +107,16 @@ public:
 		m_tpi2_pb(0)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<pla_device> m_pla1;
-	optional_device<mc6845_device> m_crtc;
-	optional_device<palette_device> m_palette;
-	required_device<mos6581_device> m_sid;
-	required_device<tpi6525_device> m_tpi1;
-	required_device<tpi6525_device> m_tpi2;
-	required_device<mos6551_device> m_acia;
-	required_device<mos6526_device> m_cia;
-	required_device<ds75160a_device> m_ieee1;
-	required_device<ds75161a_device> m_ieee2;
-	required_device<vcs_control_port_device> m_joy1;
-	required_device<vcs_control_port_device> m_joy2;
-	required_device<cbm2_expansion_slot_device> m_exp;
-	required_device<cbm2_user_port_device> m_user;
-	required_device<ram_device> m_ram;
-	required_device<pet_datassette_port_device> m_cassette;
-	required_device<ieee488_device> m_ieee;
-	optional_device<cpu_device> m_ext_cpu;
-	optional_device<pic8259_device> m_ext_pic;
-	optional_device<mos6526_device> m_ext_cia;
-	optional_device<tpi6525_device> m_ext_tpi;
-	required_memory_region m_basic;
-	required_memory_region m_kernal;
-	required_memory_region m_charom;
-	optional_shared_ptr<uint8_t> m_buffer_ram;
-	optional_shared_ptr<uint8_t> m_extbuf_ram;
-	optional_shared_ptr<uint8_t> m_video_ram;
-	required_ioport_array<8> m_pa;
-	required_ioport_array<8> m_pb;
-	required_ioport m_lock;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	DECLARE_MACHINE_START( cbm2 );
-	DECLARE_MACHINE_START( cbm2_ntsc );
-	DECLARE_MACHINE_START( cbm2_pal );
-	DECLARE_MACHINE_START( cbm2x_ntsc );
-	DECLARE_MACHINE_START( cbm2x_pal );
-	DECLARE_MACHINE_RESET( cbm2 );
-
-	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
-		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4);
-
-	void bankswitch(offs_t offset, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
-		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs,
-		int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
-		int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs);
-
-	uint8_t read_keyboard();
-	void set_busy2(int state);
+	void _128k(machine_config &config);
+	void _256k(machine_config &config);
+	void cbm2lp_ntsc(machine_config &config);
+	void cbm2lp_pal(machine_config &config);
+	void cbm2hp_ntsc(machine_config &config);
+	void cbm2hp_pal(machine_config &config);
+	void cbm620(machine_config &config);
+	void b128(machine_config &config);
+	void b256(machine_config &config);
+	void cbm610(machine_config &config);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -196,6 +155,61 @@ public:
 	MC6845_UPDATE_ROW( crtc_update_row );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbmb );
+
+	DECLARE_MACHINE_START( cbm2x_ntsc );
+	DECLARE_MACHINE_START( cbm2x_pal );
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<pla_device> m_pla1;
+	optional_device<mc6845_device> m_crtc;
+	optional_device<palette_device> m_palette;
+	required_device<mos6581_device> m_sid;
+	required_device<tpi6525_device> m_tpi1;
+	required_device<tpi6525_device> m_tpi2;
+	required_device<mos6551_device> m_acia;
+	required_device<mos6526_device> m_cia;
+	required_device<ds75160a_device> m_ieee1;
+	required_device<ds75161a_device> m_ieee2;
+	required_device<vcs_control_port_device> m_joy1;
+	required_device<vcs_control_port_device> m_joy2;
+	required_device<cbm2_expansion_slot_device> m_exp;
+	required_device<cbm2_user_port_device> m_user;
+	required_device<ram_device> m_ram;
+	required_device<pet_datassette_port_device> m_cassette;
+	required_device<ieee488_device> m_ieee;
+	optional_device<cpu_device> m_ext_cpu;
+	optional_device<pic8259_device> m_ext_pic;
+	optional_device<mos6526_device> m_ext_cia;
+	optional_device<tpi6525_device> m_ext_tpi;
+	required_memory_region m_basic;
+	required_memory_region m_kernal;
+	required_memory_region m_charom;
+	optional_shared_ptr<uint8_t> m_buffer_ram;
+	optional_shared_ptr<uint8_t> m_extbuf_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
+	required_ioport_array<8> m_pa;
+	required_ioport_array<8> m_pb;
+	required_ioport m_lock;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	DECLARE_MACHINE_START( cbm2 );
+	DECLARE_MACHINE_START( cbm2_ntsc );
+	DECLARE_MACHINE_START( cbm2_pal );
+	DECLARE_MACHINE_RESET( cbm2 );
+
+	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
+		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4);
+
+	void bankswitch(offs_t offset, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
+		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs,
+		int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
+		int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs);
+
+	uint8_t read_keyboard();
+	void set_busy2(int state);
+
 	// memory state
 	int m_dramon;
 	int m_busen1;
@@ -222,16 +236,7 @@ public:
 
 	// timers
 	emu_timer *m_todclk_timer;
-	void _128k(machine_config &config);
-	void _256k(machine_config &config);
-	void cbm2lp_ntsc(machine_config &config);
-	void cbm2lp_pal(machine_config &config);
-	void cbm2hp_ntsc(machine_config &config);
-	void cbm2hp_pal(machine_config &config);
-	void cbm620(machine_config &config);
-	void b128(machine_config &config);
-	void b256(machine_config &config);
-	void cbm610(machine_config &config);
+
 	void cbm2_mem(address_map &map);
 	void ext_io(address_map &map);
 	void ext_mem(address_map &map);
@@ -245,16 +250,19 @@ public:
 		: cbm2_state(mconfig, type, tag)
 	{ }
 
-	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
-		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4) override;
-
-	DECLARE_READ8_MEMBER( tpi2_pc_r );
 	void b256hp(machine_config &config);
 	void b128hp(machine_config &config);
 	void cbm710(machine_config &config);
 	void cbm730(machine_config &config);
 	void cbm720(machine_config &config);
 	void bx256hp(machine_config &config);
+
+	DECLARE_READ8_MEMBER( tpi2_pc_r );
+
+private:
+	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
+		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4) override;
+
 };
 
 
@@ -272,6 +280,13 @@ public:
 			m_vic_irq(CLEAR_LINE)
 	{ }
 
+	void p500_pal(machine_config &config);
+	void p500_ntsc(machine_config &config);
+
+	DECLARE_READ8_MEMBER( tpi2_pc_r );
+	DECLARE_WRITE8_MEMBER( tpi2_pc_w );
+
+private:
 	required_device<pla_device> m_pla2;
 	required_device<mos6566_device> m_vic;
 	optional_shared_ptr<uint8_t> m_color_ram;
@@ -307,9 +322,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
 	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
 
-	DECLARE_READ8_MEMBER( tpi2_pc_r );
-	DECLARE_WRITE8_MEMBER( tpi2_pc_w );
-
 	DECLARE_WRITE_LINE_MEMBER( user_irq_w );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( p500 );
@@ -320,8 +332,7 @@ public:
 
 	// interrupt state
 	int m_vic_irq;
-	void p500_pal(machine_config &config);
-	void p500_ntsc(machine_config &config);
+
 	void p500_mem(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);

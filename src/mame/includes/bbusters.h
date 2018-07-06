@@ -28,6 +28,10 @@ public:
 		m_pf2_scroll_data(*this, "pf2_scroll_data")
 	{ }
 
+	void bbusters(machine_config &config);
+	void mechatt(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -78,8 +82,7 @@ public:
 	inline const uint8_t *get_source_ptr(gfx_element *gfx, uint32_t sprite, int dx, int dy, int block);
 	void draw_block(bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int bank,int block);
 	void draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, int bank, int colval, int colmask);
-	void bbusters(machine_config &config);
-	void mechatt(machine_config &config);
+
 	void bbusters_map(address_map &map);
 	void mechatt_map(address_map &map);
 	void sound_map(address_map &map);

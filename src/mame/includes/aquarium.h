@@ -28,6 +28,11 @@ public:
 		m_watchdog(*this, "watchdog")
 		{ }
 
+	void aquarium(machine_config &config);
+
+	void init_aquarium();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_mid_videoram;
 	required_shared_ptr<uint16_t> m_bak_videoram;
@@ -57,7 +62,6 @@ public:
 	DECLARE_WRITE16_MEMBER(aquarium_txt_videoram_w);
 	DECLARE_WRITE16_MEMBER(aquarium_mid_videoram_w);
 	DECLARE_WRITE16_MEMBER(aquarium_bak_videoram_w);
-	void init_aquarium();
 	TILE_GET_INFO_MEMBER(get_aquarium_txt_tile_info);
 	TILE_GET_INFO_MEMBER(get_aquarium_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_aquarium_bak_tile_info);
@@ -66,7 +70,7 @@ public:
 	uint8_t aquarium_snd_bitswap( uint8_t scrambled_data );
 	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_mask, int priority_value);
 	bitmap_ind16 m_temp_sprite_bitmap;
-	void aquarium(machine_config &config);
+
 	void main_map(address_map &map);
 	void snd_map(address_map &map);
 	void snd_portmap(address_map &map);

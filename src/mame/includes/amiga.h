@@ -354,6 +354,41 @@ public:
 		m_rx_previous(1)
 	{ }
 
+	void amiga_base(machine_config &config);
+	void pal_video(machine_config &config);
+	void ntsc_video(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
+	DECLARE_CUSTOM_INPUT_MEMBER( floppy_drive_status );
+
+	DECLARE_VIDEO_START( amiga_aga );
+
+	uint32_t screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	/* chip RAM access */
+	DECLARE_READ16_MEMBER(chip_ram_r)
+	{
+		return read_chip_ram(offset & ~1) & mem_mask;
+	}
+
+	DECLARE_WRITE16_MEMBER(chip_ram_w)
+	{
+		uint16_t val = read_chip_ram(offset & ~1) & ~mem_mask;
+		write_chip_ram(offset & ~1, val | data);
+	}
+	DECLARE_WRITE_LINE_MEMBER( paula_int_w );
+
+	DECLARE_WRITE8_MEMBER( cia_0_port_a_write );
+	DECLARE_WRITE_LINE_MEMBER( cia_0_irq );
+	DECLARE_READ8_MEMBER( cia_1_port_a_read );
+	DECLARE_WRITE8_MEMBER( cia_1_port_a_write );
+	DECLARE_WRITE_LINE_MEMBER( cia_1_irq );
+
+	DECLARE_WRITE_LINE_MEMBER(fdc_dskblk_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_dsksyn_w);
+
+protected:
 	/* chip RAM access */
 	uint16_t read_chip_ram(offs_t byteoffs)
 	{
@@ -364,17 +399,6 @@ public:
 	{
 		if (EXPECTED(byteoffs < m_chip_ram.bytes()))
 			m_chip_ram.write(byteoffs >> 1, data);
-	}
-
-	DECLARE_READ16_MEMBER(chip_ram_r)
-	{
-		return read_chip_ram(offset & ~1) & mem_mask;
-	}
-
-	DECLARE_WRITE16_MEMBER(chip_ram_w)
-	{
-		uint16_t val = read_chip_ram(offset & ~1) & ~mem_mask;
-		write_chip_ram(offset & ~1, val | data);
 	}
 
 	/* sprite states */
@@ -415,11 +439,8 @@ public:
 	int m_aga_sprite_dma_used_words[8];
 
 	DECLARE_VIDEO_START( amiga );
-	DECLARE_VIDEO_START( amiga_aga );
 	DECLARE_PALETTE_INIT( amiga );
 
-	uint32_t screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_screenmode();
 
 	TIMER_CALLBACK_MEMBER( scanline_callback );
@@ -427,20 +448,12 @@ public:
 	TIMER_CALLBACK_MEMBER( amiga_blitter_proc );
 	void update_irqs();
 
-	DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
-	DECLARE_CUSTOM_INPUT_MEMBER( floppy_drive_status );
-
 	DECLARE_WRITE_LINE_MEMBER( m68k_reset );
 	DECLARE_WRITE_LINE_MEMBER( kbreset_w );
 
 	DECLARE_READ16_MEMBER( cia_r );
 	DECLARE_WRITE16_MEMBER( cia_w );
 	DECLARE_WRITE16_MEMBER( gayle_cia_w );
-	DECLARE_WRITE8_MEMBER( cia_0_port_a_write );
-	DECLARE_WRITE_LINE_MEMBER( cia_0_irq );
-	DECLARE_READ8_MEMBER( cia_1_port_a_read );
-	DECLARE_WRITE8_MEMBER( cia_1_port_a_write );
-	DECLARE_WRITE_LINE_MEMBER( cia_1_irq );
 
 	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
 	DECLARE_WRITE_LINE_MEMBER( rs232_dcd_w );
@@ -456,13 +469,9 @@ public:
 	DECLARE_READ16_MEMBER( custom_chip_r );
 	DECLARE_WRITE16_MEMBER( custom_chip_w );
 
-	DECLARE_WRITE_LINE_MEMBER( paula_int_w );
 
 	DECLARE_READ16_MEMBER( rom_mirror_r );
 	DECLARE_READ32_MEMBER( rom_mirror32_r );
-
-	DECLARE_WRITE_LINE_MEMBER(fdc_dskblk_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_dsksyn_w);
 
 	// standard clocks
 	static constexpr XTAL CLK_28M_PAL = XTAL(28'375'160);
@@ -498,15 +507,12 @@ public:
 
 	void blitter_setup();
 
-	void amiga_base(machine_config &config);
-	void pal_video(machine_config &config);
-	void ntsc_video(machine_config &config);
 	void overlay_1mb_map(address_map &map);
 	void overlay_1mb_map32(address_map &map);
 	void overlay_2mb_map16(address_map &map);
 	void overlay_2mb_map32(address_map &map);
 	void overlay_512kb_map(address_map &map);
-protected:
+
 	// A bit of a trick here: some registers are 32-bit. In order to efficiently
 	// read them on both big-endian and little-endian systems, we store the custom
 	// registers in 32-bit natural order. This means we need to XOR the register

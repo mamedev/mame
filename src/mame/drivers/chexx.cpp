@@ -43,6 +43,10 @@ public:
 	{
 	}
 
+	void faceoffh(machine_config &config);
+	void chexx83(machine_config &config);
+
+private:
 	// callbacks
 	TIMER_DEVICE_CALLBACK_MEMBER(update);
 
@@ -63,12 +67,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
 
-	void faceoffh(machine_config &config);
-	void chexx83(machine_config &config);
 	void chexx83_map(address_map &map);
 	void faceoffh_map(address_map &map);
 
-private:
 	// vars
 	uint8_t  m_port_a, m_port_b;
 	uint8_t  m_bank;

@@ -44,6 +44,12 @@ public:
 		m_inp_pa3(*this, "PA3.%u", 0)
 	{ }
 
+	void creativision(machine_config &config);
+	void ntsc(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device<sn76496_base_device> m_psg;
@@ -62,12 +68,9 @@ public:
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_READ8_MEMBER( pia_pb_r );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
-	void creativision(machine_config &config);
-	void ntsc(machine_config &config);
 	void crvision_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 };
 
@@ -90,6 +93,9 @@ public:
 		, m_inp_joy(*this, "JOY.%u", 0)
 	{ }
 
+	void lasr2001(machine_config &config);
+
+private:
 	required_device<centronics_device> m_centronics;
 	required_ioport_array<8> m_inp_y;
 	required_ioport_array<4> m_inp_joy;
@@ -109,9 +115,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( pia_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
-	void lasr2001(machine_config &config);
 	void lasr2001_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 };
 

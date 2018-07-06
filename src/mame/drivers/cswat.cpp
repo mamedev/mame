@@ -41,6 +41,9 @@ public:
 		m_dips_inp(*this, "DIPS")
 	{ }
 
+	void cswat(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -63,7 +66,7 @@ public:
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	void cswat(machine_config &config);
+
 	void cswat_map(address_map &map);
 };
 

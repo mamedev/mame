@@ -334,6 +334,13 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void winner81(machine_config &config);
+	void winner82(machine_config &config);
+	void rcirulet(machine_config &config);
+	void luckyrlt(machine_config &config);
+	void re800(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(blitter_y_w);
 	DECLARE_WRITE8_MEMBER(blitter_unk_w);
 	DECLARE_WRITE8_MEMBER(blitter_x_w);
@@ -351,11 +358,7 @@ public:
 	DECLARE_PALETTE_INIT(corona);
 	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void winner81(machine_config &config);
-	void winner82(machine_config &config);
-	void rcirulet(machine_config &config);
-	void luckyrlt(machine_config &config);
-	void re800(machine_config &config);
+
 	void luckyrlt_cpu_io_map(address_map &map);
 	void luckyrlt_map(address_map &map);
 	void luckyrlt_sound_cpu_io_map(address_map &map);
@@ -373,7 +376,6 @@ public:
 	void winner82_sound_cpu_io_map(address_map &map);
 	void winner82_sound_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 
 	uint8_t m_blitter_x_reg;

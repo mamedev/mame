@@ -61,7 +61,11 @@ public:
 		, m_fdc(*this, "fdc")
 	{ }
 
+	void czk80(machine_config &config);
+
 	void init_czk80();
+
+private:
 	DECLARE_MACHINE_RESET(czk80);
 	TIMER_CALLBACK_MEMBER(czk80_reset);
 	DECLARE_READ8_MEMBER(port80_r);
@@ -72,10 +76,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	void czk80(machine_config &config);
+
 	void czk80_io(address_map &map);
 	void czk80_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;

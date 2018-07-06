@@ -56,6 +56,26 @@ public:
 	{
 	}
 
+	void bullet(machine_config &config);
+
+	DECLARE_READ8_MEMBER( dma_mreq_r );
+	DECLARE_WRITE8_MEMBER( dma_mreq_w );
+
+	DECLARE_WRITE_LINE_MEMBER( dartardy_w );
+	DECLARE_WRITE_LINE_MEMBER( dartbrdy_w );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+
+	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+
+	DECLARE_WRITE_LINE_MEMBER(dart_rxtxca_w);
+	DECLARE_READ8_MEMBER(io_read_byte);
+	DECLARE_WRITE8_MEMBER(io_write_byte);
+
+protected:
 	DECLARE_READ8_MEMBER( mreq_r );
 	DECLARE_WRITE8_MEMBER( mreq_w );
 	DECLARE_READ8_MEMBER( info_r );
@@ -67,26 +87,12 @@ public:
 	DECLARE_WRITE8_MEMBER( exdma_w );
 	DECLARE_WRITE8_MEMBER( hdcon_w );
 	DECLARE_WRITE8_MEMBER( segst_w );
-	DECLARE_READ8_MEMBER( dma_mreq_r );
-	DECLARE_WRITE8_MEMBER( dma_mreq_w );
+
 	DECLARE_READ8_MEMBER( pio_pb_r );
-	DECLARE_WRITE_LINE_MEMBER( dartardy_w );
-	DECLARE_WRITE_LINE_MEMBER( dartbrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
-	DECLARE_WRITE_LINE_MEMBER(dart_rxtxca_w);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
-
-	void bullet(machine_config &config);
 	void bullet_io(address_map &map);
 	void bullet_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -147,6 +153,9 @@ public:
 	{
 	}
 
+	void bulletf(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( mreq_r );
 	DECLARE_WRITE8_MEMBER( mreq_w );
 	DECLARE_WRITE8_MEMBER( xdma0_w );
@@ -162,10 +171,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
 	DECLARE_WRITE_LINE_MEMBER( req_w );
 
-	void bulletf(machine_config &config);
 	void bulletf_io(address_map &map);
 	void bulletf_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

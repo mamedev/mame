@@ -26,6 +26,9 @@ public:
 	{
 	}
 
+	void busicom(machine_config &config);
+
+private:
 	uint8_t m_drum_index;
 	uint16_t m_keyboard_shifter;
 	uint32_t m_printer_shifter;
@@ -46,13 +49,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	uint8_t get_bit_selected(uint32_t val,int num);
 
-	void busicom(machine_config &config);
 	void busicom_mem(address_map &map);
 	void busicom_mp(address_map &map);
 	void busicom_rom(address_map &map);
 	void busicom_rp(address_map &map);
 	void busicom_stat(address_map &map);
-private:
+
 	required_device<i4004_cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_ioport_array<10> m_input_lines;

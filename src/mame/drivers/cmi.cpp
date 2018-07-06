@@ -264,6 +264,11 @@ public:
 	{
 	}
 
+	void cmi2x(machine_config &config);
+
+	void init_cmi2x();
+
+private:
 	void set_interrupt(int cpunum, int level, int state);
 
 	virtual void machine_reset() override;
@@ -274,8 +279,6 @@ public:
 	static const device_timer_id TIMER_HBLANK = 1;
 	static const device_timer_id TIMER_JAM_TIMEOUT = 2;
 	static const device_timer_id TIMER_CMI10_SCND = 3;
-
-	void init_cmi2x();
 
 	// CPU card
 	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq );
@@ -365,7 +368,6 @@ public:
 
 	template<int Channel> DECLARE_WRITE_LINE_MEMBER( channel_irq );
 
-	void cmi2x(machine_config &config);
 	void alphakeys_map(address_map &map);
 	void cmi07cpu_map(address_map &map);
 	void maincpu1_map(address_map &map);
@@ -373,7 +375,6 @@ public:
 	void midicpu_map(address_map &map);
 	void muskeys_map(address_map &map);
 
-protected:
 	required_device<mc6809e_device> m_maincpu1;
 	required_device<mc6809e_device> m_maincpu2;
 	required_device<m6802_cpu_device> m_muskeyscpu;
@@ -440,8 +441,6 @@ protected:
 
 	address_space *m_cpu1space;
 	address_space *m_cpu2space;
-
-private:
 
 	emu_timer *m_map_switch_timer;
 	emu_timer *m_hblank_timer;

@@ -25,6 +25,21 @@ public:
 			m_in1(*this, "IN1"),
 			m_mo_command(*this, "mo_command") { }
 
+	void atarig1(machine_config &config);
+	void pitfightj(machine_config &config);
+	void pitfight7(machine_config &config);
+	void pitfight9(machine_config &config);
+	void pitfightb(machine_config &config);
+	void pitfight(machine_config &config);
+	void hydrap(machine_config &config);
+	void hydra(machine_config &config);
+
+	void init_hydrap();
+	void init_hydra();
+	void init_pitfight();
+	void init_pitfightb();
+
+private:
 	required_device<atari_jsa_ii_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
@@ -56,25 +71,15 @@ public:
 	DECLARE_READ16_MEMBER(a2d_data_r);
 	DECLARE_READ16_MEMBER(pitfightb_cheap_slapstic_r);
 	void update_bank(int bank);
-	void init_hydrap();
-	void init_hydra();
-	void init_pitfight();
-	void init_pitfightb();
+
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(atarig1);
 	DECLARE_MACHINE_RESET(atarig1);
 	DECLARE_VIDEO_START(atarig1);
 	uint32_t screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void atarig1(machine_config &config);
-	void pitfightj(machine_config &config);
-	void pitfight7(machine_config &config);
-	void pitfight9(machine_config &config);
-	void pitfightb(machine_config &config);
-	void pitfight(machine_config &config);
-	void hydrap(machine_config &config);
-	void hydra(machine_config &config);
+	
 	void main_map(address_map &map);
-private:
+
 	void pitfightb_cheap_slapstic_init();
 };

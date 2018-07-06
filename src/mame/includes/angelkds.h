@@ -20,6 +20,12 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
+	void angelkds(machine_config &config);
+	void spcpostn(machine_config &config);
+
+	void init_angelkds();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_bgtopvideoram;
 	required_shared_ptr<uint8_t> m_bgbotvideoram;
@@ -54,7 +60,6 @@ public:
 	DECLARE_WRITE8_MEMBER(angelkds_bgbotbank_write);
 	DECLARE_WRITE8_MEMBER(angelkds_bgbotscroll_write);
 	DECLARE_WRITE8_MEMBER(angelkds_layer_ctrl_write);
-	void init_angelkds();
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgtop_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgbot_tile_info);
@@ -66,8 +71,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
-	void angelkds(machine_config &config);
-	void spcpostn(machine_config &config);
+
 	void decrypted_opcodes_map(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);

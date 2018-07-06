@@ -90,7 +90,7 @@ public:
 
 	void vvillage(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(sc0_vram_w);
 	DECLARE_WRITE8_MEMBER(sc0_attr_w);
 	DECLARE_WRITE8_MEMBER(vvillage_scroll_w);
@@ -106,7 +106,6 @@ protected:
 	void vvillage_io(address_map &map);
 	void vvillage_mem(address_map &map);
 
-private:
 	required_shared_ptr<uint8_t> m_sc0_vram;
 	required_shared_ptr<uint8_t> m_sc0_attr;
 	tilemap_t *m_sc0_tilemap;

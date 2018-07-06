@@ -89,12 +89,17 @@ public:
 	{
 	}
 
+	void ccs2810(machine_config &config);
+	void ccs2422(machine_config &config);
+
+	void init_ccs2810();
+	void init_ccs2422();
+
+private:
 	DECLARE_READ8_MEMBER(memory_read);
 	DECLARE_WRITE8_MEMBER(memory_write);
 	DECLARE_READ8_MEMBER(io_read);
 	DECLARE_WRITE8_MEMBER(io_write);
-	void init_ccs2810();
-	void init_ccs2422();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(port04_r);
@@ -103,12 +108,10 @@ public:
 	DECLARE_WRITE8_MEMBER(port34_w);
 	DECLARE_WRITE8_MEMBER(port40_w);
 
-	void ccs2810(machine_config &config);
-	void ccs2422(machine_config &config);
 	void ccs2422_io(address_map &map);
 	void ccs2810_io(address_map &map);
 	void ccs2810_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_region_ptr<uint8_t> m_rom;

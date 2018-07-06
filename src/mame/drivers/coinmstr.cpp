@@ -156,6 +156,16 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void coinmstr(machine_config &config);
+	void pokeroul(machine_config &config);
+	void supnudg2(machine_config &config);
+	void jpcoin(machine_config &config);
+	void quizmstr(machine_config &config);
+	void trailblz(machine_config &config);
+
+	void init_coinmstr();
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_attr_ram1;
 	required_shared_ptr<uint8_t> m_attr_ram2;
@@ -169,19 +179,14 @@ public:
 	DECLARE_READ8_MEMBER(question_r);
 	DECLARE_WRITE8_MEMBER(question_w);
 	DECLARE_READ8_MEMBER(ff_r);
-	void init_coinmstr();
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_coinmstr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void coinmstr(machine_config &config);
-	void pokeroul(machine_config &config);
-	void supnudg2(machine_config &config);
-	void jpcoin(machine_config &config);
-	void quizmstr(machine_config &config);
-	void trailblz(machine_config &config);
+
 	void coinmstr_map(address_map &map);
 	void jpcoin_io_map(address_map &map);
 	void jpcoin_map(address_map &map);

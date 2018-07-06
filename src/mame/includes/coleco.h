@@ -40,6 +40,12 @@ public:
 			m_roller_y(*this, "ROLLER_Y")
 	{ }
 
+	void colecop(machine_config &config);
+	void coleco(machine_config &config);
+	void czz50(machine_config &config);
+	void dina(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -59,14 +65,10 @@ public:
 	uint8_t coleco_paddle_read(int port, int joy_mode, uint8_t joy_status);
 	uint8_t coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1);
 
-	void colecop(machine_config &config);
-	void coleco(machine_config &config);
-	void czz50(machine_config &config);
-	void dina(machine_config &config);
 	void coleco_io_map(address_map &map);
 	void coleco_map(address_map &map);
 	void czz50_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<colecovision_cartridge_slot_device> m_cart;
 	required_shared_ptr<uint8_t> m_ram;

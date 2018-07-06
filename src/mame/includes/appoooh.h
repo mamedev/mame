@@ -26,12 +26,13 @@ public:
 		m_msm(*this, "msm")
 	{ }
 
-	void init_robowresb();
 	void appoooh(machine_config &config);
 	void robowres(machine_config &config);
 	void robowrese(machine_config &config);
 
-protected:
+	void init_robowresb();
+
+private:
 	DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_WRITE8_MEMBER(fg_videoram_w);
@@ -58,7 +59,6 @@ protected:
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_fg_videoram;

@@ -23,6 +23,9 @@ public:
 		m_soundlatch(*this, "soundlatch")
 		{ }
 
+	void battlera(machine_config &config);
+
+private:
 	required_device<h6280_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
 	required_device<msm5205_device> m_msm;
@@ -44,7 +47,7 @@ public:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void battlera(machine_config &config);
+
 	void battlera_map(address_map &map);
 	void battlera_portmap(address_map &map);
 	void sound_map(address_map &map);

@@ -50,6 +50,37 @@ public:
 		m_captflag_leds = 0;
 	}
 
+	void scudhamm(machine_config &config);
+	void armchmp2(machine_config &config);
+	void cischeat(machine_config &config);
+	void f1gpstr2(machine_config &config);
+	void f1gpstar(machine_config &config);
+	void captflag(machine_config &config);
+	void bigrun(machine_config &config);
+
+	void init_cischeat();
+	void init_bigrun();
+	void init_f1gpstar();
+	void init_captflag();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(captflag_motor_busy_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(captflag_motor_pos_r);
+
+	DECLARE_READ16_MEMBER(f1gpstr2_ioready_r);
+	DECLARE_WRITE16_MEMBER(f1gpstr2_io_w);
+	
+	DECLARE_READ16_MEMBER(wildplt_mux_r);
+	DECLARE_WRITE16_MEMBER(wildplt_mux_w);
+	DECLARE_READ16_MEMBER(wildplt_xy_r);
+
+	DECLARE_WRITE16_MEMBER(ip_select_w);
+
+	DECLARE_WRITE16_MEMBER(f1gpstar_soundint_w);
+	DECLARE_WRITE16_MEMBER(f1gpstar_comms_w);
+
+	DECLARE_WRITE16_MEMBER(active_layers_w);
+
+protected:
 	DECLARE_WRITE16_MEMBER(scudhamm_motor_command_w);
 	DECLARE_WRITE16_MEMBER(scudhamm_leds_w);
 	DECLARE_WRITE16_MEMBER(scudhamm_enable_w);
@@ -68,28 +99,21 @@ public:
 	DECLARE_WRITE16_MEMBER(unknown_out_w);
 	DECLARE_WRITE16_MEMBER(motor_out_w);
 	DECLARE_WRITE16_MEMBER(wheel_out_w);
-	DECLARE_WRITE16_MEMBER(ip_select_w);
+
 	DECLARE_WRITE16_MEMBER(ip_select_plus1_w);
 	DECLARE_WRITE16_MEMBER(bigrun_comms_w);
-	DECLARE_WRITE16_MEMBER(active_layers_w);
+
 	DECLARE_READ16_MEMBER(cischeat_ip_select_r);
 	DECLARE_WRITE16_MEMBER(cischeat_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(cischeat_comms_w);
 	DECLARE_READ16_MEMBER(f1gpstar_wheel_r);
-	DECLARE_READ16_MEMBER(f1gpstr2_ioready_r);
-	DECLARE_READ16_MEMBER(wildplt_xy_r);
-	DECLARE_READ16_MEMBER(wildplt_mux_r);
-	DECLARE_WRITE16_MEMBER(wildplt_mux_w);
+
 	DECLARE_WRITE16_MEMBER(f1gpstar_motor_w);
-	DECLARE_WRITE16_MEMBER(f1gpstar_soundint_w);
-	DECLARE_WRITE16_MEMBER(f1gpstar_comms_w);
-	DECLARE_WRITE16_MEMBER(f1gpstr2_io_w);
+
 	DECLARE_WRITE16_MEMBER(cischeat_soundbank_1_w);
 	DECLARE_WRITE16_MEMBER(cischeat_soundbank_2_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	void init_cischeat();
-	void init_bigrun();
-	void init_f1gpstar();
+
 	uint32_t screen_update_bigrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_scudhamm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cischeat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -107,21 +131,13 @@ public:
 	DECLARE_WRITE16_MEMBER(captflag_motor_command_right_w);
 	DECLARE_WRITE16_MEMBER(captflag_motor_command_left_w);
 	void captflag_motor_move(int side, uint16_t data);
-	DECLARE_CUSTOM_INPUT_MEMBER(captflag_motor_busy_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(captflag_motor_pos_r);
+
 	DECLARE_WRITE16_MEMBER(captflag_oki_bank_w);
 
 	DECLARE_WRITE16_MEMBER(captflag_leds_w);
 
-	void init_captflag();
 	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
-	void scudhamm(machine_config &config);
-	void armchmp2(machine_config &config);
-	void cischeat(machine_config &config);
-	void f1gpstr2(machine_config &config);
-	void f1gpstar(machine_config &config);
-	void captflag(machine_config &config);
-	void bigrun(machine_config &config);
+
 	void armchmp2_map(address_map &map);
 	void bigrun_map(address_map &map);
 	void bigrun_map2(address_map &map);
@@ -143,7 +159,6 @@ public:
 	void f1gpstr2_sound_map(address_map &map);
 	void scudhamm_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void video_start() override;
 
@@ -205,15 +220,15 @@ public:
 		: cischeat_state(mconfig, type, tag)
 	{}
 
-	uint16_t *m_buffer_spriteram;
-	void wildplt_map(address_map &map);
 	void wildplt(machine_config &config);
-	DECLARE_WRITE16_MEMBER(sprite_dma_w);
-
-protected:
-	virtual void video_start() override;
 
 private:
+	uint16_t *m_buffer_spriteram;
+	void wildplt_map(address_map &map);
+	DECLARE_WRITE16_MEMBER(sprite_dma_w);
+
+	virtual void video_start() override;
+
 	uint16_t m_sprite_dma_reg;
 };
 

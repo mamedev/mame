@@ -31,10 +31,11 @@ public:
 		m_videolatch(*this, "videolatch")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
 	void cloud9(machine_config &config);
 
-protected:
+	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+
+private:
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
@@ -56,7 +57,6 @@ protected:
 	inline void schedule_next_irq(int curscanline);
 	void cloud9_map(address_map &map);
 
-private:
 	/* devices */
 	required_device<m6502_device> m_maincpu;
 	required_device<x2212_device> m_nvram;

@@ -15,16 +15,16 @@ public:
 	{ }
 
 	void bingo(machine_config &config);
-	void bingo_map(address_map &map);
-protected:
 
+	void init_bingo();
+
+private:
+	void bingo_map(address_map &map);
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	void init_bingo();
 };
 
 

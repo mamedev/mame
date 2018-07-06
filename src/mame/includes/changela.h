@@ -26,6 +26,9 @@ public:
 	{
 	}
 
+	void changela(machine_config &config);
+
+private:
 	/* video-related */
 	bitmap_ind16 m_obj0_bitmap;
 	bitmap_ind16 m_river_bitmap;
@@ -87,9 +90,8 @@ public:
 	void draw_river( bitmap_ind16 &bitmap, int sy );
 	void draw_tree( bitmap_ind16 &bitmap, int sy, int tree_num );
 
-	void changela(machine_config &config);
 	void changela_map(address_map &map);
-protected:
+
 	// memory pointers
 	required_shared_ptr<u8>         m_spriteram;
 	required_shared_ptr<u8>         m_videoram;

@@ -46,6 +46,12 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void bmcpokr(machine_config &config);
+	void mjmaglmp(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+
+private:
 	// Devices
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
@@ -70,7 +76,7 @@ public:
 	uint16_t m_mux;
 	DECLARE_WRITE16_MEMBER(mux_w);
 	DECLARE_READ16_MEMBER(dsw_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+
 	DECLARE_READ16_MEMBER(mjmaglmp_dsw_r);
 	DECLARE_READ16_MEMBER(mjmaglmp_key_r);
 
@@ -106,8 +112,7 @@ public:
 		save_item(NAME(m_pixpal));
 		machine().save().register_postload(save_prepost_delegate(FUNC(bmcpokr_state::pixbitmap_redraw), this));
 	}
-	void bmcpokr(machine_config &config);
-	void mjmaglmp(machine_config &config);
+
 	void bmcpokr_mem(address_map &map);
 	void mjmaglmp_map(address_map &map);
 	void ramdac_map(address_map &map);

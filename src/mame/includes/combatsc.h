@@ -32,6 +32,12 @@ public:
 	{
 	}
 
+	void combatscb(machine_config &config);
+	void combatsc(machine_config &config);
+
+	void init_combatsc();
+
+private:
 	/* memory pointers */
 	uint8_t *    m_videoram;
 	uint8_t *    m_scrollram;
@@ -97,7 +103,7 @@ public:
 	DECLARE_WRITE8_MEMBER(combatsc_portA_w);
 	DECLARE_WRITE8_MEMBER(combatscb_msm_w);
 	DECLARE_WRITE8_MEMBER(combatscb_sound_irq_ack);
-	void init_combatsc();
+
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_text_info);
@@ -115,8 +121,7 @@ public:
 	uint32_t screen_update_combatscb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask );
 	void bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit );
-	void combatscb(machine_config &config);
-	void combatsc(machine_config &config);
+
 	void combatsc_map(address_map &map);
 	void combatsc_sound_map(address_map &map);
 	void combatscb_map(address_map &map);

@@ -103,6 +103,18 @@ public:
 		m_caps_lock(1)
 	{ }
 
+	void pal(machine_config &config);
+	void ntsc(machine_config &config);
+	void c128pal(machine_config &config);
+	void c128(machine_config &config);
+	void c128dcr(machine_config &config);
+	void c128dcrp(machine_config &config);
+	void c128d81(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( caps_lock );
+	DECLARE_WRITE_LINE_MEMBER( write_restore );
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<m8502_device> m_subcpu;
 	required_device<mos8722_device> m_mmu;
@@ -184,9 +196,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
-	DECLARE_WRITE_LINE_MEMBER( write_restore );
-	DECLARE_INPUT_CHANGED_MEMBER( caps_lock );
-
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
 
 	DECLARE_READ8_MEMBER( cia2_pb_r );
@@ -238,13 +247,7 @@ public:
 
 	int m_user_pa2;
 	int m_user_pb;
-	void pal(machine_config &config);
-	void ntsc(machine_config &config);
-	void c128pal(machine_config &config);
-	void c128(machine_config &config);
-	void c128dcr(machine_config &config);
-	void c128dcrp(machine_config &config);
-	void c128d81(machine_config &config);
+
 	void m8502_mem(address_map &map);
 	void vdc_videoram_map(address_map &map);
 	void vic_colorram_map(address_map &map);

@@ -20,6 +20,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette") { }
 
+	void bk0010(machine_config &config);
+	void bk0010fd(machine_config &config);
+
+private:
 	uint16_t m_scrool;
 	required_shared_ptr<uint16_t> m_bk0010_video_ram;
 	uint16_t m_kbd_state;
@@ -47,8 +51,7 @@ public:
 	IRQ_CALLBACK_MEMBER(bk0010_irq_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
-	void bk0010(machine_config &config);
-	void bk0010fd(machine_config &config);
+
 	void bk0010_mem(address_map &map);
 	void bk0010fd_mem(address_map &map);
 };

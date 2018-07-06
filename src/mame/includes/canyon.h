@@ -42,7 +42,7 @@ public:
 
 	void canyon(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(canyon_switches_r);
 	DECLARE_READ8_MEMBER(canyon_options_r);
 	DECLARE_WRITE8_MEMBER(output_latch_w);
@@ -58,7 +58,6 @@ protected:
 	virtual void video_start() override;
 	void main_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 

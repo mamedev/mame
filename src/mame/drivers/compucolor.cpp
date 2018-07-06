@@ -55,6 +55,9 @@ public:
 		m_y128(*this, "Y128")
 	{ }
 
+	void compucolor2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tms5501_device> m_mioc;
 	required_device<crt5027_device> m_vtac;
@@ -79,7 +82,7 @@ public:
 	IRQ_CALLBACK_MEMBER( int_ack );
 
 	uint8_t m_xo;
-	void compucolor2(machine_config &config);
+
 	void compucolor2_io(address_map &map);
 	void compucolor2_mem(address_map &map);
 };

@@ -23,6 +23,11 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void bigevglf(machine_config &config);
+
+	void init_bigevglf();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_paletteram;
 	required_shared_ptr<uint8_t> m_spriteram1;
@@ -62,7 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bigevglf_vidram_addr_w);
 	DECLARE_WRITE8_MEMBER(bigevglf_vidram_w);
 	DECLARE_READ8_MEMBER(bigevglf_vidram_r);
-	void init_bigevglf();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -75,7 +80,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void bigevglf(machine_config &config);
+
 	void bigevglf_portmap(address_map &map);
 	void bigevglf_sub_portmap(address_map &map);
 	void main_map(address_map &map);

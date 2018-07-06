@@ -28,6 +28,11 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_rombank(*this, "rombank") { }
 
+	void crimfght(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -51,13 +56,11 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
-	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
 
-	void crimfght(machine_config &config);
 	void bank0000_map(address_map &map);
 	void crimfght_map(address_map &map);
 	void crimfght_sound_map(address_map &map);
-private:
+
 	int m_woco;
 	int m_rmrd;
 	int m_init;

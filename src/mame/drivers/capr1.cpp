@@ -47,10 +47,12 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void cspin2(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(output_w);
 
 	required_device<cpu_device> m_maincpu;
-	void cspin2(machine_config &config);
 	void cspin2_map(address_map &map);
 };
 

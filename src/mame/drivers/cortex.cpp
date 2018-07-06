@@ -64,18 +64,21 @@ public:
 		, m_io_dsw(*this, "DSW")
 	{ }
 
+	void cortex(machine_config &config);
+
+	void init_init();
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(romsw_w);
 	DECLARE_WRITE_LINE_MEMBER(vdp_int_w);
 	DECLARE_READ8_MEMBER(pio_r);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	void init_init();
 
-	void cortex(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	bool m_kbd_ack;
 	bool m_vdp_int;
 	uint8_t m_term_data;

@@ -127,6 +127,11 @@ public:
 		m_vid2(*this, "vid2"),
 		m_palette(*this, "palette") { }
 
+	void bmcbowl(machine_config &config);
+
+	void init_bmcbowl();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_stats_ram;
 	required_shared_ptr<uint16_t> m_vid1;
@@ -142,12 +147,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
 	DECLARE_READ8_MEMBER(dips1_r);
 	DECLARE_WRITE8_MEMBER(input_mux_w);
-	void init_bmcbowl();
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init_stats(const uint8_t *table, int table_len, int address);
-	void bmcbowl(machine_config &config);
 	void bmcbowl_mem(address_map &map);
 	void ramdac_map(address_map &map);
 };

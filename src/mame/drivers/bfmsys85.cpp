@@ -87,6 +87,12 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void bfmsys85(machine_config &config);
+
+	void init_decode();
+	void init_nodecode();
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
 	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
@@ -107,11 +113,10 @@ public:
 	DECLARE_READ8_MEMBER(triac_r);
 	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	void init_decode();
-	void init_nodecode();
+
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	int b85_find_project_string();
-	void bfmsys85(machine_config &config);
+
 	void memmap(address_map &map);
 
 protected:

@@ -27,8 +27,10 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	void caprcyc(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	void caprcyc_map(address_map &map);
 };
 

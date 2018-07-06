@@ -528,6 +528,11 @@ public:
 		m_slavecpu(*this, "slavecpu"),
 		m_palette(*this, "palette")  { }
 
+	void bingor(machine_config &config);
+	void bingor2(machine_config &config);
+	void vip2000(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_blit_ram;
 	virtual void video_start() override;
 	uint32_t screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -542,9 +547,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vip2000_outputs_w);
 	u8 m_toslave;
 	u8 m_fromslave;
-	void bingor(machine_config &config);
-	void bingor2(machine_config &config);
-	void vip2000(machine_config &config);
+
 	void bingor2_map(address_map &map);
 	void bingor_io(address_map &map);
 	void bingor_map(address_map &map);

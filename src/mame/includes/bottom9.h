@@ -26,6 +26,9 @@ public:
 		m_k051316(*this, "k051316"),
 		m_palette(*this, "palette") { }
 
+	void bottom9(machine_config &config);
+
+private:
 	/* misc */
 	int        m_video_enable;
 	int        m_zoomreadroms;
@@ -62,7 +65,7 @@ public:
 	K051316_CB_MEMBER(zoom_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	void bottom9(machine_config &config);
+
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 };

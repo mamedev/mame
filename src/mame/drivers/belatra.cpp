@@ -55,9 +55,9 @@ public:
 	{ }
 
 	void belatra(machine_config &config);
-	void belatra_map(address_map &map);
-protected:
 
+private:
+	void belatra_map(address_map &map);
 	// devices
 	required_device<cpu_device> m_maincpu;
 };

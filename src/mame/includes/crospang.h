@@ -22,6 +22,13 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void crospang(machine_config &config);
+	void bestri(machine_config &config);
+	void bestria(machine_config &config);
+
+	void init_crospang();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_fg_videoram;
 	required_shared_ptr<uint16_t> m_bg_videoram;
@@ -49,7 +56,7 @@ public:
 	DECLARE_WRITE16_MEMBER(crospang_bg_scrollx_w);
 	DECLARE_WRITE16_MEMBER(crospang_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(crospang_bg_videoram_w);
-	void init_crospang();
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
@@ -57,9 +64,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_crospang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
-	void crospang(machine_config &config);
-	void bestri(machine_config &config);
-	void bestria(machine_config &config);
+
 	void bestri_map(address_map &map);
 	void bestria_map(address_map &map);
 	void crospang_base_map(address_map &map);

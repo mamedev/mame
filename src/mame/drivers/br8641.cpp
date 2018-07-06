@@ -44,14 +44,16 @@ public:
 		, m_beep(*this, "beeper")
 	{ }
 
+	void brandt8641(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port08_r);
 	DECLARE_WRITE8_MEMBER(port08_w);
 	DECLARE_WRITE8_MEMBER(port09_w);
 
-	void brandt8641(machine_config &config);
 	void brandt8641_io(address_map &map);
 	void brandt8641_mem(address_map &map);
-private:
+
 	uint8_t m_port08;
 	uint8_t m_port09;
 	required_device<cpu_device> m_maincpu;

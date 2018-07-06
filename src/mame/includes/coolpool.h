@@ -23,6 +23,15 @@ public:
 		, m_dsp_rom(*this, "dspdata")
 	{ }
 
+	void _9ballsht(machine_config &config);
+	void coolpool(machine_config &config);
+	void amerdart(machine_config &config);
+
+	void init_coolpool();
+	void init_amerdart();
+	void init_9ballsht();
+
+private:
 	required_device<tms34010_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	optional_device<tlc34076_device> m_tlc34076;
@@ -68,18 +77,14 @@ public:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(amerdart_scanline);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_scanline);
-	void init_coolpool();
-	void init_amerdart();
-	void init_9ballsht();
+
 	DECLARE_MACHINE_RESET(amerdart);
 	DECLARE_MACHINE_RESET(coolpool);
 	TIMER_DEVICE_CALLBACK_MEMBER(nvram_write_timeout);
 	TIMER_DEVICE_CALLBACK_MEMBER(amerdart_audio_int_gen);
 	void register_state_save();
 	int amerdart_trackball_direction(int num, int data);
-	void _9ballsht(machine_config &config);
-	void coolpool(machine_config &config);
-	void amerdart(machine_config &config);
+
 	void amerdart_dsp_io_map(address_map &map);
 	void amerdart_dsp_pgm_map(address_map &map);
 	void amerdart_map(address_map &map);

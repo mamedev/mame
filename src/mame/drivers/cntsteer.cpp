@@ -58,6 +58,14 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void cntsteer(machine_config &config);
+	void zerotrgt(machine_config &config);
+
+	void init_zerotrgt();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -104,8 +112,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cntsteer_main_irq_w);
 	DECLARE_READ8_MEMBER(cntsteer_adx_r);
 	DECLARE_WRITE8_MEMBER(nmimask_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	void init_zerotrgt();
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_MACHINE_START(cntsteer);
@@ -122,8 +129,7 @@ public:
 	void zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void zerotrgt_rearrange_gfx( int romsize, int romarea );
-	void cntsteer(machine_config &config);
-	void zerotrgt(machine_config &config);
+
 	void cntsteer_cpu1_map(address_map &map);
 	void cntsteer_cpu2_map(address_map &map);
 	void gekitsui_cpu1_map(address_map &map);

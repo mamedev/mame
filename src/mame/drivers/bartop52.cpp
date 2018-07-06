@@ -39,7 +39,7 @@ public:
 
 	void a5200(machine_config &config);
 
-protected:
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER( bartop_interrupt );
 
 	virtual void machine_reset() override;

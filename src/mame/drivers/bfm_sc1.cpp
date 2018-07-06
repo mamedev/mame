@@ -142,7 +142,7 @@ public:
 	void scorpion1(machine_config &config);
 	void scorpion1_viper(machine_config &config);
 
-protected:
+private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(irqlatch_r);
@@ -187,7 +187,6 @@ protected:
 	void sc1_base(address_map &map);
 	void sc1_viper(address_map &map);
 
-private:
 	int m_mmtr_latch;
 	int m_triac_latch;
 	int m_vfd_latch;  //initialized but not used

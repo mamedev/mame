@@ -47,7 +47,14 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void by6803(machine_config &config);
+
 	void init_by6803();
+
+	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
+	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
+private:
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_READ8_MEMBER(port2_r);
@@ -62,13 +69,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(pia0_timer);
-	void by6803(machine_config &config);
 	void by6803_io(address_map &map);
 	void by6803_map(address_map &map);
-private:
+
 	uint8_t m_pia0_a;
 	uint8_t m_pia0_b;
 	uint8_t m_pia1_a;

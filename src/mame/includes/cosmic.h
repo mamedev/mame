@@ -32,6 +32,28 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void cosmic(machine_config &config);
+	void cosmica(machine_config &config);
+	void cosmicg(machine_config &config);
+	void nomnlnd(machine_config &config);
+	void devzone(machine_config &config);
+	void panic(machine_config &config);
+	void magspot(machine_config &config);
+
+	void init_devzone();
+	void init_cosmicg();
+	void init_nomnlnd();
+	void init_cosmica();
+	void init_panic();
+
+	DECLARE_INPUT_CHANGED_MEMBER(cosmica_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(cosmicg_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq0);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
+
+	DECLARE_WRITE_LINE_MEMBER(panic_coin_inserted);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_spriteram;
@@ -75,16 +97,7 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(cosmic_color_register_w);
 	DECLARE_WRITE8_MEMBER(cosmic_background_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(panic_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(cosmica_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(cosmicg_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq0);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
-	void init_devzone();
-	void init_cosmicg();
-	void init_nomnlnd();
-	void init_cosmica();
-	void init_panic();
+
 	DECLARE_MACHINE_START(cosmic);
 	DECLARE_MACHINE_RESET(cosmic);
 	DECLARE_MACHINE_RESET(cosmicg);
@@ -109,13 +122,7 @@ public:
 	pen_t cosmica_map_color(uint8_t x, uint8_t y);
 	pen_t cosmicg_map_color(uint8_t x, uint8_t y);
 	pen_t magspot_map_color(uint8_t x, uint8_t y);
-	void cosmic(machine_config &config);
-	void cosmica(machine_config &config);
-	void cosmicg(machine_config &config);
-	void nomnlnd(machine_config &config);
-	void devzone(machine_config &config);
-	void panic(machine_config &config);
-	void magspot(machine_config &config);
+
 	void cosmica_map(address_map &map);
 	void cosmicg_io_map(address_map &map);
 	void cosmicg_map(address_map &map);

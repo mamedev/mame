@@ -50,8 +50,12 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_upd7759(*this, "upd"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
+	void bingoc(machine_config &config);
+
+private:
 	uint8_t m_x;
 	DECLARE_READ16_MEMBER(unknown_r);
 	DECLARE_WRITE16_MEMBER(main_sound_latch_w);
@@ -62,7 +66,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void bingoc(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_io(address_map &map);
 	void sound_map(address_map &map);

@@ -39,6 +39,21 @@ public:
 		, m_outlatch(*this, "outlatch")
 	{ }
 
+	void atarisy1(machine_config &config);
+	void indytemp(machine_config &config);
+	void roadb110(machine_config &config);
+	void peterpak(machine_config &config);
+	void roadrunn(machine_config &config);
+	void roadb109(machine_config &config);
+	void marble(machine_config &config);
+
+	void init_roadblst();
+	void init_peterpak();
+	void init_marble();
+	void init_roadrunn();
+	void init_indytemp();
+
+private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<atari_sound_comm_device> m_soundcomm;
 
@@ -87,11 +102,7 @@ public:
 	DECLARE_READ8_MEMBER(via_pa_r);
 	DECLARE_WRITE8_MEMBER(via_pb_w);
 	DECLARE_READ8_MEMBER(via_pb_r);
-	void init_roadblst();
-	void init_peterpak();
-	void init_marble();
-	void init_roadrunn();
-	void init_indytemp();
+
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(atarisy1);
@@ -113,13 +124,7 @@ public:
 	DECLARE_WRITE16_MEMBER( atarisy1_priority_w );
 
 	static const atari_motion_objects_config s_mob_config;
-	void atarisy1(machine_config &config);
-	void indytemp(machine_config &config);
-	void roadb110(machine_config &config);
-	void peterpak(machine_config &config);
-	void roadrunn(machine_config &config);
-	void roadb109(machine_config &config);
-	void marble(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

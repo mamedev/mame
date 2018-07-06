@@ -46,15 +46,17 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void basic52(machine_config &config);
+	void basic31(machine_config &config);
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_READ8_MEMBER(from_term);
 
-	void basic52(machine_config &config);
-	void basic31(machine_config &config);
 	void basic52_io(address_map &map);
 	void basic52_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
 };

@@ -17,16 +17,17 @@ public:
 	{ }
 
 	void capcom(machine_config &config);
+
+	void init_capcom();
+
+private:
 	void capcom_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	void init_capcom();
 };
 
 

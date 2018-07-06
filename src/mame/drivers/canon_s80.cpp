@@ -27,8 +27,11 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	void init_canons80();
 	void canons80(machine_config &config);
+
+	void init_canons80();
+
+private:
 	void canons80_map(address_map &map);
 };
 

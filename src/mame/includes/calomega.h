@@ -26,6 +26,17 @@ public:
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void sys905(machine_config &config);
+	void s903mod(machine_config &config);
+	void sys906(machine_config &config);
+	void sys903(machine_config &config);
+
+	void init_sys903();
+	void init_comg080();
+	void init_s903mod();
+	void init_sys905();
+
+private:
 	DECLARE_WRITE8_MEMBER(calomega_videoram_w);
 	DECLARE_WRITE8_MEMBER(calomega_colorram_w);
 	DECLARE_READ8_MEMBER(s903_mux_port_r);
@@ -47,27 +58,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_tx);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(update_aciabaud_scale);
-	void init_sys903();
-	void init_comg080();
-	void init_s903mod();
-	void init_sys905();
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(calomega);
 
-	void sys905(machine_config &config);
-	void s903mod(machine_config &config);
-	void sys906(machine_config &config);
-	void sys903(machine_config &config);
 	void s903mod_map(address_map &map);
 	void sys903_map(address_map &map);
 	void sys905_map(address_map &map);
 	void sys906_map(address_map &map);
-protected:
+
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<acia6850_device> m_acia6850_0;
 	optional_device<clock_device> m_aciabaud;

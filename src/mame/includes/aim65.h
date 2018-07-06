@@ -47,7 +47,7 @@ public:
 
 	void aim65(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(aim65_pia_a_w);
@@ -71,7 +71,6 @@ protected:
 
 	void aim65_mem(address_map &map);
 
-private:
 	uint8_t m_riot_port_a;
 	uint8_t m_pb_save;
 

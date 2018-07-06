@@ -31,6 +31,11 @@ public:
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
+	void boogwing(machine_config &config);
+
+	void init_boogwing();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
@@ -48,7 +53,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(priority_w);
-	void init_boogwing();
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -58,7 +63,7 @@ public:
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_callback2);
-	void boogwing(machine_config &config);
+
 	void audio_map(address_map &map);
 	void boogwing_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);

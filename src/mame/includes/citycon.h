@@ -19,8 +19,14 @@ public:
 		m_scroll(*this, "scroll"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
+	void citycon(machine_config &config);
+
+	void init_citycon();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_linecolor;
@@ -42,7 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(citycon_videoram_w);
 	DECLARE_WRITE8_MEMBER(citycon_linecolor_w);
 	DECLARE_WRITE8_MEMBER(citycon_background_w);
-	void init_citycon();
+
 	TILEMAP_MAPPER_MEMBER(citycon_scan);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -52,7 +58,7 @@ public:
 	uint32_t screen_update_citycon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	inline void changecolor_RRRRGGGGBBBBxxxx( int color, int indx );
-	void citycon(machine_config &config);
+
 	void citycon_map(address_map &map);
 	void sound_map(address_map &map);
 };

@@ -149,56 +149,30 @@ public:
 		m_dochk41 = false;
 	}
 
-	required_device<m68307_cpu_device> m_maincpu;
-	required_memory_region m_cpuregion;
-	// devices
-	required_device<nvram_device> m_nvram;
-	optional_device<stepper_device> m_reel1;
-	optional_device<stepper_device> m_reel2;
-	optional_device<stepper_device> m_reel3;
-	optional_device<stepper_device> m_reel4;
-	optional_device<stepper_device> m_reel5;
-	optional_device<stepper_device> m_reel6;
-
-
-	int m_reel12_latch;
-	int m_reel3_latch;
-	int m_reel4_latch;
-	int m_reel56_latch;
-	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
-	SEC sec;
-
-	int m_meterstatus;
-
-	int m_chk41addr;
-	bool m_dochk41;
-
-	uint16_t m_mainram[0x10000/2];
-
-	uint8_t read_input_matrix(int row);
-
-
-	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
-
-	DECLARE_READ16_MEMBER(sc4_mem_r);
-	DECLARE_WRITE16_MEMBER(sc4_mem_w);
-
-	DECLARE_READ16_MEMBER(sc4_cs1_r);
-
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_txa);
-	DECLARE_READ8_MEMBER(bfm_sc4_duart_input_r);
-	DECLARE_WRITE8_MEMBER(bfm_sc4_duart_output_w);
-
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa);
-	DECLARE_READ8_MEMBER(m68307_duart_input_r);
-	DECLARE_WRITE8_MEMBER(m68307_duart_output_w);
+	void sc4_common(machine_config &config);
+	void sc4(machine_config &config);
+	void sc4_200_4r(machine_config &config);
+	void sc4_200_4ra(machine_config &config);
+	void sc4_200_4rb(machine_config &config);
+	void sc4_200_5r(machine_config &config);
+	void sc4_200_5ra(machine_config &config);
+	void sc4_200_5rb(machine_config &config);
+	void sc4_200_5rc(machine_config &config);
+	void sc4_200_alt(machine_config &config);
+	void sc4_200_alta(machine_config &config);
+	void sc4_200_altb(machine_config &config);
+	void sc4_200_std(machine_config &config);
+	void sc4_3reel(machine_config &config);
+	void sc4_3reel_200(machine_config &config);
+	void sc4_3reel_200_48(machine_config &config);
+	void sc4_4reel(machine_config &config);
+	void sc4_4reel_200(machine_config &config);
+	void sc4_4reel_alt(machine_config &config);
+	void sc4_5reel(machine_config &config);
+	void sc4_5reel_alt(machine_config &config);
+	void sc4_adder4(machine_config &config);
+	void sc4_no_reels(machine_config &config);
+	void sc4dmd(machine_config &config);
 
 	void init_sc4();
 	void init_sc4mbus();
@@ -612,6 +586,56 @@ public:
 	void init_sc4corotb();
 	void init_sc4hyper();
 
+protected:
+	required_device<m68307_cpu_device> m_maincpu;
+	required_memory_region m_cpuregion;
+	// devices
+	required_device<nvram_device> m_nvram;
+	optional_device<stepper_device> m_reel1;
+	optional_device<stepper_device> m_reel2;
+	optional_device<stepper_device> m_reel3;
+	optional_device<stepper_device> m_reel4;
+	optional_device<stepper_device> m_reel5;
+	optional_device<stepper_device> m_reel6;
+
+	int m_reel12_latch;
+	int m_reel3_latch;
+	int m_reel4_latch;
+	int m_reel56_latch;
+	int m_optic_pattern;
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
+	SEC sec;
+
+	int m_meterstatus;
+
+	int m_chk41addr;
+	bool m_dochk41;
+
+	uint16_t m_mainram[0x10000/2];
+
+	uint8_t read_input_matrix(int row);
+
+	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
+
+	DECLARE_READ16_MEMBER(sc4_mem_r);
+	DECLARE_WRITE16_MEMBER(sc4_mem_w);
+
+	DECLARE_READ16_MEMBER(sc4_cs1_r);
+
+	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_txa);
+	DECLARE_READ8_MEMBER(bfm_sc4_duart_input_r);
+	DECLARE_WRITE8_MEMBER(bfm_sc4_duart_output_w);
+
+	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa);
+	DECLARE_READ8_MEMBER(m68307_duart_input_r);
+	DECLARE_WRITE8_MEMBER(m68307_duart_output_w);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -623,35 +647,8 @@ public:
 	uint16_t bfm_sc4_68307_portb_r(address_space &space, bool dedicated, uint16_t line_mask);
 
 	void find_mbus(uint16_t* rom);
-
-
-	void sc4_common(machine_config &config);
-	void sc4(machine_config &config);
-	void sc4_200_4r(machine_config &config);
-	void sc4_200_4ra(machine_config &config);
-	void sc4_200_4rb(machine_config &config);
-	void sc4_200_5r(machine_config &config);
-	void sc4_200_5ra(machine_config &config);
-	void sc4_200_5rb(machine_config &config);
-	void sc4_200_5rc(machine_config &config);
-	void sc4_200_alt(machine_config &config);
-	void sc4_200_alta(machine_config &config);
-	void sc4_200_altb(machine_config &config);
-	void sc4_200_std(machine_config &config);
-	void sc4_3reel(machine_config &config);
-	void sc4_3reel_200(machine_config &config);
-	void sc4_3reel_200_48(machine_config &config);
-	void sc4_4reel(machine_config &config);
-	void sc4_4reel_200(machine_config &config);
-	void sc4_4reel_alt(machine_config &config);
-	void sc4_5reel(machine_config &config);
-	void sc4_5reel_alt(machine_config &config);
-	void sc4_adder4(machine_config &config);
-	void sc4_no_reels(machine_config &config);
-	void sc4dmd(machine_config &config);
 	void sc4_map(address_map &map);
 
-protected:
 	optional_ioport_array<16> m_io_ports;
 };
 
@@ -664,6 +661,9 @@ public:
 		, m_adder4cpu(*this, "adder4")
 	{ }
 
+	void sc4_adder4(machine_config &config);
+
+private:
 	required_region_ptr<uint32_t> m_adder4cpuregion;
 	std::unique_ptr<uint32_t[]> m_adder4ram;
 
@@ -673,7 +673,7 @@ public:
 
 	// devices
 	required_device<m68340_cpu_device> m_adder4cpu;
-	void sc4_adder4(machine_config &config);
+
 	void sc4_adder4_map(address_map &map);
 };
 

@@ -44,27 +44,28 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void chsuper(machine_config &config);
+
+	void init_chsuper3();
+	void init_chmpnum();
+	void init_chsuper2();
+
+private:
 	DECLARE_WRITE8_MEMBER(chsuper_vram_w);
 	DECLARE_WRITE8_MEMBER(chsuper_outporta_w);
 	DECLARE_WRITE8_MEMBER(chsuper_outportb_w);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void chsuper(machine_config &config);
 	void chsuper_portmap(address_map &map);
 	void chsuper_prg_map(address_map &map);
 	void ramdac_map(address_map &map);
-	void init_chsuper3();
-	void init_chmpnum();
-	void init_chsuper2();
 
-protected:
 	// driver_device overrides
 	virtual void machine_start() override { m_lamps.resolve(); }
 	//virtual void machine_reset();
 
 	virtual void video_start() override;
-
 
 	int m_tilexor;
 	uint8_t m_blacklamp;

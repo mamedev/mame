@@ -38,6 +38,11 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void calcune(machine_config &config);
+
+	void init_calcune();
+
+private:
 	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
 	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
 	WRITE_LINE_MEMBER(vdp_lv4irqline_callback_genesis_68k);
@@ -47,17 +52,14 @@ public:
 
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 
-	void init_calcune();
-
 	DECLARE_READ16_MEMBER(cal_700000_r);
 	DECLARE_WRITE16_MEMBER(cal_770000_w);
 	DECLARE_READ16_MEMBER(cal_vdp_r);
 	DECLARE_WRITE16_MEMBER(cal_vdp_w);
 
 	uint32_t screen_update_calcune(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void calcune(machine_config &config);
 	void calcune_map(address_map &map);
-private:
+
 	int vdp_state;
 
 	required_device<cpu_device> m_maincpu;

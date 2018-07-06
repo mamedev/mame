@@ -71,25 +71,28 @@ public:
 		, m_io_keyboard(*this, "KEY.%u", 0)
 	{ }
 
+	void bcs3a(machine_config &config);
+	void bcs3(machine_config &config);
+	void bcs3b(machine_config &config);
+
+	void init_bcs3a();
+	void init_bcs3b();
+	void init_bcs3c();
+	void init_bcs3d();
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_READ8_MEMBER(video_r);
 	DECLARE_READ8_MEMBER(zx_r);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	void init_bcs3a();
-	void init_bcs3b();
-	void init_bcs3c();
-	void init_bcs3d();
 	u32 screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bcs3a(machine_config &config);
-	void bcs3(machine_config &config);
-	void bcs3b(machine_config &config);
 	void bcs3_io(address_map &map);
 	void bcs3_mem(address_map &map);
 	void bcs3a_mem(address_map &map);
-private:
+
 	bool m_cass_bit;
 	u8 s_curs;
 	u8 s_init;

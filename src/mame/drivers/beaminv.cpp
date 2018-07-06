@@ -67,8 +67,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{ }
 
+	void beaminv(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -90,7 +94,7 @@ public:
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	void create_interrupt_timer();
 	void start_interrupt_timer();
-	void beaminv(machine_config &config);
+
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
 };

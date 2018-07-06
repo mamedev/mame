@@ -31,13 +31,14 @@ public:
 		, m_adc(*this, "adc")
 	{ }
 
-	void init_spclords();
-	void init_rrreveng();
-	void init_motofren();
 	void atarigx2_0x200(machine_config &config);
 	void atarigx2_0x400(machine_config &config);
 
-protected:
+	void init_spclords();
+	void init_rrreveng();
+	void init_motofren();
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void update_interrupts() override;
@@ -59,7 +60,6 @@ protected:
 	void atarigx2(machine_config &config);
 	void main_map(address_map &map);
 
-private:
 	uint16_t          m_playfield_base;
 
 	required_device<atari_jsa_iiis_device> m_jsa;

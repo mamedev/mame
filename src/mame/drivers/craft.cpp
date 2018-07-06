@@ -45,6 +45,11 @@ public:
 	{
 	}
 
+	void craft(machine_config &config);
+
+	void init_craft();
+
+private:
 	void video_update();
 
 	virtual void machine_start() override;
@@ -63,12 +68,12 @@ public:
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
-	void init_craft();
+
 	virtual void machine_reset() override;
 	uint32_t screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<dac_byte_interface> m_dac;
-	void craft(machine_config &config);
+
 	void craft_data_map(address_map &map);
 	void craft_io_map(address_map &map);
 	void craft_prg_map(address_map &map);

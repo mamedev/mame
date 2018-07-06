@@ -115,6 +115,9 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void bfm_swp(machine_config &config);
+
+private:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 
@@ -127,9 +130,7 @@ public:
 		return 0;
 	}
 
-	void bfm_swp(machine_config &config);
 	void bfm_swp_map(address_map &map);
-protected:
 
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;

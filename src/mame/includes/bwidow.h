@@ -32,7 +32,7 @@ public:
 	void gravitar_audio(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-protected:
+private:
 	DECLARE_READ8_MEMBER(spacduel_IN3_r);
 	DECLARE_READ8_MEMBER(bwidowp_in_r);
 	DECLARE_WRITE8_MEMBER(bwidow_misc_w);

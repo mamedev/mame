@@ -24,6 +24,21 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void cop01(machine_config &config);
+
+	void init_mightguy();
+
+	DECLARE_WRITE8_MEMBER(cop01_vreg_w);
+	DECLARE_READ8_MEMBER(cop01_sound_command_r);
+	DECLARE_WRITE8_MEMBER(cop01_sound_command_w);
+	DECLARE_WRITE8_MEMBER(cop01_irq_ack_w);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(mightguy_area_r);
+
+	DECLARE_PALETTE_INIT(cop01);
+	uint32_t screen_update_cop01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -45,28 +60,23 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(cop01_sound_command_w);
-	DECLARE_READ8_MEMBER(cop01_sound_command_r);
-	DECLARE_WRITE8_MEMBER(cop01_irq_ack_w);
 	DECLARE_READ8_MEMBER(cop01_sound_irq_ack_w);
 	DECLARE_READ8_MEMBER(kludge);
 	DECLARE_WRITE8_MEMBER(cop01_background_w);
 	DECLARE_WRITE8_MEMBER(cop01_foreground_w);
-	DECLARE_WRITE8_MEMBER(cop01_vreg_w);
+
 	DECLARE_WRITE8_MEMBER(prot_address_w);
 	DECLARE_WRITE8_MEMBER(prot_data_w);
 	DECLARE_READ8_MEMBER(prot_data_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mightguy_area_r);
-	void init_mightguy();
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cop01);
-	uint32_t screen_update_cop01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void cop01(machine_config &config);
+
 	void audio_io_map(address_map &map);
 	void cop01_map(address_map &map);
 	void io_map(address_map &map);

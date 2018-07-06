@@ -36,14 +36,17 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ccs300(machine_config &config);
+
 	void init_ccs300();
+
+private:
 	DECLARE_MACHINE_RESET(ccs300);
 	DECLARE_WRITE8_MEMBER(port40_w);
 
-	void ccs300(machine_config &config);
 	void ccs300_io(address_map &map);
 	void ccs300_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 

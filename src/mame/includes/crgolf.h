@@ -17,10 +17,8 @@ class crgolf_state : public driver_device
 public:
 	crgolf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-
 		m_videoram_a(*this, "vrama"),
 		m_videoram_b(*this, "vramb"),
-
 		m_vrambank(*this, "vrambank"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -28,8 +26,14 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void crgolfhi(machine_config &config);
+	void crgolf(machine_config &config);
+	void crgolf_video(machine_config &config);
+	void mastrglf(machine_config &config);
 
+	void init_crgolfhi();
 
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram_a;
 	required_shared_ptr<uint8_t> m_videoram_b;
@@ -65,7 +69,7 @@ public:
 	DECLARE_READ8_MEMBER(unk_sub_05_r);
 	DECLARE_READ8_MEMBER(unk_sub_07_r);
 	DECLARE_WRITE8_MEMBER(unk_sub_0c_w);
-	void init_crgolfhi();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(crgolf);
@@ -73,10 +77,7 @@ public:
 	uint32_t screen_update_crgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void get_pens( pen_t *pens );
 	DECLARE_WRITE_LINE_MEMBER(vck_callback);
-	void crgolfhi(machine_config &config);
-	void crgolf(machine_config &config);
-	void crgolf_video(machine_config &config);
-	void mastrglf(machine_config &config);
+
 	void main_map(address_map &map);
 	void mastrglf_io(address_map &map);
 	void mastrglf_map(address_map &map);
