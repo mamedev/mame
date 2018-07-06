@@ -187,21 +187,21 @@ MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
 	adc.set_input_cb<2>(FUNC(model1io2_device::analog2_r), this);
 	adc.set_input_cb<3>(FUNC(model1io2_device::analog3_r), this);
 
-	// diagnostic lcd display
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(6*20+1, 19)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*20, 0, 19-1)
-	MCFG_SCREEN_UPDATE_DEVICE("lcd", hd44780_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	// diagnostic LCD display
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(6*20+1, 19);
+	screen.set_visarea(0, 6*20, 0, 19-1);
+	screen.set_screen_update("lcd", FUNC(hd44780_device::screen_update));
+	screen.set_palette("palette");
 
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(model1io2_device, lcd)
 
-	MCFG_HD44780_ADD("lcd")
-	MCFG_HD44780_LCD_SIZE(2, 20)
-	MCFG_HD44780_PIXEL_UPDATE_CB(model1io2_device, lcd_pixel_update)
+	HD44780(config, m_lcd, 0);
+	m_lcd->set_lcd_size(2, 20);
+	m_lcd->set_pixel_update_cb(FUNC(model1io2_device::lcd_pixel_update), this);
 MACHINE_CONFIG_END
 
 

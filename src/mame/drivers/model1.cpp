@@ -1688,13 +1688,13 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_MACHINE_START_OVERRIDE(model1_state,model1)
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
 
-	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
-	MCFG_MODEL1IO_READ_CB(READ8("dpram", mb8421_device, left_r))
-	MCFG_MODEL1IO_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
-	MCFG_MODEL1IO_IN0_CB(IOPORT("IN.0"))
-	MCFG_MODEL1IO_IN1_CB(IOPORT("IN.1"))
+	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
+	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
+	ioboard.write_callback().set(m_dpram, FUNC(mb8421_device::left_w));
+	ioboard.in_callback<0>().set_ioport("IN.0");
+	ioboard.in_callback<1>().set_ioport("IN.1");
 
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+	MB8421(config, m_dpram, 0);
 
 	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
 	MCFG_GFX_PALETTE("palette")
@@ -1727,62 +1727,64 @@ MACHINE_CONFIG_START(model1_state::model1_hle)
 	MCFG_DEVICE_REMOVE("tgp_copro")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model1_state::vf)
+void model1_state::vf(machine_config &config)
+{
 	model1_hle(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_DEVICE_BIOS("epr14869b");
-	MCFG_MODEL1IO_IN2_CB(IOPORT("IN.2"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, vf_outputs_w))
-MACHINE_CONFIG_END
+	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.set_default_bios_tag("epr14869b");
+	ioboard.in_callback<2>().set_ioport("IN.2");
+	ioboard.output_callback().set(FUNC(model1_state::vf_outputs_w));
+}
 
-MACHINE_CONFIG_START(model1_state::vr)
+void model1_state::vr(machine_config &config)
+{
 	model1(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_AN0_CB(IOPORT("WHEEL"))
-	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
-	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, vr_outputs_w))
+	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.an_callback<0>().set_ioport("WHEEL");
+	ioboard.an_callback<1>().set_ioport("ACCEL");
+	ioboard.an_callback<2>().set_ioport("BRAKE");
+	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 
-	MCFG_M1COMM_ADD(M1COMM_TAG)
-	MCFG_DEVICE_BIOS("epr15112");
-MACHINE_CONFIG_END
+	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
+}
 
-MACHINE_CONFIG_START(model1_state::vformula)
+void model1_state::vformula(machine_config &config)
+{
 	model1(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_AN0_CB(IOPORT("WHEEL"))
-	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
-	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, vr_outputs_w))
+	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.an_callback<0>().set_ioport("WHEEL");
+	ioboard.an_callback<1>().set_ioport("ACCEL");
+	ioboard.an_callback<2>().set_ioport("BRAKE");
+	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 
-	MCFG_M1COMM_ADD(M1COMM_TAG)
-	MCFG_DEVICE_BIOS("epr15624");
-MACHINE_CONFIG_END
+	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15624");
+}
 
-MACHINE_CONFIG_START(model1_state::swa)
+void model1_state::swa(machine_config &config)
+{
 	model1_hle(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_DEVICE_BIOS("epr14869b");
-	MCFG_MODEL1IO_AN0_CB(IOPORT("STICK1X"))
-	MCFG_MODEL1IO_AN1_CB(IOPORT("STICK1Y"))
-	MCFG_MODEL1IO_AN2_CB(IOPORT("THROTTLE"))
-	MCFG_MODEL1IO_AN4_CB(IOPORT("STICK2X"))
-	MCFG_MODEL1IO_AN5_CB(IOPORT("STICK2Y"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, swa_outputs_w))
+	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.set_default_bios_tag("epr14869b");
+	ioboard.an_callback<0>().set_ioport("STICK1X");
+	ioboard.an_callback<1>().set_ioport("STICK1Y");
+	ioboard.an_callback<2>().set_ioport("THROTTLE");
+	ioboard.an_callback<4>().set_ioport("STICK2X");
+	ioboard.an_callback<5>().set_ioport("STICK2Y");
+	ioboard.output_callback().set(FUNC(model1_state::swa_outputs_w));
 
 	SPEAKER(config, "dleft").front_left();
 	SPEAKER(config, "dright").front_right();
-	MCFG_DSBZ80_ADD(DSBZ80_TAG)
-	MCFG_SOUND_ROUTE(0, "dleft", 1.0)
-	MCFG_SOUND_ROUTE(1, "dright", 1.0)
+	DSBZ80(config, m_dsbz80, 0);
+	m_dsbz80->add_route(0, "dleft", 1.0);
+	m_dsbz80->add_route(1, "dright", 1.0);
 
 	// Apparently m1audio has to filter out commands the DSB shouldn't see
 	m_m1audio->rxd_handler().append(m_dsbz80, FUNC(dsbz80_device::write_txd));
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(model1_state::wingwar)
 	model1_hle(config);
@@ -1790,33 +1792,31 @@ MACHINE_CONFIG_START(model1_state::wingwar)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(model1_comm_mem)
 
-	MCFG_DEVICE_REMOVE("ioboard")
-
-	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO2, 0)
-	MCFG_DEVICE_BIOS("epr16891");
-	MCFG_MODEL1IO2_READ_CB(READ8("dpram", mb8421_device, left_r))
-	MCFG_MODEL1IO2_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
-	MCFG_MODEL1IO2_IN0_CB(IOPORT("IN.0"))
-	MCFG_MODEL1IO2_IN1_CB(IOPORT("IN.1"))
-	MCFG_MODEL1IO2_AN0_CB(IOPORT("STICKX"))
-	MCFG_MODEL1IO2_AN1_CB(IOPORT("STICKY"))
-	MCFG_MODEL1IO2_AN2_CB(IOPORT("THROTTLE"))
-	MCFG_MODEL1IO2_OUTPUT_CB(WRITE8(*this, model1_state, wingwar_outputs_w))
+	model1io2_device &ioboard(SEGA_MODEL1IO2(config.replace(), "ioboard", 0));
+	ioboard.set_default_bios_tag("epr16891");
+	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
+	ioboard.write_callback().set(m_dpram, FUNC(mb8421_device::left_w));
+	ioboard.in_callback<0>().set_ioport("IN.0");
+	ioboard.in_callback<1>().set_ioport("IN.1");
+	ioboard.an_callback<0>().set_ioport("STICKX");
+	ioboard.an_callback<1>().set_ioport("STICKY");
+	ioboard.an_callback<2>().set_ioport("THROTTLE");
+	ioboard.output_callback().set(FUNC(model1_state::wingwar_outputs_w));
 
 	MCFG_DEFAULT_LAYOUT(layout_model1io2)
 
-	MCFG_M1COMM_ADD(M1COMM_TAG)
-	MCFG_DEVICE_BIOS("epr15112");
+	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model1_state::wingwar360)
+void model1_state::wingwar360(machine_config &config)
+{
 	wingwar(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO2_IN2_CB(READ8(*this, model1_state, r360_r))
-	MCFG_MODEL1IO2_DRIVE_WRITE_CB(WRITE8(*this, model1_state, r360_w))
-	MCFG_MODEL1IO2_AN2_CB(CONSTANT(0))
-	MCFG_MODEL1IO2_OUTPUT_CB(WRITE8(*this, model1_state, wingwar360_outputs_w))
+	model1io2_device &ioboard(*subdevice<model1io2_device>("ioboard"));
+	ioboard.in_callback<2>().set(FUNC(model1_state::r360_r));
+	ioboard.drive_write_callback().set(FUNC(model1_state::r360_w));
+	ioboard.an_callback<2>().set_constant(0);
+	ioboard.output_callback().set(FUNC(model1_state::wingwar360_outputs_w));
 
 	MCFG_DEFAULT_LAYOUT(layout_model1io2)
 MACHINE_CONFIG_END
@@ -1833,17 +1833,16 @@ MACHINE_CONFIG_START(model1_state::netmerc)
 	MCFG_DEVICE_ADD("polhemus", I386SX, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(polhemus_map)
 
-	MCFG_DEVICE_REMOVE("ioboard")
+	model1io2_device &ioboard(SEGA_MODEL1IO2(config.replace(), "ioboard", 0));
+	ioboard.set_default_bios_tag("epr18021");
+	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
+	ioboard.write_callback().set(m_dpram, FUNC(mb8421_device::left_w));
+	ioboard.in_callback<0>().set_ioport("IN.0");
+	ioboard.in_callback<1>().set_ioport("IN.1");
+	ioboard.an_callback<0>().set_ioport("STICKX");
+	ioboard.an_callback<2>().set_ioport("STICKY");
+	ioboard.output_callback().set(FUNC(model1_state::netmerc_outputs_w));
 
-	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO2, 0)
-	MCFG_DEVICE_BIOS("epr18021");
-	MCFG_MODEL1IO2_READ_CB(READ8("dpram", mb8421_device, left_r))
-	MCFG_MODEL1IO2_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
-	MCFG_MODEL1IO2_IN0_CB(IOPORT("IN.0"))
-	MCFG_MODEL1IO2_IN1_CB(IOPORT("IN.1"))
-	MCFG_MODEL1IO2_AN0_CB(IOPORT("STICKX"))
-	MCFG_MODEL1IO2_AN2_CB(IOPORT("STICKY"))
-	MCFG_MODEL1IO2_OUTPUT_CB(WRITE8(*this, model1_state, netmerc_outputs_w))
 	MCFG_DEFAULT_LAYOUT(layout_model1io2)
 MACHINE_CONFIG_END
 

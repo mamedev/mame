@@ -2466,30 +2466,30 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 	MCFG_DEVICE_IO_MAP(copro_tgp_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(mb86233_device::AS_RF, copro_tgp_rf_map)
 
-	MCFG_DEVICE_ADD("copro_tgp_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(copro_tgp_bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_SHIFT(-2)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, m_copro_tgp_bank, 0);
+	m_copro_tgp_bank->set_addrmap(0, &model2o_state::copro_tgp_bank_map);
+	m_copro_tgp_bank->set_endianness(ENDIANNESS_LITTLE);
+	m_copro_tgp_bank->set_data_width(32);
+	m_copro_tgp_bank->set_addr_width(17);
+	m_copro_tgp_bank->set_shift(-2);
+	m_copro_tgp_bank->set_stride(0x10000);
 
-	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
-	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
+	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
+	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
 
 	MCFG_MACHINE_START_OVERRIDE(model2_tgp_state,model2_tgp)
 	MCFG_MACHINE_RESET_OVERRIDE(model2o_state,model2o)
 
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
-	MCFG_DEVICE_BIOS("epr14869c");
-	MCFG_MODEL1IO_READ_CB(READ8("dpram", mb8421_device, left_r))
-	MCFG_MODEL1IO_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
-	MCFG_MODEL1IO_IN0_CB(IOPORT("IN0"))
-	MCFG_MODEL1IO_IN1_CB(IOPORT("IN1"))
+	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
+	ioboard.set_default_bios_tag("epr14869c");
+	ioboard.read_callback().set("dpram", FUNC(mb8421_device::left_r));
+	ioboard.write_callback().set("dpram", FUNC(mb8421_device::left_w));
+	ioboard.in_callback<0>().set_ioport("IN0");
+	ioboard.in_callback<1>().set_ioport("IN1");
 
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+	MB8421(config, "dpram", 0);
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2504,7 +2504,7 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	MCFG_M2COMM_ADD("m2comm")
+	M2COMM(config, "m2comm", 0);
 MACHINE_CONFIG_END
 
 READ8_MEMBER(model2_state::driveio_portg_r)
@@ -2554,17 +2554,18 @@ MACHINE_CONFIG_START(model2_state::sj25_0207_01)
 	MSM6253(config, "driveadc", 0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2o_state::daytona)
+void model2o_state::daytona(machine_config &config)
+{
 	model2o(config);
 	sj25_0207_01(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_DRIVE_WRITE_CB(WRITE8(*this, model2o_state, drive_board_w))
-	MCFG_MODEL1IO_AN0_CB(IOPORT("STEER"))
-	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
-	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model2o_state, daytona_output_w))
-MACHINE_CONFIG_END
+	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.drive_write_callback().set(FUNC(model2o_state::drive_board_w));
+	ioboard.an_callback<0>().set_ioport("STEER");
+	ioboard.an_callback<1>().set_ioport("ACCEL");
+	ioboard.an_callback<2>().set_ioport("BRAKE");
+	ioboard.output_callback().set(FUNC(model2o_state::daytona_output_w));
+}
 
 MACHINE_CONFIG_START(model2o_maxx_state::daytona_maxx)
 	daytona(config);
@@ -2580,33 +2581,32 @@ MACHINE_CONFIG_START(model2o_gtx_state::daytona_gtx)
 	MCFG_DEVICE_PROGRAM_MAP(model2o_gtx_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2o_state::desert)
+void model2o_state::desert(machine_config &config)
+{
 	model2o(config);
 
-	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_AN0_CB(IOPORT("STEER"))
-	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
-	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model2o_state, desert_output_w))
-MACHINE_CONFIG_END
+	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
+	ioboard.an_callback<0>().set_ioport("STEER");
+	ioboard.an_callback<1>().set_ioport("ACCEL");
+	ioboard.an_callback<2>().set_ioport("BRAKE");
+	ioboard.output_callback().set(FUNC(model2o_state::desert_output_w));
+}
 
 MACHINE_CONFIG_START(model2o_state::vcop)
 	model2o(config);
 
-	MCFG_DEVICE_REMOVE("ioboard")
-
-	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO2, 0)
-	MCFG_DEVICE_BIOS("epr17181");
-	MCFG_MODEL1IO2_READ_CB(READ8("dpram", mb8421_device, left_r))
-	MCFG_MODEL1IO2_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
-	MCFG_MODEL1IO2_IN0_CB(IOPORT("IN0"))
-	MCFG_MODEL1IO2_IN1_CB(IOPORT("IN1"))
-	MCFG_MODEL1IO2_IN2_CB(IOPORT("IN2"))
-	MCFG_MODEL1IO2_OUTPUT_CB(WRITE8(*this, model2o_state, vcop_output_w))
-	MCFG_MODEL1IO2_LIGHTGUN_P1X_TAG("P1_X")
-	MCFG_MODEL1IO2_LIGHTGUN_P1Y_TAG("P1_Y")
-	MCFG_MODEL1IO2_LIGHTGUN_P2X_TAG("P2_X")
-	MCFG_MODEL1IO2_LIGHTGUN_P2Y_TAG("P2_Y")
+	model1io2_device &ioboard(SEGA_MODEL1IO2(config.replace(), "ioboard", 0));
+	ioboard.set_default_bios_tag("epr17181");
+	ioboard.read_callback().set("dpram", FUNC(mb8421_device::left_r));
+	ioboard.write_callback().set("dpram", FUNC(mb8421_device::left_w));
+	ioboard.in_callback<0>().set_ioport("IN0");
+	ioboard.in_callback<1>().set_ioport("IN1");
+	ioboard.in_callback<2>().set_ioport("IN2");
+	ioboard.output_callback().set(FUNC(model2o_state::vcop_output_w));
+	ioboard.set_lightgun_p1x_tag("P1_X");
+	ioboard.set_lightgun_p1y_tag("P1_Y");
+	ioboard.set_lightgun_p2x_tag("P2_X");
+	ioboard.set_lightgun_p2y_tag("P2_Y");
 
 	MCFG_DEFAULT_LAYOUT(layout_model1io2)
 MACHINE_CONFIG_END
@@ -2623,16 +2623,16 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 	MCFG_DEVICE_IO_MAP(copro_tgp_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(mb86233_device::AS_RF, copro_tgp_rf_map)
 
-	MCFG_DEVICE_ADD("copro_tgp_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(copro_tgp_bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_SHIFT(-2)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, m_copro_tgp_bank, 0);
+	m_copro_tgp_bank->set_addrmap(0, &model2a_state::copro_tgp_bank_map);
+	m_copro_tgp_bank->set_endianness(ENDIANNESS_LITTLE);
+	m_copro_tgp_bank->set_data_width(32);
+	m_copro_tgp_bank->set_addr_width(17);
+	m_copro_tgp_bank->set_shift(-2);
+	m_copro_tgp_bank->set_stride(0x10000);
 
-	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
-	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
+	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
+	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
 
 	MCFG_MACHINE_START_OVERRIDE(model2_tgp_state,model2_tgp)
 	MCFG_MACHINE_RESET_OVERRIDE(model2a_state,model2a)
@@ -2650,7 +2650,7 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 	model2_screen(config);
 	model2_scsp(config);
 
-	MCFG_M2COMM_ADD("m2comm")
+	M2COMM(config, "m2comm", 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2a_state::manxtt)
@@ -2663,14 +2663,15 @@ MACHINE_CONFIG_START(model2a_state::manxtt)
 MACHINE_CONFIG_END
 
 // Includes a Model 1 Sound board for additional sounds - Deluxe version only
-MACHINE_CONFIG_START(model2a_state::manxttdx)
+void model2a_state::manxttdx(machine_config &config)
+{
 	manxtt(config);
 
 	SEGAM1AUDIO(config, m_m1audio, 0);
 	m_m1audio->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
 	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START( model2a_state::srallyc )
 	model2a(config);
@@ -2744,8 +2745,8 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(18000))
 
-	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
-	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
+	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
+	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
 
 	MCFG_MACHINE_START_OVERRIDE(model2b_state,model2b)
 	MCFG_MACHINE_RESET_OVERRIDE(model2b_state,model2b)
@@ -2763,7 +2764,7 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 	model2_screen(config);
 	model2_scsp(config);
 
-	MCFG_M2COMM_ADD("m2comm")
+	M2COMM(config, "m2comm", 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2b_state::model2b_5881)
@@ -2859,8 +2860,8 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_MB86235_FIFOIN("copro_fifo_in")
 	MCFG_MB86235_FIFOOUT0("copro_fifo_out")
 
-	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
-	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
+	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
+	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
 
 	MCFG_MACHINE_START_OVERRIDE(model2c_state,model2c)
 	MCFG_MACHINE_RESET_OVERRIDE(model2c_state,model2c)
@@ -2878,7 +2879,7 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	model2_screen(config);
 	model2_scsp(config);
 
-	MCFG_M2COMM_ADD("m2comm")
+	M2COMM(config, "m2comm", 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( model2c_state::skisuprg )
