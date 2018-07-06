@@ -110,6 +110,10 @@ void nscsi_cdrom_device::scsi_command()
 		switch(page) {
 		case 0:
 			std::fill_n(scsi_cmdbuf, 148, 0);
+
+			// vendor and product information must be padded with spaces
+			std::fill_n(&scsi_cmdbuf[8], 28, 0x20);
+
 			scsi_cmdbuf[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
 			scsi_cmdbuf[1] = 0x80; // media is removable
 			scsi_cmdbuf[2] = 0x05; // device complies with SPC-3 standard
