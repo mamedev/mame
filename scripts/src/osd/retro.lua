@@ -11,7 +11,6 @@
 
 dofile("retro_modules.lua")
 
-
 function maintargetosdoptions(_target,_subtarget)
 	osdmodulestargetconf()
 end

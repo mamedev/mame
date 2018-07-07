@@ -11,7 +11,6 @@
 
 dofile("modules.lua")
 
-
 function maintargetosdoptions(_target,_subtarget)
 	osdmodulestargetconf()
 

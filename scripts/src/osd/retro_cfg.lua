@@ -1,13 +1,11 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
-
 dofile("retro_modules.lua")
 
 forcedincludes {
 	MAME_DIR .. "src/osd/libretro/retroprefix.h"
 }
-
 
 if SDL_NETWORK~="" and not _OPTIONS["DONT_USE_NETWORK"] then
 	defines {
@@ -15,7 +13,6 @@ if SDL_NETWORK~="" and not _OPTIONS["DONT_USE_NETWORK"] then
 		"OSD_NET_USE_" .. string.upper(SDL_NETWORK),
 	}
 end
-
 
 if _OPTIONS["RETRO_INI_PATH"]~=nil then
 	defines {

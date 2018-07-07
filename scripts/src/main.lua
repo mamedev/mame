@@ -418,11 +418,16 @@ end
 			MAME_DIR .. "src/osd/libretro",
 			MAME_DIR .. "src/osd/modules/render",
 			MAME_DIR .. "3rdparty",
-			MAME_DIR .. "3rdparty/winpcap/Include",
 			MAME_DIR .. "3rdparty/bgfx/include",
 			MAME_DIR .. "3rdparty/bx/include",
 			MAME_DIR .. "src/osd/libretro/libretro-internal",
 		}
+
+  	if _OPTIONS["targetos"]=="windows" then
+  		includedirs {
+  			MAME_DIR .. "3rdparty/winpcap/Include",
+		}
+	end
 
 		files {
 			MAME_DIR .. "src/osd/libretro/retromain.cpp",
