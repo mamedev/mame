@@ -540,7 +540,7 @@ WRITE_LINE_MEMBER(ps2sony_state::iop_timer_irq)
 
 WRITE32_MEMBER(ps2sony_state::iop_debug_w)
 {
-	printf("%08x ", data);
+	//printf("%08x ", data);
 }
 
 READ32_MEMBER(ps2sony_state::unk_iop_r)
@@ -658,7 +658,7 @@ TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
 
 WRITE8_MEMBER(ps2sony_state::debug_w)
 {
-    printf("%c", (char)data);
+    //printf("%c", (char)data);
 }
 
 WRITE64_MEMBER(ps2sony_state::ee_iop_ram_w)
