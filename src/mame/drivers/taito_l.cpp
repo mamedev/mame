@@ -1501,13 +1501,13 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitol_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc.read_0_callback().set_ioport("DSWA");
+	tc0220ioc.read_1_callback().set_ioport("DSWB");
+	tc0220ioc.read_2_callback().set_ioport("IN0");
+	tc0220ioc.read_3_callback().set_ioport("IN1");
+	tc0220ioc.write_4_callback().set(FUNC(taitol_state::coin_control_w));
+	tc0220ioc.read_7_callback().set_ioport("IN2");
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -1574,15 +1574,15 @@ MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
-	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, taitol_state, coin_control_w))
-	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc.read_0_callback().set_ioport("DSWA");
+	tc0040ioc.read_1_callback().set_ioport("DSWB");
+	tc0040ioc.read_2_callback().set_ioport("IN0");
+	tc0040ioc.read_3_callback().set_ioport("IN1");
+	tc0040ioc.write_4_callback().set(FUNC(taitol_state::coin_control_w));
+	tc0040ioc.read_7_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+	MB8421(config, "dpram", 0);
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -1618,15 +1618,15 @@ MACHINE_CONFIG_START(taitol_2cpu_state::kurikint)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc.read_0_callback().set_ioport("DSWA");
+	tc0040ioc.read_1_callback().set_ioport("DSWB");
+	tc0040ioc.read_2_callback().set_ioport("IN0");
+	tc0040ioc.read_3_callback().set_ioport("IN1");
+	tc0040ioc.write_4_callback().set(FUNC(taitol_state::coin_control_w));
+	tc0040ioc.read_7_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
-	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, taitol_state, coin_control_w))
-	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
+	MB8421(config, "dpram", 0);
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -1765,13 +1765,13 @@ MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, taitol_state, coin_control_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_0_callback().set_ioport("DSWA");
+	tc0510nio.read_1_callback().set_ioport("DSWB");
+	tc0510nio.read_2_callback().set_ioport("IN0");
+	tc0510nio.read_3_callback().set_ioport("IN1");
+	tc0510nio.write_4_callback().set(FUNC(taitol_state::coin_control_w));
+	tc0510nio.read_7_callback().set_ioport("IN2");
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 	MCFG_MB8421_INTL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))

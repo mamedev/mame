@@ -10,7 +10,7 @@
 	downcast<msm5232_device &>(*device).set_capacitors(_a, _b, _c, _d, _e, _f, _g, _h);
 
 #define MCFG_MSM5232_GATE_HANDLER_CB(_devcb) \
-	devcb = &downcast<msm5232_device &>(*device).set_gate_handler_callback(DEVCB_##_devcb);
+	downcast<msm5232_device &>(*device).set_gate_handler_callback(DEVCB_##_devcb);
 
 
 class msm5232_device : public device_t,

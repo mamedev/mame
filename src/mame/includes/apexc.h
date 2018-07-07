@@ -1,6 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet, Robbbert
-
 #ifndef MAME_INCLUDES_APEXC
 #define MAME_INCLUDES_APEXC
 

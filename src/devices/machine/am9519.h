@@ -33,7 +33,7 @@
 ***************************************************************************/
 
 #define MCFG_AM9519_OUT_INT_CB(_devcb) \
-	devcb = &downcast<am9519_device &>(*device).static_set_out_int_callback(DEVCB_##_devcb);
+	downcast<am9519_device &>(*device).static_set_out_int_callback(DEVCB_##_devcb);
 
 
 class am9519_device : public device_t

@@ -411,7 +411,7 @@ MACHINE_CONFIG_START(othello_state::othello)
 	MCFG_DEVICE_IO_MAP(audio_portmap)
 
 	MCFG_DEVICE_ADD(m_n7751, N7751, XTAL(6'000'000))
-	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
+	MCFG_MCS48_PORT_T1_IN_CB(CONSTANT(0)) // labelled as "TEST", connected to ground
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, othello_state, n7751_command_r))
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, othello_state, n7751_rom_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))

@@ -362,14 +362,14 @@ WRITE8_MEMBER(pve500_state::io_sel_w)
 
 MACHINE_CONFIG_START(pve500_state::pve500)
 	/* Main CPU */
-	MCFG_DEVICE_ADD("maincpu", TMPZ84C015, 12_MHz_XTAL / 2) /* TMPZ84C015BF-6 */
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_prg)
-	MCFG_DEVICE_IO_MAP(maincpu_io)
-	MCFG_Z80_DAISY_CHAIN(maincpu_daisy_chain)
-	MCFG_TMPZ84C015_OUT_DTRA_CB(WRITELINE(*this, pve500_state, GPI_w))
-	MCFG_TMPZ84C015_OUT_DTRB_CB(WRITELINE("buzzer", beep_device, set_state)) MCFG_DEVCB_INVERT
-	MCFG_TMPZ84C015_OUT_TXDA_CB(WRITELINE("recorder", rs232_port_device, write_txd))
-	MCFG_TMPZ84C015_OUT_TXDB_CB(WRITELINE("player1", rs232_port_device, write_txd))
+	TMPZ84C015(config, m_maincpu, 12_MHz_XTAL / 2); // TMPZ84C015BF-6
+	m_maincpu->set_addrmap(AS_PROGRAM, &pve500_state::maincpu_prg);
+	m_maincpu->set_addrmap(AS_IO, &pve500_state::maincpu_io);
+	m_maincpu->set_daisy_config(maincpu_daisy_chain);
+	m_maincpu->out_dtra_callback().set(FUNC(pve500_state::GPI_w));
+	m_maincpu->out_dtrb_callback().set(m_buzzer, FUNC(beep_device::set_state)).invert();
+	m_maincpu->out_txda_callback().set("recorder", FUNC(rs232_port_device::write_txd));
+	m_maincpu->out_txdb_callback().set("player1", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("external_ctc", Z80CTC, 12_MHz_XTAL / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -429,15 +429,15 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 	MCFG_DEVICE_ADD("serial_mixer", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("subcpu", tmpz84c015_device, rxb_w))
 
-	MCFG_DEVICE_ADD("clk1", CLOCK, 12_MHz_XTAL / 20)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("maincpu", tmpz84c015_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("maincpu", tmpz84c015_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("maincpu", tmpz84c015_device, rxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("maincpu", tmpz84c015_device, txcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("subcpu", tmpz84c015_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("subcpu", tmpz84c015_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("subcpu", tmpz84c015_device, rxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("subcpu", tmpz84c015_device, txcb_w))
+	clock_device &clk1(CLOCK(config, "clk1", 12_MHz_XTAL / 20));
+	clk1.signal_handler().set(m_maincpu, FUNC(tmpz84c015_device::rxca_w));
+	clk1.signal_handler().append(m_maincpu, FUNC(tmpz84c015_device::txca_w));
+	clk1.signal_handler().append(m_maincpu, FUNC(tmpz84c015_device::rxcb_w));
+	clk1.signal_handler().append(m_maincpu, FUNC(tmpz84c015_device::txcb_w));
+	clk1.signal_handler().append(m_subcpu, FUNC(tmpz84c015_device::rxca_w));
+	clk1.signal_handler().append(m_subcpu, FUNC(tmpz84c015_device::txca_w));
+	clk1.signal_handler().append(m_subcpu, FUNC(tmpz84c015_device::rxcb_w));
+	clk1.signal_handler().append(m_subcpu, FUNC(tmpz84c015_device::txcb_w));
 
 	/* ICF5: 2kbytes of RAM shared between the two CPUs (dual-port RAM)*/
 	MCFG_DEVICE_ADD("mb8421", MB8421, 0)

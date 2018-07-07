@@ -39,34 +39,34 @@
 
 
 #define MCFG_WANGPC_BUS_IRQ2_CALLBACK(_write) \
-	devcb = &downcast<wangpcbus_device &>(*device).set_irq2_wr_callback(DEVCB_##_write);
+	downcast<wangpcbus_device &>(*device).set_irq2_wr_callback(DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_IRQ3_CALLBACK(_write) \
-	devcb = &downcast<wangpcbus_device &>(*device).set_irq3_wr_callback(DEVCB_##_write);
+	downcast<wangpcbus_device &>(*device).set_irq3_wr_callback(DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_IRQ4_CALLBACK(_write) \
-	devcb = &downcast<wangpcbus_device &>(*device).set_irq4_wr_callback(DEVCB_##_write);
+	downcast<wangpcbus_device &>(*device).set_irq4_wr_callback(DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_IRQ5_CALLBACK(_write) \
-	devcb = &downcast<wangpcbus_device &>(*device).set_irq5_wr_callback(DEVCB_##_write);
+	downcast<wangpcbus_device &>(*device).set_irq5_wr_callback(DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_IRQ6_CALLBACK(_write) \
-	devcb = &downcast<wangpcbus_device &>(*device).set_irq6_wr_callback(DEVCB_##_write);
+	downcast<wangpcbus_device &>(*device).set_irq6_wr_callback(DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_IRQ7_CALLBACK(_write) \
-	devcb = &downcast<wangpcbus_device &>(*device).set_irq7_wr_callback(DEVCB_##_write);
+	downcast<wangpcbus_device &>(*device).set_irq7_wr_callback(DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_DRQ1_CALLBACK(_write) \
-	devcb = &downcast<wangpcbus_device &>(*device).set_drq1_wr_callback(DEVCB_##_write);
+	downcast<wangpcbus_device &>(*device).set_drq1_wr_callback(DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_DRQ2_CALLBACK(_write) \
-	devcb = &downcast<wangpcbus_device &>(*device).set_drq2_wr_callback(DEVCB_##_write);
+	downcast<wangpcbus_device &>(*device).set_drq2_wr_callback(DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_DRQ3_CALLBACK(_write) \
-	devcb = &downcast<wangpcbus_device &>(*device).set_drq3_wr_callback(DEVCB_##_write);
+	downcast<wangpcbus_device &>(*device).set_drq3_wr_callback(DEVCB_##_write);
 
 #define MCFG_WANGPC_BUS_IOERROR_CALLBACK(_write) \
-	devcb = &downcast<wangpcbus_device &>(*device).set_ioerror_wr_callback(DEVCB_##_write);
+	downcast<wangpcbus_device &>(*device).set_ioerror_wr_callback(DEVCB_##_write);
 
 
 //**************************************************************************

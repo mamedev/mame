@@ -27,43 +27,43 @@
 	downcast<s3c2440_device &>(*device).set_screen_tag(screen_tag);
 
 #define MCFG_S3C2440_CORE_PIN_R_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_core_pin_r_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_core_pin_r_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_CORE_PIN_W_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_core_pin_w_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_core_pin_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_GPIO_PORT_R_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_gpio_port_r_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_gpio_port_r_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_GPIO_PORT_W_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_gpio_port_w_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_gpio_port_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_I2C_SCL_W_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_i2c_scl_w_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_i2c_scl_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_I2C_SDA_R_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_i2c_sda_r_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_i2c_sda_r_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_I2C_SDA_W_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_i2c_sda_w_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_i2c_sda_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_ADC_DATA_R_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_adc_data_r_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_adc_data_r_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_I2S_DATA_W_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_i2s_data_w_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_i2s_data_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_NAND_COMMAND_W_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_nand_command_w_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_nand_command_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_NAND_ADDRESS_W_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_nand_address_w_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_nand_address_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_NAND_DATA_R_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_nand_data_r_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_nand_data_r_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_NAND_DATA_W_CB(_devcb) \
-	devcb = &downcast<s3c2440_device &>(*device).set_nand_data_w_callback(DEVCB_##_devcb);
+	downcast<s3c2440_device &>(*device).set_nand_data_w_callback(DEVCB_##_devcb);
 
 #define MCFG_S3C2440_LCD_FLAGS(_flags) \
 	downcast<s3c2440_device &>(*device).set_lcd_flags(_flags);

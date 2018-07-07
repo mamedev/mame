@@ -24,41 +24,41 @@ DECLARE_DEVICE_TYPE(MB89363B, mb89363b_device)
 
 
 #define MCFG_MB89363B_IN_PORTA_CB(_devcb) \
-	devcb = &downcast<mb89363b_device &>(*device).set_in_a_pa_callback(DEVCB_##_devcb);
+	downcast<mb89363b_device &>(*device).set_in_a_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_IN_PORTB_CB(_devcb) \
-	devcb = &downcast<mb89363b_device &>(*device).set_in_a_pb_callback(DEVCB_##_devcb);
+	downcast<mb89363b_device &>(*device).set_in_a_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_IN_PORTC_CB(_devcb) \
-	devcb = &downcast<mb89363b_device &>(*device).set_in_a_pc_callback(DEVCB_##_devcb);
+	downcast<mb89363b_device &>(*device).set_in_a_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_OUT_PORTA_CB(_devcb) \
-	devcb = &downcast<mb89363b_device &>(*device).set_out_a_pa_callback(DEVCB_##_devcb);
+	downcast<mb89363b_device &>(*device).set_out_a_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_OUT_PORTB_CB(_devcb) \
-	devcb = &downcast<mb89363b_device &>(*device).set_out_a_pb_callback(DEVCB_##_devcb);
+	downcast<mb89363b_device &>(*device).set_out_a_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_OUT_PORTC_CB(_devcb) \
-	devcb = &downcast<mb89363b_device &>(*device).set_out_a_pc_callback(DEVCB_##_devcb);
+	downcast<mb89363b_device &>(*device).set_out_a_pc_callback(DEVCB_##_devcb);
 
 
 #define MCFG_MB89363B_IN_PORTD_CB(_devcb) \
-	devcb = &downcast<mb89363b_device &>(*device).set_in_b_pa_callback(DEVCB_##_devcb);
+	downcast<mb89363b_device &>(*device).set_in_b_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_IN_PORTE_CB(_devcb) \
-	devcb = &downcast<mb89363b_device &>(*device).set_in_b_pb_callback(DEVCB_##_devcb);
+	downcast<mb89363b_device &>(*device).set_in_b_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_IN_PORTF_CB(_devcb) \
-	devcb = &downcast<mb89363b_device &>(*device).set_in_b_pc_callback(DEVCB_##_devcb);
+	downcast<mb89363b_device &>(*device).set_in_b_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_OUT_PORTD_CB(_devcb) \
-	devcb = &downcast<mb89363b_device &>(*device).set_out_b_pa_callback(DEVCB_##_devcb);
+	downcast<mb89363b_device &>(*device).set_out_b_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_OUT_PORTE_CB(_devcb) \
-	devcb = &downcast<mb89363b_device &>(*device).set_out_b_pb_callback(DEVCB_##_devcb);
+	downcast<mb89363b_device &>(*device).set_out_b_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89363B_OUT_PORTF_CB(_devcb) \
-	devcb = &downcast<mb89363b_device &>(*device).set_out_b_pc_callback(DEVCB_##_devcb);
+	downcast<mb89363b_device &>(*device).set_out_b_pc_callback(DEVCB_##_devcb);
 
 
 

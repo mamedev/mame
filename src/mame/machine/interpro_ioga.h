@@ -7,27 +7,27 @@
 #pragma once
 
 #define MCFG_INTERPRO_IOGA_NMI_CB(_out_nmi) \
-	devcb = &downcast<interpro_ioga_device &>(*device).set_out_nmi_callback(DEVCB_##_out_nmi);
+	downcast<interpro_ioga_device &>(*device).set_out_nmi_callback(DEVCB_##_out_nmi);
 
 #define MCFG_INTERPRO_IOGA_IRQ_CB(_out_irq) \
-	devcb = &downcast<interpro_ioga_device &>(*device).set_out_irq_callback(DEVCB_##_out_irq);
+	downcast<interpro_ioga_device &>(*device).set_out_irq_callback(DEVCB_##_out_irq);
 
 #define MCFG_INTERPRO_IOGA_IVEC_CB(_out_ivec) \
-	devcb = &downcast<interpro_ioga_device &>(*device).set_out_irq_vector_callback(DEVCB_##_out_ivec);
+	downcast<interpro_ioga_device &>(*device).set_out_irq_vector_callback(DEVCB_##_out_ivec);
 
 #define MCFG_INTERPRO_IOGA_DMA_CB(_channel, _dma_r, _dma_w) \
-	devcb = &downcast<interpro_ioga_device &>(*device).set_dma_r_callback(_channel, DEVCB_##_dma_r); \
-	devcb = &downcast<interpro_ioga_device &>(*device).set_dma_w_callback(_channel, DEVCB_##_dma_w);
+	downcast<interpro_ioga_device &>(*device).set_dma_r_callback(_channel, DEVCB_##_dma_r); \
+	downcast<interpro_ioga_device &>(*device).set_dma_w_callback(_channel, DEVCB_##_dma_w);
 
 #define MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(_channel, _dma_r, _dma_w) \
-	devcb = &downcast<interpro_ioga_device &>(*device).set_serial_dma_r_callback(_channel, DEVCB_##_dma_r); \
-	devcb = &downcast<interpro_ioga_device &>(*device).set_serial_dma_w_callback(_channel, DEVCB_##_dma_w);
+	downcast<interpro_ioga_device &>(*device).set_serial_dma_r_callback(_channel, DEVCB_##_dma_r); \
+	downcast<interpro_ioga_device &>(*device).set_serial_dma_w_callback(_channel, DEVCB_##_dma_w);
 
 #define MCFG_INTERPRO_IOGA_FDCTC_CB(_tc) \
-	devcb = &downcast<interpro_ioga_device &>(*device).set_fdc_tc_callback(DEVCB_##_tc);
+	downcast<interpro_ioga_device &>(*device).set_fdc_tc_callback(DEVCB_##_tc);
 
 #define MCFG_INTERPRO_IOGA_ETH_CA_CB(_ca) \
-	devcb = &downcast<interpro_ioga_device &>(*device).set_eth_ca_callback(DEVCB_##_ca);
+	downcast<interpro_ioga_device &>(*device).set_eth_ca_callback(DEVCB_##_ca);
 
 #define MCFG_INTERPRO_IOGA_MEMORY(_tag, _spacenum) \
 	downcast<interpro_ioga_device &>(*device).set_memory(_tag, _spacenum);
@@ -85,6 +85,15 @@ public:
 	template <class Object> devcb_base &set_serial_dma_w_callback(int channel, Object &&cb) { return m_serial_dma_channel[channel].device_w.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_fdc_tc_callback(Object &&cb) { return m_fdc_tc_func.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_eth_ca_callback(Object &&cb) { return m_eth_ca_func.set_callback(std::forward<Object>(cb)); }
+	auto out_nmi_callback() { return m_out_nmi_func.bind(); }
+	auto out_irq_callback() { return m_out_irq_func.bind(); }
+	auto out_irq_vector_callback() { return m_out_irq_vector_func.bind(); }
+	template <unsigned Chan> auto dma_r_callback() { return m_dma_channel[Chan].device_r.bind(); }
+	template <unsigned Chan> auto dma_w_callback() { return m_dma_channel[Chan].device_w.bind(); }
+	template <unsigned Chan> auto serial_dma_r_callback() { return m_serial_dma_channel[Chan].device_r.bind(); }
+	template <unsigned Chan> auto serial_dma_w_callback() { return m_serial_dma_channel[Chan].device_w.bind(); }
+	auto fdc_tc_callback() { return m_fdc_tc_func.bind(); }
+	auto eth_ca_callback() { return m_eth_ca_func.bind(); }
 
 	void set_memory(const char *const tag, const int spacenum)
 	{

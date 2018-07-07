@@ -8026,10 +8026,10 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_UPD4701_PORTX("TRACKX")
 	MCFG_UPD4701_PORTY("TRACKY")
 
-	MCFG_DEVICE_ADD("buttonmux", HC157, 0)
-	MCFG_74157_OUT_CB(WRITELINE("upd4701", upd4701_device, middle_w)) MCFG_DEVCB_BIT(0)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, right_w)) MCFG_DEVCB_BIT(1)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, left_w)) MCFG_DEVCB_BIT(2)
+	HC157(config, m_buttonmux, 0);
+	m_buttonmux->out_callback().set(m_upd4701, FUNC(upd4701_device::middle_w)).bit(0);
+	m_buttonmux->out_callback().append(m_upd4701, FUNC(upd4701_device::right_w)).bit(1);
+	m_buttonmux->out_callback().append(m_upd4701, FUNC(upd4701_device::left_w)).bit(2);
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state,usclssic)
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)

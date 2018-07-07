@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
-
 #ifndef MAME_INCLUDES_ETI660_H
 #define MAME_INCLUDES_ETI660_H
+
+#pragma once
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"

@@ -9,19 +9,19 @@
 
 // LOCAL IRQ callbacks
 #define MCFG_FGA002_OUT_INT_CB(_devcb)                              \
-	devcb = &downcast<fga002_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
+	downcast<fga002_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 #define MCFG_FGA002_OUT_LIACK4_CB(_devcb)                               \
-	devcb = &downcast<fga002_device &>(*device).set_liack4_callback(DEVCB_##_devcb);
+	downcast<fga002_device &>(*device).set_liack4_callback(DEVCB_##_devcb);
 
 #define MCFG_FGA002_OUT_LIACK5_CB(_devcb)                               \
-	devcb = &downcast<fga002_device &>(*device).set_liack5_callback(DEVCB_##_devcb);
+	downcast<fga002_device &>(*device).set_liack5_callback(DEVCB_##_devcb);
 
 #define MCFG_FGA002_OUT_LIACK6_CB(_devcb)                               \
-	devcb = &downcast<fga002_device &>(*device).set_liack6_callback(DEVCB_##_devcb);
+	downcast<fga002_device &>(*device).set_liack6_callback(DEVCB_##_devcb);
 
 #define MCFG_FGA002_OUT_LIACK7_CB(_devcb)                               \
-	devcb = &downcast<fga002_device &>(*device).set_liack7_callback(DEVCB_##_devcb);
+	downcast<fga002_device &>(*device).set_liack7_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -351,14 +351,14 @@ MACHINE_CONFIG_START(runaway_state::runaway)
 	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 8) /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(runaway_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // coin counter?
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // coin counter?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, runaway_state, tile_bank_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set_nop(); // coin counter?
+	mainlatch.q_out_cb<1>().set_nop(); // coin counter?
+	mainlatch.q_out_cb<3>().set_output("led0").invert();
+	mainlatch.q_out_cb<4>().set_output("led1").invert();
+	mainlatch.q_out_cb<5>().set(FUNC(runaway_state::tile_bank_w));
 
-	MCFG_DEVICE_ADD("earom", ER2055)
+	ER2055(config, m_earom);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

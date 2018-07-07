@@ -16,7 +16,7 @@
 
 
 #define MCFG_IOP_TIMER_IRQ_CALLBACK(_write) \
-	devcb = &downcast<iop_timer_device &>(*device).set_int_cb(DEVCB_##_write);
+	downcast<iop_timer_device &>(*device).set_int_cb(DEVCB_##_write);
 
 class iop_timer_device : public device_t
 {

@@ -42,25 +42,25 @@
 //**************************************************************************
 
 #define MCFG_Z80DMA_OUT_BUSREQ_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_out_busreq_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_out_busreq_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_OUT_INT_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_OUT_BAO_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_out_bao_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_out_bao_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_IN_MREQ_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_in_mreq_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_in_mreq_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_OUT_MREQ_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_out_mreq_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_out_mreq_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_IN_IORQ_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_in_iorq_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_in_iorq_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_OUT_IORQ_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_out_iorq_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_out_iorq_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

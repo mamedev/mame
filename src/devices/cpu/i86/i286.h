@@ -165,6 +165,6 @@ private:
 	downcast<i80286_cpu_device &>(*device).set_a20_callback(i80286_cpu_device::a20_cb(&_class::_a20_cb, this));
 
 #define MCFG_80286_SHUTDOWN(_devcb) \
-	devcb = &downcast<i80286_cpu_device &>(*device).set_shutdown_callback(DEVCB_##_devcb);
+	downcast<i80286_cpu_device &>(*device).set_shutdown_callback(DEVCB_##_devcb);
 
 #endif // MAME_CPU_I86_I286_H

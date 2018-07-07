@@ -32,35 +32,35 @@
 
 
 #define MCFG_IEEE488_EOI_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_eoi_callback(DEVCB_##_write);
+	downcast<ieee488_device *>(device)->set_eoi_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_DAV_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_dav_callback(DEVCB_##_write);
+	downcast<ieee488_device *>(device)->set_dav_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_NRFD_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_nrfd_callback(DEVCB_##_write);
+	downcast<ieee488_device *>(device)->set_nrfd_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_NDAC_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_ndac_callback(DEVCB_##_write);
+	downcast<ieee488_device *>(device)->set_ndac_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_IFC_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_ifc_callback(DEVCB_##_write);
+	downcast<ieee488_device *>(device)->set_ifc_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_SRQ_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_srq_callback(DEVCB_##_write);
+	downcast<ieee488_device *>(device)->set_srq_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_ATN_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_atn_callback(DEVCB_##_write);
+	downcast<ieee488_device *>(device)->set_atn_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_REN_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_ren_callback(DEVCB_##_write);
+	downcast<ieee488_device *>(device)->set_ren_callback(DEVCB_##_write);
 
 // This CB reports changes to the DIO lines on the bus (whose value comes from
 // ANDing the DIO lines of each device on the bus)
 // This CB is needed by those controllers that start a parallel poll and wait
 // for some condition to be set by devices on the DIO lines (e.g. PHI controller).
 #define MCFG_IEEE488_DIO_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_dio_callback(DEVCB_##_write);
+	downcast<ieee488_device *>(device)->set_dio_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_SLOT_ADD(_tag, _address, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, IEEE488_SLOT, 0) \

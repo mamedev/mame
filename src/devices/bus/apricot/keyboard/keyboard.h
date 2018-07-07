@@ -43,7 +43,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(apricot_keyboard_devices, _def_slot, false)
 
 #define MCFG_APRICOT_KEYBOARD_IN_HANDLER(_devcb) \
-	devcb = &downcast<apricot_keyboard_bus_device &>(*device).set_in_handler(DEVCB_##_devcb);
+	downcast<apricot_keyboard_bus_device &>(*device).set_in_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

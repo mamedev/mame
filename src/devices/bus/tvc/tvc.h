@@ -125,9 +125,9 @@ DECLARE_DEVICE_TYPE(TVCEXP_SLOT, tvcexp_slot_device)
 ***************************************************************************/
 
 #define MCFG_TVCEXP_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<tvcexp_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<tvcexp_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_TVCEXP_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &downcast<tvcexp_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
+	downcast<tvcexp_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #endif // MAME_BUS_TVC_TVC_H

@@ -359,12 +359,12 @@ MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
 
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL(12'000'000) / 10)
-	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(4)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	VIA6522(config, m_via, 12_MHz_XTAL / 10);
+	m_via->readpa_handler().set_ioport("IN2");
+	m_via->readpb_handler().set_ioport("IN1");
+	m_via->writepb_handler().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(4);
+	m_via->writepb_handler().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(6);
+	m_via->writepb_handler().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
 	// CB2 used for serial communication with 8798
 
 	MCFG_DEVICE_ADD("mcu", P8098, XTAL(12'000'000))

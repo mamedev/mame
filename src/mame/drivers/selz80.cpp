@@ -228,9 +228,9 @@ MACHINE_CONFIG_START(selz80_state::selz80)
 	MCFG_DEFAULT_LAYOUT(layout_selz80)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	CLOCK(config, m_clock, 153600);
+	m_clock->signal_handler().set("uart", FUNC(i8251_device::write_txc));
+	m_clock->signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
@@ -246,8 +246,8 @@ MACHINE_CONFIG_START(selz80_state::selz80)
 	MCFG_I8279_OUT_SL_CB(WRITE8(*this, selz80_state, scanlines_w))         // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, selz80_state, digit_w))           // display A&B
 	MCFG_I8279_IN_RL_CB(READ8(*this, selz80_state, kbd_r))                 // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	MCFG_I8279_IN_SHIFT_CB(CONSTANT(1))                                    // Shift key
+	MCFG_I8279_IN_CTRL_CB(CONSTANT(1))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(selz80_state::dagz80)

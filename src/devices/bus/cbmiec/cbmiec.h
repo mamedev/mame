@@ -31,19 +31,19 @@
 
 
 #define MCFG_CBM_IEC_BUS_SRQ_CALLBACK(_write) \
-	devcb = &downcast<cbm_iec_device *>(device)->set_srq_callback(DEVCB_##_write);
+	downcast<cbm_iec_device *>(device)->set_srq_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_ATN_CALLBACK(_write) \
-	devcb = &downcast<cbm_iec_device *>(device)->set_atn_callback(DEVCB_##_write);
+	downcast<cbm_iec_device *>(device)->set_atn_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_CLK_CALLBACK(_write) \
-	devcb = &downcast<cbm_iec_device *>(device)->set_clk_callback(DEVCB_##_write);
+	downcast<cbm_iec_device *>(device)->set_clk_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_DATA_CALLBACK(_write) \
-	devcb = &downcast<cbm_iec_device *>(device)->set_data_callback(DEVCB_##_write);
+	downcast<cbm_iec_device *>(device)->set_data_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_RESET_CALLBACK(_write) \
-	devcb = &downcast<cbm_iec_device *>(device)->set_reset_callback(DEVCB_##_write);
+	downcast<cbm_iec_device *>(device)->set_reset_callback(DEVCB_##_write);
 
 
 #define MCFG_CBM_IEC_SLOT_ADD(_tag, _address, _slot_intf, _def_slot) \

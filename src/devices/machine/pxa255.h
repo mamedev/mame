@@ -22,13 +22,13 @@
 #include "pxa255defs.h"
 
 #define MCFG_PXA255_GPIO0_SET_CALLBACK(_devcb) \
-	devcb = &downcast<pxa255_periphs_device &>(*device).set_gpio0_set_cb(DEVCB_##_devcb);
+	downcast<pxa255_periphs_device &>(*device).set_gpio0_set_cb(DEVCB_##_devcb);
 
 #define MCFG_PXA255_GPIO0_CLEAR_CALLBACK(_devcb) \
-	devcb = &downcast<pxa255_periphs_device &>(*device).set_gpio0_clear_cb(DEVCB_##_devcb);
+	downcast<pxa255_periphs_device &>(*device).set_gpio0_clear_cb(DEVCB_##_devcb);
 
 #define MCFG_PXA255_GPIO0_IN_CALLBACK(_devcb) \
-	devcb = &downcast<pxa255_periphs_device &>(*device).set_gpio0_in_cb(DEVCB_##_devcb);
+	downcast<pxa255_periphs_device &>(*device).set_gpio0_in_cb(DEVCB_##_devcb);
 
 class pxa255_periphs_device : public device_t
 {

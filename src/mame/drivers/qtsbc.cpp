@@ -486,12 +486,12 @@ MACHINE_CONFIG_START(qtsbc_state::qtsbc)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("pit", PIT8253, 0) // U9
-	MCFG_PIT8253_CLK0(4_MHz_XTAL / 2) /* Timer 0: baud rate gen for 8251 */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("usart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("usart", i8251_device, write_rxc))
-	MCFG_PIT8253_CLK1(4_MHz_XTAL / 2)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit", pit8253_device, write_clk2))
+	PIT8253(config, m_pit, 0); // U9
+	m_pit->set_clk<0>(4_MHz_XTAL / 2); /* Timer 0: baud rate gen for 8251 */
+	m_pit->out_handler<0>().set(m_usart, FUNC(i8251_device::write_txc));
+	m_pit->out_handler<0>().append(m_usart, FUNC(i8251_device::write_rxc));
+	m_pit->set_clk<1>(4_MHz_XTAL / 2);
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
 
 	MCFG_DEVICE_ADD("usart", I8251, 0) // U8
 	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))

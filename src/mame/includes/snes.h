@@ -299,13 +299,14 @@ struct snes_cart_info
 class snes_state : public driver_device
 {
 public:
-	snes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	snes_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_spc700(*this, "spc700"),
 		m_ppu(*this, "ppu"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{ }
 
 	void init_snes();
 	void init_snes_hirom();

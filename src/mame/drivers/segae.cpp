@@ -932,13 +932,13 @@ MACHINE_CONFIG_START(systeme_state::ridleofp)
 	MCFG_UPD4701_PORTX("PAD1")
 	MCFG_UPD4701_PORTY("PAD2")
 
-	MCFG_DEVICE_MODIFY("ppi")
-	MCFG_I8255_IN_PORTA_CB(READ8("upd4701", upd4701_device, d_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITELINE("upd4701", upd4701_device, cs_w)) MCFG_DEVCB_BIT(4)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, xy_w)) MCFG_DEVCB_BIT(3)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, ul_w)) MCFG_DEVCB_BIT(2)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, resetx_w)) MCFG_DEVCB_BIT(1) // or possibly bit 0
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, resety_w)) MCFG_DEVCB_BIT(0) // or possibly bit 1
+	i8255_device &ppi(*subdevice<i8255_device>("ppi"));
+	ppi.in_pa_callback().set("upd4701", FUNC(upd4701_device::d_r));
+	ppi.out_pc_callback().set("upd4701", FUNC(upd4701_device::cs_w)).bit(4);
+	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::xy_w)).bit(3);
+	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::ul_w)).bit(2);
+	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::resetx_w)).bit(1); // or possibly bit 0
+	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::resety_w)).bit(0); // or possibly bit 1
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(systeme_state::systemex)

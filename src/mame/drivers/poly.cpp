@@ -344,13 +344,12 @@ MACHINE_CONFIG_START(poly_state::poly)
 	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<6>))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	CLOCK(config, m_acia_clock, 153600);
+	m_acia_clock->signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	m_acia_clock->signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "poly_flop")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "POLY1")
+	SOFTWARE_LIST(config, "flop_list").set_original("poly_flop").set_filter("POLY1");
 MACHINE_CONFIG_END
 
 

@@ -18,7 +18,7 @@
 ***************************************************************************/
 
 #define MCFG_MB87078_GAIN_CHANGED_CB(_devcb) \
-	devcb = &downcast<mb87078_device &>(*device).set_gain_changed_callback(DEVCB_##_devcb);
+	downcast<mb87078_device &>(*device).set_gain_changed_callback(DEVCB_##_devcb);
 
 /***************************************************************************
     TYPE DEFINITIONS

@@ -340,33 +340,33 @@ MACHINE_CONFIG_START(jp_state::jp)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("latch0", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, disp_data_w)) MCFG_DEVCB_INVERT
+	LS259(config, m_latch[0]);
+	m_latch[0]->q_out_cb<1>().set(FUNC(jp_state::disp_data_w)).invert();
 
-	MCFG_DEVICE_ADD("latch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, disp_clock_w)) MCFG_DEVCB_INVERT
+	LS259(config, m_latch[1]);
+	m_latch[1]->q_out_cb<1>().set(FUNC(jp_state::disp_clock_w)).invert();
 
-	MCFG_DEVICE_ADD("latch2", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, disp_strobe_w)) MCFG_DEVCB_INVERT
+	LS259(config, m_latch[2]);
+	m_latch[2]->q_out_cb<1>().set(FUNC(jp_state::disp_strobe_w)).invert();
 
-	MCFG_DEVICE_ADD("latch3", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
+	LS259(config, m_latch[3]);
+	m_latch[3]->q_out_cb<1>().set(FUNC(jp_state::row_w));
 
-	MCFG_DEVICE_ADD("latch4", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
+	LS259(config, m_latch[4]);
+	m_latch[4]->q_out_cb<1>().set(FUNC(jp_state::row_w));
 
-	MCFG_DEVICE_ADD("latch5", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
+	LS259(config, m_latch[5]);
+	m_latch[5]->q_out_cb<1>().set(FUNC(jp_state::row_w));
 
-	MCFG_DEVICE_ADD("latch6", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
+	LS259(config, m_latch[6]);
+	m_latch[6]->q_out_cb<1>().set(FUNC(jp_state::row_w));
 
-	MCFG_DEVICE_ADD("latch7", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
+	LS259(config, m_latch[7]);
+	m_latch[7]->q_out_cb<1>().set(FUNC(jp_state::row_w));
 
-	MCFG_DEVICE_ADD("latch8", LS259, 0)
+	LS259(config, m_latch[8]);
 
-	MCFG_DEVICE_ADD("latch9", LS259, 0)
+	LS259(config, m_latch[9]);
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_jp)

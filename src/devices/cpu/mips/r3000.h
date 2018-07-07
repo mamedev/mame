@@ -22,16 +22,16 @@
 	downcast<r3000_device &>(*device).set_endianness(_endianness);
 
 #define MCFG_R3000_BRCOND0_INPUT(_devcb) \
-	devcb = &downcast<r3000_device &>(*device).set_brcond0_input(DEVCB_##_devcb);
+	downcast<r3000_device &>(*device).set_brcond0_input(DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND1_INPUT(_devcb) \
-	devcb = &downcast<r3000_device &>(*device).set_brcond1_input(DEVCB_##_devcb);
+	downcast<r3000_device &>(*device).set_brcond1_input(DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND2_INPUT(_devcb) \
-	devcb = &downcast<r3000_device &>(*device).set_brcond2_input(DEVCB_##_devcb);
+	downcast<r3000_device &>(*device).set_brcond2_input(DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND3_INPUT(_devcb) \
-	devcb = &downcast<r3000_device &>(*device).set_brcond3_input(DEVCB_##_devcb);
+	downcast<r3000_device &>(*device).set_brcond3_input(DEVCB_##_devcb);
 
 
 /***************************************************************************

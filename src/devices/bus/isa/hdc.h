@@ -20,10 +20,10 @@
 // XT HD controller device
 
 #define MCFG_XTHDC_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<xt_hdc_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<xt_hdc_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_XTHDC_DRQ_HANDLER(_devcb) \
-	devcb = &downcast<xt_hdc_device &>(*device).set_drq_handler(DEVCB_##_devcb);
+	downcast<xt_hdc_device &>(*device).set_drq_handler(DEVCB_##_devcb);
 
 class xt_hdc_device :
 		public device_t
