@@ -3068,8 +3068,8 @@ files {
 	MAME_DIR .. "src/mame/machine/iopdma.h",
 	MAME_DIR .. "src/mame/machine/iopintc.cpp",
 	MAME_DIR .. "src/mame/machine/iopintc.h",
-	MAME_DIR .. "src/mame/machine/iopspu.cpp",
-	MAME_DIR .. "src/mame/machine/iopspu.h",
+	MAME_DIR .. "src/mame/audio/iopspu.cpp",
+	MAME_DIR .. "src/mame/audio/iopspu.h",
 	MAME_DIR .. "src/mame/machine/ioptimer.cpp",
 	MAME_DIR .. "src/mame/machine/ioptimer.h",
 }
