@@ -20,6 +20,8 @@ iop_dma_device::iop_dma_device(const machine_config &mconfig, const char *tag, d
 	, m_intc(*this, finder_base::DUMMY_TAG)
 	, m_ram(*this, finder_base::DUMMY_TAG)
 	, m_sif(*this, finder_base::DUMMY_TAG)
+	, m_spu(*this, finder_base::DUMMY_TAG)
+	, m_spu2(*this, finder_base::DUMMY_TAG)
 	, m_icount(0)
 {
 }
@@ -90,10 +92,14 @@ void iop_dma_device::execute_run()
 			{
 				switch (channel)
 				{
-					case 10:
+					case SPU:
+					case SPU2:
+						transfer_spu(channel);
+						break;
+					case SIF0:
 						transfer_sif0(channel);
 						break;
-					case 11:
+					case SIF1:
 						transfer_sif1(channel);
 						break;
 					default:
@@ -140,7 +146,7 @@ void iop_dma_device::transfer_sif0(uint32_t chan)
 
 			logerror("%s: following sif0 iop tag, full tag is %08x %08x %08x %08x\n", machine().describe_context(), iop_hi, iop_lo, ee_hi, ee_lo);
 			channel.set_addr(iop_hi & 0x00ffffff);
-			channel.set_count(iop_lo + 2);
+			channel.set_count((iop_lo + 3) & ~3);
 			channel.set_tag_addr(tag_addr_bytes + 0x10);
 
 			m_sif->fifo_push(0, ee_hi);
@@ -148,7 +154,7 @@ void iop_dma_device::transfer_sif0(uint32_t chan)
 
 			if (iop_hi & 0xc0000000)
 			{
-				logerror("%s: sif0 iop tag end\n", machine().describe_context());
+				//logerror("%s: sif0 iop tag end\n", machine().describe_context());
 				channel.m_end = true;
 			}
 		}
@@ -163,7 +169,7 @@ void iop_dma_device::transfer_sif1(uint32_t chan)
 		if (m_sif->fifo_depth(1))
 		{
 			const uint32_t data = m_sif->fifo_pop(1);
-			logerror("%s: sif1 pop value: %08x\n", machine().describe_context(), (uint32_t)data);
+			//logerror("%s: sif1 pop value: %08x\n", machine().describe_context(), (uint32_t)data);
 			m_ram[channel.m_addr >> 2] = data;
 
 			channel.m_addr += 4;
@@ -189,10 +195,45 @@ void iop_dma_device::transfer_sif1(uint32_t chan)
 
 			if (iop_hi & 0xc0000000)
 			{
-				logerror("%s: sif1 iop tag end\n", machine().describe_context());
+				//logerror("%s: sif1 iop tag end\n", machine().describe_context());
 				channel.m_end = true;
 			}
 		}
+	}
+}
+
+void iop_dma_device::transfer_spu(uint32_t chan)
+{
+	channel_t &channel = m_channels[chan];
+	const uint32_t size = channel.size();
+	if (size)
+	{
+		printf("Size: %08x\n", size);
+		const uint32_t addr = channel.addr();
+
+		if (chan == SPU)
+			m_spu->dma_write(m_ram[addr >> 2]);
+		else
+			m_spu2->dma_write(m_ram[addr >> 2]);
+
+		channel.set_size(size - 1);
+		channel.set_addr(addr + 4);
+	}
+	else
+	{
+		channel.set_count(0);
+
+        if (chan == SPU)
+			m_spu->dma_done();
+		else
+			m_spu2->dma_done();
+
+		if (chan == SPU)
+		{
+			m_intc->raise_interrupt(iop_intc_device::INT_SPU);
+		}
+
+        transfer_finish(chan);
 	}
 }
 
@@ -210,18 +251,6 @@ void iop_dma_device::transfer_finish(uint32_t chan)
 	if (m_int_ctrl[index].m_status & m_int_ctrl[index].m_mask)
 	{
 		m_intc->raise_interrupt(iop_intc_device::INT_DMA);
-		if (m_int_ctrl[index].m_enabled)
-		{
-			m_dicr[index] |= 0x80000000;
-		}
-		else
-		{
-			m_dicr[index] &= ~0x80000000;
-		}
-	}
-	else
-	{
-		m_dicr[index] &= ~0x80000000;
 	}
 }
 
@@ -230,16 +259,34 @@ READ32_MEMBER(iop_dma_device::bank0_r)
 	uint32_t ret = 0;
 	switch (offset)
 	{
+		case 0x00/4: case 0x10/4: case 0x20/4: case 0x30/4: case 0x40/4: case 0x50/4: case 0x60/4:
+			ret = m_channels[offset >> 2].addr();
+			logerror("%s: bank0_r: channel[%d].addr (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
+			break;
+		case 0x04/4: case 0x14/4: case 0x24/4: case 0x34/4: case 0x44/4: case 0x54/4: case 0x64/4:
+			ret = (m_channels[offset >> 2].count() << 16) | m_channels[offset >> 2].size();
+			logerror("%s: bank0_r: channel[%d].block  (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
+			break;
+		case 0x08/4: case 0x18/4: case 0x28/4: case 0x38/4: case 0x48/4: case 0x58/4: case 0x68/4:
+			ret = m_channels[offset >> 2].ctrl();
+			logerror("%s: bank0_r: channel[%d].ctrl (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
+			break;
+		case 0x0c/4: case 0x1c/4: case 0x2c/4: case 0x3c/4: case 0x4c/4: case 0x5c/4: case 0x6c/4:
+			ret = m_channels[offset >> 2].tag_addr();
+			logerror("%s: bank0_r: channel[%d].tag_addr (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
+			break;
 		case 0x70/4: // 0x1f8010f0, DPCR
 			ret = m_dpcr[0];
 			logerror("%s: bank0_r: DPCR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 0x74/4: // 0x1f8010f4, DICR
 			ret = m_dicr[0];
+			if ((m_int_ctrl[0].m_status & m_int_ctrl[0].m_mask) && m_int_ctrl[0].m_enabled)
+				ret |= 0x80000000;
 			logerror("%s: bank0_r: DICR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		default:
-			// Can't happen
+			logerror("%s: bank0_r: Unknown %08x & %08x\n", machine().describe_context(), 0x1f801080 + (offset << 2), mem_mask);
 			break;
 	}
 	return ret;
@@ -275,7 +322,7 @@ WRITE32_MEMBER(iop_dma_device::bank0_w)
 			set_dicr(data, 0);
 			break;
 		default:
-			// Can't happen
+			logerror("%s: bank0_w: Unknown %08x = %08x & %08x\n", machine().describe_context(), 0x1f801080 + (offset << 2), data, mem_mask);
 			break;
 	}
 }
@@ -285,16 +332,34 @@ READ32_MEMBER(iop_dma_device::bank1_r)
 	uint32_t ret = 0;
 	switch (offset)
 	{
+		case 0x00/4: case 0x10/4: case 0x20/4: case 0x30/4: case 0x40/4: case 0x50/4: case 0x60/4:
+			ret = m_channels[(offset >> 2) + 8].addr();
+			logerror("%s: bank1_r: channel[%d].addr (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
+			break;
+		case 0x04/4: case 0x14/4: case 0x24/4: case 0x34/4: case 0x44/4: case 0x54/4: case 0x64/4:
+			ret = (m_channels[(offset >> 2) + 8].count() << 16) | m_channels[(offset >> 2) + 8].size();
+			logerror("%s: bank1_r: channel[%d].block  (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
+			break;
+		case 0x08/4: case 0x18/4: case 0x28/4: case 0x38/4: case 0x48/4: case 0x58/4: case 0x68/4:
+			ret = m_channels[(offset >> 2) + 8].ctrl();
+			logerror("%s: bank1_r: channel[%d].ctrl (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
+			break;
+		case 0x0c/4: case 0x1c/4: case 0x2c/4: case 0x3c/4: case 0x4c/4: case 0x5c/4: case 0x6c/4:
+			ret = m_channels[(offset >> 2) + 8].tag_addr();
+			logerror("%s: bank1_r: channel[%d].tag_addr (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
+			break;
 		case 0x70/4: // 0x1f801570, DPCR2
 			ret = m_dpcr[1];
 			logerror("%s: bank1_r: DPCR2 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 0x74/4: // 0x1f801574, DICR2
 			ret = m_dicr[1];
+			if ((m_int_ctrl[1].m_status & m_int_ctrl[1].m_mask) && m_int_ctrl[1].m_enabled)
+				ret |= 0x80000000;
 			logerror("%s: bank1_r: DICR2 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		default:
-			// Can't happen
+			logerror("%s: bank1_r: Unknown %08x & %08x\n", machine().describe_context(), 0x1f801500 + (offset << 2), mem_mask);
 			break;
 	}
 	return ret;
@@ -330,7 +395,7 @@ WRITE32_MEMBER(iop_dma_device::bank1_w)
 			set_dicr(data, 1);
 			break;
 		default:
-			// Can't happen
+			logerror("%s: bank1_w: Unknown %08x = %08x & %08x\n", machine().describe_context(), 0x1f801500 + (offset << 2), data, mem_mask);
 			break;
 	}
 }
