@@ -1636,7 +1636,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		<publisher>アミューズメント (Amusement)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="blade of the great elements (test version) (1990)(amusement).dim" size="1261824" crc="f0c71952" sha1="7d11252bb23ce4f8c242cfa71f9b04fc1b368b25" offset="000000" />
+				<rom name="blade of the great elements (test version) (1990)(amusement).dim" size="1261824" crc="d924f2f5" sha1="66e8b6733147f083929c254c0b226dcf553f3ae7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5936,7 +5936,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<publisher>コナミ (Konami)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="gradius ii gofer no yabou (demo) (1992)(konami).dim" size="1261824" crc="b983c29e" sha1="72a4d7571409cace19bf469d565ee172ac8761ed" offset="000000" />
+				<rom name="gradius ii gofer no yabou (demo) (1992)(konami).dim" size="1261824" crc="8ebc5b14" sha1="f18ee490427af71147a3e429bba744d6fdf54028" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21267,9 +21267,10 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
+	<!-- User data included in disk image -->
 	<software name="fevrie">
 		<description>Fevrie</description>
-		<year>19??</year>
+		<year>1990</year>
 		<publisher>Login</publisher>
 		<info name="developer" value="Jeudi" />
 		<info name="alt_title" value="フェブリー" />

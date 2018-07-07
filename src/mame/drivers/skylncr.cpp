@@ -161,6 +161,18 @@ public:
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void neraidou(machine_config &config);
+	void sstar97(machine_config &config);
+	void bdream97(machine_config &config);
+	void skylncr(machine_config &config);
+	void mbutrfly(machine_config &config);
+
+	void init_miaction();
+	void init_sonikfig();
+
+	READ_LINE_MEMBER(mbutrfly_prot_r);
+
+private:
 	DECLARE_WRITE8_MEMBER(skylncr_videoram_w);
 	DECLARE_WRITE8_MEMBER(skylncr_colorram_w);
 	DECLARE_WRITE8_MEMBER(reeltiles_1_w);
@@ -179,10 +191,8 @@ public:
 	DECLARE_READ8_MEMBER(ret_ff);
 	DECLARE_WRITE8_MEMBER(skylncr_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(mbutrfly_prot_w);
-	READ_LINE_MEMBER(mbutrfly_prot_r);
 	DECLARE_READ8_MEMBER(bdream97_opcode_r);
-	void init_miaction();
-	void init_sonikfig();
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
@@ -190,11 +200,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
 	uint32_t screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
-	void neraidou(machine_config &config);
-	void sstar97(machine_config &config);
-	void bdream97(machine_config &config);
-	void skylncr(machine_config &config);
-	void mbutrfly(machine_config &config);
 	void bdream97_opcode_map(address_map &map);
 	void io_map_mbutrfly(address_map &map);
 	void io_map_skylncr(address_map &map);
@@ -202,7 +207,6 @@ public:
 	void ramdac2_map(address_map &map);
 	void ramdac_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 

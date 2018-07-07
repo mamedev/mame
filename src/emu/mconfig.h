@@ -223,9 +223,7 @@ inline std::enable_if_t<emu::detail::is_device_interface<typename std::remove_re
 ATTR_COLD void _name(machine_config &config) \
 { \
 	device_t *device = nullptr; \
-	devcb_base *devcb = nullptr; \
 	(void)device; \
-	(void)devcb;
 
 /**
 @def MACHINE_CONFIG_END

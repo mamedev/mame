@@ -104,9 +104,9 @@ MACHINE_CONFIG_START(harriet_state::harriet)
 	MCFG_DEVICE_ADD("timekpr", M48T02, 0)
 	MCFG_NVRAM_ADD_0FILL("zpram") // MK48Z02
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("mfp", mc68901_device, write_rx))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mfp", mc68901_device, tbi_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("mfp", FUNC(mc68901_device::write_rx));
+	rs232.rxd_handler().append("mfp", FUNC(mc68901_device::tbi_w));
 
 	//MCFG_DEVICE_ADD("wdca", WD33C93, 40_MHz_XTAL / 4)
 	//MCFG_DEVICE_ADD("wdcb", WD33C93, 40_MHz_XTAL / 4)

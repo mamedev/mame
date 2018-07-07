@@ -26,7 +26,7 @@ public:
 	void qwak(machine_config &config);
 	void runaway(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(runaway_input_r);
 	DECLARE_WRITE8_MEMBER(runaway_irq_ack_w);
 	DECLARE_READ8_MEMBER(earom_read);

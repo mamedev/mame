@@ -29,7 +29,7 @@ public:
 
 	void toobin(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	virtual void update_interrupts() override;
@@ -50,7 +50,6 @@ protected:
 
 	void main_map(address_map &map);
 
-private:
 	required_device<atari_jsa_i_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;

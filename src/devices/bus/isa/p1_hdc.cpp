@@ -26,8 +26,6 @@
 		} \
 	} while (0)
 
-#define KM1809VG7_TAG   "d17"
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -59,12 +57,12 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(p1_hdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(KM1809VG7_TAG, WD2010, 5000000) // XXX clock?
-	MCFG_WD2010_IN_DRDY_CB(VCC)
-	MCFG_WD2010_IN_INDEX_CB(VCC)
-	MCFG_WD2010_IN_WF_CB(VCC)
-	MCFG_WD2010_IN_TK000_CB(VCC)
-	MCFG_WD2010_IN_SC_CB(VCC)
+	WD2010(config, m_hdc, 5'000'000); // XXX clock?
+	m_hdc->in_drdy_callback().set_constant(1);
+	m_hdc->in_index_callback().set_constant(1);
+	m_hdc->in_wf_callback().set_constant(1);
+	m_hdc->in_tk000_callback().set_constant(1);
+	m_hdc->in_sc_callback().set_constant(1);
 
 	MCFG_HARDDISK_ADD("hard0")
 	MCFG_HARDDISK_ADD("hard1")
@@ -117,7 +115,7 @@ WRITE8_MEMBER(p1_hdc_device::p1_HDC_w)
 p1_hdc_device::p1_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, P1_HDC, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
-	, m_hdc(*this, KM1809VG7_TAG)
+	, m_hdc(*this, "d17")
 {
 }
 

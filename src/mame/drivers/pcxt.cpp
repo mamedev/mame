@@ -72,6 +72,10 @@ public:
 		m_mb(*this, "mb"),
 		m_bank(*this, "bank"){ }
 
+	void tetriskr(machine_config &config);
+	void filetto(machine_config &config);
+
+private:
 	int m_lastvalue;
 	uint8_t m_disk_data[2];
 	uint8_t m_port_b_data;
@@ -93,8 +97,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	optional_device<address_map_bank_device> m_bank;
-	void tetriskr(machine_config &config);
-	void filetto(machine_config &config);
 	void bank_map(address_map &map);
 	void filetto_io(address_map &map);
 	void filetto_map(address_map &map);

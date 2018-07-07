@@ -82,6 +82,9 @@ public:
 	{
 	}
 
+	void vax11(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( term_r );
@@ -91,7 +94,6 @@ public:
 	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	uint16_t m_term_status;
-	void vax11(machine_config &config);
 	void vax11_mem(address_map &map);
 };
 

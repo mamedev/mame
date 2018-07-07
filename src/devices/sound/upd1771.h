@@ -11,7 +11,7 @@
 
 
 #define MCFG_UPD1771_ACK_HANDLER(_devcb) \
-	devcb = &downcast<upd1771c_device &>(*device).set_ack_handler(DEVCB_##_devcb);
+	downcast<upd1771c_device &>(*device).set_ack_handler(DEVCB_##_devcb);
 
 
 /***************************************************************************

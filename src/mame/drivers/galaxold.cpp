@@ -745,7 +745,7 @@ void galaxold_state::drivfrcg_io(address_map &map)
 }
 
 
-void galaxold_state::racknrol(address_map &map)
+void galaxold_state::racknrol_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x1400, 0x143f).mirror(0x6000).ram().w(FUNC(galaxold_state::galaxold_attributesram_w)).share("attributesram");
@@ -2575,11 +2575,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galaxold_state::racknrol)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, PIXEL_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(racknrol)
-	MCFG_DEVICE_IO_MAP(racknrol_io)
+	s2650_device &maincpu(S2650(config, m_maincpu, PIXEL_CLOCK/2));
+	maincpu.set_addrmap(AS_PROGRAM, &galaxold_state::racknrol_map);
+	maincpu.set_addrmap(AS_IO, &galaxold_state::racknrol_io);
+	maincpu.sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert(); // ???
+	device = &maincpu; // FIXME: kill the following line - convert to a screen vblank callback
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)
@@ -2603,11 +2604,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galaxold_state::hexpoola)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, PIXEL_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(racknrol)
-	MCFG_DEVICE_IO_MAP(hexpoola_io)
-	MCFG_DEVICE_DATA_MAP(hexpoola_data)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
+	s2650_device &maincpu(S2650(config, m_maincpu, PIXEL_CLOCK/2));
+	maincpu.set_addrmap(AS_PROGRAM, &galaxold_state::racknrol_map);
+	maincpu.set_addrmap(AS_IO, &galaxold_state::hexpoola_io);
+	maincpu.set_addrmap(AS_DATA, &galaxold_state::hexpoola_data);
+	maincpu.sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert(); // ???
+	device = &maincpu; // FIXME: kill the following line - convert to a screen vblank callback
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)

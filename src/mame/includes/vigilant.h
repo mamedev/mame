@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour
+#ifndef MAME_INCLUDES_VIGILANT_H
+#define MAME_INCLUDES_VIGILANT_H
+
+#pragma once
+
 #include "audio/m72.h"
 #include "emupal.h"
 
@@ -15,8 +20,14 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_mainbank(*this, "mainbank") { }
+		m_mainbank(*this, "mainbank")
+	{ }
 
+	void vigilant(machine_config &config);
+	void kikcubic(machine_config &config);
+	void buccanrs(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -59,9 +70,7 @@ public:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void vigilant_postload();
-	void vigilant(machine_config &config);
-	void kikcubic(machine_config &config);
-	void buccanrs(machine_config &config);
+
 	void buccanrs_sound_io_map(address_map &map);
 	void kikcubic_io_map(address_map &map);
 	void kikcubic_map(address_map &map);
@@ -70,3 +79,5 @@ public:
 	void vigilant_io_map(address_map &map);
 	void vigilant_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_VIGILANT_H

@@ -36,10 +36,10 @@
 #pragma once
 
 #define MCFG_SP0256_DATA_REQUEST_CB(_devcb) \
-	devcb = &downcast<sp0256_device &>(*device).set_data_request_callback(DEVCB_##_devcb);
+	downcast<sp0256_device &>(*device).set_data_request_callback(DEVCB_##_devcb);
 
 #define MCFG_SP0256_STANDBY_CB(_devcb) \
-	devcb = &downcast<sp0256_device &>(*device).set_standby_callback(DEVCB_##_devcb);
+	downcast<sp0256_device &>(*device).set_standby_callback(DEVCB_##_devcb);
 
 
 class sp0256_device : public device_t,

@@ -469,14 +469,6 @@ WRITE_LINE_MEMBER( xerox820_state::fdc_drq_w )
 	update_nmi();
 }
 
-/* COM8116 Interface */
-
-WRITE_LINE_MEMBER( xerox820_state::fr_w )
-{
-	m_sio->rxca_w(state);
-	m_sio->txca_w(state);
-}
-
 /* Video */
 
 uint32_t xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -655,9 +647,10 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, 5.0688_MHz_XTAL)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, xerox820_state, fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
+	dbrg.fr_handler().set(m_sio, FUNC(z80dart_device::rxca_w));
+	dbrg.fr_handler().append(m_sio, FUNC(z80dart_device::txca_w));
+	dbrg.ft_handler().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, XEROX_820_KEYBOARD, 0)
 	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))
@@ -744,21 +737,22 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, 5.0688_MHz_XTAL)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, xerox820_state, fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
+	dbrg.fr_handler().set(m_sio, FUNC(z80dart_device::rxca_w));
+	dbrg.fr_handler().append(m_sio, FUNC(z80dart_device::txca_w));
+	dbrg.ft_handler().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, XEROX_820_KEYBOARD, 0)
 	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))
 
 	// SASI bus
-	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
-	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
-	MCFG_SCSI_BSY_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit0)) MCFG_DEVCB_XOR(1)
-	MCFG_SCSI_MSG_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit1)) MCFG_DEVCB_XOR(1)
-	MCFG_SCSI_CD_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit2)) MCFG_DEVCB_XOR(1)
-	MCFG_SCSI_REQ_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit3)) MCFG_DEVCB_XOR(1)
-	MCFG_SCSI_IO_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit4)) MCFG_DEVCB_XOR(1)
+	SCSI_PORT(config, m_sasibus, 0);
+	m_sasibus->set_data_input_buffer("sasi_data_in");
+	m_sasibus->bsy_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit0)).exor(1);
+	m_sasibus->msg_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit1)).exor(1);
+	m_sasibus->cd_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit2)).exor(1);
+	m_sasibus->req_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit3)).exor(1);
+	m_sasibus->io_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit4)).exor(1);
 
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SA1403D, SCSI_ID_0)
 

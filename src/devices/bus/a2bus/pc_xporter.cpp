@@ -147,8 +147,8 @@ MACHINE_CONFIG_START(a2bus_pcxporter_device::device_add_mconfig)
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, a2bus_pcxporter_device, pc_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, a2bus_pcxporter_device, pc_dack3_w))
 
-	MCFG_DEVICE_ADD(m_pic8259, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(m_v30, 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_v30, 0);
 
 	MCFG_DEVICE_ADD(m_isabus, ISA8, 0)
 	MCFG_ISA8_CPU(m_v30)

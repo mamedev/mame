@@ -1695,7 +1695,7 @@ WRITE_LINE_MEMBER(dkong_state::busreq_w )
 MACHINE_CONFIG_START(dkong_state::dkong_base)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CLOCK_1H)
+	MCFG_DEVICE_ADD(m_maincpu, Z80, CLOCK_1H)
 	MCFG_DEVICE_PROGRAM_MAP(dkong_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
@@ -1710,7 +1710,7 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	MCFG_I8257_REVERSE_RW_MODE(1) // why?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
 	MCFG_SCREEN_PALETTE("palette")
@@ -1791,7 +1791,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dkong_state::dkong3)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2) /* verified in schematics */
+	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(8'000'000) / 2) /* verified in schematics */
 	MCFG_DEVICE_PROGRAM_MAP(dkong3_map)
 	MCFG_DEVICE_IO_MAP(dkong3_io_map)
 
@@ -1803,13 +1803,13 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, dkong_state, memory_write_byte))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dkong_state, vblank_irq))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("n2a03a", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("n2a03b", INPUT_LINE_NMI))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(dkong_state::screen_update_dkong));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(dkong_state::vblank_irq));
+	m_screen->screen_vblank().append_inputline(m_dev_n2a03a, INPUT_LINE_NMI);
+	m_screen->screen_vblank().append_inputline(m_dev_n2a03b, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dkong)
 	MCFG_PALETTE_ADD("palette", DK3_PALETTE_LENGTH)
@@ -1839,8 +1839,7 @@ MACHINE_CONFIG_START(dkong_state::pestplce)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong2b)  /* wrong! */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_pestplce)
+	m_screen->set_screen_update(FUNC(dkong_state::screen_update_pestplce));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dkong_state::dkong3b)
@@ -1861,15 +1860,14 @@ MACHINE_CONFIG_START(dkong_state::s2650)
 	dkong2b(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", S2650, CLOCK_1H / 2)    /* ??? */
+	MCFG_DEVICE_REPLACE(m_maincpu, S2650, CLOCK_1H / 2)    /* ??? */
 	MCFG_DEVICE_PROGRAM_MAP(s2650_map)
 	MCFG_DEVICE_IO_MAP(s2650_io_map)
 	MCFG_DEVICE_DATA_MAP(s2650_data_map)
 	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, dkong_state, s2650_fo_w))
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dkong_state, s2650_interrupt))
+	m_screen->screen_vblank().set(FUNC(dkong_state::s2650_interrupt));
 
 	MCFG_DEVICE_MODIFY("dma8257")
 	MCFG_I8257_IN_MEMR_CB(READ8(*this, dkong_state, hb_dma_read_byte))
@@ -1878,11 +1876,11 @@ MACHINE_CONFIG_START(dkong_state::s2650)
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dkong_state::herbiedk)
+void dkong_state::herbiedk(machine_config &config)
+{
 	s2650(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
-MACHINE_CONFIG_END
+	downcast<s2650_device &>(*m_maincpu).sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert(); // ???
+}
 
 MACHINE_CONFIG_START(dkong_state::spclforc)
 	herbiedk(config);
@@ -1891,8 +1889,7 @@ MACHINE_CONFIG_START(dkong_state::spclforc)
 	MCFG_DEVICE_REMOVE("soundcpu")
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_spclforc)
+	m_screen->set_screen_update(FUNC(dkong_state::screen_update_spclforc));
 MACHINE_CONFIG_END
 
 /*************************************

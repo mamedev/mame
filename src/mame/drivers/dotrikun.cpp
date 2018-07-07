@@ -51,7 +51,7 @@ public:
 
 	void dotrikun(machine_config &config);
 
-private:
+protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

@@ -26,6 +26,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void a5130(machine_config &config);
+	void a5120(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(a5130);
@@ -33,8 +37,6 @@ public:
 	uint32_t screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_a5130(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void a5130(machine_config &config);
-	void a5120(machine_config &config);
 	void a5120_io(address_map &map);
 	void a5120_mem(address_map &map);
 	void a5130_io(address_map &map);

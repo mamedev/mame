@@ -125,7 +125,7 @@ MACHINE_CONFIG_START(microkit_state::microkit)
 	MCFG_DEVICE_ADD("maincpu", CDP1802, 1750000)
 	MCFG_DEVICE_PROGRAM_MAP(microkit_mem)
 	MCFG_DEVICE_IO_MAP(microkit_io)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
 	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, microkit_state, clear_r))
 
 	/* video hardware */

@@ -32,28 +32,28 @@
 //**************************************************************************
 
 #define MCFG_MOS6529_P0_HANDLER(_devcb) \
-	devcb = &downcast<mos6529_device &>(*device).set_p0_handler(DEVCB_##_devcb);
+	downcast<mos6529_device &>(*device).set_p0_handler(DEVCB_##_devcb);
 
 #define MCFG_MOS6529_P1_HANDLER(_devcb) \
-	devcb = &downcast<mos6529_device &>(*device).set_p1_handler(DEVCB_##_devcb);
+	downcast<mos6529_device &>(*device).set_p1_handler(DEVCB_##_devcb);
 
 #define MCFG_MOS6529_P2_HANDLER(_devcb) \
-	devcb = &downcast<mos6529_device &>(*device).set_p2_handler(DEVCB_##_devcb);
+	downcast<mos6529_device &>(*device).set_p2_handler(DEVCB_##_devcb);
 
 #define MCFG_MOS6529_P3_HANDLER(_devcb) \
-	devcb = &downcast<mos6529_device &>(*device).set_p3_handler(DEVCB_##_devcb);
+	downcast<mos6529_device &>(*device).set_p3_handler(DEVCB_##_devcb);
 
 #define MCFG_MOS6529_P4_HANDLER(_devcb) \
-	devcb = &downcast<mos6529_device &>(*device).set_p4_handler(DEVCB_##_devcb);
+	downcast<mos6529_device &>(*device).set_p4_handler(DEVCB_##_devcb);
 
 #define MCFG_MOS6529_P5_HANDLER(_devcb) \
-	devcb = &downcast<mos6529_device &>(*device).set_p5_handler(DEVCB_##_devcb);
+	downcast<mos6529_device &>(*device).set_p5_handler(DEVCB_##_devcb);
 
 #define MCFG_MOS6529_P6_HANDLER(_devcb) \
-	devcb = &downcast<mos6529_device &>(*device).set_p6_handler(DEVCB_##_devcb);
+	downcast<mos6529_device &>(*device).set_p6_handler(DEVCB_##_devcb);
 
 #define MCFG_MOS6529_P7_HANDLER(_devcb) \
-	devcb = &downcast<mos6529_device &>(*device).set_p7_handler(DEVCB_##_devcb);
+	downcast<mos6529_device &>(*device).set_p7_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

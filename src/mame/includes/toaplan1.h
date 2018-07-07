@@ -28,6 +28,21 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void demonwld(machine_config &config);
+	void samesame(machine_config &config);
+	void truxton(machine_config &config);
+	void outzone(machine_config &config);
+	void vimana(machine_config &config);
+	void outzonecv(machine_config &config);
+	void hellfire(machine_config &config);
+	void zerowing(machine_config &config);
+
+	void init_toaplan1();
+	void init_demonwld();
+
+	DECLARE_MACHINE_RESET(toaplan1);
+
+protected:
 	required_shared_ptr<uint16_t> m_bgpaletteram;
 	required_shared_ptr<uint16_t> m_fgpaletteram;
 
@@ -83,8 +98,6 @@ public:
 	tilemap_t *m_pf3_tilemap;
 	tilemap_t *m_pf4_tilemap;
 
-
-
 	DECLARE_WRITE16_MEMBER(toaplan1_intenable_w);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_addrsel_w);
 	DECLARE_READ16_MEMBER(demonwld_dsp_r);
@@ -130,13 +143,11 @@ public:
 	DECLARE_WRITE8_MEMBER(samesame_sound_done_w);
 	DECLARE_READ8_MEMBER(samesame_cmdavailable_r);
 
-	void init_toaplan1();
-	void init_demonwld();
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf3_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf4_tile_info);
-	DECLARE_MACHINE_RESET(toaplan1);
+
 	DECLARE_VIDEO_START(toaplan1);
 	DECLARE_MACHINE_RESET(zerowing);
 	DECLARE_MACHINE_RESET(demonwld);
@@ -167,14 +178,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void demonwld(machine_config &config);
-	void samesame(machine_config &config);
-	void truxton(machine_config &config);
-	void outzone(machine_config &config);
-	void vimana(machine_config &config);
-	void outzonecv(machine_config &config);
-	void hellfire(machine_config &config);
-	void zerowing(machine_config &config);
+
 	void DSP_io_map(address_map &map);
 	void DSP_program_map(address_map &map);
 	void demonwld_main_map(address_map &map);
@@ -206,6 +210,9 @@ public:
 	{
 	}
 
+	void rallybik(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
@@ -216,7 +223,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_rallybik);
 
 	required_device<toaplan_scu_device> m_spritegen;
-	void rallybik(machine_config &config);
 	void rallybik_main_map(address_map &map);
 	void rallybik_sound_io_map(address_map &map);
 };

@@ -85,6 +85,14 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::MOUSE; }
 
+	void nimbus(machine_config &config);
+
+	uint32_t m_debug_machine;
+
+	void decode_subbios(device_t *device, offs_t pc, uint8_t raw_flag);
+	void decode_dos21(device_t *device, offs_t pc);
+
+private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i8031_device> m_iocpu;
 	required_device<msm5205_device> m_msm;
@@ -108,7 +116,6 @@ public:
 
 	bitmap_ind16 m_video_mem;
 
-	uint32_t m_debug_machine;
 	uint8_t m_mcu_reg080;
 	uint8_t m_iou_reg092;
 	uint8_t m_last_playmode;
@@ -232,15 +239,11 @@ public:
 		emu_timer   *m_mouse_timer;
 	} m_nimbus_mouse;
 
-	void nimbus(machine_config &config);
 	void nimbus_io(address_map &map);
 	void nimbus_iocpu_io(address_map &map);
 	void nimbus_iocpu_mem(address_map &map);
 	void nimbus_mem(address_map &map);
-	void decode_subbios(device_t *device, offs_t pc, uint8_t raw_flag);
-	void decode_dos21(device_t *device, offs_t pc);
 
-private:
 	void decode_dssi_none(uint16_t ds, uint16_t si, uint8_t raw_flag);
 	void decode_dssi_generic(uint16_t ds, uint16_t si, uint8_t raw_flag);
 	void decode_dssi_f_fill_area(uint16_t ds, uint16_t si, uint8_t raw_flag);
@@ -248,7 +251,6 @@ private:
 	void decode_dssi_f_set_new_clt(uint16_t ds, uint16_t si, uint8_t raw_flag);
 	void decode_dssi_f_plonk_char(uint16_t ds, uint16_t si, uint8_t raw_flag);
 	void decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si, uint8_t raw_flag);
-
 
 	void debug_command(int ref, const std::vector<std::string> &params);
 	void video_debug(int ref, const std::vector<std::string> &params);

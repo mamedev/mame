@@ -189,10 +189,11 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
-	void init_sfkick();
 	void sfkick(machine_config &config);
 
-protected:
+	void init_sfkick();
+
+private:
 	DECLARE_WRITE8_MEMBER(page0_w);
 	DECLARE_WRITE8_MEMBER(page1_w);
 	DECLARE_WRITE8_MEMBER(page2_w);
@@ -209,7 +210,6 @@ protected:
 	void sfkick_sound_io_map(address_map &map);
 	void sfkick_sound_map(address_map &map);
 
-private:
 	std::unique_ptr<uint8_t[]> m_main_mem;
 	int m_bank_cfg;
 	int m_bank[8];

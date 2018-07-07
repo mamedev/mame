@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_EEPROM_SERIAL_DO_CALLBACK(_devcb) \
-	devcb = &downcast<eeprom_serial_base_device &>(*device).set_do_callback(DEVCB_##_devcb);
+	downcast<eeprom_serial_base_device &>(*device).set_do_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -43,6 +43,7 @@ public:
 	void enable_streaming(bool enable) { m_streaming_enabled = enable; }
 	void enable_output_on_falling_clock(bool enable) { m_output_on_falling_clock_enabled = enable; }
 	template<class Object> devcb_base &set_do_callback(Object &&cb) { return m_do_cb.set_callback(std::forward<Object>(cb)); }
+	auto do_callback() { return m_do_cb.bind(); }
 
 protected:
 	// construction/destruction

@@ -34,6 +34,11 @@ public:
 		m_serflash(*this, "flash")
 	{ }
 
+	void nexus3d(machine_config &config);
+
+	void init_nexus3d();
+
+private:
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<cpu_device> m_maincpu;
 	required_device<serflash_device> m_serflash;
@@ -44,11 +49,9 @@ public:
 //  DECLARE_WRITE32_MEMBER(nexus3d_unk2_w);
 //  DECLARE_WRITE32_MEMBER(nexus3d_unk3_w);
 
-	void init_nexus3d();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void nexus3d(machine_config &config);
 	void nexus3d_map(address_map &map);
 };
 

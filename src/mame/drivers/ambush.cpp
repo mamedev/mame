@@ -72,6 +72,11 @@ public:
 		m_color_bank(0)
 	{ }
 
+	void mariobl(machine_config &config);
+	void ambush(machine_config &config);
+	void dkong3abl(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(ambush);
 	DECLARE_PALETTE_INIT(mario);
 	DECLARE_PALETTE_INIT(dkong3);
@@ -96,13 +101,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(output_latches_w);
 
-	void mariobl(machine_config &config);
-	void ambush(machine_config &config);
-	void dkong3abl(machine_config &config);
 	void bootleg_map(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
-private:
+
 	void register_save_states();
 
 	required_device<gfxdecode_device> m_gfxdecode;

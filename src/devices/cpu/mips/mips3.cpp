@@ -248,6 +248,10 @@ void mips3_device::generate_exception(int exception, int backup)
 		offset = 0;
 		exception = (exception - EXCEPTION_TLBLOAD_FILL) + EXCEPTION_TLBLOAD;
 	}
+	else if (exception == EXCEPTION_INTERRUPT && m_flavor == MIPS3_TYPE_R5900)
+	{
+		offset = 0x200;
+	}
 
 	/* set the exception PC */
 	m_core->cpr[0][COP0_EPC] = m_core->pc;
@@ -309,6 +313,7 @@ void mips3_device::generate_tlb_exception(int exception, offs_t address)
 
 void mips3_device::invalid_instruction(uint32_t op)
 {
+	printf("Invalid instruction! %08x\n", op);
 	generate_exception(EXCEPTION_INVALIDOP, 1);
 }
 
@@ -320,7 +325,8 @@ void mips3_device::invalid_instruction(uint32_t op)
 
 void mips3_device::check_irqs()
 {
-	if ((CAUSE & SR & 0xfc00) && (SR & SR_IE) && !(SR & SR_EXL) && !(SR & SR_ERL))
+	bool ie = (SR & SR_IE) && ((SR & SR_EIE) || m_flavor != MIPS3_TYPE_R5900);
+	if ((CAUSE & SR & 0xfc00) && ie && !(SR & SR_EXL) && !(SR & SR_ERL))
 		generate_exception(EXCEPTION_INTERRUPT, 0);
 }
 
@@ -1778,13 +1784,17 @@ void mips3_device::handle_cop0(uint32_t op)
 				case 0x10:  /* RFE */   invalid_instruction(op);                            break;
 				case 0x18:  /* ERET   logerror("ERET\n"); */ m_core->pc = m_core->cpr[0][COP0_EPC]; SR &= ~SR_EXL; check_irqs(); m_lld_value ^= 0xffffffff; m_ll_value ^= 0xffffffff;  break;
 				case 0x20:  /* WAIT */                                                      break;
-				default:    invalid_instruction(op);                                        break;
+				default:    handle_extra_cop0(op);                                          break;
 			}
 			break;
 		default:    invalid_instruction(op);                                                break;
 	}
 }
 
+void mips3_device::handle_extra_cop0(uint32_t op)
+{
+	invalid_instruction(op);
+}
 
 
 /***************************************************************************
@@ -2097,12 +2107,6 @@ void mips3_device::handle_cop1_fr0(uint32_t op)
 						FDVALD_FR0 = 1.0 / sqrt(FSVALD_FR0);
 					break;
 
-				case 0x18: /* R5900 */
-					if (m_flavor != MIPS3_TYPE_R5900)
-						break;
-					m_core->acc = FSVALS_FR0 + FTVALS_FR0;
-					break;
-
 				case 0x20:
 					if (IS_INTEGRAL(op))
 					{
@@ -2206,13 +2210,17 @@ void mips3_device::handle_cop1_fr0(uint32_t op)
 					break;
 
 				default:
-					fprintf(stderr, "cop1 %X\n", op);
+					handle_extra_cop1(op);
 					break;
 			}
 			break;
 	}
 }
 
+void mips3_device::handle_extra_cop1(uint32_t op)
+{
+	invalid_instruction(op);
+}
 
 void mips3_device::handle_cop1_fr1(uint32_t op)
 {
@@ -3358,9 +3366,42 @@ void r5900le_device::handle_extra_regimm(uint32_t op)
 	}
 }
 
+void r5900le_device::handle_extra_cop0(uint32_t op)
+{
+	switch (op & 0x01ffffff)
+	{
+		case 0x38: /* EI */
+			if ((SR & (SR_EXL | SR_ERL | SR_EDI)) || ((SR & SR_KSU_MASK) == SR_KSU_KERNEL))
+				SR |= SR_EIE;
+			break;
+		case 0x39: /* DI */
+			if ((SR & (SR_EXL | SR_ERL | SR_EDI)) || ((SR & SR_KSU_MASK) == SR_KSU_KERNEL))
+				SR &= ~SR_EIE;
+			break;
+		default:
+			invalid_instruction(op);
+			break;
+	}
+}
+
+void r5900le_device::handle_extra_cop1(uint32_t op)
+{
+	switch (op & 0x3f)
+	{
+		case 0x18: /* ADDA.S */
+			m_core->acc = FSVALS_FR0 + FTVALS_FR0;
+			break;
+
+		case 0x1c: /* MADD.S */
+			m_core->acc += FSVALS_FR1 * FTVALS_FR1;
+			FDVALS_FR1 = m_core->acc;
+			break;
+	}
+}
+
 void r5900le_device::handle_idt(uint32_t op)
 {
-    //const int rs = (op >> 21) & 31;
+    const int rs = (op >> 21) & 31;
     //const int rt = (op >> 16) & 31;
     const int rd = (op >> 11) & 31;
 
@@ -3373,7 +3414,13 @@ void r5900le_device::handle_idt(uint32_t op)
 			printf("Unsupported instruction: MADDU @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x04: /* PLZCW */
-			printf("Unsupported instruction: PLZCW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval = m_core->r[rs];
+				const uint64_t hi = (uint32_t)(count_leading_zeros((uint32_t)(rsval >> 32)) - 1);
+				const uint64_t lo = (uint32_t)(count_leading_zeros((uint32_t)rsval) - 1);
+				m_core->r[rd] = (hi << 32) | lo;
+			}
 			break;
 		case 0x08: /* MMI0 */
 			handle_mmi0(op);
@@ -3387,7 +3434,8 @@ void r5900le_device::handle_idt(uint32_t op)
             m_core->icount--;
             break;
 		case 0x11: /* MTHI1 */
-			printf("Unsupported instruction: MTHI1 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			m_core->rh[REG_HI] = m_core->r[rs];
+            m_core->icount--;
 			break;
 		case 0x12: /* MFLO1 */
 		    if (rd)
@@ -3395,7 +3443,8 @@ void r5900le_device::handle_idt(uint32_t op)
             m_core->icount--;
 			break;
 		case 0x13: /* MTLO1 */
-			printf("Unsupported instruction: MTLO1 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			m_core->rh[REG_LO] = m_core->r[rs];
+            m_core->icount--;
 			break;
 		case 0x18: /* MULT1 */
 		{

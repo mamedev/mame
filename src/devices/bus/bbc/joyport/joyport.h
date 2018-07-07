@@ -42,10 +42,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_BBC_JOYPORT_CB1_HANDLER(_devcb) \
-	devcb = &downcast<bbc_joyport_slot_device &>(*device).set_cb1_handler(DEVCB_##_devcb);
+	downcast<bbc_joyport_slot_device &>(*device).set_cb1_handler(DEVCB_##_devcb);
 
 #define MCFG_BBC_JOYPORT_CB2_HANDLER(_devcb) \
-	devcb = &downcast<bbc_joyport_slot_device &>(*device).set_cb2_handler(DEVCB_##_devcb);
+	downcast<bbc_joyport_slot_device &>(*device).set_cb2_handler(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

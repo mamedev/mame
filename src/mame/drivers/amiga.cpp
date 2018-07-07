@@ -1381,19 +1381,19 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga)
 
 	// cia
-	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_PAL)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("cia_0_port_a"))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_MOS6526_PC_CALLBACK(WRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE("kbd", amiga_keyboard_bus_device, kdat_in_w)) MCFG_DEVCB_INVERT
+	MOS8520(config, m_cia_0, amiga_state::CLK_E_PAL);
+	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
+	m_cia_0->pa_rd_callback().set_ioport("cia_0_port_a");
+	m_cia_0->pa_wr_callback().set(FUNC(amiga_state::cia_0_port_a_write));
+	m_cia_0->pb_wr_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_cia_0->pc_wr_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
+	m_cia_0->sp_wr_callback().set("kbd", FUNC(amiga_keyboard_bus_device::kdat_in_w)).invert();
 
-	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_PAL)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, amiga_state, cia_1_port_a_read))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_1_port_a_write))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8("fdc", amiga_fdc_device, ciaaprb_w))
+	MOS8520(config, m_cia_1, amiga_state::CLK_E_PAL);
+	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
+	m_cia_1->pa_rd_callback().set(FUNC(amiga_state::cia_1_port_a_read));
+	m_cia_1->pa_wr_callback().set(FUNC(amiga_state::cia_1_port_a_write));
+	m_cia_1->pb_wr_callback().set(m_fdc, FUNC(amiga_fdc_device::ciaaprb_w));
 
 	// audio
 	SPEAKER(config, "lspeaker").front_left();
@@ -1618,13 +1618,13 @@ MACHINE_CONFIG_START(cdtv_state::cdtv)
 	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cdtv_state, tpi_port_b_write))
 
 	// cd-rom
-	MCFG_CR511B_ADD("cdrom")
-	MCFG_CR511B_SCOR_HANDLER(WRITELINE("u32", tpi6525_device, i1_w)) MCFG_DEVCB_INVERT
-	MCFG_CR511B_STCH_HANDLER(WRITELINE("u32", tpi6525_device, i2_w)) MCFG_DEVCB_INVERT
-	MCFG_CR511B_STEN_HANDLER(WRITELINE("u32", tpi6525_device, i3_w))
-	MCFG_CR511B_XAEN_HANDLER(WRITELINE("u32", tpi6525_device, pb2_w))
-	MCFG_CR511B_DRQ_HANDLER(WRITELINE("u36", amiga_dmac_device, xdreq_w))
-	MCFG_CR511B_DTEN_HANDLER(WRITELINE("u36", amiga_dmac_device, xdreq_w))
+	CR511B(config, m_cdrom, 0);
+	m_cdrom->scor_handler().set("u32", FUNC(tpi6525_device::i1_w)).invert();
+	m_cdrom->stch_handler().set("u32", FUNC(tpi6525_device::i2_w)).invert();
+	m_cdrom->sten_handler().set("u32", FUNC(tpi6525_device::i3_w));
+	m_cdrom->xaen_handler().set("u32", FUNC(tpi6525_device::pb2_w));
+	m_cdrom->drq_handler().set("u36", FUNC(amiga_dmac_device::xdreq_w));
+	m_cdrom->dten_handler().set("u36", FUNC(amiga_dmac_device::xdreq_w));
 
 	// software
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "cdtv")

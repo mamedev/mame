@@ -71,6 +71,9 @@ public:
 		, m_keyboard(*this, "X%u", 0)
 	{ }
 
+	void sbc6510(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(a2_r);
 	DECLARE_WRITE8_MEMBER(a2_w);
 	DECLARE_READ8_MEMBER(psg_a_r);
@@ -78,12 +81,11 @@ public:
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(key_r);
 
-	void sbc6510(machine_config &config);
 	void sbc6510_mem(address_map &map);
 	void sbc6510_video_data(address_map &map);
 	void sbc6510_video_io(address_map &map);
 	void sbc6510_video_mem(address_map &map);
-private:
+
 	uint8_t m_key_row;
 	uint8_t m_2;
 	virtual void machine_start() override;

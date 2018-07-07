@@ -7,6 +7,10 @@
     driver by Aaron Giles
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_BALSENTE_H
+#define MAME_INCLUDES_BALSENTE_H
+
+#pragma once
 
 #include "machine/6850acia.h"
 #include "machine/pit8253.h"
@@ -105,7 +109,6 @@ private:
 	DECLARE_READ8_MEMBER(novram_8bit_r);
 	DECLARE_WRITE8_MEMBER(novram_8bit_w);
 	DECLARE_WRITE8_MEMBER(acia_w);
-	DECLARE_WRITE_LINE_MEMBER(uint_w);
 	DECLARE_WRITE_LINE_MEMBER(uint_propagate_w);
 	DECLARE_READ8_MEMBER(adc_data_r);
 	DECLARE_WRITE8_MEMBER(adc_select_w);
@@ -233,3 +236,5 @@ private:
 
 /*----------- defined in machine/balsente.c -----------*/
 void balsente_noise_gen(device_t *device, int count, short *buffer);
+
+#endif // MAME_INCLUDES_BALSENTE_H

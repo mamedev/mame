@@ -19,7 +19,7 @@ DECLARE_DEVICE_TYPE(SEGAPSG,  segapsg_device)
 
 
 #define MCFG_SN76496_READY_HANDLER(cb) \
-	devcb = &downcast<sn76496_base_device &>(*device).set_ready_handler((DEVCB_##cb));
+	downcast<sn76496_base_device &>(*device).set_ready_handler((DEVCB_##cb));
 
 class sn76496_base_device : public device_t, public device_sound_interface
 {

@@ -17,10 +17,10 @@
 #define LOG_Move0905    0
 
 #define MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(_devcb) \
-	devcb = &downcast<raiden2cop_device &>(*device).set_videoramout_cb(DEVCB_##_devcb);
+	downcast<raiden2cop_device &>(*device).set_videoramout_cb(DEVCB_##_devcb);
 
 #define MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(_devcb) \
-	devcb = &downcast<raiden2cop_device &>(*device).set_paletteramout_cb(DEVCB_##_devcb);
+	downcast<raiden2cop_device &>(*device).set_paletteramout_cb(DEVCB_##_devcb);
 
 #define MCFG_RAIDEN2COP_HOST_CPU(_tag) \
 	downcast<raiden2cop_device &>(*device).set_host_cpu_tag(_tag);

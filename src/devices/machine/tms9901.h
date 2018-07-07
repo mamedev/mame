@@ -139,57 +139,57 @@ private:
 ***************************************************************************/
 
 #define MCFG_TMS9901_READBLOCK_HANDLER( _read ) \
-	devcb = &downcast<tms9901_device &>(*device).set_readblock_callback(DEVCB_##_read);
+	downcast<tms9901_device &>(*device).set_readblock_callback(DEVCB_##_read);
 
 #define MCFG_TMS9901_P0_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<0>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<0>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P1_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<1>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<1>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P2_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<2>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<2>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P3_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<3>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<3>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P4_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<4>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<4>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P5_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<5>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<5>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P6_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<6>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<6>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P7_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<7>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<7>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P8_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<8>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<8>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P9_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<9>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<9>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P10_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<10>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<10>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P11_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<11>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<11>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P12_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<12>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<12>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P13_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<13>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<13>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P14_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<14>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<14>(DEVCB_##_write);
 
 #define MCFG_TMS9901_P15_HANDLER( _write ) \
-	devcb = &downcast<tms9901_device &>(*device).set_p_callback<15>(DEVCB_##_write);
+	downcast<tms9901_device &>(*device).set_p_callback<15>(DEVCB_##_write);
 
 #define MCFG_TMS9901_INTLEVEL_HANDLER( _intlevel ) \
-	devcb = &downcast<tms9901_device &>(*device).set_intlevel_callback(DEVCB_##_intlevel);
+	downcast<tms9901_device &>(*device).set_intlevel_callback(DEVCB_##_intlevel);
 
 #endif // MAME_MACHINE_TMS9901_H

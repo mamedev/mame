@@ -24,19 +24,19 @@
 	downcast<kbdc8042_device &>(*device).set_keyboard_type(kbdc8042_device::_kbdt);
 
 #define MCFG_KBDC8042_SYSTEM_RESET_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_system_reset_callback(DEVCB_##_devcb);
+	downcast<kbdc8042_device &>(*device).set_system_reset_callback(DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_GATE_A20_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_gate_a20_callback(DEVCB_##_devcb);
+	downcast<kbdc8042_device &>(*device).set_gate_a20_callback(DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_input_buffer_full_callback(DEVCB_##_devcb);
+	downcast<kbdc8042_device &>(*device).set_input_buffer_full_callback(DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_OUTPUT_BUFFER_EMPTY_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_output_buffer_empty_callback(DEVCB_##_devcb);
+	downcast<kbdc8042_device &>(*device).set_output_buffer_empty_callback(DEVCB_##_devcb);
 
 #define MCFG_KBDC8042_SPEAKER_CB(_devcb) \
-	devcb = &downcast<kbdc8042_device &>(*device).set_speaker_callback(DEVCB_##_devcb);
+	downcast<kbdc8042_device &>(*device).set_speaker_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

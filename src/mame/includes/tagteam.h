@@ -17,6 +17,11 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram") { }
 
+	void tagteam(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -41,7 +46,6 @@ public:
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -52,7 +56,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tagteam(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

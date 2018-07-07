@@ -1232,11 +1232,11 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("crtc", CRT5027, 12.8544_MHz_XTAL / 8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
-	MCFG_TMS9927_HSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
-	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE)) MCFG_DEVCB_XOR(1)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CRT5027(config, m_crtc, 12.8544_MHz_XTAL / 8);
+	m_crtc->set_char_width(8);
+	m_crtc->hsyn_wr_callback().set_inputline("maincpu", I8085_RST55_LINE);
+	m_crtc->vsyn_wr_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
+	m_crtc->set_screen("screen");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
 
@@ -1314,10 +1314,10 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("crtc", CRT5037, 12.8544_MHz_XTAL / 8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
-	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE)) MCFG_DEVCB_XOR(1)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CRT5037(config, m_crtc, 12.8544_MHz_XTAL / 8);
+	m_crtc->set_char_width(8);
+	m_crtc->vsyn_wr_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
+	m_crtc->set_screen("screen");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
 
@@ -1347,7 +1347,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp30)
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("i8088", 0))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(100000)  // 15Mhz osc with unknown divisor

@@ -32,7 +32,7 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_keyboard(*this, "X%u", 0)
-		{ }
+	{ }
 
 	void mc8020(machine_config &config);
 
@@ -324,10 +324,10 @@ MACHINE_CONFIG_START(mc8020_state::mc8020)
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(2'457'600) / 64) // guess
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg2))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(2'457'600))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg0))
+	z80ctc_device &ctc(Z80CTC(config, "ctc", XTAL(2'457'600)));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg1));
+	ctc.zc_callback<2>().append("ctc", FUNC(z80ctc_device::trg0));
 MACHINE_CONFIG_END
 
 

@@ -104,6 +104,9 @@ public:
 		m_tilemap_base[3] = 0xfc000;
 	}
 
+	void popobear(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -132,7 +135,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 
 	void postload();
-	void popobear(machine_config &config);
 	void popobear_mem(address_map &map);
 };
 

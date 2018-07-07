@@ -61,6 +61,10 @@ public:
 		m_bsmt(*this, "bsmt"),
 		m_videoram(*this, "videoram") {}
 
+	void tapatune(machine_config &config);
+	void tapatune_base(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_videocpu;
 	required_device<bsmt2000_device> m_bsmt;
@@ -106,8 +110,7 @@ public:
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void tapatune(machine_config &config);
-	void tapatune_base(machine_config &config);
+
 	void maincpu_io_map(address_map &map);
 	void maincpu_map(address_map &map);
 	void video_map(address_map &map);

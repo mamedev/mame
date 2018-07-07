@@ -115,8 +115,13 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void amusco(machine_config &config);
+	void draw88pkr(machine_config &config);
+
 	DECLARE_WRITE_LINE_MEMBER(coin_irq);
+
+private:
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_READ8_MEMBER(mc6845_r);
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_WRITE8_MEMBER(output_a_w);
@@ -130,14 +135,9 @@ public:
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_PALETTE_INIT(amusco);
 
-	void amusco(machine_config &config);
-	void draw88pkr(machine_config &config);
-
-protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 
-private:
 	void amusco_mem_map(address_map &map);
 	void amusco_io_map(address_map &map);
 

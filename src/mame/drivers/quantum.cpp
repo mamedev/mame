@@ -73,7 +73,7 @@ public:
 
 	void quantum(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override { m_leds.resolve(); }
 	DECLARE_READ16_MEMBER(trackball_r);
 	DECLARE_WRITE16_MEMBER(led_w);
@@ -82,7 +82,6 @@ protected:
 	DECLARE_READ8_MEMBER(input_2_r);
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<avg_quantum_device> m_avg;
 	required_device<x2212_device> m_nvram;

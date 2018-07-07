@@ -31,14 +31,18 @@
 class xbox_state : public xbox_base_state
 {
 public:
-	xbox_state(const machine_config &mconfig, device_type type, const char *tag) :
-		xbox_base_state(mconfig, type, tag)
+	xbox_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xbox_base_state(mconfig, type, tag)
+		, m_ide(*this, "ide")
+		, m_devh(*this, "pci:09.0:ide:0:hdd")
+		, m_devc(*this, "pci:09.0:ide:1:cdrom")
 	{ }
 
 	void xbox(machine_config &config);
+protected:
 	void xbox_map(address_map &map);
 	void xbox_map_io(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -46,9 +50,10 @@ protected:
 
 	virtual void hack_eeprom() override;
 
-	struct chihiro_devices {
-		bus_master_ide_controller_device    *ide;
-	} xbox_devs;
+	// devices
+	optional_device<bus_master_ide_controller_device> m_ide;
+	required_device<ata_mass_storage_device> m_devh;
+	required_device<atapi_cdrom_device> m_devc;
 };
 
 void xbox_state::video_start()
@@ -136,24 +141,20 @@ void xbox_state::hack_eeprom()
 void xbox_state::machine_start()
 {
 	xbox_base_state::machine_start();
-	xbox_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
 	// savestates
 	//save_item(NAME(item));
 }
 
 void xbox_state::machine_reset()
 {
-	ata_mass_storage_device *devh;
-	atapi_cdrom_device *devc;
 	uint16_t *id;
 
 	// set some needed parameters
-	devh = machine().device<ata_mass_storage_device>(":pci:09.0:ide:0:hdd");
-	id = devh->identify_device_buffer();
+	id = m_devh->identify_device_buffer();
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 	id[128] |= 2; // bits 2-1=01 drive already unlocked
-	devc = machine().device<atapi_cdrom_device>(":pci:09.0:ide:1:cdrom");
-	id = devc->identify_device_buffer();
+
+	id = m_devc->identify_device_buffer();
 	id[64] |= (1 << 1);
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 }

@@ -45,12 +45,9 @@ public:
 	~seibu_sound_device() {}
 
 	//  configuration
-	void set_cpu_tag(const char *tag)
-	{
-		m_sound_cpu.set_tag(tag);
-		m_sound_rom.set_tag(tag);
-	}
+	void set_rom_tag(const char *tag) { m_sound_rom.set_tag(tag); }
 	void set_rombank_tag(const char *tag) { m_rom_bank.set_tag(tag); }
+	template<class Object> devcb_base &set_int_callback(Object &&object)  { return m_int_cb.set_callback(std::forward<Object>(object)); }
 	template<class Object> devcb_base &set_ym_read_callback(Object &&object)  { return m_ym_read_cb.set_callback(std::forward<Object>(object)); }
 	template<class Object> devcb_base &set_ym_write_callback(Object &&object) { return m_ym_write_cb.set_callback(std::forward<Object>(object)); }
 
@@ -70,7 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER( main_data_w );
 	DECLARE_WRITE8_MEMBER( pending_w );
 
-	void update_irq_lines(int param);
+	IRQ_CALLBACK_MEMBER(im0_vector_cb);
 
 protected:
 	// device-level overrides
@@ -78,12 +75,15 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	void update_irq_lines(int param);
+	TIMER_CALLBACK_MEMBER(update_irq_synced);
+
 	// device callbacks
+	devcb_write_line m_int_cb;
 	devcb_read8 m_ym_read_cb;
 	devcb_write8 m_ym_write_cb;
 
 	// internal state
-	required_device<cpu_device> m_sound_cpu;
 	optional_region_ptr<uint8_t> m_sound_rom;
 	optional_memory_bank m_rom_bank;
 	uint8_t m_main2sub[2];
@@ -182,16 +182,17 @@ DECLARE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 #define MCFG_SEIBU_SOUND_CPU(_audiocputag) \
-	downcast<seibu_sound_device &>(*device).set_cpu_tag(_audiocputag);
+	downcast<seibu_sound_device &>(*device).set_int_callback(DEVCB_INPUTLINE(_audiocputag, 0)); \
+	downcast<seibu_sound_device &>(*device).set_rom_tag(_audiocputag);
 
 #define MCFG_SEIBU_SOUND_ROMBANK(_banktag) \
 	downcast<seibu_sound_device &>(*device).set_rombank_tag(_banktag);
 
 #define MCFG_SEIBU_SOUND_YM_READ_CB(_devcb) \
-	devcb = &downcast<seibu_sound_device &>(*device).set_ym_read_callback(DEVCB_##_devcb);
+	downcast<seibu_sound_device &>(*device).set_ym_read_callback(DEVCB_##_devcb);
 
 #define MCFG_SEIBU_SOUND_YM_WRITE_CB(_devcb) \
-	devcb = &downcast<seibu_sound_device &>(*device).set_ym_write_callback(DEVCB_##_devcb);
+	downcast<seibu_sound_device &>(*device).set_ym_write_callback(DEVCB_##_devcb);
 
 /**************************************************************************/
 

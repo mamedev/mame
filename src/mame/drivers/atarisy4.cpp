@@ -40,9 +40,9 @@ public:
 	{
 	}
 
-	void init_laststar();
-
 	void atarisy4(machine_config &config);
+
+	void init_laststar();
 
 protected:
 	struct atarisy4_polydata

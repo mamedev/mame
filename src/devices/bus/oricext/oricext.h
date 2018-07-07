@@ -17,7 +17,7 @@
 	MCFG_DEVICE_ADD(_tag, ORICEXT_CONNECTOR, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	downcast<oricext_connector *>(device)->set_cputag(_cputag); \
-	devcb = &downcast<oricext_connector &>(*device).set_irq_handler(DEVCB_##_irq);
+	downcast<oricext_connector &>(*device).set_irq_handler(DEVCB_##_irq);
 
 
 class oricext_device;

@@ -99,6 +99,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void tec1(machine_config &config);
+	void tecjmon(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cass;
@@ -125,8 +129,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(tec1_kbd_callback);
-	void tec1(machine_config &config);
-	void tecjmon(machine_config &config);
+
 	void tec1_io(address_map &map);
 	void tec1_map(address_map &map);
 	void tecjmon_io(address_map &map);

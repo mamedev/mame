@@ -75,6 +75,12 @@ public:
 		m_tms6100(*this, "tms6100")
 	{ }
 
+	void rev1(machine_config &config);
+	void rev2(machine_config &config);
+
+	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
+
+private:
 	// devices
 	optional_device<cpu_device> m_subcpu;
 	optional_device<tms6100_device> m_tms6100;
@@ -83,7 +89,6 @@ public:
 	u16 m_sub_o;
 	u16 m_sub_r;
 
-	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
 	virtual void power_off() override;
 	void prepare_display();
 	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
@@ -101,10 +106,6 @@ public:
 	DECLARE_WRITE16_MEMBER(rev2_write_o);
 	DECLARE_WRITE16_MEMBER(rev2_write_r);
 
-	void rev1(machine_config &config);
-	void rev2(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
 };
 

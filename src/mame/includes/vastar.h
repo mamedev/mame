@@ -1,13 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Allard van der Bas
+#ifndef MAME_INCLUDES_VASTAR_H
+#define MAME_INCLUDES_VASTAR_H
+
+#pragma once
 
 #include "emupal.h"
 
 class vastar_state : public driver_device
 {
 public:
-	vastar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	vastar_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -16,8 +20,12 @@ public:
 		m_bg2videoram(*this, "bg2videoram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_sprite_priority(*this, "sprite_priority"),
-		m_sharedram(*this, "sharedram") { }
+		m_sharedram(*this, "sharedram")
+	{ }
 
+	void vastar(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -59,9 +67,11 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void vastar(machine_config &config);
+
 	void cpu2_map(address_map &map);
 	void cpu2_port_map(address_map &map);
 	void main_map(address_map &map);
 	void main_port_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_VASTAR_H

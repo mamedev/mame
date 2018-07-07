@@ -370,6 +370,16 @@ public:
 		std::fill(std::begin(m_cat702_dataout), std::end(m_cat702_dataout), 1);
 	}
 
+	void init_coh3002t_nz();
+
+	void coh3002t_t2_mp(machine_config &config);
+	void coh3002t(machine_config &config);
+	void coh3002t_t1_mp(machine_config &config);
+	void coh3002t_cf(machine_config &config);
+	void coh3002t_t2(machine_config &config);
+	void coh3002t_t1(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(sio0_sck){ m_cat702[0]->write_clock(state);  m_cat702[1]->write_clock(state); m_znmcu->write_clock(state); }
 	DECLARE_WRITE_LINE_MEMBER(sio0_txd){ m_cat702[0]->write_datain(state);  m_cat702[1]->write_datain(state); }
 	DECLARE_WRITE_LINE_MEMBER(cat702_1_dataout){ m_cat702_dataout[0] = state; update_sio0_rxd(); }
@@ -391,22 +401,14 @@ public:
 	DECLARE_READ8_MEMBER(coin_r);
 	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
 	DECLARE_READ32_MEMBER(zsg2_ext_r);
-	void init_coh3002t_nz();
 
-	void coh3002t_t2_mp(machine_config &config);
-	void coh3002t(machine_config &config);
-	void coh3002t_t1_mp(machine_config &config);
-	void coh3002t_cf(machine_config &config);
-	void coh3002t_t2(machine_config &config);
-	void coh3002t_t1(machine_config &config);
 	void flashbank_map(address_map &map);
 	void taitogn_map(address_map &map);
 	void taitogn_mp_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<psxsio0_device> m_sio0;
 	required_device_array<cat702_device, 2> m_cat702;
 	required_device<znmcu_device> m_znmcu;

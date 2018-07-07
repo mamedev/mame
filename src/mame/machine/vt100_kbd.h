@@ -18,14 +18,6 @@
 
 
 //**************************************************************************
-//  CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(_devcb) \
-	devcb = &downcast<vt100_keyboard_device &>(*device).set_signal_out_callback(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -38,7 +30,7 @@ public:
 	vt100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	template <class Object> devcb_base &set_signal_out_callback(Object &&cb) { return m_signal_out_cb.set_callback(std::forward<Object>(cb)); }
+	auto signal_out_callback() { return m_signal_out_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(signal_line_w);
 

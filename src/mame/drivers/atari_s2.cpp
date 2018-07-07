@@ -48,7 +48,7 @@ public:
 	void atari_s2(machine_config &config);
 	void atari_s3(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(sound0_w);
 	DECLARE_WRITE8_MEMBER(sound1_w);
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
@@ -62,7 +62,6 @@ protected:
 	void atari_s2_map(address_map &map);
 	void atari_s3_map(address_map &map);
 
-private:
 	bool m_timer_sb;
 	uint8_t m_timer_s[5];
 	uint8_t m_sound0;

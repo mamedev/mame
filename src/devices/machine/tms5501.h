@@ -43,16 +43,16 @@
 //**************************************************************************
 
 #define MCFG_TMS5501_IRQ_CALLBACK(_write) \
-	devcb = &downcast<tms5501_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<tms5501_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_TMS5501_XMT_CALLBACK(_write) \
-	devcb = &downcast<tms5501_device &>(*device).set_xmt_wr_callback(DEVCB_##_write);
+	downcast<tms5501_device &>(*device).set_xmt_wr_callback(DEVCB_##_write);
 
 #define MCFG_TMS5501_XI_CALLBACK(_read) \
-	devcb = &downcast<tms5501_device &>(*device).set_xi_rd_callback(DEVCB_##_read);
+	downcast<tms5501_device &>(*device).set_xi_rd_callback(DEVCB_##_read);
 
 #define MCFG_TMS5501_XO_CALLBACK(_write) \
-	devcb = &downcast<tms5501_device &>(*device).set_xo_wr_callback(DEVCB_##_write);
+	downcast<tms5501_device &>(*device).set_xo_wr_callback(DEVCB_##_write);
 
 
 

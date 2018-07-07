@@ -46,10 +46,16 @@ DAC               -26.6860Mhz
 class _2mindril_state : public taito_f3_state
 {
 public:
-	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag)
-		: taito_f3_state(mconfig, type, tag),
-		m_in0(*this, "IN0") { }
+	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag) :
+		taito_f3_state(mconfig, type, tag),
+		m_in0(*this, "IN0")
+	{ }
 
+	void drill(machine_config &config);
+
+	void init_drill();
+
+private:
 	/* input-related */
 	required_ioport m_in0;
 	uint8_t         m_defender_sensor;
@@ -63,7 +69,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sensors_w);
 	DECLARE_READ16_MEMBER(drill_irq_r);
 	DECLARE_WRITE16_MEMBER(drill_irq_w);
-	void init_drill();
+
 	DECLARE_MACHINE_START(drill);
 	DECLARE_MACHINE_RESET(drill);
 	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
@@ -71,7 +77,6 @@ public:
 	void tile_decode();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
-	void drill(machine_config &config);
 	void drill_map(address_map &map);
 
 	#ifdef UNUSED_FUNCTION
@@ -361,12 +366,12 @@ MACHINE_CONFIG_START(_2mindril_state::drill)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(_2mindril_state, drill_device_irq, 60)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_2mindril)
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSW"))
-	MCFG_TC0510NIO_READ_1_CB(READ8(*this, _2mindril_state, arm_pwr_r))
-	MCFG_TC0510NIO_READ_2_CB(READ8(*this, _2mindril_state, sensors_r))
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, _2mindril_state, coins_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("COINS"))
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_0_callback().set_ioport("DSW");
+	tc0510nio.read_1_callback().set(FUNC(_2mindril_state::arm_pwr_r));
+	tc0510nio.read_2_callback().set(FUNC(_2mindril_state::sensors_r));
+	tc0510nio.write_4_callback().set(FUNC(_2mindril_state::coins_w));
+	tc0510nio.read_7_callback().set_ioport("COINS");
 
 	MCFG_MACHINE_START_OVERRIDE(_2mindril_state,drill)
 	MCFG_MACHINE_RESET_OVERRIDE(_2mindril_state,drill)

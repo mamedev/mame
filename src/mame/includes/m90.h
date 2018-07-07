@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_M90_H
+#define MAME_INCLUDES_M90_H
+
+#pragma once
+
 #include "audio/m72.h"
 #include "emupal.h"
 
@@ -89,3 +94,5 @@ private:
 	void quizf1_main_cpu_io_map(address_map &map);
 	void quizf1_main_cpu_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_M90_H

@@ -605,25 +605,25 @@ DECLARE_DEVICE_TYPE(S3C44B0, s3c44b0_device)
 
 
 #define MCFG_S3C44B0_GPIO_PORT_R_CB(cb) \
-	devcb = &downcast<s3c44b0_device &>(*device).set_gpio_port_r_callback(DEVCB_##cb);
+	downcast<s3c44b0_device &>(*device).set_gpio_port_r_callback(DEVCB_##cb);
 
 #define MCFG_S3C44B0_GPIO_PORT_W_CB(cb) \
-	devcb = &downcast<s3c44b0_device &>(*device).set_gpio_port_w_callback(DEVCB_##cb);
+	downcast<s3c44b0_device &>(*device).set_gpio_port_w_callback(DEVCB_##cb);
 
 #define MCFG_S3C44B0_I2C_SCL_W_CB(cb) \
-	devcb = &downcast<s3c44b0_device &>(*device).set_i2c_scl_w_callback(DEVCB_##cb);
+	downcast<s3c44b0_device &>(*device).set_i2c_scl_w_callback(DEVCB_##cb);
 
 #define MCFG_S3C44B0_I2C_SDA_R_CB(cb) \
-	devcb = &downcast<s3c44b0_device &>(*device).set_i2c_sda_r_callback(DEVCB_##cb);
+	downcast<s3c44b0_device &>(*device).set_i2c_sda_r_callback(DEVCB_##cb);
 
 #define MCFG_S3C44B0_I2C_SDA_W_CB(cb) \
-	devcb = &downcast<s3c44b0_device &>(*device).set_i2c_sda_w_callback(DEVCB_##cb);
+	downcast<s3c44b0_device &>(*device).set_i2c_sda_w_callback(DEVCB_##cb);
 
 #define MCFG_S3C44B0_ADC_DATA_R_CB(cb) \
-	devcb = &downcast<s3c44b0_device &>(*device).set_adc_data_r_callback(DEVCB_##cb);
+	downcast<s3c44b0_device &>(*device).set_adc_data_r_callback(DEVCB_##cb);
 
 #define MCFG_S3C44B0_I2S_DATA_W_CB(cb) \
-	devcb = &downcast<s3c44b0_device &>(*device).set_i2s_data_w_callback(DEVCB_##cb);
+	downcast<s3c44b0_device &>(*device).set_i2s_data_w_callback(DEVCB_##cb);
 
 
 #endif // MAME_MACHINE_S3C44B0_H

@@ -33,10 +33,10 @@
 ///*************************************************************************
 
 #define MCFG_I8214_INT_CALLBACK(_write) \
-	devcb = &downcast<i8214_device &>(*device).set_int_wr_callback(DEVCB_##_write);
+	downcast<i8214_device &>(*device).set_int_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8214_ENLG_CALLBACK(_write) \
-	devcb = &downcast<i8214_device &>(*device).set_enlg_wr_callback(DEVCB_##_write);
+	downcast<i8214_device &>(*device).set_enlg_wr_callback(DEVCB_##_write);
 
 
 
@@ -54,6 +54,8 @@ public:
 
 	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_enlg_wr_callback(Object &&cb) { return m_write_enlg.set_callback(std::forward<Object>(cb)); }
+	auto int_wr_callback() { return m_write_int.bind(); }
+	auto enlg_wr_callback() { return m_write_enlg.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( sgs_w );
 	DECLARE_WRITE_LINE_MEMBER( etlg_w );

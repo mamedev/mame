@@ -28,13 +28,13 @@
 	MCFG_DEVICE_SLOT_INTERFACE(amiga_keyboard_devices, _def_slot, false)
 
 #define MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(_devcb) \
-	devcb = &downcast<amiga_keyboard_bus_device &>(*device).set_kclk_handler(DEVCB_##_devcb);
+	downcast<amiga_keyboard_bus_device &>(*device).set_kclk_handler(DEVCB_##_devcb);
 
 #define MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(_devcb) \
-	devcb = &downcast<amiga_keyboard_bus_device &>(*device).set_kdat_handler(DEVCB_##_devcb);
+	downcast<amiga_keyboard_bus_device &>(*device).set_kdat_handler(DEVCB_##_devcb);
 
 #define MCFG_AMIGA_KEYBOARD_KRST_HANDLER(_devcb) \
-	devcb = &downcast<amiga_keyboard_bus_device &>(*device).set_krst_handler(DEVCB_##_devcb);
+	downcast<amiga_keyboard_bus_device &>(*device).set_krst_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

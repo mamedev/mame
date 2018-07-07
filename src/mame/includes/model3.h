@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Ville Linde
+#ifndef MAME_INCLUDES_MODEL3_H
+#define MAME_INCLUDES_MODEL3_H
+
+#pragma once
+
 #include "cpu/powerpc/ppc.h"
 #include "video/poly.h"
 #include "bus/scsi/scsi.h"
@@ -57,8 +62,8 @@ class model3_renderer;
 class model3_state : public driver_device
 {
 public:
-	model3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	model3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_lsi53c810(*this, "lsi53c810"),
 		m_audiocpu(*this, "audiocpu"),
@@ -66,7 +71,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_rtc(*this, "rtc"),
-		m_adc_ports(*this, {"AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7"}),
+		m_adc_ports(*this, "AN%u", 0U),
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, DSBZ80_TAG),
@@ -353,3 +358,5 @@ private:
 	void model3_mem(address_map &map);
 	void model3_snd(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MODEL3_H

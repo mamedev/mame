@@ -208,17 +208,25 @@ class studio2_state : public driver_device
 public:
 
 	studio2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, CDP1802_TAG),
-			m_beeper(*this, "beeper"),
-			m_vdc(*this, CDP1861_TAG),
-			m_cart(*this, "cartslot"),
-			m_clear(*this, "CLEAR"),
-			m_a(*this, "A"),
-			m_b(*this, "B"),
-			m_screen(*this, "screen")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, CDP1802_TAG)
+		, m_beeper(*this, "beeper")
+		, m_vdc(*this, CDP1861_TAG)
+		, m_cart(*this, "cartslot")
+		, m_clear(*this, "CLEAR")
+		, m_a(*this, "A")
+		, m_b(*this, "B")
+		, m_screen(*this, "screen")
 	{ }
 
+	void studio2_cartslot(machine_config &config);
+	void studio2(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
+
+	DECLARE_READ8_MEMBER( cart_400 );
+
+protected:
 	required_device<cosmac_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	optional_device<cdp1861_device> m_vdc;
@@ -231,7 +239,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( cart_400 );
 	DECLARE_READ8_MEMBER( cart_a00 );
 	DECLARE_READ8_MEMBER( cart_e00 );
 	DECLARE_READ8_MEMBER( dispon_r );
@@ -241,13 +248,11 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( studio2_cart_load );
 
 	/* keyboard state */
 	uint8_t m_keylatch;
-	void studio2_cartslot(machine_config &config);
-	void studio2(machine_config &config);
+
 	void studio2_io_map(address_map &map);
 	void studio2_map(address_map &map);
 };
@@ -261,13 +266,15 @@ public:
 			m_color1_ram(*this, "color1_ram")
 	{ }
 
+	void visicom(machine_config &config);
+
+private:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_shared_ptr<uint8_t> m_color0_ram;
 	required_shared_ptr<uint8_t> m_color1_ram;
 
 	DECLARE_WRITE8_MEMBER( dma_w );
-	void visicom(machine_config &config);
 	void visicom_io_map(address_map &map);
 	void visicom_map(address_map &map);
 };
@@ -281,6 +288,9 @@ public:
 			m_color_ram(*this, "color_ram")
 	{ }
 
+	void mpt02(machine_config &config);
+
+private:
 	required_device<cdp1864_device> m_cti;
 
 	virtual void machine_start() override;
@@ -295,7 +305,6 @@ public:
 	/* video state */
 	required_shared_ptr<uint8_t> m_color_ram;
 	uint8_t m_color;
-	void mpt02(machine_config &config);
 	void mpt02_io_map(address_map &map);
 	void mpt02_map(address_map &map);
 };
@@ -643,7 +652,7 @@ MACHINE_CONFIG_START(studio2_state::studio2)
 	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, 1760000) /* the real clock is derived from an oscillator circuit */
 	MCFG_DEVICE_PROGRAM_MAP(studio2_map)
 	MCFG_DEVICE_IO_MAP(studio2_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
 	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, studio2_state, clear_r))
 	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, studio2_state, ef3_r))
 	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, studio2_state, ef4_r))
@@ -670,7 +679,7 @@ MACHINE_CONFIG_START(visicom_state::visicom)
 	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(3'579'545)/2)
 	MCFG_DEVICE_PROGRAM_MAP(visicom_map)
 	MCFG_DEVICE_IO_MAP(visicom_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
 	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, visicom_state, clear_r))
 	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, visicom_state, ef3_r))
 	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, visicom_state, ef4_r))
@@ -702,7 +711,7 @@ MACHINE_CONFIG_START(mpt02_state::mpt02)
 	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, CDP1864_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(mpt02_map)
 	MCFG_DEVICE_IO_MAP(mpt02_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
 	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, mpt02_state, clear_r))
 	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, mpt02_state, ef3_r))
 	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, mpt02_state, ef4_r))
@@ -718,7 +727,7 @@ MACHINE_CONFIG_START(mpt02_state::mpt02)
 	MCFG_DEVICE_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, CDP1864_CLOCK, GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(*this, mpt02_state, rdata_r), READLINE(*this, mpt02_state, bdata_r), READLINE(*this, mpt02_state, gdata_r))
+	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, CDP1864_CLOCK, CONSTANT(0), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(*this, mpt02_state, rdata_r), READLINE(*this, mpt02_state, bdata_r), READLINE(*this, mpt02_state, gdata_r))
 	MCFG_CDP1864_CHROMINANCE(RES_K(4.7), RES_K(8.2), RES_K(4.7), RES_K(22))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

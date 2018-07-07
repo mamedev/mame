@@ -8,6 +8,7 @@
     Additionally, We display one page of teletyper output.
 */
 
+#include "emu.h"
 #include "includes/apexc.h"
 
 /*static*/ const rgb_t apexc_state::palette_table[] =

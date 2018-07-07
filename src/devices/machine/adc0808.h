@@ -42,35 +42,35 @@
 //**************************************************************************
 
 #define MCFG_ADC0808_EOC_CB(_devcb) \
-	devcb = &downcast<adc0808_device &>(*device).set_eoc_callback(DEVCB_##_devcb);
+	downcast<adc0808_device &>(*device).set_eoc_callback(DEVCB_##_devcb);
 
 // common hookup where the eoc output is connected to a flip-flop
 #define MCFG_ADC0808_EOC_FF_CB(_devcb) \
-	devcb = &downcast<adc0808_device &>(*device).set_eoc_ff_callback(DEVCB_##_devcb);
+	downcast<adc0808_device &>(*device).set_eoc_ff_callback(DEVCB_##_devcb);
 
 #define MCFG_ADC0808_IN0_CB(_devcb) \
-	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 0);
+	downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 0);
 
 #define MCFG_ADC0808_IN1_CB(_devcb) \
-	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 1);
+	downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 1);
 
 #define MCFG_ADC0808_IN2_CB(_devcb) \
-	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 2);
+	downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 2);
 
 #define MCFG_ADC0808_IN3_CB(_devcb) \
-	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 3);
+	downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 3);
 
 #define MCFG_ADC0808_IN4_CB(_devcb) \
-	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 4);
+	downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 4);
 
 #define MCFG_ADC0808_IN5_CB(_devcb) \
-	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 5);
+	downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 5);
 
 #define MCFG_ADC0808_IN6_CB(_devcb) \
-	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 6);
+	downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 6);
 
 #define MCFG_ADC0808_IN7_CB(_devcb) \
-	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 7);
+	downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 7);
 
 
 //**************************************************************************

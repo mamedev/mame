@@ -18,16 +18,16 @@
 //**************************************************************************
 
 #define MCFG_UPD65031_KB_CALLBACK(_read) \
-	devcb = &downcast<upd65031_device &>(*device).set_kb_rd_callback(DEVCB_##_read);
+	downcast<upd65031_device &>(*device).set_kb_rd_callback(DEVCB_##_read);
 
 #define MCFG_UPD65031_INT_CALLBACK(_write) \
-	devcb = &downcast<upd65031_device &>(*device).set_int_wr_callback(DEVCB_##_write);
+	downcast<upd65031_device &>(*device).set_int_wr_callback(DEVCB_##_write);
 
 #define MCFG_UPD65031_NMI_CALLBACK(_write) \
-	devcb = &downcast<upd65031_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
+	downcast<upd65031_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_UPD65031_SPKR_CALLBACK(_write) \
-	devcb = &downcast<upd65031_device &>(*device).set_spkr_wr_callback(DEVCB_##_write);
+	downcast<upd65031_device &>(*device).set_spkr_wr_callback(DEVCB_##_write);
 
 #define MCFG_UPD65031_SCR_UPDATE_CB(_class, _method) \
 	downcast<upd65031_device &>(*device).set_screen_update_callback(upd65031_screen_update_delegate(&_class::_method, #_class "::" #_method, this));
@@ -59,6 +59,10 @@ public:
 	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_spkr_wr_callback(Object &&cb) { return m_write_spkr.set_callback(std::forward<Object>(cb)); }
+	auto kb_rd_callback() { return m_read_kb.bind(); }
+	auto int_wr_callback() { return m_write_int.bind(); }
+	auto nmi_wr_callback() { return m_write_nmi.bind(); }
+	auto spkr_wr_callback() { return m_write_spkr.bind(); }
 
 	template <class Object> void set_screen_update_callback(Object &&cb) { m_screen_update_cb = std::forward<Object>(cb); }
 	template <class Object> void set_memory_update_callback(Object &&cb) { m_out_mem_cb = std::forward<Object>(cb); }

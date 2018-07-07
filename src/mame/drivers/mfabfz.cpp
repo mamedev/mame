@@ -104,14 +104,14 @@ void mfabfz_state::machine_reset()
 
 MACHINE_CONFIG_START(mfabfz_state::mfabfz)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(4'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mfabfz_mem)
-	MCFG_DEVICE_IO_MAP(mfabfz_io)
+	I8085A(config, m_maincpu, 4_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mfabfz_state::mfabfz_mem);
+	m_maincpu->set_addrmap(AS_IO, &mfabfz_state::mfabfz_io);
 
 	// uart1 - terminal - clock hardware unknown
-	MCFG_DEVICE_ADD("uart1_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
+	clock_device &uart1_clock(CLOCK(config, "uart1_clock", 153600));
+	uart1_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
+	uart1_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
@@ -124,7 +124,7 @@ MACHINE_CONFIG_START(mfabfz_state::mfabfz)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
 
 	// uart2 - cassette - clock comes from 2MHz through a divider consisting of 4 chips and some jumpers.
-	MCFG_DEVICE_ADD("uart2", I8251, 0)
+	I8251(config, "uart2", 0);
 MACHINE_CONFIG_END
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -136,17 +136,20 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(mfabfz_state::mfabfz85)
+void mfabfz_state::mfabfz85(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(4'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mfabfz_mem)
-	MCFG_DEVICE_IO_MAP(mfabfz85_io)
-	MCFG_I8085A_SID(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_I8085A_SOD(WRITELINE("rs232", rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
-	MCFG_DEVICE_ADD("uart2", I8251, 0)
-MACHINE_CONFIG_END
+	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, 4_MHz_XTAL / 2));
+	maincpu.set_addrmap(AS_PROGRAM, &mfabfz_state::mfabfz_mem);
+	maincpu.set_addrmap(AS_IO, &mfabfz_state::mfabfz85_io);
+	maincpu.in_sid_func().set("rs232", FUNC(rs232_port_device::rxd_r));
+	maincpu.out_sod_func().set("rs232", FUNC(rs232_port_device::write_txd)).invert();
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+
+	I8251(config, "uart2", 0);
+}
 
 
 /* ROM definition */

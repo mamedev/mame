@@ -162,6 +162,11 @@ public:
 	{
 	}
 
+	void replicator(machine_config &config);
+
+	void init_replicator();
+
+private:
 	virtual void machine_start() override;
 
 	uint8_t m_port_a;
@@ -184,10 +189,8 @@ public:
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
-	void init_replicator();
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(replicator);
-	void replicator(machine_config &config);
 	void replicator_data_map(address_map &map);
 	void replicator_io_map(address_map &map);
 	void replicator_prg_map(address_map &map);

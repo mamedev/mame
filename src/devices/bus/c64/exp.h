@@ -68,22 +68,22 @@
 
 
 #define MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &downcast<c64_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<c64_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(_write) \
-	devcb = &downcast<c64_expansion_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
+	downcast<c64_expansion_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(_write) \
-	devcb = &downcast<c64_expansion_slot_device &>(*device).set_reset_wr_callback(DEVCB_##_write);
+	downcast<c64_expansion_slot_device &>(*device).set_reset_wr_callback(DEVCB_##_write);
 
 #define MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(_read) \
-	devcb = &downcast<c64_expansion_slot_device &>(*device).set_cd_rd_callback(DEVCB_##_read);
+	downcast<c64_expansion_slot_device &>(*device).set_cd_rd_callback(DEVCB_##_read);
 
 #define MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(_write) \
-	devcb = &downcast<c64_expansion_slot_device &>(*device).set_cd_wr_callback(DEVCB_##_write);
+	downcast<c64_expansion_slot_device &>(*device).set_cd_wr_callback(DEVCB_##_write);
 
 #define MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(_write) \
-	devcb = &downcast<c64_expansion_slot_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
+	downcast<c64_expansion_slot_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
 
 
 
