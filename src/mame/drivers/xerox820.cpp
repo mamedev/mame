@@ -469,14 +469,6 @@ WRITE_LINE_MEMBER( xerox820_state::fdc_drq_w )
 	update_nmi();
 }
 
-/* COM8116 Interface */
-
-WRITE_LINE_MEMBER( xerox820_state::fr_w )
-{
-	m_sio->rxca_w(state);
-	m_sio->txca_w(state);
-}
-
 /* Video */
 
 uint32_t xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -655,9 +647,10 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, 5.0688_MHz_XTAL)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, xerox820_state, fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
+	dbrg.fr_handler().set(m_sio, FUNC(z80dart_device::rxca_w));
+	dbrg.fr_handler().append(m_sio, FUNC(z80dart_device::txca_w));
+	dbrg.ft_handler().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, XEROX_820_KEYBOARD, 0)
 	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))
@@ -744,9 +737,10 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio0_device, rxb_w))
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, 5.0688_MHz_XTAL)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, xerox820_state, fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
+	dbrg.fr_handler().set(m_sio, FUNC(z80dart_device::rxca_w));
+	dbrg.fr_handler().append(m_sio, FUNC(z80dart_device::txca_w));
+	dbrg.ft_handler().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, XEROX_820_KEYBOARD, 0)
 	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))

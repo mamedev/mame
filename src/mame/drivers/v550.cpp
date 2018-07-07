@@ -110,12 +110,11 @@ MACHINE_CONFIG_START(v550_state::v550)
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 4'000'000) // NEC D7201C
 	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("brg1", COM8116, 5068800) // actually SMC COM8116T-020 (unknown clock)
-	MCFG_COM8116_FT_HANDLER(WRITELINE("mpsc", upd7201_new_device, txca_w))
-	MCFG_COM8116_FR_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxca_w))
+	com8116_device &brg1(COM8116(config, "brg1", 5068800)); // actually SMC COM8116T-020 (unknown clock)
+	brg1.ft_handler().set("mpsc", FUNC(upd7201_new_device::txca_w));
+	brg1.fr_handler().set("mpsc", FUNC(upd7201_new_device::rxca_w));
 
 	com8116_device &brg2(COM8116(config, "brg2", 5068800)); // actually SMC COM8116T-020
 	brg2.ft_handler().set("mpsc", FUNC(upd7201_new_device::txcb_w));

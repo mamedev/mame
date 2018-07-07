@@ -1,19 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_SHISEN_H
+#define MAME_INCLUDES_SHISEN_H
+
+#pragma once
+
 #include "audio/m72.h"
 #include "emupal.h"
 
 class shisen_state : public driver_device
 {
 public:
-	shisen_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	shisen_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audio (*this, "m72"),
+		m_audio(*this, "m72"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_paletteram(*this, "paletteram"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	void shisen(machine_config &config);
 
@@ -46,3 +52,5 @@ private:
 	void shisen_sound_io_map(address_map &map);
 	void shisen_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SHISEN_H
