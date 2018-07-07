@@ -14,10 +14,10 @@
 	downcast<es5503_device &>(*device).set_channels(_channels);
 
 #define MCFG_ES5503_IRQ_FUNC(_write) \
-	devcb = &downcast<es5503_device &>(*device).set_irqf(DEVCB_##_write);
+	downcast<es5503_device &>(*device).set_irqf(DEVCB_##_write);
 
 #define MCFG_ES5503_ADC_FUNC(_read) \
-	devcb = &downcast<es5503_device &>(*device).set_adcf(DEVCB_##_read);
+	downcast<es5503_device &>(*device).set_adcf(DEVCB_##_read);
 
 // ======================> es5503_device
 

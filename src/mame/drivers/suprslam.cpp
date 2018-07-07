@@ -278,13 +278,13 @@ MACHINE_CONFIG_START(suprslam_state::suprslam)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 
-	MCFG_DEVICE_ADD("io", VS9209, 0)
-	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_VS9209_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
-	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
-	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
-	MCFG_VS9209_OUT_PORTG_CB(WRITE8(*this, suprslam_state, spr_ctrl_w))
+	vs9209_device &io(VS9209(config, "io", 0));
+	io.porta_input_cb().set_ioport("P1");
+	io.portb_input_cb().set_ioport("P2");
+	io.portc_input_cb().set_ioport("SYSTEM");
+	io.portd_input_cb().set_ioport("DSW1");
+	io.porte_input_cb().set_ioport("DSW2");
+	io.porth_output_cb().set(FUNC(suprslam_state::spr_ctrl_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprslam)
 

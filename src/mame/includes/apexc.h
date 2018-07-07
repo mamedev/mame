@@ -1,12 +1,10 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet, Robbbert
-
 #ifndef MAME_INCLUDES_APEXC
 #define MAME_INCLUDES_APEXC
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/apexc/apexc.h"
 #include "machine/apexc.h"
 #include "emupal.h"

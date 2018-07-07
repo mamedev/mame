@@ -10,7 +10,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(slot_intf, def_slot, false)
 
 #define MCFG_INTERPRO_KEYBOARD_RXD_HANDLER(cb) \
-	devcb = &downcast<interpro_keyboard_port_device &>(*device).set_rxd_handler(DEVCB_##cb);
+	downcast<interpro_keyboard_port_device &>(*device).set_rxd_handler(DEVCB_##cb);
 
 class device_interpro_keyboard_port_interface;
 

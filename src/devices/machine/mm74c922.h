@@ -49,22 +49,22 @@
 	downcast<mm74c922_device &>(*device).set_cap_debounce(_value);
 
 #define MCFG_MM74C922_DA_CALLBACK(_write) \
-	devcb = &downcast<mm74c922_device &>(*device).set_da_wr_callback(DEVCB_##_write);
+	downcast<mm74c922_device &>(*device).set_da_wr_callback(DEVCB_##_write);
 
 #define MCFG_MM74C922_X1_CALLBACK(_read) \
-	devcb = &downcast<mm74c922_device &>(*device).set_x1_rd_callback(DEVCB_##_read);
+	downcast<mm74c922_device &>(*device).set_x1_rd_callback(DEVCB_##_read);
 
 #define MCFG_MM74C922_X2_CALLBACK(_read) \
-	devcb = &downcast<mm74c922_device &>(*device).set_x2_rd_callback(DEVCB_##_read);
+	downcast<mm74c922_device &>(*device).set_x2_rd_callback(DEVCB_##_read);
 
 #define MCFG_MM74C922_X3_CALLBACK(_read) \
-	devcb = &downcast<mm74c922_device &>(*device).set_x3_rd_callback(DEVCB_##_read);
+	downcast<mm74c922_device &>(*device).set_x3_rd_callback(DEVCB_##_read);
 
 #define MCFG_MM74C922_X4_CALLBACK(_read) \
-	devcb = &downcast<mm74c922_device &>(*device).set_x4_rd_callback(DEVCB_##_read);
+	downcast<mm74c922_device &>(*device).set_x4_rd_callback(DEVCB_##_read);
 
 #define MCFG_MM74C922_X5_CALLBACK(_read) \
-	devcb = &downcast<mm74c922_device &>(*device).set_x5_rd_callback(DEVCB_##_read);
+	downcast<mm74c922_device &>(*device).set_x5_rd_callback(DEVCB_##_read);
 
 
 

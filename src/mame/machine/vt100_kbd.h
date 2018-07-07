@@ -22,7 +22,7 @@
 //**************************************************************************
 
 #define MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(_devcb) \
-	devcb = &downcast<vt100_keyboard_device &>(*device).set_signal_out_callback(DEVCB_##_devcb);
+	downcast<vt100_keyboard_device &>(*device).set_signal_out_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

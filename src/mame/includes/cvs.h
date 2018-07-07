@@ -85,9 +85,9 @@ public:
 	uint32_t screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cvs_main_cpu_interrupt);
 	TIMER_CALLBACK_MEMBER(cvs_393hz_timer_cb);
-	void set_pens(  );
-	void cvs_scroll_stars(  );
-	void cvs_init_stars(  );
+	void set_pens();
+	void cvs_scroll_stars();
+	void cvs_init_stars();
 	void cvs_update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always);
 	void start_393hz_timer();
 	void cvs(machine_config &config);

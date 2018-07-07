@@ -63,7 +63,7 @@ private:
 
 
 #define MCFG_TAITO_M68705_AUX_STROBE_CB(cb) \
-		devcb = &downcast<taito68705_mcu_device &>(*device).set_aux_strobe_cb(DEVCB_##cb);
+		downcast<taito68705_mcu_device &>(*device).set_aux_strobe_cb(DEVCB_##cb);
 
 class taito68705_mcu_device : public taito68705_mcu_device_base
 {
@@ -98,10 +98,10 @@ protected:
 
 
 #define MCFG_ARKANOID_MCU_SEMAPHORE_CB(cb) \
-		devcb = &downcast<arkanoid_mcu_device_base &>(*device).set_semaphore_cb(DEVCB_##cb);
+		downcast<arkanoid_mcu_device_base &>(*device).set_semaphore_cb(DEVCB_##cb);
 
 #define MCFG_ARKANOID_MCU_PORTB_R_CB(cb) \
-		devcb = &downcast<arkanoid_mcu_device_base &>(*device).set_portb_r_cb(DEVCB_##cb);
+		downcast<arkanoid_mcu_device_base &>(*device).set_portb_r_cb(DEVCB_##cb);
 
 class arkanoid_mcu_device_base : public taito68705_mcu_device_base
 {

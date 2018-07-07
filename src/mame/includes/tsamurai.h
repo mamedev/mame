@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
+#ifndef MAME_INCLUDES_TSAMURAI_H
+#define MAME_INCLUDES_TSAMURAI_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -7,8 +11,8 @@
 class tsamurai_state : public driver_device
 {
 public:
-	tsamurai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tsamurai_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_audio2(*this, "audio2"),
@@ -19,7 +23,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	void tsamurai(machine_config &config);
 	void m660(machine_config &config);
@@ -136,3 +141,5 @@ private:
 	TILE_GET_INFO_MEMBER(get_vsgongf_tile_info);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
+
+#endif // MAME_INCLUDES_TSAMURAI_H

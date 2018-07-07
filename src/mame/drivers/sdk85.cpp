@@ -167,13 +167,13 @@ MACHINE_CONFIG_START(sdk85_state::sdk85)
 	MCFG_DEFAULT_LAYOUT(layout_sdk85)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("kdc", I8279, 6.144_MHz_XTAL / 2) // Keyboard/Display Controller (A13)
+	MCFG_DEVICE_ADD("kdc", I8279, 6.144_MHz_XTAL / 2)               // Keyboard/Display Controller (A13)
 	MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))   // irq
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, sdk85_state, scanlines_w))          // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, sdk85_state, digit_w))            // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, sdk85_state, kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, sdk85_state, scanlines_w))   // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, sdk85_state, digit_w))     // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(*this, sdk85_state, kbd_r))           // kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(CONSTANT(1))                             // Shift key
+	MCFG_I8279_IN_CTRL_CB(CONSTANT(1))
 MACHINE_CONFIG_END
 
 /* ROM definition */

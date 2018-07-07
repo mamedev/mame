@@ -37,6 +37,7 @@ public:
 		m_awacs(*this, "awacs"),
 		m_cuda(*this, CUDA_TAG),
 		m_ram(*this, RAM_TAG),
+		m_scc(*this, "scc"),
 		m_539x_1(*this, MAC_539X_1_TAG),
 		m_539x_2(*this, MAC_539X_2_TAG)
 		{ }
@@ -49,6 +50,7 @@ private:
 	optional_device<awacs_device> m_awacs;
 	required_device<cuda_device> m_cuda;
 	required_device<ram_device> m_ram;
+	optional_device<scc8530_t> m_scc;
 	optional_device<ncr539x_device> m_539x_1;
 	optional_device<ncr539x_device> m_539x_2;
 

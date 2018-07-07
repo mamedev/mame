@@ -16,25 +16,25 @@
 // SCU
 
 #define MCFG_V53_SCU_TXD_HANDLER(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_txd_handler(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 #define MCFG_V53_SCU_DTR_HANDLER(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_dtr_handler(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_dtr_handler(DEVCB_##_devcb);
 
 #define MCFG_V53_SCU_RTS_HANDLER(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_rts_handler(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_rts_handler(DEVCB_##_devcb);
 
 #define MCFG_V53_SCU_RXRDY_HANDLER(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_rxrdy_handler(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_rxrdy_handler(DEVCB_##_devcb);
 
 #define MCFG_V53_SCU_TXRDY_HANDLER(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_txrdy_handler(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_txrdy_handler(DEVCB_##_devcb);
 
 #define MCFG_V53_SCU_TXEMPTY_HANDLER(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_txempty_handler(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_txempty_handler(DEVCB_##_devcb);
 
 #define MCFG_V53_SCU_SYNDET_HANDLER(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_syndet_handler(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_syndet_handler(DEVCB_##_devcb);
 
 // TCU
 #define MCFG_V53_TCU_CLK0(_clk) \
@@ -47,63 +47,63 @@
 	downcast<v53_base_device &>(*device).set_clk2(_clk);
 
 #define MCFG_V53_TCU_OUT0_HANDLER(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out0_handler(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out0_handler(DEVCB_##_devcb);
 
 #define MCFG_V53_TCU_OUT1_HANDLER(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out1_handler(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out1_handler(DEVCB_##_devcb);
 
 #define MCFG_V53_TCU_OUT2_HANDLER(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out2_handler(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out2_handler(DEVCB_##_devcb);
 
 // DMAU
 
 #define MCFG_V53_DMAU_OUT_HREQ_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out_hreq_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out_hreq_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_OUT_EOP_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out_eop_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out_eop_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_IN_MEMR_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_in_memr_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_in_memr_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_OUT_MEMW_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out_memw_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out_memw_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_IN_IOR_0_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_in_ior_0_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_in_ior_0_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_IN_IOR_1_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_in_ior_1_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_in_ior_1_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_IN_IOR_2_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_in_ior_2_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_in_ior_2_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_IN_IOR_3_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_in_ior_3_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_in_ior_3_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_OUT_IOW_0_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out_iow_0_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out_iow_0_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_OUT_IOW_1_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out_iow_1_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out_iow_1_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_OUT_IOW_2_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out_iow_2_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out_iow_2_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_OUT_IOW_3_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out_iow_3_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out_iow_3_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_OUT_DACK_0_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out_dack_0_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out_dack_0_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_OUT_DACK_1_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out_dack_1_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out_dack_1_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_OUT_DACK_2_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out_dack_2_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out_dack_2_callback(DEVCB_##_devcb);
 
 #define MCFG_V53_DMAU_OUT_DACK_3_CB(_devcb) \
-	devcb = &downcast<v53_base_device &>(*device).set_out_dack_3_callback(DEVCB_##_devcb);
+	downcast<v53_base_device &>(*device).set_out_dack_3_callback(DEVCB_##_devcb);
 
 
 

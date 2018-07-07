@@ -16,11 +16,11 @@
 
 /* IRQ callback function, active low, i.e. state=0 */
 #define MCFG_TMS52XX_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<tms5220_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<tms5220_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 /* Ready callback function, active low, i.e. state=0 */
 #define MCFG_TMS52XX_READYQ_HANDLER(_devcb) \
-	devcb = &downcast<tms5220_device &>(*device).set_readyq_handler(DEVCB_##_devcb);
+	downcast<tms5220_device &>(*device).set_readyq_handler(DEVCB_##_devcb);
 
 /* old VSM handler, remove me! */
 #define MCFG_TMS52XX_SPEECHROM(_tag) \
@@ -28,19 +28,19 @@
 
 /* new VSM handler */
 #define MCFG_TMS52XX_M0_CB(_devcb) \
-	devcb = &downcast<tms5220_device &>(*device).set_m0_callback(DEVCB_##_devcb);
+	downcast<tms5220_device &>(*device).set_m0_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS52XX_M1_CB(_devcb) \
-	devcb = &downcast<tms5220_device &>(*device).set_m1_callback(DEVCB_##_devcb);
+	downcast<tms5220_device &>(*device).set_m1_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS52XX_ADDR_CB(_devcb) \
-	devcb = &downcast<tms5220_device &>(*device).set_addr_callback(DEVCB_##_devcb);
+	downcast<tms5220_device &>(*device).set_addr_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS52XX_DATA_CB(_devcb) \
-	devcb = &downcast<tms5220_device &>(*device).set_data_callback(DEVCB_##_devcb);
+	downcast<tms5220_device &>(*device).set_data_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS52XX_ROMCLK_CB(_devcb) \
-	devcb = &downcast<tms5220_device &>(device).set_romclk_callback(DEVCB_##_devcb);
+	downcast<tms5220_device &>(device).set_romclk_callback(DEVCB_##_devcb);
 
 class tms5220_device : public device_t, public device_sound_interface
 {

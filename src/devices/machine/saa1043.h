@@ -42,58 +42,58 @@
 	&downcast<saa1043_device &>(*device).set_type(_type);
 
 #define MCFG_SAA1043_BC_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_bc_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_bc_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_FH2_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_fh2_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_fh2_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_FH3_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_fh3_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_fh3_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_FH80_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_fh80_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_fh80_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_PH_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_ph_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_ph_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_NS_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_ns_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_ns_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_RI_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_ri_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_ri_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_WMP_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_wmp_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_wmp_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_RR_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_rr_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_rr_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_V1_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_v1_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_v1_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_V2_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_v2_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_v2_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_CLP_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_clp_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_clp_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_DL_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_dl_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_dl_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_H1_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_h1_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_h1_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_H2_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_h2_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_h2_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_CB_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_cb_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_cb_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_CS_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_cs_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_cs_callback(DEVCB_##_write);
 
 #define MCFG_SAA1043_ID_CALLBACK(_write) \
-	devcb = &downcast<saa1043_device &>(*device).set_id_callback(DEVCB_##_write);
+	downcast<saa1043_device &>(*device).set_id_callback(DEVCB_##_write);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

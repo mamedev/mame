@@ -432,9 +432,9 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, p8k_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, p8k_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 307200)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio", z80sio_device, txcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxcb_w))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 307200));
+	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txcb_w));
+	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxcb_w));
 
 	MCFG_DEVICE_ADD("ctc0", Z80CTC, 1229000)    /* 1.22MHz clock */
 	// to implement: callbacks!
@@ -494,9 +494,9 @@ MACHINE_CONFIG_START(p8k_state::p8k_16)
 	MCFG_DEVICE_ADD("p8k_16_daisy", P8K_16_DAISY, 0)
 	MCFG_Z80_DAISY_CHAIN(p8k_16_daisy_chain)
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 307200)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio", z80sio_device, txcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxcb_w))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 307200));
+	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txcb_w));
+	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxcb_w));
 
 	/* peripheral hardware */
 	MCFG_DEVICE_ADD("ctc0", Z80CTC, XTAL(4'000'000))

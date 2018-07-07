@@ -338,16 +338,16 @@ void apollo_csr_set_status_register(uint16_t mask, uint16_t data);
 	MCFG_DEVICE_ADD(_tag, APOLLO_SIO, _clock)
 
 #define MCFG_APOLLO_SIO_IRQ_CALLBACK(_cb) \
-	devcb = &downcast<apollo_sio &>(*device).set_irq_cb(DEVCB_##_cb);
+	downcast<apollo_sio &>(*device).set_irq_cb(DEVCB_##_cb);
 
 #define MCFG_APOLLO_SIO_A_TX_CALLBACK(_cb) \
-	devcb = &downcast<apollo_sio &>(*device).set_a_tx_cb(DEVCB_##_cb);
+	downcast<apollo_sio &>(*device).set_a_tx_cb(DEVCB_##_cb);
 
 #define MCFG_APOLLO_SIO_B_TX_CALLBACK(_cb) \
-	devcb = &downcast<apollo_sio &>(*device).set_b_tx_cb(DEVCB_##_cb);
+	downcast<apollo_sio &>(*device).set_b_tx_cb(DEVCB_##_cb);
 
 #define MCFG_APOLLO_SIO_OUTPORT_CALLBACK(_cb) \
-	devcb = &downcast<apollo_sio &>(*device).set_outport_cb(DEVCB_##_cb);
+	downcast<apollo_sio &>(*device).set_outport_cb(DEVCB_##_cb);
 
 class apollo_sio: public duart_base_device
 {
@@ -685,7 +685,7 @@ DECLARE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i)
 //**************************************************************************
 
 #define MCFG_APOLLO_STDIO_TX_CALLBACK(_cb) \
-	devcb = &downcast<apollo_stdio_device &>(*device).set_tx_cb(DEVCB_##_cb);
+	downcast<apollo_stdio_device &>(*device).set_tx_cb(DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

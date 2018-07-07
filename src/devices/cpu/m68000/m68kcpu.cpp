@@ -669,9 +669,14 @@ void m68000_base_device::postload()
 
 void m68000_base_device::m68k_cause_bus_error()
 {
-	uint32_t sr;
+	// Halt the cpu on berr when writing the stack frame.
+	if (m_run_mode == RUN_MODE_BERR_AERR_RESET)
+	{
+		m_stopped = STOP_LEVEL_HALT;
+		return;
+	}
 
-	sr = m68ki_init_exception();
+	uint32_t sr = m68ki_init_exception();
 
 	m_run_mode = RUN_MODE_BERR_AERR_RESET;
 

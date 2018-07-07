@@ -60,13 +60,13 @@
 // handlers
 
 #define MCFG_DS1386_INTA_HANDLER(_devcb) \
-	devcb = &downcast<ds1386_device &>(*device).set_inta_cb(DEVCB_##_devcb);
+	downcast<ds1386_device &>(*device).set_inta_cb(DEVCB_##_devcb);
 
 #define MCFG_DS1386_INTB_HANDLER(_devcb) \
-	devcb = &downcast<ds1386_device &>(*device).set_intb_cb(DEVCB_##_devcb);
+	downcast<ds1386_device &>(*device).set_intb_cb(DEVCB_##_devcb);
 
 #define MCFG_DS1386_SQW_HANDLER(_devcb) \
-	devcb = &downcast<ds1386_device &>(*device).set_sqw_cb(DEVCB_##_devcb);
+	downcast<ds1386_device &>(*device).set_sqw_cb(DEVCB_##_devcb);
 
 // devices
 

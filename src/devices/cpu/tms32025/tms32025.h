@@ -24,22 +24,22 @@
 
 
 #define MCFG_TMS32025_BIO_IN_CB(_devcb) \
-	devcb = &downcast<tms32025_device &>(*device).set_bio_in_cb(DEVCB_##_devcb); /* BIO input  */
+	downcast<tms32025_device &>(*device).set_bio_in_cb(DEVCB_##_devcb); /* BIO input  */
 
 #define MCFG_TMS32025_HOLD_IN_CB(_devcb) \
-	devcb = &downcast<tms32025_device &>(*device).set_hold_in_cb(DEVCB_##_devcb); /* HOLD input */
+	downcast<tms32025_device &>(*device).set_hold_in_cb(DEVCB_##_devcb); /* HOLD input */
 
 #define MCFG_TMS32025_HOLD_ACK_OUT_CB(_devcb) \
-	devcb = &downcast<tms32025_device &>(*device).set_hold_ack_out_cb(DEVCB_##_devcb); /* HOLD Acknowledge output */
+	downcast<tms32025_device &>(*device).set_hold_ack_out_cb(DEVCB_##_devcb); /* HOLD Acknowledge output */
 
 #define MCFG_TMS32025_XF_OUT_CB(_devcb) \
-	devcb = &downcast<tms32025_device &>(*device).set_xf_out_cb(DEVCB_##_devcb); /* XF output  */
+	downcast<tms32025_device &>(*device).set_xf_out_cb(DEVCB_##_devcb); /* XF output  */
 
 #define MCFG_TMS32025_DR_IN_CB(_devcb) \
-	devcb = &downcast<tms32025_device &>(*device).set_dr_in_cb(DEVCB_##_devcb); /* Serial Data  Receive  input  */
+	downcast<tms32025_device &>(*device).set_dr_in_cb(DEVCB_##_devcb); /* Serial Data  Receive  input  */
 
 #define MCFG_TMS32025_DX_OUT_CB(_devcb) \
-	devcb = &downcast<tms32025_device &>(*device).set_dx_out_cb(DEVCB_##_devcb); /* Serial Data  Transmit output */
+	downcast<tms32025_device &>(*device).set_dx_out_cb(DEVCB_##_devcb); /* Serial Data  Transmit output */
 
 
 /****************************************************************************

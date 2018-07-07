@@ -378,11 +378,11 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 	MCFG_DECO_SPRITE_GFX_REGION(2)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DECO104_ADD("ioprot104")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SET_INTERFACE_SCRAMBLE(8,9,  4,5,6,7    ,1,0,3,2) // hopefully this is correct, nothing else uses this arrangement!
+	DECO104PROT(config, m_deco104, 0);
+	m_deco104->port_a_cb().set_ioport("INPUTS");
+	m_deco104->port_b_cb().set_ioport("SYSTEM");
+	m_deco104->port_c_cb().set_ioport("DSW");
+	m_deco104->set_interface_scramble(8,9,  4,5,6,7,    1,0,3,2); // hopefully this is correct, nothing else uses this arrangement!
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -3286,10 +3286,10 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_WD2010_IN_WF_CB(READLINE(*this, rainbow_state, hdc_write_fault))   // WRITE FAULT  (set to GND if not serviced)
 
 	MCFG_WD2010_IN_DRDY_CB(READLINE(*this, rainbow_state, hdc_drive_ready)) // DRIVE_READY  (set to VCC if not serviced)
-	MCFG_WD2010_IN_SC_CB(VCC)                                        // SEEK COMPLETE (set to VCC if not serviced)
+	MCFG_WD2010_IN_SC_CB(CONSTANT(1))                                        // SEEK COMPLETE (set to VCC if not serviced)
 
-	MCFG_WD2010_IN_TK000_CB(VCC) // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
-	MCFG_WD2010_IN_INDEX_CB(VCC) //    "
+	MCFG_WD2010_IN_TK000_CB(CONSTANT(1)) // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
+	MCFG_WD2010_IN_INDEX_CB(CONSTANT(1)) //    "
 
 	MCFG_HARDDISK_ADD("decharddisk1")
 	/// ******************************** / HARD DISK CONTROLLER ****************************************

@@ -320,6 +320,10 @@ void cbus_device::device_start()
 	m_out_irq2_cb.resolve_safe();
 	m_out_vblank_cb.resolve_safe();
 
+	// FIXME: silence the slot address map
+	m_main_space->nop_read(CBUS_BASE, CBUS_BASE + (CBUS_STRIDE * (CBUS_COUNT - 1)) + (CBUS_SIZE - 1));
+	m_io_space->nop_read(CBUS_BASE, CBUS_BASE + (CBUS_STRIDE * (CBUS_COUNT - 1)) + (CBUS_SIZE - 1));
+
 	// empty the slots
 	m_slot_count = 0;
 	for (device_cbus_card_interface *&slot : m_slot)

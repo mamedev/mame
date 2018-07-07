@@ -329,12 +329,12 @@ MACHINE_CONFIG_START(h8_state::h8)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, h8_state, txdata_callback))
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(FUNC(h8_state::txdata_callback));
 
-	MCFG_DEVICE_ADD("cassette_clock", CLOCK, 4800)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	clock_device &cassette_clock(CLOCK(config, "cassette_clock", 4800));
+	cassette_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	cassette_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)

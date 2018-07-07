@@ -61,13 +61,13 @@ The following chips are functionally equivalent and pin-compatible.
 	downcast<fifo7200_device &>(*device).set_ram_size(_ramsize);
 
 #define MCFG_FIFO7200_EF_HANDLER(_devcb) \
-	devcb = &downcast<fifo7200_device &>(*device).set_ef_handler(DEVCB_##_devcb);
+	downcast<fifo7200_device &>(*device).set_ef_handler(DEVCB_##_devcb);
 
 #define MCFG_FIFO7200_FF_HANDLER(_devcb) \
-	devcb = &downcast<fifo7200_device &>(*device).set_ff_handler(DEVCB_##_devcb);
+	downcast<fifo7200_device &>(*device).set_ff_handler(DEVCB_##_devcb);
 
 #define MCFG_FIFO7200_HF_HANDLER(_devcb) \
-	devcb = &downcast<fifo7200_device &>(*device).set_hf_handler(DEVCB_##_devcb);
+	downcast<fifo7200_device &>(*device).set_hf_handler(DEVCB_##_devcb);
 
 
 

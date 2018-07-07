@@ -1,13 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_CLSHROAD_H
+#define MAME_INCLUDES_CLSHROAD_H
+
+#pragma once
 
 #include "emupal.h"
 
 class clshroad_state : public driver_device
 {
 public:
-	clshroad_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	clshroad_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -15,7 +19,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
-		m_vregs(*this, "vregs") { }
+		m_vregs(*this, "vregs")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -63,3 +68,5 @@ public:
 	void clshroad_map(address_map &map);
 	void clshroad_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CLSHROAD_H

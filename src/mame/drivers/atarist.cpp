@@ -2055,9 +2055,9 @@ MACHINE_CONFIG_START(st_state::st)
 
 	// devices
 
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, Y2/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, st_state, fdc_drq_w))
+	WD1772(config, m_fdc, Y2/4);
+	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
+	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
@@ -2146,9 +2146,9 @@ MACHINE_CONFIG_START(megast_state::megast)
 	// devices
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
 
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, Y2/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, st_state, fdc_drq_w))
+	WD1772(config, m_fdc, Y2/4);
+	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
+	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
@@ -2245,9 +2245,9 @@ MACHINE_CONFIG_START(ste_state::ste)
 
 	// devices
 
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, Y2/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, st_state, fdc_drq_w))
+	WD1772(config, m_fdc, Y2/4);
+	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
+	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
@@ -2359,9 +2359,9 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_MC68901_OUT_TDO_CB(WRITELINE(*this, st_state, mfp_tdo_w))
 	MCFG_MC68901_OUT_SO_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, U517/2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, st_state, fdc_drq_w))
+	WD1772(config, m_fdc, U517/2);
+	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
+	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 

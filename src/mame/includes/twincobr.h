@@ -4,6 +4,10 @@
         Twincobr/Flying Shark/Wardner  game hardware from 1986-1987
         -----------------------------------------------------------
 ****************************************************************************/
+#ifndef MAME_INCLUDES_TWINCOBR_H
+#define MAME_INCLUDES_TWINCOBR_H
+
+#pragma once
 
 #include "video/mc6845.h"
 #include "video/bufsprite.h"
@@ -14,8 +18,8 @@
 class twincobr_state : public driver_device
 {
 public:
-	twincobr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	twincobr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_sharedram(*this, "sharedram"),
 		m_spriteram8(*this, "spriteram8"),
 		m_spriteram16(*this, "spriteram16"),
@@ -139,3 +143,5 @@ protected:
 	void sound_io_map(address_map &map);
 	void sound_program_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TWINCOBR_H

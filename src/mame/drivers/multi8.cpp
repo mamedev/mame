@@ -605,9 +605,9 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, multi8_state, portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, multi8_state, portc_w))
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD("uart", I8251, 0) // for cassette
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)

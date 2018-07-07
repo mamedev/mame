@@ -635,10 +635,10 @@ void r3000_device::writecache_le_dword(offs_t offset, uint32_t data)
     EXECEPTION HANDLING
 ***************************************************************************/
 
-inline void r3000_device::generate_exception(int exception)
+inline void r3000_device::generate_exception(int exception, bool backup)
 {
 	// set the exception PC
-	m_cpr[0][COP0_EPC] = (exception == EXCEPTION_SYSCALL ? m_ppc : m_pc);
+	m_cpr[0][COP0_EPC] = backup ? m_ppc : m_pc;
 
 	// put the cause in the low 8 bits and clear the branch delay flag
 	CAUSE = (CAUSE & ~0x800000ff) | (exception << 2);
@@ -668,7 +668,7 @@ inline void r3000_device::generate_exception(int exception)
 
 inline void r3000_device::invalid_instruction()
 {
-	generate_exception(EXCEPTION_INVALIDOP);
+	generate_exception(EXCEPTION_INVALIDOP, true);
 }
 
 
@@ -679,7 +679,7 @@ inline void r3000_device::invalid_instruction()
 void r3000_device::check_irqs()
 {
 	if ((CAUSE & SR & 0xff00) && (SR & SR_IEc))
-		generate_exception(EXCEPTION_INTERRUPT);
+		generate_exception(EXCEPTION_INTERRUPT, false);
 }
 
 
@@ -756,7 +756,7 @@ inline void r3000_device::set_cop0_creg(int idx, uint32_t val)
 inline void r3000_device::handle_cop0()
 {
 	if (!(SR & SR_COP0) && (SR & SR_KUc))
-		generate_exception(EXCEPTION_BADCOP);
+		generate_exception(EXCEPTION_BADCOP, true);
 
 	switch (RSREG)
 	{
@@ -833,7 +833,7 @@ inline void r3000_device::set_cop1_creg(int idx, uint32_t val)
 inline void r3000_device::handle_cop1()
 {
 	if (!(SR & SR_COP1))
-		generate_exception(EXCEPTION_BADCOP);
+		generate_exception(EXCEPTION_BADCOP, true);
 	if (!m_hasfpu)
 		return;
 
@@ -901,7 +901,7 @@ inline void r3000_device::set_cop2_creg(int idx, uint32_t val)
 inline void r3000_device::handle_cop2()
 {
 	if (!(SR & SR_COP2))
-		generate_exception(EXCEPTION_BADCOP);
+		generate_exception(EXCEPTION_BADCOP, true);
 
 	switch (RSREG)
 	{
@@ -967,7 +967,7 @@ inline void r3000_device::set_cop3_creg(int idx, uint32_t val)
 inline void r3000_device::handle_cop3()
 {
 	if (!(SR & SR_COP3))
-		generate_exception(EXCEPTION_BADCOP);
+		generate_exception(EXCEPTION_BADCOP, true);
 
 	switch (RSREG)
 	{
@@ -1076,6 +1076,23 @@ void r3000_device::execute_run()
 		m_ppc = m_pc;
 		debugger_instruction_hook(m_pc);
 
+		/*
+		if ((m_pc & 0x1fffffff) == 0x00012C48 || (m_pc & 0x1fffffff) == 0x0001420C || (m_pc & 0x1fffffff) == 0x0001430C)
+		{
+			uint32_t ptr = m_r[5];
+			uint32_t length = m_r[6];
+			if (length >= 4096)
+				length = 4095;
+			while (length)
+			{
+				printf("%c", (char)RBYTE(ptr));
+				ptr++;
+				length--;
+			}
+			fflush(stdout);
+		}
+		*/
+
 		// instruction fetch
 		m_op = readop(m_pc);
 
@@ -1102,9 +1119,9 @@ void r3000_device::execute_run()
 					case 0x07:  /* SRAV */      if (RDREG) RDVAL = (int32_t)RTVAL >> (RSVAL & 31);   break;
 					case 0x08:  /* JR */        SETPC(RSVAL);                                             break;
 					case 0x09:  /* JALR */      SETPCL(RSVAL, RDREG);                                     break;
-					case 0x0c:  /* SYSCALL */   generate_exception(EXCEPTION_SYSCALL);                           break;
-					case 0x0d:  /* BREAK */     generate_exception(EXCEPTION_BREAK);                             break;
-					case 0x0f:  /* SYNC */      invalid_instruction();                                         break;
+					case 0x0c:  /* SYSCALL */   generate_exception(EXCEPTION_SYSCALL, true);                break;
+					case 0x0d:  /* BREAK */     generate_exception(EXCEPTION_BREAK, true);                  break;
+					case 0x0f:  /* SYNC */      invalid_instruction();                                      break;
 					case 0x10:  /* MFHI */      if (RDREG) RDVAL = m_hi;                                    break;
 					case 0x11:  /* MTHI */      m_hi = RSVAL;                                               break;
 					case 0x12:  /* MFLO */      if (RDREG) RDVAL = m_lo;                                    break;
@@ -1138,12 +1155,12 @@ void r3000_device::execute_run()
 						m_icount -= 34;
 						break;
 					case 0x20:  /* ADD */
-						if (ENABLE_OVERFLOWS && RSVAL > ~RTVAL) generate_exception(EXCEPTION_OVERFLOW);
+						if (ENABLE_OVERFLOWS && RSVAL > ~RTVAL) generate_exception(EXCEPTION_OVERFLOW, true);
 						else RDVAL = RSVAL + RTVAL;
 						break;
 					case 0x21:  /* ADDU */      if (RDREG) RDVAL = RSVAL + RTVAL;                  break;
 					case 0x22:  /* SUB */
-						if (ENABLE_OVERFLOWS && RSVAL < RTVAL) generate_exception(EXCEPTION_OVERFLOW);
+						if (ENABLE_OVERFLOWS && RSVAL < RTVAL) generate_exception(EXCEPTION_OVERFLOW, true);
 						else RDVAL = RSVAL - RTVAL;
 						break;
 					case 0x23:  /* SUBU */      if (RDREG) RDVAL = RSVAL - RTVAL;                  break;
@@ -1191,7 +1208,7 @@ void r3000_device::execute_run()
 			case 0x06:  /* BLEZ */      if ((int32_t)RSVAL <= 0) ADDPC(SIMMVAL);                            break;
 			case 0x07:  /* BGTZ */      if ((int32_t)RSVAL > 0) ADDPC(SIMMVAL);                             break;
 			case 0x08:  /* ADDI */
-				if (ENABLE_OVERFLOWS && RSVAL > ~SIMMVAL) generate_exception(EXCEPTION_OVERFLOW);
+				if (ENABLE_OVERFLOWS && RSVAL > ~SIMMVAL) generate_exception(EXCEPTION_OVERFLOW, true);
 				else if (RTREG) RTVAL = RSVAL + SIMMVAL;
 				break;
 			case 0x09:  /* ADDIU */     if (RTREG) RTVAL = RSVAL + SIMMVAL;                               break;

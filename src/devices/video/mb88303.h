@@ -32,13 +32,13 @@
 //**************************************************************************
 
 #define MCFG_MB88303_VOW_CALLBACK(_write) \
-	devcb = &downcast<mb88303_device &>(*device).set_vow_callback(DEVCB_##_write);
+	downcast<mb88303_device &>(*device).set_vow_callback(DEVCB_##_write);
 
 #define MCFG_MB88303_VOBN_CALLBACK(_write) \
-	devcb = &downcast<mb88303_device &>(*device).set_vob_n_callback(DEVCB_##_write);
+	downcast<mb88303_device &>(*device).set_vob_n_callback(DEVCB_##_write);
 
 #define MCFG_MB88303_DO_CALLBACK(_write) \
-	devcb = &downcast<mb88303_device &>(*device).set_do_callback(DEVCB_##_write);
+	downcast<mb88303_device &>(*device).set_do_callback(DEVCB_##_write);
 
 
 //**************************************************************************

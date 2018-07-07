@@ -21,7 +21,7 @@ Nichibutsu 1412M2 device emulation
 		MCFG_DEVICE_ADD((tag), NB1412M2, (freq))
 
 #define MCFG_NB1412M2_DAC_CB(_devcb) \
-	devcb = &downcast<nb1412m2_device &>(*device).set_dac_callback(DEVCB_##_devcb);
+	downcast<nb1412m2_device &>(*device).set_dac_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

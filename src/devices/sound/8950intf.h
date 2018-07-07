@@ -7,19 +7,19 @@
 
 
 #define MCFG_Y8950_IRQ_HANDLER(cb) \
-	devcb = &downcast<y8950_device &>(*device).set_irq_handler((DEVCB_##cb));
+	downcast<y8950_device &>(*device).set_irq_handler((DEVCB_##cb));
 
 #define MCFG_Y8950_KEYBOARD_READ_HANDLER(cb) \
-	devcb = &downcast<y8950_device &>(*device).set_keyboard_read_handler((DEVCB_##cb));
+	downcast<y8950_device &>(*device).set_keyboard_read_handler((DEVCB_##cb));
 
 #define MCFG_Y8950_KEYBOARD_WRITE_HANDLER(cb) \
-	devcb = &downcast<y8950_device &>(*device).set_keyboard_write_handler((DEVCB_##cb));
+	downcast<y8950_device &>(*device).set_keyboard_write_handler((DEVCB_##cb));
 
 #define MCFG_Y8950_IO_READ_HANDLER(cb) \
-	devcb = &downcast<y8950_device &>(*device).set_io_read_handler((DEVCB_##cb));
+	downcast<y8950_device &>(*device).set_io_read_handler((DEVCB_##cb));
 
 #define MCFG_Y8950_IO_WRITE_HANDLER(cb) \
-	devcb = &downcast<y8950_device &>(*device).set_io_write_handler((DEVCB_##cb));
+	downcast<y8950_device &>(*device).set_io_write_handler((DEVCB_##cb));
 
 class y8950_device : public device_t, public device_sound_interface
 {

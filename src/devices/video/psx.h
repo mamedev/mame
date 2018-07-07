@@ -18,7 +18,7 @@
 
 
 #define MCFG_PSX_GPU_VBLANK_HANDLER(_devcb) \
-	devcb = &downcast<psxgpu_device &>(*device).set_vblank_handler(DEVCB_##_devcb);
+	downcast<psxgpu_device &>(*device).set_vblank_handler(DEVCB_##_devcb);
 
 #define MCFG_PSXGPU_ADD( cputag, tag, type, _vramSize, clock ) \
 	MCFG_DEVICE_MODIFY( cputag ) \

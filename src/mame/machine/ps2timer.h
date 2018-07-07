@@ -14,7 +14,6 @@
 
 #pragma once
 
-#include "emu.h"
 
 class ps2_timer_device : public device_t
 {
