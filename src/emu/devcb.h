@@ -640,7 +640,7 @@ private:
 			, m_delegate(std::forward<T>(func), name, tag, std::add_pointer_t<devcb_read::delegate_device_class_t<T> >(nullptr))
 		{ }
 		template <typename T>
-		delegate_builder(devcb_read &target, bool append, device_t &devbase, typename devcb_read::delegate_device_class_t<T> &obj, T &&func, char const *name)
+		delegate_builder(devcb_read &target, bool append, device_t &devbase, devcb_read::template delegate_device_class_t<T> &obj, T &&func, char const *name)
 			: builder_base(target, append)
 			, transform_base<output_t, delegate_builder>(DefaultMask & delegate_traits<Delegate>::default_mask)
 			, m_devbase(devbase)
