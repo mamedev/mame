@@ -8,6 +8,20 @@
 #include "machine/namcoic.h"
 
 
+static inline uint8_t
+nth_byte16( const uint16_t *pSource, int which )
+{
+	uint16_t data = pSource[which/2];
+	if( which&1 )
+	{
+		return data&0xff;
+	}
+	else
+	{
+		return data>>8;
+	}
+} /* nth_byte16 */
+
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */

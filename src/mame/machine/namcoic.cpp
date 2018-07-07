@@ -847,7 +847,7 @@ TILE_GET_INFO_MEMBER( namcos2_shared_state::c169_roz_get_info )
 {
 	int tile, mask;
 	m_c169_cb( m_c169_roz_videoram[tile_index] & 0x3fff, &tile, &mask, Which );
-	tileinfo.mask_data = m_c169_roz_mask + 32*tile;
+	tileinfo.mask_data = m_c169_roz_mask + 32*mask;
 	SET_TILE_INFO_MEMBER(m_c169_roz_gfxbank, tile, 0/*color*/, 0/*flag*/);
 }
 
@@ -891,6 +891,7 @@ void namcos2_shared_state::c169_roz_unpack_params(const uint16_t *source, roz_pa
 	 */
 
 	uint16_t temp = source[1];
+	params.wrap = BIT(~temp, 11);
 	params.size = 512 << ((temp & 0x0300) >> 8);
 	if (m_gametype == NAMCOFL_SPEED_RACER || m_gametype == NAMCOFL_FINAL_LAP_R)
 		params.color = (temp & 0x0007) * 256;
@@ -936,6 +937,7 @@ void namcos2_shared_state::c169_roz_unpack_params(const uint16_t *source, roz_pa
 void namcos2_shared_state::c169_roz_draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params)
 {
 	if (m_gametype != NAMCOFL_SPEED_RACER && m_gametype != NAMCOFL_FINAL_LAP_R)
+//	if (m_gametype != NAMCOFL_FINAL_LAP_R) // Fix speedrcr some title animations, but broke at road scene
 	{
 		uint32_t size_mask = params.size - 1;
 		bitmap_ind16 &srcbitmap = tmap.pixmap();
@@ -951,7 +953,7 @@ void namcos2_shared_state::c169_roz_draw_helper(screen_device &screen, bitmap_in
 			uint32_t cy = starty;
 			uint16_t *dest = &bitmap.pix(sy, sx);
 			while (x <= clip.max_x)
-			{
+			{ // TODO : Wraparound disable isn't implemented
 				uint32_t xpos = (((cx >> 16) & size_mask) + params.left) & 0xfff;
 				uint32_t ypos = (((cy >> 16) & size_mask) + params.top) & 0xfff;
 				if (flagsbitmap.pix(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
@@ -976,7 +978,7 @@ void namcos2_shared_state::c169_roz_draw_helper(screen_device &screen, bitmap_in
 			params.startx, params.starty,
 			params.incxx, params.incxy,
 			params.incyx, params.incyy,
-			1,0,0); // wrap, flags, pri
+			params.wrap,0,0); // wrap, flags, pri
 	}
 }
 

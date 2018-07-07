@@ -48,6 +48,8 @@ public:
 
 	void namconb1(machine_config &config);
 	void namconb2(machine_config &config);
+	void outfxies(machine_config &config);
+	void machbrkr(machine_config &config);
 
 	void init_sws95();
 	void init_machbrkr();
@@ -126,8 +128,8 @@ private:
 	void NB1TilemapCB(uint16_t code, int *tile, int *mask);
 	void NB2TilemapCB_machbrkr(uint16_t code, int *tile, int *mask);
 	void NB2TilemapCB_outfxies(uint16_t code, int *tile, int *mask);
-	void NB2RozCB_machbrkr(uint16_t code, int *tile, int *mask);
-	void NB2RozCB_outfxies(uint16_t code, int *tile, int *mask);
+	void NB2RozCB_machbrkr(uint16_t code, int *tile, int *mask, int which);
+	void NB2RozCB_outfxies(uint16_t code, int *tile, int *mask, int which);
 	void namcoc75_am(address_map &map);
 	void namcoc75_io(address_map &map);
 	void namconb1_am(address_map &map);

@@ -205,6 +205,7 @@ protected:
 		uint32_t startx, starty;
 		int incxx, incxy, incyx, incyy;
 		int color, priority;
+		int wrap;
 	};
 	void c169_roz_unpack_params(const uint16_t *source, roz_parameters &params);
 	void c169_roz_draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params);

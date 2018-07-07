@@ -1141,8 +1141,6 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb2)
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("c352", C352, MASTER_CLOCK/2, 288)
