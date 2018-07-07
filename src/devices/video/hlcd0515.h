@@ -43,11 +43,11 @@
 
 // COL/ROW pins (offset for ROW)
 #define MCFG_HLCD0515_WRITE_COLS_CB(_devcb) \
-	devcb = &downcast<hlcd0515_device &>(*device).set_write_cols_callback(DEVCB_##_devcb);
+	downcast<hlcd0515_device &>(*device).set_write_cols_callback(DEVCB_##_devcb);
 
 // DATA OUT pin, don't use on HLCD0569
 #define MCFG_HLCD0515_WRITE_DATA_CB(_devcb) \
-	devcb = &downcast<hlcd0515_device &>(*device).set_write_data_callback(DEVCB_##_devcb);
+	downcast<hlcd0515_device &>(*device).set_write_data_callback(DEVCB_##_devcb);
 
 
 class hlcd0515_device : public device_t

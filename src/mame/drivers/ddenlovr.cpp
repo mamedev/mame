@@ -9859,15 +9859,15 @@ MACHINE_CONFIG_START(ddenlovr_state::quizchq)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(336, 256+22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, strobe_a)) MCFG_DEVCB_INVERT
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(336, 256+22);
+	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::strobe_a)).invert();
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
@@ -9885,8 +9885,7 @@ MACHINE_CONFIG_START(ddenlovr_state::quizchq)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg2)) MCFG_DEVCB_INVERT
+	MSM6242(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg2)).invert();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ddenlovr_state::rongrong)
@@ -10175,12 +10174,10 @@ MACHINE_CONFIG_START(ddenlovr_state::funkyfig)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,funkyfig)
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, ddenlovr_state, funkyfig_sound_irq))
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0));
+	m_screen->screen_vblank().append(FUNC(ddenlovr_state::funkyfig_sound_irq));
 
-	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg1)) MCFG_DEVCB_INVERT
+	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1)).invert();
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, funkyfig_blitter_irq)
 
@@ -10237,8 +10234,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjschuka)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL(32'768)) // internal oscillator
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, pa7_w)) MCFG_DEVCB_INVERT
+	RTC62421(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert(); // internal oscillator
 MACHINE_CONFIG_END
 
 
@@ -10264,8 +10260,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyster)
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mmpanic_rombank_w))
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
 	MCFG_DEVICE_MODIFY("rtc")
 	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
@@ -10305,8 +10300,7 @@ MACHINE_CONFIG_START(ddenlovr_state::hginga)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0))
 
-	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, pa7_w)) MCFG_DEVCB_INVERT
+	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert();
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
 
@@ -10332,8 +10326,7 @@ MACHINE_CONFIG_START(ddenlovr_state::hgokou)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0))
 
-	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, pa7_w)) MCFG_DEVCB_INVERT
+	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert();
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
 
@@ -10375,8 +10368,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyuniv)
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mmpanic_rombank_w))
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
@@ -10401,8 +10393,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyornt)
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, mjmyster_rambank_w))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mmpanic_rombank_w))
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 4, 256-16+4-1)
@@ -10457,12 +10448,10 @@ MACHINE_CONFIG_START(ddenlovr_state::mjflove)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, mjflove_irq))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("maincpu", tmpz84c015_device, trg0)) // frame counter?
+	m_screen->screen_vblank().set(FUNC(ddenlovr_state::mjflove_irq));
+	m_screen->screen_vblank().append(m_maincpu, FUNC(tmpz84c015_device::trg0)); // frame counter?
 
-	MCFG_DEVICE_REPLACE("rtc", RTC72421, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, ddenlovr_state, mjflove_rtc_irq))
+	RTC72421(config.replace(), "rtc", 32.768_kHz_XTAL).out_int_handler().set(FUNC(ddenlovr_state::mjflove_rtc_irq));
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjflove_blitter_irq)
 

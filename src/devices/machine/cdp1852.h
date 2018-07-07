@@ -34,16 +34,16 @@
 //**************************************************************************
 
 #define MCFG_CDP1852_MODE_CALLBACK(_read) \
-	devcb = &downcast<cdp1852_device &>(*device).set_mode_rd_callback(DEVCB_##_read);
+	downcast<cdp1852_device &>(*device).set_mode_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1852_SR_CALLBACK(_write) \
-	devcb = &downcast<cdp1852_device &>(*device).set_sr_wr_callback(DEVCB_##_write);
+	downcast<cdp1852_device &>(*device).set_sr_wr_callback(DEVCB_##_write);
 
 #define MCFG_CDP1852_DI_CALLBACK(_read) \
-	devcb = &downcast<cdp1852_device &>(*device).set_data_rd_callback(DEVCB_##_read);
+	downcast<cdp1852_device &>(*device).set_data_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1852_DO_CALLBACK(_write) \
-	devcb = &downcast<cdp1852_device &>(*device).set_data_wr_callback(DEVCB_##_write);
+	downcast<cdp1852_device &>(*device).set_data_wr_callback(DEVCB_##_write);
 
 
 

@@ -57,13 +57,13 @@
 
 
 #define MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(_write) \
-	devcb = &downcast<vip_expansion_slot_device &>(*device).set_int_wr_callback(DEVCB_##_write);
+	downcast<vip_expansion_slot_device &>(*device).set_int_wr_callback(DEVCB_##_write);
 
 #define MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(_write) \
-	devcb = &downcast<vip_expansion_slot_device &>(*device).set_dma_out_wr_callback(DEVCB_##_write);
+	downcast<vip_expansion_slot_device &>(*device).set_dma_out_wr_callback(DEVCB_##_write);
 
 #define MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(_write) \
-	devcb = &downcast<vip_expansion_slot_device &>(*device).set_dma_in_wr_callback(DEVCB_##_write);
+	downcast<vip_expansion_slot_device &>(*device).set_dma_in_wr_callback(DEVCB_##_write);
 
 
 

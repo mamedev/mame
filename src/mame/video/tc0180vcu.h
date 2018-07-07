@@ -6,9 +6,9 @@
 #pragma once
 
 #define MCFG_TC0180VCU_INTH_CALLBACK(_write) \
-	devcb = &downcast<tc0180vcu_device &>(*device).set_inth_callback(DEVCB_##_write);
+	downcast<tc0180vcu_device &>(*device).set_inth_callback(DEVCB_##_write);
 #define MCFG_TC0180VCU_INTL_CALLBACK(_write) \
-	devcb = &downcast<tc0180vcu_device &>(*device).set_intl_callback(DEVCB_##_write);
+	downcast<tc0180vcu_device &>(*device).set_intl_callback(DEVCB_##_write);
 
 class tc0180vcu_device : public device_t, public device_gfx_interface, public device_video_interface
 {

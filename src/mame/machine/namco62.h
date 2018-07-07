@@ -9,22 +9,22 @@
 	MCFG_DEVICE_ADD(_tag, NAMCO_62XX, _clock)
 
 #define MCFG_NAMCO_62XX_INPUT_0_CB(_devcb) \
-	devcb = &downcast<namco_62xx_device &>(*device).set_input_callback<0>(DEVCB_##_devcb);
+	downcast<namco_62xx_device &>(*device).set_input_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_62XX_INPUT_1_CB(_devcb) \
-	devcb = &downcast<namco_62xx_device &>(*device).set_input_callback<1>(DEVCB_##_devcb);
+	downcast<namco_62xx_device &>(*device).set_input_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_62XX_INPUT_2_CB(_devcb) \
-	devcb = &downcast<namco_62xx_device &>(*device).set_input_callback<2>(DEVCB_##_devcb);
+	downcast<namco_62xx_device &>(*device).set_input_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_62XX_INPUT_3_CB(_devcb) \
-	devcb = &downcast<namco_62xx_device &>(*device).set_input_callback<3>(DEVCB_##_devcb);
+	downcast<namco_62xx_device &>(*device).set_input_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_62XX_OUTPUT_0_CB(_devcb) \
-	devcb = &downcast<namco_62xx_device &>(*device).set_output_callback<0>(DEVCB_##_devcb);
+	downcast<namco_62xx_device &>(*device).set_output_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_62XX_OUTPUT_1_CB(_devcb) \
-	devcb = &downcast<namco_62xx_device &>(*device).set_output_callback<1>(DEVCB_##_devcb);
+	downcast<namco_62xx_device &>(*device).set_output_callback<1>(DEVCB_##_devcb);
 
 
 class namco_62xx_device : public device_t

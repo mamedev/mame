@@ -100,10 +100,10 @@
 	MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(WRITELINE(DEVICE_SELF_OWNER, bbc_1mhzbus_slot_device, nmi_w))
 
 #define MCFG_BBC_1MHZBUS_SLOT_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<bbc_1mhzbus_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<bbc_1mhzbus_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &downcast<bbc_1mhzbus_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
+	downcast<bbc_1mhzbus_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

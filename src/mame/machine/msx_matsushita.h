@@ -14,7 +14,7 @@ DECLARE_DEVICE_TYPE(MSX_MATSUSHITA, msx_matsushita_device)
 	MCFG_DEVICE_ADD(_tag, MSX_MATSUSHITA, 0)
 
 #define MCFG_MSX_MATSUSHITA_TURBO_CB(_devcb) \
-	devcb = &downcast<msx_matsushita_device &>(*device).set_turbo_callback(DEVCB_##_devcb);
+	downcast<msx_matsushita_device &>(*device).set_turbo_callback(DEVCB_##_devcb);
 
 
 class msx_matsushita_device : public device_t,

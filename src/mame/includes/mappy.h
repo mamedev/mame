@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_MAPPY_H
+#define MAME_INCLUDES_MAPPY_H
+
+#pragma once
+
 #include "machine/namcoio.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
@@ -9,11 +14,6 @@
 class mappy_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_IO_RUN
-	};
-
 	mappy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
@@ -44,7 +44,17 @@ public:
 	void init_grobda();
 	void init_digdug2();
 
+protected:
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
+	enum
+	{
+		TIMER_IO0_RUN,
+		TIMER_IO1_RUN
+	};
+
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
@@ -68,6 +78,8 @@ private:
 	uint8_t m_sub_irq_mask;
 	uint8_t m_sub2_irq_mask;
 
+	emu_timer *m_namcoio_run_timer[2];
+
 	DECLARE_WRITE_LINE_MEMBER(int_on_w);
 	DECLARE_WRITE_LINE_MEMBER(int_on_2_w);
 	DECLARE_WRITE_LINE_MEMBER(int_on_3_w);
@@ -83,7 +95,7 @@ private:
 	TILE_GET_INFO_MEMBER(superpac_get_tile_info);
 	TILE_GET_INFO_MEMBER(phozon_get_tile_info);
 	TILE_GET_INFO_MEMBER(mappy_get_tile_info);
-	virtual void machine_start() override;
+
 	DECLARE_VIDEO_START(superpac);
 	DECLARE_PALETTE_INIT(superpac);
 	DECLARE_VIDEO_START(phozon);
@@ -104,6 +116,6 @@ private:
 	void phozon_cpu3_map(address_map &map);
 	void superpac_cpu1_map(address_map &map);
 	void superpac_cpu2_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_MAPPY_H

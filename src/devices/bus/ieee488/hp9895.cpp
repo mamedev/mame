@@ -891,18 +891,19 @@ MACHINE_CONFIG_START(hp9895_device::device_add_mconfig)
 	MCFG_DEVICE_IO_MAP(z80_io_map)
 	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(*this, hp9895_device , z80_m1_w))
 
-	MCFG_DEVICE_ADD("phi" , PHI , 0)
-	MCFG_PHI_EOI_WRITE_CB(WRITELINE(*this, hp9895_device , phi_eoi_w))
-	MCFG_PHI_DAV_WRITE_CB(WRITELINE(*this, hp9895_device , phi_dav_w))
-	MCFG_PHI_NRFD_WRITE_CB(WRITELINE(*this, hp9895_device , phi_nrfd_w))
-	MCFG_PHI_NDAC_WRITE_CB(WRITELINE(*this, hp9895_device , phi_ndac_w))
-	MCFG_PHI_IFC_WRITE_CB(WRITELINE(*this, hp9895_device , phi_ifc_w))
-	MCFG_PHI_SRQ_WRITE_CB(WRITELINE(*this, hp9895_device , phi_srq_w))
-	MCFG_PHI_ATN_WRITE_CB(WRITELINE(*this, hp9895_device , phi_atn_w))
-	MCFG_PHI_REN_WRITE_CB(WRITELINE(*this, hp9895_device , phi_ren_w))
-	MCFG_PHI_DIO_READWRITE_CB(READ8(*this, hp9895_device , phi_dio_r) , WRITE8(*this, hp9895_device , phi_dio_w))
-	MCFG_PHI_INT_WRITE_CB(WRITELINE(*this, hp9895_device , phi_int_w))
-	MCFG_PHI_SYS_CNTRL_READ_CB(GND)
+	PHI(config, m_phi, 0);
+	m_phi->signal_write_cb<phi_device::PHI_488_EOI>().set(FUNC(hp9895_device::phi_eoi_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_DAV>().set(FUNC(hp9895_device::phi_dav_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_NRFD>().set(FUNC(hp9895_device::phi_nrfd_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_NDAC>().set(FUNC(hp9895_device::phi_ndac_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_IFC>().set(FUNC(hp9895_device::phi_ifc_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_SRQ>().set(FUNC(hp9895_device::phi_srq_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_ATN>().set(FUNC(hp9895_device::phi_atn_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_REN>().set(FUNC(hp9895_device::phi_ren_w));
+	m_phi->dio_read_cb().set(FUNC(hp9895_device::phi_dio_r));
+	m_phi->dio_write_cb().set(FUNC(hp9895_device::phi_dio_w));
+	m_phi->int_write_cb().set(FUNC(hp9895_device::phi_int_w));
+	m_phi->sys_cntrl_read_cb().set_constant(0);
 
 	MCFG_FLOPPY_DRIVE_ADD("floppy0" , hp9895_floppies , "8dsdd" , hp9895_floppy_formats)
 	MCFG_SLOT_FIXED(true)

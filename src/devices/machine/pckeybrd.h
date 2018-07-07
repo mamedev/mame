@@ -115,16 +115,16 @@ DECLARE_DEVICE_TYPE(AT_KEYB, at_keyboard_device)
 
 #define MCFG_PC_KEYB_ADD(_tag, _cb) \
 	MCFG_DEVICE_ADD(_tag, PC_KEYB, 0) \
-	devcb = &downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
+	downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
 
 #define MCFG_AT_KEYB_ADD(_tag, _def_set, _cb) \
 	MCFG_DEVICE_ADD(_tag, AT_KEYB, 0) \
 	downcast<at_keyboard_device &>(*device).set_type(pc_keyboard_device::KEYBOARD_TYPE::AT, _def_set); \
-	devcb = &downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
+	downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
 
 #define MCFG_AT_MF2_KEYB_ADD(_tag, _def_set, _cb) \
 	MCFG_DEVICE_ADD(_tag, AT_KEYB, 0) \
 	downcast<at_keyboard_device &>(*device).set_type(pc_keyboard_device::KEYBOARD_TYPE_MF2, _def_set); \
-	devcb = &downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
+	downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
 
 #endif // MAME_MACHINE_PCKEYBRD_H

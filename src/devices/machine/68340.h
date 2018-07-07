@@ -17,37 +17,37 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 #define MCFG_MC68340_PA_INPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_pa_in_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_pa_in_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_PA_OUTPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_pa_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_pa_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_PB_INPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_pb_in_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_pb_in_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_PB_OUTPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_pb_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_pb_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_ADD_CRYSTAL(_crystal) \
 	downcast<m68340_cpu_device &>(*device).set_crystal(_crystal);
 
 #define MCFG_MC68340_TOUT1_OUTPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_tout1_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_tout1_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_TIN1_INPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_tin1_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_tin1_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_TGATE1_INPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_tgate1_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_tgate1_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_TOUT2_OUTPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_tout2_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_tout2_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_TIN2_INPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_tin2_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_tin2_out_callback(DEVCB_##_devcb);
 
 #define MCFG_MC68340_TGATE2_INPUT_CB(_devcb) \
-	devcb = &downcast<m68340_cpu_device &>(*device).set_tgate2_out_callback(DEVCB_##_devcb);
+	downcast<m68340_cpu_device &>(*device).set_tgate2_out_callback(DEVCB_##_devcb);
 
 class m68340_cpu_device : public fscpu32_device
 {

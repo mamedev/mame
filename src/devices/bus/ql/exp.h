@@ -53,16 +53,16 @@
 //**************************************************************************
 
 #define MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK(_write) \
-	devcb = &downcast<ql_expansion_slot_device &>(*device).set_ipl0l_wr_callback(DEVCB_##_write);
+	downcast<ql_expansion_slot_device &>(*device).set_ipl0l_wr_callback(DEVCB_##_write);
 
 #define MCFG_QL_EXPANSION_SLOT_IPL1L_CALLBACK(_write) \
-	devcb = &downcast<ql_expansion_slot_device &>(*device).set_ipl1l_wr_callback(DEVCB_##_write);
+	downcast<ql_expansion_slot_device &>(*device).set_ipl1l_wr_callback(DEVCB_##_write);
 
 #define MCFG_QL_EXPANSION_SLOT_BERRL_CALLBACK(_write) \
-	devcb = &downcast<ql_expansion_slot_device &>(*device).set_berrl_wr_callback(DEVCB_##_write);
+	downcast<ql_expansion_slot_device &>(*device).set_berrl_wr_callback(DEVCB_##_write);
 
 #define MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(_write) \
-	devcb = &downcast<ql_expansion_slot_device &>(*device).set_extintl_wr_callback(DEVCB_##_write);
+	downcast<ql_expansion_slot_device &>(*device).set_extintl_wr_callback(DEVCB_##_write);
 
 
 

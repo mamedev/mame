@@ -383,8 +383,8 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_DEVICE_ADD("i8279", I8279, 4000000) /* guessed value. TODO: verify on PCB */
 	MCFG_I8279_OUT_SL_CB(WRITE8(*this, i7000_state, i7000_scanlines_w))          // scan SL lines
 	MCFG_I8279_IN_RL_CB(READ8(*this, i7000_state, i7000_kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC) // TODO: Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC) // TODO: Ctrl key
+	MCFG_I8279_IN_SHIFT_CB(CONSTANT(1)) // TODO: Shift key
+	MCFG_I8279_IN_CTRL_CB(CONSTANT(1)) // TODO: Ctrl key
 
 	/* Cartridge slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_romram_plain_slot, "i7000_card")

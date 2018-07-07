@@ -49,10 +49,10 @@
 //**************************************************************************
 
 #define MCFG_PAULA_MEM_READ_CB(_devcb) \
-	devcb = &downcast<paula_8364_device &>(*device).set_mem_r_callback(DEVCB_##_devcb);
+	downcast<paula_8364_device &>(*device).set_mem_r_callback(DEVCB_##_devcb);
 
 #define MCFG_PAULA_INT_CB(_devcb) \
-	devcb = &downcast<paula_8364_device &>(*device).set_int_w_callback(DEVCB_##_devcb);
+	downcast<paula_8364_device &>(*device).set_int_w_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

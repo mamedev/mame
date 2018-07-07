@@ -145,11 +145,11 @@ MACHINE_CONFIG_START(sys9002_state::sys9002)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(sys9002_state, crtc_update_row)
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 614400)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart2", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart2", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 614400));
+	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
+	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))

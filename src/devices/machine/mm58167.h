@@ -19,7 +19,7 @@
 //**************************************************************************
 
 #define MCFG_MM58167_IRQ_CALLBACK(_cb) \
-	devcb = &downcast<mm58167_device &>(*device).set_irq_cb(DEVCB_##_cb);
+	downcast<mm58167_device &>(*device).set_irq_cb(DEVCB_##_cb);
 
 
 //**************************************************************************

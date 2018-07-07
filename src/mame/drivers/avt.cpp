@@ -447,7 +447,7 @@ public:
 		, m_colorram(*this, "colorram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		{ }
+	{ }
 
 	void avtnfl(machine_config &config);
 	void avt(machine_config &config);
@@ -981,11 +981,12 @@ MACHINE_CONFIG_START(avt_state::avt)
 	MCFG_PALETTE_ADD("palette", 8*16)
 	MCFG_PALETTE_INIT_OWNER(avt_state, avt)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("ctc0", z80ctc_device, trg3))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, avt_state, avtbingo_w))
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK)); // guess
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set("ctc0", FUNC(z80ctc_device::trg3));
+	crtc.out_vsync_callback().append(FUNC(avt_state::avtbingo_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1018,15 +1019,16 @@ WRITE_LINE_MEMBER( avt_state::avtnfl_w )
 	m_pio1->port_b_write((m_pio1->port_b_read() & 0xbf) | (state ? 0x40 : 0));
 }
 
-MACHINE_CONFIG_START(avt_state::avtnfl)
+void avt_state::avtnfl(machine_config &config)
+{
 	avt(config);
-	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("ctc0", z80ctc_device, trg3))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, avt_state, avtnfl_w))
-MACHINE_CONFIG_END
+	mc6845_device &crtc(MC6845(config.replace(), "crtc", CRTC_CLOCK)); // guess
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set("ctc0", FUNC(z80ctc_device::trg3));
+	crtc.out_vsync_callback().append(FUNC(avt_state::avtnfl_w));
+}
 
 /*********************************************
 *                  Rom Load                  *

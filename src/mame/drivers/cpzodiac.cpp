@@ -168,20 +168,20 @@ MACHINE_CONFIG_START(cpzodiac_state::cpzodiac)
 	MCFG_DEVICE_IO_MAP(main_io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	MCFG_DEVICE_ADD("io", TE7750, 0)
-	MCFG_TE7750_IOS_CB(CONSTANT(4))
-	MCFG_TE7750_IN_PORT1_CB(IOPORT("IN1"))
-	MCFG_TE7750_IN_PORT2_CB(IOPORT("IN2"))
-	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN3"))
-	MCFG_TE7750_IN_PORT4_CB(IOPORT("IN4"))
-	MCFG_TE7750_OUT_PORT8_CB(MEMBANK("databank")) MCFG_DEVCB_RSHIFT(-4)
+	te7750_device &io(TE7750(config, "io", 0));
+	io.ios_cb().set_constant(4);
+	io.in_port1_cb().set_ioport("IN1");
+	io.in_port2_cb().set_ioport("IN2");
+	io.in_port3_cb().set_ioport("IN3");
+	io.in_port4_cb().set_ioport("IN4");
+	io.out_port8_cb().set_membank(m_bank).rshift(4);
 	// Code initializes Port 3 and 4 latches to 0 by mistake?
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 12_MHz_XTAL/2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
+	z80ctc_device &ctc(Z80CTC(config, "ctc", 12_MHz_XTAL/2));
+	ctc.intr_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 12_MHz_XTAL/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cpzodiac_state::sound_map);
 
 	/* video hardware */
 	// TODO

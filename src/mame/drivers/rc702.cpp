@@ -340,14 +340,13 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 
 	MCFG_MACHINE_RESET_OVERRIDE(rc702_state, rc702)
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 614000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, rc702_state, clock_w))
+	CLOCK(config, "ctc_clock", 614000).signal_handler().set(FUNC(rc702_state::clock_w));
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(8'000'000) / 2)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio1", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio1", z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("sio1", z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc1, 8_MHz_XTAL / 2);
+	m_ctc1->zc_callback<0>().set("sio1", FUNC(z80dart_device::txca_w));
+	m_ctc1->zc_callback<0>().append("sio1", FUNC(z80dart_device::rxca_w));
+	m_ctc1->zc_callback<1>().set("sio1", FUNC(z80dart_device::rxtxcb_w));
+	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD("sio1", Z80DART, XTAL(8'000'000) / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -388,12 +387,12 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 
-	MCFG_DEVICE_ADD("crtc", I8275, 11640000/7)
-	MCFG_I8275_CHARACTER_WIDTH(7)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(rc702_state, display_pixels)
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE("7474", ttl7474_device, clear_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc1", z80ctc_device, trg2))
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, rc702_state, crtc_drq_w))
+	i8275_device &crtc(I8275(config, "crtc", 11640000/7));
+	crtc.set_character_width(7);
+	crtc.set_display_callback(FUNC(rc702_state::display_pixels), this);
+	crtc.irq_wr_callback().set(m_7474, FUNC(ttl7474_device::clear_w)).invert();
+	crtc.irq_wr_callback().append(m_ctc1, FUNC(z80ctc_device::trg2));
+	crtc.drq_wr_callback().set(FUNC(rc702_state::crtc_drq_w));
 	MCFG_PALETTE_ADD("palette", 2)
 
 	/* sound hardware */

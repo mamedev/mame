@@ -250,16 +250,16 @@ private:
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false)
 
 #define MCFG_PERIBOX_INTA_HANDLER( _inta ) \
-	devcb = &downcast<bus::ti99::peb::peribox_device &>(*device).set_inta_callback(DEVCB_##_inta);
+	downcast<bus::ti99::peb::peribox_device &>(*device).set_inta_callback(DEVCB_##_inta);
 
 #define MCFG_PERIBOX_INTB_HANDLER( _intb ) \
-	devcb = &downcast<bus::ti99::peb::peribox_device &>(*device).set_intb_callback(DEVCB_##_intb);
+	downcast<bus::ti99::peb::peribox_device &>(*device).set_intb_callback(DEVCB_##_intb);
 
 #define MCFG_PERIBOX_READY_HANDLER( _ready ) \
-	devcb = &downcast<bus::ti99::peb::peribox_device &>(*device).set_ready_callback(DEVCB_##_ready);
+	downcast<bus::ti99::peb::peribox_device &>(*device).set_ready_callback(DEVCB_##_ready);
 
 #define MCFG_PERIBOX_LCP_HANDLER( _lcp ) \
-	devcb = &downcast<bus::ti99::peb::peribox_device &>(*device).set_lcp_callback(DEVCB_##_lcp);
+	downcast<bus::ti99::peb::peribox_device &>(*device).set_lcp_callback(DEVCB_##_lcp);
 
 } } } // end namespace bus::ti99::peb
 

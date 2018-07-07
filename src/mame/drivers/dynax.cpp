@@ -4262,15 +4262,15 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 	MCFG_DEVICE_ADD("mainirq", RST_POS_BUFFER, 0)
 	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT  // MSM5205 reset
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, dynax_state, adpcm_reset_kludge_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w))     // Flip Screen
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, coincounter_0_w))  // Coin Counters
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, coincounter_1_w))  //
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, blitter_ack_w))        // Blitter IRQ Ack
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, dynax_state, blit_palbank_w))       // Layers Palettes (High Bit)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))       // half of the interleaved layer to write to
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();  // MSM5205 reset
+	m_mainlatch->q_out_cb<0>().append(FUNC(dynax_state::adpcm_reset_kludge_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::flipscreen_w));       // Flip Screen
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::coincounter_0_w));    // Coin Counters
+	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::coincounter_1_w));    //
+	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_state::blitter_ack_w));      // Blitter IRQ Ack
+	m_mainlatch->q_out_cb<6>().set(FUNC(dynax_state::blit_palbank_w));     // Layers Palettes (High Bit)
+	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::layer_half_w));       // half of the interleaved layer to write to
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -4815,12 +4815,10 @@ MACHINE_CONFIG_START(dynax_state::mjelctrn)
 
 	MCFG_DEVICE_REMOVE("mainirq")
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
-	MCFG_DEVICE_MODIFY("blitter")
-	MCFG_DYNAX_BLITTER_REV2_READY_CB(WRITELINE("maincpu", tmpz84c015_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("maincpu", tmpz84c015_device, trg2))
+	m_blitter->ready_cb().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
+	m_blitter->ready_cb().append(m_maincpu, FUNC(tmpz84c015_device::trg2));
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 MACHINE_CONFIG_END
@@ -4901,13 +4899,13 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 10C on Ougon no Hai
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, dynax_state, layer_half_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, dynax_state, layer_half2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, dynax_state, tenkai_6c_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, dynax_state, tenkai_70_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, dynax_state, tenkai_blitter_ack_w))
+	LS259(config, m_mainlatch); // 10C on Ougon no Hai
+	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w)).invert();
+	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::layer_half_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::tenkai_6c_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_state::tenkai_70_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::tenkai_blitter_ack_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

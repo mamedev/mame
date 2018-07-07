@@ -16,19 +16,19 @@
 ***************************************************************************/
 
 #define MCFG_E05A03_NLQ_LP_CALLBACK(_write) \
-	devcb = &downcast<e05a03_device &>(*device).set_nlq_lp_wr_callback(DEVCB_##_write);
+	downcast<e05a03_device &>(*device).set_nlq_lp_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A03_PE_LP_CALLBACK(_write) \
-	devcb = &downcast<e05a03_device &>(*device).set_pe_lp_wr_callback(DEVCB_##_write);
+	downcast<e05a03_device &>(*device).set_pe_lp_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A03_RESO_CALLBACK(_write) \
-	devcb = &downcast<e05a03_device &>(*device).set_reso_wr_callback(DEVCB_##_write);
+	downcast<e05a03_device &>(*device).set_reso_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A03_PE_CALLBACK(_write) \
-	devcb = &downcast<e05a03_device &>(*device).set_pe_wr_callback(DEVCB_##_write);
+	downcast<e05a03_device &>(*device).set_pe_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A03_DATA_CALLBACK(_read) \
-	devcb = &downcast<e05a03_device &>(*device).set_data_rd_callback(DEVCB_##_read);
+	downcast<e05a03_device &>(*device).set_data_rd_callback(DEVCB_##_read);
 
 
 /***************************************************************************

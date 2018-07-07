@@ -85,7 +85,7 @@ private:
 };
 
 #define MCFG_ISBC_215_IRQ(_irq_line) \
-	devcb = &downcast<isbc_215g_device &>(*device).set_irq_callback(DEVCB_##_irq_line);
+	downcast<isbc_215g_device &>(*device).set_irq_callback(DEVCB_##_irq_line);
 
 DECLARE_DEVICE_TYPE(ISBC_215G, isbc_215g_device)
 

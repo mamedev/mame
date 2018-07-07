@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_DEVICE_ADD("fdc", WD2793, 16_MHz_XTAL / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic1", pic8259_device, ir6_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
-	MCFG_WD_FDC_ENMF_CALLBACK(GND)
+	MCFG_WD_FDC_ENMF_CALLBACK(CONSTANT(0))
 
 	// floppy drives
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcd_floppies, "55f", pcd_state::floppy_formats)

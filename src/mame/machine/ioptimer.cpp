@@ -9,6 +9,7 @@
 *
 */
 
+#include "emu.h"
 #include "ioptimer.h"
 
 DEFINE_DEVICE_TYPE(SONYIOP_TIMER, iop_timer_device, "ioptimer", "Sony IOP Timer")
@@ -208,18 +209,18 @@ READ32_MEMBER(iop_timer_device::read)
             update_count();
             ret = m_count;
             if (old != m_count)
-                logerror("%s: IOP timer read: COUNT (%08x)\n", machine().describe_context(), ret);
+                logerror("%s: IOP timer read: COUNT (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
             break;
         }
 
         case 0x01:
             ret = m_ctrl | (m_ovf_int ? CTRL_OVFF : 0) | (m_cmp_int ? CTRL_CMPF : 0);
-            logerror("%s: IOP timer read: MODE (%08x)\n", machine().describe_context(), ret);
+            logerror("%s: IOP timer read: MODE (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
             break;
 
         case 0x02:
             ret = m_compare;
-            logerror("%s: IOP timer read: COMPARE (%08x)\n", machine().describe_context(), ret);
+            logerror("%s: IOP timer read: COMPARE (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
             break;
 
         default:
@@ -234,7 +235,7 @@ WRITE32_MEMBER(iop_timer_device::write)
     {
         case 0x00:
             m_count = data;
-            logerror("%s: IOP timer write: COUNT = %08x\n", machine().describe_context(), data);
+            logerror("%s: IOP timer write: COUNT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
             update_compare_timer();
             update_overflow_timer();
             break;
@@ -245,7 +246,7 @@ WRITE32_MEMBER(iop_timer_device::write)
 
         case 0x02:
         {
-            logerror("%s: IOP timer write: COMPARE = %08x\n", machine().describe_context(), data);
+            logerror("%s: IOP timer write: COMPARE = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			if (m_compare == data)
 				break;
 

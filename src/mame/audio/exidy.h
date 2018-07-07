@@ -127,13 +127,13 @@ protected:
 };
 
 #define MCFG_EXIDY_VENTURE_WRITEPA_HANDLER(_devcb) \
-	devcb = &downcast<venture_sound_device &>(*device).set_pa_callback(DEVCB_##_devcb);
+	downcast<venture_sound_device &>(*device).set_pa_callback(DEVCB_##_devcb);
 #define MCFG_EXIDY_VENTURE_WRITEPB_HANDLER(_devcb) \
-	devcb = &downcast<venture_sound_device &>(*device).set_pb_callback(DEVCB_##_devcb);
+	downcast<venture_sound_device &>(*device).set_pb_callback(DEVCB_##_devcb);
 #define MCFG_EXIDY_VENTURE_CA2_HANDLER(_devcb) \
-	devcb = &downcast<venture_sound_device &>(*device).set_ca2_callback(DEVCB_##_devcb);
+	downcast<venture_sound_device &>(*device).set_ca2_callback(DEVCB_##_devcb);
 #define MCFG_EXIDY_VENTURE_CB2_HANDLER(_devcb) \
-	devcb = &downcast<venture_sound_device &>(*device).set_cb2_callback(DEVCB_##_devcb);
+	downcast<venture_sound_device &>(*device).set_cb2_callback(DEVCB_##_devcb);
 
 class venture_sound_device : public exidy_sh8253_sound_device
 {

@@ -494,11 +494,11 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	MCFG_DEVICE_ADD(MM58167_TAG, MM58167, XTAL(32'768))
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, cgc7900_state, irq<0x0>))
 
-	MCFG_DEVICE_ADD(K1135A_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(INS8251_0_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(INS8251_0_TAG, i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(INS8251_1_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(INS8251_1_TAG, i8251_device, write_rxc))
+	com8116_device &k1135a(COM8116(config, K1135A_TAG, XTAL(5'068'800)));
+	k1135a.fr_handler().set(m_i8251_0, FUNC(i8251_device::write_txc));
+	k1135a.fr_handler().append(m_i8251_0, FUNC(i8251_device::write_rxc));
+	k1135a.ft_handler().set(m_i8251_1, FUNC(i8251_device::write_txc));
+	k1135a.ft_handler().append(m_i8251_1, FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD(INS8251_0_TAG, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))

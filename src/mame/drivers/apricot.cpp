@@ -408,15 +408,15 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_DEVICE_ADD("ic31", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("ic91", 0))
 
-	MCFG_DEVICE_ADD("ic16", PIT8253, 0)
-	MCFG_PIT8253_CLK0(4_MHz_XTAL / 16)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("ic31", pic8259_device, ir6_w))
-	MCFG_PIT8253_CLK1(4_MHz_XTAL / 2)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("ic14", ttl153_device, i0a_w))
-	MCFG_PIT8253_CLK2(4_MHz_XTAL / 2)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("ic14", ttl153_device, i0b_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ic14", ttl153_device, i2a_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ic14", ttl153_device, i2b_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(4_MHz_XTAL / 16);
+	m_pit->out_handler<0>().set("ic31", FUNC(pic8259_device::ir6_w));
+	m_pit->set_clk<1>(4_MHz_XTAL / 2);
+	m_pit->out_handler<1>().set("ic14", FUNC(ttl153_device::i0a_w));
+	m_pit->set_clk<2>(4_MHz_XTAL / 2);
+	m_pit->out_handler<2>().set("ic14", FUNC(ttl153_device::i0b_w));
+	m_pit->out_handler<2>().append("ic14", FUNC(ttl153_device::i2a_w));
+	m_pit->out_handler<2>().append("ic14", FUNC(ttl153_device::i2b_w));
 
 	MCFG_DEVICE_ADD("ic14", TTL153)
 	MCFG_TTL153_ZA_CB(WRITELINE("ic15", z80sio_device, rxca_w))
@@ -437,12 +437,12 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("ic31", pic8259_device, ir5_w))
 
 	// rs232 port
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	// note: missing a receive clock callback to support external clock mode (i1 to 153)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("ic15", z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("ic15", z80sio_device, dcda_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("ic15", z80sio_device, synca_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("ic15", z80sio_device, ctsa_w))  MCFG_DEVCB_XOR(1)
+	m_rs232->rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
+	m_rs232->dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
+	m_rs232->dsr_handler().set(m_sio, FUNC(z80sio_device::synca_w));
+	m_rs232->cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w)).invert();
 
 	// keyboard
 	MCFG_APRICOT_KEYBOARD_INTERFACE_ADD("kbd", "hle")

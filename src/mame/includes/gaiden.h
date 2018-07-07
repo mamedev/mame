@@ -6,6 +6,10 @@
     Ninja Gaiden
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_GAIDEN_H
+#define MAME_INCLUDES_GAIDEN_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/74157.h"
@@ -18,8 +22,8 @@
 class gaiden_state : public driver_device
 {
 public:
-	gaiden_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gaiden_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram%u", 1),
 		m_spriteram(*this, "spriteram"),
 		m_adpcm_bank(*this, "adpcm_bank"),
@@ -32,7 +36,7 @@ public:
 		m_mixer(*this, "mixer"),
 		m_msm(*this, "msm%u", 1),
 		m_adpcm_select(*this, "adpcm_select%u", 1)
-		{ }
+	{ }
 
 	void raiga(machine_config &config);
 	void drgnbowl(machine_config &config);
@@ -142,3 +146,5 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
+
+#endif // MAME_INCLUDES_GAIDEN_H

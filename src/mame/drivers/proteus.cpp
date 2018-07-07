@@ -329,9 +329,9 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_DEVICE_PROGRAM_MAP(proteus_z80_mem)
 	MCFG_DEVICE_IO_MAP(proteus_z80_io)
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("z80", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, m_irqs);
+	m_irqs->output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	m_irqs->output_handler().append_inputline(m_z80, INPUT_LINE_IRQ0);
 
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", FD1771, 4_MHz_XTAL / 2)
@@ -380,9 +380,9 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia0", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia0", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia0_clock", CLOCK, 4_MHz_XTAL / 2 / 13) // TODO: this is set using jumpers
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia0", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia0", acia6850_device, write_rxc))
+	clock_device &acia0_clock(CLOCK(config, "acia0_clock", 4_MHz_XTAL / 2 / 13)); // TODO: this is set using jumpers
+	acia0_clock.signal_handler().set(m_acia[0], FUNC(acia6850_device::write_txc));
+	acia0_clock.signal_handler().append(m_acia[0], FUNC(acia6850_device::write_rxc));
 
 	/* printer port */
 	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
@@ -394,9 +394,9 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia1_clock", CLOCK, 4_MHz_XTAL / 2 / 13) // TODO: this is set using jumpers J2
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_rxc))
+	clock_device &acia1_clock(CLOCK(config, "acia1_clock", 4_MHz_XTAL / 2 / 13)); // TODO: this is set using jumpers J2
+	acia1_clock.signal_handler().set(m_acia[1], FUNC(acia6850_device::write_txc));
+	acia1_clock.signal_handler().append(m_acia[1], FUNC(acia6850_device::write_rxc));
 
 	/* modem port */
 	MCFG_DEVICE_ADD("acia2", ACIA6850, 0)
@@ -408,9 +408,9 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia2", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia2_clock", CLOCK, 4_MHz_XTAL / 2 / 13) // TODO: this is set using jumpers J1
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia2", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia2", acia6850_device, write_rxc))
+	clock_device &acia2_clock(CLOCK(config, "acia2_clock", 4_MHz_XTAL / 2 / 13)); // TODO: this is set using jumpers J1
+	acia2_clock.signal_handler().set(m_acia[2], FUNC(acia6850_device::write_txc));
+	acia2_clock.signal_handler().append(m_acia[2], FUNC(acia6850_device::write_rxc));
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "poly_flop")

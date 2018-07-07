@@ -331,15 +331,15 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_PTM6840_O2_CB(WRITELINE(*this, v6809_state, speaker_en_w))
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("acia0", ACIA6850, 0)
+	ACIA6850(config, "acia0", 0);
 
-	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
+	ACIA6850(config, "acia1", 0);
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia0", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia0", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
+	acia_clock.signal_handler().set("acia0", FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append("acia0", FUNC(acia6850_device::write_rxc));
+	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_rxc));
 
 	MCFG_DEVICE_ADD("rtc", MM58274C, 0)
 // this is all guess

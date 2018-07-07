@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
+#ifndef MAME_INCLUDES_MODEL2_H
+#define MAME_INCLUDES_MODEL2_H
+
+#pragma once
+
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
 #include "cpu/i960/i960.h"
@@ -28,8 +33,8 @@ struct triangle;
 class model2_state : public driver_device
 {
 public:
-	model2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	model2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_textureram0(*this, "textureram0"),
 		m_textureram1(*this, "textureram1"),
 		m_workram(*this, "workram"),
@@ -736,3 +741,5 @@ struct quad_m2
 	uint16_t              texheader[4];
 	uint8_t               luma;
 };
+
+#endif // MAME_INCLUDES_MODEL2_H

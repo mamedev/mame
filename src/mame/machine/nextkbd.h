@@ -7,13 +7,13 @@
 
 
 #define MCFG_NEXTKBD_INT_CHANGE_CALLBACK(_write) \
-	devcb = &downcast<nextkbd_device &>(*device).set_int_change_wr_callback(DEVCB_##_write);
+	downcast<nextkbd_device &>(*device).set_int_change_wr_callback(DEVCB_##_write);
 
 #define MCFG_NEXTKBD_INT_POWER_CALLBACK(_write) \
-	devcb = &downcast<nextkbd_device &>(*device).set_int_power_wr_callback(DEVCB_##_write);
+	downcast<nextkbd_device &>(*device).set_int_power_wr_callback(DEVCB_##_write);
 
 #define MCFG_NEXTKBD_INT_NMI_CALLBACK(_write) \
-	devcb = &downcast<nextkbd_device &>(*device).set_int_nmi_wr_callback(DEVCB_##_write);
+	downcast<nextkbd_device &>(*device).set_int_nmi_wr_callback(DEVCB_##_write);
 
 class nextkbd_device : public device_t {
 public:

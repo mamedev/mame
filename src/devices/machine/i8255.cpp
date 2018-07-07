@@ -876,22 +876,20 @@ WRITE8_MEMBER( i8255_device::write )
 
 READ8_MEMBER( i8255_device::pa_r )
 {
-	return pa_r();
+	return read_pa();
 }
 
 
 //-------------------------------------------------
-//  pb_r - port A read
+//  read_pa - port A read
 //-------------------------------------------------
 
-uint8_t i8255_device::pa_r()
+uint8_t i8255_device::read_pa()
 {
 	uint8_t data = 0xff;
 
 	if (port_mode(PORT_A) == MODE_OUTPUT)
-	{
 		data = m_output[PORT_A];
-	}
 
 	return data;
 }
@@ -903,15 +901,15 @@ uint8_t i8255_device::pa_r()
 
 READ8_MEMBER( i8255_device::pb_r )
 {
-	return pb_r();
+	return read_pb();
 }
 
 
 //-------------------------------------------------
-//  pb_r - port B read
+//  read_pb - port B read
 //-------------------------------------------------
 
-uint8_t i8255_device::pb_r()
+uint8_t i8255_device::read_pb()
 {
 	uint8_t data = 0xff;
 

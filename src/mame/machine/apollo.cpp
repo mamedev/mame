@@ -1084,14 +1084,14 @@ MACHINE_CONFIG_START(apollo_state::common)
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, apollo_state, pc_dack6_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, apollo_state, pc_dack7_w))
 
-	MCFG_DEVICE_ADD(APOLLO_PIC1_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, apollo_state, apollo_pic8259_master_set_int_line))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, apollo_state, apollo_pic8259_get_slave_ack))
+	PIC8259(config, m_pic8259_master, 0);
+	m_pic8259_master->out_int_callback().set(FUNC(apollo_state::apollo_pic8259_master_set_int_line));
+	m_pic8259_master->in_sp_callback().set_constant(1);
+	m_pic8259_master->read_slave_ack_callback().set(FUNC(apollo_state::apollo_pic8259_get_slave_ack));
 
-	MCFG_DEVICE_ADD(APOLLO_PIC2_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, apollo_state, apollo_pic8259_slave_set_int_line))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	PIC8259(config, m_pic8259_slave, 0);
+	m_pic8259_slave->out_int_callback().set(FUNC(apollo_state::apollo_pic8259_slave_set_int_line));
+	m_pic8259_slave->in_sp_callback().set_constant(0);
 
 	MCFG_DEVICE_ADD(APOLLO_PTM_TAG, PTM6840, 0)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 125000, 62500)

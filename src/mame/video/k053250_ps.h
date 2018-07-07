@@ -17,7 +17,7 @@
 	downcast<k053250ps_device &>(*device).set_offsets(offx, offy);
 
 #define MCFG_K053250PS_DMAIRQ_CB(_cb) \
-	devcb = &downcast<k053250ps_device &>(*device).set_dmairq_cb(DEVCB_##_cb);
+	downcast<k053250ps_device &>(*device).set_dmairq_cb(DEVCB_##_cb);
 
 class k053250ps_device :  public device_t,
 						public device_gfx_interface,
