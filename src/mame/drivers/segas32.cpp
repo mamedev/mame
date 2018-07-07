@@ -2207,26 +2207,26 @@ MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(system32_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas32_state,  start_of_vblank_int)
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(system32_sound_map)
-	MCFG_DEVICE_IO_MAP(system32_sound_portmap)
+	Z80(config, m_soundcpu, MASTER_CLOCK/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas32_state::system32_sound_portmap);
 
-	MCFG_DEVICE_ADD("io_chip", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1_A"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2_A"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("PORTC_A"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas32_state, misc_output_0_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(6)
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE12_A"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("SERVICE34_A"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, segas32_state, sw2_output_0_w))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segas32_state, tilebank_external_w))
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas32_state, display_enable_0_w))
-	MCFG_315_5296_OUT_CNT2_CB(INPUTLINE("soundcpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	sega_315_5296_device &io_chip(SEGA_315_5296(config, "io_chip", 0)); // unknown clock
+	io_chip.in_pa_callback().set_ioport("P1_A");
+	io_chip.in_pb_callback().set_ioport("P2_A");
+	io_chip.in_pc_callback().set_ioport("PORTC_A");
+	io_chip.out_pd_callback().set(FUNC(segas32_state::misc_output_0_w));
+	io_chip.out_pd_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(7);
+	io_chip.out_pd_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(5);
+	io_chip.out_pd_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(6);
+	io_chip.in_pe_callback().set_ioport("SERVICE12_A");
+	io_chip.in_pf_callback().set_ioport("SERVICE34_A");
+	io_chip.out_pg_callback().set(FUNC(segas32_state::sw2_output_0_w));
+	io_chip.out_ph_callback().set(FUNC(segas32_state::tilebank_external_w));
+	io_chip.out_cnt1_callback().set(FUNC(segas32_state::display_enable_0_w));
+	io_chip.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_SERIAL_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
@@ -2524,32 +2524,32 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(multi32_sound_map)
 	MCFG_DEVICE_IO_MAP(multi32_sound_portmap)
 
-	MCFG_DEVICE_ADD("io_chip_0", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1_A"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2_A"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("PORTC_A"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas32_state, misc_output_0_w))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE12_A"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("SERVICE34_A"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, segas32_state, sw2_output_0_w))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segas32_state, tilebank_external_w))
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas32_state, display_enable_0_w))
-	MCFG_315_5296_OUT_CNT2_CB(INPUTLINE("soundcpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	sega_315_5296_device &io_chip_0(SEGA_315_5296(config, "io_chip_0", 0)); // unknown clock
+	io_chip_0.in_pa_callback().set_ioport("P1_A");
+	io_chip_0.in_pb_callback().set_ioport("P2_A");
+	io_chip_0.in_pc_callback().set_ioport("PORTC_A");
+	io_chip_0.out_pd_callback().set(FUNC(segas32_state::misc_output_0_w));
+	io_chip_0.in_pe_callback().set_ioport("SERVICE12_A");
+	io_chip_0.in_pf_callback().set_ioport("SERVICE34_A");
+	io_chip_0.out_pg_callback().set(FUNC(segas32_state::sw2_output_0_w));
+	io_chip_0.out_ph_callback().set(FUNC(segas32_state::tilebank_external_w));
+	io_chip_0.out_cnt1_callback().set(FUNC(segas32_state::display_enable_0_w));
+	io_chip_0.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_DEVICE_ADD("io_chip_1", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1_B"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2_B"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("PORTC_B"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas32_state, misc_output_1_w))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE12_B"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("SERVICE34_B"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, segas32_state, sw2_output_1_w))
-	MCFG_315_5296_OUT_PORTH_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(6)
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas32_state, display_enable_1_w))
+	sega_315_5296_device &io_chip_1(SEGA_315_5296(config, "io_chip_1", 0)); // unknown clock
+	io_chip_1.in_pa_callback().set_ioport("P1_B");
+	io_chip_1.in_pb_callback().set_ioport("P2_B");
+	io_chip_1.in_pc_callback().set_ioport("PORTC_B");
+	io_chip_1.out_pd_callback().set(FUNC(segas32_state::misc_output_1_w));
+	io_chip_1.in_pe_callback().set_ioport("SERVICE12_B");
+	io_chip_1.in_pf_callback().set_ioport("SERVICE34_B");
+	io_chip_1.out_pg_callback().set(FUNC(segas32_state::sw2_output_1_w));
+	io_chip_1.out_ph_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(7);
+	io_chip_1.out_ph_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(5);
+	io_chip_1.out_ph_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(6);
+	io_chip_1.out_cnt1_callback().set(FUNC(segas32_state::display_enable_1_w));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_SERIAL_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
@@ -2685,8 +2685,18 @@ public:
 		, m_slavepcb(*this, "slavepcb")
 	{ }
 
-	required_device<segas32_state> m_mainpcb;
-	optional_device<segas32_state> m_slavepcb;
+	void sega_multi32(machine_config &config);
+	void sega_system32(machine_config &config);
+	void sega_multi32_analog(machine_config &config);
+	void sega_multi32_6p(machine_config &config);
+	void sega_system32_dual_direct_upd7725(machine_config &config);
+	void sega_system32_dual_direct(machine_config &config);
+	void sega_system32_track(machine_config &config);
+	void sega_system32_ga2(machine_config &config);
+	void sega_system32_cd(machine_config &config);
+	void sega_system32_arf(machine_config &config);
+	void sega_system32_analog(machine_config &config);
+	void sega_system32_4p(machine_config &config);
 
 	void init_titlef();
 	void init_slipstrm();
@@ -2712,25 +2722,15 @@ public:
 	void init_f1lap();
 	void init_orunners();
 
+private:
+	required_device<segas32_state> m_mainpcb;
+	optional_device<segas32_state> m_slavepcb;
+
 	std::unique_ptr<uint16_t[]> m_dual_pcb_comms;
 	DECLARE_WRITE16_MEMBER(dual_pcb_comms_w);
 	DECLARE_READ16_MEMBER(dual_pcb_comms_r);
 	DECLARE_READ16_MEMBER(dual_pcb_masterslave);
 	DECLARE_READ16_MEMBER(dual_pcb_slave);
-
-
-	void sega_multi32(machine_config &config);
-	void sega_system32(machine_config &config);
-	void sega_multi32_analog(machine_config &config);
-	void sega_multi32_6p(machine_config &config);
-	void sega_system32_dual_direct_upd7725(machine_config &config);
-	void sega_system32_dual_direct(machine_config &config);
-	void sega_system32_track(machine_config &config);
-	void sega_system32_ga2(machine_config &config);
-	void sega_system32_cd(machine_config &config);
-	void sega_system32_arf(machine_config &config);
-	void sega_system32_analog(machine_config &config);
-	void sega_system32_4p(machine_config &config);
 };
 
 

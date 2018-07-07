@@ -31,10 +31,10 @@
 //**************************************************************************
 
 #define MCFG_TTL166_DATA_CB(_devcb) \
-	devcb = &downcast<ttl166_device &>(*device).set_data_callback(DEVCB_##_devcb);
+	downcast<ttl166_device &>(*device).set_data_callback(DEVCB_##_devcb);
 
 #define MCFG_TTL166_QH_CB(_devcb) \
-	devcb = &downcast<ttl166_device &>(*device).set_qh_callback(DEVCB_##_devcb);
+	downcast<ttl166_device &>(*device).set_qh_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

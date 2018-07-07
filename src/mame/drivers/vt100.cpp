@@ -75,6 +75,13 @@ public:
 	{
 	}
 
+	void vt100(machine_config &config);
+	void vt100ac(machine_config &config);
+	void vt101(machine_config &config);
+	void vt102(machine_config &config);
+	void vt180(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
 	required_device<vt100_keyboard_device> m_keyboard;
@@ -97,11 +104,6 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(vt102_irq_callback);
-	void vt100(machine_config &config);
-	void vt100ac(machine_config &config);
-	void vt101(machine_config &config);
-	void vt102(machine_config &config);
-	void vt180(machine_config &config);
 	void vt100_mem(address_map &map);
 	void vt100_io(address_map &map);
 	void vt102_io(address_map &map);
@@ -349,11 +351,11 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("pusart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("pusart", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD("dbrg", COM5016_013, XTAL(24'883'200) / 9) // COM5016T-013 (or WD1943CD-02), 2.7648Mhz Clock
-	MCFG_COM8116_FR_HANDLER(WRITELINE("pusart", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("pusart", i8251_device, write_txc))
+	com8116_device &dbrg(COM5016_013(config, "dbrg", XTAL(24'883'200) / 9)); // COM5016T-013 (or WD1943CD-02), 2.7648Mhz Clock
+	dbrg.fr_handler().set(m_pusart, FUNC(i8251_device::write_rxc));
+	dbrg.ft_handler().set(m_pusart, FUNC(i8251_device::write_txc));
 
-	MCFG_DEVICE_ADD("nvr", ER1400, 0)
+	ER1400(config, m_nvr, 0);
 
 	MCFG_DEVICE_ADD("keyboard", VT100_KEYBOARD, 0)
 	MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(WRITELINE("kbduart", ay31015_device, write_si))
@@ -401,21 +403,17 @@ MACHINE_CONFIG_START(vt100_state::vt100ac)
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE("stprxint", input_merger_device, in_w<2>))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE("stptxint", input_merger_device, in_w<2>))
 
-	MCFG_INPUT_MERGER_ANY_HIGH("stptxint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("stpcpu", I8085_RST55_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "stptxint").output_handler().set_inputline("stpcpu", I8085_RST55_LINE);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("stprxint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("stpcpu", I8085_RST65_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "stprxint").output_handler().set_inputline("stpcpu", I8085_RST65_LINE);
 
-	MCFG_DEVICE_MODIFY("dbrg")
-	MCFG_COM8116_FR_HANDLER(WRITELINE("pusart", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart0", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart1", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart2", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("pusart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart0", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("stpusart2", i8251_device, write_txc))
+	com8116_device &dbrg(*subdevice<com8116_device>("dbrg"));
+	dbrg.fr_handler().append("stpusart0", FUNC(i8251_device::write_rxc));
+	dbrg.fr_handler().append("stpusart1", FUNC(i8251_device::write_rxc));
+	dbrg.fr_handler().append("stpusart2", FUNC(i8251_device::write_rxc));
+	dbrg.ft_handler().append("stpusart0", FUNC(i8251_device::write_txc));
+	dbrg.ft_handler().append("stpusart1", FUNC(i8251_device::write_txc));
+	dbrg.ft_handler().append("stpusart2", FUNC(i8251_device::write_txc));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt100_state::vt180)

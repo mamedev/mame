@@ -42,13 +42,13 @@
 //**************************************************************************
 
 #define MCFG_CDP1861_RD_CALLBACK(_read) \
-	devcb = &downcast<cdp1862_device &>(*device).set_rd_rd_callback(DEVCB_##_read);
+	downcast<cdp1862_device &>(*device).set_rd_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1861_BD_CALLBACK(_read) \
-	devcb = &downcast<cdp1862_device &>(*device).set_bd_rd_callback(DEVCB_##_read);
+	downcast<cdp1862_device &>(*device).set_bd_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1861_GD_CALLBACK(_read) \
-	devcb = &downcast<cdp1862_device &>(*device).set_gd_rd_callback(DEVCB_##_read);
+	downcast<cdp1862_device &>(*device).set_gd_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1862_LUMINANCE(_r, _b, _g, _bkg) \
 	downcast<cdp1862_device &>(*device).set_luminance(_r, _b, _g, _bkg);

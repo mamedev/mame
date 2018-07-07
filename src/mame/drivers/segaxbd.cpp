@@ -360,7 +360,14 @@ public:
 	{
 	}
 
-	required_device<segaxbd_state> m_mainpcb;
+	void sega_smgp_fd1094(machine_config &config);
+	void sega_lastsurv_fd1094(machine_config &config);
+	void sega_lastsurv(machine_config &config);
+	void sega_xboard(machine_config &config);
+	void sega_aburner2(machine_config &config);
+	void sega_xboard_fd1094(machine_config &config);
+	void sega_rascot(machine_config &config);
+	void sega_smgp(machine_config &config);
 
 	// game-specific driver init
 	void init_generic();
@@ -371,14 +378,8 @@ public:
 	void init_rascot();
 	void init_gprider();
 
-	void sega_smgp_fd1094(machine_config &config);
-	void sega_lastsurv_fd1094(machine_config &config);
-	void sega_lastsurv(machine_config &config);
-	void sega_xboard(machine_config &config);
-	void sega_aburner2(machine_config &config);
-	void sega_xboard_fd1094(machine_config &config);
-	void sega_rascot(machine_config &config);
-	void sega_smgp(machine_config &config);
+protected:
+	required_device<segaxbd_state> m_mainpcb;
 };
 
 class segaxbd_new_state_double : public segaxbd_new_state
@@ -396,6 +397,11 @@ public:
 		rampage2 = 0x0000;
 	}
 
+	void sega_xboard_fd1094_double(machine_config &config);
+
+	void init_gprider_double();
+
+private:
 	required_device<segaxbd_state> m_subpcb;
 
 	DECLARE_READ16_MEMBER(shareram1_r) {
@@ -429,12 +435,9 @@ public:
 		}
 	}
 
-	void init_gprider_double();
-
 	uint16_t shareram[0x800];
 	uint16_t rampage1;
 	uint16_t rampage2;
-	void sega_xboard_fd1094_double(machine_config &config);
 };
 
 //**************************************************************************
@@ -926,7 +929,7 @@ void segaxbd_state::main_map(address_map &map)
 	map(0x0d0000, 0x0d0fff).mirror(0x00f000).rw("segaic16vid", FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
 	map(0x0e0000, 0x0e0007).mirror(0x003ff8).rw("multiplier_main", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
 	map(0x0e4000, 0x0e401f).mirror(0x003fe0).rw("divider_main", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
-	map(0x0e8000, 0x0e801f).mirror(0x003fe0).rw("cmptimer_main", FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
+	map(0x0e8000, 0x0e801f).mirror(0x003fe0).rw(m_cmptimer_1, FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
 	map(0x100000, 0x100fff).mirror(0x00f000).ram().share("sprites");
 	map(0x110000, 0x11ffff).w("sprites", FUNC(sega_xboard_sprite_device::draw_write));
 	map(0x120000, 0x123fff).mirror(0x00c000).ram().w(FUNC(segaxbd_state::paletteram_w)).share("paletteram");
@@ -990,7 +993,7 @@ void segaxbd_state::sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x40, 0x40).mirror(0x3f).r("cmptimer_main", FUNC(sega_315_5250_compare_timer_device::zread));
+	map(0x40, 0x40).mirror(0x3f).r(m_cmptimer_1, FUNC(sega_315_5250_compare_timer_device::zread));
 }
 
 
@@ -1014,7 +1017,7 @@ void segaxbd_state::smgp_sound2_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(0x3f).r("cmptimer_main", FUNC(sega_315_5250_compare_timer_device::zread));
+	map(0x40, 0x40).mirror(0x3f).r(m_cmptimer_1, FUNC(sega_315_5250_compare_timer_device::zread));
 }
 
 
@@ -1682,11 +1685,11 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_main")
 	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_subx")
 
-	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_main")
-	MCFG_SEGA_315_5250_68KINT_CALLBACK(WRITELINE(*this, segaxbd_state, timer_irq_w))
-	MCFG_SEGA_315_5250_ZINT_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
+	m_cmptimer_1->m68kint_callback().set(FUNC(segaxbd_state::timer_irq_w));
+	m_cmptimer_1->zint_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_subx")
+	SEGA_315_5250_COMPARE_TIMER(config, "cmptimer_subx", 0);
 
 	MCFG_DEVICE_ADD("iochip_0", CXD1095, 0) // IC160
 	MCFG_CXD1095_IN_PORTA_CB(IOPORT("IO0PORTA"))
@@ -1897,9 +1900,7 @@ MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(smgp_airdrive_map)
 	MCFG_DEVICE_IO_MAP(smgp_airdrive_portmap)
 
-	MCFG_DEVICE_MODIFY("cmptimer_main")
-	MCFG_SEGA_315_5250_ZINT_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("soundcpu2", INPUT_LINE_NMI))
+	m_cmptimer_1->zint_callback().append_inputline(m_soundcpu2, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_MODIFY("iochip_0")
 	MCFG_CXD1095_IN_PORTA_CB(READ8(*this, segaxbd_state, smgp_motor_r))
@@ -1943,9 +1944,7 @@ MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(smgp_airdrive_map)
 	MCFG_DEVICE_IO_MAP(smgp_airdrive_portmap)
 
-	MCFG_DEVICE_MODIFY("cmptimer_main")
-	MCFG_SEGA_315_5250_ZINT_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("soundcpu2", INPUT_LINE_NMI))
+	m_cmptimer_1->zint_callback().append_inputline(m_soundcpu2, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_MODIFY("iochip_0")
 	MCFG_CXD1095_IN_PORTA_CB(READ8(*this, segaxbd_state, smgp_motor_r))

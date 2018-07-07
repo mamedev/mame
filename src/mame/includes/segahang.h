@@ -43,34 +43,6 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	// PPI read/write callbacks
-	DECLARE_WRITE8_MEMBER( video_lamps_w );
-	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
-	DECLARE_WRITE8_MEMBER( sub_control_adc_w );
-	DECLARE_READ8_MEMBER( adc_status_r );
-
-	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER( hangon_io_r );
-	DECLARE_WRITE16_MEMBER( hangon_io_w );
-	DECLARE_READ16_MEMBER( sharrier_io_r );
-	DECLARE_WRITE16_MEMBER( sharrier_io_w );
-
-	// Z80 sound CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
-
-	// I8751-related VBLANK interrupt handlers
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
-
-	// game-specific driver init
-	void init_generic();
-	void init_sharrier();
-	void init_enduror();
-	void init_endurobl();
-	void init_endurob2();
-
-	// video updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void sound_board_2203(machine_config &config);
 	void sound_board_2203x2(machine_config &config);
 	void sound_board_2151(machine_config &config);
@@ -89,6 +61,36 @@ public:
 	void endurobl(machine_config &config);
 	void enduror1(machine_config &config);
 	void hangon(machine_config &config);
+
+	// game-specific driver init
+	void init_generic();
+	void init_sharrier();
+	void init_enduror();
+	void init_endurobl();
+	void init_endurob2();
+
+private:
+	// PPI read/write callbacks
+	DECLARE_WRITE8_MEMBER( video_lamps_w );
+	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
+	DECLARE_WRITE8_MEMBER( sub_control_adc_w );
+	DECLARE_READ8_MEMBER( adc_status_r );
+
+	// main CPU read/write handlers
+	DECLARE_READ16_MEMBER( hangon_io_r );
+	DECLARE_WRITE16_MEMBER( hangon_io_w );
+	DECLARE_READ16_MEMBER( sharrier_io_r );
+	DECLARE_WRITE16_MEMBER( sharrier_io_w );
+
+	// Z80 sound CPU read/write handlers
+	DECLARE_READ8_MEMBER( sound_data_r );
+
+	// I8751-related VBLANK interrupt handlers
+	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+
+	// video updates
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void decrypted_opcodes_map(address_map &map);
 	void fd1094_decrypted_opcodes_map(address_map &map);
 	void hangon_map(address_map &map);
@@ -100,7 +102,7 @@ public:
 	void sound_portmap_2203(address_map &map);
 	void sound_portmap_2203x2(address_map &map);
 	void sub_map(address_map &map);
-protected:
+
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
 

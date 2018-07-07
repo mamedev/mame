@@ -34,7 +34,7 @@
 #define PROJECT_48STEP_REEL     10
 
 #define MCFG_STEPPER_OPTIC_CALLBACK(_write) \
-	devcb = &downcast<stepper_device &>(*device).set_optic_handler(DEVCB_##_write);
+	downcast<stepper_device &>(*device).set_optic_handler(DEVCB_##_write);
 
 class stepper_device : public device_t
 {

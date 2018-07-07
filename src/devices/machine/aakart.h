@@ -18,10 +18,10 @@ Acorn Archimedes KART interface
 //**************************************************************************
 
 #define MCFG_AAKART_OUT_TX_CB(_devcb) \
-	devcb = &downcast<aakart_device &>(*device).set_out_tx_callback(DEVCB_##_devcb);
+	downcast<aakart_device &>(*device).set_out_tx_callback(DEVCB_##_devcb);
 
 #define MCFG_AAKART_OUT_RX_CB(_devcb) \
-	devcb = &downcast<aakart_device &>(*device).set_out_rx_callback(DEVCB_##_devcb);
+	downcast<aakart_device &>(*device).set_out_rx_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

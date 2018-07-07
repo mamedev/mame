@@ -71,13 +71,13 @@
 //**************************************************************************
 
 #define MCFG_64H156_ATN_CALLBACK(_write) \
-	devcb = &downcast<c64h156_device &>(*device).set_atn_wr_callback(DEVCB_##_write);
+	downcast<c64h156_device &>(*device).set_atn_wr_callback(DEVCB_##_write);
 
 #define MCFG_64H156_SYNC_CALLBACK(_write) \
-	devcb = &downcast<c64h156_device &>(*device).set_sync_wr_callback(DEVCB_##_write);
+	downcast<c64h156_device &>(*device).set_sync_wr_callback(DEVCB_##_write);
 
 #define MCFG_64H156_BYTE_CALLBACK(_write) \
-	devcb = &downcast<c64h156_device &>(*device).set_byte_wr_callback(DEVCB_##_write);
+	downcast<c64h156_device &>(*device).set_byte_wr_callback(DEVCB_##_write);
 
 
 

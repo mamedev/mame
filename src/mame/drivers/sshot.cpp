@@ -179,6 +179,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void supershot(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t   *m_tilemap;
 	DECLARE_WRITE8_MEMBER(supershot_vidram_w);
@@ -189,7 +192,6 @@ public:
 	uint32_t screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void supershot(machine_config &config);
 	void supershot_map(address_map &map);
 };
 

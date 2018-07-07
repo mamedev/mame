@@ -19,7 +19,7 @@
 //**************************************************************************
 
 #define MCFG_UPD934G_DATA_CB(_devcb) \
-	devcb = &downcast<upd934g_device &>(*device).set_data_callback(DEVCB_##_devcb);
+	downcast<upd934g_device &>(*device).set_data_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

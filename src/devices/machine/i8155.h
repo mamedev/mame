@@ -41,25 +41,25 @@
 //**************************************************************************
 
 #define MCFG_I8155_IN_PORTA_CB(_devcb) \
-	devcb = &downcast<i8155_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
+	downcast<i8155_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_I8155_IN_PORTB_CB(_devcb) \
-	devcb = &downcast<i8155_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
+	downcast<i8155_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_I8155_IN_PORTC_CB(_devcb) \
-	devcb = &downcast<i8155_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
+	downcast<i8155_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_I8155_OUT_PORTA_CB(_devcb) \
-	devcb = &downcast<i8155_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
+	downcast<i8155_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_I8155_OUT_PORTB_CB(_devcb) \
-	devcb = &downcast<i8155_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
+	downcast<i8155_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_I8155_OUT_PORTC_CB(_devcb) \
-	devcb = &downcast<i8155_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
+	downcast<i8155_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_I8155_OUT_TIMEROUT_CB(_devcb) \
-	devcb = &downcast<i8155_device &>(*device).set_out_to_callback(DEVCB_##_devcb);
+	downcast<i8155_device &>(*device).set_out_to_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -82,6 +82,13 @@ public:
 	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_pc_callback(Object &&cb) { return m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_to_callback(Object &&cb) { return m_out_to_cb.set_callback(std::forward<Object>(cb)); }
+	auto in_pa_callback()  { return m_in_pa_cb.bind(); }
+	auto in_pb_callback()  { return m_in_pb_cb.bind(); }
+	auto in_pc_callback()  { return m_in_pc_cb.bind(); }
+	auto out_pa_callback() { return m_out_pa_cb.bind(); }
+	auto out_pb_callback() { return m_out_pb_cb.bind(); }
+	auto out_pc_callback() { return m_out_pc_cb.bind(); }
+	auto out_to_callback() { return m_out_to_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );

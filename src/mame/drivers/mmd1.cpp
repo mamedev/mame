@@ -523,8 +523,8 @@ MACHINE_CONFIG_START(mmd1_state::mmd2)
 	MCFG_I8279_OUT_SL_CB(WRITE8(*this, mmd1_state, mmd2_scanlines_w))          // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, mmd1_state, mmd2_digit_w))            // display A&B
 	MCFG_I8279_IN_RL_CB(READ8(*this, mmd1_state, mmd2_kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	MCFG_I8279_IN_SHIFT_CB(CONSTANT(1))                                     // Shift key
+	MCFG_I8279_IN_CTRL_CB(CONSTANT(1))
 
 MACHINE_CONFIG_END
 

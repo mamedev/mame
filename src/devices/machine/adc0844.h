@@ -34,19 +34,19 @@
 	MCFG_DEVICE_ADD(_tag, ADC0844, 0)
 
 #define MCFG_ADC0844_INTR_CB(_devcb) \
-	devcb = &downcast<adc0844_device &>(*device).set_intr_callback(DEVCB_##_devcb);
+	downcast<adc0844_device &>(*device).set_intr_callback(DEVCB_##_devcb);
 
 #define MCFG_ADC0844_CH1_CB(_devcb) \
-	devcb = &downcast<adc0844_device &>(*device).set_ch1_callback(DEVCB_##_devcb);
+	downcast<adc0844_device &>(*device).set_ch1_callback(DEVCB_##_devcb);
 
 #define MCFG_ADC0844_CH2_CB(_devcb) \
-	devcb = &downcast<adc0844_device &>(*device).set_ch2_callback(DEVCB_##_devcb);
+	downcast<adc0844_device &>(*device).set_ch2_callback(DEVCB_##_devcb);
 
 #define MCFG_ADC0844_CH3_CB(_devcb) \
-	devcb = &downcast<adc0844_device &>(*device).set_ch3_callback(DEVCB_##_devcb);
+	downcast<adc0844_device &>(*device).set_ch3_callback(DEVCB_##_devcb);
 
 #define MCFG_ADC0844_CH4_CB(_devcb) \
-	devcb = &downcast<adc0844_device &>(*device).set_ch4_callback(DEVCB_##_devcb);
+	downcast<adc0844_device &>(*device).set_ch4_callback(DEVCB_##_devcb);
 
 #define MCFG_ADC0848_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, ADC0848, 0)
@@ -58,16 +58,16 @@
 #define MCFG_ADC0848_CH4_CB  MCFG_ADC0844_CH4_CB
 
 #define MCFG_ADC0848_CH5_CB(_devcb) \
-	devcb = &downcast<adc0848_device &>(*device).set_ch5_callback(DEVCB_##_devcb);
+	downcast<adc0848_device &>(*device).set_ch5_callback(DEVCB_##_devcb);
 
 #define MCFG_ADC0848_CH6_CB(_devcb) \
-	devcb = &downcast<adc0848_device &>(*device).set_ch6_callback(DEVCB_##_devcb);
+	downcast<adc0848_device &>(*device).set_ch6_callback(DEVCB_##_devcb);
 
 #define MCFG_ADC0848_CH7_CB(_devcb) \
-	devcb = &downcast<adc0848_device &>(*device).set_ch7_callback(DEVCB_##_devcb);
+	downcast<adc0848_device &>(*device).set_ch7_callback(DEVCB_##_devcb);
 
 #define MCFG_ADC0848_CH8_CB(_devcb) \
-	devcb = &downcast<adc0848_device &>(*device).set_ch8_callback(DEVCB_##_devcb);
+	downcast<adc0848_device &>(*device).set_ch8_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

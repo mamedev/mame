@@ -177,25 +177,25 @@ void williams_cvsd_sound_device::williams_cvsd_map(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(williams_cvsd_sound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cpu", MC6809E, CVSD_MASTER_CLOCK / 4)
+	MCFG_DEVICE_ADD(m_cpu, MC6809E, CVSD_MASTER_CLOCK / 4)
 	MCFG_DEVICE_PROGRAM_MAP(williams_cvsd_map)
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, williams_cvsd_sound_device, talkback_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("cpu", M6809_FIRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("cpu", INPUT_LINE_NMI))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pia->writepb_handler().set(FUNC(williams_cvsd_sound_device::talkback_w));
+	m_pia->irqa_handler().set_inputline(m_cpu, M6809_FIRQ_LINE);
+	m_pia->irqb_handler().set_inputline(m_cpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym2151", YM2151, CVSD_FM_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("pia", pia6821_device, ca1_w)) MCFG_DEVCB_INVERT // IRQ is not true state
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.10)
+	ym2151_device &ym(YM2151(config, "ym2151", CVSD_FM_CLOCK));
+	ym.irq_handler().set(m_pia, FUNC(pia6821_device::ca1_w)).invert(); // IRQ is not true state
+	ym.add_route(ALL_OUTPUTS, *this, 0.10);
 
-	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_DEVICE_ADD("cvsd", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.60)
+	HC55516(config, m_hc55516, 0);
+	m_hc55516->add_route(ALL_OUTPUTS, *this, 0.60);
 MACHINE_CONFIG_END
 
 

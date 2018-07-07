@@ -18,34 +18,34 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 #define MCFG_TTL74145_OUTPUT_LINE_0_CB(_devcb) \
-	devcb = &downcast<ttl74145_device &>(*device).set_output_line_0_callback(DEVCB_##_devcb);
+	downcast<ttl74145_device &>(*device).set_output_line_0_callback(DEVCB_##_devcb);
 
 #define MCFG_TTL74145_OUTPUT_LINE_1_CB(_devcb) \
-	devcb = &downcast<ttl74145_device &>(*device).set_output_line_1_callback(DEVCB_##_devcb);
+	downcast<ttl74145_device &>(*device).set_output_line_1_callback(DEVCB_##_devcb);
 
 #define MCFG_TTL74145_OUTPUT_LINE_2_CB(_devcb) \
-	devcb = &downcast<ttl74145_device &>(*device).set_output_line_2_callback(DEVCB_##_devcb);
+	downcast<ttl74145_device &>(*device).set_output_line_2_callback(DEVCB_##_devcb);
 
 #define MCFG_TTL74145_OUTPUT_LINE_3_CB(_devcb) \
-	devcb = &downcast<ttl74145_device &>(*device).set_output_line_3_callback(DEVCB_##_devcb);
+	downcast<ttl74145_device &>(*device).set_output_line_3_callback(DEVCB_##_devcb);
 
 #define MCFG_TTL74145_OUTPUT_LINE_4_CB(_devcb) \
-	devcb = &downcast<ttl74145_device &>(*device).set_output_line_4_callback(DEVCB_##_devcb);
+	downcast<ttl74145_device &>(*device).set_output_line_4_callback(DEVCB_##_devcb);
 
 #define MCFG_TTL74145_OUTPUT_LINE_5_CB(_devcb) \
-	devcb = &downcast<ttl74145_device &>(*device).set_output_line_5_callback(DEVCB_##_devcb);
+	downcast<ttl74145_device &>(*device).set_output_line_5_callback(DEVCB_##_devcb);
 
 #define MCFG_TTL74145_OUTPUT_LINE_6_CB(_devcb) \
-	devcb = &downcast<ttl74145_device &>(*device).set_output_line_6_callback(DEVCB_##_devcb);
+	downcast<ttl74145_device &>(*device).set_output_line_6_callback(DEVCB_##_devcb);
 
 #define MCFG_TTL74145_OUTPUT_LINE_7_CB(_devcb) \
-	devcb = &downcast<ttl74145_device &>(*device).set_output_line_7_callback(DEVCB_##_devcb);
+	downcast<ttl74145_device &>(*device).set_output_line_7_callback(DEVCB_##_devcb);
 
 #define MCFG_TTL74145_OUTPUT_LINE_8_CB(_devcb) \
-	devcb = &downcast<ttl74145_device &>(*device).set_output_line_8_callback(DEVCB_##_devcb);
+	downcast<ttl74145_device &>(*device).set_output_line_8_callback(DEVCB_##_devcb);
 
 #define MCFG_TTL74145_OUTPUT_LINE_9_CB(_devcb) \
-	devcb = &downcast<ttl74145_device &>(*device).set_output_line_9_callback(DEVCB_##_devcb);
+	downcast<ttl74145_device &>(*device).set_output_line_9_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

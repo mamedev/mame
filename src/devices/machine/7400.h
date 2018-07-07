@@ -35,16 +35,16 @@
 
 
 #define MCFG_7400_Y1_CB(_devcb) \
-	devcb = &downcast<ttl7400_device &>(*device).set_y1_cb(DEVCB_##_devcb);
+	downcast<ttl7400_device &>(*device).set_y1_cb(DEVCB_##_devcb);
 
 #define MCFG_7400_Y2_CB(_devcb) \
-	devcb = &downcast<ttl7400_device &>(*device).set_y2_cb(DEVCB_##_devcb);
+	downcast<ttl7400_device &>(*device).set_y2_cb(DEVCB_##_devcb);
 
 #define MCFG_7400_Y3_CB(_devcb) \
-	devcb = &downcast<ttl7400_device &>(*device).set_y3_cb(DEVCB_##_devcb);
+	downcast<ttl7400_device &>(*device).set_y3_cb(DEVCB_##_devcb);
 
 #define MCFG_7400_Y4_CB(_devcb) \
-	devcb = &downcast<ttl7400_device &>(*device).set_y4_cb(DEVCB_##_devcb);
+	downcast<ttl7400_device &>(*device).set_y4_cb(DEVCB_##_devcb);
 
 
 class ttl7400_device : public device_t

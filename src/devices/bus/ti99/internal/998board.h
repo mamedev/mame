@@ -702,16 +702,16 @@ private:
 } } } // end namespace bus::ti99::internal
 
 #define MCFG_MAINBOARD8_READY_CALLBACK(_write) \
-	devcb = &downcast<bus::ti99::internal::mainboard8_device &>(*device).set_ready_wr_callback(DEVCB_##_write);
+	downcast<bus::ti99::internal::mainboard8_device &>(*device).set_ready_wr_callback(DEVCB_##_write);
 
 #define MCFG_MAINBOARD8_RESET_CALLBACK(_write) \
-	devcb = &downcast<bus::ti99::internal::mainboard8_device &>(*device).set_reset_wr_callback(DEVCB_##_write);
+	downcast<bus::ti99::internal::mainboard8_device &>(*device).set_reset_wr_callback(DEVCB_##_write);
 
 #define MCFG_MAINBOARD8_HOLD_CALLBACK(_write) \
-	devcb = &downcast<bus::ti99::internal::mainboard8_device &>(*device).set_hold_wr_callback(DEVCB_##_write);
+	downcast<bus::ti99::internal::mainboard8_device &>(*device).set_hold_wr_callback(DEVCB_##_write);
 
 #define MCFG_OSO_INT_CALLBACK(_int) \
-	devcb = &downcast<bus::ti99::internal::oso_device &>(*device).set_int_callback(DEVCB##_int);
+	downcast<bus::ti99::internal::oso_device &>(*device).set_int_callback(DEVCB##_int);
 
 DECLARE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device)
 DECLARE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device)

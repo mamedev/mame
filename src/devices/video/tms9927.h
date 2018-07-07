@@ -11,10 +11,10 @@
 
 
 #define MCFG_TMS9927_VSYN_CALLBACK(_write) \
-	devcb = &downcast<tms9927_device &>(*device).set_vsyn_wr_callback(DEVCB_##_write);
+	downcast<tms9927_device &>(*device).set_vsyn_wr_callback(DEVCB_##_write);
 
 #define MCFG_TMS9927_HSYN_CALLBACK(_write) \
-	devcb = &downcast<tms9927_device &>(*device).set_hsyn_wr_callback(DEVCB_##_write);
+	downcast<tms9927_device &>(*device).set_hsyn_wr_callback(DEVCB_##_write);
 
 #define MCFG_TMS9927_CHAR_WIDTH(_pixels) \
 	downcast<tms9927_device &>(*device).set_char_width(_pixels);
@@ -32,6 +32,8 @@ public:
 
 	template <class Object> devcb_base &set_vsyn_wr_callback(Object &&cb) { return m_write_vsyn.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_hsyn_wr_callback(Object &&cb) { return m_write_hsyn.set_callback(std::forward<Object>(cb)); }
+	auto vsyn_wr_callback() { return m_write_vsyn.bind(); }
+	auto hsyn_wr_callback() { return m_write_hsyn.bind(); }
 
 	void set_char_width(int pixels) { m_hpixels_per_column = pixels; }
 	void set_region_tag(const char *tag) { m_selfload.set_tag(tag); }

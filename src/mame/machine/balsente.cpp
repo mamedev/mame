@@ -333,11 +333,6 @@ WRITE8_MEMBER(balsente_state::acia_w)
 	m_acia->write(space, offset, (BIT(offset, 0) && data == 0xe0) ? 0 : data);
 }
 
-WRITE_LINE_MEMBER(balsente_state::uint_w)
-{
-	m_uint = bool(state);
-}
-
 WRITE_LINE_MEMBER(balsente_state::uint_propagate_w)
 {
 	if (state && BIT(m_counter_control, 5))

@@ -41,6 +41,12 @@ public:
 		m_joy4_y(*this, "JOY4-Y")
 	{ }
 
+	void vidbrain(machine_config &config);
+	void vidbrain_video(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<f3853_device> m_smi;
 	required_device<uv201_device> m_uv;
@@ -71,7 +77,7 @@ public:
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_WRITE8_MEMBER( sound_w );
 	DECLARE_WRITE8_MEMBER( f3853_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
 	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
 	DECLARE_WRITE_LINE_MEMBER( hblank_w );
 	DECLARE_READ8_MEMBER(memory_read_byte);
@@ -97,8 +103,6 @@ public:
 
 	// timers
 	emu_timer *m_timer_ne555;
-	void vidbrain(machine_config &config);
-	void vidbrain_video(machine_config &config);
 	void vidbrain_io(address_map &map);
 	void vidbrain_mem(address_map &map);
 };

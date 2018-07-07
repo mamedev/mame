@@ -87,9 +87,9 @@ private:
 DECLARE_DEVICE_TYPE(ASR733, asr733_device)
 
 #define MCFG_ASR733_KEYINT_HANDLER( _intcallb ) \
-	devcb = &downcast<asr733_device &>(*device).set_keyint_callback(DEVCB_##_intcallb);
+	downcast<asr733_device &>(*device).set_keyint_callback(DEVCB_##_intcallb);
 
 #define MCFG_ASR733_LINEINT_HANDLER( _intcallb ) \
-	devcb = &downcast<asr733_device &>(*device).set_lineint_callback(DEVCB_##_intcallb);
+	downcast<asr733_device &>(*device).set_lineint_callback(DEVCB_##_intcallb);
 
 #endif // MAME_VIDEO_733_ASR

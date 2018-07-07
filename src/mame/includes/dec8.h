@@ -133,7 +133,6 @@ private:
 	DECLARE_WRITE8_MEMBER(csilver_i8751_w);
 	DECLARE_WRITE8_MEMBER(dec8_bank_w);
 	DECLARE_WRITE8_MEMBER(ghostb_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(ghostb_nmi_w);
 	DECLARE_WRITE8_MEMBER(csilver_control_w);
 	DECLARE_WRITE8_MEMBER(dec8_sound_w);
 	DECLARE_WRITE8_MEMBER(csilver_adpcm_data_w);

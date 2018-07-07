@@ -53,6 +53,13 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void vp111(machine_config &config);
+	void vip(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
+	DECLARE_INPUT_CHANGED_MEMBER( beeper_w );
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void update_interrupts();
@@ -82,16 +89,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_out_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_in_w );
 
-	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
-	DECLARE_INPUT_CHANGED_MEMBER( beeper_w );
-
 	DECLARE_QUICKLOAD_LOAD_MEMBER( vip );
-	void vp111(machine_config &config);
-	void vip(machine_config &config);
+
 	void vip_io(address_map &map);
 	void vip_mem(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

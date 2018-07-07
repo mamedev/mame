@@ -11,7 +11,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_MIDI_RX_HANDLER(_devcb) \
-	devcb = &downcast<midi_port_device &>(*device).set_rx_handler(DEVCB_##_devcb);
+	downcast<midi_port_device &>(*device).set_rx_handler(DEVCB_##_devcb);
 
 class device_midi_port_interface;
 

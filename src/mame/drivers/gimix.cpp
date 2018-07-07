@@ -611,11 +611,11 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("acia4",acia6850_device,write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia4",acia6850_device,write_cts))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia2", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia2", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
+	acia_clock.signal_handler().set(m_acia1, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia1, FUNC(acia6850_device::write_rxc));
+	acia_clock.signal_handler().append(m_acia2, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia2, FUNC(acia6850_device::write_rxc));
 
 	/* banking */
 	MCFG_ADDRESS_BANK("bank1")

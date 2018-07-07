@@ -45,37 +45,37 @@
 	downcast<crt9007_device &>(*device).config_set_character_width(_value);
 
 #define MCFG_CRT9007_INT_CALLBACK(_write) \
-	devcb = &downcast<crt9007_device &>(*device).set_int_wr_callback(DEVCB_##_write);
+	downcast<crt9007_device &>(*device).set_int_wr_callback(DEVCB_##_write);
 
 #define MCFG_CRT9007_DMAR_CALLBACK(_write) \
-	devcb = &downcast<crt9007_device &>(*device).set_dmar_wr_callback(DEVCB_##_write);
+	downcast<crt9007_device &>(*device).set_dmar_wr_callback(DEVCB_##_write);
 
 #define MCFG_CRT9007_VS_CALLBACK(_write) \
-	devcb = &downcast<crt9007_device &>(*device).set_vs_wr_callback(DEVCB_##_write);
+	downcast<crt9007_device &>(*device).set_vs_wr_callback(DEVCB_##_write);
 
 #define MCFG_CRT9007_HS_CALLBACK(_write) \
-	devcb = &downcast<crt9007_device &>(*device).set_hs_wr_callback(DEVCB_##_write);
+	downcast<crt9007_device &>(*device).set_hs_wr_callback(DEVCB_##_write);
 
 #define MCFG_CRT9007_VLT_CALLBACK(_write) \
-	devcb = &downcast<crt9007_device &>(*device).set_vlt_wr_callback(DEVCB_##_write);
+	downcast<crt9007_device &>(*device).set_vlt_wr_callback(DEVCB_##_write);
 
 #define MCFG_CRT9007_CURS_CALLBACK(_write) \
-	devcb = &downcast<crt9007_device &>(*device).set_curs_wr_callback(DEVCB_##_write);
+	downcast<crt9007_device &>(*device).set_curs_wr_callback(DEVCB_##_write);
 
 #define MCFG_CRT9007_DRB_CALLBACK(_write) \
-	devcb = &downcast<crt9007_device &>(*device).set_drb_wr_callback(DEVCB_##_write);
+	downcast<crt9007_device &>(*device).set_drb_wr_callback(DEVCB_##_write);
 
 #define MCFG_CRT9007_WBEN_CALLBACK(_write) \
-	devcb = &downcast<crt9007_device &>(*device).set_wben_wr_callback(DEVCB_##_write);
+	downcast<crt9007_device &>(*device).set_wben_wr_callback(DEVCB_##_write);
 
 #define MCFG_CRT9007_CBLANK_CALLBACK(_write) \
-	devcb = &downcast<crt9007_device &>(*device).set_cblank_wr_callback(DEVCB_##_write);
+	downcast<crt9007_device &>(*device).set_cblank_wr_callback(DEVCB_##_write);
 
 #define MCFG_CRT9007_SLG_CALLBACK(_write) \
-	devcb = &downcast<crt9007_device &>(*device).set_slg_wr_callback(DEVCB_##_write);
+	downcast<crt9007_device &>(*device).set_slg_wr_callback(DEVCB_##_write);
 
 #define MCFG_CRT9007_SLD_CALLBACK(_write) \
-	devcb = &downcast<crt9007_device &>(*device).set_sld_wr_callback(DEVCB_##_write);
+	downcast<crt9007_device &>(*device).set_sld_wr_callback(DEVCB_##_write);
 
 
 

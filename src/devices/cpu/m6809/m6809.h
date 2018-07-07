@@ -307,7 +307,7 @@ public:
 
 // MC6809E has LIC line to indicate opcode/data fetch
 #define MCFG_MC6809E_LIC_CB(_devcb) \
-	devcb = &downcast<mc6809e_device &>(*device).set_lic_cb(DEVCB_##_devcb);
+	downcast<mc6809e_device &>(*device).set_lic_cb(DEVCB_##_devcb);
 
 
 class mc6809e_device : public m6809_base_device

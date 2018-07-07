@@ -76,6 +76,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void act_f1(machine_config &config);
+
+private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	virtual void machine_start() override;
@@ -104,7 +107,7 @@ public:
 
 	int m_40_80;
 	int m_200_256;
-	void act_f1(machine_config &config);
+
 	void act_f1_io(address_map &map);
 	void act_f1_mem(address_map &map);
 };

@@ -19,6 +19,7 @@
 #include "machine/cuda.h"
 #include "bus/nubus/nubus.h"
 #include "bus/macpds/macpds.h"
+#include "machine/applefdc.h"
 #include "machine/ncr539x.h"
 #include "machine/ncr5380.h"
 #include "machine/mackbd.h"
@@ -74,11 +75,13 @@ public:
 		m_egret(*this, EGRET_TAG),
 		m_cuda(*this, CUDA_TAG),
 		m_ram(*this, RAM_TAG),
+		m_scc(*this, "scc"),
 		m_539x_1(*this, MAC_539X_1_TAG),
 		m_539x_2(*this, MAC_539X_2_TAG),
 		m_ncr5380(*this, "ncr5380"),
+		m_fdc(*this, "fdc"),
 		m_mackbd(*this, MACKBD_TAG),
-		m_rtc(*this,"rtc"),
+		m_rtc(*this, "rtc"),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
@@ -239,9 +242,11 @@ private:
 	optional_device<egret_device> m_egret;
 	optional_device<cuda_device> m_cuda;
 	required_device<ram_device> m_ram;
+	required_device<scc8530_t> m_scc;
 	optional_device<ncr539x_device> m_539x_1;
 	optional_device<ncr539x_device> m_539x_2;
 	optional_device<ncr5380_device> m_ncr5380;
+	required_device<applefdc_base_device> m_fdc;
 	optional_device<mackbd_device> m_mackbd;
 	optional_device<rtc3430042_device> m_rtc;
 

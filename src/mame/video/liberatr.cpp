@@ -54,12 +54,6 @@ WRITE8_MEMBER( liberatr_state::bitmap_w )
 }
 
 
-WRITE_LINE_MEMBER(liberatr_state::planet_select_w)
-{
-	m_planet_select = state;
-}
-
-
 /********************************************************************************************
   liberatr_init_planet()
 

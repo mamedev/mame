@@ -27,26 +27,26 @@ enum
 
 
 #define MCFG_V25_PORT_PT_READ_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_pt_in_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_pt_in_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P0_READ_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_p0_in_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_p0_in_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P1_READ_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_p1_in_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_p1_in_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P2_READ_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_p2_in_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_p2_in_cb(DEVCB_##_devcb);
 
 
 #define MCFG_V25_PORT_P0_WRITE_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_p0_out_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_p0_out_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P1_WRITE_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_p1_out_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_p1_out_cb(DEVCB_##_devcb);
 
 #define MCFG_V25_PORT_P2_WRITE_CB(_devcb) \
-	devcb = &downcast<v25_common_device &>(*device).set_p2_out_cb(DEVCB_##_devcb);
+	downcast<v25_common_device &>(*device).set_p2_out_cb(DEVCB_##_devcb);
 
 class v25_common_device : public cpu_device
 {
@@ -58,10 +58,17 @@ public:
 	template <class Object> devcb_base &set_p0_in_cb(Object &&cb) { return m_p0_in.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_p1_in_cb(Object &&cb) { return m_p1_in.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_p2_in_cb(Object &&cb) { return m_p2_in.set_callback(std::forward<Object>(cb)); }
+	auto pt_in_cb() { return m_pt_in.bind(); }
+	auto p0_in_cb() { return m_p0_in.bind(); }
+	auto p1_in_cb() { return m_p1_in.bind(); }
+	auto p2_in_cb() { return m_p2_in.bind(); }
 
 	template <class Object> devcb_base &set_p0_out_cb(Object &&cb) { return m_p0_out.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_p1_out_cb(Object &&cb) { return m_p1_out.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_p2_out_cb(Object &&cb) { return m_p2_out.set_callback(std::forward<Object>(cb)); }
+	auto p0_out_cb() { return m_p0_out.bind(); }
+	auto p1_out_cb() { return m_p1_out.bind(); }
+	auto p2_out_cb() { return m_p2_out.bind(); }
 
 	TIMER_CALLBACK_MEMBER(v25_timer_callback);
 

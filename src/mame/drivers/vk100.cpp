@@ -168,11 +168,6 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 class vk100_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_EXECUTE_VG
-	};
-
 	vk100_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -187,6 +182,16 @@ public:
 		m_dipsw(*this, "SWITCHES")
 	{
 	}
+
+	void vk100(machine_config &config);
+
+	void init_vk100();
+
+private:
+	enum
+	{
+		TIMER_EXECUTE_VG
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -241,7 +246,7 @@ public:
 	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
 	DECLARE_READ8_MEMBER(SYSTAT_A);
 	DECLARE_READ8_MEMBER(SYSTAT_B);
-	void init_vk100();
+
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	TIMER_CALLBACK_MEMBER(execute_vg);
@@ -254,10 +259,9 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void vram_write(uint8_t data);
 
-	void vk100(machine_config &config);
 	void vk100_io(address_map &map);
 	void vk100_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

@@ -27,6 +27,12 @@ public:
 		m_audiobank(*this, "audiobank")
 	{ }
 
+	void sfp(machine_config &config);
+	void sfjp(machine_config &config);
+	void sfus(machine_config &config);
+	void sfan(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -69,10 +75,7 @@ public:
 	inline int invert( int nb );
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	void write_dword( address_space &space, offs_t offset, uint32_t data );
-	void sfp(machine_config &config);
-	void sfjp(machine_config &config);
-	void sfus(machine_config &config);
-	void sfan(machine_config &config);
+
 	void sfan_map(address_map &map);
 	void sfjp_map(address_map &map);
 	void sfus_map(address_map &map);

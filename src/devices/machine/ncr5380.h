@@ -37,7 +37,7 @@ enum
 // device stuff
 
 #define MCFG_NCR5380_IRQ_CB(_devcb) \
-	devcb = &downcast<ncr5380_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	downcast<ncr5380_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 class ncr5380_device : public legacy_scsi_host_adapter
 {

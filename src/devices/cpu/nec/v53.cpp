@@ -496,7 +496,6 @@ MACHINE_CONFIG_START(v53_base_device::device_add_mconfig)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE( *this, v53_base_device, tcu_out1_trampoline_cb ))
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE( *this, v53_base_device, tcu_out2_trampoline_cb ))
 
-
 	MCFG_DEVICE_ADD("upd71071dma", V53_DMAU, 4000000)
 	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, v53_base_device, hreq_trampoline_cb))
 	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(*this, v53_base_device, eop_trampoline_cb))
@@ -515,13 +514,10 @@ MACHINE_CONFIG_START(v53_base_device::device_add_mconfig)
 	MCFG_AM9517A_OUT_DACK_2_CB(WRITELINE(*this, v53_base_device, dma_dack2_trampoline_w))
 	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(*this, v53_base_device, dma_dack3_trampoline_w))
 
-
-	MCFG_DEVICE_ADD("upd71059pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, v53_base_device, internal_irq_w))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, v53_base_device, get_pic_ack))
-
-
+	pic8259_device &upd71059pic(PIC8259(config, "upd71059pic", 0));
+	upd71059pic.out_int_callback().set(FUNC(v53_base_device::internal_irq_w));
+	upd71059pic.in_sp_callback().set_constant(1);
+	upd71059pic.read_slave_ack_callback().set(FUNC(v53_base_device::get_pic_ack));
 
 	MCFG_DEVICE_ADD("v53scu", V53_SCU, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, v53_base_device, scu_txd_trampoline_cb))

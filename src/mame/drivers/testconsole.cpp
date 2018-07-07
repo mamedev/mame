@@ -82,7 +82,7 @@ public:
 
 	void whousetc(machine_config &config);
 
-protected:
+private:
 	template <unsigned Dsp> DECLARE_WRITE16_MEMBER(update_dsp)
 	{
 		m_digit[(Dsp << 2) | offset] = data;
@@ -102,7 +102,6 @@ protected:
 	void io_map(address_map &map);
 	void program_map(address_map &map);
 
-private:
 	required_device_array<dl1416_device, 4> m_dsp;
 	output_finder<16> m_digit;
 };

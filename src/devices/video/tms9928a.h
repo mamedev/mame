@@ -37,12 +37,12 @@
 	downcast<tms9928a_device &>(*device).set_vram_size(_size);
 
 #define MCFG_TMS9928A_OUT_INT_LINE_CB(_devcb) \
-	devcb = &downcast<tms9928a_device &>(*device).set_out_int_line_callback(DEVCB_##_devcb);
+	downcast<tms9928a_device &>(*device).set_out_int_line_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS9928A_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_TMS9928A_OUT_GROMCLK_CB(_devcb) \
-	devcb = &downcast<tms9928a_device &>(*device).set_out_gromclk_callback(DEVCB_##_devcb);
+	downcast<tms9928a_device &>(*device).set_out_gromclk_callback(DEVCB_##_devcb);
 
 
 #define MCFG_TMS9928A_SCREEN_ADD_NTSC(_screen_tag) \
@@ -92,6 +92,8 @@ public:
 	void set_vram_size(int vram_size) { m_vram_size = vram_size; }
 	template <class Object> devcb_base &set_out_int_line_callback(Object &&cb) { return m_out_int_line_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_gromclk_callback(Object &&cb) { return m_out_gromclk_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_int_line_callback() { return m_out_int_line_cb.bind(); }
+	auto out_gromclk_callback() { return m_out_gromclk_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

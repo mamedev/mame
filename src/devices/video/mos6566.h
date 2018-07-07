@@ -93,16 +93,16 @@
 	downcast<mos6566_device &>(*device).set_cpu_tag(_tag);
 
 #define MCFG_MOS6566_IRQ_CALLBACK(_write) \
-	devcb = &downcast<mos6566_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<mos6566_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_MOS6566_BA_CALLBACK(_write) \
-	devcb = &downcast<mos6566_device &>(*device).set_ba_wr_callback(DEVCB_##_write);
+	downcast<mos6566_device &>(*device).set_ba_wr_callback(DEVCB_##_write);
 
 #define MCFG_MOS6566_AEC_CALLBACK(_write) \
-	devcb = &downcast<mos6566_device &>(*device).set_aec_wr_callback(DEVCB_##_write);
+	downcast<mos6566_device &>(*device).set_aec_wr_callback(DEVCB_##_write);
 
 #define MCFG_MOS8564_K_CALLBACK(_write) \
-	devcb = &downcast<mos6566_device &>(*device).set_k_wr_callback(DEVCB_##_write);
+	downcast<mos6566_device &>(*device).set_k_wr_callback(DEVCB_##_write);
 
 
 

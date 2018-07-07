@@ -207,15 +207,15 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE("irq1", input_merger_device, in_w<1>))
 
 	// PIT
-	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(24_MHz_XTAL / 3)
-	MCFG_PIT8253_CLK1(24_MHz_XTAL / 3)
-	MCFG_PIT8253_CLK2(24_MHz_XTAL / 3)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, zorba_state, br1_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_uart1, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_uart1, i8251_device, write_rxc))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(m_uart2, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_uart2, i8251_device, write_rxc))
+	pit8254_device &pit(PIT8254(config, "pit", 0));
+	pit.set_clk<0>(24_MHz_XTAL / 3);
+	pit.set_clk<1>(24_MHz_XTAL / 3);
+	pit.set_clk<2>(24_MHz_XTAL / 3);
+	pit.out_handler<0>().set(FUNC(zorba_state::br1_w));
+	pit.out_handler<1>().set(m_uart1, FUNC(i8251_device::write_txc));
+	pit.out_handler<1>().append(m_uart1, FUNC(i8251_device::write_rxc));
+	pit.out_handler<2>().set(m_uart2, FUNC(i8251_device::write_txc));
+	pit.out_handler<2>().append(m_uart2, FUNC(i8251_device::write_rxc));
 
 	// CRTC
 	MCFG_DEVICE_ADD(m_crtc, I8275, 14.318'181_MHz_XTAL / 7)
@@ -247,11 +247,11 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 
 	// J3 Parallel printer
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("parprndata", "parprn")
-	MCFG_DEVICE_ADD("parprn", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m_uart1, i8251_device, write_cts))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_uart1, i8251_device, write_dsr)) // TODO: shared with serial CTS
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, zorba_state, printer_fault_w))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, zorba_state, printer_select_w))
+	centronics_device &parprn(CENTRONICS(config, "parprn", centronics_devices, "printer"));
+	parprn.busy_handler().set(m_uart1, FUNC(i8251_device::write_cts));
+	parprn.busy_handler().append(m_uart1, FUNC(i8251_device::write_dsr)); // TODO: shared with serial CTS
+	parprn.fault_handler().set(FUNC(zorba_state::printer_fault_w));
+	parprn.select_handler().set(FUNC(zorba_state::printer_select_w));
 
 	// J3 Serial printer
 	MCFG_DEVICE_ADD("serprn", RS232_PORT, default_rs232_devices, nullptr)

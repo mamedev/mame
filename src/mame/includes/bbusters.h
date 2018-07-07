@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_BBUSTERS_H
+#define MAME_INCLUDES_BBUSTERS_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
@@ -7,8 +11,8 @@
 class bbusters_state : public driver_device
 {
 public:
-	bbusters_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bbusters_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -21,7 +25,8 @@ public:
 		m_pf1_data(*this, "pf1_data"),
 		m_pf2_data(*this, "pf2_data"),
 		m_pf1_scroll_data(*this, "pf1_scroll_data"),
-		m_pf2_scroll_data(*this, "pf2_scroll_data") { }
+		m_pf2_scroll_data(*this, "pf2_scroll_data")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -81,3 +86,5 @@ public:
 	void sound_portmap(address_map &map);
 	void sounda_portmap(address_map &map);
 };
+
+#endif // MAME_INCLUDES_BBUSTERS_H

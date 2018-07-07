@@ -34,13 +34,13 @@
 ///*************************************************************************
 
 #define MCFG_COM8116_FX4_HANDLER(_devcb) \
-	devcb = &downcast<com8116_device &>(*device).set_fx4_handler(DEVCB_##_devcb);
+	downcast<com8116_device &>(*device).set_fx4_handler(DEVCB_##_devcb);
 
 #define MCFG_COM8116_FR_HANDLER(_devcb) \
-	devcb = &downcast<com8116_device &>(*device).set_fr_handler(DEVCB_##_devcb);
+	downcast<com8116_device &>(*device).set_fr_handler(DEVCB_##_devcb);
 
 #define MCFG_COM8116_FT_HANDLER(_devcb) \
-	devcb = &downcast<com8116_device &>(*device).set_ft_handler(DEVCB_##_devcb);
+	downcast<com8116_device &>(*device).set_ft_handler(DEVCB_##_devcb);
 
 
 ///*************************************************************************
@@ -58,6 +58,9 @@ public:
 	template <class Object> devcb_base &set_fx4_handler(Object &&cb) { return m_fx4_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_fr_handler(Object &&cb) { return m_fr_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_ft_handler(Object &&cb) { return m_ft_handler.set_callback(std::forward<Object>(cb)); }
+	auto fx4_handler() { return m_fx4_handler.bind(); }
+	auto fr_handler() { return m_fr_handler.bind(); }
+	auto ft_handler() { return m_ft_handler.bind(); }
 
 	void write_str(uint8_t data);
 	void write_stt(uint8_t data);

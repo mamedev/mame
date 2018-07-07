@@ -36,65 +36,65 @@ enum
 		downcast<i4004_cpu_device &>(*device).set_bus_cycle_cb((MCS40CB_##obj));
 
 #define MCFG_I4004_SYNC_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_sync_cb(DEVCB_##obj);
+		downcast<i4004_cpu_device &>(*device).set_sync_cb(DEVCB_##obj);
 
 #define MCFG_I4004_CM_ROM_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_cm_rom_cb(DEVCB_##obj);
+		downcast<i4004_cpu_device &>(*device).set_cm_rom_cb(DEVCB_##obj);
 
 #define MCFG_I4004_CM_RAM0_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_cm_ram_cb<0>(DEVCB_##obj);
+		downcast<i4004_cpu_device &>(*device).set_cm_ram_cb<0>(DEVCB_##obj);
 
 #define MCFG_I4004_CM_RAM1_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_cm_ram_cb<1>(DEVCB_##obj);
+		downcast<i4004_cpu_device &>(*device).set_cm_ram_cb<1>(DEVCB_##obj);
 
 #define MCFG_I4004_CM_RAM2_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_cm_ram_cb<2>(DEVCB_##obj);
+		downcast<i4004_cpu_device &>(*device).set_cm_ram_cb<2>(DEVCB_##obj);
 
 #define MCFG_I4004_CM_RAM3_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_cm_ram_cb<3>(DEVCB_##obj);
+		downcast<i4004_cpu_device &>(*device).set_cm_ram_cb<3>(DEVCB_##obj);
 
 #define MCFG_I4004_4289_PM_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_4289_pm_cb(DEVCB_##obj);
+		downcast<i4004_cpu_device &>(*device).set_4289_pm_cb(DEVCB_##obj);
 
 #define MCFG_I4004_4289_F_L_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_4289_f_l_cb(DEVCB_##obj);
+		downcast<i4004_cpu_device &>(*device).set_4289_f_l_cb(DEVCB_##obj);
 
 
 #define MCFG_I4040_BUS_CYCLE_CB(obj) \
 		downcast<i4040_cpu_device &>(*device).set_bus_cycle_cb((MCS40CB_##obj));
 
 #define MCFG_I4040_SYNC_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_sync_cb(DEVCB_##obj);
+		downcast<i4040_cpu_device &>(*device).set_sync_cb(DEVCB_##obj);
 
 #define MCFG_I4040_CM_ROM0_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cm_rom_cb<0>(DEVCB_##obj);
+		downcast<i4040_cpu_device &>(*device).set_cm_rom_cb<0>(DEVCB_##obj);
 
 #define MCFG_I4040_CM_ROM1_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cm_rom_cb<1>(DEVCB_##obj);
+		downcast<i4040_cpu_device &>(*device).set_cm_rom_cb<1>(DEVCB_##obj);
 
 #define MCFG_I4040_CM_RAM0_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cm_ram_cb<0>(DEVCB_##obj);
+		downcast<i4040_cpu_device &>(*device).set_cm_ram_cb<0>(DEVCB_##obj);
 
 #define MCFG_I4040_CM_RAM1_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cm_ram_cb<1>(DEVCB_##obj);
+		downcast<i4040_cpu_device &>(*device).set_cm_ram_cb<1>(DEVCB_##obj);
 
 #define MCFG_I4040_CM_RAM2_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cm_ram_cb<2>(DEVCB_##obj);
+		downcast<i4040_cpu_device &>(*device).set_cm_ram_cb<2>(DEVCB_##obj);
 
 #define MCFG_I4040_CM_RAM3_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cm_ram_cb<3>(DEVCB_##obj);
+		downcast<i4040_cpu_device &>(*device).set_cm_ram_cb<3>(DEVCB_##obj);
 
 #define MCFG_I4040_CY_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cy_cb(DEVCB_##obj);
+		downcast<i4040_cpu_device &>(*device).set_cy_cb(DEVCB_##obj);
 
 #define MCFG_I4040_STP_ACK_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_stp_ack_cb(DEVCB_##obj);
+		downcast<i4040_cpu_device &>(*device).set_stp_ack_cb(DEVCB_##obj);
 
 #define MCFG_I4040_4289_PM_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_4289_pm_cb(DEVCB_##obj);
+		downcast<i4040_cpu_device &>(*device).set_4289_pm_cb(DEVCB_##obj);
 
 #define MCFG_I4040_4289_F_L_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_4289_f_l_cb(DEVCB_##obj);
+		downcast<i4040_cpu_device &>(*device).set_4289_f_l_cb(DEVCB_##obj);
 
 
 

@@ -96,6 +96,9 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_colorram(*this, "colorram") { }
 
+	void sliver(machine_config &config);
+
+private:
 	uint16_t m_io_offset;
 	uint16_t m_io_reg[IO_SIZE];
 	uint16_t m_fifo[FIFO_SIZE];
@@ -139,7 +142,7 @@ public:
 	void render_jpeg();
 
 	void postload();
-	void sliver(machine_config &config);
+
 	void oki_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void sliver_map(address_map &map);

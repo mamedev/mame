@@ -48,16 +48,16 @@
 
 
 #define MCFG_CBM2_USER_PORT_IRQ_CALLBACK(_write) \
-	devcb = &downcast<cbm2_user_port_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<cbm2_user_port_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_CBM2_USER_PORT_SP_CALLBACK(_write) \
-	devcb = &downcast<cbm2_user_port_device &>(*device).set_sp_wr_callback(DEVCB_##_write);
+	downcast<cbm2_user_port_device &>(*device).set_sp_wr_callback(DEVCB_##_write);
 
 #define MCFG_CBM2_USER_PORT_CNT_CALLBACK(_write) \
-	devcb = &downcast<cbm2_user_port_device &>(*device).set_cnt_wr_callback(DEVCB_##_write);
+	downcast<cbm2_user_port_device &>(*device).set_cnt_wr_callback(DEVCB_##_write);
 
 #define MCFG_CBM2_USER_PORT_FLAG_CALLBACK(_write) \
-	devcb = &downcast<cbm2_user_port_device &>(*device).set_flag_wr_callback(DEVCB_##_write);
+	downcast<cbm2_user_port_device &>(*device).set_flag_wr_callback(DEVCB_##_write);
 
 
 

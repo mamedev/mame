@@ -205,7 +205,7 @@ MACHINE_CONFIG_START(mk14_state::mk14)
 	/* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
 	MCFG_DEVICE_ADD("maincpu", INS8060, XTAL(4'433'619))
-	MCFG_SCMP_CONFIG(WRITELINE(*this, mk14_state, cass_w), NOOP, READLINE(*this, mk14_state, cass_r), NOOP, READLINE(*this, mk14_state, cass_r), NOOP)
+	MCFG_SCMP_CONFIG(WRITELINE(*this, mk14_state, cass_w), NOOP, READLINE(*this, mk14_state, cass_r), CONSTANT(0), READLINE(*this, mk14_state, cass_r), NOOP)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
