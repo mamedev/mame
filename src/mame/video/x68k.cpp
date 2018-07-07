@@ -374,7 +374,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
  */
 WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 {
-	if (offset < 0x24)
+	if (offset < 24)
 		COMBINE_DATA(m_crtc.reg+offset);
 	switch(offset)
 	{
@@ -1099,6 +1099,7 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (m_gfxdecode->gfx(gfx_index) == nullptr)
 			break;
+	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_pcgpalette, x68k_pcg_8, memregion("user1")->base(), 0, 32, 0));

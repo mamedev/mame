@@ -1329,7 +1329,7 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_start(int timer)
 	{
 		hz = freq / cnt;
 	}
-	verboselog(*this, 5, "PWM %d - pclk=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, pclk, prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
+	verboselog(*this, 5, "PWM %d - pclk=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, pclk, prescaler, (mux < 4) ? mux_table[mux] : 1, freq, cnt, cmp, auto_reload, hz);
 	m_pwm.cnt[timer] = cnt;
 	m_pwm.cmp[timer] = cmp;
 	m_pwm.freq[timer] = freq;
@@ -2725,8 +2725,8 @@ void S3C24_CLASS_NAME::nand_update_mecc(uint8_t *ecc, int pos, uint8_t data)
 	if (pos & 0x040) ecc[1] ^= (temp << 5); else ecc[1] ^= (temp << 4);
 	if (pos & 0x080) ecc[1] ^= (temp << 7); else ecc[1] ^= (temp << 6);
 	if (pos & 0x100) ecc[2] ^= (temp << 1); else ecc[2] ^= (temp << 0);
-	if (pos & 0x200) ecc[3] ^= (temp << 5); else ecc[3] ^= (temp << 4);
-	if (pos & 0x400) ecc[3] ^= (temp << 7); else ecc[3] ^= (temp << 6);
+	if (pos & 0x200) ecc[2] ^= (temp << 5); else ecc[2] ^= (temp << 4);
+	if (pos & 0x400) ecc[2] ^= (temp << 7); else ecc[2] ^= (temp << 6);
 }
 
 #if defined(DEVICE_S3C2440)

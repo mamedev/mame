@@ -796,6 +796,7 @@ public:
 				devinfo->device()->add_item(tempname, itemid, generic_axis_get_state<std::int32_t>, &devinfo->joystick.axes[axis]);
 			}
 
+			assert(SDL_JoystickNumButtons(joy) < MAX_BUTTONS);
 			// loop over all buttons
 			for (int button = 0; button < SDL_JoystickNumButtons(joy); button++)
 			{
