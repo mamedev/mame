@@ -166,12 +166,6 @@ sapphire_ioga_device::sapphire_ioga_device(const machine_config &mconfig, const 
 {
 }
 
-void interpro_ioga_device::device_validity_check(validity_checker &valid) const
-{
-	if (m_memory_device && !m_memory_device->has_space(m_memory_spacenum))
-		osd_printf_error("Device %s (%s) doen't have memory space %d\n", m_memory_device->device().tag(), m_memory_device->device().name(), m_memory_spacenum);
-}
-
 void interpro_ioga_device::device_start()
 {
 	// get the memory space
