@@ -240,12 +240,12 @@ protected:
 		auto rshift(unsigned val)
 		{
 			auto trans(static_cast<Impl &>(*this).transform([val] (offs_t offset, T data, std::make_unsigned_t<T> &mem_mask) { mem_mask >>= val; return data >> val; }));
-			return std::move(trans.mask(m_mask >> val));
+			return inherited_mask() ? std::move(trans) : std::move(trans.mask(m_mask >> val));
 		}
 		auto lshift(unsigned val)
 		{
 			auto trans(static_cast<Impl &>(*this).transform([val] (offs_t offset, T data, std::make_unsigned_t<T> &mem_mask) { mem_mask <<= val; return data << val; }));
-			return std::move(trans.mask(m_mask << val));
+			return inherited_mask() ? std::move(trans) : std::move(trans.mask(m_mask << val));
 		}
 		auto bit(unsigned val) { return std::move(rshift(val).mask(T(1U))); }
 
@@ -1119,7 +1119,10 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<output_t, output_t, T>::value, transform_builder<transform_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return transform_builder<transform_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, std::move(*this), std::forward<T>(cb), this->mask());
+			output_t const m(this->mask());
+			if (this->inherited_mask())
+				this->mask(output_t(~output_t(0)));
+			return transform_builder<transform_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, std::move(*this), std::forward<T>(cb), m);
 		}
 
 		auto build()
@@ -1170,9 +1173,9 @@ private:
 		using output_t = mask_t<transform_result_t<typename Sink::input_t, typename Sink::input_t, Func>, typename Sink::input_t>;
 
 		template <typename T>
-		first_transform_builder(devcb_write &target, bool append, Sink &&sink, T &&cb, std::make_unsigned_t<Input> in_exor, std::make_unsigned_t<Input> in_mask)
+		first_transform_builder(devcb_write &target, bool append, Sink &&sink, T &&cb, std::make_unsigned_t<Input> in_exor, std::make_unsigned_t<Input> in_mask, std::make_unsigned_t<output_t> mask)
 			: builder_base(target, append)
-			, transform_base<output_t, first_transform_builder>(DefaultMask)
+			, transform_base<output_t, first_transform_builder>(mask)
 			, m_sink(std::move(sink))
 			, m_cb(std::forward<T>(cb))
 			, m_in_exor(in_exor & in_mask)
@@ -1197,7 +1200,10 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<output_t, output_t, T>::value, transform_builder<first_transform_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return transform_builder<first_transform_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, std::move(*this), std::forward<T>(cb), this->mask());
+			output_t const m(this->mask());
+			if (this->inherited_mask())
+				this->mask(output_t(~output_t(0)));
+			return transform_builder<first_transform_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, std::move(*this), std::forward<T>(cb), m);
 		}
 
 		auto build()
@@ -1303,7 +1309,7 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
 		void validity_check(validity_checker &valid) const { }
@@ -1411,7 +1417,9 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask());
+			std::make_unsigned_t<Input> const in_mask(this->inherited_mask() ? DefaultMask : this->mask());
+			mask_t<Input, typename delegate_traits<Delegate>::input_t> const out_mask(DefaultMask & delegate_traits<Delegate>::default_mask);
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), in_mask, out_mask);
 		}
 
 		void validity_check(validity_checker &valid) const
@@ -1549,9 +1557,8 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			first_transform_builder<wrapped_builder, std::remove_reference_t<T> > result(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->inherited_mask() ? DefaultMask : this->mask());
-			result.mask(1);
-			return std::move(result);
+			std::make_unsigned_t<Input> const in_mask(this->inherited_mask() ? DefaultMask : this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), in_mask, 1U);
 		}
 
 		void validity_check(validity_checker &valid) const
@@ -1710,7 +1717,7 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->inherited_mask() ? DefaultMask : this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
 		void validity_check(validity_checker &valid) const
@@ -1826,7 +1833,7 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
 		void validity_check(validity_checker &valid) const { }
@@ -1926,7 +1933,7 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
 		void validity_check(validity_checker &valid) const { }
@@ -2023,7 +2030,7 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
 		void validity_check(validity_checker &valid) const { }
@@ -2117,7 +2124,7 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->inherited_mask() ? DefaultMask : this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
 		void validity_check(validity_checker &valid) const { }
