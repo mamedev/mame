@@ -513,57 +513,6 @@ READ16_MEMBER( namcos2_shared_state::c355_obj_position_r )
 	return m_c355_obj_position[offset];
 }
 
-static inline uint8_t
-nth_byte16( const uint16_t *pSource, int which )
-{
-	uint16_t data = pSource[which/2];
-	if( which&1 )
-	{
-		return data&0xff;
-	}
-	else
-	{
-		return data>>8;
-	}
-} /* nth_byte16 */
-
-/* nth_word32 is a general-purpose utility function, which allows us to
- * read from 32-bit aligned memory as if it were an array of 16 bit words.
- */
-#ifdef UNUSED_FUNCTION
-static inline uint16_t
-nth_word32( const uint32_t *pSource, int which )
-{
-	uint32_t data = pSource[which/2];
-	if( which&1 )
-	{
-		return data&0xffff;
-	}
-	else
-	{
-		return data>>16;
-	}
-} /* nth_word32 */
-#endif
-
-/* nth_byte32 is a general-purpose utility function, which allows us to
- * read from 32-bit aligned memory as if it were an array of bytes.
- */
-#ifdef UNUSED_FUNCTION
-static inline uint8_t
-nth_byte32( const uint32_t *pSource, int which )
-{
-		uint32_t data = pSource[which/4];
-		switch( which&3 )
-		{
-		case 0: return data>>24;
-		case 1: return (data>>16)&0xff;
-		case 2: return (data>>8)&0xff;
-		default: return data&0xff;
-		}
-} /* nth_byte32 */
-#endif
-
 /**************************************************************************************************************/
 
 /**
