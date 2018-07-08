@@ -43,6 +43,7 @@ private:
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
+	void kbd_map(address_map &map);
 	void pvtc_char_map(address_map &map);
 	void pvtc_attr_map(address_map &map);
 
@@ -77,6 +78,11 @@ void v550_state::io_map(address_map &map)
 	map(0x60, 0x67).rw("pvtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
 	map(0x70, 0x70).rw("pvtc", FUNC(scn2672_device::buffer_r), FUNC(scn2672_device::buffer_w));
 	map(0x71, 0x71).rw("pvtc", FUNC(scn2672_device::attr_buffer_r), FUNC(scn2672_device::attr_buffer_w));
+}
+
+void v550_state::kbd_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom().region("keyboard", 0);
 }
 
 void v550_state::pvtc_char_map(address_map &map)
@@ -129,7 +135,8 @@ MACHINE_CONFIG_START(v550_state::v550)
 	brg2.fr_handler().set("usart", FUNC(i8251_device::write_txc));
 	brg2.fr_handler().append("usart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("kbdmcu", I8049, 4'608'000)
+	MCFG_DEVICE_ADD("kbdmcu", I8035, 4'608'000)
+	MCFG_DEVICE_PROGRAM_MAP(kbd_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(34.846_MHz_XTAL, 19 * 102, 0, 19 * 80, 295, 0, 272)
@@ -157,7 +164,7 @@ ROM_START( v550 )
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("e242-085_r03_u97.bin", 0x0000, 0x1000, CRC(8a491cee) SHA1(d8a9546a7dd2ffc0a5e54524ee16068dde56975c))
 
-	ROM_REGION(0x0800, "kbdmcu", 0)
+	ROM_REGION(0x0800, "keyboard", 0)
 	ROM_LOAD("v550kb.bin", 0x0000, 0x0800, CRC(d11d19a3) SHA1(2d88202d0548e934800f07667c8d13a3762b12fa))
 ROM_END
 
