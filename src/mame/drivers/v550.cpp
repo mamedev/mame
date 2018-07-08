@@ -15,6 +15,7 @@
 #include "emu.h"
 //include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/com8116.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
@@ -42,7 +43,8 @@ private:
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
-	void pvtc_map(address_map &map);
+	void pvtc_char_map(address_map &map);
+	void pvtc_attr_map(address_map &map);
 
 	virtual void machine_start() override;
 
@@ -74,10 +76,15 @@ void v550_state::io_map(address_map &map)
 	map(0x50, 0x50).w("brg2", FUNC(com8116_device::stt_str_w));
 	map(0x60, 0x67).rw("pvtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
 	map(0x70, 0x70).rw("pvtc", FUNC(scn2672_device::buffer_r), FUNC(scn2672_device::buffer_w));
-	map(0x71, 0x71).noprw(); // TODO: attribute buffer
+	map(0x71, 0x71).rw("pvtc", FUNC(scn2672_device::attr_buffer_r), FUNC(scn2672_device::attr_buffer_w));
 }
 
-void v550_state::pvtc_map(address_map &map)
+void v550_state::pvtc_char_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+}
+
+void v550_state::pvtc_attr_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 }
@@ -122,12 +129,15 @@ MACHINE_CONFIG_START(v550_state::v550)
 	brg2.fr_handler().set("usart", FUNC(i8251_device::write_txc));
 	brg2.fr_handler().append("usart", FUNC(i8251_device::write_rxc));
 
+	MCFG_DEVICE_ADD("kbdmcu", I8049, 4'608'000)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(16'248'600, 918, 0, 720, 295, 0, 272)
 	MCFG_SCREEN_UPDATE_DRIVER(v550_state, screen_update)
 
 	MCFG_DEVICE_ADD("pvtc", SCN2672, 1'805'400)
-	MCFG_DEVICE_ADDRESS_MAP(0, pvtc_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, pvtc_char_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, pvtc_attr_map)
 	MCFG_SCN2672_CHARACTER_WIDTH(9)
 	MCFG_SCN2672_INTR_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_VIDEO_SET_SCREEN("screen")
@@ -145,6 +155,9 @@ ROM_START( v550 )
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("e242-085_r03_u97.bin", 0x0000, 0x1000, CRC(8a491cee) SHA1(d8a9546a7dd2ffc0a5e54524ee16068dde56975c))
+
+	ROM_REGION(0x0800, "kbdmcu", 0)
+	ROM_LOAD("v550kb.bin", 0x0000, 0x0800, CRC(d11d19a3) SHA1(2d88202d0548e934800f07667c8d13a3762b12fa))
 ROM_END
 
 COMP( 1982, v550, 0, 0, v550, v550, v550_state, empty_init, "Visual Technology", "Visual 550", MACHINE_IS_SKELETON )
