@@ -1700,16 +1700,16 @@ via software as INT1
 /*                                                           */
 /*************************************************************/
 
-MACHINE_CONFIG_START(namcos2_state::configure_c148_standard)
-	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
-	MCFG_NAMCO_C148_LINK("slave_intc")
-	MCFG_NAMCO_C148_EXT1_CB(WRITE8(*this, namcos2_state, sound_reset_w))
-	MCFG_NAMCO_C148_EXT2_CB(WRITE8(*this, namcos2_state, system_reset_w))
+void namcos2_state::configure_c148_standard(machine_config &config)
+{
+	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
+	m_master_intc->link_c148_device(m_slave_intc);
+	m_master_intc->out_ext1_callback().set(FUNC(namcos2_state::sound_reset_w));
+	m_master_intc->out_ext2_callback().set(FUNC(namcos2_state::system_reset_w));
 
-	MCFG_NAMCO_C148_ADD("slave_intc","slave",false)
-	MCFG_NAMCO_C148_LINK("master_intc")
-
-MACHINE_CONFIG_END
+	NAMCO_C148(config, m_slave_intc, 0, m_slave, false);
+	m_slave_intc->link_c148_device(m_master_intc);
+}
 
 // TODO: temp
 TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)

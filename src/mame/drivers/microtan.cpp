@@ -213,6 +213,8 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", microtan_state, interrupt)
 
+	// The 6502 IRQ line is active low and probably driven by open collector outputs (guess).
+	INPUT_MERGER_ANY_HIGH(config, m_irq_line).output_handler().set_inputline(m_maincpu, 0);
 
 	/* video hardware - include overscan */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -247,20 +249,20 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 
 	/* via */
-	MCFG_DEVICE_ADD(m_via6522[0], VIA6522, XTAL(6'000'000) / 8)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, microtan_state, via_0_in_a))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, microtan_state, via_0_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, microtan_state, via_0_out_b))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, microtan_state, via_0_out_ca2))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, microtan_state, via_0_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, microtan_state, via_0_irq))
+	VIA6522(config, m_via6522[0], 6_MHz_XTAL / 8);
+	m_via6522[0]->readpa_handler().set(FUNC(microtan_state::via_0_in_a));
+	m_via6522[0]->writepa_handler().set(FUNC(microtan_state::via_0_out_a));
+	m_via6522[0]->writepb_handler().set(FUNC(microtan_state::via_0_out_b));
+	m_via6522[0]->ca2_handler().set(FUNC(microtan_state::via_0_out_ca2));
+	m_via6522[0]->cb2_handler().set(FUNC(microtan_state::via_0_out_cb2));
+	m_via6522[0]->irq_handler().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_VIA_0>));
 
 	MCFG_DEVICE_ADD(m_via6522[1], VIA6522, XTAL(6'000'000) / 8)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, microtan_state, via_1_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, microtan_state, via_1_out_b))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, microtan_state, via_1_out_ca2))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, microtan_state, via_1_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, microtan_state, via_1_irq))
+	m_via6522[1]->writepa_handler().set(FUNC(microtan_state::via_1_out_a));
+	m_via6522[1]->writepb_handler().set(FUNC(microtan_state::via_1_out_b));
+	m_via6522[1]->ca2_handler().set(FUNC(microtan_state::via_1_out_ca2));
+	m_via6522[1]->cb2_handler().set(FUNC(microtan_state::via_1_out_cb2));
+	m_via6522[1]->irq_handler().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_VIA_1>));
 MACHINE_CONFIG_END
 
 ROM_START( microtan )
