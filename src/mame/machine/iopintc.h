@@ -38,6 +38,7 @@ public:
 	{
 		INT_VB_ON = 0,
 		INT_DMA = 3,
+		INT_SPU = 9,
 		INT_VB_OFF = 11,
 		INT_TIMER = 16
 	};

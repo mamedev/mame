@@ -389,9 +389,9 @@ MACHINE_CONFIG_START(softbox_state::softbox)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, softbox_state, ppi1_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, softbox_state, ppi1_pc_w))
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_txc))
+	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
+	dbrg.fr_handler().set(I8251_TAG, FUNC(i8251_device::write_rxc));
+	dbrg.ft_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
 
 	MCFG_CBM_IEEE488_ADD("c8050")
 

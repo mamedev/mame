@@ -110,8 +110,7 @@ MACHINE_CONFIG_START(unistar_state::unistar)
 	MCFG_DEVICE_PROGRAM_MAP(unistar_mem)
 	MCFG_DEVICE_IO_MAP(unistar_io)
 
-	MCFG_DEVICE_ADD("stc", AM9513, 8_MHz_XTAL)
-	MCFG_AM9513_FOUT_CALLBACK(WRITELINE("stc", am9513_device, source1_w))
+	AM9513(config, "stc", 8_MHz_XTAL).fout_cb().set("stc", FUNC(am9513_device::source1_w));
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 

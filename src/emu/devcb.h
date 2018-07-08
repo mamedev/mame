@@ -466,9 +466,13 @@ private:
 		std::string m_message;
 	};
 
+	template <typename Source, typename Func> class transform_builder; // workaround for GCC 8 not implementing friend properly
+
 	class builder_base
 	{
 	protected:
+		template <typename T, typename U> friend class transform_builder; // workaround for GCC 8 not implementing friend properly
+
 		builder_base(devcb_read &target, bool append) : m_target(target), m_append(append) { }
 		builder_base(builder_base const &) = delete;
 		builder_base(builder_base &&) = default;
@@ -1047,9 +1051,15 @@ private:
 		virtual func_t create() override { return [] (address_space &space, offs_t offset, Input data, std::make_unsigned_t<Input> mem_mask) { }; }
 	};
 
+	template <typename Source, typename Func> class transform_builder; // workaround for GCC 8 not implementing friend properly
+	template <typename Sink, typename Func> class first_transform_builder; // workaround for GCC 8 not implementing friend properly
+
 	class builder_base
 	{
 	protected:
+		template <typename T, typename U> friend class transform_builder; // workaround for GCC 8 not implementing friend properly
+		template <typename T, typename U> friend class first_transform_builder; // workaround for GCC 8 not implementing friend properly
+
 		builder_base(devcb_write &target, bool append) : m_target(target), m_append(append) { }
 		builder_base(builder_base const &) = delete;
 		builder_base(builder_base &&) = default;
@@ -1361,6 +1371,8 @@ private:
 			Delegate m_delegate;
 		};
 
+		friend class wrapped_builder; // workaround for MSVC
+
 		delegate_builder(delegate_builder const &) = delete;
 		delegate_builder &operator=(delegate_builder const &) = delete;
 		delegate_builder &operator=(delegate_builder &&that) = delete;
@@ -1490,6 +1502,8 @@ private:
 			device_execute_interface *m_exec;
 			int const m_linenum;
 		};
+
+		friend class wrapped_builder; // workaround for MSVC
 
 		inputline_builder(inputline_builder const &) = delete;
 		inputline_builder &operator=(inputline_builder const &) = delete;
@@ -1646,6 +1660,8 @@ private:
 			int const m_value;
 		};
 
+		friend class wrapped_builder; // workaround for MSVC
+
 		latched_inputline_builder(latched_inputline_builder const &) = delete;
 		latched_inputline_builder &operator=(latched_inputline_builder const &) = delete;
 		latched_inputline_builder &operator=(latched_inputline_builder &&that) = delete;
@@ -1778,6 +1794,8 @@ private:
 			std::string m_tag;
 		};
 
+		friend class wrapped_builder; // workaround for MSVC
+
 		ioport_builder(ioport_builder const &) = delete;
 		ioport_builder &operator=(ioport_builder const &) = delete;
 		ioport_builder &operator=(ioport_builder &&that) = delete;
@@ -1876,6 +1894,8 @@ private:
 			std::string m_tag;
 		};
 
+		friend class wrapped_builder; // workaround for MSVC
+
 		membank_builder(membank_builder const &) = delete;
 		membank_builder &operator=(membank_builder const &) = delete;
 		membank_builder &operator=(membank_builder &&that) = delete;
@@ -1971,6 +1991,8 @@ private:
 			std::string m_tag;
 		};
 
+		friend class wrapped_builder; // workaround for MSVC
+
 		output_builder(output_builder const &) = delete;
 		output_builder &operator=(output_builder const &) = delete;
 		output_builder &operator=(output_builder &&that) = delete;
@@ -2062,6 +2084,8 @@ private:
 			device_t &m_devbase;
 			std::string m_message;
 		};
+
+		friend class wrapped_builder; // workaround for MSVC
 
 		log_builder(log_builder const &) = delete;
 		log_builder &operator=(log_builder const &) = delete;

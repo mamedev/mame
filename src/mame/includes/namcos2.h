@@ -7,6 +7,10 @@
   Common functions & declarations for the Namco System 2 driver
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_NAMCOS2_H
+#define MAME_INCLUDES_NAMCOS2_H
+
+#pragma once
 
 #include "machine/namco_c139.h"
 #include "machine/namco_c148.h"
@@ -100,28 +104,29 @@ enum
 class namcos2_shared_state : public driver_device
 {
 public:
-	namcos2_shared_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_dspmaster(*this, "dspmaster"),
-		m_dspslave(*this, "dspslave"),
-		m_gametype(0),
-		m_c68(*this, "c68"),
-		m_master_intc(*this, "master_intc"),
-		m_slave_intc(*this, "slave_intc"),
-		m_sci(*this, "sci"),
-		m_gpu(*this, "gpu"),
-		m_c169_roz_videoram(*this, "rozvideoram", 0),
-		m_c169_roz_gfxbank(0),
-		m_c169_roz_mask(nullptr),
-		m_c355_obj_gfxbank(0),
-		m_c355_obj_palxor(0),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_slave(*this, "slave"),
-		m_mcu(*this, "mcu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+	namcos2_shared_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_dspmaster(*this, "dspmaster")
+		, m_dspslave(*this, "dspslave")
+		, m_gametype(0)
+		, m_c68(*this, "c68")
+		, m_master_intc(*this, "master_intc")
+		, m_slave_intc(*this, "slave_intc")
+		, m_sci(*this, "sci")
+		, m_gpu(*this, "gpu")
+		, m_c169_roz_videoram(*this, "rozvideoram", 0)
+		, m_c169_roz_gfxbank(0)
+		, m_c169_roz_mask(nullptr)
+		, m_c355_obj_gfxbank(0)
+		, m_c355_obj_palxor(0)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_slave(*this, "slave")
+		, m_mcu(*this, "mcu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+	{ }
 
 	optional_device<cpu_device> m_dspmaster;
 	optional_device<cpu_device> m_dspslave;
@@ -470,3 +475,5 @@ extern void (*namcos2_kickstart)(running_machine &machine, int internal);
 /**************************************************************/
 /* Sound CPU support handlers - 6809                          */
 /**************************************************************/
+
+#endif // MAME_INCLUDES_NAMCOS2_H
