@@ -133,7 +133,7 @@ DEFINE_DEVICE_TYPE(SAPPHIRE_IOGA, sapphire_ioga_device, "ioga_s", "I/O Gate Arra
 
 interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_memory_tag(nullptr)
+	, m_memory_device(*this, finder_base::DUMMY_TAG)
 	, m_memory_space(nullptr)
 	, m_out_nmi_func(*this)
 	, m_out_irq_func(*this)
@@ -166,14 +166,18 @@ sapphire_ioga_device::sapphire_ioga_device(const machine_config &mconfig, const 
 {
 }
 
+void interpro_ioga_device::device_validity_check(validity_checker &valid) const
+{
+	if (m_memory_device && !m_memory_device->has_space(m_memory_spacenum))
+		osd_printf_error("Device %s (%s) doen't have memory space %d\n", m_memory_device->device().tag(), m_memory_device->device().name(), m_memory_spacenum);
+}
+
 void interpro_ioga_device::device_start()
 {
-	assert_always(m_memory_tag != nullptr, "memory tag and address space number must be configured");
-
 	// get the memory space
-	device_memory_interface *memory;
-	siblingdevice(m_memory_tag)->interface(memory);
-	m_memory_space = &memory->space(m_memory_spacenum);
+	if (!m_memory_device->has_space(m_memory_spacenum))
+		throw emu_fatalerror("%s: Device %s (%s) doen't have memory space %d\n", tag(), m_memory_device->device().tag(), m_memory_device->device().name(), m_memory_spacenum);
+	m_memory_space = &m_memory_device->space(m_memory_spacenum);
 
 	// resolve callbacks
 	m_out_nmi_func.resolve();

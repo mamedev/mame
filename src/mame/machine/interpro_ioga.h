@@ -6,32 +6,6 @@
 
 #pragma once
 
-#define MCFG_INTERPRO_IOGA_NMI_CB(_out_nmi) \
-	downcast<interpro_ioga_device &>(*device).set_out_nmi_callback(DEVCB_##_out_nmi);
-
-#define MCFG_INTERPRO_IOGA_IRQ_CB(_out_irq) \
-	downcast<interpro_ioga_device &>(*device).set_out_irq_callback(DEVCB_##_out_irq);
-
-#define MCFG_INTERPRO_IOGA_IVEC_CB(_out_ivec) \
-	downcast<interpro_ioga_device &>(*device).set_out_irq_vector_callback(DEVCB_##_out_ivec);
-
-#define MCFG_INTERPRO_IOGA_DMA_CB(_channel, _dma_r, _dma_w) \
-	downcast<interpro_ioga_device &>(*device).set_dma_r_callback(_channel, DEVCB_##_dma_r); \
-	downcast<interpro_ioga_device &>(*device).set_dma_w_callback(_channel, DEVCB_##_dma_w);
-
-#define MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(_channel, _dma_r, _dma_w) \
-	downcast<interpro_ioga_device &>(*device).set_serial_dma_r_callback(_channel, DEVCB_##_dma_r); \
-	downcast<interpro_ioga_device &>(*device).set_serial_dma_w_callback(_channel, DEVCB_##_dma_w);
-
-#define MCFG_INTERPRO_IOGA_FDCTC_CB(_tc) \
-	downcast<interpro_ioga_device &>(*device).set_fdc_tc_callback(DEVCB_##_tc);
-
-#define MCFG_INTERPRO_IOGA_ETH_CA_CB(_ca) \
-	downcast<interpro_ioga_device &>(*device).set_eth_ca_callback(DEVCB_##_ca);
-
-#define MCFG_INTERPRO_IOGA_MEMORY(_tag, _spacenum) \
-	downcast<interpro_ioga_device &>(*device).set_memory(_tag, _spacenum);
-
 class interpro_ioga_device : public device_t
 {
 protected:
@@ -76,15 +50,6 @@ protected:
 	};
 
 public:
-	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq_vector_callback(Object &&cb) { return m_out_irq_vector_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_r_callback(int channel, Object &&cb) { return m_dma_channel[channel].device_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_w_callback(int channel, Object &&cb) { return m_dma_channel[channel].device_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_serial_dma_r_callback(int channel, Object &&cb) { return m_serial_dma_channel[channel].device_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_serial_dma_w_callback(int channel, Object &&cb) { return m_serial_dma_channel[channel].device_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_fdc_tc_callback(Object &&cb) { return m_fdc_tc_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_eth_ca_callback(Object &&cb) { return m_eth_ca_func.set_callback(std::forward<Object>(cb)); }
 	auto out_nmi_callback() { return m_out_nmi_func.bind(); }
 	auto out_irq_callback() { return m_out_irq_func.bind(); }
 	auto out_irq_vector_callback() { return m_out_irq_vector_func.bind(); }
@@ -95,9 +60,9 @@ public:
 	auto fdc_tc_callback() { return m_fdc_tc_func.bind(); }
 	auto eth_ca_callback() { return m_eth_ca_func.bind(); }
 
-	void set_memory(const char *const tag, const int spacenum)
+	template <typename T> void set_memory(T &&tag, int spacenum)
 	{
-		m_memory_tag = tag;
+		m_memory_device.set_tag(std::forward<T>(tag));
 		m_memory_spacenum = spacenum;
 	}
 
@@ -278,10 +243,11 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	const char *m_memory_tag;
+	required_device<device_memory_interface> m_memory_device;
 	int m_memory_spacenum;
 	address_space *m_memory_space;
 
