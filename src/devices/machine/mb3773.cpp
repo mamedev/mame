@@ -66,6 +66,8 @@ void mb3773_device::device_timer(emu_timer &timer, device_timer_id id, int param
 #else
 	machine().schedule_soft_reset();
 #endif
+
+	reset_timer();
 }
 
 void mb3773_device::reset_timer()
