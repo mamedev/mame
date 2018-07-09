@@ -2167,7 +2167,7 @@ MACHINE_CONFIG_START(megast_state::megast)
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
-	aciairq.output_handler().set("mfp", FUNC(mc68901_device::i4_w)).invert();
+	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
@@ -2269,7 +2269,7 @@ MACHINE_CONFIG_START(ste_state::ste)
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
-	aciairq.output_handler().set("mfp", FUNC(mc68901_device::i4_w)).invert();
+	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
@@ -2379,7 +2379,7 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
-	aciairq.output_handler().set("mfp", FUNC(mc68901_device::i4_w)).invert();
+	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
