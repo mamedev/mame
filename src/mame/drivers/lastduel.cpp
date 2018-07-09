@@ -916,7 +916,7 @@ ROM_START( leds2011p ) /* CAPCOM 87616A-2 PCB connected to a CAPCOM 87616B-2 + 4
 	ROM_LOAD( "05.10e",    0x20000, 0x20000, CRC(b06e03b5) SHA1(7d17e5cfb57866c60146bea1a4535e961c73327c) ) /* hand written checksum of 926D on genuine CAPCOM label */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "63S141an.15k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) ) /* priority (not used) BPROM type MMI 63S141AN or compatible like 82S129A */
+	ROM_LOAD( "63s141an.15k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) ) /* priority (not used) BPROM type MMI 63S141AN or compatible like 82S129A */
 ROM_END
 
 /******************************************************************************/
