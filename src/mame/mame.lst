@@ -1018,7 +1018,7 @@ maddog2_100                     // (c) 1992
 maddog2_110                     // (c) 1992
 maddog2_202                     // (c) 1992
 maddoga                         // (c) 1990
-marvice							// (c) 1994
+marvice                         // (c) 1994
 spacepir                        // (c) 1992
 spacepir_14                     // (c) 1992
 wsjr                            // (c) 1991
@@ -17870,6 +17870,7 @@ lastduelb                       // bootleg
 lastduelj                       // 7/1988 (c) 1988 (Japan)
 lastduelo                       // 7/1988 (c) 1988 (US)
 leds2011                        // 1988 (c) 1988 (World)
+leds2011p                       // 1988 (c) 1988 (US, Prototype)
 leds2011u                       // 1988 (c) 1988 (US)
 ledstorm                        // 1988 (c) 1988 (US)
 madgear                         // 2/1989 (c) 1989 (US)
@@ -32772,6 +32773,7 @@ raidendxj                       // (c) 1994 Seibu Kaihatsu
 raidendxja                      // (c) 1994 Seibu Kaihatsu
 raidendxk                       // (c) 1994 Seibu Kaihatsu
 raidendxnl                      // (c) 1994 Seibu Kaihatsu
+raidendxpt                      // (c) 1994 Seibu Kaihatsu
 raidendxu                       // (c) 1994 Seibu Kaihatsu + Fabtek license
 xsedae                          // (c) 1995 Dream Island
 zeroteam                        // (c) 1993 Seibu Kaihatsu + Fabtek license
@@ -34194,8 +34196,9 @@ alien3j                         // 1993.?? Aliens 3 (Japan)
 arabfgt                         // 1992.?? Arabian Fight (World)
 arabfgtj                        // 1992.03 Arabian Fight (Japan)
 arabfgtu                        // 1992.03 Arabian Fight (US)
-arescue                         // 1992.03 Air Rescue (US)
+arescue                         // 1992.03 Air Rescue (World)
 arescuej                        // 1992.04 Air Rescue (Japan)
+arescueu                        // 1992.03 Air Rescue (US)
 brival                          // 1993.?? Burning Rival (World)
 brivalj                         // 1993.08 Burning Rival (Japan)
 darkedge                        // 1993.?? Dark Edge (World)

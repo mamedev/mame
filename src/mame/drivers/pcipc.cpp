@@ -452,7 +452,7 @@ WRITE8_MEMBER(pcipc_state::boot_state_phoenix_ver40_rev6_w)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-
+	printf("[%02X]",data);
 }
 
 

@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_RIOT6532_OUT_PB_CB(WRITE8("tms", tms5220_device, data_w))
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
-	MCFG_X2212_ADD_AUTOSAVE("x2212") /* nvram */
+	X2212(config, "x2212").set_auto_save(true); /* nvram */
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // 9L/M
 	outlatch.q_out_cb<0>().set(FUNC(starwars_state::coin1_counter_w)); // Coin counter 1

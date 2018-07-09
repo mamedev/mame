@@ -1782,7 +1782,7 @@ void mips3_device::handle_cop0(uint32_t op)
 					break;
 
 				case 0x10:  /* RFE */   invalid_instruction(op);                            break;
-				case 0x18:  /* ERET   logerror("ERET\n"); */ m_core->pc = m_core->cpr[0][COP0_EPC]; SR &= ~SR_EXL; check_irqs(); m_lld_value ^= 0xffffffff; m_ll_value ^= 0xffffffff;  break;
+				case 0x18:  /* ERET */ m_core->pc = m_core->cpr[0][COP0_EPC]; SR &= ~SR_EXL; check_irqs(); m_lld_value ^= 0xffffffff; m_ll_value ^= 0xffffffff;  break;
 				case 0x20:  /* WAIT */                                                      break;
 				default:    handle_extra_cop0(op);                                          break;
 			}
@@ -3417,9 +3417,21 @@ void r5900le_device::handle_idt(uint32_t op)
 			if (rd)
 			{
 				const uint64_t rsval = m_core->r[rs];
-				const uint64_t hi = (uint32_t)(count_leading_zeros((uint32_t)(rsval >> 32)) - 1);
-				const uint64_t lo = (uint32_t)(count_leading_zeros((uint32_t)rsval) - 1);
-				m_core->r[rd] = (hi << 32) | lo;
+				uint32_t count[2] = { 0 };
+				for (uint32_t word = 0; word < 2; word++)
+				{
+					uint32_t value = (uint32_t)(rsval >> (word * 32));
+					const uint32_t compare = value & (1U << 31);
+					for (int bit = 30; bit > 0; bit--)
+					{
+						value <<= 1;
+						if ((value & (1U << 31)) == compare)
+							count[word]++;
+						else
+							break;
+					}
+				}
+				m_core->r[rd] = ((uint64_t)count[1] << 32) | count[0];
 			}
 			break;
 		case 0x08: /* MMI0 */

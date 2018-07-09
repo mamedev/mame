@@ -65,8 +65,8 @@ DEFINE_DEVICE_TYPE(NAMCO_C148, namco_c148_device, "namco_c148", "Namco C148 Inte
 //  namco_c148_device - constructor
 //-------------------------------------------------
 
-namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C148, tag, owner, clock),
+namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NAMCO_C148, tag, owner, clock),
 	m_out_ext1_cb(*this),
 	m_out_ext2_cb(*this),
 	m_hostcpu(*this, finder_base::DUMMY_TAG),
@@ -96,6 +96,17 @@ void namco_c148_device::map(address_map &map)
 	map(0x26000, 0x27fff).noprw(); // watchdog
 }
 
+
+
+//-------------------------------------------------
+//  device_validity_check - device-specific checks
+//-------------------------------------------------
+
+void namco_c148_device::device_validity_check(validity_checker &valid) const
+{
+	if ((m_linked_c148.finder_tag() != finder_base::DUMMY_TAG) && !m_linked_c148)
+		osd_printf_error("Linked C148 configured but not found.\n");
+}
 
 
 //-------------------------------------------------

@@ -115,7 +115,7 @@ void ps2_dmac_device::transfer_sif0()
 	{
 		if (m_sif->fifo_depth(0) >= 4)
 		{
-			logerror("%s: SIF0 depth is %d\n", machine().describe_context(), m_sif->fifo_depth(0));
+			//logerror("%s: SIF0 depth is %d\n", machine().describe_context(), m_sif->fifo_depth(0));
 			uint32_t addr = channel.addr();
 			for (int word = 0; word < 4; word++)
 			{
@@ -126,7 +126,7 @@ void ps2_dmac_device::transfer_sif0()
 			}
 			channel.set_addr(addr);
 			channel.set_quadword_count(count - 1);
-			logerror("%s: SIF0 remaining count: %08x\n", machine().describe_context(), channel.quadword_count());
+			//logerror("%s: SIF0 remaining count: %08x\n", machine().describe_context(), channel.quadword_count());
 		}
 	}
 	else if (channel.end_tag())
@@ -182,7 +182,7 @@ void ps2_dmac_device::transfer_sif1()
 	}
 	else
 	{
-		//logerror("%s: DMAC SIF1 following source tag\n", machine().describe_context());
+		logerror("%s: DMAC SIF1 following source tag\n", machine().describe_context());
 		follow_source_tag(SIF1);
 	}
 }

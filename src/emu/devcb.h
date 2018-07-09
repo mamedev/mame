@@ -95,6 +95,18 @@ enum devcb_noop_t { DEVCB_NOOP };
 
 
 //**************************************************************************
+//  DETECT PROBLEMATIC COMPILERS
+//**************************************************************************
+
+#if defined(__GNUC__) && !defined(__clang__)
+#if __GNUC__ >= 8
+#define MAME_DEVCB_GNUC_BROKEN_FRIEND 1
+#endif // __GNUC__ >= 8
+#endif // defined(__GNUC__) && !defined(__clang__)
+
+
+
+//**************************************************************************
 //  DELEGATE TYPES
 //**************************************************************************
 
@@ -240,12 +252,12 @@ protected:
 		auto rshift(unsigned val)
 		{
 			auto trans(static_cast<Impl &>(*this).transform([val] (offs_t offset, T data, std::make_unsigned_t<T> &mem_mask) { mem_mask >>= val; return data >> val; }));
-			return std::move(trans.mask(m_mask >> val));
+			return inherited_mask() ? std::move(trans) : std::move(trans.mask(m_mask >> val));
 		}
 		auto lshift(unsigned val)
 		{
 			auto trans(static_cast<Impl &>(*this).transform([val] (offs_t offset, T data, std::make_unsigned_t<T> &mem_mask) { mem_mask <<= val; return data << val; }));
-			return std::move(trans.mask(m_mask << val));
+			return inherited_mask() ? std::move(trans) : std::move(trans.mask(m_mask << val));
 		}
 		auto bit(unsigned val) { return std::move(rshift(val).mask(T(1U))); }
 
@@ -466,9 +478,13 @@ private:
 		std::string m_message;
 	};
 
+	template <typename Source, typename Func> class transform_builder; // workaround for MSVC
+
 	class builder_base
 	{
 	protected:
+		template <typename T, typename U> friend class transform_builder; // workaround for MSVC
+
 		builder_base(devcb_read &target, bool append) : m_target(target), m_append(append) { }
 		builder_base(builder_base const &) = delete;
 		builder_base(builder_base &&) = default;
@@ -476,7 +492,13 @@ private:
 		builder_base &operator=(builder_base const &) = delete;
 		builder_base &operator=(builder_base &&) = default;
 
+#ifdef MAME_DEVCB_GNUC_BROKEN_FRIEND
+	public:
+#endif
 		void consume() { m_consumed = true; }
+#ifdef MAME_DEVCB_GNUC_BROKEN_FRIEND
+	protected:
+#endif
 		void built() { assert(!m_built); m_built = true; }
 
 		template <typename T>
@@ -1047,9 +1069,15 @@ private:
 		virtual func_t create() override { return [] (address_space &space, offs_t offset, Input data, std::make_unsigned_t<Input> mem_mask) { }; }
 	};
 
+	template <typename Source, typename Func> class transform_builder; // workaround for MSVC
+	template <typename Sink, typename Func> class first_transform_builder; // workaround for MSVC
+
 	class builder_base
 	{
 	protected:
+		template <typename T, typename U> friend class transform_builder; // workaround for MSVC
+		template <typename T, typename U> friend class first_transform_builder; // workaround for MSVC
+
 		builder_base(devcb_write &target, bool append) : m_target(target), m_append(append) { }
 		builder_base(builder_base const &) = delete;
 		builder_base(builder_base &&) = default;
@@ -1057,7 +1085,13 @@ private:
 		builder_base &operator=(builder_base const &) = delete;
 		builder_base &operator=(builder_base &&) = default;
 
+#ifdef MAME_DEVCB_GNUC_BROKEN_FRIEND
+	public:
+#endif
 		void consume() { m_consumed = true; }
+#ifdef MAME_DEVCB_GNUC_BROKEN_FRIEND
+	protected:
+#endif
 		void built() { assert(!m_built); m_built = true; }
 
 		template <typename T>
@@ -1109,7 +1143,10 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<output_t, output_t, T>::value, transform_builder<transform_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return transform_builder<transform_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, std::move(*this), std::forward<T>(cb), this->mask());
+			output_t const m(this->mask());
+			if (this->inherited_mask())
+				this->mask(output_t(~output_t(0)));
+			return transform_builder<transform_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, std::move(*this), std::forward<T>(cb), m);
 		}
 
 		auto build()
@@ -1160,9 +1197,9 @@ private:
 		using output_t = mask_t<transform_result_t<typename Sink::input_t, typename Sink::input_t, Func>, typename Sink::input_t>;
 
 		template <typename T>
-		first_transform_builder(devcb_write &target, bool append, Sink &&sink, T &&cb, std::make_unsigned_t<Input> in_exor, std::make_unsigned_t<Input> in_mask)
+		first_transform_builder(devcb_write &target, bool append, Sink &&sink, T &&cb, std::make_unsigned_t<Input> in_exor, std::make_unsigned_t<Input> in_mask, std::make_unsigned_t<output_t> mask)
 			: builder_base(target, append)
-			, transform_base<output_t, first_transform_builder>(DefaultMask)
+			, transform_base<output_t, first_transform_builder>(mask)
 			, m_sink(std::move(sink))
 			, m_cb(std::forward<T>(cb))
 			, m_in_exor(in_exor & in_mask)
@@ -1187,7 +1224,10 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<output_t, output_t, T>::value, transform_builder<first_transform_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return transform_builder<first_transform_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, std::move(*this), std::forward<T>(cb), this->mask());
+			output_t const m(this->mask());
+			if (this->inherited_mask())
+				this->mask(output_t(~output_t(0)));
+			return transform_builder<first_transform_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, std::move(*this), std::forward<T>(cb), m);
 		}
 
 		auto build()
@@ -1293,7 +1333,7 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
 		void validity_check(validity_checker &valid) const { }
@@ -1361,6 +1401,8 @@ private:
 			Delegate m_delegate;
 		};
 
+		friend class wrapped_builder; // workaround for MSVC
+
 		delegate_builder(delegate_builder const &) = delete;
 		delegate_builder &operator=(delegate_builder const &) = delete;
 		delegate_builder &operator=(delegate_builder &&that) = delete;
@@ -1399,7 +1441,9 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask());
+			std::make_unsigned_t<Input> const in_mask(this->inherited_mask() ? DefaultMask : this->mask());
+			mask_t<Input, typename delegate_traits<Delegate>::input_t> const out_mask(DefaultMask & delegate_traits<Delegate>::default_mask);
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), in_mask, out_mask);
 		}
 
 		void validity_check(validity_checker &valid) const
@@ -1491,6 +1535,8 @@ private:
 			int const m_linenum;
 		};
 
+		friend class wrapped_builder; // workaround for MSVC
+
 		inputline_builder(inputline_builder const &) = delete;
 		inputline_builder &operator=(inputline_builder const &) = delete;
 		inputline_builder &operator=(inputline_builder &&that) = delete;
@@ -1535,9 +1581,8 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			first_transform_builder<wrapped_builder, std::remove_reference_t<T> > result(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->inherited_mask() ? DefaultMask : this->mask());
-			result.mask(1);
-			return std::move(result);
+			std::make_unsigned_t<Input> const in_mask(this->inherited_mask() ? DefaultMask : this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), in_mask, 1U);
 		}
 
 		void validity_check(validity_checker &valid) const
@@ -1646,6 +1691,8 @@ private:
 			int const m_value;
 		};
 
+		friend class wrapped_builder; // workaround for MSVC
+
 		latched_inputline_builder(latched_inputline_builder const &) = delete;
 		latched_inputline_builder &operator=(latched_inputline_builder const &) = delete;
 		latched_inputline_builder &operator=(latched_inputline_builder &&that) = delete;
@@ -1694,7 +1741,7 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->inherited_mask() ? DefaultMask : this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
 		void validity_check(validity_checker &valid) const
@@ -1778,6 +1825,8 @@ private:
 			std::string m_tag;
 		};
 
+		friend class wrapped_builder; // workaround for MSVC
+
 		ioport_builder(ioport_builder const &) = delete;
 		ioport_builder &operator=(ioport_builder const &) = delete;
 		ioport_builder &operator=(ioport_builder &&that) = delete;
@@ -1808,7 +1857,7 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
 		void validity_check(validity_checker &valid) const { }
@@ -1876,6 +1925,8 @@ private:
 			std::string m_tag;
 		};
 
+		friend class wrapped_builder; // workaround for MSVC
+
 		membank_builder(membank_builder const &) = delete;
 		membank_builder &operator=(membank_builder const &) = delete;
 		membank_builder &operator=(membank_builder &&that) = delete;
@@ -1906,7 +1957,7 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
 		void validity_check(validity_checker &valid) const { }
@@ -1971,6 +2022,8 @@ private:
 			std::string m_tag;
 		};
 
+		friend class wrapped_builder; // workaround for MSVC
+
 		output_builder(output_builder const &) = delete;
 		output_builder &operator=(output_builder const &) = delete;
 		output_builder &operator=(output_builder &&that) = delete;
@@ -2001,7 +2054,7 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
 		void validity_check(validity_checker &valid) const { }
@@ -2063,6 +2116,8 @@ private:
 			std::string m_message;
 		};
 
+		friend class wrapped_builder; // workaround for MSVC
+
 		log_builder(log_builder const &) = delete;
 		log_builder &operator=(log_builder const &) = delete;
 		log_builder &operator=(log_builder &&that) = delete;
@@ -2093,7 +2148,7 @@ private:
 		template <typename T>
 		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
 		{
-			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->inherited_mask() ? DefaultMask : this->mask());
+			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
 		void validity_check(validity_checker &valid) const { }

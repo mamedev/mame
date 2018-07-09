@@ -897,7 +897,7 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 	MCFG_QUANTUM_PERFECT_CPU("dsp")
 #endif
 
-	MCFG_X2212_ADD("x2212")
+	X2212(config, "x2212");
 
 	/* video hardware */
 

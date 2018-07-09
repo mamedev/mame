@@ -156,6 +156,7 @@ iLinkSGUID=0x--------
 (*) values are not detected
 ************************************************************************************************************************/
 #include "emu.h"
+#include "audio/iopspu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
 #include "machine/ioptimer.h"
@@ -182,6 +183,7 @@ public:
 		, m_iop_timer(*this, "iop_timer")
 		, m_iop_dma(*this, "iop_dma")
 		, m_iop_intc(*this, "iop_intc")
+		, m_iop_spu(*this, "iop_spu%u", 1U)
 		, m_screen(*this, "screen")
 		, m_ram(*this, "ram")
 		, m_iop_ram(*this, "iop_ram")
@@ -231,6 +233,10 @@ protected:
     DECLARE_WRITE32_MEMBER(iop_debug_w);
 	DECLARE_READ32_MEMBER(unk_iop_r);
 	DECLARE_WRITE32_MEMBER(unk_iop_w);
+    DECLARE_WRITE16_MEMBER(iop_spu_w);
+    DECLARE_READ16_MEMBER(iop_spu_r);
+    DECLARE_WRITE16_MEMBER(iop_spu2_w);
+    DECLARE_READ16_MEMBER(iop_spu2_r);
 
 	DECLARE_WRITE_LINE_MEMBER(iop_timer_irq);
 
@@ -246,6 +252,7 @@ protected:
 	required_device<iop_timer_device> m_iop_timer;
 	required_device<iop_dma_device> m_iop_dma;
 	required_device<iop_intc_device> m_iop_intc;
+	required_device_array<iop_spu_device, 2> m_iop_spu;
 	required_device<screen_device>	m_screen;
 	required_shared_ptr<uint64_t>	m_ram;
 	required_shared_ptr<uint32_t>	m_iop_ram;
@@ -556,6 +563,28 @@ READ32_MEMBER(ps2sony_state::unk_iop_r)
 WRITE32_MEMBER(ps2sony_state::unk_iop_w)
 {
 	logerror("%s; unk_iop_w: Unknown write: %08x = %08x & %08x\n", machine().describe_context(), 0x1f402000 + (offset << 2), data, mem_mask);
+}
+
+WRITE16_MEMBER(ps2sony_state::iop_spu2_w)
+{
+	switch (offset)
+	{
+		default:
+			logerror("%s: iop_spu2_w: Unknown %08x = %04x & %04x\n", 0x1f900000 + (offset << 1), data, mem_mask);
+			break;
+	}
+}
+
+READ16_MEMBER(ps2sony_state::iop_spu2_r)
+{
+	uint32_t ret = 0;
+	switch (offset)
+	{
+		default:
+			logerror("%s: iop_spu2_r: Unknown %08x (%04x)\n", 0x1f900000 + (offset << 1), mem_mask);
+			break;
+	}
+	return ret;
 }
 
 void ps2sony_state::machine_start()
@@ -880,6 +909,8 @@ void ps2sony_state::iop_map(address_map &map)
     map(0x1f801500, 0x1f801577).rw(m_iop_dma, FUNC(iop_dma_device::bank1_r), FUNC(iop_dma_device::bank1_w));
     map(0x1f801578, 0x1f80157b).noprw();
     map(0x1f802070, 0x1f802073).w(FUNC(ps2sony_state::iop_debug_w)).nopr();
+    map(0x1f900000, 0x1f9003ff).rw(m_iop_spu[0], FUNC(iop_spu_device::read), FUNC(iop_spu_device::write));
+    map(0x1f900400, 0x1f9007ff).rw(m_iop_spu[1], FUNC(iop_spu_device::read), FUNC(iop_spu_device::write));
     map(0x1fc00000, 0x1fffffff).rom().region("bios", 0);
     map(0x1ffe0130, 0x1ffe0133).nopw();
 }
@@ -912,8 +943,10 @@ MACHINE_CONFIG_START(ps2sony_state::ps2sony)
 	MCFG_DEVICE_ADD(m_iop_intc, SONYIOP_INTC, m_iop)
 	MCFG_DEVICE_ADD(m_iop_timer, SONYIOP_TIMER, XTAL(67'737'600)/2)
 	MCFG_IOP_TIMER_IRQ_CALLBACK(WRITELINE(*this, ps2sony_state, iop_timer_irq))
+	MCFG_DEVICE_ADD(m_iop_spu[0], SONYIOP_SPU, XTAL(67'737'600)/2, m_iop)
+	MCFG_DEVICE_ADD(m_iop_spu[1], SONYIOP_SPU, XTAL(67'737'600)/2, m_iop)
 
-	MCFG_DEVICE_ADD(m_iop_dma, SONYIOP_DMA, XTAL(67'737'600)/2, m_iop_intc, m_iop_ram, m_sif)
+	MCFG_DEVICE_ADD(m_iop_dma, SONYIOP_DMA, XTAL(67'737'600)/2, m_iop_intc, m_iop_ram, m_sif, m_iop_spu[0], m_iop_spu[1])
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

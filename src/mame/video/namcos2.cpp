@@ -8,19 +8,14 @@
 void namcos2_state::TilemapCB(uint16_t code, int *tile, int *mask)
 {
 	*mask = code;
+	/* The order of bits needs to be corrected to index the right tile  14 15 11 12 13 */
+	*tile = bitswap<16>(code, 13, 12, 11, 15, 14, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+}
 
-	switch( m_gametype )
-	{
-	case NAMCOS2_FINAL_LAP_2:
-	case NAMCOS2_FINAL_LAP_3:
-		*tile = (code&0x07ff)|((code&0x4000)>>3)|((code&0x3800)<<1);
-		break;
-
-	default:
-		/* The order of bits needs to be corrected to index the right tile  14 15 11 12 13 */
-		*tile = (code&0x07ff)|((code&0xc000)>>3)|((code&0x3800)<<2);
-		break;
-	}
+void namcos2_state::TilemapCB_finalap2(uint16_t code, int *tile, int *mask)
+{
+	*mask = code;
+	*tile = bitswap<15>(code, 13, 12, 11, 14, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 /**
@@ -448,6 +443,12 @@ void namcos2_state::video_start_finallap()
 	draw_sprite_init();
 }
 
+void namcos2_state::video_start_finalap2()
+{
+	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
+	draw_sprite_init();
+}
+
 uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
@@ -471,13 +472,29 @@ uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind
 
 /**************************************************************************/
 
+void namcos2_state::RozCB_luckywld(uint16_t code, int *tile, int *mask, int which)
+{
+	*mask = code;
+
+	uint16_t mangle = bitswap<11>(code & 0x31ff, 13, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+	switch ((code >> 9) & 7)
+	{
+		case 0x00: mangle += 0x1c00; break; // Plus, NOT OR
+		case 0x01: mangle |= 0x0800; break;
+		case 0x02: mangle |= 0x0000; break;
+		default: break;
+	}
+
+	*tile = mangle;
+}
+
 void namcos2_state::video_start_luckywld()
 {
 	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	c355_obj_init( 0, 0x0, namcos2_shared_state::c355_obj_code2tile_delegate() );
 	if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
 	{
-		c169_roz_init(1, "gfx5");
+		c169_roz_init(1, "gfx5", namcos2_shared_state::c169_tilemap_delegate(&namcos2_state::RozCB_luckywld, this));
 	}
 }
 
@@ -534,10 +551,16 @@ uint32_t namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind1
 
 /**************************************************************************/
 
+void namcos2_state::RozCB_metlhawk(uint16_t code, int *tile, int *mask, int which)
+{
+	*mask = code;
+	*tile = bitswap<13>(code & 0x1fff, 11, 10, 9, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+}
+
 void namcos2_state::video_start_metlhawk()
 {
 	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
-	c169_roz_init(1, "gfx5");
+	c169_roz_init(1, "gfx5", namcos2_shared_state::c169_tilemap_delegate(&namcos2_state::RozCB_metlhawk, this));
 }
 
 uint32_t namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
