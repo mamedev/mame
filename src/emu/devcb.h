@@ -95,6 +95,18 @@ enum devcb_noop_t { DEVCB_NOOP };
 
 
 //**************************************************************************
+//  DETECT PROBLEMATIC COMPILERS
+//**************************************************************************
+
+#if defined(__GNUC__) && !defined(__clang__)
+#if __GNUC__ >= 8
+#define MAME_DEVCB_GNUC_BROKEN_FRIEND 1
+#endif // __GNUC__ >= 8
+#endif // defined(__GNUC__) && !defined(__clang__)
+
+
+
+//**************************************************************************
 //  DELEGATE TYPES
 //**************************************************************************
 
@@ -466,12 +478,12 @@ private:
 		std::string m_message;
 	};
 
-	template <typename Source, typename Func> class transform_builder; // workaround for GCC 8 not implementing friend properly
+	template <typename Source, typename Func> class transform_builder; // workaround for MSVC
 
 	class builder_base
 	{
 	protected:
-		template <typename T, typename U> friend class transform_builder; // workaround for GCC 8 not implementing friend properly
+		template <typename T, typename U> friend class transform_builder; // workaround for MSVC
 
 		builder_base(devcb_read &target, bool append) : m_target(target), m_append(append) { }
 		builder_base(builder_base const &) = delete;
@@ -480,7 +492,13 @@ private:
 		builder_base &operator=(builder_base const &) = delete;
 		builder_base &operator=(builder_base &&) = default;
 
+#ifdef MAME_DEVCB_GNUC_BROKEN_FRIEND
+	public:
+#endif
 		void consume() { m_consumed = true; }
+#ifdef MAME_DEVCB_GNUC_BROKEN_FRIEND
+	protected:
+#endif
 		void built() { assert(!m_built); m_built = true; }
 
 		template <typename T>
@@ -1051,14 +1069,14 @@ private:
 		virtual func_t create() override { return [] (address_space &space, offs_t offset, Input data, std::make_unsigned_t<Input> mem_mask) { }; }
 	};
 
-	template <typename Source, typename Func> class transform_builder; // workaround for GCC 8 not implementing friend properly
-	template <typename Sink, typename Func> class first_transform_builder; // workaround for GCC 8 not implementing friend properly
+	template <typename Source, typename Func> class transform_builder; // workaround for MSVC
+	template <typename Sink, typename Func> class first_transform_builder; // workaround for MSVC
 
 	class builder_base
 	{
 	protected:
-		template <typename T, typename U> friend class transform_builder; // workaround for GCC 8 not implementing friend properly
-		template <typename T, typename U> friend class first_transform_builder; // workaround for GCC 8 not implementing friend properly
+		template <typename T, typename U> friend class transform_builder; // workaround for MSVC
+		template <typename T, typename U> friend class first_transform_builder; // workaround for MSVC
 
 		builder_base(devcb_write &target, bool append) : m_target(target), m_append(append) { }
 		builder_base(builder_base const &) = delete;
@@ -1067,7 +1085,13 @@ private:
 		builder_base &operator=(builder_base const &) = delete;
 		builder_base &operator=(builder_base &&) = default;
 
+#ifdef MAME_DEVCB_GNUC_BROKEN_FRIEND
+	public:
+#endif
 		void consume() { m_consumed = true; }
+#ifdef MAME_DEVCB_GNUC_BROKEN_FRIEND
+	protected:
+#endif
 		void built() { assert(!m_built); m_built = true; }
 
 		template <typename T>
