@@ -905,7 +905,7 @@ ROM_START( leds2011p ) /* CAPCOM 87616A-2 PCB connected to a CAPCOM 87616B-2 + 4
 	ROM_LOAD16_BYTE( "17.rom0",   0x000000, 0x20000, CRC(078a11e7) SHA1(993e4c7e27e94d373d872ca3b3fa1cad06c433b7) ) /* hand written checksum of 7384 on genuine CAPCOM label */
 	ROM_LOAD16_BYTE( "18.rom1",   0x000001, 0x20000, CRC(2222130e) SHA1(d257ce456d1e1b31aeccd4f796bceca6ef5d94a3) ) /* hand written checksum of A0D8 on genuine CAPCOM label */
 
-	ROM_REGION( 0x80000, "gfx4", 0 ) /* ROMs 13 through 16 located on a */
+	ROM_REGION( 0x80000, "gfx4", 0 ) /* ROMs 13 through 16 located on a 87616-C daughter card */
 	ROM_LOAD16_BYTE( "13.rom0",   0x000000, 0x20000, CRC(813e9775) SHA1(1d636966a2a9bb02cfc43655b4dfdb66cf0cd81d) ) /* hand written checksum of C3F7 on genuine CAPCOM label */
 	ROM_LOAD16_BYTE( "14.rom1",   0x000001, 0x20000, CRC(8f1d3727) SHA1(ac0c9d501124de23550e14193780290596639b7c) ) /* hand written checksum of 35D3 on genuine CAPCOM label */
 	ROM_LOAD16_BYTE( "15.rom2",   0x040000, 0x20000, CRC(b68ebcec) SHA1(efbd05896bcf5d7d83dcb196f39941014a7dcfae) ) /* hand written checksum of 8784 on genuine CAPCOM label */
