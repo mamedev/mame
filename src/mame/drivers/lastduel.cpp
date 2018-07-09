@@ -879,6 +879,45 @@ ROM_START( leds2011u )
 	ROM_LOAD( "29.14k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
 ROM_END
 
+ROM_START( leds2011p )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 256K for 68000 code */
+	ROM_LOAD16_BYTE( "04.8d",    0x00000, 0x20000, CRC(7a20bc60) SHA1(36348d8ea150e20e0f9279a3fbac2b204d1e05f1) )
+	ROM_LOAD16_BYTE( "03.7d",    0x00001, 0x20000, CRC(b6a20b12) SHA1(c15a551de283b165aed5ae65363b79a75697423c) )
+	ROM_LOAD16_BYTE( "02.6d",    0x40000, 0x20000, CRC(c7e7f0bc) SHA1(18cbaa2a9a170523680495a3ffa8827990acebe7) )
+	ROM_LOAD16_BYTE( "01.5d",    0x40001, 0x20000, CRC(01520af8) SHA1(45cc4b30ec0ff2432d2794d213261c65e4eda783) )
+
+	ROM_REGION( 0x80000, "unused", 0 ) /* this is actually a 68k program rom from an entirely different revision shoved in a socket near the Z80 */
+	ROM_LOAD16_BYTE( "04.15k",    0x00000, 0x20000, CRC(4817558b) SHA1(82c08bafd7701cfa16b4a012825b8ae1b2386f24) )
+
+	ROM_REGION( 0x18000 , "audiocpu", 0 ) /* audio CPU */
+	ROM_LOAD( "07.14j",   0x00000,  0x10000, CRC(742dc60e) SHA1(7e2edbbb830afb2ee7add2e69323f912c5f9b9db) )
+
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD32_BYTE( "09.rom0",   0x000000, 0x20000, CRC(945aeded) SHA1(ed75b44641b81833cd8925df4fd1966bc71eeb01) )
+	ROM_LOAD32_BYTE( "10.rom1",   0x000002, 0x20000, CRC(1ebd62b7) SHA1(2a132edf4057dc9db38e25374b81f306ca9a7625) )
+	ROM_LOAD32_BYTE( "11.rom0",   0x000001, 0x20000, CRC(e34b20aa) SHA1(f966d6a29b77e6e7182ebe98e4ce48b2e8798e43) )
+	ROM_LOAD32_BYTE( "12.rom1",   0x000003, 0x20000, CRC(c106d67c) SHA1(ea104847c555852259cff57dced6297d5511a146) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "10k",    0x000000, 0x08000, CRC(e2ecb7c6) SHA1(fc8f7e06fbeac37e25ab81c440cd48ca8be02dda) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD16_BYTE( "17.rom0",   0x000000, 0x20000, CRC(078a11e7) SHA1(993e4c7e27e94d373d872ca3b3fa1cad06c433b7) )
+	ROM_LOAD16_BYTE( "18.rom1",   0x000001, 0x20000, CRC(2222130e) SHA1(d257ce456d1e1b31aeccd4f796bceca6ef5d94a3) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_LOAD16_BYTE( "13.rom0",   0x000000, 0x20000, CRC(813e9775) SHA1(1d636966a2a9bb02cfc43655b4dfdb66cf0cd81d) )
+	ROM_LOAD16_BYTE( "14.rom1",   0x000001, 0x20000, CRC(8f1d3727) SHA1(ac0c9d501124de23550e14193780290596639b7c) )
+	ROM_LOAD16_BYTE( "15.rom2",   0x040000, 0x20000, CRC(b68ebcec) SHA1(efbd05896bcf5d7d83dcb196f39941014a7dcfae) )
+	ROM_LOAD16_BYTE( "16.rom3",   0x040001, 0x20000, CRC(ccf22c41) SHA1(e69b638fa13ded00f7e60feaf73d3f247aa22fc2) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM - IC positions swapped compared to other sets? */
+	ROM_LOAD( "06.12e",    0x00000, 0x20000, CRC(88d39a5b) SHA1(8fb2d1d26e2ffb93dfc9cf8f23bb81eb64496c2b) )
+	ROM_LOAD( "05.10e",    0x20000, 0x20000, CRC(b06e03b5) SHA1(7d17e5cfb57866c60146bea1a4535e961c73327c) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "29.14k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
+ROM_END
 
 /******************************************************************************/
 
@@ -895,3 +934,4 @@ GAME( 1988, ledstorm,  madgear,  madgear,  madgear,  lastduel_state, empty_init,
 
 GAME( 1988, leds2011,  0,        madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, leds2011u, leds2011, madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011p, leds2011, madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US, prototype 12)", MACHINE_SUPPORTS_SAVE )
