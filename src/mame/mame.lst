@@ -257,9 +257,6 @@ a5105                           //
 a5120                           //
 a5130                           //
 
-@source:a6809.cpp
-a6809                           //
-
 @source:a7150.cpp
 a7150                           //
 
@@ -873,6 +870,13 @@ acommand                        // (c) 1990
 
 @source:acrnsys1.cpp
 acrnsys1                        // 1979 Acorn System 1 (Microcomputer Kit)
+
+@source:acrnsys.cpp
+acrnsys2                        // 1980 Acorn System 2
+acrnsys3                        // 1980 Acorn System 3 (6502)
+acrnsys3_6809                   // 1980 Acorn System 3 (6809)
+acrnsys4                        // 1980 Acorn System 4
+acrnsys5                        // 1982 Acorn System 5
 
 @source:actfancr.cpp
 actfancr                        // (c) 1989 Data East Corporation (World)
