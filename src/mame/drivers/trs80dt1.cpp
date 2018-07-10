@@ -337,7 +337,7 @@ MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 	m_crtc->set_screen("screen");
 	MCFG_PALETTE_ADD("palette", 3)
 
-	MCFG_X2210_ADD("nvram")
+	X2210(config, "nvram");
 
 	TTL7474(config, m_7474, 0);
 	m_7474->comp_output_cb().set_inputline(m_maincpu, MCS51_INT1_LINE).invert(); // /Q connects directly to /INT1, so we need to invert?

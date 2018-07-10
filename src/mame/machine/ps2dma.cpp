@@ -211,6 +211,10 @@ void ps2_dmac_device::follow_source_tag(uint32_t chan)
             channel.set_addr(addr);
             channel.set_tag_addr(channel.tag_addr() + 0x10);
             break;
+        case ID_NEXT:
+            channel.set_addr(channel.tag_addr() + 0x10);
+            channel.set_tag_addr(addr);
+			break;
         default:
         	logerror("%s: Unknown DMAtag ID: %d\n", machine().describe_context(), id);
         	break;
@@ -401,7 +405,7 @@ READ32_MEMBER(ps2_dmac_device::channel_r)
 			break;
 		case 0xc400/8: /* SIF1_CHCR */
 			ret = m_channels[SIF1].chcr();
-			logerror("%s: dmac_channel_r: SIF1_CHCR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: dmac_channel_r: SIF1_CHCR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 0xc410/8: /* SIF1_MADR */
 			ret = m_channels[SIF1].addr();
@@ -413,7 +417,7 @@ READ32_MEMBER(ps2_dmac_device::channel_r)
 			break;
 		case 0xc430/8: /* SIF1_TADR */
 			ret = m_channels[SIF1].tag_addr();
-			logerror("%s: dmac_channel_r: SIF1_TADR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: dmac_channel_r: SIF1_TADR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 0xc800/8: /* D7_CHCR */
 			logerror("%s: dmac_channel_r: D7_CHCR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);

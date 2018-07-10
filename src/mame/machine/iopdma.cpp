@@ -21,7 +21,7 @@ iop_dma_device::iop_dma_device(const machine_config &mconfig, const char *tag, d
 	, m_ram(*this, finder_base::DUMMY_TAG)
 	, m_sif(*this, finder_base::DUMMY_TAG)
 	, m_spu(*this, finder_base::DUMMY_TAG)
-	, m_spu2(*this, finder_base::DUMMY_TAG)
+	, m_sio2(*this, finder_base::DUMMY_TAG)
 	, m_icount(0)
 {
 }
@@ -38,11 +38,12 @@ void iop_dma_device::device_start()
 		save_item(NAME(m_channels[channel].m_end), channel);
 
 		save_item(NAME(m_channels[channel].m_addr), channel);
-		save_item(NAME(m_channels[channel].m_block), channel);
 		save_item(NAME(m_channels[channel].m_ctrl), channel);
 		save_item(NAME(m_channels[channel].m_tag_addr), channel);
 
-		save_item(NAME(m_channels[channel].m_size), channel);
+		save_item(NAME(m_channels[channel].m_block), channel);
+		save_item(NAME(m_channels[channel].m_block_count), channel);
+		save_item(NAME(m_channels[channel].m_word_count), channel);
 		save_item(NAME(m_channels[channel].m_count), channel);
 	}
 
@@ -92,8 +93,8 @@ void iop_dma_device::execute_run()
 			{
 				switch (channel)
 				{
-					case SPU:
-					case SPU2:
+					case SPU_BANK1:
+					case SPU_BANK2:
 						transfer_spu(channel);
 						break;
 					case SIF0:
@@ -101,6 +102,12 @@ void iop_dma_device::execute_run()
 						break;
 					case SIF1:
 						transfer_sif1(channel);
+						break;
+					case SIO2_IN:
+						transfer_to_sio2(channel);
+						break;
+					case SIO2_OUT:
+						transfer_from_sio2(channel);
 						break;
 					default:
 						logerror("%s: Attempting to transfer an unimplemented DMA channel (%d)\n", machine().describe_context(), channel);
@@ -164,16 +171,18 @@ void iop_dma_device::transfer_sif0(uint32_t chan)
 void iop_dma_device::transfer_sif1(uint32_t chan)
 {
 	channel_t &channel = m_channels[chan];
-	if (channel.m_count)
+	const uint32_t count = channel.count();
+	if (count)
 	{
 		if (m_sif->fifo_depth(1))
 		{
 			const uint32_t data = m_sif->fifo_pop(1);
+			const uint32_t addr = channel.addr();
 			//logerror("%s: sif1 pop value: %08x\n", machine().describe_context(), (uint32_t)data);
-			m_ram[channel.m_addr >> 2] = data;
+			m_ram[addr >> 2] = data;
 
-			channel.m_addr += 4;
-			channel.m_count--;
+			channel.set_addr(addr + 4);
+			channel.set_count(count - 1);
 		}
 	}
 	else
@@ -205,35 +214,77 @@ void iop_dma_device::transfer_sif1(uint32_t chan)
 void iop_dma_device::transfer_spu(uint32_t chan)
 {
 	channel_t &channel = m_channels[chan];
-	const uint32_t size = channel.size();
-	if (size)
+	const uint32_t count = channel.count();
+	const bool first_bank = chan == SPU_BANK1;
+	const int bank = first_bank ? 0 : 1;
+	if (count)
 	{
-		printf("Size: %08x\n", size);
 		const uint32_t addr = channel.addr();
 
-		if (chan == SPU)
-			m_spu->dma_write(m_ram[addr >> 2]);
-		else
-			m_spu2->dma_write(m_ram[addr >> 2]);
+		m_spu->dma_write(bank, m_ram[addr >> 2]);
 
-		channel.set_size(size - 1);
+		channel.set_count(count - 1);
+		channel.set_addr(addr + 4);
+	}
+	else if (channel.busy())
+	{
+		channel.set_word_count(0);
+		channel.set_block_count(0);
+
+		m_spu->dma_done(bank);
+
+		//if (first_bank)
+			//m_intc->raise_interrupt(iop_intc_device::INT_SPU);
+
+        transfer_finish(chan);
+	}
+}
+
+void iop_dma_device::transfer_to_sio2(uint32_t chan)
+{
+	channel_t &channel = m_channels[chan];
+	const uint32_t count = channel.count();
+	// TODO: Clock out at correct serial rate
+	if (count)
+	{
+		const uint32_t addr = channel.addr();
+		const uint32_t data = m_ram[addr >> 2];
+		m_sio2->receive((data >> 24) & 0xff);
+		m_sio2->receive((data >> 16) & 0xff);
+		m_sio2->receive((data >> 8) & 0xff);
+		m_sio2->receive(data & 0xff);
+		channel.set_count(count - 1);
 		channel.set_addr(addr + 4);
 	}
 	else
 	{
-		channel.set_count(0);
+		channel.set_block_count(0);
+		channel.set_word_count(0);
+		transfer_finish(SIO2_IN);
+	}
+}
 
-        if (chan == SPU)
-			m_spu->dma_done();
-		else
-			m_spu2->dma_done();
-
-		if (chan == SPU)
-		{
-			m_intc->raise_interrupt(iop_intc_device::INT_SPU);
-		}
-
-        transfer_finish(chan);
+void iop_dma_device::transfer_from_sio2(uint32_t chan)
+{
+	channel_t &channel = m_channels[chan];
+	const uint32_t count = channel.count();
+	// TODO: Clock in at correct serial rate
+	if (count)
+	{
+		const uint32_t addr = channel.addr();
+		uint32_t data = m_sio2->transmit() << 24;
+		data |= m_sio2->transmit() << 16;
+		data |= m_sio2->transmit() << 8;
+		data |= m_sio2->transmit();
+		m_ram[addr >> 2] = data;
+		channel.set_count(count - 1);
+		channel.set_addr(addr + 4);
+	}
+	else
+	{
+		channel.set_block_count(0);
+		channel.set_word_count(0);
+		transfer_finish(SIO2_OUT);
 	}
 }
 
@@ -264,7 +315,7 @@ READ32_MEMBER(iop_dma_device::bank0_r)
 			logerror("%s: bank0_r: channel[%d].addr (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
 			break;
 		case 0x04/4: case 0x14/4: case 0x24/4: case 0x34/4: case 0x44/4: case 0x54/4: case 0x64/4:
-			ret = (m_channels[offset >> 2].count() << 16) | m_channels[offset >> 2].size();
+			ret = m_channels[offset >> 2].block();
 			logerror("%s: bank0_r: channel[%d].block  (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
 			break;
 		case 0x08/4: case 0x18/4: case 0x28/4: case 0x38/4: case 0x48/4: case 0x58/4: case 0x68/4:
@@ -337,7 +388,7 @@ READ32_MEMBER(iop_dma_device::bank1_r)
 			logerror("%s: bank1_r: channel[%d].addr (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
 			break;
 		case 0x04/4: case 0x14/4: case 0x24/4: case 0x34/4: case 0x44/4: case 0x54/4: case 0x64/4:
-			ret = (m_channels[(offset >> 2) + 8].count() << 16) | m_channels[(offset >> 2) + 8].size();
+			ret = m_channels[(offset >> 2) + 8].block();
 			logerror("%s: bank1_r: channel[%d].block  (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
 			break;
 		case 0x08/4: case 0x18/4: case 0x28/4: case 0x38/4: case 0x48/4: case 0x58/4: case 0x68/4:
@@ -421,8 +472,8 @@ void iop_dma_device::set_dpcr(uint32_t data, uint32_t index)
 
 void iop_dma_device::set_dicr(uint32_t data, uint32_t index)
 {
-	m_dicr[index] = (m_dicr[index] & (0x7f << 24)) | (data & ~(0x7f << 24));
-	m_dicr[index] &= ~(data & (0x7f << 24));
+	m_dicr[index] = (m_dicr[index] & 0x7f000000) | (data & ~0x7f007fff);
+	m_dicr[index] &= ~(data & 0x7f000000);
 	m_int_ctrl[index].m_mask = (data >> 16) & 0x7f;
 	m_int_ctrl[index].m_status &= ~((data >> 24) & 0x7f);
 	m_int_ctrl[index].m_enabled = BIT(data, 23);
@@ -440,10 +491,23 @@ void iop_dma_device::channel_t::set_pri_ctrl(uint32_t pri_ctrl)
 
 void iop_dma_device::channel_t::set_block(uint32_t block, uint32_t mem_mask)
 {
+	m_block = block;
 	if (mem_mask & 0xffff)
-		m_size = (uint16_t)block;
+		set_block_count(block);
 	if (mem_mask & 0xffff0000)
-		m_count = (uint16_t)(block >> 16);
+		set_word_count(block >> 16);
+}
+
+void iop_dma_device::channel_t::set_block_count(uint32_t block_count)
+{
+	m_block_count = (uint16_t)block_count;
+	m_count = m_block_count * m_word_count;
+}
+
+void iop_dma_device::channel_t::set_word_count(uint32_t word_count)
+{
+	m_word_count = (uint16_t)word_count;
+	m_count = m_block_count * m_word_count;
 }
 
 void iop_dma_device::channel_t::set_ctrl(uint32_t ctrl)

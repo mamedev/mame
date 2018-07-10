@@ -880,7 +880,7 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_MC2661_TXC(19200)
 	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("videoirq", input_merger_device, in_w<4>))
 
-	MCFG_X2210_ADD("vsram")  // XD2210
+	X2210(config, "vsram");  // XD2210
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(19.6608_MHz_XTAL, 1020, 0, 800, 324, 0, 300)

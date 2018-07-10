@@ -2885,9 +2885,9 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	m_notifier = m_space.add_change_notifier([this](read_or_write mode) {
 												 if (m_enabled)
 												 {
-													 if (u32(mode) & u32(read_or_write::READ))
+													 if (u32(mode) & u32(m_type) & u32(read_or_write::READ))
 														 m_phr->remove();
-													 if (u32(mode) & u32(read_or_write::WRITE))
+													 if (u32(mode) & u32(m_type) & u32(read_or_write::WRITE))
 														 m_phw->remove();
 													 install(mode);
 												 }
@@ -2896,6 +2896,10 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 
 device_debug::watchpoint::~watchpoint()
 {
+	if (m_phr)
+		m_phr->remove();
+	if (m_phw)
+		m_phw->remove();
 	m_space.remove_change_notifier(m_notifier);
 }
 
