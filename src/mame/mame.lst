@@ -9854,6 +9854,9 @@ cmi2x                           // Fairlight CMI IIx
 @source:cmmb.cpp
 cmmb162                         //
 
+@source:cms.cpp
+cms6502                         // CMS 6502 Development System
+
 @source:cninja.cpp
 cninja                          // MAG (c) 1991 Data East Corporation (World)
 cninja1                         // MAG (c) 1991 Data East Corporation (World)

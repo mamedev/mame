@@ -134,6 +134,7 @@ ckz80.cpp
 clcd.cpp
 cm1800.cpp
 cmi.cpp
+cms.cpp
 coco12.cpp
 coco3.cpp
 codata.cpp
