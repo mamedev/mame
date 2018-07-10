@@ -29,7 +29,6 @@
     * Kawaiso Monogatari ~ かわいそう物語, by System Software
     * Fantasy III ~ ファンタジーⅢ, by Starcraft
     * Lodoss Shima Senki ~ ロードス島戦記, by Humming Bird Soft
-    * Tetris ~ テトリス, by BPS
     * Art of War ~ アートオブウォー, by Broderbund Japan
     * Eiyuu Napoleon ~ 英雄ナポレオン, by Pony Canyon
     * Ultima I-IV ~ ウルティマI～IV, by Pony Canyon
@@ -650,6 +649,19 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
 				<rom name="sorcerian va (selected5)(takeru_brother).d88" size="761008" crc="cc7b491a" sha1="720774039653a48325d7cd5e32dbfe536ff44016" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris" supported="no">
+		<description>Tetris</description>
+		<year>1988</year>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
+		<info name="release" value="19881222"/>
+		<info name="alt_title" value="テトリス"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3481685">
+				<rom name="tetris.mfm" size="3481685" crc="2edafe52" sha1="1a93282d59f56517ac2d4a8aa3fa323611c8c67a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
