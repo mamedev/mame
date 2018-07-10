@@ -42,14 +42,14 @@
 		</part>
 	</software>
 	
-	<software name ="deskbudg">
+	<software name="deskbudg">
 		<description>Desktop Budget (Sv)</description>
 		<year>1989</year>
 		<publisher>Gold Disk</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Desktop Budget (Sv)" />
 			<dataarea name="flop" size="901120">
-				<rom name="desktop budget (swe).adf" size="901120" crc="d16bca57" sha1="ff650ffb504ffe21ff6fb884f5a1904ddcb47912" status="baddump" offset="0"/>
+				<rom name="desktop budget (swe).adf" size="901120" crc="d9c1fab6" sha1="ff650ffb504ffe21ff6fb884f5a1904ddcb47912" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -63,7 +63,7 @@
 			<!-- Verified dump -->
 			<feature name="part_id" value="Organiser 1.1 (De)" />
 			<dataarea name="flop" size="901120">
-				<rom name="organiser11_de.adf" size="901120" crc="0d8ac3ec" sha1="ce0453c1a48a648c968e84a9afe6bfb939d3817c" offset="0"/>
+				<rom name="organiser11_de.adf" size="901120" crc="0d8ac3ec" sha1="013b152b9aa7eff0263d54b85bb107f77b4c4245" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
