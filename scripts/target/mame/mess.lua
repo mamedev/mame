@@ -653,6 +653,7 @@ BUSES["A7800"] = true
 BUSES["A800"] = true
 BUSES["ABCBUS"] = true
 BUSES["ABCKB"] = true
+BUSES["ACORN"] = true
 BUSES["ADAM"] = true
 BUSES["ADAMNET"] = true
 BUSES["APF"] = true
