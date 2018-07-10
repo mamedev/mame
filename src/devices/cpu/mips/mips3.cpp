@@ -3443,20 +3443,16 @@ void r5900le_device::handle_idt(uint32_t op)
 		case 0x10: /* MFHI1 */
             if (rd)
                 m_core->r[rd] = m_core->rh[REG_HI];
-            m_core->icount--;
             break;
 		case 0x11: /* MTHI1 */
 			m_core->rh[REG_HI] = m_core->r[rs];
-            m_core->icount--;
 			break;
 		case 0x12: /* MFLO1 */
-		    if (rd)
-		        m_core->r[rd] = m_core->rh[REG_LO];
-            m_core->icount--;
+			if (rd)
+				m_core->r[rd] = m_core->rh[REG_LO];
 			break;
 		case 0x13: /* MTLO1 */
 			m_core->rh[REG_LO] = m_core->r[rs];
-            m_core->icount--;
 			break;
 		case 0x18: /* MULT1 */
 		{
@@ -3565,7 +3561,24 @@ void r5900le_device::handle_mmi0(uint32_t op)
 			printf("Unsupported instruction: PADDB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x09: /* PSUBB */
-			printf("Unsupported instruction: PSUBB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int word_idx = 0; word_idx < 2; word_idx++)
+				{
+					for (int byte_idx = 0; byte_idx < 64; byte_idx += 8)
+					{
+						const uint8_t rsbyte = (uint8_t)(rsval[word_idx] >> byte_idx);
+						const uint8_t rtbyte = (uint8_t)(rtval[word_idx] >> byte_idx);
+						const uint8_t result = rsbyte - rtbyte;
+						rdval[word_idx] |= (uint64_t)result << byte_idx;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x0a: /* PCGTB */
 			printf("Unsupported instruction: PCGTB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
@@ -3674,7 +3687,6 @@ void r5900le_device::handle_mmi1(uint32_t op)
             }
             m_core->r[rd] = rdval[0] | (rdval[1] << 32);
             m_core->rh[rd] = rdval[2] | (rdval[3] << 32);
-            m_core->icount -= 1;
             break;
         }
 		case 0x11: /* PSUBUW */
@@ -3736,7 +3748,6 @@ void r5900le_device::handle_mmi2(uint32_t op)
 		        m_core->r[rd]  = m_core->r[REG_HI];
 		        m_core->rh[rd] = m_core->rh[REG_HI];
 			}
-            m_core->icount--;
 			break;
 		case 0x09: /* PMFLO */
 		    if (rd)
@@ -3744,7 +3755,6 @@ void r5900le_device::handle_mmi2(uint32_t op)
 		        m_core->r[rd]  = m_core->r[REG_LO];
 		        m_core->rh[rd] = m_core->rh[REG_LO];
 			}
-            m_core->icount--;
 			break;
 		case 0x0a: /* PINTH */
 			printf("Unsupported instruction: PINTH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
@@ -3761,7 +3771,6 @@ void r5900le_device::handle_mmi2(uint32_t op)
 				m_core->rh[rd] = m_core->r[rs];
 				m_core->r[rd] = m_core->r[rt];
 			}
-			m_core->icount--;
 			break;
 		case 0x10: /* PMADDH */
 			printf("Unsupported instruction: PMADDH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
@@ -3770,10 +3779,18 @@ void r5900le_device::handle_mmi2(uint32_t op)
 			printf("Unsupported instruction: PHMADH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x12: /* PAND */
-			printf("Unsupported instruction: PAND @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				m_core->rh[rd] = m_core->rh[rs] & m_core->rh[rt];
+				m_core->r[rd]  = m_core->r[rs] & m_core->r[rt];
+			}
 			break;
 		case 0x13: /* PXOR */
-			printf("Unsupported instruction: PXOR @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				m_core->rh[rd] = m_core->rh[rs] ^ m_core->rh[rt];
+				m_core->r[rd]  = m_core->r[rs] ^ m_core->r[rt];
+			}
 			break;
 		case 0x14: /* PMSUBH */
 			printf("Unsupported instruction: PMSUBH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
@@ -3840,7 +3857,6 @@ void r5900le_device::handle_mmi3(uint32_t op)
 				m_core->rh[rd] = m_core->rh[rs];
 				m_core->r[rd] = m_core->rh[rt];
 			}
-			m_core->icount--;
 			break;
 		case 0x12: /* POR */
 			if (rd)
@@ -3848,16 +3864,26 @@ void r5900le_device::handle_mmi3(uint32_t op)
 				m_core->rh[rd] = m_core->rh[rs] | m_core->rh[rt];
 				m_core->r[rd]  = m_core->r[rs]  | m_core->r[rt];
 			}
-			m_core->icount--;
 			break;
 		case 0x13: /* PNOR */
-			printf("Unsupported instruction: PNOR @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				m_core->rh[rd] = ~(m_core->rh[rs] | m_core->rh[rt]);
+				m_core->r[rd]  = ~(m_core->r[rs]  | m_core->r[rt]);
+			}
 			break;
 		case 0x1a: /* PEXCH */
 			printf("Unsupported instruction: PEXCH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x1b: /* PCPYH */
-			printf("Unsupported instruction: PCPYH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint16_t msh = (uint16_t)m_core->rh[rt];
+				const uint16_t lsh = (uint16_t)m_core->r[rt];
+				m_core->rh[rd] = msh * 0x0001000100010001ULL;
+				m_core->r[rd] = lsh * 0x0001000100010001ULL;
+			}
+			m_core->icount--;
 			break;
 		case 0x1e: /* PEXCW */
 			printf("Unsupported instruction: PEXCW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
