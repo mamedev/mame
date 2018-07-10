@@ -9,7 +9,6 @@
 #include "namcos2.h"
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
-#include "video/namco_c116.h"
 
 #define NAMCONB1_HTOTAL     (288)   /* wrong */
 #define NAMCONB1_HBSTART    (288)
@@ -31,7 +30,6 @@ class namconb1_state : public namcos2_shared_state
 public:
 	namconb1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcos2_shared_state(mconfig, type, tag),
-		m_c116(*this, "c116"),
 		m_eeprom(*this, "eeprom"),
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2"),
@@ -63,7 +61,6 @@ public:
 	void init_gslgr94u();
 
 private:
-	required_device<namco_c116_device> m_c116;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
 	required_ioport m_p1;
 	required_ioport m_p2;

@@ -458,7 +458,6 @@ $a00000 checks have been seen on the Final Lap boards.
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
 #include "sound/ym2151.h"
-#include "sound/c140.h"
 #include "speaker.h"
 
 #include "finallap.lh"
@@ -603,7 +602,7 @@ void namcos2_state::namcos2_68k_default_cpu_board_am(address_map &map)
 	map(0x200000, 0x3fffff).rom().region("data_rom", 0);
 	map(0x400000, 0x41ffff).rw(FUNC(namcos2_state::c123_tilemap_videoram_r), FUNC(namcos2_state::c123_tilemap_videoram_w));
 	map(0x420000, 0x42003f).rw(FUNC(namcos2_state::c123_tilemap_control_r), FUNC(namcos2_state::c123_tilemap_control_w));
-	map(0x440000, 0x44ffff).rw(FUNC(namcos2_state::paletteram_word_r), FUNC(namcos2_state::paletteram_word_w)).share("paletteram");
+	map(0x440000, 0x44ffff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x460000, 0x460fff).mirror(0xf000).rw(FUNC(namcos2_state::dpram_word_r), FUNC(namcos2_state::dpram_word_w));
 	map(0x480000, 0x483fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
 	map(0x4a0000, 0x4a000f).m(m_sci, FUNC(namco_c139_device::regs_map));
@@ -764,7 +763,7 @@ void namcos2_state::sound_default_am(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("bank6"); /* banked */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x5000, 0x6fff).rw("c140", FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
+	map(0x5000, 0x6fff).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
 	map(0x7000, 0x77ff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
 	map(0x7800, 0x7fff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)); /* mirror */
 	map(0x8000, 0x9fff).ram();
@@ -1705,6 +1704,15 @@ via software as INT1
 /*                                                           */
 /*************************************************************/
 
+void namcos2_state::configure_c116_standard(machine_config &config)
+{
+	PALETTE(config, m_palette, 0x2000);
+	m_palette->enable_shadows();
+
+	NAMCO_C116(config, m_c116, 0);
+	m_c116->set_palette(m_palette);
+}
+
 void namcos2_state::configure_c148_standard(machine_config &config)
 {
 	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
@@ -1761,7 +1769,7 @@ MACHINE_CONFIG_START(namcos2_state::base)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -1770,18 +1778,17 @@ MACHINE_CONFIG_START(namcos2_state::base)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos2)
+	configure_c116_standard(config);
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_namcos2)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -1792,10 +1799,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos2_state::base2)
 	base(config);
 
-	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	m_c140->reset_routes();
+	m_c140->add_route(0, "lspeaker", 1.0);
+	m_c140->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 /* end */
 
@@ -1808,10 +1814,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos2_state::base3)
 	base(config);
 
-	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	m_c140->reset_routes();
+	m_c140->add_route(0, "lspeaker", 0.45);
+	m_c140->add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1842,7 +1847,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -1851,18 +1856,17 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos2)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_namcos2)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	configure_c116_standard(config);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -1893,7 +1897,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -1902,23 +1906,22 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_finallap)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_finallap)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	configure_c116_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finallap)
 
-	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C45_ROAD(config, m_c45_road, 0);
+	m_c45_road->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -1956,7 +1959,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -1965,20 +1968,19 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sgunner)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_sgunner)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	configure_c116_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -2014,7 +2016,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -2023,20 +2025,19 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sgunner)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_sgunner)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	configure_c116_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -2067,7 +2068,7 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -2076,23 +2077,22 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_luckywld)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_luckywld)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	configure_c116_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
 
-	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C45_ROAD(config, m_c45_road, 0);
+	m_c45_road->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -2123,7 +2123,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -2132,20 +2132,19 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlhawk)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_metlhawk)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	configure_c116_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 //  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))

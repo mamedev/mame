@@ -15,7 +15,9 @@
 #include "machine/namco_c139.h"
 #include "machine/namco_c148.h"
 #include "machine/timer.h"
+#include "sound/c140.h"
 #include "video/c45.h"
+#include "video/namco_c116.h"
 
 #include "cpu/m6502/m3745x.h"
 #include "emupal.h"
@@ -109,7 +111,9 @@ public:
 		, m_dspmaster(*this, "dspmaster")
 		, m_dspslave(*this, "dspslave")
 		, m_gametype(0)
+		, m_c140(*this, "c140")
 		, m_c68(*this, "c68")
+		, m_c116(*this, "c116")
 		, m_master_intc(*this, "master_intc")
 		, m_slave_intc(*this, "slave_intc")
 		, m_sci(*this, "sci")
@@ -134,7 +138,9 @@ public:
 	int m_gametype;
 
 protected:
+	optional_device<c140_device> m_c140;
 	optional_device<m37450_device> m_c68;
+	optional_device<namco_c116_device> m_c116;
 	optional_device<namco_c148_device> m_master_intc;
 	optional_device<namco_c148_device> m_slave_intc;
 	optional_device<namco_c139_device> m_sci;
@@ -275,7 +281,7 @@ protected:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_slave;
 	optional_device<cpu_device> m_mcu;
-	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 };
@@ -286,13 +292,13 @@ public:
 	namcos2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcos2_shared_state(mconfig, type, tag),
 		m_dpram(*this, "dpram"),
-		m_paletteram(*this, "paletteram"),
 		m_spriteram(*this, "spriteram"),
 		m_rozram(*this, "rozram"),
 		m_roz_ctrl(*this, "rozctrl"),
 		m_c45_road(*this, "c45_road")
 	{ }
 
+	void configure_c116_standard(machine_config &config);
 	void configure_c148_standard(machine_config &config);
 	void metlhawk(machine_config &config);
 	void gollygho(machine_config &config);
@@ -365,25 +371,20 @@ private:
 
 	TILE_GET_INFO_MEMBER( roz_tile_info );
 
-	DECLARE_READ16_MEMBER( paletteram_word_r );
-	DECLARE_WRITE16_MEMBER( paletteram_word_w );
 	DECLARE_WRITE16_MEMBER( rozram_word_w );
 	DECLARE_READ16_MEMBER( gfx_ctrl_r );
 	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
 
 	void draw_sprite_init();
-	void update_palette();
 	void apply_clip( rectangle &clip, const rectangle &cliprect );
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control );
 	void draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
-	uint16_t get_palette_register( int which );
 
-	int get_pos_irq_scanline() { return (get_palette_register(5) - 32) & 0xff; }
+	int get_pos_irq_scanline() { return (m_c116->get_reg(5) - 32) & 0xff; }
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	required_shared_ptr<uint8_t> m_dpram; /* 2Kx8 */
-	required_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_rozram;
 	optional_shared_ptr<uint16_t> m_roz_ctrl;
