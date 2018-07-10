@@ -8,19 +8,10 @@
 
 #include "cpu/clipper/common.h"
 
-#define MCFG_CAMMU_ID(_id) \
-	downcast<cammu_c4_device &>(*device).set_cammu_id(_id);
-
-#define MCFG_CAMMU_EXCEPTION_CB(_exceptioncb) \
-	downcast<cammu_device &>(*device).set_exception_callback(DEVCB_##_exceptioncb);
-
-#define MCFG_CAMMU_LINK(_tag) \
-	downcast<cammu_c3_device &>(*device).add_linked(_tag);
-
 class cammu_device : public device_t
 {
 public:
-	template <class Object> devcb_base &set_exception_callback(Object &&cb) { return m_exception_func.set_callback(std::forward<Object>(cb)); }
+	auto exception_callback() { return m_exception_func.bind(); }
 
 	static const u32 CAMMU_PAGE_SIZE = 0x1000;
 	static const u32 CAMMU_PAGE_MASK = (CAMMU_PAGE_SIZE - 1);
@@ -295,7 +286,7 @@ protected:
 class cammu_c4t_device : public cammu_c4_device
 {
 public:
-	cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void map(address_map &map) override;
 
@@ -385,7 +376,7 @@ private:
 class cammu_c4i_device : public cammu_c4_device
 {
 public:
-	cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void map(address_map &map) override;
 
@@ -482,12 +473,12 @@ private:
 class cammu_c3_device : public cammu_device
 {
 public:
-	cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void map(address_map &map) override;
 	virtual void map_global(address_map &map);
 
-	void add_linked(const char *const tag) { m_linked.push_back(downcast<cammu_c3_device *>(siblingdevice(tag))); }
+	void add_linked(cammu_c3_device *child) { m_linked.push_back(child); }
 
 	enum control_mask : u32
 	{

@@ -817,15 +817,15 @@ static INPUT_PORTS_START(interpro)
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(interpro_state::interpro)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16M")
-	MCFG_RAM_EXTRA_OPTIONS("32M,64M,128M,256M")
+	RAM(config, m_ram, 0);
+	m_ram->set_default_size("16M");
+	m_ram->set_extra_options("32M,64M,128M,256M");
 
 	// memory control gate array
 
 	// srx gate array
-	MCFG_DEVICE_ADD(m_sga, INTERPRO_SGA, 0)
-	MCFG_INTERPRO_SGA_BERR_CB(WRITE32(m_ioga, interpro_ioga_device, bus_error))
+	INTERPRO_SGA(config, m_sga);
+	m_sga->berr_callback().set(m_ioga, FUNC(interpro_ioga_device::bus_error));
 
 	// floppy
 
@@ -872,19 +872,18 @@ MACHINE_CONFIG_START(emerald_state::emerald)
 	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, acknowledge_interrupt)
 
-	MCFG_DEVICE_ADD(m_i_cammu, CAMMU_C3, 0)
-	MCFG_CAMMU_EXCEPTION_CB(WRITE16(m_maincpu, clipper_device, set_exception))
+	CAMMU_C3(config, m_i_cammu);
+	m_i_cammu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
 
-	MCFG_DEVICE_ADD(m_d_cammu, CAMMU_C3, 0)
-	MCFG_CAMMU_EXCEPTION_CB(WRITE16(m_maincpu, clipper_device, set_exception))
-	MCFG_CAMMU_LINK(INTERPRO_MMU_TAG "_i")
+	CAMMU_C3(config, m_d_cammu);
+	m_d_cammu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
+	m_d_cammu->add_linked(m_i_cammu);
 
 	// boot fails memory test without this
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	m_ram->set_default_value(0);
 
 	// memory control gate array
-	MCFG_DEVICE_ADD(m_mcga, INTERPRO_MCGA, 0)
+	INTERPRO_MCGA(config, m_mcga);
 
 	// floppy controller
 	MCFG_I82072_ADD(m_fdc, false)
@@ -897,9 +896,9 @@ MACHINE_CONFIG_START(emerald_state::emerald)
 	MCFG_FLOPPY_DRIVE_SOUND(false)
 
 	// serial controllers and ports
-	MCFG_DEVICE_ADD(m_scc1, SCC85C30, 4.9152_MHz_XTAL)
+	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
 	interpro_scc1(config);
-	MCFG_DEVICE_ADD(m_scc2, SCC85C30, 4.9152_MHz_XTAL)
+	SCC85C30(config, m_scc2, 4.9152_MHz_XTAL);
 	interpro_scc2(config);
 
 	// scsi controller
@@ -919,25 +918,25 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(turquoise_state::turquoise)
 	interpro(config);
+
 	MCFG_DEVICE_ADD(m_maincpu, CLIPPER_C300, 12.5_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, turquoise_main_map)
 	MCFG_DEVICE_ADDRESS_MAP(1, turquoise_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, acknowledge_interrupt)
 
-	MCFG_DEVICE_ADD(m_i_cammu, CAMMU_C3, 0)
-	MCFG_CAMMU_EXCEPTION_CB(WRITE16(m_maincpu, clipper_device, set_exception))
+	CAMMU_C3(config, m_i_cammu);
+	m_i_cammu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
 
-	MCFG_DEVICE_ADD(m_d_cammu, CAMMU_C3, 0)
-	MCFG_CAMMU_EXCEPTION_CB(WRITE16(m_maincpu, clipper_device, set_exception))
-	MCFG_CAMMU_LINK(INTERPRO_MMU_TAG "_i")
+	CAMMU_C3(config, m_d_cammu);
+	m_d_cammu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
+	m_d_cammu->add_linked(m_i_cammu);
 
 	// boot fails memory test without this
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	m_ram->set_default_value(0);
 
 	// memory control gate array
-	MCFG_DEVICE_ADD(m_mcga, INTERPRO_MCGA, 0)
+	INTERPRO_MCGA(config, m_mcga);
 
 	// floppy controller
 	MCFG_I82072_ADD(m_fdc, false)
@@ -949,9 +948,9 @@ MACHINE_CONFIG_START(turquoise_state::turquoise)
 	MCFG_FLOPPY_DRIVE_SOUND(false)
 
 	// serial controllers and ports
-	MCFG_DEVICE_ADD(m_scc1, SCC85C30, 4.9152_MHz_XTAL)
+	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
 	interpro_scc1(config);
-	MCFG_DEVICE_ADD(m_scc2, SCC85C30, 4.9152_MHz_XTAL)
+	SCC85C30(config, m_scc2, 4.9152_MHz_XTAL);
 	interpro_scc2(config);
 
 	// scsi controller
@@ -988,11 +987,11 @@ MACHINE_CONFIG_START(sapphire_state::sapphire)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, acknowledge_interrupt)
 
 	// FIXME: 2400/6400 should be C4T cammu?
-	MCFG_DEVICE_ADD(m_mmu, CAMMU_C4I, 0)
-	MCFG_CAMMU_EXCEPTION_CB(WRITE16(m_maincpu, clipper_device, set_exception))
+	CAMMU_C4I(config, m_mmu);
+	m_mmu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
 
 	// memory control gate array
-	MCFG_DEVICE_ADD(m_mcga, INTERPRO_FMCC, 0)
+	INTERPRO_FMCC(config, m_mcga);
 
 	// floppy controller
 	MCFG_N82077AA_ADD(m_fdc, n82077aa_device::MODE_PS2)
@@ -1004,12 +1003,12 @@ MACHINE_CONFIG_START(sapphire_state::sapphire)
 	MCFG_FLOPPY_DRIVE_SOUND(false)
 
 	// srx arbiter gate array
-	MCFG_DEVICE_ADD(m_arbga, INTERPRO_ARBGA, 0)
+	INTERPRO_ARBGA(config, m_arbga);
 
 	// serial controllers and ports
-	MCFG_DEVICE_ADD(m_scc1, SCC85230, 4.9152_MHz_XTAL)
+	SCC85230(config, m_scc1, 4.9152_MHz_XTAL);
 	interpro_scc1(config);
-	MCFG_DEVICE_ADD(m_scc2, SCC85C30, 4.9152_MHz_XTAL)
+	SCC85C30(config, m_scc2, 4.9152_MHz_XTAL);
 	interpro_scc2(config);
 
 	// scsi controller
@@ -1027,14 +1026,13 @@ MACHINE_CONFIG_START(sapphire_state::sapphire)
 	ioga(config);
 
 	// flash memory
-	MCFG_DEVICE_ADD(m_flash_lsb, INTEL_28F010, 0)
-	MCFG_DEVICE_ADD(m_flash_msb, INTEL_28F010, 0)
+	INTEL_28F010(config, m_flash_lsb);
+	INTEL_28F010(config, m_flash_msb);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(turquoise_state::ip2000)
 	turquoise(config);
-	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
-	//MCFG_DEVICE_CLOCK(40_MHz_XTAL)
+	//m_maincpu->set_clock(40_MHz_XTAL);
 
 	// GT graphics (2020)
 	MCFG_DEVICE_MODIFY(INTERPRO_SLOT_TAG ":0")
@@ -1045,11 +1043,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sapphire_state::ip2400)
 	sapphire(config);
-	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
-	//MCFG_DEVICE_CLOCK(50_MHz_XTAL)
+	//m_maincpu->set_clock(50_MHz_XTAL);
 
-	MCFG_DEVICE_MODIFY(INTERPRO_MMU_TAG)
-	MCFG_CAMMU_ID(cammu_c4i_device::CID_C4IR0)
+	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR0);
 
 	// cbus and slots (default to 2430 with GT+ graphics)
 	MCFG_DEVICE_ADD(INTERPRO_SLOT_TAG, CBUS, 0)
@@ -1063,8 +1059,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sapphire_state::ip2500)
 	sapphire(config);
-	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
-	//MCFG_DEVICE_CLOCK(XTAL(?)
+	//m_maincpu->set_clock(?);
 
 	// cbus and slots (default to 2530 with GT+ graphics)
 	MCFG_DEVICE_ADD(INTERPRO_SLOT_TAG, CBUS, 0)
@@ -1077,16 +1072,14 @@ MACHINE_CONFIG_START(sapphire_state::ip2500)
 	//MCFG_SLOT_DEFAULT_OPTION("msmt135")
 
 	// FIXME: don't know which cammu revision
-	MCFG_DEVICE_MODIFY(INTERPRO_MMU_TAG)
-	MCFG_CAMMU_ID(cammu_c4i_device::CID_C4IR0)
+	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR0);
 
 	MCFG_SOFTWARE_LIST_FILTER("softlist", "2500")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sapphire_state::ip2700)
 	sapphire(config);
-	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
-	//MCFG_DEVICE_CLOCK(?)
+	//m_maincpu->set_clock(?);
 
 	// cbus and slots (default to 2730 with GT+ graphics)
 	MCFG_DEVICE_ADD(INTERPRO_SLOT_TAG, CBUS, 0)
@@ -1098,16 +1091,14 @@ MACHINE_CONFIG_START(sapphire_state::ip2700)
 	// GT II graphics?
 	//MCFG_SLOT_DEFAULT_OPTION("msmt135")
 
-	MCFG_DEVICE_MODIFY(INTERPRO_MMU_TAG)
-	MCFG_CAMMU_ID(cammu_c4i_device::CID_C4IR2)
+	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
 	MCFG_SOFTWARE_LIST_FILTER("softlist", "2700")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sapphire_state::ip2800)
 	sapphire(config);
-	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
-	//MCFG_DEVICE_CLOCK(?)
+	//m_maincpu->set_clock(?);
 
 	// cbus and slots (default to 2830 with GT+ graphics)
 	MCFG_DEVICE_ADD(INTERPRO_SLOT_TAG, CBUS, 0)
@@ -1120,17 +1111,14 @@ MACHINE_CONFIG_START(sapphire_state::ip2800)
 	//MCFG_SLOT_DEFAULT_OPTION("msmt135")
 
 	// FIXME: don't know which cammu revision
-	MCFG_DEVICE_MODIFY(INTERPRO_MMU_TAG)
-	MCFG_CAMMU_ID(cammu_c4i_device::CID_C4IR2)
+	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
 	MCFG_SOFTWARE_LIST_FILTER("softlist", "2800")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(emerald_state::ip6000)
 	emerald(config);
-
-	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
-	//MCFG_DEVICE_CLOCK(80_MHz_XTAL / 2)
+	//m_maincpu->set_clock(80_MHz_XTAL / 2);
 
 	// EDGE systems use graphics keyboard
 	MCFG_DEVICE_MODIFY(INTERPRO_KEYBOARD_PORT_TAG)
@@ -1153,11 +1141,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sapphire_state::ip6400)
 	sapphire(config);
-	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
-	//MCFG_DEVICE_CLOCK(36_MHz_XTAL)
+	//m_maincpu->set_clock(36_MHz_XTAL);
 
-	MCFG_DEVICE_MODIFY(INTERPRO_MMU_TAG)
-	MCFG_CAMMU_ID(cammu_c4i_device::CID_C4IR0)
+	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR0);
 
 	// srx and slots (default to 6450 with GT II graphics)
 	MCFG_DEVICE_ADD(INTERPRO_SLOT_TAG, SRX, 0)
@@ -1179,12 +1165,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sapphire_state::ip6700)
 	sapphire(config);
-	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
-	//MCFG_DEVICE_CLOCK(?)
+	//m_maincpu->set_clock(?);
 
 	// FIXME: don't know which cammu revision
-	MCFG_DEVICE_MODIFY(INTERPRO_MMU_TAG)
-	MCFG_CAMMU_ID(cammu_c4i_device::CID_C4IR2)
+	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
 	// srx and slots (default to 6780 with EDGE-2 Plus graphics)
 	MCFG_DEVICE_ADD(INTERPRO_SLOT_TAG, SRX, 0)
@@ -1202,12 +1186,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sapphire_state::ip6800)
 	sapphire(config);
-	//MCFG_DEVICE_MODIFY(INTERPRO_CPU_TAG)
-	//MCFG_DEVICE_CLOCK(?)
+	//m_maincpu->set_clock(?);
 
 	// FIXME: don't know which cammu revision
-	MCFG_DEVICE_MODIFY(INTERPRO_MMU_TAG)
-	MCFG_CAMMU_ID(cammu_c4i_device::CID_C4IR2)
+	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
 	// EDGE systems use graphics keyboard
 	MCFG_DEVICE_MODIFY(INTERPRO_KEYBOARD_PORT_TAG)
