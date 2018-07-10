@@ -3072,8 +3072,6 @@ files {
 	MAME_DIR .. "src/mame/machine/iopintc.h",
 	MAME_DIR .. "src/mame/machine/iopsio2.cpp",
 	MAME_DIR .. "src/mame/machine/iopsio2.h",
-	MAME_DIR .. "src/mame/machine/iopspu.cpp",
-	MAME_DIR .. "src/mame/machine/iopspu.h",
 	MAME_DIR .. "src/mame/machine/ioptimer.cpp",
 	MAME_DIR .. "src/mame/machine/ioptimer.h",
 	MAME_DIR .. "src/mame/audio/iopspu.cpp",
