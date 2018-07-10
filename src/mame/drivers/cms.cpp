@@ -266,7 +266,7 @@ WRITE_LINE_MEMBER(cms_state::bus_nmi_w)
 void cms_state::cms6502(machine_config &config)
 {
 	M6502(config, m_maincpu, 1_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, cms_state::cms6502_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cms_state::cms6502_mem);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
