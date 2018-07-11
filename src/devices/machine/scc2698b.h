@@ -13,18 +13,6 @@ class scc2698b_device;
 
 // _port should be a letter port index from "a" .. "h"
 
-#define MCFG_SCC2698B_TX_CALLBACK(_port, _cb) \
-	devcb = &downcast<scc2698b_device &>(*device).set_##_port##_tx(DEVCB_##_cb);
-
-#define MCFG_SCC2698B_MPP1_CALLBACK(_port, _cb) \
-	devcb = &downcast<scc2698b_device &>(*device).set_##_port##_mpp1(DEVCB_##_cb);
-
-#define MCFG_SCC2698B_MPP2_CALLBACK(_port, _cb) \
-	devcb = &downcast<scc2698b_device &>(*device).set_##_port##_mpp2(DEVCB_##_cb);
-
-#define MCFG_SCC2698B_MPO_CALLBACK(_port, _cb) \
-	devcb = &downcast<scc2698b_device &>(*device).set_##_port##_mpo(DEVCB_##_cb);
-
 
 
 class scc2698b_channel : public device_t, public device_serial_interface
@@ -105,43 +93,6 @@ public:
 	template <class Object> devcb_base &set_intr_C(Object &&cb) { return write_intr_C.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_intr_D(Object &&cb) { return write_intr_D.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> devcb_base &set_a_tx(Object &&cb) { return write_a_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_b_tx(Object &&cb) { return write_b_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_c_tx(Object &&cb) { return write_c_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_d_tx(Object &&cb) { return write_d_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_e_tx(Object &&cb) { return write_e_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_f_tx(Object &&cb) { return write_f_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_g_tx(Object &&cb) { return write_g_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_h_tx(Object &&cb) { return write_h_tx.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_a_mpp1(Object &&cb) { return write_a_mpp1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_b_mpp1(Object &&cb) { return write_b_mpp1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_c_mpp1(Object &&cb) { return write_c_mpp1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_d_mpp1(Object &&cb) { return write_d_mpp1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_e_mpp1(Object &&cb) { return write_e_mpp1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_f_mpp1(Object &&cb) { return write_f_mpp1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_g_mpp1(Object &&cb) { return write_g_mpp1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_h_mpp1(Object &&cb) { return write_h_mpp1.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_a_mpp2(Object &&cb) { return write_a_mpp2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_b_mpp2(Object &&cb) { return write_b_mpp2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_c_mpp2(Object &&cb) { return write_c_mpp2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_d_mpp2(Object &&cb) { return write_d_mpp2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_e_mpp2(Object &&cb) { return write_e_mpp2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_f_mpp2(Object &&cb) { return write_f_mpp2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_g_mpp2(Object &&cb) { return write_g_mpp2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_h_mpp2(Object &&cb) { return write_h_mpp2.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_a_mpo(Object &&cb) { return write_a_mpo.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_b_mpo(Object &&cb) { return write_b_mpo.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_c_mpo(Object &&cb) { return write_c_mpo.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_d_mpo(Object &&cb) { return write_d_mpo.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_e_mpo(Object &&cb) { return write_e_mpo.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_f_mpo(Object &&cb) { return write_f_mpo.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_g_mpo(Object &&cb) { return write_g_mpo.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_h_mpo(Object &&cb) { return write_h_mpo.set_callback(std::forward<Object>(cb)); }
-
-
 	required_device_array<scc2698b_channel, 8> m_channel;
 
 	DECLARE_WRITE_LINE_MEMBER(port_a_rx_w);
@@ -159,6 +110,66 @@ public:
 	void write_line_mpp2(int port, int value);
 	void write_line_mpo(int port, int value);
 
+
+	auto tx_callback(char port) {
+		switch (port) {
+		case 'a': return write_a_tx.bind();
+		case 'b': return write_b_tx.bind();
+		case 'c': return write_c_tx.bind();
+		case 'd': return write_d_tx.bind();
+		case 'e': return write_e_tx.bind();
+		case 'f': return write_f_tx.bind();
+		case 'g': return write_g_tx.bind();
+		case 'h': return write_h_tx.bind();
+		default:
+			fatalerror("Wrong port for tx_callback\n");			
+		}
+	}
+
+	auto mpp1_callback(char port) {
+		switch (port) {
+		case 'a': return write_a_mpp1.bind();
+		case 'b': return write_b_mpp1.bind();
+		case 'c': return write_c_mpp1.bind();
+		case 'd': return write_d_mpp1.bind();
+		case 'e': return write_e_mpp1.bind();
+		case 'f': return write_f_mpp1.bind();
+		case 'g': return write_g_mpp1.bind();
+		case 'h': return write_h_mpp1.bind();
+		default:
+			fatalerror("Wrong port for mpp1_callback\n");
+		}
+	}
+
+	auto mpp2_callback(char port) {
+		switch (port) {
+		case 'a': return write_a_mpp2.bind();
+		case 'b': return write_b_mpp2.bind();
+		case 'c': return write_c_mpp2.bind();
+		case 'd': return write_d_mpp2.bind();
+		case 'e': return write_e_mpp2.bind();
+		case 'f': return write_f_mpp2.bind();
+		case 'g': return write_g_mpp2.bind();
+		case 'h': return write_h_mpp2.bind();
+		default:
+			fatalerror("Wrong port for mpp2_callback\n");
+		}
+	}
+
+	auto mpo_callback(char port) {
+		switch (port) {
+		case 'a': return write_a_mpo.bind();
+		case 'b': return write_b_mpo.bind();
+		case 'c': return write_c_mpo.bind();
+		case 'd': return write_d_mpo.bind();
+		case 'e': return write_e_mpo.bind();
+		case 'f': return write_f_mpo.bind();
+		case 'g': return write_g_mpo.bind();
+		case 'h': return write_h_mpo.bind();
+		default:
+			fatalerror("Wrong port for mpo_callback\n");
+		}
+	}
 
 protected:
 	virtual void device_start() override;

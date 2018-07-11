@@ -863,7 +863,7 @@ void r9751_state::r9751_mem(address_map &map)
 	map(0xFF010000, 0xFF01FFFF).rw(FUNC(r9751_state::r9751_mmio_ff01_r), FUNC(r9751_state::r9751_mmio_ff01_w));
 	map(0xFF050000, 0xFF06FFFF).rw(FUNC(r9751_state::r9751_mmio_ff05_r), FUNC(r9751_state::r9751_mmio_ff05_w));
 	map(0xFFF80000, 0xFFF8FFFF).rw(FUNC(r9751_state::r9751_mmio_fff8_r), FUNC(r9751_state::r9751_mmio_fff8_w));
-	//AM_RANGE(0xffffff00,0xffffffff) AM_RAM // Unknown areaMCFG_QUANTUM_TIME
+	//AM_RANGE(0xffffff00,0xffffffff) AM_RAM // Unknown area
 }
 
 /******************************************************************************

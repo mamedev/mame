@@ -49,7 +49,7 @@ static const int BAUD_DIVIDER_ACR7_1[16] =
 
 void scc2698b_device::map(address_map &map)
 {
-	map(0x0, 0x3F).rw(this, FUNC(scc2698b_device::read), FUNC(scc2698b_device::write));
+	map(0x0, 0x3F).rw(FUNC(scc2698b_device::read), FUNC(scc2698b_device::write));
 }
 
 #define CHANA_TAG   "cha"

@@ -104,8 +104,8 @@ DECLARE_DEVICE_TYPE(SMIOC, smioc_device)
 
 /* MCFG defines */
 #define MCFG_SMIOC_R_CB(_devcb) \
-	devcb = &smioc_device::m68k_r_callback(*device, DEVCB_##_devcb);
+	smioc_device::m68k_r_callback(*device, DEVCB_##_devcb);
 #define MCFG_SMIOC_W_CB(_devcb) \
-	devcb = &smioc_device::m68k_w_callback(*device, DEVCB_##_devcb);
+	smioc_device::m68k_w_callback(*device, DEVCB_##_devcb);
 
 #endif // MAME_MACHINE_SMIOC_H

@@ -108,14 +108,14 @@ const tiny_rom_entry *smioc_device::device_rom_region() const
 void smioc_device::smioc_mem(address_map &map)
 {
 	map(0x00000, 0x07FFF).ram().share("smioc_ram");
-	map(0x40000, 0x4FFFF).rw(this, FUNC(smioc_device::ram2_mmio_r), FUNC(smioc_device::ram2_mmio_w));
-	map(0x50000, 0x5FFFF).rw(this, FUNC(smioc_device::dma68k_r), FUNC(smioc_device::dma68k_w));
+	map(0x40000, 0x4FFFF).rw(FUNC(smioc_device::ram2_mmio_r), FUNC(smioc_device::ram2_mmio_w));
+	map(0x50000, 0x5FFFF).rw(FUNC(smioc_device::dma68k_r), FUNC(smioc_device::dma68k_w));
 	map(0xC0080, 0xC008F).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Probably RAM DMA
 	map(0xC0090, 0xC009F).rw("dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
 	map(0xC00A0, 0xC00AF).rw("dma8237_3", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
 	map(0xC00B0, 0xC00BF).rw("dma8237_4", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
 	map(0xC00C0, 0xC00CF).rw("dma8237_5", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
-	map(0xC0100, 0xC011F).rw(this, FUNC(smioc_device::boardlogic_mmio_r), FUNC(smioc_device::boardlogic_mmio_w));
+	map(0xC0100, 0xC011F).rw(FUNC(smioc_device::boardlogic_mmio_r), FUNC(smioc_device::boardlogic_mmio_w));
 	map(0xC0200, 0xC023F).rw("scc2698b", FUNC(scc2698b_device::read), FUNC(scc2698b_device::write));
 	map(0xF8000, 0xFFFFF).rom().region("rom", 0);
 }
@@ -150,13 +150,20 @@ MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	
 
 	/* SCC2698B */
-	MCFG_DEVICE_ADD("scc2698b", SCC2698B, XTAL(3'686'400))
-	MCFG_SCC2698B_TX_CALLBACK(a, WRITELINE("rs232_p1", rs232_port_device, write_txd))
-	MCFG_SCC2698B_MPP1_CALLBACK(a, WRITELINE("dma8237_2", am9517a_device, dreq1_w)) MCFG_DEVCB_INVERT // MPP1 output is TxRDY (Active High), DREQ1 is UART 0 TX request (Active Low)
-	MCFG_SCC2698B_MPP2_CALLBACK(a, WRITELINE("dma8237_2", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT // MPP2 output is RxRDY (Active High), DREQ0 is UART 0 RX request (Active Low)
-	MCFG_SCC2698B_TX_CALLBACK(b, WRITELINE("rs232_p2", rs232_port_device, write_txd))
-	MCFG_SCC2698B_MPP1_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq3_w)) MCFG_DEVCB_INVERT
-	MCFG_SCC2698B_MPP2_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq2_w)) MCFG_DEVCB_INVERT
+	scc2698b_device &scc2698b(SCC2698B(config, "scc2698b", XTAL(3'686'400)));
+	scc2698b.tx_callback('a').set("rs232_p1", FUNC(rs232_port_device::write_txd));
+	scc2698b.mpp1_callback('a').set("dma8237_2", FUNC(am9517a_device::dreq1_w)).invert();
+	scc2698b.mpp2_callback('a').set("dma8237_2", FUNC(am9517a_device::dreq0_w)).invert();
+	scc2698b.tx_callback('b').set("rs232_p2", FUNC(rs232_port_device::write_txd));
+	scc2698b.mpp1_callback('b').set("dma8237_2", FUNC(am9517a_device::dreq3_w)).invert();
+	scc2698b.mpp2_callback('b').set("dma8237_2", FUNC(am9517a_device::dreq2_w)).invert();
+
+	//MCFG_SCC2698B_TX_CALLBACK(a, WRITELINE("rs232_p1", rs232_port_device, write_txd))
+	//MCFG_SCC2698B_MPP1_CALLBACK(a, WRITELINE("dma8237_2", am9517a_device, dreq1_w).invert()) // MPP1 output is TxRDY (Active High), DREQ1 is UART 0 TX request (Active Low)
+	//MCFG_SCC2698B_MPP2_CALLBACK(a, WRITELINE("dma8237_2", am9517a_device, dreq0_w).invert()) // MPP2 output is RxRDY (Active High), DREQ0 is UART 0 RX request (Active Low)
+	//MCFG_SCC2698B_TX_CALLBACK(b, WRITELINE("rs232_p2", rs232_port_device, write_txd))
+	//MCFG_SCC2698B_MPP1_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq3_w).invert())
+	//MCFG_SCC2698B_MPP2_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq2_w).invert())
 
 	/* The first dma8237 is set up in cascade mode, and each of its four channels provides HREQ/HACK to the other 4 DMA controllers*/
 	MCFG_DEVICE_MODIFY("dma8237_1")
@@ -216,6 +223,10 @@ smioc_device::smioc_device(const machine_config &mconfig, const char *tag, devic
 void smioc_device::device_start()
 {
 	m_dma_timer = timer_alloc(0, nullptr);
+
+	/* Resolve callbacks */
+	m_m68k_r_cb.resolve_safe(0);
+	m_m68k_w_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -228,9 +239,7 @@ void smioc_device::device_reset()
 	m_smioccpu->reset();
 	m_smioccpu->drq0_w(1);
 
-	/* Resolve callbacks */
-	m_m68k_r_cb.resolve_safe(0);
-	m_m68k_w_cb.resolve_safe();
+
 
 }
 
