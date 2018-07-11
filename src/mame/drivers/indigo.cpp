@@ -34,11 +34,6 @@
 class indigo_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_RTC
-	};
-
 	indigo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -47,6 +42,15 @@ public:
 		, m_eeprom(*this, "eeprom")
 	{
 	}
+
+	void indigo4k(machine_config &config);
+	void indigo3k(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_RTC
+	};
 
 	DECLARE_READ32_MEMBER(hpc_r);
 	DECLARE_WRITE32_MEMBER(hpc_w);
@@ -60,12 +64,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static void cdrom_config(device_t *device);
-	void indigo4k(machine_config &config);
-	void indigo3k(machine_config &config);
 	void indigo3k_map(address_map &map);
 	void indigo4k_map(address_map &map);
 	void indigo_map(address_map &map);
-private:
+
 	struct hpc_t
 	{
 		uint8_t m_misc_status;
@@ -95,7 +97,6 @@ private:
 
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

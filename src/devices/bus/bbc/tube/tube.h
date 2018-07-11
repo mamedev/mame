@@ -54,7 +54,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_BBC_TUBE_SLOT_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<bbc_tube_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<bbc_tube_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

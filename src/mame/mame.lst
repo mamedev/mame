@@ -257,9 +257,6 @@ a5105                           //
 a5120                           //
 a5130                           //
 
-@source:a6809.cpp
-a6809                           //
-
 @source:a7150.cpp
 a7150                           //
 
@@ -874,6 +871,13 @@ acommand                        // (c) 1990
 @source:acrnsys1.cpp
 acrnsys1                        // 1979 Acorn System 1 (Microcomputer Kit)
 
+@source:acrnsys.cpp
+acrnsys2                        // 1980 Acorn System 2
+acrnsys3                        // 1980 Acorn System 3 (6502)
+acrnsys3_6809                   // 1980 Acorn System 3 (6809)
+acrnsys4                        // 1980 Acorn System 4
+acrnsys5                        // 1982 Acorn System 5
+
 @source:actfancr.cpp
 actfancr                        // (c) 1989 Data East Corporation (World)
 actfancr1                       // (c) 1989 Data East Corporation (World)
@@ -1018,6 +1022,7 @@ maddog2_100                     // (c) 1992
 maddog2_110                     // (c) 1992
 maddog2_202                     // (c) 1992
 maddoga                         // (c) 1990
+marvice                         // (c) 1994
 spacepir                        // (c) 1992
 spacepir_14                     // (c) 1992
 wsjr                            // (c) 1991
@@ -9663,6 +9668,7 @@ chessmsta                       //
 chessmstdm                      //
 
 @source:chesstrv.cpp
+boris                           //
 borisdpl                        //
 chesstrv                        //
 
@@ -9851,6 +9857,9 @@ cmi2x                           // Fairlight CMI IIx
 
 @source:cmmb.cpp
 cmmb162                         //
+
+@source:cms.cpp
+cms6502                         // CMS 6502 Development System
 
 @source:cninja.cpp
 cninja                          // MAG (c) 1991 Data East Corporation (World)
@@ -10768,6 +10777,7 @@ pinkswts                        // (c) 2006 Cave (AMI license) - 2006/04/06 MAST
 pinkswtsa                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER...
 pinkswtsb                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER.
 pinkswtsx                       // (c) 2006 Cave (AMI license) - 2006/xx/xx MASTER VER.
+pinkswtssc                      // bootleg
 
 @source:cvicny.cpp
 cvicny                          //
@@ -14141,6 +14151,7 @@ aplan                           // bootleg (WeaShing)
 bingowng                        // (c) 1993 Wing Co. Ltd
 bingownga                       // (c) 1993 Wing Co. Ltd
 bonusch                         // (c) 1990 Wing Co. Ltd
+feverch                         // (c) 1990 Wing Co. Ltd
 carb2002                        // bootleg
 carb2003                        // bootleg
 cb3                             // (c) 199? Dyna Electronics
@@ -15469,6 +15480,7 @@ pinmoonl                        //
 @source:inderp.cpp
 centauri
 centauri2
+topaz
 
 @source:indiana.cpp
 indiana                         //
@@ -17865,6 +17877,7 @@ lastduelb                       // bootleg
 lastduelj                       // 7/1988 (c) 1988 (Japan)
 lastduelo                       // 7/1988 (c) 1988 (US)
 leds2011                        // 1988 (c) 1988 (World)
+leds2011p                       // 1988 (c) 1988 (US, Prototype)
 leds2011u                       // 1988 (c) 1988 (US)
 ledstorm                        // 1988 (c) 1988 (US)
 madgear                         // 2/1989 (c) 1989 (US)
@@ -32767,6 +32780,7 @@ raidendxj                       // (c) 1994 Seibu Kaihatsu
 raidendxja                      // (c) 1994 Seibu Kaihatsu
 raidendxk                       // (c) 1994 Seibu Kaihatsu
 raidendxnl                      // (c) 1994 Seibu Kaihatsu
+raidendxpt                      // (c) 1994 Seibu Kaihatsu
 raidendxu                       // (c) 1994 Seibu Kaihatsu + Fabtek license
 xsedae                          // (c) 1995 Dream Island
 zeroteam                        // (c) 1993 Seibu Kaihatsu + Fabtek license
@@ -33180,6 +33194,7 @@ esha_ma3                        //
 esha_pa1                        //
 esha_pa4                        //
 esha_pr4                        //
+jokrz_g4                        //
 jokrz_l3                        //
 jokrz_l6                        //
 mousn_l1                        //
@@ -34188,8 +34203,9 @@ alien3j                         // 1993.?? Aliens 3 (Japan)
 arabfgt                         // 1992.?? Arabian Fight (World)
 arabfgtj                        // 1992.03 Arabian Fight (Japan)
 arabfgtu                        // 1992.03 Arabian Fight (US)
-arescue                         // 1992.03 Air Rescue (US)
+arescue                         // 1992.03 Air Rescue (World)
 arescuej                        // 1992.04 Air Rescue (Japan)
+arescueu                        // 1992.03 Air Rescue (US)
 brival                          // 1993.?? Burning Rival (World)
 brivalj                         // 1993.08 Burning Rival (Japan)
 darkedge                        // 1993.?? Dark Edge (World)
@@ -36727,7 +36743,8 @@ vikingt                         //
 
 @source:tatsumi.cpp
 apache3                         // (c) 1988 Tatsumi
-apache3a                        // (c) 1988 Tatsumi + Kana Corporation license
+apache3a                        // (c) 1988 Tatsumi
+apache3b                        // (c) 1988 Tatsumi + Kana Corporation license
 bigfight                        // (c) 1992 Tatsumi
 cyclwarr                        // (c) 1991 Tatsumi
 cyclwarra                       // (c) 1991 Tatsumi
@@ -38954,6 +38971,7 @@ ngg_10                          //
 ngg_13                          //
 ngg_p06                         //
 sc_091                          //
+sc_10                           //
 sc_14                           //
 sc_17                           //
 sc_17n                          //

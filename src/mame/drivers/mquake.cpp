@@ -53,19 +53,21 @@ public:
 		m_es5503_rom(*this, "es5503")
 	{ }
 
+	void mquake(machine_config &config);
+
 	void init_mquake();
 
+private:
 	DECLARE_READ8_MEMBER( es5503_sample_r );
 	DECLARE_WRITE16_MEMBER( output_w );
 	DECLARE_READ16_MEMBER( coin_chip_r );
 	DECLARE_WRITE16_MEMBER( coin_chip_w );
 
-	void mquake(machine_config &config);
 	void a500_mem(address_map &map);
 	void main_map(address_map &map);
 	void mquake_es5503_map(address_map &map);
 	void overlay_512kb_map(address_map &map);
-private:
+
 	required_device<es5503_device> m_es5503;
 	required_region_ptr<uint8_t> m_es5503_rom;
 };

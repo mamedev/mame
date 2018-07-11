@@ -5,6 +5,10 @@
   Toaplan Slap Fight hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_SLAPFGHT_H
+#define MAME_INCLUDES_SLAPFGHT_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "video/bufsprite.h"
@@ -15,8 +19,8 @@
 class slapfght_state : public driver_device
 {
 public:
-	slapfght_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	slapfght_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bmcu(*this, "bmcu"),
@@ -30,6 +34,22 @@ public:
 		m_fixcolorram(*this, "fixcolorram")
 	{ }
 
+	void tigerhb2(machine_config &config);
+	void tigerhb1(machine_config &config);
+	void tigerh(machine_config &config);
+	void getstarb2(machine_config &config);
+	void slapfighb2(machine_config &config);
+	void getstarb1(machine_config &config);
+	void perfrman(machine_config &config);
+	void slapfigh(machine_config &config);
+	void slapfighb1(machine_config &config);
+
+	void init_banks();
+	void init_getstarb1();
+	void init_slapfigh();
+	void init_getstarb2();
+
+private:
 	// devices, memory pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -99,11 +119,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void init_banks();
-	void init_getstarb1();
-	void init_slapfigh();
-	void init_getstarb2();
-
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
@@ -117,15 +132,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
-	void tigerhb2(machine_config &config);
-	void tigerhb1(machine_config &config);
-	void tigerh(machine_config &config);
-	void getstarb2(machine_config &config);
-	void slapfighb2(machine_config &config);
-	void getstarb1(machine_config &config);
-	void perfrman(machine_config &config);
-	void slapfigh(machine_config &config);
-	void slapfighb1(machine_config &config);
+
 	void getstar_map(address_map &map);
 	void getstarb1_io_map(address_map &map);
 	void getstarb2_io_map(address_map &map);
@@ -143,3 +150,5 @@ public:
 	void tigerhb1_map(address_map &map);
 	void tigerhb2_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SLAPFGHT_H

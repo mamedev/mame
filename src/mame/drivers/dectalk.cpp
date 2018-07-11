@@ -252,11 +252,6 @@ dgc (dg(no!spam)cx@mac.com)
 class dectalk_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_OUTFIFO_READ
-	};
-
 	dectalk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -266,6 +261,14 @@ public:
 		m_dac(*this, "dac")
 	{
 	}
+
+	void dectalk(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_OUTFIFO_READ
+	};
 
 	// input fifo, between m68k and tms32010
 	uint16_t m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
@@ -321,11 +324,10 @@ public:
 	uint16_t dsp_outfifo_r();
 	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
-	void dectalk(machine_config &config);
 	void m68k_mem(address_map &map);
 	void tms32010_io(address_map &map);
 	void tms32010_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -895,7 +897,7 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 	MCFG_QUANTUM_PERFECT_CPU("dsp")
 #endif
 
-	MCFG_X2212_ADD("x2212")
+	X2212(config, "x2212");
 
 	/* video hardware */
 

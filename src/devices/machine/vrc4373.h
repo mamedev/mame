@@ -17,7 +17,7 @@
 	downcast<vrc4373_device &>(*device).set_simm0_size(_size);
 
 #define MCFG_VRC4373_IRQ_CB(_devcb) \
-	devcb = &ide_pci_device::set_irq_cb(*device, DEVCB_##_devcb);
+	ide_pci_device::set_irq_cb(*device, DEVCB_##_devcb);
 
 
 class vrc4373_device : public pci_host_device {

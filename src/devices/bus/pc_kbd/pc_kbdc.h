@@ -21,10 +21,10 @@ set the data line and then set the clock line.
 //**************************************************************************
 
 #define MCFG_PC_KBDC_OUT_CLOCK_CB(_devcb) \
-	devcb = &downcast<pc_kbdc_device &>(*device).set_out_clock_callback(DEVCB_##_devcb);
+	downcast<pc_kbdc_device &>(*device).set_out_clock_callback(DEVCB_##_devcb);
 
 #define MCFG_PC_KBDC_OUT_DATA_CB(_devcb) \
-	devcb = &downcast<pc_kbdc_device &>(*device).set_out_data_callback(DEVCB_##_devcb);
+	downcast<pc_kbdc_device &>(*device).set_out_data_callback(DEVCB_##_devcb);
 
 #define MCFG_PC_KBDC_SLOT_ADD(_kbdc_tag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, PC_KBDC_SLOT, 0 ) \

@@ -49,6 +49,10 @@ public:
 		m_scanline_off_timer(*this, "scanline_off")
 	{ }
 
+	void dotrikun(machine_config &config);
+
+protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_vram;
@@ -67,7 +71,6 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void dotrikun(machine_config &config);
 	void dotrikun_map(address_map &map);
 	void io_map(address_map &map);
 };

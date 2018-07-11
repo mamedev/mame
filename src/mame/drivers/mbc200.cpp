@@ -74,6 +74,9 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
+	void mbc200(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(p2_porta_r);
 	DECLARE_WRITE8_MEMBER(p1_portc_w);
 	DECLARE_WRITE8_MEMBER(pm_porta_w);
@@ -83,12 +86,11 @@ public:
 	MC6845_UPDATE_ROW(update_row);
 	required_device<palette_device> m_palette;
 
-	void mbc200(machine_config &config);
 	void mbc200_io(address_map &map);
 	void mbc200_mem(address_map &map);
 	void mbc200_sub_io(address_map &map);
 	void mbc200_sub_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint8_t m_comm_latch;

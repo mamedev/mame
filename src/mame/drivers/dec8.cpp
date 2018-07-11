@@ -349,12 +349,6 @@ WRITE8_MEMBER(dec8_state::ghostb_bank_w)
 	flip_screen_set(BIT(data, 3));
 }
 
-WRITE_LINE_MEMBER(dec8_state::ghostb_nmi_w)
-{
-	if (state && m_nmi_enable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
 WRITE8_MEMBER(dec8_state::csilver_control_w)
 {
 	/*
@@ -2090,19 +2084,18 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(58)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
-	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_gondo)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dec8_state, screen_vblank_dec8))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("nmigate", input_merger_device, in_w<1>))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(58);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */);
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	device = &screen; MCFG_SCREEN_RAW_PARAMS_DATA_EAST
+	screen.set_screen_update(FUNC(dec8_state::screen_update_gondo));
+	screen.screen_vblank().set(FUNC(dec8_state::screen_vblank_dec8));
+	screen.screen_vblank().append(m_nmigate, FUNC(input_merger_device::in_w<1>));
+	screen.set_palette("palette");
 
-	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gondo)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
@@ -2151,19 +2144,18 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(58)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
-	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_garyoret)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dec8_state, screen_vblank_dec8))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("nmigate", input_merger_device, in_w<1>))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(58);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */);
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	device = &screen; MCFG_SCREEN_RAW_PARAMS_DATA_EAST
+	screen.set_screen_update(FUNC(dec8_state::screen_update_garyoret));
+	screen.screen_vblank().set(FUNC(dec8_state::screen_vblank_dec8));
+	screen.screen_vblank().append(m_nmigate, FUNC(input_merger_device::in_w<1>));
+	screen.set_palette("palette");
 
-	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gondo)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
@@ -2216,16 +2208,16 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(58)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
-	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_ghostb)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dec8_state, screen_vblank_dec8))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, dec8_state, ghostb_nmi_w))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(58);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */);
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	device = &screen; MCFG_SCREEN_RAW_PARAMS_DATA_EAST
+	screen.set_screen_update(FUNC(dec8_state::screen_update_ghostb));
+	screen.screen_vblank().set(FUNC(dec8_state::screen_vblank_dec8));
+	screen.screen_vblank().append([this] (int state) { if (state && m_nmi_enable) m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE); });
+	screen.set_palette("palette");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ghostb)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting

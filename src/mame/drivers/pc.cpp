@@ -362,20 +362,6 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-
-	DECLARE_READ8_MEMBER(unk_r);
-
-	void init_bondwell();
-
-	DECLARE_INPUT_CHANGED_MEMBER(pc_turbo_callback);
-
-	double m_turbo_off_speed;
-
-	static void cfg_dual_720K(device_t *device);
-	static void cfg_single_360K(device_t *device);
-	static void cfg_single_720K(device_t *device);
-
 	void ataripc1(machine_config &config);
 	void ncrpc4i(machine_config &config);
 	void kaypro16(machine_config &config);
@@ -395,6 +381,22 @@ public:
 	void eagle1600(machine_config &config);
 	void laser_turbo_xt(machine_config &config);
 	void ibm5550(machine_config &config);
+
+	void init_bondwell();
+
+	DECLARE_INPUT_CHANGED_MEMBER(pc_turbo_callback);
+
+private:
+	required_device<cpu_device> m_maincpu;
+
+	DECLARE_READ8_MEMBER(unk_r);
+
+	double m_turbo_off_speed;
+
+	static void cfg_dual_720K(device_t *device);
+	static void cfg_single_360K(device_t *device);
+	static void cfg_single_720K(device_t *device);
+
 	void epc_io(address_map &map);
 	void ibm5550_io(address_map &map);
 	void pc16_io(address_map &map);

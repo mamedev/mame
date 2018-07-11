@@ -44,7 +44,34 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void tourny(machine_config &config);
+	void sftm(machine_config &config);
+	void drivedge(machine_config &config);
+	void bloodstm(machine_config &config);
+	void timekill(machine_config &config);
 
+	void init_gtclasscp();
+	void init_shufshot();
+	void init_wcbowlt();
+	void init_hardyard();
+	void init_s_ver();
+	void init_sftm110();
+	void init_wcbowln();
+	void init_gt2kp();
+	void init_sftm();
+	void init_drivedge();
+	void init_wcbowl();
+	void init_wcbowlj();
+	void init_aamat();
+	void init_bloodstm();
+	void init_aama();
+	void init_timekill();
+	void init_gt3d();
+	void init_gt3dl();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(special_port_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_dsp1;
@@ -157,29 +184,10 @@ public:
 	DECLARE_WRITE32_MEMBER(itech020_video_w);
 	DECLARE_WRITE32_MEMBER(drivedge_zbuf_control_w);
 	DECLARE_READ32_MEMBER(itech020_video_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(special_port_r);
 	DECLARE_WRITE8_MEMBER(drivedge_portb_out);
 	DECLARE_WRITE_LINE_MEMBER(drivedge_turbo_light);
 	DECLARE_WRITE8_MEMBER(pia_portb_out);
 
-	void init_gtclasscp();
-	void init_shufshot();
-	void init_wcbowlt();
-	void init_hardyard();
-	void init_s_ver();
-	void init_sftm110();
-	void init_wcbowln();
-	void init_gt2kp();
-	void init_sftm();
-	void init_drivedge();
-	void init_wcbowl();
-	void init_wcbowlj();
-	void init_aamat();
-	void init_bloodstm();
-	void init_aama();
-	void init_timekill();
-	void init_gt3d();
-	void init_gt3dl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -209,11 +217,6 @@ public:
 	void handle_video_command();
 	inline int determine_irq_state(int vint, int xint, int qint);
 	void itech32_update_interrupts(int vint, int xint, int qint);
-	void tourny(machine_config &config);
-	void sftm(machine_config &config);
-	void drivedge(machine_config &config);
-	void bloodstm(machine_config &config);
-	void timekill(machine_config &config);
 	void bloodstm_map(address_map &map);
 	void drivedge_map(address_map &map);
 	void drivedge_tms1_map(address_map &map);

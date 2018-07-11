@@ -84,6 +84,11 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void mycom(machine_config &config);
+
+	void init_mycom();
+
+private:
 	DECLARE_READ8_MEMBER(mycom_upper_r);
 	DECLARE_WRITE8_MEMBER(mycom_upper_w);
 	DECLARE_READ8_MEMBER(vram_data_r);
@@ -95,15 +100,13 @@ public:
 	DECLARE_READ8_MEMBER(mycom_05_r);
 	DECLARE_READ8_MEMBER(mycom_06_r);
 	DECLARE_READ8_MEMBER(mycom_08_r);
-	void init_mycom();
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void mycom(machine_config &config);
 	void mycom_io(address_map &map);
 	void mycom_map(address_map &map);
-private:
+
 	uint8_t m_0a;
 	uint16_t m_i_videoram;
 	uint8_t m_keyb_press;

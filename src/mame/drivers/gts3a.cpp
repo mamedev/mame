@@ -42,7 +42,13 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void gts3a(machine_config &config);
+
 	void init_gts3a();
+
+	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
+
+private:
 	DECLARE_WRITE8_MEMBER(segbank_w);
 	DECLARE_READ8_MEMBER(u4a_r);
 	DECLARE_READ8_MEMBER(u4b_r);
@@ -50,14 +56,12 @@ public:
 	DECLARE_READ8_MEMBER(dmd_r);
 	DECLARE_WRITE8_MEMBER(dmd_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
-	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_PALETTE_INIT(gts3a);
 	required_device<palette_device> m_palette;
-	void gts3a(machine_config &config);
 	void gts3a_dmd_map(address_map &map);
 	void gts3a_map(address_map &map);
-private:
+
 	bool m_dispclk;
 	bool m_lampclk;
 	uint8_t m_digit;

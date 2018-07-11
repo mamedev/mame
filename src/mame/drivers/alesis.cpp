@@ -416,12 +416,12 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 
 MACHINE_CONFIG_START(alesis_state::hr16)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8031, 12_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(hr16_mem)
-	MCFG_DEVICE_IO_MAP(hr16_io)
-	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("SELECT"))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, alesis_state, p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, alesis_state, p3_w))
+	I8031(config, m_maincpu, 12_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alesis_state::hr16_mem);
+	m_maincpu->set_addrmap(AS_IO, &alesis_state::hr16_io);
+	m_maincpu->port_in_cb<1>().set_ioport("SELECT");
+	m_maincpu->port_in_cb<3>().set(FUNC(alesis_state::p3_r));
+	m_maincpu->port_out_cb<3>().set(FUNC(alesis_state::p3_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -451,11 +451,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alesis_state::sr16)
 	hr16(config);
+
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sr16_mem)
-	MCFG_DEVICE_IO_MAP(sr16_io)
-	MCFG_MCS51_PORT_P1_IN_CB(NOOP)
+	m_maincpu->set_addrmap(AS_PROGRAM, &alesis_state::sr16_mem);
+	m_maincpu->set_addrmap(AS_IO, &alesis_state::sr16_io);
+	m_maincpu->port_in_cb<1>().set_constant(0);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -470,12 +470,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alesis_state::mmt8)
 	hr16(config);
+
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(mmt8_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, alesis_state, kb_r))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, alesis_state, mmt8_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, alesis_state, mmt8_p3_w))
+	m_maincpu->set_addrmap(AS_IO, &alesis_state::mmt8_io);
+	m_maincpu->port_in_cb<1>().set(FUNC(alesis_state::kb_r));
+	m_maincpu->port_in_cb<3>().set(FUNC(alesis_state::mmt8_p3_r));
+	m_maincpu->port_out_cb<3>().set(FUNC(alesis_state::mmt8_p3_w));
 
 	MCFG_DEVICE_REMOVE("dm3ag")
 MACHINE_CONFIG_END

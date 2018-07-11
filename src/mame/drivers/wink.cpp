@@ -33,6 +33,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram") { }
 
+	void wink(machine_config &config);
+
+	void init_wink();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -60,7 +65,6 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void init_wink();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -68,7 +72,6 @@ public:
 	uint32_t screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(wink_sound);
-	void wink(machine_config &config);
 	void wink_io(address_map &map);
 	void wink_map(address_map &map);
 	void wink_sound_io(address_map &map);

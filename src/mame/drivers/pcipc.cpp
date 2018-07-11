@@ -40,18 +40,18 @@ public:
 	static const boot_state_info boot_state_infos_phoenix_ver40_rev6[];
 	static const boot_state_info boot_state_infos_award[];
 
+	void pcipc(machine_config &config);
+	void pcipctx(machine_config &config);
+
+	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
+
+private:
 	DECLARE_WRITE8_MEMBER(boot_state_phoenix_w);
 	DECLARE_WRITE8_MEMBER(boot_state_phoenix_ver40_rev6_w);
 	DECLARE_WRITE8_MEMBER(boot_state_award_w);
 
-	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-
-	void pcipc(machine_config &config);
-	void pcipctx(machine_config &config);
 
 	static void superio_config(device_t *device);
 };
@@ -452,7 +452,7 @@ WRITE8_MEMBER(pcipc_state::boot_state_phoenix_ver40_rev6_w)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-
+	printf("[%02X]",data);
 }
 
 

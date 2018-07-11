@@ -23,7 +23,7 @@
 	MCFG_DEVICE_ADD(_tag, DS1315, 0)
 
 #define MCFG_DS1315_BACKING_HANDLER(_devcb) \
-	devcb = &downcast<ds1315_device &>(*device).set_backing_handler(DEVCB_##_devcb);
+	downcast<ds1315_device &>(*device).set_backing_handler(DEVCB_##_devcb);
 
 /***************************************************************************
     MACROS

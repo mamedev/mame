@@ -28,17 +28,17 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(bsmt_status_r);
+	void sshooter(machine_config &config);
+	void policetr(machine_config &config);
 
 	void init_sshoot12();
 	void init_policetr();
 	void init_sshooter();
 	void init_plctr13b();
 
-	void sshooter(machine_config &config);
-	void policetr(machine_config &config);
+	DECLARE_CUSTOM_INPUT_MEMBER(bsmt_status_r);
 
-protected:
+private:
 	enum
 	{
 		TIMER_IRQ5_GEN

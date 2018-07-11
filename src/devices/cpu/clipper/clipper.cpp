@@ -20,8 +20,10 @@
 
 #define LOG_GENERAL   (1U << 0)
 #define LOG_EXCEPTION (1U << 1)
+#define LOG_SYSCALLS  (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_EXCEPTION)
+#define VERBOSE (LOG_SYSCALLS)
 
 #include "logmacro.h"
 
@@ -54,21 +56,21 @@ DEFINE_DEVICE_TYPE(CLIPPER_C300, clipper_c300_device, "clipper_c300", "C300 CLIP
 DEFINE_DEVICE_TYPE(CLIPPER_C400, clipper_c400_device, "clipper_c400", "C400 CLIPPER")
 
 clipper_c100_device::clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: clipper_device(mconfig, CLIPPER_C100, tag, owner, clock, ENDIANNESS_LITTLE, 0)
+	: clipper_device(mconfig, CLIPPER_C100, tag, owner, clock, ENDIANNESS_LITTLE, SSW_ID_C1R1)
 	, m_icammu(*this, "^cammu_i")
 	, m_dcammu(*this, "^cammu_d")
 {
 }
 
 clipper_c300_device::clipper_c300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: clipper_device(mconfig, CLIPPER_C300, tag, owner, clock, ENDIANNESS_LITTLE, 0)
+	: clipper_device(mconfig, CLIPPER_C300, tag, owner, clock, ENDIANNESS_LITTLE, SSW_ID_C3R1)
 	, m_icammu(*this, "^cammu_i")
 	, m_dcammu(*this, "^cammu_d")
 {
 }
 
 clipper_c400_device::clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: clipper_device(mconfig, CLIPPER_C400, tag, owner, clock, ENDIANNESS_LITTLE, SSW_ID_C400R4)
+	: clipper_device(mconfig, CLIPPER_C400, tag, owner, clock, ENDIANNESS_LITTLE, SSW_ID_C4R4)
 	, m_cammu(*this, "^cammu")
 {
 }
@@ -113,7 +115,7 @@ inline u64 rotr64(u64 x, u8 shift)
 void clipper_device::device_start()
 {
 	// map spaces to system tags
-	std::vector<address_space *> spaces = { &space(0), &space(0), &space(0), &space(0), &space(1), &space(2), nullptr, nullptr };
+	std::vector<address_space *> spaces = { &space(0), &space(0), &space(0), &space(0), &space(1), &space(2), &space(0), &machine().dummy_space() };
 
 	// configure the cammu address spaces
 	get_icammu().set_spaces(spaces);
@@ -141,7 +143,6 @@ void clipper_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
-	state_add(STATE_GENSP, "GENSP", m_r[15]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_psw).mask(0xf).formatstr("%4s").noshow();
 
 	state_add(CLIPPER_PC, "pc", m_pc);
@@ -150,7 +151,9 @@ void clipper_device::device_start()
 
 	// integer regsters
 	for (int i = 0; i < get_ireg_count(); i++)
-		state_add(CLIPPER_IREG + i, util::string_format("r%d", i).c_str(), m_r[i]);
+		state_add(CLIPPER_UREG + i, util::string_format("ur%d", i).c_str(), m_ru[i]);
+	for (int i = 0; i < get_ireg_count(); i++)
+		state_add(CLIPPER_SREG + i, util::string_format("sr%d", i).c_str(), m_rs[i]);
 
 	// floating point registers
 	for (int i = 0; i < get_freg_count(); i++)
@@ -213,7 +216,7 @@ void clipper_device::execute_run()
 	}
 	else if (SSW(EI) && m_irq)
 	{
-		LOGMASKED(LOG_EXCEPTION, "received prioritised interrupt ivec 0x%02x\n", m_ivec);
+		LOGMASKED(LOG_EXCEPTION, "prioritised interrupt vector 0x%02x\n", m_ivec);
 
 		// allow equal/higher priority interrupts
 		if ((m_ivec & IVEC_LEVEL) <= SSW(IL))
@@ -223,16 +226,19 @@ void clipper_device::execute_run()
 
 			m_pc = intrap(EXCEPTION_INTERRUPT_BASE + m_ivec * 8, m_pc);
 
-			LOGMASKED(LOG_EXCEPTION, "transferring control to ivec 0x%02x address 0x%08x\n", m_ivec, m_pc);
+			LOGMASKED(LOG_EXCEPTION, "transferring control to vector 0x%02x address 0x%08x\n", m_ivec, m_pc);
 		}
 	}
-
-	if (m_wait)
-		m_icount = 0;
 
 	while (m_icount > 0)
 	{
 		debugger_instruction_hook(m_pc);
+
+		if (m_wait)
+		{
+			m_icount = 0;
+			continue;
+		}
 
 		// fetch and decode an instruction
 		if (decode_instruction())
@@ -249,6 +255,8 @@ void clipper_device::execute_run()
 
 		if (m_exception)
 		{
+			debugger_exception_hook(m_exception);
+
 			/*
 			 * For traced instructions which are interrupted or cause traps, the TP
 			 * flag is set by hardware when the interrupt or trap occurs to ensure
@@ -349,9 +357,11 @@ WRITE16_MEMBER(clipper_device::set_exception)
  */
 bool clipper_device::decode_instruction()
 {
+	// record the current instruction address
+	m_info.pc = m_pc;
+
 	// fetch and decode the primary parcel
 	if (!get_icammu().fetch<u16>(m_ssw, m_pc + 0, [this](u16 insn) {
-		m_info.pc = m_pc;
 		m_info.opcode = insn >> 8;
 		m_info.subopcode = insn & 0xff;
 		m_info.r1 = (insn & 0x00f0) >> 4;
@@ -511,6 +521,14 @@ void clipper_device::execute_instruction()
 	case 0x12:
 		// calls: call supervisor
 		m_exception = EXCEPTION_SUPERVISOR_CALL_BASE + (m_info.subopcode & 0x7f) * 8;
+		if (VERBOSE & LOG_SYSCALLS)
+			switch (m_info.subopcode & 0x7f)
+			{
+			case 0x3b: // execve
+				LOGMASKED(LOG_SYSCALLS, "execve(\"%s\", [ %s ], envp)\n",
+					debug_string(m_r[0]), debug_string_array(m_r[1]));
+				break;
+			}
 		break;
 	case 0x13:
 		// ret: return from subroutine
@@ -522,8 +540,8 @@ void clipper_device::execute_instruction()
 		break;
 	case 0x14:
 		// pushw: push word
-		if (get_dcammu().store<u32>(m_ssw, m_r[R1] - 4, m_r[R2]))
-			m_r[R1] -= 4;
+		get_dcammu().store<u32>(m_ssw, m_r[R1] - 4, m_r[R2]);
+		m_r[R1] -= 4;
 		// TRAPS: A,P,W
 		break;
 
@@ -1247,12 +1265,12 @@ void clipper_device::execute_instruction()
 			// saved0..saved7: push registers fN:f7
 
 			// store fi at sp - 8 * (8 - i)
-			for (int i = R2; i < 8 && !m_exception; i++)
+			for (int i = m_info.subopcode & 0x7; i < 8 && !m_exception; i++)
 				get_dcammu().store<float64>(m_ssw, m_r[15] - 8 * (8 - i), get_fp64(i));
 
 			// decrement sp after push to allow restart on exceptions
 			if (!m_exception)
-				m_r[15] -= 8 * (8 - R2);
+				m_r[15] -= 8 * (8 - (m_info.subopcode & 0x7));
 			// TRAPS: A,P,W
 			break;
 		case 0x28: case 0x29: case 0x2a: case 0x2b:
@@ -1260,12 +1278,12 @@ void clipper_device::execute_instruction()
 			// restd0..restd7: pop registers fN:f7
 
 			// load fi from sp + 8 * (i - N)
-			for (int i = R2; i < 8 && !m_exception; i++)
-				get_dcammu().load<float64>(m_ssw, m_r[15] + 8 * (i - R2), [this, i](float64 v) { set_fp(i, v, F_NONE); });
+			for (int i = m_info.subopcode & 0x7; i < 8 && !m_exception; i++)
+				get_dcammu().load<float64>(m_ssw, m_r[15] + 8 * (i - (m_info.subopcode & 0x7)), [this, i](float64 v) { set_fp(i, v, F_NONE); });
 
 			// increment sp after pop to allow restart on exceptions
 			if (!m_exception)
-				m_r[15] += 8 * (8 - R2);
+				m_r[15] += 8 * (8 - (m_info.subopcode & 0x7));
 			// TRAPS: C,U,A,P,R
 			break;
 		case 0x30:
@@ -1500,8 +1518,6 @@ u32 clipper_device::intrap(const u16 vector, const u32 old_pc)
 	const u32 old_psw = m_psw;
 	u32 new_pc = 0, new_ssw = 0;
 
-	debugger_exception_hook(vector);
-
 	// clear ssw bits to enable supervisor memory access
 	m_ssw &= ~(SSW_U | SSW_K | SSW_UU | SSW_KU);
 
@@ -1584,8 +1600,6 @@ u32 clipper_c400_device::intrap(const u16 vector, const u32 old_pc)
 	const u32 old_ssw = m_ssw;
 	const u32 old_psw = m_psw;
 	u32 new_pc = 0, new_ssw = 0;
-
-	debugger_exception_hook(vector);
 
 	// clear ssw bits to enable supervisor memory access
 	m_ssw &= ~(SSW_U | SSW_K | SSW_UU | SSW_KU);
@@ -1969,4 +1983,52 @@ void clipper_c400_device::execute_instruction()
 std::unique_ptr<util::disasm_interface> clipper_device::create_disassembler()
 {
 	return std::make_unique<clipper_disassembler>();
+}
+
+std::string clipper_device::debug_string(u32 pointer)
+{
+	auto const suppressor(machine().disable_side_effects());
+
+	std::string s("");
+
+	while (true)
+	{
+		char c;
+
+		if (!get_dcammu().load<u8>(m_ssw, pointer++, [&c](u8 v) { c = v; }))
+			break;
+
+		if (c == '\0')
+			break;
+
+		s += c;
+	}
+
+	return s;
+}
+
+std::string clipper_device::debug_string_array(u32 array_pointer)
+{
+	auto const suppressor(machine().disable_side_effects());
+
+	std::string s("");
+
+	while (true)
+	{
+		u32 string_pointer;
+
+		if (!get_dcammu().load<u32>(m_ssw, array_pointer, [&string_pointer](u32 v) { string_pointer = v; }))
+			break;
+
+		if (string_pointer == 0)
+			break;
+
+		if (!s.empty())
+			s += ", ";
+
+		s += '\"' + debug_string(string_pointer) + '\"';
+		array_pointer += 4;
+	}
+
+	return s;
 }

@@ -1901,16 +1901,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 	}
 }
 
-MACHINE_CONFIG_START(namcos21_state::configure_c148_standard)
-	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
-	MCFG_NAMCO_C148_LINK("slave_intc")
-	MCFG_NAMCO_C148_EXT1_CB(WRITE8(*this, namcos21_state, sound_reset_w))
-	MCFG_NAMCO_C148_EXT2_CB(WRITE8(*this, namcos21_state, system_reset_w))
+void namcos21_state::configure_c148_standard(machine_config &config)
+{
+	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
+	m_master_intc->link_c148_device(m_slave_intc);
+	m_master_intc->out_ext1_callback().set(FUNC(namcos21_state::sound_reset_w));
+	m_master_intc->out_ext2_callback().set(FUNC(namcos21_state::system_reset_w));
 
-	MCFG_NAMCO_C148_ADD("slave_intc","slave",false)
-	MCFG_NAMCO_C148_LINK("master_intc")
-
-MACHINE_CONFIG_END
+	NAMCO_C148(config, m_slave_intc, 0, m_slave, false);
+	m_slave_intc->link_c148_device(m_master_intc);
+}
 
 MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
@@ -1933,7 +1933,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_DEVICE_PROGRAM_MAP(master_dsp_program)
 	MCFG_DEVICE_DATA_MAP(master_dsp_data)
 	MCFG_DEVICE_IO_MAP(master_dsp_io)
-	MCFG_TMS32025_HOLD_IN_CB(NOOP)
+	MCFG_TMS32025_HOLD_IN_CB(CONSTANT(0))
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
 	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos21_state, dsp_xf_w))
 
@@ -1941,7 +1941,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_DEVICE_PROGRAM_MAP(slave_dsp_program)
 	MCFG_DEVICE_DATA_MAP(slave_dsp_data)
 	MCFG_DEVICE_IO_MAP(slave_dsp_io)
-	MCFG_TMS32025_HOLD_IN_CB(NOOP)
+	MCFG_TMS32025_HOLD_IN_CB(CONSTANT(0))
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
 	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos21_state, slave_XF_output_w))
 
@@ -2002,7 +2002,7 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	MCFG_DEVICE_DATA_MAP(winrun_dsp_data)
 	MCFG_DEVICE_IO_MAP(winrun_dsp_io)
 	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos21_state, winrun_poly_reset_r))
-	MCFG_TMS32025_HOLD_IN_CB(NOOP)
+	MCFG_TMS32025_HOLD_IN_CB(CONSTANT(0))
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
 	MCFG_TMS32025_XF_OUT_CB(NOOP)
 
@@ -2063,7 +2063,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_DEVICE_DATA_MAP(winrun_dsp_data)
 	MCFG_DEVICE_IO_MAP(winrun_dsp_io)
 	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos21_state, winrun_poly_reset_r))
-	MCFG_TMS32025_HOLD_IN_CB(NOOP)
+	MCFG_TMS32025_HOLD_IN_CB(CONSTANT(0))
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
 	MCFG_TMS32025_XF_OUT_CB(NOOP)
 
@@ -2071,7 +2071,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_DEVICE_PROGRAM_MAP(winrun_gpu_map)
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C148_ADD("gpu_intc","gpu",false)
+	NAMCO_C148(config, m_gpu_intc, 0, "gpu", false);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */

@@ -65,6 +65,11 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void scyclone(machine_config &config);
+
+	CUSTOM_INPUT_MEMBER(collision_r);
+
+private:
 	DECLARE_WRITE8_MEMBER(vidctrl_w);
 
 	DECLARE_WRITE8_MEMBER(sprite_xpos_w);
@@ -87,19 +92,16 @@ public:
 
 	INTERRUPT_GEN_MEMBER(irq);
 
-	CUSTOM_INPUT_MEMBER(collision_r);
 
-	void scyclone(machine_config &config);
 	void scyclone_iomap(address_map &map);
 	void scyclone_map(address_map &map);
 	void scyclone_sub_iomap(address_map &map);
 	void scyclone_sub_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_region_ptr<uint8_t> m_stars;

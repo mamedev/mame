@@ -18,19 +18,19 @@
 //**************************************************************************
 
 #define MCFG_RIOT6532_IN_PA_CB(_devcb) \
-	devcb = &downcast<riot6532_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
+	downcast<riot6532_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_RIOT6532_OUT_PA_CB(_devcb) \
-	devcb = &downcast<riot6532_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
+	downcast<riot6532_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_RIOT6532_IN_PB_CB(_devcb) \
-	devcb = &downcast<riot6532_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
+	downcast<riot6532_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_RIOT6532_OUT_PB_CB(_devcb) \
-	devcb = &downcast<riot6532_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
+	downcast<riot6532_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_RIOT6532_IRQ_CB(_devcb) \
-	devcb = &downcast<riot6532_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	downcast<riot6532_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 
 /***************************************************************************

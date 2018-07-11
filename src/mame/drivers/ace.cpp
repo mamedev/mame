@@ -64,7 +64,7 @@ public:
 
 	void ace(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(ace_objpos_w);
 	DECLARE_WRITE8_MEMBER(ace_characterram_w);
 	DECLARE_WRITE8_MEMBER(ace_scoreram_w);
@@ -76,7 +76,6 @@ protected:
 	void ace_postload();
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 
 	/* video-related */

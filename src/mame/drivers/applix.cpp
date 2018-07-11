@@ -101,6 +101,11 @@ public:
 		m_expansion(*this, "expansion"),
 		m_palette(*this, "palette"){ }
 
+	void applix(machine_config &config);
+
+	void init_applix();
+
+private:
 	DECLARE_READ16_MEMBER(applix_inputs_r);
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_WRITE16_MEMBER(analog_latch_w);
@@ -135,7 +140,7 @@ public:
 	DECLARE_READ8_MEMBER( p3_read );
 	DECLARE_WRITE8_MEMBER( p3_write );
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
-	void init_applix();
+
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t m_video_latch;
 	uint8_t m_pa;
@@ -144,13 +149,13 @@ public:
 	DECLARE_PALETTE_INIT(applix);
 	uint8_t m_palette_latch[4];
 	required_shared_ptr<uint16_t> m_base;
-	void applix(machine_config &config);
+
 	void applix_mem(address_map &map);
 	void keytronic_pc3270_io(address_map &map);
 	void keytronic_pc3270_program(address_map &map);
 	void subcpu_io(address_map &map);
 	void subcpu_mem(address_map &map);
-private:
+
 	uint8_t m_pb;
 	uint8_t m_analog_latch;
 	uint8_t m_dac_latch;
@@ -205,7 +210,7 @@ private:
 	required_ioport m_io_k3b0;
 	required_ioport m_io_k0b;
 	required_shared_ptr<uint16_t> m_expansion;
-public:
+
 	required_device<palette_device> m_palette;
 };
 

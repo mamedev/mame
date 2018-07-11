@@ -162,7 +162,7 @@ INPUT_PORTS_END
 READ8_MEMBER( isa8_ibm_mfc_device::ppi0_i_a )
 {
 	// Read data from the Z80 PIU
-	return m_d71055c_1->pa_r();
+	return m_d71055c_1->read_pa();
 }
 
 WRITE8_MEMBER( isa8_ibm_mfc_device::ppi0_o_b )
@@ -210,7 +210,7 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_a )
 READ8_MEMBER( isa8_ibm_mfc_device::ppi1_i_b )
 {
 	// Read data from the PC PIU
-	return m_d71055c_0->pb_r();
+	return m_d71055c_0->read_pb();
 }
 
 WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_c )

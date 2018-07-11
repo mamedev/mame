@@ -17,10 +17,10 @@
 
 
 #define MCFG_GTIA_READ_CB(_devcb) \
-	devcb = &downcast<gtia_device &>(*device).set_read_callback(DEVCB_##_devcb);
+	downcast<gtia_device &>(*device).set_read_callback(DEVCB_##_devcb);
 
 #define MCFG_GTIA_WRITE_CB(_devcb) \
-	devcb = &downcast<gtia_device &>(*device).set_write_callback(DEVCB_##_devcb);
+	downcast<gtia_device &>(*device).set_write_callback(DEVCB_##_devcb);
 
 #define MCFG_GTIA_REGION(region) \
 	downcast<gtia_device &>(*device).set_region(region);

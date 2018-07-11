@@ -78,16 +78,16 @@
 //**************************************************************************
 
 #define MCFG_X68K_EXPANSION_SLOT_OUT_IRQ2_CB(_devcb) \
-	devcb = &downcast<x68k_expansion_slot_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
+	downcast<x68k_expansion_slot_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
 
 #define MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(_devcb) \
-	devcb = &downcast<x68k_expansion_slot_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
+	downcast<x68k_expansion_slot_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
 
 #define MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &downcast<x68k_expansion_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
+	downcast<x68k_expansion_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_X68K_EXPANSION_SLOT_OUT_RESET_CB(_devcb) \
-	devcb = &downcast<x68k_expansion_slot_device &>(*device).set_out_reset_callback(DEVCB_##_devcb);
+	downcast<x68k_expansion_slot_device &>(*device).set_out_reset_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

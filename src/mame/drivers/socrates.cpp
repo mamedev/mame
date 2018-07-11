@@ -97,13 +97,6 @@ TODO:
 class socrates_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_KBMCU_SIM,
-		TIMER_CLEAR_SPEECH,
-		TIMER_CLEAR_IRQ
-	};
-
 	socrates_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -118,6 +111,23 @@ public:
 		m_rambank2(*this, "rambank2"),
 		m_kbdrow(*this, "IN%u", 0)
 		{ }
+
+	void socrates_pal(machine_config &config);
+	void socrates(machine_config &config);
+
+	void init_socrates();
+	void init_iqunlimz();
+
+	DECLARE_PALETTE_INIT(socrates);
+
+protected:
+	enum
+	{
+		TIMER_KBMCU_SIM,
+		TIMER_CLEAR_SPEECH,
+		TIMER_CLEAR_IRQ
+	};
+
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
 	required_device<screen_device> m_screen;
@@ -167,12 +177,11 @@ public:
 	DECLARE_WRITE8_MEMBER(reset_speech);
 	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
 	DECLARE_WRITE8_MEMBER(socrates_sound_w);
-	void init_socrates();
-	void init_iqunlimz();
+
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(socrates);
+
 	uint32_t screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(assert_irq);
 	TIMER_CALLBACK_MEMBER(kbmcu_sim_cb);
@@ -193,13 +202,11 @@ public:
 		uint8_t    count;
 	} m_kb_queue;
 
-	void socrates_pal(machine_config &config);
-	void socrates(machine_config &config);
 	void socrates_rambank_map(address_map &map);
 	void socrates_rombank_map(address_map &map);
 	void z80_io(address_map &map);
 	void z80_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -211,23 +218,25 @@ public:
 		: socrates_state(mconfig, type, tag)
 		{ }
 
+	void iqunlimz(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( send_input );
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER( colors_w );
 	DECLARE_READ8_MEMBER( video_regs_r );
 	DECLARE_WRITE8_MEMBER( video_regs_w );
 	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_INPUT_CHANGED_MEMBER( send_input );
 
-	void iqunlimz(machine_config &config);
 	void iqunlimz_io(address_map &map);
 	void iqunlimz_mem(address_map &map);
 	void iqunlimz_rambank_map(address_map &map);
 	void iqunlimz_rombank_map(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 	int get_color(int index, int y);
 
-private:
 	uint8_t   m_colors[8];
 	uint8_t   m_video_regs[4];
 

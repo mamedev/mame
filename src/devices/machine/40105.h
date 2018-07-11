@@ -31,13 +31,13 @@
 ///*************************************************************************
 
 #define MCFG_40105_DATA_IN_READY_CB(_dir) \
-	devcb = &downcast<cmos_40105_device *>(device)->set_dir_callback(DEVCB_##_dir);
+	downcast<cmos_40105_device *>(device)->set_dir_callback(DEVCB_##_dir);
 
 #define MCFG_40105_DATA_OUT_READY_CB(_dor) \
-	devcb = &downcast<cmos_40105_device *>(device)->set_dor_callback(DEVCB_##_dor);
+	downcast<cmos_40105_device *>(device)->set_dor_callback(DEVCB_##_dor);
 
 #define MCFG_40105_DATA_OUT_CB(_out) \
-	devcb = &downcast<cmos_40105_device *>(device)->set_data_out_callback(DEVCB_##_out);
+	downcast<cmos_40105_device *>(device)->set_data_out_callback(DEVCB_##_out);
 
 
 

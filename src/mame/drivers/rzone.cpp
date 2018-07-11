@@ -46,6 +46,11 @@ public:
 		m_led_off(*this, "led_off")
 	{ }
 
+	void rzbatfor(machine_config &config);
+	void rztoshden(machine_config &config);
+	void rzindy500(machine_config &config);
+
+private:
 	output_finder<> m_led_out;
 	required_device<timer_device> m_led_off;
 
@@ -68,11 +73,6 @@ public:
 	DECLARE_WRITE8_MEMBER(t2_write_r);
 	DECLARE_WRITE8_MEMBER(t2_write_s);
 
-	void rzbatfor(machine_config &config);
-	void rztoshden(machine_config &config);
-	void rzindy500(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
 };
 

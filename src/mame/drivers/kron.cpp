@@ -128,35 +128,38 @@
 class kron180_state : public driver_device
 {
 public:
-kron180_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device (mconfig, type, tag)
-	,m_maincpu (*this, "maincpu")
-	,m_videoram(*this, "videoram")
-	,m_keyboard(*this, "pc_keyboard")
+	kron180_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_videoram(*this, "videoram")
+		, m_keyboard(*this, "pc_keyboard")
 	{ }
-	uint8_t *m_char_ptr;
+
+	void kron180(machine_config &config);
+
+private:
+	uint8_t * m_char_ptr;
 	uint8_t *m_vram;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
-	DECLARE_WRITE8_MEMBER( sn74259_w ){     LOGIO(("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0)); }
-	DECLARE_WRITE8_MEMBER( ap5_w ){         LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_READ8_MEMBER( ap5_r ){          LOGIO(("%s() %02x = %02x\n",  FUNCNAME, offset, 1)); return 1; }
-	DECLARE_WRITE8_MEMBER( wkb_w ){         LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_WRITE8_MEMBER( sn74299_w ){     LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_READ8_MEMBER( sn74299_r ){      LOGIO(("%s() %02x = %02x\n", FUNCNAME, offset, 1)); return 1; }
-	DECLARE_WRITE8_MEMBER( txen_w ){        LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_WRITE8_MEMBER( kbd_reset_w ){   LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_WRITE8_MEMBER( dreq_w ){        LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	void kron180(machine_config &config);
+	DECLARE_WRITE8_MEMBER(sn74259_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0)); }
+	DECLARE_WRITE8_MEMBER(ap5_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_READ8_MEMBER(ap5_r) { LOGIO(("%s() %02x = %02x\n", FUNCNAME, offset, 1)); return 1; }
+	DECLARE_WRITE8_MEMBER(wkb_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_WRITE8_MEMBER(sn74299_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_READ8_MEMBER(sn74299_r) { LOGIO(("%s() %02x = %02x\n", FUNCNAME, offset, 1)); return 1; }
+	DECLARE_WRITE8_MEMBER(txen_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_WRITE8_MEMBER(kbd_reset_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_WRITE8_MEMBER(dreq_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
 	void kron180_iomap(address_map &map);
 	void kron180_mem(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<pc_keyboard_device> m_keyboard;
 	uint8_t m_kbd_data;
-private:
-	virtual void machine_start () override;
+
+	virtual void machine_start() override;
 };
 
 void kron180_state::kron180_mem(address_map &map)

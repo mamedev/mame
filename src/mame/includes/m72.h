@@ -5,6 +5,11 @@
     Irem M72 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_M72_H
+#define MAME_INCLUDES_M72_H
+
+#pragma once
+
 #include "audio/m72.h"
 #include "sound/dac.h"
 #include "machine/pic8259.h"
@@ -27,8 +32,8 @@
 class m72_state : public driver_device
 {
 public:
-	m72_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m72_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
@@ -52,8 +57,36 @@ public:
 		m_m81_b_b_j3(*this, "JumperJ3"),
 		m_m82_rowscroll(0),
 		m_m82_tmcontrol(0)
-		{ }
+	{ }
 
+	void m72_base(machine_config &config);
+	void m72_audio_chips(machine_config &config);
+	void m72_xmultipl(machine_config &config);
+	void m72_dbreed(machine_config &config);
+	void cosmccop(machine_config &config);
+	void poundfor(machine_config &config);
+	void m72(machine_config &config);
+	void m81_hharry(machine_config &config);
+	void m81_xmultipl(machine_config &config);
+	void kengo(machine_config &config);
+	void m81_dbreed(machine_config &config);
+	void m72_8751(machine_config &config);
+	void hharryu(machine_config &config);
+	void rtype2(machine_config &config);
+	void m82(machine_config &config);
+	void rtype(machine_config &config);
+
+	void init_dkgenm72();
+	void init_bchopper();
+	void init_gallop();
+	void init_m72_8751();
+	void init_dbreedm72();
+	void init_airduelm72();
+	void init_nspirit();
+	void init_loht();
+	void init_imgfight();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_mcu;
@@ -168,15 +201,6 @@ public:
 	DECLARE_VIDEO_START(poundfor);
 	DECLARE_MACHINE_START(kengo);
 	DECLARE_MACHINE_RESET(kengo);
-	void init_dkgenm72();
-	void init_bchopper();
-	void init_gallop();
-	void init_m72_8751();
-	void init_dbreedm72();
-	void init_airduelm72();
-	void init_nspirit();
-	void init_loht();
-	void init_imgfight();
 
 	INTERRUPT_GEN_MEMBER(mcu_int);
 	INTERRUPT_GEN_MEMBER(fake_nmi);
@@ -197,22 +221,7 @@ public:
 	void majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void copy_le(uint16_t *dest, const uint8_t *src, uint8_t bytes);
 	void install_protection_handler(const uint8_t *code,const uint8_t *crc);
-	void m72_base(machine_config &config);
-	void m72_audio_chips(machine_config &config);
-	void m72_xmultipl(machine_config &config);
-	void m72_dbreed(machine_config &config);
-	void cosmccop(machine_config &config);
-	void poundfor(machine_config &config);
-	void m72(machine_config &config);
-	void m81_hharry(machine_config &config);
-	void m81_xmultipl(machine_config &config);
-	void kengo(machine_config &config);
-	void m81_dbreed(machine_config &config);
-	void m72_8751(machine_config &config);
-	void hharryu(machine_config &config);
-	void rtype2(machine_config &config);
-	void m82(machine_config &config);
-	void rtype(machine_config &config);
+
 	void dbreed_map(address_map &map);
 	void dbreedm72_map(address_map &map);
 	void hharry_map(address_map &map);
@@ -241,3 +250,5 @@ public:
 	void xmultipl_map(address_map &map);
 	void xmultiplm72_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_M72_H

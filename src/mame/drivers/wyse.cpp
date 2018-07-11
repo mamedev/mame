@@ -36,14 +36,16 @@ class wyse_state : public driver_device
 public:
 	wyse_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      , m_maincpu(*this, "maincpu")
+		//      , m_maincpu(*this, "maincpu")
 	{ }
 
-void wyse(machine_config &config);
-void io_map(address_map &map);
-void mem_map(address_map &map);
+	void wyse(machine_config &config);
+
 private:
-//  required_device<cpu_device> m_maincpu;
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
+	//  required_device<cpu_device> m_maincpu;
 };
 
 void wyse_state::mem_map(address_map &map)

@@ -53,6 +53,9 @@ public:
 		m_fg_tilemap(nullptr)
 	{ }
 
+	void zwackery(machine_config &config);
+
+private:
 	DECLARE_VIDEO_START(zwackery);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	DECLARE_WRITE16_MEMBER(videoram_w);
@@ -72,12 +75,10 @@ public:
 
 	DECLARE_READ8_MEMBER(ptm_r);
 
-	void zwackery(machine_config &config);
 	void zwackery_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_device<m68000_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;

@@ -39,74 +39,74 @@ enum
 
 
 #define MCFG_UPD7810_TO(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_to_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_to_func(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_CO0(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_co0_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_co0_func(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_CO1(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_co1_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_co1_func(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_TXD(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_txd_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_txd_func(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_RXD(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_rxd_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_rxd_func(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN0(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_an0_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_an0_func(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN1(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_an1_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_an1_func(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN2(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_an2_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_an2_func(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN3(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_an3_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_an3_func(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN4(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_an4_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_an4_func(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN5(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_an5_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_an5_func(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN6(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_an6_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_an6_func(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN7(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_an7_func(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_an7_func(DEVCB_##_devcb);
 
 
 #define MCFG_UPD7810_PORTA_READ_CB(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_pa_in_cb(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_pa_in_cb(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_PORTB_READ_CB(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_pb_in_cb(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_pb_in_cb(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_PORTC_READ_CB(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_pc_in_cb(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_pc_in_cb(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_PORTD_READ_CB(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_pd_in_cb(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_pd_in_cb(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_PORTF_READ_CB(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_pf_in_cb(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_pf_in_cb(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_PORTA_WRITE_CB(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_pa_out_cb(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_pa_out_cb(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_PORTB_WRITE_CB(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_pb_out_cb(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_pb_out_cb(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_PORTC_WRITE_CB(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_pc_out_cb(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_pc_out_cb(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_PORTD_WRITE_CB(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_pd_out_cb(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_pd_out_cb(DEVCB_##_devcb);
 
 #define MCFG_UPD7810_PORTF_WRITE_CB(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_pf_out_cb(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_pf_out_cb(DEVCB_##_devcb);
 
 
 #define MCFG_UPD7807_PORTA_READ_CB MCFG_UPD7810_PORTA_READ_CB
@@ -121,7 +121,7 @@ enum
 #define MCFG_UPD7807_PORTF_WRITE_CB MCFG_UPD7810_PORTF_WRITE_CB
 
 #define MCFG_UPD7807_PORTT_READ_CB(_devcb) \
-	devcb = &downcast<upd7810_device &>(*device).set_pt_in_cb(DEVCB_##_devcb);
+	downcast<upd7810_device &>(*device).set_pt_in_cb(DEVCB_##_devcb);
 
 
 class upd7810_device : public cpu_device

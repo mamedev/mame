@@ -34,13 +34,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void zac_proto(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(out0_w);
 	DECLARE_WRITE8_MEMBER(out1_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
-	void zac_proto(machine_config &config);
 	void zac_proto_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;

@@ -24,11 +24,12 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void init_ohmygod();
-	void init_naname();
 	void ohmygod(machine_config &config);
 
-protected:
+	void init_ohmygod();
+	void init_naname();
+
+private:
 	DECLARE_WRITE16_MEMBER(ohmygod_ctrl_w);
 	DECLARE_WRITE16_MEMBER(ohmygod_videoram_w);
 	DECLARE_WRITE16_MEMBER(ohmygod_spritebank_w);
@@ -43,7 +44,6 @@ protected:
 	void ohmygod_map(address_map &map);
 	void oki_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;

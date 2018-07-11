@@ -46,6 +46,11 @@ public:
 		m_beeper(*this, "beeper")
 	{ }
 
+	void destiny(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 
@@ -60,9 +65,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bank_select_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-	void destiny(machine_config &config);
 	void main_map(address_map &map);
 protected:
 	// driver_device overrides

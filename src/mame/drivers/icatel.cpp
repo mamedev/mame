@@ -38,6 +38,11 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
+	void icatel(machine_config &config);
+
+	void init_icatel();
+
+private:
 	DECLARE_READ8_MEMBER(magic_string);
 
 	DECLARE_READ8_MEMBER(i80c31_p1_r);
@@ -60,16 +65,14 @@ public:
 	DECLARE_READ8_MEMBER(ci16_r);
 	DECLARE_WRITE8_MEMBER(ci16_w);
 
-	void init_icatel();
 	DECLARE_PALETTE_INIT(icatel);
 
 	HD44780_PIXEL_UPDATE(icatel_pixel_update);
 
-	void icatel(machine_config &config);
 	void i80c31_data(address_map &map);
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

@@ -10,7 +10,7 @@
 //**************************************************************************
 
 #define MCFG_SPU_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<spu_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<spu_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_SPU_ADD(_tag, _clock) \
 	MCFG_DEVICE_MODIFY( "maincpu" ) \

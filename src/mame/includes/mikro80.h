@@ -42,6 +42,14 @@ public:
 		m_dac(*this, "dac"),
 		m_maincpu(*this, "maincpu") { }
 
+	void kristall(machine_config &config);
+	void radio99(machine_config &config);
+	void mikro80(machine_config &config);
+
+	void init_radio99();
+	void init_mikro80();
+
+private:
 	required_shared_ptr<uint8_t> m_cursor_ram;
 	required_shared_ptr<uint8_t> m_video_ram;
 	int m_keyboard_mask;
@@ -55,20 +63,15 @@ public:
 	DECLARE_WRITE8_MEMBER(mikro80_keyboard_w);
 	DECLARE_WRITE8_MEMBER(mikro80_tape_w);
 	DECLARE_READ8_MEMBER(mikro80_tape_r);
-	void init_radio99();
-	void init_mikro80();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void kristall(machine_config &config);
-	void radio99(machine_config &config);
-	void mikro80(machine_config &config);
 	void kristall_io(address_map &map);
 	void mikro80_io(address_map &map);
 	void mikro80_mem(address_map &map);
 	void radio99_io(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<i8255_device> m_ppi8255;
 	required_device<cassette_image_device> m_cassette;

@@ -39,6 +39,9 @@ public:
 		, m_keyboard(*this, "LINE%u", 0)
 	{ }
 
+	void irisha(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(irisha_keyboard_r);
 	DECLARE_READ8_MEMBER(irisha_8255_portb_r);
 	DECLARE_READ8_MEMBER(irisha_8255_portc_r);
@@ -50,10 +53,9 @@ public:
 	uint32_t screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
 
-	void irisha(machine_config &config);
 	void irisha_io(address_map &map);
 	void irisha_mem(address_map &map);
-private:
+
 	bool m_sg1_line;
 	bool m_keypressed;
 	uint8_t m_keyboard_cnt;
@@ -389,14 +391,14 @@ MACHINE_CONFIG_START(irisha_state::irisha)
 	/* Devices */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'000'000) / 9)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(16'000'000) / 9 / 8 / 8)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
-	MCFG_PIT8253_CLK2(XTAL(16'000'000) / 9)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, irisha_state, speaker_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(16_MHz_XTAL / 9);
+	m_pit->out_handler<0>().set("pic8259", FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(16_MHz_XTAL / 9 / 8 / 8);
+	m_pit->out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
+	m_pit->out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
+	m_pit->set_clk<2>(16_MHz_XTAL / 9);
+	m_pit->out_handler<2>().set(FUNC(irisha_state::speaker_w));
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, irisha_state, irisha_8255_porta_w))

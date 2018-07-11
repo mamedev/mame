@@ -60,7 +60,6 @@
 #define RS232_B_TAG     "rs232b"
 #define SCREEN_TAG      "screen"
 #define KB_TAG          "kb"
-#define FDC_TAG         "fdc"
 
 class victor9k_state : public driver_device
 {
@@ -79,7 +78,7 @@ public:
 		m_crtc(*this, HD46505S_TAG),
 		m_ram(*this, RAM_TAG),
 		m_kb(*this, KB_TAG),
-		m_fdc(*this, FDC_TAG),
+		m_fdc(*this, "fdc"),
 		m_centronics(*this, "centronics"),
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
@@ -97,6 +96,9 @@ public:
 		m_kbackctl(0)
 	{ }
 
+	void victor9k(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ieee488_device> m_ieee488;
 	required_device<pic8259_device> m_pic;
@@ -169,7 +171,7 @@ public:
 	int m_kbackctl;
 
 	void update_kback();
-	void victor9k(machine_config &config);
+
 	void victor9k_mem(address_map &map);
 };
 
@@ -780,10 +782,10 @@ MACHINE_CONFIG_START(victor9k_state::victor9k)
 	MCFG_VICTOR9K_KBRDY_HANDLER(WRITELINE(*this, victor9k_state, kbrdy_w))
 	MCFG_VICTOR9K_KBDATA_HANDLER(WRITELINE(*this, victor9k_state, kbdata_w))
 
-	MCFG_DEVICE_ADD(FDC_TAG, VICTOR_9000_FDC, 0)
-	MCFG_VICTOR_9000_FDC_IRQ_CB(WRITELINE(*this, victor9k_state, fdc_irq_w))
-	MCFG_VICTOR_9000_FDC_SYN_CB(WRITELINE(I8259A_TAG, pic8259_device, ir0_w)) MCFG_DEVCB_XOR(1)
-	MCFG_VICTOR_9000_FDC_LBRDY_CB(INPUTLINE(I8088_TAG, INPUT_LINE_TEST)) MCFG_DEVCB_XOR(1)
+	VICTOR_9000_FDC(config, m_fdc, 0);
+	m_fdc->irq_wr_callback().set(FUNC(victor9k_state::fdc_irq_w));
+	m_fdc->syn_wr_callback().set(I8259A_TAG, FUNC(pic8259_device::ir0_w)).invert();
+	m_fdc->lbrdy_wr_callback().set_inputline(I8088_TAG, INPUT_LINE_TEST).invert();
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

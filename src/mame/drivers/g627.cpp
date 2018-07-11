@@ -61,17 +61,19 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void g627(machine_config &config);
+
 	void init_v115();
 	void init_v117();
+
+private:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
-	void g627(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
 	uint8_t m_seg[6];
 	uint8_t m_portc;
 	uint8_t m_motor;

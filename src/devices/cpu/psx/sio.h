@@ -17,19 +17,19 @@ DECLARE_DEVICE_TYPE(PSX_SIO0, psxsio0_device)
 DECLARE_DEVICE_TYPE(PSX_SIO1, psxsio1_device)
 
 #define MCFG_PSX_SIO_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<psxsio_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<psxsio_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_PSX_SIO_SCK_HANDLER(_devcb) \
-	devcb = &downcast<psxsio_device &>(*device).set_sck_handler(DEVCB_##_devcb);
+	downcast<psxsio_device &>(*device).set_sck_handler(DEVCB_##_devcb);
 
 #define MCFG_PSX_SIO_TXD_HANDLER(_devcb) \
-	devcb = &downcast<psxsio_device &>(*device).set_txd_handler(DEVCB_##_devcb);
+	downcast<psxsio_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 #define MCFG_PSX_SIO_DTR_HANDLER(_devcb) \
-	devcb = &downcast<psxsio_device &>(*device).set_dtr_handler(DEVCB_##_devcb);
+	downcast<psxsio_device &>(*device).set_dtr_handler(DEVCB_##_devcb);
 
 #define MCFG_PSX_SIO_RTS_HANDLER(_devcb) \
-	devcb = &downcast<psxsio_device &>(*device).set_rts_handler(DEVCB_##_devcb);
+	downcast<psxsio_device &>(*device).set_rts_handler(DEVCB_##_devcb);
 
 #define SIO_BUF_SIZE ( 8 )
 

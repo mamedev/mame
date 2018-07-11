@@ -168,23 +168,18 @@ READ32_MEMBER(macpci_state::mac_read_id)
 
 READ16_MEMBER ( macpci_state::mac_scc_r )
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
-	uint16_t result;
-
-	result = scc->reg_r(space, offset);
+	uint16_t result = m_scc->reg_r(space, offset);
 	return (result << 8) | result;
 }
 
 WRITE16_MEMBER ( macpci_state::mac_scc_w )
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
-	scc->reg_w(space, offset, data);
+	m_scc->reg_w(space, offset, data);
 }
 
 WRITE16_MEMBER ( macpci_state::mac_scc_2_w )
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
-	scc->reg_w(space, offset, data >> 8);
+	m_scc->reg_w(space, offset, data >> 8);
 }
 
 READ8_MEMBER(macpci_state::mac_5396_r)

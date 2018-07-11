@@ -49,14 +49,16 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void microkit(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(ram_r);
 
-	void microkit(machine_config &config);
 	void microkit_io(address_map &map);
 	void microkit_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	uint8_t m_resetcnt;
 	uint8_t m_ram_data;
@@ -123,7 +125,7 @@ MACHINE_CONFIG_START(microkit_state::microkit)
 	MCFG_DEVICE_ADD("maincpu", CDP1802, 1750000)
 	MCFG_DEVICE_PROGRAM_MAP(microkit_mem)
 	MCFG_DEVICE_IO_MAP(microkit_io)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
 	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, microkit_state, clear_r))
 
 	/* video hardware */

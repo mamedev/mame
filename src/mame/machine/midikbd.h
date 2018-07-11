@@ -10,7 +10,7 @@
 
 #define MCFG_MIDI_KBD_ADD(_tag, _devcb, _clock) \
 	MCFG_DEVICE_ADD(_tag, MIDI_KBD, _clock) \
-	devcb = &downcast<midi_keyboard_device &>(*device).set_tx_callback(DEVCB_##_devcb);
+	downcast<midi_keyboard_device &>(*device).set_tx_callback(DEVCB_##_devcb);
 
 class midi_keyboard_device : public device_t, public device_serial_interface
 {

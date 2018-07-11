@@ -153,6 +153,14 @@ public:
 			m_nvram_loaded = false;
 		}
 
+	void ngp_common(machine_config &config);
+	void ngp(machine_config &config);
+	void ngpc(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
+
+private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -196,19 +204,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ngp_hblank_pin_w );
 	DECLARE_WRITE8_MEMBER( ngp_tlcs900_porta );
 	uint32_t screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
 	TIMER_CALLBACK_MEMBER(ngp_seconds_callback);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ngp_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ngp_cart );
 
-	void ngp_common(machine_config &config);
-	void ngp(machine_config &config);
-	void ngpc(machine_config &config);
 	void ngp_mem(address_map &map);
 	void z80_io(address_map &map);
 	void z80_mem(address_map &map);
-protected:
+
 	bool m_nvram_loaded;
 	required_ioport m_io_controls;
 	required_ioport m_io_power;

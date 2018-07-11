@@ -64,7 +64,7 @@ private:
 DECLARE_DEVICE_TYPE(K057714, k057714_device)
 
 #define MCFG_K057714_IRQ_CALLBACK(_devcb) \
-	devcb = &downcast<k057714_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	downcast<k057714_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 
 #endif // MAME_MACHINE_K057714_H

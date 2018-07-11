@@ -116,6 +116,10 @@ public:
 			m_in0(*this, "IN0")
 	{ }
 
+	void vp50(machine_config &config);
+	void vp101(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -140,11 +144,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t vp50_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void vp50(machine_config &config);
-	void vp101(machine_config &config);
 	void main_map(address_map &map);
 	void vp50_map(address_map &map);
-protected:
 
 	// devices
 	required_device<mips3_device> m_maincpu;

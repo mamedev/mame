@@ -34,7 +34,7 @@
 	downcast<asc_device &>(*device).set_type(asc_device::asc_type::_type);
 
 #define MCFG_IRQ_FUNC(_irqf) \
-	devcb = &downcast<asc_device *>(device)->set_irqf(DEVCB_##_irqf);
+	downcast<asc_device *>(device)->set_irqf(DEVCB_##_irqf);
 
 
 //**************************************************************************

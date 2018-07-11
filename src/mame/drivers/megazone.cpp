@@ -72,7 +72,6 @@ REAR BOARD      1C026           N/U       (CUSTOM ON ORIGINAL)
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/flt_rc.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
@@ -99,10 +98,7 @@ READ8_MEMBER(megazone_state::megazone_port_a_r)
 
 WRITE8_MEMBER(megazone_state::megazone_port_b_w)
 {
-	static const char *const fltname[] = { "filter.0.0", "filter.0.1", "filter.0.2" };
-	int i;
-
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		int C = 0;
 		if (data & 1)
@@ -111,7 +107,7 @@ WRITE8_MEMBER(megazone_state::megazone_port_b_w)
 			C += 220000;    /* 220000pF = 0.22uF */
 
 		data >>= 2;
-		downcast<filter_rc_device*>(machine().device(fltname[i]))->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 200, CAP_P(C));
+		m_filter[i]->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 200, CAP_P(C));
 	}
 }
 

@@ -45,6 +45,21 @@ public:
 		m_coin_port(*this, "I8751")
 	{ }
 
+	void shackled(machine_config &config);
+	void meikyuh(machine_config &config);
+	void lastmisn(machine_config &config);
+	void csilver(machine_config &config);
+	void cobracom(machine_config &config);
+	void garyoret(machine_config &config);
+	void srdarwin(machine_config &config);
+	void ghostb(machine_config &config);
+	void oscar(machine_config &config);
+	void gondo(machine_config &config);
+
+	void init_dec8();
+	void init_csilver();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
@@ -118,7 +133,6 @@ public:
 	DECLARE_WRITE8_MEMBER(csilver_i8751_w);
 	DECLARE_WRITE8_MEMBER(dec8_bank_w);
 	DECLARE_WRITE8_MEMBER(ghostb_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(ghostb_nmi_w);
 	DECLARE_WRITE8_MEMBER(csilver_control_w);
 	DECLARE_WRITE8_MEMBER(dec8_sound_w);
 	DECLARE_WRITE8_MEMBER(csilver_adpcm_data_w);
@@ -149,8 +163,6 @@ public:
 	DECLARE_WRITE8_MEMBER(lastmisn_scrolly_w);
 	DECLARE_WRITE8_MEMBER(gondo_scroll_w);
 	DECLARE_READ8_MEMBER(csilver_adpcm_reset_r);
-	void init_dec8();
-	void init_csilver();
 	TILE_GET_INFO_MEMBER(get_cobracom_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_ghostb_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_oscar_fix_tile_info);
@@ -187,16 +199,7 @@ public:
 	void srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
 
-	void shackled(machine_config &config);
-	void meikyuh(machine_config &config);
-	void lastmisn(machine_config &config);
-	void csilver(machine_config &config);
-	void cobracom(machine_config &config);
-	void garyoret(machine_config &config);
-	void srdarwin(machine_config &config);
-	void ghostb(machine_config &config);
-	void oscar(machine_config &config);
-	void gondo(machine_config &config);
+
 	void cobra_map(address_map &map);
 	void csilver_map(address_map &map);
 	void csilver_s_map(address_map &map);

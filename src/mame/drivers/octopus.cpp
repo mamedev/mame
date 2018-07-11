@@ -168,8 +168,11 @@ public:
 		m_speaker_active(false),
 		m_beep_active(false),
 		m_z80_active(false)
-		{ }
+	{ }
 
+	void octopus(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -224,16 +227,14 @@ public:
 		BEEP_TIMER = 100
 	};
 
-	void octopus(machine_config &config);
 	void octopus_io(address_map &map);
 	void octopus_mem(address_map &map);
 	void octopus_sub_io(address_map &map);
 	void octopus_sub_mem(address_map &map);
 	void octopus_vram(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<scn2674_device> m_crtc;
@@ -925,12 +926,12 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 
 	MCFG_DEVICE_ADD("pic_master", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
 	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, octopus_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic_slave", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic_master", pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
 	// RTC (MC146818 via i8255 PPI)
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
@@ -982,14 +983,14 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("serial_a",rs232_port_device, write_rts))
 	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("serial_b",rs232_port_device, write_rts))
 
-	MCFG_DEVICE_ADD("serial_a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("serial",z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("serial",z80sio_device, ctsa_w)) MCFG_DEVCB_INVERT
-	//MCFG_RS232_RI_HANDLER(WRITELINE("serial",z80sio_device, ria_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVICE_ADD("serial_b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("serial",z80sio_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("serial",z80sio_device, ctsb_w)) MCFG_DEVCB_INVERT
-	//MCFG_RS232_RI_HANDLER(WRITELINE("serial",z80sio_device, rib_w)) MCFG_DEVCB_INVERT
+	rs232_port_device &serial_a(RS232_PORT(config, "serial_a", default_rs232_devices, nullptr));
+	serial_a.rxd_handler().set(m_serial, FUNC(z80sio_device::rxa_w));
+	serial_a.cts_handler().set(m_serial, FUNC(z80sio_device::ctsa_w)).invert();
+	//serial_a.ri_handler().set(m_serial, FUNC(z80sio_device::ria_w)).invert();
+	rs232_port_device &serial_b(RS232_PORT(config, "serial_b", default_rs232_devices, nullptr));
+	serial_b.rxd_handler().set(m_serial, FUNC(z80sio_device::rxb_w));
+	serial_b.cts_handler().set(m_serial, FUNC(z80sio_device::ctsb_w)).invert();
+	//serial_b.ri_handler().set(m_serial, FUNC(z80sio_device::rib_w)).invert();
 
 	MCFG_DEVICE_ADD(m_parallel, CENTRONICS, octopus_centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, octopus_state, parallel_busy_w))

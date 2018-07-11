@@ -34,16 +34,16 @@
 ///*************************************************************************
 
 #define MCFG_I8212_INT_CALLBACK(_write) \
-	devcb = &downcast<i8212_device &>(*device).set_int_wr_callback(DEVCB_##_write);
+	downcast<i8212_device &>(*device).set_int_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8212_DI_CALLBACK(_read) \
-	devcb = &downcast<i8212_device &>(*device).set_di_rd_callback(DEVCB_##_read);
+	downcast<i8212_device &>(*device).set_di_rd_callback(DEVCB_##_read);
 
 #define MCFG_I8212_DO_CALLBACK(_write) \
-	devcb = &downcast<i8212_device &>(*device).set_do_wr_callback(DEVCB_##_write);
+	downcast<i8212_device &>(*device).set_do_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8212_MD_CALLBACK(_read) \
-	devcb = &downcast<i8212_device &>(*device).set_md_rd_callback(DEVCB_##_read);
+	downcast<i8212_device &>(*device).set_md_rd_callback(DEVCB_##_read);
 
 
 

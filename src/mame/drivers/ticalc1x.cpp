@@ -67,11 +67,13 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
+	void cmulti8(machine_config &config);
+
+private:
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
-	void cmulti8(machine_config &config);
 };
 
 // handlers
@@ -452,11 +454,13 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
+	void ti1270(machine_config &config);
+	void ti1250(machine_config &config);
+
+private:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
-	void ti1270(machine_config &config);
-	void ti1250(machine_config &config);
 };
 
 // handlers
@@ -587,11 +591,13 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
+	void ti25503(machine_config &config);
+
+private:
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
-	void ti25503(machine_config &config);
 };
 
 // handlers
@@ -706,10 +712,12 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
+	void ti1000(machine_config &config);
+
+private:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
-	void ti1000(machine_config &config);
 };
 
 // handlers
@@ -804,10 +812,11 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
+	void wizatron(machine_config &config);
+
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_READ8_MEMBER(read_k);
-	void wizatron(machine_config &config);
 };
 
 // handlers
@@ -908,9 +917,11 @@ public:
 		: wizatron_state(mconfig, type, tag)
 	{ }
 
+	void lilprof(machine_config &config);
+
+private:
 	virtual DECLARE_WRITE16_MEMBER(write_o) override;
 	virtual DECLARE_READ8_MEMBER(read_k) override;
-	void lilprof(machine_config &config);
 };
 
 // handlers
@@ -983,10 +994,12 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
+	void lilprof78(machine_config &config);
+
+private:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
-	void lilprof78(machine_config &config);
 };
 
 // handlers
@@ -1091,11 +1104,12 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
+	void dataman(machine_config &config);
+
 	virtual void prepare_display();
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_READ8_MEMBER(read_k);
-	void dataman(machine_config &config);
 };
 
 // handlers
@@ -1207,8 +1221,10 @@ public:
 		: dataman_state(mconfig, type, tag)
 	{ }
 
-	virtual DECLARE_WRITE16_MEMBER(write_r) override;
 	void mathmarv(machine_config &config);
+
+private:
+	virtual DECLARE_WRITE16_MEMBER(write_r) override;
 };
 
 // handlers
@@ -1289,10 +1305,12 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
+	void ti30(machine_config &config);
+
+private:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
-	void ti30(machine_config &config);
 };
 
 // handlers

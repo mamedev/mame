@@ -46,37 +46,37 @@
 #include "machine/6850acia.h"
 
 #define MCFG_GF1_TXIRQ_HANDLER(_devcb) \
-	devcb = &downcast<gf1_device &>(*device).set_txirq_handler(DEVCB_##_devcb);
+	downcast<gf1_device &>(*device).set_txirq_handler(DEVCB_##_devcb);
 
 #define MCFG_GF1_RXIRQ_HANDLER(_devcb) \
-	devcb = &downcast<gf1_device &>(*device).set_rxirq_handler(DEVCB_##_devcb);
+	downcast<gf1_device &>(*device).set_rxirq_handler(DEVCB_##_devcb);
 
 #define MCFG_GF1_WAVE_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<gf1_device &>(*device).set_wave_irq_handler(DEVCB_##_devcb);
+	downcast<gf1_device &>(*device).set_wave_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_GF1_RAMP_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<gf1_device &>(*device).set_ramp_irq_handler(DEVCB_##_devcb);
+	downcast<gf1_device &>(*device).set_ramp_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_GF1_TIMER1_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<gf1_device &>(*device).set_timer1_irq_handler(DEVCB_##_devcb);
+	downcast<gf1_device &>(*device).set_timer1_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_GF1_TIMER2_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<gf1_device &>(*device).set_timer2_irq_handler(DEVCB_##_devcb);
+	downcast<gf1_device &>(*device).set_timer2_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_GF1_SB_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<gf1_device &>(*device).set_sb_irq_handler(DEVCB_##_devcb);
+	downcast<gf1_device &>(*device).set_sb_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_GF1_DMA_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<gf1_device &>(*device).set_dma_irq_handler(DEVCB_##_devcb);
+	downcast<gf1_device &>(*device).set_dma_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_GF1_DRQ1_HANDLER(_devcb) \
-	devcb = &downcast<gf1_device &>(*device).set_drq1_handler(DEVCB_##_devcb);
+	downcast<gf1_device &>(*device).set_drq1_handler(DEVCB_##_devcb);
 
 #define MCFG_GF1_DRQ2_HANDLER(_devcb) \
-	devcb = &downcast<gf1_device &>(*device).set_drq2_handler(DEVCB_##_devcb);
+	downcast<gf1_device &>(*device).set_drq2_handler(DEVCB_##_devcb);
 
 #define MCFG_GF1_NMI_HANDLER(_devcb) \
-	devcb = &downcast<gf1_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
+	downcast<gf1_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

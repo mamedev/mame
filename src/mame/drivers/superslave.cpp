@@ -61,7 +61,7 @@ public:
 
 	void superslave(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void superslave_io(address_map &map);
@@ -73,7 +73,6 @@ protected:
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( cmd_w );
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
 	required_device<ram_device> m_ram;
@@ -364,7 +363,7 @@ void superslave_state::machine_reset()
 
 MACHINE_CONFIG_START(superslave_state::superslave)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(8'000'000)/2)
 	MCFG_DEVICE_PROGRAM_MAP(superslave_mem)
 	MCFG_DEVICE_IO_MAP(superslave_io)
 	MCFG_Z80_DAISY_CHAIN(superslave_daisy_chain)
@@ -415,13 +414,13 @@ MACHINE_CONFIG_START(superslave_state::superslave)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, ctsb_w))
 
-	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_0_TAG, z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_1_TAG, z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_1_TAG, z80dart_device, rxca_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, rxtxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_1_TAG, z80dart_device, rxtxcb_w))
+	COM8116(config, m_dbrg, XTAL(5'068'800));
+	m_dbrg->fr_handler().set(Z80DART_0_TAG, FUNC(z80dart_device::txca_w));
+	m_dbrg->fr_handler().append(Z80DART_0_TAG, FUNC(z80dart_device::rxca_w));
+	m_dbrg->fr_handler().append(Z80DART_1_TAG, FUNC(z80dart_device::txca_w));
+	m_dbrg->fr_handler().append(Z80DART_1_TAG, FUNC(z80dart_device::rxca_w));
+	m_dbrg->ft_handler().set(Z80DART_0_TAG, FUNC(z80dart_device::rxtxcb_w));
+	m_dbrg->ft_handler().append(Z80DART_1_TAG, FUNC(z80dart_device::rxtxcb_w));
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

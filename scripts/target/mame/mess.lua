@@ -653,6 +653,7 @@ BUSES["A7800"] = true
 BUSES["A800"] = true
 BUSES["ABCBUS"] = true
 BUSES["ABCKB"] = true
+BUSES["ACORN"] = true
 BUSES["ADAM"] = true
 BUSES["ADAMNET"] = true
 BUSES["APF"] = true
@@ -1369,15 +1370,16 @@ files {
 createMESSProjects(_target, _subtarget, "acorn")
 files {
 	MAME_DIR .. "src/mame/drivers/aa310.cpp",
-	MAME_DIR .. "src/mame/drivers/a6809.cpp",
 	MAME_DIR .. "src/mame/drivers/accomm.cpp",
 	MAME_DIR .. "src/mame/drivers/acrnsys1.cpp",
+	MAME_DIR .. "src/mame/drivers/acrnsys.cpp",
 	MAME_DIR .. "src/mame/drivers/atom.cpp",
 	MAME_DIR .. "src/mame/includes/atom.h",
 	MAME_DIR .. "src/mame/drivers/bbc.cpp",
 	MAME_DIR .. "src/mame/includes/bbc.h",
 	MAME_DIR .. "src/mame/machine/bbc.cpp",
 	MAME_DIR .. "src/mame/video/bbc.cpp",
+	MAME_DIR .. "src/mame/drivers/cms.cpp",
 	MAME_DIR .. "src/mame/drivers/electron.cpp",
 	MAME_DIR .. "src/mame/includes/electron.h",
 	MAME_DIR .. "src/mame/machine/electron.cpp",
@@ -1497,17 +1499,12 @@ createMESSProjects(_target, _subtarget, "apple")
 files {
 	MAME_DIR .. "src/mame/drivers/apple1.cpp",
 	MAME_DIR .. "src/mame/drivers/apple2.cpp",
-	MAME_DIR .. "src/mame/includes/apple2.h",
 	MAME_DIR .. "src/mame/drivers/apple2e.cpp",
 	MAME_DIR .. "src/mame/includes/apple2e.h",
-	MAME_DIR .. "src/mame/machine/apple2.cpp",
 	MAME_DIR .. "src/mame/video/apple2.cpp",
 	MAME_DIR .. "src/mame/video/apple2.h",
 	MAME_DIR .. "src/mame/drivers/tk2000.cpp",
 	MAME_DIR .. "src/mame/drivers/apple2gs.cpp",
-	MAME_DIR .. "src/mame/includes/apple2gs.h",
-	MAME_DIR .. "src/mame/machine/apple2gs.cpp",
-	MAME_DIR .. "src/mame/video/apple2gs.cpp",
 	MAME_DIR .. "src/mame/drivers/apple3.cpp",
 	MAME_DIR .. "src/mame/includes/apple3.h",
 	MAME_DIR .. "src/mame/machine/apple3.cpp",
@@ -2986,6 +2983,7 @@ files {
 	MAME_DIR .. "src/mame/video/x1.cpp",
 	MAME_DIR .. "src/mame/drivers/x1twin.cpp",
 	MAME_DIR .. "src/mame/drivers/mz2500.cpp",
+	MAME_DIR .. "src/mame/includes/mz2500.h",
 	MAME_DIR .. "src/mame/drivers/mz3500.cpp",
 	MAME_DIR .. "src/mame/drivers/pce220.cpp",
 	MAME_DIR .. "src/mame/machine/pce220_ser.cpp",
@@ -3060,6 +3058,26 @@ files {
 	MAME_DIR .. "src/mame/drivers/pve500.cpp",
 	MAME_DIR .. "src/mame/drivers/smc777.cpp",
 	MAME_DIR .. "src/mame/drivers/ps2sony.cpp",
+	MAME_DIR .. "src/mame/machine/ps2timer.cpp",
+	MAME_DIR .. "src/mame/machine/ps2timer.h",
+	MAME_DIR .. "src/mame/machine/ps2dma.cpp",
+	MAME_DIR .. "src/mame/machine/ps2dma.h",
+	MAME_DIR .. "src/mame/machine/ps2intc.cpp",
+	MAME_DIR .. "src/mame/machine/ps2intc.h",
+	MAME_DIR .. "src/mame/machine/ps2sif.cpp",
+	MAME_DIR .. "src/mame/machine/ps2sif.h",
+	MAME_DIR .. "src/mame/machine/iopcdvd.cpp",
+	MAME_DIR .. "src/mame/machine/iopcdvd.h",
+	MAME_DIR .. "src/mame/machine/iopdma.cpp",
+	MAME_DIR .. "src/mame/machine/iopdma.h",
+	MAME_DIR .. "src/mame/machine/iopintc.cpp",
+	MAME_DIR .. "src/mame/machine/iopintc.h",
+	MAME_DIR .. "src/mame/machine/iopsio2.cpp",
+	MAME_DIR .. "src/mame/machine/iopsio2.h",
+	MAME_DIR .. "src/mame/machine/ioptimer.cpp",
+	MAME_DIR .. "src/mame/machine/ioptimer.h",
+	MAME_DIR .. "src/mame/audio/iopspu.cpp",
+	MAME_DIR .. "src/mame/audio/iopspu.h",
 }
 
 createMESSProjects(_target, _subtarget, "sord")

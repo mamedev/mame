@@ -13,7 +13,7 @@
 #include "legscsi.h"
 
 #define MCFG_AM53CF96_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<am53cf96_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<am53cf96_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 class am53cf96_device : public legacy_scsi_host_adapter
 {

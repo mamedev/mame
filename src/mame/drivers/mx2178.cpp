@@ -44,12 +44,14 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void mx2178(machine_config &config);
+
+private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void mx2178(machine_config &config);
 	void mx2178_io(address_map &map);
 	void mx2178_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_p_videoram;
@@ -152,11 +154,11 @@ MACHINE_CONFIG_START(mx2178_state::mx2178)
 	MCFG_MC6845_UPDATE_ROW_CB(mx2178_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(18'869'600) / 30)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia2", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia2", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL(18'869'600) / 30));
+	acia_clock.signal_handler().set("acia1", FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_rxc));
+	acia_clock.signal_handler().append("acia2", FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append("acia2", FUNC(acia6850_device::write_rxc));
 
 	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))

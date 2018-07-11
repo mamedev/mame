@@ -260,7 +260,7 @@ uint32_t bbusters_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_data[1][1]);
 
 	m_pf_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-	//draw_sprites(machine(), bitmap, m_spriteram[1]->buffer(), 2, 0x8, 0x8);
+	//draw_sprites(bitmap, m_spriteram[1]->buffer(), 2, 0x8, 0x8);
 	m_pf_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, m_spriteram[1]->buffer(), 2, 0, 0);
 	draw_sprites(bitmap, m_spriteram[0]->buffer(), 1, 0, 0);

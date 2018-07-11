@@ -87,7 +87,11 @@ public:
 		m_int(0)
 	{}
 
+	void einstein(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_button);
+
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_timer_callback);
 	DECLARE_WRITE8_MEMBER(keyboard_line_write);
 	DECLARE_READ8_MEMBER(keyboard_data_read);
@@ -107,14 +111,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ardy_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(strobe_callback);
 
-	void einstein(machine_config &config);
 	void einstein_io(address_map &map);
 	void einstein_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	void einstein_scan_keyboard();
 
 	required_device<cpu_device> m_maincpu;
@@ -600,10 +602,10 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(IC_I060, i8251_device, write_rxc))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(IC_I058, z80ctc_device, trg3))
 
-	MCFG_CLOCK_ADD("ctc_trigger", XTAL_X002 / 4)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(IC_I058, z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(IC_I058, z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(IC_I058, z80ctc_device, trg2))
+	clock_device &ctc_trigger(CLOCK(config, "ctc_trigger", XTAL_X002 / 4));
+	ctc_trigger.signal_handler().set(IC_I058, FUNC(z80ctc_device::trg0));
+	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg1));
+	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg2));
 
 	/* Einstein daisy chain support for non-Z80 devices */
 	MCFG_Z80DAISY_GENERIC_ADD("keyboard_daisy", 0xf7)

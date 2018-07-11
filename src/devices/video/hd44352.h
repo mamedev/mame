@@ -13,7 +13,7 @@
 
 
 #define MCFG_HD44352_ON_CB(_devcb) \
-	devcb = &downcast<hd44352_device &>(*device).set_on_callback(DEVCB_##_devcb);
+	downcast<hd44352_device &>(*device).set_on_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

@@ -73,9 +73,14 @@ public:
 		, m_bankw0(*this, "bankw0")
 		, m_bank2(*this, "bank2")
 		, m_keyboard(*this, "X%u", 0)
-		{}
+	{
+	}
+
+	void sbrain(machine_config &config);
 
 	void init_sbrain();
+
+private:
 	DECLARE_MACHINE_RESET(sbrain);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
@@ -90,12 +95,11 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
 
-	void sbrain(machine_config &config);
 	void sbrain_io(address_map &map);
 	void sbrain_mem(address_map &map);
 	void sbrain_subio(address_map &map);
 	void sbrain_submem(address_map &map);
-private:
+
 	bool m_busak;
 	u8 m_keydown;
 	u8 m_porta;
@@ -569,15 +573,15 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, sbrain_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sbrain_state, ppi_pc_w))
 
-	MCFG_DEVICE_ADD("uart0", I8251, 0)
+	I8251(config, m_u0, 0);
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0)
+	I8251(config, m_u1, 0);
 
-	MCFG_DEVICE_ADD("brg", COM8116, 5.0688_MHz_XTAL) // BR1941L
-	MCFG_COM8116_FR_HANDLER(WRITELINE("uart0", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart0", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
+	com8116_device &brg(COM8116(config, "brg", 5.0688_MHz_XTAL)); // BR1941L
+	brg.fr_handler().set(m_u0, FUNC(i8251_device::write_txc));
+	brg.fr_handler().append(m_u0, FUNC(i8251_device::write_rxc));
+	brg.ft_handler().set(m_u1, FUNC(i8251_device::write_txc));
+	brg.ft_handler().append(m_u1, FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD("fdc", FD1791, 16_MHz_XTAL / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

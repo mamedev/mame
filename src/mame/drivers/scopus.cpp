@@ -34,22 +34,26 @@
 class sagitta180_state : public driver_device
 {
 public:
-	sagitta180_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sagitta180_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
 		m_crtc(*this, "crtc"),
 		m_dma8257(*this, "dma"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu")
+	{ }
+
+	void sagitta180(machine_config &config);
 
 	void init_sagitta180();
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
-	void sagitta180(machine_config &config);
 	void maincpu_io_map(address_map &map);
 	void maincpu_map(address_map &map);
-private:
+
 	/* devices */
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
@@ -59,7 +63,6 @@ private:
 	// Character generator
 	const uint8_t *m_chargen;
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -194,9 +197,9 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 19218) // 19218 / 19222 ? guesses...
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 19218)); // 19218 / 19222 ? guesses...
+	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
 //  MCFG_DEVICE_ADD("intlatch", I8212, 0)
 //  MCFG_I8212_MD_CALLBACK(GND) // guessed !

@@ -73,10 +73,10 @@
 
 
 #define MCFG_GENERIC_FIFO_EMPTY_CALLBACK(_devcb) \
-	devcb = &downcast<screen_device &>(*device).set_empty_cb(DEVCB_##_devcb);
+	downcast<screen_device &>(*device).set_empty_cb(DEVCB_##_devcb);
 
 #define MCFG_GENERIC_FIFO_FULL_CALLBACK(_devcb) \
-	devcb = &downcast<screen_device &>(*device).set_full_cb(DEVCB_##_devcb);
+	downcast<screen_device &>(*device).set_full_cb(DEVCB_##_devcb);
 
 
 template<typename T> class generic_fifo_device_base : public device_t {
