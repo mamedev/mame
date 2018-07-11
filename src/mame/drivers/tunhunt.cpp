@@ -272,13 +272,16 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 6)        /* ??? */
+	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL/6)        /* ??? */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(tunhunt_state, irq0_line_hold,  4*60)  /* 48V, 112V, 176V, 240V */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(256, 256-16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(tunhunt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -290,12 +293,12 @@ MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, 12.096_MHz_XTAL / 10)
+	MCFG_DEVICE_ADD("pokey1", POKEY, 12.096_MHz_XTAL/10)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.047), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, 12.096_MHz_XTAL / 10)
+	MCFG_DEVICE_ADD("pokey2", POKEY, 12.096_MHz_XTAL/10)
 	MCFG_POKEY_POT0_R_CB(IOPORT("IN1"))
 	MCFG_POKEY_POT1_R_CB(IOPORT("IN2"))
 	MCFG_POKEY_POT2_R_CB(READ8(*this, tunhunt_state, dsw2_0r))

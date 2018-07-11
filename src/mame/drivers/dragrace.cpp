@@ -274,7 +274,7 @@ void dragrace_state::machine_reset()
 MACHINE_CONFIG_START(dragrace_state::dragrace)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 12.096_MHz_XTAL / 12)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(12'096'000) / 12)
 	MCFG_DEVICE_PROGRAM_MAP(dragrace_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(dragrace_state, irq0_line_hold,  4*60)
 
@@ -285,7 +285,9 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(256, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(dragrace_state, screen_update_dragrace)
 	MCFG_SCREEN_PALETTE("palette")
 
