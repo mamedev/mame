@@ -764,9 +764,9 @@ MACHINE_CONFIG_START(m107_state::firebarr)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_IREMGA20_ADD("irem", XTAL(14'318'181)/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	iremga20_device &ga20(IREMGA20(config, "irem", XTAL(14'318'181)/4));
+	ga20.add_route(0, "lspeaker", 1.0);
+	ga20.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m107_state::dsoccr94)
