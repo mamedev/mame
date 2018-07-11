@@ -63,7 +63,7 @@ protected:
 
 	void sound_map(address_map &map);
 private:
-	required_shared_ptr<uint16_t> m_eprom_data;
+	optional_shared_ptr<uint16_t> m_eprom_data;
 
 	DECLARE_READ16_MEMBER(eprom_r);
 	DECLARE_READ16_MEMBER(control_3_r);
