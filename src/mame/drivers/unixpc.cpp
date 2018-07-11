@@ -51,8 +51,7 @@ public:
 		m_floppy(*this, "wd2797:0:525dd"),
 		m_ramrombank(*this, "ramrombank"),
 		m_mapram(*this, "mapram"),
-		m_videoram(*this, "videoram"),
-		m_leds(*this, "led_%u", 0U)
+		m_videoram(*this, "videoram")
 	{ }
 
 	void unixpc(machine_config &config);
@@ -99,8 +98,6 @@ private:
 	required_shared_ptr<uint16_t> m_mapram;
 	required_shared_ptr<uint16_t> m_videoram;
 
-	output_finder<4> m_leds;
-
 	uint16_t *m_ramptr;
 	uint32_t m_ramsize;
 	uint16_t m_diskdmasize;
@@ -146,8 +143,6 @@ void unixpc_state::machine_start()
 {
 	m_ramptr = (uint16_t *)m_ram->pointer();
 	m_ramsize = m_ram->size();
-
-	m_leds.resolve();
 }
 
 void unixpc_state::machine_reset()
