@@ -17,9 +17,12 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "machine/6850acia.h"
 #include "machine/74259.h"
 #include "machine/bankdev.h"
+#include "machine/output_latch.h"
 #include "machine/ram.h"
 //#include "machine/tc8250.h"
 //#include "machine/wd1010.h"
@@ -48,7 +51,8 @@ public:
 		m_floppy(*this, "wd2797:0:525dd"),
 		m_ramrombank(*this, "ramrombank"),
 		m_mapram(*this, "mapram"),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_leds(*this, "led_%u", 0U)
 	{ }
 
 	void unixpc(machine_config &config);
@@ -60,7 +64,6 @@ private:
 	virtual void machine_reset() override;
 
 	DECLARE_READ16_MEMBER(line_printer_r);
-	DECLARE_WRITE16_MEMBER(misc_control_w);
 	DECLARE_WRITE16_MEMBER(disk_control_w);
 	DECLARE_WRITE16_MEMBER(gcr_w);
 	DECLARE_WRITE_LINE_MEMBER(romlmap_w);
@@ -95,6 +98,8 @@ private:
 
 	required_shared_ptr<uint16_t> m_mapram;
 	required_shared_ptr<uint16_t> m_videoram;
+
+	output_finder<4> m_leds;
 
 	uint16_t *m_ramptr;
 	uint32_t m_ramsize;
@@ -141,6 +146,8 @@ void unixpc_state::machine_start()
 {
 	m_ramptr = (uint16_t *)m_ram->pointer();
 	m_ramsize = m_ram->size();
+
+	m_leds.resolve();
 }
 
 void unixpc_state::machine_reset()
@@ -208,21 +215,6 @@ READ16_MEMBER(unixpc_state::line_printer_r)
 	//logerror("line_printer_r: %04x\n", data);
 
 	return data;
-}
-
-WRITE16_MEMBER(unixpc_state::misc_control_w)
-{
-	logerror("misc_control_w: %04x\n", data);
-
-	// bit 15 = VBL ack (must go high-low-high to ack)
-	// bit 14 = 0 for disk DMA write, 1 for disk DMA read
-	// bit 13 = Centronics strobe
-	// bit 12 = 0 = modem baud rate from UART clock inputs, 1 = baud from programmable timer
-
-	output().set_value("led_0", !BIT(data,  8));
-	output().set_value("led_1", !BIT(data,  9));
-	output().set_value("led_2", !BIT(data, 10));
-	output().set_value("led_3", !BIT(data, 11));
 }
 
 /***************************************************************************
@@ -316,9 +308,10 @@ void unixpc_state::unixpc_mem(address_map &map)
 	map(0x470000, 0x470001).r(FUNC(unixpc_state::line_printer_r));
 	map(0x480000, 0x480001).w(FUNC(unixpc_state::rtc_w));
 	map(0x490000, 0x490001).select(0x7000).w(FUNC(unixpc_state::tcr_w));
-	map(0x4a0000, 0x4a0001).w(FUNC(unixpc_state::misc_control_w));
+	map(0x4a0000, 0x4a0000).w("mreg", FUNC(output_latch_device::bus_w));
 	map(0x4d0000, 0x4d7fff).w(FUNC(unixpc_state::diskdma_ptr_w));
 	map(0x4e0000, 0x4e0001).w(FUNC(unixpc_state::disk_control_w));
+	map(0x4f0001, 0x4f0001).w("printlatch", FUNC(output_latch_device::bus_w));
 	//map(0xe00000, 0xe0000f).rw("hdc", FUNC(wd1010_device::read), FUNC(wd1010_device::write)).umask16(0x00ff);
 	map(0xe10000, 0xe10007).rw(m_wd2797, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write)).umask16(0x00ff);
 	map(0xe30000, 0xe30001).r(FUNC(unixpc_state::rtc_r));
@@ -364,6 +357,16 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 
 	MCFG_DEVICE_ADD("tcr", LS259) // 10K
 
+	output_latch_device &mreg(OUTPUT_LATCH(config, "mreg"));
+	mreg.bit_handler<0>().set_output("led_0").invert();
+	mreg.bit_handler<1>().set_output("led_1").invert();
+	mreg.bit_handler<2>().set_output("led_2").invert();
+	mreg.bit_handler<3>().set_output("led_3").invert();
+	// bit 4 (D12) = 0 = modem baud rate from UART clock inputs, 1 = baud from programmable timer
+	mreg.bit_handler<5>().set("printer", FUNC(centronics_device::write_strobe)).invert();
+	// bit 6 (D14) = 0 for disk DMA write, 1 for disk DMA read
+	// bit 7 (D15) = VBL ack (must go high-low-high to ack)
+
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(unixpc_state, screen_update)
@@ -394,6 +397,9 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 19.6608_MHz_XTAL / 8)
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 
 	MCFG_DEVICE_ADD("kbc", ACIA6850, 0)
 
@@ -401,7 +407,15 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	//MCFG_DEVICE_ADD("hdc", WD1010, 40_MHz_XTAL / 8)
 
 	// TODO: RTC
-	//MCFG_DEVICE_ADD("rtc", TC8250, 32.768_kHZ_XTAL)
+	//MCFG_DEVICE_ADD("rtc", TC8250, 32.768_kHz_XTAL)
+
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxa_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("mpsc", upd7201_new_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("mpsc", upd7201_new_device, ctsa_w))
+
+	MCFG_DEVICE_ADD("printer", CENTRONICS, centronics_devices, nullptr)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("printlatch", "printer")
 MACHINE_CONFIG_END
 
 
