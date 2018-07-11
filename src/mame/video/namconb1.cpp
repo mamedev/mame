@@ -8,20 +8,6 @@
 #include "machine/namcoic.h"
 
 
-static inline uint8_t
-nth_byte16( const uint16_t *pSource, int which )
-{
-	uint16_t data = pSource[which/2];
-	if( which&1 )
-	{
-		return data&0xff;
-	}
-	else
-	{
-		return data>>8;
-	}
-} /* nth_byte16 */
-
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
@@ -82,7 +68,7 @@ void namconb1_state::NB2TilemapCB_outfxies(uint16_t code, int *tile, int *mask )
 
 void namconb1_state::NB2RozCB_machbrkr(uint16_t code, int *tile, int *mask, int which )
 {
-	int bank = nth_byte16(&m_c169_roz_bank[which * 8 / 2], (code >> 11) & 0x7);
+	int bank = nth_byte32(&m_rozbank32[which * 8 / 4], (code >> 11) & 0x7);
 	int mangle = (code & 0x7ff) | (bank << 11);
 	*tile = mangle;
 	*mask = mangle;
@@ -92,7 +78,7 @@ void namconb1_state::NB2RozCB_machbrkr(uint16_t code, int *tile, int *mask, int 
 void namconb1_state::NB2RozCB_outfxies(uint16_t code, int *tile, int *mask, int which )
 {
 	/* the pixmap index is mangled, the transparency bitmask index is not */
-	int bank = nth_byte16(&m_c169_roz_bank[which * 8 / 2], (code >> 11) & 0x7);
+	int bank = nth_byte32(&m_rozbank32[which * 8 / 4], (code >> 11) & 0x7);
 	int mangle = (code & 0x7ff) | (bank << 11);
 	*mask = mangle;
 	mangle = bitswap<19>(mangle & 0x7ffff, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 4, 5, 6, 3, 2, 1, 0);
@@ -162,6 +148,15 @@ VIDEO_START_MEMBER(namconb1_state,namconb1)
 } /* namconb1 */
 
 /****************************************************************************************************/
+
+WRITE32_MEMBER(namconb1_state::rozbank32_w)
+{
+	uint32_t old_data = m_rozbank32[offset];
+	COMBINE_DATA(&m_rozbank32[offset]);
+	if (m_rozbank32[offset] != old_data)
+		for (auto & elem : m_c169_roz_tilemap)
+			elem->mark_all_dirty();
+}
 
 uint32_t namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

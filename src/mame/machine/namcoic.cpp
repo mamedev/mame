@@ -823,7 +823,6 @@ void namcos2_shared_state::c169_roz_init(int gfxbank, const char *maskregion, c1
 			16,16,
 			256,256);
 
-	save_item(NAME(m_c169_roz_bank));
 	save_item(NAME(m_c169_roz_control));
 }
 
@@ -994,20 +993,6 @@ READ16_MEMBER( namcos2_shared_state::c169_roz_control_r )
 WRITE16_MEMBER( namcos2_shared_state::c169_roz_control_w )
 {
 	COMBINE_DATA(&m_c169_roz_control[offset]);
-}
-
-READ16_MEMBER( namcos2_shared_state::c169_roz_bank_r )
-{
-	return m_c169_roz_bank[offset];
-}
-
-WRITE16_MEMBER( namcos2_shared_state::c169_roz_bank_w )
-{
-	uint16_t old_data = m_c169_roz_bank[offset];
-	COMBINE_DATA(&m_c169_roz_bank[offset]);
-	if (m_c169_roz_bank[offset] != old_data)
-		for (auto & elem : m_c169_roz_tilemap)
-			elem->mark_all_dirty();
 }
 
 READ16_MEMBER( namcos2_shared_state::c169_roz_videoram_r )

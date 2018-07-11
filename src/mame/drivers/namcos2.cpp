@@ -31,7 +31,7 @@ known issues:
     - sprite size bit is bogus during splash screen
 
     Final Lap 3:
-    - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.c yet
+    - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.cpp yet
 
     Suzuka 8 Hours II
     - some sprite cropping issues

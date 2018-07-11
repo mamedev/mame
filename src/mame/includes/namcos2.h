@@ -204,8 +204,6 @@ protected:
 	void c169_roz_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	DECLARE_READ16_MEMBER( c169_roz_control_r );
 	DECLARE_WRITE16_MEMBER( c169_roz_control_w );
-	DECLARE_READ16_MEMBER( c169_roz_bank_r );
-	DECLARE_WRITE16_MEMBER( c169_roz_bank_w );
 	DECLARE_READ16_MEMBER( c169_roz_videoram_r );
 	DECLARE_WRITE16_MEMBER( c169_roz_videoram_w );
 
@@ -227,7 +225,6 @@ protected:
 
 	static const int ROZ_TILEMAP_COUNT = 2;
 	tilemap_t *m_c169_roz_tilemap[ROZ_TILEMAP_COUNT];
-	uint16_t m_c169_roz_bank[0x10/2];
 	uint16_t m_c169_roz_control[0x20/2];
 	optional_shared_ptr<uint16_t> m_c169_roz_videoram;
 	int m_c169_roz_gfxbank;
