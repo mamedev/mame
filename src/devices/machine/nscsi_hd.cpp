@@ -372,6 +372,27 @@ void nscsi_harddisk_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
+	case SC_FORMAT_UNIT:
+		LOG("command FORMAT UNIT:%s%s%s%s%s\n",
+				(scsi_cmdbuf[1] & 0x80) ? " FMT-PINFO" : "",
+				(scsi_cmdbuf[1] & 0x40) ? " RTO_REQ" : "",
+				(scsi_cmdbuf[1] & 0x20) ? " LONG-LIST" : "",
+				(scsi_cmdbuf[1] & 0x10) ? " FMTDATA" : "",
+				(scsi_cmdbuf[1] & 0x08) ? " CMPLIST" : "");
+		{
+			hard_disk_info *info = hard_disk_get_info(harddisk);
+			auto block = std::make_unique<uint8_t[]>(info->sectorbytes);
+			for(int cyl = 0; cyl < info->cylinders; cyl++) {
+				for(int head = 0; head < info->heads; head++) {
+					for(int sector = 0; sector < info->sectors; sector++) {
+						hard_disk_write(harddisk, cyl * head * sector, block.get());
+					}
+				}
+			}
+		}
+		scsi_status_complete(SS_GOOD);
+		break;
+
 	default:
 		LOG("command %02x ***UNKNOWN***\n", scsi_cmdbuf[0]);
 		nscsi_full_device::scsi_command();
