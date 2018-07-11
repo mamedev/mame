@@ -1105,7 +1105,7 @@ void subsino_state::mtrainnv_map(address_map &map)
 {
 	map(0x00000, 0x0bfff).rom();
 
-	map(0x0c000, 0x0cfff).ram();
+	map(0x0c000, 0x0cfff).ram().share("nvram");
 
 	map(0x0d000, 0x0d002).r("ppi1", FUNC(i8255_device::read));
 	map(0x0d004, 0x0d006).r("ppi2", FUNC(i8255_device::read));
