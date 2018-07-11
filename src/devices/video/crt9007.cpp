@@ -520,6 +520,11 @@ void crt9007_device::device_start()
 	save_item(NAME(m_vlt));
 	save_item(NAME(m_drb));
 	save_item(NAME(m_lpstb));
+	save_item(NAME(m_dmar));
+	save_item(NAME(m_ack));
+	save_item(NAME(m_dma_count));
+	save_item(NAME(m_dma_burst));
+	save_item(NAME(m_dma_delay));
 }
 
 
@@ -556,6 +561,7 @@ void crt9007_device::device_reset()
 	m_write_int(CLEAR_LINE);
 
 	// 28 (DMAR) = 0
+	m_dmar = false;
 	m_write_dmar(CLEAR_LINE);
 
 	// 29 (WBEN) = 0
@@ -669,7 +675,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_dma_count = CHARACTERS_PER_DATA_ROW;
 			m_dma_burst = DMA_BURST_COUNT ? (DMA_BURST_COUNT * 4) : CHARACTERS_PER_DATA_ROW;
 			m_dma_delay = DMA_BURST_DELAY;
-			m_dmar = 1;
+			m_dmar = true;
 
 			LOG("CRT9007 DMAR 1\n");
 			m_write_dmar(ASSERT_LINE);
@@ -929,7 +935,7 @@ WRITE_LINE_MEMBER( crt9007_device::ack_w )
 		m_dma_timer->adjust(attotime::from_hz(clock()));
 	}
 
-	m_ack = state;
+	m_ack = bool(state);
 }
 
 

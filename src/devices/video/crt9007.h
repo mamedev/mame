@@ -197,11 +197,11 @@ private:
 	//int m_sld;
 
 	// DMA
-	int m_dmar;
-	int m_ack;
-	int m_dma_count;
-	int m_dma_burst;
-	int m_dma_delay;
+	bool m_dmar;
+	bool m_ack;
+	uint16_t m_dma_count;
+	uint16_t m_dma_burst;
+	uint8_t m_dma_delay;
 
 	// timers
 	emu_timer *m_vsync_timer;
