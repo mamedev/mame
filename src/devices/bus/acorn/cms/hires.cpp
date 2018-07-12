@@ -68,7 +68,6 @@ cms_hires_device::cms_hires_device(const machine_config &mconfig, const char *ta
 
 void cms_hires_device::device_start()
 {
-	set_acorn_bus_device();
 	address_space &space = m_bus->memspace();
 
 	space.install_readwrite_handler(0xfc10, 0xfc1f, read8_delegate(FUNC(ef9365_device::data_r), m_gdp.target()), write8_delegate(FUNC(ef9365_device::data_w), m_gdp.target()));

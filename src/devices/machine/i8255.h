@@ -111,6 +111,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	bool m_force_portb_in;
+	bool m_force_portc_out;
+	bool m_dont_clear_output_latches;
+	
 private:
 	inline void check_interrupt(int port);
 	inline void set_ibf(int port, int state);
@@ -158,9 +162,23 @@ private:
 	int m_intr[2];              // interrupt
 };
 
+// AMS40489 ASIC (Amstrad Plus/GX4000 PPI implementation)
+class ams40489_ppi_device : public i8255_device
+{
+public:
+	// construction/destruction
+	ams40489_ppi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(I8255, i8255_device)
 DECLARE_DEVICE_TYPE(I8255A, i8255_device)
+DECLARE_DEVICE_TYPE(AMS40489_PPI, ams40489_ppi_device)
 
 #endif // MAME_MACHINE_I8255_H

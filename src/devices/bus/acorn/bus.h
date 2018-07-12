@@ -15,10 +15,16 @@
 
 
 //**************************************************************************
-//  TYPE DEFINITIONS
+//  FORWARD DECLARATIONS
 //**************************************************************************
 
 class acorn_bus_device;
+class device_acorn_bus_interface;
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 class acorn_bus_slot_device : public device_t, public device_slot_interface
 {
@@ -38,17 +44,17 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 
 	// configuration
-	required_device<device_t> m_bus;
+	required_device<acorn_bus_device> m_bus;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(ACORN_BUS_SLOT, acorn_bus_slot_device)
 
 
-class device_acorn_bus_interface;
 
 // ======================> acorn_bus_device
 class acorn_bus_device : public device_t
@@ -67,8 +73,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 
-	void add_slot(const char *tag);
-	void add_slot(device_slot_interface *slot);
+	void add_slot(acorn_bus_slot_device &slot);
 
 protected:
 	// device-level overrides
@@ -81,7 +86,7 @@ protected:
 	devcb_write_line m_out_irq_cb;
 	devcb_write_line m_out_nmi_cb;
 
-	std::forward_list<device_slot_interface *> m_slot_list;
+	std::forward_list<acorn_bus_slot_device *> m_slot_list;
 };
 
 
@@ -93,27 +98,21 @@ DECLARE_DEVICE_TYPE(ACORN_BUS, acorn_bus_device)
 // class representing interface-specific live acorn bus card
 class device_acorn_bus_interface : public device_slot_card_interface
 {
-	friend class acorn_bus_device;
-	template <class ElementType> friend class simple_list;
 public:
+	friend class acorn_bus_device;
+
 	// construction/destruction
 	virtual ~device_acorn_bus_interface();
 
-	device_acorn_bus_interface *next() const { return m_next; }
-
-	void set_acorn_bus_device();
-
 	// inline configuration
-	void set_acorn_bus(device_t *acorn_bus_device) { m_bus_dev = acorn_bus_device; }
+	void set_acorn_bus(acorn_bus_device &bus) { m_bus = &bus; }
 
-public:
+protected:
 	device_acorn_bus_interface(const machine_config &mconfig, device_t &device);
 
-	acorn_bus_device  *m_bus;
-	device_t          *m_bus_dev;
+	virtual void interface_pre_start() override;
 
-private:
-	device_acorn_bus_interface *m_next;
+	acorn_bus_device  *m_bus;
 };
 
 

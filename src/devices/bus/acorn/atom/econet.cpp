@@ -56,7 +56,6 @@ atom_econet_device::atom_econet_device(const machine_config &mconfig, const char
 
 void atom_econet_device::device_start()
 {
-	set_acorn_bus_device();
 	address_space &space = m_bus->memspace();
 
 	space.install_readwrite_handler(0xb400, 0xb403, read8_delegate(FUNC(mc6854_device::read), m_adlc.target()), write8_delegate(FUNC(mc6854_device::write), m_adlc.target()));

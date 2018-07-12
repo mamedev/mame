@@ -83,7 +83,6 @@ atom_discpack_device::atom_discpack_device(const machine_config &mconfig, const 
 
 void atom_discpack_device::device_start()
 {
-	set_acorn_bus_device();
 	address_space &space = m_bus->memspace();
 
 	space.install_device(0x0a00, 0x0a03, *m_fdc, &i8271_device::map);

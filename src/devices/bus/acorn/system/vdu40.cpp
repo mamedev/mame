@@ -78,7 +78,6 @@ void acorn_vdu40_device::device_start()
 
 void acorn_vdu40_device::device_reset()
 {
-	set_acorn_bus_device();
 	address_space &space = m_bus->memspace();
 
 	space.install_ram(0x0400, 0x07ff, m_videoram.get());

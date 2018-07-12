@@ -53,7 +53,6 @@ atom_sid_device::atom_sid_device(const machine_config &mconfig, const char *tag,
 
 void atom_sid_device::device_start()
 {
-	set_acorn_bus_device();
 	address_space &space = m_bus->memspace();
 
 	space.install_readwrite_handler(0xbdc0, 0xbddf, read8_delegate(FUNC(mos6581_device::read), m_sid.target()), write8_delegate(FUNC(mos6581_device::write), m_sid.target()));
