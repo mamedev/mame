@@ -31,7 +31,7 @@ protected:
     DECLARE_READ32_MEMBER(clock1_r);
 
 private:
-	required_device<cpu_device> m_maincpu;
+    required_device<cpu_device> m_maincpu;
     required_shared_ptr<uint32_t> m_ram;
 	required_device<screen_device> m_screen;
     required_memory_bank m_bank1;
