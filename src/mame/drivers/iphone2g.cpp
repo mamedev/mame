@@ -83,11 +83,11 @@ void iphone2g_state::machine_reset()
 MACHINE_CONFIG_START(iphone2g_state::iphone2g)
 
 	/* Basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, ARM1176JZF_S, XTAL(412'000'000)) //Downclocked from 620 MHz.
+	MCFG_DEVICE_ADD(m_maincpu, ARM1176JZF_S, XTAL(12'000'000) * 103 / 3) //412 MHz, downclocked from 600 MHz
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_SCREEN_ADD(m_screen, RASTER)
-    MCFG_SCREEN_RAW_PARAMS(XTAL(9'216'000), 320, 0, 320, 480, 0, 480) //Complete guess
+    MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 320, 0, 320, 480, 0, 480) //Complete guess
 	MCFG_SCREEN_UPDATE_DRIVER(iphone2g_state, screen_update)
 MACHINE_CONFIG_END
 
