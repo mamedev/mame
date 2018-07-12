@@ -184,7 +184,7 @@ protected:
 	uint8_t m_decoded_access_control[16];
 
 	uint8_t m_archRev;          // ARM architecture revision (3, 4, and 5 are valid)
-	uint8_t m_archFlags;        // architecture flags
+	uint32_t m_archFlags;        // architecture flags
 
 	uint32_t m_vectorbase;
 
