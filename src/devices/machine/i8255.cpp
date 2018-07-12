@@ -260,8 +260,8 @@ inline int i8255_device::port_c_upper_mode()
 //  i8255_device - constructor
 //-------------------------------------------------
 
-i8255_device::i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I8255, tag, owner, clock),
+i8255_device::i8255_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		m_in_pa_cb(*this),
 		m_in_pb_cb(*this),
 		m_in_pc_cb(*this),
@@ -273,6 +273,11 @@ i8255_device::i8255_device(const machine_config &mconfig, const char *tag, devic
 {
 	m_intr[PORT_A] = m_intr[PORT_B] = 0;
 	m_control = 0;
+}
+
+i8255_device::i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i8255_device(mconfig, I8255, tag, owner, clock)
+{
 }
 
 //-------------------------------------------------
@@ -1022,8 +1027,9 @@ WRITE_LINE_MEMBER( i8255_device::pc6_w )
 
 // AMS40489 (Amstrad Plus/GX4000 ASIC PPI implementation)
 ams40489_ppi_device::ams40489_ppi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8255_device(mconfig,tag,owner,clock)
-{}
+	: i8255_device(mconfig,AMS40489_PPI,tag,owner,clock)
+{
+}
 
 void ams40489_ppi_device::device_reset() { i8255_device::device_reset(); }
 
