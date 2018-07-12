@@ -32,15 +32,15 @@ class cms_state : public driver_device
 {
 public:
 	cms_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag)
-	, m_maincpu(*this, "maincpu")
-	, m_rom(*this, "rom")
-	, m_bank1(*this, "bank1")
-	, m_via(*this, "via")
-	, m_irqs(*this, "irqs")
-	, m_bus(*this, "bus")
-	, m_map_select(0)
-	, m_page_select(0)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "rom")
+		, m_bank1(*this, "bank1")
+		, m_via(*this, "via")
+		, m_irqs(*this, "irqs")
+		, m_bus(*this, "bus")
+		, m_map_select(0)
+		, m_page_select(0)
 	{ }
 
 	//DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);

@@ -91,7 +91,6 @@ void acorn_vib_device::device_start()
 
 void acorn_vib_device::device_reset()
 {
-	set_acorn_bus_device();
 	address_space &space = m_bus->memspace();
 
 	space.install_readwrite_handler(0x0c00, 0x0c0f, 0, 0x10, 0, read8_delegate(FUNC(via6522_device::read), m_via6522.target()), write8_delegate(FUNC(via6522_device::write), m_via6522.target()));

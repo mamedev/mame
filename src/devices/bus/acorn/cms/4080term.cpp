@@ -143,7 +143,6 @@ cms_4080term_device::cms_4080term_device(const machine_config &mconfig, const ch
 
 void cms_4080term_device::device_start()
 {
-	set_acorn_bus_device();
 	address_space &space = m_bus->memspace();
 
 	space.install_readwrite_handler(0xfd20, 0xfd2f, read8_delegate(FUNC(ef9345_device::data_r), m_ef9345.target()), write8_delegate(FUNC(ef9345_device::data_w), m_ef9345.target()));

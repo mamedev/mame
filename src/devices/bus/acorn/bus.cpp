@@ -34,17 +34,33 @@ acorn_bus_slot_device::acorn_bus_slot_device(const machine_config &mconfig, cons
 }
 
 //-------------------------------------------------
+//  device_validity_check - device-specific checks
+//-------------------------------------------------
+
+void acorn_bus_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const card(get_card_device());
+	if (card && !dynamic_cast<device_acorn_bus_interface *>(card))
+		osd_printf_error("acorn_bus_slot_device: card device %s (%s) does not implement device_acorn_bus_interface\n", card->tag(), card->name());
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void acorn_bus_slot_device::device_start()
 {
-	device_acorn_bus_interface *const dev = dynamic_cast<device_acorn_bus_interface *>(get_card_device());
-	if (dev)
-		dev->set_acorn_bus(m_bus);
+	device_t *const card(get_card_device());
+	if (card)
+	{
+		device_acorn_bus_interface *const intf(dynamic_cast<device_acorn_bus_interface *>(card));
+		if (!intf)
+			throw emu_fatalerror("acorn_bus_slot_device: card device %s (%s) does not implement device_acorn_bus_interface\n", card->tag(), card->name());
+		intf->set_acorn_bus(*m_bus);
+	}
 
 	// tell acorn bus that there is one slot with the specified tag
-	downcast<acorn_bus_device &>(*m_bus).add_slot(tag());
+	m_bus->add_slot(*this);
 }
 
 
@@ -71,16 +87,9 @@ acorn_bus_device::acorn_bus_device(const machine_config &mconfig, const char *ta
 }
 
 
-void acorn_bus_device::add_slot(const char *tag)
+void acorn_bus_device::add_slot(acorn_bus_slot_device &slot)
 {
-	device_t *dev = subdevice(tag);
-
-	add_slot(dynamic_cast<device_slot_interface *>(dev));
-}
-
-void acorn_bus_device::add_slot(device_slot_interface *slot)
-{
-	m_slot_list.push_front(slot);
+	m_slot_list.push_front(&slot);
 }
 
 
@@ -125,8 +134,6 @@ WRITE_LINE_MEMBER(acorn_bus_device::nmi_w) { m_out_nmi_cb(state); }
 device_acorn_bus_interface::device_acorn_bus_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 	, m_bus(nullptr)
-	, m_bus_dev(nullptr)
-	, m_next(nullptr)
 {
 }
 
@@ -139,9 +146,10 @@ device_acorn_bus_interface::~device_acorn_bus_interface()
 {
 }
 
-void device_acorn_bus_interface::set_acorn_bus_device()
+void device_acorn_bus_interface::interface_pre_start()
 {
-	m_bus = dynamic_cast<acorn_bus_device *>(m_bus_dev);
+	if (!m_bus)
+		throw device_missing_dependencies();
 }
 
 

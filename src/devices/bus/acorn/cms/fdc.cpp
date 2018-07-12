@@ -73,7 +73,6 @@ cms_fdc_device::cms_fdc_device(const machine_config &mconfig, const char *tag, d
 
 void cms_fdc_device::device_start()
 {
-	set_acorn_bus_device();
 	address_space &space = m_bus->memspace();
 
 	space.install_readwrite_handler(0xfc50, 0xfc5f, read8_delegate(FUNC(cms_fdc_device::wd1770_state_r), this), write8_delegate(FUNC(cms_fdc_device::wd1770_control_w), this));

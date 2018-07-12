@@ -71,14 +71,14 @@ class acrnsys_state : public driver_device
 {
 public:
 	acrnsys_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag)
-	, m_maincpu(*this, "maincpu")
-	, m_irqs(*this, "irqs")
-	, m_bus(*this, "bus")
-	, m_ins8154(*this, "ins8154")
-	, m_via6522(*this, "via6522")
-	, m_centronics(*this, "centronics")
-	, m_kbd_data(0)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_irqs(*this, "irqs")
+		, m_bus(*this, "bus")
+		, m_ins8154(*this, "ins8154")
+		, m_via6522(*this, "via6522")
+		, m_centronics(*this, "centronics")
+		, m_kbd_data(0)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);

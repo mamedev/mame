@@ -66,7 +66,6 @@ void acorn_econet_device::device_start()
 
 void acorn_econet_device::device_reset()
 {
-	set_acorn_bus_device();
 	address_space &space = m_bus->memspace();
 
 	space.install_readwrite_handler(0x1940, 0x1943, read8_delegate(FUNC(mc6854_device::read), m_adlc.target()), write8_delegate(FUNC(mc6854_device::write), m_adlc.target()));

@@ -109,7 +109,6 @@ void acorn_8k_device::device_start()
 
 void acorn_8k_device::device_reset()
 {
-	set_acorn_bus_device();
 	address_space &space = m_bus->memspace();
 
 	uint16_t ram_addr = (m_links->read() & 0x0f) << 13;

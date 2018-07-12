@@ -81,7 +81,6 @@ void acorn_32k_device::device_start()
 
 void acorn_32k_device::device_reset()
 {
-	set_acorn_bus_device();
 	address_space &space = m_bus->memspace();
 
 	if (m_links->read())

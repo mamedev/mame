@@ -2676,9 +2676,9 @@ layout_view::item::item(
 	// sanity checks
 	if (strcmp(itemnode.get_name(), "screen") == 0)
 	{
-        char const *const tag(itemnode.get_attribute_string("tag", nullptr));
-        if (tag)
-            m_screen = dynamic_cast<screen_device *>(machine.root_device().subdevice(tag));
+		char const *const tag(itemnode.get_attribute_string("tag", nullptr));
+		if (tag)
+			m_screen = dynamic_cast<screen_device *>(machine.root_device().subdevice(tag));
 		if (!m_screen)
 			throw layout_reference_error(util::string_format("invalid screen index %d", index));
 	}
