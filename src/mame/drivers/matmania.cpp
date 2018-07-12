@@ -349,7 +349,7 @@ MACHINE_CONFIG_START(matmania_state::maniach)
 	MCFG_DEVICE_PROGRAM_MAP(maniach_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", matmania_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", M6809, 1500000)    /* 1.5 MHz ???? */
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 1500000)    /* 1.5 MHz ???? (HD68A09EP) */
 	MCFG_DEVICE_PROGRAM_MAP(maniach_sound_map)
 
 	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, 1500000*2)  /* (don't know really how fast, but it doesn't need to even be this fast) */
