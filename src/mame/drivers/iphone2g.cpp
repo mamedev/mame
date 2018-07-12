@@ -18,8 +18,10 @@ public:
 	iphone2g_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "ram"),
+		m_bios(*this, "bios"),
 		m_screen(*this, "screen")
-		{ }
+	{ }
 
 	void iphone2g(machine_config &config);
 
@@ -31,6 +33,8 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint32_t> m_ram;
+	required_region_ptr<uint8_t> m_bios;
 	required_device<screen_device> m_screen;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -58,7 +62,7 @@ READ32_MEMBER(iphone2g_state::clock1_r)
 
 void iphone2g_state::mem_map(address_map &map)
 {
-	map(0x00000000, 0x07FFFFFF).mirror(0x18000000).ram();                              /* DRAM */
+	map(0x00000000, 0x07FFFFFF).mirror(0x18000000).ram().share("ram");                 /* DRAM */
 	map(0x20000000, 0x2000FFFF).rom().region("bios", 0);                               /* BIOS */
 	map(0x22000000, 0x224FFFFF).ram();                                                 /* SRAM */
 	map(0x3C500000, 0x3C500FFF).r(FUNC(iphone2g_state::clock1_r)).nopw();
@@ -66,6 +70,8 @@ void iphone2g_state::mem_map(address_map &map)
 
 void iphone2g_state::machine_start()
 {
+	//Using memcpy, because for SOME reason, std::copy doesn't work here
+	memcpy((uint8_t*)m_ram.target(), (uint8_t*)m_bios.target(), 0x1000);
 }
 
 void iphone2g_state::machine_reset()
