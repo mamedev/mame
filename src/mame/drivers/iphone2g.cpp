@@ -20,7 +20,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "ram"),
 		m_screen(*this, "screen"),
-        m_bank1(*this, "bank1") { }
+		m_bank1(*this, "bank1") { }
 
 	void iphone2g(machine_config &config);
 

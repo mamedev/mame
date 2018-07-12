@@ -68,7 +68,7 @@ protected:
 		ARCHFLAG_MMU  = 8,        // has on-board MMU (traditional ARM style like the SA1110)
 		ARCHFLAG_SA   = 16,       // StrongARM extensions (enhanced TLB)
 		ARCHFLAG_XSCALE   = 32,   // XScale extensions (CP14, enhanced TLB)
-		ARCHFLAG_MODE26   = 64,    // supports 26-bit backwards compatibility mode
+		ARCHFLAG_MODE26   = 64,   // supports 26-bit backwards compatibility mode
 		ARCHFLAG_K    = 128,      // enhanced MMU extensions present (only for v6)
 		ARCHFLAG_T2   = 256,      //Thumb-2 present
 	};
