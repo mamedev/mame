@@ -66,9 +66,9 @@ void bbusters_state::video_start()
 
 void mechatt_state::video_start()
 {
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&bbusters_state::get_pf_tile_info<0,2>, "layer0_gfx2", this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
-	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&bbusters_state::get_pf_tile_info<1,3>, "layer1_gfx3", this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mechatt_state::get_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&mechatt_state::get_pf_tile_info<0,2>, "layer0_gfx2", this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
+	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&mechatt_state::get_pf_tile_info<1,3>, "layer1_gfx3", this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
 
 	m_pf_tilemap[0]->set_transparent_pen(15);
 	m_fix_tilemap->set_transparent_pen(15);
