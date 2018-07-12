@@ -361,7 +361,8 @@ const double XTAL::known_xtals[] = {
 	 87'183'360, /* 87.18336_MHz_XTAL      AT&T 630 MTG */
 	100'000'000, /* 100_MHz_XTAL           PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
 	101'491'200, /* 101.4912_MHz_XTAL      PSX-based Namco System 10 */
-	200'000'000  /* 200_MHz_XTAL           Base SH4 CPU (Naomi, Hikaru etc.) */
+	200'000'000, /* 200_MHz_XTAL           Base SH4 CPU (Naomi, Hikaru etc.) */
+	412'000'000  /* 412_MHz_XTAL           ARM1176JZF in the original iPhone */
 };
 
 double XTAL::last_correct_value = -1;

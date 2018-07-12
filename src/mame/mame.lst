@@ -15547,6 +15547,9 @@ ipc                             // intel
 @source:ipds.cpp
 ipds                            // intel
 
+@source:iphone2g.cpp
+iphone2g                        // (c) 2007 Apple
+
 @source:iq151.cpp
 iq151                           //
 
