@@ -1565,7 +1565,7 @@ void arm7_cpu_device::arm9ops_1(uint32_t insn)
 	{
 		// unsupported (armv6 onwards only)
 		if(m_archRev < 6) arm9ops_undef(insn);
-		else set_cpsr(GET_CPSR | (BIT(insn, 9)));
+		else set_cpsr(GET_CPSR | (insn & (1 << 9)));
 		R15 += 4;
 	}
 	else
