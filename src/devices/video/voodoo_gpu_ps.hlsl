@@ -18,10 +18,11 @@ cbuffer cbFrameBufferCtrl : register(b0)
 {
 	float xSize;
 	float ySize;
-	int flipY;
+	int fbzFlipY;
+	int lfbFlipY;
 	int enablePerspective0;
 	int enablePerspective1;
-	float pad00, pad01, pad02;
+	float pad00, pad01;
 };
 
 struct Combine_Struct {

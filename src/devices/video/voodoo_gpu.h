@@ -76,10 +76,11 @@ public:
 	{
 		float xSize;
 		float ySize;
-		int flipY;
+		int fbzFlipY;
+		int lfbFlipY;
 		int enablePerspective0;
 		int enablePerspective1;
-		int pad0[3];
+		int pad0[2];
 	};
 
 	struct Combine_Struct {
@@ -213,6 +214,7 @@ public:
 	void CopyBufferRGB(uint8_t *dst);
 	
 	void SetFbzMode(uint32_t fbzMode);
+	void SetLfbMode(uint32_t lfbMode);
 	void SetAlphaMode(uint32_t &alphaMode);
 	void SetZAColor(uint32_t zaColor);
 	void SetFogCtrl(uint32_t &fogMode, uint32_t &fogColor);
@@ -336,6 +338,6 @@ private:
 	uint16_t *m_drawBuffer;
 
 	uint32_t m_fastFbzMode;
-	uint32_t m_regFbzMode, m_regFbzColorPath, m_regColor0, m_regColor1, m_regAlphaMode, m_regTexMode[NUM_TEX];
+	uint32_t m_regFbzMode, m_regLfbMode, m_regFbzColorPath, m_regColor0, m_regColor1, m_regAlphaMode, m_regTexMode[NUM_TEX];
 	uint32_t m_regZAColor, m_regFogMode, m_regFogColor;
 };

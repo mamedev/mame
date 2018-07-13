@@ -71,7 +71,8 @@ voodoo_gpu::voodoo_gpu()
 
 	m_frameBufferCtrl.xSize = 0.0f;
 	m_frameBufferCtrl.ySize = 0.0f;
-	m_frameBufferCtrl.flipY = 0;
+	m_frameBufferCtrl.fbzFlipY = 0;
+	m_frameBufferCtrl.lfbFlipY = 0;
 	m_frameBufferCtrl.enablePerspective0 = 0;
 	m_frameBufferCtrl.enablePerspective1 = 0;
 
@@ -82,6 +83,7 @@ voodoo_gpu::voodoo_gpu()
 	m_drawBuffer = nullptr;
 	m_fastFbzMode = 0;
 	m_regFbzMode = 0;
+	m_regLfbMode = 0;
 
 	m_updateColorCtrl = true;
 	m_regFbzColorPath = 0;
@@ -800,7 +802,7 @@ void voodoo_gpu::SetFbzMode(uint32_t fbzMode)
 
 	// Y origin for render operations (fastfill, triangle, pixel pipeline lfb)
 	if ((m_regFbzMode ^ fbzMode) & 0x20000) {
-		m_frameBufferCtrl.flipY = (fbzMode >> 17) & 1;
+		m_frameBufferCtrl.fbzFlipY = (fbzMode >> 17) & 1;
 		m_updateFrameBufferCtrl = true;
 	}
 
@@ -817,6 +819,19 @@ void voodoo_gpu::SetFbzMode(uint32_t fbzMode)
 		m_updateColorCtrl = true;
 
 	m_regFbzMode = fbzMode;
+}
+
+void voodoo_gpu::SetLfbMode(uint32_t lfbMode)
+{
+	// Make sure Lfb pipe is clear
+	DrawLfbWrites();
+
+	// Y origin for lfb write operations
+	if ((m_regLfbMode ^ lfbMode) & (1 << 13)) {
+		m_frameBufferCtrl.lfbFlipY = (lfbMode >> 13) & 1;
+		m_updateFrameBufferCtrl = true;
+	}
+	m_regLfbMode = lfbMode;
 }
 
 void voodoo_gpu::SetAlphaMode(uint32_t &alphaMode)

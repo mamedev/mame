@@ -2490,6 +2490,16 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 			}
 			break;
 
+		case lfbMode:
+			if (chips & 1) {
+				vd->reg[lfbMode].u = data;
+				if USE_GPU{
+					//vd->m_gpu.DrawTriangle();
+					vd->m_gpu.SetLfbMode(vd->reg[lfbMode].u);
+				}
+			}
+			break;
+
 		case fogMode:
 			poly_wait(vd->poly, vd->regnames[regnum]);
 			if (vd->vd_type < TYPE_VOODOO_2)

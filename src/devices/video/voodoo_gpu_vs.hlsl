@@ -5,10 +5,11 @@ cbuffer cbFrameBufferCtrl : register(b0)
 {
 	float xSize;
 	float ySize;
-	int flipY;
+	int fbzFlipY;
+	int lfbFlipY;
 	int enablePerspective0;
 	int enablePerspective1;
-	float pad00, pad01, pad02;
+	float pad00, pad01;
 };
 
 struct Combine_Struct {
@@ -228,8 +229,14 @@ float2 ConvertScreenPos(float2 posXY)
 		output.x = posXY.x / (xSize / 2.0f) - 1.0f;
 		output.y = 1.0f - posXY.y / (ySize / 2.0f);
 	}
-	if (flipY)
-		output.y = -output.y;
+	if (pixel_mode == 2) {
+		if (lfbFlipY)
+			output.y = -output.y;
+	}
+	else {
+		if (fbzFlipY)
+			output.y = -output.y;
+	}
 	return output;
 }
 
