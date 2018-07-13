@@ -171,7 +171,7 @@ void galpani3_state::video_start()
 // TODO : m_framebuffer_bright1 is alpha-blended?
 #define FB_DRAW_PIXEL(_chip, _pixel)                                                              \
 	int alpha = 0xff;                                                                             \
-	uint32_t pal = m_grap2[_chip]->pen_r(_pixel);                                                 \
+	const pen_t &pal = m_grap2[_chip]->pen(_pixel);                                               \
 	if (m_grap2[_chip]->m_framebuffer_palette[_pixel] & 0x8000)                                   \
 	{                                                                                             \
 		alpha = (m_grap2[_chip]->m_framebuffer_bright2 & 0xff);                                   \
@@ -194,7 +194,10 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 
 	bitmap.fill(0, cliprect);
 
-	m_sprite_bitmap.fill(0x0000, cliprect);
+	if (!(m_spc_regs[1] & 0x00000004))
+	{
+		m_sprite_bitmap.fill(0x0000, cliprect);
+	}
 
 	m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram32.get(), 0x4000, m_spc_regs.get() );
 
@@ -252,11 +255,33 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 				else if (pridat==0xcf) // the girl
 				{
 					SPRITE_DRAW_PIXEL(0x0000);
-					FB_DRAW_PIXEL(0, 0x100);
+					if (m_grap2[0]->m_framebuffer_enable)
+					{
+						FB_DRAW_PIXEL(0, 0x100);
+					}
 					SPRITE_DRAW_PIXEL(0x4000);
 					if (m_grap2[1]->m_framebuffer_enable)
 					{
 						FB_DRAW_PIXEL(1, 0x100);
+					}
+					SPRITE_DRAW_PIXEL(0x8000);
+					if (dat3 && m_grap2[2]->m_framebuffer_enable)
+					{
+						FB_DRAW_PIXEL(2, dat3);
+					}
+					SPRITE_DRAW_PIXEL(0xc000);
+				}
+				else if (pridat==0x30) // during the 'gals boxes' on the intro
+				{
+					SPRITE_DRAW_PIXEL(0x0000);
+					if (m_grap2[1]->m_framebuffer_enable) // TODO : Opaqued and Swapped order?
+					{
+						FB_DRAW_PIXEL(1, dat2);
+					}
+					SPRITE_DRAW_PIXEL(0x4000);
+					if (dat1 && m_grap2[0]->m_framebuffer_enable)
+					{
+						FB_DRAW_PIXEL(0, dat1);
 					}
 					SPRITE_DRAW_PIXEL(0x8000);
 					if (dat3 && m_grap2[2]->m_framebuffer_enable)
