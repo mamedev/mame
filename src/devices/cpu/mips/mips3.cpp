@@ -3189,33 +3189,48 @@ void mips3_device::handle_special(uint32_t op)
 			break;
 		case 0x1c:  /* DMULT */
 		{
-			int64_t rshi = (int32_t)(RSVAL64 >> 32);
-			int64_t rthi = (int32_t)(RTVAL64 >> 32);
-			int64_t rslo = (uint32_t)RSVAL64;
-			int64_t rtlo = (uint32_t)RTVAL64;
-			int64_t mid_prods = (rshi * rtlo) + (rslo * rthi);
-			uint64_t lo_prod = (rslo * rtlo);
-			int64_t hi_prod = (rshi * rthi);
-			mid_prods += lo_prod >> 32;
+			int64_t a_hi = (int32_t)(RSVAL64 >> 32);
+			int64_t b_hi = (int32_t)(RTVAL64 >> 32);
+			int64_t a_lo = (uint32_t)RSVAL64;
+			int64_t b_lo = (uint32_t)RTVAL64;
+			uint64_t p1 = a_lo * b_lo;
+			uint64_t p2 = a_hi * b_lo;
+			uint64_t p3 = a_lo * b_hi;
+			uint64_t p4 = a_hi * b_hi;
 
-			HIVAL64 = hi_prod + (mid_prods >> 32);
-			LOVAL64 = (uint32_t)lo_prod + (mid_prods << 32);
+			/* Now add up the LO and HI products */
+			uint64_t s1 = p1 + (p2 << 32);
+			uint64_t s2 = p2 >> 32;
+			uint64_t s3 = p3 + (p4 << 32);
+			uint64_t s4 = p4 >> 32;
+			uint64_t temp = (s4 << 32) + (s3 >> 32) + 1;
+
+			LOVAL64 = s1 + (s3 << 32);
+			HIVAL64 = s2 + temp;
 			m_core->icount -= 7;
 			break;
 		}
 		case 0x1d:  /* DMULTU */
 		{
-			uint64_t rshi = (int32_t)(RSVAL64 >> 32);
-			uint64_t rthi = (int32_t)(RTVAL64 >> 32);
-			uint64_t rslo = (uint32_t)RSVAL64;
-			uint64_t rtlo = (uint32_t)RTVAL64;
-			uint64_t mid_prods = (rshi * rtlo) + (rslo * rthi);
-			uint64_t lo_prod = (rslo * rtlo);
-			uint64_t hi_prod = (rshi * rthi);
-			mid_prods += lo_prod >> 32;
+			uint64_t a_hi = (uint32_t)(RSVAL64 >> 32);
+			uint64_t b_hi = (uint32_t)(RTVAL64 >> 32);
+			uint64_t a_lo = (uint32_t)RSVAL64;
+			uint64_t b_lo = (uint32_t)RTVAL64;
+			uint64_t p1 = a_lo * b_lo;
+			uint64_t p2 = a_hi * b_lo;
+			uint64_t p3 = a_lo * b_hi;
+			uint64_t p4 = a_hi * b_hi;
 
-			HIVAL64 = hi_prod + (mid_prods >> 32);
-			LOVAL64 = (uint32_t)lo_prod + (mid_prods << 32);
+			/* Now add up the LO and HI products */
+			uint64_t s1 = p1 + (p2 << 32);
+			uint64_t s2 = p2 >> 32;
+			uint64_t s3 = p3 + (p4 << 32);
+			uint64_t s4 = p4 >> 32;
+			uint64_t temp = ((s4 + s3) << 32);
+
+			LOVAL64 = s1 + (s3 << 32);
+			HIVAL64 = s2 + temp;
+
 			m_core->icount -= 7;
 			break;
 		}
