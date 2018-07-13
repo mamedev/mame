@@ -1003,7 +1003,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragonb)
 	ddragon(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("sub", M6809, MAIN_CLOCK / 8)  /* 1.5MHz */
+	MCFG_DEVICE_REPLACE("sub", HD6309E, MAIN_CLOCK / 8)  /* 1.5MHz; labeled "ENC EL1200AR" on one PCB */
 	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 MACHINE_CONFIG_END
 

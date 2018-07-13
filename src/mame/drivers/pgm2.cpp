@@ -758,73 +758,73 @@ static GFXDECODE_START( pgm2_bg )
 	GFXDECODE_ENTRY( "bgtile", 0, tiles32x32x8_layout, 0, 0x2000/4/0x80 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(pgm2_state::pgm2)
-
+void pgm2_state::pgm2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", IGS036, 100000000) // ?? ARM based CPU, has internal ROM; clock not verified
-	MCFG_DEVICE_PROGRAM_MAP(pgm2_rom_map)
+	IGS036(config, m_maincpu, 100000000); // ?? ARM based CPU, has internal ROM; clock not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_rom_map);
 
-	MCFG_TIMER_DRIVER_ADD("mcu_timer", pgm2_state, igs_interrupt)
+	TIMER(config, m_mcu_timer, 0);
+	m_mcu_timer->configure_generic(timer_device::expired_delegate(FUNC(pgm2_state::igs_interrupt), nullptr, (pgm2_state *)nullptr));
 
-	MCFG_DEVICE_ADD("arm_aic", ARM_AIC)
-	MCFG_IRQ_LINE_CB(INPUTLINE("maincpu", ARM7_IRQ_LINE))
+	ARM_AIC(config, m_arm_aic, 100000000); // TODO : Unknown clock source/divider
+	m_arm_aic->irq_out().set_inputline(m_maincpu, ARM7_IRQ_LINE);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 448-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm2_state, screen_vblank_pgm2))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0, 448-1, 0, 224-1);
+	m_screen->set_screen_update(FUNC(pgm2_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(pgm2_state::screen_vblank));
 
-	MCFG_DEVICE_ADD("gfxdecode2", GFXDECODE, "tx_palette", pgm2_tx)
+	GFXDECODE(config, m_gfxdecode[0], m_tx_palette, pgm2_tx);
 
-	MCFG_DEVICE_ADD("gfxdecode3", GFXDECODE, "bg_palette", pgm2_bg)
+	GFXDECODE(config, m_gfxdecode[1], m_bg_palette, pgm2_bg);
 
-	MCFG_PALETTE_ADD("sp_palette", 0x4000/4) // sprites
-	MCFG_PALETTE_FORMAT(XRGB)
+	PALETTE(config, m_sp_palette, 0x4000/4); // sprites
+	m_sp_palette->set_format(PALETTE_FORMAT_XRGB);
 
-	MCFG_PALETTE_ADD("tx_palette", 0x800/4) // text
-	MCFG_PALETTE_FORMAT(XRGB)
+	PALETTE(config, m_tx_palette, 0x800/4); // text
+	m_tx_palette->set_format(PALETTE_FORMAT_XRGB);
 
-	MCFG_PALETTE_ADD("bg_palette", 0x2000/4) // bg
-	MCFG_PALETTE_FORMAT(XRGB)
+	PALETTE(config, m_bg_palette, 0x2000/4); // bg
+	m_bg_palette->set_format(PALETTE_FORMAT_XRGB);
 
-	MCFG_NVRAM_ADD_0FILL("sram")
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ymz774", YMZ774, 16384000) // is clock correct ?
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ymz774_device &ymz774(YMZ774(config, "ymz774", 16384000)); // is clock correct ?
+	ymz774.add_route(0, "lspeaker", 1.0);
+	ymz774.add_route(1, "rspeaker", 1.0);
 
-	MCFG_PGM2_MEMCARD_ADD("memcard_p1")
-	MCFG_PGM2_MEMCARD_ADD("memcard_p2")
-	MCFG_PGM2_MEMCARD_ADD("memcard_p3")
-	MCFG_PGM2_MEMCARD_ADD("memcard_p4")
-MACHINE_CONFIG_END
+	PGM2_MEMCARD(config, m_memcard[0]);
+	PGM2_MEMCARD(config, m_memcard[1]);
+	PGM2_MEMCARD(config, m_memcard[2]);
+	PGM2_MEMCARD(config, m_memcard[3]);
+}
 
 // not strictly needed as the video code supports changing on the fly, but makes recording easier etc.
-MACHINE_CONFIG_START(pgm2_state::pgm2_lores)
+void pgm2_state::pgm2_lores(machine_config &config)
+{
 	pgm2(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 320-1, 0, 240-1);
+}
 
-MACHINE_CONFIG_START(pgm2_state::pgm2_hires)
+void pgm2_state::pgm2_hires(machine_config &config)
+{
 	pgm2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pgm2_module_rom_map)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_module_rom_map);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+}
 
-MACHINE_CONFIG_START(pgm2_state::pgm2_ramrom)
+void pgm2_state::pgm2_ramrom(machine_config &config)
+{
 	pgm2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pgm2_ram_rom_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_ram_rom_map);
+}
 
 /* using macros for the video / sound roms because the locations never change between sets, and
    we're going to have a LOT of clones to cover all the internal rom regions and external rom revision

@@ -8,22 +8,18 @@
 
 DECLARE_DEVICE_TYPE(ARM_AIC, arm_aic_device)
 
-#define MCFG_IRQ_LINE_CB(_devcb) \
-	downcast<arm_aic_device &>(*device).set_line_callback(DEVCB_##_devcb);
-
 class arm_aic_device : public device_t
 {
 public:
 	// construction/destruction
-	arm_aic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) :
+	arm_aic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ARM_AIC, tag, owner, clock),
 		m_irq_out(*this)
 	{
 	}
 
 	// configuration
-	template <class Object> devcb_base &set_line_callback(Object &&cb) { return m_irq_out.set_callback(std::forward<Object>(cb)); }
-
+	auto irq_out() { return m_irq_out.bind(); }
 	void regs_map(address_map &map);
 
 	void set_irq(int line, int state);

@@ -24,14 +24,8 @@
 
 //#include "imagedev/snapquik.h"
 
-
-#ifndef VERBOSE
-#define VERBOSE 0
-#endif
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-
-
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 static const char keyboard[8][9][8] = {
@@ -138,51 +132,36 @@ uint8_t microtan_state::read_dsw()
 	}
 }
 
-void microtan_state::set_irq_line()
-{
-	/* The 6502 IRQ line is active low and probably driven
-	   by open collector outputs (guess). Since MAME uses
-	   a non-0 value for ASSERT_LINE we OR the signals here */
-	m_maincpu->set_input_line(0, m_via_irq_line[0] | m_via_irq_line[1] | m_kbd_irq_line);
-}
-
 /**************************************************************
  * VIA callback functions for VIA #0
  **************************************************************/
 READ8_MEMBER(microtan_state::via_0_in_a)
 {
 	int data = ioport("JOY")->read();
-	LOG(("via_0_in_a %02X\n", data));
+	LOG("via_0_in_a %02X\n", data);
 	return data;
 }
 
 WRITE8_MEMBER(microtan_state::via_0_out_a)
 {
-	LOG(("via_0_out_a %02X\n", data));
+	LOG("via_0_out_a %02X\n", data);
 }
 
 WRITE8_MEMBER(microtan_state::via_0_out_b)
 {
-	LOG(("via_0_out_b %02X\n", data));
+	LOG("via_0_out_b %02X\n", data);
 	/* bit #7 is the cassette output signal */
 	m_cassette->output(data & 0x80 ? +1.0 : -1.0);
 }
 
 WRITE_LINE_MEMBER(microtan_state::via_0_out_ca2)
 {
-	LOG(("via_0_out_ca2 %d\n", state));
+	LOG("via_0_out_ca2 %d\n", state);
 }
 
 WRITE_LINE_MEMBER(microtan_state::via_0_out_cb2)
 {
-	LOG(("via_0_out_cb2 %d\n", state));
-}
-
-WRITE_LINE_MEMBER(microtan_state::via_0_irq)
-{
-	LOG(("via_0_irq %d\n", state));
-	m_via_irq_line[0] = state;
-	set_irq_line();
+	LOG("via_0_out_cb2 %d\n", state);
 }
 
 /**************************************************************
@@ -191,29 +170,22 @@ WRITE_LINE_MEMBER(microtan_state::via_0_irq)
 
 WRITE8_MEMBER(microtan_state::via_1_out_a)
 {
-	LOG(("via_1_out_a %02X\n", data));
+	LOG("via_1_out_a %02X\n", data);
 }
 
 WRITE8_MEMBER(microtan_state::via_1_out_b)
 {
-	LOG(("via_1_out_b %02X\n", data));
+	LOG("via_1_out_b %02X\n", data);
 }
 
 WRITE_LINE_MEMBER(microtan_state::via_1_out_ca2)
 {
-	LOG(("via_1_out_ca2 %d\n", state));
+	LOG("via_1_out_ca2 %d\n", state);
 }
 
 WRITE_LINE_MEMBER(microtan_state::via_1_out_cb2)
 {
-	LOG(("via_1_out_cb2 %d\n", state));
-}
-
-WRITE_LINE_MEMBER(microtan_state::via_1_irq)
-{
-	LOG(("via_1_irq %d\n", state));
-	m_via_irq_line[1] = state;
-	set_irq_line();
+	LOG("via_1_out_cb2 %d\n", state);
 }
 
 void microtan_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -236,7 +208,7 @@ TIMER_CALLBACK_MEMBER(microtan_state::read_cassette)
 {
 	double level = m_cassette->input();
 
-	LOG(("read_cassette: %g\n", level));
+	LOG("read_cassette: %g\n", level);
 	if (level < -0.07)
 		m_via6522[0]->write_cb2(0);
 	else if (level > +0.07)
@@ -246,13 +218,13 @@ TIMER_CALLBACK_MEMBER(microtan_state::read_cassette)
 READ8_MEMBER(microtan_state::sound_r)
 {
 	int data = 0xff;
-	LOG(("sound_r: -> %02x\n", data));
+	LOG("sound_r: -> %02x\n", data);
 	return data;
 }
 
 WRITE8_MEMBER(microtan_state::sound_w)
 {
-	LOG(("sound_w: <- %02x\n", data));
+	LOG("sound_w: <- %02x\n", data);
 }
 
 
@@ -263,17 +235,17 @@ READ8_MEMBER(microtan_state::bffx_r)
 	{
 	case  0: /* BFF0: read enables chunky graphics */
 		m_chunky_graphics = 1;
-		LOG(("bff0_r: -> %02x (chunky graphics on)\n", data));
+		LOG("bff0_r: -> %02x (chunky graphics on)\n", data);
 		break;
 	case  1: /* BFF1: read undefined (?) */
-		LOG(("bff1_r: -> %02x\n", data));
+		LOG("bff1_r: -> %02x\n", data);
 		break;
 	case  2: /* BFF2: read undefined (?) */
-		LOG(("bff2_r: -> %02x\n", data));
+		LOG("bff2_r: -> %02x\n", data);
 		break;
 	default: /* BFF3: read keyboard ASCII value */
 		data = m_keyboard_ascii;
-		LOG(("bff3_r: -> %02x (keyboard ASCII)\n", data));
+		LOG("bff3_r: -> %02x (keyboard ASCII)\n", data);
 	}
 	return data;
 }
@@ -291,31 +263,29 @@ WRITE8_MEMBER(microtan_state::bffx_w)
 	{
 	case 0: /* BFF0: write reset keyboard interrupt flag */
 		/* This removes bit 7 from the ASCII value of the last key pressed. */
-		LOG(("bff0_w: %d <- %02x (keyboard IRQ clear )\n", offset, data));
+		LOG("bff0_w: %d <- %02x (keyboard IRQ clear )\n", offset, data);
 		m_keyboard_ascii &= ~0x80;
-		m_kbd_irq_line = CLEAR_LINE;
-		set_irq_line();
+		m_irq_line->in_w<IRQ_KBD>(0);
 		break;
 	case 1: /* BFF1: write delayed NMI */
-		LOG(("bff1_w: %d <- %02x (delayed NMI)\n", offset, data));
+		LOG("bff1_w: %d <- %02x (delayed NMI)\n", offset, data);
 		m_pulse_nmi_timer->adjust(m_maincpu->cycles_to_attotime(8));
 		break;
 	case 2: /* BFF2: write keypad column write (what is this meant for?) */
-		LOG(("bff2_w: %d <- %02x (keypad column)\n", offset, data));
+		LOG("bff2_w: %d <- %02x (keypad column)\n", offset, data);
 		m_keypad_column = data;
 		break;
 	default: /* BFF3: write disable chunky graphics */
-		LOG(("bff3_w: %d <- %02x (chunky graphics off)\n", offset, data));
+		LOG("bff3_w: %d <- %02x (chunky graphics off)\n", offset, data);
 		m_chunky_graphics = 0;
 	}
 }
 
 void microtan_state::store_key(int key)
 {
-	LOG(("microtan: store key '%c'\n", key));
+	LOG("microtan: store key '%c'\n", key);
 	m_keyboard_ascii = key | 0x80;
-	m_kbd_irq_line = ASSERT_LINE;
-	set_irq_line();
+	m_irq_line->in_w<IRQ_KBD>(1);
 }
 
 INTERRUPT_GEN_MEMBER(microtan_state::interrupt)
@@ -509,8 +479,6 @@ void microtan_state::machine_start()
 	save_item(NAME(m_chunky_graphics));
 	save_item(NAME(m_keypad_column));
 	save_item(NAME(m_keyboard_ascii));
-	save_item(NAME(m_via_irq_line));
-	save_item(NAME(m_kbd_irq_line));
 	save_item(NAME(m_keyrows));
 	save_item(NAME(m_lastrow));
 	save_item(NAME(m_mask));

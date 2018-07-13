@@ -66,6 +66,8 @@ enum
 DEFINE_DEVICE_TYPE(I8255, i8255_device, "i8255", "Intel 8255 PPI")
 decltype(I8255) I8255A = I8255;
 
+DEFINE_DEVICE_TYPE(AMS40489_PPI, ams40489_ppi_device, "ams40489_ppi", "Amstrad AMS40489 PPI")
+
 
 //**************************************************************************
 //  INLINE HELPERS
@@ -258,8 +260,8 @@ inline int i8255_device::port_c_upper_mode()
 //  i8255_device - constructor
 //-------------------------------------------------
 
-i8255_device::i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I8255, tag, owner, clock),
+i8255_device::i8255_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		m_in_pa_cb(*this),
 		m_in_pb_cb(*this),
 		m_in_pc_cb(*this),
@@ -271,6 +273,11 @@ i8255_device::i8255_device(const machine_config &mconfig, const char *tag, devic
 {
 	m_intr[PORT_A] = m_intr[PORT_B] = 0;
 	m_control = 0;
+}
+
+i8255_device::i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i8255_device(mconfig, I8255, tag, owner, clock)
+{
 }
 
 //-------------------------------------------------
@@ -299,6 +306,10 @@ void i8255_device::device_start()
 	save_item(NAME(m_inte1));
 	save_item(NAME(m_inte2));
 	save_item(NAME(m_intr));
+	
+	m_force_portb_in = false;
+	m_force_portc_out = false;
+	m_dont_clear_output_latches = false;
 }
 
 
@@ -651,8 +662,18 @@ void i8255_device::set_mode(uint8_t data)
 {
 	m_control = data;
 
+	if(m_force_portb_in)
+		m_control = m_control | CONTROL_PORT_B_INPUT;
+
+	if(m_force_portc_out)
+	{
+		m_control = m_control & ~CONTROL_PORT_C_UPPER_INPUT;
+		m_control = m_control & ~CONTROL_PORT_C_LOWER_INPUT;
+	}
+	
 	// group A
-	m_output[PORT_A] = 0;
+	if(!m_dont_clear_output_latches)
+		m_output[PORT_A] = 0;
 	m_input[PORT_A] = 0;
 	m_ibf[PORT_A] = 0;
 	m_obf[PORT_A] = 1;
@@ -678,7 +699,8 @@ void i8255_device::set_mode(uint8_t data)
 	LOG("I8255 Port C Lower Mode: %s\n", (port_c_lower_mode() == MODE_OUTPUT) ? "output" : "input");
 
 	// group B
-	m_output[PORT_B] = 0;
+	if(!m_dont_clear_output_latches)
+		m_output[PORT_B] = 0;
 	m_input[PORT_B] = 0;
 	m_ibf[PORT_B] = 0;
 	m_obf[PORT_B] = 1;
@@ -694,7 +716,8 @@ void i8255_device::set_mode(uint8_t data)
 		m_out_pb_cb((offs_t)0, m_tri_pb_cb(0));
 	}
 
-	m_output[PORT_C] = 0;
+	if(!m_dont_clear_output_latches)
+		m_output[PORT_C] = 0;
 	m_input[PORT_C] = 0;
 
 	output_pc();
@@ -999,4 +1022,22 @@ WRITE_LINE_MEMBER( i8255_device::pc6_w )
 			set_obf(PORT_A, 1);
 		}
 	}
+}
+
+
+// AMS40489 (Amstrad Plus/GX4000 ASIC PPI implementation)
+ams40489_ppi_device::ams40489_ppi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i8255_device(mconfig,AMS40489_PPI,tag,owner,clock)
+{
+}
+
+void ams40489_ppi_device::device_reset() { i8255_device::device_reset(); }
+
+void ams40489_ppi_device::device_start()
+{
+	i8255_device::device_start();
+	
+	m_force_portb_in = true;
+	m_force_portc_out = true;
+	m_dont_clear_output_latches = true;
 }

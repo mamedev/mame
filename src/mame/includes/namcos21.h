@@ -3,6 +3,10 @@
 /**
  * @file namcos21.h
  */
+#ifndef MAME_INCLUDES_NAMCOS21_H
+#define MAME_INCLUDES_NAMCOS21_H
+
+#pragma once
 
 #include "namcos2.h"
 #include "machine/namcoio_gearbox.h"
@@ -45,8 +49,8 @@ struct edge
 class namcos21_state : public namcos2_shared_state
 {
 public:
-	namcos21_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcos2_shared_state(mconfig, type, tag),
+	namcos21_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos2_shared_state(mconfig, type, tag),
 		m_master_dsp_code(*this,"master_dsp_code"),
 		m_winrun_dspbios(*this,"winrun_dspbios"),
 		m_winrun_polydata(*this,"winrun_polydata"),
@@ -57,7 +61,7 @@ public:
 		m_dsp(*this, "dsp"),
 		m_io_gearbox(*this, "gearbox"),
 		m_gpu_intc(*this, "gpu_intc")
-		{ }
+	{ }
 
 	void configure_c148_standard(machine_config &config);
 	void driveyes(machine_config &config);
@@ -221,3 +225,5 @@ private:
 	void winrun_master_map(address_map &map);
 	void winrun_slave_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NAMCOS21_H

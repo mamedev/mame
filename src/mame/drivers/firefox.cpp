@@ -698,8 +698,8 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram_1c")
-	MCFG_X2212_ADD_AUTOSAVE("nvram_1d")
+	X2212(config, "nvram_1c").set_auto_save(true);
+	X2212(config, "nvram_1d").set_auto_save(true);
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_XTAL/8)
 	MCFG_RIOT6532_IN_PA_CB(READ8(*this, firefox_state, riot_porta_r))

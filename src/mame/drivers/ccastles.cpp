@@ -451,8 +451,8 @@ MACHINE_CONFIG_START(ccastles_state::ccastles)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram_4b")
-	MCFG_X2212_ADD_AUTOSAVE("nvram_4a")
+	X2212(config, "nvram_4b").set_auto_save(true);
+	X2212(config, "nvram_4a").set_auto_save(true);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ccastles)

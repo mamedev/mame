@@ -9,12 +9,15 @@ inline void pgm2_state::draw_sprite_pixel(uint32_t* dst, uint8_t* dstpri, const 
 {
 	if (cliprect.contains(realx, realy))
 	{
-		uint16_t pix = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
-		if ((!(dstpri[realx] & 2)) || (!pri)) // sprite is 1/3, bg is 2
+		if (!(dstpri[realx] & 1))
 		{
-			dst[realx] = pen[pix];
+			uint16_t pix = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
+			if ((!(dstpri[realx] & 2)) || (!pri)) // sprite is 1/3, bg is 2
+			{
+				dst[realx] = pen[pix];
+			}
+			dstpri[realx] |= 1;
 		}
-		dstpri[realx] |= 1;
 	}
 }
 
@@ -108,8 +111,7 @@ inline void pgm2_state::skip_sprite_chunk(int &palette_offset, uint32_t maskdata
 inline void pgm2_state::draw_sprite_line(bitmap_rgb32 &bitmap, bitmap_ind8 &primap, const rectangle &cliprect, const pen_t *pen, int &mask_offset,
                                          int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pri, int zoomybit, int zoomx_bits, int xrepeats)
 {
-	if ((realy < cliprect.min_y) && (realy > cliprect.max_y))
-		return;
+	assert((realy >= cliprect.min_y) && (realy <= cliprect.max_y));
 
 	uint32_t *dst = &bitmap.pix32(realy);
 	uint8_t *dstpri = &primap.pix8(realy);
@@ -158,26 +160,26 @@ inline void pgm2_state::draw_sprite_line(bitmap_rgb32 &bitmap, bitmap_ind8 &prim
 
 void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap, const uint32_t* spriteram)
 {
-	//printf("frame\n");
+	//logerror("frame\n");
 
 	int endoflist = -1;
 
-	//printf("frame\n");
+	//logerror("frame\n");
 
 	for (int i = 0; i < m_sp_videoram.bytes() / 4; i += 4)
 	{
 		if (spriteram[i + 2] & 0x80000000)
 		{
-			endoflist = i;
+			endoflist = i - 4;
 			break;
 		}
 	}
 
-	if (endoflist != -1)
+	if (endoflist >= 0)
 	{
-		for (int i = 0; i < endoflist - 2; i += 4)
+		for (int i = endoflist; i >= 0; i -= 4)
 		{
-			//printf("sprite with %08x %08x %08x %08x\n", spriteram[i + 0], spriteram[i + 1], spriteram[i + 2], spriteram[i + 3]);
+			//logerror("sprite with %08x %08x %08x %08x\n", spriteram[i + 0], spriteram[i + 1], spriteram[i + 2], spriteram[i + 3]);
 
 			int x = (spriteram[i + 0] & 0x000007ff) >> 0;
 			int y = (spriteram[i + 0] & 0x003ff800) >> 11;
@@ -273,7 +275,7 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 	}
 }
 
-uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t pgm2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int mode = m_vidmode[0] & 0x00030000; // other bits not used?
 
@@ -309,7 +311,7 @@ uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
-WRITE_LINE_MEMBER(pgm2_state::screen_vblank_pgm2)
+WRITE_LINE_MEMBER(pgm2_state::screen_vblank)
 {
 	// rising edge
 	if (state)

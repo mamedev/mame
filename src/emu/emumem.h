@@ -240,15 +240,12 @@ template<int Width, int AddrShift, int Endian> class memory_units_descriptor;
 
 // =====================-> Address segmentation for the search tree
 
-static inline constexpr int handler_entry_dispatch_lowbits(int highbits, int width, int ashift)
+constexpr int handler_entry_dispatch_lowbits(int highbits, int width, int ashift)
 {
-	if(highbits > 48)
-		return 48;
-	if(highbits > 32)
-		return 32;
-	if(highbits > 14)
-		return 14;
-	return width + ashift;
+	return (highbits > 48) ? 48 :
+		(highbits > 32) ? 32 :
+		(highbits > 14) ? 14 :
+		width + ashift;
 }
 
 

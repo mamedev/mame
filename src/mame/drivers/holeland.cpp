@@ -306,19 +306,19 @@ MACHINE_CONFIG_START(holeland_state::holeland)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 20000000/32) /* verified on PCB */
+	MCFG_DEVICE_ADD("ay1", AY8910, 20000000 / 32) /* verified on PCB */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 20000000/16) /* verified on PCB */
+	MCFG_DEVICE_ADD("ay2", AY8910, 20000000 / 16) /* verified on PCB */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD("speech", SP0256, 3355700) /* measured 298ns on PCB */
-	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	sp0256_device &speech(SP0256(config, "speech", 3355700)); /* measured 298ns on PCB */
+	speech.data_request_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	speech.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /*

@@ -51,64 +51,13 @@ public:
 		m_tx_palette(*this, "tx_palette"),
 		m_mcu_timer(*this, "mcu_timer"),
 		m_maindata(*this, "maindata"),
-		m_memcard(*this, "memcard_p%u", 1U) { }
-
-	DECLARE_READ32_MEMBER(unk_startup_r);
-	DECLARE_READ32_MEMBER(rtc_r);
-	DECLARE_READ32_MEMBER(mcu_r);
-	DECLARE_WRITE32_MEMBER(fg_videoram_w);
-	DECLARE_WRITE32_MEMBER(bg_videoram_w);
-	DECLARE_WRITE32_MEMBER(mcu_w);
-	DECLARE_WRITE16_MEMBER(share_bank_w);
-	DECLARE_READ8_MEMBER(shareram_r);
-	DECLARE_WRITE8_MEMBER(shareram_w);
-	DECLARE_WRITE16_MEMBER(vbl_ack_w);
-	DECLARE_WRITE16_MEMBER(unk30120014_w);
-
-	DECLARE_WRITE32_MEMBER(pio_sodr_w);
-	DECLARE_WRITE32_MEMBER(pio_codr_w);
-	DECLARE_READ32_MEMBER(pio_pdsr_r);
-	DECLARE_WRITE16_MEMBER(module_rom_w);
-	DECLARE_READ16_MEMBER(module_rom_r);
-	DECLARE_READ_LINE_MEMBER(module_data_r);
-	DECLARE_WRITE_LINE_MEMBER(module_data_w);
-	DECLARE_WRITE_LINE_MEMBER(module_clk_w);
-
-	DECLARE_READ32_MEMBER(orleg2_speedup_r);
-	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
-	DECLARE_READ32_MEMBER(kof98umh_speedup_r);
-	DECLARE_READ32_MEMBER(ddpdojt_speedup_r);
-	DECLARE_READ32_MEMBER(ddpdojt_speedup2_r);
-	DECLARE_READ32_MEMBER(kov3_speedup_r);
-
-	DECLARE_READ8_MEMBER(encryption_r);
-	DECLARE_WRITE8_MEMBER(encryption_w);
-	DECLARE_WRITE32_MEMBER(encryption_do_w);
-	DECLARE_WRITE32_MEMBER(sprite_encryption_w);
-
-	void init_kov2nl();
-	void init_orleg2();
-	void init_ddpdojt();
-	void init_kov3();
-	void init_kov3_104();
-	void init_kov3_102();
-	void init_kov3_101();
-	void init_kov3_100();
-	void init_kof98umh();
-
-	uint32_t screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
+		m_memcard(*this, "memcard_p%u", 1U)
+	{ }
 
 	void pgm2_ramrom(machine_config &config);
 	void pgm2_lores(machine_config &config);
 	void pgm2(machine_config &config);
 	void pgm2_hires(machine_config &config);
-	void pgm2_map(address_map &map);
-	void pgm2_module_rom_map(address_map &map);
-	void pgm2_ram_rom_map(address_map &map);
-	void pgm2_rom_map(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -187,6 +136,59 @@ private:
 	required_memory_region m_maindata;
 
 	optional_device_array<pgm2_memcard_device, 4> m_memcard;
+
+	DECLARE_READ32_MEMBER(unk_startup_r);
+	DECLARE_READ32_MEMBER(rtc_r);
+	DECLARE_READ32_MEMBER(mcu_r);
+	DECLARE_WRITE32_MEMBER(fg_videoram_w);
+	DECLARE_WRITE32_MEMBER(bg_videoram_w);
+	DECLARE_WRITE32_MEMBER(mcu_w);
+	DECLARE_WRITE16_MEMBER(share_bank_w);
+	DECLARE_READ8_MEMBER(shareram_r);
+	DECLARE_WRITE8_MEMBER(shareram_w);
+	DECLARE_WRITE16_MEMBER(vbl_ack_w);
+	DECLARE_WRITE16_MEMBER(unk30120014_w);
+
+	DECLARE_WRITE32_MEMBER(pio_sodr_w);
+	DECLARE_WRITE32_MEMBER(pio_codr_w);
+	DECLARE_READ32_MEMBER(pio_pdsr_r);
+	DECLARE_WRITE16_MEMBER(module_rom_w);
+	DECLARE_READ16_MEMBER(module_rom_r);
+	DECLARE_READ_LINE_MEMBER(module_data_r);
+	DECLARE_WRITE_LINE_MEMBER(module_data_w);
+	DECLARE_WRITE_LINE_MEMBER(module_clk_w);
+
+	DECLARE_READ32_MEMBER(orleg2_speedup_r);
+	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
+	DECLARE_READ32_MEMBER(kof98umh_speedup_r);
+	DECLARE_READ32_MEMBER(ddpdojt_speedup_r);
+	DECLARE_READ32_MEMBER(ddpdojt_speedup2_r);
+	DECLARE_READ32_MEMBER(kov3_speedup_r);
+
+	DECLARE_READ8_MEMBER(encryption_r);
+	DECLARE_WRITE8_MEMBER(encryption_w);
+	DECLARE_WRITE32_MEMBER(encryption_do_w);
+	DECLARE_WRITE32_MEMBER(sprite_encryption_w);
+
+	void init_kov2nl();
+	void init_orleg2();
+	void init_ddpdojt();
+	void init_kov3();
+	void init_kov3_104();
+	void init_kov3_102();
+	void init_kov3_101();
+	void init_kov3_100();
+	void init_kof98umh();
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
+
+	void pgm2_map(address_map &map);
+	void pgm2_module_rom_map(address_map &map);
+	void pgm2_ram_rom_map(address_map &map);
+	void pgm2_rom_map(address_map &map);
 };
 
 #endif

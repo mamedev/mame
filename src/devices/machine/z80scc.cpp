@@ -2594,11 +2594,27 @@ void z80scc_channel::data_write(uint8_t data)
 		{
 			LOGTX("- TX FIFO has only one slot so is now completelly filled, clearing TBE bit\n");
 			m_rr0 &= ~RR0_TX_BUFFER_EMPTY; // If only one FIFO position it is full now!
+
+			LOGINT("Single-slot TX FIFO no longer empty, clearing TBE interrupt\n");
+			m_tx_int_disarm = 1;
+			m_uart->m_int_state[INT_TRANSMIT_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
+			// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
+			m_uart->m_chanA->m_rr3 &= ~(1 << (INT_TRANSMIT_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0)));
+			// Update interrupt line
+			m_uart->check_interrupts();
 		}
 		else if (m_tx_fifo_wp + 1 == m_tx_fifo_rp || ( (m_tx_fifo_wp + 1 == m_tx_fifo_sz) && (m_tx_fifo_rp == 0) ))
 		{
 			LOGTX("- TX FIFO has filled all slots so now completelly filled, clearing TBE bit\n");
 			m_rr0 &= ~RR0_TX_BUFFER_EMPTY; // Indicate that the TX fifo is full
+
+			LOGINT("Multi-slot TX FIFO no longer empty, clearing TBE interrupt\n");
+			m_tx_int_disarm = 1;
+			m_uart->m_int_state[INT_TRANSMIT_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
+			// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
+			m_uart->m_chanA->m_rr3 &= ~(1 << (INT_TRANSMIT_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0)));
+			// Update interrupt line
+			m_uart->check_interrupts();
 		}
 		else
 		{
@@ -2647,31 +2663,10 @@ void z80scc_channel::data_write(uint8_t data)
 		{
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
 		}
-		/*
-			RB July 1, 2018: This breaks the Apple IIgs SCC MIDI driver.  The driver does this with interrupts off:
-
-			sta SCCdata,x           ; send the byte
-			lda SCCcommand,x        ; try to do another character
-			bit #$04                ; transmitter empty?
-			beq done                ; if not, don't do this
-			jsl getNextByte         ; get the next byte to send
-			bcs nochar              ; there isn't one?
-			sta SCCdata,x           ; send a second byte
-
-			The first byte write with this behavior raises a TX_BUFFER_EMPTY interrupt, but interrupts are off here.
-			Because TX_BUFFER_EMPTY is asserted at the "try to do another character" it sends a second byte.  The second 
-			byte turns OFF the TX_BUFFER_EMPTY flag, so when interrupts are re-enabled and the interrupt fires, the
-			code has no idea why it fired and the system locks up.
-
-			Also, this behavior contradicted the comment above: we are an NMOS/CMOS part and on the first write
-			the transmit buffer is not full, so this interrupt should not be raised here.
-		*/
-		#if 0
 		else if(m_rr0 & RR0_TX_BUFFER_EMPTY)  // Check TBE bit and interrupt if one or more FIFO slots available
 		{
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
 		}
-		#endif
 	}
 }
 

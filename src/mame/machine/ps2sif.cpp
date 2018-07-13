@@ -66,8 +66,8 @@ READ32_MEMBER(ps2_sif_device::ee_r)
 			break;
 		case 6:
 			ret = m_sm_flag;
-			if (ret != 0)
-				logerror("%s: ee_r: SIF slave->master flag (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//if (ret != 0)
+				//logerror("%s: ee_r: SIF slave->master flag (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 8:
 			ret = m_ctrl | 0xF0000102;

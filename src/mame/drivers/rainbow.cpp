@@ -3306,9 +3306,9 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
-	MCFG_DEVICE_ADD("dbrg", COM8116_003, 24.0734_MHz_XTAL / 4) // 6.01835 MHz (nominally 6 MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, rainbow_state, dbrg_fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(*this, rainbow_state, dbrg_ft_w))
+	COM8116_003(config, m_dbrg, 24.0734_MHz_XTAL / 4); // 6.01835 MHz (nominally 6 MHz)
+	m_dbrg->fr_handler().set(FUNC(rainbow_state::dbrg_fr_w));
+	m_dbrg->ft_handler().set(FUNC(rainbow_state::dbrg_ft_w));
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 24.0734_MHz_XTAL / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
 	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, rainbow_state, mpsc_irq))
