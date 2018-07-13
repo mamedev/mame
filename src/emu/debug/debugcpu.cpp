@@ -2841,9 +2841,9 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	if (end != rend)
 	{
 		if (endian == ENDIANNESS_LITTLE)
-			emask &= make_bitmask<u64>((rend + subamask + 1 - end) * unit_size);
+			emask &= make_bitmask<u64>((subamask + 1 + end - rend) * unit_size);
 		else
-			emask &= ~make_bitmask<u64>((end - rend) * unit_size);
+			emask &= ~make_bitmask<u64>((rend - end) * unit_size);
 	}
 
 	if (rend == (rstart | subamask) || smask == emask)
