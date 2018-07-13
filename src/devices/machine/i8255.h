@@ -74,7 +74,7 @@ class i8255_device : public device_t
 {
 public:
 	// construction/destruction
-	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool is_ams40489 = false);
+	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_in_pa_callback(Object &&cb)  { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
@@ -107,9 +107,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc6_w );
 
 protected:
-	i8255_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_ams40489 = false);
+	i8255_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_ams40489);
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -170,14 +171,6 @@ class ams40489_ppi_device : public i8255_device
 public:
 	// construction/destruction
 	ams40489_ppi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-//	ams40489_ppi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	
 };
 
 // device type definition
