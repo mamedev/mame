@@ -993,8 +993,8 @@ MACHINE_CONFIG_START(namcona1_state::namcona1)
 
 	C140(config, m_c140, 44100);
 	m_c140->set_bank_type(c140_device::C140_TYPE::ASIC219);
-	m_c140->add_route(0, "lspeaker", 1.00);
-	m_c140->add_route(1, "rspeaker", 1.00);
+	m_c140->add_route(0, "rspeaker", 1.00);
+	m_c140->add_route(1, "lspeaker", 1.00);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcona2_state::namcona2)
