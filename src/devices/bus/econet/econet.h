@@ -59,6 +59,8 @@ public:
 
 	template <class Object> devcb_base &set_clk_wr_callback(Object &&cb) { return m_write_clk.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_data_wr_callback(Object &&cb) { return m_write_data.set_callback(std::forward<Object>(cb)); }
+	auto clk_wr_callback() { return m_write_clk.bind(); }
+	auto data_wr_callback() { return m_write_data.bind(); }
 
 	void add_device(device_t *target, int address);
 

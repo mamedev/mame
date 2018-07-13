@@ -241,9 +241,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(canyon_state::canyon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'096'000) / 16)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 16)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", canyon_state,  nmi_line_pulse)
 
 	MCFG_DEVICE_ADD("outlatch", F9334, 0) // C7
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("discrete", discrete_device, write_line<CANYON_WHISTLE1_EN>))
@@ -258,12 +257,10 @@ MACHINE_CONFIG_START(canyon_state::canyon)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(22 * 1000000 / 15750))
-	MCFG_SCREEN_SIZE(256, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240) // HSYNC = 15,750 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(canyon_state, screen_update_canyon)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", m6502_device::NMI_LINE))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_canyon)
 	MCFG_PALETTE_ADD("palette", 4)

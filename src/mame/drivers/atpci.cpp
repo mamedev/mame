@@ -43,7 +43,7 @@ private:
 WRITE8_MEMBER(at586_state::boot_state_w)
 {
 	logerror("Boot state %02x\n", data);
-	printf("[%02x]",data);
+	printf("[%02X]",data);
 }
 
 void at586_state::tx_config(device_t *device)

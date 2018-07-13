@@ -1315,7 +1315,7 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, wangpc_state, pit2_w))
 
 	MCFG_IM6402_ADD(IM6402_TAG, 62500*16, 62500*16)
-	MCFG_IM6402_TRO_CALLBACK(WRITELINE(WANGPC_KEYBOARD_TAG, wangpc_keyboard_device, write_rxd))
+	MCFG_IM6402_TRO_CALLBACK(WRITELINE("wangpckb", wangpc_keyboard_device, write_rxd))
 	MCFG_IM6402_DR_CALLBACK(WRITELINE(*this, wangpc_state, uart_dr_w))
 	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(*this, wangpc_state, uart_tbre_w))
 
@@ -1332,21 +1332,20 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, wangpc_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, wangpc_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, wangpc_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, wangpc_state, write_centronics_perror))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer");
+	m_centronics->set_data_input_buffer(m_cent_data_in);
+	m_centronics->ack_handler().set(FUNC(wangpc_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(wangpc_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(wangpc_state::write_centronics_fault));
+	m_centronics->perror_handler().set(FUNC(wangpc_state::write_centronics_perror));
 
-	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, m_cent_data_in);
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(SCN2661_TAG, mc2661_device, rx_w))
 
-	MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
-	MCFG_WANGPCKB_TXD_HANDLER(WRITELINE(IM6402_TAG, im6402_device, write_rri))
+	WANGPC_KEYBOARD(config, "wangpckb").txd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 
 	// bus
 	MCFG_WANGPC_BUS_ADD()

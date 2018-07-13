@@ -7,19 +7,6 @@
 
 #pragma once
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C140_ADD(tag, clock) \
-	MCFG_DEVICE_ADD((tag), C140, (clock))
-
-#define MCFG_C140_REPLACE(tag, clock) \
-	MCFG_DEVICE_REPLACE((tag), C140, (clock))
-
-#define MCFG_C140_BANK_TYPE(type) \
-	downcast<c140_device &>(*device).set_bank_type((c140_device::C140_TYPE::type));
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS

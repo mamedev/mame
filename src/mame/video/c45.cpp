@@ -77,15 +77,16 @@ void namco_c45_road_device::map(address_map &map)
 //  namco_c45_road_device -- constructor
 //-------------------------------------------------
 
-namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C45_ROAD, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, gfxinfo),
-		device_memory_interface(mconfig, *this),
-		m_space_config("c45", ENDIANNESS_BIG, 16, 17, 0, address_map_constructor(FUNC(namco_c45_road_device::map), this)),
-		m_tmapram(*this, "tmapram"),
-		m_tileram(*this, "tileram"),
-		m_lineram(*this, "lineram"),
-		m_transparent_color(~0)
+namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NAMCO_C45_ROAD, tag, owner, clock),
+	device_gfx_interface(mconfig, *this, gfxinfo),
+	device_memory_interface(mconfig, *this),
+	m_space_config("c45", ENDIANNESS_BIG, 16, 17, 0, address_map_constructor(FUNC(namco_c45_road_device::map), this)),
+	m_tmapram(*this, "tmapram"),
+	m_tileram(*this, "tileram"),
+	m_lineram(*this, "lineram"),
+	m_clut(*this, "clut"),
+	m_transparent_color(~0)
 {
 }
 
@@ -232,9 +233,6 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void namco_c45_road_device::device_start()
 {
-	if (memregion("clut") != nullptr)
-		m_clut = memregion("clut")->base();
-
 	// create a tilemap for the road
 	m_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
 		TILEMAP_SCAN_ROWS, ROAD_TILE_SIZE, ROAD_TILE_SIZE, ROAD_COLS, ROAD_ROWS);

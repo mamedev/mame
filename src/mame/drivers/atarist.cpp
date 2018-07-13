@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "includes/atarist.h"
 #include "machine/clock.h"
+#include "machine/input_merger.h"
 #include "bus/midi/midi.h"
 #include "video/atarist.h"
 #include "screen.h"
@@ -1773,21 +1774,6 @@ WRITE_LINE_MEMBER( st_state::ikbd_tx_w )
 	m_ikbd_tx = state;
 }
 
-WRITE_LINE_MEMBER( st_state::acia_ikbd_irq_w )
-{
-	m_acia_ikbd_irq = state;
-
-	m_mfp->i4_w(!(m_acia_ikbd_irq || m_acia_midi_irq));
-}
-
-
-WRITE_LINE_MEMBER( st_state::acia_midi_irq_w )
-{
-	m_acia_midi_irq = state;
-
-	m_mfp->i4_w(!(m_acia_ikbd_irq || m_acia_midi_irq));
-}
-
 WRITE_LINE_MEMBER(st_state::write_acia_clock)
 {
 	m_acia0->write_txc(state);
@@ -1880,8 +1866,6 @@ void st_state::state_save()
 	save_item(NAME(m_ikbd_tx));
 	save_item(NAME(m_ikbd_joy));
 	save_item(NAME(m_midi_tx));
-	save_item(NAME(m_acia_ikbd_irq));
-	save_item(NAME(m_acia_midi_irq));
 }
 
 //-------------------------------------------------
@@ -2082,11 +2066,14 @@ MACHINE_CONFIG_START(st_state::st)
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_ikbd_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_midi_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+
+	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
+	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
@@ -2173,11 +2160,14 @@ MACHINE_CONFIG_START(megast_state::megast)
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_ikbd_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_midi_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+
+	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
+	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
@@ -2272,11 +2262,14 @@ MACHINE_CONFIG_START(ste_state::ste)
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_ikbd_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_midi_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+
+	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
+	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
@@ -2379,11 +2372,14 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	// device hardware
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, st_state, ikbd_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_ikbd_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, st_state, acia_midi_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("aciairq", input_merger_device, in_w<1>))
+
+	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
+	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))

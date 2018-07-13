@@ -789,24 +789,29 @@ void interpro_state::interpro_cdrom(device_t *device)
 	downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
 }
 
-MACHINE_CONFIG_START(interpro_state::ioga)
+void interpro_state::ioga(machine_config &config)
+{
 	m_ioga->out_nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ioga->out_irq_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ioga->out_irq_vector_callback().set(m_maincpu, FUNC(clipper_device::set_ivec));
 
 	// ioga dma and serial dma channels
-	MCFG_DEVICE_MODIFY(INTERPRO_IOGA_TAG);
-	//MCFG_INTERPRO_IOGA_DMA_CB(0, unknown) // plotter
-	MCFG_INTERPRO_IOGA_DMA_CB(1, READ8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, mdma_r), WRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, mdma_w))
-	MCFG_INTERPRO_IOGA_DMA_CB(2, READ8(m_fdc, upd765_family_device, mdma_r), WRITE8(m_fdc, upd765_family_device, mdma_w))
-	MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(0, READ8(m_scc2, z80scc_device, db_r), WRITE8(m_scc2, z80scc_device, db_w))
-	MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(1, READ8(m_scc1, z80scc_device, da_r), WRITE8(m_scc1, z80scc_device, da_w))
-	MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(2, READ8(m_scc1, z80scc_device, db_r), WRITE8(m_scc1, z80scc_device, db_w))
+	//m_ioga->dma_r_callback<0>().set(unknown); // plotter
+	m_ioga->dma_r_callback<1>().set(INTERPRO_SCSI_DEVICE_TAG, FUNC(ncr53c90a_device::mdma_r));
+	m_ioga->dma_w_callback<1>().set(INTERPRO_SCSI_DEVICE_TAG, FUNC(ncr53c90a_device::mdma_w));
+	m_ioga->dma_r_callback<2>().set(m_fdc, FUNC(upd765_family_device::mdma_r));
+	m_ioga->dma_w_callback<2>().set(m_fdc, FUNC(upd765_family_device::mdma_w));
+	m_ioga->serial_dma_r_callback<0>().set(m_scc2, FUNC(z80scc_device::db_r));
+	m_ioga->serial_dma_w_callback<0>().set(m_scc2, FUNC(z80scc_device::db_w));
+	m_ioga->serial_dma_r_callback<1>().set(m_scc1, FUNC(z80scc_device::da_r));
+	m_ioga->serial_dma_w_callback<1>().set(m_scc1, FUNC(z80scc_device::da_w));
+	m_ioga->serial_dma_r_callback<2>().set(m_scc1, FUNC(z80scc_device::db_r));
+	m_ioga->serial_dma_w_callback<2>().set(m_scc1, FUNC(z80scc_device::db_w));
 
 	// ioga floppy terminal count, ethernet channel attention
-	MCFG_INTERPRO_IOGA_FDCTC_CB(WRITELINE(m_fdc, upd765_family_device, tc_line_w))
-	MCFG_INTERPRO_IOGA_ETH_CA_CB(WRITELINE(m_eth, i82586_base_device, ca))
-MACHINE_CONFIG_END
+	m_ioga->fdc_tc_callback().set(m_fdc, FUNC(upd765_family_device::tc_line_w));
+	m_ioga->eth_ca_callback().set(m_eth, FUNC(i82586_base_device::ca));
+}
 
 static INPUT_PORTS_START(interpro)
 INPUT_PORTS_END
@@ -907,8 +912,8 @@ MACHINE_CONFIG_START(emerald_state::emerald)
 	MCFG_DEVICE_ADDRESS_MAP(0, interpro_82586_map)
 
 	// i/o gate array
-	MCFG_DEVICE_ADD(m_ioga, EMERALD_IOGA, 0)
-	MCFG_INTERPRO_IOGA_MEMORY(INTERPRO_CPU_TAG, 0)
+	EMERALD_IOGA(config, m_ioga, 0);
+	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
 MACHINE_CONFIG_END
 
@@ -959,8 +964,8 @@ MACHINE_CONFIG_START(turquoise_state::turquoise)
 	MCFG_DEVICE_ADDRESS_MAP(0, interpro_82586_map)
 
 	// i/o gate array
-	MCFG_DEVICE_ADD(m_ioga, TURQUOISE_IOGA, 0)
-	MCFG_INTERPRO_IOGA_MEMORY(INTERPRO_CPU_TAG, 0)
+	TURQUOISE_IOGA(config, m_ioga, 0);
+	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
 
 	// cbus and slots
@@ -1017,8 +1022,8 @@ MACHINE_CONFIG_START(sapphire_state::sapphire)
 	MCFG_DEVICE_ADDRESS_MAP(0, interpro_82596_map)
 
 	// i/o gate array
-	MCFG_DEVICE_ADD(m_ioga, SAPPHIRE_IOGA, 0)
-	MCFG_INTERPRO_IOGA_MEMORY(INTERPRO_CPU_TAG, 0)
+	SAPPHIRE_IOGA(config, m_ioga, 0);
+	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
 
 	// flash memory

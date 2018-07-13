@@ -103,8 +103,8 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(s100_dj2db_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, 5.0688_MHz_XTAL)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, s100_dj2db_device, fr_w))
+	COM8116(config, m_dbrg, 5.0688_MHz_XTAL);
+	m_dbrg->fr_handler().set(FUNC(s100_dj2db_device::fr_w));
 
 	MCFG_DEVICE_ADD(MB8866_TAG, MB8866, 10_MHz_XTAL / 5)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, s100_dj2db_device, fdc_intrq_w))

@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(quantum_state::quantum)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(quantum_state, irq1_line_hold, CLOCK_3KHZ / 12)
 
-	MCFG_X2212_ADD("nvram") // "137288-001" in parts list and schematic diagram
+	X2212(config, "nvram"); // "137288-001" in parts list and schematic diagram
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
