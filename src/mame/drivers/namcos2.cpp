@@ -2143,8 +2143,8 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 
 	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
 	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
-	m_c140->add_route(0, "lspeaker", 0.75);
-	m_c140->add_route(1, "rspeaker", 0.75);
+	m_c140->add_route(0, "lspeaker", 1.0);
+	m_c140->add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 //  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
