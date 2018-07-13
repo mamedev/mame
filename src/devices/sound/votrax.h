@@ -26,6 +26,7 @@ public:
 	votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_ar_callback(Object &&cb) { return m_ar_cb.set_callback(std::forward<Object>(cb)); }
+	auto ar_callback() { return m_ar_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_WRITE8_MEMBER(inflection_w);

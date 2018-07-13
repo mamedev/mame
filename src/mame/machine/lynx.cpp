@@ -1299,35 +1299,31 @@ DISPCTL EQU $FD92       ; set to $D by INITMIKEY
 
 void lynx_state::lynx_draw_line()
 {
-	const pen_t *pen = m_palette->pens();
-	int x, y;
+	pen_t const *const pen = m_palette->pens();
 	uint16_t j; // clipping needed!
-	uint8_t byte;
-	uint16_t *line;
-
 
 	// calculate y: first three lines are vblank,
-	y = 101-m_timer[2].counter;
+	int const y = 101-m_timer[2].counter;
 	// Documentation states lower two bits of buffer address are ignored (thus 0xfffc mask)
 	j = (m_mikey.disp_addr & 0xfffc) + y * 160 / 2;
 
 	if (m_mikey.data[0x92] & 0x02)
 	{
 		j -= 160 * 102 / 2 - 1;
-		line = &m_bitmap_temp.pix32(102 - 1 - y);
-		for (x = 160 - 2; x >= 0; j++, x -= 2)
+		uint32_t *const line = &m_bitmap_temp.pix32(102 - 1 - y);
+		for (int x = 160 - 2; x >= 0; j++, x -= 2)
 		{
-			byte = lynx_read_ram(j);
+			uint8_t const byte = lynx_read_ram(j);
 			line[x + 1] = pen[(byte >> 4) & 0x0f];
 			line[x + 0] = pen[(byte >> 0) & 0x0f];
 		}
 	}
 	else
 	{
-		line = &m_bitmap_temp.pix32(y);
-		for (x = 0; x < 160; j++, x += 2)
+		uint32_t *const line = &m_bitmap_temp.pix32(y);
+		for (int x = 0; x < 160; j++, x += 2)
 		{
-			byte = lynx_read_ram(j);
+			uint8_t const byte = lynx_read_ram(j);
 			line[x + 0] = pen[(byte >> 4) & 0x0f];
 			line[x + 1] = pen[(byte >> 0) & 0x0f];
 		}
