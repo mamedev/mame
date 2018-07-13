@@ -34,7 +34,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_ram;
-	required_region_ptr<uint8_t> m_bios;
+	required_region_ptr<uint32_t> m_bios;
 	required_device<screen_device> m_screen;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -70,8 +70,7 @@ void iphone2g_state::mem_map(address_map &map)
 
 void iphone2g_state::machine_start()
 {
-	//Using memcpy, because for SOME reason, std::copy doesn't work here
-	memcpy((uint8_t*)m_ram.target(), (uint8_t*)m_bios.target(), 0x1000);
+	std::copy_n(m_bios.target(), m_bios.length(), m_ram.target());
 }
 
 void iphone2g_state::machine_reset()
@@ -90,7 +89,7 @@ MACHINE_CONFIG_START(iphone2g_state::iphone2g)
 MACHINE_CONFIG_END
 
 ROM_START(iphone2g)
-	ROM_REGION(0x10000, "bios", 0)
+	ROM_REGION32_LE(0x10000, "bios", 0)
 	ROM_LOAD("s5l8900-bootrom.bin", 0x00000, 0x10000, CRC(beb15cd1) SHA1(079a3acab577eb52cc349ea811af3cbd5d01b8f5))
 ROM_END
 
