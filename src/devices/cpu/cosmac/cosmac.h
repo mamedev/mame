@@ -441,7 +441,7 @@ protected:
 
 	// opcode/condition tables
 	typedef void (cosmac_device::*ophandler)();
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) = 0;
+	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const = 0;
 };
 
 
@@ -457,7 +457,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
+	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const override;
 
 	static const ophandler s_opcodetable[256];
 };
@@ -475,7 +475,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
+	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const override;
 
 	static const ophandler s_opcodetable[256];
 };

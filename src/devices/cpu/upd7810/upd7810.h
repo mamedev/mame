@@ -144,6 +144,19 @@ public:
 	template <class Object> devcb_base &set_an5_func(Object &&cb) { return m_an5_func.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_an6_func(Object &&cb) { return m_an6_func.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_an7_func(Object &&cb) { return m_an7_func.set_callback(std::forward<Object>(cb)); }
+	auto to_func() { return m_to_func.bind(); }
+	auto co0_func() { return m_co0_func.bind(); }
+	auto co1_func() { return m_co1_func.bind(); }
+	auto txd_func() { return m_txd_func.bind(); }
+	auto rxd_func() { return m_rxd_func.bind(); }
+	auto an0_func() { return m_an0_func.bind(); }
+	auto an1_func() { return m_an1_func.bind(); }
+	auto an2_func() { return m_an2_func.bind(); }
+	auto an3_func() { return m_an3_func.bind(); }
+	auto an4_func() { return m_an4_func.bind(); }
+	auto an5_func() { return m_an5_func.bind(); }
+	auto an6_func() { return m_an6_func.bind(); }
+	auto an7_func() { return m_an7_func.bind(); }
 
 	template <class Object> devcb_base &set_pa_in_cb(Object &&cb) { return m_pa_in_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_pb_in_cb(Object &&cb) { return m_pb_in_cb.set_callback(std::forward<Object>(cb)); }
@@ -155,8 +168,19 @@ public:
 	template <class Object> devcb_base &set_pc_out_cb(Object &&cb) { return m_pc_out_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_pd_out_cb(Object &&cb) { return m_pd_out_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_pf_out_cb(Object &&cb) { return m_pf_out_cb.set_callback(std::forward<Object>(cb)); }
+	auto pa_in_cb() { return m_pa_in_cb.bind(); }
+	auto pb_in_cb() { return m_pb_in_cb.bind(); }
+	auto pc_in_cb() { return m_pc_in_cb.bind(); }
+	auto pd_in_cb() { return m_pd_in_cb.bind(); }
+	auto pf_in_cb() { return m_pf_in_cb.bind(); }
+	auto pa_out_cb() { return m_pa_out_cb.bind(); }
+	auto pb_out_cb() { return m_pb_out_cb.bind(); }
+	auto pc_out_cb() { return m_pc_out_cb.bind(); }
+	auto pd_out_cb() { return m_pd_out_cb.bind(); }
+	auto pf_out_cb() { return m_pf_out_cb.bind(); }
 
 	template <class Object> devcb_base &set_pt_in_cb(Object &&cb) { return m_pt_in_cb.set_callback(std::forward<Object>(cb)); }
+	auto pt_in_cb() { return m_pt_in_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(pb_w);
@@ -164,10 +188,11 @@ public:
 	DECLARE_WRITE8_MEMBER(pd_w);
 	DECLARE_WRITE8_MEMBER(pf_w);
 
+protected:
 	void upd_internal_128_ram_map(address_map &map);
 	void upd_internal_256_ram_map(address_map &map);
 	void upd_internal_4096_rom_map(address_map &map);
-protected:
+
 	// flags
 	enum
 	{

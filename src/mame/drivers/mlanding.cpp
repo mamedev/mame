@@ -70,8 +70,8 @@
 class mlanding_state : public driver_device
 {
 public:
-	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mlanding_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_dsp(*this, "dsp"),
@@ -959,7 +959,7 @@ MACHINE_CONFIG_START(mlanding_state::mlanding)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_TAITOIO_YOKE_ADD("yokectrl")
+	TAITOIO_YOKE(config, m_yoke, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

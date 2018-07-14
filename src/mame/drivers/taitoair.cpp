@@ -728,7 +728,7 @@ MACHINE_CONFIG_START(taitoair_state::airsys)
 	m_tc0220ioc->write_4_callback().set(FUNC(taitoair_state::coin_control_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
-	MCFG_TAITOIO_YOKE_ADD("yokectrl")
+	TAITOIO_YOKE(config, m_yoke, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

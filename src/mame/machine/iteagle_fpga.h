@@ -60,6 +60,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_update);
 	DECLARE_WRITE8_MEMBER(serial_rx_w);
 
+	enum { IO_SYSTEM, IO_IN1, IO_SW5, IO_NUM };
+	template <unsigned N> auto in_callback() { return m_in_cb[N].bind(); }
+	auto trackx_callback() { return m_trackx_cb.bind(); }
+	auto tracky_callback() { return m_tracky_cb.bind(); }
+	auto gunx_callback() { return m_gunx_cb.bind(); }
+	auto guny_callback() { return m_guny_cb.bind(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -72,13 +79,11 @@ private:
 	required_device<scc85c30_device> m_scc1;
 	required_device<screen_device> m_screen;
 	required_device<device_execute_interface> m_cpu;
-	required_ioport m_io_system;
-	required_ioport m_io_in1;
-	required_ioport m_io_sw5;
-	optional_ioport m_io_trackx;
-	optional_ioport m_io_tracky;
-	optional_ioport m_io_gunx;
-	optional_ioport m_io_guny;
+	devcb_read16 m_in_cb[3];
+	devcb_read8 m_trackx_cb;
+	devcb_read8 m_tracky_cb;
+	devcb_read16 m_gunx_cb;
+	devcb_read16 m_guny_cb;
 
 	emu_timer *     m_timer;
 	int m_irq_num;
