@@ -604,17 +604,17 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_DEVICE_ADD("proglatch", LS259, 0) // U41
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("outlatch1", ls259_device, clear_w)) // FCRST - also resets the 8877
 
-	MCFG_DEVICE_ADD("syslatch1", LS259, 0) // U14
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(MEMBANK("bankr")) // D_S
-	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("bankv"))
-	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("banka"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, bigbord2_state, side_select_w)) // SIDSEL
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, bigbord2_state, smc1_w)) // SMC1
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, bigbord2_state, smc2_w)) // SMC2
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("fdc", mb8877_device, dden_w)) // DDEN
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, bigbord2_state, head_load_w)) // HLD
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, bigbord2_state, disk_motor_w)) // MOTOR
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("beeper", beep_device, set_state)) // BELL
+	LS259(config, m_syslatch1, 0); // U14
+	m_syslatch1->q_out_cb<0>().set_membank(m_bankr); // D_S
+	m_syslatch1->q_out_cb<0>().append_membank(m_bankv);
+	m_syslatch1->q_out_cb<0>().append_membank(m_banka);
+	m_syslatch1->q_out_cb<1>().set(FUNC(bigbord2_state::side_select_w)); // SIDSEL
+	m_syslatch1->q_out_cb<2>().set(FUNC(bigbord2_state::smc1_w)); // SMC1
+	m_syslatch1->q_out_cb<3>().set(FUNC(bigbord2_state::smc2_w)); // SMC2
+	m_syslatch1->q_out_cb<4>().set(m_fdc, FUNC(mb8877_device::dden_w)); // DDEN
+	m_syslatch1->q_out_cb<5>().set(FUNC(bigbord2_state::head_load_w)); // HLD
+	m_syslatch1->q_out_cb<6>().set(FUNC(bigbord2_state::disk_motor_w)); // MOTOR
+	m_syslatch1->q_out_cb<7>().set("beeper", FUNC(beep_device::set_state)); // BELL
 
 	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // U96
 

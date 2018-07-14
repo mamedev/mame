@@ -301,10 +301,10 @@ WRITE8_MEMBER(jangou_state::adpcm_w)
 WRITE_LINE_MEMBER(jangou_state::jngolady_vclk_cb)
 {
 	if (m_msm5205_vclk_toggle == 0)
-		m_msm->data_w(m_adpcm_byte >> 4);
+		m_msm->write_data(m_adpcm_byte >> 4);
 	else
 	{
-		m_msm->data_w(m_adpcm_byte & 0xf);
+		m_msm->write_data(m_adpcm_byte & 0xf);
 		m_cpu_1->set_input_line(0, HOLD_LINE);
 	}
 
@@ -1270,12 +1270,12 @@ void jangou_state::init_luckygrl()
 		{
 			case 0x000: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
 			case 0x001: x = bitswap<8>(x ^ 0xa0, 3, 6, 5, 4, 7, 2, 1, 0); break;
-			case 0x010: x = bitswap<8>(x ^ 0x88, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x011: x = bitswap<8>(x ^ 0x28, 7, 6, 3, 4, 5, 2, 1, 0); break;
-			case 0x100: x = bitswap<8>(x ^ 0x28, 7, 6, 3, 4, 5, 2, 1, 0); break;
-			case 0x101: x = bitswap<8>(x ^ 0x20, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x110: x = bitswap<8>(x ^ 0x28, 3, 6, 5, 4, 7, 2, 1, 0); break;
-			case 0x111: x = bitswap<8>(x ^ 0x88, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x010: x = bitswap<8>(x ^ 0x88, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x011: x = bitswap<8>(x ^ 0x28, 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x100: x = bitswap<8>(x ^ 0x28, 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x101: x = bitswap<8>(x ^ 0x20, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x111: x = bitswap<8>(x ^ 0x88, 5, 6, 7, 4, 3, 2, 1, 0); break;
 		}
 
 		ROM[A] = x;

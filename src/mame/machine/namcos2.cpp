@@ -69,6 +69,16 @@ READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
 /* Perform basic machine initialisation                      */
 /*************************************************************/
 
+READ8_MEMBER(namcos2_shared_state::dpram_r)
+{
+	return m_dpram[offset];
+}
+
+WRITE8_MEMBER(namcos2_shared_state::dpram_w)
+{
+	m_dpram[offset] = data;
+}
+
 #define m_eeprom_size 0x2000
 
 WRITE8_MEMBER(namcos2_shared_state::sound_reset_w)
@@ -491,28 +501,28 @@ WRITE8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_ctrl_w )
 		switch((data>>2) & 0x07)
 		{
 		case 0:
-			m_mcu_analog_data=ioport("AN0")->read();
+			m_mcu_analog_data=m_analog_io[0]->read();
 			break;
 		case 1:
-			m_mcu_analog_data=ioport("AN1")->read();
+			m_mcu_analog_data=m_analog_io[1]->read();
 			break;
 		case 2:
-			m_mcu_analog_data=ioport("AN2")->read();
+			m_mcu_analog_data=m_analog_io[2]->read();
 			break;
 		case 3:
-			m_mcu_analog_data=ioport("AN3")->read();
+			m_mcu_analog_data=m_analog_io[3]->read();
 			break;
 		case 4:
-			m_mcu_analog_data=ioport("AN4")->read();
+			m_mcu_analog_data=m_analog_io[4]->read();
 			break;
 		case 5:
-			m_mcu_analog_data=ioport("AN5")->read();
+			m_mcu_analog_data=m_analog_io[5]->read();
 			break;
 		case 6:
-			m_mcu_analog_data=ioport("AN6")->read();
+			m_mcu_analog_data=m_analog_io[6]->read();
 			break;
 		case 7:
-			m_mcu_analog_data=ioport("AN7")->read();
+			m_mcu_analog_data=m_analog_io[7]->read();
 			break;
 		default:
 			output().set_value("anunk",data);
@@ -570,14 +580,14 @@ READ8_MEMBER( namcos2_shared_state::namcos2_mcu_port_d_r )
 	int data = 0;
 
 	/* Read/convert the bits one at a time */
-	if(ioport("AN0")->read() > threshold) data |= 0x01;
-	if(ioport("AN1")->read() > threshold) data |= 0x02;
-	if(ioport("AN2")->read() > threshold) data |= 0x04;
-	if(ioport("AN3")->read() > threshold) data |= 0x08;
-	if(ioport("AN4")->read() > threshold) data |= 0x10;
-	if(ioport("AN5")->read() > threshold) data |= 0x20;
-	if(ioport("AN6")->read() > threshold) data |= 0x40;
-	if(ioport("AN7")->read() > threshold) data |= 0x80;
+	if(m_analog_io[0]->read() > threshold) data |= 0x01;
+	if(m_analog_io[1]->read() > threshold) data |= 0x02;
+	if(m_analog_io[2]->read() > threshold) data |= 0x04;
+	if(m_analog_io[3]->read() > threshold) data |= 0x08;
+	if(m_analog_io[4]->read() > threshold) data |= 0x10;
+	if(m_analog_io[5]->read() > threshold) data |= 0x20;
+	if(m_analog_io[6]->read() > threshold) data |= 0x40;
+	if(m_analog_io[7]->read() > threshold) data |= 0x80;
 
 	/* Return the result */
 	return data;

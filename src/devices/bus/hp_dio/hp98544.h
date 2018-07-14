@@ -40,6 +40,10 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual space_config_vector memory_space_config() const override;
 private:
+
+	static constexpr int m_v_pix = 768;
+	static constexpr int m_h_pix = 1024;
+
 	const address_space_config m_space_config;
 	void map(address_map &map);
 

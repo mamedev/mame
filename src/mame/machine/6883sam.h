@@ -15,7 +15,7 @@
 
 
 #define MCFG_SAM6883_RES_CALLBACK(_read) \
-	devcb = &downcast<sam6883_device &>(*device).set_res_rd_callback(DEVCB_##_read);
+	downcast<sam6883_device &>(*device).set_res_rd_callback(DEVCB_##_read);
 
 
 //**************************************************************************
@@ -86,13 +86,13 @@ class sam6883_device : public device_t, public sam6883_friend_device_interface
 {
 public:
 	template <typename T>
-    sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-        : sam6883_device(mconfig, tag, owner, clock)
+	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: sam6883_device(mconfig, tag, owner, clock)
 	{
-        m_cpu.set_tag(std::forward<T>(cpu_tag));
-    }
-    
-    sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+	}
+
+	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_res_rd_callback(Object &&cb) { return m_read_res.set_callback(std::forward<Object>(cb)); }
 

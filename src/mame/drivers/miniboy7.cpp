@@ -168,6 +168,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void miniboy7(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(ay_pa_w);
 	DECLARE_WRITE8_MEMBER(ay_pb_w);
 	DECLARE_READ8_MEMBER(pia_pb_r);
@@ -177,14 +180,11 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_PALETTE_INIT(miniboy7);
 
-	void miniboy7(machine_config &config);
 	void miniboy7_map(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 
-private:
 	required_shared_ptr<uint8_t> m_videoram_a;
 	required_shared_ptr<uint8_t> m_colorram_a;
 	required_shared_ptr<uint8_t> m_videoram_b;

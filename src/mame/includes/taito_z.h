@@ -6,6 +6,10 @@
     Taito Z system
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_TAITO_Z_H
+#define MAME_INCLUDES_TAITO_Z_H
+
+#pragma once
 
 #include "audio/taitosnd.h"
 #include "machine/eepromser.h"
@@ -165,3 +169,5 @@ private:
 	void spacegun_map(address_map &map);
 	void z80_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TAITO_Z_H

@@ -91,19 +91,22 @@ private:
 public:
 	// construction/destruction
 	screen_bitmap()
-		: m_format(BITMAP_FORMAT_RGB32),
-			m_texformat(TEXFORMAT_RGB32),
-			m_live(&m_rgb32) { }
+		: m_format(BITMAP_FORMAT_RGB32)
+		, m_texformat(TEXFORMAT_RGB32)
+		, m_live(&m_rgb32)
+	{ }
 	screen_bitmap(bitmap_ind16 &orig)
-		: m_format(BITMAP_FORMAT_IND16),
-			m_texformat(TEXFORMAT_PALETTE16),
-			m_live(&m_ind16),
-			m_ind16(orig, orig.cliprect()) { }
+		: m_format(BITMAP_FORMAT_IND16)
+		, m_texformat(TEXFORMAT_PALETTE16)
+		, m_live(&m_ind16)
+		, m_ind16(orig, orig.cliprect())
+	{ }
 	screen_bitmap(bitmap_rgb32 &orig)
-		: m_format(BITMAP_FORMAT_RGB32),
-			m_texformat(TEXFORMAT_RGB32),
-			m_live(&m_rgb32),
-			m_rgb32(orig, orig.cliprect()) { }
+		: m_format(BITMAP_FORMAT_RGB32)
+		, m_texformat(TEXFORMAT_RGB32)
+		, m_live(&m_rgb32)
+		, m_rgb32(orig, orig.cliprect())
+	{ }
 
 	// resizing
 	void resize(int width, int height) { live().resize(width, height); }
@@ -205,7 +208,7 @@ public:
 	}
 	void set_raw(const XTAL &xtal, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart) { set_raw(xtal.value(), htotal, hbend, hbstart, vtotal, vbend, vbstart); }
 	void set_refresh(attoseconds_t rate) { m_refresh = rate; }
-	void set_refresh_hz(attoseconds_t hz) { set_refresh(HZ_TO_ATTOSECONDS(hz)); }
+	template <typename T> void set_refresh_hz(T &&hz) { set_refresh(HZ_TO_ATTOSECONDS(std::forward<T>(hz))); }
 	void set_vblank_time(attoseconds_t time) { m_vblank = time; m_oldstyle_vblank_supplied = true; }
 	void set_size(u16 width, u16 height) { m_width = width; m_height = height; }
 	void set_visarea(s16 minx, s16 maxx, s16 miny, s16 maxy) { m_visarea.set(minx, maxx, miny, maxy); }
@@ -214,6 +217,28 @@ public:
 		m_xoffset = xoffs;
 		m_yscale = yscale;
 		m_yoffset = yoffs;
+	}
+
+	// FIXME: these should be aware of current device for resolving the tag
+	template <class FunctionClass>
+	void set_screen_update(u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
+	{
+		set_screen_update(screen_update_ind16_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass>
+	void set_screen_update(u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
+	{
+		set_screen_update(screen_update_rgb32_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass>
+	void set_screen_update(const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
+	{
+		set_screen_update(screen_update_ind16_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass>
+	void set_screen_update(const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
+	{
+		set_screen_update(screen_update_rgb32_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
 	}
 	void set_screen_update(screen_update_ind16_delegate callback)
 	{
@@ -225,7 +250,9 @@ public:
 		m_screen_update_ind16 = screen_update_ind16_delegate();
 		m_screen_update_rgb32 = callback;
 	}
+
 	template<class Object> devcb_base &set_screen_vblank(Object &&object) { return m_screen_vblank.set_callback(std::forward<Object>(object)); }
+	auto screen_vblank() { return m_screen_vblank.bind(); }
 	template<typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_video_attributes(u32 flags) { m_video_attributes = flags; }
 	void set_color(rgb_t color) { m_color = color; }
@@ -246,9 +273,8 @@ public:
 	// beam positioning and state
 	int vpos() const;
 	int hpos() const;
-	bool vblank() const { return (machine().time() < m_vblank_end_time); }
-	DECLARE_READ_LINE_MEMBER(vblank) { return (machine().time() < m_vblank_end_time) ? ASSERT_LINE : CLEAR_LINE; }
-	DECLARE_READ_LINE_MEMBER(hblank) { int curpos = hpos(); return (curpos < m_visarea.min_x || curpos > m_visarea.max_x) ? ASSERT_LINE : CLEAR_LINE; }
+	DECLARE_READ_LINE_MEMBER(vblank) const { return (machine().time() < m_vblank_end_time) ? 1 : 0; }
+	DECLARE_READ_LINE_MEMBER(hblank) const { int const curpos = hpos(); return (curpos < m_visarea.min_x || curpos > m_visarea.max_x) ? 1 : 0; }
 
 	// timing
 	attotime time_until_pos(int vpos, int hpos = 0) const;
@@ -512,11 +538,11 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 #define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)  \
 	downcast<screen_device &>(*device).set_default_position(_xscale, _xoffs, _yscale, _yoffs);
 #define MCFG_SCREEN_UPDATE_DRIVER(_class, _method) \
-	downcast<screen_device &>(*device).set_screen_update(screen_update_delegate_smart(&_class::_method, #_class "::" #_method, nullptr));
+	downcast<screen_device &>(*device).set_screen_update(&_class::_method, #_class "::" #_method);
 #define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
-	downcast<screen_device &>(*device).set_screen_update(screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device));
+	downcast<screen_device &>(*device).set_screen_update(_device, &_class::_method, #_class "::" #_method);
 #define MCFG_SCREEN_VBLANK_CALLBACK(_devcb) \
-	devcb = &downcast<screen_device &>(*device).set_screen_vblank(DEVCB_##_devcb);
+	downcast<screen_device &>(*device).set_screen_vblank(DEVCB_##_devcb);
 #define MCFG_SCREEN_PALETTE(_palette_tag) \
 	downcast<screen_device &>(*device).set_palette(_palette_tag);
 #define MCFG_SCREEN_NO_PALETTE \
@@ -526,29 +552,4 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 #define MCFG_SCREEN_COLOR(_color) \
 	downcast<screen_device &>(*device).set_color(_color);
 
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  screen_update_delegate_smart - collection of
-//  inline helpers which create the appropriate
-//  screen_update_delegate based on the input
-//  function type
-//-------------------------------------------------
-
-template<class _FunctionClass>
-inline screen_update_ind16_delegate screen_update_delegate_smart(u32 (_FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name, const char *devname)
-{
-	return screen_update_ind16_delegate(callback, name, devname, (_FunctionClass *)nullptr);
-}
-
-template<class _FunctionClass>
-inline screen_update_rgb32_delegate screen_update_delegate_smart(u32 (_FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name, const char *devname)
-{
-	return screen_update_rgb32_delegate(callback, name, devname, (_FunctionClass *)nullptr);
-}
-
-
-#endif  /* MAME_EMU_SCREEN_H */
+#endif // MAME_EMU_SCREEN_H

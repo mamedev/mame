@@ -24,6 +24,9 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void himesiki(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_bg_ram;
 	required_shared_ptr<uint8_t> m_spriteram_p103a;
@@ -54,7 +57,6 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_himesiki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void himesiki(machine_config &config);
 	void himesiki_iom0(address_map &map);
 	void himesiki_iom1(address_map &map);
 	void himesiki_prm0(address_map &map);

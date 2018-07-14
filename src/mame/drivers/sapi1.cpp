@@ -60,6 +60,17 @@ public:
 	{
 	}
 
+	void sapi3(machine_config &config);
+	void sapi1(machine_config &config);
+	void sapi2(machine_config &config);
+	void sapi3a(machine_config &config);
+	void sapi3b(machine_config &config);
+
+	void init_sapizps3();
+	void init_sapizps3a();
+	void init_sapizps3b();
+
+private:
 	optional_shared_ptr<uint8_t> m_p_videoram;
 	DECLARE_READ8_MEMBER(sapi1_keyboard_r);
 	DECLARE_WRITE8_MEMBER(sapi1_keyboard_w);
@@ -75,19 +86,12 @@ public:
 	DECLARE_READ8_MEMBER(uart_ready_r);
 	DECLARE_WRITE8_MEMBER(uart_mode_w);
 	DECLARE_WRITE8_MEMBER(uart_reset_w);
-	void init_sapizps3();
-	void init_sapizps3a();
-	void init_sapizps3b();
 	DECLARE_MACHINE_RESET(sapi1);
 	DECLARE_MACHINE_RESET(sapizps3);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sapi3(machine_config &config);
-	void sapi1(machine_config &config);
-	void sapi2(machine_config &config);
-	void sapi3a(machine_config &config);
-	void sapi3b(machine_config &config);
+
 	void sapi1_mem(address_map &map);
 	void sapi2_mem(address_map &map);
 	void sapi3_io(address_map &map);
@@ -96,7 +100,7 @@ public:
 	void sapi3a_mem(address_map &map);
 	void sapi3b_io(address_map &map);
 	void sapi3b_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	uint8_t m_keyboard_mask;
 	uint8_t m_refresh_counter;
@@ -110,7 +114,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<ay31015_device> m_uart;
 	optional_device<rs232_port_device> m_v24;
-public:
+
 	optional_device<palette_device> m_palette;
 };
 

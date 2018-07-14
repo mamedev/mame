@@ -77,13 +77,15 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void odyssey(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void odyssey(machine_config &config);
 	void odyssey_map(address_map &map);
 };
 

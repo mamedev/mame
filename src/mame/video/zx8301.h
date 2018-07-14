@@ -42,7 +42,7 @@
 ///*************************************************************************
 
 #define MCFG_ZX8301_VSYNC_CALLBACK(_write) \
-	devcb = &downcast<zx8301_device &>(*device).set_vsync_wr_callback(DEVCB_##_write);
+	downcast<zx8301_device &>(*device).set_vsync_wr_callback(DEVCB_##_write);
 
 
 

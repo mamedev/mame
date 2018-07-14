@@ -262,6 +262,10 @@ public:
 		, m_palette(*this, "palette")
 		, m_timer(nullptr)
 	{}
+
+	void spc1500(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(psga_r);
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
@@ -292,10 +296,10 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
-	void spc1500(machine_config &config);
+
 	void spc1500_double_io(address_map &map);
 	void spc1500_mem(address_map &map);
-private:
+
 	uint8_t *m_p_ram;
 	uint8_t m_ipl;
 	uint8_t m_palet[3];
@@ -914,7 +918,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, spc1500_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)

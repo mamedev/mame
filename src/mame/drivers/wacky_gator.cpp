@@ -50,7 +50,7 @@ public:
 
 	void wackygtr(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -76,7 +76,6 @@ protected:
 
 	void program_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<pit8253_device> m_pit8253_0;
@@ -255,7 +254,7 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 	if (!(m_adpcm_ctrl & 0x80))
 	{
 		uint8_t data = m_samples->base()[m_adpcm_pos & 0xffff];
-		m_msm->data_w((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
+		m_msm->write_data((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
 		m_adpcm_pos += m_adpcm_sel;
 		m_adpcm_sel ^= 1;
 	}

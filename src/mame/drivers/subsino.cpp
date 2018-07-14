@@ -219,6 +219,7 @@ To Do:
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
 #include "machine/subsino.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
@@ -1065,7 +1066,7 @@ void subsino_state::stbsub_map(address_map &map)
 {
 	map(0x00000, 0x0bfff).rom();
 
-	map(0x0c000, 0x0cfff).ram();
+	map(0x0c000, 0x0cfff).ram().share("nvram");
 
 	map(0x0d000, 0x0d002).r("ppi1", FUNC(i8255_device::read));
 	map(0x0d004, 0x0d006).r("ppi2", FUNC(i8255_device::read));
@@ -1104,7 +1105,7 @@ void subsino_state::mtrainnv_map(address_map &map)
 {
 	map(0x00000, 0x0bfff).rom();
 
-	map(0x0c000, 0x0cfff).ram();
+	map(0x0c000, 0x0cfff).ram().share("nvram");
 
 	map(0x0d000, 0x0d002).r("ppi1", FUNC(i8255_device::read));
 	map(0x0d004, 0x0d006).r("ppi2", FUNC(i8255_device::read));
@@ -2896,6 +2897,7 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("INB"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("INA"))
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
@@ -3804,7 +3806,7 @@ void subsino_state::init_stbsub()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
 	}
 }
 
@@ -3820,7 +3822,7 @@ void subsino_state::init_stisub()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
 	}
 }
 
@@ -3840,7 +3842,7 @@ void subsino_state::init_tesorone()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
 	}
 }
 
@@ -3860,7 +3862,7 @@ void subsino_state::init_tesorone230()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
 	}
 }
 
@@ -3873,7 +3875,7 @@ void subsino_state::init_mtrainnv()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
 	}
 }
 
@@ -3895,7 +3897,7 @@ GAMEL( 1995, stbsub,      0,       stbsub,   stbsub,   subsino_state, init_stbsu
 GAMEL( 1995, stisub,      stbsub,  stbsub,   stbsub,   subsino_state, init_stisub,      ROT0, "Subsino",         "Super Treasure Island (Italy, v1.6)",  MACHINE_NOT_WORKING, layout_stisub   ) // need proper patches
 GAMEL( 1995, tesorone,    stbsub,  stbsub,   tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.41)",   0,               layout_stisub   )
 GAMEL( 1995, tesorone240, stbsub,  stbsub,   tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",   0,               layout_stisub   )
-GAMEL( 1995, tesorone230, stbsub,  stbsub,   tesorone, subsino_state, init_tesorone230, ROT0,"Subsino",        "Tesorone Dell'Isola (Italy, v2.30)",   0,               layout_stisub   )
+GAMEL( 1995, tesorone230, stbsub,  stbsub,   tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.30)",   0,               layout_stisub   )
 
 GAMEL( 1996, sharkpy,     0,       sharkpy,  sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.3)",            0,               layout_sharkpy  ) // missing POST messages?
 GAMEL( 1996, sharkpya,    sharkpy, sharkpy,  sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.6)",            0,               layout_sharkpy  ) // missing POST messages?

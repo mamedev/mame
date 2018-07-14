@@ -18,13 +18,8 @@
 class volfied_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_VOLFIED
-	};
-
-	volfied_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	volfied_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_cchip(*this, "cchip"),
@@ -33,6 +28,13 @@ public:
 		m_cchip_irq_clear(*this, "cchip_irq_clear")
 	{ }
 
+	void volfied(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_VOLFIED
+	};
 	DECLARE_READ16_MEMBER(video_ram_r);
 	DECLARE_WRITE16_MEMBER(video_ram_w);
 	DECLARE_WRITE16_MEMBER(video_ctrl_w);
@@ -49,11 +51,9 @@ public:
 
 	void refresh_pixel_layer( bitmap_ind16 &bitmap );
 
-	void volfied(machine_config &config);
 	void main_map(address_map &map);
 	void z80_map(address_map &map);
 
-private:
 	/* memory pointers */
 	std::unique_ptr<uint16_t[]>    m_video_ram;
 

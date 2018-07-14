@@ -312,7 +312,7 @@ WRITE8_MEMBER( ecb_grip21_device::ppi_pc_w )
 	m_sti->i7_w(m_ia);
 
 	// PROF-80 handshaking
-	m_ppi_pc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (m_ppi->pa_r() & 0x3f);
+	m_ppi_pc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (m_ppi->read_pa() & 0x3f);
 }
 
 //-------------------------------------------------
@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	MCFG_Z80STI_OUT_TCO_CB(WRITELINE(Z80STI_TAG, z80sti_device, tc_w))
 	MCFG_Z80STI_OUT_TDO_CB(WRITELINE(Z80STI_TAG, z80sti_device, tc_w))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, ecb_grip21_device, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, ecb_grip21_device, write_centronics_fault))
 

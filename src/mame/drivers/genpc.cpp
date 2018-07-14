@@ -22,7 +22,6 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	required_device<cpu_device> m_maincpu;
 	void pcega(machine_config &config);
 	void pcvga(machine_config &config);
 	void pccga(machine_config &config);
@@ -30,6 +29,9 @@ public:
 	void pcmda(machine_config &config);
 	void pc8_io(address_map &map);
 	void pc8_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
 };
 
 void genpc_state::pc8_map(address_map &map)

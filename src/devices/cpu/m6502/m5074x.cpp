@@ -109,6 +109,13 @@ void m5074x_device::device_start()
 }
 
 
+device_memory_interface::space_config_vector m5074x_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
@@ -510,7 +517,7 @@ void m50741_device::m50741_map(address_map &map)
 }
 
 m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m50741_device(mconfig, M50740, tag, owner, clock)
+	m50741_device(mconfig, M50741, tag, owner, clock)
 {
 }
 

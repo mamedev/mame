@@ -96,9 +96,33 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_hopper(*this, "hopper")
+		, m_keyb(*this, "KEYB_%u", 0U)
+		, m_dsw(*this, "DSW%u", 1U)
+		, m_system(*this, "SYSTEM")
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void bishjan(machine_config &config);
+	void saklove(machine_config &config);
+	void mtrain(machine_config &config);
+	void humlan(machine_config &config);
+	void new2001(machine_config &config);
+	void expcard(machine_config &config);
+	void xplan(machine_config &config);
+	void xtrain(machine_config &config);
+
+	void init_bishjan();
+	void init_new2001();
+	void init_humlan();
+	void init_xtrain();
+	void init_expcard();
+	void init_wtrnymph();
+	void init_mtrain();
+	void init_saklove();
+	void init_xplan();
+	void init_ptrain();
+
+private:
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo2_w);
 	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_hi_w);
@@ -151,30 +175,13 @@ public:
 	DECLARE_WRITE8_MEMBER(xtrain_outputs_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_bit0_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_bit4_w);
-	void init_bishjan();
-	void init_new2001();
-	void init_humlan();
-	void init_xtrain();
-	void init_expcard();
-	void init_wtrnymph();
-	void init_mtrain();
-	void init_saklove();
-	void init_xplan();
-	void init_ptrain();
+
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 	DECLARE_VIDEO_START(subsino2);
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
 
-	void bishjan(machine_config &config);
-	void saklove(machine_config &config);
-	void mtrain(machine_config &config);
-	void humlan(machine_config &config);
-	void new2001(machine_config &config);
-	void expcard(machine_config &config);
-	void xplan(machine_config &config);
-	void xtrain(machine_config &config);
 	void bishjan_map(address_map &map);
 	void expcard_io(address_map &map);
 	void humlan_map(address_map &map);
@@ -189,7 +196,6 @@ public:
 	void xplan_map(address_map &map);
 	void xtrain_io(address_map &map);
 
-protected:
 	virtual void machine_start() override { m_leds.resolve(); }
 
 	layer_t m_layers[2];
@@ -212,9 +218,11 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<ticket_dispenser_device> m_hopper;
+	optional_ioport_array<5> m_keyb;
+	optional_ioport_array<4> m_dsw;
+	optional_ioport m_system;
 	output_finder<9> m_leds;
 
-private:
 	inline void ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
 
@@ -825,10 +833,10 @@ WRITE8_MEMBER(subsino2_state::dsw_mask_w)
 
 READ8_MEMBER(subsino2_state::dsw_r)
 {
-	return  ( (ioport("DSW1")->read() & m_dsw_mask) ? 0x01 : 0 ) |
-			( (ioport("DSW2")->read() & m_dsw_mask) ? 0x02 : 0 ) |
-			( (ioport("DSW3")->read() & m_dsw_mask) ? 0x04 : 0 ) |
-			( (ioport("DSW4")->read() & m_dsw_mask) ? 0x08 : 0 ) ;
+	return  ( (m_dsw[0]->read() & m_dsw_mask) ? 0x01 : 0 ) |
+			( (m_dsw[1]->read() & m_dsw_mask) ? 0x02 : 0 ) |
+			( (m_dsw[2]->read() & m_dsw_mask) ? 0x04 : 0 ) |
+			( (m_dsw[3]->read() & m_dsw_mask) ? 0x08 : 0 ) ;
 }
 
 
@@ -896,18 +904,14 @@ WRITE16_MEMBER(subsino2_state::bishjan_input_w)
 
 READ16_MEMBER(subsino2_state::bishjan_input_r)
 {
-	int i;
 	uint16_t res = 0xff;
-	static const char *const port[] = { "KEYB_0", "KEYB_1", "KEYB_2", "KEYB_3", "KEYB_4" };
 
-	for (i = 0; i < 5; i++)
+	for (int i = 0; i < 5; i++)
 		if (m_bishjan_input & (1 << i))
-			res = ioport(port[i])->read();
+			res = m_keyb[i]->read();
 
 	return  (res << 8) |                    // high byte
-			ioport("SYSTEM")->read() |      // low byte
-			(machine().device<ticket_dispenser_device>("hopper")->line_r() ? 0x00 : 0x04) // bit 2: hopper sensor
-	;
+			m_system->read();       // low byte
 }
 
 WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
@@ -1587,7 +1591,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_START("SYSTEM") // IN A
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE        )   PORT_IMPULSE(1) // service mode (press twice for inputs)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,IPT_CUSTOM        )   // hopper sensor
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM        )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1       )   // stats
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2       )   // pay out? "hopper empty"
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1          )   PORT_IMPULSE(2) // coin
@@ -2382,7 +2386,7 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

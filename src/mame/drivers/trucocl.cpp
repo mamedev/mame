@@ -69,7 +69,7 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 	uint8_t *rom = memregion("maincpu")->base();
 	int dac_address = ( data & 0xf0 ) << 8;
 	int sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
-	
+
 	if ( m_cur_dac_address != dac_address )
 	{
 		m_cur_dac_address_index = 0;
@@ -121,7 +121,7 @@ static INPUT_PORTS_START( trucocl )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) //PORT_IMPULSE(60)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(2)
-	
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Enable BGM fanfare" ) // enables extra BGMs on attract mode
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -176,7 +176,7 @@ void trucocl_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(trucocl_state::trucocl_interrupt)
 {
-//	if(m_irq_mask)
+//  if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 

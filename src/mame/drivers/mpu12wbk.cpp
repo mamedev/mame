@@ -228,19 +228,22 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void mpu12wbk(machine_config &config);
+
+	void init_mpu12wbk();
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(mpu12wbk_videoram_w);
 	DECLARE_WRITE8_MEMBER(mpu12wbk_colorram_w);
-	void init_mpu12wbk();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mpu12wbk);
 	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void mpu12wbk(machine_config &config);
 	void mpu12wbk_map(address_map &map);
 };
 

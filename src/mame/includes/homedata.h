@@ -23,6 +23,20 @@ public:
 	{
 	}
 
+	void reikaids(machine_config &config);
+	void mrokumei(machine_config &config);
+	void mirderby(machine_config &config);
+	void pteacher(machine_config &config);
+	void lemnangl(machine_config &config);
+	void mjkinjas(machine_config &config);
+
+	void init_reikaids();
+	void init_mjikaga();
+	void init_jogakuen();
+	void init_battlcry();
+	void init_mirderby();
+
+private:
 	/* memory pointers */
 	optional_shared_ptr<uint8_t> m_vreg;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -92,11 +106,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mrokumei_blitter_start_w);
 	DECLARE_WRITE8_MEMBER(reikaids_blitter_start_w);
 	DECLARE_WRITE8_MEMBER(pteacher_blitter_start_w);
-	void init_reikaids();
-	void init_mjikaga();
-	void init_jogakuen();
-	void init_battlcry();
-	void init_mirderby();
 	TILE_GET_INFO_MEMBER(mrokumei_get_info0_0);
 	TILE_GET_INFO_MEMBER(mrokumei_get_info1_0);
 	TILE_GET_INFO_MEMBER(mrokumei_get_info0_1);
@@ -153,12 +162,6 @@ public:
 	inline void lemnangl_info( tile_data &tileinfo, int tile_index, int page, int layer, int gfxset, int gfxbank );
 	inline void mirderby_info0( tile_data &tileinfo, int tile_index, int page, int gfxbank );
 	inline void mirderby_info1( tile_data &tileinfo, int tile_index, int page, int gfxbank );
-	void reikaids(machine_config &config);
-	void mrokumei(machine_config &config);
-	void mirderby(machine_config &config);
-	void pteacher(machine_config &config);
-	void lemnangl(machine_config &config);
-	void mjkinjas(machine_config &config);
 	void cpu0_map(address_map &map);
 	void cpu1_map(address_map &map);
 	void cpu2_map(address_map &map);

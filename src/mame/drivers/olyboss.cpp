@@ -58,20 +58,20 @@ class olyboss_state : public driver_device
 {
 public:
 	olyboss_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_dma(*this, I8257_TAG),
-			m_crtc(*this,UPD3301_TAG),
-			m_fdc(*this, "fdc"),
-			m_uic(*this, "uic"),
-			m_pic(*this, "pic"),
-			m_ppi(*this, "ppi"),
-			m_fdd0(*this, "fdc:0"),
-			m_fdd1(*this, "fdc:1"),
-			m_rom(*this, "mainrom"),
-			m_lowram(*this, "lowram"),
-			m_char_rom(*this, UPD3301_TAG)
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_dma(*this, I8257_TAG)
+		, m_crtc(*this, UPD3301_TAG)
+		, m_fdc(*this, "fdc")
+		, m_uic(*this, "uic")
+		, m_pic(*this, "pic")
+		, m_ppi(*this, "ppi")
+		, m_fdd0(*this, "fdc:0")
+		, m_fdd1(*this, "fdc:1")
+		, m_rom(*this, "mainrom")
+		, m_lowram(*this, "lowram")
+		, m_char_rom(*this, UPD3301_TAG)
+	{ }
 
 public:
 	void bossa85(machine_config &config);
@@ -448,11 +448,11 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	MCFG_DEVICE_ADD("uic", AM9519, 0)
 	MCFG_AM9519_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("uic", am9519_device, ireq2_w)) MCFG_DEVCB_INVERT
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq0_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq2_w)).invert();
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
+	FLOPPY_CONNECTOR(config, m_fdd0, bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	m_fdd0->enable_sound(true);
 
 	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, olyboss_state, hrq_w))
@@ -463,12 +463,12 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	MCFG_I8257_OUT_IOW_2_CB(WRITE8(*this, olyboss_state, crtcdma_w))
 	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, olyboss_state, tc_w))
 
-	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
-	MCFG_UPD3301_CHARACTER_WIDTH(8)
-	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(olyboss_state, olyboss_display_pixels)
-	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq2_w))
-	MCFG_UPD3301_INT_CALLBACK(WRITELINE("uic", am9519_device, ireq0_w)) MCFG_DEVCB_INVERT
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	UPD3301(config, m_crtc, XTAL(14'318'181));
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels), this);
+	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
+	m_crtc->int_wr_callback().set(m_uic, FUNC(am9519_device::ireq0_w)).invert();
+	m_crtc->set_screen(SCREEN_TAG);
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, olyboss_state, keyboard_read))

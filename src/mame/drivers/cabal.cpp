@@ -249,7 +249,7 @@ WRITE8_MEMBER(cabal_state::cabalbl_1_adpcm_w)
 {
 	m_msm1->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm1->data_w(data);
+	m_msm1->write_data(data);
 	m_msm1->vclk_w(1);
 	m_msm1->vclk_w(0);
 }
@@ -257,7 +257,7 @@ WRITE8_MEMBER(cabal_state::cabalbl_2_adpcm_w)
 {
 	m_msm2->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm2->data_w(data);
+	m_msm2->write_data(data);
 	m_msm2->vclk_w(1);
 	m_msm2->vclk_w(0);
 }
@@ -511,6 +511,7 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")

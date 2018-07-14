@@ -61,29 +61,35 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "wd1772"),
+		m_floppy_connector(*this, "wd1772:0"),
 		m_via(*this, "via6522"),
 		m_digits(*this, "digit%u", 0U)
 	{
 	}
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	void mirage(machine_config &config);
 
 	void init_mirage();
+
+private:
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);
 	DECLARE_WRITE_LINE_MEMBER(mirage_doc_irq);
 	DECLARE_READ8_MEMBER(mirage_adc_read);
 
-	void mirage(machine_config &config);
 	void mirage_map(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	virtual void video_start() override;
 
 	required_device<mc6809e_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;
+	required_device<floppy_connector> m_floppy_connector;
 	required_device<via6522_device> m_via;
 
 	int last_sndram_bank;
@@ -257,8 +263,7 @@ ROM_END
 
 void enmirage_state::init_mirage()
 {
-	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : nullptr;
+	floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
 	if (floppy)
 	{
 		m_fdc->set_floppy(floppy);

@@ -130,6 +130,15 @@ public:
 		m_screen(*this, SCREEN_TAG)
 	{ }
 
+	void lisa(machine_config &config);
+	void lisa210(machine_config &config);
+	void macxl(machine_config &config);
+
+	void init_lisa210();
+	void init_mac_xl();
+	void init_lisa2();
+
+private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
@@ -213,9 +222,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sfmsk_w);
 	DECLARE_WRITE_LINE_MEMBER(hdmsk_w);
 
-	void init_lisa210();
-	void init_mac_xl();
-	void init_lisa2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -243,9 +249,6 @@ public:
 	void scan_keyboard();
 	void unplug_keyboard();
 	void plug_keyboard();
-	void lisa(machine_config &config);
-	void lisa210(machine_config &config);
-	void macxl(machine_config &config);
 	void lisa210_fdc_map(address_map &map);
 	void lisa_fdc_map(address_map &map);
 	void lisa_map(address_map &map);

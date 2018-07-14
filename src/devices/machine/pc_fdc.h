@@ -20,10 +20,10 @@
 	MCFG_DEVICE_ADD(_tag, PC_FDC_AT, 0)
 
 #define MCFG_PC_FDC_INTRQ_CALLBACK(_write) \
-	devcb = &downcast<pc_fdc_family_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
+	downcast<pc_fdc_family_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_PC_FDC_DRQ_CALLBACK(_write) \
-	devcb = &downcast<pc_fdc_family_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
+	downcast<pc_fdc_family_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 class pc_fdc_family_device : public pc_fdc_interface {
 public:

@@ -24,10 +24,10 @@
 #include <queue>
 
 #define MCFG_YM3802_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ym3802_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<ym3802_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_YM3802_TXD_HANDLER(_devcb) \
-	devcb = &downcast<ym3802_device &>(*device).set_txd_handler(DEVCB_##_devcb);
+	downcast<ym3802_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 class ym3802_device : public device_t, public device_serial_interface
 {

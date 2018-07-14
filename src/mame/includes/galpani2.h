@@ -29,6 +29,9 @@ public:
 		m_spriteram(*this, "spriteram")
 	{ }
 
+	void galpani2(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	optional_device<kaneko16_sprite_device> m_kaneko_spr;
@@ -72,7 +75,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt2);
 	void galpani2_mcu_nmi1();
 	void galpani2_mcu_nmi2();
-	void galpani2(machine_config &config);
 	void galpani2_mem1(address_map &map);
 	void galpani2_mem2(address_map &map);
 };

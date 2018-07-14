@@ -280,6 +280,7 @@ public:
 	void fcrash(machine_config &config);
 	void sf2m10(machine_config &config);
 	void sf2m3(machine_config &config);
+	void sf2cems6(machine_config &config);
 	void forgottn(machine_config &config);
 	void ganbare(machine_config &config);
 	void qsound(machine_config &config);
@@ -302,6 +303,7 @@ public:
 	void sf2m10_map(address_map &map);
 	void sf2m1_map(address_map &map);
 	void sf2m3_map(address_map &map);
+	void sf2cems6_map(address_map &map);
 	void sf2mdt_map(address_map &map);
 	void sf2mdt_z80map(address_map &map);
 	void sgyxz_map(address_map &map);

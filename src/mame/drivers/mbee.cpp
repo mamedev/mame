@@ -691,7 +691,7 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 3)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 3)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("z80pio", z80pio_device, strobe_a))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -748,7 +748,7 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("z80pio", z80pio_device, strobe_a))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -786,13 +786,13 @@ MACHINE_CONFIG_START(mbee_state::mbee56)
 	MCFG_DEVICE_IO_MAP(mbee56_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56)
 
-	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_drq_w))
-	MCFG_WD_FDC_ENMF_CALLBACK(GND)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	WD2793(config, m_fdc, 4_MHz_XTAL / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(mbee_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(mbee_state::fdc_drq_w));
+	m_fdc->enmf_rd_callback().set_constant(0);
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
@@ -814,13 +814,13 @@ MACHINE_CONFIG_START(mbee_state::mbee128p)
 	MCFG_DEVICE_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 
-	MCFG_DEVICE_ADD("fdc", WD2793, 4_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_drq_w))
-	MCFG_WD_FDC_ENMF_CALLBACK(GND)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	WD2793(config, m_fdc, 4_MHz_XTAL / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(mbee_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(mbee_state::fdc_drq_w));
+	m_fdc->enmf_rd_callback().set_constant(0);
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
@@ -833,9 +833,9 @@ MACHINE_CONFIG_START(mbee_state::mbee256)
 
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "35dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "35dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 

@@ -33,6 +33,11 @@ public:
 	{
 	}
 
+	void vega(machine_config &config);
+
+	void init_vegaeo();
+
+private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport m_system_io;
 
@@ -47,11 +52,9 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
-	void init_vegaeo();
 	DECLARE_VIDEO_START(vega);
 
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vega(machine_config &config);
 	void vega_map(address_map &map);
 };
 
@@ -153,7 +156,7 @@ INPUT_PORTS_END
 VIDEO_START_MEMBER(vegaeo_state,vega)
 {
 	m_vram = std::make_unique<uint8_t[]>(0x14000*2);
-	save_pointer(NAME(m_vram.get()), 0x14000*2);
+	save_pointer(NAME(m_vram), 0x14000*2);
 	save_item(NAME(m_vbuffer));
 }
 

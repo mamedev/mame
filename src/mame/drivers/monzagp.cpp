@@ -61,6 +61,9 @@ public:
 		m_digits(*this, "digit%u%u", 0U, 0U)
 		{ }
 
+	void monzagp(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_WRITE8_MEMBER(port1_w);
@@ -85,10 +88,9 @@ public:
 	required_ioport m_dsw;
 	output_finder<4, 7> m_digits;
 
-	void monzagp(machine_config &config);
 	void monzagp_io(address_map &map);
 	void monzagp_map(address_map &map);
-private:
+
 	uint8_t m_p1;
 	uint8_t m_p2;
 	uint8_t m_video_ctrl[2][8];
@@ -156,8 +158,8 @@ void monzagp_state::machine_start()
 	m_mycar_pos = 0;
 	m_collisions_ff = 0;
 	m_collisions_clk = 0;
-	save_pointer(NAME(m_vram.get()), 0x800);
-	save_pointer(NAME(m_score_ram.get()), 0x100);
+	save_pointer(NAME(m_vram), 0x800);
+	save_pointer(NAME(m_score_ram), 0x100);
 
 	m_nvram->set_base(m_score_ram.get(), 0x100);
 

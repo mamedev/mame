@@ -50,7 +50,7 @@ public:
 	void de_type2_alpha3(machine_config &config);
 	void de_type3(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -104,7 +104,6 @@ protected:
 	bool m_more_data;
 	bool m_nmi_enable;
 
-private:
 	uint32_t m_segment1;
 	uint32_t m_segment2;
 	uint8_t m_strobe;
@@ -245,7 +244,7 @@ WRITE_LINE_MEMBER(de_2_state::ym2151_irq_w)
 
 WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
 {
-	m_msm5205->data_w(m_sample_data >> 4);
+	m_msm5205->write_data(m_sample_data >> 4);
 	if(m_more_data)
 	{
 		if(m_nmi_enable)

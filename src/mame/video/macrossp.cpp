@@ -183,8 +183,8 @@ void macrossp_state::video_start()
 	m_gfxdecode->gfx(2)->set_granularity(64);
 	m_gfxdecode->gfx(3)->set_granularity(64);
 
-	save_pointer(NAME(m_spriteram_old.get()), m_spriteram.bytes() / 4);
-	save_pointer(NAME(m_spriteram_old2.get()), m_spriteram.bytes() / 4);
+	save_pointer(NAME(m_spriteram_old), m_spriteram.bytes() / 4);
+	save_pointer(NAME(m_spriteram_old2), m_spriteram.bytes() / 4);
 }
 
 

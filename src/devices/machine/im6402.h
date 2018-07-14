@@ -55,16 +55,16 @@
 	downcast<im6402_device &>(*device).set_trc(_trc);
 
 #define MCFG_IM6402_TRO_CALLBACK(_write) \
-	devcb = &downcast<im6402_device &>(*device).set_tro_wr_callback(DEVCB_##_write);
+	downcast<im6402_device &>(*device).set_tro_wr_callback(DEVCB_##_write);
 
 #define MCFG_IM6402_DR_CALLBACK(_write) \
-	devcb = &downcast<im6402_device &>(*device).set_dr_wr_callback(DEVCB_##_write);
+	downcast<im6402_device &>(*device).set_dr_wr_callback(DEVCB_##_write);
 
 #define MCFG_IM6402_TBRE_CALLBACK(_write) \
-	devcb = &downcast<im6402_device &>(*device).set_tbre_wr_callback(DEVCB_##_write);
+	downcast<im6402_device &>(*device).set_tbre_wr_callback(DEVCB_##_write);
 
 #define MCFG_IM6402_TRE_CALLBACK(_write) \
-	devcb = &downcast<im6402_device &>(*device).set_tre_wr_callback(DEVCB_##_write);
+	downcast<im6402_device &>(*device).set_tre_wr_callback(DEVCB_##_write);
 
 
 

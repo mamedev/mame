@@ -44,6 +44,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void metlfrzr(machine_config &config);
+
+	void init_metlfrzr();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -59,12 +64,10 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	void init_metlfrzr();
 	DECLARE_WRITE8_MEMBER(output_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	uint8_t m_fg_tilebank;
 	bool m_rowscroll_enable;
-	void metlfrzr(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void metlfrzr_map(address_map &map);
 };

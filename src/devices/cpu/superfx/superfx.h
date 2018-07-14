@@ -90,7 +90,7 @@ enum
 
 
 #define MCFG_SUPERFX_OUT_IRQ(_devcb) \
-	devcb = &downcast<superfx_device &>(*device).set_out_irq_func(DEVCB_##_devcb);
+	downcast<superfx_device &>(*device).set_out_irq_func(DEVCB_##_devcb);
 
 
 class superfx_device :  public cpu_device, public superfx_disassembler::config

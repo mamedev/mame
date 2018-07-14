@@ -17,13 +17,13 @@
 
 
 #define MCFG_NCR53C7XX_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ncr53c7xx_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<ncr53c7xx_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_NCR53C7XX_HOST_WRITE(_devcb) \
-	devcb = &downcast<ncr53c7xx_device &>(*device).set_host_write(DEVCB_##_devcb);
+	downcast<ncr53c7xx_device &>(*device).set_host_write(DEVCB_##_devcb);
 
 #define MCFG_NCR53C7XX_HOST_READ(_devcb) \
-	devcb = &downcast<ncr53c7xx_device &>(*device).set_host_read(DEVCB_##_devcb);
+	downcast<ncr53c7xx_device &>(*device).set_host_read(DEVCB_##_devcb);
 
 class ncr53c7xx_device : public nscsi_device, public device_execute_interface
 {

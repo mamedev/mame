@@ -49,6 +49,9 @@ public:
 		, m_nvram_bank(*this, "nvram_bank")
 		, m_nvram_mem(0x2000){ }
 
+	void pcat_dyn(machine_config &config);
+
+private:
 	required_device<isa8_device> m_isabus;
 	required_memory_bank m_prgbank;
 	required_memory_bank m_nvram_bank;
@@ -60,7 +63,6 @@ public:
 	virtual void machine_start() override;
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
 	static void pcat_dyn_sb_conf(device_t *device);
-	void pcat_dyn(machine_config &config);
 	void pcat_io(address_map &map);
 	void pcat_map(address_map &map);
 };

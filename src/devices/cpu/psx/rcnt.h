@@ -16,11 +16,11 @@
 DECLARE_DEVICE_TYPE(PSX_RCNT, psxrcnt_device)
 
 #define MCFG_PSX_RCNT_IRQ0_HANDLER(_devcb) \
-	devcb = &downcast<psxrcnt_device &>(*device).set_irq0_handler(DEVCB_##_devcb);
+	downcast<psxrcnt_device &>(*device).set_irq0_handler(DEVCB_##_devcb);
 #define MCFG_PSX_RCNT_IRQ1_HANDLER(_devcb) \
-	devcb = &downcast<psxrcnt_device &>(*device).set_irq1_handler(DEVCB_##_devcb);
+	downcast<psxrcnt_device &>(*device).set_irq1_handler(DEVCB_##_devcb);
 #define MCFG_PSX_RCNT_IRQ2_HANDLER(_devcb) \
-	devcb = &downcast<psxrcnt_device &>(*device).set_irq2_handler(DEVCB_##_devcb);
+	downcast<psxrcnt_device &>(*device).set_irq2_handler(DEVCB_##_devcb);
 #define PSX_RC_STOP ( 0x01 )
 #define PSX_RC_RESET ( 0x04 ) /* guess */
 #define PSX_RC_COUNTTARGET ( 0x08 )

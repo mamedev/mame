@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_PACMAN_H
+#define MAME_INCLUDES_PACMAN_H
+
+#pragma once
+
 #include "machine/watchdog.h"
 #include "sound/namco.h"
 #include "emupal.h"
@@ -240,3 +245,5 @@ private:
 	uint8_t jumpshot_decrypt(int addr, uint8_t e);
 	void jumpshot_decode();
 };
+
+#endif // MAME_INCLUDES_PACMAN_H

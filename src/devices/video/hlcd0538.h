@@ -42,11 +42,11 @@
 
 // C/R pins (0538: d0-d7 for rows)
 #define MCFG_HLCD0538_WRITE_COLS_CB(_devcb) \
-	devcb = &downcast<hlcd0538_device &>(*device).set_write_cols_callback(DEVCB_##_devcb);
+	downcast<hlcd0538_device &>(*device).set_write_cols_callback(DEVCB_##_devcb);
 
 // INTERRUPT pin
 #define MCFG_HLCD0538_INTERRUPT_CB(_devcb) \
-	devcb = &downcast<hlcd0538_device &>(*device).set_write_interrupt_callback(DEVCB_##_devcb);
+	downcast<hlcd0538_device &>(*device).set_write_interrupt_callback(DEVCB_##_devcb);
 
 
 class hlcd0538_device : public device_t

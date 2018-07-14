@@ -578,12 +578,12 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	MCFG_SCREEN_UPDATE_DRIVER(namcofl_state, screen_update_namcofl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8192)
+	PALETTE(config, m_palette, 0x2000);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcofl)
 
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C116(config, m_c116, 0);
+	m_c116->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 
@@ -767,7 +767,7 @@ ROM_END
 void namcofl_state::common_init()
 {
 	m_workram = std::make_unique<uint32_t[]>(0x100000/4);
-	save_pointer(NAME(m_workram.get()), 0x100000/4),
+	save_pointer(NAME(m_workram), 0x100000/4),
 
 	save_item(NAME(m_mcu_port6));
 	save_item(NAME(m_sprbank));

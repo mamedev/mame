@@ -128,8 +128,8 @@ void backfire_state::video_start()
 	m_left =  std::make_unique<bitmap_ind16>(80*8, 32*8);
 	m_right = std::make_unique<bitmap_ind16>(80*8, 32*8);
 
-	save_pointer(NAME(m_spriteram_1.get()), 0x2000/2);
-	save_pointer(NAME(m_spriteram_2.get()), 0x2000/2);
+	save_pointer(NAME(m_spriteram_1), 0x2000/2);
+	save_pointer(NAME(m_spriteram_2), 0x2000/2);
 
 	save_item(NAME(*m_left));
 	save_item(NAME(*m_right));

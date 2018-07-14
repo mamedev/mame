@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "romload.h"
 #include "speaker.h"
 #include "debug/debugcpu.h"
 
@@ -314,6 +315,10 @@ void device_t::config_complete()
 
 void device_t::validity_check(validity_checker &valid) const
 {
+	// validate callbacks
+	for (devcb_base const *callback : m_callbacks)
+		callback->validity_check(valid);
+
 	// validate via the interfaces
 	for (device_interface &intf : interfaces())
 		intf.interface_validity_check(valid);
@@ -948,6 +953,13 @@ finder_base *device_t::register_auto_finder(finder_base &autodev)
 	m_auto_finder_list = &autodev;
 	return old;
 }
+
+
+void device_t::register_callback(devcb_base &callback)
+{
+	m_callbacks.emplace_back(&callback);
+}
+
 
 //**************************************************************************
 //  LIVE DEVICE INTERFACES

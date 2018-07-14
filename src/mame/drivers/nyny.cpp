@@ -114,6 +114,9 @@ public:
 		m_soundlatch2(*this, "soundlatch2"),
 		m_soundlatch3(*this, "soundlatch3") { }
 
+	void nyny(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram1;
 	required_shared_ptr<uint8_t> m_colorram1;
@@ -158,7 +161,6 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_END_UPDATE(crtc_end_update);
-	void nyny(machine_config &config);
 	void nyny_audio_1_map(address_map &map);
 	void nyny_audio_2_map(address_map &map);
 	void nyny_main_map(address_map &map);

@@ -76,7 +76,7 @@ public:
 
 	static const char *const SWITCHES_TAG;
 
-protected:
+private:
 	void machine_reset() override;
 	void machine_start() override;
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

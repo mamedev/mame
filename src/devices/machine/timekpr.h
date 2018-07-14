@@ -27,10 +27,10 @@
 //**************************************************************************
 
 #define MCFG_M48T37_RESET_HANDLER(_devcb) \
-	devcb = &downcast<timekeeper_device &>(*device).set_reset_handler(DEVCB_##_devcb);
+	downcast<timekeeper_device &>(*device).set_reset_handler(DEVCB_##_devcb);
 
 #define MCFG_M48T37_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<timekeeper_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<timekeeper_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

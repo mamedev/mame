@@ -31,7 +31,7 @@ known issues:
     - sprite size bit is bogus during splash screen
 
     Final Lap 3:
-    - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.c yet
+    - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.cpp yet
 
     Suzuka 8 Hours II
     - some sprite cropping issues
@@ -45,7 +45,8 @@ known issues:
     - no artwork
 
 	Metal Hawk
-	- roz wraparound and tilemap issues
+	- tilemap issues (ex : Result and stage select screen)
+	- ROZ wraparound isn't implemented
 
 The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
 complete system consists of two boards: CPU + GRAPHICS. It contains a large
@@ -457,7 +458,6 @@ $a00000 checks have been seen on the Final Lap boards.
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
 #include "sound/ym2151.h"
-#include "sound/c140.h"
 #include "speaker.h"
 
 #include "finallap.lh"
@@ -471,7 +471,6 @@ $a00000 checks have been seen on the Final Lap boards.
 #define C68_CPU_CLOCK       (MAIN_OSC_CLOCK / 6)        /* 8.192MHz clock for 37450 I/O CPU */
 #define YM2151_SOUND_CLOCK  XTAL(3'579'545)            /* 3.579545MHz FM clock */
 #define C140_SOUND_CLOCK    (MAIN_OSC_CLOCK / 384 / 6)  /* 21.333kHz C140 clock (was 8000000/374 or 21.390kHz) */
-
 
 /*************************************************************/
 /* 68000/6809/63705 Shared memory area - DUAL PORT Memory    */
@@ -505,7 +504,7 @@ void namcos2_state::GollyGhostUpdateDiorama_c0( int data )
 {
 	if (data & 0x80)
 	{
-		m_dollhouse_output, 1; /* diorama is lit up */
+		m_dollhouse_output = 1; /* diorama is lit up */
 
 		/* dollhouse controller; solenoids control physical components */
 		m_toybox_output =        (data >> 0) & 1;
@@ -531,49 +530,28 @@ void namcos2_state::GollyGhostUpdateDiorama_c0( int data )
 	}
 }
 
-READ16_MEMBER(namcos2_state::dpram_word_r)
-{
-	return m_dpram[offset];
-}
-
-WRITE16_MEMBER(namcos2_state::dpram_word_w)
-{
-	if( ACCESSING_BITS_0_7 )
-	{
-		m_dpram[offset] = data&0xff;
-
-		if( m_gametype==NAMCOS2_GOLLY_GHOST )
-		{
-			switch( offset )
-			{
-			case 0xc0/2: GollyGhostUpdateDiorama_c0(data); break;
-			case 0xc2/2:
-				/* unknown; 0x00 or 0x01 - probably lights up guns */
-			break;
-			case 0xc4/2: GollyGhostUpdateLED_c4(data); break;
-			case 0xc6/2: GollyGhostUpdateLED_c6(data); break;
-			case 0xc8/2: GollyGhostUpdateLED_c8(data); break;
-			case 0xca/2: GollyGhostUpdateLED_ca(data); break;
-			default:
-				break;
-			}
-		}
-		/* Note:  Outputs for the other gun games pass through here as well, but I couldn't find the offsets. */
-		/* Steel Gunner 1 & 2 have 6 "damage lamps" (three on each side) as well as gun recoils. */
-
-	}
-}
-
-
-READ8_MEMBER(namcos2_state::dpram_byte_r)
-{
-	return m_dpram[offset];
-}
-
-WRITE8_MEMBER(namcos2_state::dpram_byte_w)
+WRITE8_MEMBER(namcos2_state::gollygho_dpram_w)
 {
 	m_dpram[offset] = data;
+
+	switch( offset )
+	{
+	case 0xc0/2: GollyGhostUpdateDiorama_c0(data); break;
+	case 0xc2/2:
+		/* unknown; 0x00 or 0x01 - probably lights up guns */
+	break;
+	case 0xc4/2: GollyGhostUpdateLED_c4(data); break;
+	case 0xc6/2: GollyGhostUpdateLED_c6(data); break;
+	case 0xc8/2: GollyGhostUpdateLED_c8(data); break;
+	case 0xca/2: GollyGhostUpdateLED_ca(data); break;
+	default:
+		break;
+	}
+
+	/* Note:  Outputs for the other gun games pass through here as well, but I couldn't find the offsets. */
+	/* Steel Gunner 1 & 2 have 6 "damage lamps" (three on each side) as well as gun recoils. */
 }
+
 
 READ8_MEMBER(namcos2_state::ack_mcu_vbl_r)
 {
@@ -602,8 +580,8 @@ void namcos2_state::namcos2_68k_default_cpu_board_am(address_map &map)
 	map(0x200000, 0x3fffff).rom().region("data_rom", 0);
 	map(0x400000, 0x41ffff).rw(FUNC(namcos2_state::c123_tilemap_videoram_r), FUNC(namcos2_state::c123_tilemap_videoram_w));
 	map(0x420000, 0x42003f).rw(FUNC(namcos2_state::c123_tilemap_control_r), FUNC(namcos2_state::c123_tilemap_control_w));
-	map(0x440000, 0x44ffff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write)).umask16(0x00ff);
-	map(0x460000, 0x460fff).mirror(0xf000).rw(FUNC(namcos2_state::dpram_word_r), FUNC(namcos2_state::dpram_word_w));
+	map(0x440000, 0x44ffff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x460000, 0x460fff).mirror(0xf000).rw(FUNC(namcos2_state::dpram_r), FUNC(namcos2_state::dpram_w)).umask16(0x00ff);
 	map(0x480000, 0x483fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
 	map(0x4a0000, 0x4a000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 }
@@ -637,7 +615,6 @@ void namcos2_state::slave_default_am(address_map &map)
 	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
 }
 
-
 /*************************************************************/
 
 void namcos2_state::common_finallap_am(address_map &map)
@@ -662,6 +639,31 @@ void namcos2_state::master_finallap_am(address_map &map)
 void namcos2_state::slave_finallap_am(address_map &map)
 {
 	common_finallap_am(map);
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x13ffff).ram();
+	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
+}
+
+/*************************************************************/
+
+void namcos2_state::common_gollygho_am(address_map &map)
+{
+	common_default_am(map);
+	map(0x460000, 0x460fff).mirror(0xf000).rw(FUNC(namcos2_state::dpram_r), FUNC(namcos2_state::gollygho_dpram_w)).umask16(0x00ff);
+}
+
+void namcos2_state::master_gollygho_am(address_map &map)
+{
+	common_gollygho_am(map);
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::namcos2_68k_eeprom_r), FUNC(namcos2_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
+	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
+}
+
+void namcos2_state::slave_gollygho_am(address_map &map)
+{
+	common_gollygho_am(map);
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x13ffff).ram();
 	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
@@ -724,7 +726,7 @@ void namcos2_state::slave_metlhawk_am(address_map &map)
 
 /*************************************************************/
 
-void namcos2_state::common_luckywld_am(address_map &map)
+void namcos2_state::common_suzuka8h_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
 	map(0x800000, 0x8141ff).rw(FUNC(namcos2_state::c355_obj_ram_r), FUNC(namcos2_state::c355_obj_ram_w));
@@ -733,9 +735,33 @@ void namcos2_state::common_luckywld_am(address_map &map)
 	map(0x840000, 0x840001).nopr();
 	map(0x900000, 0x900007).rw(FUNC(namcos2_state::c355_obj_position_r), FUNC(namcos2_state::c355_obj_position_w));
 	map(0xa00000, 0xa1ffff).rw(m_c45_road, FUNC(namco_c45_road_device::read), FUNC(namco_c45_road_device::write));
+	map(0xf00000, 0xf00007).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
+}
+
+void namcos2_state::master_suzuka8h_am(address_map &map)
+{
+	common_suzuka8h_am(map);
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::namcos2_68k_eeprom_r), FUNC(namcos2_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
+	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
+}
+
+void namcos2_state::slave_suzuka8h_am(address_map &map)
+{
+	common_suzuka8h_am(map);
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x13ffff).ram();
+	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
+}
+
+/*************************************************************/
+
+void namcos2_state::common_luckywld_am(address_map &map)
+{
+	common_suzuka8h_am(map);
 	map(0xc00000, 0xc0ffff).rw(FUNC(namcos2_state::c169_roz_videoram_r), FUNC(namcos2_state::c169_roz_videoram_w)).share("rozvideoram");
 	map(0xd00000, 0xd0001f).rw(FUNC(namcos2_state::c169_roz_control_r), FUNC(namcos2_state::c169_roz_control_w));
-	map(0xf00000, 0xf00007).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
 }
 
 void namcos2_state::master_luckywld_am(address_map &map)
@@ -763,9 +789,8 @@ void namcos2_state::sound_default_am(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("audiobank"); /* banked */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x5000, 0x6fff).rw("c140", FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
-	map(0x7000, 0x77ff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
-	map(0x7800, 0x7fff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)); /* mirror */
+	map(0x5000, 0x6fff).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
+	map(0x7000, 0x77ff).rw(FUNC(namcos2_state::dpram_r), FUNC(namcos2_state::dpram_w)).share("dpram").mirror(0x0800);
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).nopw(); /* Amplifier enable on 1st write */
 	map(0xc000, 0xc001).w(FUNC(namcos2_state::namcos2_sound_bankselect_w));
@@ -797,7 +822,7 @@ void namcos2_state::mcu_default_am(address_map &map)
 	map(0x3001, 0x3001).portr("MCUDI1");
 	map(0x3002, 0x3002).portr("MCUDI2");
 	map(0x3003, 0x3003).portr("MCUDI3");
-	map(0x5000, 0x57ff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
+	map(0x5000, 0x57ff).rw(FUNC(namcos2_state::dpram_r), FUNC(namcos2_state::dpram_w)).share("dpram");
 	map(0x6000, 0x6fff).nopr(); /* watchdog */
 	map(0x8000, 0xffff).rom();
 }
@@ -808,12 +833,12 @@ void namcos2_state::mcu_default_am(address_map &map)
 /*************************************************************/
 READ8_MEMBER(namcos2_state::c68_p5_r)
 {
-	return (m_player_mux) ? ioport("MCUB2")->read() : ioport("MCUB")->read();
+	return (m_player_mux) ? m_mcu_b2_io->read() : m_mcu_b_io->read();
 }
 
 WRITE8_MEMBER(namcos2_state::c68_p3_w)
 {
-	m_player_mux = (data & 0x80) ? 1 : 0;
+	m_player_mux = BIT(data, 7);
 }
 
 void namcos2_state::c68_default_am(address_map &map)
@@ -824,7 +849,7 @@ void namcos2_state::c68_default_am(address_map &map)
 	map(0x3001, 0x3001).portr("MCUDI1");
 	map(0x3002, 0x3002).portr("MCUDI2");
 	map(0x3003, 0x3003).portr("MCUDI3");
-	map(0x5000, 0x57ff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
+	map(0x5000, 0x57ff).rw(FUNC(namcos2_state::dpram_r), FUNC(namcos2_state::dpram_w)).share("dpram");
 	map(0x6000, 0x6fff).r(FUNC(namcos2_state::ack_mcu_vbl_r)); // VBL ack
 	map(0x8000, 0xffff).rom().region("c68", 0);
 }
@@ -1599,10 +1624,21 @@ static const gfx_layout metlhawk_sprite_layout = {
 	32*32*8
 };
 
+static const gfx_layout metlhawk_sprite_layout_swapped = {
+	32,32,
+	RGN_FRAC(1,1), /* number of sprites */
+	8, /* bits per pixel */
+	{ STEP8(0,1) },
+	{ STEP32(0,8*32) },
+	{ STEP32(0,8) },
+	32*32*8
+};
+
 static GFXDECODE_START( gfx_metlhawk )
-	GFXDECODE_ENTRY( "sprites",  0x000000, metlhawk_sprite_layout, 0*256, 16 )
-	GFXDECODE_ENTRY( "tiles",    0x000000, layout8x8x8,           16*256, 16 )
-	GFXDECODE_ENTRY( "roztiles", 0x000000, layout16x16x8,          0*256, 16 )
+	GFXDECODE_ENTRY( "sprites",  0x000000, metlhawk_sprite_layout,         0*256, 16 )
+	GFXDECODE_ENTRY( "tiles",    0x000000, layout8x8x8,                   16*256, 16 )
+	GFXDECODE_ENTRY( "roztiles", 0x000000, layout16x16x8,                  0*256, 16 )
+	GFXDECODE_ENTRY( "sprites",  0x000000, metlhawk_sprite_layout_swapped, 0*256, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_namcos2 )
@@ -1659,16 +1695,29 @@ via software as INT1
 /*                                                           */
 /*************************************************************/
 
-MACHINE_CONFIG_START(namcos2_state::configure_c148_standard)
-	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
-	MCFG_NAMCO_C148_LINK("slave_intc")
-	MCFG_NAMCO_C148_EXT1_CB(WRITE8(*this, namcos2_state, sound_reset_w))
-	MCFG_NAMCO_C148_EXT2_CB(WRITE8(*this, namcos2_state, system_reset_w))
+void namcos2_state::configure_c116_standard(machine_config &config)
+{
+	PALETTE(config, m_palette, 0x2000);
+	m_palette->enable_shadows();
 
-	MCFG_NAMCO_C148_ADD("slave_intc","slave",false)
-	MCFG_NAMCO_C148_LINK("master_intc")
+	NAMCO_C116(config, m_c116, 0);
+	m_c116->set_palette(m_palette);
 
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(49'152'000) / 8, 384, 0, 288, 264, 0, 224);
+	m_screen->set_palette(m_palette);
+}
+
+void namcos2_state::configure_c148_standard(machine_config &config)
+{
+	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
+	m_master_intc->link_c148_device(m_slave_intc);
+	m_master_intc->out_ext1_callback().set(FUNC(namcos2_state::sound_reset_w));
+	m_master_intc->out_ext2_callback().set(FUNC(namcos2_state::system_reset_w));
+
+	NAMCO_C148(config, m_slave_intc, 0, m_slave, false);
+	m_slave_intc->link_c148_device(m_master_intc);
+}
 
 // TODO: temp
 TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
@@ -1715,30 +1764,20 @@ MACHINE_CONFIG_START(namcos2_state::base)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
-	MCFG_SCREEN_SIZE(384, 264)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	configure_c116_standard(config);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos2)
-
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_namcos2)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -1749,10 +1788,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos2_state::base2)
 	base(config);
 
-	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	m_c140->reset_routes();
+	m_c140->add_route(0, "lspeaker", 1.0);
+	m_c140->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 /* end */
 
@@ -1765,10 +1803,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos2_state::base3)
 	base(config);
 
-	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	m_c140->reset_routes();
+	m_c140->add_route(0, "lspeaker", 0.45);
+	m_c140->add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1777,11 +1814,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_DEVICE_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(master_default_am)
+	MCFG_DEVICE_PROGRAM_MAP(master_gollygho_am)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos2_state, screen_scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(slave_default_am)
+	MCFG_DEVICE_PROGRAM_MAP(slave_gollygho_am)
 
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
@@ -1799,30 +1836,20 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
-	MCFG_SCREEN_SIZE(384, 264)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	configure_c116_standard(config);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos2)
-
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_namcos2)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -1853,39 +1880,36 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
-	MCFG_SCREEN_SIZE(384, 264)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
-	MCFG_SCREEN_PALETTE("palette")
+	configure_c116_standard(config);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_finallap));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_finallap)
-
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_finallap)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finallap)
 
-	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C45_ROAD(config, m_c45_road, 0);
+	m_c45_road->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+MACHINE_CONFIG_END
+
+// finalap2 has different mangle
+MACHINE_CONFIG_START(namcos2_state::finalap2)
+	finallap(config);
+
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finalap2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos2_state::sgunner)
@@ -1912,32 +1936,22 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
-	MCFG_SCREEN_SIZE(384, 264)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
-	MCFG_SCREEN_PALETTE("palette")
+	configure_c116_standard(config);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_sgunner));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sgunner)
-
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_sgunner)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -1973,45 +1987,35 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
-	MCFG_SCREEN_SIZE(384, 264)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
-	MCFG_SCREEN_PALETTE("palette")
+	configure_c116_standard(config);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_sgunner));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sgunner)
-
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_sgunner)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(namcos2_state::luckywld)
+MACHINE_CONFIG_START(namcos2_state::suzuka8h)
 	MCFG_DEVICE_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(master_luckywld_am)
+	MCFG_DEVICE_PROGRAM_MAP(master_suzuka8h_am)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos2_state, screen_scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
-	MCFG_DEVICE_PROGRAM_MAP(slave_luckywld_am)
+	MCFG_DEVICE_PROGRAM_MAP(slave_suzuka8h_am)
 
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_DEVICE_PROGRAM_MAP(sound_default_am)
@@ -2029,39 +2033,44 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
-	MCFG_SCREEN_SIZE(384, 264)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
-	MCFG_SCREEN_PALETTE("palette")
+	configure_c116_standard(config);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_suzuka8h));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_luckywld)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_sgunner)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
-
-	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C45_ROAD(config, m_c45_road, 0);
+	m_c45_road->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(namcos2_state::luckywld) // same as suzuka8h but ROZ hardware is populated
+	suzuka8h(config);
+	MCFG_DEVICE_MODIFY("maincpu") /* 12.288MHz (49.152MHz OSC/4) */
+	MCFG_DEVICE_PROGRAM_MAP(master_luckywld_am)
+
+	MCFG_DEVICE_MODIFY("slave") /* 12.288MHz (49.152MHz OSC/4) */
+	MCFG_DEVICE_PROGRAM_MAP(slave_luckywld_am)
+
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_luckywld));
+
+	MCFG_DEVICE_REPLACE(m_gfxdecode, GFXDECODE, "palette", gfx_luckywld)
+
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos2_state::metlhawk)
@@ -2088,32 +2097,22 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
-	MCFG_SCREEN_SIZE(384, 264)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
-	MCFG_SCREEN_PALETTE("palette")
+	configure_c116_standard(config);
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_metlhawk));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlhawk)
-
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_metlhawk)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 1.0);
+	m_c140->add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 //  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
@@ -2190,7 +2189,7 @@ ROM_START( assault )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65b.bin",  0x008000, 0x008000, CRC(e9f2922a) SHA1(5767d2f85e1eb3de19192e73b02221f28b1fbb83) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_128K( "atobj0.bin",  0x000003, CRC(22240076) SHA1(916fc0e6b338a6dda84399df910c3c9463e6b915) )
 	NAMCOS2_SPRROM_LOAD_128K( "atobj1.bin",  0x000002, CRC(2284a8e8) SHA1(80f9143e08f9f8ff3e937312a8ce76855a1929ad) )
 	NAMCOS2_SPRROM_LOAD_128K( "atobj2.bin",  0x000001, CRC(51425476) SHA1(12a2fb1b61adfa4c21a5af4f206ffe48a045a953) )
@@ -2242,7 +2241,7 @@ ROM_START( assaultj )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65b.bin",  0x008000, 0x008000, CRC(e9f2922a) SHA1(5767d2f85e1eb3de19192e73b02221f28b1fbb83) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_128K( "atobj0.bin",  0x000003, CRC(22240076) SHA1(916fc0e6b338a6dda84399df910c3c9463e6b915) )
 	NAMCOS2_SPRROM_LOAD_128K( "atobj1.bin",  0x000002, CRC(2284a8e8) SHA1(80f9143e08f9f8ff3e937312a8ce76855a1929ad) )
 	NAMCOS2_SPRROM_LOAD_128K( "atobj2.bin",  0x000001, CRC(51425476) SHA1(12a2fb1b61adfa4c21a5af4f206ffe48a045a953) )
@@ -2294,7 +2293,7 @@ ROM_START( assaultp )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65b.bin",  0x008000, 0x008000, CRC(e9f2922a) SHA1(5767d2f85e1eb3de19192e73b02221f28b1fbb83) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_128K( "atobj0.bin",  0x000003, CRC(22240076) SHA1(916fc0e6b338a6dda84399df910c3c9463e6b915) )
 	NAMCOS2_SPRROM_LOAD_128K( "atobj1.bin",  0x000002, CRC(2284a8e8) SHA1(80f9143e08f9f8ff3e937312a8ce76855a1929ad) )
 	NAMCOS2_SPRROM_LOAD_128K( "atobj2.bin",  0x000001, CRC(51425476) SHA1(12a2fb1b61adfa4c21a5af4f206ffe48a045a953) )
@@ -2346,7 +2345,7 @@ ROM_START( burnforc )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "bu_obj-0.bin",  0x000003, 0x080000, CRC(24c919a1) SHA1(ddf5bfbf1bbe2a10d6708b618b77f1d6d7862372) )
 	ROM_LOAD32_BYTE( "bu_obj-1.bin",  0x000002, 0x080000, CRC(5bcb519b) SHA1(1d2979a4bed7e952ec77d3a5891a6412044d5f49) )
 	ROM_LOAD32_BYTE( "bu_obj-2.bin",  0x000001, 0x080000, CRC(509dd5d0) SHA1(68a9054fcde7b677f529ef4db6a8b29750649a2a) )
@@ -2396,7 +2395,7 @@ ROM_START( burnforco )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "bu_obj-0.bin",  0x000003, 0x080000, CRC(24c919a1) SHA1(ddf5bfbf1bbe2a10d6708b618b77f1d6d7862372) )
 	ROM_LOAD32_BYTE( "bu_obj-1.bin",  0x000002, 0x080000, CRC(5bcb519b) SHA1(1d2979a4bed7e952ec77d3a5891a6412044d5f49) )
 	ROM_LOAD32_BYTE( "bu_obj-2.bin",  0x000001, 0x080000, CRC(509dd5d0) SHA1(68a9054fcde7b677f529ef4db6a8b29750649a2a) )
@@ -2447,7 +2446,7 @@ ROM_START( cosmogng )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "co1obj0.bin",  0x000003, 0x080000, CRC(5df8ce0c) SHA1(afb9fb6e048af5aed8976192b847c0674c5e5ce1) )
 	ROM_LOAD32_BYTE( "co1obj1.bin",  0x000002, 0x080000, CRC(3d152497) SHA1(70c6725cacf86ba4d4b9dbeed7a1e04df9301228) )
 	ROM_LOAD32_BYTE( "co1obj2.bin",  0x000001, 0x080000, CRC(4e50b6ee) SHA1(0fd4c19fa77ba6774237c760ac1096d4806248dd) )
@@ -2491,7 +2490,7 @@ ROM_START( cosmogngj )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "co1obj0.bin",  0x000003, 0x080000, CRC(5df8ce0c) SHA1(afb9fb6e048af5aed8976192b847c0674c5e5ce1) )
 	ROM_LOAD32_BYTE( "co1obj1.bin",  0x000002, 0x080000, CRC(3d152497) SHA1(70c6725cacf86ba4d4b9dbeed7a1e04df9301228) )
 	ROM_LOAD32_BYTE( "co1obj2.bin",  0x000001, 0x080000, CRC(4e50b6ee) SHA1(0fd4c19fa77ba6774237c760ac1096d4806248dd) )
@@ -2535,7 +2534,7 @@ ROM_START( dirtfoxj )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "df1_obj0.bin",  0x000003, 0x080000, CRC(b6bd1a68) SHA1(38677b54cd257411db499ba03b9176422797bf64) )
 	ROM_LOAD32_BYTE( "df1_obj1.bin",  0x000002, 0x080000, CRC(05421dc1) SHA1(d538bb33b1ec1a3ad0feaa75d69a7a327c7dc6fa) )
 	ROM_LOAD32_BYTE( "df1_obj2.bin",  0x000001, 0x080000, CRC(9390633e) SHA1(91d1a7f2c981c893e4c5d0c6c7199646b86bd1e0) )
@@ -2586,7 +2585,7 @@ ROM_START( dsaber )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "do obj-0a.obj0",  0x000003, 0x080000, CRC(f08c6648) SHA1(ac5221ba159f2390060cbbb7d9cd8148c7bb4a02) )
 	ROM_LOAD32_BYTE( "do obj-1a.obj1",  0x000002, 0x080000, CRC(34e0810d) SHA1(679d9b82879cff5197a5098e5dc724c85373b9dc) )
 	ROM_LOAD32_BYTE( "do obj-2a.obj2",  0x000001, 0x080000, CRC(bccdabf3) SHA1(d079d89083ac6e71ac8926792d0d7cdcebc848a9) )
@@ -2635,7 +2634,7 @@ ROM_START( dsabera )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "do obj-0a.obj0",  0x000003, 0x080000, CRC(f08c6648) SHA1(ac5221ba159f2390060cbbb7d9cd8148c7bb4a02) )
 	ROM_LOAD32_BYTE( "do obj-1a.obj1",  0x000002, 0x080000, CRC(34e0810d) SHA1(679d9b82879cff5197a5098e5dc724c85373b9dc) )
 	ROM_LOAD32_BYTE( "do obj-2a.obj2",  0x000001, 0x080000, CRC(bccdabf3) SHA1(d079d89083ac6e71ac8926792d0d7cdcebc848a9) )
@@ -2683,7 +2682,7 @@ ROM_START( dsaberj )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "do obj-0a.obj0",  0x000003, 0x080000, CRC(f08c6648) SHA1(ac5221ba159f2390060cbbb7d9cd8148c7bb4a02) )
 	ROM_LOAD32_BYTE( "do obj-1a.obj1",  0x000002, 0x080000, CRC(34e0810d) SHA1(679d9b82879cff5197a5098e5dc724c85373b9dc) )
 	ROM_LOAD32_BYTE( "do obj-2a.obj2",  0x000001, 0x080000, CRC(bccdabf3) SHA1(d079d89083ac6e71ac8926792d0d7cdcebc848a9) )
@@ -2989,7 +2988,7 @@ ROM_START( finalap2 )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "fl2obj0",  0x000003, 0x080000, CRC(3657dd7a) SHA1(8f286ec0642b09ff42bf0dbd784ae257d4ab278a) )
 	ROM_LOAD32_BYTE( "fl2obj2",  0x000002, 0x080000, CRC(8ac933fd) SHA1(b158df2ec55f49ec05861075c8d7bd265361dab0) )
 	ROM_LOAD32_BYTE( "fl2obj4",  0x000001, 0x080000, CRC(e7b989e6) SHA1(485e8148510edd1645f5b4fbbc9a53e8bf1c3e5f) )
@@ -3044,7 +3043,7 @@ ROM_START( finalap2j )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "fl2obj0",  0x000003, 0x080000, CRC(3657dd7a) SHA1(8f286ec0642b09ff42bf0dbd784ae257d4ab278a) )
 	ROM_LOAD32_BYTE( "fl2obj2",  0x000002, 0x080000, CRC(8ac933fd) SHA1(b158df2ec55f49ec05861075c8d7bd265361dab0) )
 	ROM_LOAD32_BYTE( "fl2obj4",  0x000001, 0x080000, CRC(e7b989e6) SHA1(485e8148510edd1645f5b4fbbc9a53e8bf1c3e5f) )
@@ -3100,7 +3099,7 @@ ROM_START( finalap3 ) // this set displays MOTION (Ver. 3) in the test mode menu
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "flt_obj-0.4c",  0x000003, 0x080000, CRC(eab19ec6) SHA1(2859e88b94aa873f3b6ba22790f2211f3e172dd1) )
 	ROM_LOAD32_BYTE( "flt_obj-2.4a",  0x000002, 0x080000, CRC(2a3b7ded) SHA1(455d9d6cf7d497687f93af899fc20bbff6129391) )
 	ROM_LOAD32_BYTE( "flt_obj-4.8c",  0x000001, 0x080000, CRC(84aa500c) SHA1(087c0089478a270154f50f3b0f001428e80d74c7) )
@@ -3159,7 +3158,7 @@ ROM_START( finalap3a )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "flt_obj-0.4c",  0x000003, 0x080000, CRC(eab19ec6) SHA1(2859e88b94aa873f3b6ba22790f2211f3e172dd1) )
 	ROM_LOAD32_BYTE( "flt_obj-2.4a",  0x000002, 0x080000, CRC(2a3b7ded) SHA1(455d9d6cf7d497687f93af899fc20bbff6129391) )
 	ROM_LOAD32_BYTE( "flt_obj-4.8c",  0x000001, 0x080000, CRC(84aa500c) SHA1(087c0089478a270154f50f3b0f001428e80d74c7) )
@@ -3221,7 +3220,7 @@ ROM_START( finalap3j )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "flt_obj-0.4c",  0x000003, 0x080000, CRC(eab19ec6) SHA1(2859e88b94aa873f3b6ba22790f2211f3e172dd1) )
 	ROM_LOAD32_BYTE( "flt_obj-2.4a",  0x000002, 0x080000, CRC(2a3b7ded) SHA1(455d9d6cf7d497687f93af899fc20bbff6129391) )
 	ROM_LOAD32_BYTE( "flt_obj-4.8c",  0x000001, 0x080000, CRC(84aa500c) SHA1(087c0089478a270154f50f3b0f001428e80d74c7) )
@@ -3281,7 +3280,7 @@ ROM_START( finalap3jc )
 	ROM_LOAD( "c68.3d",     0x000000, 0x002000, BAD_DUMP CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c68.3f", 0x008000, 0x008000, CRC(ca64550a) SHA1(38d1ad1b1287cadef0c999aff9357927315f8e6b) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "flt_obj-0.4c",  0x000003, 0x080000, CRC(eab19ec6) SHA1(2859e88b94aa873f3b6ba22790f2211f3e172dd1) )
 	ROM_LOAD32_BYTE( "flt_obj-2.4a",  0x000002, 0x080000, CRC(2a3b7ded) SHA1(455d9d6cf7d497687f93af899fc20bbff6129391) )
 	ROM_LOAD32_BYTE( "flt_obj-4.8c",  0x000001, 0x080000, CRC(84aa500c) SHA1(087c0089478a270154f50f3b0f001428e80d74c7) )
@@ -3338,7 +3337,7 @@ ROM_START( finalap3bl ) // bootleg set
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "flt_obj-0.4c",  0x000003, 0x080000, CRC(eab19ec6) SHA1(2859e88b94aa873f3b6ba22790f2211f3e172dd1) )
 	ROM_LOAD32_BYTE( "flt_obj-2.4a",  0x000002, 0x080000, CRC(2a3b7ded) SHA1(455d9d6cf7d497687f93af899fc20bbff6129391) )
 	ROM_LOAD32_BYTE( "flt_obj-4.8c",  0x000001, 0x080000, CRC(84aa500c) SHA1(087c0089478a270154f50f3b0f001428e80d74c7) )
@@ -3396,7 +3395,7 @@ ROM_START( finehour )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "fh1_ob0.bin",  0x000003, 0x080000, CRC(b1fd86f1) SHA1(5504ca1a83c329a19d5632b9ac40cfa7e8ced304) )
 	ROM_LOAD32_BYTE( "fh1_ob1.bin",  0x000002, 0x080000, CRC(519c44ce) SHA1(f4b033d1caac1944a870d94a06a40aad332a75db) )
 	ROM_LOAD32_BYTE( "fh1_ob2.bin",  0x000001, 0x080000, CRC(9c5de4fa) SHA1(ead6e53d3fd7adc6f1cb4971a0858ff0098e9897) )
@@ -3608,7 +3607,7 @@ ROM_START( fourtrax )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "fx_obj-0.4c",  0x000003, 0x040000, CRC(1aa60ffa) SHA1(1fa625a52c763b8db718af14e9f3cc3e076ff83b) )
 	ROM_LOAD32_BYTE( "fx_obj-1.3c",  0x100003, 0x040000, CRC(7509bc09) SHA1(823d8d884afc685dda26c1256c2d241c7f626f9e) )
 	ROM_LOAD32_BYTE( "fx_obj2.2c",   0x200003, 0x040000, CRC(243affc7) SHA1(738d62960e79b95079b2208ec48fa0f3738c7611) )
@@ -3668,7 +3667,7 @@ ROM_START( fourtraxa )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "fx_obj-0.4c",  0x000003, 0x040000, CRC(1aa60ffa) SHA1(1fa625a52c763b8db718af14e9f3cc3e076ff83b) )
 	ROM_LOAD32_BYTE( "fx_obj-1.3c",  0x100003, 0x040000, CRC(7509bc09) SHA1(823d8d884afc685dda26c1256c2d241c7f626f9e) )
 	ROM_LOAD32_BYTE( "fx_obj2.2c",   0x200003, 0x040000, CRC(243affc7) SHA1(738d62960e79b95079b2208ec48fa0f3738c7611) )
@@ -3730,7 +3729,7 @@ ROM_START( marvland )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj0.bin",  0x000003, CRC(73a29361) SHA1(fc8ac9a063c1f18ae619ddca3062491774c86040) )
 	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj1.bin",  0x000002, CRC(abbe4a99) SHA1(7f8df4b40236b97a0dce984698308647d5803244) )
 	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj2.bin",  0x000001, CRC(753659e0) SHA1(2662acf7bec528c7ac4181f62154581e304eea82) )
@@ -3779,7 +3778,7 @@ ROM_START( marvlandj )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj0.bin",  0x000003, CRC(73a29361) SHA1(fc8ac9a063c1f18ae619ddca3062491774c86040) )
 	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj1.bin",  0x000002, CRC(abbe4a99) SHA1(7f8df4b40236b97a0dce984698308647d5803244) )
 	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj2.bin",  0x000001, CRC(753659e0) SHA1(2662acf7bec528c7ac4181f62154581e304eea82) )
@@ -3826,7 +3825,7 @@ ROM_START( metlhawk )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_256K( "mhobj-0.5d", 0x000000, CRC(52ae6620) SHA1(0d08109db975d26caa06ac47b71ac8d26a993f9c) )
 	NAMCOS2_SPRROM_LOAD_256K( "mhobj-1.5b", 0x000001, CRC(2c2a1291) SHA1(b644586cf623f9a113dbf3a8d951e62507e93179) )
 	NAMCOS2_SPRROM_LOAD_256K( "mhobj-2.6d", 0x000002, CRC(6221b927) SHA1(caa106a47bc9e24fb90752175dc5156f7249d12a) )
@@ -3895,7 +3894,7 @@ ROM_START( metlhawkj )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_256K( "mhobj-0.5d", 0x000000, CRC(52ae6620) SHA1(0d08109db975d26caa06ac47b71ac8d26a993f9c) )
 	NAMCOS2_SPRROM_LOAD_256K( "mhobj-1.5b", 0x000001, CRC(2c2a1291) SHA1(b644586cf623f9a113dbf3a8d951e62507e93179) )
 	NAMCOS2_SPRROM_LOAD_256K( "mhobj-2.6d", 0x000002, CRC(6221b927) SHA1(caa106a47bc9e24fb90752175dc5156f7249d12a) )
@@ -3964,7 +3963,7 @@ ROM_START( mirninja )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65b.bin",  0x008000, 0x008000, CRC(e9f2922a) SHA1(5767d2f85e1eb3de19192e73b02221f28b1fbb83) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_128K( "mn_obj0.bin",  0x000003, CRC(6bd1e290) SHA1(11e5f7adef0d7a519246c6d88f9371e49a6b49e9) )
 	NAMCOS2_SPRROM_LOAD_128K( "mn_obj1.bin",  0x000002, CRC(5e8503be) SHA1(e03e13e70932b65e1bd560f685eda107f00a8bb6) )
 	NAMCOS2_SPRROM_LOAD_128K( "mn_obj2.bin",  0x000001, CRC(a96d9b45) SHA1(5ad32ef08c38bff368590e0549c4b4552af5c2c8) )
@@ -4017,7 +4016,7 @@ ROM_START( ordyne )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2_c65b.3f",  0x008000, 0x008000, CRC(e9f2922a) SHA1(5767d2f85e1eb3de19192e73b02221f28b1fbb83) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_128K( "or_obj-0.obj0",  0x000003, CRC(67b2b9e4) SHA1(4e589c28ed23224e40d3c68055ada0136cbf94cb) )
 	NAMCOS2_SPRROM_LOAD_128K( "or_obj-1.obj1",  0x000002, CRC(8a54fa5e) SHA1(8f71a79dc3bdf8ea4f11cfc31338836ab0c695a5) )
 	NAMCOS2_SPRROM_LOAD_128K( "or_obj-2.obj2",  0x000001, CRC(a2c1cca0) SHA1(f2e8b1b09751695c18bbfbdbe1765e3802833850) )
@@ -4074,7 +4073,7 @@ ROM_START( ordyneje )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2_c65b.3f",  0x008000, 0x008000, CRC(e9f2922a) SHA1(5767d2f85e1eb3de19192e73b02221f28b1fbb83) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_128K( "or_obj-0.obj0",  0x000003, CRC(67b2b9e4) SHA1(4e589c28ed23224e40d3c68055ada0136cbf94cb) )
 	NAMCOS2_SPRROM_LOAD_128K( "or_obj-1.obj1",  0x000002, CRC(8a54fa5e) SHA1(8f71a79dc3bdf8ea4f11cfc31338836ab0c695a5) )
 	NAMCOS2_SPRROM_LOAD_128K( "or_obj-2.obj2",  0x000001, CRC(a2c1cca0) SHA1(f2e8b1b09751695c18bbfbdbe1765e3802833850) )
@@ -4131,7 +4130,7 @@ ROM_START( ordynej )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2_c65b.3f",  0x008000, 0x008000, CRC(e9f2922a) SHA1(5767d2f85e1eb3de19192e73b02221f28b1fbb83) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_128K( "or_obj-0.obj0",  0x000003, CRC(67b2b9e4) SHA1(4e589c28ed23224e40d3c68055ada0136cbf94cb) )
 	NAMCOS2_SPRROM_LOAD_128K( "or_obj-1.obj1",  0x000002, CRC(8a54fa5e) SHA1(8f71a79dc3bdf8ea4f11cfc31338836ab0c695a5) )
 	NAMCOS2_SPRROM_LOAD_128K( "or_obj-2.obj2",  0x000001, CRC(a2c1cca0) SHA1(f2e8b1b09751695c18bbfbdbe1765e3802833850) )
@@ -4188,7 +4187,7 @@ ROM_START( phelios )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2_c65c.3f",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_256K( "ps_obj-0.obj0",  0x000003, CRC(f323db2b) SHA1(fa3c42c618da06af161ad3f8aa1283e9c4bd63c0) )
 	NAMCOS2_SPRROM_LOAD_256K( "ps_obj-1.obj1",  0x000002, CRC(faf7c2f5) SHA1(d0d33eddaf5de2b639717db83a85f441d81a5924) )
 	NAMCOS2_SPRROM_LOAD_256K( "ps_obj-2.obj2",  0x000001, CRC(828178ba) SHA1(d35ab8020ebaad0b4c0b24fa9edc2886b713a8ed) )
@@ -4244,7 +4243,7 @@ ROM_START( pheliosj )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2_c65c.3f",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	NAMCOS2_SPRROM_LOAD_256K( "ps_obj-0.obj0",  0x000003, CRC(f323db2b) SHA1(fa3c42c618da06af161ad3f8aa1283e9c4bd63c0) )
 	NAMCOS2_SPRROM_LOAD_256K( "ps_obj-1.obj1",  0x000002, CRC(faf7c2f5) SHA1(d0d33eddaf5de2b639717db83a85f441d81a5924) )
 	NAMCOS2_SPRROM_LOAD_256K( "ps_obj-2.obj2",  0x000001, CRC(828178ba) SHA1(d35ab8020ebaad0b4c0b24fa9edc2886b713a8ed) )
@@ -4286,89 +4285,89 @@ ROM_END
 /* ROLLING THUNDER 2 */
 ROM_START( rthun2 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
-	ROM_LOAD16_BYTE( "mpr0.bin",  0x000000, 0x020000, CRC(e09a3549) SHA1(027fe87c98a497c50d12c810b9c7e7216f985dca) )
-	ROM_LOAD16_BYTE( "mpr1.bin",  0x000001, 0x020000, CRC(09573bff) SHA1(b75e036419f95967d5d95c14f1e08aa0c2a05d8a) )
+	ROM_LOAD16_BYTE( "rts2_mpr0.bin",  0x000000, 0x020000, CRC(e09a3549) SHA1(027fe87c98a497c50d12c810b9c7e7216f985dca) )
+	ROM_LOAD16_BYTE( "rts2_mpr1.bin",  0x000001, 0x020000, CRC(09573bff) SHA1(b75e036419f95967d5d95c14f1e08aa0c2a05d8a) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
-	ROM_LOAD16_BYTE( "spr0.bin",  0x000000, 0x010000, CRC(54c22ac5) SHA1(747df2362839e6af15bdbf3298f9ea1c6e25f76a) )
-	ROM_LOAD16_BYTE( "spr1.bin",  0x000001, 0x010000, CRC(060eb393) SHA1(e8f7dd163df16747a74713a6cadd1d52c09b8036) )
+	ROM_LOAD16_BYTE( "rts2_spr0.bin",  0x000000, 0x010000, CRC(54c22ac5) SHA1(747df2362839e6af15bdbf3298f9ea1c6e25f76a) )
+	ROM_LOAD16_BYTE( "rts2_spr1.bin",  0x000001, 0x010000, CRC(060eb393) SHA1(e8f7dd163df16747a74713a6cadd1d52c09b8036) )
 
 	ROM_REGION( 0x040000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "snd0.bin",  0x000000, 0x020000, CRC(55b7562a) SHA1(47b12206ec4a709769351f3f5b4a1c5ebb98b416) )
-	ROM_LOAD( "snd1.bin",  0x020000, 0x020000, CRC(00445a4f) SHA1(2e136e3c38e4a1b69f80a19e07555f3269b7beb1) )
+	ROM_LOAD( "rst1_snd0.bin",  0x000000, 0x020000, CRC(55b7562a) SHA1(47b12206ec4a709769351f3f5b4a1c5ebb98b416) )
+	ROM_LOAD( "rst1_snd1.bin",  0x020000, 0x020000, CRC(00445a4f) SHA1(2e136e3c38e4a1b69f80a19e07555f3269b7beb1) )
 
 	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
-	ROM_LOAD32_BYTE( "obj0.bin",  0x000003, 0x080000, CRC(e5cb82c1) SHA1(2dc1922ecfd9e52af8c4a1edac1df343be64b499) )
-	ROM_LOAD32_BYTE( "obj1.bin",  0x000002, 0x080000, CRC(19ebe9fd) SHA1(6d7991a52a707f710c809eb44f1dfa4873369c17) )
-	ROM_LOAD32_BYTE( "obj2.bin",  0x000001, 0x080000, CRC(455c4a2f) SHA1(9d7944b41e98f990423d315365106890e2c5ae77) )
-	ROM_LOAD32_BYTE( "obj3.bin",  0x000000, 0x080000, CRC(fdcae8a9) SHA1(a1e1057b3263ee9af9e2d861cf8879f51265805e) )
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
+	ROM_LOAD32_BYTE( "rst1_obj0.bin",  0x000003, 0x080000, CRC(e5cb82c1) SHA1(2dc1922ecfd9e52af8c4a1edac1df343be64b499) )
+	ROM_LOAD32_BYTE( "rst1_obj1.bin",  0x000002, 0x080000, CRC(19ebe9fd) SHA1(6d7991a52a707f710c809eb44f1dfa4873369c17) )
+	ROM_LOAD32_BYTE( "rst1_obj2.bin",  0x000001, 0x080000, CRC(455c4a2f) SHA1(9d7944b41e98f990423d315365106890e2c5ae77) )
+	ROM_LOAD32_BYTE( "rst1_obj3.bin",  0x000000, 0x080000, CRC(fdcae8a9) SHA1(a1e1057b3263ee9af9e2d861cf8879f51265805e) )
 
 	ROM_REGION( 0x400000, "tiles", 0 ) /* Tiles */
-	ROM_LOAD( "chr0.bin",  0x000000, 0x080000, CRC(6f0e9a68) SHA1(873296778104eff11b828273abf7f6ca461c055a) )
-	ROM_LOAD( "chr1.bin",  0x080000, 0x080000, CRC(15e44adc) SHA1(fead0b2d693f9b6267895d8339bb250f5c77fb4d) )
+	ROM_LOAD( "rst1_chr0.bin",  0x000000, 0x080000, CRC(6f0e9a68) SHA1(873296778104eff11b828273abf7f6ca461c055a) )
+	ROM_LOAD( "rst1_chr1.bin",  0x080000, 0x080000, CRC(15e44adc) SHA1(fead0b2d693f9b6267895d8339bb250f5c77fb4d) )
 
 	ROM_REGION( 0x400000, "roztiles", 0 ) /* ROZ Tiles */
-	ROM_LOAD( "roz0.bin",  0x000000, 0x080000, CRC(482d0554) SHA1(95b99d1db5851b83b2af4deda2b61635a0562604) )
+	ROM_LOAD( "rst1_roz0.bin",  0x000000, 0x080000, CRC(482d0554) SHA1(95b99d1db5851b83b2af4deda2b61635a0562604) )
 
 	ROM_REGION( 0x080000, "tile_mask", 0 ) /* Mask shape */
 	ROM_LOAD( "shape.bin",  0x000000, 0x080000, CRC(cf58fbbe) SHA1(fbe3b2f0c3267b298993d6238d97b119e13e07f6) )
 
 	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data roms */
-	NAMCOS2_DATA_LOAD_E_128K( "data0.bin",  0x000000, CRC(0baf44ee) SHA1(5135d634f76893adb26a32976a69e2d47e2385c6) )
-	NAMCOS2_DATA_LOAD_O_128K( "data1.bin",  0x000000, CRC(58a8daac) SHA1(c13ae8fc25b748a006c6db5b4b7ae593738544e8) )
-	NAMCOS2_DATA_LOAD_E_128K( "data2.bin",  0x100000, CRC(8e850a2a) SHA1(e5230e80a23ca6d09c2c53f443ecf70cc74075d7) )
+	NAMCOS2_DATA_LOAD_E_128K( "rst1_data0.bin",  0x000000, CRC(0baf44ee) SHA1(5135d634f76893adb26a32976a69e2d47e2385c6) )
+	NAMCOS2_DATA_LOAD_O_128K( "rst1_data1.bin",  0x000000, CRC(58a8daac) SHA1(c13ae8fc25b748a006c6db5b4b7ae593738544e8) )
+	NAMCOS2_DATA_LOAD_E_128K( "rst1_data2.bin",  0x100000, CRC(8e850a2a) SHA1(e5230e80a23ca6d09c2c53f443ecf70cc74075d7) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
-	ROM_LOAD( "voi1.bin",  0x000000, 0x080000, CRC(e42027cd) SHA1(fa3a81118c7f112289c27023236dec2e9cbc78b5) )
-	ROM_LOAD( "voi2.bin",  0x080000, 0x080000, CRC(0c4c2b66) SHA1(7723cbef755439a66d026015596fe1547ccd65b1) )
+	ROM_LOAD( "rst1_voi1.bin",  0x000000, 0x080000, CRC(e42027cd) SHA1(fa3a81118c7f112289c27023236dec2e9cbc78b5) )
+	ROM_LOAD( "rst1_voi2.bin",  0x080000, 0x080000, CRC(0c4c2b66) SHA1(7723cbef755439a66d026015596fe1547ccd65b1) )
 ROM_END
 
 /* ROLLING THUNDER 2 (Japan) */
 ROM_START( rthun2j )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
-	ROM_LOAD16_BYTE( "mpr0j.bin",  0x000000, 0x020000, CRC(2563b9ee) SHA1(c6a4305f88ca5d796f3ba4f36af54fed51c16b75) )
-	ROM_LOAD16_BYTE( "mpr1j.bin",  0x000001, 0x020000, CRC(14c4c564) SHA1(a826176fef65c53518fdbc7b14c7a1a65c821c8c) )
+	ROM_LOAD16_BYTE( "rst1_mpr0.bin",  0x000000, 0x020000, CRC(2563b9ee) SHA1(c6a4305f88ca5d796f3ba4f36af54fed51c16b75) )
+	ROM_LOAD16_BYTE( "rst1_mpr1.bin",  0x000001, 0x020000, CRC(14c4c564) SHA1(a826176fef65c53518fdbc7b14c7a1a65c821c8c) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
-	ROM_LOAD16_BYTE( "spr0j.bin",  0x000000, 0x010000, CRC(f8ef5150) SHA1(92fddf08b97210afe8d47386fe73078ffc00bd90) )
-	ROM_LOAD16_BYTE( "spr1j.bin",  0x000001, 0x010000, CRC(52ed3a48) SHA1(21a9f0be29a7b121f1a8ca802af3a5ebf2c49cc0) )
+	ROM_LOAD16_BYTE( "rst1_spr0.bin",  0x000000, 0x010000, CRC(f8ef5150) SHA1(92fddf08b97210afe8d47386fe73078ffc00bd90) )
+	ROM_LOAD16_BYTE( "rst1_spr1.bin",  0x000001, 0x010000, CRC(52ed3a48) SHA1(21a9f0be29a7b121f1a8ca802af3a5ebf2c49cc0) )
 
 	ROM_REGION( 0x040000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "snd0.bin",  0x000000, 0x020000, CRC(55b7562a) SHA1(47b12206ec4a709769351f3f5b4a1c5ebb98b416) )
-	ROM_LOAD( "snd1.bin",  0x020000, 0x020000, CRC(00445a4f) SHA1(2e136e3c38e4a1b69f80a19e07555f3269b7beb1) )
+	ROM_LOAD( "rst1_snd0.bin",  0x000000, 0x020000, CRC(55b7562a) SHA1(47b12206ec4a709769351f3f5b4a1c5ebb98b416) )
+	ROM_LOAD( "rst1_snd1.bin",  0x020000, 0x020000, CRC(00445a4f) SHA1(2e136e3c38e4a1b69f80a19e07555f3269b7beb1) )
 
 	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
-	ROM_LOAD32_BYTE( "obj0.bin",  0x000003, 0x080000, CRC(e5cb82c1) SHA1(2dc1922ecfd9e52af8c4a1edac1df343be64b499) )
-	ROM_LOAD32_BYTE( "obj1.bin",  0x000002, 0x080000, CRC(19ebe9fd) SHA1(6d7991a52a707f710c809eb44f1dfa4873369c17) )
-	ROM_LOAD32_BYTE( "obj2.bin",  0x000001, 0x080000, CRC(455c4a2f) SHA1(9d7944b41e98f990423d315365106890e2c5ae77) )
-	ROM_LOAD32_BYTE( "obj3.bin",  0x000000, 0x080000, CRC(fdcae8a9) SHA1(a1e1057b3263ee9af9e2d861cf8879f51265805e) )
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
+	ROM_LOAD32_BYTE( "rst1_obj0.bin",  0x000003, 0x080000, CRC(e5cb82c1) SHA1(2dc1922ecfd9e52af8c4a1edac1df343be64b499) )
+	ROM_LOAD32_BYTE( "rst1_obj1.bin",  0x000002, 0x080000, CRC(19ebe9fd) SHA1(6d7991a52a707f710c809eb44f1dfa4873369c17) )
+	ROM_LOAD32_BYTE( "rst1_obj2.bin",  0x000001, 0x080000, CRC(455c4a2f) SHA1(9d7944b41e98f990423d315365106890e2c5ae77) )
+	ROM_LOAD32_BYTE( "rst1_obj3.bin",  0x000000, 0x080000, CRC(fdcae8a9) SHA1(a1e1057b3263ee9af9e2d861cf8879f51265805e) )
 
 	ROM_REGION( 0x400000, "tiles", 0 ) /* Tiles */
-	ROM_LOAD( "chr0.bin",  0x000000, 0x080000, CRC(6f0e9a68) SHA1(873296778104eff11b828273abf7f6ca461c055a) )
-	ROM_LOAD( "chr1.bin",  0x080000, 0x080000, CRC(15e44adc) SHA1(fead0b2d693f9b6267895d8339bb250f5c77fb4d) )
+	ROM_LOAD( "rst1_chr0.bin",  0x000000, 0x080000, CRC(6f0e9a68) SHA1(873296778104eff11b828273abf7f6ca461c055a) )
+	ROM_LOAD( "rst1_chr1.bin",  0x080000, 0x080000, CRC(15e44adc) SHA1(fead0b2d693f9b6267895d8339bb250f5c77fb4d) )
 
 	ROM_REGION( 0x400000, "roztiles", 0 ) /* ROZ Tiles */
-	ROM_LOAD( "roz0.bin",  0x000000, 0x080000, CRC(482d0554) SHA1(95b99d1db5851b83b2af4deda2b61635a0562604) )
+	ROM_LOAD( "rst1_roz0.bin",  0x000000, 0x080000, CRC(482d0554) SHA1(95b99d1db5851b83b2af4deda2b61635a0562604) )
 
 	ROM_REGION( 0x080000, "tile_mask", 0 ) /* Mask shape */
 	ROM_LOAD( "shape.bin",  0x000000, 0x080000, CRC(cf58fbbe) SHA1(fbe3b2f0c3267b298993d6238d97b119e13e07f6) )
 
 	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data roms */
-	NAMCOS2_DATA_LOAD_E_128K( "data0.bin",  0x000000, CRC(0baf44ee) SHA1(5135d634f76893adb26a32976a69e2d47e2385c6) )
-	NAMCOS2_DATA_LOAD_O_128K( "data1.bin",  0x000000, CRC(58a8daac) SHA1(c13ae8fc25b748a006c6db5b4b7ae593738544e8) )
-	NAMCOS2_DATA_LOAD_E_128K( "data2.bin",  0x100000, CRC(8e850a2a) SHA1(e5230e80a23ca6d09c2c53f443ecf70cc74075d7) )
+	NAMCOS2_DATA_LOAD_E_128K( "rst1_data0.bin",  0x000000, CRC(0baf44ee) SHA1(5135d634f76893adb26a32976a69e2d47e2385c6) )
+	NAMCOS2_DATA_LOAD_O_128K( "rst1_data1.bin",  0x000000, CRC(58a8daac) SHA1(c13ae8fc25b748a006c6db5b4b7ae593738544e8) )
+	NAMCOS2_DATA_LOAD_E_128K( "rst1_data2.bin",  0x100000, CRC(8e850a2a) SHA1(e5230e80a23ca6d09c2c53f443ecf70cc74075d7) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
-	ROM_LOAD( "voi1.bin",  0x000000, 0x080000, CRC(e42027cd) SHA1(fa3a81118c7f112289c27023236dec2e9cbc78b5) )
-	ROM_LOAD( "voi2.bin",  0x080000, 0x080000, CRC(0c4c2b66) SHA1(7723cbef755439a66d026015596fe1547ccd65b1) )
+	ROM_LOAD( "rst1_voi1.bin",  0x000000, 0x080000, CRC(e42027cd) SHA1(fa3a81118c7f112289c27023236dec2e9cbc78b5) )
+	ROM_LOAD( "rst1_voi2.bin",  0x080000, 0x080000, CRC(0c4c2b66) SHA1(7723cbef755439a66d026015596fe1547ccd65b1) )
 ROM_END
 
 /* STEEL GUNNER */
@@ -4388,7 +4387,7 @@ ROM_START( sgunner )
 	ROM_LOAD( "c68.3d",     0x000000, 0x002000, BAD_DUMP CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c68.3f", 0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "sn_obj0.8c",   0x000000, 0x080000, CRC(bbae38f7) SHA1(7a40ade13307791f5c5d300882f9a38e18c411d6) )
 	ROM_LOAD32_BYTE( "sn_obj1.12c",  0x000001, 0x080000, CRC(4dfacb51) SHA1(1b5ae37f7ee12b791ce80422bd7472aa38c41ddd) )
 	ROM_LOAD32_BYTE( "sn_obj2.10c",  0x000002, 0x080000, CRC(313a308f) SHA1(0773a567cf649394cd6fcdd6fba0c4575220a582) )
@@ -4434,7 +4433,7 @@ ROM_START( sgunnerj )
 	ROM_LOAD( "c68.3d",     0x000000, 0x002000, BAD_DUMP CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c68.3f", 0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "sn_obj0.8c",   0x000000, 0x080000, CRC(bbae38f7) SHA1(7a40ade13307791f5c5d300882f9a38e18c411d6) )
 	ROM_LOAD32_BYTE( "sn_obj1.12c",  0x000001, 0x080000, CRC(4dfacb51) SHA1(1b5ae37f7ee12b791ce80422bd7472aa38c41ddd) )
 	ROM_LOAD32_BYTE( "sn_obj2.10c",  0x000002, 0x080000, CRC(313a308f) SHA1(0773a567cf649394cd6fcdd6fba0c4575220a582) )
@@ -4479,7 +4478,7 @@ ROM_START( sgunner2 )
 	ROM_REGION( 0x8000, "c68", 0 ) /* C68 (M37450) I/O MCU program */
 	ROM_LOAD( "sys2_c68.3f",  0x000000, 0x008000, CRC(ca64550a) SHA1(38d1ad1b1287cadef0c999aff9357927315f8e6b) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "sns_obj0.bin",  0x000000, 0x080000, CRC(c762445c) SHA1(108170c9a5c82c23c1ac09f91195137ca05989f4) )
 	ROM_LOAD32_BYTE( "sns_obj1.bin",  0x000001, 0x080000, CRC(e9e379d8) SHA1(01b5f5946e746a5265d230273c99a41910fd9e6f) )
 	ROM_LOAD32_BYTE( "sns_obj2.bin",  0x000002, 0x080000, CRC(0d076f6c) SHA1(247da0514c3809350ce308334e601f1689a7449f) )
@@ -4532,7 +4531,7 @@ ROM_START( sgunner2j )
 	ROM_REGION( 0x8000, "c68", 0 ) /* C68 (M37450) I/O MCU program */
 	ROM_LOAD( "sys2_c68.3f",  0x000000, 0x008000, CRC(ca64550a) SHA1(38d1ad1b1287cadef0c999aff9357927315f8e6b) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "sns_obj0.bin",  0x000000, 0x080000, CRC(c762445c) SHA1(108170c9a5c82c23c1ac09f91195137ca05989f4) )
 	ROM_LOAD32_BYTE( "sns_obj1.bin",  0x000001, 0x080000, CRC(e9e379d8) SHA1(01b5f5946e746a5265d230273c99a41910fd9e6f) )
 	ROM_LOAD32_BYTE( "sns_obj2.bin",  0x000002, 0x080000, CRC(0d076f6c) SHA1(247da0514c3809350ce308334e601f1689a7449f) )
@@ -4585,7 +4584,7 @@ ROM_START( sws )
 	ROM_LOAD( "c68.3d",     0x000000, 0x002000, BAD_DUMP CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c68.3f", 0x008000, 0x008000, CRC(ca64550a) SHA1(38d1ad1b1287cadef0c999aff9357927315f8e6b) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "ss1_obj0.5b",  0x000003, 0x080000, CRC(9bd6add1) SHA1(34595987670d7f64ba18a840e98667b96ae5e4bf) )
 	ROM_LOAD32_BYTE( "ss1_obj1.4b",  0x000002, 0x080000, CRC(a9db3d02) SHA1(63ff1ebc3fe27cd58fda0133bade9ca177ad2d89) )
 	ROM_LOAD32_BYTE( "ss1_obj2.5d",  0x000001, 0x080000, CRC(b4a73ced) SHA1(9d8476fb3db7fd2fce124dab09094f0ce0057116) )
@@ -4627,7 +4626,7 @@ ROM_START( sws92 )
 	ROM_LOAD( "c68.3d",     0x000000, 0x002000, BAD_DUMP CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c68.3f", 0x008000, 0x008000, CRC(ca64550a) SHA1(38d1ad1b1287cadef0c999aff9357927315f8e6b) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "sss_obj0.bin",  0x000003, 0x080000, CRC(375e8f1f) SHA1(b737bcceb498a66593d06ef102958bea90032106) )
 	ROM_LOAD32_BYTE( "sss_obj1.bin",  0x000002, 0x080000, CRC(675c1014) SHA1(b960a1f72cddc5e369ab7063678e5548b508e376) )
 	ROM_LOAD32_BYTE( "sss_obj2.bin",  0x000001, 0x080000, CRC(bdc55f1c) SHA1(fa4f454406eb7e21daed16fedba2adcdb0fb6247) )
@@ -4671,7 +4670,7 @@ ROM_START( sws92g )
 	ROM_LOAD( "c68.3d",     0x000000, 0x002000, BAD_DUMP CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c68.3f", 0x008000, 0x008000, CRC(ca64550a) SHA1(38d1ad1b1287cadef0c999aff9357927315f8e6b) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "sss_obj0.bin",  0x000003, 0x080000, CRC(375e8f1f) SHA1(b737bcceb498a66593d06ef102958bea90032106) )
 	ROM_LOAD32_BYTE( "sss_obj1.bin",  0x000002, 0x080000, CRC(675c1014) SHA1(b960a1f72cddc5e369ab7063678e5548b508e376) )
 	ROM_LOAD32_BYTE( "sss_obj2.bin",  0x000001, 0x080000, CRC(bdc55f1c) SHA1(fa4f454406eb7e21daed16fedba2adcdb0fb6247) )
@@ -4717,7 +4716,7 @@ ROM_START( sws93 )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "sst_obj0.bin",  0x000003, 0x080000, CRC(4089dfd7) SHA1(d37fb08d03a4d3f87b10a8e73bbb1817543396ff) )
 	ROM_LOAD32_BYTE( "sst_obj1.bin",  0x000002, 0x080000, CRC(cfbc25c7) SHA1(7b6459bda373d1025db6bc8df671d73d6c0963b9) )
 	ROM_LOAD32_BYTE( "sst_obj2.bin",  0x000001, 0x080000, CRC(61ed3558) SHA1(af1785e909f61db4ad1b250a7064ad07d886edd5) )
@@ -4761,7 +4760,7 @@ ROM_START( suzuka8h )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "eh1-obj0.bin",  0x000000, 0x080000, CRC(864b6816) SHA1(72d831b631afb2848578bd49cd7d3e12a78644b4) )
 	ROM_LOAD32_BYTE( "eh1-obj1.bin",  0x000001, 0x080000, CRC(d4921c35) SHA1(fe1b3997c3298e58919fa5602b94bd121439d5bc) )
 	ROM_LOAD32_BYTE( "eh1-obj2.bin",  0x000002, 0x080000, CRC(966d3f19) SHA1(997669cce56350cd7ed02eec0a88696469435490) )
@@ -4775,8 +4774,6 @@ ROM_START( suzuka8h )
 	ROM_LOAD( "eh2-chr0.bin",  0x000000, 0x080000, CRC(b2450fd2) SHA1(4aafb2c96b15e01364eb61ad0a71929c730e30a4) )
 	ROM_LOAD( "eh2-chr1.bin",  0x080000, 0x080000, CRC(57204651) SHA1(72cd7bd761a2b0fd12b3c3214098439d85438db8) )
 	ROM_LOAD( "eh1-chr2.bin",  0x100000, 0x080000, CRC(8150f644) SHA1(bf41d43938dbae6fd3162caebe8ffd4ec4bbd169) )
-
-	ROM_REGION( 0x400000, "roztiles", ROMREGION_ERASE00 ) /* 16x16 Tiles */
 
 	ROM_REGION( 0x080000, "tile_mask", 0 ) /* Mask shape */
 	ROM_LOAD( "eh2-sha0.bin",  0x000000, 0x080000, CRC(7f24619c) SHA1(0d19ab621cb42c5315be9a6b56f6711fc46ffff7) )
@@ -4811,7 +4808,7 @@ ROM_START( suzuka8hj )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "eh1-obj0.bin",  0x000000, 0x080000, CRC(864b6816) SHA1(72d831b631afb2848578bd49cd7d3e12a78644b4) )
 	ROM_LOAD32_BYTE( "eh1-obj1.bin",  0x000001, 0x080000, CRC(d4921c35) SHA1(fe1b3997c3298e58919fa5602b94bd121439d5bc) )
 	ROM_LOAD32_BYTE( "eh1-obj2.bin",  0x000002, 0x080000, CRC(966d3f19) SHA1(997669cce56350cd7ed02eec0a88696469435490) )
@@ -4825,8 +4822,6 @@ ROM_START( suzuka8hj )
 	ROM_LOAD( "eh1-chr0.bin",  0x000000, 0x080000, CRC(bc90ebef) SHA1(592ca134cc018e87214f72a97979cbf9425cfffd) )
 	ROM_LOAD( "eh1-chr1.bin",  0x080000, 0x080000, CRC(61395018) SHA1(4ffb8323b5671f99bb420881f84be58de7d79d07) )
 	ROM_LOAD( "eh1-chr2.bin",  0x100000, 0x080000, CRC(8150f644) SHA1(bf41d43938dbae6fd3162caebe8ffd4ec4bbd169) )
-
-	ROM_REGION( 0x400000, "roztiles", ROMREGION_ERASE00 ) /* 16x16 Tiles */
 
 	ROM_REGION( 0x080000, "tile_mask", 0 ) /* Mask shape */
 	ROM_LOAD( "eh1-sha0.bin",  0x000000, 0x080000, CRC(39585cf9) SHA1(8cc18b5745ab2cf50d4df0a17fc1a57771db28ab) )
@@ -4862,7 +4857,7 @@ ROM_START( suzuk8h2 )
 	ROM_LOAD( "sys2c68.3f", 0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 	/*There is no C65 on the board. There is C68 instead */
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "ehs1-obj0.3p",  0x000000, 0x080000, CRC(a0acf307) SHA1(6d79d2dd00da4f8f0462245f42a9d88b6ad632b1) )
 	ROM_LOAD32_BYTE( "ehs1-obj1.3w",  0x000001, 0x080000, CRC(ca780b44) SHA1(d16263851c165f5958b0a2ad1ba199058a8d56d5) )
 	ROM_LOAD32_BYTE( "ehs1-obj2.3t",  0x000002, 0x080000, CRC(83b45afe) SHA1(10a4b88b36f8d037cbb611cb273613b1d45e8eb5) )
@@ -4881,9 +4876,6 @@ ROM_START( suzuk8h2 )
 	ROM_LOAD( "ehs1-chr5.9p",  0x280000, 0x080000, CRC(9448537c) SHA1(99b9215907ed8658f19bec1153dc1d48bbfd7753) )
 	ROM_LOAD( "ehs1-chr6.9r",  0x300000, 0x080000, CRC(2d1c01ad) SHA1(1ed79e22b964fe648d22e43b78c1c3b5a7d5f8c8) )
 	ROM_LOAD( "ehs1-chr7.9s",  0x380000, 0x080000, CRC(18dd8676) SHA1(59b9a07f4a980fd920a29b8a90ef54c8c3b53e97) )
-
-	ROM_REGION( 0x400000, "roztiles", ROMREGION_ERASEFF ) /* ROZ Tiles */
-	/* No ROZ hardware on PCB */
 
 	ROM_REGION( 0x080000, "tile_mask", 0 ) /* Mask shape */
 	ROM_LOAD( "ehs1-sha0.7n",  0x000000, 0x080000, CRC(0f0e2dbf) SHA1(a4575fbdc868ba959d23204be7d659d40d8db4c2) )
@@ -4920,7 +4912,7 @@ ROM_START( suzuk8h2j )
 	ROM_LOAD( "sys2c68.3f", 0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 	/*There is no C65 on the board. There is C68 instead */
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "ehs1-obj0.3p",  0x000000, 0x080000, CRC(a0acf307) SHA1(6d79d2dd00da4f8f0462245f42a9d88b6ad632b1) )
 	ROM_LOAD32_BYTE( "ehs1-obj1.3w",  0x000001, 0x080000, CRC(ca780b44) SHA1(d16263851c165f5958b0a2ad1ba199058a8d56d5) )
 	ROM_LOAD32_BYTE( "ehs1-obj2.3t",  0x000002, 0x080000, CRC(83b45afe) SHA1(10a4b88b36f8d037cbb611cb273613b1d45e8eb5) )
@@ -4939,9 +4931,6 @@ ROM_START( suzuk8h2j )
 	ROM_LOAD( "ehs1-chr5.9p",  0x280000, 0x080000, CRC(9448537c) SHA1(99b9215907ed8658f19bec1153dc1d48bbfd7753) )
 	ROM_LOAD( "ehs1-chr6.9r",  0x300000, 0x080000, CRC(2d1c01ad) SHA1(1ed79e22b964fe648d22e43b78c1c3b5a7d5f8c8) )
 	ROM_LOAD( "ehs1-chr7.9s",  0x380000, 0x080000, CRC(18dd8676) SHA1(59b9a07f4a980fd920a29b8a90ef54c8c3b53e97) )
-
-	ROM_REGION( 0x400000, "roztiles", ROMREGION_ERASEFF ) /* ROZ Tiles */
-	/* No ROZ hardware on PCB */
 
 	ROM_REGION( 0x080000, "tile_mask", 0 ) /* Mask shape */
 	ROM_LOAD( "ehs1-sha0.7n",  0x000000, 0x080000, CRC(0f0e2dbf) SHA1(a4575fbdc868ba959d23204be7d659d40d8db4c2) )
@@ -5130,7 +5119,7 @@ ROM_START( gollygho )
 	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "gl1edr0c.ic7", 0x008000, 0x008000, CRC(db60886f) SHA1(a1183c058c0470a4ef8b0f69a3637b1640c5b5a4) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "gl1obj0.5b",  0x000003, 0x040000, CRC(6809d267) SHA1(8a0f636067974e51659bd05a3c17819c630d70e3) )
 	ROM_LOAD32_BYTE( "gl1obj1.4b",  0x000002, 0x040000, CRC(ae4304d4) SHA1(e3db507acf2ab9392060fc603bb95492d0251adc) )
 	ROM_LOAD32_BYTE( "gl1obj2.5d",  0x000001, 0x040000, CRC(9f2e9eb0) SHA1(d3b001286a5ede58860505bb2f48a755cc661f1f) )
@@ -5177,7 +5166,7 @@ ROM_START( bubbletr ) /* All labels were hand written and included the rom size,
 	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "bt1edr0a.ic7", 0x008000, 0x008000, CRC(155b02fc) SHA1(191683c19f756ac150b8e037f46a6daca1a082fa) ) /* dated 4/24 */
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "bt1-obj0.5b",  0x000003, 0x080000, CRC(16b5dc04) SHA1(57cc4b7907442f922102fbd61e470c149f0379ac) ) /* dated 4/24 */
 	ROM_LOAD32_BYTE( "bt1-obj1.4b",  0x000002, 0x080000, CRC(ae37a969) SHA1(524a8ef68a62f9168d356e6cd37a72a888ced202) ) /* dated 4/24 */
 	ROM_LOAD32_BYTE( "bt1-obj2.5d",  0x000001, 0x080000, CRC(75f74871) SHA1(75c47a2132e21a2d82000bca137929bffecc96ef) ) /* dated 4/24 */
@@ -5224,7 +5213,7 @@ ROM_START( bubbletrj )
 	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "bt1edr0a.ic7", 0x008000, 0x008000, CRC(155b02fc) SHA1(191683c19f756ac150b8e037f46a6daca1a082fa) )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "bt1-obj0.5b",  0x000003, 0x080000, CRC(16b5dc04) SHA1(57cc4b7907442f922102fbd61e470c149f0379ac) )
 	ROM_LOAD32_BYTE( "bt1-obj1.4b",  0x000002, 0x080000, CRC(ae37a969) SHA1(524a8ef68a62f9168d356e6cd37a72a888ced202) )
 	ROM_LOAD32_BYTE( "bt1-obj2.5d",  0x000001, 0x080000, CRC(75f74871) SHA1(75c47a2132e21a2d82000bca137929bffecc96ef) )
@@ -5257,7 +5246,7 @@ ROM_END
 
 /*
 Lucky & Wild
-Namco, 1989
+Namco, 1992
 
 PCB Layout
 ----------
@@ -5379,7 +5368,7 @@ ROM_START( luckywld )
 	ROM_LOAD( "c68.3d",  0x000000, 0x002000, BAD_DUMP CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 		/* MCU code only, C68PRG socket is unpopulated on real Lucky & Wild PCB */
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "lw1obj0.3p",  0x000000, 0x080000, CRC(21485830) SHA1(e55a1f6df90c17b9c49e2b08c423b9be86996659) )
 	ROM_LOAD32_BYTE( "lw1obj1.3w",  0x000001, 0x080000, CRC(d6437a82) SHA1(0aad3242828ed7dce65db75cad196c44ddd55ba8) )
 	ROM_LOAD32_BYTE( "lw1obj2.3t",  0x000002, 0x080000, CRC(ceb6f516) SHA1(943dfe3bcf71a4885ce0ff33aaf81b2a49cf0b70) )
@@ -5442,7 +5431,7 @@ ROM_START( luckywldj )
 	ROM_LOAD( "c68.3d",  0x000000, 0x002000, BAD_DUMP CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 		/* MCU code only, C68PRG socket is unpopulated on real Lucky & Wild PCB */
 
-	ROM_REGION( 0x400000, "sprites", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD32_BYTE( "lw1obj0.3p",  0x000000, 0x080000, CRC(21485830) SHA1(e55a1f6df90c17b9c49e2b08c423b9be86996659) )
 	ROM_LOAD32_BYTE( "lw1obj1.3w",  0x000001, 0x080000, CRC(d6437a82) SHA1(0aad3242828ed7dce65db75cad196c44ddd55ba8) )
 	ROM_LOAD32_BYTE( "lw1obj2.3t",  0x000002, 0x080000, CRC(ceb6f516) SHA1(943dfe3bcf71a4885ce0ff33aaf81b2a49cf0b70) )
@@ -5768,8 +5757,8 @@ GAME(  1990, dsaber,     0,        base3,    base,     namcos2_state, init_dsabe
 GAME(  1990, dsabera,    dsaber,   base3,    base,     namcos2_state, init_dsaber,   ROT90,  "Namco", "Dragon Saber (World, older?)", 0 )
 GAME(  1990, dsaberj,    dsaber,   base3,    base,     namcos2_state, init_dsaberj,  ROT90,  "Namco", "Dragon Saber (Japan, Rev B)", 0 )
 
-GAMEL( 1990, finalap2,   0,        finallap, finallap, namcos2_state, init_finalap2, ROT0,   "Namco", "Final Lap 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
-GAMEL( 1990, finalap2j,  finalap2, finallap, finallap, namcos2_state, init_finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
+GAMEL( 1990, finalap2,   0,        finalap2, finallap, namcos2_state, init_finalap2, ROT0,   "Namco", "Final Lap 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
+GAMEL( 1990, finalap2j,  finalap2, finalap2, finallap, namcos2_state, init_finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
 
 GAME(  1990, gollygho,   0,        gollygho, gollygho, namcos2_state, init_gollygho, ROT180, "Namco", "Golly! Ghost!", MACHINE_REQUIRES_ARTWORK )
 
@@ -5788,24 +5777,24 @@ GAME(  1991, cosmogngj,  cosmogng, base,     base,     namcos2_state, init_cosmo
 GAME(  1992, bubbletr,   0,        gollygho, bubbletr, namcos2_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble (World, Rev B)", MACHINE_REQUIRES_ARTWORK )
 GAME(  1992, bubbletrj,  bubbletr, gollygho, bubbletr, namcos2_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble (Japan, Rev C)", MACHINE_REQUIRES_ARTWORK )
 
-GAMEL( 1992, finalap3,   0,        finallap, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
-GAMEL( 1992, finalap3a,  finalap3, finallap, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
-GAMEL( 1992, finalap3j,  finalap3, finallap, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
-GAMEL( 1992, finalap3jc, finalap3, finallap, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
-GAMEL( 1992, finalap3bl, finalap3, finallap, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
+GAMEL( 1992, finalap3,   0,        finalap2, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
+GAMEL( 1992, finalap3a,  finalap3, finalap2, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
+GAMEL( 1992, finalap3j,  finalap3, finalap2, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
+GAMEL( 1992, finalap3jc, finalap3, finalap2, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
+GAMEL( 1992, finalap3bl, finalap3, finalap2, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
 
 GAME(  1992, luckywld,   0,        luckywld, luckywld, namcos2_state, init_luckywld, ROT0,   "Namco", "Lucky & Wild", 0 )
 GAME(  1992, luckywldj,  luckywld, luckywld, luckywld, namcos2_state, init_luckywld, ROT0,   "Namco", "Lucky & Wild (Japan)", 0 )
 
-GAME(  1992, suzuka8h,   0,        luckywld, suzuka,   namcos2_state, init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
-GAME(  1992, suzuka8hj,  suzuka8h, luckywld, suzuka,   namcos2_state, init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME(  1992, suzuka8h,   0,        suzuka8h, suzuka,   namcos2_state, init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME(  1992, suzuka8hj,  suzuka8h, suzuka8h, suzuka,   namcos2_state, init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 
 GAME(  1992, sws,        0,        base,     base,     namcos2_state, init_sws,      ROT0,   "Namco", "Super World Stadium (Japan)", 0 )
 
 GAME(  1992, sws92,      0,        base,     base,     namcos2_state, init_sws92,    ROT0,   "Namco", "Super World Stadium '92 (Japan)", 0 )
 GAME(  1992, sws92g,     sws92,    base,     base,     namcos2_state, init_sws92g,   ROT0,   "Namco", "Super World Stadium '92 Gekitouban (Japan)", 0 )
 
-GAME(  1993, suzuk8h2,   0,        luckywld, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
-GAME(  1993, suzuk8h2j,  suzuk8h2, luckywld, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME(  1993, suzuk8h2,   0,        suzuka8h, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME(  1993, suzuk8h2j,  suzuk8h2, suzuka8h, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 
 GAME(  1993, sws93,      0,        base,     base,     namcos2_state, init_sws93,    ROT0,   "Namco", "Super World Stadium '93 (Japan)", 0 )

@@ -31,14 +31,16 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void evmbug(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(rs232_r);
 	DECLARE_WRITE8_MEMBER(rs232_w);
 	void kbd_put(u8 data);
 
-	void evmbug(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
 	uint8_t m_term_out;

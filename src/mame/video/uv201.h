@@ -65,13 +65,13 @@
 //**************************************************************************
 
 #define MCFG_UV201_EXT_INT_CALLBACK(_write) \
-	devcb = &downcast<uv201_device &>(*device).set_ext_int_wr_callback(DEVCB_##_write);
+	downcast<uv201_device &>(*device).set_ext_int_wr_callback(DEVCB_##_write);
 
 #define MCFG_UV201_HBLANK_CALLBACK(_write) \
-	devcb = &downcast<uv201_device &>(*device).set_hblank_wr_callback(DEVCB_##_write);
+	downcast<uv201_device &>(*device).set_hblank_wr_callback(DEVCB_##_write);
 
 #define MCFG_UV201_DB_CALLBACK(_read) \
-	devcb = &downcast<uv201_device &>(*device).set_db_rd_callback(DEVCB_##_read);
+	downcast<uv201_device &>(*device).set_db_rd_callback(DEVCB_##_read);
 
 
 

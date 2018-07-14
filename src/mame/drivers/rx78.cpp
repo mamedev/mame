@@ -88,7 +88,7 @@ public:
 	void init_rx78();
 	void rx78(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_READ8_MEMBER( cass_r );
 	DECLARE_READ8_MEMBER( vram_r );
@@ -107,7 +107,6 @@ protected:
 	void rx78_io(address_map &map);
 	void rx78_mem(address_map &map);
 
-private:
 	uint8_t m_vram_read_bank;
 	uint8_t m_vram_write_bank;
 	uint8_t m_pal_reg[7];

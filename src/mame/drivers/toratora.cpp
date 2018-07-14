@@ -63,6 +63,9 @@ public:
 		m_pia_u2(*this, "pia_u2"),
 		m_pia_u3(*this, "pia_u3") { }
 
+	void toratora(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -93,7 +96,6 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(toratora_timer);
-	void toratora(machine_config &config);
 	void main_map(address_map &map);
 };
 

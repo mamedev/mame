@@ -88,34 +88,34 @@
 //**************************************************************************
 
 #define MCFG_COSMAC_WAIT_CALLBACK(_read) \
-	devcb = &downcast<cosmac_device &>(*device).set_wait_rd_callback(DEVCB_##_read);
+	downcast<cosmac_device &>(*device).set_wait_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_CLEAR_CALLBACK(_read) \
-	devcb = &downcast<cosmac_device &>(*device).set_clear_rd_callback(DEVCB_##_read);
+	downcast<cosmac_device &>(*device).set_clear_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_EF1_CALLBACK(_read) \
-	devcb = &downcast<cosmac_device &>(*device).set_ef1_rd_callback(DEVCB_##_read);
+	downcast<cosmac_device &>(*device).set_ef1_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_EF2_CALLBACK(_read) \
-	devcb = &downcast<cosmac_device &>(*device).set_ef2_rd_callback(DEVCB_##_read);
+	downcast<cosmac_device &>(*device).set_ef2_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_EF3_CALLBACK(_read) \
-	devcb = &downcast<cosmac_device &>(*device).set_ef3_rd_callback(DEVCB_##_read);
+	downcast<cosmac_device &>(*device).set_ef3_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_EF4_CALLBACK(_read) \
-	devcb = &downcast<cosmac_device &>(*device).set_ef4_rd_callback(DEVCB_##_read);
+	downcast<cosmac_device &>(*device).set_ef4_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_Q_CALLBACK(_write) \
-	devcb = &downcast<cosmac_device &>(*device).set_q_wr_callback(DEVCB_##_write);
+	downcast<cosmac_device &>(*device).set_q_wr_callback(DEVCB_##_write);
 
 #define MCFG_COSMAC_DMAR_CALLBACK(_read) \
-	devcb = &downcast<cosmac_device &>(*device).set_dma_rd_callback(DEVCB_##_read);
+	downcast<cosmac_device &>(*device).set_dma_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_DMAW_CALLBACK(_write) \
-	devcb = &downcast<cosmac_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
+	downcast<cosmac_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
 
 #define MCFG_COSMAC_SC_CALLBACK(_write) \
-	devcb = &downcast<cosmac_device &>(*device).set_sc_wr_callback(DEVCB_##_write);
+	downcast<cosmac_device &>(*device).set_sc_wr_callback(DEVCB_##_write);
 
 
 
@@ -441,7 +441,7 @@ protected:
 
 	// opcode/condition tables
 	typedef void (cosmac_device::*ophandler)();
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) = 0;
+	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const = 0;
 };
 
 
@@ -457,7 +457,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
+	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const override;
 
 	static const ophandler s_opcodetable[256];
 };
@@ -475,7 +475,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
+	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const override;
 
 	static const ophandler s_opcodetable[256];
 };

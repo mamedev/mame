@@ -12,6 +12,7 @@
 
     --- Hardware ---
     A 6809 CPU (U3) is clocked by a 556 (U2) circuit with 3 Pin addressing decoding via a 74LS138 (U14)
+    (this information seems incorrect: CPU clock is almost certainly sourced from the VDP's CPUCLK output)
     Program ROM is a 27256 (U15)
     Two 6821 PIAs (U4/U17) are used for I/O
     Video is processed via a TMS9118 (U11) with two TMS4416 (U12/U13) as RAM
@@ -62,7 +63,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
-#include "machine/ram.h"
+#include "machine/nvram.h"
 #include "sound/spkrdev.h"
 #include "video/tms9928a.h"
 #include "speaker.h"
@@ -86,6 +87,9 @@ public:
 			m_speaker(*this, SPEAKER_TAG)
 	{ }
 
+	void arachnid(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_u4;
 	required_device<pia6821_device> m_pia_u17;
@@ -109,7 +113,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
 
 	uint8_t read_keyboard(int pa);
-	void arachnid(machine_config &config);
 	void arachnid_map(address_map &map);
 };
 
@@ -123,7 +126,7 @@ public:
 
 void arachnid_state::arachnid_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram();
+	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x2000, 0x2007).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x4004, 0x4007).rw(m_pia_u4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4008, 0x400b).rw(m_pia_u17, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -422,8 +425,10 @@ void arachnid_state::machine_start()
 
 MACHINE_CONFIG_START(arachnid_state::arachnid)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M6809_TAG, M6809, XTAL(1'000'000))
+	MCFG_DEVICE_ADD(M6809_TAG, MC6809, 10.738635_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(arachnid_map)
+
+	MCFG_NVRAM_ADD_0FILL("nvram") // MK48Z02 (or DS1220Y)
 
 	// devices
 	MCFG_DEVICE_ADD(PIA6821_U4_TAG, PIA6821, 0)
@@ -443,7 +448,7 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, arachnid_state, pia_u17_pcb_w))
 
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9118_TAG, TMS9118, XTAL(10'738'635) / 2 )
+	MCFG_DEVICE_ADD(TMS9118_TAG, TMS9118, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6809_TAG, INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
@@ -454,7 +459,7 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, XTAL(8'000'000) / 4)
+	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 10.738635_MHz_XTAL / 3 / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_O1_CB(WRITELINE(*this, arachnid_state, ptm_o1_callback))
 MACHINE_CONFIG_END

@@ -47,6 +47,11 @@ Notes:
   during soundlatch operations, resulting in double or missing sound
   effects.
 
+  Trojan (Romstar) Manual has some bonus live values as well as locations
+  which do no jive with actual emulation.  One can only assume this means
+  the manual is incorrect and software was adjusted later but the game could
+  use some PCB comparisons of DIP selections to be certain.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -280,7 +285,7 @@ READ8_MEMBER(lwings_state::avengers_soundlatch2_r)
 WRITE8_MEMBER(lwings_state::msm5205_w)
 {
 	m_msm->reset_w(BIT(data, 7));
-	m_msm->data_w(data);
+	m_msm->write_data(data);
 	m_msm->vclk_w(1);
 	m_msm->vclk_w(0);
 }
@@ -669,12 +674,12 @@ static INPUT_PORTS_START( trojanls )
 
 	/* DSW tags inverted to use lwings map */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:8,7")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(    0x00, "Upright 1 Player" )
 	PORT_DIPSETTING(    0x02, "Upright 2 Players" )
 	PORT_DIPSETTING(    0x03, DEF_STR( Cocktail ) )
 /* 0x01 same as 0x02 or 0x03 */
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWB:6,5,4")
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWB:3,4,5")
 	PORT_DIPSETTING(    0x10, "20000 60000" )
 	PORT_DIPSETTING(    0x0c, "20000 70000" )
 	PORT_DIPSETTING(    0x08, "20000 80000" )
@@ -683,30 +688,30 @@ static INPUT_PORTS_START( trojanls )
 	PORT_DIPSETTING(    0x14, "30000 80000" )
 	PORT_DIPSETTING(    0x04, "40000 80000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SWB:3" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:2" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SWB:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:8,7")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:6,5")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:4,3")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:2")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWA:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -715,7 +720,7 @@ static INPUT_PORTS_START( trojan )
 	PORT_INCLUDE( trojanls )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0xe0, 0xe0, "Starting Level" ) PORT_DIPLOCATION("SWB:3,2,1")
+	PORT_DIPNAME( 0xe0, 0xe0, "Starting Level" ) PORT_DIPLOCATION("SWB:6,7,8")
 	PORT_DIPSETTING(    0xe0, "1" )
 	PORT_DIPSETTING(    0xc0, "2" )
 	PORT_DIPSETTING(    0xa0, "3" )
@@ -1791,10 +1796,10 @@ GAME( 1986, lwingsja,  lwings,   lwings,    lwings,   lwings_state, empty_init, 
 GAME( 1986, lwingsb,   lwings,   lwings,    lwingsb,  lwings_state, empty_init,     ROT90, "bootleg",          "Legendary Wings (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, trojan,    0,        trojan,    trojanls, lwings_state, empty_init,     ROT0,  "Capcom",           "Trojan (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojana,   trojan,   trojan,    trojanls, lwings_state, empty_init,     ROT0,  "Capcom",           "Trojan (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojana,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "Capcom",           "Trojan (US set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, trojanr,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, trojanj,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "Capcom",           "Tatakai no Banka (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojanb,   trojan,   trojan,    trojanls, lwings_state, empty_init,     ROT0,  "bootleg",          "Trojan (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanb,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "bootleg",          "Trojan (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, avengers,  0,        avengers,  avengers, lwings_state, empty_init,     ROT90, "Capcom",           "Avengers (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, avengers2, avengers, avengers,  avengers, lwings_state, empty_init,     ROT90, "Capcom",           "Avengers (US set 2)", MACHINE_SUPPORTS_SAVE )

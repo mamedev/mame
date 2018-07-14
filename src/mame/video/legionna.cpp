@@ -229,12 +229,12 @@ void legionna_state::common_video_allocate_ptr()
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
 
-	save_pointer(NAME(m_back_data.get()), 0x800/2);
-	save_pointer(NAME(m_fore_data.get()), 0x800/2);
-	save_pointer(NAME(m_mid_data.get()), 0x800/2);
-	save_pointer(NAME(m_textram.get()), 0x1000/2);
-	save_pointer(NAME(m_scrollram16.get()), 0x60/2);
-	save_pointer(NAME(m_paletteram.get()), 0x1000/2);
+	save_pointer(NAME(m_back_data), 0x800/2);
+	save_pointer(NAME(m_fore_data), 0x800/2);
+	save_pointer(NAME(m_mid_data), 0x800/2);
+	save_pointer(NAME(m_textram), 0x1000/2);
+	save_pointer(NAME(m_scrollram16), 0x60/2);
+	save_pointer(NAME(m_paletteram), 0x1000/2);
 
 	save_item(NAME(m_back_gfx_bank));
 	save_item(NAME(m_mid_gfx_bank));
@@ -492,7 +492,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 		y = spriteram16[offs+3];
 		x = spriteram16[offs+2];
 
-		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite warp,
+		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite wrap,
 		   this doesn't work on denjin makai as the visible area is larger */
 		if (cliprect.max_x<(320-1))
 		{

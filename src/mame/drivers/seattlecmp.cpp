@@ -47,12 +47,14 @@ public:
 		, m_pic(*this, "pic%u", 1)
 	{ }
 
+	void seattle(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(pic_slave_ack);
 
-	void seattle(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pic8259_device, 2> m_pic;
 };
@@ -109,20 +111,20 @@ MACHINE_CONFIG_START(seattle_comp_state::seattle)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic1", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("pic1", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_INT0))
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, seattle_comp_state, pic_slave_ack))
+	PIC8259(config, m_pic[0], 0);
+	m_pic[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_INT0);
+	m_pic[0]->read_slave_ack_callback().set(FUNC(seattle_comp_state::pic_slave_ack));
 
-	MCFG_DEVICE_ADD("pic2", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic1", pic8259_device, ir1_w))
+	PIC8259(config, m_pic[1], 0);
+	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir1_w));
 
-	MCFG_DEVICE_ADD("stc", AM9513, XTAL(4'000'000)) // dedicated XTAL
-	MCFG_AM9513_OUT2_CALLBACK(WRITELINE("pic2", pic8259_device, ir0_w))
-	MCFG_AM9513_OUT3_CALLBACK(WRITELINE("pic2", pic8259_device, ir4_w))
-	MCFG_AM9513_OUT4_CALLBACK(WRITELINE("pic2", pic8259_device, ir7_w))
-	MCFG_AM9513_OUT5_CALLBACK(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
-	MCFG_AM9513_FOUT_CALLBACK(WRITELINE("stc", am9513_device, source1_w))
+	am9513_device &stc(AM9513(config, "stc", 4_MHz_XTAL)); // dedicated XTAL
+	stc.out2_cb().set(m_pic[1], FUNC(pic8259_device::ir0_w));
+	stc.out3_cb().set(m_pic[1], FUNC(pic8259_device::ir4_w));
+	stc.out4_cb().set(m_pic[1], FUNC(pic8259_device::ir7_w));
+	stc.out5_cb().set("uart", FUNC(i8251_device::write_txc));
+	stc.out5_cb().append("uart", FUNC(i8251_device::write_rxc));
+	stc.fout_cb().set("stc", FUNC(am9513_device::source1_w));
 	// FOUT not shown on schematics, which inexplicably have Source 1 tied to Gate 5
 
 	MCFG_DEVICE_ADD("uart", I8251, XTAL(24'000'000) / 12) // CLOCK on line 49

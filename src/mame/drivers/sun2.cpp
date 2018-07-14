@@ -158,6 +158,10 @@ public:
 		, m_bw2_vram(*this, "bw2_vram")
 	{ }
 
+	void sun2mbus(machine_config &config);
+	void sun2vme(machine_config &config);
+
+private:
 	required_device<m68010_device> m_maincpu;
 	required_memory_region m_rom, m_idprom;
 	required_device<ram_device> m_ram;
@@ -176,8 +180,6 @@ public:
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void sun2mbus(machine_config &config);
-	void sun2vme(machine_config &config);
 	void mbustype0space_map(address_map &map);
 	void mbustype1space_map(address_map &map);
 	void mbustype2space_map(address_map &map);
@@ -187,7 +189,7 @@ public:
 	void vmetype1space_map(address_map &map);
 	void vmetype2space_map(address_map &map);
 	void vmetype3space_map(address_map &map);
-private:
+
 	uint16_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
 	uint16_t m_diagreg, m_sysenable, m_buserror;
@@ -653,13 +655,13 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_DEVICE_ADD("timer", AM9513A, 19.6608_MHz_XTAL / 4)
-	MCFG_AM9513_FOUT_CALLBACK(WRITELINE("timer", am9513_device, gate1_w))
-	MCFG_AM9513_OUT1_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
-	MCFG_AM9513_OUT2_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<0>))
-	MCFG_AM9513_OUT3_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<1>))
-	MCFG_AM9513_OUT4_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<2>))
-	MCFG_AM9513_OUT5_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<3>))
+	am9513a_device &timer(AM9513A(config, "timer", 19.6608_MHz_XTAL / 4));
+	timer.fout_cb().set("timer", FUNC(am9513_device::gate1_w));
+	timer.out1_cb().set_inputline(m_maincpu, M68K_IRQ_7);
+	timer.out2_cb().set("irq5", FUNC(input_merger_device::in_w<0>));
+	timer.out3_cb().set("irq5", FUNC(input_merger_device::in_w<1>));
+	timer.out4_cb().set("irq5", FUNC(input_merger_device::in_w<2>));
+	timer.out5_cb().set("irq5", FUNC(input_merger_device::in_w<3>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
@@ -725,13 +727,13 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_DEVICE_ADD("timer", AM9513, 39.3216_MHz_XTAL / 8)
-	MCFG_AM9513_FOUT_CALLBACK(WRITELINE("timer", am9513_device, gate1_w))
-	MCFG_AM9513_OUT1_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
-	MCFG_AM9513_OUT2_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<0>))
-	MCFG_AM9513_OUT3_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<1>))
-	MCFG_AM9513_OUT4_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<2>))
-	MCFG_AM9513_OUT5_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<3>))
+	am9513a_device &timer(AM9513A(config, "timer", 39.3216_MHz_XTAL / 8));
+	timer.fout_cb().set("timer", FUNC(am9513_device::gate1_w));
+	timer.out1_cb().set_inputline(m_maincpu, M68K_IRQ_7);
+	timer.out2_cb().set("irq5", FUNC(input_merger_device::in_w<0>));
+	timer.out3_cb().set("irq5", FUNC(input_merger_device::in_w<1>));
+	timer.out4_cb().set("irq5", FUNC(input_merger_device::in_w<2>));
+	timer.out5_cb().set("irq5", FUNC(input_merger_device::in_w<3>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))

@@ -32,6 +32,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void zephyr(machine_config &config);
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(special_r);
@@ -39,10 +42,9 @@ public:
 
 	virtual void machine_start() override;
 
-	void zephyr(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ay51013_device> m_uart;
 	required_device<rs232_port_device> m_rs232;

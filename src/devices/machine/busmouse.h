@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-	Logitech bus mouse interface emulation
+    Logitech bus mouse interface emulation
 
 **********************************************************************/
 
@@ -17,7 +17,7 @@
 //**************************************************************************
 
 #define MCFG_BUS_MOUSE_EXTINT_CALLBACK(_write) \
-	devcb = &bus_mouse_device::set_extint_wr_callback(*device, DEVCB_##_write);
+	bus_mouse_device::set_extint_wr_callback(*device, DEVCB_##_write);
 
 
 //**************************************************************************

@@ -694,13 +694,13 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 
 	MCFG_DEVICE_ADD("spriteram16", BUFFERED_SPRITERAM16)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000)/4, 446, 0, 320, 286, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(twincobr_state, screen_update_toaplan0)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram16", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, twincobr_state, twincobr_vblank_irq))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(28_MHz_XTAL/4, 446, 0, 320, 286, 0, 240);
+	m_screen->set_screen_update(FUNC(twincobr_state::screen_update_toaplan0));
+	m_screen->screen_vblank().set(m_spriteram16, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	m_screen->screen_vblank().append(FUNC(twincobr_state::twincobr_vblank_irq));
+	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_twincobr)
 	MCFG_PALETTE_ADD("palette", 1792)

@@ -48,9 +48,16 @@ public:
 		, m_statuslatch(*this, "statuslatch")
 		, m_bios(*this, "user1")
 		, m_biosram(*this, "biosram")
-		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void isbc2861(machine_config &config);
+	void isbc86(machine_config &config);
+	void rpc86(machine_config &config);
+	void isbc8605(machine_config &config);
+	void isbc286(machine_config &config);
+	void isbc8630(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
@@ -65,18 +72,8 @@ public:
 	DECLARE_WRITE8_MEMBER(edge_intr_clear_w);
 	DECLARE_WRITE8_MEMBER(status_register_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(override_w);
 	DECLARE_WRITE_LINE_MEMBER(bus_intr_out1_w);
 	DECLARE_WRITE_LINE_MEMBER(bus_intr_out2_w);
-	DECLARE_WRITE_LINE_MEMBER(led_ds1_w);
-	DECLARE_WRITE_LINE_MEMBER(led_ds3_w);
-	DECLARE_WRITE_LINE_MEMBER(megabyte_select_w);
-	void isbc2861(machine_config &config);
-	void isbc86(machine_config &config);
-	void rpc86(machine_config &config);
-	void isbc8605(machine_config &config);
-	void isbc286(machine_config &config);
-	void isbc8630(machine_config &config);
 	void isbc2861_mem(address_map &map);
 	void isbc286_io(address_map &map);
 	void isbc286_mem(address_map &map);
@@ -86,8 +83,7 @@ public:
 	void isbc_io(address_map &map);
 	void rpc86_io(address_map &map);
 	void rpc86_mem(address_map &map);
-protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
@@ -101,9 +97,7 @@ protected:
 	optional_device<ls259_device> m_statuslatch;
 	optional_memory_region m_bios;
 	optional_shared_ptr<u16> m_biosram;
-	output_finder<2> m_leds;
 
-private:
 	bool m_upperen;
 	offs_t m_megabyte_page;
 	bool m_nmi_enable;
@@ -322,12 +316,6 @@ WRITE_LINE_MEMBER(isbc_state::nmi_mask_w)
 	m_nmi_enable = state;
 }
 
-WRITE_LINE_MEMBER(isbc_state::override_w)
-{
-	// 1 = access onboard dual-port RAM
-	m_override = state;
-}
-
 WRITE_LINE_MEMBER(isbc_state::bus_intr_out1_w)
 {
 	// Multibus interrupt request (active high)
@@ -336,21 +324,6 @@ WRITE_LINE_MEMBER(isbc_state::bus_intr_out1_w)
 WRITE_LINE_MEMBER(isbc_state::bus_intr_out2_w)
 {
 	// Multibus interrupt request (active high)
-}
-
-WRITE_LINE_MEMBER(isbc_state::led_ds1_w)
-{
-	m_leds[0] = state ? 0 : 1;
-}
-
-WRITE_LINE_MEMBER(isbc_state::led_ds3_w)
-{
-	m_leds[1] = state ? 0 : 1;
-}
-
-WRITE_LINE_MEMBER(isbc_state::megabyte_select_w)
-{
-	m_megabyte_enable = !state;
 }
 
 MACHINE_CONFIG_START(isbc_state::isbc86)
@@ -432,8 +405,7 @@ MACHINE_CONFIG_START(isbc_state::isbc8605)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(isbc8605_io)
 
-	MCFG_DEVICE_ADD("isbc_208", ISBC_208, 0)
-	MCFG_ISBC_208_MAINCPU("maincpu")
+	MCFG_DEVICE_ADD("isbc_208", ISBC_208, "maincpu")
 	MCFG_ISBC_208_IRQ(WRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 
@@ -442,19 +414,19 @@ MACHINE_CONFIG_START(isbc_state::isbc8630)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(isbc8630_io)
 
-	MCFG_ISBC_215_ADD("isbc_215g", 0x100, "maincpu")
+	MCFG_DEVICE_ADD("isbc_215g", ISBC_215G, 0x100, "maincpu")
 	MCFG_ISBC_215_IRQ(WRITELINE("pic_0", pic8259_device, ir5_w))
 
-	MCFG_DEVICE_ADD("statuslatch", LS259, 0) // U14
-//  MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("pit", pit8253_device, write_gate0))
-//  MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("pit", pit8253_device, write_gate1))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, isbc_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, isbc_state, override_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, isbc_state, bus_intr_out1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, isbc_state, bus_intr_out2_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, isbc_state, led_ds1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, isbc_state, led_ds3_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, isbc_state, megabyte_select_w))
+	LS259(config, m_statuslatch); // U14
+//  m_statuslatch->q_out_cb<0>().set("pit", FUNC(pit8253_device::write_gate0));
+//  m_statuslatch->q_out_cb<1>().set("pit", FUNC(pit8253_device::write_gate1));
+	m_statuslatch->q_out_cb<2>().set(FUNC(isbc_state::nmi_mask_w));
+	m_statuslatch->q_out_cb<3>().set([this] (int state) { m_override = state; }); // 1 = access onboard dual-port RAM
+	m_statuslatch->q_out_cb<4>().set(FUNC(isbc_state::bus_intr_out1_w));
+	m_statuslatch->q_out_cb<5>().set(FUNC(isbc_state::bus_intr_out2_w));
+	m_statuslatch->q_out_cb<5>().append_output("led0").invert(); // ds1
+	m_statuslatch->q_out_cb<6>().set_output("led1").invert(); // ds3
+	m_statuslatch->q_out_cb<7>().set([this] (int state) { m_megabyte_enable = !state; });
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isbc_state::isbc286)
@@ -466,12 +438,12 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 
 	MCFG_DEVICE_ADD("pic_0", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
 	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, isbc_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic_1", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic_0", pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
@@ -487,7 +459,7 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_I8255_IN_PORTB_CB(READ8("cent_status_in", input_buffer_device, bus_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, isbc_state, ppi_c_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, isbc_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
@@ -547,7 +519,7 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_1", pic8259_device, ir5_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_1", pic8259_device, ir6_w))
 
-	MCFG_ISBC_215_ADD("isbc_215g", 0x100, "maincpu")
+	MCFG_DEVICE_ADD("isbc_215g", ISBC_215G, 0x100, "maincpu")
 	MCFG_ISBC_215_IRQ(WRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 

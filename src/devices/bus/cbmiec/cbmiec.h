@@ -31,19 +31,19 @@
 
 
 #define MCFG_CBM_IEC_BUS_SRQ_CALLBACK(_write) \
-	devcb = &downcast<cbm_iec_device *>(device)->set_srq_callback(DEVCB_##_write);
+	downcast<cbm_iec_device *>(device)->set_srq_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_ATN_CALLBACK(_write) \
-	devcb = &downcast<cbm_iec_device *>(device)->set_atn_callback(DEVCB_##_write);
+	downcast<cbm_iec_device *>(device)->set_atn_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_CLK_CALLBACK(_write) \
-	devcb = &downcast<cbm_iec_device *>(device)->set_clk_callback(DEVCB_##_write);
+	downcast<cbm_iec_device *>(device)->set_clk_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_DATA_CALLBACK(_write) \
-	devcb = &downcast<cbm_iec_device *>(device)->set_data_callback(DEVCB_##_write);
+	downcast<cbm_iec_device *>(device)->set_data_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_RESET_CALLBACK(_write) \
-	devcb = &downcast<cbm_iec_device *>(device)->set_reset_callback(DEVCB_##_write);
+	downcast<cbm_iec_device *>(device)->set_reset_callback(DEVCB_##_write);
 
 
 #define MCFG_CBM_IEC_SLOT_ADD(_tag, _address, _slot_intf, _def_slot) \
@@ -93,11 +93,11 @@ public:
 	DECLARE_READ_LINE_MEMBER( reset_r ) { return get_signal(RESET); }
 
 	// writes for host (driver_device)
-	DECLARE_WRITE_LINE_MEMBER( srq_w ) { set_signal(this, SRQ, state); }
-	DECLARE_WRITE_LINE_MEMBER( atn_w ) { set_signal(this, ATN, state); }
-	DECLARE_WRITE_LINE_MEMBER( clk_w ) { set_signal(this, CLK, state); }
-	DECLARE_WRITE_LINE_MEMBER( data_w ) { set_signal(this, DATA, state); }
-	DECLARE_WRITE_LINE_MEMBER( reset_w ) { set_signal(this, RESET, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_srq_w ) { set_signal(this, SRQ, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_atn_w ) { set_signal(this, ATN, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_clk_w ) { set_signal(this, CLK, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_data_w ) { set_signal(this, DATA, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_reset_w ) { set_signal(this, RESET, state); }
 
 	// writes for peripherals (device_t)
 	void srq_w(device_t *device, int state) { set_signal(device, SRQ, state); }

@@ -105,6 +105,9 @@ public:
 			m_video_ram(*this, "video_ram")
 	{ }
 
+	void fp(machine_config &config);
+
+private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<cpu_device> m_maincpu;
@@ -155,7 +158,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
-	void fp(machine_config &config);
+
 	void fp_io(address_map &map);
 	void fp_mem(address_map &map);
 	void sound_io(address_map &map);
@@ -655,7 +658,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", fp_floppies, "d32w", fp_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", fp_floppies, nullptr,   fp_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fp_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, fp_state, write_centronics_select))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fp_state, write_centronics_fault))

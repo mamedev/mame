@@ -32,8 +32,8 @@ class decwriter_state : public driver_device
 {
 public:
 	// constructor
-	decwriter_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	decwriter_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "beeper"),
 		m_usart(*this, "usart"),
@@ -414,6 +414,7 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
 	MCFG_DEVICE_PROGRAM_MAP(la120_mem)
 	MCFG_DEVICE_IO_MAP(la120_io)
+	//MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("prtlsi", dc305_device, inta_cb)
 
 	/* video hardware */
 	//TODO: no actual screen! has 8 leds above the keyboard (similar to vt100/vk100) and has 4 7segment leds for showing an error code.
@@ -424,16 +425,19 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_SCREEN_REFRESH_RATE(30)
 
 	//MCFG_DEVICE_ADD("prtlsi", DC305, XTAL(18'000'000) / 9)
+	//MCFG_DC305_OUT_RXC_CB(WRITELINE("usart", i8251_device, write_rxc))
+	//MCFG_DC305_OUT_TXC_CB(WRITELINE("usart", i8251_device, write_txc))
+	//MCFG_DC305_OUT_INT_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
 
-	MCFG_DEVICE_ADD("ledlatch", LS259, 0) // E2 on keyboard
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // ON LINE
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT // LOCAL
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led3")) MCFG_DEVCB_INVERT // ALT CHAR SET
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led4")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led5")) MCFG_DEVCB_INVERT // CTS
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led6")) MCFG_DEVCB_INVERT // DSR
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led7")) MCFG_DEVCB_INVERT // SETUP
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led8")) MCFG_DEVCB_INVERT // PAPER OUT
+	LS259(config, m_ledlatch); // E2 on keyboard
+	m_ledlatch->q_out_cb<0>().set_output("led1").invert(); // ON LINE
+	m_ledlatch->q_out_cb<1>().set_output("led2").invert(); // LOCAL
+	m_ledlatch->q_out_cb<2>().set_output("led3").invert(); // ALT CHAR SET
+	m_ledlatch->q_out_cb<3>().set_output("led4").invert();
+	m_ledlatch->q_out_cb<4>().set_output("led5").invert(); // CTS
+	m_ledlatch->q_out_cb<5>().set_output("led6").invert(); // DSR
+	m_ledlatch->q_out_cb<6>().set_output("led7").invert(); // SETUP
+	m_ledlatch->q_out_cb<7>().set_output("led8").invert(); // PAPER OUT
 
 	//MCFG_DEFAULT_LAYOUT( layout_la120 )
 
@@ -448,14 +452,14 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainint", input_merger_device, in_w<1>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(WRITELINE("usart", i8251_device, write_dsr))
-
-	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE("usart", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("usart", i8251_device, write_txc))
 	*/
 
 	MCFG_DEVICE_ADD("nvm", ER1400, 0)

@@ -296,6 +296,11 @@ public:
 		, m_latch(*this, "latch%u", 1)
 	{ }
 
+	void luckybal(machine_config &config);
+
+	void init_luckybal();
+
+private:
 	DECLARE_WRITE8_MEMBER(port90_bitswap_w);
 	DECLARE_READ8_MEMBER(ppi_bitswap_r);
 	DECLARE_WRITE8_MEMBER(ppi_bitswap_w);
@@ -303,7 +308,6 @@ public:
 	DECLARE_WRITE8_MEMBER(output_port_b_w);
 	DECLARE_READ8_MEMBER(input_port_c_r);
 	DECLARE_WRITE8_MEMBER(output_port_c_w);
-	void init_luckybal();
 	uint8_t daclatch;
 
 	required_device<v9938_device> m_v9938;
@@ -312,7 +316,6 @@ public:
 	required_device<dac_byte_interface> m_dac;
 	required_device_array<cd4099_device, 3> m_latch;
 
-	void luckybal(machine_config &config);
 	void main_io(address_map &map);
 	void main_map(address_map &map);
 };

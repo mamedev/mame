@@ -252,6 +252,7 @@ cosmic.cpp
 cps1.cpp
 cps2.cpp
 cps3.cpp
+cpzodiac.cpp
 crbaloon.cpp
 crgolf.cpp
 crimfght.cpp
@@ -312,6 +313,7 @@ divebomb.cpp
 diverboy.cpp
 djboy.cpp
 djmain.cpp
+dkmb.cpp
 dkong.cpp
 dlair.cpp
 dlair2.cpp

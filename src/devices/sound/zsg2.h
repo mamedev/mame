@@ -20,7 +20,7 @@
 	MCFG_DEVICE_REPLACE(_tag, ZSG2, _clock)
 
 #define MCFG_ZSG2_EXT_READ_HANDLER(_devcb) \
-	devcb = &downcast<zsg2_device &>(*device).set_ext_read_handler(DEVCB_##_devcb);
+	downcast<zsg2_device &>(*device).set_ext_read_handler(DEVCB_##_devcb);
 
 
 // ======================> zsg2_device

@@ -476,7 +476,7 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 {
 	if (m_adpcm_data[chip] != -1)
 	{
-		device->data_w(m_adpcm_data[chip] & 0x0f);
+		device->write_data(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 		if (m_adpcm_pos[chip] == m_adpcm_end[chip])
 		{
@@ -488,7 +488,7 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 	{
 		m_adpcm_data[chip] = memregion("adpcm")->base()[m_adpcm_pos[chip]];
 		m_adpcm_pos[chip] = (m_adpcm_pos[chip] + 1) & 0x7ffff;
-		device->data_w(m_adpcm_data[chip] >> 4);
+		device->write_data(m_adpcm_data[chip] >> 4);
 	}
 }
 WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_1)
@@ -792,7 +792,7 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK ) /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(opwolf_sound_z80_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)) /* 12MHz measured on pin 20 */
+	TAITO_CCHIP(config, m_cchip, 12_MHz_XTAL); /* 12MHz measured on pin 20 */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 

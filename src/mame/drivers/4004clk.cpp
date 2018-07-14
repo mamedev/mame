@@ -29,7 +29,7 @@ public:
 
 	void _4004clk(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER( nixie_w );
 	DECLARE_WRITE8_MEMBER( neon_w );
 
@@ -41,7 +41,6 @@ protected:
 
 	virtual void machine_start() override;
 
-private:
 	static constexpr uint8_t nixie_to_num(uint16_t val)
 	{
 		return

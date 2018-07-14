@@ -61,10 +61,17 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void ltd4(machine_config &config);
+	void ltd3(machine_config &config);
+
 	void init_atla_ltd();
 	void init_bhol_ltd();
 	void init_zephy();
 	void init_ltd();
+
+	DECLARE_INPUT_CHANGED_MEMBER(ficha);
+
+private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(port1_r);
@@ -72,14 +79,11 @@ public:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_WRITE8_MEMBER(count_reset_w);
-	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
-	void ltd4(machine_config &config);
-	void ltd3(machine_config &config);
 	void ltd3_map(address_map &map);
 	void ltd4_io(address_map &map);
 	void ltd4_map(address_map &map);
-private:
+
 	bool m_timer_r;
 	bool m_clear;
 	uint8_t m_counter;

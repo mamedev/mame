@@ -52,11 +52,6 @@
 class alphatro_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_SYSTEM
-	};
-
 	alphatro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_ram(*this, RAM_TAG)
@@ -73,10 +68,21 @@ public:
 		, m_cartbank(*this, "cartbank")
 		, m_monbank(*this, "monbank")
 		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_dmac(*this, "dmac")
 		, m_config(*this, "CONFIG")
 		, m_cart(*this, "cartslot")
 	{ }
+
+	void alphatro(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
+
+private:
+	enum
+	{
+		TIMER_SYSTEM
+	};
 
 	DECLARE_READ8_MEMBER (ram0000_r);
 	DECLARE_WRITE8_MEMBER(ram0000_w);
@@ -93,7 +99,6 @@ public:
 	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_READ8_MEMBER(portf0_r);
 	DECLARE_WRITE8_MEMBER(portf0_w);
-	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
@@ -106,13 +111,12 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void alphatro(machine_config &config);
 	void alphatro_io(address_map &map);
 	void alphatro_map(address_map &map);
 	void cartbank_map(address_map &map);
 	void monbank_map(address_map &map);
 	void rombank_map(address_map &map);
-private:
+
 	uint8_t *m_ram_ptr;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<u8> m_p_videoram;
@@ -135,6 +139,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_lowbank, m_cartbank, m_monbank;
 	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<i8257_device> m_dmac;
 	required_ioport m_config;
 	required_device<generic_slot_device> m_cart;
@@ -300,18 +305,14 @@ WRITE8_MEMBER( alphatro_state::portf0_w)
 	{
 		m_fdc->reset();
 
-		floppy_connector *con = machine().device<floppy_connector>("fdc:0");
-		floppy_image_device *floppy = con ? con->get_device() : nullptr;
-		if (floppy)
+		for (auto &con : m_floppy)
 		{
-			floppy->mon_w(0);
-			m_fdc->set_rate(250000);
-		}
-		con = machine().device<floppy_connector>("fdc:1");
-		floppy = con ? con->get_device() : nullptr;
-		if (floppy)
-		{
-			floppy->mon_w(0);
+			floppy_image_device *floppy = con->get_device();
+			if (floppy)
+			{
+				floppy->mon_w(0);
+				m_fdc->set_rate(250000);
+			}
 		}
 	}
 
@@ -745,9 +746,9 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_DEVICE_ADD("usart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, alphatro_state, txdata_callback))
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19218) // 19218 to load a real tape, 19222 to load a tape made by this driver
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("usart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("usart", i8251_device, write_rxc))
+	clock_device &usart_clock(CLOCK(config, "usart_clock", 19218)); // 19218 to load a real tape, 19222 to load a tape made by this driver
+	usart_clock.signal_handler().set(m_usart, FUNC(i8251_device::write_txc));
+	usart_clock.signal_handler().append(m_usart, FUNC(i8251_device::write_rxc));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)

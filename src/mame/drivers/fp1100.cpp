@@ -70,6 +70,11 @@ public:
 		, m_cass(*this, "cassette")
 	{ }
 
+	void fp1100(machine_config &config);
+
+	void init_fp1100();
+
+private:
 	DECLARE_WRITE8_MEMBER(main_bank_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(main_to_sub_w);
@@ -87,16 +92,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void init_fp1100();
 	DECLARE_MACHINE_RESET(fp1100);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	required_device<palette_device> m_palette;
-	void fp1100(machine_config &config);
 	void io_map(address_map &map);
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
-private:
+
 	uint8_t m_irq_mask;
 	uint8_t m_main_latch;
 	uint8_t m_sub_latch;
@@ -673,7 +676,7 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	MCFG_MC6845_UPDATE_ROW_CB(fp1100_state, crtc_update_row)
 
 	/* Printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fp1100_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 

@@ -44,15 +44,17 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void savia84(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(savia84_8255_portc_r);
 	DECLARE_WRITE8_MEMBER(savia84_8255_porta_w);
 	DECLARE_WRITE8_MEMBER(savia84_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(savia84_8255_portc_w);
 
-	void savia84(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t m_kbd;
 	uint8_t m_segment;
 	uint8_t m_digit;

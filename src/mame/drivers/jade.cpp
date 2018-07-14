@@ -34,9 +34,11 @@ public:
 	{ }
 
 	void jade(machine_config &config);
+
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -68,14 +70,13 @@ MACHINE_CONFIG_START(jade_state::jade)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(4'000'000))
+	Z80CTC(config, "ctc1", 4_MHz_XTAL);
 
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, txca_w))
+	z80ctc_device &ctc2(Z80CTC(config, "ctc2", 4_MHz_XTAL));
+	ctc2.zc_callback<0>().set("sio", FUNC(z80sio_device::rxca_w));
+	ctc2.zc_callback<0>().append("sio", FUNC(z80sio_device::txca_w));
 
-	MCFG_DEVICE_ADD("trg0", CLOCK, XTAL(4'000'000) / 2)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc2", z80ctc_device, trg0))
+	CLOCK(config, "trg0", 4_MHz_XTAL / 2).signal_handler().set("ctc2", FUNC(z80ctc_device::trg0));
 
 	/* Devices */
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))

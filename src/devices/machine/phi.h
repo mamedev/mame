@@ -72,23 +72,19 @@ public:
 		PHI_488_SIGNAL_COUNT
 	};
 
-	template <class Object> devcb_base& set_dio_read_cb(Object &&cb)
-	{ return m_dio_read_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base& set_dio_read_cb(Object &&cb) { return m_dio_read_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base& set_dio_write_cb(Object &&cb) { return m_dio_write_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base& set_488_signal_write_cb(phi_488_signal_t signal , Object &&cb) { return m_signal_wr_fns[ signal ].set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base& set_int_write_cb(Object &&cb) { return m_int_write_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base& set_dmarq_write_cb(Object &&cb) { return m_dmarq_write_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sys_cntrl_read_cb(Object &&cb) { return m_sys_cntrl_read_func.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> devcb_base& set_dio_write_cb(Object &&cb)
-	{ return m_dio_write_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base& set_488_signal_write_cb(phi_488_signal_t signal , Object &&cb)
-	{ return m_signal_wr_fns[ signal ].set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base& set_int_write_cb(Object &&cb)
-	{ return m_int_write_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base& set_dmarq_write_cb(Object &&cb)
-	{ return m_dmarq_write_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_sys_cntrl_read_cb(Object &&cb)
-	{ return m_sys_cntrl_read_func.set_callback(std::forward<Object>(cb)); }
+	auto dio_read_cb() { return m_dio_read_func.bind(); }
+	auto dio_write_cb() { return m_dio_write_func.bind(); }
+	template <phi_488_signal_t Signal> auto signal_write_cb() { return m_signal_wr_fns[ Signal ].bind(); }
+	auto int_write_cb() { return m_int_write_func.bind(); }
+	auto dmarq_write_cb() { return m_dmarq_write_func.bind(); }
+	auto sys_cntrl_read_cb() { return m_sys_cntrl_read_func.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(eoi_w);
 	DECLARE_WRITE_LINE_MEMBER(dav_w);

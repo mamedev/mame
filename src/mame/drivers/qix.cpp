@@ -705,12 +705,12 @@ MACHINE_CONFIG_START(qix_state::slither)
 	MCFG_DEVICE_MODIFY("pia1")
 	MCFG_PIA_READPA_HANDLER(READ8(*this, qix_state, slither_trak_lr_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, slither_76489_0_w))
-	MCFG_PIA_READPB_HANDLER(NOOP)
+	MCFG_PIA_READPB_HANDLER(CONSTANT(0))
 
 	MCFG_DEVICE_MODIFY("pia2")
 	MCFG_PIA_READPA_HANDLER(READ8(*this, qix_state, slither_trak_ud_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, slither_76489_1_w))
-	MCFG_PIA_READPB_HANDLER(NOOP)
+	MCFG_PIA_READPB_HANDLER(CONSTANT(0))
 
 	/* video hardware */
 	slither_video(config);

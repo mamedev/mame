@@ -33,6 +33,10 @@ public:
 	{
 	}
 
+	void rougien(machine_config &config);
+	void mermaid(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram2;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -103,7 +107,5 @@ public:
 	uint8_t collision_check( rectangle& rect );
 	void collision_update();
 	DECLARE_WRITE_LINE_MEMBER(rougien_adpcm_int);
-	void rougien(machine_config &config);
-	void mermaid(machine_config &config);
 	void mermaid_map(address_map &map);
 };

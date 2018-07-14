@@ -97,6 +97,23 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void findout(machine_config &config);
+	void suprpokr(machine_config &config);
+	void gselect(machine_config &config);
+	void amuse1(machine_config &config);
+	void gepoker(machine_config &config);
+	void jokpokera(machine_config &config);
+	void quizvid(machine_config &config);
+	void getrivia(machine_config &config);
+	void amuse(machine_config &config);
+	void sprtauth(machine_config &config);
+
+	void init_setbank();
+	void init_bank2k();
+	void init_bank8k();
+	void init_geimulti();
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(gei_drawctrl_w);
@@ -114,23 +131,8 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_w);
 	DECLARE_READ8_MEMBER(portC_r);
 
-	void init_setbank();
-	void init_bank2k();
-	void init_bank8k();
-	void init_geimulti();
-
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	void findout(machine_config &config);
-	void suprpokr(machine_config &config);
-	void gselect(machine_config &config);
-	void amuse1(machine_config &config);
-	void gepoker(machine_config &config);
-	void jokpokera(machine_config &config);
-	void quizvid(machine_config &config);
-	void getrivia(machine_config &config);
-	void amuse(machine_config &config);
-	void sprtauth(machine_config &config);
 	void amuse1_map(address_map &map);
 	void amuse_map(address_map &map);
 	void findout_map(address_map &map);
@@ -140,11 +142,10 @@ public:
 	void quizvid_map(address_map &map);
 	void sprtauth_map(address_map &map);
 	void suprpokr_map(address_map &map);
-protected:
+
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
-private:
 	bitmap_ind16 m_bitmap;
 
 	uint8_t m_drawctrl[3];

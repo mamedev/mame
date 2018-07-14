@@ -231,6 +231,7 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/clock.h"
 #include "machine/watchdog.h"
 #include "sound/cem3394.h"
 #include "speaker.h"
@@ -265,7 +266,7 @@ void balsente_state::cpu1_base_map(address_map &map)
 	map(0x9902, 0x9902).portr("IN0");
 	map(0x9903, 0x9903).portr("IN1").nopw();
 	map(0x9a00, 0x9a03).r(FUNC(balsente_state::random_num_r));
-	map(0x9a04, 0x9a05).rw(FUNC(balsente_state::m6850_r), FUNC(balsente_state::m6850_w));
+	map(0x9a04, 0x9a05).r("acia", FUNC(acia6850_device::read)).w(FUNC(balsente_state::acia_w));
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).bankr("bank2");
 }
@@ -295,8 +296,8 @@ void balsente_state::cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x5fff).ram();
-	map(0x6000, 0x7fff).w(FUNC(balsente_state::m6850_sound_w));
-	map(0xe000, 0xffff).r(FUNC(balsente_state::m6850_sound_r));
+	map(0x6000, 0x6001).mirror(0x1ffe).w("audiouart", FUNC(acia6850_device::write));
+	map(0xe000, 0xe001).mirror(0x1ffe).r("audiouart", FUNC(acia6850_device::read));
 }
 
 
@@ -1314,10 +1315,23 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
 	MCFG_DEVICE_IO_MAP(cpu2_io_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(m_audiouart, FUNC(acia6850_device::write_rxd));
+	m_acia->irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
-	MCFG_X2212_ADD_AUTOSAVE("nov0") // system NOVRAM
-	MCFG_X2212_ADD_AUTOSAVE("nov1") // cart NOVRAM
+	ACIA6850(config, m_audiouart, 0);
+	m_audiouart->txd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	m_audiouart->irq_handler().set([this] (int state) { m_uint = bool(state); });
+
+	clock_device &uartclock(CLOCK(config, "uartclock", 8_MHz_XTAL / 16)); // 500 kHz
+	uartclock.signal_handler().set(FUNC(balsente_state::uint_propagate_w));
+	uartclock.signal_handler().append(m_audiouart, FUNC(acia6850_device::write_txc));
+	uartclock.signal_handler().append(m_audiouart, FUNC(acia6850_device::write_rxc));
+	uartclock.signal_handler().append(m_acia, FUNC(acia6850_device::write_txc)).invert();
+	uartclock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc)).invert();
+
+	X2212(config, "nov0").set_auto_save(true); // system NOVRAM
+	X2212(config, "nov1").set_auto_save(true); // cart NOVRAM
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

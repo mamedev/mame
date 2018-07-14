@@ -39,22 +39,25 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dart(*this, "dart")
-		, m_ctc (*this, "ctc")
-		, m_fdc (*this, "fdc")
+		, m_ctc(*this, "ctc")
+		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
+	void ampro(machine_config &config);
+
 	void init_ampro();
+
+private:
 	DECLARE_MACHINE_RESET(ampro);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 
-	void ampro(machine_config &config);
 	void ampro_io(address_map &map);
 	void ampro_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
 	required_device<z80ctc_device> m_ctc;
@@ -157,16 +160,16 @@ MACHINE_CONFIG_START(ampro_state::ampro)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 	MCFG_MACHINE_RESET_OVERRIDE(ampro_state, ampro)
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 16_MHz_XTAL / 8) // 2MHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 16_MHz_XTAL / 8)); // 2MHz
+	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 16_MHz_XTAL / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("dart", z80dart_device, txca_w))    // Z80DART Ch A, SIO Ch A
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("dart", z80dart_device, rxtxcb_w))   // SIO Ch B
+	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set("dart", FUNC(z80dart_device::txca_w));    // Z80DART Ch A, SIO Ch A
+	m_ctc->zc_callback<0>().append("dart", FUNC(z80dart_device::rxca_w));
+	m_ctc->zc_callback<1>().set("dart", FUNC(z80dart_device::rxtxcb_w));   // SIO Ch B
 
 	MCFG_DEVICE_ADD("dart", Z80DART, 16_MHz_XTAL / 4)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))

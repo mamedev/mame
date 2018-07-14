@@ -103,17 +103,6 @@
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-//-------------------------------------------------
-//  dbrg_w - baud rate selection
-//-------------------------------------------------
-
-WRITE8_MEMBER( softbox_state::dbrg_w )
-{
-	m_dbrg->write_str(data & 0x0f);
-	m_dbrg->write_stt(data >> 4);
-}
-
-
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -139,7 +128,7 @@ void softbox_state::softbox_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x08, 0x08).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x09, 0x09).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x0c, 0x0c).w(FUNC(softbox_state::dbrg_w));
+	map(0x0c, 0x0c).w(COM8116_TAG, FUNC(com8116_device::stt_str_w));
 	map(0x10, 0x13).rw(I8255_0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x14, 0x17).rw(I8255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x18, 0x18).rw(m_hdc, FUNC(corvus_hdc_device::read), FUNC(corvus_hdc_device::write));
@@ -242,14 +231,14 @@ WRITE8_MEMBER( softbox_state::ppi1_pb_w )
 
 	*/
 
-	m_ieee->atn_w(!BIT(data, 0));
-	m_ieee->dav_w(!BIT(data, 1));
-	m_ieee->ndac_w(!BIT(data, 2));
-	m_ieee->nrfd_w(!BIT(data, 3));
-	m_ieee->eoi_w(!BIT(data, 4));
-	m_ieee->srq_w(!BIT(data, 5));
-	m_ieee->ren_w(!BIT(data, 6));
-	m_ieee->ifc_w(!BIT(data, 7));
+	m_ieee->host_atn_w(!BIT(data, 0));
+	m_ieee->host_dav_w(!BIT(data, 1));
+	m_ieee->host_ndac_w(!BIT(data, 2));
+	m_ieee->host_nrfd_w(!BIT(data, 3));
+	m_ieee->host_eoi_w(!BIT(data, 4));
+	m_ieee->host_srq_w(!BIT(data, 5));
+	m_ieee->host_ren_w(!BIT(data, 6));
+	m_ieee->host_ifc_w(!BIT(data, 7));
 }
 
 READ8_MEMBER( softbox_state::ppi1_pc_r )
@@ -400,9 +389,9 @@ MACHINE_CONFIG_START(softbox_state::softbox)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, softbox_state, ppi1_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, softbox_state, ppi1_pc_w))
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_txc))
+	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
+	dbrg.fr_handler().set(I8251_TAG, FUNC(i8251_device::write_rxc));
+	dbrg.ft_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
 
 	MCFG_CBM_IEEE488_ADD("c8050")
 

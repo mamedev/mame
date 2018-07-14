@@ -29,25 +29,28 @@ public:
 	{
 	}
 
+	void prose2k(machine_config &config);
+
+	void init_prose2k();
+
+private:
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_WRITE8_MEMBER(peripheral_w);
 	DECLARE_READ16_MEMBER(dsp_data_r);
 	DECLARE_WRITE16_MEMBER(dsp_data_w);
 	DECLARE_READ16_MEMBER(dsp_status_r);
 	DECLARE_WRITE16_MEMBER(dsp_status_w);
-	void init_prose2k();
 	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txempty_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p0_w);
 	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p1_w);
 
-	void prose2k(machine_config &config);
 	void dsp_data_map(address_map &map);
 	void dsp_prg_map(address_map &map);
 	void i8086_io(address_map &map);
 	void i8086_mem(address_map &map);
-protected:
+
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;

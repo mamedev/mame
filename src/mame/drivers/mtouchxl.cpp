@@ -62,6 +62,10 @@ public:
 		m_iocard(*this, "dbank"),
 		m_multikey(*this, "multikey")
 		{ }
+
+	void at486(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 #ifndef REAL_PCI_CHIPSET
 	required_device<at_mb_device> m_mb;
@@ -75,7 +79,6 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(coin_r);
-	void at486(machine_config &config);
 	static void cdrom(device_t *device);
 	void at32_io(address_map &map);
 	void at32_map(address_map &map);

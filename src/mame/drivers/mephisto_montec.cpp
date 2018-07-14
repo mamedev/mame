@@ -45,7 +45,14 @@ public:
 		, m_high_leds(*this, "led%u", 100U)
 	{ }
 
+	void smondial(machine_config &config);
+	void mondial2(machine_config &config);
+	void smondial2(machine_config &config);
+	void montec(machine_config &config);
+	void monteciv(machine_config &config);
+	void megaiv(machine_config &config);
 
+private:
 	DECLARE_READ8_MEMBER(montec_input_r);
 	DECLARE_READ8_MEMBER(montec_nmi_ack_r);
 	DECLARE_WRITE8_MEMBER(montec_nmi_ack_w);
@@ -66,22 +73,15 @@ public:
 	DECLARE_WRITE8_MEMBER(mondial2_input_mux_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(refresh_leds);
 
-	void smondial(machine_config &config);
-	void mondial2(machine_config &config);
-	void smondial2(machine_config &config);
-	void montec(machine_config &config);
-	void monteciv(machine_config &config);
-	void megaiv(machine_config &config);
 	void megaiv_mem(address_map &map);
 	void mondial2_mem(address_map &map);
 	void montec_mem(address_map &map);
 	void smondial2_mem(address_map &map);
 	void smondial_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
 	required_device<beep_device> m_beeper;

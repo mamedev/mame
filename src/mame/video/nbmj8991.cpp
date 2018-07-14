@@ -313,8 +313,8 @@ void nbmj8991_state::video_start()
 	save_item(NAME(m_dispflag));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_clutsel));
-	save_pointer(NAME(m_videoram.get()), width * height);
-	save_pointer(NAME(m_clut.get()), 0x800);
+	save_pointer(NAME(m_videoram), width * height);
+	save_pointer(NAME(m_clut), 0x800);
 	save_item(NAME(m_flipscreen_old));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj8991_state::postload), this));

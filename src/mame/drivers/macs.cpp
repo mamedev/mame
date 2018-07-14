@@ -67,16 +67,24 @@ class macs_state : public driver_device
 {
 public:
 	macs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_cart_bank(0),
-			m_ram2(*this, "ram2"),
-			m_maincpu(*this,"maincpu"),
-			m_cart1(*this, "slot_a"),
-			m_cart2(*this, "slot_b"),
-			m_rombank(*this, "rombank%u", 1),
-			m_rambank(*this, "rambank%u", 1)
-			{ }
+		: driver_device(mconfig, type, tag)
+		, m_cart_bank(0)
+		, m_ram2(*this, "ram2")
+		, m_maincpu(*this,"maincpu")
+		, m_cart1(*this, "slot_a")
+		, m_cart2(*this, "slot_b")
+		, m_rombank(*this, "rombank%u", 1)
+		, m_rambank(*this, "rambank%u", 1)
+	{ }
 
+	void macs(machine_config &config);
+
+	void init_macs();
+	void init_kisekaeh();
+	void init_kisekaem();
+	void init_macs2();
+
+private:
 	uint8_t m_mux_data;
 	uint8_t m_rev;
 	uint8_t m_cart_bank;
@@ -86,13 +94,9 @@ public:
 	DECLARE_READ8_MEMBER(macs_input_r);
 	DECLARE_WRITE8_MEMBER(macs_rom_bank_w);
 	DECLARE_WRITE8_MEMBER(macs_output_w);
-	void init_macs();
-	void init_kisekaeh();
-	void init_kisekaem();
-	void init_macs2();
 	DECLARE_MACHINE_RESET(macs);
 	DECLARE_MACHINE_START(macs);
-	ST0016_DMA_OFFS_CB(dma_offset);
+	uint8_t dma_offset();
 
 	uint32_t screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -103,7 +107,6 @@ public:
 	required_memory_bank_array<2> m_rombank;
 	required_memory_bank_array<2> m_rambank;
 
-	void macs(machine_config &config);
 	void macs_io(address_map &map);
 	void macs_mem(address_map &map);
 };
@@ -491,31 +494,30 @@ uint32_t macs_state::screen_update_macs(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-ST0016_DMA_OFFS_CB(macs_state::dma_offset)
+uint8_t macs_state::dma_offset()
 {
 	return m_cart_bank;
 }
 
 MACHINE_CONFIG_START(macs_state::macs)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(macs_mem)
-	MCFG_DEVICE_IO_MAP(macs_io)
-	MCFG_ST0016_DMA_OFFS_CB(macs_state, dma_offset)
-
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", macs_state, irq0_line_hold)
+	ST0016_CPU(config, m_maincpu, 8000000); // 8 MHz ?
+	m_maincpu->set_memory_map(&macs_state::macs_mem);
+	m_maincpu->set_io_map(&macs_state::macs_io);
+	m_maincpu->set_dma_offs_callback(FUNC(macs_state::dma_offset), this);
 
 	MCFG_MACHINE_START_OVERRIDE(macs_state, macs)
 	MCFG_MACHINE_RESET_OVERRIDE(macs_state, macs)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(128*8, 128*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 128*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(macs_state, screen_update_macs)
-	MCFG_SCREEN_PALETTE("maincpu:palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(128*8, 128*8);
+	screen.set_visarea(0*8, 128*8-1, 0*8, 128*8-1);
+	screen.set_screen_update(FUNC(macs_state::screen_update_macs));
+	screen.set_palette("maincpu:palette");
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE); // FIXME: HOLD_LINE is bad juju
 
 	MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT("slot_a", generic_plain_slot, "macs_cart", "rom")
 	MCFG_SET_IMAGE_LOADABLE(false)

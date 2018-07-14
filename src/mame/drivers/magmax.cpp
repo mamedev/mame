@@ -366,9 +366,9 @@ MACHINE_CONFIG_START(magmax_state::magmax)
 	MCFG_DEVICE_ADD(m_ay[2], AY8910, XTAL(20'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, 0))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+	m_soundlatch->set_separate_acknowledge(true);
 MACHINE_CONFIG_END
 
 

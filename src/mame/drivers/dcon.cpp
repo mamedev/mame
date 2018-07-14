@@ -284,6 +284,7 @@ MACHINE_CONFIG_START(dcon_state::dcon)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* Perhaps 14318180/4? */
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -328,6 +329,7 @@ MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

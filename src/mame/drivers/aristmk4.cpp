@@ -371,6 +371,13 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void aristmk4_poker(machine_config &config);
+	void aristmk4(machine_config &config);
+	void _86lions(machine_config &config);
+
+	void init_aristmk4();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
 	required_device<ay8910_device> m_ay1;
@@ -431,7 +438,7 @@ public:
 	DECLARE_READ8_MEMBER(pa1_r);
 	DECLARE_READ8_MEMBER(pb1_r);
 	DECLARE_READ8_MEMBER(pc1_r);
-	void init_aristmk4();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -443,9 +450,7 @@ public:
 	TIMER_CALLBACK_MEMBER(hopper_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_pf);
 	inline void uBackgroundColour();
-	void aristmk4_poker(machine_config &config);
-	void aristmk4(machine_config &config);
-	void _86lions(machine_config &config);
+
 	void aristmk4_map(address_map &map);
 	void aristmk4_poker_map(address_map &map);
 };
@@ -1722,7 +1727,7 @@ void aristmk4_state::init_aristmk4()
 
 void aristmk4_state::machine_start()
 {
-	save_pointer(NAME(m_nvram.get()), 0x1000); // m_nvram
+	save_pointer(NAME(m_nvram), 0x1000); // m_nvram
 	m_credit_spend_meter.resolve();
 	m_credit_out_meter.resolve();
 	m_hopper_motor_out.resolve();

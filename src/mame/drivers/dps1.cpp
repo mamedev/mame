@@ -33,6 +33,11 @@ public:
 		//, m_floppy1(*this, "fdc:1")
 	{ }
 
+	void dps1(machine_config &config);
+
+	void init_dps1();
+
+private:
 	DECLARE_WRITE8_MEMBER(portb2_w);
 	DECLARE_WRITE8_MEMBER(portb4_w);
 	DECLARE_WRITE8_MEMBER(portb6_w);
@@ -43,13 +48,10 @@ public:
 	DECLARE_READ8_MEMBER(portff_r);
 	DECLARE_WRITE8_MEMBER(portff_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	void init_dps1();
 	DECLARE_MACHINE_RESET(dps1);
 
-	void dps1(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
 	bool m_dma_dir;
 	uint16_t m_dma_adr;
 	required_device<cpu_device> m_maincpu;

@@ -163,6 +163,9 @@ public:
 		, m_centronics(*this, "centronics")
 	{}
 
+	void spc1000(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(iplk_w);
 	DECLARE_READ8_MEMBER(iplk_r);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
@@ -178,10 +181,9 @@ public:
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
 	}
 
-	void spc1000(machine_config &config);
 	void spc1000_io(address_map &map);
 	void spc1000_mem(address_map &map);
-private:
+
 	uint8_t m_IPLK;
 	uint8_t m_GMODE;
 	uint16_t m_page;
@@ -491,7 +493,7 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	MCFG_DEVICE_ADD("ext1", SPC1000_EXP_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, nullptr, false)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, spc1000_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)

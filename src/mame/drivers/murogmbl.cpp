@@ -55,6 +55,9 @@ public:
 		m_palette(*this, "palette"),
 		m_video(*this, "video") { }
 
+	void murogmbl(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -65,7 +68,6 @@ public:
 	DECLARE_PALETTE_INIT(murogmbl);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void murogmbl(machine_config &config);
 	void murogmbl_map(address_map &map);
 };
 
@@ -79,6 +81,9 @@ public:
 		m_palette(*this, "palette"),
 		m_video(*this, "video") { }
 
+	void slotunbl(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -89,7 +94,6 @@ public:
 	DECLARE_PALETTE_INIT(slotunbl);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void slotunbl(machine_config &config);
 	void slotunbl_map(address_map &map);
 };
 

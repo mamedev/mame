@@ -67,6 +67,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void a7150(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -104,7 +107,7 @@ public:
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
-	void a7150(machine_config &config);
+
 	void a7150_io(address_map &map);
 	void a7150_mem(address_map &map);
 	void k7070_cpu_banked(address_map &map);
@@ -507,7 +510,7 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
 
-	MCFG_ISBC_215_ADD("isbc_215g", 0x4a, "maincpu")
+	MCFG_DEVICE_ADD("isbc_215g", ISBC_215G, 0x4a, "maincpu")
 	MCFG_ISBC_215_IRQ(WRITELINE("pic8259", pic8259_device, ir5_w))
 
 	// KGS K7070 graphics terminal controlling ABG K7072 framebuffer
@@ -523,17 +526,17 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 1230750)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(Z80CTC_TAG, z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 1230750));
+	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg3));
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(16'000'000)/3)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("gfxcpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80SIO_TAG, z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80SIO_TAG, z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80SIO_TAG, z80sio_device, rxtxcb_w))
+	Z80CTC(config, m_ctc, 16_MHz_XTAL/3);
+	m_ctc->intr_callback().set_inputline(m_gfxcpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80sio_device::rxca_w));
+	m_ctc->zc_callback<0>().append(Z80SIO_TAG, FUNC(z80sio_device::txca_w));
+	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, XTAL(16'000'000)/4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("gfxcpu", INPUT_LINE_IRQ0))

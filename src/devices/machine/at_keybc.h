@@ -19,22 +19,22 @@
 //**************************************************************************
 
 #define MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(_devcb) \
-	devcb = &downcast<at_keyboard_controller_device &>(*device).set_system_reset_callback(DEVCB_##_devcb);
+	downcast<at_keyboard_controller_device &>(*device).set_system_reset_callback(DEVCB_##_devcb);
 
 #define MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(_devcb) \
-	devcb = &downcast<at_keyboard_controller_device &>(*device).set_gate_a20_callback(DEVCB_##_devcb);
+	downcast<at_keyboard_controller_device &>(*device).set_gate_a20_callback(DEVCB_##_devcb);
 
 #define MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(_devcb) \
-	devcb = &downcast<at_keyboard_controller_device &>(*device).set_input_buffer_full_callback(DEVCB_##_devcb);
+	downcast<at_keyboard_controller_device &>(*device).set_input_buffer_full_callback(DEVCB_##_devcb);
 
 #define MCFG_AT_KEYBOARD_CONTROLLER_OUTPUT_BUFFER_EMPTY_CB(_devcb) \
-	devcb = &downcast<at_keyboard_controller_device &>(*device).set_output_buffer_empty_callback(DEVCB_##_devcb);
+	downcast<at_keyboard_controller_device &>(*device).set_output_buffer_empty_callback(DEVCB_##_devcb);
 
 #define MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(_devcb) \
-	devcb = &downcast<at_keyboard_controller_device &>(*device).set_keyboard_clock_callback(DEVCB_##_devcb);
+	downcast<at_keyboard_controller_device &>(*device).set_keyboard_clock_callback(DEVCB_##_devcb);
 
 #define MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(_devcb) \
-	devcb = &downcast<at_keyboard_controller_device &>(*device).set_keyboard_data_callback(DEVCB_##_devcb);
+	downcast<at_keyboard_controller_device &>(*device).set_keyboard_data_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

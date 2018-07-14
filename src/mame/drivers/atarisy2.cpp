@@ -1261,7 +1261,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy2_state::paperboy)
 	atarisy2(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 105)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 105, false)
 MACHINE_CONFIG_END
 
 
@@ -1271,13 +1271,13 @@ MACHINE_CONFIG_START(atarisy2_state::_720)
 	   issues with the sound CPU; temporarily increasing the sound CPU frequency
 	   to ~2.2MHz "fixes" the problem */
 
-	MCFG_SLAPSTIC_ADD("slapstic", 107)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, false)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(atarisy2_state::ssprint)
 	atarisy2(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 108)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 108, false)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("tms")
@@ -1286,7 +1286,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy2_state::csprint)
 	atarisy2(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 109)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 109, false)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("tms")
@@ -1295,7 +1295,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy2_state::apb)
 	atarisy2(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 110)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 110, false)
 MACHINE_CONFIG_END
 
 

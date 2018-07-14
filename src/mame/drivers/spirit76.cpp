@@ -33,6 +33,9 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu") { }
 
+	void spirit76(machine_config &config);
+
+private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
@@ -40,9 +43,8 @@ public:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_READ8_MEMBER(unk_r);
-	void spirit76(machine_config &config);
 	void maincpu_map(address_map &map);
-private:
+
 	u8 m_t_c;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

@@ -42,7 +42,7 @@ public:
 	void init_ecoinf3_swap();
 	void ecoinf3_pyramid(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override
 	{
 		m_lamp_outputs.resolve();
@@ -268,7 +268,6 @@ protected:
 	void pyramid_memmap(address_map &map);
 	void pyramid_portmap(address_map &map);
 
-private:
 	required_device<z180_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reels;
 	output_finder<16 * 16> m_lamp_outputs;

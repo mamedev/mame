@@ -72,6 +72,9 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
+	void excali64(machine_config &config);
+
+private:
 	DECLARE_PALETTE_INIT(excali64);
 	DECLARE_WRITE8_MEMBER(ppib_w);
 	DECLARE_READ8_MEMBER(ppic_r);
@@ -96,10 +99,9 @@ public:
 	DECLARE_MACHINE_RESET(excali64);
 	required_device<palette_device> m_palette;
 
-	void excali64(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t *m_p_videoram;
 	uint8_t *m_p_hiresram;
 	uint8_t m_sys_status;
@@ -623,7 +625,7 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, excali64_state, motor_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, excali64_state, cent_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END

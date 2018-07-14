@@ -269,10 +269,12 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	required_device<cpu_device> m_maincpu;
 	void ibm5160(machine_config &config);
 	void ibm5150(machine_config &config);
 	void ibm5140(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	void pc8_io(address_map &map);
 	void pc8_map(address_map &map);
 };

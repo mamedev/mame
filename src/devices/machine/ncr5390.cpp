@@ -510,16 +510,16 @@ void ncr5390_device::step(bool timeout)
 		break;
 
 	case INIT_XFR_FUNCTION_COMPLETE:
-		// wait for dma transfer to complete
-		if (dma_command && !(status & S_TC0))
+		// wait for dma transfer to complete or fifo to drain
+		if (dma_command && !(status & S_TC0) && fifo_pos)
 			break;
 
 		function_complete();
 		break;
 
 	case INIT_XFR_BUS_COMPLETE:
-		// wait for dma transfer to complete
-		if (dma_command && !(status & S_TC0))
+		// wait for dma transfer to complete or fifo to drain
+		if (dma_command && !(status & S_TC0) && fifo_pos)
 			break;
 
 		bus_complete();
@@ -794,9 +794,9 @@ void ncr5390_device::start_command()
 	case CD_SELECT:
 	case CD_SELECT_ATN:
 	case CD_SELECT_ATN_STOP:
-		LOGMASKED(LOG_COMMAND, 
-			(c == CD_SELECT) ? "Select without ATN sequence\n" : 
-			(c == CD_SELECT_ATN) ? "Select with ATN sequence\n" : 
+		LOGMASKED(LOG_COMMAND,
+			(c == CD_SELECT) ? "Select without ATN sequence\n" :
+			(c == CD_SELECT_ATN) ? "Select with ATN sequence\n" :
 			"Select with ATN and stop sequence\n");
 		seq = 0;
 		state = DISC_SEL_ARBITRATION_INIT;
@@ -987,7 +987,7 @@ WRITE8_MEMBER(ncr5390_device::clock_w)
 void ncr5390_device::dma_set(int dir)
 {
 	dma_dir = dir;
-	if(dma_dir == DMA_OUT && fifo_pos != 16 && tcounter > fifo_pos)
+	if(dma_dir == DMA_OUT && fifo_pos != 16 && ((tcounter > fifo_pos) || !tcounter))
 		drq_set();
 }
 

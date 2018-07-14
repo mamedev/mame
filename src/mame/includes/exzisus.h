@@ -18,6 +18,9 @@ public:
 		m_objectram0(*this, "objectram0"),
 		m_videoram0(*this, "videoram0") { }
 
+	void exzisus(machine_config &config);
+
+private:
 	required_device<cpu_device> m_cpuc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -37,7 +40,6 @@ public:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void exzisus(machine_config &config);
 	void cpua_map(address_map &map);
 	void cpub_map(address_map &map);
 	void cpuc_map(address_map &map);

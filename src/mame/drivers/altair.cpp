@@ -43,14 +43,13 @@ public:
 
 	void altair(machine_config &config);
 
-protected:
+private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
 
 	virtual void machine_reset() override;
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
 };
@@ -114,9 +113,9 @@ MACHINE_CONFIG_START(altair_state::altair)
 	MCFG_RS232_DCD_HANDLER(WRITELINE("acia", acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600) // TODO: this is set using jumpers S3/S2/S1/S0
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600)); // TODO: this is set using jumpers S3/S2/S1/S0
+	uart_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
+	uart_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", altair_state, altair, "bin", 0)

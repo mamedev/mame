@@ -365,6 +365,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "sound/cdda.h"
 #include "video/psx.h"
 #include "cdrom.h"
+#include "romload.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -401,71 +402,6 @@ public:
 		m_duart(*this, "mb89371"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
-
-	double m_pad_position[ 6 ];
-	optional_ioport m_pads;
-
-	DECLARE_CUSTOM_INPUT_MEMBER( gn845pwbb_read );
-	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_tank_shutter_sensor );
-	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_cable_holder_sensor );
-	DECLARE_READ16_MEMBER( control_r );
-	DECLARE_WRITE16_MEMBER( control_w );
-	DECLARE_WRITE16_MEMBER( atapi_reset_w );
-	DECLARE_WRITE16_MEMBER( security_w );
-	DECLARE_READ16_MEMBER( security_r );
-	DECLARE_READ16_MEMBER( ge765pwbba_r );
-	DECLARE_WRITE16_MEMBER( ge765pwbba_w );
-	DECLARE_READ16_MEMBER( gx700pwbf_io_r );
-	DECLARE_WRITE16_MEMBER( gx700pwbf_io_w );
-	DECLARE_WRITE16_MEMBER( gunmania_w );
-	DECLARE_READ16_MEMBER( gunmania_r );
-	void init_salarymc();
-	void init_pnchmn();
-	void init_ddr();
-	void init_hyperbbc();
-	void init_drmn();
-	DECLARE_MACHINE_RESET( konami573 );
-	WRITE_LINE_MEMBER( h8_clk_w );
-	DECLARE_READ_LINE_MEMBER( h8_d0_r );
-	DECLARE_READ_LINE_MEMBER( h8_d1_r );
-	DECLARE_READ_LINE_MEMBER( h8_d2_r );
-	DECLARE_READ_LINE_MEMBER( h8_d3_r );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b7 );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b6 );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b5 );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b4 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b0 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b1 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b2 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b3 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b4 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b5 );
-	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b3 );
-	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b4 );
-	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b5 );
-	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_rst );
-	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_d );
-	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_clk );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_red );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_green );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_blue );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_start );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe1 );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe2 );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe3 );
-	DECLARE_WRITE_LINE_MEMBER( ata_interrupt );
-	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
-	DECLARE_WRITE8_MEMBER( ddr_output_callback );
-	DECLARE_WRITE8_MEMBER( ddrsolo_output_callback );
-	DECLARE_WRITE8_MEMBER( drmn_output_callback );
-	DECLARE_WRITE8_MEMBER( dmx_output_callback );
-	DECLARE_WRITE8_MEMBER( mamboagg_output_callback );
-	DECLARE_WRITE8_MEMBER( punchmania_output_callback );
-	ADC083X_INPUT_CB(analogue_inputs_callback);
-
-	void cdrom_dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
-	void cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
-	void sys573_vblank( screen_device &screen, bool vblank_state );
 
 	void gtfrk10mb(machine_config &config);
 	void ddr(machine_config &config);
@@ -516,6 +452,79 @@ public:
 	void casszi(machine_config &config);
 	void cassxzi(machine_config &config);
 
+	void init_salarymc();
+	void init_pnchmn();
+	void init_ddr();
+	void init_hyperbbc();
+	void init_drmn();
+
+	DECLARE_CUSTOM_INPUT_MEMBER( gn845pwbb_read );
+	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_tank_shutter_sensor );
+	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_cable_holder_sensor );
+
+	DECLARE_READ_LINE_MEMBER( h8_d0_r );
+	DECLARE_READ_LINE_MEMBER( h8_d1_r );
+	DECLARE_READ_LINE_MEMBER( h8_d2_r );
+	DECLARE_READ_LINE_MEMBER( h8_d3_r );
+
+	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b7 );
+	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b6 );
+	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b5 );
+	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b4 );
+	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b0 );
+	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b1 );
+	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b2 );
+	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b3 );
+	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b4 );
+	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b5 );
+	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b3 );
+	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b4 );
+	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b5 );
+	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_rst );
+	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_d );
+	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_clk );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_red );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_green );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_blue );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_start );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe1 );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe2 );
+	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe3 );
+
+	WRITE_LINE_MEMBER( h8_clk_w );
+
+	double m_pad_position[ 6 ];
+	optional_ioport m_pads;
+
+private:
+
+	DECLARE_READ16_MEMBER( control_r );
+	DECLARE_WRITE16_MEMBER( control_w );
+	DECLARE_WRITE16_MEMBER( atapi_reset_w );
+	DECLARE_WRITE16_MEMBER( security_w );
+	DECLARE_READ16_MEMBER( security_r );
+	DECLARE_READ16_MEMBER( ge765pwbba_r );
+	DECLARE_WRITE16_MEMBER( ge765pwbba_w );
+	DECLARE_READ16_MEMBER( gx700pwbf_io_r );
+	DECLARE_WRITE16_MEMBER( gx700pwbf_io_w );
+	DECLARE_WRITE16_MEMBER( gunmania_w );
+	DECLARE_READ16_MEMBER( gunmania_r );
+	DECLARE_MACHINE_RESET( konami573 );
+	DECLARE_WRITE_LINE_MEMBER( ata_interrupt );
+
+	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
+	DECLARE_WRITE8_MEMBER( ddr_output_callback );
+	DECLARE_WRITE8_MEMBER( ddrsolo_output_callback );
+	DECLARE_WRITE8_MEMBER( drmn_output_callback );
+	DECLARE_WRITE8_MEMBER( dmx_output_callback );
+	DECLARE_WRITE8_MEMBER( mamboagg_output_callback );
+	DECLARE_WRITE8_MEMBER( punchmania_output_callback );
+	ADC083X_INPUT_CB(analogue_inputs_callback);
+
+	void cdrom_dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
+	void cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
+	void sys573_vblank( screen_device &screen, bool vblank_state );
+
 	void punchmania_cassette_install(device_t *device);
 	void salarymc_cassette_install(device_t *device);
 	void hyperbbc_cassette_install(device_t *device);
@@ -528,7 +537,7 @@ public:
 	void konami573_map(address_map &map);
 	void konami573a_map(address_map &map);
 	void konami573d_map(address_map &map);
-protected:
+
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void driver_start() override;
 
@@ -537,7 +546,6 @@ protected:
 	required_ioport m_analog2;
 	required_ioport m_analog3;
 
-private:
 	inline void ATTR_PRINTF( 3,4 ) verboselog( int n_level, const char *s_fmt, ... );
 	void update_disc();
 	void gx700pwbf_output( int offset, uint8_t data );

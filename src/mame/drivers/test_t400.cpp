@@ -18,10 +18,12 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_WRITE8_MEMBER( port_l_w );
-	required_device<cpu_device> m_maincpu;
 	void test_t410(machine_config &config);
 	void test_t420(machine_config &config);
+
+private:
+	DECLARE_WRITE8_MEMBER( port_l_w );
+	required_device<cpu_device> m_maincpu;
 };
 
 WRITE8_MEMBER( t400_test_suite_state::port_l_w )

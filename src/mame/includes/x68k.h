@@ -22,13 +22,11 @@
 #include "sound/flt_vol.h"
 #include "sound/okim6258.h"
 #include "sound/ym2151.h"
+#include "video/x68k_crtc.h"
 #include "bus/x68k/x68kexp.h"
 
 #include "emupal.h"
 #include "screen.h"
-
-#define MC68901_TAG     "mc68901"
-#define RP5C15_TAG      "rp5c15"
 
 #define GFX16     0
 #define GFX256    1
@@ -37,34 +35,18 @@
 class x68k_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_X68K_LED,
-		TIMER_X68K_SCC_ACK,
-		TIMER_MD_6BUTTON_PORT1_TIMEOUT,
-		TIMER_MD_6BUTTON_PORT2_TIMEOUT,
-		TIMER_X68K_BUS_ERROR,
-		TIMER_X68K_NET_IRQ,
-		TIMER_X68K_CRTC_OPERATION_END,
-		TIMER_X68K_HSYNC,
-		TIMER_X68K_CRTC_RASTER_END,
-		TIMER_X68K_CRTC_RASTER_IRQ,
-		TIMER_X68K_CRTC_VBLANK_IRQ,
-		TIMER_X68K_FDC_TC,
-		TIMER_X68K_ADPCM
-	};
-
 	x68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_okim6258(*this, "okim6258")
 		, m_hd63450(*this, "hd63450")
 		, m_ram(*this, RAM_TAG)
+		, m_crtc(*this, "crtc")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_gfxpalette(*this, "gfxpalette")
 		, m_pcgpalette(*this, "pcgpalette")
-		, m_mfpdev(*this, MC68901_TAG)
-		, m_rtc(*this, RP5C15_TAG)
+		, m_mfpdev(*this, "mc68901")
+		, m_rtc(*this, "rp5c15")
 		, m_scc(*this, "scc")
 		, m_ym2151(*this, "ym2151")
 		, m_ppi(*this, "ppi8255")
@@ -92,10 +74,33 @@ public:
 		, m_spritereg(0x8000/sizeof(uint16_t), 0)
 	{ }
 
+	void x68kxvi(machine_config &config);
+	void x68ksupr(machine_config &config);
+	void x68030(machine_config &config);
+	void x68000(machine_config &config);
+
+	void init_x68kxvi();
+	void init_x68030();
+	void init_x68000();
+
+private:
+	enum
+	{
+		TIMER_X68K_LED,
+		TIMER_X68K_SCC_ACK,
+		TIMER_MD_6BUTTON_PORT1_TIMEOUT,
+		TIMER_MD_6BUTTON_PORT2_TIMEOUT,
+		TIMER_X68K_BUS_ERROR,
+		TIMER_X68K_NET_IRQ,
+		TIMER_X68K_FDC_TC,
+		TIMER_X68K_ADPCM
+	};
+
 	required_device<m68000_base_device> m_maincpu;
 	required_device<okim6258_device> m_okim6258;
 	required_device<hd63450_device> m_hd63450;
 	required_device<ram_device> m_ram;
+	required_device<x68k_crtc_device> m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_gfxpalette;
 	required_device<palette_device> m_pcgpalette;
@@ -172,39 +177,6 @@ public:
 		int clock;  // ADPCM clock speed
 	} m_adpcm;
 	struct
-	{
-		unsigned short reg[24];  // registers
-		int operation;  // operation port (0xe80481)
-		int vblank;  // 1 if in VBlank
-		int hblank;  // 1 if in HBlank
-		int htotal;  // Horizontal Total (in characters)
-		int vtotal;  // Vertical Total
-		int hbegin;  // Horizontal Begin
-		int vbegin;  // Vertical Begin
-		int hend;    // Horizontal End
-		int vend;    // Vertical End
-		int hsync_end;  // Horizontal Sync End
-		int vsync_end;  // Vertical Sync End
-		int hsyncadjust;  // Horizontal Sync Adjustment
-		float hmultiple;  // Horizontal pixel multiplier
-		float vmultiple;  // Vertical scanline multiplier (x2 for doublescan modes)
-		int height;
-		int width;
-		int visible_height;
-		int visible_width;
-		int hshift;
-		int vshift;
-		int video_width;  // horizontal total (in pixels)
-		int video_height; // vertical total
-		int bg_visible_height;
-		int bg_visible_width;
-		int bg_hshift;
-		int bg_vshift;
-		int bg_hvres;  // bits 0,1 = H-Res, bits 2,3 = V-Res, bit 4 = L/H Freq (0=15.98kHz, 1=31.5kHz)
-		int bg_double;  // 1 if PCG is to be doubled.
-		int interlace;  // 1024 vertical resolution is interlaced
-	} m_crtc;  // CRTC
-	struct
 	{   // video controller at 0xe82000
 		unsigned short reg[3];
 		int text_pri;
@@ -213,6 +185,12 @@ public:
 		int gfxlayer_pri[4];  // block displayed for each priority level
 		int tile8_dirty[1024];
 		int tile16_dirty[256];
+		int bg_visible_height;
+		int bg_visible_width;
+		int bg_hshift;
+		int bg_vshift;
+		int bg_hvres;  // bits 0,1 = H-Res, bits 2,3 = V-Res, bit 4 = L/H Freq (0=15.98kHz, 1=31.5kHz)
+		int bg_double;  // 1 if PCG is to be doubled.
 	} m_video;
 	struct
 	{
@@ -244,7 +222,6 @@ public:
 	uint8_t m_ppi_port[3];
 	int m_current_vector[8];
 	uint8_t m_current_irq_line;
-	unsigned int m_scanline;
 	int m_led_state;
 	emu_timer* m_mouse_timer;
 	emu_timer* m_led_timer;
@@ -252,9 +229,6 @@ public:
 	unsigned char m_scc_prev;
 	uint16_t m_ppi_prev;
 	int m_mfp_prev;
-	emu_timer* m_scanline_timer;
-	emu_timer* m_raster_irq;
-	emu_timer* m_vblank_irq;
 	emu_timer* m_fdc_tc;
 	emu_timer* m_adpcm_timer;
 	emu_timer* m_bus_error_timer;
@@ -264,11 +238,8 @@ public:
 	tilemap_t* m_bg0_16;
 	tilemap_t* m_bg1_16;
 	int m_sprite_shift;
-	int m_oddscanline;
 	bool m_is_32bit;
-	void init_x68kxvi();
-	void init_x68030();
-	void init_x68000();
+
 	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile);
 	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile);
 	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile_16);
@@ -282,11 +253,6 @@ public:
 	TIMER_CALLBACK_MEMBER(md_6button_port2_timeout);
 	TIMER_CALLBACK_MEMBER(x68k_bus_error);
 	TIMER_CALLBACK_MEMBER(x68k_net_irq);
-	TIMER_CALLBACK_MEMBER(x68k_crtc_operation_end);
-	TIMER_CALLBACK_MEMBER(x68k_hsync);
-	TIMER_CALLBACK_MEMBER(x68k_crtc_raster_end);
-	TIMER_CALLBACK_MEMBER(x68k_crtc_raster_irq);
-	TIMER_CALLBACK_MEMBER(x68k_crtc_vblank_irq);
 	DECLARE_READ8_MEMBER(ppi_port_a_r);
 	DECLARE_READ8_MEMBER(ppi_port_b_r);
 	DECLARE_READ8_MEMBER(ppi_port_c_r);
@@ -342,27 +308,17 @@ public:
 	DECLARE_WRITE16_MEMBER(x68k_spritereg_w);
 	DECLARE_READ16_MEMBER(x68k_spriteram_r);
 	DECLARE_WRITE16_MEMBER(x68k_spriteram_w);
-	DECLARE_WRITE16_MEMBER(x68k_crtc_w);
-	DECLARE_READ16_MEMBER(x68k_crtc_r);
-	DECLARE_WRITE16_MEMBER(x68k_gvram_w);
-	DECLARE_READ16_MEMBER(x68k_gvram_r);
-	DECLARE_WRITE16_MEMBER(x68k_tvram_w);
-	DECLARE_READ16_MEMBER(x68k_tvram_r);
+	DECLARE_READ16_MEMBER(tvram_read);
+	DECLARE_WRITE16_MEMBER(tvram_write);
+	DECLARE_READ16_MEMBER(gvram_read);
+	DECLARE_WRITE16_MEMBER(gvram_write);
 	IRQ_CALLBACK_MEMBER(x68k_int_ack);
-
-	void x68kxvi(machine_config &config);
-	void x68ksupr(machine_config &config);
-	void x68030(machine_config &config);
-	void x68000(machine_config &config);
 
 	void x68030_map(address_map &map);
 	void x68k_map(address_map &map);
 	void x68kxvi_map(address_map &map);
 
-private:
 	inline void x68k_plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
-	void x68k_crtc_text_copy(int src, int dest, uint8_t planes);
-	void x68k_crtc_refresh_mode();
 	void x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect);
 	bool x68k_draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, uint8_t priority);
 	void x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);

@@ -684,7 +684,7 @@ void pleiads_sound_device::common_start()
 	save_item(NAME(m_noise.counter));
 	save_item(NAME(m_noise.polyoffs));
 	save_item(NAME(m_noise.freq));
-	save_pointer(NAME(m_poly18.get()), (1ul << (18-5)));
+	save_pointer(NAME(m_poly18), (1ul << (18-5)));
 }
 
 //-------------------------------------------------

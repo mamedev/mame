@@ -22,19 +22,24 @@
 class namcofl_state : public namcos2_shared_state
 {
 public:
-	namcofl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcos2_shared_state(mconfig, type, tag)
-		, m_mainbank(*this, "mainbank%u",1)
-		, m_in0(*this, "IN0")
-		, m_in1(*this, "IN1")
-		, m_in2(*this, "IN2")
-		, m_misc(*this, "MISC")
-		, m_accel(*this, "ACCEL")
-		, m_brake(*this, "BRAKE")
-		, m_wheel(*this, "WHEEL")
-		, m_shareram(*this, "shareram", 32)
-	{ }
+	namcofl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos2_shared_state(mconfig, type, tag),
+		m_mainbank(*this, "mainbank%u", 1U),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
+		m_in2(*this, "IN2"),
+		m_misc(*this, "MISC"),
+		m_accel(*this, "ACCEL"),
+		m_brake(*this, "BRAKE"),
+		m_wheel(*this, "WHEEL"),
+		m_shareram(*this, "shareram", 32) { }
 
+	void namcofl(machine_config &config);
+
+	void init_speedrcr();
+	void init_finalapr();
+
+private:
 	required_memory_bank_array<2> m_mainbank;
 	required_ioport m_in0;
 	required_ioport m_in1;
@@ -69,8 +74,6 @@ public:
 	DECLARE_READ8_MEMBER(dac1_r);
 	DECLARE_READ8_MEMBER(dac0_r);
 	DECLARE_WRITE32_MEMBER(namcofl_spritebank_w);
-	void init_speedrcr();
-	void init_finalapr();
 	DECLARE_MACHINE_START(namcofl);
 	DECLARE_MACHINE_RESET(namcofl);
 	DECLARE_VIDEO_START(namcofl);
@@ -84,7 +87,7 @@ public:
 	void common_init();
 	int FLobjcode2tile(int code);
 	void TilemapCB(uint16_t code, int *tile, int *mask);
-	void namcofl(machine_config &config);
+	void RozCB(uint16_t code, int *tile, int *mask, int which);
 	void namcoc75_am(address_map &map);
 	void namcoc75_io(address_map &map);
 	void namcofl_mem(address_map &map);

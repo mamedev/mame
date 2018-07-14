@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Joakim Larsson Edstr??m
+// copyright-holders:Joakim Larsson Edstrom
 /**********************************************************************
 *
 *   Motorola MC68230 PI/T Parallel Interface and Timer
@@ -43,40 +43,40 @@
 //**************************************************************************
 
 #define MCFG_PIT68230_PA_INPUT_CB(_devcb) \
-	devcb = &downcast<pit68230_device &>(*device).set_pa_in_callback(DEVCB_##_devcb);
+	downcast<pit68230_device &>(*device).set_pa_in_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PA_OUTPUT_CB(_devcb) \
-	devcb = &downcast<pit68230_device &>(*device).set_pa_out_callback(DEVCB_##_devcb);
+	downcast<pit68230_device &>(*device).set_pa_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PB_INPUT_CB(_devcb) \
-	devcb = &downcast<pit68230_device &>(*device).set_pb_in_callback(DEVCB_##_devcb);
+	downcast<pit68230_device &>(*device).set_pb_in_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PB_OUTPUT_CB(_devcb) \
-	devcb = &downcast<pit68230_device &>(*device).set_pb_out_callback(DEVCB_##_devcb);
+	downcast<pit68230_device &>(*device).set_pb_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PC_INPUT_CB(_devcb) \
-	devcb = &downcast<pit68230_device &>(*device).set_pc_in_callback(DEVCB_##_devcb);
+	downcast<pit68230_device &>(*device).set_pc_in_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PC_OUTPUT_CB(_devcb) \
-	devcb = &downcast<pit68230_device &>(*device).set_pc_out_callback(DEVCB_##_devcb);
+	downcast<pit68230_device &>(*device).set_pc_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_H1_CB(_devcb) \
-	devcb = &downcast<pit68230_device &>(*device).set_h1_out_callback(DEVCB_##_devcb);
+	downcast<pit68230_device &>(*device).set_h1_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_H2_CB(_devcb) \
-	devcb = &downcast<pit68230_device &>(*device).set_h2_out_callback(DEVCB_##_devcb);
+	downcast<pit68230_device &>(*device).set_h2_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_H3_CB(_devcb) \
-	devcb = &downcast<pit68230_device &>(*device).set_h3_out_callback(DEVCB_##_devcb);
+	downcast<pit68230_device &>(*device).set_h3_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_H4_CB(_devcb) \
-	devcb = &downcast<pit68230_device &>(*device).set_h4_out_callback(DEVCB_##_devcb);
+	downcast<pit68230_device &>(*device).set_h4_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_TIMER_IRQ_CB(_devcb) \
-	devcb = &downcast<pit68230_device &>(*device).set_tirq_out_callback(DEVCB_##_devcb);
+	downcast<pit68230_device &>(*device).set_tirq_out_callback(DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PORT_IRQ_CB(_devcb) \
-	devcb = &downcast<pit68230_device &>(*device).set_pirq_out_callback(DEVCB_##_devcb);
+	downcast<pit68230_device &>(*device).set_pirq_out_callback(DEVCB_##_devcb);
 
 /*-----------------------------------------------------------------------
  * Registers                RS1-RS5   R/W Description

@@ -106,7 +106,7 @@ WRITE8_MEMBER(splash_state::splash_adpcm_control_w)
 
 WRITE_LINE_MEMBER(splash_state::splash_msm5205_int)
 {
-	m_msm->data_w(m_adpcm_data >> 4);
+	m_msm->write_data(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
 }
 
@@ -559,11 +559,11 @@ MACHINE_CONFIG_START(splash_state::roldfrog)
 	MCFG_DEVICE_IO_MAP(roldfrog_sound_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", splash_state,  roldfrog_interrupt)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, splash_state, coin1_lockout_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, splash_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, splash_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, splash_state, coin2_counter_w))
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<1>().set(FUNC(splash_state::coin1_lockout_w));
+	m_outlatch->q_out_cb<1>().append(FUNC(splash_state::coin2_lockout_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(splash_state::coin1_counter_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(splash_state::coin2_counter_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -600,7 +600,7 @@ WRITE_LINE_MEMBER(funystrp_state::adpcm_int1)
 {
 	if (m_snd_interrupt_enable1  || m_msm_toggle1 == 1)
 	{
-		m_msm1->data_w(m_msm_data1 >> 4);
+		m_msm1->write_data(m_msm_data1 >> 4);
 		m_msm_data1 <<= 4;
 		m_msm_toggle1 ^= 1;
 		if (m_msm_toggle1 == 0)
@@ -615,7 +615,7 @@ WRITE_LINE_MEMBER(funystrp_state::adpcm_int2)
 {
 	if (m_snd_interrupt_enable2 || m_msm_toggle2 == 1)
 	{
-		m_msm2->data_w(m_msm_data2 >> 4);
+		m_msm2->write_data(m_msm_data2 >> 4);
 		m_msm_data2 <<= 4;
 		m_msm_toggle2 ^= 1;
 		if (m_msm_toggle2 == 0)

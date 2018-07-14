@@ -89,16 +89,22 @@ ROMS: All ROM labels say only "PROM" and a number.
 class pturn_state : public driver_device
 {
 public:
-	pturn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pturn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
+	void pturn(machine_config &config);
+
+	void init_pturn();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -135,7 +141,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void init_pturn();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -144,7 +149,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(sub_intgen);
 	INTERRUPT_GEN_MEMBER(main_intgen);
-	void pturn(machine_config &config);
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
 };

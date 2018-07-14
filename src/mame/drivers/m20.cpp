@@ -79,6 +79,9 @@ public:
 	{
 	}
 
+	void m20(machine_config &config);
+
+private:
 	required_device<z8001_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<i8251_device> m_kbdi8251;
@@ -106,16 +109,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	MC6845_UPDATE_ROW(update_row);
 
-	void m20(machine_config &config);
 	void m20_data_mem(address_map &map);
 	void m20_io(address_map &map);
 	void m20_program_mem(address_map &map);
-private:
+
 	offs_t m_memsize;
 	uint8_t m_port21;
 	void install_memory();
 
-public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	IRQ_CALLBACK_MEMBER(m20_irq_callback);
 };
@@ -849,7 +850,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_2", i8251_device, write_rxd))
 
-	MCFG_DEVICE_ADD("apb", M20_8086, 0)
+	MCFG_DEVICE_ADD("apb", M20_8086, "maincpu", "i8259", RAM_TAG)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","m20")
 MACHINE_CONFIG_END

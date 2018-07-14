@@ -11,7 +11,7 @@
 DECLARE_DEVICE_TYPE(CAT702, cat702_device)
 
 #define MCFG_CAT702_DATAOUT_HANDLER(_devcb) \
-	devcb = &downcast<cat702_device &>(*device).set_dataout_handler(DEVCB_##_devcb);
+	downcast<cat702_device &>(*device).set_dataout_handler(DEVCB_##_devcb);
 
 class cat702_device : public device_t
 {

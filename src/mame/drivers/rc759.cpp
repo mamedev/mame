@@ -65,6 +65,9 @@ public:
 		m_centronics_data(0xff)
 	{ }
 
+	void rc759(machine_config &config);
+
+private:
 	void keyb_put(u8 data);
 	DECLARE_READ8_MEMBER(keyboard_r);
 
@@ -104,15 +107,13 @@ public:
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_READ8_MEMBER(irq_callback);
 
-	void rc759(machine_config &config);
 	void rc759_io(address_map &map);
 	void rc759_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<nvram_device> m_nvram;
@@ -581,7 +582,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// internal centronics
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, rc759_state, centronics_busy_w))
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, rc759_state, centronics_ack_w))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, rc759_state, centronics_fault_w))

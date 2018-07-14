@@ -39,8 +39,6 @@
 
 #include "avalnche.lh"
 
-#define MASTER_CLOCK XTAL(12'096'000)
-
 
 /*************************************
  *
@@ -220,7 +218,7 @@ void avalnche_state::machine_start()
 MACHINE_CONFIG_START(avalnche_state::avalnche_base)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502,MASTER_CLOCK/16)     /* clock input is the "2H" signal divided by two */
+	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 16)     /* clock input is the "2H" signal divided by two */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(avalnche_state, nmi_line_pulse, 8*60)
 
@@ -235,10 +233,7 @@ MACHINE_CONFIG_START(avalnche_state::avalnche_base)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 16, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(avalnche_state, screen_update_avalnche)
 MACHINE_CONFIG_END
 

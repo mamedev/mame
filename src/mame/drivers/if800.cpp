@@ -25,6 +25,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
 
+	void if800(machine_config &config);
+
+private:
 	required_device<upd7220_device> m_hgdc;
 
 	required_shared_ptr<uint16_t> m_video_ram;
@@ -33,7 +36,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	void if800(machine_config &config);
 	void if800_io(address_map &map);
 	void if800_map(address_map &map);
 	void upd7220_map(address_map &map);

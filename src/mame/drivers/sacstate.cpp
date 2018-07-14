@@ -48,15 +48,17 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void sacstate(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_WRITE8_MEMBER(port08_w);
 	void kbd_put(u8 data);
-	void sacstate(machine_config &config);
 	void sacstate_io(address_map &map);
 	void sacstate_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	uint8_t m_val;
 	virtual void machine_reset() override;

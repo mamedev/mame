@@ -8,6 +8,7 @@
     see cpu/apexc.c for background and tech info
 */
 
+#include "emu.h"
 #include "includes/apexc.h"
 
 /*static*/ const device_timer_id apexc_state::TIMER_POLL_INPUTS = 1;
@@ -217,9 +218,9 @@ void apexc_state::check_inputs()
 
 	if (control_transitions & panel_mem)
 	{   /* read/write memory */
-		if (control_keys & panel_write)	/* write memory */
+		if (control_keys & panel_write) /* write memory */
 			m_maincpu->space(AS_PROGRAM).write_dword(m_maincpu->pc(), m_panel_data_reg);
-		else							/* read memory */
+		else                            /* read memory */
 			m_panel_data_reg = m_maincpu->space(AS_PROGRAM).read_dword(m_maincpu->pc());
 	}
 
@@ -366,13 +367,13 @@ MACHINE_CONFIG_START(apexc_state::apexc)
 	MCFG_APEXC_TAPE_PUNCH_CB(WRITE8(*this, apexc_state, tape_write))
 
 	/* video hardware does not exist, but we display a control panel and the typewriter output */
-	device = &SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(256, 192);
 	m_screen->set_visarea(0, 256-1, 0, 192-1);
 	m_screen->set_palette(m_palette);
-	MCFG_SCREEN_UPDATE_DRIVER(apexc_state, screen_update_apexc)
+	m_screen->set_screen_update(FUNC(apexc_state::screen_update_apexc));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apexc);
 

@@ -28,19 +28,19 @@ enum
 };
 
 #define MCFG_TMS9995_EXTOP_HANDLER( _extop) \
-	devcb = &downcast<tms9995_device &>(*device).set_extop_callback(DEVCB_##_extop);
+	downcast<tms9995_device &>(*device).set_extop_callback(DEVCB_##_extop);
 
 #define MCFG_TMS9995_IAQ_HANDLER( _iaq )    \
-	devcb = &downcast<tms9995_device &>(*device).set_iaq_callback(DEVCB_##_iaq);
+	downcast<tms9995_device &>(*device).set_iaq_callback(DEVCB_##_iaq);
 
 #define MCFG_TMS9995_CLKOUT_HANDLER( _clkout ) \
-	devcb = &downcast<tms9995_device &>(*device).set_clkout_callback(DEVCB_##_clkout);
+	downcast<tms9995_device &>(*device).set_clkout_callback(DEVCB_##_clkout);
 
 #define MCFG_TMS9995_HOLDA_HANDLER( _holda ) \
-	devcb = &downcast<tms9995_device &>(*device).set_holda_callback(DEVCB_##_holda);
+	downcast<tms9995_device &>(*device).set_holda_callback(DEVCB_##_holda);
 
 #define MCFG_TMS9995_DBIN_HANDLER( _dbin ) \
-	devcb = &downcast<tms9995_device &>(*device).set_dbin_callback(DEVCB_##_dbin);
+	downcast<tms9995_device &>(*device).set_dbin_callback(DEVCB_##_dbin);
 
 #define MCFG_TMS9995_ENABLE_OVINT( _ovint ) \
 	downcast<tms9995_device*>(device)->set_overflow_interrupt( _ovint );
@@ -49,6 +49,8 @@ enum
 class tms9995_device : public cpu_device
 {
 public:
+	static constexpr int AS_SETOFFSET = 4;
+
 	tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// READY input line. When asserted (high), the memory is ready for data exchange.
@@ -125,8 +127,10 @@ private:
 	uint8_t   m_onchip_memory[256];
 
 	const address_space_config      m_program_config;
+	const address_space_config      m_setoffset_config;
 	const address_space_config      m_io_config;
 	address_space*                  m_prgspace;
+	address_space*                  m_sospace;
 	address_space*                  m_cru;
 
 	// Processor states

@@ -59,37 +59,37 @@
 //**************************************************************************
 
 #define MCFG_POKEY_POT0_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<0>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT1_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<1>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT2_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<2>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT3_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<3>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<3>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT4_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<4>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<4>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT5_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<5>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<5>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT6_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<6>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<6>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_POT7_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_pot_r_callback<7>(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_pot_r_callback<7>(DEVCB_##_devcb);
 
 #define MCFG_POKEY_ALLPOT_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_allpot_r_callback(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_allpot_r_callback(DEVCB_##_devcb);
 
 #define MCFG_POKEY_SERIN_R_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_serin_r_callback(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_serin_r_callback(DEVCB_##_devcb);
 
 #define MCFG_POKEY_SEROUT_W_CB(_devcb) \
-	devcb = &downcast<pokey_device &>(*device).set_serout_w_callback(DEVCB_##_devcb);
+	downcast<pokey_device &>(*device).set_serout_w_callback(DEVCB_##_devcb);
 
 /* k543210 = k5 ... k0 returns bit0: kr1, bit1: kr2 */
 /* all are, in contrast to actual hardware, ACTIVE_HIGH */

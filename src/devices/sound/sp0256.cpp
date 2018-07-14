@@ -85,7 +85,7 @@ void sp0256_device::device_start()
 	/*  Allocate a scratch buffer for generating ~10kHz samples.             */
 	/* -------------------------------------------------------------------- */
 	m_scratch = std::make_unique<int16_t[]>(SCBUF_SIZE);
-	save_pointer(NAME(m_scratch.get()), SCBUF_SIZE);
+	save_pointer(NAME(m_scratch), SCBUF_SIZE);
 
 	m_sc_head = m_sc_tail = 0;
 

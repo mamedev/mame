@@ -98,6 +98,11 @@ public:
 	{
 	}
 
+	void konamigq(machine_config &config);
+
+	void init_konamigq();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<tms57002_device> m_dasp;
@@ -105,7 +110,6 @@ public:
 	required_device<k056800_device> m_k056800;
 	required_shared_ptr<uint8_t> m_pcmram;
 
-	uint8_t *m_p_n_pcmram;
 	uint8_t m_sector_buffer[ 512 ];
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_intck;
@@ -117,7 +121,6 @@ public:
 	DECLARE_WRITE16_MEMBER(tms57002_data_word_w);
 	DECLARE_READ16_MEMBER(tms57002_status_word_r);
 	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
-	void init_konamigq();
 	DECLARE_MACHINE_START(konamigq);
 	DECLARE_MACHINE_RESET(konamigq);
 	INTERRUPT_GEN_MEMBER(tms_sync);
@@ -125,7 +128,6 @@ public:
 
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-	void konamigq(machine_config &config);
 	void konamigq_dasp_map(address_map &map);
 	void konamigq_k054539_map(address_map &map);
 	void konamigq_map(address_map &map);

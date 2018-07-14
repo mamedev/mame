@@ -25,7 +25,7 @@
 //**************************************************************************
 
 #define MCFG_ABC80_KEYBOARD_KEYDOWN_CALLBACK(_write) \
-	devcb = &downcast<abc80_keyboard_device &>(*device).set_keydown_wr_callback(DEVCB_##_write);
+	downcast<abc80_keyboard_device &>(*device).set_keydown_wr_callback(DEVCB_##_write);
 
 
 

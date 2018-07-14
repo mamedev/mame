@@ -148,8 +148,7 @@ void foodf_state::machine_start()
 
 void foodf_state::machine_reset()
 {
-	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
-	scan_timer->adjust(m_screen->time_until_pos(0));
+	m_scan_timer->adjust(m_screen->time_until_pos(0));
 }
 
 
@@ -329,12 +328,12 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	MCFG_ADC0808_IN2_CB(IOPORT("STICK1_X"))
 	MCFG_ADC0808_IN3_CB(IOPORT("STICK0_X"))
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram")
+	X2212(config, "nvram").set_auto_save(true);
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", foodf_state, scanline_update_timer)
+	MCFG_TIMER_DRIVER_ADD(m_scan_timer, foodf_state, scanline_update_timer)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_foodf)

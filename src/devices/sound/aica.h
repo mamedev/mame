@@ -21,10 +21,10 @@
 	downcast<aica_device &>(*device).set_roffset((offs));
 
 #define MCFG_AICA_IRQ_CB(cb) \
-	devcb = &downcast<aica_device &>(*device).set_irq_callback((DEVCB_##cb));
+	downcast<aica_device &>(*device).set_irq_callback((DEVCB_##cb));
 
 #define MCFG_AICA_MAIN_IRQ_CB(cb) \
-	devcb = &downcast<aica_device &>(*device).set_main_irq_callback((DEVCB_##cb));
+	downcast<aica_device &>(*device).set_main_irq_callback((DEVCB_##cb));
 
 class aica_device : public device_t, public device_sound_interface
 {

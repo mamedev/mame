@@ -42,19 +42,19 @@ Data Link Controller
 //**************************************************************************
 
 #define MCFG_MB89374_IRQ_CB(_devcb) \
-	devcb = &downcast<mb89374_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<mb89374_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89374_PO0_CB(_devcb) \
-	devcb = &downcast<mb89374_device &>(*device).set_out_po_callback<0>(DEVCB_##_devcb);
+	downcast<mb89374_device &>(*device).set_out_po_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_MB89374_PO1_CB(_devcb) \
-	devcb = &downcast<mb89374_device &>(*device).set_out_po_callback<1>(DEVCB_##_devcb);
+	downcast<mb89374_device &>(*device).set_out_po_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_MB89374_PO2_CB(_devcb) \
-	devcb = &downcast<mb89374_device &>(*device).set_out_po_callback<2>(DEVCB_##_devcb);
+	downcast<mb89374_device &>(*device).set_out_po_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_MB89374_PO3_CB(_devcb) \
-	devcb = &downcast<mb89374_device &>(*device).set_out_po_callback<3>(DEVCB_##_devcb);
+	downcast<mb89374_device &>(*device).set_out_po_callback<3>(DEVCB_##_devcb);
 
 
 class mb89374_device : public device_t,

@@ -37,10 +37,11 @@ VIDEO_START_MEMBER(spectrum_state,spectrum)
 
 	m_screen_location = m_video_ram;
 
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+
 	m_CyclesPerLine = SPEC_CYCLES_PER_LINE;
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
-	timer_set(m_maincpu->cycles_to_attotime(m_CyclesPerLine), TIMER_SCANLINE);
-
+	m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
 }
 
 VIDEO_START_MEMBER(spectrum_state,spectrum_128)
@@ -58,9 +59,11 @@ VIDEO_START_MEMBER(spectrum_state,spectrum_128)
 
 	m_screen_location = m_ram->pointer() + (5 << 14);
 
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+
 	m_CyclesPerLine = SPEC128_CYCLES_PER_LINE;
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
-	timer_set(m_maincpu->cycles_to_attotime(m_CyclesPerLine), TIMER_SCANLINE);
+	m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
 }
 
 

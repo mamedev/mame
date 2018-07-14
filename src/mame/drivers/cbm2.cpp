@@ -1472,20 +1472,20 @@ READ8_MEMBER( cbm2_state::sid_potx_r )
 
 	switch (m_cia_pa >> 6)
 	{
-	case 1: data = m_joy1->pot_x_r(); break;
-	case 2: data = m_joy2->pot_x_r(); break;
+	case 1: data = m_joy1->read_pot_x(); break;
+	case 2: data = m_joy2->read_pot_x(); break;
 	case 3:
 		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
 		{
-			data = 1 / (1 / m_joy1->pot_x_r() + 1 / m_joy2->pot_x_r());
+			data = 1 / (1 / m_joy1->read_pot_x() + 1 / m_joy2->read_pot_x());
 		}
 		else if (m_joy1->has_pot_x())
 		{
-			data = m_joy1->pot_x_r();
+			data = m_joy1->read_pot_x();
 		}
 		else if (m_joy2->has_pot_x())
 		{
-			data = m_joy2->pot_x_r();
+			data = m_joy2->read_pot_x();
 		}
 		break;
 	}
@@ -1499,20 +1499,20 @@ READ8_MEMBER( cbm2_state::sid_poty_r )
 
 	switch (m_cia_pa >> 6)
 	{
-	case 1: data = m_joy1->pot_y_r(); break;
-	case 2: data = m_joy2->pot_y_r(); break;
+	case 1: data = m_joy1->read_pot_y(); break;
+	case 2: data = m_joy2->read_pot_y(); break;
 	case 3:
 		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
 		{
-			data = 1 / (1 / m_joy1->pot_y_r() + 1 / m_joy2->pot_y_r());
+			data = 1 / (1 / m_joy1->read_pot_y() + 1 / m_joy2->read_pot_y());
 		}
 		else if (m_joy1->has_pot_y())
 		{
-			data = m_joy1->pot_y_r();
+			data = m_joy1->read_pot_y();
 		}
 		else if (m_joy2->has_pot_y())
 		{
-			data = m_joy2->pot_y_r();
+			data = m_joy2->read_pot_y();
 		}
 		break;
 	}
@@ -1830,8 +1830,8 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 	data &= m_user->d1_r(space, 0);
 
 	// joystick
-	data &= ~(!BIT(m_joy1->joy_r(), 5) << 6);
-	data &= ~(!BIT(m_joy2->joy_r(), 5) << 7);
+	data &= ~(!BIT(m_joy1->read_joy(), 5) << 6);
+	data &= ~(!BIT(m_joy2->read_joy(), 5) << 7);
 
 	return data;
 }
@@ -1883,8 +1883,8 @@ READ8_MEMBER( cbm2_state::cia_pb_r )
 	uint8_t data = 0;
 
 	// joystick
-	data |= m_joy1->joy_r() & 0x0f;
-	data |= (m_joy2->joy_r() & 0x0f) << 4;
+	data |= m_joy1->read_joy() & 0x0f;
+	data |= (m_joy2->read_joy() & 0x0f) << 4;
 
 	// user port
 	data &= m_user->d2_r(space, 0);
@@ -2373,7 +2373,7 @@ MACHINE_CONFIG_START(p500_state::p500_ntsc)
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, cbm2_state, cia_pb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(CBM2_USER_PORT_TAG, cbm2_user_port_device, d2_w))
 	MCFG_MOS6526_PC_CALLBACK(WRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, pc_w))
-	MCFG_DS75160A_ADD(DS75160A_TAG, READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_DS75160A_ADD(DS75160A_TAG, READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
 	MCFG_DEVICE_ADD(DS75161A_TAG, DS75161A, 0)
 	MCFG_DS75161A_IN_REN_CB(READLINE(IEEE488_TAG, ieee488_device, ren_r))
 	MCFG_DS75161A_IN_IFC_CB(READLINE(IEEE488_TAG, ieee488_device, ifc_r))
@@ -2383,14 +2383,14 @@ MACHINE_CONFIG_START(p500_state::p500_ntsc)
 	MCFG_DS75161A_IN_EOI_CB(READLINE(IEEE488_TAG, ieee488_device, eoi_r))
 	MCFG_DS75161A_IN_ATN_CB(READLINE(IEEE488_TAG, ieee488_device, atn_r))
 	MCFG_DS75161A_IN_SRQ_CB(READLINE(IEEE488_TAG, ieee488_device, srq_r))
-	MCFG_DS75161A_OUT_REN_CB(WRITELINE(IEEE488_TAG, ieee488_device, ren_w))
-	MCFG_DS75161A_OUT_IFC_CB(WRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
-	MCFG_DS75161A_OUT_NDAC_CB(WRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
-	MCFG_DS75161A_OUT_NRFD_CB(WRITELINE(IEEE488_TAG, ieee488_device, nrfd_w))
-	MCFG_DS75161A_OUT_DAV_CB(WRITELINE(IEEE488_TAG, ieee488_device, dav_w))
-	MCFG_DS75161A_OUT_EOI_CB(WRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
-	MCFG_DS75161A_OUT_ATN_CB(WRITELINE(IEEE488_TAG, ieee488_device, atn_w))
-	MCFG_DS75161A_OUT_SRQ_CB(WRITELINE(IEEE488_TAG, ieee488_device, srq_w))
+	MCFG_DS75161A_OUT_REN_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ren_w))
+	MCFG_DS75161A_OUT_IFC_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ifc_w))
+	MCFG_DS75161A_OUT_NDAC_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
+	MCFG_DS75161A_OUT_NRFD_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_nrfd_w))
+	MCFG_DS75161A_OUT_DAV_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
+	MCFG_DS75161A_OUT_EOI_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_eoi_w))
+	MCFG_DS75161A_OUT_ATN_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_atn_w))
+	MCFG_DS75161A_OUT_SRQ_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_srq_w))
 	MCFG_CBM_IEEE488_ADD("c8050")
 	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(MOS6525_1_TAG, tpi6525_device, i1_w))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, nullptr, WRITELINE(MOS6526_TAG, mos6526_device, flag_w))
@@ -2486,7 +2486,7 @@ MACHINE_CONFIG_START(p500_state::p500_pal)
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, cbm2_state, cia_pb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(CBM2_USER_PORT_TAG, cbm2_user_port_device, d2_w))
 	MCFG_MOS6526_PC_CALLBACK(WRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, pc_w))
-	MCFG_DS75160A_ADD(DS75160A_TAG, READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_DS75160A_ADD(DS75160A_TAG, READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
 	MCFG_DEVICE_ADD(DS75161A_TAG, DS75161A, 0)
 	MCFG_DS75161A_IN_REN_CB(READLINE(IEEE488_TAG, ieee488_device, ren_r))
 	MCFG_DS75161A_IN_IFC_CB(READLINE(IEEE488_TAG, ieee488_device, ifc_r))
@@ -2496,14 +2496,14 @@ MACHINE_CONFIG_START(p500_state::p500_pal)
 	MCFG_DS75161A_IN_EOI_CB(READLINE(IEEE488_TAG, ieee488_device, eoi_r))
 	MCFG_DS75161A_IN_ATN_CB(READLINE(IEEE488_TAG, ieee488_device, atn_r))
 	MCFG_DS75161A_IN_SRQ_CB(READLINE(IEEE488_TAG, ieee488_device, srq_r))
-	MCFG_DS75161A_OUT_REN_CB(WRITELINE(IEEE488_TAG, ieee488_device, ren_w))
-	MCFG_DS75161A_OUT_IFC_CB(WRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
-	MCFG_DS75161A_OUT_NDAC_CB(WRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
-	MCFG_DS75161A_OUT_NRFD_CB(WRITELINE(IEEE488_TAG, ieee488_device, nrfd_w))
-	MCFG_DS75161A_OUT_DAV_CB(WRITELINE(IEEE488_TAG, ieee488_device, dav_w))
-	MCFG_DS75161A_OUT_EOI_CB(WRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
-	MCFG_DS75161A_OUT_ATN_CB(WRITELINE(IEEE488_TAG, ieee488_device, atn_w))
-	MCFG_DS75161A_OUT_SRQ_CB(WRITELINE(IEEE488_TAG, ieee488_device, srq_w))
+	MCFG_DS75161A_OUT_REN_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ren_w))
+	MCFG_DS75161A_OUT_IFC_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ifc_w))
+	MCFG_DS75161A_OUT_NDAC_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
+	MCFG_DS75161A_OUT_NRFD_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_nrfd_w))
+	MCFG_DS75161A_OUT_DAV_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
+	MCFG_DS75161A_OUT_EOI_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_eoi_w))
+	MCFG_DS75161A_OUT_ATN_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_atn_w))
+	MCFG_DS75161A_OUT_SRQ_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_srq_w))
 	MCFG_CBM_IEEE488_ADD("c8050")
 	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(MOS6525_1_TAG, tpi6525_device, i1_w))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, nullptr, WRITELINE(MOS6526_TAG, mos6526_device, flag_w))
@@ -2599,7 +2599,7 @@ MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, cbm2_state, cia_pb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(CBM2_USER_PORT_TAG, cbm2_user_port_device, d2_w))
 	MCFG_MOS6526_PC_CALLBACK(WRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, pc_w))
-	MCFG_DS75160A_ADD(DS75160A_TAG, READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_DS75160A_ADD(DS75160A_TAG, READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
 	MCFG_DEVICE_ADD(DS75161A_TAG, DS75161A, 0)
 	MCFG_DS75161A_IN_REN_CB(READLINE(IEEE488_TAG, ieee488_device, ren_r))
 	MCFG_DS75161A_IN_IFC_CB(READLINE(IEEE488_TAG, ieee488_device, ifc_r))
@@ -2609,14 +2609,14 @@ MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
 	MCFG_DS75161A_IN_EOI_CB(READLINE(IEEE488_TAG, ieee488_device, eoi_r))
 	MCFG_DS75161A_IN_ATN_CB(READLINE(IEEE488_TAG, ieee488_device, atn_r))
 	MCFG_DS75161A_IN_SRQ_CB(READLINE(IEEE488_TAG, ieee488_device, srq_r))
-	MCFG_DS75161A_OUT_REN_CB(WRITELINE(IEEE488_TAG, ieee488_device, ren_w))
-	MCFG_DS75161A_OUT_IFC_CB(WRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
-	MCFG_DS75161A_OUT_NDAC_CB(WRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
-	MCFG_DS75161A_OUT_NRFD_CB(WRITELINE(IEEE488_TAG, ieee488_device, nrfd_w))
-	MCFG_DS75161A_OUT_DAV_CB(WRITELINE(IEEE488_TAG, ieee488_device, dav_w))
-	MCFG_DS75161A_OUT_EOI_CB(WRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
-	MCFG_DS75161A_OUT_ATN_CB(WRITELINE(IEEE488_TAG, ieee488_device, atn_w))
-	MCFG_DS75161A_OUT_SRQ_CB(WRITELINE(IEEE488_TAG, ieee488_device, srq_w))
+	MCFG_DS75161A_OUT_REN_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ren_w))
+	MCFG_DS75161A_OUT_IFC_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ifc_w))
+	MCFG_DS75161A_OUT_NDAC_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
+	MCFG_DS75161A_OUT_NRFD_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_nrfd_w))
+	MCFG_DS75161A_OUT_DAV_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
+	MCFG_DS75161A_OUT_EOI_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_eoi_w))
+	MCFG_DS75161A_OUT_ATN_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_atn_w))
+	MCFG_DS75161A_OUT_SRQ_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_srq_w))
 	MCFG_CBM_IEEE488_ADD("c8050")
 	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(MOS6525_1_TAG, tpi6525_device, i1_w))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, nullptr, WRITELINE(MOS6526_TAG, mos6526_device, flag_w))

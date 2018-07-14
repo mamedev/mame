@@ -24,7 +24,11 @@ public:
 		, nvram_bank(*this, "nvram_bank")
 	{ }
 
+	void stratos(machine_config &config);
+
 	void init_stratos();
+
+private:
 	DECLARE_WRITE8_MEMBER(p2000_w);
 	DECLARE_READ8_MEMBER(p2200_r);
 	DECLARE_WRITE8_MEMBER(p2200_w);
@@ -37,9 +41,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void stratos(machine_config &config);
 	void stratos_mem(address_map &map);
-private:
+
 	std::unique_ptr<uint8_t[]> nvram_data;
 	uint8_t control, led_latch_control;
 	uint32_t individual_leds;

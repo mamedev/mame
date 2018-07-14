@@ -916,8 +916,8 @@ READ8_MEMBER(pc9801_state::pc9801rs_2dd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0: return machine().device<upd765a_device>("upd765_2hd")->msr_r(space, 0, 0xff);
-			case 2: return machine().device<upd765a_device>("upd765_2hd")->fifo_r(space, 0, 0xff);
+			case 0: return m_fdc_2hd->msr_r(space, 0, 0xff);
+			case 2: return m_fdc_2hd->fifo_r(space, 0, 0xff);
 			case 4: return 0x44; //2dd flag
 		}
 	}
@@ -936,7 +936,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2dd_w)
 	{
 		switch(offset & 6)
 		{
-			case 2: machine().device<upd765a_device>("upd765_2hd")->fifo_w(space, 0, data, 0xff); return;
+			case 2: m_fdc_2hd->fifo_w(space, 0, data, 0xff); return;
 			case 4: logerror("%02x 2DD FDC ctrl\n",data); return;
 		}
 	}
@@ -2306,13 +2306,13 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_ide)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_common)
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(MAIN_CLOCK_X1) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259_master", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(MAIN_CLOCK_X1) /* Memory Refresh */
-	MCFG_PIT8253_CLK2(MAIN_CLOCK_X1) /* RS-232c */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(UPD8251_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(UPD8251_TAG, i8251_device, write_rxc))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(MAIN_CLOCK_X1); // heartbeat IRQ
+	m_pit8253->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
+	m_pit8253->set_clk<1>(MAIN_CLOCK_X1); // Memory Refresh
+	m_pit8253->set_clk<2>(MAIN_CLOCK_X1); // RS-232C
+	m_pit8253->out_handler<2>().set(m_sio, FUNC(i8251_device::write_txc));
+	m_pit8253->out_handler<2>().append(m_sio, FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD("i8237", AM9517A, 5000000) // unknown clock, TODO: check channels 0 - 1
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, pc9801_state, dma_hrq_changed))
@@ -2328,12 +2328,12 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 
 	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
 	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, pc9801_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w)) // TODO: Check ir7_w
-	MCFG_PIC8259_IN_SP_CB(GND)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
 	MCFG_DEVICE_ADD("ppi8255_sys", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
@@ -2351,11 +2351,11 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
-	MCFG_UPD765A_ADD("upd765_2hd", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic8259_slave", pic8259_device, ir3_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("i8237", am9517a_device, dreq2_w)) MCFG_DEVCB_INVERT
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
+	UPD765A(config, m_fdc_2hd, true, true);
+	m_fdc_2hd->intrq_wr_callback().set(m_pic2, FUNC(pic8259_device::ir3_w));
+	m_fdc_2hd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq2_w)).invert();
+	FLOPPY_CONNECTOR(config, "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
 
 	MCFG_DEVICE_ADD("ppi8255_fdd", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(CONSTANT(0xff))
@@ -2403,11 +2403,11 @@ MACHINE_CONFIG_START(pc9801_state::pc9801)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 	MCFG_RAM_EXTRA_OPTIONS("128K,256K,384K,512K")
 
-	MCFG_UPD765A_ADD("upd765_2dd", false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc9801_state, fdc_2dd_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("i8237", am9517a_device, dreq3_w)) MCFG_DEVCB_INVERT
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats)
+	UPD765A(config, m_fdc_2dd, false, true);
+	m_fdc_2dd->intrq_wr_callback().set(FUNC(pc9801_state::fdc_2dd_irq));
+	m_fdc_2dd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w)).invert();
+	FLOPPY_CONNECTOR(config, "upd765_2dd:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
 
 	pc9801_sasi(config);
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)

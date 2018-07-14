@@ -20,6 +20,7 @@
 #include "sound/c352.h"
 #include "sound/c6280.h"
 #include "sound/gb.h"
+#include "sound/iremga20.h"
 #include "sound/k051649.h"
 #include "sound/k053260.h"
 #include "sound/k054539.h"
@@ -93,7 +94,8 @@ public:
 		A_K054539A   = 0x00014000,
 		A_K054539B   = 0x00014400,
 		A_QSOUND     = 0x00013070,
-		A_K051649    = 0x00013080
+		A_K051649    = 0x00013080,
+		A_GA20       = 0x000130a0
 	};
 
 	enum io16_t
@@ -126,6 +128,7 @@ public:
 	template<int Chip> DECLARE_READ8_MEMBER(k054539_rom_r);
 	DECLARE_READ8_MEMBER(c352_rom_r);
 	DECLARE_READ8_MEMBER(qsound_rom_r);
+	DECLARE_READ8_MEMBER(ga20_rom_r);
 
 	template<int Chip> DECLARE_WRITE8_MEMBER(multipcm_bank_hi_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(multipcm_bank_lo_w);
@@ -181,6 +184,8 @@ private:
 		LED_K051649,
 		LED_K053260,
 		LED_K054539,
+
+		LED_GA20,
 
 		LED_COUNT
 	};
@@ -268,6 +273,7 @@ public:
 	void vgmplay(machine_config &config);
 	void c352_map(address_map &map);
 	void file_map(address_map &map);
+	void ga20_map(address_map &map);
 	void h6280_io_map(address_map &map);
 	void h6280_map(address_map &map);
 	void k053260_map(address_map &map);
@@ -316,6 +322,7 @@ private:
 	required_device<ym2608_device> m_ym2608;
 	required_device<qsound_device> m_qsound;
 	required_device<k051649_device> m_k051649;
+	required_device<iremga20_device> m_ga20;
 
 	uint32_t m_okim6295_clock[2];
 	uint32_t m_okim6295_pin7[2];
@@ -722,6 +729,13 @@ void vgmplay_device::execute_run()
 					m_io->write_byte(A_POKEYA + (offset & 0x7f), m_file->read_byte(m_pc+2));
 				else
 					m_io->write_byte(A_POKEYB + (offset & 0x7f), m_file->read_byte(m_pc+2));
+				m_pc += 3;
+				break;
+			}
+
+			case 0xbf: {
+				pulse_act_led(LED_GA20);
+				m_io->write_byte(A_GA20 + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 			}
@@ -1253,6 +1267,11 @@ READ8_MEMBER(vgmplay_device::c352_rom_r)
 	return rom_r(0, 0x92, offset);
 }
 
+READ8_MEMBER(vgmplay_device::ga20_rom_r)
+{
+	return rom_r(0, 0x93, offset);
+}
+
 vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
 	, m_file(*this, "file")
@@ -1284,6 +1303,7 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_ym2608(*this, "ym2608")
 	, m_qsound(*this, "qsound")
 	, m_k051649(*this, "k051649")
+	, m_ga20(*this, "ga20")
 {
 }
 
@@ -1547,6 +1567,9 @@ void vgmplay_state::machine_start()
 			if(version >= 0x171 && r32(0xdc)) {
 				m_c352->set_unscaled_clock(r32(0xdc));
 			}
+			if(version >= 0x171 && r32(0xe0)) {
+				m_ga20->set_unscaled_clock(r32(0xe0));
+			}
 		}
 	}
 }
@@ -1691,11 +1714,11 @@ INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 
 static INPUT_PORTS_START( vgmplay )
 	PORT_START("CONTROLS")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_STOP)		PORT_NAME("Stop")
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PAUSE)		PORT_NAME("Pause")
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PLAY)		PORT_NAME("Play")
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RESTART)		PORT_NAME("Restart")
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_LOOP)		PORT_NAME("Loop")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_STOP)        PORT_NAME("Stop")
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PAUSE)       PORT_NAME("Pause")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PLAY)        PORT_NAME("Play")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RESTART)     PORT_NAME("Restart")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_LOOP)        PORT_NAME("Loop")
 INPUT_PORTS_END
 
 void vgmplay_state::file_map(address_map &map)
@@ -1758,6 +1781,7 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_K054539B, vgmplay_device::A_K054539B+0x22f).w("k054539b", FUNC(k054539_device::write));
 	map(vgmplay_device::A_QSOUND, vgmplay_device::A_QSOUND+0x2).w(m_qsound, FUNC(qsound_device::qsound_w));
 	map(vgmplay_device::A_K051649, vgmplay_device::A_K051649+0xf).w(FUNC(vgmplay_state::scc_w));
+	map(vgmplay_device::A_GA20, vgmplay_device::A_GA20+0x1f).w(m_ga20, FUNC(iremga20_device::irem_ga20_w));
 }
 
 void vgmplay_state::segapcm_map(address_map &map)
@@ -1818,6 +1842,11 @@ void vgmplay_state::ymf271_map(address_map &map)
 void vgmplay_state::ymz280b_map(address_map &map)
 {
 	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::ymz280b_rom_r));
+}
+
+void vgmplay_state::ga20_map(address_map &map)
+{
+	map(0, 0xfffff).r("vgmplay", FUNC(vgmplay_device::ga20_rom_r));
 }
 
 void vgmplay_state::nescpu_map(address_map &map)
@@ -1989,6 +2018,11 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_K051649_ADD("k051649", 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
+
+	IREMGA20(config, m_ga20, 3579545);
+	m_ga20->set_addrmap(0, &vgmplay_state::ga20_map);
+	m_ga20->add_route(0, "lspeaker", 1);
+	m_ga20->add_route(1, "rspeaker", 1);
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )

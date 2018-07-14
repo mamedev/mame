@@ -56,12 +56,12 @@ MACHINE_CONFIG_START(wd7600_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("intc1", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, wd7600_device, pic1_int_w))
-	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
 	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, wd7600_device, pic1_slave_ack_r))
 
 	MCFG_DEVICE_ADD("intc2", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("intc1", pic8259_device, ir2_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
 	MCFG_DEVICE_ADD("ctc", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL(14'318'181) / 12.0)
@@ -72,7 +72,7 @@ MACHINE_CONFIG_START(wd7600_device::device_add_mconfig)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, wd7600_device, ctc_out2_w))
 
 	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, wd7600_device, rtc_irq_w))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("intc2", pic8259_device, ir0_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 MACHINE_CONFIG_END
 
@@ -266,11 +266,6 @@ WRITE8_MEMBER( wd7600_device::rtc_w )
 	}
 
 	m_rtc->write(space, offset, data);
-}
-
-WRITE_LINE_MEMBER( wd7600_device::rtc_irq_w )
-{
-	m_pic2->ir0_w(state ? 0 : 1); // inverted?
 }
 
 READ8_MEMBER( wd7600_device::pic1_slave_ack_r )
