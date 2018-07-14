@@ -284,7 +284,7 @@ void i386_device::i486_group0F01_16()      // Opcode 0x0f 01
 			}
 		case 6:         /* LMSW */
 			{
-				uint16_t b;
+				uint16_t b = 0;
 				if(PROTECTED_MODE && m_CPL)
 					FAULT(FAULT_GP,0)
 				if( modrm >= 0xc0 ) {
