@@ -671,7 +671,7 @@ ROM_END
 
 ROM_START(cheetahb)
 	ROM_REGION(0x10000, "maincpu", 0)   // Blue cabinet version - has different sound effects to the black cabinet version
-	ROM_LOAD( "cheetah__x_b16.u1", 0x1000, 0x0800, CRC(2f736A0A) SHA1(e0dc14215d90145881ac1b407fbe057770696122))
+	ROM_LOAD( "cheetah__x_b16.u1", 0x1000, 0x0800, CRC(2f736a0a) SHA1(e0dc14215d90145881ac1b407fbe057770696122))
 	ROM_LOAD( "cheetah__x_b16.u5", 0x1800, 0x0800, CRC(168f0650) SHA1(5b3294bf64f06cc9d193bb14891b2acfbb5c06d4))
 	ROM_LOAD( "cheetah__x_b16.u2", 0x5000, 0x0800, CRC(f6bd41bc) SHA1(ac94f4ba17c31dfe10ab7efab63d98aa3401e4ae))
 	ROM_LOAD( "cheetah__x_b16.u6", 0x5800, 0x0800, CRC(c7eba210) SHA1(ced377e53f30b371e74c26527e5f8bebcc10ee59))
