@@ -261,6 +261,8 @@ protected:
 	inline void sample_ef_lines();
 	inline void output_state_code();
 	inline void set_q_flag(int state);
+	inline void put_low_reg(int reg, uint8_t data);
+	inline void put_high_reg(int reg, uint8_t data);
 
 	// arithmetic handlers
 	void add(int left, int right);
