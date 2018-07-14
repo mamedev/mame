@@ -1330,8 +1330,8 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 	uartclock.signal_handler().append(m_acia, FUNC(acia6850_device::write_txc)).invert();
 	uartclock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc)).invert();
 
-	MCFG_X2212_ADD_AUTOSAVE("nov0") // system NOVRAM
-	MCFG_X2212_ADD_AUTOSAVE("nov1") // cart NOVRAM
+	X2212(config, "nov0").set_auto_save(true); // system NOVRAM
+	X2212(config, "nov1").set_auto_save(true); // cart NOVRAM
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

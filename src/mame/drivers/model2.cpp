@@ -2640,11 +2640,11 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
-	MCFG_315_5649_OUT_PA_CB(WRITE8(*this, model2a_state, eeprom_w))
-	MCFG_315_5649_IN_PB_CB(READ8(*this, model2a_state, in0_r))
-	MCFG_315_5649_IN_PC_CB(IOPORT("IN1"))
-	MCFG_315_5649_IN_PD_CB(IOPORT("IN2"))
+	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	io.out_pa_callback().set(FUNC(model2a_state::eeprom_w));
+	io.in_pb_callback().set(FUNC(model2a_state::in0_r));
+	io.in_pc_callback().set_ioport("IN1");
+	io.in_pd_callback().set_ioport("IN2");
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2653,14 +2653,15 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 	M2COMM(config, "m2comm", 0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2a_state::manxtt)
+void model2a_state::manxtt(machine_config &config)
+{
 	model2a(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("THROTTLE"))
-	MCFG_315_5649_AN1_CB(IOPORT("BRAKE"))
-	MCFG_315_5649_AN2_CB(IOPORT("BANK"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("THROTTLE");
+	io.an_port_callback<1>().set_ioport("BRAKE");
+	io.an_port_callback<2>().set_ioport("BANK");
+}
 
 // Includes a Model 1 Sound board for additional sounds - Deluxe version only
 void model2a_state::manxttdx(machine_config &config)
@@ -2673,32 +2674,35 @@ void model2a_state::manxttdx(machine_config &config)
 	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
 }
 
-MACHINE_CONFIG_START( model2a_state::srallyc )
+void model2a_state::srallyc(machine_config &config)
+{
 	model2a(config);
 	sj25_0207_01(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_OUT_PE_CB(WRITE8(*this, model2a_state, drive_board_w))
-	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
-	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
-	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pe_callback().set(FUNC(model2a_state::drive_board_w));
+	io.an_port_callback<0>().set_ioport("STEER");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
+}
 
-MACHINE_CONFIG_START( model2a_state::vcop2 )
+void model2a_state::vcop2(machine_config &config)
+{
 	model2a(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(*this, model2a_state, lightgun_mux_r))
-	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(*this, model2a_state, lightgun_mux_w))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.serial_ch2_rd_callback().set(FUNC(model2a_state::lightgun_mux_r));
+	io.serial_ch2_wr_callback().set(FUNC(model2a_state::lightgun_mux_w));
+}
 
-MACHINE_CONFIG_START( model2a_state::skytargt )
+void model2a_state::skytargt(machine_config &config)
+{
 	model2a(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("STICKY"))
-	MCFG_315_5649_AN2_CB(IOPORT("STICKX"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("STICKY");
+	io.an_port_callback<2>().set_ioport("STICKX");
+}
 
 uint16_t model2_state::crypt_read_callback(uint32_t addr)
 {
@@ -2722,12 +2726,13 @@ MACHINE_CONFIG_START(model2a_state::model2a_0229)
 //  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( model2a_state::zeroguna )
+void model2a_state::zeroguna(machine_config &config)
+{
 	model2a_5881(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_IN_PG_CB(IOPORT("DSW"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.in_pg_callback().set_ioport("DSW");
+}
 
 /* 2B-CRX */
 MACHINE_CONFIG_START(model2b_state::model2b)
@@ -2754,11 +2759,11 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
-	MCFG_315_5649_OUT_PA_CB(WRITE8(*this, model2b_state, eeprom_w))
-	MCFG_315_5649_IN_PB_CB(READ8(*this, model2b_state, in0_r))
-	MCFG_315_5649_IN_PC_CB(IOPORT("IN1"))
-	MCFG_315_5649_IN_PD_CB(IOPORT("IN2"))
+	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	io.out_pa_callback().set(FUNC(model2b_state::eeprom_w));
+	io.in_pb_callback().set(FUNC(model2b_state::in0_r));
+	io.in_pc_callback().set_ioport("IN1");
+	io.in_pd_callback().set_ioport("IN2");
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2783,14 +2788,15 @@ MACHINE_CONFIG_START(model2b_state::model2b_0229)
 //  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model2b_state::indy500)
+void model2b_state::indy500(machine_config &config)
+{
 	model2b(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
-	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
-	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("STEER");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
+}
 
 
 void model2b_state::rchase2_iocpu_map(address_map &map)
@@ -2812,41 +2818,44 @@ MACHINE_CONFIG_START( model2b_state::rchase2 )
 	MCFG_DEVICE_PROGRAM_MAP(rchase2_iocpu_map)
 	MCFG_DEVICE_IO_MAP(rchase2_ioport_map)
 
-	MCFG_DEVICE_ADD("ioexp", CXD1095, 0)
+	CXD1095(config, "ioexp", 0);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_IN_PD_CB(READ8(*this, model2b_state, rchase2_drive_board_r))
-	MCFG_315_5649_OUT_PE_CB(WRITE8(*this, model2b_state, rchase2_drive_board_w))
-	MCFG_315_5649_AN0_CB(IOPORT("P2_X"))
-	MCFG_315_5649_AN1_CB(IOPORT("P1_X"))
-	MCFG_315_5649_AN2_CB(IOPORT("P2_Y"))
-	MCFG_315_5649_AN3_CB(IOPORT("P1_Y"))
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.in_pd_callback().set(FUNC(model2b_state::rchase2_drive_board_r));
+	io.out_pe_callback().set(FUNC(model2b_state::rchase2_drive_board_w));
+	io.an_port_callback<0>().set_ioport("P2_X");
+	io.an_port_callback<1>().set_ioport("P1_X");
+	io.an_port_callback<2>().set_ioport("P2_Y");
+	io.an_port_callback<3>().set_ioport("P1_Y");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( model2b_state::gunblade )
+void model2b_state::gunblade(machine_config &config)
+{
 	model2b(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("P1_X"))
-	MCFG_315_5649_AN1_CB(IOPORT("P2_X"))
-	MCFG_315_5649_AN2_CB(IOPORT("P1_Y"))
-	MCFG_315_5649_AN3_CB(IOPORT("P2_Y"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("P1_X");
+	io.an_port_callback<1>().set_ioport("P2_X");
+	io.an_port_callback<2>().set_ioport("P1_Y");
+	io.an_port_callback<3>().set_ioport("P2_Y");
+}
 
-MACHINE_CONFIG_START( model2b_state::dynabb )
+void model2b_state::dynabb(machine_config &config)
+{
 	model2b(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("BAT1"))
-	MCFG_315_5649_AN1_CB(IOPORT("BAT2"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("BAT1");
+	io.an_port_callback<1>().set_ioport("BAT2");
+}
 
-MACHINE_CONFIG_START( model2b_state::zerogun )
+void model2b_state::zerogun(machine_config &config)
+{
 	model2b_5881(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_IN_PG_CB(IOPORT("DSW"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.in_pg_callback().set_ioport("DSW");
+}
 
 /* 2C-CRX */
 MACHINE_CONFIG_START(model2c_state::model2c)
@@ -2869,11 +2878,11 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
-	MCFG_315_5649_OUT_PA_CB(WRITE8(*this, model2c_state, eeprom_w))
-	MCFG_315_5649_IN_PB_CB(READ8(*this, model2c_state, in0_r))
-	MCFG_315_5649_IN_PC_CB(IOPORT("IN1"))
-	MCFG_315_5649_IN_PD_CB(IOPORT("IN2"))
+	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	io.out_pa_callback().set(FUNC(model2c_state::eeprom_w));
+	io.in_pb_callback().set(FUNC(model2c_state::in0_r));
+	io.in_pc_callback().set_ioport("IN1");
+	io.in_pd_callback().set_ioport("IN2");
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2882,56 +2891,61 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	M2COMM(config, "m2comm", 0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( model2c_state::skisuprg )
+void model2c_state::skisuprg(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("SWING"))
-	MCFG_315_5649_AN1_CB(IOPORT("INCLINING"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("SWING");
+	io.an_port_callback<1>().set_ioport("INCLINING");
+}
 
-MACHINE_CONFIG_START( model2c_state::stcc )
+void model2c_state::stcc(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
-	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
-	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("STEER");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
 
-	MCFG_DSBZ80_ADD(DSBZ80_TAG)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	DSBZ80(config, m_dsbz80, 0);
+	m_dsbz80->add_route(0, "lspeaker", 1.0);
+	m_dsbz80->add_route(1, "rspeaker", 1.0);
 
 	m_uart->txd_handler().set(m_dsbz80, FUNC(dsbz80_device::write_txd));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START( model2c_state::waverunr )
+void model2c_state::waverunr(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("HANDLE"))
-	MCFG_315_5649_AN1_CB(IOPORT("ROLL"))
-	MCFG_315_5649_AN2_CB(IOPORT("THROTTLE"))
-	MCFG_315_5649_AN3_CB(IOPORT("PITCH"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("HANDLE");
+	io.an_port_callback<1>().set_ioport("ROLL");
+	io.an_port_callback<2>().set_ioport("THROTTLE");
+	io.an_port_callback<3>().set_ioport("PITCH");
+}
 
-MACHINE_CONFIG_START( model2c_state::bel )
+void model2c_state::bel(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("P1_X"))
-	MCFG_315_5649_AN1_CB(IOPORT("P2_X"))
-	MCFG_315_5649_AN2_CB(IOPORT("P1_Y"))
-	MCFG_315_5649_AN3_CB(IOPORT("P2_Y"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("P1_X");
+	io.an_port_callback<1>().set_ioport("P2_X");
+	io.an_port_callback<2>().set_ioport("P1_Y");
+	io.an_port_callback<3>().set_ioport("P2_Y");
+}
 
-MACHINE_CONFIG_START( model2c_state::hotd )
+void model2c_state::hotd(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(*this, model2c_state, lightgun_mux_r))
-	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(*this, model2c_state, lightgun_mux_w))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.serial_ch2_rd_callback().set(FUNC(model2c_state::lightgun_mux_r));
+	io.serial_ch2_wr_callback().set(FUNC(model2c_state::lightgun_mux_w));
+}
 
 MACHINE_CONFIG_START(model2c_state::model2c_5881)
 	model2c(config);
@@ -2943,29 +2957,32 @@ MACHINE_CONFIG_START(model2c_state::model2c_5881)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( model2c_state::overrev2c )
+void model2c_state::overrev2c(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
-	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
-	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("STEER");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
+}
 
-MACHINE_CONFIG_START( model2c_state::segawski )
+void model2c_state::segawski(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("SLIDE"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("SLIDE");
+}
 
-MACHINE_CONFIG_START( model2c_state::topskatr )
+void model2c_state::topskatr(machine_config &config)
+{
 	model2c(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_AN0_CB(IOPORT("CURVING"))
-	MCFG_315_5649_AN1_CB(IOPORT("SLIDE"))
-MACHINE_CONFIG_END
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.an_port_callback<0>().set_ioport("CURVING");
+	io.an_port_callback<1>().set_ioport("SLIDE");
+}
 
 
 /* ROM definitions */

@@ -67,4 +67,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SONYPS2_INTC, ps2_intc_device)
 
-#endif // MAME_MACHINE_PS2SIF_H
+#endif // MAME_MACHINE_PS2INTC_H

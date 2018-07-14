@@ -18,10 +18,10 @@
 	</element>
 
 	<view name="Default">
-		<screen index="1">
+		<screen tag="ioboard:screen">
 			<bounds left="0" top="0" right="1" bottom="1" />
 		</screen>
-		<screen index="0">
+		<screen tag="screen">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 	</view>
@@ -30,10 +30,10 @@
 		<backdrop element="background">
 			<bounds x="0" y="0" width="496" height="419" />
 		</backdrop>
-		<screen index="0">
+		<screen tag="screen">
 			<bounds left="0" top="0" right="496" bottom="384" />
 		</screen>
-		<screen index="1">
+		<screen tag="ioboard:screen">
 			<bounds left="8" top="392" right="129" bottom="411" />
 		</screen>
 		<cpanel name="led_comm_err" element="led_red">

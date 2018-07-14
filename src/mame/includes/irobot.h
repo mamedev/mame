@@ -112,6 +112,7 @@ private:
 	int m_ir_ymin;
 	int m_ir_xmax;
 	int m_ir_ymax;
+	emu_timer *m_scanline_timer;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

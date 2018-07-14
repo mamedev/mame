@@ -52,9 +52,22 @@ DEFINE_DEVICE_TYPE(IREM_M72_AUDIO, m72_audio_device, "m72_audio", "Irem M72 Audi
 m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IREM_M72_AUDIO, tag, owner, clock)
 	, m_sample_addr(0)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_samples(*this, finder_base::DUMMY_TAG)
 	, m_dac(*this, finder_base::DUMMY_TAG)
+	, m_sample_update(*this)
 {
+}
+
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void m72_audio_device::device_resolve_objects()
+{
+	m_sample_update.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -63,9 +76,32 @@ m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *ta
 
 void m72_audio_device::device_start()
 {
+	m_sample_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_audio_device::sample_timer),this));
 	save_item(NAME(m_sample_addr));
 }
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void m72_audio_device::device_reset()
+{
+	if (m_sample_update.isnull())
+	{
+		m_sample_timer->adjust(attotime::never);
+	}
+	else
+	{
+		if (m_screen != nullptr)
+		{
+			m_sample_timer->adjust(m_screen->time_until_pos(0));
+		}
+		else
+		{
+			m_sample_timer->adjust(attotime::from_hz(clock()));
+		}
+	}
+}
 
 void m72_audio_device::set_sample_start(int start)
 {
@@ -134,4 +170,32 @@ WRITE8_MEMBER( m72_audio_device::sample_w )
 
 	m_dac->write(data);
 	m_sample_addr = (m_sample_addr + 1) & m_samples.mask();
+}
+
+TIMER_CALLBACK_MEMBER( m72_audio_device::sample_timer )
+{
+	if (m_sample_update.isnull())
+	{
+		m_sample_timer->adjust(attotime::never);
+	}
+	if (m_screen != nullptr) // Sample frequency is related to half of screen total height
+	{
+		int scanline = param & ~1;
+
+		m_sample_update(ASSERT_LINE);
+		m_sample_update(CLEAR_LINE);
+
+		scanline += 2;
+		/* adjust for next scanline */
+		if (scanline >= m_screen->height())
+			scanline -= m_screen->height();
+		m_sample_timer->adjust(m_screen->time_until_pos(scanline), scanline);
+	}
+	else // If when screen raw params are not verified, we use this instead(related to device clock).
+	{
+		m_sample_update(ASSERT_LINE);
+		m_sample_update(CLEAR_LINE);
+
+		m_sample_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	}
 }

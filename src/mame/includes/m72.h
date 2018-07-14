@@ -199,7 +199,7 @@ private:
 	DECLARE_MACHINE_RESET(kengo);
 
 	INTERRUPT_GEN_MEMBER(mcu_int);
-	INTERRUPT_GEN_MEMBER(fake_nmi);
+	DECLARE_WRITE_LINE_MEMBER(fake_nmi);
 	TIMER_CALLBACK_MEMBER(synch_callback);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(kengo_scanline_interrupt);

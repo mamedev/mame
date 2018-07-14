@@ -1017,7 +1017,7 @@ CUSTOM_INPUT_MEMBER(neogeo_base_state::get_memcard_status)
 {
 	// D0 and D1 are memcard 1 and 2 presence indicators, D2 indicates memcard
 	// write protect status (we are always write enabled)
-	return (!m_memcard || (m_memcard->present() == -1)) ? 0x07 : 0x00;
+	return (!m_memcard || !m_memcard->present()) ? 0x07 : 0x00;
 }
 
 
@@ -1027,7 +1027,7 @@ READ16_MEMBER(neogeo_base_state::memcard_r)
 
 	uint16_t ret;
 
-	if (m_memcard->present() != -1)
+	if (m_memcard->present())
 		ret = m_memcard->read(space, offset) | 0xff00;
 	else
 		ret = 0xffff;
@@ -1042,7 +1042,7 @@ WRITE16_MEMBER(neogeo_base_state::memcard_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		if (m_memcard->present() != -1)
+		if (m_memcard->present())
 				m_memcard->write(space, offset, data);
 	}
 }
@@ -1990,7 +1990,7 @@ MACHINE_CONFIG_START(mvs_led_state::mv1)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+	NG_MEMCARD(config, m_memcard, 0);
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
 
@@ -2031,7 +2031,7 @@ MACHINE_CONFIG_START(mvs_led_el_state::mv2f)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+	NG_MEMCARD(config, m_memcard, 0);
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
 
@@ -2048,7 +2048,7 @@ MACHINE_CONFIG_START(mvs_led_el_state::mv4f)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+	NG_MEMCARD(config, m_memcard, 0);
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
 
@@ -2067,7 +2067,7 @@ MACHINE_CONFIG_START(mvs_led_el_state::mv6f)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+	NG_MEMCARD(config, m_memcard, 0);
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
 
@@ -2088,7 +2088,7 @@ MACHINE_CONFIG_START(mvs_led_state::mv1_fixed)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+	NG_MEMCARD(config, m_memcard, 0);
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", true)
 
@@ -2133,7 +2133,7 @@ MACHINE_CONFIG_START(aes_state::aes)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(aes_main_map)
 
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
+	NG_MEMCARD(config, m_memcard, 0);
 
 	MCFG_NEOGEO_CARTRIDGE_ADD("cslot1", neogeo_cart, nullptr)
 

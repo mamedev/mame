@@ -75,8 +75,8 @@ private:
 	uint32_t screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bomblord(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(fake_nmi);
-	INTERRUPT_GEN_MEMBER(bomblord_fake_nmi);
+	DECLARE_WRITE_LINE_MEMBER(fake_nmi);
+	DECLARE_WRITE_LINE_MEMBER(bomblord_fake_nmi);
 	DECLARE_WRITE_LINE_MEMBER(dynablsb_vblank_int_w);
 	DECLARE_WRITE_LINE_MEMBER(bomblord_vblank_int_w);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);

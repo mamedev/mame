@@ -167,9 +167,9 @@ MACHINE_CONFIG_START(coco_ssc_device::device_add_mconfig)
 
 	SPEAKER(config, "ssc_audio").front_center();
 
-	MCFG_DEVICE_ADD(SP0256_TAG, SP0256, XTAL(3'120'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_audio", SP0256_GAIN)
-	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE(PIC_TAG, TMS7000_INT1_LINE))
+	SP0256(config, m_spo, XTAL(3'120'000));
+	m_spo->add_route(ALL_OUTPUTS, "ssc_audio", SP0256_GAIN);
+	m_spo->data_request_callback().set_inputline(m_tms7040, TMS7000_INT1_LINE);
 
 	MCFG_DEVICE_ADD(AY_TAG, AY8913, DERIVED_CLOCK(2, 1))
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)

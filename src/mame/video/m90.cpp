@@ -310,6 +310,7 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 // m_pf_layer[0].wide_tmap->enable(pf_enable[0]);
 // m_pf_layer[1].wide_tmap->enable(pf_enable[1]);
 
+	// TODO : Fix rowscroll at bbmanw intro; reference : https://youtu.be/SpHF_bU3T7g
 	constexpr int rowscroll_offs[2] = { 0xf000 >> 1, 0xf400 >> 1 };
 	constexpr int rowscroll_bias[2] = { 2, -2 };
 	for (int laynum = 0; laynum < 2; laynum++)
