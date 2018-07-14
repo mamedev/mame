@@ -194,8 +194,6 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 
 	bitmap.fill(0, cliprect);
 
-	m_sprite_bitmap.fill(0x0000, cliprect);
-
 	m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram32.get(), 0x4000, m_spc_regs.get() );
 
 //  popmessage("%02x %02x", m_grap2[0]->m_framebuffer_bright2, m_grap2[1]->m_framebuffer_bright2);
