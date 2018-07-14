@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "machine/pci.h"
+#include "pci.h"
 
 #define MCFG_PCI9050_SET_MAP(id, map) \
 	downcast<pci9050_device *>(device)->set_map(id, address_map_constructor(&map, #map, this), this);

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "machine/pci.h"
+#include "pci.h"
 
 #define MCFG_ES1373_IRQ_HANDLER(cb) \
 	downcast<es1373_device &>(*device).set_irq_handler(DEVCB_##cb);

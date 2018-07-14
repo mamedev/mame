@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "machine/pci.h"
+#include "pci.h"
 
 class geforce_7600gs_device : public pci_device {
 public:

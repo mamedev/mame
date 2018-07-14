@@ -103,12 +103,12 @@ www.multitech.com
 
 #include "emu.h"
 #include "cpu/mips/mips3.h"
-#include "machine/pci.h"
-#include "machine/vrc4373.h"
-#include "video/voodoo_pci.h"
-#include "sound/es1373.h"
+#include "bus/pci/pci.h"
+#include "bus/pci/vrc4373.h"
+#include "bus/pci/voodoo_pci.h"
+#include "bus/pci/es1373.h"
 #include "machine/iteagle_fpga.h"
-#include "machine/pci-ide.h"
+#include "bus/pci/pci-ide.h"
 #include "screen.h"
 
 

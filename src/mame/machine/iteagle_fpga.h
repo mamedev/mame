@@ -6,7 +6,7 @@
 #ifndef MAME_MACHINE_ITEAGLE_FPGA_H
 #define MAME_MACHINE_ITEAGLE_FPGA_H
 
-#include "machine/pci.h"
+#include "bus/pci/pci.h"
 #include "machine/nvram.h"
 #include "machine/eepromser.h"
 #include "machine/z80scc.h"

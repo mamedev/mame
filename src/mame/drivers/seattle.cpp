@@ -194,10 +194,10 @@
 #include "machine/nvram.h"
 #include "machine/smc91c9x.h"
 
-#include "machine/pci.h"
-#include "machine/gt64xxx.h"
-#include "machine/pci-ide.h"
-#include "video/voodoo_pci.h"
+#include "bus/pci/pci.h"
+#include "bus/pci/gt64xxx.h"
+#include "bus/pci/pci-ide.h"
+#include "bus/pci/voodoo_pci.h"
 #include "screen.h"
 
 #include "calspeed.lh"
