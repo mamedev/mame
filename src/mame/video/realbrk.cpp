@@ -167,8 +167,10 @@ void realbrk_state::video_start()
         8.w     fe-- ---- ---- ----
                 --d- ---- ---- ----     Flip Y
                 ---c ---- ---- ----     Flip X
+                ---- ba98 76-- ----
                 ---- ---- --54 ----     Rotation
-                ---- ba98 76-- 3210     Priority?
+                ---- ---- ---- 32--
+                ---- ---- ---- --10     Priority
 
         A.w     fedc b--- ---- ----
                 ---- -a98 7654 3210     Color
@@ -193,16 +195,15 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,
 
 	for ( offs = 0x3000/2; offs < 0x3600/2; offs += 2/2 )
 	{
-		int sx, sy, dim, zoom, flip, color, attr, code, flipx, flipy, gfx, rot;
+		int sx, sy, dim, zoom, flip, color, attr, code, flipx, flipy, gfx, rot, pri;
 
 		int x, xdim, xnum, xstart, xend, xinc;
 		int y, ydim, ynum, ystart, yend, yinc;
 
-		uint16_t *s;
+		if (m_spriteram[offs] & 0x8000)
+			continue;
 
-		if (m_spriteram[offs] & 0x8000) continue;
-
-		s       =       &m_spriteram[(m_spriteram[offs] & 0x3ff) * 16/2];
+		uint16_t const *const s =       &m_spriteram[(m_spriteram[offs] & 0x3ff) * 16/2];
 
 		sy      =       s[ 0 ];
 		sx      =       s[ 1 ];
@@ -213,14 +214,17 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,
 		attr    =       s[ 6 ];
 		code    =       s[ 7 ];
 
-		if(( flip & 0x03 ) != layer ) continue;
+		pri     =       flip & 0x03;
+
+		if(pri != layer)
+			continue;
 
 		xnum    =       ((dim >> 0) & 0x1f) + 1;
 		ynum    =       ((dim >> 8) & 0x1f) + 1;
 
 		flipx   =       flip & 0x0100;
 		flipy   =       flip & 0x0200;
-		rot     =       flip & 0x0030;
+		rot     =       (flip & 0x0030) >> 4;
 
 		gfx     =       (attr & 0x0001) + 2;
 
@@ -280,7 +284,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,
 
 				switch( rot )
 				{
-					case 0x10: // rot 90
+					case 0x1: // rot 90
 						copyrozbitmap_trans( *m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
 							(uint32_t)0<<16,
 							(uint32_t)16<<16,
@@ -296,7 +300,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,
 							copybitmap_trans( bitmap,*m_tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
 						break;
 
-					case 0x20: // rot 180
+					case 0x2: // rot 180
 						copyrozbitmap_trans( *m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
 							(uint32_t)16<<16,
 							(uint32_t)16<<16,
@@ -312,7 +316,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,
 							copybitmap_trans( bitmap,*m_tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
 						break;
 
-					case 0x30: // rot 270
+					case 0x3: // rot 270
 						copyrozbitmap_trans( *m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
 							(uint32_t)16<<16,
 							(uint32_t)0<<16,
