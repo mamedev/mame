@@ -65,7 +65,12 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_key);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 	void osborne1nv_io(address_map &map);
+
 	required_device<ram_device>             m_ram;
 
 private:
@@ -89,9 +94,6 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(serial_acia_irq_func);
 
-
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device>             m_maincpu;
@@ -106,9 +108,9 @@ private:
 	required_device<floppy_connector>       m_floppy0;
 	required_device<floppy_connector>       m_floppy1;
 
-	void osborne1_io(address_map &map);
 	void osborne1_mem(address_map &map);
 	void osborne1_op(address_map &map);
+	void osborne1_io(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(video_callback);
 	TIMER_CALLBACK_MEMBER(acia_rxc_txc_callback);
@@ -175,11 +177,12 @@ public:
 	{
 	}
 
+	void osborne1nv(machine_config &config);
+
+private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr_changed);
 
-	void osborne1nv(machine_config &config);
-protected:
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8>         m_p_nuevo;
 };

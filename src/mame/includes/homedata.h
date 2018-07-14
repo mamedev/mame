@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Nicola Salmoria
+#ifndef MAME_INCLUDES_HOMEDATA_H
+#define MAME_INCLUDES_HOMEDATA_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/sn76496.h"
@@ -9,8 +13,8 @@
 class homedata_state : public driver_device
 {
 public:
-	homedata_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	homedata_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vreg(*this, "vreg"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -151,7 +155,6 @@ private:
 	uint32_t screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_homedata);
 	INTERRUPT_GEN_MEMBER(homedata_irq);
-	INTERRUPT_GEN_MEMBER(upd7807_irq);
 	void mrokumei_handleblit( address_space &space, int rom_base );
 	void reikaids_handleblit( address_space &space, int rom_base );
 	void pteacher_handleblit( address_space &space, int rom_base );
@@ -173,3 +176,5 @@ private:
 	void reikaids_map(address_map &map);
 	void reikaids_upd7807_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_HOMEDATA_H
