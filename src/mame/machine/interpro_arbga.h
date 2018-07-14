@@ -9,7 +9,7 @@
 class interpro_arbga_device : public device_t
 {
 public:
-	interpro_arbga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	interpro_arbga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map);
 

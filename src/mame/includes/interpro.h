@@ -77,8 +77,11 @@ public:
 		, m_scc2(*this, INTERPRO_SCC2_TAG)
 		, m_rtc(*this, INTERPRO_RTC_TAG)
 		, m_scsibus(*this, INTERPRO_SCSI_TAG)
+		, m_bus(*this, INTERPRO_SLOT_TAG)
 		, m_eth(*this, INTERPRO_ETH_TAG)
 		, m_ioga(*this, INTERPRO_IOGA_TAG)
+		, m_keyboard(*this, INTERPRO_KEYBOARD_PORT_TAG)
+		, m_mouse(*this, INTERPRO_MOUSE_PORT_TAG)
 		, m_diag_led(*this, "digit0")
 	{
 	}
@@ -93,8 +96,12 @@ public:
 	required_device<z80scc_device> m_scc2;
 	required_device<mc146818_device> m_rtc;
 	required_device<nscsi_bus_device> m_scsibus;
+	required_device<interpro_bus_device> m_bus;
 	required_device<i82586_base_device> m_eth;
 	required_device<interpro_ioga_device> m_ioga;
+
+	required_device<interpro_keyboard_port_device> m_keyboard;
+	required_device<interpro_mouse_port_device> m_mouse;
 
 	void init_common();
 

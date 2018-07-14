@@ -286,7 +286,7 @@ protected:
 class cammu_c4t_device : public cammu_c4_device
 {
 public:
-	cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
 
@@ -376,7 +376,7 @@ private:
 class cammu_c4i_device : public cammu_c4_device
 {
 public:
-	cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
 
@@ -473,7 +473,7 @@ private:
 class cammu_c3_device : public cammu_device
 {
 public:
-	cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
 	virtual void map_global(address_map &map);
