@@ -161,7 +161,7 @@ const cosmac_device::ophandler cdp1801_device::s_opcodetable[256] =
 	&cdp1801_device::adi,    &cdp1801_device::sdi,    &cdp1801_device::und,    &cdp1801_device::smi
 };
 
-cosmac_device::ophandler cdp1801_device::get_ophandler(uint8_t opcode)
+cosmac_device::ophandler cdp1801_device::get_ophandler(uint8_t opcode) const
 {
 	return s_opcodetable[opcode];
 }
@@ -249,7 +249,7 @@ const cosmac_device::ophandler cdp1802_device::s_opcodetable[256] =
 	&cdp1802_device::adi,    &cdp1802_device::sdi,    &cdp1802_device::shl,    &cdp1802_device::smi
 };
 
-cosmac_device::ophandler cdp1802_device::get_ophandler(uint8_t opcode)
+cosmac_device::ophandler cdp1802_device::get_ophandler(uint8_t opcode) const
 {
 	return s_opcodetable[opcode];
 }
@@ -828,8 +828,8 @@ inline void cosmac_device::set_q_flag(int state)
 inline void cosmac_device::fetch_instruction()
 {
 	// instruction fetch
-	m_op = read_opcode(R[P]);
-	R[P]++;
+	offs_t addr = R[P]++;
+	m_op = read_opcode(addr);
 
 	I = m_op >> 4;
 	N = m_op & 0x0f;
@@ -919,9 +919,8 @@ inline void cosmac_device::execute_instruction()
 
 inline void cosmac_device::dma_input()
 {
-	RAM_W(R[0], m_read_dma(R[0]));
-
-	R[0]++;
+	offs_t addr = R[0]++;
+	RAM_W(addr, m_read_dma(addr));
 
 	m_icount -= CLOCKS_DMA;
 
@@ -956,9 +955,8 @@ inline void cosmac_device::dma_input()
 
 inline void cosmac_device::dma_output()
 {
-	m_write_dma((offs_t)R[0], RAM_R(R[0]));
-
-	R[0]++;
+	offs_t addr = R[0]++;
+	m_write_dma(addr, RAM_R(addr));
 
 	m_icount -= CLOCKS_DMA;
 
