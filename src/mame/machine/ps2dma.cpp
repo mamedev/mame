@@ -21,6 +21,8 @@ ps2_dmac_device::ps2_dmac_device(const machine_config &mconfig, const char *tag,
 	, m_ee(*this, finder_base::DUMMY_TAG)
 	, m_ram(*this, finder_base::DUMMY_TAG)
 	, m_sif(*this, finder_base::DUMMY_TAG)
+	, m_gif(*this, finder_base::DUMMY_TAG)
+	, m_vif1(*this, finder_base::DUMMY_TAG)
 	, m_icount(0)
 {
 }
@@ -91,6 +93,12 @@ void ps2_dmac_device::execute_run()
 
 			switch (m_last_serviced)
 			{
+				case VIF1:
+					transfer_vif1();
+					break;
+				case GIF:
+					transfer_gif();
+					break;
 				case SIF0:
 					transfer_sif0();
 					break;
@@ -107,6 +115,97 @@ void ps2_dmac_device::execute_run()
 	}
 }
 
+void ps2_dmac_device::transfer_vif1()
+{
+	if (m_mem_drain)
+	{
+		logerror("%s: transfer_vif1: Not yet implemented: memory drain bit. HACK: Disabling channel.\n", machine().describe_context());
+		transfer_finish(VIF1);
+		return;
+	}
+
+	channel_t &channel = m_channels[VIF1];
+	const uint32_t count = channel.quadword_count();
+	if (count)
+	{
+		//logerror("%s: DMAC VIF1 quadword count: %08x\n", machine().describe_context(), count);
+		uint32_t addr = channel.addr();
+		if (BIT(addr, 31))
+			addr -= 0x10000000;
+		address_space &space = m_ee->space(AS_PROGRAM);
+		uint32_t words[4] = { 0, 0, 0, 0 };
+		for (int word = 0; word < 4; word++)
+		{
+			words[word] = space.read_dword(addr);
+			addr += 4;
+		}
+		m_vif1->dma_write(((uint64_t)words[3] << 32) | words[2], ((uint64_t)words[1] << 32) | words[0]);
+		channel.set_addr(channel.addr() + 0x10);
+		channel.set_quadword_count(count - 1);
+	}
+	else if (channel.end_tag())
+	{
+		logerror("%s: DMAC VIF1 end tag\n", machine().describe_context());
+		transfer_finish(VIF1);
+	}
+	else
+	{
+		logerror("%s: DMAC VIF1 following source tag\n", machine().describe_context());
+		uint32_t tag_addr = channel.tag_addr();
+		if (BIT(tag_addr, 31))
+			tag_addr -= 0x10000000;
+		address_space &space = m_ee->space(AS_PROGRAM);
+		uint32_t words[4] = { 0, 0, 0, 0 };
+		for (int word = 0; word < 4; word++)
+		{
+			words[word] = space.read_dword(tag_addr);
+			tag_addr += 4;
+		}
+		m_vif1->tag_write(words);
+		follow_source_tag(VIF1);
+	}
+}
+
+void ps2_dmac_device::transfer_gif()
+{
+	if (m_mem_drain)
+	{
+		logerror("%s: Not yet implemented: memory drain bit. HACK: Disabling channel.\n", machine().describe_context());
+		transfer_finish(GIF);
+		return;
+	}
+
+	channel_t &channel = m_channels[GIF];
+	const uint32_t count = channel.quadword_count();
+	if (count)
+	{
+		//logerror("%s: DMAC GIF quadword count: %08x\n", machine().describe_context(), count);
+		uint32_t addr = channel.addr();
+		if (BIT(addr, 31))
+			addr -= 0x10000000;
+		address_space &space = m_ee->space(AS_PROGRAM);
+		uint32_t words[4] = { 0, 0, 0, 0 };
+		for (int word = 0; word < 4; word++)
+		{
+			words[word] = space.read_dword(addr);
+			addr += 4;
+		}
+		m_gif->write_path3(((uint64_t)words[3] << 32) | words[2], ((uint64_t)words[1] << 32) | words[0]);
+		channel.set_addr(channel.addr() + 0x10);
+		channel.set_quadword_count(count - 1);
+	}
+	else if (channel.end_tag())
+	{
+		logerror("%s: DMAC GIF end tag\n", machine().describe_context());
+		transfer_finish(GIF);
+	}
+	else
+	{
+		logerror("%s: DMAC GIF following source tag\n", machine().describe_context());
+		follow_source_tag(GIF);
+	}
+}
+
 void ps2_dmac_device::transfer_sif0()
 {
 	channel_t &channel = m_channels[SIF0];
@@ -117,6 +216,8 @@ void ps2_dmac_device::transfer_sif0()
 		{
 			//logerror("%s: SIF0 depth is %d\n", machine().describe_context(), m_sif->fifo_depth(0));
 			uint32_t addr = channel.addr();
+			if (BIT(addr, 31))
+				addr -= 0x10000000;
 			for (int word = 0; word < 4; word++)
 			{
 				const uint32_t data = m_sif->fifo_pop(0);
@@ -124,7 +225,7 @@ void ps2_dmac_device::transfer_sif0()
 				m_ee->space(AS_PROGRAM).write_dword(addr, data);
 				addr += 4;
 			}
-			channel.set_addr(addr);
+			channel.set_addr(channel.addr() + 0x10);
 			channel.set_quadword_count(count - 1);
 			//logerror("%s: SIF0 remaining count: %08x\n", machine().describe_context(), channel.quadword_count());
 		}
@@ -163,6 +264,8 @@ void ps2_dmac_device::transfer_sif1()
 		if (m_sif->fifo_depth(1) < (ps2_sif_device::MAX_FIFO_DEPTH - 4))
 		{
 			uint32_t addr = channel.addr();
+			if (BIT(addr, 31))
+				addr -= 0x10000000;
 			address_space &space = m_ee->space(AS_PROGRAM);
 			for (int word = 0; word < 4; word++)
 			{
@@ -171,7 +274,7 @@ void ps2_dmac_device::transfer_sif1()
 				addr += 4;
 				m_sif->fifo_push(1, data);
 			}
-			channel.set_addr(addr);
+			channel.set_addr(channel.addr() + 0x10);
 			channel.set_quadword_count(count - 1);
 		}
 	}
@@ -190,9 +293,12 @@ void ps2_dmac_device::transfer_sif1()
 void ps2_dmac_device::follow_source_tag(uint32_t chan)
 {
 	channel_t &channel = m_channels[chan];
-	const uint32_t tag_addr = channel.tag_addr() >> 3;
-	const uint64_t hi = m_ram[tag_addr];
-	const uint64_t lo = m_ram[tag_addr + 1];
+	uint32_t tag_addr = channel.tag_addr();
+	if (BIT(tag_addr, 31))
+		tag_addr -= 0x10000000;
+	address_space &space = m_ee->space(AS_PROGRAM);
+	const uint64_t hi = space.read_qword(tag_addr);
+	const uint64_t lo = space.read_dword(tag_addr + 8);
 	const uint32_t tag = (uint32_t)hi;
 	const uint32_t addr = (uint32_t)(hi >> 32) & ~0xf;
 	logerror("Trying to follow tag: %08x|%08x %08x|%08x\n", (uint32_t)(hi >> 32), (uint32_t)hi, (uint32_t)(lo >> 32), (uint32_t)lo);
@@ -204,6 +310,10 @@ void ps2_dmac_device::follow_source_tag(uint32_t chan)
 
 	switch (id)
 	{
+		case ID_CNT:
+            channel.set_addr(channel.tag_addr() + 0x10);
+           	channel.set_tag_addr(channel.addr() + (channel.quadword_count() << 4));
+			break;
 		case ID_REFE:
             channel.set_end_tag(true);
             // Intentional fall-through
@@ -211,10 +321,19 @@ void ps2_dmac_device::follow_source_tag(uint32_t chan)
             channel.set_addr(addr);
             channel.set_tag_addr(channel.tag_addr() + 0x10);
             break;
+		case ID_REFS:
+			// We don't handle stalls yet, just act the same as REF for now
+            channel.set_addr(addr);
+            channel.set_tag_addr(channel.tag_addr() + 0x10);
+            break;
         case ID_NEXT:
             channel.set_addr(channel.tag_addr() + 0x10);
             channel.set_tag_addr(addr);
 			break;
+		case ID_END:
+            channel.set_addr(channel.tag_addr() + 0x10);
+            channel.set_end_tag(true);
+            break;
         default:
         	logerror("%s: Unknown DMAtag ID: %d\n", machine().describe_context(), id);
         	break;
@@ -281,6 +400,7 @@ WRITE32_MEMBER(ps2_dmac_device::write)
 		case 0: /* D_CTRL */
 			logerror("%s: dmac_w: D_CTRL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			logerror("%s:         ENABLE=%d MEM_DRAIN=%d\n", machine().describe_context(), BIT(data, 0), (data >> 2) & 3);
+			m_ctrl = data;
 			m_enabled = BIT(data, 0);
 			m_mem_drain = (data >> 2) & 3;
 			break;
@@ -334,41 +454,49 @@ READ32_MEMBER(ps2_dmac_device::channel_r)
 		case 0x8050/8: /* D0_ASR1 */
 			logerror("%s: dmac_channel_r: D0_ASR1 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
-		case 0x9000/8: /* D1_CHCR */
-			logerror("%s: dmac_channel_r: D1_CHCR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+		case 0x9000/8: /* VIF1_CHCR */
+			ret = m_channels[VIF1].chcr();
+			//logerror("%s: dmac_channel_r: VIF1_CHCR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
-		case 0x9010/8: /* D1_MADR */
-			logerror("%s: dmac_channel_r: D1_MADR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+		case 0x9010/8: /* VIF1_MADR */
+			ret = m_channels[VIF1].addr();
+			logerror("%s: dmac_channel_r: VIF1_MADR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
-		case 0x9020/8: /* D1_QWC */
-			logerror("%s: dmac_channel_r: D1_QWC (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+		case 0x9020/8: /* VIF1_QWC */
+			ret = m_channels[VIF1].quadword_count();
+			logerror("%s: dmac_channel_r: VIF1_QWC (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
-		case 0x9030/8: /* D1_TADR */
-			logerror("%s: dmac_channel_r: D1_TADR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+		case 0x9030/8: /* VIF1_TADR */
+			ret = m_channels[VIF1].tag_addr();
+			logerror("%s: dmac_channel_r: VIF1_TADR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
-		case 0x9040/8: /* D1_ASR0 */
-			logerror("%s: dmac_channel_r: D1_ASR0 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+		case 0x9040/8: /* VIF1_ASR0 */
+			logerror("%s: dmac_channel_r: VIF1_ASR0 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
-		case 0x9050/8: /* D1_ASR1 */
-			logerror("%s: dmac_channel_r: D1_ASR1 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+		case 0x9050/8: /* VIF1_ASR1 */
+			logerror("%s: dmac_channel_r: VIF1_ASR1 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
-		case 0xa000/8: /* D2_CHCR */
-			logerror("%s: dmac_channel_r: D2_CHCR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+		case 0xa000/8: /* GIF_CHCR */
+			ret = m_channels[GIF].chcr();
+			//logerror("%s: dmac_channel_r: GIF_CHCR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
-		case 0xa010/8: /* D2_MADR */
-			logerror("%s: dmac_channel_r: D2_MADR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+		case 0xa010/8: /* GIF_MADR */
+			ret = m_channels[GIF].addr();
+			logerror("%s: dmac_channel_r: GIF_MADR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
-		case 0xa020/8: /* D2_QWC */
-			logerror("%s: dmac_channel_r: D2_QWC (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+		case 0xa020/8: /* GIF_QWC */
+			ret = m_channels[GIF].quadword_count();
+			logerror("%s: dmac_channel_r: GIF_QWC (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
-		case 0xa030/8: /* D2_TADR */
-			logerror("%s: dmac_channel_r: D2_TADR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+		case 0xa030/8: /* GIF_TADR */
+			ret = m_channels[GIF].tag_addr();
+			logerror("%s: dmac_channel_r: GIF_TADR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
-		case 0xa040/8: /* D2_ASR0 */
-			logerror("%s: dmac_channel_r: D2_ASR0 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+		case 0xa040/8: /* GIF_ASR0 */
+			logerror("%s: dmac_channel_r: GIF_ASR0 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
-		case 0xa050/8: /* D2_ASR1 */
-			logerror("%s: dmac_channel_r: D2_ASR1 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+		case 0xa050/8: /* GIF_ASR1 */
+			logerror("%s: dmac_channel_r: GIF_ASR1 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 0xb000/8: /* D3_CHCR */
 			logerror("%s: dmac_channel_r: D3_CHCR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
@@ -486,41 +614,51 @@ WRITE32_MEMBER(ps2_dmac_device::channel_w)
 		case 0x8050/8: /* D0_ASR1 */
 			logerror("%s: dmac_channel_w: D0_ASR1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
-		case 0x9000/8: /* D1_CHCR */
-			logerror("%s: dmac_channel_w: D1_CHCR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		case 0x9000/8: /* VIF1_CHCR */
+			logerror("%s: dmac_channel_w: VIF1_CHCR = %08x & %08x (DIR=%s Memory, MOD=%s, ASP=%d, TTE=%s DMAtag, \n", machine().describe_context(), data, mem_mask, BIT(data, 0) ? "From" : "To", mode_strings[(data >> 2) & 3], (data >> 4) & 3, BIT(data, 6) ? "Transfers" : "Does not transfer");
+			logerror("%s:                                   TIE=%d, START=%d, TAG=%04x\n", machine().describe_context(), BIT(data, 7), BIT(data, 8), data >> 16);
+			m_channels[VIF1].set_chcr(data);
 			break;
-		case 0x9010/8: /* D1_MADR */
-			logerror("%s: dmac_channel_w: D1_MADR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		case 0x9010/8: /* VIF1_MADR */
+			logerror("%s: dmac_channel_w: VIF1_MADR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			m_channels[VIF1].set_addr(data);
 			break;
-		case 0x9020/8: /* D1_QWC */
-			logerror("%s: dmac_channel_w: D1_QWC = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		case 0x9020/8: /* VIF1_QWC */
+			logerror("%s: dmac_channel_w: VIF1_QWC = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			m_channels[VIF1].set_quadword_count(data);
 			break;
-		case 0x9030/8: /* D1_TADR */
-			logerror("%s: dmac_channel_w: D1_TADR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		case 0x9030/8: /* VIF1_TADR */
+			logerror("%s: dmac_channel_w: VIF1_TADR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			m_channels[VIF1].set_tag_addr(data);
 			break;
-		case 0x9040/8: /* D1_ASR0 */
-			logerror("%s: dmac_channel_w: D1_ASR0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		case 0x9040/8: /* VIF1_ASR0 */
+			logerror("%s: dmac_channel_w: VIF1_ASR0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
-		case 0x9050/8: /* D1_ASR1 */
-			logerror("%s: dmac_channel_w: D1_ASR1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		case 0x9050/8: /* VIF1_ASR1 */
+			logerror("%s: dmac_channel_w: VIF1_ASR1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
-		case 0xa000/8: /* D2_CHCR */
-			logerror("%s: dmac_channel_w: D2_CHCR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		case 0xa000/8: /* GIF_CHCR */
+			logerror("%s: dmac_channel_w: GIF_CHCR = %08x & %08x (DIR=%s Memory, MOD=%s, ASP=%d, TTE=%s DMAtag, \n", machine().describe_context(), data, mem_mask, BIT(data, 0) ? "From" : "To", mode_strings[(data >> 2) & 3], (data >> 4) & 3, BIT(data, 6) ? "Transfers" : "Does not transfer");
+			logerror("%s:                                   TIE=%d, START=%d, TAG=%04x\n", machine().describe_context(), BIT(data, 7), BIT(data, 8), data >> 16);
+			m_channels[GIF].set_chcr(data);
 			break;
-		case 0xa010/8: /* D2_MADR */
-			logerror("%s: dmac_channel_w: D2_MADR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		case 0xa010/8: /* GIF_MADR */
+			logerror("%s: dmac_channel_w: GIF_MADR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			m_channels[GIF].set_addr(data);
 			break;
-		case 0xa020/8: /* D2_QWC */
-			logerror("%s: dmac_channel_w: D2_QWC = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		case 0xa020/8: /* GIF_QWC */
+			logerror("%s: dmac_channel_w: GIF_QWC = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			m_channels[GIF].set_quadword_count(data);
 			break;
-		case 0xa030/8: /* D2_TADR */
-			logerror("%s: dmac_channel_w: D2_TADR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		case 0xa030/8: /* GIF_TADR */
+			logerror("%s: dmac_channel_w: GIF_TADR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			m_channels[GIF].set_tag_addr(data);
 			break;
-		case 0xa040/8: /* D2_ASR0 */
-			logerror("%s: dmac_channel_w: D2_ASR0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		case 0xa040/8: /* GIF_ASR0 */
+			logerror("%s: dmac_channel_w: GIF_ASR0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
-		case 0xa050/8: /* D2_ASR1 */
-			logerror("%s: dmac_channel_w: D2_ASR1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		case 0xa050/8: /* GIF_ASR1 */
+			logerror("%s: dmac_channel_w: GIF_ASR1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case 0xb000/8: /* D3_CHCR */
 			logerror("%s: dmac_channel_w: D3_CHCR = %08x & %08x\n", machine().describe_context(), data, mem_mask);

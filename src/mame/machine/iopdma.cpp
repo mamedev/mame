@@ -139,7 +139,7 @@ void iop_dma_device::transfer_sif0(uint32_t chan)
 	{
 		if (channel.end())
 		{
-			logerror("sif0.end\n");
+			//logerror("sif0.end\n");
 			transfer_finish(SIF0);
 		}
 		else if (m_sif->fifo_depth(0) < ps2_sif_device::MAX_FIFO_DEPTH - 2)
@@ -151,7 +151,7 @@ void iop_dma_device::transfer_sif0(uint32_t chan)
 			const uint32_t ee_hi = m_ram[tag_addr + 2];
 			const uint32_t ee_lo = m_ram[tag_addr + 3];
 
-			logerror("%s: following sif0 iop tag, full tag is %08x %08x %08x %08x\n", machine().describe_context(), iop_hi, iop_lo, ee_hi, ee_lo);
+			//logerror("%s: following sif0 iop tag, full tag is %08x %08x %08x %08x\n", machine().describe_context(), iop_hi, iop_lo, ee_hi, ee_lo);
 			channel.set_addr(iop_hi & 0x00ffffff);
 			channel.set_count((iop_lo + 3) & ~3);
 			channel.set_tag_addr(tag_addr_bytes + 0x10);
@@ -189,7 +189,7 @@ void iop_dma_device::transfer_sif1(uint32_t chan)
 	{
 		if (channel.end())
 		{
-			logerror("sif1.end\n");
+			//logerror("sif1.end\n");
 			transfer_finish(SIF1);
 		}
 		else if (m_sif->fifo_depth(1) >= 4)
@@ -198,7 +198,7 @@ void iop_dma_device::transfer_sif1(uint32_t chan)
 			const uint32_t iop_lo = m_sif->fifo_pop(1);
 			m_sif->fifo_pop(1); // ee_hi - ignored
 			m_sif->fifo_pop(1); // ee_lo - ignored
-			logerror("%s: following sif1 iop tag, tag is %08x %08x\n", machine().describe_context(), iop_hi, iop_lo);
+			//logerror("%s: following sif1 iop tag, tag is %08x %08x\n", machine().describe_context(), iop_hi, iop_lo);
 			channel.set_addr(iop_hi & 0x00ffffff);
 			channel.set_count(iop_lo);
 
@@ -249,10 +249,10 @@ void iop_dma_device::transfer_to_sio2(uint32_t chan)
 	{
 		const uint32_t addr = channel.addr();
 		const uint32_t data = m_ram[addr >> 2];
-		m_sio2->receive((data >> 24) & 0xff);
-		m_sio2->receive((data >> 16) & 0xff);
-		m_sio2->receive((data >> 8) & 0xff);
-		m_sio2->receive(data & 0xff);
+		m_sio2->transmit(data & 0xff);
+		m_sio2->transmit((data >> 8) & 0xff);
+		m_sio2->transmit((data >> 16) & 0xff);
+		m_sio2->transmit((data >> 24) & 0xff);
 		channel.set_count(count - 1);
 		channel.set_addr(addr + 4);
 	}
@@ -272,10 +272,10 @@ void iop_dma_device::transfer_from_sio2(uint32_t chan)
 	if (count)
 	{
 		const uint32_t addr = channel.addr();
-		uint32_t data = m_sio2->transmit() << 24;
-		data |= m_sio2->transmit() << 16;
-		data |= m_sio2->transmit() << 8;
-		data |= m_sio2->transmit();
+		uint32_t data = m_sio2->receive();
+		data |= m_sio2->receive() << 8;
+		data |= m_sio2->receive() << 16;
+		data |= m_sio2->receive() << 24;
 		m_ram[addr >> 2] = data;
 		channel.set_count(count - 1);
 		channel.set_addr(addr + 4);
@@ -312,29 +312,29 @@ READ32_MEMBER(iop_dma_device::bank0_r)
 	{
 		case 0x00/4: case 0x10/4: case 0x20/4: case 0x30/4: case 0x40/4: case 0x50/4: case 0x60/4:
 			ret = m_channels[offset >> 2].addr();
-			logerror("%s: bank0_r: channel[%d].addr (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
+			//logerror("%s: bank0_r: channel[%d].addr (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
 			break;
 		case 0x04/4: case 0x14/4: case 0x24/4: case 0x34/4: case 0x44/4: case 0x54/4: case 0x64/4:
 			ret = m_channels[offset >> 2].block();
-			logerror("%s: bank0_r: channel[%d].block  (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
+			//logerror("%s: bank0_r: channel[%d].block  (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
 			break;
 		case 0x08/4: case 0x18/4: case 0x28/4: case 0x38/4: case 0x48/4: case 0x58/4: case 0x68/4:
 			ret = m_channels[offset >> 2].ctrl();
-			logerror("%s: bank0_r: channel[%d].ctrl (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
+			//logerror("%s: bank0_r: channel[%d].ctrl (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
 			break;
 		case 0x0c/4: case 0x1c/4: case 0x2c/4: case 0x3c/4: case 0x4c/4: case 0x5c/4: case 0x6c/4:
 			ret = m_channels[offset >> 2].tag_addr();
-			logerror("%s: bank0_r: channel[%d].tag_addr (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
+			//logerror("%s: bank0_r: channel[%d].tag_addr (%08x & %08x)\n", machine().describe_context(), offset >> 2, ret, mem_mask);
 			break;
 		case 0x70/4: // 0x1f8010f0, DPCR
 			ret = m_dpcr[0];
-			logerror("%s: bank0_r: DPCR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: bank0_r: DPCR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 0x74/4: // 0x1f8010f4, DICR
 			ret = m_dicr[0];
 			if ((m_int_ctrl[0].m_status & m_int_ctrl[0].m_mask) && m_int_ctrl[0].m_enabled)
 				ret |= 0x80000000;
-			logerror("%s: bank0_r: DICR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: bank0_r: DICR (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		default:
 			logerror("%s: bank0_r: Unknown %08x & %08x\n", machine().describe_context(), 0x1f801080 + (offset << 2), mem_mask);
@@ -348,28 +348,28 @@ WRITE32_MEMBER(iop_dma_device::bank0_w)
 	switch (offset)
 	{
 		case 0x00/4: case 0x10/4: case 0x20/4: case 0x30/4: case 0x40/4: case 0x50/4: case 0x60/4:
-			logerror("%s: bank0_w: channel[%d].addr = %08x & %08x\n", machine().describe_context(), offset >> 2, data, mem_mask);
+			//logerror("%s: bank0_w: channel[%d].addr = %08x & %08x\n", machine().describe_context(), offset >> 2, data, mem_mask);
 			m_channels[offset >> 2].set_addr(data);
 			break;
 		case 0x04/4: case 0x14/4: case 0x24/4: case 0x34/4: case 0x44/4: case 0x54/4: case 0x64/4:
-			logerror("%s: bank0_w: channel[%d].block = %08x & %08x\n", machine().describe_context(), offset >> 2, data, mem_mask);
+			//logerror("%s: bank0_w: channel[%d].block = %08x & %08x\n", machine().describe_context(), offset >> 2, data, mem_mask);
 			m_channels[offset >> 2].set_block(data, mem_mask);
 			break;
 		case 0x08/4: case 0x18/4: case 0x28/4: case 0x38/4: case 0x48/4: case 0x58/4: case 0x68/4:
-			logerror("%s: bank0_w: channel[%d].ctrl = %08x & %08x\n", machine().describe_context(), offset >> 2, data, mem_mask);
+			//logerror("%s: bank0_w: channel[%d].ctrl = %08x & %08x\n", machine().describe_context(), offset >> 2, data, mem_mask);
 			m_channels[offset >> 2].set_ctrl(data);
 			m_running_mask |= m_channels[offset >> 2].busy() ? (1 << (offset >> 2)) : 0;
 			break;
 		case 0x0c/4: case 0x1c/4: case 0x2c/4: case 0x3c/4: case 0x4c/4: case 0x5c/4: case 0x6c/4:
-			logerror("%s: bank0_w: channel[%d].tag_addr = %08x & %08x\n", machine().describe_context(), offset >> 2, data, mem_mask);
+			//logerror("%s: bank0_w: channel[%d].tag_addr = %08x & %08x\n", machine().describe_context(), offset >> 2, data, mem_mask);
 			m_channels[offset >> 2].set_tag_addr(data);
 			break;
 		case 0x70/4: // 0x1f8010f0, DPCR
-			logerror("%s: bank0_w: DPCR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: bank0_w: DPCR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			set_dpcr(data, 0);
 			break;
 		case 0x74/4: // 0x1f8010f4, DICR
-			logerror("%s: bank0_w: DICR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: bank0_w: DICR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			set_dicr(data, 0);
 			break;
 		default:
@@ -385,29 +385,30 @@ READ32_MEMBER(iop_dma_device::bank1_r)
 	{
 		case 0x00/4: case 0x10/4: case 0x20/4: case 0x30/4: case 0x40/4: case 0x50/4: case 0x60/4:
 			ret = m_channels[(offset >> 2) + 8].addr();
-			logerror("%s: bank1_r: channel[%d].addr (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
+			//logerror("%s: bank1_r: channel[%d].addr (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
 			break;
 		case 0x04/4: case 0x14/4: case 0x24/4: case 0x34/4: case 0x44/4: case 0x54/4: case 0x64/4:
 			ret = m_channels[(offset >> 2) + 8].block();
-			logerror("%s: bank1_r: channel[%d].block  (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
+			//logerror("%s: bank1_r: channel[%d].block  (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
 			break;
 		case 0x08/4: case 0x18/4: case 0x28/4: case 0x38/4: case 0x48/4: case 0x58/4: case 0x68/4:
 			ret = m_channels[(offset >> 2) + 8].ctrl();
-			logerror("%s: bank1_r: channel[%d].ctrl (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
+			//if ((offset >> 2) != 2)
+				//logerror("%s: bank1_r: channel[%d].ctrl (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
 			break;
 		case 0x0c/4: case 0x1c/4: case 0x2c/4: case 0x3c/4: case 0x4c/4: case 0x5c/4: case 0x6c/4:
 			ret = m_channels[(offset >> 2) + 8].tag_addr();
-			logerror("%s: bank1_r: channel[%d].tag_addr (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
+			//logerror("%s: bank1_r: channel[%d].tag_addr (%08x & %08x)\n", machine().describe_context(), (offset >> 2) + 8, ret, mem_mask);
 			break;
 		case 0x70/4: // 0x1f801570, DPCR2
 			ret = m_dpcr[1];
-			logerror("%s: bank1_r: DPCR2 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: bank1_r: DPCR2 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 0x74/4: // 0x1f801574, DICR2
 			ret = m_dicr[1];
 			if ((m_int_ctrl[1].m_status & m_int_ctrl[1].m_mask) && m_int_ctrl[1].m_enabled)
 				ret |= 0x80000000;
-			logerror("%s: bank1_r: DICR2 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: bank1_r: DICR2 (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		default:
 			logerror("%s: bank1_r: Unknown %08x & %08x\n", machine().describe_context(), 0x1f801500 + (offset << 2), mem_mask);
@@ -421,28 +422,28 @@ WRITE32_MEMBER(iop_dma_device::bank1_w)
 	switch (offset & 0x1f)
 	{
 		case 0x00/4: case 0x10/4: case 0x20/4: case 0x30/4: case 0x40/4: case 0x50/4: case 0x60/4:
-			logerror("%s: bank1_w: channel[%d].addr = %08x & %08x\n", machine().describe_context(), (offset >> 2) + 8, data, mem_mask);
+			//logerror("%s: bank1_w: channel[%d].addr = %08x & %08x\n", machine().describe_context(), (offset >> 2) + 8, data, mem_mask);
 			m_channels[(offset >> 2) + 8].set_addr(data);
 			break;
 		case 0x04/4: case 0x14/4: case 0x24/4: case 0x34/4: case 0x44/4: case 0x54/4: case 0x64/4:
-			logerror("%s: bank1_w: channel[%d].block = %08x & %08x\n", machine().describe_context(), (offset >> 2) + 8, data, mem_mask);
+			//logerror("%s: bank1_w: channel[%d].block = %08x & %08x\n", machine().describe_context(), (offset >> 2) + 8, data, mem_mask);
 			m_channels[(offset >> 2) + 8].set_block(data, mem_mask);
 			break;
 		case 0x08/4: case 0x18/4: case 0x28/4: case 0x38/4: case 0x48/4: case 0x58/4: case 0x68/4:
-			logerror("%s: bank1_w: channel[%d].ctrl = %08x & %08x\n", machine().describe_context(), (offset >> 2) + 8, data, mem_mask);
+			//logerror("%s: bank1_w: channel[%d].ctrl = %08x & %08x\n", machine().describe_context(), (offset >> 2) + 8, data, mem_mask);
 			m_channels[(offset >> 2) + 8].set_ctrl(data);
 			m_running_mask |= m_channels[(offset >> 2) + 8].busy() ? (1 << ((offset >> 2) + 8)) : 0;
 			break;
 		case 0x0c/4: case 0x1c/4: case 0x2c/4: case 0x3c/4: case 0x4c/4: case 0x5c/4: case 0x6c/4:
-			logerror("%s: bank1_w: channel[%d].tag_addr = %08x & %08x\n", machine().describe_context(), (offset >> 2) + 8, data, mem_mask);
+			//logerror("%s: bank1_w: channel[%d].tag_addr = %08x & %08x\n", machine().describe_context(), (offset >> 2) + 8, data, mem_mask);
 			m_channels[(offset >> 2) + 8].set_tag_addr(data);
 			break;
 		case 0x70/4: // 0x1f801570, DPCR2
-			logerror("%s: bank1_w: DPCR2 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: bank1_w: DPCR2 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			set_dpcr(data, 1);
 			break;
 		case 0x74/4: // 0x1f801574, DICR2
-			logerror("%s: bank1_w: DICR2 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: bank1_w: DICR2 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			set_dicr(data, 1);
 			break;
 		default:
