@@ -11,6 +11,7 @@ enough to provoke a lawsuit, which led to its eventual withdrawal in favor of it
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/i8251.h"
 #include "machine/mc68681.h"
 #include "video/scn2674.h"
@@ -36,6 +37,8 @@ private:
 	void mem_map(address_map &map);
 	void char_map(address_map &map);
 	void attr_map(address_map &map);
+	void keyboard_map(address_map &map);
+	void kbd_io_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -81,6 +84,15 @@ void cit220_state::attr_map(address_map &map)
 	map(0x0000, 0x2fff).ram();
 }
 
+void cit220_state::keyboard_map(address_map &map)
+{
+	map(0x000, 0xfff).rom().region("keyboard", 0);
+}
+
+void cit220_state::kbd_io_map(address_map &map)
+{
+}
+
 
 static INPUT_PORTS_START( cit220p )
 INPUT_PORTS_END
@@ -108,6 +120,10 @@ MACHINE_CONFIG_START(cit220_state::cit220p)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
 
 	MCFG_DEVICE_ADD("usart", I8251, 3000000)
+
+	MCFG_DEVICE_ADD("kbdmcu", I8035, 4608000)
+	MCFG_DEVICE_PROGRAM_MAP(keyboard_map)
+	MCFG_DEVICE_IO_MAP(kbd_io_map)
 MACHINE_CONFIG_END
 
 
@@ -122,7 +138,7 @@ ROM_START( cit220p )
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "v20_cg.ic17",   0x0000, 0x1000, CRC(76ef7ca9) SHA1(6e7799ca0a41350fbc369bbbd4ab581150f37b10) )
 
-	ROM_REGION(0x10000, "keyboard", 0)
+	ROM_REGION(0x1000, "keyboard", 0)
 	ROM_LOAD( "v00_kbd.bin",   0x0000, 0x1000, CRC(f9d24190) SHA1(c4e9ef8188afb18de373f2a537ca9b7a315bfb76) )
 ROM_END
 
