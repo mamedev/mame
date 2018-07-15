@@ -475,7 +475,7 @@ private:
 	void sound_default_am(address_map &map);
 };
 
-/*----------- defined in video/namcos2.c -----------*/
+/*----------- defined in video/namcos21.cpp -----------*/
 
 #define NAMCOS21_NUM_COLORS 0x8000
 
@@ -483,7 +483,7 @@ private:
 /*  ROZ - Rotate & Zoom memory function handlers              */
 /**************************************************************/
 
-/*----------- defined in machine/namcos2.c -----------*/
+/*----------- defined in machine/namcos2.cpp -----------*/
 
 extern void (*namcos2_kickstart)(running_machine &machine, int internal);
 
@@ -500,26 +500,5 @@ extern void (*namcos2_kickstart)(running_machine &machine, int internal);
 #define NAMCOS2_C148_POSIRQ     5       /* 0x1ca000 */
 #define NAMCOS2_C148_SERIRQ     6       /* 0x1cc000 */
 #define NAMCOS2_C148_VBLANKIRQ  7       /* 0x1ce000 */
-
-/**************************************************************/
-/* MASTER CPU RAM MEMORY                                      */
-/**************************************************************/
-
-#define NAMCOS2_68K_MASTER_RAM  "bank3"
-
-/**************************************************************/
-/* SLAVE CPU RAM MEMORY                                       */
-/**************************************************************/
-
-#define NAMCOS2_68K_SLAVE_RAM   "bank4"
-
-/**************************************************************/
-/*                                                            */
-/**************************************************************/
-#define BANKED_SOUND_ROM        "bank6"
-
-/**************************************************************/
-/* Sound CPU support handlers - 6809                          */
-/**************************************************************/
 
 #endif // MAME_INCLUDES_NAMCOS2_H

@@ -532,9 +532,6 @@ Filter Board
 
 
 #define PTRAM_SIZE 0x20000
-// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
-#define MCFG_SCREEN_RAW_PARAMS_NAMCO480I \
-	MCFG_SCREEN_RAW_PARAMS(12288000*2, 768, 0, 496, 264*2,0,480)
 
 #define ENABLE_LOGGING      0
 
@@ -1864,6 +1861,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 	}
 }
 
+void namcos21_state::configure_screen_standard(machine_config &config)
+{
+	PALETTE(config, m_palette, NAMCOS21_NUM_COLORS);
+	m_palette->set_format(PALETTE_FORMAT_XBRG);
+
+	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(12288000*2, 768, 0, 496, 264*2,0,480);
+	m_screen->set_palette(m_palette);
+}
+
 void namcos21_state::configure_c148_standard(machine_config &config)
 {
 	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
@@ -1914,18 +1922,13 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
-	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
-	MCFG_SCREEN_PALETTE("palette")
+	configure_screen_standard(config);
+	m_screen->set_screen_update(FUNC(namcos21_state::screen_update_namcos21));
 
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
-	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
-	MCFG_PALETTE_FORMAT(XBRG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos21);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
@@ -1980,14 +1983,10 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
-	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_driveyes)
-	MCFG_SCREEN_PALETTE("palette")
+	configure_screen_standard(config);
+	m_screen->set_screen_update(FUNC(namcos21_state::screen_update_driveyes));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
-	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
-	MCFG_PALETTE_FORMAT(XBRG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos21);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
@@ -2043,13 +2042,8 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
-	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_winrun)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
-	MCFG_PALETTE_FORMAT(XBRG)
+	configure_screen_standard(config);
+	m_screen->set_screen_update(FUNC(namcos21_state::screen_update_winrun));
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 

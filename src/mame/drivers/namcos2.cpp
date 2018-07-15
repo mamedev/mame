@@ -1638,32 +1638,32 @@ static const gfx_layout metlhawk_sprite_layout_swapped = {
 };
 
 static GFXDECODE_START( gfx_metlhawk )
-	GFXDECODE_ENTRY( "sprites",  0x000000, metlhawk_sprite_layout,         0*256, 16 )
-	GFXDECODE_ENTRY( "tiles",    0x000000, layout8x8x8,                   16*256, 16 )
-	GFXDECODE_ENTRY( "roztiles", 0x000000, layout16x16x8,                  0*256, 16 )
-	GFXDECODE_ENTRY( "sprites",  0x000000, metlhawk_sprite_layout_swapped, 0*256, 16 )
+	GFXDECODE_ENTRY( "sprites",  0, metlhawk_sprite_layout,         0*256, 16 )
+	GFXDECODE_ENTRY( "tiles",    0, layout8x8x8,                   16*256, 16 )
+	GFXDECODE_ENTRY( "roztiles", 0, layout16x16x8,                  0*256, 16 )
+	GFXDECODE_ENTRY( "sprites",  0, metlhawk_sprite_layout_swapped, 0*256, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_namcos2 )
-	GFXDECODE_ENTRY( "sprites",  0x000000, obj_layout,   0*256, 16 )
-	GFXDECODE_ENTRY( "tiles",    0x000000, layout8x8x8, 16*256, 16 )
-	GFXDECODE_ENTRY( "roztiles", 0x000000, layout8x8x8,  0*256, 16 )
+	GFXDECODE_ENTRY( "sprites",  0, obj_layout,   0*256, 16 )
+	GFXDECODE_ENTRY( "tiles",    0, layout8x8x8, 16*256, 16 )
+	GFXDECODE_ENTRY( "roztiles", 0, layout8x8x8,  0*256, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_finallap )
-	GFXDECODE_ENTRY( "sprites", 0x000000, obj_layout,   0*256, 16 )
-	GFXDECODE_ENTRY( "tiles",   0x000000, layout8x8x8, 16*256, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, obj_layout,   0*256, 16 )
+	GFXDECODE_ENTRY( "tiles",   0, layout8x8x8, 16*256, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_sgunner )
-	GFXDECODE_ENTRY( "sprites",  0x000000, layout16x16x8, 0*256, 16 )
-	GFXDECODE_ENTRY( "tiles",    0x000000, layout8x8x8,  16*256, 16 )
+	GFXDECODE_ENTRY( "sprites",  0, layout16x16x8, 0*256, 16 )
+	GFXDECODE_ENTRY( "tiles",    0, layout8x8x8,  16*256, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_luckywld )
-	GFXDECODE_ENTRY( "sprites",  0x000000, layout16x16x8, 0*256, 16 )
-	GFXDECODE_ENTRY( "tiles",    0x000000, layout8x8x8,  16*256, 16 )
-	GFXDECODE_ENTRY( "roztiles", 0x000000, layout16x16x8, 0*256, 16 )
+	GFXDECODE_ENTRY( "sprites",  0, layout16x16x8, 0*256, 16 )
+	GFXDECODE_ENTRY( "tiles",    0, layout8x8x8,  16*256, 16 )
+	GFXDECODE_ENTRY( "roztiles", 0, layout16x16x8, 0*256, 16 )
 GFXDECODE_END
 
 /* end */
@@ -4969,7 +4969,7 @@ ROM_START( valkyrie )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )          /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )          /* Sprites */
 	NAMCOS2_SPRROM_LOAD_256K( "wdobj0.bin",  0x000003, CRC(e8089451) SHA1(f4d05df0015de01ec570f5f89ea11592204e4fe2) )
 	NAMCOS2_SPRROM_LOAD_256K( "wdobj1.bin",  0x000002, CRC(7ca65666) SHA1(39d792abf5a1a5f3906cb6ab4626f4a5b20cb081) )
 	NAMCOS2_SPRROM_LOAD_256K( "wdobj2.bin",  0x000001, CRC(7c159407) SHA1(ed5472eb9df7990b8d80ff5a587e41d138f48db8) )
@@ -5026,7 +5026,7 @@ ROM_START( kyukaidk )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )          /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )          /* Sprites */
 	ROM_LOAD32_BYTE( "ky1_o0.bin",  0x000003, 0x080000, CRC(ebec5132) SHA1(8d2dec3f1cd27c203899bb715a9983fff7ab820d) )
 	ROM_LOAD32_BYTE( "ky1_o1.bin",  0x000002, 0x080000, CRC(fde7e5ae) SHA1(e17822f885977e10b6d1524a3d97fa9640472f8a) )
 	ROM_LOAD32_BYTE( "ky1_o2.bin",  0x000001, 0x080000, CRC(2a181698) SHA1(bad62c6c59b4362d6815749b5622e321b6051ea4) )
@@ -5074,7 +5074,7 @@ ROM_START( kyukaidko )
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )          /* Sprites */
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )          /* Sprites */
 	ROM_LOAD32_BYTE( "ky1_o0.bin",  0x000003, 0x080000, CRC(ebec5132) SHA1(8d2dec3f1cd27c203899bb715a9983fff7ab820d) )
 	ROM_LOAD32_BYTE( "ky1_o1.bin",  0x000002, 0x080000, CRC(fde7e5ae) SHA1(e17822f885977e10b6d1524a3d97fa9640472f8a) )
 	ROM_LOAD32_BYTE( "ky1_o2.bin",  0x000001, 0x080000, CRC(2a181698) SHA1(bad62c6c59b4362d6815749b5622e321b6051ea4) )

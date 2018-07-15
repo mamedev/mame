@@ -62,6 +62,7 @@ public:
 		m_gpu_intc(*this, "gpu_intc")
 	{ }
 
+	void configure_screen_standard(machine_config &config);
 	void configure_c148_standard(machine_config &config);
 	void driveyes(machine_config &config);
 	void winrun(machine_config &config);
