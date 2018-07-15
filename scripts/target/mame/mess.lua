@@ -1885,6 +1885,9 @@ files {
 createMESSProjects(_target, _subtarget, "dec")
 files {
 	MAME_DIR .. "src/mame/drivers/dct11em.cpp",
+	MAME_DIR .. "src/mame/drivers/decstation.cpp",
+	MAME_DIR .. "src/mame/machine/decioga.cpp",
+	MAME_DIR .. "src/mame/machine/decioga.h",
 	MAME_DIR .. "src/mame/drivers/dectalk.cpp",
 	MAME_DIR .. "src/mame/drivers/decwritr.cpp",
 	MAME_DIR .. "src/mame/drivers/pdp11.cpp",
