@@ -26,15 +26,21 @@ public:
 
 	void map(address_map &map);
 
+	// irq inputs
+	DECLARE_WRITE_LINE_MEMBER(rtc_irq_w);
+
 protected:
     virtual void device_start() override;
     virtual void device_reset() override;
 
 	DECLARE_READ32_MEMBER(csr_r);
 	DECLARE_WRITE32_MEMBER(csr_w);
-
+	DECLARE_READ32_MEMBER(intr_r);
+	DECLARE_WRITE32_MEMBER(intr_w);
+	DECLARE_READ32_MEMBER(imsk_r);
+	DECLARE_WRITE32_MEMBER(imsk_w);
 private:
-	uint32_t m_csr;
+	uint32_t m_csr, m_intr, m_imsk;
 };
 
 DECLARE_DEVICE_TYPE(DECSTATION_IOGA, dec_ioga_device)
