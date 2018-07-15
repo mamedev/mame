@@ -740,8 +740,7 @@ MACHINE_CONFIG_START(taitoair_state::airsys)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_airsys);
 
-	PALETTE(config, m_palette, 512*16+512*16);
-	m_palette->set_init(palette_init_delegate(FUNC(palette_device::palette_init_all_black), m_palette));
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512*16+512*16)
 
 	TC0080VCO(config, m_tc0080vco, 0);
 	m_tc0080vco->set_gfx_region(0);
