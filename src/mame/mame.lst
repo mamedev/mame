@@ -11362,6 +11362,9 @@ czeroize                        // 37 1983.10 Zeroize
 decocass                        //
 decomult                        //
 
+@source:decstation.cpp
+ds5k133                         // 1993 Digital Equipment Corporation (DECstation 5000/133)
+
 @source:dectalk.cpp
 dectalk                         // 1983 Digital Equipment Corporation
 
