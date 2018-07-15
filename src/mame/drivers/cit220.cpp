@@ -30,6 +30,8 @@ public:
 
 	void cit220p(machine_config &config);
 private:
+	virtual void machine_start() override;
+
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
@@ -44,6 +46,12 @@ private:
 	required_device<screen_device> m_screen;
 	//required_region_ptr<u8> m_p_chargen;
 };
+
+
+void cit220_state::machine_start()
+{
+	subdevice<i8251_device>("usart")->write_cts(0);
+}
 
 
 WRITE_LINE_MEMBER(cit220_state::sod_w)
@@ -116,8 +124,10 @@ MACHINE_CONFIG_START(cit220_state::cit220p)
 	MCFG_DEVICE_ADDRESS_MAP(1, attr_map)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("duart", SCN2681, 3686400)
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
+	scn2681_device &duart(SCN2681(config, "duart", 3686400));
+	duart.irq_cb().set_inputline("maincpu", I8085_RST55_LINE);
+	duart.outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3); // 9600 baud?
+	duart.outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
 
 	MCFG_DEVICE_ADD("usart", I8251, 3000000)
 
