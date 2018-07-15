@@ -27,14 +27,16 @@ public:
 		//, m_p_chargen(*this, "chargen")
 	{ }
 
+	void cit220p(machine_config &config);
+private:
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void cit220p(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	void vram_map(address_map &map);
-private:
+	void char_map(address_map &map);
+	void attr_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	//required_region_ptr<u8> m_p_chargen;
@@ -60,8 +62,8 @@ void cit220_state::io_map(address_map &map)
 	map(0x10, 0x10).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x11, 0x11).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x20, 0x27).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
-	map(0xa0, 0xa0).unmaprw(); // ???
-	map(0xc0, 0xc0).unmaprw(); // ???
+	map(0xa0, 0xa0).rw("avdc", FUNC(scn2674_device::attr_buffer_r), FUNC(scn2674_device::attr_buffer_w));
+	map(0xc0, 0xc0).rw("avdc", FUNC(scn2674_device::buffer_r), FUNC(scn2674_device::buffer_w));
 }
 
 
@@ -69,9 +71,14 @@ SCN2674_DRAW_CHARACTER_MEMBER(cit220_state::draw_character)
 {
 }
 
-void cit220_state::vram_map(address_map &map)
+void cit220_state::char_map(address_map &map)
 {
-	map(0x0000, 0x27ff).noprw();
+	map(0x0000, 0x2fff).ram();
+}
+
+void cit220_state::attr_map(address_map &map)
+{
+	map(0x0000, 0x2fff).ram();
 }
 
 
@@ -93,7 +100,8 @@ MACHINE_CONFIG_START(cit220_state::cit220p)
 	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE))
 	MCFG_SCN2674_CHARACTER_WIDTH(10)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(cit220_state, draw_character)
-	MCFG_DEVICE_ADDRESS_MAP(0, vram_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, char_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, attr_map)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("duart", SCN2681, 3686400)
