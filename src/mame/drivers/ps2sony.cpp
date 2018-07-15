@@ -170,9 +170,15 @@ iLinkSGUID=0x--------
 #include "machine/ioptimer.h"
 
 #include "machine/ps2dma.h"
+#include "machine/ps2gif.h"
 #include "machine/ps2intc.h"
+#include "machine/ps2mc.h"
+#include "machine/ps2pad.h"
 #include "machine/ps2sif.h"
 #include "machine/ps2timer.h"
+#include "machine/ps2vif1.h"
+
+#include "video/ps2gs.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -194,6 +200,11 @@ public:
 		, m_iop_spu(*this, "iop_spu")
 		, m_iop_cdvd(*this, "iop_cdvd")
 		, m_iop_sio2(*this, "iop_sio2")
+		, m_gif(*this, "gif")
+		, m_gs(*this, "gs")
+		, m_vif1(*this, "vif1")
+		, m_pad(*this, "pad%u", 0U)
+		, m_mc(*this, "mc")
 		, m_screen(*this, "screen")
 		, m_ram(*this, "ram")
 		, m_iop_ram(*this, "iop_ram")
@@ -215,17 +226,10 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(vblank);
 
-    DECLARE_READ64_MEMBER(gs_regs0_r);
-    DECLARE_WRITE64_MEMBER(gs_regs0_w);
-    DECLARE_READ64_MEMBER(gs_regs1_r);
-    DECLARE_WRITE64_MEMBER(gs_regs1_w);
-
     DECLARE_READ32_MEMBER(ipu_r);
     DECLARE_WRITE32_MEMBER(ipu_w);
     DECLARE_READ64_MEMBER(vif0_fifo_r);
     DECLARE_WRITE64_MEMBER(vif0_fifo_w);
-    DECLARE_READ64_MEMBER(vif1_fifo_r);
-    DECLARE_WRITE64_MEMBER(vif1_fifo_w);
     DECLARE_READ64_MEMBER(gif_fifo_r);
     DECLARE_WRITE64_MEMBER(gif_fifo_w);
     DECLARE_READ64_MEMBER(ipu_fifo_r);
@@ -259,6 +263,11 @@ protected:
 	required_device<iop_spu_device> m_iop_spu;
 	required_device<iop_cdvd_device> m_iop_cdvd;
 	required_device<iop_sio2_device> m_iop_sio2;
+	required_device<ps2_gif_device> m_gif;
+	required_device<ps2_gs_device> m_gs;
+	required_device<ps2_vif1_device> m_vif1;
+	required_device_array<ps2_pad_device, 2> m_pad;
+	required_device<ps2_mc_device>	m_mc;
 	required_device<screen_device>	m_screen;
 	required_shared_ptr<uint64_t>	m_ram;
 	required_shared_ptr<uint32_t>	m_iop_ram;
@@ -267,12 +276,6 @@ protected:
 	required_shared_ptr<uint64_t>	m_vu0_dmem;
 	required_shared_ptr<uint64_t>	m_vu1_imem;
 	required_shared_ptr<uint64_t>	m_vu1_dmem;
-
-    uint64_t m_gs_base_regs[15];
-    uint64_t m_gs_csr;
-    uint64_t m_gs_imr;
-    uint64_t m_gs_busdir;
-    uint64_t m_gs_sig_label_id;
 
 	uint32_t m_unk_f430_reg;
 	uint32_t m_unk_f440_counter;
@@ -317,32 +320,6 @@ WRITE64_MEMBER(ps2sony_state::vif0_fifo_w)
 	else
 	{
 		logerror("%s: vif0_fifo_w [63..0]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-	}
-}
-
-READ64_MEMBER(ps2sony_state::vif1_fifo_r)
-{
-	uint64_t ret = 0ULL;
-	if (offset)
-	{
-		logerror("%s: vif1_fifo_r [127..64]: (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-	}
-	else
-	{
-		logerror("%s: vif1_fifo_r [63..0]: (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-	}
-	return ret;
-}
-
-WRITE64_MEMBER(ps2sony_state::vif1_fifo_w)
-{
-	if (offset)
-	{
-		logerror("%s: vif1_fifo_w [127..64]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-	}
-	else
-	{
-		logerror("%s: vif1_fifo_w [63..0]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 }
 
@@ -545,12 +522,6 @@ WRITE32_MEMBER(ps2sony_state::iop_debug_w)
 
 void ps2sony_state::machine_start()
 {
-    save_item(NAME(m_gs_base_regs));
-    save_item(NAME(m_gs_csr));
-    save_item(NAME(m_gs_imr));
-    save_item(NAME(m_gs_busdir));
-    save_item(NAME(m_gs_sig_label_id));
-
 	save_item(NAME(m_unk_f430_reg));
 	save_item(NAME(m_unk_f440_counter));
 	save_item(NAME(m_unk_f440_reg));
@@ -579,12 +550,6 @@ void ps2sony_state::machine_reset()
 	memset(m_ipu_out_fifo, 0, sizeof(uint64_t)*0x1000);
 	m_ipu_out_fifo_index = 0;
 
-	memset(m_gs_base_regs, 0, sizeof(uint64_t) * 15);
-    m_gs_csr = 0ULL;
-    m_gs_imr = 0ULL;
-    m_gs_busdir = 0ULL;
-    m_gs_sig_label_id = 0ULL;
-
     m_vblank_timer->adjust(m_screen->time_until_pos(480), 1);
 }
 
@@ -596,13 +561,15 @@ TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
 		m_intc->raise_interrupt(ps2_intc_device::INT_VB_ON);
 		m_iop_intc->raise_interrupt(iop_intc_device::INT_VB_ON);
 		m_vblank_timer->adjust(m_screen->time_until_pos(0), 0);
+		m_gs->vblank_start();
 	}
 	else
 	{
 		// VBlank exit
-		m_intc->raise_interrupt(ps2_intc_device::INT_VB_OFF);
+		//m_intc->raise_interrupt(ps2_intc_device::INT_VB_OFF);
 		m_iop_intc->raise_interrupt(iop_intc_device::INT_VB_OFF);
 		m_vblank_timer->adjust(m_screen->time_until_pos(480), 1);
+		m_gs->vblank_end();
 	}
 }
 
@@ -703,109 +670,6 @@ WRITE32_MEMBER(ps2sony_state::unk_f440_w)
  *
  */
 
-READ64_MEMBER(ps2sony_state::gs_regs0_r)
-{
-    uint64_t ret = m_gs_base_regs[offset >> 1];
-    switch (offset)
-    {
-        case 0x00: logerror("%s: gs_regs0_r: PMODE (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x02: logerror("%s: gs_regs0_r: SMODE1 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x04: logerror("%s: gs_regs0_r: SMODE2 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x06: logerror("%s: gs_regs0_r: SRFSH (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x08: logerror("%s: gs_regs0_r: SYNCH1 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x0a: logerror("%s: gs_regs0_r: SYNCH2 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x0c: logerror("%s: gs_regs0_r: SYNCV (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x0e: logerror("%s: gs_regs0_r: DISPFB1 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x10: logerror("%s: gs_regs0_r: DISPLAY1 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x12: logerror("%s: gs_regs0_r: DISPFB2 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x14: logerror("%s: gs_regs0_r: DISPLAY2 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x16: logerror("%s: gs_regs0_r: EXTBUF (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x18: logerror("%s: gs_regs0_r: EXTDATA (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x1a: logerror("%s: gs_regs0_r: EXTWRITE (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x1c: logerror("%s: gs_regs0_r: BGCOLOR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        default:   logerror("%s: gs_regs0_r: Unknown (%08x)\n", machine().describe_context(), 0x12000000 + (offset << 3)); break;
-    }
-    return ret;
-}
-
-WRITE64_MEMBER(ps2sony_state::gs_regs0_w)
-{
-    switch (offset)
-    {
-        case 0x00: logerror("%s: gs_regs0_w: PMODE = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x02: logerror("%s: gs_regs0_w: SMODE1 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x04: logerror("%s: gs_regs0_w: SMODE2 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x06: logerror("%s: gs_regs0_w: SRFSH = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x08: logerror("%s: gs_regs0_w: SYNCH1 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x0a: logerror("%s: gs_regs0_w: SYNCH2 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x0c: logerror("%s: gs_regs0_w: SYNCV = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x0e: logerror("%s: gs_regs0_w: DISPFB1 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x10: logerror("%s: gs_regs0_w: DISPLAY1 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x12: logerror("%s: gs_regs0_w: DISPFB2 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x14: logerror("%s: gs_regs0_w: DISPLAY2 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x16: logerror("%s: gs_regs0_w: EXTBUF = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x18: logerror("%s: gs_regs0_w: EXTDATA = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x1a: logerror("%s: gs_regs0_w: EXTWRITE = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x1c: logerror("%s: gs_regs0_w: BGCOLOR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        default:   logerror("%s: gs_regs0_w: Unknown %08x = %08x%08x\n", machine().describe_context(), 0x12000000 + (offset << 3), (uint32_t)(data >> 32), (uint32_t)data); break;
-    }
-    COMBINE_DATA(&m_gs_base_regs[offset >> 1]);
-}
-
-READ64_MEMBER(ps2sony_state::gs_regs1_r)
-{
-	uint64_t ret = 0;
-    switch (offset)
-    {
-        case 0x00:
-        	ret = m_gs_csr;
-        	logerror("%s: gs_regs1_r: CSR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
-        case 0x02:
-        	ret = m_gs_imr;
-        	logerror("%s: gs_regs1_r: IMR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
-        case 0x08:
-        	ret = m_gs_busdir;
-        	logerror("%s: gs_regs1_r: BUSDIR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
-        case 0x10:
-        	ret = m_gs_sig_label_id;
-        	logerror("%s: gs_regs1_r: SIGLBLID (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
-        default:
-        	logerror("%s: gs_regs1_r: Unknown (%08x)\n", machine().describe_context(), 0x12000000 + (offset << 3));
-        	break;
-	}
-	return ret;
-}
-
-WRITE64_MEMBER(ps2sony_state::gs_regs1_w)
-{
-    switch (offset)
-    {
-        case 0x00:
-        	logerror("%s: gs_regs1_w: CSR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
-        	COMBINE_DATA(&m_gs_csr);
-        	break;
-        case 0x02:
-        	logerror("%s: gs_regs1_w: IMR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
-        	COMBINE_DATA(&m_gs_imr);
-        	break;
-        case 0x08:
-        	logerror("%s: gs_regs1_w: BUSDIR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
-        	COMBINE_DATA(&m_gs_busdir);
-        	break;
-        case 0x10:
-        	logerror("%s: gs_regs1_w: SIGLBLID = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
-        	COMBINE_DATA(&m_gs_sig_label_id);
-        	break;
-        default:
-        	logerror("%s: gs_regs1_w: Unknown %08x = %08x%08x\n", machine().describe_context(), 0x12000000 + (offset << 3), (uint32_t)(data >> 32), (uint32_t)data);
-        	break;
-    }
-}
-
 uint32_t ps2sony_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
@@ -819,8 +683,9 @@ void ps2sony_state::mem_map(address_map &map)
     map(0x10001000, 0x100017ff).rw(m_timer[2], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
     map(0x10001800, 0x10001fff).rw(m_timer[3], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
     map(0x10002000, 0x10002fff).rw(FUNC(ps2sony_state::ipu_r), FUNC(ps2sony_state::ipu_w)).umask64(0x00000000ffffffff);
+    map(0x10003000, 0x100030af).rw(m_gif, FUNC(ps2_gif_device::read), FUNC(ps2_gif_device::write));
     map(0x10004000, 0x1000400f).mirror(0xff0).rw(FUNC(ps2sony_state::vif0_fifo_r), FUNC(ps2sony_state::vif0_fifo_w));
-    map(0x10005000, 0x1000500f).mirror(0xff0).rw(FUNC(ps2sony_state::vif1_fifo_r), FUNC(ps2sony_state::vif1_fifo_w));
+    map(0x10005000, 0x1000500f).mirror(0xff0).rw(m_vif1, FUNC(ps2_vif1_device::mmio_r), FUNC(ps2_vif1_device::mmio_w));
     map(0x10006000, 0x1000600f).mirror(0xff0).rw(FUNC(ps2sony_state::gif_fifo_r), FUNC(ps2sony_state::gif_fifo_w));
     map(0x10007000, 0x1000701f).mirror(0xfe0).rw(FUNC(ps2sony_state::ipu_fifo_r), FUNC(ps2sony_state::ipu_fifo_w));
     map(0x10008000, 0x1000dfff).rw(m_dmac, FUNC(ps2_dmac_device::channel_r), FUNC(ps2_dmac_device::channel_w)).umask64(0x00000000ffffffff);;
@@ -837,8 +702,8 @@ void ps2sony_state::mem_map(address_map &map)
     map(0x11004000, 0x11004fff).mirror(0x3000).ram().share(m_vu0_dmem);
     map(0x11008000, 0x1100bfff).ram().share(m_vu1_imem);
     map(0x1100c000, 0x1100ffff).ram().share(m_vu1_dmem);
-    map(0x12000000, 0x120003ff).mirror(0xc00).rw(FUNC(ps2sony_state::gs_regs0_r), FUNC(ps2sony_state::gs_regs0_w));
-    map(0x12001000, 0x120013ff).mirror(0xc00).rw(FUNC(ps2sony_state::gs_regs1_r), FUNC(ps2sony_state::gs_regs1_w));
+    map(0x12000000, 0x120003ff).mirror(0xc00).rw(m_gs, FUNC(ps2_gs_device::priv_regs0_r), FUNC(ps2_gs_device::priv_regs0_w));
+    map(0x12001000, 0x120013ff).mirror(0xc00).rw(m_gs, FUNC(ps2_gs_device::priv_regs1_r), FUNC(ps2_gs_device::priv_regs1_w));
     map(0x1c000000, 0x1c1fffff).rw(FUNC(ps2sony_state::ee_iop_ram_r), FUNC(ps2sony_state::ee_iop_ram_w)); // IOP has 2MB EDO RAM per Wikipedia, and writes go up to this point
     map(0x1f803800, 0x1f803807).r(FUNC(ps2sony_state::board_id_r));
     map(0x1fc00000, 0x1fffffff).rom().region("bios", 0);
@@ -875,14 +740,18 @@ MACHINE_CONFIG_START(ps2sony_state::ps2sony)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
+	MCFG_DEVICE_ADD(m_vif1, SONYPS2_VIF1, 294912000/2, m_gif)
+
 	MCFG_DEVICE_ADD(m_timer[0], SONYPS2_TIMER, 294912000/2, true)
 	MCFG_DEVICE_ADD(m_timer[1], SONYPS2_TIMER, 294912000/2, true)
 	MCFG_DEVICE_ADD(m_timer[2], SONYPS2_TIMER, 294912000/2, false)
 	MCFG_DEVICE_ADD(m_timer[3], SONYPS2_TIMER, 294912000/2, false)
 
+	MCFG_DEVICE_ADD(m_gs, SONYPS2_GS, 294912000/2)
 	MCFG_DEVICE_ADD(m_intc, SONYPS2_INTC, m_maincpu)
-	MCFG_DEVICE_ADD(m_dmac, SONYPS2_DMAC, 294912000/2, m_maincpu, m_ram, m_sif)
+	MCFG_DEVICE_ADD(m_dmac, SONYPS2_DMAC, 294912000/2, m_maincpu, m_ram, m_sif, m_gif, m_vif1)
 	MCFG_DEVICE_ADD(m_sif, SONYPS2_SIF, m_intc)
+	MCFG_DEVICE_ADD(m_gif, SONYPS2_GIF, m_gs)
 
 	MCFG_DEVICE_ADD(m_iop, SONYPS2_IOP, XTAL(67'737'600)/2)
 	MCFG_DEVICE_PROGRAM_MAP(iop_map)
@@ -890,8 +759,12 @@ MACHINE_CONFIG_START(ps2sony_state::ps2sony)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_QUANTUM_PERFECT_CPU("iop")
 
+	MCFG_DEVICE_ADD(m_pad[0], SONYPS2_PAD)
+	MCFG_DEVICE_ADD(m_pad[1], SONYPS2_PAD)
+	MCFG_DEVICE_ADD(m_mc, SONYPS2_MC)
+
 	MCFG_DEVICE_ADD(m_iop_intc, SONYIOP_INTC, m_iop)
-	MCFG_DEVICE_ADD(m_iop_sio2, SONYIOP_SIO2, m_iop_intc)
+	MCFG_DEVICE_ADD(m_iop_sio2, SONYIOP_SIO2, m_iop_intc, m_pad[0], m_pad[1], m_mc)
 	MCFG_DEVICE_ADD(m_iop_cdvd, SONYIOP_CDVD, m_iop_intc)
 	MCFG_DEVICE_ADD(m_iop_timer, SONYIOP_TIMER, XTAL(67'737'600)/2)
 	MCFG_IOP_TIMER_IRQ_CALLBACK(WRITELINE(*this, ps2sony_state, iop_timer_irq))

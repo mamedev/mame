@@ -283,7 +283,8 @@ void mips3_device::generate_exception(int exception, int backup)
 	/* most exceptions go to offset 0x180, except for TLB stuff */
 	if (exception >= EXCEPTION_TLBMOD && exception <= EXCEPTION_TLBSTORE)
 	{
-		osd_printf_debug("TLB miss @ %08X\n", (uint32_t)m_core->cpr[0][COP0_BadVAddr]);
+		//printf("TLB miss @ %08X\n", (uint32_t)m_core->cpr[0][COP0_BadVAddr]);
+		//machine().debug_break();
 	}
 	else
 	{
@@ -313,7 +314,7 @@ void mips3_device::generate_tlb_exception(int exception, offs_t address)
 
 void mips3_device::invalid_instruction(uint32_t op)
 {
-	printf("Invalid instruction! %08x\n", op);
+	fatalerror("Invalid instruction! %08x\n", op);
 	generate_exception(EXCEPTION_INVALIDOP, 1);
 }
 
@@ -345,9 +346,6 @@ void mips3_device::device_start()
 
 	/* initialize based on the config */
 	memset(m_core, 0, sizeof(internal_mips3_state));
-	m_core->vfr[0][3] = 1.0f;
-	m_core->vfmem = &m_core->vumem[0];
-	m_core->vimem = reinterpret_cast<uint32_t*>(m_core->vfmem);
 
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
@@ -1072,6 +1070,13 @@ void mips3_device::device_reset()
 	m_core->mode = (MODE_KERNEL << 1) | 0;
 	m_cache_dirty = true;
 	m_interrupt_cycles = 0;
+
+	m_core->vfr[0][3] = 1.0f;
+	m_core->vfmem = &m_core->vumem[0];
+	m_core->vimem = reinterpret_cast<uint32_t*>(m_core->vfmem);
+	m_core->vr = &m_core->vcr[20];
+	m_core->i = reinterpret_cast<float*>(&m_core->vcr[21]);
+	m_core->q = reinterpret_cast<float*>(&m_core->vcr[22]);
 }
 
 
@@ -2929,6 +2934,7 @@ void mips3_device::handle_extra_cop2(uint32_t op)
 
 void r5900le_device::handle_extra_cop2(uint32_t op)
 {
+	// TODO: Flags, rounding...
 	const int rd   = (op >>  6) & 31;
 	const int rs   = (op >> 11) & 31;
 	const int rt   = (op >> 16) & 31;
@@ -2936,25 +2942,136 @@ void r5900le_device::handle_extra_cop2(uint32_t op)
 
 	switch (op & 0x3f)
 	{
-		case 0x00: case 0x01: case 0x02: case 0x03:
-			printf("Unsupported instruction: VADDbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x04: case 0x05: case 0x06: case 0x07:
-			printf("Unsupported instruction: VSUBbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x08: case 0x09: case 0x0a: case 0x0b:
-			printf("Unsupported instruction: VMADDbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+		case 0x00: case 0x01: case 0x02: case 0x03: /* VADDbc */
+			if (rd)
+			{
+				const uint32_t bc = op & 3;
+				float *fs = m_core->vfr[rs];
+				float *ft = m_core->vfr[rt];
+				float *fd = m_core->vfr[rd];
+				for (int field = 0; field < 4; field++)
+				{
+					if (BIT(op, 24-field))
+					{
+						fd[field] = fs[field] + ft[bc];
+					}
+				}
+			}
+			break;
+		case 0x04: case 0x05: case 0x06: case 0x07: /* VSUBbc */
+			if (rd)
+			{
+				const uint32_t bc = op & 3;
+				float *fs = m_core->vfr[rs];
+				float *ft = m_core->vfr[rt];
+				float *fd = m_core->vfr[rd];
+				for (int field = 0; field < 4; field++)
+				{
+					if (BIT(op, 24-field))
+					{
+						fd[field] = fs[field] - ft[bc];
+					}
+				}
+			}
+			break;
+		case 0x08: case 0x09: case 0x0a: case 0x0b: /* VMADDbc */
+			if (rd)
+			{
+				const uint32_t bc = op & 3;
+				float *fs = m_core->vfr[rs];
+				float *ft = m_core->vfr[rt];
+				float *fd = m_core->vfr[rd];
+				for (int field = 0; field < 4; field++)
+				{
+					if (BIT(op, 24-field))
+					{
+						fd[field] = m_core->vacc[field] + fs[field] + ft[bc];
+					}
+				}
+			}
+			break;
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			printf("Unsupported instruction: VMSUBbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x10: case 0x11: case 0x12: case 0x13:
-			printf("Unsupported instruction: VMAXbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x14: case 0x15: case 0x16: case 0x17:
-			printf("Unsupported instruction: VMINIbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x18: case 0x19: case 0x1a: case 0x1b:
-			printf("Unsupported instruction: VMULbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x1c: printf("Unsupported instruction: VMULq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+		case 0x10: case 0x11: case 0x12: case 0x13: /* VMAXbc */
+			if (rd)
+			{
+				const uint32_t bc = op & 3;
+				float *fs = m_core->vfr[rs];
+				float *ft = m_core->vfr[rt];
+				float *fd = m_core->vfr[rd];
+				for (int field = 0; field < 4; field++)
+				{
+					if (BIT(op, 24-field))
+					{
+						fd[field] = std::fmax(fs[field], ft[bc]);
+					}
+				}
+			}
+			break;
+		case 0x14: case 0x15: case 0x16: case 0x17: /* VMINIbc */
+			if (rd)
+			{
+				const uint32_t bc = op & 3;
+				float *fs = m_core->vfr[rs];
+				float *ft = m_core->vfr[rt];
+				float *fd = m_core->vfr[rd];
+				for (int field = 0; field < 4; field++)
+				{
+					if (BIT(op, 24-field))
+					{
+						fd[field] = std::fmin(fs[field], ft[bc]);
+					}
+				}
+			}
+			break;
+		case 0x18: case 0x19: case 0x1a: case 0x1b: /* VMULbc */
+			if (rd)
+			{
+				const uint32_t bc = op & 3;
+				float *fs = m_core->vfr[rs];
+				float *ft = m_core->vfr[rt];
+				float *fd = m_core->vfr[rd];
+				for (int field = 0; field < 4; field++)
+				{
+					if (BIT(op, 24-field))
+					{
+						fd[field] = fs[field] * ft[bc];
+					}
+				}
+			}
+			break;
+		case 0x1c: /* VMULq */
+			if (rd)
+			{
+				float *fs = m_core->vfr[rs];
+				float *ft = m_core->vfr[rt];
+				float *fd = m_core->vfr[rd];
+				for (int field = 0; field < 4; field++)
+				{
+					if (BIT(op, 24-field))
+					{
+						fd[field] = fs[field] * ft[field];
+					}
+				}
+			}
+			break;
 		case 0x1d: printf("Unsupported instruction: VMAXi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 		case 0x1e: printf("Unsupported instruction: VMULi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 		case 0x1f: printf("Unsupported instruction: VMINIi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x20: printf("Unsupported instruction: VADDq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+		case 0x20: /* VADDq */
+			if (rd)
+			{
+				float *fs = m_core->vfr[rs];
+				float *fd = m_core->vfr[rd];
+				for (int field = 0; field < 4; field++)
+				{
+					if (BIT(op, 24-field))
+					{
+						fd[field] = fs[field] + *(m_core->q);
+					}
+				}
+			}
+			break;
 		case 0x21: printf("Unsupported instruction: VMADDq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 		case 0x22: printf("Unsupported instruction: VADDi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 		case 0x23: printf("Unsupported instruction: VMADDi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
@@ -2962,26 +3079,67 @@ void r5900le_device::handle_extra_cop2(uint32_t op)
 		case 0x25: printf("Unsupported instruction: VMSUBq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 		case 0x26: printf("Unsupported instruction: VSUBi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 		case 0x27: printf("Unsupported instruction: VMSUBi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x28: printf("Unsupported instruction: VADD @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x29: printf("Unsupported instruction: VMADD @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x2a: printf("Unsupported instruction: VMUL @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x2b: printf("Unsupported instruction: VMAX @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x2c:
-		{
-			float *fs = m_core->vfr[rs];
-			float *ft = m_core->vfr[rt];
-			float *fd = m_core->vfr[rt];
-			for (int field = 0; field < 4; field++)
+		case 0x28: /* VADD */
+			if (rd)
 			{
-				if (BIT(op, 24-field))
+				float *fs = m_core->vfr[rs];
+				float *ft = m_core->vfr[rt];
+				float *fd = m_core->vfr[rd];
+				for (int field = 0; field < 4; field++)
 				{
-					fd[field] = fs[field] - ft[field];
+					if (BIT(op, 24-field))
+					{
+						fd[field] = fs[field] + ft[field];
+					}
+				}
+			}
+			break;
+		case 0x29: printf("Unsupported instruction: VMADD @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+		case 0x2a: /* VMUL */
+			if (rd)
+			{
+				float *fs = m_core->vfr[rs];
+				float *ft = m_core->vfr[rt];
+				float *fd = m_core->vfr[rd];
+				for (int field = 0; field < 4; field++)
+				{
+					if (BIT(op, 24-field))
+					{
+						fd[field] = fs[field] * ft[field];
+					}
+				}
+			}
+			break;
+		case 0x2b: printf("Unsupported instruction: VMAX @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+		case 0x2c: /* VSUB */
+		{
+			if (rd)
+			{
+				float *fs = m_core->vfr[rs];
+				float *ft = m_core->vfr[rt];
+				float *fd = m_core->vfr[rd];
+				for (int field = 0; field < 4; field++)
+				{
+					if (BIT(op, 24-field))
+					{
+						fd[field] = fs[field] - ft[field];
+					}
 				}
 			}
 			break;
 		}
 		case 0x2d: printf("Unsupported instruction: VMSUB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x2e: printf("Unsupported instruction: VOPMSUB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+		case 0x2e: /* VOPMSUB */
+			if (rd)
+			{
+				float *fs = m_core->vfr[rs];
+				float *ft = m_core->vfr[rt];
+				float *fd = m_core->vfr[rd];
+				fd[0] = m_core->vacc[0] - fs[1] * ft[2];
+				fd[1] = m_core->vacc[1] - fs[2] * ft[0];
+				fd[2] = m_core->vacc[2] - fs[0] * ft[1];
+			}
+			break;
 		case 0x2f: printf("Unsupported instruction: VMINI @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 		case 0x30:
 			if (rd)
@@ -3002,20 +3160,72 @@ void r5900le_device::handle_extra_cop2(uint32_t op)
 					printf("Unsupported instruction: VADDAbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 				case 0x04: case 0x05: case 0x06: case 0x07:
 					printf("Unsupported instruction: VSUBAbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x08: case 0x09: case 0x0a: case 0x0b:
-					printf("Unsupported instruction: VMADDAbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+				case 0x08: case 0x09: case 0x0a: case 0x0b: /* VMADDAbc */
+					if (rd)
+					{
+						const uint32_t bc = op & 3;
+						float *fs = m_core->vfr[rs];
+						float *ft = m_core->vfr[rt];
+						float *fd = m_core->vfr[rd];
+						for (int field = 0; field < 4; field++)
+						{
+							if (BIT(op, 24-field))
+							{
+								fd[field] = m_core->vacc[field] + fs[field] * ft[bc];
+							}
+						}
+					}
+					break;
 				case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 					printf("Unsupported instruction: VMSUBAbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 				case 0x10: printf("Unsupported instruction: VITOF0 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 				case 0x11: printf("Unsupported instruction: VITOF4 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 				case 0x12: printf("Unsupported instruction: VITOF12 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 				case 0x13: printf("Unsupported instruction: VITOF15 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x14: printf("Unsupported instruction: VFTOI0 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x15: printf("Unsupported instruction: VFTOI4 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+				case 0x14: /* VFTOI0 */
+					if (rt)
+					{
+						float *fs = m_core->vfr[rs];
+						int32_t *ft = reinterpret_cast<int32_t*>(m_core->vfr[rt]);
+						for (int field = 0; field < 4; field++)
+						{
+							if (BIT(op, 24-field))
+							{
+								ft[field] = (int32_t)(fs[field]);
+							}
+						}
+					}
+					break;
+				case 0x15: /* VFTOI4 */
+					if (rt)
+					{
+						float *fs = m_core->vfr[rs];
+						int32_t *ft = reinterpret_cast<int32_t*>(m_core->vfr[rt]);
+						for (int field = 0; field < 4; field++)
+						{
+							if (BIT(op, 24-field))
+							{
+								ft[field] = (int32_t)(fs[field] * 16.0f);
+							}
+						}
+					}
+					break;
 				case 0x16: printf("Unsupported instruction: VFTOI12 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 				case 0x17: printf("Unsupported instruction: VFTOI15 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x18: case 0x19: case 0x1a: case 0x1b:
-					printf("Unsupported instruction: VMULAbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+				case 0x18: case 0x19: case 0x1a: case 0x1b: /* VMULAbc */
+					{
+						const uint32_t bc = op & 3;
+						float *fs = m_core->vfr[rs];
+						float *ft = m_core->vfr[rt];
+						for (int field = 0; field < 4; field++)
+						{
+							if (BIT(op, 24-field))
+							{
+								m_core->vacc[field] = fs[field] * ft[bc];
+							}
+						}
+					}
+					break;
 				case 0x1c: printf("Unsupported instruction: VMULAq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 				case 0x1d: printf("Unsupported instruction: VABS @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 				case 0x1e: printf("Unsupported instruction: VMULAi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
@@ -3034,16 +3244,51 @@ void r5900le_device::handle_extra_cop2(uint32_t op)
 				// 2b?
 				case 0x2c: printf("Unsupported instruction: VSUBA @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 				case 0x2d: printf("Unsupported instruction: VMSUBA @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x2e: printf("Unsupported instruction: VOPMULA @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x2f: printf("Unsupported instruction: VNOP @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x30: printf("Unsupported instruction: VMOVE @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x31: printf("Unsupported instruction: VMR32 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+				case 0x2e: /* VOPMULA */
+					{
+						float *fs = m_core->vfr[rs];
+						float *ft = m_core->vfr[rt];
+						m_core->vacc[0] = fs[1] * ft[2];
+						m_core->vacc[1] = fs[2] * ft[0];
+						m_core->vacc[2] = fs[0] * ft[1];
+					}
+					break;
+				case 0x2f: /* VNOP */
+					break;
+				case 0x30: /* VMOVE */
+					if (rt)
+					{
+						float *fs = m_core->vfr[rs];
+						float *ft = m_core->vfr[rt];
+						for (int field = 0; field < 4; field++)
+						{
+							if (BIT(op, 24-field))
+							{
+								ft[field] = fs[field];
+							}
+						}
+					}
+					break;
+				case 0x31: /* VMR32 */
+					if (rt)
+					{
+						float *fs = m_core->vfr[rs];
+						float *ft = m_core->vfr[rt];
+						for (int field = 0; field < 4; field++)
+						{
+							if (BIT(op, 24-field))
+							{
+								ft[field] = fs[(field + 3) & 3];
+							}
+						}
+					}
+					break;
 				// 32?
 				// 33?
 				case 0x34: printf("Unsupported instruction: VLQI @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x35:
+				case 0x35: /* VSQI */
 				{
-					uint32_t *base = &m_core->vimem[m_core->vcr[rt] << 2];
+					uint32_t *base = &m_core->vimem[(m_core->vcr[rt] << 2) & 0xfff];
 					uint32_t *fs = reinterpret_cast<uint32_t*>(m_core->vfr[rs]);
 					for (int field = 0; field < 4; field++)
 					{
@@ -3061,10 +3306,27 @@ void r5900le_device::handle_extra_cop2(uint32_t op)
 				}
 				case 0x36: printf("Unsupported instruction: VLQD @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 				case 0x37: printf("Unsupported instruction: VSQD @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x38: printf("Unsupported instruction: VDIV @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x39: printf("Unsupported instruction: VSQRT @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+				case 0x38: /* VDIV */
+					{
+						const uint32_t fsf = (op >> 21) & 3;
+						const uint32_t ftf = (op >> 23) & 3;
+						const float *fs = m_core->vfr[rs];
+						const float *ft = m_core->vfr[rt];
+						const float ftval = ft[ftf];
+						if (ftval)
+							*(m_core->q) = fs[fsf] / ft[ftf];
+					}
+					break;
+				case 0x39: /* VSQRT */
+					{
+						const uint32_t ftf = (op >> 23) & 3;
+						*(m_core->q) = (float)sqrt(m_core->vfr[rt][ftf]);
+					}
+					break;
 				case 0x3a: printf("Unsupported instruction: VRSQRT @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x3b: printf("Unsupported instruction: VWAITQ @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+				case 0x3b: /* VWAITQ */
+					// TODO: We assume Q is instantly available. Fix this!
+					break;
 				case 0x3c: printf("Unsupported instruction: VMTIR @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 				case 0x3d: printf("Unsupported instruction: VMFIR @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 				case 0x3e: printf("Unsupported instruction: VILWR @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
@@ -3076,7 +3338,7 @@ void r5900le_device::handle_extra_cop2(uint32_t op)
 					{
 						if (BIT(op, 24-field))
 						{
-							m_core->vimem[base + field] = val;
+							m_core->vimem[(base + field) & 0xfff] = val;
 						}
 					}
 					break;
@@ -3408,8 +3670,15 @@ void r5900le_device::handle_idt(uint32_t op)
     switch (op & 0x3f)
 	{
 		case 0x00: /* MADD */
-			printf("Unsupported instruction: MADD @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+		{
+			uint64_t temp64 = (int64_t)(int32_t)RSVAL32 * (int64_t)(int32_t)RTVAL32;
+			m_core->r[REG_LO] += (int32_t)temp64;
+			m_core->r[REG_HI] += (int32_t)(temp64 >> 32);
+			if (rd)
+				m_core->r[rd] = m_core->r[REG_LO];
+			m_core->icount -= 3; // ?
 			break;
+		}
 		case 0x01: /* MADDU */
 			printf("Unsupported instruction: MADDU @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
@@ -3537,7 +3806,18 @@ void r5900le_device::handle_mmi0(uint32_t op)
 			printf("Unsupported instruction: PADDW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x01: /* PSUBW */
-			printf("Unsupported instruction: PSUBW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint32_t rsval[4] = { (uint32_t)(m_core->rh[rs] >> 32), (uint32_t)m_core->rh[rs], (uint32_t)(m_core->r[rs] >> 32), (uint32_t)m_core->r[rs] };
+				const uint32_t rtval[4] = { (uint32_t)(m_core->rh[rt] >> 32), (uint32_t)m_core->rh[rt], (uint32_t)(m_core->r[rt] >> 32), (uint32_t)m_core->r[rt] };
+				uint32_t rdval[4] = { 0, 0, 0, 0 };
+				for (int word_idx = 0; word_idx < 4; word_idx++)
+				{
+					rdval[word_idx] = rsval[word_idx] - rtval[word_idx];
+				}
+				m_core->rh[rd] = ((uint64_t)rdval[0] << 32) | rdval[1];
+				m_core->r[rd]  = ((uint64_t)rdval[2] << 32) | rdval[3];
+			}
 			break;
 		case 0x02: /* PCGTW */
 			printf("Unsupported instruction: PCGTW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
@@ -3673,27 +3953,32 @@ void r5900le_device::handle_mmi1(uint32_t op)
 			printf("Unsupported instruction: PCEQB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x10: /* PADDUW */
-        {
-            if (rd == 0) break;
-
-		    uint32_t rsval[4] = { (uint32_t)m_core->r[rs], (uint32_t)(m_core->r[rs] >> 32), (uint32_t)m_core->rh[rs], (uint32_t)(m_core->rh[rs] >> 32) };
-            uint32_t rtval[4] = { (uint32_t)m_core->r[rt], (uint32_t)(m_core->r[rt] >> 32), (uint32_t)m_core->rh[rt], (uint32_t)(m_core->rh[rt] >> 32) };
-            uint64_t rdval[4] = { 0 };
-
-            for (int i = 0; i < 4; i++)
+            if (rd)
             {
-                uint64_t sum = (uint64_t)rsval[i] + (uint64_t)rtval[i];
-                rdval[i] = (sum >= 0x100000000ULL) ? 0xffffffffULL : sum;
-            }
-            m_core->r[rd] = rdval[0] | (rdval[1] << 32);
-            m_core->rh[rd] = rdval[2] | (rdval[3] << 32);
-            break;
-        }
+				uint32_t rsval[4] = { (uint32_t)m_core->r[rs], (uint32_t)(m_core->r[rs] >> 32), (uint32_t)m_core->rh[rs], (uint32_t)(m_core->rh[rs] >> 32) };
+				uint32_t rtval[4] = { (uint32_t)m_core->r[rt], (uint32_t)(m_core->r[rt] >> 32), (uint32_t)m_core->rh[rt], (uint32_t)(m_core->rh[rt] >> 32) };
+				uint64_t rdval[4] = { 0 };
+
+				for (int i = 0; i < 4; i++)
+				{
+					uint64_t sum = (uint64_t)rsval[i] + (uint64_t)rtval[i];
+					rdval[i] = (sum >= 0x100000000ULL) ? 0xffffffffULL : sum;
+				}
+				m_core->r[rd] = rdval[0] | (rdval[1] << 32);
+				m_core->rh[rd] = rdval[2] | (rdval[3] << 32);
+			}
+			break;
 		case 0x11: /* PSUBUW */
 			printf("Unsupported instruction: PSUBUW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x12: /* PEXTUW */
-			printf("Unsupported instruction: PEXTUW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+            if (rd)
+            {
+				uint64_t rsval = m_core->rh[rs];
+				uint64_t rtval = m_core->rh[rt];
+				m_core->rh[rd] = (rsval & 0xffffffff00000000ULL) | (rtval >> 32);
+				m_core->r[rd]  = (rtval & 0x00000000ffffffffULL) | (rsval << 32);
+			}
 			break;
 		case 0x14: /* PADDUH */
 			printf("Unsupported instruction: PADDUH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");

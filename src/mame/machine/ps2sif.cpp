@@ -54,15 +54,15 @@ READ32_MEMBER(ps2_sif_device::ee_r)
 	{
 		case 0:
 			ret = m_ms_mailbox;
-			logerror("%s: ee_r: SIF master->slave mailbox (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: ee_r: SIF master->slave mailbox (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 2:
 			ret = m_sm_mailbox;
-			logerror("%s: ee_r: SIF slave->master mailbox (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: ee_r: SIF slave->master mailbox (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 4:
 			ret = m_ms_flag;
-			logerror("%s: ee_r: SIF master->slave flag (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: ee_r: SIF master->slave flag (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 6:
 			ret = m_sm_flag;
@@ -71,7 +71,7 @@ READ32_MEMBER(ps2_sif_device::ee_r)
 			break;
 		case 8:
 			ret = m_ctrl | 0xF0000102;
-			logerror("%s: ee_r: SIF control (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: ee_r: SIF control (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		default:
 			logerror("%s: ee_r: Unknown (%08x & %08x)\n", machine().describe_context(), 0x1000f200 + (offset << 3), mem_mask);
@@ -85,19 +85,19 @@ WRITE32_MEMBER(ps2_sif_device::ee_w)
 	switch (offset)
 	{
 		case 0:
-			logerror("%s: ee_w: SIF master->slave mailbox (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: ee_w: SIF master->slave mailbox (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 			m_ms_mailbox = data;
 			break;
 		case 4:
-			logerror("%s: ee_w: SIF set master->slave flag (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: ee_w: SIF set master->slave flag (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 			m_ms_flag |= data;
 			break;
 		case 6:
-			logerror("%s: ee_w: SIF clear slave->master flag (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: ee_w: SIF clear slave->master flag (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 			m_sm_flag &= ~data;
 			break;
 		case 8:
-			logerror("%s: ee_w: SIF set control = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: ee_w: SIF set control = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			if (BIT(data, 8))
 				m_ctrl |= (1 << 8);
 			else
@@ -117,24 +117,24 @@ READ32_MEMBER(ps2_sif_device::iop_r)
 	{
 		case 0:
 			ret = m_ms_mailbox;
-			logerror("%s: iop_r: SIF master->slave mailbox (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: iop_r: SIF master->slave mailbox (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 4:
 			ret = m_sm_mailbox;
-			logerror("%s: iop_r: SIF slave->master mailbox (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: iop_r: SIF slave->master mailbox (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 8:
 			ret = m_ms_flag;
-			if (ret != 0)
-				logerror("%s: iop_r: SIF master->slave flag (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//if (ret != 0)
+				//logerror("%s: iop_r: SIF master->slave flag (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 12:
 			ret = m_sm_flag;
-			logerror("%s: iop_r: SIF slave->master flag (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: iop_r: SIF slave->master flag (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 16:
 			ret = m_ctrl | 0xf0000002;
-			logerror("%s: iop_r: SIF control register (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: iop_r: SIF control register (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
 			break;
 		default:
 			logerror("%s: iop_r: Unknown read (%08x & %08x)\n", machine().describe_context(), 0x1d000000 + (offset << 2), mem_mask);
@@ -148,19 +148,19 @@ WRITE32_MEMBER(ps2_sif_device::iop_w)
 	switch (offset)
 	{
 		case 4:
-			logerror("%s: iop_w: SIF slave->master mailbox (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: iop_w: SIF slave->master mailbox (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 			m_sm_mailbox = data;
 			break;
 		case 8:
-			logerror("%s: iop_w: SIF clear master->slave flag (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: iop_w: SIF clear master->slave flag (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 			m_ms_flag &= ~data;
 			break;
 		case 12:
-			logerror("%s: iop_w: SIF set slave->master flag (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: iop_w: SIF set slave->master flag (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 			m_sm_flag |= data;
 			break;
 		case 16:
-			logerror("%s: iop_w: SIF set control (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: iop_w: SIF set control (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
 			m_ctrl ^= data & 0xf0;
 			if (data & 0x80 || data & 0x20)
 			{

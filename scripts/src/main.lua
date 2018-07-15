@@ -169,7 +169,10 @@ end
 
 			if _OPTIONS["WEBASSEMBLY"] then
 				emccopts = emccopts
-					.. " -s BINARYEN=1"
+					.. " -s WASM=1"
+			else
+				emccopts = emccopts
+					.. " -s WASM=0"
 			end
 
 			if _OPTIONS["ARCHOPTS"] then

@@ -31,7 +31,7 @@ known issues:
     - sprite size bit is bogus during splash screen
 
     Final Lap 3:
-    - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.c yet
+    - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.cpp yet
 
     Suzuka 8 Hours II
     - some sprite cropping issues
@@ -458,7 +458,6 @@ $a00000 checks have been seen on the Final Lap boards.
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
 #include "sound/ym2151.h"
-#include "sound/c140.h"
 #include "speaker.h"
 
 #include "finallap.lh"
@@ -603,7 +602,7 @@ void namcos2_state::namcos2_68k_default_cpu_board_am(address_map &map)
 	map(0x200000, 0x3fffff).rom().region("data_rom", 0);
 	map(0x400000, 0x41ffff).rw(FUNC(namcos2_state::c123_tilemap_videoram_r), FUNC(namcos2_state::c123_tilemap_videoram_w));
 	map(0x420000, 0x42003f).rw(FUNC(namcos2_state::c123_tilemap_control_r), FUNC(namcos2_state::c123_tilemap_control_w));
-	map(0x440000, 0x44ffff).rw(FUNC(namcos2_state::paletteram_word_r), FUNC(namcos2_state::paletteram_word_w)).share("paletteram");
+	map(0x440000, 0x44ffff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x460000, 0x460fff).mirror(0xf000).rw(FUNC(namcos2_state::dpram_word_r), FUNC(namcos2_state::dpram_word_w));
 	map(0x480000, 0x483fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
 	map(0x4a0000, 0x4a000f).m(m_sci, FUNC(namco_c139_device::regs_map));
@@ -764,7 +763,7 @@ void namcos2_state::sound_default_am(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("bank6"); /* banked */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x5000, 0x6fff).rw("c140", FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
+	map(0x5000, 0x6fff).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
 	map(0x7000, 0x77ff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
 	map(0x7800, 0x7fff).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)); /* mirror */
 	map(0x8000, 0x9fff).ram();
@@ -1705,6 +1704,15 @@ via software as INT1
 /*                                                           */
 /*************************************************************/
 
+void namcos2_state::configure_c116_standard(machine_config &config)
+{
+	PALETTE(config, m_palette, 0x2000);
+	m_palette->enable_shadows();
+
+	NAMCO_C116(config, m_c116, 0);
+	m_c116->set_palette(m_palette);
+}
+
 void namcos2_state::configure_c148_standard(machine_config &config)
 {
 	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
@@ -1761,7 +1769,7 @@ MACHINE_CONFIG_START(namcos2_state::base)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -1770,18 +1778,17 @@ MACHINE_CONFIG_START(namcos2_state::base)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos2)
+	configure_c116_standard(config);
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_namcos2)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -1792,10 +1799,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos2_state::base2)
 	base(config);
 
-	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	m_c140->reset_routes();
+	m_c140->add_route(0, "lspeaker", 1.0);
+	m_c140->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 /* end */
 
@@ -1808,10 +1814,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos2_state::base3)
 	base(config);
 
-	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	m_c140->reset_routes();
+	m_c140->add_route(0, "lspeaker", 0.45);
+	m_c140->add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1842,7 +1847,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -1851,18 +1856,17 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos2)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_namcos2)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	configure_c116_standard(config);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -1893,7 +1897,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -1902,23 +1906,22 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_finallap)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_finallap)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	configure_c116_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finallap)
 
-	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C45_ROAD(config, m_c45_road, 0);
+	m_c45_road->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -1956,7 +1959,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -1965,20 +1968,19 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sgunner)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_sgunner)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	configure_c116_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -2014,7 +2016,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -2023,20 +2025,19 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sgunner)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_sgunner)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	configure_c116_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -2067,7 +2068,7 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -2076,23 +2077,22 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_luckywld)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_luckywld)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	configure_c116_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
 
-	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C45_ROAD(config, m_c45_road, 0);
+	m_c45_road->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 0.75);
+	m_c140->add_route(1, "rspeaker", 0.75);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -2123,7 +2123,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -2132,20 +2132,19 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlhawk)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_metlhawk)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	configure_c116_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
-	MCFG_C140_BANK_TYPE(SYSTEM2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->add_route(0, "lspeaker", 1.0);
+	m_c140->add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
 //  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
@@ -4391,93 +4390,93 @@ ROM_END
 /* ROLLING THUNDER 2 */
 ROM_START( rthun2 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
-	ROM_LOAD16_BYTE( "mpr0.bin",  0x000000, 0x020000, CRC(e09a3549) SHA1(027fe87c98a497c50d12c810b9c7e7216f985dca) )
-	ROM_LOAD16_BYTE( "mpr1.bin",  0x000001, 0x020000, CRC(09573bff) SHA1(b75e036419f95967d5d95c14f1e08aa0c2a05d8a) )
+	ROM_LOAD16_BYTE( "rts2_mpr0.bin",  0x000000, 0x020000, CRC(e09a3549) SHA1(027fe87c98a497c50d12c810b9c7e7216f985dca) )
+	ROM_LOAD16_BYTE( "rts2_mpr1.bin",  0x000001, 0x020000, CRC(09573bff) SHA1(b75e036419f95967d5d95c14f1e08aa0c2a05d8a) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
-	ROM_LOAD16_BYTE( "spr0.bin",  0x000000, 0x010000, CRC(54c22ac5) SHA1(747df2362839e6af15bdbf3298f9ea1c6e25f76a) )
-	ROM_LOAD16_BYTE( "spr1.bin",  0x000001, 0x010000, CRC(060eb393) SHA1(e8f7dd163df16747a74713a6cadd1d52c09b8036) )
+	ROM_LOAD16_BYTE( "rts2_spr0.bin",  0x000000, 0x010000, CRC(54c22ac5) SHA1(747df2362839e6af15bdbf3298f9ea1c6e25f76a) )
+	ROM_LOAD16_BYTE( "rts2_spr1.bin",  0x000001, 0x010000, CRC(060eb393) SHA1(e8f7dd163df16747a74713a6cadd1d52c09b8036) )
 
 	ROM_REGION( 0x050000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "snd0.bin",  0x00c000, 0x004000, CRC(55b7562a) SHA1(47b12206ec4a709769351f3f5b4a1c5ebb98b416) )
-	ROM_CONTINUE(          0x010000, 0x01c000 )
-	ROM_RELOAD(            0x010000, 0x020000 )
-	ROM_LOAD( "snd1.bin",  0x030000, 0x020000, CRC(00445a4f) SHA1(2e136e3c38e4a1b69f80a19e07555f3269b7beb1) )
+	ROM_LOAD( "rst1_snd0.bin",  0x00c000, 0x004000, CRC(55b7562a) SHA1(47b12206ec4a709769351f3f5b4a1c5ebb98b416) )
+	ROM_CONTINUE(               0x010000, 0x01c000 )
+	ROM_RELOAD(                 0x010000, 0x020000 )
+	ROM_LOAD( "rst1_snd1.bin",  0x030000, 0x020000, CRC(00445a4f) SHA1(2e136e3c38e4a1b69f80a19e07555f3269b7beb1) )
 
 	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
-	ROM_LOAD( "obj0.bin",  0x000000, 0x80000, CRC(e5cb82c1) SHA1(2dc1922ecfd9e52af8c4a1edac1df343be64b499) )
-	ROM_LOAD( "obj1.bin",  0x080000, 0x80000, CRC(19ebe9fd) SHA1(6d7991a52a707f710c809eb44f1dfa4873369c17) )
-	ROM_LOAD( "obj2.bin",  0x100000, 0x80000, CRC(455c4a2f) SHA1(9d7944b41e98f990423d315365106890e2c5ae77) )
-	ROM_LOAD( "obj3.bin",  0x180000, 0x80000, CRC(fdcae8a9) SHA1(a1e1057b3263ee9af9e2d861cf8879f51265805e) )
+	ROM_LOAD( "rst1_obj0.bin",  0x000000, 0x80000, CRC(e5cb82c1) SHA1(2dc1922ecfd9e52af8c4a1edac1df343be64b499) )
+	ROM_LOAD( "rst1_obj1.bin",  0x080000, 0x80000, CRC(19ebe9fd) SHA1(6d7991a52a707f710c809eb44f1dfa4873369c17) )
+	ROM_LOAD( "rst1_obj2.bin",  0x100000, 0x80000, CRC(455c4a2f) SHA1(9d7944b41e98f990423d315365106890e2c5ae77) )
+	ROM_LOAD( "rst1_obj3.bin",  0x180000, 0x80000, CRC(fdcae8a9) SHA1(a1e1057b3263ee9af9e2d861cf8879f51265805e) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* Tiles */
-	ROM_LOAD( "chr0.bin",  0x000000, 0x80000, CRC(6f0e9a68) SHA1(873296778104eff11b828273abf7f6ca461c055a) )
-	ROM_LOAD( "chr1.bin",  0x080000, 0x80000, CRC(15e44adc) SHA1(fead0b2d693f9b6267895d8339bb250f5c77fb4d) )
+	ROM_LOAD( "rst1_chr0.bin",  0x000000, 0x80000, CRC(6f0e9a68) SHA1(873296778104eff11b828273abf7f6ca461c055a) )
+	ROM_LOAD( "rst1_chr1.bin",  0x080000, 0x80000, CRC(15e44adc) SHA1(fead0b2d693f9b6267895d8339bb250f5c77fb4d) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* ROZ Tiles */
-	ROM_LOAD( "roz0.bin",  0x000000, 0x80000, CRC(482d0554) SHA1(95b99d1db5851b83b2af4deda2b61635a0562604) )
+	ROM_LOAD( "rst1_roz0.bin",  0x000000, 0x80000, CRC(482d0554) SHA1(95b99d1db5851b83b2af4deda2b61635a0562604) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Mask shape */
 	ROM_LOAD( "shape.bin",  0x000000, 0x80000, CRC(cf58fbbe) SHA1(fbe3b2f0c3267b298993d6238d97b119e13e07f6) )
 
 	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data roms */
-	NAMCOS2_DATA_LOAD_E_128K( "data0.bin",  0x000000, CRC(0baf44ee) SHA1(5135d634f76893adb26a32976a69e2d47e2385c6) )
-	NAMCOS2_DATA_LOAD_O_128K( "data1.bin",  0x000000, CRC(58a8daac) SHA1(c13ae8fc25b748a006c6db5b4b7ae593738544e8) )
-	NAMCOS2_DATA_LOAD_E_128K( "data2.bin",  0x100000, CRC(8e850a2a) SHA1(e5230e80a23ca6d09c2c53f443ecf70cc74075d7) )
+	NAMCOS2_DATA_LOAD_E_128K( "rst1_data0.bin",  0x000000, CRC(0baf44ee) SHA1(5135d634f76893adb26a32976a69e2d47e2385c6) )
+	NAMCOS2_DATA_LOAD_O_128K( "rst1_data1.bin",  0x000000, CRC(58a8daac) SHA1(c13ae8fc25b748a006c6db5b4b7ae593738544e8) )
+	NAMCOS2_DATA_LOAD_E_128K( "rst1_data2.bin",  0x100000, CRC(8e850a2a) SHA1(e5230e80a23ca6d09c2c53f443ecf70cc74075d7) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
-	ROM_LOAD( "voi1.bin",  0x000000, 0x080000, CRC(e42027cd) SHA1(fa3a81118c7f112289c27023236dec2e9cbc78b5) )
-	ROM_LOAD( "voi2.bin",  0x080000, 0x080000, CRC(0c4c2b66) SHA1(7723cbef755439a66d026015596fe1547ccd65b1) )
+	ROM_LOAD( "rst1_voi1.bin",  0x000000, 0x080000, CRC(e42027cd) SHA1(fa3a81118c7f112289c27023236dec2e9cbc78b5) )
+	ROM_LOAD( "rst1_voi2.bin",  0x080000, 0x080000, CRC(0c4c2b66) SHA1(7723cbef755439a66d026015596fe1547ccd65b1) )
 ROM_END
 
 /* ROLLING THUNDER 2 (Japan) */
 ROM_START( rthun2j )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
-	ROM_LOAD16_BYTE( "mpr0j.bin",  0x000000, 0x020000, CRC(2563b9ee) SHA1(c6a4305f88ca5d796f3ba4f36af54fed51c16b75) )
-	ROM_LOAD16_BYTE( "mpr1j.bin",  0x000001, 0x020000, CRC(14c4c564) SHA1(a826176fef65c53518fdbc7b14c7a1a65c821c8c) )
+	ROM_LOAD16_BYTE( "rst1_mpr0.bin",  0x000000, 0x020000, CRC(2563b9ee) SHA1(c6a4305f88ca5d796f3ba4f36af54fed51c16b75) )
+	ROM_LOAD16_BYTE( "rst1_mpr1.bin",  0x000001, 0x020000, CRC(14c4c564) SHA1(a826176fef65c53518fdbc7b14c7a1a65c821c8c) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
-	ROM_LOAD16_BYTE( "spr0j.bin",  0x000000, 0x010000, CRC(f8ef5150) SHA1(92fddf08b97210afe8d47386fe73078ffc00bd90) )
-	ROM_LOAD16_BYTE( "spr1j.bin",  0x000001, 0x010000, CRC(52ed3a48) SHA1(21a9f0be29a7b121f1a8ca802af3a5ebf2c49cc0) )
+	ROM_LOAD16_BYTE( "rst1_spr0.bin",  0x000000, 0x010000, CRC(f8ef5150) SHA1(92fddf08b97210afe8d47386fe73078ffc00bd90) )
+	ROM_LOAD16_BYTE( "rst1_spr1.bin",  0x000001, 0x010000, CRC(52ed3a48) SHA1(21a9f0be29a7b121f1a8ca802af3a5ebf2c49cc0) )
 
 	ROM_REGION( 0x050000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "snd0.bin",  0x00c000, 0x004000, CRC(55b7562a) SHA1(47b12206ec4a709769351f3f5b4a1c5ebb98b416) )
-	ROM_CONTINUE(          0x010000, 0x01c000 )
-	ROM_RELOAD(            0x010000, 0x020000 )
-	ROM_LOAD( "snd1.bin",  0x030000, 0x020000, CRC(00445a4f) SHA1(2e136e3c38e4a1b69f80a19e07555f3269b7beb1) )
+	ROM_LOAD( "rst1_snd0.bin",  0x00c000, 0x004000, CRC(55b7562a) SHA1(47b12206ec4a709769351f3f5b4a1c5ebb98b416) )
+	ROM_CONTINUE(               0x010000, 0x01c000 )
+	ROM_RELOAD(                 0x010000, 0x020000 )
+	ROM_LOAD( "rst1_snd1.bin",  0x030000, 0x020000, CRC(00445a4f) SHA1(2e136e3c38e4a1b69f80a19e07555f3269b7beb1) )
 
 	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
-	ROM_LOAD( "obj0.bin",  0x000000, 0x80000, CRC(e5cb82c1) SHA1(2dc1922ecfd9e52af8c4a1edac1df343be64b499) )
-	ROM_LOAD( "obj1.bin",  0x080000, 0x80000, CRC(19ebe9fd) SHA1(6d7991a52a707f710c809eb44f1dfa4873369c17) )
-	ROM_LOAD( "obj2.bin",  0x100000, 0x80000, CRC(455c4a2f) SHA1(9d7944b41e98f990423d315365106890e2c5ae77) )
-	ROM_LOAD( "obj3.bin",  0x180000, 0x80000, CRC(fdcae8a9) SHA1(a1e1057b3263ee9af9e2d861cf8879f51265805e) )
+	ROM_LOAD( "rst1_obj0.bin",  0x000000, 0x80000, CRC(e5cb82c1) SHA1(2dc1922ecfd9e52af8c4a1edac1df343be64b499) )
+	ROM_LOAD( "rst1_obj1.bin",  0x080000, 0x80000, CRC(19ebe9fd) SHA1(6d7991a52a707f710c809eb44f1dfa4873369c17) )
+	ROM_LOAD( "rst1_obj2.bin",  0x100000, 0x80000, CRC(455c4a2f) SHA1(9d7944b41e98f990423d315365106890e2c5ae77) )
+	ROM_LOAD( "rst1_obj3.bin",  0x180000, 0x80000, CRC(fdcae8a9) SHA1(a1e1057b3263ee9af9e2d861cf8879f51265805e) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* Tiles */
-	ROM_LOAD( "chr0.bin",  0x000000, 0x80000, CRC(6f0e9a68) SHA1(873296778104eff11b828273abf7f6ca461c055a) )
-	ROM_LOAD( "chr1.bin",  0x080000, 0x80000, CRC(15e44adc) SHA1(fead0b2d693f9b6267895d8339bb250f5c77fb4d) )
+	ROM_LOAD( "rst1_chr0.bin",  0x000000, 0x80000, CRC(6f0e9a68) SHA1(873296778104eff11b828273abf7f6ca461c055a) )
+	ROM_LOAD( "rst1_chr1.bin",  0x080000, 0x80000, CRC(15e44adc) SHA1(fead0b2d693f9b6267895d8339bb250f5c77fb4d) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* ROZ Tiles */
-	ROM_LOAD( "roz0.bin",  0x000000, 0x80000, CRC(482d0554) SHA1(95b99d1db5851b83b2af4deda2b61635a0562604) )
+	ROM_LOAD( "rst1_roz0.bin",  0x000000, 0x80000, CRC(482d0554) SHA1(95b99d1db5851b83b2af4deda2b61635a0562604) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Mask shape */
 	ROM_LOAD( "shape.bin",  0x000000, 0x80000, CRC(cf58fbbe) SHA1(fbe3b2f0c3267b298993d6238d97b119e13e07f6) )
 
 	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data roms */
-	NAMCOS2_DATA_LOAD_E_128K( "data0.bin",  0x000000, CRC(0baf44ee) SHA1(5135d634f76893adb26a32976a69e2d47e2385c6) )
-	NAMCOS2_DATA_LOAD_O_128K( "data1.bin",  0x000000, CRC(58a8daac) SHA1(c13ae8fc25b748a006c6db5b4b7ae593738544e8) )
-	NAMCOS2_DATA_LOAD_E_128K( "data2.bin",  0x100000, CRC(8e850a2a) SHA1(e5230e80a23ca6d09c2c53f443ecf70cc74075d7) )
+	NAMCOS2_DATA_LOAD_E_128K( "rst1_data0.bin",  0x000000, CRC(0baf44ee) SHA1(5135d634f76893adb26a32976a69e2d47e2385c6) )
+	NAMCOS2_DATA_LOAD_O_128K( "rst1_data1.bin",  0x000000, CRC(58a8daac) SHA1(c13ae8fc25b748a006c6db5b4b7ae593738544e8) )
+	NAMCOS2_DATA_LOAD_E_128K( "rst1_data2.bin",  0x100000, CRC(8e850a2a) SHA1(e5230e80a23ca6d09c2c53f443ecf70cc74075d7) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
-	ROM_LOAD( "voi1.bin",  0x000000, 0x080000, CRC(e42027cd) SHA1(fa3a81118c7f112289c27023236dec2e9cbc78b5) )
-	ROM_LOAD( "voi2.bin",  0x080000, 0x080000, CRC(0c4c2b66) SHA1(7723cbef755439a66d026015596fe1547ccd65b1) )
+	ROM_LOAD( "rst1_voi1.bin",  0x000000, 0x080000, CRC(e42027cd) SHA1(fa3a81118c7f112289c27023236dec2e9cbc78b5) )
+	ROM_LOAD( "rst1_voi2.bin",  0x080000, 0x080000, CRC(0c4c2b66) SHA1(7723cbef755439a66d026015596fe1547ccd65b1) )
 ROM_END
 
 /* STEEL GUNNER */

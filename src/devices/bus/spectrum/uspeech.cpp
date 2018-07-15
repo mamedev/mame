@@ -136,7 +136,7 @@ WRITE8_MEMBER(spectrum_uspeech_device::mreq_w)
 		m_nsp->set_clock(3500000); // CK / 4 ??
 		break;
 
-		case 0x3001:
+	case 0x3001:
 		// intonation high
 		m_nsp->set_clock(3800000); // TODO: the exact frequency is unknown
 		break;

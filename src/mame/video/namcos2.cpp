@@ -290,92 +290,6 @@ WRITE16_MEMBER( namcos2_state::rozram_word_w )
 
 /**************************************************************************/
 
-uint16_t namcos2_state::get_palette_register( int which )
-{
-	const uint16_t *source = &m_paletteram[0x3000/2];
-	return ((source[which*2]&0xff)<<8) | (source[which*2+1]&0xff);
-}
-
-READ16_MEMBER( namcos2_state::paletteram_word_r )
-{
-	if( (offset&0x1800) == 0x1800 )
-	{
-		/* palette register */
-		offset &= 0x180f;
-
-		/* registers 6,7: unmapped? */
-		if (offset > 0x180b) return 0xff;
-	}
-	return m_paletteram[offset];
-}
-
-WRITE16_MEMBER( namcos2_state::paletteram_word_w )
-{
-	if( (offset&0x1800) == 0x1800 )
-	{
-		/* palette register */
-		offset &= 0x180f;
-
-		if( ACCESSING_BITS_0_7 ) data&=0xff;
-		else data>>=8;
-
-		switch (offset) {
-			/* registers 0-3: clipping */
-
-			/* register 4: ? */
-			/* sets using it:
-			assault:    $0020
-			burnforc:   $0130 after titlescreen
-			dirtfoxj:   $0108 at game start
-			finalap1/2/3:   $00C0
-			finehour:   $0168 after titlescreen
-			fourtrax:   $00E8 and $00F0
-			luckywld:   $00E8 at titlescreen, $00A0 in game and $0118 if in tunnel
-			suzuka8h1/2:    $00E8 and $00A0 */
-			case 0x1808: case 0x1809:
-				// if (data^m_paletteram[offset]) printf("%04X\n",data<<((~offset&1)<<3)|m_paletteram[offset^1]<<((offset&1)<<3));
-				break;
-
-			/* register 5: POSIRQ scanline (only 8 bits used) */
-			/*case 0x180a:*/ case 0x180b:
-				//if (data^m_paletteram[offset]) {
-					m_paletteram[offset] = data;
-				//}
-				break;
-
-			/* registers 6,7: nothing? */
-			default: break;
-		}
-
-		m_paletteram[offset] = data;
-	}
-	else
-	{
-		COMBINE_DATA(&m_paletteram[offset]);
-	}
-}
-
-
-inline void
-namcos2_state::update_palette()
-{
-	int bank;
-	for( bank=0; bank<0x20; bank++ )
-	{
-		int pen = bank*256;
-		int offset = ((pen & 0x1800) << 2) | (pen & 0x07ff);
-		int i;
-		for( i=0; i<256; i++ )
-		{
-			int r = m_paletteram[offset | 0x0000] & 0x00ff;
-			int g = m_paletteram[offset | 0x0800] & 0x00ff;
-			int b = m_paletteram[offset | 0x1000] & 0x00ff;
-			m_palette->set_pen_color(pen++,rgb_t(r,g,b));
-			offset++;
-		}
-	}
-}
-
 /**************************************************************************/
 
 void namcos2_state::draw_sprite_init()
@@ -399,10 +313,10 @@ void namcos2_state::video_start()
 
 void namcos2_state::apply_clip( rectangle &clip, const rectangle &cliprect )
 {
-	clip.min_x = get_palette_register(0) - 0x4a;
-	clip.max_x = get_palette_register(1) - 0x4a - 1;
-	clip.min_y = get_palette_register(2) - 0x21;
-	clip.max_y = get_palette_register(3) - 0x21 - 1;
+	clip.min_x = m_c116->get_reg(0) - 0x4a;
+	clip.max_x = m_c116->get_reg(1) - 0x4a - 1;
+	clip.min_y = m_c116->get_reg(2) - 0x21;
+	clip.max_y = m_c116->get_reg(3) - 0x21 - 1;
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 }
@@ -412,7 +326,6 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	rectangle clip;
 	int pri;
 
-	update_palette();
 	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
@@ -454,7 +367,6 @@ uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind
 	rectangle clip;
 	int pri;
 
-	update_palette();
 	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
@@ -503,7 +415,6 @@ uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind
 	rectangle clip;
 	int pri;
 
-	update_palette();
 	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
@@ -536,7 +447,6 @@ uint32_t namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind1
 	rectangle clip;
 	int pri;
 
-	update_palette();
 	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
@@ -568,7 +478,6 @@ uint32_t namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind
 	rectangle clip;
 	int pri;
 
-	update_palette();
 	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 

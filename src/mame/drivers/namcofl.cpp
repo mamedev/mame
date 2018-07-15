@@ -607,8 +607,8 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcofl)
 
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C116(config, m_c116, 0);
+	m_c116->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 

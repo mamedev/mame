@@ -36,18 +36,12 @@ TILE_GET_INFO_MEMBER(bbusters_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0,tile&0xfff,tile>>12,0);
 }
 
-TILE_GET_INFO_MEMBER(bbusters_state::get_pf1_tile_info)
+template<int Layer, int Gfx>
+TILE_GET_INFO_MEMBER(bbusters_state::get_pf_tile_info)
 {
-	uint16_t tile = m_pf1_data[tile_index];
+	uint16_t tile = m_pf_data[Layer][tile_index];
 
-	SET_TILE_INFO_MEMBER(3,tile&0xfff,tile>>12,0);
-}
-
-TILE_GET_INFO_MEMBER(bbusters_state::get_pf2_tile_info)
-{
-	uint16_t tile = m_pf2_data[tile_index];
-
-	SET_TILE_INFO_MEMBER(4,tile&0xfff,tile>>12,0);
+	SET_TILE_INFO_MEMBER(Gfx,tile&0xfff,tile>>12,0);
 }
 
 WRITE16_MEMBER(bbusters_state::video_w)
@@ -56,39 +50,27 @@ WRITE16_MEMBER(bbusters_state::video_w)
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bbusters_state::pf1_w)
-{
-	COMBINE_DATA(&m_pf1_data[offset]);
-	m_pf1_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(bbusters_state::pf2_w)
-{
-	COMBINE_DATA(&m_pf2_data[offset]);
-	m_pf2_tilemap->mark_tile_dirty(offset);
-}
-
 /******************************************************************************/
 
-VIDEO_START_MEMBER(bbusters_state,bbuster)
+void bbusters_state::video_start()
 {
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_pf1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
-	m_pf2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_pf2_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
+	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&bbusters_state::get_pf_tile_info<0,3>, "layer0_gfx3", this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
+	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&bbusters_state::get_pf_tile_info<1,4>, "layer1_gfx4", this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
 
-	m_pf1_tilemap->set_transparent_pen(15);
+	m_pf_tilemap[0]->set_transparent_pen(15);
 	m_fix_tilemap->set_transparent_pen(15);
 
 	save_item(NAME(m_scale_line_count));
 }
 
-VIDEO_START_MEMBER(bbusters_state,mechatt)
+void mechatt_state::video_start()
 {
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_pf1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
-	m_pf2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_pf2_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mechatt_state::get_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&mechatt_state::get_pf_tile_info<0,2>, "layer0_gfx2", this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
+	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&mechatt_state::get_pf_tile_info<1,3>, "layer1_gfx3", this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
 
-	m_pf1_tilemap->set_transparent_pen(15);
+	m_pf_tilemap[0]->set_transparent_pen(15);
 	m_fix_tilemap->set_transparent_pen(15);
 
 	save_item(NAME(m_scale_line_count));
@@ -196,7 +178,6 @@ void bbusters_state::draw_block(bitmap_ind16 &dest,int x,int y,int size,int flip
 
 void bbusters_state::draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, int bank, int colval, int colmask)
 {
-	const uint8_t *scale_table=memregion("user1")->base();
 	int offs;
 
 	for (offs = 0;offs <0x800 ;offs += 4) {
@@ -243,25 +224,25 @@ void bbusters_state::draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, 
 		switch ((source[offs+0]>>8)&0x3) {
 			case 0:
 				scale=source[offs+0]&0x7;
-				m_scale_table_ptr = scale_table+0x387f+(0x80*scale);
+				m_scale_table_ptr = m_scale_table+0x387f+(0x80*scale);
 				m_scale_line_count = 0x10-scale;
 				draw_block(bitmap,x,y,16,fx,fy,sprite,colour,bank,block);
 				break;
 			case 1: /* 2 x 2 */
 				scale=source[offs+0]&0xf;
-				m_scale_table_ptr = scale_table+0x707f+(0x80*scale);
+				m_scale_table_ptr = m_scale_table+0x707f+(0x80*scale);
 				m_scale_line_count = 0x20-scale;
 				draw_block(bitmap,x,y,32,fx,fy,sprite,colour,bank,block);
 				break;
 			case 2: /* 64 by 64 block (2 x 2) x 2 */
 				scale=source[offs+0]&0x1f;
-				m_scale_table_ptr = scale_table+0xa07f+(0x80*scale);
+				m_scale_table_ptr = m_scale_table+0xa07f+(0x80*scale);
 				m_scale_line_count = 0x40-scale;
 				draw_block(bitmap,x,y,64,fx,fy,sprite,colour,bank,block);
 				break;
 			case 3: /* 2 x 2 x 2 x 2 */
 				scale=source[offs+0]&0x3f;
-				m_scale_table_ptr = scale_table+0xc07f+(0x80*scale);
+				m_scale_table_ptr = m_scale_table+0xc07f+(0x80*scale);
 				m_scale_line_count = 0x80-scale;
 				draw_block(bitmap,x,y,128,fx,fy,sprite,colour,bank,block);
 				break;
@@ -271,32 +252,32 @@ void bbusters_state::draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, 
 
 /******************************************************************************/
 
-uint32_t bbusters_state::screen_update_bbuster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bbusters_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_pf1_tilemap->set_scrollx(0, m_pf1_scroll_data[0]);
-	m_pf1_tilemap->set_scrolly(0, m_pf1_scroll_data[1]);
-	m_pf2_tilemap->set_scrollx(0, m_pf2_scroll_data[0]);
-	m_pf2_tilemap->set_scrolly(0, m_pf2_scroll_data[1]);
+	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_data[0][0]);
+	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_data[0][1]);
+	m_pf_tilemap[1]->set_scrollx(0, m_pf_scroll_data[1][0]);
+	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_data[1][1]);
 
-	m_pf2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	//draw_sprites(machine(), bitmap, m_spriteram2->buffer(), 2, 0x8, 0x8);
-	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, m_spriteram2->buffer(), 2, 0, 0);
-	draw_sprites(bitmap, m_spriteram->buffer(), 1, 0, 0);
+	m_pf_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	//draw_sprites(bitmap, m_spriteram[1]->buffer(), 2, 0x8, 0x8);
+	m_pf_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, m_spriteram[1]->buffer(), 2, 0, 0);
+	draw_sprites(bitmap, m_spriteram[0]->buffer(), 1, 0, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-uint32_t bbusters_state::screen_update_mechatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mechatt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_pf1_tilemap->set_scrollx(0, m_pf1_scroll_data[0]);
-	m_pf1_tilemap->set_scrolly(0, m_pf1_scroll_data[1]);
-	m_pf2_tilemap->set_scrollx(0, m_pf2_scroll_data[0]);
-	m_pf2_tilemap->set_scrolly(0, m_pf2_scroll_data[1]);
+	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_data[0][0]);
+	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_data[0][1]);
+	m_pf_tilemap[1]->set_scrollx(0, m_pf_scroll_data[1][0]);
+	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_data[1][1]);
 
-	m_pf2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, m_spriteram->buffer(), 1, 0, 0);
+	m_pf_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	m_pf_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, m_spriteram[0]->buffer(), 1, 0, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

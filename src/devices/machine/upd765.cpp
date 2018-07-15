@@ -474,9 +474,13 @@ uint8_t upd765_family_device::read_fifo()
 		memmove(result, result+1, result_pos);
 		if(!result_pos)
 			main_phase = PHASE_CMD;
-		else if(result_pos == 1)
+		else if(result_pos == 1) {
 			// clear drive busy bit after the first sense interrupt status result byte is read
+			for(floppy_info &fi : flopi)
+				if((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
+					fi.main_state = IDLE;
 			clr_drive_busy();
+		}
 		break;
 	default:
 		LOGFIFO("read_fifo in phase %d\n", main_phase);
@@ -1468,11 +1472,11 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 {
 	LOGCOMMAND("command done (%s) - %s\n", data_completion ? "data" : "seek", results());
 	fi.main_state = fi.sub_state = IDLE;
-	fi.st0_filled = true;
 	if(data_completion)
 		data_irq = true;
 	else {
 		other_irq = true;
+		fi.st0_filled = true;
 	}
 	check_irq();
 }

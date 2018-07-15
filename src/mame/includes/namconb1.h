@@ -9,7 +9,6 @@
 #include "namcos2.h"
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
-#include "video/namco_c116.h"
 
 #define NAMCONB1_HTOTAL     (288)   /* wrong */
 #define NAMCONB1_HBSTART    (288)
@@ -31,7 +30,6 @@ class namconb1_state : public namcos2_shared_state
 public:
 	namconb1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcos2_shared_state(mconfig, type, tag),
-		m_c116(*this, "c116"),
 		m_eeprom(*this, "eeprom"),
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2"),
@@ -44,6 +42,7 @@ public:
 		m_light1_y(*this, "LIGHT1_Y"),
 		m_spritebank32(*this, "spritebank32"),
 		m_tilebank32(*this, "tilebank32"),
+		m_rozbank32(*this, "rozbank32"),
 		m_namconb_shareram(*this, "namconb_share") { }
 
 	void namconb1(machine_config &config);
@@ -63,7 +62,6 @@ public:
 	void init_gslgr94u();
 
 private:
-	required_device<namco_c116_device> m_c116;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
 	required_ioport m_p1;
 	required_ioport m_p2;
@@ -76,6 +74,7 @@ private:
 	optional_ioport m_light1_y;
 	required_shared_ptr<uint32_t> m_spritebank32;
 	optional_shared_ptr<uint32_t> m_tilebank32;
+	optional_shared_ptr<uint32_t> m_rozbank32;
 	required_shared_ptr<uint16_t> m_namconb_shareram;
 
 	uint8_t m_vbl_irq_level;
@@ -108,8 +107,9 @@ private:
 	DECLARE_READ8_MEMBER(dac1_r);
 	DECLARE_READ8_MEMBER(dac0_r);
 
+	DECLARE_WRITE32_MEMBER(rozbank32_w);
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(namconb);
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(namconb1);
 	DECLARE_VIDEO_START(machbrkr);
 	DECLARE_VIDEO_START(outfxies);

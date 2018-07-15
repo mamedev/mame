@@ -1072,8 +1072,8 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C116(config, m_c116, 0);
+	m_c116->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -15,17 +15,21 @@
 #pragma once
 
 #include "emu.h"
+#include "ps2gif.h"
+#include "ps2vif1.h"
 
 class ps2_dmac_device : public device_t, public device_execute_interface
 {
 public:
-	template <typename T, typename U, typename V>
-    ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&ee_tag, U &&ram_tag, V &&sif_tag)
+	template <typename T, typename U, typename V, typename W, typename X>
+    ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&ee_tag, U &&ram_tag, V &&sif_tag, W &&gif_tag, X &&vif1_tag)
     	: ps2_dmac_device(mconfig, tag, owner, clock)
     {
 		m_ee.set_tag(std::forward<T>(ee_tag));
 		m_ram.set_tag(std::forward<U>(ram_tag));
 		m_sif.set_tag(std::forward<V>(sif_tag));
+		m_gif.set_tag(std::forward<W>(gif_tag));
+		m_vif1.set_tag(std::forward<X>(vif1_tag));
 	}
 
     ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -113,6 +117,8 @@ protected:
 		uint32_t m_tag_addr;
 	};
 
+	void transfer_vif1();
+	void transfer_gif();
 	void transfer_sif0();
 	void transfer_sif1();
 	void transfer_finish(uint32_t chan);
@@ -122,6 +128,8 @@ protected:
 	required_device<cpu_device> m_ee;
 	required_shared_ptr<uint64_t> m_ram;
 	required_device<ps2_sif_device> m_sif;
+	required_device<ps2_gif_device> m_gif;
+	required_device<ps2_vif1_device> m_vif1;
 
 	int m_icount;
 

@@ -917,9 +917,9 @@ static const gfx_layout shape_layout =
 };
 
 static GFXDECODE_START( gfx_namcona1 )
-	GFXDECODE_RAM( "cgram", 0, cg_layout_8bpp, 0, 0x2000/256 )
-	GFXDECODE_RAM( "cgram", 0, cg_layout_4bpp, 0, 0x2000/16  )
-	GFXDECODE_RAM(  nullptr,   0, shape_layout,   0, 0x2000/2   )
+	GFXDECODE_RAM( "cgram",  0, cg_layout_8bpp, 0, 0x2000/256 )
+	GFXDECODE_RAM( "cgram",  0, cg_layout_4bpp, 0, 0x2000/16  )
+	GFXDECODE_RAM(  nullptr, 0, shape_layout,   0, 0x2000/2   )
 GFXDECODE_END
 
 /***************************************************************************/
@@ -991,10 +991,10 @@ MACHINE_CONFIG_START(namcona1_state::namcona1)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", 44100)
-	MCFG_C140_BANK_TYPE(ASIC219)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
+	C140(config, m_c140, 44100);
+	m_c140->set_bank_type(c140_device::C140_TYPE::ASIC219);
+	m_c140->add_route(0, "rspeaker", 1.00);
+	m_c140->add_route(1, "lspeaker", 1.00);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcona2_state::namcona2)
