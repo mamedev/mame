@@ -821,6 +821,26 @@ inline void cosmac_device::set_q_flag(int state)
 
 
 //-------------------------------------------------
+//  put_low_reg - set the low byte of a register
+//-------------------------------------------------
+
+inline void cosmac_device::put_low_reg(int reg, uint8_t data)
+{
+	R[reg] = (R[reg] & 0xff00) | data;
+}
+
+
+//-------------------------------------------------
+//  put_high_reg - set the high byte of a register
+//-------------------------------------------------
+
+inline void cosmac_device::put_high_reg(int reg, uint8_t data)
+{
+	R[reg] = (R[reg] & 0x00ff) | data << 8;
+}
+
+
+//-------------------------------------------------
 //  fetch_instruction - fetch instruction from
 //  the program memory
 //-------------------------------------------------
@@ -1030,9 +1050,9 @@ void cosmac_device::inc()   { R[N]++; }
 void cosmac_device::dec()   { R[N]--; }
 void cosmac_device::irx()   { R[X]++; }
 void cosmac_device::glo()   { D = R[N] & 0xff; }
-void cosmac_device::plo()   { R[N] = (R[N] & 0xff00) | D; }
+void cosmac_device::plo()   { put_low_reg(N, D); }
 void cosmac_device::ghi()   { D = R[N] >> 8; }
-void cosmac_device::phi()   { R[N] = (D << 8) | (R[N] & 0xff); }
+void cosmac_device::phi()   { put_high_reg(N, D); }
 
 // logic operations opcode handlers
 void cosmac_device::_or()   { D = RAM_R(R[X]) | D; }
@@ -1097,7 +1117,7 @@ void cosmac_device::short_branch(int taken)
 {
 	if (taken)
 	{
-		R[P] = (R[P] & 0xff00) | OPCODE_R(R[P]);
+		put_low_reg(P, OPCODE_R(R[P]));
 	}
 	else
 	{

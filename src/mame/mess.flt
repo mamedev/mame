@@ -316,6 +316,7 @@ interpro.cpp
 intv.cpp
 ipc.cpp
 ipds.cpp
+iphone2g.cpp
 iq151.cpp
 iqunlim.cpp
 iris3130.cpp

@@ -107,7 +107,7 @@ void scn2674_device::device_start()
 	screen().register_screen_bitmap(m_bitmap);
 
 	m_char_space = &space(0);
-	if (m_attr_space != nullptr)
+	if (has_space(1))
 		m_attr_space = &space(1);
 
 	save_item(NAME(m_address));
@@ -633,7 +633,7 @@ void scn2674_device::write_delayed_command(uint8_t data)
 		// write at pointer address
 		m_char_space->write_byte(m_display_pointer_address, m_char_buffer);
 		if (m_attr_space != nullptr)
-			m_attr_space->write_byte(m_display_pointer_address, m_char_buffer);
+			m_attr_space->write_byte(m_display_pointer_address, m_attr_buffer);
 		LOGMASKED(LOG_COMMAND, "%s: DELAYED write at display pointer address %02x\n", machine().describe_context(), data);
 		break;
 

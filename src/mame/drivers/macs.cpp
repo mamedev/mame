@@ -84,6 +84,10 @@ public:
 	void init_kisekaem();
 	void init_macs2();
 
+protected:
+	void machine_reset() override;
+	void machine_start() override;
+
 private:
 	uint8_t m_mux_data;
 	uint8_t m_rev;
@@ -94,8 +98,6 @@ private:
 	DECLARE_READ8_MEMBER(macs_input_r);
 	DECLARE_WRITE8_MEMBER(macs_rom_bank_w);
 	DECLARE_WRITE8_MEMBER(macs_output_w);
-	DECLARE_MACHINE_RESET(macs);
-	DECLARE_MACHINE_START(macs);
 	uint8_t dma_offset();
 
 	uint32_t screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -506,9 +508,6 @@ MACHINE_CONFIG_START(macs_state::macs)
 	m_maincpu->set_io_map(&macs_state::macs_io);
 	m_maincpu->set_dma_offs_callback(FUNC(macs_state::dma_offset), this);
 
-	MCFG_MACHINE_START_OVERRIDE(macs_state, macs)
-	MCFG_MACHINE_RESET_OVERRIDE(macs_state, macs)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -656,7 +655,7 @@ static const uint8_t ramdata[160]=
 };
 #endif
 
-MACHINE_START_MEMBER(macs_state,macs)
+void macs_state::machine_start()
 {
 	m_rombank[0]->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
 	m_rombank[0]->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
@@ -675,9 +674,9 @@ MACHINE_START_MEMBER(macs_state,macs)
 	m_rambank[1]->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(macs_state,macs)
+void macs_state::machine_reset()
 {
-	#if 0
+#if 0
 	uint8_t *macs_ram1 = m_ram1.get();
 	uint8_t *macs_ram2 = m_ram2;
 /*
@@ -708,45 +707,42 @@ MACHINE_RESET_MEMBER(macs_state,macs)
         730E: ED B0         ldir
         ...
 */
-		memcpy(macs_ram1 + 0x0e9f, memregion("bios")->base()+0x7327, 0xc7);
-		memcpy(macs_ram1 + 0x1e9f, memregion("bios")->base()+0x7327, 0xc7);
+	memcpy(macs_ram1 + 0x0e9f, memregion("bios")->base()+0x7327, 0xc7);
+	memcpy(macs_ram1 + 0x1e9f, memregion("bios")->base()+0x7327, 0xc7);
 
-		memcpy(macs_ram1 + 0x0800, memregion("bios")->base()+0x73fa, 0x507);
-		memcpy(macs_ram1 + 0x1800, memregion("bios")->base()+0x73fa, 0x507);
+	memcpy(macs_ram1 + 0x0800, memregion("bios")->base()+0x73fa, 0x507);
+	memcpy(macs_ram1 + 0x1800, memregion("bios")->base()+0x73fa, 0x507);
 
 #define MAKEJMP(n,m)    macs_ram2[(n) - 0xe800 + 0]=0xc3;\
 						macs_ram2[(n) - 0xe800 + 1]=(m)&0xff;\
 						macs_ram2[(n) - 0xe800 + 2]=((m)>>8)&0xff;
 
-		MAKEJMP(0xe810, 0xfe4b);
-		MAKEJMP(0xe816, 0xfe9f);
-		MAKEJMP(0xe81a, 0xfee0);
+	MAKEJMP(0xe810, 0xfe4b);
+	MAKEJMP(0xe816, 0xfe9f);
+	MAKEJMP(0xe81a, 0xfee0);
 
 #undef MAKEJMP
 
-		{
-			int i;
-			for(i=0;i<160;i++)
-			{
-				macs_ram1[0xe00+i]=ramdata[i];
-				macs_ram1[0x1e00+i]=ramdata[i];
-			}
-		}
-		macs_ram1[0x0f67]=0xff;
-		macs_ram1[0x1f67]=0xff;
+	for(int i=0;i<160;i++)
+	{
+		macs_ram1[0xe00+i]=ramdata[i];
+		macs_ram1[0x1e00+i]=ramdata[i];
+	}
+	macs_ram1[0x0f67]=0xff;
+	macs_ram1[0x1f67]=0xff;
 
-		macs_ram1[0x0ff6]=0x02;
-		macs_ram1[0x1ff6]=0x02;
+	macs_ram1[0x0ff6]=0x02;
+	macs_ram1[0x1ff6]=0x02;
 
-		macs_ram1[0x0ff7]=0x08;
-		macs_ram1[0x1ff7]=0x08;
+	macs_ram1[0x0ff7]=0x08;
+	macs_ram1[0x1ff7]=0x08;
 
-		macs_ram1[0x0ff8]=0x6c;
-		macs_ram1[0x1ff8]=0x6c;
+	macs_ram1[0x0ff8]=0x6c;
+	macs_ram1[0x1ff8]=0x6c;
 
-		macs_ram1[0x0ff9]=0x07;
-		macs_ram1[0x1ff9]=0x07;
-		#endif
+	macs_ram1[0x0ff9]=0x07;
+	macs_ram1[0x1ff9]=0x07;
+#endif
 }
 
 
