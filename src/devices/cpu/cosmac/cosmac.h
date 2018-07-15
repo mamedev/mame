@@ -261,6 +261,8 @@ protected:
 	inline void sample_ef_lines();
 	inline void output_state_code();
 	inline void set_q_flag(int state);
+	inline void put_low_reg(int reg, uint8_t data);
+	inline void put_high_reg(int reg, uint8_t data);
 
 	// arithmetic handlers
 	void add(int left, int right);
@@ -441,7 +443,7 @@ protected:
 
 	// opcode/condition tables
 	typedef void (cosmac_device::*ophandler)();
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) = 0;
+	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const = 0;
 };
 
 
@@ -457,7 +459,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
+	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const override;
 
 	static const ophandler s_opcodetable[256];
 };
@@ -475,7 +477,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
+	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const override;
 
 	static const ophandler s_opcodetable[256];
 };

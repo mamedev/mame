@@ -27,7 +27,7 @@ class acia6850_device :  public device_t
 {
 public:
 	// construction/destruction
-	acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// static configuration helpers
 	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }

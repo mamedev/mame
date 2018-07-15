@@ -78,6 +78,7 @@ protected:
 	void xbox_base_map(address_map &map);
 	void xbox_base_map_io(address_map &map);
 
+private:
 	void dump_string_command(int ref, const std::vector<std::string> &params);
 	void dump_process_command(int ref, const std::vector<std::string> &params);
 	void dump_list_command(int ref, const std::vector<std::string> &params);

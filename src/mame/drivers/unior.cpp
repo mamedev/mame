@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(unior_state::unior)
 	m_pit->set_clk<1>(20_MHz_XTAL / 9);
 	m_pit->out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
 	m_pit->out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
-	m_pit->set_clk<1>(16_MHz_XTAL / 9 / 64); // unknown frequency
+	m_pit->set_clk<2>(16_MHz_XTAL / 9 / 64); // unknown frequency
 	m_pit->out_handler<2>().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	MCFG_DEVICE_ADD("ppi0", I8255, 0)

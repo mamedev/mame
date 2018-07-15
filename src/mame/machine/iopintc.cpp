@@ -40,11 +40,11 @@ READ32_MEMBER(iop_intc_device::read)
 	{
 		case 0: // I_STAT
 			ret = m_status;
-			logerror("%s: read: I_STAT %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: read: I_STAT %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 1: // I_MASK
 			ret = m_mask;
-			logerror("%s: read: I_MASK %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+			//logerror("%s: read: I_MASK %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 			break;
 		case 2: // I_ENABLE
 			ret = m_enabled ? 1 : 0;
@@ -64,12 +64,12 @@ WRITE32_MEMBER(iop_intc_device::write)
 	switch (offset)
 	{
 		case 0: // I_STAT
-			logerror("%s: write: I_STAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: write: I_STAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			m_status &= data;
 			update_interrupts();
 			break;
 		case 1: // I_MASK
-			logerror("%s: write: I_MASK = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			//logerror("%s: write: I_MASK = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			m_mask = data;
 			update_interrupts();
 			break;
@@ -86,7 +86,7 @@ WRITE32_MEMBER(iop_intc_device::write)
 
 void iop_intc_device::raise_interrupt(uint32_t line)
 {
-	logerror("%s: raise_interrupt: %d\n", machine().describe_context(), line);
+	//logerror("%s: raise_interrupt: %d\n", machine().describe_context(), line);
 	m_status |= (1 << line);
 	update_interrupts();
 }

@@ -493,7 +493,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sprint2_state::sprint2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'096'000) / 16)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 16)
 	MCFG_DEVICE_PROGRAM_MAP(sprint2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprint2_state,  sprint2)
 
@@ -502,9 +502,7 @@ MACHINE_CONFIG_START(sprint2_state::sprint2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 223)
+	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL, 768, 0, 512, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint2_state, screen_update_sprint2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint2_state, screen_vblank_sprint2))
 	MCFG_SCREEN_PALETTE("palette")

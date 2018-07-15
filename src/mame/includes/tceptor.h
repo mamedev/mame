@@ -8,8 +8,8 @@
 class tceptor_state : public driver_device
 {
 public:
-	tceptor_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tceptor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_mcu(*this, "mcu"),
@@ -45,12 +45,9 @@ private:
 	int m_sprite32;
 	int m_bg;
 	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_bg1_tilemap;
-	tilemap_t *m_bg2_tilemap;
-	int32_t m_bg1_scroll_x;
-	int32_t m_bg1_scroll_y;
-	int32_t m_bg2_scroll_x;
-	int32_t m_bg2_scroll_y;
+	tilemap_t *m_bg_tilemap[2];
+	int32_t m_bg_scroll_x[2];
+	int32_t m_bg_scroll_y[2];
 	bitmap_ind16 m_temp_bitmap;
 	std::unique_ptr<uint16_t[]> m_sprite_ram_buffered;
 	std::unique_ptr<uint8_t[]> m_decoded_16;

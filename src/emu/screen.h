@@ -208,7 +208,7 @@ public:
 	}
 	void set_raw(const XTAL &xtal, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart) { set_raw(xtal.value(), htotal, hbend, hbstart, vtotal, vbend, vbstart); }
 	void set_refresh(attoseconds_t rate) { m_refresh = rate; }
-	void set_refresh_hz(attoseconds_t hz) { set_refresh(HZ_TO_ATTOSECONDS(hz)); }
+	template <typename T> void set_refresh_hz(T &&hz) { set_refresh(HZ_TO_ATTOSECONDS(std::forward<T>(hz))); }
 	void set_vblank_time(attoseconds_t time) { m_vblank = time; m_oldstyle_vblank_supplied = true; }
 	void set_size(u16 width, u16 height) { m_width = width; m_height = height; }
 	void set_visarea(s16 minx, s16 maxx, s16 miny, s16 maxy) { m_visarea.set(minx, maxx, miny, maxy); }

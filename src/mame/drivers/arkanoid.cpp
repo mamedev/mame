@@ -1350,8 +1350,8 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
 
-	MCFG_DEVICE_ADD("mcu", ARKANOID_68705P5, XTAL(12'000'000)/4) /* verified on pcb */
-	MCFG_ARKANOID_MCU_PORTB_R_CB(IOPORT("MUX"))
+	ARKANOID_68705P5(config, m_mcuintf, 12_MHz_XTAL / 4); // verified on PCB
+	m_mcuintf->portb_r_cb().set_ioport("MUX");
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
@@ -1378,20 +1378,17 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(arkanoid_state::p3mcu)
+void arkanoid_state::p3mcu(machine_config &config)
+{
 	arkanoid(config);
 
 	/* unprotected MCU */
-	MCFG_DEVICE_REPLACE("mcu", ARKANOID_68705P3, XTAL(12'000'000)/4)
-	MCFG_ARKANOID_MCU_PORTB_R_CB(IOPORT("MUX"))
-MACHINE_CONFIG_END
+	ARKANOID_68705P3(config.replace(), m_mcuintf, 12_MHz_XTAL / 4);
+	m_mcuintf->portb_r_cb().set_ioport("MUX");
+}
 
 MACHINE_CONFIG_START(arkanoid_state::p3mcuay)
-	arkanoid(config);
-
-	/* unprotected MCU */
-	MCFG_DEVICE_REPLACE("mcu", ARKANOID_68705P3, XTAL(12'000'000)/4)
-	MCFG_ARKANOID_MCU_PORTB_R_CB(IOPORT("MUX"))
+	p3mcu(config);
 
 	MCFG_DEVICE_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4) // AY-3-8910A
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
@@ -1412,6 +1409,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(arkanoid_state::aysnd)
 	bootleg(config);
+
 	MCFG_DEVICE_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))

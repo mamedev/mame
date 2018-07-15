@@ -6,6 +6,10 @@
     Taito Qix hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_QIX_H
+#define MAME_INCLUDES_QIX_H
+
+#pragma once
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6805/m68705.h"
@@ -30,8 +34,8 @@
 class qix_state : public driver_device
 {
 public:
-	qix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	qix_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_videocpu(*this, "videocpu"),
@@ -53,7 +57,8 @@ public:
 		m_scanline_latch(*this, "scanline_latch"),
 		m_bank0(*this, "bank0"),
 		m_bank1(*this, "bank1"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{ }
 
 	void mcu(machine_config &config);
 	void qix_base(machine_config &config);
@@ -172,3 +177,5 @@ private:
 	void zoo_main_map(address_map &map);
 	void zookeep_video_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_QIX_H

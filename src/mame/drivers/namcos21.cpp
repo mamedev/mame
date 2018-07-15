@@ -528,7 +528,6 @@ Filter Board
 #include "cpu/tms32025/tms32025.h"
 #include "sound/ym2151.h"
 #include "machine/nvram.h"
-#include "sound/c140.h"
 #include "speaker.h"
 
 
@@ -1537,7 +1536,7 @@ void namcos21_state::sound_map(address_map &map)
 	map(0x0000, 0x3fff).bankr("bank6"); /* banked */
 	map(0x3000, 0x3003).nopw(); /* ? */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x5000, 0x6fff).rw("c140", FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
+	map(0x5000, 0x6fff).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
 	map(0x7000, 0x77ff).rw(FUNC(namcos21_state::namcos2_dualportram_byte_r), FUNC(namcos21_state::namcos2_dualportram_byte_w)).share("mpdualportram");
 	map(0x7800, 0x7fff).rw(FUNC(namcos21_state::namcos2_dualportram_byte_r), FUNC(namcos21_state::namcos2_dualportram_byte_w)); /* mirror */
 	map(0x8000, 0x9fff).ram();
@@ -1901,16 +1900,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 	}
 }
 
-MACHINE_CONFIG_START(namcos21_state::configure_c148_standard)
-	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
-	MCFG_NAMCO_C148_LINK("slave_intc")
-	MCFG_NAMCO_C148_EXT1_CB(WRITE8(*this, namcos21_state, sound_reset_w))
-	MCFG_NAMCO_C148_EXT2_CB(WRITE8(*this, namcos21_state, system_reset_w))
+void namcos21_state::configure_c148_standard(machine_config &config)
+{
+	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
+	m_master_intc->link_c148_device(m_slave_intc);
+	m_master_intc->out_ext1_callback().set(FUNC(namcos21_state::sound_reset_w));
+	m_master_intc->out_ext2_callback().set(FUNC(namcos21_state::system_reset_w));
 
-	MCFG_NAMCO_C148_ADD("slave_intc","slave",false)
-	MCFG_NAMCO_C148_LINK("master_intc")
-
-MACHINE_CONFIG_END
+	NAMCO_C148(config, m_slave_intc, 0, m_slave, false);
+	m_slave_intc->link_c148_device(m_master_intc);
+}
 
 MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
@@ -1958,7 +1957,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_SCREEN_PALETTE("palette")
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
@@ -1969,10 +1968,10 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_C140_BANK_TYPE(SYSTEM21)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	C140(config, m_c140, 8000000/374);
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	m_c140->add_route(0, "lspeaker", 0.50);
+	m_c140->add_route(1, "rspeaker", 0.50);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
@@ -2015,7 +2014,7 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	MCFG_DEVICE_ADD("gearbox", NAMCOIO_GEARBOX, 0)
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
@@ -2031,10 +2030,10 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_C140_BANK_TYPE(SYSTEM21)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	C140(config, m_c140, 8000000/374);
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	m_c140->add_route(0, "lspeaker", 0.50);
+	m_c140->add_route(1, "rspeaker", 0.50);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
@@ -2071,8 +2070,8 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_DEVICE_PROGRAM_MAP(winrun_gpu_map)
 
 	configure_c148_standard(config);
-	MCFG_NAMCO_C148_ADD("gpu_intc","gpu",false)
-	MCFG_NAMCO_C139_ADD("sci")
+	NAMCO_C148(config, m_gpu_intc, 0, "gpu", false);
+	NAMCO_C139(config, m_sci, 0);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
@@ -2085,8 +2084,6 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_winrun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
-
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)
 
@@ -2095,10 +2092,10 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_C140_BANK_TYPE(SYSTEM21)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	C140(config, m_c140, 8000000/374);
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	m_c140->add_route(0, "lspeaker", 0.50);
+	m_c140->add_route(1, "rspeaker", 0.50);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)

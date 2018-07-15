@@ -58,7 +58,7 @@ Undumped:
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="fallblock.bin" size="8192" crc="58e409fb" sha1="f6f7e3dae361fbd56d4a8457d81bb4f3828c48aB" offset="00000" />
+				<rom name="fallblock.bin" size="8192" crc="58e409fb" sha1="f6f7e3dae361fbd56d4a8457d81bb4f3828c48ab" offset="00000" />
 			</dataarea>
 		</part>
 	</software>

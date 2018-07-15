@@ -668,12 +668,12 @@ come from... they might be eventually removed -->
 			<dataarea name="ram" size="65536">
 			</dataarea>
 			<dataarea name="rom" size="0x16000">
-				<rom name="krx_rom2.rom" size="0x2000" crc="5AF18FBD" sha1="cd67d65fb51cdb3a47cc8350a878a77360a353c8" offset="0x0000"/>
+				<rom name="krx_rom2.rom" size="0x2000" crc="5af18fbd" sha1="cd67d65fb51cdb3a47cc8350a878a77360a353c8" offset="0x0000"/>
 				<rom name="basic-i (198x)(sord)(jp).bin" size="0x2000" crc="9a98e6ce" sha1="d11f7623919ee593e275e9f00f8a4acf7aed3cf5" offset="0x2000"/>
-				<rom name="krx_rom4.rom" size="0x4000" crc="27FFB883" sha1="be930946e7cd5f0f3e803792906e087cce122703" offset="0x6000"/>
-				<rom name="krx_rom5.rom" size="0x4000" crc="107B5DDC" sha1="071fa84c7b10d9d7841c504564825609ebf66140" offset="0xa000"/>
-				<rom name="krx_rom6.rom" size="0x4000" crc="4D6E9C1A" sha1="d8bf96fc4016e245fd84d713fd988dd503a38d0b" offset="0xe000"/>
-				<rom name="krx_rom7.rom" size="0x4000" crc="4EF7830A" sha1="9527236af9dd0db25498f4029793703ba8672af5" offset="0x12000"/>
+				<rom name="krx_rom4.rom" size="0x4000" crc="27ffb883" sha1="be930946e7cd5f0f3e803792906e087cce122703" offset="0x6000"/>
+				<rom name="krx_rom5.rom" size="0x4000" crc="107b5ddc" sha1="071fa84c7b10d9d7841c504564825609ebf66140" offset="0xa000"/>
+				<rom name="krx_rom6.rom" size="0x4000" crc="4d6e9c1a" sha1="d8bf96fc4016e245fd84d713fd988dd503a38d0b" offset="0xe000"/>
+				<rom name="krx_rom7.rom" size="0x4000" crc="4ef7830a" sha1="9527236af9dd0db25498f4029793703ba8672af5" offset="0x12000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -686,7 +686,7 @@ come from... they might be eventually removed -->
 		<publisher>&lt;Pavel Brychta a spol.&gt;</publisher>
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="3456">
-				<rom name="brno_boot.rom" size="3456" crc="60008729" sha1="FB26E2AE9F74B0AE0D723B417A038A8EF3D72782" offset="00000"/>
+				<rom name="brno_boot.rom" size="3456" crc="60008729" sha1="fb26e2ae9f74b0ae0d723b417a038a8ef3d72782" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>

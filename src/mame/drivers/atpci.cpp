@@ -43,7 +43,7 @@ private:
 WRITE8_MEMBER(at586_state::boot_state_w)
 {
 	logerror("Boot state %02x\n", data);
-	printf("[%02x]",data);
+	printf("[%02X]",data);
 }
 
 void at586_state::tx_config(device_t *device)
@@ -241,10 +241,10 @@ ROM_END
 ROM_START(m55hipl)
 	ROM_REGION32_LE(0x40000, "isa", 0)
 	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
-	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116B2B0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
+	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116b2b0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "m55s04", "m55s04") // with sound
-	ROMX_LOAD("m55-04s.rom", 0x20000, 0x20000, CRC(34A7422E) SHA1(68753fe373c97844beff83ea75c634c77cfedb8f), ROM_BIOS(1))
+	ROMX_LOAD("m55-04s.rom", 0x20000, 0x20000, CRC(34a7422e) SHA1(68753fe373c97844beff83ea75c634c77cfedb8f), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "m55ns03", "m55ns03") // Micronics M55HI-Plus with no sound
 	ROMX_LOAD("m55ns03.rom", 0x20000, 0x20000, CRC(6a3deb49) SHA1(78bfc20e0f8699f4d153d241a757153afcde3efb), ROM_BIOS(2))

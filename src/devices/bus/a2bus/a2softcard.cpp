@@ -37,10 +37,11 @@ void a2bus_softcard_device::z80_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_softcard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 1021800*2)   // Z80 runs on double the Apple II's clock
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
-MACHINE_CONFIG_END
+void a2bus_softcard_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_z80, 1021800*2);   // Z80 runs on double the Apple II's clock
+	m_z80->set_addrmap(AS_PROGRAM, &a2bus_softcard_device::z80_mem);
+}
 
 //**************************************************************************
 //  LIVE DEVICE

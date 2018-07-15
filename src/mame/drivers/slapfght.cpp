@@ -956,7 +956,7 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_DEVICE_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360) // music speed, verified with pcb recording
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU_TIGER, XTAL(36'000'000)/12) // 3MHz
+	TAITO68705_MCU_TIGER(config, m_bmcu, 36_MHz_XTAL/12); // 3MHz
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1028,8 +1028,8 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_DEVICE_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(36'000'000)/12) // 3MHz
-	MCFG_TAITO_M68705_AUX_STROBE_CB(WRITE8(*this, slapfght_state, scroll_from_mcu_w))
+	TAITO68705_MCU(config, m_bmcu, 36_MHz_XTAL/12); // 3MHz
+	m_bmcu->aux_strobe_cb().set(FUNC(slapfght_state::scroll_from_mcu_w));
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
