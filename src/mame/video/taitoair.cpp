@@ -112,7 +112,6 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		tile_offs = (m_tc0080vco->sprram_r(offs + 3) & 0x1fff) << 2;
 		ysize     = size[(m_tc0080vco->sprram_r(offs) & 0x0c00) >> 10];
 
-
 		if (tile_offs)
 		{
 			/* Convert zoomy value to real value as zoomx */
@@ -181,13 +180,12 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 							flipy ^= 0x0080;
 						}
 
-
-									m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
-									tile,
-									color,
-									flipx, flipy,
-									x, y,
-									zx, zy, 0
+						m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
+						tile,
+						color,
+						flipx, flipy,
+						x, y,
+						zx, zy, 0
 						);
 					}
 					tile_offs ++;
@@ -550,8 +548,6 @@ uint32_t taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_in
 		counter1 += inc1y;
 		counter2 += inc2y;
 	}
-
-
 
 	copybitmap_trans(bitmap, *m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
 

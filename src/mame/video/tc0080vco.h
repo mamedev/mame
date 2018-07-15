@@ -11,7 +11,7 @@ public:
 	tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int gfxnum) { m_gfxnum = gfxnum; }
 	void set_offsets(int x_offset, int y_offset)
 	{
@@ -42,23 +42,23 @@ protected:
 private:
 	// internal state
 	std::unique_ptr<uint16_t[]>       m_ram;
-	uint16_t *       m_bg_ram_0[2];
-	uint16_t *       m_bg_ram_1[2];
-	uint16_t *       m_tx_ram_0;
-	uint16_t *       m_tx_ram_1;
-	uint16_t *       m_char_ram;
-	uint16_t *       m_bgscroll_ram;
+	uint16_t        *m_bg_ram_0[2];
+	uint16_t        *m_bg_ram_1[2];
+	uint16_t        *m_tx_ram_0;
+	uint16_t        *m_tx_ram_1;
+	uint16_t        *m_char_ram;
+	uint16_t        *m_bgscroll_ram;
 
 /* FIXME: This sprite related stuff still needs to be accessed in video/taito_h */
-	uint16_t *       m_chain_ram_0;
-	uint16_t *       m_chain_ram_1;
-	uint16_t *       m_spriteram;
-	uint16_t *       m_scroll_ram;
+	uint16_t        *m_chain_ram_0;
+	uint16_t        *m_chain_ram_1;
+	uint16_t        *m_spriteram;
+	uint16_t        *m_scroll_ram;
 
 	uint16_t         m_bg_scrollx[2];
 	uint16_t         m_bg_scrolly[2];
 
-	tilemap_t      *m_tilemap[3];
+	tilemap_t       *m_tilemap[3];
 
 	int32_t          m_flipscreen;
 
@@ -76,17 +76,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TC0080VCO, tc0080vco_device)
-
-#define MCFG_TC0080VCO_GFX_REGION(_region) \
-	downcast<tc0080vco_device &>(*device).set_gfx_region(_region);
-
-#define MCFG_TC0080VCO_OFFSETS(_xoffs, _yoffs) \
-	downcast<tc0080vco_device &>(*device).set_offsets(_xoffs, _yoffs);
-
-#define MCFG_TC0080VCO_BGFLIP_OFFS(_offs) \
-	downcast<tc0080vco_device &>(*device).set_bgflip_yoffs(_offs);
-
-#define MCFG_TC0080VCO_GFXDECODE(_gfxtag) \
-	downcast<tc0080vco_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_TC0080VCO_H

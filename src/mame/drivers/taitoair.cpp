@@ -265,11 +265,9 @@ WRITE16_MEMBER(taitoair_state::dsp_HOLDA_signal_w)
 
 WRITE16_MEMBER(taitoair_state::airsys_paletteram16_w)/* xxBBBBxRRRRxGGGG */
 {
-	int a;
-
 	COMBINE_DATA(&m_paletteram[offset]);
 
-	a = m_paletteram[offset];
+	int const a = m_paletteram[offset];
 	m_palette->set_pen_color(offset, pal4bit(a >> 0), pal4bit(a >> 5), pal4bit(a >> 10));
 }
 
@@ -656,13 +654,12 @@ static const gfx_layout tilelayout =
 	16,16,  /* 16x16 pixels */
 	RGN_FRAC(1,4),
 	4,
-	{ 0, 1, 2, 3 },
+	{ STEP4(0,1) },
 	{ 4, 0, 12, 8,
 		RGN_FRAC(1,4)+4, RGN_FRAC(1,4), RGN_FRAC(1,4)+12, RGN_FRAC(1,4)+8,
 		RGN_FRAC(2,4)+4, RGN_FRAC(2,4), RGN_FRAC(2,4)+12, RGN_FRAC(2,4)+8,
 		RGN_FRAC(3,4)+4, RGN_FRAC(3,4), RGN_FRAC(3,4)+12, RGN_FRAC(3,4)+8 },
-	{ 0*16, 1*16, 2*16,  3*16,  4*16,  5*16,  6*16,  7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP16(0,4*4) },
 	16*16
 };
 
@@ -728,7 +725,7 @@ MACHINE_CONFIG_START(taitoair_state::airsys)
 	m_tc0220ioc->write_4_callback().set(FUNC(taitoair_state::coin_control_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
-	MCFG_TAITOIO_YOKE_ADD("yokectrl")
+	TAITOIO_YOKE(config, m_yoke, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -741,16 +738,17 @@ MACHINE_CONFIG_START(taitoair_state::airsys)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoair_state, screen_update_taitoair)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_airsys)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_airsys);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512*16+512*16)
+	PALETTE(config, m_palette, 512*16+512*16);
+	m_palette->set_init(palette_init_delegate(FUNC(palette_device::palette_init_all_black), m_palette));
 
-	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
-	MCFG_TC0080VCO_GFX_REGION(0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0080VCO_OFFSETS(1, 1)
-	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
-	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
+	TC0080VCO(config, m_tc0080vco, 0);
+	m_tc0080vco->set_gfx_region(0);
+	m_tc0080vco->set_palette(m_palette);
+	m_tc0080vco->set_offsets(1, 1);
+	m_tc0080vco->set_bgflip_yoffs(-2);
+	m_tc0080vco->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

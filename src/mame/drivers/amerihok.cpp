@@ -55,7 +55,7 @@ WRITE8_MEMBER(amerihok_state::control_w)
 
 void amerihok_state::amerihok_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom();
+	map(0x0000, 0xffff).rom().region("maincpu", 0);
 }
 
 void amerihok_state::amerihok_data_map(address_map &map)
@@ -81,7 +81,7 @@ void amerihok_state::machine_reset()
 MACHINE_CONFIG_START(amerihok_state::amerihok)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z8681, XTAL(12'000'000))
+	MCFG_DEVICE_ADD("maincpu", Z8681, 12_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(amerihok_map)
 	MCFG_DEVICE_DATA_MAP(amerihok_data_map)
 

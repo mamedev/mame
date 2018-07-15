@@ -92,6 +92,7 @@ class XmlError(Exception):
 
 
 class LayoutChecker(Minifyer):
+    BADTAGPATTERN = re.compile('[^abcdefghijklmnopqrstuvwxyz0123456789_.:^$]')
     VARPATTERN = re.compile('^~scr(0|[1-9][0-9]*)(native[xy]aspect|width|height)~$')
     SHAPES = frozenset(('disk', 'led14seg', 'led14segsc', 'led16seg', 'led16segsc', 'led7seg', 'led8seg_gts1', 'rect'))
     OBJECTS = frozenset(('backdrop', 'bezel', 'cpanel', 'marquee', 'overlay'))
@@ -181,6 +182,21 @@ class LayoutChecker(Minifyer):
                         self.handleError('Element screen attribute index "%s" is negative' % (attrs['index'], ))
                 except:
                     self.handleError('Element screen attribute index "%s" is not an integer' % (attrs['index'], ))
+                if 'tag' in attrs:
+                    self.handleError('Element screen has both index and tag attributes');
+            if 'tag' in attrs:
+                tag = attrs['tag']
+                if '' == tag:
+                    self.handleError('Element screen attribute tag is empty')
+                else:
+                    if self.BADTAGPATTERN.search(tag):
+                        self.handleError('Element screen attribute tag "%s" contains invalid characters' % (tag, ));
+                    if tag.find('^') >= 0:
+                        self.handleError('Element screen attribute tag "%s" contains parent device reference' % (tag, ));
+                    if ':' == tag[-1]:
+                        self.handleError('Element screen attribute tag "%s" ends with separator' % (tag, ));
+                    if tag.find('::') >= 0:
+                        self.handleError('Element screen attribute tag "%s" contains double separator' % (tag, ));
             self.in_object = True
             self.have_bounds.append(False)
         elif 'group' == name:

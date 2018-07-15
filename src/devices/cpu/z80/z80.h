@@ -42,6 +42,9 @@ public:
 	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex);
+	template <typename... T> void set_memory_map(T &&... args) { set_addrmap(AS_PROGRAM, std::forward<T>(args)...); }
+	template <typename... T> void set_m1_map(T &&... args) { set_addrmap(AS_OPCODES, std::forward<T>(args)...); }
+	template <typename... T> void set_io_map(T &&... args) { set_addrmap(AS_IO, std::forward<T>(args)...); }
 	template<class Object> devcb_base &set_irqack_cb(Object &&cb) { return m_irqack_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_refresh_cb(Object &&cb) { return m_refresh_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_halt_cb(Object &&cb) { return m_halt_cb.set_callback(std::forward<Object>(cb)); }

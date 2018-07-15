@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(cloud9_state::cloud9)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
-	MCFG_X2212_ADD_AUTOSAVE("nvram")
+	X2212(config, "nvram").set_auto_save(true);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cloud9)

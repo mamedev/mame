@@ -61,6 +61,7 @@ private:
 	void recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void taitoh_log_vram();
+	void common_map(address_map &map);
 	void dleague_map(address_map &map);
 	void recordbr_map(address_map &map);
 	void sound_map(address_map &map);

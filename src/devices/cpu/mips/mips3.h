@@ -366,11 +366,17 @@ protected:
         float			acc;
 
         /* VU0 registers (R5900 only) */
-        float			vfr[32][4];
+        float			vfr[32][4]; // 0..3 = w..x
         uint32_t		vcr[32];
         float			vumem[0x1000];
         float*			vfmem;
         uint32_t*		vimem;
+        float			vacc[4];
+        float			p;
+
+        uint32_t*		vr;
+        float*			i;
+        float*			q;
 
         uint32_t		mode;                       /* current global mode */
 

@@ -737,6 +737,7 @@ DEFINE_DEVICE_TYPE(I82371SB_IDE, i82371sb_ide_device, "i82371sb_ide", "Intel 823
 
 void i82371sb_ide_device::config_map(address_map &map)
 {
+	pci_device::config_map(map);
 	map(0x04, 0x05).rw(FUNC(i82371sb_ide_device::command_r), FUNC(i82371sb_ide_device::command_w));
 	map(0x20, 0x23).rw(FUNC(i82371sb_ide_device::bmiba_r), FUNC(i82371sb_ide_device::bmiba_w));
 	map(0x40, 0x41).rw(FUNC(i82371sb_ide_device::idetim_primary_r), FUNC(i82371sb_ide_device::idetim_primary_w));
@@ -774,7 +775,7 @@ i82371sb_ide_device::i82371sb_ide_device(const machine_config &mconfig, const ch
 	, m_ide1(*this, "ide1")
 	, m_ide2(*this, "ide2")
 {
-	set_ids(0x80867010, 0x03, 0x010180, 0x00000000);
+	set_ids(0x80867010, 0, 0x010180, 0x00000000);
 }
 
 void i82371sb_ide_device::device_start()
@@ -794,11 +795,11 @@ void i82371sb_ide_device::reset_all_mappings()
 void i82371sb_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
+	io_space->install_device(0, 0x3ff, *this, &i82371sb_ide_device::internal_io_map);
 	if (command & 1)
 	{
 		offs_t m_base = bmiba & 0xfff0;
 
-		io_space->install_device(0, 0x3ff, *this, &i82371sb_ide_device::internal_io_map);
 		io_space->install_readwrite_handler(m_base, m_base + 0x7, read32_delegate(FUNC(bus_master_ide_controller_device::bmdma_r), &(*m_ide1)), write32_delegate(FUNC(bus_master_ide_controller_device::bmdma_w), &(*m_ide1)), 0xffffffff);
 		io_space->install_readwrite_handler(m_base + 0x8, m_base + 0xf, read32_delegate(FUNC(bus_master_ide_controller_device::bmdma_r), &(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::bmdma_w), &(*m_ide2)), 0xffffffff);
 	}
@@ -869,40 +870,56 @@ WRITE8_MEMBER(i82371sb_ide_device::sidetim_w)
 
 READ32_MEMBER(i82371sb_ide_device::ide1_read32_cs0_r)
 {
+	if (!(command & 1))
+		return 0xffffffff;
 	return m_ide1->read_cs0(offset, mem_mask);
 }
 
 WRITE32_MEMBER(i82371sb_ide_device::ide1_write32_cs0_w)
 {
+	if (!(command & 1))
+		return;
 	m_ide1->write_cs0(offset, data, mem_mask);
 }
 
 READ32_MEMBER(i82371sb_ide_device::ide2_read32_cs0_r)
 {
+	if (!(command & 1))
+		return 0xffffffff;
 	return m_ide2->read_cs0(offset, mem_mask);
 }
 
 WRITE32_MEMBER(i82371sb_ide_device::ide2_write32_cs0_w)
 {
+	if (!(command & 1))
+		return;
 	m_ide2->write_cs0(offset, data, mem_mask);
 }
 
 READ8_MEMBER(i82371sb_ide_device::ide1_read_cs1_r)
 {
+	if (!(command & 1))
+		return 0xff;
 	return m_ide1->read_cs1(1, 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(i82371sb_ide_device::ide1_write_cs1_w)
 {
+	if (!(command & 1))
+		return;
 	m_ide1->write_cs1(1, data << 16, 0xff0000);
 }
 
 READ8_MEMBER(i82371sb_ide_device::ide2_read_cs1_r)
 {
+	if (!(command & 1))
+		return 0xff;
 	return m_ide2->read_cs1(1, 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(i82371sb_ide_device::ide2_write_cs1_w)
 {
+	if (!(command & 1))
+		return;
 	m_ide2->write_cs1(1, data << 16, 0xff0000);
 }

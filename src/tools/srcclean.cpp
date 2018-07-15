@@ -88,6 +88,8 @@ public:
 		VMS
 	};
 
+	virtual ~cleaner_base() = default;
+
 	template <typename InputIt>
 	void process(InputIt begin, InputIt end);
 	void finalise();

@@ -35,7 +35,7 @@ offs_t cosmac_disassembler::short_branch(offs_t base_pc, offs_t &pc, const data_
 
 offs_t cosmac_disassembler::long_branch(offs_t &pc, const data_buffer &params)
 {
-	u16 res = params.r16(pc);
+	u16 res = params.r8(pc) << 8 | params.r8(pc + 1);
 	pc += 2;
 	return res;
 }

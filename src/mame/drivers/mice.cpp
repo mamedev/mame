@@ -182,7 +182,7 @@ MACHINE_CONFIG_START(mice_state::mice)
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", mice_terminal)
 
 	i8155_device &rpt(I8155(config, "rpt", 6.144_MHz_XTAL / 2));
-	rpt.in_pa_callback().set_ioport("BAUD");
+	rpt.in_pc_callback().set_ioport("BAUD");
 	rpt.out_to_callback().set("uart", FUNC(i8251_device::write_txc));
 	rpt.out_to_callback().append("uart", FUNC(i8251_device::write_rxc));
 

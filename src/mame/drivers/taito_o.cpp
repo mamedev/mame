@@ -198,7 +198,7 @@ static const gfx_layout parentj_layout =
 	16,16,
 	RGN_FRAC(1,8),
 	4,
-	{ 0,1,2,3 },
+	{ STEP4(0,1) },
 	{ RGN_FRAC(7,8)+4, RGN_FRAC(7,8)+0,
 		RGN_FRAC(6,8)+4, RGN_FRAC(6,8)+0,
 		RGN_FRAC(5,8)+4, RGN_FRAC(5,8)+0,
@@ -207,10 +207,9 @@ static const gfx_layout parentj_layout =
 		RGN_FRAC(2,8)+4, RGN_FRAC(2,8)+0,
 		RGN_FRAC(1,8)+4, RGN_FRAC(1,8)+0,
 		RGN_FRAC(0,8)+4, RGN_FRAC(0,8)+0
-		},
-	{ 0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120},
-
-	1*128
+	},
+	{ STEP16(0,4*2) },
+	4*2*16
 };
 
 static GFXDECODE_START( gfx_parentj )
@@ -249,16 +248,16 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoo_state, screen_update_parentj)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_parentj)
-	MCFG_PALETTE_ADD("palette", 33*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_parentj);
+	PALETTE(config, m_palette, 33*16);
+	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
-	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
-	MCFG_TC0080VCO_GFX_REGION(0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0080VCO_OFFSETS(1, 1)
-	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
-	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
+	TC0080VCO(config, m_tc0080vco, 0);
+	m_tc0080vco->set_gfx_region(0);
+	m_tc0080vco->set_palette(m_palette);
+	m_tc0080vco->set_offsets(1, 1);
+	m_tc0080vco->set_bgflip_yoffs(-2);
+	m_tc0080vco->set_gfxdecode_tag(m_gfxdecode);
 
 	SPEAKER(config, "mono").front_center();
 

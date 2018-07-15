@@ -5,7 +5,7 @@
 2017-10-28 Skeleton
 
 Televideo TS-3000. CPU is 8088. Other chips are: 8259, 8253, 8237, 8255, NS8250, uPD765AC, MM58167AN.
-Crystals are: 18.432, 16.000, 24.000, 14.31818, 4.7727266. There's a barrel-type backup battery, and a bank of 8 dispswitches.
+Crystals are: 18.432, 16.000, 24.000, 14.31818, 4.7727266. There's a barrel-type backup battery, and a bank of 8 dipswitches.
 There are 25-pin serial and parallel ports, and a FDC connector. There's an undumped prom labelled "U20 V1.0" at position U20.
 
 ************************************************************************************************************************************/

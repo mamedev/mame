@@ -31,6 +31,8 @@ Revisions:
 #include "emu.h"
 #include "iremga20.h"
 
+#include <algorithm>
+
 #define MAX_VOL 256
 
 
@@ -46,11 +48,11 @@ DEFINE_DEVICE_TYPE(IREMGA20, iremga20_device, "iremga20", "Irem GA20")
 //  iremga20_device - constructor
 //-------------------------------------------------
 
-iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, IREMGA20, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_rom(*this, DEVICE_SELF),
-		m_stream(nullptr)
+iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, IREMGA20, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_rom_interface(mconfig, *this, 20),
+	m_stream(nullptr)
 {
 }
 
@@ -65,8 +67,7 @@ void iremga20_device::device_start()
 
 	iremga20_reset();
 
-	for ( i = 0; i < 0x40; i++ )
-		m_regs[i] = 0;
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 
 	m_stream = stream_alloc(0, 2, clock()/4);
 
@@ -96,6 +97,24 @@ void iremga20_device::device_reset()
 	iremga20_reset();
 }
 
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void iremga20_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock()/4);
+}
+
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void iremga20_device::rom_bank_updated()
+{
+	m_stream->update();
+}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -104,7 +123,6 @@ void iremga20_device::device_reset()
 void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	uint32_t rate[4], pos[4], frac[4], end[4], vol[4], play[4];
-	uint8_t *pSamples;
 	stream_sample_t *outL, *outR;
 	int i, sampleout;
 
@@ -120,7 +138,6 @@ void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	}
 
 	i = samples;
-	pSamples = &m_rom[0];
 	outL = outputs[0];
 	outR = outputs[1];
 
@@ -131,7 +148,7 @@ void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 		// update the 4 channels inline
 		if (play[0])
 		{
-			sampleout += (pSamples[pos[0]] - 0x80) * vol[0];
+			sampleout += (read_byte(pos[0]) - 0x80) * vol[0];
 			frac[0] += rate[0];
 			pos[0] += frac[0] >> 24;
 			frac[0] &= 0xffffff;
@@ -139,7 +156,7 @@ void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 		}
 		if (play[1])
 		{
-			sampleout += (pSamples[pos[1]] - 0x80) * vol[1];
+			sampleout += (read_byte(pos[1]) - 0x80) * vol[1];
 			frac[1] += rate[1];
 			pos[1] += frac[1] >> 24;
 			frac[1] &= 0xffffff;
@@ -147,7 +164,7 @@ void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 		}
 		if (play[2])
 		{
-			sampleout += (pSamples[pos[2]] - 0x80) * vol[2];
+			sampleout += (read_byte(pos[2]) - 0x80) * vol[2];
 			frac[2] += rate[2];
 			pos[2] += frac[2] >> 24;
 			frac[2] &= 0xffffff;
@@ -155,7 +172,7 @@ void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 		}
 		if (play[3])
 		{
-			sampleout += (pSamples[pos[3]] - 0x80) * vol[3];
+			sampleout += (read_byte(pos[3]) - 0x80) * vol[3];
 			frac[3] += rate[3];
 			pos[3] += frac[3] >> 24;
 			frac[3] &= 0xffffff;

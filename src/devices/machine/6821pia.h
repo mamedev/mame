@@ -77,7 +77,7 @@ class pia6821_device :  public device_t
 {
 public:
 	// construction/destruction
-	pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// static configuration helpers
 	// TODO: REMOVE THESE

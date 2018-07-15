@@ -5,6 +5,10 @@
     Taito Air System
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_TAITOAIR_H
+#define MAME_INCLUDES_TAITOAIR_H
+
+#pragma once
 
 #include "machine/taitoio.h"
 #include "machine/taitoio_yoke.h"
@@ -28,23 +32,23 @@ struct taitoair_poly {
 class taitoair_state : public driver_device
 {
 public:
-	taitoair_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_line_ram(*this, "line_ram"),
-		m_dsp_ram(*this, "dsp_ram"),
-		m_paletteram(*this, "paletteram"),
-		m_gradram(*this, "gradram"),
-		m_tc0430grw(*this, "tc0430grw"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_dsp(*this, "dsp"),
-		m_tc0080vco(*this, "tc0080vco"),
-		m_tc0220ioc(*this, "tc0220ioc"),
-		m_yoke(*this, "yokectrl"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_z80bank(*this, "z80bank")
+	taitoair_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_line_ram(*this, "line_ram")
+		, m_dsp_ram(*this, "dsp_ram")
+		, m_paletteram(*this, "paletteram")
+		, m_gradram(*this, "gradram")
+		, m_tc0430grw(*this, "tc0430grw")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_dsp(*this, "dsp")
+		, m_tc0080vco(*this, "tc0080vco")
+		, m_tc0220ioc(*this, "tc0220ioc")
+		, m_yoke(*this, "yokectrl")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_z80bank(*this, "z80bank")
 	{ }
 
 	void airsys(machine_config &config);
@@ -146,3 +150,5 @@ private:
 	void airsys_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TAITOAIR_H
