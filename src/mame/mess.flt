@@ -167,6 +167,7 @@ datum.cpp
 dbox.cpp
 dccons.cpp
 dct11em.cpp
+decstation.cpp
 dectalk.cpp
 decwritr.cpp
 dgn_beta.cpp
