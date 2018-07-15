@@ -124,8 +124,8 @@ READ8_MEMBER(namco_c116_device::read)
 				return m_regs[reg] & 0xff;
 			else
 				return m_regs[reg] >> 8;
-		/* registers 6,7: unmapped? */
-		//if (reg > 0x6) return 0xff;
+			/* registers 6,7: unmapped? */
+			//if (reg > 0x5) return 0xff; // namcos2 specific?
 		}
 	}
 

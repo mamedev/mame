@@ -576,11 +576,11 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	MCFG_SCREEN_SIZE(NAMCOFL_HTOTAL, NAMCOFL_VTOTAL)
 	MCFG_SCREEN_VISIBLE_AREA(0, NAMCOFL_HBSTART-1, 0, NAMCOFL_VBSTART-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcofl_state, screen_update_namcofl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcofl);
 
 	PALETTE(config, m_palette, 0x2000);
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcofl)
 
 	NAMCO_C116(config, m_c116, 0);
 	m_c116->set_palette(m_palette);

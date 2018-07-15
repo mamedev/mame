@@ -30,6 +30,9 @@ known issues:
     Final Lap:
     - sprite size bit is bogus during splash screen
 
+	Final Lap 2:
+	- tilemap issue
+
     Final Lap 3:
     - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.cpp yet
 
@@ -580,7 +583,7 @@ void namcos2_state::namcos2_68k_default_cpu_board_am(address_map &map)
 	map(0x200000, 0x3fffff).rom().region("data_rom", 0);
 	map(0x400000, 0x41ffff).rw(FUNC(namcos2_state::c123_tilemap_videoram_r), FUNC(namcos2_state::c123_tilemap_videoram_w));
 	map(0x420000, 0x42003f).rw(FUNC(namcos2_state::c123_tilemap_control_r), FUNC(namcos2_state::c123_tilemap_control_w));
-	map(0x440000, 0x44ffff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x440000, 0x44ffff).r(FUNC(namcos2_state::c116_r)).w(m_c116, FUNC(namco_c116_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x460000, 0x460fff).mirror(0xf000).rw(FUNC(namcos2_state::dpram_r), FUNC(namcos2_state::dpram_w)).umask16(0x00ff);
 	map(0x480000, 0x483fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
 	map(0x4a0000, 0x4a000f).m(m_sci, FUNC(namco_c139_device::regs_map));
@@ -1769,7 +1772,7 @@ MACHINE_CONFIG_START(namcos2_state::base)
 	configure_c116_standard(config);
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_namcos2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1841,7 +1844,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	configure_c116_standard(config);
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_namcos2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1885,7 +1888,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 	configure_c116_standard(config);
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_finallap));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_finallap)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_finallap);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finallap)
 
@@ -1941,7 +1944,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	configure_c116_standard(config);
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_sgunner));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_sgunner)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sgunner);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
@@ -1992,7 +1995,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	configure_c116_standard(config);
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_sgunner));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_sgunner)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sgunner);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
@@ -2038,7 +2041,7 @@ MACHINE_CONFIG_START(namcos2_state::suzuka8h)
 	configure_c116_standard(config);
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_suzuka8h));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_sgunner)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sgunner);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
@@ -2068,7 +2071,7 @@ MACHINE_CONFIG_START(namcos2_state::luckywld) // same as suzuka8h but ROZ hardwa
 
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_luckywld));
 
-	MCFG_DEVICE_REPLACE(m_gfxdecode, GFXDECODE, "palette", gfx_luckywld)
+	m_gfxdecode->set_info(gfx_luckywld);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
 MACHINE_CONFIG_END
@@ -2102,7 +2105,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	configure_c116_standard(config);
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_metlhawk));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_metlhawk)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_metlhawk);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
 

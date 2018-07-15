@@ -1065,9 +1065,9 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	MCFG_SCREEN_SIZE(NAMCONB1_HTOTAL, NAMCONB1_VTOTAL)
 	MCFG_SCREEN_VISIBLE_AREA(0, NAMCONB1_HBSTART-1, 0, NAMCONB1_VBSTART-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namconb1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namconb1);
 
 	PALETTE(config, m_palette, 0x2000);
 	m_palette->enable_shadows();
@@ -1094,7 +1094,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb2)
 
-	MCFG_DEVICE_REPLACE("gfxdecode", GFXDECODE, "palette", gfx_namconb2)
+	m_gfxdecode->set_info(gfx_namconb2);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namconb1_state::machbrkr)

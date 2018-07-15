@@ -176,8 +176,8 @@ void namcos2_shared_state::zdrawgfxzoom(
 	{
 		if( gfx )
 		{
-			int shadow_offset = (m_palette->shadows_enabled())?m_palette->entries():0;
-			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			int shadow_offset = (gfx->palette().shadows_enabled())?gfx->palette().entries():0;
+			const pen_t *pal = &gfx->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 			int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
 			int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;

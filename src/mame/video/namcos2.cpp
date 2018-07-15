@@ -290,6 +290,19 @@ WRITE16_MEMBER( namcos2_state::rozram_word_w )
 
 /**************************************************************************/
 
+READ8_MEMBER( namcos2_state::c116_r )
+{
+	if( (offset&0x1800) == 0x1800 )
+	{
+		/* palette register */
+		offset &= 0x180f;
+
+		/* registers 6,7: unmapped? */
+		if (offset > 0x180b) return 0xff; // fix for finallap boot
+	}
+	return m_c116->read(space,offset,mem_mask);
+}
+
 /**************************************************************************/
 
 void namcos2_state::draw_sprite_init()
@@ -309,6 +322,7 @@ void namcos2_state::video_start()
 	m_tilemap_roz = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_state::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8,8,256,256);
 	m_tilemap_roz->set_transparent_pen(0xff);
 	draw_sprite_init();
+	save_item(NAME(m_gfx_ctrl));
 }
 
 void namcos2_state::apply_clip( rectangle &clip, const rectangle &cliprect )
@@ -354,12 +368,14 @@ void namcos2_state::video_start_finallap()
 {
 	c123_tilemap_init(1,memregion("tile_mask")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	draw_sprite_init();
+	save_item(NAME(m_gfx_ctrl));
 }
 
 void namcos2_state::video_start_finalap2()
 {
-	c123_tilemap_init(2,memregion("tile_mask")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
+	c123_tilemap_init(1,memregion("tile_mask")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
 	draw_sprite_init();
+	save_item(NAME(m_gfx_ctrl));
 }
 
 uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -475,6 +491,7 @@ void namcos2_state::video_start_metlhawk()
 {
 	c123_tilemap_init(1,memregion("tile_mask")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	c169_roz_init(2, "roz_mask", namcos2_shared_state::c169_tilemap_delegate(&namcos2_state::RozCB_metlhawk, this));
+	save_item(NAME(m_gfx_ctrl));
 }
 
 uint32_t namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

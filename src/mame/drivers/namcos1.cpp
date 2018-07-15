@@ -1065,12 +1065,12 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 9+8*8, 9+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos1_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos1_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos1);
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette, 0x2000);
+	m_palette->enable_shadows();
 
 	NAMCO_C116(config, m_c116, 0);
 	m_c116->set_palette(m_palette);
