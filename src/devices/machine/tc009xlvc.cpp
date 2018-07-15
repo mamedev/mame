@@ -15,6 +15,7 @@
 #include "machine/tc009xlvc.h"
 
 #include "screen.h"
+#include "emupal.h"
 
 
 DEFINE_DEVICE_TYPE(TC0091LVC, tc0091lvc_device, "tc009xlvc", "Taito TC0091LVC")
@@ -143,10 +144,11 @@ TILE_GET_INFO_MEMBER(tc0091lvc_device::get_tx_tile_info)
 }
 
 
-MACHINE_CONFIG_START(tc0091lvc_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xBGRBBBBGGGGRRRR_bit0) /* TODO: correct? */
-MACHINE_CONFIG_END
+void tc0091lvc_device::device_add_mconfig(machine_config &config)
+{
+	palette_device &palette(PALETTE(config, "palette", 256));
+	palette.set_format(PALETTE_FORMAT_xBGRBBBBGGGGRRRR_bit0); /* TODO: correct? */
+}
 
 void tc0091lvc_device::device_start()
 {

@@ -26,6 +26,7 @@ public:
 		, m_ram_bnks(*this, "rambank%u", 1)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_ym2203(*this, "ym2203")
 		, m_vram(*this, "vram")
 	{
 	}
@@ -99,6 +100,7 @@ protected:
 	required_device_array<address_map_bank_device, 4> m_ram_bnks;
 	required_device<gfxdecode_device>                 m_gfxdecode;
 	required_device<palette_device>                   m_palette;
+	optional_device<ym2203_device>                    m_ym2203;
 
 	required_shared_ptr<u8>                           m_vram;
 };
@@ -151,7 +153,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(rombank2switch_w);
 	DECLARE_READ8_MEMBER(rombank2switch_r);
-	DECLARE_WRITE8_MEMBER(portA_w);
 
 	void fhawk(machine_config &config);
 	void fhawk_2_map(address_map &map);
@@ -210,7 +211,6 @@ class taitol_1cpu_state : public taitol_state
 public:
 	taitol_1cpu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: taitol_state(mconfig, type, tag)
-		, m_ymsnd(*this, "ymsnd")
 		, m_mux(*this, {"dswmux", "inmux"})
 	{
 	}
@@ -239,7 +239,6 @@ protected:
 	virtual void state_register() override;
 	virtual void taito_machine_reset() override;
 
-	required_device<ym2203_device>  m_ymsnd;
 	optional_device_array<ls157_x2_device, 2> m_mux;
 };
 

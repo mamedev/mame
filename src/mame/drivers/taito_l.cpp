@@ -321,7 +321,7 @@ READ8_MEMBER(taitol_1cpu_state::extport_select_and_ym2203_r)
 {
 	for (auto &mux : m_mux)
 		mux->select_w((offset >> 1) & 1);
-	return m_ymsnd->read(space, offset & 1);
+	return m_ym2203->read(space, offset & 1);
 }
 
 WRITE8_MEMBER(taitol_state::mcu_control_w)
@@ -426,7 +426,7 @@ void fhawk_state::fhawk_3_map(address_map &map)
 	map(0x8000, 0x9fff).ram();
 	map(0xe000, 0xe000).nopr().w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xe001, 0xe001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf000, 0xf001).rw(m_ym2203, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
 
 
@@ -458,7 +458,7 @@ void taitol_2cpu_state::raimais_3_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr("audiobank");
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe000, 0xe003).rw("ym2610", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0xe200, 0xe200).nopr().w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw("tc0140syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
 	map(0xe400, 0xe403).nopw(); /* pan */
@@ -493,7 +493,7 @@ void champwr_state::champwr_3_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr("audiobank");
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x9000, 0x9001).rw(m_ym2203, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa000, 0xa000).nopr().w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
 	map(0xb000, 0xb000).w(FUNC(champwr_state::msm5205_hi_w));
@@ -517,7 +517,7 @@ void taitol_2cpu_state::kurikint_2_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe7ff).rw("dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
-	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xe800, 0xe801).rw(m_ym2203, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
 
 
@@ -526,7 +526,7 @@ void taitol_1cpu_state::puzznic_map(address_map &map)
 {
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xa003).r(FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
+	map(0xa000, 0xa003).r(FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ym2203, FUNC(ym2203_device::write));
 	map(0xa800, 0xa800).nopr(); // Watchdog
 	map(0xb800, 0xb800).rw("mcu", FUNC(arkanoid_68705p3_device::data_r), FUNC(arkanoid_68705p3_device::data_w));
 	map(0xb801, 0xb801).rw(FUNC(taitol_1cpu_state::mcu_control_r), FUNC(taitol_1cpu_state::mcu_control_w));
@@ -538,7 +538,7 @@ void taitol_1cpu_state::puzznici_map(address_map &map)
 {
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xa003).r(FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
+	map(0xa000, 0xa003).r(FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ym2203, FUNC(ym2203_device::write));
 	map(0xa800, 0xa800).nopr(); // Watchdog
 	map(0xb801, 0xb801).r(FUNC(taitol_1cpu_state::mcu_control_r));
 //  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
@@ -550,7 +550,7 @@ void taitol_1cpu_state::plotting_map(address_map &map)
 {
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xa003).r(FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
+	map(0xa000, 0xa003).r(FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ym2203, FUNC(ym2203_device::write));
 	map(0xa800, 0xa800).nopw();    // Watchdog or interrupt ack
 	map(0xb800, 0xb800).nopw();    // Control register, function unknown
 }
@@ -560,7 +560,7 @@ void taitol_1cpu_state::palamed_map(address_map &map)
 {
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xa003).rw(m_ymsnd, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa003).rw(m_ym2203, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa800, 0xa803).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xb000, 0xb000).nopw();    // Control register, function unknown (copy of 8822)
 	map(0xb001, 0xb001).nopr(); // Watchdog or interrupt ack
@@ -571,7 +571,7 @@ void taitol_1cpu_state::cachat_map(address_map &map)
 {
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xa003).rw(m_ymsnd, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa003).rw(m_ym2203, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa800, 0xa803).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xb000, 0xb000).nopw();    // Control register, function unknown
 	map(0xb001, 0xb001).nopr(); // Watchdog or interrupt ack (value ignored)
@@ -583,7 +583,7 @@ void horshoes_state::horshoes_map(address_map &map)
 {
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xa003).r(FUNC(horshoes_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
+	map(0xa000, 0xa003).r(FUNC(horshoes_state::extport_select_and_ym2203_r)).w(m_ym2203, FUNC(ym2203_device::write));
 	map(0xa800, 0xa800).select(0x000c).lr8("upd4701_r",
 										   [this](address_space &space, offs_t offset, u8 mem_mask) {
 											   return m_upd4701->read_xy(space, offset >> 2, mem_mask);
@@ -608,7 +608,7 @@ void taitol_2cpu_state::evilston_2_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe7ff).rw("dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
-	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xe800, 0xe801).rw(m_ym2203, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf000, 0xf7ff).bankr("audiobank");
 }
 
@@ -1446,26 +1446,16 @@ static GFXDECODE_START( taito_l )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(fhawk_state::portA_w)
-{
-	m_audio_bnk->set_entry(data & 0x03);
-	//logerror ("YM2203 bank change val=%02x  %s\n", data & 0x03, machine().describe_context() );
-}
-
-#define TC0090LVC_BANK_ADD(_tag)                           \
-	MCFG_DEVICE_ADD(_tag, ADDRESS_MAP_BANK, 0)       \
-	MCFG_DEVICE_PROGRAM_MAP(tc0090lvc_map)                 \
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)    \
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)                    \
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)                   \
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
-
 MACHINE_CONFIG_START(taitol_state::l_system_video)
-	TC0090LVC_BANK_ADD("rambank1")
-	TC0090LVC_BANK_ADD("rambank2")
-	TC0090LVC_BANK_ADD("rambank3")
-	TC0090LVC_BANK_ADD("rambank4")
-
+	for (int i = 0; i < 4; i++)
+	{
+		ADDRESS_MAP_BANK(config, m_ram_bnks[i], 0);
+		m_ram_bnks[i]->set_addrmap(AS_PROGRAM, &taitol_state::tc0090lvc_map);
+		m_ram_bnks[i]->set_endianness(ENDIANNESS_LITTLE);
+		m_ram_bnks[i]->set_data_width(8);
+		m_ram_bnks[i]->set_addr_width(20);
+		m_ram_bnks[i]->set_stride(0x1000);
+	}
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -1526,13 +1516,13 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL/4)       /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fhawk_state, portA_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	YM2203(config, m_ym2203, 12_MHz_XTAL/4);       /* verified on pcb */
+	m_ym2203->irq_handler().set_inputline("audiocpu", 0);
+	m_ym2203->port_a_write_callback().set_membank("audiobank").mask(0x03);
+	m_ym2203->add_route(0, "mono", 0.20);
+	m_ym2203->add_route(1, "mono", 0.20);
+	m_ym2203->add_route(2, "mono", 0.20);
+	m_ym2203->add_route(3, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("slave")
@@ -1555,10 +1545,7 @@ MACHINE_CONFIG_START(champwr_state::champwr)
 	MCFG_DEVICE_PROGRAM_MAP(champwr_2_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ymsnd")
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, champwr_state, portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, champwr_state, msm5205_volume_w))
+	m_ym2203->port_b_write_callback().set(FUNC(champwr_state::msm5205_volume_w));
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384_kHz_XTAL)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, champwr_state, msm5205_vck)) /* VCK function */
@@ -1603,7 +1590,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8_MHz_XTAL)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
+	MCFG_DEVICE_ADD("ym2610", YM2610, 8_MHz_XTAL)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -1648,7 +1635,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::kurikint)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL/4)       /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2203", YM2203, 12_MHz_XTAL/4)       /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -1673,7 +1660,7 @@ MACHINE_CONFIG_START(taitol_1cpu_state::plotting)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(13'330'560)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2203", YM2203, XTAL(13'330'560)/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(READ8("dswmux", ls157_x2_device, output_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8("inmux", ls157_x2_device, output_r))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
@@ -1739,7 +1726,7 @@ MACHINE_CONFIG_START(taitol_1cpu_state::palamed)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
-	MCFG_DEVICE_MODIFY("ymsnd")
+	MCFG_DEVICE_MODIFY("ym2203")
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 
@@ -1761,7 +1748,7 @@ MACHINE_CONFIG_START(taitol_1cpu_state::cachat)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
-	MCFG_DEVICE_MODIFY("ymsnd")
+	MCFG_DEVICE_MODIFY("ym2203")
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 
@@ -1808,7 +1795,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL/4)       /* not verified */
+	MCFG_DEVICE_ADD("ym2203", YM2203, 12_MHz_XTAL/4)       /* not verified */
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
@@ -1831,7 +1818,7 @@ ROM_START( raimais )
 	ROM_LOAD( "b36-01.bin",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) )
 	ROM_LOAD( "b36-02.bin",   0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ym2610", 0 )
 	ROM_LOAD( "b36-03.bin",   0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) )
 ROM_END
 
@@ -1850,7 +1837,7 @@ ROM_START( raimaisj )
 	ROM_LOAD( "b36-01.bin",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) )
 	ROM_LOAD( "b36-02.bin",   0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ym2610", 0 )
 	ROM_LOAD( "b36-03.bin",   0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) )
 ROM_END
 
@@ -1869,7 +1856,7 @@ ROM_START( raimaisjo )
 	ROM_LOAD( "b36-01.bin",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) )
 	ROM_LOAD( "b36-02.bin",   0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ym2610", 0 )
 	ROM_LOAD( "b36-03.bin",   0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) )
 ROM_END
 
