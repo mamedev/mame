@@ -296,7 +296,7 @@ MACHINE_CONFIG_START(s8a_state::s8a)
 	MCFG_MACHINE_RESET_OVERRIDE(s8a_state, s8a)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s8a)
+	config.set_default_layout(layout_s8a);
 
 	/* Sound */
 	genpin_audio(config);

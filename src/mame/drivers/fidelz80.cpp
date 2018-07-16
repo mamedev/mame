@@ -1667,7 +1667,7 @@ MACHINE_CONFIG_START(fidelz80_state::bcc)
 	MCFG_DEVICE_IO_MAP(bcc_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_bcc)
+	config.set_default_layout(layout_fidel_bcc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1684,7 +1684,7 @@ MACHINE_CONFIG_START(fidelz80_state::scc)
 	MCFG_DEVICE_IO_MAP(scc_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_sc8)
+	config.set_default_layout(layout_fidel_sc8);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1710,7 +1710,7 @@ MACHINE_CONFIG_START(fidelz80_state::cc10)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidelz80_state, vcc_ppi_portc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_cc)
+	config.set_default_layout(layout_fidel_cc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1736,7 +1736,7 @@ MACHINE_CONFIG_START(fidelz80_state::vcc)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidelz80_state, vcc_ppi_portc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_vcc)
+	config.set_default_layout(layout_fidel_vcc);
 
 	MCFG_MACHINE_START_OVERRIDE(fidelz80_state,vcc)
 
@@ -1766,7 +1766,7 @@ MACHINE_CONFIG_START(fidelz80_state::vsc)
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, fidelz80_state, vsc_pio_portb_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_vsc)
+	config.set_default_layout(layout_fidel_vsc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1794,7 +1794,7 @@ MACHINE_CONFIG_START(fidelz80_state::vbrc)
 	MCFG_I8243_ADD("i8243", CONSTANT(0), WRITE8(*this, fidelz80_state, vbrc_ioexp_port_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_vbrc)
+	config.set_default_layout(layout_fidel_vbrc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1813,7 +1813,7 @@ MACHINE_CONFIG_START(fidelz80_state::dsc)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidelz80_state, irq_off, attotime::from_hz(523))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_dsc)
+	config.set_default_layout(layout_fidel_dsc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

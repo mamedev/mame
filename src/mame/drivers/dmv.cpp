@@ -798,7 +798,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dmv)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
-	MCFG_DEFAULT_LAYOUT(layout_dmv)
+	config.set_default_layout(layout_dmv);
 
 	// devices
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(5'000'000)/2) // unk clock

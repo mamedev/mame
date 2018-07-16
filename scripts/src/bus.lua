@@ -100,6 +100,47 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/acorn/bus.h,BUSES["ACORN"] = true
+---------------------------------------------------
+
+if (BUSES["ACORN"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/acorn/bus.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/bus.h",
+		MAME_DIR .. "src/devices/bus/acorn/atom/sid.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/atom/sid.h",
+		MAME_DIR .. "src/devices/bus/acorn/atom/discpack.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/atom/discpack.h",
+		MAME_DIR .. "src/devices/bus/acorn/atom/econet.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/atom/econet.h",
+		MAME_DIR .. "src/devices/bus/acorn/cms/4080term.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/cms/4080term.h",
+		MAME_DIR .. "src/devices/bus/acorn/cms/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/cms/fdc.h",
+		MAME_DIR .. "src/devices/bus/acorn/cms/hires.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/cms/hires.h",
+		MAME_DIR .. "src/devices/bus/acorn/system/32k.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/system/32k.h",
+		MAME_DIR .. "src/devices/bus/acorn/system/8k.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/system/8k.h",
+		MAME_DIR .. "src/devices/bus/acorn/system/cass.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/system/cass.h",
+		MAME_DIR .. "src/devices/bus/acorn/system/econet.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/system/econet.h",
+		MAME_DIR .. "src/devices/bus/acorn/system/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/system/fdc.h",
+		MAME_DIR .. "src/devices/bus/acorn/system/vdu40.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/system/vdu40.h",
+		MAME_DIR .. "src/devices/bus/acorn/system/vdu80.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/system/vdu80.h",
+		MAME_DIR .. "src/devices/bus/acorn/system/vib.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/system/vib.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/adam/exp.h,BUSES["ADAM"] = true
 ---------------------------------------------------
 
@@ -1076,6 +1117,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/aha1542.h",
 		MAME_DIR .. "src/devices/bus/isa/wd1002a_wx1.cpp",
 		MAME_DIR .. "src/devices/bus/isa/wd1002a_wx1.h",
+		MAME_DIR .. "src/devices/bus/isa/wd1007a.cpp",
+		MAME_DIR .. "src/devices/bus/isa/wd1007a.h",
 		MAME_DIR .. "src/devices/bus/isa/dectalk.cpp",
 		MAME_DIR .. "src/devices/bus/isa/dectalk.h",
 		MAME_DIR .. "src/devices/bus/isa/pds.cpp",

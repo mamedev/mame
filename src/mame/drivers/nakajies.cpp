@@ -763,7 +763,7 @@ MACHINE_CONFIG_START(nakajies_state::nakajies210)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wales210)
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(nakajies_state, nakajies)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();

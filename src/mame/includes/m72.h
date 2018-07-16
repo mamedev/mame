@@ -5,6 +5,11 @@
     Irem M72 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_M72_H
+#define MAME_INCLUDES_M72_H
+
+#pragma once
+
 #include "audio/m72.h"
 #include "sound/dac.h"
 #include "machine/pic8259.h"
@@ -27,8 +32,8 @@
 class m72_state : public driver_device
 {
 public:
-	m72_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m72_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
@@ -52,7 +57,7 @@ public:
 		m_m81_b_b_j3(*this, "JumperJ3"),
 		m_m82_rowscroll(0),
 		m_m82_tmcontrol(0)
-		{ }
+	{ }
 
 	void m72_base(machine_config &config);
 	void m72_audio_chips(machine_config &config);
@@ -245,3 +250,5 @@ private:
 	void xmultipl_map(address_map &map);
 	void xmultiplm72_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_M72_H

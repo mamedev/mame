@@ -158,6 +158,7 @@ enum
 DEFINE_DEVICE_TYPE(Z8601,   z8601_device,   "z8601",   "Zilog Z8601")
 DEFINE_DEVICE_TYPE(UB8830D, ub8830d_device, "ub8830d", "UB8830D")
 DEFINE_DEVICE_TYPE(Z8611,   z8611_device,   "z8611",   "Zilog Z8611")
+DEFINE_DEVICE_TYPE(Z8671,   z8671_device,   "z8671",   "Zilog Z8671")
 DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Zilog Z8681")
 
 
@@ -165,50 +166,69 @@ DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Zilog Z8681")
     ADDRESS MAPS
 ***************************************************************************/
 
-void z8_device::program_2kb(address_map &map)
+void z8_device::program_map(address_map &map)
 {
-	map(0x0000, 0x07ff).rom();
+	if (m_rom_size > 0)
+		map(0x0000, m_rom_size - 1).rom().region(DEVICE_SELF, 0);
 }
 
-void z8_device::program_4kb(address_map &map)
+void z8_device::preprogrammed_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rom();
+	map(0x0000, m_rom_size - 1).rom().region("internal", 0);
 }
 
 
-z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_constructor map)
+z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, bool preprogrammed)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, map)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, preprogrammed ? address_map_constructor(FUNC(z8_device::preprogrammed_map), this) : address_map_constructor(FUNC(z8_device::program_map), this))
 	, m_data_config("data", ENDIANNESS_BIG, 8, 16, 0)
 	, m_input_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_output_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_rom_size(rom_size)
 {
+	assert(((rom_size - 1) & rom_size) == 0);
 }
 
 
 z8601_device::z8601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8601, tag, owner, clock, 0x800, address_map_constructor(FUNC(z8601_device::program_2kb), this))
+	: z8_device(mconfig, Z8601, tag, owner, clock, 0x800, false)
 {
 }
 
 
 ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, UB8830D, tag, owner, clock, 0x800, address_map_constructor(FUNC(ub8830d_device::program_2kb), this))
+	: z8_device(mconfig, UB8830D, tag, owner, clock, 0x800, false)
 {
 }
 
 
 z8611_device::z8611_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8611, tag, owner, clock, 0x1000, address_map_constructor(FUNC(z8611_device::program_4kb), this))
+	: z8_device(mconfig, Z8611, tag, owner, clock, 0x1000, false)
 {
+}
+
+
+z8671_device::z8671_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z8_device(mconfig, Z8671, tag, owner, clock, 0x800, true)
+{
+}
+
+ROM_START(z8671)
+	ROM_REGION(0x0800, "internal", 0)
+	ROM_LOAD("z8671.bin", 0x0000, 0x0800, CRC(3fceeb76) SHA1(290a24c77debd2e280fe31380287838c5fb7cabd))
+ROM_END
+
+const tiny_rom_entry *z8671_device::device_rom_region() const
+{
+	return ROM_NAME(z8671);
 }
 
 
 z8681_device::z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8681, tag, owner, clock, 0, address_map_constructor())
+	: z8_device(mconfig, Z8681, tag, owner, clock, 0, false)
 {
 }
+
 
 std::unique_ptr<util::disasm_interface> z8_device::create_disassembler()
 {

@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(palm_state::palm)
 
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(palm_state, palm)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

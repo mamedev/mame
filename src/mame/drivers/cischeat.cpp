@@ -2259,7 +2259,7 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_TIMER_ADD_NONE("motor_right")
 
 	// Layout
-	MCFG_DEFAULT_LAYOUT(layout_captflag)
+	config.set_default_layout(layout_captflag);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -56,7 +56,7 @@ MACHINE_CONFIG_START(kc85_state::kc85_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(kc85_state,kc85)
@@ -84,7 +84,7 @@ MACHINE_CONFIG_START(tandy200_state::tandy200_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(tandy200_state,tandy200)

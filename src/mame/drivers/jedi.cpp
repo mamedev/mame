@@ -336,8 +336,8 @@ MACHINE_CONFIG_START(jedi_state::jedi)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(240))
 
-	MCFG_X2212_ADD("novram12b")
-	MCFG_X2212_ADD("novram12c")
+	X2212(config, "novram12b");
+	X2212(config, "novram12c");
 
 	MCFG_DEVICE_ADD("adc", ADC0809, JEDI_AUDIO_CPU_OSC / 2 / 9) // nominally 666 kHz
 	MCFG_ADC0808_IN0_CB(IOPORT("STICKY"))

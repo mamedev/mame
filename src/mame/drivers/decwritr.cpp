@@ -439,7 +439,7 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	m_ledlatch->q_out_cb<6>().set_output("led7").invert(); // SETUP
 	m_ledlatch->q_out_cb<7>().set_output("led8").invert(); // PAPER OUT
 
-	//MCFG_DEFAULT_LAYOUT( layout_la120 )
+	//config.set_default_layout(layout_la120);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

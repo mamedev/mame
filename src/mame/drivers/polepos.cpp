@@ -926,7 +926,7 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_polepos)
 	MCFG_PALETTE_ADD(m_palette, 0x0f00)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_DEFAULT_LAYOUT(layout_polepos)
+	config.set_default_layout(layout_polepos);
 
 	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
 
@@ -1036,7 +1036,7 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_polepos)
 	MCFG_PALETTE_ADD(m_palette, 0x0f00)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_DEFAULT_LAYOUT(layout_topracer)
+	config.set_default_layout(layout_topracer);
 
 	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
 

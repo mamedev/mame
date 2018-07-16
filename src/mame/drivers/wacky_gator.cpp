@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", wackygtr_state, nmi_timer, attotime::from_hz(100))  // FIXME
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_wackygtr)
+	config.set_default_layout(layout_wackygtr);
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();

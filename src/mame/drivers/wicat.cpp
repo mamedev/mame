@@ -880,7 +880,7 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_MC2661_TXC(19200)
 	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("videoirq", input_merger_device, in_w<4>))
 
-	MCFG_X2210_ADD("vsram")  // XD2210
+	X2210(config, "vsram");  // XD2210
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(19.6608_MHz_XTAL, 1020, 0, 800, 324, 0, 300)
@@ -895,7 +895,7 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_I8275_VRTC_CALLBACK(WRITELINE(*this, wicat_state, crtc_irq_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEFAULT_LAYOUT(layout_wicat)
+	config.set_default_layout(layout_wicat);
 
 	/* Winchester Disk Controller (WD1000 + FD1795) */
 	MCFG_DEVICE_ADD("wd1kcpu", N8X300, 8_MHz_XTAL)

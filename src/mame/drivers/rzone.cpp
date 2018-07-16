@@ -259,7 +259,7 @@ MACHINE_CONFIG_START(rzone_state::rzbatfor)
 
 	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_rzone)
+	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(rzone_state::rztoshden)
 
 	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_rzone)
+	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(rzone_state::rzindy500)
 
 	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_rzone)
+	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

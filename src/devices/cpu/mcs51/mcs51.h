@@ -359,6 +359,8 @@ DECLARE_DEVICE_TYPE(I8032, i8032_device)
 /* variants 4k internal rom and 128 byte internal memory */
 DECLARE_DEVICE_TYPE(I8051, i8051_device)
 DECLARE_DEVICE_TYPE(I8751, i8751_device)
+/* variants 8k internal rom and 128 byte internal memory (no 8052 features) */
+DECLARE_DEVICE_TYPE(AM8753, am8753_device)
 /* variants 8k internal rom and 256 byte internal memory and more registers */
 DECLARE_DEVICE_TYPE(I8052, i8052_device)
 DECLARE_DEVICE_TYPE(I8752, i8752_device)
@@ -396,6 +398,13 @@ class i8751_device : public mcs51_cpu_device
 public:
 	// construction/destruction
 	i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class am8753_device : public mcs51_cpu_device
+{
+public:
+	// construction/destruction
+	am8753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

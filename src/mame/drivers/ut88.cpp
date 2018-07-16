@@ -238,7 +238,7 @@ MACHINE_CONFIG_START(ut88_state::ut88mini)
 	MCFG_MACHINE_RESET_OVERRIDE(ut88_state, ut88mini )
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_ut88mini)
+	config.set_default_layout(layout_ut88mini);
 
 	/* Cassette */
 	SPEAKER(config, "speaker").front_center();

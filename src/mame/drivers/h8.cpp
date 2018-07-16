@@ -321,7 +321,7 @@ MACHINE_CONFIG_START(h8_state::h8)
 	MCFG_I8085A_INTE(WRITELINE(*this, h8_state, h8_inte_callback))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_h8)
+	config.set_default_layout(layout_h8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

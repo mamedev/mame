@@ -351,17 +351,17 @@ MACHINE_CONFIG_START(v100_state::v100)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(v100_state, irq_ack)
 
-	MCFG_DEVICE_ADD("usart1", I8251, XTAL(47'736'000) / 12) // divider not verified
+	I8251(config, m_usart[0], XTAL(47'736'000) / 12); // divider not verified
 
-	MCFG_DEVICE_ADD("brg1", COM8116, 5068800) // TODO: clock and divisors for this customized variant
-	MCFG_COM8116_FR_HANDLER(WRITELINE("usart1", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("usart1", i8251_device, write_txc))
+	com8116_device &brg1(COM8116(config, "brg1", 5068800)); // TODO: clock and divisors for this customized variant
+	brg1.fr_handler().set(m_usart[0], FUNC(i8251_device::write_rxc));
+	brg1.ft_handler().set(m_usart[0], FUNC(i8251_device::write_txc));
 
-	MCFG_DEVICE_ADD("usart2", I8251, XTAL(47'736'000) / 12)
+	I8251(config, m_usart[1], XTAL(47'736'000) / 12);
 
-	MCFG_DEVICE_ADD("brg2", COM8116, 5068800)
-	MCFG_COM8116_FR_HANDLER(WRITELINE("usart2", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(WRITELINE("usart2", i8251_device, write_txc))
+	com8116_device &brg2(COM8116(config, "brg2", 5068800));
+	brg2.fr_handler().set(m_usart[1], FUNC(i8251_device::write_rxc));
+	brg2.ft_handler().set(m_usart[1], FUNC(i8251_device::write_txc));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000) / 2, 102 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 260, 0, 240)

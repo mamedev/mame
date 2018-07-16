@@ -3056,7 +3056,7 @@ MACHINE_CONFIG_START(mpu4_state::mpu4base)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEFAULT_LAYOUT(layout_mpu4)
+	config.set_default_layout(layout_mpu4);
 MACHINE_CONFIG_END
 
 

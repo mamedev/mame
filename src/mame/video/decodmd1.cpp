@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", decodmd_type1_device, dmd_nmi, attotime::from_hz(2000))  // seems a lot
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_ADD("dmd",LCD)
 	MCFG_SCREEN_SIZE(128, 16)

@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(tb303_state::tb303)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clear", tb303_state, tp3_clear, TP3_PERIOD)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tb303)
+	config.set_default_layout(layout_tb303);
 
 	/* sound hardware */
 	// discrete...

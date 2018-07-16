@@ -379,7 +379,7 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_play_2)
+	config.set_default_layout(layout_play_2);
 
 	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL(2'950'000) / 8) // TPB line from CPU
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_2_state, clock_w))

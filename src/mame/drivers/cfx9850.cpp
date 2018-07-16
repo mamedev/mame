@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(cfx9850_state::cfx9850)
 	MCFG_SCREEN_UPDATE_DRIVER(cfx9850_state, screen_update_cfx9850)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	// TODO: Verify amount of colors and palette. Colors can be changed by changing the contrast.
 	MCFG_PALETTE_ADD("palette", 4)

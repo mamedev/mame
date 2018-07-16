@@ -512,24 +512,24 @@ MACHINE_CONFIG_START(sauro_state::sauro)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, sauro_state, sauro_palette_bank0_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, sauro_state, sauro_palette_bank1_w))
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(20'000'000)/5)     /* verified on pcb */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(20'000'000) / 5)     /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(sauro_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(sauro_state, irq0_line_hold,  8*60) // ?
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(sauro_state, irq0_line_hold, 8 * 60) // ?
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sauro)
 
-	MCFG_VIDEO_START_OVERRIDE(sauro_state,sauro)
+	MCFG_VIDEO_START_OVERRIDE(sauro_state, sauro)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_sauro)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_MODIFY("ymsnd")
-	MCFG_DEVICE_CLOCK(XTAL(20'000'000)/5)     /* verified on pcb */
+	MCFG_DEVICE_CLOCK(XTAL(20'000'000) / 5)     /* verified on pcb */
 
-	MCFG_DEVICE_ADD("speech", SP0256, XTAL(20'000'000)/5)     /* verified on pcb */
-	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SP0256(config, m_sp0256, XTAL(20'000'000) / 5);     /* verified on pcb */
+	m_sp0256->data_request_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	m_sp0256->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sauro_state::saurob)

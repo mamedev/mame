@@ -441,7 +441,7 @@ MACHINE_CONFIG_START(s7_state::s7)
 	MCFG_MACHINE_RESET_OVERRIDE(s7_state, s7)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s7)
+	config.set_default_layout(layout_s7);
 
 	/* Sound */
 	genpin_audio(config);

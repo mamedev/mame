@@ -1778,7 +1778,7 @@ MACHINE_CONFIG_START(vsnes_state::vsdual)
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("screen1", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

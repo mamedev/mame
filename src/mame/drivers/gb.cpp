@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(gb_state::gameboy)
 	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 //  MCFG_SCREEN_SIZE(20*8, 18*8)
 	MCFG_SCREEN_SIZE( 458, 154 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
@@ -666,7 +666,7 @@ MACHINE_CONFIG_START(gb_state::supergb)
 	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_horizont) /* runs on a TV, not an LCD */
+	config.set_default_layout(layout_horizont); /* runs on a TV, not an LCD */
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 
@@ -701,7 +701,7 @@ MACHINE_CONFIG_START(gb_state::supergb2)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_horizont) /* runs on a TV, not an LCD */
+	config.set_default_layout(layout_horizont); /* runs on a TV, not an LCD */
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 28*8)
@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 //  MCFG_SCREEN_SIZE(20*8, 18*8)
 	MCFG_SCREEN_SIZE( 458, 154 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
@@ -795,7 +795,7 @@ MACHINE_CONFIG_START(megaduck_state::megaduck)
 	MCFG_SCREEN_SIZE(20*8, 18*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("palette", 4)

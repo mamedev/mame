@@ -805,7 +805,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(6_MHz_XTAL * 2, 720, 0, 512, 278, 0, 256)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w)) // XXX actually it's driven by 555 (U59)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
@@ -825,7 +825,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
 	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(6_MHz_XTAL * 2, 720, 0, 640, 480, 0, 400)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w))
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")

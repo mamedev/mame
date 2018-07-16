@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(mmd1_state::mmd1)
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd1)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mmd1)
+	config.set_default_layout(layout_mmd1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mmd1_state::mmd2)
@@ -516,7 +516,7 @@ MACHINE_CONFIG_START(mmd1_state::mmd2)
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd2)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mmd2)
+	config.set_default_layout(layout_mmd2);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("i8279", I8279, 400000) // based on divider

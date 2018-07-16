@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	MCFG_HD44780_PIXEL_UPDATE_CB(novagbase_state, novag_lcd_pixel_update)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_diablo68k)
+	config.set_default_layout(layout_novag_diablo68k);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(novag68k_state::scorpio68k)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(scorpio68k_map)
 
-	MCFG_DEFAULT_LAYOUT(layout_novag_scorpio68k)
+	config.set_default_layout(layout_novag_scorpio68k);
 MACHINE_CONFIG_END
 
 

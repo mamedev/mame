@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(techno_state::techno)
 	//MCFG_DEVICE_PROGRAM_MAP(techno_sub_map)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_techno)
+	config.set_default_layout(layout_techno);
 MACHINE_CONFIG_END
 
 ROM_START(xforce)

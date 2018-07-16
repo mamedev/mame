@@ -1827,7 +1827,7 @@ MACHINE_CONFIG_START(konamigx_state::gxtype3)
 	MCFG_DEVICE_PROGRAM_MAP(gx_type3_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type4_scanline, "screen", 0, 1)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_type3)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type3)
@@ -1868,7 +1868,7 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4)
 	MCFG_DEVICE_PROGRAM_MAP(gx_type4_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type4_scanline, "screen", 0, 1)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
@@ -1905,7 +1905,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamigx_state::gxtype4_vsn)
 	gxtype4(config);
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	//MCFG_SCREEN_MODIFY("screen")
 	//MCFG_SCREEN_SIZE(128*8, 32*8)

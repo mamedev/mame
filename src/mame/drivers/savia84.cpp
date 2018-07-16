@@ -188,7 +188,7 @@ MACHINE_CONFIG_START(savia84_state::savia84)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_savia84)
+	config.set_default_layout(layout_savia84);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)

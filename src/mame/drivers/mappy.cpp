@@ -609,19 +609,10 @@ WRITE_LINE_MEMBER(mappy_state::mappy_flip_w)
 }
 
 
-void mappy_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+template<uint8_t Chip>
+TIMER_CALLBACK_MEMBER(mappy_state::namcoio_run_timer)
 {
-	switch (id)
-	{
-		case TIMER_IO0_RUN:
-			m_namcoio[0]->customio_run();
-			break;
-		case TIMER_IO1_RUN:
-			m_namcoio[1]->customio_run();
-			break;
-		default:
-			assert_always(false, "Unknown id in mappy_state::device_timer");
-	}
+	m_namcoio[Chip]->customio_run();
 }
 
 WRITE_LINE_MEMBER(mappy_state::vblank_irq)
@@ -1315,8 +1306,8 @@ void mappy_state::machine_start()
 {
 	m_leds.resolve();
 
-	m_namcoio_run_timer[0] = timer_alloc(TIMER_IO0_RUN);
-	m_namcoio_run_timer[1] = timer_alloc(TIMER_IO1_RUN);
+	m_namcoio_run_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mappy_state::namcoio_run_timer<0>), this));
+	m_namcoio_run_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mappy_state::namcoio_run_timer<1>), this));
 
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));

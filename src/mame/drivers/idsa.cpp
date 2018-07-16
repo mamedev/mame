@@ -348,8 +348,8 @@ MACHINE_CONFIG_START(idsa_state::idsa)
 	genpin_audio(config);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("speech", SP0256, 3120000) // unknown variant
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.5)
+	SP0256(config, m_speech, 3120000); // unknown variant
+	m_speech->add_route(ALL_OUTPUTS, "lspeaker", 1.5);
 
 	MCFG_DEVICE_ADD("aysnd1", AY8910, 2000000) // 2Mhz according to pinmame, schematic omits the clock line
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)

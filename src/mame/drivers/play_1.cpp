@@ -484,7 +484,7 @@ MACHINE_CONFIG_START(play_1_state::play_1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_play_1)
+	config.set_default_layout(layout_play_1);
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 100) // crossing-point detector
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_1_state, clock_w))

@@ -1803,7 +1803,7 @@ MACHINE_CONFIG_START(model1_state::wingwar)
 	ioboard.an_callback<2>().set_ioport("THROTTLE");
 	ioboard.output_callback().set(FUNC(model1_state::wingwar_outputs_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_model1io2)
+	config.set_default_layout(layout_model1io2);
 
 	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
 MACHINE_CONFIG_END
@@ -1818,7 +1818,7 @@ void model1_state::wingwar360(machine_config &config)
 	ioboard.an_callback<2>().set_constant(0);
 	ioboard.output_callback().set(FUNC(model1_state::wingwar360_outputs_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_model1io2)
+	config.set_default_layout(layout_model1io2);
 MACHINE_CONFIG_END
 
 void model1_state::polhemus_map(address_map &map)
@@ -1843,7 +1843,7 @@ MACHINE_CONFIG_START(model1_state::netmerc)
 	ioboard.an_callback<2>().set_ioport("STICKY");
 	ioboard.output_callback().set(FUNC(model1_state::netmerc_outputs_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_model1io2)
+	config.set_default_layout(layout_model1io2);
 MACHINE_CONFIG_END
 
 

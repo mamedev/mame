@@ -179,7 +179,7 @@ void tranz330_state::tranz330(machine_config &config)
 
 	// video
 	MIC10937(config, VFD_TAG).set_port_value(0);
-	config.m_default_layout = &layout_tranz330;
+	config.set_default_layout(layout_tranz330);
 
 	// sound
 	SPEAKER(config, "mono").front_center();

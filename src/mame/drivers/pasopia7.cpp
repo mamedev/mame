@@ -1012,7 +1012,7 @@ MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_DEFAULT_LAYOUT( layout_lcd )
+	config.set_default_layout(layout_lcd);
 MACHINE_CONFIG_END
 
 /* ROM definition */

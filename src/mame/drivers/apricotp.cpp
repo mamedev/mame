@@ -601,7 +601,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_apricotp )
+	config.set_default_layout(layout_apricotp);
 
 	MCFG_SCREEN_ADD(SCREEN_LCD_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)

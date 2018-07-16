@@ -70,8 +70,6 @@
 #define RS232_K_TAG "rs232kbd"
 #define RS232_D_TAG "rs232debug"
 #define RS232_M_TAG "rs232mouse"
-#define COM8116_A_TAG "com8116_a"
-#define COM8116_B_TAG "com8116_b"
 #define ADLC_TAG "adlc"
 #define PIA_TAG "pia"
 #define PSG_TAG "psg"
@@ -101,8 +99,8 @@ public:
 		, m_acia2(*this, ACIA2_TAG)
 		, m_acia3(*this, ACIA3_TAG)
 		, m_adlc(*this, ADLC_TAG)
-		, m_dbrga(*this, COM8116_A_TAG)
-		, m_dbrgb(*this, COM8116_B_TAG)
+		, m_dbrga(*this, "com8116_a")
+		, m_dbrgb(*this, "com8116_b")
 		, m_pia(*this, PIA_TAG)
 		, m_psg(*this, PSG_TAG)
 		, m_earom(*this, EAROM_TAG)
@@ -536,13 +534,13 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA2_TAG, acia6850_device, write_cts))
 
 	// XXX actual part may be something else
-	MCFG_DEVICE_ADD(COM8116_A_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, bitgraph_state, com8116_a_fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(*this, bitgraph_state, com8116_a_ft_w))
+	COM8116(config, m_dbrga, 5.0688_MHz_XTAL);
+	m_dbrga->fr_handler().set(FUNC(bitgraph_state::com8116_a_fr_w));
+	m_dbrga->ft_handler().set(FUNC(bitgraph_state::com8116_a_ft_w));
 
-	MCFG_DEVICE_ADD(COM8116_B_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(*this, bitgraph_state, com8116_b_fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(*this, bitgraph_state, com8116_b_ft_w))
+	COM8116(config, m_dbrgb, 5.0688_MHz_XTAL);
+	m_dbrgb->fr_handler().set(FUNC(bitgraph_state::com8116_b_fr_w));
+	m_dbrgb->ft_handler().set(FUNC(bitgraph_state::com8116_b_ft_w));
 
 	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
 	MCFG_PIA_READCA1_HANDLER(READLINE(*this, bitgraph_state, pia_ca1_r))

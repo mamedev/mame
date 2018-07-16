@@ -528,7 +528,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	MCFG_PALETTE_ADD("rpalette", 2048)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	MCFG_PALETTE_ADD("rpalette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -649,7 +649,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 	MCFG_PALETTE_ADD("rpalette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -46,15 +46,8 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	enum
-	{
-		TIMER_IO0_RUN,
-		TIMER_IO1_RUN
-	};
-
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
@@ -95,6 +88,7 @@ private:
 	TILE_GET_INFO_MEMBER(superpac_get_tile_info);
 	TILE_GET_INFO_MEMBER(phozon_get_tile_info);
 	TILE_GET_INFO_MEMBER(mappy_get_tile_info);
+	template<uint8_t Chip> TIMER_CALLBACK_MEMBER(namcoio_run_timer);
 
 	DECLARE_VIDEO_START(superpac);
 	DECLARE_PALETTE_INIT(superpac);
