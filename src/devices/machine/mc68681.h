@@ -230,6 +230,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void update_interrupts() override;
+	mc68681_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
 	bool m_read_vector; // if this is read and IRQ is active, it counts as pulling IACK
@@ -270,10 +271,20 @@ protected:
 	mc68340_duart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class xr68c681_device : public mc68681_device
+{
+public:
+	xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_READ8_MEMBER(read) override;
+	//virtual DECLARE_WRITE8_MEMBER(write) override;
+};
+
 DECLARE_DEVICE_TYPE(SCN2681, scn2681_device)
 DECLARE_DEVICE_TYPE(MC68681, mc68681_device)
 DECLARE_DEVICE_TYPE(SC28C94, sc28c94_device)
 DECLARE_DEVICE_TYPE(MC68340_DUART, mc68340_duart_device)
+DECLARE_DEVICE_TYPE(XR68C681, xr68c681_device)
 DECLARE_DEVICE_TYPE(DUART_CHANNEL, duart_channel)
 
 #endif // MAME_MACHINE_MC68681_H

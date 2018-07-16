@@ -5,12 +5,14 @@
     68681 DUART
     28C94 QUART
     68340 serial module
+    XR68C681 DUART (backwards compatible with 68681 with some improvements)
 
     Written by Mariusz Wojcieszek
     Updated by Jonathan Gevaryahu AKA Lord Nightmare
     Improved interrupt handling by R. Belmont
     Rewrite and modernization in progress by R. Belmont
     Addition of the duart compatible 68340 serial module support by Edstrom
+    Support for the Exar XR68C681 by Joseph Zatarski
 
     The main incompatibility between the 2681 and 68681 (Signetics and Motorola each
     manufactured both versions of the chip) is that the 68681 has a R/W input and
@@ -21,6 +23,26 @@
     The command register addresses should never be read from. Doing so may place
     the baud rate generator into a test mode which drives the parallel outputs with
     internal counters and causes serial ports to operate at uncontrollable rates.
+
+    Exar XR68C681
+
+    The XR68C681 is an improvement upon the MC68681 which supports more baud
+    rates, adds an additional MISR (masked ISR) register, and adds a low-power
+    standby mode. There may be other differences, but these are the most
+    notable.
+
+    The extra baud rates are implemented by an 'X' bit for each channel. The X
+    bit chooses between two baud rate tables, in addition to the ACR[7] bit.
+    The X bit is changed by additional commands that are written to CRA and
+    CRB.
+
+    The MISR is a read only register that takes the place of the 'BRG Test'
+    register on the MC68681.
+
+    The low power standby mode is entered and left by a command written to CRA
+    or CRB registers. Writing the commands to either register affects the whole
+    DUART, not just one channel. Resetting the DUART also leaves low power
+    mode.
 */
 
 #include "emu.h"
@@ -74,6 +96,7 @@ DEFINE_DEVICE_TYPE(SCN2681, scn2681_device, "scn2681", "SCN2681 DUART")
 DEFINE_DEVICE_TYPE(MC68681, mc68681_device, "mc68681", "MC68681 DUART")
 DEFINE_DEVICE_TYPE(SC28C94, sc28c94_device, "sc28c94", "SC28C94 QUART")
 DEFINE_DEVICE_TYPE(MC68340_DUART, mc68340_duart_device, "mc68340duart", "MC68340 DUART Device")
+DEFINE_DEVICE_TYPE(XR68C681, xr68c681_device, "xr68c681", "XR68C681 DUART")
 DEFINE_DEVICE_TYPE(DUART_CHANNEL, duart_channel, "duart_channel", "DUART channel")
 
 
@@ -108,9 +131,14 @@ scn2681_device::scn2681_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: duart_base_device(mconfig, MC68681, tag, owner, clock),
+mc68681_device::mc68681_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: duart_base_device(mconfig, type, tag, owner, clock),
 	m_read_vector(false)
+{
+}
+
+mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68681_device(mconfig, MC68681, tag, owner, clock)
 {
 }
 
@@ -133,6 +161,11 @@ mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, device
 
 mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc68340_duart_device(mconfig, MC68340_DUART, tag, owner, clock)
+{
+}
+
+xr68c681_device::xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68681_device(mconfig, XR68C681, tag, owner, clock)
 {
 }
 
@@ -472,6 +505,11 @@ READ8_MEMBER( sc28c94_device::read )
 	}
 
 	return r;
+}
+
+READ8_MEMBER( xr68c681_device::read )
+{
+	return mc68681_device::read(space, offset, mem_mask);
 }
 
 READ8_MEMBER( duart_base_device::read )
