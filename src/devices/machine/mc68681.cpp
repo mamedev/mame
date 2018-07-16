@@ -509,7 +509,13 @@ READ8_MEMBER( sc28c94_device::read )
 
 READ8_MEMBER( xr68c681_device::read )
 {
-	return mc68681_device::read(space, offset, mem_mask);
+	if (offset == 0x02)
+	{
+		LOG( "Reading XR68C681 (%s) reg 0x02 (MISR)\n", tag());
+		return ISR & IMR;
+	}
+	else
+		return mc68681_device::read(space, offset, mem_mask);
 }
 
 READ8_MEMBER( duart_base_device::read )

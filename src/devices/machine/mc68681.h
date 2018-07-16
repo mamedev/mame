@@ -169,8 +169,12 @@ private:
 
 	/* registers */
 	uint8_t ACR;  /* Auxiliary Control Register */
+
+protected: /* made this protected so the XR68C681 routines can calculate MISR */
 	uint8_t IMR;  /* Interrupt Mask Register */
 	uint8_t ISR;  /* Interrupt Status Register */
+
+private:
 	uint8_t OPCR; /* Output Port Conf. Register */
 	uint8_t OPR;  /* Output Port Register */
 	PAIR  CTR;  /* Counter/Timer Preset Value */
