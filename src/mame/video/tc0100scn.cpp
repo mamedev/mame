@@ -155,21 +155,11 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	device_t(mconfig, TC0100SCN, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, nullptr),
 	m_ram(nullptr),
-	m_bg_ram(nullptr),
-	m_fg_ram(nullptr),
 	m_tx_ram(nullptr),
 	m_char_ram(nullptr),
-	m_bgscroll_ram(nullptr),
-	m_fgscroll_ram(nullptr),
 	m_colscroll_ram(nullptr),
-	m_bgscrollx(0),
-	m_bgscrolly(0),
-	m_fgscrollx(0),
-	m_fgscrolly(0),
 	m_bg_tilemask(0),
 	m_gfxbank(0),
-	m_bg0_colbank(0),
-	m_bg1_colbank(0),
 	m_tx_colbank(0),
 	m_dblwidth(0),
 	m_gfxnum(0),
@@ -183,6 +173,14 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	m_multiscrn_hack(0),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
+	std::fill(std::begin(m_bg_colbank), std::end(m_bg_colbank), 0);
+	std::fill(std::begin(m_scrollx), std::end(m_scrollx), 0);
+	std::fill(std::begin(m_scrolly), std::end(m_scrolly), 0);
+	for (int i = 0; i < 2; i++)
+	{
+		m_bg_ram[i] = nullptr;
+		m_scroll_ram[i] = nullptr;
+	}
 }
 
 //-------------------------------------------------
@@ -213,13 +211,13 @@ void tc0100scn_device::device_start()
 	   we're safe as it uses single width tilemaps. */
 
 	/* Single width versions */
-	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[2][0] = &machine().tilemap().create(*this,        tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	/* Double width versions */
-	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	m_tilemap[2][1] = &machine().tilemap().create(*this,        tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	m_tilemap[0][0]->set_transparent_pen(0);
@@ -307,36 +305,27 @@ void tc0100scn_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void tc0100scn_device::common_get_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int colbank )
+template<int Layer>
+TILE_GET_INFO_MEMBER(tc0100scn_device::get_bg_tile_info)
 {
 	int code, attr;
 
 	if (!m_dblwidth)
 	{
 		/* Mahjong Quest (F2 system) inexplicably has a banking feature */
-		code = (ram[2 * tile_index + 1] & m_bg_tilemask) + (m_gfxbank << 15);
-		attr = ram[2 * tile_index];
+		code = (m_bg_ram[Layer][2 * tile_index + 1] & m_bg_tilemask) + (m_gfxbank << 15);
+		attr = m_bg_ram[Layer][2 * tile_index];
 	}
 	else
 	{
-		code = ram[2 * tile_index + 1] & m_bg_tilemask;
-		attr = ram[2 * tile_index];
+		code = m_bg_ram[Layer][2 * tile_index + 1] & m_bg_tilemask;
+		attr = m_bg_ram[Layer][2 * tile_index];
 	}
 
 	SET_TILE_INFO_MEMBER(m_gfxnum,
 			code,
-			((attr + colbank) & 0xff),
+			((attr + m_bg_colbank[Layer]) & 0xff),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
-}
-
-TILE_GET_INFO_MEMBER(tc0100scn_device::get_bg_tile_info)
-{
-	common_get_tile_info(tileinfo, tile_index, m_bg_ram, m_bg0_colbank);
-}
-
-TILE_GET_INFO_MEMBER(tc0100scn_device::get_fg_tile_info)
-{
-	common_get_tile_info(tileinfo, tile_index, m_fg_ram, m_bg1_colbank);
 }
 
 TILE_GET_INFO_MEMBER(tc0100scn_device::get_tx_tile_info)
@@ -351,8 +340,8 @@ TILE_GET_INFO_MEMBER(tc0100scn_device::get_tx_tile_info)
 
 void tc0100scn_device::set_colbanks( int bg0, int bg1, int tx )
 {
-	m_bg0_colbank = bg0;
-	m_bg1_colbank = bg1;
+	m_bg_colbank[0] = bg0;
+	m_bg_colbank[1] = bg1;
 	m_tx_colbank = tx;
 }
 
@@ -370,20 +359,20 @@ void tc0100scn_device::set_layer_ptrs()
 {
 	if (!m_dblwidth)
 	{
-		m_bg_ram        = m_ram.get() + 0x0;
+		m_bg_ram[0]        = m_ram.get() + 0x0;
 		m_tx_ram        = m_ram.get() + 0x4000 /2;
 		m_char_ram      = m_ram.get() + 0x6000 /2;
-		m_fg_ram        = m_ram.get() + 0x8000 /2;
-		m_bgscroll_ram  = m_ram.get() + 0xc000 /2;
-		m_fgscroll_ram  = m_ram.get() + 0xc400 /2;
+		m_bg_ram[1]        = m_ram.get() + 0x8000 /2;
+		m_scroll_ram[0]  = m_ram.get() + 0xc000 /2;
+		m_scroll_ram[1]  = m_ram.get() + 0xc400 /2;
 		m_colscroll_ram = m_ram.get() + 0xe000 /2;
 	}
 	else
 	{
-		m_bg_ram        = m_ram.get() + 0x0;
-		m_fg_ram        = m_ram.get() + 0x08000 /2;
-		m_bgscroll_ram  = m_ram.get() + 0x10000 /2;
-		m_fgscroll_ram  = m_ram.get() + 0x10400 /2;
+		m_bg_ram[0]        = m_ram.get() + 0x0;
+		m_bg_ram[1]        = m_ram.get() + 0x08000 /2;
+		m_scroll_ram[0]  = m_ram.get() + 0x10000 /2;
+		m_scroll_ram[1]  = m_ram.get() + 0x10400 /2;
 		m_colscroll_ram = m_ram.get() + 0x10800 /2;
 		m_char_ram      = m_ram.get() + 0x11000 /2;
 		m_tx_ram        = m_ram.get() + 0x12000 /2;
@@ -401,13 +390,13 @@ void tc0100scn_device::restore_scroll()
 {
 	int flip;
 
-	m_bgscrollx = -m_ctrl[0];
-	m_fgscrollx = -m_ctrl[1];
+	m_scrollx[0] = -m_ctrl[0];
+	m_scrollx[1] = -m_ctrl[1];
 	m_tilemap[2][0]->set_scrollx(0, -m_ctrl[2]);
 	m_tilemap[2][1]->set_scrollx(0, -m_ctrl[2]);
 
-	m_bgscrolly = -m_ctrl[3];
-	m_fgscrolly = -m_ctrl[4];
+	m_scrolly[0] = -m_ctrl[3];
+	m_scrolly[1] = -m_ctrl[4];
 	m_tilemap[2][0]->set_scrolly(0, -m_ctrl[5]);
 	m_tilemap[2][1]->set_scrolly(0, -m_ctrl[5]);
 
@@ -482,11 +471,11 @@ WRITE16_MEMBER( tc0100scn_device::ctrl_word_w )
 	switch (offset)
 	{
 		case 0x00:
-			m_bgscrollx = -data;
+			m_scrollx[0] = -data;
 			break;
 
 		case 0x01:
-			m_fgscrollx = -data;
+			m_scrollx[1] = -data;
 			break;
 
 		case 0x02:
@@ -495,11 +484,11 @@ WRITE16_MEMBER( tc0100scn_device::ctrl_word_w )
 			break;
 
 		case 0x03:
-			m_bgscrolly = -data;
+			m_scrolly[0] = -data;
 			break;
 
 		case 0x04:
-			m_fgscrolly = -data;
+			m_scrolly[1] = -data;
 			break;
 
 		case 0x05:
@@ -591,13 +580,13 @@ void tc0100scn_device::tilemap_update()
 {
 	int j;
 
-	m_tilemap[0][m_dblwidth]->set_scrolly(0, m_bgscrolly);
-	m_tilemap[1][m_dblwidth]->set_scrolly(0, m_fgscrolly);
+	m_tilemap[0][m_dblwidth]->set_scrolly(0, m_scrolly[0]);
+	m_tilemap[1][m_dblwidth]->set_scrolly(0, m_scrolly[1]);
 
 	for (j = 0; j < 256; j++)
-		m_tilemap[0][m_dblwidth]->set_scrollx((j + m_bgscrolly) & 0x1ff, m_bgscrollx - m_bgscroll_ram[j]);
+		m_tilemap[0][m_dblwidth]->set_scrollx((j + m_scrolly[0]) & 0x1ff, m_scrollx[0] - m_scroll_ram[0][j]);
 	for (j = 0; j < 256; j++)
-		m_tilemap[1][m_dblwidth]->set_scrollx((j + m_fgscrolly) & 0x1ff, m_fgscrollx - m_fgscroll_ram[j]);
+		m_tilemap[1][m_dblwidth]->set_scrollx((j + m_scrolly[1]) & 0x1ff, m_scrollx[1] - m_scroll_ram[1][j]);
 }
 
 void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, uint32_t priority )
@@ -611,7 +600,7 @@ void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bit
 	width_mask = src_bitmap.width() - 1;
 	height_mask = src_bitmap.height() - 1;
 
-	src_y = (m_fgscrolly + scrolly_delta) & height_mask;
+	src_y = (m_scrolly[1] + scrolly_delta) & height_mask;
 	if (m_ctrl[0x7] & 1) // Flipscreen
 		src_y = (256 - src_y) & height_mask;
 
@@ -620,7 +609,7 @@ void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bit
 	// Row offsets are 'screen space' 0-255 regardless of Y scroll
 	for (y = 0; y <= cliprect.max_y; y++)
 	{
-		src_x = (m_fgscrollx - m_fgscroll_ram[(y + scrolly_delta) & 0x1ff] + scrollx_delta + cliprect.min_x) & width_mask;
+		src_x = (m_scrollx[1] - m_scroll_ram[1][(y + scrolly_delta) & 0x1ff] + scrollx_delta + cliprect.min_x) & width_mask;
 		if (m_ctrl[0x7] & 1) // Flipscreen
 			src_x = (256 - 64 - src_x) & width_mask;
 
@@ -648,6 +637,10 @@ void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bit
 int tc0100scn_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority )
 {
 	int disable = m_ctrl[6] & 0xf7;
+
+	if (BIT(disable, layer))
+		return 1;
+
 	rectangle clip = cliprect;
 	clip &= screen.visible_area();
 
@@ -659,18 +652,12 @@ if (disable != 0 && disable != 3 && disable != 7)
 	switch (layer)
 	{
 		case 0:
-			if (disable & 0x01)
-				return 1;
 			m_tilemap[0][m_dblwidth]->draw(screen, bitmap, clip, flags, priority);
 			break;
 		case 1:
-			if (disable & 0x02)
-				return 1;
 			tilemap_draw_fg(screen, bitmap, clip, m_tilemap[1][m_dblwidth], flags, priority);
 			break;
 		case 2:
-			if (disable & 0x04)
-				return 1;
 			m_tilemap[2][m_dblwidth]->draw(screen, bitmap, clip, flags, priority);
 			break;
 	}

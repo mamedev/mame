@@ -3556,27 +3556,11 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(taitof2_state::deadconxj)
-	taito_f2_te7750(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(deadconx_map)
+	deadconx(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_deadconxj)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
-
-	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
-	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_GFX_PALETTE("palette")
+	MCFG_DEVICE_MODIFY("tc0480scp")
 	MCFG_TC0480SCP_OFFSETS(0x34 + 3, -0x05)
-	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
-	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
-	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-
-	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 

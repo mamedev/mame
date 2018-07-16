@@ -26,7 +26,6 @@ void galastrm_state::video_start()
 	m_screen->register_screen_bitmap(m_tmpbitmaps);
 	m_screen->register_screen_bitmap(m_poly->screenbits());
 
-	save_item(NAME(m_tc0110pcr_addr));
 	save_item(NAME(m_tc0610_addr));
 	save_item(NAME(m_tc0610_ctrl_reg));
 	save_item(NAME(m_rsxb));

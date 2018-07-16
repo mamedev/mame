@@ -162,11 +162,6 @@ VIDEO_START_MEMBER(taitof2_state,taitof2_deadconx)
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_deadconxj)
-{
-	taitof2_core_vh_start(0, 3, 3);
-}
-
 VIDEO_START_MEMBER(taitof2_state,taitof2_metalb)
 {
 	taitof2_core_vh_start(0, 3, 3);

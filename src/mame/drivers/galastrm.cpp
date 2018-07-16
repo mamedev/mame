@@ -57,14 +57,6 @@ INTERRUPT_GEN_MEMBER(galastrm_state::galastrm_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-WRITE32_MEMBER(galastrm_state::galastrm_palette_w)
-{
-	if (ACCESSING_BITS_16_31)
-		m_tc0110pcr_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (m_tc0110pcr_addr < 4096))
-		m_palette->set_pen_color(m_tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-}
-
 template<int RegNo>
 WRITE32_MEMBER(galastrm_state::galastrm_tc0610_w)
 {
@@ -104,7 +96,7 @@ void galastrm_state::galastrm_map(address_map &map)
 	map(0x600000, 0x6007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); /* Sound shared ram */
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
-	map(0x900000, 0x900003).w(FUNC(galastrm_state::galastrm_palette_w));                               /* TC0110PCR */
+	map(0x900000, 0x900003).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));  /* TC0110PCR */
 	map(0xb00000, 0xb00003).w(FUNC(galastrm_state::galastrm_tc0610_w<0>));                              /* TC0610 */
 	map(0xc00000, 0xc00003).w(FUNC(galastrm_state::galastrm_tc0610_w<1>));
 	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));        /* piv tilemaps */
@@ -231,6 +223,8 @@ MACHINE_CONFIG_START(galastrm_state::galastrm)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galastrm)
 	MCFG_PALETTE_ADD("palette", 4096)
+
+	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(0)

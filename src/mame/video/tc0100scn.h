@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "emupal.h"
-
 class tc0100scn_device : public device_t, public device_gfx_interface
 {
 public:
@@ -72,25 +70,23 @@ protected:
 
 private:
 	// internal state
-	uint16_t       m_ctrl[8];
+	uint16_t     m_ctrl[8];
 
 	std::unique_ptr<uint16_t[]>    m_ram;
-	uint16_t *     m_bg_ram;
-	uint16_t *     m_fg_ram;
-	uint16_t *     m_tx_ram;
-	uint16_t *     m_char_ram;
-	uint16_t *     m_bgscroll_ram;
-	uint16_t *     m_fgscroll_ram;
-	uint16_t *     m_colscroll_ram;
+	uint16_t     *m_bg_ram[2];
+	uint16_t     *m_tx_ram;
+	uint16_t     *m_char_ram;
+	uint16_t     *m_scroll_ram[2];
+	uint16_t     *m_colscroll_ram;
 
-	int          m_bgscrollx, m_bgscrolly, m_fgscrollx, m_fgscrolly;
+	int          m_scrollx[2], m_scrolly[2];
 
 	/* We keep two tilemaps for each of the 3 actual tilemaps: one at standard width, one double */
-	tilemap_t      *m_tilemap[3][2];
+	tilemap_t    *m_tilemap[3][2];
 
 	int          m_bg_tilemask;
-	int32_t        m_gfxbank;
-	int32_t        m_bg0_colbank, m_bg1_colbank, m_tx_colbank;
+	int32_t      m_gfxbank;
+	int32_t      m_bg_colbank[2], m_tx_colbank;
 	int          m_dblwidth;
 
 	int          m_gfxnum;
@@ -102,11 +98,8 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-
-	void common_get_tile_info(tile_data &tileinfo, int tile_index, uint16_t *ram, int colbank);
 
 	void tilemap_draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, uint32_t priority);
 	void set_layer_ptrs();

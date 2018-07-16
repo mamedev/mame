@@ -208,7 +208,6 @@ protected:
 	DECLARE_VIDEO_START(taitof2_qzchikyu);
 	DECLARE_VIDEO_START(taitof2_yesnoj);
 	DECLARE_VIDEO_START(taitof2_deadconx);
-	DECLARE_VIDEO_START(taitof2_deadconxj);
 	DECLARE_VIDEO_START(taitof2_dinorex);
 	DECLARE_VIDEO_START(taitof2_quiz);
 	uint32_t screen_update_taitof2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
