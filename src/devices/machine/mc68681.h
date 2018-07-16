@@ -59,7 +59,7 @@ public:
 
 	uint8_t read_rx_fifo();
 
-	void ACR_updated();
+	void baud_updated();
 
 	uint8_t get_chan_CSR();
 
@@ -167,10 +167,9 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER( duart_timer_callback );
 
+protected:
 	/* registers */
 	uint8_t ACR;  /* Auxiliary Control Register */
-
-protected: /* made this protected so the XR68C681 routines can calculate MISR */
 	uint8_t IMR;  /* Interrupt Mask Register */
 	uint8_t ISR;  /* Interrupt Status Register */
 
@@ -190,7 +189,7 @@ private:
 	double get_ct_rate();
 	uint16_t get_ct_count();
 	void start_ct(int count);
-	int calc_baud(int ch, uint8_t data);
+	virtual int calc_baud(int ch, bool rx, uint8_t data);
 	void clear_ISR_bits(int mask);
 	void set_ISR_bits(int mask);
 
@@ -281,7 +280,16 @@ public:
 	xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER(read) override;
-	//virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	virtual int calc_baud(int ch, bool rx, uint8_t data) override;
+
+	bool m_XTXA,m_XRXA,m_XTXB,m_XRXB; /* X bits for the BRG (selects between 2 BRG tables) */
 };
 
 DECLARE_DEVICE_TYPE(SCN2681, scn2681_device)
