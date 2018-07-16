@@ -766,6 +766,7 @@ void i8291a_device::run_t_fsm()
 {
 	switch (m_t_state) {
 	case talker_state::TIDS:
+		m_send_eoi = false;
 		m_address_status &= ~REG_ADDRESS_STATUS_TA;
 		break;
 
