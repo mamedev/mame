@@ -5,12 +5,14 @@
     68681 DUART
     28C94 QUART
     68340 serial module
+    XR68C681 DUART (backwards compatible with 68681 with some improvements)
 
     Written by Mariusz Wojcieszek
     Updated by Jonathan Gevaryahu AKA Lord Nightmare
     Improved interrupt handling by R. Belmont
     Rewrite and modernization in progress by R. Belmont
     Addition of the duart compatible 68340 serial module support by Edstrom
+    Support for the Exar XR68C681 by Joseph Zatarski
 
     The main incompatibility between the 2681 and 68681 (Signetics and Motorola each
     manufactured both versions of the chip) is that the 68681 has a R/W input and
@@ -21,6 +23,26 @@
     The command register addresses should never be read from. Doing so may place
     the baud rate generator into a test mode which drives the parallel outputs with
     internal counters and causes serial ports to operate at uncontrollable rates.
+
+    Exar XR68C681
+
+    The XR68C681 is an improvement upon the MC68681 which supports more baud
+    rates, adds an additional MISR (masked ISR) register, and adds a low-power
+    standby mode. There may be other differences, but these are the most
+    notable.
+
+    The extra baud rates are implemented by an 'X' bit for each channel. The X
+    bit chooses between two baud rate tables, in addition to the ACR[7] bit.
+    The X bit is changed by additional commands that are written to CRA and
+    CRB.
+
+    The MISR is a read only register that takes the place of the 'BRG Test'
+    register on the MC68681.
+
+    The low power standby mode is entered and left by a command written to CRA
+    or CRB registers. Writing the commands to either register affects the whole
+    DUART, not just one channel. Resetting the DUART also leaves low power
+    mode.
 */
 
 #include "emu.h"
@@ -41,8 +63,10 @@ static const char *const duart68681_reg_write_names[0x10] =
 	"MRA", "CSRA", "CRA", "THRA", "ACR", "IMR", "CRUR", "CTLR", "MRB", "CSRB", "CRB", "THRB", "IVR", "OPCR", "Set OP Bits", "Reset OP Bits"
 };
 
-static const int baud_rate_ACR_0[] = { 50, 110, 134, 200, 300, 600, 1200, 1050, 2400, 4800, 7200, 9600, 38400, 0, 0, 0 };
-static const int baud_rate_ACR_1[] = { 75, 110, 134, 150, 300, 600, 1200, 2000, 2400, 4800, 1800, 9600, 19200, 0, 0, 0 };
+static const int baud_rate_ACR_0[] =     { 50, 110, 134, 200, 300,  600,   1200,  1050,  2400,   4800, 7200, 9600, 38400, 0, 0, 0 }; /* xr68c681 X=0 */
+static const int baud_rate_ACR_0_X_1[] = { 75, 110, 134, 150, 3600, 14400, 28800, 57600, 115200, 4800, 1800, 9600, 19200, 0, 0, 0 };
+static const int baud_rate_ACR_1[] =     { 75, 110, 134, 150, 300,  600,   1200,  2000,  2400,   4800, 1800, 9600, 19200, 0, 0, 0 }; /* xr68c681 X=0 */
+static const int baud_rate_ACR_1_X_1[] = { 50, 110, 134, 200, 3600, 14400, 28800, 57600, 115200, 4800, 7200, 9600, 38400, 0, 0, 0 };
 
 #define INT_INPUT_PORT_CHANGE       0x80
 #define INT_DELTA_BREAK_B           0x40
@@ -74,6 +98,7 @@ DEFINE_DEVICE_TYPE(SCN2681, scn2681_device, "scn2681", "SCN2681 DUART")
 DEFINE_DEVICE_TYPE(MC68681, mc68681_device, "mc68681", "MC68681 DUART")
 DEFINE_DEVICE_TYPE(SC28C94, sc28c94_device, "sc28c94", "SC28C94 QUART")
 DEFINE_DEVICE_TYPE(MC68340_DUART, mc68340_duart_device, "mc68340duart", "MC68340 DUART Device")
+DEFINE_DEVICE_TYPE(XR68C681, xr68c681_device, "xr68c681", "XR68C681 DUART")
 DEFINE_DEVICE_TYPE(DUART_CHANNEL, duart_channel, "duart_channel", "DUART channel")
 
 
@@ -108,9 +133,14 @@ scn2681_device::scn2681_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: duart_base_device(mconfig, MC68681, tag, owner, clock),
+mc68681_device::mc68681_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: duart_base_device(mconfig, type, tag, owner, clock),
 	m_read_vector(false)
+{
+}
+
+mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68681_device(mconfig, MC68681, tag, owner, clock)
 {
 }
 
@@ -133,6 +163,15 @@ mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, device
 
 mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc68340_duart_device(mconfig, MC68340_DUART, tag, owner, clock)
+{
+}
+
+xr68c681_device::xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68681_device(mconfig, XR68C681, tag, owner, clock),
+	m_XTXA(false),
+	m_XRXA(false),
+	m_XTXB(false),
+	m_XRXB(false)
 {
 }
 
@@ -182,6 +221,16 @@ void mc68681_device::device_start()
 	save_item(NAME(IVR));
 }
 
+void xr68c681_device::device_start()
+{
+	mc68681_device::device_start();
+
+	save_item(NAME(m_XTXA));
+	save_item(NAME(m_XRXA));
+	save_item(NAME(m_XTXB));
+	save_item(NAME(m_XRXB));
+}
+
 /*-------------------------------------------------
     device reset callback
 -------------------------------------------------*/
@@ -207,6 +256,13 @@ void mc68681_device::device_reset()
 
 	IVR = 0x0f;  /* Interrupt Vector Register */
 	m_read_vector = false;
+}
+
+void xr68c681_device::device_reset()
+{
+	mc68681_device::device_reset();
+
+	m_XTXA = m_XRXA = m_XTXB = m_XRXB = false;
 }
 
 MACHINE_CONFIG_START(duart_base_device::device_add_mconfig)
@@ -474,6 +530,17 @@ READ8_MEMBER( sc28c94_device::read )
 	return r;
 }
 
+READ8_MEMBER( xr68c681_device::read )
+{
+	if (offset == 0x02)
+	{
+		LOG( "Reading XR68C681 (%s) reg 0x02 (MISR)\n", tag());
+		return ISR & IMR;
+	}
+	else
+		return mc68681_device::read(space, offset, mem_mask);
+}
+
 READ8_MEMBER( duart_base_device::read )
 {
 	uint8_t r = 0xff;
@@ -624,6 +691,81 @@ WRITE8_MEMBER( sc28c94_device::write )
 	}
 }
 
+WRITE8_MEMBER( xr68c681_device::write )
+{
+	if (offset == 0x02) /* CRA */
+		switch(data >> 4)
+		{
+			case 0x8: /* set RX extend bit */
+			m_XRXA = true;
+			m_chanA->baud_updated();
+			data &= 0x0f; /* disable command before we send it off to 68681 */
+			break;
+
+			case 0x9: /* clear RX extend bit */
+			m_XRXA = false;
+			m_chanA->baud_updated();
+			data &= 0x0f;
+			break;
+
+			case 0xA: /* set TX extend bit */
+			m_XTXA = true;
+			m_chanA->baud_updated();
+			data &= 0x0f;
+			break;
+
+			case 0xB: /* clear TX extend bit */
+			m_XTXA = false;
+			m_chanA->baud_updated();
+			data &= 0x0f;
+			break;
+
+			case 0xC: /* enter low power mode TODO: unimplemented */
+			case 0xD: /* leave low power mode */
+			case 0xE: /* reserved */
+			case 0xF: /* reserved */
+			data &= 0x0f;
+			break;
+		}
+
+	else if (offset == 0x0A) /* CRB */
+		switch(data >> 4)
+		{
+			case 0x8: /* set RX extend bit */
+			m_XRXB = true;
+			m_chanB->baud_updated();
+			data &= 0x0f;
+			break;
+
+			case 0x9: /* clear RX extend bit */
+			m_XRXB = false;
+			m_chanB->baud_updated();
+			data &= 0x0f;
+			break;
+
+			case 0xA: /* set TX extend bit */
+			m_XTXB = true;
+			m_chanB->baud_updated();
+			data &= 0x0f;
+			break;
+
+			case 0xB: /* clear TX extend bit */
+			m_XTXB = false;
+			m_chanB->baud_updated();
+			data &= 0x0f;
+			break;
+
+			case 0xC: /* enter low power mode TODO: unimplemented */
+			case 0xD: /* leave low power mode */
+			case 0xE: /* reserved */
+			case 0xF: /* reserved */
+			data &= 0x0f;
+			break;
+		}
+	
+	mc68681_device::write(space, offset, data, mem_mask); /* pass on 68681 command */
+}
+
 WRITE8_MEMBER( duart_base_device::write )
 {
 	offset &= 0x0f;
@@ -665,8 +807,8 @@ WRITE8_MEMBER( duart_base_device::write )
 			if ((((IPCR>>4) & data) & 0x0f) != 0)
 				set_ISR_bits(INT_INPUT_PORT_CHANGE);
 
-			m_chanA->ACR_updated();
-			m_chanB->ACR_updated();
+			m_chanA->baud_updated();
+			m_chanB->baud_updated();
 			m_chanA->update_interrupts();
 			m_chanB->update_interrupts();
 			break;
@@ -808,7 +950,7 @@ duart_channel *duart_base_device::get_channel(int chan)
 	return m_chanB;
 }
 
-int duart_base_device::calc_baud(int ch, uint8_t data)
+int duart_base_device::calc_baud(int ch, bool rx, uint8_t data)
 {
 	int baud_rate;
 
@@ -842,6 +984,45 @@ int duart_base_device::calc_baud(int ch, uint8_t data)
 	else
 	{
 		baud_rate = baud_rate_ACR_1[data & 0x0f];
+	}
+
+	if ((baud_rate == 0) && ((data & 0xf) != 0xd))
+	{
+		LOG( "Unsupported transmitter clock: channel %d, clock select = %02x\n", ch, data );
+	}
+
+	//printf("%s ch %d setting baud to %d\n", tag(), ch, baud_rate);
+	return baud_rate;
+}
+
+int xr68c681_device::calc_baud(int ch, bool rx, uint8_t data)
+{
+	int baud_rate;
+
+
+	baud_rate = baud_rate_ACR_0[data & 0x0f];
+
+	if (ch == 0)
+	{
+		if ((data & 0x0f) == 0x0e)
+			baud_rate = ip3clk/16;
+		else if ((data & 0x0f) == 0x0f)
+			baud_rate = ip3clk;
+		else if ((rx && m_XRXA) || (!rx && m_XTXA)) /* X = 1 */
+			baud_rate = BIT(ACR, 7) == 0 ? baud_rate_ACR_0_X_1[data & 0x0f] : baud_rate_ACR_1_X_1[data & 0x0f];
+		else /* X = 0 */
+			baud_rate = BIT(ACR, 7) == 0 ? baud_rate_ACR_0[data & 0x0f] : baud_rate_ACR_1[data & 0x0f];
+	}
+	else if (ch == 1)
+	{
+		if ((data & 0x0f) == 0x0e)
+			baud_rate = ip5clk/16;
+		else if ((data & 0x0f) == 0x0f)
+			baud_rate = ip5clk;
+		else if ((rx && m_XRXB) || (!rx && m_XTXB)) /* X = 1 */
+			baud_rate = BIT(ACR, 7) == 0 ? baud_rate_ACR_0_X_1[data & 0x0f] : baud_rate_ACR_1_X_1[data & 0x0f];
+		else /* X = 0 */
+			baud_rate = BIT(ACR, 7) == 0 ? baud_rate_ACR_0[data & 0x0f] : baud_rate_ACR_1[data & 0x0f];
 	}
 
 	if ((baud_rate == 0) && ((data & 0xf) != 0xd))
@@ -1176,8 +1357,8 @@ void duart_channel::write_chan_reg(int reg, uint8_t data)
 
 	case 0x01: /* CSR */
 		CSR = data;
-		tx_baud_rate = m_uart->calc_baud(m_ch, data & 0xf);
-		rx_baud_rate = m_uart->calc_baud(m_ch, (data>>4) & 0xf);
+		tx_baud_rate = m_uart->calc_baud(m_ch, false, data & 0xf);
+		rx_baud_rate = m_uart->calc_baud(m_ch, true, (data>>4) & 0xf);
 	//printf("%s ch %d CSR %02x Tx baud %d Rx baud %d\n", tag(), m_ch, data, tx_baud_rate, rx_baud_rate);
 		set_rcv_rate(rx_baud_rate);
 		set_tra_rate(tx_baud_rate);
@@ -1371,7 +1552,7 @@ void duart_channel::write_TX(uint8_t data)
 	update_interrupts();
 }
 
-void duart_channel::ACR_updated()
+void duart_channel::baud_updated()
 {
 	write_chan_reg(1, CSR);
 }

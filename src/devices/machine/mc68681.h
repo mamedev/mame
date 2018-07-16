@@ -59,7 +59,7 @@ public:
 
 	uint8_t read_rx_fifo();
 
-	void ACR_updated();
+	void baud_updated();
 
 	uint8_t get_chan_CSR();
 
@@ -167,10 +167,13 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER( duart_timer_callback );
 
+protected:
 	/* registers */
 	uint8_t ACR;  /* Auxiliary Control Register */
 	uint8_t IMR;  /* Interrupt Mask Register */
 	uint8_t ISR;  /* Interrupt Status Register */
+
+private:
 	uint8_t OPCR; /* Output Port Conf. Register */
 	uint8_t OPR;  /* Output Port Register */
 	PAIR  CTR;  /* Counter/Timer Preset Value */
@@ -186,7 +189,7 @@ private:
 	double get_ct_rate();
 	uint16_t get_ct_count();
 	void start_ct(int count);
-	int calc_baud(int ch, uint8_t data);
+	virtual int calc_baud(int ch, bool rx, uint8_t data);
 	void clear_ISR_bits(int mask);
 	void set_ISR_bits(int mask);
 
@@ -230,6 +233,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void update_interrupts() override;
+	mc68681_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
 	bool m_read_vector; // if this is read and IRQ is active, it counts as pulling IACK
@@ -270,10 +274,29 @@ protected:
 	mc68340_duart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class xr68c681_device : public mc68681_device
+{
+public:
+	xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	virtual int calc_baud(int ch, bool rx, uint8_t data) override;
+
+	bool m_XTXA,m_XRXA,m_XTXB,m_XRXB; /* X bits for the BRG (selects between 2 BRG tables) */
+};
+
 DECLARE_DEVICE_TYPE(SCN2681, scn2681_device)
 DECLARE_DEVICE_TYPE(MC68681, mc68681_device)
 DECLARE_DEVICE_TYPE(SC28C94, sc28c94_device)
 DECLARE_DEVICE_TYPE(MC68340_DUART, mc68340_duart_device)
+DECLARE_DEVICE_TYPE(XR68C681, xr68c681_device)
 DECLARE_DEVICE_TYPE(DUART_CHANNEL, duart_channel)
 
 #endif // MAME_MACHINE_MC68681_H
