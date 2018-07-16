@@ -1393,7 +1393,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_PALETTE_ADD("palette", NC_NUM_COLOURS)
 	MCFG_PALETTE_INIT_OWNER(nc_state, nc)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

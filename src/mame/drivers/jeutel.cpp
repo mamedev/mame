@@ -209,7 +209,7 @@ MACHINE_CONFIG_START(jeutel_state::jeutel)
 	MCFG_DEVICE_IO_MAP(jeutel_cpu3_io)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_jeutel)
+	config.set_default_layout(layout_jeutel);
 
 	/* Sound */
 	genpin_audio(config);

@@ -1854,7 +1854,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 	MCFG_DEVICE_ADD("sub_gfxdecode", GFXDECODE, "sub_palette", gfx_rocknms_sub)
 	MCFG_PALETTE_ADD("sub_palette", 0x8000)
 
-	MCFG_DEFAULT_LAYOUT(layout_rocknms)
+	config.set_default_layout(layout_rocknms);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1934,7 +1934,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
 	MCFG_PALETTE_ADD("rpalette", 0x8000)
 
-	MCFG_DEFAULT_LAYOUT(layout_stepstag)
+	config.set_default_layout(layout_stepstag);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2007,7 +2007,7 @@ MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
 	MCFG_PALETTE_ADD("rpalette", 0x8000)
 
-	MCFG_DEFAULT_LAYOUT(layout_vjdash)
+	config.set_default_layout(layout_vjdash);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();

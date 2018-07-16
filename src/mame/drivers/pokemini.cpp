@@ -1779,7 +1779,7 @@ MACHINE_CONFIG_START(pokemini_state::pokemini)
 	MCFG_SCREEN_REFRESH_RATE( 72 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(pokemini_state, pokemini)

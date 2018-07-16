@@ -455,7 +455,7 @@ MACHINE_CONFIG_START(mu100_state::mu100)
 	MCFG_SCREEN_UPDATE_DRIVER(mu100_state, screen_update)
 	MCFG_SCREEN_SIZE(900, 241)
 	MCFG_SCREEN_VISIBLE_AREA(0, 899, 0, 240)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

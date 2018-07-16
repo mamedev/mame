@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(hankin_state::hankin)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_hankin)
+	config.set_default_layout(layout_hankin);
 
 	/* Sound */
 	genpin_audio(config);

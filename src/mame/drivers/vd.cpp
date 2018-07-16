@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(vd_state::vd)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) //?
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_vd)
+	config.set_default_layout(layout_vd);
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

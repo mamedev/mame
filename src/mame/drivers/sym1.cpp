@@ -332,7 +332,7 @@ MACHINE_CONFIG_START(sym1_state::sym1)
 	MCFG_DEVICE_ADD("maincpu", M6502, SYM1_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(sym1_map)
 
-	MCFG_DEFAULT_LAYOUT(layout_sym1)
+	config.set_default_layout(layout_sym1);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

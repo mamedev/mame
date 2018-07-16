@@ -165,7 +165,7 @@ MACHINE_CONFIG_START(sc1_state::sc1)
 	MCFG_DEVICE_IO_MAP(sc1_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sc1)
+	config.set_default_layout(layout_sc1);
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))

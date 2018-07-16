@@ -667,7 +667,7 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(microvision_state,microvision)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -522,7 +522,7 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, cosmicos_state, sc_w))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_cosmicos )
+	config.set_default_layout(layout_cosmicos);
 	MCFG_DEVICE_ADD(DM9368_TAG, DM9368, 0)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("digit", cosmicos_state, digit_tick, attotime::from_hz(100))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("interrupt", cosmicos_state, int_tick, attotime::from_hz(1000))

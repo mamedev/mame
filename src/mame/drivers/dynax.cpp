@@ -4718,7 +4718,7 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
-	MCFG_DEFAULT_LAYOUT(layout_dualhuov)
+	config.set_default_layout(layout_dualhuov);
 
 	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
 	top.set_refresh_hz(60);

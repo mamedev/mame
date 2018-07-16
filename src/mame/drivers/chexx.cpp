@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(chexx_state::chexx83)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, chexx_state, via_irq_out))
 
 	// Layout
-	MCFG_DEFAULT_LAYOUT(layout_chexx)
+	config.set_default_layout(layout_chexx);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

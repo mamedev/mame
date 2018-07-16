@@ -357,7 +357,7 @@ MACHINE_CONFIG_START(gmaster_state::gmaster)
 
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(gmaster_palette))
 	MCFG_PALETTE_INIT_OWNER(gmaster_state, gmaster)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 0.50);

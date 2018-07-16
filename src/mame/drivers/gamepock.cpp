@@ -59,7 +59,7 @@ MACHINE_CONFIG_START(gamepock_state::gamepock)
 	screen.set_screen_update(FUNC(gamepock_state::screen_update_gamepock));
 	screen.set_palette("palette");
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

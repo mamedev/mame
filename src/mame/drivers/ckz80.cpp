@@ -447,7 +447,7 @@ MACHINE_CONFIG_START(ckz80_state::master)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ckz80_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ck_master)
+	config.set_default_layout(layout_ck_master);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

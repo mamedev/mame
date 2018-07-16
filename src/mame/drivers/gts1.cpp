@@ -735,7 +735,7 @@ MACHINE_CONFIG_START(gts1_state::gts1)
 	MCFG_R10788_UPDATE( WRITE8(*this, gts1_state,gts1_display_w) )
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT( layout_gts1 )
+	config.set_default_layout(layout_gts1);
 
 	/* Sound */
 	genpin_audio(config);

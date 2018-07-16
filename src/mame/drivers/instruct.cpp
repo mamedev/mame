@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(instruct_state::instruct)
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, instruct_state, flag_w))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_instruct)
+	config.set_default_layout(layout_instruct);
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", instruct_state, instruct, "pgm", 1)

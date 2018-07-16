@@ -2389,11 +2389,11 @@ void layout_element::component::apply_skew(bitmap_argb32 &dest, int skewwidth)
 //-------------------------------------------------
 
 layout_view::layout_view(
-		running_machine &machine,
+		device_t &device,
 		util::xml::data_node const &viewnode,
 		element_map &elemmap,
 		group_map const &groupmap)
-	: m_name(xml_get_attribute_string_with_subst(machine, viewnode, "name", ""))
+	: m_name(make_name(device, viewnode))
 	, m_aspect(1.0f)
 	, m_scraspect(1.0f)
 {
@@ -2401,10 +2401,10 @@ layout_view::layout_view(
 	util::xml::data_node const *const boundsnode = viewnode.get_child("bounds");
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
 	if (boundsnode)
-		parse_bounds(machine, boundsnode, m_expbounds);
+		parse_bounds(device.machine(), boundsnode, m_expbounds);
 
 	// load items
-	add_items(machine, viewnode, elemmap, groupmap, render_bounds{ 0.0f, 0.0f, 1.0f, 1.0f });
+	add_items(device, viewnode, elemmap, groupmap, render_bounds{ 0.0f, 0.0f, 1.0f, 1.0f });
 
 	// recompute the data for the view based on a default layer config
 	recompute(render_layer_config());
@@ -2561,7 +2561,7 @@ void layout_view::resolve_tags()
 //-------------------------------------------------
 
 void layout_view::add_items(
-		running_machine &machine,
+		device_t &device,
 		util::xml::data_node const &parentnode,
 		element_map &elemmap,
 		group_map const &groupmap,
@@ -2571,31 +2571,31 @@ void layout_view::add_items(
 	{
 		if (!strcmp(itemnode->get_name(), "backdrop"))
 		{
-			m_backdrop_list.emplace_back(machine, *itemnode, elemmap, transform);
+			m_backdrop_list.emplace_back(device, *itemnode, elemmap, transform);
 		}
 		else if (!strcmp(itemnode->get_name(), "screen"))
 		{
-			m_screen_list.emplace_back(machine, *itemnode, elemmap, transform);
+			m_screen_list.emplace_back(device, *itemnode, elemmap, transform);
 		}
 		else if (!strcmp(itemnode->get_name(), "overlay"))
 		{
-			m_overlay_list.emplace_back(machine, *itemnode, elemmap, transform);
+			m_overlay_list.emplace_back(device, *itemnode, elemmap, transform);
 		}
 		else if (!strcmp(itemnode->get_name(), "bezel"))
 		{
-			m_bezel_list.emplace_back(machine, *itemnode, elemmap, transform);
+			m_bezel_list.emplace_back(device, *itemnode, elemmap, transform);
 		}
 		else if (!strcmp(itemnode->get_name(), "cpanel"))
 		{
-			m_cpanel_list.emplace_back(machine, *itemnode, elemmap, transform);
+			m_cpanel_list.emplace_back(device, *itemnode, elemmap, transform);
 		}
 		else if (!strcmp(itemnode->get_name(), "marquee"))
 		{
-			m_marquee_list.emplace_back(machine, *itemnode, elemmap, transform);
+			m_marquee_list.emplace_back(device, *itemnode, elemmap, transform);
 		}
 		else if (!strcmp(itemnode->get_name(), "group"))
 		{
-			char const *ref(xml_get_attribute_string_with_subst(machine, *itemnode, "ref", nullptr));
+			char const *ref(xml_get_attribute_string_with_subst(device.machine(), *itemnode, "ref", nullptr));
 			if (!ref)
 				throw layout_syntax_error("nested group must have ref attribute");
 
@@ -2608,16 +2608,32 @@ void layout_view::add_items(
 			if (itemboundsnode)
 			{
 				render_bounds itembounds;
-				parse_bounds(machine, itemboundsnode, itembounds);
+				parse_bounds(device.machine(), itemboundsnode, itembounds);
 				grouptrans = found->second.make_transform(itembounds, transform);
 			}
 
-			add_items(machine, found->second.get_groupnode(), elemmap, groupmap, grouptrans);
+			add_items(device, found->second.get_groupnode(), elemmap, groupmap, grouptrans);
 		}
 		else if (strcmp(itemnode->get_name(), "bounds"))
 		{
 			throw layout_syntax_error(util::string_format("unknown view item %s", itemnode->get_name()));
 		}
+	}
+}
+
+std::string layout_view::make_name(device_t &device, util::xml::data_node const &viewnode)
+{
+	char const *const name(xml_get_attribute_string_with_subst(device.machine(), viewnode, "name", ""));
+	if (&device == &device.machine().root_device())
+	{
+		return name;
+	}
+	else
+	{
+		char const *tag(device.tag());
+		if (':' == *tag)
+			++tag;
+		return util::string_format("%s %s", tag, name);
 	}
 }
 
@@ -2632,20 +2648,21 @@ void layout_view::add_items(
 //-------------------------------------------------
 
 layout_view::item::item(
-		running_machine &machine,
+		device_t &device,
 		util::xml::data_node const &itemnode,
 		element_map &elemmap,
 		render_bounds const &transform)
 	: m_element(nullptr)
-	, m_output(machine.root_device(), xml_get_attribute_string_with_subst(machine, itemnode, "name", ""))
-	, m_have_output(xml_get_attribute_string_with_subst(machine, itemnode, "name", "")[0])
-	, m_input_tag(xml_get_attribute_string_with_subst(machine, itemnode, "inputtag", ""))
+	, m_output(device, xml_get_attribute_string_with_subst(device.machine(), itemnode, "name", ""))
+	, m_have_output(xml_get_attribute_string_with_subst(device.machine(), itemnode, "name", "")[0])
+	, m_input_tag(xml_get_attribute_string_with_subst(device.machine(), itemnode, "inputtag", ""))
 	, m_input_port(nullptr)
 	, m_input_mask(0)
 	, m_screen(nullptr)
 	, m_orientation(ROT0)
 {
 	// find the associated element
+	running_machine &machine(device.machine());
 	char const *const name = xml_get_attribute_string_with_subst(machine, itemnode, "element", nullptr);
 	if (name)
 	{
@@ -2676,22 +2693,25 @@ layout_view::item::item(
 	// sanity checks
 	if (strcmp(itemnode.get_name(), "screen") == 0)
 	{
-		char const *const tag(itemnode.get_attribute_string("tag", nullptr));
-		if (tag)
-			m_screen = dynamic_cast<screen_device *>(machine.root_device().subdevice(tag));
-		if (!m_screen)
+		if (itemnode.has_attribute("tag"))
+		{
+			char const *const tag(xml_get_attribute_string_with_subst(machine, itemnode, "tag", ""));
+			m_screen = dynamic_cast<screen_device *>(device.subdevice(tag));
+			if (!m_screen)
+				throw layout_reference_error(util::string_format("invalid screen tag '%d'", tag));
+		}
+		else if (!m_screen)
+		{
 			throw layout_reference_error(util::string_format("invalid screen index %d", index));
+		}
 	}
-	else
+	else if (!m_element)
 	{
-		if (m_element == nullptr)
-			throw layout_syntax_error(util::string_format("item of type %s require an element tag", itemnode.get_name()));
+		throw layout_syntax_error(util::string_format("item of type %s require an element tag", itemnode.get_name()));
 	}
 
 	if (has_input())
-	{
-		m_input_port = m_element->machine().root_device().ioport(m_input_tag.c_str());
-	}
+		m_input_port = device.ioport(m_input_tag.c_str());
 }
 
 
@@ -2766,10 +2786,11 @@ void layout_view::item::resolve_tags()
 //  layout_file - constructor
 //-------------------------------------------------
 
-layout_file::layout_file(running_machine &machine, util::xml::data_node const &rootnode, const char *dirname)
+layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode, const char *dirname)
 	: m_elemmap()
 	, m_viewlist()
 {
+	running_machine &machine(device.machine());
 	try
 	{
 		// find the layout node
@@ -2814,7 +2835,7 @@ layout_file::layout_file(running_machine &machine, util::xml::data_node const &r
 			// if the error is allowed to propagate, the entire layout is dropped so you can't select the useful view
 			try
 			{
-				m_viewlist.emplace_back(machine, *viewnode, m_elemmap, groupmap);
+				m_viewlist.emplace_back(device, *viewnode, m_elemmap, groupmap);
 			}
 			catch (layout_reference_error const &err)
 			{

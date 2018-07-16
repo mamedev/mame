@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(prodigy_state::prodigy)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(2'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
-	MCFG_DEFAULT_LAYOUT(layout_prodigy)
+	config.set_default_layout(layout_prodigy);
 
 	MCFG_DEVICE_ADD("io_74145", TTL74145, 0)
 

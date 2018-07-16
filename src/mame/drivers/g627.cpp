@@ -317,7 +317,7 @@ MACHINE_CONFIG_START(g627_state::g627)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_g627)
+	config.set_default_layout(layout_g627);
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

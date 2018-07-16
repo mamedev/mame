@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(s6_state::s6)
 	MCFG_MACHINE_RESET_OVERRIDE(s6_state, s6)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s6)
+	config.set_default_layout(layout_s6);
 
 	/* Sound */
 	genpin_audio(config);

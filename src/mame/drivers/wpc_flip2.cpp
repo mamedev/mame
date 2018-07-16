@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(wpc_flip2_state::wpc_flip2)
 	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_dot_state,wpcsnd_reply_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(128, 32)

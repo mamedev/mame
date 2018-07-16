@@ -611,7 +611,7 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_peyper)
+	config.set_default_layout(layout_peyper);
 
 	/* Sound */
 	genpin_audio(config);

@@ -166,37 +166,49 @@ class LayoutChecker(Minifyer):
             except:
                 self.handleError('Element color attribute %s "%s" is not numeric' % (name, attrs[name]))
 
+    def checkTag(self, tag, element, attr):
+        if '' == tag:
+            self.handleError('Element %s attribute %s is empty', (element, attr))
+        else:
+            if tag.find('^') >= 0:
+                self.handleError('Element %s attribute %s "%s" contains parent device reference' % (element, attr, tag))
+            if ':' == tag[-1]:
+                self.handleError('Element %s attribute %s "%s" ends with separator' % (element, attr, tag))
+            if tag.find('::') >= 0:
+                self.handleError('Element %s attribute %s "%s" contains double separator' % (element, attr, tag))
+
     def checkGroupViewItem(self, name, attrs):
         if name in self.OBJECTS:
             if 'element' not in attrs:
                 self.handleError('Element %s missing attribute element', (name, ))
             elif attrs['element'] not in self.referenced_elements:
                 self.referenced_elements[attrs['element']] = self.formatLocation()
+            if 'inputtag' in attrs:
+                if 'inputmask' not in attrs:
+                    self.handleError('Element %s has inputtag without inputmask attribute' % (name, ))
+                self.checkTag(attrs['inputtag'], name, 'inputtag')
+            if 'inputmask' in attrs:
+                try:
+                    int(attrs['inputmask'], 0)
+                except:
+                    self.handleError('Element %s attribute inputmask "%s" is not an integer' % (name, attrs['inputmask']))
             self.in_object = True
             self.have_bounds.append(False)
         elif 'screen' == name:
             if 'index' in attrs:
                 try:
-                    index = long(attrs['index'])
+                    index = long(attrs['index'], 0)
                     if 0 > index:
                         self.handleError('Element screen attribute index "%s" is negative' % (attrs['index'], ))
                 except:
                     self.handleError('Element screen attribute index "%s" is not an integer' % (attrs['index'], ))
                 if 'tag' in attrs:
-                    self.handleError('Element screen has both index and tag attributes');
+                    self.handleError('Element screen has both index and tag attributes')
             if 'tag' in attrs:
                 tag = attrs['tag']
-                if '' == tag:
-                    self.handleError('Element screen attribute tag is empty')
-                else:
-                    if self.BADTAGPATTERN.search(tag):
-                        self.handleError('Element screen attribute tag "%s" contains invalid characters' % (tag, ));
-                    if tag.find('^') >= 0:
-                        self.handleError('Element screen attribute tag "%s" contains parent device reference' % (tag, ));
-                    if ':' == tag[-1]:
-                        self.handleError('Element screen attribute tag "%s" ends with separator' % (tag, ));
-                    if tag.find('::') >= 0:
-                        self.handleError('Element screen attribute tag "%s" contains double separator' % (tag, ));
+                self.checkTag(tag, name, 'tag')
+                if self.BADTAGPATTERN.search(tag):
+                    self.handleError('Element screen attribute tag "%s" contains invalid characters' % (tag, ))
             self.in_object = True
             self.have_bounds.append(False)
         elif 'group' == name:

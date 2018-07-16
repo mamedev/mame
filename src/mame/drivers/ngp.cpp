@@ -842,7 +842,7 @@ MACHINE_CONFIG_START(ngp_state::ngp_common)
 	MCFG_SCREEN_RAW_PARAMS( 6.144_MHz_XTAL, 515, 0, 160 /*480*/, 199, 0, 152 )
 	MCFG_SCREEN_UPDATE_DRIVER(ngp_state, screen_update_ngp)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

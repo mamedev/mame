@@ -1333,7 +1333,7 @@ MACHINE_CONFIG_START(jpmimpct_state::impctawp)
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd",UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEFAULT_LAYOUT(layout_jpmimpct)
+	config.set_default_layout(layout_jpmimpct);
 
 	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel0_optic_cb))

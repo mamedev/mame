@@ -220,7 +220,7 @@ MACHINE_CONFIG_START(pda600_state::pda600)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pda600)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly

@@ -222,7 +222,7 @@ MACHINE_CONFIG_START(pitagjr_state::pitajr)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 200-1, 0, 100-1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pitagjr_state, pitagjr)

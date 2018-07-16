@@ -161,7 +161,7 @@ MACHINE_CONFIG_START(fidelmcs48_state::sc6)
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, fidelmcs48_state, sc6_input7_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_sc6)
+	config.set_default_layout(layout_fidel_sc6);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

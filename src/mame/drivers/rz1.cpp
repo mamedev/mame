@@ -359,7 +359,7 @@ MACHINE_CONFIG_START( rz1_state::rz1 )
 	m_hd44780->set_lcd_size(1, 16);
 	m_hd44780->set_pixel_update_cb(FUNC(rz1_state::lcd_pixel_update), this);
 
-	MCFG_DEFAULT_LAYOUT(layout_rz1)
+	config.set_default_layout(layout_rz1);
 
 	SPEAKER(config, "speaker").front_center();
 	UPD934G(config, m_pg[0], 1333000);

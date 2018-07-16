@@ -227,7 +227,7 @@ MACHINE_CONFIG_START(bfm_sc5_state::bfm_sc5)
 
 	MCFG_BFMBDA_ADD("vfd0",0)
 
-	MCFG_DEFAULT_LAYOUT(layout_bfm_sc5)
+	config.set_default_layout(layout_bfm_sc5);
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

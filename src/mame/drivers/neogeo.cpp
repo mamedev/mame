@@ -1951,7 +1951,7 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, neogeo_base_state, set_palette_bank))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_neogeo)
+	config.set_default_layout(layout_neogeo);
 
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
@@ -2498,7 +2498,7 @@ MACHINE_CONFIG_START(mvs_state::irrmaze)
 
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "irrmaze", true)
 
-	MCFG_DEFAULT_LAYOUT(layout_irrmaze)
+	config.set_default_layout(layout_irrmaze);
 
 	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom")
 MACHINE_CONFIG_END

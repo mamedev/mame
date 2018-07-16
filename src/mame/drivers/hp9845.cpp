@@ -3835,7 +3835,7 @@ MACHINE_CONFIG_START(hp9845b_state::hp9845b)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp9845b_state, scanline_timer, "screen", 0, 1)
 
-	MCFG_DEFAULT_LAYOUT(layout_hp9845b)
+	config.set_default_layout(layout_hp9845b);
 
 	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
 

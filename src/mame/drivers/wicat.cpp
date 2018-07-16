@@ -895,7 +895,7 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_I8275_VRTC_CALLBACK(WRITELINE(*this, wicat_state, crtc_irq_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEFAULT_LAYOUT(layout_wicat)
+	config.set_default_layout(layout_wicat);
 
 	/* Winchester Disk Controller (WD1000 + FD1795) */
 	MCFG_DEVICE_ADD("wd1kcpu", N8X300, 8_MHz_XTAL)

@@ -1066,7 +1066,7 @@ MACHINE_CONFIG_START(vk100_state::vk100)
 	dbrg.fr_handler().set(m_uart, FUNC(i8251_device::write_rxc));
 	dbrg.ft_handler().set(m_uart, FUNC(i8251_device::write_txc));
 
-	MCFG_DEFAULT_LAYOUT( layout_vk100 )
+	config.set_default_layout(layout_vk100);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_speaker, 116).add_route(ALL_OUTPUTS, "mono", 0.25); // 116 hz (page 172 of TM), but duty cycle is wrong here!

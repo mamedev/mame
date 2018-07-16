@@ -203,7 +203,7 @@ MACHINE_CONFIG_START(gizmondo_state::gizmondo)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 240 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("gf4500", gf4500_device, screen_update)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_GF4500_ADD("gf4500")
 

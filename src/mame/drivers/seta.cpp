@@ -8589,7 +8589,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_setaroul)
+	config.set_default_layout(layout_setaroul);
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -9847,7 +9847,7 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_jockeyc)
+	config.set_default_layout(layout_jockeyc);
 MACHINE_CONFIG_END
 
 
@@ -9876,7 +9876,7 @@ MACHINE_CONFIG_START(jockeyc_state::inttoote)
 	MCFG_DEVICE_ADD ("acia2", ACIA6850, 0)
 
 	// layout
-	MCFG_DEFAULT_LAYOUT(layout_inttoote)
+	config.set_default_layout(layout_inttoote);
 MACHINE_CONFIG_END
 
 

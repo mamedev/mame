@@ -757,7 +757,7 @@ MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
 	MCFG_PALETTE_FORMAT(XGRB)
 
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -789,7 +789,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tmmjprd_state::tmpdoki)
 	tmmjprd(config);
-	MCFG_DEFAULT_LAYOUT(layout_horizont)
+	config.set_default_layout(layout_horizont);
 
 	MCFG_DEVICE_REMOVE("rscreen")
 MACHINE_CONFIG_END

@@ -915,7 +915,7 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 120-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rex6000)
@@ -1005,7 +1005,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 80-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
 

@@ -429,9 +429,9 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(6*16, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_PALETTE_INIT_OWNER(alesis_state, alesis)
@@ -461,7 +461,7 @@ MACHINE_CONFIG_START(alesis_state::sr16)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(6*8, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*8-1, 0, 9*2-1)
-	MCFG_DEFAULT_LAYOUT(layout_sr16)
+	config.set_default_layout(layout_sr16);
 
 	MCFG_DEVICE_MODIFY("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 8)

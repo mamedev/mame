@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(gts3_state::gts3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_gts3)
+	config.set_default_layout(layout_gts3);
 
 	/* Sound */
 	genpin_audio(config);

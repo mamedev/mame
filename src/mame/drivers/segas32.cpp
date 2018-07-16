@@ -2557,7 +2557,7 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas32)
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
