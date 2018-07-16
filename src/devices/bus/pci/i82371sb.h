@@ -7,7 +7,7 @@
 #pragma once
 
 #include "pci.h"
-#include "machine/pci-ide.h"
+#include "pci-ide.h"
 
 #include "machine/ins8250.h"
 #include "machine/ds128x.h"

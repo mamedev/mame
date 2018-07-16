@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "machine/pci.h"
-#include "voodoo.h"
+#include "pci.h"
+#include "video/voodoo.h"
 
 #define MCFG_VOODOO_PCI_FBMEM(_value) \
 	downcast<voodoo_pci_device &>(*device).set_fbmem(_value);

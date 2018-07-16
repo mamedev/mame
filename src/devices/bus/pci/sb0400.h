@@ -5,7 +5,7 @@
 #ifndef MAME_SOUND_SB0400_H
 #define MAME_SOUND_SB0400_H
 
-#include "machine/pci.h"
+#include "pci.h"
 
 class sb0400_device : public pci_device {
 public:

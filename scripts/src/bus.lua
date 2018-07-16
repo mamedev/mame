@@ -2842,6 +2842,65 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/pci/pci.h,BUSES["PCI"] = true
+---------------------------------------------------
+
+if (BUSES["PCI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pci/pci.cpp",
+		MAME_DIR .. "src/devices/bus/pci/pci.h",
+		MAME_DIR .. "src/devices/bus/pci/pci-ac97.cpp",
+		MAME_DIR .. "src/devices/bus/pci/pci-ac97.h",
+		MAME_DIR .. "src/devices/bus/pci/pci-apic.cpp",
+		MAME_DIR .. "src/devices/bus/pci/pci-apic.h",
+		MAME_DIR .. "src/devices/bus/pci/pci-ide.cpp",
+		MAME_DIR .. "src/devices/bus/pci/pci-ide.h",
+		MAME_DIR .. "src/devices/bus/pci/pci-sata.cpp",
+		MAME_DIR .. "src/devices/bus/pci/pci-sata.h",
+		MAME_DIR .. "src/devices/bus/pci/pci-smbus.cpp",
+		MAME_DIR .. "src/devices/bus/pci/pci-smbus.h",
+		MAME_DIR .. "src/devices/bus/pci/pci-usb.cpp",
+		MAME_DIR .. "src/devices/bus/pci/pci-usb.h",
+		MAME_DIR .. "src/devices/bus/pci/lpc.h",
+		MAME_DIR .. "src/devices/bus/pci/lpc-acpi.cpp",
+		MAME_DIR .. "src/devices/bus/pci/lpc-acpi.h",
+		MAME_DIR .. "src/devices/bus/pci/lpc-rtc.cpp",
+		MAME_DIR .. "src/devices/bus/pci/lpc-rtc.h",
+		MAME_DIR .. "src/devices/bus/pci/lpc-pit.cpp",
+		MAME_DIR .. "src/devices/bus/pci/lpc-pit.h",
+		MAME_DIR .. "src/devices/bus/pci/i82371sb.cpp",
+		MAME_DIR .. "src/devices/bus/pci/i82371sb.h",
+		MAME_DIR .. "src/devices/bus/pci/i82439hx.cpp",
+		MAME_DIR .. "src/devices/bus/pci/i82439hx.h",
+		MAME_DIR .. "src/devices/bus/pci/i82439tx.cpp",
+		MAME_DIR .. "src/devices/bus/pci/i82439tx.h",
+		MAME_DIR .. "src/devices/bus/pci/i82541.cpp",
+		MAME_DIR .. "src/devices/bus/pci/i82541.h",
+		MAME_DIR .. "src/devices/bus/pci/i82875p.cpp",
+		MAME_DIR .. "src/devices/bus/pci/i82875p.h",
+		MAME_DIR .. "src/devices/bus/pci/gt64xxx.cpp",
+		MAME_DIR .. "src/devices/bus/pci/gt64xxx.h",
+		MAME_DIR .. "src/devices/bus/pci/sis85c496.cpp",
+		MAME_DIR .. "src/devices/bus/pci/sis85c496.h",
+		MAME_DIR .. "src/devices/bus/pci/vrc4373.cpp",
+		MAME_DIR .. "src/devices/bus/pci/vrc4373.h",
+		MAME_DIR .. "src/devices/bus/pci/vrc5074.cpp",
+		MAME_DIR .. "src/devices/bus/pci/vrc5074.h",
+		MAME_DIR .. "src/devices/bus/pci/sb0400.cpp",
+		MAME_DIR .. "src/devices/bus/pci/sb0400.h",
+		MAME_DIR .. "src/devices/bus/pci/es1373.cpp",
+		MAME_DIR .. "src/devices/bus/pci/es1373.h",
+		MAME_DIR .. "src/devices/bus/pci/voodoo_pci.cpp",
+		MAME_DIR .. "src/devices/bus/pci/voodoo_pci.h",
+		MAME_DIR .. "src/devices/bus/pci/mga2064w.cpp",
+		MAME_DIR .. "src/devices/bus/pci/mga2064w.h",
+		MAME_DIR .. "src/devices/bus/pci/gf7600gs.cpp",
+		MAME_DIR .. "src/devices/bus/pci/gf7600gs.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/scv/slot.h,BUSES["SCV"] = true
 ---------------------------------------------------
 if (BUSES["SCV"]~=null) then

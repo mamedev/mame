@@ -17,7 +17,7 @@ TODO:
 #pragma once
 
 #include "pci.h"
-#include "idectrl.h"
+#include "machine/idectrl.h"
 
 #define MCFG_IDE_PCI_IRQ_HANDLER(_devcb) \
 	downcast<ide_pci_device &>(*device).set_irq_handler(DEVCB_##_devcb);

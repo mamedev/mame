@@ -10,7 +10,7 @@
 
 #include "machine/idectrl.h"
 #include "machine/pic8259.h"
-#include "machine/pci.h"
+#include "bus/pci/pci.h"
 
 class xbox_base_state : public driver_device
 {

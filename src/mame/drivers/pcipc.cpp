@@ -19,12 +19,12 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/pci.h"
-#include "machine/pci-ide.h"
-#include "machine/i82439hx.h"
-#include "machine/i82439tx.h"
-#include "machine/i82371sb.h"
-#include "video/mga2064w.h"
+#include "bus/pci/pci.h"
+#include "bus/pci/pci-ide.h"
+#include "bus/pci/i82439hx.h"
+#include "bus/pci/i82439tx.h"
+#include "bus/pci/i82371sb.h"
+#include "bus/pci/mga2064w.h"
 #include "bus/isa/isa_cards.h"
 #include "machine/fdc37c93x.h"
 
@@ -545,5 +545,5 @@ static INPUT_PORTS_START(pcipc)
 	PORT_INCLUDE(at_keyboard)
 INPUT_PORTS_END
 
-COMP(1998, pcipc,   0, 0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (440HX)", MACHINE_NO_SOUND)
-COMP(1998, pcipctx, 0, 0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (440TX)", MACHINE_NO_SOUND)
+COMP(1998, pcipc,   0, 0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND)
+COMP(1998, pcipctx, 0, 0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "machine/pci.h"
+#include "bus/pci/pci.h"
 
 class sega_lindbergh_baseboard_device : public pci_device {
 public:

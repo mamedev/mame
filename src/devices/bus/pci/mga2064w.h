@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "machine/pci.h"
+#include "pci.h"
 
 class mga2064w_device : public pci_device {
 public:
