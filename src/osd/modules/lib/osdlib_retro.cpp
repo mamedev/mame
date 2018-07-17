@@ -130,3 +130,18 @@ char *osd_get_clipboard_text(void)
 {
 	return NULL;
 }
+
+
+//============================================================
+//  osd_getpid
+//============================================================
+
+int osd_getpid(void)
+{
+#if defined(_WIN32)
+	return GetCurrentProcessId();
+#else
+	return getpid();
+#endif
+}
+
