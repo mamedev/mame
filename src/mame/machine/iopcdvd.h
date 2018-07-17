@@ -36,21 +36,34 @@ protected:
     virtual void device_start() override;
     virtual void device_reset() override;
 
+	void handle_data_command(uint8_t data);
+	void data_fifo_push(uint8_t data);
+	uint8_t data_fifo_pop();
+
 	enum
 	{
-		CDVD_STATUS_BOOT = 0x08,
 		CDVD_STATUS_IDLE = 0x40,
-
-		CDVD_COMMAND_0x15 = 0x15,
 	};
 
 	required_device<iop_intc_device> m_intc;
-	uint8_t m_status_0x05;
-	uint8_t m_status_0x17;
-	uint8_t m_command;
-	std::unique_ptr<uint8_t[]> m_out_buf;
-	uint8_t m_out_count;
-	uint8_t m_out_curr;
+
+	enum
+	{
+		CHAN_SERVO = 0,
+		CHAN_DATA = 1
+	};
+
+	struct drive_channel_t
+	{
+		uint8_t m_buffer[0x10]; // Buffer size is a total guess
+		uint8_t m_curr;
+		uint8_t m_end;
+
+		uint8_t m_status;
+		uint8_t m_command;
+	};
+
+	drive_channel_t m_channel[2];
 
 	static const size_t BUFFER_SIZE;
 };

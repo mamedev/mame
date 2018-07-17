@@ -18,6 +18,7 @@ MIPS III/IV emulator.
 #include "divtlb.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
+#include "sonyvu.h"
 
 
 // NEC VR4300 series is MIPS III with 32-bit address bus and slightly custom COP0/TLB
@@ -366,7 +367,7 @@ protected:
         float			acc;
 
         /* VU0 registers (R5900 only) */
-        float			vfr[32][4]; // 0..3 = w..x
+        float			vfr[32][4]; // 0..3 = x..w
         uint32_t		vcr[32];
         float			vumem[0x1000];
         float*			vfmem;
@@ -629,6 +630,7 @@ private:
     void log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
     void log_opcode_desc(const opcode_desc *desclist, int indent);
 
+	void load_elf();
 };
 
 
@@ -778,8 +780,17 @@ public:
 class r5900le_device : public mips3_device {
 public:
     // construction/destruction
+   	template <typename T>
+    r5900le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&vu0_tag)
+        : r5900le_device(mconfig, tag, owner, clock)
+	{
+		m_vu0.set_tag(std::forward<T>(vu0_tag));
+    }
+
     r5900le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-        : mips3_device(mconfig, R5900LE, tag, owner, clock, MIPS3_TYPE_R5900, ENDIANNESS_LITTLE, 64) {
+        : mips3_device(mconfig, R5900LE, tag, owner, clock, MIPS3_TYPE_R5900, ENDIANNESS_LITTLE, 64)
+        , m_vu0(*this, finder_base::DUMMY_TAG)
+	{
     }
 
 protected:
@@ -824,6 +835,8 @@ protected:
     void handle_sdc2(uint32_t op) override;
     void handle_dmfc2(uint32_t op) override;
     void handle_dmtc2(uint32_t op) override;
+
+    required_device<sonyvu0_device> m_vu0;
 };
 
 class qed5271be_device : public mips3_device {

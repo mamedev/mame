@@ -15,16 +15,18 @@
 #pragma once
 
 #include "emu.h"
+#include "cpu/mips/sonyvu.h"
 #include "ps2gif.h"
 
 class ps2_vif1_device : public device_t, public device_execute_interface
 {
 public:
-	template <typename T>
-    ps2_vif1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gif_tag)
+	template <typename T, typename U>
+    ps2_vif1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gif_tag, U &&vu1_tag)
     	: ps2_vif1_device(mconfig, tag, owner, clock)
     {
 		m_gif.set_tag(std::forward<T>(gif_tag));
+		m_vu1.set_tag(std::forward<U>(vu1_tag));
 	}
 
 	ps2_vif1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -37,6 +39,7 @@ public:
 
 	void dma_write(const uint64_t hi, const uint64_t lo);
 	void tag_write(uint32_t *data);
+	bool fifo_available(uint32_t count) const { return (BUFFER_SIZE - m_end) >= count; }
 
 protected:
     virtual void device_start() override;
@@ -103,6 +106,7 @@ protected:
 	};
 
 	required_device<ps2_gif_device> m_gif;
+	required_device<sonyvu1_device> m_vu1;
 
 	int m_icount;
 

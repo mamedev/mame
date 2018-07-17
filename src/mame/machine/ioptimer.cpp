@@ -205,11 +205,11 @@ READ32_MEMBER(iop_timer_device::read)
     {
         case 0x00:
         {
-            const uint32_t old = m_count;
+            //const uint32_t old = m_count;
             update_count();
             ret = m_count;
-            if (old != m_count)
-                logerror("%s: IOP timer read: COUNT (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+            //if (old != m_count)
+                //logerror("%s: IOP timer read: COUNT (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
             break;
         }
 

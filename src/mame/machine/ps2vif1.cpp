@@ -27,6 +27,7 @@ ps2_vif1_device::ps2_vif1_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, SONYPS2_VIF1, tag, owner, clock)
 	, device_execute_interface(mconfig, *this)
 	, m_gif(*this, finder_base::DUMMY_TAG)
+	, m_vu1(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -264,11 +265,11 @@ WRITE64_MEMBER(ps2_vif1_device::mmio_w)
 
 void ps2_vif1_device::dma_write(const uint64_t hi, const uint64_t lo)
 {
-	logerror("%s: dma_write: %08x%08x%08x%08x\n", machine().describe_context(), (uint32_t)(hi >> 32), (uint32_t)hi, (uint32_t)(lo >> 32), (uint32_t)lo);
-	fifo_push((uint32_t)(hi >> 32));
-	fifo_push((uint32_t)hi);
+	//logerror("%s: dma_write: %08x%08x%08x%08x\n", machine().describe_context(), (uint32_t)(hi >> 32), (uint32_t)hi, (uint32_t)(lo >> 32), (uint32_t)lo);
 	fifo_push((uint32_t)(lo >> 32));
 	fifo_push((uint32_t)lo);
+	fifo_push((uint32_t)(hi >> 32));
+	fifo_push((uint32_t)hi);
 }
 
 void ps2_vif1_device::tag_write(uint32_t *data)
@@ -278,14 +279,19 @@ void ps2_vif1_device::tag_write(uint32_t *data)
 	fifo_push(data[3]);
 }
 
-void ps2_vif1_device::fifo_push(uint32_t value)
+void ps2_vif1_device::fifo_push(uint32_t data)
 {
 	if (m_end >= BUFFER_SIZE)
 	{
+		printf("FIFO overflow :(\n");
 		return;
 	}
 
-	m_buffer[m_end++] = value;
+	m_buffer[m_end++] = data;
+
+	m_status &= ~0x1f000000;
+	m_status |= ((m_end - m_curr) >> 2) << 24;
+	logerror("%s: Pushing %08x onto FIFO, depth is now %d, status is now %08x\n", machine().describe_context(), data, m_end - m_curr, m_status);
 }
 
 uint32_t ps2_vif1_device::fifo_pop()
@@ -303,6 +309,11 @@ uint32_t ps2_vif1_device::fifo_pop()
 		m_curr = 0;
 		m_end = 0;
 	}
+
+	m_status &= ~0x1f000000;
+	m_status |= ((m_end - m_curr) >> 2) << 24;
+	logerror("%s: Popping %08x from FIFO, depth is now %d, status is now %08x\n", machine().describe_context(), ret, m_end - m_curr, m_status);
+
 	return ret;
 }
 
@@ -322,9 +333,11 @@ void ps2_vif1_device::execute_run()
 				if (fifo_depth())
 				{
 					m_code = fifo_pop();
+					logerror("%s: New VIFcode: %08x\n", machine().describe_context(), m_code);
 				}
 				else
 				{
+					//logerror("%s: Nothing in FIFO, idle\n", machine().describe_context());
 					m_icount = 0;
 					break;
 				}
@@ -333,7 +346,7 @@ void ps2_vif1_device::execute_run()
 				decode_vifcode();
 				break;
 			case STAT_MODE_WAIT:
-				if (fifo_depth() == 0)
+				if (fifo_depth() < m_data_needed)
 				{
 					m_icount = 0;
 					break;
@@ -351,6 +364,7 @@ void ps2_vif1_device::transfer_vifcode_data()
 	m_status &= ~STAT_MODE_MASK;
 	if (fifo_depth() < m_data_needed)
 	{
+		//logerror("%s: transfer: We need %d but only have %d, waiting\n", machine().describe_context(), m_data_needed, fifo_depth());
 		m_status |= STAT_MODE_WAIT;
 		m_icount = 0;
 		return;
@@ -360,15 +374,18 @@ void ps2_vif1_device::transfer_vifcode_data()
 	{
 		case 0x20: /* STMASK */
 			m_mask = fifo_pop();
+			logerror("%s: STMASK: %08x\n", machine().describe_context(), m_mask);
 			m_data_needed = 0;
 			break;
 		case 0x30: /* STROW */
 			m_row_fill[m_data_index] = fifo_pop();
-			m_data_needed = 0;
+			logerror("%s: STMASK: %08x\n", machine().describe_context(), m_row_fill[m_data_index]);
+			m_data_needed--;
 			break;
 		case 0x31: /* STCOL */
 			m_col_fill[m_data_index] = fifo_pop();
-			m_data_needed = 0;
+			logerror("%s: STMASK: %08x\n", machine().describe_context(), m_col_fill[m_data_index]);
+			m_data_needed--;
 			break;
 		case 0x4a: /* MPG */
 			transfer_mpg();
@@ -376,7 +393,12 @@ void ps2_vif1_device::transfer_vifcode_data()
 		default:
 			if ((m_command & 0x60) == 0x60)
 			{
+				logerror("%s: Unpack: %02x\n", machine().describe_context(), m_command);
 				transfer_unpack();
+			}
+			else
+			{
+				logerror("%s: Unknown command: %02x\n", machine().describe_context(), m_command);
 			}
 			break;
 	}
@@ -397,6 +419,7 @@ void ps2_vif1_device::transfer_vifcode_data()
 	else if (fifo_depth() > 0)
 	{
 		m_code = fifo_pop();
+		logerror("%s: New VIFcode: %08x\n", machine().describe_context(), m_code);
 		m_status |= STAT_MODE_DECODE;
 		m_icount--;
 	}
@@ -412,22 +435,28 @@ void ps2_vif1_device::transfer_unpack()
 	switch (m_unpack_format)
 	{
 		case FMT_V4_32:
-			logerror("%s: Unpacking V4-32.\n", machine().describe_context());
+			//logerror("%s: Unpacking V4-32.\n", machine().describe_context());
 			for (int element = 0; element < 4; element++)
 			{
-				fifo_pop();
-				//const uint32_t data = fifo_pop();
-				//m_vu->write_data(m_unpack_addr, data);
+				const uint32_t data = fifo_pop();
+				m_vu1->write_vu_mem(m_unpack_addr, data);
 				m_unpack_addr += 4;
+				m_unpack_count--;
 			}
-			m_unpack_count--;
 			break;
 		default:
 			logerror("%s: Unsupported unpack format: %02x\n", machine().describe_context(), m_unpack_format);
 			break;
 	}
 
-	m_data_needed = FORMAT_SIZE[m_unpack_format] - (m_unpack_bits_remaining ? 1 : 0);
+	if (m_unpack_count > 0)
+	{
+		m_data_needed = FORMAT_SIZE[m_unpack_format] - (m_unpack_bits_remaining ? 1 : 0);
+	}
+	else
+	{
+		m_data_needed = 0;
+	}
 }
 
 void ps2_vif1_device::transfer_mpg()
@@ -438,26 +467,27 @@ void ps2_vif1_device::transfer_mpg()
 		m_data_needed--;
 	}
 
-	m_mpg_insn = fifo_pop();
-	m_mpg_insn |= (uint64_t)fifo_pop() << 32;
-	m_mpg_addr += 8;
+	m_mpg_insn = (uint64_t)fifo_pop() << 32;
+	m_mpg_insn |= fifo_pop();
 	m_mpg_count--;
+
+	m_vu1->write_micro_mem(m_mpg_addr, m_mpg_insn);
+	logerror("%s: MPG, VU insn: %08x = %08x%08x, %d remaining\n", machine().describe_context(), m_mpg_addr, (uint32_t)(m_mpg_insn >> 32), (uint32_t)m_mpg_insn, m_mpg_count);
+
+	m_mpg_addr += 8;
 	m_data_needed = m_mpg_count ? 2 : 0;
-
-	logerror("%s: MPG, VU insn: %08x%08x, %d remaining\n", machine().describe_context(), (uint32_t)(m_mpg_insn >> 32), (uint32_t)m_mpg_insn, m_mpg_count);
-
-	//m_vu->write_instruction(m_mpg_addr, m_mpg_insn);
 }
 
 void ps2_vif1_device::decode_vifcode()
 {
-	//bool trigger_interrupt = BIT(m_code, 31);
+	bool trigger_interrupt = BIT(m_code, 31);
 	m_command = (m_code >> 24) & 0x7f;
 	m_status &= ~STAT_MODE_MASK;
 
 	switch (m_command)
 	{
 		case 0x00: /* NOP */
+			logerror("%s: NOP\n", machine().describe_context());
 			break;
 		case 0x01: /* STCYCL */
 			m_cycle = (uint16_t)m_code;
@@ -519,6 +549,7 @@ void ps2_vif1_device::decode_vifcode()
 				m_unpack_add_tops = BIT(m_code, 15);
 				m_unpack_format = (uint8_t)(m_command & 0xf);
 				m_data_needed = FORMAT_SIZE[m_unpack_format];
+				logerror("%s: UNPACK (%08x), count %d\n", machine().describe_context(), m_code, m_unpack_count);
 			}
 			else
 			{ /* unknown */
@@ -550,6 +581,11 @@ void ps2_vif1_device::decode_vifcode()
 	{
 		m_status |= STAT_MODE_IDLE;
 		m_icount = 0;
+	}
+
+	if (trigger_interrupt)
+	{
+		printf("******************\n");
 	}
 }
 

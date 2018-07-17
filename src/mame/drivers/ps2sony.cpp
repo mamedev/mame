@@ -162,6 +162,7 @@ iLinkSGUID=0x--------
 
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
+#include "cpu/mips/sonyvu.h"
 
 #include "machine/iopcdvd.h"
 #include "machine/iopdma.h"
@@ -203,6 +204,8 @@ public:
 		, m_gif(*this, "gif")
 		, m_gs(*this, "gs")
 		, m_vif1(*this, "vif1")
+		, m_vu0(*this, "vu0")
+		, m_vu1(*this, "vu1")
 		, m_pad(*this, "pad%u", 0U)
 		, m_mc(*this, "mc")
 		, m_screen(*this, "screen")
@@ -266,6 +269,8 @@ protected:
 	required_device<ps2_gif_device> m_gif;
 	required_device<ps2_gs_device> m_gs;
 	required_device<ps2_vif1_device> m_vif1;
+	required_device<sonyvu0_device> m_vu0;
+	required_device<sonyvu1_device> m_vu1;
 	required_device_array<ps2_pad_device, 2> m_pad;
 	required_device<ps2_mc_device>	m_mc;
 	required_device<screen_device>	m_screen;
@@ -550,7 +555,7 @@ void ps2sony_state::machine_reset()
 	memset(m_ipu_out_fifo, 0, sizeof(uint64_t)*0x1000);
 	m_ipu_out_fifo_index = 0;
 
-    m_vblank_timer->adjust(m_screen->time_until_pos(480), 1);
+    m_vblank_timer->adjust(m_screen->time_until_pos(0), 1);
 }
 
 TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
@@ -558,17 +563,17 @@ TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
 	if (param)
 	{
 		// VBlank enter
-		m_intc->raise_interrupt(ps2_intc_device::INT_VB_ON);
 		m_iop_intc->raise_interrupt(iop_intc_device::INT_VB_ON);
-		m_vblank_timer->adjust(m_screen->time_until_pos(0), 0);
+		m_intc->raise_interrupt(ps2_intc_device::INT_VB_ON);
+		m_vblank_timer->adjust(m_screen->time_until_pos(32), 0);
 		m_gs->vblank_start();
 	}
 	else
 	{
 		// VBlank exit
-		//m_intc->raise_interrupt(ps2_intc_device::INT_VB_OFF);
 		m_iop_intc->raise_interrupt(iop_intc_device::INT_VB_OFF);
-		m_vblank_timer->adjust(m_screen->time_until_pos(480), 1);
+		m_intc->raise_interrupt(ps2_intc_device::INT_VB_OFF);
+		m_vblank_timer->adjust(m_screen->time_until_pos(0), 1);
 		m_gs->vblank_end();
 	}
 }
@@ -734,21 +739,24 @@ static INPUT_PORTS_START( ps2sony )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ps2sony_state::ps2sony)
-	MCFG_DEVICE_ADD(m_maincpu, R5900LE, 294'912'000)
+	MCFG_DEVICE_ADD(m_maincpu, R5900LE, 294'912'000, m_vu0)
 	MCFG_CPU_FORCE_NO_DRC()
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD(m_vif1, SONYPS2_VIF1, 294912000/2, m_gif)
+	MCFG_DEVICE_ADD(m_vu0, SONYVU0, 294'912'000, m_vu1)
+	MCFG_DEVICE_ADD(m_vu1, SONYVU1, 294'912'000)
+
+	MCFG_DEVICE_ADD(m_vif1, SONYPS2_VIF1, 294912000/2, m_gif, m_vu1)
 
 	MCFG_DEVICE_ADD(m_timer[0], SONYPS2_TIMER, 294912000/2, true)
 	MCFG_DEVICE_ADD(m_timer[1], SONYPS2_TIMER, 294912000/2, true)
 	MCFG_DEVICE_ADD(m_timer[2], SONYPS2_TIMER, 294912000/2, false)
 	MCFG_DEVICE_ADD(m_timer[3], SONYPS2_TIMER, 294912000/2, false)
 
-	MCFG_DEVICE_ADD(m_gs, SONYPS2_GS, 294912000/2)
 	MCFG_DEVICE_ADD(m_intc, SONYPS2_INTC, m_maincpu)
+	MCFG_DEVICE_ADD(m_gs, SONYPS2_GS, 294912000/2, m_intc)
 	MCFG_DEVICE_ADD(m_dmac, SONYPS2_DMAC, 294912000/2, m_maincpu, m_ram, m_sif, m_gif, m_vif1)
 	MCFG_DEVICE_ADD(m_sif, SONYPS2_SIF, m_intc)
 	MCFG_DEVICE_ADD(m_gif, SONYPS2_GIF, m_gs)
@@ -776,8 +784,8 @@ MACHINE_CONFIG_START(ps2sony_state::ps2sony)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(ps2sony_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 525)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	MCFG_SCREEN_SIZE(640, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 223)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 MACHINE_CONFIG_END

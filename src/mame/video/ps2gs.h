@@ -15,11 +15,20 @@
 #pragma once
 
 #include "emu.h"
+#include "machine/ps2intc.h"
 
 class ps2_gs_device : public device_t
 {
 public:
-    ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+
+    ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&intc_tag)
+    	: ps2_gs_device(mconfig, tag, owner, clock)
+    {
+		m_intc.set_tag(std::forward<T>(intc_tag));
+	}
+
+	ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
     DECLARE_READ64_MEMBER(priv_regs0_r);
     DECLARE_WRITE64_MEMBER(priv_regs0_w);
@@ -115,8 +124,22 @@ protected:
 
 	enum : uint32_t
 	{
-		CSR_RESET     = 0x00000200,
-		CSR_FIELD_ODD = 0x00002000
+		CSR_SIGNAL     = 0x00000001,
+		CSR_FINISH     = 0x00000002,
+		CSR_HSINT      = 0x00000004,
+		CSR_VSINT      = 0x00000008,
+		CSR_EDWINT     = 0x00000010,
+		CSR_FLUSH      = 0x00000100,
+		CSR_RESET      = 0x00000200,
+		CSR_NFIELD     = 0x00001000,
+		CSR_FIELD_ODD  = 0x00002000,
+		CSR_FIFO_MASK  = 0x0000c000,
+		CSR_FIFO_MID   = 0x00000000,
+		CSR_FIFO_EMPTY = 0x00004000,
+		CSR_FIFO_HI    = 0x00008000,
+		CSR_FIFO_INV   = 0x0000c000,
+		CSR_REV        = 0x001b0000,
+		CSR_ID         = 0x55000000
 	};
 
 	struct vertex_t
@@ -136,6 +159,8 @@ protected:
 
 		uint8_t m_fog;
 	};
+
+	required_device<ps2_intc_device> m_intc;
 
 	std::unique_ptr<uint32_t[]> m_ram;
 	std::unique_ptr<vertex_t[]> m_vertices;

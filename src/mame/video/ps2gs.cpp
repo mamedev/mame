@@ -41,6 +41,7 @@ DEFINE_DEVICE_TYPE(SONYPS2_GS, ps2_gs_device, "ps2gs", "Playstation 2 GS")
 
 ps2_gs_device::ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SONYPS2_GS, tag, owner, clock)
+	, m_intc(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -366,7 +367,7 @@ READ64_MEMBER(ps2_gs_device::priv_regs1_r)
     switch (offset)
     {
         case 0x00:
-        	ret = m_csr;
+        	ret = m_csr | (CSR_REV | CSR_ID | CSR_FIFO_EMPTY);
         	logerror("%s: regs1_r: CSR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
         	break;
         case 0x02:
@@ -394,7 +395,8 @@ WRITE64_MEMBER(ps2_gs_device::priv_regs1_w)
     {
         case 0x00:
         	logerror("%s: regs1_w: CSR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
-        	m_csr = data &~ CSR_RESET;
+        	m_csr = data &~ (CSR_RESET | CSR_SIGNAL | CSR_HSINT | CSR_VSINT | CSR_EDWINT | CSR_FLUSH);
+        	//m_csr |= (CSR_SIGNAL | CSR_HSINT | CSR_VSINT | CSR_EDWINT | CSR_FLUSH);
         	break;
         case 0x02:
         	logerror("%s: regs1_w: IMR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
@@ -724,7 +726,7 @@ void ps2_gs_device::vblank_end()
 {
 	m_curr_field ^= 1;
 	if (m_curr_field)
-		m_csr |= CSR_FIELD_ODD;
-	else
 		m_csr &= ~CSR_FIELD_ODD;
+	else
+		m_csr |= CSR_FIELD_ODD;
 }
