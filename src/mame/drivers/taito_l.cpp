@@ -1450,7 +1450,7 @@ MACHINE_CONFIG_START(taitol_state::l_system_video)
 	for (int i = 0; i < 4; i++)
 	{
 		ADDRESS_MAP_BANK(config, m_ram_bnks[i], 0);
-		m_ram_bnks[i]->set_addrmap(AS_PROGRAM, &taitol_state::tc0090lvc_map);
+		m_ram_bnks[i]->set_map(&taitol_state::tc0090lvc_map);
 		m_ram_bnks[i]->set_endianness(ENDIANNESS_LITTLE);
 		m_ram_bnks[i]->set_data_width(8);
 		m_ram_bnks[i]->set_addr_width(20);
