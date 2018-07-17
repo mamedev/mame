@@ -184,8 +184,8 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 	// bits 2 & 3: control the lamps, allowing for overrides
 	if (((m_video_control ^ data) & 0x0c) && !m_lamp_changed_w.isnull())
 		m_lamp_changed_w(m_video_control ^ data, data);
-	m_lamp[1] = BIT(data, 3);
-	m_lamp[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 3);
+	m_lamps[0] = BIT(data, 2);
 
 	m_video_control = data;
 
@@ -960,8 +960,8 @@ void segas16a_state::system16a_map(address_map &map)
 	map(0x400000, 0x407fff).mirror(0xb88000).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
 	map(0x410000, 0x410fff).mirror(0xb8f000).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
 	map(0x440000, 0x4407ff).mirror(0x3bf800).ram().share("sprites");
-	map(0x840000, 0x840fff).mirror(0x3bf000).ram().w(this, FUNC(segas16a_state::paletteram_w)).share("paletteram");
-	map(0xc40000, 0xc43fff).mirror(0x39c000).rw(this, FUNC(segas16a_state::misc_io_r), FUNC(segas16a_state::misc_io_w));
+	map(0x840000, 0x840fff).mirror(0x3bf000).ram().w(FUNC(segas16a_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc43fff).mirror(0x39c000).rw(FUNC(segas16a_state::misc_io_r), FUNC(segas16a_state::misc_io_w));
 	map(0xc60000, 0xc6ffff).r(m_watchdog, FUNC(watchdog_timer_device::reset16_r));
 	map(0xc70000, 0xc73fff).mirror(0x38c000).ram().share("nvram");
 }
@@ -979,7 +979,7 @@ void segas16a_state::sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
-	map(0xe800, 0xe800).r(this, FUNC(segas16a_state::sound_data_r));
+	map(0xe800, 0xe800).r(FUNC(segas16a_state::sound_data_r));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -993,8 +993,8 @@ void segas16a_state::sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x80, 0x80).mirror(0x3f).w(this, FUNC(segas16a_state::n7751_command_w));
-	map(0xc0, 0xc0).mirror(0x3f).r(this, FUNC(segas16a_state::sound_data_r));
+	map(0x80, 0x80).mirror(0x3f).w(FUNC(segas16a_state::n7751_command_w));
+	map(0xc0, 0xc0).mirror(0x3f).r(FUNC(segas16a_state::sound_data_r));
 }
 
 void segas16a_state::sound_no7751_portmap(address_map &map)
@@ -1003,7 +1003,7 @@ void segas16a_state::sound_no7751_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x80, 0x80).mirror(0x3f).noprw();
-	map(0xc0, 0xc0).mirror(0x3f).r(this, FUNC(segas16a_state::sound_data_r));
+	map(0xc0, 0xc0).mirror(0x3f).r(FUNC(segas16a_state::sound_data_r));
 }
 
 
@@ -1014,7 +1014,7 @@ void segas16a_state::sound_no7751_portmap(address_map &map)
 
 void segas16a_state::mcu_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(segas16a_state::mcu_io_r), FUNC(segas16a_state::mcu_io_w));
+	map(0x0000, 0xffff).rw(FUNC(segas16a_state::mcu_io_r), FUNC(segas16a_state::mcu_io_w));
 }
 
 
@@ -1976,7 +1976,7 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 	MCFG_DEVICE_ADD("n7751", N7751, 6000000)
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, segas16a_state, n7751_rom_r))
 	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, segas16a_state, n7751_p2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, segas16a_state, n7751_p2_w))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("n7751_8243", i8243_device, prog_w))
@@ -2000,9 +2000,8 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 	MCFG_SCREEN_UPDATE_DRIVER(segas16a_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SEGA_SYS16A_SPRITES_ADD("sprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	MCFG_DEVICE_ADD("sprites", SEGA_SYS16A_SPRITES, 0)
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas16a)
 	MCFG_PALETTE_ADD("palette", 2048*3)

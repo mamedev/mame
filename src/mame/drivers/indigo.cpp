@@ -27,6 +27,7 @@
 #include "machine/eepromser.h"
 #include "machine/sgi.h"
 #include "machine/wd33c93.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -475,8 +476,8 @@ void indigo_state::indigo_map(address_map &map)
 	map(0x0c000000, 0x0c7fffff).ram().share("share8");
 	map(0x10000000, 0x107fffff).ram().share("share9");
 	map(0x18000000, 0x187fffff).ram().share("share1");
-	map(0x1fb80000, 0x1fb8ffff).rw(this, FUNC(indigo_state::hpc_r), FUNC(indigo_state::hpc_w));
-	map(0x1fbd9000, 0x1fbd903f).rw(this, FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
+	map(0x1fb80000, 0x1fb8ffff).rw(FUNC(indigo_state::hpc_r), FUNC(indigo_state::hpc_w));
+	map(0x1fbd9000, 0x1fbd903f).rw(FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
 }
 
 void indigo_state::indigo3k_map(address_map &map)
@@ -611,7 +612,7 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_WD33C93_IRQ_CB(WRITELINE(*this, indigo_state, scsi_irq))      /* command completion IRQ */
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(indigo_state::indigo4k)
@@ -627,9 +628,9 @@ MACHINE_CONFIG_END
 ROM_START( indigo3k )
 	ROM_REGION( 0x40000, "user1", 0 )
 	ROM_SYSTEM_BIOS( 0, "401-rev-c", "SGI Version 4.0.1 Rev C LG1/GR2, Jul 9, 1992" ) // dumped over serial connection from boot monitor and swapped
-	ROMX_LOAD( "ip12prom.070-8088-xxx.u56", 0x000000, 0x040000, CRC(25ca912f) SHA1(94b3753d659bfe50b914445cef41290122f43880), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
+	ROMX_LOAD( "ip12prom.070-8088-xxx.u56", 0x000000, 0x040000, CRC(25ca912f) SHA1(94b3753d659bfe50b914445cef41290122f43880), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "401-rev-d", "SGI Version 4.0.1 Rev D LG1/GR2, Mar 24, 1992" ) // dumped with EPROM programmer
-	ROMX_LOAD( "ip12prom.070-8088-002.u56", 0x000000, 0x040000, CRC(ea4329ef) SHA1(b7d67d0e30ae8836892f7170dd4757732a0a3fd6), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2) )
+	ROMX_LOAD( "ip12prom.070-8088-002.u56", 0x000000, 0x040000, CRC(ea4329ef) SHA1(b7d67d0e30ae8836892f7170dd4757732a0a3fd6), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
 ROM_END
 
 ROM_START( indigo4k )

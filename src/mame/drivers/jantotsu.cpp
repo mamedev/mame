@@ -98,6 +98,7 @@ dumped by sayu
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -316,7 +317,7 @@ WRITE_LINE_MEMBER(jantotsu_state::jan_adpcm_int)
 		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
-		m_adpcm->data_w(m_adpcm_data & 0xf);
+		m_adpcm->write_data(m_adpcm_data & 0xf);
 		m_adpcm_trigger ^= 1;
 		if (m_adpcm_trigger == 0)
 		{
@@ -338,17 +339,17 @@ void jantotsu_state::jantotsu_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xe000, 0xffff).rw(this, FUNC(jantotsu_state::jantotsu_bitmap_r), FUNC(jantotsu_state::jantotsu_bitmap_w));
+	map(0xe000, 0xffff).rw(FUNC(jantotsu_state::jantotsu_bitmap_r), FUNC(jantotsu_state::jantotsu_bitmap_w));
 }
 
 void jantotsu_state::jantotsu_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("DSW1").w("sn1", FUNC(sn76489a_device::write));
-	map(0x01, 0x01).r(this, FUNC(jantotsu_state::jantotsu_dsw2_r)).w("sn2", FUNC(sn76489a_device::write));
-	map(0x02, 0x03).w(this, FUNC(jantotsu_state::jan_adpcm_w));
-	map(0x04, 0x04).rw(this, FUNC(jantotsu_state::jantotsu_mux_r), FUNC(jantotsu_state::jantotsu_mux_w));
-	map(0x07, 0x07).w(this, FUNC(jantotsu_state::bankaddr_w));
+	map(0x00, 0x00).portr("DSW1").w("sn1", FUNC(sn76489a_device::command_w));
+	map(0x01, 0x01).r(FUNC(jantotsu_state::jantotsu_dsw2_r)).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0x02, 0x03).w(FUNC(jantotsu_state::jan_adpcm_w));
+	map(0x04, 0x04).rw(FUNC(jantotsu_state::jantotsu_mux_r), FUNC(jantotsu_state::jantotsu_mux_w));
+	map(0x07, 0x07).w(FUNC(jantotsu_state::bankaddr_w));
 }
 
 

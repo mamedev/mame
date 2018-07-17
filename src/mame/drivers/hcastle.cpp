@@ -43,26 +43,26 @@ WRITE8_MEMBER(hcastle_state::hcastle_coin_w)
 
 void hcastle_state::hcastle_map(address_map &map)
 {
-	map(0x0000, 0x0007).w(this, FUNC(hcastle_state::hcastle_pf1_control_w));
+	map(0x0000, 0x0007).w(FUNC(hcastle_state::hcastle_pf1_control_w));
 	map(0x0020, 0x003f).ram(); /* rowscroll? */
-	map(0x0200, 0x0207).w(this, FUNC(hcastle_state::hcastle_pf2_control_w));
+	map(0x0200, 0x0207).w(FUNC(hcastle_state::hcastle_pf2_control_w));
 	map(0x0220, 0x023f).ram(); /* rowscroll? */
-	map(0x0400, 0x0400).w(this, FUNC(hcastle_state::hcastle_bankswitch_w));
+	map(0x0400, 0x0400).w(FUNC(hcastle_state::hcastle_bankswitch_w));
 	map(0x0404, 0x0404).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x0408, 0x0408).w(this, FUNC(hcastle_state::hcastle_soundirq_w));
+	map(0x0408, 0x0408).w(FUNC(hcastle_state::hcastle_soundirq_w));
 	map(0x040c, 0x040c).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0410, 0x0410).portr("SYSTEM").w(this, FUNC(hcastle_state::hcastle_coin_w));
+	map(0x0410, 0x0410).portr("SYSTEM").w(FUNC(hcastle_state::hcastle_coin_w));
 	map(0x0411, 0x0411).portr("P1");
 	map(0x0412, 0x0412).portr("P2");
 	map(0x0413, 0x0413).portr("DSW3");
 	map(0x0414, 0x0414).portr("DSW1");
 	map(0x0415, 0x0415).portr("DSW2");
-	map(0x0418, 0x0418).rw(this, FUNC(hcastle_state::hcastle_gfxbank_r), FUNC(hcastle_state::hcastle_gfxbank_w));
+	map(0x0418, 0x0418).rw(FUNC(hcastle_state::hcastle_gfxbank_r), FUNC(hcastle_state::hcastle_gfxbank_w));
 	map(0x0600, 0x06ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
 	map(0x0700, 0x1fff).ram();
-	map(0x2000, 0x2fff).ram().w(this, FUNC(hcastle_state::hcastle_pf1_video_w)).share("pf1_videoram");
+	map(0x2000, 0x2fff).ram().w(FUNC(hcastle_state::hcastle_pf1_video_w)).share("pf1_videoram");
 	map(0x3000, 0x3fff).ram().share("spriteram");
-	map(0x4000, 0x4fff).ram().w(this, FUNC(hcastle_state::hcastle_pf2_video_w)).share("pf2_videoram");
+	map(0x4000, 0x4fff).ram().w(FUNC(hcastle_state::hcastle_pf2_video_w)).share("pf2_videoram");
 	map(0x5000, 0x5fff).ram().share("spriteram2");
 	map(0x6000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();
@@ -84,7 +84,7 @@ void hcastle_state::sound_map(address_map &map)
 	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
-	map(0xc000, 0xc000).w(this, FUNC(hcastle_state::sound_bank_w)); /* 7232 bankswitch */
+	map(0xc000, 0xc000).w(FUNC(hcastle_state::sound_bank_w)); /* 7232 bankswitch */
 	map(0xd000, 0xd000).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 

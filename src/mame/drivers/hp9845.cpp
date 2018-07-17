@@ -3716,13 +3716,13 @@ void hp9845_base_state::ppu_io_map(address_map &map)
 	map(HP_MAKE_IOADDR(PRINTER_PA, 0), HP_MAKE_IOADDR(PRINTER_PA, 1)).rw("printer", FUNC(hp9845_printer_device::printer_r), FUNC(hp9845_printer_device::printer_w));
 	// PA = 0, IC = 2
 	// Keyboard scancode input
-	map(HP_MAKE_IOADDR(0, 2), HP_MAKE_IOADDR(0, 2)).r(this, FUNC(hp9845_base_state::kb_scancode_r));
+	map(HP_MAKE_IOADDR(0, 2), HP_MAKE_IOADDR(0, 2)).r(FUNC(hp9845_base_state::kb_scancode_r));
 	// PA = 0, IC = 3
 	// Keyboard status input & keyboard interrupt clear
-	map(HP_MAKE_IOADDR(0, 3), HP_MAKE_IOADDR(0, 3)).rw(this, FUNC(hp9845_base_state::kb_status_r), FUNC(hp9845_base_state::kb_irq_clear_w));
+	map(HP_MAKE_IOADDR(0, 3), HP_MAKE_IOADDR(0, 3)).rw(FUNC(hp9845_base_state::kb_status_r), FUNC(hp9845_base_state::kb_irq_clear_w));
 	// PA = 13, IC = 0..3
 	// Graphic video
-	map(HP_MAKE_IOADDR(GVIDEO_PA, 0), HP_MAKE_IOADDR(GVIDEO_PA, 3)).rw(this, FUNC(hp9845_base_state::graphic_r), FUNC(hp9845_base_state::graphic_w));
+	map(HP_MAKE_IOADDR(GVIDEO_PA, 0), HP_MAKE_IOADDR(GVIDEO_PA, 3)).rw(FUNC(hp9845_base_state::graphic_r), FUNC(hp9845_base_state::graphic_w));
 	// PA = 14, IC = 0..3
 	// Left-hand side tape drive (T14)
 	map(HP_MAKE_IOADDR(T14_PA, 0), HP_MAKE_IOADDR(T14_PA, 3)).rw("t14", FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));

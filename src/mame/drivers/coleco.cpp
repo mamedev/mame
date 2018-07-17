@@ -104,13 +104,13 @@ void coleco_state::coleco_map(address_map &map)
 void coleco_state::coleco_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x80, 0x80).mirror(0x1f).w(this, FUNC(coleco_state::paddle_off_w));
-	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
-	map(0xc0, 0xc0).mirror(0x1f).w(this, FUNC(coleco_state::paddle_on_w));
-	map(0xe0, 0xe0).mirror(0x1f).w("sn76489a", FUNC(sn76489a_device::write));
-	map(0xe0, 0xe0).mirror(0x1d).r(this, FUNC(coleco_state::paddle_1_r));
-	map(0xe2, 0xe2).mirror(0x1d).r(this, FUNC(coleco_state::paddle_2_r));
+	map(0x80, 0x80).mirror(0x1f).w(FUNC(coleco_state::paddle_off_w));
+	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(coleco_state::paddle_on_w));
+	map(0xe0, 0xe0).mirror(0x1f).w("sn76489a", FUNC(sn76489a_device::command_w));
+	map(0xe0, 0xe0).mirror(0x1d).r(FUNC(coleco_state::paddle_1_r));
+	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_state::paddle_2_r));
 }
 
 void coleco_state::czz50_map(address_map &map)
@@ -446,10 +446,10 @@ MACHINE_CONFIG_END
 ROM_START (coleco)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "original", "Original" )
-	ROMX_LOAD( "313 10031-4005 73108a.u2", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92), ROM_BIOS(1) )
+	ROMX_LOAD( "313 10031-4005 73108a.u2", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "thick", "Thick characters" )
 	// differences to 0x3aa93ef3 modified characters, added a pad 2 related fix
-	ROMX_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59), ROM_BIOS(2) )
+	ROMX_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59), ROM_BIOS(1) )
 ROM_END
 
 /*  ONYX (Prototype)

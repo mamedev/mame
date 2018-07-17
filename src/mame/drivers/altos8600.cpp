@@ -667,57 +667,57 @@ IRQ_CALLBACK_MEMBER(altos8600_state::inta)
 
 void altos8600_state::cpu_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(altos8600_state::cpuram_r), FUNC(altos8600_state::cpuram_w));
+	map(0x00000, 0xfffff).rw(FUNC(altos8600_state::cpuram_r), FUNC(altos8600_state::cpuram_w));
 }
 
 void altos8600_state::stack_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(altos8600_state::stkram_r), FUNC(altos8600_state::stkram_w));
+	map(0x00000, 0xfffff).rw(FUNC(altos8600_state::stkram_r), FUNC(altos8600_state::stkram_w));
 }
 
 void altos8600_state::code_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(altos8600_state::coderam_r), FUNC(altos8600_state::coderam_w));
+	map(0x00000, 0xfffff).rw(FUNC(altos8600_state::coderam_r), FUNC(altos8600_state::coderam_w));
 }
 
 void altos8600_state::extra_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(altos8600_state::xtraram_r), FUNC(altos8600_state::xtraram_w));
+	map(0x00000, 0xfffff).rw(FUNC(altos8600_state::xtraram_r), FUNC(altos8600_state::xtraram_w));
 }
 
 void altos8600_state::cpu_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(altos8600_state::cpuio_r), FUNC(altos8600_state::cpuio_w));
+	map(0x0000, 0xffff).rw(FUNC(altos8600_state::cpuio_r), FUNC(altos8600_state::cpuio_w));
 }
 
 void altos8600_state::dmac_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(altos8600_state::dmacram_r), FUNC(altos8600_state::dmacram_w));
+	map(0x00000, 0xfffff).rw(FUNC(altos8600_state::dmacram_r), FUNC(altos8600_state::dmacram_w));
 }
 
 void altos8600_state::dmac_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(altos8600_state::nmi_r), FUNC(altos8600_state::nmi_w));
-	map(0x0000, 0x0007).r(this, FUNC(altos8600_state::fault_r));
-	map(0x0008, 0x000f).w(this, FUNC(altos8600_state::clear_w));
-	map(0x0010, 0x0017).r(this, FUNC(altos8600_state::errlo_r));
-	map(0x0018, 0x001f).r(this, FUNC(altos8600_state::errhi_r));
-	map(0x0020, 0x0027).rw(this, FUNC(altos8600_state::hd_r), FUNC(altos8600_state::hd_w)).umask16(0x00ff);
-	map(0x0030, 0x0037).w(this, FUNC(altos8600_state::mode_w));
-	map(0x0038, 0x003f).w(this, FUNC(altos8600_state::cattn_w));
+	map(0x0000, 0xffff).rw(FUNC(altos8600_state::nmi_r), FUNC(altos8600_state::nmi_w));
+	map(0x0000, 0x0007).r(FUNC(altos8600_state::fault_r));
+	map(0x0008, 0x000f).w(FUNC(altos8600_state::clear_w));
+	map(0x0010, 0x0017).r(FUNC(altos8600_state::errlo_r));
+	map(0x0018, 0x001f).r(FUNC(altos8600_state::errhi_r));
+	map(0x0020, 0x0027).rw(FUNC(altos8600_state::hd_r), FUNC(altos8600_state::hd_w)).umask16(0x00ff);
+	map(0x0030, 0x0037).w(FUNC(altos8600_state::mode_w));
+	map(0x0038, 0x003f).w(FUNC(altos8600_state::cattn_w));
 	map(0x0040, 0x0047).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0xff00);
 	map(0x0048, 0x004f).rw(m_uart8274, FUNC(i8274_new_device::cd_ba_r), FUNC(i8274_new_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0048, 0x004f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
-	map(0x0050, 0x0057).rw(this, FUNC(altos8600_state::romport_r), FUNC(altos8600_state::romport_w));
+	map(0x0050, 0x0057).rw(FUNC(altos8600_state::romport_r), FUNC(altos8600_state::romport_w));
 	map(0x0058, 0x005f).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x0058, 0x005f).w(this, FUNC(altos8600_state::clrsys_w)).umask16(0xff00);
+	map(0x0058, 0x005f).w(FUNC(altos8600_state::clrsys_w)).umask16(0xff00);
 	map(0x0060, 0x0067).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x0068, 0x006f).rw(m_pic3, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x0070, 0x0077).noprw();
-	map(0x0078, 0x0079).w(this, FUNC(altos8600_state::ics_attn_w));
-	map(0x0200, 0x03ff).rw(this, FUNC(altos8600_state::mmuflags_r), FUNC(altos8600_state::mmuflags_w));
-	map(0x0400, 0x05ff).rw(this, FUNC(altos8600_state::mmuaddr_r), FUNC(altos8600_state::mmuaddr_w));
+	map(0x0078, 0x0079).w(FUNC(altos8600_state::ics_attn_w));
+	map(0x0200, 0x03ff).rw(FUNC(altos8600_state::mmuflags_r), FUNC(altos8600_state::mmuflags_w));
+	map(0x0400, 0x05ff).rw(FUNC(altos8600_state::mmuaddr_r), FUNC(altos8600_state::mmuaddr_w));
 }
 
 static void altos8600_floppies(device_slot_interface &device)
@@ -790,7 +790,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_PIT8253_CLK2(1228800)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic8259_1", pic8259_device, ir1_w))
 
-	MCFG_FD1797_ADD("fd1797", 2000000)
+	MCFG_DEVICE_ADD("fd1797", FD1797, 2000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic8259_2", pic8259_device, ir1_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, altos8600_state, fddrq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
@@ -798,8 +798,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("ics", ACS8600_ICS, 0)
-	MCFG_ACS8600_ICS_MAINCPU(":dmac") // TODO: fixme
+	MCFG_DEVICE_ADD("ics", ACS8600_ICS, "dmac")
 	MCFG_ACS8600_ICS_IRQ1(WRITELINE("pic8259_1", pic8259_device, ir5_w))
 	MCFG_ACS8600_ICS_IRQ2(WRITELINE("pic8259_1", pic8259_device, ir6_w))
 
@@ -809,8 +808,8 @@ MACHINE_CONFIG_END
 ROM_START(altos8600)
 	ROM_REGION(0x2000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "bios", "bios")
-	ROMX_LOAD("11753_1.5_lo.bin", 0x0000, 0x1000, CRC(dfa7bf0e) SHA1(6628fd7c579423b51d2642aeaa7fc0405a989252), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("11753_1.5_hi.bin", 0x0001, 0x1000, CRC(9b5e812c) SHA1(c2ef24859edd48d2096db47e16855c9bc01dae75), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("11753_1.5_lo.bin", 0x0000, 0x1000, CRC(dfa7bf0e) SHA1(6628fd7c579423b51d2642aeaa7fc0405a989252), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("11753_1.5_hi.bin", 0x0001, 0x1000, CRC(9b5e812c) SHA1(c2ef24859edd48d2096db47e16855c9bc01dae75), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 COMP( 1981, altos8600, 0, 0, altos8600, 0, altos8600_state, empty_init, "Altos Computer Systems", "ACS8600", MACHINE_NO_SOUND_HW)

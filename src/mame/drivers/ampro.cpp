@@ -107,13 +107,13 @@ void ampro_state::ampro_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(ampro_state::port00_w)); // system
+	map(0x00, 0x00).w(FUNC(ampro_state::port00_w)); // system
 	//AM_RANGE(0x01, 0x01) AM_WRITE(port01_w) // printer data
 	//AM_RANGE(0x02, 0x03) AM_WRITE(port02_w) // printer strobe
 	//AM_RANGE(0x20, 0x27) AM_READWRITE() // scsi chip
 	//AM_RANGE(0x28, 0x28) AM_WRITE(port28_w) // scsi control
 	//AM_RANGE(0x29, 0x29) AM_READ(port29_r) // ID port
-	map(0x40, 0x8f).rw(this, FUNC(ampro_state::io_r), FUNC(ampro_state::io_w));
+	map(0x40, 0x8f).rw(FUNC(ampro_state::io_r), FUNC(ampro_state::io_w));
 	map(0xc0, 0xc3).w(m_fdc, FUNC(wd1772_device::write));
 	map(0xc4, 0xc7).r(m_fdc, FUNC(wd1772_device::read));
 }
@@ -151,24 +151,24 @@ void ampro_state::init_ampro()
 
 MACHINE_CONFIG_START(ampro_state::ampro)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(ampro_mem)
 	MCFG_DEVICE_IO_MAP(ampro_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 	MCFG_MACHINE_RESET_OVERRIDE(ampro_state, ampro)
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(16'000'000) / 8) // 2MHz
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 16_MHz_XTAL / 8) // 2MHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 16_MHz_XTAL / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE("dart", z80dart_device, txca_w))    // Z80DART Ch A, SIO Ch A
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE("dart", z80dart_device, rxtxcb_w))   // SIO Ch B
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("dart", Z80DART, 16_MHz_XTAL / 4)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
@@ -177,7 +177,7 @@ MACHINE_CONFIG_START(ampro_state::ampro)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
 
-	MCFG_WD1772_ADD("fdc", XTAL(16'000'000) / 2)
+	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "ampro")
@@ -187,11 +187,11 @@ MACHINE_CONFIG_END
 ROM_START( ampro )
 	ROM_REGION( 0x11000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "mntr", "Monitor")
-	ROMX_LOAD( "mntr", 0x10000, 0x1000, CRC(d59d0909) SHA1(936410f414b1e71445253840eea0045545e4ff0b), ROM_BIOS(1))
+	ROMX_LOAD( "mntr", 0x10000, 0x1000, CRC(d59d0909) SHA1(936410f414b1e71445253840eea0045545e4ff0b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "boot", "Boot")
-	ROMX_LOAD( "boot", 0x10000, 0x1000, CRC(b3524046) SHA1(5466f7d28c1a04cfbf328095cb35ad1525e91f44), ROM_BIOS(2))
+	ROMX_LOAD( "boot", 0x10000, 0x1000, CRC(b3524046) SHA1(5466f7d28c1a04cfbf328095cb35ad1525e91f44), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "scsi", "SCSI Boot")
-	ROMX_LOAD( "scsi", 0x10000, 0x1000, CRC(8eb20e5d) SHA1(0ab1ff65cf6d3c1a713a8ac5c1ee4c662ac3da0c), ROM_BIOS(3))
+	ROMX_LOAD( "scsi", 0x10000, 0x1000, CRC(8eb20e5d) SHA1(0ab1ff65cf6d3c1a713a8ac5c1ee4c662ac3da0c), ROM_BIOS(2))
 ROM_END
 
 /* Driver */

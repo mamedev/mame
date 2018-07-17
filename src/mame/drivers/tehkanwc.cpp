@@ -217,10 +217,10 @@ WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
 	int msm_data = SAMPLES[m_msm_data_offs & 0x7fff];
 
 	if (m_toggle == 0)
-		m_msm->data_w((msm_data >> 4) & 0x0f);
+		m_msm->write_data((msm_data >> 4) & 0x0f);
 	else
 	{
-		m_msm->data_w(msm_data & 0x0f);
+		m_msm->write_data(msm_data & 0x0f);
 		m_msm_data_offs++;
 	}
 
@@ -236,26 +236,26 @@ void tehkanwc_state::main_mem(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).ram().share("share1");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(tehkanwc_state::videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(tehkanwc_state::colorram_w)).share("colorram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(tehkanwc_state::videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(tehkanwc_state::colorram_w)).share("colorram");
 	map(0xd800, 0xddff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xde00, 0xdfff).ram().share("share5"); /* unused part of the palette RAM, I think? Gridiron uses it */
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(tehkanwc_state::videoram2_w)).share("videoram2");
+	map(0xe000, 0xe7ff).ram().w(FUNC(tehkanwc_state::videoram2_w)).share("videoram2");
 	map(0xe800, 0xebff).ram().share("spriteram"); /* sprites */
-	map(0xec00, 0xec01).ram().w(this, FUNC(tehkanwc_state::scroll_x_w));
-	map(0xec02, 0xec02).ram().w(this, FUNC(tehkanwc_state::scroll_y_w));
-	map(0xf800, 0xf801).rw(this, FUNC(tehkanwc_state::track_0_r), FUNC(tehkanwc_state::track_0_reset_w)); /* track 0 x/y */
-	map(0xf802, 0xf802).portr("SYSTEM").w(this, FUNC(tehkanwc_state::gridiron_led0_w));
+	map(0xec00, 0xec01).ram().w(FUNC(tehkanwc_state::scroll_x_w));
+	map(0xec02, 0xec02).ram().w(FUNC(tehkanwc_state::scroll_y_w));
+	map(0xf800, 0xf801).rw(FUNC(tehkanwc_state::track_0_r), FUNC(tehkanwc_state::track_0_reset_w)); /* track 0 x/y */
+	map(0xf802, 0xf802).portr("SYSTEM").w(FUNC(tehkanwc_state::gridiron_led0_w));
 	map(0xf803, 0xf803).portr("P1BUT");
 	map(0xf806, 0xf806).portr("SYSTEM");
-	map(0xf810, 0xf811).rw(this, FUNC(tehkanwc_state::track_1_r), FUNC(tehkanwc_state::track_1_reset_w)); /* track 1 x/y */
-	map(0xf812, 0xf812).w(this, FUNC(tehkanwc_state::gridiron_led1_w));
+	map(0xf810, 0xf811).rw(FUNC(tehkanwc_state::track_1_r), FUNC(tehkanwc_state::track_1_reset_w)); /* track 1 x/y */
+	map(0xf812, 0xf812).w(FUNC(tehkanwc_state::gridiron_led1_w));
 	map(0xf813, 0xf813).portr("P2BUT");
-	map(0xf820, 0xf820).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(this, FUNC(tehkanwc_state::sound_command_w));  /* answer from the sound CPU */
-	map(0xf840, 0xf840).portr("DSW2").w(this, FUNC(tehkanwc_state::sub_cpu_halt_w));
+	map(0xf820, 0xf820).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(FUNC(tehkanwc_state::sound_command_w));  /* answer from the sound CPU */
+	map(0xf840, 0xf840).portr("DSW2").w(FUNC(tehkanwc_state::sub_cpu_halt_w));
 	map(0xf850, 0xf850).portr("DSW3").nopw();           /* ?? writes 0x00 or 0xff */
-	map(0xf860, 0xf860).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(tehkanwc_state::flipscreen_x_w));
-	map(0xf870, 0xf870).portr("DSW1").w(this, FUNC(tehkanwc_state::flipscreen_y_w));
+	map(0xf860, 0xf860).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(tehkanwc_state::flipscreen_x_w));
+	map(0xf870, 0xf870).portr("DSW1").w(FUNC(tehkanwc_state::flipscreen_y_w));
 }
 
 void tehkanwc_state::sub_mem(address_map &map)
@@ -263,14 +263,14 @@ void tehkanwc_state::sub_mem(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).ram().share("share1");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(tehkanwc_state::videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(tehkanwc_state::colorram_w)).share("colorram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(tehkanwc_state::videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(tehkanwc_state::colorram_w)).share("colorram");
 	map(0xd800, 0xddff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xde00, 0xdfff).ram().share("share5"); /* unused part of the palette RAM, I think? Gridiron uses it */
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(tehkanwc_state::videoram2_w)).share("videoram2");
+	map(0xe000, 0xe7ff).ram().w(FUNC(tehkanwc_state::videoram2_w)).share("videoram2");
 	map(0xe800, 0xebff).ram().share("spriteram"); /* sprites */
-	map(0xec00, 0xec01).ram().w(this, FUNC(tehkanwc_state::scroll_x_w));
-	map(0xec02, 0xec02).ram().w(this, FUNC(tehkanwc_state::scroll_y_w));
+	map(0xec00, 0xec01).ram().w(FUNC(tehkanwc_state::scroll_x_w));
+	map(0xec02, 0xec02).ram().w(FUNC(tehkanwc_state::scroll_y_w));
 	map(0xf860, 0xf860).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
@@ -278,10 +278,10 @@ void tehkanwc_state::sound_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x8001, 0x8001).w(this, FUNC(tehkanwc_state::msm_reset_w));/* MSM51xx reset */
+	map(0x8001, 0x8001).w(FUNC(tehkanwc_state::msm_reset_w));/* MSM51xx reset */
 	map(0x8002, 0x8002).nopw();    /* ?? written in the IRQ handler */
 	map(0x8003, 0x8003).nopw();    /* ?? written in the NMI handler */
-	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(tehkanwc_state::sound_answer_w));
+	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(tehkanwc_state::sound_answer_w));
 }
 
 void tehkanwc_state::sound_port(address_map &map)

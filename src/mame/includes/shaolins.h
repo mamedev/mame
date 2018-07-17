@@ -2,6 +2,7 @@
 // copyright-holders:Allard van der Bas
 
 #include "machine/timer.h"
+#include "emupal.h"
 
 class shaolins_state : public driver_device
 {

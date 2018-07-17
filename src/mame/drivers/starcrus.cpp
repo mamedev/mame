@@ -32,18 +32,18 @@ void starcrus_state::starcrus_map(address_map &map)
 
 void starcrus_state::starcrus_io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("P1").w(this, FUNC(starcrus_state::s1_x_w));
-	map(0x01, 0x01).portr("P2").w(this, FUNC(starcrus_state::s1_y_w));
-	map(0x02, 0x02).rw(this, FUNC(starcrus_state::coll_det_r), FUNC(starcrus_state::s2_x_w));
-	map(0x03, 0x03).portr("DSW").w(this, FUNC(starcrus_state::s2_y_w));
-	map(0x04, 0x04).w(this, FUNC(starcrus_state::p1_x_w));
-	map(0x05, 0x05).w(this, FUNC(starcrus_state::p1_y_w));
-	map(0x06, 0x06).w(this, FUNC(starcrus_state::p2_x_w));
-	map(0x07, 0x07).w(this, FUNC(starcrus_state::p2_y_w));
-	map(0x08, 0x08).w(this, FUNC(starcrus_state::ship_parm_1_w));
-	map(0x09, 0x09).w(this, FUNC(starcrus_state::ship_parm_2_w));
-	map(0x0a, 0x0a).w(this, FUNC(starcrus_state::proj_parm_1_w));
-	map(0x0b, 0x0b).w(this, FUNC(starcrus_state::proj_parm_2_w));
+	map(0x00, 0x00).portr("P1").w(FUNC(starcrus_state::s1_x_w));
+	map(0x01, 0x01).portr("P2").w(FUNC(starcrus_state::s1_y_w));
+	map(0x02, 0x02).rw(FUNC(starcrus_state::coll_det_r), FUNC(starcrus_state::s2_x_w));
+	map(0x03, 0x03).portr("DSW").w(FUNC(starcrus_state::s2_y_w));
+	map(0x04, 0x04).w(FUNC(starcrus_state::p1_x_w));
+	map(0x05, 0x05).w(FUNC(starcrus_state::p1_y_w));
+	map(0x06, 0x06).w(FUNC(starcrus_state::p2_x_w));
+	map(0x07, 0x07).w(FUNC(starcrus_state::p2_y_w));
+	map(0x08, 0x08).w(FUNC(starcrus_state::ship_parm_1_w));
+	map(0x09, 0x09).w(FUNC(starcrus_state::ship_parm_2_w));
+	map(0x0a, 0x0a).w(FUNC(starcrus_state::proj_parm_1_w));
+	map(0x0b, 0x0b).w(FUNC(starcrus_state::proj_parm_2_w));
 }
 
 

@@ -169,18 +169,18 @@ void chesstrv_base_state::chesstrv_mem(address_map &map)
 
 void chesstrv_state::chesstrv_io(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(chesstrv_state::ram_addr_r), FUNC(chesstrv_state::ram_addr_w));
-	map(0x01, 0x01).w(this, FUNC(chesstrv_state::display_w));
-	map(0x04, 0x04).rw(this, FUNC(chesstrv_state::ram_r), FUNC(chesstrv_state::ram_w));
-	map(0x05, 0x05).rw(this, FUNC(chesstrv_state::keypad_r), FUNC(chesstrv_state::matrix_w));
+	map(0x00, 0x00).rw(FUNC(chesstrv_state::ram_addr_r), FUNC(chesstrv_state::ram_addr_w));
+	map(0x01, 0x01).w(FUNC(chesstrv_state::display_w));
+	map(0x04, 0x04).rw(FUNC(chesstrv_state::ram_r), FUNC(chesstrv_state::ram_w));
+	map(0x05, 0x05).rw(FUNC(chesstrv_state::keypad_r), FUNC(chesstrv_state::matrix_w));
 }
 
 void borisdpl_state::borisdpl_io(address_map &map)
 {
-	map(0x00, 0x00).rw(this, FUNC(borisdpl_state::keypad_r), FUNC(borisdpl_state::matrix_w));
-	map(0x01, 0x01).w(this, FUNC(borisdpl_state::display_w));
-	map(0x04, 0x04).rw(this, FUNC(borisdpl_state::ram_r), FUNC(borisdpl_state::ram_w));
-	map(0x05, 0x05).rw(this, FUNC(borisdpl_state::ram_addr_r), FUNC(borisdpl_state::ram_addr_w));
+	map(0x00, 0x00).rw(FUNC(borisdpl_state::keypad_r), FUNC(borisdpl_state::matrix_w));
+	map(0x01, 0x01).w(FUNC(borisdpl_state::display_w));
+	map(0x04, 0x04).rw(FUNC(borisdpl_state::ram_r), FUNC(borisdpl_state::ram_w));
+	map(0x05, 0x05).rw(FUNC(borisdpl_state::ram_addr_r), FUNC(borisdpl_state::ram_addr_w));
 }
 
 static INPUT_PORTS_START( chesstrv )

@@ -223,7 +223,7 @@ public:
 		m_svc(*this, "SVC"),
 		m_dsw(*this, "DSW"),
 		m_unk(*this, "UNK"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(mux_w);
@@ -267,7 +267,7 @@ protected:
 	required_ioport m_svc;
 	required_ioport m_dsw;
 	required_ioport m_unk;
-	output_finder<38> m_lamp;
+	output_finder<38> m_lamps;
 };
 
 
@@ -277,8 +277,8 @@ protected:
 
 void kas89_state::machine_start()
 {
-	m_lamp.resolve();
-	m_lamp[37] = 0;   /* turning off the operator led */
+	m_lamps.resolve();
+	m_lamps[37] = 0;   /* turning off the operator led */
 }
 
 void kas89_state::machine_reset()
@@ -315,7 +315,7 @@ READ8_MEMBER(kas89_state::mux_r)
 		case 0x20: return m_pl6->read();
 		case 0x40:
 		{
-			m_lamp[37] = BIT(~m_svc->read(), 5);  /* Operator Key LAMP */
+			m_lamps[37] = BIT(~m_svc->read(), 5);  /* Operator Key LAMP */
 			return m_svc->read();
 		}
 		case 0x80: return m_dsw->read();    /* Polled at $162a through NMI routine */
@@ -381,7 +381,7 @@ WRITE8_MEMBER(kas89_state::sound_comm_w)
 			uint8_t i;
 			for ( i = 0; i < 37; i++ )
 			{
-				m_lamp[i] = 0;    /* All roulette LEDs OFF */
+				m_lamps[i] = 0;    /* All roulette LEDs OFF */
 			}
 		}
 
@@ -427,7 +427,7 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 	uint8_t i;
 	for ( i = 0; i < 37; i++ )
 	{
-		m_lamp[i] = 0;    /* All LEDs OFF */
+		m_lamps[i] = 0;    /* All LEDs OFF */
 	}
 
 	switch(data)
@@ -436,69 +436,69 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 		{
 			for ( i = 0; i < 37; i++ )
 			{
-				m_lamp[i] = 0;    /* All LEDs OFF */
+				m_lamps[i] = 0;    /* All LEDs OFF */
 			}
 		}
 
 		case 0x01:
 		{
-			m_lamp[11] = BIT(m_leds_mux_data, 0);  /* Number 11 LED */
-			m_lamp[36] = BIT(m_leds_mux_data, 1);  /* Number 36 LED */
-			m_lamp[13] = BIT(m_leds_mux_data, 2);  /* Number 13 LED */
-			m_lamp[27] = BIT(m_leds_mux_data, 3);  /* Number 27 LED */
-			m_lamp[06] = BIT(m_leds_mux_data, 4);  /* Number  6 LED */
-			m_lamp[34] = BIT(m_leds_mux_data, 5);  /* Number 34 LED */
-			m_lamp[17] = BIT(m_leds_mux_data, 6);  /* Number 17 LED */
-			m_lamp[25] = BIT(m_leds_mux_data, 7);  /* Number 25 LED */
+			m_lamps[11] = BIT(m_leds_mux_data, 0);  /* Number 11 LED */
+			m_lamps[36] = BIT(m_leds_mux_data, 1);  /* Number 36 LED */
+			m_lamps[13] = BIT(m_leds_mux_data, 2);  /* Number 13 LED */
+			m_lamps[27] = BIT(m_leds_mux_data, 3);  /* Number 27 LED */
+			m_lamps[06] = BIT(m_leds_mux_data, 4);  /* Number  6 LED */
+			m_lamps[34] = BIT(m_leds_mux_data, 5);  /* Number 34 LED */
+			m_lamps[17] = BIT(m_leds_mux_data, 6);  /* Number 17 LED */
+			m_lamps[25] = BIT(m_leds_mux_data, 7);  /* Number 25 LED */
 			break;
 		}
 
 		case 0x02:
 		{
-			m_lamp[ 2] = BIT(m_leds_mux_data, 0);  /* Number  2 LED */
-			m_lamp[21] = BIT(m_leds_mux_data, 1);  /* Number 21 LED */
-			m_lamp[ 4] = BIT(m_leds_mux_data, 2);  /* Number  4 LED */
-			m_lamp[19] = BIT(m_leds_mux_data, 3);  /* Number 19 LED */
-			m_lamp[15] = BIT(m_leds_mux_data, 4);  /* Number 15 LED */
-			m_lamp[32] = BIT(m_leds_mux_data, 5);  /* Number 32 LED */
-			m_lamp[ 0] = BIT(m_leds_mux_data, 6);  /* Number  0 LED */
-			m_lamp[26] = BIT(m_leds_mux_data, 7);  /* Number 26 LED */
+			m_lamps[ 2] = BIT(m_leds_mux_data, 0);  /* Number  2 LED */
+			m_lamps[21] = BIT(m_leds_mux_data, 1);  /* Number 21 LED */
+			m_lamps[ 4] = BIT(m_leds_mux_data, 2);  /* Number  4 LED */
+			m_lamps[19] = BIT(m_leds_mux_data, 3);  /* Number 19 LED */
+			m_lamps[15] = BIT(m_leds_mux_data, 4);  /* Number 15 LED */
+			m_lamps[32] = BIT(m_leds_mux_data, 5);  /* Number 32 LED */
+			m_lamps[ 0] = BIT(m_leds_mux_data, 6);  /* Number  0 LED */
+			m_lamps[26] = BIT(m_leds_mux_data, 7);  /* Number 26 LED */
 			break;
 		}
 
 		case 0x04:
 		{
-			m_lamp[ 3] = BIT(m_leds_mux_data, 0);  /* Number  3 LED */
-			m_lamp[35] = BIT(m_leds_mux_data, 1);  /* Number 35 LED */
-			m_lamp[12] = BIT(m_leds_mux_data, 2);  /* Number 12 LED */
-			m_lamp[28] = BIT(m_leds_mux_data, 3);  /* Number 28 LED */
-			m_lamp[ 7] = BIT(m_leds_mux_data, 4);  /* Number  7 LED */
-			m_lamp[29] = BIT(m_leds_mux_data, 5);  /* Number 29 LED */
-			m_lamp[18] = BIT(m_leds_mux_data, 6);  /* Number 18 LED */
+			m_lamps[ 3] = BIT(m_leds_mux_data, 0);  /* Number  3 LED */
+			m_lamps[35] = BIT(m_leds_mux_data, 1);  /* Number 35 LED */
+			m_lamps[12] = BIT(m_leds_mux_data, 2);  /* Number 12 LED */
+			m_lamps[28] = BIT(m_leds_mux_data, 3);  /* Number 28 LED */
+			m_lamps[ 7] = BIT(m_leds_mux_data, 4);  /* Number  7 LED */
+			m_lamps[29] = BIT(m_leds_mux_data, 5);  /* Number 29 LED */
+			m_lamps[18] = BIT(m_leds_mux_data, 6);  /* Number 18 LED */
 			break;
 		}
 
 		case 0x08:
 		{
-			m_lamp[22] = BIT(m_leds_mux_data, 0);  /* Number 22 LED */
-			m_lamp[ 9] = BIT(m_leds_mux_data, 1);  /* Number  9 LED */
-			m_lamp[31] = BIT(m_leds_mux_data, 2);  /* Number 31 LED */
-			m_lamp[14] = BIT(m_leds_mux_data, 3);  /* Number 14 LED */
-			m_lamp[20] = BIT(m_leds_mux_data, 4);  /* Number 20 LED */
-			m_lamp[ 1] = BIT(m_leds_mux_data, 5);  /* Number  1 LED */
-			m_lamp[33] = BIT(m_leds_mux_data, 6);  /* Number 33 LED */
+			m_lamps[22] = BIT(m_leds_mux_data, 0);  /* Number 22 LED */
+			m_lamps[ 9] = BIT(m_leds_mux_data, 1);  /* Number  9 LED */
+			m_lamps[31] = BIT(m_leds_mux_data, 2);  /* Number 31 LED */
+			m_lamps[14] = BIT(m_leds_mux_data, 3);  /* Number 14 LED */
+			m_lamps[20] = BIT(m_leds_mux_data, 4);  /* Number 20 LED */
+			m_lamps[ 1] = BIT(m_leds_mux_data, 5);  /* Number  1 LED */
+			m_lamps[33] = BIT(m_leds_mux_data, 6);  /* Number 33 LED */
 			break;
 		}
 
 		case 0x10:
 		{
-			m_lamp[16] = BIT(m_leds_mux_data, 0);  /* Number 16 LED */
-			m_lamp[24] = BIT(m_leds_mux_data, 1);  /* Number 24 LED */
-			m_lamp[ 5] = BIT(m_leds_mux_data, 2);  /* Number  5 LED */
-			m_lamp[10] = BIT(m_leds_mux_data, 3);  /* Number 10 LED */
-			m_lamp[23] = BIT(m_leds_mux_data, 4);  /* Number 23 LED */
-			m_lamp[ 8] = BIT(m_leds_mux_data, 5);  /* Number  8 LED */
-			m_lamp[30] = BIT(m_leds_mux_data, 6);  /* Number 30 LED */
+			m_lamps[16] = BIT(m_leds_mux_data, 0);  /* Number 16 LED */
+			m_lamps[24] = BIT(m_leds_mux_data, 1);  /* Number 24 LED */
+			m_lamps[ 5] = BIT(m_leds_mux_data, 2);  /* Number  5 LED */
+			m_lamps[10] = BIT(m_leds_mux_data, 3);  /* Number 10 LED */
+			m_lamps[23] = BIT(m_leds_mux_data, 4);  /* Number 23 LED */
+			m_lamps[ 8] = BIT(m_leds_mux_data, 5);  /* Number  8 LED */
+			m_lamps[30] = BIT(m_leds_mux_data, 6);  /* Number 30 LED */
 			break;
 		}
 
@@ -506,7 +506,7 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 		{
 			for ( i = 0; i < 37; i++ )
 			{
-				m_lamp[i] = 1;    /* All LEDs ON */
+				m_lamps[i] = 1;    /* All LEDs ON */
 			}
 		}
 	}
@@ -537,12 +537,12 @@ void kas89_state::kas89_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x40, 0x43).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
-	map(0x80, 0x80).w(this, FUNC(kas89_state::mux_w));
-	map(0x81, 0x81).r(this, FUNC(kas89_state::mux_r));
-	map(0x82, 0x82).w(this, FUNC(kas89_state::control_w));    /* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
-	map(0x83, 0x83).w(this, FUNC(kas89_state::led_mux_data_w));
-	map(0x84, 0x84).w(this, FUNC(kas89_state::led_mux_select_w));
-	map(0x85, 0x85).w(this, FUNC(kas89_state::sound_comm_w));
+	map(0x80, 0x80).w(FUNC(kas89_state::mux_w));
+	map(0x81, 0x81).r(FUNC(kas89_state::mux_r));
+	map(0x82, 0x82).w(FUNC(kas89_state::control_w));    /* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
+	map(0x83, 0x83).w(FUNC(kas89_state::led_mux_data_w));
+	map(0x84, 0x84).w(FUNC(kas89_state::led_mux_select_w));
+	map(0x85, 0x85).w(FUNC(kas89_state::sound_comm_w));
 }
 
 /*
@@ -592,7 +592,7 @@ void kas89_state::audio_map(address_map &map)
 void kas89_state::audio_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(kas89_state::int_ack_w));    // comm out (1st Z80). seems to write here the value previously read through soundlatch (port 0x02).
+	map(0x00, 0x00).w(FUNC(kas89_state::int_ack_w));    // comm out (1st Z80). seems to write here the value previously read through soundlatch (port 0x02).
 	map(0x02, 0x02).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x04, 0x04).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x04, 0x05).w("aysnd", FUNC(ay8910_device::data_address_w));

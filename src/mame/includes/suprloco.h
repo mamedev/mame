@@ -2,6 +2,7 @@
 // copyright-holders:Zsolt Vasvari
 
 #include "machine/i8255.h"
+#include "emupal.h"
 
 class suprloco_state : public driver_device
 {

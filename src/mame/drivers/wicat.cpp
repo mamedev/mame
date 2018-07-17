@@ -26,11 +26,13 @@ Wicat - various systems.
 #include "machine/6522via.h"
 #include "machine/am9517a.h"
 #include "machine/im6402.h"
+#include "machine/input_merger.h"
 #include "machine/mc2661.h"
 #include "machine/mm58274c.h"
 #include "machine/wd_fdc.h"
 #include "machine/x2212.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "wicat.lh"
@@ -44,22 +46,24 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rtc(*this, "rtc"),
 		m_via(*this, "via"),
-		m_uart0(*this,"uart0"),
-		m_uart1(*this,"uart1"),
-		m_uart2(*this,"uart2"),
-		m_uart3(*this,"uart3"),
-		m_uart4(*this,"uart4"),
-		m_uart5(*this,"uart5"),
-		m_uart6(*this,"uart6"),
-		m_videocpu(*this,"videocpu"),
-		m_videoctrl(*this,"video"),
-		m_videodma(*this,"videodma"),
-		m_videouart0(*this,"videouart0"),
-		m_videouart1(*this,"videouart1"),
-		m_videouart(*this,"videouart"),
-		m_videosram(*this,"vsram"),
+		m_uart0(*this, "uart0"),
+		m_uart1(*this, "uart1"),
+		m_uart2(*this, "uart2"),
+		m_uart3(*this, "uart3"),
+		m_uart4(*this, "uart4"),
+		m_uart5(*this, "uart5"),
+		m_uart6(*this, "uart6"),
+		m_videocpu(*this, "videocpu"),
+		m_videoctrl(*this, "videoctrl"),
+		m_videoirq(*this, "videoirq"),
+		m_crtc(*this, "video"),
+		m_videodma(*this, "videodma"),
+		m_videouart0(*this, "videouart0"),
+		m_videouart1(*this, "videouart1"),
+		m_videouart(*this, "videouart"),
+		m_videosram(*this, "vsram"),
 		m_palette(*this, "palette"),
-		m_chargen(*this,"g2char"),
+		m_chargen(*this, "g2char"),
 		m_fdc(*this,"fdc")
 	{
 	}
@@ -88,19 +92,16 @@ public:
 	DECLARE_WRITE8_MEMBER(video_timer_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(video_ctrl_r);
-	DECLARE_WRITE8_MEMBER(video_ctrl_w);
 	DECLARE_READ8_MEMBER(video_status_r);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
-	DECLARE_WRITE_LINE_MEMBER(dma_nmi_cb);
-	DECLARE_WRITE_LINE_MEMBER(crtc_cb);
+	DECLARE_WRITE_LINE_MEMBER(crtc_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(crtc_irq_clear_w);
 	DECLARE_READ8_MEMBER(hdc_r);
 	DECLARE_WRITE8_MEMBER(hdc_w);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_READ16_MEMBER(via_r);
 	DECLARE_WRITE16_MEMBER(via_w);
-	DECLARE_WRITE_LINE_MEMBER(kb_data_ready);
 	I8275_DRAW_CHARACTER_MEMBER(wicat_display_pixels);
 
 	required_shared_ptr<uint8_t> m_vram;
@@ -115,7 +116,9 @@ public:
 	required_device<mc2661_device> m_uart5;
 	required_device<mc2661_device> m_uart6;
 	required_device<cpu_device> m_videocpu;
-	required_device<i8275_device> m_videoctrl;
+	required_device<ls259_device> m_videoctrl;
+	required_device<input_merger_device> m_videoirq;
+	required_device<i8275_device> m_crtc;
 	required_device<am9517a_device> m_videodma;
 	required_device<mc2661_device> m_videouart0;
 	required_device<mc2661_device> m_videouart1;
@@ -143,19 +146,14 @@ private:
 	void poll_kb();
 	void send_key(uint8_t val);
 
-	emu_timer* m_video_timer;
 	emu_timer* m_kb_timer;
 	emu_timer* m_kb_serial_timer;
-	static const device_timer_id VIDEO_TIMER = 0;
 	static const device_timer_id KB_TIMER = 1;
 	static const device_timer_id KB_SERIAL_TIMER = 2;
 
 	uint8_t m_portA;
 	uint8_t m_portB;
-	bool m_video_timer_irq;
-	bool m_video_kb_irq;
-	uint8_t m_nmi_enable;
-	uint8_t m_crtc_irq;
+	bool m_crtc_irq;
 	uint16_t m_kb_data;
 	uint8_t m_kb_bit;
 	uint32_t m_kb_keys[8];
@@ -169,9 +167,9 @@ void wicat_state::wicat_mem(address_map &map)
 	map(0x000000, 0x001fff).rom().region("c2", 0x0000);
 	map(0x020000, 0x1fffff).ram();
 	map(0x200000, 0x2fffff).ram();
-	map(0x300000, 0xdfffff).rw(this, FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0x300000, 0xdfffff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
 	map(0xeff800, 0xeffbff).ram();  // memory mapping SRAM, used during boot sequence for storing various data (TODO)
-	map(0xeffc00, 0xeffc01).rw(this, FUNC(wicat_state::memmap_r), FUNC(wicat_state::memmap_w));
+	map(0xeffc00, 0xeffc01).rw(FUNC(wicat_state::memmap_r), FUNC(wicat_state::memmap_w));
 	map(0xf00000, 0xf00007).rw(m_uart0, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);  // UARTs
 	map(0xf00008, 0xf0000f).rw(m_uart1, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
 	map(0xf00010, 0xf00017).rw(m_uart2, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
@@ -179,12 +177,12 @@ void wicat_state::wicat_mem(address_map &map)
 	map(0xf00020, 0xf00027).rw(m_uart4, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
 	map(0xf00028, 0xf0002f).rw(m_uart5, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
 	map(0xf00030, 0xf00037).rw(m_uart6, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00040, 0xf0005f).rw(this, FUNC(wicat_state::via_r), FUNC(wicat_state::via_w));
+	map(0xf00040, 0xf0005f).rw(FUNC(wicat_state::via_r), FUNC(wicat_state::via_w));
 	map(0xf00060, 0xf0007f).rw(m_rtc, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0xff00);
 	map(0xf000d0, 0xf000d0).w("ledlatch", FUNC(ls259_device::write_nibble_d3));
-	map(0xf00180, 0xf0018f).rw(this, FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
-	map(0xf00190, 0xf0019f).rw(this, FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
-	map(0xf00f00, 0xf00fff).rw(this, FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0xf00180, 0xf0018f).rw(FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
+	map(0xf00190, 0xf0019f).rw(FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
+	map(0xf00f00, 0xf00fff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
 }
 
 void wicat_state::wicat_video_mem(address_map &map)
@@ -196,16 +194,16 @@ void wicat_state::wicat_video_mem(address_map &map)
 void wicat_state::wicat_video_io(address_map &map)
 {
 	// these are largely wild guesses...
-	map(0x0000, 0x0003).rw(this, FUNC(wicat_state::video_timer_r), FUNC(wicat_state::video_timer_w));  // some sort of timer?
-	map(0x0100, 0x0107).rw(this, FUNC(wicat_state::video_uart0_r), FUNC(wicat_state::video_uart0_w));  // INS2651 UART #1
-	map(0x0200, 0x0207).rw(this, FUNC(wicat_state::video_uart1_r), FUNC(wicat_state::video_uart1_w));  // INS2651 UART #2
-	map(0x0304, 0x0304).r(this, FUNC(wicat_state::video_status_r));
-	map(0x0400, 0x047f).rw(this, FUNC(wicat_state::videosram_r), FUNC(wicat_state::videosram_w));  // XD2210  4-bit NOVRAM
-	map(0x0500, 0x0500).w(this, FUNC(wicat_state::videosram_recall_w));
-	map(0x0600, 0x0600).w(this, FUNC(wicat_state::videosram_store_w));
-	map(0x0800, 0x080f).rw(this, FUNC(wicat_state::video_ctrl_r), FUNC(wicat_state::video_ctrl_w));
-	map(0x0a00, 0x0a1f).rw(this, FUNC(wicat_state::video_dma_r), FUNC(wicat_state::video_dma_w)); // AM9517A DMA
-	map(0x0b00, 0x0b03).rw(this, FUNC(wicat_state::video_r), FUNC(wicat_state::video_w));  // i8275 CRTC
+	map(0x0000, 0x0003).rw(FUNC(wicat_state::video_timer_r), FUNC(wicat_state::video_timer_w));  // some sort of timer?
+	map(0x0100, 0x0107).rw(FUNC(wicat_state::video_uart0_r), FUNC(wicat_state::video_uart0_w));  // INS2651 UART #1
+	map(0x0200, 0x0207).rw(FUNC(wicat_state::video_uart1_r), FUNC(wicat_state::video_uart1_w));  // INS2651 UART #2
+	map(0x0304, 0x0304).r(FUNC(wicat_state::video_status_r));
+	map(0x0400, 0x047f).rw(FUNC(wicat_state::videosram_r), FUNC(wicat_state::videosram_w));  // XD2210  4-bit NOVRAM
+	map(0x0500, 0x0500).w(FUNC(wicat_state::videosram_recall_w));
+	map(0x0600, 0x0600).w(FUNC(wicat_state::videosram_store_w));
+	map(0x0800, 0x0807).w("videoctrl", FUNC(ls259_device::write_d0)).umask16(0xffff);
+	map(0x0a00, 0x0a1f).rw(FUNC(wicat_state::video_dma_r), FUNC(wicat_state::video_dma_w)); // AM9517A DMA
+	map(0x0b00, 0x0b03).rw(FUNC(wicat_state::video_r), FUNC(wicat_state::video_w));  // i8275 CRTC
 	map(0x0e00, 0x0eff).ram();
 	map(0x4000, 0x5fff).ram().share("vram"); // video RAM?
 	map(0x8000, 0x8fff).rom().region("g2char", 0x0000);
@@ -297,7 +295,6 @@ static void wicat_floppies(device_slot_interface &device)
 
 void wicat_state::driver_start()
 {
-	m_video_timer = timer_alloc(VIDEO_TIMER);
 	m_kb_timer = timer_alloc(KB_TIMER);
 	m_kb_serial_timer = timer_alloc(KB_SERIAL_TIMER);
 }
@@ -325,12 +322,8 @@ void wicat_state::machine_reset()
 	m_videouart->sbs_w(0);
 	m_videouart->crl_w(1);
 
-	m_video_timer_irq = false;
-	m_video_kb_irq = false;
-	m_video_timer->adjust(attotime::zero,0,attotime::from_hz(60));
 	m_kb_timer->adjust(attotime::zero,0,attotime::from_msec(50));
-	m_nmi_enable = 0;
-	m_crtc_irq = CLEAR_LINE;
+	m_crtc_irq = false;
 	for(auto & elem : m_kb_keys)
 		elem = 0;
 }
@@ -339,10 +332,6 @@ void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 {
 	switch (id)
 	{
-	case VIDEO_TIMER:
-		m_video_timer_irq = true;
-		m_videocpu->set_input_line(INPUT_LINE_IRQ0,ASSERT_LINE);
-		break;
 	case KB_TIMER:
 		poll_kb();
 		break;
@@ -576,9 +565,9 @@ READ8_MEMBER(wicat_state::video_r)
 	switch(offset)
 	{
 	case 0x00:
-		return m_videoctrl->read(space,0);
+		return m_crtc->read(space,0);
 	case 0x02:
-		return m_videoctrl->read(space,1);
+		return m_crtc->read(space,1);
 	default:
 		return 0xff;
 	}
@@ -589,10 +578,10 @@ WRITE8_MEMBER(wicat_state::video_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_videoctrl->write(space,0,data);
+		m_crtc->write(space,0,data);
 		break;
 	case 0x02:
-		m_videoctrl->write(space,1,data);
+		m_crtc->write(space,1,data);
 		break;
 	}
 }
@@ -682,22 +671,16 @@ READ8_MEMBER(wicat_state::video_timer_r)
 	uint8_t ret = 0x00;
 
 	if(offset == 0x00)
-	{
-		if(m_video_timer_irq)
-		{
-			ret |= 0x08;
-			m_video_timer_irq = false;
-			m_videocpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
-		}
-		if(m_video_kb_irq)
-		{
-			ret |= 0x10;
-			m_video_kb_irq = false;
-			m_videocpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
-		}
-	}
+		return (m_videouart->dr_r() << 4) | (m_videouart->tbre_r() && m_videoctrl->q6_r() ? 0x08 : 0x00);
 	if(offset == 0x02)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			m_videouart->drr_w(1);
+			m_videouart->drr_w(0);
+		}
 		return m_videouart->read(space,0);
+	}
 	return ret;
 }
 
@@ -708,28 +691,10 @@ WRITE8_MEMBER(wicat_state::video_timer_w)
 		m_videouart->write(space,0,data);
 }
 
-READ8_MEMBER(wicat_state::video_ctrl_r)
-{
-	return 0x00;  // TODO
-}
-
-WRITE8_MEMBER(wicat_state::video_ctrl_w)
-{
-	if(offset == 0x07)
-		m_nmi_enable = data;
-}
-
 READ8_MEMBER(wicat_state::video_status_r)
 {
 	// this port is read in the NVI IRQ routine, which if bit 2 is set, will unmask DMA channel 0.  But no idea what triggers it...
-	if(m_crtc_irq == ASSERT_LINE)
-	{
-		m_crtc_irq = CLEAR_LINE;
-		m_videocpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
-		return 0x04;
-	}
-	else
-		return 0x00;
+	return m_crtc_irq ? 0x04 : 0x00;
 }
 
 WRITE_LINE_MEMBER(wicat_state::dma_hrq_w)
@@ -738,25 +703,22 @@ WRITE_LINE_MEMBER(wicat_state::dma_hrq_w)
 	m_videodma->hack_w(state);
 }
 
-WRITE_LINE_MEMBER(wicat_state::dma_nmi_cb)
+WRITE_LINE_MEMBER(wicat_state::crtc_irq_w)
 {
-	if(state)
+	if (state && m_videoctrl->q0_r())
 	{
-		if(m_nmi_enable != 0)
-			m_videocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_crtc_irq = true;
+		m_videoirq->in_w<1>(1);
 	}
 }
 
-WRITE_LINE_MEMBER(wicat_state::kb_data_ready)
+WRITE_LINE_MEMBER(wicat_state::crtc_irq_clear_w)
 {
-	m_video_kb_irq = state ? ASSERT_LINE : CLEAR_LINE;
-	m_videocpu->set_input_line(INPUT_LINE_IRQ0,m_video_kb_irq);
-}
-
-WRITE_LINE_MEMBER(wicat_state::crtc_cb)
-{
-	m_crtc_irq = state ? ASSERT_LINE : CLEAR_LINE;
-	m_videocpu->set_input_line(INPUT_LINE_IRQ0,m_crtc_irq);
+	if (!state)
+	{
+		m_crtc_irq = false;
+		m_videoirq->in_w<1>(0);
+	}
 }
 
 I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
@@ -879,26 +841,43 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_DEVICE_PROGRAM_MAP(wicat_video_mem)
 	MCFG_DEVICE_IO_MAP(wicat_video_io)
 
+	MCFG_INPUT_MERGER_ANY_HIGH("videoirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("videocpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("videoctrl", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wicat_state, crtc_irq_clear_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("tbreirq", input_merger_device, in_w<1>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("dmairq", input_merger_device, in_w<1>))
+	// Q1-Q5 are all used but unknown
+
 	MCFG_DEVICE_ADD("videodma", AM9517A, 8_MHz_XTAL)  // clock is a bit of guess
 	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, wicat_state, dma_hrq_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(*this, wicat_state, dma_nmi_cb))
+	MCFG_AM9517A_OUT_EOP_CB(WRITELINE("dmairq", input_merger_device, in_w<0>))
 	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, wicat_state, vram_r))
 	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, wicat_state, vram_w))
 	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8("video", i8275_device, dack_w))
-	MCFG_IM6402_ADD("videouart", 0, 0)
-	MCFG_IM6402_DR_CALLBACK(WRITELINE(*this, wicat_state, kb_data_ready))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("dmairq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("videocpu", INPUT_LINE_NMI))
+
+	MCFG_IM6402_ADD("videouart", 0, 1200)
+	MCFG_IM6402_DR_CALLBACK(WRITELINE("videoirq", input_merger_device, in_w<2>))
+	MCFG_IM6402_TBRE_CALLBACK(WRITELINE("tbreirq", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("tbreirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("videoirq", input_merger_device, in_w<3>))
 
 	// terminal (2x INS2651, 1x IM6042 - one of these is for the keyboard, another communicates with the main board, the third is unknown)
 	MCFG_DEVICE_ADD("videouart0", MC2661, 5.0688_MHz_XTAL)  // the INS2651 looks similar enough to the MC2661...
 	MCFG_MC2661_TXD_HANDLER(WRITELINE("uart0", mc2661_device, rx_w))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("videocpu", INPUT_LINE_IRQ0))
+	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("videoirq", input_merger_device, in_w<0>))
 	MCFG_MC2661_RTS_HANDLER(WRITELINE("uart0", mc2661_device, cts_w))
 	MCFG_MC2661_DTR_HANDLER(WRITELINE("uart0", mc2661_device, dsr_w))
 
 	MCFG_DEVICE_ADD("videouart1", MC2661, 5.0688_MHz_XTAL)
 	MCFG_MC2661_RXC(19200)
 	MCFG_MC2661_TXC(19200)
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("videocpu", INPUT_LINE_IRQ0))
+	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("videoirq", input_merger_device, in_w<4>))
 
 	MCFG_X2210_ADD("vsram")  // XD2210
 
@@ -911,8 +890,8 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_DEVICE_ADD("video", I8275, 19.6608_MHz_XTAL/10)
 	MCFG_I8275_CHARACTER_WIDTH(10)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(wicat_state, wicat_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE("videodma",am9517a_device, dreq0_w))
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE(*this, wicat_state,crtc_cb))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE("videodma", am9517a_device, dreq0_w))
+	MCFG_I8275_VRTC_CALLBACK(WRITELINE(*this, wicat_state, crtc_irq_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEFAULT_LAYOUT(layout_wicat)
@@ -921,7 +900,8 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_DEVICE_ADD("wd1kcpu", N8X300, 8_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(wicat_wd1000_mem)
 	MCFG_DEVICE_IO_MAP(wicat_wd1000_io)
-	MCFG_FD1795_ADD("fdc", 8_MHz_XTAL)
+
+	MCFG_DEVICE_ADD("fdc", FD1795, 8_MHz_XTAL)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", wicat_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
@@ -951,15 +931,15 @@ ROM_START( wicat )
 	// System 150 CPU/MU board
 	ROM_REGION16_BE(0x2000, "c2", 0)
 	ROM_SYSTEM_BIOS( 0, "cms", "CMS HD / Floppy Boot / Boot v1.56" )
-	ROMX_LOAD("s156.a5", 0x00000, 0x0800, CRC(2c1e9542) SHA1(50184e04f0c881818e96e2162111d16304e8762f), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD("s156.a7", 0x00001, 0x0800, CRC(5a0cb30d) SHA1(aa106ad5a8b9e89613f7ea026d62832cfdb19fd0), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD("37m.b5",  0x01000, 0x0800, CRC(831571fb) SHA1(fcc647b3ef9f0cca3e8212f850f96676d24cf318), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD("37m.b7",  0x01001, 0x0800, CRC(3c346e8e) SHA1(d8ff8297d265b25655c854ed8515fa9e16c63f39), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD("s156.a5", 0x00000, 0x0800, CRC(2c1e9542) SHA1(50184e04f0c881818e96e2162111d16304e8762f), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD("s156.a7", 0x00001, 0x0800, CRC(5a0cb30d) SHA1(aa106ad5a8b9e89613f7ea026d62832cfdb19fd0), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD("37m.b5",  0x01000, 0x0800, CRC(831571fb) SHA1(fcc647b3ef9f0cca3e8212f850f96676d24cf318), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD("37m.b7",  0x01001, 0x0800, CRC(3c346e8e) SHA1(d8ff8297d265b25655c854ed8515fa9e16c63f39), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "wd3", "WD3 HD Boot / Boot v1.56" )
-	ROMX_LOAD("boot156.a5", 0x00000, 0x0800, CRC(58510a52) SHA1(d2135b056a04ba830b0ae1cef539e4a9a1b58f82), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD("boot156.a7", 0x00001, 0x0800, CRC(e53999f1) SHA1(9c6c6a3a56b5c16a35e1fe824f37c8ae739ebcb9), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD("wd3_15.b5",  0x01000, 0x0800, CRC(a765899b) SHA1(8427c564029914b7dbc29768ce451604180e390f), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD("wd3_15.b7",  0x01001, 0x0800, CRC(9d986585) SHA1(1ac7579c692f827b121c56dac0a77b15400caba1), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD("boot156.a5", 0x00000, 0x0800, CRC(58510a52) SHA1(d2135b056a04ba830b0ae1cef539e4a9a1b58f82), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD("boot156.a7", 0x00001, 0x0800, CRC(e53999f1) SHA1(9c6c6a3a56b5c16a35e1fe824f37c8ae739ebcb9), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD("wd3_15.b5",  0x01000, 0x0800, CRC(a765899b) SHA1(8427c564029914b7dbc29768ce451604180e390f), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD("wd3_15.b7",  0x01001, 0x0800, CRC(9d986585) SHA1(1ac7579c692f827b121c56dac0a77b15400caba1), ROM_SKIP(1) | ROM_BIOS(1) )
 
 	// Terminal CPU board (Graphical)
 	// "MG8000 VERSION 3.0"

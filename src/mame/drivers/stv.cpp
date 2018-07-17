@@ -976,22 +976,22 @@ void stv_state::stv_mem(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().mirror(0x20000000).region("bios", 0); // bios
 	map(0x00100000, 0x0010007f).rw(m_smpc_hle, FUNC(smpc_hle_device::read), FUNC(smpc_hle_device::write));
-	map(0x00180000, 0x0018ffff).rw(this, FUNC(stv_state::saturn_backupram_r), FUNC(stv_state::saturn_backupram_w)).share("share1");
+	map(0x00180000, 0x0018ffff).rw(FUNC(stv_state::saturn_backupram_r), FUNC(stv_state::saturn_backupram_w)).share("share1");
 	map(0x00200000, 0x002fffff).ram().mirror(0x20100000).share("workram_l");
 //  AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_ioga_r32, stv_io_w32) AM_SHARE("ioga") AM_MIRROR(0x20) /* installed with per-game specific */
-	map(0x01000000, 0x017fffff).w(this, FUNC(stv_state::minit_w));
-	map(0x01800000, 0x01ffffff).w(this, FUNC(stv_state::sinit_w));
+	map(0x01000000, 0x017fffff).w(FUNC(stv_state::minit_w));
+	map(0x01800000, 0x01ffffff).w(FUNC(stv_state::sinit_w));
 	map(0x02000000, 0x04ffffff).rom().mirror(0x20000000).region("abus", 0); // cartridge
 	/* Sound */
-	map(0x05a00000, 0x05afffff).rw(this, FUNC(stv_state::saturn_soundram_r), FUNC(stv_state::saturn_soundram_w));
+	map(0x05a00000, 0x05afffff).rw(FUNC(stv_state::saturn_soundram_r), FUNC(stv_state::saturn_soundram_w));
 	map(0x05b00000, 0x05b00fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
 	/* VDP1 */
-	map(0x05c00000, 0x05c7ffff).rw(this, FUNC(stv_state::saturn_vdp1_vram_r), FUNC(stv_state::saturn_vdp1_vram_w));
-	map(0x05c80000, 0x05cbffff).rw(this, FUNC(stv_state::saturn_vdp1_framebuffer0_r), FUNC(stv_state::saturn_vdp1_framebuffer0_w));
-	map(0x05d00000, 0x05d0001f).rw(this, FUNC(stv_state::saturn_vdp1_regs_r), FUNC(stv_state::saturn_vdp1_regs_w));
-	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(this, FUNC(stv_state::saturn_vdp2_vram_r), FUNC(stv_state::saturn_vdp2_vram_w));
-	map(0x05f00000, 0x05f7ffff).rw(this, FUNC(stv_state::saturn_vdp2_cram_r), FUNC(stv_state::saturn_vdp2_cram_w));
-	map(0x05f80000, 0x05fbffff).rw(this, FUNC(stv_state::saturn_vdp2_regs_r), FUNC(stv_state::saturn_vdp2_regs_w));
+	map(0x05c00000, 0x05c7ffff).rw(FUNC(stv_state::saturn_vdp1_vram_r), FUNC(stv_state::saturn_vdp1_vram_w));
+	map(0x05c80000, 0x05cbffff).rw(FUNC(stv_state::saturn_vdp1_framebuffer0_r), FUNC(stv_state::saturn_vdp1_framebuffer0_w));
+	map(0x05d00000, 0x05d0001f).rw(FUNC(stv_state::saturn_vdp1_regs_r), FUNC(stv_state::saturn_vdp1_regs_w));
+	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(stv_state::saturn_vdp2_vram_r), FUNC(stv_state::saturn_vdp2_vram_w));
+	map(0x05f00000, 0x05f7ffff).rw(FUNC(stv_state::saturn_vdp2_cram_r), FUNC(stv_state::saturn_vdp2_cram_w));
+	map(0x05f80000, 0x05fbffff).rw(FUNC(stv_state::saturn_vdp2_regs_r), FUNC(stv_state::saturn_vdp2_regs_w));
 	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //AM_READWRITE(saturn_scu_r, saturn_scu_w)
 	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
 	map(0x60000000, 0x600003ff).nopw();
@@ -1100,7 +1100,7 @@ MACHINE_CONFIG_START(stv_state::stv)
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually AK93C45F */
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT) /* Actually AK93C45F */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1282,9 +1282,9 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 }
 
 
-MACHINE_START_MEMBER(stv_state,stv)
+MACHINE_START_MEMBER(stv_state, stv)
 {
-	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
+	m_scsp->set_ram_base(m_sound_ram);
 
 	// save states
 //  save_pointer(NAME(m_scu_regs.get()), 0x100/4);
@@ -1787,7 +1787,7 @@ static INPUT_PORTS_START( micrombc )
 INPUT_PORTS_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 /* BIOS rev info found at 0x800 (byte swapped):
 

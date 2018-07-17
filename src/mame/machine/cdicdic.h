@@ -34,16 +34,6 @@ TODO:
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CDICDIC_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MACHINE_CDICDIC, 0)
-#define MCFG_CDICDIC_REPLACE(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, MACHINE_CDICDIC, 0)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -124,6 +114,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(MACHINE_CDICDIC, cdicdic_device)
+DECLARE_DEVICE_TYPE(CDI_CDIC, cdicdic_device)
 
 #endif // MAME_MACHINE_CDICDIC_H

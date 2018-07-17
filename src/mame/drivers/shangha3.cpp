@@ -70,43 +70,34 @@ WRITE16_MEMBER(shangha3_state::shangha3_prot_w)
 	logerror("PC %04x: write %02x to 20004e\n",m_maincpu->pc(),data);
 }
 
-WRITE16_MEMBER(shangha3_state::shangha3_coinctrl_w)
+WRITE8_MEMBER(shangha3_state::shangha3_coinctrl_w)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		machine().bookkeeping().coin_lockout_w(0,~data & 0x0400);
-		machine().bookkeeping().coin_lockout_w(1,~data & 0x0400);
-		machine().bookkeeping().coin_counter_w(0,data & 0x0100);
-		machine().bookkeeping().coin_counter_w(1,data & 0x0200);
-	}
+	machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
+	machine().bookkeeping().coin_lockout_w(1,~data & 0x04);
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 }
 
-WRITE16_MEMBER(shangha3_state::heberpop_coinctrl_w)
+WRITE8_MEMBER(shangha3_state::heberpop_coinctrl_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		/* the sound ROM bank is selected by the main CPU! */
-		m_oki->set_rom_bank((data >> 3) & 1);
+	/* the sound ROM bank is selected by the main CPU! */
+	m_oki->set_rom_bank((data >> 3) & 1);
 
-		machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
-		machine().bookkeeping().coin_lockout_w(1,~data & 0x04);
-		machine().bookkeeping().coin_counter_w(0,data & 0x01);
-		machine().bookkeeping().coin_counter_w(1,data & 0x02);
-	}
+	machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
+	machine().bookkeeping().coin_lockout_w(1,~data & 0x04);
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 }
 
-WRITE16_MEMBER(shangha3_state::blocken_coinctrl_w)
+WRITE8_MEMBER(shangha3_state::blocken_coinctrl_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		/* the sound ROM bank is selected by the main CPU! */
-		m_oki->set_rom_bank((data >> 4) & 3);
+	/* the sound ROM bank is selected by the main CPU! */
+	m_okibank->set_entry((data >> 4) & 3);
 
-		machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
-		machine().bookkeeping().coin_lockout_w(1,~data & 0x04);
-		machine().bookkeeping().coin_counter_w(0,data & 0x01);
-		machine().bookkeeping().coin_counter_w(1,data & 0x02);
-	}
+	machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
+	machine().bookkeeping().coin_lockout_w(1,~data & 0x04);
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 }
 
 
@@ -121,17 +112,17 @@ void shangha3_state::shangha3_map(address_map &map)
 	map(0x100000, 0x100fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x200000, 0x200001).portr("INPUTS");
 	map(0x200002, 0x200003).portr("SYSTEM");
-	map(0x200008, 0x200009).w(this, FUNC(shangha3_state::blitter_go_w));
-	map(0x20000a, 0x20000b).w(this, FUNC(shangha3_state::irq_ack_w));
-	map(0x20000c, 0x20000d).w(this, FUNC(shangha3_state::shangha3_coinctrl_w));
+	map(0x200008, 0x200009).w(FUNC(shangha3_state::blitter_go_w));
+	map(0x20000a, 0x20000b).w(FUNC(shangha3_state::irq_ack_w));
+	map(0x20000c, 0x20000c).w(FUNC(shangha3_state::shangha3_coinctrl_w));
 	map(0x20001f, 0x20001f).r("aysnd", FUNC(ym2149_device::data_r));
 	map(0x20002f, 0x20002f).w("aysnd", FUNC(ym2149_device::data_w));
 	map(0x20003f, 0x20003f).w("aysnd", FUNC(ym2149_device::address_w));
-	map(0x20004e, 0x20004f).rw(this, FUNC(shangha3_state::shangha3_prot_r), FUNC(shangha3_state::shangha3_prot_w));
+	map(0x20004e, 0x20004f).rw(FUNC(shangha3_state::shangha3_prot_r), FUNC(shangha3_state::shangha3_prot_w));
 	map(0x20006f, 0x20006f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
-	map(0x340000, 0x340001).w(this, FUNC(shangha3_state::flipscreen_w));
-	map(0x360000, 0x360001).w(this, FUNC(shangha3_state::gfxlist_addr_w));
+	map(0x340001, 0x340001).w(FUNC(shangha3_state::flipscreen_w));
+	map(0x360000, 0x360001).w(FUNC(shangha3_state::gfxlist_addr_w));
 }
 
 void shangha3_state::heberpop_map(address_map &map)
@@ -141,13 +132,13 @@ void shangha3_state::heberpop_map(address_map &map)
 	map(0x200000, 0x200001).portr("INPUTS");
 	map(0x200002, 0x200003).portr("SYSTEM");
 	map(0x200004, 0x200005).portr("DSW");
-	map(0x200008, 0x200009).w(this, FUNC(shangha3_state::blitter_go_w));
-	map(0x20000a, 0x20000b).w(this, FUNC(shangha3_state::irq_ack_w));
-	map(0x20000c, 0x20000d).w(this, FUNC(shangha3_state::heberpop_coinctrl_w));
+	map(0x200008, 0x200009).w(FUNC(shangha3_state::blitter_go_w));
+	map(0x20000a, 0x20000b).w(FUNC(shangha3_state::irq_ack_w));
+	map(0x20000d, 0x20000d).w(FUNC(shangha3_state::heberpop_coinctrl_w));
 	map(0x20000f, 0x20000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
-	map(0x340000, 0x340001).w(this, FUNC(shangha3_state::flipscreen_w));
-	map(0x360000, 0x360001).w(this, FUNC(shangha3_state::gfxlist_addr_w));
+	map(0x340001, 0x340001).w(FUNC(shangha3_state::flipscreen_w));
+	map(0x360000, 0x360001).w(FUNC(shangha3_state::gfxlist_addr_w));
 	map(0x800000, 0xb7ffff).rom().region("gfx1", 0);
 }
 
@@ -157,14 +148,14 @@ void shangha3_state::blocken_map(address_map &map)
 	map(0x100000, 0x100001).portr("INPUTS");
 	map(0x100002, 0x100003).portr("SYSTEM").nopw(); // w -> unknown purpose
 	map(0x100004, 0x100005).portr("DSW");
-	map(0x100008, 0x100009).w(this, FUNC(shangha3_state::blitter_go_w));
-	map(0x10000a, 0x10000b).nopr().w(this, FUNC(shangha3_state::irq_ack_w)); // r -> unknown purpose (value doesn't matter, left-over?)
-	map(0x10000c, 0x10000d).w(this, FUNC(shangha3_state::blocken_coinctrl_w));
+	map(0x100008, 0x100009).w(FUNC(shangha3_state::blitter_go_w));
+	map(0x10000a, 0x10000b).nopr().w(FUNC(shangha3_state::irq_ack_w)); // r -> unknown purpose (value doesn't matter, left-over?)
+	map(0x10000d, 0x10000d).w(FUNC(shangha3_state::blocken_coinctrl_w));
 	map(0x10000f, 0x10000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
-	map(0x340000, 0x340001).w(this, FUNC(shangha3_state::flipscreen_w));
-	map(0x360000, 0x360001).w(this, FUNC(shangha3_state::gfxlist_addr_w));
+	map(0x340001, 0x340001).w(FUNC(shangha3_state::flipscreen_w));
+	map(0x360000, 0x360001).w(FUNC(shangha3_state::gfxlist_addr_w));
 	map(0x800000, 0xb7ffff).rom().region("gfx1", 0);
 }
 
@@ -183,6 +174,13 @@ void shangha3_state::heberpop_sound_io_map(address_map &map)
 	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
+/* $00000-$20000 stays the same in all sound banks, */
+/* the second half of the bank is what gets switched */
+void shangha3_state::blocken_oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
 static INPUT_PORTS_START( shangha3 )
 	PORT_START("INPUTS")
@@ -438,8 +436,7 @@ static const gfx_layout charlayout =
 	{ 0, 1, 2, 3 },
 	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
 			9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	{ STEP16(0,4*16) },
 	128*8
 };
 
@@ -569,6 +566,7 @@ MACHINE_CONFIG_START(shangha3_state::blocken)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, blocken_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -714,20 +712,8 @@ ROM_START( blocken ) /* PCB labeled KID-07 */
 	ROM_LOAD( "ic100j.bin",   0x200000, 0x80000, CRC(a34786fd) SHA1(7d4879cbaa055c2ddbe6d20dd946bf0e3e069d4d) )
 	/* 280000-37ffff empty */
 
-	ROM_REGION( 0x80000, "samples", 0 ) /* samples for M6295 */
+	ROM_REGION( 0x80000, "oki", 0 ) /* samples for M6295 */
 	ROM_LOAD( "ic53.bin",     0x0000, 0x80000, CRC(86108c56) SHA1(aa405fa2eec5cc178ef6226f229a12dac09504f0) )
-
-	ROM_REGION( 0x100000, "oki", 0 )
-	/* $00000-$20000 stays the same in all sound banks, */
-	/* the second half of the bank is what gets switched */
-	ROM_COPY( "samples", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "samples", 0x000000, 0x020000, 0x020000)
-	ROM_COPY( "samples", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "samples", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "samples", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "samples", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "samples", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "samples", 0x060000, 0x0e0000, 0x020000)
 ROM_END
 
 
@@ -747,9 +733,15 @@ void shangha3_state::init_heberpop()
 	m_audiocpu->set_input_line_vector(0, 0xff);  /* RST 38h */
 }
 
-GAME( 1993, shangha3,   0,        shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shangha3u,  shangha3, shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shangha3up, shangha3, shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (US, prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shangha3j,  shangha3, shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", MACHINE_SUPPORTS_SAVE )
+void shangha3_state::init_blocken()
+{
+	init_heberpop();
+	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x20000);
+}
+
+GAME( 1993, shangha3,   0,        shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // MT #01002
+GAME( 1993, shangha3u,  shangha3, shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3up, shangha3, shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (US, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3j,  shangha3, shangha3, shangha3, shangha3_state, init_shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, heberpop,   0,        heberpop, heberpop, shangha3_state, init_heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, blocken,    0,        blocken,  blocken,  shangha3_state, init_heberpop, ROT0, "Visco / KID", "Blocken (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blocken,    0,        blocken,  blocken,  shangha3_state, init_blocken,  ROT0, "Visco / KID", "Blocken (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

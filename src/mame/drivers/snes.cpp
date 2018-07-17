@@ -1023,7 +1023,7 @@ void snes_console_state::spc_map(address_map &map)
 {
 	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
 	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
-	map(0x0100, 0xffff).rw(this, FUNC(snes_console_state::spc_ram_100_r), FUNC(snes_console_state::spc_ram_100_w));
+	map(0x0100, 0xffff).rw(FUNC(snes_console_state::spc_ram_100_r), FUNC(snes_console_state::spc_ram_100_w));
 }
 
 

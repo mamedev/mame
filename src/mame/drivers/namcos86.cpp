@@ -180,7 +180,6 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6801.h"
 #include "sound/ym2151.h"
-#include "sound/n63701x.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -284,8 +283,8 @@ WRITE8_MEMBER(namcos86_state::coin_w)
 
 WRITE8_MEMBER(namcos86_state::led_w)
 {
-	m_led[0] = BIT(data, 3);
-	m_led[1] = BIT(data, 4);
+	m_leds[0] = BIT(data, 3);
+	m_leds[1] = BIT(data, 4);
 }
 
 
@@ -304,7 +303,7 @@ WRITE8_MEMBER(namcos86_state::cus115_w)
 		case 1:
 		case 2:
 		case 3:
-			machine().device<namco_63701x_device>("namco2")->namco_63701x_w(space, (offset & 0x1e00) >> 9,data);
+			m_63701x->namco_63701x_w(space, (offset & 0x1e00) >> 9,data);
 			break;
 
 		case 4:
@@ -329,7 +328,7 @@ void namcos86_state::machine_start()
 	if (membank("bank2"))
 		membank("bank2")->configure_entries(0, 4, memregion("cpu2")->base(), 0x2000);
 
-	m_led.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_wdog));
 }
@@ -337,10 +336,10 @@ void namcos86_state::machine_start()
 
 void namcos86_state::cpu1_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().w(this, FUNC(namcos86_state::videoram1_w)).share("videoram1");
-	map(0x2000, 0x3fff).ram().w(this, FUNC(namcos86_state::videoram2_w)).share("videoram2");
+	map(0x0000, 0x1fff).ram().w(FUNC(namcos86_state::videoram1_w)).share("videoram1");
+	map(0x2000, 0x3fff).ram().w(FUNC(namcos86_state::videoram2_w)).share("videoram2");
 
-	map(0x4000, 0x5fff).ram().w(this, FUNC(namcos86_state::spriteram_w)).share("spriteram");
+	map(0x4000, 0x5fff).ram().w(FUNC(namcos86_state::spriteram_w)).share("spriteram");
 
 	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
 
@@ -348,21 +347,21 @@ void namcos86_state::cpu1_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 
 	/* ROM & Voice expansion board - only some games have it */
-	map(0x6000, 0x7fff).w(this, FUNC(namcos86_state::cus115_w)); /* ROM bank select and 63701X sample player control */
+	map(0x6000, 0x7fff).w(FUNC(namcos86_state::cus115_w)); /* ROM bank select and 63701X sample player control */
 
-	map(0x8000, 0x8000).w(this, FUNC(namcos86_state::watchdog1_w));
-	map(0x8400, 0x8400).w(this, FUNC(namcos86_state::int_ack1_w)); /* IRQ acknowledge */
-	map(0x8800, 0x8fff).w(this, FUNC(namcos86_state::tilebank_select_w));
+	map(0x8000, 0x8000).w(FUNC(namcos86_state::watchdog1_w));
+	map(0x8400, 0x8400).w(FUNC(namcos86_state::int_ack1_w)); /* IRQ acknowledge */
+	map(0x8800, 0x8fff).w(FUNC(namcos86_state::tilebank_select_w));
 
-	map(0x9000, 0x9002).w(this, FUNC(namcos86_state::scroll0_w));   /* scroll + priority */
-	map(0x9003, 0x9003).w(this, FUNC(namcos86_state::bankswitch1_w));
-	map(0x9004, 0x9006).w(this, FUNC(namcos86_state::scroll1_w));   /* scroll + priority */
+	map(0x9000, 0x9002).w(FUNC(namcos86_state::scroll0_w));   /* scroll + priority */
+	map(0x9003, 0x9003).w(FUNC(namcos86_state::bankswitch1_w));
+	map(0x9004, 0x9006).w(FUNC(namcos86_state::scroll1_w));   /* scroll + priority */
 
-	map(0x9400, 0x9402).w(this, FUNC(namcos86_state::scroll2_w));   /* scroll + priority */
+	map(0x9400, 0x9402).w(FUNC(namcos86_state::scroll2_w));   /* scroll + priority */
 //  { 0x9403, 0x9403 } sub CPU rom bank select would be here
-	map(0x9404, 0x9406).w(this, FUNC(namcos86_state::scroll3_w));   /* scroll + priority */
+	map(0x9404, 0x9406).w(FUNC(namcos86_state::scroll3_w));   /* scroll + priority */
 
-	map(0xa000, 0xa000).w(this, FUNC(namcos86_state::backcolor_w));
+	map(0xa000, 0xa000).w(FUNC(namcos86_state::backcolor_w));
 }
 
 
@@ -371,52 +370,52 @@ void namcos86_state::cpu1_map(address_map &map)
 void namcos86_state::hopmappy_cpu2_map(address_map &map)
 {
 	map(0x8000, 0xffff).rom();
-	map(0x9000, 0x9000).w(this, FUNC(namcos86_state::watchdog2_w));
-	map(0x9400, 0x9400).w(this, FUNC(namcos86_state::int_ack2_w));
+	map(0x9000, 0x9000).w(FUNC(namcos86_state::watchdog2_w));
+	map(0x9400, 0x9400).w(FUNC(namcos86_state::int_ack2_w));
 }
 
 void namcos86_state::roishtar_cpu2_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().w(this, FUNC(namcos86_state::spriteram_w)).share("spriteram");
-	map(0x4000, 0x5fff).ram().w(this, FUNC(namcos86_state::videoram2_w)).share("videoram2");
-	map(0x6000, 0x7fff).ram().w(this, FUNC(namcos86_state::videoram1_w)).share("videoram1");
+	map(0x0000, 0x1fff).ram().w(FUNC(namcos86_state::spriteram_w)).share("spriteram");
+	map(0x4000, 0x5fff).ram().w(FUNC(namcos86_state::videoram2_w)).share("videoram2");
+	map(0x6000, 0x7fff).ram().w(FUNC(namcos86_state::videoram1_w)).share("videoram1");
 	map(0x8000, 0xffff).rom();
-	map(0xa000, 0xa000).w(this, FUNC(namcos86_state::watchdog2_w));
-	map(0xb000, 0xb000).w(this, FUNC(namcos86_state::int_ack2_w));   // IRQ acknowledge
+	map(0xa000, 0xa000).w(FUNC(namcos86_state::watchdog2_w));
+	map(0xb000, 0xb000).w(FUNC(namcos86_state::int_ack2_w));   // IRQ acknowledge
 }
 
 void namcos86_state::genpeitd_cpu2_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().w(this, FUNC(namcos86_state::videoram1_w)).share("videoram1");
-	map(0x2000, 0x3fff).ram().w(this, FUNC(namcos86_state::videoram2_w)).share("videoram2");
-	map(0x4000, 0x5fff).ram().w(this, FUNC(namcos86_state::spriteram_w)).share("spriteram");
+	map(0x0000, 0x1fff).ram().w(FUNC(namcos86_state::videoram1_w)).share("videoram1");
+	map(0x2000, 0x3fff).ram().w(FUNC(namcos86_state::videoram2_w)).share("videoram2");
+	map(0x4000, 0x5fff).ram().w(FUNC(namcos86_state::spriteram_w)).share("spriteram");
 	map(0x8000, 0xffff).rom();
-	map(0xb000, 0xb000).w(this, FUNC(namcos86_state::watchdog2_w));
-	map(0x8800, 0x8800).w(this, FUNC(namcos86_state::int_ack2_w));   // IRQ acknowledge
+	map(0xb000, 0xb000).w(FUNC(namcos86_state::watchdog2_w));
+	map(0x8800, 0x8800).w(FUNC(namcos86_state::int_ack2_w));   // IRQ acknowledge
 }
 
 void namcos86_state::rthunder_cpu2_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().w(this, FUNC(namcos86_state::spriteram_w)).share("spriteram");
-	map(0x2000, 0x3fff).ram().w(this, FUNC(namcos86_state::videoram1_w)).share("videoram1");
-	map(0x4000, 0x5fff).ram().w(this, FUNC(namcos86_state::videoram2_w)).share("videoram2");
+	map(0x0000, 0x1fff).ram().w(FUNC(namcos86_state::spriteram_w)).share("spriteram");
+	map(0x2000, 0x3fff).ram().w(FUNC(namcos86_state::videoram1_w)).share("videoram1");
+	map(0x4000, 0x5fff).ram().w(FUNC(namcos86_state::videoram2_w)).share("videoram2");
 	map(0x6000, 0x7fff).bankr("bank2");
 	map(0x8000, 0xffff).rom();
-	map(0x8000, 0x8000).w(this, FUNC(namcos86_state::watchdog2_w));
-	map(0x8800, 0x8800).w(this, FUNC(namcos86_state::int_ack2_w));   // IRQ acknowledge
+	map(0x8000, 0x8000).w(FUNC(namcos86_state::watchdog2_w));
+	map(0x8800, 0x8800).w(FUNC(namcos86_state::int_ack2_w));   // IRQ acknowledge
 //  { 0xd800, 0xd802 } layer 2 scroll registers would be here
-	map(0xd803, 0xd803).w(this, FUNC(namcos86_state::bankswitch2_w));
+	map(0xd803, 0xd803).w(FUNC(namcos86_state::bankswitch2_w));
 //  { 0xd804, 0xd806 } layer 3 scroll registers would be here
 }
 
 void namcos86_state::wndrmomo_cpu2_map(address_map &map)
 {
-	map(0x2000, 0x3fff).ram().w(this, FUNC(namcos86_state::spriteram_w)).share("spriteram");
-	map(0x4000, 0x5fff).ram().w(this, FUNC(namcos86_state::videoram1_w)).share("videoram1");
-	map(0x6000, 0x7fff).ram().w(this, FUNC(namcos86_state::videoram2_w)).share("videoram2");
+	map(0x2000, 0x3fff).ram().w(FUNC(namcos86_state::spriteram_w)).share("spriteram");
+	map(0x4000, 0x5fff).ram().w(FUNC(namcos86_state::videoram1_w)).share("videoram1");
+	map(0x6000, 0x7fff).ram().w(FUNC(namcos86_state::videoram2_w)).share("videoram2");
 	map(0x8000, 0xffff).rom();
-	map(0xc000, 0xc000).w(this, FUNC(namcos86_state::watchdog2_w));
-	map(0xc800, 0xc800).w(this, FUNC(namcos86_state::int_ack2_w));   // IRQ acknowledge
+	map(0xc000, 0xc000).w(FUNC(namcos86_state::watchdog2_w));
+	map(0xc800, 0xc800).w(FUNC(namcos86_state::int_ack2_w));   // IRQ acknowledge
 }
 
 
@@ -436,8 +435,8 @@ void namcos86_state::hopmappy_mcu_map(address_map &map)
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x2020, 0x2020).portr("IN0");
 	map(0x2021, 0x2021).portr("IN1");
-	map(0x2030, 0x2030).r(this, FUNC(namcos86_state::dsw0_r));
-	map(0x2031, 0x2031).r(this, FUNC(namcos86_state::dsw1_r));
+	map(0x2030, 0x2030).r(FUNC(namcos86_state::dsw0_r));
+	map(0x2031, 0x2031).r(FUNC(namcos86_state::dsw1_r));
 	map(0x8000, 0x8000).nopw(); // ??? written (not always) at end of interrupt
 	map(0x8800, 0x8800).nopw(); // ??? written (not always) at end of interrupt
 }
@@ -449,8 +448,8 @@ void namcos86_state::roishtar_mcu_map(address_map &map)
 	map(0x6000, 0x6001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x6020, 0x6020).portr("IN0");
 	map(0x6021, 0x6021).portr("IN1");
-	map(0x6030, 0x6030).r(this, FUNC(namcos86_state::dsw0_r));
-	map(0x6031, 0x6031).r(this, FUNC(namcos86_state::dsw1_r));
+	map(0x6030, 0x6030).r(FUNC(namcos86_state::dsw0_r));
+	map(0x6031, 0x6031).r(FUNC(namcos86_state::dsw1_r));
 	map(0x8000, 0x8000).nopw(); // ??? written (not always) at end of interrupt
 	map(0x9800, 0x9800).nopw(); // ??? written (not always) at end of interrupt
 }
@@ -462,8 +461,8 @@ void namcos86_state::genpeitd_mcu_map(address_map &map)
 	map(0x2800, 0x2801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x2820, 0x2820).portr("IN0");
 	map(0x2821, 0x2821).portr("IN1");
-	map(0x2830, 0x2830).r(this, FUNC(namcos86_state::dsw0_r));
-	map(0x2831, 0x2831).r(this, FUNC(namcos86_state::dsw1_r));
+	map(0x2830, 0x2830).r(FUNC(namcos86_state::dsw0_r));
+	map(0x2831, 0x2831).r(FUNC(namcos86_state::dsw1_r));
 	map(0x4000, 0x7fff).rom();
 	map(0xa000, 0xa000).nopw(); // ??? written (not always) at end of interrupt
 	map(0xa800, 0xa800).nopw(); // ??? written (not always) at end of interrupt
@@ -475,8 +474,8 @@ void namcos86_state::rthunder_mcu_map(address_map &map)
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x2020, 0x2020).portr("IN0");
 	map(0x2021, 0x2021).portr("IN1");
-	map(0x2030, 0x2030).r(this, FUNC(namcos86_state::dsw0_r));
-	map(0x2031, 0x2031).r(this, FUNC(namcos86_state::dsw1_r));
+	map(0x2030, 0x2030).r(FUNC(namcos86_state::dsw0_r));
+	map(0x2031, 0x2031).r(FUNC(namcos86_state::dsw1_r));
 	map(0x4000, 0x7fff).rom();
 	map(0xb000, 0xb000).nopw(); // ??? written (not always) at end of interrupt
 	map(0xb800, 0xb800).nopw(); // ??? written (not always) at end of interrupt
@@ -488,8 +487,8 @@ void namcos86_state::wndrmomo_mcu_map(address_map &map)
 	map(0x3800, 0x3801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x3820, 0x3820).portr("IN0");
 	map(0x3821, 0x3821).portr("IN1");
-	map(0x3830, 0x3830).r(this, FUNC(namcos86_state::dsw0_r));
-	map(0x3831, 0x3831).r(this, FUNC(namcos86_state::dsw1_r));
+	map(0x3830, 0x3830).r(FUNC(namcos86_state::dsw0_r));
+	map(0x3831, 0x3831).r(FUNC(namcos86_state::dsw1_r));
 	map(0x4000, 0x7fff).rom();
 	map(0xc000, 0xc000).nopw(); // ??? written (not always) at end of interrupt
 	map(0xc800, 0xc800).nopw(); // ??? written (not always) at end of interrupt
@@ -504,9 +503,9 @@ READ8_MEMBER(namcos86_state::readFF)
 void namcos86_state::mcu_port_map(address_map &map)
 {
 	map(M6801_PORT1, M6801_PORT1).portr("IN2");
-	map(M6801_PORT2, M6801_PORT2).r(this, FUNC(namcos86_state::readFF));  /* leds won't work otherwise */
-	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(namcos86_state::coin_w));
-	map(M6801_PORT2, M6801_PORT2).w(this, FUNC(namcos86_state::led_w));
+	map(M6801_PORT2, M6801_PORT2).r(FUNC(namcos86_state::readFF));  /* leds won't work otherwise */
+	map(M6801_PORT1, M6801_PORT1).w(FUNC(namcos86_state::coin_w));
+	map(M6801_PORT2, M6801_PORT2).w(FUNC(namcos86_state::led_w));
 }
 
 

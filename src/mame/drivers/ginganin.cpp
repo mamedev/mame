@@ -81,11 +81,11 @@ void ginganin_state::ginganin_map(address_map &map)
 /* The ROM area: 10000-13fff is written with: 0000 0000 0000 0001, at startup only. Why? */
 	map(0x000000, 0x01ffff).rom();
 	map(0x020000, 0x023fff).ram();
-	map(0x030000, 0x0307ff).ram().w(this, FUNC(ginganin_state::ginganin_txtram16_w)).share("txtram");
+	map(0x030000, 0x0307ff).ram().w(FUNC(ginganin_state::ginganin_txtram16_w)).share("txtram");
 	map(0x040000, 0x0407ff).ram().share("spriteram");
 	map(0x050000, 0x0507ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x060000, 0x06000f).ram().w(this, FUNC(ginganin_state::ginganin_vregs16_w)).share("vregs");
-	map(0x068000, 0x06bfff).ram().w(this, FUNC(ginganin_state::ginganin_fgram16_w)).share("fgram");
+	map(0x060000, 0x06000f).ram().w(FUNC(ginganin_state::ginganin_vregs16_w)).share("vregs");
+	map(0x068000, 0x06bfff).ram().w(FUNC(ginganin_state::ginganin_fgram16_w)).share("fgram");
 	map(0x070000, 0x070001).portr("P1_P2");
 	map(0x070002, 0x070003).portr("DSW");
 }

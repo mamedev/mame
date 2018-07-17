@@ -42,13 +42,14 @@ TODO:
 #include "cpu/mcs48/mcs48.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 void spcforce_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_sn76496_latch));
 	save_item(NAME(m_sn76496_select));
@@ -91,9 +92,9 @@ WRITE8_MEMBER(spcforce_state::SN76496_select_w)
 {
 	m_sn76496_select = data;
 
-	if (~data & 0x40) m_sn1->write(space, 0, m_sn76496_latch);
-	if (~data & 0x20) m_sn2->write(space, 0, m_sn76496_latch);
-	if (~data & 0x10) m_sn3->write(space, 0, m_sn76496_latch);
+	if (~data & 0x40) m_sn1->write(m_sn76496_latch);
+	if (~data & 0x20) m_sn2->write(m_sn76496_latch);
+	if (~data & 0x10) m_sn3->write(m_sn76496_latch);
 }
 
 READ_LINE_MEMBER(spcforce_state::t0_r)
@@ -110,9 +111,9 @@ WRITE8_MEMBER(spcforce_state::soundtrigger_w)
 
 WRITE8_MEMBER(spcforce_state::misc_outputs_w)
 {
-	m_lamp[0] = BIT(data, 0); // 1P start lamp
+	m_lamps[0] = BIT(data, 0); // 1P start lamp
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
-	m_lamp[1] = BIT(data, 2); // 2P start lamp
+	m_lamps[1] = BIT(data, 2); // 2P start lamp
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));
 }
 
@@ -131,8 +132,8 @@ void spcforce_state::spcforce_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram();
 	map(0x7000, 0x7000).portr("DSW").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x7001, 0x7001).portr("P1").w(this, FUNC(spcforce_state::soundtrigger_w));
-	map(0x7002, 0x7002).portr("P2").w(this, FUNC(spcforce_state::misc_outputs_w));
+	map(0x7001, 0x7001).portr("P1").w(FUNC(spcforce_state::soundtrigger_w));
+	map(0x7002, 0x7002).portr("P2").w(FUNC(spcforce_state::misc_outputs_w));
 	map(0x7008, 0x700f).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x8000, 0x83ff).ram().share("videoram");
 	map(0x9000, 0x93ff).ram().share("colorram");

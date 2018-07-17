@@ -119,21 +119,21 @@ class apollo_ni;
 class apollo_state : public driver_device
 {
 public:
-	apollo_state(const machine_config &mconfig, device_type type, const char *tag)
-			: driver_device(mconfig, type, tag),
-			m_maincpu(*this, MAINCPU),
-			m_messram_ptr(*this, "messram"),
-			m_dma8237_1(*this, APOLLO_DMA1_TAG),
-			m_dma8237_2(*this, APOLLO_DMA2_TAG),
-			m_pic8259_master(*this, APOLLO_PIC1_TAG),
-			m_pic8259_slave(*this, APOLLO_PIC2_TAG),
-			m_ptm(*this, APOLLO_PTM_TAG),
-			m_sio(*this, APOLLO_SIO_TAG),
-			m_sio2(*this, APOLLO_SIO2_TAG),
-			m_rtc(*this, APOLLO_RTC_TAG),
-			m_node_id(*this, APOLLO_NI_TAG),
-			m_isa(*this, APOLLO_ISA_TAG)
-			{ }
+	apollo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, MAINCPU),
+		m_messram_ptr(*this, "messram"),
+		m_dma8237_1(*this, APOLLO_DMA1_TAG),
+		m_dma8237_2(*this, APOLLO_DMA2_TAG),
+		m_pic8259_master(*this, APOLLO_PIC1_TAG),
+		m_pic8259_slave(*this, APOLLO_PIC2_TAG),
+		m_ptm(*this, APOLLO_PTM_TAG),
+		m_sio(*this, APOLLO_SIO_TAG),
+		m_sio2(*this, APOLLO_SIO2_TAG),
+		m_rtc(*this, APOLLO_RTC_TAG),
+		m_node_id(*this, APOLLO_NI_TAG),
+		m_isa(*this, APOLLO_ISA_TAG)
+	{ }
 
 	required_device<m68000_base_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_messram_ptr;
@@ -224,6 +224,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_irq_function );
 	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_timer_tick );
 	DECLARE_READ8_MEMBER( apollo_pic8259_get_slave_ack );
+	DECLARE_WRITE_LINE_MEMBER( apollo_rtc_irq_function );
 
 	DECLARE_READ8_MEMBER(pc_dma8237_0_dack_r);
 	DECLARE_READ8_MEMBER(pc_dma8237_1_dack_r);
@@ -247,7 +248,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
-	TIMER_CALLBACK_MEMBER( apollo_rtc_timer );
 
 	void apollo_pic_set_irq_line(int irq, int state);
 	void select_dma_channel(int channel, bool state);
@@ -283,7 +283,6 @@ private:
 	uint8_t sio_output_data;
 	int m_dma_channel;
 	bool m_cur_eop;
-	emu_timer *m_dn3000_timer;
 };
 
 /*----------- machine/apollo_config.c -----------*/

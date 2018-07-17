@@ -38,6 +38,7 @@
 #include "machine/isbc_215g.h"
 #include "machine/keyboard.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -324,7 +325,7 @@ void a7150_state::a7150_io(address_map &map)
 	map(0x00d0, 0x00d7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x0200, 0x0203).rw(this, FUNC(a7150_state::a7150_kgs_r), FUNC(a7150_state::a7150_kgs_w)).umask16(0x00ff); // ABS/KGS board
+	map(0x0200, 0x0203).rw(FUNC(a7150_state::a7150_kgs_r), FUNC(a7150_state::a7150_kgs_w)).umask16(0x00ff); // ABS/KGS board
 	map(0x0300, 0x031f).unmaprw(); // ASP board #1
 	map(0x0320, 0x033f).unmaprw(); // ASP board #2
 }
@@ -362,7 +363,7 @@ void a7150_state::k7070_cpu_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x0000, 0x0003).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0008, 0x000b).rw(Z80SIO_TAG, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-	map(0x0010, 0x0017).rw(this, FUNC(a7150_state::kgs_host_r), FUNC(a7150_state::kgs_host_w)); // p. 11 of KGS-K7070.pdf
+	map(0x0010, 0x0017).rw(FUNC(a7150_state::kgs_host_r), FUNC(a7150_state::kgs_host_w)); // p. 11 of KGS-K7070.pdf
 
 	map(0x0020, 0x0021).noprw(); // address register
 	map(0x0022, 0x0022).noprw(); // function register (p. 6 of ABG-K7072.pdf)
@@ -481,8 +482,8 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 
 	// IFSP port on processor card
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-//  MCFG_I8255_IN_PORTA_CB(READ8("cent_status_in", input_buffer_device, read))
-//  MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, write))
+//  MCFG_I8255_IN_PORTA_CB(READ8("cent_status_in", input_buffer_device, bus_r))
+//  MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, a7150_state, ppi_c_w))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
@@ -506,7 +507,7 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
 
-	MCFG_ISBC_215_ADD("isbc_215g", 0x4a, "maincpu")
+	MCFG_DEVICE_ADD("isbc_215g", ISBC_215G, 0x4a, "maincpu")
 	MCFG_ISBC_215_IRQ(WRITELINE("pic8259", pic8259_device, ir5_w))
 
 	// KGS K7070 graphics terminal controlling ABG K7072 framebuffer
@@ -567,29 +568,29 @@ ROM_START( a7150 )
 
 	// A7100
 	ROM_SYSTEM_BIOS(0, "1.1", "ACT 1.1")
-	ROMX_LOAD("q259.bin", 0x4001, 0x2000, CRC(fb5b547b) SHA1(1d17fcededa91cad321a7b237a46a308142d902b),ROM_BIOS(1)|ROM_SKIP(1))
-	ROMX_LOAD("q260.bin", 0x0001, 0x2000, CRC(b51f8ed6) SHA1(9aa6291bf8ab49a343741717366992649e2957b3),ROM_BIOS(1)|ROM_SKIP(1))
-	ROMX_LOAD("q261.bin", 0x4000, 0x2000, CRC(43c08ea3) SHA1(ea697180b415b71d834968be84431a6efe9490c2),ROM_BIOS(1)|ROM_SKIP(1))
-	ROMX_LOAD("q262.bin", 0x0000, 0x2000, CRC(9df1c396) SHA1(a627889e1162e5b2fe95804de52bb78e41aaf7cc),ROM_BIOS(1)|ROM_SKIP(1))
+	ROMX_LOAD("q259.bin", 0x4001, 0x2000, CRC(fb5b547b) SHA1(1d17fcededa91cad321a7b237a46a308142d902b), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("q260.bin", 0x0001, 0x2000, CRC(b51f8ed6) SHA1(9aa6291bf8ab49a343741717366992649e2957b3), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("q261.bin", 0x4000, 0x2000, CRC(43c08ea3) SHA1(ea697180b415b71d834968be84431a6efe9490c2), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("q262.bin", 0x0000, 0x2000, CRC(9df1c396) SHA1(a627889e1162e5b2fe95804de52bb78e41aaf7cc), ROM_BIOS(0) | ROM_SKIP(1))
 
 	// A7150
 	ROM_SYSTEM_BIOS(1, "2.1", "ACT 2.1")
-	ROMX_LOAD("265.bin",  0x4001, 0x2000, CRC(a5fb5f35) SHA1(9d9501441cad0ef724dec7b5ffb52b17a678a9f8),ROM_BIOS(2)|ROM_SKIP(1))
-	ROMX_LOAD("266.bin",  0x0001, 0x2000, CRC(f5898eb7) SHA1(af3fd82813fbea7883dea4d7e23a9b5e5b2b844a),ROM_BIOS(2)|ROM_SKIP(1))
-	ROMX_LOAD("267.bin",  0x4000, 0x2000, CRC(c1873a01) SHA1(77f15cc217cd854732fbe33d395e1ea9867fedd7),ROM_BIOS(2)|ROM_SKIP(1))
-	ROMX_LOAD("268.bin",  0x0000, 0x2000, CRC(e3f09213) SHA1(1e2d69061f8e84697440b219181e0b870fe21835),ROM_BIOS(2)|ROM_SKIP(1))
+	ROMX_LOAD("265.bin",  0x4001, 0x2000, CRC(a5fb5f35) SHA1(9d9501441cad0ef724dec7b5ffb52b17a678a9f8), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("266.bin",  0x0001, 0x2000, CRC(f5898eb7) SHA1(af3fd82813fbea7883dea4d7e23a9b5e5b2b844a), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("267.bin",  0x4000, 0x2000, CRC(c1873a01) SHA1(77f15cc217cd854732fbe33d395e1ea9867fedd7), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("268.bin",  0x0000, 0x2000, CRC(e3f09213) SHA1(1e2d69061f8e84697440b219181e0b870fe21835), ROM_BIOS(1) | ROM_SKIP(1))
 
 	ROM_SYSTEM_BIOS(2, "2.2", "ACT 2.2")
-	ROMX_LOAD("269.bin",  0x4001, 0x2000, CRC(f137f94b) SHA1(7cb79f332db48cb66dae04c1ce1bdd169a6ab561),ROM_BIOS(3)|ROM_SKIP(1))
-	ROMX_LOAD("270.bin",  0x0001, 0x2000, CRC(1ea44a33) SHA1(f5708d1f6a9dc109979a9a91a80f2a4e4956d1eb),ROM_BIOS(3)|ROM_SKIP(1))
-	ROMX_LOAD("271.bin",  0x4000, 0x2000, CRC(de2222c9) SHA1(e02225c93b49f0380dfb2d996b63370141359199),ROM_BIOS(3)|ROM_SKIP(1))
-	ROMX_LOAD("272.bin",  0x0000, 0x2000, CRC(5001c528) SHA1(ce67c35326fbfd17f086a37ffe81b79aefaef0cb),ROM_BIOS(3)|ROM_SKIP(1))
+	ROMX_LOAD("269.bin",  0x4001, 0x2000, CRC(f137f94b) SHA1(7cb79f332db48cb66dae04c1ce1bdd169a6ab561), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("270.bin",  0x0001, 0x2000, CRC(1ea44a33) SHA1(f5708d1f6a9dc109979a9a91a80f2a4e4956d1eb), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("271.bin",  0x4000, 0x2000, CRC(de2222c9) SHA1(e02225c93b49f0380dfb2d996b63370141359199), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("272.bin",  0x0000, 0x2000, CRC(5001c528) SHA1(ce67c35326fbfd17f086a37ffe81b79aefaef0cb), ROM_BIOS(2) | ROM_SKIP(1))
 
 	ROM_SYSTEM_BIOS(3, "2.3", "ACT 2.3")
-	ROMX_LOAD("273.rom",  0x4001, 0x2000, CRC(67ca9b78) SHA1(bcb6221f6df28b24b602846b149ac12e93b5e356),ROM_BIOS(4)|ROM_SKIP(1))
-	ROMX_LOAD("274.rom",  0x0001, 0x2000, CRC(6fa68834) SHA1(49abe48bbb5ae151f977a9c63b27336c15e8a08d),ROM_BIOS(4)|ROM_SKIP(1))
-	ROMX_LOAD("275.rom",  0x4000, 0x2000, CRC(0da54426) SHA1(7492caff98b1d1a896c5964942b17beadf996b60),ROM_BIOS(4)|ROM_SKIP(1))
-	ROMX_LOAD("276.rom",  0x0000, 0x2000, CRC(5924192a) SHA1(eb494d9f96a0b3ea69f4b9cb2b7add66a8c16946),ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("273.rom",  0x4001, 0x2000, CRC(67ca9b78) SHA1(bcb6221f6df28b24b602846b149ac12e93b5e356), ROM_BIOS(3) | ROM_SKIP(1))
+	ROMX_LOAD("274.rom",  0x0001, 0x2000, CRC(6fa68834) SHA1(49abe48bbb5ae151f977a9c63b27336c15e8a08d), ROM_BIOS(3) | ROM_SKIP(1))
+	ROMX_LOAD("275.rom",  0x4000, 0x2000, CRC(0da54426) SHA1(7492caff98b1d1a896c5964942b17beadf996b60), ROM_BIOS(3) | ROM_SKIP(1))
+	ROMX_LOAD("276.rom",  0x0000, 0x2000, CRC(5924192a) SHA1(eb494d9f96a0b3ea69f4b9cb2b7add66a8c16946), ROM_BIOS(3) | ROM_SKIP(1))
 
 	ROM_REGION( 0x10000, "user2", ROMREGION_ERASEFF )
 	// ROM from A7100

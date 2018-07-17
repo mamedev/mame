@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include "sound/tiaintf.h"
+#include "emupal.h"
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -65,6 +68,8 @@ protected:
 	// construction/destruction
 	tia_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename T> void set_tia_tag(T &&tag) { m_tia.set_tag(std::forward<T>(tag)); }
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -117,6 +122,7 @@ private:
 	devcb_write16   m_vsync_cb;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<tia_device> m_tia;
 
 	struct player_gfx p0gfx;
 	struct player_gfx p1gfx;
@@ -212,6 +218,12 @@ private:
 class tia_pal_video_device : public tia_video_device
 {
 public:
+	template <typename T> tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&tia_tag)
+		: tia_pal_video_device(mconfig, tag, owner, clock)
+	{
+		set_tia_tag(std::forward<T>(tia_tag));
+	}
+
 	tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -224,6 +236,12 @@ private:
 class tia_ntsc_video_device : public tia_video_device
 {
 public:
+	template <typename T> tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&tia_tag)
+		: tia_ntsc_video_device(mconfig, tag, owner, clock)
+	{
+		set_tia_tag(std::forward<T>(tia_tag));
+	}
+
 	tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:

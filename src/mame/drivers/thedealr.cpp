@@ -35,6 +35,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/seta001.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -48,7 +49,7 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_seta001(*this, "spritegen"),
 		m_palette(*this, "palette"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	// IOX
@@ -83,7 +84,7 @@ private:
 	required_device<cpu_device> m_subcpu;
 	required_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
-	output_finder<8> m_led;
+	output_finder<8> m_leds;
 };
 
 /***************************************************************************
@@ -165,14 +166,14 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 		{
 			case 0x20:  // leds
 				m_iox_leds = data;
-				m_led[0] = BIT(data, 0);  // bet
-				m_led[1] = BIT(data, 1);  // deal
-				m_led[2] = BIT(data, 2);
-				m_led[3] = BIT(data, 3);
-				m_led[4] = BIT(data, 4);  // hold 1-5?
-				m_led[5] = BIT(data, 5);
-				m_led[6] = BIT(data, 6);
-				m_led[7] = BIT(data, 7);
+				m_leds[0] = BIT(data, 0);  // bet
+				m_leds[1] = BIT(data, 1);  // deal
+				m_leds[2] = BIT(data, 2);
+				m_leds[3] = BIT(data, 3);
+				m_leds[4] = BIT(data, 4);  // hold 1-5?
+				m_leds[5] = BIT(data, 5);
+				m_leds[6] = BIT(data, 6);
+				m_leds[7] = BIT(data, 7);
 				break;
 
 			case 0x40:  // coin counters
@@ -284,16 +285,16 @@ void thedealr_state::thedealr(address_map &map)
 
 	map(0x2000, 0x2000).ram(); // w ff at boot (after clearing commram)
 
-	map(0x2400, 0x2400).r(this, FUNC(thedealr_state::irq_ack_r)); // r = irq ack.
-	map(0x2400, 0x2400).w(this, FUNC(thedealr_state::unk_w));    // w = ?
+	map(0x2400, 0x2400).r(FUNC(thedealr_state::irq_ack_r)); // r = irq ack.
+	map(0x2400, 0x2400).w(FUNC(thedealr_state::unk_w));    // w = ?
 
 	map(0x2800, 0x2800).portr("COINS").nopw();  // rw
 
 	map(0x2801, 0x2801).portr("DSW4");
 	map(0x2c00, 0x2c00).portr("DSW3");
 
-	map(0x3400, 0x3400).rw(this, FUNC(thedealr_state::iox_r), FUNC(thedealr_state::iox_w));
-	map(0x3401, 0x3401).r(this, FUNC(thedealr_state::iox_status_r));
+	map(0x3400, 0x3400).rw(FUNC(thedealr_state::iox_r), FUNC(thedealr_state::iox_w));
+	map(0x3401, 0x3401).r(FUNC(thedealr_state::iox_status_r));
 
 	map(0x3000, 0x3000).ram(); // rw, comm in test mode
 	map(0x3001, 0x3001).ram(); // rw, ""
@@ -513,7 +514,7 @@ GFXDECODE_END
 
 void thedealr_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_iox_status));
 	save_item(NAME(m_iox_ret));

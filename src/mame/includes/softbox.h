@@ -28,16 +28,13 @@ public:
 	softbox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, Z80_TAG)
-		, m_dbrg(*this, COM8116_TAG)
 		, m_ieee(*this, IEEE488_TAG)
 		, m_hdc(*this, CORVUS_HDC_TAG)
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	// device_ieee488_interface overrides
 	virtual void ieee488_ifc(int state);
-
-	DECLARE_WRITE8_MEMBER( dbrg_w );
 
 	DECLARE_READ8_MEMBER( ppi0_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi0_pb_w );
@@ -64,10 +61,9 @@ protected:
 	virtual void device_reset_after_children() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<com8116_device> m_dbrg;
 	required_device<ieee488_device> m_ieee;
 	required_device<corvus_hdc_device> m_hdc;
-	output_finder<3> m_led;
+	output_finder<3> m_leds;
 };
 
 #endif

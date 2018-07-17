@@ -35,7 +35,7 @@ void s11a_state::s11a_main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
 	map(0x2100, 0x2103).mirror(0x00fc).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).mirror(0x01ff).w(this, FUNC(s11a_state::sol3_w)); // solenoids
+	map(0x2200, 0x2200).mirror(0x01ff).w(FUNC(s11a_state::sol3_w)); // solenoids
 	map(0x2400, 0x2403).mirror(0x03fc).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).mirror(0x03fc).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x2c00, 0x2c03).mirror(0x03fc).rw(m_pia2c, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
@@ -47,7 +47,7 @@ void s11a_state::s11a_main_map(address_map &map)
 void s11a_state::s11a_audio_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x0800).ram();
-	map(0x1000, 0x1fff).w(this, FUNC(s11a_state::bank_w));
+	map(0x1000, 0x1fff).w(FUNC(s11a_state::bank_w));
 	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8000, 0xbfff).bankr("bank0");
 	map(0xc000, 0xffff).bankr("bank1");
@@ -58,7 +58,7 @@ void s11a_state::s11a_bg_map(address_map &map)
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x2001).mirror(0x1ffe).rw(m_ym, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x4000, 0x4003).mirror(0x1ffc).rw(m_pia40, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x7800, 0x7fff).w(this, FUNC(s11a_state::bgbank_w));
+	map(0x7800, 0x7fff).w(FUNC(s11a_state::bgbank_w));
 	map(0x8000, 0xffff).bankr("bgbank");
 }
 
@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(s11a_state::s11a)
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(*this, s11_state, sound_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s11_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pia40_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
@@ -268,7 +268,7 @@ MACHINE_CONFIG_START(s11a_state::s11a)
 	MCFG_DEVICE_ADD("dac1", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
 
 	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac1", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac1", dac_byte_interface, data_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11_state, pia40_pb_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s11_state, pias_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pias_cb2_w))

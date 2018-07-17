@@ -788,33 +788,33 @@ WRITE8_MEMBER(calomega_state::pia1_bout_w)
 WRITE8_MEMBER(calomega_state::lamps_903a_w)
 {
 	/* First 5 bits of PIA0 port B */
-	m_lamp[1] = BIT(~data, 0);  /* L1 (Hold 1) */
-	m_lamp[2] = BIT(~data, 1);  /* L2 (Hold 2) */
-	m_lamp[3] = BIT(~data, 2);  /* L3 (Hold 3) */
-	m_lamp[4] = BIT(~data, 3);  /* L4 (Hold 4) */
-	m_lamp[5] = BIT(~data, 4);  /* L5 (Hold 5) */
+	m_lamps[0] = BIT(~data, 0);  /* L1 (Hold 1) */
+	m_lamps[1] = BIT(~data, 1);  /* L2 (Hold 2) */
+	m_lamps[2] = BIT(~data, 2);  /* L3 (Hold 3) */
+	m_lamps[3] = BIT(~data, 3);  /* L4 (Hold 4) */
+	m_lamps[4] = BIT(~data, 4);  /* L5 (Hold 5) */
 }
 
 WRITE8_MEMBER(calomega_state::lamps_903b_w)
 {
 	/* First 4 bits of PIA1 port A */
-	m_lamp[6] = BIT(~data, 0);  /* L6 (Cancel) */
-	m_lamp[7] = BIT(~data, 1);  /* L7 (Bet) */
-	m_lamp[8] = BIT(~data, 2);  /* L8 (Take) */
-	m_lamp[9] = BIT(~data, 3);  /* L9 (Door?) */
+	m_lamps[5] = BIT(~data, 0);  /* L6 (Cancel) */
+	m_lamps[6] = BIT(~data, 1);  /* L7 (Bet) */
+	m_lamps[7] = BIT(~data, 2);  /* L8 (Take) */
+	m_lamps[8] = BIT(~data, 3);  /* L9 (Door?) */
 }
 
 WRITE8_MEMBER(calomega_state::lamps_905_w)
 {
 	/* Whole 8 bits of PIA0 port B */
-	m_lamp[1] = BIT(~data, 0);  /* L1 (Hold 1) */
-	m_lamp[2] = BIT(~data, 1);  /* L2 (Hold 2) */
-	m_lamp[3] = BIT(~data, 2);  /* L3 (Hold 3) */
-	m_lamp[4] = BIT(~data, 3);  /* L4 (Hold 4) */
-	m_lamp[5] = BIT(~data, 4);  /* L5 (Hold 5) */
-	m_lamp[6] = BIT(~data, 5);  /* L6 (unknown) */
-	m_lamp[7] = BIT(~data, 6);  /* L7 (unknown) */
-	m_lamp[8] = BIT(~data, 7);  /* L8 (unknown) */
+	m_lamps[0] = BIT(~data, 0);  /* L1 (Hold 1) */
+	m_lamps[1] = BIT(~data, 1);  /* L2 (Hold 2) */
+	m_lamps[2] = BIT(~data, 2);  /* L3 (Hold 3) */
+	m_lamps[3] = BIT(~data, 3);  /* L4 (Hold 4) */
+	m_lamps[4] = BIT(~data, 4);  /* L5 (Hold 5) */
+	m_lamps[5] = BIT(~data, 5);  /* L6 (unknown) */
+	m_lamps[6] = BIT(~data, 6);  /* L7 (unknown) */
+	m_lamps[7] = BIT(~data, 7);  /* L8 (unknown) */
 }
 
 
@@ -832,8 +832,8 @@ void calomega_state::sys903_map(address_map &map)
 	map(0x08c4, 0x08c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x08c8, 0x08cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x08d0, 0x08d1).rw(m_acia6850_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
-	map(0x1400, 0x17ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x1800, 0x3fff).rom();
 }
 
@@ -846,8 +846,8 @@ void calomega_state::s903mod_map(address_map &map)
 	map(0x0881, 0x0881).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x08c4, 0x08c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x08c8, 0x08cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
-	map(0x1400, 0x17ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x1800, 0x3fff).rom();
 }
 
@@ -860,8 +860,8 @@ void calomega_state::sys905_map(address_map &map)
 	map(0x1081, 0x1081).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x10c4, 0x10c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x10c8, 0x10cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x2000, 0x23ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x2000, 0x23ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x2400, 0x27ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x2800, 0x7fff).rom();
 }
 
@@ -873,8 +873,8 @@ void calomega_state::sys906_map(address_map &map)
 	map(0x2c04, 0x2c04).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2c05, 0x2c05).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x2c08, 0x2c09).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0x2000, 0x23ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x2000, 0x23ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x2400, 0x27ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x6000, 0xffff).rom();
 }
 

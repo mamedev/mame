@@ -255,3 +255,13 @@ public:
 	void nsub_io_map(address_map &map);
 	void nsub_map(address_map &map);
 };
+
+class headonsa_state : public vicdual_state
+{
+public:
+	headonsa_state(const machine_config &mconfig, device_type type, const char *tag)
+		: vicdual_state(mconfig, type, tag)
+	{}
+
+	DECLARE_INPUT_CHANGED_MEMBER(headonsa_coin_inserted);
+};

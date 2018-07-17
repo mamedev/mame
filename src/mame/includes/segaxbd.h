@@ -21,6 +21,7 @@
 #include "machine/mb3773.h"
 #include "machine/watchdog.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 
 // ======================> segaxbd_state
@@ -146,7 +147,7 @@ protected:
 	required_ioport m_io0_porta;
 	optional_ioport_array<8> m_adc_ports;
 	optional_ioport_array<4> m_mux_ports;
-	output_finder<4> m_lamp;
+	output_finder<4> m_lamps;
 
 protected:
 	virtual void device_start() override;

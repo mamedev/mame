@@ -39,15 +39,15 @@ Philips P2000 1 Memory map
 void p2000t_state::p2000t_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).r(this, FUNC(p2000t_state::p2000t_port_000f_r));
-	map(0x10, 0x1f).w(this, FUNC(p2000t_state::p2000t_port_101f_w));
-	map(0x20, 0x2f).r(this, FUNC(p2000t_state::p2000t_port_202f_r));
-	map(0x30, 0x3f).w(this, FUNC(p2000t_state::p2000t_port_303f_w));
-	map(0x50, 0x5f).w(this, FUNC(p2000t_state::p2000t_port_505f_w));
-	map(0x70, 0x7f).w(this, FUNC(p2000t_state::p2000t_port_707f_w));
-	map(0x88, 0x8b).w(this, FUNC(p2000t_state::p2000t_port_888b_w));
-	map(0x8c, 0x90).w(this, FUNC(p2000t_state::p2000t_port_8c90_w));
-	map(0x94, 0x94).w(this, FUNC(p2000t_state::p2000t_port_9494_w));
+	map(0x00, 0x0f).r(FUNC(p2000t_state::p2000t_port_000f_r));
+	map(0x10, 0x1f).w(FUNC(p2000t_state::p2000t_port_101f_w));
+	map(0x20, 0x2f).r(FUNC(p2000t_state::p2000t_port_202f_r));
+	map(0x30, 0x3f).w(FUNC(p2000t_state::p2000t_port_303f_w));
+	map(0x50, 0x5f).w(FUNC(p2000t_state::p2000t_port_505f_w));
+	map(0x70, 0x7f).w(FUNC(p2000t_state::p2000t_port_707f_w));
+	map(0x88, 0x8b).w(FUNC(p2000t_state::p2000t_port_888b_w));
+	map(0x8c, 0x90).w(FUNC(p2000t_state::p2000t_port_8c90_w));
+	map(0x94, 0x94).w(FUNC(p2000t_state::p2000t_port_9494_w));
 }
 
 /* Memory w/r functions */

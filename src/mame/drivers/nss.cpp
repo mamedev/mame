@@ -301,6 +301,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 #include "machine/s3520cf.h"
 #include "machine/rp5h01.h"
 #include "video/m50458.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "speaker.h"
 
@@ -369,9 +370,9 @@ uint32_t nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, 
 
 void nss_state::snes_map(address_map &map)
 {
-	map(0x000000, 0x7dffff).rw(this, FUNC(nss_state::snes_r_bank1), FUNC(nss_state::snes_w_bank1));
+	map(0x000000, 0x7dffff).rw(FUNC(nss_state::snes_r_bank1), FUNC(nss_state::snes_w_bank1));
 	map(0x7e0000, 0x7fffff).ram();                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	map(0x800000, 0xffffff).rw(this, FUNC(nss_state::snes_r_bank2), FUNC(nss_state::snes_w_bank2));    /* Mirror and ROM */
+	map(0x800000, 0xffffff).rw(FUNC(nss_state::snes_r_bank2), FUNC(nss_state::snes_w_bank2));    /* Mirror and ROM */
 }
 
 READ8_MEMBER(nss_state::spc_ram_100_r)
@@ -388,7 +389,7 @@ void nss_state::spc_mem(address_map &map)
 {
 	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
 	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
-	map(0x0100, 0xffff).rw(this, FUNC(nss_state::spc_ram_100_r), FUNC(nss_state::spc_ram_100_w));
+	map(0x0100, 0xffff).rw(FUNC(nss_state::spc_ram_100_r), FUNC(nss_state::spc_ram_100_w));
 }
 
 /* NSS specific */
@@ -512,10 +513,10 @@ void nss_state::bios_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9fff).rw(this, FUNC(nss_state::ram_wp_r), FUNC(nss_state::ram_wp_w));
+	map(0x9000, 0x9fff).rw(FUNC(nss_state::ram_wp_r), FUNC(nss_state::ram_wp_w));
 	map(0xa000, 0xa000).portr("EEPROMIN");
 	map(0xc000, 0xdfff).rom().region("ibios_rom", 0x6000);
-	map(0xe000, 0xffff).rw(this, FUNC(nss_state::nss_prot_r), FUNC(nss_state::nss_prot_w));
+	map(0xe000, 0xffff).rw(FUNC(nss_state::nss_prot_r), FUNC(nss_state::nss_prot_w));
 }
 
 READ8_MEMBER(nss_state::port_00_r)
@@ -631,12 +632,12 @@ WRITE8_MEMBER(nss_state::port_07_w)
 void nss_state::bios_io_map(address_map &map)
 {
 	map.global_mask(0x7);
-	map(0x00, 0x00).r(this, FUNC(nss_state::port_00_r)).w(this, FUNC(nss_state::port_00_w));
-	map(0x01, 0x01).portr("FP").w(this, FUNC(nss_state::port_01_w));
-	map(0x02, 0x02).portr("SYSTEM").w(this, FUNC(nss_state::port_02_w));
-	map(0x03, 0x03).portr("RTC").w(this, FUNC(nss_state::port_03_w));
-	map(0x04, 0x04).w(this, FUNC(nss_state::port_04_w));
-	map(0x07, 0x07).w(this, FUNC(nss_state::port_07_w));
+	map(0x00, 0x00).r(FUNC(nss_state::port_00_r)).w(FUNC(nss_state::port_00_w));
+	map(0x01, 0x01).portr("FP").w(FUNC(nss_state::port_01_w));
+	map(0x02, 0x02).portr("SYSTEM").w(FUNC(nss_state::port_02_w));
+	map(0x03, 0x03).portr("RTC").w(FUNC(nss_state::port_03_w));
+	map(0x04, 0x04).w(FUNC(nss_state::port_04_w));
+	map(0x07, 0x07).w(FUNC(nss_state::port_07_w));
 }
 
 void nss_state::machine_start()
@@ -891,11 +892,11 @@ MACHINE_CONFIG_END
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
 	ROM_REGION(0x8000,         "bios",  0)      /* Bios CPU */ \
 	ROM_SYSTEM_BIOS( 0, "single", "Nintendo Super System (Single Cart BIOS)" ) \
-	ROMX_LOAD("nss-ic14.02.ic14", 0x00000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477), ROM_BIOS(1) )   /* bios */ \
+	ROMX_LOAD("nss-ic14.02.ic14", 0x00000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477), ROM_BIOS(0) )   /* bios */ \
 	ROM_SYSTEM_BIOS( 1, "multi", "Nintendo Super System (Multi Cart BIOS)" ) \
-	ROMX_LOAD("nss-c.ic14"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2), ROM_BIOS(2) )   /* bios */ \
+	ROMX_LOAD("nss-c.ic14"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2), ROM_BIOS(1) )   /* bios */ \
 	ROM_SYSTEM_BIOS( 2, "single3", "Nintendo Super System (Single Cart BIOS v3, hack?)" ) \
-	ROMX_LOAD("nss-v3.ic14" , 0x00000, 0x8000, CRC(ac385b53) SHA1(e3942f9d508c3c8074c3c3941376c37ca68b8e54), ROM_BIOS(3) )   /* bios */
+	ROMX_LOAD("nss-v3.ic14" , 0x00000, 0x8000, CRC(ac385b53) SHA1(e3942f9d508c3c8074c3c3941376c37ca68b8e54), ROM_BIOS(2) )   /* bios */
 
 
 ROM_START( nss )

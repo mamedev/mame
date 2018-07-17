@@ -8,28 +8,29 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class sf_state : public driver_device
 {
 public:
-	sf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_msm1(*this, "msm1"),
-		m_msm2(*this, "msm2"),
+		m_msm(*this, "msm%u", 1U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
-		m_objectram(*this, "objectram")
+		m_objectram(*this, "objectram"),
+		m_tilerom(*this, "tilerom"),
+		m_audiobank(*this, "audiobank")
 	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<msm5205_device> m_msm1;
-	required_device<msm5205_device> m_msm2;
+	required_device_array<msm5205_device, 2> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -37,6 +38,9 @@ public:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_objectram;
+	required_region_ptr<uint8_t> m_tilerom;
+
+	required_memory_bank m_audiobank;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -54,8 +58,7 @@ public:
 	DECLARE_WRITE16_MEMBER(bg_scroll_w);
 	DECLARE_WRITE16_MEMBER(fg_scroll_w);
 	DECLARE_WRITE16_MEMBER(gfxctrl_w);
-	DECLARE_WRITE8_MEMBER(msm1_5205_w);
-	DECLARE_WRITE8_MEMBER(msm2_5205_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(msm_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

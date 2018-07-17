@@ -25,6 +25,7 @@
 #include "machine/pckeybrd.h"
 #include "machine/pcshare.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -40,6 +41,7 @@ public:
 		m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
+		m_ramdac(*this, "ramdac"),
 		m_palette(*this, "palette") { }
 
 	required_shared_ptr<uint32_t> m_main_ram;
@@ -48,6 +50,7 @@ public:
 	required_shared_ptr<uint32_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+	required_device<ramdac_device> m_ramdac;
 	required_device<palette_device> m_palette;
 	uint8_t m_pal[768];
 
@@ -342,8 +345,6 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
 	{
-		ramdac_device *ramdac = machine().device<ramdac_device>("ramdac");
-
 		if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00e00000) == 0x00400000)
 		{
 			// guess: crtc params?
@@ -352,7 +353,7 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
 		{
 			m_pal_index = data;
-			ramdac->index_w( space, 0, data );
+			m_ramdac->index_w( space, 0, data );
 		}
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
 		{
@@ -362,7 +363,7 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 			{
 				m_pal_index = 0;
 			}
-			ramdac->pal_w( space, 0, data );
+			m_ramdac->pal_w( space, 0, data );
 		}
 	}
 	else
@@ -482,9 +483,9 @@ void pinball2k_state::mediagx_map(address_map &map)
 	map(0x000b0000, 0x000b7fff).ram().share("cga_ram");
 	map(0x000c0000, 0x000fffff).ram().share("bios_ram");
 	map(0x00100000, 0x00ffffff).ram();
-	map(0x40008000, 0x400080ff).rw(this, FUNC(pinball2k_state::biu_ctrl_r), FUNC(pinball2k_state::biu_ctrl_w));
-	map(0x40008300, 0x400083ff).rw(this, FUNC(pinball2k_state::disp_ctrl_r), FUNC(pinball2k_state::disp_ctrl_w));
-	map(0x40008400, 0x400084ff).rw(this, FUNC(pinball2k_state::memory_ctrl_r), FUNC(pinball2k_state::memory_ctrl_w));
+	map(0x40008000, 0x400080ff).rw(FUNC(pinball2k_state::biu_ctrl_r), FUNC(pinball2k_state::biu_ctrl_w));
+	map(0x40008300, 0x400083ff).rw(FUNC(pinball2k_state::disp_ctrl_r), FUNC(pinball2k_state::disp_ctrl_w));
+	map(0x40008400, 0x400084ff).rw(FUNC(pinball2k_state::memory_ctrl_r), FUNC(pinball2k_state::memory_ctrl_w));
 	map(0x40800000, 0x40bfffff).ram().share("vram");
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
@@ -492,11 +493,11 @@ void pinball2k_state::mediagx_map(address_map &map)
 void pinball2k_state::mediagx_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x0022, 0x0023).rw(this, FUNC(pinball2k_state::io20_r), FUNC(pinball2k_state::io20_w));
+	map(0x0022, 0x0023).rw(FUNC(pinball2k_state::io20_r), FUNC(pinball2k_state::io20_w));
 	map(0x00e8, 0x00eb).noprw();     // I/O delay port
-	map(0x0378, 0x037b).rw(this, FUNC(pinball2k_state::parallel_port_r), FUNC(pinball2k_state::parallel_port_w));
-	map(0x0400, 0x0403).rw(this, FUNC(pinball2k_state::port400_r), FUNC(pinball2k_state::port400_w));
-	map(0x0800, 0x0803).rw(this, FUNC(pinball2k_state::port800_r), FUNC(pinball2k_state::port800_w));
+	map(0x0378, 0x037b).rw(FUNC(pinball2k_state::parallel_port_r), FUNC(pinball2k_state::parallel_port_w));
+	map(0x0400, 0x0403).rw(FUNC(pinball2k_state::port400_r), FUNC(pinball2k_state::port400_w));
+	map(0x0800, 0x0803).rw(FUNC(pinball2k_state::port800_r), FUNC(pinball2k_state::port800_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
 

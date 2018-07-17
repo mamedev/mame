@@ -70,17 +70,6 @@ Notes:
 //**************************************************************************
 
 //-------------------------------------------------
-//  com8116_w - baud rate selection
-//-------------------------------------------------
-
-WRITE8_MEMBER( ob68k1a_state::com8116_w )
-{
-	m_dbrg->stt_w(data & 0x0f);
-	m_dbrg->str_w(data >> 4);
-}
-
-
-//-------------------------------------------------
 //  pia_r - trampoline for PIA odd/even access
 //-------------------------------------------------
 
@@ -123,11 +112,11 @@ void ob68k1a_state::ob68k1a_mem(address_map &map)
 	map(0x000000, 0x01ffff).ram();
 	map(0xfe0000, 0xfeffff).rom().region(MC68000L10_TAG, 0);
 	map(0xffff00, 0xffff03).rw(m_acia0, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
-	map(0xffff10, 0xffff10).w(this, FUNC(ob68k1a_state::com8116_w));
+	map(0xffff10, 0xffff10).w(COM8116_TAG, FUNC(com8116_device::str_stt_w));
 	map(0xffff20, 0xffff23).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 //  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_0_TAG, pia6821_device, read, write, 0x00ff)
 //  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_1_TAG, pia6821_device, read, write, 0xff00)
-	map(0xffff40, 0xffff47).rw(this, FUNC(ob68k1a_state::pia_r), FUNC(ob68k1a_state::pia_w));
+	map(0xffff40, 0xffff47).rw(FUNC(ob68k1a_state::pia_r), FUNC(ob68k1a_state::pia_w));
 	map(0xffff60, 0xffff6f).rw(MC6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 }
 
@@ -171,8 +160,8 @@ void ob68k1a_state::machine_start()
 void ob68k1a_state::machine_reset()
 {
 	// initialize COM8116
-	m_dbrg->stt_w(0x0e);
-	m_dbrg->str_w(0x0e);
+	m_dbrg->write_stt(0x0e);
+	m_dbrg->write_str(0x0e);
 
 	// set reset vector
 	void *ram = m_maincpu->space(AS_PROGRAM).get_write_ptr(0);

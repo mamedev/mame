@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+
 #include "sound/sn76496.h"
+#include "emupal.h"
 
 class spcforce_state : public driver_device
 {
@@ -17,7 +19,7 @@ public:
 		m_scrollram(*this, "scrollram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(SN76496_latch_w);
@@ -57,7 +59,7 @@ protected:
 	required_shared_ptr<uint8_t> m_scrollram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 
 	int m_sn76496_latch;
 	int m_sn76496_select;

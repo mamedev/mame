@@ -339,14 +339,14 @@ WRITE_LINE_MEMBER(champwr_state::msm5205_vck)
 {
 	if (m_adpcm_data != -1)
 	{
-		m_msm->data_w(m_adpcm_data & 0x0f);
+		m_msm->write_data(m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
 	{
 		m_adpcm_data = m_adpcm_rgn[m_adpcm_pos];
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0x1ffff;
-		m_msm->data_w(m_adpcm_data >> 4);
+		m_msm->write_data(m_adpcm_data >> 4);
 	}
 }
 
@@ -385,18 +385,18 @@ void taitol_state::common_banks_map(address_map &map)
 	map(0xd000, 0xdfff).m("rambank2", FUNC(address_map_bank_device::amap8));
 	map(0xe000, 0xefff).m("rambank3", FUNC(address_map_bank_device::amap8));
 	map(0xf000, 0xfdff).m("rambank4", FUNC(address_map_bank_device::amap8));
-	map(0xfe00, 0xfe03).rw(this, FUNC(taitol_state::taitol_bankc_r), FUNC(taitol_state::taitol_bankc_w));
-	map(0xfe04, 0xfe04).rw(this, FUNC(taitol_state::taitol_control_r), FUNC(taitol_state::taitol_control_w));
-	map(0xff00, 0xff02).rw(this, FUNC(taitol_state::irq_adr_r), FUNC(taitol_state::irq_adr_w));
-	map(0xff03, 0xff03).rw(this, FUNC(taitol_state::irq_enable_r), FUNC(taitol_state::irq_enable_w));
-	map(0xff04, 0xff07).rw(this, FUNC(taitol_state::rambankswitch_r), FUNC(taitol_state::rambankswitch_w));
-	map(0xff08, 0xff08).rw(this, FUNC(taitol_state::rombankswitch_r), FUNC(taitol_state::rombankswitch_w));
+	map(0xfe00, 0xfe03).rw(FUNC(taitol_state::taitol_bankc_r), FUNC(taitol_state::taitol_bankc_w));
+	map(0xfe04, 0xfe04).rw(FUNC(taitol_state::taitol_control_r), FUNC(taitol_state::taitol_control_w));
+	map(0xff00, 0xff02).rw(FUNC(taitol_state::irq_adr_r), FUNC(taitol_state::irq_adr_w));
+	map(0xff03, 0xff03).rw(FUNC(taitol_state::irq_enable_r), FUNC(taitol_state::irq_enable_w));
+	map(0xff04, 0xff07).rw(FUNC(taitol_state::rambankswitch_r), FUNC(taitol_state::rambankswitch_w));
+	map(0xff08, 0xff08).rw(FUNC(taitol_state::rombankswitch_r), FUNC(taitol_state::rombankswitch_w));
 }
 
 
 void taitol_state::tc0090lvc_map(address_map &map)
 {
-	map(0x10000, 0x1ffff).ram().w(this, FUNC(taitol_state::vram_w)).share("vram");
+	map(0x10000, 0x1ffff).ram().w(FUNC(taitol_state::vram_w)).share("vram");
 	map(0x80000, 0x801ff).mirror(0x00e00).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
@@ -412,7 +412,7 @@ void fhawk_state::fhawk_2_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("slavebank");
-	map(0xc000, 0xc000).w(this, FUNC(fhawk_state::rombank2switch_w));
+	map(0xc000, 0xc000).w(FUNC(fhawk_state::rombank2switch_w));
 	map(0xc800, 0xc800).nopr().w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0xc801, 0xc801).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	map(0xd000, 0xd007).rw("tc0220ioc", FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write));
@@ -465,7 +465,7 @@ void taitol_2cpu_state::raimais_3_map(address_map &map)
 	map(0xe600, 0xe600).nopw(); /* ? */
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
-	map(0xf200, 0xf200).w(this, FUNC(taitol_2cpu_state::sound_bankswitch_w));
+	map(0xf200, 0xf200).w(FUNC(taitol_2cpu_state::sound_bankswitch_w));
 }
 
 
@@ -485,7 +485,7 @@ void champwr_state::champwr_2_map(address_map &map)
 	map(0xe008, 0xe00f).nopr();
 	map(0xe800, 0xe800).nopr().w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0xe801, 0xe801).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
-	map(0xf000, 0xf000).rw(this, FUNC(champwr_state::rombank2switch_r), FUNC(champwr_state::rombank2switch_w));
+	map(0xf000, 0xf000).rw(FUNC(champwr_state::rombank2switch_r), FUNC(champwr_state::rombank2switch_w));
 }
 
 void champwr_state::champwr_3_map(address_map &map)
@@ -496,10 +496,10 @@ void champwr_state::champwr_3_map(address_map &map)
 	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa000, 0xa000).nopr().w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xb000, 0xb000).w(this, FUNC(champwr_state::msm5205_hi_w));
-	map(0xc000, 0xc000).w(this, FUNC(champwr_state::msm5205_lo_w));
-	map(0xd000, 0xd000).w(this, FUNC(champwr_state::msm5205_start_w));
-	map(0xe000, 0xe000).w(this, FUNC(champwr_state::msm5205_stop_w));
+	map(0xb000, 0xb000).w(FUNC(champwr_state::msm5205_hi_w));
+	map(0xc000, 0xc000).w(FUNC(champwr_state::msm5205_lo_w));
+	map(0xd000, 0xd000).w(FUNC(champwr_state::msm5205_start_w));
+	map(0xe000, 0xe000).w(FUNC(champwr_state::msm5205_stop_w));
 }
 
 
@@ -526,10 +526,10 @@ void taitol_1cpu_state::puzznic_map(address_map &map)
 {
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xa003).r(this, FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
+	map(0xa000, 0xa003).r(FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
 	map(0xa800, 0xa800).nopr(); // Watchdog
 	map(0xb800, 0xb800).rw("mcu", FUNC(arkanoid_68705p3_device::data_r), FUNC(arkanoid_68705p3_device::data_w));
-	map(0xb801, 0xb801).rw(this, FUNC(taitol_1cpu_state::mcu_control_r), FUNC(taitol_1cpu_state::mcu_control_w));
+	map(0xb801, 0xb801).rw(FUNC(taitol_1cpu_state::mcu_control_r), FUNC(taitol_1cpu_state::mcu_control_w));
 	map(0xbc00, 0xbc00).nopw();    // Control register, function unknown
 }
 
@@ -538,9 +538,9 @@ void taitol_1cpu_state::puzznici_map(address_map &map)
 {
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xa003).r(this, FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
+	map(0xa000, 0xa003).r(FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
 	map(0xa800, 0xa800).nopr(); // Watchdog
-	map(0xb801, 0xb801).r(this, FUNC(taitol_1cpu_state::mcu_control_r));
+	map(0xb801, 0xb801).r(FUNC(taitol_1cpu_state::mcu_control_r));
 //  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
 	map(0xbc00, 0xbc00).nopw();    // Control register, function unknown
 }
@@ -550,7 +550,7 @@ void taitol_1cpu_state::plotting_map(address_map &map)
 {
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xa003).r(this, FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
+	map(0xa000, 0xa003).r(FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
 	map(0xa800, 0xa800).nopw();    // Watchdog or interrupt ack
 	map(0xb800, 0xb800).nopw();    // Control register, function unknown
 }
@@ -575,7 +575,7 @@ void taitol_1cpu_state::cachat_map(address_map &map)
 	map(0xa800, 0xa803).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xb000, 0xb000).nopw();    // Control register, function unknown
 	map(0xb001, 0xb001).nopr(); // Watchdog or interrupt ack (value ignored)
-	map(0xfff8, 0xfff8).rw(this, FUNC(taitol_1cpu_state::rombankswitch_r), FUNC(taitol_1cpu_state::rombankswitch_w));
+	map(0xfff8, 0xfff8).rw(FUNC(taitol_1cpu_state::rombankswitch_r), FUNC(taitol_1cpu_state::rombankswitch_w));
 }
 
 
@@ -583,15 +583,15 @@ void horshoes_state::horshoes_map(address_map &map)
 {
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xa003).r(this, FUNC(horshoes_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
+	map(0xa000, 0xa003).r(FUNC(horshoes_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
 	map(0xa800, 0xa800).select(0x000c).lr8("upd4701_r",
 										   [this](address_space &space, offs_t offset, u8 mem_mask) {
 											   return m_upd4701->read_xy(space, offset >> 2, mem_mask);
 										   });
-	map(0xa802, 0xa802).r(m_upd4701, FUNC(upd4701_device::reset_x));
-	map(0xa803, 0xa803).r(m_upd4701, FUNC(upd4701_device::reset_y));
+	map(0xa802, 0xa802).r(m_upd4701, FUNC(upd4701_device::reset_x_r));
+	map(0xa803, 0xa803).r(m_upd4701, FUNC(upd4701_device::reset_y_r));
 	map(0xb801, 0xb801).nopr(); // Watchdog or interrupt ack
-	map(0xb802, 0xb802).w(this, FUNC(horshoes_state::bankg_w));
+	map(0xb802, 0xb802).w(FUNC(horshoes_state::bankg_w));
 	map(0xbc00, 0xbc00).nopw();
 }
 

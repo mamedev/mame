@@ -2,6 +2,7 @@
 // copyright-holders:Bryan McPhail
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class liberate_state : public driver_device
 {

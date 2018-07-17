@@ -164,16 +164,16 @@ void changela_state::changela_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram().share("spriteram"); /* OBJ0 RAM */
 	map(0x9000, 0x97ff).ram().share("videoram");    /* OBJ1 RAM */
-	map(0xa000, 0xa07f).w(this, FUNC(changela_state::changela_colors_w)).share("colorram");   /* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
+	map(0xa000, 0xa07f).w(FUNC(changela_state::changela_colors_w)).share("colorram");   /* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
 	map(0xb000, 0xbfff).rom();
 
-	map(0xc000, 0xc7ff).rw(this, FUNC(changela_state::changela_mem_device_r), FUNC(changela_state::changela_mem_device_w)); /* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
+	map(0xc000, 0xc7ff).rw(FUNC(changela_state::changela_mem_device_r), FUNC(changela_state::changela_mem_device_w)); /* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
 
 	/* LS138 - U16 */
 	map(0xc800, 0xc800).nopw();                /* not connected */
-	map(0xc900, 0xc900).w(this, FUNC(changela_state::changela_mem_device_select_w)); /* selects the memory device to be accessible at 0xc000-0xc7ff */
-	map(0xca00, 0xca00).w(this, FUNC(changela_state::changela_slope_rom_addr_hi_w));
-	map(0xcb00, 0xcb00).w(this, FUNC(changela_state::changela_slope_rom_addr_lo_w));
+	map(0xc900, 0xc900).w(FUNC(changela_state::changela_mem_device_select_w)); /* selects the memory device to be accessible at 0xc000-0xc7ff */
+	map(0xca00, 0xca00).w(FUNC(changela_state::changela_slope_rom_addr_hi_w));
+	map(0xcb00, 0xcb00).w(FUNC(changela_state::changela_slope_rom_addr_lo_w));
 
 	map(0xd000, 0xd001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xd010, 0xd011).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
@@ -182,14 +182,14 @@ void changela_state::changela_map(address_map &map)
 	map(0xd020, 0xd027).w("outlatch", FUNC(ls259_device::write_d0));
 
 	/* LS139 - U24 */
-	map(0xd024, 0xd024).r(this, FUNC(changela_state::changela_24_r));
-	map(0xd025, 0xd025).r(this, FUNC(changela_state::changela_25_r));
-	map(0xd028, 0xd028).r(this, FUNC(changela_state::mcu_r));
-	map(0xd02c, 0xd02c).r(this, FUNC(changela_state::changela_2c_r));
-	map(0xd02d, 0xd02d).r(this, FUNC(changela_state::changela_2d_r));
+	map(0xd024, 0xd024).r(FUNC(changela_state::changela_24_r));
+	map(0xd025, 0xd025).r(FUNC(changela_state::changela_25_r));
+	map(0xd028, 0xd028).r(FUNC(changela_state::mcu_r));
+	map(0xd02c, 0xd02c).r(FUNC(changela_state::changela_2c_r));
+	map(0xd02d, 0xd02d).r(FUNC(changela_state::changela_2d_r));
 
-	map(0xd030, 0xd030).rw(this, FUNC(changela_state::changela_30_r), FUNC(changela_state::mcu_w));
-	map(0xd031, 0xd031).r(this, FUNC(changela_state::changela_31_r));
+	map(0xd030, 0xd030).rw(FUNC(changela_state::changela_30_r), FUNC(changela_state::mcu_w));
+	map(0xd031, 0xd031).r(FUNC(changela_state::changela_31_r));
 
 	map(0xe000, 0xe000).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* Watchdog */
 

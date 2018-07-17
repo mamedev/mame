@@ -35,6 +35,7 @@ $c088-$c095 player tiles
 #include "sound/msm5205.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -300,10 +301,10 @@ WRITE8_MEMBER(jangou_state::adpcm_w)
 WRITE_LINE_MEMBER(jangou_state::jngolady_vclk_cb)
 {
 	if (m_msm5205_vclk_toggle == 0)
-		m_msm->data_w(m_adpcm_byte >> 4);
+		m_msm->write_data(m_adpcm_byte >> 4);
 	else
 	{
-		m_msm->data_w(m_adpcm_byte & 0xf);
+		m_msm->write_data(m_adpcm_byte & 0xf);
 		m_cpu_1->set_input_line(0, HOLD_LINE);
 	}
 
@@ -356,12 +357,12 @@ void jangou_state::cpu0_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).portr("DSW").w(this, FUNC(jangou_state::output_w)); //dsw + blitter busy flag
-	map(0x11, 0x11).w(this, FUNC(jangou_state::mux_w));
+	map(0x10, 0x10).portr("DSW").w(FUNC(jangou_state::output_w)); //dsw + blitter busy flag
+	map(0x11, 0x11).w(FUNC(jangou_state::mux_w));
 	map(0x12, 0x17).m(m_blitter, FUNC(jangou_blitter_device::blit_v1_regs));
 	map(0x20, 0x2f).w(m_blitter, FUNC(jangou_blitter_device::vregs_w));
 	map(0x30, 0x30).nopw(); //? polls 0x03 continuously
-	map(0x31, 0x31).w(this, FUNC(jangou_state::sound_latch_w));
+	map(0x31, 0x31).w(FUNC(jangou_state::sound_latch_w));
 }
 
 
@@ -373,8 +374,8 @@ void jangou_state::cpu1_map(address_map &map)
 void jangou_state::cpu1_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(jangou_state::sound_latch_r));
-	map(0x01, 0x01).w(this, FUNC(jangou_state::cvsd_w));
+	map(0x00, 0x00).r(FUNC(jangou_state::sound_latch_r));
+	map(0x01, 0x01).w(FUNC(jangou_state::cvsd_w));
 	map(0x02, 0x02).nopw(); // Echoes sound command - acknowledge?
 }
 
@@ -389,7 +390,7 @@ void jangou_state::jngolady_cpu0_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xc000, 0xc7ff).ram().share("share1");
-	map(0xe000, 0xe000).rw(this, FUNC(jangou_state::master_com_r), FUNC(jangou_state::master_com_w));
+	map(0xe000, 0xe000).rw(FUNC(jangou_state::master_com_r), FUNC(jangou_state::master_com_w));
 }
 
 
@@ -401,8 +402,8 @@ void jangou_state::jngolady_cpu1_map(address_map &map)
 void jangou_state::jngolady_cpu1_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(jangou_state::sound_latch_r));
-	map(0x01, 0x01).w(this, FUNC(jangou_state::adpcm_w));
+	map(0x00, 0x00).r(FUNC(jangou_state::sound_latch_r));
+	map(0x01, 0x01).w(FUNC(jangou_state::adpcm_w));
 	map(0x02, 0x02).nopw();
 }
 
@@ -411,7 +412,7 @@ void jangou_state::nsc_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram(); //internal ram for irq etc.
 	map(0x8000, 0x8000).nopw(); //write-only,irq related?
-	map(0x9000, 0x9000).rw(this, FUNC(jangou_state::slave_com_r), FUNC(jangou_state::slave_com_w));
+	map(0x9000, 0x9000).rw(FUNC(jangou_state::slave_com_r), FUNC(jangou_state::slave_com_w));
 	map(0xc000, 0xc7ff).ram().share("share1");
 	map(0xf000, 0xffff).rom();
 }
@@ -435,8 +436,8 @@ void jangou_state::cntrygrl_cpu0_io(address_map &map)
 	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x10, 0x10).portr("DSW"); //dsw + blitter busy flag
-	map(0x10, 0x10).w(this, FUNC(jangou_state::output_w));
-	map(0x11, 0x11).w(this, FUNC(jangou_state::mux_w));
+	map(0x10, 0x10).w(FUNC(jangou_state::output_w));
+	map(0x11, 0x11).w(FUNC(jangou_state::mux_w));
 	map(0x12, 0x17).m(m_blitter, FUNC(jangou_blitter_device::blit_v1_regs));
 	map(0x20, 0x2f).w(m_blitter, FUNC(jangou_blitter_device::vregs_w));
 	map(0x30, 0x30).nopw(); //? polls 0x03 continuously
@@ -462,7 +463,7 @@ void jangou_state::roylcrdn_cpu0_io(address_map &map)
 	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x10, 0x10).portr("DSW");         /* DSW + blitter busy flag */
 	map(0x10, 0x10).nopw();                 /* Writes continuosly 0's in attract mode, and 1's in game */
-	map(0x11, 0x11).w(this, FUNC(jangou_state::mux_w));
+	map(0x11, 0x11).w(FUNC(jangou_state::mux_w));
 	map(0x12, 0x17).m(m_blitter, FUNC(jangou_blitter_device::blit_v1_regs));
 	map(0x13, 0x13).nopr();                  /* Often reads bit7 with unknown purposes */
 	map(0x20, 0x2f).w(m_blitter, FUNC(jangou_blitter_device::vregs_w));

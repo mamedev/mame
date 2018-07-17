@@ -8,6 +8,7 @@
 
 #include "machine/74259.h"
 #include "sound/samples.h"
+#include "emupal.h"
 
 class zaxxon_state : public driver_device
 {

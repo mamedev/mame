@@ -133,12 +133,12 @@ void timeplt_state::timeplt_main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x5fff).rom();
-	map(0xa000, 0xa3ff).ram().w(this, FUNC(timeplt_state::colorram_w)).share("colorram");
-	map(0xa400, 0xa7ff).ram().w(this, FUNC(timeplt_state::videoram_w)).share("videoram");
+	map(0xa000, 0xa3ff).ram().w(FUNC(timeplt_state::colorram_w)).share("colorram");
+	map(0xa400, 0xa7ff).ram().w(FUNC(timeplt_state::videoram_w)).share("videoram");
 	map(0xa800, 0xafff).ram();
 	map(0xb000, 0xb0ff).mirror(0x0b00).ram().share("spriteram");
 	map(0xb400, 0xb4ff).mirror(0x0b00).ram().share("spriteram2");
-	map(0xc000, 0xc000).mirror(0x0cff).r(this, FUNC(timeplt_state::scanline_r)).w("timeplt_audio", FUNC(timeplt_audio_device::sound_data_w));
+	map(0xc000, 0xc000).mirror(0x0cff).r(FUNC(timeplt_state::scanline_r)).w("timeplt_audio", FUNC(timeplt_audio_device::sound_data_w));
 	map(0xc200, 0xc200).mirror(0x0cff).portr("DSW1").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xc300, 0xc300).mirror(0x0c9f).portr("IN0");
 	map(0xc300, 0xc30f).lw8("mainlatch_w",
@@ -153,7 +153,7 @@ void timeplt_state::timeplt_main_map(address_map &map)
 void timeplt_state::psurge_main_map(address_map &map)
 {
 	timeplt_main_map(map);
-	map(0x6004, 0x6004).r(this, FUNC(timeplt_state::psurge_protection_r));
+	map(0x6004, 0x6004).r(FUNC(timeplt_state::psurge_protection_r));
 }
 
 void timeplt_state::chkun_main_map(address_map &map)

@@ -195,14 +195,14 @@ void exerion_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("main_ram");
-	map(0x6008, 0x600b).r(this, FUNC(exerion_state::exerion_protection_r));
+	map(0x6008, 0x600b).r(FUNC(exerion_state::exerion_protection_r));
 	map(0x8000, 0x87ff).ram().share("videoram");
 	map(0x8800, 0x887f).ram().share("spriteram");
 	map(0x8880, 0x8bff).ram();
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa800, 0xa800).portr("DSW0");
 	map(0xb000, 0xb000).portr("DSW1");
-	map(0xc000, 0xc000).w(this, FUNC(exerion_state::exerion_videoreg_w));
+	map(0xc000, 0xc000).w(FUNC(exerion_state::exerion_videoreg_w));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xd000, 0xd001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xd800, 0xd801).w("ay2", FUNC(ay8910_device::address_data_w));
@@ -222,8 +222,8 @@ void exerion_state::sub_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8000, 0x800c).w(this, FUNC(exerion_state::exerion_video_latch_w));
-	map(0xa000, 0xa000).r(this, FUNC(exerion_state::exerion_video_timing_r));
+	map(0x8000, 0x800c).w(FUNC(exerion_state::exerion_video_latch_w));
+	map(0xa000, 0xa000).r(FUNC(exerion_state::exerion_video_timing_r));
 }
 
 

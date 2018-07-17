@@ -10,7 +10,7 @@
     driver by Angelo Salese
 
     TODO:
-    - inputs in Cycle Maabou;
+    - inputs in Cycle Maabou (weird dial/positional input);
     - sound (controlled by three i8741);
     - add flipscreen;
     - color prom resistor network is guessed, cyclemb yellows are more reddish on pcb video and photos;
@@ -77,6 +77,7 @@ Dumped by Chack'n
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -247,7 +248,7 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	0x27 cone (0x13 0x00)
 	*/
 
-	for(i=0;i<0x40;i+=2)
+	for(i=0;i<0x80;i+=2)
 	{
 		y = 0xf1 - m_obj2_ram[i];
 		x = m_obj2_ram[i+1] - 56;
@@ -587,21 +588,21 @@ void cyclemb_state::cyclemb_map(address_map &map)
 void cyclemb_state::cyclemb_io(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	map(0xc000, 0xc000).w(this, FUNC(cyclemb_state::cyclemb_bankswitch_w));
+	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
 	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
-	map(0xc09e, 0xc09f).rw(this, FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
-	map(0xc0bf, 0xc0bf).w(this, FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
+	map(0xc09e, 0xc09f).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
+	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
 
 
 void cyclemb_state::skydest_io(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	map(0xc000, 0xc000).w(this, FUNC(cyclemb_state::cyclemb_bankswitch_w));
+	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
 	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
-	map(0xc080, 0xc081).rw(this, FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
+	map(0xc080, 0xc081).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
 	//AM_RANGE(0xc0a0, 0xc0a0) AM_WRITENOP // ?
-	map(0xc0bf, 0xc0bf).w(this, FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
+	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
 
 
@@ -641,7 +642,7 @@ void cyclemb_state::cyclemb_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x40, 0x41).rw(this, FUNC(cyclemb_state::skydest_i8741_1_r), FUNC(cyclemb_state::skydest_i8741_1_w));
+	map(0x40, 0x41).rw(FUNC(cyclemb_state::skydest_i8741_1_r), FUNC(cyclemb_state::skydest_i8741_1_w));
 }
 
 

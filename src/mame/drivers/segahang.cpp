@@ -70,8 +70,8 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 	m_segaic16vid->set_display_enable(data & 0x10);
 
 	// bits 2 & 3: control the lamps
-	m_lamp[1] = BIT(data, 3);
-	m_lamp[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 3);
+	m_lamps[0] = BIT(data, 2);
 
 	// bits 0 & 1: update coin counters
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -404,11 +404,11 @@ void segahang_state::hangon_map(address_map &map)
 	map(0x400000, 0x403fff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
 	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
 	map(0x600000, 0x6007ff).ram().share("sprites");
-	map(0xa00000, 0xa00fff).ram().w(this, FUNC(segahang_state::paletteram_w)).share("paletteram");
+	map(0xa00000, 0xa00fff).ram().w(FUNC(segahang_state::paletteram_w)).share("paletteram");
 	map(0xc00000, 0xc3ffff).rom().region("subcpu", 0);
 	map(0xc68000, 0xc68fff).ram().share("roadram");
 	map(0xc7c000, 0xc7ffff).ram().share("subram");
-	map(0xe00000, 0xffffff).rw(this, FUNC(segahang_state::hangon_io_r), FUNC(segahang_state::hangon_io_w));
+	map(0xe00000, 0xffffff).rw(FUNC(segahang_state::hangon_io_r), FUNC(segahang_state::hangon_io_w));
 }
 
 void segahang_state::decrypted_opcodes_map(address_map &map)
@@ -424,10 +424,10 @@ void segahang_state::sharrier_map(address_map &map)
 	map(0x040000, 0x043fff).ram().share("workram");
 	map(0x100000, 0x107fff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
 	map(0x108000, 0x108fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
-	map(0x110000, 0x110fff).ram().w(this, FUNC(segahang_state::paletteram_w)).share("paletteram");
+	map(0x110000, 0x110fff).ram().w(FUNC(segahang_state::paletteram_w)).share("paletteram");
 	map(0x124000, 0x127fff).ram().share("subram");
 	map(0x130000, 0x130fff).ram().share("sprites");
-	map(0x140000, 0x14ffff).rw(this, FUNC(segahang_state::sharrier_io_r), FUNC(segahang_state::sharrier_io_w));
+	map(0x140000, 0x14ffff).rw(FUNC(segahang_state::sharrier_io_r), FUNC(segahang_state::sharrier_io_w));
 	map(0xc68000, 0xc68fff).ram().share("roadram");
 }
 
@@ -469,7 +469,7 @@ void segahang_state::sound_portmap_2203(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(segahang_state::sound_data_r));
+	map(0x40, 0x40).mirror(0x3f).r(FUNC(segahang_state::sound_data_r));
 }
 
 void segahang_state::sound_map_2151(address_map &map)
@@ -485,7 +485,7 @@ void segahang_state::sound_portmap_2151(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(segahang_state::sound_data_r));
+	map(0x40, 0x40).mirror(0x3f).r(FUNC(segahang_state::sound_data_r));
 }
 
 void segahang_state::sound_portmap_2203x2(address_map &map)
@@ -493,7 +493,7 @@ void segahang_state::sound_portmap_2203x2(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(segahang_state::sound_data_r));
+	map(0x40, 0x40).mirror(0x3f).r(FUNC(segahang_state::sound_data_r));
 	map(0xc0, 0xc1).mirror(0x3e).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
 
@@ -778,9 +778,8 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segahang_state, sub_control_adc_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, segahang_state, adc_status_r))
 
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
-	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
 
 	// video hardware
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segahang)
@@ -798,7 +797,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(segahang_state::hangon_base)
 	shared_base(config);
 	// video hardware
-	MCFG_SEGA_HANGON_SPRITES_ADD("sprites")
+	MCFG_DEVICE_ADD("sprites", SEGA_HANGON_SPRITES, 0)
 MACHINE_CONFIG_END
 
 
@@ -814,7 +813,7 @@ MACHINE_CONFIG_START(segahang_state::sharrier_base)
 	MCFG_DEVICE_CLOCK(MASTER_CLOCK_10MHz)
 
 	// video hardware
-	MCFG_SEGA_SHARRIER_SPRITES_ADD("sprites")
+	MCFG_DEVICE_ADD("sprites", SEGA_SHARRIER_SPRITES, 0)
 MACHINE_CONFIG_END
 
 

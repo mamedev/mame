@@ -538,7 +538,7 @@ READ8_MEMBER( c64_state::vic_colorram_r )
 
 void c64_state::c64_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c64_state::read), FUNC(c64_state::write));
+	map(0x0000, 0xffff).rw(FUNC(c64_state::read), FUNC(c64_state::write));
 }
 
 
@@ -548,7 +548,7 @@ void c64_state::c64_mem(address_map &map)
 
 void c64_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(c64_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(c64_state::vic_videoram_r));
 }
 
 
@@ -558,7 +558,7 @@ void c64_state::vic_videoram_map(address_map &map)
 
 void c64_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(this, FUNC(c64_state::vic_colorram_r));
+	map(0x000, 0x3ff).r(FUNC(c64_state::vic_colorram_r));
 }
 
 
@@ -723,22 +723,22 @@ READ8_MEMBER( c64_state::sid_potx_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->pa_r() >> 6)
+	switch (m_cia1->read_pa() >> 6)
 	{
-	case 1: data = m_joy1->pot_x_r(); break;
-	case 2: data = m_joy2->pot_x_r(); break;
+	case 1: data = m_joy1->read_pot_x(); break;
+	case 2: data = m_joy2->read_pot_x(); break;
 	case 3:
 		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
 		{
-			data = 1 / (1 / m_joy1->pot_x_r() + 1 / m_joy2->pot_x_r());
+			data = 1 / (1 / m_joy1->read_pot_x() + 1 / m_joy2->read_pot_x());
 		}
 		else if (m_joy1->has_pot_x())
 		{
-			data = m_joy1->pot_x_r();
+			data = m_joy1->read_pot_x();
 		}
 		else if (m_joy2->has_pot_x())
 		{
-			data = m_joy2->pot_x_r();
+			data = m_joy2->read_pot_x();
 		}
 		break;
 	}
@@ -750,22 +750,22 @@ READ8_MEMBER( c64_state::sid_poty_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->pa_r() >> 6)
+	switch (m_cia1->read_pa() >> 6)
 	{
-	case 1: data = m_joy1->pot_y_r(); break;
-	case 2: data = m_joy2->pot_y_r(); break;
+	case 1: data = m_joy1->read_pot_y(); break;
+	case 2: data = m_joy2->read_pot_y(); break;
 	case 3:
 		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
 		{
-			data = 1 / (1 / m_joy1->pot_y_r() + 1 / m_joy2->pot_y_r());
+			data = 1 / (1 / m_joy1->read_pot_y() + 1 / m_joy2->read_pot_y());
 		}
 		else if (m_joy1->has_pot_y())
 		{
-			data = m_joy1->pot_y_r();
+			data = m_joy1->read_pot_y();
 		}
 		else if (m_joy2->has_pot_y())
 		{
-			data = m_joy2->pot_y_r();
+			data = m_joy2->read_pot_y();
 		}
 		break;
 	}
@@ -805,13 +805,13 @@ READ8_MEMBER( c64_state::cia1_pa_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy_b = m_joy2->joy_r();
+	uint8_t joy_b = m_joy2->read_joy();
 
 	data &= (0xf0 | (joy_b & 0x0f));
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pb = m_cia1->pb_r();
+	uint8_t cia1_pb = m_cia1->read_pb();
 	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
@@ -873,13 +873,13 @@ READ8_MEMBER( c64_state::cia1_pb_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy_a = m_joy1->joy_r();
+	uint8_t joy_a = m_joy1->read_joy();
 
 	data &= (0xf0 | (joy_a & 0x0f));
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pa = m_cia1->pa_r();
+	uint8_t cia1_pa = m_cia1->read_pa();
 
 	if (!BIT(cia1_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia1_pa, 6)) data &= m_row[6]->read();
@@ -935,7 +935,7 @@ READ8_MEMBER( c64gs_state::cia1_pa_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy_b = m_joy2->joy_r();
+	uint8_t joy_b = m_joy2->read_joy();
 
 	data &= (0xf0 | (joy_b & 0x0f));
 	data &= ~(!BIT(joy_b, 5) << 4);
@@ -963,7 +963,7 @@ READ8_MEMBER( c64gs_state::cia1_pb_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy_a = m_joy1->joy_r();
+	uint8_t joy_a = m_joy1->read_joy();
 
 	data &= (0xf0 | (joy_a & 0x0f));
 	data &= ~(!BIT(joy_a, 5) << 4);
@@ -1037,9 +1037,9 @@ WRITE8_MEMBER( c64_state::cia2_pa_w )
 	m_user->write_m(BIT(data, 2));
 
 	// IEC bus
-	m_iec->atn_w(!BIT(data, 3));
-	m_iec->clk_w(!BIT(data, 4));
-	m_iec->data_w(!BIT(data, 5));
+	m_iec->host_atn_w(!BIT(data, 3));
+	m_iec->host_clk_w(!BIT(data, 4));
+	m_iec->host_data_w(!BIT(data, 5));
 }
 
 READ8_MEMBER( c64_state::cia2_pb_r )
@@ -1391,13 +1391,13 @@ MACHINE_CONFIG_START(c64_state::ntsc)
 	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, c64_state, write))
 	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(*this, c64_state, exp_dma_w))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, nullptr)
+	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, c64_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, c64_state, exp_reset_w))
 	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
 	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
 	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
 	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, atn_w))
+	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, host_atn_w))
 	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
 	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(*this, c64_state, write_user_pb0))
 	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(*this, c64_state, write_user_pb1))
@@ -1550,13 +1550,13 @@ MACHINE_CONFIG_START(c64_state::pal)
 	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, c64_state, write))
 	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(*this, c64_state, exp_dma_w))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, nullptr)
+	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, c64_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, c64_state, exp_reset_w))
 	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
 	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
 	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
 	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, atn_w))
+	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, host_atn_w))
 	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
 	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(*this, c64_state, write_user_pb0))
 	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(*this, c64_state, write_user_pb1))
@@ -1685,13 +1685,13 @@ MACHINE_CONFIG_START(c64gs_state::pal_gs)
 	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, c64_state, write))
 	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(*this, c64_state, exp_dma_w))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, nullptr)
+	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, c64_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, c64_state, exp_reset_w))
 	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
 	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
 	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
 	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
-	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, atn_w))
+	MCFG_PET_USER_PORT_9_HANDLER(WRITELINE(CBM_IEC_TAG, cbm_iec_device, host_atn_w))
 	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
 	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(*this, c64_state, write_user_pb0))
 	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(*this, c64_state, write_user_pb1))
@@ -1733,63 +1733,63 @@ ROM_START( c64 )
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r3")
 	ROM_SYSTEM_BIOS(0, "r1", "Kernal rev. 1" )
-	ROMX_LOAD( "901227-01.u4", 0x0000, 0x2000, CRC(dce782fa) SHA1(87cc04d61fc748b82df09856847bb5c2754a2033), ROM_BIOS(1) )
+	ROMX_LOAD( "901227-01.u4", 0x0000, 0x2000, CRC(dce782fa) SHA1(87cc04d61fc748b82df09856847bb5c2754a2033), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "r2", "Kernal rev. 2" )
-	ROMX_LOAD( "901227-02.u4", 0x0000, 0x2000, CRC(a5c687b3) SHA1(0e2e4ee3f2d41f00bed72f9ab588b83e306fdb13), ROM_BIOS(2) )
+	ROMX_LOAD( "901227-02.u4", 0x0000, 0x2000, CRC(a5c687b3) SHA1(0e2e4ee3f2d41f00bed72f9ab588b83e306fdb13), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "r3", "Kernal rev. 3" )
-	ROMX_LOAD( "901227-03.u4", 0x0000, 0x2000, CRC(dbe3e7c7) SHA1(1d503e56df85a62fee696e7618dc5b4e781df1bb), ROM_BIOS(3) )
+	ROMX_LOAD( "901227-03.u4", 0x0000, 0x2000, CRC(dbe3e7c7) SHA1(1d503e56df85a62fee696e7618dc5b4e781df1bb), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos c64.u4", 0x0000, 0x2000, CRC(2f79984c) SHA1(31e73e66eccb28732daea8ec3ad1addd9b39a017), ROM_BIOS(4) )
+	ROMX_LOAD( "jiffydos c64.u4", 0x0000, 0x2000, CRC(2f79984c) SHA1(31e73e66eccb28732daea8ec3ad1addd9b39a017), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(4, "speeddos", "SpeedDOS" )
-	ROMX_LOAD( "speed-dos.u4", 0x0000, 0x2000, CRC(5beb9ac8) SHA1(8896c8de9e26ef1396eb46020b2de346a3eeab7e), ROM_BIOS(5) )
+	ROMX_LOAD( "speed-dos.u4", 0x0000, 0x2000, CRC(5beb9ac8) SHA1(8896c8de9e26ef1396eb46020b2de346a3eeab7e), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS(5, "speeddos20", "SpeedDOS-Plus+ v2.0" )
-	ROMX_LOAD( "speed-dosplus.u4", 0x0000, 0x2000, CRC(10aee0ae) SHA1(6cebd4dc0c5e8c0b073586a3f1c43cc3349b9736), ROM_BIOS(6) )
+	ROMX_LOAD( "speed-dosplus.u4", 0x0000, 0x2000, CRC(10aee0ae) SHA1(6cebd4dc0c5e8c0b073586a3f1c43cc3349b9736), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS(6, "speeddos27", "SpeedDOS-Plus+ v2.7" )
-	ROMX_LOAD( "speed-dosplus27.u4", 0x0000, 0x2000, CRC(ff59995e) SHA1(c8d864e5fc7089af8afce97dc0a0224df11df1c3), ROM_BIOS(7) )
+	ROMX_LOAD( "speed-dosplus27.u4", 0x0000, 0x2000, CRC(ff59995e) SHA1(c8d864e5fc7089af8afce97dc0a0224df11df1c3), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS(7, "prodos", "Professional-DOS v1" )
-	ROMX_LOAD( "prodos.u4", 0x0000, 0x2000, CRC(37ed83a2) SHA1(35f4f0fe03c0b7b3762b526ba855de41b496fb60), ROM_BIOS(8) )
+	ROMX_LOAD( "prodos.u4", 0x0000, 0x2000, CRC(37ed83a2) SHA1(35f4f0fe03c0b7b3762b526ba855de41b496fb60), ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS(8, "prodos2", "Professional-DOS Release 2/4L2" )
-	ROMX_LOAD( "prodos24l2.u4", 0x0000, 0x2000, CRC(41dad9fe) SHA1(fbf3dcc2ed40e58b07595740ea6fbff7ab19ebad), ROM_BIOS(9) )
+	ROMX_LOAD( "prodos24l2.u4", 0x0000, 0x2000, CRC(41dad9fe) SHA1(fbf3dcc2ed40e58b07595740ea6fbff7ab19ebad), ROM_BIOS(8) )
 	ROM_SYSTEM_BIOS(9, "prodos3", "Professional-DOS Release 3/5L2" )
-	ROMX_LOAD( "prodos35l2.u4", 0x0000, 0x2000, CRC(2822eee7) SHA1(77356b84c1648018863d1c8dd5bc3a37485bc00e), ROM_BIOS(10) )
+	ROMX_LOAD( "prodos35l2.u4", 0x0000, 0x2000, CRC(2822eee7) SHA1(77356b84c1648018863d1c8dd5bc3a37485bc00e), ROM_BIOS(9) )
 	ROM_SYSTEM_BIOS(10, "turborom", "Cockroach Turbo-ROM" )
-	ROMX_LOAD( "turborom.u4", 0x0000, 0x2000, CRC(e6c763a2) SHA1(eff5a4b6bc65daa9421bd3856dd99a3195068e1c), ROM_BIOS(11) )
+	ROMX_LOAD( "turborom.u4", 0x0000, 0x2000, CRC(e6c763a2) SHA1(eff5a4b6bc65daa9421bd3856dd99a3195068e1c), ROM_BIOS(10) )
 	ROM_SYSTEM_BIOS(11, "dosrom", "DOS-ROM v1.2" )
-	ROMX_LOAD( "dosrom12.u4", 0x0000, 0x2000, CRC(ac030fc0) SHA1(0e4b38e81b49f55d52162154a44f0fffd2b0d04f), ROM_BIOS(12) )
+	ROMX_LOAD( "dosrom12.u4", 0x0000, 0x2000, CRC(ac030fc0) SHA1(0e4b38e81b49f55d52162154a44f0fffd2b0d04f), ROM_BIOS(11) )
 	ROM_SYSTEM_BIOS(12, "turborom2", "Datel Turbo ROM II (PAL)" )
-	ROMX_LOAD( "turborom2.u4", 0x0000, 0x2000, CRC(ea3ba683) SHA1(4bb23f764a3d255119fbae37202ca820caa04e1f), ROM_BIOS(13) )
+	ROMX_LOAD( "turborom2.u4", 0x0000, 0x2000, CRC(ea3ba683) SHA1(4bb23f764a3d255119fbae37202ca820caa04e1f), ROM_BIOS(12) )
 	ROM_SYSTEM_BIOS(13, "mercury", "Mercury-ROM v3 (NTSC)" )
-	ROMX_LOAD( "mercury3.u4", 0x0000, 0x2000, CRC(6eac46a2) SHA1(4e351aa5fcb97c4c21e565aa2c830cc09bd47533), ROM_BIOS(14) )
+	ROMX_LOAD( "mercury3.u4", 0x0000, 0x2000, CRC(6eac46a2) SHA1(4e351aa5fcb97c4c21e565aa2c830cc09bd47533), ROM_BIOS(13) )
 	ROM_SYSTEM_BIOS(14, "dolphin", "Dolphin-DOS 1.0" )
-	ROMX_LOAD( "kernal-10-mager.u4", 0x0000, 0x2000, CRC(c9bb21bc) SHA1(e305216e50ff8a7acf102be6c6343e3d44a16233), ROM_BIOS(15) )
+	ROMX_LOAD( "kernal-10-mager.u4", 0x0000, 0x2000, CRC(c9bb21bc) SHA1(e305216e50ff8a7acf102be6c6343e3d44a16233), ROM_BIOS(14) )
 	ROM_SYSTEM_BIOS(15, "dolphin201au", "Dolphin-DOS 2.0 1 au" )
-	ROMX_LOAD( "kernal-20-1_au.u4", 0x0000, 0x2000, CRC(7068bbcc) SHA1(325ce7e32609a8fc704aaa76f5eb4cd7d8099a92), ROM_BIOS(16) )
+	ROMX_LOAD( "kernal-20-1_au.u4", 0x0000, 0x2000, CRC(7068bbcc) SHA1(325ce7e32609a8fc704aaa76f5eb4cd7d8099a92), ROM_BIOS(15) )
 	ROM_SYSTEM_BIOS(16, "dolphin201", "Dolphin-DOS 2.0 1" )
-	ROMX_LOAD( "kernal-20-1.u4", 0x0000, 0x2000, CRC(c9c4c44e) SHA1(7f5d8f08c5ed2182ffb415a3d777fdd922496d02), ROM_BIOS(17) )
+	ROMX_LOAD( "kernal-20-1.u4", 0x0000, 0x2000, CRC(c9c4c44e) SHA1(7f5d8f08c5ed2182ffb415a3d777fdd922496d02), ROM_BIOS(16) )
 	ROM_SYSTEM_BIOS(17, "dolphin202", "Dolphin-DOS 2.0 2" )
-	ROMX_LOAD( "kernal-20-2.u4", 0x0000, 0x2000, CRC(ffaeb9bc) SHA1(5f6c1bad379da16f77bccb58e80910f307dfd5f8), ROM_BIOS(18) )
+	ROMX_LOAD( "kernal-20-2.u4", 0x0000, 0x2000, CRC(ffaeb9bc) SHA1(5f6c1bad379da16f77bccb58e80910f307dfd5f8), ROM_BIOS(17) )
 	ROM_SYSTEM_BIOS(18, "dolphin203", "Dolphin-DOS 2.0 3" )
-	ROMX_LOAD( "kernal-20-3.u4", 0x0000, 0x2000, CRC(4fd511f2) SHA1(316fba280dcb29496d593c0c4e3ee9a19844054e), ROM_BIOS(19) )
+	ROMX_LOAD( "kernal-20-3.u4", 0x0000, 0x2000, CRC(4fd511f2) SHA1(316fba280dcb29496d593c0c4e3ee9a19844054e), ROM_BIOS(18) )
 	ROM_SYSTEM_BIOS(19, "dolphin30", "Dolphin-DOS 3.0" )
-	ROMX_LOAD( "kernal-30.u4", 0x0000, 0x2000, CRC(5402d643) SHA1(733acb96fead2fb4df77840c5bb618f08439fc7e), ROM_BIOS(20) )
+	ROMX_LOAD( "kernal-30.u4", 0x0000, 0x2000, CRC(5402d643) SHA1(733acb96fead2fb4df77840c5bb618f08439fc7e), ROM_BIOS(19) )
 	ROM_SYSTEM_BIOS(20, "taccess", "TurboAccess v2.6" )
-	ROMX_LOAD( "turboaccess26.u4", 0x0000, 0x2000, CRC(93de6cd9) SHA1(a74478f3b9153c13176eac80ebfacc512ae7cbf0), ROM_BIOS(21) )
+	ROMX_LOAD( "turboaccess26.u4", 0x0000, 0x2000, CRC(93de6cd9) SHA1(a74478f3b9153c13176eac80ebfacc512ae7cbf0), ROM_BIOS(20) )
 	ROM_SYSTEM_BIOS(21, "ttrans301", "TurboTrans v3.0 1" )
-	ROMX_LOAD( "turboaccess301.u4", 0x0000, 0x2000, CRC(b3304dcf) SHA1(4d47a265ef65e4823f862cfc3d514c2a71473580), ROM_BIOS(22) )
+	ROMX_LOAD( "turboaccess301.u4", 0x0000, 0x2000, CRC(b3304dcf) SHA1(4d47a265ef65e4823f862cfc3d514c2a71473580), ROM_BIOS(21) )
 	ROM_SYSTEM_BIOS(22, "ttrans302", "TurboTrans v3.0 2" )
-	ROMX_LOAD( "turboaccess302.u4", 0x0000, 0x2000, CRC(9e696a7b) SHA1(5afae75d66d539f4bb4af763f029f0ef6523a4eb), ROM_BIOS(23) )
+	ROMX_LOAD( "turboaccess302.u4", 0x0000, 0x2000, CRC(9e696a7b) SHA1(5afae75d66d539f4bb4af763f029f0ef6523a4eb), ROM_BIOS(22) )
 	ROM_SYSTEM_BIOS(23, "tprocess", "Turbo-Process (PAL)" )
-	ROMX_LOAD( "turboprocess.u4", 0x0000, 0x2000, CRC(e5610d76) SHA1(e3f35777cfd16cce4717858f77ff354763395ba9), ROM_BIOS(24) )
+	ROMX_LOAD( "turboprocess.u4", 0x0000, 0x2000, CRC(e5610d76) SHA1(e3f35777cfd16cce4717858f77ff354763395ba9), ROM_BIOS(23) )
 	ROM_SYSTEM_BIOS(24, "tprocessn", "Turbo-Process (NTSC)" )
-	ROMX_LOAD( "turboprocessus.u4", 0x0000, 0x2000, CRC(7480b76a) SHA1(ef1664b5057ae3cc6d104fc2f5c1fb29ee5a1b2b), ROM_BIOS(25) )
+	ROMX_LOAD( "turboprocessus.u4", 0x0000, 0x2000, CRC(7480b76a) SHA1(ef1664b5057ae3cc6d104fc2f5c1fb29ee5a1b2b), ROM_BIOS(24) )
 	ROM_SYSTEM_BIOS(25, "exos3", "EXOS v3" )
-	ROMX_LOAD( "exos3.u4", 0x0000, 0x2000, CRC(4e54d020) SHA1(f8931b7c0b26807f4de0cc241f0b1e2c8f5271e9), ROM_BIOS(26) )
+	ROMX_LOAD( "exos3.u4", 0x0000, 0x2000, CRC(4e54d020) SHA1(f8931b7c0b26807f4de0cc241f0b1e2c8f5271e9), ROM_BIOS(25) )
 	ROM_SYSTEM_BIOS(26, "exos4", "EXOS v4" )
-	ROMX_LOAD( "exos4.u4", 0x0000, 0x2000, CRC(d5cf83a9) SHA1(d5f03a5c0e9d00032d4751ecc6bcd6385879c9c7), ROM_BIOS(27) )
+	ROMX_LOAD( "exos4.u4", 0x0000, 0x2000, CRC(d5cf83a9) SHA1(d5f03a5c0e9d00032d4751ecc6bcd6385879c9c7), ROM_BIOS(26) )
 	ROM_SYSTEM_BIOS(27, "digidos", "DigiDOS" )
-	ROMX_LOAD( "digidos.u4", 0x0000, 0x2000, CRC(2b0c8e89) SHA1(542d6f61c318bced0642e7c2d4d3b34a0f13e634), ROM_BIOS(28) )
+	ROMX_LOAD( "digidos.u4", 0x0000, 0x2000, CRC(2b0c8e89) SHA1(542d6f61c318bced0642e7c2d4d3b34a0f13e634), ROM_BIOS(27) )
 	ROM_SYSTEM_BIOS(28, "magnum", "Magnum Load" )
-	ROMX_LOAD( "magnum.u4", 0x0000, 0x2000, CRC(b2cffcc6) SHA1(827c782c1723b5d0992c05c00738ae4b2133b641), ROM_BIOS(29) )
+	ROMX_LOAD( "magnum.u4", 0x0000, 0x2000, CRC(b2cffcc6) SHA1(827c782c1723b5d0992c05c00738ae4b2133b641), ROM_BIOS(28) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
@@ -1838,9 +1838,9 @@ ROM_START( c64_se )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "Swedish Characters" )
-	ROMX_LOAD( "charswe.u5", 0x0000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a), ROM_BIOS(1) )
+	ROMX_LOAD( "charswe.u5", 0x0000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "alt", "Swedish Characters (Alt)" )
-	ROMX_LOAD( "charswe2.u5", 0x0000, 0x1000, CRC(377a382b) SHA1(20df25e0ba1c88f31689c1521397c96968967fac), ROM_BIOS(2) )
+	ROMX_LOAD( "charswe2.u5", 0x0000, 0x1000, CRC(377a382b) SHA1(20df25e0ba1c88f31689c1521397c96968967fac), ROM_BIOS(1) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "906114-01.u17", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
@@ -1883,13 +1883,13 @@ ROM_START( sx64 )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_SYSTEM_BIOS(0, "cbm", "Original" )
-	ROMX_LOAD( "251104-04.ud3", 0x0000, 0x2000, CRC(2c5965d4) SHA1(aa136e91ecf3c5ac64f696b3dbcbfc5ba0871c98), ROM_BIOS(1) )
+	ROMX_LOAD( "251104-04.ud3", 0x0000, 0x2000, CRC(2c5965d4) SHA1(aa136e91ecf3c5ac64f696b3dbcbfc5ba0871c98), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos sx64.ud3", 0x0000, 0x2000, CRC(2b5a88f5) SHA1(942c2150123dc30f40b3df6086132ef0a3c43948), ROM_BIOS(2) )
+	ROMX_LOAD( "jiffydos sx64.ud3", 0x0000, 0x2000, CRC(2b5a88f5) SHA1(942c2150123dc30f40b3df6086132ef0a3c43948), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "1541flash", "1541 FLASH!" )
-	ROMX_LOAD( "1541 flash.ud3", 0x0000, 0x2000, CRC(0a1c9b85) SHA1(0bfcaab0ae453b663a6e01cd59a9764805419e00), ROM_BIOS(3) )
+	ROMX_LOAD( "1541 flash.ud3", 0x0000, 0x2000, CRC(0a1c9b85) SHA1(0bfcaab0ae453b663a6e01cd59a9764805419e00), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "turborom", "Cockroach Turbo-ROM" )
-	ROMX_LOAD( "turboromsx.u4", 0x0000, 0x2000, CRC(48579c30) SHA1(6c907fdd07c14e162eb8c8fb750b1bbaf69dccb4), ROM_BIOS(4) )
+	ROMX_LOAD( "turboromsx.u4", 0x0000, 0x2000, CRC(48579c30) SHA1(6c907fdd07c14e162eb8c8fb750b1bbaf69dccb4), ROM_BIOS(3) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.ud1", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
@@ -1960,9 +1960,9 @@ ROM_START( c64c )
 	ROM_REGION( 0x4000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("cbm")
 	ROM_SYSTEM_BIOS(0, "cbm", "Original" )
-	ROMX_LOAD( "251913-01.u4", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88), ROM_BIOS(1) )
+	ROMX_LOAD( "251913-01.u4", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "pdc", "ProLogic-DOS Classic" )
-	ROMX_LOAD( "pdc.u4", 0x0000, 0x4000, CRC(6b653b9c) SHA1(0f44a9c62619424a0cd48a90e1b377b987b494e0), ROM_BIOS(2) )
+	ROMX_LOAD( "pdc.u4", 0x0000, 0x4000, CRC(6b653b9c) SHA1(0f44a9c62619424a0cd48a90e1b377b987b494e0), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )

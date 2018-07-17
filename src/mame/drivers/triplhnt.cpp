@@ -18,7 +18,7 @@ Atari Triple Hunt Driver
 
 void triplhnt_state::init_triplhnt()
 {
-	machine().device<nvram_device>("nvram")->set_base(m_cmos, sizeof(m_cmos));
+	subdevice<nvram_device>("nvram")->set_base(m_cmos, sizeof(m_cmos));
 }
 
 
@@ -133,10 +133,10 @@ void triplhnt_state::triplhnt_map(address_map &map)
 	map(0x0c08, 0x0c08).portr("0C08");
 	map(0x0c09, 0x0c09).portr("0C09");
 	map(0x0c0a, 0x0c0a).portr("0C0A");
-	map(0x0c0b, 0x0c0b).r(this, FUNC(triplhnt_state::input_port_4_r));
-	map(0x0c10, 0x0c1f).r(this, FUNC(triplhnt_state::da_latch_r));
-	map(0x0c20, 0x0c2f).r(this, FUNC(triplhnt_state::cmos_r)).share("nvram");
-	map(0x0c30, 0x0c3f).r(this, FUNC(triplhnt_state::misc_r)).w(m_latch, FUNC(f9334_device::write_a0));
+	map(0x0c0b, 0x0c0b).r(FUNC(triplhnt_state::input_port_4_r));
+	map(0x0c10, 0x0c1f).r(FUNC(triplhnt_state::da_latch_r));
+	map(0x0c20, 0x0c2f).r(FUNC(triplhnt_state::cmos_r)).share("nvram");
+	map(0x0c30, 0x0c3f).r(FUNC(triplhnt_state::misc_r)).w(m_latch, FUNC(f9334_device::write_a0));
 	map(0x0c40, 0x0c40).portr("0C40");
 	map(0x0c48, 0x0c48).portr("0C48");
 	map(0x7000, 0x7fff).rom(); /* program */

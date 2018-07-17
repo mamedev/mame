@@ -55,6 +55,7 @@
 #include "sound/msm5205.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -576,7 +577,7 @@ void mlanding_state::msm5205_update(int chip)
 	uint8_t data = rom[m_msm_pos[chip]];
 	msm5205_device *msm = chip ? m_msm2 : m_msm1;
 
-	msm->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
+	msm->write_data((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
 
 	if (m_msm_nibble[chip])
 		++m_msm_pos[chip];
@@ -724,21 +725,21 @@ void mlanding_state::main_map(address_map &map)
 	map(0x180000, 0x1bffff).ram().share("cha_ram");
 	map(0x1c0000, 0x1c3fff).bankrw("dma_ram");
 	map(0x1c4000, 0x1cffff).ram().share("sub_com_ram");
-	map(0x1d0000, 0x1d0001).w(this, FUNC(mlanding_state::dma_start_w));
-	map(0x1d0002, 0x1d0003).w(this, FUNC(mlanding_state::dma_stop_w));
+	map(0x1d0000, 0x1d0001).w(FUNC(mlanding_state::dma_start_w));
+	map(0x1d0002, 0x1d0003).w(FUNC(mlanding_state::dma_stop_w));
 	map(0x200000, 0x20ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x240004, 0x240005).nopr(); // Watchdog
-	map(0x240006, 0x240007).r(this, FUNC(mlanding_state::input_r));
-	map(0x280000, 0x280fff).rw(this, FUNC(mlanding_state::power_ram_r), FUNC(mlanding_state::power_ram_w));
+	map(0x240006, 0x240007).r(FUNC(mlanding_state::input_r));
+	map(0x280000, 0x280fff).rw(FUNC(mlanding_state::power_ram_r), FUNC(mlanding_state::power_ram_w));
 	map(0x290000, 0x290001).portr("IN1");
 	map(0x290002, 0x290003).portr("IN0");
-	map(0x2a0000, 0x2a0001).w(this, FUNC(mlanding_state::output_w));
-	map(0x2b0000, 0x2b0001).r(this, FUNC(mlanding_state::analog1_msb_r));
-	map(0x2b0002, 0x2b0003).r(this, FUNC(mlanding_state::analog1_lsb_r));
-	map(0x2b0004, 0x2b0005).r(this, FUNC(mlanding_state::analog2_msb_r));
-	map(0x2b0006, 0x2b0007).r(this, FUNC(mlanding_state::analog2_lsb_r));
-	map(0x2c0000, 0x2c0001).r(this, FUNC(mlanding_state::analog3_msb_r));
-	map(0x2c0002, 0x2c0003).r(this, FUNC(mlanding_state::analog3_lsb_r));
+	map(0x2a0000, 0x2a0001).w(FUNC(mlanding_state::output_w));
+	map(0x2b0000, 0x2b0001).r(FUNC(mlanding_state::analog1_msb_r));
+	map(0x2b0002, 0x2b0003).r(FUNC(mlanding_state::analog1_lsb_r));
+	map(0x2b0004, 0x2b0005).r(FUNC(mlanding_state::analog2_msb_r));
+	map(0x2b0006, 0x2b0007).r(FUNC(mlanding_state::analog2_lsb_r));
+	map(0x2c0000, 0x2c0001).r(FUNC(mlanding_state::analog3_msb_r));
+	map(0x2c0002, 0x2c0003).r(FUNC(mlanding_state::analog3_lsb_r));
 	map(0x2d0000, 0x2d0001).nopr();
 	map(0x2d0001, 0x2d0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x2d0003, 0x2d0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
@@ -757,7 +758,7 @@ void mlanding_state::sub_map(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x040000, 0x043fff).ram();
 	map(0x050000, 0x0503ff).ram().share("dsp_prog");
-	map(0x060000, 0x060001).w(this, FUNC(mlanding_state::dsp_control_w));
+	map(0x060000, 0x060001).w(FUNC(mlanding_state::dsp_control_w));
 	map(0x1c0000, 0x1c3fff).bankrw("dma_ram");
 	map(0x1c4000, 0x1cffff).ram().share("sub_com_ram");
 	map(0x200000, 0x2007ff).ram();
@@ -795,12 +796,12 @@ void mlanding_state::audio_map_prog(address_map &map)
 	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xb000, 0xb000).w(this, FUNC(mlanding_state::msm5205_2_start_w));
-	map(0xc000, 0xc000).w(this, FUNC(mlanding_state::msm5205_2_stop_w));
-	map(0xd000, 0xd000).w(this, FUNC(mlanding_state::msm5205_1_start_w));
-	map(0xe000, 0xe000).w(this, FUNC(mlanding_state::msm5205_1_stop_w));
-	map(0xf000, 0xf000).w(this, FUNC(mlanding_state::msm5205_1_addr_lo_w));
-	map(0xf200, 0xf200).w(this, FUNC(mlanding_state::msm5205_1_addr_hi_w));
+	map(0xb000, 0xb000).w(FUNC(mlanding_state::msm5205_2_start_w));
+	map(0xc000, 0xc000).w(FUNC(mlanding_state::msm5205_2_stop_w));
+	map(0xd000, 0xd000).w(FUNC(mlanding_state::msm5205_1_start_w));
+	map(0xe000, 0xe000).w(FUNC(mlanding_state::msm5205_1_stop_w));
+	map(0xf000, 0xf000).w(FUNC(mlanding_state::msm5205_1_addr_lo_w));
+	map(0xf200, 0xf200).w(FUNC(mlanding_state::msm5205_1_addr_hi_w));
 	map(0xf400, 0xf400).nopw();
 	map(0xf600, 0xf600).nopw(); // MSM5205 2 volume?
 	map(0xf800, 0xf800).nopw();
@@ -827,7 +828,7 @@ void mlanding_state::mecha_map_prog(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8fff).ram().share("power_ram");
 	map(0x9000, 0x9003).nopw();
-	map(0x9800, 0x9805).r(this, FUNC(mlanding_state::motor_r));
+	map(0x9800, 0x9805).r(FUNC(mlanding_state::motor_r));
 }
 
 

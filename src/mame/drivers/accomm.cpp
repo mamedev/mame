@@ -25,6 +25,7 @@
 #include "bus/econet/econet.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -637,17 +638,17 @@ WRITE_LINE_MEMBER(accomm_state::econet_clk_w)
 
 void accomm_state::main_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rw(this, FUNC(accomm_state::ram_r), FUNC(accomm_state::ram_w));                                       /* System RAM */
+	map(0x000000, 0x1fffff).rw(FUNC(accomm_state::ram_r), FUNC(accomm_state::ram_w));                                       /* System RAM */
 	map(0x200000, 0x3fffff).noprw();                                                           /* External expansion RAM */
 	map(0x400000, 0x400000).noprw();                                                           /* MODEM */
 	map(0x410000, 0x410000).ram();                                                           /* Econet ID */
 	map(0x420000, 0x42000f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));          /* 6522 VIA (printer etc) */
 	map(0x430000, 0x430001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));            /* 2641 ACIA (RS423) */
-	map(0x440000, 0x440000).w(this, FUNC(accomm_state::ch00switch_w));                                           /* CH00SWITCH */
+	map(0x440000, 0x440000).w(FUNC(accomm_state::ch00switch_w));                                           /* CH00SWITCH */
 	map(0x450000, 0x457fff).ram().share("vram");                                          /* Video RAM */
-	map(0x458000, 0x459fff).r(this, FUNC(accomm_state::read_keyboard1));                                          /* Video ULA */
-	map(0x45a000, 0x45bfff).r(this, FUNC(accomm_state::read_keyboard2));                                          /* Video ULA */
-	map(0x45fe00, 0x45feff).rw(this, FUNC(accomm_state::sheila_r), FUNC(accomm_state::sheila_w));                                 /* Video ULA */
+	map(0x458000, 0x459fff).r(FUNC(accomm_state::read_keyboard1));                                          /* Video ULA */
+	map(0x45a000, 0x45bfff).r(FUNC(accomm_state::read_keyboard2));                                          /* Video ULA */
+	map(0x45fe00, 0x45feff).rw(FUNC(accomm_state::sheila_r), FUNC(accomm_state::sheila_w));                                 /* Video ULA */
 	map(0x460000, 0x467fff).ram().share("nvram");                                         /* CMOS RAM */
 	map(0x470000, 0x47001f).rw(m_adlc, FUNC(mc6854_device::read), FUNC(mc6854_device::write));            /* 68B54 (Econet) */
 	map(0x480000, 0x7fffff).noprw();                                                           /* Reserved */
@@ -865,7 +866,7 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL(16'000'000) / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
 
 	/* acia */
@@ -884,7 +885,7 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 
 	/* econet */
 	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, data_w))
+	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, host_data_w))
 	MCFG_MC6854_OUT_IRQ_CB(INPUTLINE("maincpu", G65816_LINE_NMI))
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, accomm_state, econet_clk_w))
@@ -892,7 +893,7 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
@@ -901,10 +902,10 @@ ROM_START(accomm)
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("100")
 	ROM_SYSTEM_BIOS(0, "100", "1.00 13/Nov/86") /* Version 1.00 13/Nov/86 (C)1986 */
-	ROMX_LOAD( "romv100-3.rom", 0x000000, 0x010000, CRC(bd87a157) SHA1(b9b9ed1aab9ffef2de988b2cfeac293afa11448a), ROM_BIOS(1) )
-	ROMX_LOAD( "romv100-2.rom", 0x010000, 0x010000, CRC(3438adee) SHA1(cd9d5522d9430cb2e1936210b77d2edd280f9419), ROM_BIOS(1) )
-	ROMX_LOAD( "romv100-1.rom", 0x020000, 0x010000, CRC(adc6a073) SHA1(3e87f21fafc1d69f33c5b541a20a98e82aacbfab), ROM_BIOS(1) )
-	ROMX_LOAD( "romv100-0.rom", 0x030000, 0x010000, CRC(6d22950d) SHA1(d4cbdccf8d2bc836fb81182b2ed344d7134fe5c9), ROM_BIOS(1) )
+	ROMX_LOAD( "romv100-3.rom", 0x000000, 0x010000, CRC(bd87a157) SHA1(b9b9ed1aab9ffef2de988b2cfeac293afa11448a), ROM_BIOS(0) )
+	ROMX_LOAD( "romv100-2.rom", 0x010000, 0x010000, CRC(3438adee) SHA1(cd9d5522d9430cb2e1936210b77d2edd280f9419), ROM_BIOS(0) )
+	ROMX_LOAD( "romv100-1.rom", 0x020000, 0x010000, CRC(adc6a073) SHA1(3e87f21fafc1d69f33c5b541a20a98e82aacbfab), ROM_BIOS(0) )
+	ROMX_LOAD( "romv100-0.rom", 0x030000, 0x010000, CRC(6d22950d) SHA1(d4cbdccf8d2bc836fb81182b2ed344d7134fe5c9), ROM_BIOS(0) )
 	/* Version 1.70 04/Jun/87 (C)1987 */
 	/* Versone 3.00 13/gen/88 (C)1988 */
 ROM_END

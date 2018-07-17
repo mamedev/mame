@@ -52,8 +52,8 @@ Ver. 2.2 should exist
 class mgavegas_state : public driver_device
 {
 public:
-	mgavegas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mgavegas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ay(*this, "aysnd"),
 		m_msm(*this, "5205"),
@@ -353,7 +353,7 @@ WRITE8_MEMBER(mgavegas_state::csoki_w)
 	if (LOG_MSM5205)
 		logerror("MSM5205 write to %04X data = %02X \n",offset+0xc800,data);
 	m_msm->reset_w(data&0x10>>4);
-	m_msm->data_w(data&0x0f);
+	m_msm->write_data(data&0x0f);
 }
 
 
@@ -426,10 +426,10 @@ void mgavegas_state::mgavegas_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram().share("nvram");
-	map(0xa000, 0xa003).rw(this, FUNC(mgavegas_state::r_a0), FUNC(mgavegas_state::w_a0));            // AY-3-8910
-	map(0xc000, 0xc001).w(this, FUNC(mgavegas_state::cso1_w));                   // /CSout1
-	map(0xc400, 0xc401).w(this, FUNC(mgavegas_state::cso2_w));                   // /CSout2
-	map(0xc800, 0xc801).rw(this, FUNC(mgavegas_state::csoki_r), FUNC(mgavegas_state::csoki_w));      // /CSoki
+	map(0xa000, 0xa003).rw(FUNC(mgavegas_state::r_a0), FUNC(mgavegas_state::w_a0));            // AY-3-8910
+	map(0xc000, 0xc001).w(FUNC(mgavegas_state::cso1_w));                   // /CSout1
+	map(0xc400, 0xc401).w(FUNC(mgavegas_state::cso2_w));                   // /CSout2
+	map(0xc800, 0xc801).rw(FUNC(mgavegas_state::csoki_r), FUNC(mgavegas_state::csoki_w));      // /CSoki
 	//AM_RANGE(0xcc00, 0xcc01) AM_READWRITE(cso3_r,cso3_w)      // /CSout3 unused
 	//AM_RANGE(0xe000, 0xe003) AM_READWRITE(r_e0,w_e0)          // /CSaux unused
 }

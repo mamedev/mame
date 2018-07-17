@@ -53,6 +53,7 @@
 #include "video/zeus2.h"
 #include "machine/timekpr.h"
 #include "coreutil.h"
+#include "emupal.h"
 
 // Reset bits
 #define RESET_IOASIC        0x01
@@ -667,13 +668,13 @@ void atlantis_state::device_timer(emu_timer &timer, device_timer_id id, int para
  *************************************/
 void atlantis_state::map0(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).rw(this, FUNC(atlantis_state::cmos_r), FUNC(atlantis_state::cmos_w)).umask32(0x000000ff);
+	map(0x00000000, 0x0001ffff).rw(FUNC(atlantis_state::cmos_r), FUNC(atlantis_state::cmos_w)).umask32(0x000000ff);
 	//AM_RANGE(0x00080000, 0x000?0000) AM_READWRITE8(zeus debug)
 	map(0x00100000, 0x0010001f).rw(m_uart1, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff); // Serial UART1 (TL16C552 CS0)
 	map(0x00180000, 0x0018001f).rw(m_uart2, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff); // Serial UART2 (TL16C552 CS1)
-	map(0x00200000, 0x0020001f).rw(this, FUNC(atlantis_state::parallel_r), FUNC(atlantis_state::parallel_w)).umask32(0x000000ff); // Parallel UART (TL16C552 CS2)
-	map(0x00400000, 0x007fffff).rw(this, FUNC(atlantis_state::exprom_r), FUNC(atlantis_state::exprom_w)).umask32(0x000000ff); // EXPROM
-	map(0x00800000, 0x00f00003).rw(this, FUNC(atlantis_state::board_ctrl_r), FUNC(atlantis_state::board_ctrl_w));
+	map(0x00200000, 0x0020001f).rw(FUNC(atlantis_state::parallel_r), FUNC(atlantis_state::parallel_w)).umask32(0x000000ff); // Parallel UART (TL16C552 CS2)
+	map(0x00400000, 0x007fffff).rw(FUNC(atlantis_state::exprom_r), FUNC(atlantis_state::exprom_w)).umask32(0x000000ff); // EXPROM
+	map(0x00800000, 0x00f00003).rw(FUNC(atlantis_state::board_ctrl_r), FUNC(atlantis_state::board_ctrl_w));
 	//AM_RANGE(0x00d80000, 0x00d80003) AM_READWRITE(status_leds_r, status_leds_w)
 	//AM_RANGE(0x00e00000, 0x00e00003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
 	//AM_RANGE(0x00e80000, 0x00e80003) AM_NOP // Watchdog
@@ -683,14 +684,14 @@ void atlantis_state::map0(address_map &map)
 void atlantis_state::map1(address_map &map)
 {
 	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
-	map(0x00200000, 0x00200003).w(this, FUNC(atlantis_state::dcs3_fifo_full_w));
+	map(0x00200000, 0x00200003).w(FUNC(atlantis_state::dcs3_fifo_full_w));
 	map(0x00400000, 0x00400003).w(m_dcs, FUNC(dcs_audio_device::dsio_idma_addr_w));
 	map(0x00600000, 0x00600003).rw(m_dcs, FUNC(dcs_audio_device::dsio_idma_data_r), FUNC(dcs_audio_device::dsio_idma_data_w));
-	map(0x00800000, 0x00900003).rw(this, FUNC(atlantis_state::port_ctrl_r), FUNC(atlantis_state::port_ctrl_w)).umask32(0x0000ffff);
+	map(0x00800000, 0x00900003).rw(FUNC(atlantis_state::port_ctrl_r), FUNC(atlantis_state::port_ctrl_w)).umask32(0x0000ffff);
 	//AM_RANGE(0x00880000, 0x00880003) // AUX Output Initial write 0000fff0, follow by sequence ffef, ffdf, ffbf, fff7. Row Select?
 	//AM_RANGE(0x00900000, 0x00900003) // AUX Input Read once before each sequence write to 0x00880000. Code checks bits 0,1,2. Keypad?
-	map(0x00980000, 0x00980001).rw(this, FUNC(atlantis_state::a2d_ctrl_r), FUNC(atlantis_state::a2d_ctrl_w)); // A2D Control Read / Write.  Bytes written 0x8f, 0xcf. Code if read 0x1 then read 00a00000.
-	map(0x00a00000, 0x00a00001).rw(this, FUNC(atlantis_state::a2d_data_r), FUNC(atlantis_state::a2d_data_w)); // A2D Data
+	map(0x00980000, 0x00980001).rw(FUNC(atlantis_state::a2d_ctrl_r), FUNC(atlantis_state::a2d_ctrl_w)); // A2D Control Read / Write.  Bytes written 0x8f, 0xcf. Code if read 0x1 then read 00a00000.
+	map(0x00a00000, 0x00a00001).rw(FUNC(atlantis_state::a2d_data_r), FUNC(atlantis_state::a2d_data_w)); // A2D Data
 	//AM_RANGE(0x00a80000, 0x00a80003) // Trackball Chan 0 16 bits
 	//AM_RANGE(0x00b00000, 0x00b00003) // Trackball Chan 1 16 bits
 	//AM_RANGE(0x00b80000, 0x00b80003) // Trackball Error 16 bits
@@ -822,7 +823,7 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	MCFG_PCI9050_USER_OUTPUT_CALLBACK(WRITE32(*this, atlantis_state, user_io_output))
 	MCFG_PCI9050_USER_INPUT_CALLBACK(READ32(*this, atlantis_state, user_io_input))
 
-	MCFG_M48T37_ADD(m_rtc)
+	MCFG_DEVICE_ADD(m_rtc, M48T37, 0)
 	MCFG_M48T37_RESET_HANDLER(WRITELINE(*this, atlantis_state, watchdog_reset))
 	MCFG_M48T37_IRQ_HANDLER(WRITELINE(*this, atlantis_state, watchdog_irq))
 
@@ -846,7 +847,7 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(m_dcs, DCS2_AUDIO_DENVER, 0)
+	MCFG_DEVICE_ADD(m_dcs, DCS2_AUDIO_DENVER_2CH, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0xe33)
 
@@ -863,13 +864,13 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	}
 
 	// TL16C552 UART
-	MCFG_DEVICE_ADD(m_uart1, NS16550, XTAL(24'000'000))
+	MCFG_DEVICE_ADD(m_uart1, NS16550, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("com1", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE("com1", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(WRITELINE("com1", rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, atlantis_state, duart_irq_callback))
 
-	MCFG_DEVICE_ADD(m_uart2, NS16550, XTAL(24'000'000))
+	MCFG_DEVICE_ADD(m_uart2, NS16550, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("com2", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE("com2", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(WRITELINE("com2", rs232_port_device, write_rts))

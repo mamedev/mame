@@ -138,6 +138,7 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -164,7 +165,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(ay_pa_w);
@@ -180,7 +181,7 @@ public:
 	void miniboy7_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 
 private:
@@ -196,7 +197,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<5> m_lamp;
+	output_finder<5> m_lamps;
 
 	uint8_t m_ay_pb;
 	int m_gpri;
@@ -314,11 +315,11 @@ WRITE8_MEMBER(miniboy7_state::ay_pa_w)
 
 	data = data ^ 0xff;
 
-//    m_lamp[0] = BIT(data, 0);    // [----x]
-//    m_lamp[1] = BIT(data, 1);    // [---x-]
-//    m_lamp[2] = BIT(data, 2);    // [--x--]
-//    m_lamp[3] = BIT(data, 3);    // [-x---]
-//    m_lamp[4] = BIT(data, 4);    // [x----]
+//    m_lamps[0] = BIT(data, 0);    // [----x]
+//    m_lamps[1] = BIT(data, 1);    // [---x-]
+//    m_lamps[2] = BIT(data, 2);    // [--x--]
+//    m_lamps[3] = BIT(data, 3);    // [-x---]
+//    m_lamps[4] = BIT(data, 4);    // [x----]
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);    // counter
 

@@ -21,6 +21,7 @@
 #include "bus/generic/carts.h"
 #include "bus/nasbus/nasbus.h"
 
+#include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 
@@ -483,9 +484,9 @@ void nascom1_state::nascom1_mem(address_map &map)
 void nascom1_state::nascom1_io(address_map &map)
 {
 	map.global_mask(0x0f);
-	map(0x00, 0x00).rw(this, FUNC(nascom1_state::nascom1_port_00_r), FUNC(nascom1_state::nascom1_port_00_w));
-	map(0x01, 0x01).rw(this, FUNC(nascom1_state::nascom1_port_01_r), FUNC(nascom1_state::nascom1_port_01_w));
-	map(0x02, 0x02).r(this, FUNC(nascom1_state::nascom1_port_02_r));
+	map(0x00, 0x00).rw(FUNC(nascom1_state::nascom1_port_00_r), FUNC(nascom1_state::nascom1_port_00_w));
+	map(0x01, 0x01).rw(FUNC(nascom1_state::nascom1_port_01_r), FUNC(nascom1_state::nascom1_port_01_w));
+	map(0x02, 0x02).r(FUNC(nascom1_state::nascom1_port_02_r));
 	map(0x04, 0x07).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
@@ -500,9 +501,9 @@ void nascom2_state::nascom2_mem(address_map &map)
 void nascom2_state::nascom2_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(nascom2_state::nascom1_port_00_r), FUNC(nascom2_state::nascom1_port_00_w));
-	map(0x01, 0x01).rw(this, FUNC(nascom2_state::nascom1_port_01_r), FUNC(nascom2_state::nascom1_port_01_w));
-	map(0x02, 0x02).r(this, FUNC(nascom2_state::nascom1_port_02_r));
+	map(0x00, 0x00).rw(FUNC(nascom2_state::nascom1_port_00_r), FUNC(nascom2_state::nascom1_port_00_w));
+	map(0x01, 0x01).rw(FUNC(nascom2_state::nascom1_port_01_r), FUNC(nascom2_state::nascom1_port_01_w));
+	map(0x02, 0x02).r(FUNC(nascom2_state::nascom1_port_02_r));
 	map(0x04, 0x07).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
@@ -757,11 +758,11 @@ ROM_START( nascom1 )
 	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_DEFAULT_BIOS("t4")
 	ROM_SYSTEM_BIOS(0, "t1", "NasBug T1")
-	ROMX_LOAD("nasbugt1.rom", 0x0000, 0x0400, CRC(8ea07054) SHA1(3f9a8632826003d6ea59d2418674d0fb09b83a4c), ROM_BIOS(1))
+	ROMX_LOAD("nasbugt1.rom", 0x0000, 0x0400, CRC(8ea07054) SHA1(3f9a8632826003d6ea59d2418674d0fb09b83a4c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "t2", "NasBug T2")
-	ROMX_LOAD("nasbugt2.rom", 0x0000, 0x0400, CRC(e371b58a) SHA1(485b20a560b587cf9bb4208ba203b12b3841689b), ROM_BIOS(2))
+	ROMX_LOAD("nasbugt2.rom", 0x0000, 0x0400, CRC(e371b58a) SHA1(485b20a560b587cf9bb4208ba203b12b3841689b), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "t4", "NasBug T4")
-	ROMX_LOAD("nasbugt4.rom", 0x0000, 0x0800, CRC(f391df68) SHA1(00218652927afc6360c57e77d6a4fd32d4e34566), ROM_BIOS(3))
+	ROMX_LOAD("nasbugt4.rom", 0x0000, 0x0800, CRC(f391df68) SHA1(00218652927afc6360c57e77d6a4fd32d4e34566), ROM_BIOS(2))
 
 	ROM_REGION(0x0800, "gfx1", 0)
 	ROM_LOAD("nascom1.chr",   0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
@@ -771,9 +772,9 @@ ROM_START( nascom2 )
 	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_DEFAULT_BIOS("ns3")
 	ROM_SYSTEM_BIOS(0, "ns1", "NasSys 1")
-	ROMX_LOAD("nassys1.rom", 0x0000, 0x0800, CRC(b6300716) SHA1(29da7d462ba3f569f70ed3ecd93b981f81c7adfa), ROM_BIOS(1))
+	ROMX_LOAD("nassys1.rom", 0x0000, 0x0800, CRC(b6300716) SHA1(29da7d462ba3f569f70ed3ecd93b981f81c7adfa), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ns3", "NasSys 3")
-	ROMX_LOAD("nassys3.rom", 0x0000, 0x0800, CRC(3da17373) SHA1(5fbda15765f04e4cd08cf95c8d82ce217889f240), ROM_BIOS(2))
+	ROMX_LOAD("nassys3.rom", 0x0000, 0x0800, CRC(3da17373) SHA1(5fbda15765f04e4cd08cf95c8d82ce217889f240), ROM_BIOS(1))
 
 	ROM_REGION(0x2000, "basic", 0)
 	ROM_LOAD("basic.rom", 0x0000, 0x2000, CRC(5cb5197b) SHA1(c41669c2b6d6dea808741a2738426d97bccc9b07))

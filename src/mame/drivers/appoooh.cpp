@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 			uint8_t *RAM = memregion("adpcm")->base();
 
 			m_adpcm_data = RAM[m_adpcm_address++];
-			m_msm->data_w(m_adpcm_data >> 4);
+			m_msm->write_data(m_adpcm_data >> 4);
 
 			if (m_adpcm_data == 0x70)
 			{
@@ -192,7 +192,7 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 		}
 		else
 		{
-			m_msm->data_w(m_adpcm_data & 0x0f);
+			m_msm->write_data(m_adpcm_data & 0x0f);
 			m_adpcm_data = -1;
 		}
 	}
@@ -223,11 +223,11 @@ void appoooh_state::main_map(address_map &map)
 
 	map(0xf000, 0xffff).ram();
 	map(0xf000, 0xf01f).share("spriteram");
-	map(0xf020, 0xf3ff).w(this, FUNC(appoooh_state::fg_videoram_w)).share("fg_videoram");
-	map(0xf420, 0xf7ff).w(this, FUNC(appoooh_state::fg_colorram_w)).share("fg_colorram");
+	map(0xf020, 0xf3ff).w(FUNC(appoooh_state::fg_videoram_w)).share("fg_videoram");
+	map(0xf420, 0xf7ff).w(FUNC(appoooh_state::fg_colorram_w)).share("fg_colorram");
 	map(0xf800, 0xf81f).share("spriteram_2");
-	map(0xf820, 0xfbff).w(this, FUNC(appoooh_state::bg_videoram_w)).share("bg_videoram");
-	map(0xfc20, 0xffff).w(this, FUNC(appoooh_state::bg_colorram_w)).share("bg_colorram");
+	map(0xf820, 0xfbff).w(FUNC(appoooh_state::bg_videoram_w)).share("bg_videoram");
+	map(0xfc20, 0xffff).w(FUNC(appoooh_state::bg_colorram_w)).share("bg_colorram");
 }
 
 void appoooh_state::decrypted_opcodes_map(address_map &map)
@@ -240,12 +240,12 @@ void appoooh_state::decrypted_opcodes_map(address_map &map)
 void appoooh_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::write));
-	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::write));
-	map(0x02, 0x02).w("sn3", FUNC(sn76489_device::write));
-	map(0x03, 0x03).portr("DSW1").w(this, FUNC(appoooh_state::adpcm_w));
-	map(0x04, 0x04).portr("BUTTON3").w(this, FUNC(appoooh_state::out_w));
-	map(0x05, 0x05).w(this, FUNC(appoooh_state::scroll_w)); /* unknown */
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::command_w));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::command_w));
+	map(0x02, 0x02).w("sn3", FUNC(sn76489_device::command_w));
+	map(0x03, 0x03).portr("DSW1").w(FUNC(appoooh_state::adpcm_w));
+	map(0x04, 0x04).portr("BUTTON3").w(FUNC(appoooh_state::out_w));
+	map(0x05, 0x05).w(FUNC(appoooh_state::scroll_w)); /* unknown */
 }
 
 

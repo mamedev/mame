@@ -429,23 +429,23 @@ void atarisy1_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x087fff).rom(); /* slapstic maps here */
-	map(0x2e0000, 0x2e0001).r(this, FUNC(atarisy1_state::atarisy1_int3state_r));
+	map(0x2e0000, 0x2e0001).r(FUNC(atarisy1_state::atarisy1_int3state_r));
 	map(0x400000, 0x401fff).ram();
-	map(0x800000, 0x800001).w(this, FUNC(atarisy1_state::atarisy1_xscroll_w)).share("xscroll");
-	map(0x820000, 0x820001).w(this, FUNC(atarisy1_state::atarisy1_yscroll_w)).share("yscroll");
-	map(0x840000, 0x840001).w(this, FUNC(atarisy1_state::atarisy1_priority_w));
-	map(0x860000, 0x860001).w(this, FUNC(atarisy1_state::atarisy1_bankselect_w)).share("bankselect");
+	map(0x800000, 0x800001).w(FUNC(atarisy1_state::atarisy1_xscroll_w)).share("xscroll");
+	map(0x820000, 0x820001).w(FUNC(atarisy1_state::atarisy1_yscroll_w)).share("yscroll");
+	map(0x840000, 0x840001).w(FUNC(atarisy1_state::atarisy1_priority_w));
+	map(0x860000, 0x860001).w(FUNC(atarisy1_state::atarisy1_bankselect_w)).share("bankselect");
 	map(0x880000, 0x880001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x8a0000, 0x8a0001).w(this, FUNC(atarisy1_state::video_int_ack_w));
+	map(0x8a0000, 0x8a0001).w(FUNC(atarisy1_state::video_int_ack_w));
 	map(0x8c0000, 0x8c0001).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x900000, 0x9fffff).ram();
 	map(0xa00000, 0xa01fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
-	map(0xa02000, 0xa02fff).ram().w(this, FUNC(atarisy1_state::atarisy1_spriteram_w)).share("mob");
+	map(0xa02000, 0xa02fff).ram().w(FUNC(atarisy1_state::atarisy1_spriteram_w)).share("mob");
 	map(0xa03000, 0xa03fff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 	map(0xb00000, 0xb007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xf00000, 0xf00fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-	map(0xf20000, 0xf20007).r(this, FUNC(atarisy1_state::trakball_r));
-	map(0xf40000, 0xf4001f).rw(this, FUNC(atarisy1_state::adc_r), FUNC(atarisy1_state::adc_w)).umask16(0x00ff);
+	map(0xf20000, 0xf20007).r(FUNC(atarisy1_state::trakball_r));
+	map(0xf40000, 0xf4001f).rw(FUNC(atarisy1_state::adc_r), FUNC(atarisy1_state::adc_w)).umask16(0x00ff);
 	map(0xf60000, 0xf60003).portr("F60000");
 	map(0xf80001, 0xf80001).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w)); /* used by roadbls2 */
 	map(0xfc0001, 0xfc0001).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r));
@@ -466,7 +466,7 @@ void atarisy1_state::sound_map(address_map &map)
 	map(0x1000, 0x100f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0x1800, 0x1801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x1810, 0x1810).rw(m_soundcomm, FUNC(atari_sound_comm_device::sound_command_r), FUNC(atari_sound_comm_device::sound_response_w));
-	map(0x1820, 0x1820).r(this, FUNC(atarisy1_state::switch_6502_r));
+	map(0x1820, 0x1820).r(FUNC(atarisy1_state::switch_6502_r));
 	map(0x1820, 0x1827).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0x1870, 0x187f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x4000, 0xffff).rom();
@@ -800,7 +800,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::marble)
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 103)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 103, true)
 
 	// No joystick
 	MCFG_DEVICE_REMOVE("adc")
@@ -809,7 +809,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::peterpak)
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 107)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, true)
 
 	// Digital joystick read through ADC
 	MCFG_DEVICE_MODIFY("adc")
@@ -821,7 +821,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::indytemp)
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 105)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 105, true)
 
 	// Digital joystick read through ADC
 	MCFG_DEVICE_MODIFY("adc")
@@ -833,7 +833,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::roadrunn)
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 108)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 108, true)
 
 	// Hall-effect analog joystick
 	MCFG_DEVICE_MODIFY("adc")
@@ -843,7 +843,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::roadb109)
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 109)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 109, true)
 
 	// Road Blasters gas pedal
 	MCFG_DEVICE_MODIFY("adc")
@@ -852,7 +852,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::roadb110)
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 110)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 110, true)
 
 	// Road Blasters gas pedal
 	MCFG_DEVICE_MODIFY("adc")
@@ -879,10 +879,10 @@ MACHINE_CONFIG_END
 */
 
 #define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1) | ROM_SKIP(1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios) | ROM_SKIP(1))
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define MOTHERBOARD_BIOS                                                                                                       \
 	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )                                                                     \
@@ -1913,7 +1913,11 @@ ROM_START( roadblstgu )
 	ROM_LOAD( "136048-1174.a7", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )//
 	ROM_LOAD( "136048-1173.a5", 0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )//
 
+	// FIXME: this game requires the LSI BIOS, so why are we loading the PROMs that are only present on TTL boards?
 	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )
+	ROM_SYSTEM_BIOS( 1, "ttl1", "TTL Motherboard (Rev 1)" )
+	ROM_SYSTEM_BIOS( 2, "lsi", "LSI Motherboard" )
 	MOTHERBOARD_PROMS
 ROM_END
 
@@ -2404,7 +2408,11 @@ ROM_START( roadblstcg )
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
+	// FIXME: this game requires the LSI BIOS, so why are we loading the PROMs that are only present on TTL boards?
 	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )
+	ROM_SYSTEM_BIOS( 1, "ttl1", "TTL Motherboard (Rev 1)" )
+	ROM_SYSTEM_BIOS( 2, "lsi", "LSI Motherboard" )
 	MOTHERBOARD_PROMS
 ROM_END
 

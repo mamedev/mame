@@ -19,8 +19,10 @@
 #include "bus/z88/rom.h"
 #include "bus/z88/z88.h"
 
+#include "emupal.h"
 #include "rendlay.h"
-
+#include "screen.h"
+#include "speaker.h"
 
 #define Z88_NUM_COLOURS 3
 
@@ -39,10 +41,18 @@ class z88_state : public driver_device
 {
 public:
 	z88_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_bios_region(*this, "bios")
+		, m_ram(*this, RAM_TAG)
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_blink(*this, "blink")
+		, m_mono(*this, "mono")
+		, m_speaker(*this, "speaker")
+		, m_lines(*this, "LINE%u", 0U)
+		, m_banks(*this, "bank%u", 1U)
+		, m_carts(*this, "slot%u", 0U)
 	{ }
 
 	void z88(machine_config &config);
@@ -86,8 +96,16 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_memory_region m_bios_region;
 	required_device<ram_device> m_ram;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<upd65031_device> m_blink;
+	required_device<speaker_device> m_mono;
+	required_device<speaker_sound_device> m_speaker;
+	required_ioport_array<8> m_lines;
+	required_memory_bank_array<5> m_banks;
+	optional_device_array<z88cart_slot_device, 4> m_carts;
 
 	struct
 	{
@@ -95,10 +113,9 @@ private:
 		uint8_t page;
 	} m_bank[4];
 
-	int                   m_bank_type[4];
-	uint8_t *               m_bios;
-	uint8_t *               m_ram_base;
-	z88cart_slot_device * m_carts[4];
+	int         m_bank_type[4];
+	uint8_t *   m_bios;
+	uint8_t *   m_ram_base;
 };
 
 #endif /* MAME_INCLUDES_Z88_H */

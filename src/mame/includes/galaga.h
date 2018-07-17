@@ -9,6 +9,7 @@
 #include "sound/discrete.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 class galaga_state : public driver_device
@@ -28,7 +29,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(bosco_dsw_r);
@@ -79,7 +80,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 	emu_timer *m_cpu3_interrupt_timer;
 
 	/* machine state */

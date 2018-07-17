@@ -159,8 +159,8 @@ void mephisto_state::rebel5_mem(address_map &map)
 	map(0x0000, 0x1fff).ram();                        // AM_BASE(m_p_ram)
 	map(0x2000, 0x2007).w("outlatch", FUNC(hc259_device::write_d7));           // Status LEDs+ buzzer
 	map(0x3000, 0x4000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x3000, 0x3007).r(this, FUNC(mephisto_state::read_keys));            // Rebel 5.0
-	map(0x5000, 0x5000).w(this, FUNC(mephisto_state::write_lcd));
+	map(0x3000, 0x3007).r(FUNC(mephisto_state::read_keys));            // Rebel 5.0
+	map(0x5000, 0x5000).w(FUNC(mephisto_state::write_lcd));
 	map(0x6000, 0x6000).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x7000, 0x7000).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x8000, 0xffff).rom();
@@ -170,13 +170,13 @@ void mephisto_state::rebel5_mem(address_map &map)
 void mephisto_state::mephisto_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram(); //AM_BASE(m_p_ram)
-	map(0x2000, 0x2000).w(this, FUNC(mephisto_state::write_lcd));
+	map(0x2000, 0x2000).w(FUNC(mephisto_state::write_lcd));
 	map(0x2400, 0x2407).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
-	map(0x2c00, 0x2c07).r(this, FUNC(mephisto_state::read_keys));
+	map(0x2c00, 0x2c07).r(FUNC(mephisto_state::read_keys));
 	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7));           // Status LEDs+ buzzer
-	map(0x3800, 0x3800).w(this, FUNC(mephisto_state::mephisto_NMI));            // NMI enable
+	map(0x3800, 0x3800).w(FUNC(mephisto_state::mephisto_NMI));            // NMI enable
 	map(0x4000, 0x7fff).rom();                        // Opening Library
 	map(0x8000, 0xffff).rom();
 }
@@ -185,9 +185,9 @@ void mephisto_state::mm2_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).ram(); //AM_BASE(m_p_ram)
 	map(0x1000, 0x1007).w("outlatch", FUNC(hc259_device::write_d7));       //Status LEDs
-	map(0x1800, 0x1807).r(this, FUNC(mephisto_state::read_keys));
+	map(0x1800, 0x1807).r(FUNC(mephisto_state::read_keys));
 	map(0x2000, 0x2000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x2800, 0x2800).w(this, FUNC(mephisto_state::write_lcd));
+	map(0x2800, 0x2800).w(FUNC(mephisto_state::write_lcd));
 	map(0x3000, 0x3000).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x3800, 0x3800).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x4000, 0x7fff).rom();                        // Opening Library ?
@@ -365,7 +365,7 @@ ROM_START(mm4)
 	ROM_LOAD("mephisto4.rom", 0x8000, 0x8000, CRC(f68a4124) SHA1(d1d03a9aacc291d5cb720d2ee2a209eeba13a36c))
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg440", "HG440 Opening Library" )
-	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(2))
+	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(1))
 ROM_END
 
 ROM_START(mm4tk)
@@ -373,7 +373,7 @@ ROM_START(mm4tk)
 	ROM_LOAD("mm4tk.rom", 0x8000, 0x8000, CRC(51cb36a4) SHA1(9e184b4e85bb721e794b88d8657ae8d2ff5a24af))
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg440", "HG440 Opening Library" )
-	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(0))
+	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(1))
 ROM_END
 
 ROM_START(mm5tk)
@@ -381,7 +381,7 @@ ROM_START(mm5tk)
 	ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, BAD_DUMP CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" )
-	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(0))
+	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614), ROM_BIOS(1))
 ROM_END
 
 ROM_START(mm5)
@@ -389,7 +389,7 @@ ROM_START(mm5)
 	ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" )
-	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(2))
+	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614), ROM_BIOS(1))
 ROM_END
 
 ROM_START(mm50)
@@ -397,7 +397,7 @@ ROM_START(mm50)
 	ROM_LOAD("mm50.rom", 0x8000, 0x8000, CRC(fcfa7e6e) SHA1(afeac3a8c957ba58cefaa27b11df974f6f2066da))
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" )
-	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(2))
+	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614), ROM_BIOS(1))
 ROM_END
 
 

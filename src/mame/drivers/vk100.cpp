@@ -179,7 +179,6 @@ public:
 		m_crtc(*this, "crtc"),
 		m_speaker(*this, "beeper"),
 		m_uart(*this, "i8251"),
-		m_dbrg(*this, COM5016T_TAG),
 		//m_i8251_rx_timer(nullptr),
 		//m_i8251_tx_timer(nullptr),
 		//m_sync_timer(nullptr),
@@ -193,7 +192,6 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_speaker;
 	required_device<i8251_device> m_uart;
-	required_device<com8116_device> m_dbrg;
 	//required_device<> m_i8251_rx_timer;
 	//required_device<> m_i8251_tx_timer;
 	//required_device<> m_sync_timer;
@@ -240,7 +238,6 @@ public:
 	DECLARE_WRITE8_MEMBER(vgREG);
 	DECLARE_WRITE8_MEMBER(vgEX);
 	DECLARE_WRITE8_MEMBER(KBDW);
-	DECLARE_WRITE8_MEMBER(BAUD);
 	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
 	DECLARE_READ8_MEMBER(SYSTAT_A);
 	DECLARE_READ8_MEMBER(SYSTAT_B);
@@ -617,11 +614,6 @@ WRITE8_MEMBER(vk100_state::KBDW)
  * 1 1 1 0 - 33   (5068800 / 33 = 16*9600)        = 9600 baud
  * 1 1 1 1 - 16   (5068800 / 16 = 16*19800)      ~= 19200 baud
  */
-WRITE8_MEMBER(vk100_state::BAUD)
-{
-	m_dbrg->str_w(data & 0x0f);
-	m_dbrg->stt_w(data >> 4);
-}
 
 /* port 0x40-0x47: "SYSTAT A"; various status bits, poorly documented in the tech manual
  * /GO    VDM1   VDM1   VDM1   VDM1   Dip     RST7.5 GND***
@@ -691,7 +683,7 @@ void vk100_state::vk100_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x6fff).rom();
-	map(0x7000, 0x700f).mirror(0x0ff0).r(this, FUNC(vk100_state::vk100_keyboard_column_r));
+	map(0x7000, 0x700f).mirror(0x0ff0).r(FUNC(vk100_state::vk100_keyboard_column_r));
 	map(0x8000, 0xbfff).ram();
 }
 
@@ -743,23 +735,23 @@ void vk100_state::vk100_io(address_map &map)
 	map(0x00, 0x00).mirror(0xBE).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x01, 0x01).mirror(0xBE).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	// Comments are from page 118 (5-14) of http://web.archive.org/web/20091015205827/http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
-	map(0x40, 0x41).mirror(0x98).w(this, FUNC(vk100_state::vgLD_X));  //LD X LO + HI 12 bits
-	map(0x42, 0x43).mirror(0x98).w(this, FUNC(vk100_state::vgLD_Y));  //LD Y LO + HI 12 bits
-	map(0x44, 0x44).mirror(0x98).w(this, FUNC(vk100_state::vgERR));    //LD ERR ('error' in bresenham algorithm)
-	map(0x45, 0x45).mirror(0x98).w(this, FUNC(vk100_state::vgSOPS));   //LD SOPS (screen options (plus uart dest))
-	map(0x46, 0x46).mirror(0x98).w(this, FUNC(vk100_state::vgPAT));    //LD PAT (pattern register)
-	map(0x47, 0x47).mirror(0x98).w(this, FUNC(vk100_state::vgPMUL));   //LD PMUL (pattern multiplier)
-	map(0x60, 0x63).mirror(0x80).w(this, FUNC(vk100_state::vgREG));     //LD DU, DVM, DIR, WOPS (register file)
-	map(0x64, 0x67).mirror(0x80).w(this, FUNC(vk100_state::vgEX));    //EX MOV, DOT, VEC, ER
-	map(0x68, 0x68).mirror(0x83).w(this, FUNC(vk100_state::KBDW));   //KBDW (probably AM_MIRROR(0x03))
-	map(0x6C, 0x6C).mirror(0x83).w(this, FUNC(vk100_state::BAUD));   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
+	map(0x40, 0x41).mirror(0x98).w(FUNC(vk100_state::vgLD_X));  //LD X LO + HI 12 bits
+	map(0x42, 0x43).mirror(0x98).w(FUNC(vk100_state::vgLD_Y));  //LD Y LO + HI 12 bits
+	map(0x44, 0x44).mirror(0x98).w(FUNC(vk100_state::vgERR));    //LD ERR ('error' in bresenham algorithm)
+	map(0x45, 0x45).mirror(0x98).w(FUNC(vk100_state::vgSOPS));   //LD SOPS (screen options (plus uart dest))
+	map(0x46, 0x46).mirror(0x98).w(FUNC(vk100_state::vgPAT));    //LD PAT (pattern register)
+	map(0x47, 0x47).mirror(0x98).w(FUNC(vk100_state::vgPMUL));   //LD PMUL (pattern multiplier)
+	map(0x60, 0x63).mirror(0x80).w(FUNC(vk100_state::vgREG));     //LD DU, DVM, DIR, WOPS (register file)
+	map(0x64, 0x67).mirror(0x80).w(FUNC(vk100_state::vgEX));    //EX MOV, DOT, VEC, ER
+	map(0x68, 0x68).mirror(0x83).w(FUNC(vk100_state::KBDW));   //KBDW (probably AM_MIRROR(0x03))
+	map(0x6C, 0x6C).mirror(0x83).w(COM5016T_TAG, FUNC(com8116_device::stt_str_w));   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
 	map(0x70, 0x70).mirror(0x82).w(m_uart, FUNC(i8251_device::data_w)); //LD COMD (i8251 data reg)
 	map(0x71, 0x71).mirror(0x82).w(m_uart, FUNC(i8251_device::control_w)); //LD COM (i8251 control reg)
 	//AM_RANGE (0x74, 0x74) AM_MIRROR(0x83) AM_WRITE(unknown_74)
 	//AM_RANGE (0x78, 0x78) AM_MIRROR(0x83) AM_WRITE(kbdw)   //KBDW ?(mirror?)
 	//AM_RANGE (0x7C, 0x7C) AM_MIRROR(0x83) AM_WRITE(unknown_7C)
-	map(0x40, 0x47).mirror(0x80).r(this, FUNC(vk100_state::SYSTAT_A)); // SYSTAT A (state machine done and last 4 bits of vram, as well as dipswitches)
-	map(0x48, 0x48).mirror(0x87/*0x80*/).r(this, FUNC(vk100_state::SYSTAT_B)); // SYSTAT B (uart stuff)
+	map(0x40, 0x47).mirror(0x80).r(FUNC(vk100_state::SYSTAT_A)); // SYSTAT A (state machine done and last 4 bits of vram, as well as dipswitches)
+	map(0x48, 0x48).mirror(0x87/*0x80*/).r(FUNC(vk100_state::SYSTAT_B)); // SYSTAT B (uart stuff)
 	map(0x50, 0x50).mirror(0x86).r(m_uart, FUNC(i8251_device::data_r)); // UART O
 	map(0x51, 0x51).mirror(0x86).r(m_uart, FUNC(i8251_device::status_r)); // UAR
 	//AM_RANGE (0x58, 0x58) AM_MIRROR(0x87) AM_READ(unknown_58)

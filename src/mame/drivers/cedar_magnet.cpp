@@ -22,6 +22,11 @@
     * there seem to be 2 checks, one based on a weird sector on the discs, the other based on
       a port read
   - add additional hardware notes from ArcadeHacker
+  - layer enables on War Mission? (transitions from title screen etc.)
+
+ notes:
+  - 2 player mode can be enabled in service mode for War Mission, it is disabled by default
+    (settings are stored on the disk)
 
 */
 
@@ -115,6 +120,7 @@ I suspect the additional memory was an afterthought.
 #include "machine/cedar_magnet_sprite.h"
 #include "machine/cedar_magnet_flop.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -241,9 +247,9 @@ void cedar_magnet_state::cedar_magnet_mainboard_sub_pal_map(address_map &map)
 {
 // these are 3x MOTOROLA MM2114N SRAM 4096 bit RAM (twice the size because we map bytes, but only 4 bits are used)
 // these are on the master board memory sub-board
-	map(0x2400, 0x27ff).ram().w(this, FUNC(cedar_magnet_state::palette_r_w)).share("pal_r");
-	map(0x2800, 0x2bff).ram().w(this, FUNC(cedar_magnet_state::palette_g_w)).share("pal_g");
-	map(0x3000, 0x33ff).ram().w(this, FUNC(cedar_magnet_state::palette_b_w)).share("pal_b");
+	map(0x2400, 0x27ff).ram().w(FUNC(cedar_magnet_state::palette_r_w)).share("pal_r");
+	map(0x2800, 0x2bff).ram().w(FUNC(cedar_magnet_state::palette_g_w)).share("pal_g");
+	map(0x3000, 0x33ff).ram().w(FUNC(cedar_magnet_state::palette_b_w)).share("pal_b");
 }
 
 void cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map(address_map &map)
@@ -262,10 +268,10 @@ void cedar_magnet_state::cedar_magnet_io(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x18, 0x18).rw(this, FUNC(cedar_magnet_state::port18_r), FUNC(cedar_magnet_state::port18_w));
-	map(0x19, 0x19).rw(this, FUNC(cedar_magnet_state::port19_r), FUNC(cedar_magnet_state::port19_w));
-	map(0x1a, 0x1a).r(this, FUNC(cedar_magnet_state::port1a_r));
-	map(0x1b, 0x1b).w(this, FUNC(cedar_magnet_state::port1b_w));
+	map(0x18, 0x18).rw(FUNC(cedar_magnet_state::port18_r), FUNC(cedar_magnet_state::port18_w));
+	map(0x19, 0x19).rw(FUNC(cedar_magnet_state::port19_r), FUNC(cedar_magnet_state::port19_w));
+	map(0x1a, 0x1a).r(FUNC(cedar_magnet_state::port1a_r));
+	map(0x1b, 0x1b).w(FUNC(cedar_magnet_state::port1b_w));
 
 	map(0x20, 0x23).rw(m_ic48_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x40, 0x43).rw(m_ic49_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
@@ -277,10 +283,10 @@ void cedar_magnet_state::cedar_magnet_io(address_map &map)
 	map(0x6c, 0x6c).portr("TEST");
 
 	// banking / access controls to the sub-board memory
-	map(0x70, 0x70).w(this, FUNC(cedar_magnet_state::rambank_palbank_w));
-	map(0x74, 0x74).w(this, FUNC(cedar_magnet_state::palupload_w));
-	map(0x78, 0x78).rw(this, FUNC(cedar_magnet_state::watchdog_r), FUNC(cedar_magnet_state::paladdr_w));
-	map(0x7c, 0x7c).r(this, FUNC(cedar_magnet_state::port7c_r)); // protection??
+	map(0x70, 0x70).w(FUNC(cedar_magnet_state::rambank_palbank_w));
+	map(0x74, 0x74).w(FUNC(cedar_magnet_state::palupload_w));
+	map(0x78, 0x78).rw(FUNC(cedar_magnet_state::watchdog_r), FUNC(cedar_magnet_state::paladdr_w));
+	map(0x7c, 0x7c).r(FUNC(cedar_magnet_state::port7c_r)); // protection??
 
 	map(0xff, 0xff).w(m_cedsound, FUNC(cedar_magnet_sound_device::sound_command_w));
 }
@@ -296,7 +302,7 @@ void cedar_magnet_state::cedar_bank0(address_map &map)
 
 	/* memory configuration  2*/
 	map(0x20000, 0x2bfff).m(m_sub_ram_bankdev, FUNC(address_map_bank_device::amap8));
-	map(0x2c000, 0x2ffff).rw(this, FUNC(cedar_magnet_state::other_cpu_r), FUNC(cedar_magnet_state::other_cpu_w));
+	map(0x2c000, 0x2ffff).rw(FUNC(cedar_magnet_state::other_cpu_r), FUNC(cedar_magnet_state::other_cpu_w));
 
 	/* memory configuration 3*/
 	map(0x30000, 0x31fff).rom().region("maincpu", 0x0000).mirror(0x0e000);
@@ -859,13 +865,16 @@ ROM_START( mag_xain )
 	ROM_LOAD( "xain.img", 0x00000, 0xf0000, CRC(5647849f) SHA1(edd2f3f6359424583bf526bf4601476dc849e617) )
 ROM_END
 
-// game has various lockups, including in attract mode, which may be due to problems with the image or other emulation bugs.
 ROM_START( mag_war )
 	BIOS_ROM
+	/* Data after 0xd56b0 would not read consistently, however the game only appears to use the first 24 tracks (up to 0x48fff)
+	   as it loads once on startup, not during gameplay, and all tracks before that gave consistent reads.  There is data after this
+	   point but it is likely leftovers from another game / whatever was on the disk before, so for our purposes this should be fine.
 
+	   Some bullets do seem to spawn from locations where there are no enemies, but I think this is just annoying game design.
+	*/
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	// track 44, side 0 is broken at least (0x400 bytes were missing, substituted with 0x00 values) maybe others have bad data too, needs reading with original drive.
-	ROM_LOAD( "warmission.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(547e2338) SHA1(a798fc0a92d0b8d0d4f95a9eb7081a30f6b28e35) )
+	ROM_LOAD( "war mission wm 4_6_87.img", 0x00000, 0xf0000, CRC(e6b35710) SHA1(e24f9adde09e4eacbfb58e359a2df263748fc7de) )
 ROM_END
 
 /*
@@ -927,5 +936,5 @@ GAME( 1987, cedmag,   0,      cedar_magnet, cedar_magnet, cedar_magnet_state, em
 GAME( 1987, mag_time, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Sega
 GAME( 1987, mag_exzi, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
 GAME( 1987, mag_xain, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Technos
-GAME( 1987, mag_war,  cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "War Mission (WM 4/6/87)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, mag_war,  cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "War Mission (WM 4/6/87)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

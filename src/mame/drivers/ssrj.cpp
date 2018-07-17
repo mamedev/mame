@@ -65,14 +65,14 @@ READ8_MEMBER(ssrj_state::wheel_r)
 void ssrj_state::ssrj_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(ssrj_state::vram1_w)).share("vram1");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(ssrj_state::vram2_w)).share("vram2");
+	map(0xc000, 0xc7ff).ram().w(FUNC(ssrj_state::vram1_w)).share("vram1");
+	map(0xc800, 0xcfff).ram().w(FUNC(ssrj_state::vram2_w)).share("vram2");
 	map(0xd000, 0xd7ff).ram().share("vram3");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(ssrj_state::vram4_w)).share("vram4");
+	map(0xd800, 0xdfff).ram().w(FUNC(ssrj_state::vram4_w)).share("vram4");
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xefff).ram().share("scrollram");
 	map(0xf000, 0xf000).portr("IN0");
-	map(0xf001, 0xf001).r(this, FUNC(ssrj_state::wheel_r));
+	map(0xf001, 0xf001).r(FUNC(ssrj_state::wheel_r));
 	map(0xf002, 0xf002).portr("IN2");
 	map(0xf003, 0xf003).nopw(); /* unknown */
 	map(0xf401, 0xf401).r("aysnd", FUNC(ay8910_device::data_r));

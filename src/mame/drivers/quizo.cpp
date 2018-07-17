@@ -28,6 +28,7 @@ Xtals 8MHz, 21.47727MHz
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -150,7 +151,7 @@ void quizo_state::memmap(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xffff).w(this, FUNC(quizo_state::vram_w));
+	map(0xc000, 0xffff).w(FUNC(quizo_state::vram_w));
 
 }
 
@@ -161,8 +162,8 @@ void quizo_state::portmap(address_map &map)
 	map(0x10, 0x10).portr("IN1");
 	map(0x40, 0x40).portr("IN2");
 	map(0x50, 0x51).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x60, 0x60).w(this, FUNC(quizo_state::port60_w));
-	map(0x70, 0x70).w(this, FUNC(quizo_state::port70_w));
+	map(0x60, 0x60).w(FUNC(quizo_state::port60_w));
+	map(0x70, 0x70).w(FUNC(quizo_state::port70_w));
 }
 
 static INPUT_PORTS_START( quizo )

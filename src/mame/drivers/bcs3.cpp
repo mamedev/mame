@@ -53,6 +53,7 @@
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "imagedev/cassette.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -137,9 +138,9 @@ void bcs3_state::bcs3_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).mirror(0x2000).rom().region("roms", 0);
-	map(0x1000, 0x13ff).mirror(0x2000).r(this, FUNC(bcs3_state::keyboard_r));
+	map(0x1000, 0x13ff).mirror(0x2000).r(FUNC(bcs3_state::keyboard_r));
 	map(0x1400, 0x17ff).mirror(0x2000).noprw(); //  /WAIT circuit
-	map(0x1800, 0x1bff).mirror(0x2000).r(this, FUNC(bcs3_state::video_r));
+	map(0x1800, 0x1bff).mirror(0x2000).r(FUNC(bcs3_state::video_r));
 	map(0x1c00, 0x1fff).mirror(0x2000).ram().share("videoram");
 }
 
@@ -147,9 +148,9 @@ void bcs3_state::bcs3a_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).mirror(0x2000).rom().region("roms", 0);
-	map(0x1000, 0x13ff).mirror(0x2000).r(this, FUNC(bcs3_state::keyboard_r));
+	map(0x1000, 0x13ff).mirror(0x2000).r(FUNC(bcs3_state::keyboard_r));
 	map(0x1400, 0x17ff).mirror(0x2000).noprw(); //  /WAIT circuit
-	map(0x1800, 0x1bff).mirror(0x2000).r(this, FUNC(bcs3_state::zx_r));
+	map(0x1800, 0x1bff).mirror(0x2000).r(FUNC(bcs3_state::zx_r));
 	map(0x3c00, 0x7fff).ram().share("videoram");
 	map(0xf000, 0xf3ff).rom().region("roms", 0x1000);
 }

@@ -600,7 +600,7 @@ void ampoker2_state::ampoker2_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram().share("nvram");
-	map(0xe000, 0xefff).ram().w(this, FUNC(ampoker2_state::ampoker2_videoram_w)).share("videoram");
+	map(0xe000, 0xefff).ram().w(FUNC(ampoker2_state::ampoker2_videoram_w)).share("videoram");
 }
 
 void ampoker2_state::ampoker2_io_map(address_map &map)
@@ -616,14 +616,14 @@ void ampoker2_state::ampoker2_io_map(address_map &map)
 	map(0x16, 0x16).portr("IN6");
 	map(0x17, 0x17).portr("IN7");
 //  AM_RANGE(0x21, 0x21) AM_WRITENOP                    /* undocumented, write 0x1a after each reset */
-	map(0x30, 0x30).w(this, FUNC(ampoker2_state::ampoker2_port30_w));    /* see write handlers */
-	map(0x31, 0x31).w(this, FUNC(ampoker2_state::ampoker2_port31_w));    /* see write handlers */
-	map(0x32, 0x32).w(this, FUNC(ampoker2_state::ampoker2_port32_w));    /* see write handlers */
-	map(0x33, 0x33).w(this, FUNC(ampoker2_state::ampoker2_port33_w));    /* see write handlers */
-	map(0x34, 0x34).w(this, FUNC(ampoker2_state::ampoker2_port34_w));    /* see write handlers */
-	map(0x35, 0x35).w(this, FUNC(ampoker2_state::ampoker2_port35_w));    /* see write handlers */
-	map(0x36, 0x36).w(this, FUNC(ampoker2_state::ampoker2_port36_w));    /* see write handlers */
-	map(0x37, 0x37).w(this, FUNC(ampoker2_state::ampoker2_watchdog_reset_w));
+	map(0x30, 0x30).w(FUNC(ampoker2_state::ampoker2_port30_w));    /* see write handlers */
+	map(0x31, 0x31).w(FUNC(ampoker2_state::ampoker2_port31_w));    /* see write handlers */
+	map(0x32, 0x32).w(FUNC(ampoker2_state::ampoker2_port32_w));    /* see write handlers */
+	map(0x33, 0x33).w(FUNC(ampoker2_state::ampoker2_port33_w));    /* see write handlers */
+	map(0x34, 0x34).w(FUNC(ampoker2_state::ampoker2_port34_w));    /* see write handlers */
+	map(0x35, 0x35).w(FUNC(ampoker2_state::ampoker2_port35_w));    /* see write handlers */
+	map(0x36, 0x36).w(FUNC(ampoker2_state::ampoker2_port36_w));    /* see write handlers */
+	map(0x37, 0x37).w(FUNC(ampoker2_state::ampoker2_watchdog_reset_w));
 	map(0x38, 0x39).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x3A, 0x3A).r("aysnd", FUNC(ay8910_device::data_r));
 }

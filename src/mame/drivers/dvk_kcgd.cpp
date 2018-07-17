@@ -22,6 +22,7 @@
 #include "machine/clock.h"
 #include "machine/ms7004.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -123,13 +124,13 @@ protected:
 void kcgd_state::kcgd_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0000000, 0077777).rw(this, FUNC(kcgd_state::vram_mmap_r), FUNC(kcgd_state::vram_mmap_w));
+	map(0000000, 0077777).rw(FUNC(kcgd_state::vram_mmap_r), FUNC(kcgd_state::vram_mmap_w));
 	map(0100000, 0157777).rom();
-	map(0160000, 0160001).mirror(03774).rw(this, FUNC(kcgd_state::vram_addr_r), FUNC(kcgd_state::vram_addr_w));
-	map(0160002, 0160003).mirror(03774).rw(this, FUNC(kcgd_state::vram_data_r), FUNC(kcgd_state::vram_data_w));
-	map(0167770, 0167771).rw(this, FUNC(kcgd_state::status_r), FUNC(kcgd_state::status_w));
-	map(0167772, 0167772).rw(this, FUNC(kcgd_state::palette_index_r), FUNC(kcgd_state::palette_index_w)); // reads always return 0
-	map(0167773, 0167773).rw(this, FUNC(kcgd_state::palette_data_r), FUNC(kcgd_state::palette_data_w));
+	map(0160000, 0160001).mirror(03774).rw(FUNC(kcgd_state::vram_addr_r), FUNC(kcgd_state::vram_addr_w));
+	map(0160002, 0160003).mirror(03774).rw(FUNC(kcgd_state::vram_data_r), FUNC(kcgd_state::vram_data_w));
+	map(0167770, 0167771).rw(FUNC(kcgd_state::status_r), FUNC(kcgd_state::status_w));
+	map(0167772, 0167772).rw(FUNC(kcgd_state::palette_index_r), FUNC(kcgd_state::palette_index_w)); // reads always return 0
+	map(0167773, 0167773).rw(FUNC(kcgd_state::palette_data_r), FUNC(kcgd_state::palette_data_w));
 //  map(0176560, 0176567).ram();  // USART2 -- host
 //  map(0177560, 0177567).ram();  // USART3 -- keyboard
 }
@@ -160,8 +161,6 @@ void kcgd_state::machine_reset()
 
 void kcgd_state::video_start()
 {
-//  screen_device *screen = machine().device<screen_device>("screen");
-
 	// 64 kwords, word size is 17 bits
 	m_videoram = std::make_unique<uint32_t[]>(65536);
 
@@ -169,10 +168,10 @@ void kcgd_state::video_start()
 	m_tmpbmp.allocate(KCGD_DISP_HORZ, KCGD_DISP_VERT);
 /*
     m_vsync_on_timer = timer_alloc(TIMER_ID_VSYNC_ON);
-    m_vsync_on_timer->adjust(screen->time_until_pos(0, 0), 0, screen->frame_period());
+    m_vsync_on_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->frame_period());
 
     m_vsync_off_timer = timer_alloc(TIMER_ID_VSYNC_OFF);
-    m_vsync_off_timer->adjust(screen->time_until_pos(16, 0), 0, screen->frame_period());
+    m_vsync_off_timer->adjust(m_screen->time_until_pos(16, 0), 0, m_screen->frame_period());
 */
 	m_500hz_timer = timer_alloc(TIMER_ID_500HZ);
 	m_500hz_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
@@ -378,9 +377,9 @@ ROM_START( dvk_kcgd )
 	ROM_REGION16_BE(0x100000,"maincpu", ROMREGION_ERASE00)
 	ROM_DEFAULT_BIOS("181")
 	ROM_SYSTEM_BIOS(0, "181", "mask 181")
-	ROMX_LOAD("kr1801re2-181.bin", 0100000, 020000, CRC(acac124f) SHA1(412c3eb71bece6f791fc5a9d707cf4692fd0b45b), ROM_BIOS(1))
+	ROMX_LOAD("kr1801re2-181.bin", 0100000, 020000, CRC(acac124f) SHA1(412c3eb71bece6f791fc5a9d707cf4692fd0b45b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "182", "mask 182")
-	ROMX_LOAD("kr1801re2-182.bin", 0100000, 020000, CRC(3ca2921a) SHA1(389b30c40ed7e41dae71d58c7bff630359a48153), ROM_BIOS(2))
+	ROMX_LOAD("kr1801re2-182.bin", 0100000, 020000, CRC(3ca2921a) SHA1(389b30c40ed7e41dae71d58c7bff630359a48153), ROM_BIOS(1))
 ROM_END
 
 /* Driver */

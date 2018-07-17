@@ -15,6 +15,7 @@
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -324,12 +325,12 @@ void fk1_state::fk1_io(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x20, 0x23).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x30, 0x30).rw(this, FUNC(fk1_state::fk1_bank_ram_r), FUNC(fk1_state::fk1_intr_w));
+	map(0x30, 0x30).rw(FUNC(fk1_state::fk1_bank_ram_r), FUNC(fk1_state::fk1_intr_w));
 	map(0x40, 0x40).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x41, 0x41).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x50, 0x50).rw(this, FUNC(fk1_state::fk1_bank_rom_r), FUNC(fk1_state::fk1_disk_w));
+	map(0x50, 0x50).rw(FUNC(fk1_state::fk1_bank_rom_r), FUNC(fk1_state::fk1_disk_w));
 	map(0x60, 0x63).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x70, 0x70).rw(this, FUNC(fk1_state::fk1_mouse_r), FUNC(fk1_state::fk1_reset_int_w));
+	map(0x70, 0x70).rw(FUNC(fk1_state::fk1_mouse_r), FUNC(fk1_state::fk1_reset_int_w));
 }
 
 /* Input ports */
@@ -473,9 +474,9 @@ MACHINE_CONFIG_END
 ROM_START( fk1 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "orig", "Original BIOS" )
-	ROMX_LOAD( "fk1.u65",      0x0000, 0x0800, CRC(145561f8) SHA1(a4eb17d773e51b34620c508b6cebcb4531ae99c2), ROM_BIOS(1))
+	ROMX_LOAD( "fk1.u65",      0x0000, 0x0800, CRC(145561f8) SHA1(a4eb17d773e51b34620c508b6cebcb4531ae99c2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "diag", "Diag BIOS" )
-	ROMX_LOAD( "fk1-diag.u65", 0x0000, 0x0800, CRC(e0660ae1) SHA1(6ad609049b28f27126af0a8a6224362351073dee), ROM_BIOS(2))
+	ROMX_LOAD( "fk1-diag.u65", 0x0000, 0x0800, CRC(e0660ae1) SHA1(6ad609049b28f27126af0a8a6224362351073dee), ROM_BIOS(1))
 ROM_END
 
 /* Driver */

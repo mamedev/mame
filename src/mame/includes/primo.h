@@ -31,7 +31,9 @@ public:
 		m_cassette(*this, "cassette"),
 		m_cart1(*this, "cartslot1"),
 		m_cart2(*this, "cartslot2"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_mem_exp_port(*this, "MEMORY_EXPANSION"),
+		m_clock_port(*this, "CPU_CLOCK")
 	{ }
 
 	void init_primo48();
@@ -80,6 +82,8 @@ private:
 	required_device<generic_slot_device> m_cart1;
 	required_device<generic_slot_device> m_cart2;
 	required_device<screen_device> m_screen;
+	required_ioport m_mem_exp_port;
+	required_ioport m_clock_port;
 
 	memory_region *m_cart1_rom;
 	memory_region *m_cart2_rom;

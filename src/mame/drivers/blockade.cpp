@@ -15,6 +15,8 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "emupal.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -85,16 +87,16 @@ void blockade_state::main_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x6000).rom();
 	map(0x0400, 0x07ff).mirror(0x6000).rom(); // comotion, blasto, hustle
-	map(0x8000, 0x83ff).mirror(0x6c00).ram().w(this, FUNC(blockade_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x6c00).ram().w(FUNC(blockade_state::videoram_w)).share("videoram");
 	map(0x9000, 0x90ff).mirror(0x6f00).ram();
 }
 
 void blockade_state::main_io_map(address_map &map)
 {
-	map(0x01, 0x01).portr("IN0").w(this, FUNC(blockade_state::coin_latch_w));
-	map(0x02, 0x02).portr("IN1").w(this, FUNC(blockade_state::sound_freq_w));
-	map(0x04, 0x04).portr("IN2").w(this, FUNC(blockade_state::env_on_w));
-	map(0x08, 0x08).w(this, FUNC(blockade_state::env_off_w));
+	map(0x01, 0x01).portr("IN0").w(FUNC(blockade_state::coin_latch_w));
+	map(0x02, 0x02).portr("IN1").w(FUNC(blockade_state::sound_freq_w));
+	map(0x04, 0x04).portr("IN2").w(FUNC(blockade_state::env_on_w));
+	map(0x08, 0x08).w(FUNC(blockade_state::env_off_w));
 }
 
 

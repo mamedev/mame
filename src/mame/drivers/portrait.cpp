@@ -23,9 +23,14 @@ Pierpaolo Prazzoli, xx-07-2004
    ON    ON -> camera test
 
 TODO:
- - add sound
- - add colors
- - fix sprites positions
+ - add sound;
+ - add colors (maybe not RGB555);
+ - fix sprites positions (zooming?);
+ - video priority bits;
+ - offset background scrolling positions (i.e. monkey climbing on trees);
+ - camera device (type?);
+ - misc unknown input/outputs;
+
 
 RAM Location 9240: Controls what level you are on: 0-3 (for each scene)
 
@@ -105,8 +110,8 @@ WRITE8_MEMBER(portrait_state::ctrl_w)
 	machine().bookkeeping().coin_counter_w(2, data & 0x04);
 
 	/* the 2 lamps near the camera */
-	m_lamp[0] = BIT(data, 3);
-	m_lamp[1] = BIT(data, 6);
+	m_lamps[0] = BIT(data, 3);
+	m_lamps[1] = BIT(data, 6);
 
 	/* shows the black and white photo from the camera */
 	output().set_value("photo", (data >> 7) & 1);
@@ -125,18 +130,18 @@ WRITE8_MEMBER(portrait_state::negative_scroll_w)
 void portrait_state::portrait_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().w(this, FUNC(portrait_state::bgvideo_write)).share("bgvideoram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(portrait_state::fgvideo_write)).share("fgvideoram");
+	map(0x8000, 0x87ff).ram().w(FUNC(portrait_state::bgvideo_write)).share("bgvideoram");
+	map(0x8800, 0x8fff).ram().w(FUNC(portrait_state::fgvideo_write)).share("fgvideoram");
 	map(0x9000, 0x91ff).ram().share("spriteram");
 	map(0x9200, 0x97ff).ram();
 	map(0xa000, 0xa000).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xa010, 0xa010).nopw(); // ?
 	map(0xa000, 0xa000).portr("DSW1");
 	map(0xa004, 0xa004).portr("DSW2");
-	map(0xa008, 0xa008).portr("SYSTEM").w(this, FUNC(portrait_state::ctrl_w));
+	map(0xa008, 0xa008).portr("SYSTEM").w(FUNC(portrait_state::ctrl_w));
 	map(0xa010, 0xa010).portr("INPUTS");
-	map(0xa018, 0xa018).nopr().w(this, FUNC(portrait_state::positive_scroll_w));
-	map(0xa019, 0xa019).w(this, FUNC(portrait_state::negative_scroll_w));
+	map(0xa018, 0xa018).nopr().w(FUNC(portrait_state::positive_scroll_w));
+	map(0xa019, 0xa019).w(FUNC(portrait_state::negative_scroll_w));
 	map(0xa800, 0xa83f).ram().share("nvram");
 	map(0xffff, 0xffff).nopr();
 }
@@ -392,5 +397,5 @@ ROM_END
 
 
 
-GAME( 1983, portrait, 0,        portrait, portrait, portrait_state, empty_init, ROT270, "Olympia", "Portraits (set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, portraita,portrait, portrait, portrait, portrait_state, empty_init, ROT270, "Olympia", "Portraits (set 2)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, portrait, 0,        portrait, portrait, portrait_state, empty_init, ROT270, "Olympia", "Portraits (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, portraita,portrait, portrait, portrait, portrait_state, empty_init, ROT270, "Olympia", "Portraits (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

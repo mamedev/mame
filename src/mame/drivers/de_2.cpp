@@ -122,7 +122,7 @@ void de_2_state::de_2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2100, 0x2103).rw("pia21", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).w(this, FUNC(de_2_state::sol3_w)); // solenoids
+	map(0x2200, 0x2200).w(FUNC(de_2_state::sol3_w)); // solenoids
 	map(0x2400, 0x2403).rw("pia24", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).rw("pia28", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
@@ -135,10 +135,10 @@ void de_2_state::de_2_audio_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x2400, 0x2400).r(this, FUNC(de_2_state::sound_latch_r));
-	map(0x2800, 0x2800).w(this, FUNC(de_2_state::sample_bank_w));
+	map(0x2400, 0x2400).r(FUNC(de_2_state::sound_latch_r));
+	map(0x2800, 0x2800).w(FUNC(de_2_state::sample_bank_w));
 	// 0x2c00        - 4052(?)
-	map(0x3000, 0x3000).w(this, FUNC(de_2_state::sample_w));
+	map(0x3000, 0x3000).w(FUNC(de_2_state::sample_w));
 	// 0x3800        - Watchdog reset
 	map(0x4000, 0x7fff).bankr("sample_bank");
 	map(0x8000, 0xffff).rom();
@@ -245,7 +245,7 @@ WRITE_LINE_MEMBER(de_2_state::ym2151_irq_w)
 
 WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
 {
-	m_msm5205->data_w(m_sample_data >> 4);
+	m_msm5205->write_data(m_sample_data >> 4);
 	if(m_more_data)
 	{
 		if(m_nmi_enable)

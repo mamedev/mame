@@ -150,6 +150,7 @@ Dumped by Chack'n
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -339,11 +340,11 @@ CUSTOM_INPUT_MEMBER(ssingles_state::controls_r)
 
 void ssingles_state::ssingles_map(address_map &map)
 {
-	map(0x0000, 0x00ff).w(this, FUNC(ssingles_state::ssingles_videoram_w));
-	map(0x0800, 0x08ff).w(this, FUNC(ssingles_state::ssingles_colorram_w));
+	map(0x0000, 0x00ff).w(FUNC(ssingles_state::ssingles_videoram_w));
+	map(0x0800, 0x08ff).w(FUNC(ssingles_state::ssingles_colorram_w));
 	map(0x0000, 0x1fff).rom();
-	map(0xc000, 0xc000).r(this, FUNC(ssingles_state::c000_r));
-	map(0xc001, 0xc001).rw(this, FUNC(ssingles_state::c001_r), FUNC(ssingles_state::c001_w));
+	map(0xc000, 0xc000).r(FUNC(ssingles_state::c000_r));
+	map(0xc001, 0xc001).rw(FUNC(ssingles_state::c001_r), FUNC(ssingles_state::c001_w));
 	map(0x6000, 0xbfff).rom();
 	map(0xf800, 0xffff).ram();
 }
@@ -378,13 +379,13 @@ WRITE8_MEMBER(ssingles_state::atamanot_prot_w)
 
 void ssingles_state::atamanot_map(address_map &map)
 {
-	map(0x0000, 0x00ff).w(this, FUNC(ssingles_state::ssingles_videoram_w));
-	map(0x0800, 0x08ff).w(this, FUNC(ssingles_state::ssingles_colorram_w));
+	map(0x0000, 0x00ff).w(FUNC(ssingles_state::ssingles_videoram_w));
+	map(0x0800, 0x08ff).w(FUNC(ssingles_state::ssingles_colorram_w));
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x60ff).ram(); //kanji tilemap?
 //  AM_RANGE(0x6000, 0x7fff) AM_ROM
-	map(0x8000, 0x83ff).r(this, FUNC(ssingles_state::atamanot_prot_r));
+	map(0x8000, 0x83ff).r(FUNC(ssingles_state::atamanot_prot_r));
 //  AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("question",0x10000)
 //  AM_RANGE(0xc000, 0xc000) AM_READ(c000_r )
 //  AM_RANGE(0xc001, 0xc001) AM_READWRITE(c001_r, c001_w )
@@ -415,7 +416,7 @@ void ssingles_state::atamanot_io_map(address_map &map)
 	map(0x08, 0x08).nopr();
 	map(0x0a, 0x0a).w("ay2", FUNC(ay8910_device::data_w));
 	map(0x16, 0x16).portr("DSW0");
-	map(0x18, 0x18).portr("DSW1").w(this, FUNC(ssingles_state::atamanot_prot_w));
+	map(0x18, 0x18).portr("DSW1").w(FUNC(ssingles_state::atamanot_prot_w));
 	map(0x1c, 0x1c).portr("INPUTS");
 //  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
 	map(0xfe, 0xfe).w("crtc", FUNC(mc6845_device::address_w));

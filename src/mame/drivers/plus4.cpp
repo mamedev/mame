@@ -484,7 +484,7 @@ READ8_MEMBER( plus4_state::ted_videoram_r )
 
 void plus4_state::plus4_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(plus4_state::read), FUNC(plus4_state::write));
+	map(0x0000, 0xffff).rw(FUNC(plus4_state::read), FUNC(plus4_state::write));
 }
 
 
@@ -494,7 +494,7 @@ void plus4_state::plus4_mem(address_map &map)
 
 void plus4_state::ted_videoram_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(plus4_state::ted_videoram_r));
+	map(0x0000, 0xffff).r(FUNC(plus4_state::ted_videoram_r));
 }
 
 
@@ -709,13 +709,13 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 	//logerror("%s cpu write %02x\n", machine().describe_context(), data);
 
 	// serial data
-	m_iec->data_w(!BIT(data, 0));
+	m_iec->host_data_w(!BIT(data, 0));
 
 	// serial clock
-	m_iec->clk_w(!BIT(data, 1));
+	m_iec->host_clk_w(!BIT(data, 1));
 
 	// serial attention
-	m_iec->atn_w(!BIT(data, 2));
+	m_iec->host_atn_w(!BIT(data, 2));
 
 	// cassette motor
 	m_cassette->motor_w(BIT(data, 3));
@@ -758,7 +758,7 @@ READ8_MEMBER( plus4_state::ted_k_r )
 	// joystick
 	if (!BIT(offset, 2))
 	{
-		uint8_t joy_a = m_joy1->joy_r();
+		uint8_t joy_a = m_joy1->read_joy();
 
 		data &= (0xf0 | (joy_a & 0x0f));
 		data &= ~(!BIT(joy_a, 5) << 6);
@@ -766,7 +766,7 @@ READ8_MEMBER( plus4_state::ted_k_r )
 
 	if (!BIT(offset, 1))
 	{
-		uint8_t joy_b = m_joy2->joy_r();
+		uint8_t joy_b = m_joy2->read_joy();
 
 		data &= (0xf0 | (joy_b & 0x0f));
 		data &= ~(!BIT(joy_b, 5) << 7);
@@ -914,37 +914,37 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, plus4_user_port_cards, nullptr)
-	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p2)) // cassette sense
-	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p3))
-	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p4))
-	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p5))
-	MCFG_PET_USER_PORT_8_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_rxc))
-	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p0))
-	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
-	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p7))
-	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dcd)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
-	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p6))
-	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(MOS6529_USER_TAG, mos6529_device, write_p1))
-	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dsr)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
+	MCFG_DEVICE_ADD(m_user, PET_USER_PORT, plus4_user_port_cards, nullptr)
+	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p2)) // cassette sense
+	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p3))
+	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p4))
+	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p5))
+	MCFG_PET_USER_PORT_8_HANDLER(WRITELINE(m_acia, mos6551_device, write_rxc))
+	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p0))
+	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(m_acia, mos6551_device, write_rxd))
+	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p7))
+	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(m_acia, mos6551_device, write_dcd)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
+	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p6))
+	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(m_spi_user, mos6529_device, write_p1))
+	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(m_acia, mos6551_device, write_dsr)) MCFG_DEVCB_XOR(1) // TODO: add missing pull up before inverter
 
-	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
+	MCFG_DEVICE_ADD(m_acia, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_RXC_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
-	MCFG_MOS6551_RTS_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_d)) MCFG_DEVCB_XOR(1)
-	MCFG_MOS6551_DTR_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_e)) MCFG_DEVCB_XOR(1)
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
+	MCFG_MOS6551_RXC_HANDLER(WRITELINE(m_user, pet_user_port_device, write_8))
+	MCFG_MOS6551_RTS_HANDLER(WRITELINE(m_user, pet_user_port_device, write_d)) MCFG_DEVCB_XOR(1)
+	MCFG_MOS6551_DTR_HANDLER(WRITELINE(m_user, pet_user_port_device, write_e)) MCFG_DEVCB_XOR(1)
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE(m_user, pet_user_port_device, write_m))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, plus4_state, acia_irq_w))
 
-	MCFG_DEVICE_ADD(MOS6529_USER_TAG, MOS6529, 0)
-	MCFG_MOS6529_P0_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
-	MCFG_MOS6529_P1_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_k))
-	MCFG_MOS6529_P2_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4))
-	MCFG_MOS6529_P3_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_5))
-	MCFG_MOS6529_P4_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6))
-	MCFG_MOS6529_P5_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
-	MCFG_MOS6529_P6_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_j))
-	MCFG_MOS6529_P7_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_f))
+	MCFG_DEVICE_ADD(m_spi_user, MOS6529, 0)
+	MCFG_MOS6529_P0_HANDLER(WRITELINE(m_user, pet_user_port_device, write_b))
+	MCFG_MOS6529_P1_HANDLER(WRITELINE(m_user, pet_user_port_device, write_k))
+	MCFG_MOS6529_P2_HANDLER(WRITELINE(m_user, pet_user_port_device, write_4))
+	MCFG_MOS6529_P3_HANDLER(WRITELINE(m_user, pet_user_port_device, write_5))
+	MCFG_MOS6529_P4_HANDLER(WRITELINE(m_user, pet_user_port_device, write_6))
+	MCFG_MOS6529_P5_HANDLER(WRITELINE(m_user, pet_user_port_device, write_7))
+	MCFG_MOS6529_P6_HANDLER(WRITELINE(m_user, pet_user_port_device, write_j))
+	MCFG_MOS6529_P7_HANDLER(WRITELINE(m_user, pet_user_port_device, write_f))
 
 	MCFG_DEVICE_ADD(MOS6529_KB_TAG, MOS6529, 0)
 	MCFG_MOS6529_P0_HANDLER(WRITELINE(*this, plus4_state, write_kb0))
@@ -959,7 +959,7 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, plus4_datassette_devices, "c1531", NOOP)
 
 	MCFG_CBM_IEC_ADD("c1541")
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(WRITELINE(m_user, pet_user_port_device, write_9))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
@@ -1159,11 +1159,11 @@ ROM_START( plus4 )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r4", "Revision 4" )
-	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(1) )
+	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r5", "Revision 5" )
-	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(2) )
+	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(3) ) // first half contains R5 kernal
+	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(2) ) // first half contains R5 kernal
 
 	ROM_LOAD( "318006-01.u23", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 
@@ -1186,11 +1186,11 @@ ROM_START( plus4p )
 
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
-	ROMX_LOAD( "318004-03.u24", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
+	ROMX_LOAD( "318004-03.u24", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
-	ROMX_LOAD( "318004-04.u24", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
+	ROMX_LOAD( "318004-04.u24", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
-	ROMX_LOAD( "318004-05.u24", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
+	ROMX_LOAD( "318004-05.u24", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(2) )
 
 	ROM_REGION( 0x8000, "function", 0 )
 	ROM_LOAD( "317053-01.u25", 0x0000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
@@ -1209,11 +1209,11 @@ ROM_START( c16 )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r4", "Revision 4" )
-	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(1) )
+	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r5", "Revision 5" )
-	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(2) )
+	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(3) ) // first half contains R5 kernal
+	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(2) ) // first half contains R5 kernal
 
 	ROM_LOAD( "318006-01.u23", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 
@@ -1232,11 +1232,11 @@ ROM_START( c16p )
 
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
-	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
+	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
-	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
+	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
-	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
+	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(2) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
@@ -1253,9 +1253,9 @@ ROM_START( c16_hu )
 
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "318030-01.u4", 0x4000, 0x4000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "318030-01.u4", 0x4000, 0x4000, NO_DUMP, ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "318030-02.u4", 0x4000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee), ROM_BIOS(2) )
+	ROMX_LOAD( "318030-02.u4", 0x4000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee), ROM_BIOS(1) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
@@ -1272,11 +1272,11 @@ ROM_START( c116 )
 
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
-	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
+	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
-	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
+	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
-	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
+	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(2) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u101", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )

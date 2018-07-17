@@ -16,6 +16,7 @@
 #include "video/pc080sn.h"
 #include "video/pc090oj.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 class rbisland_state : public driver_device
 {

@@ -50,7 +50,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_digits(*this, "digit%u", 0U)
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(fpga_w);
@@ -61,10 +61,10 @@ public:
 private:
 	unsigned char row_selection;
 	void fpga_send(unsigned char cmd);
-	virtual void machine_start() override { m_digits.resolve(); m_lamp.resolve(); }
+	virtual void machine_start() override { m_digits.resolve(); m_lamps.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	output_finder<4> m_digits;
-	output_finder<16> m_lamp;
+	output_finder<16> m_lamps;
 };
 
 /************************
@@ -206,12 +206,12 @@ void barata_state::fpga_send(unsigned char cmd)
 				{
 //                  logerror("LED: ERASE ALL\n");
 					for (int i=0; i<16; i++){
-						m_lamp[i] = 1;
+						m_lamps[i] = 1;
 					}
 				}
 				else
 				{
-					m_lamp[lamp_index] = state ? 0 : 1;
+					m_lamps[lamp_index] = state ? 0 : 1;
 				}
 			default:
 				mode = FPGA_WAITING_FOR_NEW_CMD;

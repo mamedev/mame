@@ -241,11 +241,11 @@ void proteus_state::proteus_6809_mem(address_map &map)
 	map(0xe004, 0xe005).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Terminal
 	map(0xe008, 0xe009).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Printer
 	map(0xe00c, 0xe00d).rw(m_acia[2], FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Modem
-	map(0xe014, 0xe014).rw(this, FUNC(proteus_state::drive_register_r), FUNC(proteus_state::drive_register_w));
-	map(0xe018, 0xe01b).rw(this, FUNC(proteus_state::fdc_inv_r), FUNC(proteus_state::fdc_inv_w)); // Floppy control
+	map(0xe014, 0xe014).rw(FUNC(proteus_state::drive_register_r), FUNC(proteus_state::drive_register_w));
+	map(0xe018, 0xe01b).rw(FUNC(proteus_state::fdc_inv_r), FUNC(proteus_state::fdc_inv_w)); // Floppy control
 	map(0xe020, 0xe027).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));       // Timer
-	map(0xe030, 0xe036).rw(this, FUNC(proteus_state::network_r), FUNC(proteus_state::network_w)); // Poly network
-	map(0xe060, 0xe060).w(this, FUNC(proteus_state::enable_z80_w));
+	map(0xe030, 0xe036).rw(FUNC(proteus_state::network_r), FUNC(proteus_state::network_w)); // Poly network
+	map(0xe060, 0xe060).w(FUNC(proteus_state::enable_z80_w));
 	map(0xf000, 0xffff).rom().region("bios", 0);
 }
 
@@ -262,11 +262,11 @@ void proteus_state::proteus_z80_io(address_map &map)
 	map(0x04, 0x05).mirror(0xff00).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Terminal
 	map(0x08, 0x09).mirror(0xff00).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Printer
 	map(0x0c, 0x0d).mirror(0xff00).rw(m_acia[2], FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Modem
-	map(0x14, 0x14).mirror(0xff00).rw(this, FUNC(proteus_state::drive_register_r), FUNC(proteus_state::drive_register_w));
-	map(0x18, 0x1b).mirror(0xff00).rw(this, FUNC(proteus_state::fdc_inv_r), FUNC(proteus_state::fdc_inv_w)); // Floppy control
+	map(0x14, 0x14).mirror(0xff00).rw(FUNC(proteus_state::drive_register_r), FUNC(proteus_state::drive_register_w));
+	map(0x18, 0x1b).mirror(0xff00).rw(FUNC(proteus_state::fdc_inv_r), FUNC(proteus_state::fdc_inv_w)); // Floppy control
 	map(0x20, 0x27).mirror(0xff00).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));       // Timer
-	map(0x30, 0x36).mirror(0xff00).rw(this, FUNC(proteus_state::network_r), FUNC(proteus_state::network_w)); // Poly network
-	map(0x50, 0x50).mirror(0xff00).w(this, FUNC(proteus_state::enable_6809_w));
+	map(0x30, 0x36).mirror(0xff00).rw(FUNC(proteus_state::network_r), FUNC(proteus_state::network_w)); // Poly network
+	map(0x50, 0x50).mirror(0xff00).w(FUNC(proteus_state::enable_6809_w));
 }
 
 
@@ -333,7 +333,7 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("z80", INPUT_LINE_IRQ0))
 
 	/* fdc */
-	MCFG_FD1771_ADD("fdc", 4_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("fdc", FD1771, 4_MHz_XTAL / 2)
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, proteus_state, motor_w))
 	MCFG_WD_FDC_FORCE_READY
 
@@ -365,7 +365,7 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE("irqs", input_merger_device, in_w<3>))
 
-	MCFG_CENTRONICS_ADD("parallel", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("parallel", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("pia", pia6821_device, ca1_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "parallel")
 
@@ -421,9 +421,9 @@ ROM_START(proteus)
 	ROM_REGION(0x1000, "bios", 0)
 	ROM_DEFAULT_BIOS("82")
 	ROM_SYSTEM_BIOS(0, "82", "030982")
-	ROMX_LOAD("proteusv30.u28", 0x0000, 0x1000, CRC(ad02dc36) SHA1(f73aff8b3d85448f603a2fe807e3a7e02550db27), ROM_BIOS(1))
+	ROMX_LOAD("proteusv30.u28", 0x0000, 0x1000, CRC(ad02dc36) SHA1(f73aff8b3d85448f603a2fe807e3a7e02550db27), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "86", "300986")
-	ROMX_LOAD("300986.u28", 0x0000, 0x1000, CRC(f607d396) SHA1(0b9d9d3178b5587e60da56885b9e8a83f7d5dd26), ROM_BIOS(2))
+	ROMX_LOAD("300986.u28", 0x0000, 0x1000, CRC(f607d396) SHA1(0b9d9d3178b5587e60da56885b9e8a83f7d5dd26), ROM_BIOS(1))
 ROM_END
 
 

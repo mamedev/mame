@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -34,7 +35,7 @@ public:
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_charram(*this, "charram"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void victory(machine_config &config);
@@ -61,12 +62,10 @@ protected:
 	void update_background();
 	void update_foreground();
 
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
-	void victory_audio(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
-	void victory_audio_map(address_map &map);
 
 private:
 	/* microcode state */
@@ -90,7 +89,7 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_charram;
-	output_finder<4> m_lamp;
+	output_finder<4> m_lamps;
 
 	uint16_t m_paletteram[0x40];
 	std::unique_ptr<uint8_t[]> m_bgbitmap;

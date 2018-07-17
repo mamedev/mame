@@ -17,7 +17,7 @@
 
 /******************************************************************************/
 
-VIDEO_START_MEMBER(deco_mlc_state,mlc)
+void deco_mlc_state::video_start()
 {
 	int max_color = (0x800 / m_gfxdecode->gfx(0)->granularity());
 	m_colour_mask=max_color - 1;
@@ -34,8 +34,7 @@ VIDEO_START_MEMBER(deco_mlc_state,mlc)
 }
 
 
-static void mlc_drawgfxzoomline(deco_mlc_state *state,
-		uint32_t* dest,const rectangle &clip,gfx_element *gfx,
+void deco_mlc_state::drawgfxzoomline(uint32_t* dest,const rectangle &clip,gfx_element *gfx,
 		uint32_t code1,uint32_t code2, uint32_t color,int flipx,int sx,
 		int transparent_color,int use8bpp,
 		int scalex, int alpha, int srcline, int shadowMode, int alphaMode  )
@@ -90,7 +89,7 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 
 		if( ex>sx )
 		{ /* skip if inner loop doesn't draw anything */
-			const pen_t *pal = &state->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const uint8_t *code_base1 = gfx->get_data(code1 % gfx->elements());
 			const uint8_t *code_base2 = gfx->get_data(code2 % gfx->elements());
 			const uint8_t *source1 = code_base1 + (srcline) * gfx->rowbytes();
@@ -516,8 +515,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 				}
 			}
 
-			mlc_drawgfxzoomline(this,
-							dest,user_clip,m_gfxdecode->gfx(0),
+			drawgfxzoomline(dest,user_clip,m_gfxdecode->gfx(0),
 							tile,tile2,
 							color + colorOffset,fx,realxbase,
 							0,

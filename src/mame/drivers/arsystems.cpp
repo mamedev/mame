@@ -207,12 +207,12 @@ void arcadia_amiga_state::a500_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
-	map(0xa00000, 0xbfffff).rw(this, FUNC(arcadia_amiga_state::cia_r), FUNC(arcadia_amiga_state::cia_w));
-	map(0xc00000, 0xd7ffff).rw(this, FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
+	map(0xa00000, 0xbfffff).rw(FUNC(arcadia_amiga_state::cia_r), FUNC(arcadia_amiga_state::cia_w));
+	map(0xc00000, 0xd7ffff).rw(FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
 	map(0xd80000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(this, FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(this, FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
-	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(arcadia_amiga_state::rom_mirror_r));
+	map(0xde0000, 0xdeffff).rw(FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(FUNC(arcadia_amiga_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
 }
@@ -223,7 +223,7 @@ void arcadia_amiga_state::arcadia_map(address_map &map)
 	map(0x800000, 0x97ffff).bankr("bank2").region("user3", 0);
 	map(0x980000, 0x9fbfff).rom().region("user2", 0);
 	map(0x9fc000, 0x9ffffd).ram().share("nvram");
-	map(0x9ffffe, 0x9fffff).w(this, FUNC(arcadia_amiga_state::arcadia_multibios_change_game));
+	map(0x9ffffe, 0x9fffff).w(FUNC(arcadia_amiga_state::arcadia_multibios_change_game));
 	map(0xf00000, 0xf7ffff).rom().region("user2", 0);
 }
 
@@ -367,7 +367,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios+1))
+#define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios))
 
 #define ARCADIA_BIOS \
 	ROM_REGION16_BE(0x80000, "kickstart", 0 ) \

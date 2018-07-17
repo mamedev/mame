@@ -86,7 +86,7 @@ READ8_MEMBER( mquake_state::es5503_sample_r )
 
 void mquake_state::mquake_es5503_map(address_map &map)
 {
-	map(0x000000, 0x1ffff).r(this, FUNC(mquake_state::es5503_sample_r));
+	map(0x000000, 0x1ffff).r(FUNC(mquake_state::es5503_sample_r));
 }
 
 WRITE16_MEMBER( mquake_state::output_w )
@@ -134,12 +134,12 @@ void mquake_state::a500_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
-	map(0xa00000, 0xbfffff).rw(this, FUNC(mquake_state::cia_r), FUNC(mquake_state::cia_w));
-	map(0xc00000, 0xd7ffff).rw(this, FUNC(mquake_state::custom_chip_r), FUNC(mquake_state::custom_chip_w));
+	map(0xa00000, 0xbfffff).rw(FUNC(mquake_state::cia_r), FUNC(mquake_state::cia_w));
+	map(0xc00000, 0xd7ffff).rw(FUNC(mquake_state::custom_chip_r), FUNC(mquake_state::custom_chip_w));
 	map(0xd80000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(this, FUNC(mquake_state::custom_chip_r), FUNC(mquake_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(this, FUNC(mquake_state::custom_chip_r), FUNC(mquake_state::custom_chip_w));
-	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(mquake_state::rom_mirror_r));
+	map(0xde0000, 0xdeffff).rw(FUNC(mquake_state::custom_chip_r), FUNC(mquake_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(FUNC(mquake_state::custom_chip_r), FUNC(mquake_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(FUNC(mquake_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
 }
@@ -151,8 +151,8 @@ void mquake_state::main_map(address_map &map)
 	map(0x204000, 0x2041ff).rw(m_es5503, FUNC(es5503_device::read), FUNC(es5503_device::write)).umask16(0x00ff);
 	map(0x282000, 0x282001).portr("SW.LO");
 	map(0x282002, 0x282003).portr("SW.HI");
-	map(0x284000, 0x28400f).w(this, FUNC(mquake_state::output_w));
-	map(0x286000, 0x28600f).rw(this, FUNC(mquake_state::coin_chip_r), FUNC(mquake_state::coin_chip_w));
+	map(0x284000, 0x28400f).w(FUNC(mquake_state::output_w));
+	map(0x286000, 0x28600f).rw(FUNC(mquake_state::coin_chip_r), FUNC(mquake_state::coin_chip_w));
 	map(0x300000, 0x3bffff).rom().region("user2", 0);
 	map(0xf00000, 0xfbffff).rom().region("user2", 0);           /* Custom ROM */
 }

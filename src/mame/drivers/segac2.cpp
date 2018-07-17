@@ -84,6 +84,7 @@
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -642,12 +643,12 @@ WRITE16_MEMBER(segac2_state::print_club_camera_w)
 void segac2_state::main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x800001, 0x800001).mirror(0x13fdfe).rw(this, FUNC(segac2_state::prot_r), FUNC(segac2_state::prot_w));
-	map(0x800201, 0x800201).mirror(0x13fdfe).w(this, FUNC(segac2_state::control_w));
+	map(0x800001, 0x800001).mirror(0x13fdfe).rw(FUNC(segac2_state::prot_r), FUNC(segac2_state::prot_w));
+	map(0x800201, 0x800201).mirror(0x13fdfe).w(FUNC(segac2_state::control_w));
 	map(0x840000, 0x84001f).mirror(0x13fee0).rw("io", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	map(0x840100, 0x840107).mirror(0x13fef8).rw(m_ymsnd, FUNC(ym3438_device::read), FUNC(ym3438_device::write)).umask16(0x00ff);
-	map(0x880101, 0x880101).mirror(0x13fefe).w(this, FUNC(segac2_state::counter_timer_w));
-	map(0x8c0000, 0x8c0fff).mirror(0x13f000).rw(this, FUNC(segac2_state::palette_r), FUNC(segac2_state::palette_w)).share("paletteram");
+	map(0x880101, 0x880101).mirror(0x13fefe).w(FUNC(segac2_state::counter_timer_w));
+	map(0x8c0000, 0x8c0fff).mirror(0x13f000).rw(FUNC(segac2_state::palette_r), FUNC(segac2_state::palette_w)).share("paletteram");
 	map(0xc00000, 0xc0001f).mirror(0x18ff00).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 	map(0xe00000, 0xe0ffff).mirror(0x1f0000).ram().share("nvram");
 }
@@ -1559,13 +1560,14 @@ MACHINE_CONFIG_START(segac2_state::segac)
 	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segac2_state, io_porth_w))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, XL2_CLOCK, "maincpu")
 	MCFG_SEGA315_5313_IS_PAL(false)
 	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_sndirqline_callback_c2));
 	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_lv6irqline_callback_c2));
 	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_lv4irqline_callback_c2));
 	MCFG_SEGA315_5313_ALT_TIMING(1);
 	MCFG_VIDEO_SET_SCREEN("megadriv")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 
@@ -1587,9 +1589,6 @@ MACHINE_CONFIG_START(segac2_state::segac)
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segac2_state, segac2_irq2_interrupt))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	/* right channel not connected */
-
-	MCFG_DEVICE_ADD("snsnd", SN76496, XL2_CLOCK/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -1627,7 +1626,7 @@ ROM_START( bloxeedc ) /* Bloxeed (C System Version)  (c)1989 Sega / Elorg */
 ROM_END
 
 
-ROM_START( bloxeedu ) /* Bloxeed USA (C System Version)  (c)1989 Sega / Elorg */
+ROM_START( bloxeedu ) /* Bloxeed USA (C System Version)  (c)1989 Sega / Elorg - 834-7306-01 BLOXEED Rev.A */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-12997a.ic32", 0x000000, 0x020000, CRC(23655bc9) SHA1(32fc1f75a43aa49dc656d40d34ec10f3f0a2bdb3) )
 	ROM_LOAD16_BYTE( "epr-12996a.ic31", 0x000001, 0x020000, CRC(83c83f0c) SHA1(ca8e2ad7cceabd8de7a91b91cb92eafb6dd3171f) )
@@ -1663,7 +1662,7 @@ ROM_START( columnsj ) /* Columns (Jpn) (c)1990 Sega */
 ROM_END
 
 
-ROM_START( columns2 ) /* Columns II - The Voyage Through Time  (c)1990 Sega */
+ROM_START( columns2 ) /* Columns II - The Voyage Through Time  (c)1990 Sega - 834-7555-01 COLUMNS 2 */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13363.ic32", 0x000000, 0x020000, CRC(c99e4ffd) SHA1(67981aa08c8a625af35dd7689011364159cf9194) )
 	ROM_LOAD16_BYTE( "epr-13362.ic31", 0x000001, 0x020000, CRC(394e2419) SHA1(d4f726b32cf301d0d52611237b83177e69bfaf71) )
@@ -1726,7 +1725,7 @@ ROM_START( borencha ) /* Borench  (c)1990 Sega */
 ROM_END
 
 
-ROM_START( tfrceac ) /* Thunder Force AC  (c)1990 Technosoft / Sega */
+ROM_START( tfrceac ) /* Thunder Force AC  (c)1990 Technosoft / Sega - 834-7745-02 THUNDER FORCE (EMP5032 labeled 317-0172)  */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13675.ic32", 0x000000, 0x040000, CRC(95ecf202) SHA1(92b0f351f2bee7d59873a4991615f14f1afe4da7) )
 	ROM_LOAD16_BYTE( "epr-13674.ic31", 0x000001, 0x040000, CRC(e63d7f1a) SHA1(a40d0a5a96f379a467048dc8fddd8aaaeb94da1d) )

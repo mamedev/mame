@@ -55,8 +55,8 @@ void mt735_state::mt735_map(address_map &map)
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x278000, 0x287fff).ram();
 	map(0x400000, 0x4fffff).ram();
-	map(0xff8004, 0xff8004).r(this, FUNC(mt735_state::p4_r));
-	map(0xff8005, 0xff8005).r(this, FUNC(mt735_state::p5_r));
+	map(0xff8004, 0xff8004).r(FUNC(mt735_state::p4_r));
+	map(0xff8005, 0xff8005).r(FUNC(mt735_state::p5_r));
 }
 
 static INPUT_PORTS_START( mt735 )

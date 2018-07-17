@@ -355,6 +355,7 @@ public:
 	uint8_t m_sio_reset_ctrl;
 	uint8_t m_sio_irq_enable;
 	uint8_t m_sio_irq_state;
+	uint8_t m_duart_irq_state;
 	uint8_t m_sio_led_state;
 	uint8_t m_pending_analog_read;
 	uint8_t m_cmos_unlocked;
@@ -464,6 +465,7 @@ void vegas_state::machine_start()
 	save_item(NAME(m_sio_reset_ctrl));
 	save_item(NAME(m_sio_irq_enable));
 	save_item(NAME(m_sio_irq_state));
+	save_item(NAME(m_duart_irq_state));
 	save_item(NAME(m_sio_led_state));
 	save_item(NAME(m_pending_analog_read));
 	save_item(NAME(m_cmos_unlocked));
@@ -500,6 +502,7 @@ void vegas_state::machine_reset()
 	memset(m_cpuio_data, 0, ARRAY_LENGTH(m_cpuio_data));
 	// Clear SIO registers
 	reset_sio();
+	m_duart_irq_state = 0;
 	m_i40_data = 0;
 	m_keypad_select = 0;
 	m_gear = 1;
@@ -604,7 +607,8 @@ std::string vegas_state::sioIRQString(uint8_t data)
 
 void vegas_state::update_sio_irqs()
 {
-	if (m_sio_irq_state & m_sio_irq_enable) {
+	// Duart shares IRQ with SIO
+	if ((m_sio_irq_state & m_sio_irq_enable) || m_duart_irq_state) {
 		m_nile->pci_intr_c(ASSERT_LINE);
 	}
 	else {
@@ -619,10 +623,11 @@ void vegas_state::update_sio_irqs()
 
 WRITE_LINE_MEMBER(vegas_state::duart_irq_cb)
 {
-	if (state)
-		m_nile->pci_intr_c(ASSERT_LINE);
-	else
-		m_nile->pci_intr_c(CLEAR_LINE);
+	// Duart shares IRQ with SIO
+	if (state ^ m_duart_irq_state) {
+		m_duart_irq_state = state;
+		update_sio_irqs();
+	}
 }
 
 WRITE_LINE_MEMBER(vegas_state::vblank_assert)
@@ -1664,31 +1669,31 @@ INPUT_PORTS_END
 *************************************/
 void vegas_state::vegas_cs2_map(address_map &map)
 {
-	map(0x00000000, 0x00007003).rw(this, FUNC(vegas_state::sio_r), FUNC(vegas_state::sio_w));
+	map(0x00000000, 0x00007003).rw(FUNC(vegas_state::sio_r), FUNC(vegas_state::sio_w));
 }
 
 void vegas_state::vegas_cs3_map(address_map &map)
 {
-	map(0x00000000, 0x00000003).rw(this, FUNC(vegas_state::analog_port_r), FUNC(vegas_state::analog_port_w));
+	map(0x00000000, 0x00000003).rw(FUNC(vegas_state::analog_port_r), FUNC(vegas_state::analog_port_w));
 	//AM_RANGE(0x00001000, 0x00001003) AM_READWRITE(lcd_r, lcd_w)
 }
 
 void vegas_state::vegas_cs4_map(address_map &map)
 {
-	map(0x00000000, 0x00007fff).rw(this, FUNC(vegas_state::timekeeper_r), FUNC(vegas_state::timekeeper_w));
+	map(0x00000000, 0x00007fff).rw(FUNC(vegas_state::timekeeper_r), FUNC(vegas_state::timekeeper_w));
 }
 
 void vegas_state::vegas_cs5_map(address_map &map)
 {
-	map(0x00000000, 0x00000003).rw(this, FUNC(vegas_state::cpu_io_r), FUNC(vegas_state::cpu_io_w));
-	map(0x00100000, 0x001fffff).r(this, FUNC(vegas_state::unknown_r));
+	map(0x00000000, 0x00000003).rw(FUNC(vegas_state::cpu_io_r), FUNC(vegas_state::cpu_io_w));
+	map(0x00100000, 0x001fffff).r(FUNC(vegas_state::unknown_r));
 }
 
 void vegas_state::vegas_cs6_map(address_map &map)
 {
 	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::packed_r), FUNC(midway_ioasic_device::packed_w));
-	map(0x00001000, 0x00001003).w(this, FUNC(vegas_state::asic_fifo_w));
-	map(0x00003000, 0x00003003).w(this, FUNC(vegas_state::dcs3_fifo_full_w));  // if (m_dcs_idma_cs != 0)
+	map(0x00001000, 0x00001003).w(FUNC(vegas_state::asic_fifo_w));
+	map(0x00003000, 0x00003003).w(FUNC(vegas_state::dcs3_fifo_full_w));  // if (m_dcs_idma_cs != 0)
 	map(0x00005000, 0x00005003).w(m_dcs, FUNC(dcs_audio_device::dsio_idma_addr_w)); // if (m_dcs_idma_cs == 6)
 	map(0x00007000, 0x00007003).rw(m_dcs, FUNC(dcs_audio_device::dsio_idma_data_r), FUNC(dcs_audio_device::dsio_idma_data_w)); // if (m_dcs_idma_cs == 6)
 }
@@ -1696,7 +1701,7 @@ void vegas_state::vegas_cs6_map(address_map &map)
 void vegas_state::vegas_cs7_map(address_map &map)
 {
 	//AM_RANGE(0x00000000, 0x00000003) AM_READWRITE8(nss_r, nss_w, 0xffffffff)
-	map(0x00001000, 0x0000100f).rw(this, FUNC(vegas_state::ethernet_r), FUNC(vegas_state::ethernet_w));
+	map(0x00001000, 0x0000100f).rw(FUNC(vegas_state::ethernet_r), FUNC(vegas_state::ethernet_w));
 	map(0x00005000, 0x00005003).w(m_dcs, FUNC(dcs_audio_device::dsio_idma_addr_w)); // if (m_dcs_idma_cs == 7)
 	map(0x00007000, 0x00007003).rw(m_dcs, FUNC(dcs_audio_device::dsio_idma_data_r), FUNC(dcs_audio_device::dsio_idma_data_w)); // if (m_dcs_idma_cs == 7)
 }
@@ -1705,8 +1710,8 @@ void vegas_state::vegas_cs8_map(address_map &map)
 {
 	map(0x01000000, 0x0100001f).rw(m_uart1, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff); // Serial ttyS01 (TL16C552 CS0)
 	map(0x01400000, 0x0140001f).rw(m_uart2, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff); // Serial ttyS02 (TL16C552 CS1)
-	map(0x01800000, 0x0180001f).rw(this, FUNC(vegas_state::parallel_r), FUNC(vegas_state::parallel_w)).umask32(0x000000ff); // Parallel UART (TL16C552 CS2)
-	map(0x01c00000, 0x01c00000).w(this, FUNC(vegas_state::mpsreset_w)); // MPS Reset
+	map(0x01800000, 0x0180001f).rw(FUNC(vegas_state::parallel_r), FUNC(vegas_state::parallel_w)).umask32(0x000000ff); // Parallel UART (TL16C552 CS2)
+	map(0x01c00000, 0x01c00000).w(FUNC(vegas_state::mpsreset_w)); // MPS Reset
 }
 
 /*************************************
@@ -1744,7 +1749,7 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, vegas_state, vblank_assert))
 
-	MCFG_M48T37_ADD(m_timekeeper)
+	MCFG_DEVICE_ADD(m_timekeeper, M48T37, 0)
 	MCFG_M48T37_RESET_HANDLER(WRITELINE(*this, vegas_state, watchdog_reset))
 	MCFG_M48T37_IRQ_HANDLER(WRITELINE(*this, vegas_state, watchdog_irq))
 
@@ -1822,13 +1827,13 @@ MACHINE_CONFIG_START(vegas_state::denver)
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, vegas_state, vblank_assert))
 
 	// TL16C552 UART
-	MCFG_DEVICE_ADD(m_uart1, NS16550, vegas_state::SYSTEM_CLOCK / 12)
+	MCFG_DEVICE_ADD(m_uart1, NS16550, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("ttys01", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE("ttys01", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(WRITELINE("ttys01", rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, vegas_state, duart_irq_cb))
 
-	MCFG_DEVICE_ADD(m_uart2, NS16550, vegas_state::SYSTEM_CLOCK / 12)
+	MCFG_DEVICE_ADD(m_uart2, NS16550, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(WRITELINE("ttys02", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(WRITELINE("ttys02", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(WRITELINE("ttys02", rs232_port_device, write_rts))
@@ -1969,7 +1974,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::sf2049)
 	denver(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER_5CH, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
 
@@ -1984,7 +1989,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::sf2049se)
 	denver(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER_5CH, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
 
@@ -1999,7 +2004,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vegas_state::sf2049te)
 	denver(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER_5CH, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
 
@@ -2060,11 +2065,11 @@ ROM_START( gauntleg12 )
 	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
 
 	ROM_SYSTEM_BIOS( 1, "up16_1",       "Disk Update 1.2 to 1.6 Step 1 of 3" )
-	ROMX_LOAD("12to16.1.bin", 0x000000, 0x100000, CRC(253c6bf2) SHA1(5e129576afe2bc4c638242e010735655d269a747), ROM_BIOS(2))
+	ROMX_LOAD("12to16.1.bin", 0x000000, 0x100000, CRC(253c6bf2) SHA1(5e129576afe2bc4c638242e010735655d269a747), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "up16_2",       "Disk Update 1.2 to 1.6 Step 2 of 3" )
-	ROMX_LOAD("12to16.2.bin", 0x000000, 0x100000, CRC(15b1fe78) SHA1(532c4937b55befcc3a8cb25b0282d63e206fba47), ROM_BIOS(3))
+	ROMX_LOAD("12to16.2.bin", 0x000000, 0x100000, CRC(15b1fe78) SHA1(532c4937b55befcc3a8cb25b0282d63e206fba47), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update 1.2 to 1.6 Step 3 of 3" )
-	ROMX_LOAD("12to16.3.bin", 0x000000, 0x100000, CRC(1027e54f) SHA1(a841f5cc5b022ddfaf70c97a64d1582f0a2ca70e), ROM_BIOS(4))
+	ROMX_LOAD("12to16.3.bin", 0x000000, 0x100000, CRC(1027e54f) SHA1(a841f5cc5b022ddfaf70c97a64d1582f0a2ca70e), ROM_BIOS(3))
 
 
 

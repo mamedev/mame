@@ -80,20 +80,20 @@ void techno_state::techno_map(address_map &map)
 	map(0x00000, 0x03fff).rom();
 	map(0x04000, 0x04fff).ram().share("nvram"); // battery backed-up
 	map(0x06000, 0x0ffff).rom();
-	map(0x14000, 0x147ff).rw(this, FUNC(techno_state::key_r), FUNC(techno_state::lamp1_w));
-	map(0x14800, 0x14fff).rw(this, FUNC(techno_state::sound_r), FUNC(techno_state::lamp2_w));
-	map(0x15000, 0x157ff).rw(this, FUNC(techno_state::rtrg_r), FUNC(techno_state::sol1_w));
-	map(0x15800, 0x15fff).nopr().w(this, FUNC(techno_state::sol2_w)); // reads from 15800, but shown as not connected
-	map(0x16000, 0x167ff).w(this, FUNC(techno_state::sound_w));
-	map(0x16800, 0x16fff).w(this, FUNC(techno_state::disp1_w));
-	map(0x17000, 0x177ff).w(this, FUNC(techno_state::disp2_w));
-	map(0x17800, 0x17fff).w(this, FUNC(techno_state::setout_w));
+	map(0x14000, 0x147ff).rw(FUNC(techno_state::key_r), FUNC(techno_state::lamp1_w));
+	map(0x14800, 0x14fff).rw(FUNC(techno_state::sound_r), FUNC(techno_state::lamp2_w));
+	map(0x15000, 0x157ff).rw(FUNC(techno_state::rtrg_r), FUNC(techno_state::sol1_w));
+	map(0x15800, 0x15fff).nopr().w(FUNC(techno_state::sol2_w)); // reads from 15800, but shown as not connected
+	map(0x16000, 0x167ff).w(FUNC(techno_state::sound_w));
+	map(0x16800, 0x16fff).w(FUNC(techno_state::disp1_w));
+	map(0x17000, 0x177ff).w(FUNC(techno_state::disp2_w));
+	map(0x17800, 0x17fff).w(FUNC(techno_state::setout_w));
 }
 
 void techno_state::techno_sub_map(address_map &map)
 { //       no ram here, must be internal to the cpu
-	map(0x0000, 0x3fff).r(this, FUNC(techno_state::rd_r)); // to TKY2016A audio processor which has its own 3.58MHz clock
-	map(0x4000, 0x7fff).w(this, FUNC(techno_state::wr_w)); // A11=LED;A12=WR2 (DAC) ;A13=WR1 (TKY2016A as above)
+	map(0x0000, 0x3fff).r(FUNC(techno_state::rd_r)); // to TKY2016A audio processor which has its own 3.58MHz clock
+	map(0x4000, 0x7fff).w(FUNC(techno_state::wr_w)); // A11=LED;A12=WR2 (DAC) ;A13=WR1 (TKY2016A as above)
 	map(0x4000, 0xbfff).rom(); // 4000-7FFF is same as 8000-BFFF; 4x 16k ROMS bankswitched
 	map(0xc000, 0xffff).rom(); // another 16k ROM
 }

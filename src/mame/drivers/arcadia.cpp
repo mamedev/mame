@@ -127,7 +127,7 @@ anything in hardware. No cartridge has been found which uses them.
 void arcadia_state::arcadia_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).r(m_cart, FUNC(arcadia_cart_slot_device::read_rom));
-	map(0x1800, 0x1aff).rw(this, FUNC(arcadia_state::video_r), FUNC(arcadia_state::video_w));
+	map(0x1800, 0x1aff).rw(FUNC(arcadia_state::video_r), FUNC(arcadia_state::video_w));
 }
 
 /* The Emerson Arcadia 2001 controllers have 2 fire buttons on the side,

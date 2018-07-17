@@ -17,6 +17,7 @@ TODO:
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -188,16 +189,16 @@ void albazc_state::hanaroku_map(address_map &map)
 	map(0x9000, 0x97ff).ram().share("spriteram2");
 	map(0xa000, 0xa1ff).ram().share("spriteram3");
 	map(0xa200, 0xa2ff).nopw();    // ??? written once during P.O.S.T.
-	map(0xa300, 0xa304).w(this, FUNC(albazc_state::albazc_vregs_w));   // ???
+	map(0xa300, 0xa304).w(FUNC(albazc_state::albazc_vregs_w));   // ???
 	map(0xb000, 0xb000).nopw();    // ??? always 0x40
 	map(0xc000, 0xc3ff).ram();         // main ram
 	map(0xc400, 0xc4ff).ram().share("nvram");
 	map(0xd000, 0xd000).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0xe000, 0xe000).portr("IN0").w(this, FUNC(albazc_state::hanaroku_out_0_w));
+	map(0xe000, 0xe000).portr("IN0").w(FUNC(albazc_state::hanaroku_out_0_w));
 	map(0xe001, 0xe001).portr("IN1");
-	map(0xe002, 0xe002).portr("IN2").w(this, FUNC(albazc_state::hanaroku_out_1_w));
-	map(0xe004, 0xe004).portr("DSW3").w(this, FUNC(albazc_state::hanaroku_out_2_w));
+	map(0xe002, 0xe002).portr("IN2").w(FUNC(albazc_state::hanaroku_out_1_w));
+	map(0xe004, 0xe004).portr("DSW3").w(FUNC(albazc_state::hanaroku_out_2_w));
 }
 
 

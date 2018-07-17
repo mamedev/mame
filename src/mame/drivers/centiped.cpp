@@ -655,19 +655,19 @@ void centiped_state::centiped_base_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x03ff).ram().share("rambase");
-	map(0x0400, 0x07bf).ram().w(this, FUNC(centiped_state::centiped_videoram_w)).share("videoram");
+	map(0x0400, 0x07bf).ram().w(FUNC(centiped_state::centiped_videoram_w)).share("videoram");
 	map(0x07c0, 0x07ff).ram().share("spriteram");
 	map(0x0800, 0x0800).portr("DSW1");
 	map(0x0801, 0x0801).portr("DSW2");
-	map(0x0c00, 0x0c00).r(this, FUNC(centiped_state::centiped_IN0_r));
+	map(0x0c00, 0x0c00).r(FUNC(centiped_state::centiped_IN0_r));
 	map(0x0c01, 0x0c01).portr("IN1");
-	map(0x0c02, 0x0c02).r(this, FUNC(centiped_state::centiped_IN2_r));
+	map(0x0c02, 0x0c02).r(FUNC(centiped_state::centiped_IN2_r));
 	map(0x0c03, 0x0c03).portr("IN3");
-	map(0x1400, 0x140f).w(this, FUNC(centiped_state::centiped_paletteram_w)).share("paletteram");
+	map(0x1400, 0x140f).w(FUNC(centiped_state::centiped_paletteram_w)).share("paletteram");
 	map(0x1600, 0x163f).nopr().w("earom", FUNC(atari_vg_earom_device::write));
 	map(0x1680, 0x1680).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
 	map(0x1700, 0x173f).r("earom", FUNC(atari_vg_earom_device::read));
-	map(0x1800, 0x1800).w(this, FUNC(centiped_state::irq_ack_w));
+	map(0x1800, 0x1800).w(FUNC(centiped_state::irq_ack_w));
 	map(0x1c00, 0x1c07).nopr().w("outlatch", FUNC(ls259_device::write_d7));
 	map(0x2000, 0x2000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x2000, 0x3fff).rom();
@@ -695,21 +695,21 @@ void centiped_state::centipdb_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x03ff).mirror(0x4000).ram();
-	map(0x0400, 0x07bf).mirror(0x4000).ram().w(this, FUNC(centiped_state::centiped_videoram_w)).share("videoram");
+	map(0x0400, 0x07bf).mirror(0x4000).ram().w(FUNC(centiped_state::centiped_videoram_w)).share("videoram");
 	map(0x07c0, 0x07ff).mirror(0x4000).ram().share("spriteram");
 	map(0x0800, 0x0800).mirror(0x4000).portr("DSW1");
 	map(0x0801, 0x0801).mirror(0x4000).portr("DSW2");
-	map(0x0c00, 0x0c00).mirror(0x4000).r(this, FUNC(centiped_state::centiped_IN0_r));
+	map(0x0c00, 0x0c00).mirror(0x4000).r(FUNC(centiped_state::centiped_IN0_r));
 	map(0x0c01, 0x0c01).mirror(0x4000).portr("IN1");
-	map(0x0c02, 0x0c02).mirror(0x4000).r(this, FUNC(centiped_state::centiped_IN2_r));
+	map(0x0c02, 0x0c02).mirror(0x4000).r(FUNC(centiped_state::centiped_IN2_r));
 	map(0x0c03, 0x0c03).mirror(0x4000).portr("IN3");
 	map(0x1000, 0x1001).mirror(0x4000).w(m_aysnd, FUNC(ay8910_device::data_address_w));
 	map(0x1001, 0x1001).mirror(0x4000).r(m_aysnd, FUNC(ay8910_device::data_r));
-	map(0x1400, 0x140f).mirror(0x4000).w(this, FUNC(centiped_state::centiped_paletteram_w)).share("paletteram");
+	map(0x1400, 0x140f).mirror(0x4000).w(FUNC(centiped_state::centiped_paletteram_w)).share("paletteram");
 	map(0x1600, 0x163f).mirror(0x4000).w("earom", FUNC(atari_vg_earom_device::write));
 	map(0x1680, 0x1680).mirror(0x4000).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
 	map(0x1700, 0x173f).mirror(0x4000).r("earom", FUNC(atari_vg_earom_device::read));
-	map(0x1800, 0x1800).mirror(0x4000).w(this, FUNC(centiped_state::irq_ack_w));
+	map(0x1800, 0x1800).mirror(0x4000).w(FUNC(centiped_state::irq_ack_w));
 	map(0x1c00, 0x1c07).mirror(0x4000).w("outlatch", FUNC(ls259_device::write_d7));
 	map(0x2000, 0x27ff).rom();
 	map(0x2800, 0x3fff).mirror(0x4000).rom();
@@ -728,8 +728,8 @@ void centiped_state::magworm_map(address_map &map)
 void centiped_state::caterplr_map(address_map &map)
 {
 	centiped_base_map(map);
-	map(0x1780, 0x1780).r(this, FUNC(centiped_state::caterplr_unknown_r));
-	map(0x1000, 0x100f).rw(this, FUNC(centiped_state::caterplr_AY8910_r), FUNC(centiped_state::caterplr_AY8910_w));
+	map(0x1780, 0x1780).r(FUNC(centiped_state::caterplr_unknown_r));
+	map(0x1000, 0x100f).rw(FUNC(centiped_state::caterplr_AY8910_r), FUNC(centiped_state::caterplr_AY8910_w));
 }
 
 WRITE8_MEMBER(centiped_state::caterplr_AY8910_w)
@@ -758,16 +758,16 @@ void centiped_state::milliped_map(address_map &map)
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x040f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x0800, 0x080f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x1000, 0x13bf).ram().w(this, FUNC(centiped_state::centiped_videoram_w)).share("videoram");
+	map(0x1000, 0x13bf).ram().w(FUNC(centiped_state::centiped_videoram_w)).share("videoram");
 	map(0x13c0, 0x13ff).ram().share("spriteram");
-	map(0x2000, 0x2000).r(this, FUNC(centiped_state::centiped_IN0_r));
-	map(0x2001, 0x2001).r(this, FUNC(centiped_state::milliped_IN1_r));
-	map(0x2010, 0x2010).r(this, FUNC(centiped_state::milliped_IN2_r));
+	map(0x2000, 0x2000).r(FUNC(centiped_state::centiped_IN0_r));
+	map(0x2001, 0x2001).r(FUNC(centiped_state::milliped_IN1_r));
+	map(0x2010, 0x2010).r(FUNC(centiped_state::milliped_IN2_r));
 	map(0x2011, 0x2011).portr("IN3");
 	map(0x2030, 0x2030).r("earom", FUNC(atari_vg_earom_device::read));
-	map(0x2480, 0x249f).w(this, FUNC(centiped_state::milliped_paletteram_w)).share("paletteram");
+	map(0x2480, 0x249f).w(FUNC(centiped_state::milliped_paletteram_w)).share("paletteram");
 	map(0x2500, 0x2507).w("outlatch", FUNC(ls259_device::write_d7));
-	map(0x2600, 0x2600).w(this, FUNC(centiped_state::irq_ack_w));
+	map(0x2600, 0x2600).w(FUNC(centiped_state::irq_ack_w));
 	map(0x2680, 0x2680).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x2700, 0x2700).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
 	map(0x2780, 0x27bf).w("earom", FUNC(atari_vg_earom_device::write));
@@ -803,25 +803,25 @@ void centiped_state::multiped_map(address_map &map)
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x040f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x0800, 0x080f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x1000, 0x13bf).ram().w(this, FUNC(centiped_state::centiped_videoram_w)).share("videoram");
+	map(0x1000, 0x13bf).ram().w(FUNC(centiped_state::centiped_videoram_w)).share("videoram");
 	map(0x13c0, 0x13ff).ram().share("spriteram");
-	map(0x2000, 0x2000).r(this, FUNC(centiped_state::centiped_IN0_r));
-	map(0x2001, 0x2001).r(this, FUNC(centiped_state::milliped_IN1_r));
-	map(0x2010, 0x2010).r(this, FUNC(centiped_state::milliped_IN2_r));
+	map(0x2000, 0x2000).r(FUNC(centiped_state::centiped_IN0_r));
+	map(0x2001, 0x2001).r(FUNC(centiped_state::milliped_IN1_r));
+	map(0x2010, 0x2010).r(FUNC(centiped_state::milliped_IN2_r));
 	map(0x2011, 0x2011).portr("IN3");
 	map(0x2030, 0x2030).nopr();
-	map(0x2480, 0x249f).w(this, FUNC(centiped_state::milliped_paletteram_w)).share("paletteram");
+	map(0x2480, 0x249f).w(FUNC(centiped_state::milliped_paletteram_w)).share("paletteram");
 	map(0x2500, 0x2507).w("outlatch", FUNC(ls259_device::write_d7));
-	map(0x2600, 0x2600).w(this, FUNC(centiped_state::irq_ack_w));
+	map(0x2600, 0x2600).w(FUNC(centiped_state::irq_ack_w));
 	map(0x2680, 0x2680).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x2700, 0x2700).nopw();
 	map(0x2780, 0x27bf).nopw();
 	map(0x4000, 0x5fff).rom();
 	map(0x6000, 0x7fff).mirror(0x8000).rom();
 	map(0x8000, 0xbfff).rom();
-	map(0xd000, 0xd7ff).w(this, FUNC(centiped_state::multiped_eeprom_w));
-	map(0xd800, 0xd800).mirror(0x03ff).rw(this, FUNC(centiped_state::multiped_eeprom_r), FUNC(centiped_state::multiped_prgbank_w));
-	map(0xdc00, 0xdc00).mirror(0x03ff).w(this, FUNC(centiped_state::multiped_gfxbank_w));
+	map(0xd000, 0xd7ff).w(FUNC(centiped_state::multiped_eeprom_w));
+	map(0xd800, 0xd800).mirror(0x03ff).rw(FUNC(centiped_state::multiped_eeprom_r), FUNC(centiped_state::multiped_prgbank_w));
+	map(0xdc00, 0xdc00).mirror(0x03ff).w(FUNC(centiped_state::multiped_gfxbank_w));
 }
 
 READ8_MEMBER(centiped_state::multiped_eeprom_r)
@@ -875,14 +875,14 @@ void centiped_state::warlords_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07bf).ram().w(this, FUNC(centiped_state::centiped_videoram_w)).share("videoram");
+	map(0x0400, 0x07bf).ram().w(FUNC(centiped_state::centiped_videoram_w)).share("videoram");
 	map(0x07c0, 0x07ff).ram().share("spriteram");
 	map(0x0800, 0x0800).portr("DSW1");
 	map(0x0801, 0x0801).portr("DSW2");
 	map(0x0c00, 0x0c00).portr("IN0");
 	map(0x0c01, 0x0c01).portr("IN1");
 	map(0x1000, 0x100f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x1800, 0x1800).w(this, FUNC(centiped_state::irq_ack_w));
+	map(0x1800, 0x1800).w(FUNC(centiped_state::irq_ack_w));
 	map(0x1c00, 0x1c07).w("outlatch", FUNC(ls259_device::write_d7));
 	map(0x4000, 0x4000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x5000, 0x7fff).rom();
@@ -902,18 +902,18 @@ void centiped_state::mazeinv_map(address_map &map)
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x040f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x0800, 0x080f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x1000, 0x13bf).ram().w(this, FUNC(centiped_state::centiped_videoram_w)).share("videoram");
+	map(0x1000, 0x13bf).ram().w(FUNC(centiped_state::centiped_videoram_w)).share("videoram");
 	map(0x13c0, 0x13ff).ram().share("spriteram");
 	map(0x2000, 0x2000).portr("IN0");
 	map(0x2001, 0x2001).portr("IN1");
 	map(0x2010, 0x2010).portr("IN2");
 	map(0x2011, 0x2011).portr("IN3");
-	map(0x2020, 0x2020).r(this, FUNC(centiped_state::mazeinv_input_r));
+	map(0x2020, 0x2020).r(FUNC(centiped_state::mazeinv_input_r));
 	map(0x2030, 0x2030).r("earom", FUNC(atari_vg_earom_device::read));
-	map(0x2480, 0x249f).w(this, FUNC(centiped_state::mazeinv_paletteram_w)).share("paletteram");
+	map(0x2480, 0x249f).w(FUNC(centiped_state::mazeinv_paletteram_w)).share("paletteram");
 	map(0x2500, 0x2507).w("outlatch", FUNC(ls259_device::write_d7));
-	map(0x2580, 0x2583).w(this, FUNC(centiped_state::mazeinv_input_select_w));
-	map(0x2600, 0x2600).w(this, FUNC(centiped_state::irq_ack_w));
+	map(0x2580, 0x2583).w(FUNC(centiped_state::mazeinv_input_select_w));
+	map(0x2600, 0x2600).w(FUNC(centiped_state::irq_ack_w));
 	map(0x2680, 0x2680).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x2700, 0x2700).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
 	map(0x2780, 0x27bf).w("earom", FUNC(atari_vg_earom_device::write));
@@ -932,17 +932,17 @@ void centiped_state::bullsdrt_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x1000).mirror(0x6000).portr("DSW1");
-	map(0x1080, 0x1080).mirror(0x6000).r(this, FUNC(centiped_state::centiped_IN0_r));
+	map(0x1080, 0x1080).mirror(0x6000).r(FUNC(centiped_state::centiped_IN0_r));
 	map(0x1081, 0x1081).mirror(0x6000).portr("IN1");
-	map(0x1082, 0x1082).mirror(0x6000).r(this, FUNC(centiped_state::centiped_IN2_r));
+	map(0x1082, 0x1082).mirror(0x6000).r(FUNC(centiped_state::centiped_IN2_r));
 	map(0x1200, 0x123f).mirror(0x6000).rw("earom", FUNC(atari_vg_earom_device::read), FUNC(atari_vg_earom_device::write));
 	map(0x1280, 0x1280).mirror(0x6000).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
 	map(0x1300, 0x1300).mirror(0x6000).portr("DSW2");
-	map(0x1400, 0x140f).mirror(0x6000).w(this, FUNC(centiped_state::centiped_paletteram_w)).share("paletteram");
+	map(0x1400, 0x140f).mirror(0x6000).w(FUNC(centiped_state::centiped_paletteram_w)).share("paletteram");
 	map(0x1480, 0x1487).mirror(0x6000).w("outlatch", FUNC(ls259_device::write_d7));
 	map(0x1500, 0x1500).mirror(0x6000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x1580, 0x1580).mirror(0x6000).noprw();
-	map(0x1800, 0x1bbf).mirror(0x6000).w(this, FUNC(centiped_state::centiped_videoram_w)).share("videoram");
+	map(0x1800, 0x1bbf).mirror(0x6000).w(FUNC(centiped_state::centiped_videoram_w)).share("videoram");
 	map(0x1bc0, 0x1bff).mirror(0x6000).ram().share("spriteram");
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 	map(0x2000, 0x2fff).rom();
@@ -952,13 +952,13 @@ void centiped_state::bullsdrt_map(address_map &map)
 
 void centiped_state::bullsdrt_port_map(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(centiped_state::bullsdrt_sprites_bank_w));
-	map(0x20, 0x3f).w(this, FUNC(centiped_state::bullsdrt_tilesbank_w)).share("bullsdrt_bank");
+	map(0x00, 0x00).w(FUNC(centiped_state::bullsdrt_sprites_bank_w));
+	map(0x20, 0x3f).w(FUNC(centiped_state::bullsdrt_tilesbank_w)).share("bullsdrt_bank");
 }
 
 void centiped_state::bullsdrt_data_map(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(this, FUNC(centiped_state::bullsdrt_data_port_r)).w("snsnd", FUNC(sn76496_device::write));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(centiped_state::bullsdrt_data_port_r)).w("snsnd", FUNC(sn76496_device::command_w));
 }
 
 
@@ -1873,7 +1873,7 @@ MACHINE_CONFIG_START(centiped_state::multiped)
 	MCFG_DEVICE_PROGRAM_MAP(multiped_map)
 
 	MCFG_DEVICE_REMOVE("earom")
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
 MACHINE_CONFIG_END
 
 

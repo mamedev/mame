@@ -10,6 +10,7 @@
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
+#include "emupal.h"
 
 class simpl156_state : public driver_device
 {

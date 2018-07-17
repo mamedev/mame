@@ -47,6 +47,7 @@ To Do:
 #include "machine/timer.h"
 #include "sound/beep.h"
 //#include "video/dp8350.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -61,7 +62,6 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_beep(*this, "beeper")
-		, m_brg(*this, "brg")
 		, m_u0(*this, "uart0")
 		, m_u1(*this, "uart1")
 		, m_ppi(*this, "ppi")
@@ -87,7 +87,6 @@ public:
 	DECLARE_READ8_MEMBER(port50_r);
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(baud_w);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
 
@@ -110,7 +109,6 @@ private:
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
-	required_device<com8116_device> m_brg;
 	required_device<i8251_device> m_u0;
 	required_device<i8251_device> m_u1;
 	required_device<i8255_device> m_ppi;
@@ -138,11 +136,11 @@ void sbrain_state::sbrain_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x40).mirror(6).rw(m_u0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x41, 0x41).mirror(6).rw(m_u0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x48, 0x4f).r(this, FUNC(sbrain_state::port48_r)); //chr_int_latch
-	map(0x50, 0x57).r(this, FUNC(sbrain_state::port50_r));
+	map(0x48, 0x4f).r(FUNC(sbrain_state::port48_r)); //chr_int_latch
+	map(0x50, 0x57).r(FUNC(sbrain_state::port50_r));
 	map(0x58, 0x58).mirror(6).rw(m_u1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x59, 0x59).mirror(6).rw(m_u1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x60, 0x67).w(this, FUNC(sbrain_state::baud_w));
+	map(0x60, 0x60).mirror(7).w("brg", FUNC(com8116_device::stt_str_w));
 	map(0x68, 0x6b).mirror(4).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -156,7 +154,7 @@ void sbrain_state::sbrain_subio(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x08, 0x0b).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
-	map(0x10, 0x10).rw(this, FUNC(sbrain_state::port10_r), FUNC(sbrain_state::port10_w));
+	map(0x10, 0x10).rw(FUNC(sbrain_state::port10_r), FUNC(sbrain_state::port10_w));
 }
 
 
@@ -200,12 +198,6 @@ WRITE8_MEMBER( sbrain_state::port10_w )
 
 	m_floppy0->get_device()->mon_w(0); // motors run all the time
 	m_floppy1->get_device()->mon_w(0);
-}
-
-WRITE8_MEMBER( sbrain_state::baud_w )
-{
-	m_brg->str_w(data & 0x0f);
-	m_brg->stt_w(data >> 4);
 }
 
 READ8_MEMBER( sbrain_state::ppi_pa_r )
@@ -539,12 +531,12 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 MACHINE_CONFIG_START(sbrain_state::sbrain)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(sbrain_mem)
 	MCFG_DEVICE_IO_MAP(sbrain_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sbrain_state, irq0_line_hold)
 
-	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("subcpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(sbrain_submem)
 	MCFG_DEVICE_IO_MAP(sbrain_subio)
 
@@ -561,7 +553,7 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	//MCFG_DEVICE_ADD("crtc", DP8350, XTAL(10'920'000))
+	//MCFG_DEVICE_ADD("crtc", DP8350, 10.92_MHz_XTAL)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -581,13 +573,13 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 
-	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800)) // BR1941L
+	MCFG_DEVICE_ADD("brg", COM8116, 5.0688_MHz_XTAL) // BR1941L
 	MCFG_COM8116_FR_HANDLER(WRITELINE("uart0", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart0", i8251_device, write_rxc))
 	MCFG_COM8116_FT_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
 
-	MCFG_FD1791_ADD("fdc", XTAL(16'000'000) / 16)
+	MCFG_DEVICE_ADD("fdc", FD1791, 16_MHz_XTAL / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -601,14 +593,14 @@ ROM_START( sbrain )
 
 	ROM_REGION( 0x10000, "subcpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "4_003", "4.003" )
-	ROMX_LOAD( "4_003_vc8001.z69", 0x0000, 0x0800, CRC(3ce3cd53) SHA1(fb6ade6bd67de3d9f911a1a48481ca619bda65ae), ROM_BIOS(1) )
+	ROMX_LOAD("4_003_vc8001.z69", 0x0000, 0x0800, CRC(3ce3cd53) SHA1(fb6ade6bd67de3d9f911a1a48481ca619bda65ae), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "3_1", "3.1" )
-	ROMX_LOAD( "3_1.z69", 0x0000, 0x0800, CRC(b6a2e6a5) SHA1(a646faaecb9ac45ee1a42764628e8971524d5c13), ROM_BIOS(2) )
+	ROMX_LOAD("3_1.z69", 0x0000, 0x0800, CRC(b6a2e6a5) SHA1(a646faaecb9ac45ee1a42764628e8971524d5c13), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "3_05", "3.05" )
-	ROMX_LOAD( "qd_3_05.z69", 0x0000, 0x0800, CRC(aedbe777) SHA1(9ee9ca3f05e11ceb80896f06c3a3ae352db214dc), ROM_BIOS(3) )
+	ROMX_LOAD("qd_3_05.z69", 0x0000, 0x0800, CRC(aedbe777) SHA1(9ee9ca3f05e11ceb80896f06c3a3ae352db214dc), ROM_BIOS(2))
 	// Using the chargen from 'c10' for now.
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
+	ROM_LOAD("c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
 COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, init_sbrain, "Intertec", "Superbrain", MACHINE_NOT_WORKING )

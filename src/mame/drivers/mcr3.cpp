@@ -319,9 +319,9 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op5_w)
 	/* bit 3 -> J1-10 = lamp 1 */
 	/* bit 2 -> J1-8 = lamp 2 */
 	/* bit 1 -> J1-6 = lamp 3 */
-	m_lamp[0] = BIT(data, 3);
-	m_lamp[1] = BIT(data, 2);
-	m_lamp[2] = BIT(data, 1);
+	m_lamps[0] = BIT(data, 3);
+	m_lamps[1] = BIT(data, 2);
+	m_lamps[2] = BIT(data, 1);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -362,9 +362,9 @@ WRITE8_MEMBER(mcr3_state::stargrds_op5_w)
 	/* bit 2 controls light #0 */
 	/* bit 3 controls light #1 */
 	/* bit 4 controls light #2 */
-	m_lamp[0] = BIT(data, 2);
-	m_lamp[1] = BIT(data, 3);
-	m_lamp[2] = BIT(data, 4);
+	m_lamps[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 3);
+	m_lamps[2] = BIT(data, 4);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -481,8 +481,8 @@ void mcr3_state::mcrmono_map(address_map &map)
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xe800, 0xe9ff).ram().share("spriteram");
 	map(0xea00, 0xebff).ram();
-	map(0xec00, 0xec7f).mirror(0x0380).w(this, FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(mcr3_state::mcr3_videoram_w)).share("videoram");
+	map(0xec00, 0xec7f).mirror(0x0380).w(FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(mcr3_state::mcr3_videoram_w)).share("videoram");
 	map(0xf800, 0xffff).rom();     /* schematics show a 2716 @ 2B here, but nobody used it */
 }
 
@@ -496,7 +496,7 @@ void mcr3_state::mcrmono_portmap(address_map &map)
 	map(0x02, 0x02).mirror(0x78).portr("MONO.IP2");
 	map(0x03, 0x03).mirror(0x78).portr("MONO.IP3");
 	map(0x04, 0x04).mirror(0x78).portr("MONO.IP4");
-	map(0x05, 0x05).mirror(0x78).w(this, FUNC(mcr3_state::mcrmono_control_port_w));
+	map(0x05, 0x05).mirror(0x78).w(FUNC(mcr3_state::mcrmono_control_port_w));
 	map(0x07, 0x07).mirror(0x78).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xf0, 0xf3).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
@@ -514,11 +514,11 @@ void mcr3_state::spyhunt_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xdfff).rom();
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(mcr3_state::spyhunt_videoram_w)).share("videoram");
-	map(0xe800, 0xebff).mirror(0x0400).ram().w(this, FUNC(mcr3_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
+	map(0xe000, 0xe7ff).ram().w(FUNC(mcr3_state::spyhunt_videoram_w)).share("videoram");
+	map(0xe800, 0xebff).mirror(0x0400).ram().w(FUNC(mcr3_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
 	map(0xf000, 0xf7ff).ram().share("nvram");
 	map(0xf800, 0xf9ff).ram().share("spriteram");
-	map(0xfa00, 0xfa7f).mirror(0x0180).w(this, FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
+	map(0xfa00, 0xfa7f).mirror(0x0180).w(FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports and scroll registers are verified from schematics */
@@ -527,7 +527,7 @@ void mcr3_state::spyhunt_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	m_ssio->ssio_input_ports(map, "ssio");
-	map(0x84, 0x86).w(this, FUNC(mcr3_state::spyhunt_scroll_value_w));
+	map(0x84, 0x86).w(FUNC(mcr3_state::spyhunt_scroll_value_w));
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -1659,8 +1659,8 @@ void mcr3_state::init_turbotag()
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 88;
 
-	/* the SSIO Z80 doesn't have any program to execute */
-	machine().device<cpu_device>("csd:cpu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	/* the CSD 68k doesn't have any program to execute */
+	m_cheap_squeak_deluxe->suspend_cpu();
 
 	/* kludge for bad ROM read */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0b53, 0x0b53, read8_delegate(FUNC(mcr3_state::turbotag_kludge_r),this));

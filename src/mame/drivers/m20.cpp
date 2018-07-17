@@ -51,6 +51,7 @@ E I1     Vectored interrupt error
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -121,7 +122,7 @@ public:
 
 
 #define MAIN_CLOCK 4000000 /* 4 MHz */
-#define PIXEL_CLOCK XTAL(4'433'619)
+#define PIXEL_CLOCK 4.433619_MHz_XTAL
 
 
 MC6845_UPDATE_ROW( m20_state::update_row )
@@ -707,7 +708,7 @@ void m20_state::m20_io(address_map &map)
 
 	map(0x00, 0x07).rw(m_fd1797, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0x00ff);
 
-	map(0x20, 0x21).rw(this, FUNC(m20_state::port21_r), FUNC(m20_state::port21_w));
+	map(0x20, 0x21).rw(FUNC(m20_state::port21_r), FUNC(m20_state::port21_w));
 
 	map(0x61, 0x61).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x62, 0x62).w("crtc", FUNC(mc6845_device::address_w)); // FIXME
@@ -724,7 +725,7 @@ void m20_state::m20_io(address_map &map)
 
 	map(0x120, 0x127).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 
-	map(0x140, 0x143).rw(this, FUNC(m20_state::m20_i8259_r), FUNC(m20_state::m20_i8259_w));
+	map(0x140, 0x143).rw(FUNC(m20_state::m20_i8259_r), FUNC(m20_state::m20_i8259_w));
 
 	map(0x3ffa, 0x3ffd).w(m_apb, FUNC(m20_8086_device::handshake_w));
 }
@@ -810,7 +811,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_FD1797_ADD("fd1797", 1000000)
+	MCFG_DEVICE_ADD("fd1797", FD1797, 1000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("i8259", pic8259_device, ir0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
@@ -848,7 +849,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_2", i8251_device, write_rxd))
 
-	MCFG_DEVICE_ADD("apb", M20_8086, 0)
+	MCFG_DEVICE_ADD("apb", M20_8086, "maincpu", "i8259", RAM_TAG)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","m20")
 MACHINE_CONFIG_END
@@ -856,23 +857,23 @@ MACHINE_CONFIG_END
 ROM_START(m20)
 	ROM_REGION(0x2000,"maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "m20", "M20 1.0" )
-	ROMX_LOAD("m20.bin", 0x0000, 0x2000, CRC(5c93d931) SHA1(d51025e087a94c55529d7ee8fd18ff4c46d93230), ROM_BIOS(1))
+	ROMX_LOAD("m20.bin", 0x0000, 0x2000, CRC(5c93d931) SHA1(d51025e087a94c55529d7ee8fd18ff4c46d93230), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "m20-20d", "M20 2.0d" )
-	ROMX_LOAD("m20-20d.bin", 0x0000, 0x2000, CRC(cbe265a6) SHA1(c7cb9d9900b7b5014fcf1ceb2e45a66a91c564d0), ROM_BIOS(2))
+	ROMX_LOAD("m20-20d.bin", 0x0000, 0x2000, CRC(cbe265a6) SHA1(c7cb9d9900b7b5014fcf1ceb2e45a66a91c564d0), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "m20-20f", "M20 2.0f" )
-	ROMX_LOAD("m20-20f.bin", 0x0000, 0x2000, CRC(db7198d8) SHA1(149d8513867081d31c73c2965dabb36d5f308041), ROM_BIOS(3))
+	ROMX_LOAD("m20-20f.bin", 0x0000, 0x2000, CRC(db7198d8) SHA1(149d8513867081d31c73c2965dabb36d5f308041), ROM_BIOS(2))
 ROM_END
 
 ROM_START(m40)
 	ROM_REGION(0x14000,"maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "m40-81", "M40 15.dec.81" )
-	ROMX_LOAD( "m40rom-15-dec-81", 0x0000, 0x2000, CRC(e8e7df84) SHA1(e86018043bf5a23ff63434f9beef7ce2972d8153), ROM_BIOS(1))
+	ROMX_LOAD( "m40rom-15-dec-81", 0x0000, 0x2000, CRC(e8e7df84) SHA1(e86018043bf5a23ff63434f9beef7ce2972d8153), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "m40-82", "M40 17.dec.82" )
-	ROMX_LOAD( "m40rom-17-dec-82", 0x0000, 0x2000, CRC(cf55681c) SHA1(fe4ae14a6751fef5d7bde49439286f1da3689437), ROM_BIOS(2))
+	ROMX_LOAD( "m40rom-17-dec-82", 0x0000, 0x2000, CRC(cf55681c) SHA1(fe4ae14a6751fef5d7bde49439286f1da3689437), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "m40-41", "M40 4.1" )
-	ROMX_LOAD( "m40rom-4.1", 0x0000, 0x2000, CRC(cf55681c) SHA1(fe4ae14a6751fef5d7bde49439286f1da3689437), ROM_BIOS(3))
+	ROMX_LOAD( "m40rom-4.1", 0x0000, 0x2000, CRC(cf55681c) SHA1(fe4ae14a6751fef5d7bde49439286f1da3689437), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "m40-60", "M40 6.0" )
-	ROMX_LOAD( "m40rom-6.0", 0x0000, 0x4000, CRC(8114ebec) SHA1(4e2c65b95718c77a87dbee0288f323bd1c8837a3), ROM_BIOS(4))
+	ROMX_LOAD( "m40rom-6.0", 0x0000, 0x4000, CRC(8114ebec) SHA1(4e2c65b95718c77a87dbee0288f323bd1c8837a3), ROM_BIOS(3))
 
 	ROM_REGION(0x4000, "apb_bios", ROMREGION_ERASEFF) // Processor board with 8086
 ROM_END

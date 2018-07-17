@@ -204,7 +204,7 @@ pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, co
 	m_maincpu(*this, I8048_TAG),
 	m_joy(*this, "joy"),
 	m_y(*this, "Y%u", 1),
-	m_led(*this, "led%u", 0U),
+	m_leds(*this, "led%u", 0U),
 	m_write_clock(*this),
 	m_write_data(*this),
 	m_data_in(1),
@@ -223,7 +223,7 @@ pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, co
 
 void pc1512_keyboard_device::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	// allocate timers
 	m_reset_timer = timer_alloc();
 
@@ -350,10 +350,7 @@ READ8_MEMBER( pc1512_keyboard_device::kb_bus_r )
 	if (!BIT(m_kb_y, 8)) data &= m_y[8]->read();
 	if (!BIT(m_kb_y, 9)) data &= m_y[9]->read();
 	if (!BIT(m_kb_y, 10)) data &= m_y[10]->read();
-	if (!m_joy_com)
-	{
-		data &= m_joy->joy_r();
-	}
+	if (!m_joy_com) data &= m_joy->read_joy();
 
 	return data;
 }
@@ -442,10 +439,10 @@ WRITE8_MEMBER( pc1512_keyboard_device::kb_p2_w )
 	m_write_clock(BIT(data, 1));
 
 	// CAPS LOCK
-	m_led[LED_CAPS] = BIT(data, 2);
+	m_leds[LED_CAPS] = BIT(data, 2);
 
 	// NUM LOCK
-	m_led[LED_NUM] = BIT(data, 3);
+	m_leds[LED_NUM] = BIT(data, 3);
 
 	// keyboard row
 	m_kb_y = (((data >> 4) & 0x07) << 8) | (m_kb_y & 0xff);

@@ -61,6 +61,7 @@
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -77,6 +78,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
+	void nsmpoker(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
@@ -89,9 +93,8 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_nsmpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nsmpoker_interrupt);
-	required_device<cpu_device> m_maincpu;
+	required_device<tms9995_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void nsmpoker(machine_config &config);
 	void nsmpoker_map(address_map &map);
 	void nsmpoker_portmap(address_map &map);
 };
@@ -182,14 +185,14 @@ void nsmpoker_state::nsmpoker_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x9000, 0xafff).ram(); // OK... cleared at beginning.
 	map(0xb000, 0xcfff).rom(); // WRONG... just to map the last rom somewhere.
-	map(0xe000, 0xefff).ram().w(this, FUNC(nsmpoker_state::nsmpoker_videoram_w)).share("videoram"); // WRONG... just a placeholder.
-	map(0xf000, 0xffff).ram().w(this, FUNC(nsmpoker_state::nsmpoker_colorram_w)).share("colorram"); // WRONG... just a placeholder.
+	map(0xe000, 0xefff).ram().w(FUNC(nsmpoker_state::nsmpoker_videoram_w)).share("videoram"); // WRONG... just a placeholder.
+	map(0xf000, 0xffff).ram().w(FUNC(nsmpoker_state::nsmpoker_colorram_w)).share("colorram"); // WRONG... just a placeholder.
 }
 
 void nsmpoker_state::nsmpoker_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).r(this, FUNC(nsmpoker_state::debug_r));   // kind of trap at beginning
+	map(0xf0, 0xf0).r(FUNC(nsmpoker_state::debug_r));   // kind of trap at beginning
 }
 
 /* I/O byte R/W
@@ -405,9 +408,8 @@ GFXDECODE_END
 void nsmpoker_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
-	cpu->ready_line(ASSERT_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 /*************************

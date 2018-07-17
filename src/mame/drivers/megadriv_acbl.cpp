@@ -269,14 +269,14 @@ void md_boot_state::md_bootleg_map(address_map &map)
 	map(0x000000, 0x0fffff).rom(); /* Cartridge Program Rom */
 	map(0x200000, 0x2023ff).ram(); // tested
 
-	map(0xa00000, 0xa01fff).rw(this, FUNC(md_boot_state::megadriv_68k_read_z80_ram), FUNC(md_boot_state::megadriv_68k_write_z80_ram));
-	map(0xa02000, 0xa03fff).w(this, FUNC(md_boot_state::megadriv_68k_write_z80_ram));
-	map(0xa04000, 0xa04003).rw(this, FUNC(md_boot_state::megadriv_68k_YM2612_read), FUNC(md_boot_state::megadriv_68k_YM2612_write));
-	map(0xa06000, 0xa06001).w(this, FUNC(md_boot_state::megadriv_68k_z80_bank_write));
+	map(0xa00000, 0xa01fff).rw(FUNC(md_boot_state::megadriv_68k_read_z80_ram), FUNC(md_boot_state::megadriv_68k_write_z80_ram));
+	map(0xa02000, 0xa03fff).w(FUNC(md_boot_state::megadriv_68k_write_z80_ram));
+	map(0xa04000, 0xa04003).rw(FUNC(md_boot_state::megadriv_68k_YM2612_read), FUNC(md_boot_state::megadriv_68k_YM2612_write));
+	map(0xa06000, 0xa06001).w(FUNC(md_boot_state::megadriv_68k_z80_bank_write));
 
-	map(0xa10000, 0xa1001f).rw(this, FUNC(md_boot_state::megadriv_68k_io_read), FUNC(md_boot_state::megadriv_68k_io_write));
-	map(0xa11100, 0xa11101).rw(this, FUNC(md_boot_state::megadriv_68k_check_z80_bus), FUNC(md_boot_state::megadriv_68k_req_z80_bus));
-	map(0xa11200, 0xa11201).w(this, FUNC(md_boot_state::megadriv_68k_req_z80_reset));
+	map(0xa10000, 0xa1001f).rw(FUNC(md_boot_state::megadriv_68k_io_read), FUNC(md_boot_state::megadriv_68k_io_write));
+	map(0xa11100, 0xa11101).rw(FUNC(md_boot_state::megadriv_68k_check_z80_bus), FUNC(md_boot_state::megadriv_68k_req_z80_bus));
+	map(0xa11200, 0xa11201).w(FUNC(md_boot_state::megadriv_68k_req_z80_reset));
 
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 	map(0xd00000, 0xd0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));

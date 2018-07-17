@@ -295,7 +295,7 @@ WRITE8_MEMBER( comx35_state::io_w )
 void comx35_state::comx35_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(comx35_state::mem_r), FUNC(comx35_state::mem_w));
+	map(0x0000, 0xffff).rw(FUNC(comx35_state::mem_r), FUNC(comx35_state::mem_w));
 }
 
 
@@ -306,7 +306,7 @@ void comx35_state::comx35_mem(address_map &map)
 void comx35_state::comx35_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x07).rw(this, FUNC(comx35_state::io_r), FUNC(comx35_state::io_w));
+	map(0x00, 0x07).rw(FUNC(comx35_state::io_r), FUNC(comx35_state::io_w));
 }
 
 
@@ -704,9 +704,9 @@ ROM_START( comx35p )
 	ROM_REGION( 0x4000, CDP1802_TAG, 0 )
 	ROM_DEFAULT_BIOS( "basic100" )
 	ROM_SYSTEM_BIOS( 0, "basic100", "COMX BASIC V1.00" )
-	ROMX_LOAD( "comx_10.u21", 0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(1) )
+	ROMX_LOAD( "comx_10.u21", 0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "basic101", "COMX BASIC V1.01" )
-	ROMX_LOAD( "comx_11.u21", 0x0000, 0x4000, CRC(609d89cd) SHA1(799646810510d8236fbfafaff7a73d5170990f16), ROM_BIOS(2) )
+	ROMX_LOAD( "comx_11.u21", 0x0000, 0x4000, CRC(609d89cd) SHA1(799646810510d8236fbfafaff7a73d5170990f16), ROM_BIOS(1) )
 ROM_END
 
 

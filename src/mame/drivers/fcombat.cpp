@@ -119,18 +119,18 @@ void fcombat_state::main_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd7ff).ram().share("videoram");
 	map(0xd800, 0xd8ff).ram().share("spriteram");
-	map(0xe000, 0xe000).r(this, FUNC(fcombat_state::fcombat_port01_r));
+	map(0xe000, 0xe000).r(FUNC(fcombat_state::fcombat_port01_r));
 	map(0xe100, 0xe100).portr("DSW0");
 	map(0xe200, 0xe200).portr("DSW1");
-	map(0xe300, 0xe300).r(this, FUNC(fcombat_state::e300_r));
-	map(0xe400, 0xe400).r(this, FUNC(fcombat_state::fcombat_protection_r)); // protection?
-	map(0xe800, 0xe800).w(this, FUNC(fcombat_state::fcombat_videoreg_w));   // at least bit 0 for flip screen and joystick input multiplexor
-	map(0xe900, 0xe900).w(this, FUNC(fcombat_state::e900_w));
-	map(0xea00, 0xea00).w(this, FUNC(fcombat_state::ea00_w));
-	map(0xeb00, 0xeb00).w(this, FUNC(fcombat_state::eb00_w));
-	map(0xec00, 0xec00).w(this, FUNC(fcombat_state::ec00_w));
-	map(0xed00, 0xed00).w(this, FUNC(fcombat_state::ed00_w));
-	map(0xee00, 0xee00).w(this, FUNC(fcombat_state::ee00_w));   // related to protection ? - doesn't seem to have any effect
+	map(0xe300, 0xe300).r(FUNC(fcombat_state::e300_r));
+	map(0xe400, 0xe400).r(FUNC(fcombat_state::fcombat_protection_r)); // protection?
+	map(0xe800, 0xe800).w(FUNC(fcombat_state::fcombat_videoreg_w));   // at least bit 0 for flip screen and joystick input multiplexor
+	map(0xe900, 0xe900).w(FUNC(fcombat_state::e900_w));
+	map(0xea00, 0xea00).w(FUNC(fcombat_state::ea00_w));
+	map(0xeb00, 0xeb00).w(FUNC(fcombat_state::eb00_w));
+	map(0xec00, 0xec00).w(FUNC(fcombat_state::ec00_w));
+	map(0xed00, 0xed00).w(FUNC(fcombat_state::ed00_w));
+	map(0xee00, 0xee00).w(FUNC(fcombat_state::ee00_w));   // related to protection ? - doesn't seem to have any effect
 	map(0xef00, 0xef00).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 

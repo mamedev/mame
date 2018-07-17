@@ -78,11 +78,11 @@ ROM_START( c1571 )
 	ROM_REGION( 0x8000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
-	ROMX_LOAD( "310654-03.u2", 0x0000, 0x8000, CRC(3889b8b8) SHA1(e649ef4419d65829d2afd65e07d31f3ce147d6eb), ROM_BIOS(1) )
+	ROMX_LOAD( "310654-03.u2", 0x0000, 0x8000, CRC(3889b8b8) SHA1(e649ef4419d65829d2afd65e07d31f3ce147d6eb), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "r5", "Revision 5" )
-	ROMX_LOAD( "310654-05.u2", 0x0000, 0x8000, CRC(5755bae3) SHA1(f1be619c106641a685f6609e4d43d6fc9eac1e70), ROM_BIOS(2) )
+	ROMX_LOAD( "310654-05.u2", 0x0000, 0x8000, CRC(5755bae3) SHA1(f1be619c106641a685f6609e4d43d6fc9eac1e70), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos 1571.u2", 0x0000, 0x8000, CRC(fe6cac6d) SHA1(d4b79b60cf1eaa399d0932200eb7811e00455249), ROM_BIOS(3) )
+	ROMX_LOAD( "jiffydos 1571.u2", 0x0000, 0x8000, CRC(fe6cac6d) SHA1(d4b79b60cf1eaa399d0932200eb7811e00455249), ROM_BIOS(2) )
 ROM_END
 
 
@@ -104,9 +104,9 @@ ROM_START( c1571cr )
 	ROM_REGION( 0x8000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS("cbm")
 	ROM_SYSTEM_BIOS( 0, "cbm", "Commodore" )
-	ROMX_LOAD( "318047-01.u102", 0x0000, 0x8000, CRC(f24efcc4) SHA1(14ee7a0fb7e1c59c51fbf781f944387037daa3ee), ROM_BIOS(1) )
+	ROMX_LOAD( "318047-01.u102", 0x0000, 0x8000, CRC(f24efcc4) SHA1(14ee7a0fb7e1c59c51fbf781f944387037daa3ee), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos 1571d.u102", 0x0000, 0x8000, CRC(9cba146d) SHA1(823b178561302b403e6bfd8dd741d757efef3958), ROM_BIOS(2) )
+	ROMX_LOAD( "jiffydos 1571d.u102", 0x0000, 0x8000, CRC(9cba146d) SHA1(823b178561302b403e6bfd8dd741d757efef3958), ROM_BIOS(1) )
 ROM_END
 
 
@@ -148,7 +148,7 @@ void c1571_device::c1571_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x1800, 0x180f).mirror(0x03f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(this, FUNC(c1571_device::via1_r), FUNC(c1571_device::via1_w));
+	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(FUNC(c1571_device::via1_r), FUNC(c1571_device::via1_w));
 	map(0x2000, 0x2003).mirror(0x1ffc).rw(WD1770_TAG, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x4000, 0x400f).mirror(0x3ff0).rw(M6526_TAG, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
 	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
@@ -163,7 +163,7 @@ void mini_chief_device::mini_chief_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x1800, 0x180f).mirror(0x03f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(this, FUNC(mini_chief_device::via1_r), FUNC(mini_chief_device::via1_w));
+	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(FUNC(mini_chief_device::via1_r), FUNC(mini_chief_device::via1_w));
 	map(0x2000, 0x2003).mirror(0x1ffc).rw(WD1770_TAG, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x4000, 0x400f).mirror(0xff0).rw(M6526_TAG, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
 	map(0x5000, 0x5fff).mirror(0x2000).ram();
@@ -235,7 +235,7 @@ WRITE8_MEMBER( c1571_device::via0_pa_w )
 
 	if (m_1_2mhz != clock_1_2)
 	{
-		const XTAL clock = clock_1_2 ? XTAL(16'000'000)/8 : XTAL(16'000'000)/16;
+		const XTAL clock = 16_MHz_XTAL / (clock_1_2 ? 8 : 16);
 
 		m_maincpu->set_unscaled_clock(clock);
 		m_cia->set_unscaled_clock(clock);
@@ -277,7 +277,7 @@ WRITE8_MEMBER( c1571cr_device::via0_pa_w )
 
 	if (m_1_2mhz != clock_1_2)
 	{
-		const XTAL clock = clock_1_2 ? XTAL(16'000'000)/8 : XTAL(16'000'000)/16;
+		const XTAL clock = 16_MHz_XTAL / (clock_1_2 ? 8 : 16);
 
 		m_maincpu->set_unscaled_clock(clock);
 		m_cia->set_unscaled_clock(clock);
@@ -459,7 +459,7 @@ WRITE8_MEMBER( c1571_device::via1_pb_w )
 	m_ga->stp_w(data & 0x03); // TODO actually STP1=0, STP0=!(PB0^PB1), Y0=PB1, Y2=!PB1
 
 	// activity LED
-	m_led[LED_ACT] = BIT(data, 3);
+	m_leds[LED_ACT] = BIT(data, 3);
 
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
@@ -605,18 +605,18 @@ static void mini_chief_isa8_cards(device_slot_interface &device)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c1570_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, 16_MHz_XTAL / 16)
 	MCFG_DEVICE_PROGRAM_MAP(c1571_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 16_MHz_XTAL / 16)
 	MCFG_VIA6522_READPA_HANDLER(READ8(*this, c1571_device, via0_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via0_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, c1571_device, via0_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1571_device, via0_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via0_irq_w))
 
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 16_MHz_XTAL / 16)
 	MCFG_VIA6522_READPA_HANDLER(READ8(C64H156_TAG, c64h156_device, yb_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via1_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(C64H156_TAG, c64h156_device, yb_w))
@@ -625,7 +625,7 @@ MACHINE_CONFIG_START(c1570_device::device_add_mconfig)
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, oe_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via1_irq_w))
 
-	MCFG_DEVICE_ADD(M6526_TAG, MOS6526, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6526_TAG, MOS6526, 16_MHz_XTAL / 16)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c1571_device, cia_irq_w))
 	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c1571_device, cia_cnt_w))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c1571_device, cia_sp_w))
@@ -633,26 +633,27 @@ MACHINE_CONFIG_START(c1570_device::device_add_mconfig)
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c1571_device, cia_pb_w))
 	MCFG_MOS6526_PC_CALLBACK(WRITELINE(*this, c1571_device, cia_pc_w))
 
-	MCFG_WD1770_ADD(WD1770_TAG, XTAL(16'000'000)/2)
-	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL(16'000'000))
+	MCFG_DEVICE_ADD(WD1770_TAG, WD1770, 16_MHz_XTAL / 2)
+
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, 16_MHz_XTAL)
 	MCFG_64H156_BYTE_CALLBACK(WRITELINE(*this, c1571_device, byte_w))
 	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(c1571_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, 16_MHz_XTAL / 16)
 	MCFG_DEVICE_PROGRAM_MAP(c1571_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 16_MHz_XTAL / 16)
 	MCFG_VIA6522_READPA_HANDLER(READ8(*this, c1571_device, via0_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via0_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, c1571_device, via0_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1571_device, via0_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via0_irq_w))
 
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 16_MHz_XTAL / 16)
 	MCFG_VIA6522_READPA_HANDLER(READ8(C64H156_TAG, c64h156_device, yb_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via1_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(C64H156_TAG, c64h156_device, yb_w))
@@ -661,7 +662,7 @@ MACHINE_CONFIG_START(c1571_device::device_add_mconfig)
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, oe_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via1_irq_w))
 
-	MCFG_DEVICE_ADD(M6526_TAG, MOS6526, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6526_TAG, MOS6526, 16_MHz_XTAL / 16)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c1571_device, cia_irq_w))
 	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c1571_device, cia_cnt_w))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c1571_device, cia_sp_w))
@@ -669,26 +670,27 @@ MACHINE_CONFIG_START(c1571_device::device_add_mconfig)
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c1571_device, cia_pb_w))
 	MCFG_MOS6526_PC_CALLBACK(WRITELINE(*this, c1571_device, cia_pc_w))
 
-	MCFG_WD1770_ADD(WD1770_TAG, XTAL(16'000'000)/2)
-	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL(16'000'000))
+	MCFG_DEVICE_ADD(WD1770_TAG, WD1770, 16_MHz_XTAL / 2)
+
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, 16_MHz_XTAL)
 	MCFG_64H156_BYTE_CALLBACK(WRITELINE(*this, c1571_device, byte_w))
 	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(c1571cr_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, 16_MHz_XTAL / 16)
 	MCFG_DEVICE_PROGRAM_MAP(c1571_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 16_MHz_XTAL / 16)
 	MCFG_VIA6522_READPA_HANDLER(READ8(*this, c1571_device, via0_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via0_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, c1571cr_device, via0_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1571cr_device, via0_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via0_irq_w))
 
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 16_MHz_XTAL / 16)
 	MCFG_VIA6522_READPA_HANDLER(READ8(C64H156_TAG, c64h156_device, yb_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via1_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(C64H156_TAG, c64h156_device, yb_w))
@@ -697,28 +699,29 @@ MACHINE_CONFIG_START(c1571cr_device::device_add_mconfig)
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, oe_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via1_irq_w))
 
-	//MCFG_MOS5710_ADD(M5710_TAG, XTAL(16'000'000)/16, 0)
+	//MCFG_MOS5710_ADD(M5710_TAG, 16_MHz_XTAL / 16, 0)
 
-	MCFG_WD1770_ADD(WD1770_TAG, XTAL(16'000'000)/2)
-	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL(16'000'000))
+	MCFG_DEVICE_ADD(WD1770_TAG, WD1770, 16_MHz_XTAL / 2)
+
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, 16_MHz_XTAL)
 	MCFG_64H156_BYTE_CALLBACK(WRITELINE(*this, c1571_device, byte_w))
 	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(mini_chief_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, 16_MHz_XTAL / 16)
 	MCFG_DEVICE_PROGRAM_MAP(mini_chief_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
-	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 16_MHz_XTAL / 16)
 	MCFG_VIA6522_READPA_HANDLER(READ8(*this, c1571_device, via0_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via0_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, c1571_device, via0_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1571_device, via0_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via0_irq_w))
 
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 16_MHz_XTAL / 16)
 	MCFG_VIA6522_READPA_HANDLER(READ8(C64H156_TAG, c64h156_device, yb_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1571_device, via1_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(C64H156_TAG, c64h156_device, yb_w))
@@ -727,7 +730,7 @@ MACHINE_CONFIG_START(mini_chief_device::device_add_mconfig)
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, oe_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1571_device, via1_irq_w))
 
-	MCFG_DEVICE_ADD(M6526_TAG, MOS6526, XTAL(16'000'000)/16)
+	MCFG_DEVICE_ADD(M6526_TAG, MOS6526, 16_MHz_XTAL / 16)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c1571_device, cia_irq_w))
 	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c1571_device, cia_cnt_w))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c1571_device, cia_sp_w))
@@ -735,8 +738,9 @@ MACHINE_CONFIG_START(mini_chief_device::device_add_mconfig)
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c1571_device, cia_pb_w))
 	MCFG_MOS6526_PC_CALLBACK(WRITELINE(*this, c1571_device, cia_pc_w))
 
-	MCFG_WD1770_ADD(WD1770_TAG, XTAL(16'000'000)/2)
-	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL(16'000'000))
+	MCFG_DEVICE_ADD(WD1770_TAG, WD1770, 16_MHz_XTAL / 2)
+
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, 16_MHz_XTAL)
 	MCFG_64H156_BYTE_CALLBACK(WRITELINE(*this, c1571_device, byte_w))
 	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 
@@ -791,7 +795,7 @@ c1571_device::c1571_device(const machine_config &mconfig, device_type type, cons
 		m_ga(*this, C64H156_TAG),
 		m_floppy(*this, C64H156_TAG":0:525qd"),
 		m_address(*this, "ADDRESS"),
-		m_led(*this, "led%u", 0U),
+		m_leds(*this, "led%u", 0U),
 		m_1_2mhz(0),
 		m_data_out(1),
 		m_ser_dir(0),
@@ -845,7 +849,7 @@ mini_chief_device::mini_chief_device(const machine_config &mconfig, const char *
 
 void c1571_device::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);

@@ -80,6 +80,7 @@ TODO:
 #include "machine/i8255.h"
 #include "machine/ins8154.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -396,7 +397,7 @@ void vega_state::vega_map(address_map &map)
 
 void vega_state::vega_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(vega_state::extern_r), FUNC(vega_state::extern_w));
+	map(0x00, 0xff).rw(FUNC(vega_state::extern_r), FUNC(vega_state::extern_w));
 }
 
 

@@ -30,7 +30,7 @@ TODO:
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(CDISLAVE, cdislave_device, "cdislave", "CD-i Mono-I Slave")
+DEFINE_DEVICE_TYPE(CDI_SLAVE, cdislave_device, "cdislave", "CD-i Mono-I Slave")
 
 
 #if ENABLE_VERBOSE_LOG
@@ -433,7 +433,7 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 //-------------------------------------------------
 
 cdislave_device::cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CDISLAVE, tag, owner, clock)
+	: device_t(mconfig, CDI_SLAVE, tag, owner, clock)
 	, m_maincpu(*this, ":maincpu")
 	, m_dmadac(*this, ":dac%u", 1U)
 	, m_mousex(*this, "MOUSEX")

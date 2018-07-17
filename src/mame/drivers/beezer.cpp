@@ -34,6 +34,7 @@
 #include "sound/mm5837.h"
 #include "sound/dac76.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -137,7 +138,7 @@ void beezer_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).ram().share("videoram");
 	map(0xc000, 0xcfff).m(m_sysbank, FUNC(address_map_bank_device::amap8));
-	map(0xd000, 0xdfff).rom().region("maincpu", 0x0000).w(this, FUNC(beezer_state::bankswitch_w)); // g1
+	map(0xd000, 0xdfff).rom().region("maincpu", 0x0000).w(FUNC(beezer_state::bankswitch_w)); // g1
 	map(0xe000, 0xefff).rom().region("maincpu", 0x1000); // g3
 	map(0xf000, 0xffff).rom().region("maincpu", 0x2000); // g5
 }
@@ -145,8 +146,8 @@ void beezer_state::main_map(address_map &map)
 void beezer_state::banked_map(address_map &map)
 {
 	map(0x0600, 0x0600).mirror(0x1ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0800, 0x080f).mirror(0x1f0).w(this, FUNC(beezer_state::palette_w));
-	map(0x0a00, 0x0a00).mirror(0x1ff).r(this, FUNC(beezer_state::line_r));
+	map(0x0800, 0x080f).mirror(0x1f0).w(FUNC(beezer_state::palette_w));
+	map(0x0a00, 0x0a00).mirror(0x1ff).r(FUNC(beezer_state::line_r));
 	map(0x0e00, 0x0e0f).mirror(0x1f0).rw("via_u6", FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0x1000, 0x1fff).bankr("rombank_f1");
 	map(0x2000, 0x2fff).bankr("rombank_f3");
@@ -163,7 +164,7 @@ void beezer_state::sound_map(address_map &map)
 	map(0x0800, 0x0fff).ram(); // 2d, optional (can be rom)
 	map(0x1000, 0x1007).mirror(0x07f8).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x1800, 0x180f).mirror(0x07f0).rw(m_via_audio, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x8000, 0x8003).mirror(0x1ffc).w(this, FUNC(beezer_state::dac_w));
+	map(0x8000, 0x8003).mirror(0x1ffc).w(FUNC(beezer_state::dac_w));
 //  AM_RANGE(0xa000, 0xbfff) AM_ROM // 2d (can be ram, unpopulated)
 //  AM_RANGE(0xc000, 0xdfff) AM_ROM // 4d (unpopulated)
 	map(0xe000, 0xffff).rom().region("audiocpu", 0); // 6d

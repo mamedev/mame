@@ -725,7 +725,7 @@ WRITE32_MEMBER(skns_state::v3t_w)
 void skns_state::skns_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom(); /* BIOS ROM */
-	map(0x00400000, 0x0040000f).w(this, FUNC(skns_state::io_w)); /* I/O Write */
+	map(0x00400000, 0x0040000f).w(FUNC(skns_state::io_w)); /* I/O Write */
 	map(0x00400000, 0x00400003).portr("400000");
 	map(0x00400004, 0x00400007).portr("400004");
 	/* In between is write only */
@@ -733,18 +733,18 @@ void skns_state::skns_map(address_map &map)
 	map(0x00800000, 0x00801fff).ram().share("nvram"); /* 'backup' RAM */
 	map(0x00c00000, 0x00c00001).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)); /* ymz280_w (sound) */
 	map(0x01000000, 0x0100000f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x01800000, 0x01800003).w(this, FUNC(skns_state::hit2_w));
+	map(0x01800000, 0x01800003).w(FUNC(skns_state::hit2_w));
 	map(0x02000000, 0x02003fff).ram().share("spriteram"); /* sprite ram */
 	map(0x02100000, 0x0210003f).ram().share("spc_regs"); /* sprite registers */
-	map(0x02400000, 0x0240007f).ram().w(this, FUNC(skns_state::v3_regs_w)).share("v3_regs"); /* tilemap registers */
-	map(0x02500000, 0x02503fff).ram().w(this, FUNC(skns_state::tilemapA_w)).share("tilemapa_ram"); /* tilemap A */
-	map(0x02504000, 0x02507fff).ram().w(this, FUNC(skns_state::tilemapB_w)).share("tilemapb_ram"); /* tilemap B */
+	map(0x02400000, 0x0240007f).ram().w(FUNC(skns_state::v3_regs_w)).share("v3_regs"); /* tilemap registers */
+	map(0x02500000, 0x02503fff).ram().w(FUNC(skns_state::tilemapA_w)).share("tilemapa_ram"); /* tilemap A */
+	map(0x02504000, 0x02507fff).ram().w(FUNC(skns_state::tilemapB_w)).share("tilemapb_ram"); /* tilemap B */
 	map(0x02600000, 0x02607fff).ram().share("v3slc_ram"); /* tilemap linescroll */
-	map(0x02a00000, 0x02a0001f).ram().w(this, FUNC(skns_state::pal_regs_w)).share("pal_regs");
-	map(0x02a40000, 0x02a5ffff).ram().w(this, FUNC(skns_state::palette_ram_w)).share("palette_ram");
-	map(0x02f00000, 0x02f000ff).rw(this, FUNC(skns_state::hit_r), FUNC(skns_state::hit_w));
+	map(0x02a00000, 0x02a0001f).ram().w(FUNC(skns_state::pal_regs_w)).share("pal_regs");
+	map(0x02a40000, 0x02a5ffff).ram().w(FUNC(skns_state::palette_ram_w)).share("palette_ram");
+	map(0x02f00000, 0x02f000ff).rw(FUNC(skns_state::hit_r), FUNC(skns_state::hit_w));
 	map(0x04000000, 0x041fffff).bankr("bank1"); /* GAME ROM */
-	map(0x04800000, 0x0483ffff).ram().w(this, FUNC(skns_state::v3t_w)).share("v3t_ram"); /* tilemap b ram based tiles */
+	map(0x04800000, 0x0483ffff).ram().w(FUNC(skns_state::v3t_w)).share("v3t_ram"); /* tilemap b ram based tiles */
 	map(0x06000000, 0x060fffff).ram().share("main_ram");
 	map(0xc0000000, 0xc0000fff).ram().share("cache_ram"); /* 'cache' RAM */
 }
@@ -1034,7 +1034,7 @@ void skns_state::init_galpans3()   { m_spritegen->skns_sprite_kludge(-1,-1); ini
 // maybe we should treat each motherboard region as a separate parent / root?
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
  /* NOTE: The Euro BIOS rom has been found labeled SKNSE1 and SKNSE2 but the data is the same */
 #define SKNS_BIOS \

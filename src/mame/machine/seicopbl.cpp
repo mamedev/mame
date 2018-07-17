@@ -384,29 +384,30 @@ void seibu_cop_bootleg_device::seibucopbl_map(address_map &map)
 {
 	map(0x01e, 0x01f).ram(); // angle step, PC=0xc0186
 	map(0x028, 0x02b).ram(); // DMA fill latches
-	map(0x02c, 0x02d).rw(this, FUNC(seibu_cop_bootleg_device::prng_max_r), FUNC(seibu_cop_bootleg_device::prng_max_w));
+	map(0x02c, 0x02d).rw(FUNC(seibu_cop_bootleg_device::prng_max_r), FUNC(seibu_cop_bootleg_device::prng_max_w));
 	map(0x040, 0x043).ram(); // n/a
-	map(0x044, 0x045).rw(this, FUNC(seibu_cop_bootleg_device::scale_r), FUNC(seibu_cop_bootleg_device::scale_w));
-	map(0x046, 0x049).rw(this, FUNC(seibu_cop_bootleg_device::d104_move_r), FUNC(seibu_cop_bootleg_device::d104_move_w));
+	map(0x044, 0x045).rw(FUNC(seibu_cop_bootleg_device::scale_r), FUNC(seibu_cop_bootleg_device::scale_w));
+	map(0x046, 0x049).rw(FUNC(seibu_cop_bootleg_device::d104_move_r), FUNC(seibu_cop_bootleg_device::d104_move_w));
 	map(0x04a, 0x04f).ram(); // n/a
 	map(0x050, 0x05f).ram(); // n/a
 	map(0x070, 0x07f).ram(); // DMA registers, PC=0xc0034
 
-	map(0x0a0, 0x0af).rw(this, FUNC(seibu_cop_bootleg_device::reg_hi_addr_r), FUNC(seibu_cop_bootleg_device::reg_hi_addr_w));
+	map(0x0a0, 0x0af).rw(FUNC(seibu_cop_bootleg_device::reg_hi_addr_r), FUNC(seibu_cop_bootleg_device::reg_hi_addr_w));
 	map(0x0b0, 0x0b3).ram(); // unknown, not in original COP
-	map(0x0c0, 0x0cf).rw(this, FUNC(seibu_cop_bootleg_device::reg_lo_addr_r), FUNC(seibu_cop_bootleg_device::reg_lo_addr_w));
+	map(0x0c0, 0x0cf).rw(FUNC(seibu_cop_bootleg_device::reg_lo_addr_r), FUNC(seibu_cop_bootleg_device::reg_lo_addr_w));
 
-	map(0x100, 0x105).w(this, FUNC(seibu_cop_bootleg_device::cmd_trigger_w));
-	map(0x1a0, 0x1a7).r(this, FUNC(seibu_cop_bootleg_device::prng_r));
-	map(0x1b0, 0x1b1).r(this, FUNC(seibu_cop_bootleg_device::status_r));
-	map(0x1b2, 0x1b3).r(this, FUNC(seibu_cop_bootleg_device::dist_r));
-	map(0x1b4, 0x1b5).r(this, FUNC(seibu_cop_bootleg_device::angle_r));
+	map(0x100, 0x105).w(FUNC(seibu_cop_bootleg_device::cmd_trigger_w));
+	map(0x1a0, 0x1a7).r(FUNC(seibu_cop_bootleg_device::prng_r));
+	map(0x1b0, 0x1b1).r(FUNC(seibu_cop_bootleg_device::status_r));
+	map(0x1b2, 0x1b3).r(FUNC(seibu_cop_bootleg_device::dist_r));
+	map(0x1b4, 0x1b5).r(FUNC(seibu_cop_bootleg_device::angle_r));
 }
 
 seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEIBU_COP_BOOTLEG, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		m_space_config("regs", ENDIANNESS_BIG, 16, 9, 0, address_map_constructor(), address_map_constructor(FUNC(seibu_cop_bootleg_device::seibucopbl_map), this))
+	device_memory_interface(mconfig, *this),
+	m_host_cpu(*this, finder_base::DUMMY_TAG),
+	m_space_config("regs", ENDIANNESS_BIG, 16, 9, 0, address_map_constructor(), address_map_constructor(FUNC(seibu_cop_bootleg_device::seibucopbl_map), this))
 {
 }
 
@@ -435,7 +436,6 @@ void seibu_cop_bootleg_device::device_start()
 
 void seibu_cop_bootleg_device::device_reset()
 {
-	m_host_cpu = machine().device<cpu_device>("maincpu");
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 }
 

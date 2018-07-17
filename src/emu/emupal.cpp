@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emupal.h"
 
 
 //**************************************************************************
@@ -17,8 +18,8 @@
 
 DEFINE_DEVICE_TYPE(PALETTE, palette_device, "palette", "palette")
 
-palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, PALETTE, tag, owner, clock),
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 entries)
+	: device_t(mconfig, PALETTE, tag, owner, (uint32_t)0),
 		device_palette_interface(mconfig, *this),
 		m_entries(0),
 		m_indirect_entries(0),
@@ -32,6 +33,7 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 		m_init(palette_init_delegate()),
 		m_raw_to_rgb(raw_to_rgb_converter())
 {
+	set_entries(entries);
 }
 
 

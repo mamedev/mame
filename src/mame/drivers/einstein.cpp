@@ -41,8 +41,8 @@
 #define VERBOSE_KEYBOARD    0
 #define VERBOSE_DISK        0
 
-#define XTAL_X001  XTAL(10'738'635)
-#define XTAL_X002  XTAL(8'000'000)
+#define XTAL_X001  10.738635_MHz_XTAL
+#define XTAL_X002  8_MHz_XTAL
 
 #define IC_I001  "i001"  /* Z8400A */
 #define IC_I030  "i030"  /* AY-3-8910 */
@@ -61,8 +61,8 @@
 class einstein_state : public driver_device
 {
 public:
-	einstein_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	einstein_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, IC_I001),
 		m_keyboard_daisy(*this, "keyboard_daisy"),
 		m_adc_daisy(*this, "adc_daisy"),
@@ -423,19 +423,19 @@ void einstein_state::einstein_mem(address_map &map)
 void einstein_state::einstein_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).mirror(0xff04).rw(this, FUNC(einstein_state::reset_r), FUNC(einstein_state::reset_w));
+	map(0x00, 0x00).mirror(0xff04).rw(FUNC(einstein_state::reset_r), FUNC(einstein_state::reset_w));
 	map(0x02, 0x02).mirror(0xff04).rw(m_psg, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0x03, 0x03).mirror(0xff04).w(m_psg, FUNC(ay8910_device::data_w));
-	map(0x08, 0x08).mirror(0xff06).rw("vdp", FUNC(tms9129_device::vram_read), FUNC(tms9129_device::vram_write));
-	map(0x09, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::register_read), FUNC(tms9129_device::register_write));
+	map(0x08, 0x08).mirror(0xff06).rw("vdp", FUNC(tms9129_device::vram_r), FUNC(tms9129_device::vram_w));
+	map(0x09, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::register_r), FUNC(tms9129_device::register_w));
 	map(0x10, 0x10).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x11, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x18, 0x1b).mirror(0xff04).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
-	map(0x20, 0x20).mirror(0xff00).rw(this, FUNC(einstein_state::kybint_msk_r), FUNC(einstein_state::kybint_msk_w));
-	map(0x21, 0x21).mirror(0xff00).w(this, FUNC(einstein_state::adcint_msk_w));
-	map(0x23, 0x23).mirror(0xff00).w(this, FUNC(einstein_state::drsel_w));
-	map(0x24, 0x24).mirror(0xff00).rw(this, FUNC(einstein_state::rom_r), FUNC(einstein_state::rom_w));
-	map(0x25, 0x25).mirror(0xff00).w(this, FUNC(einstein_state::fireint_msk_w));
+	map(0x20, 0x20).mirror(0xff00).rw(FUNC(einstein_state::kybint_msk_r), FUNC(einstein_state::kybint_msk_w));
+	map(0x21, 0x21).mirror(0xff00).w(FUNC(einstein_state::adcint_msk_w));
+	map(0x23, 0x23).mirror(0xff00).w(FUNC(einstein_state::drsel_w));
+	map(0x24, 0x24).mirror(0xff00).rw(FUNC(einstein_state::rom_r), FUNC(einstein_state::rom_w));
+	map(0x25, 0x25).mirror(0xff00).w(FUNC(einstein_state::fireint_msk_w));
 	map(0x28, 0x2b).mirror(0xff04).rw(IC_I058, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x30, 0x33).mirror(0xff04).rw(IC_I063, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x38, 0x38).mirror(0xff07).rw("adc", FUNC(adc0844_device::read), FUNC(adc0844_device::write));
@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	MCFG_DEVICE_ADD(IC_I063, Z80PIO, XTAL_X002 / 2)
 	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, einstein_state, int_w<0>))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, einstein_state, ardy_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8("user", einstein_userport_device, read))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8("user", einstein_userport_device, write))
@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<4>))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp", TMS9129, XTAL(10'738'635) / 2)
+	MCFG_DEVICE_ADD("vdp", TMS9129, 10.738635_MHz_XTAL / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k RAM, provided by IC i040 and i041
 	MCFG_TMS9928A_SET_SCREEN("screen")
 	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
@@ -635,7 +635,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_ADC0844_CH4_CB(IOPORT("analogue_2_y"))
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(IC_I063, z80pio_device, strobe_a))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, einstein_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, einstein_state, write_centronics_perror))
@@ -658,7 +658,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(IC_I060, i8251_device, write_cts))
 
 	// floppy
-	MCFG_WD1770_ADD(IC_I042, XTAL_X002)
+	MCFG_DEVICE_ADD(IC_I042, WD1770, XTAL_X002)
 
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
@@ -696,9 +696,9 @@ ROM_START( einstein )
 	ROM_REGION(0x8000, "bios", 0)
 	/* i023 */
 	ROM_SYSTEM_BIOS(0,  "mos12",  "MOS 1.2")
-	ROMX_LOAD("mos12.i023", 0, 0x2000, CRC(ec134953) SHA1(a02125d8ebcda48aa784adbb42a8b2d7ef3a4b77), ROM_BIOS(1))
+	ROMX_LOAD("mos12.i023", 0, 0x2000, CRC(ec134953) SHA1(a02125d8ebcda48aa784adbb42a8b2d7ef3a4b77), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1,  "mos121",  "MOS 1.21")
-	ROMX_LOAD("mos121.i023", 0, 0x2000, CRC(a746eeb6) SHA1(f75aaaa777d0fd92225acba291f6bf428b341d3e), ROM_BIOS(2))
+	ROMX_LOAD("mos121.i023", 0, 0x2000, CRC(a746eeb6) SHA1(f75aaaa777d0fd92225acba291f6bf428b341d3e), ROM_BIOS(1))
 	ROM_RELOAD(0x2000, 0x2000)
 	/* i024 */
 	ROM_FILL(0x4000, 0x4000, 0xff)

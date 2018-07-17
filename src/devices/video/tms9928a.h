@@ -71,6 +71,7 @@ DECLARE_DEVICE_TYPE(TMS9129,  tms9129_device)
 
 class tms9928a_device : public device_t,
 						public device_memory_interface,
+						public device_palette_interface,
 						public device_video_interface
 {
 public:
@@ -95,10 +96,10 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	DECLARE_READ8_MEMBER( vram_read );
-	DECLARE_WRITE8_MEMBER( vram_write );
-	DECLARE_READ8_MEMBER( register_read );
-	DECLARE_WRITE8_MEMBER( register_write );
+	DECLARE_READ8_MEMBER( vram_r ) { return vram_read(); }
+	DECLARE_WRITE8_MEMBER( vram_w ) { vram_write(data); }
+	DECLARE_READ8_MEMBER( register_r ) { return register_read(); }
+	DECLARE_WRITE8_MEMBER( register_w ) { register_write(data); }
 
 	u8 vram_read();
 	void vram_write(u8 data);
@@ -122,6 +123,9 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 16; }
 
 private:
 	void change_register(uint8_t reg, uint8_t val);
@@ -157,7 +161,6 @@ private:
 	const bool    m_50hz;
 	const bool    m_reva;
 	const bool    m_99;
-	rgb_t   m_palette[16];
 
 	/* memory */
 	const address_space_config      m_space_config;

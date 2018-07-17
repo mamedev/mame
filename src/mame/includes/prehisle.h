@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/upd7759.h"
+#include "emupal.h"
 
 class prehisle_state : public driver_device
 {

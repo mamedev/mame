@@ -13,6 +13,7 @@
 #include "sound/multipcm.h"
 #include "machine/s32comm.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -351,7 +352,7 @@ protected:
 //  virtual void device_reset() override;
 
 private:
-	output_finder<16> m_lamp;
+	output_finder<16> m_lamps;
 };
 
 class sega_multi32_state : public segas32_state

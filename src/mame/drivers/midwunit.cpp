@@ -112,17 +112,17 @@ Notes:
 
 void midwunit_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).rw(this, FUNC(midwunit_state::midtunit_vram_r), FUNC(midwunit_state::midtunit_vram_w));
+	map(0x00000000, 0x003fffff).rw(FUNC(midwunit_state::midtunit_vram_r), FUNC(midwunit_state::midtunit_vram_w));
 	map(0x01000000, 0x013fffff).ram().share("mainram");
-	map(0x01400000, 0x0145ffff).rw(this, FUNC(midwunit_state::midwunit_cmos_r), FUNC(midwunit_state::midwunit_cmos_w)).share("nvram");
-	map(0x01480000, 0x014fffff).w(this, FUNC(midwunit_state::midwunit_cmos_enable_w));
-	map(0x01600000, 0x0160001f).rw(this, FUNC(midwunit_state::midwunit_security_r), FUNC(midwunit_state::midwunit_security_w));
-	map(0x01680000, 0x0168001f).rw(this, FUNC(midwunit_state::midwunit_sound_r), FUNC(midwunit_state::midwunit_sound_w));
-	map(0x01800000, 0x0187ffff).rw(this, FUNC(midwunit_state::midwunit_io_r), FUNC(midwunit_state::midwunit_io_w));
+	map(0x01400000, 0x0145ffff).rw(FUNC(midwunit_state::midwunit_cmos_r), FUNC(midwunit_state::midwunit_cmos_w)).share("nvram");
+	map(0x01480000, 0x014fffff).w(FUNC(midwunit_state::midwunit_cmos_enable_w));
+	map(0x01600000, 0x0160001f).rw(FUNC(midwunit_state::midwunit_security_r), FUNC(midwunit_state::midwunit_security_w));
+	map(0x01680000, 0x0168001f).rw(FUNC(midwunit_state::midwunit_sound_r), FUNC(midwunit_state::midwunit_sound_w));
+	map(0x01800000, 0x0187ffff).rw(FUNC(midwunit_state::midwunit_io_r), FUNC(midwunit_state::midwunit_io_w));
 	map(0x01880000, 0x018fffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x01a00000, 0x01a000ff).mirror(0x00080000).rw(this, FUNC(midwunit_state::midtunit_dma_r), FUNC(midwunit_state::midtunit_dma_w));
-	map(0x01b00000, 0x01b0001f).rw(this, FUNC(midwunit_state::midwunit_control_r), FUNC(midwunit_state::midwunit_control_w));
-	map(0x02000000, 0x06ffffff).r(this, FUNC(midwunit_state::midwunit_gfxrom_r));
+	map(0x01a00000, 0x01a000ff).mirror(0x00080000).rw(FUNC(midwunit_state::midtunit_dma_r), FUNC(midwunit_state::midtunit_dma_w));
+	map(0x01b00000, 0x01b0001f).rw(FUNC(midwunit_state::midwunit_control_r), FUNC(midwunit_state::midwunit_control_w));
+	map(0x02000000, 0x06ffffff).r(FUNC(midwunit_state::midwunit_gfxrom_r));
 	map(0xc0000000, 0xc00001ff).rw("maincpu", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffffffff).rom().region("maincpu", 0);
 }

@@ -113,13 +113,13 @@ public:
 	DECLARE_WRITE8_MEMBER(dor_w);
 	DECLARE_READ8_MEMBER (tdr_r);
 	DECLARE_WRITE8_MEMBER(tdr_w);
-	uint8_t msr_r();
+	uint8_t read_msr();
 	DECLARE_READ8_MEMBER (msr_r);
 	DECLARE_WRITE8_MEMBER(dsr_w);
-	uint8_t fifo_r();
-	void fifo_w(uint8_t data);
-	DECLARE_READ8_MEMBER (fifo_r);
-	DECLARE_WRITE8_MEMBER(fifo_w);
+	uint8_t read_fifo();
+	void write_fifo(uint8_t data);
+	DECLARE_READ8_MEMBER (fifo_r) { return read_fifo(); }
+	DECLARE_WRITE8_MEMBER(fifo_w) { write_fifo(data); }
 	DECLARE_READ8_MEMBER (dir_r);
 	DECLARE_WRITE8_MEMBER(ccr_w);
 
@@ -233,6 +233,7 @@ protected:
 		SEEK_WAIT_DONE,
 		SEEK_DONE,
 
+		HEAD_LOAD,
 		HEAD_LOAD_DONE,
 
 		WAIT_INDEX,
@@ -345,7 +346,8 @@ protected:
 	emu_timer *poll_timer;
 
 	static std::string tts(attotime t);
-	std::string ttsn();
+	std::string results() const;
+	std::string ttsn() const;
 
 	enum {
 		C_CONFIGURE,

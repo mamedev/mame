@@ -32,7 +32,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_vtac(*this, "vtac")
-		, m_brg(*this, "brg%u", 1)
 		, m_usart(*this, "usart%u", 1)
 		, m_earom(*this, "earom")
 		, m_picu(*this, "picu")
@@ -41,7 +40,6 @@ public:
 		, m_key_row(*this, "ROW%u", 0)
 	{ }
 
-	template<int N> DECLARE_WRITE8_MEMBER(brg_w);
 	DECLARE_READ8_MEMBER(earom_r);
 	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -63,7 +61,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<crt5037_device> m_vtac;
-	required_device_array<com8116_device, 2> m_brg;
 	required_device_array<i8251_device, 2> m_usart;
 	required_device<er1400_device> m_earom;
 	required_device<i8214_device> m_picu;
@@ -154,13 +151,6 @@ void v100_state::machine_start()
 	save_item(NAME(m_active_row));
 }
 
-template<int N>
-WRITE8_MEMBER(v100_state::brg_w)
-{
-	m_brg[N]->str_w(data & 0x0f);
-	m_brg[N]->stt_w(data >> 4);
-}
-
 READ8_MEMBER(v100_state::earom_r)
 {
 	return m_earom->data_r();
@@ -225,17 +215,17 @@ void v100_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x0f).w(m_vtac, FUNC(crt5037_device::write));
-	map(0x10, 0x10).w(this, FUNC(v100_state::brg_w<0>));
+	map(0x10, 0x10).w("brg1", FUNC(com8116_device::stt_str_w));
 	map(0x12, 0x12).rw("usart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x13, 0x13).rw("usart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x14, 0x14).rw("usart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x15, 0x15).rw("usart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x16, 0x16).w(this, FUNC(v100_state::brg_w<1>));
-	map(0x20, 0x20).r(this, FUNC(v100_state::earom_r));
-	map(0x30, 0x30).w(this, FUNC(v100_state::port30_w));
-	map(0x40, 0x40).rw(this, FUNC(v100_state::keyboard_r), FUNC(v100_state::key_row_w));
-	map(0x48, 0x48).w(this, FUNC(v100_state::port48_w));
-	map(0x60, 0x60).w(this, FUNC(v100_state::picu_w));
+	map(0x16, 0x16).w("brg2", FUNC(com8116_device::stt_str_w));
+	map(0x20, 0x20).r(FUNC(v100_state::earom_r));
+	map(0x30, 0x30).w(FUNC(v100_state::port30_w));
+	map(0x40, 0x40).rw(FUNC(v100_state::keyboard_r), FUNC(v100_state::key_row_w));
+	map(0x48, 0x48).w(FUNC(v100_state::port48_w));
+	map(0x60, 0x60).w(FUNC(v100_state::picu_w));
 	map(0x70, 0x73).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 

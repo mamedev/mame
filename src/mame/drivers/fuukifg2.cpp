@@ -94,17 +94,17 @@ void fuuki16_state::fuuki16_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                     // ROM
 	map(0x400000, 0x40ffff).ram();                                                                     // RAM
-	map(0x500000, 0x501fff).ram().w(this, FUNC(fuuki16_state::vram_w<0>)).share("vram.0");                  // Layers
-	map(0x502000, 0x503fff).ram().w(this, FUNC(fuuki16_state::vram_w<1>)).share("vram.1");                  //
-	map(0x504000, 0x505fff).ram().w(this, FUNC(fuuki16_state::vram_w<2>)).share("vram.2");                  //
-	map(0x506000, 0x507fff).ram().w(this, FUNC(fuuki16_state::vram_w<3>)).share("vram.3");                  //
+	map(0x500000, 0x501fff).ram().w(FUNC(fuuki16_state::vram_w<0>)).share("vram.0");                  // Layers
+	map(0x502000, 0x503fff).ram().w(FUNC(fuuki16_state::vram_w<1>)).share("vram.1");                  //
+	map(0x504000, 0x505fff).ram().w(FUNC(fuuki16_state::vram_w<2>)).share("vram.2");                  //
+	map(0x506000, 0x507fff).ram().w(FUNC(fuuki16_state::vram_w<3>)).share("vram.3");                  //
 	map(0x600000, 0x601fff).mirror(0x008000).rw(m_fuukivid, FUNC(fuukivid_device::fuuki_sprram_r), FUNC(fuukivid_device::fuuki_sprram_w)).share("spriteram");   // Sprites, mirrored?
 	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x800000, 0x800001).portr("SYSTEM");
 	map(0x810000, 0x810001).portr("P1_P2");
 	map(0x880000, 0x880001).portr("DSW");
-	map(0x8a0001, 0x8a0001).w(this, FUNC(fuuki16_state::sound_command_w));                                          // To Sound CPU
-	map(0x8c0000, 0x8c001f).ram().w(this, FUNC(fuuki16_state::vregs_w)).share("vregs");                        // Video Registers
+	map(0x8a0001, 0x8a0001).w(FUNC(fuuki16_state::sound_command_w));                                          // To Sound CPU
+	map(0x8c0000, 0x8c001f).ram().w(FUNC(fuuki16_state::vregs_w)).share("vregs");                        // Video Registers
 	map(0x8d0000, 0x8d0003).ram().share("unknown");                                         //
 	map(0x8e0000, 0x8e0001).ram().share("priority");                                            //
 }
@@ -146,9 +146,9 @@ void fuuki16_state::fuuki16_sound_map(address_map &map)
 void fuuki16_state::fuuki16_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(fuuki16_state::sound_rombank_w));  // ROM Bank
+	map(0x00, 0x00).w(FUNC(fuuki16_state::sound_rombank_w));  // ROM Bank
 	map(0x11, 0x11).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // From Main CPU / ? To Main CPU ?
-	map(0x20, 0x20).w(this, FUNC(fuuki16_state::oki_banking_w));    // Oki Banking
+	map(0x20, 0x20).w(FUNC(fuuki16_state::oki_banking_w));    // Oki Banking
 	map(0x30, 0x30).nopw();    // ? In the NMI routine
 	map(0x40, 0x41).w("ym1", FUNC(ym2203_device::write));
 	map(0x50, 0x51).rw("ym2", FUNC(ym3812_device::read), FUNC(ym3812_device::write));

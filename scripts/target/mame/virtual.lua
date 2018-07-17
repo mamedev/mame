@@ -59,6 +59,7 @@ SOUNDS["WAVE"] = true
 --------------------------------------------------
 MACHINES["LDV1000"] = true
 MACHINES["LDPR8210"] = true
+MACHINES["Z80DAISY"] = true
 
 --------------------------------------------------
 -- specify available bus cores

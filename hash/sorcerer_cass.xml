@@ -913,4 +913,86 @@
 			</dataarea>
 		</part>
 	</software>
+	<!-- Added 2018-05-31 -->
+	<software name="checkers">
+		<description>Checkers</description>
+		<year>198?</year>
+		<publisher>Creative Computing</publisher>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="5634604">
+				<rom name="checkers.wav" size="5634604" crc="3e56fd0a" sha1="6d0d059c4b498ddf9af60c13688a571df7dec82c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="crossup">
+		<description>Cross-Up</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Ted Crowley"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="6018780">
+				<rom name="crossup.wav" size="6018780" crc="dd5d53ad" sha1="47030e72a6c0f82632b0ad38888d03b7ad7cc85a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="lazerfire">
+		<description>Lazer Fire</description>
+		<year>198?</year>
+		<publisher>University Software</publisher>
+		<info name="developer" value="Mark Yvanovich"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="5692146">
+				<rom name="lazerfire.wav" size="5692146" crc="cf744d7d" sha1="a02cf9a3ba6013b255f3013c7a3fe57592374fe7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="minefield">
+		<description>Mine Field</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Colin Morle"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="2725760">
+				<rom name="minefield.wav" size="2725760" crc="e99d2b41" sha1="14149b6165b06fe813c5e707687eb79065a3731c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="nuclear">
+		<description>Nuclear Reaction</description>
+		<year>198?</year>
+		<publisher>Creative Computing</publisher>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="3744044">
+				<rom name="nuclear.wav" size="3744044" crc="1559f774" sha1="66b00b67623e4f451ede73b6ed3b4f2da3caf222" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="pielob">
+		<description>Pie Lob</description>
+		<year>198?</year>
+		<publisher>Creative Computing</publisher>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="5018924">
+				<rom name="pielob.wav" size="5018924" crc="bdbc149e" sha1="53ebb15672cb4d02a2cc2ad612300a854a9892a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="west">
+		<description>How The West Was Won</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Colin Morle"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="6220906">
+				<rom name="west.wav" size="6220906" crc="9e84b0f4" sha1="6f578e9d50b648e367763d9ec45eefd36889fe6b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

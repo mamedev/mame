@@ -73,7 +73,7 @@ ToDo:
 
 void zorba_state::zorba_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bankr0").bankw("bankw0");
+	map(0x0000, 0x3fff).bankr(m_read_bank).bankw("bankw0");
 	map(0x4000, 0xffff).ram();
 }
 
@@ -82,8 +82,8 @@ void zorba_state::zorba_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-	map(0x04, 0x04).rw(this, FUNC(zorba_state::rom_r), FUNC(zorba_state::rom_w));
-	map(0x05, 0x05).rw(this, FUNC(zorba_state::ram_r), FUNC(zorba_state::ram_w));
+	map(0x04, 0x04).rw(FUNC(zorba_state::rom_r), FUNC(zorba_state::rom_w));
+	map(0x05, 0x05).rw(FUNC(zorba_state::ram_r), FUNC(zorba_state::ram_w));
 	map(0x10, 0x11).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x20, 0x20).rw(m_uart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x21, 0x21).rw(m_uart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -91,8 +91,8 @@ void zorba_state::zorba_io(address_map &map)
 	map(0x23, 0x23).rw(m_uart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x24, 0x24).rw(m_uart2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x25, 0x25).rw(m_uart2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x26, 0x26).w(this, FUNC(zorba_state::intmask_w));
-	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x26, 0x26).w(FUNC(zorba_state::intmask_w));
+	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
 	map(0x40, 0x43).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x50, 0x53).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x60, 0x63).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -137,9 +137,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(zorba_state::zorba)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, Z80, 24_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(zorba_mem)
-	MCFG_DEVICE_IO_MAP(zorba_io)
+	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zorba_state::zorba_mem);
+	m_maincpu->set_addrmap(AS_IO, &zorba_state::zorba_io);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -192,17 +192,17 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	// port B - parallel interface
 	MCFG_DEVICE_ADD(m_pia0, PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, zorba_state, pia0_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("parprndata", output_latch_device, write))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("parprndata", output_latch_device, bus_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE("parprn", centronics_device, write_strobe))
 
 	// IEEE488 interface
 	MCFG_DEVICE_ADD(m_pia1, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(m_ieee, ieee488_device, dio_r)) // TODO: gated with PB1
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(m_ieee, ieee488_device, dio_w)) // TODO: gated with PB1
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(m_ieee, ieee488_device, host_dio_w)) // TODO: gated with PB1
 	MCFG_PIA_READPB_HANDLER(READ8(*this, zorba_state, pia1_portb_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, zorba_state, pia1_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(m_ieee, ieee488_device, ifc_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(m_ieee, ieee488_device, ren_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(m_ieee, ieee488_device, host_ifc_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(m_ieee, ieee488_device, host_ren_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE("irq1", input_merger_device, in_w<0>))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE("irq1", input_merger_device, in_w<1>))
 
@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// Floppies
-	MCFG_FD1793_ADD(m_fdc, 24_MHz_XTAL / 24)
+	MCFG_DEVICE_ADD(m_fdc, FD1793, 24_MHz_XTAL / 24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("irq2", input_merger_device, in_w<0>))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("irq2", input_merger_device, in_w<1>))
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 
 	// J3 Parallel printer
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("parprndata", "parprn")
-	MCFG_CENTRONICS_ADD("parprn", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("parprn", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m_uart1, i8251_device, write_cts))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_uart1, i8251_device, write_dsr)) // TODO: shared with serial CTS
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, zorba_state, printer_fault_w))
@@ -273,8 +273,8 @@ void zorba_state::machine_start()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
-	membank("bankr0")->configure_entry(0, &main[0x0000]);
-	membank("bankr0")->configure_entry(1, &main[0x10000]);
+	m_read_bank->configure_entry(0, &main[0x0000]);
+	m_read_bank->configure_entry(1, &main[0x10000]);
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 
 	save_item(NAME(m_intmask));
@@ -304,7 +304,7 @@ void zorba_state::machine_reset()
 	m_pia0->cb1_w(m_printer_prowriter ? m_printer_select : m_printer_fault);
 
 	m_read_bank->set_entry(1); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
+	membank("bankw0")->set_entry(0); // always write to RAM
 
 	m_maincpu->reset();
 }
@@ -489,11 +489,11 @@ WRITE8_MEMBER( zorba_state::pia1_portb_w )
 	// 6  NDAC  gated with PB1 (active low)
 	// 7  NRFD  gated with PB1 (active low)
 
-	m_ieee->eoi_w(BIT(data, 3) & BIT(~data, 2));
-	m_ieee->atn_w(BIT(data, 4));
-	m_ieee->dav_w(BIT(data, 5) & BIT(~data, 2));
-	m_ieee->ndac_w(BIT(data, 6) & BIT(~data, 1));
-	m_ieee->nrfd_w(BIT(data, 7) & BIT(~data, 1));
+	m_ieee->host_eoi_w(BIT(data, 3) & BIT(~data, 2));
+	m_ieee->host_atn_w(BIT(data, 4));
+	m_ieee->host_dav_w(BIT(data, 5) & BIT(~data, 2));
+	m_ieee->host_ndac_w(BIT(data, 6) & BIT(~data, 1));
+	m_ieee->host_nrfd_w(BIT(data, 7) & BIT(~data, 1));
 }
 
 

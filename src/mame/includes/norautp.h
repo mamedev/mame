@@ -7,6 +7,7 @@
 
 #include "machine/i8255.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -26,7 +27,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(ppi2_obf_w);
@@ -71,7 +72,7 @@ public:
 	void ssjkrpkr_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	std::unique_ptr<uint16_t[]> m_np_vram;
@@ -81,7 +82,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	output_finder<12> m_lamp;
+	output_finder<12> m_lamps;
 };
 
 /*----------- defined in audio/norautp.c -----------*/

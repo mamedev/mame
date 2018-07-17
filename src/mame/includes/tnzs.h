@@ -13,6 +13,7 @@
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/upd4701.h"
+#include "emupal.h"
 
 #define MAX_SAMPLES 0x2f        /* max samples */
 

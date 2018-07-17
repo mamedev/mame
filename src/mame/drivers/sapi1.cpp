@@ -38,6 +38,7 @@ Unable to proceed due to no info available (& in English).
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class sapi1_state : public driver_device
@@ -195,7 +196,7 @@ void sapi1_state::sapi1_mem(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x1fff).rom(); // Extension ROM
 	map(0x2000, 0x23ff).ram();
-	map(0x2400, 0x27ff).rw(this, FUNC(sapi1_state::sapi1_keyboard_r), FUNC(sapi1_state::sapi1_keyboard_w)); // PORT 0 - keyboard
+	map(0x2400, 0x27ff).rw(FUNC(sapi1_state::sapi1_keyboard_r), FUNC(sapi1_state::sapi1_keyboard_w)); // PORT 0 - keyboard
 	//AM_RANGE(0x2800, 0x2bff) AM_NOP // PORT 1
 	//AM_RANGE(0x2c00, 0x2fff) AM_NOP // PORT 2
 	//AM_RANGE(0x3000, 0x33ff) AM_NOP // 3214
@@ -209,8 +210,8 @@ void sapi1_state::sapi2_mem(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x1fff).rom(); // Extension ROM
 	map(0x2000, 0x23ff).ram();
-	map(0x2400, 0x27ff).r(this, FUNC(sapi1_state::sapi2_keyboard_status_r));
-	map(0x2800, 0x28ff).r(this, FUNC(sapi1_state::sapi2_keyboard_data_r));
+	map(0x2400, 0x27ff).r(FUNC(sapi1_state::sapi2_keyboard_status_r));
+	map(0x2800, 0x28ff).r(FUNC(sapi1_state::sapi2_keyboard_data_r));
 	map(0x3800, 0x3fff).ram().share("videoram"); // AND-1 (video RAM)
 	map(0x4000, 0x7fff).ram(); // REM-1
 }
@@ -245,29 +246,29 @@ void sapi1_state::sapi3_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sapi1_state::sapi3_00_w));
-	map(0x25, 0x25).rw(this, FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+	map(0x00, 0x00).w(FUNC(sapi1_state::sapi3_00_w));
+	map(0x25, 0x25).rw(FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
 }
 
 void sapi1_state::sapi3a_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sapi1_state::sapi3_00_w));
-	map(0x10, 0x10).rw(this, FUNC(sapi1_state::uart_status_r), FUNC(sapi1_state::modem_control_w));
-	map(0x11, 0x11).rw(this, FUNC(sapi1_state::uart_ready_r), FUNC(sapi1_state::uart_mode_w));
+	map(0x00, 0x00).w(FUNC(sapi1_state::sapi3_00_w));
+	map(0x10, 0x10).rw(FUNC(sapi1_state::uart_status_r), FUNC(sapi1_state::modem_control_w));
+	map(0x11, 0x11).rw(FUNC(sapi1_state::uart_ready_r), FUNC(sapi1_state::uart_mode_w));
 	map(0x12, 0x12).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
-	map(0x13, 0x13).w(this, FUNC(sapi1_state::uart_reset_w));
-	map(0x25, 0x25).rw(this, FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+	map(0x13, 0x13).w(FUNC(sapi1_state::uart_reset_w));
+	map(0x25, 0x25).rw(FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
 }
 
 void sapi1_state::sapi3b_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sapi1_state::sapi3_00_w));
-	map(0x0c, 0x0c).r(this, FUNC(sapi1_state::sapi3_0c_r));
-	map(0x25, 0x25).rw(this, FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+	map(0x00, 0x00).w(FUNC(sapi1_state::sapi3_00_w));
+	map(0x0c, 0x0c).r(FUNC(sapi1_state::sapi3_0c_r));
+	map(0x25, 0x25).rw(FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
 	map(0xe0, 0xe0).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe1, 0xe1).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
@@ -721,47 +722,47 @@ MACHINE_CONFIG_END
 ROM_START( sapi1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "mb1", "MB1" )
-	ROMX_LOAD( "sapi1.rom", 0x0000, 0x1000, CRC(c6e85b01) SHA1(2a26668249c6161aef7215a1e2b92bfdf6fe3671), ROM_BIOS(1))
+	ROMX_LOAD("sapi1.rom", 0x0000, 0x1000, CRC(c6e85b01) SHA1(2a26668249c6161aef7215a1e2b92bfdf6fe3671), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mb2", "MB2 (ANK-1)" )
-	ROMX_LOAD( "mb2_4.bin", 0x0000, 0x1000, CRC(a040b3e0) SHA1(586990a07a96323741679a11ff54ad0023da87bc), ROM_BIOS(2))
+	ROMX_LOAD("mb2_4.bin", 0x0000, 0x1000, CRC(a040b3e0) SHA1(586990a07a96323741679a11ff54ad0023da87bc), ROM_BIOS(1))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "sapi1.chr",  0x0000, 0x1000, CRC(9edafa2c) SHA1(a903db0e8923cca91646274d010dc19b6b377e3e) )
+	ROM_LOAD("sapi1.chr",  0x0000, 0x1000, CRC(9edafa2c) SHA1(a903db0e8923cca91646274d010dc19b6b377e3e))
 ROM_END
 
 ROM_START( sapizps2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v4", "MIKOS 4" )
-	ROMX_LOAD( "36.bin", 0x0000, 0x0800, CRC(a27f340a) SHA1(d07d208fcbe428897336c17197d3e8fb52181f38), ROM_BIOS(1))
-	ROMX_LOAD( "37.bin", 0x0800, 0x0800, CRC(30daa708) SHA1(66e990c40788ee25cf6cabd4842a78daf4fcdddd), ROM_BIOS(1))
+	ROMX_LOAD("36.bin", 0x0000, 0x0800, CRC(a27f340a) SHA1(d07d208fcbe428897336c17197d3e8fb52181f38), ROM_BIOS(0))
+	ROMX_LOAD("37.bin", 0x0800, 0x0800, CRC(30daa708) SHA1(66e990c40788ee25cf6cabd4842a78daf4fcdddd), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v5", "MIKOS 5" )
-	ROMX_LOAD( "mikos5_1.bin", 0x0000, 0x0800, CRC(c2a83ca3) SHA1(a3678253d7690c89945e791ea0f8e15b081c9126), ROM_BIOS(2))
-	ROMX_LOAD( "mikos5_2.bin", 0x0800, 0x0800, CRC(c4458a04) SHA1(0cc909323f0e6507d95e57ea39e1deb8bd57bf89), ROM_BIOS(2))
-	ROMX_LOAD( "mikos5_3.bin", 0x1000, 0x0800, CRC(efb499f3) SHA1(78f0ca3ff10d7af4ae94ab820723296beb035f8f), ROM_BIOS(2))
-	ROMX_LOAD( "mikos5_4.bin", 0x1800, 0x0800, CRC(4d90e9be) SHA1(8ec554198697550a49432e8210d43700ef1d6a32), ROM_BIOS(2))
+	ROMX_LOAD("mikos5_1.bin", 0x0000, 0x0800, CRC(c2a83ca3) SHA1(a3678253d7690c89945e791ea0f8e15b081c9126), ROM_BIOS(1))
+	ROMX_LOAD("mikos5_2.bin", 0x0800, 0x0800, CRC(c4458a04) SHA1(0cc909323f0e6507d95e57ea39e1deb8bd57bf89), ROM_BIOS(1))
+	ROMX_LOAD("mikos5_3.bin", 0x1000, 0x0800, CRC(efb499f3) SHA1(78f0ca3ff10d7af4ae94ab820723296beb035f8f), ROM_BIOS(1))
+	ROMX_LOAD("mikos5_4.bin", 0x1800, 0x0800, CRC(4d90e9be) SHA1(8ec554198697550a49432e8210d43700ef1d6a32), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "mb3", "MB3 (Consul)" )
-	ROMX_LOAD( "mb3_1.bin", 0x0000, 0x1000, CRC(be895f88) SHA1(7fc2a92f41d978a9f0ccd0e235ea3c6146adfb6f), ROM_BIOS(3))
+	ROMX_LOAD("mb3_1.bin", 0x0000, 0x1000, CRC(be895f88) SHA1(7fc2a92f41d978a9f0ccd0e235ea3c6146adfb6f), ROM_BIOS(2))
 ROM_END
 
 ROM_START( sapizps3 )
 	ROM_REGION( 0x10800, "maincpu", 0 )
 	// These 2 bioses use videoram at F800
 	ROM_SYSTEM_BIOS( 0, "per", "Perina" )
-	ROMX_LOAD( "perina_1988.bin",0x10000, 0x0800, CRC(d71e8d3a) SHA1(9b3a26ea7c2f2c8a1fb10b51c1c880acc9fd806d), ROM_BIOS(1))
+	ROMX_LOAD("perina_1988.bin",0x10000, 0x0800, CRC(d71e8d3a) SHA1(9b3a26ea7c2f2c8a1fb10b51c1c880acc9fd806d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "1zmod", "JPR-1Zmod" )
-	ROMX_LOAD( "jpr1zmod.bin",   0x10000, 0x0800, CRC(69a29b07) SHA1(1cd31032954fcd7d10b1586be62db6f7597eb4f2), ROM_BIOS(2))
+	ROMX_LOAD("jpr1zmod.bin",   0x10000, 0x0800, CRC(69a29b07) SHA1(1cd31032954fcd7d10b1586be62db6f7597eb4f2), ROM_BIOS(1))
 ROM_END
 
 ROM_START( sapizps3a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	// This bios uses a terminal
-	ROM_LOAD( "jpr1a.bin",      0xf800, 0x0800, CRC(3ed89786) SHA1(dcc8657b4884bfe58d114c539b733b73d038ee30))
+	ROM_LOAD("jpr1a.bin",      0xf800, 0x0800, CRC(3ed89786) SHA1(dcc8657b4884bfe58d114c539b733b73d038ee30))
 ROM_END
 
 ROM_START( sapizps3b )
 	ROM_REGION( 0x10800, "maincpu", 0 )
-	// This bios uses a 6845
-	ROM_LOAD( "pkt1.bin",       0x10000, 0x0800, CRC(ed5a2725) SHA1(3383c15f87f976400b8d0f31829e2a95236c4b6c))
+	// This BIOS uses a 6845
+	ROM_LOAD("pkt1.bin",       0x10000, 0x0800, CRC(ed5a2725) SHA1(3383c15f87f976400b8d0f31829e2a95236c4b6c))
 ROM_END
 
 

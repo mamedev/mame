@@ -33,6 +33,7 @@ TODO:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -46,7 +47,8 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	void init_rmhaihai();
 	void rmhaihai(machine_config &config);
@@ -211,9 +213,9 @@ READ8_MEMBER(rmhaihai_state::samples_r)
 
 WRITE8_MEMBER(rmhaihai_state::adpcm_w)
 {
-	m_msm->data_w(data);         /* bit0..3  */
-	m_msm->reset_w(BIT(data, 5)); /* bit 5    */
-	m_msm->vclk_w(BIT(data, 4)); /* bit4     */
+	m_msm->write_data(data);        // bit0..3
+	m_msm->reset_w(BIT(data, 5));   // bit 5
+	m_msm->vclk_w(BIT(data, 4));    // bit4
 }
 
 WRITE8_MEMBER(rmhaihai_state::ctrl_w)
@@ -255,8 +257,8 @@ void rmhaihai_state::rmhaihai_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xa000, 0xa7ff).ram().share("nvram");
-	map(0xa800, 0xafff).ram().w(this, FUNC(rmhaihai_state::colorram_w)).share("colorram");
-	map(0xb000, 0xb7ff).ram().w(this, FUNC(rmhaihai_state::videoram_w)).share("videoram");
+	map(0xa800, 0xafff).ram().w(FUNC(rmhaihai_state::colorram_w)).share("colorram");
+	map(0xb000, 0xb7ff).ram().w(FUNC(rmhaihai_state::videoram_w)).share("videoram");
 	map(0xb83c, 0xb83c).nopw();    // ??
 	map(0xbc00, 0xbc00).nopw();    // ??
 	map(0xc000, 0xdfff).rom();
@@ -265,13 +267,13 @@ void rmhaihai_state::rmhaihai_map(address_map &map)
 
 void rmhaihai_state::rmhaihai_io_map(address_map &map)
 {
-	map(0x0000, 0x7fff).r(this, FUNC(rmhaihai_state::samples_r));
-	map(0x8000, 0x8000).r(this, FUNC(rmhaihai_state::keyboard_r)).nopw();    // ??
-	map(0x8001, 0x8001).nopr().w(this, FUNC(rmhaihai_state::keyboard_w));    // ??
+	map(0x0000, 0x7fff).r(FUNC(rmhaihai_state::samples_r));
+	map(0x8000, 0x8000).r(FUNC(rmhaihai_state::keyboard_r)).nopw();    // ??
+	map(0x8001, 0x8001).nopr().w(FUNC(rmhaihai_state::keyboard_w));    // ??
 	map(0x8020, 0x8020).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x8020, 0x8021).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x8040, 0x8040).w(this, FUNC(rmhaihai_state::adpcm_w));
-	map(0x8060, 0x8060).w(this, FUNC(rmhaihai_state::ctrl_w));
+	map(0x8040, 0x8040).w(FUNC(rmhaihai_state::adpcm_w));
+	map(0x8060, 0x8060).w(FUNC(rmhaihai_state::ctrl_w));
 	map(0x8080, 0x8080).nopw();    // ??
 	map(0xbc04, 0xbc04).nopw();    // ??
 	map(0xbc0c, 0xbc0c).nopw();    // ??
@@ -282,23 +284,23 @@ void themj_state::themj_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xa7ff).ram();
-	map(0xa800, 0xafff).ram().w(this, FUNC(themj_state::colorram_w)).share("colorram");
-	map(0xb000, 0xb7ff).ram().w(this, FUNC(themj_state::videoram_w)).share("videoram");
+	map(0xa800, 0xafff).ram().w(FUNC(themj_state::colorram_w)).share("colorram");
+	map(0xb000, 0xb7ff).ram().w(FUNC(themj_state::videoram_w)).share("videoram");
 	map(0xc000, 0xdfff).bankr("bank2");
 	map(0xe000, 0xffff).rom();
 }
 
 void themj_state::themj_io_map(address_map &map)
 {
-	map(0x0000, 0x7fff).r(this, FUNC(themj_state::samples_r));
-	map(0x8000, 0x8000).r(this, FUNC(themj_state::keyboard_r)).nopw();    // ??
-	map(0x8001, 0x8001).nopr().w(this, FUNC(themj_state::keyboard_w));    // ??
+	map(0x0000, 0x7fff).r(FUNC(themj_state::samples_r));
+	map(0x8000, 0x8000).r(FUNC(themj_state::keyboard_r)).nopw();    // ??
+	map(0x8001, 0x8001).nopr().w(FUNC(themj_state::keyboard_w));    // ??
 	map(0x8020, 0x8020).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x8020, 0x8021).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x8040, 0x8040).w(this, FUNC(themj_state::adpcm_w));
-	map(0x8060, 0x8060).w(this, FUNC(themj_state::ctrl_w));
+	map(0x8040, 0x8040).w(FUNC(themj_state::adpcm_w));
+	map(0x8060, 0x8060).w(FUNC(themj_state::ctrl_w));
 	map(0x8080, 0x8080).nopw();    // ??
-	map(0x80a0, 0x80a0).w(this, FUNC(themj_state::themj_rombank_w));
+	map(0x80a0, 0x80a0).w(FUNC(themj_state::themj_rombank_w));
 	map(0xbc04, 0xbc04).nopw();    // ??
 	map(0xbc0c, 0xbc0c).nopw();    // ??
 }

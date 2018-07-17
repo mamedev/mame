@@ -373,15 +373,15 @@ void pcxt_state::filetto_io(address_map &map)
 {
 	map.global_mask(0x3ff);
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
-	map(0x0060, 0x0060).r(this, FUNC(pcxt_state::port_a_r));  //not a real 8255
-	map(0x0061, 0x0061).rw(this, FUNC(pcxt_state::port_b_r), FUNC(pcxt_state::port_b_w));
-	map(0x0062, 0x0062).r(this, FUNC(pcxt_state::port_c_r));
+	map(0x0060, 0x0060).r(FUNC(pcxt_state::port_a_r));  //not a real 8255
+	map(0x0061, 0x0061).rw(FUNC(pcxt_state::port_b_r), FUNC(pcxt_state::port_b_w));
+	map(0x0062, 0x0062).r(FUNC(pcxt_state::port_c_r));
 	map(0x0201, 0x0201).portr("COIN"); //game port
-	map(0x0310, 0x0311).rw(this, FUNC(pcxt_state::disk_iobank_r), FUNC(pcxt_state::disk_iobank_w)); //Prototyping card
+	map(0x0310, 0x0311).rw(FUNC(pcxt_state::disk_iobank_r), FUNC(pcxt_state::disk_iobank_w)); //Prototyping card
 	map(0x0312, 0x0312).portr("IN0"); //Prototyping card,read only
-	map(0x03f2, 0x03f2).w(this, FUNC(pcxt_state::fdc_dor_w));
-	map(0x03f4, 0x03f4).r(this, FUNC(pcxt_state::fdc765_status_r)); //765 Floppy Disk Controller (FDC) Status
-	map(0x03f5, 0x03f5).rw(this, FUNC(pcxt_state::fdc765_data_r), FUNC(pcxt_state::fdc765_data_w));//FDC Data
+	map(0x03f2, 0x03f2).w(FUNC(pcxt_state::fdc_dor_w));
+	map(0x03f4, 0x03f4).r(FUNC(pcxt_state::fdc765_status_r)); //765 Floppy Disk Controller (FDC) Status
+	map(0x03f5, 0x03f5).rw(FUNC(pcxt_state::fdc765_data_r), FUNC(pcxt_state::fdc765_data_w));//FDC Data
 }
 
 void pcxt_state::tetriskr_map(address_map &map)

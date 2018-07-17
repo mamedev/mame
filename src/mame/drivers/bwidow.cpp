@@ -336,8 +336,8 @@ WRITE8_MEMBER(bwidow_state::bwidow_misc_w)
 	*/
 
 	if (data == m_lastdata) return;
-	m_led[0] = BIT(~data, 4);
-	m_led[1] = BIT(~data, 5);
+	m_leds[0] = BIT(~data, 4);
+	m_leds[1] = BIT(~data, 5);
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	m_lastdata = data;
@@ -346,8 +346,8 @@ WRITE8_MEMBER(bwidow_state::bwidow_misc_w)
 WRITE8_MEMBER(bwidow_state::spacduel_coin_counter_w)
 {
 	if (data == m_lastdata) return;
-	m_led[0] = BIT(~data, 5); // start lamp
-	m_led[1] = BIT(~data, 4); // select lamp
+	m_leds[0] = BIT(~data, 5); // start lamp
+	m_leds[1] = BIT(~data, 4); // select lamp
 	machine().bookkeeping().coin_lockout_w(0, !BIT(data,3));
 	machine().bookkeeping().coin_lockout_w(1, !BIT(data,3));
 	machine().bookkeeping().coin_lockout_w(2, !BIT(data,3));
@@ -386,10 +386,10 @@ void bwidow_state::bwidow_map(address_map &map)
 	map(0x7800, 0x7800).portr("IN0");
 	map(0x8000, 0x8000).portr("IN3");
 	map(0x8800, 0x8800).portr("IN4");
-	map(0x8800, 0x8800).w(this, FUNC(bwidow_state::bwidow_misc_w)); /* coin counters, leds */
+	map(0x8800, 0x8800).w(FUNC(bwidow_state::bwidow_misc_w)); /* coin counters, leds */
 	map(0x8840, 0x8840).w("avg", FUNC(avg_device::go_w));
 	map(0x8880, 0x8880).w("avg", FUNC(avg_device::reset_w));
-	map(0x88c0, 0x88c0).w(this, FUNC(bwidow_state::irq_ack_w)); /* interrupt acknowledge */
+	map(0x88c0, 0x88c0).w(FUNC(bwidow_state::irq_ack_w)); /* interrupt acknowledge */
 	map(0x8900, 0x8900).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
 	map(0x8940, 0x897f).w("earom", FUNC(atari_vg_earom_device::write));
 	map(0x8980, 0x89ed).nopw(); /* watchdog clear */
@@ -401,15 +401,15 @@ void bwidow_state::bwidowp_map(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x080f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x0810, 0x081f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x1000, 0x1000).r(this, FUNC(bwidow_state::bwidowp_in_r));
+	map(0x1000, 0x1000).r(FUNC(bwidow_state::bwidowp_in_r));
 	map(0x1800, 0x1800).portr("IN0");
 	map(0x2000, 0x2000).w("avg", FUNC(avg_device::go_w));
 	map(0x2800, 0x2800).w("avg", FUNC(avg_device::reset_w));
 	map(0x3000, 0x3000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3800, 0x3800).w(this, FUNC(bwidow_state::bwidow_misc_w)); /* coin counters, leds */
+	map(0x3800, 0x3800).w(FUNC(bwidow_state::bwidow_misc_w)); /* coin counters, leds */
 	map(0x4000, 0x47ff).ram().share("vectorram").region("maincpu", 0x4000);
 	map(0x4800, 0x6fff).rom();
-	map(0x6000, 0x6000).w(this, FUNC(bwidow_state::irq_ack_w)); /* interrupt acknowledge */
+	map(0x6000, 0x6000).w(FUNC(bwidow_state::irq_ack_w)); /* interrupt acknowledge */
 	map(0x8000, 0x803f).w("earom", FUNC(atari_vg_earom_device::write));
 	map(0x8800, 0x8800).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
 	map(0x9000, 0x9000).r("earom", FUNC(atari_vg_earom_device::read));
@@ -421,14 +421,14 @@ void bwidow_state::spacduel_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
 	map(0x0800, 0x0800).portr("IN0");
-	map(0x0900, 0x0907).r(this, FUNC(bwidow_state::spacduel_IN3_r));    /* IN1 */
+	map(0x0900, 0x0907).r(FUNC(bwidow_state::spacduel_IN3_r));    /* IN1 */
 	map(0x0905, 0x0906).nopw(); /* ignore? */
 	map(0x0a00, 0x0a00).r("earom", FUNC(atari_vg_earom_device::read));
-	map(0x0c00, 0x0c00).w(this, FUNC(bwidow_state::spacduel_coin_counter_w)); /* coin out */
+	map(0x0c00, 0x0c00).w(FUNC(bwidow_state::spacduel_coin_counter_w)); /* coin out */
 	map(0x0c80, 0x0c80).w("avg", FUNC(avg_device::go_w));
 	map(0x0d00, 0x0d00).nopw(); /* watchdog clear */
 	map(0x0d80, 0x0d80).w("avg", FUNC(avg_device::reset_w));
-	map(0x0e00, 0x0e00).w(this, FUNC(bwidow_state::irq_ack_w)); /* interrupt acknowledge */
+	map(0x0e00, 0x0e00).w(FUNC(bwidow_state::irq_ack_w)); /* interrupt acknowledge */
 	map(0x0e80, 0x0e80).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
 	map(0x0f00, 0x0f3f).w("earom", FUNC(atari_vg_earom_device::write));
 	map(0x1000, 0x10ff).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));

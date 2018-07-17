@@ -222,12 +222,12 @@ uint32_t pmd85_state::screen_update_pmd85(screen_device &screen, bitmap_ind16 &b
 
 void pmd85_state::pmd85_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(pmd85_state::pmd85_io_r), FUNC(pmd85_state::pmd85_io_w));
+	map(0x00, 0xff).rw(FUNC(pmd85_state::pmd85_io_r), FUNC(pmd85_state::pmd85_io_w));
 }
 
 void pmd85_state::mato_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(pmd85_state::mato_io_r), FUNC(pmd85_state::mato_io_w));
+	map(0x00, 0xff).rw(FUNC(pmd85_state::mato_io_r), FUNC(pmd85_state::mato_io_w));
 }
 
 /* memory w/r functions */
@@ -794,19 +794,19 @@ ROM_END
 ROM_START(mato)
 	ROM_REGION(0x14000,"maincpu",0)
 	ROM_SYSTEM_BIOS(0, "default", "BASIC")
-	ROMX_LOAD("mato.bin",  0x10000, 0x4000, CRC(574110a6) SHA1(4ff2cd4b07a1a700c55f92e5b381c04f758fb461), ROM_BIOS(1))
+	ROMX_LOAD("mato.bin",  0x10000, 0x4000, CRC(574110a6) SHA1(4ff2cd4b07a1a700c55f92e5b381c04f758fb461), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ru", "Russian")
-	ROMX_LOAD("mato-ru.rom",  0x10000, 0x4000, CRC(44b68be4) SHA1(0d9ea9a9380e2af011a2f0b64c534dd0eb0a1fac), ROM_BIOS(2))
+	ROMX_LOAD("mato-ru.rom",  0x10000, 0x4000, CRC(44b68be4) SHA1(0d9ea9a9380e2af011a2f0b64c534dd0eb0a1fac), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "lan", "BASIC LAN")
-	ROMX_LOAD("mato-lan.rom",  0x10000, 0x4000, CRC(422cddde) SHA1(2a3dacf8e3e7637109c9d267f589a00881e9a5f4), ROM_BIOS(3))
+	ROMX_LOAD("mato-lan.rom",  0x10000, 0x4000, CRC(422cddde) SHA1(2a3dacf8e3e7637109c9d267f589a00881e9a5f4), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "games", "Games v1")
-	ROMX_LOAD("matoh.bin", 0x10000, 0x4000, CRC(ca25880d) SHA1(38ce0b6a26d48a09fdf96863c3eaf3705aca2590), ROM_BIOS(4))
+	ROMX_LOAD("matoh.bin", 0x10000, 0x4000, CRC(ca25880d) SHA1(38ce0b6a26d48a09fdf96863c3eaf3705aca2590), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "gamesen", "Games v2 EN")
-	ROMX_LOAD("matogmen.rom", 0x10000, 0x4000, CRC(47e039c8) SHA1(6cc73a6b58921b33691d2751dee28428456eb222), ROM_BIOS(5))
+	ROMX_LOAD("matogmen.rom", 0x10000, 0x4000, CRC(47e039c8) SHA1(6cc73a6b58921b33691d2751dee28428456eb222), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(5, "gamessk", "Games v2 SK")
-	ROMX_LOAD("matogmsk.rom", 0x10000, 0x4000, CRC(d0c9b1e7) SHA1(9e7289d971a957bf161c317e5fa76db3289ee23c), ROM_BIOS(6))
+	ROMX_LOAD("matogmsk.rom", 0x10000, 0x4000, CRC(d0c9b1e7) SHA1(9e7289d971a957bf161c317e5fa76db3289ee23c), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS(6, "games3", "Games v3")
-	ROMX_LOAD("matogm3.rom", 0x10000, 0x4000, CRC(9352f2c1) SHA1(b3e45c56d2800c69a0bb02febda6fa715f1afbc3), ROM_BIOS(7))
+	ROMX_LOAD("matogm3.rom", 0x10000, 0x4000, CRC(9352f2c1) SHA1(b3e45c56d2800c69a0bb02febda6fa715f1afbc3), ROM_BIOS(6))
 ROM_END
 
 ROM_START(c2717)

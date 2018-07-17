@@ -1113,8 +1113,8 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 				m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
 				m_segaic16vid->set_display_enable(data & 0x20);
-			m_lamp[1] = BIT(data, 3);
-			m_lamp[0] = BIT(data, 2);
+			m_lamps[1] = BIT(data, 3);
+			m_lamps[0] = BIT(data, 2);
 			machine().bookkeeping().coin_counter_w(1, data & 0x02);
 			machine().bookkeeping().coin_counter_w(0, data & 0x01);
 			return;
@@ -1723,13 +1723,13 @@ void segas16b_state::system16b_bootleg_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x23ffff).ram(); // used during startup for decompression
-	map(0x3f0000, 0x3fffff).w(this, FUNC(segas16b_state::rom_5704_bank_w));
+	map(0x3f0000, 0x3fffff).w(FUNC(segas16b_state::rom_5704_bank_w));
 	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
 	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
 	map(0x440000, 0x4407ff).ram().share("sprites");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas16b_state::paletteram_w)).share("paletteram");
-	map(0xc40000, 0xc43fff).rw(this, FUNC(segas16b_state::bootleg_custom_io_r), FUNC(segas16b_state::bootleg_custom_io_w));
-	map(0x123406, 0x123407).w(this, FUNC(segas16b_state::sound_w16));
+	map(0x840000, 0x840fff).ram().w(FUNC(segas16b_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc43fff).rw(FUNC(segas16b_state::bootleg_custom_io_r), FUNC(segas16b_state::bootleg_custom_io_w));
+	map(0x123406, 0x123407).w(FUNC(segas16b_state::sound_w16));
 	map(0xffc000, 0xffffff).ram().share("workram");
 }
 
@@ -1743,7 +1743,7 @@ void segas16b_state::map_fpointbla(address_map &map)
 	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
 	map(0x440000, 0x4407ff).ram().share("sprites");
 	map(0x443002, 0x443003).portr("SERVICE");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas16b_state::paletteram_w)).share("paletteram");
+	map(0x840000, 0x840fff).ram().w(FUNC(segas16b_state::paletteram_w)).share("paletteram");
 	map(0x843018, 0x843019).portr("DSW1");
 	map(0xfe0005, 0xfe0005).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xfe000c, 0xfe000d).portr("P1");
@@ -1766,11 +1766,11 @@ void segas16b_state::lockonph_map(address_map &map)
 {
 	// this still appears to have a mapper device, does the hardware use it? should we move this to all be configured by it?
 	map(0x000000, 0x0bffff).rom();
-	map(0x3f0000, 0x3fffff).w(this, FUNC(segas16b_state::rom_5704_bank_w));
+	map(0x3f0000, 0x3fffff).w(FUNC(segas16b_state::rom_5704_bank_w));
 	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
 	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
 	map(0x440000, 0x4407ff).ram().share("sprites");
-	map(0x840000, 0x841fff).ram().w(this, FUNC(segas16b_state::philko_paletteram_w)).share("paletteram");
+	map(0x840000, 0x841fff).ram().w(FUNC(segas16b_state::philko_paletteram_w)).share("paletteram");
 
 	map(0xC40000, 0xC40001).nopw(); // coin counters etc.?
 
@@ -1803,7 +1803,7 @@ void segas16b_state::fpointbl_map(address_map &map)
 	map(0x600000, 0x600001).portr("DSW2");
 	map(0x600002, 0x600003).portr("DSW1");
 
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas16b_state::paletteram_w)).share("paletteram");
+	map(0x840000, 0x840fff).ram().w(FUNC(segas16b_state::paletteram_w)).share("paletteram");
 	map(0x843000, 0x843001).nopw();
 
 	map(0xC46000, 0xC4601f).ram().share("bootleg_scroll");
@@ -1859,8 +1859,8 @@ void segas16b_state::sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x40, 0x40).mirror(0x3f).w(this, FUNC(segas16b_state::upd7759_control_w));
-	map(0x80, 0x80).mirror(0x3f).r(this, FUNC(segas16b_state::upd7759_status_r)).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0x40, 0x40).mirror(0x3f).w(FUNC(segas16b_state::upd7759_control_w));
+	map(0x80, 0x80).mirror(0x3f).r(FUNC(segas16b_state::upd7759_status_r)).w(m_upd7759, FUNC(upd7759_device::port_w));
 	map(0xc0, 0xc0).mirror(0x3f).r(m_mapper, FUNC(sega_315_5195_mapper_device::pread));
 }
 
@@ -1878,8 +1878,8 @@ void segas16b_state::bootleg_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x40, 0x40).mirror(0x3f).w(this, FUNC(segas16b_state::upd7759_control_w));
-	map(0x80, 0x80).mirror(0x3f).r(this, FUNC(segas16b_state::upd7759_status_r)).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0x40, 0x40).mirror(0x3f).w(FUNC(segas16b_state::upd7759_control_w));
+	map(0x80, 0x80).mirror(0x3f).r(FUNC(segas16b_state::upd7759_status_r)).w(m_upd7759, FUNC(upd7759_device::port_w));
 	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -3742,9 +3742,8 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -3893,7 +3892,7 @@ MACHINE_CONFIG_START(segas16b_state::fpointbl)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(75) // these align the pieces with the playfield
 	MCFG_BOOTLEG_SYS16B_SPRITES_YORIGIN(-2) // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
 
@@ -3938,9 +3937,8 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
+	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -9611,30 +9609,30 @@ void isgsm_state::isgsm_map(address_map &map)
 
 	map(0x000000, 0x0fffff).bankr(ISGSM_MAIN_BANK).region("bios", 0); // this area is ALWAYS read-only, even when the game is banked in
 	map(0x200000, 0x23ffff).ram(); // used during startup for decompression
-	map(0x3f0000, 0x3fffff).w(this, FUNC(isgsm_state::rom_5704_bank_w));
+	map(0x3f0000, 0x3fffff).w(FUNC(isgsm_state::rom_5704_bank_w));
 	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
 	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
 	map(0x440000, 0x4407ff).ram().share("sprites");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(isgsm_state::paletteram_w)).share("paletteram");
-	map(0xc40000, 0xc43fff).rw(this, FUNC(isgsm_state::standard_io_r), FUNC(isgsm_state::standard_io_w));
+	map(0x840000, 0x840fff).ram().w(FUNC(isgsm_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc43fff).rw(FUNC(isgsm_state::standard_io_r), FUNC(isgsm_state::standard_io_w));
 
-	map(0xe00000, 0xe00001).w(this, FUNC(isgsm_state::data_w)); // writes decompressed data here (copied from RAM..)
-	map(0xe00002, 0xe00003).w(this, FUNC(isgsm_state::datatype_w)); // selects which 'type' of data we're writing
-	map(0xe00004, 0xe00005).w(this, FUNC(isgsm_state::addr_high_w)); // high address, and some mode bits
-	map(0xe00006, 0xe00007).w(this, FUNC(isgsm_state::addr_low_w));  // low address
+	map(0xe00000, 0xe00001).w(FUNC(isgsm_state::data_w)); // writes decompressed data here (copied from RAM..)
+	map(0xe00002, 0xe00003).w(FUNC(isgsm_state::datatype_w)); // selects which 'type' of data we're writing
+	map(0xe00004, 0xe00005).w(FUNC(isgsm_state::addr_high_w)); // high address, and some mode bits
+	map(0xe00006, 0xe00007).w(FUNC(isgsm_state::addr_low_w));  // low address
 
-	map(0xe80000, 0xe80001).r(this, FUNC(isgsm_state::cart_data_r)); // 8-bit port that the entire cart can be read from
+	map(0xe80000, 0xe80001).r(FUNC(isgsm_state::cart_data_r)); // 8-bit port that the entire cart can be read from
 	map(0xe80002, 0xe80003).portr("CARDDSW");
-	map(0xe80004, 0xe80005).w(this, FUNC(isgsm_state::cart_addr_high_w));
-	map(0xe80006, 0xe80007).w(this, FUNC(isgsm_state::cart_addr_low_w));
-	map(0xe80008, 0xe80009).rw(this, FUNC(isgsm_state::cart_security_high_r), FUNC(isgsm_state::cart_security_high_w)); // 32-bit bitswap device..
-	map(0xe8000a, 0xe8000b).rw(this, FUNC(isgsm_state::cart_security_low_r), FUNC(isgsm_state::cart_security_low_w));
+	map(0xe80004, 0xe80005).w(FUNC(isgsm_state::cart_addr_high_w));
+	map(0xe80006, 0xe80007).w(FUNC(isgsm_state::cart_addr_low_w));
+	map(0xe80008, 0xe80009).rw(FUNC(isgsm_state::cart_security_high_r), FUNC(isgsm_state::cart_security_high_w)); // 32-bit bitswap device..
+	map(0xe8000a, 0xe8000b).rw(FUNC(isgsm_state::cart_security_low_r), FUNC(isgsm_state::cart_security_low_w));
 
 	map(0xee0000, 0xefffff).rom().region("gamecart_rgn", 0); // only the first 0x20000 bytes of the cart are visible here..
 
-	map(0xfe0006, 0xfe0007).w(this, FUNC(isgsm_state::sound_w16));
-	map(0xfe0008, 0xfe0009).w(this, FUNC(isgsm_state::sound_reset_w));
-	map(0xfe000a, 0xfe000b).w(this, FUNC(isgsm_state::main_bank_change_w));
+	map(0xfe0006, 0xfe0007).w(FUNC(isgsm_state::sound_w16));
+	map(0xfe0008, 0xfe0009).w(FUNC(isgsm_state::sound_reset_w));
+	map(0xfe000a, 0xfe000b).w(FUNC(isgsm_state::main_bank_change_w));
 	map(0xffc000, 0xffffff).ram().share("workram");
 }
 

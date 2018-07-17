@@ -85,7 +85,7 @@ void altos2_state::io_map(address_map &map)
 	map(0x00, 0x03).rw("dart1", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x04, 0x07).rw("dart2", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x08, 0x0b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x0c, 0x0c).w(this, FUNC(altos2_state::video_mode_w));
+	map(0x0c, 0x0c).w(FUNC(altos2_state::video_mode_w));
 	map(0x40, 0x7f).rw(m_novram, FUNC(x2210_device::read), FUNC(x2210_device::write));
 	//AM_RANGE(0x80, 0xff) AM_DEVREADWRITE_MOD("vpac", crt9007_device, read, write, rshift<1>)
 }
@@ -145,6 +145,9 @@ ROM_START( altos2 )
 
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "us_v1.1_14410.u34", 0x0000, 0x2000, CRC(0ebb78bf) SHA1(96a1f7d34ff35037cbbc93049c0e2b9c9f11f1db) )
+
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	ROM_LOAD( "358_7258", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
-COMP( 1983, altos2, 0, 0, altos2, altos2, altos2_state, empty_init, "Altos", "Altos II Terminal", MACHINE_IS_SKELETON )
+COMP( 1983, altos2, 0, 0, altos2, altos2, altos2_state, empty_init, "Altos Computer Systems", "Altos II Terminal", MACHINE_IS_SKELETON )

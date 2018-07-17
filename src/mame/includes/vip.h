@@ -50,7 +50,7 @@ public:
 		, m_exp_ef1(CLEAR_LINE)
 		, m_exp_ef3(CLEAR_LINE)
 		, m_exp_ef4(CLEAR_LINE)
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -130,7 +130,7 @@ protected:
 
 	// expansion state
 	uint8_t m_byteio_data;
-	output_finder<3> m_led;
+	output_finder<3> m_leds;
 };
 
 #endif

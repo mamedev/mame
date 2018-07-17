@@ -23,6 +23,9 @@ ICS GENDAC ICS5342-3
 some logic
 clocks 50MHz (near 3DFX) and 14.31818MHz (near RAMDAC)
 
+TODO:
+- program ROM is read via parallel port (for offset write, encrypted) and game port!?
+
 */
 
 #include "emu.h"
@@ -36,6 +39,7 @@ clocks 50MHz (near 3DFX) and 14.31818MHz (near RAMDAC)
 #if ENABLE_VGA
 #include "video/pc_vga.h"
 #endif
+#include "emupal.h"
 #include "screen.h"
 
 class taitowlf_state : public pcat_base_state
@@ -47,13 +51,9 @@ public:
 		m_bank1(*this, "bank1"),
 		m_palette(*this, "palette") { }
 
-	std::unique_ptr<uint32_t[]> m_bios_ram;
-	uint8_t m_mtxc_config_reg[256];
-	uint8_t m_piix4_config_reg[4][256];
-
 	required_region_ptr<uint8_t> m_bootscreen_rom;
 	required_memory_bank m_bank1;
-	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_palette;
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
@@ -77,6 +77,11 @@ public:
 	void piix4_config_w(int function, int reg, uint8_t data);
 	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
 	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+
+private:
+	std::unique_ptr<uint32_t[]> m_bios_ram;
+	uint8_t m_mtxc_config_reg[256];
+	uint8_t m_piix4_config_reg[4][256];
 };
 
 #if !ENABLE_VGA
@@ -291,7 +296,7 @@ void taitowlf_state::taitowlf_map(address_map &map)
 	#endif
 	map(0x000e0000, 0x000effff).ram();
 	map(0x000f0000, 0x000fffff).bankr("bank1");
-	map(0x000f0000, 0x000fffff).w(this, FUNC(taitowlf_state::bios_ram_w));
+	map(0x000f0000, 0x000fffff).w(FUNC(taitowlf_state::bios_ram_w));
 	map(0x00100000, 0x01ffffff).ram();
 //  AM_RANGE(0xf8000000, 0xf83fffff) AM_ROM AM_REGION("user3", 0)
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);   /* System BIOS */
@@ -303,14 +308,15 @@ void taitowlf_state::taitowlf_io(address_map &map)
 
 	map(0x00e8, 0x00eb).noprw();
 	map(0x0300, 0x03af).noprw();
-	map(0x03b0, 0x03df).noprw();
-	map(0x0278, 0x027b).w(this, FUNC(taitowlf_state::pnp_config_w));
+	map(0x0278, 0x027b).w(FUNC(taitowlf_state::pnp_config_w));
 	#if ENABLE_VGA
 	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	#else
+	map(0x03b0, 0x03df).noprw();
 	#endif
-	map(0x0a78, 0x0a7b).w(this, FUNC(taitowlf_state::pnp_data_w));
+	map(0x0a78, 0x0a7b).w(FUNC(taitowlf_state::pnp_data_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
 

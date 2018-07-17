@@ -1,8 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
+#ifndef MAME_INCLUDES_HYPERSPT_H
+#define MAME_INCLUDES_HYPERSPT_H
 
+#pragma once
+
+#include "audio/trackfld.h"
+#include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
+
+#include "emupal.h"
+#include "screen.h"
 
 class hyperspt_state : public driver_device
 {
@@ -14,8 +23,12 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_soundbrd(*this, "trackfld_audio"),
+		m_dac(*this, "dac"),
 		m_sn(*this, "snsnd"),
 		m_vlm(*this, "vlm"),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -27,8 +40,12 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<trackfld_audio_device> m_soundbrd;
+	required_device<dac_8bit_r2r_device> m_dac;
 	optional_device<sn76496_device> m_sn;
 	optional_device<vlm5030_device> m_vlm;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -45,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(konami_SN76496_latch_w) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER(konami_SN76496_w) { m_sn->write(space, offset, m_SN76496_latch); };
+	DECLARE_WRITE8_MEMBER(konami_SN76496_w) { m_sn->write(m_SN76496_latch); };
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -69,3 +86,5 @@ public:
 	void soundb_map(address_map &map);
 	void hyprolyb_adpcm_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_HYPERSPT_H

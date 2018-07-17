@@ -7,13 +7,20 @@
     If you have any questions about how this driver works, don't hesitate to
     ask.  - Mike Balfour (mab22@po.cwru.edu)
 
+    To Do:
+    - Device-ify video and audio hardware to turn optional_devices into
+      required_devices.
+
 ****************************************************************************/
+
 #ifndef MAME_INCLUDES_REDALERT_H
 #define MAME_INCLUDES_REDALERT_H
 
 #pragma once
 
+#include "cpu/i8085/i8085.h"
 #include "machine/gen_latch.h"
+#include "sound/ay8910.h"
 #include "sound/hc55516.h"
 #include "screen.h"
 
@@ -28,6 +35,9 @@ public:
 		m_bitmap_color(*this, "bitmap_color"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_voicecpu(*this, "voice"),
+		m_ay8910(*this, "aysnd"),
+		m_ay(*this, "ay%u", 1U),
 		m_cvsd(*this, "cvsd"),
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
@@ -42,6 +52,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_voicecpu;
+	optional_device<ay8910_device> m_ay8910;
+	optional_device_array<ay8910_device, 2> m_ay;
 	optional_device<hc55516_device> m_cvsd;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;

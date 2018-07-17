@@ -445,6 +445,7 @@
 #include "machine/74259.h"
 #include "machine/bankdev.h"
 #include "machine/eeprompar.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -594,7 +595,7 @@ WRITE8_MEMBER(mastboy_state::msm5205_data_w)
 
 WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
 {
-	m_msm->data_w(m_m5205_next);
+	m_msm->write_data(m_m5205_next);
 	m_m5205_next >>= 4;
 
 	m_m5205_part ^= 1;
@@ -637,9 +638,9 @@ void mastboy_state::mastboy_map(address_map &map)
 	map(0xff810, 0xff817).portr("DSW1");
 	map(0xff818, 0xff81f).portr("DSW2");
 
-	map(0xff820, 0xff827).w(this, FUNC(mastboy_state::bank_w));
+	map(0xff820, 0xff827).w(FUNC(mastboy_state::bank_w));
 	map(0xff828, 0xff829).w("saa", FUNC(saa1099_device::write));
-	map(0xff830, 0xff830).w(this, FUNC(mastboy_state::msm5205_data_w));
+	map(0xff830, 0xff830).w(FUNC(mastboy_state::msm5205_data_w));
 	map(0xff838, 0xff83f).w(m_outlatch, FUNC(ls259_device::write_d0));
 
 	map(0xffc00, 0xfffff).ram(); // Internal RAM
@@ -648,7 +649,7 @@ void mastboy_state::mastboy_map(address_map &map)
 // TODO : banked map is mirrored?
 void mastboy_state::bank_c000_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).mirror(0x1e0000).rw(this, FUNC(mastboy_state::vram_r), FUNC(mastboy_state::vram_w)).share("vram");
+	map(0x000000, 0x00ffff).mirror(0x1e0000).rw(FUNC(mastboy_state::vram_r), FUNC(mastboy_state::vram_w)).share("vram");
 	map(0x010000, 0x01ffff).mirror(0x1e0000).rom().region("vrom", 0);
 	map(0x200000, 0x3fffff).rom().region("bankedrom", 0);
 }
@@ -668,8 +669,8 @@ READ8_MEMBER(mastboy_state::nmi_read)
 
 void mastboy_state::mastboy_io_map(address_map &map)
 {
-	map(0x38, 0x38).r(this, FUNC(mastboy_state::port_38_read));
-	map(0x39, 0x39).r(this, FUNC(mastboy_state::nmi_read));
+	map(0x38, 0x38).r(FUNC(mastboy_state::port_38_read));
+	map(0x39, 0x39).r(FUNC(mastboy_state::nmi_read));
 }
 
 /* Input Ports */

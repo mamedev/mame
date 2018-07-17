@@ -27,23 +27,23 @@ DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "Toshiba TMP95C063"
 
 void tmp95c061_device::tmp95c061_mem8(address_map &map)
 {
-	map(0x000000, 0x00007f).rw(this, FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
+	map(0x000000, 0x00007f).rw(FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
 }
 
 void tmp95c061_device::tmp95c061_mem16(address_map &map)
 {
-	map(0x000000, 0x00007f).rw(this, FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
+	map(0x000000, 0x00007f).rw(FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
 }
 
 
 void tmp95c063_device::tmp95c063_mem8(address_map &map)
 {
-	map(0x000000, 0x00009f).rw(this, FUNC(tmp95c063_device::internal_r), FUNC(tmp95c063_device::internal_w));
+	map(0x000000, 0x00009f).rw(FUNC(tmp95c063_device::internal_r), FUNC(tmp95c063_device::internal_w));
 }
 
 void tmp95c063_device::tmp95c063_mem16(address_map &map)
 {
-	map(0x000000, 0x00009f).rw(this, FUNC(tmp95c063_device::internal_r), FUNC(tmp95c063_device::internal_w));
+	map(0x000000, 0x00009f).rw(FUNC(tmp95c063_device::internal_r), FUNC(tmp95c063_device::internal_w));
 }
 
 

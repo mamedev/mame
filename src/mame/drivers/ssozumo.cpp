@@ -32,18 +32,18 @@ void ssozumo_state::ssozumo_map(address_map &map)
 {
 	map(0x0000, 0x077f).ram();
 	map(0x0780, 0x07ff).ram().share("spriteram");
-	map(0x2000, 0x23ff).ram().w(this, FUNC(ssozumo_state::videoram2_w)).share("videoram2");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(ssozumo_state::colorram2_w)).share("colorram2");
-	map(0x3000, 0x31ff).ram().w(this, FUNC(ssozumo_state::videoram_w)).share("videoram");
-	map(0x3200, 0x33ff).ram().w(this, FUNC(ssozumo_state::colorram_w)).share("colorram");
+	map(0x2000, 0x23ff).ram().w(FUNC(ssozumo_state::videoram2_w)).share("videoram2");
+	map(0x2400, 0x27ff).ram().w(FUNC(ssozumo_state::colorram2_w)).share("colorram2");
+	map(0x3000, 0x31ff).ram().w(FUNC(ssozumo_state::videoram_w)).share("videoram");
+	map(0x3200, 0x33ff).ram().w(FUNC(ssozumo_state::colorram_w)).share("colorram");
 	map(0x3400, 0x35ff).ram();
 	map(0x3600, 0x37ff).ram();
-	map(0x4000, 0x4000).portr("P1").w(this, FUNC(ssozumo_state::flipscreen_w));
+	map(0x4000, 0x4000).portr("P1").w(FUNC(ssozumo_state::flipscreen_w));
 	map(0x4010, 0x4010).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x4020, 0x4020).portr("DSW2").w(this, FUNC(ssozumo_state::scroll_w));
+	map(0x4020, 0x4020).portr("DSW2").w(FUNC(ssozumo_state::scroll_w));
 	map(0x4030, 0x4030).portr("DSW1");
 //  AM_RANGE(0x4030, 0x4030) AM_WRITEONLY
-	map(0x4050, 0x407f).ram().w(this, FUNC(ssozumo_state::paletteram_w)).share("paletteram");
+	map(0x4050, 0x407f).ram().w(FUNC(ssozumo_state::paletteram_w)).share("paletteram");
 	map(0x6000, 0xffff).rom();
 }
 
@@ -59,8 +59,8 @@ void ssozumo_state::ssozumo_sound_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x2000, 0x2001).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x2002, 0x2003).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::write));
-	map(0x2005, 0x2005).w(this, FUNC(ssozumo_state::sound_nmi_mask_w));
+	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x2005, 0x2005).w(FUNC(ssozumo_state::sound_nmi_mask_w));
 	map(0x2007, 0x2007).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x4000, 0xffff).rom();
 }

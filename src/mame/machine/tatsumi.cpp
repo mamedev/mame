@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, Angelo Salese
 #include "emu.h"
 #include "includes/tatsumi.h"
 #include "sound/okim6295.h"
@@ -174,6 +174,9 @@ WRITE16_MEMBER(roundup5_state::roundup5_control_w)
 	    0x0040  :   Z80 rom (lower half) mapped to 0x10000
 	    0x0060  :   Z80 rom (upper half) mapped to 0x10000
 
+	    0x0080  :   enabled when showing map screen after a play
+	                (switches video priority between text layer and sprites)
+
 	    0x0100  :   watchdog.
 
 	    0x0c00  :   vram bank (bits 0x7000 also set when writing vram)
@@ -204,21 +207,19 @@ WRITE16_MEMBER(roundup5_state::roundup5_control_w)
 	m_last_control = m_control_word;
 }
 
-WRITE16_MEMBER(roundup5_state::roundup5_d0000_w)
+WRITE16_MEMBER(roundup5_state::road_vregs_w)
 {
-	COMBINE_DATA(&m_roundup5_d0000_ram[offset]);
-//  logerror("d_68k_d0000_w %s %04x\n", m_maincpu->pc(), data);
-}
-
-WRITE16_MEMBER(roundup5_state::roundup5_e0000_w)
-{
-	/*  Bit 0x10 is road bank select,
-	    Bit 0x100 is used, but unknown
+	/*
+	    ---- ---x ---- ---- enabled when there's a road slope of any kind, unknown purpose
+	    ---- ---- -xx- ---- enables alternatively in tunnels sometimes, color mods?
+	    ---- ---- ---x ---- road bank select
+	    ---- ---- ---- xxxx various values written during POST while accessing road pixel ram,
+	                        otherwise 0xb at the start of irq service
 	*/
 
-	COMBINE_DATA(&m_roundup5_e0000_ram[offset]);
-	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
+	COMBINE_DATA(&m_road_vregs[offset]);
 
+	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
 //  logerror("d_68k_e0000_w %s %04x\n", m_maincpu->pc(), data);
 }
 
@@ -265,7 +266,9 @@ READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 	/* Read from 68k RAM */
 	if ((m_control_word&0x1f)==0x18)
 	{
+		#ifdef UNUSED_FUNCTION
 		// hack to make roundup 5 boot
+		// doesn't seem necessary anymore, left for reference
 		if (m_maincpu->pc()==0xec575)
 		{
 			uint8_t *dst = m_mainregion->base();
@@ -279,8 +282,9 @@ READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 			dst[BYTE_XOR_LE(0xfc524)]=0x46;
 			dst[BYTE_XOR_LE(0xfc525)]=0x46;
 		}
+		#endif
 
-		return m_68k_ram[offset & 0x1fff];
+		return m_sharedram[offset & 0x1fff];
 	}
 
 	/* Read from 68k ROM */
@@ -294,7 +298,7 @@ WRITE16_MEMBER(tatsumi_state::tatsumi_v30_68000_w)
 	if ((m_control_word&0x1f)!=0x18)
 		logerror("68k write in bank %05x\n",m_control_word);
 
-	COMBINE_DATA(&m_68k_ram[offset]);
+	COMBINE_DATA(&m_sharedram[offset]);
 }
 
 /***********************************************************************************/
@@ -312,9 +316,18 @@ READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
 	return r;
 }
 
-READ8_MEMBER(tatsumi_state::tatsumi_hack_oki_r)
+READ8_MEMBER(cyclwarr_state::oki_status_xor_r)
 {
-	int r=m_oki->read(space,0);
+	int r = m_oki->read(space,0);
+
+	// Cycle Warriors and Big Fight access this with reversed activeness.
+	// this is particularly noticeable with the "We got em" sample played in CW at stage clear:
+	// gets cut too early with the old hack below.
+	// fwiw returning normal oki status doesn't work at all, both games don't make any sound.
+	// TODO: verify with HW
+	return (r ^ 0xff);
+	#ifdef UNUSED_FUNCTION
+	// old hack left for reference
 
 	if (m_audiocpu->pc()==0x2b70 || m_audiocpu->pc()==0x2bb5
 		|| m_audiocpu->pc()==0x2acc
@@ -326,4 +339,5 @@ READ8_MEMBER(tatsumi_state::tatsumi_hack_oki_r)
 		|| m_audiocpu->pc()==0x1cac) // BigFight
 		return 0;
 	return r;
+	#endif
 }

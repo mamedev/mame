@@ -125,7 +125,7 @@ void superchs_state::superchs_map(address_map &map)
 	map(0x180000, 0x18ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));
 	map(0x1b0000, 0x1b002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
 	map(0x200000, 0x20ffff).ram().share("shared_ram");
-	map(0x240000, 0x240003).w(this, FUNC(superchs_state::cpua_ctrl_w));
+	map(0x240000, 0x240003).w(FUNC(superchs_state::cpua_ctrl_w));
 	map(0x280000, 0x287fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x2c0000, 0x2c07ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
 	map(0x300000, 0x300007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
@@ -137,7 +137,7 @@ void superchs_state::superchs_cpub_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x20ffff).ram();
 	map(0x600000, 0x60ffff).w(m_tc0480scp, FUNC(tc0480scp_device::word_w)); /* Only written upon errors */
-	map(0x800000, 0x80ffff).rw(this, FUNC(superchs_state::shared_ram_r), FUNC(superchs_state::shared_ram_w));
+	map(0x800000, 0x80ffff).rw(FUNC(superchs_state::shared_ram_r), FUNC(superchs_state::shared_ram_w));
 	map(0xa00000, 0xa001ff).ram(); /* Extra road control?? */
 }
 
@@ -147,7 +147,7 @@ void superchs_state::chase3_cpub_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();
 	map(0x400000, 0x40ffff).ram();
 	map(0x600000, 0x60ffff).w(m_tc0480scp, FUNC(tc0480scp_device::word_w)); /* Only written upon errors */
-	map(0x800000, 0x80ffff).rw(this, FUNC(superchs_state::shared_ram_r), FUNC(superchs_state::shared_ram_w));
+	map(0x800000, 0x80ffff).rw(FUNC(superchs_state::shared_ram_r), FUNC(superchs_state::shared_ram_w));
 	map(0xa00000, 0xa001ff).ram(); /* Extra road control?? */
 }
 
@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
 	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 3))

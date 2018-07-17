@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 		uint8_t data = memregion("adpcm")->base()[m_sample_offset >> 1];
 
 		/* write the next nibble and advance */
-		m_msm->data_w((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
+		m_msm->write_data((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
 		m_sample_offset++;
 
 		/* every 256 clocks, we decrement the length */
@@ -284,7 +284,7 @@ void crgolf_state::main_map(address_map &map)
 	map(0x8000, 0x8007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x8800, 0x8800).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x8800, 0x8800).w("soundlatch1", FUNC(generic_latch_8_device::write));
-	map(0x9000, 0x9000).w(this, FUNC(crgolf_state::rom_bank_select_w));
+	map(0x9000, 0x9000).w(FUNC(crgolf_state::rom_bank_select_w));
 	map(0xa000, 0xffff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
 }
 
@@ -307,8 +307,8 @@ void crgolf_state::sound_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0xc000, 0xc001).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xc002, 0xc002).nopw();
-	map(0xe000, 0xe000).rw(this, FUNC(crgolf_state::switch_input_r), FUNC(crgolf_state::switch_input_select_w));
-	map(0xe001, 0xe001).rw(this, FUNC(crgolf_state::analog_input_r), FUNC(crgolf_state::unknown_w));
+	map(0xe000, 0xe000).rw(FUNC(crgolf_state::switch_input_r), FUNC(crgolf_state::switch_input_select_w));
+	map(0xe001, 0xe001).rw(FUNC(crgolf_state::analog_input_r), FUNC(crgolf_state::unknown_w));
 	map(0xe003, 0xe003).r("soundlatch1", FUNC(generic_latch_8_device::read));
 	map(0xe003, 0xe003).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
@@ -372,12 +372,12 @@ void crgolf_state::mastrglf_subio(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch1", FUNC(generic_latch_8_device::read)).nopw();
-	map(0x02, 0x02).r(this, FUNC(crgolf_state::unk_sub_02_r));
-	map(0x05, 0x05).r(this, FUNC(crgolf_state::unk_sub_05_r));
+	map(0x02, 0x02).r(FUNC(crgolf_state::unk_sub_02_r));
+	map(0x05, 0x05).r(FUNC(crgolf_state::unk_sub_05_r));
 	map(0x06, 0x06).nopr();
-	map(0x07, 0x07).r(this, FUNC(crgolf_state::unk_sub_07_r));
+	map(0x07, 0x07).r(FUNC(crgolf_state::unk_sub_07_r));
 	map(0x08, 0x08).w("soundlatch2", FUNC(generic_latch_8_device::write));
-	map(0x0c, 0x0c).w(this, FUNC(crgolf_state::unk_sub_0c_w));
+	map(0x0c, 0x0c).w(FUNC(crgolf_state::unk_sub_0c_w));
 	map(0x10, 0x11).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 

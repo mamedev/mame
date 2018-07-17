@@ -147,10 +147,6 @@ Common Issues:
 
 - Some ROMs aren't used (priorities?)
 - Screen control register (priorities, layers enabling etc.) - Where is it?
-- In cischeat & bigrun, at the start of some levels, you can see the empty
-  scrolling layers as they are filled. In f1gpstar, I'm unsure whether they
-  are correct in a few places (e.g. in the attract mode, where cars move
-  horizontally, the wheels don't follow for this reason, I think
 - Sound communication not quite right: see Test Mode
 
 To Do:
@@ -159,8 +155,21 @@ To Do:
 - Use the Tilemap Manager for the road layers (when this kind of layers
   will be supported) for performance and better priority support.
   A line based zooming is additionally needed for f1gpstar.
+- Wild Pilot road needs some serious work (empty gaps, ship "floating"
+  in stage 6 etc.);
 - Force feedback :)
+- Major cleanups needed, especially in video file;
+- Split the non-road games into own driver, merge them with Alien Command,
+  device-ify the sprite chip;
 
+BTANBs:
+- In cischeat & bigrun, at the start of some levels, you can see the empty
+  scrolling layers as they are filled. In f1gpstar, I'm unsure whether they
+  are correct in a few places (e.g. in the attract mode, where cars move
+  horizontally, the wheels don't follow for this reason, I think)
+  Update: this happens on real HW as well (at least for Big Run);
+- Some serious sprite popups happening in Big Run, again this happens on
+  the reference video too so not a bug.
 
 2008-08
 Dip locations verified for Big Run with the manual. Also added missing dips
@@ -176,6 +185,7 @@ Cisco Heat.
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "machine/jalcrpt.h"
+#include "machine/nvram.h"
 #include "speaker.h"
 
 #include "cischeat.lh"
@@ -199,23 +209,23 @@ Cisco Heat.
 void cischeat_state::bigrun_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                 // ROM
-	map(0x080000, 0x080001).portr("IN1").w(this, FUNC(cischeat_state::leds_out_w));       // Coins
-	map(0x080002, 0x080003).portr("IN2").w(this, FUNC(cischeat_state::unknown_out_w));    // Buttons
-	map(0x080004, 0x080005).portr("IN3").w(this, FUNC(cischeat_state::motor_out_w));      // Motor Limit Switches
-	map(0x080006, 0x080007).portr("IN4").w(this, FUNC(cischeat_state::wheel_out_w));      // DSW 1 & 2
+	map(0x080000, 0x080001).portr("IN1").w(FUNC(cischeat_state::leds_out_w));       // Coins
+	map(0x080002, 0x080003).portr("IN2").w(FUNC(cischeat_state::unknown_out_w));    // Buttons
+	map(0x080004, 0x080005).portr("IN3").w(FUNC(cischeat_state::motor_out_w));      // Motor Limit Switches
+	map(0x080006, 0x080007).portr("IN4").w(FUNC(cischeat_state::wheel_out_w));      // DSW 1 & 2
 	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));   // From sound cpu
 	map(0x08000a, 0x08000b).w(m_soundlatch, FUNC(generic_latch_16_device::write));  // To sound cpu
 	map(0x08000c, 0x08000d).nopw();            // ??
-	map(0x080010, 0x080011).rw(this, FUNC(cischeat_state::bigrun_ip_select_r), FUNC(cischeat_state::ip_select_w));
-	map(0x080012, 0x080013).w(this, FUNC(cischeat_state::ip_select_plus1_w));
+	map(0x080010, 0x080011).rw(FUNC(cischeat_state::bigrun_ip_select_r), FUNC(cischeat_state::ip_select_w));
+	map(0x080012, 0x080013).w(FUNC(cischeat_state::ip_select_plus1_w));
 	map(0x082000, 0x082005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082008, 0x08200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082100, 0x082105).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082108, 0x082109).noprw();                 // ? written with 0 only
 	map(0x082200, 0x082201).portr("IN5");    // DSW 3 (4 bits)
 	map(0x082208, 0x082209).noprw();                 // watchdog reset
-	map(0x082308, 0x082309).w(this, FUNC(cischeat_state::cischeat_comms_w));
-	map(0x082400, 0x082401).w(this, FUNC(cischeat_state::active_layers_w));
+	map(0x082308, 0x082309).w(FUNC(cischeat_state::cischeat_comms_w));
+	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
 	/* It's actually 0x840000-0x847ff, divided in four banks and shared with other boards.
 	    Each board expects reads from the other boards and writes to own bank.
@@ -254,13 +264,13 @@ void cischeat_state::bigrun_map(address_map &map)
 void cischeat_state::cischeat_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                     // ROM
-	map(0x080000, 0x080001).portr("IN1").w(this, FUNC(cischeat_state::leds_out_w));       // Coins
-	map(0x080002, 0x080003).portr("IN2").w(this, FUNC(cischeat_state::unknown_out_w));    // Buttons
-	map(0x080004, 0x080005).portr("IN3").w(this, FUNC(cischeat_state::motor_out_w));      // Motor Limit Switches
-	map(0x080006, 0x080007).portr("IN4").w(this, FUNC(cischeat_state::wheel_out_w));      // DSW 1 & 2
+	map(0x080000, 0x080001).portr("IN1").w(FUNC(cischeat_state::leds_out_w));       // Coins
+	map(0x080002, 0x080003).portr("IN2").w(FUNC(cischeat_state::unknown_out_w));    // Buttons
+	map(0x080004, 0x080005).portr("IN3").w(FUNC(cischeat_state::motor_out_w));      // Motor Limit Switches
+	map(0x080006, 0x080007).portr("IN4").w(FUNC(cischeat_state::wheel_out_w));      // DSW 1 & 2
 	map(0x08000a, 0x08000b).w(m_soundlatch, FUNC(generic_latch_16_device::write));  // To sound cpu
 	map(0x08000c, 0x08000d).nopw();            // ??
-	map(0x080010, 0x080011).rw(this, FUNC(cischeat_state::cischeat_ip_select_r), FUNC(cischeat_state::ip_select_w));
+	map(0x080010, 0x080011).rw(FUNC(cischeat_state::cischeat_ip_select_r), FUNC(cischeat_state::ip_select_w));
 	map(0x080012, 0x080013).nopw();            // value above + 1
 	map(0x082000, 0x082005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082008, 0x08200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
@@ -268,9 +278,9 @@ void cischeat_state::cischeat_map(address_map &map)
 	map(0x082108, 0x082109).noprw();                 // ? written with 0 only
 	map(0x082200, 0x082201).portr("IN5");    // DSW 3 (4 bits)
 	map(0x082208, 0x082209).noprw();                 // watchdog reset
-	map(0x082300, 0x082301).r(m_soundlatch2, FUNC(generic_latch_16_device::read)).w(this, FUNC(cischeat_state::cischeat_soundlatch_w)); // From sound cpu
-	map(0x082308, 0x082309).w(this, FUNC(cischeat_state::cischeat_comms_w));
-	map(0x082400, 0x082401).w(this, FUNC(cischeat_state::active_layers_w));
+	map(0x082300, 0x082301).r(m_soundlatch2, FUNC(generic_latch_16_device::read)).w(FUNC(cischeat_state::cischeat_soundlatch_w)); // From sound cpu
+	map(0x082308, 0x082309).w(FUNC(cischeat_state::cischeat_comms_w));
+	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
 	map(0x088000, 0x0887ff).ram();                                                                     // Linking with other units
 
@@ -318,22 +328,22 @@ void cischeat_state::f1gpstar_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                     // ROM
 	map(0x080000, 0x080001).portr("IN1");    // DSW 1 & 2
-	map(0x080004, 0x080005).portr("IN2").w(this, FUNC(cischeat_state::f1gpstar_motor_w));   // Buttons
+	map(0x080004, 0x080005).portr("IN2").w(FUNC(cischeat_state::f1gpstar_motor_w));   // Buttons
 	map(0x080006, 0x080007).portr("IN3");    // ? Read at boot only
 	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));     // From sound cpu
 	map(0x080008, 0x080009).w(m_soundlatch, FUNC(generic_latch_16_device::write));    // To sound cpu
 	map(0x08000c, 0x08000d).portr("IN4");    // DSW 3
-	map(0x080010, 0x080011).r(this, FUNC(cischeat_state::f1gpstar_wheel_r)).nopw(); // Accel + Driving Wheel
+	map(0x080010, 0x080011).r(FUNC(cischeat_state::f1gpstar_wheel_r)).nopw(); // Accel + Driving Wheel
 	map(0x080014, 0x080015).nopw();
-	map(0x080018, 0x080019).w(this, FUNC(cischeat_state::f1gpstar_soundint_w));
+	map(0x080018, 0x080019).w(FUNC(cischeat_state::f1gpstar_soundint_w));
 
 	map(0x082000, 0x082005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082008, 0x08200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082100, 0x082105).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082108, 0x082109).noprw();                 // ? written with 0 only
 	map(0x082208, 0x082209).noprw();                 // watchdog reset
-	map(0x082308, 0x082309).nopr().w(this, FUNC(cischeat_state::f1gpstar_comms_w));
-	map(0x082400, 0x082401).w(this, FUNC(cischeat_state::active_layers_w));
+	map(0x082308, 0x082309).nopr().w(FUNC(cischeat_state::f1gpstar_comms_w));
+	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
 	map(0x088000, 0x0883ff).ram();                                                                     // Linking with other units
 
@@ -389,17 +399,17 @@ WRITE16_MEMBER(cischeat_state::wildplt_mux_w)
 
 
 // Same as f1gpstar, but vregs are slightly different:
-void cischeat_state::wildplt_map(address_map &map)
+void wildplt_state::wildplt_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                     // ROM
-	map(0x080000, 0x080001).portr("IN0").w(this, FUNC(cischeat_state::f1gpstr2_io_w));    // DSW 1 & 2
-	map(0x080004, 0x080005).r(this, FUNC(cischeat_state::wildplt_mux_r)).w(this, FUNC(cischeat_state::wildplt_mux_w)); // Buttons
+	map(0x080000, 0x080001).portr("IN0").w(FUNC(cischeat_state::f1gpstr2_io_w));    // DSW 1 & 2
+	map(0x080004, 0x080005).r(FUNC(cischeat_state::wildplt_mux_r)).w(FUNC(cischeat_state::wildplt_mux_w)); // Buttons
 	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));     // From sound cpu
 	map(0x080008, 0x080009).w(m_soundlatch, FUNC(generic_latch_16_device::write));    // To sound cpu
-	map(0x08000c, 0x08000d).nopw(); // 1000, 3000
-	map(0x080010, 0x080011).r(this, FUNC(cischeat_state::wildplt_xy_r)).w(this, FUNC(cischeat_state::ip_select_w)); // X, Y
+	map(0x08000c, 0x08000d).w(FUNC(wildplt_state::sprite_dma_w)); // 1000, 3000
+	map(0x080010, 0x080011).r(FUNC(cischeat_state::wildplt_xy_r)).w(FUNC(cischeat_state::ip_select_w)); // X, Y
 	map(0x080014, 0x080015).nopw();
-	map(0x080018, 0x080019).rw(this, FUNC(cischeat_state::f1gpstr2_ioready_r), FUNC(cischeat_state::f1gpstar_soundint_w));
+	map(0x080018, 0x080019).rw(FUNC(cischeat_state::f1gpstr2_ioready_r), FUNC(cischeat_state::f1gpstar_soundint_w));
 
 	map(0x081000, 0x081fff).ram().share("shareio");
 
@@ -408,8 +418,8 @@ void cischeat_state::wildplt_map(address_map &map)
 	map(0x082100, 0x082105).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082108, 0x082109).noprw();                 // ? written with 0 only
 	map(0x082208, 0x082209).noprw();                 // watchdog reset
-	map(0x082308, 0x082309).nopr().w(this, FUNC(cischeat_state::f1gpstar_comms_w));
-	map(0x082400, 0x082401).w(this, FUNC(cischeat_state::active_layers_w));
+	map(0x082308, 0x082309).nopr().w(FUNC(cischeat_state::f1gpstar_comms_w));
+	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
 //  AM_RANGE(0x088000, 0x088fff) AM_RAM                                                                     // Linking with other units
 
@@ -436,15 +446,15 @@ void cischeat_state::wildplt_map(address_map &map)
 void cischeat_state::f1gpstr2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                     // ROM
-	map(0x080000, 0x080001).portr("IN1").w(this, FUNC(cischeat_state::f1gpstr2_io_w));      // DSW 1 & 2
-	map(0x080004, 0x080005).portr("IN2").w(this, FUNC(cischeat_state::f1gpstar_motor_w));   // Buttons
+	map(0x080000, 0x080001).portr("IN1").w(FUNC(cischeat_state::f1gpstr2_io_w));      // DSW 1 & 2
+	map(0x080004, 0x080005).portr("IN2").w(FUNC(cischeat_state::f1gpstar_motor_w));   // Buttons
 	map(0x080006, 0x080007).portr("IN3");    // ? Read at boot only
 	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));     // From sound cpu
 	map(0x080008, 0x080009).w(m_soundlatch, FUNC(generic_latch_16_device::write));    // To sound cpu
 	map(0x08000c, 0x08000d).portr("IN4");    // DSW 3
-	map(0x080010, 0x080011).r(this, FUNC(cischeat_state::f1gpstar_wheel_r)).nopw();
+	map(0x080010, 0x080011).r(FUNC(cischeat_state::f1gpstar_wheel_r)).nopw();
 	map(0x080014, 0x080015).nopw();
-	map(0x080018, 0x080019).rw(this, FUNC(cischeat_state::f1gpstr2_ioready_r), FUNC(cischeat_state::f1gpstar_soundint_w));
+	map(0x080018, 0x080019).rw(FUNC(cischeat_state::f1gpstr2_ioready_r), FUNC(cischeat_state::f1gpstar_soundint_w));
 
 	map(0x081000, 0x081fff).ram().share("shareio");
 
@@ -453,8 +463,8 @@ void cischeat_state::f1gpstr2_map(address_map &map)
 	map(0x082100, 0x082105).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082108, 0x082109).noprw();                 // ? written with 0 only
 	map(0x082208, 0x082209).noprw();                 // watchdog reset
-	map(0x082308, 0x082309).nopr().w(this, FUNC(cischeat_state::f1gpstar_comms_w));
-	map(0x082400, 0x082401).w(this, FUNC(cischeat_state::active_layers_w));
+	map(0x082308, 0x082309).nopr().w(FUNC(cischeat_state::f1gpstar_comms_w));
+	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
 	// 0x100 RAM banks instead of 0x200
 	map(0x088000, 0x0887ff).ram();                                                                     // Linking with other units
@@ -544,15 +554,15 @@ WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_led[0] = BIT(data, 8);    // 3 buttons
-		m_led[1] = BIT(data, 9);
-		m_led[2] = BIT(data, 10);
+		m_leds[0] = BIT(data, 8);    // 3 buttons
+		m_leds[1] = BIT(data, 9);
+		m_leds[2] = BIT(data, 10);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		m_led[3] = BIT(data, 4);
-		m_led[4] = BIT(data, 5);
+		m_leds[3] = BIT(data, 4);
+		m_leds[4] = BIT(data, 5);
 	}
 }
 
@@ -586,14 +596,14 @@ void cischeat_state::scudhamm_map(address_map &map)
 	map(0x0b0000, 0x0b3fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");   // Scroll RAM 2
 	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");          // Palette
 	map(0x0f0000, 0x0fffff).ram().share("ram");                                         // Work RAM + Spriteram
-	map(0x100000, 0x100001).w(this, FUNC(cischeat_state::scudhamm_oki_bank_w));                                          // Sound
-	map(0x100008, 0x100009).portr("IN0").w(this, FUNC(cischeat_state::scudhamm_leds_w));                          // Buttons
+	map(0x100000, 0x100001).w(FUNC(cischeat_state::scudhamm_oki_bank_w));                                          // Sound
+	map(0x100008, 0x100009).portr("IN0").w(FUNC(cischeat_state::scudhamm_leds_w));                          // Buttons
 	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));             // Sound
 	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));             //
-	map(0x10001c, 0x10001d).w(this, FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
-	map(0x100040, 0x100041).r(this, FUNC(cischeat_state::scudhamm_analog_r)).nopw();                         // A / D
-	map(0x100044, 0x100045).r(this, FUNC(cischeat_state::scudhamm_motor_pos_r));                                  // Motor Position
-	map(0x100050, 0x100051).r(this, FUNC(cischeat_state::scudhamm_motor_status_r)).w(this, FUNC(cischeat_state::scudhamm_motor_command_w));        // Motor Limit Switches
+	map(0x10001c, 0x10001d).w(FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
+	map(0x100040, 0x100041).r(FUNC(cischeat_state::scudhamm_analog_r)).nopw();                         // A / D
+	map(0x100044, 0x100045).r(FUNC(cischeat_state::scudhamm_motor_pos_r));                                  // Motor Position
+	map(0x100050, 0x100051).r(FUNC(cischeat_state::scudhamm_motor_status_r)).w(FUNC(cischeat_state::scudhamm_motor_command_w));        // Motor Limit Switches
 	map(0x10005c, 0x10005d).portr("IN2");                                                    // 2 x DSW
 }
 
@@ -647,10 +657,10 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_led[0] = BIT(data, 8);
-		m_led[1] = BIT(data, 12);
-		m_led[2] = BIT(data, 13);
-		m_led[3] = BIT(data, 14);
+		m_leds[0] = BIT(data, 8);
+		m_leds[1] = BIT(data, 12);
+		m_leds[2] = BIT(data, 13);
+		m_leds[3] = BIT(data, 14);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -671,11 +681,11 @@ void cischeat_state::armchmp2_map(address_map &map)
 	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
 	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");              // Palette
 	map(0x0f0000, 0x0fffff).ram().share("ram");                                         // Work RAM + Spriteram
-	map(0x100000, 0x100001).portr("IN2").w(this, FUNC(cischeat_state::scudhamm_oki_bank_w));                      // DSW + Sound
+	map(0x100000, 0x100001).portr("IN2").w(FUNC(cischeat_state::scudhamm_oki_bank_w));                      // DSW + Sound
 	map(0x100004, 0x100005).portr("IN3");                                                    // DSW
-	map(0x100008, 0x100009).rw(this, FUNC(cischeat_state::armchmp2_buttons_r), FUNC(cischeat_state::armchmp2_leds_w));                      // Leds + Coin Counters + Buttons + Sensors
-	map(0x10000c, 0x10000d).r(this, FUNC(cischeat_state::armchmp2_analog_r)).nopw();                         // A / D
-	map(0x100010, 0x100011).rw(this, FUNC(cischeat_state::armchmp2_motor_status_r), FUNC(cischeat_state::armchmp2_motor_command_w));        // Motor Limit Switches?
+	map(0x100008, 0x100009).rw(FUNC(cischeat_state::armchmp2_buttons_r), FUNC(cischeat_state::armchmp2_leds_w));                      // Leds + Coin Counters + Buttons + Sensors
+	map(0x10000c, 0x10000d).r(FUNC(cischeat_state::armchmp2_analog_r)).nopw();                         // A / D
+	map(0x100010, 0x100011).rw(FUNC(cischeat_state::armchmp2_motor_status_r), FUNC(cischeat_state::armchmp2_motor_command_w));        // Motor Limit Switches?
 	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           // Sound
 	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           //
 }
@@ -694,9 +704,9 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		machine().bookkeeping().coin_counter_w(1, data & 0x0100);    // coin 2
-		m_led[0] = BIT(data, 8);    // decide
+		m_leds[0] = BIT(data, 8);    // decide
 		machine().bookkeeping().coin_counter_w(0, data & 0x0400);    // coin 1
-		m_led[1] = BIT(data, 13);    // select
+		m_leds[1] = BIT(data, 13);    // select
 
 		int power = (data & 0x1000);
 		m_captflag_hopper->motor_w(power ? 1 : 0);    // prize motor
@@ -817,15 +827,15 @@ void cischeat_state::captflag_map(address_map &map)
 	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2"); // Scroll RAM 2
 	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
 	map(0x0f0000, 0x0fffff).ram().share("ram");                                                 // Work RAM + Spriteram
-	map(0x100000, 0x100001).portr("SW1_2").w(this, FUNC(cischeat_state::captflag_oki_bank_w));                    // 2 x DSW + Sound
-	map(0x100008, 0x100009).portr("Buttons").w(this, FUNC(cischeat_state::captflag_leds_w));                      // Buttons + Leds
+	map(0x100000, 0x100001).portr("SW1_2").w(FUNC(cischeat_state::captflag_oki_bank_w));                    // 2 x DSW + Sound
+	map(0x100008, 0x100009).portr("Buttons").w(FUNC(cischeat_state::captflag_leds_w));                      // Buttons + Leds
 	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));         // Sound
 	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));         //
-	map(0x10001c, 0x10001d).w(this, FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
+	map(0x10001c, 0x10001d).w(FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
 	map(0x100040, 0x100041).portr("SW01");                                                   // DSW + Motor
-	map(0x100044, 0x100045).w(this, FUNC(cischeat_state::captflag_motor_command_left_w));                                // Motor Command (Left)
-	map(0x100048, 0x100049).w(this, FUNC(cischeat_state::captflag_motor_command_right_w));                               // Motor Command (Right)
-	map(0x100060, 0x10007d).ram();                                                                 // 7-seg? NVRAM?
+	map(0x100044, 0x100045).w(FUNC(cischeat_state::captflag_motor_command_left_w));                                // Motor Command (Left)
+	map(0x100048, 0x100049).w(FUNC(cischeat_state::captflag_motor_command_right_w));                               // Motor Command (Right)
+	map(0x100060, 0x10007f).ram().share("nvram");      // NVRAM (even bytes only)
 }
 
 void cischeat_state::captflag_oki1_map(address_map &map)
@@ -946,7 +956,7 @@ WRITE16_MEMBER(cischeat_state::bigrun_soundbank_w)
 void cischeat_state::bigrun_sound_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(this, FUNC(cischeat_state::bigrun_soundbank_w));    // From Main CPU
+	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(FUNC(cischeat_state::bigrun_soundbank_w));    // From Main CPU
 	map(0x060000, 0x060001).w(m_soundlatch2, FUNC(generic_latch_16_device::write));                           // To Main CPU
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0x0a0000, 0x0a0003).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
@@ -972,8 +982,8 @@ WRITE16_MEMBER(cischeat_state::cischeat_soundbank_2_w)
 void cischeat_state::cischeat_sound_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040002, 0x040003).w(this, FUNC(cischeat_state::cischeat_soundbank_1_w));               // Sample Banking
-	map(0x040004, 0x040005).w(this, FUNC(cischeat_state::cischeat_soundbank_2_w));               // Sample Banking
+	map(0x040002, 0x040003).w(FUNC(cischeat_state::cischeat_soundbank_1_w));               // Sample Banking
+	map(0x040004, 0x040005).w(FUNC(cischeat_state::cischeat_soundbank_2_w));               // Sample Banking
 	map(0x060002, 0x060003).w(m_soundlatch2, FUNC(generic_latch_16_device::write));                          // To Main CPU
 	map(0x060004, 0x060005).r(m_soundlatch, FUNC(generic_latch_16_device::read));                             // From Main CPU
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
@@ -990,8 +1000,8 @@ void cischeat_state::cischeat_sound_map(address_map &map)
 void cischeat_state::f1gpstar_sound_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040004, 0x040005).w(this, FUNC(cischeat_state::cischeat_soundbank_1_w));               // Sample Banking   (cischeat: 40002)
-	map(0x040008, 0x040009).w(this, FUNC(cischeat_state::cischeat_soundbank_2_w));               // Sample Banking   (cischeat: 40004)
+	map(0x040004, 0x040005).w(FUNC(cischeat_state::cischeat_soundbank_1_w));               // Sample Banking   (cischeat: 40002)
+	map(0x040008, 0x040009).w(FUNC(cischeat_state::cischeat_soundbank_2_w));               // Sample Banking   (cischeat: 40004)
 	map(0x060000, 0x060001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(m_soundlatch2, FUNC(generic_latch_16_device::write));   // From Main CPU    (cischeat: 60004)
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0x0a0000, 0x0a0003).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
@@ -1007,8 +1017,8 @@ void cischeat_state::f1gpstar_sound_map(address_map &map)
 void cischeat_state::f1gpstr2_sound_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom(); // ROM
-	map(0x040004, 0x040005).w(this, FUNC(cischeat_state::cischeat_soundbank_1_w));                   // Sample Banking
-	map(0x040008, 0x040009).w(this, FUNC(cischeat_state::cischeat_soundbank_2_w));                   // Sample Banking
+	map(0x040004, 0x040005).w(FUNC(cischeat_state::cischeat_soundbank_1_w));                   // Sample Banking
+	map(0x040008, 0x040009).w(FUNC(cischeat_state::cischeat_soundbank_2_w));                   // Sample Banking
 	map(0x04000e, 0x04000f).nopw();                                            // ? 0              (f1gpstar: no)
 	map(0x060002, 0x060003).w(m_soundlatch2, FUNC(generic_latch_16_device::write));                          // To Main CPU
 	map(0x060004, 0x060005).r(m_soundlatch, FUNC(generic_latch_16_device::read));                             // From Main CPU
@@ -1849,8 +1859,8 @@ static GFXDECODE_START( gfx_bigrun )
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x1600/2 , 16 ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x3600/2 , 16 ) // Scroll 2
 	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16,0x2800/2 , 64 ) // [0] Sprites
-	GFXDECODE_ENTRY( "road0", 0, road_layout,0x1800/2 , 64 ) // [1] Road 0
-	GFXDECODE_ENTRY( "road1", 0, road_layout,0x2000/2 , 64 ) // [2] Road 1
+	GFXDECODE_ENTRY( "road0", 0, road_layout,0x2000/2 , 64 ) // [1] Road 0
+	GFXDECODE_ENTRY( "road1", 0, road_layout,0x1800/2 , 64 ) // [2] Road 1
 GFXDECODE_END
 
 /**************************************************************************
@@ -1922,11 +1932,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 //      m_cpu1->set_input_line(1, HOLD_LINE);
 }
 
-
-
-#define STD_FM_CLOCK    3000000
-#define STD_OKI_CLOCK     (1584000)
-
+WRITE_LINE_MEMBER(cischeat_state::sound_irq)
+{
+	if(state)
+		m_soundcpu->set_input_line(4, HOLD_LINE);
+}
 
 
 
@@ -1947,7 +1957,8 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 
 	MCFG_DEVICE_ADD("soundcpu", M68000, 6000000)
 	MCFG_DEVICE_PROGRAM_MAP(bigrun_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
+	// timing set by the YM irqhandler
+//  MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -1977,15 +1988,17 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, STD_FM_CLOCK)
+	// TODO: all sound frequencies unverified (assume same as Mega System 1)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 7000000/2)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, cischeat_state,sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, STD_OKI_CLOCK, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, STD_OKI_CLOCK, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
@@ -2084,7 +2097,7 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstr2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(cischeat_state::wildplt)
+MACHINE_CONFIG_START(wildplt_state::wildplt)
 	f1gpstr2(config);
 	MCFG_DEVICE_MODIFY("cpu1")
 	MCFG_DEVICE_PROGRAM_MAP(wildplt_map)
@@ -2144,11 +2157,11 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 MACHINE_CONFIG_END
@@ -2212,6 +2225,7 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
 	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2242,12 +2256,12 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
@@ -3631,13 +3645,13 @@ void cischeat_state::init_captflag()
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)",  MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
 GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
 GAMEL( 1991, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 GAMEL( 1991, f1gpstaro, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
 GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1992, wildplt,   0,        wildplt,  wildplt,  cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
+GAME(  1992, wildplt,   0,        wildplt,  wildplt,  wildplt_state,  init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
 GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 GAME(  1993, captflag,  0,        captflag, captflag, cischeat_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
 GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state, empty_init,    ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )

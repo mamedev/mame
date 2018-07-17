@@ -2,6 +2,7 @@
 // copyright-holders:smf, David Haywood
 
 #include "audio/irem.h"
+#include "emupal.h"
 
 class m62_state : public driver_device
 {

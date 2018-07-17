@@ -108,17 +108,17 @@ void cabal_state::main_map(address_map &map)
 	map(0x40000, 0x437ff).ram();
 	map(0x43800, 0x43fff).ram().share("spriteram");
 	map(0x44000, 0x4ffff).ram();
-	map(0x60000, 0x607ff).ram().w(this, FUNC(cabal_state::text_videoram_w)).share("colorram");
-	map(0x80000, 0x801ff).ram().w(this, FUNC(cabal_state::background_videoram_w)).share("videoram");
+	map(0x60000, 0x607ff).ram().w(FUNC(cabal_state::text_videoram_w)).share("colorram");
+	map(0x80000, 0x801ff).ram().w(FUNC(cabal_state::background_videoram_w)).share("videoram");
 	map(0x80200, 0x803ff).ram();
 	map(0xa0000, 0xa0001).portr("DSW");
 	map(0xa0008, 0xa0009).portr("IN2");
 	map(0xa0010, 0xa0011).portr("INPUTS");
 	map(0xc0040, 0xc0041).nopw(); /* ??? */
-	map(0xc0080, 0xc0081).w(this, FUNC(cabal_state::flipscreen_w));
+	map(0xc0080, 0xc0081).w(FUNC(cabal_state::flipscreen_w));
 	map(0xe0000, 0xe07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xe8000, 0xe800d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
-	map(0xe8008, 0xe8009).w(this, FUNC(cabal_state::sound_irq_trigger_word_w)); // fix coin insertion
+	map(0xe8008, 0xe8009).w(FUNC(cabal_state::sound_irq_trigger_word_w)); // fix coin insertion
 }
 
 
@@ -128,8 +128,8 @@ void cabal_state::trackball_main_map(address_map &map)
 	main_map(map);
 	map(0xa0008, 0xa000f).r("upd4701l", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
 	map(0xa0008, 0xa000f).r("upd4701h", FUNC(upd4701_device::read_xy)).umask16(0xff00);
-	map(0xc0001, 0xc0001).w("upd4701l", FUNC(upd4701_device::reset_xy));
-	map(0xc0000, 0xc0000).w("upd4701h", FUNC(upd4701_device::reset_xy));
+	map(0xc0001, 0xc0001).w("upd4701l", FUNC(upd4701_device::reset_xy_w));
+	map(0xc0000, 0xc0000).w("upd4701h", FUNC(upd4701_device::reset_xy_w));
 }
 
 
@@ -140,18 +140,18 @@ void cabal_state::cabalbl_main_map(address_map &map)
 	map(0x40000, 0x437ff).ram();
 	map(0x43800, 0x43fff).ram().share("spriteram");
 	map(0x44000, 0x4ffff).ram();
-	map(0x60000, 0x607ff).ram().w(this, FUNC(cabal_state::text_videoram_w)).share("colorram");
-	map(0x80000, 0x801ff).ram().w(this, FUNC(cabal_state::background_videoram_w)).share("videoram");
+	map(0x60000, 0x607ff).ram().w(FUNC(cabal_state::text_videoram_w)).share("colorram");
+	map(0x80000, 0x801ff).ram().w(FUNC(cabal_state::background_videoram_w)).share("videoram");
 	map(0x80200, 0x803ff).ram();
 	map(0xa0000, 0xa0001).portr("DSW");
 	map(0xa0008, 0xa0009).portr("JOY");
 	map(0xa0010, 0xa0011).portr("INPUTS");
 	map(0xc0040, 0xc0041).nopw(); /* ??? */
-	map(0xc0080, 0xc0081).w(this, FUNC(cabal_state::flipscreen_w));
+	map(0xc0080, 0xc0081).w(FUNC(cabal_state::flipscreen_w));
 	map(0xe0000, 0xe07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xe8000, 0xe8003).w(this, FUNC(cabal_state::cabalbl_sndcmd_w));
+	map(0xe8000, 0xe8003).w(FUNC(cabal_state::cabalbl_sndcmd_w));
 	map(0xe8005, 0xe8005).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xe8008, 0xe8009).w(this, FUNC(cabal_state::cabalbl_sound_irq_trigger_word_w));
+	map(0xe8008, 0xe8009).w(FUNC(cabal_state::cabalbl_sound_irq_trigger_word_w));
 }
 
 /*********************************************************************/
@@ -207,10 +207,10 @@ void cabal_state::cabalbl_sound_map(address_map &map)
 	map(0x2000, 0x2fff).ram();
 	map(0x4000, 0x4000).w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0x4002, 0x4002).w("soundlatch3", FUNC(generic_latch_8_device::write));
-	map(0x4004, 0x4004).w(this, FUNC(cabal_state::cabalbl_coin_w));
+	map(0x4004, 0x4004).w(FUNC(cabal_state::cabalbl_coin_w));
 	map(0x4006, 0x4006).portr("COIN");
-	map(0x4008, 0x4008).r(this, FUNC(cabal_state::cabalbl_snd2_r));
-	map(0x400a, 0x400a).r(this, FUNC(cabal_state::cabalbl_snd1_r));
+	map(0x4008, 0x4008).r(FUNC(cabal_state::cabalbl_snd2_r));
+	map(0x400a, 0x400a).r(FUNC(cabal_state::cabalbl_snd1_r));
 	map(0x400c, 0x400c).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x400e, 0x400f).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x6000, 0x6000).nopw();  /* ??? */
@@ -249,7 +249,7 @@ WRITE8_MEMBER(cabal_state::cabalbl_1_adpcm_w)
 {
 	m_msm1->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm1->data_w(data);
+	m_msm1->write_data(data);
 	m_msm1->vclk_w(1);
 	m_msm1->vclk_w(0);
 }
@@ -257,7 +257,7 @@ WRITE8_MEMBER(cabal_state::cabalbl_2_adpcm_w)
 {
 	m_msm2->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm2->data_w(data);
+	m_msm2->write_data(data);
 	m_msm2->vclk_w(1);
 	m_msm2->vclk_w(0);
 }
@@ -270,7 +270,7 @@ void cabal_state::cabalbl_talk1_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));
-	map(0x01, 0x01).w(this, FUNC(cabal_state::cabalbl_1_adpcm_w));
+	map(0x01, 0x01).w(FUNC(cabal_state::cabalbl_1_adpcm_w));
 }
 
 void cabal_state::cabalbl_talk2_map(address_map &map)
@@ -282,7 +282,7 @@ void cabal_state::cabalbl_talk2_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch3", FUNC(generic_latch_8_device::read));
-	map(0x01, 0x01).w(this, FUNC(cabal_state::cabalbl_2_adpcm_w));
+	map(0x01, 0x01).w(FUNC(cabal_state::cabalbl_2_adpcm_w));
 }
 
 /***************************************************************************/

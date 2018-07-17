@@ -375,7 +375,7 @@ WRITE8_MEMBER( vip_state::io_w )
 void vip_state::vip_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(vip_state::read), FUNC(vip_state::write));
+	map(0x0000, 0xffff).rw(FUNC(vip_state::read), FUNC(vip_state::write));
 }
 
 
@@ -386,7 +386,7 @@ void vip_state::vip_mem(address_map &map)
 void vip_state::vip_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x07).rw(this, FUNC(vip_state::io_r), FUNC(vip_state::io_w));
+	map(0x00, 0x07).rw(FUNC(vip_state::io_r), FUNC(vip_state::io_w));
 }
 
 
@@ -464,7 +464,7 @@ READ_LINE_MEMBER( vip_state::ef1_r )
 
 READ_LINE_MEMBER( vip_state::ef2_r )
 {
-	m_led[LED_TAPE] = m_cassette->input() > 0 ? 1 : 0;
+	m_leds[LED_TAPE] = m_cassette->input() > 0 ? 1 : 0;
 
 	return (m_cassette->input() < 0) ? ASSERT_LINE : CLEAR_LINE;
 }
@@ -485,7 +485,7 @@ WRITE_LINE_MEMBER( vip_state::q_w )
 	m_beeper->write(machine().dummy_space(), NODE_01, state);
 
 	// Q led
-	m_led[LED_Q] = state ? 1 : 0;
+	m_leds[LED_Q] = state ? 1 : 0;
 
 	// tape output
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -621,10 +621,10 @@ void vip_state::machine_start()
 		ram[addr] = machine().rand() & 0xff;
 	}
 
-	m_led.resolve();
+	m_leds.resolve();
 
 	// turn on power LED
-	m_led[LED_POWER] = 1;
+	m_leds[LED_POWER] = 1;
 
 	// reset sound
 	m_beeper->write(machine().dummy_space(), NODE_01, 0);

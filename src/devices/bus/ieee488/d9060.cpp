@@ -73,14 +73,14 @@ ROM_START( d9060 )
 	ROM_REGION( 0x4000, M6502_DOS_TAG, 0 )
 	ROM_DEFAULT_BIOS("rc")
 	ROM_SYSTEM_BIOS( 0, "ra", "Revision A" )
-	ROMX_LOAD( "300516-001.7c", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "300517-001.7d", 0x2000, 0x2000, CRC(566df630) SHA1(b1602dfff408b165ee52a6a4ca3e2ec27e689ba9), ROM_BIOS(1) )
+	ROMX_LOAD( "300516-001.7c", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "300517-001.7d", 0x2000, 0x2000, CRC(566df630) SHA1(b1602dfff408b165ee52a6a4ca3e2ec27e689ba9), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "rb", "Revision B" )
-	ROMX_LOAD( "300516-002.7c", 0x0000, 0x2000, CRC(2d758a14) SHA1(c959cc9dde84fc3d64e95e58a0a096a26d8107fd), ROM_BIOS(2) )
-	ROMX_LOAD( "300517-002.7d", 0x2000, 0x2000, CRC(f0382bc3) SHA1(0b0a8dc520f5b41ffa832e4a636b3d226ccbb7f1), ROM_BIOS(2) )
+	ROMX_LOAD( "300516-002.7c", 0x0000, 0x2000, CRC(2d758a14) SHA1(c959cc9dde84fc3d64e95e58a0a096a26d8107fd), ROM_BIOS(1) )
+	ROMX_LOAD( "300517-002.7d", 0x2000, 0x2000, CRC(f0382bc3) SHA1(0b0a8dc520f5b41ffa832e4a636b3d226ccbb7f1), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "rc", "Revision C" )
-	ROMX_LOAD( "300516-003.7c", 0x0000, 0x2000, CRC(d6a3e88f) SHA1(bb1ddb5da94a86266012eca54818aa21dc4cef6a), ROM_BIOS(3) )
-	ROMX_LOAD( "300517-003.7d", 0x2000, 0x2000, CRC(2a9ad4ad) SHA1(4c17d014de48c906871b9b6c7d037d8736b1fd52), ROM_BIOS(3) )
+	ROMX_LOAD( "300516-003.7c", 0x0000, 0x2000, CRC(d6a3e88f) SHA1(bb1ddb5da94a86266012eca54818aa21dc4cef6a), ROM_BIOS(2) )
+	ROMX_LOAD( "300517-003.7d", 0x2000, 0x2000, CRC(2a9ad4ad) SHA1(4c17d014de48c906871b9b6c7d037d8736b1fd52), ROM_BIOS(2) )
 
 	ROM_REGION( 0x800, M6502_HDC_TAG, 0 )
 	ROM_LOAD( "300515-001.4c", 0x000, 0x800, CRC(99e096f7) SHA1(a3d1deb27bf5918b62b89c27fa3e488eb8f717a4) ) // Revision A
@@ -161,7 +161,7 @@ READ8_MEMBER( d9060_device_base::dio_r )
 
 	*/
 
-	return m_bus->dio_r();
+	return m_bus->read_dio();
 }
 
 
@@ -305,13 +305,13 @@ WRITE8_MEMBER( d9060_device_base::riot1_pb_w )
 	*/
 
 	// ready led
-	m_led[LED_READY] = BIT(data, 4);
+	m_leds[LED_READY] = BIT(data, 4);
 
 	// power led
-	m_led[LED_POWER] = BIT(data, 5);
+	m_leds[LED_POWER] = BIT(data, 5);
 
 	// error led
-	m_led[LED_ERROR] = !BIT(data, 5);
+	m_leds[LED_ERROR] = !BIT(data, 5);
 }
 
 
@@ -486,7 +486,7 @@ d9060_device_base::d9060_device_base(const machine_config &mconfig, device_type 
 	, m_sasibus(*this, SASIBUS_TAG)
 	, m_sasi_data_out(*this, "sasi_data_out")
 	, m_address(*this, "ADDRESS")
-	, m_led(*this, "led%u", 0U)
+	, m_leds(*this, "led%u", 0U)
 	, m_rfdo(1)
 	, m_daco(1)
 	, m_atna(1)
@@ -524,7 +524,7 @@ d9090_device::d9090_device(const machine_config &mconfig, const char *tag, devic
 
 void d9060_device_base::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	// state saving
 	save_item(NAME(m_rfdo));

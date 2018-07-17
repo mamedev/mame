@@ -148,8 +148,8 @@ There don't seem to be any JV1 boot disks for Model III/4.
 void trs80_state::trs80_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x3800, 0x38ff).r(this, FUNC(trs80_state::trs80_keyboard_r));
-	map(0x3c00, 0x3fff).rw(this, FUNC(trs80_state::trs80_videoram_r), FUNC(trs80_state::trs80_videoram_w)).share("videoram");
+	map(0x3800, 0x38ff).r(FUNC(trs80_state::trs80_keyboard_r));
+	map(0x3c00, 0x3fff).rw(FUNC(trs80_state::trs80_videoram_r), FUNC(trs80_state::trs80_videoram_w)).share("videoram");
 	map(0x4000, 0x7fff).ram();
 }
 
@@ -157,24 +157,24 @@ void trs80_state::trs80_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xff, 0xff).rw(this, FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
+	map(0xff, 0xff).rw(FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
 }
 
 void trs80_state::model1_map(address_map &map)
 {
 	map(0x0000, 0x377f).rom(); // sys80,ht1080 needs up to 375F
-	map(0x37de, 0x37de).rw(this, FUNC(trs80_state::sys80_f9_r), FUNC(trs80_state::sys80_f8_w));
+	map(0x37de, 0x37de).rw(FUNC(trs80_state::sys80_f9_r), FUNC(trs80_state::sys80_f8_w));
 	map(0x37df, 0x37df).rw("uart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0x37e0, 0x37e3).rw(this, FUNC(trs80_state::trs80_irq_status_r), FUNC(trs80_state::trs80_motor_w));
-	map(0x37e4, 0x37e7).w(this, FUNC(trs80_state::trs80_cassunit_w));
-	map(0x37e8, 0x37eb).rw(this, FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
-	map(0x37ec, 0x37ec).r(this, FUNC(trs80_state::trs80_wd179x_r));
+	map(0x37e0, 0x37e3).rw(FUNC(trs80_state::trs80_irq_status_r), FUNC(trs80_state::trs80_motor_w));
+	map(0x37e4, 0x37e7).w(FUNC(trs80_state::trs80_cassunit_w));
+	map(0x37e8, 0x37eb).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0x37ec, 0x37ec).r(FUNC(trs80_state::trs80_wd179x_r));
 	map(0x37ec, 0x37ec).w(m_fdc, FUNC(fd1793_device::cmd_w));
 	map(0x37ed, 0x37ed).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
 	map(0x37ee, 0x37ee).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
 	map(0x37ef, 0x37ef).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
-	map(0x3800, 0x38ff).mirror(0x300).r(this, FUNC(trs80_state::trs80_keyboard_r));
-	map(0x3c00, 0x3fff).rw(this, FUNC(trs80_state::trs80_videoram_r), FUNC(trs80_state::trs80_videoram_w)).share("videoram");
+	map(0x3800, 0x38ff).mirror(0x300).r(FUNC(trs80_state::trs80_keyboard_r));
+	map(0x3c00, 0x3fff).rw(FUNC(trs80_state::trs80_videoram_r), FUNC(trs80_state::trs80_videoram_w)).share("videoram");
 	map(0x4000, 0xffff).ram();
 }
 
@@ -182,18 +182,18 @@ void trs80_state::model1_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xff, 0xff).rw(this, FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
+	map(0xff, 0xff).rw(FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
 }
 
 void trs80_state::sys80_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xf8, 0xf8).r("uart", FUNC(ay31015_device::receive)).w(this, FUNC(trs80_state::sys80_f8_w));
-	map(0xf9, 0xf9).r(this, FUNC(trs80_state::sys80_f9_r)).w("uart", FUNC(ay31015_device::transmit));
-	map(0xfd, 0xfd).rw(this, FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
-	map(0xfe, 0xfe).w(this, FUNC(trs80_state::sys80_fe_w));
-	map(0xff, 0xff).rw(this, FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
+	map(0xf8, 0xf8).r("uart", FUNC(ay31015_device::receive)).w(FUNC(trs80_state::sys80_f8_w));
+	map(0xf9, 0xf9).r(FUNC(trs80_state::sys80_f9_r)).w("uart", FUNC(ay31015_device::transmit));
+	map(0xfd, 0xfd).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0xfe, 0xfe).w(FUNC(trs80_state::sys80_fe_w));
+	map(0xff, 0xff).rw(FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
 }
 
 void trs80_state::lnw80_map(address_map &map)
@@ -205,12 +205,12 @@ void trs80_state::lnw80_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xe8, 0xe8).rw(this, FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
+	map(0xe8, 0xe8).rw(FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
 	map(0xe9, 0xe9).portr("E9");
-	map(0xea, 0xea).rw(this, FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
+	map(0xea, 0xea).rw(FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
 	map(0xeb, 0xeb).rw("uart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0xfe, 0xfe).rw(this, FUNC(trs80_state::lnw80_fe_r), FUNC(trs80_state::lnw80_fe_w));
-	map(0xff, 0xff).rw(this, FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
+	map(0xfe, 0xfe).rw(FUNC(trs80_state::lnw80_fe_r), FUNC(trs80_state::lnw80_fe_w));
+	map(0xff, 0xff).rw(FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
 }
 
 void trs80_state::model3_map(address_map &map)
@@ -221,77 +221,77 @@ void trs80_state::model3_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xe0, 0xe3).rw(this, FUNC(trs80_state::trs80m4_e0_r), FUNC(trs80_state::trs80m4_e0_w));
-	map(0xe4, 0xe4).rw(this, FUNC(trs80_state::trs80m4_e4_r), FUNC(trs80_state::trs80m4_e4_w));
-	map(0xe8, 0xe8).rw(this, FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
-	map(0xe9, 0xe9).portr("E9").w(this, FUNC(trs80_state::trs80m4_e9_w));
-	map(0xea, 0xea).rw(this, FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
+	map(0xe0, 0xe3).rw(FUNC(trs80_state::trs80m4_e0_r), FUNC(trs80_state::trs80m4_e0_w));
+	map(0xe4, 0xe4).rw(FUNC(trs80_state::trs80m4_e4_r), FUNC(trs80_state::trs80m4_e4_w));
+	map(0xe8, 0xe8).rw(FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
+	map(0xe9, 0xe9).portr("E9").w(FUNC(trs80_state::trs80m4_e9_w));
+	map(0xea, 0xea).rw(FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
 	map(0xeb, 0xeb).rw("uart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0xec, 0xef).rw(this, FUNC(trs80_state::trs80m4_ec_r), FUNC(trs80_state::trs80m4_ec_w));
-	map(0xf0, 0xf0).r(this, FUNC(trs80_state::trs80_wd179x_r));
+	map(0xec, 0xef).rw(FUNC(trs80_state::trs80m4_ec_r), FUNC(trs80_state::trs80m4_ec_w));
+	map(0xf0, 0xf0).r(FUNC(trs80_state::trs80_wd179x_r));
 	map(0xf0, 0xf0).w(m_fdc, FUNC(fd1793_device::cmd_w));
 	map(0xf1, 0xf1).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
 	map(0xf2, 0xf2).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
 	map(0xf3, 0xf3).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
-	map(0xf4, 0xf4).w(this, FUNC(trs80_state::trs80m4_f4_w));
-	map(0xf8, 0xfb).rw(this, FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
-	map(0xfc, 0xff).rw(this, FUNC(trs80_state::trs80m4_ff_r), FUNC(trs80_state::trs80m4_ff_w));
+	map(0xf4, 0xf4).w(FUNC(trs80_state::trs80m4_f4_w));
+	map(0xf8, 0xfb).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0xfc, 0xff).rw(FUNC(trs80_state::trs80m4_ff_r), FUNC(trs80_state::trs80m4_ff_w));
 }
 
 void trs80_state::model4_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x84, 0x87).w(this, FUNC(trs80_state::trs80m4_84_w));
-	map(0x88, 0x89).w(this, FUNC(trs80_state::trs80m4_88_w));
-	map(0x90, 0x93).w(this, FUNC(trs80_state::trs80m4_90_w));
-	map(0xe0, 0xe3).rw(this, FUNC(trs80_state::trs80m4_e0_r), FUNC(trs80_state::trs80m4_e0_w));
-	map(0xe4, 0xe4).rw(this, FUNC(trs80_state::trs80m4_e4_r), FUNC(trs80_state::trs80m4_e4_w));
-	map(0xe8, 0xe8).rw(this, FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
-	map(0xe9, 0xe9).portr("E9").w(this, FUNC(trs80_state::trs80m4_e9_w));
-	map(0xea, 0xea).rw(this, FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
+	map(0x84, 0x87).w(FUNC(trs80_state::trs80m4_84_w));
+	map(0x88, 0x89).w(FUNC(trs80_state::trs80m4_88_w));
+	map(0x90, 0x93).w(FUNC(trs80_state::trs80m4_90_w));
+	map(0xe0, 0xe3).rw(FUNC(trs80_state::trs80m4_e0_r), FUNC(trs80_state::trs80m4_e0_w));
+	map(0xe4, 0xe4).rw(FUNC(trs80_state::trs80m4_e4_r), FUNC(trs80_state::trs80m4_e4_w));
+	map(0xe8, 0xe8).rw(FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
+	map(0xe9, 0xe9).portr("E9").w(FUNC(trs80_state::trs80m4_e9_w));
+	map(0xea, 0xea).rw(FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
 	map(0xeb, 0xeb).rw("uart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0xec, 0xef).rw(this, FUNC(trs80_state::trs80m4_ec_r), FUNC(trs80_state::trs80m4_ec_w));
-	map(0xf0, 0xf0).r(this, FUNC(trs80_state::trs80_wd179x_r));
+	map(0xec, 0xef).rw(FUNC(trs80_state::trs80m4_ec_r), FUNC(trs80_state::trs80m4_ec_w));
+	map(0xf0, 0xf0).r(FUNC(trs80_state::trs80_wd179x_r));
 	map(0xf0, 0xf0).w(m_fdc, FUNC(fd1793_device::cmd_w));
 	map(0xf1, 0xf1).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
 	map(0xf2, 0xf2).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
 	map(0xf3, 0xf3).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
-	map(0xf4, 0xf4).w(this, FUNC(trs80_state::trs80m4_f4_w));
-	map(0xf8, 0xfb).rw(this, FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
-	map(0xfc, 0xff).rw(this, FUNC(trs80_state::trs80m4_ff_r), FUNC(trs80_state::trs80m4_ff_w));
+	map(0xf4, 0xf4).w(FUNC(trs80_state::trs80m4_f4_w));
+	map(0xf8, 0xfb).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0xfc, 0xff).rw(FUNC(trs80_state::trs80m4_ff_r), FUNC(trs80_state::trs80m4_ff_w));
 }
 
 void trs80_state::model4p_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x84, 0x87).w(this, FUNC(trs80_state::trs80m4_84_w));
-	map(0x88, 0x89).w(this, FUNC(trs80_state::trs80m4_88_w));
-	map(0x90, 0x93).w(this, FUNC(trs80_state::trs80m4_90_w));
-	map(0x9c, 0x9f).w(this, FUNC(trs80_state::trs80m4p_9c_w));
-	map(0xe0, 0xe3).rw(this, FUNC(trs80_state::trs80m4_e0_r), FUNC(trs80_state::trs80m4_e0_w));
-	map(0xe4, 0xe4).rw(this, FUNC(trs80_state::trs80m4_e4_r), FUNC(trs80_state::trs80m4_e4_w));
-	map(0xe8, 0xe8).rw(this, FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
-	map(0xe9, 0xe9).portr("E9").w(this, FUNC(trs80_state::trs80m4_e9_w));
-	map(0xea, 0xea).rw(this, FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
+	map(0x84, 0x87).w(FUNC(trs80_state::trs80m4_84_w));
+	map(0x88, 0x89).w(FUNC(trs80_state::trs80m4_88_w));
+	map(0x90, 0x93).w(FUNC(trs80_state::trs80m4_90_w));
+	map(0x9c, 0x9f).w(FUNC(trs80_state::trs80m4p_9c_w));
+	map(0xe0, 0xe3).rw(FUNC(trs80_state::trs80m4_e0_r), FUNC(trs80_state::trs80m4_e0_w));
+	map(0xe4, 0xe4).rw(FUNC(trs80_state::trs80m4_e4_r), FUNC(trs80_state::trs80m4_e4_w));
+	map(0xe8, 0xe8).rw(FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
+	map(0xe9, 0xe9).portr("E9").w(FUNC(trs80_state::trs80m4_e9_w));
+	map(0xea, 0xea).rw(FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
 	map(0xeb, 0xeb).rw("uart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0xec, 0xef).rw(this, FUNC(trs80_state::trs80m4_ec_r), FUNC(trs80_state::trs80m4_ec_w));
-	map(0xf0, 0xf0).r(this, FUNC(trs80_state::trs80_wd179x_r));
+	map(0xec, 0xef).rw(FUNC(trs80_state::trs80m4_ec_r), FUNC(trs80_state::trs80m4_ec_w));
+	map(0xf0, 0xf0).r(FUNC(trs80_state::trs80_wd179x_r));
 	map(0xf0, 0xf0).w(m_fdc, FUNC(fd1793_device::cmd_w));
 	map(0xf1, 0xf1).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
 	map(0xf2, 0xf2).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
 	map(0xf3, 0xf3).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
-	map(0xf4, 0xf4).w(this, FUNC(trs80_state::trs80m4_f4_w));
-	map(0xf8, 0xfb).rw(this, FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
-	map(0xfc, 0xff).rw(this, FUNC(trs80_state::trs80m4_ff_r), FUNC(trs80_state::trs80m4_ff_w));
+	map(0xf4, 0xf4).w(FUNC(trs80_state::trs80m4_f4_w));
+	map(0xf8, 0xfb).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0xfc, 0xff).rw(FUNC(trs80_state::trs80m4_ff_r), FUNC(trs80_state::trs80m4_ff_w));
 }
 
 void trs80_state::meritum_map(address_map &map)
 {
 	map(0x0000, 0x37ff).rom();
-	map(0x3800, 0x38ff).mirror(0x300).r(this, FUNC(trs80_state::trs80_keyboard_r));
-	map(0x3c00, 0x3fff).rw(this, FUNC(trs80_state::trs80_videoram_r), FUNC(trs80_state::trs80_videoram_w)).share("videoram");
+	map(0x3800, 0x38ff).mirror(0x300).r(FUNC(trs80_state::trs80_keyboard_r));
+	map(0x3c00, 0x3fff).rw(FUNC(trs80_state::trs80_videoram_r), FUNC(trs80_state::trs80_videoram_w)).share("videoram");
 	map(0x4000, 0xffff).ram();
 }
 
@@ -304,37 +304,37 @@ void trs80_state::meritum_io(address_map &map)
 	// The disk input expects values that are different to the usual,
 	// eg. port F0 should be 5, port F2 should have bit 3 set.
 	//AM_RANGE(0x03, 0x03) unknown
-	map(0xf0, 0xf0).r(this, FUNC(trs80_state::trs80_wd179x_r));
+	map(0xf0, 0xf0).r(FUNC(trs80_state::trs80_wd179x_r));
 	map(0xf0, 0xf0).w(m_fdc, FUNC(fd1793_device::cmd_w));
 	map(0xf1, 0xf1).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
 	map(0xf2, 0xf2).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
 	map(0xf3, 0xf3).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
-	map(0xf4, 0xf4).w(this, FUNC(trs80_state::trs80m4_f4_w));
-	map(0xf8, 0xfb).rw(this, FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0xf4, 0xf4).w(FUNC(trs80_state::trs80m4_f4_w));
+	map(0xf8, 0xfb).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
 	//AM_RANGE(0xfc, 0xfd) unknown
-	map(0xff, 0xff).rw(this, FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
+	map(0xff, 0xff).rw(FUNC(trs80_state::trs80_ff_r), FUNC(trs80_state::trs80_ff_w));
 }
 
 void trs80_state::cp500_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xe0, 0xe3).rw(this, FUNC(trs80_state::trs80m4_e0_r), FUNC(trs80_state::trs80m4_e0_w));
-	map(0xe4, 0xe4).rw(this, FUNC(trs80_state::trs80m4_e4_r), FUNC(trs80_state::trs80m4_e4_w));
-	map(0xe8, 0xe8).rw(this, FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
-	map(0xe9, 0xe9).portr("E9").w(this, FUNC(trs80_state::trs80m4_e9_w));
-	map(0xea, 0xea).rw(this, FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
+	map(0xe0, 0xe3).rw(FUNC(trs80_state::trs80m4_e0_r), FUNC(trs80_state::trs80m4_e0_w));
+	map(0xe4, 0xe4).rw(FUNC(trs80_state::trs80m4_e4_r), FUNC(trs80_state::trs80m4_e4_w));
+	map(0xe8, 0xe8).rw(FUNC(trs80_state::trs80m4_e8_r), FUNC(trs80_state::trs80m4_e8_w));
+	map(0xe9, 0xe9).portr("E9").w(FUNC(trs80_state::trs80m4_e9_w));
+	map(0xea, 0xea).rw(FUNC(trs80_state::trs80m4_ea_r), FUNC(trs80_state::trs80m4_ea_w));
 	map(0xeb, 0xeb).rw("uart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0xec, 0xef).rw(this, FUNC(trs80_state::trs80m4_ec_r), FUNC(trs80_state::trs80m4_ec_w));
-	map(0xf0, 0xf0).r(this, FUNC(trs80_state::trs80_wd179x_r));
+	map(0xec, 0xef).rw(FUNC(trs80_state::trs80m4_ec_r), FUNC(trs80_state::trs80m4_ec_w));
+	map(0xf0, 0xf0).r(FUNC(trs80_state::trs80_wd179x_r));
 	map(0xf0, 0xf0).w(m_fdc, FUNC(fd1793_device::cmd_w));
 	map(0xf1, 0xf1).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
 	map(0xf2, 0xf2).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
 	map(0xf3, 0xf3).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
-	map(0xf4, 0xf4).w(this, FUNC(trs80_state::trs80m4_f4_w));
-	map(0xf4, 0xf7).r(this, FUNC(trs80_state::cp500_a11_flipflop_toggle));
-	map(0xf8, 0xfb).rw(this, FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
-	map(0xfc, 0xff).rw(this, FUNC(trs80_state::trs80m4_ff_r), FUNC(trs80_state::trs80m4_ff_w));
+	map(0xf4, 0xf4).w(FUNC(trs80_state::trs80m4_f4_w));
+	map(0xf4, 0xf7).r(FUNC(trs80_state::cp500_a11_flipflop_toggle));
+	map(0xf8, 0xfb).rw(FUNC(trs80_state::trs80_printer_r), FUNC(trs80_state::trs80_printer_w));
+	map(0xfc, 0xff).rw(FUNC(trs80_state::trs80m4_ff_r), FUNC(trs80_state::trs80m4_ff_w));
 }
 
 /**************************************************************************
@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 0.5)
 
-	MCFG_FD1793_ADD("fdc", 4_MHz_XTAL / 4) // todo: should be fd1771
+	MCFG_DEVICE_ADD("fdc", FD1793, 4_MHz_XTAL / 4) // todo: should be fd1771
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, trs80_state,trs80_fdc_intrq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)
@@ -655,7 +655,7 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", trs80_floppies, "", trs80_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", trs80_floppies, "", trs80_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
@@ -782,13 +782,13 @@ ROM_END
 ROM_START(trs80l2)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "level2", "Radio Shack Level II Basic")
-	ROMX_LOAD("trs80.z33",   0x0000, 0x1000, CRC(37c59db2) SHA1(e8f8f6a4460a6f6755873580be6ff70cebe14969), ROM_BIOS(1))
-	ROMX_LOAD("trs80.z34",   0x1000, 0x1000, CRC(05818718) SHA1(43c538ca77623af6417474ca5b95fb94205500c1), ROM_BIOS(1))
-	ROMX_LOAD("trs80.zl2",   0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369), ROM_BIOS(1))
+	ROMX_LOAD("trs80.z33",   0x0000, 0x1000, CRC(37c59db2) SHA1(e8f8f6a4460a6f6755873580be6ff70cebe14969), ROM_BIOS(0))
+	ROMX_LOAD("trs80.z34",   0x1000, 0x1000, CRC(05818718) SHA1(43c538ca77623af6417474ca5b95fb94205500c1), ROM_BIOS(0))
+	ROMX_LOAD("trs80.zl2",   0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rsl2", "R/S L2 Basic")
-	ROMX_LOAD("trs80alt.z33",0x0000, 0x1000, CRC(be46faf5) SHA1(0e63fc11e207bfd5288118be5d263e7428cc128b), ROM_BIOS(2))
-	ROMX_LOAD("trs80alt.z34",0x1000, 0x1000, CRC(6c791c2d) SHA1(2a38e0a248f6619d38f1a108eea7b95761cf2aee), ROM_BIOS(2))
-	ROMX_LOAD("trs80alt.zl2",0x2000, 0x1000, CRC(55b3ad13) SHA1(6279f6a68f927ea8628458b278616736f0b3c339), ROM_BIOS(2))
+	ROMX_LOAD("trs80alt.z33",0x0000, 0x1000, CRC(be46faf5) SHA1(0e63fc11e207bfd5288118be5d263e7428cc128b), ROM_BIOS(1))
+	ROMX_LOAD("trs80alt.z34",0x1000, 0x1000, CRC(6c791c2d) SHA1(2a38e0a248f6619d38f1a108eea7b95761cf2aee), ROM_BIOS(1))
+	ROMX_LOAD("trs80alt.zl2",0x2000, 0x1000, CRC(55b3ad13) SHA1(6279f6a68f927ea8628458b278616736f0b3c339), ROM_BIOS(1))
 
 	ROM_REGION(0x00400, "chargen",0)
 	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
@@ -854,19 +854,19 @@ Note: Be careful when dumping rom C: if dumped on the trs-80 m3 with software, b
 */
 	ROM_REGION(0x20000, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "trs80m3_revc", "Level 2 bios, RomC Rev C")
+	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(0)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
+	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(0)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117", (Level 2 bios ROM B '407c')
+	ROMX_LOAD("8040316c.u106", 0x3000, 0x0800, CRC(c8f79433) SHA1(6f395bba822d39d3cd2b73c8ea25aab4c4c26da7), ROM_BIOS(0)) // Label: "SCM91692P // Tandy (c) 81 // 8040316-C // QQ8220" (Level 2 bios ROM C REV C '2f84')
+	ROM_SYSTEM_BIOS(1, "trs80m3_revb", "Level 2 bios, RomC Rev B")
 	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(1)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
 	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(1)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117", (Level 2 bios ROM B '407c')
-	ROMX_LOAD("8040316c.u106", 0x3000, 0x0800, CRC(c8f79433) SHA1(6f395bba822d39d3cd2b73c8ea25aab4c4c26da7), ROM_BIOS(1)) // Label: "SCM91692P // Tandy (c) 81 // 8040316-C // QQ8220" (Level 2 bios ROM C REV C '2f84')
-	ROM_SYSTEM_BIOS(1, "trs80m3_revb", "Level 2 bios, RomC Rev B")
-	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(2)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
-	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(2)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117", (Level 2 bios ROM B '407c')
-	ROMX_LOAD("8040316b.u106", 0x3000, 0x0800, CRC(84a5702d) SHA1(297dca756a9d3c6fd13e0fa6f93d172ff795b520), ROM_BIOS(2)) // Label: "SCM91692P // Tandy (c) 80 // 8040316B // QQ8040" (Level 2 bios ROM C REV B '2ef8')
+	ROMX_LOAD("8040316b.u106", 0x3000, 0x0800, CRC(84a5702d) SHA1(297dca756a9d3c6fd13e0fa6f93d172ff795b520), ROM_BIOS(1)) // Label: "SCM91692P // Tandy (c) 80 // 8040316B // QQ8040" (Level 2 bios ROM C REV B '2ef8')
 	ROM_SYSTEM_BIOS(2, "trs80m3_n3v2", "Level 2 bios, Network III v2 (student)")
-	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(3)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
-	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(3)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117" (Level 2 bios ROM B '407c')
-	ROMX_LOAD("276a.u106", 0x3000, 0x0800, CRC(7d38720a) SHA1(bef621e5ae2a8c1f9e7f6325b7841f5ab8ab7e6a), ROM_BIOS(3)) // 2716 EPROM Label: "MOD.III // ROM C // (276A)" (Network III v2 ROM C '276a')
+	ROMX_LOAD("8041364.u104", 0x0000, 0x2000, CRC(ec0c6daa) SHA1(257cea6b9b46912d4681251019ec2b84f1b95fc8), ROM_BIOS(2)) // Label: "SCM91248C // Tandy (c) 80 // 8041364 // 8134" (Level 2 bios ROM A '9639')
+	ROMX_LOAD("8040332.u105", 0x2000, 0x1000, CRC(ed4ee921) SHA1(ec0a19d4b72f71e51965de63250009c3c4e4cab3), ROM_BIOS(2)) // Label: "SCM91619P // Tandy (c) 80 // 8040332 // QQ8117" (Level 2 bios ROM B '407c')
+	ROMX_LOAD("276a.u106", 0x3000, 0x0800, CRC(7d38720a) SHA1(bef621e5ae2a8c1f9e7f6325b7841f5ab8ab7e6a), ROM_BIOS(2)) // 2716 EPROM Label: "MOD.III // ROM C // (276A)" (Network III v2 ROM C '276a')
 	ROM_SYSTEM_BIOS(3, "trs80m3_l1", "Level 1 bios")
-	ROMX_LOAD("8040032.u104", 0x0000, 0x1000, CRC(6418d641) SHA1(f823ab6ceb102588d27e5f5c751e31175289291c), ROM_BIOS(4) ) // Label: "8040032 // (M) QQ8028 // SCM91616P"; Silkscreen: "TANDY // (C) '80"; (Level 1 bios)
+	ROMX_LOAD("8040032.u104", 0x0000, 0x1000, CRC(6418d641) SHA1(f823ab6ceb102588d27e5f5c751e31175289291c), ROM_BIOS(3) ) // Label: "8040032 // (M) QQ8028 // SCM91616P"; Silkscreen: "TANDY // (C) '80"; (Level 1 bios)
 
 	ROM_REGION(0x00800, "chargen",0)    /* correct for later systems; the trs80m3_l1 bios uses the non-a version of this rom, dump is pending */
 	ROM_LOAD("8044316.u36", 0x0000, 0x0800, NO_DUMP) // Label: "(M) // SCM91665P // 8044316 // QQ8029" ('no-letter' revision)
@@ -885,9 +885,9 @@ ROM_END
 ROM_START(trs80m4p) // uses a completely different memory map scheme to the others; the trs-80 model 3 roms are loaded from a boot disk, the only rom on the machine is a bootloader; bootloader can be banked out of 0x0000-0x1000 space which is replaced with ram; see the tech ref pdf, pdf page 62
 	ROM_REGION(0x20000, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "trs80m4p", "Level 2 bios, gate array machine")
-	ROMX_LOAD("8075332.u69", 0x0000, 0x1000, CRC(3a738aa9) SHA1(6393396eaa10a84b9e9f0cf5930aba73defc5c52), ROM_BIOS(1)) // Label: "SCM95060P // 8075332 // TANDY (C) 1983 // 8421" at location U69 (may be located at U70 on some pcb revisions)
+	ROMX_LOAD("8075332.u69", 0x0000, 0x1000, CRC(3a738aa9) SHA1(6393396eaa10a84b9e9f0cf5930aba73defc5c52), ROM_BIOS(0)) // Label: "SCM95060P // 8075332 // TANDY (C) 1983 // 8421" at location U69 (may be located at U70 on some pcb revisions)
 	ROM_SYSTEM_BIOS(1, "trs80m4p_hack", "Disk loader hack")
-	ROMX_LOAD("trs80m4p_loader_hack.rom", 0x0000, 0x01f8, CRC(7ff336f4) SHA1(41184f5240b4b54f3804f5a22b4d78bbba52ed1d), ROM_BIOS(2))
+	ROMX_LOAD("trs80m4p_loader_hack.rom", 0x0000, 0x01f8, CRC(7ff336f4) SHA1(41184f5240b4b54f3804f5a22b4d78bbba52ed1d), ROM_BIOS(1))
 
 	ROM_REGION(0x00800, "chargen",0)
 	ROM_LOAD("8049007.u103", 0x0000, 0x0800, CRC(1ac44bea) SHA1(c9426ab2b2aa5380dc97a7b9c048ccd1bbde92ca)) // Label: "SCM95987P // 8049007 // TANDY (C) 1983 // 8447" at location U103 (may be located at U43 on some pcb revisions)

@@ -162,11 +162,11 @@ void sparkz_state::main_map(address_map &map)
 	map(0x640022, 0x640023).portr("TRACKY2");
 	map(0x640024, 0x640025).portr("TRACKX1");
 	map(0x640026, 0x640027).portr("TRACKY1");
-	map(0x640040, 0x64004f).w(this, FUNC(sparkz_state::latch_w));
+	map(0x640040, 0x64004f).w(FUNC(sparkz_state::latch_w));
 	map(0x640060, 0x64006f).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x641000, 0x641fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x642000, 0x642000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x646000, 0x646fff).w(this, FUNC(sparkz_state::scanline_int_ack_w));
+	map(0x646000, 0x646fff).w(FUNC(sparkz_state::scanline_int_ack_w));
 	map(0x647000, 0x647fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 }
 

@@ -13,6 +13,7 @@ DEFINE_DEVICE_TYPE(ISBC_215G, isbc_215g_device, "isbc_215g", "ISBC 215G Winchest
 
 isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISBC_215G, tag, owner, clock),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_dmac(*this, "u84"),
 	m_hdd0(*this, "drive0"),
 	m_hdd1(*this, "drive1"),
@@ -318,14 +319,14 @@ WRITE16_MEMBER(isbc_215g_device::mem_w)
 
 void isbc_215g_device::isbc_215g_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(isbc_215g_device::mem_r), FUNC(isbc_215g_device::mem_w));
+	map(0x00000, 0xfffff).rw(FUNC(isbc_215g_device::mem_r), FUNC(isbc_215g_device::mem_w));
 }
 
 void isbc_215g_device::isbc_215g_io(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("i8089", 0);
 	map(0x4000, 0x47ff).mirror(0x3800).ram();
-	map(0x8000, 0x8039).mirror(0x3fc0).rw(this, FUNC(isbc_215g_device::io_r), FUNC(isbc_215g_device::io_w));
+	map(0x8000, 0x8039).mirror(0x3fc0).rw(FUNC(isbc_215g_device::io_r), FUNC(isbc_215g_device::io_w));
 	map(0xc070, 0xc08f).rw("sbx1", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
 	map(0xc0b0, 0xc0bf).rw("sbx1", FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0x00ff);
 	map(0xc0d0, 0xc0df).rw("sbx2", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
@@ -399,7 +400,7 @@ void isbc_215g_device::device_reset()
 
 void isbc_215g_device::device_start()
 {
-	m_maincpu_mem = &machine().device<cpu_device>(m_maincpu_tag)->space(AS_PROGRAM);
+	m_maincpu_mem = &m_maincpu->space(AS_PROGRAM);
 	m_cyl[0] = m_cyl[1] = 0;
 	m_lba[0] = m_lba[1] = 0;
 	m_idcompare[0] = m_idcompare[1] = m_idcompare[2] = m_idcompare[3] = 0;

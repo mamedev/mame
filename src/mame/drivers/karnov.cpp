@@ -433,12 +433,12 @@ void karnov_state::karnov_map(address_map &map)
 	map(0x000000, 0x05ffff).rom();
 	map(0x060000, 0x063fff).ram().share("ram");
 	map(0x080000, 0x080fff).ram().share("spriteram");
-	map(0x0a0000, 0x0a07ff).ram().w(this, FUNC(karnov_state::karnov_videoram_w)).share("videoram");
-	map(0x0a0800, 0x0a0fff).w(this, FUNC(karnov_state::karnov_videoram_w)); /* Wndrplnt Mirror */
+	map(0x0a0000, 0x0a07ff).ram().w(FUNC(karnov_state::karnov_videoram_w)).share("videoram");
+	map(0x0a0800, 0x0a0fff).w(FUNC(karnov_state::karnov_videoram_w)); /* Wndrplnt Mirror */
 	map(0x0a1000, 0x0a17ff).writeonly().share("pf_data");
-	map(0x0a1800, 0x0a1fff).w(this, FUNC(karnov_state::karnov_playfield_swap_w));
-	map(0x0c0000, 0x0c0007).r(this, FUNC(karnov_state::karnov_control_r));
-	map(0x0c0000, 0x0c000f).w(this, FUNC(karnov_state::karnov_control_w));
+	map(0x0a1800, 0x0a1fff).w(FUNC(karnov_state::karnov_playfield_swap_w));
+	map(0x0c0000, 0x0c0007).r(FUNC(karnov_state::karnov_control_r));
+	map(0x0c0000, 0x0c000f).w(FUNC(karnov_state::karnov_control_w));
 }
 
 

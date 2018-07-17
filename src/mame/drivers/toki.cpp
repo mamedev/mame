@@ -118,7 +118,7 @@ READ16_MEMBER(toki_state::pip_r)
 
 WRITE_LINE_MEMBER(toki_state::tokib_adpcm_int)
 {
-	m_msm->data_w(m_msm5205next);
+	m_msm->write_data(m_msm5205next);
 	m_msm5205next >>= 4;
 
 	m_toggle ^= 1;
@@ -148,11 +148,11 @@ void toki_state::toki_map(address_map &map)
 	map(0x060000, 0x06d7ff).ram();
 	map(0x06d800, 0x06dfff).ram().share("spriteram");
 	map(0x06e000, 0x06e7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x06e800, 0x06efff).ram().w(this, FUNC(toki_state::background1_videoram_w)).share("bg1_vram");
-	map(0x06f000, 0x06f7ff).ram().w(this, FUNC(toki_state::background2_videoram_w)).share("bg2_vram");
-	map(0x06f800, 0x06ffff).ram().w(this, FUNC(toki_state::foreground_videoram_w)).share("videoram");
+	map(0x06e800, 0x06efff).ram().w(FUNC(toki_state::background1_videoram_w)).share("bg1_vram");
+	map(0x06f000, 0x06f7ff).ram().w(FUNC(toki_state::background2_videoram_w)).share("bg2_vram");
+	map(0x06f800, 0x06ffff).ram().w(FUNC(toki_state::foreground_videoram_w)).share("videoram");
 	map(0x080000, 0x08000d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
-	map(0x0a0000, 0x0a005f).w(this, FUNC(toki_state::toki_control_w)).share("scrollram");
+	map(0x0a0000, 0x0a005f).w(FUNC(toki_state::toki_control_w)).share("scrollram");
 	map(0x0c0000, 0x0c0001).portr("DSW");
 	map(0x0c0002, 0x0c0003).portr("INPUTS");
 	map(0x0c0004, 0x0c0005).portr("SYSTEM");
@@ -164,20 +164,20 @@ void toki_state::tokib_map(address_map &map)
 	map(0x000000, 0x05ffff).rom();
 	map(0x060000, 0x06dfff).ram();
 	map(0x06e000, 0x06e7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x06e800, 0x06efff).ram().w(this, FUNC(toki_state::background1_videoram_w)).share("bg1_vram");
-	map(0x06f000, 0x06f7ff).ram().w(this, FUNC(toki_state::background2_videoram_w)).share("bg2_vram");
-	map(0x06f800, 0x06ffff).ram().w(this, FUNC(toki_state::foreground_videoram_w)).share("videoram");
+	map(0x06e800, 0x06efff).ram().w(FUNC(toki_state::background1_videoram_w)).share("bg1_vram");
+	map(0x06f000, 0x06f7ff).ram().w(FUNC(toki_state::background2_videoram_w)).share("bg2_vram");
+	map(0x06f800, 0x06ffff).ram().w(FUNC(toki_state::foreground_videoram_w)).share("videoram");
 	map(0x071000, 0x071001).nopw();    /* sprite related? seems another scroll register */
 				/* gets written the same value as 75000a (bg2 scrollx) */
 	map(0x071804, 0x071807).nopw();    /* sprite related, always 01be0100 */
 	map(0x07180e, 0x071e45).writeonly().share("spriteram");
 	map(0x072000, 0x072001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));   /* probably */
-	map(0x075000, 0x075001).w(this, FUNC(toki_state::tokib_soundcommand_w));
+	map(0x075000, 0x075001).w(FUNC(toki_state::tokib_soundcommand_w));
 	map(0x075004, 0x07500b).writeonly().share("scrollram");
 	map(0x0c0000, 0x0c0001).portr("DSW");
 	map(0x0c0002, 0x0c0003).portr("INPUTS");
 	map(0x0c0004, 0x0c0005).portr("SYSTEM");
-	map(0x0c000e, 0x0c000f).r(this, FUNC(toki_state::pip_r));  /* sound related, if we return 0 the code writes */
+	map(0x0c000e, 0x0c000f).r(FUNC(toki_state::pip_r));  /* sound related, if we return 0 the code writes */
 				/* the sound command quickly followed by 0 and the */
 				/* sound CPU often misses the command. */
 }
@@ -211,7 +211,7 @@ void toki_state::toki_audio_opcodes_map(address_map &map)
 
 void toki_state::jujuba_audio_map(address_map &map)
 {
-	map(0x0000, 0x1fff).r(this, FUNC(toki_state::jujuba_z80_data_decrypt));
+	map(0x0000, 0x1fff).r(FUNC(toki_state::jujuba_z80_data_decrypt));
 	map(0x2000, 0x27ff).ram();
 	map(0x4000, 0x4000).w(m_seibu_sound, FUNC(seibu_sound_device::pending_w));
 	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
@@ -243,8 +243,8 @@ void toki_state::tokib_audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xe000, 0xe000).w(this, FUNC(toki_state::tokib_adpcm_control_w)); /* MSM5205 + ROM bank */
-	map(0xe400, 0xe400).w(this, FUNC(toki_state::tokib_adpcm_data_w));
+	map(0xe000, 0xe000).w(FUNC(toki_state::tokib_adpcm_control_w)); /* MSM5205 + ROM bank */
+	map(0xe400, 0xe400).w(FUNC(toki_state::tokib_adpcm_data_w));
 	map(0xec00, 0xec01).mirror(0x0008).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));

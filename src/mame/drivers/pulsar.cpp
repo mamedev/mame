@@ -52,7 +52,6 @@ public:
 	pulsar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_brg(*this, "brg")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
@@ -62,7 +61,6 @@ public:
 	void init_pulsar();
 	DECLARE_MACHINE_RESET(pulsar);
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
-	DECLARE_WRITE8_MEMBER(baud_w);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
 	DECLARE_WRITE8_MEMBER(ppi_pb_w);
 	DECLARE_WRITE8_MEMBER(ppi_pc_w);
@@ -74,7 +72,6 @@ public:
 private:
 	floppy_image_device *m_floppy;
 	required_device<cpu_device> m_maincpu;
-	required_device<com8116_device> m_brg;
 	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -96,15 +93,9 @@ void pulsar_state::pulsar_io(address_map &map)
 	map(0xc0, 0xc3).mirror(0x0c).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0xd0, 0xd3).mirror(0x0c).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
 	map(0xe0, 0xe3).mirror(0x0c).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf0, 0xff).w(this, FUNC(pulsar_state::baud_w));
+	map(0xf0, 0xf0).mirror(0x0f).w("brg", FUNC(com8116_device::stt_str_w));
 }
 
-
-WRITE8_MEMBER( pulsar_state::baud_w )
-{
-	m_brg->str_w(data & 0x0f);
-	m_brg->stt_w(data >> 4);
-}
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 TIMER_CALLBACK_MEMBER( pulsar_state::pulsar_reset)
@@ -213,7 +204,7 @@ void pulsar_state::init_pulsar()
 
 MACHINE_CONFIG_START(pulsar_state::pulsar)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(pulsar_mem)
 	MCFG_DEVICE_IO_MAP(pulsar_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
@@ -226,9 +217,9 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, pulsar_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pulsar_state, ppi_pc_w))
 
-	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
+	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("dart", Z80DART, 4_MHz_XTAL)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
@@ -239,14 +230,14 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("dart", z80dart_device, ctsa_w))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800))
+	MCFG_DEVICE_ADD("brg", COM8116, 5.0688_MHz_XTAL)
 	// Schematic has the labels for FT and FR the wrong way around, but the pin numbers are correct.
 	MCFG_COM8116_FR_HANDLER(WRITELINE("dart", z80dart_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
 	MCFG_COM8116_FT_HANDLER(WRITELINE("dart", z80dart_device, txcb_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxcb_w))
 
-	MCFG_FD1797_ADD("fdc", XTAL(4'000'000) / 2)
+	MCFG_DEVICE_ADD("fdc", FD1797, 4_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
@@ -257,9 +248,9 @@ MACHINE_CONFIG_END
 ROM_START( pulsarlb )
 	ROM_REGION( 0x10800, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "mon7", "MP7A")
-	ROMX_LOAD( "mp7a.bin", 0x10000, 0x800, CRC(726b8a19) SHA1(43b2af84d5622c1f67584c501b730acf002a6113), ROM_BIOS(1))
+	ROMX_LOAD( "mp7a.bin", 0x10000, 0x800, CRC(726b8a19) SHA1(43b2af84d5622c1f67584c501b730acf002a6113), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "mon6", "LBOOT6") // Blank screen until floppy boots
-	ROMX_LOAD( "lboot6.rom", 0x10000, 0x800, CRC(3bca9096) SHA1(ff99288e51a9e832785ce8e3ab5a9452b1064231), ROM_BIOS(2))
+	ROMX_LOAD( "lboot6.rom", 0x10000, 0x800, CRC(3bca9096) SHA1(ff99288e51a9e832785ce8e3ab5a9452b1064231), ROM_BIOS(1))
 ROM_END
 
 /* Driver */

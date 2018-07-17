@@ -294,17 +294,17 @@ void ddragon3_state::ddragon3_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x000004, 0x000007).nopw();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
-	map(0x082000, 0x0827ff).ram().w(this, FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
-	map(0x0c0000, 0x0c000f).w(this, FUNC(ddragon3_state::ddragon3_scroll_w));
+	map(0x080000, 0x080fff).ram().w(FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
+	map(0x082000, 0x0827ff).ram().w(FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
+	map(0x0c0000, 0x0c000f).w(FUNC(ddragon3_state::ddragon3_scroll_w));
 	map(0x100000, 0x100001).portr("P1_P2");
 	map(0x100002, 0x100003).portr("SYSTEM");
 	map(0x100004, 0x100005).portr("DSW");
 	map(0x100006, 0x100007).portr("P3");
-	map(0x100000, 0x100001).w(this, FUNC(ddragon3_state::ddragon3_vreg_w));
+	map(0x100000, 0x100001).w(FUNC(ddragon3_state::ddragon3_vreg_w));
 	map(0x100003, 0x100003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x100004, 0x100005).w(this, FUNC(ddragon3_state::irq6_ack_w));
-	map(0x100006, 0x100007).w(this, FUNC(ddragon3_state::irq5_ack_w));
+	map(0x100004, 0x100005).w(FUNC(ddragon3_state::irq6_ack_w));
+	map(0x100006, 0x100007).w(FUNC(ddragon3_state::irq5_ack_w));
 	map(0x140000, 0x1405ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
 	map(0x180000, 0x180fff).ram().share("spriteram");
 	map(0x1c0000, 0x1c3fff).ram(); /* work RAM */
@@ -313,15 +313,15 @@ void ddragon3_state::ddragon3_map(address_map &map)
 void ddragon3_state::dd3b_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
+	map(0x080000, 0x080fff).ram().w(FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
 	map(0x081000, 0x081fff).ram().share("spriteram");
-	map(0x082000, 0x0827ff).ram().w(this, FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
-	map(0x0c0000, 0x0c000f).w(this, FUNC(ddragon3_state::ddragon3_scroll_w));
+	map(0x082000, 0x0827ff).ram().w(FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
+	map(0x0c0000, 0x0c000f).w(FUNC(ddragon3_state::ddragon3_scroll_w));
 	map(0x100000, 0x1005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
-	map(0x140000, 0x140001).w(this, FUNC(ddragon3_state::ddragon3_vreg_w));
+	map(0x140000, 0x140001).w(FUNC(ddragon3_state::ddragon3_vreg_w));
 	map(0x140003, 0x140003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x140004, 0x140005).w(this, FUNC(ddragon3_state::irq6_ack_w));
-	map(0x140006, 0x140007).w(this, FUNC(ddragon3_state::irq5_ack_w));
+	map(0x140004, 0x140005).w(FUNC(ddragon3_state::irq6_ack_w));
+	map(0x140006, 0x140007).w(FUNC(ddragon3_state::irq5_ack_w));
 	map(0x140008, 0x140009).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x180000, 0x180001).portr("IN0");
 	map(0x180002, 0x180003).portr("IN1");
@@ -333,16 +333,16 @@ void ddragon3_state::dd3b_map(address_map &map)
 void ddragon3_state::ctribe_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
+	map(0x080000, 0x080fff).ram().w(FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
 	map(0x081000, 0x081fff).ram().share("spriteram");
-	map(0x082000, 0x0827ff).ram().w(this, FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
+	map(0x082000, 0x0827ff).ram().w(FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
 	map(0x082800, 0x082fff).ram();
-	map(0x0c0000, 0x0c000f).rw(this, FUNC(ddragon3_state::ddragon3_scroll_r), FUNC(ddragon3_state::ddragon3_scroll_w));
+	map(0x0c0000, 0x0c000f).rw(FUNC(ddragon3_state::ddragon3_scroll_r), FUNC(ddragon3_state::ddragon3_scroll_w));
 	map(0x100000, 0x1005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
-	map(0x140000, 0x140001).w(this, FUNC(ddragon3_state::ddragon3_vreg_w));
+	map(0x140000, 0x140001).w(FUNC(ddragon3_state::ddragon3_vreg_w));
 	map(0x140003, 0x140003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x140004, 0x140005).w(this, FUNC(ddragon3_state::irq6_ack_w));
-	map(0x140006, 0x140007).w(this, FUNC(ddragon3_state::irq5_ack_w));
+	map(0x140004, 0x140005).w(FUNC(ddragon3_state::irq6_ack_w));
+	map(0x140006, 0x140007).w(FUNC(ddragon3_state::irq5_ack_w));
 	map(0x140008, 0x140009).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x180000, 0x180001).portr("IN0");
 	map(0x180002, 0x180003).portr("IN1");
@@ -354,20 +354,20 @@ void ddragon3_state::ctribe_map(address_map &map)
 void wwfwfest_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x0c0000, 0x0c1fff).ram().w(this, FUNC(wwfwfest_state::wwfwfest_fg0_videoram_w)).share("fg0_videoram"); /* FG0 Ram - 4 bytes per tile */
+	map(0x0c0000, 0x0c1fff).ram().w(FUNC(wwfwfest_state::wwfwfest_fg0_videoram_w)).share("fg0_videoram"); /* FG0 Ram - 4 bytes per tile */
 	map(0x0c2000, 0x0c3fff).ram().share("spriteram");                       /* SPR Ram */
-	map(0x080000, 0x080fff).ram().w(this, FUNC(wwfwfest_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* BG0 Ram - 4 bytes per tile */
-	map(0x082000, 0x082fff).ram().w(this, FUNC(wwfwfest_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* BG1 Ram - 2 bytes per tile */
-	map(0x100000, 0x100007).rw(this, FUNC(wwfwfest_state::ddragon3_scroll_r), FUNC(wwfwfest_state::ddragon3_scroll_w));
-	map(0x10000a, 0x10000b).w(this, FUNC(wwfwfest_state::wwfwfest_flipscreen_w));
-	map(0x140000, 0x140003).w(this, FUNC(wwfwfest_state::wwfwfest_irq_ack_w));
-	map(0x14000c, 0x14000d).w(this, FUNC(wwfwfest_state::wwfwfest_soundwrite));
-	map(0x140011, 0x140011).w(this, FUNC(wwfwfest_state::wwfwfest_priority_w));
+	map(0x080000, 0x080fff).ram().w(FUNC(wwfwfest_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* BG0 Ram - 4 bytes per tile */
+	map(0x082000, 0x082fff).ram().w(FUNC(wwfwfest_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* BG1 Ram - 2 bytes per tile */
+	map(0x100000, 0x100007).rw(FUNC(wwfwfest_state::ddragon3_scroll_r), FUNC(wwfwfest_state::ddragon3_scroll_w));
+	map(0x10000a, 0x10000b).w(FUNC(wwfwfest_state::wwfwfest_flipscreen_w));
+	map(0x140000, 0x140003).w(FUNC(wwfwfest_state::wwfwfest_irq_ack_w));
+	map(0x14000c, 0x14000d).w(FUNC(wwfwfest_state::wwfwfest_soundwrite));
+	map(0x140011, 0x140011).w(FUNC(wwfwfest_state::wwfwfest_priority_w));
 	map(0x140020, 0x140021).portr("P1");
 	map(0x140022, 0x140023).portr("P2");
 	map(0x140024, 0x140025).portr("P3");
 	map(0x140026, 0x140027).portr("P4");
-	map(0x180000, 0x18ffff).rw(this, FUNC(wwfwfest_state::wwfwfest_paletteram_r), FUNC(wwfwfest_state::wwfwfest_paletteram_w)).share("palette");
+	map(0x180000, 0x18ffff).rw(FUNC(wwfwfest_state::wwfwfest_paletteram_r), FUNC(wwfwfest_state::wwfwfest_paletteram_w)).share("palette");
 	map(0x1c0000, 0x1c3fff).ram(); /* Work Ram */
 }
 
@@ -379,7 +379,7 @@ void ddragon3_state::sound_map(address_map &map)
 	map(0xc800, 0xc801).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd800, 0xd800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).w(this, FUNC(ddragon3_state::oki_bankswitch_w));
+	map(0xe800, 0xe800).w(FUNC(ddragon3_state::oki_bankswitch_w));
 }
 
 

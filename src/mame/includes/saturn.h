@@ -5,22 +5,25 @@
 
 #pragma once
 
-#include "machine/timer.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/sega_scu.h"
-#include "machine/smpc.h"
-#include "cpu/sh/sh2.h"
-
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "machine/315-5881_crypt.h"
-#include "machine/315-5838_317-0229_comp.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/sh/sh2.h"
 
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
-#include "debugger.h"
 
+#include "machine/315-5881_crypt.h"
+#include "machine/315-5838_317-0229_comp.h"
+#include "machine/sega_scu.h"
+#include "machine/smpc.h"
+#include "machine/timer.h"
+
+#include "sound/scsp.h"
+
+#include "debugger.h"
+#include "emupal.h"
 #include "screen.h"
 
 class saturn_state : public driver_device
@@ -36,6 +39,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_slave(*this, "slave"),
 			m_audiocpu(*this, "audiocpu"),
+			m_scsp(*this, "scsp"),
 			m_smpc_hle(*this, "smpc"),
 			m_scu(*this, "scu"),
 			m_gfxdecode(*this, "gfxdecode"),
@@ -106,6 +110,7 @@ public:
 	required_device<sh2_device> m_maincpu;
 	required_device<sh2_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
+	required_device<scsp_device> m_scsp;
 	required_device<smpc_hle_device> m_smpc_hle;
 	required_device<sega_scu_device> m_scu;
 	required_device<gfxdecode_device> m_gfxdecode;

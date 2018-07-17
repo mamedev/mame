@@ -19,6 +19,7 @@
 #include "machine/bankdev.h"
 #include "machine/x2212.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -553,29 +554,29 @@ void vt240_state::bank_map(address_map &map)
 void vt240_state::vt240_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0000000, 0167777).rw(this, FUNC(vt240_state::mem_r), FUNC(vt240_state::mem_w));
-	map(0170000, 0170037).rw(this, FUNC(vt240_state::mem_map_cs_r), FUNC(vt240_state::mem_map_cs_w)).umask16(0x00ff);
-	map(0170040, 0170040).w(this, FUNC(vt240_state::mem_map_sel_w));
-	map(0170100, 0170100).r(this, FUNC(vt240_state::ctrl_r));
-	map(0170140, 0170140).rw(this, FUNC(vt240_state::nvr_store_r), FUNC(vt240_state::nvr_store_w));
+	map(0000000, 0167777).rw(FUNC(vt240_state::mem_r), FUNC(vt240_state::mem_w));
+	map(0170000, 0170037).rw(FUNC(vt240_state::mem_map_cs_r), FUNC(vt240_state::mem_map_cs_w)).umask16(0x00ff);
+	map(0170040, 0170040).w(FUNC(vt240_state::mem_map_sel_w));
+	map(0170100, 0170100).r(FUNC(vt240_state::ctrl_r));
+	map(0170140, 0170140).rw(FUNC(vt240_state::nvr_store_r), FUNC(vt240_state::nvr_store_w));
 	map(0171000, 0171003).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0x00ff);
 	map(0171004, 0171007).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0x00ff);
-	map(0172000, 0172077).rw(this, FUNC(vt240_state::duart_r), FUNC(vt240_state::duart_w)).umask16(0x00ff);
+	map(0172000, 0172077).rw(FUNC(vt240_state::duart_r), FUNC(vt240_state::duart_w)).umask16(0x00ff);
 	map(0173000, 0173003).r(m_hgdc, FUNC(upd7220_device::read)).umask16(0x00ff);
-	map(0173040, 0173077).r(this, FUNC(vt240_state::vom_r)).umask16(0x00ff);
-	map(0173140, 0173140).r(this, FUNC(vt240_state::char_buf_r));
+	map(0173040, 0173077).r(FUNC(vt240_state::vom_r)).umask16(0x00ff);
+	map(0173140, 0173140).r(FUNC(vt240_state::char_buf_r));
 	map(0174000, 0174003).w(m_hgdc, FUNC(upd7220_device::write)).umask16(0x00ff);
-	map(0174040, 0174077).w(this, FUNC(vt240_state::vom_w)).umask16(0x00ff);
-	map(0174140, 0174140).w(this, FUNC(vt240_state::char_buf_w));
-	map(0174400, 0174400).w(this, FUNC(vt240_state::patmult_w));
-	map(0174440, 0174440).w(this, FUNC(vt240_state::mask_w));
-	map(0174500, 0174500).w(this, FUNC(vt240_state::vpat_w));
-	map(0174540, 0174540).w(this, FUNC(vt240_state::lu_w));
-	map(0174600, 0174600).w(this, FUNC(vt240_state::reg0_w));
-	map(0174640, 0174640).w(this, FUNC(vt240_state::reg1_w));
-	map(0174700, 0174700).w(this, FUNC(vt240_state::hbscrl_w));
-	map(0174740, 0174740).w(this, FUNC(vt240_state::lbscrl_w));
-	map(0175000, 0175005).rw(this, FUNC(vt240_state::i8085_comm_r), FUNC(vt240_state::i8085_comm_w)).umask16(0x00ff);
+	map(0174040, 0174077).w(FUNC(vt240_state::vom_w)).umask16(0x00ff);
+	map(0174140, 0174140).w(FUNC(vt240_state::char_buf_w));
+	map(0174400, 0174400).w(FUNC(vt240_state::patmult_w));
+	map(0174440, 0174440).w(FUNC(vt240_state::mask_w));
+	map(0174500, 0174500).w(FUNC(vt240_state::vpat_w));
+	map(0174540, 0174540).w(FUNC(vt240_state::lu_w));
+	map(0174600, 0174600).w(FUNC(vt240_state::reg0_w));
+	map(0174640, 0174640).w(FUNC(vt240_state::reg1_w));
+	map(0174700, 0174700).w(FUNC(vt240_state::hbscrl_w));
+	map(0174740, 0174740).w(FUNC(vt240_state::lbscrl_w));
+	map(0175000, 0175005).rw(FUNC(vt240_state::i8085_comm_r), FUNC(vt240_state::i8085_comm_w)).umask16(0x00ff);
 	map(0176000, 0176777).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 	// 017700x System comm logic
 }
@@ -594,22 +595,22 @@ void vt240_state::vt240_char_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-	map(0x10, 0x1f).rw(this, FUNC(vt240_state::vom_r), FUNC(vt240_state::vom_w));
-	map(0x20, 0x20).rw(this, FUNC(vt240_state::t11_comm_r), FUNC(vt240_state::t11_comm_w));
-	map(0x30, 0x30).rw(this, FUNC(vt240_state::char_buf_r), FUNC(vt240_state::char_buf_w));
-	map(0x80, 0x80).w(this, FUNC(vt240_state::patmult_w));
-	map(0x90, 0x90).w(this, FUNC(vt240_state::mask_w));
-	map(0xa0, 0xa0).w(this, FUNC(vt240_state::vpat_w));
-	map(0xb0, 0xb0).w(this, FUNC(vt240_state::lu_w));
-	map(0xc0, 0xc0).w(this, FUNC(vt240_state::reg0_w));
-	map(0xd0, 0xd0).w(this, FUNC(vt240_state::reg1_w));
-	map(0xe0, 0xe0).w(this, FUNC(vt240_state::hbscrl_w));
-	map(0xf0, 0xf0).w(this, FUNC(vt240_state::lbscrl_w));
+	map(0x10, 0x1f).rw(FUNC(vt240_state::vom_r), FUNC(vt240_state::vom_w));
+	map(0x20, 0x20).rw(FUNC(vt240_state::t11_comm_r), FUNC(vt240_state::t11_comm_w));
+	map(0x30, 0x30).rw(FUNC(vt240_state::char_buf_r), FUNC(vt240_state::char_buf_w));
+	map(0x80, 0x80).w(FUNC(vt240_state::patmult_w));
+	map(0x90, 0x90).w(FUNC(vt240_state::mask_w));
+	map(0xa0, 0xa0).w(FUNC(vt240_state::vpat_w));
+	map(0xb0, 0xb0).w(FUNC(vt240_state::lu_w));
+	map(0xc0, 0xc0).w(FUNC(vt240_state::reg0_w));
+	map(0xd0, 0xd0).w(FUNC(vt240_state::reg1_w));
+	map(0xe0, 0xe0).w(FUNC(vt240_state::hbscrl_w));
+	map(0xf0, 0xf0).w(FUNC(vt240_state::lbscrl_w));
 }
 
 void vt240_state::upd7220_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).rw(this, FUNC(vt240_state::vram_r), FUNC(vt240_state::vram_w)).share("vram");
+	map(0x00000, 0x3ffff).rw(FUNC(vt240_state::vram_r), FUNC(vt240_state::vram_w)).share("vram");
 }
 
 
@@ -759,15 +760,15 @@ ROM_START( vt240 )
 	// but according to the Field Change Order below, the initial release is V2.1, so the above must be a prototype.
 	// DOL for v2.1 to v2.2 change: http://web.archive.org/web/20060905145200/http://cmcnabb.cc.vt.edu/dec94mds/vt240dol.txt
 	ROM_SYSTEM_BIOS( 0, "vt240v21", "VT240 V2.1" ) // initial factory release, FCO says this was 8 Feburary 1985
-	ROMX_LOAD( "23-006e6-00.e20", 0x00000, 0x8000, CRC(79c11d82) SHA1(5a6fe5b75b6504a161f2c9b148c0fe9f19770837), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "23-004e6-00.e22", 0x00001, 0x8000, CRC(eba10fef) SHA1(c0ee4d8e4eeb70066f03f3d17a7e2f2bd0b5f8ad), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "23-007e6-00.e19", 0x10000, 0x8000, CRC(d18a2ab8) SHA1(37f448a332fc50298007ed39c8bf1ab1eb6d4cae), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "23-005e6-00.e21", 0x10001, 0x8000, CRC(558d0285) SHA1(e96a49bf9d55d8ab879d9b39aa380368c5c9ade0), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "23-006e6-00.e20", 0x00000, 0x8000, CRC(79c11d82) SHA1(5a6fe5b75b6504a161f2c9b148c0fe9f19770837), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "23-004e6-00.e22", 0x00001, 0x8000, CRC(eba10fef) SHA1(c0ee4d8e4eeb70066f03f3d17a7e2f2bd0b5f8ad), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "23-007e6-00.e19", 0x10000, 0x8000, CRC(d18a2ab8) SHA1(37f448a332fc50298007ed39c8bf1ab1eb6d4cae), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "23-005e6-00.e21", 0x10001, 0x8000, CRC(558d0285) SHA1(e96a49bf9d55d8ab879d9b39aa380368c5c9ade0), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "vt240", "VT240 V2.2" ) // Revised version, December 1985
-	ROMX_LOAD( "23-058e6.e20", 0x00000, 0x8000, CRC(d2a56b90) SHA1(39cbb26134d7d8ba308df3a93228918a5945b45f), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "23-056e6.e22", 0x00001, 0x8000, CRC(c46e13c3) SHA1(0f2801fa7483d1f97708143cd81ae0816bf9a435), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "23-059e6.e19", 0x10000, 0x8000, CRC(f8393346) SHA1(1e28daf1b7f2bdabc47ce2f6fa99ef038b275a29), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "23-057e6.e21", 0x10001, 0x8000, CRC(7ce9dce9) SHA1(5a105e5bdca13910b3b79cc23567ce2dc36b844d), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "23-058e6.e20", 0x00000, 0x8000, CRC(d2a56b90) SHA1(39cbb26134d7d8ba308df3a93228918a5945b45f), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "23-056e6.e22", 0x00001, 0x8000, CRC(c46e13c3) SHA1(0f2801fa7483d1f97708143cd81ae0816bf9a435), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "23-059e6.e19", 0x10000, 0x8000, CRC(f8393346) SHA1(1e28daf1b7f2bdabc47ce2f6fa99ef038b275a29), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "23-057e6.e21", 0x10001, 0x8000, CRC(7ce9dce9) SHA1(5a105e5bdca13910b3b79cc23567ce2dc36b844d), ROM_SKIP(1) | ROM_BIOS(1))
 	// E39, E85, E131 are empty.
 
 	ROM_REGION( 0x1000, "proms", ROMREGION_ERASEFF )

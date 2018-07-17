@@ -242,32 +242,6 @@ WRITE8_MEMBER( super6_state::fdc_w )
 }
 
 
-//-------------------------------------------------
-//  baud_w - baud rate
-//-------------------------------------------------
-
-WRITE8_MEMBER( super6_state::baud_w )
-{
-	/*
-
-	    bit     description
-
-	    0       SIO channel A baud bit A
-	    1       SIO channel A baud bit B
-	    2       SIO channel A baud bit C
-	    3       SIO channel A baud bit D
-	    4       SIO channel B baud bit A
-	    5       SIO channel B baud bit B
-	    6       SIO channel B baud bit C
-	    7       SIO channel B baud bit D
-
-	*/
-
-	m_brg->str_w(data & 0x0f);
-	m_brg->stt_w(data >> 4);
-}
-
-
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -293,12 +267,12 @@ void super6_state::super6_io(address_map &map)
 	map(0x04, 0x07).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
-	map(0x10, 0x10).mirror(0x03).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
-	map(0x14, 0x14).rw(this, FUNC(super6_state::fdc_r), FUNC(super6_state::fdc_w));
-	map(0x15, 0x15).portr("J7").w(this, FUNC(super6_state::s100_w));
-	map(0x16, 0x16).w(this, FUNC(super6_state::bank0_w));
-	map(0x17, 0x17).w(this, FUNC(super6_state::bank1_w));
-	map(0x18, 0x18).mirror(0x03).w(this, FUNC(super6_state::baud_w));
+	map(0x10, 0x10).mirror(0x03).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x14, 0x14).rw(FUNC(super6_state::fdc_r), FUNC(super6_state::fdc_w));
+	map(0x15, 0x15).portr("J7").w(FUNC(super6_state::s100_w));
+	map(0x16, 0x16).w(FUNC(super6_state::bank0_w));
+	map(0x17, 0x17).w(FUNC(super6_state::bank1_w));
+	map(0x18, 0x18).mirror(0x03).w(BR1945_TAG, FUNC(com8116_device::stt_str_w));
 //  AM_RANGE(0x40, 0x40) ?
 //  AM_RANGE(0xe0, 0xe7) HDC?
 }
@@ -464,8 +438,8 @@ void super6_state::machine_reset()
 
 	uint8_t baud = m_j7->read();
 
-	m_brg->str_w(baud & 0x0f);
-	m_brg->stt_w((baud >> 4) & 0x07);
+	m_brg->write_str(baud & 0x0f);
+	m_brg->write_stt((baud >> 4) & 0x07);
 }
 
 
@@ -480,18 +454,18 @@ void super6_state::machine_reset()
 
 MACHINE_CONFIG_START(super6_state::super6)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(24'000'000)/4)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 24_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(super6_mem)
 	MCFG_DEVICE_IO_MAP(super6_io)
 	MCFG_Z80_DAISY_CHAIN(super6_daisy_chain)
 
 	// devices
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(24'000'000)/4)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 24_MHz_XTAL / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", super6_state, ctc_tick, attotime::from_hz(XTAL(24'000'000)/16))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", super6_state, ctc_tick, attotime::from_hz(24_MHz_XTAL / 16))
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(24'000'000)/6)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, 24_MHz_XTAL / 6)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, super6_state, memory_read_byte))
@@ -499,17 +473,17 @@ MACHINE_CONFIG_START(super6_state::super6)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, super6_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, super6_state, io_write_byte))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(24'000'000)/4)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 24_MHz_XTAL / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_WD2793_ADD(WD2793_TAG, 1000000)
+	MCFG_DEVICE_ADD(WD2793_TAG, WD2793, 1000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, super6_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, super6_state, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", super6_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL(24'000'000)/4)
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, 24_MHz_XTAL / 4)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -525,7 +499,7 @@ MACHINE_CONFIG_START(super6_state::super6)
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
 
-	MCFG_DEVICE_ADD(BR1945_TAG, COM8116, XTAL(5'068'800))
+	MCFG_DEVICE_ADD(BR1945_TAG, COM8116, 5.0688_MHz_XTAL)
 	MCFG_COM8116_FR_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_TAG, z80dart_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
@@ -553,9 +527,9 @@ ROM_START( super6 )
 	ROM_REGION( 0x800, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v36" )
 	ROM_SYSTEM_BIOS( 0, "v36", "ADC S6 v3.6" )
-	ROMX_LOAD( "adcs6_v3.6.u29", 0x000, 0x800, CRC(386fd22a) SHA1(9c177990aa180ab93be9c4641e92ae934627e661), ROM_BIOS(1) )
+	ROMX_LOAD( "adcs6_v3.6.u29", 0x000, 0x800, CRC(386fd22a) SHA1(9c177990aa180ab93be9c4641e92ae934627e661), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v12", "Digitex Monitor v1.2a" )
-	ROMX_LOAD( "digitex monitor 1.2a 6oct1983.u29", 0x000, 0x800, CRC(a4c33ce4) SHA1(46dde43ea51d295f2b3202c2d0e1883bde1a8da7), ROM_BIOS(2) )
+	ROMX_LOAD( "digitex monitor 1.2a 6oct1983.u29", 0x000, 0x800, CRC(a4c33ce4) SHA1(46dde43ea51d295f2b3202c2d0e1883bde1a8da7), ROM_BIOS(1) )
 
 	ROM_REGION( 0x800, "plds", 0 )
 	ROM_LOAD( "pal16l8.u16", 0x000, 0x800, NO_DUMP )

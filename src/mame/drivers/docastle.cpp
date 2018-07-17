@@ -205,13 +205,13 @@ WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 	}
 	else if (m_adpcm_data != -1)
 	{
-		m_msm->data_w(m_adpcm_data & 0x0f);
+		m_msm->write_data(m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
 	{
 		m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos++];
-		m_msm->data_w(m_adpcm_data >> 4);
+		m_msm->write_data(m_adpcm_data >> 4);
 	}
 }
 
@@ -243,30 +243,30 @@ void docastle_state::docastle_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x97ff).ram();
 	map(0x9800, 0x99ff).ram().share("spriteram");
-	map(0xa000, 0xa008).rw(this, FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
+	map(0xa000, 0xa008).rw(FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
 	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(this, FUNC(docastle_state::docastle_videoram_w)).share("videoram");
-	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(this, FUNC(docastle_state::docastle_colorram_w)).share("colorram");
-	map(0xe000, 0xe000).w(this, FUNC(docastle_state::docastle_nmitrigger_w));
+	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(FUNC(docastle_state::docastle_videoram_w)).share("videoram");
+	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(FUNC(docastle_state::docastle_colorram_w)).share("colorram");
+	map(0xe000, 0xe000).w(FUNC(docastle_state::docastle_nmitrigger_w));
 }
 
 void docastle_state::docastle_map2(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa008).rw(this, FUNC(docastle_state::docastle_shared1_r), FUNC(docastle_state::docastle_shared0_w));
-	map(0xc000, 0xc007).select(0x0080).rw(this, FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
-	map(0xe000, 0xe000).w("sn1", FUNC(sn76489a_device::write));
-	map(0xe400, 0xe400).w("sn2", FUNC(sn76489a_device::write));
-	map(0xe800, 0xe800).w("sn3", FUNC(sn76489a_device::write));
-	map(0xec00, 0xec00).w("sn4", FUNC(sn76489a_device::write));
+	map(0xa000, 0xa008).rw(FUNC(docastle_state::docastle_shared1_r), FUNC(docastle_state::docastle_shared0_w));
+	map(0xc000, 0xc007).select(0x0080).rw(FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
+	map(0xe000, 0xe000).w("sn1", FUNC(sn76489a_device::command_w));
+	map(0xe400, 0xe400).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0xe800, 0xe800).w("sn3", FUNC(sn76489a_device::command_w));
+	map(0xec00, 0xec00).w("sn4", FUNC(sn76489a_device::command_w));
 }
 
 void docastle_state::docastle_map3(address_map &map)
 {
 	map(0x0000, 0x00ff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x8000, 0x8008).r(this, FUNC(docastle_state::docastle_shared1_r));    // ???
+	map(0x8000, 0x8008).r(FUNC(docastle_state::docastle_shared1_r));    // ???
 	map(0xc003, 0xc003).noprw(); // EP according to schematics
 	map(0xc432, 0xc435).noprw(); // ???
 }
@@ -285,23 +285,23 @@ void docastle_state::dorunrun_map(address_map &map)
 	map(0x2000, 0x37ff).ram();
 	map(0x3800, 0x39ff).ram().share("spriteram");
 	map(0x4000, 0x9fff).rom();
-	map(0xa000, 0xa008).rw(this, FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
+	map(0xa000, 0xa008).rw(FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
 	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xb000, 0xb3ff).ram().w(this, FUNC(docastle_state::docastle_videoram_w)).share("videoram");
-	map(0xb400, 0xb7ff).ram().w(this, FUNC(docastle_state::docastle_colorram_w)).share("colorram");
-	map(0xb800, 0xb800).w(this, FUNC(docastle_state::docastle_nmitrigger_w));
+	map(0xb000, 0xb3ff).ram().w(FUNC(docastle_state::docastle_videoram_w)).share("videoram");
+	map(0xb400, 0xb7ff).ram().w(FUNC(docastle_state::docastle_colorram_w)).share("colorram");
+	map(0xb800, 0xb800).w(FUNC(docastle_state::docastle_nmitrigger_w));
 }
 
 void docastle_state::dorunrun_map2(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa000).w("sn1", FUNC(sn76489a_device::write));
-	map(0xa400, 0xa400).w("sn2", FUNC(sn76489a_device::write));
-	map(0xa800, 0xa800).w("sn3", FUNC(sn76489a_device::write));
-	map(0xac00, 0xac00).w("sn4", FUNC(sn76489a_device::write));
-	map(0xc000, 0xc007).select(0x0080).rw(this, FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
-	map(0xe000, 0xe008).rw(this, FUNC(docastle_state::docastle_shared1_r), FUNC(docastle_state::docastle_shared0_w));
+	map(0xa000, 0xa000).w("sn1", FUNC(sn76489a_device::command_w));
+	map(0xa400, 0xa400).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0xa800, 0xa800).w("sn3", FUNC(sn76489a_device::command_w));
+	map(0xac00, 0xac00).w("sn4", FUNC(sn76489a_device::command_w));
+	map(0xc000, 0xc007).select(0x0080).rw(FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
+	map(0xe000, 0xe008).rw(FUNC(docastle_state::docastle_shared1_r), FUNC(docastle_state::docastle_shared0_w));
 }
 
 
@@ -311,12 +311,12 @@ void docastle_state::idsoccer_map(address_map &map)
 	map(0x4000, 0x57ff).ram();
 	map(0x5800, 0x59ff).ram().share("spriteram");
 	map(0x6000, 0x9fff).rom();
-	map(0xa000, 0xa008).rw(this, FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
+	map(0xa000, 0xa008).rw(FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
 	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(this, FUNC(docastle_state::docastle_videoram_w)).share("videoram");
-	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(this, FUNC(docastle_state::docastle_colorram_w)).share("colorram");
-	map(0xc000, 0xc000).rw(this, FUNC(docastle_state::idsoccer_adpcm_status_r), FUNC(docastle_state::idsoccer_adpcm_w));
-	map(0xe000, 0xe000).w(this, FUNC(docastle_state::docastle_nmitrigger_w));
+	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(FUNC(docastle_state::docastle_videoram_w)).share("videoram");
+	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(FUNC(docastle_state::docastle_colorram_w)).share("colorram");
+	map(0xc000, 0xc000).rw(FUNC(docastle_state::idsoccer_adpcm_status_r), FUNC(docastle_state::idsoccer_adpcm_w));
+	map(0xe000, 0xe000).w(FUNC(docastle_state::docastle_nmitrigger_w));
 }
 
 /* Input Ports */

@@ -401,13 +401,13 @@ void twincobr_state::main_program_map(address_map &map)
 	map(0x050000, 0x050dff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x060001, 0x060001).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x060003, 0x060003).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x070000, 0x070003).w(this, FUNC(twincobr_state::twincobr_txscroll_w));  /* text layer scroll */
-	map(0x070004, 0x070005).w(this, FUNC(twincobr_state::twincobr_txoffs_w));    /* offset in text video RAM */
-	map(0x072000, 0x072003).w(this, FUNC(twincobr_state::twincobr_bgscroll_w));  /* bg layer scroll */
-	map(0x072004, 0x072005).w(this, FUNC(twincobr_state::twincobr_bgoffs_w));    /* offset in bg video RAM */
-	map(0x074000, 0x074003).w(this, FUNC(twincobr_state::twincobr_fgscroll_w));  /* fg layer scroll */
-	map(0x074004, 0x074005).w(this, FUNC(twincobr_state::twincobr_fgoffs_w));    /* offset in fg video RAM */
-	map(0x076000, 0x076003).w(this, FUNC(twincobr_state::twincobr_exscroll_w));  /* Spare layer scroll */
+	map(0x070000, 0x070003).w(FUNC(twincobr_state::twincobr_txscroll_w));  /* text layer scroll */
+	map(0x070004, 0x070005).w(FUNC(twincobr_state::twincobr_txoffs_w));    /* offset in text video RAM */
+	map(0x072000, 0x072003).w(FUNC(twincobr_state::twincobr_bgscroll_w));  /* bg layer scroll */
+	map(0x072004, 0x072005).w(FUNC(twincobr_state::twincobr_bgoffs_w));    /* offset in bg video RAM */
+	map(0x074000, 0x074003).w(FUNC(twincobr_state::twincobr_fgscroll_w));  /* fg layer scroll */
+	map(0x074004, 0x074005).w(FUNC(twincobr_state::twincobr_fgoffs_w));    /* offset in fg video RAM */
+	map(0x076000, 0x076003).w(FUNC(twincobr_state::twincobr_exscroll_w));  /* Spare layer scroll */
 	map(0x078000, 0x078001).portr("DSWA");
 	map(0x078002, 0x078003).portr("DSWB");
 	map(0x078004, 0x078005).portr("P1");
@@ -415,10 +415,10 @@ void twincobr_state::main_program_map(address_map &map)
 	map(0x078008, 0x078009).portr("VBLANK");         /* V-Blank & FShark Coin/Start */
 	map(0x07800b, 0x07800b).w("coinlatch", FUNC(ls259_device::write_nibble_d0)); /* Flying Shark DSP Comms & coin stuff */
 	map(0x07800d, 0x07800d).w("mainlatch", FUNC(ls259_device::write_nibble_d0)); /* Twin Cobra DSP Comms & system control */
-	map(0x07a000, 0x07afff).rw(this, FUNC(twincobr_state::twincobr_sharedram_r), FUNC(twincobr_state::twincobr_sharedram_w));   /* 16-bit on 68000 side, 8-bit on Z80 side */
-	map(0x07e000, 0x07e001).rw(this, FUNC(twincobr_state::twincobr_txram_r), FUNC(twincobr_state::twincobr_txram_w));   /* data for text video RAM */
-	map(0x07e002, 0x07e003).rw(this, FUNC(twincobr_state::twincobr_bgram_r), FUNC(twincobr_state::twincobr_bgram_w));   /* data for bg video RAM */
-	map(0x07e004, 0x07e005).rw(this, FUNC(twincobr_state::twincobr_fgram_r), FUNC(twincobr_state::twincobr_fgram_w));   /* data for fg video RAM */
+	map(0x07a000, 0x07afff).rw(FUNC(twincobr_state::twincobr_sharedram_r), FUNC(twincobr_state::twincobr_sharedram_w));   /* 16-bit on 68000 side, 8-bit on Z80 side */
+	map(0x07e000, 0x07e001).rw(FUNC(twincobr_state::twincobr_txram_r), FUNC(twincobr_state::twincobr_txram_w));   /* data for text video RAM */
+	map(0x07e002, 0x07e003).rw(FUNC(twincobr_state::twincobr_bgram_r), FUNC(twincobr_state::twincobr_bgram_w));   /* data for bg video RAM */
+	map(0x07e004, 0x07e005).rw(FUNC(twincobr_state::twincobr_fgram_r), FUNC(twincobr_state::twincobr_fgram_w));   /* data for fg video RAM */
 }
 
 
@@ -452,10 +452,10 @@ void twincobr_state::DSP_program_map(address_map &map)
 
 void twincobr_state::DSP_io_map(address_map &map)
 {
-	map(0, 0).w(this, FUNC(twincobr_state::twincobr_dsp_addrsel_w));
-	map(1, 1).rw(this, FUNC(twincobr_state::twincobr_dsp_r), FUNC(twincobr_state::twincobr_dsp_w));
-	map(2, 2).rw(this, FUNC(twincobr_state::fsharkbt_dsp_r), FUNC(twincobr_state::fsharkbt_dsp_w));
-	map(3, 3).w(this, FUNC(twincobr_state::twincobr_dsp_bio_w));
+	map(0, 0).w(FUNC(twincobr_state::twincobr_dsp_addrsel_w));
+	map(1, 1).rw(FUNC(twincobr_state::twincobr_dsp_r), FUNC(twincobr_state::twincobr_dsp_w));
+	map(2, 2).rw(FUNC(twincobr_state::fsharkbt_dsp_r), FUNC(twincobr_state::fsharkbt_dsp_w));
+	map(3, 3).w(FUNC(twincobr_state::twincobr_dsp_bio_w));
 }
 
 

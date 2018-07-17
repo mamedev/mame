@@ -58,9 +58,9 @@ WRITE8_MEMBER(poolshrk_state::da_latch_w)
 WRITE8_MEMBER(poolshrk_state::led_w)
 {
 	if (offset & 2)
-		m_led[0] = BIT(offset, 0);
+		m_leds[0] = BIT(offset, 0);
 	if (offset & 4)
-		m_led[1] = BIT(offset, 0);
+		m_leds[1] = BIT(offset, 0);
 }
 
 
@@ -108,15 +108,15 @@ void poolshrk_state::poolshrk_cpu_map(address_map &map)
 	map(0x0400, 0x07ff).mirror(0x2000).writeonly().share("playfield_ram");
 	map(0x0800, 0x080f).mirror(0x23f0).writeonly().share("hpos_ram");
 	map(0x0c00, 0x0c0f).mirror(0x23f0).writeonly().share("vpos_ram");
-	map(0x1000, 0x13ff).mirror(0x2000).rw(this, FUNC(poolshrk_state::input_r), FUNC(poolshrk_state::watchdog_w));
-	map(0x1400, 0x17ff).mirror(0x2000).w(this, FUNC(poolshrk_state::scratch_sound_w));
-	map(0x1800, 0x1bff).mirror(0x2000).w(this, FUNC(poolshrk_state::score_sound_w));
-	map(0x1c00, 0x1fff).mirror(0x2000).w(this, FUNC(poolshrk_state::click_sound_w));
+	map(0x1000, 0x13ff).mirror(0x2000).rw(FUNC(poolshrk_state::input_r), FUNC(poolshrk_state::watchdog_w));
+	map(0x1400, 0x17ff).mirror(0x2000).w(FUNC(poolshrk_state::scratch_sound_w));
+	map(0x1800, 0x1bff).mirror(0x2000).w(FUNC(poolshrk_state::score_sound_w));
+	map(0x1c00, 0x1fff).mirror(0x2000).w(FUNC(poolshrk_state::click_sound_w));
 	map(0x4000, 0x4000).noprw(); /* diagnostic ROM location */
-	map(0x6000, 0x63ff).w(this, FUNC(poolshrk_state::da_latch_w));
-	map(0x6400, 0x67ff).w(this, FUNC(poolshrk_state::bump_sound_w));
-	map(0x6800, 0x6bff).r(this, FUNC(poolshrk_state::irq_reset_r));
-	map(0x6c00, 0x6fff).w(this, FUNC(poolshrk_state::led_w));
+	map(0x6000, 0x63ff).w(FUNC(poolshrk_state::da_latch_w));
+	map(0x6400, 0x67ff).w(FUNC(poolshrk_state::bump_sound_w));
+	map(0x6800, 0x6bff).r(FUNC(poolshrk_state::irq_reset_r));
+	map(0x6c00, 0x6fff).w(FUNC(poolshrk_state::led_w));
 	map(0x7000, 0x7fff).rom();
 }
 

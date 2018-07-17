@@ -180,12 +180,12 @@ void sothello_state::maincpu_io_map(address_map &map)
 	map(0x00, 0x0f).portr("INPUT1");
 	map(0x10, 0x1f).portr("INPUT2");
 	map(0x20, 0x2f).portr("SYSTEM");
-	map(0x30, 0x30).r(this, FUNC(sothello_state::subcpu_halt_set));
-	map(0x31, 0x31).r(this, FUNC(sothello_state::subcpu_halt_clear));
-	map(0x32, 0x32).r(this, FUNC(sothello_state::subcpu_comm_status));
-	map(0x33, 0x33).r(this, FUNC(sothello_state::soundcpu_status_r));
+	map(0x30, 0x30).r(FUNC(sothello_state::subcpu_halt_set));
+	map(0x31, 0x31).r(FUNC(sothello_state::subcpu_halt_clear));
+	map(0x32, 0x32).r(FUNC(sothello_state::subcpu_comm_status));
+	map(0x33, 0x33).r(FUNC(sothello_state::soundcpu_status_r));
 	map(0x40, 0x4f).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x50, 0x50).w(this, FUNC(sothello_state::bank_w));
+	map(0x50, 0x50).w(FUNC(sothello_state::bank_w));
 	map(0x60, 0x61).mirror(0x02).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 						/* not sure, but the A1 line is ignored, code @ $8b8 */
 	map(0x70, 0x73).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
@@ -235,11 +235,11 @@ void sothello_state::soundcpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x01, 0x01).w(this, FUNC(sothello_state::msm_data_w));
-	map(0x02, 0x02).w(this, FUNC(sothello_state::msm_cfg_w));
-	map(0x03, 0x03).w(this, FUNC(sothello_state::soundcpu_busyflag_set_w));
-	map(0x04, 0x04).w(this, FUNC(sothello_state::soundcpu_busyflag_reset_w));
-	map(0x05, 0x05).w(this, FUNC(sothello_state::soundcpu_int_clear_w));
+	map(0x01, 0x01).w(FUNC(sothello_state::msm_data_w));
+	map(0x02, 0x02).w(FUNC(sothello_state::msm_cfg_w));
+	map(0x03, 0x03).w(FUNC(sothello_state::soundcpu_busyflag_set_w));
+	map(0x04, 0x04).w(FUNC(sothello_state::soundcpu_busyflag_reset_w));
+	map(0x05, 0x05).w(FUNC(sothello_state::soundcpu_int_clear_w));
 }
 
 /* sub 6809 */
@@ -269,7 +269,7 @@ READ8_MEMBER(sothello_state::subcpu_status_r)
 
 void sothello_state::subcpu_mem_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(this, FUNC(sothello_state::subcpu_status_r), FUNC(sothello_state::subcpu_status_w));
+	map(0x0000, 0x1fff).rw(FUNC(sothello_state::subcpu_status_r), FUNC(sothello_state::subcpu_status_w));
 	map(0x2000, 0x77ff).ram();
 	map(0x7800, 0x7fff).ram().share("mainsub");  /* upper 0x800 of 6264 is shared with main cpu */
 	map(0x8000, 0xffff).rom().region("subcpu", 0);
@@ -344,7 +344,7 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 {
 	/* only 4 bits are used */
-	m_msm->data_w(m_msm_data & 0x0f);
+	m_msm->write_data(m_msm_data & 0x0f);
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 }
 

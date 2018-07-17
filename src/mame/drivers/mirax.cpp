@@ -105,6 +105,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -330,7 +331,7 @@ void mirax_state::mirax_main_map(address_map &map)
 	map(0xf300, 0xf300).nopr(); //watchdog? value is always read then discarded
 	map(0xf400, 0xf400).portr("DSW2");
 	map(0xf500, 0xf507).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xf800, 0xf800).w(this, FUNC(mirax_state::sound_cmd_w));
+	map(0xf800, 0xf800).w(FUNC(mirax_state::sound_cmd_w));
 //  AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
 }
 
@@ -342,13 +343,13 @@ void mirax_state::mirax_sound_map(address_map &map)
 
 	map(0xe000, 0xe000).nopw();
 	map(0xe001, 0xe001).nopw();
-	map(0xe003, 0xe003).w(this, FUNC(mirax_state::ay1_sel)); //1st ay ?
+	map(0xe003, 0xe003).w(FUNC(mirax_state::ay1_sel)); //1st ay ?
 
 	map(0xe400, 0xe400).nopw();
 	map(0xe401, 0xe401).nopw();
-	map(0xe403, 0xe403).w(this, FUNC(mirax_state::ay2_sel)); //2nd ay ?
+	map(0xe403, 0xe403).w(FUNC(mirax_state::ay2_sel)); //2nd ay ?
 
-	map(0xf900, 0xf9ff).w(this, FUNC(mirax_state::audio_w));
+	map(0xf900, 0xf9ff).w(FUNC(mirax_state::audio_w));
 }
 
 

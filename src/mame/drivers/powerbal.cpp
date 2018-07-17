@@ -111,14 +111,14 @@ void powerbal_state::magicstk_main_map(address_map &map)
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094000, 0x094001).nopw();
 	map(0x094002, 0x094003).nopw();
-	map(0x094004, 0x094005).w(this, FUNC(powerbal_state::tile_banking_w));
-	map(0x098180, 0x09917f).ram().w(this, FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
+	map(0x094004, 0x094005).w(FUNC(powerbal_state::tile_banking_w));
+	map(0x098180, 0x09917f).ram().w(FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
-	map(0x0c2014, 0x0c2015).portr("IN2").w(this, FUNC(powerbal_state::magicstk_coin_eeprom_w));
+	map(0x0c2014, 0x0c2015).portr("IN2").w(FUNC(powerbal_state::magicstk_coin_eeprom_w));
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(this, FUNC(powerbal_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_banking));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw();
 	map(0x0e0000, 0x0fffff).ram();
@@ -131,15 +131,15 @@ void powerbal_state::powerbal_main_map(address_map &map)
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094000, 0x094001).nopw();
 	map(0x094002, 0x094003).nopw();
-	map(0x094004, 0x094005).w(this, FUNC(powerbal_state::tile_banking_w));
-	map(0x098000, 0x098fff).ram().w(this, FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
+	map(0x094004, 0x094005).w(FUNC(powerbal_state::tile_banking_w));
+	map(0x098000, 0x098fff).ram().w(FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
 	map(0x099000, 0x09bfff).ram(); // not used
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
 	map(0x0c2014, 0x0c2015).portr("IN2");
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(this, FUNC(powerbal_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_banking));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw();
 	map(0x0f0000, 0x0fffff).ram();
@@ -154,15 +154,15 @@ void powerbal_state::atombjt_map(address_map &map)
 	map(0x080008, 0x080009).nopr(); // remnant of the original?
 	map(0x080014, 0x080015).noprw(); // always 1 in this bootleg. Flip-screen switch not present according to dip sheet.
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x094000, 0x094001).w(this, FUNC(powerbal_state::atombjt_tile_banking_w));
+	map(0x094000, 0x094001).w(FUNC(powerbal_state::atombjt_tile_banking_w));
 	map(0x094002, 0x094003).noprw();    /* IRQ enable? */
-	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(this, FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
+	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
 	map(0x0c2014, 0x0c2015).portr("IN2");
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(this, FUNC(powerbal_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_banking));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw(); // always 0?
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
@@ -665,8 +665,8 @@ MACHINE_CONFIG_START(powerbal_state::magicstk)
 	MCFG_DEVICE_PROGRAM_MAP(magicstk_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", powerbal_state, irq2_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(powerbal_state,powerbal)
 	MCFG_MACHINE_RESET_OVERRIDE(powerbal_state,powerbal)

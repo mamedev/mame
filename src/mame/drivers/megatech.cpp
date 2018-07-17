@@ -120,6 +120,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bios_port_7f_w);
 	DECLARE_READ8_MEMBER(vdp1_count_r);
 	DECLARE_READ8_MEMBER(sms_count_r);
+	DECLARE_WRITE8_MEMBER(sms_sn_w);
 	DECLARE_READ8_MEMBER(sms_ioport_dc_r);
 	DECLARE_READ8_MEMBER(sms_ioport_dd_r);
 	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);
@@ -320,6 +321,11 @@ READ8_MEMBER(mtech_state::sms_count_r)
 		return m_vdp->vcount_read(prg, offset);
 }
 
+WRITE8_MEMBER(mtech_state::sms_sn_w)
+{
+	address_space &prg = m_z80snd->space(AS_PROGRAM);
+	m_vdp->vdp_w(prg, 0x10 >> 1, data, 0x00ff);
+}
 
 READ8_MEMBER (mtech_state::sms_ioport_dc_r)
 {
@@ -383,7 +389,7 @@ void mtech_state::set_genz80_as_sms()
 
 	// ports
 	io.install_read_handler      (0x40, 0x41, 0, 0x3e, 0, read8_delegate(FUNC(mtech_state::sms_count_r),this));
-	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8_delegate(FUNC(sn76496_device::write),(sn76496_base_device *)m_snsnd));
+	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8_delegate(FUNC(mtech_state::sms_sn_w),this));
 	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::vram_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::vram_write),(sega315_5124_device *)m_vdp));
 	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::register_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::register_write),(sega315_5124_device *)m_vdp));
 
@@ -525,14 +531,14 @@ WRITE8_MEMBER(mtech_state::banked_ram_w )
 void mtech_state::megatech_bios_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom(); // from bios rom (0x0000-0x2fff populated in ROM)
-	map(0x3000, 0x3fff).rw(this, FUNC(mtech_state::banked_ram_r), FUNC(mtech_state::banked_ram_w)); // copies instruction data here at startup, must be banked
+	map(0x3000, 0x3fff).rw(FUNC(mtech_state::banked_ram_r), FUNC(mtech_state::banked_ram_w)); // copies instruction data here at startup, must be banked
 	map(0x4000, 0x5fff).ram(); // plain ram?
-	map(0x6000, 0x6000).w(this, FUNC(mtech_state::mt_z80_bank_w));
+	map(0x6000, 0x6000).w(FUNC(mtech_state::mt_z80_bank_w));
 	map(0x6400, 0x6407).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x6800, 0x6807).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x7000, 0x77ff).rom(); // from bios rom (0x7000-0x77ff populated in ROM)
 	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
-	map(0x8000, 0x9fff).rw(this, FUNC(mtech_state::read_68k_banked_data), FUNC(mtech_state::write_68k_banked_data)); // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
+	map(0x8000, 0x9fff).rw(FUNC(mtech_state::read_68k_banked_data), FUNC(mtech_state::write_68k_banked_data)); // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
 }
 
 
@@ -580,14 +586,14 @@ READ8_MEMBER(mtech_state::vdp1_count_r)
 void mtech_state::megatech_bios_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x3f, 0x3f).w(this, FUNC(mtech_state::bios_port_ctrl_w));
-	map(0x7f, 0x7f).w(this, FUNC(mtech_state::bios_port_7f_w));
+	map(0x3f, 0x3f).w(FUNC(mtech_state::bios_port_ctrl_w));
+	map(0x7f, 0x7f).w(FUNC(mtech_state::bios_port_7f_w));
 
-	map(0x40, 0x41).mirror(0x3e).r(this, FUNC(mtech_state::vdp1_count_r));
+	map(0x40, 0x41).mirror(0x3e).r(FUNC(mtech_state::vdp1_count_r));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
 
-	map(0xdc, 0xdd).r(this, FUNC(mtech_state::bios_joypad_r));  // player inputs
+	map(0xdc, 0xdd).r(FUNC(mtech_state::bios_joypad_r));  // player inputs
 }
 
 
@@ -800,13 +806,13 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x10000, "mtbios", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "ver1", "Ver 1" ) \
-	ROMX_LOAD( "epr-12664.20",  0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953), ROM_BIOS(1)) \
+	ROMX_LOAD( "epr-12664.20",  0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953), ROM_BIOS(0)) \
 	ROM_SYSTEM_BIOS( 1, "ver0a", "Ver 0 Rev A" ) \
-	ROMX_LOAD( "epr-12263a.20", 0x000000, 0x8000, CRC(07c3f423) SHA1(50c28bbc2d4349c820d988ae3f20aae3f808545f), ROM_BIOS(2)) \
+	ROMX_LOAD( "epr-12263a.20", 0x000000, 0x8000, CRC(07c3f423) SHA1(50c28bbc2d4349c820d988ae3f20aae3f808545f), ROM_BIOS(1)) \
 	ROM_SYSTEM_BIOS( 2, "ver0b", "Ver 0 Rev B" ) \
-	ROMX_LOAD( "epr-12263b.20", 0x000000, 0x8000, CRC(ca26c87a) SHA1(987a18bede6e54cd73c4434426eb6c302a37cdc5), ROM_BIOS(3)) \
+	ROMX_LOAD( "epr-12263b.20", 0x000000, 0x8000, CRC(ca26c87a) SHA1(987a18bede6e54cd73c4434426eb6c302a37cdc5), ROM_BIOS(2)) \
 	ROM_SYSTEM_BIOS( 3, "ver0aa","Ver 0 Rev B (alt?)" ) \
-	ROMX_LOAD( "epr-12604a.20", 0x000000, 0x8000, CRC(884e4aa5) SHA1(c9008c431a937c084fb475273093ca0b434b5f47), ROM_BIOS(4))
+	ROMX_LOAD( "epr-12604a.20", 0x000000, 0x8000, CRC(884e4aa5) SHA1(c9008c431a937c084fb475273093ca0b434b5f47), ROM_BIOS(3))
 
 
 /* no games */

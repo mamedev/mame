@@ -127,7 +127,7 @@ void cyberbal_state::main_map(address_map &map)
 	map(0xfd0000, 0xfd1fff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0xfd2000, 0xfd3fff).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_reset_w));
 	map(0xfd4000, 0xfd5fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0xfd6000, 0xfd7fff).w(this, FUNC(cyberbal_state::p2_reset_w));
+	map(0xfd6000, 0xfd7fff).w(FUNC(cyberbal_state::p2_reset_w));
 	map(0xfd8000, 0xfd9fff).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w)).umask16(0xff00);
 	map(0xfe0000, 0xfe0fff).portr("IN0");
 	map(0xfe1000, 0xfe1fff).portr("IN1");
@@ -156,7 +156,7 @@ void cyberbal_state::main_map(address_map &map)
 void cyberbal_state::extra_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0xfc0000, 0xfdffff).w(this, FUNC(cyberbal_state::video_int_ack_w));
+	map(0xfc0000, 0xfdffff).w(FUNC(cyberbal_state::video_int_ack_w));
 	map(0xfe0000, 0xfe0fff).portr("IN0");
 	map(0xfe1000, 0xfe1fff).portr("IN1");
 	map(0xfe8000, 0xfe8fff).ram().w("rpalette", FUNC(palette_device::write16)).share("rpalette");
@@ -185,14 +185,14 @@ void cyberbal_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2001).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x2800, 0x2801).w(this, FUNC(cyberbal_state::sound_68k_6502_w));
+	map(0x2800, 0x2801).w(FUNC(cyberbal_state::sound_68k_6502_w));
 	map(0x2802, 0x2803).rw(m_soundcomm, FUNC(atari_sound_comm_device::sound_irq_ack_r), FUNC(atari_sound_comm_device::sound_irq_ack_w));
 	map(0x2804, 0x2805).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_response_w));
-	map(0x2806, 0x2807).w(this, FUNC(cyberbal_state::sound_bank_select_w));
+	map(0x2806, 0x2807).w(FUNC(cyberbal_state::sound_bank_select_w));
 	map(0x2c00, 0x2c01).r(m_soundcomm, FUNC(atari_sound_comm_device::sound_command_r));
-	map(0x2c02, 0x2c03).r(this, FUNC(cyberbal_state::special_port3_r));
-	map(0x2c04, 0x2c05).r(this, FUNC(cyberbal_state::sound_68k_6502_r));
-	map(0x2c06, 0x2c07).r(this, FUNC(cyberbal_state::sound_6502_stat_r));
+	map(0x2c02, 0x2c03).r(FUNC(cyberbal_state::special_port3_r));
+	map(0x2c04, 0x2c05).r(FUNC(cyberbal_state::sound_68k_6502_r));
+	map(0x2c06, 0x2c07).r(FUNC(cyberbal_state::sound_6502_stat_r));
 	map(0x3000, 0x3fff).bankr("soundbank");
 	map(0x4000, 0xffff).rom();
 }
@@ -208,10 +208,10 @@ void cyberbal_state::sound_map(address_map &map)
 void cyberbal_state::sound_68k_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0xff8000, 0xff87ff).r(this, FUNC(cyberbal_state::sound_68k_r));
-	map(0xff8800, 0xff8fff).w(this, FUNC(cyberbal_state::sound_68k_w));
-	map(0xff9000, 0xff97ff).w(this, FUNC(cyberbal_state::io_68k_irq_ack_w));
-	map(0xff9800, 0xff9fff).w(this, FUNC(cyberbal_state::sound_68k_dac_w));
+	map(0xff8000, 0xff87ff).r(FUNC(cyberbal_state::sound_68k_r));
+	map(0xff8800, 0xff8fff).w(FUNC(cyberbal_state::sound_68k_w));
+	map(0xff9000, 0xff97ff).w(FUNC(cyberbal_state::io_68k_irq_ack_w));
+	map(0xff9800, 0xff9fff).w(FUNC(cyberbal_state::sound_68k_dac_w));
 	map(0xfff000, 0xffffff).ram();
 }
 
@@ -235,9 +235,9 @@ void cyberbal2p_state::cyberbal2p_map(address_map &map)
 	map(0xfd0000, 0xfd0003).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0xfd2000, 0xfd2003).w("jsa", FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0xfd4000, 0xfd4003).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0xfd6000, 0xfd6003).w(this, FUNC(cyberbal2p_state::video_int_ack_w));
+	map(0xfd6000, 0xfd6003).w(FUNC(cyberbal2p_state::video_int_ack_w));
 	map(0xfd8000, 0xfd8003).w("jsa", FUNC(atari_jsa_ii_device::main_command_w)).umask16(0xff00);
-	map(0xfe0000, 0xfe0003).r(this, FUNC(cyberbal2p_state::sound_state_r));
+	map(0xfe0000, 0xfe0003).r(FUNC(cyberbal2p_state::sound_state_r));
 	map(0xff0000, 0xff1fff).ram().w("playfield", FUNC(tilemap_device::write16)).share("playfield");
 	map(0xff2000, 0xff2fff).ram().w("alpha", FUNC(tilemap_device::write16)).share("alpha");
 	map(0xff3000, 0xff37ff).ram().share("mob");
@@ -475,7 +475,7 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbalt)
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
-	MCFG_SLAPSTIC_ADD("slapstic", 116)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 116, true)
 MACHINE_CONFIG_END
 
 

@@ -542,19 +542,19 @@ void harddriv_state::driver_68k_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).rom();
-	map(0x600000, 0x603fff).r(this, FUNC(harddriv_state::hd68k_port0_r));
-	map(0x604000, 0x607fff).w(this, FUNC(harddriv_state::hd68k_nwr_w));
+	map(0x600000, 0x603fff).r(FUNC(harddriv_state::hd68k_port0_r));
+	map(0x604000, 0x607fff).w(FUNC(harddriv_state::hd68k_nwr_w));
 	map(0x608000, 0x60bfff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x60c000, 0x60ffff).w(this, FUNC(harddriv_state::hd68k_irq_ack_w));
-	map(0xa00000, 0xa7ffff).w(this, FUNC(harddriv_state::hd68k_wr0_write));
-	map(0xa80000, 0xafffff).r(this, FUNC(harddriv_state::hd68k_a80000_r)).w(this, FUNC(harddriv_state::hd68k_wr1_write));
+	map(0x60c000, 0x60ffff).w(FUNC(harddriv_state::hd68k_irq_ack_w));
+	map(0xa00000, 0xa7ffff).w(FUNC(harddriv_state::hd68k_wr0_write));
+	map(0xa80000, 0xafffff).r(FUNC(harddriv_state::hd68k_a80000_r)).w(FUNC(harddriv_state::hd68k_wr1_write));
 	map(0xb00001, 0xb00001).mirror(0x7fffe).r("adc8", FUNC(adc0808_device::data_r));
-	map(0xb00000, 0xb7ffff).w(this, FUNC(harddriv_state::hd68k_wr2_write));
-	map(0xb80000, 0xbfffff).rw(this, FUNC(harddriv_state::hd68k_adc12_r), FUNC(harddriv_state::hd68k_adc_control_w));
-	map(0xc00000, 0xc03fff).rw(this, FUNC(harddriv_state::hd68k_gsp_io_r), FUNC(harddriv_state::hd68k_gsp_io_w));
-	map(0xc04000, 0xc07fff).rw(this, FUNC(harddriv_state::hd68k_msp_io_r), FUNC(harddriv_state::hd68k_msp_io_w));
+	map(0xb00000, 0xb7ffff).w(FUNC(harddriv_state::hd68k_wr2_write));
+	map(0xb80000, 0xbfffff).rw(FUNC(harddriv_state::hd68k_adc12_r), FUNC(harddriv_state::hd68k_adc_control_w));
+	map(0xc00000, 0xc03fff).rw(FUNC(harddriv_state::hd68k_gsp_io_r), FUNC(harddriv_state::hd68k_gsp_io_w));
+	map(0xc04000, 0xc07fff).rw(FUNC(harddriv_state::hd68k_msp_io_r), FUNC(harddriv_state::hd68k_msp_io_w));
 	map(0xff0000, 0xff001f).rw("duartn68681", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
-	map(0xff4000, 0xff4fff).rw(this, FUNC(harddriv_state::hd68k_zram_r), FUNC(harddriv_state::hd68k_zram_w));
+	map(0xff4000, 0xff4fff).rw(FUNC(harddriv_state::hd68k_zram_r), FUNC(harddriv_state::hd68k_zram_w));
 	map(0xff8000, 0xffffff).ram();
 }
 
@@ -563,12 +563,12 @@ void harddriv_state::driver_gsp_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x0000200f).noprw();                 /* hit during self-test */
-	map(0x02000000, 0x0207ffff).rw(this, FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_1bpp_w));
+	map(0x02000000, 0x0207ffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_1bpp_w));
 	map(0xc0000000, 0xc00001ff).rw("gsp", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
-	map(0xf4000000, 0xf40000ff).rw(this, FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
-	map(0xf4800000, 0xf48000ff).rw(this, FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
-	map(0xf5000000, 0xf5000fff).rw(this, FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
-	map(0xf5800000, 0xf5800fff).rw(this, FUNC(harddriv_state::hdgsp_paletteram_hi_r), FUNC(harddriv_state::hdgsp_paletteram_hi_w)).share("gsp_palram_hi");
+	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
+	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
+	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
+	map(0xf5800000, 0xf5800fff).rw(FUNC(harddriv_state::hdgsp_paletteram_hi_r), FUNC(harddriv_state::hdgsp_paletteram_hi_w)).share("gsp_palram_hi");
 	map(0xff800000, 0xffffffff).ram().share("gsp_vram");
 }
 
@@ -594,18 +594,18 @@ void harddriv_state::multisync_68k_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).rom();
-	map(0x604000, 0x607fff).rw(this, FUNC(harddriv_state::hd68k_sound_reset_r), FUNC(harddriv_state::hd68k_nwr_w));
+	map(0x604000, 0x607fff).rw(FUNC(harddriv_state::hd68k_sound_reset_r), FUNC(harddriv_state::hd68k_nwr_w));
 	map(0x608000, 0x60bfff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x60c000, 0x60ffff).rw(this, FUNC(harddriv_state::hd68k_port0_r), FUNC(harddriv_state::hd68k_irq_ack_w));
-	map(0xa00000, 0xa7ffff).w(this, FUNC(harddriv_state::hd68k_wr0_write));
-	map(0xa80000, 0xafffff).r(this, FUNC(harddriv_state::hd68k_a80000_r)).w(this, FUNC(harddriv_state::hd68k_wr1_write));
+	map(0x60c000, 0x60ffff).rw(FUNC(harddriv_state::hd68k_port0_r), FUNC(harddriv_state::hd68k_irq_ack_w));
+	map(0xa00000, 0xa7ffff).w(FUNC(harddriv_state::hd68k_wr0_write));
+	map(0xa80000, 0xafffff).r(FUNC(harddriv_state::hd68k_a80000_r)).w(FUNC(harddriv_state::hd68k_wr1_write));
 	map(0xb00001, 0xb00001).mirror(0x7fffe).r("adc8", FUNC(adc0808_device::data_r));
-	map(0xb00000, 0xb7ffff).w(this, FUNC(harddriv_state::hd68k_wr2_write));
-	map(0xb80000, 0xbfffff).rw(this, FUNC(harddriv_state::hd68k_adc12_r), FUNC(harddriv_state::hd68k_adc_control_w));
-	map(0xc00000, 0xc03fff).rw(this, FUNC(harddriv_state::hd68k_gsp_io_r), FUNC(harddriv_state::hd68k_gsp_io_w));
-	map(0xc04000, 0xc07fff).rw(this, FUNC(harddriv_state::hd68k_msp_io_r), FUNC(harddriv_state::hd68k_msp_io_w));
+	map(0xb00000, 0xb7ffff).w(FUNC(harddriv_state::hd68k_wr2_write));
+	map(0xb80000, 0xbfffff).rw(FUNC(harddriv_state::hd68k_adc12_r), FUNC(harddriv_state::hd68k_adc_control_w));
+	map(0xc00000, 0xc03fff).rw(FUNC(harddriv_state::hd68k_gsp_io_r), FUNC(harddriv_state::hd68k_gsp_io_w));
+	map(0xc04000, 0xc07fff).rw(FUNC(harddriv_state::hd68k_msp_io_r), FUNC(harddriv_state::hd68k_msp_io_w));
 	map(0xff0000, 0xff001f).rw("duartn68681", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
-	map(0xff4000, 0xff4fff).rw(this, FUNC(harddriv_state::hd68k_zram_r), FUNC(harddriv_state::hd68k_zram_w));
+	map(0xff4000, 0xff4fff).rw(FUNC(harddriv_state::hd68k_zram_r), FUNC(harddriv_state::hd68k_zram_w));
 	map(0xff8000, 0xffffff).ram();
 }
 
@@ -614,12 +614,12 @@ void harddriv_state::multisync_gsp_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x0000200f).noprw();                 /* hit during self-test */
-	map(0x02000000, 0x020fffff).rw(this, FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_2bpp_w));
-	map(0xc0000000, 0xc00001ff).r("gsp", FUNC(tms34010_device::io_register_r)).w(this, FUNC(harddriv_state::hdgsp_io_w));
-	map(0xf4000000, 0xf40000ff).rw(this, FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
-	map(0xf4800000, 0xf48000ff).rw(this, FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
-	map(0xf5000000, 0xf5000fff).rw(this, FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
-	map(0xf5800000, 0xf5800fff).rw(this, FUNC(harddriv_state::hdgsp_paletteram_hi_r), FUNC(harddriv_state::hdgsp_paletteram_hi_w)).share("gsp_palram_hi");
+	map(0x02000000, 0x020fffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_2bpp_w));
+	map(0xc0000000, 0xc00001ff).r("gsp", FUNC(tms34010_device::io_register_r)).w(FUNC(harddriv_state::hdgsp_io_w));
+	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
+	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
+	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
+	map(0xf5800000, 0xf5800fff).rw(FUNC(harddriv_state::hdgsp_paletteram_hi_r), FUNC(harddriv_state::hdgsp_paletteram_hi_w)).share("gsp_palram_hi");
 	map(0xff800000, 0xffbfffff).mirror(0x0400000).ram().share("gsp_vram");
 }
 
@@ -635,18 +635,18 @@ void harddriv_state::multisync2_68k_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rom();
-	map(0x604000, 0x607fff).w(this, FUNC(harddriv_state::hd68k_nwr_w));
+	map(0x604000, 0x607fff).w(FUNC(harddriv_state::hd68k_nwr_w));
 	map(0x608000, 0x60bfff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x60c000, 0x60ffff).rw(this, FUNC(harddriv_state::hd68k_port0_r), FUNC(harddriv_state::hd68k_irq_ack_w));
-	map(0xa00000, 0xa7ffff).w(this, FUNC(harddriv_state::hd68k_wr0_write));
-	map(0xa80000, 0xafffff).r(this, FUNC(harddriv_state::hd68k_a80000_r)).w(this, FUNC(harddriv_state::hd68k_wr1_write));
+	map(0x60c000, 0x60ffff).rw(FUNC(harddriv_state::hd68k_port0_r), FUNC(harddriv_state::hd68k_irq_ack_w));
+	map(0xa00000, 0xa7ffff).w(FUNC(harddriv_state::hd68k_wr0_write));
+	map(0xa80000, 0xafffff).r(FUNC(harddriv_state::hd68k_a80000_r)).w(FUNC(harddriv_state::hd68k_wr1_write));
 	map(0xb00001, 0xb00001).mirror(0x7fffe).r("adc8", FUNC(adc0808_device::data_r));
-	map(0xb00000, 0xb7ffff).w(this, FUNC(harddriv_state::hd68k_wr2_write));
-	map(0xb80000, 0xbfffff).rw(this, FUNC(harddriv_state::hd68k_adc12_r), FUNC(harddriv_state::hd68k_adc_control_w));
-	map(0xc00000, 0xc03fff).rw(this, FUNC(harddriv_state::hd68k_gsp_io_r), FUNC(harddriv_state::hd68k_gsp_io_w));
-	map(0xc04000, 0xc07fff).rw(this, FUNC(harddriv_state::hd68k_msp_io_r), FUNC(harddriv_state::hd68k_msp_io_w));
+	map(0xb00000, 0xb7ffff).w(FUNC(harddriv_state::hd68k_wr2_write));
+	map(0xb80000, 0xbfffff).rw(FUNC(harddriv_state::hd68k_adc12_r), FUNC(harddriv_state::hd68k_adc_control_w));
+	map(0xc00000, 0xc03fff).rw(FUNC(harddriv_state::hd68k_gsp_io_r), FUNC(harddriv_state::hd68k_gsp_io_w));
+	map(0xc04000, 0xc07fff).rw(FUNC(harddriv_state::hd68k_msp_io_r), FUNC(harddriv_state::hd68k_msp_io_w));
 	map(0xfc0000, 0xfc001f).rw("duartn68681", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
-	map(0xfd0000, 0xfd0fff).mirror(0x004000).rw(this, FUNC(harddriv_state::hd68k_zram_r), FUNC(harddriv_state::hd68k_zram_w));
+	map(0xfd0000, 0xfd0fff).mirror(0x004000).rw(FUNC(harddriv_state::hd68k_zram_r), FUNC(harddriv_state::hd68k_zram_w));
 	map(0xff0000, 0xffffff).ram();
 }
 
@@ -656,12 +656,12 @@ void harddriv_state::multisync2_gsp_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x0000200f).noprw();                 /* hit during self-test */
-	map(0x02000000, 0x020fffff).rw(this, FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_2bpp_w));
-	map(0xc0000000, 0xc00001ff).r("gsp", FUNC(tms34010_device::io_register_r)).w(this, FUNC(harddriv_state::hdgsp_io_w));
-	map(0xf4000000, 0xf40000ff).rw(this, FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
-	map(0xf4800000, 0xf48000ff).rw(this, FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
-	map(0xf5000000, 0xf5000fff).rw(this, FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
-	map(0xf5800000, 0xf5800fff).rw(this, FUNC(harddriv_state::hdgsp_paletteram_hi_r), FUNC(harddriv_state::hdgsp_paletteram_hi_w)).share("gsp_palram_hi");
+	map(0x02000000, 0x020fffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_2bpp_w));
+	map(0xc0000000, 0xc00001ff).r("gsp", FUNC(tms34010_device::io_register_r)).w(FUNC(harddriv_state::hdgsp_io_w));
+	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
+	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
+	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
+	map(0xf5800000, 0xf5800fff).rw(FUNC(harddriv_state::hdgsp_paletteram_hi_r), FUNC(harddriv_state::hdgsp_paletteram_hi_w)).share("gsp_palram_hi");
 	map(0xff800000, 0xffffffff).ram().share("gsp_vram");
 }
 
@@ -685,7 +685,7 @@ void harddriv_state::adsp_data_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("adsp_data");
-	map(0x2000, 0x2fff).rw(this, FUNC(harddriv_state::hdadsp_special_r), FUNC(harddriv_state::hdadsp_special_w));
+	map(0x2000, 0x2fff).rw(FUNC(harddriv_state::hdadsp_special_r), FUNC(harddriv_state::hdadsp_special_w));
 }
 
 
@@ -707,9 +707,9 @@ void harddriv_state::ds3_data_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("adsp_data");
-	map(0x2000, 0x3fff).rw(this, FUNC(harddriv_state::hdds3_special_r), FUNC(harddriv_state::hdds3_special_w));
+	map(0x2000, 0x3fff).rw(FUNC(harddriv_state::hdds3_special_r), FUNC(harddriv_state::hdds3_special_w));
 	map(0x3800, 0x3bff).ram();                     /* internal RAM */
-	map(0x3fe0, 0x3fff).rw(this, FUNC(harddriv_state::hdds3_control_r), FUNC(harddriv_state::hdds3_control_w));  /* adsp control regs */
+	map(0x3fe0, 0x3fff).rw(FUNC(harddriv_state::hdds3_control_r), FUNC(harddriv_state::hdds3_control_w));  /* adsp control regs */
 }
 
 
@@ -722,9 +722,9 @@ void harddriv_state::ds3sdsp_program_map(address_map &map)
 void harddriv_state::ds3sdsp_data_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x2000, 0x3fff).rw(this, FUNC(harddriv_state::hdds3_sdsp_special_r), FUNC(harddriv_state::hdds3_sdsp_special_w));
+	map(0x2000, 0x3fff).rw(FUNC(harddriv_state::hdds3_sdsp_special_r), FUNC(harddriv_state::hdds3_sdsp_special_w));
 	map(0x3800, 0x39ff).ram();                     /* internal RAM */
-	map(0x3fe0, 0x3fff).rw(this, FUNC(harddriv_state::hdds3_sdsp_control_r), FUNC(harddriv_state::hdds3_sdsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(harddriv_state::hdds3_sdsp_control_r), FUNC(harddriv_state::hdds3_sdsp_control_w));
 }
 
 
@@ -739,7 +739,7 @@ void harddriv_state::ds3xdsp_data_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram(); // TODO
 	map(0x3800, 0x39ff).ram();                     /* internal RAM */
-	map(0x3fe0, 0x3fff).rw(this, FUNC(harddriv_state::hdds3_xdsp_control_r), FUNC(harddriv_state::hdds3_xdsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(harddriv_state::hdds3_xdsp_control_r), FUNC(harddriv_state::hdds3_xdsp_control_w));
 }
 
 
@@ -1460,8 +1460,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_DEVICE_PROGRAM_MAP(driver_68k_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen, HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
-	MCFG_SLAPSTIC_ADD("slapstic", 117)
-	MCFG_SLAPSTIC_68K_ACCESS(1)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 117, true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1488,7 +1487,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
-	MCFG_M48T02_ADD("200e") // MK48T02
+	MCFG_DEVICE_ADD("200e", M48T02, 0)
 	MCFG_EEPROM_2816_ADD("210e") // MK48Z02
 
 	MCFG_DEVICE_ADD("duartn68681", MC68681, XTAL(3'686'400))

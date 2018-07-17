@@ -54,8 +54,8 @@ NOTE: The Atari 136002-125 PROM in the sets below wasn't dumped from an actual
 #include "video/avgdvg.h"
 #include "sound/pokey.h"
 #include "sound/discrete.h"
-#include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "machine/x2212.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -67,15 +67,17 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_avg(*this, "avg"),
-		m_led(*this, "led%u", 0U)
+		m_nvram(*this, "nvram"),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void quantum(machine_config &config);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 	DECLARE_READ16_MEMBER(trackball_r);
 	DECLARE_WRITE16_MEMBER(led_w);
+	DECLARE_WRITE16_MEMBER(nvram_recall_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_READ8_MEMBER(input_2_r);
 	void main_map(address_map &map);
@@ -83,7 +85,8 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<avg_quantum_device> m_avg;
-	output_finder<2> m_led;
+	required_device<x2212_device> m_nvram;
+	output_finder<2> m_leds;
 };
 
 
@@ -130,16 +133,24 @@ WRITE16_MEMBER(quantum_state::led_w)
 		machine().bookkeeping().coin_counter_w(0, data & 2);
 		machine().bookkeeping().coin_counter_w(1, data & 1);
 
+		m_nvram->store(BIT(data, 2));
+
 		/* bit 3 = select second trackball for cocktail mode? */
 
 		/* bits 4 and 5 are LED controls */
-		m_led[0] = BIT(data, 4);
-		m_led[1] = BIT(data, 5);
+		m_leds[0] = BIT(data, 4);
+		m_leds[1] = BIT(data, 5);
 
 		/* bits 6 and 7 flip screen */
 		m_avg->set_flip_x (data & 0x40);
 		m_avg->set_flip_y (data & 0x80);
 	}
+}
+
+WRITE16_MEMBER(quantum_state::nvram_recall_w)
+{
+	m_nvram->recall(1);
+	m_nvram->recall(0);
 }
 
 
@@ -157,12 +168,12 @@ void quantum_state::main_map(address_map &map)
 	map(0x800000, 0x801fff).ram().share("vectorram");
 	map(0x840000, 0x84001f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
 	map(0x840020, 0x84003f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
-	map(0x900000, 0x9001ff).ram().share("nvram");
-	map(0x940000, 0x940001).r(this, FUNC(quantum_state::trackball_r)); /* trackball */
+	map(0x900000, 0x9001ff).rw("nvram", FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
+	map(0x940000, 0x940001).r(FUNC(quantum_state::trackball_r)); /* trackball */
 	map(0x948000, 0x948001).portr("SYSTEM");
 	map(0x950000, 0x95001f).writeonly().share("colorram");
-	map(0x958000, 0x958001).w(this, FUNC(quantum_state::led_w));
-	map(0x960000, 0x960001).nopw();
+	map(0x958000, 0x958001).w(FUNC(quantum_state::led_w));
+	map(0x960000, 0x960001).w(FUNC(quantum_state::nvram_recall_w));
 	map(0x968000, 0x968001).w(m_avg, FUNC(avg_quantum_device::reset_word_w));
 	map(0x970000, 0x970001).w(m_avg, FUNC(avg_quantum_device::go_word_w));
 	map(0x978000, 0x978001).nopr().w("watchdog", FUNC(watchdog_timer_device::reset16_w));
@@ -282,7 +293,7 @@ MACHINE_CONFIG_START(quantum_state::quantum)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(quantum_state, irq1_line_hold, CLOCK_3KHZ / 12)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_X2212_ADD("nvram") // "137288-001" in parts list and schematic diagram
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

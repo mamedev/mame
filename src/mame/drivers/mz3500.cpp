@@ -35,6 +35,7 @@
 #include "machine/pit8253.h"
 #include "sound/beep.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,7 +55,8 @@ public:
 			m_beeper(*this, "beeper"),
 			m_palette(*this, "palette"),
 			m_system_dsw(*this, "SYSTEM_DSW"),
-			m_fd_dsw(*this, "FD_DSW")
+			m_fd_dsw(*this, "FD_DSW"),
+			m_floppy_connector(*this, "upd765a:%u", 0U)
 	{ }
 
 	// devices
@@ -120,7 +122,7 @@ protected:
 private:
 	required_ioport m_system_dsw;
 	required_ioport m_fd_dsw;
-	floppy_connector *m_floppy_connector[4];
+	required_device_array<floppy_connector, 4> m_floppy_connector;
 };
 
 void mz3500_state::video_start()
@@ -593,7 +595,7 @@ READ8_MEMBER(mz3500_state::mz3500_fdc_dma_r)
 
 void mz3500_state::mz3500_master_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(mz3500_state::mz3500_master_mem_r), FUNC(mz3500_state::mz3500_master_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(mz3500_state::mz3500_master_mem_r), FUNC(mz3500_state::mz3500_master_mem_w));
 }
 
 void mz3500_state::mz3500_master_io(address_map &map)
@@ -605,15 +607,15 @@ void mz3500_state::mz3500_master_io(address_map &map)
 //  AM_RANGE(0xec, 0xef) irq signal from slave to master CPU
 	map(0xf4, 0xf5).m(m_fdc, FUNC(upd765a_device::map)); // MFD upd765
 //  AM_RANGE(0xf8, 0xfb) MFD I/O port
-	map(0xf8, 0xf8).rw(this, FUNC(mz3500_state::mz3500_fdc_r), FUNC(mz3500_state::mz3500_fdc_w));
-	map(0xf9, 0xf9).r(this, FUNC(mz3500_state::mz3500_fdc_dma_r));
-	map(0xfc, 0xff).rw(this, FUNC(mz3500_state::mz3500_io_r), FUNC(mz3500_state::mz3500_io_w)); // memory mapper
+	map(0xf8, 0xf8).rw(FUNC(mz3500_state::mz3500_fdc_r), FUNC(mz3500_state::mz3500_fdc_w));
+	map(0xf9, 0xf9).r(FUNC(mz3500_state::mz3500_fdc_dma_r));
+	map(0xfc, 0xff).rw(FUNC(mz3500_state::mz3500_io_r), FUNC(mz3500_state::mz3500_io_w)); // memory mapper
 }
 
 void mz3500_state::mz3500_slave_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("ipl", 0);
-	map(0x2000, 0x27ff).rw(this, FUNC(mz3500_state::mz3500_shared_ram_r), FUNC(mz3500_state::mz3500_shared_ram_w));
+	map(0x2000, 0x27ff).rw(FUNC(mz3500_state::mz3500_shared_ram_r), FUNC(mz3500_state::mz3500_shared_ram_w));
 	map(0x4000, 0x5fff).ram();
 }
 
@@ -626,7 +628,7 @@ void mz3500_state::mz3500_slave_io(address_map &map)
 //  AM_RANGE(0x20, 0x2f) pit8253
 	map(0x30, 0x33).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x40).portr("DSW");
-	map(0x50, 0x5f).ram().w(this, FUNC(mz3500_state::mz3500_crtc_w));
+	map(0x50, 0x5f).ram().w(FUNC(mz3500_state::mz3500_crtc_w));
 	map(0x60, 0x61).rw(m_hgdc2, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 	map(0x70, 0x71).rw(m_hgdc1, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 }
@@ -756,13 +758,6 @@ void mz3500_state::machine_start()
 	m_char_rom = memregion("gfx1")->base();
 	m_work_ram = make_unique_clear<uint8_t[]>(0x40000);
 	m_shared_ram = make_unique_clear<uint8_t[]>(0x800);
-
-	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
-
-	for (int i = 0; i < 4; i++)
-	{
-		m_floppy_connector[i] = machine().device<floppy_connector>(m_fddnames[i]);
-	}
 }
 
 void mz3500_state::machine_reset()
@@ -776,10 +771,7 @@ void mz3500_state::machine_reset()
 	//m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_srdy = 0;
 
-	upd765a_device *fdc;
-	fdc = machine().device<upd765a_device>(":upd765a");
-
-	if (fdc)
+	if (m_fdc.found())
 	{
 		m_fdd_sel = 0;
 		{
@@ -789,7 +781,7 @@ void mz3500_state::machine_reset()
 				elem->get_device()->set_rpm(300);
 			}
 
-			machine().device<upd765a_device>("upd765a")->set_rate(250000);
+			m_fdc->set_rate(250000);
 		}
 	}
 

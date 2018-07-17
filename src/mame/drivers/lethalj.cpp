@@ -143,6 +143,7 @@ Pin #11(+) | | R               |
 #include "includes/lethalj.h"
 
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -178,16 +179,16 @@ WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	m_ticket->motor_w(BIT(data, 1));
-	m_lamp[0] = BIT(data, 2);
+	m_lamps[0] = BIT(data, 2);
 }
 
 
 WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 {
 	m_ticket->motor_w(BIT(data, 0));
-	m_lamp[0] = BIT(data, 2);
-	m_lamp[1] = BIT(data, 3);
-	m_lamp[2] = BIT(data, 4);
+	m_lamps[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 3);
+	m_lamps[2] = BIT(data, 4);
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
 }
 
@@ -195,9 +196,9 @@ WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 WRITE16_MEMBER(lethalj_state::cclownz_control_w)
 {
 	m_ticket->motor_w(BIT(data, 0));
-	m_lamp[0] = BIT(data, 2);
-	m_lamp[1] = BIT(data, 4);
-	m_lamp[2] = BIT(data, 5);
+	m_lamps[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 4);
+	m_lamps[2] = BIT(data, 5);
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
 }
 
@@ -217,11 +218,11 @@ void lethalj_state::lethalj_map(address_map &map)
 	map(0x04100000, 0x0410000f).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x04100010, 0x0410001f) AM_READNOP     /* read but never examined */
 	map(0x04200000, 0x0420001f).nopw();    /* clocks bits through here */
-	map(0x04300000, 0x0430007f).r(this, FUNC(lethalj_state::lethalj_gun_r));
+	map(0x04300000, 0x0430007f).r(FUNC(lethalj_state::lethalj_gun_r));
 	map(0x04400000, 0x0440000f).nopw();    /* clocks bits through here */
 	map(0x04500010, 0x0450001f).portr("IN0");
 	map(0x04600000, 0x0460000f).portr("IN1");
-	map(0x04700000, 0x0470007f).w(this, FUNC(lethalj_state::lethalj_blitter_w));
+	map(0x04700000, 0x0470007f).w(FUNC(lethalj_state::lethalj_blitter_w));
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();    /* seems to be a bug in their code, one of many. */
 	map(0xff800000, 0xffffffff).rom().region("user1", 0);

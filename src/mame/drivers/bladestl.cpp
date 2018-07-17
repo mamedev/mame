@@ -73,8 +73,8 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bits 2 & 3 = lamps */
-	m_lamp[0] = BIT(data, 2);
-	m_lamp[1] = BIT(data, 3);
+	m_lamps[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 3);
 
 	/* bit 4 = relay (???) */
 
@@ -132,8 +132,8 @@ void bladestl_state::main_map(address_map &map)
 	map(0x2e40, 0x2e40).portr("DSW1");               /* DIPSW #1 */
 	map(0x2e80, 0x2e80).w("soundlatch", FUNC(generic_latch_8_device::write)); /* cause interrupt on audio CPU */
 	map(0x2ec0, 0x2ec0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x2f00, 0x2f03).r(this, FUNC(bladestl_state::trackball_r));               /* Trackballs */
-	map(0x2f40, 0x2f40).w(this, FUNC(bladestl_state::bladestl_bankswitch_w));    /* bankswitch control */
+	map(0x2f00, 0x2f03).r(FUNC(bladestl_state::trackball_r));               /* Trackballs */
+	map(0x2f40, 0x2f40).w(FUNC(bladestl_state::bladestl_bankswitch_w));    /* bankswitch control */
 	map(0x2f80, 0x2f9f).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));    /* Protection: 051733 */
 	map(0x2fc0, 0x2fc0).nopw();                        /* ??? */
 	map(0x4000, 0x5fff).ram();                             /* Work RAM */
@@ -145,8 +145,8 @@ void bladestl_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x1000, 0x1001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));    /* YM2203 */
-	map(0x3000, 0x3000).w(this, FUNC(bladestl_state::bladestl_speech_ctrl_w));   /* UPD7759 */
-	map(0x4000, 0x4000).r(this, FUNC(bladestl_state::bladestl_speech_busy_r));    /* UPD7759 */
+	map(0x3000, 0x3000).w(FUNC(bladestl_state::bladestl_speech_ctrl_w));   /* UPD7759 */
+	map(0x4000, 0x4000).r(FUNC(bladestl_state::bladestl_speech_busy_r));    /* UPD7759 */
 	map(0x5000, 0x5000).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xffff).rom();
@@ -285,7 +285,7 @@ GFXDECODE_END
 void bladestl_state::machine_start()
 {
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_last_track));

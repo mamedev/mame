@@ -13,6 +13,7 @@
 #include "machine/74259.h"
 #include "machine/timer.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Discrete Sound Input Nodes */

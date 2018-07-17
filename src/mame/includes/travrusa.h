@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Lee Taylor
 // thanks-to:John Clegg,Tomasz Slanina
+
+#include "emupal.h"
+
 class travrusa_state : public driver_device
 {
 public:

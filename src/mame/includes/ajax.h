@@ -8,6 +8,7 @@
 #include "video/k051960.h"
 #include "video/k051316.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 
 class ajax_state : public driver_device
 {
@@ -25,7 +26,7 @@ public:
 		m_k051316(*this, "k051316"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
@@ -68,5 +69,5 @@ protected:
 	required_device<k051316_device> m_k051316;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	output_finder<8> m_lamp;
+	output_finder<8> m_lamps;
 };

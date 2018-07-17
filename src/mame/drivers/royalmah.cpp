@@ -104,6 +104,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -621,7 +622,7 @@ void royalmah_state::mjapinky_map(address_map &map)
 	map(0x7800, 0x7fff).ram();
 	map(0x8000, 0xffff).bankr("mainbank");
 	map(0x8000, 0xffff).writeonly().share("videoram");
-	map(0x8000, 0x8000).r(this, FUNC(royalmah_state::mjapinky_dsw_r));
+	map(0x8000, 0x8000).r(FUNC(royalmah_state::mjapinky_dsw_r));
 }
 
 void royalmah_state::tahjong_map(address_map &map)
@@ -640,8 +641,8 @@ void royalmah_state::royalmah_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 }
 
 void royalmah_state::ippatsu_iomap(address_map &map)
@@ -649,8 +650,8 @@ void royalmah_state::ippatsu_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 	map(0x12, 0x12).portr("DSW2");
 	map(0x13, 0x13).portr("DSW3");
 }
@@ -672,8 +673,8 @@ void royalmah_state::seljan_iomap(address_map &map)
 {
 	map(0x0001, 0x0001).mirror(0x7f00).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x0002, 0x0003).mirror(0x7f00).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x0010, 0x0010).mirror(0x7f00).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x0011, 0x0011).mirror(0x7f00).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x0010, 0x0010).mirror(0x7f00).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x0011, 0x0011).mirror(0x7f00).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 	map(0x0012, 0x0012).mirror(0x7f00).portr("DSW2").w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0013, 0x0013).mirror(0x7f00).portr("DSW3").w("crtc", FUNC(mc6845_device::register_w));
 
@@ -686,9 +687,9 @@ void royalmah_state::tahjong_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
-	map(0x12, 0x12).w(this, FUNC(royalmah_state::tahjong_bank_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
+	map(0x12, 0x12).w(FUNC(royalmah_state::tahjong_bank_w));
 	map(0x13, 0x13).portr("DSW2");
 }
 
@@ -697,10 +698,10 @@ void royalmah_state::suzume_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
-	map(0x80, 0x80).r(this, FUNC(royalmah_state::suzume_dsw_r));
-	map(0x81, 0x81).w(this, FUNC(royalmah_state::suzume_bank_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
+	map(0x80, 0x80).r(FUNC(royalmah_state::suzume_dsw_r));
+	map(0x81, 0x81).w(FUNC(royalmah_state::suzume_bank_w));
 }
 
 void royalmah_state::mjyarou_iomap(address_map &map)
@@ -708,8 +709,8 @@ void royalmah_state::mjyarou_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 	map(0x12, 0x12).portr("DSW2");
 }
 
@@ -718,11 +719,11 @@ void royalmah_state::dondenmj_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 	map(0x85, 0x85).portr("DSW2"); // DSW2
 	map(0x86, 0x86).portr("DSW3"); // DSW3
-	map(0x87, 0x87).w(this, FUNC(royalmah_state::dynax_bank_w));
+	map(0x87, 0x87).w(FUNC(royalmah_state::dynax_bank_w));
 }
 
 void royalmah_state::makaijan_iomap(address_map &map)
@@ -730,11 +731,11 @@ void royalmah_state::makaijan_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 	map(0x84, 0x84).portr("DSW2"); // DSW2
 	map(0x85, 0x85).portr("DSW3"); // DSW3
-	map(0x86, 0x86).w(this, FUNC(royalmah_state::dynax_bank_w));
+	map(0x86, 0x86).w(FUNC(royalmah_state::dynax_bank_w));
 }
 
 void royalmah_state::daisyari_iomap(address_map &map)
@@ -742,19 +743,19 @@ void royalmah_state::daisyari_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
-	map(0xc0, 0xc0).rw(this, FUNC(royalmah_state::daisyari_dsw_r), FUNC(royalmah_state::daisyari_bank_w));
+	map(0x10, 0x10).w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
+	map(0xc0, 0xc0).rw(FUNC(royalmah_state::daisyari_dsw_r), FUNC(royalmah_state::daisyari_bank_w));
 }
 
 void royalmah_state::mjclub_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(royalmah_state::mjclub_dsw_r), FUNC(royalmah_state::mjclub_bank_w));
+	map(0x00, 0x00).rw(FUNC(royalmah_state::mjclub_dsw_r), FUNC(royalmah_state::mjclub_bank_w));
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 }
 
 void royalmah_state::mjdiplob_iomap(address_map &map)
@@ -762,9 +763,9 @@ void royalmah_state::mjdiplob_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
-	map(0x61, 0x61).w(this, FUNC(royalmah_state::tontonb_bank_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
+	map(0x61, 0x61).w(FUNC(royalmah_state::tontonb_bank_w));
 	map(0x62, 0x62).portr("DSW2"); // DSW2
 	map(0x63, 0x63).portr("DSW3"); // DSW3
 }
@@ -774,9 +775,9 @@ void royalmah_state::tontonb_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
-	map(0x44, 0x44).w(this, FUNC(royalmah_state::tontonb_bank_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
+	map(0x44, 0x44).w(FUNC(royalmah_state::tontonb_bank_w));
 	map(0x46, 0x46).portr("DSW2"); // DSW2
 	map(0x47, 0x47).portr("DSW3"); // DSW3
 }
@@ -786,9 +787,9 @@ void royalmah_state::majs101b_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
-	map(0x00, 0x00).rw(this, FUNC(royalmah_state::majs101b_dsw_r), FUNC(royalmah_state::dynax_bank_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
+	map(0x00, 0x00).rw(FUNC(royalmah_state::majs101b_dsw_r), FUNC(royalmah_state::dynax_bank_w));
 }
 
 void royalmah_state::mjderngr_iomap(address_map &map)
@@ -797,23 +798,23 @@ void royalmah_state::mjderngr_iomap(address_map &map)
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
 //  AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1")
-	map(0x10, 0x10).w(this, FUNC(royalmah_state::mjderngr_coin_w));   // palette bank is set separately
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
-	map(0x20, 0x20).w(this, FUNC(royalmah_state::dynax_bank_w));
+	map(0x10, 0x10).w(FUNC(royalmah_state::mjderngr_coin_w));   // palette bank is set separately
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
+	map(0x20, 0x20).w(FUNC(royalmah_state::dynax_bank_w));
 	map(0x40, 0x40).portr("DSW2");
 	map(0x4c, 0x4c).portr("DSW1");
-	map(0x60, 0x60).w(this, FUNC(royalmah_state::mjderngr_palbank_w));
+	map(0x60, 0x60).w(FUNC(royalmah_state::mjderngr_palbank_w));
 }
 
 void royalmah_state::mjapinky_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(royalmah_state::mjapinky_bank_w));
+	map(0x00, 0x00).w(FUNC(royalmah_state::mjapinky_bank_w));
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
 	map(0x04, 0x04).portr("DSW2");
-	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::mjapinky_palbank_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::mjapinky_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 }
 
 void royalmah_state::janoh_map(address_map &map)
@@ -927,16 +928,16 @@ void royalmah_state::jansou_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().nopw();
 
-	map(0x6000, 0x600f).w(this, FUNC(royalmah_state::jansou_colortable_w));
-	map(0x6400, 0x6400).w(this, FUNC(royalmah_state::jansou_6400_w));
-	map(0x6401, 0x6401).w(this, FUNC(royalmah_state::jansou_6401_w));
-	map(0x6402, 0x6402).w(this, FUNC(royalmah_state::jansou_6402_w));
-	map(0x6403, 0x6403).r(this, FUNC(royalmah_state::jansou_6403_r));
-	map(0x6404, 0x6404).r(this, FUNC(royalmah_state::jansou_6404_r));
-	map(0x6405, 0x6405).r(this, FUNC(royalmah_state::jansou_6405_r));
-	map(0x6406, 0x6406).w(this, FUNC(royalmah_state::jansou_dsw_sel_w));
-	map(0x6407, 0x6407).r(this, FUNC(royalmah_state::jansou_dsw_r));
-	map(0x6800, 0x6800).w(this, FUNC(royalmah_state::jansou_sound_w));
+	map(0x6000, 0x600f).w(FUNC(royalmah_state::jansou_colortable_w));
+	map(0x6400, 0x6400).w(FUNC(royalmah_state::jansou_6400_w));
+	map(0x6401, 0x6401).w(FUNC(royalmah_state::jansou_6401_w));
+	map(0x6402, 0x6402).w(FUNC(royalmah_state::jansou_6402_w));
+	map(0x6403, 0x6403).r(FUNC(royalmah_state::jansou_6403_r));
+	map(0x6404, 0x6404).r(FUNC(royalmah_state::jansou_6404_r));
+	map(0x6405, 0x6405).r(FUNC(royalmah_state::jansou_6405_r));
+	map(0x6406, 0x6406).w(FUNC(royalmah_state::jansou_dsw_sel_w));
+	map(0x6407, 0x6407).r(FUNC(royalmah_state::jansou_dsw_r));
+	map(0x6800, 0x6800).w(FUNC(royalmah_state::jansou_sound_w));
 
 	map(0x7000, 0x77ff).ram().share("nvram");
 	map(0x8000, 0xffff).writeonly().share("videoram");
@@ -951,7 +952,7 @@ void royalmah_state::jansou_sub_map(address_map &map)
 void royalmah_state::jansou_sub_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("dac", FUNC(dac_byte_interface::write));
+	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 
@@ -1011,14 +1012,14 @@ WRITE8_MEMBER(royalmah_state::janptr96_coin_counter_w)
 void royalmah_state::janptr96_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(royalmah_state::janptr96_rombank_w));    // BANK ROM Select
-	map(0x20, 0x20).rw(this, FUNC(royalmah_state::janptr96_unknown_r), FUNC(royalmah_state::janptr96_rambank_w));
-	map(0x50, 0x50).w(this, FUNC(royalmah_state::mjderngr_palbank_w));
+	map(0x00, 0x00).w(FUNC(royalmah_state::janptr96_rombank_w));    // BANK ROM Select
+	map(0x20, 0x20).rw(FUNC(royalmah_state::janptr96_unknown_r), FUNC(royalmah_state::janptr96_rambank_w));
+	map(0x50, 0x50).w(FUNC(royalmah_state::mjderngr_palbank_w));
 	map(0x60, 0x6f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x81, 0x81).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x93, 0x93).w(this, FUNC(royalmah_state::input_port_select_w));
-	map(0xd8, 0xd8).w(this, FUNC(royalmah_state::janptr96_coin_counter_w));
+	map(0x93, 0x93).w(FUNC(royalmah_state::input_port_select_w));
+	map(0xd8, 0xd8).w(FUNC(royalmah_state::janptr96_coin_counter_w));
 	map(0xd9, 0xd9).portr("SYSTEM").nopw(); // second input select?
 }
 
@@ -1089,8 +1090,8 @@ void royalmah_state::mjifb_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xbfff).rw(this, FUNC(royalmah_state::mjifb_rom_io_r), FUNC(royalmah_state::mjifb_rom_io_w)).share("videoram");
-	map(0xc000, 0xffff).rom().w(this, FUNC(royalmah_state::mjifb_videoram_w));
+	map(0x8000, 0xbfff).rw(FUNC(royalmah_state::mjifb_rom_io_r), FUNC(royalmah_state::mjifb_rom_io_w)).share("videoram");
+	map(0xc000, 0xffff).rom().w(FUNC(royalmah_state::mjifb_videoram_w));
 //  AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITEONLY  This should, but doesn't work
 }
 
@@ -1180,8 +1181,8 @@ void royalmah_state::mjdejavu_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xbfff).rw(this, FUNC(royalmah_state::mjdejavu_rom_io_r), FUNC(royalmah_state::mjdejavu_rom_io_w)).share("videoram");
-	map(0xc000, 0xffff).rom().w(this, FUNC(royalmah_state::mjifb_videoram_w));
+	map(0x8000, 0xbfff).rw(FUNC(royalmah_state::mjdejavu_rom_io_r), FUNC(royalmah_state::mjdejavu_rom_io_w)).share("videoram");
+	map(0xc000, 0xffff).rom().w(FUNC(royalmah_state::mjifb_videoram_w));
 }
 
 
@@ -1215,12 +1216,12 @@ void royalmah_state::mjtensin_map(address_map &map)
 	map(0x6000, 0x6fbf).ram();
 	map(0x6fc1, 0x6fc1).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x6fc2, 0x6fc3).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x6fd0, 0x6fd0).w(this, FUNC(royalmah_state::janptr96_coin_counter_w));
-	map(0x6fd1, 0x6fd1).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x6fd0, 0x6fd0).w(FUNC(royalmah_state::janptr96_coin_counter_w));
+	map(0x6fd1, 0x6fd1).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 	map(0x6fe0, 0x6fef).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x6ff0, 0x6ff0).rw(this, FUNC(royalmah_state::janptr96_dsw_r), FUNC(royalmah_state::janptr96_dswsel_w));
-	map(0x6ff1, 0x6ff1).w(this, FUNC(royalmah_state::mjderngr_palbank_w));
-	map(0x6ff3, 0x6ff3).w(this, FUNC(royalmah_state::mjtensin_6ff3_w));
+	map(0x6ff0, 0x6ff0).rw(FUNC(royalmah_state::janptr96_dsw_r), FUNC(royalmah_state::janptr96_dswsel_w));
+	map(0x6ff1, 0x6ff1).w(FUNC(royalmah_state::mjderngr_palbank_w));
+	map(0x6ff3, 0x6ff3).w(FUNC(royalmah_state::mjtensin_6ff3_w));
 	map(0x7000, 0x7fff).ram().share("nvram");
 	map(0x8000, 0xffff).bankr("mainbank");
 	map(0x8000, 0xffff).writeonly().share("videoram");
@@ -1279,14 +1280,14 @@ void royalmah_state::cafetime_map(address_map &map)
 	map(0x6000, 0x7eff).ram().share("nvram");
 	map(0x7fc1, 0x7fc1).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x7fc2, 0x7fc3).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x7fd0, 0x7fd0).w(this, FUNC(royalmah_state::janptr96_coin_counter_w));
+	map(0x7fd0, 0x7fd0).w(FUNC(royalmah_state::janptr96_coin_counter_w));
 	map(0x7fd1, 0x7fd1).portr("SYSTEM").nopw();
-	map(0x7fd3, 0x7fd3).w(this, FUNC(royalmah_state::input_port_select_w));
-	map(0x7fe0, 0x7fe0).r(this, FUNC(royalmah_state::cafetime_dsw_r));
-	map(0x7fe1, 0x7fe1).w(this, FUNC(royalmah_state::cafetime_dsw_w));
-	map(0x7fe2, 0x7fe2).w(this, FUNC(royalmah_state::mjderngr_palbank_w));
-	map(0x7fe3, 0x7fe3).w(this, FUNC(royalmah_state::cafetime_7fe3_w));
-	map(0x7fe4, 0x7fe4).r(this, FUNC(royalmah_state::cafetime_7fe4_r));
+	map(0x7fd3, 0x7fd3).w(FUNC(royalmah_state::input_port_select_w));
+	map(0x7fe0, 0x7fe0).r(FUNC(royalmah_state::cafetime_dsw_r));
+	map(0x7fe1, 0x7fe1).w(FUNC(royalmah_state::cafetime_dsw_w));
+	map(0x7fe2, 0x7fe2).w(FUNC(royalmah_state::mjderngr_palbank_w));
+	map(0x7fe3, 0x7fe3).w(FUNC(royalmah_state::cafetime_7fe3_w));
+	map(0x7fe4, 0x7fe4).r(FUNC(royalmah_state::cafetime_7fe4_r));
 	map(0x7ff0, 0x7fff).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x8000, 0xffff).bankr("mainbank");
 	map(0x8000, 0xffff).writeonly().share("videoram");
@@ -1369,20 +1370,20 @@ void royalmah_state::mjvegasa_map(address_map &map)
 
 	map(0x00000, 0x05fff).rom();
 	map(0x06000, 0x07fff).ram().share("nvram");
-	map(0x08000, 0x0ffff).rw(this, FUNC(royalmah_state::mjvegasa_rom_io_r), FUNC(royalmah_state::mjvegasa_rom_io_w)).share("videoram");
+	map(0x08000, 0x0ffff).rw(FUNC(royalmah_state::mjvegasa_rom_io_r), FUNC(royalmah_state::mjvegasa_rom_io_w)).share("videoram");
 
 	map(0x10001, 0x10001).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x10002, 0x10003).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x10010, 0x10010).w(this, FUNC(royalmah_state::mjvegasa_coin_counter_w));
-	map(0x10011, 0x10011).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
-	map(0x10013, 0x10013).w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x10010, 0x10010).w(FUNC(royalmah_state::mjvegasa_coin_counter_w));
+	map(0x10011, 0x10011).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
+	map(0x10013, 0x10013).w(FUNC(royalmah_state::input_port_select_w));
 
-	map(0x12000, 0x12000).w(this, FUNC(royalmah_state::mjvegasa_rombank_w));
-	map(0x12100, 0x12100).r(this, FUNC(royalmah_state::cafetime_dsw_r));
-	map(0x12200, 0x12200).w(this, FUNC(royalmah_state::cafetime_dsw_w));
-	map(0x12300, 0x12300).w(this, FUNC(royalmah_state::mjderngr_palbank_w));
-	map(0x12400, 0x12400).w(this, FUNC(royalmah_state::mjvegasa_12400_w));
-	map(0x12500, 0x12500).r(this, FUNC(royalmah_state::mjvegasa_12500_r));
+	map(0x12000, 0x12000).w(FUNC(royalmah_state::mjvegasa_rombank_w));
+	map(0x12100, 0x12100).r(FUNC(royalmah_state::cafetime_dsw_r));
+	map(0x12200, 0x12200).w(FUNC(royalmah_state::cafetime_dsw_w));
+	map(0x12300, 0x12300).w(FUNC(royalmah_state::mjderngr_palbank_w));
+	map(0x12400, 0x12400).w(FUNC(royalmah_state::mjvegasa_12400_w));
+	map(0x12500, 0x12500).r(FUNC(royalmah_state::mjvegasa_12500_r));
 
 }
 

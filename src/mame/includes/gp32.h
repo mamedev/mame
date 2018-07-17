@@ -7,6 +7,7 @@
 #include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define INT_ADC       31

@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+
+#include "emupal.h"
+
 class snookr10_state : public driver_device
 {
 public:
@@ -9,7 +12,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(dsw_port_1_r);
@@ -36,7 +39,7 @@ public:
 	void tenballs_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	int m_outportl;
@@ -52,5 +55,5 @@ protected:
 	tilemap_t *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<7> m_lamp;
+	output_finder<7> m_lamps;
 };

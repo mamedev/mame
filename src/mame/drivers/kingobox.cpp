@@ -59,12 +59,12 @@ void kingofb_state::kingobox_map(address_map &map)
 	map(0xe000, 0xe7ff).ram().share("share2"); /* shared with sprite cpu */
 	map(0xe800, 0xefff).ram().share("share1"); /* shared with video cpu */
 	map(0xf000, 0xf7ff).ram(); /* ???? */
-	map(0xf800, 0xf800).w(this, FUNC(kingofb_state::kingofb_f800_w));   /* NMI enable, palette bank */
+	map(0xf800, 0xf800).w(FUNC(kingofb_state::kingofb_f800_w));   /* NMI enable, palette bank */
 	map(0xf801, 0xf801).nopw(); /* ???? */
 	map(0xf802, 0xf802).writeonly().share("scroll_y");
-	map(0xf803, 0xf803).w(this, FUNC(kingofb_state::scroll_interrupt_w));
-	map(0xf804, 0xf804).w(this, FUNC(kingofb_state::video_interrupt_w));
-	map(0xf807, 0xf807).w(this, FUNC(kingofb_state::sound_command_w)); /* sound latch */
+	map(0xf803, 0xf803).w(FUNC(kingofb_state::scroll_interrupt_w));
+	map(0xf804, 0xf804).w(FUNC(kingofb_state::video_interrupt_w));
+	map(0xf807, 0xf807).w(FUNC(kingofb_state::sound_command_w)); /* sound latch */
 	map(0xfc00, 0xfc00).portr("DSW1");
 	map(0xfc01, 0xfc01).portr("DSW2");
 	map(0xfc02, 0xfc02).portr("P1");
@@ -78,10 +78,10 @@ void kingofb_state::kingobox_video_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram(); /* work ram */
 	map(0xa000, 0xa7ff).ram().share("share1"); /* shared with main */
-	map(0xc000, 0xc0ff).ram().w(this, FUNC(kingofb_state::kingofb_videoram_w)).share("videoram"); /* background vram */
-	map(0xc400, 0xc4ff).ram().w(this, FUNC(kingofb_state::kingofb_colorram_w)).share("colorram"); /* background colorram */
-	map(0xc800, 0xcbff).ram().w(this, FUNC(kingofb_state::kingofb_videoram2_w)).share("videoram2"); /* foreground vram */
-	map(0xcc00, 0xcfff).ram().w(this, FUNC(kingofb_state::kingofb_colorram2_w)).share("colorram2"); /* foreground colorram */
+	map(0xc000, 0xc0ff).ram().w(FUNC(kingofb_state::kingofb_videoram_w)).share("videoram"); /* background vram */
+	map(0xc400, 0xc4ff).ram().w(FUNC(kingofb_state::kingofb_colorram_w)).share("colorram"); /* background colorram */
+	map(0xc800, 0xcbff).ram().w(FUNC(kingofb_state::kingofb_videoram2_w)).share("videoram2"); /* foreground vram */
+	map(0xcc00, 0xcfff).ram().w(FUNC(kingofb_state::kingofb_colorram2_w)).share("colorram2"); /* foreground colorram */
 }
 
 void kingofb_state::kingobox_sprite_map(address_map &map)
@@ -103,7 +103,7 @@ void kingofb_state::kingobox_sound_map(address_map &map)
 void kingofb_state::kingobox_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::write));
+	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x08, 0x08).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x0c, 0x0c).w("aysnd", FUNC(ay8910_device::address_w));
 }
@@ -115,10 +115,10 @@ void kingofb_state::ringking_map(address_map &map)
 	map(0xc000, 0xc3ff).ram(); /* work ram */
 	map(0xc800, 0xcfff).ram().share("share2"); /* shared with sprite cpu */
 	map(0xd000, 0xd7ff).ram().share("share1"); /* shared with video cpu */
-	map(0xd800, 0xd800).w(this, FUNC(kingofb_state::kingofb_f800_w));
-	map(0xd801, 0xd801).w(this, FUNC(kingofb_state::sprite_interrupt_w));
-	map(0xd802, 0xd802).w(this, FUNC(kingofb_state::video_interrupt_w));
-	map(0xd803, 0xd803).w(this, FUNC(kingofb_state::sound_command_w));
+	map(0xd800, 0xd800).w(FUNC(kingofb_state::kingofb_f800_w));
+	map(0xd801, 0xd801).w(FUNC(kingofb_state::sprite_interrupt_w));
+	map(0xd802, 0xd802).w(FUNC(kingofb_state::video_interrupt_w));
+	map(0xd803, 0xd803).w(FUNC(kingofb_state::sound_command_w));
 	map(0xe000, 0xe000).portr("DSW1");
 	map(0xe001, 0xe001).portr("DSW2");
 	map(0xe002, 0xe002).portr("P1");
@@ -134,10 +134,10 @@ void kingofb_state::ringking_video_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram(); /* work ram */
 	map(0xc000, 0xc7ff).ram().share("share1"); /* shared with main */
-	map(0xa800, 0xa8ff).ram().w(this, FUNC(kingofb_state::kingofb_videoram_w)).share("videoram"); /* background vram */
-	map(0xac00, 0xacff).ram().w(this, FUNC(kingofb_state::kingofb_colorram_w)).share("colorram"); /* background colorram */
-	map(0xa000, 0xa3ff).ram().w(this, FUNC(kingofb_state::kingofb_videoram2_w)).share("videoram2"); /* foreground vram */
-	map(0xa400, 0xa7ff).ram().w(this, FUNC(kingofb_state::kingofb_colorram2_w)).share("colorram2"); /* foreground colorram */
+	map(0xa800, 0xa8ff).ram().w(FUNC(kingofb_state::kingofb_videoram_w)).share("videoram"); /* background vram */
+	map(0xac00, 0xacff).ram().w(FUNC(kingofb_state::kingofb_colorram_w)).share("colorram"); /* background colorram */
+	map(0xa000, 0xa3ff).ram().w(FUNC(kingofb_state::kingofb_videoram2_w)).share("videoram2"); /* foreground vram */
+	map(0xa400, 0xa7ff).ram().w(FUNC(kingofb_state::kingofb_colorram2_w)).share("colorram2"); /* foreground colorram */
 }
 
 void kingofb_state::ringking_sprite_map(address_map &map)
@@ -152,7 +152,7 @@ void kingofb_state::ringking_sprite_map(address_map &map)
 void kingofb_state::ringking_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::write));
+	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 }

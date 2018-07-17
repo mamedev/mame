@@ -559,18 +559,18 @@ void grchamp_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).mirror(0x78).portr("ACCEL");
-	map(0x02, 0x02).mirror(0x78).r(this, FUNC(grchamp_state::sub_to_main_comm_r));
+	map(0x02, 0x02).mirror(0x78).r(FUNC(grchamp_state::sub_to_main_comm_r));
 	map(0x03, 0x03).mirror(0x78).portr("WHEEL");
 	map(0x04, 0x04).mirror(0x78).portr("DSWA");
 	map(0x05, 0x05).mirror(0x78).portr("DSWB");
 	map(0x06, 0x06).mirror(0x78).portr("TILT");
-	map(0x01, 0x01).mirror(0x60).r(this, FUNC(grchamp_state::pc3259_0_r));
-	map(0x09, 0x09).mirror(0x60).r(this, FUNC(grchamp_state::pc3259_1_r));
-	map(0x11, 0x11).mirror(0x60).r(this, FUNC(grchamp_state::pc3259_2_r));
-	map(0x19, 0x19).mirror(0x60).r(this, FUNC(grchamp_state::pc3259_3_r));
-	map(0x00, 0x0f).mirror(0x40).w(this, FUNC(grchamp_state::cpu0_outputs_w));
-	map(0x10, 0x13).mirror(0x40).w(this, FUNC(grchamp_state::main_to_sub_comm_w));
-	map(0x20, 0x20).select(0x0c).mirror(0x53).w(this, FUNC(grchamp_state::led_board_w));
+	map(0x01, 0x01).mirror(0x60).r(FUNC(grchamp_state::pc3259_0_r));
+	map(0x09, 0x09).mirror(0x60).r(FUNC(grchamp_state::pc3259_1_r));
+	map(0x11, 0x11).mirror(0x60).r(FUNC(grchamp_state::pc3259_2_r));
+	map(0x19, 0x19).mirror(0x60).r(FUNC(grchamp_state::pc3259_3_r));
+	map(0x00, 0x0f).mirror(0x40).w(FUNC(grchamp_state::cpu0_outputs_w));
+	map(0x10, 0x13).mirror(0x40).w(FUNC(grchamp_state::main_to_sub_comm_w));
+	map(0x20, 0x20).select(0x0c).mirror(0x53).w(FUNC(grchamp_state::led_board_w));
 }
 
 
@@ -578,9 +578,9 @@ void grchamp_state::main_portmap(address_map &map)
 void grchamp_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x27ff).ram().w(this, FUNC(grchamp_state::left_w)).share("leftram");
-	map(0x2800, 0x2fff).ram().w(this, FUNC(grchamp_state::right_w)).share("rightram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(grchamp_state::center_w)).share("centerram");
+	map(0x2000, 0x27ff).ram().w(FUNC(grchamp_state::left_w)).share("leftram");
+	map(0x2800, 0x2fff).ram().w(FUNC(grchamp_state::right_w)).share("rightram");
+	map(0x3000, 0x37ff).ram().w(FUNC(grchamp_state::center_w)).share("centerram");
 	map(0x4000, 0x43ff).mirror(0x0400).ram();
 	map(0x5000, 0x6fff).rom();
 }
@@ -589,8 +589,8 @@ void grchamp_state::sub_map(address_map &map)
 void grchamp_state::sub_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).r(this, FUNC(grchamp_state::main_to_sub_comm_r));
-	map(0x00, 0x0f).mirror(0x70).w(this, FUNC(grchamp_state::cpu1_outputs_w));
+	map(0x00, 0x03).r(FUNC(grchamp_state::main_to_sub_comm_r));
+	map(0x00, 0x0f).mirror(0x70).w(FUNC(grchamp_state::cpu1_outputs_w));
 }
 
 
@@ -635,8 +635,8 @@ void grchamp_state::sound_map(address_map &map)
 	map(0x4803, 0x4803).mirror(0x07f8).r("ay2", FUNC(ay8910_device::data_r));
 	map(0x4804, 0x4805).mirror(0x07fa).w("ay3", FUNC(ay8910_device::address_data_w));
 	map(0x4805, 0x4805).mirror(0x07fa).r("ay3", FUNC(ay8910_device::data_r));
-	map(0x5000, 0x5000).mirror(0x07fc).r(this, FUNC(grchamp_state::soundlatch_r)).w(this, FUNC(grchamp_state::soundlatch_clear7_w));
-	map(0x5001, 0x5001).mirror(0x07fc).r(this, FUNC(grchamp_state::soundlatch_flags_r)).nopw(); // writes here on taitosj reset the secondary semaphore, which doesn't exist on grchamp, but the code tries to reset it anyway!
+	map(0x5000, 0x5000).mirror(0x07fc).r(FUNC(grchamp_state::soundlatch_r)).w(FUNC(grchamp_state::soundlatch_clear7_w));
+	map(0x5001, 0x5001).mirror(0x07fc).r(FUNC(grchamp_state::soundlatch_flags_r)).nopw(); // writes here on taitosj reset the secondary semaphore, which doesn't exist on grchamp, but the code tries to reset it anyway!
 }
 
 

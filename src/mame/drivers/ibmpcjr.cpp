@@ -400,7 +400,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
 		m_fdc->set_floppy(nullptr);
 
 	if((pdor^m_pcjr_dor) & 0x80)
-		m_fdc->reset();
+		m_fdc->soft_reset();
 
 	if(m_pcjr_dor & 0x20) {
 		if((pdor & 0x40) && !(m_pcjr_dor & 0x40))
@@ -560,9 +560,9 @@ void pcjr_state::ibmpcjr_io(address_map &map)
 	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0063).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x00a0, 0x00a0).rw(this, FUNC(pcjr_state::pcjr_nmi_enable_r), FUNC(pcjr_state::pc_nmi_enable_w));
-	map(0x00c0, 0x00c0).w("sn76496", FUNC(sn76496_device::write));
-	map(0x00f2, 0x00f2).w(this, FUNC(pcjr_state::pcjr_fdc_dor_w));
+	map(0x00a0, 0x00a0).rw(FUNC(pcjr_state::pcjr_nmi_enable_r), FUNC(pcjr_state::pc_nmi_enable_w));
+	map(0x00c0, 0x00c0).w("sn76496", FUNC(sn76496_device::command_w));
+	map(0x00f2, 0x00f2).w(FUNC(pcjr_state::pcjr_fdc_dor_w));
 	map(0x00f4, 0x00f5).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x02f8, 0x02ff).rw("ins8250", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
@@ -584,7 +584,7 @@ void pcjr_state::ibmpcjx_io(address_map &map)
 {
 	map.unmap_value_high();
 	ibmpcjr_io(map);
-	map(0x01ff, 0x01ff).rw(this, FUNC(pcjr_state::pcjx_port_1ff_r), FUNC(pcjr_state::pcjx_port_1ff_w));
+	map(0x01ff, 0x01ff).rw(FUNC(pcjr_state::pcjx_port_1ff_r), FUNC(pcjr_state::pcjx_port_1ff_w));
 }
 
 MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
@@ -628,7 +628,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("ins8250", ins8250_uart_device, cts_w))
 
 	/* video hardware */
-	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
+	MCFG_DEVICE_ADD("pcvideo_pcjr", PCVIDEO_PCJR, 0)
 	MCFG_VIDEO_SET_SCREEN("pcvideo_pcjr:screen")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_pcjr:palette", gfx_pcjr)
@@ -706,9 +706,9 @@ MACHINE_CONFIG_END
 ROM_START( ibmpcjr )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_SYSTEM_BIOS( 0, "default", "Default" )
-	ROMX_LOAD("bios.rom", 0x0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414), ROM_BIOS(1))
+	ROMX_LOAD("bios.rom", 0x0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "quiksilver", "Quicksilver" ) // Alternate bios to boot up faster (Synectics)
-	ROMX_LOAD("quiksilv.rom", 0x0000, 0x10000, CRC(86aaa1c4) SHA1(b3d7e8ce5de17441891e0b71e5261ed01a169dc1), ROM_BIOS(2))
+	ROMX_LOAD("quiksilv.rom", 0x0000, 0x10000, CRC(86aaa1c4) SHA1(b3d7e8ce5de17441891e0b71e5261ed01a169dc1), ROM_BIOS(1))
 
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
@@ -718,10 +718,10 @@ ROM_START( ibmpcjx )
 	ROM_REGION(0x20000,"bios", ROMREGION_ERASEFF)
 	ROM_DEFAULT_BIOS("unk")
 	ROM_SYSTEM_BIOS( 0, "5601jda", "5601jda" )
-	ROMX_LOAD("5601jda.bin", 0x10000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6), ROM_BIOS(1))
-	ROMX_LOAD("basicjx.rom",   0x08000, 0x08000, NO_DUMP, ROM_BIOS(1)) // boot fails due of this.
+	ROMX_LOAD("5601jda.bin", 0x10000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6), ROM_BIOS(0))
+	ROMX_LOAD("basicjx.rom",   0x08000, 0x08000, NO_DUMP, ROM_BIOS(0)) // boot fails due to this.
 	ROM_SYSTEM_BIOS( 1, "unk", "unk" )
-	ROMX_LOAD("ipljx.rom", 0x00000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(2))
+	ROMX_LOAD("ipljx.rom", 0x00000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(1))
 
 	ROM_REGION(0x08100,"gfx1", 0) //TODO: needs a different charset
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card

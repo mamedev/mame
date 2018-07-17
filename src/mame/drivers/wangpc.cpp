@@ -747,18 +747,18 @@ void wangpc_state::wangpc_mem(address_map &map)
 void wangpc_state::wangpc_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x1000, 0x1000).w(this, FUNC(wangpc_state::fdc_ctrl_w));
-	map(0x1004, 0x1004).rw(this, FUNC(wangpc_state::deselect_drive1_r), FUNC(wangpc_state::deselect_drive1_w));
-	map(0x1006, 0x1006).rw(this, FUNC(wangpc_state::select_drive1_r), FUNC(wangpc_state::select_drive1_w));
-	map(0x1008, 0x1008).rw(this, FUNC(wangpc_state::deselect_drive2_r), FUNC(wangpc_state::deselect_drive2_w));
-	map(0x100a, 0x100a).rw(this, FUNC(wangpc_state::select_drive2_r), FUNC(wangpc_state::select_drive2_w));
-	map(0x100c, 0x100c).rw(this, FUNC(wangpc_state::motor1_off_r), FUNC(wangpc_state::motor1_off_w));
-	map(0x100e, 0x100e).rw(this, FUNC(wangpc_state::motor1_on_r), FUNC(wangpc_state::motor1_on_w));
-	map(0x1010, 0x1010).rw(this, FUNC(wangpc_state::motor2_off_r), FUNC(wangpc_state::motor2_off_w));
-	map(0x1012, 0x1012).rw(this, FUNC(wangpc_state::motor2_on_r), FUNC(wangpc_state::motor2_on_w));
+	map(0x1000, 0x1000).w(FUNC(wangpc_state::fdc_ctrl_w));
+	map(0x1004, 0x1004).rw(FUNC(wangpc_state::deselect_drive1_r), FUNC(wangpc_state::deselect_drive1_w));
+	map(0x1006, 0x1006).rw(FUNC(wangpc_state::select_drive1_r), FUNC(wangpc_state::select_drive1_w));
+	map(0x1008, 0x1008).rw(FUNC(wangpc_state::deselect_drive2_r), FUNC(wangpc_state::deselect_drive2_w));
+	map(0x100a, 0x100a).rw(FUNC(wangpc_state::select_drive2_r), FUNC(wangpc_state::select_drive2_w));
+	map(0x100c, 0x100c).rw(FUNC(wangpc_state::motor1_off_r), FUNC(wangpc_state::motor1_off_w));
+	map(0x100e, 0x100e).rw(FUNC(wangpc_state::motor1_on_r), FUNC(wangpc_state::motor1_on_w));
+	map(0x1010, 0x1010).rw(FUNC(wangpc_state::motor2_off_r), FUNC(wangpc_state::motor2_off_w));
+	map(0x1012, 0x1012).rw(FUNC(wangpc_state::motor2_on_r), FUNC(wangpc_state::motor2_on_w));
 	map(0x1014, 0x1017).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
-	map(0x1018, 0x1018).mirror(0x0002).rw(this, FUNC(wangpc_state::fdc_reset_r), FUNC(wangpc_state::fdc_reset_w));
-	map(0x101c, 0x101c).mirror(0x0002).rw(this, FUNC(wangpc_state::fdc_tc_r), FUNC(wangpc_state::fdc_tc_w));
+	map(0x1018, 0x1018).mirror(0x0002).rw(FUNC(wangpc_state::fdc_reset_r), FUNC(wangpc_state::fdc_reset_w));
+	map(0x101c, 0x101c).mirror(0x0002).rw(FUNC(wangpc_state::fdc_tc_r), FUNC(wangpc_state::fdc_tc_w));
 	map(0x1020, 0x1027).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x1028, 0x1029); //AM_WRITE(?)
 	map(0x1040, 0x1047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
@@ -766,16 +766,16 @@ void wangpc_state::wangpc_io(address_map &map)
 	map(0x1080, 0x1087).r(m_epci, FUNC(mc2661_device::read)).umask16(0x00ff);
 	map(0x1088, 0x108f).w(m_epci, FUNC(mc2661_device::write)).umask16(0x00ff);
 	map(0x10a0, 0x10bf).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
-	map(0x10c2, 0x10c7).w(this, FUNC(wangpc_state::dma_page_w)).umask16(0x00ff);
-	map(0x10e0, 0x10e0).rw(this, FUNC(wangpc_state::status_r), FUNC(wangpc_state::timer0_irq_clr_w));
-	map(0x10e2, 0x10e2).rw(this, FUNC(wangpc_state::timer2_irq_clr_r), FUNC(wangpc_state::nmi_mask_w));
-	map(0x10e4, 0x10e4).rw(this, FUNC(wangpc_state::led_on_r), FUNC(wangpc_state::fpu_mask_w));
-	map(0x10e6, 0x10e6).rw(this, FUNC(wangpc_state::dma_eop_clr_r), FUNC(wangpc_state::uart_tbre_clr_w));
-	map(0x10e8, 0x10e8).rw(this, FUNC(wangpc_state::uart_r), FUNC(wangpc_state::uart_w));
-	map(0x10ea, 0x10ea).rw(this, FUNC(wangpc_state::centronics_r), FUNC(wangpc_state::centronics_w));
-	map(0x10ec, 0x10ec).rw(this, FUNC(wangpc_state::busy_clr_r), FUNC(wangpc_state::acknlg_clr_w));
-	map(0x10ee, 0x10ee).rw(this, FUNC(wangpc_state::led_off_r), FUNC(wangpc_state::parity_nmi_clr_w));
-	map(0x10fe, 0x10fe).r(this, FUNC(wangpc_state::option_id_r));
+	map(0x10c2, 0x10c7).w(FUNC(wangpc_state::dma_page_w)).umask16(0x00ff);
+	map(0x10e0, 0x10e0).rw(FUNC(wangpc_state::status_r), FUNC(wangpc_state::timer0_irq_clr_w));
+	map(0x10e2, 0x10e2).rw(FUNC(wangpc_state::timer2_irq_clr_r), FUNC(wangpc_state::nmi_mask_w));
+	map(0x10e4, 0x10e4).rw(FUNC(wangpc_state::led_on_r), FUNC(wangpc_state::fpu_mask_w));
+	map(0x10e6, 0x10e6).rw(FUNC(wangpc_state::dma_eop_clr_r), FUNC(wangpc_state::uart_tbre_clr_w));
+	map(0x10e8, 0x10e8).rw(FUNC(wangpc_state::uart_r), FUNC(wangpc_state::uart_w));
+	map(0x10ea, 0x10ea).rw(FUNC(wangpc_state::centronics_r), FUNC(wangpc_state::centronics_w));
+	map(0x10ec, 0x10ec).rw(FUNC(wangpc_state::busy_clr_r), FUNC(wangpc_state::acknlg_clr_w));
+	map(0x10ee, 0x10ee).rw(FUNC(wangpc_state::led_off_r), FUNC(wangpc_state::parity_nmi_clr_w));
+	map(0x10fe, 0x10fe).r(FUNC(wangpc_state::option_id_r));
 	map(0x1100, 0x1fff).rw(m_bus, FUNC(wangpcbus_device::sad_r), FUNC(wangpcbus_device::sad_w));
 }
 
@@ -1332,7 +1332,7 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, wangpc_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, wangpc_state, write_centronics_busy))

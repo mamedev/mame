@@ -354,6 +354,7 @@ VIDEOS["PPU2C0X"] = true
 --------------------------------------------------
 
 MACHINES["AKIKO"] = true
+MACHINES["BUSMOUSE"] = true
 MACHINES["NCR53C7XX"] = true
 MACHINES["LSI53C810"] = true
 MACHINES["6522VIA"] = true
@@ -535,6 +536,7 @@ MACHINES["PIT8253"] = true
 MACHINES["PLA"] = true
 --MACHINES["PROFILE"] = true
 --MACHINES["PROM82S129"] = true
+MACHINES["PXA255"] = true
 MACHINES["R10696"] = true
 MACHINES["R10788"] = true
 MACHINES["RA17XX"] = true
@@ -1707,6 +1709,8 @@ files {
 	MAME_DIR .. "src/mame/includes/realbrk.h",
 	MAME_DIR .. "src/mame/video/realbrk.cpp",
 	MAME_DIR .. "src/mame/drivers/royalmah.cpp",
+	MAME_DIR .. "src/mame/video/dynax_blitter_rev2.cpp",
+	MAME_DIR .. "src/mame/video/dynax_blitter_rev2.h",
 }
 
 createMAMEProjects(_target, _subtarget, "edevices")
@@ -2895,6 +2899,7 @@ files {
 	MAME_DIR .. "src/mame/includes/nbmj9195.h",
 	MAME_DIR .. "src/mame/video/nbmj9195.cpp",
 	MAME_DIR .. "src/mame/drivers/nightgal.cpp",
+	MAME_DIR .. "src/mame/drivers/nichild.cpp",
 	MAME_DIR .. "src/mame/audio/nichisnd.cpp",
 	MAME_DIR .. "src/mame/audio/nichisnd.h",
 	MAME_DIR .. "src/mame/drivers/niyanpai.cpp",
@@ -3282,6 +3287,7 @@ files {
 	MAME_DIR .. "src/mame/machine/segag80.cpp",
 	MAME_DIR .. "src/mame/machine/segag80.h",
 	MAME_DIR .. "src/mame/audio/segag80r.cpp",
+	MAME_DIR .. "src/mame/audio/segag80r.h",
 	MAME_DIR .. "src/mame/video/segag80r.cpp",
 	MAME_DIR .. "src/mame/drivers/segag80v.cpp",
 	MAME_DIR .. "src/mame/includes/segag80v.h",
@@ -4553,6 +4559,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/ecoinf1.cpp",
 	MAME_DIR .. "src/mame/drivers/ecoinf2.cpp",
 	MAME_DIR .. "src/mame/drivers/ecoinf3.cpp",
+	MAME_DIR .. "src/mame/includes/efdt.h",
+	MAME_DIR .. "src/mame/drivers/efdt.cpp",
 	MAME_DIR .. "src/mame/drivers/electra.cpp",
 	MAME_DIR .. "src/mame/drivers/epos.cpp",
 	MAME_DIR .. "src/mame/includes/epos.h",

@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli
 #include "sound/tms5220.h"
+#include "emupal.h"
 
 class portrait_state : public driver_device
 {
@@ -14,7 +15,7 @@ public:
 		, m_bgvideoram(*this, "bgvideoram")
 		, m_fgvideoram(*this, "fgvideoram")
 		, m_spriteram(*this, "spriteram")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(ctrl_w);
@@ -35,8 +36,10 @@ public:
 	void portrait_map(address_map &map);
 	void portrait_sound_map(address_map &map);
 
+	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
+
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
@@ -47,7 +50,7 @@ protected:
 	required_shared_ptr<uint8_t> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 
 	int m_scroll;
 	tilemap_t *m_foreground;

@@ -9,6 +9,7 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define FIRETRUCK_MOTOR_DATA    NODE_01
@@ -60,7 +61,7 @@ public:
 		, m_bit_7(*this, "BIT_7")
 		, m_dips(*this, {"DIP_0", "DIP_1"})
 		, m_steer(*this, {"STEER_1", "STEER_2"})
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(firetrk_output_w);
@@ -120,7 +121,7 @@ public:
 	void superbug_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -145,7 +146,7 @@ protected:
 	optional_ioport m_bit_7;
 	required_ioport_array<2> m_dips;
 	optional_ioport_array<2> m_steer;
-	output_finder<4> m_led;
+	output_finder<4> m_leds;
 
 	uint8_t m_in_service_mode;
 	uint32_t m_dial[2];

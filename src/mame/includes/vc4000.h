@@ -19,6 +19,7 @@
 #include "bus/vc4000/slot.h"
 #include "bus/vc4000/rom.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 // define this to use digital inputs instead of the slow

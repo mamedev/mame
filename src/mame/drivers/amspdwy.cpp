@@ -75,16 +75,16 @@ void amspdwy_state::amspdwy_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x801f).w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(amspdwy_state::amspdwy_videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).ram().w(this, FUNC(amspdwy_state::amspdwy_colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(amspdwy_state::amspdwy_videoram_w)).share("videoram");
+	map(0x9800, 0x9bff).ram().w(FUNC(amspdwy_state::amspdwy_colorram_w)).share("colorram");
 	map(0x9c00, 0x9fff).ram(); // unused?
 //  AM_RANGE(0xa000, 0xa000) AM_WRITENOP // ?
 	map(0xa000, 0xa000).portr("DSW1");
-	map(0xa400, 0xa400).portr("DSW2").w(this, FUNC(amspdwy_state::amspdwy_flipscreen_w));
-	map(0xa800, 0xa800).r(this, FUNC(amspdwy_state::amspdwy_wheel_0_r));
-	map(0xac00, 0xac00).r(this, FUNC(amspdwy_state::amspdwy_wheel_1_r));
+	map(0xa400, 0xa400).portr("DSW2").w(FUNC(amspdwy_state::amspdwy_flipscreen_w));
+	map(0xa800, 0xa800).r(FUNC(amspdwy_state::amspdwy_wheel_0_r));
+	map(0xac00, 0xac00).r(FUNC(amspdwy_state::amspdwy_wheel_1_r));
 	map(0xb000, 0xb000).nopw(); // irq ack?
-	map(0xb400, 0xb400).r(this, FUNC(amspdwy_state::amspdwy_sound_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xb400, 0xb400).r(FUNC(amspdwy_state::amspdwy_sound_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xc000, 0xc0ff).ram().share("spriteram");
 	map(0xe000, 0xe7ff).ram();
 }

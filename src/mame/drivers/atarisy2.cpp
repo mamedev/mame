@@ -199,7 +199,7 @@ MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 {
 	atarigen_state::machine_start();
 
-	m_led.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_interrupt_enable));
 	save_item(NAME(m_p2portwr_state));
@@ -335,8 +335,8 @@ READ8_MEMBER(atarisy2_state::switch_6502_r)
 
 WRITE8_MEMBER(atarisy2_state::switch_6502_w)
 {
-	m_led[0] = BIT(data, 2);
-	m_led[1] = BIT(data, 3);
+	m_leds[0] = BIT(data, 2);
+	m_leds[1] = BIT(data, 3);
 	if (m_tms5220.found())
 	{
 		data = 12 | ((data >> 5) & 1);
@@ -738,23 +738,23 @@ void atarisy2_state::main_map(address_map &map)
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x11ff).mirror(0x0200).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x1400, 0x1400).mirror(0x007e).r("adc", FUNC(adc0808_device::data_r));
-	map(0x1400, 0x1403).mirror(0x007c).w(this, FUNC(atarisy2_state::bankselect_w));
+	map(0x1400, 0x1403).mirror(0x007c).w(FUNC(atarisy2_state::bankselect_w));
 	map(0x1480, 0x148f).mirror(0x0070).w("adc", FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
-	map(0x1580, 0x1581).mirror(0x001e).w(this, FUNC(atarisy2_state::int0_ack_w));
-	map(0x15a0, 0x15a1).mirror(0x001e).w(this, FUNC(atarisy2_state::int1_ack_w));
-	map(0x15c0, 0x15c1).mirror(0x001e).w(this, FUNC(atarisy2_state::scanline_int_ack_w));
-	map(0x15e0, 0x15e1).mirror(0x001e).w(this, FUNC(atarisy2_state::video_int_ack_w));
-	map(0x1600, 0x1601).mirror(0x007e).w(this, FUNC(atarisy2_state::int_enable_w));
+	map(0x1580, 0x1581).mirror(0x001e).w(FUNC(atarisy2_state::int0_ack_w));
+	map(0x15a0, 0x15a1).mirror(0x001e).w(FUNC(atarisy2_state::int1_ack_w));
+	map(0x15c0, 0x15c1).mirror(0x001e).w(FUNC(atarisy2_state::scanline_int_ack_w));
+	map(0x15e0, 0x15e1).mirror(0x001e).w(FUNC(atarisy2_state::video_int_ack_w));
+	map(0x1600, 0x1601).mirror(0x007e).w(FUNC(atarisy2_state::int_enable_w));
 	map(0x1680, 0x1680).mirror(0x007e).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w));
-	map(0x1700, 0x1701).mirror(0x007e).w(this, FUNC(atarisy2_state::xscroll_w)).share("xscroll");
-	map(0x1780, 0x1781).mirror(0x007e).w(this, FUNC(atarisy2_state::yscroll_w)).share("yscroll");
-	map(0x1800, 0x1801).mirror(0x03fe).r(this, FUNC(atarisy2_state::switch_r)).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x1c00, 0x1c01).mirror(0x03fe).r(this, FUNC(atarisy2_state::sound_r));
+	map(0x1700, 0x1701).mirror(0x007e).w(FUNC(atarisy2_state::xscroll_w)).share("xscroll");
+	map(0x1780, 0x1781).mirror(0x007e).w(FUNC(atarisy2_state::yscroll_w)).share("yscroll");
+	map(0x1800, 0x1801).mirror(0x03fe).r(FUNC(atarisy2_state::switch_r)).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x1c00, 0x1c01).mirror(0x03fe).r(FUNC(atarisy2_state::sound_r));
 	map(0x2000, 0x3fff).m(m_vrambank, FUNC(address_map_bank_device::amap16));
 	map(0x4000, 0x5fff).bankr("rombank1");
 	map(0x6000, 0x7fff).bankr("rombank2");
 	map(0x8000, 0xffff).rom();
-	map(0x8000, 0x81ff).rw(this, FUNC(atarisy2_state::slapstic_r), FUNC(atarisy2_state::slapstic_w)).share("slapstic_base");
+	map(0x8000, 0x81ff).rw(FUNC(atarisy2_state::slapstic_r), FUNC(atarisy2_state::slapstic_w)).share("slapstic_base");
 }
 
 
@@ -769,7 +769,7 @@ void atarisy2_state::vrambank_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x17ff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
-	map(0x1800, 0x1fff).ram().w(this, FUNC(atarisy2_state::spriteram_w)).share("mob");
+	map(0x1800, 0x1fff).ram().w(FUNC(atarisy2_state::spriteram_w)).share("mob");
 	map(0x2000, 0x3fff).ram();
 	map(0x4000, 0x7fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 }
@@ -787,19 +787,19 @@ void atarisy2_state::sound_map(address_map &map)
 	map(0x0000, 0x0fff).mirror(0x2000).ram();
 	map(0x1000, 0x17ff).mirror(0x2000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 	map(0x1800, 0x180f).mirror(0x2780).rw(m_pokey[0], FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x1810, 0x1813).mirror(0x278c).r(this, FUNC(atarisy2_state::leta_r));
+	map(0x1810, 0x1813).mirror(0x278c).r(FUNC(atarisy2_state::leta_r));
 	map(0x1830, 0x183f).mirror(0x2780).rw(m_pokey[1], FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x1840, 0x1840).mirror(0x278f).r(this, FUNC(atarisy2_state::switch_6502_r));
+	map(0x1840, 0x1840).mirror(0x278f).r(FUNC(atarisy2_state::switch_6502_r));
 	map(0x1850, 0x1851).mirror(0x278e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x1860, 0x1860).mirror(0x278f).r(this, FUNC(atarisy2_state::sound_6502_r));
-	map(0x1870, 0x1870).mirror(0x2781).w(this, FUNC(atarisy2_state::tms5220_w));
-	map(0x1872, 0x1873).mirror(0x2780).w(this, FUNC(atarisy2_state::tms5220_strobe_w));
-	map(0x1874, 0x1874).mirror(0x2781).w(this, FUNC(atarisy2_state::sound_6502_w));
-	map(0x1876, 0x1876).mirror(0x2781).w(this, FUNC(atarisy2_state::coincount_w));
+	map(0x1860, 0x1860).mirror(0x278f).r(FUNC(atarisy2_state::sound_6502_r));
+	map(0x1870, 0x1870).mirror(0x2781).w(FUNC(atarisy2_state::tms5220_w));
+	map(0x1872, 0x1873).mirror(0x2780).w(FUNC(atarisy2_state::tms5220_strobe_w));
+	map(0x1874, 0x1874).mirror(0x2781).w(FUNC(atarisy2_state::sound_6502_w));
+	map(0x1876, 0x1876).mirror(0x2781).w(FUNC(atarisy2_state::coincount_w));
 	map(0x1878, 0x1878).mirror(0x2781).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_irq_ack_w));
-	map(0x187a, 0x187a).mirror(0x2781).w(this, FUNC(atarisy2_state::mixer_w));
-	map(0x187c, 0x187c).mirror(0x2781).w(this, FUNC(atarisy2_state::switch_6502_w));
-	map(0x187e, 0x187e).mirror(0x2781).w(this, FUNC(atarisy2_state::sound_reset_w));
+	map(0x187a, 0x187a).mirror(0x2781).w(FUNC(atarisy2_state::mixer_w));
+	map(0x187c, 0x187c).mirror(0x2781).w(FUNC(atarisy2_state::switch_6502_w));
+	map(0x187e, 0x187e).mirror(0x2781).w(FUNC(atarisy2_state::sound_reset_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -1261,7 +1261,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy2_state::paperboy)
 	atarisy2(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 105)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 105, false)
 MACHINE_CONFIG_END
 
 
@@ -1271,13 +1271,13 @@ MACHINE_CONFIG_START(atarisy2_state::_720)
 	   issues with the sound CPU; temporarily increasing the sound CPU frequency
 	   to ~2.2MHz "fixes" the problem */
 
-	MCFG_SLAPSTIC_ADD("slapstic", 107)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, false)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(atarisy2_state::ssprint)
 	atarisy2(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 108)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 108, false)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("tms")
@@ -1286,7 +1286,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy2_state::csprint)
 	atarisy2(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 109)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 109, false)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("tms")
@@ -1295,7 +1295,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy2_state::apb)
 	atarisy2(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 110)
+	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 110, false)
 MACHINE_CONFIG_END
 
 

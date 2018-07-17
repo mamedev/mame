@@ -83,7 +83,6 @@
 #include "includes/mz700.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74145.h"
 #include "sound/sn76496.h"
 #include "sound/wave.h"
 
@@ -99,7 +98,7 @@
 
 TIMER_DEVICE_CALLBACK_MEMBER(mz_state::ne556_cursor_callback)
 {
-	m_cursor_timer ^= 1;
+	m_cursor_bit ^= 1;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mz_state::ne556_other_callback)
@@ -127,7 +126,7 @@ void mz_state::mz700_banke(address_map &map)
 	// bank 1: devices (mz700_bank3)
 	map(0x2000, 0x2003).mirror(0x1ff0).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x2004, 0x2007).mirror(0x1ff0).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x2008, 0x200b).mirror(0x1ff0).rw(this, FUNC(mz_state::mz700_e008_r), FUNC(mz_state::mz700_e008_w));
+	map(0x2008, 0x200b).mirror(0x1ff0).rw(FUNC(mz_state::mz700_e008_r), FUNC(mz_state::mz700_e008_w));
 	map(0x200c, 0x200f).mirror(0x1ff0).noprw();
 	// bank 2: switched out (mz700_bank5)
 	map(0x4000, 0x5fff).noprw();
@@ -136,13 +135,13 @@ void mz_state::mz700_banke(address_map &map)
 void mz_state::mz700_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xe0, 0xe0).w(this, FUNC(mz_state::mz700_bank_0_w));
-	map(0xe1, 0xe1).w(this, FUNC(mz_state::mz700_bank_1_w));
-	map(0xe2, 0xe2).w(this, FUNC(mz_state::mz700_bank_2_w));
-	map(0xe3, 0xe3).w(this, FUNC(mz_state::mz700_bank_3_w));
-	map(0xe4, 0xe4).w(this, FUNC(mz_state::mz700_bank_4_w));
-	map(0xe5, 0xe5).w(this, FUNC(mz_state::mz700_bank_5_w));
-	map(0xe6, 0xe6).w(this, FUNC(mz_state::mz700_bank_6_w));
+	map(0xe0, 0xe0).w(FUNC(mz_state::mz700_bank_0_w));
+	map(0xe1, 0xe1).w(FUNC(mz_state::mz700_bank_1_w));
+	map(0xe2, 0xe2).w(FUNC(mz_state::mz700_bank_2_w));
+	map(0xe3, 0xe3).w(FUNC(mz_state::mz700_bank_3_w));
+	map(0xe4, 0xe4).w(FUNC(mz_state::mz700_bank_4_w));
+	map(0xe5, 0xe5).w(FUNC(mz_state::mz700_bank_5_w));
+	map(0xe6, 0xe6).w(FUNC(mz_state::mz700_bank_6_w));
 }
 
 void mz_state::mz800_mem(address_map &map)
@@ -163,7 +162,7 @@ void mz_state::mz800_bankf(address_map &map)
 	// bank 1: devices (mz700_bank3)
 	map(0x2000, 0x2003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x2004, 0x2007).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x2008, 0x200b).rw(this, FUNC(mz_state::mz700_e008_r), FUNC(mz_state::mz700_e008_w));
+	map(0x2008, 0x200b).rw(FUNC(mz_state::mz700_e008_r), FUNC(mz_state::mz700_e008_w));
 	map(0x200c, 0x200f).noprw();
 	map(0x2010, 0x3fff).rom().region("monitor", 0x2010);
 	// bank 2: switched out (mz700_bank5)
@@ -173,24 +172,24 @@ void mz_state::mz800_bankf(address_map &map)
 void mz_state::mz800_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xcc, 0xcc).w(this, FUNC(mz_state::mz800_write_format_w));
-	map(0xcd, 0xcd).w(this, FUNC(mz_state::mz800_read_format_w));
-	map(0xce, 0xce).rw(this, FUNC(mz_state::mz800_crtc_r), FUNC(mz_state::mz800_display_mode_w));
-	map(0xcf, 0xcf).w(this, FUNC(mz_state::mz800_scroll_border_w));
+	map(0xcc, 0xcc).w(FUNC(mz_state::mz800_write_format_w));
+	map(0xcd, 0xcd).w(FUNC(mz_state::mz800_read_format_w));
+	map(0xce, 0xce).rw(FUNC(mz_state::mz800_crtc_r), FUNC(mz_state::mz800_display_mode_w));
+	map(0xcf, 0xcf).w(FUNC(mz_state::mz800_scroll_border_w));
 	map(0xd0, 0xd3).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xd4, 0xd7).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xe0, 0xe0).rw(this, FUNC(mz_state::mz800_bank_0_r), FUNC(mz_state::mz800_bank_0_w));
-	map(0xe1, 0xe1).rw(this, FUNC(mz_state::mz800_bank_1_r), FUNC(mz_state::mz700_bank_1_w));
-	map(0xe2, 0xe2).w(this, FUNC(mz_state::mz700_bank_2_w));
-	map(0xe3, 0xe3).w(this, FUNC(mz_state::mz700_bank_3_w));
-	map(0xe4, 0xe4).w(this, FUNC(mz_state::mz700_bank_4_w));
-	map(0xe5, 0xe5).w(this, FUNC(mz_state::mz700_bank_5_w));
-	map(0xe6, 0xe6).w(this, FUNC(mz_state::mz700_bank_6_w));
-	map(0xea, 0xea).rw(this, FUNC(mz_state::mz800_ramdisk_r), FUNC(mz_state::mz800_ramdisk_w));
-	map(0xeb, 0xeb).w(this, FUNC(mz_state::mz800_ramaddr_w));
-	map(0xf0, 0xf0).portr("atari_joy1").w(this, FUNC(mz_state::mz800_palette_w));
+	map(0xe0, 0xe0).rw(FUNC(mz_state::mz800_bank_0_r), FUNC(mz_state::mz800_bank_0_w));
+	map(0xe1, 0xe1).rw(FUNC(mz_state::mz800_bank_1_r), FUNC(mz_state::mz700_bank_1_w));
+	map(0xe2, 0xe2).w(FUNC(mz_state::mz700_bank_2_w));
+	map(0xe3, 0xe3).w(FUNC(mz_state::mz700_bank_3_w));
+	map(0xe4, 0xe4).w(FUNC(mz_state::mz700_bank_4_w));
+	map(0xe5, 0xe5).w(FUNC(mz_state::mz700_bank_5_w));
+	map(0xe6, 0xe6).w(FUNC(mz_state::mz700_bank_6_w));
+	map(0xea, 0xea).rw(FUNC(mz_state::mz800_ramdisk_r), FUNC(mz_state::mz800_ramdisk_w));
+	map(0xeb, 0xeb).w(FUNC(mz_state::mz800_ramaddr_w));
+	map(0xf0, 0xf0).portr("atari_joy1").w(FUNC(mz_state::mz800_palette_w));
 	map(0xf1, 0xf1).portr("atari_joy2");
-	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489_device::write));
+	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489_device::command_w));
 	map(0xfc, 0xff).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
@@ -470,9 +469,9 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, mz_state, mz800_z80pio_irq))
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz_state, mz800_z80pio_port_a_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz_state, mz800_z80pio_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END

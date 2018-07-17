@@ -66,6 +66,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "sound/tms5220.h"
 #include "sound/volt_reg.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -548,19 +549,19 @@ void looping_state::looping_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 
-	map(0x9000, 0x93ff).ram().w(this, FUNC(looping_state::looping_videoram_w)).share("videoram");
+	map(0x9000, 0x93ff).ram().w(FUNC(looping_state::looping_videoram_w)).share("videoram");
 
-	map(0x9800, 0x983f).mirror(0x0700).ram().w(this, FUNC(looping_state::looping_colorram_w)).share("colorram");
+	map(0x9800, 0x983f).mirror(0x0700).ram().w(FUNC(looping_state::looping_colorram_w)).share("colorram");
 	map(0x9840, 0x987f).mirror(0x0700).ram().share("spriteram");
 	map(0x9880, 0x98ff).mirror(0x0700).ram();
 
 	map(0xb000, 0xb007).mirror(0x07f8).w("videolatch", FUNC(ls259_device::write_d0));
 
 	map(0xe000, 0xefff).ram();
-	map(0xf800, 0xf800).mirror(0x03fc).portr("P1").w(this, FUNC(looping_state::out_0_w));                 /* /OUT0 */
-	map(0xf801, 0xf801).mirror(0x03fc).portr("P2").w(this, FUNC(looping_state::looping_soundlatch_w));    /* /OUT1 */
-	map(0xf802, 0xf802).mirror(0x03fc).portr("DSW").w(this, FUNC(looping_state::out_2_w));                /* /OUT2 */
-	map(0xf803, 0xf803).mirror(0x03fc).rw(this, FUNC(looping_state::adc_r), FUNC(looping_state::adc_w));
+	map(0xf800, 0xf800).mirror(0x03fc).portr("P1").w(FUNC(looping_state::out_0_w));                 /* /OUT0 */
+	map(0xf801, 0xf801).mirror(0x03fc).portr("P2").w(FUNC(looping_state::looping_soundlatch_w));    /* /OUT1 */
+	map(0xf802, 0xf802).mirror(0x03fc).portr("DSW").w(FUNC(looping_state::out_2_w));                /* /OUT2 */
+	map(0xf803, 0xf803).mirror(0x03fc).rw(FUNC(looping_state::adc_r), FUNC(looping_state::adc_w));
 }
 
 void looping_state::looping_io_map(address_map &map)

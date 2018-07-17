@@ -16,6 +16,7 @@
 #include "bus/arcadia/slot.h"
 #include "bus/arcadia/rom.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 // space vultures sprites above

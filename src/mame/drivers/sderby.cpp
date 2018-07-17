@@ -206,9 +206,9 @@ WRITE16_MEMBER(sderby_state::sderby_out_w)
     x--- ----  End of Race lamp.
 
 */
-	m_lamp[1] = BIT(data, 0);      /* Lamp 1 - START */
-	m_lamp[2] = BIT(data, 1);      /* Lamp 2 - BET */
-	m_lamp[3] = BIT(data, 15);     /* Lamp 3 - END OF RACE */
+	m_lamps[0] = BIT(data, 0);      /* Lamp 1 - START */
+	m_lamps[1] = BIT(data, 1);      /* Lamp 2 - BET */
+	m_lamps[2] = BIT(data, 15);     /* Lamp 3 - END OF RACE */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x2000);
 }
@@ -251,13 +251,13 @@ WRITE16_MEMBER(sderby_state::scmatto_out_w)
     --x- ----  Coin counter.
 
 */
-	m_lamp[1] = BIT(data, 0);      /* Lamp 1 - HOLD 1 */
-	m_lamp[2] = BIT(data, 1);      /* Lamp 2 - HOLD 2 */
-	m_lamp[3] = BIT(data, 2);      /* Lamp 3 - HOLD 3 */
-	m_lamp[4] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
-	m_lamp[5] = BIT(data, 4);      /* Lamp 5 - HOLD 5 */
-	m_lamp[6] = BIT(data, 5);      /* Lamp 6 - START  */
-	m_lamp[7] = BIT(data, 6);      /* Lamp 7 - BET    */
+	m_lamps[0] = BIT(data, 0);      /* Lamp 1 - HOLD 1 */
+	m_lamps[1] = BIT(data, 1);      /* Lamp 2 - HOLD 2 */
+	m_lamps[2] = BIT(data, 2);      /* Lamp 3 - HOLD 3 */
+	m_lamps[3] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
+	m_lamps[4] = BIT(data, 4);      /* Lamp 5 - HOLD 5 */
+	m_lamps[5] = BIT(data, 5);      /* Lamp 6 - START  */
+	m_lamps[6] = BIT(data, 6);      /* Lamp 7 - BET    */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x2000);
 }
@@ -287,8 +287,8 @@ WRITE16_MEMBER(sderby_state::roulette_out_w)
     ---- x---  Unknown (always activated).
 
 */
-	m_lamp[1] = BIT(data, 0);      /* Lamp 1 - START */
-	m_lamp[2] = BIT(data, 1);      /* Lamp 2 - BET   */
+	m_lamps[0] = BIT(data, 0);      /* Lamp 1 - START */
+	m_lamps[1] = BIT(data, 1);      /* Lamp 2 - BET   */
 }
 
 
@@ -299,15 +299,15 @@ WRITE16_MEMBER(sderby_state::roulette_out_w)
 void sderby_state::sderby_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(sderby_state::sderby_videoram_w)).share("videoram");       /* bg */
-	map(0x101000, 0x101fff).ram().w(this, FUNC(sderby_state::sderby_md_videoram_w)).share("md_videoram"); /* mid */
-	map(0x102000, 0x103fff).ram().w(this, FUNC(sderby_state::sderby_fg_videoram_w)).share("fg_videoram"); /* fg */
-	map(0x104000, 0x10400b).w(this, FUNC(sderby_state::sderby_scroll_w));
+	map(0x100000, 0x100fff).ram().w(FUNC(sderby_state::sderby_videoram_w)).share("videoram");       /* bg */
+	map(0x101000, 0x101fff).ram().w(FUNC(sderby_state::sderby_md_videoram_w)).share("md_videoram"); /* mid */
+	map(0x102000, 0x103fff).ram().w(FUNC(sderby_state::sderby_fg_videoram_w)).share("fg_videoram"); /* fg */
+	map(0x104000, 0x10400b).w(FUNC(sderby_state::sderby_scroll_w));
 	map(0x10400c, 0x10400d).nopw();    /* ??? - check code at 0x000456 (executed once at startup) */
 	map(0x10400e, 0x10400f).nopw();    /* ??? - check code at 0x000524 (executed once at startup) */
 	map(0x200000, 0x200fff).ram().share("spriteram");
-	map(0x308000, 0x30800d).r(this, FUNC(sderby_state::sderby_input_r));
-	map(0x308008, 0x308009).w(this, FUNC(sderby_state::sderby_out_w)); /* output port */
+	map(0x308000, 0x30800d).r(FUNC(sderby_state::sderby_input_r));
+	map(0x308008, 0x308009).w(FUNC(sderby_state::sderby_out_w)); /* output port */
 	map(0x30800f, 0x30800f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x380000, 0x380fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x500001).nopw();    /* unknown... write 0x01 in game, and 0x00 on reset */
@@ -318,15 +318,15 @@ void sderby_state::sderby_map(address_map &map)
 void sderby_state::sderbya_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(sderby_state::sderby_videoram_w)).share("videoram");       /* bg */
-	map(0x101000, 0x101fff).ram().w(this, FUNC(sderby_state::sderby_md_videoram_w)).share("md_videoram"); /* mid */
-	map(0x102000, 0x103fff).ram().w(this, FUNC(sderby_state::sderby_fg_videoram_w)).share("fg_videoram"); /* fg */
-	map(0x104000, 0x10400b).w(this, FUNC(sderby_state::sderby_scroll_w));
+	map(0x100000, 0x100fff).ram().w(FUNC(sderby_state::sderby_videoram_w)).share("videoram");       /* bg */
+	map(0x101000, 0x101fff).ram().w(FUNC(sderby_state::sderby_md_videoram_w)).share("md_videoram"); /* mid */
+	map(0x102000, 0x103fff).ram().w(FUNC(sderby_state::sderby_fg_videoram_w)).share("fg_videoram"); /* fg */
+	map(0x104000, 0x10400b).w(FUNC(sderby_state::sderby_scroll_w));
 	map(0x10400c, 0x10400d).nopw();    /* ??? - check code at 0x000456 (executed once at startup) */
 	map(0x10400e, 0x10400f).nopw();    /* ??? - check code at 0x000524 (executed once at startup) */
 	map(0x200000, 0x200fff).ram().share("spriteram");
-	map(0x308000, 0x30800d).r(this, FUNC(sderby_state::sderbya_input_r));
-	map(0x308008, 0x308009).w(this, FUNC(sderby_state::sderby_out_w)); /* output port */
+	map(0x308000, 0x30800d).r(FUNC(sderby_state::sderbya_input_r));
+	map(0x308008, 0x308009).w(FUNC(sderby_state::sderby_out_w)); /* output port */
 	map(0x30800f, 0x30800f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x380000, 0x380fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x300000, 0x300001).nopw();    /* unknown... write 0x01 in game, and 0x00 on reset */      //MOD
@@ -338,15 +338,15 @@ void sderby_state::sderbya_map(address_map &map)
 void sderby_state::luckboom_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(sderby_state::sderby_videoram_w)).share("videoram");       /* bg */
-	map(0x101000, 0x101fff).ram().w(this, FUNC(sderby_state::sderby_md_videoram_w)).share("md_videoram"); /* mid */
-	map(0x102000, 0x103fff).ram().w(this, FUNC(sderby_state::sderby_fg_videoram_w)).share("fg_videoram"); /* fg */
-	map(0x104000, 0x10400b).w(this, FUNC(sderby_state::sderby_scroll_w));
+	map(0x100000, 0x100fff).ram().w(FUNC(sderby_state::sderby_videoram_w)).share("videoram");       /* bg */
+	map(0x101000, 0x101fff).ram().w(FUNC(sderby_state::sderby_md_videoram_w)).share("md_videoram"); /* mid */
+	map(0x102000, 0x103fff).ram().w(FUNC(sderby_state::sderby_fg_videoram_w)).share("fg_videoram"); /* fg */
+	map(0x104000, 0x10400b).w(FUNC(sderby_state::sderby_scroll_w));
 	map(0x10400c, 0x10400d).nopw();    /* ??? - check code at 0x000456 (executed once at startup) */
 	map(0x10400e, 0x10400f).nopw();    /* ??? - check code at 0x000524 (executed once at startup) */
 	map(0x200000, 0x200fff).ram().share("spriteram");
-	map(0x308000, 0x30800d).r(this, FUNC(sderby_state::sderby_input_r));
-	map(0x308008, 0x308009).w(this, FUNC(sderby_state::sderby_out_w)); /* output port */
+	map(0x308000, 0x30800d).r(FUNC(sderby_state::sderby_input_r));
+	map(0x308008, 0x308009).w(FUNC(sderby_state::sderby_out_w)); /* output port */
 	map(0x30800f, 0x30800f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x380000, 0x380fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x500001).nopw();    /* unknown... write 0x01 in game, and 0x00 on reset */
@@ -357,16 +357,16 @@ void sderby_state::luckboom_map(address_map &map)
 void sderby_state::spacewin_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(sderby_state::sderby_videoram_w)).share("videoram");       /* bg */
-	map(0x101000, 0x101fff).ram().w(this, FUNC(sderby_state::sderby_md_videoram_w)).share("md_videoram"); /* mid */
-	map(0x102000, 0x103fff).ram().w(this, FUNC(sderby_state::sderby_fg_videoram_w)).share("fg_videoram"); /* fg */
-	map(0x104000, 0x10400b).w(this, FUNC(sderby_state::sderby_scroll_w));  /* tilemaps offset control */
+	map(0x100000, 0x100fff).ram().w(FUNC(sderby_state::sderby_videoram_w)).share("videoram");       /* bg */
+	map(0x101000, 0x101fff).ram().w(FUNC(sderby_state::sderby_md_videoram_w)).share("md_videoram"); /* mid */
+	map(0x102000, 0x103fff).ram().w(FUNC(sderby_state::sderby_fg_videoram_w)).share("fg_videoram"); /* fg */
+	map(0x104000, 0x10400b).w(FUNC(sderby_state::sderby_scroll_w));  /* tilemaps offset control */
 	map(0x10400c, 0x10400d).nopw();    /* seems another video register. constantly used */
 	map(0x10400e, 0x10400f).nopw();    /* seems another video register. constantly used */
 	map(0x104010, 0x105fff).nopw();    /* unknown */
 	map(0x300000, 0x300001).nopw();    /* unknown... write 0x01 in game, and 0x00 on reset */
-	map(0x308000, 0x30800d).r(this, FUNC(sderby_state::sderby_input_r));
-	map(0x308008, 0x308009).w(this, FUNC(sderby_state::scmatto_out_w));    /* output port */
+	map(0x308000, 0x30800d).r(FUNC(sderby_state::sderby_input_r));
+	map(0x308008, 0x308009).w(FUNC(sderby_state::scmatto_out_w));    /* output port */
 	map(0x30800f, 0x30800f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x380000, 0x380fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd00000, 0xd001ff).ram();
@@ -379,15 +379,15 @@ void sderby_state::spacewin_map(address_map &map)
 void sderby_state::shinygld_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(sderby_state::sderby_videoram_w)).share("videoram");       /* bg */
-	map(0x101000, 0x101fff).ram().w(this, FUNC(sderby_state::sderby_md_videoram_w)).share("md_videoram"); /* mid */
-	map(0x102000, 0x103fff).ram().w(this, FUNC(sderby_state::sderby_fg_videoram_w)).share("fg_videoram"); /* fg */
-	map(0x104000, 0x10400b).w(this, FUNC(sderby_state::sderby_scroll_w));  /* tilemaps offset control */
+	map(0x100000, 0x100fff).ram().w(FUNC(sderby_state::sderby_videoram_w)).share("videoram");       /* bg */
+	map(0x101000, 0x101fff).ram().w(FUNC(sderby_state::sderby_md_videoram_w)).share("md_videoram"); /* mid */
+	map(0x102000, 0x103fff).ram().w(FUNC(sderby_state::sderby_fg_videoram_w)).share("fg_videoram"); /* fg */
+	map(0x104000, 0x10400b).w(FUNC(sderby_state::sderby_scroll_w));  /* tilemaps offset control */
 	map(0x10400c, 0x10400d).nopw();    /* seems another video register. constantly used */
 	map(0x10400e, 0x10400f).nopw();    /* seems another video register. constantly used */
 	map(0x104010, 0x105fff).nopw();    /* unknown */
 	map(0x300000, 0x300001).nopw();    /* unknown... write 0x01 in game, and 0x00 on reset */
-	map(0x308000, 0x30800d).r(this, FUNC(sderby_state::sderby_input_r));
+	map(0x308000, 0x30800d).r(FUNC(sderby_state::sderby_input_r));
 	map(0x308008, 0x308009).nopw();    /* output port */
 	map(0x30800f, 0x30800f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x380000, 0x380fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -401,17 +401,17 @@ void sderby_state::roulette_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x440000, 0x440fff).writeonly().share("spriteram");
-	map(0x500000, 0x500fff).ram().w(this, FUNC(sderby_state::sderby_videoram_w)).share("videoram");           /* bg */
-	map(0x501000, 0x501fff).ram().w(this, FUNC(sderby_state::sderby_md_videoram_w)).share("md_videoram"); /* mid */
-	map(0x502000, 0x503fff).ram().w(this, FUNC(sderby_state::sderby_fg_videoram_w)).share("fg_videoram"); /* fg */
-	map(0x504000, 0x50400b).ram().w(this, FUNC(sderby_state::sderby_scroll_w));
+	map(0x500000, 0x500fff).ram().w(FUNC(sderby_state::sderby_videoram_w)).share("videoram");           /* bg */
+	map(0x501000, 0x501fff).ram().w(FUNC(sderby_state::sderby_md_videoram_w)).share("md_videoram"); /* mid */
+	map(0x502000, 0x503fff).ram().w(FUNC(sderby_state::sderby_fg_videoram_w)).share("fg_videoram"); /* fg */
+	map(0x504000, 0x50400b).ram().w(FUNC(sderby_state::sderby_scroll_w));
 	map(0x50400e, 0x50400f).nopw();
 
-	map(0x708000, 0x708009).r(this, FUNC(sderby_state::roulette_input_r));
-	map(0x708006, 0x708007).w(this, FUNC(sderby_state::roulette_out_w));
+	map(0x708000, 0x708009).r(FUNC(sderby_state::roulette_input_r));
+	map(0x708006, 0x708007).w(FUNC(sderby_state::roulette_out_w));
 	map(0x70800b, 0x70800b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x70800c, 0x70800d).nopw();    /* watchdog?? (0x0003) */
-	map(0x70800e, 0x70800f).rw(this, FUNC(sderby_state::rprot_r), FUNC(sderby_state::rprot_w)); /* MCU communication */
+	map(0x70800e, 0x70800f).rw(FUNC(sderby_state::rprot_r), FUNC(sderby_state::rprot_w)); /* MCU communication */
 	map(0x780000, 0x780fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0xff0000, 0xff07ff).ram().share("nvram");

@@ -505,25 +505,25 @@ void digel804_state::z80_io_1_4(address_map &map)
 	map.global_mask(0xff);
 	// io bits: x 1 x x x * * *
 	// writes to 47, 4e, 57, 5e, 67, 6e, 77, 7e, c7, ce, d7, de, e7, ee, f7, fe all go to 47, same with reads
-	map(0x00, 0x00).mirror(0x38).w(this, FUNC(digel804_state::op00)); // W, banked ram
-	map(0x40, 0x40).mirror(0xB8).rw(this, FUNC(digel804_state::ip40), FUNC(digel804_state::op40)); // RW, eprom socket data bus input/output value
-	map(0x41, 0x41).mirror(0xB8).w(this, FUNC(digel804_state::op41)); // W, eprom socket address low out
-	map(0x42, 0x42).mirror(0xB8).w(this, FUNC(digel804_state::op42)); // W, eprom socket address hi/control out
-	map(0x43, 0x43).mirror(0xB8).rw(this, FUNC(digel804_state::ip43), FUNC(digel804_state::op43_1_4)); // RW, mode and status register, also checks if keypad is pressed; write is unknown
-	map(0x44, 0x44).mirror(0xB8).w(this, FUNC(digel804_state::op44)); // W, 10937 vfd controller, z80 power and state control reg
-	map(0x45, 0x45).mirror(0xB8).w(this, FUNC(digel804_state::op45)); // W, speaker bit; every write inverts state
-	map(0x46, 0x46).mirror(0xB8).rw(this, FUNC(digel804_state::ip46), FUNC(digel804_state::op46)); // RW, reads keypad, writes controls the front panel leds.
-	map(0x47, 0x47).mirror(0xB8).w(this, FUNC(digel804_state::op47)); // W eprom socket power and timing control
+	map(0x00, 0x00).mirror(0x38).w(FUNC(digel804_state::op00)); // W, banked ram
+	map(0x40, 0x40).mirror(0xB8).rw(FUNC(digel804_state::ip40), FUNC(digel804_state::op40)); // RW, eprom socket data bus input/output value
+	map(0x41, 0x41).mirror(0xB8).w(FUNC(digel804_state::op41)); // W, eprom socket address low out
+	map(0x42, 0x42).mirror(0xB8).w(FUNC(digel804_state::op42)); // W, eprom socket address hi/control out
+	map(0x43, 0x43).mirror(0xB8).rw(FUNC(digel804_state::ip43), FUNC(digel804_state::op43_1_4)); // RW, mode and status register, also checks if keypad is pressed; write is unknown
+	map(0x44, 0x44).mirror(0xB8).w(FUNC(digel804_state::op44)); // W, 10937 vfd controller, z80 power and state control reg
+	map(0x45, 0x45).mirror(0xB8).w(FUNC(digel804_state::op45)); // W, speaker bit; every write inverts state
+	map(0x46, 0x46).mirror(0xB8).rw(FUNC(digel804_state::ip46), FUNC(digel804_state::op46)); // RW, reads keypad, writes controls the front panel leds.
+	map(0x47, 0x47).mirror(0xB8).w(FUNC(digel804_state::op47)); // W eprom socket power and timing control
 	// io bits: 1 0 x x x * * *
 	// writes to 80, 88, 90, 98, a0, a8, b0, b8 all go to 80, same with reads
-	map(0x80, 0x80).mirror(0x38).w(this, FUNC(digel804_state::acia_txd_w)); // (ACIA xmit reg)
-	map(0x81, 0x81).mirror(0x38).r(this, FUNC(digel804_state::acia_rxd_r)); // (ACIA rcv reg)
-	map(0x82, 0x82).mirror(0x38).w(this, FUNC(digel804_state::acia_reset_w)); // (ACIA reset reg)
-	map(0x83, 0x83).mirror(0x38).r(this, FUNC(digel804_state::acia_status_r)); // (ACIA status reg)
-	map(0x84, 0x84).mirror(0x38).w(this, FUNC(digel804_state::acia_command_w)); // (ACIA command reg)
-	map(0x85, 0x85).mirror(0x38).r(this, FUNC(digel804_state::acia_command_r)); // (ACIA command reg)
-	map(0x86, 0x86).mirror(0x38).w(this, FUNC(digel804_state::acia_control_w)); // (ACIA control reg)
-	map(0x87, 0x87).mirror(0x38).r(this, FUNC(digel804_state::acia_control_r)); // (ACIA control reg)
+	map(0x80, 0x80).mirror(0x38).w(FUNC(digel804_state::acia_txd_w)); // (ACIA xmit reg)
+	map(0x81, 0x81).mirror(0x38).r(FUNC(digel804_state::acia_rxd_r)); // (ACIA rcv reg)
+	map(0x82, 0x82).mirror(0x38).w(FUNC(digel804_state::acia_reset_w)); // (ACIA reset reg)
+	map(0x83, 0x83).mirror(0x38).r(FUNC(digel804_state::acia_status_r)); // (ACIA status reg)
+	map(0x84, 0x84).mirror(0x38).w(FUNC(digel804_state::acia_command_w)); // (ACIA command reg)
+	map(0x85, 0x85).mirror(0x38).r(FUNC(digel804_state::acia_command_r)); // (ACIA command reg)
+	map(0x86, 0x86).mirror(0x38).w(FUNC(digel804_state::acia_control_w)); // (ACIA control reg)
+	map(0x87, 0x87).mirror(0x38).r(FUNC(digel804_state::acia_control_r)); // (ACIA control reg)
 	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", mos6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
 
 }
@@ -534,24 +534,24 @@ void ep804_state::z80_io_1_2(address_map &map)
 	map.global_mask(0xff);
 	// io bits: x 1 x x x * * *
 	// writes to 47, 4e, 57, 5e, 67, 6e, 77, 7e, c7, ce, d7, de, e7, ee, f7, fe all go to 47, same with reads
-	map(0x40, 0x40).mirror(0xB8).rw(this, FUNC(ep804_state::ip40), FUNC(ep804_state::op40)); // RW, eprom socket data bus input/output value
-	map(0x41, 0x41).mirror(0xB8).w(this, FUNC(ep804_state::op41)); // W, eprom socket address low out
-	map(0x42, 0x42).mirror(0xB8).w(this, FUNC(ep804_state::op42)); // W, eprom socket address hi/control out
-	map(0x43, 0x43).mirror(0xB8).rw(this, FUNC(ep804_state::ip43), FUNC(ep804_state::op43)); // RW, mode and status register, also checks if keypad is pressed; write is unknown
-	map(0x44, 0x44).mirror(0xB8).w(this, FUNC(ep804_state::op44)); // W, 10937 vfd controller, z80 power and state control reg
-	map(0x45, 0x45).mirror(0xB8).w(this, FUNC(ep804_state::op45)); // W, speaker bit; every write inverts state
-	map(0x46, 0x46).mirror(0xB8).rw(this, FUNC(ep804_state::ip46), FUNC(ep804_state::op46)); // RW, reads keypad, writes controls the front panel leds.
-	map(0x47, 0x47).mirror(0xB8).w(this, FUNC(ep804_state::op47)); // W eprom socket power and timing control
+	map(0x40, 0x40).mirror(0xB8).rw(FUNC(ep804_state::ip40), FUNC(ep804_state::op40)); // RW, eprom socket data bus input/output value
+	map(0x41, 0x41).mirror(0xB8).w(FUNC(ep804_state::op41)); // W, eprom socket address low out
+	map(0x42, 0x42).mirror(0xB8).w(FUNC(ep804_state::op42)); // W, eprom socket address hi/control out
+	map(0x43, 0x43).mirror(0xB8).rw(FUNC(ep804_state::ip43), FUNC(ep804_state::op43)); // RW, mode and status register, also checks if keypad is pressed; write is unknown
+	map(0x44, 0x44).mirror(0xB8).w(FUNC(ep804_state::op44)); // W, 10937 vfd controller, z80 power and state control reg
+	map(0x45, 0x45).mirror(0xB8).w(FUNC(ep804_state::op45)); // W, speaker bit; every write inverts state
+	map(0x46, 0x46).mirror(0xB8).rw(FUNC(ep804_state::ip46), FUNC(ep804_state::op46)); // RW, reads keypad, writes controls the front panel leds.
+	map(0x47, 0x47).mirror(0xB8).w(FUNC(ep804_state::op47)); // W eprom socket power and timing control
 	// io bits: 1 0 x x x * * *
 	// writes to 80, 88, 90, 98, a0, a8, b0, b8 all go to 80, same with reads
-	map(0x80, 0x80).mirror(0x38).w(this, FUNC(ep804_state::acia_txd_w)); // (ACIA xmit reg)
-	map(0x81, 0x81).mirror(0x38).r(this, FUNC(ep804_state::acia_rxd_r)); // (ACIA rcv reg)
-	map(0x82, 0x82).mirror(0x38).w(this, FUNC(ep804_state::acia_reset_w)); // (ACIA reset reg)
-	map(0x83, 0x83).mirror(0x38).r(this, FUNC(ep804_state::acia_status_r)); // (ACIA status reg)
-	map(0x84, 0x84).mirror(0x38).w(this, FUNC(ep804_state::acia_command_w)); // (ACIA command reg)
-	map(0x85, 0x85).mirror(0x38).r(this, FUNC(ep804_state::acia_command_r)); // (ACIA command reg)
-	map(0x86, 0x86).mirror(0x38).w(this, FUNC(ep804_state::acia_control_w)); // (ACIA control reg)
-	map(0x87, 0x87).mirror(0x38).r(this, FUNC(ep804_state::acia_control_r)); // (ACIA control reg)
+	map(0x80, 0x80).mirror(0x38).w(FUNC(ep804_state::acia_txd_w)); // (ACIA xmit reg)
+	map(0x81, 0x81).mirror(0x38).r(FUNC(ep804_state::acia_rxd_r)); // (ACIA rcv reg)
+	map(0x82, 0x82).mirror(0x38).w(FUNC(ep804_state::acia_reset_w)); // (ACIA reset reg)
+	map(0x83, 0x83).mirror(0x38).r(FUNC(ep804_state::acia_status_r)); // (ACIA status reg)
+	map(0x84, 0x84).mirror(0x38).w(FUNC(ep804_state::acia_command_w)); // (ACIA command reg)
+	map(0x85, 0x85).mirror(0x38).r(FUNC(ep804_state::acia_command_r)); // (ACIA command reg)
+	map(0x86, 0x86).mirror(0x38).w(FUNC(ep804_state::acia_control_w)); // (ACIA control reg)
+	map(0x87, 0x87).mirror(0x38).r(FUNC(ep804_state::acia_control_r)); // (ACIA control reg)
 	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", mos6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
 
 }
@@ -752,15 +752,15 @@ ROM_START(ep804) // address mapper 804-1-2
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("ep804_v1.6")
 	ROM_SYSTEM_BIOS( 0, "ep804_v1.6", "Wavetek/Digelec EP804 FWv1.6") // hardware 1.1
-	ROMX_LOAD("804-2__rev_1.6__07f7.hn482764g-4.d41", 0x0000, 0x2000, CRC(2d4c334c) SHA1(1be70ed5f4f315a8d2e38a17327a049e00fa174e), ROM_BIOS(1))
-	ROMX_LOAD("804-3__rev_1.6__265c.hn482764g-4.d42", 0x2000, 0x2000, CRC(9c14906b) SHA1(41996039e604011c7c0f757397f82b6479ee3f62), ROM_BIOS(1))
+	ROMX_LOAD("804-2__rev_1.6__07f7.hn482764g-4.d41", 0x0000, 0x2000, CRC(2d4c334c) SHA1(1be70ed5f4f315a8d2e38a17327a049e00fa174e), ROM_BIOS(0))
+	ROMX_LOAD("804-3__rev_1.6__265c.hn482764g-4.d42", 0x2000, 0x2000, CRC(9c14906b) SHA1(41996039e604011c7c0f757397f82b6479ee3f62), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "ep804_v1.4", "Wavetek/Digelec EP804 FWv1.4") // hardware 1.1
-	ROMX_LOAD("804-2_rev_1.4__7a7e.hn482764g-4.d41", 0x0000, 0x2000, CRC(fdc0d2e3) SHA1(da1bc1e8c4cb2a2d8cd2273f3e1a9f318ae8cb87), ROM_BIOS(2))
-	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x2000, 0x1000, CRC(29827e29) SHA1(4c7fadf81bcf32349a564d946f5d215de50315c5), ROM_BIOS(2))
-	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x3000, 0x1000, CRC(29827e29) SHA1(4c7fadf81bcf32349a564d946f5d215de50315c5), ROM_BIOS(2)) // load this twice
+	ROMX_LOAD("804-2_rev_1.4__7a7e.hn482764g-4.d41", 0x0000, 0x2000, CRC(fdc0d2e3) SHA1(da1bc1e8c4cb2a2d8cd2273f3e1a9f318ae8cb87), ROM_BIOS(1))
+	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x2000, 0x1000, CRC(29827e29) SHA1(4c7fadf81bcf32349a564d946f5d215de50315c5), ROM_BIOS(1))
+	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x3000, 0x1000, CRC(29827e29) SHA1(4c7fadf81bcf32349a564d946f5d215de50315c5), ROM_BIOS(1)) // load this twice
 	ROM_SYSTEM_BIOS( 2, "ep804_v2.21", "Wavetek/Digelec EP804 FWv2.21") // hardware 1.5 NOTE: this may use the address mapper 804-1-3 which is not dumped!
-	ROMX_LOAD("804-2_rev2.21__cs_ab50.hn482764g.d41", 0x0000, 0x2000, CRC(ffbc95f6) SHA1(b12aa97e23d546064f1d17aa9b90772017fec5ec), ROM_BIOS(3))
-	ROMX_LOAD("804-3_rev2.21__cs_6b98.hn482764g.d42", 0x2000, 0x2000, CRC(a4acb9fe) SHA1(bbc7e3e2e6b3b1abe747380909dcddc985ef8d0d), ROM_BIOS(3))
+	ROMX_LOAD("804-2_rev2.21__cs_ab50.hn482764g.d41", 0x0000, 0x2000, CRC(ffbc95f6) SHA1(b12aa97e23d546064f1d17aa9b90772017fec5ec), ROM_BIOS(2))
+	ROMX_LOAD("804-3_rev2.21__cs_6b98.hn482764g.d42", 0x2000, 0x2000, CRC(a4acb9fe) SHA1(bbc7e3e2e6b3b1abe747380909dcddc985ef8d0d), ROM_BIOS(2))
 	ROM_REGION(0x20, "proms", 0)
 	ROM_LOAD("804-1-2.mmi_6330-in.d30", 0x0000, 0x0020, CRC(30dd4721) SHA1(e4b2f5756118be4c8ab56c708dc4f42469c7e51b)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
 ROM_END

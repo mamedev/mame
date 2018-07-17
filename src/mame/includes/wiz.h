@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "sound/discrete.h"
+#include "emupal.h"
 
 class wiz_state : public driver_device
 {

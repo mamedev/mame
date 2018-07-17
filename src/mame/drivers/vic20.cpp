@@ -361,7 +361,7 @@ READ8_MEMBER( vic20_state::vic_videoram_r )
 
 void vic20_state::vic20_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(vic20_state::read), FUNC(vic20_state::write));
+	map(0x0000, 0xffff).rw(FUNC(vic20_state::read), FUNC(vic20_state::write));
 }
 
 
@@ -371,7 +371,7 @@ void vic20_state::vic20_mem(address_map &map)
 
 void vic20_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(vic20_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(vic20_state::vic_videoram_r));
 }
 
 
@@ -556,7 +556,7 @@ READ8_MEMBER( vic20_state::via1_pa_r )
 	data |= m_iec->data_r() << 1;
 
 	// joystick / user port
-	uint8_t joy = m_joy->joy_r();
+	uint8_t joy = m_joy->read_joy();
 
 	data |= (m_user_joy0 && BIT(joy, 0)) << 2;
 	data |= (m_user_joy1 && BIT(joy, 1)) << 3;
@@ -592,7 +592,7 @@ WRITE8_MEMBER( vic20_state::via1_pa_w )
 
 	// serial attention out
 	m_user->write_9(!BIT(data, 7));
-	m_iec->atn_w(!BIT(data, 7));
+	m_iec->host_atn_w(!BIT(data, 7));
 }
 
 WRITE8_MEMBER( vic20_state::via1_pb_w )
@@ -654,7 +654,7 @@ READ8_MEMBER( vic20_state::via2_pb_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy = m_joy->joy_r();
+	uint8_t joy = m_joy->read_joy();
 
 	data &= BIT(joy, 3) << 7;
 
@@ -688,13 +688,13 @@ WRITE8_MEMBER( vic20_state::via2_pb_w )
 WRITE_LINE_MEMBER( vic20_state::via2_ca2_w )
 {
 	// serial clock out
-	m_iec->clk_w(!state);
+	m_iec->host_clk_w(!state);
 }
 
 WRITE_LINE_MEMBER( vic20_state::via2_cb2_w )
 {
 	// serial data out
-	m_iec->data_w(!state);
+	m_iec->host_data_w(!state);
 }
 
 
@@ -805,7 +805,7 @@ MACHINE_CONFIG_START(vic20_state::vic20)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(*this, vic20_state, write_light_pen))
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, vic20_user_port_cards, nullptr)
+	MCFG_DEVICE_ADD(PET_USER_PORT_TAG, PET_USER_PORT, vic20_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, vic20_state, exp_reset_w))
 	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(*this, vic20_state, write_user_joy0))
 	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(*this, vic20_state, write_user_joy1))
@@ -963,9 +963,9 @@ ROM_START( vic20 )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_SYSTEM_BIOS( 0, "cbm", "Original" )
-	ROMX_LOAD( "901486-06.ue12", 0x0000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19), ROM_BIOS(1) )
+	ROMX_LOAD( "901486-06.ue12", 0x0000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS" )
-	ROMX_LOAD( "jiffydos vic-20 ntsc.ue12", 0x0000, 0x2000, CRC(683a757f) SHA1(83fb83e97b5a840311dbf7e1fe56fe828f41936d), ROM_BIOS(2) )
+	ROMX_LOAD( "jiffydos vic-20 ntsc.ue12", 0x0000, 0x2000, CRC(683a757f) SHA1(83fb83e97b5a840311dbf7e1fe56fe828f41936d), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901460-03.ud7", 0x0000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
@@ -982,9 +982,9 @@ ROM_START( vic20p )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_SYSTEM_BIOS( 0, "cbm", "Original" )
-	ROMX_LOAD( "901486-07.ue12", 0x0000, 0x2000, CRC(4be07cb4) SHA1(ce0137ed69f003a299f43538fa9eee27898e621e), ROM_BIOS(1) )
+	ROMX_LOAD( "901486-07.ue12", 0x0000, 0x2000, CRC(4be07cb4) SHA1(ce0137ed69f003a299f43538fa9eee27898e621e), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS" )
-	ROMX_LOAD( "jiffydos vic-20 pal.ue12", 0x0000, 0x2000, CRC(705e7810) SHA1(5a03623a4b855531b8bffd756f701306f128be2d), ROM_BIOS(2) )
+	ROMX_LOAD( "jiffydos vic-20 pal.ue12", 0x0000, 0x2000, CRC(705e7810) SHA1(5a03623a4b855531b8bffd756f701306f128be2d), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901460-03.ud7", 0x0000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )

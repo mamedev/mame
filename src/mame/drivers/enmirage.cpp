@@ -61,6 +61,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "wd1772"),
+		m_floppy_connector(*this, "wd1772:0"),
 		m_via(*this, "via6522"),
 		m_digits(*this, "digit%u", 0U)
 	{
@@ -77,6 +78,7 @@ public:
 
 	void mirage(machine_config &config);
 	void mirage_map(address_map &map);
+
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
@@ -84,6 +86,7 @@ protected:
 
 	required_device<mc6809e_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;
+	required_device<floppy_connector> m_floppy_connector;
 	required_device<via6522_device> m_via;
 
 	int last_sndram_bank;
@@ -238,7 +241,7 @@ MACHINE_CONFIG_START(enmirage_state::mirage)
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 
-	MCFG_WD1772_ADD("wd1772", 8000000)
+	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
@@ -257,8 +260,7 @@ ROM_END
 
 void enmirage_state::init_mirage()
 {
-	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : nullptr;
+	floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
 	if (floppy)
 	{
 		m_fdc->set_floppy(floppy);

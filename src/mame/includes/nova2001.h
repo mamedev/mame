@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Howie Cohen, Frank Palazzolo, Alex Pasadyn, David Haywood, Phil Stroffolino, Uki
+
+#include "emupal.h"
+
 class nova2001_state : public driver_device
 {
 public:

@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria
 #include "machine/nvram.h"
 #include "sound/dac.h"
+#include "emupal.h"
 
 class seicross_state : public driver_device
 {

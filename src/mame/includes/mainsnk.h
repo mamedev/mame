@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood, Tomasz Slanina
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class mainsnk_state : public driver_device
 {

@@ -114,8 +114,8 @@ Sound PCB
 void sbugger_state::sbugger_map(address_map &map)
 {
 	map(0x0000, 0x37ff).rom();
-	map(0xc800, 0xcbff).ram().w(this, FUNC(sbugger_state::videoram_attr_w)).share("videoram_attr");
-	map(0xcc00, 0xcfff).ram().w(this, FUNC(sbugger_state::videoram_w)).share("videoram");
+	map(0xc800, 0xcbff).ram().w(FUNC(sbugger_state::videoram_attr_w)).share("videoram_attr");
+	map(0xcc00, 0xcfff).ram().w(FUNC(sbugger_state::videoram_w)).share("videoram");
 	map(0xe000, 0xe0ff).rw("i8156", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w)); /* sp is set to e0ff */
 	map(0xf400, 0xffff).ram();
 }
@@ -123,8 +123,8 @@ void sbugger_state::sbugger_map(address_map &map)
 void sbugger_state::sbugger_io_map(address_map &map)
 {
 	map(0xe0, 0xe7).rw("i8156", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xe8, 0xe8).w("sn76489.1", FUNC(sn76489_device::write));
-	map(0xe9, 0xe9).w("sn76489.2", FUNC(sn76489_device::write));
+	map(0xe8, 0xe8).w("sn76489.1", FUNC(sn76489_device::command_w));
+	map(0xe9, 0xe9).w("sn76489.2", FUNC(sn76489_device::command_w));
 }
 
 

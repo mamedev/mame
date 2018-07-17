@@ -9,6 +9,8 @@
 
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/timekpr.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define VIDEO_CLOCK     XTAL(8'000'000)           /* video (pixel) clock */
@@ -30,6 +32,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ticket(*this, "ticket"),
+		m_timekeeper(*this, "m48t02"),
 		m_main_ram(*this, "main_ram", 0),
 		m_nvram(*this, "nvram", 0),
 		m_video(*this, "video", 0),
@@ -38,7 +41,7 @@ public:
 		m_tms1_boot(*this, "tms1_boot"),
 		m_tms1_ram(*this, "tms1_ram"),
 		m_tms2_ram(*this, "tms2_ram"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 
@@ -49,6 +52,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_ticket;
+	optional_device<timekeeper_device> m_timekeeper;
 
 	optional_shared_ptr<uint16_t> m_main_ram;
 	optional_shared_ptr<uint16_t> m_nvram;
@@ -58,7 +62,7 @@ public:
 	optional_shared_ptr<uint32_t> m_tms1_boot;
 	optional_shared_ptr<uint32_t> m_tms1_ram;
 	optional_shared_ptr<uint32_t> m_tms2_ram;
-	output_finder<4> m_led;
+	output_finder<4> m_leds;
 
 	void nvram_init(nvram_device &nvram, void *base, size_t length);
 

@@ -164,8 +164,7 @@ WRITE16_MEMBER(coolpool_state::nvram_thrash_w)
 	if (!memcmp(nvram_unlock_seq, m_nvram_write_seq, sizeof(nvram_unlock_seq)))
 	{
 		m_nvram_write_enable = 1;
-		timer_device *nvram_timer = machine().device<timer_device>("nvram_timer");
-		nvram_timer->adjust(attotime::from_msec(1000));
+		m_nvram_timer->adjust(attotime::from_msec(1000));
 	}
 }
 
@@ -524,9 +523,9 @@ READ16_MEMBER(coolpool_state::coolpool_input_r)
 void coolpool_state::amerdart_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share("vram_base");
-	map(0x04000000, 0x0400000f).w(this, FUNC(coolpool_state::amerdart_misc_w));
+	map(0x04000000, 0x0400000f).w(FUNC(coolpool_state::amerdart_misc_w));
 	map(0x05000000, 0x0500000f).r(m_dsp2main, FUNC(generic_latch_16_device::read)).w(m_main2dsp, FUNC(generic_latch_16_device::write));
-	map(0x06000000, 0x06007fff).ram().w(this, FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
+	map(0x06000000, 0x06007fff).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffb00000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -537,9 +536,9 @@ void coolpool_state::coolpool_map(address_map &map)
 	map(0x00000000, 0x001fffff).ram().share("vram_base");
 	map(0x01000000, 0x010000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);    // IMSG176P-40
 	map(0x02000000, 0x020000ff).r(m_dsp2main, FUNC(generic_latch_16_device::read)).w(m_main2dsp, FUNC(generic_latch_16_device::write));
-	map(0x03000000, 0x0300000f).w(this, FUNC(coolpool_state::coolpool_misc_w));
+	map(0x03000000, 0x0300000f).w(FUNC(coolpool_state::coolpool_misc_w));
 	map(0x03000000, 0x03ffffff).rom().region("gfx1", 0);
-	map(0x06000000, 0x06007fff).ram().w(this, FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
+	map(0x06000000, 0x06007fff).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -549,9 +548,9 @@ void coolpool_state::nballsht_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("vram_base");
 	map(0x02000000, 0x020000ff).r(m_dsp2main, FUNC(generic_latch_16_device::read)).w(m_main2dsp, FUNC(generic_latch_16_device::write));
-	map(0x03000000, 0x0300000f).w(this, FUNC(coolpool_state::coolpool_misc_w));
+	map(0x03000000, 0x0300000f).w(FUNC(coolpool_state::coolpool_misc_w));
 	map(0x04000000, 0x040000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);    // IMSG176P-40
-	map(0x06000000, 0x0601ffff).mirror(0x00020000).ram().w(this, FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
+	map(0x06000000, 0x0601ffff).mirror(0x00020000).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff000000, 0xff7fffff).rom().region("gfx1", 0);
 	map(0xffc00000, 0xffffffff).rom().region("maincpu", 0);
@@ -574,12 +573,12 @@ void coolpool_state::amerdart_dsp_pgm_map(address_map &map)
 
 void coolpool_state::amerdart_dsp_io_map(address_map &map)
 {
-	map(0x00, 0x01).w(this, FUNC(coolpool_state::dsp_romaddr_w));
+	map(0x00, 0x01).w(FUNC(coolpool_state::dsp_romaddr_w));
 	map(0x02, 0x02).w(m_dsp2main, FUNC(generic_latch_16_device::write));
-	map(0x03, 0x03).w("dac", FUNC(dac_word_interface::write));
-	map(0x04, 0x04).r(this, FUNC(coolpool_state::dsp_rom_r));
+	map(0x03, 0x03).w("dac", FUNC(dac_word_interface::data_w));
+	map(0x04, 0x04).r(FUNC(coolpool_state::dsp_rom_r));
 	map(0x05, 0x05).portr("IN0");
-	map(0x06, 0x06).r(this, FUNC(coolpool_state::amerdart_trackball_r));
+	map(0x06, 0x06).r(FUNC(coolpool_state::amerdart_trackball_r));
 	map(0x07, 0x07).r(m_main2dsp, FUNC(generic_latch_16_device::read));
 }
 
@@ -592,10 +591,10 @@ void coolpool_state::coolpool_dsp_pgm_map(address_map &map)
 
 void coolpool_state::coolpool_dsp_io_base_map(address_map &map)
 {
-	map(0x00, 0x01).w(this, FUNC(coolpool_state::dsp_romaddr_w));
+	map(0x00, 0x01).w(FUNC(coolpool_state::dsp_romaddr_w));
 	map(0x02, 0x02).r(m_main2dsp, FUNC(generic_latch_16_device::read)).w(m_dsp2main, FUNC(generic_latch_16_device::write));
-	map(0x03, 0x03).w("dac", FUNC(dac_word_interface::write));
-	map(0x04, 0x04).r(this, FUNC(coolpool_state::dsp_rom_r));
+	map(0x03, 0x03).w("dac", FUNC(dac_word_interface::data_w));
+	map(0x04, 0x04).r(FUNC(coolpool_state::dsp_rom_r));
 	map(0x05, 0x05).portr("IN0");
 }
 
@@ -603,7 +602,7 @@ void coolpool_state::coolpool_dsp_io_base_map(address_map &map)
 void coolpool_state::coolpool_dsp_io_map(address_map &map)
 {
 	coolpool_dsp_io_base_map(map);
-	map(0x07, 0x07).r(this, FUNC(coolpool_state::coolpool_input_r));
+	map(0x07, 0x07).r(FUNC(coolpool_state::coolpool_input_r));
 }
 
 
@@ -738,7 +737,7 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)
+	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -783,7 +782,7 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)
+	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

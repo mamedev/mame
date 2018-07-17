@@ -67,7 +67,6 @@ public:
 		m_keyboard(*this, "keyboard"),
 		m_kbduart(*this, "kbduart"),
 		m_pusart(*this, "pusart"),
-		m_dbrg(*this, "dbrg"),
 		m_nvr(*this, "nvr"),
 		m_rstbuf(*this, "rstbuf"),
 		m_rs232(*this, RS232_TAG),
@@ -81,7 +80,6 @@ public:
 	required_device<vt100_keyboard_device> m_keyboard;
 	required_device<ay31015_device> m_kbduart;
 	required_device<i8251_device> m_pusart;
-	required_device<com8116_device> m_dbrg;
 	required_device<er1400_device> m_nvr;
 	required_device<rst_pos_buffer_device> m_rstbuf;
 	required_device<rs232_port_device> m_rs232;
@@ -161,12 +159,6 @@ READ8_MEMBER(vt100_state::flags_r)
 	return ret;
 }
 
-WRITE8_MEMBER(vt100_state::baud_rate_w)
-{
-	m_dbrg->str_w(data & 0x0f);
-	m_dbrg->stt_w(data >> 4);
-}
-
 READ8_MEMBER(vt100_state::modem_r)
 {
 	uint8_t ret = 0x0f;
@@ -201,15 +193,15 @@ void vt100_state::vt100_io(address_map &map)
 	map(0x00, 0x00).rw("pusart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x01, 0x01).rw("pusart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// 0x02 Baud rate generator
-	map(0x02, 0x02).w(this, FUNC(vt100_state::baud_rate_w));
+	map(0x02, 0x02).w("dbrg", FUNC(com8116_device::stt_str_w));
 	// 0x22 Modem buffer
-	map(0x22, 0x22).r(this, FUNC(vt100_state::modem_r));
+	map(0x22, 0x22).r(FUNC(vt100_state::modem_r));
 	// 0x42 Flags buffer
-	map(0x42, 0x42).r(this, FUNC(vt100_state::flags_r));
+	map(0x42, 0x42).r(FUNC(vt100_state::flags_r));
 	// 0x42 Brightness D/A latch
 	map(0x42, 0x42).w(m_crtc, FUNC(vt100_video_device::brightness_w));
 	// 0x62 NVR latch
-	map(0x62, 0x62).w(this, FUNC(vt100_state::nvr_latch_w));
+	map(0x62, 0x62).w(FUNC(vt100_state::nvr_latch_w));
 	// 0x82 Keyboard UART data
 	map(0x82, 0x82).rw("kbduart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	// 0xA2 Video processor DC012
@@ -233,8 +225,8 @@ WRITE8_MEMBER(vt100_state::printer_w)
 void vt100_state::vt102_io(address_map &map)
 {
 	vt100_io(map);
-	map(0x03, 0x03).select(0x1c).r(this, FUNC(vt100_state::printer_r));
-	map(0x23, 0x23).select(0x1c).w (this, FUNC(vt100_state::printer_w));
+	map(0x03, 0x03).select(0x1c).r(FUNC(vt100_state::printer_r));
+	map(0x23, 0x23).select(0x1c).w(FUNC(vt100_state::printer_w));
 }
 
 /* Input ports */
@@ -592,9 +584,9 @@ ROM_START( vt100 ) // This is from the schematics at http://www.bitsavers.org/pd
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "vt100" )
 	ROM_SYSTEM_BIOS( 0, "vt100o", "VT100 older roms" )
-	ROMX_LOAD( "23-031e2-00.e56", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1)) // version 1 1978 'earlier rom', dump needed, correct for earlier vt100s
+	ROMX_LOAD( "23-031e2-00.e56", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(0)) // version 1 1978 'earlier rom', dump needed, correct for earlier vt100s
 	ROM_SYSTEM_BIOS( 1, "vt100", "VT100 newer roms" )
-	ROMX_LOAD( "23-061e2-00.e56", 0x0000, 0x0800, CRC(3dae97ff) SHA1(e3437850c33565751b86af6c2fe270a491246d15), ROM_BIOS(2)) // version 2 1979 or 1980 'later rom', correct for later vt100s
+	ROMX_LOAD( "23-061e2-00.e56", 0x0000, 0x0800, CRC(3dae97ff) SHA1(e3437850c33565751b86af6c2fe270a491246d15), ROM_BIOS(1)) // version 2 1979 or 1980 'later rom', correct for later vt100s
 	ROM_LOAD( "23-032e2-00.e52", 0x0800, 0x0800, CRC(3d86db99) SHA1(cdd8bdecdc643442f6e7d2c83cf002baf8101867))
 	ROM_LOAD( "23-033e2-00.e45", 0x1000, 0x0800, CRC(384dac0a) SHA1(22aaf5ab5f9555a61ec43f91d4dea3029f613e64))
 	ROM_LOAD( "23-034e2-00.e40", 0x1800, 0x0800, CRC(4643184d) SHA1(27e6c19d9932bf13fdb70305ef4d806e90d60833))
@@ -824,11 +816,11 @@ ROM_START( vt102 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "vt102" )
 	ROM_SYSTEM_BIOS( 0, "vt102o", "VT102 older roms" )
-	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(1)) // shared with vt131
-	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(1)) // shared with vt131
+	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(0)) // shared with vt131
+	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(0)) // shared with vt131
 	ROM_SYSTEM_BIOS( 1, "vt102", "VT102 newer roms" )
-	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(2)) // shared with vt131
-	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(2)) // shared with vt131
+	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(1)) // shared with vt131
+	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(1)) // shared with vt131
 	//e67 socket is empty on vt102 but populated on vt131 below
 
 	ROM_REGION(0x1000, "chargen", 0)
@@ -843,11 +835,11 @@ ROM_START( vt131 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt131 mainboa
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "vt131" )
 	ROM_SYSTEM_BIOS( 0, "vt131o", "VT131 older roms" )
-	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(1)) // shared with vt102
-	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(1)) // shared with vt102
+	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(0)) // shared with vt102
+	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(0)) // shared with vt102
 	ROM_SYSTEM_BIOS( 1, "vt131", "VT131 newer roms" )
-	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(2)) // shared with vt102
-	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(2)) // shared with vt102
+	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(1)) // shared with vt102
+	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(1)) // shared with vt102
 	ROM_LOAD( "23-280e2-00.e67", 0xA000, 0x0800, CRC(71b4172e) SHA1(5a82c7dc313bb92b9829eb8350840e072825a797)) // called "VT131 ROM" in the vt101 quick reference guide; pins 20, 18 and 21 are /CE /CE2 and /CE3 on this mask rom
 
 	ROM_REGION(0x1000, "chargen", 0)

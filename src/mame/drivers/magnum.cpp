@@ -12,6 +12,7 @@
 #include "video/hd61830.h"
 #include "video/i8275.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -266,9 +267,9 @@ void magnum_state::magnum_io(address_map &map)
 	map(0x001a, 0x001b).rw("lcdc2", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x001c, 0x001d).rw("lcdc1", FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x001e, 0x001f).rw("lcdc1", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
-	map(0x0040, 0x004f).rw(this, FUNC(magnum_state::sysctl_r), FUNC(magnum_state::sysctl_w));
-	map(0x0050, 0x0051).rw(this, FUNC(magnum_state::irqstat_r), FUNC(magnum_state::port50_w));
-	map(0x0056, 0x0056).w(this, FUNC(magnum_state::beep_w));
+	map(0x0040, 0x004f).rw(FUNC(magnum_state::sysctl_r), FUNC(magnum_state::sysctl_w));
+	map(0x0050, 0x0051).rw(FUNC(magnum_state::irqstat_r), FUNC(magnum_state::port50_w));
+	map(0x0056, 0x0056).w(FUNC(magnum_state::beep_w));
 	map(0x0080, 0x008f).rw("rtc", FUNC(cdp1879_device::read), FUNC(cdp1879_device::write)).umask16(0x00ff);
 	//map(0x0100, 0x0107).rw("fdc", FUNC(wd1793_device::read), FUNC(wd1793_device::write)).umask16(0x00ff);
 }
@@ -310,7 +311,7 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 
 	//MCFG_DEVICE_ADD("crtc", I8275, 3000000) // unknown clock
 
-	//MCFG_WD1793_ADD("fdc", 1000000) // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
+	//MCFG_DEVICE_ADD("fdc", WD1793, 1000000) // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
 
 	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
 

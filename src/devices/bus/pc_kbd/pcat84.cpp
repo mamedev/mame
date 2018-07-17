@@ -343,7 +343,7 @@ ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config 
 	m_dr(*this, "DR%02u", 0),
 	m_kbdida(*this, "KBDIDA"),
 	m_kbdidb(*this, "KBDIDB"),
-	m_led(*this, "led%u", 0U),
+	m_leds(*this, "led%u", 0U),
 	m_db(0),
 	m_cnt(0),
 	m_sense(0),
@@ -370,7 +370,7 @@ void ibm_pc_at_84_keyboard_device::device_start()
 {
 	set_pc_kbdc_device();
 
-	m_led.resolve();
+	m_leds.resolve();
 
 	// state saving
 	save_item(NAME(m_db));
@@ -529,9 +529,9 @@ WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::p2_w )
 
 	*/
 
-	m_led[LED_SCROLL] = BIT(data, 0);
-	m_led[LED_NUM] = BIT(data, 1);
-	m_led[LED_CAPS] = BIT(data, 2);
+	m_leds[LED_SCROLL] = BIT(data, 0);
+	m_leds[LED_NUM] = BIT(data, 1);
+	m_leds[LED_CAPS] = BIT(data, 2);
 
 	m_pc_kbdc->data_write_from_kb(!BIT(data, 7));
 	m_pc_kbdc->clock_write_from_kb(!BIT(data, 6));

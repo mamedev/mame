@@ -247,7 +247,7 @@ READ8_MEMBER( vic10_state::vic_colorram_r )
 
 void vic10_state::vic10_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(vic10_state::read), FUNC(vic10_state::write));
+	map(0x0000, 0xffff).rw(FUNC(vic10_state::read), FUNC(vic10_state::write));
 }
 
 
@@ -257,7 +257,7 @@ void vic10_state::vic10_mem(address_map &map)
 
 void vic10_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(vic10_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(vic10_state::vic_videoram_r));
 }
 
 
@@ -267,7 +267,7 @@ void vic10_state::vic_videoram_map(address_map &map)
 
 void vic10_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(this, FUNC(vic10_state::vic_colorram_r));
+	map(0x000, 0x3ff).r(FUNC(vic10_state::vic_colorram_r));
 }
 
 
@@ -395,22 +395,22 @@ READ8_MEMBER( vic10_state::sid_potx_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia->pa_r() >> 6)
+	switch (m_cia->read_pa() >> 6)
 	{
-	case 1: data = m_joy1->pot_x_r(); break;
-	case 2: data = m_joy2->pot_x_r(); break;
+	case 1: data = m_joy1->read_pot_x(); break;
+	case 2: data = m_joy2->read_pot_x(); break;
 	case 3:
 		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
 		{
-			data = 1 / (1 / m_joy1->pot_x_r() + 1 / m_joy2->pot_x_r());
+			data = 1 / (1 / m_joy1->read_pot_x() + 1 / m_joy2->read_pot_x());
 		}
 		else if (m_joy1->has_pot_x())
 		{
-			data = m_joy1->pot_x_r();
+			data = m_joy1->read_pot_x();
 		}
 		else if (m_joy2->has_pot_x())
 		{
-			data = m_joy2->pot_x_r();
+			data = m_joy2->read_pot_x();
 		}
 		break;
 	}
@@ -422,22 +422,22 @@ READ8_MEMBER( vic10_state::sid_poty_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia->pa_r() >> 6)
+	switch (m_cia->read_pa() >> 6)
 	{
-	case 1: data = m_joy1->pot_y_r(); break;
-	case 2: data = m_joy2->pot_y_r(); break;
+	case 1: data = m_joy1->read_pot_y(); break;
+	case 2: data = m_joy2->read_pot_y(); break;
 	case 3:
 		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
 		{
-			data = 1 / (1 / m_joy1->pot_y_r() + 1 / m_joy2->pot_y_r());
+			data = 1 / (1 / m_joy1->read_pot_y() + 1 / m_joy2->read_pot_y());
 		}
 		else if (m_joy1->has_pot_y())
 		{
-			data = m_joy1->pot_y_r();
+			data = m_joy1->read_pot_y();
 		}
 		else if (m_joy2->has_pot_y())
 		{
-			data = m_joy2->pot_y_r();
+			data = m_joy2->read_pot_y();
 		}
 		break;
 	}
@@ -477,13 +477,13 @@ READ8_MEMBER( vic10_state::cia_pa_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy_b = m_joy2->joy_r();
+	uint8_t joy_b = m_joy2->read_joy();
 
 	data &= (0xf0 | (joy_b & 0x0f));
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	uint8_t cia_pb = m_cia->pb_r();
+	uint8_t cia_pb = m_cia->read_pb();
 	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
@@ -525,13 +525,13 @@ READ8_MEMBER( vic10_state::cia_pb_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy_a = m_joy1->joy_r();
+	uint8_t joy_a = m_joy1->read_joy();
 
 	data &= (0xf0 | (joy_a & 0x0f));
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	uint8_t cia_pa = m_cia->pa_r();
+	uint8_t cia_pa = m_cia->read_pa();
 
 	if (!BIT(cia_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia_pa, 6)) data &= m_row[6]->read();

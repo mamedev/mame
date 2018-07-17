@@ -177,18 +177,18 @@ WRITE8_MEMBER(gcpinbal_state::es8712_reset_w)
 void gcpinbal_state::gcpinbal_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0xc00000, 0xc03fff).rw(this, FUNC(gcpinbal_state::gcpinbal_tilemaps_word_r), FUNC(gcpinbal_state::gcpinbal_tilemaps_word_w)).share("tilemapram");
+	map(0xc00000, 0xc03fff).rw(FUNC(gcpinbal_state::gcpinbal_tilemaps_word_r), FUNC(gcpinbal_state::gcpinbal_tilemaps_word_w)).share("tilemapram");
 	map(0xc80000, 0xc81fff).rw(m_sprgen, FUNC(excellent_spr_device::read), FUNC(excellent_spr_device::write)).umask16(0x00ff);
 	map(0xd00000, 0xd00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xd80010, 0xd8002f).ram().w(this, FUNC(gcpinbal_state::d80010_w)).share("d80010");
-	map(0xd80040, 0xd8005b).w(this, FUNC(gcpinbal_state::d80040_w)).umask16(0x00ff);
-	map(0xd80060, 0xd80077).ram().w(this, FUNC(gcpinbal_state::d80060_w)).share("d80060");
+	map(0xd80010, 0xd8002f).ram().w(FUNC(gcpinbal_state::d80010_w)).share("d80010");
+	map(0xd80040, 0xd8005b).w(FUNC(gcpinbal_state::d80040_w)).umask16(0x00ff);
+	map(0xd80060, 0xd80077).ram().w(FUNC(gcpinbal_state::d80060_w)).share("d80060");
 	map(0xd80080, 0xd80081).portr("DSW");
 	map(0xd80084, 0xd80085).portr("IN0");
 	map(0xd80086, 0xd80087).portr("IN1");
-	map(0xd80088, 0xd80088).w(this, FUNC(gcpinbal_state::bank_w));
-	map(0xd8008a, 0xd8008a).w(this, FUNC(gcpinbal_state::eeprom_w));
-	map(0xd8008e, 0xd8008e).w(this, FUNC(gcpinbal_state::es8712_reset_w));
+	map(0xd80088, 0xd80088).w(FUNC(gcpinbal_state::bank_w));
+	map(0xd8008a, 0xd8008a).w(FUNC(gcpinbal_state::eeprom_w));
+	map(0xd8008e, 0xd8008e).w(FUNC(gcpinbal_state::es8712_reset_w));
 	map(0xd800a0, 0xd800a0).mirror(0x2).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xd800c0, 0xd800cd).w(m_essnd, FUNC(es8712_device::write)).umask16(0xff00);
 	map(0xff0000, 0xffffff).ram(); /* RAM */
@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_DEVICE_PROGRAM_MAP(gcpinbal_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gcpinbal_state,  gcpinbal_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 

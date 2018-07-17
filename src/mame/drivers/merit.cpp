@@ -96,7 +96,7 @@ public:
 		, m_backup_ram(*this, "backup_ram")
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
@@ -163,13 +163,13 @@ protected:
 	optional_shared_ptr<uint8_t> m_backup_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	output_finder<10> m_led;
+	output_finder<10> m_leds;
 };
 
 
 void merit_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	m_question_address = 0;
 	m_ram_palette = std::make_unique<uint8_t[]>(RAM_PALETTE_SIZE);
 
@@ -346,21 +346,21 @@ WRITE_LINE_MEMBER(merit_state::hsync_changed)
 WRITE8_MEMBER(merit_state::led1_w)
 {
 	/* 5 button lamps player 1 */
-	m_led[0] = BIT(~data, 0);
-	m_led[1] = BIT(~data, 1);
-	m_led[2] = BIT(~data, 2);
-	m_led[3] = BIT(~data, 3);
-	m_led[4] = BIT(~data, 4);
+	m_leds[0] = BIT(~data, 0);
+	m_leds[1] = BIT(~data, 1);
+	m_leds[2] = BIT(~data, 2);
+	m_leds[3] = BIT(~data, 3);
+	m_leds[4] = BIT(~data, 4);
 }
 
 WRITE8_MEMBER(merit_state::led2_w)
 {
 	/* 5 button lamps player 2 */
-	m_led[5] = BIT(~data, 0);
-	m_led[6] = BIT(~data, 1);
-	m_led[7] = BIT(~data, 2);
-	m_led[8] = BIT(~data, 3);
-	m_led[9] = BIT(~data, 4);
+	m_leds[5] = BIT(~data, 0);
+	m_leds[6] = BIT(~data, 1);
+	m_leds[7] = BIT(~data, 2);
+	m_leds[8] = BIT(~data, 3);
+	m_leds[9] = BIT(~data, 4);
 
 	/* coin counter */
 	machine().bookkeeping().coin_counter_w(0, BIT(~data, 7));
@@ -420,7 +420,7 @@ void merit_state::pitboss_map(address_map &map)
 	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
 }
 
 void merit_state::casino5_map(address_map &map)
@@ -429,7 +429,7 @@ void merit_state::casino5_map(address_map &map)
 	map(0x2000, 0x3fff).bankr("bank1");
 	map(0x4000, 0x5fff).bankr("bank2");
 	map(0x6000, 0x6fff).ram().share("nvram");
-	map(0x7000, 0x7000).w(this, FUNC(merit_state::casino5_bank_w));
+	map(0x7000, 0x7000).w(FUNC(merit_state::casino5_bank_w));
 	map(0x7001, 0x7fff).ram();
 	map(0xa000, 0xa003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc000, 0xc003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -437,7 +437,7 @@ void merit_state::casino5_map(address_map &map)
 	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
 }
 
 void merit_state::bigappg_map(address_map &map)
@@ -450,7 +450,7 @@ void merit_state::bigappg_map(address_map &map)
 	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
 }
 
 void merit_state::misdraw_map(address_map &map)
@@ -464,7 +464,7 @@ void merit_state::misdraw_map(address_map &map)
 	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
 }
 
 void merit_state::dodge_map(address_map &map)
@@ -477,7 +477,7 @@ void merit_state::dodge_map(address_map &map)
 	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
 }
 
 /* Address decoding is done by prom u13 on crt200a hardware. It decodes
@@ -488,9 +488,9 @@ void merit_state::dodge_map(address_map &map)
 void merit_state::trvwhiz_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4c00, 0x4cff).rw(this, FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
-	map(0x5400, 0x54ff).w(this, FUNC(merit_state::low_offset_w));
-	map(0x5800, 0x58ff).w(this, FUNC(merit_state::med_offset_w));
+	map(0x4c00, 0x4cff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
+	map(0x5400, 0x54ff).w(FUNC(merit_state::low_offset_w));
+	map(0x5800, 0x58ff).w(FUNC(merit_state::med_offset_w));
 	map(0x6000, 0x67ff).ram();
 	map(0xa000, 0xa003).mirror(0x1df0).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc000, 0xc003).mirror(0x1df0).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -498,7 +498,7 @@ void merit_state::trvwhiz_map(address_map &map)
 	map(0xe001, 0xe001).mirror(0x05f0).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
 }
 
 void merit_state::trvwhiz_io_map(address_map &map)
@@ -514,14 +514,14 @@ void merit_state::phrcraze_map(address_map &map)
 	map(0xa000, 0xbfff).ram();
 	map(0xc008, 0xc00b).mirror(0x1df0).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc00c, 0xc00f).mirror(0x1df0).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xce00, 0xceff).rw(this, FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
-	map(0xd600, 0xd6ff).w(this, FUNC(merit_state::low_offset_w));
-	map(0xda00, 0xdaff).w(this, FUNC(merit_state::med_offset_w));
+	map(0xce00, 0xceff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
+	map(0xd600, 0xd6ff).w(FUNC(merit_state::low_offset_w));
+	map(0xda00, 0xdaff).w(FUNC(merit_state::med_offset_w));
 	map(0xe000, 0xe000).mirror(0x05f0).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).mirror(0x05f0).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
 }
 
 void merit_state::phrcraze_io_map(address_map &map)
@@ -537,14 +537,14 @@ void merit_state::tictac_map(address_map &map)
 	map(0x8000, 0x9fff).ram();
 	map(0xc004, 0xc007).mirror(0x1df0).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc008, 0xc00b).mirror(0x1df0).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xce00, 0xceff).rw(this, FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
-	map(0xd600, 0xd6ff).w(this, FUNC(merit_state::low_offset_w));
-	map(0xda00, 0xdaff).w(this, FUNC(merit_state::med_offset_w));
+	map(0xce00, 0xceff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
+	map(0xd600, 0xd6ff).w(FUNC(merit_state::low_offset_w));
+	map(0xda00, 0xdaff).w(FUNC(merit_state::med_offset_w));
 	map(0xe000, 0xe000).mirror(0x05f0).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).mirror(0x05f0).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
 }
 
 void merit_state::tictac_io_map(address_map &map)
@@ -560,14 +560,14 @@ void merit_state::trvwhziv_map(address_map &map)
 	map(0xa000, 0xbfff).ram();
 	map(0xc004, 0xc007).mirror(0x1df0).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc008, 0xc00b).mirror(0x1df0).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xce00, 0xceff).rw(this, FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
-	map(0xd600, 0xd6ff).w(this, FUNC(merit_state::low_offset_w));
-	map(0xda00, 0xdaff).w(this, FUNC(merit_state::med_offset_w));
+	map(0xce00, 0xceff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
+	map(0xd600, 0xd6ff).w(FUNC(merit_state::low_offset_w));
+	map(0xda00, 0xdaff).w(FUNC(merit_state::med_offset_w));
 	map(0xe000, 0xe000).mirror(0x05f0).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).mirror(0x05f0).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
 }
 
 void merit_state::dtrvwz5_map(address_map &map)
@@ -577,14 +577,14 @@ void merit_state::dtrvwz5_map(address_map &map)
 	map(0xb000, 0xb0ff).rom(); /* protection? code jumps here */
 	map(0xc004, 0xc007).mirror(0x1df0).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc008, 0xc00b).mirror(0x1df0).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xce00, 0xceff).rw(this, FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
-	map(0xd600, 0xd6ff).w(this, FUNC(merit_state::low_offset_w));
-	map(0xda00, 0xdaff).w(this, FUNC(merit_state::med_offset_w));
+	map(0xce00, 0xceff).rw(FUNC(merit_state::questions_r), FUNC(merit_state::high_offset_w));
+	map(0xd600, 0xd6ff).w(FUNC(merit_state::low_offset_w));
+	map(0xda00, 0xdaff).w(FUNC(merit_state::med_offset_w));
 	map(0xe000, 0xe000).mirror(0x05f0).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).mirror(0x05f0).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
 }
 
 void merit_state::couple_map(address_map &map)
@@ -598,7 +598,7 @@ void merit_state::couple_map(address_map &map)
 	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xe800, 0xefff).ram().share("raattr");
 	map(0xf000, 0xf7ff).ram().share("ravideo");
-	map(0xf800, 0xfbff).rw(this, FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
+	map(0xf800, 0xfbff).rw(FUNC(merit_state::palette_r), FUNC(merit_state::palette_w));
 }
 
 

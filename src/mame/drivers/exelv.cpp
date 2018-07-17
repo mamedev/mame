@@ -64,6 +64,7 @@ TODO:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -418,8 +419,8 @@ void exelv_state::tms7020_mem(address_map &map)
 	map(0x012d, 0x012d).w(m_tms3556, FUNC(tms3556_device::reg_w));
 	map(0x012e, 0x012e).w(m_tms3556, FUNC(tms3556_device::vram_w));
 
-	map(0x0130, 0x0130).rw(this, FUNC(exelv_state::mailbox_wx319_r), FUNC(exelv_state::mailbox_wx318_w));
-	map(0x0200, 0x7fff).r(this, FUNC(exelv_state::rom_r));
+	map(0x0130, 0x0130).rw(FUNC(exelv_state::mailbox_wx319_r), FUNC(exelv_state::mailbox_wx318_w));
+	map(0x0200, 0x7fff).r(FUNC(exelv_state::rom_r));
 	map(0x8000, 0xbfff).noprw();
 	map(0xc000, 0xc7ff).ram();                                     /* CPU RAM */
 	map(0xc800, 0xf7ff).noprw();
@@ -434,7 +435,7 @@ void exelv_state::tms7040_mem(address_map &map)
 	map(0x0128, 0x0128).r(m_tms3556, FUNC(tms3556_device::initptr_r));
 	map(0x012d, 0x012d).w(m_tms3556, FUNC(tms3556_device::reg_w));
 	map(0x012e, 0x012e).w(m_tms3556, FUNC(tms3556_device::vram_w));
-	map(0x0130, 0x0130).rw(this, FUNC(exelv_state::mailbox_wx319_r), FUNC(exelv_state::mailbox_wx318_w));
+	map(0x0130, 0x0130).rw(FUNC(exelv_state::mailbox_wx319_r), FUNC(exelv_state::mailbox_wx318_w));
 	map(0x0200, 0x7fff).bankr("bank1");                                /* system ROM */
 	map(0x8000, 0xbfff).noprw();
 	map(0xc000, 0xc7ff).ram();                                     /* CPU RAM */
@@ -607,9 +608,9 @@ ROM_START(exeltel)
 
 	ROM_REGION(0x10000,"user1",0)
 	ROM_SYSTEM_BIOS( 0, "french", "French v1.4" )
-	ROMX_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89), ROM_BIOS(1))  /* French system ROM v1.4 */
+	ROMX_LOAD("exeltel14.bin", 0x0000, 0x10000, CRC(52a80dd4) SHA1(2cb4c784fba3aec52770999bb99a9a303269bf89), ROM_BIOS(0))  /* French system ROM v1.4 */
 	ROM_SYSTEM_BIOS( 1, "spanish", "Spanish" )
-	ROMX_LOAD("amper.bin", 0x0000, 0x10000, CRC(45af256c) SHA1(3bff16542f8ac55b9841084ea38034132459facb), ROM_BIOS(2)) /* Spanish system rom */
+	ROMX_LOAD("amper.bin", 0x0000, 0x10000, CRC(45af256c) SHA1(3bff16542f8ac55b9841084ea38034132459facb), ROM_BIOS(1)) /* Spanish system rom */
 
 	ROM_REGION(0x8000, "vsm", 0)
 	ROM_LOAD("cm62312.bin", 0x0000, 0x4000, CRC(93b817de) SHA1(03863087a071b8f22d36a52d18243f1c33e17ff7)) /* system speech ROM */

@@ -24,13 +24,13 @@ public:
 	tourtabl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void tourtabl(machine_config &config);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
 	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
 	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
@@ -38,7 +38,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	output_finder<4> m_led;
+	output_finder<4> m_leds;
 };
 
 
@@ -47,10 +47,10 @@ private:
 
 WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)
 {
-	m_led[0] = BIT(data, 6); /* start 1 */
-	m_led[1] = BIT(data, 5); /* start 2 */
-	m_led[2] = BIT(data, 4); /* start 4 */
-	m_led[3] = BIT(data, 7); /* select game */
+	m_leds[0] = BIT(data, 6); /* start 1 */
+	m_leds[1] = BIT(data, 5); /* start 2 */
+	m_leds[2] = BIT(data, 4); /* start 4 */
+	m_leds[3] = BIT(data, 7); /* select game */
 
 	machine().bookkeeping().coin_lockout_global_w(!(data & 0x80));
 }
@@ -174,7 +174,7 @@ MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
+	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0, "tia")
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, tourtabl_state, tourtabl_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, tourtabl_state, tourtabl_get_databus_contents))
 

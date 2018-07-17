@@ -27,6 +27,7 @@
 #include "machine/nvram.h"
 #include "machine/upd1990a.h"
 #include "sound/2610intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -255,12 +256,12 @@ void neoprint_state::neoprint_map(address_map &map)
 	map(0x300000, 0x30ffff).ram().share("nvram");
 	map(0x400000, 0x43ffff).ram().share("npvidram");
 	map(0x500000, 0x51ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x600000, 0x600000).rw(this, FUNC(neoprint_state::neoprint_audio_result_r), FUNC(neoprint_state::audio_command_w));
-	map(0x600002, 0x600002).rw(this, FUNC(neoprint_state::neoprint_calendar_r), FUNC(neoprint_state::neoprint_calendar_w));
+	map(0x600000, 0x600000).rw(FUNC(neoprint_state::neoprint_audio_result_r), FUNC(neoprint_state::audio_command_w));
+	map(0x600002, 0x600002).rw(FUNC(neoprint_state::neoprint_calendar_r), FUNC(neoprint_state::neoprint_calendar_w));
 	map(0x600004, 0x600005).portr("SYSTEM").nopw();
 	map(0x600006, 0x600007).portr("IN").nopw();
 	map(0x600008, 0x600009).portr("DSW1");
-	map(0x60000a, 0x60000a).r(this, FUNC(neoprint_state::neoprint_unk_r));
+	map(0x60000a, 0x60000a).r(FUNC(neoprint_state::neoprint_unk_r));
 	map(0x60000c, 0x60000d).portr("DSW2");
 	map(0x60000e, 0x60000f).nopw();
 
@@ -319,14 +320,14 @@ READ16_MEMBER(neoprint_state::rom_window_r)
 void neoprint_state::nprsp_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x0fffff).r(this, FUNC(neoprint_state::rom_window_r));
-	map(0x200000, 0x200000).rw(this, FUNC(neoprint_state::neoprint_audio_result_r), FUNC(neoprint_state::audio_command_w));
-	map(0x200002, 0x200002).rw(this, FUNC(neoprint_state::neoprint_calendar_r), FUNC(neoprint_state::neoprint_calendar_w));
+	map(0x080000, 0x0fffff).r(FUNC(neoprint_state::rom_window_r));
+	map(0x200000, 0x200000).rw(FUNC(neoprint_state::neoprint_audio_result_r), FUNC(neoprint_state::audio_command_w));
+	map(0x200002, 0x200002).rw(FUNC(neoprint_state::neoprint_calendar_r), FUNC(neoprint_state::neoprint_calendar_w));
 	map(0x200004, 0x200005).portr("SYSTEM").nopw();
 	map(0x200006, 0x200007).portr("IN").nopw();
 	map(0x200008, 0x200009).portr("DSW1");
-	map(0x200008, 0x200008).w(this, FUNC(neoprint_state::nprsp_bank_w));
-	map(0x20000a, 0x20000a).r(this, FUNC(neoprint_state::neoprint_unk_r));
+	map(0x200008, 0x200008).w(FUNC(neoprint_state::nprsp_bank_w));
+	map(0x20000a, 0x20000a).r(FUNC(neoprint_state::neoprint_unk_r));
 	map(0x20000c, 0x20000d).portr("DSW2");
 	map(0x20000e, 0x20000f).nopw();
 
@@ -336,7 +337,7 @@ void neoprint_state::nprsp_map(address_map &map)
 	map(0x300000, 0x33ffff).ram().share("nvram");
 	map(0x380000, 0x38ffff).ram();
 	map(0x400000, 0x43ffff).ram().share("npvidram");
-	map(0x500000, 0x57ffff).ram().w(this, FUNC(neoprint_state::nprsp_palette_w)).share("paletteram");
+	map(0x500000, 0x57ffff).ram().w(FUNC(neoprint_state::nprsp_palette_w)).share("paletteram");
 }
 
 /*************************************
@@ -366,14 +367,14 @@ void neoprint_state::neoprint_audio_map(address_map &map)
 void neoprint_state::neoprint_audio_io_map(address_map &map)
 {
 	/*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
-	map(0x00, 0x00).mirror(0xff00).r(this, FUNC(neoprint_state::audio_command_r)).nopw();
+	map(0x00, 0x00).mirror(0xff00).r(FUNC(neoprint_state::audio_command_r)).nopw();
 	map(0x04, 0x07).mirror(0xff00).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 //  AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
 //  AM_RANGE(0x08, 0x08) AM_SELECT(0xfff0) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
 //  AM_RANGE(0x09, 0x09) AM_SELECT(0xfff0) AM_READ(audio_cpu_bank_select_e000_efff_r)
 //  AM_RANGE(0x0a, 0x0a) AM_SELECT(0xfff0) AM_READ(audio_cpu_bank_select_c000_dfff_r)
 //  AM_RANGE(0x0b, 0x0b) AM_SELECT(0xfff0) AM_READ(audio_cpu_bank_select_8000_bfff_r)
-	map(0x0c, 0x0c).mirror(0xff00).w(this, FUNC(neoprint_state::audio_result_w));
+	map(0x0c, 0x0c).mirror(0xff00).w(FUNC(neoprint_state::audio_result_w));
 //  AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
 }
 

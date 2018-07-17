@@ -95,13 +95,13 @@ ROM_END
 
 void stereo_fx_device::stereo_fx_io(address_map &map)
 {
-	map(0xFF00, 0xFF00).w(this, FUNC(stereo_fx_device::port00_w));
-	map(0xFF10, 0xFF10).w("rdac", FUNC(dac_byte_interface::write));
-	map(0xFF20, 0xFF20).w(this, FUNC(stereo_fx_device::port20_w));
+	map(0xFF00, 0xFF00).w(FUNC(stereo_fx_device::port00_w));
+	map(0xFF10, 0xFF10).w("rdac", FUNC(dac_byte_interface::data_w));
+	map(0xFF20, 0xFF20).w(FUNC(stereo_fx_device::port20_w));
 	//AM_RANGE(0xFF30, 0xFF30) AM_WRITE()  //  used only on reset and undocumented cmd 0xc4
-	map(0xFF40, 0xFF40).rw(this, FUNC(stereo_fx_device::dev_dsp_data_r), FUNC(stereo_fx_device::dev_dsp_data_w));
-	map(0xFF50, 0xFF50).w(this, FUNC(stereo_fx_device::raise_drq_w));
-	map(0xFF60, 0xFF60).w(this, FUNC(stereo_fx_device::dev_host_irq_w));
+	map(0xFF40, 0xFF40).rw(FUNC(stereo_fx_device::dev_dsp_data_r), FUNC(stereo_fx_device::dev_dsp_data_w));
+	map(0xFF50, 0xFF50).w(FUNC(stereo_fx_device::raise_drq_w));
+	map(0xFF60, 0xFF60).w(FUNC(stereo_fx_device::dev_host_irq_w));
 }
 
 void stereo_fx_device::stereo_fx_rom(address_map &map)
@@ -119,7 +119,7 @@ MACHINE_CONFIG_START(stereo_fx_device::device_add_mconfig)
 	MCFG_DEVICE_IO_MAP(stereo_fx_io)
 	MCFG_DEVICE_PROGRAM_MAP(stereo_fx_rom)
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, stereo_fx_device, p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8("ldac", dac_byte_interface, write))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8("ldac", dac_byte_interface, data_w))
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, stereo_fx_device, p3_r))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, stereo_fx_device, p3_w))
 

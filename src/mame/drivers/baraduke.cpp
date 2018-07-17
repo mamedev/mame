@@ -154,8 +154,8 @@ READ8_MEMBER(baraduke_state::inputport_r)
 
 WRITE8_MEMBER(baraduke_state::baraduke_lamps_w)
 {
-	m_lamp[0] = BIT(data, 3);
-	m_lamp[1] = BIT(data, 4);
+	m_lamps[0] = BIT(data, 3);
+	m_lamps[1] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
@@ -167,14 +167,14 @@ WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
 
 void baraduke_state::baraduke_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(this, FUNC(baraduke_state::baraduke_spriteram_r), FUNC(baraduke_state::baraduke_spriteram_w)).share("spriteram");  /* Sprite RAM */
-	map(0x2000, 0x3fff).rw(this, FUNC(baraduke_state::baraduke_videoram_r), FUNC(baraduke_state::baraduke_videoram_w)).share("videoram"); /* Video RAM */
+	map(0x0000, 0x1fff).rw(FUNC(baraduke_state::baraduke_spriteram_r), FUNC(baraduke_state::baraduke_spriteram_w)).share("spriteram");  /* Sprite RAM */
+	map(0x2000, 0x3fff).rw(FUNC(baraduke_state::baraduke_videoram_r), FUNC(baraduke_state::baraduke_videoram_w)).share("videoram"); /* Video RAM */
 	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));       /* PSG device, shared RAM */
-	map(0x4800, 0x4fff).rw(this, FUNC(baraduke_state::baraduke_textram_r), FUNC(baraduke_state::baraduke_textram_w)).share("textram");/* video RAM (text layer) */
+	map(0x4800, 0x4fff).rw(FUNC(baraduke_state::baraduke_textram_r), FUNC(baraduke_state::baraduke_textram_w)).share("textram");/* video RAM (text layer) */
 	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* watchdog reset */
-	map(0x8800, 0x8800).w(this, FUNC(baraduke_state::baraduke_irq_ack_w));       /* irq acknowledge */
-	map(0xb000, 0xb002).w(this, FUNC(baraduke_state::baraduke_scroll0_w));       /* scroll (layer 0) */
-	map(0xb004, 0xb006).w(this, FUNC(baraduke_state::baraduke_scroll1_w));       /* scroll (layer 1) */
+	map(0x8800, 0x8800).w(FUNC(baraduke_state::baraduke_irq_ack_w));       /* irq acknowledge */
+	map(0xb000, 0xb002).w(FUNC(baraduke_state::baraduke_scroll0_w));       /* scroll (layer 0) */
+	map(0xb004, 0xb006).w(FUNC(baraduke_state::baraduke_scroll1_w));       /* scroll (layer 1) */
 	map(0x6000, 0xffff).rom();                             /* ROM */
 }
 
@@ -188,7 +188,7 @@ void baraduke_state::mcu_map(address_map &map)
 	map(0x0000, 0x001f).rw("mcu", FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));/* internal registers */
 	map(0x0080, 0x00ff).ram();                             /* built in RAM */
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
-	map(0x1105, 0x1105).r(this, FUNC(baraduke_state::soundkludge_r));             /* cures speech */
+	map(0x1105, 0x1105).r(FUNC(baraduke_state::soundkludge_r));             /* cures speech */
 	map(0x8000, 0xbfff).rom();                             /* MCU external ROM */
 	map(0x8000, 0x8000).nopw();                        /* watchdog reset? */
 	map(0x8800, 0x8800).nopw();                        /* irq acknoledge? */
@@ -204,10 +204,10 @@ READ8_MEMBER(baraduke_state::readFF)
 
 void baraduke_state::mcu_port_map(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).r(this, FUNC(baraduke_state::inputport_r));         /* input ports read */
-	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(baraduke_state::inputport_select_w)); /* input port select */
-	map(M6801_PORT2, M6801_PORT2).r(this, FUNC(baraduke_state::readFF));  /* leds won't work otherwise */
-	map(M6801_PORT2, M6801_PORT2).w(this, FUNC(baraduke_state::baraduke_lamps_w));       /* lamps */
+	map(M6801_PORT1, M6801_PORT1).r(FUNC(baraduke_state::inputport_r));         /* input ports read */
+	map(M6801_PORT1, M6801_PORT1).w(FUNC(baraduke_state::inputport_select_w)); /* input port select */
+	map(M6801_PORT2, M6801_PORT2).r(FUNC(baraduke_state::readFF));  /* leds won't work otherwise */
+	map(M6801_PORT2, M6801_PORT2).w(FUNC(baraduke_state::baraduke_lamps_w));       /* lamps */
 }
 
 
@@ -374,7 +374,7 @@ GFXDECODE_END
 
 void baraduke_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 }
 
 

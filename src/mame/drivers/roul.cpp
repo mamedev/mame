@@ -67,6 +67,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -81,7 +82,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_soundlatch(*this, "soundlatch"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(blitter_status_r);
@@ -99,14 +100,14 @@ public:
 	void sound_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<generic_latch_8_device> m_soundlatch;
-	output_finder<256> m_lamp;
+	output_finder<256> m_lamps;
 
 	uint8_t m_reg[0x10];
 	std::unique_ptr<uint8_t[]> m_videobuf;
@@ -206,8 +207,8 @@ WRITE8_MEMBER(roul_state::ball_w)
 {
 	int lamp = data;
 
-	m_lamp[data] = 1;
-	m_lamp[m_lamp_old] = 0;
+	m_lamps[data] = 1;
+	m_lamps[m_lamp_old] = 0;
 	m_lamp_old = lamp;
 }
 
@@ -220,13 +221,13 @@ void roul_state::roul_map(address_map &map)
 void roul_state::roul_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf4).w(this, FUNC(roul_state::blitter_cmd_w));
-	map(0xf5, 0xf5).r(this, FUNC(roul_state::blitter_status_r));
+	map(0xf0, 0xf4).w(FUNC(roul_state::blitter_cmd_w));
+	map(0xf5, 0xf5).r(FUNC(roul_state::blitter_status_r));
 	map(0xf8, 0xf8).portr("DSW");
-	map(0xf9, 0xf9).w(this, FUNC(roul_state::ball_w));
+	map(0xf9, 0xf9).w(FUNC(roul_state::ball_w));
 	map(0xfa, 0xfa).portr("IN0");
 	map(0xfd, 0xfd).portr("IN1");
-	map(0xfe, 0xfe).w(this, FUNC(roul_state::sound_latch_w));
+	map(0xfe, 0xfe).w(FUNC(roul_state::sound_latch_w));
 }
 
 void roul_state::sound_map(address_map &map)

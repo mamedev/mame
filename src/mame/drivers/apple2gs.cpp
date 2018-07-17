@@ -188,7 +188,7 @@ void apple2gs_state::apple2gs_map(address_map &map)
 
 void apple2gs_state::vectors_map(address_map &map)
 {
-	map(0x00, 0x1f).r(this, FUNC(apple2gs_state::apple2gs_read_vector));
+	map(0x00, 0x1f).r(FUNC(apple2gs_state::apple2gs_read_vector));
 }
 
 // ADB microcontroller emulation
@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	MCFG_IWM_ADD("fdc", apple2_fdc_interface)
 
 	/* SCC */
-	MCFG_SCC85C30_ADD(SCC_TAG, APPLE2GS_14M/2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(SCC_TAG, SCC85C30, APPLE2GS_14M/2)
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 

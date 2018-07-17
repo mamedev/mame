@@ -28,15 +28,15 @@ DEFINE_DEVICE_TYPE(PCI9050, pci9050_device, "pci9050", "PLX PCI9050 PCI to Local
 
 void pci9050_device::map(address_map &map)
 {
-	map(0x00, 0x0f).rw(this, FUNC(pci9050_device::lasrr_r), FUNC(pci9050_device::lasrr_w));
-	map(0x10, 0x13).rw(this, FUNC(pci9050_device::eromrr_r), FUNC(pci9050_device::eromrr_w));
-	map(0x14, 0x23).rw(this, FUNC(pci9050_device::lasba_r), FUNC(pci9050_device::lasba_w));
-	map(0x24, 0x27).rw(this, FUNC(pci9050_device::eromba_r), FUNC(pci9050_device::eromba_w));
-	map(0x28, 0x37).rw(this, FUNC(pci9050_device::lasbrd_r), FUNC(pci9050_device::lasbrd_w));
-	map(0x38, 0x3b).rw(this, FUNC(pci9050_device::erombrd_r), FUNC(pci9050_device::erombrd_w));
-	map(0x3c, 0x4b).rw(this, FUNC(pci9050_device::csbase_r), FUNC(pci9050_device::csbase_w));
-	map(0x4c, 0x4f).rw(this, FUNC(pci9050_device::intcsr_r), FUNC(pci9050_device::intcsr_w));
-	map(0x50, 0x53).rw(this, FUNC(pci9050_device::cntrl_r), FUNC(pci9050_device::cntrl_w));
+	map(0x00, 0x0f).rw(FUNC(pci9050_device::lasrr_r), FUNC(pci9050_device::lasrr_w));
+	map(0x10, 0x13).rw(FUNC(pci9050_device::eromrr_r), FUNC(pci9050_device::eromrr_w));
+	map(0x14, 0x23).rw(FUNC(pci9050_device::lasba_r), FUNC(pci9050_device::lasba_w));
+	map(0x24, 0x27).rw(FUNC(pci9050_device::eromba_r), FUNC(pci9050_device::eromba_w));
+	map(0x28, 0x37).rw(FUNC(pci9050_device::lasbrd_r), FUNC(pci9050_device::lasbrd_w));
+	map(0x38, 0x3b).rw(FUNC(pci9050_device::erombrd_r), FUNC(pci9050_device::erombrd_w));
+	map(0x3c, 0x4b).rw(FUNC(pci9050_device::csbase_r), FUNC(pci9050_device::csbase_w));
+	map(0x4c, 0x4f).rw(FUNC(pci9050_device::intcsr_r), FUNC(pci9050_device::intcsr_w));
+	map(0x50, 0x53).rw(FUNC(pci9050_device::cntrl_r), FUNC(pci9050_device::cntrl_w));
 }
 
 pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

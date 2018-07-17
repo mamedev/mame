@@ -38,6 +38,7 @@
 #include "machine/z80sio.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "apricotp.lh"
@@ -428,7 +429,7 @@ WRITE16_MEMBER( fp_state::mem_w )
 void fp_state::fp_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0xf7fff).rw(this, FUNC(fp_state::mem_r), FUNC(fp_state::mem_w));
+	map(0x00000, 0xf7fff).rw(FUNC(fp_state::mem_r), FUNC(fp_state::mem_w));
 	map(0xf8000, 0xfffff).rom().region(I8086_TAG, 0);
 }
 
@@ -443,13 +444,13 @@ void fp_state::fp_io(address_map &map)
 	map(0x000, 0x007).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 	map(0x008, 0x00f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x018, 0x01f).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
-	map(0x020, 0x020).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x022, 0x022).w(this, FUNC(fp_state::pint_clr_w));
-	map(0x024, 0x024).r(this, FUNC(fp_state::prtr_snd_r));
-	map(0x026, 0x026).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0x028, 0x028).w(this, FUNC(fp_state::contrast_w));
-	map(0x02a, 0x02a).w(this, FUNC(fp_state::palette_w));
-	map(0x02e, 0x02f).w(this, FUNC(fp_state::video_w));
+	map(0x020, 0x020).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x022, 0x022).w(FUNC(fp_state::pint_clr_w));
+	map(0x024, 0x024).r(FUNC(fp_state::prtr_snd_r));
+	map(0x026, 0x026).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x028, 0x028).w(FUNC(fp_state::contrast_w));
+	map(0x02a, 0x02a).w(FUNC(fp_state::palette_w));
+	map(0x02e, 0x02f).w(FUNC(fp_state::video_w));
 	map(0x040, 0x05f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
 	map(0x068, 0x06b).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x06c, 0x06c).w(m_crtc, FUNC(mc6845_device::address_w));
@@ -586,7 +587,7 @@ static void fp_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(fp_state::fp)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, XTAL(15'000'000)/3)
+	MCFG_DEVICE_ADD(I8086_TAG, I8086, 15_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(fp_mem)
 	MCFG_DEVICE_IO_MAP(fp_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
@@ -647,14 +648,14 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_DEVICE_ADD(Z80SIO0_TAG, Z80SIO, 2500000)
 	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(I8259A_TAG, pic8259_device, ir4_w))
 
-	MCFG_WD2797_ADD(WD2797_TAG, 2000000)
+	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 2000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir1_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(I8237_TAG, am9517a_device, dreq1_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", fp_floppies, "d32w", fp_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", fp_floppies, nullptr,   fp_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fp_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, fp_state, write_centronics_select))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fp_state, write_centronics_fault))

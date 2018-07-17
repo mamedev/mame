@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define TILEMAPS 0
@@ -30,7 +31,7 @@ public:
 		m_bank1d(*this, "bank1d"),
 		m_prot_opcode_toggle(0),
 		m_remap_sound(0),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	enum GFXBANK_TYPE_T
@@ -156,7 +157,7 @@ public:
 	void starfigh_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_hardhead_ip;
@@ -207,5 +208,5 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 #endif
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 };

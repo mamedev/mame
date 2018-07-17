@@ -81,16 +81,14 @@ public:
 	/RS is bit 1, /WS is bit 0
 	Note this is a hack and probably can be removed later, once the 'real'
 	line handlers above defer by at least 4 clock cycles before taking effect */
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_WRITE8_MEMBER( data_w ) { write_data(data); }
+	DECLARE_READ8_MEMBER( status_r ) { return read_status(); }
 
-	void data_w(uint8_t data);
-	uint8_t status_r();
+	void write_data(uint8_t data);
+	uint8_t read_status();
 
 	READ_LINE_MEMBER( readyq_r );
 	READ_LINE_MEMBER( intq_r );
-
-	attotime time_to_ready();
 
 protected:
 	tms5220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
@@ -118,23 +116,27 @@ private:
 	void data_write(int data);
 	void update_fifo_status_and_ints();
 	int extract_bits(int count);
-	int status_read();
-	int ready_read();
-	int cycles_to_ready();
-	int int_read();
+	uint8_t status_read(bool clear_int);
+	bool ready_read();
+	bool int_read();
 	void process(int16_t *buffer, unsigned int size);
+	int16_t clip_analog(int16_t cliptemp) const;
+	int32_t matrix_multiply(int32_t a, int32_t b) const;
 	int32_t lattice_filter();
 	void process_command(unsigned char cmd);
 	void parse_frame();
 	void set_interrupt_state(int state);
 	void update_ready_state();
 
-	uint8_t TALK_STATUS() const { return m_SPEN | m_TALKD; }
-	uint8_t &OLD_FRAME_SILENCE_FLAG() { return m_OLDE; } // 1 if E=0, 0 otherwise.
-	uint8_t &OLD_FRAME_UNVOICED_FLAG() { return m_OLDP; } // 1 if P=0 (unvoiced), 0 if voiced
-	bool NEW_FRAME_STOP_FLAG() const { return m_new_frame_energy_idx == 0x0F; } // 1 if this is a stop (Energy = 0xF) frame
-	bool NEW_FRAME_SILENCE_FLAG() const { return m_new_frame_energy_idx == 0; } // ditto as above
-	bool NEW_FRAME_UNVOICED_FLAG() const { return m_new_frame_pitch_idx == 0; } // ditto as above
+	bool talk_status() const { return m_SPEN || m_TALKD; }
+	bool &old_frame_silence_flag() { return m_OLDE; } // 1 if E=0, 0 otherwise.
+	bool &old_frame_unvoiced_flag() { return m_OLDP; } // 1 if P=0 (unvoiced), 0 if voiced
+	bool new_frame_stop_flag() const { return m_new_frame_energy_idx == 0x0F; } // 1 if this is a stop (Energy = 0xF) frame
+	bool new_frame_silence_flag() const { return m_new_frame_energy_idx == 0; } // ditto as above
+	bool new_frame_unvoiced_flag() const { return m_new_frame_pitch_idx == 0; } // ditto as above
+
+	// debugging helper
+	void printbits(long data, int num);
 
 	// internal state
 
@@ -144,23 +146,23 @@ private:
 	/* coefficient tables */
 	const struct tms5100_coeffs *m_coeff;
 
-	/* these contain global status bits */
+	/* these contain global status bits for the 5100 */
 	uint8_t m_PDC;
 	uint8_t m_CTL_pins;
 	uint8_t m_state;
 
 	/* New VSM interface */
 	uint32_t m_address;
-	uint8_t  m_next_is_address;
-	uint8_t  m_schedule_dummy_read;
+	bool  m_next_is_address;
+	bool  m_schedule_dummy_read;
 	uint8_t  m_addr_bit;
 	/* read byte */
 	uint8_t  m_CTL_buffer;
 
 	/* Old VSM interface; R Nabet : These have been added to emulate speech Roms */
-	//uint8_t m_schedule_dummy_read;          /* set after each load address, so that next read operation is preceded by a dummy read */
-	uint8_t m_data_register;                /* data register, used by read command */
-	uint8_t m_RDB_flag;                 /* whether we should read data register or status register */
+	//bool m_schedule_dummy_read;          /* set after each load address, so that next read operation is preceded by a dummy read */
+	uint8_t m_read_byte_register;       /* a serial->parallel shifter, used by "read byte" command to store 8 bits from the VSM */
+	bool m_RDB_flag;                   /* whether we should read data register or status register */
 
 	/* these contain data that describes the 128-bit data FIFO */
 	uint8_t m_fifo[FIFO_SIZE];
@@ -170,20 +172,20 @@ private:
 	uint8_t m_fifo_bits_taken;
 
 
-	/* these contain global status bits */
-	uint8_t m_previous_TALK_STATUS;      /* this is the OLD value of TALK_STATUS (i.e. previous value of m_SPEN|m_TALKD), needed for generating interrupts on a falling TALK_STATUS edge */
-	uint8_t m_SPEN;             /* set on speak(or speak external and BL falling edge) command, cleared on stop command, reset command, or buffer out */
-	uint8_t m_DDIS;             /* If 1, DDIS is 1, i.e. Speak External command in progress, writes go to FIFO. */
-	uint8_t m_TALK;             /* set on SPEN & RESETL4(pc12->pc0 transition), cleared on stop command or reset command */
-	uint8_t m_TALKD;            /* TALK(TCON) value, latched every RESETL4 */
-	uint8_t m_buffer_low;       /* If 1, FIFO has less than 8 bytes in it */
-	uint8_t m_buffer_empty;     /* If 1, FIFO is empty */
-	uint8_t m_irq_pin;          /* state of the IRQ pin (output) */
-	uint8_t m_ready_pin;        /* state of the READY pin (output) */
+	/* these contain global status bits (booleans) */
+	bool m_previous_talk_status;/* this is the OLD value of talk_status (i.e. previous value of m_SPEN|m_TALKD), needed for generating interrupts on a falling talk_status edge */
+	bool m_SPEN;                /* set on speak(or speak external and BL falling edge) command, cleared on stop command, reset command, or buffer out */
+	bool m_DDIS;                /* If 1, DDIS is 1, i.e. Speak External command in progress, writes go to FIFO. */
+	bool m_TALK;                /* set on SPEN & RESETL4(pc12->pc0 transition), cleared on stop command or reset command */
+	bool m_TALKD;               /* TALK(TCON) value, latched every RESETL4 */
+	bool m_buffer_low;          /* If 1, FIFO has less than 8 bytes in it */
+	bool m_buffer_empty;        /* If 1, FIFO is empty */
+	bool m_irq_pin;             /* state of the IRQ pin (output) */
+	bool m_ready_pin;           /* state of the READY pin (output) */
 
 	/* these contain data describing the current and previous voice frames */
-	uint8_t m_OLDE;
-	uint8_t m_OLDP;
+	bool m_OLDE;
+	bool m_OLDP;
 
 	uint8_t m_new_frame_energy_idx;
 	uint8_t m_new_frame_pitch_idx;
@@ -199,8 +201,8 @@ private:
 	uint8_t m_old_frame_energy_idx;
 	uint8_t m_old_frame_pitch_idx;
 	uint8_t m_old_frame_k_idx[10];
-	uint8_t m_old_zpar;
-	uint8_t m_old_uv_zpar;
+	bool m_old_zpar;
+	bool m_old_uv_zpar;
 
 	int32_t m_current_energy;
 	int32_t m_current_pitch;
@@ -214,11 +216,11 @@ private:
 	uint8_t m_PC;               /* current parameter counter (what param is being interpolated), ranges from 0 to 12 */
 	/* NOTE: the interpolation period counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,2,2,1 */
 	uint8_t m_IP;               /* the current interpolation period */
-	uint8_t m_inhibit;          /* If 1, interpolation is inhibited until the DIV1 period */
-	uint8_t m_uv_zpar;          /* If 1, zero k5 thru k10 coefficients */
-	uint8_t m_zpar;             /* If 1, zero ALL parameters. */
-	uint8_t m_pitch_zero;       /* circuit 412; pitch is forced to zero under certain circumstances */
-	uint8_t m_c_variant_rate;    /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
+	bool m_inhibit;             /* If 1, interpolation is inhibited until the DIV1 period */
+	bool m_uv_zpar;             /* If 1, zero k5 thru k10 coefficients */
+	bool m_zpar;                /* If 1, zero ALL parameters. */
+	bool m_pitch_zero;          /* circuit 412; pitch is forced to zero under certain circumstances */
+	uint8_t m_c_variant_rate;   /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
 	uint16_t m_pitch_count;     /* pitch counter; provides chirp rom address */
 
 	int32_t m_u[11];
@@ -232,17 +234,17 @@ private:
 	   The internal DAC used to feed the analog pin is only 8 bits, and has the
 	   funny clipping/clamping logic, while the digital pin gives full 10 bit
 	   resolution of the output data.
-	   TODO: add a way to set/reset this other than the FORCE_DIGITAL define
+	   TODO: add an MCFG macro to set this other than the FORCE_DIGITAL define
 	 */
-	uint8_t m_digital_select;
+	bool m_digital_select;
 
 	/* io_ready: page 3 of the datasheet specifies that READY will be asserted until
 	 * data is available or processed by the system.
 	 */
-	uint8_t m_io_ready;
+	bool m_io_ready;
 
 	/* flag for "true" timing involving rs/ws */
-	uint8_t m_true_timing;
+	bool m_true_timing;
 
 	/* rsws - state, rs bit 1, ws bit 0 */
 	uint8_t m_rs_ws;

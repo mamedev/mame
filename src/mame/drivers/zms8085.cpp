@@ -95,9 +95,9 @@ void zms8085_state::mem_map(address_map &map)
 
 void zms8085_state::io_map(address_map &map)
 {
-	map(0x61, 0x61).r(this, FUNC(zms8085_state::special_r)).w(m_uart, FUNC(ay51013_device::transmit));
+	map(0x61, 0x61).r(FUNC(zms8085_state::special_r)).w(m_uart, FUNC(ay51013_device::transmit));
 	map(0x62, 0x62).r(m_uart, FUNC(ay51013_device::receive));
-	map(0x63, 0x63).r(this, FUNC(zms8085_state::uart_status_r));
+	map(0x63, 0x63).r(FUNC(zms8085_state::uart_status_r));
 	map(0x68, 0x68).nopw();
 }
 
@@ -150,10 +150,10 @@ ROM_START( zephyr )
 	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("test") // for now
 	ROM_SYSTEM_BIOS(0, "main", "Main program" )
-	ROMX_LOAD( "23-067-03b.bin",  0x0000, 0x0800, CRC(29cfa003) SHA1(9de7a8402173a2c448e54ee433ba3050db7b70bb), ROM_BIOS(1) )
-	ROMX_LOAD( "23-067-004b.bin", 0x0800, 0x0800, CRC(37741104) SHA1(52b9998e0a8d4949e0dc7c3349b3681e13345061), ROM_BIOS(1) )
+	ROMX_LOAD( "23-067-03b.bin",  0x0000, 0x0800, CRC(29cfa003) SHA1(9de7a8402173a2c448e54ee433ba3050db7b70bb), ROM_BIOS(0) )
+	ROMX_LOAD( "23-067-004b.bin", 0x0800, 0x0800, CRC(37741104) SHA1(52b9998e0a8d4949e0dc7c3349b3681e13345061), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "test", "Test program" )
-	ROMX_LOAD( "23-006-32c.bin",  0x0000, 0x0800, CRC(0a3a5447) SHA1(a8c25730a1d7e5b9c86e0d504afc923e931f9025), ROM_BIOS(2) )
+	ROMX_LOAD( "23-006-32c.bin",  0x0000, 0x0800, CRC(0a3a5447) SHA1(a8c25730a1d7e5b9c86e0d504afc923e931f9025), ROM_BIOS(1) )
 
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD( "23-066-02a.bin",  0x0000, 0x0800, CRC(d5650b6c) SHA1(e6333e59018d9904f12abb270db4ba28aeff1995) )

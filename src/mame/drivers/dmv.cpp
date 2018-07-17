@@ -19,6 +19,7 @@
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 
 // expansion slots
 #include "bus/dmv/dmvbus.h"
@@ -69,7 +70,7 @@ public:
 		, m_slot6(*this, "slot6")
 		, m_slot7(*this, "slot7")
 		, m_slot7a(*this, "slot7a")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 1U)
 	{ }
 
 	void update_halt_line();
@@ -176,7 +177,7 @@ private:
 	required_device<dmvcart_slot_device> m_slot6;
 	required_device<dmvcart_slot_device> m_slot7;
 	required_device<dmvcart_slot_device> m_slot7a;
-	output_finder<9> m_led;
+	output_finder<8> m_leds;
 
 	bool        m_ramoutdis;
 	int         m_switch16;
@@ -220,7 +221,7 @@ WRITE8_MEMBER(dmv_state::leds_w)
 	*/
 
 	for(int i=0; i<8; i++)
-		m_led[8-i] = BIT(data, i);
+		m_leds[7-i] = BIT(data, i);
 }
 
 READ8_MEMBER(dmv_state::ramsel_r)
@@ -562,32 +563,32 @@ uint8_t dmv_state::program_read(address_space &space, int cas, offs_t offset)
 void dmv_state::dmv_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(dmv_state::program_r), FUNC(dmv_state::program_w));
+	map(0x0000, 0xffff).rw(FUNC(dmv_state::program_r), FUNC(dmv_state::program_w));
 }
 
 void dmv_state::dmv_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(dmv_state::leds_w));
-	map(0x10, 0x10).rw(this, FUNC(dmv_state::ramsel_r), FUNC(dmv_state::ramsel_w));
-	map(0x11, 0x11).rw(this, FUNC(dmv_state::romsel_r), FUNC(dmv_state::romsel_w));
-	map(0x12, 0x12).w(this, FUNC(dmv_state::tc_set_w));
-	map(0x13, 0x13).r(this, FUNC(dmv_state::sys_status_r));
-	map(0x14, 0x14).w(this, FUNC(dmv_state::fdd_motor_w));
+	map(0x00, 0x00).w(FUNC(dmv_state::leds_w));
+	map(0x10, 0x10).rw(FUNC(dmv_state::ramsel_r), FUNC(dmv_state::ramsel_w));
+	map(0x11, 0x11).rw(FUNC(dmv_state::romsel_r), FUNC(dmv_state::romsel_w));
+	map(0x12, 0x12).w(FUNC(dmv_state::tc_set_w));
+	map(0x13, 0x13).r(FUNC(dmv_state::sys_status_r));
+	map(0x14, 0x14).w(FUNC(dmv_state::fdd_motor_w));
 	map(0x20, 0x2f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x40, 0x41).rw("kb_ctrl_mcu", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 	map(0x50, 0x51).m(m_fdc, FUNC(i8272a_device::map));
 	map(0x80, 0x83).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xa0, 0xa1).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-	map(0xd0, 0xd7).w(this, FUNC(dmv_state::switch16_w));
-	map(0xe0, 0xe7).w(this, FUNC(dmv_state::rambank_w));
+	map(0xd0, 0xd7).w(FUNC(dmv_state::switch16_w));
+	map(0xe0, 0xe7).w(FUNC(dmv_state::rambank_w));
 
-	map(0x60, 0x6f).rw(this, FUNC(dmv_state::ifsel0_r), FUNC(dmv_state::ifsel0_w));
-	map(0x70, 0x7f).rw(this, FUNC(dmv_state::ifsel1_r), FUNC(dmv_state::ifsel1_w));
-	map(0x30, 0x3f).rw(this, FUNC(dmv_state::ifsel2_r), FUNC(dmv_state::ifsel2_w));
-	map(0xb0, 0xbf).rw(this, FUNC(dmv_state::ifsel3_r), FUNC(dmv_state::ifsel3_w));
-	map(0xc0, 0xcf).rw(this, FUNC(dmv_state::ifsel4_r), FUNC(dmv_state::ifsel4_w));
+	map(0x60, 0x6f).rw(FUNC(dmv_state::ifsel0_r), FUNC(dmv_state::ifsel0_w));
+	map(0x70, 0x7f).rw(FUNC(dmv_state::ifsel1_r), FUNC(dmv_state::ifsel1_w));
+	map(0x30, 0x3f).rw(FUNC(dmv_state::ifsel2_r), FUNC(dmv_state::ifsel2_w));
+	map(0xb0, 0xbf).rw(FUNC(dmv_state::ifsel3_r), FUNC(dmv_state::ifsel3_w));
+	map(0xc0, 0xcf).rw(FUNC(dmv_state::ifsel4_r), FUNC(dmv_state::ifsel4_w));
 }
 
 READ8_MEMBER(dmv_state::kb_mcu_port1_r)
@@ -624,7 +625,7 @@ INPUT_PORTS_END
 
 void dmv_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 }
 
 void dmv_state::machine_reset()
@@ -892,18 +893,18 @@ ROM_START( dmv )
 	ROM_SYSTEM_BIOS(3, "m06", "M.06.00")    // Mono machine
 	ROM_SYSTEM_BIOS(4, "m05", "M.05.00")    // Mono machine, marked "updated"
 
-	ROMX_LOAD( "dmv_mb_rom_33610.bin", 0x00000,    0x02000,    CRC(bf25f3f0) SHA1(0c7dd37704db4799e340cc836f887cd543e5c964), ROM_BIOS(1) )
-	ROMX_LOAD( "dmv_mb_rom_32838.bin", 0x00000,    0x02000,    CRC(d5ceb559) SHA1(e3a05e43aa1b09f0a857b8d54b00bcd321215bf6), ROM_BIOS(2) )
-	ROMX_LOAD( "dmv_mb_rom_33609.bin", 0x00000,    0x02000,    CRC(120951b6) SHA1(57bef9cc6379dea5730bc1477e8896508e00a349), ROM_BIOS(3) )
-	ROMX_LOAD( "dmv_mb_rom_32676.bin", 0x00000,    0x02000,    CRC(7796519e) SHA1(8d5dd9c1e66c96fcca271b6f673d6a0e784acb33), ROM_BIOS(4) )
-	ROMX_LOAD( "dmv_mb_rom_32664.bin", 0x00000,    0x02000,    CRC(6624610e) SHA1(e9226be897d2c5f875784ab77dad8807f14c7714), ROM_BIOS(5) )
+	ROMX_LOAD( "dmv_mb_rom_33610.bin", 0x00000,    0x02000,    CRC(bf25f3f0) SHA1(0c7dd37704db4799e340cc836f887cd543e5c964), ROM_BIOS(0) )
+	ROMX_LOAD( "dmv_mb_rom_32838.bin", 0x00000,    0x02000,    CRC(d5ceb559) SHA1(e3a05e43aa1b09f0a857b8d54b00bcd321215bf6), ROM_BIOS(1) )
+	ROMX_LOAD( "dmv_mb_rom_33609.bin", 0x00000,    0x02000,    CRC(120951b6) SHA1(57bef9cc6379dea5730bc1477e8896508e00a349), ROM_BIOS(2) )
+	ROMX_LOAD( "dmv_mb_rom_32676.bin", 0x00000,    0x02000,    CRC(7796519e) SHA1(8d5dd9c1e66c96fcca271b6f673d6a0e784acb33), ROM_BIOS(3) )
+	ROMX_LOAD( "dmv_mb_rom_32664.bin", 0x00000,    0x02000,    CRC(6624610e) SHA1(e9226be897d2c5f875784ab77dad8807f14c7714), ROM_BIOS(4) )
 
 	ROM_REGION(0x400, "kb_ctrl_mcu", 0)
+	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(0) )
 	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(1) )
 	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(2) )
 	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(3) )
-	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(4) )
-	ROMX_LOAD( "dmv_mb_8741_32121.bin",    0x00000,    0x00400,    CRC(a03af298) SHA1(144cba41294c46f5ca79b7ad8ced0e4408168775), ROM_BIOS(5) )
+	ROMX_LOAD( "dmv_mb_8741_32121.bin",    0x00000,    0x00400,    CRC(a03af298) SHA1(144cba41294c46f5ca79b7ad8ced0e4408168775), ROM_BIOS(4) )
 
 	ROM_REGION(0x800, "chargen", 0)
 	ROM_LOAD( "76161.bin",    0x00000,    0x00800,  CRC(6e4df4f9) SHA1(20ff4fc48e55eaf5131f6573fff93e7f97d2f45d)) // same for both color and monochrome board

@@ -22,6 +22,7 @@ sound system appears to be the same as 'spartanxtec.cpp'
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -432,16 +433,16 @@ void spyhuntertec_state::spyhuntertec_map(address_map &map)
 	map(0xa800, 0xa8ff).ram(); // the ROM is a solid fill in these areas, and they get tested as RAM, I think they moved the 'real' scroll regs here
 	map(0xa900, 0xa9ff).ram();
 
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(spyhuntertec_state::spyhunt_videoram_w)).share("videoram");
-	map(0xe800, 0xebff).mirror(0x0400).ram().w(this, FUNC(spyhuntertec_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
+	map(0xe000, 0xe7ff).ram().w(FUNC(spyhuntertec_state::spyhunt_videoram_w)).share("videoram");
+	map(0xe800, 0xebff).mirror(0x0400).ram().w(FUNC(spyhuntertec_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
 	map(0xf000, 0xf7ff).ram(); //AM_SHARE("nvram")
 	map(0xf800, 0xf9ff).ram().share("spriteram"); // origional spriteram
-	map(0xfa00, 0xfa7f).mirror(0x0180).ram().w(this, FUNC(spyhuntertec_state::spyhuntertec_paletteram_w)).share("paletteram");
+	map(0xfa00, 0xfa7f).mirror(0x0180).ram().w(FUNC(spyhuntertec_state::spyhuntertec_paletteram_w)).share("paletteram");
 
 	map(0xfc00, 0xfc00).portr("DSW0");
 	map(0xfc01, 0xfc01).portr("DSW1");
-	map(0xfc02, 0xfc02).r(this, FUNC(spyhuntertec_state::spyhuntertec_in2_r));
-	map(0xfc03, 0xfc03).r(this, FUNC(spyhuntertec_state::spyhuntertec_in3_r));
+	map(0xfc02, 0xfc02).r(FUNC(spyhuntertec_state::spyhuntertec_in2_r));
+	map(0xfc03, 0xfc03).r(FUNC(spyhuntertec_state::spyhuntertec_in3_r));
 
 	map(0xfd00, 0xfd00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
@@ -462,11 +463,11 @@ void spyhuntertec_state::spyhuntertec_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x04, 0x04).w(this, FUNC(spyhuntertec_state::spyhuntertec_port04_w));
-	map(0x84, 0x86).w(this, FUNC(spyhuntertec_state::spyhunt_scroll_value_w));
+	map(0x04, 0x04).w(FUNC(spyhuntertec_state::spyhuntertec_port04_w));
+	map(0x84, 0x86).w(FUNC(spyhuntertec_state::spyhunt_scroll_value_w));
 	map(0xe0, 0xe0).nopw(); // was watchdog
 //  AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-	map(0xf0, 0xf0).w(this, FUNC(spyhuntertec_state::spyhuntertec_portf0_w));
+	map(0xf0, 0xf0).w(FUNC(spyhuntertec_state::spyhuntertec_portf0_w));
 }
 
 
@@ -489,7 +490,7 @@ void spyhuntertec_state::spyhuntertec_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 
-	map(0x00, 0x00).w(this, FUNC(spyhuntertec_state::sound_irq_ack));
+	map(0x00, 0x00).w(FUNC(spyhuntertec_state::sound_irq_ack));
 
 	map(0x0012, 0x0013).w("ay3", FUNC(ay8912_device::address_data_w));
 	map(0x0012, 0x0012).r("ay3", FUNC(ay8912_device::data_r));

@@ -458,10 +458,10 @@ WRITE8_MEMBER(taitogn_state::control_w)
 			m_zoom->reset();
 
 			// assume that this also readys the sound flash chips
-			m_pgmflash->write(0, 0xff);
-			m_sndflash[0]->write(0, 0xff);
-			m_sndflash[1]->write(0, 0xff);
-			m_sndflash[2]->write(0, 0xff);
+			m_pgmflash->write(space, 0, 0xff);
+			m_sndflash[0]->write(space, 0, 0xff);
+			m_sndflash[1]->write(space, 0, 0xff);
+			m_sndflash[2]->write(space, 0, 0xff);
 		}
 	}
 
@@ -593,7 +593,7 @@ READ32_MEMBER(taitogn_state::zsg2_ext_r)
 	{
 		case 0x000000:
 		case 0x100000:
-		case 0x200000: return m_sndflash[offset >> 20]->read(offset & 0xfffff) | m_sndflash[offset >> 20]->read((offset & 0xfffff) | 1) << 16;
+		case 0x200000: return m_sndflash[offset >> 20]->read(space, offset & 0xfffff) | m_sndflash[offset >> 20]->read(space, (offset & 0xfffff) | 1) << 16;
 
 		default:
 			break;
@@ -636,17 +636,17 @@ void taitogn_state::taitogn_map(address_map &map)
 	map(0x1fa00300, 0x1fa00303).portr("SYSTEM");
 	map(0x1fa10000, 0x1fa10003).portr("P3");
 	map(0x1fa10100, 0x1fa10103).portr("P4");
-	map(0x1fa10200, 0x1fa10200).r(this, FUNC(taitogn_state::boardconfig_r));
-	map(0x1fa10300, 0x1fa10300).rw(this, FUNC(taitogn_state::znsecsel_r), FUNC(taitogn_state::znsecsel_w));
-	map(0x1fa20000, 0x1fa20000).rw(this, FUNC(taitogn_state::coin_r), FUNC(taitogn_state::coin_w));
-	map(0x1fa30000, 0x1fa30000).rw(this, FUNC(taitogn_state::control3_r), FUNC(taitogn_state::control3_w));
+	map(0x1fa10200, 0x1fa10200).r(FUNC(taitogn_state::boardconfig_r));
+	map(0x1fa10300, 0x1fa10300).rw(FUNC(taitogn_state::znsecsel_r), FUNC(taitogn_state::znsecsel_w));
+	map(0x1fa20000, 0x1fa20000).rw(FUNC(taitogn_state::coin_r), FUNC(taitogn_state::coin_w));
+	map(0x1fa30000, 0x1fa30000).rw(FUNC(taitogn_state::control3_r), FUNC(taitogn_state::control3_w));
 	map(0x1fa51c00, 0x1fa51dff).nopr(); // systematic read at spu_address + 250000, result dropped, maybe other accesses
-	map(0x1fa60000, 0x1fa60003).r(this, FUNC(taitogn_state::hack1_r));
+	map(0x1fa60000, 0x1fa60003).r(FUNC(taitogn_state::hack1_r));
 	map(0x1faf0000, 0x1faf07ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)); /* eeprom */
 	map(0x1fb00000, 0x1fb0ffff).rw("rf5c296", FUNC(rf5c296_device::io_r), FUNC(rf5c296_device::io_w));
-	map(0x1fb40000, 0x1fb40000).rw(this, FUNC(taitogn_state::control_r), FUNC(taitogn_state::control_w));
-	map(0x1fb60000, 0x1fb60001).w(this, FUNC(taitogn_state::control2_w));
-	map(0x1fb70000, 0x1fb70001).rw(this, FUNC(taitogn_state::gn_1fb70000_r), FUNC(taitogn_state::gn_1fb70000_w));
+	map(0x1fb40000, 0x1fb40000).rw(FUNC(taitogn_state::control_r), FUNC(taitogn_state::control_w));
+	map(0x1fb60000, 0x1fb60001).w(FUNC(taitogn_state::control2_w));
+	map(0x1fb70000, 0x1fb70001).rw(FUNC(taitogn_state::gn_1fb70000_r), FUNC(taitogn_state::gn_1fb70000_w));
 	map(0x1fb80000, 0x1fb80001).w(m_zoom, FUNC(taito_zoom_device::reg_data_w));
 	map(0x1fb80002, 0x1fb80003).w(m_zoom, FUNC(taito_zoom_device::reg_address_w));
 	map(0x1fba0000, 0x1fba0001).w(m_zoom, FUNC(taito_zoom_device::sound_irq_w));
@@ -675,7 +675,7 @@ void taitogn_state::flashbank_map(address_map &map)
 void taitogn_state::taitogn_mp_map(address_map &map)
 {
 	taitogn_map(map);
-	map(0x1fa10100, 0x1fa10100).r(this, FUNC(taitogn_state::gnet_mahjong_panel_r));
+	map(0x1fa10100, 0x1fa10100).r(FUNC(taitogn_state::gnet_mahjong_panel_r));
 }
 
 void slot_ataflash(device_slot_interface &device)
@@ -936,7 +936,7 @@ INPUT_PORTS_END
 //
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define TAITOGNET_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \

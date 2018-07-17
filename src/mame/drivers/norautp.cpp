@@ -647,14 +647,14 @@ WRITE8_MEMBER(norautp_state::mainlamps_w)
     -x-- ----  * HOLD 5 lamp.
     x--- ----  * CANCEL lamp.
 */
-	m_lamp[0] = BIT(data, 0);  /* CHANGE CARD lamp */
-	m_lamp[1] = BIT(data, 1);  /* SAVE / HALF GAMBLE lamp */
-	m_lamp[2] = BIT(data, 2);  /* HOLD 1 lamp */
-	m_lamp[3] = BIT(data, 3);  /* HOLD 2 lamp */
-	m_lamp[4] = BIT(data, 4);  /* HOLD 3 lamp */
-	m_lamp[5] = BIT(data, 5);  /* HOLD 4 lamp */
-	m_lamp[6] = BIT(data, 6);  /* HOLD 5 lamp */
-	m_lamp[7] = BIT(data, 7);  /* CANCEL lamp */
+	m_lamps[0] = BIT(data, 0);  /* CHANGE CARD lamp */
+	m_lamps[1] = BIT(data, 1);  /* SAVE / HALF GAMBLE lamp */
+	m_lamps[2] = BIT(data, 2);  /* HOLD 1 lamp */
+	m_lamps[3] = BIT(data, 3);  /* HOLD 2 lamp */
+	m_lamps[4] = BIT(data, 4);  /* HOLD 3 lamp */
+	m_lamps[5] = BIT(data, 5);  /* HOLD 4 lamp */
+	m_lamps[6] = BIT(data, 6);  /* HOLD 5 lamp */
+	m_lamps[7] = BIT(data, 7);  /* CANCEL lamp */
 
 //  popmessage("lamps: %02x", data);
 }
@@ -672,8 +672,8 @@ WRITE8_MEMBER(norautp_state::soundlamps_w)
   xxxx ----  * Discrete Sound Lines.
 */
 
-	m_lamp[8] = BIT(data, 0);  /* DEAL / DRAW lamp */
-	m_lamp[9] = BIT(data, 1);  /* BET / COLLECT lamp */
+	m_lamps[8] = BIT(data, 0);  /* DEAL / DRAW lamp */
+	m_lamps[9] = BIT(data, 1);  /* BET / COLLECT lamp */
 
 	/* the 4 MSB are for discrete sound */
 	m_discrete->write(space, NORAUTP_SND_EN, (data >> 7) & 0x01);
@@ -697,8 +697,8 @@ WRITE8_MEMBER(norautp_state::counterlamps_w)
     -x-- ----  + Coin counter related.
     x--- ----  + DEFLECT (always activated).
 */
-	m_lamp[10] = BIT(data, 0); /* HI lamp */
-	m_lamp[11] = BIT(data, 1); /* LO lamp */
+	m_lamps[10] = BIT(data, 0); /* HI lamp */
+	m_lamps[11] = BIT(data, 1); /* LO lamp */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* Coin1/3 counter */
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);  /* Coin2 counter */
@@ -845,7 +845,7 @@ void norautp_state::norautp_portmap(address_map &map)
 	//AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE(vram_data_r, vram_data_w)
 	//AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE(vram_addr_w)
 	//AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ(test_r)
-	map(0xef, 0xef).r(this, FUNC(norautp_state::test2_r));
+	map(0xef, 0xef).r(FUNC(norautp_state::test2_r));
 }
 
 /*

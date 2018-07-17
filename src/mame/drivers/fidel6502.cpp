@@ -14,13 +14,12 @@
     - Source organization is a big mess. Each machine family could be in its own
       sub driverclass, and separate files.
     - verify cpu speed and rom labels where unknown
-    - improve SC12/AS12 CPU divider? it seems a little bit slower than the real machine.
+    - improve EAS/SC12/etc CPU divider? it seems a little bit slower than the real machine.
       Currently, a dummy timer workaround is needed, or it's much worse.
       Is the problem here is due to timing of CPU addressbus changes? We can only 'sense'
       the addressbus at read or write accesses.
     - granits gives error beeps at start, need to press clear to play
     - finish fphantom emulation
-    - PC has 14KB RAM. 0000-0fff and 8000-9fff is certain, where does the remaining map to?
 
 ******************************************************************************
 
@@ -474,17 +473,25 @@ public:
 		: fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
 		m_rombank(*this, "rombank"),
-		m_sc12_map(*this, "sc12_map")
+		m_mainmap(*this, "mainmap"),
+		m_div_config(*this, "div_config")
 	{ }
 
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
 	optional_memory_bank m_rombank;
-	optional_device<address_map_bank_device> m_sc12_map;
+	optional_device<address_map_bank_device> m_mainmap;
+	optional_ioport m_div_config;
 
+	// common
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(dummy) { ; }
+	TIMER_DEVICE_CALLBACK_MEMBER(dummy) { ; } // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
+
+	DECLARE_WRITE8_MEMBER(div_trampoline_w);
+	DECLARE_READ8_MEMBER(div_trampoline_r);
+	void div_set_cpu_freq(offs_t offset);
+	void div_trampoline(address_map &map);
 
 	// CSC, SU9, RSC
 	void csc_prepare_display();
@@ -543,13 +550,9 @@ public:
 	void playmatic(machine_config &config);
 
 	// SC12
-	DECLARE_WRITE8_MEMBER(sc12_trampoline_w);
-	DECLARE_READ8_MEMBER(sc12_trampoline_r);
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
 	DECLARE_READ8_MEMBER(sc12_input_r);
-	void sc12_set_cpu_freq(offs_t offset);
 	void sc12_map(address_map &map);
-	void sc12_trampoline(address_map &map);
 	void sc12(machine_config &config);
 	void sc12b(machine_config &config);
 
@@ -604,6 +607,61 @@ public:
 	void chesster(machine_config &config);
 	void kishon(machine_config &config);
 };
+
+
+/***************************************************************************
+
+  Helper Functions
+
+***************************************************************************/
+
+// Offset-dependent CPU divider on some machines
+
+void fidel6502_state::div_set_cpu_freq(offs_t offset)
+{
+	if (m_div_config->read() & 2)
+	{
+		// when a13/a14 is high, XTAL goes through divider(s)
+		// (depending on factory-set jumper, either one or two 7474)
+		float div = (m_div_config->read() & 1) ? 0.25 : 0.5;
+		m_maincpu->set_clock_scale((offset & 0x6000) ? div : 1.0);
+	}
+}
+
+WRITE8_MEMBER(fidel6502_state::div_trampoline_w)
+{
+	div_set_cpu_freq(offset);
+	m_mainmap->write8(space, offset, data);
+}
+
+READ8_MEMBER(fidel6502_state::div_trampoline_r)
+{
+	if (!machine().side_effects_disabled())
+		div_set_cpu_freq(offset);
+
+	return m_mainmap->read8(space, offset);
+}
+
+void fidel6502_state::div_trampoline(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(fidel6502_state::div_trampoline_r), FUNC(fidel6502_state::div_trampoline_w));
+}
+
+static INPUT_PORTS_START( cpu_div_2 )
+	PORT_START("div_config") // hardwired, default to /2
+	PORT_CONFNAME( 0x03, 0x02, "CPU Divider" )
+	PORT_CONFSETTING(    0x00, "Disabled" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x03, "4" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cpu_div_4 )
+	PORT_START("div_config") // hardwired, default to /4
+	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" )
+	PORT_CONFSETTING(    0x00, "Disabled" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x03, "4" )
+INPUT_PORTS_END
 
 
 
@@ -904,31 +962,6 @@ MACHINE_RESET_MEMBER(fidel6502_state, sc9c)
 ******************************************************************************/
 
 // TTL/generic
-
-void fidel6502_state::sc12_set_cpu_freq(offs_t offset)
-{
-	if (m_inp_matrix[9]->read() & 2)
-	{
-		// when a13/a14 is high, XTAL goes through divider(s)
-		// (depending on factory-set jumper, either one or two 7474)
-		float div = (m_inp_matrix[9]->read() & 1) ? 0.25 : 0.5;
-		m_maincpu->set_clock_scale((offset & 0x6000) ? div : 1.0);
-	}
-}
-
-WRITE8_MEMBER(fidel6502_state::sc12_trampoline_w)
-{
-	sc12_set_cpu_freq(offset);
-	m_sc12_map->write8(space, offset, data);
-}
-
-READ8_MEMBER(fidel6502_state::sc12_trampoline_r)
-{
-	if (!machine().side_effects_disabled())
-		sc12_set_cpu_freq(offset);
-
-	return m_sc12_map->read8(space, offset);
-}
 
 WRITE8_MEMBER(fidel6502_state::sc12_control_w)
 {
@@ -1259,11 +1292,11 @@ void fidel6502_state::eas_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
+	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
 	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7020, 0x7027).w(this, FUNC(fidel6502_state::eas_segment_w)).nopr();
-	map(0x7030, 0x7037).w(this, FUNC(fidel6502_state::eas_led_w)).nopr();
-	map(0x7050, 0x7050).r(this, FUNC(fidel6502_state::eas_input_r));
+	map(0x7020, 0x7027).w(FUNC(fidel6502_state::eas_segment_w)).nopr();
+	map(0x7030, 0x7037).w(FUNC(fidel6502_state::eas_led_w)).nopr();
+	map(0x7050, 0x7050).r(FUNC(fidel6502_state::eas_input_r));
 	map(0x8000, 0x9fff).rom();
 	map(0xc000, 0xffff).rom();
 }
@@ -1272,11 +1305,11 @@ void fidel6502_state::eag_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
+	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
 	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7020, 0x7027).w(this, FUNC(fidel6502_state::eas_segment_w)).nopr();
-	map(0x7030, 0x7037).w(this, FUNC(fidel6502_state::eas_led_w)).nopr();
-	map(0x7050, 0x7050).r(this, FUNC(fidel6502_state::eas_input_r));
+	map(0x7020, 0x7027).w(FUNC(fidel6502_state::eas_segment_w)).nopr();
+	map(0x7030, 0x7037).w(FUNC(fidel6502_state::eas_led_w)).nopr();
+	map(0x7050, 0x7050).r(FUNC(fidel6502_state::eas_input_r));
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).bankr("rombank");
 	map(0xc000, 0xffff).rom();
@@ -1285,14 +1318,14 @@ void fidel6502_state::eag_map(address_map &map)
 void fidel6502_state::pc_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
-	map(0x7000, 0x7000).w(this, FUNC(fidel6502_state::eas_ppi_porta_w));
-	map(0x7010, 0x7010).r(this, FUNC(fidel6502_state::eas_ppi_portb_r));
-	map(0x7020, 0x7027).w(this, FUNC(fidel6502_state::eas_segment_w)).nopr();
-	map(0x7030, 0x7037).w(this, FUNC(fidel6502_state::eas_led_w)).nopr();
-	map(0x7040, 0x7040).w(this, FUNC(fidel6502_state::eas_ppi_portc_w));
-	map(0x7050, 0x7050).r(this, FUNC(fidel6502_state::eas_input_r));
+	map(0x0000, 0x17ff).ram();
+	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
+	map(0x7000, 0x7000).w(FUNC(fidel6502_state::eas_ppi_porta_w));
+	map(0x7010, 0x7010).r(FUNC(fidel6502_state::eas_ppi_portb_r));
+	map(0x7020, 0x7027).w(FUNC(fidel6502_state::eas_segment_w)).nopr();
+	map(0x7030, 0x7037).w(FUNC(fidel6502_state::eas_led_w)).nopr();
+	map(0x7040, 0x7040).w(FUNC(fidel6502_state::eas_ppi_portc_w));
+	map(0x7050, 0x7050).r(FUNC(fidel6502_state::eas_input_r));
 	map(0x8000, 0x9fff).ram();
 	map(0xb000, 0xffff).rom();
 }
@@ -1304,35 +1337,30 @@ void fidel6502_state::sc9_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
-	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
-	map(0x6000, 0x6000).mirror(0x1fff).w(this, FUNC(fidel6502_state::sc9_control_w));
-	map(0x8000, 0x8007).mirror(0x1ff8).w(this, FUNC(fidel6502_state::sc9_led_w)).nopr();
-	map(0xa000, 0xa000).mirror(0x1fff).r(this, FUNC(fidel6502_state::sc9_input_r));
+	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
+	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(fidel6502_state::sc9_control_w));
+	map(0x8000, 0x8007).mirror(0x1ff8).w(FUNC(fidel6502_state::sc9_led_w)).nopr();
+	map(0xa000, 0xa000).mirror(0x1fff).r(FUNC(fidel6502_state::sc9_input_r));
 	map(0xc000, 0xffff).rom();
 }
 
 void fidel6502_state::sc9d_map(address_map &map)
 {
 	sc9_map(map);
-	map(0xa000, 0xa007).mirror(0x1ff8).r(this, FUNC(fidel6502_state::sc9d_input_r));
+	map(0xa000, 0xa007).mirror(0x1ff8).r(FUNC(fidel6502_state::sc9d_input_r));
 }
 
 
 // SC12, AS12
 
-void fidel6502_state::sc12_trampoline(address_map &map)
-{
-	map(0x0000, 0xffff).rw(this, FUNC(fidel6502_state::sc12_trampoline_r), FUNC(fidel6502_state::sc12_trampoline_w));
-}
-
 void fidel6502_state::sc12_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
-	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
-	map(0x6000, 0x6000).mirror(0x1fff).w(this, FUNC(fidel6502_state::sc12_control_w));
+	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
+	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(fidel6502_state::sc12_control_w));
 	map(0x8000, 0x9fff).rom();
-	map(0xa000, 0xa007).mirror(0x1ff8).r(this, FUNC(fidel6502_state::sc12_input_r));
+	map(0xa000, 0xa007).mirror(0x1ff8).r(FUNC(fidel6502_state::sc12_input_r));
 	map(0xc000, 0xcfff).mirror(0x1000).rom();
 	map(0xe000, 0xffff).rom();
 }
@@ -1341,11 +1369,11 @@ void fidel6502_state::as12_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
-	map(0x1800, 0x1807).w(this, FUNC(fidel6502_state::as12_led_w)).nopr();
-	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
-	map(0x6000, 0x6000).mirror(0x1fff).w(this, FUNC(fidel6502_state::as12_control_w));
+	map(0x1800, 0x1807).w(FUNC(fidel6502_state::as12_led_w)).nopr();
+	map(0x2000, 0x5fff).r(FUNC(fidel6502_state::cartridge_r));
+	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(fidel6502_state::as12_control_w));
 	map(0x8000, 0x9fff).rom();
-	map(0xa000, 0xa007).mirror(0x1ff8).r(this, FUNC(fidel6502_state::as12_input_r));
+	map(0xa000, 0xa007).mirror(0x1ff8).r(FUNC(fidel6502_state::as12_input_r));
 	map(0xc000, 0xffff).rom();
 }
 
@@ -1355,7 +1383,7 @@ void fidel6502_state::as12_map(address_map &map)
 void fidel6502_state::fexcel_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x3800).ram();
-	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
 	//map(0x8000, 0x8000).nopr(); // checks for opening book module, but hw doesn't have a module slot
 	map(0xc000, 0xffff).rom();
 }
@@ -1363,14 +1391,14 @@ void fidel6502_state::fexcel_map(address_map &map)
 void fidel6502_state::fexcelp_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x2000).ram();
-	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
 	map(0x8000, 0xffff).rom();
 }
 
 void fidel6502_state::fexcelb_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x2000).ram();
-	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(fidel6502_state::fexcelb_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(fidel6502_state::fexcelb_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1380,9 +1408,9 @@ void fidel6502_state::fexcelb_map(address_map &map)
 void fidel6502_state::fdesdis_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(this, FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::fdesdis_control_w));
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::fdesdis_control_w));
 	map(0x4000, 0x7fff).bankr("rombank");
-	map(0x6000, 0x6007).mirror(0x1ff8).w(this, FUNC(fidel6502_state::fdesdis_lcd_w));
+	map(0x6000, 0x6007).mirror(0x1ff8).w(FUNC(fidel6502_state::fdesdis_lcd_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1396,16 +1424,16 @@ void fidel6502_state::fphantom_map(address_map &map)
 void fidel6502_state::chesster_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(this, FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::chesster_control_w));
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::chesster_control_w));
 	map(0x4000, 0x7fff).bankr("rombank");
-	map(0x6000, 0x6000).mirror(0x1fff).w("dac8", FUNC(dac_byte_interface::write));
+	map(0x6000, 0x6000).mirror(0x1fff).w("dac8", FUNC(dac_byte_interface::data_w));
 	map(0x8000, 0xffff).rom();
 }
 
 void fidel6502_state::kishon_map(address_map &map)
 {
 	chesster_map(map);
-	map(0x2000, 0x2007).mirror(0x1ff8).rw(this, FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::kishon_control_w));
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::kishon_control_w));
 }
 
 
@@ -1532,6 +1560,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( eas )
 	PORT_INCLUDE( fidel_cb_magnets )
+	PORT_INCLUDE( cpu_div_4 )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
@@ -1580,6 +1609,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( eag )
 	PORT_INCLUDE( fidel_cb_magnets )
+	PORT_INCLUDE( cpu_div_4 )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
@@ -1641,33 +1671,19 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sc12 )
 	PORT_INCLUDE( fidel_cb_buttons )
 	PORT_INCLUDE( sc12_sidepanel )
-
-	PORT_START("IN.9") // hardwired, default to /2
-	PORT_CONFNAME( 0x03, 0x02, "CPU Divider" )
-	PORT_CONFSETTING(    0x00, "Disabled" )
-	PORT_CONFSETTING(    0x02, "2" )
-	PORT_CONFSETTING(    0x03, "4" )
+	PORT_INCLUDE( cpu_div_2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12b )
-	PORT_INCLUDE( sc12 )
-
-	PORT_MODIFY("IN.9") // hardwired, modify default to /4
-	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" )
-	PORT_CONFSETTING(    0x00, "Disabled" )
-	PORT_CONFSETTING(    0x02, "2" )
-	PORT_CONFSETTING(    0x03, "4" )
+	PORT_INCLUDE( fidel_cb_buttons )
+	PORT_INCLUDE( sc12_sidepanel )
+	PORT_INCLUDE( cpu_div_4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( as12 )
 	PORT_INCLUDE( fidel_cb_magnets )
 	PORT_INCLUDE( sc12_sidepanel )
-
-	PORT_START("IN.9") // hardwired, default to /4
-	PORT_CONFNAME( 0x03, 0x03, "CPU Divider" )
-	PORT_CONFSETTING(    0x00, "Disabled" )
-	PORT_CONFSETTING(    0x02, "2" )
-	PORT_CONFSETTING(    0x03, "4" )
+	PORT_INCLUDE( cpu_div_4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( playmatic )
@@ -1808,7 +1824,9 @@ MACHINE_CONFIG_START(fidel6502_state::csc)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // from 3.9MHz resonator
 	MCFG_DEVICE_PROGRAM_MAP(csc_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // 38400Hz/64
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(38.4_kHz_XTAL/64)) // through 4060 IC, 600Hz
+	MCFG_TIMER_START_DELAY(attotime::from_hz(38.4_kHz_XTAL/64) - attotime::from_hz(38.4_kHz_XTAL*2)) // edge!
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(38.4_kHz_XTAL/64))
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(*this, fidel6502_state, csc_pia0_pb_r))
@@ -1855,8 +1873,18 @@ MACHINE_CONFIG_START(fidel6502_state::eas)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", R65C02, 3_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(div_trampoline)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(38.4_kHz_XTAL/64)) // through 4060 IC, 600Hz
+	MCFG_TIMER_START_DELAY(attotime::from_hz(38.4_kHz_XTAL/64) - attotime::from_hz(38.4_kHz_XTAL*2)) // edge!
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(38.4_kHz_XTAL/64))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(3_MHz_XTAL))
+
+	MCFG_DEVICE_ADD("mainmap", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(eas_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0) // port B: input, port A & C: output
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fidel6502_state, eas_ppi_porta_w))
@@ -1887,39 +1915,34 @@ MACHINE_CONFIG_START(fidel6502_state::eas)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::pc)
+	eas(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R65C02, 4_MHz_XTAL)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(4_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_REMOVE("dummy_timer")
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(4_MHz_XTAL))
+
+	MCFG_DEVICE_MODIFY("mainmap")
 	MCFG_DEVICE_PROGRAM_MAP(pc_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEVICE_REMOVE("ppi8255")
+	MCFG_DEVICE_REMOVE("nvram")
+
 	MCFG_DEFAULT_LAYOUT(layout_fidel_pc)
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidel6502_state, csc_speech_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
-
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-
-	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
-	MCFG_GENERIC_EXTENSIONS("bin,dat")
-	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::eag)
 	eas(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(5_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_REMOVE("dummy_timer")
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(5_MHz_XTAL))
+
+	MCFG_DEVICE_MODIFY("mainmap")
 	MCFG_DEVICE_PROGRAM_MAP(eag_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag)
 MACHINE_CONFIG_END
@@ -1978,14 +2001,14 @@ MACHINE_CONFIG_START(fidel6502_state::sc12)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
-	MCFG_DEVICE_PROGRAM_MAP(sc12_trampoline)
+	MCFG_DEVICE_PROGRAM_MAP(div_trampoline)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(3_MHz_XTAL)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(3_MHz_XTAL))
 
-	MCFG_DEVICE_ADD("sc12_map", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_ADD("mainmap", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(sc12_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
@@ -2022,14 +2045,14 @@ MACHINE_CONFIG_START(fidel6502_state::sc12b)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(596))
 
 	MCFG_DEVICE_REMOVE("dummy_timer")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(4_MHz_XTAL)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(4_MHz_XTAL))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::as12)
 	sc12b(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("sc12_map")
+	MCFG_DEVICE_MODIFY("mainmap")
 	MCFG_DEVICE_PROGRAM_MAP(as12_map)
 
 	// change irq timer frequency
@@ -2318,7 +2341,7 @@ ROM_END
 
 
 ROM_START( feasbu )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("eli_bu.6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // ST M27C64A, unknown label
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -2332,7 +2355,7 @@ ROM_START( feasbu )
 ROM_END
 
 ROM_START( feasbusp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("eli_bu.6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -2345,7 +2368,7 @@ ROM_START( feasbusp )
 ROM_END
 
 ROM_START( feasbug )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("eli_bu.6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -2358,7 +2381,7 @@ ROM_START( feasbug )
 ROM_END
 
 ROM_START( feasbufr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("eli_bu.6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -2371,7 +2394,7 @@ ROM_START( feasbufr )
 ROM_END
 
 ROM_START( feasgla )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("eli_gla.6", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -2391,7 +2414,7 @@ ROM_START( feasgla )
 ROM_END
 
 ROM_START( feasglasp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("eli_gla.6", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -2410,7 +2433,7 @@ ROM_START( feasglasp )
 ROM_END
 
 ROM_START( feasglag )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("eli_gla.6", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -2429,7 +2452,7 @@ ROM_START( feasglag )
 ROM_END
 
 ROM_START( feasglafr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("eli_gla.6", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
@@ -2449,7 +2472,7 @@ ROM_END
 
 
 ROM_START( fpres )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
 	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
 	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
@@ -2462,7 +2485,7 @@ ROM_START( fpres )
 ROM_END
 
 ROM_START( fpressp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
 	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
 	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
@@ -2474,7 +2497,7 @@ ROM_START( fpressp )
 ROM_END
 
 ROM_START( fpresg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
 	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
 	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
@@ -2486,7 +2509,7 @@ ROM_START( fpresg )
 ROM_END
 
 ROM_START( fpresfr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
 	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
 	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
@@ -2498,7 +2521,7 @@ ROM_START( fpresfr )
 ROM_END
 
 ROM_START( fpresbu )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
 	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(af0aec0e) SHA1(8293d00a12efa1c142b9e37bc7786012250536d9) )
 	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(214a91cc) SHA1(aab07ecdd66ac208874f4053fc4b0b0659b017aa) )
@@ -2511,7 +2534,7 @@ ROM_START( fpresbu )
 ROM_END
 
 ROM_START( fpresbusp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
 	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(af0aec0e) SHA1(8293d00a12efa1c142b9e37bc7786012250536d9) )
 	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(214a91cc) SHA1(aab07ecdd66ac208874f4053fc4b0b0659b017aa) )
@@ -2523,7 +2546,7 @@ ROM_START( fpresbusp )
 ROM_END
 
 ROM_START( fpresbug )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
 	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(af0aec0e) SHA1(8293d00a12efa1c142b9e37bc7786012250536d9) )
 	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(214a91cc) SHA1(aab07ecdd66ac208874f4053fc4b0b0659b017aa) )
@@ -2535,7 +2558,7 @@ ROM_START( fpresbug )
 ROM_END
 
 ROM_START( fpresbufr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
 	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(af0aec0e) SHA1(8293d00a12efa1c142b9e37bc7786012250536d9) )
 	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(214a91cc) SHA1(aab07ecdd66ac208874f4053fc4b0b0659b017aa) )
@@ -2548,7 +2571,7 @@ ROM_END
 
 
 ROM_START( feag2100 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("el2100.2",  0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
 	ROM_LOAD("el2100.3",  0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
 
@@ -2561,7 +2584,7 @@ ROM_START( feag2100 )
 ROM_END
 
 ROM_START( feag2100sp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("el2100.2",  0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
 	ROM_LOAD("el2100.3",  0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
 
@@ -2573,7 +2596,7 @@ ROM_START( feag2100sp )
 ROM_END
 
 ROM_START( feag2100g )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("el2100.2",  0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
 	ROM_LOAD("el2100.3",  0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
 
@@ -2585,7 +2608,7 @@ ROM_START( feag2100g )
 ROM_END
 
 ROM_START( feag2100fr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("el2100.2",  0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
 	ROM_LOAD("el2100.3",  0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
 
@@ -2623,14 +2646,14 @@ ROM_END
 
 
 ROM_START( fscc12 ) // model SC12, PCB label 510-1084B01
-	ROM_REGION( 0x10000, "sc12_map", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("101-1068a01.ic15", 0x8000, 0x2000, CRC(63c76cdd) SHA1(e0771c98d4483a6b1620791cb99a7e46b0db95c4) ) // SSS SCM23C65E4
 	ROM_LOAD("orange.ic13",      0xc000, 0x1000, CRC(ed5289b2) SHA1(9b0c7f9ae4102d4a66eb8c91d4e84b9eec2ffb3d) ) // TI TMS2732AJL-45, no label, orange sticker
 	ROM_LOAD("red.ic14",         0xe000, 0x2000, CRC(0c4968c4) SHA1(965a66870b0f8ce9549418cbda09d2ff262a1504) ) // TI TMS2764JL-25, no label, red sticker
 ROM_END
 
 ROM_START( fscc12b ) // model 6086, PCB label 510-1084B01
-	ROM_REGION( 0x10000, "sc12_map", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("101-1068a01.ic15", 0x8000, 0x2000, CRC(63c76cdd) SHA1(e0771c98d4483a6b1620791cb99a7e46b0db95c4) ) // SSS SCM23C65E4
 	ROM_LOAD("orange.ic13",      0xc000, 0x1000, CRC(45070a71) SHA1(8aeecff828f26fb7081902c757559903be272649) ) // TI TMS2732AJL-45, no label, orange sticker
 	ROM_LOAD("red.ic14",         0xe000, 0x2000, CRC(183d3edc) SHA1(3296a4c3bce5209587d4a1694fce153558544e63) ) // Toshiba TMM2764D-2, no label, red sticker
@@ -2638,7 +2661,7 @@ ROM_END
 
 
 ROM_START( feleg ) // model AS12(or 6085), PCB label 510-1084B01
-	ROM_REGION( 0x10000, "sc12_map", 0 )
+	ROM_REGION( 0x10000, "mainmap", 0 )
 	ROM_LOAD("feleg.1", 0x8000, 0x2000, CRC(e9df31e8) SHA1(31c52bb8f75580c82093eb950959c1bc294189a8) ) // TMM2764, no label
 	ROM_LOAD("feleg.2", 0xc000, 0x2000, CRC(bed9c84b) SHA1(c12f39765b054d2ad81f747e698715ad4246806d) ) // "
 	ROM_LOAD("feleg.3", 0xe000, 0x2000, CRC(b1fb49aa) SHA1(d8c9687dd564f0fa603e6d684effb1d113ac64b4) ) // "

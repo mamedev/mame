@@ -14,6 +14,7 @@
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "emupal.h"
 
 
 class pmd85_state : public driver_device
@@ -54,7 +55,7 @@ public:
 		m_bank16(*this, "bank16"),
 		m_io_dsw0(*this, "DSW0"),
 		m_palette(*this, "palette"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	uint8_t m_rom_module_present;
@@ -126,7 +127,7 @@ public:
 	void pmd85_io_map(address_map &map);
 	void pmd85_mem(address_map &map);
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -157,7 +158,7 @@ protected:
 	optional_ioport m_io_dsw0;
 	ioport_port *m_io_port[16];
 	required_device<palette_device> m_palette;
-	output_finder<3> m_led;
+	output_finder<3> m_leds;
 
 	void pmd851_update_memory();
 	void pmd852a_update_memory();

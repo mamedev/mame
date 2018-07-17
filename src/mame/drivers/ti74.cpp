@@ -75,6 +75,7 @@
 #include "cpu/tms7000/tms7000.h"
 #include "machine/nvram.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -91,7 +92,7 @@ public:
 		m_cart(*this, "cartslot"),
 		m_key_matrix(*this, "IN.%u", 0),
 		m_battery_inp(*this, "BATTERY"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void update_lcd_indicator(u8 y, u8 x, int state);
@@ -123,7 +124,7 @@ private:
 	u8 m_key_select;
 	u8 m_power;
 
-	output_finder<80> m_lamp;
+	output_finder<80> m_lamps;
 };
 
 
@@ -180,7 +181,7 @@ void ti74_state::update_lcd_indicator(u8 y, u8 x, int state)
 	// above    | _LOW _ERROR  2nd  INV  ALPHA  LC  INS  DEGRAD  HEX  OCT  I/O
 	// screen-  | _P{70} <{71}                                             RUN{3}
 	//   area   .                                                          SYS{4}
-	m_lamp[y * 10 + x] = state ? 1 : 0;
+	m_lamps[y * 10 + x] = state ? 1 : 0;
 }
 
 HD44780_PIXEL_UPDATE(ti74_state::ti74_pixel_update)
@@ -498,7 +499,7 @@ void ti74_state::machine_reset()
 
 void ti74_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));

@@ -58,6 +58,7 @@
 
 #include "bus/rs232/rs232.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -176,7 +177,7 @@ void proteus3_state::kbd_put(u8 data)
 {
 	if (data == 0x08)
 		data = 0x0f; // take care of backspace (bios 1 and 2)
-	m_pia->portb_w(data);
+	m_pia->write_portb(data);
 	m_pia->cb1_w(1);
 	m_pia->cb1_w(0);
 }
@@ -420,7 +421,7 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2", acia6850_device, write_cts))
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD ("brg", XTAL(1'843'200)) // crystal needs verification but is the likely one
+	MCFG_DEVICE_ADD ("brg", MC14411, XTAL(1'843'200)) // crystal needs verification but is the likely one
 	MCFG_MC14411_F1_CB(WRITELINE (*this, proteus3_state, write_f1_clock))
 	MCFG_MC14411_F2_CB(WRITELINE (*this, proteus3_state, write_f2_clock))
 	MCFG_MC14411_F3_CB(WRITELINE (*this, proteus3_state, write_f3_clock))
@@ -447,21 +448,21 @@ MACHINE_CONFIG_END
 ROM_START(proteus3)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "14k", "14k BASIC")
-	ROMX_LOAD( "bas1.bin",     0xc800, 0x0800, CRC(016bf2d6) SHA1(89605dbede3b6fd101ee0548e5c545a0824fcfd3), ROM_BIOS(1) )
-	ROMX_LOAD( "bas2.bin",     0xd000, 0x0800, CRC(39d3e543) SHA1(dd0fe220e3c2a48ce84936301311cbe9f1597ca7), ROM_BIOS(1) )
-	ROMX_LOAD( "bas3.bin",     0xd800, 0x0800, CRC(3a41617d) SHA1(175406f4732389e226bc50d27ada39e6ea48de34), ROM_BIOS(1) )
-	ROMX_LOAD( "bas4.bin",     0xe000, 0x0800, CRC(ee9d77ee) SHA1(f7e60a1ab88a3accc8ffdc545657c071934d09d2), ROM_BIOS(1) )
-	ROMX_LOAD( "bas5.bin",     0xe800, 0x0800, CRC(bd81bb34) SHA1(6325735e5750a9536e63b67048f74711fae1fa42), ROM_BIOS(1) )
-	ROMX_LOAD( "bas6.bin",     0xf000, 0x0800, CRC(60cd006b) SHA1(28354f78490da1eb5116cbbc43eaca0670f7f398), ROM_BIOS(1) )
-	ROMX_LOAD( "bas7.bin",     0xf800, 0x0800, CRC(84c3dc22) SHA1(8fddba61b5f0270ca2daef32ab5edfd60300c776), ROM_BIOS(1) )
+	ROMX_LOAD( "bas1.bin",     0xc800, 0x0800, CRC(016bf2d6) SHA1(89605dbede3b6fd101ee0548e5c545a0824fcfd3), ROM_BIOS(0) )
+	ROMX_LOAD( "bas2.bin",     0xd000, 0x0800, CRC(39d3e543) SHA1(dd0fe220e3c2a48ce84936301311cbe9f1597ca7), ROM_BIOS(0) )
+	ROMX_LOAD( "bas3.bin",     0xd800, 0x0800, CRC(3a41617d) SHA1(175406f4732389e226bc50d27ada39e6ea48de34), ROM_BIOS(0) )
+	ROMX_LOAD( "bas4.bin",     0xe000, 0x0800, CRC(ee9d77ee) SHA1(f7e60a1ab88a3accc8ffdc545657c071934d09d2), ROM_BIOS(0) )
+	ROMX_LOAD( "bas5.bin",     0xe800, 0x0800, CRC(bd81bb34) SHA1(6325735e5750a9536e63b67048f74711fae1fa42), ROM_BIOS(0) )
+	ROMX_LOAD( "bas6.bin",     0xf000, 0x0800, CRC(60cd006b) SHA1(28354f78490da1eb5116cbbc43eaca0670f7f398), ROM_BIOS(0) )
+	ROMX_LOAD( "bas7.bin",     0xf800, 0x0800, CRC(84c3dc22) SHA1(8fddba61b5f0270ca2daef32ab5edfd60300c776), ROM_BIOS(0) )
 	ROM_FILL( 0xc000, 1, 0x00 )  // if c000 isn't 0 it assumes a rom is there and jumps to it
 
 	ROM_SYSTEM_BIOS( 1, "8k", "8k BASIC")
-	ROMX_LOAD( "proteus3_basic8k.m0", 0xe000, 0x2000, CRC(7d9111c2) SHA1(3c032c9c7f87d22a1a9819b3b812be84404d2ad2), ROM_BIOS(2) )
+	ROMX_LOAD( "proteus3_basic8k.m0", 0xe000, 0x2000, CRC(7d9111c2) SHA1(3c032c9c7f87d22a1a9819b3b812be84404d2ad2), ROM_BIOS(1) )
 	ROM_RELOAD( 0xc000, 0x2000 )
 
 	ROM_SYSTEM_BIOS( 2, "8kms", "8k Micro-Systemes BASIC")
-	ROMX_LOAD( "ms1_basic8k.bin", 0xe000, 0x2000, CRC(b5476e28) SHA1(c8c2366d549b2645c740be4ab4237e05c3cab4a9), ROM_BIOS(3) )
+	ROMX_LOAD( "ms1_basic8k.bin", 0xe000, 0x2000, CRC(b5476e28) SHA1(c8c2366d549b2645c740be4ab4237e05c3cab4a9), ROM_BIOS(2) )
 	ROM_RELOAD( 0xc000, 0x2000 )
 
 	ROM_REGION(0x400, "chargen", 0)

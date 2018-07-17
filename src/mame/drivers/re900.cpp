@@ -95,7 +95,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_rom(*this, "rom"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	// common
@@ -116,7 +116,7 @@ public:
 	void mem_prg(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 
 	required_device<cpu_device> m_maincpu;
 
@@ -129,7 +129,7 @@ protected:
 	uint8_t m_ledant;
 	uint8_t m_player;
 	uint8_t m_stat_a;
-	output_finder<84> m_lamp;
+	output_finder<84> m_lamps;
 };
 
 
@@ -141,12 +141,12 @@ READ8_MEMBER(re900_state::re_psg_portA_r)
 {
 	if ((ioport("IN0")->read() & 0x01) == 0)
 	{
-		m_lamp[0] = 1;     // Operator Key ON
+		m_lamps[0] = 1;     // Operator Key ON
 	}
 
 	else
 	{
-		m_lamp[0] = 0;     // Operator Key OFF
+		m_lamps[0] = 0;     // Operator Key OFF
 	}
 
 	return ioport("IN0")->read();
@@ -158,18 +158,18 @@ READ8_MEMBER(re900_state::re_psg_portB_r)
 	logerror("llamada a re_psg_portB_r\n");
 	/* This is a hack to select the active player due to Keyboard size restrictions  */
 
-	m_lamp[m_player] = 1;
+	m_lamps[m_player] = 1;
 
 	if (ioport("IN_S")->read())
 	{
 		if (!m_stat_a)
 		{
-			m_lamp[1] = 0;
-			m_lamp[2] = 0;
-			m_lamp[3] = 0;
-			m_lamp[4] = 0;
-			m_lamp[5] = 0;
-			m_lamp[6] = 0;
+			m_lamps[1] = 0;
+			m_lamps[2] = 0;
+			m_lamps[3] = 0;
+			m_lamps[4] = 0;
+			m_lamps[5] = 0;
+			m_lamps[6] = 0;
 			m_player++;
 
 			if (m_player == 7)
@@ -177,7 +177,7 @@ READ8_MEMBER(re900_state::re_psg_portB_r)
 				m_player = 1;
 			}
 
-			m_lamp[m_player] = 1; /* It shows active player via layout buttons   */
+			m_lamps[m_player] = 1; /* It shows active player via layout buttons   */
 			m_stat_a = 1;
 		}
 	}
@@ -226,11 +226,11 @@ WRITE8_MEMBER(re900_state::re_mux_port_B_w)
 
 	if (data == 0x7f)
 	{
-		m_lamp[20 + led] = 1;
+		m_lamps[20 + led] = 1;
 
 		if (led != m_ledant)
 		{
-			m_lamp[20 + m_ledant] = 0;
+			m_lamps[20 + m_ledant] = 0;
 			m_ledant = led;
 		}
 	}
@@ -238,8 +238,8 @@ WRITE8_MEMBER(re900_state::re_mux_port_B_w)
 
 WRITE8_MEMBER(re900_state::cpu_port_0_w)
 {
-//  m_lamp[7] = 1 ^ ( (data >> 4) & 1); /* Cont. Sal */
-//  m_lamp[8] = 1 ^ ( (data >> 5) & 1); /* Cont. Ent */
+//  m_lamps[7] = 1 ^ ( (data >> 4) & 1); /* Cont. Sal */
+//  m_lamps[8] = 1 ^ ( (data >> 5) & 1); /* Cont. Ent */
 }
 
 WRITE8_MEMBER(re900_state::watchdog_reset_w)
@@ -259,11 +259,11 @@ void re900_state::mem_prg(address_map &map)
 
 void re900_state::mem_io(address_map &map)
 {
-	map(0x0000, 0xbfff).r(this, FUNC(re900_state::rom_r));
+	map(0x0000, 0xbfff).r(FUNC(re900_state::rom_r));
 	map(0xc000, 0xdfff).ram().share("nvram");
-	map(0xe000, 0xefff).w(this, FUNC(re900_state::watchdog_reset_w));
-	map(0xe000, 0xe000).w("tms9128", FUNC(tms9928a_device::vram_write));
-	map(0xe001, 0xe001).w("tms9128", FUNC(tms9928a_device::register_write));
+	map(0xe000, 0xefff).w(FUNC(re900_state::watchdog_reset_w));
+	map(0xe000, 0xe000).w("tms9128", FUNC(tms9928a_device::vram_w));
+	map(0xe001, 0xe001).w("tms9128", FUNC(tms9928a_device::register_w));
 	map(0xe800, 0xe801).w("ay_re900", FUNC(ay8910_device::address_data_w));
 	map(0xe802, 0xe802).r("ay_re900", FUNC(ay8910_device::data_r));
 }

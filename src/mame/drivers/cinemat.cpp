@@ -324,9 +324,9 @@ void qb3_state::data_map_qb3(address_map &map)
 
 void cinemat_state::io_map(address_map &map)
 {
-	map(0x00, 0x0f).r(this, FUNC(cinemat_state::inputs_r));
-	map(0x10, 0x16).r(this, FUNC(cinemat_state::switches_r));
-	map(0x17, 0x17).r(this, FUNC(cinemat_state::coin_input_r));
+	map(0x00, 0x0f).r(FUNC(cinemat_state::inputs_r));
+	map(0x10, 0x16).r(FUNC(cinemat_state::switches_r));
+	map(0x17, 0x17).r(FUNC(cinemat_state::coin_input_r));
 
 	map(0x00, 0x07).w(m_outlatch, FUNC(ls259_device::write_d0));
 }
@@ -335,9 +335,9 @@ void qb3_state::io_map_qb3(address_map &map)
 {
 	io_map(map);
 	// Some of the outputs here are definitely not mapped through the LS259, since they use multiple bits of data
-	map(0x00, 0x00).w(this, FUNC(qb3_state::qb3_ram_bank_w));
-	map(0x04, 0x04).w(this, FUNC(qb3_state::qb3_sound_fifo_w));
-	map(0x0f, 0x0f).r(this, FUNC(qb3_state::qb3_frame_r));
+	map(0x00, 0x00).w(FUNC(qb3_state::qb3_ram_bank_w));
+	map(0x04, 0x04).w(FUNC(qb3_state::qb3_sound_fifo_w));
+	map(0x0f, 0x0f).r(FUNC(qb3_state::qb3_frame_r));
 }
 
 

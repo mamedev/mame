@@ -15,6 +15,7 @@
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -28,12 +29,13 @@ class jtc_state : public driver_device
 {
 public:
 	jtc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, UB8830D_TAG),
-			m_cassette(*this, "cassette"),
-			m_speaker(*this, "speaker"),
-			m_centronics(*this, CENTRONICS_TAG),
-		m_video_ram(*this, "video_ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, UB8830D_TAG)
+		, m_cassette(*this, "cassette")
+		, m_speaker(*this, "speaker")
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_video_ram(*this, "video_ram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
@@ -278,8 +280,8 @@ void jtces40_state::jtc_es40_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0800, 0x1fff).rom();
-	map(0x4000, 0x5fff).rw(this, FUNC(jtces40_state::videoram_r), FUNC(jtces40_state::videoram_w));
-	map(0x6000, 0x63ff).w(this, FUNC(jtces40_state::banksel_w));
+	map(0x4000, 0x5fff).rw(FUNC(jtces40_state::videoram_r), FUNC(jtces40_state::videoram_w));
+	map(0x6000, 0x63ff).w(FUNC(jtces40_state::banksel_w));
 	map(0x7001, 0x7001).mirror(0x0ff0).portr("Y1");
 	map(0x7002, 0x7002).mirror(0x0ff0).portr("Y2");
 	map(0x7003, 0x7003).mirror(0x0ff0).portr("Y3");
@@ -744,7 +746,7 @@ MACHINE_CONFIG_START(jtc_state::basic)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, jtc_state, write_centronics_busy))
 MACHINE_CONFIG_END
 

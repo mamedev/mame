@@ -460,7 +460,7 @@ public:
 WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
 {
 	m_soundirq->rst30_w(1);
-	m_adpcm->data_w(m_adpcm_data);
+	m_adpcm->write_data(m_adpcm_data);
 }
 
 
@@ -526,11 +526,11 @@ void kurukuru_state::kurukuru_map(address_map &map)
 void kurukuru_state::kurukuru_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).mirror(0x0f).w(this, FUNC(kurukuru_state::kurukuru_out_latch_w));
+	map(0x00, 0x00).mirror(0x0f).w(FUNC(kurukuru_state::kurukuru_out_latch_w));
 	map(0x10, 0x10).mirror(0x0f).portr("DSW1");
 	map(0x20, 0x20).mirror(0x0f).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x80, 0x83).mirror(0x0c).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
-	map(0x90, 0x90).mirror(0x0f).w(this, FUNC(kurukuru_state::kurukuru_bankswitch_w));
+	map(0x90, 0x90).mirror(0x0f).w(FUNC(kurukuru_state::kurukuru_bankswitch_w));
 	map(0xa0, 0xa0).mirror(0x0f).portr("IN0");
 	map(0xb0, 0xb0).mirror(0x0f).portr("IN1");
 	map(0xc0, 0xc0).mirror(0x0f).rw("ym2149", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
@@ -547,11 +547,11 @@ void kurukuru_state::ppj_map(address_map &map)
 void kurukuru_state::ppj_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).mirror(0x0f).w(this, FUNC(kurukuru_state::kurukuru_bankswitch_w));
+	map(0x00, 0x00).mirror(0x0f).w(FUNC(kurukuru_state::kurukuru_bankswitch_w));
 	map(0x10, 0x13).mirror(0x0c).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0x30, 0x30).mirror(0x0f).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x40, 0x40).mirror(0x0f).portr("DSW1");
-	map(0x50, 0x50).mirror(0x0f).w(this, FUNC(kurukuru_state::kurukuru_out_latch_w));
+	map(0x50, 0x50).mirror(0x0f).w(FUNC(kurukuru_state::kurukuru_out_latch_w));
 	map(0x60, 0x60).mirror(0x0f).portr("IN1");
 	map(0x70, 0x70).mirror(0x0f).portr("IN0");
 	map(0xc0, 0xc0).mirror(0x0f).w("ym2149", FUNC(ay8910_device::address_w));
@@ -619,10 +619,10 @@ void kurukuru_state::kurukuru_audio_map(address_map &map)
 void kurukuru_state::kurukuru_audio_io(address_map &map)
 {
 	map.global_mask(0x7f);
-	map(0x40, 0x40).mirror(0x0f).w(this, FUNC(kurukuru_state::kurukuru_adpcm_data_w));
-	map(0x50, 0x50).mirror(0x0f).w(this, FUNC(kurukuru_state::kurukuru_adpcm_reset_w));
+	map(0x40, 0x40).mirror(0x0f).w(FUNC(kurukuru_state::kurukuru_adpcm_data_w));
+	map(0x50, 0x50).mirror(0x0f).w(FUNC(kurukuru_state::kurukuru_adpcm_reset_w));
 	map(0x60, 0x60).mirror(0x0f).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x70, 0x70).mirror(0x0f).r(this, FUNC(kurukuru_state::kurukuru_adpcm_timer_irqack_r));
+	map(0x70, 0x70).mirror(0x0f).r(FUNC(kurukuru_state::kurukuru_adpcm_timer_irqack_r));
 }
 
 void kurukuru_state::ppj_audio_map(address_map &map)
@@ -634,10 +634,10 @@ void kurukuru_state::ppj_audio_map(address_map &map)
 void kurukuru_state::ppj_audio_io(address_map &map)
 {
 	map.global_mask(0x7f);
-	map(0x20, 0x20).mirror(0x0f).w(this, FUNC(kurukuru_state::kurukuru_adpcm_data_w));
-	map(0x30, 0x30).mirror(0x0f).w(this, FUNC(kurukuru_state::kurukuru_adpcm_reset_w));
+	map(0x20, 0x20).mirror(0x0f).w(FUNC(kurukuru_state::kurukuru_adpcm_data_w));
+	map(0x30, 0x30).mirror(0x0f).w(FUNC(kurukuru_state::kurukuru_adpcm_reset_w));
 	map(0x40, 0x40).mirror(0x0f).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x50, 0x50).mirror(0x0f).r(this, FUNC(kurukuru_state::kurukuru_adpcm_timer_irqack_r));
+	map(0x50, 0x50).mirror(0x0f).r(FUNC(kurukuru_state::kurukuru_adpcm_timer_irqack_r));
 }
 /*
   30h -W  --> 0x0b

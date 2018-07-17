@@ -43,14 +43,14 @@ void darkseal_state::darkseal_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x120000, 0x1207ff).ram().share("spriteram");
-	map(0x140000, 0x140fff).ram().w(this, FUNC(darkseal_state::palette_w)).share("palette");
-	map(0x141000, 0x141fff).ram().w(this, FUNC(darkseal_state::palette_ext_w)).share("palette_ext");
+	map(0x140000, 0x140fff).ram().w(FUNC(darkseal_state::palette_w)).share("palette");
+	map(0x141000, 0x141fff).ram().w(FUNC(darkseal_state::palette_ext_w)).share("palette_ext");
 	map(0x180000, 0x180001).portr("DSW");
 	map(0x180002, 0x180003).portr("P1_P2");
 	map(0x180004, 0x180005).portr("SYSTEM");
 	map(0x180006, 0x180007).nopr().w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x180008, 0x180009).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
-	map(0x18000a, 0x18000b).nopr().w(this, FUNC(darkseal_state::irq_ack_w));
+	map(0x18000a, 0x18000b).nopr().w(FUNC(darkseal_state::irq_ack_w));
 
 	map(0x200000, 0x201fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x202000, 0x203fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));

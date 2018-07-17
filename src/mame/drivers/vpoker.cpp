@@ -101,6 +101,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -187,7 +188,7 @@ void vpoker_state::main_map(address_map &map)
 	map.global_mask(0x3fff);
 	map(0x0000, 0x01ff).ram();     /* vpoker has 0x100, 5acespkr has 0x200 */
 	map(0x0400, 0x0407).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
-	map(0x0800, 0x0807).r(this, FUNC(vpoker_state::blitter_r)).w(this, FUNC(vpoker_state::blitter_w));
+	map(0x0800, 0x0807).r(FUNC(vpoker_state::blitter_r)).w(FUNC(vpoker_state::blitter_w));
 	map(0x2000, 0x3fff).rom();
 }
 

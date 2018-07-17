@@ -81,6 +81,7 @@
 #include "sound/volt_reg.h"
 #include "video/hd44780.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -97,7 +98,8 @@ public:
 		m_cart(*this, "cartslot"),
 		m_key_matrix(*this, "IN.%u", 0),
 		m_battery_inp(*this, "BATTERY"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_nvram(*this, "sysram.%u", 1U),
+		m_lamps(*this, "lamp%u", 0U)
 	{
 		m_sysram[0] = nullptr;
 		m_sysram[1] = nullptr;
@@ -137,8 +139,7 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;
 	required_ioport m_battery_inp;
-
-	nvram_device *m_nvram[2];
+	required_device_array<nvram_device, 2> m_nvram;
 
 	memory_region *m_cart_rom;
 
@@ -153,7 +154,7 @@ private:
 	u16 m_sysram_size[2];
 	u16 m_sysram_end[2];
 	u16 m_sysram_mask[2];
-	output_finder<80> m_lamp;
+	output_finder<80> m_lamps;
 };
 
 
@@ -204,7 +205,7 @@ void cc40_state::update_lcd_indicator(u8 y, u8 x, int state)
 	// ---- raw lcd screen here ----
 	// under    |    ERROR   v      v      v      v      v      v    _LOW
 	// output#  |    60     61     62     63     50     51     52     53
-	m_lamp[y * 10 + x] = state ? 1 : 0;
+	m_lamps[y * 10 + x] = state ? 1 : 0;
 }
 
 HD44780_PIXEL_UPDATE(cc40_state::cc40_pixel_update)
@@ -372,19 +373,19 @@ void cc40_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 
-	map(0x0110, 0x0110).rw(this, FUNC(cc40_state::bus_control_r), FUNC(cc40_state::bus_control_w));
-	map(0x0111, 0x0111).w(this, FUNC(cc40_state::power_w));
+	map(0x0110, 0x0110).rw(FUNC(cc40_state::bus_control_r), FUNC(cc40_state::bus_control_w));
+	map(0x0111, 0x0111).w(FUNC(cc40_state::power_w));
 	map(0x0112, 0x0112).noprw(); // d0-d3: Hexbus data
 	map(0x0113, 0x0113).noprw(); // d0: Hexbus available
 	map(0x0114, 0x0114).noprw(); // d0,d1: Hexbus handshake
-	map(0x0115, 0x0115).w("dac", FUNC(dac_bit_interface::write)); // d0: piezo control
-	map(0x0116, 0x0116).r(this, FUNC(cc40_state::battery_r));
-	map(0x0119, 0x0119).rw(this, FUNC(cc40_state::bankswitch_r), FUNC(cc40_state::bankswitch_w));
-	map(0x011a, 0x011a).rw(this, FUNC(cc40_state::clock_control_r), FUNC(cc40_state::clock_control_w));
+	map(0x0115, 0x0115).w("dac", FUNC(dac_bit_interface::data_w)); // d0: piezo control
+	map(0x0116, 0x0116).r(FUNC(cc40_state::battery_r));
+	map(0x0119, 0x0119).rw(FUNC(cc40_state::bankswitch_r), FUNC(cc40_state::bankswitch_w));
+	map(0x011a, 0x011a).rw(FUNC(cc40_state::clock_control_r), FUNC(cc40_state::clock_control_w));
 	map(0x011e, 0x011f).rw("hd44780", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 
 	map(0x0800, 0x0fff).ram().share("sysram.0");
-	map(0x1000, 0x4fff).rw(this, FUNC(cc40_state::sysram_r), FUNC(cc40_state::sysram_w));
+	map(0x1000, 0x4fff).rw(FUNC(cc40_state::sysram_r), FUNC(cc40_state::sysram_w));
 	map(0x5000, 0xcfff).bankr("cartbank");
 	map(0xd000, 0xefff).bankr("sysbank");
 }
@@ -548,7 +549,7 @@ void cc40_state::postload()
 void cc40_state::machine_start()
 {
 	// init
-	m_lamp.resolve();
+	m_lamps.resolve();
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
@@ -558,8 +559,6 @@ void cc40_state::machine_start()
 	else
 		membank("cartbank")->set_base(memregion("maincpu")->base() + 0x5000);
 
-	m_nvram[0] = machine().device<nvram_device>("sysram.1");
-	m_nvram[1] = machine().device<nvram_device>("sysram.2");
 	init_sysram(0, 0x800); // default to 6KB
 	init_sysram(1, 0x800); // "
 

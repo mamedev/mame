@@ -5,11 +5,6 @@
 #include "emu.h"
 #include "video/315_5313.h"
 
-/* still have dependencies on the following external gunk */
-
-#include "sound/sn76496.h"
-
-
 /*  The VDP occupies addresses C00000h to C0001Fh.
 
  C00000h    -   Data port (8=r/w, 16=r/w)
@@ -153,16 +148,58 @@
 
 DEFINE_DEVICE_TYPE(SEGA315_5313, sega315_5313_device, "sega315_5313", "Sega 315-5313 Megadrive VDP")
 
-sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sega315_5124_device(mconfig, SEGA315_5313, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true),
-	m_render_bitmap(nullptr), m_render_line(nullptr), m_render_line_raw(nullptr), m_megadriv_scanline_timer(nullptr),
-	m_sndirqline_callback(*this), m_lv6irqline_callback(*this), m_lv4irqline_callback(*this),
-	m_command_pending(0), m_command_part1(0), m_command_part2(0), m_vdp_code(0), m_vdp_address(0), m_vram_fill_pending(0), m_vram_fill_length(0), m_irq4counter(0),
-	m_imode_odd_frame(0), m_sprite_collision(0), m_irq6_pending(0), m_irq4_pending(0), m_scanline_counter(0), m_vblank_flag(0), m_imode(0), m_visible_scanlines(0), m_irq6_scanline(0),
-	m_z80irq_scanline(0), m_total_scanlines(0), m_base_total_scanlines(0), m_framerate(0), m_vdp_pal(0), m_use_cram(0),
-	m_dma_delay(0), m_regs(nullptr), m_vram(nullptr), m_cram(nullptr), m_vsram(nullptr), m_internal_sprite_attribute_table(nullptr), m_irq6_on_timer(nullptr), m_irq4_on_timer(nullptr),
-	m_render_timer(nullptr), m_sprite_renderline(nullptr), m_highpri_renderline(nullptr), m_video_renderline(nullptr), m_palette_lookup(nullptr), m_palette_lookup_sprite(nullptr),
-	m_palette_lookup_shadow(nullptr), m_palette_lookup_highlight(nullptr), m_space68k(nullptr), m_cpu68k(nullptr)
+sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega315_5124_device(mconfig, SEGA315_5313, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true)
+	, device_mixer_interface(mconfig, *this, 2)
+	, m_render_bitmap(nullptr)
+	, m_render_line(nullptr)
+	, m_render_line_raw(nullptr)
+	, m_megadriv_scanline_timer(nullptr)
+	, m_sndirqline_callback(*this)
+	, m_lv6irqline_callback(*this)
+	, m_lv4irqline_callback(*this)
+	, m_command_pending(0)
+	, m_command_part1(0)
+	, m_command_part2(0)
+	, m_vdp_code(0)
+	, m_vdp_address(0)
+	, m_vram_fill_pending(0)
+	, m_vram_fill_length(0)
+	, m_irq4counter(0)
+	, m_imode_odd_frame(0)
+	, m_sprite_collision(0)
+	, m_irq6_pending(0)
+	, m_irq4_pending(0)
+	, m_scanline_counter(0)
+	, m_vblank_flag(0)
+	, m_imode(0)
+	, m_visible_scanlines(0)
+	, m_irq6_scanline(0)
+	, m_z80irq_scanline(0)
+	, m_total_scanlines(0)
+	, m_base_total_scanlines(0)
+	, m_framerate(0)
+	, m_vdp_pal(0)
+	, m_use_cram(0)
+	, m_dma_delay(0)
+	, m_regs(nullptr)
+	, m_vram(nullptr)
+	, m_cram(nullptr)
+	, m_vsram(nullptr)
+	, m_internal_sprite_attribute_table(nullptr)
+	, m_irq6_on_timer(nullptr)
+	, m_irq4_on_timer(nullptr)
+	, m_render_timer(nullptr)
+	, m_sprite_renderline(nullptr)
+	, m_highpri_renderline(nullptr)
+	, m_video_renderline(nullptr)
+	, m_palette_lookup(nullptr)
+	, m_palette_lookup_sprite(nullptr)
+	, m_palette_lookup_shadow(nullptr)
+	, m_palette_lookup_highlight(nullptr)
+	, m_space68k(nullptr)
+	, m_cpu68k(*this, finder_base::DUMMY_TAG)
+	, m_snsnd(*this, "snsnd")
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base = -1;
@@ -176,6 +213,9 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 MACHINE_CONFIG_START(sega315_5313_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
+
+	MCFG_DEVICE_ADD("snsnd", SEGAPSG, DERIVED_CLOCK(1, 15))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.5, 0)
 MACHINE_CONFIG_END
 
 TIMER_CALLBACK_MEMBER(sega315_5313_device::irq6_on_timer_callback)
@@ -280,8 +320,7 @@ void sega315_5313_device::device_start()
 	m_irq4_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq4_on_timer_callback), this));
 	m_render_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::render_scanline), this));
 
-	m_space68k = &machine().device<m68000_base_device>(":maincpu")->space();
-	m_cpu68k = machine().device<m68000_base_device>(":maincpu");
+	m_space68k = &m_cpu68k->space();
 
 	sega315_5124_device::device_start();
 }
@@ -917,9 +956,9 @@ WRITE16_MEMBER( sega315_5313_device::vdp_w )
 		case 0x16:
 		{
 			// accessed by either segapsg_device or sn76496_device
-			sn76496_base_device *sn = machine().device<sn76496_base_device>(":snsnd");
-			if (ACCESSING_BITS_0_7) sn->write(space, 0, data & 0xff);
-			//if (ACCESSING_BITS_8_15) sn->write(space, 0, (data>>8) & 0xff);
+			if (m_snsnd && ACCESSING_BITS_0_7)
+				m_snsnd->write(data & 0xff);
+			//if (m_snsnd && ACCESSING_BITS_8_15) sn->write((data>>8) & 0xff);
 			break;
 		}
 

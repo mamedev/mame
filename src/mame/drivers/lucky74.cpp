@@ -878,10 +878,10 @@ WRITE8_MEMBER(lucky74_state::lamps_a_w)
     ---- xx--  BIG + SMALL (need to be individualized)
 */
 
-	m_lamp[8] = BIT(data, 0);      /* D-UP */
-	m_lamp[9] = BIT(data, 1);      /* TAKE SCORE */
-	m_lamp[10] = BIT(data, 2);     /* BIG */
-	m_lamp[11] = BIT(data, 3);     /* SMALL */
+	m_lamps[8] = BIT(data, 0);      /* D-UP */
+	m_lamps[9] = BIT(data, 1);      /* TAKE SCORE */
+	m_lamps[10] = BIT(data, 2);     /* BIG */
+	m_lamps[11] = BIT(data, 3);     /* SMALL */
 }
 
 WRITE8_MEMBER(lucky74_state::lamps_b_w)
@@ -898,14 +898,14 @@ WRITE8_MEMBER(lucky74_state::lamps_b_w)
     x--- ----  CANCEL (should lit start too?)
 */
 
-	m_lamp[0] = BIT(data, 0);                 /* HOLD1 */
-	m_lamp[1] = BIT(data, 1);                 /* HOLD2 */
-	m_lamp[2] = BIT(data, 2);                 /* HOLD3 */
-	m_lamp[3] = BIT(data, 3);                 /* HOLD4 */
-	m_lamp[4] = BIT(data, 4);                 /* HOLD5 */
-	m_lamp[5] = BIT(data, 5);                 /* BET */
-	m_lamp[6] = BIT(data, 6) | BIT(data, 7);  /* START */
-	m_lamp[7] = BIT(data, 7);                 /* CANCEL */
+	m_lamps[0] = BIT(data, 0);                 /* HOLD1 */
+	m_lamps[1] = BIT(data, 1);                 /* HOLD2 */
+	m_lamps[2] = BIT(data, 2);                 /* HOLD3 */
+	m_lamps[3] = BIT(data, 3);                 /* HOLD4 */
+	m_lamps[4] = BIT(data, 4);                 /* HOLD5 */
+	m_lamps[5] = BIT(data, 5);                 /* BET */
+	m_lamps[6] = BIT(data, 6) | BIT(data, 7);  /* START */
+	m_lamps[7] = BIT(data, 7);                 /* CANCEL */
 }
 
 
@@ -930,27 +930,27 @@ void lucky74_state::lucky74_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram().share("nvram");   /* NVRAM */
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(lucky74_state::lucky74_fg_videoram_w)).share("fg_videoram");    /* VRAM1-1 */
-	map(0xd800, 0xdfff).ram().w(this, FUNC(lucky74_state::lucky74_fg_colorram_w)).share("fg_colorram");    /* VRAM1-2 */
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(lucky74_state::lucky74_bg_videoram_w)).share("bg_videoram");    /* VRAM2-1 */
-	map(0xe800, 0xefff).ram().w(this, FUNC(lucky74_state::lucky74_bg_colorram_w)).share("bg_colorram");    /* VRAM2-2 */
-	map(0xf000, 0xf003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));        /* Input Ports 0 & 1 */
-	map(0xf080, 0xf083).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));        /* DSW 1, 2 & 3 */
-	map(0xf0c0, 0xf0c3).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));        /* DSW 4 */
-	map(0xf100, 0xf100).w("sn1", FUNC(sn76489_device::write));                      /* SN76489 #1 */
-	map(0xf200, 0xf203).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));        /* Input Ports 2 & 4 */
-	map(0xf300, 0xf300).w("sn2", FUNC(sn76489_device::write));                      /* SN76489 #2 */
-	map(0xf400, 0xf400).w("aysnd", FUNC(ay8910_device::address_w));                  /* YM2149 control */
-	map(0xf500, 0xf500).w("sn3", FUNC(sn76489_device::write));                      /* SN76489 #3 */
-	map(0xf600, 0xf600).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));       /* YM2149 (Input Port 1) */
-	map(0xf700, 0xf701).rw(this, FUNC(lucky74_state::usart_8251_r), FUNC(lucky74_state::usart_8251_w));                       /* USART 8251 port */
-	map(0xf800, 0xf803).rw(this, FUNC(lucky74_state::copro_sm7831_r), FUNC(lucky74_state::copro_sm7831_w));                   /* SM7831 Co-Processor */
+	map(0xd000, 0xd7ff).ram().w(FUNC(lucky74_state::lucky74_fg_videoram_w)).share("fg_videoram");       // VRAM1-1
+	map(0xd800, 0xdfff).ram().w(FUNC(lucky74_state::lucky74_fg_colorram_w)).share("fg_colorram");       // VRAM1-2
+	map(0xe000, 0xe7ff).ram().w(FUNC(lucky74_state::lucky74_bg_videoram_w)).share("bg_videoram");       // VRAM2-1
+	map(0xe800, 0xefff).ram().w(FUNC(lucky74_state::lucky74_bg_colorram_w)).share("bg_colorram");       // VRAM2-2
+	map(0xf000, 0xf003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));           // Input Ports 0 & 1
+	map(0xf080, 0xf083).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));           // DSW 1, 2 & 3
+	map(0xf0c0, 0xf0c3).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));           // DSW 4
+	map(0xf100, 0xf100).w("sn1", FUNC(sn76489_device::command_w));                                      // SN76489 #1
+	map(0xf200, 0xf203).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));           // Input Ports 2 & 4
+	map(0xf300, 0xf300).w("sn2", FUNC(sn76489_device::command_w));                                      // SN76489 #2
+	map(0xf400, 0xf400).w("aysnd", FUNC(ay8910_device::address_w));                                     // YM2149 control
+	map(0xf500, 0xf500).w("sn3", FUNC(sn76489_device::command_w));                                      // SN76489 #3
+	map(0xf600, 0xf600).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));          // YM2149 (Input Port 1)
+	map(0xf700, 0xf701).rw(FUNC(lucky74_state::usart_8251_r), FUNC(lucky74_state::usart_8251_w));       // USART 8251 port
+	map(0xf800, 0xf803).rw(FUNC(lucky74_state::copro_sm7831_r), FUNC(lucky74_state::copro_sm7831_w));   // SM7831 Co-Processor
 }
 
 void lucky74_state::lucky74_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x05).rw(this, FUNC(lucky74_state::custom_09R81P_port_r), FUNC(lucky74_state::custom_09R81P_port_w));           /* custom 09R81P (samples system) */
+	map(0x00, 0x05).rw(FUNC(lucky74_state::custom_09R81P_port_r), FUNC(lucky74_state::custom_09R81P_port_w));           /* custom 09R81P (samples system) */
 	map(0xff, 0xff).ram(); // presumably HS satellite control port (check patched in Lucky 74)
 }
 
@@ -1438,7 +1438,7 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 			/* transferring 1st nibble */
 			m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos];
 			m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
-			m_msm->data_w(m_adpcm_data >> 4);
+			m_msm->write_data(m_adpcm_data >> 4);
 
 			if (m_adpcm_pos == m_adpcm_end)
 			{
@@ -1451,7 +1451,7 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 		else
 		{
 			/* transferring 2nd nibble */
-			m_msm->data_w(m_adpcm_data & 0x0f);
+			m_msm->write_data(m_adpcm_data & 0x0f);
 			m_adpcm_data = -1;
 		}
 	}

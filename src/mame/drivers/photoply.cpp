@@ -196,7 +196,7 @@ void photoply_state::photoply_map(address_map &map)
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5446_device::mem_r), FUNC(cirrus_gd5446_device::mem_w));
 //  AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
 //  AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("ex_bios", 0)
-	map(0x000c0000, 0x000fffff).rw(this, FUNC(photoply_state::bios_r), FUNC(photoply_state::bios_w));
+	map(0x000c0000, 0x000fffff).rw(FUNC(photoply_state::bios_r), FUNC(photoply_state::bios_w));
 	map(0x00100000, 0x07ffffff).ram(); // 64MB RAM, guess!
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 }
@@ -208,17 +208,17 @@ void photoply_state::photoply_io(address_map &map)
 	pcat32_io_common(map);
 	map(0x00e8, 0x00eb).noprw();
 
-	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
-	map(0x0202, 0x0202).w(this, FUNC(photoply_state::eeprom_w));
+	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x0202, 0x0202).w(FUNC(photoply_state::eeprom_w));
 //  AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
-	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
+	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 //  AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
 	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5446_device::port_03b0_r), FUNC(cirrus_gd5446_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5446_device::port_03c0_r), FUNC(cirrus_gd5446_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5446_device::port_03d0_r), FUNC(cirrus_gd5446_device::port_03d0_w));
 
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
@@ -325,7 +325,7 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5446, 0)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
 	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
 	MCFG_EEPROM_ERASE_ALL_TIME(attotime::from_usec(10))
 MACHINE_CONFIG_END

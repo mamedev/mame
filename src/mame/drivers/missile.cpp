@@ -354,6 +354,7 @@ Super Missile Attack Board Layout
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -376,7 +377,7 @@ public:
 		, m_track1_y(*this, "TRACK1_Y")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(missile_w);
@@ -422,7 +423,7 @@ protected:
 	required_ioport m_track1_y;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 	const uint8_t *m_mainrom;
 	const uint8_t *m_writeprom;
@@ -533,7 +534,7 @@ TIMER_CALLBACK_MEMBER(missile_state::adjust_cpu_speed)
 
 void missile_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	/* initialize globals */
 	m_mainrom = memregion("maincpu")->base();
@@ -748,8 +749,8 @@ WRITE8_MEMBER(missile_state::missile_w)
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);
 		machine().bookkeeping().coin_counter_w(1, data & 0x10);
 		machine().bookkeeping().coin_counter_w(2, data & 0x08);
-		m_led[1] = BIT(~data, 2);
-		m_led[0] = BIT(~data, 1);
+		m_leds[1] = BIT(~data, 2);
+		m_leds[0] = BIT(~data, 1);
 		m_ctrld = data & 1;
 	}
 
@@ -861,8 +862,8 @@ WRITE8_MEMBER(missile_state::bootleg_w)
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);
 		machine().bookkeeping().coin_counter_w(1, data & 0x10);
 		machine().bookkeeping().coin_counter_w(2, data & 0x08);
-		m_led[1] = BIT(~data, 2);
-		m_led[0] = BIT(~data, 1);
+		m_leds[1] = BIT(~data, 2);
+		m_leds[0] = BIT(~data, 1);
 		m_ctrld = data & 1;
 	}
 
@@ -954,13 +955,13 @@ READ8_MEMBER(missile_state::bootleg_r)
 /* complete memory map derived from schematics (implemented above) */
 void missile_state::main_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(missile_state::missile_r), FUNC(missile_state::missile_w)).share("videoram");
+	map(0x0000, 0xffff).rw(FUNC(missile_state::missile_r), FUNC(missile_state::missile_w)).share("videoram");
 }
 
 /* adjusted from the above to get the bootlegs to boot */
 void missile_state::bootleg_main_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(missile_state::bootleg_r), FUNC(missile_state::bootleg_w)).share("videoram");
+	map(0x0000, 0xffff).rw(FUNC(missile_state::bootleg_r), FUNC(missile_state::bootleg_w)).share("videoram");
 }
 
 /*************************************
@@ -1021,9 +1022,9 @@ static INPUT_PORTS_START( missile )
 	PORT_DIPNAME( 0x04, 0x04, "Bonus Credit for 4 Coins" ) PORT_DIPLOCATION("R8:!3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Trackball Size" ) PORT_DIPLOCATION("R8:!4")
-	PORT_DIPSETTING(    0x00, "Large" )
-	PORT_DIPSETTING(    0x08, "Mini" )
+	PORT_DIPNAME( 0x08, 0x08, "Trackball Size" ) PORT_DIPLOCATION("R8:!4")
+	PORT_DIPSETTING(    0x00, "Mini" ) // Faster Cursor Speed
+	PORT_DIPSETTING(    0x08, "Large" ) // Slower Cursor Speed
 	PORT_DIPNAME( 0x70, 0x70, "Bonus City" ) PORT_DIPLOCATION("R8:!5,!6,!7")
 	PORT_DIPSETTING(    0x10, "8000" )
 	PORT_DIPSETTING(    0x70, "10000" )
@@ -1111,9 +1112,9 @@ static INPUT_PORTS_START( suprmatk )
 	PORT_DIPNAME( 0x04, 0x04, "Bonus Credit for 4 Coins" ) PORT_DIPLOCATION("R8:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Trackball Size" ) PORT_DIPLOCATION("R8:4")
-	PORT_DIPSETTING(    0x00, "Large" )
-	PORT_DIPSETTING(    0x08, "Mini" )
+	PORT_DIPNAME( 0x08, 0x08, "Trackball Size" ) PORT_DIPLOCATION("R8:4")
+	PORT_DIPSETTING(    0x00, "Mini" ) // Faster Cursor Speed
+	PORT_DIPSETTING(    0x08, "Large" ) // Slower Cursor Speed
 	PORT_DIPNAME( 0x70, 0x70, "Bonus City" ) PORT_DIPLOCATION("R8:5,6,7")
 	PORT_DIPSETTING(    0x10, "8000" )
 	PORT_DIPSETTING(    0x70, "10000" )

@@ -223,7 +223,6 @@ seem to have access to.
 #include "includes/system1.h"
 
 #include "cpu/mcs51/mcs51.h"
-#include "machine/z80pio.h"
 #include "machine/segacrpt_device.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
@@ -526,8 +525,6 @@ WRITE8_MEMBER(system1_state::sound_control_w)
 
 READ8_MEMBER(system1_state::sound_data_r)
 {
-	z80pio_device *pio = machine().device<z80pio_device>("pio");
-
 	/* if we have an 8255 PPI, get the data from the port and toggle the ack */
 	if (m_ppi8255 != nullptr)
 	{
@@ -537,11 +534,11 @@ READ8_MEMBER(system1_state::sound_data_r)
 	}
 
 	/* if we have a Z80 PIO, get the data from the port and toggle the strobe */
-	else if (pio != nullptr)
+	else if (m_pio != nullptr)
 	{
-		uint8_t data = pio->port_read(z80pio_device::PORT_A);
-		pio->strobe(z80pio_device::PORT_A, false);
-		pio->strobe(z80pio_device::PORT_A, true);
+		uint8_t data = m_pio->port_read(z80pio_device::PORT_A);
+		m_pio->strobe(z80pio_device::PORT_A, false);
+		m_pio->strobe(z80pio_device::PORT_A, true);
 		return data;
 	}
 
@@ -760,12 +757,12 @@ void system1_state::system1_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xcfff).ram().share("ram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(system1_state::system1_paletteram_w)).share("palette");
-	map(0xe000, 0xefff).rw(this, FUNC(system1_state::system1_videoram_r), FUNC(system1_state::system1_videoram_w));
-	map(0xf000, 0xf3ff).rw(this, FUNC(system1_state::system1_mixer_collision_r), FUNC(system1_state::system1_mixer_collision_w));
-	map(0xf400, 0xf7ff).w(this, FUNC(system1_state::system1_mixer_collision_reset_w));
-	map(0xf800, 0xfbff).rw(this, FUNC(system1_state::system1_sprite_collision_r), FUNC(system1_state::system1_sprite_collision_w));
-	map(0xfc00, 0xffff).w(this, FUNC(system1_state::system1_sprite_collision_reset_w));
+	map(0xd800, 0xdfff).ram().w(FUNC(system1_state::system1_paletteram_w)).share("palette");
+	map(0xe000, 0xefff).rw(FUNC(system1_state::system1_videoram_r), FUNC(system1_state::system1_videoram_w));
+	map(0xf000, 0xf3ff).rw(FUNC(system1_state::system1_mixer_collision_r), FUNC(system1_state::system1_mixer_collision_w));
+	map(0xf400, 0xf7ff).w(FUNC(system1_state::system1_mixer_collision_reset_w));
+	map(0xf800, 0xfbff).rw(FUNC(system1_state::system1_sprite_collision_r), FUNC(system1_state::system1_sprite_collision_w));
+	map(0xfc00, 0xffff).w(FUNC(system1_state::system1_sprite_collision_reset_w));
 }
 
 void system1_state::decrypted_opcodes_map(address_map &map)
@@ -774,7 +771,7 @@ void system1_state::decrypted_opcodes_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xcfff).ram().share("ram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(system1_state::system1_paletteram_w)).share("palette");
+	map(0xd800, 0xdfff).ram().w(FUNC(system1_state::system1_paletteram_w)).share("palette");
 }
 
 void system1_state::banked_decrypted_opcodes_map(address_map &map)
@@ -783,7 +780,7 @@ void system1_state::banked_decrypted_opcodes_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1d");
 	map(0xc000, 0xcfff).ram().share("ram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(system1_state::system1_paletteram_w)).share("palette");
+	map(0xd800, 0xdfff).ram().w(FUNC(system1_state::system1_paletteram_w)).share("palette");
 }
 
 /* same as normal System 1 except address map is shuffled (RAM/collision are swapped) */
@@ -791,13 +788,13 @@ void system1_state::nobo_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc3ff).rw(this, FUNC(system1_state::system1_mixer_collision_r), FUNC(system1_state::system1_mixer_collision_w));
-	map(0xc400, 0xc7ff).w(this, FUNC(system1_state::system1_mixer_collision_reset_w));
-	map(0xc800, 0xcbff).rw(this, FUNC(system1_state::system1_sprite_collision_r), FUNC(system1_state::system1_sprite_collision_w));
-	map(0xcc00, 0xcfff).w(this, FUNC(system1_state::system1_sprite_collision_reset_w));
+	map(0xc000, 0xc3ff).rw(FUNC(system1_state::system1_mixer_collision_r), FUNC(system1_state::system1_mixer_collision_w));
+	map(0xc400, 0xc7ff).w(FUNC(system1_state::system1_mixer_collision_reset_w));
+	map(0xc800, 0xcbff).rw(FUNC(system1_state::system1_sprite_collision_r), FUNC(system1_state::system1_sprite_collision_w));
+	map(0xcc00, 0xcfff).w(FUNC(system1_state::system1_sprite_collision_reset_w));
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(system1_state::system1_paletteram_w)).share("palette");
-	map(0xe000, 0xefff).rw(this, FUNC(system1_state::system1_videoram_r), FUNC(system1_state::system1_videoram_w));
+	map(0xd800, 0xdfff).ram().w(FUNC(system1_state::system1_paletteram_w)).share("palette");
+	map(0xe000, 0xefff).rw(FUNC(system1_state::system1_videoram_r), FUNC(system1_state::system1_videoram_w));
 	map(0xf000, 0xffff).ram().share("ram");
 }
 
@@ -839,9 +836,9 @@ void system1_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).mirror(0x1800).ram();
-	map(0xa000, 0xa000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::write));
-	map(0xc000, 0xc000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::write));
-	map(0xe000, 0xe000).mirror(0x1fff).r(this, FUNC(system1_state::sound_data_r));
+	map(0xa000, 0xa000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::command_w));
+	map(0xc000, 0xc000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0xe000, 0xe000).mirror(0x1fff).r(FUNC(system1_state::sound_data_r));
 }
 
 
@@ -854,7 +851,7 @@ void system1_state::sound_map(address_map &map)
 
 void system1_state::mcu_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(system1_state::mcu_io_r), FUNC(system1_state::mcu_io_w));
+	map(0x0000, 0xffff).rw(FUNC(system1_state::mcu_io_r), FUNC(system1_state::mcu_io_w));
 }
 
 
@@ -2584,9 +2581,9 @@ MACHINE_CONFIG_END
 /* ROM is #5318, is probably the first or second System 1 game produced */
 ROM_START( starjack )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr5320b.129",   0x0000, 0x2000, CRC(7ab72ecd) SHA1(28d3f87851cccc94a86eb0217893de0baf8e62fd) )
-	ROM_LOAD( "epr5321a.130",   0x2000, 0x2000, CRC(38b99050) SHA1(79fd23bb7db577d1dbf1b50503085eccdd17b98c) )
-	ROM_LOAD( "epr5322a.131",   0x4000, 0x2000, CRC(103a595b) SHA1(6bb8a063279c93341ff472351b79c92795845f74) )
+	ROM_LOAD( "epr-5320b.129",  0x0000, 0x2000, CRC(7ab72ecd) SHA1(28d3f87851cccc94a86eb0217893de0baf8e62fd) )
+	ROM_LOAD( "epr-5321a.130",  0x2000, 0x2000, CRC(38b99050) SHA1(79fd23bb7db577d1dbf1b50503085eccdd17b98c) )
+	ROM_LOAD( "epr-5322a.131",  0x4000, 0x2000, CRC(103a595b) SHA1(6bb8a063279c93341ff472351b79c92795845f74) )
 	ROM_LOAD( "epr-5323.132",   0x6000, 0x2000, CRC(46af0d58) SHA1(6cfa288e28e3b415db5ef3cef8e8849259234af9) )
 	ROM_LOAD( "epr-5324.133",   0x8000, 0x2000, CRC(1e89efe2) SHA1(d36ef8f176d5e44884d3d0b9af81be6f7fbd0cde) )
 	ROM_LOAD( "epr-5325.134",   0xa000, 0x2000, CRC(d6e379a1) SHA1(27362b3e10d9d4235647eadb9cd1404700a8fb49) )
@@ -2612,27 +2609,27 @@ ROM_END
 
 ROM_START( starjacks )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a1_ic29.129",    0x0000, 0x2000, CRC(59a22a1f) SHA1(4827b537f8df04429ed53c2119c67a32efcf04a2) )
-	ROM_LOAD( "a1_ic30.130",    0x2000, 0x2000, CRC(7f4597dc) SHA1(7574853fc2e38880f8493cf628100a890f7aa7dc) )
-	ROM_LOAD( "a1_ic31.131",    0x4000, 0x2000, CRC(6074c046) SHA1(5d2bd679d6a13a6c3b203662ce5496b801383db9) )
-	ROM_LOAD( "a1_ic32.132",    0x6000, 0x2000, CRC(1c48a3fa) SHA1(4a2e7798600bc4a5fd68533083547212d148d347) )
-	ROM_LOAD( "a1_ic33.133",    0x8000, 0x2000, CRC(7598bd51) SHA1(0c18b83dc7874aefcd94593ffbe2b50cc0329367) )
-	ROM_LOAD( "a1_ic34.134",    0xa000, 0x2000, CRC(f66fa604) SHA1(d7a81920217fcf7a687ba5e2d10abad5c78085d2) )
+	ROM_LOAD( "star_jacker_a1_ic29.129", 0x0000, 0x2000, CRC(59a22a1f) SHA1(4827b537f8df04429ed53c2119c67a32efcf04a2) )
+	ROM_LOAD( "star_jacker_a1_ic30.130", 0x2000, 0x2000, CRC(7f4597dc) SHA1(7574853fc2e38880f8493cf628100a890f7aa7dc) )
+	ROM_LOAD( "star_jacker_a1_ic31.131", 0x4000, 0x2000, CRC(6074c046) SHA1(5d2bd679d6a13a6c3b203662ce5496b801383db9) )
+	ROM_LOAD( "star_jacker_a1_ic32.132", 0x6000, 0x2000, CRC(1c48a3fa) SHA1(4a2e7798600bc4a5fd68533083547212d148d347) )
+	ROM_LOAD( "star_jacker_a1_ic33.133", 0x8000, 0x2000, CRC(7598bd51) SHA1(0c18b83dc7874aefcd94593ffbe2b50cc0329367) )
+	ROM_LOAD( "star_jacker_a1_ic34.134", 0xa000, 0x2000, CRC(f66fa604) SHA1(d7a81920217fcf7a687ba5e2d10abad5c78085d2) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr-5332.3",     0x0000, 0x2000, CRC(7a72ab3d) SHA1(4a6ad09949a438562d7043532d628cefdbb5a2fe) )
+	ROM_LOAD( "star_jacker_a1_ic3.3",    0x0000, 0x2000, CRC(7a72ab3d) SHA1(4a6ad09949a438562d7043532d628cefdbb5a2fe) ) /* same as EPR-5332 */
 
 	ROM_REGION( 0xc000, "tiles", 0 )
-	ROM_LOAD( "epr-5331.82",    0x0000, 0x2000, CRC(251d898f) SHA1(353067a75d583d5f53ce2f473b52a35dd912639f) )
-	ROM_LOAD( "a1_ic65.65",     0x2000, 0x2000, CRC(0ab1893c) SHA1(97877f5d8be7a7b80bbf9fe8dae2acd47c411d64) )
-	ROM_LOAD( "epr-5329.81",    0x4000, 0x2000, CRC(3e8bcaed) SHA1(6d19543427b9c4d8d8f5ea0872cdf8cc4fe5018c) )
-	ROM_LOAD( "a1_ic64.64",     0x6000, 0x2000, CRC(7f628ae6) SHA1(f859a505b543382b42a478c8ae5cd90f3ea2bc2c) )
-	ROM_LOAD( "epr-5327.80",    0x8000, 0x2000, CRC(79e92cb1) SHA1(03124ce123684b8469cf42be6ed5f0fffa64c480) )
-	ROM_LOAD( "a1_ic63.63",     0xa000, 0x2000, CRC(5bcb253e) SHA1(8c34a8377344940bcfb2495bfda3ffc6794f261b) )
+	ROM_LOAD( "star_jacker_a1_ic82.82",  0x0000, 0x2000, CRC(251d898f) SHA1(353067a75d583d5f53ce2f473b52a35dd912639f) )
+	ROM_LOAD( "star_jacker_a1_ic65.65",  0x2000, 0x2000, CRC(0ab1893c) SHA1(97877f5d8be7a7b80bbf9fe8dae2acd47c411d64) )
+	ROM_LOAD( "epr-5456.81",             0x4000, 0x2000, CRC(3e8bcaed) SHA1(6d19543427b9c4d8d8f5ea0872cdf8cc4fe5018c) )
+	ROM_LOAD( "epr-5455.64",             0x6000, 0x2000, CRC(7f628ae6) SHA1(f859a505b543382b42a478c8ae5cd90f3ea2bc2c) ) /* Also found labeled as STAR JACKER A1 IC64 */
+	ROM_LOAD( "epr-5454.80",             0x8000, 0x2000, CRC(79e92cb1) SHA1(03124ce123684b8469cf42be6ed5f0fffa64c480) )
+	ROM_LOAD( "epr-5453.63",             0xa000, 0x2000, CRC(5bcb253e) SHA1(8c34a8377344940bcfb2495bfda3ffc6794f261b) ) /* Also found labeled as STAR JACKER A1 IC63 */
 
 	ROM_REGION( 0x8000, "sprites", 0 )
-	ROM_LOAD( "a1_ic86.86",   0x0000, 0x4000, CRC(6f2e1fd3) SHA1(326d538551245fce67d0fdba85975e27093b7a93) )
-	ROM_LOAD( "a1_ic93.93",   0x4000, 0x4000, CRC(07987244) SHA1(8468b95684b1f62c6de6af1b1d405bfb333e4e26) )
+	ROM_LOAD( "star_jacker_a1_ic86.86",  0x0000, 0x4000, CRC(6f2e1fd3) SHA1(326d538551245fce67d0fdba85975e27093b7a93) )
+	ROM_LOAD( "epr-5446.93",             0x4000, 0x4000, CRC(07987244) SHA1(8468b95684b1f62c6de6af1b1d405bfb333e4e26) ) /* Also found labeled as STAR JACKER A1 IC93 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "pr-5317.106",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )

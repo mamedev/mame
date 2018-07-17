@@ -158,6 +158,7 @@ iLinkSGUID=0x--------
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -198,7 +199,7 @@ static INPUT_PORTS_START( ps2sony )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ps2sony_state::ps2sony)
-	MCFG_DEVICE_ADD("maincpu", R5000LE, 294'912'000) // actually R5900
+	MCFG_DEVICE_ADD("maincpu", R5900LE, 294'912'000)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)

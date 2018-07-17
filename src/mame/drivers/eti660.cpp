@@ -92,8 +92,8 @@ void eti660_state::mem_map(address_map &map)
 void eti660_state::io_map(address_map &map)
 {
 	map(0x01, 0x01).rw(m_cti, FUNC(cdp1864_device::dispon_r), FUNC(cdp1864_device::step_bgcolor_w));
-	map(0x02, 0x02).rw(this, FUNC(eti660_state::pia_r), FUNC(eti660_state::pia_w));
-	map(0x03, 0x03).w(this, FUNC(eti660_state::colorram_w));
+	map(0x02, 0x02).rw(FUNC(eti660_state::pia_r), FUNC(eti660_state::pia_w));
+	map(0x03, 0x03).w(FUNC(eti660_state::colorram_w));
 	map(0x04, 0x04).rw(m_cti, FUNC(cdp1864_device::dispoff_r), FUNC(cdp1864_device::tone_latch_w));
 }
 
@@ -178,7 +178,7 @@ WRITE_LINE_MEMBER( eti660_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* PULSE led */
-	m_led[LED_PULSE] = state ? 1 : 0;
+	m_leds[LED_PULSE] = state ? 1 : 0;
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -263,7 +263,7 @@ void eti660_state::machine_reset()
 
 void eti660_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_color_ram));
 }

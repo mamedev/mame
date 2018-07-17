@@ -95,7 +95,7 @@ void n64_state::video_start()
 
 	m_rdp->set_machine(machine());
 	m_rdp->init_internal_state();
-	m_rdp->set_n64_periphs(machine().device<n64_periphs>("rcp"));
+	m_rdp->set_n64_periphs(m_rcp_periphs);
 
 	m_rdp->m_blender.set_machine(machine());
 	m_rdp->m_blender.set_processor(m_rdp);
@@ -112,16 +112,14 @@ void n64_state::video_start()
 
 uint32_t n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	n64_periphs* n64 = machine().device<n64_periphs>("rcp");
-
-	//uint16_t* frame_buffer = (uint16_t*)&rdram[(n64->vi_origin & 0xffffff) >> 2];
-	//uint8_t* cvg_buffer = &m_rdp.m_hidden_bits[((n64->vi_origin & 0xffffff) >> 2) >> 1];
-	//int32_t vibuffering = ((n64->vi_control & 2) && fsaa && divot);
+	//uint16_t* frame_buffer = (uint16_t*)&rdram[(m_rcp_periphs->vi_origin & 0xffffff) >> 2];
+	//uint8_t* cvg_buffer = &m_rdp.m_hidden_bits[((m_rcp_periphs->vi_origin & 0xffffff) >> 2) >> 1];
+	//int32_t vibuffering = ((m_rcp_periphs->vi_control & 2) && fsaa && divot);
 
 	//vibuffering = 0; // Disabled for now
 
 	/*
-	if (vibuffering && ((n64->vi_control & 3) == 2))
+	if (vibuffering && ((m_rcp_periphs->vi_control & 3) == 2))
 	{
 	    if (frame_buffer)
 	    {
@@ -134,7 +132,7 @@ uint32_t n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitma
 	                curpixel_cvg = ((pix & 1) << 2) | (cvg_buffer[pixels ^ BYTE_ADDR_XOR] & 3); // Reuse of this variable
 	                if (curpixel_cvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2) && fsaa)
 	                {
-	                    newc = video_filter16(&frame_buffer[pixels ^ WORD_ADDR_XOR], &cvg_buffer[pixels ^ BYTE_ADDR_XOR], n64->vi_width);
+	                    newc = video_filter16(&frame_buffer[pixels ^ WORD_ADDR_XOR], &cvg_buffer[pixels ^ BYTE_ADDR_XOR], m_rcp_periphs->vi_width);
 	                    ViBuffer[i][j] = newc;
 	                }
 	                else
@@ -154,13 +152,13 @@ uint32_t n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitma
 
 	m_rdp->mark_frame();
 
-	if (n64->vi_blank)
+	if (m_rcp_periphs->vi_blank)
 	{
 		bitmap.fill(0, screen.visible_area());
 		return 0;
 	}
 
-	n64->video_update(bitmap);
+	m_rcp_periphs->video_update(bitmap);
 
 	return 0;
 }
