@@ -3024,6 +3024,20 @@ ROM_START( scramb2 )
 	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
+ROM_START( scramb3 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "ra.7f",        0x0000, 0x1000, CRC(979be487) SHA1(74817d4d7f616e244ca331d05f1dcea30050a98e) )
+	ROM_LOAD( "r2.7h",        0x1000, 0x1000, CRC(f2179cf5) SHA1(5c38aa9bd1d5ebdccf16d2e50acc56f0b3f042d0) )
+	ROM_LOAD( "r3.7k",        0x2000, 0x1000, CRC(941c804e) SHA1(f1eedf719a234cf98071e6a46120765e231f0730) )
+	ROM_LOAD( "top32",        0x3000, 0x1000, CRC(0c3297a6) SHA1(6d6bb183139b30e78d74e8272d3a9f7234d394c6) ) // on a smaller top PCB
+
+	ROM_REGION( 0x1000, "gfx1", 0 ) // identical to scramble and a lot of other sets
+	ROM_LOAD( "6.1h",       0x0000, 0x0800, CRC(4708845b) SHA1(a8b1ad19a95a9d35050a2ab7194cc96fc5afcdc9) )
+	ROM_LOAD( "5.1k",       0x0800, 0x0800, CRC(11fd2887) SHA1(69844e48bb4d372cac7ae83c953df573c7ecbb7f) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // three proms on smaller top PCB not dumped yet. The one used is taken from scramble.
+	ROM_LOAD( "c01s.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
 
 ROM_START( scrambler )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3606,7 +3620,8 @@ GAME( 1981, ckonggx,   ckong,    ckongg,    ckonggx,   galaxold_state, init_ckon
 GAME( 1982, ckongcv,   ckong,    ckongg,    ckonggx,   galaxold_state, init_ckonggx,   ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 2)", MACHINE_NOT_WORKING )
 GAME( 1982, ckongis,   ckong,    ckongg,    ckonggx,   galaxold_state, init_ckonggx,   ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 3)", MACHINE_NOT_WORKING )
 GAME( 1981, scramblb,  scramble, scramblb,  scramblb,  galaxold_state, empty_init,     ROT90,  "bootleg", "Scramble (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scramb2,   scramble, scramb2,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg", "Scramble (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scramb2,   scramble, scramb2,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg", "Scramble (bootleg, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scramb3,   scramble, scramb2,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg", "Scramble (bootleg, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambler, scramble, scrambler, scrambler, galaxold_state, empty_init,     ROT90,  "bootleg (Reben S.A.)", "Scramble (Reben S.A. Spanish bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, 4in1,      0,        _4in1,     4in1,      galaxold_state, init_4in1,      ROT90,  "Armenia / Food and Fun", "4 Fun in 1", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagmanmc,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, empty_init,     ROT90,  "bootleg", "Bagman (bootleg on Moon Cresta hardware, set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
