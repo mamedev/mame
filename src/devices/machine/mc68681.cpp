@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mariusz Wojcieszek, R. Belmont
+// copyright-holders:Mariusz Wojcieszek, R. Belmont, Joseph Zatarski
 /*
     2681 DUART
     68681 DUART
@@ -12,7 +12,7 @@
     Improved interrupt handling by R. Belmont
     Rewrite and modernization in progress by R. Belmont
     Addition of the duart compatible 68340 serial module support by Edstrom
-    Support for the Exar XR68C681 by Joseph Zatarski
+    Support for the Exar XR68C681 by Joseph Zatarski (July of 2018)
 
     The main incompatibility between the 2681 and 68681 (Signetics and Motorola each
     manufactured both versions of the chip) is that the 68681 has a R/W input and
