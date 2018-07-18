@@ -368,6 +368,7 @@ private:
 
 	TILE_GET_INFO_MEMBER( roz_tile_info );
 
+	DECLARE_READ8_MEMBER( c116_r );
 	DECLARE_WRITE16_MEMBER( rozram_word_w );
 	DECLARE_READ16_MEMBER( gfx_ctrl_r );
 	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
