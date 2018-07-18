@@ -356,7 +356,7 @@ READ8_MEMBER(galaxold_state::scramb2_port0_r){ return (ioport("IN0")->read() >> 
 READ8_MEMBER(galaxold_state::scramb2_port1_r){ return (ioport("IN1")->read() >> offset) & 0x1; }
 READ8_MEMBER(galaxold_state::scramb2_port2_r){ return (ioport("IN2")->read() >> offset) & 0x1; }
 
-void galaxold_state::scramb2_map(address_map &map)
+void galaxold_state::scramb_common_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
@@ -370,7 +370,6 @@ void galaxold_state::scramb2_map(address_map &map)
 	map(0x6000, 0x6007).r(FUNC(galaxold_state::scramb2_port0_r)); // reads from 8 addresses, 1 bit per address
 	map(0x6800, 0x6807).r(FUNC(galaxold_state::scramb2_port1_r)); // reads from 8 addresses, 1 bit per address
 	map(0x6801, 0x6801).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
-	map(0x6802, 0x6802).w(FUNC(galaxold_state::galaxold_coin_counter_w));
 	map(0x6804, 0x6804).w(FUNC(galaxold_state::galaxold_stars_enable_w));
 	map(0x6806, 0x6806).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));
 	map(0x6807, 0x6807).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
@@ -379,6 +378,18 @@ void galaxold_state::scramb2_map(address_map &map)
 	map(0x7007, 0x7007).nopw();
 	map(0x7800, 0x7807).r(FUNC(galaxold_state::scramb2_port2_r)); // reads from 8 addresses, 1 bit per address
 	map(0x7800, 0x7800).w("cust", FUNC(galaxian_sound_device::pitch_w));
+}
+
+void galaxold_state::scramb2_map(address_map &map)
+{
+	scramb_common_map(map);
+	map(0x6802, 0x6802).w(FUNC(galaxold_state::galaxold_coin_counter_w));
+}
+
+void galaxold_state::scramb3_map(address_map &map)
+{
+	scramb_common_map(map);
+	map(0x6003, 0x6003).w(FUNC(galaxold_state::galaxold_coin_counter_w));
 }
 
 READ8_MEMBER( galaxold_state::scrambler_protection_2_r )
@@ -2358,6 +2369,13 @@ MACHINE_CONFIG_START(galaxold_state::scramb2)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(galaxold_state::scramb3)
+	scramb2(config);
+
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scramb3_map)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxold_state::scrambler)
 	galaxian(config);
@@ -3621,7 +3639,7 @@ GAME( 1982, ckongcv,   ckong,    ckongg,    ckonggx,   galaxold_state, init_ckon
 GAME( 1982, ckongis,   ckong,    ckongg,    ckonggx,   galaxold_state, init_ckonggx,   ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 3)", MACHINE_NOT_WORKING )
 GAME( 1981, scramblb,  scramble, scramblb,  scramblb,  galaxold_state, empty_init,     ROT90,  "bootleg", "Scramble (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scramb2,   scramble, scramb2,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg", "Scramble (bootleg, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scramb3,   scramble, scramb2,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg", "Scramble (bootleg, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scramb3,   scramble, scramb3,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg", "Scramble (bootleg, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambler, scramble, scrambler, scrambler, galaxold_state, empty_init,     ROT90,  "bootleg (Reben S.A.)", "Scramble (Reben S.A. Spanish bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, 4in1,      0,        _4in1,     4in1,      galaxold_state, init_4in1,      ROT90,  "Armenia / Food and Fun", "4 Fun in 1", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagmanmc,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, empty_init,     ROT90,  "bootleg", "Bagman (bootleg on Moon Cresta hardware, set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
