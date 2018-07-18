@@ -524,8 +524,6 @@ uint32_t vgmplay_device::handle_pcm_write(uint32_t address)
 	uint32_t src = m_file->read_dword(m_pc+3) & 0xffffff;
 	uint32_t dst = m_file->read_dword(m_pc+6) & 0xffffff;
 	uint32_t size = m_file->read_dword(m_pc+9) & 0xffffff;
-	//uint8_t decompressed = type & 0x40;
-	type &= 0x3f;
 
 	if (type == 0x01) {
 		for (int i = 0; i < size; i++)
