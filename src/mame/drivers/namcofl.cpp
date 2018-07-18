@@ -169,6 +169,7 @@ OSC3: 48.384MHz
 
 #include "namcofl.lh"
 
+#include <algorithm>
 
 READ32_MEMBER(namcofl_state::fl_unk1_r)
 {
@@ -191,13 +192,13 @@ WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
 	{
 		if (data == 0)  // RAM at 00000000, ROM at 10000000
 		{
-			membank("bank1")->set_entry(1);
-			membank("bank2")->set_entry(1);
+			for (int bank = 0; bank < 2; bank++)
+				m_mainbank[bank]->set_entry(1^bank);
 		}
 		else        // ROM at 00000000, RAM at 10000000
 		{
-			membank("bank1")->set_entry(0);
-			membank("bank2")->set_entry(0);
+			for (int bank = 0; bank < 2; bank++)
+				m_mainbank[bank]->set_entry(bank);
 		}
 	}
 }
@@ -216,8 +217,8 @@ WRITE8_MEMBER(namcofl_state::namcofl_c116_w)
 
 void namcofl_state::namcofl_mem(address_map &map)
 {
-	map(0x00000000, 0x000fffff).bankrw("bank1");
-	map(0x10000000, 0x100fffff).bankrw("bank2");
+	map(0x00000000, 0x000fffff).bankrw("mainbank1");
+	map(0x10000000, 0x100fffff).bankrw("mainbank2");
 	map(0x20000000, 0x201fffff).rom().region("data", 0);
 	map(0x30000000, 0x30001fff).ram().share("nvram"); /* nvram */
 	map(0x30100000, 0x30100003).w(FUNC(namcofl_state::namcofl_spritebank_w));
@@ -462,56 +463,31 @@ static INPUT_PORTS_START( finalapr )
 INPUT_PORTS_END
 
 
-static const gfx_layout obj_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8, /* bits per pixel */
-	{
-		/* plane offsets */
-		0,1,2,3,4,5,6,7,
-	},
-	{
-		0*16+8,1*16+8,0*16,1*16,
-		2*16+8,3*16+8,2*16,3*16,
-		4*16+8,5*16+8,4*16,5*16,
-		6*16+8,7*16+8,6*16,7*16
-	},
-	{
-		0x0*128,0x1*128,0x2*128,0x3*128,0x4*128,0x5*128,0x6*128,0x7*128,
-		0x8*128,0x9*128,0xa*128,0xb*128,0xc*128,0xd*128,0xe*128,0xf*128
-	},
-	16*128
-};
-
-static const gfx_layout tile_layout =
-{
+static const gfx_layout layout8x8x8 = {
 	8,8,
 	RGN_FRAC(1,1),
 	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64 },
-	8*64
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
+	8*8*8
 };
 
-static const gfx_layout roz_layout =
+static const gfx_layout layout16x16x8 =
 {
 	16,16,
 	RGN_FRAC(1,1),
 	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
-	{
-		0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128
-	},
-	16*128
+	{ STEP8(0,1) },
+	{ STEP16(0,8) },
+	{ STEP16(0,8*16) },
+	16*16*8
 };
 
 static GFXDECODE_START( gfx_namcofl )
-	GFXDECODE_ENTRY( NAMCOFL_TILEGFXREGION,   0, tile_layout, 0x1000, 0x08 )
-	GFXDECODE_ENTRY( NAMCOFL_SPRITEGFXREGION, 0, obj_layout,  0x0000, 0x10 )
-	GFXDECODE_ENTRY( NAMCOFL_ROTGFXREGION,    0, roz_layout,  0x1800, 0x08 )
+	GFXDECODE_ENTRY( "tile",   0, layout8x8x8,   0x1000, 0x08 )
+	GFXDECODE_ENTRY( "sprite", 0, layout16x16x8, 0x0000, 0x10 )
+	GFXDECODE_ENTRY( "rot",    0, layout16x16x8, 0x1800, 0x08 )
 GFXDECODE_END
 
 
@@ -558,13 +534,12 @@ MACHINE_START_MEMBER(namcofl_state,namcofl)
 	m_network_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
 	m_vblank_interrupt_timer =  machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
 
-	membank("bank1")->configure_entry(0, memregion("maincpu")->base());
-	membank("bank1")->configure_entry(1, m_workram.get());
-	membank("bank1")->set_entry(0);
-
-	membank("bank2")->configure_entry(0, m_workram.get());
-	membank("bank2")->configure_entry(1, memregion("maincpu")->base());
-	membank("bank2")->set_entry(0);
+	for (int bank = 0; bank < 2; bank++)
+	{
+		m_mainbank[bank]->configure_entry(0, memregion("maincpu")->base());
+		m_mainbank[bank]->configure_entry(1, m_workram.get());
+		m_mainbank[bank]->set_entry(bank);
+	}
 }
 
 
@@ -573,10 +548,10 @@ MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 	m_network_interrupt_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y + 3));
 	m_vblank_interrupt_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y + 1));
 
-	memset(m_workram.get(), 0x00, 0x100000);
+	std::fill(&m_workram[0], &m_workram[0x100000/4], 0);
 
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
+	for (int bank = 0; bank < 2; bank++)
+		m_mainbank[bank]->set_entry(bank);
 }
 
 
@@ -601,11 +576,11 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	MCFG_SCREEN_SIZE(NAMCOFL_HTOTAL, NAMCOFL_VTOTAL)
 	MCFG_SCREEN_VISIBLE_AREA(0, NAMCOFL_HBSTART-1, 0, NAMCOFL_VBSTART-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcofl_state, screen_update_namcofl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 8192)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcofl);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcofl)
+	PALETTE(config, m_palette, 0x2000);
 
 	NAMCO_C116(config, m_c116, 0);
 	m_c116->set_palette(m_palette);
@@ -633,28 +608,28 @@ ROM_START( speedrcr )
 	ROM_LOAD32_BYTE("se1_dat3.16a",   0x000003, 0x080000, CRC(49849aff) SHA1(b7c7eea1d56304e40e996ee998c971313ff03614) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
-	ROM_LOAD("se1_spr.21l",   0x000000,  0x80000, CRC(850a27ac) SHA1(7d5db840ec67659a1f2e69a62cdb03ce6ee0b47b) )
+	ROM_LOAD("se1_spr.21l",   0x000000, 0x080000, CRC(850a27ac) SHA1(7d5db840ec67659a1f2e69a62cdb03ce6ee0b47b) )
 
-	ROM_REGION( 0x200000, NAMCOFL_ROTGFXREGION, 0 ) // "RCHAR" (roz characters)
+	ROM_REGION( 0x200000, "rot", 0 ) // "RCHAR" (roz characters)
 	ROM_LOAD("se1_rch0.19j",   0x000000, 0x100000, CRC(a0827288) SHA1(13691ef4d402a6dc91851de4f82cfbdf96d417cb) )
 	ROM_LOAD("se1_rch1.18j",   0x100000, 0x100000, CRC(af7609ad) SHA1(b16041f0eb47d7566011d9d762a3083411dc422e) )
 
-	ROM_REGION( 0x400000, NAMCOFL_TILEGFXREGION, 0 ) // "SCHAR" (regular BG characters)
+	ROM_REGION( 0x400000, "tile", 0 ) // "SCHAR" (regular BG characters)
 	ROM_LOAD("se1_sch0.21p",   0x000000, 0x100000, CRC(7b5cfad0) SHA1(5a0355e37eb191bc0cf8b6b7c3d0274560b9bbd5) )
 	ROM_LOAD("se1_sch1.20p",   0x100000, 0x100000, CRC(5086e0d3) SHA1(0aa7d11f4f9a75117e69cc77f1b73a68d9007aef) )
 	ROM_LOAD("se1_sch2.19p",   0x200000, 0x100000, CRC(e59a731e) SHA1(3fed72e9bb485d4d689ab51490360c4c6f1dc5cb) )
 	ROM_LOAD("se1_sch3.18p",   0x300000, 0x100000, CRC(f817027a) SHA1(71745476f496c60d89c8563b3e46bc85eebc79ce) )
 
-	ROM_REGION( 0x800000, NAMCOFL_SPRITEGFXREGION, 0 )  // OBJ
-	ROM_LOAD16_BYTE("se1obj0l.ic1", 0x000001, 0x200000, CRC(17585218) SHA1(3332afa9bd194ac37b8d6f352507c523a0f2e2b3) )
-	ROM_LOAD16_BYTE("se1obj0u.ic2", 0x000000, 0x200000, CRC(d14b1236) SHA1(e5447732ef3acec88fb7a00e0deca3e71a40ae65) )
-	ROM_LOAD16_BYTE("se1obj1l.ic3", 0x400001, 0x200000, CRC(c4809fd5) SHA1(e0b80fccc17c83fb9d08f7f1cf2cd2f0f3a510b4) )
-	ROM_LOAD16_BYTE("se1obj1u.ic4", 0x400000, 0x200000, CRC(0beefa56) SHA1(012fb7b330dbf851ab2217da0a0e7136ddc3d23f) )
+	ROM_REGION( 0x800000, "sprite", 0 )  // OBJ
+	ROM_LOAD32_WORD("se1obj0l.ic1", 0x000000, 0x200000, CRC(17585218) SHA1(3332afa9bd194ac37b8d6f352507c523a0f2e2b3) )
+	ROM_LOAD32_WORD("se1obj0u.ic2", 0x000002, 0x200000, CRC(d14b1236) SHA1(e5447732ef3acec88fb7a00e0deca3e71a40ae65) )
+	ROM_LOAD32_WORD("se1obj1l.ic3", 0x400000, 0x200000, CRC(c4809fd5) SHA1(e0b80fccc17c83fb9d08f7f1cf2cd2f0f3a510b4) )
+	ROM_LOAD32_WORD("se1obj1u.ic4", 0x400002, 0x200000, CRC(0beefa56) SHA1(012fb7b330dbf851ab2217da0a0e7136ddc3d23f) )
 
-	ROM_REGION( 0x100000, NAMCOFL_ROTMASKREGION, 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x100000, "rotmask", 0 ) // "RSHAPE" (roz mask like NB-1?)
 	ROM_LOAD("se1_rsh.14k",    0x000000, 0x100000, CRC(7aa5a962) SHA1(ff936dfcfcc4ee1f5f2232df62def76ff99e671e) )
 
-	ROM_REGION( 0x100000, NAMCOFL_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x100000, "tilemask", 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("se1_ssh.18u",    0x000000, 0x100000, CRC(7a8e0bda) SHA1(f6a508d90274d0205fec0c46f5f783a2715c0c6e) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -672,8 +647,6 @@ ROM_START( speedrcr )
 ROM_END
 
 
-
-
 ROM_START( finalapr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr2mpeb.19a",   0x000000, 0x080000, CRC(8bfe615f) SHA1(7b867eb261268a83177f1f873689f77d1b6c47ca) )
@@ -682,28 +655,28 @@ ROM_START( finalapr )
 	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
-	ROM_LOAD("flr1spr.21l",   0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
+	ROM_LOAD("flr1spr.21l",   0x000000, 0x020000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 
-	ROM_REGION( 0x200000, NAMCOFL_ROTGFXREGION, 0 ) // "RCHAR" (roz characters)
+	ROM_REGION( 0x200000, "rot", 0 ) // "RCHAR" (roz characters)
 	ROM_LOAD("flr1rch0.19j",   0x000000, 0x100000, CRC(f413f50d) SHA1(cdd8073dda4feaea78e3b94520cf20a9799fd04d) )
 	ROM_LOAD("flr1rch1.18j",   0x100000, 0x100000, CRC(4654d519) SHA1(f8bb473013cdca48dd98df0de2f78c300c156e91) )
 
-	ROM_REGION( 0x400000, NAMCOFL_TILEGFXREGION, 0 ) // "SCHAR" (regular BG characters)
+	ROM_REGION( 0x400000, "tile", 0 ) // "SCHAR" (regular BG characters)
 	ROM_LOAD("flr1sch0.21p",   0x000000, 0x100000, CRC(7169efca) SHA1(66c7aa1b50b236b4700b07be0dca7aebdabedb8c) )
 	ROM_LOAD("flr1sch1.20p",   0x100000, 0x100000, CRC(aa233a02) SHA1(0011329f585658d90f820daf0ba08ce2735bddfc) )
 	ROM_LOAD("flr1sch2.19p",   0x200000, 0x100000, CRC(9b6b7abd) SHA1(5cdec70db1b46bc5d0866ca155b520157fef3adf) )
 	ROM_LOAD("flr1sch3.18p",   0x300000, 0x100000, CRC(50a14f54) SHA1(ab9c2f2e11f006a9dc7e5aedd5788d7d67166d36) )
 
-	ROM_REGION( 0x800000, NAMCOFL_SPRITEGFXREGION, 0 )  // OBJ
-	ROM_LOAD16_BYTE("flr1obj0l.ic1", 0x000001, 0x200000, CRC(364a902c) SHA1(4a1ea48eee86d410e36096cc100b4c9a5a645034) )
-	ROM_LOAD16_BYTE("flr1obj0u.ic2", 0x000000, 0x200000, CRC(a5c7b80e) SHA1(4e0e863cfdd8c051c3c4594bb21e11fb93c28f0c) )
-	ROM_LOAD16_BYTE("flr1obj1l.ic3", 0x400001, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
-	ROM_LOAD16_BYTE("flr1obj1u.ic4", 0x400000, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
+	ROM_REGION( 0x800000, "sprite", 0 )  // OBJ
+	ROM_LOAD32_WORD("flr1obj0l.ic1", 0x000000, 0x200000, CRC(364a902c) SHA1(4a1ea48eee86d410e36096cc100b4c9a5a645034) )
+	ROM_LOAD32_WORD("flr1obj0u.ic2", 0x000002, 0x200000, CRC(a5c7b80e) SHA1(4e0e863cfdd8c051c3c4594bb21e11fb93c28f0c) )
+	ROM_LOAD32_WORD("flr1obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
+	ROM_LOAD32_WORD("flr1obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
-	ROM_REGION( 0x80000, NAMCOFL_ROTMASKREGION, 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "rotmask", 0 ) // "RSHAPE" (roz mask like NB-1?)
 	ROM_LOAD("flr1rsh.14k",    0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
 
-	ROM_REGION( 0x80000, NAMCOFL_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "tilemask", 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("flr1ssh.18u",    0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -721,28 +694,28 @@ ROM_START( finalapro )
 	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
-	ROM_LOAD("flr1spr.21l",   0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
+	ROM_LOAD("flr1spr.21l",   0x000000, 0x020000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 
-	ROM_REGION( 0x200000, NAMCOFL_ROTGFXREGION, 0 ) // "RCHAR" (roz characters)
+	ROM_REGION( 0x200000, "rot", 0 ) // "RCHAR" (roz characters)
 	ROM_LOAD("flr1rch0.19j",   0x000000, 0x100000, CRC(f413f50d) SHA1(cdd8073dda4feaea78e3b94520cf20a9799fd04d) )
 	ROM_LOAD("flr1rch1.18j",   0x100000, 0x100000, CRC(4654d519) SHA1(f8bb473013cdca48dd98df0de2f78c300c156e91) )
 
-	ROM_REGION( 0x400000, NAMCOFL_TILEGFXREGION, 0 ) // "SCHAR" (regular BG characters)
+	ROM_REGION( 0x400000, "tile", 0 ) // "SCHAR" (regular BG characters)
 	ROM_LOAD("flr1sch0.21p",   0x000000, 0x100000, CRC(7169efca) SHA1(66c7aa1b50b236b4700b07be0dca7aebdabedb8c) )
 	ROM_LOAD("flr1sch1.20p",   0x100000, 0x100000, CRC(aa233a02) SHA1(0011329f585658d90f820daf0ba08ce2735bddfc) )
 	ROM_LOAD("flr1sch2.19p",   0x200000, 0x100000, CRC(9b6b7abd) SHA1(5cdec70db1b46bc5d0866ca155b520157fef3adf) )
 	ROM_LOAD("flr1sch3.18p",   0x300000, 0x100000, CRC(50a14f54) SHA1(ab9c2f2e11f006a9dc7e5aedd5788d7d67166d36) )
 
-	ROM_REGION( 0x800000, NAMCOFL_SPRITEGFXREGION, 0 )  // OBJ
-	ROM_LOAD16_BYTE("flr1obj0l.ic1", 0x000001, 0x200000, CRC(364a902c) SHA1(4a1ea48eee86d410e36096cc100b4c9a5a645034) )
-	ROM_LOAD16_BYTE("flr1obj0u.ic2", 0x000000, 0x200000, CRC(a5c7b80e) SHA1(4e0e863cfdd8c051c3c4594bb21e11fb93c28f0c) )
-	ROM_LOAD16_BYTE("flr1obj1l.ic3", 0x400001, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
-	ROM_LOAD16_BYTE("flr1obj1u.ic4", 0x400000, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
+	ROM_REGION( 0x800000, "sprite", 0 )  // OBJ
+	ROM_LOAD32_WORD("flr1obj0l.ic1", 0x000000, 0x200000, CRC(364a902c) SHA1(4a1ea48eee86d410e36096cc100b4c9a5a645034) )
+	ROM_LOAD32_WORD("flr1obj0u.ic2", 0x000002, 0x200000, CRC(a5c7b80e) SHA1(4e0e863cfdd8c051c3c4594bb21e11fb93c28f0c) )
+	ROM_LOAD32_WORD("flr1obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
+	ROM_LOAD32_WORD("flr1obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
-	ROM_REGION( 0x80000, NAMCOFL_ROTMASKREGION, 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "rotmask", 0 ) // "RSHAPE" (roz mask like NB-1?)
 	ROM_LOAD("flr1rsh.14k",    0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
 
-	ROM_REGION( 0x80000, NAMCOFL_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "tilemask", 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("flr1ssh.18u",    0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -752,7 +725,6 @@ ROM_START( finalapro )
 	ROM_LOAD("finalapr.nv",   0x000000, 0x2000, CRC(d51d65fe) SHA1(8a0a523cb6ba2880951e41ca04db23584f0a108c) )
 ROM_END
 
-
 ROM_START( finalaprj )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr1_mpec.19a", 0x000000, 0x080000, CRC(52735494) SHA1(db9873cb39bcfdd3dbe2e5079249fecac2c46df9) )
@@ -761,28 +733,28 @@ ROM_START( finalaprj )
 	ROM_REGION32_LE( 0x200000, "data", ROMREGION_ERASEFF ) // Data
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
-	ROM_LOAD("flr1spr.21l",   0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
+	ROM_LOAD("flr1spr.21l",   0x000000, 0x020000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 
-	ROM_REGION( 0x200000, NAMCOFL_ROTGFXREGION, 0 ) // "RCHAR" (roz characters)
+	ROM_REGION( 0x200000, "rot", 0 ) // "RCHAR" (roz characters)
 	ROM_LOAD("flr1rch0.19j",   0x000000, 0x100000, CRC(f413f50d) SHA1(cdd8073dda4feaea78e3b94520cf20a9799fd04d) )
 	ROM_LOAD("flr1rch1.18j",   0x100000, 0x100000, CRC(4654d519) SHA1(f8bb473013cdca48dd98df0de2f78c300c156e91) )
 
-	ROM_REGION( 0x400000, NAMCOFL_TILEGFXREGION, 0 ) // "SCHAR" (regular BG characters)
+	ROM_REGION( 0x400000, "tile", 0 ) // "SCHAR" (regular BG characters)
 	ROM_LOAD("flr1sch0.21p",   0x000000, 0x100000, CRC(7169efca) SHA1(66c7aa1b50b236b4700b07be0dca7aebdabedb8c) )
 	ROM_LOAD("flr1sch1.20p",   0x100000, 0x100000, CRC(aa233a02) SHA1(0011329f585658d90f820daf0ba08ce2735bddfc) )
 	ROM_LOAD("flr1sch2.19p",   0x200000, 0x100000, CRC(9b6b7abd) SHA1(5cdec70db1b46bc5d0866ca155b520157fef3adf) )
 	ROM_LOAD("flr1sch3.18p",   0x300000, 0x100000, CRC(50a14f54) SHA1(ab9c2f2e11f006a9dc7e5aedd5788d7d67166d36) )
 
-	ROM_REGION( 0x800000, NAMCOFL_SPRITEGFXREGION, 0 )  // OBJ
-	ROM_LOAD16_BYTE("flr1obj0l.ic1", 0x000001, 0x200000, CRC(364a902c) SHA1(4a1ea48eee86d410e36096cc100b4c9a5a645034) )
-	ROM_LOAD16_BYTE("flr1obj0u.ic2", 0x000000, 0x200000, CRC(a5c7b80e) SHA1(4e0e863cfdd8c051c3c4594bb21e11fb93c28f0c) )
-	ROM_LOAD16_BYTE("flr1obj1l.ic3", 0x400001, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
-	ROM_LOAD16_BYTE("flr1obj1u.ic4", 0x400000, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
+	ROM_REGION( 0x800000, "sprite", 0 )  // OBJ
+	ROM_LOAD32_WORD("flr1obj0l.ic1", 0x000000, 0x200000, CRC(364a902c) SHA1(4a1ea48eee86d410e36096cc100b4c9a5a645034) )
+	ROM_LOAD32_WORD("flr1obj0u.ic2", 0x000002, 0x200000, CRC(a5c7b80e) SHA1(4e0e863cfdd8c051c3c4594bb21e11fb93c28f0c) )
+	ROM_LOAD32_WORD("flr1obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
+	ROM_LOAD32_WORD("flr1obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
-	ROM_REGION( 0x80000, NAMCOFL_ROTMASKREGION, 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "rotmask", 0 ) // "RSHAPE" (roz mask like NB-1?)
 	ROM_LOAD("flr1rsh.14k",    0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
 
-	ROM_REGION( 0x80000, NAMCOFL_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "tilemask", 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("flr1ssh.18u",    0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples

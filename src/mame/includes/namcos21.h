@@ -55,7 +55,6 @@ public:
 		m_winrun_dspbios(*this,"winrun_dspbios"),
 		m_winrun_polydata(*this,"winrun_polydata"),
 		m_dspram16(*this,"dspram16"),
-		m_mpDualPortRAM(*this,"mpdualportram"),
 		m_ptrom24(*this,"point24"),
 		m_ptrom16(*this,"point16"),
 		m_dsp(*this, "dsp"),
@@ -63,6 +62,7 @@ public:
 		m_gpu_intc(*this, "gpu_intc")
 	{ }
 
+	void configure_screen_standard(machine_config &config);
 	void configure_c148_standard(machine_config &config);
 	void driveyes(machine_config &config);
 	void winrun(machine_config &config);
@@ -84,7 +84,6 @@ private:
 	optional_shared_ptr<uint16_t> m_winrun_dspbios;
 	optional_shared_ptr<uint16_t> m_winrun_polydata;
 	optional_shared_ptr<uint16_t> m_dspram16;
-	required_shared_ptr<uint8_t> m_mpDualPortRAM;
 
 	optional_region_ptr<int32_t> m_ptrom24;
 	optional_region_ptr<uint16_t> m_ptrom16;
@@ -153,10 +152,6 @@ private:
 	DECLARE_WRITE16_MEMBER(pointram_data_w);
 	DECLARE_READ16_MEMBER(namcos21_depthcue_r);
 	DECLARE_WRITE16_MEMBER(namcos21_depthcue_w);
-	DECLARE_READ16_MEMBER(namcos2_68k_dualportram_word_r);
-	DECLARE_WRITE16_MEMBER(namcos2_68k_dualportram_word_w);
-	DECLARE_READ8_MEMBER(namcos2_dualportram_byte_r);
-	DECLARE_WRITE8_MEMBER(namcos2_dualportram_byte_w);
 	DECLARE_READ16_MEMBER(winrun_dspcomram_r);
 	DECLARE_WRITE16_MEMBER(winrun_dspcomram_w);
 	DECLARE_READ16_MEMBER(winrun_cuskey_r);

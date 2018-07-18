@@ -69,6 +69,16 @@ READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
 /* Perform basic machine initialisation                      */
 /*************************************************************/
 
+READ8_MEMBER(namcos2_shared_state::dpram_r)
+{
+	return m_dpram[offset];
+}
+
+WRITE8_MEMBER(namcos2_shared_state::dpram_w)
+{
+	m_dpram[offset] = data;
+}
+
 #define m_eeprom_size 0x2000
 
 WRITE8_MEMBER(namcos2_shared_state::sound_reset_w)
@@ -134,28 +144,62 @@ void namcos2_shared_state::reset_all_subcpus(int state)
 
 MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 {
+	if (m_audiobank.found())
+	{
+		int max = memregion("audiocpu")->bytes() / 0x4000;
+		int ind = 0;
+		while (ind < 16)
+		{
+			m_audiobank->configure_entries(ind,max,memregion("audiocpu")->base(),0x4000);
+			ind += max;
+		}
+	}
+
 	namcos2_kickstart = nullptr;
 	m_eeprom = std::make_unique<uint8_t[]>(m_eeprom_size);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), m_eeprom_size);
 }
 
+MACHINE_START_MEMBER(namcos2_state,gollygho)
+{
+	MACHINE_START_CALL_MEMBER(namcos2);
+	m_zip1_output.resolve();
+	m_zip10_output.resolve();
+	m_zip100_output.resolve();
+	m_zap1_output.resolve();
+	m_zap10_output.resolve();
+	m_zap100_output.resolve();
+	m_time1_output.resolve();
+	m_time10_output.resolve();
+	m_dollhouse_output.resolve();
+	m_toybox_output.resolve();
+	m_bathroom_output.resolve();
+	m_bureau_output.resolve();
+	m_refrigerator_output.resolve();
+	m_porch_output.resolve();
+	m_gunrecoil_output.resolve();
+}
+
 MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
 {
 //  address_space &space = m_maincpu->space(AS_PROGRAM);
-	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
 
 	m_mcu_analog_ctrl = 0;
 	m_mcu_analog_data = 0xaa;
 	m_mcu_analog_complete = 0;
 
 	/* Initialise the bank select in the sound CPU */
-	namcos2_sound_bankselect_w(audio_space, 0, 0); /* Page in bank 0 */
+	m_audiobank->set_entry(0); /* Page in bank 0 */
 
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
 
 	/* Place CPU2 & CPU3 into the reset condition */
 	reset_all_subcpus(ASSERT_LINE);
+}
 
+MACHINE_RESET_MEMBER(namcos2_state, sgunner2)
+{
+	MACHINE_RESET_CALL_MEMBER(namcos2);
 	m_player_mux = 0;
 }
 
@@ -433,10 +477,7 @@ bool namcos2_shared_state::is_system21()
 
 WRITE8_MEMBER( namcos2_shared_state::namcos2_sound_bankselect_w )
 {
-	uint8_t *RAM= memregion("audiocpu")->base();
-	uint32_t max = (memregion("audiocpu")->bytes() - 0x10000) / 0x4000;
-	int bank = ( data >> 4 ) % max; /* 991104.CAB */
-	membank(BANKED_SOUND_ROM)->set_base(&RAM[ 0x10000 + ( 0x4000 * bank ) ] );
+	m_audiobank->set_entry(data >> 4);
 }
 
 /**************************************************************/
@@ -460,28 +501,28 @@ WRITE8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_ctrl_w )
 		switch((data>>2) & 0x07)
 		{
 		case 0:
-			m_mcu_analog_data=ioport("AN0")->read();
+			m_mcu_analog_data=m_analog_io[0]->read();
 			break;
 		case 1:
-			m_mcu_analog_data=ioport("AN1")->read();
+			m_mcu_analog_data=m_analog_io[1]->read();
 			break;
 		case 2:
-			m_mcu_analog_data=ioport("AN2")->read();
+			m_mcu_analog_data=m_analog_io[2]->read();
 			break;
 		case 3:
-			m_mcu_analog_data=ioport("AN3")->read();
+			m_mcu_analog_data=m_analog_io[3]->read();
 			break;
 		case 4:
-			m_mcu_analog_data=ioport("AN4")->read();
+			m_mcu_analog_data=m_analog_io[4]->read();
 			break;
 		case 5:
-			m_mcu_analog_data=ioport("AN5")->read();
+			m_mcu_analog_data=m_analog_io[5]->read();
 			break;
 		case 6:
-			m_mcu_analog_data=ioport("AN6")->read();
+			m_mcu_analog_data=m_analog_io[6]->read();
 			break;
 		case 7:
-			m_mcu_analog_data=ioport("AN7")->read();
+			m_mcu_analog_data=m_analog_io[7]->read();
 			break;
 		default:
 			output().set_value("anunk",data);
@@ -539,14 +580,14 @@ READ8_MEMBER( namcos2_shared_state::namcos2_mcu_port_d_r )
 	int data = 0;
 
 	/* Read/convert the bits one at a time */
-	if(ioport("AN0")->read() > threshold) data |= 0x01;
-	if(ioport("AN1")->read() > threshold) data |= 0x02;
-	if(ioport("AN2")->read() > threshold) data |= 0x04;
-	if(ioport("AN3")->read() > threshold) data |= 0x08;
-	if(ioport("AN4")->read() > threshold) data |= 0x10;
-	if(ioport("AN5")->read() > threshold) data |= 0x20;
-	if(ioport("AN6")->read() > threshold) data |= 0x40;
-	if(ioport("AN7")->read() > threshold) data |= 0x80;
+	if(m_analog_io[0]->read() > threshold) data |= 0x01;
+	if(m_analog_io[1]->read() > threshold) data |= 0x02;
+	if(m_analog_io[2]->read() > threshold) data |= 0x04;
+	if(m_analog_io[3]->read() > threshold) data |= 0x08;
+	if(m_analog_io[4]->read() > threshold) data |= 0x10;
+	if(m_analog_io[5]->read() > threshold) data |= 0x20;
+	if(m_analog_io[6]->read() > threshold) data |= 0x40;
+	if(m_analog_io[7]->read() > threshold) data |= 0x80;
 
 	/* Return the result */
 	return data;

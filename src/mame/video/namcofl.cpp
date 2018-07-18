@@ -96,7 +96,7 @@ int namcofl_state::FLobjcode2tile(int code)
 
 VIDEO_START_MEMBER(namcofl_state,namcofl)
 {
-	c123_tilemap_init(NAMCOFL_TILEGFX, memregion(NAMCOFL_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namcofl_state::TilemapCB, this));
-	c355_obj_init(NAMCOFL_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));
-	c169_roz_init(NAMCOFL_ROTGFX,NAMCOFL_ROTMASKREGION,namcos2_shared_state::c169_tilemap_delegate(&namcofl_state::RozCB, this));
+	c123_tilemap_init(0, memregion("tilemask")->base(), namcos2_shared_state::c123_tilemap_delegate(&namcofl_state::TilemapCB, this));
+	c355_obj_init(1,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));
+	c169_roz_init(2,"rotmask",namcos2_shared_state::c169_tilemap_delegate(&namcofl_state::RozCB, this));
 }

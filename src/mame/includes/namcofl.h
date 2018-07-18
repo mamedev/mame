@@ -9,21 +9,12 @@
 #define NAMCOFL_VTOTAL      (262)   /* needs to be checked */
 #define NAMCOFL_VBSTART (224)
 
-#define NAMCOFL_TILEMASKREGION      "tilemask"
-#define NAMCOFL_TILEGFXREGION       "tile"
-#define NAMCOFL_SPRITEGFXREGION "sprite"
-#define NAMCOFL_ROTMASKREGION       "rotmask"
-#define NAMCOFL_ROTGFXREGION        "rot"
-
-#define NAMCOFL_TILEGFX     0
-#define NAMCOFL_SPRITEGFX       1
-#define NAMCOFL_ROTGFX          2
-
 class namcofl_state : public namcos2_shared_state
 {
 public:
 	namcofl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcos2_shared_state(mconfig, type, tag),
+		m_mainbank(*this, "mainbank%u", 1U),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
@@ -39,6 +30,7 @@ public:
 	void init_finalapr();
 
 private:
+	required_memory_bank_array<2> m_mainbank;
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport m_in2;

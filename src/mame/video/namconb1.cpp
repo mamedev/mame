@@ -141,8 +141,8 @@ int namconb1_state::NB1objcode2tile( int code )
 
 VIDEO_START_MEMBER(namconb1_state,namconb1)
 {
-	c123_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB1TilemapCB, this));
-	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
+	c123_tilemap_init(0, memregion("tilemask")->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB1TilemapCB, this));
+	c355_obj_init(1,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
 
 	save_item(NAME(m_tilemap_tile_bank));
 } /* namconb1 */
@@ -199,18 +199,18 @@ int namconb1_state::NB2objcode2tile_outfxies( int code )
 
 VIDEO_START_MEMBER(namconb1_state,machbrkr)
 {
-	c123_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_machbrkr, this));
-	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_machbrkr, this));
-	c169_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION,namcos2_shared_state::c169_tilemap_delegate(&namconb1_state::NB2RozCB_machbrkr, this));
+	c123_tilemap_init(0, memregion("tilemask")->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_machbrkr, this));
+	c355_obj_init(1,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_machbrkr, this));
+	c169_roz_init(2,"rotmask",namcos2_shared_state::c169_tilemap_delegate(&namconb1_state::NB2RozCB_machbrkr, this));
 
 	save_item(NAME(m_tilemap_tile_bank));
 } /* machbrkr */
 
 VIDEO_START_MEMBER(namconb1_state,outfxies)
 {
-	c123_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_outfxies, this));
-	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_outfxies, this));
-	c169_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION,namcos2_shared_state::c169_tilemap_delegate(&namconb1_state::NB2RozCB_outfxies, this));
+	c123_tilemap_init(0, memregion("tilemask")->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB_outfxies, this));
+	c355_obj_init(1,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile_outfxies, this));
+	c169_roz_init(2,"rotmask",namcos2_shared_state::c169_tilemap_delegate(&namconb1_state::NB2RozCB_outfxies, this));
 
 	save_item(NAME(m_tilemap_tile_bank));
 } /* outfxies */

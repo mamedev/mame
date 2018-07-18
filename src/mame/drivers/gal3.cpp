@@ -144,16 +144,14 @@ public:
 	gal3_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcos2_shared_state(mconfig, type, tag) ,
 		m_rso_shared_ram(*this, "rso_shared_ram"),
-		m_generic_paletteram_16(*this, "paletteram"),
 		m_c140_16a(*this, "c140_16a"),
 		m_c140_16g(*this, "c140_16g") { }
 
 	void gal3(machine_config &config);
 
 private:
-	uint16_t m_namcos21_video_enable;
+	uint16_t m_video_enable[2];
 	required_shared_ptr<uint16_t> m_rso_shared_ram;
-	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
 	required_device<c140_device> m_c140_16a;
 	required_device<c140_device> m_c140_16g;
 	uint32_t m_led_mst;
@@ -162,15 +160,12 @@ private:
 	DECLARE_WRITE32_MEMBER(led_mst_w);
 	DECLARE_READ32_MEMBER(led_slv_r);
 	DECLARE_WRITE32_MEMBER(led_slv_w);
-	DECLARE_READ32_MEMBER(paletteram32_r);
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
-	DECLARE_READ32_MEMBER(namcos21_video_enable_r);
-	DECLARE_WRITE32_MEMBER(namcos21_video_enable_w);
+	template<int Screen> DECLARE_READ16_MEMBER(video_enable_r);
+	template<int Screen> DECLARE_WRITE16_MEMBER(video_enable_w);
 	DECLARE_READ32_MEMBER(rso_r);
 	DECLARE_WRITE32_MEMBER(rso_w);
 	DECLARE_VIDEO_START(gal3);
-	uint32_t screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void update_palette(  );
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void cpu_mst_map(address_map &map);
 	void cpu_slv_map(address_map &map);
 	void psn_b1_cpu_map(address_map &map);
@@ -181,8 +176,6 @@ private:
 
 VIDEO_START_MEMBER(gal3_state,gal3)
 {
-	m_generic_paletteram_16.allocate(0x10000);
-
 	c355_obj_init(
 		0,      /* gfx bank */
 		0xf,    /* reverse palette mapping */
@@ -190,38 +183,12 @@ VIDEO_START_MEMBER(gal3_state,gal3)
 
 }
 
-/* FIXME: this code has simply been copypasted from namcos21.c
-   (which has subsequently been rewritten to use generic MAME
-   palette handling) with a 32-bit CPU it's rather unlikely
-   that the palette RAM is actually laid out this way */
-
-void gal3_state::update_palette(  )
-{
-	int i;
-	int16_t data1,data2;
-	int r,g,b;
-
-	for( i=0; i<NAMCOS21_NUM_COLORS; i++ )
-	{
-		data1 = m_generic_paletteram_16[0x00000/2+i];
-		data2 = m_generic_paletteram_16[0x10000/2+i];
-
-		r = data1>>8;
-		g = data1&0xff;
-		b = data2&0xff;
-
-		m_palette->set_pen_color( i, rgb_t(r,g,b) );
-	}
-} /* update_palette */
-
-uint32_t gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gal3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	char mst[18], slv[18];
 	static int pivot = 15;
 	int pri;
-
-	update_palette();
 
 	if( machine().input().code_pressed_once(KEYCODE_H)&&(pivot<15) )    pivot+=1;
 	if( machine().input().code_pressed_once(KEYCODE_J)&&(pivot>0) ) pivot-=1;
@@ -289,35 +256,16 @@ WRITE32_MEMBER(gal3_state::led_slv_w)
 	COMBINE_DATA(&m_led_slv);
 }
 
-/* palette memory handlers */
-
-READ32_MEMBER(gal3_state::paletteram32_r)
+template<int Screen>
+READ16_MEMBER(gal3_state::video_enable_r)
 {
-	offset *= 2;
-	return (m_generic_paletteram_16[offset]<<16)|m_generic_paletteram_16[offset+1];
+	return m_video_enable[Screen];
 }
 
-WRITE32_MEMBER(gal3_state::paletteram32_w)
+template<int Screen>
+WRITE16_MEMBER(gal3_state::video_enable_w)
 {
-	uint32_t v;
-	offset *= 2;
-	v = (m_generic_paletteram_16[offset]<<16)|m_generic_paletteram_16[offset+1];
-	COMBINE_DATA( &v );
-	m_generic_paletteram_16[offset+0] = v>>16;
-	m_generic_paletteram_16[offset+1] = v&0xffff;
-}
-
-READ32_MEMBER(gal3_state::namcos21_video_enable_r)
-{
-	return m_namcos21_video_enable<<16;
-}
-
-WRITE32_MEMBER(gal3_state::namcos21_video_enable_w)
-{
-	uint32_t v;
-	v = m_namcos21_video_enable<<16;
-	COMBINE_DATA( &v ); // 0xff53, instead of 0x40 in namcos21
-	m_namcos21_video_enable = v>>16;
+	COMBINE_DATA(&m_video_enable[Screen]); // 0xff53, instead of 0x40 in namcos21
 }
 
 READ32_MEMBER(gal3_state::rso_r)
@@ -379,14 +327,16 @@ void gal3_state::cpu_slv_map(address_map &map)
 /// AM_RANGE(0xf1480000, 0xf14807ff) AM_READWRITE(namcos21_depthcue_r,namcos21_depthcue_w)
 	map(0xf1700000, 0xf170ffff).rw(FUNC(gal3_state::c355_obj_ram_r), FUNC(gal3_state::c355_obj_ram_w)).share("objram");
 	map(0xf1720000, 0xf1720007).rw(FUNC(gal3_state::c355_obj_position_r), FUNC(gal3_state::c355_obj_position_w));
-	map(0xf1740000, 0xf175ffff).rw(FUNC(gal3_state::paletteram32_r), FUNC(gal3_state::paletteram32_w));
-	map(0xf1760000, 0xf1760003).rw(FUNC(gal3_state::namcos21_video_enable_r), FUNC(gal3_state::namcos21_video_enable_w));
+	map(0xf1740000, 0xf174ffff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette");
+	map(0xf1750000, 0xf175ffff).rw(m_palette, FUNC(palette_device::read16_ext), FUNC(palette_device::write16_ext)).share("palette_ext");
+	map(0xf1760000, 0xf1760001).rw(FUNC(gal3_state::video_enable_r<0>), FUNC(gal3_state::video_enable_w<0>));
 
 	map(0xf2200000, 0xf220ffff).ram();
-	map(0xf2700000, 0xf270ffff).ram(); //AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
-	map(0xf2720000, 0xf2720007).ram(); //AM_READWRITE16(c355_obj_position_r,c355_obj_position_w,0xffffffff)
-	map(0xf2740000, 0xf275ffff).ram(); //AM_READWRITE(paletteram16_r,paletteram16_w) AM_SHARE("paletteram")
-	map(0xf2760000, 0xf2760003).ram(); //AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
+	map(0xf2700000, 0xf270ffff).ram(); //.rw(FUNC(gal3_state::c355_obj_ram_r), FUNC(gal3_state::c355_obj_ram_w)).share("objram");
+	map(0xf2720000, 0xf2720007).ram(); //.rw(FUNC(gal3_state::c355_obj_position_r), FUNC(gal3_state::c355_obj_position_w));
+	map(0xf2740000, 0xf274ffff).ram(); //.rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette");
+	map(0xf2750000, 0xf275ffff).ram(); //.rw(m_palette, FUNC(palette_device::read16_ext), FUNC(palette_device::write16_ext)).share("palette_ext");
+	map(0xf2760000, 0xf2760003).rw(FUNC(gal3_state::video_enable_r<1>), FUNC(gal3_state::video_enable_w<1>));
 }
 
 void gal3_state::rs_cpu_map(address_map &map)
@@ -581,31 +531,20 @@ static INPUT_PORTS_START( gal3 )
 	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout tile_layout =
+static const gfx_layout layout16x16x8 =
 {
 	16,16,
-	RGN_FRAC(1,4),  /* number of tiles */
-	8,      /* bits per pixel */
-	{       /* plane offsets */
-		0,1,2,3,4,5,6,7
-	},
-	{ /* x offsets */
-		0*8,RGN_FRAC(1,4)+0*8,RGN_FRAC(2,4)+0*8,RGN_FRAC(3,4)+0*8,
-		1*8,RGN_FRAC(1,4)+1*8,RGN_FRAC(2,4)+1*8,RGN_FRAC(3,4)+1*8,
-		2*8,RGN_FRAC(1,4)+2*8,RGN_FRAC(2,4)+2*8,RGN_FRAC(3,4)+2*8,
-		3*8,RGN_FRAC(1,4)+3*8,RGN_FRAC(2,4)+3*8,RGN_FRAC(3,4)+3*8
-	},
-	{ /* y offsets */
-		0*32,1*32,2*32,3*32,
-		4*32,5*32,6*32,7*32,
-		8*32,9*32,10*32,11*32,
-		12*32,13*32,14*32,15*32
-	},
-	8*64 /* sprite offset */
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP16(0,8) },
+	{ STEP16(0,8*16) },
+	16*16*8
 };
 
-static GFXDECODE_START( gfx_namcos21 )
-	GFXDECODE_ENTRY( "obj_board1", 0x000000, tile_layout,  0x000, 0x20 )
+static GFXDECODE_START( gfx_gal3 )
+	GFXDECODE_ENTRY( "obj_board1", 0x000000, layout16x16x8,  0x000, 0x20 ) // Left screen?
+	GFXDECODE_ENTRY( "obj_board2", 0x000000, layout16x16x8,  0x000, 0x20 ) // Right screen?
 GFXDECODE_END
 
 MACHINE_CONFIG_START(gal3_state::gal3)
@@ -642,17 +581,20 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_gal3)
+	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_gal3)
+	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
-	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gal3);
+
+	PALETTE(config, m_palette, NAMCOS21_NUM_COLORS);
+	m_palette->set_membits(16);
+	m_palette->set_format(PALETTE_FORMAT_XBRG);
 
 	MCFG_VIDEO_START_OVERRIDE(gal3_state,gal3)
 
@@ -796,7 +738,7 @@ GLC1-SND-DATA1  4/5H    27c1000     DATA1.BIN
 ROM_START( gal3 )
 	/********* CPU-MST board x1 *********/
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 Code */
-	ROM_LOAD32_BYTE( "glc1-mst-prg0e.6b", 0x00003, 0x80000, CRC(5deccd72) SHA1(8d50779221538cc171469a691fabb17b62a8e664) )
+	ROM_LOAD32_BYTE( "glc1-mst-prg0e.6b",  0x00003, 0x80000, CRC(5deccd72) SHA1(8d50779221538cc171469a691fabb17b62a8e664) )
 	ROM_LOAD32_BYTE( "glc1-mst-prg1e.10b", 0x00002, 0x80000, CRC(b6144e3b) SHA1(33f63d881e7012db7f971b074bc5f876a66198b7) )
 	ROM_LOAD32_BYTE( "glc1-mst-prg2e.14b", 0x00001, 0x80000, CRC(13381084) SHA1(486c1e136e6594ba68858e40246c5fb9bef1c0d2) )
 	ROM_LOAD32_BYTE( "glc1-mst-prg3e.18b", 0x00000, 0x80000, CRC(7917584a) SHA1(ec22de8a3751099d37e14cd05c736c33baa1ee1d) )
@@ -822,17 +764,17 @@ ROM_START( gal3 )
 	/* and 5x C67 (TMS320C25) */
 
 	/********* OBJ board x2 *********/
-	ROM_REGION( 0x200000, "obj_board1", 0 )
-	ROM_LOAD( "glc1-obj-obj0.9t", 0x000000, 0x80000, CRC(0fe98d33) SHA1(5cfefa342fe2fa278d010927d761cb51105a4a60) )
-	ROM_LOAD( "glc1-obj-obj1.9w", 0x080000, 0x80000, CRC(660a4f6d) SHA1(c3c3525f51280e71f2d607649a6b5434cbd862c8) )
-	ROM_LOAD( "glc1-obj-obj2.9y", 0x100000, 0x80000, CRC(90bcc5a3) SHA1(76cb23e295bb15279e046e83f8e4ab9f85f68243) )
-	ROM_LOAD( "glc1-obj-obj3.9z", 0x180000, 0x80000, CRC(65244f07) SHA1(fd876ca5f198914f15864397b358e56fcaa41e90) )
+	ROM_REGION( 0x200000, "obj_board1", ROMREGION_ERASEFF )
+	ROM_LOAD32_BYTE( "glc1-obj-obj0.9t", 0x000000, 0x80000, CRC(0fe98d33) SHA1(5cfefa342fe2fa278d010927d761cb51105a4a60) )
+	ROM_LOAD32_BYTE( "glc1-obj-obj1.9w", 0x000001, 0x80000, CRC(660a4f6d) SHA1(c3c3525f51280e71f2d607649a6b5434cbd862c8) )
+	ROM_LOAD32_BYTE( "glc1-obj-obj2.9y", 0x000002, 0x80000, CRC(90bcc5a3) SHA1(76cb23e295bb15279e046e83f8e4ab9f85f68243) )
+	ROM_LOAD32_BYTE( "glc1-obj-obj3.9z", 0x000003, 0x80000, CRC(65244f07) SHA1(fd876ca5f198914f15864397b358e56fcaa41e90) )
 
-	ROM_REGION( 0x200000, "obj_board2", 0 )
-	ROM_LOAD( "glc1-obj-obj0.9t", 0x000000, 0x80000, CRC(0fe98d33) SHA1(5cfefa342fe2fa278d010927d761cb51105a4a60) )
-	ROM_LOAD( "glc1-obj-obj1.9w", 0x080000, 0x80000, CRC(660a4f6d) SHA1(c3c3525f51280e71f2d607649a6b5434cbd862c8) )
-	ROM_LOAD( "glc1-obj-obj2.9y", 0x100000, 0x80000, CRC(90bcc5a3) SHA1(76cb23e295bb15279e046e83f8e4ab9f85f68243) )
-	ROM_LOAD( "glc1-obj-obj3.9z", 0x180000, 0x80000, CRC(65244f07) SHA1(fd876ca5f198914f15864397b358e56fcaa41e90) )
+	ROM_REGION( 0x200000, "obj_board2", ROMREGION_ERASEFF )
+	ROM_LOAD32_BYTE( "glc1-obj-obj0.9t", 0x000000, 0x80000, CRC(0fe98d33) SHA1(5cfefa342fe2fa278d010927d761cb51105a4a60) )
+	ROM_LOAD32_BYTE( "glc1-obj-obj1.9w", 0x000001, 0x80000, CRC(660a4f6d) SHA1(c3c3525f51280e71f2d607649a6b5434cbd862c8) )
+	ROM_LOAD32_BYTE( "glc1-obj-obj2.9y", 0x000002, 0x80000, CRC(90bcc5a3) SHA1(76cb23e295bb15279e046e83f8e4ab9f85f68243) )
+	ROM_LOAD32_BYTE( "glc1-obj-obj3.9z", 0x000003, 0x80000, CRC(65244f07) SHA1(fd876ca5f198914f15864397b358e56fcaa41e90) )
 
 	/********* PSN board x3 *********/
 	ROM_REGION( 0x040000, "psn_b1_cpu", 0 )
@@ -870,7 +812,7 @@ ROM_START( gal3 )
 	ROM_LOAD( "glc1-snd-voi8.10g", 0x000000, 0x80000, CRC(bba0c15b) SHA1(b0abc22fd1ae8a9970ad45d9ebdb38e6b06033a7) )
 	ROM_LOAD( "glc1-snd-voi9.11g", 0x080000, 0x80000, CRC(dd1b1ee4) SHA1(b69af15acaa9c3d79d7758adc8722ff5c1129b76) )
 	ROM_LOAD( "glc1-snd-voi10.13g",0x100000, 0x80000, CRC(1c1dedf4) SHA1(b6b9dac68103ff2206d731d409a557a71afd98f7) )
-	ROM_LOAD( "glc1-snd-voi11.14g",0x180000, 0x80000, CRC(559e2a8a) SHA1(9a2f28305c6073a0b9b80a5d9617cc25a921e9d0))
+	ROM_LOAD( "glc1-snd-voi11.14g",0x180000, 0x80000, CRC(559e2a8a) SHA1(9a2f28305c6073a0b9b80a5d9617cc25a921e9d0) )
 
 	/********* Laserdiscs *********/
 	/* used 2 apparently, no idea what they connect to */

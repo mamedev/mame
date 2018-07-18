@@ -42,7 +42,7 @@ WRITE16_MEMBER( namcos2_state::gfx_ctrl_w )
 TILE_GET_INFO_MEMBER( namcos2_state::roz_tile_info )
 {
 	int tile = m_rozram[tile_index];
-	SET_TILE_INFO_MEMBER(3,tile,0/*color*/,0);
+	SET_TILE_INFO_MEMBER(2,tile,0/*color*/,0);
 }
 
 struct roz_param
@@ -290,6 +290,19 @@ WRITE16_MEMBER( namcos2_state::rozram_word_w )
 
 /**************************************************************************/
 
+READ8_MEMBER( namcos2_state::c116_r )
+{
+	if( (offset&0x1800) == 0x1800 )
+	{
+		/* palette register */
+		offset &= 0x180f;
+
+		/* registers 6,7: unmapped? */
+		if (offset > 0x180b) return 0xff; // fix for finallap boot
+	}
+	return m_c116->read(space,offset,mem_mask);
+}
+
 /**************************************************************************/
 
 void namcos2_state::draw_sprite_init()
@@ -305,10 +318,11 @@ void namcos2_state::draw_sprite_init()
 
 void namcos2_state::video_start()
 {
-	c123_tilemap_init(2, memregion("gfx4")->base(), namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
+	c123_tilemap_init(1, memregion("tile_mask")->base(), namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	m_tilemap_roz = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_state::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8,8,256,256);
 	m_tilemap_roz->set_transparent_pen(0xff);
 	draw_sprite_init();
+	save_item(NAME(m_gfx_ctrl));
 }
 
 void namcos2_state::apply_clip( rectangle &clip, const rectangle &cliprect )
@@ -352,14 +366,16 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 void namcos2_state::video_start_finallap()
 {
-	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
+	c123_tilemap_init(1,memregion("tile_mask")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	draw_sprite_init();
+	save_item(NAME(m_gfx_ctrl));
 }
 
 void namcos2_state::video_start_finalap2()
 {
-	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
+	c123_tilemap_init(1,memregion("tile_mask")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
 	draw_sprite_init();
+	save_item(NAME(m_gfx_ctrl));
 }
 
 uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -387,27 +403,14 @@ uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind
 void namcos2_state::RozCB_luckywld(uint16_t code, int *tile, int *mask, int which)
 {
 	*mask = code;
-
-	uint16_t mangle = bitswap<11>(code & 0x31ff, 13, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
-	switch ((code >> 9) & 7)
-	{
-		case 0x00: mangle += 0x1c00; break; // Plus, NOT OR
-		case 0x01: mangle |= 0x0800; break;
-		case 0x02: mangle |= 0x0000; break;
-		default: break;
-	}
-
-	*tile = mangle;
+	*tile = bitswap<13>(code & 0x37ff, 10, 9, 13, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 void namcos2_state::video_start_luckywld()
 {
-	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
+	c123_tilemap_init(1,memregion("tile_mask")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	c355_obj_init( 0, 0x0, namcos2_shared_state::c355_obj_code2tile_delegate() );
-	if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
-	{
-		c169_roz_init(1, "gfx5", namcos2_shared_state::c169_tilemap_delegate(&namcos2_state::RozCB_luckywld, this));
-	}
+	c169_roz_init(2, "roz_mask", namcos2_shared_state::c169_tilemap_delegate(&namcos2_state::RozCB_luckywld, this));
 }
 
 uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -425,10 +428,7 @@ uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind
 			c123_tilemap_draw( screen, bitmap, clip, pri/2 );
 		}
 		m_c45_road->draw(bitmap,clip,pri);
-		if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
-		{
-			c169_roz_draw(screen, bitmap, clip, pri);
-		}
+		c169_roz_draw(screen, bitmap, clip, pri );
 		c355_obj_draw(screen, bitmap, clip, pri );
 	}
 	return 0;
@@ -438,7 +438,7 @@ uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind
 
 void namcos2_state::video_start_sgunner()
 {
-	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
+	c123_tilemap_init(1,memregion("tile_mask")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	c355_obj_init( 0, 0x0, namcos2_shared_state::c355_obj_code2tile_delegate() );
 }
 
@@ -458,6 +458,26 @@ uint32_t namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
+uint32_t namcos2_state::screen_update_suzuka8h(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	rectangle clip;
+	int pri;
+
+	bitmap.fill(m_palette->black_pen(), cliprect );
+	apply_clip( clip, cliprect );
+
+	for( pri=0; pri<16; pri++ )
+	{
+		if( (pri&1)==0 )
+		{
+			c123_tilemap_draw( screen, bitmap, clip, pri/2 );
+		}
+		m_c45_road->draw(bitmap,clip,pri);
+		c355_obj_draw(screen, bitmap, clip, pri );
+	}
+	return 0;
+}
+
 
 /**************************************************************************/
 
@@ -469,8 +489,9 @@ void namcos2_state::RozCB_metlhawk(uint16_t code, int *tile, int *mask, int whic
 
 void namcos2_state::video_start_metlhawk()
 {
-	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
-	c169_roz_init(1, "gfx5", namcos2_shared_state::c169_tilemap_delegate(&namcos2_state::RozCB_metlhawk, this));
+	c123_tilemap_init(1,memregion("tile_mask")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
+	c169_roz_init(2, "roz_mask", namcos2_shared_state::c169_tilemap_delegate(&namcos2_state::RozCB_metlhawk, this));
+	save_item(NAME(m_gfx_ctrl));
 }
 
 uint32_t namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

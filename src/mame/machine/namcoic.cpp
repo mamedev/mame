@@ -5,6 +5,7 @@
 
 #include "includes/namcos2.h" /* for game-specific hacks */
 
+#include <algorithm>
 
 /**************************************************************************************/
 
@@ -19,9 +20,8 @@ void namcos2_shared_state::c123_tilemap_invalidate(void)
 template<int Offset>
 TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info )
 {
-	const uint16_t *vram = &m_c123_TilemapInfo.videoram[Offset];
 	int tile, mask;
-	m_c123_TilemapInfo.cb( vram[tile_index], &tile, &mask );
+	m_c123_TilemapInfo.cb( m_c123_TilemapInfo.videoram[Offset + tile_index], &tile, &mask );
 	tileinfo.mask_data = m_c123_TilemapInfo.maskBaseAddr+mask*8;
 	SET_TILE_INFO_MEMBER(m_c123_TilemapInfo.gfxbank,tile,0,0);
 } /* get_tile_info */
@@ -33,24 +33,24 @@ void namcos2_shared_state::c123_tilemap_init( int gfxbank, void *maskBaseAddr, c
 	m_c123_TilemapInfo.cb = tilemap_cb;
 	m_c123_TilemapInfo.videoram = std::make_unique<uint16_t[]>( 0x10000 );
 
-		/* four scrolling tilemaps */
-		m_c123_TilemapInfo.tmap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x0000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-		m_c123_TilemapInfo.tmap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x1000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-		m_c123_TilemapInfo.tmap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x2000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-		m_c123_TilemapInfo.tmap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x3000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	/* four scrolling tilemaps */
+	m_c123_TilemapInfo.tmap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x0000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_c123_TilemapInfo.tmap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x1000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_c123_TilemapInfo.tmap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x2000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_c123_TilemapInfo.tmap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x3000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
-		/* two non-scrolling tilemaps */
-		m_c123_TilemapInfo.tmap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x4008>),this),TILEMAP_SCAN_ROWS,8,8,36,28);
-		m_c123_TilemapInfo.tmap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x4408>),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+	/* two non-scrolling tilemaps */
+	m_c123_TilemapInfo.tmap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x4008>),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+	m_c123_TilemapInfo.tmap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info<0x4408>),this),TILEMAP_SCAN_ROWS,8,8,36,28);
 
-		/* define offsets for scrolling */
-		for( int i = 0; i < 4; i++ )
-		{
-			static const int adj[4] = { 4,2,1,0 };
-			int dx = 44+adj[i];
-			m_c123_TilemapInfo.tmap[i]->set_scrolldx( -dx, 288+dx );
-			m_c123_TilemapInfo.tmap[i]->set_scrolldy( -24, 224+24 );
-		}
+	/* define offsets for scrolling */
+	for( int i = 0; i < 4; i++ )
+	{
+		static const int adj[4] = { 4,2,1,0 };
+		int dx = 44+adj[i];
+		m_c123_TilemapInfo.tmap[i]->set_scrolldx( -dx, 288+dx );
+		m_c123_TilemapInfo.tmap[i]->set_scrolldy( -24, 224+24 );
+	}
 
 	save_item(NAME(m_c123_TilemapInfo.control));
 	save_pointer(NAME(m_c123_TilemapInfo.videoram), 0x10000);
@@ -60,40 +60,35 @@ void namcos2_shared_state::c123_tilemap_draw( screen_device &screen, bitmap_ind1
 {
 	for( int i = 0; i < 6; i++ )
 	{
+		if (!m_c123_TilemapInfo.tmap[i]->enabled())
+			continue;
+
 		/* note: priority is only in range 0..7, but Point Blank uses 0xf to hide a layer */
-		if( (m_c123_TilemapInfo.control[0x20/2+i]&0xf) == pri )
-		{
-			int color = m_c123_TilemapInfo.control[0x30/2+i] & 0x07;
-			m_c123_TilemapInfo.tmap[i]->set_palette_offset( color*256 );
+		if( (m_c123_TilemapInfo.control[0x20/2+i]&0x7) == pri )
 			m_c123_TilemapInfo.tmap[i]->draw(screen, bitmap,cliprect,0,0);
-		}
 	}
 } /* c123_tilemap_draw */
 
-void namcos2_shared_state::c123_SetTilemapVideoram(int offset, uint16_t newword)
-{
-	m_c123_TilemapInfo.videoram[offset] = newword;
-	if( offset<0x4000 )
-	{
-		m_c123_TilemapInfo.tmap[offset>>12]->mark_tile_dirty(offset&0xfff);
-	}
-	else if( offset>=0x8010/2 && offset<0x87f0/2 )
-	{ /* fixed plane#1 */
-		offset-=0x8010/2;
-		m_c123_TilemapInfo.tmap[4]->mark_tile_dirty( offset );
-	}
-	else if( offset>=0x8810/2 && offset<0x8ff0/2 )
-	{ /* fixed plane#2 */
-		offset-=0x8810/2;
-		m_c123_TilemapInfo.tmap[5]->mark_tile_dirty( offset );
-	}
-} /* SetTilemapVideoram */
-
 WRITE16_MEMBER( namcos2_shared_state::c123_tilemap_videoram_w )
 {
-	uint16_t newword = m_c123_TilemapInfo.videoram[offset];
-	COMBINE_DATA( &newword );
-	c123_SetTilemapVideoram( offset, newword );
+	if ((m_c123_TilemapInfo.videoram[offset] & mem_mask) != (data & mem_mask))
+	{
+		COMBINE_DATA( &m_c123_TilemapInfo.videoram[offset] );
+		if( offset<0x4000 )
+		{
+			m_c123_TilemapInfo.tmap[offset>>12]->mark_tile_dirty(offset&0xfff);
+		}
+		else if( offset>=0x8010/2 && offset<0x87f0/2 )
+		{ /* fixed plane#1 */
+			offset-=0x8010/2;
+			m_c123_TilemapInfo.tmap[4]->mark_tile_dirty( offset );
+		}
+		else if( offset>=0x8810/2 && offset<0x8ff0/2 )
+		{ /* fixed plane#2 */
+			offset-=0x8810/2;
+			m_c123_TilemapInfo.tmap[5]->mark_tile_dirty( offset );
+		}
+	}
 }
 
 READ16_MEMBER( namcos2_shared_state::c123_tilemap_videoram_r )
@@ -101,9 +96,10 @@ READ16_MEMBER( namcos2_shared_state::c123_tilemap_videoram_r )
 	return m_c123_TilemapInfo.videoram[offset];
 }
 
-void namcos2_shared_state::c123_SetTilemapControl(int offset, uint16_t newword)
+WRITE16_MEMBER( namcos2_shared_state::c123_tilemap_control_w )
 {
-	m_c123_TilemapInfo.control[offset] = newword;
+	COMBINE_DATA( &m_c123_TilemapInfo.control[offset] );
+	uint16_t newword = m_c123_TilemapInfo.control[offset];
 	if( offset<0x20/2 )
 	{
 		if( offset == 0x02/2 )
@@ -116,46 +112,49 @@ void namcos2_shared_state::c123_SetTilemapControl(int offset, uint16_t newword)
 				m_c123_TilemapInfo.tmap[i]->set_flip(attrs);
 			}
 		}
+		newword &= 0x1ff;
+		if( m_c123_TilemapInfo.control[0x02/2]&0x8000 )
+		{
+			newword = -newword;
+		}
+		switch( offset )
+		{
+		case 0x02/2:
+			m_c123_TilemapInfo.tmap[0]->set_scrollx( 0, newword );
+			break;
+		case 0x06/2:
+			m_c123_TilemapInfo.tmap[0]->set_scrolly( 0, newword );
+			break;
+		case 0x0a/2:
+			m_c123_TilemapInfo.tmap[1]->set_scrollx( 0, newword );
+			break;
+		case 0x0e/2:
+			m_c123_TilemapInfo.tmap[1]->set_scrolly( 0, newword );
+			break;
+		case 0x12/2:
+			m_c123_TilemapInfo.tmap[2]->set_scrollx( 0, newword );
+			break;
+		case 0x16/2:
+			m_c123_TilemapInfo.tmap[2]->set_scrolly( 0, newword );
+			break;
+		case 0x1a/2:
+			m_c123_TilemapInfo.tmap[3]->set_scrollx( 0, newword );
+			break;
+		case 0x1e/2:
+			m_c123_TilemapInfo.tmap[3]->set_scrolly( 0, newword );
+			break;
+		}
 	}
-	newword &= 0x1ff;
-	if( m_c123_TilemapInfo.control[0x02/2]&0x8000 )
+	else
 	{
-		newword = -newword;
+		if ((offset & 7) < 6)
+		{
+			if (offset & 8) // 30-3f Color
+				m_c123_TilemapInfo.tmap[offset & 7]->set_palette_offset( (newword&7)*256 );
+			else // 20-2f Priority
+				m_c123_TilemapInfo.tmap[offset & 7]->enable( (newword & 8) ? false : true );
+		}
 	}
-	switch( offset )
-	{
-	case 0x02/2:
-		m_c123_TilemapInfo.tmap[0]->set_scrollx( 0, newword );
-		break;
-	case 0x06/2:
-		m_c123_TilemapInfo.tmap[0]->set_scrolly( 0, newword );
-		break;
-	case 0x0a/2:
-		m_c123_TilemapInfo.tmap[1]->set_scrollx( 0, newword );
-		break;
-	case 0x0e/2:
-		m_c123_TilemapInfo.tmap[1]->set_scrolly( 0, newword );
-		break;
-	case 0x12/2:
-		m_c123_TilemapInfo.tmap[2]->set_scrollx( 0, newword );
-		break;
-	case 0x16/2:
-		m_c123_TilemapInfo.tmap[2]->set_scrolly( 0, newword );
-		break;
-	case 0x1a/2:
-		m_c123_TilemapInfo.tmap[3]->set_scrollx( 0, newword );
-		break;
-	case 0x1e/2:
-		m_c123_TilemapInfo.tmap[3]->set_scrolly( 0, newword );
-		break;
-	}
-} /* SetTilemapControl */
-
-WRITE16_MEMBER( namcos2_shared_state::c123_tilemap_control_w )
-{
-	uint16_t newword = m_c123_TilemapInfo.control[offset];
-	COMBINE_DATA( &newword );
-	c123_SetTilemapControl( offset, newword );
 }
 
 READ16_MEMBER( namcos2_shared_state::c123_tilemap_control_r )
@@ -177,8 +176,8 @@ void namcos2_shared_state::zdrawgfxzoom(
 	{
 		if( gfx )
 		{
-			int shadow_offset = (m_palette->shadows_enabled())?m_palette->entries():0;
-			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			int shadow_offset = (gfx->palette().shadows_enabled())?gfx->palette().entries():0;
+			const pen_t *pal = &gfx->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 			int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
 			int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
@@ -320,6 +319,7 @@ void namcos2_shared_state::zdrawgfxzoom(
 
 void namcos2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control )
 {
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int offset = (control & 0x000f) * (128*4);
 	int loop;
 	if( pri==0 )
@@ -364,8 +364,7 @@ void namcos2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 			if((sizey-1) && sizex )
 			{
 				int color  = (word3>>4)&0x000f;
-				int sprn   = (word1>>2)&0x7ff;
-				int rgn    = (word1&0x2000)?1:0;
+				int sprn   = (word1>>2)&0xfff;
 				int ypos   = (0x1ff-(word0&0x01ff))-0x50+0x02;
 				int xpos   = (offset4&0x03ff)-0x50+0x07;
 				int flipy  = word1&0x8000;
@@ -374,8 +373,6 @@ void namcos2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 				int scaley = (sizey<<16)/((word0&0x0200)?0x20:0x10);
 				if(scalex && scaley)
 				{
-					gfx_element *gfx = m_gfxdecode->gfx(rgn);
-
 					if( (word0&0x0200)==0 )
 						gfx->set_source_clip((word1&0x0001) ? 16 : 0, 16, (word1&0x0002) ? 16 : 0, 16);
 					else
@@ -400,6 +397,7 @@ void namcos2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void namcos2_state::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
+	gfx_element *gfx;
 	/**
 	 * word#0
 	 *  xxxxxx---------- ysize
@@ -445,16 +443,7 @@ void namcos2_state::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &
 		int attrs = pSource[7];
 		int sizey = ((ypos>>10)&0x3f)+1;
 		int sizex = (xpos>>10)&0x3f;
-		int sprn  = (tile>>2)&0x7ff;
-
-		if( tile&0x2000 )
-		{
-			sprn&=0x3ff;
-		}
-		else
-		{
-			sprn|=0x400;
-		}
+		int sprn  = (tile>>2)&0xfff;
 
 		if( (sizey-1) && sizex && (attrs&0xf)==pri )
 		{
@@ -470,7 +459,7 @@ void namcos2_state::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &
 			/* swap xy */
 			int rgn = (flags&0x01) ? 3 : 0;
 
-			gfx_element *gfx = m_gfxdecode->gfx(rgn);
+			gfx = m_gfxdecode->gfx(rgn);
 
 			if( bBigSprite )
 			{
@@ -528,7 +517,6 @@ READ16_MEMBER( namcos2_shared_state::c355_obj_position_r )
 template<class _BitmapClass>
 void namcos2_shared_state::c355_obj_draw_sprite(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, const uint16_t *pSource, int pri, int zpos )
 {
-	uint16_t *spriteram16 = m_c355_obj_ram;
 	unsigned screen_height_remaining, screen_width_remaining;
 	unsigned source_height_remaining, source_width_remaining;
 	int hpos,vpos;
@@ -546,8 +534,8 @@ void namcos2_shared_state::c355_obj_draw_sprite(screen_device &screen, _BitmapCl
 	uint32_t zoomx, zoomy;
 	int tile_screen_width;
 	int tile_screen_height;
-	const uint16_t *spriteformat16 = &spriteram16[0x4000/2];
-	const uint16_t *spritetile16   = &spriteram16[0x8000/2];
+	const uint16_t *spriteformat16 = &m_c355_obj_ram[0x4000/2];
+	const uint16_t *spritetile16   = &m_c355_obj_ram[0x8000/2];
 	int color;
 	const uint16_t *pWinAttr;
 	rectangle clip;
@@ -606,7 +594,7 @@ void namcos2_shared_state::c355_obj_draw_sprite(screen_device &screen, _BitmapCl
 
 	hpos -= xscroll;
 	vpos -= yscroll;
-	pWinAttr = &spriteram16[0x2400/2+((palette>>8)&0xf)*4];
+	pWinAttr = &m_c355_obj_ram[0x2400/2+((palette>>8)&0xf)*4];
 	clip.set(pWinAttr[0] - xscroll, pWinAttr[1] - xscroll, pWinAttr[2] - yscroll, pWinAttr[3] - yscroll);
 	clip &= cliprect;
 	hpos&=0x7ff; if( hpos&0x400 ) hpos |= ~0x7ff; /* sign extend */
@@ -718,12 +706,11 @@ void namcos2_shared_state::c355_obj_init(int gfxbank, int pal_xor, c355_obj_code
 	else
 		m_c355_obj_code2tile = c355_obj_code2tile_delegate(&namcos2_shared_state::c355_obj_default_code2tile, this);
 
-	memset(m_c355_obj_ram, 0, sizeof(m_c355_obj_ram)); // needed for Nebulas Ray
-	memset(m_c355_obj_position, 0, sizeof(m_c355_obj_position));
+	m_c355_obj_ram = make_unique_clear<uint16_t[]>(0x20000/2); // needed for Nebulas Ray
+	std::fill(std::begin(m_c355_obj_position), std::end(m_c355_obj_position), 0);
 
 	save_item(NAME(m_c355_obj_position));
-	save_item(NAME(m_c355_obj_ram));
-	save_item(NAME(m_player_mux));
+	save_pointer(NAME(m_c355_obj_ram), 0x20000/2);
 }
 
 template<class _BitmapClass>
