@@ -751,7 +751,7 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 				{
 					m_dr[6] |= 1 << dr;
 					i386_trap(1,0,0);
-				});
+				}, m_dr_breakpoints[dr]);
 				else if(breakpoint_type == 3) m_dr_breakpoints[dr] = m_program->install_readwrite_tap(phys_addr, phys_addr + true_length, "i386_debug_readwrite_breakpoint",
 				[&](offs_t offset, u32& data, u32 mem_mask)
 				{
@@ -762,7 +762,7 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 				{
 					m_dr[6] |= 1 << dr;
 					i386_trap(1,0,0);
-				});
+				}, m_dr_breakpoints[dr]);
 			}
 			CYCLES(CYCLES_MOV_DR0_3_REG);
 			break;
@@ -799,7 +799,7 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 					{
 						m_dr[6] |= 1 << i;
 						i386_trap(1,0,0);
-					});
+					}, m_dr_breakpoints[i]);
 					else if(breakpoint_type == 3) m_dr_breakpoints[i] = m_program->install_readwrite_tap(phys_addr, phys_addr + true_length, "i386_debug_readwrite_breakpoint",
 					[&](offs_t offset, u32& data, u32 mem_mask)
 					{
@@ -810,7 +810,7 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 					{
 						m_dr[6] |= 1 << i;
 						i386_trap(1,0,0);
-					});
+					}, m_dr_breakpoints[i]);
 				}
 			}
 			CYCLES(CYCLES_MOV_DR6_7_REG);
