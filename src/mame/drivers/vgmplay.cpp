@@ -1232,7 +1232,7 @@ READ8_MEMBER(vgmplay_device::okim6295_rom_r)
 	{
 		if ((offset < 0x400) && (m_okim6295_nmk112_enable[Chip] & 0x80))
 		{
-			offset = (m_okim6295_nmk112_bank[Chip][(offset >> 8) & 0x3] << 16) | (offset & 0xff);
+			offset = (m_okim6295_nmk112_bank[Chip][(offset >> 8) & 0x3] << 16) | (offset & 0x3ff);
 		}
 		else
 		{
