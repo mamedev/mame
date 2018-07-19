@@ -399,7 +399,7 @@ void vip_state::vip_io(address_map &map)
 //  INPUT_PORTS( vip )
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER(vip_state::reset_w )
+INPUT_CHANGED_MEMBER(vip_state::reset_w)
 {
 	m_exp->run_w(newval);
 
@@ -409,7 +409,7 @@ INPUT_CHANGED_MEMBER(vip_state::reset_w )
 	}
 }
 
-INPUT_CHANGED_MEMBER(vip_state::beeper_w )
+INPUT_CHANGED_MEMBER(vip_state::beeper_w)
 {
 	m_beeper->set_output_gain(0, newval ? 0.80 : 0);
 }
@@ -452,34 +452,34 @@ INPUT_PORTS_END
 //  COSMAC_INTERFACE( cosmac_intf )
 //-------------------------------------------------
 
-READ_LINE_MEMBER(vip_state::clear_r )
+READ_LINE_MEMBER(vip_state::clear_r)
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER(vip_state::ef1_r )
+READ_LINE_MEMBER(vip_state::ef1_r)
 {
 	return m_vdc_ef1 || m_exp->ef1_r();
 }
 
-READ_LINE_MEMBER(vip_state::ef2_r )
+READ_LINE_MEMBER(vip_state::ef2_r)
 {
 	m_leds[LED_TAPE] = m_cassette->input() > 0 ? 1 : 0;
 
 	return (m_cassette->input() < 0) ? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(vip_state::ef3_r )
+READ_LINE_MEMBER(vip_state::ef3_r)
 {
 	return !BIT(m_keypad->read(), m_keylatch) || m_byteio_ef3 || m_exp_ef3;
 }
 
-READ_LINE_MEMBER(vip_state::ef4_r )
+READ_LINE_MEMBER(vip_state::ef4_r)
 {
 	return m_byteio_ef4 || m_exp_ef4;
 }
 
-WRITE_LINE_MEMBER(vip_state::q_w )
+WRITE_LINE_MEMBER(vip_state::q_w)
 {
 	// sound output
 	m_beeper->write(machine().dummy_space(), NODE_01, state);
@@ -499,21 +499,21 @@ WRITE_LINE_MEMBER(vip_state::q_w )
 //  CDP1861_INTERFACE( vdc_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(vip_state::vdc_int_w )
+WRITE_LINE_MEMBER(vip_state::vdc_int_w)
 {
 	m_vdc_int = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(vip_state::vdc_dma_out_w )
+WRITE_LINE_MEMBER(vip_state::vdc_dma_out_w)
 {
 	m_vdc_dma_out = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(vip_state::vdc_ef1_w )
+WRITE_LINE_MEMBER(vip_state::vdc_ef1_w)
 {
 	m_vdc_ef1 = state;
 }
