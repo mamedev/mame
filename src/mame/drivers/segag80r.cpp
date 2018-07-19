@@ -57,7 +57,7 @@
     EPROM, video, and background hardware on one or two boards:
 
     Monster Bash (2 board):
-        * G-80 consolidated boardset (315-5006 encrypted Z80)
+        * G-80 consolidated boardset (315-5008 encrypted Z80)
         * Monster Bash Sound Board (N7751+DAC, TMS3617, discrete)
 
     Pig Newton:
@@ -1570,7 +1570,7 @@ void segag80r_state::init_monster2()
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
-	/* configure the 315-5006 security chip */
+	/* configure the 315-5008 security chip */
 	m_decrypt = segag80_security(0);
 
 	/* configure video */
