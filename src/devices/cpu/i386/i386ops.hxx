@@ -717,20 +717,163 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 		FAULT(FAULT_GP, 0);
 	uint8_t modrm = FETCH();
 	uint8_t dr = (modrm >> 3) & 0x7;
-
-	m_dr[dr] = LOAD_RM32(modrm);
+	uint32_t rm32 = LOAD_RM32(modrm);
 	switch(dr)
 	{
 		case 0:
 		case 1:
 		case 2:
 		case 3:
+		{
+			m_dr[dr] = LOAD_RM32(modrm);
+			int dr_enabled = (m_dr[7] & (1 << (dr << 1))) || (m_dr[7] & (1 << ((dr << 1) + 1))); //Check both local enable AND global enable bits for this breakpoint.
+			if(dr_enabled)
+			{
+				if(m_dr_breakpoints[dr]) m_dr_breakpoints[dr]->remove();
+				int breakpoint_type = (m_dr[7] >> ((dr << 2) + 16)) & 3;
+				int breakpoint_length = (m_dr[7] >> ((dr << 2) + 16 + 2)) & 3;
+				uint32_t error;
+				uint32_t phys_addr = 0;
+				phys_addr = (m_cr[0] & (1 << 31)) ? translate_address(m_CPL, TRANSLATE_FETCH, &m_dr[dr], &error) : m_dr[dr];
+				int true_length = 0;
+				switch(breakpoint_length)
+				{
+					case 0: true_length = 1; break;
+					case 1: true_length = 2; break;
+					case 3: true_length = 4; break;
+				}
+				if(true_length == 0)
+				{
+					logerror("i386: Unknown breakpoint length value\n");
+				}
+				else if(breakpoint_type == 1) m_dr_breakpoints[dr] = m_program->install_write_tap(phys_addr, phys_addr + true_length, "i386_debug_write_breakpoint",
+				[&](offs_t offset, u32& data, u32 mem_mask)
+				{
+					m_dr[6] |= 1 << dr;
+					i386_trap(1,0,0);
+				}, m_dr_breakpoints[dr]);
+				else if(breakpoint_type == 3) m_dr_breakpoints[dr] = m_program->install_readwrite_tap(phys_addr, phys_addr + true_length, "i386_debug_readwrite_breakpoint",
+				[&](offs_t offset, u32& data, u32 mem_mask)
+				{
+					m_dr[6] |= 1 << dr;
+					i386_trap(1,0,0);
+				},
+				[&](offs_t offset, u32& data, u32 mem_mask)
+				{
+					m_dr[6] |= 1 << dr;
+					i386_trap(1,0,0);
+				}, m_dr_breakpoints[dr]);
+
+				m_notifier = m_program->add_change_notifier([this](read_or_write mode)
+				{
+					for(int i = 0; i < 4; i++)
+					{
+						int dr_enabled = (m_dr[7] & (1 << (i << 1))) || (m_dr[7] & (1 << ((i << 1) + 1)));
+						if(dr_enabled)
+						{
+							m_dr_breakpoints[i]->remove();
+							if(breakpoint_type == 1) m_dr_breakpoints[i] = m_program->install_write_tap(phys_addr, phys_addr + true_length, "i386_debug_write_breakpoint",
+							[&](offs_t offset, u32& data, u32 mem_mask)
+							{
+								m_dr[6] |= 1 << i;
+								i386_trap(1,0,0);
+							}, m_dr_breakpoints[i]);
+							else if(breakpoint_type == 3) m_dr_breakpoints[i] = m_program->install_readwrite_tap(phys_addr, phys_addr + true_length, "i386_debug_readwrite_breakpoint",
+							[&](offs_t offset, u32& data, u32 mem_mask)
+							{
+								m_dr[6] |= 1 << i;
+								i386_trap(1,0,0);
+							},
+							[&](offs_t offset, u32& data, u32 mem_mask)
+							{
+								m_dr[6] |= 1 << i;
+								i386_trap(1,0,0);
+							}, m_dr_breakpoints[i]);
+						}
+					}
+				});
+			}
 			CYCLES(CYCLES_MOV_DR0_3_REG);
 			break;
-		case 6:
+		}
+		case 6: CYCLES(CYCLES_MOV_DR6_7_REG); m_dr[dr] = LOAD_RM32(modrm); break;
 		case 7:
+		{
+			int breakpoint_types = (m_dr[7] >> 16) & 0x3333;
+			int breakpoint_lengths = (m_dr[7] >> 18) & 0x3333;
+			int new_breakpoint_types = (rm32 >> 16) & 0x3333;
+			int new_breakpoint_lengths = (rm32 >> 18) & 0x3333;
+			if(breakpoint_types != new_breakpoint_types && breakpoint_lengths != new_breakpoint_lengths)
+			{
+				for(int i = 0; i < 4; i++)
+				{
+					if(m_dr_breakpoints[i]) m_dr_breakpoints[i]->remove();
+					uint32_t error;
+					uint32_t phys_addr = (m_cr[0] & (1 << 31)) ? translate_address(m_CPL, TRANSLATE_FETCH, &m_dr[i], &error) : m_dr[i];
+					int breakpoint_type = (new_breakpoint_types >> (i << 2)) & 3;
+					int breakpoint_length = (new_breakpoint_lengths >> ((i << 2) + 2)) & 3;
+					int true_length = 0;
+					switch(breakpoint_length)
+					{
+						case 0: true_length = 1; break;
+						case 1: true_length = 2; break;
+						case 3: true_length = 4; break;
+					}
+					if(true_length == 0)
+					{
+						logerror("i386: Unknown breakpoint length value\n");
+					}
+					else if(breakpoint_type == 1) m_dr_breakpoints[i] = m_program->install_write_tap(phys_addr, phys_addr + true_length, "i386_debug_write_breakpoint",
+					[&](offs_t offset, u32& data, u32 mem_mask)
+					{
+						m_dr[6] |= 1 << i;
+						i386_trap(1,0,0);
+					}, m_dr_breakpoints[i]);
+					else if(breakpoint_type == 3) m_dr_breakpoints[i] = m_program->install_readwrite_tap(phys_addr, phys_addr + true_length, "i386_debug_readwrite_breakpoint",
+					[&](offs_t offset, u32& data, u32 mem_mask)
+					{
+						m_dr[6] |= 1 << i;
+						i386_trap(1,0,0);
+					},
+					[&](offs_t offset, u32& data, u32 mem_mask)
+					{
+						m_dr[6] |= 1 << i;
+						i386_trap(1,0,0);
+					}, m_dr_breakpoints[i]);
+				}
+				m_notifier = m_program->add_change_notifier([this](read_or_write mode)
+				{
+					for(int i = 0; i < 4; i++)
+					{
+						int dr_enabled = (m_dr[7] & (1 << (i << 1))) || (m_dr[7] & (1 << ((i << 1) + 1)));
+						if(dr_enabled)
+						{
+							m_dr_breakpoints[i]->remove();
+							if(breakpoint_type == 1) m_dr_breakpoints[i] = m_program->install_write_tap(phys_addr, phys_addr + true_length, "i386_debug_write_breakpoint",
+							[&](offs_t offset, u32& data, u32 mem_mask)
+							{
+								m_dr[6] |= 1 << i;
+								i386_trap(1,0,0);
+							}, m_dr_breakpoints[i]);
+							else if(breakpoint_type == 3) m_dr_breakpoints[i] = m_program->install_readwrite_tap(phys_addr, phys_addr + true_length, "i386_debug_readwrite_breakpoint",
+							[&](offs_t offset, u32& data, u32 mem_mask)
+							{
+								m_dr[6] |= 1 << i;
+								i386_trap(1,0,0);
+							},
+							[&](offs_t offset, u32& data, u32 mem_mask)
+							{
+								m_dr[6] |= 1 << i;
+								i386_trap(1,0,0);
+							}, m_dr_breakpoints[i]);
+						}
+					}
+				});
+			}
 			CYCLES(CYCLES_MOV_DR6_7_REG);
+			m_dr[dr] = rm32;
 			break;
+		}
 		default:
 			logerror("i386: mov_dr_r32 DR%d!\n", dr);
 			return;

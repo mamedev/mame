@@ -1357,6 +1357,11 @@ void i386_device::i386_task_switch(uint16_t selector, uint8_t nested)
 	CHANGE_PC(m_eip);
 
 	m_CPL = (m_sreg[SS].flags >> 5) & 3;
+
+	int t_bit = READ32(tss+0x64) & 1;
+	if(t_bit) m_dr[6] |= (1 << 15); //If the T bit of the new TSS is set, set the BT bit of DR6.
+
+	m_dr[7] &= ~(0x155); //Clear all of the local enable bits from DR7.
 //  printf("386 Task Switch from selector %04x to %04x\n",old_task,selector);
 }
 
@@ -3992,15 +3997,45 @@ void i386_device::execute_run()
 #endif
 		try
 		{
+			//The LE and GE bits of DR7 aren't currently implemented because they could potentially require cycle-accurate emulation.
+			if((m_dr[7] & 0xff) != 0) //If all of the breakpoints are disabled, skip checking for instruction breakpoint hitting entirely.
+			for(int i = 0; i < 4; i++)
+			{
+				bool dri_enabled = (m_dr[7] & (1 << ((i << 1) + 1))) || (m_dr[7] & (1 << (i << 1))); //Check both local AND global enable bits for this breakpoint.
+				if(dri_enabled && !m_RF)
+				{
+					int breakpoint_type = (m_dr[7] >> (i << 2)) & 3;
+					int breakpoint_length = (m_dr[7] >> ((i << 2) + 2)) & 3;
+					if(breakpoint_type == 0)
+					{
+						uint32_t phys_addr = 0;
+						uint32_t error;
+						phys_addr = (m_cr[0] & (1 << 31)) ? translate_address(m_CPL, TRANSLATE_FETCH, &m_dr[i], &error) : m_dr[i];
+						if(breakpoint_length != 0) //Not one byte in length? logerror it, I have no idea how this works on real processors.
+						{
+							logerror("i386: Breakpoint length not 1 byte on an instruction breakpoint\n");
+						}
+						if(m_eip == phys_addr)
+						{
+							//The processor never automatically clears bits in DR6. It only sets them.
+							m_dr[6] |= 1 << i;
+							i386_trap(1,0,0);
+							break;
+						}
+					}
+				}
+			}
 			i386_decode_opcode();
 			if(m_TF && old_tf)
 			{
 				m_prev_eip = m_eip;
 				m_ext = 1;
+				m_dr[6] |= (1 << 14); //Set BS bit of DR6.
 				i386_trap(1,0,0);
 			}
 			if(m_lock && (m_opcode != 0xf0))
 				m_lock = false;
+			if(m_RF) m_RF = 0;
 		}
 		catch(uint64_t e)
 		{
