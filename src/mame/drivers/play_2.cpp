@@ -367,22 +367,20 @@ WRITE8_MEMBER( play_2_state::psg_w )
 // **************** Machine *****************************
 MACHINE_CONFIG_START(play_2_state::play_2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", CDP1802, XTAL(2'950'000))
-	MCFG_DEVICE_PROGRAM_MAP(play_2_map)
-	MCFG_DEVICE_IO_MAP(play_2_io)
-	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, play_2_state, clear_r))
-	MCFG_COSMAC_EF1_CALLBACK(READLINE(*this, play_2_state, ef1_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, play_2_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE("4013a", ttl7474_device, clear_w))
+	CDP1802(config, m_maincpu, 2.95_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &play_2_state::play_2_map);
+	m_maincpu->set_addrmap(AS_IO, &play_2_state::play_2_io);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(play_2_state::clear_r));
+	m_maincpu->ef1_cb().set(FUNC(play_2_state::ef1_r));
+	m_maincpu->ef4_cb().set(FUNC(play_2_state::ef4_r));
+	m_maincpu->q_cb().set("4013a", FUNC(ttl7474_device::clear_w));
+	m_maincpu->tpb_cb().set(FUNC(play_2_state::clock_w));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
 	config.set_default_layout(layout_play_2);
-
-	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL(2'950'000) / 8) // TPB line from CPU
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_2_state, clock_w))
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_2_state, clock2_w))
@@ -400,22 +398,22 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	genpin_audio(config);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_CDP1863_ADD("1863", 0, XTAL(2'950'000) / 8)
+	MCFG_CDP1863_ADD("1863", 0, 2.95_MHz_XTAL / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(play_2_state::zira)
 	play_2(config);
-	MCFG_DEVICE_ADD("cop402", COP402, XTAL(2'000'000))
+	MCFG_DEVICE_ADD("cop402", COP402, 2_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(zira_sound_map)
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false)
 	MCFG_COP400_WRITE_D_CB(WRITE8(*this, play_2_state, sound_d_w))
 	MCFG_COP400_WRITE_G_CB(WRITE8(*this, play_2_state, sound_g_w))
 	MCFG_COP400_READ_L_CB(READ8(*this, play_2_state, psg_r))
 	MCFG_COP400_WRITE_L_CB(WRITE8(*this, play_2_state, psg_w))
 	MCFG_COP400_READ_IN_CB(READ8(*this, play_2_state, sound_in_r))
 
-	MCFG_DEVICE_ADD("aysnd1", AY8910, XTAL(2'000'000))
+	MCFG_DEVICE_ADD("aysnd1", AY8910, 2_MHz_XTAL)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
