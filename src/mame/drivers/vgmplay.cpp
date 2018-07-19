@@ -92,15 +92,15 @@ public:
 		A_YMF271     = 0x00013040,
 		A_YMZ280B    = 0x00013050,
 		A_YM2608     = 0x00013060,
-		A_K054539A   = 0x00014000,
-		A_K054539B   = 0x00014400,
-		A_QSOUND     = 0x00013070,
-		A_K051649    = 0x00013080,
-		A_GA20       = 0x000130a0,
-		A_RF5C68     = 0x000130b0,
-		A_RF5C164    = 0x000130c0,
-		A_RF5C68RAM  = 0x000130d0,
-		A_RF5C164RAM = 0x000230d0
+		A_K054539A   = 0x00013400,
+		A_K054539B   = 0x00013800,
+		A_QSOUND     = 0x00013c00,
+		A_K051649    = 0x00013c20,
+		A_GA20       = 0x00013c40,
+		A_RF5C68     = 0x00013c60,
+		A_RF5C164    = 0x00013c70,
+		A_RF5C68RAM  = 0x00020000,
+		A_RF5C164RAM = 0x00030000
 	};
 
 	enum io16_t
@@ -503,12 +503,10 @@ uint32_t vgmplay_device::handle_data_block(uint32_t address)
 		if (type == 0xc0) {
 			for (int i = 0; i < data_size; i++)
 				m_io->write_byte(A_RF5C68RAM + start + i, m_file->read_byte(m_pc + 9 + i));
-		}
-		if (type == 0xc1) {
+		} else if (type == 0xc1) {
 			for (int i = 0; i < data_size; i++)
 				m_io->write_byte(A_RF5C164RAM + start + i, m_file->read_byte(m_pc + 9 + i));
-		}
-		if (type == 0xc2) {
+		} else if (type == 0xc2) {
 			for (int i = 0; i < data_size; i++)
 				m_io->write_byte(A_NESRAM + start + i, m_file->read_byte(m_pc + 9 + i));
 		}
