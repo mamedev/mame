@@ -729,7 +729,7 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 			int dr_enabled = (m_dr[7] & (1 << (dr << 1))) || (m_dr[7] & (1 << ((dr << 1) + 1))); //Check both local enable AND global enable bits for this breakpoint.
 			if(dr_enabled)
 			{
-				m_dr_breakpoints[dr]->remove();
+				if(m_dr_breakpoints[dr]) m_dr_breakpoints[dr]->remove();
 				int breakpoint_type = (m_dr[7] >> ((dr << 2) + 16)) & 3;
 				int breakpoint_length = (m_dr[7] >> ((dr << 2) + 16 + 2)) & 3;
 				uint32_t error;
@@ -778,7 +778,7 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 			{
 				for(int i = 0; i < 4; i++)
 				{
-					m_dr_breakpoints[i]->remove();
+					if(m_dr_breakpoints[i]) m_dr_breakpoints[i]->remove();
 					uint32_t error;
 					uint32_t phys_addr = (m_cr[0] & (1 << 31)) ? translate_address(m_CPL, TRANSLATE_FETCH, &m_dr[i], &error) : m_dr[i];
 					int breakpoint_type = (new_breakpoint_types >> (i << 2)) & 3;
