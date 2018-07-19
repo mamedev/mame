@@ -763,6 +763,31 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 					m_dr[6] |= 1 << dr;
 					i386_trap(1,0,0);
 				}, m_dr_breakpoints[dr]);
+
+				m_notifier = m_program->add_change_notifier([&](read_or_write mode)
+				{
+					if(dr_enabled)
+					{
+						m_dr_breakpoints[dr]->remove();
+						if(breakpoint_type == 1) m_dr_breakpoints[dr] = m_program->install_write_tap(phys_addr, phys_addr + true_length, "i386_debug_write_breakpoint",
+						[&](offs_t offset, u32& data, u32 mem_mask)
+						{
+							m_dr[6] |= 1 << dr;
+							i386_trap(1,0,0);
+						}, m_dr_breakpoints[dr]);
+						else if(breakpoint_type == 3) m_dr_breakpoints[dr] = m_program->install_readwrite_tap(phys_addr, phys_addr + true_length, "i386_debug_readwrite_breakpoint",
+						[&](offs_t offset, u32& data, u32 mem_mask)
+						{
+							m_dr[6] |= 1 << dr;
+							i386_trap(1,0,0);
+						},
+						[&](offs_t offset, u32& data, u32 mem_mask)
+						{
+							m_dr[6] |= 1 << dr;
+							i386_trap(1,0,0);
+						}, m_dr_breakpoints[dr]);
+					}
+				});
 			}
 			CYCLES(CYCLES_MOV_DR0_3_REG);
 			break;
@@ -811,6 +836,31 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 						m_dr[6] |= 1 << i;
 						i386_trap(1,0,0);
 					}, m_dr_breakpoints[i]);
+					m_notifier = m_program->add_change_notifier([&](read_or_write mode)
+					{
+						int dr_enabled = (m_dr[7] & (1 << (i << 1))) || (m_dr[7] & (1 << ((i << 1) + 1)));
+						if(dr_enabled)
+						{
+							m_dr_breakpoints[i]->remove();
+							if(breakpoint_type == 1) m_dr_breakpoints[i] = m_program->install_write_tap(phys_addr, phys_addr + true_length, "i386_debug_write_breakpoint",
+							[&](offs_t offset, u32& data, u32 mem_mask)
+							{
+								m_dr[6] |= 1 << i;
+								i386_trap(1,0,0);
+							}, m_dr_breakpoints[i]);
+							else if(breakpoint_type == 3) m_dr_breakpoints[i] = m_program->install_readwrite_tap(phys_addr, phys_addr + true_length, "i386_debug_readwrite_breakpoint",
+							[&](offs_t offset, u32& data, u32 mem_mask)
+							{
+								m_dr[6] |= 1 << i;
+								i386_trap(1,0,0);
+							},
+							[&](offs_t offset, u32& data, u32 mem_mask)
+							{
+								m_dr[6] |= 1 << i;
+								i386_trap(1,0,0);
+							}, m_dr_breakpoints[i]);
+						}
+					});
 				}
 			}
 			CYCLES(CYCLES_MOV_DR6_7_REG);

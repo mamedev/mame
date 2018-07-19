@@ -194,6 +194,7 @@ protected:
 	uint32_t m_tr[8];       // Test registers
 
 	memory_passthrough_handler* m_dr_breakpoints[4];
+	int m_notifier;
 
 	I386_SYS_TABLE m_gdtr;    // Global Descriptor Table Register
 	I386_SYS_TABLE m_idtr;    // Interrupt Descriptor Table Register
