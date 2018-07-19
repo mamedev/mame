@@ -26,6 +26,8 @@
 	21: K053260
 	22: K054539
 	23: GA20
+	24: RF5C68
+	25: RF5C164
 	-->
 
 	<element name="backdrop"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
