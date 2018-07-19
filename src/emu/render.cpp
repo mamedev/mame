@@ -1112,19 +1112,19 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 		{
 			for (view = view_by_index(viewindex = 0); view != nullptr; view = view_by_index(++viewindex))
 			{
-				const render_screen_list &viewscreens = view->screens();
-				if (viewscreens.count() == 0)
-					break;
+				render_screen_list const &viewscreens(view->screens());
 				if (viewscreens.count() >= scrcount)
 				{
-					bool has_screen = false;
+					bool screen_missing(false);
 					for (screen_device &screen : iter)
+					{
 						if (!viewscreens.contains(screen))
 						{
-							has_screen = true;
+							screen_missing = true;
 							break;
 						}
-					if (!has_screen)
+					}
+					if (!screen_missing)
 						break;
 				}
 			}
@@ -1709,7 +1709,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 				throw emu_fatalerror("Couldn't parse default layout??");
 		}
 	}
-	else if (screens >= 3) // generate default layouts for larger numbers of screens
+	else if (screens >= 2) // generate default layouts for larger numbers of screens
 	{
 		util::xml::file::ptr const root(util::xml::file::create());
 		if (!root)
@@ -1763,94 +1763,122 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			boundsnode->set_attribute("height", util::xml::normalize_string(util::string_format("~scr%1$uheight~", i).c_str()));
 		}
 
-		// helper for generating a view since we do this a lot
-		auto const generate_view =
-				[&layoutnode, screens, stdwidth, stdheight] (char const *title, auto &&bounds_callback)
-				{
-					util::xml::data_node *viewnode = layoutnode->add_child("view", nullptr);
-					if (!viewnode)
-						throw emu_fatalerror("Couldn't create XML node??");
-					viewnode->set_attribute("name", util::xml::normalize_string(title));
-					for (unsigned i = 0; screens > i; ++i)
-					{
-						util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
-						if (!screennode)
-							throw emu_fatalerror("Couldn't create XML node??");
-						screennode->set_attribute_int("index", i);
-						util::xml::data_node *const boundsnode(screennode->add_child("bounds", nullptr));
-						if (!boundsnode)
-							throw emu_fatalerror("Couldn't create XML node??");
-						bounds_callback(*boundsnode, i);
-						boundsnode->set_attribute_int("width", stdwidth);
-						boundsnode->set_attribute_int("height", stdheight);
-					}
-				};
-
-		// generate linear views
-		generate_view(
-				"Left-to-Right",
-				[stdwidth] (util::xml::data_node &boundsnode, unsigned i)
-				{
-					boundsnode.set_attribute_float("x", i * (stdwidth + 0.03f));
-					boundsnode.set_attribute_int("y", 0);
-				});
-		generate_view(
-				"Left-to-Right (Gapless)",
-				[stdwidth] (util::xml::data_node &boundsnode, unsigned i)
-				{
-					boundsnode.set_attribute_int("x", i * stdwidth);
-					boundsnode.set_attribute_int("y", 0);
-				});
-		generate_view(
-				"Top-to-Bottom",
-				[stdheight] (util::xml::data_node &boundsnode, unsigned i)
-				{
-					boundsnode.set_attribute_int("x", 0);
-					boundsnode.set_attribute_float("y", i * (stdheight + 0.03f));
-				});
-		generate_view(
-				"Top-to-Bottom (Gapless)",
-				[stdheight] (util::xml::data_node &boundsnode, unsigned i)
-				{
-					boundsnode.set_attribute_int("x", 0);
-					boundsnode.set_attribute_int("y", i * stdheight);
-				});
-
-		// generate tiled views
-		for (unsigned mindim = 2; ((screens + mindim - 1) / mindim) >= mindim; ++mindim)
+		// generate tiled views if the supplied artwork doesn't provide a view of all screens
+		bool need_tiles(screens >= 3);
+		if (!need_tiles)
 		{
-			unsigned const majdim((screens + mindim - 1) / mindim);
-			unsigned const remainder(screens % majdim);
-			if (!remainder || (((majdim + 1) / 2) <= remainder))
+			need_tiles = true;
+			int viewindex(0);
+			for (layout_view *view = view_by_index(viewindex); need_tiles && view; view = view_by_index(++viewindex))
 			{
-				generate_view(
-						util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom", majdim, mindim).c_str(),
-						[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+				render_screen_list const &viewscreens(view->screens());
+				if (viewscreens.count() >= screens)
+				{
+					bool screen_missing(false);
+					for (screen_device &screen : iter)
+					{
+						if (!viewscreens.contains(screen))
 						{
-							boundsnode.set_attribute_float("x", (i % majdim) * (stdwidth + 0.03f));
-							boundsnode.set_attribute_float("y", (i / majdim) * (stdheight + 0.03f));
-						});
-				generate_view(
-						util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom (Gapless)", majdim, mindim).c_str(),
-						[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+							screen_missing = true;
+							break;
+						}
+					}
+					if (!screen_missing)
+						need_tiles = false;
+				}
+			}
+		}
+		if (need_tiles)
+		{
+			// helper for generating a view since we do this a lot
+			auto const generate_view =
+					[&layoutnode, screens, stdwidth, stdheight] (char const *title, auto &&bounds_callback)
+					{
+						util::xml::data_node *viewnode = layoutnode->add_child("view", nullptr);
+						if (!viewnode)
+							throw emu_fatalerror("Couldn't create XML node??");
+						viewnode->set_attribute("name", util::xml::normalize_string(title));
+						for (unsigned i = 0; screens > i; ++i)
 						{
-							boundsnode.set_attribute_int("x", (i % majdim) * stdwidth);
-							boundsnode.set_attribute_int("y", (i / majdim) * stdheight);
-						});
-				generate_view(
-						util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right", mindim, majdim).c_str(),
-						[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
-						{
-							boundsnode.set_attribute_float("x", (i / majdim) * (stdwidth + 0.03f));
-							boundsnode.set_attribute_float("y", (i % majdim) * (stdheight + 0.03f));
-						});
-				generate_view(
-						util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right (Gapless)", mindim, majdim).c_str(),
-						[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
-						{
-							boundsnode.set_attribute_int("x", (i / majdim) * stdwidth);
-							boundsnode.set_attribute_int("y", (i % majdim) * stdheight);
-						});
+							util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
+							if (!screennode)
+								throw emu_fatalerror("Couldn't create XML node??");
+							screennode->set_attribute_int("index", i);
+							util::xml::data_node *const boundsnode(screennode->add_child("bounds", nullptr));
+							if (!boundsnode)
+								throw emu_fatalerror("Couldn't create XML node??");
+							bounds_callback(*boundsnode, i);
+							boundsnode->set_attribute_int("width", stdwidth);
+							boundsnode->set_attribute_int("height", stdheight);
+						}
+					};
+
+			// generate linear views
+			generate_view(
+					"Left-to-Right",
+					[stdwidth] (util::xml::data_node &boundsnode, unsigned i)
+					{
+						boundsnode.set_attribute_float("x", i * (stdwidth + 0.03f));
+						boundsnode.set_attribute_int("y", 0);
+					});
+			generate_view(
+					"Left-to-Right (Gapless)",
+					[stdwidth] (util::xml::data_node &boundsnode, unsigned i)
+					{
+						boundsnode.set_attribute_int("x", i * stdwidth);
+						boundsnode.set_attribute_int("y", 0);
+					});
+			generate_view(
+					"Top-to-Bottom",
+					[stdheight] (util::xml::data_node &boundsnode, unsigned i)
+					{
+						boundsnode.set_attribute_int("x", 0);
+						boundsnode.set_attribute_float("y", i * (stdheight + 0.03f));
+					});
+			generate_view(
+					"Top-to-Bottom (Gapless)",
+					[stdheight] (util::xml::data_node &boundsnode, unsigned i)
+					{
+						boundsnode.set_attribute_int("x", 0);
+						boundsnode.set_attribute_int("y", i * stdheight);
+					});
+
+			// generate tiled views
+			for (unsigned mindim = 2; ((screens + mindim - 1) / mindim) >= mindim; ++mindim)
+			{
+				unsigned const majdim((screens + mindim - 1) / mindim);
+				unsigned const remainder(screens % majdim);
+				if (!remainder || (((majdim + 1) / 2) <= remainder))
+				{
+					generate_view(
+							util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom", majdim, mindim).c_str(),
+							[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+							{
+								boundsnode.set_attribute_float("x", (i % majdim) * (stdwidth + 0.03f));
+								boundsnode.set_attribute_float("y", (i / majdim) * (stdheight + 0.03f));
+							});
+					generate_view(
+							util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom (Gapless)", majdim, mindim).c_str(),
+							[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+							{
+								boundsnode.set_attribute_int("x", (i % majdim) * stdwidth);
+								boundsnode.set_attribute_int("y", (i / majdim) * stdheight);
+							});
+					generate_view(
+							util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right", mindim, majdim).c_str(),
+							[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+							{
+								boundsnode.set_attribute_float("x", (i / majdim) * (stdwidth + 0.03f));
+								boundsnode.set_attribute_float("y", (i % majdim) * (stdheight + 0.03f));
+							});
+					generate_view(
+							util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right (Gapless)", mindim, majdim).c_str(),
+							[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+							{
+								boundsnode.set_attribute_int("x", (i / majdim) * stdwidth);
+								boundsnode.set_attribute_int("y", (i % majdim) * stdheight);
+							});
+				}
 			}
 		}
 
