@@ -20982,6 +20982,10 @@ realbrod                        // (c) 1996 Merit
 realbroda                       // (c) 1995 Merit
 spitboss                        // (c) 1988 Merit
 
+@source:meritum.cpp
+meritum                         //
+meritum_net                     //
+
 @source:mermaid.cpp
 mermaid                         // (c) 1982 Rock-ola,  made by Sanritsu
 rougien                         // (c) 1982 Sanritsu
@@ -37545,16 +37549,10 @@ ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
 ht1080z                         // Hradstechnika Szvetkezet HT-1080Z
 ht1080z2                        // Hradstechnika Szvetkezet HT-1080Z Series II
 lnw80                           // LNW Research LNW-80
-meritum                         //
-meritum_net                     //
 radionic                        // Radionic
 sys80                           // EACA System 80
 trs80                           // TRS-80 Model I - Level I BASIC
 trs80l2                         // TRS-80 Model I - Level II BASIC
-trs80m3                         // TRS-80 Model III - Radio Shack/Tandy
-trs80m4                         //
-trs80m4p                        //
-cp500                           // Prologica CP500
 
 @source:trs80dt1.cpp
 trs80dt1                        // TRS-80 Data Terminal 1
@@ -37562,6 +37560,12 @@ trs80dt1                        // TRS-80 Data Terminal 1
 @source:trs80m2.cpp
 trs80m16                        //
 trs80m2                         //
+
+@source:trs80m3.cpp
+trs80m3                         // TRS-80 Model III - Radio Shack/Tandy
+trs80m4                         //
+trs80m4p                        //
+cp500                           // Prologica CP500
 
 @source:truco.cpp
 truco                           // (c) 198? Playtronic SRL

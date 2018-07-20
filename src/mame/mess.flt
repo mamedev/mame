@@ -389,6 +389,7 @@ megadriv_rad.cpp
 mekd2.cpp
 mephisto.cpp
 mephisto_montec.cpp
+meritum.cpp
 mes.cpp
 mfabfz.cpp
 mice.cpp
@@ -727,6 +728,7 @@ tricep.cpp
 trs80.cpp
 trs80dt1.cpp
 trs80m2.cpp
+trs80m3.cpp
 ts802.cpp
 ts803.cpp
 ts816.cpp
