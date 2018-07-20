@@ -123,8 +123,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
 
-	DECLARE_WRITE_LINE_MEMBER( rx_a_w ) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
-	DECLARE_WRITE_LINE_MEMBER( rx_b_w ) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
+	DECLARE_WRITE_LINE_MEMBER(rx_a_w) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
+	DECLARE_WRITE_LINE_MEMBER(rx_b_w) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
 
 	template <class Object> devcb_base &set_irq_cb(Object &&cb) { return write_irq.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_a_tx_cb(Object &&cb) { return write_a_tx.set_callback(std::forward<Object>(cb)); }
@@ -138,13 +138,13 @@ public:
 	auto outport_cb() { return write_outport.bind(); }
 
 	// new-style push handlers for input port bits
-	DECLARE_WRITE_LINE_MEMBER( ip0_w );
-	DECLARE_WRITE_LINE_MEMBER( ip1_w );
-	DECLARE_WRITE_LINE_MEMBER( ip2_w );
-	DECLARE_WRITE_LINE_MEMBER( ip3_w );
-	DECLARE_WRITE_LINE_MEMBER( ip4_w );
-	DECLARE_WRITE_LINE_MEMBER( ip5_w );
-	DECLARE_WRITE_LINE_MEMBER( ip6_w );
+	DECLARE_WRITE_LINE_MEMBER(ip0_w);
+	DECLARE_WRITE_LINE_MEMBER(ip1_w);
+	DECLARE_WRITE_LINE_MEMBER(ip2_w);
+	DECLARE_WRITE_LINE_MEMBER(ip3_w);
+	DECLARE_WRITE_LINE_MEMBER(ip4_w);
+	DECLARE_WRITE_LINE_MEMBER(ip5_w);
+	DECLARE_WRITE_LINE_MEMBER(ip6_w);
 
 	bool irq_pending() const { return (ISR & IMR) != 0; }
 
@@ -165,7 +165,7 @@ protected:
 	virtual void update_interrupts();
 
 private:
-	TIMER_CALLBACK_MEMBER( duart_timer_callback );
+	TIMER_CALLBACK_MEMBER(duart_timer_callback);
 
 protected:
 	/* registers */
@@ -249,8 +249,8 @@ public:
 	template <class Object> devcb_base &set_c_tx_cb(Object &&cb) { return write_c_tx.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_d_tx_cb(Object &&cb) { return write_d_tx.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_WRITE_LINE_MEMBER( rx_c_w ) { m_chanC->device_serial_interface::rx_w((uint8_t)state); }
-	DECLARE_WRITE_LINE_MEMBER( rx_d_w ) { m_chanD->device_serial_interface::rx_w((uint8_t)state); }
+	DECLARE_WRITE_LINE_MEMBER(rx_c_w) { m_chanC->device_serial_interface::rx_w((uint8_t)state); }
+	DECLARE_WRITE_LINE_MEMBER(rx_d_w) { m_chanD->device_serial_interface::rx_w((uint8_t)state); }
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
