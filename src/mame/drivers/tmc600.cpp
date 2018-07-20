@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 #endif
 
 	// printer output latch
-	cdp1852_device &prtout(CDP1852(config, CDP1852_KB_TAG)); // clock is CDP1802 TPB
+	cdp1852_device &prtout(CDP1852(config, CDP1852_TMC700_TAG)); // clock is CDP1802 TPB
 	prtout.mode_cb().set_constant(1);
 	prtout.do_cb().set(FUNC(tmc600_state::printer_w));
 
