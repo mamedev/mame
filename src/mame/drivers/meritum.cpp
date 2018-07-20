@@ -43,6 +43,7 @@ perhaps III:
 #include "imagedev/snapquik.h"
 #include "bus/rs232/rs232.h"
 #include "machine/i8251.h"
+#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
@@ -104,9 +105,9 @@ void meritum_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	// map(0x00, 0x03).rw 8253-2 (optional audio interface?)
-	// map(0xf0, 0xf3).rw 8255-2 (floppy disk interface)
-	// map(0xf4, 0xf7).rw 8255-1 (parallel interface)
+	map(0x00, 0x03).rw("audiopit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xf0, 0xf3).rw("flopppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf4, 0xf7).rw("mainppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf8, 0xfb).rw("mainpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xfc, 0xfc).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xfd, 0xfd).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -410,6 +411,10 @@ MACHINE_CONFIG_START(meritum_state::meritum)
 	pit.out_handler<0>().append("usart", FUNC(i8251_device::write_rxc));
 	// Channel 1 generates INT pulse through 123 monostable
 	// Channel 2 (gated) generates NMI
+
+	MCFG_DEVICE_ADD("mainppi", I8255, 0) // parallel interface
+	MCFG_DEVICE_ADD("flopppi", I8255, 0) // floppy disk interface
+	MCFG_DEVICE_ADD("audiopit", PIT8253, 0) // optional audio interface
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
