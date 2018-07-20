@@ -36,10 +36,14 @@ perhaps III:
 - Add 4-colour mode, 4 shades of grey mode, and 512x192 monochrome.
 
 ****************************************************************************/
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "bus/rs232/rs232.h"
+#include "machine/i8251.h"
+#include "machine/pit8253.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 #include "screen.h"
@@ -103,8 +107,9 @@ void meritum_state::io_map(address_map &map)
 	// map(0x00, 0x03).rw 8253-2 (optional audio interface?)
 	// map(0xf0, 0xf3).rw 8255-2 (floppy disk interface)
 	// map(0xf4, 0xf7).rw 8255-1 (parallel interface)
-	// map(0xf8, 0xfb).rw 8253-1 (nmi, int, baud pulse generators)
-	// map(0xfc, 0xfd).rw 8251   (RS-232)
+	map(0xf8, 0xfb).rw("mainpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xfc, 0xfc).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xfd, 0xfd).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// map(0xfe, 0xfe) audio interface
 	map(0xff, 0xff).rw(FUNC(meritum_state::port_ff_r), FUNC(meritum_state::port_ff_w));
 }
@@ -386,9 +391,25 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(meritum_state::meritum)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 10_MHz_XTAL / 4) // 2.5 MHz or 1.67 MHz by jumper selection
+	MCFG_DEVICE_ADD("maincpu", Z80, 10_MHz_XTAL / 4) // U880D @ 2.5 MHz or 1.67 MHz by jumper selection
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
+
+	MCFG_DEVICE_ADD("usart", I8251, 10_MHz_XTAL / 4) // same as CPU clock
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("usart", i8251_device, write_cts))
+
+	pit8253_device &pit(PIT8253(config, "mainpit", 0));
+	pit.set_clk<0>(10_MHz_XTAL / 5); // 2 MHz
+	pit.set_clk<1>(10_MHz_XTAL / 10); // 1 MHz
+	pit.set_clk<2>(10_MHz_XTAL / 4); // same as CPU clock
+	pit.out_handler<0>().set("usart", FUNC(i8251_device::write_txc));
+	pit.out_handler<0>().append("usart", FUNC(i8251_device::write_rxc));
+	// Channel 1 generates INT pulse through 123 monostable
+	// Channel 2 (gated) generates NMI
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
