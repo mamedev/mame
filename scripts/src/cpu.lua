@@ -1263,8 +1263,10 @@ if (CPUS["MIPS"]~=null) then
 		MAME_DIR .. "src/devices/cpu/mips/mips3fe.cpp",
 		MAME_DIR .. "src/devices/cpu/mips/mips3fe.h",
 		MAME_DIR .. "src/devices/cpu/mips/mips3drc.cpp",
-		MAME_DIR .. "src/devices/cpu/mips/sonyvu.cpp",
-		MAME_DIR .. "src/devices/cpu/mips/sonyvu.h",
+		MAME_DIR .. "src/devices/cpu/mips/ps2vu.cpp",
+		MAME_DIR .. "src/devices/cpu/mips/ps2vu.h",
+		MAME_DIR .. "src/devices/cpu/mips/ps2vif1.cpp",
+		MAME_DIR .. "src/devices/cpu/mips/ps2vif1.h",
 	}
 end
 

@@ -24,6 +24,8 @@ private:
 	void dasm_upper(uint32_t pc, uint32_t op, std::ostream &stream);
 	void dasm_lower(uint32_t pc, uint32_t op, std::ostream &stream);
 	std::string signed_5bit(uint16_t val);
+	std::string signed_5bit_rd(uint16_t val);
+	std::string unsigned_11bit(uint16_t val);
 	std::string signed_11bit(uint16_t val);
 	std::string signed_11bit_x8(uint16_t val);
 	std::string signed_15bit(uint16_t val);

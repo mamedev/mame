@@ -158,11 +158,10 @@ iLinkSGUID=0x--------
 
 #include "emu.h"
 
-#include "audio/iopspu.h"
-
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
-#include "cpu/mips/sonyvu.h"
+#include "cpu/mips/ps2vu.h"
+#include "cpu/mips/ps2vif1.h"
 
 #include "machine/iopcdvd.h"
 #include "machine/iopdma.h"
@@ -171,15 +170,16 @@ iLinkSGUID=0x--------
 #include "machine/ioptimer.h"
 
 #include "machine/ps2dma.h"
-#include "machine/ps2gif.h"
 #include "machine/ps2intc.h"
 #include "machine/ps2mc.h"
 #include "machine/ps2pad.h"
 #include "machine/ps2sif.h"
 #include "machine/ps2timer.h"
-#include "machine/ps2vif1.h"
+
+#include "sound/iopspu.h"
 
 #include "video/ps2gs.h"
+#include "video/ps2gif.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -201,9 +201,7 @@ public:
 		, m_iop_spu(*this, "iop_spu")
 		, m_iop_cdvd(*this, "iop_cdvd")
 		, m_iop_sio2(*this, "iop_sio2")
-		, m_gif(*this, "gif")
 		, m_gs(*this, "gs")
-		, m_vif1(*this, "vif1")
 		, m_vu0(*this, "vu0")
 		, m_vu1(*this, "vu1")
 		, m_pad(*this, "pad%u", 0U)
@@ -266,9 +264,7 @@ protected:
 	required_device<iop_spu_device> m_iop_spu;
 	required_device<iop_cdvd_device> m_iop_cdvd;
 	required_device<iop_sio2_device> m_iop_sio2;
-	required_device<ps2_gif_device> m_gif;
 	required_device<ps2_gs_device> m_gs;
-	required_device<ps2_vif1_device> m_vif1;
 	required_device<sonyvu0_device> m_vu0;
 	required_device<sonyvu1_device> m_vu1;
 	required_device_array<ps2_pad_device, 2> m_pad;
@@ -580,7 +576,7 @@ TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
 
 WRITE8_MEMBER(ps2sony_state::debug_w)
 {
-    //printf("%c", (char)data);
+    printf("%c", (char)data);
 }
 
 WRITE64_MEMBER(ps2sony_state::ee_iop_ram_w)
@@ -688,9 +684,9 @@ void ps2sony_state::mem_map(address_map &map)
     map(0x10001000, 0x100017ff).rw(m_timer[2], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
     map(0x10001800, 0x10001fff).rw(m_timer[3], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
     map(0x10002000, 0x10002fff).rw(FUNC(ps2sony_state::ipu_r), FUNC(ps2sony_state::ipu_w)).umask64(0x00000000ffffffff);
-    map(0x10003000, 0x100030af).rw(m_gif, FUNC(ps2_gif_device::read), FUNC(ps2_gif_device::write));
+    map(0x10003000, 0x100030af).rw(m_gs, FUNC(ps2_gs_device::gif_r), FUNC(ps2_gs_device::gif_w));
     map(0x10004000, 0x1000400f).mirror(0xff0).rw(FUNC(ps2sony_state::vif0_fifo_r), FUNC(ps2sony_state::vif0_fifo_w));
-    map(0x10005000, 0x1000500f).mirror(0xff0).rw(m_vif1, FUNC(ps2_vif1_device::mmio_r), FUNC(ps2_vif1_device::mmio_w));
+    map(0x10005000, 0x1000500f).mirror(0xff0).rw(m_vu1, FUNC(sonyvu1_device::vif_r), FUNC(sonyvu1_device::vif_w));
     map(0x10006000, 0x1000600f).mirror(0xff0).rw(FUNC(ps2sony_state::gif_fifo_r), FUNC(ps2sony_state::gif_fifo_w));
     map(0x10007000, 0x1000701f).mirror(0xfe0).rw(FUNC(ps2sony_state::ipu_fifo_r), FUNC(ps2sony_state::ipu_fifo_w));
     map(0x10008000, 0x1000dfff).rw(m_dmac, FUNC(ps2_dmac_device::channel_r), FUNC(ps2_dmac_device::channel_w)).umask64(0x00000000ffffffff);;
@@ -745,10 +741,8 @@ MACHINE_CONFIG_START(ps2sony_state::ps2sony)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD(m_vu0, SONYVU0, 294'912'000, m_vu1)
-	MCFG_DEVICE_ADD(m_vu1, SONYVU1, 294'912'000)
-
-	MCFG_DEVICE_ADD(m_vif1, SONYPS2_VIF1, 294912000/2, m_gif, m_vu1)
+	MCFG_DEVICE_ADD(m_vu0, SONYPS2_VU0, 294'912'000, m_vu1)
+	MCFG_DEVICE_ADD(m_vu1, SONYPS2_VU1, 294'912'000, m_gs)
 
 	MCFG_DEVICE_ADD(m_timer[0], SONYPS2_TIMER, 294912000/2, true)
 	MCFG_DEVICE_ADD(m_timer[1], SONYPS2_TIMER, 294912000/2, true)
@@ -757,9 +751,8 @@ MACHINE_CONFIG_START(ps2sony_state::ps2sony)
 
 	MCFG_DEVICE_ADD(m_intc, SONYPS2_INTC, m_maincpu)
 	MCFG_DEVICE_ADD(m_gs, SONYPS2_GS, 294912000/2, m_intc)
-	MCFG_DEVICE_ADD(m_dmac, SONYPS2_DMAC, 294912000/2, m_maincpu, m_ram, m_sif, m_gif, m_vif1)
+	MCFG_DEVICE_ADD(m_dmac, SONYPS2_DMAC, 294912000/2, m_maincpu, m_ram, m_sif, m_gs, m_vu1)
 	MCFG_DEVICE_ADD(m_sif, SONYPS2_SIF, m_intc)
-	MCFG_DEVICE_ADD(m_gif, SONYPS2_GIF, m_gs)
 
 	MCFG_DEVICE_ADD(m_iop, SONYPS2_IOP, XTAL(67'737'600)/2)
 	MCFG_DEVICE_PROGRAM_MAP(iop_map)

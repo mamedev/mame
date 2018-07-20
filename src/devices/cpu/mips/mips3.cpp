@@ -13,11 +13,11 @@
 #include "mips3.h"
 #include "mips3com.h"
 #include "mips3dsm.h"
-
+#include "ps2vu.h"
 
 #define ENABLE_OVERFLOWS    	(0)
 #define ENABLE_EE_ELF_LOADER	(0)
-#define ENABLE_EE_DECI2			(0)
+#define ENABLE_EE_DECI2			(1)
 
 /***************************************************************************
     HELPER MACROS
@@ -3035,7 +3035,7 @@ void r5900le_device::handle_extra_cop2(uint32_t op)
 				{
 					if (BIT(op, 24-field))
 					{
-						fd[field] = m_core->vacc[field] + fs[field] + ft[bc];
+						fd[field] = m_core->vacc[field] + fs[field] * ft[bc];
 					}
 				}
 			}
@@ -3216,12 +3216,11 @@ void r5900le_device::handle_extra_cop2(uint32_t op)
 						const uint32_t bc = op & 3;
 						float *fs = m_core->vfr[rs];
 						float *ft = m_core->vfr[rt];
-						float *fd = m_core->vfr[rd];
 						for (int field = 0; field < 4; field++)
 						{
 							if (BIT(op, 24-field))
 							{
-								fd[field] = m_core->vacc[field] + fs[field] * ft[bc];
+								m_core->vacc[field] += fs[field] * ft[bc];
 							}
 						}
 					}

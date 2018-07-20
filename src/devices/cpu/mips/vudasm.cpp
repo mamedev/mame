@@ -112,9 +112,9 @@ void sonyvu_disassembler::dasm_upper(uint32_t pc, uint32_t op, std::ostream &str
 				case 0x04: case 0x05: case 0x06: case 0x07:
 					util::stream_format(stream, "suba%s.%s  ACC%s %s%s %s%s", bc, dest, destc, VFREG[rs], destc, VFREG[rt], bc); break;
 				case 0x08: case 0x09: case 0x0a: case 0x0b:
-					util::stream_format(stream, "madda%s.%s  ACC%s %s%s %s%s", bc, dest, destc, VFREG[rs], destc, VFREG[rt], bc); break;
+					util::stream_format(stream, "madda%s.%s ACC%s %s%s %s%s", bc, dest, destc, VFREG[rs], destc, VFREG[rt], bc); break;
 				case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-					util::stream_format(stream, "msuba%s.%s  ACC%s %s%s %s%s", bc, dest, destc, VFREG[rs], destc, VFREG[rt], bc); break;
+					util::stream_format(stream, "msuba%s.%s ACC%s %s%s %s%s", bc, dest, destc, VFREG[rs], destc, VFREG[rt], bc); break;
 				case 0x10: util::stream_format(stream, "itof0.%s  %s%s %s%s", dest, VFREG[rt], destc, VFREG[rs], dest); break;
 				case 0x11: util::stream_format(stream, "itof4.%s  %s%s %s%s", dest, VFREG[rt], destc, VFREG[rs], dest); break;
 				case 0x12: util::stream_format(stream, "itof12.%s %s%s %s%s", dest, VFREG[rt], destc, VFREG[rs], dest); break;
@@ -124,7 +124,7 @@ void sonyvu_disassembler::dasm_upper(uint32_t pc, uint32_t op, std::ostream &str
 				case 0x16: util::stream_format(stream, "ftoi12.%s %s%s %s%s", dest, VFREG[rt], destc, VFREG[rs], dest); break;
 				case 0x17: util::stream_format(stream, "ftoi15.%s %s%s %s%s", dest, VFREG[rt], destc, VFREG[rs], dest); break;
 				case 0x18: case 0x19: case 0x1a: case 0x1b:
-					util::stream_format(stream, "mula%s.%s   ACC%s %s%s %s%s", bc, dest, destc, VFREG[rs], destc, VFREG[rt], bc); break;
+					util::stream_format(stream, "mula%s.%s  ACC%s %s%s %s%s", bc, dest, destc, VFREG[rs], destc, VFREG[rt], bc); break;
 				case 0x1c: util::stream_format(stream, "mulaq.%s  ACC%s %s%s Q", dest, destc, VFREG[rs], destc); break;
 				case 0x1d: util::stream_format(stream, "abs.%s    %s%s %s%s", dest, VFREG[rt], destc, VFREG[rs], dest); break;
 				case 0x1e: util::stream_format(stream, "mulai.%s  ACC%s %s%s I", dest, destc, VFREG[rs], destc); break;
@@ -262,7 +262,10 @@ void sonyvu_disassembler::dasm_lower(uint32_t pc, uint32_t op, std::ostream &str
 				switch (type4_op)
 				{
 					case 0x30: // MOVE
-						util::stream_format(stream, "move.%s   %s%s %s%s", dest, VFREG[rt], destc, VFREG[rs], dest);
+						if (((op >> 21) & 15) == 0 && rt == 0 && rs == 0)
+							util::stream_format(stream, "nop");
+						else
+							util::stream_format(stream, "move.%s   %s%s %s%s", dest, VFREG[rt], destc, VFREG[rs], dest);
 						break;
 					case 0x31: // MR32
 						util::stream_format(stream, "mr32.%s   %s%s %s%s", dest, VFREG[rt], destc, VFREG[rs], dest);
@@ -386,7 +389,7 @@ void sonyvu_disassembler::dasm_lower(uint32_t pc, uint32_t op, std::ostream &str
 						util::stream_format(stream, "isub        %s, %s, %s", VIREG[rd], VIREG[rs], VIREG[rt]);
 						break;
 					case 0x32: // IADDI
-						util::stream_format(stream, "iaddi       %s, %s, %s", VIREG[rt], VIREG[rs], signed_5bit(op));
+						util::stream_format(stream, "iaddi       %s, %s, %s", VIREG[rt], VIREG[rs], signed_5bit_rd(op));
 						break;
 					case 0x34: // IAND
 						util::stream_format(stream, "iand        %s, %s, %s", VIREG[rd], VIREG[rs], VIREG[rt]);
@@ -424,6 +427,25 @@ std::string sonyvu_disassembler::signed_5bit(uint16_t val)
 		return util::string_format("$%x", sval);
 }
 
+std::string sonyvu_disassembler::signed_5bit_rd(uint16_t val)
+{
+	int16_t sval = (int32_t)((val >> 6) & 0x1f);
+	sval <<= 11;
+	sval >>= 11;
+
+	if (sval < 0)
+		return util::string_format("-$%x", -sval);
+	else
+		return util::string_format("$%x", sval);
+}
+
+std::string sonyvu_disassembler::unsigned_11bit(uint16_t val)
+{
+	val <<= 5;
+	val >>= 5;
+	return util::string_format("$%x", val);
+}
+
 std::string sonyvu_disassembler::signed_11bit(uint16_t val)
 {
 	int16_t sval = (int32_t)val;
@@ -446,16 +468,4 @@ std::string sonyvu_disassembler::signed_11bit_x8(uint16_t val)
 		return util::string_format("-$%x", -sval * 8);
 	else
 		return util::string_format("$%x", sval * 8);
-}
-
-std::string sonyvu_disassembler::signed_15bit(uint16_t val)
-{
-	int16_t sval = (int32_t)val;
-	sval <<= 1;
-	sval >>= 1;
-
-	if (sval < 0)
-		return util::string_format("-$%x", -sval);
-	else
-		return util::string_format("$%x", sval);
 }
