@@ -620,7 +620,7 @@ void cps_state::qsound_main_map(address_map &map)
 }
 
 void cps_state::qsound_sub_map(address_map &map)
-{   // used by cps2.c too
+{   // used by cps2.cpp too
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("audiobank");    /* banked (contains music data) */
 	map(0xc000, 0xcfff).ram().share("qsound_ram1");

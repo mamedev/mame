@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(et3400_state::et3400)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_et3400)
+	config.set_default_layout(layout_et3400);
 
 	// Devices
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)

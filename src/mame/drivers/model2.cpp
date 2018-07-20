@@ -2608,7 +2608,7 @@ MACHINE_CONFIG_START(model2o_state::vcop)
 	ioboard.set_lightgun_p2x_tag("P2_X");
 	ioboard.set_lightgun_p2y_tag("P2_Y");
 
-	MCFG_DEFAULT_LAYOUT(layout_model1io2)
+	config.set_default_layout(layout_model1io2);
 MACHINE_CONFIG_END
 
 /* 2A-CRX */

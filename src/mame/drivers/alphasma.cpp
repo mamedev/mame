@@ -458,7 +458,7 @@ MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(alphasmart_state, alphasmart)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

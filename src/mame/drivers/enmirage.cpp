@@ -57,8 +57,8 @@
 class enmirage_state : public driver_device
 {
 public:
-	enmirage_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	enmirage_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "wd1772"),
 		m_floppy_connector(*this, "wd1772:0"),
@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(enmirage_state::mirage)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)
 	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
 
-	MCFG_DEFAULT_LAYOUT( layout_mirage )
+	config.set_default_layout(layout_mirage);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

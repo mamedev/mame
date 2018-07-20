@@ -290,7 +290,7 @@ MACHINE_CONFIG_START(tk80_state::tk80)
 	MCFG_DEVICE_IO_MAP(tk80_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tk80)
+	config.set_default_layout(layout_tk80);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(tk80_state::nd80z)
 	MCFG_DEVICE_IO_MAP(nd80z_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tk80)
+	config.set_default_layout(layout_tk80);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)

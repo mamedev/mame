@@ -672,7 +672,7 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_playch10)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
-	MCFG_DEFAULT_LAYOUT(layout_playch10)
+	config.set_default_layout(layout_playch10);
 
 	MCFG_SCREEN_ADD("top", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

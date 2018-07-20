@@ -237,7 +237,7 @@ MACHINE_CONFIG_START(mini2440_state::mini2440)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
 

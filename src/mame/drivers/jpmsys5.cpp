@@ -855,7 +855,7 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_O1_CB(WRITELINE(*this, jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, jpmsys5_state, ptm_irq))
-	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
+	config.set_default_layout(layout_jpmsys5);
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
@@ -912,7 +912,7 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_O1_CB(WRITELINE(*this, jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, jpmsys5_state, ptm_irq))
-	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
+	config.set_default_layout(layout_jpmsys5);
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)

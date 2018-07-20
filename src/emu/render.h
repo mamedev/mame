@@ -806,7 +806,7 @@ public:
 	public:
 		// construction/destruction
 		item(
-				running_machine &machine,
+				device_t &device,
 				util::xml::data_node const &itemnode,
 				element_map &elemmap,
 				render_bounds const &transform);
@@ -846,7 +846,7 @@ public:
 
 	// construction/destruction
 	layout_view(
-			running_machine &machine,
+			device_t &device,
 			util::xml::data_node const &viewnode,
 			element_map &elemmap,
 			group_map const &groupmap);
@@ -873,11 +873,13 @@ public:
 private:
 	// add items, recursing for groups
 	void add_items(
-			running_machine &machine,
+			device_t &device,
 			util::xml::data_node const &parentnode,
 			element_map &elemmap,
 			group_map const &groupmap,
 			render_bounds const &transform);
+
+	static std::string make_name(device_t &device, util::xml::data_node const &viewnode);
 
 	// internal state
 	std::string         m_name;             // name of the layout
@@ -909,7 +911,7 @@ public:
 	using view_list = std::list<layout_view>;
 
 	// construction/destruction
-	layout_file(running_machine &machine, util::xml::data_node const &rootnode, char const *dirname);
+	layout_file(device_t &device, util::xml::data_node const &rootnode, char const *dirname);
 	~layout_file();
 
 	// getters
@@ -1020,8 +1022,8 @@ private:
 	void load_layout_files(util::xml::data_node const &rootnode, bool singlefile);
 	void load_additional_layout_files(const char *basename, bool have_artwork);
 	bool load_layout_file(const char *dirname, const char *filename);
-	bool load_layout_file(const char *dirname, const internal_layout *layout_data);
-	bool load_layout_file(const char *dirname, util::xml::data_node const &rootnode);
+	bool load_layout_file(const char *dirname, const internal_layout &layout_data, device_t *device = nullptr);
+	bool load_layout_file(device_t &device, const char *dirname, util::xml::data_node const &rootnode);
 	void add_container_primitives(render_primitive_list &list, const object_transform &root_xform, const object_transform &xform, render_container &container, int blendmode);
 	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
 	bool map_point_internal(s32 target_x, s32 target_y, render_container *container, float &mapped_x, float &mapped_y, ioport_port *&mapped_input_port, ioport_value &mapped_input_mask);

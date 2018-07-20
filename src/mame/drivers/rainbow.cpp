@@ -3212,7 +3212,7 @@ void rainbow_state::upd7220_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(rainbow_state::rainbow)
-	MCFG_DEFAULT_LAYOUT(layout_rainbow)
+	config.set_default_layout(layout_rainbow);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8088, 24.0734_MHz_XTAL / 5) // approximately 4.815 MHz

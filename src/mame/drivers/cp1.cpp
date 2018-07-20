@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(cp1_state::cp1)
 
 	MCFG_DEVICE_ADD("i8155_cp3", I8155, 0)
 
-	MCFG_DEFAULT_LAYOUT(layout_cp1)
+	config.set_default_layout(layout_cp1);
 
 	MCFG_CASSETTE_ADD("cassette")
 

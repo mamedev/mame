@@ -489,7 +489,7 @@ MACHINE_CONFIG_START(play_3_state::play_3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_play_3)
+	config.set_default_layout(layout_play_3);
 
 	// Devices
 	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL(3'579'545) / 8) // TPB line from CPU

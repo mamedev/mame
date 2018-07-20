@@ -133,7 +133,7 @@ MACHINE_CONFIG_START(tecnbras_state::tecnbras)
 */
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tecnbras)
+	config.set_default_layout(layout_tecnbras);
 
 MACHINE_CONFIG_END
 

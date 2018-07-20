@@ -273,15 +273,15 @@ MACHINE_CONFIG_START(pdc_device::device_add_mconfig)
 	/* DMA Controller - Intel P8237A-5 */
 	/* Channel 0: uPD765a Floppy Disk Controller */
 	/* Channel 1: M68K main system memory */
-	MCFG_DEVICE_ADD(FDCDMA_TAG, AM9517A, XTAL(10'000'000) / 2)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, pdc_device, i8237_hreq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, pdc_device, i8237_eop_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, pdc_device, i8237_dma_mem_r))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, pdc_device, i8237_dma_mem_w))
-	MCFG_I8237_IN_IOR_0_CB(READ8(*this, pdc_device, i8237_fdc_dma_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, pdc_device, i8237_fdc_dma_w))
-	MCFG_I8237_IN_IOR_1_CB(READ8(*this, pdc_device, m68k_dma_r))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, pdc_device, m68k_dma_w))
+	AM9517A(config, m_dma8237, 10_MHz_XTAL / 2);
+	m_dma8237->out_hreq_callback().set(FUNC(pdc_device::i8237_hreq_w));
+	m_dma8237->out_eop_callback().set(FUNC(pdc_device::i8237_eop_w));
+	m_dma8237->in_memr_callback().set(FUNC(pdc_device::i8237_dma_mem_r));
+	m_dma8237->out_memw_callback().set(FUNC(pdc_device::i8237_dma_mem_w));
+	m_dma8237->in_ior_callback<0>().set(FUNC(pdc_device::i8237_fdc_dma_r));
+	m_dma8237->out_iow_callback<0>().set(FUNC(pdc_device::i8237_fdc_dma_w));
+	m_dma8237->in_ior_callback<1>().set(FUNC(pdc_device::m68k_dma_r));
+	m_dma8237->out_iow_callback<1>().set(FUNC(pdc_device::m68k_dma_w));
 
 	/* Hard Disk Controller - HDC9224 */
 	MCFG_DEVICE_ADD(HDC_TAG, HDC9224, 0)

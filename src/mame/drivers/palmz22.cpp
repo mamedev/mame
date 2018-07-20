@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(palmz22_state::palmz22)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(160, 160)
 	MCFG_SCREEN_VISIBLE_AREA(0, 160 - 1, 0, 160 - 1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
 

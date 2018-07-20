@@ -1370,7 +1370,7 @@ MACHINE_CONFIG_START(vboy_state::vboy)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_pad", vboy_state, timer_pad_tick, attotime::from_hz(50.038029f))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_vboy)
+	config.set_default_layout(layout_vboy);
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(vboy_state, vboy)
 

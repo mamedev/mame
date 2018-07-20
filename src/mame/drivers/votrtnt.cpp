@@ -143,7 +143,7 @@ void votrtnt_state::votrtnt(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &votrtnt_state::_6802_mem);
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT(layout_votrtnt)
+	//config.set_default_layout(layout_votrtnt);
 
 	/* serial hardware */
 	acia6850_device &acia(ACIA6850(config, "acia"));

@@ -145,7 +145,7 @@ MACHINE_CONFIG_START(nixieclock_state::_4004clk)
 	cpu.set_ram_ports_map(&nixieclock_state::_4004clk_mp);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_4004clk)
+	config.set_default_layout(layout_4004clk);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

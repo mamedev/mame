@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(mpu5_state::mpu5)
 	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)    // ?
 	MCFG_DEVICE_PROGRAM_MAP(mpu5_map)
 
-	MCFG_DEFAULT_LAYOUT(layout_mpu5)
+	config.set_default_layout(layout_mpu5);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

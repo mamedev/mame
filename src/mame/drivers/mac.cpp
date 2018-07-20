@@ -1283,7 +1283,7 @@ MACHINE_CONFIG_START(mac_state::maclc)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macv8)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mac_state, mac_rbv_vbl))
-	MCFG_DEFAULT_LAYOUT(layout_mac)
+	config.set_default_layout(layout_mac);
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
@@ -1810,7 +1810,7 @@ MACHINE_CONFIG_START(mac_state::maciici)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mac_state, mac_rbv_vbl))
-	MCFG_DEFAULT_LAYOUT(layout_mac)
+	config.set_default_layout(layout_mac);
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1845,7 +1845,7 @@ MACHINE_CONFIG_START(mac_state::maciisi)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mac_state, mac_rbv_vbl))
-	MCFG_DEFAULT_LAYOUT(layout_mac)
+	config.set_default_layout(layout_mac);
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

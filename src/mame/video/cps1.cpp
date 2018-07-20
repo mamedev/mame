@@ -1941,8 +1941,8 @@ void cps2_state::init_cps2_video()
 {
 	cps2_gfx_decode();
 
-	m_scanline[0] = 262;
-	m_scanline[1] = 262;
+	m_scanline[0] = m_screen->height();
+	m_scanline[1] = m_screen->height();
 	m_scancalls = 0;
 	m_last_sprite_offset = 0;
 	m_cps2_last_sprite_offset = 0;

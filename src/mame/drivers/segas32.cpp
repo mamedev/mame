@@ -2259,7 +2259,7 @@ MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 	MCFG_DEVICE_ADDRESS_MAP(0, rf5c68_map)
 
-	MCFG_S32COMM_ADD("s32comm")
+	S32COMM(config, m_s32comm, 0);
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_REGULAR_DEVICE, segas32_regular_state, "segas32_pcb_regular", "Sega System 32 regular PCB")
@@ -2557,7 +2557,7 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas32)
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -2585,7 +2585,7 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
-	MCFG_S32COMM_ADD("s32comm")
+	S32COMM(config, m_s32comm, 0);
 MACHINE_CONFIG_END
 
 

@@ -5,6 +5,10 @@
     Metro Games
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_METRO_H
+#define MAME_INCLUDES_METRO_H
+
+#pragma once
 
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
@@ -239,3 +243,5 @@ private:
 	// blazing tornado
 	bitmap_ind16 m_vdp_bitmap;
 };
+
+#endif // MAME_INCLUDES_METRO_H

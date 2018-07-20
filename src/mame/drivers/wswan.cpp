@@ -132,7 +132,7 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_SCREEN_RAW_PARAMS(3.072_MHz_XTAL, 256, 0, WSWAN_X_PIXELS, 159, 0, WSWAN_Y_PIXELS)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_wswan)
+	config.set_default_layout(layout_wswan);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

@@ -847,7 +847,7 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(accomm_state, accomm)
 
-	MCFG_DEFAULT_LAYOUT(layout_accomm)
+	config.set_default_layout(layout_accomm);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

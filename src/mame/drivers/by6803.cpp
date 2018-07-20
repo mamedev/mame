@@ -387,7 +387,7 @@ MACHINE_CONFIG_START(by6803_state::by6803)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	//MCFG_DEFAULT_LAYOUT(layout_by6803)
+	//config.set_default_layout(layout_by6803);
 
 	/* Sound */
 	genpin_audio(config);

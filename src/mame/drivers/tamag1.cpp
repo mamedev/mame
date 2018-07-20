@@ -148,9 +148,9 @@ MACHINE_CONFIG_START(tamag1_state::tama)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40, 16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 16-1)
-	MCFG_DEFAULT_LAYOUT(layout_tama)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", e0c6s46_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	config.set_default_layout(layout_tama);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(tamag1_state, tama)

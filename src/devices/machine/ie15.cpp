@@ -574,7 +574,7 @@ MACHINE_CONFIG_START(ie15_device::ie15core)
 	MCFG_DEVICE_PROGRAM_MAP(ie15_mem)
 	MCFG_DEVICE_IO_MAP(ie15_io)
 
-	MCFG_DEFAULT_LAYOUT(layout_ie15)
+	config.set_default_layout(layout_ie15);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", IE15_KEYBOARD, 0)

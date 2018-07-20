@@ -842,31 +842,28 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_DEVICE_PROGRAM_MAP(wicat_video_mem)
 	MCFG_DEVICE_IO_MAP(wicat_video_io)
 
-	MCFG_INPUT_MERGER_ANY_HIGH("videoirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("videocpu", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, m_videoirq).output_handler().set_inputline(m_videocpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("videoctrl", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wicat_state, crtc_irq_clear_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("tbreirq", input_merger_device, in_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("dmairq", input_merger_device, in_w<1>))
+	LS259(config, m_videoctrl);
+	m_videoctrl->q_out_cb<0>().set(FUNC(wicat_state::crtc_irq_clear_w));
+	m_videoctrl->q_out_cb<6>().set("tbreirq", FUNC(input_merger_device::in_w<1>));
+	m_videoctrl->q_out_cb<7>().set("dmairq", FUNC(input_merger_device::in_w<1>));
 	// Q1-Q5 are all used but unknown
 
-	MCFG_DEVICE_ADD("videodma", AM9517A, 8_MHz_XTAL)  // clock is a bit of guess
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, wicat_state, dma_hrq_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE("dmairq", input_merger_device, in_w<0>))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, wicat_state, vram_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, wicat_state, vram_w))
-	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8("video", i8275_device, dack_w))
+	AM9517A(config, m_videodma, 8_MHz_XTAL);  // clock is a bit of guess
+	m_videodma->out_hreq_callback().set(FUNC(wicat_state::dma_hrq_w));
+	m_videodma->out_eop_callback().set("dmairq", FUNC(input_merger_device::in_w<0>));
+	m_videodma->in_memr_callback().set(FUNC(wicat_state::vram_r));
+	m_videodma->out_memw_callback().set(FUNC(wicat_state::vram_w));
+	m_videodma->out_iow_callback<0>().set(m_crtc, FUNC(i8275_device::dack_w));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("dmairq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("videocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, INPUT_LINE_NMI);
 
 	MCFG_IM6402_ADD("videouart", 0, 1200)
 	MCFG_IM6402_DR_CALLBACK(WRITELINE("videoirq", input_merger_device, in_w<2>))
 	MCFG_IM6402_TBRE_CALLBACK(WRITELINE("tbreirq", input_merger_device, in_w<0>))
 
-	MCFG_INPUT_MERGER_ALL_HIGH("tbreirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("videoirq", input_merger_device, in_w<3>))
+	INPUT_MERGER_ALL_HIGH(config, "tbreirq").output_handler().set(m_videoirq, FUNC(input_merger_device::in_w<3>));
 
 	// terminal (2x INS2651, 1x IM6042 - one of these is for the keyboard, another communicates with the main board, the third is unknown)
 	MCFG_DEVICE_ADD("videouart0", MC2661, 5.0688_MHz_XTAL)  // the INS2651 looks similar enough to the MC2661...
@@ -895,7 +892,7 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_I8275_VRTC_CALLBACK(WRITELINE(*this, wicat_state, crtc_irq_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEFAULT_LAYOUT(layout_wicat)
+	config.set_default_layout(layout_wicat);
 
 	/* Winchester Disk Controller (WD1000 + FD1795) */
 	MCFG_DEVICE_ADD("wd1kcpu", N8X300, 8_MHz_XTAL)

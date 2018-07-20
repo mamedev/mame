@@ -402,12 +402,12 @@ void cidelsa_state::machine_reset()
 
 MACHINE_CONFIG_START(cidelsa_state::destryer)
 	/* basic system hardware */
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
-	MCFG_DEVICE_PROGRAM_MAP(destryer_map)
-	MCFG_DEVICE_IO_MAP(destryer_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cidelsa_state, clear_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cidelsa_state, q_w))
+	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, DESTRYER_CHR1));
+	cpu.set_addrmap(AS_PROGRAM, &cidelsa_state::destryer_map);
+	cpu.set_addrmap(AS_IO, &cidelsa_state::destryer_io_map);
+	cpu.wait_cb().set_constant(1);
+	cpu.clear_cb().set(FUNC(cidelsa_state::clear_r));
+	cpu.q_cb().set(FUNC(cidelsa_state::q_w));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -417,12 +417,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cidelsa_state::destryera)
 	/* basic system hardware */
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
-	MCFG_DEVICE_PROGRAM_MAP(destryera_map)
-	MCFG_DEVICE_IO_MAP(destryer_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cidelsa_state, clear_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cidelsa_state, q_w))
+	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, DESTRYER_CHR1));
+	cpu.set_addrmap(AS_PROGRAM, &cidelsa_state::destryera_map);
+	cpu.set_addrmap(AS_IO, &cidelsa_state::destryer_io_map);
+	cpu.wait_cb().set_constant(1);
+	cpu.clear_cb().set(FUNC(cidelsa_state::clear_r));
+	cpu.q_cb().set(FUNC(cidelsa_state::q_w));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -432,12 +432,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cidelsa_state::altair)
 	/* basic system hardware */
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, ALTAIR_CHR1)
-	MCFG_DEVICE_PROGRAM_MAP(altair_map)
-	MCFG_DEVICE_IO_MAP(altair_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cidelsa_state, clear_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cidelsa_state, q_w))
+	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, ALTAIR_CHR1));
+	cpu.set_addrmap(AS_PROGRAM, &cidelsa_state::altair_map);
+	cpu.set_addrmap(AS_IO, &cidelsa_state::altair_io_map);
+	cpu.wait_cb().set_constant(1);
+	cpu.clear_cb().set(FUNC(cidelsa_state::clear_r));
+	cpu.q_cb().set(FUNC(cidelsa_state::q_w));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -461,12 +461,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(draco_state::draco)
 	/* basic system hardware */
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, DRACO_CHR1)
-	MCFG_DEVICE_PROGRAM_MAP(draco_map)
-	MCFG_DEVICE_IO_MAP(draco_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cidelsa_state, clear_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cidelsa_state, q_w))
+	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, ALTAIR_CHR1));
+	cpu.set_addrmap(AS_PROGRAM, &draco_state::draco_map);
+	cpu.set_addrmap(AS_IO, &draco_state::draco_io_map);
+	cpu.wait_cb().set_constant(1);
+	cpu.clear_cb().set(FUNC(draco_state::clear_r));
+	cpu.q_cb().set(FUNC(draco_state::q_w));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

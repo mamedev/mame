@@ -32,13 +32,11 @@
 #define DEVCB_READ8(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
 #define DEVCB_READ16(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
 #define DEVCB_READ32(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
-#define DEVCB_READ64(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
 #define DEVCB_READLINE(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
 
 #define DEVCB_WRITE8(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
 #define DEVCB_WRITE16(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
 #define DEVCB_WRITE32(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
-#define DEVCB_WRITE64(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
 #define DEVCB_WRITELINE(tag, _class, _func) (std::forward_as_tuple((tag), &_class::_func, #_class "::" #_func))
 
 template <typename T> struct devcb_constant_t { T m_value; };

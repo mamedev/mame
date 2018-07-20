@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	MCFG_SCREEN_PALETTE("palette")
 	// vsync should actually last 17264 pixels
 
-	MCFG_DEFAULT_LAYOUT(layout_unixpc)
+	config.set_default_layout(layout_unixpc);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

@@ -297,7 +297,7 @@ MACHINE_CONFIG_START(hp49gp_state::hp49gp)
 	MCFG_SCREEN_VISIBLE_AREA(0, 131 - 1, 0, 80 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 
 	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)

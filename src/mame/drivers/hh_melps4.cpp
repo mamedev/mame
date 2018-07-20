@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(cfrogger_state::cfrogger)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(500, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 500-1, 0, 1080-1)
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(gjungler_state::gjungler)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(481, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 481-1, 0, 1080-1)
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */

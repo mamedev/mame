@@ -533,7 +533,7 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	MCFG_SCREEN_UPDATE_DRIVER(ms0515_state, screen_update_ms0515)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ms0515_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEFAULT_LAYOUT(layout_ms0515)
+	config.set_default_layout(layout_ms0515);
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(ms0515_state, ms0515)

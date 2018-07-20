@@ -196,7 +196,7 @@ MACHINE_CONFIG_START(whouse_testcons_state::whousetc)
 	MCFG_DEVICE_ADD("dsp3", DL1416B, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<3>))
 
-	MCFG_DEFAULT_LAYOUT(layout_whousetc)
+	config.set_default_layout(layout_whousetc);
 MACHINE_CONFIG_END
 
 

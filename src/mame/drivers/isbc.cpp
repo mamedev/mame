@@ -328,13 +328,13 @@ WRITE_LINE_MEMBER(isbc_state::bus_intr_out2_w)
 
 MACHINE_CONFIG_START(isbc_state::isbc86)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(5'000'000))
+	MCFG_DEVICE_ADD(m_maincpu, I8086, XTAL(5'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(isbc86_mem)
 	MCFG_DEVICE_IO_MAP(isbc_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("pic_0", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic_0, 0);
+	m_pic_0->out_int_callback().set_inputline(m_maincpu, 0);
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
@@ -361,13 +361,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isbc_state::rpc86)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(5'000'000))
+	MCFG_DEVICE_ADD(m_maincpu, I8086, XTAL(5'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(rpc86_mem)
 	MCFG_DEVICE_IO_MAP(rpc86_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("pic_0", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic_0, 0);
+	m_pic_0->out_int_callback().set_inputline(m_maincpu, 0);
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
@@ -400,22 +400,22 @@ MACHINE_CONFIG_START(isbc_state::rpc86)
 	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_0", pic8259_device, ir6_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(isbc_state::isbc8605)
+void isbc_state::isbc8605(machine_config &config)
+{
 	rpc86(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(isbc8605_io)
 
-	MCFG_DEVICE_ADD("isbc_208", ISBC_208, "maincpu")
-	MCFG_ISBC_208_IRQ(WRITELINE("pic_0", pic8259_device, ir5_w))
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &isbc_state::isbc8605_io);
 
-MACHINE_CONFIG_START(isbc_state::isbc8630)
+	ISBC_208(config, "isbc_208", 0, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
+}
+
+void isbc_state::isbc8630(machine_config &config)
+{
 	rpc86(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(isbc8630_io)
 
-	MCFG_DEVICE_ADD("isbc_215g", ISBC_215G, 0x100, "maincpu")
-	MCFG_ISBC_215_IRQ(WRITELINE("pic_0", pic8259_device, ir5_w))
+	m_maincpu->set_addrmap(AS_IO, &isbc_state::isbc8630_io);
+
+	ISBC_215G(config, "isbc_215g", 0, 0x100, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
 
 	LS259(config, m_statuslatch); // U14
 //  m_statuslatch->q_out_cb<0>().set("pit", FUNC(pit8253_device::write_gate0));
@@ -427,23 +427,23 @@ MACHINE_CONFIG_START(isbc_state::isbc8630)
 	m_statuslatch->q_out_cb<5>().append_output("led0").invert(); // ds1
 	m_statuslatch->q_out_cb<6>().set_output("led1").invert(); // ds3
 	m_statuslatch->q_out_cb<7>().set([this] (int state) { m_megabyte_enable = !state; });
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(isbc_state::isbc286)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80286, XTAL(16'000'000)/2)
+	MCFG_DEVICE_ADD(m_maincpu, I80286, XTAL(16'000'000)/2)
 	MCFG_DEVICE_PROGRAM_MAP(isbc286_mem)
 	MCFG_DEVICE_IO_MAP(isbc286_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("pic_0", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, isbc_state, get_slave_ack))
+	PIC8259(config, m_pic_0, 0);
+	m_pic_0->out_int_callback().set_inputline(m_maincpu, 0);
+	m_pic_0->in_sp_callback().set_constant(1);
+	m_pic_0->read_slave_ack_callback().set(FUNC(isbc_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic_1", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic_0", pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
+	PIC8259(config, m_pic_1, 0);
+	m_pic_1->out_int_callback().set(m_pic_0, FUNC(pic8259_device::ir7_w));
+	m_pic_1->in_sp_callback().set_constant(0);
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
@@ -519,15 +519,14 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_1", pic8259_device, ir5_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_1", pic8259_device, ir6_w))
 
-	MCFG_DEVICE_ADD("isbc_215g", ISBC_215G, 0x100, "maincpu")
-	MCFG_ISBC_215_IRQ(WRITELINE("pic_0", pic8259_device, ir5_w))
+	ISBC_215G(config, "isbc_215g", 0, 0x100, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(isbc_state::isbc2861)
+void isbc_state::isbc2861(machine_config &config)
+{
 	isbc286(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(isbc2861_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &isbc_state::isbc2861_mem);
+}
 
 /* ROM definition */
 ROM_START( isbc86 )

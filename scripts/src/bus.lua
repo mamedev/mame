@@ -1117,6 +1117,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/aha1542.h",
 		MAME_DIR .. "src/devices/bus/isa/wd1002a_wx1.cpp",
 		MAME_DIR .. "src/devices/bus/isa/wd1002a_wx1.h",
+		MAME_DIR .. "src/devices/bus/isa/wd1007a.cpp",
+		MAME_DIR .. "src/devices/bus/isa/wd1007a.h",
 		MAME_DIR .. "src/devices/bus/isa/dectalk.cpp",
 		MAME_DIR .. "src/devices/bus/isa/dectalk.h",
 		MAME_DIR .. "src/devices/bus/isa/pds.cpp",

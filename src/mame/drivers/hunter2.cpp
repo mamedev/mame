@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hunter2_state, hunter2)
 	MCFG_DEVICE_ADD("lcdc", HD61830, XTAL(4'915'200)/2/2) // unknown clock

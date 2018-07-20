@@ -493,7 +493,7 @@ MACHINE_CONFIG_START(mephisto_polgar_state::polgar)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
+	config.set_default_layout(layout_mephisto_lcd);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_polgar_state::polgar10)
@@ -529,7 +529,7 @@ MACHINE_CONFIG_START(mephisto_risc_state::mrisc)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
+	config.set_default_layout(layout_mephisto_lcd);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_milano_state::milano)
@@ -540,7 +540,7 @@ MACHINE_CONFIG_START(mephisto_milano_state::milano)
 	MCFG_DEVICE_REMOVE("board")
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
 	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_milano)
+	config.set_default_layout(layout_mephisto_milano);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_academy_state::academy)
@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(mephisto_academy_state::academy)
 	outlatch.q_out_cb<1>().set(FUNC(mephisto_academy_state::academy_nmi_w));
 	outlatch.q_out_cb<2>().set("display:beeper", FUNC(beep_device::set_state)).invert();
 
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_academy)
+	config.set_default_layout(layout_mephisto_academy);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_modena_state::modena)
@@ -569,7 +569,7 @@ MACHINE_CONFIG_START(mephisto_modena_state::modena)
 	MCFG_DEVICE_REMOVE("display")
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
 	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
-	MCFG_DEFAULT_LAYOUT(layout_mephisto_modena)
+	config.set_default_layout(layout_mephisto_modena);
 
 	MCFG_DEVICE_REMOVE("outlatch")
 
