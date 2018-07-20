@@ -75,8 +75,6 @@ private:
 
 	bool m_mode;
 	bool m_size_store;
-	uint8_t m_irq;
-	uint8_t m_mask;
 	bool m_cassette_data;
 	emu_timer *m_cassette_data_timer;
 	double m_old_cassette_val;
@@ -388,13 +386,13 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(meritum_state::meritum)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 10.6445_MHz_XTAL / 6)
+	MCFG_DEVICE_ADD("maincpu", Z80, 10_MHz_XTAL / 4) // 2.5 MHz or 1.67 MHz by jumper selection
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(10.6445_MHz_XTAL, 672, 0, 384, 264, 0, 192)
+	MCFG_SCREEN_RAW_PARAMS(10_MHz_XTAL, 672, 0, 384, 264, 0, 192) // wrong
 	MCFG_SCREEN_UPDATE_DRIVER(meritum_state, screen_update_meritum)
 	MCFG_SCREEN_PALETTE("palette")
 
