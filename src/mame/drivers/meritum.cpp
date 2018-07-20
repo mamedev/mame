@@ -190,7 +190,7 @@ static INPUT_PORTS_START( meritum )
 INPUT_PORTS_END
 
 uint32_t meritum_state::screen_update_meritum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-/* lores characters are in the character generator. Each character is 6x11. */
+/* lores characters are in the character generator. Each character is 6x12 (basic characters are 6x7 excluding descenders/ascenders). */
 {
 	uint8_t y,ra,chr,gfx;
 	uint16_t sy=0,ma=0,x;
@@ -200,12 +200,12 @@ uint32_t meritum_state::screen_update_meritum(screen_device &screen, bitmap_ind1
 	if (m_mode != m_size_store)
 	{
 		m_size_store = m_mode;
-		screen.set_visible_area(0, cols*6-1, 0, 16*11-1);
+		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
 	for (y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 11; ra++)
+		for (ra = 0; ra < 12; ra++)
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
 
@@ -373,14 +373,14 @@ QUICKLOAD_LOAD_MEMBER( meritum_state, trs80_cmd )
 /**************************** F4 CHARACTER DISPLAYER ***********************************************************/
 static const gfx_layout meritum_charlayout =
 {
-	6, 11,          /* 8 x 16 characters */
+	6, 12,          /* 6 x 12 characters */
 	256,            /* 256 characters */
 	1,          /* 1 bits per pixel */
 	{ 0 },          /* no bitplanes */
 	/* x offsets */
 	{ 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
-	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8 },
+	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
 	8*16           /* every char takes 16 bytes (unused scanlines are blank) */
 };
 
@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(meritum_state::meritum)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(10_MHz_XTAL, 672, 0, 384, 264, 0, 192) // wrong
+	MCFG_SCREEN_RAW_PARAMS(10_MHz_XTAL, 107 * 6, 0, 64 * 6, 312, 0, 192)
 	MCFG_SCREEN_UPDATE_DRIVER(meritum_state, screen_update_meritum)
 	MCFG_SCREEN_PALETTE("palette")
 
