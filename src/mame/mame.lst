@@ -1303,6 +1303,7 @@ uniap2en                        // 1982 Unitron AP II (in English)
 uniap2pt                        // 1982 Unitron AP II (in Brazilian Portuguese)
 uniap2ti                        // 1982 Unitron AP II+ (Teclado Inteligente)
 craft2p                         // 1982 Craft?
+laser2c                         // 1985? Laser //c (Brazil)
 
 @source:apple2e.cpp
 apple2c                         // Apr 1984 Apple //c
