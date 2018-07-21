@@ -3356,13 +3356,14 @@ void layout_view::item::resolve_tags()
 //  layout_file - constructor
 //-------------------------------------------------
 
-layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode, const char *dirname)
+layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode, char const *dirname)
 	: m_elemmap()
 	, m_viewlist()
 {
-	emu::render::detail::layout_environment env(device);
 	try
 	{
+		environment env(device);
+
 		// find the layout node
 		util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
 		if (!mamelayoutnode)
@@ -3373,30 +3374,9 @@ layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode,
 		if (version != LAYOUT_VERSION)
 			throw layout_syntax_error(util::string_format("unsupported version %d", version));
 
-		// parse all the parameters
-		for (util::xml::data_node const *elemnode = mamelayoutnode->get_child("param") ; elemnode; elemnode = elemnode->get_next_sibling("param"))
-			env.set_parameter(*elemnode);
-
-		// parse all the elements
-		for (util::xml::data_node const *elemnode = mamelayoutnode->get_child("element"); elemnode; elemnode = elemnode->get_next_sibling("element"))
-		{
-			char const *const name(env.get_attribute_string(*elemnode, "name", nullptr));
-			if (!name)
-				throw layout_syntax_error("element lacks name attribute");
-			if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(env, *elemnode, dirname)).second)
-				throw layout_syntax_error(util::string_format("duplicate element name %s", name));
-		}
-
-		// parse all the groups
+		// parse all the parameters, elements and groups
 		group_map groupmap;
-		for (util::xml::data_node const *groupnode = mamelayoutnode->get_child("group"); groupnode; groupnode = groupnode->get_next_sibling("group"))
-		{
-			char const *const name(env.get_attribute_string(*groupnode, "name", nullptr));
-			if (!name)
-				throw layout_syntax_error("group lacks name attribute");
-			if (!groupmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(*groupnode)).second)
-				throw layout_syntax_error(util::string_format("duplicate group name %s", name));
-		}
+		add_elements(dirname, env, *mamelayoutnode, groupmap, false, true);
 
 		// parse all the views
 		for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
@@ -3429,4 +3409,57 @@ layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode,
 
 layout_file::~layout_file()
 {
+}
+
+
+void layout_file::add_elements(
+		char const *dirname,
+		environment &env,
+		util::xml::data_node const &parentnode,
+		group_map &groupmap,
+		bool repeat,
+		bool init)
+{
+	for (util::xml::data_node const *childnode = parentnode.get_first_child(); childnode; childnode = childnode->get_next_sibling())
+	{
+		if (!strcmp(childnode->get_name(), "param"))
+		{
+			if (!repeat)
+				env.set_parameter(*childnode);
+			else
+				env.set_repeat_parameter(*childnode, init);
+		}
+		else if (!strcmp(childnode->get_name(), "element"))
+		{
+			char const *const name(env.get_attribute_string(*childnode, "name", nullptr));
+			if (!name)
+				throw layout_syntax_error("element lacks name attribute");
+			if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(env, *childnode, dirname)).second)
+				throw layout_syntax_error(util::string_format("duplicate element name %s", name));
+		}
+		else if (!strcmp(childnode->get_name(), "group"))
+		{
+			char const *const name(env.get_attribute_string(*childnode, "name", nullptr));
+			if (!name)
+				throw layout_syntax_error("group lacks name attribute");
+			if (!groupmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(*childnode)).second)
+				throw layout_syntax_error(util::string_format("duplicate group name %s", name));
+		}
+		else if (!strcmp(childnode->get_name(), "repeat"))
+		{
+			int const count(env.get_attribute_int(*childnode, "count", -1));
+			if (0 >= count)
+				throw layout_syntax_error("repeat must have positive integer count attribute");
+			environment local(env);
+			for (int i = 0; count > i; ++i)
+			{
+				add_elements(dirname, local, *childnode, groupmap, true, !i);
+				local.increment_parameters();
+			}
+		}
+		else if (repeat || (strcmp(childnode->get_name(), "view") && strcmp(childnode->get_name(), "script")))
+		{
+			throw layout_syntax_error(util::string_format("unknown layout item %s", childnode->get_name()));
+		}
+	}
 }

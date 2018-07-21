@@ -274,6 +274,7 @@ class LayoutChecker(Minifyer):
                 except:
                     self.handleError('Element mamelayout attribute version "%s" is not an integer' % (attrs['version'], ))
             self.variable_scopes.append({ })
+            self.repeat_depth.append(0)
             self.handlers.append((self.layoutStartHandler, self.layoutEndHandler))
 
     def rootEndHandler(self, name, attrs):
@@ -284,18 +285,24 @@ class LayoutChecker(Minifyer):
             if 'name' not in attrs:
                 self.handleError('Element element missing attribute name')
             else:
+                generated_name = self.VARPATTERN.match(attrs['name'])
+                if generated_name:
+                    self.generated_element_names = True
                 if attrs['name'] not in self.elements:
                     self.elements[attrs['name']] = self.formatLocation()
-                elif not self.VARPATTERN.match(attrs['name']):
+                elif not generated_name:
                     self.handleError('Element element has duplicate name (previous %s)' % (self.elements[attrs['name']], ))
             self.handlers.append((self.elementStartHandler, self.elementEndHandler))
         elif 'group' == name:
             if 'name' not in attrs:
                 self.handleError('Element group missing attribute name')
             else:
+                generated_name = self.VARPATTERN.match(attrs['name'])
+                if generated_name:
+                    self.generated_group_names = True
                 if attrs['name'] not in self.groups:
                     self.groups[attrs['name']] = self.formatLocation()
-                elif not self.VARPATTERN.match(attrs['name']):
+                elif not generated_name:
                     self.handleError('Element group has duplicate name (previous %s)' % (self.groups[attrs['name']], ))
             self.handlers.append((self.groupViewStartHandler, self.groupViewEndHandler))
             self.variable_scopes.append({ })
@@ -313,6 +320,15 @@ class LayoutChecker(Minifyer):
             self.variable_scopes.append({ })
             self.repeat_depth.append(0)
             self.have_bounds.append(False)
+        elif 'repeat' == name:
+            if 'count' not in attrs:
+                self.handleError('Element repeat missing attribute count')
+            else:
+                count = self.checkIntAttribute(name, attrs, 'count', None)
+                if (count is not None) and (0 >= count):
+                    self.handleError('Element repeat attribute count "%s" is negative' % (attrs['count'], ))
+            self.variable_scopes.append({ })
+            self.repeat_depth[-1] += 1
         elif 'param' == name:
             self.checkParameter(attrs)
             self.ignored_depth = 1
@@ -323,14 +339,19 @@ class LayoutChecker(Minifyer):
             self.ignored_depth = 1
 
     def layoutEndHandler(self, name):
-        for element in self.referenced_elements:
-            if (element not in self.elements) and (not self.VARPATTERN.match(element)):
-                self.handleError('Element "%s" not found (first referenced at %s)' % (element, self.referenced_elements[element]))
-        for group in self.referenced_groups:
-            if (group not in self.groups) and (not self.VARPATTERN.match(group)):
-                self.handleError('Group "%s" not found (first referenced at %s)' % (group, self.referenced_groups[group]))
         self.variable_scopes.pop()
-        self.handlers.pop()
+        if self.repeat_depth[-1]:
+            self.repeat_depth[-1] -= 1
+        else:
+            if not self.generated_element_names:
+                for element in self.referenced_elements:
+                    if (element not in self.elements) and (not self.VARPATTERN.match(element)):
+                        self.handleError('Element "%s" not found (first referenced at %s)' % (element, self.referenced_elements[element]))
+            if not self.generated_group_names:
+                for group in self.referenced_groups:
+                    if (group not in self.groups) and (not self.VARPATTERN.match(group)):
+                        self.handleError('Group "%s" not found (first referenced at %s)' % (group, self.referenced_groups[group]))
+            self.handlers.pop()
 
     def elementStartHandler(self, name, attrs):
         if name in self.SHAPES:
@@ -456,6 +477,8 @@ class LayoutChecker(Minifyer):
         self.repeat_depth = [ ]
         self.have_bounds = [ ]
         self.have_color = [ ]
+        self.generated_element_names = False
+        self.generated_group_names = False
         super(LayoutChecker, self).startDocument()
 
     def endDocument(self):
@@ -471,6 +494,8 @@ class LayoutChecker(Minifyer):
         del self.repeat_depth
         del self.have_bounds
         del self.have_color
+        del self.generated_element_names
+        del self.generated_group_names
         super(LayoutChecker, self).endDocument()
 
     def startElement(self, name, attrs):
