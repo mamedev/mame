@@ -1798,13 +1798,14 @@ READ8_MEMBER(pc9801_state::get_slave_ack)
 *
 ****************************************/
 
-/* basically, PC-98xx series has two xtals.
-   My guess is that both are on the PCB, and they clocks the various system components.
+/* These rates do NOT appear to represent actual XTALs. They are likely obtained in
+   different ways on different PC-98 models as divisions of extant XTAL frequencies
+   such as 14.7456 MHz, 15.9744 MHz, 19.6608 MHz and 23.9616 MHz.
    PC-9801RS needs X1 for the pit, otherwise Uchiyama Aki no Chou Bangai has sound pitch bugs
    PC-9821 definitely needs X2, otherwise there's a timer error at POST. Unless it needs a different clock anyway ...
    */
-#define MAIN_CLOCK_X1 XTAL(1'996'800)
-#define MAIN_CLOCK_X2 XTAL(2'457'600)
+#define MAIN_CLOCK_X1 1'996'800
+#define MAIN_CLOCK_X2 2'457'600
 
 /****************************************
 *
