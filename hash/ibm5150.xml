@@ -7253,6 +7253,69 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="cadaver">
+		<description>Cadaver (5.25")</description>
+		<year>1991</year>
+		<publisher>Image Works</publisher>
+		<info name="developer" value="Bitmap Brothers" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="cad1-4.img" size="368640" crc="a6e04e3d" sha1="0b381a62151674d75485ed67e1766b4799d65b36" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="cad2-4.img" size="368640" crc="3bdfca6e" sha1="39b291320c6fe714b8938684f7d78df94a366bfc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="cad3-4.img" size="368640" crc="37c30adf" sha1="2a00259831a633a3c141a9549e26291007b2d72e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="cad4-4.img" size="368640" crc="d3440817" sha1="4f0933e96c9c9e88615e36f739a70f1cf9be2a3e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cadaver35" cloneof="cadaver">
+		<description>Cadaver (3.5", Quest and Glory Compilation)</description>
+		<year>1991</year>
+		<publisher>Image Works</publisher>
+		<info name="developer" value="Bitmap Brothers" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- modified .ini file -->
+			<dataarea name="flop" size = "737280">
+				<rom name="Cadaver (USA) (Quest and Glory Compilation) (Disk 1).img" size="737280" crc="02fe1148" sha1="9859e610587361ff52e57eb4835c0f0b310d5b52" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Cadaver (USA) (Quest and Glory Compilation) (Disk 2).img" size="737280" crc="7c76c6b2" sha1="038881ae53264a48359b1843df460e1b7c3940f4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cadaver35a" cloneof="cadaver">
+		<description>Cadaver (3.5")</description>
+		<year>1991</year>
+		<publisher>Image Works</publisher>
+		<info name="developer" value="Bitmap Brothers" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- disk has gone bad -->
+			<dataarea name="flop" size = "737280">
+				<rom name="cadf1-2bad.img" size="737280" crc="296c7410" sha1="79619225c09a0c013a3b582d579aa6f2e0bfbefb" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="cadf3-4.img" size="737280" crc="89ab4461" sha1="a8904599cfec8df6d316dd43d9f19fca9937e7e2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crtoonrs">
 		<description>Cartooners</description>
 		<year>1989</year>
