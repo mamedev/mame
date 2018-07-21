@@ -104,6 +104,7 @@ private:
 	void sys80_io(address_map &map);
 	void trs80_io(address_map &map);
 	void trs80_mem(address_map &map);
+	void ht1080z_io(address_map &map);
 
 	uint8_t m_mode;
 	uint8_t m_irq;

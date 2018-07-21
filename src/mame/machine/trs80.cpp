@@ -352,6 +352,7 @@ void trs80_state::machine_start()
 void trs80_state::machine_reset()
 {
 	m_cassette_data = false;
+	// if machine has a uart but no brg, the baud is determined by dipswitch
 	if (m_io_baud)
 	{
 		const uint16_t s_bauds[8]={ 110, 300, 600, 1200, 2400, 4800, 9600, 19200 };

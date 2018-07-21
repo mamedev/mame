@@ -71,9 +71,29 @@ F8:
 
 Shift and Right-arrow will enable 32 cpl, if the hardware allows it.
 
+SYSTEM commands:
+    - Press Break (End key) to quit
+    - Press Enter to exit with error
+    - xxxx to load program xxxx from tape.
+    - / to execute last program loaded
+    - /nnnnn to execute program at nnnnn (decimal)
+
 About the system80 - Asian version of trs80l2, known as EACA Video Genie. In USA called
     PMC-80, in South Africa called TRZ-80, and Dick Smith imported them to Australia and
     New Zealand as the System 80. The Hungarian version is the ht1080z.
+    Inbuilt extensions:
+    - SYSTEM then /12288 = enable extended keyboard and flashing block cursor
+    - SYSTEM then /12299 = turn cursor back to normal
+    - SYSTEM then /12294 = enable extended keyboard only
+    - SYSTEM then /12710 = enter machine-language monitor
+    Monitor commands:
+    - B : return to Basic
+    - Dnnnn : Dump hex to screen. Press down-arrow for more. Press enter to quit.
+    - Mnnnn : Modify memory. Enter new byte and it increments to next address. X to quit.
+    - Gnnnn : Execute program at nnnn
+    - Gnnnn,tttt : as above, breakpoint at tttt
+    - R : modify registers
+    The monitor works on the radionic too.
 
 About the ht1080z - This was made for schools in Hungary. Each comes with a BASIC extension roms
     which activated Hungarian features. To activate - start emulation - enter SYSTEM
@@ -118,7 +138,7 @@ sys80:     works
            add 32 / 64 cpl switch
 
 ht1080z    works
-           add AY-3-8910
+           verify clock for AY-3-8910
            investigate expansion-box
 
 radionic:  works
@@ -139,6 +159,7 @@ lnw80:     works
 #include "emu.h"
 #include "includes/trs80.h"
 
+#include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -199,6 +220,15 @@ void trs80_state::sys80_io(address_map &map)
 	map(0xfd, 0xfd).rw(FUNC(trs80_state::printer_r), FUNC(trs80_state::printer_w));
 	map(0xfe, 0xfe).w(FUNC(trs80_state::sys80_fe_w));
 	map(0xff, 0xff).rw(FUNC(trs80_state::port_ff_r), FUNC(trs80_state::port_ff_w));
+}
+
+void trs80_state::ht1080z_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	sys80_io(map);
+	map(0x1e, 0x1e).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x1f, 0x1f).w("ay1", FUNC(ay8910_device::address_w));
 }
 
 void trs80_state::lnw80_mem(address_map &map)
@@ -540,9 +570,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::ht1080z)
 	sys80(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(ht1080z_io)
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_ht1080z)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ht1080z)
+
+	MCFG_DEVICE_ADD("ay1", AY8910, 1'500'000) // guess of clock
+	//MCFG_AY8910_PORT_A_READ_CB(...)  // ports are some kind of expansion slot
+	//MCFG_AY8910_PORT_B_READ_CB(...)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::lnw80)
