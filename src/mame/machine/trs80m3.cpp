@@ -354,9 +354,9 @@ WRITE8_MEMBER( trs80m3_state::port_ec_w )
 
 	m_maincpu->set_unscaled_clock(data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
 
-	m_mode = (m_mode & 0xde) | ((data & 4) ? 1 : 0) | ((data & 8) ? 0x20 : 0);
+	m_mode = (m_mode & 0xde) | (BIT(data, 2) ? 1 : 0) | (BIT(data, 3) ? 0x20 : 0);
 
-	m_cassette->change_state(( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR );
+	m_cassette->change_state(( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
 	m_port_ec = data & 0x7e;
 }

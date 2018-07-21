@@ -6,6 +6,13 @@
 #include "includes/trs80m3.h"
 #include "screen.h"
 
+/* Bit assignment for "m_mode"
+    d7 Page select
+    d5 enable alternate character set
+    d3 Invert characters with bit 7 set (1=invert)
+    d2 80/40 or 64/32 characters per line (1=80)
+    d0 80/64 or 40/32 characters per line (1=32) */
+
 WRITE8_MEMBER( trs80m3_state::port_88_w )
 {
 /* This is for the programming of the CRTC registers.
@@ -41,15 +48,15 @@ uint32_t trs80m3_state::screen_update_trs80m3(screen_device &screen, bitmap_ind1
 	uint8_t s_cols = cols;
 	uint8_t mask = BIT(m_mode, 5) ? 0xff : 0xbf;  /* Select Japanese or extended chars */
 
-	if (m_mode & 1)
+	if (BIT(m_mode, 0))
 	{
 		s_cols >>= 1;
 		skip = 2;
 	}
 
-	if ((m_mode & 0x7f) != m_size_store)
+	if (m_mode != m_size_store)
 	{
-		m_size_store = m_mode & 5;
+		m_size_store = m_mode;
 		screen.set_visible_area(0, s_cols*8-1, 0, rows*lines-1);
 	}
 
