@@ -8,8 +8,6 @@
 
     The TLCS-870/C appears to have a completely different encoding.
 
-    loosely based on the tlcs90 core by Luca Elia
-
 *************************************************************************************************************/
 
 #include "emu.h"
