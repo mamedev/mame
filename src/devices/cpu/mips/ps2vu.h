@@ -81,6 +81,9 @@ public:
 	void write_vu_mem(uint32_t address, uint32_t data);
 	void write_micro_mem(uint32_t address, uint64_t data);
 	float* vector_regs() { return m_v; }
+	uint64_t *micro_mem() { return &m_micro_mem[0]; }
+	uint32_t *vu_mem() { return &m_vu_mem[0]; }
+	uint32_t mem_mask() const { return m_mem_mask; }
 
 	bool running() const { return m_running; }
 	void start(uint32_t address);
@@ -127,6 +130,8 @@ protected:
 
 	void execute_upper(const uint32_t op);
 	void execute_lower(const uint32_t op);
+
+	virtual void execute_xgkick(uint32_t rs) = 0;
 
 	static int16_t immediate_s11(const uint32_t op);
 
@@ -193,6 +198,8 @@ protected:
 	void micro_map(address_map &map);
 	void vu_map(address_map &map);
 
+	void execute_xgkick(uint32_t rs) override;
+
 	required_device<ps2_gs_device> m_gs;
 	required_device<ps2_vif1_device> m_vif;
 
@@ -217,6 +224,8 @@ protected:
 
 	void micro_map(address_map &map);
 	void vu_map(address_map &map);
+
+	void execute_xgkick(uint32_t rs) override;
 
 	DECLARE_READ32_MEMBER(vu1_reg_r);
 	DECLARE_WRITE32_MEMBER(vu1_reg_w);

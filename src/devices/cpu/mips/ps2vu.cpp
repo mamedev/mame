@@ -13,6 +13,7 @@
 #include "ps2vu.h"
 #include "ps2vif1.h"
 #include "video/ps2gs.h"
+#include "video/ps2gif.h"
 #include "vudasm.h"
 #include "debugger.h"
 
@@ -626,6 +627,8 @@ void sonyvu_device::execute_lower(const uint32_t op)
 	const int rs = (op >> 11) & 31;
 	const int rt = (op >> 16) & 31;
 	const int dest = (op >> 21) & 15;
+	const int fsf = (op >> 21) & 3;
+	//const int ftf = (op >> 23) & 3;
 
 	switch ((op >> 25) & 0x7f)
 	{
@@ -685,36 +688,44 @@ void sonyvu_device::execute_lower(const uint32_t op)
 			printf("Unsupported VU instruction: FCGET\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 			break;
 		case 0x20: // B
-			printf("Unsupported VU instruction: B\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+			m_delay_pc = (m_pc + immediate_s11(op) * 8) & m_mem_mask;
 			break;
 		case 0x21: // BAL
 			if (rt)
 				m_vcr[rt] = m_pc + 8;
-			m_delay_pc = (m_pc + (immediate_s11(op) * 8)) & m_mem_mask;
+			m_delay_pc = (m_pc + immediate_s11(op) * 8) & m_mem_mask;
 			break;
 		case 0x24: // JR
 			m_delay_pc = m_vcr[rs] & m_mem_mask;
 			break;
 		case 0x25: // JALR
-			printf("Unsupported VU instruction: JALR\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+			if (rt)
+				m_vcr[rt] = m_pc + 8;
+			m_delay_pc = m_vcr[rs] & m_mem_mask;
 			break;
 		case 0x28: // IBEQ
-			printf("Unsupported VU instruction: IBEQ\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+			if (m_vcr[rs] == m_vcr[rt])
+				m_delay_pc = (m_pc + immediate_s11(op) * 8) & m_mem_mask;
 			break;
 		case 0x29: // IBNE
-			printf("Unsupported VU instruction: IBNE\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+			if (m_vcr[rs] != m_vcr[rt])
+				m_delay_pc = (m_pc + immediate_s11(op) * 8) & m_mem_mask;
 			break;
 		case 0x2c: // IBLTZ
-			printf("Unsupported VU instruction: IBLTZ\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+			if ((int16_t)m_vcr[rs] < 0)
+				m_delay_pc = (m_pc + immediate_s11(op) * 8) & m_mem_mask;
 			break;
 		case 0x2d: // IBGTZ
-			printf("Unsupported VU instruction: IBGTZ\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+			if ((int16_t)m_vcr[rs] > 0)
+				m_delay_pc = (m_pc + immediate_s11(op) * 8) & m_mem_mask;
 			break;
 		case 0x2e: // IBLEZ
-			printf("Unsupported VU instruction: IBLEZ\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+			if ((int16_t)m_vcr[rs] <= 0)
+				m_delay_pc = (m_pc + immediate_s11(op) * 8) & m_mem_mask;
 			break;
 		case 0x2f: // IBGEZ
-			printf("Unsupported VU instruction: IBGEZ\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+			if ((int16_t)m_vcr[rs] >= 0)
+				m_delay_pc = (m_pc + immediate_s11(op) * 8) & m_mem_mask;
 			break;
 		case 0x40: // SPECIAL
 		{
@@ -788,10 +799,22 @@ void sonyvu_device::execute_lower(const uint32_t op)
 						printf("Unsupported VU instruction: WAITQ\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 						break;
 					case 0x3c: // MTIR
-						printf("Unsupported VU instruction: MTIR\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+						if (rt)
+							m_vcr[rt] = (uint16_t)*reinterpret_cast<uint32_t*>(&m_vfr[rs][fsf]);
 						break;
 					case 0x3d: // MFIR
-						printf("Unsupported VU instruction: MFIR\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+						if (rt)
+						{
+							int32_t* base = reinterpret_cast<int32_t*>(m_vfr[rt]);
+							int32_t value = (int16_t)(m_vcr[rs] & 0xffff);
+							for (int field = 0; field < 4; field++)
+							{
+								if (BIT(op, 24-field))
+								{
+									base[field] = value;
+								}
+							}
+						}
 						break;
 					case 0x3e: // ILWR
 						printf("Unsupported VU instruction: ILWR\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
@@ -821,7 +844,7 @@ void sonyvu_device::execute_lower(const uint32_t op)
 						printf("Unsupported VU instruction: XITOP\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 						break;
 					case 0x6c: // XGKICK
-						printf("Unsupported VU instruction: XGKICK\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
+						execute_xgkick(rs);
 						break;
 					case 0x70: // ESADD
 						printf("Unsupported VU instruction: ESADD\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
@@ -954,6 +977,11 @@ WRITE32_MEMBER(sonyvu0_device::vu1_reg_w)
 	m_vu1_regs[offset] = data;
 }
 
+void sonyvu0_device::execute_xgkick(uint32_t rs)
+{
+	fatalerror("Unsupported VU0 instruction: XGKICK\n");
+}
+
 void sonyvu1_device::device_start()
 {
 	sonyvu_device::device_start();
@@ -997,6 +1025,18 @@ void sonyvu_device::write_vu_mem(uint32_t address, uint32_t data)
 void sonyvu_device::write_micro_mem(uint32_t address, uint64_t data)
 {
 	m_micro_mem[(address & m_mem_mask) >> 3] = data;
+}
+
+void sonyvu1_device::execute_xgkick(uint32_t rs)
+{
+	if (m_gs->interface()->path1_available())
+	{
+		m_gs->interface()->kick_path1(m_vcr[rs]);
+	}
+	else
+	{
+		m_pc -= 8;
+	}
 }
 
 void sonyvu_device::start(uint32_t address)

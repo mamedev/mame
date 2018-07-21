@@ -18,16 +18,18 @@
 #include "machine/ps2intc.h"
 
 class ps2_gif_device;
+class sonyvu1_device;
 
 class ps2_gs_device : public device_t
 {
 public:
-	template <typename T>
+	template <typename T, typename U>
 
-    ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&intc_tag)
+    ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&intc_tag, U &&vu1_tag)
     	: ps2_gs_device(mconfig, tag, owner, clock)
     {
 		m_intc.set_tag(std::forward<T>(intc_tag));
+		m_vu1.set_tag(std::forward<U>(vu1_tag));
 	}
 
 	ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -169,6 +171,7 @@ protected:
 	};
 
 	required_device<ps2_intc_device> m_intc;
+	required_device<sonyvu1_device> m_vu1;
 	required_device<ps2_gif_device> m_gif;
 
 	std::unique_ptr<uint32_t[]> m_ram;

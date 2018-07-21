@@ -17,15 +17,17 @@
 #include "emu.h"
 
 class ps2_gs_device;
+class sonyvu1_device;
 
-class ps2_gif_device : public device_t
+class ps2_gif_device : public device_t, public device_execute_interface
 {
 public:
-	template <typename T>
-    ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gs_tag)
-    	: ps2_gif_device(mconfig, tag, owner, (uint32_t)0)
+	template <typename T, typename U>
+    ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gs_tag, U &&vu1_tag)
+    	: ps2_gif_device(mconfig, tag, owner, clock)
     {
 		m_gs.set_tag(std::forward<T>(gs_tag));
+		m_vu1.set_tag(std::forward<U>(vu1_tag));
 	}
 
     ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -33,12 +35,19 @@ public:
 	DECLARE_READ32_MEMBER(read);
 	DECLARE_WRITE32_MEMBER(write);
 
+	void kick_path1(uint32_t address);
+	void write_path1(uint64_t hi, uint64_t lo);
 	void write_path3(uint64_t hi, uint64_t lo);
 	void set_path3_mask(bool masked);
+	bool path1_available() const { return !m_current_path1_tag.valid(); }
+	bool path3_available() const { return m_path3_available; }
 
 protected:
     virtual void device_start() override;
     virtual void device_reset() override;
+	virtual void execute_run() override;
+
+	void fetch_path1(uint64_t &hi, uint64_t &lo);
 
 	void gif_reset();
 
@@ -87,6 +96,8 @@ protected:
 		uint32_t m_words[4];
 	};
 
+	void process_tag(tag_t &tag, uint64_t hi, uint64_t lo);
+
 	enum : uint32_t
 	{
 		CTRL_RST = (1 << 0),
@@ -94,15 +105,24 @@ protected:
 	};
 
 	required_device<ps2_gs_device> m_gs;
+	required_device<sonyvu1_device> m_vu1;
+
+	int m_icount;
 
 	uint32_t m_ctrl;
 	uint32_t m_mode;
 	uint32_t m_stat;
-	tag_t m_current_tag; // tag0..3
+	tag_t m_current_path1_tag;
+	tag_t m_current_path3_tag;
+	tag_t m_last_tag;
 	uint32_t m_cnt;
 	uint32_t m_p3cnt;
 	uint32_t m_p3tag;
+	uint64_t m_next_path3_hi;
+	uint64_t m_next_path3_lo;
+	bool m_path3_available;
 	bool m_p3mask;
+	uint32_t m_vu_mem_address;
 };
 
 DECLARE_DEVICE_TYPE(SONYPS2_GIF, ps2_gif_device)

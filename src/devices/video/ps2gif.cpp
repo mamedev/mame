@@ -17,7 +17,9 @@ DEFINE_DEVICE_TYPE(SONYPS2_GIF, ps2_gif_device, "ps2gif", "Playstation 2 GIF")
 
 ps2_gif_device::ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SONYPS2_GIF, tag, owner, clock)
+	, device_execute_interface(mconfig, *this)
 	, m_gs(*this, finder_base::DUMMY_TAG)
+	, m_vu1(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -47,6 +49,10 @@ ps2_gif_device::tag_t::tag_t(const uint64_t hi, const uint64_t lo)
 
 void ps2_gif_device::device_start()
 {
+	set_icountptr(m_icount);
+
+	save_item(NAME(m_icount));
+
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_stat));
@@ -54,6 +60,10 @@ void ps2_gif_device::device_start()
 	save_item(NAME(m_p3cnt));
 	save_item(NAME(m_p3tag));
 	save_item(NAME(m_p3mask));
+	save_item(NAME(m_next_path3_hi));
+	save_item(NAME(m_next_path3_lo));
+	save_item(NAME(m_path3_available));
+	save_item(NAME(m_vu_mem_address));
 
 	// TODO: Save current tag
 }
@@ -72,7 +82,13 @@ void ps2_gif_device::gif_reset()
 	m_p3cnt = 0;
 	m_p3tag = 0;
 	m_p3mask = false;
-	m_current_tag = tag_t();
+	m_current_path1_tag = tag_t();
+	m_current_path3_tag = tag_t();
+	m_last_tag = tag_t();
+	m_path3_available = true;
+	m_next_path3_hi = 0;
+	m_next_path3_lo = 0;
+	m_vu_mem_address = 0;
 }
 
 READ32_MEMBER(ps2_gif_device::read)
@@ -103,22 +119,22 @@ READ32_MEMBER(ps2_gif_device::read)
 			break;
 
 		case 0x40/4: // GIF_TAG0
-			ret = m_current_tag.word(0);
+			ret = m_last_tag.word(0);
 			logerror("%s: Read: GIF_TAG0 (%08x)\n", machine().describe_context(), ret);
 			break;
 
 		case 0x50/4: // GIF_TAG1
-			ret = m_current_tag.word(1);
+			ret = m_last_tag.word(1);
 			logerror("%s: Read: GIF_TAG1 (%08x)\n", machine().describe_context(), ret);
 			break;
 
 		case 0x60/4: // GIF_TAG2
-			ret = m_current_tag.word(2);
+			ret = m_last_tag.word(2);
 			logerror("%s: Read: GIF_TAG2 (%08x)\n", machine().describe_context(), ret);
 			break;
 
 		case 0x70/4: // GIF_TAG3
-			ret = m_current_tag.word(0);
+			ret = m_last_tag.word(0);
 			logerror("%s: Read: GIF_TAG3 (%08x)\n", machine().describe_context(), ret);
 			break;
 
@@ -200,6 +216,37 @@ WRITE32_MEMBER(ps2_gif_device::write)
 	}
 }
 
+void ps2_gif_device::kick_path1(uint32_t address)
+{
+	m_vu_mem_address = address <<= 2;
+
+	uint64_t hi, lo;
+	fetch_path1(hi, lo);
+	write_path1(hi, lo);
+}
+
+void ps2_gif_device::fetch_path1(uint64_t &hi, uint64_t &lo)
+{
+	uint32_t *tag = &m_vu1->vu_mem()[m_vu_mem_address];
+	lo = ((uint64_t)tag[0] << 32) | (uint64_t)tag[1];
+	hi = ((uint64_t)tag[2] << 32) | (uint64_t)tag[3];
+	m_vu_mem_address += 4;
+	m_vu_mem_address &= m_vu1->mem_mask() >> 2;
+}
+
+void ps2_gif_device::write_path1(uint64_t hi, uint64_t lo)
+{
+	if (!m_current_path1_tag.valid())
+	{
+		m_current_path1_tag = tag_t(hi, lo);
+		printf("Starting PATH1: %08x%08x%08x%08x\n", (uint32_t)(hi >> 32), (uint32_t)hi, (uint32_t)(lo >> 32), (uint32_t)lo);
+		return;
+	}
+
+	printf("Processing PATH1: %08x%08x%08x%08x\n", (uint32_t)(hi >> 32), (uint32_t)hi, (uint32_t)(lo >> 32), (uint32_t)lo);
+	process_tag(m_current_path1_tag, hi, lo);
+}
+
 void ps2_gif_device::write_path3(uint64_t hi, uint64_t lo)
 {
 	if (m_p3mask)
@@ -207,36 +254,43 @@ void ps2_gif_device::write_path3(uint64_t hi, uint64_t lo)
 		return;
 	}
 
-	if (!m_current_tag.valid())
+	if (!m_current_path3_tag.valid())
 	{
-		m_current_tag = tag_t(hi, lo);
+		m_current_path3_tag = tag_t(hi, lo);
 		return;
 	}
 
-	switch (m_current_tag.format())
+	m_next_path3_hi = hi;
+	m_next_path3_lo = lo;
+	m_path3_available = false;
+}
+
+void ps2_gif_device::process_tag(tag_t &tag, uint64_t hi, uint64_t lo)
+{
+	m_last_tag = tag;
+	switch (tag.format())
 	{
 		case tag_t::format_t::FMT_PACKED:
-			if (m_current_tag.is_prim() && !m_current_tag.is_prim_output())
+			if (tag.is_prim() && !tag.is_prim_output())
 			{
-				m_current_tag.set_prim_output();
-				logerror("%s: PATH3: PACKED: Not yet implemented: PRIM\n", machine().describe_context());
+				tag.set_prim_output();
+				logerror("%s: GIF: PACKED: Not yet implemented: PRIM\n", machine().describe_context());
 			}
-			else if (m_current_tag.nloop())
+			else if (tag.nloop())
 			{
-				const uint8_t reg = m_current_tag.reg();
+				const uint8_t reg = tag.reg();
 				m_gs->write_packed(reg, hi, lo);
-				m_current_tag.next_reg();
+				tag.next_reg();
 			}
 			break;
 		case tag_t::format_t::FMT_REGLIST:
-			logerror("%s: PATH3: Not yet implemented: REGLIST (%08x%08x%08x%08x)\n", machine().describe_context(), (uint32_t)(hi >> 32), (uint32_t)hi, (uint32_t)(lo >> 32), (uint32_t)lo);
-			m_current_tag.loop();
+			logerror("%s: GIF: Not yet implemented: REGLIST (%08x%08x%08x%08x)\n", machine().describe_context(), (uint32_t)(hi >> 32), (uint32_t)hi, (uint32_t)(lo >> 32), (uint32_t)lo);
+			tag.loop();
 			break;
 		default:
-			//logerror("%s: PATH3: Not yet implemented: IMAGE (%08x%08x%08x%08x)\n", machine().describe_context(), (uint32_t)(hi >> 32), (uint32_t)hi, (uint32_t)(lo >> 32), (uint32_t)lo);
 			m_gs->regs_w(machine().dummy_space(), 0x54, lo);
 			m_gs->regs_w(machine().dummy_space(), 0x54, hi);
-			m_current_tag.loop();
+			tag.loop();
 			break;
 	}
 }
@@ -254,4 +308,28 @@ void ps2_gif_device::tag_t::next_reg()
 void ps2_gif_device::set_path3_mask(bool masked)
 {
 	m_p3mask = masked;
+}
+
+void ps2_gif_device::execute_run()
+{
+	while (m_icount > 0)
+	{
+		if (m_current_path1_tag.valid())
+		{
+			uint64_t hi, lo;
+			fetch_path1(hi, lo);
+			write_path1(hi, lo);
+		}
+		else if (!m_path3_available)
+		{
+			write_path3(m_next_path3_hi, m_next_path3_lo);
+			m_path3_available = false;
+		}
+		else
+		{
+			m_icount = 0;
+			break;
+		}
+		m_icount--;
+	}
 }

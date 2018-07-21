@@ -44,12 +44,13 @@ DEFINE_DEVICE_TYPE(SONYPS2_GS, ps2_gs_device, "ps2gs", "Playstation 2 GS")
 ps2_gs_device::ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SONYPS2_GS, tag, owner, clock)
 	, m_intc(*this, finder_base::DUMMY_TAG)
+	, m_vu1(*this, finder_base::DUMMY_TAG)
 	, m_gif(*this, "gif")
 {
 }
 
 MACHINE_CONFIG_START(ps2_gs_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_gif, SONYPS2_GIF, DEVICE_SELF)
+	MCFG_DEVICE_ADD(m_gif, SONYPS2_GIF, clock(), DEVICE_SELF, m_vu1)
 MACHINE_CONFIG_END
 
 void ps2_gs_device::device_start()

@@ -750,7 +750,7 @@ MACHINE_CONFIG_START(ps2sony_state::ps2sony)
 	MCFG_DEVICE_ADD(m_timer[3], SONYPS2_TIMER, 294912000/2, false)
 
 	MCFG_DEVICE_ADD(m_intc, SONYPS2_INTC, m_maincpu)
-	MCFG_DEVICE_ADD(m_gs, SONYPS2_GS, 294912000/2, m_intc)
+	MCFG_DEVICE_ADD(m_gs, SONYPS2_GS, 294912000/2, m_intc, m_vu1)
 	MCFG_DEVICE_ADD(m_dmac, SONYPS2_DMAC, 294912000/2, m_maincpu, m_ram, m_sif, m_gs, m_vu1)
 	MCFG_DEVICE_ADD(m_sif, SONYPS2_SIF, m_intc)
 
