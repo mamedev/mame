@@ -18,6 +18,7 @@ MIPS III/IV emulator.
 #include "divtlb.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
+#include "ps2vu.h"
 
 class sonyvu0_device;
 
