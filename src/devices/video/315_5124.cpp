@@ -670,7 +670,7 @@ void sega315_5124_device::check_pending_flags()
 		m_pending_status &= ~STATUS_SPROVR;
 		m_status |= STATUS_SPROVR;
 		// copy and reset the pending bits that were based on the number
-		// of the sprite that collided.
+		// of the first sprite that overflowed.
 		m_status &= m_pending_status | (STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL);
 		m_pending_status |= ~(STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL);
 	}
