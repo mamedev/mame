@@ -1122,6 +1122,15 @@ void layout_group::resolve_bounds(
 			throw layout_syntax_error(util::string_format("unknown group element %s", itemnode->get_name()));
 		}
 	}
+
+	if (envaltered && !unresolved)
+	{
+		bool const resolved(m_bounds_resolved);
+		for (group_map::value_type &group : groupmap)
+			group.second.set_bounds_unresolved();
+		m_bounds_resolved = resolved;
+	}
+
 	if (!repeat)
 		m_bounds_resolved = true;
 }
