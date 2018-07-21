@@ -79,7 +79,7 @@ enum
 //**************************************************************************
 
 // an object_transform is used to track transformations when building an object list
-struct object_transform
+struct render_target::object_transform
 {
 	float               xoffs, yoffs;       // offset transforms
 	float               xscale, yscale;     // scale transforms
