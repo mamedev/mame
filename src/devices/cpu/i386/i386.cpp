@@ -273,7 +273,7 @@ void i386_device::i386_load_segment_descriptor(int segment )
 		{
 			if( !m_performed_intersegment_jump )
 				m_sreg[segment].base |= 0xfff00000;
-			if(m_cpu_version < 0x5000)
+			if(m_cpu_version < 0x500)
 				m_sreg[segment].flags = 0x93;
 		}
 	}
