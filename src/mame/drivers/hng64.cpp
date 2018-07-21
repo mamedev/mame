@@ -1558,7 +1558,7 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	hng64_network(config);
 
 	MCFG_DEVICE_ADD("iomcu", TMP87PH40AN, 8000000)
-	MCFG_DEVICE_DISABLE() // work in progress
+	//MCFG_DEVICE_DISABLE() // work in progress
 
 MACHINE_CONFIG_END
 

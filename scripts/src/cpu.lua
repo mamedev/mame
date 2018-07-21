@@ -2381,6 +2381,11 @@ end
 if (CPUS["TLCS870"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870_ops.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870_ops_reg.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870_ops_src.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870_ops_dst.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870_ops_helper.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870.h",
 	}
 end
