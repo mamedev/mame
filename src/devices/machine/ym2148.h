@@ -20,16 +20,16 @@
 //**************************************************************************
 
 #define MCFG_YM2148_TXD_HANDLER(_devcb) \
-	devcb = &downcast<ym2148_device &>(*device).set_txd_handler(DEVCB_##_devcb);
+	downcast<ym2148_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 #define MCFG_YM2148_PORT_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<ym2148_device &>(*device).set_port_write_handler(DEVCB_##_devcb);
+	downcast<ym2148_device &>(*device).set_port_write_handler(DEVCB_##_devcb);
 
 #define MCFG_YM2148_PORT_READ_HANDLER(_devcb) \
-	devcb = &downcast<ym2148_device &>(*device).set_port_read_handler(DEVCB_##_devcb);
+	downcast<ym2148_device &>(*device).set_port_read_handler(DEVCB_##_devcb);
 
 #define MCFG_YM2148_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ym2148_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<ym2148_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 
 class ym2148_device : public device_t, public device_serial_interface

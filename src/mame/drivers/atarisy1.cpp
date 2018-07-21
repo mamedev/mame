@@ -736,12 +736,12 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 15H (TTL) or 14F (LSI)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("ymsnd", ym2151_device, reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // J106 pin 4
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // J106 pin 3
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, atarisy1_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, atarisy1_state, coin_counter_left_w))
+	LS259(config, m_outlatch); // 15H (TTL) or 14F (LSI)
+	m_outlatch->q_out_cb<0>().set("ymsnd", FUNC(ym2151_device::reset_w));
+	m_outlatch->q_out_cb<4>().set_output("led0").invert(); // J106 pin 4
+	m_outlatch->q_out_cb<5>().set_output("led1").invert(); // J106 pin 3
+	m_outlatch->q_out_cb<6>().set(FUNC(atarisy1_state::coin_counter_right_w));
+	m_outlatch->q_out_cb<7>().set(FUNC(atarisy1_state::coin_counter_left_w));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

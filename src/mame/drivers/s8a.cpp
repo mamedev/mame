@@ -47,6 +47,14 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void s8a(machine_config &config);
+
+	void init_s8a();
+
+	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+
+private:
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
@@ -64,14 +72,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s8a);
-	void init_s8a();
-	void s8a(machine_config &config);
+
 	void s8a_audio_map(address_map &map);
 	void s8a_main_map(address_map &map);
-private:
+
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
 	uint8_t m_kbdrow;
@@ -291,7 +296,7 @@ MACHINE_CONFIG_START(s8a_state::s8a)
 	MCFG_MACHINE_RESET_OVERRIDE(s8a_state, s8a)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s8a)
+	config.set_default_layout(layout_s8a);
 
 	/* Sound */
 	genpin_audio(config);

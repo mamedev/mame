@@ -727,7 +727,7 @@ void namconb1_state::namconb2_am(address_map &map)
 	map(0x800000, 0x807fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
 	map(0x900008, 0x90000f).ram().share("spritebank32");
 	map(0x940000, 0x94000f).ram().share("tilebank32");
-	map(0x980000, 0x98000f).rw(FUNC(namconb1_state::c169_roz_bank_r), FUNC(namconb1_state::c169_roz_bank_w));
+	map(0x980000, 0x98000f).ram().w(FUNC(namconb1_state::rozbank32_w)).share("rozbank32");
 	map(0xa00000, 0xa007ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 	map(0xc00000, 0xc0001f).r(FUNC(namconb1_state::custom_key_r)).nopw();
 	map(0xf00000, 0xf0001f).rw(FUNC(namconb1_state::namconb2_cpureg_r), FUNC(namconb1_state::namconb2_cpureg_w));
@@ -1049,16 +1049,16 @@ static GFXDECODE_START( gfx_namconb1 )
 	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,  0x0000, 0x10 )
 GFXDECODE_END /* gfxdecodeinfo */
 
-static GFXDECODE_START( gfx_2 )
+static GFXDECODE_START( gfx_namconb2 )
 	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,    0, tile_layout, 0x1000, 0x08 )
 	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,  0x0000, 0x10 )
-	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION, 0, roz_layout,      0x1800, 0x08 )
+	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION,     0, roz_layout,  0x1800, 0x08 )
 GFXDECODE_END /* gfxdecodeinfo2 */
 
 
 /***************************************************************/
 
-MACHINE_RESET_MEMBER(namconb1_state, namconb)
+void namconb1_state::machine_reset()
 {
 	m_pos_irq_level = 0;
 	m_unk_irq_level = 0;
@@ -1077,7 +1077,6 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	MCFG_DEVICE_IO_MAP(namcoc75_io)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
 
@@ -1097,8 +1096,8 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+	NAMCO_C116(config, m_c116, 0);
+	m_c116->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb1)
 
@@ -1112,44 +1111,26 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namconb1_state::namconb2)
-	MCFG_DEVICE_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
+	namconb1(config);
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(namconb2_am)
 
-	MCFG_DEVICE_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
-	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
-	MCFG_DEVICE_IO_MAP(namcoc75_io)
-
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namconb1_state, mcu_irq0_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namconb1_state, mcu_irq2_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namconb1_state, mcu_adc_cb, attotime::from_hz(60))
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.7)
-	MCFG_SCREEN_SIZE(NAMCONB1_HTOTAL, NAMCONB1_VTOTAL)
-	MCFG_SCREEN_VISIBLE_AREA(0, NAMCONB1_HBSTART-1, 0, NAMCONB1_VBSTART-1)
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb2)
-	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_2)
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_DEVICE_REPLACE("gfxdecode", GFXDECODE, "palette", gfx_namconb2)
+MACHINE_CONFIG_END
 
-	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
-	MCFG_GFX_PALETTE("palette")
+MACHINE_CONFIG_START(namconb1_state::machbrkr)
+	namconb2(config);
 
-	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb2)
+	MCFG_VIDEO_START_OVERRIDE(namconb1_state,machbrkr)
+MACHINE_CONFIG_END
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("c352", C352, MASTER_CLOCK/2, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
-	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
+MACHINE_CONFIG_START(namconb1_state::outfxies)
+	namconb2(config);
+
+	MCFG_VIDEO_START_OVERRIDE(namconb1_state,outfxies)
 MACHINE_CONFIG_END
 
 
@@ -2004,7 +1985,7 @@ GAME( 1996, sws96,    0,        namconb1, namconb1, namconb1_state, init_sws96, 
 GAME( 1997, sws97,    0,        namconb1, namconb1, namconb1_state, init_sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, vshoot,   0,        namconb1, namconb1, namconb1_state, init_vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, outfxies, 0,        namconb2, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, outfxiesj,outfxies, namconb2, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, machbrkr, 0,        namconb2, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
-GAME( 1995, machbrkrj,machbrkr, namconb2, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxies, 0,        outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesj,outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, machbrkr, 0,        machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
+GAME( 1995, machbrkrj,machbrkr, machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )

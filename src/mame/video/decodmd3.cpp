@@ -145,7 +145,7 @@ MACHINE_CONFIG_START(decodmd_type3_device::device_add_mconfig)
 	MCFG_MC6845_CHAR_WIDTH(16)
 	MCFG_MC6845_UPDATE_ROW_CB(decodmd_type3_device, crtc_update_row)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_ADD("dmd",RASTER)
 	MCFG_SCREEN_SIZE(192, 64)

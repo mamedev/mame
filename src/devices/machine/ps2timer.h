@@ -2,19 +2,17 @@
 // copyright-holders:Ryan Holtz
 /******************************************************************************
 *
-*   Sony Playstation 2 Timer device skeleton
+*   Sony PlayStation 2 EE timer device skeleton
 *
 *   To Do:
 *     Everything
 *
 */
 
-#ifndef MAME_MACHINE_PS2TIMER_H
-#define MAME_MACHINE_PS2TIMER_H
+#ifndef DEVICES_MACHINE_PS2TIMER_H
+#define DEVICES_MACHINE_PS2TIMER_H
 
 #pragma once
-
-#include "emu.h"
 
 class ps2_timer_device : public device_t
 {
@@ -115,4 +113,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SONYPS2_TIMER, ps2_timer_device)
 
-#endif // MAME_MACHINE_PS2TIMER_H
+#endif // DEVICES_MACHINE_PS2TIMER_H

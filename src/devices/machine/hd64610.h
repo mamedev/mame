@@ -35,10 +35,10 @@
 //**************************************************************************
 
 #define MCFG_HD64610_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<hd64610_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	downcast<hd64610_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_HD64610_OUT_1HZ_CB(_devcb) \
-	devcb = &downcast<hd64610_device &>(*device).set_out_1hz_callback(DEVCB_##_devcb);
+	downcast<hd64610_device &>(*device).set_out_1hz_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************

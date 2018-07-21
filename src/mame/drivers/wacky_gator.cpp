@@ -50,7 +50,7 @@ public:
 
 	void wackygtr(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -76,7 +76,6 @@ protected:
 
 	void program_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<pit8253_device> m_pit8253_0;
@@ -293,7 +292,7 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", wackygtr_state, nmi_timer, attotime::from_hz(100))  // FIXME
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_wackygtr)
+	config.set_default_layout(layout_wackygtr);
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();

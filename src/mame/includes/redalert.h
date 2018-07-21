@@ -45,6 +45,22 @@ public:
 	{
 	}
 
+	void redalert_video_common(machine_config &config);
+	void redalert_video(machine_config &config);
+	void ww3_video(machine_config &config);
+	void panther_video(machine_config &config);
+	void demoneye_video(machine_config &config);
+	void redalert_audio_m37b(machine_config &config);
+	void redalert_audio_voice(machine_config &config);
+	void redalert_audio(machine_config &config);
+	void ww3_audio(machine_config &config);
+	void demoneye_audio(machine_config &config);
+	void demoneye(machine_config &config);
+	void ww3(machine_config &config);
+	void panther(machine_config &config);
+	void redalert(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_bitmap_videoram;
 	required_shared_ptr<uint8_t> m_charmap_videoram;
 	required_shared_ptr<uint8_t> m_video_control;
@@ -87,25 +103,8 @@ public:
 	DECLARE_WRITE8_MEMBER(demoneye_ay8910_data_w);
 	void get_pens(pen_t *pens);
 	void get_panther_pens(pen_t *pens);
-	void demoneye(machine_config &config);
-	void ww3(machine_config &config);
-	void panther(machine_config &config);
-	void redalert(machine_config &config);
 
-protected:
 	virtual void sound_start() override;
-
-	void redalert_video_common(machine_config &config);
-	void redalert_video(machine_config &config);
-	void ww3_video(machine_config &config);
-	void panther_video(machine_config &config);
-	void demoneye_video(machine_config &config);
-
-	void redalert_audio_m37b(machine_config &config);
-	void redalert_audio_voice(machine_config &config);
-	void redalert_audio(machine_config &config);
-	void ww3_audio(machine_config &config);
-	void demoneye_audio(machine_config &config);
 
 	void redalert_main_map(address_map &map);
 	void ww3_main_map(address_map &map);
@@ -117,7 +116,6 @@ protected:
 
 	void redalert_voice_map(address_map &map);
 
-private:
 	uint8_t m_ay8910_latch_1;
 	uint8_t m_ay8910_latch_2;
 };

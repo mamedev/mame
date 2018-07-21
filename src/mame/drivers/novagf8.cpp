@@ -36,20 +36,22 @@ public:
 		: novagbase_state(mconfig, type, tag)
 	{ }
 
+	void delta1(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+private:
 	u8 m_io[2]; // F8 CPU I/O ports
 	F3853_INTERRUPT_REQ_CB(f3853_interrupt);
 
 	// Delta-1
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	DECLARE_WRITE8_MEMBER(delta1_io0_w);
 	DECLARE_WRITE8_MEMBER(delta1_io1_w);
 	DECLARE_READ8_MEMBER(delta1_io0_r);
 	DECLARE_READ8_MEMBER(delta1_io1_r);
 	void delta1_io(address_map &map);
 	void delta1_map(address_map &map);
-	void delta1(machine_config &config);
 
-protected:
 	virtual void machine_start() override;
 };
 
@@ -201,7 +203,7 @@ MACHINE_CONFIG_START(novagf8_state::delta1)
 	MCFG_F3853_EXT_INPUT_CB(novagf8_state, f3853_interrupt)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_delta1)
+	config.set_default_layout(layout_novag_delta1);
 MACHINE_CONFIG_END
 
 

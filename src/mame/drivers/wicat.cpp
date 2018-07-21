@@ -40,8 +40,8 @@ Wicat - various systems.
 class wicat_state : public driver_device
 {
 public:
-	wicat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wicat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
 		m_rtc(*this, "rtc"),
@@ -68,6 +68,9 @@ public:
 	{
 	}
 
+	void wicat(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(invalid_r);
 	DECLARE_WRITE16_MEMBER(invalid_w);
 	DECLARE_READ16_MEMBER(memmap_r);
@@ -131,14 +134,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-
-	void wicat(machine_config &config);
 	void wicat_mem(address_map &map);
 	void wicat_video_io(address_map &map);
 	void wicat_video_mem(address_map &map);
 	void wicat_wd1000_io(address_map &map);
 	void wicat_wd1000_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void driver_start() override;
@@ -826,46 +827,43 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_RS232_DSR_HANDLER(WRITELINE("uart5",mc2661_device,dsr_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("uart5",mc2661_device,cts_w))
 
-	MCFG_DEVICE_ADD("ledlatch", LS259, 0) // U19 on I/O board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wicat_state, adir_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wicat_state, bdir_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // 0 = on, 1 = off
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led3")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led4")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led5")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led6")) MCFG_DEVCB_INVERT
+	ls259_device &ledlatch(LS259(config, "ledlatch")); // U19 on I/O board
+	ledlatch.q_out_cb<0>().set(FUNC(wicat_state::adir_w));
+	ledlatch.q_out_cb<1>().set(FUNC(wicat_state::bdir_w));
+	ledlatch.q_out_cb<2>().set_output("led1").invert(); // 0 = on, 1 = off
+	ledlatch.q_out_cb<3>().set_output("led2").invert();
+	ledlatch.q_out_cb<4>().set_output("led3").invert();
+	ledlatch.q_out_cb<5>().set_output("led4").invert();
+	ledlatch.q_out_cb<6>().set_output("led5").invert();
+	ledlatch.q_out_cb<7>().set_output("led6").invert();
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("videocpu", Z8002, 8_MHz_XTAL/2)  // AMD AMZ8002DC
 	MCFG_DEVICE_PROGRAM_MAP(wicat_video_mem)
 	MCFG_DEVICE_IO_MAP(wicat_video_io)
 
-	MCFG_INPUT_MERGER_ANY_HIGH("videoirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("videocpu", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, m_videoirq).output_handler().set_inputline(m_videocpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("videoctrl", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wicat_state, crtc_irq_clear_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("tbreirq", input_merger_device, in_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("dmairq", input_merger_device, in_w<1>))
+	LS259(config, m_videoctrl);
+	m_videoctrl->q_out_cb<0>().set(FUNC(wicat_state::crtc_irq_clear_w));
+	m_videoctrl->q_out_cb<6>().set("tbreirq", FUNC(input_merger_device::in_w<1>));
+	m_videoctrl->q_out_cb<7>().set("dmairq", FUNC(input_merger_device::in_w<1>));
 	// Q1-Q5 are all used but unknown
 
-	MCFG_DEVICE_ADD("videodma", AM9517A, 8_MHz_XTAL)  // clock is a bit of guess
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, wicat_state, dma_hrq_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE("dmairq", input_merger_device, in_w<0>))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, wicat_state, vram_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, wicat_state, vram_w))
-	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8("video", i8275_device, dack_w))
+	AM9517A(config, m_videodma, 8_MHz_XTAL);  // clock is a bit of guess
+	m_videodma->out_hreq_callback().set(FUNC(wicat_state::dma_hrq_w));
+	m_videodma->out_eop_callback().set("dmairq", FUNC(input_merger_device::in_w<0>));
+	m_videodma->in_memr_callback().set(FUNC(wicat_state::vram_r));
+	m_videodma->out_memw_callback().set(FUNC(wicat_state::vram_w));
+	m_videodma->out_iow_callback<0>().set(m_crtc, FUNC(i8275_device::dack_w));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("dmairq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("videocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, INPUT_LINE_NMI);
 
 	MCFG_IM6402_ADD("videouart", 0, 1200)
 	MCFG_IM6402_DR_CALLBACK(WRITELINE("videoirq", input_merger_device, in_w<2>))
 	MCFG_IM6402_TBRE_CALLBACK(WRITELINE("tbreirq", input_merger_device, in_w<0>))
 
-	MCFG_INPUT_MERGER_ALL_HIGH("tbreirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("videoirq", input_merger_device, in_w<3>))
+	INPUT_MERGER_ALL_HIGH(config, "tbreirq").output_handler().set(m_videoirq, FUNC(input_merger_device::in_w<3>));
 
 	// terminal (2x INS2651, 1x IM6042 - one of these is for the keyboard, another communicates with the main board, the third is unknown)
 	MCFG_DEVICE_ADD("videouart0", MC2661, 5.0688_MHz_XTAL)  // the INS2651 looks similar enough to the MC2661...
@@ -879,7 +877,7 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_MC2661_TXC(19200)
 	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("videoirq", input_merger_device, in_w<4>))
 
-	MCFG_X2210_ADD("vsram")  // XD2210
+	X2210(config, "vsram");  // XD2210
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(19.6608_MHz_XTAL, 1020, 0, 800, 324, 0, 300)
@@ -894,7 +892,7 @@ MACHINE_CONFIG_START(wicat_state::wicat)
 	MCFG_I8275_VRTC_CALLBACK(WRITELINE(*this, wicat_state, crtc_irq_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEFAULT_LAYOUT(layout_wicat)
+	config.set_default_layout(layout_wicat);
 
 	/* Winchester Disk Controller (WD1000 + FD1795) */
 	MCFG_DEVICE_ADD("wd1kcpu", N8X300, 8_MHz_XTAL)

@@ -21,8 +21,8 @@
 class rbisland_state : public driver_device
 {
 public:
-	rbisland_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	rbisland_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -34,7 +34,14 @@ public:
 		m_cchip_irq_clear(*this, "cchip_irq_clear")
 	{ }
 
+	void jumping(machine_config &config);
+	void rbisland(machine_config &config);
+	void jumpingi(machine_config &config);
 
+	void init_jumping();
+	void init_rbisland();
+
+private:
 	DECLARE_WRITE16_MEMBER(jumping_sound_w);
 	DECLARE_READ8_MEMBER(jumping_latch_r);
 	DECLARE_WRITE16_MEMBER(rbisland_cchip_ctrl_w);
@@ -46,8 +53,6 @@ public:
 	DECLARE_WRITE16_MEMBER(jumping_spritectrl_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
-	void init_jumping();
-	void init_rbisland();
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(jumping);
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -56,15 +61,11 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
-	void jumping(machine_config &config);
-	void rbisland(machine_config &config);
-	void jumpingi(machine_config &config);
 	void jumping_map(address_map &map);
 	void jumping_sound_map(address_map &map);
 	void rbisland_map(address_map &map);
 	void rbisland_sound_map(address_map &map);
 
-private:
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_spriteram;
 

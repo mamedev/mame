@@ -203,7 +203,7 @@ MACHINE_CONFIG_START(mk1_state::mk1)
 	MCFG_F3853_EXT_INPUT_CB(mk1_state, mk1_interrupt)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mk1)
+	config.set_default_layout(layout_mk1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", mk1_state, mk1_update_leds, attotime::from_hz(30))
 MACHINE_CONFIG_END

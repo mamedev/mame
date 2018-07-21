@@ -33,30 +33,30 @@
 
 
 #define MCFG_MCS51_PORT_P0_IN_CB(_devcb) \
-	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_in_cb(0, DEVCB_##_devcb);
+	downcast<mcs51_cpu_device &>(*device).set_port_in_cb(0, DEVCB_##_devcb);
 #define MCFG_MCS51_PORT_P0_OUT_CB(_devcb) \
-	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_out_cb(0, DEVCB_##_devcb);
+	downcast<mcs51_cpu_device &>(*device).set_port_out_cb(0, DEVCB_##_devcb);
 
 #define MCFG_MCS51_PORT_P1_IN_CB(_devcb) \
-	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_in_cb(1, DEVCB_##_devcb);
+	downcast<mcs51_cpu_device &>(*device).set_port_in_cb(1, DEVCB_##_devcb);
 #define MCFG_MCS51_PORT_P1_OUT_CB(_devcb) \
-	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_out_cb(1, DEVCB_##_devcb);
+	downcast<mcs51_cpu_device &>(*device).set_port_out_cb(1, DEVCB_##_devcb);
 
 #define MCFG_MCS51_PORT_P2_IN_CB(_devcb) \
-	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_in_cb(2, DEVCB_##_devcb);
+	downcast<mcs51_cpu_device &>(*device).set_port_in_cb(2, DEVCB_##_devcb);
 #define MCFG_MCS51_PORT_P2_OUT_CB(_devcb) \
-	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_out_cb(2, DEVCB_##_devcb);
+	downcast<mcs51_cpu_device &>(*device).set_port_out_cb(2, DEVCB_##_devcb);
 
 #define MCFG_MCS51_PORT_P3_IN_CB(_devcb) \
-	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_in_cb(3, DEVCB_##_devcb);
+	downcast<mcs51_cpu_device &>(*device).set_port_in_cb(3, DEVCB_##_devcb);
 #define MCFG_MCS51_PORT_P3_OUT_CB(_devcb) \
-	devcb = &downcast<mcs51_cpu_device &>(*device).set_port_out_cb(3, DEVCB_##_devcb);
+	downcast<mcs51_cpu_device &>(*device).set_port_out_cb(3, DEVCB_##_devcb);
 
 #define MCFG_MCS51_SERIAL_RX_CB(_devcb) \
-	devcb = &downcast<mcs51_cpu_device &>(*device).set_serial_rx_cb(DEVCB_##_devcb);
+	downcast<mcs51_cpu_device &>(*device).set_serial_rx_cb(DEVCB_##_devcb);
 
 #define MCFG_MCS51_SERIAL_TX_CB(_devcb) \
-	devcb = &downcast<mcs51_cpu_device &>(*device).set_serial_tx_cb(DEVCB_##_devcb);
+	downcast<mcs51_cpu_device &>(*device).set_serial_tx_cb(DEVCB_##_devcb);
 
 
 enum
@@ -100,6 +100,8 @@ public:
 	void set_port_forced_input(uint8_t port, uint8_t forced_input) { m_forced_inputs[port] = forced_input; }
 	template<class Object> devcb_base &set_serial_rx_cb(Object &&cb) { return m_serial_rx_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_serial_tx_cb(Object &&cb) { return m_serial_tx_cb.set_callback(std::forward<Object>(cb)); }
+	template <unsigned N> auto port_in_cb() { return m_port_in_cb[N].bind(); }
+	template <unsigned N> auto port_out_cb() { return m_port_out_cb[N].bind(); }
 
 	void program_internal(address_map &map);
 	void data_internal(address_map &map);
@@ -357,6 +359,8 @@ DECLARE_DEVICE_TYPE(I8032, i8032_device)
 /* variants 4k internal rom and 128 byte internal memory */
 DECLARE_DEVICE_TYPE(I8051, i8051_device)
 DECLARE_DEVICE_TYPE(I8751, i8751_device)
+/* variants 8k internal rom and 128 byte internal memory (no 8052 features) */
+DECLARE_DEVICE_TYPE(AM8753, am8753_device)
 /* variants 8k internal rom and 256 byte internal memory and more registers */
 DECLARE_DEVICE_TYPE(I8052, i8052_device)
 DECLARE_DEVICE_TYPE(I8752, i8752_device)
@@ -394,6 +398,13 @@ class i8751_device : public mcs51_cpu_device
 public:
 	// construction/destruction
 	i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class am8753_device : public mcs51_cpu_device
+{
+public:
+	// construction/destruction
+	am8753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

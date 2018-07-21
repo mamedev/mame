@@ -52,10 +52,10 @@ WRITE_LINE_MEMBER(ti99_single_cart_conn_device::romgq_line)
 /*
     Combined select lines
 */
-WRITE8_MEMBER(ti99_single_cart_conn_device::set_gromlines)
+void ti99_single_cart_conn_device::set_gromlines(line_state mline, line_state moline, line_state gsq)
 {
 	// Pass through
-	m_cartridge->set_gromlines(space, offset, data);
+	m_cartridge->set_gromlines(mline, moline, gsq);
 }
 
 

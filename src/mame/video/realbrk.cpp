@@ -70,36 +70,15 @@ WRITE16_MEMBER(realbrk_state::dai2kaku_flipscreen_w)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_0)
+template<int Layer>
+TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info)
 {
-	uint16_t attr = m_vram_0[tile_index * 2 + 0];
-	uint16_t code = m_vram_0[tile_index * 2 + 1];
+	uint16_t attr = m_vram[Layer][tile_index * 2 + 0];
+	uint16_t code = m_vram[Layer][tile_index * 2 + 1];
 	SET_TILE_INFO_MEMBER(0,
 			code,
 			attr & 0x7f,
 			TILE_FLIPYX( attr >> 14 ));
-}
-
-TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_1)
-{
-	uint16_t attr = m_vram_1[tile_index * 2 + 0];
-	uint16_t code = m_vram_1[tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(0,
-			code,
-			attr & 0x7f,
-			TILE_FLIPYX( attr >> 14 ));
-}
-
-WRITE16_MEMBER(realbrk_state::vram_0_w)
-{
-	COMBINE_DATA(&m_vram_0[offset]);
-	m_tilemap_0->mark_tile_dirty(offset/2);
-}
-
-WRITE16_MEMBER(realbrk_state::vram_1_w)
-{
-	COMBINE_DATA(&m_vram_1[offset]);
-	m_tilemap_1->mark_tile_dirty(offset/2);
 }
 
 /***************************************************************************
@@ -118,7 +97,7 @@ WRITE16_MEMBER(realbrk_state::vram_1_w)
 
 TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_2)
 {
-	uint16_t code = m_vram_2[tile_index];
+	uint16_t code = m_vram[2][tile_index];
 	SET_TILE_INFO_MEMBER(1,
 			code & 0x0fff,
 			((code & 0xf000) >> 12) | ((m_vregs[0xa/2] & 0x7f) << 4),
@@ -127,11 +106,9 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_2)
 
 WRITE16_MEMBER(realbrk_state::vram_2_w)
 {
-	COMBINE_DATA(&m_vram_2[offset]);
-	m_tilemap_2->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vram[2][offset]);
+	m_tilemap[2]->mark_tile_dirty(offset);
 }
-
-
 
 /***************************************************************************
 
@@ -144,15 +121,15 @@ WRITE16_MEMBER(realbrk_state::vram_2_w)
 void realbrk_state::video_start()
 {
 	/* Backgrounds */
-	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
-	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
 
 	/* Text */
-	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS,  8,  8, 0x40, 0x20);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS,  8,  8, 0x40, 0x20);
 
-	m_tilemap_0->set_transparent_pen(0);
-	m_tilemap_1->set_transparent_pen(0);
-	m_tilemap_2->set_transparent_pen(0);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[2]->set_transparent_pen(0);
 
 	m_tmpbitmap0 = std::make_unique<bitmap_ind16>(32,32);
 	m_tmpbitmap1 = std::make_unique<bitmap_ind16>(32,32);
@@ -190,8 +167,10 @@ void realbrk_state::video_start()
         8.w     fe-- ---- ---- ----
                 --d- ---- ---- ----     Flip Y
                 ---c ---- ---- ----     Flip X
+                ---- ba98 76-- ----
                 ---- ---- --54 ----     Rotation
-                ---- ba98 76-- 3210     Priority?
+                ---- ---- ---- 32--
+                ---- ---- ---- --10     Priority
 
         A.w     fedc b--- ---- ----
                 ---- -a98 7654 3210     Color
@@ -205,7 +184,7 @@ void realbrk_state::video_start()
 
 ***************************************************************************/
 
-void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer)
 {
 	int offs;
 
@@ -216,16 +195,15 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 	for ( offs = 0x3000/2; offs < 0x3600/2; offs += 2/2 )
 	{
-		int sx, sy, dim, zoom, flip, color, attr, code, flipx, flipy, gfx, rot;
+		int sx, sy, dim, zoom, flip, color, attr, code, flipx, flipy, gfx, rot, pri;
 
 		int x, xdim, xnum, xstart, xend, xinc;
 		int y, ydim, ynum, ystart, yend, yinc;
 
-		uint16_t *s;
+		if (m_spriteram[offs] & 0x8000)
+			continue;
 
-		if (m_spriteram[offs] & 0x8000) continue;
-
-		s       =       &m_spriteram[(m_spriteram[offs] & 0x3ff) * 16/2];
+		uint16_t const *const s =       &m_spriteram[(m_spriteram[offs] & 0x3ff) * 16/2];
 
 		sy      =       s[ 0 ];
 		sx      =       s[ 1 ];
@@ -236,12 +214,17 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		attr    =       s[ 6 ];
 		code    =       s[ 7 ];
 
+		pri     =       flip & 0x03;
+
+		if(pri != layer)
+			continue;
+
 		xnum    =       ((dim >> 0) & 0x1f) + 1;
 		ynum    =       ((dim >> 8) & 0x1f) + 1;
 
 		flipx   =       flip & 0x0100;
 		flipy   =       flip & 0x0200;
-		rot     =       flip & 0x0030;
+		rot     =       (flip & 0x0030) >> 4;
 
 		gfx     =       (attr & 0x0001) + 2;
 
@@ -301,7 +284,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 				switch( rot )
 				{
-					case 0x10: // rot 90
+					case 0x1: // rot 90
 						copyrozbitmap_trans( *m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
 							(uint32_t)0<<16,
 							(uint32_t)16<<16,
@@ -317,7 +300,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 							copybitmap_trans( bitmap,*m_tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
 						break;
 
-					case 0x20: // rot 180
+					case 0x2: // rot 180
 						copyrozbitmap_trans( *m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
 							(uint32_t)16<<16,
 							(uint32_t)16<<16,
@@ -333,7 +316,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 							copybitmap_trans( bitmap,*m_tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
 						break;
 
-					case 0x30: // rot 270
+					case 0x3: // rot 270
 						copyrozbitmap_trans( *m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
 							(uint32_t)16<<16,
 							(uint32_t)0<<16,
@@ -476,7 +459,7 @@ WRITE16_MEMBER(realbrk_state::vregs_w)
 	if (new_data != old_data)
 	{
 		if (offset == 0xa/2)
-			m_tilemap_0->mark_all_dirty();
+			m_tilemap[0]->mark_all_dirty();
 	}
 }
 
@@ -484,11 +467,11 @@ uint32_t realbrk_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	int layers_ctrl = -1;
 
-	m_tilemap_0->set_scrolly(0, m_vregs[0x0/2]);
-	m_tilemap_0->set_scrollx(0, m_vregs[0x2/2]);
+	m_tilemap[0]->set_scrolly(0, m_vregs[0x0/2]);
+	m_tilemap[0]->set_scrollx(0, m_vregs[0x2/2]);
 
-	m_tilemap_1->set_scrolly(0, m_vregs[0x4/2]);
-	m_tilemap_1->set_scrollx(0, m_vregs[0x6/2]);
+	m_tilemap[1]->set_scrolly(0, m_vregs[0x4/2]);
+	m_tilemap[1]->set_scrollx(0, m_vregs[0x6/2]);
 
 #ifdef MAME_DEBUG
 if ( machine().input().code_pressed(KEYCODE_Z) )
@@ -510,12 +493,18 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 	else
 		bitmap.fill(m_vregs[0xc/2] & 0x7fff, cliprect);
 
-	if (layers_ctrl & 2)    m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
-	if (layers_ctrl & 1)    m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
+	if (layers_ctrl & 8)    draw_sprites(bitmap,cliprect,3); // Unknown
+	if (layers_ctrl & 8)    draw_sprites(bitmap,cliprect,2); // Under m_tilemap[1], Under m_tilemap[0]
 
-	if (layers_ctrl & 8)    draw_sprites(bitmap,cliprect);
+	if (layers_ctrl & 2)    m_tilemap[1]->draw(screen, bitmap, cliprect, 0,0);
 
-	if (layers_ctrl & 4)    m_tilemap_2->draw(screen, bitmap, cliprect, 0,0);
+	if (layers_ctrl & 8)    draw_sprites(bitmap,cliprect,1); // Over m_tilemap[1], Under m_tilemap[0]
+
+	if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, bitmap, cliprect, 0,0);
+
+	if (layers_ctrl & 8)    draw_sprites(bitmap,cliprect,0); // Over m_tilemap[1], Over m_tilemap[0]
+
+	if (layers_ctrl & 4)    m_tilemap[2]->draw(screen, bitmap, cliprect, 0,0);
 
 //  popmessage("%04x",m_vregs[0x8/2]);
 	return 0;
@@ -525,40 +514,36 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 uint32_t realbrk_state::screen_update_dai2kaku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
-	int offs, bgx0, bgy0, bgx1, bgy1;
+	int offs;
 
-	bgy0 = m_vregs[0x0/2];
-	bgx0 = m_vregs[0x2/2];
-	bgy1 = m_vregs[0x4/2];
-	bgx1 = m_vregs[0x6/2];
+	int const bgy0 = m_vregs[0x0/2];
+	int const bgx0 = m_vregs[0x2/2];
+	int const bgy1 = m_vregs[0x4/2];
+	int const bgx1 = m_vregs[0x6/2];
 
 	// bg0
-	m_tilemap_0->set_scroll_rows(512);
-	m_tilemap_0->set_scroll_cols(1);
 	if( m_vregs[8/2] & (0x0100)){
+		m_tilemap[0]->set_scroll_rows(512);
 		for(offs=0; offs<(512); offs++) {
-			m_tilemap_0->set_scrollx(offs, bgx0 - (m_vram_1ras[offs]&0x3ff) );
+			m_tilemap[0]->set_scrollx(offs, bgx0 - (m_vram_ras[1][offs]&0x3ff) );
 		}
 	} else {
-		for(offs=0; offs<(512); offs++) {
-			m_tilemap_0->set_scrollx(offs, bgx0 );
-		}
+		m_tilemap[0]->set_scroll_rows(1);
+		m_tilemap[0]->set_scrollx(0, bgx0 );
 	}
-	m_tilemap_0->set_scrolly(0, bgy0 );
+	m_tilemap[0]->set_scrolly(0, bgy0 );
 
 	// bg1
-	m_tilemap_1->set_scroll_rows(512);
-	m_tilemap_1->set_scroll_cols(1);
 	if( m_vregs[8/2] & (0x0001)){
+		m_tilemap[1]->set_scroll_rows(512);
 		for(offs=0; offs<(512); offs++) {
-			m_tilemap_1->set_scrollx(offs, bgx1 - (m_vram_1ras[offs]&0x3ff) );
+			m_tilemap[1]->set_scrollx(offs, bgx1 - (m_vram_ras[1][offs]&0x3ff) );
 		}
 	} else {
-		for(offs=0; offs<(512); offs++) {
-			m_tilemap_1->set_scrollx(offs, bgx1 );
-		}
+		m_tilemap[1]->set_scroll_rows(1);
+		m_tilemap[1]->set_scrollx(0, bgx1 );
 	}
-	m_tilemap_1->set_scrolly(0, bgy1 );
+	m_tilemap[1]->set_scrolly(0, bgy1 );
 
 #ifdef MAME_DEBUG
 if ( machine().input().code_pressed(KEYCODE_Z) )
@@ -587,9 +572,9 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 
 	// bglow
 	if( m_vregs[8/2] & (0x8000)){
-		if (layers_ctrl & 1)    m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
+		if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, bitmap, cliprect, 0,0);
 	} else {
-		if (layers_ctrl & 2)    m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
+		if (layers_ctrl & 2)    m_tilemap[1]->draw(screen, bitmap, cliprect, 0,0);
 	}
 
 	// spr 1
@@ -597,16 +582,16 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 
 	// bghigh
 	if( m_vregs[8/2] & (0x8000)){
-		if (layers_ctrl & 2)    m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
+		if (layers_ctrl & 2)    m_tilemap[1]->draw(screen, bitmap, cliprect, 0,0);
 	} else {
-		if (layers_ctrl & 1)    m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
+		if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, bitmap, cliprect, 0,0);
 	}
 
 	// spr 2
 	if (layers_ctrl & 8)    dai2kaku_draw_sprites(bitmap,cliprect,0);
 
 	// fix
-	if (layers_ctrl & 4)    m_tilemap_2->draw(screen, bitmap, cliprect, 0,0);
+	if (layers_ctrl & 4)    m_tilemap[2]->draw(screen, bitmap, cliprect, 0,0);
 
 //  usrintf_showmessage("%04x",m_vregs[0x8/2]);
 	return 0;

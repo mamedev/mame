@@ -23,11 +23,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-
 	void vector4(machine_config &config);
+
+private:
 	void vector4_io(address_map &map);
 	void vector4_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
@@ -73,13 +74,13 @@ MACHINE_CONFIG_START(vector4_state::vector4)
 	MCFG_DEVICE_IO_MAP(vector4_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart2", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart2", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart3", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart3", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
+	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_rxc));
+	uart_clock.signal_handler().append("uart3", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart3", FUNC(i8251_device::write_rxc));
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))

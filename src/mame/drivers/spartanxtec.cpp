@@ -48,7 +48,7 @@ public:
 
 	void spartanxtec(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -66,7 +66,6 @@ protected:
 	void spartanxtec_sound_io(address_map &map);
 	void spartanxtec_sound_map(address_map &map);
 
-private:
 	required_shared_ptr<uint8_t> m_m62_tileram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scroll_lo;

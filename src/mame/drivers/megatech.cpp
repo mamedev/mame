@@ -710,7 +710,7 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mtech_state, megatech)
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
+	config.set_default_layout(layout_dualhovu);
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \

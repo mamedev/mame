@@ -358,35 +358,35 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_DEVICE_IO_MAP(duet16_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("i8741", I8741, 20_MHz_XTAL / 4)
+	I8741(config, "i8741", 20_MHz_XTAL / 4);
 
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("dmac", AM9517A, 20_MHz_XTAL / 4)
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, duet16_state, hrq_w))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, duet16_state, dma_mem_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, duet16_state, dma_mem_w))
-	MCFG_AM9517A_IN_IOR_0_CB(READ8("fdc", upd765a_device, mdma_r))
-	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8("fdc", upd765a_device, mdma_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE("fdc", upd765a_device, tc_line_w))
+	AM9517A(config, m_dmac, 20_MHz_XTAL / 4);
+	m_dmac->out_hreq_callback().set(FUNC(duet16_state::hrq_w));
+	m_dmac->in_memr_callback().set(FUNC(duet16_state::dma_mem_r));
+	m_dmac->out_memw_callback().set(FUNC(duet16_state::dma_mem_w));
+	m_dmac->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::mdma_r));
+	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::mdma_w));
+	m_dmac->out_eop_callback().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
-	MCFG_DEVICE_ADD("bgpit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(8_MHz_XTAL / 13)
-	MCFG_PIT8253_CLK1(8_MHz_XTAL / 13)
-	MCFG_PIT8253_CLK2(8_MHz_XTAL / 13)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("sio", upd7201_new_device, txca_w)) // TODO: selected through LS153
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", upd7201_new_device, rxca_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("sio", upd7201_new_device, txcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", upd7201_new_device, rxcb_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("kbusart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("kbusart", i8251_device, write_rxc))
+	pit8253_device &bgpit(PIT8253(config, "bgpit", 0));
+	bgpit.set_clk<0>(8_MHz_XTAL / 13);
+	bgpit.set_clk<1>(8_MHz_XTAL / 13);
+	bgpit.set_clk<2>(8_MHz_XTAL / 13);
+	bgpit.out_handler<0>().set("sio", FUNC(upd7201_new_device::txca_w)); // TODO: selected through LS153
+	bgpit.out_handler<0>().append("sio", FUNC(upd7201_new_device::rxca_w));
+	bgpit.out_handler<1>().set("sio", FUNC(upd7201_new_device::txcb_w));
+	bgpit.out_handler<1>().append("sio", FUNC(upd7201_new_device::rxcb_w));
+	bgpit.out_handler<2>().set("kbusart", FUNC(i8251_device::write_txc));
+	bgpit.out_handler<2>().append("kbusart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("itm", PTM6840, 0)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0.0, 0.0, (8_MHz_XTAL / 8).dvalue()) // C3 = 1MHz
-	MCFG_PTM6840_O3_CB(WRITELINE("itm", ptm6840_device, set_c1)) // C1 = C2 = O3
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("itm", ptm6840_device, set_c2))
-	MCFG_PTM6840_IRQ_CB(WRITELINE("tmint", input_merger_device, in_w<0>))
+	ptm6840_device &itm(PTM6840(config, "itm", 0));
+	itm.set_external_clocks(0.0, 0.0, (8_MHz_XTAL / 8).dvalue()); // C3 = 1MHz
+	itm.o3_callback().set("itm", FUNC(ptm6840_device::set_c1)); // C1 = C2 = O3
+	itm.o3_callback().append("itm", FUNC(ptm6840_device::set_c2));
+	itm.irq_callback().set(m_tmint, FUNC(input_merger_device::in_w<0>));
 
 	MCFG_DEVICE_ADD("sio", UPD7201_NEW, 8_MHz_XTAL / 2)
 	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("pic", pic8259_device, ir1_w)) // INT5

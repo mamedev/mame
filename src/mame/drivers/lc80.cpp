@@ -337,7 +337,7 @@ MACHINE_CONFIG_START(lc80_state::lc80)
 	MCFG_DEVICE_IO_MAP(lc80_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_lc80 )
+	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -376,7 +376,7 @@ MACHINE_CONFIG_START(lc80_state::lc80_2)
 	MCFG_DEVICE_IO_MAP(lc80_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_lc80 )
+	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

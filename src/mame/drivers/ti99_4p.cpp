@@ -152,6 +152,9 @@ public:
 		m_alpha(*this, "ALPHA")
 	{ }
 
+	void ti99_4p_60hz(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
 	DECLARE_WRITE_LINE_MEMBER( extint );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
@@ -186,11 +189,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
 
-	void ti99_4p_60hz(machine_config &config);
 	void cru_map(address_map &map);
 	void memmap(address_map &map);
 	void memmap_setoffset(address_map &map);
-private:
+
 	void    datamux_clock_in(int clock);
 
 	// Devices

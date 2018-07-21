@@ -23,25 +23,25 @@
 #define MCFG_DMAC_ADD(_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, AMIGA_DMAC, _clock)
 #define MCFG_DMAC_CFGOUT_HANDLER(_devcb) \
-	devcb = &downcast<amiga_dmac_device &>(*device).set_cfgout_handler(DEVCB_##_devcb);
+	downcast<amiga_dmac_device &>(*device).set_cfgout_handler(DEVCB_##_devcb);
 
 #define MCFG_DMAC_INT_HANDLER(_devcb) \
-	devcb = &downcast<amiga_dmac_device &>(*device).set_int_handler(DEVCB_##_devcb);
+	downcast<amiga_dmac_device &>(*device).set_int_handler(DEVCB_##_devcb);
 
 #define MCFG_DMAC_XDACK_HANDLER(_devcb) \
-	devcb = &downcast<amiga_dmac_device &>(*device).set_xdack_handler(DEVCB_##_devcb);
+	downcast<amiga_dmac_device &>(*device).set_xdack_handler(DEVCB_##_devcb);
 
 #define MCFG_DMAC_SCSI_READ_HANDLER(_devcb) \
-	devcb = &downcast<amiga_dmac_device &>(*device).set_scsi_read_handler(DEVCB_##_devcb);
+	downcast<amiga_dmac_device &>(*device).set_scsi_read_handler(DEVCB_##_devcb);
 
 #define MCFG_DMAC_SCSI_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<amiga_dmac_device &>(*device).set_scsi_write_handler(DEVCB_##_devcb);
+	downcast<amiga_dmac_device &>(*device).set_scsi_write_handler(DEVCB_##_devcb);
 
 #define MCFG_DMAC_IO_READ_HANDLER(_devcb) \
-	devcb = &downcast<amiga_dmac_device &>(*device).set_io_read_handler(DEVCB_##_devcb);
+	downcast<amiga_dmac_device &>(*device).set_io_read_handler(DEVCB_##_devcb);
 
 #define MCFG_DMAC_IO_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<amiga_dmac_device &>(*device).set_io_write_handler(DEVCB_##_devcb);
+	downcast<amiga_dmac_device &>(*device).set_io_write_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

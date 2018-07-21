@@ -1369,7 +1369,7 @@ MACHINE_CONFIG_START(dkong_state::radarscp1_audio)
 	MCFG_DEVICE_IO_MAP(radarscp1_sound_io_map)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8("virtual_p1", latch8_device, read))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dkong_state, m58817_command_w))
-	MCFG_MCS48_PORT_P2_IN_CB(NOOP)
+	MCFG_MCS48_PORT_P2_IN_CB(CONSTANT(0))
 
 	/* virtual_p2 is not read -see memory map-, all bits are output bits */
 	MCFG_LATCH8_ADD( "virtual_p1" ) /* virtual latch for port A */

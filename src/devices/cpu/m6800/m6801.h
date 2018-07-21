@@ -51,9 +51,9 @@ enum
 
 
 #define MCFG_M6801_SC2(_devcb) \
-	devcb = &downcast<m6801_cpu_device &>(*device).set_out_sc2_func(DEVCB_##_devcb);
+	downcast<m6801_cpu_device &>(*device).set_out_sc2_func(DEVCB_##_devcb);
 #define MCFG_M6801_SER_TX(_devcb) \
-	devcb = &downcast<m6801_cpu_device &>(*device).set_out_sertx_func(DEVCB_##_devcb);
+	downcast<m6801_cpu_device &>(*device).set_out_sertx_func(DEVCB_##_devcb);
 
 
 class m6801_cpu_device : public m6800_cpu_device

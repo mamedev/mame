@@ -106,6 +106,12 @@ public:
 		, m_cart(*this, "cartslot")
 	{}
 
+	void pencil2(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
+
+private:
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_WRITE8_MEMBER(port80_w);
@@ -113,12 +119,9 @@ public:
 	DECLARE_READ8_MEMBER(porte2_r);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
-	void pencil2(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	int m_centronics_busy;
 	int m_centronics_ack;

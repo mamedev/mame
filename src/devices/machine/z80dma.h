@@ -42,25 +42,25 @@
 //**************************************************************************
 
 #define MCFG_Z80DMA_OUT_BUSREQ_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_out_busreq_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_out_busreq_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_OUT_INT_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_OUT_BAO_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_out_bao_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_out_bao_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_IN_MREQ_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_in_mreq_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_in_mreq_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_OUT_MREQ_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_out_mreq_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_out_mreq_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_IN_IORQ_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_in_iorq_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_in_iorq_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80DMA_OUT_IORQ_CB(_devcb) \
-	devcb = &downcast<z80dma_device &>(*device).set_out_iorq_callback(DEVCB_##_devcb);
+	downcast<z80dma_device &>(*device).set_out_iorq_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -84,6 +84,13 @@ public:
 	template <class Object> devcb_base &set_out_mreq_callback(Object &&cb) { return m_out_mreq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_in_iorq_callback(Object &&cb) { return m_in_iorq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_iorq_callback(Object &&cb) { return m_out_iorq_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_busreq_callback() { return m_out_busreq_cb.bind(); }
+	auto out_int_callback() { return m_out_int_cb.bind(); }
+	auto out_bao_callback() { return m_out_bao_cb.bind(); }
+	auto in_mreq_callback() { return m_in_mreq_cb.bind(); }
+	auto out_mreq_callback() { return m_out_mreq_cb.bind(); }
+	auto in_iorq_callback() { return m_in_iorq_cb.bind(); }
+	auto out_iorq_callback() { return m_out_iorq_cb.bind(); }
 
 	uint8_t read();
 	void write(uint8_t data);

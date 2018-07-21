@@ -43,8 +43,8 @@ class micro3d_sound_device;
 class micro3d_state : public driver_device
 {
 public:
-	micro3d_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	micro3d_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_upd7759(*this, "upd7759"),

@@ -94,6 +94,9 @@ public:
 		, m_cart(*this, "cartslot")
 	{ }
 
+	void squale(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_READ8_MEMBER(video_ram_read_reg1);
 	DECLARE_READ8_MEMBER(video_ram_read_reg2);
@@ -134,9 +137,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
 
-	void squale(machine_config &config);
 	void squale_mem(address_map &map);
-private:
+
 	required_device<acia6850_device> m_acia;
 	required_device<ay8910_device> m_ay8910;
 	required_device<pia6821_device> m_pia_u72;

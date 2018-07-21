@@ -35,14 +35,16 @@ public:
 		, m_crtc(*this, "crtc")
 	{ }
 
+	void tim100(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
-	void tim100(machine_config &config);
 	void tim100_io(address_map &map);
 	void tim100_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	uint8_t *m_charmap;
 	uint16_t m_dma_adr;
@@ -185,33 +187,33 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 
 	MCFG_PALETTE_ADD("palette", 3)
 
-	MCFG_DEVICE_ADD("uart_u17", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	i8251_device &uart_u17(I8251(config, "uart_u17", 0));
+	uart_u17.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart_u17.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart_u17.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart_u17", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart_u17", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart_u17", i8251_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", tim100)
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set("uart_u17", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("uart_u17", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("uart_u17", FUNC(i8251_device::write_cts));
+	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(tim100));
 
-	MCFG_DEVICE_ADD("uart_u18", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232a", rs232_port_device, write_rts))
+	i8251_device &uart_u18(I8251(config, "uart_u18", 0));
+	uart_u18.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
+	uart_u18.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	uart_u18.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal") //"keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart_u18", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart_u18", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart_u18", i8251_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", tim100)
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal")); //"keyboard"));
+	rs232a.rxd_handler().set("uart_u18", FUNC(i8251_device::write_rxd));
+	rs232a.dsr_handler().set("uart_u18", FUNC(i8251_device::write_dsr));
+	rs232a.cts_handler().set("uart_u18", FUNC(i8251_device::write_cts));
+	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(tim100));
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart_u17", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart_u17", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart_u18", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart_u18", i8251_device, write_rxc))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153'600));
+	uart_clock.signal_handler().set("uart_u17", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart_u17", FUNC(i8251_device::write_rxc));
+	uart_clock.signal_handler().append("uart_u18", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("uart_u18", FUNC(i8251_device::write_rxc));
 MACHINE_CONFIG_END
 
 /* ROM definition */

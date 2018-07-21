@@ -179,10 +179,16 @@ bool device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 	{
 		int liveindex = m_dynindex++ % m_dynamic;
 
+
 		// if an entry already exists at this index, free it
-		if (m_live[liveindex] != 0 && m_refcnt[m_live[liveindex] - 1] <= 1)
-			m_table[m_live[liveindex] - 1] = 0;
-        m_refcnt[m_live[liveindex] - 1]--;
+		if (m_live[liveindex] != 0)
+		{
+			if (m_refcnt[m_live[liveindex] - 1] <= 1)
+				m_table[m_live[liveindex] - 1] = 0;
+			else
+				m_refcnt[m_live[liveindex] - 1]--;
+		}
+
 
 		// claim this new entry
 		m_live[liveindex] = tableindex + 1;

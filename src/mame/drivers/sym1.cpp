@@ -56,6 +56,11 @@ public:
 		m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void sym1(machine_config &config);
+
+	void init_sym1();
+
+private:
 	required_shared_ptr<uint8_t> m_ram_1k;
 	required_shared_ptr<uint8_t> m_ram_2k;
 	required_shared_ptr<uint8_t> m_ram_3k;
@@ -64,7 +69,6 @@ public:
 	uint8_t m_riot_port_a;
 	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
-	void init_sym1();
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_CALLBACK_MEMBER(led_refresh);
@@ -80,9 +84,8 @@ public:
 	DECLARE_WRITE8_MEMBER(riot_b_w);
 	DECLARE_WRITE8_MEMBER(via3_a_w);
 
-	void sym1(machine_config &config);
 	void sym1_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<ttl74145_device> m_ttl74145;
@@ -329,7 +332,7 @@ MACHINE_CONFIG_START(sym1_state::sym1)
 	MCFG_DEVICE_ADD("maincpu", M6502, SYM1_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(sym1_map)
 
-	MCFG_DEFAULT_LAYOUT(layout_sym1)
+	config.set_default_layout(layout_sym1);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

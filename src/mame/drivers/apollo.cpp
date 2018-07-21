@@ -1098,7 +1098,7 @@ MACHINE_CONFIG_START(apollo_state::dsp3500)
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M")
 
 	/* terminal hardware */
-	MCFG_DEFAULT_LAYOUT( layout_apollo_dsp )
+	config.set_default_layout(layout_apollo_dsp);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apollo_state::dn3500_19i)
@@ -1156,7 +1156,7 @@ MACHINE_CONFIG_START(apollo_state::dsp3000)
 	MCFG_RAM_MODIFY("messram")
 
 	/* terminal hardware */
-	MCFG_DEFAULT_LAYOUT( layout_apollo_dsp )
+	config.set_default_layout(layout_apollo_dsp);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apollo_state::dn3000_19i)
@@ -1197,7 +1197,7 @@ MACHINE_CONFIG_START(apollo_state::dsp5500)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* terminal hardware */
-	MCFG_DEFAULT_LAYOUT( layout_apollo_dsp )
+	config.set_default_layout(layout_apollo_dsp);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apollo_state::dn5500_19i)

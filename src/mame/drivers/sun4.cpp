@@ -552,6 +552,14 @@ public:
 	{
 	}
 
+	void sun4c(machine_config &config);
+	void sun4(machine_config &config);
+
+	void init_sun4();
+	void init_sun4c();
+	void init_ss2();
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -583,23 +591,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( scc1_int );
 	DECLARE_WRITE_LINE_MEMBER( scc2_int );
 
-	void init_sun4();
-	void init_sun4c();
-	void init_ss2();
-
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void ncr5390(device_t *device);
-	void sun4c(machine_config &config);
-	void sun4(machine_config &config);
+
 	void sun4_mem(address_map &map);
 	void sun4c_mem(address_map &map);
 	void type0space_map(address_map &map);
 	void type1space_map(address_map &map);
 	void type1space_s4_map(address_map &map);
-protected:
+
 	required_device<mb86901_device> m_maincpu;
 
 	required_device<mk48t12_device> m_timekpr;
@@ -626,7 +629,6 @@ protected:
 	uint32_t m_dma_pack_register;
 	int m_scsi_irq;
 
-private:
 	uint32_t *m_ram_ptr;
 	uint8_t m_segmap[16][4096];
 	uint32_t m_pagemap[16384];
@@ -1935,8 +1937,7 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc1_int))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type4hle")
-	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type4hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
 
 	// RS232 serial ports
 	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
@@ -2000,8 +2001,7 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc1_int))
 	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type5hle")
-	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type5hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
 
 	// RS232 serial ports
 	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)

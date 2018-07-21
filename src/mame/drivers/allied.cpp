@@ -68,6 +68,9 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void allied(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(ic1_b_w);
 	DECLARE_WRITE8_MEMBER(ic2_b_w);
 	DECLARE_WRITE_LINE_MEMBER(ic2_cb2_w);
@@ -88,9 +91,8 @@ public:
 	DECLARE_READ8_MEMBER(ic7_a_r);
 	DECLARE_WRITE_LINE_MEMBER(ic8_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void allied(machine_config &config);
 	void allied_map(address_map &map);
-private:
+
 	uint32_t m_player_score[6];
 	uint8_t m_display;
 	uint8_t m_bit_counter;
@@ -626,7 +628,7 @@ MACHINE_CONFIG_START(allied_state::allied)
 	MCFG_DEVICE_PROGRAM_MAP(allied_map)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_allied)
+	config.set_default_layout(layout_allied);
 
 	/* Sound */
 	genpin_audio(config);

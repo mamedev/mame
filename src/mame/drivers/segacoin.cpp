@@ -34,9 +34,11 @@ public:
 		m_audiocpu(*this, "audiocpu")
 	{ }
 
+	void westdrm(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	void westdrm(machine_config &config);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
 	void sound_map(address_map &map);

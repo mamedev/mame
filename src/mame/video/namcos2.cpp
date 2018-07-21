@@ -8,19 +8,14 @@
 void namcos2_state::TilemapCB(uint16_t code, int *tile, int *mask)
 {
 	*mask = code;
+	/* The order of bits needs to be corrected to index the right tile  14 15 11 12 13 */
+	*tile = bitswap<16>(code, 13, 12, 11, 15, 14, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+}
 
-	switch( m_gametype )
-	{
-	case NAMCOS2_FINAL_LAP_2:
-	case NAMCOS2_FINAL_LAP_3:
-		*tile = (code&0x07ff)|((code&0x4000)>>3)|((code&0x3800)<<1);
-		break;
-
-	default:
-		/* The order of bits needs to be corrected to index the right tile  14 15 11 12 13 */
-		*tile = (code&0x07ff)|((code&0xc000)>>3)|((code&0x3800)<<2);
-		break;
-	}
+void namcos2_state::TilemapCB_finalap2(uint16_t code, int *tile, int *mask)
+{
+	*mask = code;
+	*tile = bitswap<15>(code, 13, 12, 11, 14, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 /**
@@ -295,13 +290,7 @@ WRITE16_MEMBER( namcos2_state::rozram_word_w )
 
 /**************************************************************************/
 
-uint16_t namcos2_state::get_palette_register( int which )
-{
-	const uint16_t *source = &m_paletteram[0x3000/2];
-	return ((source[which*2]&0xff)<<8) | (source[which*2+1]&0xff);
-}
-
-READ16_MEMBER( namcos2_state::paletteram_word_r )
+READ8_MEMBER( namcos2_state::c116_r )
 {
 	if( (offset&0x1800) == 0x1800 )
 	{
@@ -309,76 +298,9 @@ READ16_MEMBER( namcos2_state::paletteram_word_r )
 		offset &= 0x180f;
 
 		/* registers 6,7: unmapped? */
-		if (offset > 0x180b) return 0xff;
+		if (offset > 0x180b) return 0xff; // fix for finallap boot
 	}
-	return m_paletteram[offset];
-}
-
-WRITE16_MEMBER( namcos2_state::paletteram_word_w )
-{
-	if( (offset&0x1800) == 0x1800 )
-	{
-		/* palette register */
-		offset &= 0x180f;
-
-		if( ACCESSING_BITS_0_7 ) data&=0xff;
-		else data>>=8;
-
-		switch (offset) {
-			/* registers 0-3: clipping */
-
-			/* register 4: ? */
-			/* sets using it:
-			assault:    $0020
-			burnforc:   $0130 after titlescreen
-			dirtfoxj:   $0108 at game start
-			finalap1/2/3:   $00C0
-			finehour:   $0168 after titlescreen
-			fourtrax:   $00E8 and $00F0
-			luckywld:   $00E8 at titlescreen, $00A0 in game and $0118 if in tunnel
-			suzuka8h1/2:    $00E8 and $00A0 */
-			case 0x1808: case 0x1809:
-				// if (data^m_paletteram[offset]) printf("%04X\n",data<<((~offset&1)<<3)|m_paletteram[offset^1]<<((offset&1)<<3));
-				break;
-
-			/* register 5: POSIRQ scanline (only 8 bits used) */
-			/*case 0x180a:*/ case 0x180b:
-				//if (data^m_paletteram[offset]) {
-					m_paletteram[offset] = data;
-				//}
-				break;
-
-			/* registers 6,7: nothing? */
-			default: break;
-		}
-
-		m_paletteram[offset] = data;
-	}
-	else
-	{
-		COMBINE_DATA(&m_paletteram[offset]);
-	}
-}
-
-
-inline void
-namcos2_state::update_palette()
-{
-	int bank;
-	for( bank=0; bank<0x20; bank++ )
-	{
-		int pen = bank*256;
-		int offset = ((pen & 0x1800) << 2) | (pen & 0x07ff);
-		int i;
-		for( i=0; i<256; i++ )
-		{
-			int r = m_paletteram[offset | 0x0000] & 0x00ff;
-			int g = m_paletteram[offset | 0x0800] & 0x00ff;
-			int b = m_paletteram[offset | 0x1000] & 0x00ff;
-			m_palette->set_pen_color(pen++,rgb_t(r,g,b));
-			offset++;
-		}
-	}
+	return m_c116->read(space,offset,mem_mask);
 }
 
 /**************************************************************************/
@@ -404,10 +326,10 @@ void namcos2_state::video_start()
 
 void namcos2_state::apply_clip( rectangle &clip, const rectangle &cliprect )
 {
-	clip.min_x = get_palette_register(0) - 0x4a;
-	clip.max_x = get_palette_register(1) - 0x4a - 1;
-	clip.min_y = get_palette_register(2) - 0x21;
-	clip.max_y = get_palette_register(3) - 0x21 - 1;
+	clip.min_x = m_c116->get_reg(0) - 0x4a;
+	clip.max_x = m_c116->get_reg(1) - 0x4a - 1;
+	clip.min_y = m_c116->get_reg(2) - 0x21;
+	clip.max_y = m_c116->get_reg(3) - 0x21 - 1;
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 }
@@ -417,7 +339,6 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	rectangle clip;
 	int pri;
 
-	update_palette();
 	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
@@ -448,12 +369,17 @@ void namcos2_state::video_start_finallap()
 	draw_sprite_init();
 }
 
+void namcos2_state::video_start_finalap2()
+{
+	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
+	draw_sprite_init();
+}
+
 uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
 	int pri;
 
-	update_palette();
 	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
@@ -471,13 +397,29 @@ uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind
 
 /**************************************************************************/
 
+void namcos2_state::RozCB_luckywld(uint16_t code, int *tile, int *mask, int which)
+{
+	*mask = code;
+
+	uint16_t mangle = bitswap<11>(code & 0x31ff, 13, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+	switch ((code >> 9) & 7)
+	{
+		case 0x00: mangle += 0x1c00; break; // Plus, NOT OR
+		case 0x01: mangle |= 0x0800; break;
+		case 0x02: mangle |= 0x0000; break;
+		default: break;
+	}
+
+	*tile = mangle;
+}
+
 void namcos2_state::video_start_luckywld()
 {
 	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	c355_obj_init( 0, 0x0, namcos2_shared_state::c355_obj_code2tile_delegate() );
 	if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
 	{
-		c169_roz_init(1, "gfx5");
+		c169_roz_init(1, "gfx5", namcos2_shared_state::c169_tilemap_delegate(&namcos2_state::RozCB_luckywld, this));
 	}
 }
 
@@ -486,7 +428,6 @@ uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind
 	rectangle clip;
 	int pri;
 
-	update_palette();
 	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
@@ -519,7 +460,6 @@ uint32_t namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind1
 	rectangle clip;
 	int pri;
 
-	update_palette();
 	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
@@ -534,10 +474,16 @@ uint32_t namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind1
 
 /**************************************************************************/
 
+void namcos2_state::RozCB_metlhawk(uint16_t code, int *tile, int *mask, int which)
+{
+	*mask = code;
+	*tile = bitswap<13>(code & 0x1fff, 11, 10, 9, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+}
+
 void namcos2_state::video_start_metlhawk()
 {
 	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
-	c169_roz_init(1, "gfx5");
+	c169_roz_init(1, "gfx5", namcos2_shared_state::c169_tilemap_delegate(&namcos2_state::RozCB_metlhawk, this));
 }
 
 uint32_t namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -545,7 +491,6 @@ uint32_t namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind
 	rectangle clip;
 	int pri;
 
-	update_palette();
 	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 

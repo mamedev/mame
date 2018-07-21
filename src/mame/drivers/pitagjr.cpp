@@ -167,13 +167,15 @@ public:
 		, m_rombank(*this, "rombank")
 	{ }
 
+	void pitajr(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
 
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(pitagjr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void pitajr(machine_config &config);
 	void pitajr_mem(address_map &map);
 };
 
@@ -220,7 +222,7 @@ MACHINE_CONFIG_START(pitagjr_state::pitajr)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 200-1, 0, 100-1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pitagjr_state, pitagjr)

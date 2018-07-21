@@ -136,15 +136,15 @@ MACHINE_CONFIG_START(vme_mzr8300_card_device::device_add_mconfig)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio0", upd7201_new_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE("sio0", upd7201_new_device, ctsb_w))
 
-	MCFG_DEVICE_ADD("stc", AM9513, XTAL(4'000'000))
-	MCFG_AM9513_OUT1_CALLBACK(WRITELINE("sio0", upd7201_new_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio0", upd7201_new_device, txca_w))
-	MCFG_AM9513_OUT2_CALLBACK(WRITELINE("sio0", upd7201_new_device, rxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio0", upd7201_new_device, txcb_w))
-	MCFG_AM9513_OUT3_CALLBACK(WRITELINE("sio1", upd7201_new_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio1", upd7201_new_device, txca_w))
-	MCFG_AM9513_OUT4_CALLBACK(WRITELINE("sio1", upd7201_new_device, rxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio1", upd7201_new_device, txcb_w))
+	am9513_device &stc(AM9513(config, "stc", 4_MHz_XTAL));
+	stc.out1_cb().set("sio0", FUNC(upd7201_new_device::rxca_w));
+	stc.out1_cb().append("sio0", FUNC(upd7201_new_device::txca_w));
+	stc.out2_cb().set("sio0", FUNC(upd7201_new_device::rxcb_w));
+	stc.out2_cb().append("sio0", FUNC(upd7201_new_device::txcb_w));
+	stc.out3_cb().set("sio1", FUNC(upd7201_new_device::rxca_w));
+	stc.out3_cb().append("sio1", FUNC(upd7201_new_device::txca_w));
+	stc.out4_cb().set("sio1", FUNC(upd7201_new_device::rxcb_w));
+	stc.out4_cb().append("sio1", FUNC(upd7201_new_device::txcb_w));
 MACHINE_CONFIG_END
 
 

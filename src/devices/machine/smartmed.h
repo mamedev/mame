@@ -18,7 +18,7 @@
 	downcast<nand_device &>(*device).set_nand_type((nand_device::chip::type));
 
 #define MCFG_NAND_RNB_CALLBACK(write) \
-	devcb = &downcast<nand_device &>(*device).set_rnb_wr_callback(DEVCB_##write);
+	downcast<nand_device &>(*device).set_rnb_wr_callback(DEVCB_##write);
 
 /***************************************************************************
     TYPE DEFINITIONS

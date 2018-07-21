@@ -131,7 +131,7 @@ MACHINE_CONFIG_START(nsm_state::nsm)
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 11052000, nsm_map, nsm_io_map)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_nsm)
+	config.set_default_layout(layout_nsm);
 
 	/* Sound */
 	SPEAKER(config, "lspeaker").front_left();

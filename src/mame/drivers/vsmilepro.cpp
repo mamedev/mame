@@ -35,8 +35,10 @@ public:
 	{ }
 
 	void vsmilpro(machine_config &config);
-	void vsmilpro_map(address_map &map);
+
 private:
+	void vsmilpro_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 };
 

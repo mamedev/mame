@@ -24,10 +24,12 @@ public:
 	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
+	void age_candy(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void age_candy(machine_config &config);
 	void age_candy_map(address_map &map);
 //  required_device<mcs51_cpu_device> m_maincpu;
 };

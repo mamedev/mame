@@ -2634,7 +2634,7 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 65536)
 	MCFG_PALETTE_INIT_OWNER(nbmj8688_state,mbmj8688_16bit)
-	MCFG_DEFAULT_LAYOUT(layout_nbmj8688)
+	config.set_default_layout(layout_nbmj8688);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

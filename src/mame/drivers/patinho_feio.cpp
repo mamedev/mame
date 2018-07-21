@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(patinho_feio_state::patinho_feio)
 	MCFG_GENERIC_EXTENSIONS("bin")
 	MCFG_GENERIC_LOAD(patinho_feio_state, patinho_tape)
 
-	MCFG_DEFAULT_LAYOUT(layout_patinho)
+	config.set_default_layout(layout_patinho);
 
 	// software lists
 //  MCFG_SOFTWARE_LIST_ADD("tape_list", "patinho")

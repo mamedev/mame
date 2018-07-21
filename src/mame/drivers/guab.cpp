@@ -539,9 +539,9 @@ MACHINE_CONFIG_START(guab_state::guab)
 	MCFG_RS232_CTS_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_cts))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", acia_1_rs232_defaults)
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600) // source? the ptm doesn't seem to output any common baud values
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia6850_1", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600)); // source? the ptm doesn't seem to output any common baud values
+	acia_clock.signal_handler().set("acia6850_1", FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append("acia6850_1", FUNC(acia6850_device::write_rxc));
 
 	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
 
@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(guab_state::guab)
 
 	MCFG_SOFTWARE_LIST_ADD("floppy_list", "guab")
 
-	MCFG_DEFAULT_LAYOUT(layout_guab)
+	config.set_default_layout(layout_guab);
 MACHINE_CONFIG_END
 
 

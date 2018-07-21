@@ -21,16 +21,18 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void tr175(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(ffec01_w);
 	DECLARE_WRITE8_MEMBER(fff000_w);
 	DECLARE_READ8_MEMBER(fff400_r);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void tr175(machine_config &config);
 	void mem_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void vram_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 

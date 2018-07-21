@@ -54,6 +54,9 @@ public:
 		m_exp_irq(CLEAR_LINE)
 	{ }
 
+	void vic10(machine_config &config);
+
+private:
 	required_device<m6510_device> m_maincpu;
 	required_device<mos6566_device> m_vic;
 	required_device<mos6581_device> m_sid;
@@ -98,7 +101,6 @@ public:
 	int m_cia_irq;
 	int m_vic_irq;
 	int m_exp_irq;
-	void vic10(machine_config &config);
 	void vic10_mem(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);

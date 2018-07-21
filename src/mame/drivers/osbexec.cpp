@@ -48,6 +48,11 @@ public:
 		, m_floppy1(*this, "mb8877:1:525ssdd")
 	{ }
 
+	void osbexec(machine_config &config);
+
+	void init_osbexec();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mb8877_device>  m_mb8877;
@@ -115,7 +120,6 @@ public:
 	DECLARE_WRITE8_MEMBER(osbexec_c000_w);
 	DECLARE_READ8_MEMBER(osbexec_kbd_r);
 	DECLARE_READ8_MEMBER(osbexec_rtc_r);
-	void init_osbexec();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
 	DECLARE_READ8_MEMBER(osbexec_pia0_a_r);
@@ -129,7 +133,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(modem_dsr_w);
 	DECLARE_WRITE_LINE_MEMBER(modem_ri_w);
 	DECLARE_WRITE_LINE_MEMBER(comm_clk_a_w);
-	void osbexec(machine_config &config);
 	void osbexec_io(address_map &map);
 	void osbexec_mem(address_map &map);
 };
@@ -596,17 +599,16 @@ MACHINE_CONFIG_START(osbexec_state::osbexec)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<2>))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<3>))
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(m_maincpu, 0))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD(m_sio, Z80SIO, MAIN_CLOCK/6)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE(MODEM_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE(MODEM_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE(MODEM_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
-	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
-	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainirq", input_merger_device, in_w<4>))
+	Z80SIO(config, m_sio, MAIN_CLOCK/6);
+	m_sio->out_txda_callback().set(MODEM_PORT_TAG, FUNC(rs232_port_device::write_txd)).invert();
+	m_sio->out_dtra_callback().set(MODEM_PORT_TAG, FUNC(rs232_port_device::write_dtr)).invert();
+	m_sio->out_rtsa_callback().set(MODEM_PORT_TAG, FUNC(rs232_port_device::write_rts)).invert();
+	m_sio->out_txdb_callback().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_txd)).invert();
+	m_sio->out_dtrb_callback().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_dtr)).invert();
+	m_sio->out_rtsb_callback().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_rts)).invert();
+	m_sio->out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<4>));
 
 	MCFG_DEVICE_ADD("ctc", PIT8253, 0)
 	MCFG_PIT8253_CLK0(MAIN_CLOCK / 13) // divided by 74S161 @ UC25
@@ -616,17 +618,17 @@ MACHINE_CONFIG_START(osbexec_state::osbexec)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_sio, z80sio_device, rxtxcb_w))
 	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, osbexec_state, spindle_clk_w))
 
-	MCFG_DEVICE_ADD(MODEM_PORT_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio, z80sio_device, rxa_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_sio, z80sio_device, dcda_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_DSR_HANDLER(WRITELINE(*this, osbexec_state, modem_dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(*this, osbexec_state, modem_ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_sio, z80sio_device, ctsa_w)) MCFG_DEVCB_INVERT
+	rs232_port_device &modem_port(RS232_PORT(config, MODEM_PORT_TAG, default_rs232_devices, nullptr));
+	modem_port.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w)).invert();
+	modem_port.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w)).invert();
+	modem_port.dsr_handler().set(FUNC(osbexec_state::modem_dsr_w));
+	modem_port.ri_handler().set(FUNC(osbexec_state::modem_ri_w));
+	modem_port.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w)).invert();
 
-	MCFG_DEVICE_ADD(PRINTER_PORT_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio, z80sio_device, rxb_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_sio, z80sio_device, dcdb_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_sio, z80sio_device, ctsb_w)) MCFG_DEVCB_INVERT
+	rs232_port_device &printer_port(RS232_PORT(config, PRINTER_PORT_TAG, default_rs232_devices, nullptr));
+	printer_port.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w)).invert();
+	printer_port.dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w)).invert();
+	printer_port.cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w)).invert();
 
 	MCFG_DEVICE_ADD("mb8877", MB8877, MAIN_CLOCK/24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(m_pia_1, pia6821_device, cb1_w))

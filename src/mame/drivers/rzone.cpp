@@ -46,6 +46,11 @@ public:
 		m_led_off(*this, "led_off")
 	{ }
 
+	void rzbatfor(machine_config &config);
+	void rztoshden(machine_config &config);
+	void rzindy500(machine_config &config);
+
+private:
 	output_finder<> m_led_out;
 	required_device<timer_device> m_led_off;
 
@@ -68,11 +73,6 @@ public:
 	DECLARE_WRITE8_MEMBER(t2_write_r);
 	DECLARE_WRITE8_MEMBER(t2_write_s);
 
-	void rzbatfor(machine_config &config);
-	void rztoshden(machine_config &config);
-	void rzindy500(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
 };
 
@@ -259,7 +259,7 @@ MACHINE_CONFIG_START(rzone_state::rzbatfor)
 
 	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_rzone)
+	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(rzone_state::rztoshden)
 
 	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_rzone)
+	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(rzone_state::rzindy500)
 
 	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_rzone)
+	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

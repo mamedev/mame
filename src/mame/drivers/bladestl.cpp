@@ -349,9 +349,9 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	   called at initialization time */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, M6809_IRQ_LINE))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD(m_upd7759, UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

@@ -115,9 +115,9 @@ private:
 DECLARE_DEVICE_TYPE(VDT911, vdt911_device)
 
 #define MCFG_VDT911_KEYINT_HANDLER( _intcallb ) \
-	devcb = &downcast<vdt911_device &>(*device).set_keyint_callback(DEVCB_##_intcallb);
+	downcast<vdt911_device &>(*device).set_keyint_callback(DEVCB_##_intcallb);
 
 #define MCFG_VDT911_LINEINT_HANDLER( _intcallb ) \
-	devcb = &downcast<vdt911_device &>(*device).set_lineint_callback(DEVCB_##_intcallb);
+	downcast<vdt911_device &>(*device).set_lineint_callback(DEVCB_##_intcallb);
 
 #endif // MAME_VIDEO_911_VDT_H

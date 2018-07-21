@@ -163,22 +163,22 @@ void igs_bitswap_device::set_val_xor(uint16_t val_xor)
 }
 
 #define MCFG_IGS_BITSWAP_IN_PORTA_CB(_devcb) \
-	devcb = &downcast<igs_bitswap_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
+	downcast<igs_bitswap_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_IGS_BITSWAP_IN_PORTB_CB(_devcb) \
-	devcb = &downcast<igs_bitswap_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
+	downcast<igs_bitswap_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_IGS_BITSWAP_IN_PORTC_CB(_devcb) \
-	devcb = &downcast<igs_bitswap_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
+	downcast<igs_bitswap_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
 
 #define MCFG_IGS_BITSWAP_OUT_PORTA_CB(_devcb) \
-	devcb = &downcast<igs_bitswap_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
+	downcast<igs_bitswap_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
 
 #define MCFG_IGS_BITSWAP_OUT_PORTB_CB(_devcb) \
-	devcb = &downcast<igs_bitswap_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
+	downcast<igs_bitswap_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
 
 #define MCFG_IGS_BITSWAP_OUT_PORTC_CB(_devcb) \
-	devcb = &downcast<igs_bitswap_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
+	downcast<igs_bitswap_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
 
 // note: b3 seems fixed to ~15, it may go away in the future
 #define MCFG_IGS_BITSWAP_M3_0_BITS(_b0, _b1, _b2, _b3) \

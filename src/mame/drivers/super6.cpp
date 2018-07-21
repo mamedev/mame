@@ -454,18 +454,18 @@ void super6_state::machine_reset()
 
 MACHINE_CONFIG_START(super6_state::super6)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 24_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD(m_maincpu, Z80, 24_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(super6_mem)
 	MCFG_DEVICE_IO_MAP(super6_io)
 	MCFG_Z80_DAISY_CHAIN(super6_daisy_chain)
 
 	// devices
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 24_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD(m_ctc, Z80CTC, 24_MHz_XTAL / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", super6_state, ctc_tick, attotime::from_hz(24_MHz_XTAL / 16))
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, 24_MHz_XTAL / 6)
+	MCFG_DEVICE_ADD(m_dma, Z80DMA, 24_MHz_XTAL / 6)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, super6_state, memory_read_byte))
@@ -473,17 +473,17 @@ MACHINE_CONFIG_START(super6_state::super6)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, super6_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, super6_state, io_write_byte))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 24_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD(m_pio, Z80PIO, 24_MHz_XTAL / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(WD2793_TAG, WD2793, 1000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, super6_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, super6_state, fdc_drq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", super6_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, super6_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, super6_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, 24_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD(m_dart, Z80DART, 24_MHz_XTAL / 4)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -493,17 +493,17 @@ MACHINE_CONFIG_START(super6_state::super6)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxa_w))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxb_w))
 
-	MCFG_DEVICE_ADD(BR1945_TAG, COM8116, 5.0688_MHz_XTAL)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_TAG, z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
+	COM8116(config, m_brg, 5.0688_MHz_XTAL);
+	m_brg->fr_handler().set(m_dart, FUNC(z80dart_device::txca_w));
+	m_brg->fr_handler().append(m_dart, FUNC(z80dart_device::rxca_w));
+	m_brg->fr_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
+	m_brg->ft_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

@@ -555,11 +555,11 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, hnayayoi_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("msm", msm5205_device, vclk_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, hnayayoi_state, nmi_enable_w)) MCFG_DEVCB_INVERT
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(hnayayoi_state::coin_counter_w));
+	mainlatch.q_out_cb<2>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
+	mainlatch.q_out_cb<3>().set(m_msm, FUNC(msm5205_device::vclk_w));
+	mainlatch.q_out_cb<4>().set(FUNC(hnayayoi_state::nmi_enable_w)).invert();
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -608,11 +608,11 @@ MACHINE_CONFIG_START(hnayayoi_state::untoucha)
 	MCFG_DEVICE_PROGRAM_MAP(untoucha_map)
 	MCFG_DEVICE_IO_MAP(untoucha_io_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("msm", msm5205_device, vclk_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, hnayayoi_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // ?
+	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
+	mainlatch.q_out_cb<1>().set(m_msm, FUNC(msm5205_device::vclk_w));
+	mainlatch.q_out_cb<2>().set(FUNC(hnayayoi_state::nmi_enable_w));
+	mainlatch.q_out_cb<3>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
+	mainlatch.q_out_cb<4>().set_nop(); // ?
 
 	MCFG_DEVICE_MODIFY("crtc")
 	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, untoucha_update_row)

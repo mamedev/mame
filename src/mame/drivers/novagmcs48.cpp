@@ -45,15 +45,18 @@ public:
 		: novagbase_state(mconfig, type, tag)
 	{ }
 
+	void presto(machine_config &config);
+	void octo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(octo_cpu_freq);
+
+private:
 	// Presto/Octo
 	DECLARE_WRITE8_MEMBER(presto_mux_w);
 	DECLARE_WRITE8_MEMBER(presto_control_w);
 	DECLARE_READ8_MEMBER(presto_input_r);
 	DECLARE_MACHINE_RESET(octo);
-	DECLARE_INPUT_CHANGED_MEMBER(octo_cpu_freq);
 	void octo_set_cpu_freq();
-	void presto(machine_config &config);
-	void octo(machine_config &config);
 };
 
 
@@ -153,7 +156,7 @@ MACHINE_CONFIG_START(novagmcs48_state::presto)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, novagmcs48_state, presto_mux_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_presto)
+	config.set_default_layout(layout_novag_presto);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

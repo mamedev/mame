@@ -30,6 +30,7 @@ public:
 	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
+	template <typename... T> void set_map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); }
 	void set_endianness(endianness_t endianness) { m_endianness = endianness; }
 	void set_data_width(uint8_t data_width) { m_data_width = data_width; }
 	void set_addr_width(uint8_t addr_width) { m_addr_width = addr_width; }

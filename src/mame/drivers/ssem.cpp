@@ -24,17 +24,20 @@ public:
 	{
 	}
 
+	void ssem(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(panel_check);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(panel_check);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(ssem_store);
 	inline uint32_t reverse(uint32_t v);
 	void strlower(char *buf);
 
-	void ssem(machine_config &config);
 	void ssem_map(address_map &map);
-private:
+
 	template <typename Format, typename... Params>
 	void glyph_print(bitmap_rgb32 &bitmap, int32_t x, int32_t y, Format &&fmt, Params &&...args);
 

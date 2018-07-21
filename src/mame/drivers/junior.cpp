@@ -232,7 +232,7 @@ MACHINE_CONFIG_START(junior_state::junior)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_junior )
+	config.set_default_layout(layout_junior);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, 1_MHz_XTAL)

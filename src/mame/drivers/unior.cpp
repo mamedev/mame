@@ -64,7 +64,7 @@ public:
 
 	void unior(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_READ8_MEMBER(ppi0_b_r);
@@ -82,7 +82,6 @@ protected:
 	void unior_io(address_map &map);
 	void unior_mem(address_map &map);
 
-private:
 	uint8_t m_4c;
 	uint8_t m_4e;
 	virtual void machine_reset() override;
@@ -397,19 +396,18 @@ MACHINE_CONFIG_START(unior_state::unior)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(20'000'000) / 12)
-	MCFG_PIT8253_CLK1(XTAL(20'000'000) / 9)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
-	MCFG_PIT8253_CLK2(XTAL(16'000'000) / 9 / 64) // unknown frequency
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(20_MHz_XTAL / 12);
+	m_pit->set_clk<1>(20_MHz_XTAL / 9);
+	m_pit->out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
+	m_pit->out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
+	m_pit->set_clk<2>(16_MHz_XTAL / 9 / 64); // unknown frequency
+	m_pit->out_handler<2>().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	MCFG_DEVICE_ADD("ppi0", I8255, 0)
 	// ports a & c connect to an external slot

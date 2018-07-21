@@ -61,7 +61,7 @@ public:
 
 	void peyper(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(sw_r);
 	DECLARE_WRITE8_MEMBER(col_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
@@ -79,7 +79,6 @@ protected:
 	void peyper_io(address_map &map);
 	void peyper_map(address_map &map);
 
-private:
 	uint8_t m_digit;
 	uint8_t m_disp_layout[36];
 	required_device<cpu_device> m_maincpu;
@@ -612,7 +611,7 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_peyper)
+	config.set_default_layout(layout_peyper);
 
 	/* Sound */
 	genpin_audio(config);
@@ -631,8 +630,8 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	MCFG_I8279_OUT_SL_CB(WRITE8(*this, peyper_state, col_w))             // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, peyper_state, disp_w))          // display A&B
 	MCFG_I8279_IN_RL_CB(READ8(*this, peyper_state, sw_r))                // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                   // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	MCFG_I8279_IN_SHIFT_CB(CONSTANT(1))                                  // Shift key
+	MCFG_I8279_IN_CTRL_CB(CONSTANT(1))
 MACHINE_CONFIG_END
 
 // Not allowed to set up an array all at once, so we have this mess

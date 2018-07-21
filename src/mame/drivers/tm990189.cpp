@@ -96,14 +96,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void tm990_189_v(machine_config &config);
+	void tm990_189(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
+
+private:
 	DECLARE_READ8_MEMBER(video_vdp_r);
 	DECLARE_WRITE8_MEMBER(video_vdp_w);
 	DECLARE_READ8_MEMBER(video_joy_r);
 	DECLARE_WRITE8_MEMBER(video_joy_w);
 
 	DECLARE_WRITE8_MEMBER( external_operation );
-
-	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led0_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led1_w);
@@ -138,13 +142,8 @@ public:
 	DECLARE_MACHINE_START(tm990_189_v);
 	DECLARE_MACHINE_RESET(tm990_189_v);
 
-	void tm990_189_v(machine_config &config);
-	void tm990_189(machine_config &config);
-
-protected:
 	emu_timer *m_rs232_input_timer;
 
-private:
 	void tm990_189_cru_map(address_map &map);
 	void tm990_189_memmap(address_map &map);
 	void tm990_189_v_memmap(address_map &map);
@@ -832,7 +831,7 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189 )
 
 	/* Video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tm990189)
+	config.set_default_layout(layout_tm990189);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -891,7 +890,7 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918_device, screen_update )
-	MCFG_DEFAULT_LAYOUT(layout_tm990189v)
+	config.set_default_layout(layout_tm990189v);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

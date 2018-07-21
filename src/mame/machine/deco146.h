@@ -9,16 +9,16 @@
 
 
 #define MCFG_DECO146_IN_PORTA_CB(_devcb) \
-	devcb = &downcast<deco_146_base_device &>(*device).set_port_a_cb(DEVCB_##_devcb);
+	downcast<deco_146_base_device &>(*device).set_port_a_cb(DEVCB_##_devcb);
 
 #define MCFG_DECO146_IN_PORTB_CB(_devcb) \
-	devcb = &downcast<deco_146_base_device &>(*device).set_port_b_cb(DEVCB_##_devcb);
+	downcast<deco_146_base_device &>(*device).set_port_b_cb(DEVCB_##_devcb);
 
 #define MCFG_DECO146_IN_PORTC_CB(_devcb) \
-	devcb = &downcast<deco_146_base_device &>(*device).set_port_c_cb(DEVCB_##_devcb);
+	downcast<deco_146_base_device &>(*device).set_port_c_cb(DEVCB_##_devcb);
 
 #define MCFG_DECO146_SOUNDLATCH_IRQ_CB(_devcb) \
-	devcb = &downcast<deco_146_base_device &>(*device).set_soundlatch_irq_callback(DEVCB_##_devcb);
+	downcast<deco_146_base_device &>(*device).set_soundlatch_irq_callback(DEVCB_##_devcb);
 
 // there are some standard ways the chip gets hooked up, so have them here ready to use
 #define MCFG_DECO146_SET_INTERFACE_SCRAMBLE( a9,a8,a7,a6,a5,a4,a3,a2,a1,a0 ) \
@@ -85,6 +85,9 @@ public:
 	template<class Object> devcb_base &set_port_a_cb(Object &&object) { return m_port_a_r.set_callback(std::forward<Object>(object)); }
 	template<class Object> devcb_base &set_port_b_cb(Object &&object) { return m_port_b_r.set_callback(std::forward<Object>(object)); }
 	template<class Object> devcb_base &set_port_c_cb(Object &&object) { return m_port_c_r.set_callback(std::forward<Object>(object)); }
+	auto port_a_cb() { return m_port_a_r.bind(); }
+	auto port_b_cb() { return m_port_b_r.bind(); }
+	auto port_c_cb() { return m_port_c_r.bind(); }
 	void set_interface_scramble(uint8_t a9, uint8_t a8, uint8_t a7, uint8_t a6, uint8_t a5, uint8_t a4, uint8_t a3,uint8_t a2,uint8_t a1,uint8_t a0)
 	{
 		m_external_addrswap[9] = a9;
@@ -103,6 +106,7 @@ public:
 	void set_use_magic_read_address_xor(bool use_xor) { m_magic_read_address_xor_enabled = use_xor; }
 
 	template <class Object> devcb_base &set_soundlatch_irq_callback(Object &&cb) { return m_soundlatch_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto soundlatch_irq_cb() { return m_soundlatch_irq_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( soundlatch_r );
 

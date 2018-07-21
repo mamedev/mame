@@ -898,7 +898,7 @@ MACHINE_CONFIG_START(pc2000_state::pc2000)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc2000_state, pc2000)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc2000)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	config.set_default_layout(layout_lcd);
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 20)
@@ -951,7 +951,7 @@ MACHINE_CONFIG_START(gl3000s_state::gl3000s)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 24-1)
 	MCFG_SCREEN_UPDATE_DRIVER( gl3000s_state, screen_update )
 
-	MCFG_DEFAULT_LAYOUT(layout_gl3000s)
+	config.set_default_layout(layout_gl3000s);
 
 	MCFG_DEVICE_REMOVE("gfxdecode")
 

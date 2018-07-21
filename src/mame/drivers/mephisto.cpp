@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(mephisto_state::mephisto)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", mephisto_state, update_nmi, attotime::from_hz(600))
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
-	MCFG_DEFAULT_LAYOUT(layout_mephisto)
+	config.set_default_layout(layout_mephisto);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_state::rebel5)

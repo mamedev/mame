@@ -120,7 +120,7 @@ DEFINE_DEVICE_TYPE(QSOUND, qsound_device, "qsound", "QSound")
 
 // DSP internal ROM region
 ROM_START( qsound )
-	ROM_REGION( 0x2000, "dsp", 0 )
+	ROM_REGION16_BE( 0x2000, "dsp", 0 )
 	ROM_LOAD16_WORD_SWAP( "dl-1425.bin", 0x0000, 0x2000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
 	ROM_IGNORE( 0x4000 )
 ROM_END

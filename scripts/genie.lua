@@ -1017,6 +1017,11 @@ end
 					"-Wno-ignored-qualifiers"
 				}
 			end
+			if (version >= 60000) then
+				buildoptions {
+					"-Wno-pragma-pack" -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
+				}
+			end
 		else
 			if (version < 50000) then
 				print("GCC version 5.0 or later needed")
@@ -1192,9 +1197,6 @@ configuration { "mingw*" }
 				"-static",
 			}
 		end
-		buildoptions {
-			"-Wa,-mbig-obj",
-		}
 		linkoptions {
 			"-Wl,--start-group",
 		}

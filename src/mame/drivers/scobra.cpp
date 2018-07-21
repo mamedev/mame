@@ -52,18 +52,6 @@ public:
 		: scramble_state(mconfig, type, tag),
 			m_soundram(*this, "soundram") { }
 
-	DECLARE_READ8_MEMBER(scobra_soundram_r);
-	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
-	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_0_r);
-	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_1_r);
-	DECLARE_READ8_MEMBER(hustler_ppi8255_0_r);
-	DECLARE_READ8_MEMBER(hustler_ppi8255_1_r);
-	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_0_w);
-	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_1_w);
-	DECLARE_WRITE8_MEMBER(hustler_ppi8255_0_w);
-	DECLARE_WRITE8_MEMBER(hustler_ppi8255_1_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(stratgyx_coinage_r);
-
 	void mimonkey(machine_config &config);
 	void stratgyx(machine_config &config);
 	void type1(machine_config &config);
@@ -78,6 +66,21 @@ public:
 	void tazmani3(machine_config &config);
 	void hustlerb(machine_config &config);
 	void rescuefe(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(stratgyx_coinage_r);
+
+private:
+	DECLARE_READ8_MEMBER(scobra_soundram_r);
+	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
+	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_0_r);
+	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_1_r);
+	DECLARE_READ8_MEMBER(hustler_ppi8255_0_r);
+	DECLARE_READ8_MEMBER(hustler_ppi8255_1_r);
+	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_0_w);
+	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_1_w);
+	DECLARE_WRITE8_MEMBER(hustler_ppi8255_0_w);
+	DECLARE_WRITE8_MEMBER(hustler_ppi8255_1_w);
+
 	void hustler_map(address_map &map);
 	void hustler_sound_io_map(address_map &map);
 	void hustler_sound_map(address_map &map);
@@ -92,7 +95,7 @@ public:
 	void tazmani3_map(address_map &map);
 	void type1_map(address_map &map);
 	void type2_map(address_map &map);
-private:
+
 	optional_shared_ptr<uint8_t> m_soundram;
 };
 

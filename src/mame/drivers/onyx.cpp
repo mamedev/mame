@@ -63,8 +63,6 @@ public:
 		, m_pio2(*this, "pio2")
 	{ }
 
-	DECLARE_MACHINE_RESET(c8002);
-
 	void c8002(machine_config &config);
 	void c5000(machine_config &config);
 	void c5000_io(address_map &map);
@@ -74,6 +72,8 @@ public:
 	void subio(address_map &map);
 	void submem(address_map &map);
 private:
+	DECLARE_MACHINE_RESET(c8002);
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<z80sio_device> m_sio1, m_sio2, m_sio3, m_sio4, m_sio5;
 	optional_device<z80ctc_device> m_ctc1, m_ctc2, m_ctc3;
@@ -145,9 +145,9 @@ MACHINE_CONFIG_START(onyx_state::c8002)
 	MCFG_DEVICE_IO_MAP(subio)
 	MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
 
-	MCFG_DEVICE_ADD("sio1_clock", CLOCK, 307200)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio1", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio1" ,z80sio_device, txca_w))
+	clock_device &sio1_clock(CLOCK(config, "sio1_clock", 307200));
+	sio1_clock.signal_handler().set(m_sio1, FUNC(z80sio_device::rxca_w));
+	sio1_clock.signal_handler().append(m_sio1, FUNC(z80sio_device::txca_w));
 
 	/* peripheral hardware */
 	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(16'000'000)/4)
@@ -174,9 +174,9 @@ MACHINE_CONFIG_START(onyx_state::c8002)
 	MCFG_DEVICE_ADD("pio1s", Z80PIO, XTAL(16'000'000)/4)
 	//MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("subcpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("sio1s_clock", CLOCK, 614400)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio1s", z80sio_device, rxtxcb_w))
-	//MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio1s" ,z80sio_device, txca_w))
+	clock_device &sio1s_clock(CLOCK(config, "sio1s_clock", 614400));
+	sio1s_clock.signal_handler().set("sio1s", FUNC(z80sio_device::rxtxcb_w));
+	//sio1s_clock.signal_handler().append("sio1s", FUNC(z80sio_device::txca_w));
 
 	MCFG_DEVICE_ADD("sio1s", Z80SIO, XTAL(16'000'000) /4)
 	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232s", rs232_port_device, write_txd))

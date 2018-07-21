@@ -20,10 +20,10 @@
 // note: INT pins are only available on MB84x1
 // INTL is for the CPU on the left side, INTR for the one on the right
 #define MCFG_MB8421_INTL_HANDLER(_devcb) \
-	devcb = &downcast<mb8421_master_device &>(*device).set_intl_handler(DEVCB_##_devcb);
+	downcast<mb8421_master_device &>(*device).set_intl_handler(DEVCB_##_devcb);
 
 #define MCFG_MB8421_INTR_HANDLER(_devcb) \
-	devcb = &downcast<mb8421_master_device &>(*device).set_intr_handler(DEVCB_##_devcb);
+	downcast<mb8421_master_device &>(*device).set_intr_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

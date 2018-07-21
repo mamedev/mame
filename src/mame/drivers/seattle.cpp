@@ -292,6 +292,43 @@ public:
 		m_leds(*this, "led%u", 0U)
 		{}
 
+	void seattle_common(machine_config &config);
+	void phoenixsa(machine_config &config);
+	void seattle150(machine_config &config);
+	void seattle150_widget(machine_config &config);
+	void seattle200(machine_config &config);
+	void seattle200_widget(machine_config &config);
+	void flagstaff(machine_config &config);
+	void wg3dh(machine_config &config);
+	void sfrush(machine_config &config);
+	void hyprdriv(machine_config &config);
+	void carnevil(machine_config &config);
+	void blitz99(machine_config &config);
+	void blitz2k(machine_config &config);
+	void blitz(machine_config &config);
+	void biofreak(machine_config &config);
+	void sfrushrkw(machine_config &config);
+	void calspeed(machine_config &config);
+	void mace(machine_config &config);
+	void vaportrx(machine_config &config);
+	void sfrushrk(machine_config &config);
+
+	void init_sfrush();
+	void init_blitz2k();
+	void init_carnevil();
+	void init_biofreak();
+	void init_calspeed();
+	void init_sfrushrk();
+	void init_vaportrx();
+	void init_hyprdriv();
+	void init_blitz();
+	void init_wg3dh();
+	void init_mace();
+	void init_blitz99();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
+
+private:
 	required_device<nvram_device> m_nvram;
 	required_device<mips3_device> m_maincpu;
 	optional_device<atari_cage_seattle_device> m_cage;
@@ -357,24 +394,11 @@ public:
 	DECLARE_READ32_MEMBER(widget_r);
 	DECLARE_WRITE32_MEMBER(widget_w);
 	DECLARE_WRITE32_MEMBER(wheel_board_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
 
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 
-	void init_sfrush();
-	void init_blitz2k();
-	void init_carnevil();
-	void init_biofreak();
-	void init_calspeed();
-	void init_sfrushrk();
-	void init_vaportrx();
-	void init_hyprdriv();
-	void init_blitz();
-	void init_wg3dh();
-	void init_mace();
-	void init_blitz99();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -386,26 +410,6 @@ public:
 	void update_widget_irq();
 	void init_common(int config);
 
-	void seattle_common(machine_config &config);
-	void phoenixsa(machine_config &config);
-	void seattle150(machine_config &config);
-	void seattle150_widget(machine_config &config);
-	void seattle200(machine_config &config);
-	void seattle200_widget(machine_config &config);
-	void flagstaff(machine_config &config);
-	void wg3dh(machine_config &config);
-	void sfrush(machine_config &config);
-	void hyprdriv(machine_config &config);
-	void carnevil(machine_config &config);
-	void blitz99(machine_config &config);
-	void blitz2k(machine_config &config);
-	void blitz(machine_config &config);
-	void biofreak(machine_config &config);
-	void sfrushrkw(machine_config &config);
-	void calspeed(machine_config &config);
-	void mace(machine_config &config);
-	void vaportrx(machine_config &config);
-	void sfrushrk(machine_config &config);
 	void seattle_cs0_map(address_map &map);
 	void seattle_cs1_map(address_map &map);
 	void seattle_cs2_map(address_map &map);
@@ -1901,9 +1905,9 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_cs3_map)
 	MCFG_GT64XX_SET_SIMM0(0x00800000)
 
-	MCFG_DEVICE_ADD(PCI_ID_IDE, IDE_PCI, 0, 0x100b0002, 0x01, 0x0)
-	MCFG_IDE_PCI_IRQ_HANDLER(INPUTLINE(m_maincpu, IDE_IRQ_NUM))
-	MCFG_IDE_PCI_SET_LEGACY_TOP(0x0a0)
+	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x100b0002, 0x01, 0x0));
+	ide.irq_handler().set_inputline(m_maincpu, IDE_IRQ_NUM);
+	ide.set_legacy_top(0x0a0);
 
 	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_1_PCI, 0, m_maincpu, m_screen)
 	MCFG_VOODOO_PCI_FBMEM(2)

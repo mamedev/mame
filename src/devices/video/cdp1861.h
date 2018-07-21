@@ -34,13 +34,13 @@
 //**************************************************************************
 
 #define MCFG_CDP1861_IRQ_CALLBACK(_write) \
-	devcb = &downcast<cdp1861_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<cdp1861_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_CDP1861_DMA_OUT_CALLBACK(_write) \
-	devcb = &downcast<cdp1861_device &>(*device).set_dma_out_wr_callback(DEVCB_##_write);
+	downcast<cdp1861_device &>(*device).set_dma_out_wr_callback(DEVCB_##_write);
 
 #define MCFG_CDP1861_EFX_CALLBACK(_write) \
-	devcb = &downcast<cdp1861_device &>(*device).set_efx_wr_callback(DEVCB_##_write);
+	downcast<cdp1861_device &>(*device).set_efx_wr_callback(DEVCB_##_write);
 
 
 #define MCFG_CDP1861_SCREEN_ADD(_cdptag, _tag, _clock) \

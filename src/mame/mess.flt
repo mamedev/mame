@@ -5,7 +5,6 @@
 a2600.cpp
 a5105.cpp
 a51xx.cpp
-a6809.cpp
 a7150.cpp
 a7800.cpp
 aa310.cpp
@@ -18,6 +17,7 @@ accomm.cpp
 acd.cpp
 aceex.cpp
 acrnsys1.cpp
+acrnsys.cpp
 acvirus.cpp
 adam.cpp
 advision.cpp
@@ -134,6 +134,7 @@ ckz80.cpp
 clcd.cpp
 cm1800.cpp
 cmi.cpp
+cms.cpp
 coco12.cpp
 coco3.cpp
 codata.cpp
@@ -166,6 +167,7 @@ datum.cpp
 dbox.cpp
 dccons.cpp
 dct11em.cpp
+decstation.cpp
 dectalk.cpp
 decwritr.cpp
 dgn_beta.cpp
@@ -315,6 +317,7 @@ interpro.cpp
 intv.cpp
 ipc.cpp
 ipds.cpp
+iphone2g.cpp
 iq151.cpp
 iqunlim.cpp
 iris3130.cpp
@@ -386,6 +389,7 @@ megadriv_rad.cpp
 mekd2.cpp
 mephisto.cpp
 mephisto_montec.cpp
+meritum.cpp
 mes.cpp
 mfabfz.cpp
 mice.cpp
@@ -724,6 +728,7 @@ tricep.cpp
 trs80.cpp
 trs80dt1.cpp
 trs80m2.cpp
+trs80m3.cpp
 ts802.cpp
 ts803.cpp
 ts816.cpp

@@ -728,7 +728,7 @@ void seta2_state::telpacfl_map(address_map &map)
 	MCFG_DEVICE_ADD( _tag, FUNCUBE_TOUCHSCREEN, _clock )
 
 #define MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(_devcb) \
-	devcb = &downcast<funcube_touchscreen_device &>(*device).set_tx_cb(DEVCB_##_devcb);
+	downcast<funcube_touchscreen_device &>(*device).set_tx_cb(DEVCB_##_devcb);
 
 class funcube_touchscreen_device : public device_t,
 									public device_serial_interface

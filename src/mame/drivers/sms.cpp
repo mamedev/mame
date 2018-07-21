@@ -609,7 +609,7 @@ MACHINE_CONFIG_START(sms_state::sms1_ntsc)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 
-	MCFG_DEFAULT_LAYOUT(layout_sms1)
+	config.set_default_layout(layout_sms1);
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
@@ -732,7 +732,7 @@ MACHINE_CONFIG_START(sms_state::sms1_pal)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 
-	MCFG_DEFAULT_LAYOUT(layout_sms1)
+	config.set_default_layout(layout_sms1);
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
@@ -804,7 +804,7 @@ MACHINE_CONFIG_START(sms_state::sms1_paln)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 
-	MCFG_DEFAULT_LAYOUT(layout_sms1)
+	config.set_default_layout(layout_sms1);
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
@@ -878,7 +878,7 @@ MACHINE_CONFIG_START(sms_state::sms1_br)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 
-	MCFG_DEFAULT_LAYOUT(layout_sms1)
+	config.set_default_layout(layout_sms1);
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)

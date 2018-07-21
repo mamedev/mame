@@ -71,6 +71,12 @@ public:
 		, m_io_keyboard(*this, "KEY.%u", 0)
 	{ }
 
+	void pegasusm(machine_config &config);
+	void pegasus(machine_config &config);
+
+	void init_pegasus();
+
+private:
 	DECLARE_READ8_MEMBER(pegasus_keyboard_r);
 	DECLARE_READ8_MEMBER(pegasus_protection_r);
 	DECLARE_READ8_MEMBER(pegasus_pcg_r);
@@ -82,7 +88,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pegasus_cassette_w);
 	DECLARE_WRITE_LINE_MEMBER(pegasus_firq_clr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void init_pegasus();
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
@@ -91,11 +96,9 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0c_load) { return load_cart(image, m_exp_0c, "c000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0d_load) { return load_cart(image, m_exp_0d, "d000"); }
 
-	void pegasusm(machine_config &config);
-	void pegasus(machine_config &config);
 	void pegasus_mem(address_map &map);
 	void pegasusm_mem(address_map &map);
-private:
+
 	uint8_t m_kbd_row;
 	bool m_kbd_irq;
 	uint8_t m_control_bits;

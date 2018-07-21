@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "mips3com.h"
+#include "ps2vu.h"
 
 
 /***************************************************************************
@@ -326,7 +327,7 @@ uint32_t mips3_device::compute_prid_register()
 			return 0x2700;
 
 		case MIPS3_TYPE_R5900:
-			return 0x2e59;
+			return 0x2e14;
 
 		default:
 			fatalerror("Unknown MIPS flavor specified\n");

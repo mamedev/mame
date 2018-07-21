@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(vcs80_state::vcs80)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", vcs80_state, vcs80_keyboard_tick, attotime::from_hz(1000))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_vcs80 )
+	config.set_default_layout(layout_vcs80);
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(5'000'000)/2)

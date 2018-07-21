@@ -51,6 +51,9 @@ public:
 	{
 	}
 
+	void ron(machine_config &config);
+
+private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(ron);
@@ -67,12 +70,11 @@ public:
 	DECLARE_READ_LINE_MEMBER(audio_T1_r);
 	DECLARE_WRITE8_MEMBER(ay_pa_w);
 
-	void ron(machine_config &config);
 	void ron_audio_io(address_map &map);
 	void ron_audio_map(address_map &map);
 	void ron_io(address_map &map);
 	void ron_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -92,7 +94,7 @@ protected:
 	required_ioport m_in1;
 	required_ioport m_in2;
 	required_ioport m_in3;
-private:
+
 	bool m_nmi_enable;
 	uint8_t m_mux_data;
 	uint8_t read_mux(bool which,bool side);

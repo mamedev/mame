@@ -3139,6 +3139,100 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="pcglobe3" supported="partial">
+		<description>PC Globe 3.0</description>
+		<year>1990</year>
+		<publisher>PC Globe, Inc</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Globe 3.0 [PC Globe] [1990] [5.25DD] [Disk 1 of 5].img" size="368640" crc="223af156" sha1="b195707c8fdfa1c21dec44c498104efc53e2b886" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Globe 3.0 [PC Globe] [1990] [5.25DD] [Disk 2 of 5].img" size="368640" crc="e00f61c2" sha1="6a48a3629b8c0b7bd0024a3cf87b2faf74040b23" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Globe 3.0 [PC Globe] [1990] [5.25DD] [Disk 3 of 5].img" size="368640" crc="b96ffaaf" sha1="9d0e150205e75afdc0fbb6aa7671a03531499e06" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Globe 3.0 [PC Globe] [1990] [5.25DD] [Disk 4 of 5].img" size="368640" crc="e8a37fd7" sha1="485e1016dbbfdf16e5f6b573e922dc33a1e2e402" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Globe 3.0 [PC Globe] [1990] [5.25DD] [Disk 5 of 5].img" size="368640" crc="41c45911" sha1="e3d40bd6a4dd5f1ebc5dc9a2af6a857e854f846a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="pcglobe4" supported="no">
+		<description>PC Globe 4.0</description>
+		<year>1990</year>
+		<publisher>PC Globe, Inc</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Globe 4.0 [PC Globe] [1990] [5.25DD] [Disk 1 of 5].img" size="368640" crc="5f6e5912" sha1="39d53b36612c5e7df96a753221a043ded4a88b1f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Globe 4.0 [PC Globe] [1990] [5.25DD] [Disk 2 of 5].img" size="368640" crc="20174f0f" sha1="c85d5ce8f62379d6354dbfe12ac5877f818bc61e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Globe 4.0 [PC Globe] [1990] [5.25DD] [Disk 3 of 5].img" size="368640" crc="20eda925" sha1="fa32ab9400c48e09a949dcc6dc91be822c502cdb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Globe 4.0 [PC Globe] [1990] [5.25DD] [Disk 4 of 5].img" size="368640" crc="e6218560" sha1="726d28768fe839911bb691af4431666ebe45fa2d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Globe 4.0 [PC Globe] [1990] [5.25DD] [Disk 5 of 5].img" size="368640" crc="61dc4553" sha1="2b2d359b75de625e1fdcfa8908e4307081db68bb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcglobe504" supported="partial">
+		<description>PC Globe 5.04</description>
+		<year>1992</year>
+		<publisher>PC Globe, Inc</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Globe 5.04 [PC Globe] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="284214e4" sha1="6c9a1fe9a0678d922fb994464fdba4abc0748d2c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Globe 5.04 [PC Globe] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="c75c43eb" sha1="865cc9ec13f73647eff94acd197312ab318b80df" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcglobe5es" cloneof="pcglobe504" supported="partial">
+		<description>PC Globe 5.0 (Spanish)</description>
+		<year>1992</year>
+		<publisher>Broderbund</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Globe 5.0 (Spanish) [Broderbund] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="8d611e3c" sha1="4ad8761012b869bb51f495470389cffef8032efd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Globe 5.0 (Spanish) [Broderbund] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="ff8c9aae" sha1="0e43d0338f2ea8fdeb5a7be75f7399c260dfdd94" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pct103">
 		<description>PC-Tools R1.03</description>
 		<year>1985</year>

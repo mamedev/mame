@@ -49,28 +49,28 @@
 	downcast<z80sti_device &>(*device).set_tx_clock(_clock);
 
 #define MCFG_Z80STI_OUT_INT_CB(_devcb) \
-	devcb = &downcast<z80sti_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
+	downcast<z80sti_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80STI_IN_GPIO_CB(_devcb) \
-	devcb = &downcast<z80sti_device &>(*device).set_in_gpio_callback(DEVCB_##_devcb);
+	downcast<z80sti_device &>(*device).set_in_gpio_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80STI_OUT_GPIO_CB(_devcb) \
-	devcb = &downcast<z80sti_device &>(*device).set_out_gpio_callback(DEVCB_##_devcb);
+	downcast<z80sti_device &>(*device).set_out_gpio_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80STI_OUT_SO_CB(_devcb) \
-	devcb = &downcast<z80sti_device &>(*device).set_out_so_callback(DEVCB_##_devcb);
+	downcast<z80sti_device &>(*device).set_out_so_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80STI_OUT_TAO_CB(_devcb) \
-	devcb = &downcast<z80sti_device &>(*device).set_out_tao_callback(DEVCB_##_devcb);
+	downcast<z80sti_device &>(*device).set_out_tao_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80STI_OUT_TBO_CB(_devcb) \
-	devcb = &downcast<z80sti_device &>(*device).set_out_tbo_callback(DEVCB_##_devcb);
+	downcast<z80sti_device &>(*device).set_out_tbo_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80STI_OUT_TCO_CB(_devcb) \
-	devcb = &downcast<z80sti_device &>(*device).set_out_tco_callback(DEVCB_##_devcb);
+	downcast<z80sti_device &>(*device).set_out_tco_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80STI_OUT_TDO_CB(_devcb) \
-	devcb = &downcast<z80sti_device &>(*device).set_out_tdo_callback(DEVCB_##_devcb);
+	downcast<z80sti_device &>(*device).set_out_tdo_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

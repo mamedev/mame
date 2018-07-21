@@ -88,7 +88,7 @@ struct chrn_id
 #define FLOPPY_DRIVE_INDEX                      0x0020
 
 #define MCFG_LEGACY_FLOPPY_IDX_CB(_devcb) \
-	devcb = &downcast<legacy_floppy_image_device &>(*device).set_out_idx_func(DEVCB_##_devcb);
+	downcast<legacy_floppy_image_device &>(*device).set_out_idx_func(DEVCB_##_devcb);
 
 class legacy_floppy_image_device :  public device_t,
 									public device_image_interface

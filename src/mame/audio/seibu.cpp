@@ -75,9 +75,9 @@ DEFINE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device, "seibu_sound", "Seibu Sound 
 
 seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEIBU_SOUND, tag, owner, clock),
+		m_int_cb(*this),
 		m_ym_read_cb(*this),
 		m_ym_write_cb(*this),
-		m_sound_cpu(*this, finder_base::DUMMY_TAG),
 		m_sound_rom(*this, finder_base::DUMMY_TAG),
 		m_rom_bank(*this, finder_base::DUMMY_TAG),
 		m_main2sub_pending(0),
@@ -93,6 +93,7 @@ seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char
 
 void seibu_sound_device::device_start()
 {
+	m_int_cb.resolve_safe();
 	m_ym_read_cb.resolve_safe(0);
 	m_ym_write_cb.resolve_safe();
 
@@ -130,6 +131,11 @@ void seibu_sound_device::device_reset()
 
 void seibu_sound_device::update_irq_lines(int param)
 {
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(seibu_sound_device::update_irq_synced), this), param);
+}
+
+TIMER_CALLBACK_MEMBER(seibu_sound_device::update_irq_synced)
+{
 	// note: we use 0xff here for inactive irqline
 
 	switch (param)
@@ -155,15 +161,12 @@ void seibu_sound_device::update_irq_lines(int param)
 			break;
 	}
 
-	if (m_sound_cpu.found())
-	{
-		if ((m_rst10_irq & m_rst18_irq) == 0xff) /* no IRQs pending */
-			m_sound_cpu->set_input_line(0, CLEAR_LINE);
-		else /* IRQ pending */
-			m_sound_cpu->set_input_line_and_vector(0, ASSERT_LINE, m_rst10_irq & m_rst18_irq);
-	}
-	else
-		return;
+	m_int_cb((m_rst10_irq & m_rst18_irq) == 0xff ? CLEAR_LINE : ASSERT_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(seibu_sound_device::im0_vector_cb)
+{
+	return m_rst10_irq & m_rst18_irq;
 }
 
 

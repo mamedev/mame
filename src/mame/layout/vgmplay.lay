@@ -25,6 +25,7 @@
 	20: K051649
 	21: K053260
 	22: K054539
+	23: GA20
 	-->
 
 	<element name="backdrop"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
@@ -57,6 +58,9 @@
 	<element name="act_label_k051649"><text string="K051649" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_k053260"><text string="K053260" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_k054539"><text string="K054539" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ga20"><text string="GA20" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_rf5c68"><text string="RF5C68" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_rf5c164"><text string="RF5C164" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
 	<element name="static_black2"><rect><color red="0.2" green="0.21" blue="0.23" /></rect></element>
 
@@ -113,6 +117,10 @@
 		<cpanel name="led_act_20" element="act_led"><bounds x="31" y="13" width="2" height="2" /></cpanel>
 		<cpanel name="led_act_21" element="act_led"><bounds x="31" y="16" width="2" height="2" /></cpanel>
 		<cpanel name="led_act_22" element="act_led"><bounds x="31" y="19" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_23" element="act_led"><bounds x="31" y="22" width="2" height="2" /></cpanel>
+	
+		<cpanel name="led_act_24" element="act_led"><bounds x="46" y="1" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_25" element="act_led"><bounds x="46" y="4" width="2" height="2" /></cpanel>
 
 		<cpanel element="act_label_ay8910"><bounds x="4" y="1.2" width="10" height="1.6" /></cpanel>
 		<cpanel element="act_label_sn76496"><bounds x="4" y="4.2" width="10" height="1.6" /></cpanel>
@@ -139,6 +147,10 @@
 		<cpanel element="act_label_k051649"><bounds x="34" y="13.2" width="10" height="1.6" /></cpanel>
 		<cpanel element="act_label_k053260"><bounds x="34" y="16.2" width="10" height="1.6" /></cpanel>
 		<cpanel element="act_label_k054539"><bounds x="34" y="19.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ga20"><bounds x="34" y="22.2" width="10" height="1.6" /></cpanel>
+	
+		<cpanel element="act_label_rf5c68"><bounds x="49" y="1.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_rf5c164"><bounds x="49" y="4.2" width="10" height="1.6" /></cpanel>
 	</group>
 
 	<view name="Internal Layout">

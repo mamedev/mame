@@ -870,7 +870,7 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbc)
 
-	MCFG_DEFAULT_LAYOUT(layout_bbc)
+	config.set_default_layout(layout_bbc);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -953,8 +953,8 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 	MCFG_UPD7002_EOC_CB(bbc_state, BBC_uPD7002_EOC)
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522_1", via6522_device, write_ca1)) MCFG_DEVCB_INVERT /* ack seems to be inverted? */
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.ack_handler().set("via6522_1", FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* fdc */
@@ -1313,7 +1313,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcm)
 
-	MCFG_DEFAULT_LAYOUT(layout_bbcm)
+	config.set_default_layout(layout_bbcm);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1352,8 +1352,8 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
 
 	/* printer */
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522_1", via6522_device, write_ca1)) MCFG_DEVCB_INVERT /* ack seems to be inverted? */
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.ack_handler().set("via6522_1", FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* cassette */

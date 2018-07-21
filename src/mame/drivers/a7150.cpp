@@ -28,6 +28,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/bankdev.h"
+#include "machine/input_merger.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
@@ -67,6 +68,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void a7150(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -104,7 +108,7 @@ public:
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
-	void a7150(machine_config &config);
+
 	void a7150_io(address_map &map);
 	void a7150_mem(address_map &map);
 	void k7070_cpu_banked(address_map &map);
@@ -486,29 +490,30 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 //  MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, a7150_state, ppi_c_w))
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(14'745'600)/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_PIT8253_CLK1(XTAL(14'745'600)/4)
-	MCFG_PIT8253_CLK2(XTAL(14'745'600)/4)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, a7150_state, a7150_tmr2_w))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(14.7456_MHz_XTAL/4);
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	m_pit8253->set_clk<1>(14.7456_MHz_XTAL/4);
+	m_pit8253->set_clk<2>(14.7456_MHz_XTAL/4);
+	m_pit8253->out_handler<2>().set(FUNC(a7150_state::a7150_tmr2_w));
 
-	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, a7150_state, ifss_write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, a7150_state, ifss_write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, a7150_state, ifss_loopback_w))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir4_w))
+	INPUT_MERGER_ANY_HIGH(config, "uart_irq").output_handler().set(m_pic8259, FUNC(pic8259_device::ir4_w));
+
+	I8251(config, m_uart8251, 0);
+	m_uart8251->txd_handler().set(FUNC(a7150_state::ifss_write_txd));
+	m_uart8251->dtr_handler().set(FUNC(a7150_state::ifss_write_dtr));
+	m_uart8251->rts_handler().set(FUNC(a7150_state::ifss_loopback_w));
+	m_uart8251->rxrdy_handler().set("uart_irq", FUNC(input_merger_device::in_w<0>));
+	m_uart8251->txrdy_handler().set("uart_irq", FUNC(input_merger_device::in_w<1>));
 
 	// IFSS port on processor card -- keyboard runs at 28800 8N2
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8251", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8251", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
+	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard");
+	m_rs232->rxd_handler().set(m_uart8251, FUNC(i8251_device::write_rxd));
+	m_rs232->cts_handler().set(m_uart8251, FUNC(i8251_device::write_cts));
+	m_rs232->dsr_handler().set(m_uart8251, FUNC(i8251_device::write_dsr));
+	m_rs232->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(kbd_rs232_defaults));
 
-	MCFG_DEVICE_ADD("isbc_215g", ISBC_215G, 0x4a, "maincpu")
-	MCFG_ISBC_215_IRQ(WRITELINE("pic8259", pic8259_device, ir5_w))
+	ISBC_215G(config, "isbc_215g", 0, 0x4a, m_maincpu).irq_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
 	// KGS K7070 graphics terminal controlling ABG K7072 framebuffer
 	MCFG_DEVICE_ADD("gfxcpu", Z80, XTAL(16'000'000)/4)
@@ -516,24 +521,24 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_DEVICE_IO_MAP(k7070_cpu_io)
 	MCFG_Z80_DAISY_CHAIN(k7070_daisy_chain)
 
-	MCFG_DEVICE_ADD("video_bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(k7070_cpu_banked)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, m_video_bankdev, 0);
+	m_video_bankdev->set_map(&a7150_state::k7070_cpu_banked);
+	m_video_bankdev->set_endianness(ENDIANNESS_BIG);
+	m_video_bankdev->set_addr_width(18);
+	m_video_bankdev->set_data_width(8);
+	m_video_bankdev->set_stride(0x10000);
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 1230750)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(Z80CTC_TAG, z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 1230750));
+	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
+	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg3));
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(16'000'000)/3)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("gfxcpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80SIO_TAG, z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80SIO_TAG, z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80SIO_TAG, z80sio_device, rxtxcb_w))
+	Z80CTC(config, m_ctc, 16_MHz_XTAL/3);
+	m_ctc->intr_callback().set_inputline(m_gfxcpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80sio_device::rxca_w));
+	m_ctc->zc_callback<0>().append(Z80SIO_TAG, FUNC(z80sio_device::txca_w));
+	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, XTAL(16'000'000)/4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("gfxcpu", INPUT_LINE_IRQ0))

@@ -170,21 +170,6 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	case TIMER_X68K_NET_IRQ:
 		x68k_net_irq(ptr, param);
 		break;
-	case TIMER_X68K_CRTC_OPERATION_END:
-		x68k_crtc_operation_end(ptr, param);
-		break;
-	case TIMER_X68K_HSYNC:
-		x68k_hsync(ptr, param);
-		break;
-	case TIMER_X68K_CRTC_RASTER_END:
-		x68k_crtc_raster_end(ptr, param);
-		break;
-	case TIMER_X68K_CRTC_RASTER_IRQ:
-		x68k_crtc_raster_irq(ptr, param);
-		break;
-	case TIMER_X68K_CRTC_VBLANK_IRQ:
-		x68k_crtc_vblank_irq(ptr, param);
-		break;
 	case TIMER_X68K_FDC_TC:
 		m_upd72065->tc_w(ASSERT_LINE);
 		m_upd72065->tc_w(CLEAR_LINE);
@@ -1129,9 +1114,9 @@ void x68k_state::x68k_map(address_map &map)
 {
 	map(0x000000, 0xbffffb).rw(FUNC(x68k_state::x68k_emptyram_r), FUNC(x68k_state::x68k_emptyram_w));
 	map(0xbffffc, 0xbfffff).rw(FUNC(x68k_state::x68k_rom0_r), FUNC(x68k_state::x68k_rom0_w));
-	map(0xc00000, 0xdfffff).rw(FUNC(x68k_state::x68k_gvram_r), FUNC(x68k_state::x68k_gvram_w));
-	map(0xe00000, 0xe7ffff).rw(FUNC(x68k_state::x68k_tvram_r), FUNC(x68k_state::x68k_tvram_w));
-	map(0xe80000, 0xe81fff).rw(FUNC(x68k_state::x68k_crtc_r), FUNC(x68k_state::x68k_crtc_w));
+	map(0xc00000, 0xdfffff).rw(m_crtc, FUNC(x68k_crtc_device::gvram_r), FUNC(x68k_crtc_device::gvram_w));
+	map(0xe00000, 0xe7ffff).rw(m_crtc, FUNC(x68k_crtc_device::tvram_r), FUNC(x68k_crtc_device::tvram_w));
+	map(0xe80000, 0xe81fff).rw(m_crtc, FUNC(x68k_crtc_device::crtc_r), FUNC(x68k_crtc_device::crtc_w));
 	map(0xe82000, 0xe821ff).rw(m_gfxpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("gfxpalette");
 	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("pcgpalette");
 	map(0xe82400, 0xe83fff).rw(FUNC(x68k_state::x68k_vid_r), FUNC(x68k_state::x68k_vid_w));
@@ -1168,9 +1153,9 @@ void x68k_state::x68kxvi_map(address_map &map)
 {
 	map(0x000000, 0xbffffb).rw(FUNC(x68k_state::x68k_emptyram_r), FUNC(x68k_state::x68k_emptyram_w));
 	map(0xbffffc, 0xbfffff).rw(FUNC(x68k_state::x68k_rom0_r), FUNC(x68k_state::x68k_rom0_w));
-	map(0xc00000, 0xdfffff).rw(FUNC(x68k_state::x68k_gvram_r), FUNC(x68k_state::x68k_gvram_w));
-	map(0xe00000, 0xe7ffff).rw(FUNC(x68k_state::x68k_tvram_r), FUNC(x68k_state::x68k_tvram_w));
-	map(0xe80000, 0xe81fff).rw(FUNC(x68k_state::x68k_crtc_r), FUNC(x68k_state::x68k_crtc_w));
+	map(0xc00000, 0xdfffff).rw(m_crtc, FUNC(x68k_crtc_device::gvram_r), FUNC(x68k_crtc_device::gvram_w));
+	map(0xe00000, 0xe7ffff).rw(m_crtc, FUNC(x68k_crtc_device::tvram_r), FUNC(x68k_crtc_device::tvram_w));
+	map(0xe80000, 0xe81fff).rw(m_crtc, FUNC(x68k_crtc_device::crtc_r), FUNC(x68k_crtc_device::crtc_w));
 	map(0xe82000, 0xe821ff).rw(m_gfxpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("gfxpalette");
 	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("pcgpalette");
 	map(0xe82400, 0xe83fff).rw(FUNC(x68k_state::x68k_vid_r), FUNC(x68k_state::x68k_vid_w));
@@ -1209,9 +1194,9 @@ void x68k_state::x68030_map(address_map &map)
 	map.global_mask(0x00ffffff);  // Still only has 24-bit address space
 	map(0x000000, 0xbffffb).rw(FUNC(x68k_state::x68k_emptyram_r), FUNC(x68k_state::x68k_emptyram_w));
 	map(0xbffffc, 0xbfffff).rw(FUNC(x68k_state::x68k_rom0_r), FUNC(x68k_state::x68k_rom0_w));
-	map(0xc00000, 0xdfffff).rw(FUNC(x68k_state::x68k_gvram_r), FUNC(x68k_state::x68k_gvram_w));
-	map(0xe00000, 0xe7ffff).rw(FUNC(x68k_state::x68k_tvram_r), FUNC(x68k_state::x68k_tvram_w));
-	map(0xe80000, 0xe81fff).rw(FUNC(x68k_state::x68k_crtc_r), FUNC(x68k_state::x68k_crtc_w));
+	map(0xc00000, 0xdfffff).rw(m_crtc, FUNC(x68k_crtc_device::gvram_r), FUNC(x68k_crtc_device::gvram_w));
+	map(0xe00000, 0xe7ffff).rw(m_crtc, FUNC(x68k_crtc_device::tvram_r), FUNC(x68k_crtc_device::tvram_w));
+	map(0xe80000, 0xe81fff).rw(m_crtc, FUNC(x68k_crtc_device::crtc_r), FUNC(x68k_crtc_device::crtc_w));
 	map(0xe82000, 0xe821ff).rw(m_gfxpalette, FUNC(palette_device::read32), FUNC(palette_device::write32)).share("gfxpalette");
 	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read32), FUNC(palette_device::write32)).share("pcgpalette");
 	map(0xe82400, 0xe83fff).rw(FUNC(x68k_state::x68k_vid_r), FUNC(x68k_state::x68k_vid_w));
@@ -1282,9 +1267,6 @@ static INPUT_PORTS_START( x68000 )
 	PORT_CONFNAME( 0x02, 0x02, "Enable fake bus errors")
 	PORT_CONFSETTING(   0x00, DEF_STR( Off ))
 	PORT_CONFSETTING(   0x02, DEF_STR( On ))
-	PORT_CONFNAME( 0x04, 0x04, "Enable partial updates on each HSync")
-	PORT_CONFSETTING(   0x00, DEF_STR( Off ))
-	PORT_CONFSETTING(   0x04, DEF_STR( On ))
 
 	PORT_START("mouse1")  // mouse buttons
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
@@ -1492,36 +1474,15 @@ void x68k_state::machine_reset()
 	memset(m_ram->pointer(),0,m_ram->size());
 	memcpy(m_ram->pointer(),romdata,8);
 
-	// initialise CRTC, set registers to defaults for the standard text mode (768x512)
-	m_crtc.reg[0] = 137;  // Horizontal total  (in characters)
-	m_crtc.reg[1] = 14;   // Horizontal sync end
-	m_crtc.reg[2] = 28;   // Horizontal start
-	m_crtc.reg[3] = 124;  // Horizontal end
-	m_crtc.reg[4] = 567;  // Vertical total
-	m_crtc.reg[5] = 5;    // Vertical sync end
-	m_crtc.reg[6] = 40;   // Vertical start
-	m_crtc.reg[7] = 552;  // Vertical end
-	m_crtc.reg[8] = 27;   // Horizontal adjust
-
-	m_scanline = m_screen->vpos();// = m_crtc.reg[6];  // Vertical start
-
-	// start VBlank timer
-	m_crtc.vblank = 1;
-	attotime const irq_time = m_screen->time_until_pos(m_crtc.reg[6],2);
-	m_vblank_irq->adjust(irq_time);
-
-	// start HBlank timer
-	m_scanline_timer->adjust(m_screen->scan_period(), 1);
-
 	/// TODO: get callbacks to trigger these
 	m_mfpdev->i0_w(1); // alarm
 	m_mfpdev->i1_w(1); // expon
 	m_mfpdev->i2_w(0); // pow sw
 	m_mfpdev->i3_w(1); // fmirq
-	m_mfpdev->i4_w(1); // v-disp
+	//m_mfpdev->i4_w(1); // v-disp
 	m_mfpdev->i5_w(1); // unused (always set)
-	m_mfpdev->i6_w(1); // cirq
-	m_mfpdev->i7_w(1); // h-sync
+	//m_mfpdev->i6_w(1); // cirq
+	//m_mfpdev->i7_w(1); // h-sync
 
 	// reset output values
 	output().set_value("key_led_kana",1);
@@ -1591,9 +1552,6 @@ void x68k_state::init_x68000()
 	// copy last half of BIOS to a user region, to use for initial startup
 	memcpy(user2,(rom+0xff0000),0x10000);
 
-	m_scanline_timer = timer_alloc(TIMER_X68K_HSYNC);
-	m_raster_irq = timer_alloc(TIMER_X68K_CRTC_RASTER_IRQ);
-	m_vblank_irq = timer_alloc(TIMER_X68K_CRTC_VBLANK_IRQ);
 	m_mouse_timer = timer_alloc(TIMER_X68K_SCC_ACK);
 	m_led_timer = timer_alloc(TIMER_X68K_LED);
 	m_net_timer = timer_alloc(TIMER_X68K_NET_IRQ);
@@ -1650,16 +1608,16 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* device hardware */
-	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD("mc68901", MC68901, 16_MHz_XTAL / 4)
 	MCFG_MC68901_TIMER_CLOCK(16_MHz_XTAL / 4)
 	MCFG_MC68901_RX_CLOCK(0)
 	MCFG_MC68901_TX_CLOCK(0)
 	MCFG_MC68901_OUT_IRQ_CB(WRITELINE(*this, x68k_state, mfp_irq_callback))
-	MCFG_MC68901_OUT_TBO_CB(WRITELINE(MC68901_TAG, mc68901_device, clock_w))
+	MCFG_MC68901_OUT_TBO_CB(WRITELINE("mc68901", mc68901_device, clock_w))
 	MCFG_MC68901_OUT_SO_CB(WRITELINE("keyboard", rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD("keyboard", RS232_PORT, keyboard, "x68k")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("mc68901", mc68901_device, write_rx))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, x68k_state, ppi_port_a_r))
@@ -1678,13 +1636,24 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 
 	MCFG_DEVICE_ADD("scc", SCC8530, 40_MHz_XTAL / 8)
 
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, 32.768_kHz_XTAL)
-	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
+	MCFG_DEVICE_ADD("rp5c15", RP5C15, 32.768_kHz_XTAL)
+	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE("mc68901", mc68901_device, i0_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(69.55199_MHz_XTAL / 2, 1096, 0, 768, 568, 0, 512)  // initial setting
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
+
+	VINAS(config, m_crtc, 38.86363_MHz_XTAL);
+	m_crtc->set_screen("screen");
+	m_crtc->vdisp_cb().set("mc68901", FUNC(mc68901_device::i4_w));
+	m_crtc->vdisp_cb().append("mc68901", FUNC(mc68901_device::tai_w));
+	m_crtc->rint_cb().set("mc68901", FUNC(mc68901_device::i6_w));
+	m_crtc->hsync_cb().set("mc68901", FUNC(mc68901_device::i7_w));
+	m_crtc->tvram_read_cb().set(FUNC(x68k_state::tvram_read));
+	m_crtc->tvram_write_cb().set(FUNC(x68k_state::tvram_write));
+	m_crtc->gvram_read_cb().set(FUNC(x68k_state::gvram_read));
+	m_crtc->gvram_write_cb().set(FUNC(x68k_state::gvram_write));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcgpalette", gfxdecode_device::empty)
 
@@ -1695,7 +1664,7 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 
 	MCFG_VIDEO_START_OVERRIDE(x68k_state, x68000 )
 
-	MCFG_DEFAULT_LAYOUT( layout_x68000 )
+	config.set_default_layout(layout_x68000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1730,7 +1699,7 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_DEVICE_SLOT_INTERFACE(x68000_exp_cards, nullptr, false)
 	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ2_CB(WRITELINE(*this, x68k_state, x68k_irq2_line))
 	MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(WRITELINE(*this, x68k_state, x68k_irq4_line))
-	MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", M68K_IRQ_7))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1762,6 +1731,17 @@ MACHINE_CONFIG_START(x68k_state::x68ksupr)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_MB89352A_IRQ_CB(WRITELINE(*this, x68k_state, x68k_scsi_irq))
 	MCFG_MB89352A_DRQ_CB(WRITELINE(*this, x68k_state, x68k_scsi_drq))
+
+	VICON(config.replace(), m_crtc, 38.86363_MHz_XTAL);
+	m_crtc->set_screen("screen");
+	m_crtc->vdisp_cb().set("mc68901", FUNC(mc68901_device::i4_w));
+	m_crtc->vdisp_cb().append("mc68901", FUNC(mc68901_device::tai_w));
+	m_crtc->rint_cb().set("mc68901", FUNC(mc68901_device::i6_w));
+	m_crtc->hsync_cb().set("mc68901", FUNC(mc68901_device::i7_w));
+	m_crtc->tvram_read_cb().set(FUNC(x68k_state::tvram_read));
+	m_crtc->tvram_write_cb().set(FUNC(x68k_state::tvram_write));
+	m_crtc->gvram_read_cb().set(FUNC(x68k_state::gvram_read));
+	m_crtc->gvram_write_cb().set(FUNC(x68k_state::gvram_write));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(x68k_state::x68kxvi)

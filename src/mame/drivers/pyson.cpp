@@ -165,11 +165,12 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void pyson(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void pyson(machine_config &config);
 	void ps2_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;

@@ -1631,28 +1631,28 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, fdc_8255_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, fdc_8255_c_w))
 
-	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, pc88va_state, get_slave_ack))
+	PIC8259(config, m_pic1, 0);
+	m_pic1->out_int_callback().set_inputline(m_maincpu, 0);
+	m_pic1->in_sp_callback().set_constant(1);
+	m_pic1->read_slave_ack_callback().set(FUNC(pc88va_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	PIC8259(config, m_pic2, 0);
+	m_pic2->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir7_w));
+	m_pic2->in_sp_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD("dmac", AM9517A, 8000000) /* ch2 is FDC, ch0/3 are "user". ch1 is unused */
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, pc88va_state, pc88va_hlda_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(*this, pc88va_state, pc88va_tc_w))
-	MCFG_AM9517A_IN_IOR_2_CB(READ8(*this, pc88va_state, fdc_dma_r))
-	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(*this, pc88va_state, fdc_dma_w))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, pc88va_state, dma_memr_cb))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, pc88va_state, dma_memw_cb))
+	AM9517A(config, m_dmac, 8000000); // ch2 is FDC, ch0/3 are "user". ch1 is unused
+	m_dmac->out_hreq_callback().set(FUNC(pc88va_state::pc88va_hlda_w));
+	m_dmac->out_eop_callback().set(FUNC(pc88va_state::pc88va_tc_w));
+	m_dmac->in_ior_callback<2>().set(FUNC(pc88va_state::fdc_dma_r));
+	m_dmac->out_iow_callback<2>().set(FUNC(pc88va_state::fdc_dma_w));
+	m_dmac->in_memr_callback().set(FUNC(pc88va_state::dma_memr_cb));
+	m_dmac->out_memw_callback().set(FUNC(pc88va_state::dma_memw_cb));
 
 	MCFG_UPD765A_ADD("upd765", false, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc88va_state, fdc_irq))
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc88va_state, fdc_drq))
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88va_floppies, "525hd", pc88va_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88va_floppies, "525hd", pc88va_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, m_fdd[0], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)

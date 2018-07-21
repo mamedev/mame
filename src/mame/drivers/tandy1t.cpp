@@ -82,6 +82,17 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_vram_bank(0) { }
 
+	void tandy1000_common(machine_config &config);
+	void tandy1000_90key(machine_config &config);
+	void tandy1000_101key(machine_config &config);
+	void t1000tl(machine_config &config);
+	void t1000sx(machine_config &config);
+	void t1000rl(machine_config &config);
+	void t1000sl2(machine_config &config);
+	void t1000hx(machine_config &config);
+	void t1000tx(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 // Memory regions for the machines that support rom banking
@@ -131,15 +142,7 @@ public:
 	uint8_t m_vram_bank;
 	static void cfg_fdc_35(device_t *device);
 	static void cfg_fdc_525(device_t *device);
-	void tandy1000_common(machine_config &config);
-	void tandy1000_90key(machine_config &config);
-	void tandy1000_101key(machine_config &config);
-	void t1000tl(machine_config &config);
-	void t1000sx(machine_config &config);
-	void t1000rl(machine_config &config);
-	void t1000sl2(machine_config &config);
-	void t1000hx(machine_config &config);
-	void t1000tx(machine_config &config);
+
 	void biosbank_map(address_map &map);
 	void tandy1000_16_io(address_map &map);
 	void tandy1000_286_map(address_map &map);

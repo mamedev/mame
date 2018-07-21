@@ -50,13 +50,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG) { }
 
+	void vt220(machine_config &config);
+	void vt220a(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	void vt220(machine_config &config);
-	void vt220a(machine_config &config);
 	void vt220_io(address_map &map);
 	void vt220_mem(address_map &map);
 	void vt220a_io(address_map &map);

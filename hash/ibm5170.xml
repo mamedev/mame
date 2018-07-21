@@ -5514,6 +5514,75 @@
 		</part>
 	</software>
 
+	<software name="excel3">
+		<description>Excel (Version 3.0a)</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Setup 1" />
+			<!-- 2 tracks modified (user registration) -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Setup 1).img" size="368640" crc="fedf10ed" sha1="4f856e45ab7f340353b10eb64e705021b8f5a1f2" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Setup 2" />
+			<!-- all tracks good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Setup 2).img" size="368640" crc="f9b3a545" sha1="c072e4b67bc410d11f8b60eb5b792cf6e3aa210c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Setup 3" />
+			<!-- 1 track bad + 3 modified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Setup 3).img" size="368640" crc="4d1e1ba9" sha1="67f0c10dc434012432ba0ca8130c5e3fe93e0924" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Help 1" />
+			<!-- all tracks good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Help 1).img" size="368640" crc="3d41cd1a" sha1="4a899278e347e81d326344a624f34f6f6ce3b562" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Help 2" />
+			<!-- all tracks good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Help 2).img" size="368640" crc="87f338ff" sha1="0b8d6462436b262eafd69eacd37b5f48eea151bc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Help 3" />
+			<!-- 1 track modified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Help 3).img" size="368640" crc="9b4c0239" sha1="a4ab1cd4c6f26b8cd6c13a9fc38ad868b6cba5de" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Library 1" />
+			<!-- 2 tracks modified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Library 1).img" size="368640" crc="52de9e49" sha1="4c2a86544a210e830cd2621112ebb8dc8f7f72d8" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Library 2" />
+			<!-- 1 track bad -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Library 2).img" size="368640" crc="0d0446bc" sha1="20d07a0d1c04ba29e84b7b5dbd5d5649b435584e" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Library 3" />
+			<!-- 1 track bad + 1 modified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Library 3).img" size="368640" crc="3e251d3b" sha1="565df94309afa5744c9cef5c4b2693a6eaa16f7b" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beureka">
 		<!-- KryoFlux dump, not original -->
 		<description>Eureka: The Solver</description>
@@ -6292,7 +6361,7 @@
 				<rom name="disk1.img" size="737280" crc="c09c7f23" sha1="630cde83828053de14f622fab89e3e6e1602b6dc" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_%">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk2.img" size="737280" crc="94ea897b" sha1="ce9e331ebfb1aac40ae1e422cbbd68ce341f48db" offset="0" />
 			</dataarea>
@@ -9137,14 +9206,46 @@
 		</part>
 	</software>
 
-	<software name="incrmach">
-		<description>Incredible Machine</description>
-		<year>1993</year>
-		<publisher>Dynamix/Sierra</publisher>
+	<software name="tim" supported="partial">
+		<description>The Incredible Machine</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="incredible machine.img" size="1474560" crc="64f15085" sha1="f0ed16b665ad2378c59c1d1d9370479ca2eb494e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tima" cloneof="tim" supported="partial">
+		<description>The Incredible Machine (alt)</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Incredible Machine [Sierra] [1992] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="8068c178" sha1="77fb9cc75d9ba8b4a39b441e1f0daeb326cd4549" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="tim2" supported="partial">
+		<description>The Incredible Machine 2</description>
+		<year>1994</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Jeff Tunnell Productions" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Incredible Machine 2 [Sierra] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ab1b5301" sha1="4c8e30f458532cd19cd2e83c77e9a4fea2b29827" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Incredible Machine 2 [Sierra] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="1a1767cc" sha1="90c636a8213c4e9c67b4addb3c8512115494bfa2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

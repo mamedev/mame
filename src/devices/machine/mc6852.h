@@ -42,16 +42,16 @@
 	downcast<mc6852_device &>(*device).set_tx_clock(_clock);
 
 #define MCFG_MC6852_TX_DATA_CALLBACK(_write) \
-	devcb = &downcast<mc6852_device &>(*device).set_tx_data_wr_callback(DEVCB_##_write);
+	downcast<mc6852_device &>(*device).set_tx_data_wr_callback(DEVCB_##_write);
 
 #define MCFG_MC6852_IRQ_CALLBACK(_write) \
-	devcb = &downcast<mc6852_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<mc6852_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_MC6852_SM_DTR_CALLBACK(_write) \
-	devcb = &downcast<mc6852_device &>(*device).set_sm_dtr_wr_callback(DEVCB_##_write);
+	downcast<mc6852_device &>(*device).set_sm_dtr_wr_callback(DEVCB_##_write);
 
 #define MCFG_MC6852_TUF_CALLBACK(_write) \
-	devcb = &downcast<mc6852_device &>(*device).set_tuf_wr_callback(DEVCB_##_write);
+	downcast<mc6852_device &>(*device).set_tuf_wr_callback(DEVCB_##_write);
 
 
 

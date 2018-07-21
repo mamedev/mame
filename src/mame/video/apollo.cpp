@@ -1714,7 +1714,7 @@ void apollo_graphics_15i::register_vblank_callback()
  ***************************************************************************/
 
 MACHINE_CONFIG_START(apollo_state::apollo_graphics)
-	MCFG_DEFAULT_LAYOUT( layout_apollo_15i )
+	config.set_default_layout(layout_apollo_15i);
 	MCFG_SCREEN_ADD(VIDEO_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(68000000, 1346, 0, 1024, 841, 0, 800)
@@ -1884,7 +1884,7 @@ void apollo_graphics_15i::device_reset()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(apollo_state::apollo_mono19i)
-	MCFG_DEFAULT_LAYOUT( layout_apollo )
+	config.set_default_layout(layout_apollo);
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_SCREEN_ADD(VIDEO_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

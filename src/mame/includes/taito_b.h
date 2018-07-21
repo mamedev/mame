@@ -35,32 +35,6 @@ public:
 		m_tracky_io(*this, "TRACKY%u", 1U)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	template<int Player> DECLARE_READ16_MEMBER(tracky_hi_r);
-	template<int Player> DECLARE_READ16_MEMBER(tracky_lo_r);
-	template<int Player> DECLARE_READ16_MEMBER(trackx_hi_r);
-	template<int Player> DECLARE_READ16_MEMBER(trackx_lo_r);
-	DECLARE_WRITE16_MEMBER(gain_control_w);
-	DECLARE_READ16_MEMBER(eep_latch_r);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE8_MEMBER(player_12_coin_ctrl_w);
-	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);
-	DECLARE_WRITE16_MEMBER(player_34_coin_ctrl_w);
-	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);
-	DECLARE_WRITE16_MEMBER(realpunc_output_w);
-	DECLARE_WRITE16_MEMBER(hitice_pixelram_w);
-	DECLARE_WRITE16_MEMBER(hitice_pixel_scroll_w);
-	DECLARE_WRITE16_MEMBER(realpunc_video_ctrl_w);
-	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
-	void init_taito_b();
-	DECLARE_VIDEO_START(hitice);
-	DECLARE_VIDEO_RESET(hitice);
-	DECLARE_VIDEO_START(realpunc);
-	DECLARE_VIDEO_START(taitob_core);
-	uint32_t screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	void spacedx(machine_config &config);
 	void rambo3(machine_config &config);
 	void hitice(machine_config &config);
@@ -79,6 +53,33 @@ public:
 	void viofight(machine_config &config);
 	void crimec(machine_config &config);
 	void selfeena(machine_config &config);
+
+	void init_taito_b();
+
+protected:
+	DECLARE_WRITE8_MEMBER(player_12_coin_ctrl_w);
+
+	void sound_map(address_map &map);
+
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	template<int Player> DECLARE_READ16_MEMBER(tracky_hi_r);
+	template<int Player> DECLARE_READ16_MEMBER(tracky_lo_r);
+	template<int Player> DECLARE_READ16_MEMBER(trackx_hi_r);
+	template<int Player> DECLARE_READ16_MEMBER(trackx_lo_r);
+	DECLARE_WRITE16_MEMBER(gain_control_w);
+	DECLARE_READ16_MEMBER(eep_latch_r);
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);
+	DECLARE_WRITE16_MEMBER(player_34_coin_ctrl_w);
+	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);
+	DECLARE_WRITE16_MEMBER(hitice_pixelram_w);
+	DECLARE_WRITE16_MEMBER(hitice_pixel_scroll_w);
+	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
+	DECLARE_VIDEO_START(hitice);
+	DECLARE_VIDEO_RESET(hitice);
+	DECLARE_VIDEO_START(taitob_core);
+	uint32_t screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void crimec_map(address_map &map);
 	void hitice_map(address_map &map);
 	void masterw_map(address_map &map);
@@ -87,29 +88,25 @@ public:
 	void qzshowby_map(address_map &map);
 	void rambo3_map(address_map &map);
 	void rastsag2_map(address_map &map);
-	void realpunc_hd63484_map(address_map &map);
-	void realpunc_map(address_map &map);
+
 	void sbm_map(address_map &map);
 	void selfeena_map(address_map &map);
 	void silentd_map(address_map &map);
-	void sound_map(address_map &map);
 	void spacedx_map(address_map &map);
 	void spacedxo_map(address_map &map);
 	void tetrist_map(address_map &map);
 	void tetrista_map(address_map &map);
 	void viofight_map(address_map &map);
 	void viofight_sound_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_pixelram;
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_pixel_bitmap;
-	std::unique_ptr<bitmap_ind16> m_realpunc_bitmap;
 
 	uint16_t        m_pixel_scroll[3];
 
@@ -118,8 +115,6 @@ private:
 	/* misc */
 	uint16_t        m_eep_latch;
 	uint16_t        m_coin_word;
-
-	uint16_t        m_realpunc_video_ctrl;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -139,7 +134,7 @@ private:
 	optional_ioport_array<2> m_trackx_io;
 	optional_ioport_array<2> m_tracky_io;
 
-	void hitice_clear_pixel_bitmap(  );
+	void hitice_clear_pixel_bitmap();
 };
 
 class taitob_c_state : public taitob_state
@@ -148,6 +143,22 @@ public:
 	using taitob_state::taitob_state;
 	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
 	void realpunc(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
+
+protected:
+	DECLARE_WRITE16_MEMBER(realpunc_output_w);
+	DECLARE_WRITE16_MEMBER(realpunc_video_ctrl_w);
+
+	void realpunc_map(address_map &map);
+	void realpunc_hd63484_map(address_map &map);
+
+	DECLARE_VIDEO_START(realpunc);
+	uint32_t screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+private:
+	std::unique_ptr<bitmap_ind16> m_realpunc_bitmap;
+	uint16_t        m_realpunc_video_ctrl;
 };
 
 #endif // MAME_INCLUDES_TAITO_B_H

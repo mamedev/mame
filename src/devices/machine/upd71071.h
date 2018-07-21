@@ -82,45 +82,45 @@ DECLARE_DEVICE_TYPE(UPD71071, upd71071_device)
 	downcast<upd71071_device &>(*device).set_clock((clk));
 
 #define MCFG_UPD71071_OUT_HREQ_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_out_hreq_callback((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_out_hreq_callback((DEVCB_##cb));
 
 #define MCFG_UPD71071_OUT_EOP_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_out_eop_callback((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_out_eop_callback((DEVCB_##cb));
 
 #define MCFG_UPD71071_DMA_READ_0_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_dma_read_callback<0>((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_dma_read_callback<0>((DEVCB_##cb));
 
 #define MCFG_UPD71071_DMA_READ_1_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_dma_read_callback<1>((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_dma_read_callback<1>((DEVCB_##cb));
 
 #define MCFG_UPD71071_DMA_READ_2_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_dma_read_callback<2>((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_dma_read_callback<2>((DEVCB_##cb));
 
 #define MCFG_UPD71071_DMA_READ_3_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_dma_read_callback<3>((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_dma_read_callback<3>((DEVCB_##cb));
 
 #define MCFG_UPD71071_DMA_WRITE_0_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_dma_write_callback<0>((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_dma_write_callback<0>((DEVCB_##cb));
 
 #define MCFG_UPD71071_DMA_WRITE_1_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_dma_write_callback<1>((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_dma_write_callback<1>((DEVCB_##cb));
 
 #define MCFG_UPD71071_DMA_WRITE_2_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_dma_write_callback<2>((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_dma_write_callback<2>((DEVCB_##cb));
 
 #define MCFG_UPD71071_DMA_WRITE_3_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_dma_write_callback<3>((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_dma_write_callback<3>((DEVCB_##cb));
 
 #define MCFG_UPD71071_OUT_DACK_0_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_out_dack_callback<0>((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_out_dack_callback<0>((DEVCB_##cb));
 
 #define MCFG_UPD71071_OUT_DACK_1_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_out_dack_callback<1>((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_out_dack_callback<1>((DEVCB_##cb));
 
 #define MCFG_UPD71071_OUT_DACK_2_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_out_dack_callback<2>((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_out_dack_callback<2>((DEVCB_##cb));
 
 #define MCFG_UPD71071_OUT_DACK_3_CB(cb) \
-	devcb = &downcast<upd71071_device &>(*device).set_out_dack_callback<3>((DEVCB_##cb));
+	downcast<upd71071_device &>(*device).set_out_dack_callback<3>((DEVCB_##cb));
 
 #endif // MAME_MACHINE_UPD71071_H

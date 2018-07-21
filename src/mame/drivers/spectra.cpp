@@ -59,7 +59,7 @@ public:
 
 	void spectra(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
@@ -68,7 +68,6 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
 	void spectra_map(address_map &map);
 
-private:
 	uint8_t m_porta;
 	uint8_t m_portb;
 	uint8_t m_t_c;
@@ -248,7 +247,7 @@ MACHINE_CONFIG_START(spectra_state::spectra)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("outtimer", spectra_state, outtimer, attotime::from_hz(1200))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_spectra)
+	config.set_default_layout(layout_spectra);
 
 	/* Sound */
 	genpin_audio(config);

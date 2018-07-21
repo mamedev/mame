@@ -163,16 +163,16 @@ public:
 			bus::ti99::internal::video992_device::TOTAL_VERT_NTSC, bus::ti99::internal::video992_device::VERT_DISPLAY_START_NTSC - 12, bus::ti99::internal::video992_device::VERT_DISPLAY_START_NTSC + 192 + 12 )
 
 #define MCFG_VIDEO992_MEM_ACCESS_CB(_devcb) \
-	devcb = &downcast<bus::ti99::internal::video992_device &>(*device).set_readmem_callback(DEVCB_##_devcb);
+	downcast<bus::ti99::internal::video992_device &>(*device).set_readmem_callback(DEVCB_##_devcb);
 
 #define MCFG_VIDEO992_HOLD_CB(_devcb) \
-	devcb = &downcast<bus::ti99::internal::video992_device &>(*device).set_hold_callback(DEVCB_##_devcb);
+	downcast<bus::ti99::internal::video992_device &>(*device).set_hold_callback(DEVCB_##_devcb);
 
 #define MCFG_VIDEO992_INT_CB(_devcb) \
-	devcb = &downcast<bus::ti99::internal::video992_device &>(*device).set_int_callback(DEVCB_##_devcb);
+	downcast<bus::ti99::internal::video992_device &>(*device).set_int_callback(DEVCB_##_devcb);
 
 #define MCFG_SET_ROMBANK_HANDLER( _devcb ) \
-	devcb = &downcast<bus::ti99::internal::io992_device &>(*device).set_rombank_callback(DEVCB_##_devcb);
+	downcast<bus::ti99::internal::io992_device &>(*device).set_rombank_callback(DEVCB_##_devcb);
 
 DECLARE_DEVICE_TYPE_NS(VIDEO99224, bus::ti99::internal, video992_24_device)
 DECLARE_DEVICE_TYPE_NS(VIDEO99232, bus::ti99::internal, video992_32_device)

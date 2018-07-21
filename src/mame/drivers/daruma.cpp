@@ -131,7 +131,7 @@ MACHINE_CONFIG_START(daruma_state::daruma)
 	MCFG_SOUND_ROUTE(0, "mono", 1.00)
 
 /*  TODO:
-    MCFG_DEFAULT_LAYOUT(layout_daruma)
+    config.set_default_layout(layout_daruma);
 
     Motors: MTA011
     http://pdf.datasheetcatalog.com/datasheet/Shindengen/mXstzvq.pdf

@@ -73,6 +73,31 @@ public:
 		m_store_cart_selection_data(false)
 	{ }
 
+	void sms_base(machine_config &config);
+	void sms_ntsc_base(machine_config &config);
+	void sms_pal_base(machine_config &config);
+	void sms_paln_base(machine_config &config);
+	void sms_br_base(machine_config &config);
+	void sms3_br(machine_config &config);
+	void sg1000m3(machine_config &config);
+	void smsj(machine_config &config);
+	void sms1_paln(machine_config &config);
+	void sms1_ntsc(machine_config &config);
+	void gamegear(machine_config &config);
+	void gamegeaj(machine_config &config);
+	void sms3_paln(machine_config &config);
+	void sms1_pal(machine_config &config);
+	void sms2_pal(machine_config &config);
+	void sms2_kr(machine_config &config);
+	void sms1_br(machine_config &config);
+	void sms2_ntsc(machine_config &config);
+	void sms1_kr(machine_config &config);
+
+	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
+
+	uint32_t screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+protected:
 	void store_post_load();
 	void store_select_cart(uint8_t data);
 
@@ -105,7 +130,6 @@ public:
 	DECLARE_READ8_MEMBER(sms_sscope_r);
 	DECLARE_WRITE8_MEMBER(sms_sscope_w);
 
-	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_csync_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
@@ -117,7 +141,6 @@ public:
 	DECLARE_VIDEO_START(sms1);
 	DECLARE_VIDEO_RESET(sms1);
 
-	uint32_t screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sms1_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sms1_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -125,25 +148,6 @@ public:
 	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sms1);
 
-	void sms_base(machine_config &config);
-	void sms_ntsc_base(machine_config &config);
-	void sms_pal_base(machine_config &config);
-	void sms_paln_base(machine_config &config);
-	void sms_br_base(machine_config &config);
-	void sms3_br(machine_config &config);
-	void sg1000m3(machine_config &config);
-	void smsj(machine_config &config);
-	void sms1_paln(machine_config &config);
-	void sms1_ntsc(machine_config &config);
-	void gamegear(machine_config &config);
-	void gamegeaj(machine_config &config);
-	void sms3_paln(machine_config &config);
-	void sms1_pal(machine_config &config);
-	void sms2_pal(machine_config &config);
-	void sms2_kr(machine_config &config);
-	void sms1_br(machine_config &config);
-	void sms2_ntsc(machine_config &config);
-	void sms1_kr(machine_config &config);
 	void gg_io(address_map &map);
 	void sg1000m3_io(address_map &map);
 	void sms1_mem(address_map &map);
@@ -152,7 +156,6 @@ public:
 	void smsj_io(address_map &map);
 	void smskr_io(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint8_t read_bus(address_space &space, unsigned int bank, uint16_t base_addr, uint16_t offset);

@@ -646,33 +646,33 @@ WRITE_LINE_MEMBER(playch10_state::vblank_irq)
 
 MACHINE_CONFIG_START(playch10_state::playch10)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, 8000000/2) // 4 MHz
-	MCFG_DEVICE_PROGRAM_MAP(bios_map)
-	MCFG_DEVICE_IO_MAP(bios_io_map)
+	Z80(config, m_maincpu, 8000000/2); // 4 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &playch10_state::bios_map);
+	m_maincpu->set_addrmap(AS_IO, &playch10_state::bios_io_map);
 
-	MCFG_DEVICE_ADD("cart", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(cart_map)
+	N2A03(config, m_cartcpu, NTSC_APU_CLOCK);
+	m_cartcpu->set_addrmap(AS_PROGRAM, &playch10_state::cart_map);
 
-	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // 7D
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, playch10_state, sdcs_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, playch10_state, cntrl_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, playch10_state, disp_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, playch10_state, sound_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("cart", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // GAMERES
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("cart", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // GAMESTOP
+	ls259_device &outlatch1(LS259(config, "outlatch1")); // 7D
+	outlatch1.q_out_cb<0>().set(FUNC(playch10_state::sdcs_w));
+	outlatch1.q_out_cb<1>().set(FUNC(playch10_state::cntrl_mask_w));
+	outlatch1.q_out_cb<2>().set(FUNC(playch10_state::disp_mask_w));
+	outlatch1.q_out_cb<3>().set(FUNC(playch10_state::sound_mask_w));
+	outlatch1.q_out_cb<4>().set_inputline(m_cartcpu, INPUT_LINE_RESET).invert(); // GAMERES
+	outlatch1.q_out_cb<5>().set_inputline(m_cartcpu, INPUT_LINE_HALT).invert(); // GAMESTOP
 
-	MCFG_DEVICE_ADD("outlatch2", LS259, 0) // 7E
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, playch10_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, playch10_state, dog_di_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, playch10_state, ppu_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, playch10_state, up8w_w))
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, playch10_state, cart_sel_w)) MCFG_DEVCB_MASK(0x78) MCFG_DEVCB_RSHIFT(-3)
+	ls259_device &outlatch2(LS259(config, "outlatch2")); // 7E
+	outlatch2.q_out_cb<0>().set(FUNC(playch10_state::nmi_enable_w));
+	outlatch2.q_out_cb<1>().set(FUNC(playch10_state::dog_di_w));
+	outlatch2.q_out_cb<2>().set(FUNC(playch10_state::ppu_reset_w));
+	outlatch2.q_out_cb<7>().set(FUNC(playch10_state::up8w_w));
+	outlatch2.parallel_out_cb().set(FUNC(playch10_state::cart_sel_w)).rshift(3).mask(0x0f);
 
 	// video hardware
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_playch10)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
-	MCFG_DEFAULT_LAYOUT(layout_playch10)
+	config.set_default_layout(layout_playch10);
 
 	MCFG_SCREEN_ADD("top", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -687,11 +687,11 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_bottom)
 
-	MCFG_PPU2C03B_ADD("ppu")
-	MCFG_PPU2C0X_SET_SCREEN("bottom")
-	MCFG_PPU2C0X_CPU("cart")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("cart", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, playch10_state, int_detect_w))
+	PPU_2C03B(config, m_ppu, 0);
+	m_ppu->set_screen("bottom");
+	m_ppu->set_cpu_tag("cart");
+	m_ppu->int_callback().set_inputline(m_cartcpu, INPUT_LINE_NMI);
+	m_ppu->int_callback().append(FUNC(playch10_state::int_detect_w));
 
 	SPEAKER(config, "mono").front_center();
 

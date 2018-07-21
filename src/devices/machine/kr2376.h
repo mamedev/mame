@@ -40,27 +40,27 @@
 //**************************************************************************
 
 #define MCFG_KR2376_MATRIX_X0(_cb) \
-	devcb = &downcast<kr2376_device &>(*device).set_x_cb<0>(DEVCB_##_cb);
+	downcast<kr2376_device &>(*device).set_x_cb<0>(DEVCB_##_cb);
 #define MCFG_KR2376_MATRIX_X1(_cb) \
-	devcb = &downcast<kr2376_device &>(*device).set_x_cb<1>(DEVCB_##_cb);
+	downcast<kr2376_device &>(*device).set_x_cb<1>(DEVCB_##_cb);
 #define MCFG_KR2376_MATRIX_X2(_cb) \
-	devcb = &downcast<kr2376_device &>(*device).set_x_cb<2>(DEVCB_##_cb);
+	downcast<kr2376_device &>(*device).set_x_cb<2>(DEVCB_##_cb);
 #define MCFG_KR2376_MATRIX_X3(_cb) \
-	devcb = &downcast<kr2376_device &>(*device).set_x_cb<3>(DEVCB_##_cb);
+	downcast<kr2376_device &>(*device).set_x_cb<3>(DEVCB_##_cb);
 #define MCFG_KR2376_MATRIX_X4(_cb) \
-	devcb = &downcast<kr2376_device &>(*device).set_x_cb<4>(DEVCB_##_cb);
+	downcast<kr2376_device &>(*device).set_x_cb<4>(DEVCB_##_cb);
 #define MCFG_KR2376_MATRIX_X5(_cb) \
-	devcb = &downcast<kr2376_device &>(*device).set_x_cb<5>(DEVCB_##_cb);
+	downcast<kr2376_device &>(*device).set_x_cb<5>(DEVCB_##_cb);
 #define MCFG_KR2376_MATRIX_X6(_cb) \
-	devcb = &downcast<kr2376_device &>(*device).set_x_cb<6>(DEVCB_##_cb);
+	downcast<kr2376_device &>(*device).set_x_cb<6>(DEVCB_##_cb);
 #define MCFG_KR2376_MATRIX_X7(_cb) \
-	devcb = &downcast<kr2376_device &>(*device).set_x_cb<7>(DEVCB_##_cb);
+	downcast<kr2376_device &>(*device).set_x_cb<7>(DEVCB_##_cb);
 #define MCFG_KR2376_SHIFT_CB(_cb) \
-	devcb = &downcast<kr2376_device &>(*device).set_shift_cb(DEVCB_##_cb);
+	downcast<kr2376_device &>(*device).set_shift_cb(DEVCB_##_cb);
 #define MCFG_KR2376_CONTROL_CB(_cb) \
-	devcb = &downcast<kr2376_device &>(*device).set_control_cb(DEVCB_##_cb);
+	downcast<kr2376_device &>(*device).set_control_cb(DEVCB_##_cb);
 #define MCFG_KR2376_STROBE_CB(_cb) \
-	devcb = &downcast<kr2376_device &>(*device).set_strobe_cb(DEVCB_##_cb);
+	downcast<kr2376_device &>(*device).set_strobe_cb(DEVCB_##_cb);
 
 class kr2376_device : public device_t
 {

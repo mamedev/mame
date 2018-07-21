@@ -2841,9 +2841,9 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	if (end != rend)
 	{
 		if (endian == ENDIANNESS_LITTLE)
-			emask &= make_bitmask<u64>((rend + subamask + 1 - end) * unit_size);
+			emask &= make_bitmask<u64>((subamask + 1 + end - rend) * unit_size);
 		else
-			emask &= ~make_bitmask<u64>((end - rend) * unit_size);
+			emask &= ~make_bitmask<u64>((rend - end) * unit_size);
 	}
 
 	if (rend == (rstart | subamask) || smask == emask)
@@ -2885,9 +2885,9 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	m_notifier = m_space.add_change_notifier([this](read_or_write mode) {
 												 if (m_enabled)
 												 {
-													 if (u32(mode) & u32(read_or_write::READ))
+													 if (u32(mode) & u32(m_type) & u32(read_or_write::READ))
 														 m_phr->remove();
-													 if (u32(mode) & u32(read_or_write::WRITE))
+													 if (u32(mode) & u32(m_type) & u32(read_or_write::WRITE))
 														 m_phw->remove();
 													 install(mode);
 												 }
@@ -2896,6 +2896,10 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 
 device_debug::watchpoint::~watchpoint()
 {
+	if (m_phr)
+		m_phr->remove();
+	if (m_phw)
+		m_phw->remove();
 	m_space.remove_change_notifier(m_notifier);
 }
 
@@ -2908,8 +2912,10 @@ void device_debug::watchpoint::setEnabled(bool value)
 			install(read_or_write::READWRITE);
 		else
 		{
-			m_phr->remove();
-			m_phw->remove();
+			if(m_phr)
+				m_phr->remove();
+			if(m_phw)
+				m_phw->remove();
 		}
 	}
 }

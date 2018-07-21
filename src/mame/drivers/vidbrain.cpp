@@ -510,7 +510,7 @@ MACHINE_CONFIG_START(vidbrain_state::vidbrain)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vidbrain_state,vidbrain_int_ack)
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT(layout_vidbrain)
+	config.set_default_layout(layout_vidbrain);
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(UV201_TAG, uv201_device, screen_update)

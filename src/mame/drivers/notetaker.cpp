@@ -116,11 +116,6 @@ DONE:
 class notetaker_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_FIFOCLK,
-	};
-
 	notetaker_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag) ,
 		m_iop_cpu(*this, "iop_cpu"),
@@ -136,6 +131,17 @@ public:
 		m_floppy(nullptr)
 	{
 	}
+
+	void notetakr(machine_config &config);
+
+	void init_notetakr();
+
+private:
+	enum
+	{
+		TIMER_FIFOCLK,
+	};
+
 // devices
 	required_device<cpu_device> m_iop_cpu;
 	required_device<pic8259_device> m_iop_pic;
@@ -172,7 +178,6 @@ public:
 	// mem map stuff
 	DECLARE_READ16_MEMBER(iop_r);
 	DECLARE_WRITE16_MEMBER(iop_w);
-	void init_notetakr();
 	//variables
 	//  IPConReg
 	uint8_t m_BootSeqDone;
@@ -228,12 +233,11 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void notetakr(machine_config &config);
 	void iop_io(address_map &map);
 	void iop_mem(address_map &map);
 	void ep_io(address_map &map);
 	void ep_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

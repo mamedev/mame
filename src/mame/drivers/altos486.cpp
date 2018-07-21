@@ -26,7 +26,7 @@ public:
 
 	void altos486(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(read_rmx_ack);
 
 	DECLARE_READ16_MEMBER(mmu_ram_r);
@@ -40,7 +40,6 @@ protected:
 	void altos486_z80_io(address_map &map);
 	void altos486_z80_mem(address_map &map);
 
-private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_ram;
 	required_memory_region m_rom;
@@ -133,7 +132,7 @@ void altos486_state::altos486_z80_io(address_map &map)
 }
 
 MACHINE_CONFIG_START(altos486_state::altos486)
-	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(8'000'000))
+	MCFG_DEVICE_ADD(m_maincpu, I80186, XTAL(8'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(altos486_mem)
 	MCFG_DEVICE_IO_MAP(altos486_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb) // yes, really
@@ -142,10 +141,10 @@ MACHINE_CONFIG_START(altos486_state::altos486)
 	MCFG_DEVICE_PROGRAM_MAP(altos486_z80_mem)
 	MCFG_DEVICE_IO_MAP(altos486_z80_io)
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int0_w))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, altos486_state, read_rmx_ack))
+	pic8259_device &pic8259(PIC8259(config, "pic8259", 0));
+	pic8259.out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	pic8259.in_sp_callback().set_constant(1);
+	pic8259.read_slave_ack_callback().set(FUNC(altos486_state::read_rmx_ack));
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 

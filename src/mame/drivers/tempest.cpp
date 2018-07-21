@@ -315,10 +315,11 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void tempest(machine_config &config);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-	void tempest(machine_config &config);
 
 protected:
 	DECLARE_WRITE8_MEMBER(wdclr_w);
@@ -336,7 +337,6 @@ protected:
 	virtual void machine_start() override;
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	required_device<watchdog_timer_device> m_watchdog;
