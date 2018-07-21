@@ -6494,7 +6494,7 @@ ROM_START( vcopa ) /* Virtua Cop Revision A, Model 2 */
 	MODEL2_CPU_BOARD
 ROM_END
 
-ROM_START( desert ) /* Desert Tank, Model 2 */
+ROM_START( desert ) /* Desert Tank, Model 2, Sega Game ID# 833-11002 FIGHTING VIPERS, ROM board ID# 834-11003 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-16976.12", 0x000000, 0x020000, CRC(d036dff0) SHA1(f3e5f22ef1f3ff9c9a1ff7352cdad3e2c2977a51) )
 	ROM_LOAD32_WORD("epr-16977.13", 0x000002, 0x020000, CRC(e91194bd) SHA1(cec8eb8d4b52c387d5750ee5a0c6e6ce7c0fe80d) )
