@@ -874,7 +874,7 @@ uint8_t napple2_state::read_floatingbus()
 
 	// calculate vertical scanning state
 	//
-	v_line  = (i / kHClocks) + 192; // which vertical scanning line
+	v_line  = (i / kHClocks) + 184; // which vertical scanning line
 	v_state = kVLine0State + v_line; // V state bits
 	if ((v_line >= kVPresetLine)) // check for previous vertical state preset
 	{
@@ -1759,4 +1759,4 @@ COMP( 1985, prav8m,   apple2, 0,      apple2p,  apple2p, napple2_state, empty_in
 COMP( 1985, space84,  apple2, 0,      space84,  apple2p, napple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_NOT_WORKING )
 COMP( 1985, am64,     apple2, 0,      space84,  apple2p, napple2_state, empty_init, "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
 //COMP( 19??, laba2p,   apple2, 0,      laba2p,   apple2p, napple2_state, empty_init, "<unknown>",           "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, laser2c,  apple2, 0,      space84,  apple2p, napple2_state, empty_init, "Milmar",               "Laser //c", MACHINE_NOT_WORKING )
+COMP( 1985, laser2c,  apple2, 0,      space84,  apple2p, napple2_state, empty_init, "Milmar",               "Laser //c", MACHINE_SUPPORTS_SAVE )
