@@ -233,8 +233,6 @@ private:
 	void gpu_read( uint32_t *p_ram, int32_t n_size );
 	void gpu_write( uint32_t *p_ram, int32_t n_size );
 
-//	bool m_has_sgram; // VRAM(false) or SGRAM(true)
-
 	int32_t m_n_tx;
 	int32_t m_n_ty;
 	int32_t n_abr;
