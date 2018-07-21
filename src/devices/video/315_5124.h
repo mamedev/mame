@@ -289,16 +289,6 @@ protected:
 #define MCFG_SEGA315_5377_IS_PAL(_bool) \
 	downcast<sega315_5377_device &>(*device).set_signal_type(_bool);
 
-<<<<<<< HEAD
-#define MCFG_SEGA315_5378_INT_CB(_devcb) \
-	downcast<sega315_5378_device &>(*device).set_int_callback(DEVCB_##_devcb);
-
-#define MCFG_SEGA315_5378_CSYNC_CB(_devcb) \
-	downcast<sega315_5378_device &>(*device).set_csync_callback(DEVCB_##_devcb);
-
-#define MCFG_SEGA315_5378_PAUSE_CB(_devcb) \
-	downcast<sega315_5378_device &>(*device).set_pause_callback(DEVCB_##_devcb);
-=======
 #define MCFG_SEGA315_5377_INT_CB(_devcb) \
 	downcast<sega315_5377_device &>(*device).set_int_callback(DEVCB_##_devcb);
 
@@ -307,7 +297,6 @@ protected:
 
 #define MCFG_SEGA315_5377_PAUSE_CB(_devcb) \
 	downcast<sega315_5377_device &>(*device).set_pause_callback(DEVCB_##_devcb);
->>>>>>> 6db16bcc7e... 315_5124.cpp updates
 
 
 #endif // MAME_VIDEO_315_5124_H

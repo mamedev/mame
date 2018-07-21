@@ -613,7 +613,7 @@ void sega315_5124_device::process_line_timer()
 
 READ8_MEMBER( sega315_5124_device::data_read )
 {
-	/* Return read buffer contents */
+	/* Return data buffer contents */
 	const uint8_t temp = m_buffer;
 
 	/* Clear pending write flag */
@@ -669,6 +669,8 @@ void sega315_5124_device::check_pending_flags()
 	{
 		m_pending_status &= ~STATUS_SPROVR;
 		m_status |= STATUS_SPROVR;
+		// copy and reset the pending bits that were based on the number
+		// of the sprite that collided.
 		m_status &= m_pending_status | (STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL);
 		m_pending_status |= ~(STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL);
 	}
@@ -912,7 +914,7 @@ void sega315_5124_device::draw_column0_x_scroll_mode4(int *line_buffer, int *pri
 {
 	// To draw the leftmost column when it is incomplete on screen due to
 	// scrolling, Sega Master System has a weird behaviour to select which
-	// palette will be selected to obtain the color in entry 0, that depends
+	// palette will be used to obtain the color in entry 0, that depends
 	// on the content of sprite 0.
 	// This implementation mimics the behaviour of the Emulicious emulator,
 	// seen with the test ROM provided by sverx here:
