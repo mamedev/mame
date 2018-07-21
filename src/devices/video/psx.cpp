@@ -44,18 +44,18 @@ void psxgpu_device::device_start()
 
 	if (type() == CXD8538Q)
 	{
-		m_has_sgram = true; // VRAM
+		m_has_sgram = false; // VRAM
 		psx_gpu_init( 1 );
 	}
 	else
 	{
 		if (type() == CXD8514Q)
 		{
-			m_has_sgram = true; // VRAM
+			m_has_sgram = false; // VRAM
 		}
 		else
 		{
-			m_has_sgram = false; // SGRAM
+			m_has_sgram = true; // SGRAM
 		}
 		psx_gpu_init( 2 );
 	}
