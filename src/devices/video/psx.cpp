@@ -44,10 +44,19 @@ void psxgpu_device::device_start()
 
 	if (type() == CXD8538Q)
 	{
+		m_15bit = true; // VRAM, 16bit Video ouptut
 		psx_gpu_init( 1 );
 	}
 	else
 	{
+		if (type() == CXD8514Q)
+		{
+			m_15bit = true; // VRAM, 16bit Video ouptut
+		}
+		else
+		{
+			m_15bit = false; // SGRAM, 24bit Video output
+		}
 		psx_gpu_init( 2 );
 	}
 }
@@ -541,11 +550,22 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 		p_n_greenb1[ n_level ] = ( ( n_level >> 5 ) & ( MAX_LEVEL - 1 ) ) * MAX_LEVEL;
 		p_n_blueb1[ n_level ] = ( ( n_level >> 10 ) & ( MAX_LEVEL - 1 ) ) * MAX_LEVEL;
 
-		/* 24bit to 15 bit conversion */
-		p_n_g0r0[ n_level ] = ( ( ( n_level >> 8 ) & 0xff ) << 8 ) | ( ( ( n_level >> 0 ) & 0xff ) << 16 );
-		p_n_b0[ n_level ] = ( ( n_level >> 0 ) & 0xff ) << 0;
-		p_n_r1[ n_level ] = ( ( n_level >> 8 ) & 0xff ) << 16;
-		p_n_b1g1[ n_level ] = ( ( ( n_level >> 8 ) & 0xff ) << 0 ) | ( ( ( n_level >> 0 ) & 0xff ) << 8 );
+		if (m_15bit)
+		{
+			/* 24bit to 15 bit conversion */
+			p_n_g0r0[ n_level ] = ( pal5bit( n_level >> 11 ) << 8 ) | ( pal5bit( n_level >> 3 ) << 16 );
+			p_n_b0[ n_level ] = pal5bit( n_level >> 3 ) << 0;
+			p_n_r1[ n_level ] = pal5bit( n_level >> 11 ) << 16;
+			p_n_b1g1[ n_level ] = ( pal5bit( n_level >> 11 ) << 0 ) | ( pal5bit( n_level >> 3 ) << 8 );
+		}
+		else
+		{
+			/* 24bit color output */
+			p_n_g0r0[ n_level ] = ( ( ( n_level >> 8 ) & 0xff ) << 8 ) | ( ( ( n_level >> 0 ) & 0xff ) << 16 );
+			p_n_b0[ n_level ] = ( ( n_level >> 0 ) & 0xff ) << 0;
+			p_n_r1[ n_level ] = ( ( n_level >> 8 ) & 0xff ) << 16;
+			p_n_b1g1[ n_level ] = ( ( ( n_level >> 8 ) & 0xff ) << 0 ) | ( ( ( n_level >> 0 ) & 0xff ) << 8 );
+		}
 	}
 
 	for( n_level = 0; n_level < MAX_LEVEL; n_level++ )
