@@ -52,7 +52,7 @@ public:
 
 	// construction/destruction
 	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, bool supports_224_240, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, bool sprcol_is_fixed_pos, const uint8_t *line_timing);
+	sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
 	void set_signal_type(bool is_pal) { m_is_pal = is_pal; }
 
@@ -71,7 +71,6 @@ public:
 
 	void hcount_latch() { hcount_latch_at_hpos(screen().hpos()); };
 	void hcount_latch_at_hpos(int hpos);
-	void stop_timers();
 
 	bitmap_rgb32 &get_bitmap() { return m_tmpbitmap; };
 	bitmap_ind8 &get_y1_bitmap() { return m_y1_bitmap; };
@@ -98,16 +97,22 @@ protected:
 	void set_display_settings();
 	void set_frame_timing();
 	virtual void update_palette();
+	virtual void write_memory(uint8_t data);
 	virtual void cram_write(uint8_t data);
 	virtual void load_vram_addr(uint8_t data);
-	virtual bool data_port_write_loads_data_buffer() { return false; };
+	virtual void select_display_mode();
+	virtual void select_extended_res_mode4(bool M1, bool M2, bool M3);
+	virtual void select_sprites(int line);
+	virtual void sprite_collision(int line, int sprite_col_x);
+	virtual void sprite_count_overflow(int line, int sprite_index);
 	virtual void draw_scanline(int pixel_offset_x, int pixel_plot_y, int line);
 	virtual void blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line);
-	virtual uint16_t mode4_name_table_row(int row);
-	virtual uint16_t mode4_sprite_attributes_addr(uint16_t base);
-	virtual uint8_t mode4_sprite_tile_mask(uint8_t tile_number);
+	virtual void draw_column0_x_scroll_mode4(int *line_buffer, int *priority_selected, int x_scroll_fine_adjust, int palette_selected, int tile_line);
+	virtual uint16_t name_table_row_mode4(int row);
+	virtual uint16_t sprite_attributes_addr_mode4(uint16_t base);
+	virtual uint8_t sprite_tile_mask_mode4(uint8_t tile_number);
+	virtual int select_sprite_tile_mode4(int sprite_index, int sprite_line);
 	void process_line_timer();
-	void select_sprites(int line);
 	void draw_scanline_mode4(int *line_buffer, int *priority_selected, int line);
 	void draw_sprites_mode4(int *line_buffer, int *priority_selected, int line);
 	void draw_sprites_tms9918_mode(int *line_buffer, int line);
@@ -148,8 +153,7 @@ protected:
 	bitmap_rgb32     m_tmpbitmap;
 	bitmap_ind8      m_y1_bitmap;
 	const uint8_t      m_palette_offset;
-	const bool       m_supports_224_240;
-	const bool       m_sprcol_is_fixed_pos;
+	const uint8_t      m_reg_num_mask;
 	bool             m_display_disabled;
 	uint16_t           m_sprite_base;
 	uint16_t           m_sprite_pattern_line[8];
@@ -195,14 +199,13 @@ class sega315_5246_device : public sega315_5124_device
 {
 public:
 	sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, bool supports_224_240, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, bool sprcol_is_fixed_pos, const uint8_t *line_timing);
+	sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
 protected:
-	virtual void load_vram_addr(uint8_t data) override;
-	virtual bool data_port_write_loads_data_buffer() override { return true; };
-	virtual uint16_t mode4_name_table_row(int row) override;
-	virtual uint16_t mode4_sprite_attributes_addr(uint16_t base) override;
-	virtual uint8_t mode4_sprite_tile_mask(uint8_t tile_number) override;
+	virtual uint16_t name_table_row_mode4(int row) override;
+	virtual uint16_t sprite_attributes_addr_mode4(uint16_t base) override;
+	virtual uint8_t sprite_tile_mask_mode4(uint8_t tile_number) override;
+	virtual void select_extended_res_mode4(bool M1, bool M2, bool M3) override;
 };
 
 
@@ -210,6 +213,7 @@ class sega315_5377_device : public sega315_5246_device
 {
 public:
 	sega315_5377_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega315_5377_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
 	virtual void set_sega315_5124_compatibility_mode(bool sega315_5124_compatibility_mode) override;
 
@@ -223,6 +227,26 @@ protected:
 
 private:
 	DECLARE_PALETTE_INIT( sega315_5377 );
+};
+
+
+// Embedded mode 4 support of the 315-5313 (Mega Drive) VDP
+class sega315_5313_mode4_device : public sega315_5246_device
+{
+public:
+	sega315_5313_mode4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
+	void stop_timers();
+
+protected:
+	virtual void write_memory(uint8_t data) override;
+	virtual void load_vram_addr(uint8_t data) override;
+	virtual void select_sprites(int line) override;
+	virtual void sprite_collision(int line, int sprite_col_x) override;
+	virtual void sprite_count_overflow(int line, int sprite_index) override;
+	virtual void select_display_mode() override;
+	virtual void select_extended_res_mode4(bool M1, bool M2, bool M3) override;
+	virtual void draw_column0_x_scroll_mode4(int *line_buffer, int *priority_selected, int x_scroll_fine_adjust, int palette_selected, int tile_line) override;
 };
 
 

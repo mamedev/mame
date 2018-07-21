@@ -142,7 +142,7 @@
 #define MEGADRIVE_REG17_DMATYPE         ((m_regs[0x17]&0xc0)>>6)
 #define MEGADRIVE_REG17_UNUSED          ((m_regs[0x17]&0x3f)>>0)
 
-static constexpr uint8_t line_315_5124[8] = {
+static constexpr uint8_t line_315_5313_mode4[8] = {
 			  26 /* VINT_HPOS */
 			, 26 /* VINT_FLAG_HPOS */
 			, 27 /* HINT_HPOS */
@@ -159,7 +159,8 @@ static constexpr uint8_t line_315_5124[8] = {
 DEFINE_DEVICE_TYPE(SEGA315_5313, sega315_5313_device, "sega315_5313", "Sega 315-5313 Megadrive VDP")
 
 sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega315_5124_device(mconfig, SEGA315_5313, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, false, 0, 0, true, line_315_5124)
+	// mode 4 support, for SMS compatibility, is implemented in 315_5124.cpp
+	: sega315_5313_mode4_device(mconfig, SEGA315_5313, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0x00, 0x1f, 0, 0, line_315_5313_mode4)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_render_bitmap(nullptr)
 	, m_render_line(nullptr)
@@ -332,7 +333,7 @@ void sega315_5313_device::device_start()
 
 	m_space68k = &m_cpu68k->space();
 
-	sega315_5124_device::device_start();
+	sega315_5313_mode4_device::device_start();
 }
 
 void sega315_5313_device::device_reset()
@@ -354,7 +355,7 @@ void sega315_5313_device::device_reset()
 	m_vblank_flag = 0;
 	m_total_scanlines = 262;
 
-	sega315_5124_device::device_reset();
+	sega315_5313_mode4_device::device_reset();
 }
 
 void sega315_5313_device::device_reset_old()
