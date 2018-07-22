@@ -14,8 +14,10 @@
 
 #pragma once
 
-class ps2_gs_device;
-class sonyvu1_device;
+class ps2_gif_device;
+
+#include "ps2gs.h"
+#include "cpu/mips/ps2vu.h"
 
 class ps2_gif_device : public device_t, public device_execute_interface
 {

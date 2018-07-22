@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "ps2dma.h"
 
-#include "ps2sif.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/ps2vif1.h"
 #include "video/ps2gif.h"

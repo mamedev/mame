@@ -12,9 +12,6 @@
 #include "emu.h"
 #include "ps2intc.h"
 
-#include "cpu/mips/ps2vu.h"
-
-
 DEFINE_DEVICE_TYPE(SONYPS2_INTC, ps2_intc_device, "ps2intc", "PlayStation 2 EE INTC")
 
 ps2_intc_device::ps2_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
