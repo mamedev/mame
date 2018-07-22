@@ -162,7 +162,7 @@ void tlcs870_device::do_RETN(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_SWAP_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// SWAP g
-	uint8_t reg = opbyte0 & 0x7;
+	const uint8_t reg = opbyte0 & 0x7;
 	handle_swap(reg);
 }
 
@@ -229,8 +229,7 @@ void tlcs870_device::do_RORC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// RORC g
 	// Rotate Right through Carry flag
-
-	uint8_t val = get_reg8(opbyte0 & 0x7);
+	const uint8_t val = get_reg8(opbyte0 & 0x7);
 
 	set_reg8(opbyte0 & 0x7, val);
 }
@@ -240,7 +239,7 @@ void tlcs870_device::do_LD_r_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// LD r,g
 	// 1110 1ggg 0101 1rrr
-	uint8_t val = get_reg8(opbyte0 & 0x7);
+	const uint8_t val = get_reg8(opbyte0 & 0x7);
 	set_reg8(opbyte1 & 0x7, val);
 
 	set_JF();
@@ -253,8 +252,8 @@ void tlcs870_device::do_XCH_r_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// XCH r,g
 	// 1110 1ggg 1010 1rrr
-	uint8_t val = get_reg8(opbyte0 & 0x7);
-	uint8_t r = get_reg8(opbyte1 & 0x7);
+	const uint8_t val = get_reg8(opbyte0 & 0x7);
+	const uint8_t r = get_reg8(opbyte1 & 0x7);
 
 	set_reg8(opbyte1 & 0x7, val);
 	set_reg8(opbyte0 & 0x7, r);
@@ -283,9 +282,9 @@ void tlcs870_device::do_ALUOP_A_g(const uint8_t opbyte0, const uint8_t opbyte1)
 	1110 1ggg 0110 0111 CMP A,g
 	*/
 
-	int aluop = (opbyte1 & 0x7);
+	const int aluop = (opbyte1 & 0x7);
 
-	uint8_t result = do_alu(aluop, get_reg8(REG_A), get_reg8(opbyte0 & 0x7));
+	const uint8_t result = do_alu(aluop, get_reg8(REG_A), get_reg8(opbyte0 & 0x7));
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -307,8 +306,8 @@ void tlcs870_device::do_ALUOP_g_A(const uint8_t opbyte0, const uint8_t opbyte1)
 	1110 1ggg 0110 1111 CMP A,g
 	*/
 
-	int aluop = (opbyte1 & 0x7);
-	uint8_t result = do_alu(aluop, get_reg8(opbyte0 & 0x7), get_reg8(REG_A));
+	const int aluop = (opbyte1 & 0x7);
+	const uint8_t result = do_alu(aluop, get_reg8(opbyte0 & 0x7), get_reg8(REG_A));
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -319,11 +318,11 @@ void tlcs870_device::do_ALUOP_g_A(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_ALUOP_g_n(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// (ALU OP) g,n
-	int aluop = (opbyte1 & 0x7);
+	const int aluop = (opbyte1 & 0x7);
 
-	uint8_t n = READ8();
+	const uint8_t n = READ8();
 
-	uint8_t result = do_alu(aluop, get_reg8(opbyte0 & 0x7), n);
+	const uint8_t result = do_alu(aluop, get_reg8(opbyte0 & 0x7), n);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -349,9 +348,9 @@ void tlcs870_device::do_ALUOP_WA_gg(const uint8_t opbyte0, const uint8_t opbyte1
 	1110 10gg 0011 0111  CMP WA,gg
 	*/
 
-	int aluop = (opbyte1 & 0x7);
+	const int aluop = (opbyte1 & 0x7);
 
-	uint16_t result = do_alu(aluop, get_reg16(REG_WA), get_reg16(opbyte0 & 0x3));
+	const uint16_t result = do_alu(aluop, get_reg16(REG_WA), get_reg16(opbyte0 & 0x3));
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -363,11 +362,11 @@ void tlcs870_device::do_ALUOP_WA_gg(const uint8_t opbyte0, const uint8_t opbyte1
 void tlcs870_device::do_ALUOP_gg_mn(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// (ALU OP) gg,mn
-	int aluop = (opbyte1 & 0x7);
+	const int aluop = (opbyte1 & 0x7);
 
-	uint16_t mn = READ16();
+	const uint16_t mn = READ16();
 
-	uint16_t result = do_alu(aluop, get_reg16(opbyte0 & 0x3), mn);
+	const uint16_t result = do_alu(aluop, get_reg16(opbyte0 & 0x3), mn);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -384,9 +383,9 @@ void tlcs870_device::do_ALUOP_gg_mn(const uint8_t opbyte0, const uint8_t opbyte1
 void tlcs870_device::do_SET_inppbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// SET (pp).g
-	uint8_t bitpos = opbyte0 & 7;
-	uint8_t bitused = 1 << bitpos;
-	uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
+	const uint8_t bitpos = opbyte0 & 7;
+	const uint8_t bitused = 1 << bitpos;
+	const uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
 	uint8_t val = RM8(addr);
 
 	if (val & bitused) // Zero flag gets set based on original value of bit?
@@ -408,9 +407,9 @@ void tlcs870_device::do_SET_inppbit(const uint8_t opbyte0, const uint8_t opbyte1
 void tlcs870_device::do_CLR_inppbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// CLR (pp).g
-	uint8_t bitpos = opbyte0 & 7;
-	uint8_t bitused = 1 << bitpos;
-	uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
+	const uint8_t bitpos = opbyte0 & 7;
+	const uint8_t bitused = 1 << bitpos;
+	const uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
 	uint8_t val = RM8(addr);
 
 	if (val & bitused) // Zero flag gets set based on original value of bit?
@@ -432,9 +431,9 @@ void tlcs870_device::do_CLR_inppbit(const uint8_t opbyte0, const uint8_t opbyte1
 void tlcs870_device::do_CPL_inppbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// CPL (pp).g
-	uint8_t bitpos = opbyte0 & 7;
-	uint8_t bitused = 1 << bitpos;
-	uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
+	const uint8_t bitpos = opbyte0 & 7;
+	const uint8_t bitused = 1 << bitpos;
+	const uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
 	uint8_t val = RM8(addr);
 
 	uint8_t bit = val & bitused;
@@ -460,9 +459,9 @@ void tlcs870_device::do_CPL_inppbit(const uint8_t opbyte0, const uint8_t opbyte1
 void tlcs870_device::do_LD_inppbit_CF(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// LD (pp).g,CF
-	uint8_t bitpos = opbyte0 & 7;
-	uint8_t bitused = 1 << bitpos;
-	uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
+	const uint8_t bitpos = opbyte0 & 7;
+	const uint8_t bitused = 1 << bitpos;
+	const uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
 	uint8_t val = RM8(addr);
 
 	if (is_CF()) // if carry flag is set, set the bit in val
@@ -485,12 +484,12 @@ void tlcs870_device::do_LD_CF_inppbit(const uint8_t opbyte0, const uint8_t opbyt
 {
 	// LD CF,(pp).g   aka TEST (pp).g
 	// 1110 1ggg 1001 111p
-	uint8_t bitpos = opbyte0 & 7;
-	uint8_t bitused = 1 << bitpos;
-	uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
-	uint8_t val = RM8(addr);
+	const uint8_t bitpos = opbyte0 & 7;
+	const uint8_t bitused = 1 << bitpos;
+	const uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
+	const uint8_t val = RM8(addr);
 
-	uint8_t bit = val & bitused;
+	const uint8_t bit = val & bitused;
 
 	bit ? set_CF() : clear_CF();
 	// for this optype of operation ( LD CF, *.b ) the Jump Flag always ends up the inverse of the Carry Flag
@@ -504,9 +503,9 @@ void tlcs870_device::do_SET_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 	// SET g.b
 	// 1110 1ggg 0100 0bbb
 	uint8_t val = get_reg8(opbyte0 & 0x7);
-	uint8_t bitpos = opbyte1 & 0x7;
+	const uint8_t bitpos = opbyte1 & 0x7;
 
-	int bitused = (1 << bitpos);
+	const int bitused = (1 << bitpos);
 
 	if (val & bitused) // Zero flag gets set based on original value of bit?
 	{
@@ -529,9 +528,9 @@ void tlcs870_device::do_CLR_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 	// CLR g.b
 	// 1110 1ggg 0100 1bbb
 	uint8_t val = get_reg8(opbyte0 & 0x7);
-	uint8_t bitpos = opbyte1 & 0x7;
+	const uint8_t bitpos = opbyte1 & 0x7;
 
-	int bitused = (1 << bitpos);
+	const int bitused = (1 << bitpos);
 
 	if (val & bitused) // Zero flag gets set based on original value of bit?
 	{
@@ -554,9 +553,9 @@ void tlcs870_device::do_CPL_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 	// CPL g.b
 	// 1110 1ggg 1100 0bbb
 	uint8_t val = get_reg8(opbyte0 & 0x7);
-	uint8_t bitpos = opbyte1 & 0x7;
+	const uint8_t bitpos = opbyte1 & 0x7;
 
-	int bitused = (1 << bitpos);
+	const int bitused = (1 << bitpos);
 
 	uint8_t bit = val & bitused;
 
@@ -584,9 +583,9 @@ void tlcs870_device::do_LD_gbit_CF(const uint8_t opbyte0, const uint8_t opbyte1)
 	// m_op = LD;    // Flags / Cycles  1--- / 2
 	//m_flagsaffected |= FLAG_J;
 	uint8_t val = get_reg8(opbyte0 & 0x7);
-	uint8_t bitpos = opbyte1 & 0x7;
+	const uint8_t bitpos = opbyte1 & 0x7;
 
-	int bitused = (1 << bitpos);
+	const int bitused = (1 << bitpos);
 
 	if (is_CF()) // if carry flag is set, set the bit in val
 	{
@@ -607,12 +606,12 @@ void tlcs870_device::do_LD_gbit_CF(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_XOR_CF_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// XOR CF,g.b
-	uint8_t bitpos = opbyte1 & 0x7;
-	uint8_t bitused = 1 << bitpos;
+	const uint8_t bitpos = opbyte1 & 0x7;
+	const uint8_t bitused = 1 << bitpos;
 
-	uint8_t g = get_reg8(opbyte0 & 0x7);
+	const uint8_t g = get_reg8(opbyte0 & 0x7);
 
-	uint8_t bit = g & bitused;
+	const uint8_t bit = g & bitused;
 
 	if (is_CF())
 	{
@@ -648,12 +647,12 @@ void tlcs870_device::do_XOR_CF_gbit(const uint8_t opbyte0, const uint8_t opbyte1
 void tlcs870_device::do_LD_CF_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// LD CF,g.b aka TEST g.b
-	uint8_t bitpos = opbyte1 & 0x7;
-	uint8_t bitused = 1 << bitpos;
+	const uint8_t bitpos = opbyte1 & 0x7;
+	const uint8_t bitused = 1 << bitpos;
 
-	uint8_t g = get_reg8(opbyte0 & 0x7);
+	const uint8_t g = get_reg8(opbyte0 & 0x7);
 
-	uint8_t bit = g & bitused;
+	const uint8_t bit = g & bitused;
 
 	bit ? set_CF() : clear_CF();
 	// for this optype of operation ( LD CF, *.b ) the Jump Flag always ends up the inverse of the Carry Flag
@@ -667,7 +666,7 @@ void tlcs870_device::do_LD_CF_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_MUL_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// MUL ggH, ggL (odd syntax, basically MUL gg)
-	uint8_t reg = opbyte0 & 0x3; // opbyte0 & 4 = invalid?
+	const uint8_t reg = opbyte0 & 0x3; // opbyte0 & 4 = invalid?
 	handle_mul(reg);  // flag changes in handler
 }
 
@@ -676,7 +675,7 @@ void tlcs870_device::do_DIV_gg_C(const uint8_t opbyte0, const uint8_t opbyte1)
 	// DIV gg,C
 	// (DIV BC,C is presumably an illegal / undefined result)
 	// (DIV WA,C is a redundant encoding)
-	uint8_t reg = opbyte0 & 0x3; // opbyte0 & 4 = invalid?
+	const uint8_t reg = opbyte0 & 0x3; // opbyte0 & 4 = invalid?
 	handle_div(reg); // flag changes in handler
 }
 
@@ -684,7 +683,7 @@ void tlcs870_device::do_POP_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// POP gg
 	m_sp.d += 2;
-	uint16_t val = RM16(m_sp.d - 1);
+	const uint16_t val = RM16(m_sp.d - 1);
 	set_reg16(opbyte0 & 3, val);
 	// no flag changes
 }
@@ -692,7 +691,7 @@ void tlcs870_device::do_POP_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_PUSH_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// PUSH gg
-	uint16_t val = get_reg16(opbyte0 & 3);
+	const uint16_t val = get_reg16(opbyte0 & 3);
 	WM16(m_sp.d - 1, val);
 	m_sp.d -= 2;
 	// no flag changes
@@ -716,7 +715,7 @@ void tlcs870_device::do_LD_gg_SP(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_LD_rr_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// LD rr,gg
-	uint16_t gg = get_reg16(opbyte0 & 0x3);
+	const uint16_t gg = get_reg16(opbyte0 & 0x3);
 	set_reg16(opbyte1 & 0x3, gg);
 
 	set_JF(); // no other flag changes for this type of LD
@@ -726,8 +725,8 @@ void tlcs870_device::do_LD_rr_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_XCH_rr_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// XCH rr,gg
-	uint16_t gg = get_reg16(opbyte0 & 0x3);
-	uint16_t rr = get_reg16(opbyte1 & 0x3);
+	const uint16_t gg = get_reg16(opbyte0 & 0x3);
+	const uint16_t rr = get_reg16(opbyte1 & 0x3);
 
 	set_reg16(opbyte1 & 0x3, gg);
 	set_reg16(opbyte0 & 0x3, rr);
@@ -739,7 +738,7 @@ void tlcs870_device::do_XCH_rr_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_CALL_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// CALL gg
-	uint16_t val = get_reg16(opbyte0 & 3);
+	const uint16_t val = get_reg16(opbyte0 & 3);
 
 	WM16(m_sp.d - 1, m_addr);
 	m_sp.d -= 2;
@@ -752,7 +751,7 @@ void tlcs870_device::do_CALL_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_JP_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// JP gg
-	uint16_t val = get_reg16(opbyte0 & 3);
+	const uint16_t val = get_reg16(opbyte0 & 3);
 
 	m_addr = val;
 	set_JF();
