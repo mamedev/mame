@@ -13,6 +13,7 @@
 #include "cpu/h6280/h6280.h"
 #include "cpu/m6502/n2a03.h"
 #include "sound/2203intf.h"
+#include "sound/2608intf.h"
 #include "sound/2612intf.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
@@ -31,11 +32,11 @@
 #include "sound/rf5c68.h"
 #include "sound/segapcm.h"
 #include "sound/sn76496.h"
+#include "sound/x1_010.h"
 #include "sound/ym2151.h"
 #include "sound/ym2413.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
-#include "sound/2608intf.h"
 
 #include "vgmplay.lh"
 #include "debugger.h"
@@ -100,7 +101,8 @@ public:
 		A_RF5C68     = 0x00013c40,
 		A_RF5C164    = 0x00013c50,
 		A_RF5C68RAM  = 0x00014000,
-		A_RF5C164RAM = 0x00024000
+		A_RF5C164RAM = 0x00024000,
+		A_X1_010     = 0x00034000
 	};
 
 	enum io16_t
@@ -134,6 +136,7 @@ public:
 	DECLARE_READ8_MEMBER(c352_rom_r);
 	DECLARE_READ8_MEMBER(qsound_rom_r);
 	DECLARE_READ8_MEMBER(ga20_rom_r);
+	DECLARE_READ8_MEMBER(x1_010_rom_r);
 
 	template<int Chip> DECLARE_WRITE8_MEMBER(multipcm_bank_hi_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(multipcm_bank_lo_w);
@@ -194,6 +197,8 @@ private:
 
 		LED_RF5C68,
 		LED_RF5C164,
+
+		LED_X1_010,
 
 		LED_COUNT
 	};
@@ -299,6 +304,7 @@ public:
 	void segapcm_map(address_map &map);
 	void soundchips16_map(address_map &map);
 	void soundchips_map(address_map &map);
+	void x1_010_map(address_map &map);
 	void ymf271_map(address_map &map);
 	void ymz280b_map(address_map &map);
 
@@ -338,6 +344,7 @@ private:
 	required_device<rf5c68_device> m_rf5c164; // TODO : !!RF5C164!!
 	required_shared_ptr<uint8_t> m_rf5c68_ram;
 	required_shared_ptr<uint8_t> m_rf5c164_ram;
+	required_device<x1_010_device> m_x1_010;
 
 	uint32_t m_okim6295_clock[2];
 	uint32_t m_okim6295_pin7[2];
@@ -841,6 +848,13 @@ void vgmplay_device::execute_run()
 				m_pc += 4;
 				break;
 
+			case 0xc8: {
+				pulse_act_led(LED_X1_010);
+				m_io->write_byte(A_X1_010 + ((m_file->read_byte(m_pc+1) << 8) | m_file->read_byte(m_pc+2)), m_file->read_byte(m_pc+3));
+				m_pc += 4;
+				break;
+			}
+
 			case 0xd1: {
 				pulse_act_led(LED_YMF271);
 				uint8_t offset = m_file->read_byte(m_pc+1);
@@ -1193,7 +1207,7 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		return 4 | SUPPORTED;
 
 	case 0xc2:
-		util::stream_format(stream, "rf5c163 %04x = %02x", opcodes.r8(pc+1) | (opcodes.r8(pc+2) << 8), opcodes.r8(pc+3));
+		util::stream_format(stream, "rf5c164 %04x = %02x", opcodes.r8(pc+1) | (opcodes.r8(pc+2) << 8), opcodes.r8(pc+3));
 		return 4 | SUPPORTED;
 
 	case 0xc3:
@@ -1202,6 +1216,10 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case 0xc4:
 		util::stream_format(stream, "qsound %02x = %04x", opcodes.r8(pc+3), opcodes.r8(pc+2) | (opcodes.r8(pc+1) << 8));
+		return 4 | SUPPORTED;
+
+	case 0xc8:
+		util::stream_format(stream, "x1-010 %04x = %02x", opcodes.r8(pc+2) | (opcodes.r8(pc+1) << 8), opcodes.r8(pc+3));
 		return 4 | SUPPORTED;
 
 	case 0xd0:
@@ -1335,6 +1353,11 @@ READ8_MEMBER(vgmplay_device::qsound_rom_r)
 	return rom_r(0, 0x8f, offset);
 }
 
+READ8_MEMBER(vgmplay_device::x1_010_rom_r)
+{
+	return rom_r(0, 0x91, offset);
+}
+
 READ8_MEMBER(vgmplay_device::c352_rom_r)
 {
 	return rom_r(0, 0x92, offset);
@@ -1381,6 +1404,7 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_rf5c164(*this, "rf5c164")
 	, m_rf5c68_ram(*this, "rf5c68_ram")
 	, m_rf5c164_ram(*this, "rf5c164_ram")
+	, m_x1_010(*this, "x1_010")
 {
 }
 
@@ -1641,6 +1665,9 @@ void vgmplay_state::machine_start()
 			if(version >= 0x171 && r8(0xd6)) {
 				m_c352->set_divider(r8(0xd6) * 4);
 			}
+			if(version >= 0x171 && r32(0xd8)) {
+				m_x1_010->set_unscaled_clock(r32(0xd8));
+			}
 			if(version >= 0x171 && r32(0xdc)) {
 				m_c352->set_unscaled_clock(r32(0xdc));
 			}
@@ -1863,6 +1890,7 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_RF5C164, vgmplay_device::A_RF5C164+0xf).w(m_rf5c164, FUNC(rf5c68_device::rf5c68_w));
 	map(vgmplay_device::A_RF5C68RAM, vgmplay_device::A_RF5C68RAM+0xffff).w(m_rf5c68, FUNC(rf5c68_device::rf5c68_mem_w));
 	map(vgmplay_device::A_RF5C164RAM, vgmplay_device::A_RF5C164RAM+0xffff).w(m_rf5c164, FUNC(rf5c68_device::rf5c68_mem_w));
+	map(vgmplay_device::A_X1_010, vgmplay_device::A_X1_010+0x1fff).w(m_x1_010, FUNC(x1_010_device::write));
 }
 
 void vgmplay_state::segapcm_map(address_map &map)
@@ -1928,6 +1956,11 @@ void vgmplay_state::ymz280b_map(address_map &map)
 void vgmplay_state::ga20_map(address_map &map)
 {
 	map(0, 0xfffff).r("vgmplay", FUNC(vgmplay_device::ga20_rom_r));
+}
+
+void vgmplay_state::x1_010_map(address_map &map)
+{
+	map(0, 0xfffff).r("vgmplay", FUNC(vgmplay_device::x1_010_rom_r));
 }
 
 void vgmplay_state::nescpu_map(address_map &map)
@@ -2124,6 +2157,11 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_rf5c164->set_addrmap(0, &vgmplay_state::rf5c164_map);
 	m_rf5c164->add_route(0, "lspeaker", 1);
 	m_rf5c164->add_route(1, "rspeaker", 1);
+
+	X1_010(config, m_x1_010, 16000000);
+	m_x1_010->set_addrmap(0, &vgmplay_state::x1_010_map);
+	m_x1_010->add_route(0, "lspeaker", 1);
+	m_x1_010->add_route(1, "rspeaker", 1);
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )

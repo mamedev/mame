@@ -69,6 +69,7 @@ public:
 		m_vctrl(*this,"vctrl_%u", 0U),
 		m_paletteram(*this,"paletteram%u", 1U),
 		m_subbank(*this,"subbank"),
+		m_x1_bank(*this,"x1_bank"),
 		m_gun_recoil(*this,"Player%u_Gun_Recoil", 1U),
 		m_leds(*this, "led%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -130,9 +131,11 @@ public:
 	void init_arbalest();
 	void init_wiggie();
 	void init_blandia();
+	void init_bankx1();
 	void init_kiwame();
 	void init_eightfrc();
 	void init_pairlove();
+	void init_zombraid();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_x_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_y_r);
@@ -171,6 +174,7 @@ protected:
 	optional_shared_ptr_array<uint16_t, 2> m_paletteram;
 
 	optional_memory_bank m_subbank;
+	optional_memory_bank m_x1_bank;
 
 	output_finder<2> m_gun_recoil;
 	output_finder<48> m_leds;
@@ -306,6 +310,7 @@ protected:
 
 	void atehate_map(address_map &map);
 	void blandia_map(address_map &map);
+	void blandia_x1_map(address_map &map);
 	void blandiap_map(address_map &map);
 	void blockcar_map(address_map &map);
 	void blockcarb_map(address_map &map);
@@ -350,6 +355,7 @@ protected:
 	void wrofaero_map(address_map &map);
 	void zingzipbl_map(address_map &map);
 	void zombraid_map(address_map &map);
+	void zombraid_x1_map(address_map &map);
 };
 
 class setaroul_state : public seta_state
