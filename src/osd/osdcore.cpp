@@ -233,11 +233,18 @@ std::vector<std::string> osd_get_command_line(int argc, char *argv[])
 	}
 #else // !WIN32
 	{
-		// for non Windows platforms, we are assuming that arguments are
-		// already UTF-8; we just need to convert to std::vector<std::string>
+		// For non Windows platforms, we are assuming that arguments are
+		// already UTF-8; we just need to convert to std::vector<std::string>.
+		// But in some cases, the shell passes empty parameters as "" strings
+		// instead of empty strings as expected, so we force those "" strings
+		// to empty strings.
+		std::string empty_args("\"\"");
 		results.reserve(argc);
 		for (int i = 0; i < argc; i++)
-			results.emplace_back(argv[i]);
+			if (empty_args.compare(argv[i]) != 0)
+				results.emplace_back(argv[i]);
+			else
+				results.emplace_back("");
 	}
 #endif // WIN32
 	return results;
