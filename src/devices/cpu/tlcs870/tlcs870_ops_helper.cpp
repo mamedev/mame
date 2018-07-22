@@ -14,17 +14,17 @@
 
 // General Helpers
 
-uint8_t tlcs870_device::get_reg8(int reg)
+const uint8_t tlcs870_device::get_reg8(const int reg)
 {
 	return m_intram[((m_RBS & 0xf) * 8) + (reg & 0x7)];
 }
 
-void tlcs870_device::set_reg8(int reg, uint8_t val)
+void tlcs870_device::set_reg8(const int reg, uint8_t val)
 {
 	m_intram[((m_RBS & 0xf) * 8) + (reg & 0x7)] = val;
 }
 
-uint16_t tlcs870_device::get_reg16(int reg)
+const uint16_t tlcs870_device::get_reg16(const int reg)
 {
 	uint16_t res = 0;
 	res |= get_reg8(((reg & 0x3) * 2) + 1) << 8;
@@ -32,13 +32,13 @@ uint16_t tlcs870_device::get_reg16(int reg)
 	return res;
 }
 
-void tlcs870_device::set_reg16(int reg, uint16_t val)
+void tlcs870_device::set_reg16(const int reg, uint16_t val)
 {
 	set_reg8(((reg & 0x3) * 2) + 1, (val & 0xff00) >> 8);
 	set_reg8(((reg & 0x3) * 2) + 0, (val & 0x00ff) >> 0);
 }
 
-uint8_t tlcs870_device::get_PSW()
+const uint8_t tlcs870_device::get_PSW()
 {
 	return (m_F & 0xf0) | (m_RBS & 0x0f);
 }
@@ -50,7 +50,7 @@ void tlcs870_device::set_PSW(uint8_t data)
 	m_RBS = data & 0xf0;
 }
 
-void tlcs870_device::handle_div(int reg)
+void tlcs870_device::handle_div(const int reg)
 {
 	const uint16_t temp16 = get_reg16(reg);
 	const uint8_t temp8 = get_reg8(REG_C);
@@ -93,7 +93,7 @@ void tlcs870_device::handle_div(int reg)
 	}
 }
 
-void tlcs870_device::handle_mul(int reg)
+void tlcs870_device::handle_mul(const int reg)
 {
 	const uint16_t temp16 = get_reg16(reg);
 	const uint16_t tempres = (temp16 & 0xff) * ((temp16 & 0xff00) >> 8);
@@ -111,7 +111,7 @@ void tlcs870_device::handle_mul(int reg)
 	}
 }
 
-void tlcs870_device::handle_swap(int reg)
+void tlcs870_device::handle_swap(const int reg)
 {
 	uint8_t temp = get_reg8(reg);
 	temp = ((temp & 0x0f) << 4) | ((temp & 0xf0) >> 4);
@@ -166,7 +166,7 @@ uint16_t tlcs870_device::get_addr(uint16_t opbyte0, uint16_t val)
 	return addr;
 }
 
-bool tlcs870_device::check_jump_condition(int param1)
+const bool tlcs870_device::check_jump_condition(int param1)
 {
 	bool takejump = true;
 

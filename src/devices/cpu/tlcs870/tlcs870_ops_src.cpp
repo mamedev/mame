@@ -29,25 +29,25 @@
 
 // Main dispatch handlers for these
 
-void tlcs870_device::do_e0_opcode(uint8_t opbyte0)
+void tlcs870_device::do_e0_opcode(const uint8_t opbyte0)
 {
 	const uint16_t srcaddr = get_addr((opbyte0 & 0x7), READ8());
 	do_e0_to_e7_opcode(opbyte0, srcaddr);
 }
 
-void tlcs870_device::do_e1_to_e3_opcode(uint8_t opbyte0)
+void tlcs870_device::do_e1_to_e3_opcode(const uint8_t opbyte0)
 {
 	const uint16_t srcaddr = get_addr((opbyte0 & 0x7), 0);
 	do_e0_to_e7_opcode(opbyte0, srcaddr);
 }
 
-void tlcs870_device::do_e4_opcode(uint8_t opbyte0)
+void tlcs870_device::do_e4_opcode(const uint8_t opbyte0)
 {
 	const uint16_t srcaddr = get_addr((opbyte0 & 0x7), READ8());
 	do_e0_to_e7_opcode(opbyte0, srcaddr);
 }
 
-void tlcs870_device::do_e5_to_e7_opcode(uint8_t opbyte0)
+void tlcs870_device::do_e5_to_e7_opcode(const uint8_t opbyte0)
 {
 	const uint16_t srcaddr = get_addr((opbyte0 & 0x7), 0);
 	do_e0_to_e7_opcode(opbyte0, srcaddr);
@@ -110,16 +110,16 @@ void tlcs870_device::do_e0_to_e7_opcode(uint8_t opbyte0, uint16_t srcaddr)
 
 // Actual handlers
 
-void tlcs870_device::do_e0_to_e7_oprand_illegal(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_e0_to_e7_oprand_illegal(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
-	logerror("Illegal E0-E7 (src prefix) OP %02x %02x (%04x)", opbyte0, opbyte1, srcaddr);
+	logerror("illegal src prefix opcode %02x %02x (src addr %04x)\n", opbyte0, opbyte1, srcaddr);
 }
 
 /**********************************************************************************************************************/
 // (16-bit)
 /**********************************************************************************************************************/
 
-void tlcs870_device::do_LD_rr_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_LD_rr_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// LD rr, (src)
 	const uint16_t val = RM16(srcaddr);
@@ -131,7 +131,7 @@ void tlcs870_device::do_LD_rr_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t s
 // (8-bit)
 /**********************************************************************************************************************/
 
-void tlcs870_device::do_INC_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_INC_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// INC (src)
 	uint8_t val = RM8(srcaddr);
@@ -151,7 +151,7 @@ void tlcs870_device::do_INC_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t src
 	WM8(srcaddr, val);
 }
 
-void tlcs870_device::do_DEC_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_DEC_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// DEC (src)
 	uint8_t val = RM8(srcaddr);
@@ -179,7 +179,7 @@ void tlcs870_device::do_DEC_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t src
 	WM8(srcaddr, val);
 }
 
-void tlcs870_device::do_ROLD_A_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_ROLD_A_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// ROLD A,(src)
 	// 12-bit left rotation using lower 4 bits of REG_A and content of (src)
@@ -196,7 +196,7 @@ void tlcs870_device::do_ROLD_A_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t 
 	// TODO: flags
 }
 
-void tlcs870_device::do_RORD_A_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_RORD_A_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// RORD A,(src)
 	// 12-bit right rotation using lower 4 bits of REG_A and content of (src)
@@ -215,7 +215,7 @@ void tlcs870_device::do_RORD_A_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t 
 
 
 
-void tlcs870_device::do_LD_inx_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_LD_inx_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// LD (x),(src)
 	// invalid if (src) is also (x) ? (not specified)
@@ -227,7 +227,7 @@ void tlcs870_device::do_LD_inx_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t 
 	// z-flag is undefined, check real behavior
 }
 
-void tlcs870_device::do_LD_inHL_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_LD_inHL_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// LD (HL),(src)
 	const uint8_t val = RM8(srcaddr);
@@ -242,7 +242,7 @@ void tlcs870_device::do_LD_inHL_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t
 	else clear_ZF();
 }
 
-void tlcs870_device::do_LD_r_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_LD_r_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// LD r, (src)
 	const uint8_t val = RM8(srcaddr);
@@ -255,7 +255,7 @@ void tlcs870_device::do_LD_r_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t sr
 	else clear_ZF();
 }
 
-void tlcs870_device::do_MCMP_insrc_n(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_MCMP_insrc_n(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// MCMP (src), n
 	const uint8_t n = READ8();
@@ -290,7 +290,7 @@ void tlcs870_device::do_MCMP_insrc_n(uint8_t opbyte0, uint8_t opbyte1, uint16_t 
 	// apparently H gets set conditionally too? (like CMP?)
 }
 
-void tlcs870_device::do_XCH_r_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_XCH_r_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// XCH r,(src)
 	const uint8_t val = RM8(srcaddr);
@@ -316,7 +316,7 @@ void tlcs870_device::do_XCH_r_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t s
 // ALU Operations
 /**********************************************************************************************************************/
 
-void tlcs870_device::do_ALUOP_insrc_inHL(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_ALUOP_insrc_inHL(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// (ALU OP) (src), (HL)
 	const int aluop = (opbyte1 & 0x7);
@@ -332,7 +332,7 @@ void tlcs870_device::do_ALUOP_insrc_inHL(uint8_t opbyte0, uint8_t opbyte1, uint1
 	}
 }
 
-void tlcs870_device::do_ALUOP_insrc_n(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_ALUOP_insrc_n(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// (ALU OP) (src), n
 	const uint8_t n = READ8();
@@ -348,7 +348,7 @@ void tlcs870_device::do_ALUOP_insrc_n(uint8_t opbyte0, uint8_t opbyte1, uint16_t
 	}
 }
 
-void tlcs870_device::do_ALUOP_A_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_ALUOP_A_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// (ALU OP) A, (src)
 	const int aluop = (opbyte1 & 0x7);
@@ -366,7 +366,7 @@ void tlcs870_device::do_ALUOP_A_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t
 // jumps / calls
 /**********************************************************************************************************************/
 
-void tlcs870_device::do_CALL_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_CALL_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// CALL (src)
 	const uint16_t val = RM16(srcaddr);
@@ -379,7 +379,7 @@ void tlcs870_device::do_CALL_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t sr
 	// no flag changes on call
 }
 
-void tlcs870_device::do_JP_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_JP_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// JP (src)
 	const uint16_t val = RM16(srcaddr);
@@ -391,7 +391,7 @@ void tlcs870_device::do_JP_insrc(uint8_t opbyte0, uint8_t opbyte1, uint16_t srca
 // (8-bit) bit operations
 /**********************************************************************************************************************/
 
-void tlcs870_device::do_XOR_CF_insrcbit(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_XOR_CF_insrcbit(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// XOR CF,(src).b
 	const uint8_t val = RM8(srcaddr);
@@ -432,7 +432,7 @@ void tlcs870_device::do_XOR_CF_insrcbit(uint8_t opbyte0, uint8_t opbyte1, uint16
 }
 
 
-void tlcs870_device::do_LD_insrcbit_CF(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_LD_insrcbit_CF(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// LD (src).b,CF
 	uint8_t val = RM8(srcaddr);
@@ -455,7 +455,7 @@ void tlcs870_device::do_LD_insrcbit_CF(uint8_t opbyte0, uint8_t opbyte1, uint16_
 	WM8(srcaddr, val);
 }
 
-void tlcs870_device::do_CPL_insrcbit(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_CPL_insrcbit(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// CPL (src).b
 	uint8_t val = RM8(srcaddr);
@@ -483,7 +483,7 @@ void tlcs870_device::do_CPL_insrcbit(uint8_t opbyte0, uint8_t opbyte1, uint16_t 
 	WM8(srcaddr, val);
 }
 
-void tlcs870_device::do_LD_CF_insrcbit(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_LD_CF_insrcbit(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// LD CF,(src).b  aka  TEST (src).b
 	const uint8_t val = RM8(srcaddr);
@@ -498,7 +498,7 @@ void tlcs870_device::do_LD_CF_insrcbit(uint8_t opbyte0, uint8_t opbyte1, uint16_
 	bit ? clear_JF() : set_JF();
 }
 
-void tlcs870_device::do_SET_insrcbit(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_SET_insrcbit(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// SET (src).b
 	uint8_t val = RM8(srcaddr);
@@ -522,7 +522,7 @@ void tlcs870_device::do_SET_insrcbit(uint8_t opbyte0, uint8_t opbyte1, uint16_t 
 	WM8(srcaddr, val);
 }
 
-void tlcs870_device::do_CLR_insrcbit(uint8_t opbyte0, uint8_t opbyte1, uint16_t srcaddr)
+void tlcs870_device::do_CLR_insrcbit(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr)
 {
 	// CLR (src).b
 	uint8_t val = RM8(srcaddr);

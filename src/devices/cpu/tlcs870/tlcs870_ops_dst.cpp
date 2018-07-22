@@ -28,7 +28,7 @@
 
 // Main dispatch handlers for these
 
-void tlcs870_device::do_f0_opcode(uint8_t opbyte0)
+void tlcs870_device::do_f0_opcode(const uint8_t opbyte0)
 {
 	// 1111 0000 xxxx xxxx 0101 0rrr
 	// destination memory prefix (dst)
@@ -36,7 +36,7 @@ void tlcs870_device::do_f0_opcode(uint8_t opbyte0)
 	do_f0_to_f7_opcode(opbyte0, dstaddr);
 }
 
-void tlcs870_device::do_f2_to_f3_opcode(uint8_t opbyte0)
+void tlcs870_device::do_f2_to_f3_opcode(const uint8_t opbyte0)
 {
 	//	0xf2: 1111 001p 0101 0rrr
 	//	0xf3: 1111 001p 0101 0rrr
@@ -46,7 +46,7 @@ void tlcs870_device::do_f2_to_f3_opcode(uint8_t opbyte0)
 }
 
 
-void tlcs870_device::do_f4_opcode(uint8_t opbyte0)
+void tlcs870_device::do_f4_opcode(const uint8_t opbyte0)
 {
 	//	0xf4: 1111 0100 dddd dddd 0101 0rrr
 	// destination memory prefix (dst)
@@ -54,7 +54,7 @@ void tlcs870_device::do_f4_opcode(uint8_t opbyte0)
 	do_f0_to_f7_opcode(opbyte0, dstaddr);
 }
 
-void tlcs870_device::do_f6_to_f7_opcode(uint8_t opbyte0)
+void tlcs870_device::do_f6_to_f7_opcode(const uint8_t opbyte0)
 {
 	//	0xf6: 1110 0110 0101 0rrr
 	//	0xf7: 1111 0111 0101 0rrr
@@ -65,7 +65,7 @@ void tlcs870_device::do_f6_to_f7_opcode(uint8_t opbyte0)
 
 // f0 - f7 use this table
 // note, same table is shown as above in manual, there's no overlap between src/dest, but they're not compatible
-void tlcs870_device::do_f0_to_f7_opcode(uint8_t opbyte0, uint16_t dstaddr)
+void tlcs870_device::do_f0_to_f7_opcode(const uint8_t opbyte0, const uint16_t dstaddr)
 {
 	const uint8_t opbyte1 = READ8();
 
@@ -88,7 +88,7 @@ void tlcs870_device::do_f0_to_f7_opcode(uint8_t opbyte0, uint16_t dstaddr)
 // (16-bit)
 /**********************************************************************************************************************/
 
-void tlcs870_device::do_LD_indst_rr(uint8_t opbyte0, uint8_t opbyte1, uint16_t dstaddr)
+void tlcs870_device::do_LD_indst_rr(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t dstaddr)
 {
 	// LD (dst),rr
 	// (dst) can only be  (x) (pp) or (HL+d) ?  not (HL+) or (-HL) ?
@@ -102,7 +102,7 @@ void tlcs870_device::do_LD_indst_rr(uint8_t opbyte0, uint8_t opbyte1, uint16_t d
 // (8-bit)
 /**********************************************************************************************************************/
 
-void tlcs870_device::do_LD_indst_n(uint8_t opbyte0, uint8_t opbyte1, uint16_t dstaddr)
+void tlcs870_device::do_LD_indst_n(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t dstaddr)
 {
 	// LD (dst),n
 	// (dst) can only be (DE), (HL+), (-HL), or (HL+d)  because (x) and (HL) are redundant encodings?
@@ -112,7 +112,7 @@ void tlcs870_device::do_LD_indst_n(uint8_t opbyte0, uint8_t opbyte1, uint16_t ds
 	set_JF();
 }
 
-void tlcs870_device::do_LD_indst_r(uint8_t opbyte0, uint8_t opbyte1, uint16_t dstaddr)
+void tlcs870_device::do_LD_indst_r(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t dstaddr)
 {
 	// LD (dst),r
 	const uint8_t reg = get_reg8(opbyte1 & 0x7);
@@ -121,6 +121,7 @@ void tlcs870_device::do_LD_indst_r(uint8_t opbyte0, uint8_t opbyte1, uint16_t ds
 	set_JF();
 }
 
-void tlcs870_device::do_f0_to_f7_oprand_illegal_opcode(uint8_t opbyte0, uint8_t opbyte1, uint16_t dstaddr)
+void tlcs870_device::do_f0_to_f7_oprand_illegal_opcode(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t dstaddr)
 {
+	logerror("illegal dst prefix opcode %02x %02x (dst addr %04x)\n", opbyte0, opbyte1, dstaddr);
 }

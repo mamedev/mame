@@ -41,7 +41,7 @@
 
 // Main dispatch handlers for these
 
-void tlcs870_device::do_regprefixtype_opcode(uint8_t opbyte0)
+void tlcs870_device::do_regprefixtype_opcode(const uint8_t opbyte0)
 {
 	// register prefix: g/gg
 	uint8_t opbyte1 = READ8();
@@ -132,12 +132,13 @@ void tlcs870_device::do_regprefixtype_opcode(uint8_t opbyte0)
 // (Special)
 /**********************************************************************************************************************/
 
-void tlcs870_device::do_regprefixtype_oprand_illegal(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_regprefixtype_oprand_illegal(const uint8_t opbyte0, const uint8_t opbyte1)
 {
+	logerror("illegal reg prefix opcode %02x %02x\n", opbyte0, opbyte1);
 }
 
 
-void tlcs870_device::do_RETN(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_RETN(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// with E8 only
 	if (opbyte0 == 0xe8)
@@ -158,14 +159,14 @@ void tlcs870_device::do_RETN(uint8_t opbyte0, uint8_t opbyte1)
 // (8-bit)
 /**********************************************************************************************************************/
 
-void tlcs870_device::do_SWAP_g(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_SWAP_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// SWAP g
 	uint8_t reg = opbyte0 & 0x7;
 	handle_swap(reg);
 }
 
-void tlcs870_device::do_DAA_g(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_DAA_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// DAA g
 	// 1110 1ggg 0000 1010
@@ -177,7 +178,7 @@ void tlcs870_device::do_DAA_g(uint8_t opbyte0, uint8_t opbyte1)
 }
 
 
-void tlcs870_device::do_DAS_g(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_DAS_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// DAS g
 	// 1110 1ggg 0000 1011
@@ -189,7 +190,7 @@ void tlcs870_device::do_DAS_g(uint8_t opbyte0, uint8_t opbyte1)
 }
 
 
-void tlcs870_device::do_SHLC_g(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_SHLC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// SHLC g
 	// Logical Shift Left with Carry Flag
@@ -200,7 +201,7 @@ void tlcs870_device::do_SHLC_g(uint8_t opbyte0, uint8_t opbyte1)
 	set_reg8(opbyte0 & 0x7, val);
 }
 
-void tlcs870_device::do_SHRC_g(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_SHRC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// SHRC g
 	// Logical Shift Right with Carry Flag
@@ -212,7 +213,7 @@ void tlcs870_device::do_SHRC_g(uint8_t opbyte0, uint8_t opbyte1)
 	set_reg8(opbyte0 & 0x7, val);
 }
 
-void tlcs870_device::do_ROLC_g(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_ROLC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// ROLC g
 	// Rotate Left through Carry flag
@@ -224,20 +225,18 @@ void tlcs870_device::do_ROLC_g(uint8_t opbyte0, uint8_t opbyte1)
 
 }
 
-void tlcs870_device::do_RORC_g(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_RORC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// RORC g
 	// Rotate Right through Carry flag
 
 	uint8_t val = get_reg8(opbyte0 & 0x7);
 
-
-
 	set_reg8(opbyte0 & 0x7, val);
 }
 
 
-void tlcs870_device::do_LD_r_g(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_LD_r_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// LD r,g
 	// 1110 1ggg 0101 1rrr
@@ -250,7 +249,7 @@ void tlcs870_device::do_LD_r_g(uint8_t opbyte0, uint8_t opbyte1)
 	else clear_ZF();
 }
 
-void tlcs870_device::do_XCH_r_g(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_XCH_r_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// XCH r,g
 	// 1110 1ggg 1010 1rrr
@@ -270,7 +269,7 @@ void tlcs870_device::do_XCH_r_g(uint8_t opbyte0, uint8_t opbyte1)
 // (ALU handlers)
 /**********************************************************************************************************************/
 
-void tlcs870_device::do_ALUOP_A_g(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_ALUOP_A_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// (ALU OP) A,g
 	/*
@@ -294,7 +293,7 @@ void tlcs870_device::do_ALUOP_A_g(uint8_t opbyte0, uint8_t opbyte1)
 	}
 }
 
-void tlcs870_device::do_ALUOP_g_A(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_ALUOP_g_A(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// (ALU OP) g,A
 	/*
@@ -317,7 +316,7 @@ void tlcs870_device::do_ALUOP_g_A(uint8_t opbyte0, uint8_t opbyte1)
 	}
 }
 
-void tlcs870_device::do_ALUOP_g_n(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_ALUOP_g_n(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// (ALU OP) g,n
 	int aluop = (opbyte1 & 0x7);
@@ -336,7 +335,7 @@ void tlcs870_device::do_ALUOP_g_n(uint8_t opbyte0, uint8_t opbyte1)
 // (16-bit ALU handlers)
 /**********************************************************************************************************************/
 
-void tlcs870_device::do_ALUOP_WA_gg(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_ALUOP_WA_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// (ALU OP) WA,gg
 	/*
@@ -361,7 +360,7 @@ void tlcs870_device::do_ALUOP_WA_gg(uint8_t opbyte0, uint8_t opbyte1)
 
 }
 
-void tlcs870_device::do_ALUOP_gg_mn(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_ALUOP_gg_mn(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// (ALU OP) gg,mn
 	int aluop = (opbyte1 & 0x7);
@@ -382,7 +381,7 @@ void tlcs870_device::do_ALUOP_gg_mn(uint8_t opbyte0, uint8_t opbyte1)
 
 // ops using (pp).g
 
-void tlcs870_device::do_SET_inppbit(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_SET_inppbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// SET (pp).g
 	uint8_t bitpos = opbyte0 & 7;
@@ -406,7 +405,7 @@ void tlcs870_device::do_SET_inppbit(uint8_t opbyte0, uint8_t opbyte1)
 	WM8(addr, val);
 }
 
-void tlcs870_device::do_CLR_inppbit(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_CLR_inppbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// CLR (pp).g
 	uint8_t bitpos = opbyte0 & 7;
@@ -430,7 +429,7 @@ void tlcs870_device::do_CLR_inppbit(uint8_t opbyte0, uint8_t opbyte1)
 	WM8(addr, val);
 }
 
-void tlcs870_device::do_CPL_inppbit(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_CPL_inppbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// CPL (pp).g
 	uint8_t bitpos = opbyte0 & 7;
@@ -458,7 +457,7 @@ void tlcs870_device::do_CPL_inppbit(uint8_t opbyte0, uint8_t opbyte1)
 	WM8(addr, val);
 }
 
-void tlcs870_device::do_LD_inppbit_CF(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_LD_inppbit_CF(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// LD (pp).g,CF
 	uint8_t bitpos = opbyte0 & 7;
@@ -482,7 +481,7 @@ void tlcs870_device::do_LD_inppbit_CF(uint8_t opbyte0, uint8_t opbyte1)
 
 }
 
-void tlcs870_device::do_LD_CF_inppbit(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_LD_CF_inppbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// LD CF,(pp).g   aka TEST (pp).g
 	// 1110 1ggg 1001 111p
@@ -500,7 +499,7 @@ void tlcs870_device::do_LD_CF_inppbit(uint8_t opbyte0, uint8_t opbyte1)
 
 // ops using g.b
 
-void tlcs870_device::do_SET_gbit(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_SET_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// SET g.b
 	// 1110 1ggg 0100 0bbb
@@ -525,7 +524,7 @@ void tlcs870_device::do_SET_gbit(uint8_t opbyte0, uint8_t opbyte1)
 	set_reg8(opbyte0 & 0x7, val);
 }
 
-void tlcs870_device::do_CLR_gbit(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_CLR_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// CLR g.b
 	// 1110 1ggg 0100 1bbb
@@ -550,7 +549,7 @@ void tlcs870_device::do_CLR_gbit(uint8_t opbyte0, uint8_t opbyte1)
 	set_reg8(opbyte0 & 0x7, val);
 }
 
-void tlcs870_device::do_CPL_gbit(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_CPL_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// CPL g.b
 	// 1110 1ggg 1100 0bbb
@@ -579,7 +578,7 @@ void tlcs870_device::do_CPL_gbit(uint8_t opbyte0, uint8_t opbyte1)
 	set_reg8(opbyte0 & 0x7, val);
 }
 
-void tlcs870_device::do_LD_gbit_CF(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_LD_gbit_CF(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// LD g.b,CF
 	// m_op = LD;    // Flags / Cycles  1--- / 2
@@ -605,7 +604,7 @@ void tlcs870_device::do_LD_gbit_CF(uint8_t opbyte0, uint8_t opbyte1)
 }
 
 
-void tlcs870_device::do_XOR_CF_gbit(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_XOR_CF_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// XOR CF,g.b
 	uint8_t bitpos = opbyte1 & 0x7;
@@ -646,7 +645,7 @@ void tlcs870_device::do_XOR_CF_gbit(uint8_t opbyte0, uint8_t opbyte1)
 }
 
 
-void tlcs870_device::do_LD_CF_gbit(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_LD_CF_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// LD CF,g.b aka TEST g.b
 	uint8_t bitpos = opbyte1 & 0x7;
@@ -665,14 +664,14 @@ void tlcs870_device::do_LD_CF_gbit(uint8_t opbyte0, uint8_t opbyte1)
 // 16-bit
 /**********************************************************************************************************************/
 
-void tlcs870_device::do_MUL_gg(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_MUL_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// MUL ggH, ggL (odd syntax, basically MUL gg)
 	uint8_t reg = opbyte0 & 0x3; // opbyte0 & 4 = invalid?
 	handle_mul(reg);  // flag changes in handler
 }
 
-void tlcs870_device::do_DIV_gg_C(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_DIV_gg_C(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// DIV gg,C
 	// (DIV BC,C is presumably an illegal / undefined result)
@@ -681,7 +680,7 @@ void tlcs870_device::do_DIV_gg_C(uint8_t opbyte0, uint8_t opbyte1)
 	handle_div(reg); // flag changes in handler
 }
 
-void tlcs870_device::do_POP_gg(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_POP_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// POP gg
 	m_sp.d += 2;
@@ -690,7 +689,7 @@ void tlcs870_device::do_POP_gg(uint8_t opbyte0, uint8_t opbyte1)
 	// no flag changes
 }
 
-void tlcs870_device::do_PUSH_gg(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_PUSH_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// PUSH gg
 	uint16_t val = get_reg16(opbyte0 & 3);
@@ -700,21 +699,21 @@ void tlcs870_device::do_PUSH_gg(uint8_t opbyte0, uint8_t opbyte1)
 }
 
 
-void tlcs870_device::do_LD_SP_gg(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_LD_SP_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// LD SP,gg
 	m_sp.d = get_reg16(opbyte0 & 0x3);
 	set_JF(); // no other flag changes for this type of LD
 }
 
-void tlcs870_device::do_LD_gg_SP(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_LD_gg_SP(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// LD gg,SP
 	set_reg16(opbyte0 & 0x3, m_sp.d);
 	set_JF(); // no other flag changes for this type of LD
 }
 
-void tlcs870_device::do_LD_rr_gg(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_LD_rr_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// LD rr,gg
 	uint16_t gg = get_reg16(opbyte0 & 0x3);
@@ -724,7 +723,7 @@ void tlcs870_device::do_LD_rr_gg(uint8_t opbyte0, uint8_t opbyte1)
 }
 
 
-void tlcs870_device::do_XCH_rr_gg(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_XCH_rr_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// XCH rr,gg
 	uint16_t gg = get_reg16(opbyte0 & 0x3);
@@ -737,7 +736,7 @@ void tlcs870_device::do_XCH_rr_gg(uint8_t opbyte0, uint8_t opbyte1)
 }
 
 
-void tlcs870_device::do_CALL_gg(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_CALL_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// CALL gg
 	uint16_t val = get_reg16(opbyte0 & 3);
@@ -750,7 +749,7 @@ void tlcs870_device::do_CALL_gg(uint8_t opbyte0, uint8_t opbyte1)
 	// no flag changes on call
 }
 
-void tlcs870_device::do_JP_gg(uint8_t opbyte0, uint8_t opbyte1)
+void tlcs870_device::do_JP_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// JP gg
 	uint16_t val = get_reg16(opbyte0 & 3);
