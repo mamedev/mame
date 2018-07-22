@@ -187,10 +187,10 @@ private:
 	void do_INC_rr(const uint8_t opbyte0);
 	void do_LD_rr_mn(const uint8_t opbyte0);
 	void do_DEC_rr(const uint8_t opbyte0);
-	void do_1c_opcode(const uint8_t opbyte0);
-	void do_1d_opcode(const uint8_t opbyte0);
-	void do_1e_opcode(const uint8_t opbyte0);
-	void do_1f_opcode(const uint8_t opbyte0);
+	void do_SHLC_A(const uint8_t opbyte0);
+	void do_SHRC_A(const uint8_t opbyte0);
+	void do_ROLC_A(const uint8_t opbyte0);
+	void do_RORC_A(const uint8_t opbyte0);
 	void do_INC_inx(const uint8_t opbyte0);
 	void do_INC_inHL(const uint8_t opbyte0);
 	void do_LD_A_inx(const uint8_t opbyte0);

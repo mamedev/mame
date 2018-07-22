@@ -69,13 +69,13 @@ void tlcs870_device::decode()
 	case 0x18: case 0x19: case 0x1a: case 0x1b:
 		do_DEC_rr(opbyte0); break;
 	case 0x1c:
-		do_1c_opcode(opbyte0); break;
+		do_SHLC_A(opbyte0); break;
 	case 0x1d:
-		do_1d_opcode(opbyte0); break;
+		do_SHRC_A(opbyte0); break;
 	case 0x1e:
-		do_1e_opcode(opbyte0); break;
+		do_ROLC_A(opbyte0); break;
 	case 0x1f:
-		do_1f_opcode(opbyte0); break;
+		do_RORC_A(opbyte0); break;
 	case 0x20:
 		do_INC_inx(opbyte0); break;
 	case 0x21:
@@ -351,7 +351,7 @@ void tlcs870_device::do_DEC_rr(const uint8_t opbyte0)
 }
 
 
-void tlcs870_device::do_1c_opcode(const uint8_t opbyte0)
+void tlcs870_device::do_SHLC_A(const uint8_t opbyte0)
 {
 	// SHLC A
 	uint8_t val = get_reg8(REG_A);
@@ -361,7 +361,7 @@ void tlcs870_device::do_1c_opcode(const uint8_t opbyte0)
 	set_reg8(REG_A, val);
 }
 
-void tlcs870_device::do_1d_opcode(const uint8_t opbyte0)
+void tlcs870_device::do_SHRC_A(const uint8_t opbyte0)
 {
 	// SHRC A
 	uint8_t val = get_reg8(REG_A);
@@ -371,7 +371,7 @@ void tlcs870_device::do_1d_opcode(const uint8_t opbyte0)
 	set_reg8(REG_A, val);
 }
 
-void tlcs870_device::do_1e_opcode(const uint8_t opbyte0)
+void tlcs870_device::do_ROLC_A(const uint8_t opbyte0)
 {
 	// ROLC A
 	uint8_t val = get_reg8(REG_A);
@@ -381,7 +381,7 @@ void tlcs870_device::do_1e_opcode(const uint8_t opbyte0)
 	set_reg8(REG_A, val);
 }
 
-void tlcs870_device::do_1f_opcode(const uint8_t opbyte0)
+void tlcs870_device::do_RORC_A(const uint8_t opbyte0)
 {
 	// RORC A
 	uint8_t val = get_reg8(REG_A);
