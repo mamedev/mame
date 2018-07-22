@@ -229,7 +229,9 @@ void tlcs870_device::do_RORC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	// RORC g
 	// Rotate Right through Carry flag
-	const uint8_t val = get_reg8(opbyte0 & 0x7);
+	uint8_t val = get_reg8(opbyte0 & 0x7);
+
+	val = handle_RORC(val);
 
 	set_reg8(opbyte0 & 0x7, val);
 }
