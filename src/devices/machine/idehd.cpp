@@ -379,15 +379,15 @@ void ata_mass_storage_device::security_error()
 
 attotime ata_mass_storage_device::seek_time()
 {
-	int sectors_per_cylinder =  m_num_heads * m_num_sectors;
+	uint32_t sectors_per_cylinder =  m_num_heads * m_num_sectors;
 
 	if (sectors_per_cylinder == 0 || m_num_cylinders == 0)
 		return attotime::zero;
 
-	int new_lba = lba_address();
-	int old_cylinder = m_cur_lba / sectors_per_cylinder;
-	int new_cylinder = new_lba / sectors_per_cylinder;
-	int diff = abs(old_cylinder - new_cylinder);
+	uint32_t new_lba = lba_address();
+	int16_t old_cylinder = m_cur_lba / sectors_per_cylinder;
+	int16_t new_cylinder = new_lba / sectors_per_cylinder;
+	uint16_t diff = abs(old_cylinder - new_cylinder);
 
 	m_cur_lba = new_lba;
 
@@ -435,7 +435,7 @@ void ata_mass_storage_device::fill_buffer()
 
 void ata_mass_storage_device::finished_read()
 {
-	int lba = lba_address(), read_status;
+	uint32_t lba = lba_address(), read_status;
 
 	set_dasp(CLEAR_LINE);
 
@@ -569,7 +569,7 @@ void ata_mass_storage_device::process_buffer()
 
 void ata_mass_storage_device::finished_write()
 {
-	int lba = lba_address(), count;
+	uint32_t lba = lba_address(), count;
 
 	set_dasp(CLEAR_LINE);
 
