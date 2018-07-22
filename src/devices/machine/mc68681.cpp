@@ -696,69 +696,69 @@ WRITE8_MEMBER(xr68c681_device::write)
 	if (offset == 0x02) /* CRA */
 		switch (data >> 4)
 		{
-		case 0x8: /* set RX extend bit */
+		case 0x08: /* set RX extend bit */
 			m_XRXA = true;
 			m_chanA->baud_updated();
 			data &= 0x0f; /* disable command before we send it off to 68681 */
 			break;
 
-		case 0x9: /* clear RX extend bit */
+		case 0x09: /* clear RX extend bit */
 			m_XRXA = false;
 			m_chanA->baud_updated();
 			data &= 0x0f;
 			break;
 
-		case 0xA: /* set TX extend bit */
+		case 0x0a: /* set TX extend bit */
 			m_XTXA = true;
 			m_chanA->baud_updated();
 			data &= 0x0f;
 			break;
 
-		case 0xB: /* clear TX extend bit */
+		case 0x0b: /* clear TX extend bit */
 			m_XTXA = false;
 			m_chanA->baud_updated();
 			data &= 0x0f;
 			break;
 
-		case 0xC: /* enter low power mode TODO: unimplemented */
-		case 0xD: /* leave low power mode */
-		case 0xE: /* reserved */
-		case 0xF: /* reserved */
+		case 0x0c: /* enter low power mode TODO: unimplemented */
+		case 0x0d: /* leave low power mode */
+		case 0x0e: /* reserved */
+		case 0x0f: /* reserved */
 			data &= 0x0f;
 			break;
 		}
 
-	else if (offset == 0x0A) /* CRB */
+	else if (offset == 0x0a) /* CRB */
 		switch (data >> 4)
 		{
-		case 0x8: /* set RX extend bit */
+		case 0x08: /* set RX extend bit */
 			m_XRXB = true;
 			m_chanB->baud_updated();
 			data &= 0x0f;
 			break;
 
-		case 0x9: /* clear RX extend bit */
+		case 0x09: /* clear RX extend bit */
 			m_XRXB = false;
 			m_chanB->baud_updated();
 			data &= 0x0f;
 			break;
 
-		case 0xA: /* set TX extend bit */
+		case 0x0a: /* set TX extend bit */
 			m_XTXB = true;
 			m_chanB->baud_updated();
 			data &= 0x0f;
 			break;
 
-		case 0xB: /* clear TX extend bit */
+		case 0x0b: /* clear TX extend bit */
 			m_XTXB = false;
 			m_chanB->baud_updated();
 			data &= 0x0f;
 			break;
 
-		case 0xC: /* enter low power mode TODO: unimplemented */
-		case 0xD: /* leave low power mode */
-		case 0xE: /* reserved */
-		case 0xF: /* reserved */
+		case 0x0c: /* enter low power mode TODO: unimplemented */
+		case 0x0d: /* leave low power mode */
+		case 0x0e: /* reserved */
+		case 0x0f: /* reserved */
 			data &= 0x0f;
 			break;
 		}
@@ -1139,7 +1139,7 @@ void duart_channel::tra_complete()
 		m_uart->clear_ISR_bits(INT_TXRDYB);
 
 	// if local loopback is on, write the transmitted data as if a byte had been received
-	if ((MR2 & 0xC0) == 0x80)
+	if ((MR2 & 0xc0) == 0x80)
 	{
 		if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
 		{
@@ -1163,7 +1163,7 @@ void duart_channel::tra_complete()
 void duart_channel::tra_callback()
 {
 	// don't actually send in loopback mode
-	if ((MR2&0xC0) != 0x80)
+	if ((MR2 & 0xc0) != 0x80)
 	{
 		int bit = transmit_register_get_data_bit();
 		//printf("%s ch %d transmit %d\n", tag(), m_ch, bit);
@@ -1213,7 +1213,7 @@ void duart_channel::update_interrupts()
 	}
 
 	// Handle the TxEMT and TxRDY bits based on mode
-	switch (MR2&0xC0) // what mode are we in?
+	switch (MR2 & 0xc0) // what mode are we in?
 	{
 	case 0x00: // normal mode
 		if (tx_enabled)
@@ -1239,7 +1239,7 @@ void duart_channel::update_interrupts()
 			SR &= ~STATUS_TRANSMITTER_EMPTY;
 		}
 	break;
-	case 0xC0: // remote loopback mode
+	case 0xc0: // remote loopback mode
 		// write me, what the txrdy/txemt regs do for remote loopback mode is undocumented afaik, for now just clear both
 		SR &= ~STATUS_TRANSMITTER_EMPTY;
 		SR &= ~STATUS_TRANSMITTER_READY;
@@ -1393,7 +1393,7 @@ void duart_channel::write_MR(uint8_t data)
 void duart_channel::recalc_framing()
 {
 	parity_t parity = PARITY_NONE;
-	switch ((MR1>>3) & 3)
+	switch ((MR1 >> 3) & 3)
 	{
 	case 0: // with parity
 		if (MR1 & 4)
@@ -1447,7 +1447,7 @@ void duart_channel::recalc_framing()
 
 	//printf("%s ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", tag(), m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
 
-	set_data_frame(1, (MR1 & 3)+5, parity, stopbits);
+	set_data_frame(1, (MR1 & 3) + 5, parity, stopbits);
 }
 
 void duart_channel::write_CR(uint8_t data)
