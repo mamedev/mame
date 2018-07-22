@@ -51,7 +51,7 @@
 	downcast<sega315_5313_device &>(*device).set_md_32x_scanline_helper(sega315_5313_device::md_32x_scanline_helper_delegate(&_class::_method, #_class "::" #_method, this));
 
 
-class sega315_5313_device : public sega315_5124_device, public device_mixer_interface
+class sega315_5313_device : public sega315_5313_mode4_device, public device_mixer_interface
 {
 public:
 	template <typename T>
