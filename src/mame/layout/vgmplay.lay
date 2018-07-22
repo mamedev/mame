@@ -26,6 +26,8 @@
 	21: K053260
 	22: K054539
 	23: GA20
+	24: RF5C68
+	25: RF5C164
 	-->
 
 	<element name="backdrop"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
@@ -90,7 +92,7 @@
 	</element>
 
 	<group name="activity">
-		<cpanel element="backdrop"><bounds x="0" y="0" width="45" height="25" /></cpanel>
+		<cpanel element="backdrop"><bounds x="0" y="0" width="60" height="25" /></cpanel>
 
 		<cpanel name="led_act_0" element="act_led"><bounds x="1" y="1" width="2" height="2" /></cpanel>
 		<cpanel name="led_act_1" element="act_led"><bounds x="1" y="4" width="2" height="2" /></cpanel>
@@ -154,26 +156,26 @@
 	</group>
 
 	<view name="Internal Layout">
-		<bounds left="0" right="45" top="0" bottom="55" />
+		<bounds left="0" right="60" top="0" bottom="55" />
 
-		<cpanel element="static_black2"><bounds x="0"  y="4" width="8" height="5" /></cpanel>
-		<cpanel element="static_black2"><bounds x="9"  y="4" width="8" height="5" /></cpanel>
-		<cpanel element="static_black2"><bounds x="18" y="4" width="8" height="5" /></cpanel>
-		<cpanel element="static_black2"><bounds x="27" y="4" width="8" height="5" /></cpanel>
-		<cpanel element="static_black2"><bounds x="36" y="4" width="8" height="5" /></cpanel>
+		<cpanel element="static_black2"><bounds x="0"  y="4" width="11" height="5" /></cpanel>
+		<cpanel element="static_black2"><bounds x="12" y="4" width="11" height="5" /></cpanel>
+		<cpanel element="static_black2"><bounds x="24" y="4" width="11" height="5" /></cpanel>
+		<cpanel element="static_black2"><bounds x="36" y="4" width="11" height="5" /></cpanel>
+		<cpanel element="static_black2"><bounds x="48" y="4" width="11" height="5" /></cpanel>
 
-		<cpanel element="text_l1"><bounds x="0"  y="5" width="8" height="3.5" /></cpanel>
-		<cpanel element="text_l2"><bounds x="9"  y="5" width="8" height="3.5" /></cpanel>
-		<cpanel element="text_l3"><bounds x="18" y="5" width="8" height="3.5" /></cpanel>
-		<cpanel element="text_l4"><bounds x="27" y="5" width="8" height="3.5" /></cpanel>
-		<cpanel element="text_l5"><bounds x="36" y="5" width="8" height="3.5" /></cpanel>
+		<cpanel element="text_l1"><bounds x="0"  y="5" width="11" height="3.5" /></cpanel>
+		<cpanel element="text_l2"><bounds x="12" y="5" width="11" height="3.5" /></cpanel>
+		<cpanel element="text_l3"><bounds x="24" y="5" width="11" height="3.5" /></cpanel>
+		<cpanel element="text_l4"><bounds x="36" y="5" width="11" height="3.5" /></cpanel>
+		<cpanel element="text_l5"><bounds x="48" y="5" width="11" height="3.5" /></cpanel>
 
-		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0001"><bounds x="0" y="4" width="8" height="5" /><color alpha="0.15" /></cpanel>
-		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0002"><bounds x="9"  y="4" width="8" height="5" /><color alpha="0.15" /></cpanel>
-		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0004"><bounds x="18" y="4" width="8" height="5" /><color alpha="0.15" /></cpanel>
-		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0008"><bounds x="27" y="4" width="8" height="5" /><color alpha="0.15" /></cpanel>
-		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0010"><bounds x="36" y="4" width="8" height="5" /><color alpha="0.15" /></cpanel>
+		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0001"><bounds x="0"  y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
+		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0002"><bounds x="12" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
+		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0004"><bounds x="24" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
+		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0008"><bounds x="36" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
+		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0010"><bounds x="48" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
 
-		<group ref="activity"><bounds x="0" y="30" width="45" height="25" /></group>
+		<group ref="activity"><bounds x="0" y="30" width="60" height="25" /></group>
 	</view>
 </mamelayout>
