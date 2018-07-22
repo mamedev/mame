@@ -590,7 +590,7 @@ void i8255_device::set_mode(uint8_t data)
 		m_control = m_control & ~CONTROL_PORT_C_UPPER_INPUT;
 		m_control = m_control & ~CONTROL_PORT_C_LOWER_INPUT;
 	}
-	
+
 	// group A
 	if (!m_dont_clear_output_latches)
 		m_output[PORT_A] = 0;

@@ -1903,7 +1903,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_SCREEN_SIZE(0x160, 0xf0)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_left)
-//	MCFG_SCREEN_PALETTE("lpalette")
+//  MCFG_SCREEN_PALETTE("lpalette")
 
 	MCFG_SCREEN_ADD("mscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1911,7 +1911,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_SCREEN_SIZE(0x160, 0xf0)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_mid)
-//	MCFG_SCREEN_PALETTE("mpalette")
+//  MCFG_SCREEN_PALETTE("mpalette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30)
@@ -2664,7 +2664,7 @@ ROM_START( vjdash )
 	ROM_FILL( 6, 1, 0x01 )
 	ROM_FILL( 0x100, 1, 0x60 )
 	ROM_FILL( 0x101, 1, 0xfe )
-	
+
 	ROM_REGION( 0x0c00000, "sprites_left", ROMREGION_ERASE )    // left screen sprites
 	ROM_LOAD( "vjdash-01", 0x000000, 0x400000, NO_DUMP )
 	ROM_LOAD( "vjdash-02", 0x400000, 0x400000, NO_DUMP )
@@ -2770,7 +2770,7 @@ ROM_START( step3 )
 	ROM_FILL( 6, 1, 0x01 )
 	ROM_FILL( 0x100, 1, 0x60 )
 	ROM_FILL( 0x101, 1, 0xfe )
-	
+
 	ROM_REGION( 0x100000, "sub", 0 ) // 68000
 	ROM_LOAD16_BYTE( "vj98348_step3_11_v1.1", 0x00000, 0x80000, CRC(9c36aef5) SHA1(bbac48c2c7949a6f8a6ec83515e94a343c88d1b6) )
 	ROM_LOAD16_BYTE( "vj98348_step3_14_v1.1", 0x00001, 0x80000, CRC(b86be557) SHA1(49dbd6ef1c50adcf3386d5423da8ae7685649c46) )

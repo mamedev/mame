@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "ps2vu.h"
+
 #include "ps2vif1.h"
 #include "video/ps2gs.h"
 #include "video/ps2gif.h"
@@ -20,8 +21,16 @@
 DEFINE_DEVICE_TYPE(SONYPS2_VU0, sonyvu0_device, "sonyvu0", "Sony PlayStation 2 VU0")
 DEFINE_DEVICE_TYPE(SONYPS2_VU1, sonyvu1_device, "sonyvu1", "Sony PlayStation 2 VU1")
 
-sonyvu_device::sonyvu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
-	address_map_constructor micro_cons, address_map_constructor vu_cons, chip_type chiptype, uint32_t mem_size)
+sonyvu_device::sonyvu_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		address_map_constructor micro_cons,
+		address_map_constructor vu_cons,
+		chip_type chiptype,
+		uint32_t mem_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_micro_config("micro", ENDIANNESS_BIG, 64, 12, 0, micro_cons)
 	, m_vu_config("vu", ENDIANNESS_BIG, 32, 12, 0, vu_cons)
@@ -736,10 +745,10 @@ void sonyvu_device::execute_lower(const uint32_t op)
 				{
 					case 0x30:
 						if (rs == 0 && rt == 0 && dest == 0)
-						{	// NOP
+						{   // NOP
 						}
 						else
-						{	// MOVE
+						{   // MOVE
 							printf("Unsupported VU instruction: MOVE\n"); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
 						}
 						break;

@@ -591,7 +591,7 @@ void cischeat_state::cischeat_draw_sprites(bitmap_ind16 &bitmap , const rectangl
 			sx -= 0x800;
 		if(sy & 0x400)
 			sy -= 0x800;
-		
+
 		/* use fixed point values (16.16), for accuracy */
 		sx <<= 16;
 		sy <<= 16;

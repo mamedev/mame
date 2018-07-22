@@ -9,10 +9,11 @@
 *
 */
 
-#ifndef DEVICES_VIDEO_PS2GS_H
-#define DEVICES_VIDEO_PS2GS_H
+#ifndef MAME_VIDEO_PS2GS_H
+#define MAME_VIDEO_PS2GS_H
 
 #pragma once
+
 
 class ps2_intc_device;
 class ps2_gif_device;
@@ -23,19 +24,20 @@ class ps2_gs_device : public device_t
 public:
 	template <typename T, typename U>
 
-    ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&intc_tag, U &&vu1_tag)
-    	: ps2_gs_device(mconfig, tag, owner, clock)
-    {
+	ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&intc_tag, U &&vu1_tag)
+		: ps2_gs_device(mconfig, tag, owner, clock)
+	{
 		m_intc.set_tag(std::forward<T>(intc_tag));
 		m_vu1.set_tag(std::forward<U>(vu1_tag));
 	}
 
 	ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~ps2_gs_device() override;
 
-    DECLARE_READ64_MEMBER(priv_regs0_r);
-    DECLARE_WRITE64_MEMBER(priv_regs0_w);
-    DECLARE_READ64_MEMBER(priv_regs1_r);
-    DECLARE_WRITE64_MEMBER(priv_regs1_w);
+	DECLARE_READ64_MEMBER(priv_regs0_r);
+	DECLARE_WRITE64_MEMBER(priv_regs0_w);
+	DECLARE_READ64_MEMBER(priv_regs1_r);
+	DECLARE_WRITE64_MEMBER(priv_regs1_w);
 
 	DECLARE_WRITE64_MEMBER(regs_w);
 
@@ -51,8 +53,8 @@ public:
 	void vblank_end();
 
 protected:
-    virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	void copy_dword_from_host(uint64_t data);
@@ -75,19 +77,19 @@ protected:
 
 	enum : uint8_t
 	{
-		PSMCT32		= 0x00,
-		PSMCT24		= 0x01,
-		PSMCT16		= 0x02,
-		PSMCT16S	= 0x0a,
-		PSMT8		= 0x13,
-		PSMT4		= 0x14,
-		PSMT8H		= 0x1b,
-		PSMT4HL		= 0x24,
-		PSMT4HH		= 0x2c,
-		PSMZ32		= 0x30,
-		PSMZ24		= 0x31,
-		PSMZ16		= 0x32,
-		PSMZ16S		= 0x3a
+		PSMCT32     = 0x00,
+		PSMCT24     = 0x01,
+		PSMCT16     = 0x02,
+		PSMCT16S    = 0x0a,
+		PSMT8       = 0x13,
+		PSMT4       = 0x14,
+		PSMT8H      = 0x1b,
+		PSMT4HL     = 0x24,
+		PSMT4HH     = 0x2c,
+		PSMZ32      = 0x30,
+		PSMZ24      = 0x31,
+		PSMZ16      = 0x32,
+		PSMZ16S     = 0x3a
 	};
 
 	enum : uint8_t
@@ -260,9 +262,9 @@ protected:
 	uint64_t m_trx_dir; // 0x53
 
 	// Privileged regs
-    uint64_t m_base_regs[15];
+	uint64_t m_base_regs[15];
 
-    uint64_t m_pmode; // Privileged 0x00
+	uint64_t m_pmode; // Privileged 0x00
 	bool m_read_circuit_enable[2];
 	bool m_use_fixed_alpha;
 	uint8_t m_alpha_out_select;
@@ -294,25 +296,21 @@ protected:
 	uint8_t m_bg_g;
 	uint8_t m_bg_b;
 
-    uint64_t m_csr;
-    uint64_t m_imr;
-    uint64_t m_busdir;
-    uint64_t m_sig_label_id;
+	uint64_t m_csr;
+	uint64_t m_imr;
+	uint64_t m_busdir;
+	uint64_t m_sig_label_id;
 
 	uint32_t m_vertex_count;
 	uint32_t m_kick_count;
 
 	uint8_t m_curr_field;
 
-    static const size_t FORMAT_PIXEL_WIDTHS[0x40];
-    static const char* FORMAT_NAMES[0x40];
-    static const uint32_t KICK_COUNTS[8];
+	static const size_t FORMAT_PIXEL_WIDTHS[0x40];
+	static const char* FORMAT_NAMES[0x40];
+	static const uint32_t KICK_COUNTS[8];
 };
 
 DECLARE_DEVICE_TYPE(SONYPS2_GS, ps2_gs_device)
 
-#include "ps2gif.h"
-#include "cpu/mips/ps2vu.h"
-#include "machine/ps2intc.h"
-
-#endif // DEVICES_VIDEO_PS2GS_H
+#endif // MAME_VIDEO_PS2GS_H

@@ -40,7 +40,7 @@
 
 # DEBUG = 1
 # PROFILER = 1
-# SANITIZE = 
+# SANITIZE =
 
 # PTR64 = 1
 # BIGENDIAN = 1

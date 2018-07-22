@@ -1401,7 +1401,7 @@ device_debug::device_debug(device_t &device)
 			else
 				m_notifiers.push_back(-1);
 	}
-		
+
 	// set up state-related stuff
 	if (m_state != nullptr)
 	{

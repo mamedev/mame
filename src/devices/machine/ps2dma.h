@@ -9,22 +9,23 @@
 *
 */
 
-#ifndef DEVICES_MACHINE_PS2DMAC_H
-#define DEVICES_MACHINE_PS2DMAC_H
+#ifndef MAME_MACHINE_PS2DMA_H
+#define MAME_MACHINE_PS2DMA_H
 
 #pragma once
 
-#include "ps2sif.h"
-#include "video/ps2gs.h"
 #include "cpu/mips/ps2vu.h"
+#include "video/ps2gs.h"
+
+class ps2_sif_device;
 
 class ps2_dmac_device : public device_t, public device_execute_interface
 {
 public:
 	template <typename T, typename U, typename V, typename W, typename X>
-    ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&ee_tag, U &&ram_tag, V &&sif_tag, W &&gs_tag, X &&vu1_tag)
-    	: ps2_dmac_device(mconfig, tag, owner, clock)
-    {
+	ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&ee_tag, U &&ram_tag, V &&sif_tag, W &&gs_tag, X &&vu1_tag)
+		: ps2_dmac_device(mconfig, tag, owner, clock)
+	{
 		m_ee.set_tag(std::forward<T>(ee_tag));
 		m_ram.set_tag(std::forward<U>(ram_tag));
 		m_sif.set_tag(std::forward<V>(sif_tag));
@@ -32,7 +33,8 @@ public:
 		m_vu1.set_tag(std::forward<X>(vu1_tag));
 	}
 
-    ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~ps2_dmac_device() override;
 
 	enum channel_type : uint32_t
 	{
@@ -57,12 +59,12 @@ public:
 	DECLARE_WRITE32_MEMBER(disable_mask_w);
 
 protected:
-    virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void execute_run() override;
 
-    enum tag_id
-    {
+	enum tag_id
+	{
 		ID_REFE = 0,
 		ID_CNT,
 		ID_NEXT,
@@ -148,4 +150,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SONYPS2_DMAC, ps2_dmac_device)
 
-#endif // DEVICES_MACHINE_PS2DMAC_H
+#endif // MAME_MACHINE_PS2DMA_H

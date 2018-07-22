@@ -54,7 +54,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
-	
+
 	void jpms80(machine_config &config);
 
 	void init_jpms80();

@@ -11,6 +11,8 @@
 
 #include "emu.h"
 #include "ps2dma.h"
+
+#include "ps2sif.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/ps2vif1.h"
 #include "video/ps2gif.h"
@@ -26,6 +28,10 @@ ps2_dmac_device::ps2_dmac_device(const machine_config &mconfig, const char *tag,
 	, m_gs(*this, finder_base::DUMMY_TAG)
 	, m_vu1(*this, finder_base::DUMMY_TAG)
 	, m_icount(0)
+{
+}
+
+ps2_dmac_device::~ps2_dmac_device()
 {
 }
 
@@ -317,32 +323,32 @@ void ps2_dmac_device::follow_source_tag(uint32_t chan)
 	switch (id)
 	{
 		case ID_CNT:
-            channel.set_addr(channel.tag_addr() + 0x10);
-           	channel.set_tag_addr(channel.addr() + (channel.quadword_count() << 4));
+			channel.set_addr(channel.tag_addr() + 0x10);
+			channel.set_tag_addr(channel.addr() + (channel.quadword_count() << 4));
 			break;
 		case ID_REFE:
-            channel.set_end_tag(true);
-            // Intentional fall-through
-        case ID_REF:
-            channel.set_addr(addr);
-            channel.set_tag_addr(channel.tag_addr() + 0x10);
-            break;
+			channel.set_end_tag(true);
+			// Intentional fall-through
+		case ID_REF:
+			channel.set_addr(addr);
+			channel.set_tag_addr(channel.tag_addr() + 0x10);
+			break;
 		case ID_REFS:
 			// We don't handle stalls yet, just act the same as REF for now
-            channel.set_addr(addr);
-            channel.set_tag_addr(channel.tag_addr() + 0x10);
-            break;
-        case ID_NEXT:
-            channel.set_addr(channel.tag_addr() + 0x10);
-            channel.set_tag_addr(addr);
+			channel.set_addr(addr);
+			channel.set_tag_addr(channel.tag_addr() + 0x10);
+			break;
+		case ID_NEXT:
+			channel.set_addr(channel.tag_addr() + 0x10);
+			channel.set_tag_addr(addr);
 			break;
 		case ID_END:
-            channel.set_addr(channel.tag_addr() + 0x10);
-            channel.set_end_tag(true);
-            break;
-        default:
-        	logerror("%s: Unknown DMAtag ID: %d\n", machine().describe_context(), id);
-        	break;
+			channel.set_addr(channel.tag_addr() + 0x10);
+			channel.set_end_tag(true);
+			break;
+		default:
+			logerror("%s: Unknown DMAtag ID: %d\n", machine().describe_context(), id);
+			break;
 	}
 
 	if (irq && channel.irq_enable())

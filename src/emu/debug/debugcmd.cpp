@@ -3162,7 +3162,7 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
 					address_space &sp = memory.space(space);
 					bool octal = sp.is_octal();
 					int nc = octal ? (sp.addr_width() + 2) / 3 : (sp.addr_width() + 3) / 4;
-						
+
 					std::vector<memory_entry> entries[2];
 					sp.dump_maps(entries[0], entries[1]);
 					for (int mode = 0; mode < 2; mode ++)

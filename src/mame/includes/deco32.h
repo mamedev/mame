@@ -94,7 +94,7 @@ protected:
 	std::unique_ptr<uint16_t[]> m_spriteram16_buffered[2]; // all but dragngun
 	std::unique_ptr<uint16_t[]> m_pf_rowscroll[4]; // common
 
-private:	
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 
@@ -111,7 +111,7 @@ public:
 	{ }
 
 	void captaven(machine_config &config);
-	
+
 	void init_captaven();
 
 private:

@@ -206,7 +206,7 @@ public:
 
 	void hp9845a(machine_config &config);
 	void hp9835a(machine_config &config);
-	
+
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

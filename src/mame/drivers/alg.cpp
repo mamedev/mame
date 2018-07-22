@@ -706,7 +706,7 @@ ROM_START( marvice )
 
 	ROM_REGION( 0x800, "unk", ROMREGION_ERASEFF ) // nvram contents, should be x4 in size
 	ROM_LOAD( "mk48z02b-20.u13", 0x0000, 0x0800, BAD_DUMP CRC(e6079615) SHA1(f528b2a600ab047ad7f87f4dbae65a7e4cd10f8c) )
-	
+
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "marvice", 0, NO_DUMP )
 ROM_END

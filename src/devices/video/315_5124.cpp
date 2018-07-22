@@ -1008,7 +1008,7 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 		/* Column 0 is the leftmost tile column that completely entered in the screen.
 		   If the leftmost pixels aren't part of a complete tile, due to horizontal
 		   scrolling, they are drawn only with color #0 of the selected palette. */
-		if (tile_column == 0 && x_scroll_fine_adjust > 0) 
+		if (tile_column == 0 && x_scroll_fine_adjust > 0)
 		{
 			draw_column0_x_scroll_mode4(line_buffer, priority_selected, x_scroll_fine_adjust, palette_selected, tile_line);
 		}
@@ -1262,24 +1262,24 @@ void sega315_5313_mode4_device::select_sprites( int line )
 	sega315_5124_device::select_sprites(line);
 
 /*
-	Info from Charles MacDonald regarding real hardware behavior: 
-	(http://www.smspower.org/forums/15772-Sprites8x16Question)
+    Info from Charles MacDonald regarding real hardware behavior:
+    (http://www.smspower.org/forums/15772-Sprites8x16Question)
 
-	"As I recall the SMS will parses the sprite table on line N to find the
-	sprite numbers to display on line N+1, and on the next line it displays
-	those sprites. The data for the sprites is read in real-time and is not
-	buffered from any earlier time. The only thing that's buffered are the
-	eight sprite numbers.
+    "As I recall the SMS will parses the sprite table on line N to find the
+    sprite numbers to display on line N+1, and on the next line it displays
+    those sprites. The data for the sprites is read in real-time and is not
+    buffered from any earlier time. The only thing that's buffered are the
+    eight sprite numbers.
 
-	On the MD it has two line buffers (RAM) that it renders sprite data into
-	on one line, and displays that buffer on the next line while preparing
-	the next one. This only reveals itself if you play with the screen
-	blanking or left-column blanking bits, as the display process erases the
-	other buffer and on a blanked line nothing gets erased.
+    On the MD it has two line buffers (RAM) that it renders sprite data into
+    on one line, and displays that buffer on the next line while preparing
+    the next one. This only reveals itself if you play with the screen
+    blanking or left-column blanking bits, as the display process erases the
+    other buffer and on a blanked line nothing gets erased.
 
-	So if you turn on either of those bits later they show the old sprite
-	data that hadn't been erased yet. This is how you can show a line of
-	sprite data further down on the screen than where the sprites were."
+    So if you turn on either of those bits later they show the old sprite
+    data that hadn't been erased yet. This is how you can show a line of
+    sprite data further down on the screen than where the sprites were."
 */
 
 	// Runs the function that draws sprites, but only to check for

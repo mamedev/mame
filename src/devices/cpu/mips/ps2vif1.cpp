@@ -14,6 +14,10 @@
 #include "emu.h"
 #include "ps2vif1.h"
 
+#include "ps2vu.h"
+#include "video/ps2gs.h"
+#include "video/ps2gif.h"
+
 DEFINE_DEVICE_TYPE(SONYPS2_VIF1, ps2_vif1_device, "ps2vif1", "PlayStation 2 VIF1")
 
 /*static*/ const size_t ps2_vif1_device::BUFFER_SIZE = 0x40;
@@ -32,39 +36,43 @@ ps2_vif1_device::ps2_vif1_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+ps2_vif1_device::~ps2_vif1_device()
+{
+}
+
 void ps2_vif1_device::device_start()
 {
 	set_icountptr(m_icount);
 
 	save_item(NAME(m_icount));
 
-    save_item(NAME(m_buffer));
-    save_item(NAME(m_curr));
-    save_item(NAME(m_end));
+	save_item(NAME(m_buffer));
+	save_item(NAME(m_curr));
+	save_item(NAME(m_end));
 
-   	save_item(NAME(m_status));
-   	save_item(NAME(m_control));
-   	save_item(NAME(m_err));
-   	save_item(NAME(m_mark));
-   	save_item(NAME(m_cycle));
-   	save_item(NAME(m_mode));
-   	save_item(NAME(m_num));
-   	save_item(NAME(m_mask));
-   	save_item(NAME(m_code));
-   	save_item(NAME(m_itops));
-   	save_item(NAME(m_base));
-   	save_item(NAME(m_offset));
-   	save_item(NAME(m_tops));
-   	save_item(NAME(m_itop));
-   	save_item(NAME(m_top));
+	save_item(NAME(m_status));
+	save_item(NAME(m_control));
+	save_item(NAME(m_err));
+	save_item(NAME(m_mark));
+	save_item(NAME(m_cycle));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_num));
+	save_item(NAME(m_mask));
+	save_item(NAME(m_code));
+	save_item(NAME(m_itops));
+	save_item(NAME(m_base));
+	save_item(NAME(m_offset));
+	save_item(NAME(m_tops));
+	save_item(NAME(m_itop));
+	save_item(NAME(m_top));
 
-   	save_item(NAME(m_row_fill));
-   	save_item(NAME(m_col_fill));
+	save_item(NAME(m_row_fill));
+	save_item(NAME(m_col_fill));
 
-   	save_item(NAME(m_data_needed));
-   	save_item(NAME(m_data_index));
-   	save_item(NAME(m_command));
-   	save_item(NAME(m_alignment));
+	save_item(NAME(m_data_needed));
+	save_item(NAME(m_data_index));
+	save_item(NAME(m_command));
+	save_item(NAME(m_alignment));
 
 	save_item(NAME(m_mpg_count));
 	save_item(NAME(m_mpg_addr));
@@ -83,37 +91,37 @@ void ps2_vif1_device::device_reset()
 {
 	m_icount = 0;
 
-   	memset(m_buffer, 0, sizeof(uint32_t) * BUFFER_SIZE);
-    m_curr = 0;
-    m_end = 0;
+	memset(m_buffer, 0, sizeof(uint32_t) * BUFFER_SIZE);
+	m_curr = 0;
+	m_end = 0;
 
-   	m_status = 0;
-   	m_control = 0;
-   	m_err = 0;
-   	m_mark = 0;
-   	m_cycle = 0;
-   	m_mode = 0;
-   	m_num = 0;
-   	m_mask = 0;
-   	m_code = 0;
-   	m_itops = 0;
-   	m_base = 0;
-   	m_offset = 0;
-   	m_tops = 0;
-   	m_itop = 0;
-   	m_top = 0;
+	m_status = 0;
+	m_control = 0;
+	m_err = 0;
+	m_mark = 0;
+	m_cycle = 0;
+	m_mode = 0;
+	m_num = 0;
+	m_mask = 0;
+	m_code = 0;
+	m_itops = 0;
+	m_base = 0;
+	m_offset = 0;
+	m_tops = 0;
+	m_itop = 0;
+	m_top = 0;
 
-   	memset(m_row_fill, 0, sizeof(uint32_t) * 4);
-   	memset(m_col_fill, 0, sizeof(uint32_t) * 4);
+	memset(m_row_fill, 0, sizeof(uint32_t) * 4);
+	memset(m_col_fill, 0, sizeof(uint32_t) * 4);
 
-   	m_data_needed = 0;
-   	m_data_index = 0;
-   	m_command = 0;
-   	m_alignment = 0;
+	m_data_needed = 0;
+	m_data_index = 0;
+	m_command = 0;
+	m_alignment = 0;
 
-   	m_mpg_count = 0;
-   	m_mpg_addr = 0;
-   	m_mpg_insn = 0;
+	m_mpg_count = 0;
+	m_mpg_addr = 0;
+	m_mpg_insn = 0;
 
 	m_unpack_count = 0;
 	m_unpack_addr = 0;

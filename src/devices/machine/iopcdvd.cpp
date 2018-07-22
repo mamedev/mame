@@ -9,6 +9,7 @@
 *
 */
 
+#include "emu.h"
 #include "iopcdvd.h"
 
 DEFINE_DEVICE_TYPE(SONYIOP_CDVD, iop_cdvd_device, "iopcdvd", "PlayStation 2 disc controller")
@@ -18,6 +19,10 @@ DEFINE_DEVICE_TYPE(SONYIOP_CDVD, iop_cdvd_device, "iopcdvd", "PlayStation 2 disc
 iop_cdvd_device::iop_cdvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SONYIOP_CDVD, tag, owner, clock)
 	, m_intc(*this, finder_base::DUMMY_TAG)
+{
+}
+
+iop_cdvd_device::~iop_cdvd_device()
 {
 }
 

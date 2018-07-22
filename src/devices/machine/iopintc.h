@@ -9,25 +9,25 @@
 *
 */
 
-#ifndef DEVICES_MACHINE_IOPINTC_H
-#define DEVICES_MACHINE_IOPINTC_H
+#ifndef MAME_MACHINE_IOPINTC_H
+#define MAME_MACHINE_IOPINTC_H
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/mips/r3000.h"
 
 class iop_intc_device : public device_t
 {
 public:
 	template <typename T>
-    iop_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&iop_tag)
-    	: iop_intc_device(mconfig, tag, owner, (uint32_t)0)
-    {
+	iop_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&iop_tag)
+		: iop_intc_device(mconfig, tag, owner, (uint32_t)0)
+	{
 		m_iop.set_tag(std::forward<T>(iop_tag));
 	}
 
-    iop_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iop_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~iop_intc_device() override;
 
 	DECLARE_READ32_MEMBER(read);
 	DECLARE_WRITE32_MEMBER(write);
@@ -45,8 +45,8 @@ public:
 	};
 
 protected:
-    virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void update_interrupts();
 
@@ -58,4 +58,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SONYIOP_INTC, iop_intc_device)
 
-#endif // DEVICES_MACHINE_IOPINTC_H
+#endif // MAME_MACHINE_IOPINTC_H

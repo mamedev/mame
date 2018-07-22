@@ -11,7 +11,9 @@
 
 #include "emu.h"
 #include "iopdma.h"
+
 #include "cpu/mips/ps2vu.h"
+
 
 DEFINE_DEVICE_TYPE(SONYIOP_DMA, iop_dma_device, "iopdma", "PlayStation 2 IOP DMAC")
 
@@ -24,6 +26,10 @@ iop_dma_device::iop_dma_device(const machine_config &mconfig, const char *tag, d
 	, m_spu(*this, finder_base::DUMMY_TAG)
 	, m_sio2(*this, finder_base::DUMMY_TAG)
 	, m_icount(0)
+{
+}
+
+iop_dma_device::~iop_dma_device()
 {
 }
 
@@ -237,7 +243,7 @@ void iop_dma_device::transfer_spu(uint32_t chan)
 		//if (first_bank)
 			//m_intc->raise_interrupt(iop_intc_device::INT_SPU);
 
-        transfer_finish(chan);
+		transfer_finish(chan);
 	}
 }
 

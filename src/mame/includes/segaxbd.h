@@ -63,7 +63,7 @@ protected:
 	DECLARE_READ16_MEMBER(adc_r);
 	DECLARE_WRITE16_MEMBER(adc_w);
 	DECLARE_WRITE16_MEMBER(iocontrol_w);
-	
+
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

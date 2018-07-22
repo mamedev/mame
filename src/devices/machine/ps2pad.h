@@ -9,20 +9,22 @@
 *
 */
 
-#ifndef DEVICES_MACHINE_PS2PAD_H
-#define DEVICES_MACHINE_PS2PAD_H
+#ifndef MAME_MACHINE_PS2PAD_H
+#define MAME_MACHINE_PS2PAD_H
 
 #pragma once
+
 
 class ps2_pad_device : public device_t
 {
 public:
-    ps2_pad_device(const machine_config &mconfig, const char *tag, device_t *owner)
-    	: ps2_pad_device(mconfig, tag, owner, (uint32_t)0)
-    {
+	ps2_pad_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: ps2_pad_device(mconfig, tag, owner, (uint32_t)0)
+	{
 	}
 
-    ps2_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~ps2_pad_device() override;
 
 	void recv_fifo_push(uint8_t data); // TODO: Turn me into a bus interface!
 	uint8_t xmit_fifo_pop();
@@ -32,8 +34,8 @@ public:
 	static const uint8_t SIO_DEVICE_ID = 0x01;
 
 protected:
-    virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void xmit_fifo_push(uint8_t data);
 	uint8_t recv_fifo_pop();
@@ -49,12 +51,12 @@ protected:
 
 	enum : uint8_t
 	{
-		CMD_READ_BUTTONS	= 0x42,
-		CMD_CONFIG			= 0x43,
-		CMD_GET_MODEL		= 0x45,
-		CMD_GET_ACT			= 0x46,
-		CMD_GET_COMB		= 0x47,
-		CMD_GET_MODE		= 0x4c,
+		CMD_READ_BUTTONS    = 0x42,
+		CMD_CONFIG          = 0x43,
+		CMD_GET_MODEL       = 0x45,
+		CMD_GET_ACT         = 0x46,
+		CMD_GET_COMB        = 0x47,
+		CMD_GET_MODE        = 0x4c,
 	};
 
 	uint8_t m_recv_buf[64]; // Buffer size is a guess
@@ -73,4 +75,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SONYPS2_PAD, ps2_pad_device)
 
-#endif // DEVICES_MACHINE_PS2PAD_H
+#endif // MAME_MACHINE_PS2PAD_H

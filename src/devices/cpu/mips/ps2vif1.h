@@ -9,8 +9,8 @@
 *
 */
 
-#ifndef DEVICES_MACHINE_VIF1_H
-#define DEVICES_MACHINE_VIF1_H
+#ifndef MAME_CPU_MIPS_PS2VIF1_H
+#define MAME_CPU_MIPS_PS2VIF1_H
 
 #pragma once
 
@@ -21,17 +21,18 @@ class ps2_vif1_device : public device_t, public device_execute_interface
 {
 public:
 	template <typename T, typename U>
-    ps2_vif1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gs_tag, U &&vu1_tag)
-    	: ps2_vif1_device(mconfig, tag, owner, clock)
-    {
+	ps2_vif1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gs_tag, U &&vu1_tag)
+		: ps2_vif1_device(mconfig, tag, owner, clock)
+	{
 		m_gs.set_tag(std::forward<T>(gs_tag));
 		m_vu1.set_tag(std::forward<U>(vu1_tag));
 	}
 
 	ps2_vif1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~ps2_vif1_device() override;
 
-    DECLARE_READ64_MEMBER(mmio_r);
-    DECLARE_WRITE64_MEMBER(mmio_w);
+	DECLARE_READ64_MEMBER(mmio_r);
+	DECLARE_WRITE64_MEMBER(mmio_w);
 
 	DECLARE_READ32_MEMBER(regs_r);
 	DECLARE_WRITE32_MEMBER(regs_w);
@@ -41,8 +42,8 @@ public:
 	bool fifo_available(uint32_t count) const { return (BUFFER_SIZE - m_end) >= count; }
 
 protected:
-    virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void execute_run() override;
 
 	uint32_t calculate_unpack_count();
@@ -66,42 +67,42 @@ protected:
 		STAT_MODE_DATA   = 3,
 
 		STAT_E_WAIT      = (1 << 2),
-		STAT_GS_WAIT	 = (1 << 3),
-		STAT_MARK		 = (1 << 6),
-		STAT_DBUF		 = (1 << 7),
+		STAT_GS_WAIT     = (1 << 3),
+		STAT_MARK        = (1 << 6),
+		STAT_DBUF        = (1 << 7),
 		STAT_STALL_STOP  = (1 << 8),
 		STAT_STALL_FBRK  = (1 << 9),
 		STAT_STALL_INT   = (1 << 10),
-		STAT_INT		 = (1 << 11),
-		STAT_BAD_TAG	 = (1 << 12),
-		STAT_BAD_CODE	 = (1 << 13),
+		STAT_INT         = (1 << 11),
+		STAT_BAD_TAG     = (1 << 12),
+		STAT_BAD_CODE    = (1 << 13),
 		STAT_FDR_TO_HOST = (1 << 23)
 	};
 
 	enum : uint8_t
 	{
-		CMD_INT			= 0x80,
-		CMD_UNPACK_MASK	= 0x10
+		CMD_INT         = 0x80,
+		CMD_UNPACK_MASK = 0x10
 	};
 
 	enum : uint8_t
 	{
-		FMT_S32		= 0x00,
-		FMT_S16		= 0x01,
-		FMT_S8		= 0x02,
-		//FMT_UNK0	= 0x03,
-		FMT_V2_32	= 0x04,
-		FMT_V2_16	= 0x05,
-		FMT_V2_8	= 0x06,
-		//FMT_UNK1	= 0x07,
-		FMT_V3_32	= 0x08,
-		FMT_V3_16	= 0x09,
-		FMT_V3_8	= 0x0a,
-		//FMT_UNK2	= 0x0b,
-		FMT_V4_32	= 0x0c,
-		FMT_V4_16	= 0x0d,
-		FMT_V4_8	= 0x0e,
-		FMT_V4_5	= 0x0f,
+		FMT_S32     = 0x00,
+		FMT_S16     = 0x01,
+		FMT_S8      = 0x02,
+		//FMT_UNK0  = 0x03,
+		FMT_V2_32   = 0x04,
+		FMT_V2_16   = 0x05,
+		FMT_V2_8    = 0x06,
+		//FMT_UNK1  = 0x07,
+		FMT_V3_32   = 0x08,
+		FMT_V3_16   = 0x09,
+		FMT_V3_8    = 0x0a,
+		//FMT_UNK2  = 0x0b,
+		FMT_V4_32   = 0x0c,
+		FMT_V4_16   = 0x0d,
+		FMT_V4_8    = 0x0e,
+		FMT_V4_5    = 0x0f,
 	};
 
 	required_device<ps2_gs_device> m_gs;
@@ -109,28 +110,28 @@ protected:
 
 	int m_icount;
 
-    uint32_t m_buffer[0x40];
-    uint32_t m_curr;
-    uint32_t m_end;
+	uint32_t m_buffer[0x40];
+	uint32_t m_curr;
+	uint32_t m_end;
 
-   	uint32_t m_status;
-   	uint32_t m_control;
-   	uint32_t m_err;
-   	uint32_t m_mark;
-   	uint32_t m_cycle;
-   	uint32_t m_mode;
-   	uint32_t m_num;
-   	uint32_t m_mask;
-   	uint32_t m_code;
-   	uint32_t m_itops;
-   	uint32_t m_base;
-   	uint32_t m_offset;
-   	uint32_t m_tops;
-   	uint32_t m_itop;
-   	uint32_t m_top;
+	uint32_t m_status;
+	uint32_t m_control;
+	uint32_t m_err;
+	uint32_t m_mark;
+	uint32_t m_cycle;
+	uint32_t m_mode;
+	uint32_t m_num;
+	uint32_t m_mask;
+	uint32_t m_code;
+	uint32_t m_itops;
+	uint32_t m_base;
+	uint32_t m_offset;
+	uint32_t m_tops;
+	uint32_t m_itop;
+	uint32_t m_top;
 
-   	uint32_t m_row_fill[4];
-   	uint32_t m_col_fill[4];
+	uint32_t m_row_fill[4];
+	uint32_t m_col_fill[4];
 
 	uint32_t m_data_needed;
 	uint32_t m_data_index;
@@ -149,13 +150,10 @@ protected:
 	bool m_unpack_add_tops;
 	uint8_t m_unpack_format;
 
-   	static const size_t BUFFER_SIZE;
-   	static const uint32_t FORMAT_SIZE[0x10];
+	static const size_t BUFFER_SIZE;
+	static const uint32_t FORMAT_SIZE[0x10];
 };
 
 DECLARE_DEVICE_TYPE(SONYPS2_VIF1, ps2_vif1_device)
 
-#include "video/ps2gs.h"
-#include "ps2vu.h"
-
-#endif // DEVICES_MACHINE_PS2VIF1_H
+#endif // MAME_CPU_MIPS_PS2VIF1_H

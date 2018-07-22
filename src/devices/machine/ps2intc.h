@@ -9,8 +9,8 @@
 *
 */
 
-#ifndef DEVICES_MACHINE_PS2INTC_H
-#define DEVICES_MACHINE_PS2INTC_H
+#ifndef MAME_MACHINE_PS2INTC_H
+#define MAME_MACHINE_PS2INTC_H
 
 #pragma once
 
@@ -20,13 +20,14 @@ class ps2_intc_device : public device_t
 {
 public:
 	template <typename T>
-    ps2_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&ee_tag)
-    	: ps2_intc_device(mconfig, tag, owner, (uint32_t)0)
-    {
+	ps2_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&ee_tag)
+		: ps2_intc_device(mconfig, tag, owner, (uint32_t)0)
+	{
 		m_ee.set_tag(std::forward<T>(ee_tag));
 	}
 
-    ps2_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~ps2_intc_device() override;
 
 	DECLARE_READ32_MEMBER(read);
 	DECLARE_WRITE32_MEMBER(write);
@@ -53,8 +54,8 @@ public:
 	};
 
 protected:
-    virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void update_interrupts();
 
@@ -66,4 +67,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SONYPS2_INTC, ps2_intc_device)
 
-#endif // DEVICES_MACHINE_PS2INTC_H
+#endif // MAME_MACHINE_PS2INTC_H

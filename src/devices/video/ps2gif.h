@@ -9,8 +9,8 @@
 *
 */
 
-#ifndef DEVICES_VIDEO_PS2GIF_H
-#define DEVICES_VIDEO_PS2GIF_H
+#ifndef MAME_VIDEO_PS2GIF_H
+#define MAME_VIDEO_PS2GIF_H
 
 #pragma once
 
@@ -21,14 +21,15 @@ class ps2_gif_device : public device_t, public device_execute_interface
 {
 public:
 	template <typename T, typename U>
-    ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gs_tag, U &&vu1_tag)
-    	: ps2_gif_device(mconfig, tag, owner, clock)
-    {
+	ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gs_tag, U &&vu1_tag)
+		: ps2_gif_device(mconfig, tag, owner, clock)
+	{
 		m_gs.set_tag(std::forward<T>(gs_tag));
 		m_vu1.set_tag(std::forward<U>(vu1_tag));
 	}
 
-    ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~ps2_gif_device() override;
 
 	DECLARE_READ32_MEMBER(read);
 	DECLARE_WRITE32_MEMBER(write);
@@ -41,8 +42,8 @@ public:
 	bool path3_available() const { return m_path3_available; }
 
 protected:
-    virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void execute_run() override;
 
 	void fetch_path1(uint64_t &hi, uint64_t &lo);
@@ -125,7 +126,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SONYPS2_GIF, ps2_gif_device)
 
-#include "ps2gs.h"
-#include "cpu/mips/ps2vu.h"
-
-#endif // DEVICES_VIDEO_PS2GIF_H
+#endif // MAME_VIDEO_PS2GIF_H

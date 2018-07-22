@@ -106,7 +106,7 @@ void a2_video_device::device_start()
 	save_item(NAME(m_altcharset));
 	save_item(NAME(m_an2));
 	save_item(NAME(m_80store));
-	save_item(NAME(m_monohgr));	
+	save_item(NAME(m_monohgr));
 	save_item(NAME(m_GSfg));
 	save_item(NAME(m_GSbg));
 	save_item(NAME(m_GSborder));

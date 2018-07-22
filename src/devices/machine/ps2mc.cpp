@@ -22,6 +22,10 @@ ps2_mc_device::ps2_mc_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+ps2_mc_device::~ps2_mc_device()
+{
+}
+
 void ps2_mc_device::device_start()
 {
 	save_item(NAME(m_recv_buf));

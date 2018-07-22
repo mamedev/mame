@@ -44,9 +44,9 @@ known issues:
     Bubble Trouble (Golly Ghost II)
     - no artwork
 
-	Metal Hawk
-	- tilemap issues (ex : Result and stage select screen)
-	- ROZ wraparound isn't implemented
+    Metal Hawk
+    - tilemap issues (ex : Result and stage select screen)
+    - ROZ wraparound isn't implemented
 
 The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
 complete system consists of two boards: CPU + GRAPHICS. It contains a large

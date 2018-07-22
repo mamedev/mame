@@ -22,6 +22,10 @@ ps2_sif_device::ps2_sif_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+ps2_sif_device::~ps2_sif_device()
+{
+}
+
 void ps2_sif_device::device_start()
 {
 	save_item(NAME(m_ms_mailbox));

@@ -9,8 +9,8 @@
 *
 */
 
-#ifndef DEVICES_MACHINE_PS2SIF_H
-#define DEVICES_MACHINE_PS2SIF_H
+#ifndef MAME_MACHINE_PS2SIF_H
+#define MAME_MACHINE_PS2SIF_H
 
 #pragma once
 
@@ -20,13 +20,14 @@ class ps2_sif_device : public device_t
 {
 public:
 	template <typename T>
-    ps2_sif_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&intc_tag)
-    	: ps2_sif_device(mconfig, tag, owner, (uint32_t)0)
-    {
+	ps2_sif_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&intc_tag)
+		: ps2_sif_device(mconfig, tag, owner, (uint32_t)0)
+	{
 		m_intc.set_tag(std::forward<T>(intc_tag));
 	}
 
-    ps2_sif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_sif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~ps2_sif_device() override;
 
 	DECLARE_READ32_MEMBER(ee_r);
 	DECLARE_WRITE32_MEMBER(ee_w);
@@ -40,8 +41,8 @@ public:
 	static const size_t MAX_FIFO_DEPTH;
 
 protected:
-    virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	required_device<ps2_intc_device> m_intc;
 
@@ -57,4 +58,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SONYPS2_SIF, ps2_sif_device)
 
-#endif // DEVICES_MACHINE_PS2SIF_H
+#endif // MAME_MACHINE_PS2SIF_H

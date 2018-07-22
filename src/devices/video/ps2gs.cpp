@@ -12,28 +12,33 @@
 #include "emu.h"
 #include "ps2gs.h"
 
+#include "ps2gif.h"
+#include "machine/ps2intc.h"
+#include "cpu/mips/ps2vu.h"
+
+
 DEFINE_DEVICE_TYPE(SONYPS2_GS, ps2_gs_device, "ps2gs", "Playstation 2 GS")
 
 /*static*/ const size_t ps2_gs_device::FORMAT_PIXEL_WIDTHS[] = {
-	32,	24,	16,	0,	0,	0,	0,	0,
-	0,	0,	16,	0,	0,	0,	0,	0,
-	0,	0,	0,	8,	4,	0,	0,	0,
-	0,	0,	0,	8,	0,	0,	0,	0,
-	0,	0,	0,	0,	4,	0,	0,	0,
-	0,	0,	0,	0,	4,	0,	0,	0,
-	32,	24,	16,	0,	0,	0,	0,	0,
-	0,	0,	16,	0,	0,	0,	0,	0
+	32, 24, 16, 0,  0,  0,  0,  0,
+	0,  0,  16, 0,  0,  0,  0,  0,
+	0,  0,  0,  8,  4,  0,  0,  0,
+	0,  0,  0,  8,  0,  0,  0,  0,
+	0,  0,  0,  0,  4,  0,  0,  0,
+	0,  0,  0,  0,  4,  0,  0,  0,
+	32, 24, 16, 0,  0,  0,  0,  0,
+	0,  0,  16, 0,  0,  0,  0,  0
 };
 
 /*static*/ const char* ps2_gs_device::FORMAT_NAMES[] = {
-	"PSMCT32",	"PSMCT24",	"PSMCT16",	"Unknown",	"Unknown",	"Unknown",	"Unknown",	"Unknown",
-	"Unknown",	"Unknown",	"PCMCT16S",	"Unknown",	"Unknown",	"Unknown",	"Unknown",	"Unknown",
-	"Unknown",	"Unknown",	"Unknown",	"PSMT8",	"PSMT4",	"Unknown",	"Unknown",	"Unknown",
-	"Unknown",	"Unknown",	"Unknown",	"PSMT8H",	"Unknown",	"Unknown",	"Unknown",	"Unknown",
-	"Unknown",	"Unknown",	"Unknown",	"Unknown",	"PSMT4HL",	"Unknown",	"Unknown",	"Unknown",
-	"Unknown",	"Unknown",	"Unknown",	"Unknown",	"PSMT4HH",	"Unknown",	"Unknown",	"Unknown",
-	"PSMZ32",	"PSMZ24",	"PSMZ16",	"Unknown",	"Unknown",	"Unknown",	"Unknown",	"Unknown",
-	"Unknown",	"Unknown",	"PSMZ16S",	"Unknown",	"Unknown",	"Unknown",	"Unknown",	"Unknown"
+	"PSMCT32",  "PSMCT24",  "PSMCT16",  "Unknown",  "Unknown",  "Unknown",  "Unknown",  "Unknown",
+	"Unknown",  "Unknown",  "PCMCT16S", "Unknown",  "Unknown",  "Unknown",  "Unknown",  "Unknown",
+	"Unknown",  "Unknown",  "Unknown",  "PSMT8",    "PSMT4",    "Unknown",  "Unknown",  "Unknown",
+	"Unknown",  "Unknown",  "Unknown",  "PSMT8H",   "Unknown",  "Unknown",  "Unknown",  "Unknown",
+	"Unknown",  "Unknown",  "Unknown",  "Unknown",  "PSMT4HL",  "Unknown",  "Unknown",  "Unknown",
+	"Unknown",  "Unknown",  "Unknown",  "Unknown",  "PSMT4HH",  "Unknown",  "Unknown",  "Unknown",
+	"PSMZ32",   "PSMZ24",   "PSMZ16",   "Unknown",  "Unknown",  "Unknown",  "Unknown",  "Unknown",
+	"Unknown",  "Unknown",  "PSMZ16S",  "Unknown",  "Unknown",  "Unknown",  "Unknown",  "Unknown"
 };
 
 /*static*/ const uint32_t ps2_gs_device::KICK_COUNTS[] = {
@@ -45,6 +50,10 @@ ps2_gs_device::ps2_gs_device(const machine_config &mconfig, const char *tag, dev
 	, m_intc(*this, finder_base::DUMMY_TAG)
 	, m_vu1(*this, finder_base::DUMMY_TAG)
 	, m_gif(*this, "gif")
+{
+}
+
+ps2_gs_device::~ps2_gs_device()
 {
 }
 
@@ -75,9 +84,9 @@ void ps2_gs_device::device_start()
 
 	save_item(NAME(m_trx_dir));
 
-    save_item(NAME(m_base_regs));
+	save_item(NAME(m_base_regs));
 
-    save_item(NAME(m_pmode));
+	save_item(NAME(m_pmode));
 	save_item(NAME(m_read_circuit_enable));
 	save_item(NAME(m_use_fixed_alpha));
 	save_item(NAME(m_alpha_out_select));
@@ -109,13 +118,13 @@ void ps2_gs_device::device_start()
 	save_item(NAME(m_bg_g));
 	save_item(NAME(m_bg_b));
 
-    save_item(NAME(m_csr));
-    save_item(NAME(m_imr));
-    save_item(NAME(m_busdir));
-    save_item(NAME(m_sig_label_id));
+	save_item(NAME(m_csr));
+	save_item(NAME(m_imr));
+	save_item(NAME(m_busdir));
+	save_item(NAME(m_sig_label_id));
 
-    save_item(NAME(m_vertex_count));
-    save_item(NAME(m_kick_count));
+	save_item(NAME(m_vertex_count));
+	save_item(NAME(m_kick_count));
 
 	save_item(NAME(m_context[0].m_xyoffset));
 	save_item(NAME(m_context[0].m_offset_x));
@@ -208,7 +217,7 @@ void ps2_gs_device::device_reset()
 
 	memset(m_base_regs, 0, sizeof(uint64_t) * 15);
 
-    m_pmode = 0;
+	m_pmode = 0;
 	memset(m_read_circuit_enable, 0, 2);
 	m_use_fixed_alpha = 0;
 	m_alpha_out_select = 0;
@@ -240,101 +249,101 @@ void ps2_gs_device::device_reset()
 	m_bg_g = 0;
 	m_bg_b = 0;
 
-    m_csr = 0;
-    m_imr = 0;
-    m_busdir = 0;
-    m_sig_label_id = 0;
+	m_csr = 0;
+	m_imr = 0;
+	m_busdir = 0;
+	m_sig_label_id = 0;
 
 	memset(m_context, 0, sizeof(context_t) * 2);
-    m_vertex_count = 0;
-    m_kick_count = 0;
+	m_vertex_count = 0;
+	m_kick_count = 0;
 }
 
 READ64_MEMBER(ps2_gs_device::priv_regs0_r)
 {
-    uint64_t ret = m_base_regs[offset >> 1];
-    switch (offset)
-    {
-        case 0x00:
-        	ret = m_pmode;
-        	logerror("%s: regs0_r: PMODE (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
+	uint64_t ret = m_base_regs[offset >> 1];
+	switch (offset)
+	{
+		case 0x00:
+			ret = m_pmode;
+			logerror("%s: regs0_r: PMODE (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+			break;
 
-        case 0x04:
-        	ret = m_smode2;
-        	logerror("%s: regs0_r: SMODE2 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
+		case 0x04:
+			ret = m_smode2;
+			logerror("%s: regs0_r: SMODE2 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+			break;
 
-        case 0x0e:
-        case 0x12:
-        	ret = m_dispfb[(offset - 0x0e) / 4];
-        	logerror("%s: regs0_r: DISPFB2 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
+		case 0x0e:
+		case 0x12:
+			ret = m_dispfb[(offset - 0x0e) / 4];
+			logerror("%s: regs0_r: DISPFB2 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+			break;
 
-        case 0x10:
-        case 0x14:
-        	ret = m_display[(offset - 0x10) / 4];
-        	logerror("%s: regs0_r: DISPLAY2 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
+		case 0x10:
+		case 0x14:
+			ret = m_display[(offset - 0x10) / 4];
+			logerror("%s: regs0_r: DISPLAY2 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+			break;
 
-        case 0x1c:
-        	ret = m_bgcolor;
-        	logerror("%s: regs0_r: BGCOLOR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
+		case 0x1c:
+			ret = m_bgcolor;
+			logerror("%s: regs0_r: BGCOLOR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+			break;
 
-        case 0x02: logerror("%s: regs0_r: SMODE1 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x06: logerror("%s: regs0_r: SRFSH (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x08: logerror("%s: regs0_r: SYNCH1 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x0a: logerror("%s: regs0_r: SYNCH2 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x0c: logerror("%s: regs0_r: SYNCV (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x16: logerror("%s: regs0_r: EXTBUF (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x18: logerror("%s: regs0_r: EXTDATA (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        case 0x1a: logerror("%s: regs0_r: EXTWRITE (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
-        default:   logerror("%s: regs0_r: Unknown (%08x)\n", machine().describe_context(), 0x12000000 + (offset << 3)); break;
-    }
-    return ret;
+		case 0x02: logerror("%s: regs0_r: SMODE1 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
+		case 0x06: logerror("%s: regs0_r: SRFSH (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
+		case 0x08: logerror("%s: regs0_r: SYNCH1 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
+		case 0x0a: logerror("%s: regs0_r: SYNCH2 (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
+		case 0x0c: logerror("%s: regs0_r: SYNCV (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
+		case 0x16: logerror("%s: regs0_r: EXTBUF (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
+		case 0x18: logerror("%s: regs0_r: EXTDATA (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
+		case 0x1a: logerror("%s: regs0_r: EXTWRITE (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret); break;
+		default:   logerror("%s: regs0_r: Unknown (%08x)\n", machine().describe_context(), 0x12000000 + (offset << 3)); break;
+	}
+	return ret;
 }
 
 WRITE64_MEMBER(ps2_gs_device::priv_regs0_w)
 {
-    switch (offset)
-    {
-        case 0x00: // PMODE
-        	m_pmode = data;
-        	m_read_circuit_enable[0] = BIT(data, 0);
-        	m_read_circuit_enable[1] = BIT(data, 1);
-        	m_use_fixed_alpha = BIT(data, 5);
-        	m_alpha_out_select = BIT(data, 6);
-        	m_blend_to_background = BIT(data, 7);
-        	m_fixed_alpha = (data >> 8) & 0xff;
-        	logerror("%s: regs0_w: PMODE = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
-        	break;
+	switch (offset)
+	{
+		case 0x00: // PMODE
+			m_pmode = data;
+			m_read_circuit_enable[0] = BIT(data, 0);
+			m_read_circuit_enable[1] = BIT(data, 1);
+			m_use_fixed_alpha = BIT(data, 5);
+			m_alpha_out_select = BIT(data, 6);
+			m_blend_to_background = BIT(data, 7);
+			m_fixed_alpha = (data >> 8) & 0xff;
+			logerror("%s: regs0_w: PMODE = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+			break;
 
-        case 0x04: // SMODE2
-        	m_smode2 = data;
-        	m_interlace = BIT(data, 0);
-        	m_frame_interlace = BIT(data, 1);
-        	m_dpms_mode = (data >> 2) & 3;
-        	logerror("%s: regs0_w: SMODE2 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
-        	break;
+		case 0x04: // SMODE2
+			m_smode2 = data;
+			m_interlace = BIT(data, 0);
+			m_frame_interlace = BIT(data, 1);
+			m_dpms_mode = (data >> 2) & 3;
+			logerror("%s: regs0_w: SMODE2 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+			break;
 
-        case 0x0e: // DISPFB1
-        case 0x12: // DISPFB2
-        {
+		case 0x0e: // DISPFB1
+		case 0x12: // DISPFB2
+		{
 			const uint8_t index = (offset - 0x0e) / 4;
-        	m_dispfb[index] = data;
-        	m_dispfb_base[index] = (data & 0x1ff) << 11;
-        	m_dispfb_width[index] = (data & 0x7e00) >> 3;
-        	m_dispfb_format[index] = (data >> 15) & 0x1f;
-        	m_dispfb_x[index] = (data >> 32) & 0x7ff;
-        	m_dispfb_y[index] = (data >> 42) & 0x7ff;
-        	logerror("%s: regs0_w: DISPFB%d = %08x%08x\n", machine().describe_context(), index + 1, (uint32_t)(data >> 32), (uint32_t)data);
+			m_dispfb[index] = data;
+			m_dispfb_base[index] = (data & 0x1ff) << 11;
+			m_dispfb_width[index] = (data & 0x7e00) >> 3;
+			m_dispfb_format[index] = (data >> 15) & 0x1f;
+			m_dispfb_x[index] = (data >> 32) & 0x7ff;
+			m_dispfb_y[index] = (data >> 42) & 0x7ff;
+			logerror("%s: regs0_w: DISPFB%d = %08x%08x\n", machine().describe_context(), index + 1, (uint32_t)(data >> 32), (uint32_t)data);
 			break;
 		}
 
-        case 0x10: // DISPLAY1
-        case 0x14: // DISPLAY2
-        {
+		case 0x10: // DISPLAY1
+		case 0x14: // DISPLAY2
+		{
 			const uint8_t index = (offset - 0x10) / 4;
 			m_display[index] = data;
 			m_display_xpos[index] = data & 0xfff;
@@ -343,84 +352,84 @@ WRITE64_MEMBER(ps2_gs_device::priv_regs0_w)
 			m_magv[index] = (data >> 27) & 3;
 			m_display_width[index] = (data >> 32) & 0xfff;
 			m_display_height[index] = (data >> 44) & 0x7ff;
-        	logerror("%s: regs0_w: DISPLAY%d = %08x%08x\n", machine().describe_context(), index + 1, (uint32_t)(data >> 32), (uint32_t)data);
-        	break;
+			logerror("%s: regs0_w: DISPLAY%d = %08x%08x\n", machine().describe_context(), index + 1, (uint32_t)(data >> 32), (uint32_t)data);
+			break;
 		}
 
-        case 0x1c: // BGCOLOR
-        	m_bgcolor = data;
-        	m_bg_r = data & 0xff;
-        	m_bg_g = (data >> 8) & 0xff;
-        	m_bg_b = (data >> 16) & 0xff;
-        	logerror("%s: regs0_w: BGCOLOR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
-        	break;
+		case 0x1c: // BGCOLOR
+			m_bgcolor = data;
+			m_bg_r = data & 0xff;
+			m_bg_g = (data >> 8) & 0xff;
+			m_bg_b = (data >> 16) & 0xff;
+			logerror("%s: regs0_w: BGCOLOR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+			break;
 
-        case 0x02: logerror("%s: regs0_w: SMODE1 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x06: logerror("%s: regs0_w: SRFSH = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x08: logerror("%s: regs0_w: SYNCH1 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x0a: logerror("%s: regs0_w: SYNCH2 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x0c: logerror("%s: regs0_w: SYNCV = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x16: logerror("%s: regs0_w: EXTBUF = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x18: logerror("%s: regs0_w: EXTDATA = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        case 0x1a: logerror("%s: regs0_w: EXTWRITE = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
-        default:   logerror("%s: regs0_w: Unknown %08x = %08x%08x\n", machine().describe_context(), 0x12000000 + (offset << 3), (uint32_t)(data >> 32), (uint32_t)data); break;
-    }
-    m_base_regs[offset >> 1] = data;
+		case 0x02: logerror("%s: regs0_w: SMODE1 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
+		case 0x06: logerror("%s: regs0_w: SRFSH = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
+		case 0x08: logerror("%s: regs0_w: SYNCH1 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
+		case 0x0a: logerror("%s: regs0_w: SYNCH2 = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
+		case 0x0c: logerror("%s: regs0_w: SYNCV = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
+		case 0x16: logerror("%s: regs0_w: EXTBUF = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
+		case 0x18: logerror("%s: regs0_w: EXTDATA = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
+		case 0x1a: logerror("%s: regs0_w: EXTWRITE = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data); break;
+		default:   logerror("%s: regs0_w: Unknown %08x = %08x%08x\n", machine().describe_context(), 0x12000000 + (offset << 3), (uint32_t)(data >> 32), (uint32_t)data); break;
+	}
+	m_base_regs[offset >> 1] = data;
 }
 
 READ64_MEMBER(ps2_gs_device::priv_regs1_r)
 {
 	uint64_t ret = 0;
-    switch (offset)
-    {
-        case 0x00:
-        	ret = m_csr | (CSR_REV | CSR_ID | CSR_FIFO_EMPTY);
-        	logerror("%s: regs1_r: CSR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
-        case 0x02:
-        	ret = m_imr;
-        	logerror("%s: regs1_r: IMR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
-        case 0x08:
-        	ret = m_busdir;
-        	logerror("%s: regs1_r: BUSDIR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
-        case 0x10:
-        	ret = m_sig_label_id;
-        	logerror("%s: regs1_r: SIGLBLID (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
-        	break;
-        default:
-        	logerror("%s: regs1_r: Unknown (%08x)\n", machine().describe_context(), 0x12000000 + (offset << 3));
-        	break;
+	switch (offset)
+	{
+		case 0x00:
+			ret = m_csr | (CSR_REV | CSR_ID | CSR_FIFO_EMPTY);
+			logerror("%s: regs1_r: CSR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+			break;
+		case 0x02:
+			ret = m_imr;
+			logerror("%s: regs1_r: IMR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+			break;
+		case 0x08:
+			ret = m_busdir;
+			logerror("%s: regs1_r: BUSDIR (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+			break;
+		case 0x10:
+			ret = m_sig_label_id;
+			logerror("%s: regs1_r: SIGLBLID (%08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret);
+			break;
+		default:
+			logerror("%s: regs1_r: Unknown (%08x)\n", machine().describe_context(), 0x12000000 + (offset << 3));
+			break;
 	}
 	return ret;
 }
 
 WRITE64_MEMBER(ps2_gs_device::priv_regs1_w)
 {
-    switch (offset)
-    {
-        case 0x00:
-        	logerror("%s: regs1_w: CSR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
-        	m_csr = data &~ (CSR_RESET | CSR_SIGNAL | CSR_HSINT | CSR_VSINT | CSR_EDWINT | CSR_FLUSH);
-        	//m_csr |= (CSR_SIGNAL | CSR_HSINT | CSR_VSINT | CSR_EDWINT | CSR_FLUSH);
-        	break;
-        case 0x02:
-        	logerror("%s: regs1_w: IMR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
-        	m_imr = data;
-        	break;
-        case 0x08:
-        	logerror("%s: regs1_w: BUSDIR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
-        	m_busdir = data;
-        	break;
-        case 0x10:
-        	logerror("%s: regs1_w: SIGLBLID = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
-        	m_sig_label_id = data;
-        	break;
-        default:
-        	logerror("%s: regs1_w: Unknown %08x = %08x%08x\n", machine().describe_context(), 0x12000000 + (offset << 3), (uint32_t)(data >> 32), (uint32_t)data);
-        	break;
-    }
+	switch (offset)
+	{
+		case 0x00:
+			logerror("%s: regs1_w: CSR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+			m_csr = data &~ (CSR_RESET | CSR_SIGNAL | CSR_HSINT | CSR_VSINT | CSR_EDWINT | CSR_FLUSH);
+			//m_csr |= (CSR_SIGNAL | CSR_HSINT | CSR_VSINT | CSR_EDWINT | CSR_FLUSH);
+			break;
+		case 0x02:
+			logerror("%s: regs1_w: IMR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+			m_imr = data;
+			break;
+		case 0x08:
+			logerror("%s: regs1_w: BUSDIR = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+			m_busdir = data;
+			break;
+		case 0x10:
+			logerror("%s: regs1_w: SIGLBLID = %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data);
+			m_sig_label_id = data;
+			break;
+		default:
+			logerror("%s: regs1_w: Unknown %08x = %08x%08x\n", machine().describe_context(), 0x12000000 + (offset << 3), (uint32_t)(data >> 32), (uint32_t)data);
+			break;
+	}
 }
 
 void ps2_gs_device::write_packed(const uint8_t reg, const uint64_t hi, const uint64_t lo)

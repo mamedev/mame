@@ -36,12 +36,12 @@ MACHINE_CONFIG_START(nscsi_cdrom_device::device_add_mconfig)
 	MCFG_CDROM_INTERFACE("cdrom")
 MACHINE_CONFIG_END
 
-void nscsi_cdrom_device::set_block_size(u32 block_size) 
+void nscsi_cdrom_device::set_block_size(u32 block_size)
 {
 	assert_always(!started(), "block size should not be set after device start");
 	assert_always(bytes_per_sector % block_size == 0, "block size must be a factor of sector size");
 
-	bytes_per_block = block_size; 
+	bytes_per_block = block_size;
 };
 
 

@@ -15,7 +15,7 @@
 
 
 #define ENABLE_OVERFLOWS    (0)
-#define ENABLE_IOP_KPUTS	(1)
+#define ENABLE_IOP_KPUTS    (1)
 
 
 /***************************************************************************

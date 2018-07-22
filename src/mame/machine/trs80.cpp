@@ -224,13 +224,13 @@ INTERRUPT_GEN_MEMBER(trs80_state::rtc_interrupt)
 
 	// While we're here, let's countdown the motor timeout too.
 	// Let's not... LDOS often freezes
-//	if (m_timeout)
-//	{
-//		m_timeout--;
-//		if (m_timeout == 0)
-//			if (m_floppy)
-//				m_floppy->mon_w(1);  // motor off
-//	}
+//  if (m_timeout)
+//  {
+//      m_timeout--;
+//      if (m_timeout == 0)
+//          if (m_floppy)
+//              m_floppy->mon_w(1);  // motor off
+//  }
 }
 
 

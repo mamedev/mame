@@ -99,7 +99,7 @@ public:
 	{}
 
 	void gimix(machine_config &config);
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(drive_size_cb);
 
 private:
