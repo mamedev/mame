@@ -394,7 +394,7 @@ attotime ata_mass_storage_device::seek_time()
 	if (diff == 0)
 		return TIME_BETWEEN_SECTORS;
 
-	attotime seek_time = ((TIME_FULL_STROKE_SEEK - TIME_PER_ROTATION) * diff) / m_num_cylinders;
+	attotime seek_time = (TIME_FULL_STROKE_SEEK * diff) / m_num_cylinders;
 
 	return seek_time + TIME_AVERAGE_ROTATIONAL_LATENCY;
 }
