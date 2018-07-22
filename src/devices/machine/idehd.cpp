@@ -385,8 +385,8 @@ attotime ata_mass_storage_device::seek_time()
 		return attotime::zero;
 
 	uint32_t new_lba = lba_address();
-	uint16_t old_cylinder = m_cur_lba / sectors_per_cylinder;
-	uint16_t new_cylinder = new_lba / sectors_per_cylinder;
+	int16_t old_cylinder = m_cur_lba / sectors_per_cylinder;
+	int16_t new_cylinder = new_lba / sectors_per_cylinder;
 	uint16_t diff = abs(old_cylinder - new_cylinder);
 
 	m_cur_lba = new_lba;
@@ -394,7 +394,7 @@ attotime ata_mass_storage_device::seek_time()
 	if (diff == 0)
 		return TIME_BETWEEN_SECTORS;
 
-	attotime seek_time = ((TIME_FULL_STROKE_SEEK - TIME_PER_ROTATION) * m_num_cylinders) / diff;
+	attotime seek_time = ((TIME_FULL_STROKE_SEEK - TIME_PER_ROTATION) * diff) / m_num_cylinders;
 
 	return seek_time + TIME_AVERAGE_ROTATIONAL_LATENCY;
 }
