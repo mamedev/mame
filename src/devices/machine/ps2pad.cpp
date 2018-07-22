@@ -9,6 +9,7 @@
 *
 */
 
+#include "emu.h"
 #include "ps2pad.h"
 
 DEFINE_DEVICE_TYPE(SONYPS2_PAD, ps2_pad_device, "ps2pad", "Sony DualShock 2")

@@ -14,7 +14,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/mips/mips3.h"
 
 class ps2_intc_device : public device_t

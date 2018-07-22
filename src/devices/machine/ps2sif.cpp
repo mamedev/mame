@@ -9,8 +9,8 @@
 *
 */
 
+#include "emu.h"
 #include "ps2sif.h"
-#include "cpu/mips/ps2vu.h"
 
 DEFINE_DEVICE_TYPE(SONYPS2_SIF, ps2_sif_device, "ps2sif", "PlayStation 2 SIF")
 

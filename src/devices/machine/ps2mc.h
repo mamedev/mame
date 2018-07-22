@@ -14,8 +14,6 @@
 
 #pragma once
 
-#include "emu.h"
-
 class ps2_mc_device : public device_t
 {
 public:

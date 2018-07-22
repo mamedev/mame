@@ -9,9 +9,8 @@
 *
 */
 
+#include "emu.h"
 #include "ps2gif.h"
-#include "ps2gs.h"
-#include "cpu/mips/ps2vu.h"
 
 DEFINE_DEVICE_TYPE(SONYPS2_GIF, ps2_gif_device, "ps2gif", "Playstation 2 GIF")
 

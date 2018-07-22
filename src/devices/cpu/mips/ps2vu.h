@@ -242,4 +242,7 @@ protected:
 DECLARE_DEVICE_TYPE(SONYPS2_VU1, sonyvu1_device)
 DECLARE_DEVICE_TYPE(SONYPS2_VU0, sonyvu0_device)
 
+#include "video/ps2gs.h"
+#include "cpu/mips/ps2vif1.h"
+
 #endif // MAME_CPU_MIPS_PS2VU_H

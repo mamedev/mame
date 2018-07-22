@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "emu.h"
+#include "ps2sif.h"
 #include "video/ps2gs.h"
 #include "cpu/mips/ps2vu.h"
 

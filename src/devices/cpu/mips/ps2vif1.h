@@ -14,8 +14,6 @@
 
 #pragma once
 
-#include "emu.h"
-
 class ps2_gs_device;
 class sonyvu1_device;
 
@@ -156,5 +154,8 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(SONYPS2_VIF1, ps2_vif1_device)
+
+#include "video/ps2gs.h"
+#include "ps2vu.h"
 
 #endif // DEVICES_MACHINE_PS2VIF1_H

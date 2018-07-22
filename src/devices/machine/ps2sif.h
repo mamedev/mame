@@ -14,7 +14,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "ps2intc.h"
 
 class ps2_sif_device : public device_t

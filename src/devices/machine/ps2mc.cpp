@@ -9,6 +9,7 @@
 *
 */
 
+#include "emu.h"
 #include "ps2mc.h"
 
 DEFINE_DEVICE_TYPE(SONYPS2_MC, ps2_mc_device, "ps2mc", "PlayStation 2 Memory Card")
