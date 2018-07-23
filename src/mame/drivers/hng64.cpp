@@ -1558,7 +1558,6 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	hng64_network(config);
 
 	MCFG_DEVICE_ADD("iomcu", TMP87PH40AN, 8000000)
-	MCFG_DEVICE_DISABLE() // work in progress
 
 MACHINE_CONFIG_END
 
@@ -1566,9 +1565,18 @@ MACHINE_CONFIG_END
 #define ROM_LOAD_HNG64_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash,  ROM_BIOS(bios))
 
-// all BIOS roms are said to be from 'fighting' type PCB, it is unknown if the actual MIPS BIOS differs on the others, or only the MCU internal ROM
+/* All main BIOS roms are said to be from 'fighting' type PCB, it is unknown if the actual MIPS BIOS differs on the others, but it appears unlikely.
+  
+  The IO MCU was dumped from a TMP87PH40AN type chip taken from an unknown IO board type. 
+  
+  Some boards instead use a TMP87CH40N but in all cases they're stickered SNK-IOJ1.00A so the content is possibly the same on all types.
+
+  This needs further studying of the MCU code as it is known that the different IO boards return a different ident value. 
+*/
+
 #define HNG64_BIOS \
-	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */ \
+	/* R4300 BIOS code (main CPU) */ \
+	ROM_REGION32_BE( 0x0100000, "user1", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "japan", "Japan" ) \
 	ROM_LOAD_HNG64_BIOS( 0, "brom1.bin",         0x00000, 0x080000, CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) ) \
 	ROM_SYSTEM_BIOS( 1, "us", "USA" ) \
@@ -1577,12 +1585,14 @@ MACHINE_CONFIG_END
 	ROM_LOAD_HNG64_BIOS( 2, "bios_export.bin",   0x00000, 0x080000, CRC(bbf07ec6) SHA1(5656aa077f6a6d43953f15b5123eea102a9d5313) ) \
 	ROM_SYSTEM_BIOS( 3, "korea", "Korea" ) \
 	ROM_LOAD_HNG64_BIOS( 3, "bios_korea.bin",    0x00000, 0x080000, CRC(ac953e2e) SHA1(f502188ef252b7c9d04934c4b525730a116de48b) ) \
-	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS */ \
+	/* KL5C80 BIOS (network CPU) */	\
+	ROM_REGION( 0x0100000, "user2", 0 ) \
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) ) \
+	/* FPGA (unknown) */ \
 	ROM_REGION( 0x0100000, "fpga", 0 ) /* FPGA data  */ \
 	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) ) \
+	/* TMP87PH40AN (I/O MCU) */	\
 	ROM_REGION( 0x10000, "iomcu", 0 ) /* "64Bit I/O Controller Ver 1.0 1997.06.29(C)SNK" internal ID string */ \
-	/* this was dumped from a TMP87PH40AN type chip.  Some boards use a TMP87CH40N, in all cases they're stickered SNK-IOJ1.00A so likely the same content */ \
 	ROM_LOAD ( "tmp87ph40an.bin",  0x8000, 0x8000,  CRC(b70df21f) SHA1(5b742e8a0bbf4c0ae4f4398d34c7058fb24acc92) )
 
 
