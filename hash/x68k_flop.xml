@@ -21799,7 +21799,7 @@ sold through Takeru vending machines -->
 	</software>
 
 	<!-- This image file is multi boot disk.
-	 Set drive 0 to boot "Fortress Attack", Set drive 1 to boot "Fortress Attack". -->
+	 Set drive 0 to boot "Fortress Attack", Set drive 1 to boot "GJ". -->
 	<software name="fortatgj">
 		<description>The World of X68000 - Fortress Attack &amp; GJ</description>
 		<year>1993</year>
@@ -21892,6 +21892,19 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="aa! o-hime-sama!.dim" size="1261824" crc="6605a6b5" sha1="05e30f93a6688a57c34fae9779d7b1cec142fd4c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This boot disk is copied file from "The World of X68000" -->
+	<software name="gj">
+		<description>GJ (The World of X68000)</description>
+		<year>1993</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="GJ (ザ・ワールド・オブ・X68000)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1261824">
+				<rom name="gj.dim" size="1261824" crc="ef80c1ba" sha1="8fb6f7d78d17e6077199d0557d0cb360afe598af" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
