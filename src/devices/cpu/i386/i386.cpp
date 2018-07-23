@@ -349,7 +349,7 @@ void i386_device::set_flags(uint32_t f )
 	m_NT = (f & 0x4000) ? 1 : 0;
 	m_RF = (f & 0x10000) ? 1 : 0;
 	m_VM = (f & 0x20000) ? 1 : 0;
-	m_AC = (f & 0x40000) ? 1 : 0;
+	if(m_cpu_version >= 0x400) m_AC = (f & 0x40000) ? 1 : 0;
 	m_VIF = (f & 0x80000) ? 1 : 0;
 	m_VIP = (f & 0x100000) ? 1 : 0;
 	m_ID = (f & 0x200000) ? 1 : 0;
