@@ -248,7 +248,7 @@ class i4004_cpu_device : public mcs40_cpu_device_base
 {
 public:
 	// configuration helpers
-	auto sync_cb() { return mcs40_cpu_device_base::sync_cb(); }
+	using mcs40_cpu_device_base::sync_cb;
 	auto cm_rom_cb() { return mcs40_cpu_device_base::cm_rom_cb<0>(); }
 	template <unsigned N> auto cm_ram_cb() { return mcs40_cpu_device_base::cm_ram_cb<N>(); }
 
@@ -271,7 +271,6 @@ protected:
 	virtual u8 do_io(u8 opr, u8 opa) override;
 
 	// configuration helpers
-	using mcs40_cpu_device_base::sync_cb;
 	using mcs40_cpu_device_base::cm_rom_cb;
 	using mcs40_cpu_device_base::cm_ram_cb;
 };
@@ -281,11 +280,10 @@ class i4040_cpu_device : public i4004_cpu_device
 {
 public:
 	// configuration helpers
-	auto sync_cb() { return mcs40_cpu_device_base::sync_cb(); }
 	template <unsigned N> auto cm_rom_cb() { return mcs40_cpu_device_base::cm_rom_cb<N>(); }
 	template <unsigned N> auto cm_ram_cb() { return mcs40_cpu_device_base::cm_ram_cb<N>(); }
 	auto cy_cb() { return i4004_cpu_device::cy_cb(); }
-	auto stp_ack_cb() { return i4004_cpu_device::stp_ack_cb(); }
+	using mcs40_cpu_device_base::stp_ack_cb;
 
 	i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
@@ -301,11 +299,9 @@ protected:
 	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) override;
 
 	// configuration helpers
-	using mcs40_cpu_device_base::sync_cb;
 	using mcs40_cpu_device_base::cm_rom_cb;
 	using mcs40_cpu_device_base::cm_ram_cb;
 	using mcs40_cpu_device_base::cy_cb;
-	using mcs40_cpu_device_base::stp_ack_cb;
 };
 
 
