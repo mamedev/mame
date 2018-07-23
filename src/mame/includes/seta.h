@@ -200,6 +200,7 @@ protected:
 	uint8_t m_usclssic_port_select;
 	int m_keroppi_prize_hop;
 	int m_keroppi_protection_count;
+	emu_timer *m_keroppi_prize_hop_timer;
 
 	uint8_t m_twineagl_xram[8];
 	int m_twineagl_tilebank[4];

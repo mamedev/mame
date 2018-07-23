@@ -2216,7 +2216,7 @@ WRITE16_MEMBER(seta_state::keroppi_prize_w)
 	if ((data & 0x0010) && !m_keroppi_prize_hop)
 	{
 		m_keroppi_prize_hop = 1;
-		machine().scheduler().timer_set(attotime::from_seconds(3), timer_expired_delegate(FUNC(seta_state::keroppi_prize_hop_callback),this), 0x20);        /* 3 seconds */
+		m_keroppi_prize_hop_timer->adjust(attotime::from_seconds(3), 0x20);        /* 3 seconds */
 	}
 }
 
@@ -2245,6 +2245,8 @@ void seta_state::keroppi_map(address_map &map)
 
 MACHINE_START_MEMBER(seta_state,keroppi)
 {
+	m_keroppi_prize_hop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta_state::keroppi_prize_hop_callback), this));
+
 	m_keroppi_prize_hop = 0;
 	m_keroppi_protection_count = 0;
 }
