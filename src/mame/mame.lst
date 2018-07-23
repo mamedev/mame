@@ -21591,6 +21591,9 @@ vs2v991                         // 1999.?? Virtual Striker 2 ver.99.1
 @source:modellot.cpp
 modellot                        //
 
+@source:modena.cpp
+modena                          // 1992 Mephisto Modena
+
 @source:mogura.cpp
 mogura                          // GX141 (c) 1991
 
@@ -32186,7 +32189,6 @@ mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
 academy                         // 1989 Mephisto Academy
 milano                          // 1991 Mephisto Milano
-modena                          // 1992 Mephisto Modena
 nshort                          // 1993 Mephisto Nigel Short
 
 @source:policetr.cpp
