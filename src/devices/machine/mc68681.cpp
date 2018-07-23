@@ -558,14 +558,12 @@ READ8_MEMBER(duart_base_device::read)
 		break;
 
 	case 0x04: /* IPCR */
-	{
 		r = IPCR;
 
 		// reading this clears all the input change bits
 		IPCR &= 0x0f;
 		clear_ISR_bits(INT_INPUT_PORT_CHANGE);
-	}
-	break;
+		break;
 
 	case 0x05: /* ISR */
 		r = ISR;
@@ -1055,14 +1053,14 @@ void duart_base_device::set_ISR_bits(int mask)
 // DUART channel class stuff
 
 duart_channel::duart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DUART_CHANNEL, tag, owner, clock),
-	device_serial_interface(mconfig, *this),
-	MR1(0),
-	MR2(0),
-	SR(0),
-	rx_enabled(0),
-	rx_fifo_num(0),
-	tx_enabled(0)
+	: device_t(mconfig, DUART_CHANNEL, tag, owner, clock)
+	, device_serial_interface(mconfig, *this)
+	, MR1(0)
+	, MR2(0)
+	, SR(0)
+	, rx_enabled(0)
+	, rx_fifo_num(0)
+	, tx_enabled(0)
 {
 }
 
@@ -1109,9 +1107,9 @@ void duart_channel::rcv_complete()
 
 	//printf("%s ch %d rcv complete\n", tag(), m_ch);
 
-	if ( rx_enabled )
+	if (rx_enabled)
 	{
-		if ( rx_fifo_num >= MC68681_RX_FIFO_SIZE )
+		if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
 		{
 			logerror("68681: FIFO overflow\n");
 			SR |= STATUS_OVERRUN_ERROR;
@@ -1143,7 +1141,7 @@ void duart_channel::tra_complete()
 	{
 		if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
 		{
-			LOG( "68681: FIFO overflow\n" );
+			LOG("68681: FIFO overflow\n");
 			SR |= STATUS_OVERRUN_ERROR;
 		}
 		else
@@ -1217,33 +1215,25 @@ void duart_channel::update_interrupts()
 	{
 	case 0x00: // normal mode
 		if (tx_enabled)
-		{
 			SR |= STATUS_TRANSMITTER_EMPTY;
-		}
 		else
-		{
 			SR &= ~STATUS_TRANSMITTER_EMPTY;
-		}
-	break;
+		break;
 	case 0x40: // automatic echo mode
 		SR &= ~STATUS_TRANSMITTER_EMPTY;
 		SR &= ~STATUS_TRANSMITTER_READY;
-	break;
+		break;
 	case 0x80: // local loopback mode
 		if (tx_enabled)
-		{
 			SR |= STATUS_TRANSMITTER_EMPTY;
-		}
 		else
-		{
 			SR &= ~STATUS_TRANSMITTER_EMPTY;
-		}
-	break;
+		break;
 	case 0xc0: // remote loopback mode
 		// write me, what the txrdy/txemt regs do for remote loopback mode is undocumented afaik, for now just clear both
 		SR &= ~STATUS_TRANSMITTER_EMPTY;
 		SR &= ~STATUS_TRANSMITTER_READY;
-	break;
+		break;
 	}
 
 	// now handle the ISR bits
@@ -1397,24 +1387,16 @@ void duart_channel::recalc_framing()
 	{
 	case 0: // with parity
 		if (MR1 & 4)
-		{
 			parity = PARITY_ODD;
-		}
 		else
-		{
 			parity = PARITY_EVEN;
-		}
 		break;
 
 	case 1: // force parity
 		if (MR1 & 4)
-		{
 			parity = PARITY_MARK;
-		}
 		else
-		{
 			parity = PARITY_SPACE;
-		}
 		break;
 
 	case 2: // no parity
@@ -1484,13 +1466,9 @@ void duart_channel::write_CR(uint8_t data)
 		break;
 	case 5: /* Reset Channel break change interrupt */
 		if (m_ch == 0)
-		{
 			m_uart->clear_ISR_bits(INT_DELTA_BREAK_A);
-		}
 		else
-		{
 			m_uart->clear_ISR_bits(INT_DELTA_BREAK_B);
-		}
 		break;
 	/* TODO: case 6 and case 7 are start break and stop break respectively, which start or stop holding the TxDA or TxDB line low (space) after whatever data is in the buffer finishes transmitting (following the stop bit?), or after two bit-times if no data is being transmitted  */
 	default:
@@ -1498,15 +1476,18 @@ void duart_channel::write_CR(uint8_t data)
 		break;
 	}
 
-	if (BIT(data, 0)) {
+	if (BIT(data, 0))
+	{
 		rx_enabled = 1;
 	}
-	if (BIT(data, 1)) {
+	if (BIT(data, 1))
+	{
 		rx_enabled = 0;
 		SR &= ~STATUS_RECEIVER_READY;
 	}
 
-	if (BIT(data, 2)) {
+	if (BIT(data, 2))
+	{
 		tx_enabled = 1;
 		tx_ready = 1;
 		SR |= STATUS_TRANSMITTER_READY;
@@ -1515,7 +1496,8 @@ void duart_channel::write_CR(uint8_t data)
 		else
 			m_uart->set_ISR_bits(INT_TXRDYB);
 	}
-	if (BIT(data, 3)) {
+	if (BIT(data, 3))
+	{
 		tx_enabled = 0;
 		tx_ready = 0;
 		SR &= ~STATUS_TRANSMITTER_READY;
