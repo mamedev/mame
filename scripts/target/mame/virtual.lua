@@ -24,30 +24,32 @@ CPUS["DSP16"] = true -- for qsound
 -- only for MAME and so aren't included
 --------------------------------------------------
 
+SOUNDS["AY8910"] = true
+SOUNDS["C352"] = true
+SOUNDS["C6280"] = true
+SOUNDS["GB_SOUND"] = true
+SOUNDS["IREMGA20"] = true
+SOUNDS["K051649"] = true
+SOUNDS["K053260"] = true
+SOUNDS["K054539"] = true
+SOUNDS["MULTIPCM"] = true
 SOUNDS["NES_APU"] = true
-SOUNDS["YM2612"] = true
+SOUNDS["OKIM6295"] = true
+SOUNDS["POKEY"] = true
+SOUNDS["QSOUND"] = true
+SOUNDS["RF5C68"] = true
+SOUNDS["SEGAPCM"] = true
+SOUNDS["SN76496"] = true
+SOUNDS["WAVE"] = true
 SOUNDS["YM2151"] = true
+SOUNDS["YM2203"] = true
 SOUNDS["YM2413"] = true
 SOUNDS["YM2608"] = true
-SOUNDS["YM2203"] = true
-SOUNDS["AY8910"] = true
+SOUNDS["YM2612"] = true
 SOUNDS["YM3526"] = true
 SOUNDS["YM3812"] = true
 SOUNDS["YMF271"] = true
 SOUNDS["YMZ280B"] = true
-SOUNDS["C6280"] = true
-SOUNDS["SN76496"] = true
-SOUNDS["K051649"] = true
-SOUNDS["K053260"] = true
-SOUNDS["K054539"] = true
-SOUNDS["SEGAPCM"] = true
-SOUNDS["MULTIPCM"] = true
-SOUNDS["GB_SOUND"] = true
-SOUNDS["POKEY"] = true
-SOUNDS["C352"] = true
-SOUNDS["OKIM6295"] = true
-SOUNDS["QSOUND"] = true
-SOUNDS["WAVE"] = true
 
 --------------------------------------------------
 -- specify available video cores
