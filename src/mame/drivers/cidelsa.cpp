@@ -465,7 +465,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(draco_state::draco)
 	/* basic system hardware */
-	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, ALTAIR_CHR1));
+	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, DRACO_CHR1));
 	cpu.set_addrmap(AS_PROGRAM, &draco_state::draco_map);
 	cpu.set_addrmap(AS_IO, &draco_state::draco_io_map);
 	cpu.wait_cb().set_constant(1);
