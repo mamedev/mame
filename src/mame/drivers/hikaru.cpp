@@ -531,9 +531,13 @@ MACHINE_CONFIG_START(hikaru_state::hikaru)
 
 //  SPEAKER(config, "lspeaker").front_left();
 //  SPEAKER(config, "rspeaker").front_right();
-//  MCFG_DEVICE_ADD("aica", AICA, 0)
+//  MCFG_DEVICE_ADD("aica_1", AICA, 33.8688_MHz_XTAL)
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-//  MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+//  MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+//	second AICA on external sound board
+//  MCFG_DEVICE_ADD("aica_2", AICA, 33.8688_MHz_XTAL)
+//  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
+//  MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
 

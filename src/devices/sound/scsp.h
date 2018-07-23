@@ -52,6 +52,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -127,8 +128,9 @@ private:
 	char m_Master;
 	sound_stream * m_stream;
 
-	std::unique_ptr<int32_t[]> m_buffertmpl;
-	std::unique_ptr<int32_t[]> m_buffertmpr;
+	std::vector<int32_t> m_buffertmpl;
+	std::vector<int32_t> m_buffertmpr;
+	int m_rate;
 
 	uint32_t m_IrqTimA;
 	uint32_t m_IrqTimBC;
@@ -205,6 +207,7 @@ private:
 	uint16_t r16(address_space &space, uint32_t addr);
 	inline int32_t UpdateSlot(SCSP_SLOT *slot);
 	void DoMasterSamples(int nsamples);
+	void UpdateClock();
 
 	//LFO
 	void LFO_Init();

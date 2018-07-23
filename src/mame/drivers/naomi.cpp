@@ -2923,11 +2923,11 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("aica", AICA, 0)
+
+	MCFG_DEVICE_ADD("aica", AICA, 33.8688_MHz_XTAL)
 	MCFG_AICA_MASTER
 	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))
 	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(*this, dc_state, sh4_aica_irq))
-
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 

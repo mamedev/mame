@@ -5763,7 +5763,6 @@ MACHINE_CONFIG_START(model3_state::model3_10)
 	MCFG_NVRAM_ADD_1FILL("backup")
 	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
 
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
@@ -5773,17 +5772,17 @@ MACHINE_CONFIG_START(model3_state::model3_10)
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("scsp1", SCSP)
+
+	MCFG_DEVICE_ADD("scsp1", SCSP, 45.158_MHz_XTAL / 2)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, model3_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
-	MCFG_DEVICE_ADD("scsp2", SCSP)
+	MCFG_DEVICE_ADD("scsp2", SCSP, 45.158_MHz_XTAL / 2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 
@@ -5810,7 +5809,6 @@ MACHINE_CONFIG_START(model3_state::model3_15)
 	MCFG_NVRAM_ADD_1FILL("backup")
 	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
 
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
@@ -5820,17 +5818,17 @@ MACHINE_CONFIG_START(model3_state::model3_15)
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("scsp1", SCSP)
+
+	MCFG_DEVICE_ADD("scsp1", SCSP, 45.158_MHz_XTAL / 2)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, model3_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
-	MCFG_DEVICE_ADD("scsp2", SCSP)
+	MCFG_DEVICE_ADD("scsp2", SCSP, 45.158_MHz_XTAL / 2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 
@@ -5875,7 +5873,6 @@ MACHINE_CONFIG_START(model3_state::model3_20)
 	MCFG_NVRAM_ADD_1FILL("backup")
 	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
 
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
@@ -5885,17 +5882,17 @@ MACHINE_CONFIG_START(model3_state::model3_20)
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("scsp1", SCSP)
+
+	MCFG_DEVICE_ADD("scsp1", SCSP, 45.158_MHz_XTAL / 2)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, model3_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
-	MCFG_DEVICE_ADD("scsp2", SCSP)
+	MCFG_DEVICE_ADD("scsp2", SCSP, 45.158_MHz_XTAL / 2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
 	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END
@@ -5940,7 +5937,6 @@ MACHINE_CONFIG_START(model3_state::model3_21)
 	MCFG_NVRAM_ADD_1FILL("backup")
 	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
 
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -5953,14 +5949,15 @@ MACHINE_CONFIG_START(model3_state::model3_21)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("scsp1", SCSP)
+
+	MCFG_DEVICE_ADD("scsp1", SCSP, 45.158_MHz_XTAL / 2)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, model3_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
-	MCFG_DEVICE_ADD("scsp2", SCSP)
+	MCFG_DEVICE_ADD("scsp2", SCSP, 45.158_MHz_XTAL / 2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
 	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END

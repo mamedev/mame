@@ -505,24 +505,7 @@ void aica_device::Init()
 
 	m_ARTABLE[0]=m_DRTABLE[0]=0;    //Infinite time
 	m_ARTABLE[1]=m_DRTABLE[1]=0;    //Infinite time
-	for(i=2;i<64;++i)
-	{
-		double t,step,scale;
-		t=ARTimes[i];   //In ms
-		if(t!=0.0)
-		{
-			step=(1023*1000.0)/(44100.0*t);
-			scale=(double) (1<<EG_SHIFT);
-			m_ARTABLE[i]=(int) (step*scale);
-		}
-		else
-			m_ARTABLE[i]=1024<<EG_SHIFT;
-
-		t=DRTimes[i];   //In ms
-		step=(1023*1000.0)/(44100.0*t);
-		scale=(double) (1<<EG_SHIFT);
-		m_DRTABLE[i]=(int) (step*scale);
-	}
+	UpdateClock();
 
 	// make sure all the slots are off
 	for(i=0;i<64;++i)
@@ -535,8 +518,8 @@ void aica_device::Init()
 	}
 
 	AICALFO_Init();
-	m_buffertmpl=make_unique_clear<int32_t[]>(44100);
-	m_buffertmpr=make_unique_clear<int32_t[]>(44100);
+	m_buffertmpl.resize(m_rate, 0);
+	m_buffertmpr.resize(m_rate, 0);
 
 	// no "pend"
 	m_udata.data[0xa0/2] = 0;
@@ -544,6 +527,28 @@ void aica_device::Init()
 	m_TimCnt[0] = 0xffff;
 	m_TimCnt[1] = 0xffff;
 	m_TimCnt[2] = 0xffff;
+}
+
+void aica_device::UpdateClock()
+{
+	for(int i=2;i<64;++i)
+	{
+		double t,step,scale;
+		t=ARTimes[i];   //In ms
+		if(t!=0.0)
+		{
+			step=(1023*1000.0)/(double(m_rate)*t);
+			scale=(double) (1<<EG_SHIFT);
+			m_ARTABLE[i]=(int) (step*scale);
+		}
+		else
+			m_ARTABLE[i]=1024<<EG_SHIFT;
+
+		t=DRTimes[i];   //In ms
+		step=(1023*1000.0)/(double(m_rate)*t);
+		scale=(double) (1<<EG_SHIFT);
+		m_DRTABLE[i]=(int) (step*scale);
+	}
 }
 
 void aica_device::UpdateSlotReg(int s,int r)
@@ -675,10 +680,10 @@ void aica_device::UpdateReg(address_space &space, int reg)
 
 				if ((m_udata.data[0x90/2]&0xff) != 255)
 				{
-					time = (44100 / m_TimPris[0]) / (255-(m_udata.data[0x90/2]&0xff));
+					time = (clock() / m_TimPris[0]) / (255-(m_udata.data[0x90/2]&0xff));
 					if (time)
 					{
-						m_timerA->adjust(attotime::from_hz(time));
+						m_timerA->adjust(attotime::from_ticks(768, time));
 					}
 				}
 			}
@@ -694,10 +699,10 @@ void aica_device::UpdateReg(address_space &space, int reg)
 
 				if ((m_udata.data[0x94/2]&0xff) != 255)
 				{
-					time = (44100 / m_TimPris[1]) / (255-(m_udata.data[0x94/2]&0xff));
+					time = (clock() / m_TimPris[1]) / (255-(m_udata.data[0x94/2]&0xff));
 					if (time)
 					{
-						m_timerB->adjust(attotime::from_hz(time));
+						m_timerB->adjust(attotime::from_ticks(768, time));
 					}
 				}
 			}
@@ -713,10 +718,10 @@ void aica_device::UpdateReg(address_space &space, int reg)
 
 				if ((m_udata.data[0x98/2]&0xff) != 255)
 				{
-					time = (44100 / m_TimPris[2]) / (255-(m_udata.data[0x98/2]&0xff));
+					time = (clock() / m_TimPris[2]) / (255-(m_udata.data[0x98/2]&0xff));
 					if (time)
 					{
-						m_timerC->adjust(attotime::from_hz(time));
+						m_timerC->adjust(attotime::from_ticks(768, time));
 					}
 				}
 			}
@@ -1418,6 +1423,7 @@ void aica_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 void aica_device::device_start()
 {
+	m_rate = clock() / 768;
 	// init the emulation
 	Init();
 
@@ -1425,7 +1431,7 @@ void aica_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_main_irq_cb.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
 
 	// save state
 	save_item(NAME(m_IrqTimA));
@@ -1440,6 +1446,27 @@ void aica_device::device_start()
 	save_item(NAME(m_RPANTABLE),0x20000);
 	save_item(NAME(m_TimPris),3);
 	save_item(NAME(m_TimCnt),3);
+}
+
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void aica_device::device_clock_changed()
+{
+	int old_rate = m_rate;
+	m_rate = clock() / 768;
+	if (m_rate != old_rate)
+	{
+		UpdateClock();
+		if (m_rate > old_rate)
+		{
+			m_buffertmpl.resize(m_rate,0);
+			m_buffertmpr.resize(m_rate,0);
+		}
+		m_stream->set_sample_rate(m_rate);
+	}
 }
 
 void aica_device::set_ram_base(void *base, int size)
@@ -1498,8 +1525,7 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 		m_AICARAM_LENGTH(0),
 		m_RAM_MASK(0),
 		m_RAM_MASK16(0),
-		m_buffertmpl(nullptr),
-		m_buffertmpr(nullptr),
+		m_rate(0),
 		m_IrqTimA(0),
 		m_IrqTimBC(0),
 		m_IrqMidi(0),
@@ -1651,7 +1677,7 @@ signed int aica_device::AICAALFO_Step(AICA_LFO_t *LFO)
 
 void aica_device::AICALFO_ComputeStep(AICA_LFO_t *LFO,uint32_t LFOF,uint32_t LFOWS,uint32_t LFOS,int ALFO)
 {
-	float step=(float) LFOFreq[LFOF]*256.0f/(float)44100.0f;
+	float step=(float) LFOFreq[LFOF]*256.0f/((float)((double)clock()/768.0));
 	LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);
 	if(ALFO)
 	{

@@ -2440,10 +2440,10 @@ MACHINE_CONFIG_START(model2_state::model2_scsp)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("scsp", SCSP)
+	MCFG_DEVICE_ADD("scsp", SCSP, 45.158_MHz_XTAL / 2) // from Model 2A video board; correct?
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, model2_state,scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
 	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
 //  m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
