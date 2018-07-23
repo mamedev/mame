@@ -269,10 +269,6 @@ protected:
 	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) override;
 	virtual void do_cycle2(u8 opr, u8 opa, u8 arg) override;
 	virtual u8 do_io(u8 opr, u8 opa) override;
-
-	// configuration helpers
-	using mcs40_cpu_device_base::cm_rom_cb;
-	using mcs40_cpu_device_base::cm_ram_cb;
 };
 
 
@@ -297,11 +293,6 @@ protected:
 
 	// mcs40_cpu_device_base implementation
 	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) override;
-
-	// configuration helpers
-	using mcs40_cpu_device_base::cm_rom_cb;
-	using mcs40_cpu_device_base::cm_ram_cb;
-	using mcs40_cpu_device_base::cy_cb;
 };
 
 

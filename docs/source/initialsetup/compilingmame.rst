@@ -38,7 +38,7 @@ Here are specific notes about compiling MAME for Microsoft Windows.
 
 * You will need to download the toolset from that link to begin. Periodically, these tools are updated and newer versions of MAME from that point on will **require** updated tools to compile.
 
-* You can do compilation on Visual Studio 2015 (if installed on your PC) by using **make vs2015**. This will always regenerate the settings, so **REGENIE=1** is *not* needed.
+* You can do compilation on Visual Studio 2017 (if installed on your PC) by using **make vs2017**. This will always regenerate the settings, so **REGENIE=1** is *not* needed.
 
 * Make sure you get SDL 2 2.0.3 or 2.0.4 as earlier versions are buggy.
 
