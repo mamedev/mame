@@ -41,6 +41,7 @@ SOUNDS["RF5C68"] = true
 SOUNDS["SEGAPCM"] = true
 SOUNDS["SN76496"] = true
 SOUNDS["WAVE"] = true
+SOUNDS["X1_010"] = true
 SOUNDS["YM2151"] = true
 SOUNDS["YM2203"] = true
 SOUNDS["YM2413"] = true
