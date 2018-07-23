@@ -142,25 +142,25 @@ private:
 	const uint16_t get_reg16(const int reg);
 	void set_reg16(const int reg, uint16_t val);
 
-	const int FLAG_J = 0x80;
-	const int FLAG_Z = 0x40;
-	const int FLAG_C = 0x20;
-	const int FLAG_H = 0x10;
+	static constexpr int FLAG_J = 0x80;
+	static constexpr int FLAG_Z = 0x40;
+	static constexpr int FLAG_C = 0x20;
+	static constexpr int FLAG_H = 0x10;
 
-	void clear_JF() { m_F &= ~FLAG_J; };
-	void clear_ZF() { m_F &= ~FLAG_Z; };
-	void clear_CF() { m_F &= ~FLAG_C; };
-	void clear_HF() { m_F &= ~FLAG_H; };
+	void clear_JF() { m_F &= ~FLAG_J; }
+	void clear_ZF() { m_F &= ~FLAG_Z; }
+	void clear_CF() { m_F &= ~FLAG_C; }
+	void clear_HF() { m_F &= ~FLAG_H; }
 
-	void set_JF() { m_F |= FLAG_J; };
-	void set_ZF() { m_F |= FLAG_Z; };
-	void set_CF() { m_F |= FLAG_C; };
-	void set_HF() { m_F |= FLAG_H; };
+	void set_JF() { m_F |= FLAG_J; }
+	void set_ZF() { m_F |= FLAG_Z; }
+	void set_CF() { m_F |= FLAG_C; }
+	void set_HF() { m_F |= FLAG_H; }
 
-	const int is_JF() { return ((m_F & FLAG_J) ? 1 : 0); };
-	const int is_ZF() { return ((m_F & FLAG_Z) ? 1 : 0); };
-	const int is_CF() { return ((m_F & FLAG_C) ? 1 : 0); };
-	const int is_HF() { return ((m_F & FLAG_H) ? 1 : 0); };
+	int is_JF() const { return ((m_F & FLAG_J) ? 1 : 0); }
+	int is_ZF() const { return ((m_F & FLAG_Z) ? 1 : 0); }
+	int is_CF() const { return ((m_F & FLAG_C) ? 1 : 0); }
+	int is_HF() const { return ((m_F & FLAG_H) ? 1 : 0); }
 
 	bool stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const uint16_t mode, const uint16_t r, const uint16_t rb);
 
