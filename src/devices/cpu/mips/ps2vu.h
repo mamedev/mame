@@ -14,8 +14,11 @@
 
 #pragma once
 
-class ps2_gs_device;
-class ps2_vif1_device;
+class sonyvu0_device;
+class sonyvu1_device;
+
+#include "video/ps2gs.h"
+#include "ps2vif1.h"
 
 enum
 {

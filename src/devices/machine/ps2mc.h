@@ -14,7 +14,6 @@
 
 #pragma once
 
-
 class ps2_mc_device : public device_t
 {
 public:

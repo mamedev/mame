@@ -14,8 +14,6 @@
 #include "emu.h"
 #include "ps2vif1.h"
 
-#include "ps2vu.h"
-#include "video/ps2gs.h"
 #include "video/ps2gif.h"
 
 DEFINE_DEVICE_TYPE(SONYPS2_VIF1, ps2_vif1_device, "ps2vif1", "PlayStation 2 VIF1")

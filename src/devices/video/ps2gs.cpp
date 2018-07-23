@@ -12,11 +12,6 @@
 #include "emu.h"
 #include "ps2gs.h"
 
-#include "ps2gif.h"
-#include "machine/ps2intc.h"
-#include "cpu/mips/ps2vu.h"
-
-
 DEFINE_DEVICE_TYPE(SONYPS2_GS, ps2_gs_device, "ps2gs", "Playstation 2 GS")
 
 /*static*/ const size_t ps2_gs_device::FORMAT_PIXEL_WIDTHS[] = {

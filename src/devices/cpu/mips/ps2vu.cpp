@@ -12,8 +12,6 @@
 #include "emu.h"
 #include "ps2vu.h"
 
-#include "ps2vif1.h"
-#include "video/ps2gs.h"
 #include "video/ps2gif.h"
 #include "vudasm.h"
 #include "debugger.h"

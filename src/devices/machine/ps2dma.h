@@ -16,8 +16,7 @@
 
 #include "cpu/mips/ps2vu.h"
 #include "video/ps2gs.h"
-
-class ps2_sif_device;
+#include "ps2sif.h"
 
 class ps2_dmac_device : public device_t, public device_execute_interface
 {
