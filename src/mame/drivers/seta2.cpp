@@ -133,19 +133,23 @@ reelquak:
 
 void seta2_state::machine_start()
 {
-	uint32_t const max = memregion( "x1snd" )->bytes() / 0x20000;
-	for (int i = 0; i < 8; i++)
+	if (memregion( "x1snd" ) != nullptr)
 	{
-		if (m_x1_bank[i] != nullptr)
+		uint32_t const max = memregion( "x1snd" )->bytes() / 0x20000;
+		for (int i = 0; i < 8; i++)
 		{
-			uint32_t ind = 0;
-			while (ind < 256)
+			if (m_x1_bank[i] != nullptr)
 			{
-				m_x1_bank[i]->configure_entries(ind, max, memregion( "x1snd" )->base(), 0x20000); // TODO : Mirrored?
-				ind += max;
+				uint32_t ind = 0;
+				while (ind < 256)
+				{
+					m_x1_bank[i]->configure_entries(ind, max, memregion( "x1snd" )->base(), 0x20000); // TODO : Mirrored?
+					ind += max;
+				}
 			}
 		}
 	}
+
 	m_leds.resolve();
 	m_lamps.resolve();
 }
@@ -3849,7 +3853,7 @@ void staraudi_state::driver_start()
 	seta2_state::driver_start();
 
 	// bad sound rom: replace the missing (zero) sample with the previous one
-	uint8_t *samples = memregion("x1snd")->base() + 0x100000;
+	uint8_t *samples = memregion("x1snd")->base();
 	for (int i = 0; i < 0x400000; i += 2)
 		samples[i + 1] = samples[i];
 }

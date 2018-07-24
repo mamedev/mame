@@ -11975,7 +11975,7 @@ void seta_state::init_bankx1()
 	m_x1_bank->configure_entries(0, 8, memregion("x1snd")->base(), 0x40000);
 }
 
-void seta_state::init_blandia()
+void seta_state::rearrange_gfx()
 {
 	/* rearrange the gfx data so it can be decoded in the same way as the other set */
 	int rom_size = 0x80000;
@@ -11999,7 +11999,11 @@ void seta_state::init_blandia()
 	}
 
 	std::copy( buf.begin(), buf.end(), &rom[0] );
+}
 
+void seta_state::init_blandia()
+{
+	rearrange_gfx();
 	init_bankx1();
 }
 
@@ -12074,7 +12078,7 @@ void seta_state::init_crazyfgt()
 
 	// fixed priorities?
 
-	init_blandia();
+	rearrange_gfx();
 }
 
 void jockeyc_state::init_inttoote()
