@@ -10919,7 +10919,7 @@ ROM_START( mandinga )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "11.bin",       0x0000, 0x1000, BAD_DUMP CRC(8ca7b750) SHA1(4f4c2915503b85abe141d717fd254ee10c9da99e) ) // 2732; original was bad dump, but using rom from amidar due to first half being identical
-	ROM_LOAD( "12.bin",       0x1000, 0x1000, BAD_DUMP CRC(9b5bdc0a) SHA1(8b58d7ec12ca569bb28e45b3ff78bd4b926aeb0a) ) // 2732; original was bad dump, but using rom from amidar due to first half being identical
+	ROM_LOAD( "12.bin",       0x1000, 0x1000, BAD_DUMP CRC(9b5bdc0a) SHA1(84d953618c8bf510d23b42232a856ac55f1baff5) ) // 2732; original was bad dump, but using rom from amidar due to first half being identical
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "9.bin",        0x0000, 0x0800, CRC(09ed5818) SHA1(69dce85228b2c9176d4be429f530410350a1c76c) ) // 2716
