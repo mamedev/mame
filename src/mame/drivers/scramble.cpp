@@ -253,9 +253,9 @@ void scramble_state::hunchbks_map(address_map &map)
 void scramble_state::mimonscr_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).rw(FUNC(scramble_state::galaxold_videoram_r), FUNC(scramble_state::galaxold_videoram_w)); /* mirror address?, probably not */
-	map(0x4400, 0x47ff).ram();
+	map(0x4000, 0x47ff).ram();
 	map(0x4800, 0x4bff).ram().w(FUNC(scramble_state::galaxold_videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).rw(FUNC(scramble_state::galaxold_videoram_r), FUNC(scramble_state::galaxold_videoram_w)); /* mirror address */
 	map(0x5000, 0x503f).ram().w(FUNC(scramble_state::galaxold_attributesram_w)).share("attributesram");
 	map(0x5040, 0x505f).ram().share("spriteram");
 	map(0x5060, 0x507f).ram().share("bulletsram");
