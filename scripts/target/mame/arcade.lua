@@ -626,6 +626,17 @@ MACHINES["K054321"] = true
 MACHINES["ADC0844"] = true
 MACHINES["GEN_FIFO"] = true
 MACHINES["Z80DAISY"] = true
+--MACHINES["PS2DMAC"] = true
+MACHINES["PS2INTC"] = true
+--MACHINES["PS2MC"] = true
+--MACHINES["PS2PAD"] = true
+--MACHINES["PS2SIF"] = true
+--MACHINES["PS2TIMER"] = true
+--MACHINES["IOPCDVD"] = true
+--MACHINES["IOPDMA"] = true
+--MACHINES["IOPINTC"] = true
+--MACHINES["IOPSIO2"] = true
+--MACHINES["IOPTIMER"] = true
 
 --------------------------------------------------
 -- specify available bus cores
