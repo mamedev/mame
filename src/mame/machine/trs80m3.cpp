@@ -86,7 +86,9 @@ READ8_MEMBER( trs80m3_state::port_e4_r )
 
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	return ~(m_nmi_mask & m_nmi_data);
+	u8 data = m_nmi_data;
+	m_nmi_data = 0;
+	return ~(m_nmi_mask & data);
 }
 
 READ8_MEMBER( trs80m3_state::port_e8_r )
@@ -375,13 +377,12 @@ WRITE8_MEMBER( trs80m3_state::port_ec_w )
 WRITE8_MEMBER( trs80m3_state::port_f4_w )
 {
 	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
+	m_wait = BIT(data, 6);
 
 	m_floppy = nullptr;
 
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
-	if (BIT(data, 2)) m_floppy = m_floppy2->get_device();
-	if (BIT(data, 3)) m_floppy = m_floppy3->get_device();
 
 	m_fdc->set_floppy(m_floppy);
 
@@ -389,7 +390,7 @@ WRITE8_MEMBER( trs80m3_state::port_f4_w )
 	{
 		m_floppy->mon_w(0);
 		m_floppy->ss_w(BIT(data, 4));
-		m_timeout = 160;
+		m_timeout = 1600;
 	}
 
 	m_fdc->dden_w(!BIT(data, 7));
@@ -431,6 +432,17 @@ INTERRUPT_GEN_MEMBER(trs80m3_state::rtc_interrupt)
 			if (m_floppy)
 				m_floppy->mon_w(1);  // motor off
 	}
+	// Also, if cpu is in wait, unlock it and trigger NMI
+	if (m_wait)
+	{
+		m_wait = false;
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+		if (BIT(m_nmi_mask, 6))
+		{
+			m_nmi_data |= 0x40;
+			m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
+		}
+	}
 }
 
 // The floppy sector has been read. Enable CPU and NMI.
@@ -438,23 +450,25 @@ WRITE_LINE_MEMBER(trs80m3_state::intrq_w)
 {
 	if (state)
 	{
-		//m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+		m_wait = false;
 		if (BIT(m_nmi_mask, 7))
 		{
-			m_nmi_data = 0x80;
+			m_nmi_data |= 0x80;
 			//m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
 		}
 	}
-	else
-		m_nmi_data = 0;
 }
 
 // The next byte from floppy is available. Enable CPU so it can get the byte.
 WRITE_LINE_MEMBER(trs80m3_state::drq_w)
 {
 	if (state)
+	{
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+		m_wait = false;
+	}
 }
 
 
@@ -508,8 +522,9 @@ void trs80m3_state::machine_start()
 {
 	m_mode = 0;
 	m_reg_load = 1;
-	m_nmi_data = 0xff;
+	m_nmi_data = 0;
 	m_timeout = 1;
+	m_wait = 0;
 
 	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(trs80m3_state::cassette_data_callback),this));
 	m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
@@ -557,25 +572,15 @@ void trs80m3_state::machine_start()
 
 void trs80m3_state::machine_reset()
 {
-	m_cassette_data = 0;
-}
-
-MACHINE_RESET_MEMBER(trs80m3_state, trs80m3)
-{
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
+	m_a11_flipflop = 0; // for cp500
 	m_cassette_data = 0;
 	m_size_store = 0xff;
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	if (m_model4 & 4)
 		port_9c_w(mem, 0, 1);    // 4P - enable rom
 	if (m_model4 & 6)
 		port_84_w(mem, 0, 0);    // 4 & 4P - switch in devices
-}
-
-MACHINE_RESET_MEMBER(trs80m3_state, cp500)
-{
-	m_a11_flipflop = 0;
-	MACHINE_RESET_CALL_MEMBER( trs80m3 );
 }
 
 
