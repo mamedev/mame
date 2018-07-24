@@ -327,7 +327,7 @@ int psxgpu_device::DebugMeshDisplay( bitmap_rgb32 &bitmap, const rectangle &clip
 	if( m_debug.b_mesh )
 	{
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-			draw_scanline16( bitmap, cliprect.min_x, y, cliprect.max_x+1, m_debug.mesh.pix16(y), pens() );
+			draw_scanline16( bitmap, cliprect.min_x, y, cliprect.max_x+1, &m_debug.mesh.pix16(y), pens() );
 	}
 	m_debug.b_clear = 1;
 	return m_debug.b_mesh;
