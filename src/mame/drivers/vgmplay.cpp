@@ -2,13 +2,13 @@
 // copyright-holders: Olivier Galibert
 
 // A "virtual" driver to play vgm files
-// Use with mame vgmplay -bitb file.vgm
+// Use with mame vgmplay -quik file.vgm
 
 #include "emu.h"
 
 #define QSOUND_LLE
 
-#include "imagedev/bitbngr.h"
+#include "imagedev/snapquik.h"
 
 #include "cpu/h6280/h6280.h"
 #include "cpu/m6502/n2a03.h"
@@ -274,7 +274,7 @@ class vgmplay_state : public driver_device
 public:
 	vgmplay_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	virtual void machine_start() override;
+	DECLARE_QUICKLOAD_LOAD_MEMBER(load_file);
 
 	DECLARE_READ8_MEMBER(file_r);
 	DECLARE_READ8_MEMBER(file_size_r);
@@ -310,7 +310,6 @@ public:
 
 private:
 	std::vector<uint8_t> m_file_data;
-	required_device<bitbanger_device> m_file;
 	required_device<vgmplay_device> m_vgmplay;
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
@@ -1370,7 +1369,6 @@ READ8_MEMBER(vgmplay_device::ga20_rom_r)
 
 vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
-	, m_file(*this, "file")
 	, m_vgmplay(*this, "vgmplay")
 	, m_lspeaker(*this, "lspeaker")
 	, m_rspeaker(*this, "rspeaker")
@@ -1422,19 +1420,22 @@ uint8_t vgmplay_state::r8(int off) const
 	return 0;
 }
 
-void vgmplay_state::machine_start()
+QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 {
 	// Disable executing devices if not required
 	m_pokey[0]->set_unscaled_clock(0);
 	m_pokey[1]->set_unscaled_clock(0);
 	m_qsound->set_unscaled_clock(0);
 
-	uint32_t size = 0;
-	if(m_file->exists() && m_file->length() > 0) {
-		size = m_file->length();
-		m_file_data.resize(size);
-		m_file->input(&m_file_data[0], size);
+	m_file_data.resize(quickload_size);
 
+	if (image.fread(&m_file_data[0], quickload_size) != quickload_size)
+	{
+		m_file_data.clear();
+		return image_init_result::FAIL;
+	}
+	else
+	{
 		// Decompress gzip-compressed files (aka vgz)
 		if(m_file_data[0] == 0x1f && m_file_data[1] == 0x8b) {
 			std::vector<uint8_t> decomp;
@@ -1453,7 +1454,7 @@ void vgmplay_state::machine_start()
 			if(err != Z_OK) {
 				logerror("gzip header but not a gzip file\n");
 				m_file_data.clear();
-				return;
+				return image_init_result::FAIL;
 			}
 			do {
 				if(str.total_out >= decomp.size())
@@ -1465,7 +1466,7 @@ void vgmplay_state::machine_start()
 			if(err != Z_STREAM_END) {
 				logerror("broken gzip file\n");
 				m_file_data.clear();
-				return;
+				return image_init_result::FAIL;
 			}
 			m_file_data.resize(str.total_out);
 			memcpy(&m_file_data[0], &decomp[0], str.total_out);
@@ -1474,7 +1475,7 @@ void vgmplay_state::machine_start()
 		if(m_file_data.size() < 0x40 || r32(0) != 0x206d6756) {
 			logerror("Not a vgm/vgz file\n");
 			m_file_data.clear();
-			return;
+			return image_init_result::FAIL;
 		}
 
 		uint32_t version = r32(8);
@@ -1675,6 +1676,8 @@ void vgmplay_state::machine_start()
 				m_ga20->set_unscaled_clock(r32(0xe0));
 			}
 		}
+
+		return image_init_result::PASS;
 	}
 }
 
@@ -1994,8 +1997,8 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_DEVICE_IO_MAP( soundchips_map )
 	MCFG_CPU_IO16_MAP( soundchips16_map )
 
-	MCFG_DEVICE_ADD("file", BITBANGER, 0)
-	MCFG_BITBANGER_READONLY(true)
+	MCFG_QUICKLOAD_ADD("quickload", vgmplay_state, load_file, "vgm,vgz", 0)
+
 	config.set_default_layout(layout_vgmplay);
 
 	SPEAKER(config, "lspeaker").front_left();
