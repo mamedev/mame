@@ -2000,6 +2000,9 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_CPU_IO16_MAP( soundchips16_map )
 
 	MCFG_QUICKLOAD_ADD("quickload", vgmplay_state, load_file, "vgm,vgz", 0)
+	MCFG_QUICKLOAD_INTERFACE("vgm_quik")
+
+	MCFG_SOFTWARE_LIST_ADD("vgm_list", "vgmplay")
 
 	config.set_default_layout(layout_vgmplay);
 
