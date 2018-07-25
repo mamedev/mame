@@ -297,10 +297,10 @@ private:
 	uint16_t p_n_greensubtrans[ MAX_LEVEL * MAX_LEVEL ];
 	uint16_t p_n_bluesubtrans[ MAX_LEVEL * MAX_LEVEL ];
 
-	uint16_t p_n_g0r0[ 0x10000 ];
-	uint16_t p_n_b0[ 0x10000 ];
-	uint16_t p_n_r1[ 0x10000 ];
-	uint16_t p_n_b1g1[ 0x10000 ];
+	uint32_t p_n_g0r0[ 0x10000 ];
+	uint32_t p_n_b0[ 0x10000 ];
+	uint32_t p_n_r1[ 0x10000 ];
+	uint32_t p_n_b1g1[ 0x10000 ];
 
 	devcb_write_line m_vblank_handler;
 
