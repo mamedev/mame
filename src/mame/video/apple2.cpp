@@ -361,8 +361,8 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 
 	/* perform adjustments */
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y);
+	endrow = std::min(endrow, cliprect.max_y);
 
 	if (!(m_sysconfig & 0x03))
 	{
@@ -379,13 +379,23 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				/* and now draw */
 				for (y = 0; y < 4; y++)
 				{
-					for (x = 0; x < 14; x++)
-						bitmap.pix16(row + y, col * 14 + x) = (code >> 0) & 0x0F;
+					if ((row + y) <= endrow)
+					{
+						for (x = 0; x < 14; x++)
+						{
+							bitmap.pix16(row + y, col * 14 + x) = (code >> 0) & 0x0F;
+						}
+					}
 				}
 				for (y = 4; y < 8; y++)
 				{
-					for (x = 0; x < 14; x++)
-						bitmap.pix16(row + y, col * 14 + x) = (code >> 4) & 0x0F;
+					if ((row + y) <= endrow)
+					{
+						for (x = 0; x < 14; x++)
+						{
+							bitmap.pix16(row + y, col * 14 + x) = (code >> 4) & 0x0F;
+						}
+					}
 				}
 			}
 		}
@@ -408,17 +418,25 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				/* and now draw */
 				for (y = 0; y < 4; y++)
 				{
-					for (x = 0; x < 14; x++)
+					if ((row + y) <= endrow)
 					{
-						bitmap.pix16(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
+						for (x = 0; x < 14; x++)
+						{
+							bitmap.pix16(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
+						}
 					}
 				}
 
 				bits = (code >> 4) & 0x0F;
 				for (y = 4; y < 8; y++)
 				{
-					for (x = 0; x < 14; x++)
-						bitmap.pix16(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
+					if ((row + y) <= endrow)
+					{
+						for (x = 0; x < 14; x++)
+						{
+							bitmap.pix16(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
+						}
+					}
 				}
 			}
 		}
