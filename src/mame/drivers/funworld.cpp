@@ -48,7 +48,7 @@
   * Pool 10 (Italian, set 6),                                   C.M.C.,             1996.
   * Pool 10 (Italian, set 7),                                   C.M.C.,             1997.
   * Pool 10 (Italian, set 8),                                   C.M.C.,             1997.
-  * Pool 10 (Italian, set 9),                                   C.M.C.,             1997.
+  * Pool 10 (Italian, set 9),                                   bootleg (R.B.),     1996.
   * Pool 10 (Italian, Dino 4 hardware, encrypted),              C.M.C.,             1997.
   * Royal (Pool 10 hack),                                       unknown,            2001.
   * Tortuga Family (Italian),                                   C.M.C.,             1997.
