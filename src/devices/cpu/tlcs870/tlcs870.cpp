@@ -151,7 +151,7 @@ void tlcs870_device::execute_set_input(int inputnum, int state)
 
 void tlcs870_device::execute_run()
 {
-	m_cycles = 1;
+	
 
 	while (m_icount > 0)
 	{
@@ -161,10 +161,18 @@ void tlcs870_device::execute_run()
 		//check_interrupts();
 		m_addr = m_pc.d;
 		m_tmppc = m_addr; // used for jumps etc.
+		m_cycles = 0;
 		decode();
 		m_pc.d = m_addr;
 
-		m_icount -= m_cycles * 4; // 1 machine cycle = 4 clock cycles?
+		if (m_cycles)
+		{
+			m_icount -= m_cycles * 4; // 1 machine cycle = 4 clock cycles?
+		}
+		else
+		{
+			fatalerror("m_cycles == 0 after PC %04x\n", m_tmppc);
+		}
 	};
 }
 

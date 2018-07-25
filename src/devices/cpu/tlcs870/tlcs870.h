@@ -162,6 +162,8 @@ private:
 	int is_CF() const { return ((m_F & FLAG_C) ? 1 : 0); }
 	int is_HF() const { return ((m_F & FLAG_H) ? 1 : 0); }
 
+	int get_base_srcdst_cycles(int i) const { const int SRC_DST_CYCLES[8] = { 1, 2, 0, 0, 2, 2, 1, 1 }; return SRC_DST_CYCLES[i]; }
+
 	bool stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const uint16_t mode, const uint16_t r, const uint16_t rb);
 
 	// tlcs870_ops.cpp
@@ -232,12 +234,7 @@ private:
 
 	// tlcs870_ops_src.cpp
 
-	void do_e0_opcode(const uint8_t opbyte0);
-	void do_e1_to_e3_opcode(const uint8_t opbyte0);
-	void do_e4_opcode(const uint8_t opbyte0);
-	void do_e5_to_e7_opcode(const uint8_t opbyte0);
-
-	void do_e0_to_e7_opcode(uint8_t opbyte0, uint16_t srcaddr);
+	void do_srcprefixtype_opcode(const uint8_t opbyte0);
 
 	void do_e0_to_e7_oprand_illegal(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr);
 
@@ -266,13 +263,7 @@ private:
 	uint16_t do_alu(int op, uint16_t param1, uint16_t param2);
 
 	// tlcs870_ops_dst.cpp
-
-	void do_f0_opcode(const uint8_t opbyte0);
-	void do_f2_to_f3_opcode(const uint8_t opbyte0);
-	void do_f4_opcode(const uint8_t opbyte0);
-	void do_f6_to_f7_opcode(const uint8_t opbyte0);
-
-	void do_f0_to_f7_opcode(const uint8_t opbyte0, const uint16_t dstaddr);
+	void do_dstprefixtype_opcode(const uint8_t opbyte0);
 
 	void do_f0_to_f7_oprand_illegal_opcode(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t dstaddr);
 
@@ -310,9 +301,9 @@ private:
 	void do_ALUOP_g_n(const uint8_t opbyte0, const uint8_t opbyte1);
 	void do_SET_inppbit(const uint8_t opbyte0, const uint8_t opbyte1);
 	void do_CLR_inppbit(const uint8_t opbyte0, const uint8_t opbyte1);
-	void do_CPL_inppbit(const uint8_t opbyte0, const uint8_t opbyte1);
-	void do_LD_inppbit_CF(const uint8_t opbyte0, const uint8_t opbyte1);
-	void do_LD_CF_inppbit(const uint8_t opbyte0, const uint8_t opbyte1);
+	void do_CPL_inpp_indirectbit(const uint8_t opbyte0, const uint8_t opbyte1);
+	void do_LD_inpp_indirectbit_CF(const uint8_t opbyte0, const uint8_t opbyte1);
+	void do_LD_CF_inpp_indirectbit(const uint8_t opbyte0, const uint8_t opbyte1);
 	void do_XCH_r_g(const uint8_t opbyte0, const uint8_t opbyte1);
 	void do_CPL_gbit(const uint8_t opbyte0, const uint8_t opbyte1);
 	void do_LD_gbit_CF(const uint8_t opbyte0, const uint8_t opbyte1);
