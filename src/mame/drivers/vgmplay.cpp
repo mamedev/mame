@@ -1677,6 +1677,8 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 			}
 		}
 
+		m_vgmplay->reset();
+
 		return image_init_result::PASS;
 	}
 }
