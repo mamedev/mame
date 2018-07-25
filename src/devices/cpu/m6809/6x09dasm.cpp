@@ -113,7 +113,10 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 	const opcodeinfo *op = fetch_opcode(opcodes, p);
 	if (!op)
 	{
-		stream << "Illegal Opcode";
+		// illegal opcode
+		util::stream_format(stream, "%-6s$%02X", "FCB", opcodes.r8(pc));
+		for (offs_t q = pc + 1; q < p; q++)
+			util::stream_format(stream, ",$%02X", opcodes.r8(q));
 		return (p - pc) | SUPPORTED;
 	}
 
@@ -126,7 +129,10 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 	p += numoperands;
 
 	// output the base instruction name
-	util::stream_format(stream, "%-6s", op->name());
+	if (op->mode() == INH)
+		stream << op->name();
+	else
+		util::stream_format(stream, "%-6s", op->name());
 
 	switch (op->mode())
 	{
