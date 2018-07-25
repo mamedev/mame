@@ -206,6 +206,7 @@ public:
 	void init_explorer();
 	void init_amigo2();
 	void init_mandinga();
+	void init_mandingarf();
 	void init_sfx();
 	void init_atlantis();
 	void init_scobra();
