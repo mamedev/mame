@@ -387,7 +387,6 @@ void vgmplay_device::device_reset()
 	m_pc = 0;
 	m_state = RESET;
 	m_paused = false;
-	m_loop = true;
 
 	m_ym2612_stream_offset = 0;
 	blocks_clear();
