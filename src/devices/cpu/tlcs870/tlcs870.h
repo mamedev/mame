@@ -7,6 +7,25 @@
 
 class tlcs870_device : public cpu_device
 {
+public:
+	auto p0_in_cb() { return m_port_in_cb[0].bind(); }
+	auto p1_in_cb() { return m_port_in_cb[1].bind(); }
+	auto p2_in_cb() { return m_port_in_cb[2].bind(); }
+	auto p3_in_cb() { return m_port_in_cb[3].bind(); }
+	auto p4_in_cb() { return m_port_in_cb[4].bind(); }
+	auto p5_in_cb() { return m_port_in_cb[5].bind(); }
+	auto p6_in_cb() { return m_port_in_cb[6].bind(); }
+	auto p7_in_cb() { return m_port_in_cb[7].bind(); }
+
+	auto p0_out_cb() { return m_port_out_cb[0].bind(); }
+	auto p1_out_cb() { return m_port_out_cb[1].bind(); }
+	auto p2_out_cb() { return m_port_out_cb[2].bind(); }
+	auto p3_out_cb() { return m_port_out_cb[3].bind(); }
+	auto p4_out_cb() { return m_port_out_cb[4].bind(); }
+	auto p5_out_cb() { return m_port_out_cb[5].bind(); }
+	auto p6_out_cb() { return m_port_out_cb[6].bind(); }
+	auto p7_out_cb() { return m_port_out_cb[7].bind(); }
+
 protected:
 	// construction/destruction
 	tlcs870_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map);
@@ -110,6 +129,35 @@ private:
 	address_space *m_io;
 	int     m_icount;
 
+	devcb_read8   m_port_in_cb[8];
+	devcb_write8  m_port_out_cb[8];
+	uint8_t m_port_out_latch[8];
+	int m_read_input_port;
+	uint8_t m_port0_cr, m_port1_cr, m_port6_cr, m_port7_cr;
+
+	DECLARE_READ8_MEMBER(port0_r);
+	DECLARE_READ8_MEMBER(port1_r);
+	DECLARE_READ8_MEMBER(port2_r);
+	DECLARE_READ8_MEMBER(port3_r);
+	DECLARE_READ8_MEMBER(port4_r);
+	DECLARE_READ8_MEMBER(port5_r);
+	DECLARE_READ8_MEMBER(port6_r);
+	DECLARE_READ8_MEMBER(port7_r);
+
+	DECLARE_WRITE8_MEMBER(port0_w);
+	DECLARE_WRITE8_MEMBER(port1_w);
+	DECLARE_WRITE8_MEMBER(port2_w);
+	DECLARE_WRITE8_MEMBER(port3_w);
+	DECLARE_WRITE8_MEMBER(port4_w);
+	DECLARE_WRITE8_MEMBER(port5_w);
+	DECLARE_WRITE8_MEMBER(port6_w);
+	DECLARE_WRITE8_MEMBER(port7_w);
+
+	DECLARE_WRITE8_MEMBER(p0cr_w);
+	DECLARE_WRITE8_MEMBER(p1cr_w);
+	DECLARE_WRITE8_MEMBER(p6cr_w);
+	DECLARE_WRITE8_MEMBER(p7cr_w);
+
 	// Work registers
 	uint8_t m_cycles;
 	uint16_t m_tmppc;
@@ -161,6 +209,8 @@ private:
 	int is_ZF() const { return ((m_F & FLAG_Z) ? 1 : 0); }
 	int is_CF() const { return ((m_F & FLAG_C) ? 1 : 0); }
 	int is_HF() const { return ((m_F & FLAG_H) ? 1 : 0); }
+
+	int get_base_srcdst_cycles(int i) const { const int SRC_DST_CYCLES[8] = { 1, 2, 0, 0, 2, 2, 1, 1 }; return SRC_DST_CYCLES[i]; }
 
 	bool stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const uint16_t mode, const uint16_t r, const uint16_t rb);
 
@@ -232,12 +282,7 @@ private:
 
 	// tlcs870_ops_src.cpp
 
-	void do_e0_opcode(const uint8_t opbyte0);
-	void do_e1_to_e3_opcode(const uint8_t opbyte0);
-	void do_e4_opcode(const uint8_t opbyte0);
-	void do_e5_to_e7_opcode(const uint8_t opbyte0);
-
-	void do_e0_to_e7_opcode(uint8_t opbyte0, uint16_t srcaddr);
+	void do_srcprefixtype_opcode(const uint8_t opbyte0);
 
 	void do_e0_to_e7_oprand_illegal(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr);
 
@@ -266,13 +311,7 @@ private:
 	uint16_t do_alu(int op, uint16_t param1, uint16_t param2);
 
 	// tlcs870_ops_dst.cpp
-
-	void do_f0_opcode(const uint8_t opbyte0);
-	void do_f2_to_f3_opcode(const uint8_t opbyte0);
-	void do_f4_opcode(const uint8_t opbyte0);
-	void do_f6_to_f7_opcode(const uint8_t opbyte0);
-
-	void do_f0_to_f7_opcode(const uint8_t opbyte0, const uint16_t dstaddr);
+	void do_dstprefixtype_opcode(const uint8_t opbyte0);
 
 	void do_f0_to_f7_oprand_illegal_opcode(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t dstaddr);
 
@@ -310,9 +349,9 @@ private:
 	void do_ALUOP_g_n(const uint8_t opbyte0, const uint8_t opbyte1);
 	void do_SET_inppbit(const uint8_t opbyte0, const uint8_t opbyte1);
 	void do_CLR_inppbit(const uint8_t opbyte0, const uint8_t opbyte1);
-	void do_CPL_inppbit(const uint8_t opbyte0, const uint8_t opbyte1);
-	void do_LD_inppbit_CF(const uint8_t opbyte0, const uint8_t opbyte1);
-	void do_LD_CF_inppbit(const uint8_t opbyte0, const uint8_t opbyte1);
+	void do_CPL_inpp_indirectbit(const uint8_t opbyte0, const uint8_t opbyte1);
+	void do_LD_inpp_indirectbit_CF(const uint8_t opbyte0, const uint8_t opbyte1);
+	void do_LD_CF_inpp_indirectbit(const uint8_t opbyte0, const uint8_t opbyte1);
 	void do_XCH_r_g(const uint8_t opbyte0, const uint8_t opbyte1);
 	void do_CPL_gbit(const uint8_t opbyte0, const uint8_t opbyte1);
 	void do_LD_gbit_CF(const uint8_t opbyte0, const uint8_t opbyte1);
