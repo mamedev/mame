@@ -2081,9 +2081,10 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_DEVICE_PROGRAM_MAP(h6280_map)
 	MCFG_DEVICE_IO_MAP(h6280_io_map)
 	MCFG_DEVICE_DISABLE()
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0) // disable for now
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0)
 
 	MCFG_DEVICE_ADD("c6280", C6280, 3579545)
-	MCFG_C6280_CPU("h6280")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
