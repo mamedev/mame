@@ -7,6 +7,25 @@
 
 class tlcs870_device : public cpu_device
 {
+public:
+	auto p0_in_cb() { return m_port_in_cb[0].bind(); }
+	auto p1_in_cb() { return m_port_in_cb[1].bind(); }
+	auto p2_in_cb() { return m_port_in_cb[2].bind(); }
+	auto p3_in_cb() { return m_port_in_cb[3].bind(); }
+	auto p4_in_cb() { return m_port_in_cb[4].bind(); }
+	auto p5_in_cb() { return m_port_in_cb[5].bind(); }
+	auto p6_in_cb() { return m_port_in_cb[6].bind(); }
+	auto p7_in_cb() { return m_port_in_cb[7].bind(); }
+
+	auto p0_out_cb() { return m_port_out_cb[0].bind(); }
+	auto p1_out_cb() { return m_port_out_cb[1].bind(); }
+	auto p2_out_cb() { return m_port_out_cb[2].bind(); }
+	auto p3_out_cb() { return m_port_out_cb[3].bind(); }
+	auto p4_out_cb() { return m_port_out_cb[4].bind(); }
+	auto p5_out_cb() { return m_port_out_cb[5].bind(); }
+	auto p6_out_cb() { return m_port_out_cb[6].bind(); }
+	auto p7_out_cb() { return m_port_out_cb[7].bind(); }
+
 protected:
 	// construction/destruction
 	tlcs870_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map);
@@ -109,6 +128,35 @@ private:
 	address_space *m_program;
 	address_space *m_io;
 	int     m_icount;
+
+	devcb_read8   m_port_in_cb[8];
+	devcb_write8  m_port_out_cb[8];
+	uint8_t m_port_out_latch[8];
+	int m_read_input_port;
+	uint8_t m_port0_cr, m_port1_cr, m_port6_cr, m_port7_cr;
+
+	DECLARE_READ8_MEMBER(port0_r);
+	DECLARE_READ8_MEMBER(port1_r);
+	DECLARE_READ8_MEMBER(port2_r);
+	DECLARE_READ8_MEMBER(port3_r);
+	DECLARE_READ8_MEMBER(port4_r);
+	DECLARE_READ8_MEMBER(port5_r);
+	DECLARE_READ8_MEMBER(port6_r);
+	DECLARE_READ8_MEMBER(port7_r);
+
+	DECLARE_WRITE8_MEMBER(port0_w);
+	DECLARE_WRITE8_MEMBER(port1_w);
+	DECLARE_WRITE8_MEMBER(port2_w);
+	DECLARE_WRITE8_MEMBER(port3_w);
+	DECLARE_WRITE8_MEMBER(port4_w);
+	DECLARE_WRITE8_MEMBER(port5_w);
+	DECLARE_WRITE8_MEMBER(port6_w);
+	DECLARE_WRITE8_MEMBER(port7_w);
+
+	DECLARE_WRITE8_MEMBER(p0cr_w);
+	DECLARE_WRITE8_MEMBER(p1cr_w);
+	DECLARE_WRITE8_MEMBER(p6cr_w);
+	DECLARE_WRITE8_MEMBER(p7cr_w);
 
 	// Work registers
 	uint8_t m_cycles;
