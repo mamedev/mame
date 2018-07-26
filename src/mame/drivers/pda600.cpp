@@ -60,7 +60,6 @@
 #include "machine/nvram.h"
 #include "machine/hd64610.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -68,9 +67,10 @@ class pda600_state : public driver_device
 {
 public:
 	pda600_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
-		{}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{
+	}
 
 	void pda600(machine_config &config);
 
@@ -220,7 +220,6 @@ MACHINE_CONFIG_START(pda600_state::pda600)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pda600)
-	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly

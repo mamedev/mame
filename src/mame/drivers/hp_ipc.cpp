@@ -374,8 +374,6 @@ Software to look for
 #include "machine/tms9914.h"
 #include "bus/ieee488/ieee488.h"
 
-#include "rendlay.h"
-
 #include "emupal.h"
 #include "screen.h"
 
@@ -801,11 +799,10 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	// horizontal time = 60 us (min)
 	// ver.refresh period = ~300 us
 	// ver.period = 16.7ms (~60 hz)
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
+	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::amber()) // actually a kind of EL display
 	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(6_MHz_XTAL * 2, 720, 0, 512, 278, 0, 256)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w)) // XXX actually it's driven by 555 (U59)
-	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
@@ -821,11 +818,10 @@ MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
+	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::amber()) // actually a kind of EL display
 	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(6_MHz_XTAL * 2, 720, 0, 640, 480, 0, 400)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w))
-	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")

@@ -24,7 +24,6 @@
 #include "machine/nvram.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -815,7 +814,6 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(clcd_state, clcd)
 

@@ -26,7 +26,6 @@
 
 #include "emu.h"
 #include "video/gamate.h"
-#include "rendlay.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(GAMATE_VIDEO, gamate_video_device, "gamate_vid", "Gamate Video Hardware")
@@ -315,8 +314,6 @@ MACHINE_CONFIG_START(gamate_video_device::device_add_mconfig)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE) // close approximate until we use timers to emulate exact video update
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
-	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(gamate_video_device,gamate)

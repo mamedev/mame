@@ -18,7 +18,6 @@
 #include "machine/ram.h"
 #include "video/hd44780.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 
 class alphasmart_state : public driver_device
@@ -458,7 +457,6 @@ MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(alphasmart_state, alphasmart)
-	config.set_default_layout(layout_lcd);
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

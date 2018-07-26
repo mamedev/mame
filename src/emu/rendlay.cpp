@@ -40,10 +40,6 @@
 // screenless layouts
 #include "noscreens.lh"
 
-// single screen layouts
-#include "horizont.lh"
-#include "vertical.lh"
-
 // dual screen layouts
 #include "dualhsxs.lh"
 #include "dualhovu.lh"
@@ -54,13 +50,6 @@
 
 // quad screen layouts
 #include "quadhsxs.lh"
-
-// LCD screen layouts
-#include "lcd.lh"
-#include "lcd_rot.lh"
-
-// SVG screen layouts
-#include "svg.lh"
 
 
 namespace {
@@ -85,38 +74,6 @@ std::locale const f_portable_locale("C");
 //**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
-
-//-------------------------------------------------
-//  gcd - compute the greatest common divisor (GCD)
-//  of two integers using the Euclidean algorithm
-//-------------------------------------------------
-
-template <typename M, typename N>
-constexpr std::common_type_t<M, N> gcd(M a, N b)
-{
-	return b ? gcd(b, a % b) : a;
-}
-
-
-//-------------------------------------------------
-//  reduce_fraction - reduce a fraction by
-//  dividing out common factors
-//-------------------------------------------------
-
-template <typename M, typename N>
-inline void reduce_fraction(M &num, N &den)
-{
-	// search the greatest common divisor
-	auto const div = gcd(num, den);
-
-	// reduce the fraction if a common divisor has been found
-	if (div)
-	{
-		num /= div;
-		den /= div;
-	}
-}
-
 
 //-------------------------------------------------
 //  render_bounds_transform - apply translation/
@@ -430,9 +387,20 @@ private:
 			unsigned i(0U);
 			for (screen_device const &screen : screen_device_iterator(machine().root_device()))
 			{
+				std::pair<u64, u64> const physaspect(screen.physical_aspect());
 				s64 const w(screen.visible_area().width()), h(screen.visible_area().height());
 				s64 xaspect(w), yaspect(h);
-				reduce_fraction(xaspect, yaspect);
+				util::reduce_fraction(xaspect, yaspect);
+
+				tmp.seekp(0);
+				util::stream_format(tmp, "scr%uphysicalxaspect", i);
+				tmp.put('\0');
+				try_insert(&tmp.vec()[0], s64(physaspect.first));
+
+				tmp.seekp(0);
+				util::stream_format(tmp, "scr%uphysicalyaspect", i);
+				tmp.put('\0');
+				try_insert(&tmp.vec()[0], s64(physaspect.second));
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%unativexaspect", i);

@@ -546,43 +546,45 @@ void screen_device::svg_renderer::rebuild_cache()
 //-------------------------------------------------
 
 screen_device::screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SCREEN, tag, owner, clock),
-		m_type(SCREEN_TYPE_RASTER),
-		m_oldstyle_vblank_supplied(false),
-		m_refresh(0),
-		m_vblank(0),
-		m_xoffset(0.0f),
-		m_yoffset(0.0f),
-		m_xscale(1.0f),
-		m_yscale(1.0f),
-		m_screen_vblank(*this),
-		m_palette(*this, finder_base::DUMMY_TAG),
-		m_video_attributes(0),
-		m_svg_region(nullptr),
-		m_container(nullptr),
-		m_width(100),
-		m_height(100),
-		m_visarea(0, 99, 0, 99),
-		m_texformat(),
-		m_curbitmap(0),
-		m_curtexture(0),
-		m_changed(true),
-		m_last_partial_scan(0),
-		m_partial_scan_hpos(0),
-		m_color(rgb_t(0xff, 0xff, 0xff, 0xff)),
-		m_brightness(0xff),
-		m_frame_period(DEFAULT_FRAME_PERIOD.as_attoseconds()),
-		m_scantime(1),
-		m_pixeltime(1),
-		m_vblank_period(0),
-		m_vblank_start_time(attotime::zero),
-		m_vblank_end_time(attotime::zero),
-		m_vblank_begin_timer(nullptr),
-		m_vblank_end_timer(nullptr),
-		m_scanline0_timer(nullptr),
-		m_scanline_timer(nullptr),
-		m_frame_number(0),
-		m_partial_updates_this_frame(0)
+	: device_t(mconfig, SCREEN, tag, owner, clock)
+	, m_type(SCREEN_TYPE_RASTER)
+	, m_orientation(ROT0)
+	, m_phys_aspect(0U, 0U)
+	, m_oldstyle_vblank_supplied(false)
+	, m_refresh(0)
+	, m_vblank(0)
+	, m_xoffset(0.0f)
+	, m_yoffset(0.0f)
+	, m_xscale(1.0f)
+	, m_yscale(1.0f)
+	, m_screen_vblank(*this)
+	, m_palette(*this, finder_base::DUMMY_TAG)
+	, m_video_attributes(0)
+	, m_svg_region(nullptr)
+	, m_container(nullptr)
+	, m_width(100)
+	, m_height(100)
+	, m_visarea(0, 99, 0, 99)
+	, m_texformat()
+	, m_curbitmap(0)
+	, m_curtexture(0)
+	, m_changed(true)
+	, m_last_partial_scan(0)
+	, m_partial_scan_hpos(0)
+	, m_color(rgb_t(0xff, 0xff, 0xff, 0xff))
+	, m_brightness(0xff)
+	, m_frame_period(DEFAULT_FRAME_PERIOD.as_attoseconds())
+	, m_scantime(1)
+	, m_pixeltime(1)
+	, m_vblank_period(0)
+	, m_vblank_start_time(attotime::zero)
+	, m_vblank_end_time(attotime::zero)
+	, m_vblank_begin_timer(nullptr)
+	, m_vblank_end_timer(nullptr)
+	, m_scanline0_timer(nullptr)
+	, m_scanline_timer(nullptr)
+	, m_frame_number(0)
+	, m_partial_updates_this_frame(0)
 {
 	m_unique_id = m_id_counter;
 	m_id_counter++;
@@ -646,6 +648,48 @@ void screen_device::device_validity_check(validity_checker &valid) const
 
 
 //-------------------------------------------------
+//  device_config_complete - finalise static
+//  configuration
+//-------------------------------------------------
+
+void screen_device::device_config_complete()
+{
+	// combine orientation with machine orientation
+	m_orientation = orientation_add(m_orientation, mconfig().gamedrv().flags & machine_flags::MASK_ORIENTATION);
+
+	// physical aspect ratio unconfigured
+	if (!m_phys_aspect.first || !m_phys_aspect.second)
+	{
+		switch (m_type)
+		{
+		case SCREEN_TYPE_RASTER:
+		case SCREEN_TYPE_VECTOR:
+			m_phys_aspect = std::make_pair(4, 3); // assume standard CRT
+			break;
+		case SCREEN_TYPE_LCD:
+		case SCREEN_TYPE_SVG:
+			m_phys_aspect = std::make_pair(~0U, ~0U); // assume square pixels
+			break;
+		case SCREEN_TYPE_INVALID:
+		default:
+			throw emu_fatalerror("%s: invalid screen type configured\n", tag());
+		}
+	}
+
+	// square pixels?
+	if ((~0U == m_phys_aspect.first) && (~0U == m_phys_aspect.second))
+	{
+		m_phys_aspect.first = visible_area().width();
+		m_phys_aspect.second = visible_area().height();
+	}
+
+	// always keep this in reduced form
+	util::reduce_fraction(m_phys_aspect.first, m_phys_aspect.second);
+}
+
+
+
+//-------------------------------------------------
 //  device_resolve_objects - resolve objects that
 //  may be needed for other devices to set
 //  initial conditions at start time
@@ -674,17 +718,14 @@ void screen_device::device_start()
 	{
 		memory_region *reg = owner()->memregion(m_svg_region);
 		if (!reg)
-			fatalerror("SVG region \"%s\" does not exist\n", m_svg_region);
+			fatalerror("%s: SVG region \"%s\" does not exist\n", tag(), m_svg_region);
 		m_svg = std::make_unique<svg_renderer>(reg);
 		machine().output().set_notifier(nullptr, svg_renderer::output_notifier, m_svg.get());
 
-		if (0)
-		{
-			// The osd picks up the size before start is called, so that's useless
-			m_width = m_svg->width();
-			m_height = m_svg->height();
-			m_visarea.set(0, m_width-1, 0, m_height-1);
-		}
+		// The OSD picks up the size before start is called, so this only affect the info display if it's called up in-game
+		m_width = m_svg->width();
+		m_height = m_svg->height();
+		m_visarea.set(0, m_width-1, 0, m_height-1);
 	}
 
 	// if we have a palette and it's not started, wait for it
