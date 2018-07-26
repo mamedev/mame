@@ -2,11 +2,16 @@
 // copyright-holders:Carl
 #if defined(OSD_NET_USE_TAPTUN)
 
+#if defined(OSD_WINDOWS)
+#include <windows.h>
+#include <winioctl.h>
+#else
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <errno.h>
+#endif
 
 #include "emu.h"
 #include "osdnet.h"
@@ -17,6 +22,12 @@
 #define IFF_TAP     0x0002
 #define IFF_NO_PI   0x1000
 #define TUNSETIFF     _IOW('T', 202, int)
+#elif defined(OSD_WINDOWS)
+#include "tap-windows6/include/tap-windows.h"
+
+// for some reason this isn't defined in the header, and presumably it changes
+// with major? versions of the driver - perhaps it should be configurable?
+#define PRODUCT_TAP_WIN_COMPONENT_ID "tap0901"
 #endif
 
 class taptun_module : public osd_module, public netdev_module
@@ -48,8 +59,14 @@ public:
 protected:
 	int recv_dev(uint8_t **buf);
 private:
+#if defined(OSD_WINDOWS)
+	HANDLE m_handle;
+	OVERLAPPED m_overlapped;
+	bool m_receive_pending;
+#else
 	int m_fd;
 	char m_ifname[10];
+#endif
 	char m_mac[6];
 	uint8_t m_buf[2048];
 };
@@ -78,7 +95,22 @@ netdev_tap::netdev_tap(const char *name, class device_network_interface *ifdev, 
 	osd_printf_verbose("netdev_tap: network up!\n");
 	strncpy(m_ifname, ifr.ifr_name, 10);
 	fcntl(m_fd, F_SETFL, O_NONBLOCK);
+#elif defined(OSD_WINDOWS)
+	std::string device_path(USERMODEDEVICEDIR);
+	device_path.append(name);
+	device_path.append(TAP_WIN_SUFFIX);
 
+	m_handle = CreateFileA(device_path.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_SYSTEM | FILE_FLAG_OVERLAPPED, 0);
+	if (m_handle != INVALID_HANDLE_VALUE)
+	{
+		ULONG status = TRUE;
+		DWORD len;
+
+		// set media status to connected
+		DeviceIoControl(m_handle, TAP_WIN_IOCTL_SET_MEDIA_STATUS, &status, sizeof(status), &status, sizeof(status), &len, NULL);
+	}
+
+	m_receive_pending = false;
 #else
 	m_fd = -1;
 #endif
@@ -86,7 +118,11 @@ netdev_tap::netdev_tap(const char *name, class device_network_interface *ifdev, 
 
 netdev_tap::~netdev_tap()
 {
+#if defined(OSD_WINDOWS)
+	CloseHandle(m_handle);
+#else
 	close(m_fd);
+#endif
 }
 
 void netdev_tap::set_mac(const char *mac)
@@ -94,6 +130,141 @@ void netdev_tap::set_mac(const char *mac)
 	memcpy(m_mac, mac, 6);
 }
 
+#if defined(OSD_WINDOWS)
+int netdev_tap::send(uint8_t *buf, int len)
+{
+	OVERLAPPED overlapped;
+
+	if (m_handle == INVALID_HANDLE_VALUE)
+		return 0;
+
+	memset(&overlapped, 0, sizeof(overlapped));
+	if (WriteFile(m_handle, buf, len, NULL, &overlapped) || GetLastError() == ERROR_IO_PENDING)
+	{
+		DWORD bytes_transferred;
+
+		// block until transfer complete
+		if (GetOverlappedResult(m_handle, &overlapped, &bytes_transferred, TRUE))
+			return bytes_transferred;
+	}
+
+	return 0;
+}
+
+int netdev_tap::recv_dev(uint8_t **buf)
+{
+	DWORD bytes_transferred;
+
+	if (m_handle == INVALID_HANDLE_VALUE)
+		return 0;
+
+	if (!m_receive_pending)
+	{
+		// start a new asynchronous read
+		memset(&m_overlapped, 0, sizeof(m_overlapped));
+		if (ReadFile(m_handle, m_buf, sizeof(m_buf), &bytes_transferred, &m_overlapped))
+		{
+			// handle unexpected synchronous completion
+			*buf = m_buf;
+
+			return bytes_transferred;
+		}
+		else if (GetLastError() == ERROR_IO_PENDING)
+			m_receive_pending = true;
+	}
+	else
+	{
+		if (GetOverlappedResult(m_handle, &m_overlapped, &bytes_transferred, FALSE))
+		{
+			// handle asynchronous completion
+			m_receive_pending = false;
+			*buf = m_buf;
+
+			return bytes_transferred;
+		}
+	}
+
+	return 0;
+}
+
+// find the friendly name for an adapter guid in the registry
+static std::string get_connection_name(std::string guid)
+{
+	std::string result;
+
+	std::string connection(NETWORK_CONNECTIONS_KEY "\\");
+	connection.append(guid);
+	connection.append("\\Connection");
+
+	HKEY connection_key;
+
+	if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, connection.c_str(), 0, KEY_READ, &connection_key) == ERROR_SUCCESS)
+	{
+		CHAR connection_name[MAX_PATH];
+		DWORD connection_name_len = sizeof(connection_name);
+		DWORD data_type;
+
+		if (RegQueryValueExA(connection_key, "Name", NULL, &data_type, LPBYTE(connection_name), &connection_name_len) == ERROR_SUCCESS && data_type == REG_SZ)
+		{
+			result.assign(std::string(connection_name));
+		}
+	}
+
+	return result;
+}
+
+// find TAP-Windows adapters by scanning the registry
+static std::vector<std::string> get_tap_adapters()
+{
+	std::vector<std::string> result;
+	HKEY adapter_key;
+
+	if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, ADAPTER_KEY, 0, KEY_READ, &adapter_key) == ERROR_SUCCESS)
+	{
+		int i = 0;
+		CHAR enum_name[MAX_PATH];
+		DWORD enum_name_len = sizeof(enum_name);
+
+		// iterate through all the adapters
+		while (RegEnumKeyExA(adapter_key, i, enum_name, &enum_name_len, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
+		{
+			std::string unit_string(ADAPTER_KEY "\\");
+			unit_string.append(enum_name);
+			HKEY unit_key;
+
+			if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, unit_string.c_str(), 0, KEY_READ, &unit_key) == ERROR_SUCCESS)
+			{
+				CHAR component_id[MAX_PATH];
+				DWORD component_id_len = sizeof(component_id);
+				DWORD data_type;
+
+				// check if the ComponentId value indicates a TAP-Windows adapter
+				if (RegQueryValueExA(unit_key, "ComponentId", NULL, &data_type, LPBYTE(component_id), &component_id_len) == ERROR_SUCCESS
+					&& data_type == REG_SZ
+					&& std::string(component_id) == PRODUCT_TAP_WIN_COMPONENT_ID)
+				{
+					CHAR net_cfg_instance_id[MAX_PATH];
+					DWORD net_cfg_instance_id_len = sizeof(net_cfg_instance_id);
+
+					// add the adapter GUID to the result
+					if (RegQueryValueExA(unit_key, "NetCfgInstanceId", NULL, &data_type, LPBYTE(net_cfg_instance_id), &net_cfg_instance_id_len) == ERROR_SUCCESS
+						&& data_type == REG_SZ)
+						result.push_back(std::string(net_cfg_instance_id));
+				}
+
+				RegCloseKey(unit_key);
+			}
+
+			enum_name_len = sizeof(enum_name);
+			i++;
+		}
+
+		RegCloseKey(adapter_key);
+	}
+
+	return result;
+}
+#else
 int netdev_tap::send(uint8_t *buf, int len)
 {
 	if(m_fd == -1) return 0;
@@ -113,6 +284,7 @@ int netdev_tap::recv_dev(uint8_t **buf)
 	*buf = m_buf;
 	return (len == -1)?0:len;
 }
+#endif
 
 static CREATE_NETDEV(create_tap)
 {
@@ -122,7 +294,12 @@ static CREATE_NETDEV(create_tap)
 
 int taptun_module::init(const osd_options &options)
 {
+#if defined(OSD_WINDOWS)
+	for (std::string guid : get_tap_adapters())
+		add_netdev(guid.c_str(), get_connection_name(guid).c_str(), create_tap);
+#else
 	add_netdev("tap", "TAP/TUN Device", create_tap);
+#endif
 	return 0;
 }
 
