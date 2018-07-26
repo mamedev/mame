@@ -14697,10 +14697,11 @@ h89                             //
 
 @source:halleys.cpp
 benberob                        // A26
-halley87                        // A62 (c) 1986 Taito Corporation (Japan)
-halleycj                        // A62 (c) 1986 Taito Corporation (Japan)
-halleys                         // A62 (c) 1986 Taito America Corporation + Coin It (US)
-halleysc                        // A62 (c) 1986 Taito Corporation (Japan)
+halleysc                        // A62 (c) 1986 Taito America Corporation + Coin It (US)
+halleysc87                      // A62 (c) 1986 Taito Corporation (Japan)
+halleyscj                       // A62 (c) 1986 Taito Corporation (Japan, rev 1)
+halleyscja                      // A62 (c) 1986 Taito Corporation (Japan)
+halleyscjp                      // A62 (c) 1985 Taito Corporation (Japan, prototype)
 
 @source:hanaawas.cpp
 hanaawas                        // (c) SetaKikaku
