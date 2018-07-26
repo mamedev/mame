@@ -341,7 +341,7 @@ void galaxold_state::scramblb_map(address_map &map)
 	map(0x7000, 0x7000).portr("IN2");
 	map(0x7001, 0x7001).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
 	map(0x7002, 0x7002).w(FUNC(galaxold_state::galaxold_coin_counter_w));
-	map(0x7003, 0x7003).nopw // background write, may not exist on hardware
+	map(0x7003, 0x7003).nopw(); // background color write, may not exist on hardware
 	map(0x7004, 0x7004).w(FUNC(galaxold_state::galaxold_stars_enable_w));
 	map(0x7006, 0x7006).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));
 	map(0x7007, 0x7007).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
@@ -371,7 +371,7 @@ void galaxold_state::scramb_common_map(address_map &map)
 	map(0x6004, 0x6007).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));
 	map(0x6800, 0x6807).r(FUNC(galaxold_state::scramb2_port1_r)); // reads from 8 addresses, 1 bit per address
 	map(0x6801, 0x6801).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
-	map(0x6803, 0x6803).nopw // background write, may not exist on hardware
+	map(0x6803, 0x6803).nopw(); // background color write, does not exist
 	map(0x6804, 0x6804).w(FUNC(galaxold_state::galaxold_stars_enable_w));
 	map(0x6806, 0x6806).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));
 	map(0x6807, 0x6807).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
@@ -423,15 +423,15 @@ void galaxold_state::scrambler_map(address_map &map)
 	map(0x6805, 0x6805).w("cust", FUNC(galaxian_sound_device::fire_enable_w));
 	map(0x6806, 0x6807).w("cust", FUNC(galaxian_sound_device::vol_w));
 	map(0x7000, 0x7000).portr("IN2").w(FUNC(galaxold_state::galaxold_nmi_enable_w));
-// AM_RANGE(0x7001, 0x7001)
+//  AM_RANGE(0x7001, 0x7001)
 	map(0x7002, 0x7002).w(FUNC(galaxold_state::galaxold_coin_counter_w));
-	map(0x7003, 0x7003).nopw // background write, may not exist on hardware
+	map(0x7003, 0x7003).nopw(); // background color write, may not exist
 	map(0x7004, 0x7004).w(FUNC(galaxold_state::galaxold_stars_enable_w));
 	map(0x7006, 0x7006).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));
 	map(0x7007, 0x7007).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
 	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x7800, 0x7800).w("cust", FUNC(galaxian_sound_device::pitch_w));
-// AM_RANGE(0x8102, 0x8102) AM_READ(scramblb_protection_1_r)
+//  AM_RANGE(0x8102, 0x8102) AM_READ(scramblb_protection_1_r)
 	map(0x8202, 0x8202).r(FUNC(galaxold_state::scrambler_protection_2_r));
 }
 

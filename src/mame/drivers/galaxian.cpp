@@ -4602,7 +4602,7 @@ static INPUT_PORTS_START( mandingarf )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) // unused?
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
@@ -4610,6 +4610,7 @@ static INPUT_PORTS_START( mandingarf )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	/* the rest appear to be unused, except for Lives? */
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4623,10 +4624,10 @@ static INPUT_PORTS_START( mandingarf )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "255 (Cheat)" )
-	PORT_DIPSETTING(    0x80, "4" )
-	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0xc0, "2" )
+	PORT_DIPSETTING(    0x40, "3" ) // skips the self test checks?
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0x00, "255 (Cheat)" ) // skips the self test checks?
 
 	/* these two are reversed for some reason... */
 	PORT_START("IN2")
@@ -4636,6 +4637,7 @@ static INPUT_PORTS_START( mandingarf )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, "A 1/1 B 1/6" )
 	PORT_DIPSETTING(    0x04, "A 2/1 B 1/3" )
+	/* the rest appear to be unused? */
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -6230,20 +6232,6 @@ MACHINE_CONFIG_START(galaxian_state::turtles)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(galaxian_state::turpins)
-	turtles(config);
-
-	// the ROMs came from a blister, so there aren't PCB infos available. Chip types and clocks are guessed.
-
-	/* alternate memory map */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(turpins_map)
-
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(turpins_sound_map)
-MACHINE_CONFIG_END
-
-
 MACHINE_CONFIG_START(galaxian_state::theend)
 	konami_base(config);
 	konami_sound_2x_ay8910(config);
@@ -6296,6 +6284,7 @@ MACHINE_CONFIG_START(galaxian_state::jungsub)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
+
 MACHINE_CONFIG_START(galaxian_state::explorer) // Sidam 10800
 	sidam_bootleg_base(config);
 
@@ -6304,18 +6293,18 @@ MACHINE_CONFIG_START(galaxian_state::explorer) // Sidam 10800
 	MCFG_DEVICE_PROGRAM_MAP(explorer_map)
 
 	/* 2nd CPU to drive sound */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) /* clock not verified */
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware is a pair of AY-3-8912 */
-	MCFG_DEVICE_ADD("8910.0", AY8912, 12_MHz_XTAL / 2 / 2 / 2)
+	MCFG_DEVICE_ADD("8910.0", AY8912, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, galaxian_state, explorer_sound_latch_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_DEVICE_ADD("8910.1", AY8912, 12_MHz_XTAL / 2 / 2 / 2)
+	MCFG_DEVICE_ADD("8910.1", AY8912, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, galaxian_state, konami_sound_timer_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
@@ -6340,21 +6329,22 @@ MACHINE_CONFIG_START(galaxian_state::amigo2) // marked "AMI", but similar to abo
 	MCFG_DEVICE_PROGRAM_MAP(amigo2_map)
 
 	/* 2nd CPU to drive sound */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) /* clock not verified */
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, 12_MHz_XTAL / 2 / 2 / 2)
+	MCFG_DEVICE_ADD("8910.0", AY8910, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
 	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, konami_sound_timer_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_DEVICE_ADD("8910.1", AY8910, 12_MHz_XTAL / 2 / 2 / 2)
+	MCFG_DEVICE_ADD("8910.1", AY8910, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
+
 
 MACHINE_CONFIG_START(galaxian_state::scorpion)
 	scramble_base(config);
@@ -6406,7 +6396,6 @@ MACHINE_CONFIG_START(galaxian_state::sfx)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
-
 
 MACHINE_CONFIG_START(galaxian_state::monsterz)
 	sfx(config);
@@ -6506,6 +6495,18 @@ MACHINE_CONFIG_START(galaxian_state::froggeram)
 	/* alternate memory map */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(froggeram_map)
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(galaxian_state::turpins) // the ROMs came from a blister, so there aren't PCB infos available. Chip types and clocks are guessed.
+	scobra(config);
+
+	/* alternate memory map */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(turpins_map)
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(turpins_sound_map)
 MACHINE_CONFIG_END
 
 
@@ -12318,15 +12319,12 @@ GAME( 1980, astrians,    galaxian, galaxian,   swarm,      galaxian_state, init_
 
 GAME( 19??, tst_galx,    galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "<unknown>", "Galaxian Test ROM", MACHINE_SUPPORTS_SAVE )
 
-
-
 /* other games on basic galaxian hardware */
 GAME( 1981, blkhole,     0,        galaxian,   blkhole,    galaxian_state, init_galaxian,   ROT90,  "TDS & MINTS", "Black Hole", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, orbitron,    0,        galaxian,   orbitron,   galaxian_state, init_galaxian,   ROT270, "Comsoft (Signatron USA license)", "Orbitron", MACHINE_SUPPORTS_SAVE ) // there's a Comsoft copyright in one of the roms, and the gameplay is the same as Victory below
 GAME( 1980, luctoday,    0,        galaxian,   luctoday,   galaxian_state, init_galaxian,   ROT270, "Sigma", "Lucky Today", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, chewing,     luctoday, galaxian,   luctoday,   galaxian_state, init_galaxian,   ROT90,  "<unknown>", "Chewing Gum", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, catacomb,    0,        galaxian,   catacomb,   galaxian_state, init_galaxian,   ROT90,  "MTM Games", "Catacomb", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, omegab,      theend,   galaxian,   omegab,     galaxian_state, init_galaxian,   ROT270, "bootleg?", "Omega (bootleg?)", MACHINE_SUPPORTS_SAVE )
 
 /* basic hardware + extra RAM */
 GAME( 1982, victoryc,    0,        galaxian,   victoryc,   galaxian_state, init_victoryc,   ROT270, "Comsoft", "Victory (Comsoft)", MACHINE_SUPPORTS_SAVE )
@@ -12377,7 +12375,6 @@ GAME( 1981, batman2,     phoenix,  galaxian,   batman2,    galaxian_state, init_
 GAME( 1983, ladybugg,    ladybug,  galaxian,   ladybugg,   galaxian_state, init_batman2,    ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, atlantisb,   atlantis, galaxian,   atlantib,   galaxian_state, init_galaxian,   ROT270, "bootleg", "Battle of Atlantis (bootleg)", MACHINE_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
 GAME( 1982, tenspot,     0,        tenspot,    tenspot,    galaxian_state, init_tenspot,    ROT270, "Thomas Automatics", "Ten Spot", MACHINE_NOT_WORKING ) // work out how menu works
-
 
 /* separate tile/sprite ROMs, plus INT instead of NMI */
 GAME( 1984, devilfsg,    devilfsh, pacmanbl,   devilfsg,   galaxian_state, init_devilfsg,   ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", MACHINE_SUPPORTS_SAVE )
@@ -12523,6 +12520,7 @@ GAME( 1982, mandingac,   amidar,   galaxian,   mandingarf, galaxian_state, init_
 GAME( 1980, theend,      0,        theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami", "The End", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, theends,     theend,   theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami (Stern Electronics license)", "The End (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, takeoff,     theend,   takeoff,    explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)", "Take Off (bootleg of The End)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // colors likely need bitswap<8> somewhere; needs different sound timer. reference: https://www.youtube.com/watch?v=iPYX3yJORTE
+GAME( 19??, omegab,      theend,   galaxian,   omegab,     galaxian_state, init_galaxian,   ROT270, "bootleg?", "Omega (The End bootleg? on Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, scramble,    0,        scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami", "Scramble", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambles,   scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 1)", MACHINE_SUPPORTS_SAVE )
