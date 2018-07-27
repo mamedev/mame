@@ -944,8 +944,10 @@ void tlcs870_device::do_JRS_T_a(const uint8_t opbyte0)
 	{
 		m_cycles += 2;
 		m_addr = m_tmppc + 2 + val;
-		set_JF();
 	}
+	
+	// always gets set?
+	set_JF();
 }
 
 void tlcs870_device::do_JRS_F_a(const uint8_t opbyte0)
@@ -967,8 +969,10 @@ void tlcs870_device::do_JRS_F_a(const uint8_t opbyte0)
 	{
 		m_cycles += 2;
 		m_addr = m_tmppc + 2 + val;
-		set_JF();
 	}
+	
+	// manual isn't clear in description, but probably always set?
+	set_JF();
 }
 
 void tlcs870_device::do_CALLV_n(const uint8_t opbyte0)
@@ -1015,8 +1019,10 @@ void tlcs870_device::do_JR_cc_a(const uint8_t opbyte0)
 	{
 		m_cycles += 2;
 		m_addr = m_tmppc + 2 + val;
-		set_JF();
 	}
+
+	// manual isn't clear in description, but probably always set?
+	set_JF();
 }
 
 void tlcs870_device::do_LD_CF_inxbit(const uint8_t opbyte0)
