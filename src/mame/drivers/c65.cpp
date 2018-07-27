@@ -147,9 +147,9 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	uint8_t *cptr = &m_iplrom[((m_VIC3_ControlA & 0x40) ? 0x9000: 0xd000) + ((m_VIC2_VS_CB_Base & 0x2) << 10)];
 
 	// TODO: border area
-	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for(int y=cliprect.top();y<=cliprect.bottom();y++)
 	{
-		for(int x=cliprect.min_x;x<=cliprect.max_x;x++)
+		for(int x=cliprect.left();x<=cliprect.right();x++)
 		{
 			//int, xi,yi,xm,ym,dot_x;
 			int xi = inner_x_char(x / pixel_width);

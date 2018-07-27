@@ -408,13 +408,13 @@ uint32_t bfcobra_state::screen_update_bfcobra(screen_device &screen, bitmap_rgb3
 		lorescol = m_col8bit;
 	}
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
 		uint16_t y_offset = (y + m_v_scroll) * 256;
 		src = &m_video_ram[offset + y_offset];
 		dest = &bitmap.pix32(y);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x / 2; ++x)
+		for (x = cliprect.left(); x <= cliprect.right() / 2; ++x)
 		{
 			uint8_t x_offset = x + m_h_scroll;
 			uint8_t pen = *(src + x_offset);

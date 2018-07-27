@@ -18,9 +18,9 @@ void electron_state::waitforramsync()
 {
 	int cycles = 0;
 
-	if (!(m_ula.screen_mode & 4) && (m_screen->vpos() > m_screen->visible_area().min_y) && (m_screen->vpos() < m_screen->visible_area().max_y) && !m_screen->hblank())
+	if (!(m_ula.screen_mode & 4) && (m_screen->vpos() > m_screen->visible_area().top()) && (m_screen->vpos() < m_screen->visible_area().bottom()) && !m_screen->hblank())
 	{
-		cycles += (m_screen->visible_area().max_x - m_screen->hpos()) / 16;
+		cycles += (m_screen->visible_area().right() - m_screen->hpos()) / 16;
 	}
 	if (cycles & 1) cycles++;
 

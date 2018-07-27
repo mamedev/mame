@@ -236,11 +236,10 @@ void bmcpokr_state::draw_layer(screen_device &screen, bitmap_ind16 &bitmap, cons
 	{
 		if (linescroll)
 		{
-			if ( (y < cliprect.min_y) || (y > cliprect.max_y) )
+			if ( (y < cliprect.top()) || (y > cliprect.bottom()) )
 				continue;
 
-			clip.min_y = y;
-			clip.max_y = y;
+			clip.sety(y, y);
 		}
 
 		int sx = (scroll[y] & 0xff) * 4;
