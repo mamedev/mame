@@ -1456,12 +1456,12 @@ void psxcpu_device::update_cop0(int reg)
 		{
 			if (ip & CAUSE_IP0) debugger_exception_hook(EXC_INT);
 			if (ip & CAUSE_IP1) debugger_exception_hook(EXC_INT);
-			if (ip & CAUSE_IP2) debugger_interrupt_hook(PSXCPU_IRQ0);
-			if (ip & CAUSE_IP3) debugger_interrupt_hook(PSXCPU_IRQ1);
-			if (ip & CAUSE_IP4) debugger_interrupt_hook(PSXCPU_IRQ2);
-			if (ip & CAUSE_IP5) debugger_interrupt_hook(PSXCPU_IRQ3);
-			if (ip & CAUSE_IP6) debugger_interrupt_hook(PSXCPU_IRQ4);
-			if (ip & CAUSE_IP7) debugger_interrupt_hook(PSXCPU_IRQ5);
+			if (ip & CAUSE_IP2) standard_irq_callback(PSXCPU_IRQ0);
+			if (ip & CAUSE_IP3) standard_irq_callback(PSXCPU_IRQ1);
+			if (ip & CAUSE_IP4) standard_irq_callback(PSXCPU_IRQ2);
+			if (ip & CAUSE_IP5) standard_irq_callback(PSXCPU_IRQ3);
+			if (ip & CAUSE_IP6) standard_irq_callback(PSXCPU_IRQ4);
+			if (ip & CAUSE_IP7) standard_irq_callback(PSXCPU_IRQ5);
 			m_op = m_cache->read_dword(m_pc);
 			execute_unstoppable_instructions(1);
 			exception(EXC_INT);
