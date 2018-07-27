@@ -333,7 +333,7 @@ void tlcs870_device::do_ALUOP_A_g(const uint8_t opbyte0, const uint8_t opbyte1)
 
 	const int aluop = (opbyte1 & 0x7);
 
-	const uint8_t result = do_alu(aluop, get_reg8(REG_A), get_reg8(opbyte0 & 0x7));
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(REG_A), get_reg8(opbyte0 & 0x7));
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -357,7 +357,7 @@ void tlcs870_device::do_ALUOP_g_A(const uint8_t opbyte0, const uint8_t opbyte1)
 	m_cycles = 3;
 
 	const int aluop = (opbyte1 & 0x7);
-	const uint8_t result = do_alu(aluop, get_reg8(opbyte0 & 0x7), get_reg8(REG_A));
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(opbyte0 & 0x7), get_reg8(REG_A));
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -384,7 +384,7 @@ void tlcs870_device::do_ALUOP_g_n(const uint8_t opbyte0, const uint8_t opbyte1)
 
 	const uint8_t n = READ8();
 
-	const uint8_t result = do_alu(aluop, get_reg8(opbyte0 & 0x7), n);
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(opbyte0 & 0x7), n);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -413,7 +413,7 @@ void tlcs870_device::do_ALUOP_WA_gg(const uint8_t opbyte0, const uint8_t opbyte1
 
 	const int aluop = (opbyte1 & 0x7);
 
-	const uint16_t result = do_alu(aluop, get_reg16(REG_WA), get_reg16(opbyte0 & 0x3));
+	const uint16_t result = do_alu_16bit(aluop, get_reg16(REG_WA), get_reg16(opbyte0 & 0x3));
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -441,7 +441,7 @@ void tlcs870_device::do_ALUOP_gg_mn(const uint8_t opbyte0, const uint8_t opbyte1
 
 	const uint16_t mn = READ16();
 
-	const uint16_t result = do_alu(aluop, get_reg16(opbyte0 & 0x3), mn);
+	const uint16_t result = do_alu_16bit(aluop, get_reg16(opbyte0 & 0x3), mn);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{

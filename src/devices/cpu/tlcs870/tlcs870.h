@@ -308,8 +308,6 @@ private:
 	void do_CALL_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr);
 	void do_JP_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr);
 
-	uint16_t do_alu(int op, uint16_t param1, uint16_t param2);
-
 	// tlcs870_ops_dst.cpp
 	void do_dstprefixtype_opcode(const uint8_t opbyte0);
 
@@ -362,10 +360,26 @@ private:
 	void do_CALL_gg(const uint8_t opbyte0, const uint8_t opbyte1);
 	void do_JP_gg(const uint8_t opbyte0, const uint8_t opbyte1);
 
+
+	// ALU related
+	uint16_t do_or(uint16_t param1, uint16_t param2);
+	uint16_t do_xor(uint16_t param1, uint16_t param2);
+	uint16_t do_and(uint16_t param1, uint16_t param2);
+
+	uint8_t do_add_8bit(uint16_t param1, uint16_t param2);
+	uint8_t do_sub_8bit(uint16_t param1, uint16_t param2);
+	void do_cmp_8bit(uint16_t param1, uint16_t param2);
+	uint8_t do_alu_8bit(int op, uint16_t param1, uint16_t param2);
+
+	uint8_t do_add_16bit(uint32_t param1, uint32_t param2);
+	uint8_t do_sub_16bit(uint32_t param1, uint32_t param2);
+	void do_cmp_16bit(uint32_t param1, uint32_t param2);
+	uint16_t do_alu_16bit(int op, uint32_t param1, uint32_t param2);
+
+	// Generic opcode helpers
 	void handle_div(const int reg);
 	void handle_mul(const int reg);
 	void handle_swap(const int reg);
-
 	uint8_t handle_SHLC(uint8_t val);
 	uint8_t handle_SHRC(uint8_t val);
 	uint8_t handle_DAS(uint8_t val);

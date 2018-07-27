@@ -1149,7 +1149,7 @@ void tlcs870_device::do_ALUOP_A_n(const uint8_t opbyte0)
 	const int aluop = (opbyte0 & 0x7);
 	const uint8_t val = READ8();
 
-	const uint8_t result = do_alu(aluop, get_reg8(REG_A), val);
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(REG_A), val);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -1176,7 +1176,7 @@ void tlcs870_device::do_ALUOP_A_inx(const uint8_t opbyte0)
 	const uint16_t addr = READ8();
 	const uint8_t val = RM8(addr);
 
-	const uint8_t result = do_alu(aluop, get_reg8(REG_A), val);
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(REG_A), val);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{

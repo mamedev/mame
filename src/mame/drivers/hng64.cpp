@@ -1532,24 +1532,56 @@ void hng64_state::machine_reset()
 	reset_sound();
 }
 
-READ8_MEMBER(hng64_state::ioport0_r) { logerror("ioport0_r\n"); return 0xff; }
-READ8_MEMBER(hng64_state::ioport1_r) { logerror("ioport1_r\n"); return 0xff; }
-READ8_MEMBER(hng64_state::ioport2_r) { logerror("ioport2_r\n"); return 0xff; }
-READ8_MEMBER(hng64_state::ioport3_r) { logerror("ioport3_r\n"); return 0xff; }
-READ8_MEMBER(hng64_state::ioport4_r) { logerror("ioport4_r\n"); return 0xff; }
-READ8_MEMBER(hng64_state::ioport5_r) { logerror("ioport5_r\n"); return 0xff; }
-READ8_MEMBER(hng64_state::ioport6_r) { logerror("ioport6_r\n"); return 0xff; }
-READ8_MEMBER(hng64_state::ioport7_r) { logerror("ioport7_r\n"); return 0xff; }
+// used
+READ8_MEMBER(hng64_state::ioport0_r)
+{
+	logerror("%s: ioport0_r\n", machine().describe_context());
+	return 0x03; // expects 0x03 after writing it to port 0 earlier
+}
 
-WRITE8_MEMBER(hng64_state::ioport0_w) { logerror("ioport0_w %02x\n", data); }
-WRITE8_MEMBER(hng64_state::ioport1_w) { logerror("ioport1_w %02x\n", data); }
-WRITE8_MEMBER(hng64_state::ioport2_w) { logerror("ioport2_w %02x\n", data); }
-WRITE8_MEMBER(hng64_state::ioport3_w) { logerror("ioport3_w %02x\n", data); }
-WRITE8_MEMBER(hng64_state::ioport4_w) { logerror("ioport4_w %02x\n", data); }
-WRITE8_MEMBER(hng64_state::ioport5_w) { logerror("ioport5_w %02x\n", data); }
-WRITE8_MEMBER(hng64_state::ioport6_w) { logerror("ioport6_w %02x\n", data); }
-WRITE8_MEMBER(hng64_state::ioport7_w) { logerror("ioport7_w %02x\n", data); }
+// used
+READ8_MEMBER(hng64_state::ioport1_r)
+{
+	logerror("%s: ioport1_r\n", machine().describe_context());
+	return 0xff;
+}
 
+// used
+WRITE8_MEMBER(hng64_state::ioport0_w)
+{
+	logerror("%s: ioport0_w %02x\n", machine().describe_context(), data);
+}
+
+// used
+WRITE8_MEMBER(hng64_state::ioport1_w)
+{
+	logerror("%s: ioport1_w %02x\n", machine().describe_context(), data);
+}
+
+// used
+WRITE8_MEMBER(hng64_state::ioport3_w)
+{
+	logerror("%s: ioport3_w %02x\n", machine().describe_context(), data);
+}
+
+// used
+WRITE8_MEMBER(hng64_state::ioport7_w)
+{
+	logerror("%s: ioport7_w %02x\n", machine().describe_context(), data);
+}
+
+// check if these are used
+READ8_MEMBER(hng64_state::ioport2_r) { logerror("%s: ioport2_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport3_r) { logerror("%s: ioport3_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport4_r) { logerror("%s: ioport4_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport5_r) { logerror("%s: ioport5_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport6_r) { logerror("%s: ioport6_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport7_r) { logerror("%s: ioport7_r\n", machine().describe_context()); return 0xff; }
+
+WRITE8_MEMBER(hng64_state::ioport2_w) { logerror("%s: ioport2_w %02x\n", machine().describe_context(), data); }
+WRITE8_MEMBER(hng64_state::ioport4_w) { logerror("%s: ioport4_w %02x\n", machine().describe_context(), data); }
+WRITE8_MEMBER(hng64_state::ioport5_w) { logerror("%s: ioport5_w %02x\n", machine().describe_context(), data); }
+WRITE8_MEMBER(hng64_state::ioport6_w) { logerror("%s: ioport6_w %02x\n", machine().describe_context(), data); }
 
 MACHINE_CONFIG_START(hng64_state::hng64)
 	/* basic machine hardware */
