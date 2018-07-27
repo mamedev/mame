@@ -208,7 +208,7 @@ uint32_t galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind
 			float s_ratio = 256.0f / 196.0f;
 
 			float sx = x * s_ratio;
-			if ((int)(sx + 0.5f) > cliprect.right())
+			if (int(sx + 0.5f) > cliprect.right())
 				break;
 
 			// copy the S2636 bitmap into the main bitmap and check collision
@@ -217,11 +217,11 @@ uint32_t galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
 				// S2636 vs. background collision detection
-				if ((m_temp_bitmap.pix16(y, (int)(sx)) | m_temp_bitmap.pix16(y, (int)(sx + 0.5f))) & 1)
+				if ((m_temp_bitmap.pix16(y, int(sx)) | m_temp_bitmap.pix16(y, int(sx + 0.5f))) & 1)
 					m_collision_register |= 0x01;
 
-				bitmap.pix16(y, (int)(sx)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
-				bitmap.pix16(y, (int)(sx + 0.5f)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
+				bitmap.pix16(y, int(sx)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
+				bitmap.pix16(y, int(sx + 0.5f)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
 			}
 		}
 	}

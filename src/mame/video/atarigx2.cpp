@@ -184,7 +184,7 @@ uint32_t atarigx2_state::screen_update_atarigx2(screen_device &screen, bitmap_in
 		bitmap_ind16 &mo_bitmap = m_rle->vram(0);
 		int left    = cliprect.left();
 		int top     = cliprect.top();
-		int right   = cliprect.left() + 1;
+		int right   = cliprect.right() + 1;
 		int bottom  = cliprect.bottom() + 1;
 		int x, y;
 

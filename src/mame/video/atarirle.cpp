@@ -97,11 +97,10 @@ WRITE8_MEMBER(atari_rle_objects_device::control_write)
 	if ((oldbits & ATARIRLE_CONTROL_ERASE) != 0)
 	{
 		// compute the top and bottom of the rect
-		rectangle cliprect = m_cliprect;
-		if (m_partial_scanline + 1 > cliprect.min_y)
-			cliprect.min_y = m_partial_scanline + 1;
-		if (scanline < cliprect.max_y)
-			cliprect.max_y = scanline;
+		rectangle cliprect(m_cliprect);
+		cliprect.sety(
+				(std::max)(cliprect.top(), m_partial_scanline + 1),
+				(std::min)(cliprect.bottom(), scanline));
 
 		//logerror("  partial erase %d-%d (frame %d)\n", cliprect.top(), cliprect.bottom(), (oldbits & ATARIRLE_CONTROL_FRAME) >> 2);
 
@@ -152,8 +151,7 @@ void atari_rle_objects_device::vblank_callback(screen_device &screen, bool state
 		{
 			// compute top only; bottom is equal to visible_area
 			rectangle cliprect = m_cliprect;
-			if (m_partial_scanline + 1 > cliprect.min_y)
-				cliprect.min_y = m_partial_scanline + 1;
+			cliprect.sety((std::max)(cliprect.top(), m_partial_scanline + 1), cliprect.bottom());
 
 			//logerror("  partial erase %d-%d (frame %d)\n", cliprect.top(), cliprect.bottom(), (m_control_bits & ATARIRLE_CONTROL_FRAME) >> 2);
 

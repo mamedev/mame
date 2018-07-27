@@ -185,7 +185,7 @@ void atari_motion_objects_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 				bandclip.min_y -= m_bitmapheight;
 
 			// maximum Y is based on the minimum
-			bandclip.max_y = bandclip.min_y + (1 << m_slipshift) - 1;
+			bandclip.set_height(1 << m_slipshift);
 
 			// keep within the cliprect
 			bandclip &= cliprect;
