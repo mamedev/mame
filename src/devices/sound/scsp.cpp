@@ -215,7 +215,8 @@ void scsp_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_main_irq_cb.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 2, 2, (int)m_rate); // Stereo output with EXTS0,1 (External digital audio output)
+	// Stereo output with EXTS0,1 Input (External digital audio output)
+	m_stream = machine().sound().stream_alloc(*this, 2, 2, (int)m_rate);
 }
 
 //-------------------------------------------------
