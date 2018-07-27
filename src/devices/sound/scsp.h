@@ -24,9 +24,6 @@
 #define MCFG_SCSP_MAIN_IRQ_CB(_devcb) \
 	downcast<scsp_device &>(*device).set_main_irq_callback(DEVCB_##_devcb);
 
-#define MCFG_SCSP_EXTS_CB(_devcb) \
-	downcast<scsp_device &>(*device).set_exts_callback(DEVCB_##_devcb);
-
 
 class scsp_device : public device_t,
 					public device_sound_interface
@@ -37,7 +34,6 @@ public:
 	void set_roffset(int roffset) { m_roffset = roffset; }
 	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_main_irq_callback(Object &&cb) { return m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_exts_callback(Object &&cb) { return m_exts_cb.set_callback(std::forward<Object>(cb)); }
 
 	// SCSP register access
 	DECLARE_READ16_MEMBER( read );
@@ -52,6 +48,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -104,10 +101,10 @@ private:
 		int16_t Prev;  //Previous sample (for interpolation)
 	};
 
+	double m_rate;
 	int m_roffset;                /* offset in the region */
 	devcb_write8       m_irq_cb;  /* irq callback */
 	devcb_write_line   m_main_irq_cb;
-	devcb_read16       m_exts_cb;
 
 	union
 	{
@@ -127,8 +124,8 @@ private:
 	char m_Master;
 	sound_stream * m_stream;
 
-	std::unique_ptr<int32_t[]> m_buffertmpl;
-	std::unique_ptr<int32_t[]> m_buffertmpr;
+	std::vector<int32_t> m_buffertmpl;
+	std::vector<int32_t> m_buffertmpr;
 
 	uint32_t m_IrqTimA;
 	uint32_t m_IrqTimBC;
@@ -168,6 +165,10 @@ private:
 
 	stream_sample_t *m_bufferl;
 	stream_sample_t *m_bufferr;
+	stream_sample_t *m_exts0;
+	stream_sample_t *m_exts1;
+
+	int16_t m_exts_r[2];
 
 	int m_length;
 
@@ -197,6 +198,7 @@ private:
 	void StartSlot(SCSP_SLOT *slot);
 	void StopSlot(SCSP_SLOT *slot, int keyoff);
 	void init();
+	void ClockChange();
 	void UpdateSlotReg(int s, int r);
 	void UpdateReg(address_space &space, int reg);
 	void UpdateSlotRegR(int slot, int reg);

@@ -30,9 +30,11 @@
     * June 6, 2011       (AS) Rewrote DMA from scratch, Darius 2 relies on it.
 */
 
+// TODO : Envelope/LFO times are based on 44100Hz case?
 #include "emu.h"
 #include "scsp.h"
 
+#include <algorithm>
 
 #define ICLIP16(x) (x<-32768)?-32768:((x>32767)?32767:x)
 
@@ -145,17 +147,15 @@ DEFINE_DEVICE_TYPE(SCSP, scsp_device, "scsp", "YMF292-F SCSP")
 scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SCSP, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
+		m_rate(44100.0),
 		m_roffset(0),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
-		m_exts_cb(*this),
 		m_BUFPTR(0),
 		m_SCSPRAM(nullptr),
 		m_SCSPRAM_LENGTH(0),
 		m_Master(0),
 		m_stream(nullptr),
-		m_buffertmpl(nullptr),
-		m_buffertmpr(nullptr),
 		m_IrqTimA(0),
 		m_IrqTimBC(0),
 		m_IrqMidi(0),
@@ -170,25 +170,29 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 		m_mcipd(0),
 		m_bufferl(nullptr),
 		m_bufferr(nullptr),
+		m_exts0(nullptr),
+		m_exts1(nullptr),
 		m_length(0),
 		m_RBUFDST(nullptr)
 {
-	memset(m_RINGBUF, 0, sizeof(m_RINGBUF));
-	memset(m_MidiStack, 0, sizeof(m_MidiStack));
-	memset(m_LPANTABLE, 0, sizeof(m_LPANTABLE));
-	memset(m_RPANTABLE, 0, sizeof(m_RPANTABLE));
-	memset(m_TimPris, 0, sizeof(m_TimPris));
-	memset(m_ARTABLE, 0, sizeof(m_ARTABLE));
-	memset(m_DRTABLE, 0, sizeof(m_DRTABLE));
-	memset(m_EG_TABLE, 0, sizeof(m_EG_TABLE));
-	memset(m_PLFO_TRI, 0, sizeof(m_PLFO_TRI));
-	memset(m_PLFO_SQR, 0, sizeof(m_PLFO_SQR));
-	memset(m_PLFO_SAW, 0, sizeof(m_PLFO_SAW));
-	memset(m_PLFO_NOI, 0, sizeof(m_PLFO_NOI));
-	memset(m_ALFO_TRI, 0, sizeof(m_ALFO_TRI));
-	memset(m_ALFO_SQR, 0, sizeof(m_ALFO_SQR));
-	memset(m_ALFO_SAW, 0, sizeof(m_ALFO_SAW));
-	memset(m_ALFO_NOI, 0, sizeof(m_ALFO_NOI));
+	std::fill(std::begin(m_exts_r), std::end(m_exts_r), 0);
+	std::fill(std::begin(m_RINGBUF), std::end(m_RINGBUF), 0);
+	std::fill(std::begin(m_MidiStack), std::end(m_MidiStack), 0);
+	std::fill(std::begin(m_LPANTABLE), std::end(m_LPANTABLE), 0);
+	std::fill(std::begin(m_RPANTABLE), std::end(m_RPANTABLE), 0);
+	std::fill(std::begin(m_TimPris), std::end(m_TimPris), 0);
+	std::fill(std::begin(m_ARTABLE), std::end(m_ARTABLE), 0);
+	std::fill(std::begin(m_DRTABLE), std::end(m_DRTABLE), 0);
+	std::fill(std::begin(m_EG_TABLE), std::end(m_EG_TABLE), 0);
+	std::fill(std::begin(m_PLFO_TRI), std::end(m_PLFO_TRI), 0);
+	std::fill(std::begin(m_PLFO_SQR), std::end(m_PLFO_SQR), 0);
+	std::fill(std::begin(m_PLFO_SAW), std::end(m_PLFO_SAW), 0);
+	std::fill(std::begin(m_PLFO_NOI), std::end(m_PLFO_NOI), 0);
+	std::fill(std::begin(m_ALFO_TRI), std::end(m_ALFO_TRI), 0);
+	std::fill(std::begin(m_ALFO_SQR), std::end(m_ALFO_SQR), 0);
+	std::fill(std::begin(m_ALFO_SAW), std::end(m_ALFO_SAW), 0);
+	std::fill(std::begin(m_ALFO_NOI), std::end(m_ALFO_NOI), 0);
+	std::fill(std::begin(m_ALFO_NOI), std::end(m_ALFO_NOI), 0);
 	memset(m_PSCALES, 0, sizeof(m_PSCALES));
 	memset(m_ASCALES, 0, sizeof(m_ASCALES));
 	memset(&m_Slots, 0, sizeof(m_Slots));
@@ -210,9 +214,19 @@ void scsp_device::device_start()
 	// set up the IRQ callbacks
 	m_irq_cb.resolve_safe();
 	m_main_irq_cb.resolve_safe();
-	m_exts_cb.resolve_safe(0);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
+	m_stream = machine().sound().stream_alloc(*this, 2, 2, (int)m_rate); // Stereo output with EXTS0,1 (External digital audio output)
+}
+
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void scsp_device::device_clock_changed()
+{
+	ClockChange();
+	m_stream->set_sample_rate((int)m_rate);
 }
 
 //-------------------------------------------------
@@ -221,6 +235,8 @@ void scsp_device::device_start()
 
 void scsp_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	m_exts0 = inputs[0];
+	m_exts1 = inputs[1];
 	m_bufferl = outputs[0];
 	m_bufferr = outputs[1];
 	m_length = samples;
@@ -592,24 +608,7 @@ void scsp_device::init()
 
 	m_ARTABLE[0]=m_DRTABLE[0]=0;    //Infinite time
 	m_ARTABLE[1]=m_DRTABLE[1]=0;    //Infinite time
-	for(i=2;i<64;++i)
-	{
-		double t,step,scale;
-		t=ARTimes[i];   //In ms
-		if(t!=0.0)
-		{
-			step=(1023*1000.0)/( double(clock())*t);
-			scale=(double) (1<<EG_SHIFT);
-			m_ARTABLE[i]=(int) (step*scale);
-		}
-		else
-			m_ARTABLE[i]=1024<<EG_SHIFT;
-
-		t=DRTimes[i];   //In ms
-		step=(1023*1000.0)/( double(clock())*t);
-		scale=(double) (1<<EG_SHIFT);
-		m_DRTABLE[i]=(int) (step*scale);
-	}
+	ClockChange();
 
 	// make sure all the slots are off
 	for(i=0;i<32;++i)
@@ -621,14 +620,37 @@ void scsp_device::init()
 	}
 
 	LFO_Init();
-	m_buffertmpl=make_unique_clear<int32_t[]>(clock());
-	m_buffertmpr=make_unique_clear<int32_t[]>(clock());
-
 	// no "pend"
 	m_udata.data[0x20/2] = 0;
 	m_TimCnt[0] = 0xffff;
 	m_TimCnt[1] = 0xffff;
 	m_TimCnt[2] = 0xffff;
+}
+
+void scsp_device::ClockChange()
+{
+	m_rate = ((double)clock()) / 512.0;
+	for(int i=2;i<64;++i)
+	{
+		double t,step,scale;
+		t=ARTimes[i];   //In ms
+		if(t!=0.0)
+		{
+			step=(1023*1000.0)/( double(m_rate)*t);
+			scale=(double) (1<<EG_SHIFT);
+			m_ARTABLE[i]=(int) (step*scale);
+		}
+		else
+			m_ARTABLE[i]=1024<<EG_SHIFT;
+
+		t=DRTimes[i];   //In ms
+		step=(1023*1000.0)/( double(m_rate)*t);
+		scale=(double) (1<<EG_SHIFT);
+		m_DRTABLE[i]=(int) (step*scale);
+	}
+
+	m_buffertmpl.resize((int)m_rate, 0);
+	m_buffertmpr.resize((int)m_rate, 0);
 }
 
 void scsp_device::UpdateSlotReg(int s,int r)
@@ -737,7 +759,7 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 					time = (clock() / m_TimPris[0]) / (255-(m_udata.data[0x18/2]&0xff));
 					if (time)
 					{
-						m_timerA->adjust(attotime::from_hz(time));
+						m_timerA->adjust(attotime::from_ticks(512, time));
 					}
 				}
 			}
@@ -756,7 +778,7 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 					time = (clock() / m_TimPris[1]) / (255-(m_udata.data[0x1A/2]&0xff));
 					if (time)
 					{
-						m_timerB->adjust(attotime::from_hz(time));
+						m_timerB->adjust(attotime::from_ticks(512, time));
 					}
 				}
 			}
@@ -775,7 +797,7 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 					time = (clock() / m_TimPris[2]) / (255-(m_udata.data[0x1C/2]&0xff));
 					if (time)
 					{
-						m_timerC->adjust(attotime::from_hz(time));
+						m_timerC->adjust(attotime::from_ticks(512, time));
 					}
 				}
 			}
@@ -1056,9 +1078,9 @@ unsigned short scsp_device::r16(address_space &space, unsigned int addr)
 			*/
 			logerror("SCSP: Reading from EXTS register %08x\n",addr);
 			if(addr == 0xee0)
-				v = m_exts_cb(0);
+				v = m_exts_r[0];
 			if(addr == 0xee2)
-				v = m_exts_cb(1);
+				v = m_exts_r[1];
 		}
 	}
 	return v;
@@ -1229,10 +1251,13 @@ inline int32_t scsp_device::UpdateSlot(SCSP_SLOT *slot)
 void scsp_device::DoMasterSamples(int nsamples)
 {
 	stream_sample_t *bufr,*bufl;
+	stream_sample_t *exts[2];
 	int sl, s, i;
 
 	bufr=m_bufferr;
 	bufl=m_bufferl;
+	exts[0]=m_exts0;
+	exts[1]=m_exts1;
 
 	for(s=0;s<nsamples;++s)
 	{
@@ -1285,6 +1310,18 @@ void scsp_device::DoMasterSamples(int nsamples)
 				unsigned short Enc=((EFPAN(slot))<<0x8)|((EFSDL(slot))<<0xd);
 				smpl+=(m_DSP.EFREG[i]*m_LPANTABLE[Enc])>>SHIFT;
 				smpr+=(m_DSP.EFREG[i]*m_RPANTABLE[Enc])>>SHIFT;
+			}
+		}
+
+		for(i=0;i<2;++i)
+		{
+			SCSP_SLOT *slot=m_Slots+i+16; // 100217, 100237 EFSDL, EFPAN for EXTS0/1
+			if(EFSDL(slot))
+			{
+				m_exts_r[i] = exts[i][s];
+				unsigned short Enc=((EFPAN(slot))<<0x8)|((EFSDL(slot))<<0xd);
+				smpl+=(m_exts_r[i]*m_LPANTABLE[Enc])>>SHIFT;
+				smpr+=(m_exts_r[i]*m_RPANTABLE[Enc])>>SHIFT;
 			}
 		}
 
@@ -1376,7 +1413,7 @@ void scsp_device::exec_dma(address_space &space)
 	if(m_udata.data[0x1e/2] & 0x10)
 	{
 		popmessage("SCSP DMA IRQ triggered, contact MAMEdev");
-		machine().device("audiocpu")->execute().set_input_line(DecodeSCI(SCIDMA),HOLD_LINE);
+		m_irq_cb(DecodeSCI(SCIDMA),HOLD_LINE);
 	}
 }
 
@@ -1549,7 +1586,7 @@ signed int scsp_device::ALFO_Step(SCSP_LFO_t *LFO)
 
 void scsp_device::LFO_ComputeStep(SCSP_LFO_t *LFO,uint32_t LFOF,uint32_t LFOWS,uint32_t LFOS,int ALFO)
 {
-	float step=(float) LFOFreq[LFOF]*256.0f/float(clock());
+	float step=(float) LFOFreq[LFOF]*256.0f/float(m_rate);
 	LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);
 	if(ALFO)
 	{
