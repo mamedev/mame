@@ -720,11 +720,11 @@ void vgmplay_device::execute_run()
 				pulse_act_led(LED_AY8910);
 				uint8_t reg = m_file->read_byte(m_pc+1);
 				if(reg & 0x80) {
-					m_io->write_byte(A_AY8910A+1, reg & 0x7f);
-					m_io->write_byte(A_AY8910A+0, m_file->read_byte(m_pc+2));
-				} else {
 					m_io->write_byte(A_AY8910B+1, reg & 0x7f);
 					m_io->write_byte(A_AY8910B+0, m_file->read_byte(m_pc+2));
+				} else {
+					m_io->write_byte(A_AY8910A+1, reg & 0x7f);
+					m_io->write_byte(A_AY8910A+0, m_file->read_byte(m_pc+2));
 				}
 				m_pc += 3;
 				break;
@@ -792,9 +792,9 @@ void vgmplay_device::execute_run()
 				pulse_act_led(LED_POKEY);
 				uint8_t offset = m_file->read_byte(m_pc+1);
 				if (offset & 0x80)
-					m_io->write_byte(A_POKEYA + (offset & 0x7f), m_file->read_byte(m_pc+2));
-				else
 					m_io->write_byte(A_POKEYB + (offset & 0x7f), m_file->read_byte(m_pc+2));
+				else
+					m_io->write_byte(A_POKEYA + (offset & 0x7f), m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 			}
@@ -1419,12 +1419,23 @@ uint8_t vgmplay_state::r8(int off) const
 	return 0;
 }
 
+static const ay8910_device::psg_type_t vgm_ay8910_type(uint8_t vgm_type)
+{
+	return (vgm_type & 0x10) ? ay8910_device::PSG_TYPE_YM : ay8910_device::PSG_TYPE_AY;
+}
+
+static const uint8_t vgm_ay8910_flags(uint8_t vgm_flags)
+{
+	uint8_t flags = 0;
+	if (vgm_flags & 1) flags |= AY8910_LEGACY_OUTPUT;
+	if (vgm_flags & 2) flags |= AY8910_SINGLE_OUTPUT;
+	if (vgm_flags & 4) flags |= AY8910_DISCRETE_OUTPUT;
+	return flags;
+}
+
 QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 {
-	// Disable executing devices if not required
-	m_pokey[0]->set_unscaled_clock(0);
-	m_pokey[1]->set_unscaled_clock(0);
-	m_qsound->set_unscaled_clock(0);
+	m_vgmplay->stop();
 
 	m_file_data.resize(quickload_size);
 
@@ -1495,188 +1506,157 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		if (version >= 0x150 && r32(0x34))
 			data_start = r32(0x34) + 0x34;
 
+		if (data_start < header_size)
+			logerror("Warning: data starts within header\n");
+
 		// Parse clocks
-		if(r32(0x0c))
-			m_sn76496->set_unscaled_clock(r32(0x0c));
-		if(r32(0x10))
-			m_ym2413->set_unscaled_clock(r32(0x10));
-		if(version >= 0x110 && r32(0x2c))
-			m_ym2612->set_unscaled_clock(r32(0x2c));
-		if(version >= 0x110 && r32(0x30))
-			m_ym2151->set_unscaled_clock(r32(0x30));
+		m_sn76496->set_unscaled_clock(r32(0x0c) & ~0xc0000000);
+		if (r32(0x0c) & 0xc0000000)
+			logerror("Warning: file requests an unsupported %s\n", r32(0x0c) & 0x80000000 ? "Y6W28" : "2nd SN76496");
 
-		if(version >= 0x151 && r32(0x38))
-			m_segapcm->set_unscaled_clock(r32(0x38));
+		m_ym2413->set_unscaled_clock(r32(0x10) & ~0x40000000);
+		if (r32(0x10) & 0x40000000)
+			logerror("Warning: file requests an unsupported 2nd YM2413\n");
 
-		if(version >= 0x151 && r32(0x3c))
-			m_segapcm->set_bank(r32(0x3c));
+		m_ym2612->set_unscaled_clock((version >= 0x110 ? r32(0x2c) : r32(0x10)) & ~0x40000000);
+		if (version >= 0x110 && (r32(0x2c) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd YM2612\n");
 
-		if (data_start > 0x40)
-		{
-			if(version >= 0x151 && r32(0x40))
-				m_rf5c68->set_unscaled_clock(r32(0x40));
-			if(version >= 0x151 && r32(0x44)) {
-				uint32_t clock = r32(0x44);
-				m_ym2203[0]->set_unscaled_clock(clock & ~0x40000000);
-				if (clock & 0x40000000)
-				{
-					clock &= ~0x40000000;
-					m_ym2203[1]->set_unscaled_clock(clock);
-				}
-			}
-			if(version >= 0x151 && r32(0x48))
-				m_ym2608->set_unscaled_clock(r32(0x48));
-			if(version >= 0x151 && r32(0x4c))
-				logerror("Warning: file requests an unsupported %s\n", r32(0x4c) & 0x80000000 ? "YM2610B" : "YM2610");
-			if(version >= 0x151 && r32(0x50)) {
-				m_ym3812->set_unscaled_clock(r32(0x50));
-			}
-			if(version >= 0x151 && r32(0x54)) {
-				m_ym3526->set_unscaled_clock(r32(0x54));
-			}
-			if(version >= 0x151 && r32(0x58))
-				logerror("Warning: file requests an unsupported Y8950\n");
-			if(version >= 0x151 && r32(0x5c))
-				logerror("Warning: file requests an unsupported YMF262\n");
-			if(version >= 0x151 && r32(0x60))
-				logerror("Warning: file requests an unsupported YMF278B\n");
-			if(version >= 0x151 && r32(0x64)) {
-				m_ymf271->set_unscaled_clock(r32(0x64));
-			}
-			if(version >= 0x151 && r32(0x68)) {
-				m_ymz280b->set_unscaled_clock(r32(0x68));
-			}
-			if(version >= 0x151 && r32(0x6c))
-				m_rf5c164->set_unscaled_clock(r32(0x6c));
-			if(version >= 0x151 && r32(0x70))
-				logerror("Warning: file requests an unsupported PWM\n");
-			if(version >= 0x151 && r32(0x74)) {
-				uint32_t clock = r32(0x74);
-				m_ay8910[0]->set_unscaled_clock(clock & ~0x40000000);
-				if (clock & 0x40000000) {
-					clock &= ~0x40000000;
-					m_ay8910[1]->set_unscaled_clock(clock);
-				}
-			}
-			if(version >= 0x151 && r8(0x78)) {
-				uint8_t type = r8(0x78);
-				if (type & 0x10)
-				{
-					m_ay8910[0]->set_psg_type(ay8910_device::PSG_TYPE_YM);
-					m_ay8910[1]->set_psg_type(ay8910_device::PSG_TYPE_YM);
-				}
-			}
-			if(version >= 0x151 && r8(0x79)) {
-				uint8_t flags = r8(0x79);
-				uint8_t to_set = 0;
-				if (flags & 1)
-					to_set |= AY8910_LEGACY_OUTPUT;
-				if (flags & 2)
-					to_set |= AY8910_SINGLE_OUTPUT;
-				if (flags & 4)
-					to_set |= AY8910_DISCRETE_OUTPUT;
-				m_ay8910[0]->set_flags(to_set);
-				m_ay8910[1]->set_flags(to_set);
-			}
-			if(version >= 0x151 && r8(0x7a)) {
-				uint8_t flags = r8(0x7a);
-				uint8_t to_set = 0;
-				if (flags & 1)
-					to_set |= AY8910_LEGACY_OUTPUT;
-				if (flags & 2)
-					to_set |= AY8910_SINGLE_OUTPUT;
-				if (flags & 4)
-					to_set |= AY8910_DISCRETE_OUTPUT;
-				m_ym2203[0]->set_flags(to_set);
-				m_ym2203[1]->set_flags(to_set);
-			}
-		}
+		m_ym2151->set_unscaled_clock((version >= 0x110 ? r32(0x30) : r32(0x10)) & ~0x40000000);
+		if (version >= 0x110 && (r32(0x30) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd YM2151\n");
 
-		if (data_start > 0x80)
-		{
-			if(version >= 0x161 && r32(0x80)) {
-				m_dmg->set_unscaled_clock(r32(0x80));
-			}
-			if(version >= 0x161 && r32(0x84)) {
-				m_nescpu->set_unscaled_clock(r32(0x84));
-				m_nescpu->m_apu->set_unscaled_clock(r32(0x84));
-			}
-			if(version >= 0x161 && r32(0x88)) {
-				uint32_t clock = r32(0x88);
-				m_multipcm[0]->set_unscaled_clock(clock & ~0x40000000);
-				if (clock & 0x40000000) {
-					clock &= ~0x40000000;
-					m_multipcm[1]->set_unscaled_clock(clock);
-				}
-			}
-			if(version >= 0x161 && r8(0x95)) {
-				m_k054539[0]->init_flags(r8(0x95));
-				m_k054539[1]->init_flags(r8(0x95));
-			}
-			if(version >= 0x161 && r32(0x98)) {
-				m_okim6295_clock[0] = r32(0x98);
-				m_okim6295_pin7[0] = 0;
-				if (m_okim6295_clock[0] & 0x80000000) {
-					m_okim6295_clock[0] &= ~0x80000000;
-					m_okim6295_pin7[0] = 1;
-				}
-				m_okim6295[0]->config_pin7(m_okim6295_pin7[0] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW); // FIXME: no guarantee this device hasn't started yet - may be better to wait for it to start then use set_pin7
-				m_okim6295[0]->set_unscaled_clock(m_okim6295_clock[0] & ~0xc0000000);
-				if (m_okim6295_clock[0] & 0x40000000) {
-					m_okim6295_clock[0] &= ~0x40000000;
-					m_okim6295_clock[1] = m_okim6295_clock[0];
-					m_okim6295_pin7[1] = m_okim6295_pin7[0];
-					m_okim6295[1]->config_pin7(m_okim6295_pin7[1] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW); // FIXME: no guarantee this device hasn't started yet - may be better to wait for it to start then use set_pin7
-					m_okim6295[1]->set_unscaled_clock(m_okim6295_clock[1]);
-				}
-			}
-			if(version >= 0x161 && r32(0x9c)) {
-				m_k051649->set_unscaled_clock(r32(0x9c));
-			}
-			if(version >= 0x161 && r32(0xa0)) {
-				uint32_t clock = r32(0xa0);
-				m_k054539[0]->set_unscaled_clock(clock & ~0x40000000);
-				if (clock & 0x40000000) {
-					clock &= ~0x40000000;
-					m_k054539[1]->set_unscaled_clock(clock);
-				}
-			}
-			if(version >= 0x161 && r32(0xac)) {
-				m_k053260->set_unscaled_clock(r32(0xac));
-			}
-			if(version >= 0x161 && r32(0xa4)) {
-				m_c6280->set_unscaled_clock(r32(0xa4));
-			}
-			if(version >= 0x161 && r32(0xb0)) {
-				uint32_t clock = r32(0xb0);
-				m_pokey[0]->set_unscaled_clock(clock & ~0x40000000);
-				if (clock & 0x40000000) {
-					clock &= ~0x40000000;
-					m_pokey[1]->set_unscaled_clock(clock);
-				}
-			}
-			if(version >= 0x161 && r32(0xb4)) {
-				m_qsound->set_unscaled_clock(r32(0xb4) * 15); // * 15 multipler for correct pitch
-			}
-		}
+		m_segapcm->set_unscaled_clock(version >= 0x151 ? r32(0x38) : 0);
+		m_segapcm->set_bank(version >= 0x151 ? r32(0x3c) : 0);
 
-		if (data_start > 0xc0)
-		{
-			if(version >= 0x171 && r8(0xd6)) {
-				m_c352->set_divider(r8(0xd6) * 4);
-			}
-			if(version >= 0x171 && r32(0xd8)) {
-				m_x1_010->set_unscaled_clock(r32(0xd8));
-			}
-			if(version >= 0x171 && r32(0xdc)) {
-				m_c352->set_unscaled_clock(r32(0xdc));
-			}
-			if(version >= 0x171 && r32(0xe0)) {
-				m_ga20->set_unscaled_clock(r32(0xe0));
-			}
-		}
+		m_rf5c68->set_unscaled_clock(version >= 0x151 ? r32(0x40) : 0);
+		m_ym2203[0]->set_unscaled_clock(version >= 0x151 ? r32(0x44) & ~0x40000000 : 0);
+		m_ym2203[1]->set_unscaled_clock(version >= 0x151 && (r32(0x44) & 0x40000000) ? r32(0x44) & ~0x40000000 : 0);
+		m_ym2608->set_unscaled_clock(version >= 0x151 ? r32(0x48) & ~0x40000000 : 0);
+		if (version >= 0x151 && (r32(0x48) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd YM2608\n");
 
-		m_vgmplay->reset();
+		if (version >= 0x151 && r32(0x4c))
+			logerror("Warning: file requests an unsupported %s\n", r32(0x4c) & 0x80000000 ? "YM2610B" : "YM2610");
+
+		m_ym3812->set_unscaled_clock(version >= 0x151 ? r32(0x50) & ~0x40000000 : 0);
+		if (version >= 0x151 && (r32(0x50) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd YM3812\n");
+
+		m_ym3526->set_unscaled_clock(version >= 0x151 ? r32(0x54) & ~0x40000000 : 0);
+		if (version >= 0x151 && (r32(0x54) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd YM3526\n");
+
+		if(version >= 0x151 && r32(0x58))
+			logerror("Warning: file requests an unsupported Y8950\n");
+		if(version >= 0x151 && r32(0x5c))
+			logerror("Warning: file requests an unsupported YMF262\n");
+		if(version >= 0x151 && r32(0x60))
+			logerror("Warning: file requests an unsupported YMF278B\n");
+
+		m_ymf271->set_unscaled_clock(version >= 0x151 ? r32(0x64) & ~0x40000000 : 0);
+		if (version >= 0x151 && (r32(0x64) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd YMF271\n");
+
+		m_ymz280b->set_unscaled_clock(version >= 0x151 ? r32(0x68) & ~0x40000000 : 0);
+		if (version >= 0x151 && (r32(0x68) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd YMZ280B\n");
+
+		m_rf5c164->set_unscaled_clock(version >= 0x151 ? r32(0x6c) : 0);
+
+		if(version >= 0x151 && r32(0x70))
+			logerror("Warning: file requests an unsupported PWM\n");
+
+		m_ay8910[0]->set_unscaled_clock(version >= 0x151 ? r32(0x74) & ~0x40000000 : 0);
+		m_ay8910[1]->set_unscaled_clock(version >= 0x151 && (r32(0x74) & 0x40000000) ? r32(0x74) & ~0x40000000 : 0);
+		m_ay8910[0]->set_psg_type(vgm_ay8910_type(version >= 0x151 ? r8(0x78) : 0));
+		m_ay8910[1]->set_psg_type(vgm_ay8910_type(version >= 0x151 ? r8(0x78) : 0));
+		m_ay8910[0]->set_flags(vgm_ay8910_flags(version >= 0x151 ? r8(0x79) : 0));
+		m_ay8910[1]->set_flags(vgm_ay8910_flags(version >= 0x151 ? r8(0x79) : 0));
+		m_ym2203[0]->set_flags(vgm_ay8910_flags(version >= 0x151 ? r8(0x7a) : 0));
+		m_ym2203[1]->set_flags(vgm_ay8910_flags(version >= 0x151 ? r8(0x7a) : 0));
+		m_ym2608->set_flags(vgm_ay8910_flags(version >= 0x151 ? r8(0x7b) : 0));
+
+		m_dmg->set_unscaled_clock(version >= 0x161 ? r32(0x80) & ~0x40000000 : 0);
+		if (version >= 0x161 && (r32(0x80) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd DMG\n");
+
+		m_nescpu->set_unscaled_clock(version >= 0x161 ? r32(0x84) & ~0x40000000 : 0);
+		m_nescpu->m_apu->set_unscaled_clock(version >= 0x161 ? r32(0x84) & ~0x40000000 : 0);
+		if (version >= 0x161 && (r32(0x84) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd NES APU\n");
+
+		m_multipcm[0]->set_unscaled_clock(version >= 0x161 ? r32(0x88) & ~0x40000000 : 0);
+		m_multipcm[1]->set_unscaled_clock(version >= 0x161 && (r32(0x88) & 0x40000000) ? r32(0x88) & ~0x40000000 : 0);
+
+		if (version >= 0x161 && r32(0x8c))
+			logerror("Warning: file requests an unsupported uPD7759\n");
+		if (version >= 0x161 && r32(0x90))
+			logerror("Warning: file requests an unsupported OKIM6258\n");
+
+		m_k054539[0]->init_flags(version >= 0x161 ? r8(0x95) : 0);
+		m_k054539[1]->init_flags(version >= 0x161 ? r8(0x95) : 0);
+
+		m_okim6295_clock[0] = version >= 0x161 ? r32(0x98) & 0xc0000000 : 0;
+		m_okim6295_clock[1] = version >= 0x161 && (r32(0x98) & 0x40000000) ? r32(0x98) & 0xc0000000 : 0;
+		m_okim6295[0]->set_unscaled_clock(m_okim6295_clock[0]);
+		m_okim6295[1]->set_unscaled_clock(m_okim6295_clock[1]);
+
+		m_okim6295_pin7[0] = version >= 0x161 && (r32(0x98) & 0x80000000) ? 1 : 0;
+		m_okim6295_pin7[1] = version >= 0x161 && (r32(0x98) & 0x40000000) && (r32(0x98) & 0x80000000) ? 1 : 0;
+		m_okim6295[0]->set_pin7(m_okim6295_pin7[0] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
+		m_okim6295[1]->set_pin7(m_okim6295_pin7[1] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
+
+		m_k051649->set_unscaled_clock(version >= 0x161 ? r32(0x9c) & ~0x40000000 : 0);
+		if (version >= 0x161 && (r32(0x9c) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd K051649\n");
+
+		m_k054539[0]->set_unscaled_clock(version >= 0x161 ? r32(0xa0) & ~0x40000000 : 0);
+		m_k054539[1]->set_unscaled_clock(version >= 0x161 && (r32(0xa0) & 0x40000000) ? r32(0xa0) & ~0x40000000 : 0);
+
+		m_c6280->set_unscaled_clock(version >= 0x161 ? r32(0xa4) & ~0x40000000 : 0);
+		if (version >= 0x161 && (r32(0xa4) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd C6280\n");
+
+		if (version >= 0x161 && r32(0x90))
+			logerror("Warning: file requests an unsupported C140\n");
+
+		m_k053260->set_unscaled_clock(version >= 0x161 ? r32(0xac) & ~0x40000000 : 0);
+		if (version >= 0x161 && (r32(0xac) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd K053260\n");
+
+		m_pokey[0]->set_unscaled_clock(version >= 0x161 ? r32(0xb0) & ~0x40000000 : 0);
+		m_pokey[1]->set_unscaled_clock(version >= 0x161 && (r32(0xb0) & 0x40000000) ? r32(0xb0) & ~0x40000000 : 0);
+		m_qsound->set_unscaled_clock(version >= 0x161 ? r32(0xb4) * 15 : 0); // * 15 multipler for correct pitch
+
+		if (version >= 0x151 && r32(0xb8))
+			logerror("Warning: file requests an unsupported SCSP\n");
+		if (version >= 0x151 && r32(0xc0))
+			logerror("Warning: file requests an unsupported WonderSwan\n");
+		if (version >= 0x151 && r32(0xc4))
+			logerror("Warning: file requests an unsupported VSU\n");
+		if (version >= 0x151 && r32(0xc8))
+			logerror("Warning: file requests an unsupported SAA1099\n");
+		if (version >= 0x151 && r32(0xcc))
+			logerror("Warning: file requests an unsupported ES5503\n");
+		if (version >= 0x151 && r32(0xd0))
+			logerror("Warning: file requests an unsupported %s\n", r32(0xd0) & 0x80000000 ? "ES5506" : "ES5505");
+
+		m_c352->set_divider(version >= 0x171 && r8(0xd6) ? r8(0xd6) * 4 : 1);
+
+		m_x1_010->set_unscaled_clock(version >= 0x171 ? r32(0xd8) & ~0x40000000 : 0);
+		if (version >= 0x171 && (r32(0xd8) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd X1-010\n");
+
+		m_c352->set_unscaled_clock(version >= 0x171 ? r32(0xdc) & ~0x40000000 : 0);
+		if (version >= 0x171 && (r32(0xd8) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd C352\n");
+
+		m_ga20->set_unscaled_clock(version >= 0x171 ? r32(0xe0) & ~0x40000000 : 0);
+		if (version >= 0x171 && (r32(0xd8) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd GA20\n");
+
+		machine().schedule_soft_reset();
 
 		return image_init_result::PASS;
 	}
@@ -2008,69 +1988,68 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ym2612", YM2612, 7670454)
+	MCFG_DEVICE_ADD("ym2612", YM2612, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("ym2151", YM2151, 3579545)
+	MCFG_DEVICE_ADD("ym2151", YM2151, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ym2413", YM2413, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("sn76496", SN76496, 3579545)
+	MCFG_DEVICE_ADD("sn76496", SN76496, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.5)
 
-	MCFG_DEVICE_ADD("segapcm", SEGAPCM, 4000000)
+	MCFG_DEVICE_ADD("segapcm", SEGAPCM, 0)
 	MCFG_SEGAPCM_BANK(BANK_512) // Should be configurable for yboard...
 	MCFG_DEVICE_ADDRESS_MAP(0, segapcm_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("multipcma", MULTIPCM, 8000000)
+	MCFG_DEVICE_ADD("multipcma", MULTIPCM, 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, multipcma_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("multipcmb", MULTIPCM, 8000000)
+	MCFG_DEVICE_ADD("multipcmb", MULTIPCM, 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, multipcmb_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("dmg", DMG_APU, XTAL(4'194'304))
+	MCFG_DEVICE_ADD("dmg", DMG_APU, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("ay8910a", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay8910a", AY8910, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_DEVICE_ADD("ay8910b", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay8910b", AY8910, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_DEVICE_ADD("ym2203a", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym2203a", YM2203, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_DEVICE_ADD("ym2203b", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym2203b", YM2203, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_DEVICE_ADD("ym3526", YM3526, 4000000)
+	MCFG_DEVICE_ADD("ym3526", YM3526, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_DEVICE_ADD("ym3812", YM3812, 4000000)
+	MCFG_DEVICE_ADD("ym3812", YM3812, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_DEVICE_ADD("nescpu", N2A03, 1000000)
+	MCFG_DEVICE_ADD("nescpu", N2A03, 0)
 	MCFG_DEVICE_PROGRAM_MAP(nescpu_map)
-	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_MODIFY("nescpu:nesapu")
 	MCFG_SOUND_ROUTES_RESET()
@@ -2082,90 +2061,90 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_DEVICE_IO_MAP(h6280_io_map)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_DEVICE_ADD("c6280", C6280, 3579545)
+	MCFG_DEVICE_ADD("c6280", C6280, 0)
 	MCFG_C6280_CPU("h6280")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_K053260_ADD("k053260", 3579545)
+	MCFG_K053260_ADD("k053260", 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("pokeya", POKEY, 1789772)
+	MCFG_DEVICE_ADD("pokeya", POKEY, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_DEVICE_ADD("pokeyb", POKEY, 1789772)
+	MCFG_DEVICE_ADD("pokeyb", POKEY, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_DEVICE_ADD("c352", C352, 1000000, 288)
+	MCFG_DEVICE_ADD("c352", C352, 0, 1)
 	MCFG_DEVICE_ADDRESS_MAP(0, c352_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("okim6295a", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("okim6295a", OKIM6295, 0, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, okim6295a_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_DEVICE_ADD("okim6295b", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("okim6295b", OKIM6295, 0, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, okim6295b_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_DEVICE_ADD("ymf271", YMF271, 16934400)
+	MCFG_DEVICE_ADD("ymf271", YMF271, 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymf271_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("ymz280b", YMZ280B, 16934400)
+	MCFG_DEVICE_ADD("ymz280b", YMZ280B, 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymz280b_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("ym2608", YM2608, 8000000)
+	MCFG_DEVICE_ADD("ym2608", YM2608, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 
-	MCFG_DEVICE_ADD("k054539a", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADD("k054539a", K054539, 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539a_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("k054539b", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADD("k054539b", K054539, 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539b_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_DEVICE_ADD("qsound", QSOUND)
+	MCFG_DEVICE_ADD("qsound", QSOUND, 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, qsound_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_K051649_ADD("k051649", 3579545)
+	MCFG_K051649_ADD("k051649", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	IREMGA20(config, m_ga20, 3579545);
+	IREMGA20(config, m_ga20, 0);
 	m_ga20->set_addrmap(0, &vgmplay_state::ga20_map);
 	m_ga20->add_route(0, "lspeaker", 1);
 	m_ga20->add_route(1, "rspeaker", 1);
 
-	RF5C68(config, m_rf5c68, 12500000);
+	RF5C68(config, m_rf5c68, 0);
 	m_rf5c68->set_addrmap(0, &vgmplay_state::rf5c68_map);
 	m_rf5c68->add_route(0, "lspeaker", 1);
 	m_rf5c68->add_route(1, "rspeaker", 1);
 
-	RF5C68(config, m_rf5c164, 12500000); // TODO : !!RF5C164!!
+	RF5C68(config, m_rf5c164, 0); // TODO : !!RF5C164!!
 	m_rf5c164->set_addrmap(0, &vgmplay_state::rf5c164_map);
 	m_rf5c164->add_route(0, "lspeaker", 1);
 	m_rf5c164->add_route(1, "rspeaker", 1);
 
-	X1_010(config, m_x1_010, 16000000);
+	X1_010(config, m_x1_010, 0);
 	m_x1_010->set_addrmap(0, &vgmplay_state::x1_010_map);
 	m_x1_010->add_route(0, "lspeaker", 1);
 	m_x1_010->add_route(1, "rspeaker", 1);

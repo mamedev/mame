@@ -136,6 +136,7 @@ void ym2203_postload(void *chip);
 void * ym2608_init(device_t *device, int baseclock, int rate,
 				void *pcmroma,int pcmsizea,
 				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
+void ym2608_clock_changed(void *chip, int clock, int rate);
 void ym2608_shutdown(void *chip);
 void ym2608_reset_chip(void *chip);
 void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length);

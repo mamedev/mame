@@ -3011,6 +3011,14 @@ void * ym2608_init(device_t *device, int clock, int rate, void *pcmrom,int pcmsi
 	return F2608;
 }
 
+void ym2608_clock_changed(void *chip, int clock, int rate)
+{
+	ym2608_state *F2608 = (ym2608_state *)chip;
+
+	F2608->OPN.ST.clock = clock;
+	F2608->OPN.ST.rate = rate;
+}
+
 /* shut down emulator */
 void ym2608_shutdown(void *chip)
 {
