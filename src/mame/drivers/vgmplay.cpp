@@ -885,7 +885,7 @@ void vgmplay_device::execute_run()
 
 			case 0xd3: {
 				pulse_act_led(LED_K054539);
-				uint16_t offset = m_file->read_byte(m_pc+1) << 16 | m_file->read_byte(m_pc+2);
+				uint16_t offset = m_file->read_byte(m_pc+1) << 8 | m_file->read_byte(m_pc+2);
 				if (offset & 0x8000)
 					m_io->write_byte(A_K054539B + (offset & 0x3ff), m_file->read_byte(m_pc+3));
 				else
@@ -1611,6 +1611,8 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		if (version >= 0x161 && data_start >= 0xa0 && (r32(0x9c) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd K051649\n");
 
+		m_k054539[0]->set_clock_scale(384); // HACK: VGMs contain 48,000 instead of 18,432,000
+		m_k054539[1]->set_clock_scale(384); // HACK: VGMs contain 48,000 instead of 18,432,000
 		m_k054539[0]->set_unscaled_clock(version >= 0x161 && data_start >= 0xa4 ? r32(0xa0) & ~0x40000000 : 0);
 		m_k054539[1]->set_unscaled_clock(version >= 0x161 && data_start >= 0xa4 && (r32(0xa0) & 0x40000000) ? r32(0xa0) & ~0x40000000 : 0);
 
@@ -1627,7 +1629,9 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 
 		m_pokey[0]->set_unscaled_clock(version >= 0x161 && data_start >= 0xb4 ? r32(0xb0) & ~0x40000000 : 0);
 		m_pokey[1]->set_unscaled_clock(version >= 0x161 && data_start >= 0xb4 && (r32(0xb0) & 0x40000000) ? r32(0xb0) & ~0x40000000 : 0);
-		m_qsound->set_unscaled_clock(version >= 0x161 && data_start >= 0xb8 ? r32(0xb4) * 15 : 0); // * 15 multipler for correct pitch
+
+		m_qsound->set_clock_scale(15); // HACK: VGMs contain 4,000,000 instead of 60,000,000
+		m_qsound->set_unscaled_clock(version >= 0x161 && data_start >= 0xb8 ? r32(0xb4) : 0);
 
 		if (version >= 0x151 && data_start >= 0xbc && r32(0xb8))
 			logerror("Warning: file requests an unsupported SCSP\n");
