@@ -227,6 +227,14 @@ void qsound_device::device_start()
 	save_item(NAME(m_channel));
 }
 
+//-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void qsound_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 2 / 1248);
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
