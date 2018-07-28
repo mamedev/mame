@@ -604,12 +604,12 @@ void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bit
 	if (m_ctrl[0x7] & 1) // Flipscreen
 		src_y = (256 - src_y) & height_mask;
 
-	//We use cliprect.max_y and cliprect.max_x to support games which use more than 1 screen
+	//We use cliprect.bottom() and cliprect.right() to support games which use more than 1 screen
 
 	// Row offsets are 'screen space' 0-255 regardless of Y scroll
-	for (y = 0; y <= cliprect.max_y; y++)
+	for (y = 0; y <= cliprect.bottom(); y++)
 	{
-		src_x = (m_scrollx[1] - m_scroll_ram[1][(y + scrolly_delta) & 0x1ff] + scrollx_delta + cliprect.min_x) & width_mask;
+		src_x = (m_scrollx[1] - m_scroll_ram[1][(y + scrolly_delta) & 0x1ff] + scrollx_delta + cliprect.left()) & width_mask;
 		if (m_ctrl[0x7] & 1) // Flipscreen
 			src_x = (256 - 64 - src_x) & width_mask;
 
@@ -621,11 +621,11 @@ void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bit
 
 			if ((p & 0xf)!= 0 || (flags & TILEMAP_DRAW_OPAQUE))
 			{
-				bitmap.pix16(y, x + cliprect.min_x) = p;
+				bitmap.pix16(y, x + cliprect.left()) = p;
 				if (screen.priority().valid())
 				{
 					uint8_t *pri = &screen.priority().pix8(y);
-					pri[x + cliprect.min_x] |= priority;
+					pri[x + cliprect.left()] |= priority;
 				}
 			}
 			src_x = (src_x + 1) & width_mask;
