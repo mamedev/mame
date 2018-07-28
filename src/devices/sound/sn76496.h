@@ -48,6 +48,7 @@ protected:
 			uint32_t clock);
 
 	virtual void    device_start() override;
+	virtual void    device_clock_changed() override;
 	virtual void    sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
