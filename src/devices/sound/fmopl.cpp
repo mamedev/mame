@@ -1631,7 +1631,7 @@ void FM_OPL::initialize()
 	/*logerror("freqbase=%f\n", freqbase);*/
 
 	/* Timer base time */
-	TimerBase = attotime::from_hz(clock) * 72;
+	TimerBase = clock ? attotime::from_hz(clock) * 72 : attotime::zero;
 
 	/* make fnumber -> increment counter table */
 	for( i=0 ; i < 1024 ; i++ )

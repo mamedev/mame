@@ -1915,7 +1915,7 @@ GFXDECODE_END
 **************************************************************************/
 
 // TODO: irq generation is unknown, as usual with Jaleco/NMK HW
-//       - irq 1 is comms related, presumably the bridge chip is capable of sending the irq signal at given times. 
+//       - irq 1 is comms related, presumably the bridge chip is capable of sending the irq signal at given times.
 //         Wild Pilot of course doesn't need it.
 //       - irq 2/4 controls gameplay speed, currently unknown about the timing
 //       - 2 updates palettes while 4 is vblank?
@@ -1925,12 +1925,12 @@ GFXDECODE_END
 TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 {
 	int scanline = param;
-	
+
 	if(m_screen->frame_number() & 1)
 	{
 		if(scanline == 240)
 			m_cpu1->set_input_line(1, HOLD_LINE);
-		
+
 		return;
 	}
 

@@ -23,7 +23,6 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -538,7 +537,6 @@ MACHINE_CONFIG_START(ti68k_state::ti89)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(ti68k_state, ti68k)
-	config.set_default_layout(layout_lcd);
 
 	MCFG_SHARP_UNK128MBIT_ADD("flash")  //should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
 

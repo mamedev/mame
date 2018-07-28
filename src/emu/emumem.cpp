@@ -38,7 +38,7 @@
 
 void handler_entry::dump_map(std::vector<memory_entry> &map) const
 {
-	fatalerror("dump_map called on non-dispatching class\n");	
+	fatalerror("dump_map called on non-dispatching class\n");
 }
 
 void handler_entry::reflist::add(const handler_entry *entry)
@@ -464,8 +464,8 @@ public:
 	static void write_qword_static(this_type &space, offs_t address, u64 data) { address &= space.m_addrmask; if (Width == 3) space.write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 3, false>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, 0xffffffffffffffffU); }
 	static void write_qword_masked_static(this_type &space, offs_t address, u64 data, u64 mask) { address &= space.m_addrmask; memory_write_generic<Width, AddrShift, Endian, 3, false>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, mask); }
 
-    handler_entry_read <Width, AddrShift, Endian> *m_root_read;
-    handler_entry_write<Width, AddrShift, Endian> *m_root_write;
+	handler_entry_read <Width, AddrShift, Endian> *m_root_read;
+	handler_entry_write<Width, AddrShift, Endian> *m_root_write;
 
 	std::unordered_set<handler_entry *> m_delayed_unrefs;
 
@@ -482,8 +482,8 @@ private:
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
-        int ncswidth;
-        check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+		int ncswidth;
+		check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 		auto hand_r = new handler_entry_read_delegate<Width, AddrShift, Endian>(this, handler_r);
 		hand_r->set_address_info(nstart, nmask);
@@ -503,8 +503,8 @@ private:
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
-        int ncswidth;
-        check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+		int ncswidth;
+		check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 		auto hand_r = new handler_entry_read_delegate<AccessWidth, -AccessWidth, Endian>(this, handler_r);
 		memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
@@ -534,8 +534,8 @@ private:
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
-        int ncswidth;
-        check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+		int ncswidth;
+		check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 		auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian>(this, handler_w);
 		hand_w->set_address_info(nstart, nmask);
@@ -555,8 +555,8 @@ private:
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
-        int ncswidth;
-        check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+		int ncswidth;
+		check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 		auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian>(this, handler_w);
 		memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_w, nstart, nend, nmask, nunitmask, ncswidth);
@@ -589,8 +589,8 @@ private:
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
-        int ncswidth;
-        check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+		int ncswidth;
+		check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 		auto hand_r = new handler_entry_read_delegate <Width, AddrShift, Endian>(this, handler_r);
 		hand_r->set_address_info(nstart, nmask);
@@ -602,7 +602,7 @@ private:
 
 		invalidate_caches(read_or_write::READWRITE);
 	}
- 
+
 	template<int AccessWidth> std::enable_if_t<(Width > AccessWidth)>
 	install_readwrite_handler_helper(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth,
 									 typename handler_entry_size<AccessWidth>::READ  handler_r,
@@ -616,8 +616,8 @@ private:
 
 		offs_t nstart, nend, nmask, nmirror;
 		u64 nunitmask;
-        int ncswidth;
-        check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+		int ncswidth;
+		check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 		auto hand_r = new handler_entry_read_delegate <AccessWidth, -AccessWidth, Endian>(this, handler_r);
 		memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
@@ -751,7 +751,7 @@ void memory_manager::allocate(device_memory_interface &memory)
 					else
 						memory.allocate<address_space_specific<3, -3, ENDIANNESS_BIG   >>(*this, spacenum);
 					break;
-	
+
 				default:
 					throw emu_fatalerror("Invalid width %d/shift %d specified for address_space::allocate", spaceconfig->data_width(), spaceconfig->addr_shift());
 			}

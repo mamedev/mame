@@ -2986,6 +2986,33 @@ ROM_START( flickyo )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
+// Coverted from and running on a Up n' Down board.
+ROM_START( flickyup )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2764-ic29",  0x0000, 0x2000, CRC(59ba3107) SHA1(2d37f00b8a81b97e45aa78ae75449663c35acece) ) /* encrypted */
+	ROM_LOAD( "2764-ic30",  0x2000, 0x2000, CRC(5c84216f) SHA1(8147a51e5d5aee788f1aab8e9032a5813e5c43a1) ) /* encrypted */
+	ROM_LOAD( "2764-ic31",  0x4000, 0x2000, CRC(106132fa) SHA1(669d9cbc1f18649a7d7a8cb462b76a6c34362ed3) ) /* encrypted */
+	ROM_LOAD( "2764-ic32",  0x6000, 0x2000, CRC(c5ea7f58) SHA1(0adcbee77dad813fe168ad383e579c94bc31635f) ) /* encrypted */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "epr-5869.120",   0x0000, 0x2000, CRC(6d220d4e) SHA1(fe02a7a94a1ad046fc775a7f67f460c8d0f6dca6) ) /* 2764-ic3 */
+
+	ROM_REGION( 0xc000, "tiles", 0 )
+	ROM_LOAD( "epr-5868.62",    0x0000, 0x2000, CRC(7402256b) SHA1(5bd660ac24a2d0d8ad983e948674a82a2d2e8b49) ) /* 2764-ic82 */
+	ROM_LOAD( "epr-5867.61",    0x2000, 0x2000, CRC(2f5ce930) SHA1(4bc3bc6eb8f03926d3710c9f96fcc1b116e918d3) ) /* 2764-ic65 */
+	ROM_LOAD( "epr-5866.64",    0x4000, 0x2000, CRC(967f1d9a) SHA1(652be7848526c6e61db4a502f75d1689d2ff2f59) ) /* 2764-ic81 */
+	ROM_LOAD( "epr-5865.63",    0x6000, 0x2000, CRC(03d9a34c) SHA1(e158db3e0b86f2b8ad34cefc2714cb0a942efde7) ) /* 2764-ic64 */
+	ROM_LOAD( "epr-5864.66",    0x8000, 0x2000, CRC(e659f358) SHA1(cf59f1fb0f9fb77d5ac36be52b6ee946ee85d6de) ) /* 2764-ic80 */
+	ROM_LOAD( "epr-5863.65",    0xa000, 0x2000, CRC(a496ca15) SHA1(8c629a853486bbe049b1deecdc00f9e16b87698f) ) /* 2764-ic63 */
+
+	ROM_REGION( 0x8000, "sprites", 0 )
+	ROM_LOAD( "epr-5855.117",   0x0000, 0x4000, CRC(b5f894a1) SHA1(2c72dc16739dad155fcd572e1add067a7647f5bd) ) /* 27128-ic86 */
+	ROM_LOAD( "epr-5856.110",   0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) ) /* 27128-ic93 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* location ic106 */
+ROM_END
+
 
 ROM_START( wmatch )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5486,6 +5513,7 @@ GAME( 1984, mrvikingj,  mrviking, sys1ppisx_315_5041,mrvikingj, system1_state, i
 GAME( 1984, swat,       0,        sys1ppix_315_5048, swat,      system1_state, init_bank00,       ROT270, "Coreland / Sega", "SWAT (315-5048)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, flickyo,    flicky,   sys1ppix_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, flickys1,   flicky,   sys1ppix_315_5051, flickys1,  system1_state, init_bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickyup,   flicky,   sys1ppix_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (64k Version, on Up'n Down boardset)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, wmatch,     0,        sys1ppisx_315_5064,wmatch,    system1_state, init_bank00,       ROT270, "Sega", "Water Match (315-5064)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bullfgt,    0,        sys1ppix_315_5065, bullfgt,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "Bullfight (315-5065)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, nprinces,   seganinj, sys1ppix_315_5051, seganinj,  system1_state, init_bank00,       ROT0,   "bootleg?", "Ninja Princess (315-5051, 64k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )

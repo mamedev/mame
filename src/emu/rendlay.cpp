@@ -40,10 +40,6 @@
 // screenless layouts
 #include "noscreens.lh"
 
-// single screen layouts
-#include "horizont.lh"
-#include "vertical.lh"
-
 // dual screen layouts
 #include "dualhsxs.lh"
 #include "dualhovu.lh"
@@ -54,13 +50,6 @@
 
 // quad screen layouts
 #include "quadhsxs.lh"
-
-// LCD screen layouts
-#include "lcd.lh"
-#include "lcd_rot.lh"
-
-// SVG screen layouts
-#include "svg.lh"
 
 
 namespace {
@@ -85,38 +74,6 @@ std::locale const f_portable_locale("C");
 //**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
-
-//-------------------------------------------------
-//  gcd - compute the greatest common divisor (GCD)
-//  of two integers using the Euclidean algorithm
-//-------------------------------------------------
-
-template <typename M, typename N>
-constexpr std::common_type_t<M, N> gcd(M a, N b)
-{
-	return b ? gcd(b, a % b) : a;
-}
-
-
-//-------------------------------------------------
-//  reduce_fraction - reduce a fraction by
-//  dividing out common factors
-//-------------------------------------------------
-
-template <typename M, typename N>
-inline void reduce_fraction(M &num, N &den)
-{
-	// search the greatest common divisor
-	auto const div = gcd(num, den);
-
-	// reduce the fraction if a common divisor has been found
-	if (div)
-	{
-		num /= div;
-		den /= div;
-	}
-}
-
 
 //-------------------------------------------------
 //  render_bounds_transform - apply translation/
@@ -430,9 +387,20 @@ private:
 			unsigned i(0U);
 			for (screen_device const &screen : screen_device_iterator(machine().root_device()))
 			{
+				std::pair<u64, u64> const physaspect(screen.physical_aspect());
 				s64 const w(screen.visible_area().width()), h(screen.visible_area().height());
 				s64 xaspect(w), yaspect(h);
-				reduce_fraction(xaspect, yaspect);
+				util::reduce_fraction(xaspect, yaspect);
+
+				tmp.seekp(0);
+				util::stream_format(tmp, "scr%uphysicalxaspect", i);
+				tmp.put('\0');
+				try_insert(&tmp.vec()[0], s64(physaspect.first));
+
+				tmp.seekp(0);
+				util::stream_format(tmp, "scr%uphysicalyaspect", i);
+				tmp.put('\0');
+				try_insert(&tmp.vec()[0], s64(physaspect.second));
 
 				tmp.seekp(0);
 				util::stream_format(tmp, "scr%unativexaspect", i);
@@ -1122,6 +1090,15 @@ void layout_group::resolve_bounds(
 			throw layout_syntax_error(util::string_format("unknown group element %s", itemnode->get_name()));
 		}
 	}
+
+	if (envaltered && !unresolved)
+	{
+		bool const resolved(m_bounds_resolved);
+		for (group_map::value_type &group : groupmap)
+			group.second.set_bounds_unresolved();
+		m_bounds_resolved = resolved;
+	}
+
 	if (!repeat)
 		m_bounds_resolved = true;
 }
@@ -1162,11 +1139,11 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 		if (curcomp->state() == -1 || curcomp->state() == elemtex->m_state)
 		{
 			// get the local scaled bounds
-			rectangle bounds;
-			bounds.min_x = render_round_nearest(curcomp->bounds().x0 * dest.width());
-			bounds.min_y = render_round_nearest(curcomp->bounds().y0 * dest.height());
-			bounds.max_x = render_round_nearest(curcomp->bounds().x1 * dest.width());
-			bounds.max_y = render_round_nearest(curcomp->bounds().y1 * dest.height());
+			rectangle bounds(
+					render_round_nearest(curcomp->bounds().x0 * dest.width()),
+					render_round_nearest(curcomp->bounds().x1 * dest.width()),
+					render_round_nearest(curcomp->bounds().y0 * dest.height()),
+					render_round_nearest(curcomp->bounds().y1 * dest.height()));
 			bounds &= dest.cliprect();
 
 			// based on the component type, add to the texture
@@ -1278,9 +1255,9 @@ protected:
 		u32 const inva = (1.0f - color().a) * 255.0f;
 
 		// iterate over X and Y
-		for (u32 y = bounds.min_y; y <= bounds.max_y; y++)
+		for (u32 y = bounds.top(); y <= bounds.bottom(); y++)
 		{
-			for (u32 x = bounds.min_x; x <= bounds.max_x; x++)
+			for (u32 x = bounds.left(); x <= bounds.right(); x++)
 			{
 				u32 finalr = r;
 				u32 finalg = g;
@@ -1331,7 +1308,7 @@ protected:
 		float const ooyradius2 = 1.0f / (yradius * yradius);
 
 		// iterate over y
-		for (u32 y = bounds.min_y; y <= bounds.max_y; y++)
+		for (u32 y = bounds.top(); y <= bounds.bottom(); y++)
 		{
 			float ycoord = ycenter - ((float)y + 0.5f);
 			float xval = xradius * sqrtf(1.0f - (ycoord * ycoord) * ooyradius2);
@@ -2180,23 +2157,23 @@ protected:
 
 			if (m_reelreversed==1)
 			{
-				basey = bounds.min_y + ((use_state)*(ourheight/num_shown)/(max_state_used/m_numstops)) + curry;
+				basey = bounds.top() + ((use_state)*(ourheight/num_shown)/(max_state_used/m_numstops)) + curry;
 			}
 			else
 			{
-				basey = bounds.min_y - ((use_state)*(ourheight/num_shown)/(max_state_used/m_numstops)) + curry;
+				basey = bounds.top() - ((use_state)*(ourheight/num_shown)/(max_state_used/m_numstops)) + curry;
 			}
 
 			// wrap around...
-			if (basey < bounds.min_y)
+			if (basey < bounds.top())
 				basey += ((max_state_used)*(ourheight/num_shown)/(max_state_used/m_numstops));
-			if (basey > bounds.max_y)
+			if (basey > bounds.bottom())
 				basey -= ((max_state_used)*(ourheight/num_shown)/(max_state_used/m_numstops));
 
 			int endpos = basey+ourheight/num_shown;
 
 			// only render the symbol / text if it's atually in view because the code is SLOW
-			if ((endpos >= bounds.min_y) && (basey <= bounds.max_y))
+			if ((endpos >= bounds.top()) && (basey <= bounds.bottom()))
 			{
 				while (1)
 				{
@@ -2207,7 +2184,7 @@ protected:
 				}
 
 				s32 curx;
-				curx = bounds.min_x + (bounds.width() - width) / 2;
+				curx = bounds.left() + (bounds.width() - width) / 2;
 
 				if (m_file[fruit])
 					if (!m_bitmap[fruit].valid())
@@ -2225,14 +2202,14 @@ protected:
 						{
 							int effy = basey + y;
 
-							if (effy >= bounds.min_y && effy <= bounds.max_y)
+							if (effy >= bounds.top() && effy <= bounds.bottom())
 							{
 								u32 *src = &tempbitmap2.pix32(y);
 								u32 *d = &dest.pix32(effy);
 								for (int x = 0; x < dest.width(); x++)
 								{
 									int effx = x;
-									if (effx >= bounds.min_x && effx <= bounds.max_x)
+									if (effx >= bounds.left() && effx <= bounds.right())
 									{
 										u32 spix = rgb_t(src[x]).a();
 										if (spix != 0)
@@ -2272,14 +2249,14 @@ protected:
 						{
 							int effy = basey + y;
 
-							if (effy >= bounds.min_y && effy <= bounds.max_y)
+							if (effy >= bounds.top() && effy <= bounds.bottom())
 							{
 								u32 *src = &tempbitmap.pix32(y);
 								u32 *d = &dest.pix32(effy);
 								for (int x = 0; x < chbounds.width(); x++)
 								{
-									int effx = curx + x + chbounds.min_x;
-									if (effx >= bounds.min_x && effx <= bounds.max_x)
+									int effx = curx + x + chbounds.left();
+									if (effx >= bounds.left() && effx <= bounds.right())
 									{
 										u32 spix = rgb_t(src[x]).a();
 										if (spix != 0)
@@ -2347,15 +2324,15 @@ private:
 			}
 
 			// wrap around...
-			if (basex < bounds.min_x)
+			if (basex < bounds.left())
 				basex += ((max_state_used)*(ourwidth/num_shown)/(max_state_used/m_numstops));
-			if (basex > bounds.max_x)
+			if (basex > bounds.right())
 				basex -= ((max_state_used)*(ourwidth/num_shown)/(max_state_used/m_numstops));
 
 			int endpos = basex+(ourwidth/num_shown);
 
 			// only render the symbol / text if it's atually in view because the code is SLOW
-			if ((endpos >= bounds.min_x) && (basex <= bounds.max_x))
+			if ((endpos >= bounds.left()) && (basex <= bounds.right()))
 			{
 				while (1)
 				{
@@ -2366,7 +2343,7 @@ private:
 				}
 
 				s32 curx;
-				curx = bounds.min_x;
+				curx = bounds.left();
 
 				if (m_file[fruit])
 					if (!m_bitmap[fruit].valid())
@@ -2384,14 +2361,14 @@ private:
 						{
 							int effy = y;
 
-							if (effy >= bounds.min_y && effy <= bounds.max_y)
+							if (effy >= bounds.top() && effy <= bounds.bottom())
 							{
 								u32 *src = &tempbitmap2.pix32(y);
 								u32 *d = &dest.pix32(effy);
 								for (int x = 0; x < ourwidth/num_shown; x++)
 								{
 									int effx = basex + x;
-									if (effx >= bounds.min_x && effx <= bounds.max_x)
+									if (effx >= bounds.left() && effx <= bounds.right())
 									{
 										u32 spix = rgb_t(src[x]).a();
 										if (spix != 0)
@@ -2433,14 +2410,14 @@ private:
 						{
 							int effy = y;
 
-							if (effy >= bounds.min_y && effy <= bounds.max_y)
+							if (effy >= bounds.top() && effy <= bounds.bottom())
 							{
 								u32 *src = &tempbitmap.pix32(y);
 								u32 *d = &dest.pix32(effy);
 								for (int x = 0; x < chbounds.width(); x++)
 								{
 									int effx = basex + curx + x;
-									if (effx >= bounds.min_x && effx <= bounds.max_x)
+									if (effx >= bounds.left() && effx <= bounds.right())
 									{
 										u32 spix = rgb_t(src[x]).a();
 										if (spix != 0)
@@ -2641,17 +2618,17 @@ void layout_element::component::draw_text(render_font &font, bitmap_argb32 &dest
 	{
 		// left
 		case 1:
-			curx = bounds.min_x;
+			curx = bounds.left();
 			break;
 
 		// right
 		case 2:
-			curx = bounds.max_x - width;
+			curx = bounds.right() - width;
 			break;
 
 		// default to center
 		default:
-			curx = bounds.min_x + (bounds.width() - width) / 2;
+			curx = bounds.left() + (bounds.width() - width) / 2;
 			break;
 	}
 
@@ -2679,15 +2656,15 @@ void layout_element::component::draw_text(render_font &font, bitmap_argb32 &dest
 		// copy the data into the target
 		for (int y = 0; y < chbounds.height(); y++)
 		{
-			int effy = bounds.min_y + y;
-			if (effy >= bounds.min_y && effy <= bounds.max_y)
+			int effy = bounds.top() + y;
+			if (effy >= bounds.top() && effy <= bounds.bottom())
 			{
 				u32 *src = &tempbitmap.pix32(y);
 				u32 *d = &dest.pix32(effy);
 				for (int x = 0; x < chbounds.width(); x++)
 				{
-					int effx = curx + x + chbounds.min_x;
-					if (effx >= bounds.min_x && effx <= bounds.max_x)
+					int effx = curx + x + chbounds.left();
+					if (effx >= bounds.left() && effx <= bounds.right())
 					{
 						u32 spix = rgb_t(src[x]).a();
 						if (spix != 0)
@@ -3347,13 +3324,14 @@ void layout_view::item::resolve_tags()
 //  layout_file - constructor
 //-------------------------------------------------
 
-layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode, const char *dirname)
+layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode, char const *dirname)
 	: m_elemmap()
 	, m_viewlist()
 {
-	emu::render::detail::layout_environment env(device);
 	try
 	{
+		environment env(device);
+
 		// find the layout node
 		util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
 		if (!mamelayoutnode)
@@ -3364,30 +3342,9 @@ layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode,
 		if (version != LAYOUT_VERSION)
 			throw layout_syntax_error(util::string_format("unsupported version %d", version));
 
-		// parse all the parameters
-		for (util::xml::data_node const *elemnode = mamelayoutnode->get_child("param") ; elemnode; elemnode = elemnode->get_next_sibling("param"))
-			env.set_parameter(*elemnode);
-
-		// parse all the elements
-		for (util::xml::data_node const *elemnode = mamelayoutnode->get_child("element"); elemnode; elemnode = elemnode->get_next_sibling("element"))
-		{
-			char const *const name(env.get_attribute_string(*elemnode, "name", nullptr));
-			if (!name)
-				throw layout_syntax_error("element lacks name attribute");
-			if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(env, *elemnode, dirname)).second)
-				throw layout_syntax_error(util::string_format("duplicate element name %s", name));
-		}
-
-		// parse all the groups
+		// parse all the parameters, elements and groups
 		group_map groupmap;
-		for (util::xml::data_node const *groupnode = mamelayoutnode->get_child("group"); groupnode; groupnode = groupnode->get_next_sibling("group"))
-		{
-			char const *const name(env.get_attribute_string(*groupnode, "name", nullptr));
-			if (!name)
-				throw layout_syntax_error("group lacks name attribute");
-			if (!groupmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(*groupnode)).second)
-				throw layout_syntax_error(util::string_format("duplicate group name %s", name));
-		}
+		add_elements(dirname, env, *mamelayoutnode, groupmap, false, true);
 
 		// parse all the views
 		for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
@@ -3420,4 +3377,57 @@ layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode,
 
 layout_file::~layout_file()
 {
+}
+
+
+void layout_file::add_elements(
+		char const *dirname,
+		environment &env,
+		util::xml::data_node const &parentnode,
+		group_map &groupmap,
+		bool repeat,
+		bool init)
+{
+	for (util::xml::data_node const *childnode = parentnode.get_first_child(); childnode; childnode = childnode->get_next_sibling())
+	{
+		if (!strcmp(childnode->get_name(), "param"))
+		{
+			if (!repeat)
+				env.set_parameter(*childnode);
+			else
+				env.set_repeat_parameter(*childnode, init);
+		}
+		else if (!strcmp(childnode->get_name(), "element"))
+		{
+			char const *const name(env.get_attribute_string(*childnode, "name", nullptr));
+			if (!name)
+				throw layout_syntax_error("element lacks name attribute");
+			if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(env, *childnode, dirname)).second)
+				throw layout_syntax_error(util::string_format("duplicate element name %s", name));
+		}
+		else if (!strcmp(childnode->get_name(), "group"))
+		{
+			char const *const name(env.get_attribute_string(*childnode, "name", nullptr));
+			if (!name)
+				throw layout_syntax_error("group lacks name attribute");
+			if (!groupmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(*childnode)).second)
+				throw layout_syntax_error(util::string_format("duplicate group name %s", name));
+		}
+		else if (!strcmp(childnode->get_name(), "repeat"))
+		{
+			int const count(env.get_attribute_int(*childnode, "count", -1));
+			if (0 >= count)
+				throw layout_syntax_error("repeat must have positive integer count attribute");
+			environment local(env);
+			for (int i = 0; count > i; ++i)
+			{
+				add_elements(dirname, local, *childnode, groupmap, true, !i);
+				local.increment_parameters();
+			}
+		}
+		else if (repeat || (strcmp(childnode->get_name(), "view") && strcmp(childnode->get_name(), "script")))
+		{
+			throw layout_syntax_error(util::string_format("unknown layout item %s", childnode->get_name()));
+		}
+	}
 }

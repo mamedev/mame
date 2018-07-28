@@ -19,7 +19,7 @@
       hooked up by the current z80 core
     - PC-88VA stock version has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31.
       Making a patch for the latter makes the system to jump into a "DIP-Switch" display.
-	  bp f0b31,pc=0xf0b36,g
+      bp f0b31,pc=0xf0b36,g
     - unemulated upd71071 demand mode.
     - Fix floppy motor hook-up;
 
@@ -540,10 +540,10 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 void pc88va_state::tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit)
 {
 	uint32_t target_offset = (spr_offset & 0xffff)/2;
-//	address_space &space = m_maincpu->space(AS_PROGRAM);
+//  address_space &space = m_maincpu->space(AS_PROGRAM);
 
-//	space.write_word(spr_offset, space.read_word(spr_offset) & ~0x200);
-//	space.write_word(spr_offset, space.read_word(spr_offset) | (sw_bit & 0x200));
+//  space.write_word(spr_offset, space.read_word(spr_offset) & ~0x200);
+//  space.write_word(spr_offset, space.read_word(spr_offset) | (sw_bit & 0x200));
 	m_tvram[target_offset] = (m_tvram[target_offset] & ~0x200) | (sw_bit & 0x200);
 }
 
@@ -764,7 +764,7 @@ WRITE16_MEMBER(pc88va_state::bios_bank_w)
 	---- ---- ---- xxxx RBC0 (0xe0000 - 0xeffff ROM bank)
 	*/
 	COMBINE_DATA(&m_bank_reg);
-	
+
 	/* SMBC */
 	m_sysbank->set_bank((m_bank_reg & 0xf00) >> 8);
 
@@ -1667,7 +1667,7 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18+4)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x40000)
-	
+
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ym", YM2203, 3993600) //unknown clock / divider
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)

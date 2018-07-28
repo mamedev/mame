@@ -34,7 +34,6 @@
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -962,7 +961,6 @@ MACHINE_CONFIG_START(pce220_state::pce220)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
-	config.set_default_layout(layout_lcd);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -998,7 +996,6 @@ MACHINE_CONFIG_START(pcg850v_state::pcg815)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
-	config.set_default_layout(layout_lcd);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1034,7 +1031,6 @@ MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
-	config.set_default_layout(layout_lcd);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

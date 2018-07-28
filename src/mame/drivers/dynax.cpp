@@ -7371,7 +7371,7 @@ GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state, init_maya,     
 GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
 GAME( 1994, mayab,    maya,     sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "Promat",                   "Maya (set 3)",                                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mayac,    maya,     sprtmtch, drgpunch, dynax_state, init_mayac,    ROT0,   "Promat",                   "Maya (set 4, clean)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "<unknown>",                "Inca",                                                          MACHINE_SUPPORTS_SAVE )
+GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "<unknown>",                "Inca",                                                          MACHINE_SUPPORTS_SAVE ) // PCB by "Barko", game too?
 GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state, init_blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Friday (Japan)",                                        MACHINE_SUPPORTS_SAVE )

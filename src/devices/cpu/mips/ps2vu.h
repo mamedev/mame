@@ -14,8 +14,11 @@
 
 #pragma once
 
-class ps2_gs_device;
-class ps2_vif1_device;
+class sonyvu0_device;
+class sonyvu1_device;
+
+#include "video/ps2gs.h"
+#include "ps2vif1.h"
 
 enum
 {
@@ -138,37 +141,37 @@ protected:
 	// address spaces
 	const address_space_config m_micro_config;
 	const address_space_config m_vu_config;
-	address_space	*m_micro_space;
-	address_space	*m_vu_space;
+	address_space   *m_micro_space;
+	address_space   *m_vu_space;
 
 	// core registers
-	uint32_t		m_mem_size;
-	uint32_t		m_mem_mask;
+	uint32_t        m_mem_size;
+	uint32_t        m_mem_mask;
 	required_shared_ptr<uint64_t> m_micro_mem;
 	required_shared_ptr<uint32_t> m_vu_mem;
-	float*			m_vfmem;
-	uint32_t*		m_vimem;
+	float*          m_vfmem;
+	uint32_t*       m_vimem;
 
-	float			m_vfr[32][4]; // 0..3 = x..w
-	uint32_t		m_vcr[32];
-	float			m_acc[4];
+	float           m_vfr[32][4]; // 0..3 = x..w
+	uint32_t        m_vcr[32];
+	float           m_acc[4];
 
-	float*			m_v;
+	float*          m_v;
 
-	uint32_t		m_status_flag;
-	uint32_t		m_mac_flag;
-	uint32_t		m_clip_flag;
-	uint32_t		m_r;
-	float			m_i;
-	float			m_q;
+	uint32_t        m_status_flag;
+	uint32_t        m_mac_flag;
+	uint32_t        m_clip_flag;
+	uint32_t        m_r;
+	float           m_i;
+	float           m_q;
 
-	uint32_t		m_pc;
-	uint32_t		m_delay_pc;
-	uint32_t		m_start_pc;
+	uint32_t        m_pc;
+	uint32_t        m_delay_pc;
+	uint32_t        m_start_pc;
 
-	bool			m_running;
+	bool            m_running;
 
-	int				m_icount;
+	int             m_icount;
 };
 
 class sonyvu1_device : public sonyvu_device
@@ -185,8 +188,8 @@ public:
 
 	ps2_vif1_device* interface();
 
-    DECLARE_READ64_MEMBER(vif_r);
-    DECLARE_WRITE64_MEMBER(vif_w);
+	DECLARE_READ64_MEMBER(vif_r);
+	DECLARE_WRITE64_MEMBER(vif_w);
 
 protected:
 	virtual void device_start() override;
@@ -232,11 +235,11 @@ protected:
 
 	required_device<sonyvu1_device> m_vu1;
 
-	float*			m_vu1_regs;
-	uint32_t		m_control;
-	uint32_t		m_vpu_stat;
-	uint32_t		m_cmsar0;
-	uint32_t		m_cmsar1;
+	float*          m_vu1_regs;
+	uint32_t        m_control;
+	uint32_t        m_vpu_stat;
+	uint32_t        m_cmsar0;
+	uint32_t        m_cmsar1;
 };
 
 DECLARE_DEVICE_TYPE(SONYPS2_VU1, sonyvu1_device)

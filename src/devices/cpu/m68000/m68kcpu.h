@@ -1523,7 +1523,7 @@ inline void m68ki_exception_address_error()
 		m_stopped = STOP_LEVEL_HALT;
 		return;
 	}
-	
+
 	m_run_mode = RUN_MODE_BERR_AERR_RESET_WSF;
 
 	if (!CPU_TYPE_IS_010_PLUS())

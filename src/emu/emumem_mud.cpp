@@ -85,7 +85,7 @@ template<int Width, int AddrShift, int Endian> memory_units_descriptor<Width, Ad
 template<int Width, int AddrShift, int Endian> void memory_units_descriptor<Width, AddrShift, Endian>::generate(u8 ukey, typename handler_entry_size<Width>::uX umask, u32 cswidth, u32 bits_per_access, u8 base_shift, s8 shift, u32 active_count)
 {
 	auto &entries = m_entries_for_key[ukey];
-	
+
 	// Compute the selection masks
 	if(!cswidth)
 		cswidth = bits_per_access;

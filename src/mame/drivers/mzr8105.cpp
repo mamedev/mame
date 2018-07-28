@@ -179,7 +179,7 @@ mzr8105_state(const machine_config &mconfig, device_type type, const char *tag) 
 	}
 
 	void mzr8105(machine_config &config);
-	
+
 private:
 	void mzr8105_mem(address_map &map);
 	required_device<cpu_device> m_maincpu;

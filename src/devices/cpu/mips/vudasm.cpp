@@ -298,7 +298,7 @@ void sonyvu_disassembler::dasm_lower(uint32_t pc, uint32_t op, std::ostream &str
 						util::stream_format(stream, "mtir        %s, %s%s", VIREG[rt], VFREG[rs], fsf);
 						break;
 					case 0x3d: // MFIR
-						util::stream_format(stream, "mtir.%s   %s%s %s", dest, VFREG[rt], destc, VIREG[rs]	);
+						util::stream_format(stream, "mtir.%s   %s%s %s", dest, VFREG[rt], destc, VIREG[rs]  );
 						break;
 					case 0x3e: // ILWR
 						util::stream_format(stream, "ilwr.%s   %s, (%s)%s", dest, VIREG[rt], VIREG[rs], dest);

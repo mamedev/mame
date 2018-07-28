@@ -209,11 +209,11 @@ public:
 		, m_screen(*this, "screen")
 		, m_ram(*this, "ram")
 		, m_iop_ram(*this, "iop_ram")
-        , m_sp_ram(*this, "sp_ram")
-        , m_vu0_imem(*this, "vu0imem")
-        , m_vu0_dmem(*this, "vu0dmem")
-        , m_vu1_imem(*this, "vu1imem")
-        , m_vu1_dmem(*this, "vu1dmem")
+		, m_sp_ram(*this, "sp_ram")
+		, m_vu0_imem(*this, "vu0imem")
+		, m_vu0_dmem(*this, "vu0dmem")
+		, m_vu1_imem(*this, "vu1imem")
+		, m_vu1_dmem(*this, "vu1dmem")
 		, m_vblank_timer(nullptr)
 	{ }
 
@@ -223,41 +223,41 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-    uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(vblank);
 
-    DECLARE_READ32_MEMBER(ipu_r);
-    DECLARE_WRITE32_MEMBER(ipu_w);
-    DECLARE_READ64_MEMBER(vif0_fifo_r);
-    DECLARE_WRITE64_MEMBER(vif0_fifo_w);
-    DECLARE_READ64_MEMBER(gif_fifo_r);
-    DECLARE_WRITE64_MEMBER(gif_fifo_w);
-    DECLARE_READ64_MEMBER(ipu_fifo_r);
-    DECLARE_WRITE64_MEMBER(ipu_fifo_w);
-    DECLARE_WRITE8_MEMBER(debug_w);
-    DECLARE_READ32_MEMBER(unk_f430_r);
-    DECLARE_WRITE32_MEMBER(unk_f430_w);
-    DECLARE_READ32_MEMBER(unk_f440_r);
-    DECLARE_WRITE32_MEMBER(unk_f440_w);
-    DECLARE_READ32_MEMBER(unk_f520_r);
-    DECLARE_READ64_MEMBER(board_id_r);
+	DECLARE_READ32_MEMBER(ipu_r);
+	DECLARE_WRITE32_MEMBER(ipu_w);
+	DECLARE_READ64_MEMBER(vif0_fifo_r);
+	DECLARE_WRITE64_MEMBER(vif0_fifo_w);
+	DECLARE_READ64_MEMBER(gif_fifo_r);
+	DECLARE_WRITE64_MEMBER(gif_fifo_w);
+	DECLARE_READ64_MEMBER(ipu_fifo_r);
+	DECLARE_WRITE64_MEMBER(ipu_fifo_w);
+	DECLARE_WRITE8_MEMBER(debug_w);
+	DECLARE_READ32_MEMBER(unk_f430_r);
+	DECLARE_WRITE32_MEMBER(unk_f430_w);
+	DECLARE_READ32_MEMBER(unk_f440_r);
+	DECLARE_WRITE32_MEMBER(unk_f440_w);
+	DECLARE_READ32_MEMBER(unk_f520_r);
+	DECLARE_READ64_MEMBER(board_id_r);
 
-    DECLARE_WRITE64_MEMBER(ee_iop_ram_w);
-    DECLARE_READ64_MEMBER(ee_iop_ram_r);
-    DECLARE_WRITE32_MEMBER(iop_debug_w);
+	DECLARE_WRITE64_MEMBER(ee_iop_ram_w);
+	DECLARE_READ64_MEMBER(ee_iop_ram_r);
+	DECLARE_WRITE32_MEMBER(iop_debug_w);
 
 	DECLARE_WRITE_LINE_MEMBER(iop_timer_irq);
 
-    void mem_map(address_map &map);
-    void iop_map(address_map &map);
+	void mem_map(address_map &map);
+	void iop_map(address_map &map);
 
-	required_device<cpu_device>		m_maincpu;
-	required_device<iop_device>		m_iop;
+	required_device<cpu_device>     m_maincpu;
+	required_device<iop_device>     m_iop;
 	required_device_array<ps2_timer_device, 4> m_timer;
 	required_device<ps2_dmac_device> m_dmac;
 	required_device<ps2_intc_device> m_intc;
-	required_device<ps2_sif_device>	m_sif;
+	required_device<ps2_sif_device> m_sif;
 	required_device<iop_timer_device> m_iop_timer;
 	required_device<iop_dma_device> m_iop_dma;
 	required_device<iop_intc_device> m_iop_intc;
@@ -268,15 +268,15 @@ protected:
 	required_device<sonyvu0_device> m_vu0;
 	required_device<sonyvu1_device> m_vu1;
 	required_device_array<ps2_pad_device, 2> m_pad;
-	required_device<ps2_mc_device>	m_mc;
-	required_device<screen_device>	m_screen;
-	required_shared_ptr<uint64_t>	m_ram;
-	required_shared_ptr<uint32_t>	m_iop_ram;
-    required_shared_ptr<uint64_t>	m_sp_ram;
-	required_shared_ptr<uint64_t>	m_vu0_imem;
-	required_shared_ptr<uint64_t>	m_vu0_dmem;
-	required_shared_ptr<uint64_t>	m_vu1_imem;
-	required_shared_ptr<uint64_t>	m_vu1_dmem;
+	required_device<ps2_mc_device>  m_mc;
+	required_device<screen_device>  m_screen;
+	required_shared_ptr<uint64_t>   m_ram;
+	required_shared_ptr<uint32_t>   m_iop_ram;
+	required_shared_ptr<uint64_t>   m_sp_ram;
+	required_shared_ptr<uint64_t>   m_vu0_imem;
+	required_shared_ptr<uint64_t>   m_vu0_dmem;
+	required_shared_ptr<uint64_t>   m_vu1_imem;
+	required_shared_ptr<uint64_t>   m_vu1_dmem;
 
 	uint32_t m_unk_f430_reg;
 	uint32_t m_unk_f440_counter;
@@ -551,7 +551,7 @@ void ps2sony_state::machine_reset()
 	memset(m_ipu_out_fifo, 0, sizeof(uint64_t)*0x1000);
 	m_ipu_out_fifo_index = 0;
 
-    m_vblank_timer->adjust(m_screen->time_until_pos(0), 1);
+	m_vblank_timer->adjust(m_screen->time_until_pos(0), 1);
 }
 
 TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
@@ -576,7 +576,7 @@ TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
 
 WRITE8_MEMBER(ps2sony_state::debug_w)
 {
-    printf("%c", (char)data);
+	printf("%c", (char)data);
 }
 
 WRITE64_MEMBER(ps2sony_state::ee_iop_ram_w)
@@ -679,56 +679,56 @@ uint32_t ps2sony_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 void ps2sony_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).mirror(0xe000000).ram().share(m_ram); // 32 MB RAM
-    map(0x10000000, 0x100007ff).rw(m_timer[0], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
-    map(0x10000800, 0x10000fff).rw(m_timer[1], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
-    map(0x10001000, 0x100017ff).rw(m_timer[2], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
-    map(0x10001800, 0x10001fff).rw(m_timer[3], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
-    map(0x10002000, 0x10002fff).rw(FUNC(ps2sony_state::ipu_r), FUNC(ps2sony_state::ipu_w)).umask64(0x00000000ffffffff);
-    map(0x10003000, 0x100030af).rw(m_gs, FUNC(ps2_gs_device::gif_r), FUNC(ps2_gs_device::gif_w));
-    map(0x10004000, 0x1000400f).mirror(0xff0).rw(FUNC(ps2sony_state::vif0_fifo_r), FUNC(ps2sony_state::vif0_fifo_w));
-    map(0x10005000, 0x1000500f).mirror(0xff0).rw(m_vu1, FUNC(sonyvu1_device::vif_r), FUNC(sonyvu1_device::vif_w));
-    map(0x10006000, 0x1000600f).mirror(0xff0).rw(FUNC(ps2sony_state::gif_fifo_r), FUNC(ps2sony_state::gif_fifo_w));
-    map(0x10007000, 0x1000701f).mirror(0xfe0).rw(FUNC(ps2sony_state::ipu_fifo_r), FUNC(ps2sony_state::ipu_fifo_w));
-    map(0x10008000, 0x1000dfff).rw(m_dmac, FUNC(ps2_dmac_device::channel_r), FUNC(ps2_dmac_device::channel_w)).umask64(0x00000000ffffffff);;
-    map(0x1000e000, 0x1000efff).rw(m_dmac, FUNC(ps2_dmac_device::read), FUNC(ps2_dmac_device::write)).umask64(0x00000000ffffffff);
-    map(0x1000f000, 0x1000f017).rw(m_intc, FUNC(ps2_intc_device::read), FUNC(ps2_intc_device::write)).umask64(0x00000000ffffffff);
-    map(0x1000f130, 0x1000f137).nopr();
-    map(0x1000f180, 0x1000f187).w(FUNC(ps2sony_state::debug_w)).umask64(0x00000000000000ff);
-    map(0x1000f200, 0x1000f24f).rw(m_sif, FUNC(ps2_sif_device::ee_r), FUNC(ps2_sif_device::ee_w)).umask64(0x00000000ffffffff);
-    map(0x1000f430, 0x1000f437).rw(FUNC(ps2sony_state::unk_f430_r), FUNC(ps2sony_state::unk_f430_w)).umask64(0x00000000ffffffff); // Unknown
-    map(0x1000f440, 0x1000f447).rw(FUNC(ps2sony_state::unk_f440_r), FUNC(ps2sony_state::unk_f440_w)).umask64(0x00000000ffffffff); // Unknown
-    map(0x1000f520, 0x1000f523).r(m_dmac, FUNC(ps2_dmac_device::disable_mask_r)).umask64(0x00000000ffffffff);
-    map(0x1000f590, 0x1000f593).w(m_dmac, FUNC(ps2_dmac_device::disable_mask_w)).umask64(0x00000000ffffffff);
-    map(0x11000000, 0x11000fff).mirror(0x3000).ram().share(m_vu0_imem);
-    map(0x11004000, 0x11004fff).mirror(0x3000).ram().share(m_vu0_dmem);
-    map(0x11008000, 0x1100bfff).ram().share(m_vu1_imem);
-    map(0x1100c000, 0x1100ffff).ram().share(m_vu1_dmem);
-    map(0x12000000, 0x120003ff).mirror(0xc00).rw(m_gs, FUNC(ps2_gs_device::priv_regs0_r), FUNC(ps2_gs_device::priv_regs0_w));
-    map(0x12001000, 0x120013ff).mirror(0xc00).rw(m_gs, FUNC(ps2_gs_device::priv_regs1_r), FUNC(ps2_gs_device::priv_regs1_w));
-    map(0x1c000000, 0x1c1fffff).rw(FUNC(ps2sony_state::ee_iop_ram_r), FUNC(ps2sony_state::ee_iop_ram_w)); // IOP has 2MB EDO RAM per Wikipedia, and writes go up to this point
-    map(0x1f803800, 0x1f803807).r(FUNC(ps2sony_state::board_id_r));
-    map(0x1fc00000, 0x1fffffff).rom().region("bios", 0);
+	map(0x10000000, 0x100007ff).rw(m_timer[0], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
+	map(0x10000800, 0x10000fff).rw(m_timer[1], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
+	map(0x10001000, 0x100017ff).rw(m_timer[2], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
+	map(0x10001800, 0x10001fff).rw(m_timer[3], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
+	map(0x10002000, 0x10002fff).rw(FUNC(ps2sony_state::ipu_r), FUNC(ps2sony_state::ipu_w)).umask64(0x00000000ffffffff);
+	map(0x10003000, 0x100030af).rw(m_gs, FUNC(ps2_gs_device::gif_r), FUNC(ps2_gs_device::gif_w));
+	map(0x10004000, 0x1000400f).mirror(0xff0).rw(FUNC(ps2sony_state::vif0_fifo_r), FUNC(ps2sony_state::vif0_fifo_w));
+	map(0x10005000, 0x1000500f).mirror(0xff0).rw(m_vu1, FUNC(sonyvu1_device::vif_r), FUNC(sonyvu1_device::vif_w));
+	map(0x10006000, 0x1000600f).mirror(0xff0).rw(FUNC(ps2sony_state::gif_fifo_r), FUNC(ps2sony_state::gif_fifo_w));
+	map(0x10007000, 0x1000701f).mirror(0xfe0).rw(FUNC(ps2sony_state::ipu_fifo_r), FUNC(ps2sony_state::ipu_fifo_w));
+	map(0x10008000, 0x1000dfff).rw(m_dmac, FUNC(ps2_dmac_device::channel_r), FUNC(ps2_dmac_device::channel_w)).umask64(0x00000000ffffffff);;
+	map(0x1000e000, 0x1000efff).rw(m_dmac, FUNC(ps2_dmac_device::read), FUNC(ps2_dmac_device::write)).umask64(0x00000000ffffffff);
+	map(0x1000f000, 0x1000f017).rw(m_intc, FUNC(ps2_intc_device::read), FUNC(ps2_intc_device::write)).umask64(0x00000000ffffffff);
+	map(0x1000f130, 0x1000f137).nopr();
+	map(0x1000f180, 0x1000f187).w(FUNC(ps2sony_state::debug_w)).umask64(0x00000000000000ff);
+	map(0x1000f200, 0x1000f24f).rw(m_sif, FUNC(ps2_sif_device::ee_r), FUNC(ps2_sif_device::ee_w)).umask64(0x00000000ffffffff);
+	map(0x1000f430, 0x1000f437).rw(FUNC(ps2sony_state::unk_f430_r), FUNC(ps2sony_state::unk_f430_w)).umask64(0x00000000ffffffff); // Unknown
+	map(0x1000f440, 0x1000f447).rw(FUNC(ps2sony_state::unk_f440_r), FUNC(ps2sony_state::unk_f440_w)).umask64(0x00000000ffffffff); // Unknown
+	map(0x1000f520, 0x1000f523).r(m_dmac, FUNC(ps2_dmac_device::disable_mask_r)).umask64(0x00000000ffffffff);
+	map(0x1000f590, 0x1000f593).w(m_dmac, FUNC(ps2_dmac_device::disable_mask_w)).umask64(0x00000000ffffffff);
+	map(0x11000000, 0x11000fff).mirror(0x3000).ram().share(m_vu0_imem);
+	map(0x11004000, 0x11004fff).mirror(0x3000).ram().share(m_vu0_dmem);
+	map(0x11008000, 0x1100bfff).ram().share(m_vu1_imem);
+	map(0x1100c000, 0x1100ffff).ram().share(m_vu1_dmem);
+	map(0x12000000, 0x120003ff).mirror(0xc00).rw(m_gs, FUNC(ps2_gs_device::priv_regs0_r), FUNC(ps2_gs_device::priv_regs0_w));
+	map(0x12001000, 0x120013ff).mirror(0xc00).rw(m_gs, FUNC(ps2_gs_device::priv_regs1_r), FUNC(ps2_gs_device::priv_regs1_w));
+	map(0x1c000000, 0x1c1fffff).rw(FUNC(ps2sony_state::ee_iop_ram_r), FUNC(ps2sony_state::ee_iop_ram_w)); // IOP has 2MB EDO RAM per Wikipedia, and writes go up to this point
+	map(0x1f803800, 0x1f803807).r(FUNC(ps2sony_state::board_id_r));
+	map(0x1fc00000, 0x1fffffff).rom().region("bios", 0);
 
-    map(0x70000000, 0x70003fff).ram().share(m_sp_ram); // 16KB Scratchpad RAM
+	map(0x70000000, 0x70003fff).ram().share(m_sp_ram); // 16KB Scratchpad RAM
 }
 
 void ps2sony_state::iop_map(address_map &map)
 {
-    map(0x00000000, 0x001fffff).ram().share(m_iop_ram);
-    map(0x1d000000, 0x1d00004f).rw(m_sif, FUNC(ps2_sif_device::iop_r), FUNC(ps2_sif_device::iop_w));
-    map(0x1e000000, 0x1e003fff).nopr();
-    map(0x1f402000, 0x1f40201f).rw(m_iop_cdvd, FUNC(iop_cdvd_device::read), FUNC(iop_cdvd_device::write));
-    map(0x1f801070, 0x1f80107b).rw(m_iop_intc, FUNC(iop_intc_device::read), FUNC(iop_intc_device::write));
-    map(0x1f801080, 0x1f8010f7).rw(m_iop_dma, FUNC(iop_dma_device::bank0_r), FUNC(iop_dma_device::bank0_w));
-    map(0x1f801450, 0x1f801453).noprw();
-    map(0x1f8014a0, 0x1f8014af).rw(m_iop_timer, FUNC(iop_timer_device::read), FUNC(iop_timer_device::write));
-    map(0x1f801500, 0x1f801577).rw(m_iop_dma, FUNC(iop_dma_device::bank1_r), FUNC(iop_dma_device::bank1_w));
-    map(0x1f801578, 0x1f80157b).noprw();
-    map(0x1f802070, 0x1f802073).w(FUNC(ps2sony_state::iop_debug_w)).nopr();
-    map(0x1f808200, 0x1f8082ff).rw(m_iop_sio2, FUNC(iop_sio2_device::read), FUNC(iop_sio2_device::write));
-    map(0x1f900000, 0x1f9007ff).rw(m_iop_spu, FUNC(iop_spu_device::read), FUNC(iop_spu_device::write));
-    map(0x1fc00000, 0x1fffffff).rom().region("bios", 0);
-    map(0x1ffe0130, 0x1ffe0133).nopw();
+	map(0x00000000, 0x001fffff).ram().share(m_iop_ram);
+	map(0x1d000000, 0x1d00004f).rw(m_sif, FUNC(ps2_sif_device::iop_r), FUNC(ps2_sif_device::iop_w));
+	map(0x1e000000, 0x1e003fff).nopr();
+	map(0x1f402000, 0x1f40201f).rw(m_iop_cdvd, FUNC(iop_cdvd_device::read), FUNC(iop_cdvd_device::write));
+	map(0x1f801070, 0x1f80107b).rw(m_iop_intc, FUNC(iop_intc_device::read), FUNC(iop_intc_device::write));
+	map(0x1f801080, 0x1f8010f7).rw(m_iop_dma, FUNC(iop_dma_device::bank0_r), FUNC(iop_dma_device::bank0_w));
+	map(0x1f801450, 0x1f801453).noprw();
+	map(0x1f8014a0, 0x1f8014af).rw(m_iop_timer, FUNC(iop_timer_device::read), FUNC(iop_timer_device::write));
+	map(0x1f801500, 0x1f801577).rw(m_iop_dma, FUNC(iop_dma_device::bank1_r), FUNC(iop_dma_device::bank1_w));
+	map(0x1f801578, 0x1f80157b).noprw();
+	map(0x1f802070, 0x1f802073).w(FUNC(ps2sony_state::iop_debug_w)).nopr();
+	map(0x1f808200, 0x1f8082ff).rw(m_iop_sio2, FUNC(iop_sio2_device::read), FUNC(iop_sio2_device::write));
+	map(0x1f900000, 0x1f9007ff).rw(m_iop_spu, FUNC(iop_spu_device::read), FUNC(iop_spu_device::write));
+	map(0x1fc00000, 0x1fffffff).rom().region("bios", 0);
+	map(0x1ffe0130, 0x1ffe0133).nopw();
 }
 
 static INPUT_PORTS_START( ps2sony )

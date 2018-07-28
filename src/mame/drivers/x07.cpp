@@ -1497,7 +1497,6 @@ MACHINE_CONFIG_START(x07_state::x07)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(x07_state, x07)
-	config.set_default_layout(layout_lcd);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x07)
 
 	/* sound hardware */

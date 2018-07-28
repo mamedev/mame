@@ -23,7 +23,6 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
@@ -666,8 +665,6 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(microvision_state,microvision)
-
-	config.set_default_layout(layout_lcd);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -9,32 +9,32 @@
 *
 */
 
-#ifndef DEVICES_MACHINE_IOPCDVD_H
-#define DEVICES_MACHINE_IOPCDVD_H
+#ifndef MAME_MACHINE_IOPCDVD_H
+#define MAME_MACHINE_IOPCDVD_H
 
 #pragma once
 
-#include "emu.h"
 #include "iopintc.h"
 
 class iop_cdvd_device : public device_t
 {
 public:
 	template <typename T>
-    iop_cdvd_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&intc_tag)
-    	: iop_cdvd_device(mconfig, tag, owner, (uint32_t)0)
-    {
+	iop_cdvd_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&intc_tag)
+		: iop_cdvd_device(mconfig, tag, owner, (uint32_t)0)
+	{
 		m_intc.set_tag(std::forward<T>(intc_tag));
 	}
 
-    iop_cdvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iop_cdvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~iop_cdvd_device() override;
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
 protected:
-    virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void handle_data_command(uint8_t data);
 	void data_fifo_push(uint8_t data);
@@ -70,4 +70,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SONYIOP_CDVD, iop_cdvd_device)
 
-#endif // DEVICES_MACHINE_IOPCDVD_H
+#endif // MAME_MACHINE_IOPCDVD_H

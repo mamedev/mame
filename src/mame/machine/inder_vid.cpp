@@ -24,14 +24,14 @@ inder_vid_device::inder_vid_device(const machine_config &mconfig, const char *ta
 void inder_vid_device::megaphx_tms_map(address_map &map)
 {
 
-	map(0x00000000, 0x003fffff).ram().share("vram"); // vram?
+	map(0x00000000, 0x003fffff).ram().share(m_vram); // vram?
 
 	map(0x04000000, 0x0400000f).w("ramdac", FUNC(ramdac_device::index_w)).umask16(0x00ff);
 	map(0x04000010, 0x0400001f).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w)).umask16(0x00ff);
 	map(0x04000030, 0x0400003f).w("ramdac", FUNC(ramdac_device::index_r_w)).umask16(0x00ff);
 	map(0x04000090, 0x0400009f).nopw();
 	map(0x7fc00000, 0x7fffffff).ram().mirror(0x80000000);
-	map(0xc0000000, 0xc00001ff).rw("tms", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 }
 
 
@@ -92,27 +92,19 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(inder_vid_device::from_shiftreg)
 	m_shiftfull = 0;
 }
 
-WRITE_LINE_MEMBER(inder_vid_device::m68k_gen_int)
-{
-	cpu_device *maincpu = (cpu_device*)machine().device("maincpu");
-	if (state) maincpu->set_input_line(4, ASSERT_LINE);
-	else maincpu->set_input_line(4, CLEAR_LINE);
-}
-
-
 void inder_vid_device::ramdac_map(address_map &map)
 {
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
 }
 
 MACHINE_CONFIG_START(inder_vid_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("tms", TMS34010, XTAL(40'000'000))
+	MCFG_DEVICE_ADD(m_tms, TMS34010, XTAL(40'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(megaphx_tms_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000)/12) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(inder_vid_device, scanline)     /* scanline updater (RGB32) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, inder_vid_device, m68k_gen_int))
+	MCFG_TMS340X0_OUTPUT_INT_CB(INPUTLINE(":maincpu", 4))
 	MCFG_TMS340X0_TO_SHIFTREG_CB(inder_vid_device, to_shiftreg)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(inder_vid_device, from_shiftreg) /* read from shiftreg function */
 
@@ -120,7 +112,7 @@ MACHINE_CONFIG_START(inder_vid_device::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000)/12, 424, 0, 338-1, 262, 0, 246-1)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD(m_palette, 256)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 	MCFG_RAMDAC_SPLIT_READ(1)
@@ -130,6 +122,7 @@ MACHINE_CONFIG_END
 
 void inder_vid_device::device_start()
 {
+	save_item(NAME(m_shiftfull));
 }
 
 void inder_vid_device::device_reset()

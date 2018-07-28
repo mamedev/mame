@@ -932,6 +932,17 @@ public:
 	view_list const &views() const { return m_viewlist; }
 
 private:
+	using environment = emu::render::detail::layout_environment;
+
+	// add elements and parameters
+	void add_elements(
+			char const *dirname,
+			environment &env,
+			util::xml::data_node const &parentnode,
+			group_map &groupmap,
+			bool repeat,
+			bool init);
+
 	// internal state
 	element_map     m_elemmap;      // list of shared layout elements
 	view_list       m_viewlist;     // list of views

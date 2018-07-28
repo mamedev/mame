@@ -395,8 +395,8 @@ void mtech_state::set_genz80_as_sms()
 	// ports
 	io.install_read_handler      (0x40, 0x41, 0, 0x3e, 0, read8_delegate(FUNC(mtech_state::sms_count_r),this));
 	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8_delegate(FUNC(mtech_state::sms_sn_w),this));
-	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::vram_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::vram_write),(sega315_5124_device *)m_vdp));
-	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::register_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::register_write),(sega315_5124_device *)m_vdp));
+	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::data_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::data_write),(sega315_5124_device *)m_vdp));
+	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::control_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::control_write),(sega315_5124_device *)m_vdp));
 
 	io.install_read_handler      (0x10, 0x10, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this)); // super tetris
 
@@ -595,8 +595,8 @@ void mtech_state::megatech_bios_portmap(address_map &map)
 	map(0x7f, 0x7f).w(FUNC(mtech_state::bios_port_7f_w));
 
 	map(0x40, 0x41).mirror(0x3e).r(FUNC(mtech_state::vdp1_count_r));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 
 	map(0xdc, 0xdd).r(FUNC(mtech_state::bios_joypad_r));  // player inputs
 }

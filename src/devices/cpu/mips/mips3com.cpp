@@ -367,7 +367,7 @@ void mips3_device::tlb_map_entry(int tlbindex)
 	}
 
 	/* get the number of pages from the page mask */
-    /* R5900: if the S bit is set in EntryLo, it is the scratchpad, and is always 4 pages. */
+	/* R5900: if the S bit is set in EntryLo, it is the scratchpad, and is always 4 pages. */
 	if ((entry->entry_lo[0] & 0x80000000) && m_flavor == MIPS3_TYPE_R5900)
 		count = 4;
 	else

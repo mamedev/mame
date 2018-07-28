@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "bus/ti99/ti99defs.h"
 
 namespace bus { namespace ti99 { namespace internal {

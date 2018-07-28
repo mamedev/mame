@@ -9,6 +9,7 @@
 *
 */
 
+#include "emu.h"
 #include "ps2mc.h"
 
 DEFINE_DEVICE_TYPE(SONYPS2_MC, ps2_mc_device, "ps2mc", "PlayStation 2 Memory Card")
@@ -18,6 +19,10 @@ DEFINE_DEVICE_TYPE(SONYPS2_MC, ps2_mc_device, "ps2mc", "PlayStation 2 Memory Car
 
 ps2_mc_device::ps2_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SONYPS2_MC, tag, owner, clock)
+{
+}
+
+ps2_mc_device::~ps2_mc_device()
 {
 }
 

@@ -129,17 +129,17 @@ protected:
 	DECLARE_WRITE8_MEMBER( dma_1_dack_w ) { }
 	DECLARE_WRITE8_MEMBER( dma_2_dack_w ) { }
 	DECLARE_WRITE8_MEMBER( dma_3_dack_w ) { popmessage("IOW3: data %02x",data); }
-	
+
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	DECLARE_WRITE_LINE_MEMBER(timer_clk_out);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 
 	void ngen386_io(address_map &map);
 	void ngen386_mem(address_map &map);
 	void ngen386i_mem(address_map &map);
-	
+
 	optional_device<i80186_cpu_device> m_maincpu;
 	optional_device<i386_device> m_i386cpu;
 	required_device<mc6845_device> m_crtc;

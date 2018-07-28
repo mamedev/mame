@@ -170,6 +170,16 @@ void gameboy_sound_device::device_start()
 
 
 //-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void gameboy_sound_device::device_clock_changed()
+{
+	m_timer->adjust(clocks_to_attotime(FRAME_CYCLES / 128), 0, clocks_to_attotime(FRAME_CYCLES / 128));
+}
+
+
+//-------------------------------------------------
 //  device_reset
 //-------------------------------------------------
 

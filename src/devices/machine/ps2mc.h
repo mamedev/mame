@@ -9,22 +9,21 @@
 *
 */
 
-#ifndef DEVICES_MACHINE_PS2MC_H
-#define DEVICES_MACHINE_PS2MC_H
+#ifndef MAME_MACHINE_PS2MC_H
+#define MAME_MACHINE_PS2MC_H
 
 #pragma once
-
-#include "emu.h"
 
 class ps2_mc_device : public device_t
 {
 public:
-    ps2_mc_device(const machine_config &mconfig, const char *tag, device_t *owner)
-    	: ps2_mc_device(mconfig, tag, owner, (uint32_t)0)
-    {
+	ps2_mc_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: ps2_mc_device(mconfig, tag, owner, (uint32_t)0)
+	{
 	}
 
-    ps2_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~ps2_mc_device() override;
 
 	void recv_fifo_push(uint8_t data); // TODO: Turn me into a bus interface!
 	uint8_t xmit_fifo_pop();
@@ -36,8 +35,8 @@ public:
 	static const uint8_t SIO_DEVICE_ID = 0x81;
 
 protected:
-    virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void xmit_fifo_push(uint8_t data);
 	uint8_t recv_fifo_pop();
@@ -49,9 +48,9 @@ protected:
 
 	enum : uint8_t
 	{
-		CMD_INIT		= 0x11,
-		CMD_GET_TERM	= 0x28,
-		CMD_UNKNOWN_F3	= 0xf3,
+		CMD_INIT        = 0x11,
+		CMD_GET_TERM    = 0x28,
+		CMD_UNKNOWN_F3  = 0xf3,
 	};
 
 	uint8_t m_recv_buf[512]; // Buffer size is a guess
@@ -72,4 +71,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SONYPS2_MC, ps2_mc_device)
 
-#endif // DEVICES_MACHINE_PS2MC_H
+#endif // MAME_MACHINE_PS2MC_H

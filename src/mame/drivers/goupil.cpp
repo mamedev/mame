@@ -496,7 +496,7 @@ MC6845_UPDATE_ROW(goupil_g2_state::crtc_update_row)
 	{
 		uint16_t const offset = ( 0x400 + ( ma + x ) ) & 0x7FF;
 		uint8_t const chr = m_visu24x80_ram->pointer()[offset];
-		uint8_t const gfx = m_visu24x80_rom[ ( ( chr & 0x7F ) << 4 ) + ra ];
+		uint8_t const gfx = m_visu24x80_rom[ ( ( chr & 0x7F ) << 4 ) + ra ] ^ ((x == cursor_x) ? 0xff : 0);
 
 		for (unsigned bit = 0; 8 > bit; ++bit)
 		{
@@ -647,23 +647,18 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( goupilg1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_DEFAULT_BIOS("v1_0")
-
-	ROM_SYSTEM_BIOS(0, "v1_0", "Version 1.0")
-	ROMX_LOAD( "smt_goupil_g1_mon_1.bin", 0xF800, 0x0400, CRC(98b7be69) SHA1(69e83fe78a43fcf2b08fb0bcefb0d217a57b1ecb), ROM_BIOS(0) )
-	ROM_LOAD ( "smt_goupil_g1_mon_2.bin", 0xFC00, 0x0400, CRC(19386b81) SHA1(e52f63fd29d374319781e9677de6d3fd61a3684c) )
-
-	ROM_LOAD ( "smt_goupil_g1_mod_3.bin", 0xF400, 0x0400, CRC(e662f152) SHA1(11b91c5737e7572a2c18472b66bbd16b485132d5) )
-
-	ROMX_LOAD( "smt_goupil_g1_basic_1.bin", 0xC000, 0x0400, CRC(ad105b12) SHA1(631cd4b997f76b57bf2509e4bff30b1595c8bd13), ROM_BIOS(0) )
-	ROMX_LOAD( "smt_goupil_g1_basic_2.bin", 0xC400, 0x0400, CRC(0c5c309c) SHA1(f1cab4b0f9191e53113790a95f1ab7108f9406a1), ROM_BIOS(0) )
-	ROMX_LOAD( "smt_goupil_g1_basic_3.bin", 0xC800, 0x0400, CRC(1f1eb127) SHA1(dbbb880c79d515acbfcb2be9a4c96962f3e4edea), ROM_BIOS(0) )
-	ROMX_LOAD( "smt_goupil_g1_basic_4.bin", 0xCC00, 0x0400, CRC(09be48e4) SHA1(86cae0d159583c1d572a5754f3bb6b4a2e479359), ROM_BIOS(0) )
-	ROMX_LOAD( "smt_goupil_g1_basic_5.bin", 0xD000, 0x0400, CRC(bdeb395c) SHA1(32a50468f1ca772ee45a1f5c61c66f3ecc774074), ROM_BIOS(0) )
-	ROMX_LOAD( "smt_goupil_g1_basic_6.bin", 0xD400, 0x0400, CRC(850a4000) SHA1(720f0bb3e45877835219b7e1d943ef4f19b9977d), ROM_BIOS(0) )
-	ROMX_LOAD( "smt_goupil_g1_basic_7.bin", 0xD800, 0x0400, CRC(586c7670) SHA1(13e2e96b9f1a53555ce0d55f657cf3c6b96f10a0), ROM_BIOS(0) )
-	ROMX_LOAD( "smt_goupil_g1_basic_8.bin", 0xDC00, 0x0400, CRC(33281300) SHA1(ce631fa8157a3f8869c5fefe24b7f40e06696df9), ROM_BIOS(0) )
-	ROMX_LOAD( "smt_goupil_g1_basic_9.bin", 0xE000, 0x0400, CRC(a3911201) SHA1(8623a0a2d83eb3a27a795030643c5c05a4350a9f), ROM_BIOS(0) )
+	ROM_LOAD( "smt_goupil_g1_basic_1.bin", 0xC000, 0x0400, CRC(ad105b12) SHA1(631cd4b997f76b57bf2509e4bff30b1595c8bd13) )
+	ROM_LOAD( "smt_goupil_g1_basic_2.bin", 0xC400, 0x0400, CRC(0c5c309c) SHA1(f1cab4b0f9191e53113790a95f1ab7108f9406a1) )
+	ROM_LOAD( "smt_goupil_g1_basic_3.bin", 0xC800, 0x0400, CRC(1f1eb127) SHA1(dbbb880c79d515acbfcb2be9a4c96962f3e4edea) )
+	ROM_LOAD( "smt_goupil_g1_basic_4.bin", 0xCC00, 0x0400, CRC(09be48e4) SHA1(86cae0d159583c1d572a5754f3bb6b4a2e479359) )
+	ROM_LOAD( "smt_goupil_g1_basic_5.bin", 0xD000, 0x0400, CRC(bdeb395c) SHA1(32a50468f1ca772ee45a1f5c61c66f3ecc774074) )
+	ROM_LOAD( "smt_goupil_g1_basic_6.bin", 0xD400, 0x0400, CRC(850a4000) SHA1(720f0bb3e45877835219b7e1d943ef4f19b9977d) )
+	ROM_LOAD( "smt_goupil_g1_basic_7.bin", 0xD800, 0x0400, CRC(586c7670) SHA1(13e2e96b9f1a53555ce0d55f657cf3c6b96f10a0) )
+	ROM_LOAD( "smt_goupil_g1_basic_8.bin", 0xDC00, 0x0400, CRC(33281300) SHA1(ce631fa8157a3f8869c5fefe24b7f40e06696df9) )
+	ROM_LOAD( "smt_goupil_g1_basic_9.bin", 0xE000, 0x0400, CRC(a3911201) SHA1(8623a0a2d83eb3a27a795030643c5c05a4350a9f) )
+	ROM_LOAD( "smt_goupil_g1_mod_3.bin",   0xF400, 0x0400, CRC(e662f152) SHA1(11b91c5737e7572a2c18472b66bbd16b485132d5) )
+	ROM_LOAD( "smt_goupil_g1_mon_1.bin",   0xF800, 0x0400, CRC(98b7be69) SHA1(69e83fe78a43fcf2b08fb0bcefb0d217a57b1ecb) )
+	ROM_LOAD( "smt_goupil_g1_mon_2.bin",   0xFC00, 0x0400, CRC(19386b81) SHA1(e52f63fd29d374319781e9677de6d3fd61a3684c) )
 
 	ROM_REGION( 0x400, "ef9364", 0 )
 	ROM_LOAD( "smt_goupil_g1_charset.bin", 0x0000, 0x0400, CRC(8b6da54b) SHA1(ac2204600f45c6dd0df1e759b62ed25928f02a12) )
@@ -672,17 +667,13 @@ ROM_END
 /* ROM definition */
 ROM_START( goupilg2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_DEFAULT_BIOS("v1_4")
-
-	ROM_SYSTEM_BIOS(0, "v1_4", "Version 1.4")
-	ROMX_LOAD( "smt_goupil_g2_mon_1.bin", 0xF000, 0x0800, CRC(91a4f256) SHA1(ece3b47a17e47fc87e2262be806ce8015f5f5db6), ROM_BIOS(0) )
-	ROM_LOAD ( "smt_goupil_g2_mon_2.bin", 0xF800, 0x0800, CRC(f7783a32) SHA1(7368fc0bd86b48e6727367bd7d1922f219741015) )
-
-	ROM_LOAD ( "smt_goupil_g2_mod_1.bin", 0xC000, 0x0400, CRC(4d585e40) SHA1(7558f89db52299c4c305755259d5c908b3f66ac7) )
-	ROM_LOAD ( "smt_goupil_g2_mod_2.bin", 0xC400, 0x0400, CRC(c5531667) SHA1(24b0a1d3b812b95e68f4dc4323581b1fd14eb4fb) )
+	ROM_LOAD( "smt_goupil_g2_mod_1.bin",   0xC000, 0x0400, CRC(4d585e40) SHA1(7558f89db52299c4c305755259d5c908b3f66ac7) )
+	ROM_LOAD( "smt_goupil_g2_mod_2.bin",   0xC400, 0x0400, CRC(c5531667) SHA1(24b0a1d3b812b95e68f4dc4323581b1fd14eb4fb) )
+	ROM_LOAD( "smt_goupil_g2_mon_1.bin",   0xF000, 0x0800, CRC(91a4f256) SHA1(ece3b47a17e47fc87e2262be806ce8015f5f5db6) )
+	ROM_LOAD( "smt_goupil_g2_mon_2.bin",   0xF800, 0x0800, CRC(f7783a32) SHA1(7368fc0bd86b48e6727367bd7d1922f219741015) )
 
 	ROM_REGION( 0x400, "ef9364", 0 )
-	ROM_LOAD ( "smt_goupil_g2_charset.bin", 0x0000, 0x0400, CRC(d3930877) SHA1(7b790fb18f8893cfc753bf622c8b795075741d22) )
+	ROM_LOAD( "smt_goupil_g2_charset.bin", 0x0000, 0x0400, CRC(d3930877) SHA1(7b790fb18f8893cfc753bf622c8b795075741d22) )
 
 	ROM_REGION( 0x800, "visu_24x80", 0 )
 	ROM_LOAD( "smt_goupil_g2_charset_24x80.bin", 0x0000, 0x0800, CRC(f0f83b99) SHA1(75a7730aec30280ee4ccf3dcaf587eea4f861196) )

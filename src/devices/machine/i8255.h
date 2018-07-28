@@ -117,7 +117,7 @@ protected:
 	const bool m_force_portb_in;
 	const bool m_force_portc_out;
 	const bool m_dont_clear_output_latches;
-	
+
 private:
 	inline void check_interrupt(int port);
 	inline void set_ibf(int port, int state);

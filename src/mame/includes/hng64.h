@@ -143,6 +143,7 @@ public:
 		m_palette(*this, "palette"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_iomcu(*this, "iomcu"),
 		m_dsp(*this, "l7a1045"),
 		m_comm(*this, "network"),
 		m_rtc(*this, "rtc"),
@@ -185,6 +186,7 @@ public:
 private:
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
+	required_device<tmp87ph40an_device> m_iomcu;
 	required_device<l7a1045_sound_device> m_dsp;
 	required_device<cpu_device> m_comm;
 	required_device<msm6242_device> m_rtc;
@@ -302,6 +304,24 @@ private:
 	DECLARE_WRITE8_MEMBER(hng64_comm_space_w);
 	DECLARE_READ8_MEMBER(hng64_comm_mmu_r);
 	DECLARE_WRITE8_MEMBER(hng64_comm_mmu_w);
+
+	DECLARE_READ8_MEMBER(ioport0_r);
+	DECLARE_READ8_MEMBER(ioport1_r);
+	DECLARE_READ8_MEMBER(ioport2_r);
+	DECLARE_READ8_MEMBER(ioport3_r);
+	DECLARE_READ8_MEMBER(ioport4_r);
+	DECLARE_READ8_MEMBER(ioport5_r);
+	DECLARE_READ8_MEMBER(ioport6_r);
+	DECLARE_READ8_MEMBER(ioport7_r);
+
+	DECLARE_WRITE8_MEMBER(ioport0_w);
+	DECLARE_WRITE8_MEMBER(ioport1_w);
+	DECLARE_WRITE8_MEMBER(ioport2_w);
+	DECLARE_WRITE8_MEMBER(ioport3_w);
+	DECLARE_WRITE8_MEMBER(ioport4_w);
+	DECLARE_WRITE8_MEMBER(ioport5_w);
+	DECLARE_WRITE8_MEMBER(ioport6_w);
+	DECLARE_WRITE8_MEMBER(ioport7_w);
 
 	void init_hng64_reorder_gfx();
 

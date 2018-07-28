@@ -109,7 +109,7 @@ public:
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 	{ }
-	
+
 	void amust(machine_config &config);
 
 	void init_amust();

@@ -9,6 +9,7 @@
 *
 */
 
+#include "emu.h"
 #include "ps2pad.h"
 
 DEFINE_DEVICE_TYPE(SONYPS2_PAD, ps2_pad_device, "ps2pad", "Sony DualShock 2")
@@ -17,6 +18,10 @@ DEFINE_DEVICE_TYPE(SONYPS2_PAD, ps2_pad_device, "ps2pad", "Sony DualShock 2")
 
 ps2_pad_device::ps2_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SONYPS2_PAD, tag, owner, clock)
+{
+}
+
+ps2_pad_device::~ps2_pad_device()
 {
 }
 

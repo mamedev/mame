@@ -325,7 +325,7 @@ void score7_cpu_device::check_irq()
 			if (m_pending_interrupt[i])
 			{
 				m_pending_interrupt[i] = false;
-				debugger_interrupt_hook(i);
+				standard_irq_callback(i);
 				gen_exception(EXCEPTION_INTERRUPT, i);
 				return;
 			}

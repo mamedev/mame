@@ -4,55 +4,55 @@
 
     decstation.cpp: MIPS-based DECstation family
 
-	WANTED: all boot ROM dumps except 5000/133, all TURBOchannel card ROM dumps
+    WANTED: all boot ROM dumps except 5000/133, all TURBOchannel card ROM dumps
 
-	NOTE: after all the spew of failing tests (it really wants a VT102 terminal),
-	press 'q' at the MORE prompt and wait a few seconds for the PROM monitor to appear.
-	Type 'ls' for a list of commands (this is a very UNIX-flavored PROM monitor).
+    NOTE: after all the spew of failing tests (it really wants a VT102 terminal),
+    press 'q' at the MORE prompt and wait a few seconds for the PROM monitor to appear.
+    Type 'ls' for a list of commands (this is a very UNIX-flavored PROM monitor).
 
-	Machine types:
-		DECstation 3100 (PMAX/KN01):
-			16.67 MHz R2000 with FPU and MMU
-			24 MiB max RAM
-			Serial: DEC "DZ" quad-UART (DC7085 gate array)
-			SCSI: DEC "SII" SCSI interface (DC7061 gate array)
-			Ethernet: AMD7990 "LANCE" controller
-			Monochrome or color video on-board
-		PMIN/KN01: 
-			Cheaper PMAX, 12.5 MHz R2000, same as PMAX
+    Machine types:
+        DECstation 3100 (PMAX/KN01):
+            16.67 MHz R2000 with FPU and MMU
+            24 MiB max RAM
+            Serial: DEC "DZ" quad-UART (DC7085 gate array)
+            SCSI: DEC "SII" SCSI interface (DC7061 gate array)
+            Ethernet: AMD7990 "LANCE" controller
+            Monochrome or color video on-board
+        PMIN/KN01:
+            Cheaper PMAX, 12.5 MHz R2000, same as PMAX
 
-		Personal DECstation 5000/xx (MAXine/KN02BA):
-			20, 25, or 33 MHz R3000 or 100 MHz R4000
-			40 MiB max RAM
-			Serial: DEC "DZ" quad-UART for keyboard/mouse, SCC8530 for modem/printer
-			SCSI: NCR53C94
-			Ethernet: AMD7990 "LANCE" controller
-			Audio: AMD AM79C30
-			Color 1024x768 8bpp video on-board
-			2 TURBOchannel slots
+        Personal DECstation 5000/xx (MAXine/KN02BA):
+            20, 25, or 33 MHz R3000 or 100 MHz R4000
+            40 MiB max RAM
+            Serial: DEC "DZ" quad-UART for keyboard/mouse, SCC8530 for modem/printer
+            SCSI: NCR53C94
+            Ethernet: AMD7990 "LANCE" controller
+            Audio: AMD AM79C30
+            Color 1024x768 8bpp video on-board
+            2 TURBOchannel slots
 
-		DECstation 5000/1xx: (3MIN/KN02DA):
-			20, 25, or 33 MHz R3000 or 100 MHz R4000
-			128 MiB max RAM
-			Serial: 2x SCC8530
-			SCSI: NCR53C94
-			Ethernet: AMD7990 "LANCE" controller
-			No on-board video
-			3 TURBOchannel slots
+        DECstation 5000/1xx: (3MIN/KN02DA):
+            20, 25, or 33 MHz R3000 or 100 MHz R4000
+            128 MiB max RAM
+            Serial: 2x SCC8530
+            SCSI: NCR53C94
+            Ethernet: AMD7990 "LANCE" controller
+            No on-board video
+            3 TURBOchannel slots
 
-		DECstation 5000/200: (3MAX/KN02):
-			25 MHz R3000
-			480 MiB max RAM
-			Serial: DEC "DZ" quad-UART
-			SCSI: NCR53C94
-			Ethernet: AMD7990 "LANCE" controllor
+        DECstation 5000/200: (3MAX/KN02):
+            25 MHz R3000
+            480 MiB max RAM
+            Serial: DEC "DZ" quad-UART
+            SCSI: NCR53C94
+            Ethernet: AMD7990 "LANCE" controllor
 
-		DECstation 5000/240, 5000/261 (3MAX+/KN03)
-			40 MHz R3400, or 120 MHz R4400.
-			480 MiB max RAM
-			Serial: 2x SCC8530
-			SCSI: NCR53C94
-			Ethernet: AMD7990 "LANCE" controller
+        DECstation 5000/240, 5000/261 (3MAX+/KN03)
+            40 MHz R3400, or 120 MHz R4400.
+            480 MiB max RAM
+            Serial: 2x SCC8530
+            SCSI: NCR53C94
+            Ethernet: AMD7990 "LANCE" controller
 
 ****************************************************************************/
 
@@ -95,7 +95,7 @@ protected:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<dec_ioga_device> m_ioga;
 	required_device<mc146818_device> m_rtc;
@@ -145,20 +145,20 @@ READ32_MEMBER(decstation_state::cfb_r)
 
 	switch (addr)
 	{
-		case 0x3c03e0: return 1;	// ROM width
-		case 0x3c03e4: return 4;	// ROM stride
-		case 0x3c03e8: return 1;	// ROM size in 8 KiB units
-		case 0x3c03ec: return 1;	// card address space in 4 MiB units
+		case 0x3c03e0: return 1;    // ROM width
+		case 0x3c03e4: return 4;    // ROM stride
+		case 0x3c03e8: return 1;    // ROM size in 8 KiB units
+		case 0x3c03ec: return 1;    // card address space in 4 MiB units
 		case 0x3c03f0: return 0x55555555; // TURBOchannel ID bytes
 		case 0x3c03f4: return 0x00000000;
 		case 0x3c03f8: return 0xaaaaaaaa;
 		case 0x3c03fc: return 0xffffffff;
-		case 0x3c0470: return 0;	// does card support parity?
+		case 0x3c0470: return 0;    // does card support parity?
 	}
 
 	return 0xffffffff;
 }
-	
+
 WRITE32_MEMBER(decstation_state::cfb_w)
 {
 	logerror("cfb: %08x (mask %08x) @ %x\n", data, mem_mask, offset);
@@ -182,7 +182,7 @@ void decstation_state::machine_reset()
 
 void decstation_state::decstation_map(address_map &map)
 {
-	map(0x00000000, 0x07ffffff).ram(); 	// full 128 MB
+	map(0x00000000, 0x07ffffff).ram();  // full 128 MB
 	map(0x10000000, 0x103cffff).rw(FUNC(decstation_state::cfb_r), FUNC(decstation_state::cfb_w));
 	map(0x1c000000, 0x1c07ffff).m(m_ioga, FUNC(dec_ioga_device::map));
 	map(0x1c100000, 0x1c100003).rw(m_scc0, FUNC(z80scc_device::ca_r), FUNC(z80scc_device::ca_w)).umask32(0x0000ff00);

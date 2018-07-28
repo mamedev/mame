@@ -9,6 +9,7 @@
 *
 */
 
+#include "emu.h"
 #include "iopsio2.h"
 
 DEFINE_DEVICE_TYPE(SONYIOP_SIO2, iop_sio2_device, "iopsio2", "PlayStation 2 IOP SIO2")
@@ -21,6 +22,10 @@ iop_sio2_device::iop_sio2_device(const machine_config &mconfig, const char *tag,
 	, m_pad0(*this, finder_base::DUMMY_TAG)
 	, m_pad1(*this, finder_base::DUMMY_TAG)
 	, m_mc0(*this, finder_base::DUMMY_TAG)
+{
+}
+
+iop_sio2_device::~iop_sio2_device()
 {
 }
 
@@ -241,29 +246,29 @@ void iop_sio2_device::transmit_to_device_hack(uint8_t data)
 
 			if (!m_cmd_size)
 			{
-				m_response_timer->adjust(attotime::from_ticks(8*pad(m_curr_port)->xmit_fifo_depth(), 250'000), m_curr_port);
-				m_curr_port++;
+			    m_response_timer->adjust(attotime::from_ticks(8*pad(m_curr_port)->xmit_fifo_depth(), 250'000), m_curr_port);
+			    m_curr_port++;
 			}*/
 			break;
 
 		case ps2_mc_device::SIO_DEVICE_ID:
 			/*if (m_cmd_size || cmd_complete)
 			{
-				logerror("Pushing %02x to memory card, m_cmd_size is %d\n", data, m_cmd_size);
-				m_mc0->recv_fifo_push(data);
+			    logerror("Pushing %02x to memory card, m_cmd_size is %d\n", data, m_cmd_size);
+			    m_mc0->recv_fifo_push(data);
 			}
 
 			if (cmd_complete)
 			{
-				logerror("Command is complete, processing fifos\n");
-				m_unknown_0x6c = 0x00001100;
-				m_mc0->process_fifos();
-				while (m_mc0->xmit_fifo_depth() && m_end_byte < BUFFER_SIZE)
-				{
-					logerror("xmit fifo is %d, end byte is %d\n", m_mc0->xmit_fifo_depth(), m_end_byte);
-					receive_from_device_hack(m_mc0->xmit_fifo_pop());
-				}
-				m_unknown_0x74 = m_cmd_length;
+			    logerror("Command is complete, processing fifos\n");
+			    m_unknown_0x6c = 0x00001100;
+			    m_mc0->process_fifos();
+			    while (m_mc0->xmit_fifo_depth() && m_end_byte < BUFFER_SIZE)
+			    {
+			        logerror("xmit fifo is %d, end byte is %d\n", m_mc0->xmit_fifo_depth(), m_end_byte);
+			        receive_from_device_hack(m_mc0->xmit_fifo_pop());
+			    }
+			    m_unknown_0x74 = m_cmd_length;
 			}*/
 			m_unknown_0x6c = 0x0001d100; // TODO: As above
 			receive_from_device_hack(0);

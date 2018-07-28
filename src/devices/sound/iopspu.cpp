@@ -9,6 +9,7 @@
 *
 */
 
+#include "emu.h"
 #include "iopspu.h"
 
 DEFINE_DEVICE_TYPE(SONYIOP_SPU, iop_spu_device, "iopspu", "PlayStation 2 IOP SPU")
@@ -18,6 +19,10 @@ iop_spu_device::iop_spu_device(const machine_config &mconfig, const char *tag, d
 	, device_sound_interface(mconfig, *this)
 	, m_iop(*this, finder_base::DUMMY_TAG)
 	, m_intc(*this, finder_base::DUMMY_TAG)
+{
+}
+
+iop_spu_device::~iop_spu_device()
 {
 }
 
@@ -139,15 +144,15 @@ uint16_t iop_spu_device::reg_read(int bank, uint32_t offset, uint16_t mem_mask)
 			logerror("%s %d: read: Unknown 0x19a (%04x & %04x)\n", machine().describe_context(), bank, ret, mem_mask);
 			break;
 
-        case 0x1a8:
-            ret = (uint16_t)(core.m_start_port_addr >> 16);
+		case 0x1a8:
+			ret = (uint16_t)(core.m_start_port_addr >> 16);
 			logerror("%s %d: read: PORT_ADDR_HI: %04x & %04x\n", machine().describe_context(), bank, ret, mem_mask);
-            break;
+			break;
 
-        case 0x1aa:
-            ret = (uint16_t)core.m_start_port_addr;
+		case 0x1aa:
+			ret = (uint16_t)core.m_start_port_addr;
 			logerror("%s %d: read: PORT_ADDR_LO: %04x & %04x\n", machine().describe_context(), bank, ret, mem_mask);
-            break;
+			break;
 
 		case 0x1b0:
 			ret = core.m_autodma_ctrl;
@@ -196,19 +201,19 @@ void iop_spu_device::reg_write(int bank, uint32_t offset, uint16_t data, uint16_
 			core.m_unknown_0x19a = data;
 			break;
 
-        case 0x1a8:
+		case 0x1a8:
 			logerror("%s %d: write: PORT_ADDR_HI: %04x & %04x\n", machine().describe_context(), bank, data, mem_mask);
 			core.m_start_port_addr &= ~0x000f0000;
 			core.m_start_port_addr |= ((uint32_t)data << 16) & 0x000f0000;
 			core.m_curr_port_addr = core.m_start_port_addr;
-            break;
+			break;
 
-        case 0x1aa:
+		case 0x1aa:
 			logerror("%s %d: write: PORT_ADDR_LO: %04x & %04x\n", machine().describe_context(), bank, data, mem_mask);
 			core.m_start_port_addr &= ~0x0000ffff;
 			core.m_start_port_addr |= data;
 			core.m_curr_port_addr = core.m_start_port_addr;
-            break;
+			break;
 
 		case 0x1b0:
 			logerror("%s %d: write: Auto DMA control: %04x & %04x\n", machine().describe_context(), bank, data, mem_mask);

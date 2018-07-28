@@ -9,9 +9,8 @@
 *
 */
 
+#include "emu.h"
 #include "ps2gif.h"
-#include "ps2gs.h"
-#include "cpu/mips/ps2vu.h"
 
 DEFINE_DEVICE_TYPE(SONYPS2_GIF, ps2_gif_device, "ps2gif", "Playstation 2 GIF")
 
@@ -20,6 +19,10 @@ ps2_gif_device::ps2_gif_device(const machine_config &mconfig, const char *tag, d
 	, device_execute_interface(mconfig, *this)
 	, m_gs(*this, finder_base::DUMMY_TAG)
 	, m_vu1(*this, finder_base::DUMMY_TAG)
+{
+}
+
+ps2_gif_device::~ps2_gif_device()
 {
 }
 

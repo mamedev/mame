@@ -2163,6 +2163,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mephisto.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_montec.cpp",
 	MAME_DIR .. "src/mame/drivers/mmodular.cpp",
+	MAME_DIR .. "src/mame/drivers/modena.cpp",
 	MAME_DIR .. "src/mame/drivers/polgar.cpp",
 	MAME_DIR .. "src/mame/drivers/risc2500.cpp",
 	MAME_DIR .. "src/mame/drivers/stratos.cpp",

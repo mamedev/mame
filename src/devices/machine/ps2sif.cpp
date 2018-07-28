@@ -9,8 +9,8 @@
 *
 */
 
+#include "emu.h"
 #include "ps2sif.h"
-#include "cpu/mips/ps2vu.h"
 
 DEFINE_DEVICE_TYPE(SONYPS2_SIF, ps2_sif_device, "ps2sif", "PlayStation 2 SIF")
 
@@ -19,6 +19,10 @@ DEFINE_DEVICE_TYPE(SONYPS2_SIF, ps2_sif_device, "ps2sif", "PlayStation 2 SIF")
 ps2_sif_device::ps2_sif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SONYPS2_SIF, tag, owner, clock)
 	, m_intc(*this, finder_base::DUMMY_TAG)
+{
+}
+
+ps2_sif_device::~ps2_sif_device()
 {
 }
 
