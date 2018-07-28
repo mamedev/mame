@@ -72,6 +72,8 @@ public:
 	// accessor
 	uint8_t get_lines();
 
+	virtual void device_reset() override;
+
 protected:
 	enum applefdc_t
 	{
@@ -85,7 +87,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// other protecteds
