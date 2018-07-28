@@ -71,10 +71,8 @@ private:
 
 	bitmap_ind16 m_bitmap;
 
-	memory_region   *m_fontram_region;
-	memory_region *m_vram_region;
-	uint8_t   *m_fontram;
-	uint8_t   *m_vram;
+	std::unique_ptr<uint8_t[]> m_fontram;
+	std::unique_ptr<uint8_t[]> m_vram;
 	uint8_t   *m_ram_0000;
 	uint8_t   *m_ram_c000;
 	uint8_t   m_temp_attr;
@@ -110,7 +108,7 @@ private:
 		}
 
 		if ( m_pia0_porta & 0x40 )
-			m_ram_c000 = m_vram_region->base();
+			m_ram_c000 = m_vram.get();
 	}
 
 	DECLARE_WRITE8_MEMBER(osbexec_0000_w);
@@ -502,14 +500,8 @@ TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 
 void osbexec_state::init_osbexec()
 {
-	m_fontram_region = machine().memory().region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
-	m_vram_region = machine().memory().region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );
-	m_vram = m_vram_region->base();
-	m_fontram = m_fontram_region->base();
-
-
-	memset( m_fontram, 0x00, 0x1000 );
-	memset( m_vram, 0x00, 0x2000 );
+	m_vram = make_unique_clear<uint8_t[]>(0x2000);
+	m_fontram = make_unique_clear<uint8_t[]>(0x1000);
 
 	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osbexec_state::osbexec_video_callback),this));
 }
