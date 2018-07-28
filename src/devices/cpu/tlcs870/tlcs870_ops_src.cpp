@@ -524,7 +524,7 @@ void tlcs870_device::do_ALUOP_insrc_inHL(const uint8_t opbyte0, const uint8_t op
 
 	const uint16_t HL = get_reg16(REG_HL);
 
-	const uint8_t result = do_alu(aluop, val, RM8(HL));
+	const uint8_t result = do_alu_8bit(aluop, val, RM8(HL));
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -618,7 +618,7 @@ void tlcs870_device::do_ALUOP_insrc_n(const uint8_t opbyte0, const uint8_t opbyt
 	const int aluop = (opbyte1 & 0x7);
 	const uint8_t val = RM8(srcaddr);
 
-	const uint8_t result = do_alu(aluop, val, n);
+	const uint8_t result = do_alu_8bit(aluop, val, n);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -710,7 +710,7 @@ void tlcs870_device::do_ALUOP_A_insrc(const uint8_t opbyte0, const uint8_t opbyt
 	const int aluop = (opbyte1 & 0x7);
 	const uint8_t val = RM8(srcaddr);
 
-	const uint8_t result = do_alu(aluop, get_reg8(REG_A), val);
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(REG_A), val);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{

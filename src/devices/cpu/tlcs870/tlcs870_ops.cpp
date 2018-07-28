@@ -944,8 +944,10 @@ void tlcs870_device::do_JRS_T_a(const uint8_t opbyte0)
 	{
 		m_cycles += 2;
 		m_addr = m_tmppc + 2 + val;
-		set_JF();
 	}
+	
+	// always gets set?
+	set_JF();
 }
 
 void tlcs870_device::do_JRS_F_a(const uint8_t opbyte0)
@@ -967,8 +969,10 @@ void tlcs870_device::do_JRS_F_a(const uint8_t opbyte0)
 	{
 		m_cycles += 2;
 		m_addr = m_tmppc + 2 + val;
-		set_JF();
 	}
+	
+	// manual isn't clear in description, but probably always set?
+	set_JF();
 }
 
 void tlcs870_device::do_CALLV_n(const uint8_t opbyte0)
@@ -1015,8 +1019,10 @@ void tlcs870_device::do_JR_cc_a(const uint8_t opbyte0)
 	{
 		m_cycles += 2;
 		m_addr = m_tmppc + 2 + val;
-		set_JF();
 	}
+
+	// manual isn't clear in description, but probably always set?
+	set_JF();
 }
 
 void tlcs870_device::do_LD_CF_inxbit(const uint8_t opbyte0)
@@ -1149,7 +1155,7 @@ void tlcs870_device::do_ALUOP_A_n(const uint8_t opbyte0)
 	const int aluop = (opbyte0 & 0x7);
 	const uint8_t val = READ8();
 
-	const uint8_t result = do_alu(aluop, get_reg8(REG_A), val);
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(REG_A), val);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
@@ -1176,7 +1182,7 @@ void tlcs870_device::do_ALUOP_A_inx(const uint8_t opbyte0)
 	const uint16_t addr = READ8();
 	const uint8_t val = RM8(addr);
 
-	const uint8_t result = do_alu(aluop, get_reg8(REG_A), val);
+	const uint8_t result = do_alu_8bit(aluop, get_reg8(REG_A), val);
 
 	if (aluop != 0x07) // CMP doesn't write back
 	{
