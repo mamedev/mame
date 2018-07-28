@@ -66,6 +66,15 @@ void rf5c68_device::device_start()
 }
 
 //-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void rf5c68_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 384);
+}
+
+//-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------

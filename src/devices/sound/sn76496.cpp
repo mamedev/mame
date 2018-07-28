@@ -267,6 +267,11 @@ void sn76496_base_device::device_start()
 	register_for_save_states();
 }
 
+void sn76496_base_device::device_clock_changed()
+{
+	m_sound->set_sample_rate(clock()/2);
+}
+
 WRITE8_MEMBER( sn76496_base_device::stereo_w )
 {
 	m_sound->update();
