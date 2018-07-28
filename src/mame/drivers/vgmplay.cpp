@@ -14,6 +14,7 @@
 #include "cpu/m6502/n2a03.h"
 #include "sound/2203intf.h"
 #include "sound/2608intf.h"
+#include "sound/2610intf.h"
 #include "sound/2612intf.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
@@ -93,6 +94,7 @@ public:
 		A_YMF271     = 0x00013040,
 		A_YMZ280B    = 0x00013050,
 		A_YM2608     = 0x00013060,
+		A_YM2610     = 0x00013070,
 		A_K054539A   = 0x00013400,
 		A_K054539B   = 0x00013800,
 		A_QSOUND     = 0x00013c00,
@@ -199,6 +201,7 @@ private:
 		LED_RF5C164,
 
 		LED_X1_010,
+		LED_YM2610,
 
 		LED_COUNT
 	};
@@ -336,6 +339,7 @@ private:
 	required_device<ymf271_device> m_ymf271;
 	required_device<ymz280b_device> m_ymz280b;
 	required_device<ym2608_device> m_ym2608;
+	required_device<ym2610_device> m_ym2610;
 	required_device<qsound_device> m_qsound;
 	required_device<k051649_device> m_k051649;
 	required_device<iremga20_device> m_ga20;
@@ -626,6 +630,14 @@ void vgmplay_device::execute_run()
 				pulse_act_led(LED_YM2608);
 				m_io->write_byte(A_YM2608+0+((code & 1) << 1), m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM2608+1+((code & 1) << 1), m_file->read_byte(m_pc+2));
+				m_pc += 3;
+				break;
+
+			case 0x58:
+			case 0x59:
+				pulse_act_led(LED_YM2610);
+				m_io->write_byte(A_YM2610 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2610 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
 				break;
 
@@ -1394,6 +1406,7 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_ymf271(*this, "ymf271")
 	, m_ymz280b(*this, "ymz280b")
 	, m_ym2608(*this, "ym2608")
+	, m_ym2610(*this, "ym2610")
 	, m_qsound(*this, "qsound")
 	, m_k051649(*this, "k051649")
 	, m_ga20(*this, "ga20")
@@ -1520,8 +1533,11 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		if (version >= 0x151 && data_start >= 0x4c && (r32(0x48) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd YM2608\n");
 
-		if (version >= 0x151 && data_start >= 0x50 && r32(0x4c))
-			logerror("Warning: file requests an unsupported %s\n", r32(0x4c) & 0x80000000 ? "YM2610B" : "YM2610");
+		m_ym2610->set_unscaled_clock(version >= 0x151 && data_start >= 0x50 ? r32(0x4c) & ~0xc0000000 : 0);
+		if (version >= 0x151 && data_start >= 0x50 && (r32(0x4c) & 0x40000000))
+			logerror("Warning: file requests an unsupported 2nd YM2610\n");
+		if (version >= 0x151 && data_start >= 0x50 && (r32(0x4c) & 0x80000000))
+			logerror("Warning: file requests an unsupported YM2610B\n");
 
 		m_ym3812->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 ? r32(0x50) & ~0x40000000 : 0);
 		if (version >= 0x151 && data_start >= 0x54 && (r32(0x50) & 0x40000000))
@@ -1849,6 +1865,7 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_YMF271, vgmplay_device::A_YMF271+0xf).w(m_ymf271, FUNC(ymf271_device::write));
 	map(vgmplay_device::A_YMZ280B, vgmplay_device::A_YMZ280B+0x1).w(m_ymz280b, FUNC(ymz280b_device::write));
 	map(vgmplay_device::A_YM2608, vgmplay_device::A_YM2608+0x3).w(m_ym2608, FUNC(ym2608_device::write));
+	map(vgmplay_device::A_YM2610, vgmplay_device::A_YM2610+0x3).w(m_ym2610, FUNC(ym2610_device::write));
 	map(vgmplay_device::A_K054539A, vgmplay_device::A_K054539A+0x22f).w("k054539a", FUNC(k054539_device::write));
 	map(vgmplay_device::A_K054539B, vgmplay_device::A_K054539B+0x22f).w("k054539b", FUNC(k054539_device::write));
 	map(vgmplay_device::A_QSOUND, vgmplay_device::A_QSOUND+0x2).w(m_qsound, FUNC(qsound_device::qsound_w));
@@ -2094,6 +2111,12 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 
+	MCFG_DEVICE_ADD("ym2610", YM2610, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  0.50)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
+
 	MCFG_DEVICE_ADD("k054539a", K054539, 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539a_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
@@ -2136,6 +2159,7 @@ MACHINE_CONFIG_END
 
 ROM_START( vgmplay )
 	ROM_REGION( 0x80000, "ym2608", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80000, "ym2610", ROMREGION_ERASE00 )
 ROM_END
 
 CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, empty_init, "MAME", "VGM player", MACHINE_CLICKABLE_ARTWORK )
