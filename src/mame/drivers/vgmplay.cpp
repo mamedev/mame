@@ -1635,17 +1635,21 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_qsound->set_clock_scale(15); // HACK: VGMs contain 4,000,000 instead of 60,000,000
 		m_qsound->set_unscaled_clock(version >= 0x161 && data_start >= 0xb8 ? r32(0xb4) : 0);
 
-		if (version >= 0x151 && data_start >= 0xbc && r32(0xb8))
+		if (version >= 0x171 && data_start >= 0xbc && r32(0xb8))
 			logerror("Warning: file requests an unsupported SCSP\n");
-		if (version >= 0x151 && data_start >= 0xc4 && r32(0xc0))
+
+		if (version >= 0x170 && data_start >= 0xc0 && r32(0xbc))
+			logerror("Warning: file requests an unsupported Extra Header\n");
+
+		if (version >= 0x171 && data_start >= 0xc4 && r32(0xc0))
 			logerror("Warning: file requests an unsupported WonderSwan\n");
-		if (version >= 0x151 && data_start >= 0xc8 && r32(0xc4))
+		if (version >= 0x171 && data_start >= 0xc8 && r32(0xc4))
 			logerror("Warning: file requests an unsupported VSU\n");
-		if (version >= 0x151 && data_start >= 0xcc && r32(0xc8))
+		if (version >= 0x171 && data_start >= 0xcc && r32(0xc8))
 			logerror("Warning: file requests an unsupported SAA1099\n");
-		if (version >= 0x151 && data_start >= 0xd0 && r32(0xcc))
+		if (version >= 0x171 && data_start >= 0xd0 && r32(0xcc))
 			logerror("Warning: file requests an unsupported ES5503\n");
-		if (version >= 0x151 && data_start >= 0xd4 && r32(0xd0))
+		if (version >= 0x171 && data_start >= 0xd4 && r32(0xd0))
 			logerror("Warning: file requests an unsupported %s\n", r32(0xd0) & 0x80000000 ? "ES5506" : "ES5505");
 
 		m_c352->set_divider(version >= 0x171 && data_start >= 0xd7 && r8(0xd6) ? r8(0xd6) * 4 : 1);
