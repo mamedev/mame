@@ -1515,7 +1515,9 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		if (r32(0x10) & 0x40000000)
 			logerror("Warning: file requests an unsupported 2nd YM2413\n");
 
-		m_ym2612->set_unscaled_clock((version >= 0x110 ? r32(0x2c) : r32(0x10)) & ~0x40000000);
+		m_ym2612->set_unscaled_clock((version >= 0x110 ? r32(0x2c) : r32(0x10)) & ~0xc0000000);
+		if (version >= 0x110 && (r32(0x2c) & 0x80000000))
+			logerror("Warning: file requests an unsupported YM3438\n");
 		if (version >= 0x110 && (r32(0x2c) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd YM2612\n");
 
