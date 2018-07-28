@@ -15,7 +15,6 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -320,7 +319,6 @@ MACHINE_CONFIG_START(juicebox_state::juicebox)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(240, 160)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240 - 1, 0, 160 - 1)
-	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c44b0", s3c44b0_device, video_update)
 

@@ -550,7 +550,6 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_DEVICE_IO_MAP(bw2_io)
 
 	// video hardware
-	config.set_default_layout(layout_lcd);
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE( MSM6255_TAG, msm6255_device, screen_update )

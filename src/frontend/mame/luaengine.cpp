@@ -1782,7 +1782,7 @@ void lua_engine::initialize()
 			"height", [](screen_device &sdev) { return sdev.visible_area().height(); },
 			"width", [](screen_device &sdev) { return sdev.visible_area().width(); },
 			"orientation", [](screen_device &sdev) {
-					uint32_t flags = sdev.machine().system().flags & machine_flags::MASK_ORIENTATION;
+					uint32_t flags = sdev.orientation();
 					int rotation_angle = 0;
 					switch (flags)
 					{

@@ -107,7 +107,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(dynax_blit_romregion_w);
 	DECLARE_WRITE8_MEMBER(dynax_extra_scrollx_w);
 	DECLARE_WRITE8_MEMBER(dynax_extra_scrolly_w);
-	
+
 	void hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
 
 	DECLARE_MACHINE_START(dynax);

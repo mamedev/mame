@@ -69,6 +69,7 @@ public:
 		m_vctrl(*this,"vctrl_%u", 0U),
 		m_paletteram(*this,"paletteram%u", 1U),
 		m_subbank(*this,"subbank"),
+		m_x1_bank(*this,"x1_bank"),
 		m_gun_recoil(*this,"Player%u_Gun_Recoil", 1U),
 		m_leds(*this, "led%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -130,9 +131,11 @@ public:
 	void init_arbalest();
 	void init_wiggie();
 	void init_blandia();
+	void init_bankx1();
 	void init_kiwame();
 	void init_eightfrc();
 	void init_pairlove();
+	void init_zombraid();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_x_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_y_r);
@@ -171,6 +174,7 @@ protected:
 	optional_shared_ptr_array<uint16_t, 2> m_paletteram;
 
 	optional_memory_bank m_subbank;
+	optional_memory_bank m_x1_bank;
 
 	output_finder<2> m_gun_recoil;
 	output_finder<48> m_leds;
@@ -196,6 +200,7 @@ protected:
 	uint8_t m_usclssic_port_select;
 	int m_keroppi_prize_hop;
 	int m_keroppi_protection_count;
+	emu_timer *m_keroppi_prize_hop_timer;
 
 	uint8_t m_twineagl_xram[8];
 	int m_twineagl_tilebank[4];
@@ -300,12 +305,14 @@ protected:
 	void usclssic_set_pens();
 	void draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen);
 	void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size, int sprite_setac );
+	void rearrange_gfx();
 	void uPD71054_timer_init(  );
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(utoukond_ym3438_interrupt);
 
 	void atehate_map(address_map &map);
 	void blandia_map(address_map &map);
+	void blandia_x1_map(address_map &map);
 	void blandiap_map(address_map &map);
 	void blockcar_map(address_map &map);
 	void blockcarb_map(address_map &map);
@@ -350,6 +357,7 @@ protected:
 	void wrofaero_map(address_map &map);
 	void zingzipbl_map(address_map &map);
 	void zombraid_map(address_map &map);
+	void zombraid_x1_map(address_map &map);
 };
 
 class setaroul_state : public seta_state

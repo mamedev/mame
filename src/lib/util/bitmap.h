@@ -43,16 +43,16 @@ class rectangle
 {
 public:
 	// construction/destruction
-	rectangle()
-		: min_x(0), max_x(0), min_y(0), max_y(0) { }
-	rectangle(int32_t minx, int32_t maxx, int32_t miny, int32_t maxy)
-		: min_x(minx), max_x(maxx), min_y(miny), max_y(maxy) { }
+	constexpr rectangle() { }
+	constexpr rectangle(int32_t minx, int32_t maxx, int32_t miny, int32_t maxy)
+		: min_x(minx), max_x(maxx), min_y(miny), max_y(maxy)
+	{ }
 
 	// getters
-	int32_t left() const { return min_x; }
-	int32_t right() const { return max_x; }
-	int32_t top() const { return min_y; }
-	int32_t bottom() const { return max_y; }
+	constexpr int32_t left() const { return min_x; }
+	constexpr int32_t right() const { return max_x; }
+	constexpr int32_t top() const { return min_y; }
+	constexpr int32_t bottom() const { return max_y; }
 
 	// compute intersection with another rect
 	rectangle &operator&=(const rectangle &src)
@@ -75,21 +75,21 @@ public:
 	}
 
 	// comparisons
-	bool operator==(const rectangle &rhs) const { return min_x == rhs.min_x && max_x == rhs.max_x && min_y == rhs.min_y && max_y == rhs.max_y; }
-	bool operator!=(const rectangle &rhs) const { return min_x != rhs.min_x || max_x != rhs.max_x || min_y != rhs.min_y || max_y != rhs.max_y; }
-	bool operator>(const rectangle &rhs) const { return min_x < rhs.min_x && min_y < rhs.min_y && max_x > rhs.max_x && max_y > rhs.max_y; }
-	bool operator>=(const rectangle &rhs) const { return min_x <= rhs.min_x && min_y <= rhs.min_y && max_x >= rhs.max_x && max_y >= rhs.max_y; }
-	bool operator<(const rectangle &rhs) const { return min_x >= rhs.min_x || min_y >= rhs.min_y || max_x <= rhs.max_x || max_y <= rhs.max_y; }
-	bool operator<=(const rectangle &rhs) const { return min_x > rhs.min_x || min_y > rhs.min_y || max_x < rhs.max_x || max_y < rhs.max_y; }
+	constexpr bool operator==(const rectangle &rhs) const { return min_x == rhs.min_x && max_x == rhs.max_x && min_y == rhs.min_y && max_y == rhs.max_y; }
+	constexpr bool operator!=(const rectangle &rhs) const { return min_x != rhs.min_x || max_x != rhs.max_x || min_y != rhs.min_y || max_y != rhs.max_y; }
+	constexpr bool operator>(const rectangle &rhs) const { return min_x < rhs.min_x && min_y < rhs.min_y && max_x > rhs.max_x && max_y > rhs.max_y; }
+	constexpr bool operator>=(const rectangle &rhs) const { return min_x <= rhs.min_x && min_y <= rhs.min_y && max_x >= rhs.max_x && max_y >= rhs.max_y; }
+	constexpr bool operator<(const rectangle &rhs) const { return min_x >= rhs.min_x || min_y >= rhs.min_y || max_x <= rhs.max_x || max_y <= rhs.max_y; }
+	constexpr bool operator<=(const rectangle &rhs) const { return min_x > rhs.min_x || min_y > rhs.min_y || max_x < rhs.max_x || max_y < rhs.max_y; }
 
 	// other helpers
-	bool empty() const { return (min_x > max_x || min_y > max_y); }
-	bool contains(int32_t x, int32_t y) const { return (x >= min_x && x <= max_x && y >= min_y && y <= max_y); }
-	bool contains(const rectangle &rect) const { return (min_x <= rect.min_x && max_x >= rect.max_x && min_y <= rect.min_y && max_y >= rect.max_y); }
-	int32_t width() const { return max_x + 1 - min_x; }
-	int32_t height() const { return max_y + 1 - min_y; }
-	int32_t xcenter() const { return (min_x + max_x + 1) / 2; }
-	int32_t ycenter() const { return (min_y + max_y + 1) / 2; }
+	constexpr bool empty() const { return (min_x > max_x) || (min_y > max_y); }
+	constexpr bool contains(int32_t x, int32_t y) const { return (x >= min_x) && (x <= max_x) && (y >= min_y) && (y <= max_y); }
+	constexpr bool contains(const rectangle &rect) const { return (min_x <= rect.min_x) && (max_x >= rect.max_x) && (min_y <= rect.min_y) && (max_y >= rect.max_y); }
+	constexpr int32_t width() const { return max_x + 1 - min_x; }
+	constexpr int32_t height() const { return max_y + 1 - min_y; }
+	constexpr int32_t xcenter() const { return (min_x + max_x + 1) / 2; }
+	constexpr int32_t ycenter() const { return (min_y + max_y + 1) / 2; }
 
 	// setters
 	void set(int32_t minx, int32_t maxx, int32_t miny, int32_t maxy) { min_x = minx; max_x = maxx; min_y = miny; max_y = maxy; }
@@ -106,10 +106,10 @@ public:
 	void offsety(int32_t delta) { min_y += delta; max_y += delta; }
 
 	// internal state
-	int32_t         min_x;          // minimum X, or left coordinate
-	int32_t         max_x;          // maximum X, or right coordinate (inclusive)
-	int32_t         min_y;          // minimum Y, or top coordinate
-	int32_t         max_y;          // maximum Y, or bottom coordinate (inclusive)
+	int32_t min_x = 0;  // minimum X, or left coordinate
+	int32_t max_x = 0;  // maximum X, or right coordinate (inclusive)
+	int32_t min_y = 0;  // minimum Y, or top coordinate
+	int32_t max_y = 0;  // maximum Y, or bottom coordinate (inclusive)
 };
 
 

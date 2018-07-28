@@ -106,7 +106,6 @@ the Neogeo Pocket.
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/k1ge.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -841,8 +840,6 @@ MACHINE_CONFIG_START(ngp_state::ngp_common)
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_RAW_PARAMS( 6.144_MHz_XTAL, 515, 0, 160 /*480*/, 199, 0, 152 )
 	MCFG_SCREEN_UPDATE_DRIVER(ngp_state, screen_update_ngp)
-
-	config.set_default_layout(layout_lcd);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

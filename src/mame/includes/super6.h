@@ -9,7 +9,7 @@
 #include "machine/z80daisy.h"
 #include "machine/com8116.h"
 #include "machine/ram.h"
-#include "machine/timer.h"
+#include "machine/clock.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
@@ -59,8 +59,6 @@ private:
 	DECLARE_WRITE8_MEMBER( bank1_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);

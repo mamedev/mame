@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef __OSDNET_H__
-#define __OSDNET_H__
+#ifndef MAME_OSD_OSDNET_H
+#define MAME_OSD_OSDNET_H
 
+#pragma once
 
 class osd_netdev;
 
@@ -46,4 +47,5 @@ void add_netdev(const char *name, const char *description, create_netdev func);
 void clear_netdev();
 const std::vector<std::unique_ptr<osd_netdev::entry_t>>& get_netdev_list();
 int netdev_count();
-#endif
+
+#endif // MAME_OSD_OSDNET_H

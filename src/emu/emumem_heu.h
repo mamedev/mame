@@ -4,7 +4,7 @@
 // handler_entry_read_units/handler_entry_write_units
 
 // merges/splits an access among multiple handlers (unitmask support)
-	
+
 template<int Width, int AddrShift, int Endian> class handler_entry_read_units : public handler_entry_read<Width, AddrShift, Endian>
 {
 public:

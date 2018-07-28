@@ -229,10 +229,10 @@ inline uint32_t powervr2_device::float_argb_to_packed_argb(float argb[4]) {
 }
 
 inline void powervr2_device::packed_argb_to_float_argb(float dst[4], uint32_t in) {
-    dst[0] = (in >> 24) / 256.0f;
-    dst[1] = ((in >> 16) & 0xff) / 256.0f;
-    dst[2] = ((in >> 8) & 0xff) / 256.0f;
-    dst[3] = (in & 0xff) / 256.0f;
+	dst[0] = (in >> 24) / 256.0f;
+	dst[1] = ((in >> 16) & 0xff) / 256.0f;
+	dst[2] = ((in >> 8) & 0xff) / 256.0f;
+	dst[3] = (in & 0xff) / 256.0f;
 }
 
 // All 64 blending modes, 3 top bits are source mode, 3 bottom bits are destination mode
@@ -1841,7 +1841,7 @@ void powervr2_device::process_ta_fifo()
 				memcpy(poly_base_color, tafifo_buff + 4, 4 * sizeof(float));
 				memset(poly_offs_color, 0, sizeof(poly_offs_color));
 			}
-                        memcpy(poly_last_mode_2_base_color, poly_base_color, sizeof(poly_last_mode_2_base_color));
+						memcpy(poly_last_mode_2_base_color, poly_base_color, sizeof(poly_last_mode_2_base_color));
 			break;
 		case 3:
 			memcpy(poly_base_color, poly_last_mode_2_base_color, sizeof(poly_base_color));
@@ -2035,9 +2035,9 @@ void powervr2_device::process_ta_fifo()
 						int idx;
 						for (idx = 0; idx < 4; idx++) {
 							memcpy(tv[idx].b, poly_base_color,
-							       sizeof(tv[idx].b));
+								   sizeof(tv[idx].b));
 							memcpy(tv[idx].o, poly_offs_color,
-							       sizeof(tv[idx].o));
+								   sizeof(tv[idx].o));
 						}
 
 						ts = &rd->strips[rd->strips_size++];
@@ -2072,12 +2072,12 @@ void powervr2_device::process_ta_fifo()
 						// floating-point color
 						if (have_16_byte_header) {
 							memcpy(vert_base_color, tafifo_buff + 8,
-							       sizeof(vert_base_color));
+								   sizeof(vert_base_color));
 							memcpy(vert_offset_color, tafifo_buff + 12,
-							       sizeof(vert_offset_color));
+								   sizeof(vert_offset_color));
 						} else {
 							memcpy(vert_base_color, tafifo_buff + 4,
-							       sizeof(vert_base_color));
+								   sizeof(vert_base_color));
 						}
 						break;
 					case 2:

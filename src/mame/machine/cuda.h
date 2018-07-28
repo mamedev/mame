@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#pragma once
+#ifndef MAME_MACHINE_CUDA_H
+#define MAME_MACHINE_CUDA_H
 
-#ifndef __CUDA_H__
-#define __CUDA_H__
+#pragma once
 
 
 //**************************************************************************
@@ -138,4 +138,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(CUDA, cuda_device)
 
-#endif
+#endif // MAME_MACHINE_CUDA_H

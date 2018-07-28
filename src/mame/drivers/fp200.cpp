@@ -98,7 +98,7 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 
 	l_offs = 0;
 	r_offs = 0;
-	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	for(int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
 	{
 		for(int x=0;x<80;x++)
 		{
@@ -110,7 +110,7 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		}
 	}
 
-	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	for(int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
 	{
 		for(int x=80;x<160;x++)
 		{
@@ -122,7 +122,7 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		}
 	}
 
-	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	for(int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
 	{
 		for(int x=0;x<80;x++)
 		{
@@ -153,7 +153,7 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		}
 	}
 
-	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	for(int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
 	{
 		for(int x=80;x<160;x++)
 		{

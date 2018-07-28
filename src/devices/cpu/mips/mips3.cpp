@@ -13,9 +13,11 @@
 #include "mips3.h"
 #include "mips3com.h"
 #include "mips3dsm.h"
+#include "ps2vu.h"
 
-
-#define ENABLE_OVERFLOWS    0
+#define ENABLE_OVERFLOWS        (0)
+#define ENABLE_EE_ELF_LOADER    (0)
+#define ENABLE_EE_DECI2         (1)
 
 /***************************************************************************
     HELPER MACROS
@@ -146,7 +148,7 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, m_ldr(endianness == ENDIANNESS_BIG ? &mips3_device::ldr_be : &mips3_device::ldr_le)
 	, m_sdl(endianness == ENDIANNESS_BIG ? &mips3_device::sdl_be : &mips3_device::sdl_le)
 	, m_sdr(endianness == ENDIANNESS_BIG ? &mips3_device::sdr_be : &mips3_device::sdr_le)
-    , m_data_bits(data_bits)
+	, m_data_bits(data_bits)
 	, c_system_clock(0)
 	, m_pfnmask(flavor == MIPS3_TYPE_VR4300 ? 0x000fffff : 0x00ffffff)
 	, m_tlbentries(flavor == MIPS3_TYPE_VR4300 ? 32 : MIPS3_MAX_TLB_ENTRIES)
@@ -242,6 +244,42 @@ void mips3_device::generate_exception(int exception, int backup)
 	if (backup)
 		m_core->pc = m_ppc;
 
+#if ENABLE_EE_DECI2
+	if (exception == EXCEPTION_SYSCALL && m_flavor == MIPS3_TYPE_R5900)
+	{
+		uint32_t call = 0;
+		bool success = RBYTE(m_core->pc - 4, &call);
+		//logerror("Syscall: %08x\n", call);
+		if (call == 0x7c)
+		{
+			const uint32_t func = m_core->r[4];
+			const uint32_t param = m_core->r[5];
+			logerror("Deci2 syscall, func=%08x, param=%08x\n", func, param);
+			if (func == 0x10 && success)
+			{
+				uint32_t str_addr = 0;
+				success = RWORD(param, &str_addr);
+
+				logerror("Deci2 str_addr: %08x\n", str_addr);
+
+				uint32_t curr_char = 0;
+				success = RBYTE(str_addr & 0x01ffffff, &curr_char);
+
+				char buf[0x10000] = { 0 };
+				uint32_t index = 0;
+				while (success && curr_char != 0 && index < 0xffff)
+				{
+					buf[index] = (char)curr_char;
+					success = RBYTE(str_addr & 0x01ffffff, &curr_char);
+					str_addr++;
+				}
+				buf[index] = 0;
+				logerror("Deci2 log: %s\n", buf);
+			}
+		}
+	}
+#endif
+
 	/* translate our fake fill exceptions into real exceptions */
 	if (exception == EXCEPTION_TLBLOAD_FILL || exception == EXCEPTION_TLBSTORE_FILL)
 	{
@@ -283,8 +321,8 @@ void mips3_device::generate_exception(int exception, int backup)
 	/* most exceptions go to offset 0x180, except for TLB stuff */
 	if (exception >= EXCEPTION_TLBMOD && exception <= EXCEPTION_TLBSTORE)
 	{
-		//printf("TLB miss @ %08X\n", (uint32_t)m_core->cpr[0][COP0_BadVAddr]);
-		//machine().debug_break();
+		fprintf(stderr, "TLB miss @ %08X\n", (uint32_t)m_core->cpr[0][COP0_BadVAddr]);
+		machine().debug_break();
 	}
 	else
 	{
@@ -351,34 +389,34 @@ void mips3_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	if(m_program->endianness() == ENDIANNESS_LITTLE)
 	{
-        if (m_data_bits == 32)
-        {
-            auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-            m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-            m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
-        }
-        else
-        {
-            auto cache = m_program->cache<3, 0, ENDIANNESS_LITTLE>();
-            m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-            m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
-        }
+		if (m_data_bits == 32)
+		{
+			auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+			m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+			m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+		}
+		else
+		{
+			auto cache = m_program->cache<3, 0, ENDIANNESS_LITTLE>();
+			m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+			m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+		}
 	}
 	else
 	{
-        if (m_data_bits == 32)
-        {
-            auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
-		    m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-		    m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
-        }
-        else
-        {
-            auto cache = m_program->cache<3, 0, ENDIANNESS_BIG>();
-            m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-            m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
-        }
-    }
+		if (m_data_bits == 32)
+		{
+			auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+			m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+			m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+		}
+		else
+		{
+			auto cache = m_program->cache<3, 0, ENDIANNESS_BIG>();
+			m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+			m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+		}
+	}
 
 	/* set up the endianness */
 	m_program->accessors(m_memory);
@@ -1454,53 +1492,53 @@ inline void mips3_device::WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t
 
 inline void r5900le_device::WBYTE(offs_t address, uint8_t data)
 {
-    if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_byte)(*m_program, address, data);
-    else mips3_device::WBYTE(address, data);
+	if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_byte)(*m_program, address, data);
+	else mips3_device::WBYTE(address, data);
 }
 
 inline void r5900le_device::WHALF(offs_t address, uint16_t data)
 {
-    if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_word)(*m_program, address, data);
-    else mips3_device::WHALF(address, data);
+	if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_word)(*m_program, address, data);
+	else mips3_device::WHALF(address, data);
 }
 
 inline void r5900le_device::WWORD(offs_t address, uint32_t data)
 {
-    if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_dword)(*m_program, address, data);
-    else mips3_device::WWORD(address, data);
+	if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_dword)(*m_program, address, data);
+	else mips3_device::WWORD(address, data);
 }
 
 inline void r5900le_device::WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask)
 {
-    if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_dword_masked)(*m_program, address, data, mem_mask);
-    else mips3_device::WWORD_MASKED(address, data, mem_mask);
+	if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_dword_masked)(*m_program, address, data, mem_mask);
+	else mips3_device::WWORD_MASKED(address, data, mem_mask);
 }
 
 inline void r5900le_device::WDOUBLE(offs_t address, uint64_t data) {
-    if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_qword)(*m_program, address, data);
-    else mips3_device::WDOUBLE(address, data);
+	if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_qword)(*m_program, address, data);
+	else mips3_device::WDOUBLE(address, data);
 }
 
 inline void r5900le_device::WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask)
 {
-    if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_qword_masked)(*m_program, address, data, mem_mask);
-    else mips3_device::WDOUBLE_MASKED(address, data, mem_mask);
+	if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_qword_masked)(*m_program, address, data, mem_mask);
+	else mips3_device::WDOUBLE_MASKED(address, data, mem_mask);
 }
 
 inline void r5900le_device::WQUAD(offs_t address, uint64_t data_hi, uint64_t data_lo)
 {
 	if (address >= 0x70000000 && address < 0x70004000)
 	{
-		(*m_memory.write_qword)(*m_program, address, data_hi);
-		(*m_memory.write_qword)(*m_program, address + 8, data_lo);
+		(*m_memory.write_qword)(*m_program, address, data_lo);
+		(*m_memory.write_qword)(*m_program, address + 8, data_hi);
 		return;
 	}
 
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
 	{
-		(*m_memory.write_qword)(*m_program, (tlbval & ~0xfff) | (address & 0xfff), data_hi);
-		(*m_memory.write_qword)(*m_program, (tlbval & ~0xfff) | ((address + 8) & 0xfff), data_lo);
+		(*m_memory.write_qword)(*m_program, (tlbval & ~0xfff) | (address & 0xfff), data_lo);
+		(*m_memory.write_qword)(*m_program, (tlbval & ~0xfff) | ((address + 8) & 0xfff), data_hi);
 	}
 	else
 	{
@@ -1520,77 +1558,77 @@ inline void r5900le_device::WQUAD(offs_t address, uint64_t data_hi, uint64_t dat
 }
 
 inline bool r5900le_device::RBYTE(offs_t address, uint32_t *result) {
-    if (address >= 0x70000000 && address < 0x70004000) {
-        *result = (*m_memory.read_byte)(*m_program, address);
-        return true;
-    }
-    return mips3_device::RBYTE(address, result);
+	if (address >= 0x70000000 && address < 0x70004000) {
+		*result = (*m_memory.read_byte)(*m_program, address);
+		return true;
+	}
+	return mips3_device::RBYTE(address, result);
 }
 
 inline bool r5900le_device::RHALF(offs_t address, uint32_t *result)
 {
-    if (address >= 0x70000000 && address < 0x70004000)
-    {
-        *result = (*m_memory.read_word)(*m_program, address);
-        return true;
-    }
-    return mips3_device::RHALF(address, result);
+	if (address >= 0x70000000 && address < 0x70004000)
+	{
+		*result = (*m_memory.read_word)(*m_program, address);
+		return true;
+	}
+	return mips3_device::RHALF(address, result);
 }
 
 inline bool r5900le_device::RWORD(offs_t address, uint32_t *result)
 {
-    if (address >= 0x70000000 && address < 0x70004000)
-    {
-        *result = (*m_memory.read_dword)(*m_program, address);
-        return true;
-    }
-    return mips3_device::RWORD(address, result);
+	if (address >= 0x70000000 && address < 0x70004000)
+	{
+		*result = (*m_memory.read_dword)(*m_program, address);
+		return true;
+	}
+	return mips3_device::RWORD(address, result);
 }
 
 inline bool r5900le_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask)
 {
-    if (address >= 0x70000000 && address < 0x70004000)
-    {
-        *result = (*m_memory.read_dword_masked)(*m_program, address, mem_mask);
-        return true;
-    }
-    return mips3_device::RWORD_MASKED(address, result, mem_mask);
+	if (address >= 0x70000000 && address < 0x70004000)
+	{
+		*result = (*m_memory.read_dword_masked)(*m_program, address, mem_mask);
+		return true;
+	}
+	return mips3_device::RWORD_MASKED(address, result, mem_mask);
 }
 
 inline bool r5900le_device::RDOUBLE(offs_t address, uint64_t *result)
 {
-    if (address >= 0x70000000 && address < 0x70004000)
-    {
-        *result = (*m_memory.read_qword)(*m_program, address);
-        return true;
-    }
-    return mips3_device::RDOUBLE(address, result);
+	if (address >= 0x70000000 && address < 0x70004000)
+	{
+		*result = (*m_memory.read_qword)(*m_program, address);
+		return true;
+	}
+	return mips3_device::RDOUBLE(address, result);
 }
 
 inline bool r5900le_device::RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask)
 {
-    if (address >= 0x70000000 && address < 0x70004000)
-    {
-        *result = (*m_memory.read_qword_masked)(*m_program, address, mem_mask);
-        return true;
-    }
-    return mips3_device::RDOUBLE_MASKED(address, result, mem_mask);
+	if (address >= 0x70000000 && address < 0x70004000)
+	{
+		*result = (*m_memory.read_qword_masked)(*m_program, address, mem_mask);
+		return true;
+	}
+	return mips3_device::RDOUBLE_MASKED(address, result, mem_mask);
 }
 
 inline bool r5900le_device::RQUAD(offs_t address, uint64_t *result_hi, uint64_t *result_lo)
 {
 	if (address >= 0x70000000 && address < 0x70004000)
 	{
-		*result_hi = (*m_memory.read_qword)(*m_program, address);
-		*result_lo = (*m_memory.read_qword)(*m_program, address + 8);
+		*result_lo = (*m_memory.read_qword)(*m_program, address);
+		*result_hi = (*m_memory.read_qword)(*m_program, address + 8);
 		return true;
 	}
 
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		*result_hi = (*m_memory.read_qword)(*m_program, (tlbval & ~0xfff) | (address & 0xfff));
-		*result_lo = (*m_memory.read_qword)(*m_program, (tlbval & ~0xfff) | ((address + 8) & 0xfff));
+		*result_lo = (*m_memory.read_qword)(*m_program, (tlbval & ~0xfff) | (address & 0xfff));
+		*result_hi = (*m_memory.read_qword)(*m_program, (tlbval & ~0xfff) | ((address + 8) & 0xfff));
 	}
 	else
 	{
@@ -2828,6 +2866,7 @@ inline void r5900le_device::set_cop2_reg(int idx, uint64_t val)
 
 inline uint64_t r5900le_device::get_cop2_creg(int idx)
 {
+	logerror("%s: CFC2: Getting ccr[%d] (%08x)\n", machine().describe_context(), idx, m_core->vcr[idx]);
 	return m_core->vcr[idx];
 }
 
@@ -2839,6 +2878,7 @@ inline void r5900le_device::set_cop2_creg(int idx, uint64_t val)
 	}
 	else
 	{
+		logerror("%s: CTC2: Setting ccr[%d] (%08x)\n", machine().describe_context(), idx, (uint32_t)val);
 		switch (idx)
 		{
 			case 16: // Status flag
@@ -2846,9 +2886,17 @@ inline void r5900le_device::set_cop2_creg(int idx, uint64_t val)
 				break;
 
 			case 17: // MAC flag
+				m_core->vcr[idx] = val & 0xffff;
+				break;
+
 			case 26: // TPC register
+				m_core->vcr[idx] = val & 0xffff;
+				logerror("%s: CTC2: Setting TPC to %08x\n", machine().describe_context(), m_core->vcr[idx]);
+				break;
+
 			case 27: // CMSAR0 register
 				m_core->vcr[idx] = val & 0xffff;
+				logerror("%s: CTC2: Setting CMSAR0 to %08x\n", machine().describe_context(), m_core->vcr[idx]);
 				break;
 
 			case 18: // clipping flag
@@ -2865,7 +2913,8 @@ inline void r5900le_device::set_cop2_creg(int idx, uint64_t val)
 				break;
 
 			case 28: // FBRST register
-				m_core->vcr[idx] = val & 0xf0f;
+				m_core->vcr[idx] = val & 0xc0c;
+				logerror("%s: CTC2: Setting FBRST to %08x\n", machine().describe_context(), val);
 				break;
 
 			case 29: // VPU-STAT register
@@ -2874,6 +2923,7 @@ inline void r5900le_device::set_cop2_creg(int idx, uint64_t val)
 
 			case 31: // CMSAR1 register
 				m_core->vcr[idx] = val & 0xffff;
+				logerror("%s: CTC2: Setting CMSAR1 to %08x\n", machine().describe_context(), m_core->vcr[idx]);
 				// TODO: Begin execution
 				break;
 
@@ -2902,17 +2952,17 @@ void mips3_device::handle_cop2(uint32_t op)
 
 	switch (RSREG)
 	{
-		case 0x00:  /* MFCz */      if (RTREG) RTVAL64 = (int32_t)get_cop2_reg(RDREG);	break;
-		case 0x01:  /* DMFCz */     handle_dmfc2(op);									break;
-		case 0x02:  /* CFCz */      if (RTREG) RTVAL64 = (int32_t)get_cop2_creg(RDREG);	break;
-		case 0x04:  /* MTCz */      set_cop2_reg(RDREG, RTVAL32);						break;
-		case 0x05:  /* DMTCz */     handle_dmtc2(op);									break;
-		case 0x06:  /* CTCz */      set_cop2_creg(RDREG, RTVAL32);						break;
+		case 0x00:  /* MFCz */      if (RTREG) RTVAL64 = (int32_t)get_cop2_reg(RDREG);  break;
+		case 0x01:  /* DMFCz */     handle_dmfc2(op);                                   break;
+		case 0x02:  /* CFCz */      if (RTREG) RTVAL64 = (int32_t)get_cop2_creg(RDREG); break;
+		case 0x04:  /* MTCz */      set_cop2_reg(RDREG, RTVAL32);                       break;
+		case 0x05:  /* DMTCz */     handle_dmtc2(op);                                   break;
+		case 0x06:  /* CTCz */      set_cop2_creg(RDREG, RTVAL32);                      break;
 		case 0x08:  /* BC */
 			switch (RTREG)
 			{
 				case 0x00:  /* BCzF */  if (!m_cf[2]) ADDPC(SIMMVAL);                   break;
-				case 0x01:  /* BCzF */  if (m_cf[2]) ADDPC(SIMMVAL);                    break;
+				case 0x01:  /* BCzT */  if (m_cf[2]) ADDPC(SIMMVAL);                    break;
 				case 0x02:  /* BCzFL */ invalid_instruction(op);                        break;
 				case 0x03:  /* BCzTL */ invalid_instruction(op);                        break;
 				default:    invalid_instruction(op);                                    break;
@@ -2985,7 +3035,7 @@ void r5900le_device::handle_extra_cop2(uint32_t op)
 				{
 					if (BIT(op, 24-field))
 					{
-						fd[field] = m_core->vacc[field] + fs[field] + ft[bc];
+						fd[field] = m_core->vacc[field] + fs[field] * ft[bc];
 					}
 				}
 			}
@@ -3166,12 +3216,11 @@ void r5900le_device::handle_extra_cop2(uint32_t op)
 						const uint32_t bc = op & 3;
 						float *fs = m_core->vfr[rs];
 						float *ft = m_core->vfr[rt];
-						float *fd = m_core->vfr[rd];
 						for (int field = 0; field < 4; field++)
 						{
 							if (BIT(op, 24-field))
 							{
-								fd[field] = m_core->vacc[field] + fs[field] * ft[bc];
+								m_core->vacc[field] += fs[field] * ft[bc];
 							}
 						}
 					}
@@ -3511,8 +3560,8 @@ void mips3_device::handle_special(uint32_t op)
 		case 0x25:  /* OR */        if (RDREG) RDVAL64 = RSVAL64 | RTVAL64;                         break;
 		case 0x26:  /* XOR */       if (RDREG) RDVAL64 = RSVAL64 ^ RTVAL64;                         break;
 		case 0x27:  /* NOR */       if (RDREG) RDVAL64 = ~(RSVAL64 | RTVAL64);                      break;
-		case 0x28:  handle_extra_special(op);														break;
-		case 0x2a:  /* SLT */       if (RDREG) RDVAL64 = (int64_t)RSVAL64 < (int64_t)RTVAL64;     	break;
+		case 0x28:  handle_extra_special(op);                                                       break;
+		case 0x2a:  /* SLT */       if (RDREG) RDVAL64 = (int64_t)RSVAL64 < (int64_t)RTVAL64;       break;
 		case 0x2b:  /* SLTU */      if (RDREG) RDVAL64 = (uint64_t)RSVAL64 < (uint64_t)RTVAL64;     break;
 		case 0x2c:  /* DADD */
 			if (ENABLE_OVERFLOWS && RSVAL64 > ~RTVAL64) generate_exception(EXCEPTION_OVERFLOW, 1);
@@ -3566,8 +3615,8 @@ void mips3_device::handle_idt(uint32_t op)
 
 void r5900le_device::handle_extra_base(uint32_t op)
 {
-    const int rs = (op >> 21) & 31;
-    const int rt = (op >> 16) & 31;
+	const int rs = (op >> 21) & 31;
+	const int rt = (op >> 16) & 31;
 
 	switch (op >> 26)
 	{
@@ -3595,8 +3644,8 @@ void r5900le_device::handle_extra_base(uint32_t op)
 
 void r5900le_device::handle_extra_special(uint32_t op)
 {
-    const int rs = (op >> 21) & 31;
-    const int rd = (op >> 11) & 31;
+	const int rs = (op >> 21) & 31;
+	const int rd = (op >> 11) & 31;
 
 	switch (op & 63)
 	{
@@ -3663,11 +3712,12 @@ void r5900le_device::handle_extra_cop1(uint32_t op)
 
 void r5900le_device::handle_idt(uint32_t op)
 {
-    const int rs = (op >> 21) & 31;
-    //const int rt = (op >> 16) & 31;
-    const int rd = (op >> 11) & 31;
+	const int rs = (op >> 21) & 31;
+	const int rt = (op >> 16) & 31;
+	const int rd = (op >> 11) & 31;
+	const int sa = (op >>  6) & 31;
 
-    switch (op & 0x3f)
+	switch (op & 0x3f)
 	{
 		case 0x00: /* MADD */
 		{
@@ -3691,7 +3741,7 @@ void r5900le_device::handle_idt(uint32_t op)
 				{
 					uint32_t value = (uint32_t)(rsval >> (word * 32));
 					const uint32_t compare = value & (1U << 31);
-					for (int bit = 30; bit > 0; bit--)
+					for (int bit = 30; bit >= 0; bit--)
 					{
 						value <<= 1;
 						if ((value & (1U << 31)) == compare)
@@ -3710,9 +3760,9 @@ void r5900le_device::handle_idt(uint32_t op)
 			handle_mmi2(op);
 			break;
 		case 0x10: /* MFHI1 */
-            if (rd)
-                m_core->r[rd] = m_core->rh[REG_HI];
-            break;
+			if (rd)
+				m_core->r[rd] = m_core->rh[REG_HI];
+			break;
 		case 0x11: /* MTHI1 */
 			m_core->rh[REG_HI] = m_core->r[rs];
 			break;
@@ -3737,13 +3787,13 @@ void r5900le_device::handle_idt(uint32_t op)
 			printf("Unsupported instruction: MULTU1 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x1a: /* DIV1 */
-            if (RTVAL32)
-            {
-                m_core->rh[REG_LO] = (int32_t)((int32_t)RSVAL32 / (int32_t)RTVAL32);
-                m_core->rh[REG_HI] = (int32_t)((int32_t)RSVAL32 % (int32_t)RTVAL32);
-            }
-            m_core->icount -= 35; // ?
-            break;
+			if (RTVAL32)
+			{
+				m_core->rh[REG_LO] = (int32_t)((int32_t)RSVAL32 / (int32_t)RTVAL32);
+				m_core->rh[REG_HI] = (int32_t)((int32_t)RSVAL32 % (int32_t)RTVAL32);
+			}
+			m_core->icount -= 35; // ?
+			break;
 		case 0x1b: /* DIVU1 */
 			if (RTVAL32)
 			{
@@ -3771,22 +3821,112 @@ void r5900le_device::handle_idt(uint32_t op)
 			printf("Unsupported instruction: PMTHL @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x34: /* PSLLH */
-			printf("Unsupported instruction: PSLLH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const uint16_t rthalf = (uint16_t)(rtval[dword_idx] >> shift);
+						const uint16_t result = rthalf << (sa & 0xf);
+						rdval[dword_idx] |= (uint64_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x36: /* PSRLH */
-			printf("Unsupported instruction: PSRLH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const uint16_t rthalf = (uint16_t)(rtval[dword_idx] >> shift);
+						const uint16_t result = rthalf >> (sa & 0xf);
+						rdval[dword_idx] |= (uint64_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x37: /* PSRAH */
-			printf("Unsupported instruction: PSRAH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const int16_t rthalf = (int16_t)(rtval[dword_idx] >> shift);
+						const int16_t result = rthalf >> (sa & 0xf);
+						rdval[dword_idx] |= (uint64_t)(uint16_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x3c: /* PSLLW */
-			printf("Unsupported instruction: PSLLW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 32)
+					{
+						const uint32_t rtword = (uint32_t)(rtval[dword_idx] >> shift);
+						const uint32_t result = rtword << (sa & 0x1f);
+						rdval[dword_idx] |= (uint64_t)(uint32_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x3e: /* PSRLW */
-			printf("Unsupported instruction: PSRLW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 32)
+					{
+						const uint32_t rtword = (uint32_t)(rtval[dword_idx] >> shift);
+						const uint32_t result = rtword >> (sa & 0x1f);
+						rdval[dword_idx] |= (uint64_t)(uint32_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x3f: /* PSRAW */
-			printf("Unsupported instruction: PSRAW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 32)
+					{
+						const int32_t rtword = (int32_t)(rtval[dword_idx] >> shift);
+						const int32_t result = rtword >> (sa & 0x1f);
+						rdval[dword_idx] |= (uint64_t)(uint32_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		default:
 			invalid_instruction(op);
@@ -3796,49 +3936,195 @@ void r5900le_device::handle_idt(uint32_t op)
 
 void r5900le_device::handle_mmi0(uint32_t op)
 {
-    const int rs = (op >> 21) & 31;
-    const int rt = (op >> 16) & 31;
-    const int rd = (op >> 11) & 31;
+	const int rs = (op >> 21) & 31;
+	const int rt = (op >> 16) & 31;
+	const int rd = (op >> 11) & 31;
 
-    switch ((op >> 6) & 0x1f)
+	switch ((op >> 6) & 0x1f)
 	{
 		case 0x00: /* PADDW */
-			printf("Unsupported instruction: PADDW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 32)
+					{
+						const uint32_t rsword = (uint32_t)(rsval[dword_idx] >> shift);
+						const uint32_t rtword = (uint32_t)(rtval[dword_idx] >> shift);
+						const uint32_t result = rsword + rtword;
+						rdval[dword_idx] |= (uint64_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x01: /* PSUBW */
 			if (rd)
 			{
-				const uint32_t rsval[4] = { (uint32_t)(m_core->rh[rs] >> 32), (uint32_t)m_core->rh[rs], (uint32_t)(m_core->r[rs] >> 32), (uint32_t)m_core->r[rs] };
-				const uint32_t rtval[4] = { (uint32_t)(m_core->rh[rt] >> 32), (uint32_t)m_core->rh[rt], (uint32_t)(m_core->r[rt] >> 32), (uint32_t)m_core->r[rt] };
-				uint32_t rdval[4] = { 0, 0, 0, 0 };
-				for (int word_idx = 0; word_idx < 4; word_idx++)
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
 				{
-					rdval[word_idx] = rsval[word_idx] - rtval[word_idx];
+					for (int shift = 0; shift < 64; shift += 32)
+					{
+						const uint32_t rsword = (uint32_t)(rsval[dword_idx] >> shift);
+						const uint32_t rtword = (uint32_t)(rtval[dword_idx] >> shift);
+						const uint32_t result = rsword - rtword;
+						rdval[dword_idx] |= (uint64_t)result << shift;
+					}
 				}
-				m_core->rh[rd] = ((uint64_t)rdval[0] << 32) | rdval[1];
-				m_core->r[rd]  = ((uint64_t)rdval[2] << 32) | rdval[3];
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
 			}
 			break;
 		case 0x02: /* PCGTW */
-			printf("Unsupported instruction: PCGTW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int word_idx = 0; word_idx < 64; word_idx += 32)
+					{
+						const int32_t rsword = (int32_t)(rsval[dword_idx] >> word_idx);
+						const int32_t rtword = (int32_t)(rtval[dword_idx] >> word_idx);
+						if (rsword > rtword)
+						{
+							rdval[dword_idx] |= (uint64_t)0xffffffff << word_idx;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x03: /* PMAXW */
-			printf("Unsupported instruction: PMAXW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 32)
+					{
+						const int32_t rsword = (int32_t)(rsval[dword_idx] >> shift);
+						const int32_t rtword = (int32_t)(rtval[dword_idx] >> shift);
+						const int32_t result = (rsword > rtword) ? rsword : rtword;
+						rdval[dword_idx] |= (uint64_t)(uint32_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x04: /* PADDH */
-			printf("Unsupported instruction: PADDH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const uint16_t rshalf = (uint16_t)(rsval[dword_idx] >> shift);
+						const uint16_t rthalf = (uint16_t)(rtval[dword_idx] >> shift);
+						const uint16_t result = rshalf + rthalf;
+						rdval[dword_idx] |= (uint64_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x05: /* PSUBH */
-			printf("Unsupported instruction: PSUBH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const uint16_t rshalf = (uint16_t)(rsval[dword_idx] >> shift);
+						const uint16_t rthalf = (uint16_t)(rtval[dword_idx] >> shift);
+						const uint16_t result = rshalf - rthalf;
+						rdval[dword_idx] |= (uint64_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x06: /* PCGTH */
-			printf("Unsupported instruction: PCGTH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int half_idx = 0; half_idx < 64; half_idx += 16)
+					{
+						const int16_t rshalf = (int16_t)(rsval[dword_idx] >> half_idx);
+						const int16_t rthalf = (int16_t)(rtval[dword_idx] >> half_idx);
+						if (rshalf > rthalf)
+						{
+							rdval[dword_idx] |= (uint64_t)0xffff << half_idx;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x07: /* PMAXH */
-			printf("Unsupported instruction: PMAXH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const int16_t rshalf = (int16_t)(rsval[dword_idx] >> shift);
+						const int16_t rthalf = (int16_t)(rtval[dword_idx] >> shift);
+						const int16_t result = (rshalf > rthalf) ? rshalf : rthalf;
+						rdval[dword_idx] |= (uint64_t)(uint16_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x08: /* PADDB */
-			printf("Unsupported instruction: PADDB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int byte_idx = 0; byte_idx < 64; byte_idx += 8)
+					{
+						const uint8_t rsbyte = (uint8_t)(rsval[dword_idx] >> byte_idx);
+						const uint8_t rtbyte = (uint8_t)(rtval[dword_idx] >> byte_idx);
+						const uint8_t result = rsbyte + rtbyte;
+						rdval[dword_idx] |= (uint64_t)result << byte_idx;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x09: /* PSUBB */
 			if (rd)
@@ -3846,14 +4132,14 @@ void r5900le_device::handle_mmi0(uint32_t op)
 				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
 				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
 				uint64_t rdval[2] = { 0, 0 };
-				for (int word_idx = 0; word_idx < 2; word_idx++)
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
 				{
 					for (int byte_idx = 0; byte_idx < 64; byte_idx += 8)
 					{
-						const uint8_t rsbyte = (uint8_t)(rsval[word_idx] >> byte_idx);
-						const uint8_t rtbyte = (uint8_t)(rtval[word_idx] >> byte_idx);
+						const uint8_t rsbyte = (uint8_t)(rsval[dword_idx] >> byte_idx);
+						const uint8_t rtbyte = (uint8_t)(rtval[dword_idx] >> byte_idx);
 						const uint8_t result = rsbyte - rtbyte;
-						rdval[word_idx] |= (uint64_t)result << byte_idx;
+						rdval[dword_idx] |= (uint64_t)result << byte_idx;
 					}
 				}
 				m_core->rh[rd] = rdval[0];
@@ -3861,13 +4147,88 @@ void r5900le_device::handle_mmi0(uint32_t op)
 			}
 			break;
 		case 0x0a: /* PCGTB */
-			printf("Unsupported instruction: PCGTB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int byte_idx = 0; byte_idx < 64; byte_idx += 8)
+					{
+						const int8_t rsbyte = (int8_t)(rsval[dword_idx] >> byte_idx);
+						const int8_t rtbyte = (int8_t)(rtval[dword_idx] >> byte_idx);
+						if (rsbyte > rtbyte)
+						{
+							rdval[dword_idx] |= (uint64_t)0xff << byte_idx;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x10: /* PADDSW */
-			printf("Unsupported instruction: PADDSW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 32)
+					{
+						const int64_t rsword = (int64_t)(int32_t)(rsval[dword_idx] >> shift);
+						const int64_t rtword = (int64_t)(int32_t)(rtval[dword_idx] >> shift);
+						const int64_t result = rsword + rtword;
+						if (result < (int32_t)0x80000000)
+						{
+							rdval[dword_idx] |= (uint64_t)0x80000000 << shift;
+						}
+						else if (result > 0x7fffffff)
+						{
+							rdval[dword_idx] |= (uint64_t)0x7fffffff << shift;
+						}
+						else
+						{
+							rdval[dword_idx] |= (uint64_t)(uint32_t)result << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x11: /* PSUBSW */
-			printf("Unsupported instruction: PSUBSW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 32)
+					{
+						const int64_t rsword = (int64_t)(int32_t)(rsval[dword_idx] >> shift);
+						const int64_t rtword = (int64_t)(int32_t)(rtval[dword_idx] >> shift);
+						const int64_t result = rsword - rtword;
+						if (result < (int32_t)0x80000000)
+						{
+							rdval[dword_idx] |= (uint64_t)0x80000000 << shift;
+						}
+						else if (result > 0x7fffffff)
+						{
+							rdval[dword_idx] |= (uint64_t)0x7fffffff << shift;
+						}
+						else
+						{
+							rdval[dword_idx] |= (uint64_t)(uint32_t)result << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x12: /* PEXTLW */
 		{
@@ -3885,10 +4246,66 @@ void r5900le_device::handle_mmi0(uint32_t op)
 			printf("Unsupported instruction: PPACW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x14: /* PADDSH */
-			printf("Unsupported instruction: PADDSH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const int32_t rshalf = (int32_t)(int16_t)(rsval[dword_idx] >> shift);
+						const int32_t rthalf = (int32_t)(int16_t)(rtval[dword_idx] >> shift);
+						const int32_t result = rshalf + rthalf;
+						if (result < -32768)
+						{
+							rdval[dword_idx] |= (uint64_t)0x8000 << shift;
+						}
+						else if (result > 32767)
+						{
+							rdval[dword_idx] |= (uint64_t)0x7fff << shift;
+						}
+						else
+						{
+							rdval[dword_idx] |= (uint64_t)(uint16_t)result << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x15: /* PSUBSH */
-			printf("Unsupported instruction: PSUBSH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const int32_t rshalf = (int32_t)(int16_t)(rsval[dword_idx] >> shift);
+						const int32_t rthalf = (int32_t)(int16_t)(rtval[dword_idx] >> shift);
+						const int32_t result = rshalf - rthalf;
+						if (result < -32768)
+						{
+							rdval[dword_idx] |= (uint64_t)0x8000 << shift;
+						}
+						else if (result > 32767)
+						{
+							rdval[dword_idx] |= (uint64_t)0x7fff << shift;
+						}
+						else
+						{
+							rdval[dword_idx] |= (uint64_t)(uint16_t)result << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x16: /* PEXTLH */
 			printf("Unsupported instruction: PEXTLH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
@@ -3897,10 +4314,66 @@ void r5900le_device::handle_mmi0(uint32_t op)
 			printf("Unsupported instruction: PPACH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x18: /* PADDSB */
-			printf("Unsupported instruction: PADDSB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 8)
+					{
+						const int32_t rsbyte = (int32_t)(int8_t)(rsval[dword_idx] >> shift);
+						const int32_t rtbyte = (int32_t)(int8_t)(rtval[dword_idx] >> shift);
+						const int32_t result = rsbyte + rtbyte;
+						if (result < -128)
+						{
+							rdval[dword_idx] |= (uint64_t)0x80 << shift;
+						}
+						else if (result > 127)
+						{
+							rdval[dword_idx] |= (uint64_t)0x7f << shift;
+						}
+						else
+						{
+							rdval[dword_idx] |= (uint64_t)(uint8_t)result << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x19: /* PSUBSB */
-			printf("Unsupported instruction: PSUBSB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 8)
+					{
+						const int32_t rsbyte = (int32_t)(int8_t)(rsval[dword_idx] >> shift);
+						const int32_t rtbyte = (int32_t)(int8_t)(rtval[dword_idx] >> shift);
+						const int32_t result = rsbyte - rtbyte;
+						if (result < -128)
+						{
+							rdval[dword_idx] |= (uint64_t)0x80 << shift;
+						}
+						else if (result >= 127)
+						{
+							rdval[dword_idx] |= (uint64_t)0x7f << shift;
+						}
+						else
+						{
+							rdval[dword_idx] |= (uint64_t)(uint8_t)result << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x1a: /* PEXTLB */
 			printf("Unsupported instruction: PEXTLB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
@@ -3922,58 +4395,247 @@ void r5900le_device::handle_mmi0(uint32_t op)
 
 void r5900le_device::handle_mmi1(uint32_t op)
 {
-    const int rs = (op >> 21) & 31;
-    const int rt = (op >> 16) & 31;
-    const int rd = (op >> 11) & 31;
+	const int rs = (op >> 21) & 31;
+	const int rt = (op >> 16) & 31;
+	const int rd = (op >> 11) & 31;
 
-    switch ((op >> 6) & 0x1f)
+	switch ((op >> 6) & 0x1f)
 	{
 		case 0x01: /* PABSW */
-			printf("Unsupported instruction: PABSW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 32)
+					{
+						const int32_t rtword = (int32_t)(rtval[dword_idx] >> shift);
+						if (rtword == 0x80000000)
+						{
+							rdval[dword_idx] |= (uint64_t)0x7fffffff << shift;
+						}
+						else if (rtword < 0)
+						{
+							rdval[dword_idx] |= (uint64_t)(0 - rtword) << shift;
+						}
+						else
+						{
+							rdval[dword_idx] |= (uint64_t)rtword << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x02: /* PCEQW */
-			printf("Unsupported instruction: PCEQW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int word_idx = 0; word_idx < 64; word_idx += 32)
+					{
+						const uint32_t rsword = (uint32_t)(rsval[dword_idx] >> word_idx);
+						const uint32_t rtword = (uint32_t)(rtval[dword_idx] >> word_idx);
+						if (rsword == rtword)
+						{
+							rdval[dword_idx] |= (uint64_t)0xffffffff << word_idx;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x03: /* PMINW */
-			printf("Unsupported instruction: PMINW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 32)
+					{
+						const int32_t rsword = (int32_t)(rsval[dword_idx] >> shift);
+						const int32_t rtword = (int32_t)(rtval[dword_idx] >> shift);
+						const int32_t result = (rsword > rtword) ? rtword : rsword;
+						rdval[dword_idx] |= (uint64_t)(uint32_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x04: /* PADSBH */
-			printf("Unsupported instruction: PADSBH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const uint16_t rshalf = (uint16_t)(rsval[dword_idx] >> shift);
+						const uint16_t rthalf = (uint16_t)(rtval[dword_idx] >> shift);
+						const uint16_t result = dword_idx ? (rshalf - rthalf) : (rshalf + rthalf);
+						rdval[dword_idx] |= (uint64_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x05: /* PABSH */
-			printf("Unsupported instruction: PABSH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const int16_t rthalf = (int16_t)(rtval[dword_idx] >> shift);
+						if (rthalf == -32768)
+						{
+							rdval[dword_idx] |= (uint64_t)0x7fff << shift;
+						}
+						else if (rthalf < 0)
+						{
+							rdval[dword_idx] |= (uint64_t)(0 - rthalf) << shift;
+						}
+						else
+						{
+							rdval[dword_idx] |= (uint64_t)rthalf << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x06: /* PCEQH */
-			printf("Unsupported instruction: PCEQH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int half_idx = 0; half_idx < 64; half_idx += 16)
+					{
+						const uint16_t rshalf = (uint16_t)(rsval[dword_idx] >> half_idx);
+						const uint16_t rthalf = (uint16_t)(rtval[dword_idx] >> half_idx);
+						if (rshalf == rthalf)
+						{
+							rdval[dword_idx] |= (uint64_t)0xffff << half_idx;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x07: /* PMINH */
-			printf("Unsupported instruction: PMINH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const int16_t rshalf = (int16_t)(rsval[dword_idx] >> shift);
+						const int16_t rthalf = (int16_t)(rtval[dword_idx] >> shift);
+						const int16_t result = (rshalf > rthalf) ? rthalf : rshalf;
+						rdval[dword_idx] |= (uint64_t)(uint16_t)result << shift;
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x0a: /* PCEQB */
-			printf("Unsupported instruction: PCEQB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int byte_idx = 0; byte_idx < 64; byte_idx += 8)
+					{
+						const uint8_t rsbyte = (uint8_t)(rsval[dword_idx] >> byte_idx);
+						const uint8_t rtbyte = (uint8_t)(rtval[dword_idx] >> byte_idx);
+						if (rsbyte == rtbyte)
+						{
+							rdval[dword_idx] |= (uint64_t)0xff << byte_idx;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x10: /* PADDUW */
-            if (rd)
-            {
-				uint32_t rsval[4] = { (uint32_t)m_core->r[rs], (uint32_t)(m_core->r[rs] >> 32), (uint32_t)m_core->rh[rs], (uint32_t)(m_core->rh[rs] >> 32) };
-				uint32_t rtval[4] = { (uint32_t)m_core->r[rt], (uint32_t)(m_core->r[rt] >> 32), (uint32_t)m_core->rh[rt], (uint32_t)(m_core->rh[rt] >> 32) };
-				uint64_t rdval[4] = { 0 };
-
-				for (int i = 0; i < 4; i++)
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
 				{
-					uint64_t sum = (uint64_t)rsval[i] + (uint64_t)rtval[i];
-					rdval[i] = (sum >= 0x100000000ULL) ? 0xffffffffULL : sum;
+					for (int shift = 0; shift < 64; shift += 32)
+					{
+						const uint64_t rshalf = (uint32_t)(rsval[dword_idx] >> shift);
+						const uint64_t rthalf = (uint32_t)(rtval[dword_idx] >> shift);
+						const uint64_t result = rshalf + rthalf;
+						if (result > 0xffffffff)
+						{
+							rdval[dword_idx] |= (uint64_t)0xffffffff << shift;
+						}
+						else
+						{
+							rdval[dword_idx] |= (uint64_t)result << shift;
+						}
+					}
 				}
-				m_core->r[rd] = rdval[0] | (rdval[1] << 32);
-				m_core->rh[rd] = rdval[2] | (rdval[3] << 32);
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
 			}
 			break;
 		case 0x11: /* PSUBUW */
-			printf("Unsupported instruction: PSUBUW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 32)
+					{
+						const uint64_t rsword = (uint32_t)(rsval[dword_idx] >> shift);
+						const uint64_t rtword = (uint32_t)(rtval[dword_idx] >> shift);
+						const uint64_t result = rsword - rtword;
+						if (result < 0x100000000ULL)
+						{
+							rdval[dword_idx] |= (uint64_t)(uint32_t)result << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x12: /* PEXTUW */
-            if (rd)
-            {
+			if (rd)
+			{
 				uint64_t rsval = m_core->rh[rs];
 				uint64_t rtval = m_core->rh[rt];
 				m_core->rh[rd] = (rsval & 0xffffffff00000000ULL) | (rtval >> 32);
@@ -3981,19 +4643,107 @@ void r5900le_device::handle_mmi1(uint32_t op)
 			}
 			break;
 		case 0x14: /* PADDUH */
-			printf("Unsupported instruction: PADDUH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const uint32_t rshalf = (uint16_t)(rsval[dword_idx] >> shift);
+						const uint32_t rthalf = (uint16_t)(rtval[dword_idx] >> shift);
+						const uint32_t result = rshalf + rthalf;
+						if (result > 0xffff)
+						{
+							rdval[dword_idx] |= (uint64_t)0xffff << shift;
+						}
+						else
+						{
+							rdval[dword_idx] |= (uint64_t)result << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x15: /* PSUBUH */
-			printf("Unsupported instruction: PSUBUH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 16)
+					{
+						const uint32_t rshalf = (uint16_t)(rsval[dword_idx] >> shift);
+						const uint32_t rthalf = (uint16_t)(rtval[dword_idx] >> shift);
+						const uint32_t result = rshalf - rthalf;
+						if (result < 0x10000)
+						{
+							rdval[dword_idx] |= (uint64_t)(uint16_t)result << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x16: /* PEXTUH */
 			printf("Unsupported instruction: PEXTUH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x18: /* PADDUB */
-			printf("Unsupported instruction: PADDUB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 8)
+					{
+						const uint32_t rsbyte = (uint8_t)(rsval[dword_idx] >> shift);
+						const uint32_t rtbyte = (uint8_t)(rtval[dword_idx] >> shift);
+						const uint32_t result = rsbyte + rtbyte;
+						if (result > 0xff)
+						{
+							rdval[dword_idx] |= (uint64_t)0xff << shift;
+						}
+						else
+						{
+							rdval[dword_idx] |= (uint64_t)result << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x19: /* PSUBUB */
-			printf("Unsupported instruction: PSUBUB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					for (int shift = 0; shift < 64; shift += 8)
+					{
+						const uint32_t rsbyte = (uint8_t)(rsval[dword_idx] >> shift);
+						const uint32_t rtbyte = (uint8_t)(rtval[dword_idx] >> shift);
+						const uint32_t result = rsbyte - rtbyte;
+						if (result < 0x100)
+						{
+							rdval[dword_idx] |= (uint64_t)(uint8_t)result << shift;
+						}
+					}
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x1a: /* PEXTUB */
 			printf("Unsupported instruction: PEXTUB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
@@ -4009,9 +4759,9 @@ void r5900le_device::handle_mmi1(uint32_t op)
 
 void r5900le_device::handle_mmi2(uint32_t op)
 {
-    const int rs = (op >> 21) & 31;
-    const int rt = (op >> 16) & 31;
-    const int rd = (op >> 11) & 31;
+	const int rs = (op >> 21) & 31;
+	const int rt = (op >> 16) & 31;
+	const int rd = (op >> 11) & 31;
 
 	switch ((op >> 6) & 0x1f)
 	{
@@ -4019,26 +4769,53 @@ void r5900le_device::handle_mmi2(uint32_t op)
 			printf("Unsupported instruction: PMADDW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x02: /* PSLLVW */
-			printf("Unsupported instruction: PSLLVW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					const uint64_t rsword = (uint32_t)rsval[dword_idx];
+					const uint64_t rtword = (uint32_t)rtval[dword_idx];
+					const uint32_t result = rtword << (rsword & 0x1f);
+					rdval[dword_idx] = (uint64_t)(int64_t)(int32_t)result;
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x03: /* PSRLVW */
-			printf("Unsupported instruction: PSRLVW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					const uint64_t rsword = (uint32_t)rsval[dword_idx];
+					const uint64_t rtword = (uint32_t)rtval[dword_idx];
+					rdval[dword_idx] = (uint64_t)(int64_t)(int32_t)(rtword >> (rsword & 0x1f));
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x04: /* PMSUBW */
 			printf("Unsupported instruction: PMSUBW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x08: /* PMFHI */
-		    if (rd)
-		    {
-		        m_core->r[rd]  = m_core->r[REG_HI];
-		        m_core->rh[rd] = m_core->rh[REG_HI];
+			if (rd)
+			{
+				m_core->r[rd]  = m_core->r[REG_HI];
+				m_core->rh[rd] = m_core->rh[REG_HI];
 			}
 			break;
 		case 0x09: /* PMFLO */
-		    if (rd)
-		    {
-		        m_core->r[rd]  = m_core->r[REG_LO];
-		        m_core->rh[rd] = m_core->rh[REG_LO];
+			if (rd)
+			{
+				m_core->r[rd]  = m_core->r[REG_LO];
+				m_core->rh[rd] = m_core->rh[REG_LO];
 			}
 			break;
 		case 0x0a: /* PINTH */
@@ -4109,9 +4886,9 @@ void r5900le_device::handle_mmi2(uint32_t op)
 
 void r5900le_device::handle_mmi3(uint32_t op)
 {
-    const int rs = (op >> 21) & 31;
-    const int rt = (op >> 16) & 31;
-    const int rd = (op >> 11) & 31;
+	const int rs = (op >> 21) & 31;
+	const int rt = (op >> 16) & 31;
+	const int rd = (op >> 11) & 31;
 
 	switch ((op >> 6) & 0x1f)
 	{
@@ -4119,13 +4896,29 @@ void r5900le_device::handle_mmi3(uint32_t op)
 			printf("Unsupported instruction: PMADDUW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
 			break;
 		case 0x03: /* PSRAVW */
-			printf("Unsupported instruction: PSRAVW @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			if (rd)
+			{
+				const uint64_t rsval[2] = { m_core->rh[rs], m_core->r[rs] };
+				const uint64_t rtval[2] = { m_core->rh[rt], m_core->r[rt] };
+				uint64_t rdval[2] = { 0, 0 };
+				for (int dword_idx = 0; dword_idx < 2; dword_idx++)
+				{
+					const uint32_t rsword = (uint32_t)rsval[dword_idx];
+					const int32_t rtword = (int32_t)rtval[dword_idx];
+					const int32_t result = rtword >> (rsword & 0x1f);
+					rdval[dword_idx] = (uint64_t)(int64_t)result;
+				}
+				m_core->rh[rd] = rdval[0];
+				m_core->r[rd] = rdval[1];
+			}
 			break;
 		case 0x08: /* PMTHI */
-			printf("Unsupported instruction: PMTHI @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			m_core->r[REG_HI] = m_core->r[rs];
+			m_core->rh[REG_HI] = m_core->rh[rs];
 			break;
 		case 0x09: /* PTMLO */
-			printf("Unsupported instruction: PMTLO @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
+			m_core->r[REG_LO] = m_core->r[rs];
+			m_core->rh[REG_LO] = m_core->rh[rs];
 			break;
 		case 0x0a: /* PINTEH */
 			printf("Unsupported instruction: PINTEH @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported parallel instruction\n");
@@ -4446,10 +5239,24 @@ void mips3_device::execute_run()
 				handle_extra_base(op);
 				break;
 		}
+
+#if ENABLE_EE_ELF_LOADER
+		bool had_delay = m_delayslot;
+#endif
+
 		/* Clear this flag once instruction execution is finished, will interfere with interrupt exceptions otherwise */
 		m_delayslot = false;
 		m_core->icount--;
 
+#if ENABLE_EE_ELF_LOADER
+		static bool elf_loaded = false;
+		if (had_delay && m_core->pc < 0x80000000 && m_core->pc >= 0x00100000 && !elf_loaded)
+		{
+			load_elf();
+			m_core->icount = 0;
+			elf_loaded = true;
+		}
+#endif
 	} while (m_core->icount > 0 || m_nextpc != ~0);
 
 	m_core->icount -= m_interrupt_cycles;
@@ -4614,4 +5421,39 @@ void mips3_device::sdr_le(uint32_t op)
 	int shift = 8 * (offs & 7);
 	uint64_t mask = 0xffffffffffffffffU << shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 << shift, mask);
+}
+
+void mips3_device::load_elf()
+{
+	FILE *elf = fopen("alu.elf", "rb");
+	fseek(elf, 0, SEEK_END);
+	const uint32_t size = ftell(elf);
+	fseek(elf, 0, SEEK_SET);
+	uint8_t *buf = new uint8_t[size];
+	fread(buf, 1, size, elf);
+	fclose(elf);
+
+	const uint32_t header_offset = *reinterpret_cast<uint32_t*>(&buf[0x1c]);
+	const uint16_t block_count = *reinterpret_cast<uint16_t*>(&buf[0x2c]);
+
+	for (uint32_t i = 0; i < block_count; i++)
+	{
+		const uint32_t *header_entry = reinterpret_cast<uint32_t*>(&buf[header_offset + i * 0x20]);
+
+		const uint32_t word_count = header_entry[4] >> 2;
+		const uint32_t file_offset = header_entry[1];
+		const uint32_t *file_data = reinterpret_cast<uint32_t*>(&buf[file_offset]);
+		uint32_t addr = header_entry[3];
+		for (uint32_t word = 0; word < word_count; word++)
+		{
+			WWORD(addr, file_data[word]);
+			addr += 4;
+		}
+	}
+
+	const uint32_t entry_point = *reinterpret_cast<uint32_t*>(&buf[0x18]);
+	m_core->pc = entry_point;
+	m_ppc = entry_point;
+
+	delete [] buf;
 }

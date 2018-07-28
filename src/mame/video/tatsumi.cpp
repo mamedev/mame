@@ -762,7 +762,7 @@ VIDEO_START_MEMBER(roundup5_state,roundup5)
 	m_tx_layer->set_transparent_pen(0);
 
 	m_gfxdecode->gfx(1)->set_source(m_tx_gfxram.get());
-	
+
 	save_pointer(NAME(m_tx_gfxram), 0x20000);
 	save_pointer(NAME(m_bg_gfxram), 0x20000);
 }

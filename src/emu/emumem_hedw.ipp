@@ -477,7 +477,7 @@ template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_
 			m_dispatch[i] = np->get_subhandler();
 			m_dispatch[i]->ref();
 			np->unref();
-			
+
 		} else
 			np->detach(handlers);
 	}

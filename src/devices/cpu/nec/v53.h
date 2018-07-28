@@ -164,9 +164,6 @@ public:
 	template <class Object> devcb_base &set_out0_handler(Object &&cb) { return m_out0_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out1_handler(Object &&cb) { return m_out1_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out2_handler(Object &&cb) { return m_out2_handler.set_callback(std::forward<Object>(cb)); }
-	DECLARE_WRITE_LINE_MEMBER(tcu_out0_trampoline_cb){ m_out0_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(tcu_out1_trampoline_cb){ m_out1_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(tcu_out2_trampoline_cb){ m_out2_handler(state); }
 
 	// DMAU
 	template<class Object> devcb_base &set_out_hreq_callback(Object &&cb) { return m_out_hreq_cb.set_callback(std::forward<Object>(cb)); }
@@ -260,22 +257,6 @@ protected:
 	devcb_write_line   m_out_dack_2_cb;
 	devcb_write_line   m_out_dack_3_cb;
 
-	DECLARE_WRITE_LINE_MEMBER(hreq_trampoline_cb) { m_out_hreq_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(eop_trampoline_cb) { m_out_eop_cb(state); }
-	DECLARE_READ8_MEMBER(dma_memr_trampoline_r) { return m_in_memr_cb(space, offset); }
-	DECLARE_WRITE8_MEMBER(dma_memw_trampoline_w) {  m_out_memw_cb(space, offset, data); }
-	DECLARE_READ8_MEMBER(dma_io_0_trampoline_r) { return m_in_ior_0_cb(space, offset); }
-	DECLARE_READ8_MEMBER(dma_io_1_trampoline_r) { return m_in_ior_1_cb(space, offset); }
-	DECLARE_READ8_MEMBER(dma_io_2_trampoline_r) { return m_in_ior_2_cb(space, offset); }
-	DECLARE_READ8_MEMBER(dma_io_3_trampoline_r) { return m_in_ior_3_cb(space, offset); }
-	DECLARE_WRITE8_MEMBER(dma_io_0_trampoline_w) { m_out_iow_0_cb(space, offset, data); }
-	DECLARE_WRITE8_MEMBER(dma_io_1_trampoline_w) { m_out_iow_1_cb(space, offset, data); }
-	DECLARE_WRITE8_MEMBER(dma_io_2_trampoline_w) { m_out_iow_2_cb(space, offset, data); }
-	DECLARE_WRITE8_MEMBER(dma_io_3_trampoline_w) { m_out_iow_3_cb(space, offset, data); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack0_trampoline_w) { m_out_dack_0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack1_trampoline_w) { m_out_dack_1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack2_trampoline_w) { m_out_dack_2_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack3_trampoline_w) { m_out_dack_3_cb(state); }
 	DECLARE_READ8_MEMBER(get_pic_ack);
 	DECLARE_WRITE_LINE_MEMBER(internal_irq_w);
 };

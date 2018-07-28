@@ -60,7 +60,6 @@ Infinite loop is reached at address 0x7699
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -262,7 +261,6 @@ MACHINE_CONFIG_START(hprot1_state::hprot1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hprot1_state, hprot1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hprot1)

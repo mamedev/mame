@@ -18,7 +18,6 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -27,15 +26,16 @@
 class palm_state : public driver_device
 {
 public:
-	palm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	palm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_lsi(*this, MC68328_TAG),
 		m_ram(*this, RAM_TAG),
 		m_io_penx(*this, "PENX"),
 		m_io_peny(*this, "PENY"),
 		m_io_penb(*this, "PENB"),
-		m_io_portd(*this, "PORTD") { }
+		m_io_portd(*this, "PORTD")
+	{ }
 
 	void palmiii(machine_config &config);
 	void pilot1k(machine_config &config);
@@ -188,7 +188,7 @@ MACHINE_CONFIG_START(palm_state::palm)
 
 	MCFG_QUANTUM_TIME( attotime::from_hz(60) )
 
-	MCFG_SCREEN_ADD( "screen", RASTER )
+	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_VBLANK_TIME( ATTOSECONDS_IN_USEC(1260) )
 	/* video hardware */
@@ -200,7 +200,6 @@ MACHINE_CONFIG_START(palm_state::palm)
 
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(palm_state, palm)
-	config.set_default_layout(layout_lcd);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

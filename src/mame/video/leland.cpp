@@ -450,13 +450,13 @@ uint32_t leland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_tilemap->draw(screen, bitmap, cliprect, 0);
 
 	/* for each scanline in the visible region */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *const dst = &bitmap.pix16(y);
 		uint8_t const *const fg_src = &m_video_ram[y << 8];
 
 		/* for each pixel on the scanline */
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			/* build the pen, background is d0-d5 */
 			pen_t pen = dst[x] & 0x3f;

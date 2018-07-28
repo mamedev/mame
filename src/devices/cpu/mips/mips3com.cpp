@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "mips3com.h"
+#include "ps2vu.h"
 
 
 /***************************************************************************
@@ -326,7 +327,7 @@ uint32_t mips3_device::compute_prid_register()
 			return 0x2700;
 
 		case MIPS3_TYPE_R5900:
-			return 0x2e59;
+			return 0x2e14;
 
 		default:
 			fatalerror("Unknown MIPS flavor specified\n");
@@ -366,7 +367,7 @@ void mips3_device::tlb_map_entry(int tlbindex)
 	}
 
 	/* get the number of pages from the page mask */
-    /* R5900: if the S bit is set in EntryLo, it is the scratchpad, and is always 4 pages. */
+	/* R5900: if the S bit is set in EntryLo, it is the scratchpad, and is always 4 pages. */
 	if ((entry->entry_lo[0] & 0x80000000) && m_flavor == MIPS3_TYPE_R5900)
 		count = 4;
 	else

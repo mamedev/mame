@@ -291,7 +291,7 @@ void tunhunt_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	for( y=0; y<256; y++ )
 	{
-		if (0xff-y >= cliprect.min_y && 0xff-y <= cliprect.max_y)
+		if (0xff-y >= cliprect.top() && 0xff-y <= cliprect.bottom())
 			for( x=0; x<256; x++ )
 			{
 				color = 0;
@@ -308,7 +308,7 @@ void tunhunt_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect)
 						z = x0; /* give priority to rightmost spans */
 					}
 				}
-				if (x >= cliprect.min_x && x <= cliprect.max_x)
+				if (x >= cliprect.left() && x <= cliprect.right())
 					bitmap.pix16(0xff-y, x) = color;
 			}
 	}

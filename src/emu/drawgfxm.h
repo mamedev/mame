@@ -419,37 +419,37 @@ do {                                                                            
 																					\
 		/* compute final pixel in X and exit if we are entirely clipped */          \
 		destendx = destx + width() - 1;                                             \
-		if (destx > cliprect.max_x || destendx < cliprect.min_x)                    \
+		if (destx > cliprect.right() || destendx < cliprect.left())                 \
 			break;                                                                  \
 																					\
 		/* apply left clip */                                                       \
 		srcx = 0;                                                                   \
-		if (destx < cliprect.min_x)                                                 \
+		if (destx < cliprect.left())                                                \
 		{                                                                           \
-			srcx = cliprect.min_x - destx;                                          \
-			destx = cliprect.min_x;                                                 \
+			srcx = cliprect.left() - destx;                                         \
+			destx = cliprect.left();                                                \
 		}                                                                           \
 																					\
 		/* apply right clip */                                                      \
-		if (destendx > cliprect.max_x)                                              \
-			destendx = cliprect.max_x;                                              \
+		if (destendx > cliprect.right())                                            \
+			destendx = cliprect.right();                                            \
 																					\
 		/* compute final pixel in Y and exit if we are entirely clipped */          \
 		destendy = desty + height() - 1;                                            \
-		if (desty > cliprect.max_y || destendy < cliprect.min_y)                    \
+		if (desty > cliprect.bottom() || destendy < cliprect.top())                 \
 			break;                                                                  \
 																					\
 		/* apply top clip */                                                        \
 		srcy = 0;                                                                   \
-		if (desty < cliprect.min_y)                                                 \
+		if (desty < cliprect.top())                                                 \
 		{                                                                           \
-			srcy = cliprect.min_y - desty;                                          \
-			desty = cliprect.min_y;                                                 \
+			srcy = cliprect.top() - desty;                                          \
+			desty = cliprect.top();                                                 \
 		}                                                                           \
 																					\
 		/* apply bottom clip */                                                     \
-		if (destendy > cliprect.max_y)                                              \
-			destendy = cliprect.max_y;                                              \
+		if (destendy > cliprect.bottom())                                           \
+			destendy = cliprect.bottom();                                           \
 																					\
 		/* apply X flipping */                                                      \
 		if (flipx)                                                                  \
@@ -601,24 +601,24 @@ do {                                                                            
 																					\
 		/* compute final pixel in X and exit if we are entirely clipped */          \
 		destendx = destx + dstwidth - 1;                                            \
-		if (destx > cliprect.max_x || destendx < cliprect.min_x)                    \
+		if (destx > cliprect.right() || destendx < cliprect.left())                 \
 			break;                                                                  \
 																					\
 		/* apply left clip */                                                       \
 		srcx = 0;                                                                   \
-		if (destx < cliprect.min_x)                                                 \
+		if (destx < cliprect.left())                                                \
 		{                                                                           \
-			srcx = (cliprect.min_x - destx) * dx;                                   \
-			destx = cliprect.min_x;                                                 \
+			srcx = (cliprect.left() - destx) * dx;                                  \
+			destx = cliprect.left();                                                \
 		}                                                                           \
 																					\
 		/* apply right clip */                                                      \
-		if (destendx > cliprect.max_x)                                              \
-			destendx = cliprect.max_x;                                              \
+		if (destendx > cliprect.right())                                            \
+			destendx = cliprect.right();                                            \
 																					\
 		/* compute final pixel in Y and exit if we are entirely clipped */          \
 		destendy = desty + dstheight - 1;                                           \
-		if (desty > cliprect.max_y || destendy < cliprect.min_y)                    \
+		if (desty > cliprect.bottom() || destendy < cliprect.top())                 \
 		{                                                                           \
 			g_profiler.stop();                                                      \
 			return;                                                                 \
@@ -626,15 +626,15 @@ do {                                                                            
 																					\
 		/* apply top clip */                                                        \
 		srcy = 0;                                                                   \
-		if (desty < cliprect.min_y)                                                 \
+		if (desty < cliprect.top())                                                 \
 		{                                                                           \
-			srcy = (cliprect.min_y - desty) * dy;                                   \
-			desty = cliprect.min_y;                                                 \
+			srcy = (cliprect.top() - desty) * dy;                                   \
+			desty = cliprect.top();                                                 \
 		}                                                                           \
 																					\
 		/* apply bottom clip */                                                     \
-		if (destendy > cliprect.max_y)                                              \
-			destendy = cliprect.max_y;                                              \
+		if (destendy > cliprect.bottom())                                           \
+			destendy = cliprect.bottom();                                           \
 																					\
 		/* apply X flipping */                                                      \
 		if (flipx)                                                                  \
@@ -740,37 +740,37 @@ do {                                                                            
 																					\
 		/* compute final pixel in X and exit if we are entirely clipped */          \
 		destendx = destx + src.width() - 1;                                         \
-		if (destx > cliprect.max_x || destendx < cliprect.min_x)                    \
+		if (destx > cliprect.right() || destendx < cliprect.left())                 \
 			break;                                                                  \
 																					\
 		/* apply left clip */                                                       \
 		srcx = 0;                                                                   \
-		if (destx < cliprect.min_x)                                                 \
+		if (destx < cliprect.left())                                                \
 		{                                                                           \
-			srcx = cliprect.min_x - destx;                                          \
-			destx = cliprect.min_x;                                                 \
+			srcx = cliprect.left() - destx;                                         \
+			destx = cliprect.left();                                                \
 		}                                                                           \
 																					\
 		/* apply right clip */                                                      \
-		if (destendx > cliprect.max_x)                                              \
-			destendx = cliprect.max_x;                                              \
+		if (destendx > cliprect.right())                                            \
+			destendx = cliprect.right();                                            \
 																					\
 		/* compute final pixel in Y and exit if we are entirely clipped */          \
 		destendy = desty + src.height() - 1;                                        \
-		if (desty > cliprect.max_y || destendy < cliprect.min_y)                    \
+		if (desty > cliprect.bottom() || destendy < cliprect.top())                 \
 			break;                                                                  \
 																					\
 		/* apply top clip */                                                        \
 		srcy = 0;                                                                   \
-		if (desty < cliprect.min_y)                                                 \
+		if (desty < cliprect.top())                                                 \
 		{                                                                           \
-			srcy = cliprect.min_y - desty;                                          \
-			desty = cliprect.min_y;                                                 \
+			srcy = cliprect.top() - desty;                                          \
+			desty = cliprect.top();                                                 \
 		}                                                                           \
 																					\
 		/* apply bottom clip */                                                     \
-		if (destendy > cliprect.max_y)                                              \
-			destendy = cliprect.max_y;                                              \
+		if (destendy > cliprect.bottom())                                           \
+			destendy = cliprect.bottom();                                           \
 																					\
 		/* apply X flipping */                                                      \
 		if (flipx)                                                                  \
@@ -912,8 +912,8 @@ do {                                                                            
 	srcfixheight = src.height() << 16;                                              \
 																					\
 	/* advance the starting coordinates to the top-left of the cliprect */          \
-	startx += cliprect.min_x * incxx + cliprect.min_y * incyx;                      \
-	starty += cliprect.min_x * incxy + cliprect.min_y * incyy;                      \
+	startx += cliprect.left() * incxx + cliprect.top() * incyx;                     \
+	starty += cliprect.left() * incxy + cliprect.top() * incyy;                     \
 																					\
 	/* compute how many blocks of 4 pixels we have */                               \
 	numblocks = cliprect.width() / 4;                                               \
@@ -926,10 +926,10 @@ do {                                                                            
 		if (!wraparound)                                                            \
 		{                                                                           \
 			/* iterate over pixels in Y */                                          \
-			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)             \
+			for (cury = cliprect.top(); cury <= cliprect.bottom(); cury++)          \
 			{                                                                       \
-				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
-				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.min_x); \
+				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.left()); \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.left()); \
 				const PIXEL_TYPE *srcptr;                                           \
 				s32 srcx = startx;                                                  \
 				s32 srcy = starty;                                                  \
@@ -987,10 +987,10 @@ do {                                                                            
 			starty &= srcfixheight;                                                 \
 																					\
 			/* iterate over pixels in Y */                                          \
-			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)             \
+			for (cury = cliprect.top(); cury <= cliprect.bottom(); cury++)          \
 			{                                                                       \
-				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
-				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.min_x); \
+				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.left()); \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.left()); \
 				const PIXEL_TYPE *srcptr = &src.pixt<PIXEL_TYPE>(starty >> 16);     \
 				s32 srcx = startx;                                                  \
 																					\
@@ -1034,10 +1034,10 @@ do {                                                                            
 		if (!wraparound)                                                            \
 		{                                                                           \
 			/* iterate over pixels in Y */                                          \
-			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)             \
+			for (cury = cliprect.top(); cury <= cliprect.bottom(); cury++)          \
 			{                                                                       \
-				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
-				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.min_x); \
+				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.left()); \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.left()); \
 				const PIXEL_TYPE *srcptr;                                           \
 				s32 srcx = startx;                                                  \
 				s32 srcy = starty;                                                  \
@@ -1110,10 +1110,10 @@ do {                                                                            
 			starty &= srcfixheight;                                                 \
 																					\
 			/* iterate over pixels in Y */                                          \
-			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)             \
+			for (cury = cliprect.top(); cury <= cliprect.bottom(); cury++)          \
 			{                                                                       \
-				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
-				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.min_x); \
+				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.left()); \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.left()); \
 				const PIXEL_TYPE *srcptr;                                           \
 				s32 srcx = startx;                                                  \
 				s32 srcy = starty;                                                  \

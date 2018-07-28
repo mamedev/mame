@@ -170,18 +170,18 @@ void wpc_dot_state::init_wpc_dot()
 	m_cpubank->set_entry(0);
 	m_fixedbank->configure_entries(0, 1, &fixed[codeoff],0x8000);
 	m_fixedbank->set_entry(0);
-	m_dmdbank1->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
-	m_dmdbank1->set_entry(0);
-	m_dmdbank2->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
-	m_dmdbank2->set_entry(1);
-	m_dmdbank3->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
-	m_dmdbank3->set_entry(2);
-	m_dmdbank4->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
-	m_dmdbank4->set_entry(3);
-	m_dmdbank5->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
-	m_dmdbank5->set_entry(4);
-	m_dmdbank6->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
-	m_dmdbank6->set_entry(5);
+	m_dmdbanks[0]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
+	m_dmdbanks[0]->set_entry(0);
+	m_dmdbanks[1]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
+	m_dmdbanks[1]->set_entry(1);
+	m_dmdbanks[2]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
+	m_dmdbanks[2]->set_entry(2);
+	m_dmdbanks[3]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
+	m_dmdbanks[3]->set_entry(3);
+	m_dmdbanks[4]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
+	m_dmdbanks[4]->set_entry(4);
+	m_dmdbanks[5]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
+	m_dmdbanks[5]->set_entry(5);
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
 	m_vblank_timer->adjust(attotime::from_hz(60),0,attotime::from_hz(60*4));
 	m_irq_timer = timer_alloc(TIMER_IRQ);
@@ -213,28 +213,18 @@ WRITE8_MEMBER(wpc_dot_state::wpc_rombank_w)
 
 WRITE8_MEMBER(wpc_dot_state::wpc_dmdbank_w)
 {
-	uint8_t page = offset >> 4;
+	uint8_t const bank(offset & 0x07);
+	uint8_t const page(offset >> 4);
 
-	switch(offset & 0x07)
+	switch (bank)
 	{
 	case 0:
-		m_dmdbank1->set_entry(data + (page*16));
-		break;
 	case 1:
-		m_dmdbank2->set_entry(data + (page*16));
-		break;
 	case 2:
-		m_dmdbank3->set_entry(data + (page*16));
-		break;
 	case 3:
-		m_dmdbank4->set_entry(data + (page*16));
-		break;
 	case 4:
-		m_dmdbank5->set_entry(data + (page*16));
-		break;
 	case 5:
-		m_dmdbank6->set_entry(data + (page*16));
-		break;
+		m_dmdbanks[bank]->set_entry(data + (page << 4));
 	}
 }
 
@@ -321,13 +311,12 @@ MACHINE_CONFIG_START(wpc_dot_state::wpc_dot)
 	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_dot_state,wpcsnd_reply_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	config.set_default_layout(layout_lcd);
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(128, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 32-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(wpc_dot_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_native_aspect();
+	screen.set_size(128, 32);
+	screen.set_visarea(0, 128-1, 0, 32-1);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(wpc_dot_state::screen_update));
 MACHINE_CONFIG_END
 
 /*-----------------

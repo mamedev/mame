@@ -439,9 +439,9 @@ ROM_START( megaphx )
 	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
 	ROM_FILL(0x2c, 1, 0x01) // patch timer length or its too slow (pic issue?)
 
-	ROM_REGION( 0x100000, "pals", 0 ) // jedutil won't convert these? are they bad?
-	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, CRC(05ef04b7) SHA1(330dd81a832b6675fb0473868c26fe9bec2da854) )
-	ROM_LOAD( "p40_u29_palce16v8h-25.jed", 0x000, 0xbd4, CRC(44b7e51c) SHA1(b8b34f3b319d664ec3ad72ed87d9f65701f183a5) )
+	ROM_REGION( 0x1000, "pals", 0 ) // protected
+	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, BAD_DUMP CRC(05ef04b7) SHA1(330dd81a832b6675fb0473868c26fe9bec2da854) )
+	ROM_LOAD( "p40_u29_palce16v8h-25.jed", 0x000, 0xbd4, BAD_DUMP CRC(44b7e51c) SHA1(b8b34f3b319d664ec3ad72ed87d9f65701f183a5) )
 ROM_END
 
 ROM_START( hamboy )

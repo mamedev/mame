@@ -943,11 +943,11 @@ MACHINE_CONFIG_START(apc_state::apc)
 	MCFG_DEVICE_IO_MAP(apc_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD(m_pit, PIT8253, 0)
-	MCFG_PIT8253_CLK0(MAIN_CLOCK) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_i8259_m, pic8259_device, ir3_w))
-	MCFG_PIT8253_CLK1(MAIN_CLOCK) /* Memory Refresh */
-	MCFG_PIT8253_CLK2(MAIN_CLOCK) /* RS-232c */
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(MAIN_CLOCK); // heartbeat IRQ
+	m_pit->out_handler<0>().set(m_i8259_m, FUNC(pic8259_device::ir3_w));
+	m_pit->set_clk<1>(MAIN_CLOCK); // Memory Refresh
+	m_pit->set_clk<2>(MAIN_CLOCK); // RS-232c
 
 	PIC8259(config, m_i8259_m, 0);
 	m_i8259_m->out_int_callback().set_inputline(m_maincpu, 0);
@@ -958,17 +958,17 @@ MACHINE_CONFIG_START(apc_state::apc)
 	m_i8259_s->out_int_callback().set(m_i8259_m, FUNC(pic8259_device::ir7_w)); // TODO: check ir7_w
 	m_i8259_s->in_sp_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD(m_dmac, AM9517A, MAIN_CLOCK)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, apc_state, apc_dma_hrq_changed))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, apc_state, apc_tc_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, apc_state, apc_dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, apc_state, apc_dma_write_byte))
-	MCFG_I8237_IN_IOR_1_CB(READ8(*this, apc_state, fdc_r))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, apc_state, fdc_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, apc_state, apc_dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, apc_state, apc_dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, apc_state, apc_dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, apc_state, apc_dack3_w))
+	AM9517A(config, m_dmac, MAIN_CLOCK);
+	m_dmac->out_hreq_callback().set(FUNC(apc_state::apc_dma_hrq_changed));
+	m_dmac->out_eop_callback().set(FUNC(apc_state::apc_tc_w));
+	m_dmac->in_memr_callback().set(FUNC(apc_state::apc_dma_read_byte));
+	m_dmac->out_memw_callback().set(FUNC(apc_state::apc_dma_write_byte));
+	m_dmac->in_ior_callback<1>().set(FUNC(apc_state::fdc_r));
+	m_dmac->out_iow_callback<1>().set(FUNC(apc_state::fdc_w));
+	m_dmac->out_dack_callback<0>().set(FUNC(apc_state::apc_dack0_w));
+	m_dmac->out_dack_callback<1>().set(FUNC(apc_state::apc_dack1_w));
+	m_dmac->out_dack_callback<2>().set(FUNC(apc_state::apc_dack2_w));
+	m_dmac->out_dack_callback<3>().set(FUNC(apc_state::apc_dack3_w));
 
 	MCFG_NVRAM_ADD_1FILL(m_cmos)
 	MCFG_UPD1990A_ADD(m_rtc, XTAL(32'768), NOOP, NOOP)
@@ -981,12 +981,12 @@ MACHINE_CONFIG_START(apc_state::apc)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","apc")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(apc_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 494)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 494-1)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_screen_update(FUNC(apc_state::screen_update));
+	m_screen->set_size(640, 494);
+	m_screen->set_visarea(0*8, 640-1, 0*8, 494-1);
 
 	MCFG_PALETTE_ADD_3BIT_BRG(m_palette)
 
