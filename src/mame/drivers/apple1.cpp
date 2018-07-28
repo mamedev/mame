@@ -358,14 +358,14 @@ uint32_t apple1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	// the cursor 555 timer counts 0.52 of a second; the cursor is ON for
 	// 2 of those counts and OFF for the last one.
-	if (((int)(machine().time().as_double() / (0.52 / 3.0)) % 3) < 2)
+	if ((int(machine().time().as_double() / (0.52 / 3.0)) % 3) < 2)
 	{
 		curs_save = m_vram[(m_cursy * 40) + m_cursx];
 		m_vram[(m_cursy * 40) + m_cursx] = 0x40;
 		cursor_blink = 1;
 	}
 
-	for (int row = 0; row < cliprect.max_y; row += 8)
+	for (int row = 0; row < cliprect.bottom(); row += 8)
 	{
 		for (int col = 0; col < 40; col++)
 		{

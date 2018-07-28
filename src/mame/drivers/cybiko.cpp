@@ -22,7 +22,6 @@ ToDo:
 #include "includes/cybiko.h"
 
 #include "bus/rs232/rs232.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -401,7 +400,7 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("flash1", at45db041_device, sck_w))
 
 	// screen
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_SIZE( hd66421_device::WIDTH, hd66421_device::HEIGHT )
 	MCFG_SCREEN_VISIBLE_AREA( 0, hd66421_device::WIDTH - 1, 0, hd66421_device::HEIGHT - 1 )
@@ -409,7 +408,6 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	MCFG_SCREEN_PALETTE("hd66421:palette")
 	// video
 	MCFG_HD66421_ADD("hd66421")
-	config.set_default_layout(layout_lcd);
 	// sound
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)

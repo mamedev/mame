@@ -23,7 +23,6 @@
 #include "cpu/arm7/arm7core.h"
 #include "sound/volt_reg.h"
 
-#include "rendlay.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -1686,9 +1685,6 @@ MACHINE_CONFIG_START(gp32_state::gp32)
 	MCFG_SCREEN_SIZE(240, 320)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
 	MCFG_SCREEN_UPDATE_DRIVER(gp32_state, screen_update_gp32)
-
-	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
-	config.set_default_layout(layout_lcd_rot);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

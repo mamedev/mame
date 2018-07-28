@@ -277,7 +277,6 @@ disabled). Perhaps power on/off related??
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -289,9 +288,10 @@ class nakajies_state : public driver_device
 {
 public:
 	nakajies_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "v20hl")
-		{}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "v20hl")
+	{
+	}
 
 	void nakajies210(machine_config &config);
 	void nakajies220(machine_config &config);
@@ -763,7 +763,6 @@ MACHINE_CONFIG_START(nakajies_state::nakajies210)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wales210)
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(nakajies_state, nakajies)
-	config.set_default_layout(layout_lcd);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();

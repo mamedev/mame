@@ -778,6 +778,14 @@ READ8_MEMBER( ymf278b_device::read )
 /**************************************************************************/
 
 //-------------------------------------------------
+//  device_post_load - device-specific post load
+//-------------------------------------------------
+void ymf278b_device::device_post_load()
+{
+	ymf262_post_load(m_ymf262);
+}
+
+//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
@@ -839,6 +847,17 @@ void ymf278b_device::device_stop()
 {
 	ymf262_shutdown(m_ymf262);
 	m_ymf262 = nullptr;
+}
+
+void ymf278b_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock()/768);
+
+	// YMF262 related
+
+	int ymf262_clock = clock() / (19/8.0);
+	ymf262_clock_changed(m_ymf262, ymf262_clock, ymf262_clock / 288);
+	m_stream_ymf262->set_sample_rate(ymf262_clock / 288);
 }
 
 void ymf278b_device::rom_bank_updated()

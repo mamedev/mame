@@ -114,7 +114,6 @@
 
 #include "emu.h"
 #include "includes/micronic.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -363,8 +362,6 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 	MCFG_SCREEN_SIZE(120, 64)   //6x20, 8x8
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
-
-	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(micronic_state, micronic)

@@ -33,7 +33,6 @@
 #include "video/mc6845.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1011,8 +1010,6 @@ MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
 	MCFG_MC6845_ADD("crtc", H46505, "screen", LCD_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-
-	config.set_default_layout(layout_lcd);
 MACHINE_CONFIG_END
 
 /* ROM definition */

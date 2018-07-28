@@ -361,8 +361,8 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 
 	/* perform adjustments */
-	beginrow = std::max(beginrow, cliprect.min_y);
-	endrow = std::min(endrow, cliprect.max_y);
+	beginrow = (std::max)(beginrow, cliprect.top());
+	endrow = (std::min)(endrow, cliprect.bottom());
 
 	if (!(m_sysconfig & 0x03))
 	{
@@ -461,8 +461,8 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 
 	/* perform adjustments */
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	if (!(m_sysconfig & 0x03))
 	{
@@ -607,8 +607,8 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		start_address = m_page2 ? 0x800 : 0x400;
 	}
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -654,8 +654,8 @@ void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitm
 	int fg = 0;
 	int bg = 0;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -685,8 +685,8 @@ void a2_video_device::text_update_jplus(screen_device &screen, bitmap_ind16 &bit
 	int fg = 0;
 	int bg = 0;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -716,8 +716,8 @@ void a2_video_device::text_update_ultr(screen_device &screen, bitmap_ind16 &bitm
 	int fg = 0;
 	int bg = 0;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -753,19 +753,19 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	int begincol = 0, endcol = 40;
 
 	/* sanity checks */
-	if (beginrow < cliprect.min_y)
-		beginrow = cliprect.min_y;
-	if (endrow > cliprect.max_y)
-		endrow = cliprect.max_y;
+	if (beginrow < cliprect.top())
+		beginrow = cliprect.top();
+	if (endrow > cliprect.bottom())
+		endrow = cliprect.bottom();
 	if (endrow < beginrow)
 		return;
 
 	// we generate 2 pixels per "column" so adjust
-	if (begincol < (cliprect.min_x/14))
-		begincol = (cliprect.min_x/14);
-	if (endcol > (cliprect.max_x/14))
-		endcol = (cliprect.max_x/14);
-	if (cliprect.max_x > 39*14)
+	if (begincol < (cliprect.left()/14))
+		begincol = (cliprect.left()/14);
+	if (endcol > (cliprect.right()/14))
+		endcol = (cliprect.right()/14);
+	if (cliprect.right() > 39*14)
 		endcol = 40;
 	if (endcol < begincol)
 		return;
@@ -872,10 +872,10 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 	int mon_type = m_sysconfig & 0x03;
 
 	/* sanity checks */
-	if (beginrow < cliprect.min_y)
-		beginrow = cliprect.min_y;
-	if (endrow > cliprect.max_y)
-		endrow = cliprect.max_y;
+	if (beginrow < cliprect.top())
+		beginrow = cliprect.top();
+	if (endrow > cliprect.bottom())
+		endrow = cliprect.bottom();
 	if (endrow < beginrow)
 		return;
 
@@ -962,10 +962,10 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	int mon_type = m_sysconfig & 0x03;
 
 	/* sanity checks */
-	if (beginrow < cliprect.min_y)
-		beginrow = cliprect.min_y;
-	if (endrow > cliprect.max_y)
-		endrow = cliprect.max_y;
+	if (beginrow < cliprect.top())
+		beginrow = cliprect.top();
+	if (endrow > cliprect.bottom())
+		endrow = cliprect.bottom();
 	if (endrow < beginrow)
 		return;
 
@@ -1084,7 +1084,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 	int beamy;
 	uint16_t *a2pixel;
 
-	beamy = cliprect.min_y;
+	beamy = cliprect.top();
 
 	if (m_newvideo & 0x80)
 	{
@@ -1302,8 +1302,8 @@ void a2_video_device::text_updateGS(screen_device &screen, bitmap_ind16 &bitmap,
 		start_address = m_page2 ? 0x800 : 0x400;
 	}
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (row = beginrow; row <= endrow; row += 8)
 	{

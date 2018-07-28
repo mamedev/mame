@@ -170,11 +170,11 @@ uint32_t quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 
 	{
 		int y;
 
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			int x;
 
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				int pixel0 = s2636_0_bitmap.pix16(y, x);
 				int pixel1 = s2636_1_bitmap.pix16(y, x);

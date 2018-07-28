@@ -29,6 +29,7 @@
 	24: RF5C68
 	25: RF5C164
 	26: X1-010
+	27: YM2610
 	-->
 
 	<element name="backdrop"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
@@ -65,6 +66,7 @@
 	<element name="act_label_rf5c68"><text string="RF5C68" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_rf5c164"><text string="RF5C164" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_x1_010"><text string="X1-010" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ym2610"><text string="YM2610" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
 	<element name="static_black2"><rect><color red="0.2" green="0.21" blue="0.23" /></rect></element>
 
@@ -126,6 +128,7 @@
 		<cpanel name="led_act_24" element="act_led"><bounds x="46" y="1" width="2" height="2" /></cpanel>
 		<cpanel name="led_act_25" element="act_led"><bounds x="46" y="4" width="2" height="2" /></cpanel>
 		<cpanel name="led_act_26" element="act_led"><bounds x="46" y="7" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_27" element="act_led"><bounds x="46" y="10" width="2" height="2" /></cpanel>
 
 		<cpanel element="act_label_ay8910"><bounds x="4" y="1.2" width="10" height="1.6" /></cpanel>
 		<cpanel element="act_label_sn76496"><bounds x="4" y="4.2" width="10" height="1.6" /></cpanel>
@@ -157,6 +160,7 @@
 		<cpanel element="act_label_rf5c68"><bounds x="49" y="1.2" width="10" height="1.6" /></cpanel>
 		<cpanel element="act_label_rf5c164"><bounds x="49" y="4.2" width="10" height="1.6" /></cpanel>
 		<cpanel element="act_label_x1_010"><bounds x="49" y="7.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ym2610"><bounds x="49" y="10.2" width="10" height="1.6" /></cpanel>
 	</group>
 
 	<view name="Internal Layout">

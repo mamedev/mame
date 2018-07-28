@@ -184,9 +184,9 @@ uint32_t dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rg
 	//
 	// really, it needs optimizing ..
 	// so for now we only draw these 2 layers on the last update call
-	if (cliprect.max_y == 247)
+	if (cliprect.bottom() == 247)
 	{
-		rectangle clip(cliprect.min_x, cliprect.max_x, 8, 247);
+		rectangle clip(cliprect.left(), cliprect.right(), 8, 247);
 
 		m_sprgenzoom->dragngun_draw_sprites(bitmap,clip,m_spriteram->buffer(), m_sprite_layout_ram[0], m_sprite_layout_ram[1], m_sprite_lookup_ram[0], m_sprite_lookup_ram[1], m_sprite_ctrl, screen.priority(), m_temp_render_bitmap );
 

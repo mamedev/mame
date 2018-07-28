@@ -170,12 +170,12 @@ WRITE_LINE_MEMBER(sprint8_state::screen_vblank)
 
 		draw_sprites(m_helper1, visarea);
 
-		for (int y = visarea.min_y; y <= visarea.max_y; y++)
+		for (int y = visarea.top(); y <= visarea.bottom(); y++)
 		{
 			const uint16_t* p1 = &m_helper1.pix16(y);
 			const uint16_t* p2 = &m_helper2.pix16(y);
 
-			for (int x = visarea.min_x; x <= visarea.max_x; x++)
+			for (int x = visarea.left(); x <= visarea.right(); x++)
 				if (p1[x] != 0x20 && p2[x] == 0x23)
 					m_collision_timer->adjust(m_screen->time_until_pos(y + 24, x), m_palette->pen_indirect(p1[x]));
 		}

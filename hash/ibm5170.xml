@@ -57,6 +57,54 @@
 		</part>
 	</software>
 
+	<software name="allinone">
+		<description>The All In One Boot Floppy 1.0</description>
+		<year>2008</year>
+		<publisher>Michael Schierl</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="allinone.img" size="1474560" crc="b9d206e2" sha1="48993ad7769f655a46180db1e4dd2cf6811299ed" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="allinonea" cloneof="allinone">
+		<description>The All In One Boot Floppy 0.9</description>
+		<year>2006</year>
+		<publisher>Michael Schierl</publisher>
+		<info name="version" value="0.9" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="rom" size = "1474560">
+				<rom name="allinone09.img" size="1474560" crc="f97836fd" sha1="f1c6cdb2a56010d5cc7d36609c343c5f434c98dc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="allinonel" cloneof="allinone">
+		<description>The All In One Boot Floppy 0.9 (Lite Version)</description>
+		<year>2006</year>
+		<publisher>Michael Schierl</publisher>
+		<info name="version" value="0.9" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="lite.img" size="737280" crc="a817a384" sha1="28d34559991788ce2e0b8ef486a8265c42e4e03d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="allinonef" cloneof="allinone">
+		<description>The All In One Boot Floppy 0.9 (FreeDOS only)</description>
+		<year>2006</year>
+		<publisher>Michael Schierl</publisher>
+		<info name="version" value="0.9" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="freedos.img" size="737280" crc="57e02573" sha1="17226bd9bb3fc593084fadb52727defffdf51433" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="brutware" supported="no">
 		<description>Brutalware Linux 1.1</description>
 		<year>1999</year>

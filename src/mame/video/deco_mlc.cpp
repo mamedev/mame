@@ -74,16 +74,16 @@ void deco_mlc_state::drawgfxzoomline(uint32_t* dest,const rectangle &clip,gfx_el
 			x_index_base = 0;
 		}
 
-		if( sx < clip.min_x)
+		if( sx < clip.left())
 		{ /* clip left */
-			int pixels = clip.min_x-sx;
+			int pixels = clip.left()-sx;
 			sx += pixels;
 			x_index_base += pixels*dx;
 		}
 		/* NS 980211 - fixed incorrect clipping */
-		if( ex > clip.max_x+1 )
+		if( ex > clip.right()+1 )
 		{ /* clip right */
-			int pixels = ex-clip.max_x-1;
+			int pixels = ex-clip.right()-1;
 			ex -= pixels;
 		}
 
@@ -245,16 +245,11 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 		int min_y = m_clip_ram[(clipper*4)+0];
 		int max_y = m_clip_ram[(clipper*4)+1];
 
-		if (scanline<min_y)
-			continue;
-
-		if (scanline>max_y)
+		if ((scanline<min_y) || (scanline>max_y))
 			continue;
 
 
-		user_clip.min_x=m_clip_ram[(clipper*4)+2];
-		user_clip.max_x=m_clip_ram[(clipper*4)+3];
-
+		user_clip.setx(m_clip_ram[(clipper*4)+2], m_clip_ram[(clipper*4)+3]);
 		user_clip &= cliprect;
 
 		/* Any colours out of range (for the bpp value) trigger 'shadow' mode */
@@ -548,7 +543,7 @@ uint32_t deco_mlc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 //  temp_bitmap->fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0), cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
 
-	for (int i=cliprect.min_y;i<=cliprect.max_y;i++)
+	for (int i=cliprect.top();i<=cliprect.bottom();i++)
 	{
 		uint32_t *dest = &bitmap.pix32(i);
 

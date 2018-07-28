@@ -614,8 +614,6 @@ MACHINE_CONFIG_START(z88_state::z88)
 	device = &PALETTE(config, m_palette, Z88_NUM_COLOURS);
 	MCFG_PALETTE_INIT_OWNER(z88_state, z88)
 
-	config.set_default_layout(layout_lcd);
-
 	device = &UPD65031(config, m_blink, XTAL(9'830'400));
 	m_blink->kb_rd_callback().set(FUNC(z88_state::kb_r));
 	m_blink->int_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

@@ -237,11 +237,6 @@ protected:
 		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
 			device().debug()->exception_hook(exception);
 	}
-	void debugger_interrupt_hook(int irqline)
-	{
-		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
-			device().debug()->interrupt_hook(irqline);
-	}
 
 private:
 	// internal information about the state of inputs

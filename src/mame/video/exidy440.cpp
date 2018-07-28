@@ -307,7 +307,7 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		uint8_t *src;
 
 		/* skip if out of range */
-		if (yoffs < cliprect.min_y || yoffs >= cliprect.max_y + 16)
+		if (yoffs < cliprect.top() || yoffs >= cliprect.bottom() + 16)
 			continue;
 
 		/* get a pointer to the source image */
@@ -328,11 +328,11 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 				sy += (VBSTART - VBEND);
 
 			/* stop if we get before the current scanline */
-			if (yoffs < cliprect.min_y)
+			if (yoffs < cliprect.top())
 				break;
 
 			/* only draw scanlines that are in this cliprect */
-			if (yoffs <= cliprect.max_y)
+			if (yoffs <= cliprect.bottom())
 			{
 				uint8_t *old = &m_local_videoram[sy * 512 + xoffs];
 				int currx = xoffs;
@@ -389,8 +389,8 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 void exidy440_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,  int scroll_offset, int check_collision)
 {
 	/* draw any dirty scanlines from the VRAM directly */
-	int sy = scroll_offset + cliprect.min_y;
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++, sy++)
+	int sy = scroll_offset + cliprect.top();
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++, sy++)
 	{
 		/* wrap at the bottom of the screen */
 		if (sy >= VBSTART)
@@ -418,7 +418,7 @@ uint32_t exidy440_state::screen_update_exidy440(screen_device &screen, bitmap_in
 	update_screen(screen, bitmap, cliprect, 0, true);
 
 	/* generate an interrupt once/frame for the beam */
-	if (cliprect.max_y == screen.visible_area().max_y)
+	if (cliprect.bottom() == screen.visible_area().bottom())
 	{
 		int i;
 
