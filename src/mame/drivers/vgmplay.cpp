@@ -1597,8 +1597,8 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_k054539[0]->init_flags(version >= 0x161 && data_start >= 0x96 ? r8(0x95) : 0);
 		m_k054539[1]->init_flags(version >= 0x161 && data_start >= 0x96 ? r8(0x95) : 0);
 
-		m_okim6295_clock[0] = version >= 0x161 && data_start >= 0x9c ? r32(0x98) & 0xc0000000 : 0;
-		m_okim6295_clock[1] = version >= 0x161 && data_start >= 0x9c && (r32(0x98) & 0x40000000) ? r32(0x98) & 0xc0000000 : 0;
+		m_okim6295_clock[0] = version >= 0x161 && data_start >= 0x9c ? r32(0x98) & ~0xc0000000 : 0;
+		m_okim6295_clock[1] = version >= 0x161 && data_start >= 0x9c && (r32(0x98) & 0x40000000) ? r32(0x98) & ~0xc0000000 : 0;
 		m_okim6295[0]->set_unscaled_clock(m_okim6295_clock[0]);
 		m_okim6295[1]->set_unscaled_clock(m_okim6295_clock[1]);
 
