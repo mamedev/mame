@@ -767,7 +767,7 @@ MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 	MCFG_PALETTE_ADD("palette2", 4096)
 	MCFG_PALETTE_ADD("palette3", 4096)
 
-	MCFG_DEFAULT_LAYOUT(layout_ninjaw)
+	config.set_default_layout(layout_ninjaw);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -883,7 +883,7 @@ MACHINE_CONFIG_START(ninjaw_state::darius2)
 	MCFG_PALETTE_ADD("palette2", 4096)
 	MCFG_PALETTE_ADD("palette3", 4096)
 
-	MCFG_DEFAULT_LAYOUT(layout_ninjaw)
+	config.set_default_layout(layout_ninjaw);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

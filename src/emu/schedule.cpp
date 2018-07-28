@@ -452,7 +452,12 @@ void device_scheduler::timeslice()
 		{
 			// only process if this CPU is executing or truly halted (not yielding)
 			// and if our target is later than the CPU's current time (coarse check)
-			if (EXPECTED((exec->m_suspend == 0 || exec->m_eatcycles) && target.seconds() >= exec->m_localtime.seconds()))
+			if (exec->m_suspend != 0)
+			{
+				if (exec->m_eatcycles)
+					exec->m_localtime = target;
+			}
+			else if (target.seconds() >= exec->m_localtime.seconds())
 			{
 				// compute how many attoseconds to execute this CPU
 				attoseconds_t delta = target.attoseconds() - exec->m_localtime.attoseconds();
@@ -467,32 +472,28 @@ void device_scheduler::timeslice()
 					int ran = exec->m_cycles_running = divu_64x32(u64(delta) >> exec->m_divshift, exec->m_divisor);
 					LOG(("  cpu '%s': %d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running));
 
-					// if we're not suspended, actually execute
-					if (exec->m_suspend == 0)
+					g_profiler.start(exec->m_profiler);
+
+					// note that this global variable cycles_stolen can be modified
+					// via the call to cpu_execute
+					exec->m_cycles_stolen = 0;
+					m_executing_device = exec;
+					*exec->m_icountptr = exec->m_cycles_running;
+					if (!call_debugger)
+						exec->run();
+					else
 					{
-						g_profiler.start(exec->m_profiler);
-
-						// note that this global variable cycles_stolen can be modified
-						// via the call to cpu_execute
-						exec->m_cycles_stolen = 0;
-						m_executing_device = exec;
-						*exec->m_icountptr = exec->m_cycles_running;
-						if (!call_debugger)
-							exec->run();
-						else
-						{
-							exec->debugger_start_cpu_hook(target);
-							exec->run();
-							exec->debugger_stop_cpu_hook();
-						}
-
-						// adjust for any cycles we took back
-						assert(ran >= *exec->m_icountptr);
-						ran -= *exec->m_icountptr;
-						assert(ran >= exec->m_cycles_stolen);
-						ran -= exec->m_cycles_stolen;
-						g_profiler.stop();
+						exec->debugger_start_cpu_hook(target);
+						exec->run();
+						exec->debugger_stop_cpu_hook();
 					}
+
+					// adjust for any cycles we took back
+					assert(ran >= *exec->m_icountptr);
+					ran -= *exec->m_icountptr;
+					assert(ran >= exec->m_cycles_stolen);
+					ran -= exec->m_cycles_stolen;
+					g_profiler.stop();
 
 					// account for these cycles
 					exec->m_totalcycles += ran;

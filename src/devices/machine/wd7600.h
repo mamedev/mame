@@ -78,10 +78,10 @@ public:
 	template <class Object> devcb_base &set_spkr_callback(Object &&spkr) { return m_write_spkr.set_callback(std::forward<Object>(spkr)); }
 
 	// inline configuration
-	void set_cputag(const char *tag) { m_cputag = tag; }
+	template <typename T> void set_cputag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	void set_isatag(const char *tag) { m_isatag = tag; }
-	void set_biostag(const char *tag) { m_biostag = tag; }
-	void set_keybctag(const char *tag) { m_keybctag = tag; }
+	template <typename T> void set_biostag(T &&tag) { m_bios.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_keybctag(T &&tag) { m_keybc.set_tag(std::forward<T>(tag)); }
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER( irq01_w ) { m_pic1->ir1_w(state); }
@@ -195,6 +195,10 @@ private:
 	required_device<pit8254_device> m_ctc;
 	required_device<ds12885_device> m_rtc;
 
+	required_device<device_memory_interface> m_cpu;
+	required_device<at_keyboard_controller_device> m_keybc;
+	required_region_ptr<uint8_t> m_bios;
+
 	offs_t page_offset();
 	void set_dma_channel(int channel, bool state);
 	void keyboard_gatea20(int state);
@@ -202,10 +206,7 @@ private:
 	void a20m();
 
 	// internal state
-	const char *m_cputag;
 	const char *m_isatag;
-	const char *m_biostag;
-	const char *m_keybctag;
 	uint8_t m_portb;
 	int m_iochck;
 	int m_nmi_mask;
@@ -228,9 +229,7 @@ private:
 	address_space *m_space;
 	address_space *m_space_io;
 	uint8_t *m_isa;
-	uint8_t *m_bios;
 	uint8_t *m_ram;
-	at_keyboard_controller_device *m_keybc;
 };
 
 // device type definition

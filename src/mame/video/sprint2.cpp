@@ -83,8 +83,8 @@ uint8_t sprint2_state::collision_check(rectangle& rect)
 	int x;
 	int y;
 
-	for (y = rect.min_y; y <= rect.max_y; y++)
-		for (x = rect.min_x; x <= rect.max_x; x++)
+	for (y = rect.top(); y <= rect.bottom(); y++)
+		for (x = rect.left(); x <= rect.right(); x++)
 		{
 			uint16_t a = m_palette->pen_indirect(m_helper.pix16(y, x));
 
@@ -155,13 +155,11 @@ WRITE_LINE_MEMBER(sprint2_state::screen_vblank_sprint2)
 
 		for (i = 0; i < 2; i++)
 		{
-			rectangle rect;
-
-			rect.min_x = get_sprite_x(video_ram, i);
-			rect.min_y = get_sprite_y(video_ram, i);
-			rect.max_x = get_sprite_x(video_ram, i) + m_gfxdecode->gfx(1)->width() - 1;
-			rect.max_y = get_sprite_y(video_ram, i) + m_gfxdecode->gfx(1)->height() - 1;
-
+			rectangle rect(
+					get_sprite_x(video_ram, i),
+					get_sprite_x(video_ram, i) + m_gfxdecode->gfx(1)->width() - 1,
+					get_sprite_y(video_ram, i),
+					get_sprite_y(video_ram, i) + m_gfxdecode->gfx(1)->height() - 1);
 			rect &= visarea;
 
 			/* check for sprite-tilemap collisions */

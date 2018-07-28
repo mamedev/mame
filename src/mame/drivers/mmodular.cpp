@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(mmodular_state::alm16)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mmodular)
+	config.set_default_layout(layout_mmodular);
 MACHINE_CONFIG_END
 
 
@@ -282,7 +282,7 @@ MACHINE_CONFIG_START(mmodular_state::alm32)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mmodular)
+	config.set_default_layout(layout_mmodular);
 MACHINE_CONFIG_END
 
 
@@ -302,7 +302,7 @@ MACHINE_CONFIG_START(mmodular_state::gen32)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mmodular)
+	config.set_default_layout(layout_mmodular);
 MACHINE_CONFIG_END
 
 
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(berlinp_state::berlinp)
 
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mmodular)
+	config.set_default_layout(layout_mmodular);
 MACHINE_CONFIG_END
 
 

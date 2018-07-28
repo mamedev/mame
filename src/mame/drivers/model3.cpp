@@ -1332,7 +1332,7 @@ void model3_state::model3_init(int step)
 
 	// copy the 68k vector table into RAM
 	memcpy(m_soundram, memregion("audiocpu")->base()+0x80000, 16);
-	machine().device("audiocpu")->reset();
+	m_audiocpu->reset();
 
 	m_m3_step = step; // step = BCD hardware rev.  0x10 for 1.0, 0x15 for 1.5, 0x20 for 2.0, etc.
 	tap_reset();

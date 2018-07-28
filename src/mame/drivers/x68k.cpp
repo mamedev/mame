@@ -1664,7 +1664,7 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 
 	MCFG_VIDEO_START_OVERRIDE(x68k_state, x68000 )
 
-	MCFG_DEFAULT_LAYOUT( layout_x68000 )
+	config.set_default_layout(layout_x68000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -407,7 +407,7 @@ MACHINE_CONFIG_START( cz101_state::cz101 )
 	MCFG_HD44780_LCD_SIZE(2, 16)
 	MCFG_HD44780_PIXEL_UPDATE_CB(cz101_state, lcd_pixel_update)
 
-	MCFG_DEFAULT_LAYOUT(layout_cz101)
+	config.set_default_layout(layout_cz101);
 MACHINE_CONFIG_END
 
 

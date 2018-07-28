@@ -248,7 +248,7 @@ MACHINE_CONFIG_START(zac_proto_state::zac_proto)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_zac_proto)
+	config.set_default_layout(layout_zac_proto);
 
 	/* Sound */
 	genpin_audio(config);

@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="vgmplay" description="Video Game Music Files">
+
+	<software name="pwrdrift">
+		<description>Power Drift (Sega Y)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+
+		<part name="01" interface="vgm_quik">
+			<feature name="part_id" value="Credit" />
+			<dataarea name="quik" size="728">
+				<rom name="01 Credit.vgz" size="728" crc="eacc90bf" sha1="86689a2754d798bd5203cb4efcb454ea6d01abe5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="02" interface="vgm_quik">
+			<feature name="part_id" value="poker face (opening)" />
+			<dataarea name="quik" size="82577">
+				<rom name="02 poker face (opening).vgz" size="82577" crc="a1c260a0" sha1="00c3ec812fab082a87fa47641a3b8a9f094e96bd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="03" interface="vgm_quik">
+			<feature name="part_id" value="side street (a course)" />
+			<dataarea name="quik" size="135621">
+				<rom name="03 side street (a course).vgz" size="135621" crc="ff9eb659" sha1="00b1723c525500a947d54788c115e49c773c348a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="04" interface="vgm_quik">
+			<feature name="part_id" value="like the wind (b course)" />
+			<dataarea name="quik" size="148162">
+				<rom name="04 like the wind (b course).vgz" size="148162" crc="7c1bf2a9" sha1="a16815b934412b17bbe5c581455b2529ae8eb465" offset="0" />
+			</dataarea>
+		</part>
+		<part name="05" interface="vgm_quik">
+			<feature name="part_id" value="silent language (c course)" />
+			<dataarea name="quik" size="101273">
+				<rom name="05 silent language (c course).vgz" size="101273" crc="e84a6f4a" sha1="b2e39aa24350bbb3b021aa375c787ce466c72e46" offset="0" />
+			</dataarea>
+		</part>
+		<part name="06" interface="vgm_quik">
+			<feature name="part_id" value="adjustment mind (d course)" />
+			<dataarea name="quik" size="112916">
+				<rom name="06 adjustment mind (d course).vgz" size="112916" crc="29be0194" sha1="cc2678d4a29a214d185cb9641860d8fb0c6483c0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="07" interface="vgm_quik">
+			<feature name="part_id" value="artistic traps (e course)" />
+			<dataarea name="quik" size="95325">
+				<rom name="07 artistic traps (e course).vgz" size="95325" crc="8458319f" sha1="09b3c12577686e13d0cc70afc4c82390d2ecea8a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="08" interface="vgm_quik">
+			<feature name="part_id" value="diversity (name entry)" />
+			<dataarea name="quik" size="48104">
+				<rom name="08 diversity (name entry).vgz" size="48104" crc="7dc38e81" sha1="7eeba3967a2fe9aa113e4feda04fcbe802037f06" offset="0" />
+			</dataarea>
+		</part>
+		<part name="09" interface="vgm_quik">
+			<feature name="part_id" value="not use" />
+			<dataarea name="quik" size="30719">
+				<rom name="09 not use.vgz" size="30719" crc="bd128149" sha1="e7abee49e6e04410308c99efa7309ad086dadbff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

@@ -84,7 +84,7 @@ class x68k_hdc_image_device :   public device_t,
 	};
 
 	enum sasi_status : u8
-	{				
+	{
 		SASI_STATUS_MSG = 1 << 4,   // MSG
 		SASI_STATUS_CD = 1 << 3,    // C/D (Command/Data)
 		SASI_STATUS_IO = 1 << 2,    // I/O

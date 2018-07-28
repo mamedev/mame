@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 	MCFG_MB8421_INTR_HANDLER(WRITELINE(*this, pve500_state, mb8421_intr))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pve500)
+	config.set_default_layout(layout_pve500);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

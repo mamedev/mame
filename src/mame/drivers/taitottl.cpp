@@ -100,7 +100,7 @@ private:
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-	
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

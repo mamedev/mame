@@ -31,7 +31,7 @@ public:
 	{ }
 
 	void dietgo(machine_config &config);
-	
+
 	void init_dietgo();
 
 private:

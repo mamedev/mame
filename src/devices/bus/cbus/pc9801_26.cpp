@@ -18,8 +18,6 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK_X1 XTAL(1'996'800)
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -40,7 +38,7 @@ WRITE_LINE_MEMBER(pc9801_26_device::sound_irq)
 
 MACHINE_CONFIG_START(pc9801_26_device::device_add_mconfig)
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
+	MCFG_DEVICE_ADD("opn", YM2203, 15.9744_MHz_XTAL / 4) // divider not verified
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pc9801_26_device, sound_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc9801_26_device, opn_porta_r))
 	//MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc9801_state, opn_portb_r))

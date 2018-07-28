@@ -102,8 +102,8 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
 	if (xpos == -1 || ypos == -1)
 		return false;
 
-	*x = visarea.min_x + xpos * visarea.width() / 255;
-	*y = visarea.min_y + ypos * visarea.height() / 255;
+	*x = visarea.left() + xpos * visarea.width() / 255;
+	*y = visarea.top() + ypos * visarea.height() / 255;
 	return true;
 }
 
@@ -706,7 +706,7 @@ ROM_START( marvice )
 
 	ROM_REGION( 0x800, "unk", ROMREGION_ERASEFF ) // nvram contents, should be x4 in size
 	ROM_LOAD( "mk48z02b-20.u13", 0x0000, 0x0800, BAD_DUMP CRC(e6079615) SHA1(f528b2a600ab047ad7f87f4dbae65a7e4cd10f8c) )
-	
+
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "marvice", 0, NO_DUMP )
 ROM_END

@@ -326,7 +326,7 @@ MACHINE_CONFIG_START(proconn_state::proconn)
 	SPEAKER(config, "rspeaker").front_right();
 
 
-	MCFG_DEFAULT_LAYOUT(layout_proconn)
+	config.set_default_layout(layout_proconn);
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000) /* ?? Mhz */ // YM2149F on PC92?
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, proconn_state, meter_w))

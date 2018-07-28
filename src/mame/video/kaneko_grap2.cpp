@@ -37,24 +37,19 @@ DEFINE_DEVICE_TYPE(KANEKO_GRAP2, kaneko_grap2_device, "kaneko_grap2", "Kaneko GR
 kaneko_grap2_device::kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KANEKO_GRAP2, tag, owner, clock)
 	, device_rom_interface(mconfig, *this, 32) // TODO : Unknown Address Bits
-	, m_palette(*this, "palette")
+	, device_palette_interface(mconfig, *this)
 {
 }
-
-MACHINE_CONFIG_START(kaneko_grap2_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", 0x101)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-MACHINE_CONFIG_END
 
 void kaneko_grap2_device::device_start()
 {
 	m_framebuffer = make_unique_clear<uint16_t[]>(0x80000/2);
-	m_framebuffer_palette = make_unique_clear<uint16_t[]>(0x101); // 0x00-0xff is internal palette, 0x100 is background colour
+	m_framebuffer_palette = make_unique_clear<uint16_t[]>(PALETTE_SIZE);
 	m_framebuffer_unk1 = make_unique_clear<uint16_t[]>(0x400/2);
 	m_framebuffer_unk2 = make_unique_clear<uint16_t[]>(0x400/2);
 
 	save_pointer(NAME(m_framebuffer), 0x80000/2);
-	save_pointer(NAME(m_framebuffer_palette), 0x101);
+	save_pointer(NAME(m_framebuffer_palette), PALETTE_SIZE);
 	save_pointer(NAME(m_framebuffer_unk1), 0x400/2);
 	save_pointer(NAME(m_framebuffer_unk2), 0x400/2);
 
@@ -170,7 +165,7 @@ WRITE16_MEMBER(kaneko_grap2_device::regs1_go_w)
 
 void kaneko_grap2_device::set_color_555(pen_t color, int rshift, int gshift, int bshift, uint16_t data)
 {
-	m_palette->set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+	set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
 WRITE16_MEMBER(kaneko_grap2_device::framebuffer1_palette_w)
@@ -184,9 +179,4 @@ WRITE16_MEMBER(kaneko_grap2_device::framebuffer1_bgcol_w)
 {
 	COMBINE_DATA(&m_framebuffer_palette[0x100]);
 	set_color_555(0x100, 5, 10, 0, m_framebuffer_palette[0x100]);
-}
-
-uint32_t kaneko_grap2_device::pen_r(int pen)
-{
-	return m_palette->pens()[pen];
 }

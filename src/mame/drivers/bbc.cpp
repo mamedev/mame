@@ -870,7 +870,7 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbc)
 
-	MCFG_DEFAULT_LAYOUT(layout_bbc)
+	config.set_default_layout(layout_bbc);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1313,7 +1313,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcm)
 
-	MCFG_DEFAULT_LAYOUT(layout_bbcm)
+	config.set_default_layout(layout_bbcm);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

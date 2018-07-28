@@ -147,7 +147,7 @@ WRITE8_MEMBER(namco_c116_device::write)
 			RAM = &m_ram_b[0];
 			break;
 		default: // case 0x1800 (internal registers)
-		{	/* notes from namcos2.cpp */
+		{   /* notes from namcos2.cpp */
 			/* registers 0-3: clipping */
 
 			/* register 4: ? */

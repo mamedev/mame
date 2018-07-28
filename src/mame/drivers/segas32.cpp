@@ -1579,6 +1579,7 @@ static INPUT_PORTS_START( f1en )
 
 	PORT_MODIFY("slavepcb:SERVICE12_A")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("slavepcb:SERVICE34_A")
@@ -2557,7 +2558,7 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas32)
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -277,14 +277,14 @@ void c6280_device::calculate_clocks()
 	/* Make waveform frequency table */
 	for (int i = 0; i < 4096; i += 1)
 	{
-		double step = ((clock() / rate) * 4096) / (i + 1);
+		double step = (16 * 4096) / (i + 1);
 		m_wave_freq_tab[(1 + i) & 0xFFF] = (uint32_t)step;
 	}
 
 	/* Make noise frequency table */
 	for (int i = 0; i < 32; i += 1)
 	{
-		double step = ((clock() / rate) * 32) / (i+1);
+		double step = (16 * 32) / (i+1);
 		m_noise_freq_tab[i] = (uint32_t)step;
 	}
 

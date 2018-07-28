@@ -538,7 +538,7 @@ MACHINE_CONFIG_START(ltd_state::ltd3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_ltd)
+	config.set_default_layout(layout_ltd);
 
 	/* Sound */
 	genpin_audio(config);
@@ -555,7 +555,7 @@ MACHINE_CONFIG_START(ltd_state::ltd4)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_ltd)
+	config.set_default_layout(layout_ltd);
 
 	/* Sound */
 	genpin_audio(config);

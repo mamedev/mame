@@ -290,7 +290,7 @@ MACHINE_CONFIG_START(midcoin24cdjuke_state::midcoin24cdjuke)
 	MCFG_DEVICE_IO_MAP(midcoin24cdjuke_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(midcoin24cdjuke_state, irq0_line_hold, 500)
 
-	MCFG_DEFAULT_LAYOUT(layout_24cdjuke)
+	config.set_default_layout(layout_24cdjuke);
 
 	MCFG_DEVICE_ADD("ic11", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("MD1"))

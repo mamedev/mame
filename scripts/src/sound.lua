@@ -1471,3 +1471,15 @@ if (SOUNDS["UPD934G"]~=null) then
 		MAME_DIR .. "src/devices/sound/upd934g.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/sound/iopspu.h,SOUNDS["IOPSPU"] = true
+---------------------------------------------------
+
+if (SOUNDS["IOPSPU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/iopspu.cpp",
+		MAME_DIR .. "src/devices/sound/iopspu.h",
+	}
+end

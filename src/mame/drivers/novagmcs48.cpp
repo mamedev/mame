@@ -156,7 +156,7 @@ MACHINE_CONFIG_START(novagmcs48_state::presto)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, novagmcs48_state, presto_mux_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_presto)
+	config.set_default_layout(layout_novag_presto);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

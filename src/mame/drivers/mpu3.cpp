@@ -897,7 +897,7 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEFAULT_LAYOUT(layout_mpu3)
+	config.set_default_layout(layout_mpu3);
 MACHINE_CONFIG_END
 
 

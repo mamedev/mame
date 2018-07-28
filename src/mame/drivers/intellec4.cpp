@@ -1122,23 +1122,24 @@ INPUT_CHANGED_MEMBER(mod4_state::sw_one_shot)
   MOD 4-specific configuration
 ----------------------------------*/
 
-MACHINE_CONFIG_START(mod4_state::mod4)
+void mod4_state::mod4(machine_config &config)
+{
 	intellec4(config);
 
-	MCFG_DEVICE_ADD(m_cpu, I4004, 5.185_MHz_XTAL / 7)
-	m_cpu->set_rom_map(&mod4_state::intellec4_rom);
-	m_cpu->set_ram_memory_map(&mod4_state::intellec4_ram_memory);
-	m_cpu->set_rom_ports_map(&mod4_state::intellec4_rom_ports);
-	m_cpu->set_ram_status_map(&mod4_state::intellec4_ram_status);
-	m_cpu->set_ram_ports_map(&mod4_state::intellec4_ram_ports);
-	m_cpu->set_program_memory_map(&mod4_state::intellec4_program_memory);
-	MCFG_I4004_BUS_CYCLE_CB(BUSCYCLE(mod4_state, bus_cycle));
-	MCFG_I4004_SYNC_CB(WRITELINE(m_bus, bus::intellec4::univ_bus_device, sync_in))
+	i4004_cpu_device &cpu(I4004(config, m_cpu, 5.185_MHz_XTAL / 7));
+	cpu.set_rom_map(&mod4_state::intellec4_rom);
+	cpu.set_ram_memory_map(&mod4_state::intellec4_ram_memory);
+	cpu.set_rom_ports_map(&mod4_state::intellec4_rom_ports);
+	cpu.set_ram_status_map(&mod4_state::intellec4_ram_status);
+	cpu.set_ram_ports_map(&mod4_state::intellec4_ram_ports);
+	cpu.set_program_memory_map(&mod4_state::intellec4_program_memory);
+	cpu.set_bus_cycle_cb(FUNC(mod4_state::bus_cycle), this);
+	cpu.sync_cb().set(m_bus, FUNC(bus::intellec4::univ_bus_device::sync_in));
 
 	m_bus->test_out_cb().set(FUNC(mod4_state::bus_test));
 
-	MCFG_DEFAULT_LAYOUT(layout_intlc44)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_intlc44);
+}
 
 
 /*----------------------------------
@@ -1347,25 +1348,26 @@ INPUT_CHANGED_MEMBER(mod40_state::sw_single_step)
   MOD 40-specific configuration
 ----------------------------------*/
 
-MACHINE_CONFIG_START(mod40_state::mod40)
+void mod40_state::mod40(machine_config &config)
+{
 	intellec4(config);
 
-	MCFG_DEVICE_ADD(m_cpu, I4040, 5.185_MHz_XTAL / 7)
-	m_cpu->set_rom_map(&mod40_state::intellec4_rom);
-	m_cpu->set_ram_memory_map(&mod40_state::intellec4_ram_memory);
-	m_cpu->set_rom_ports_map(&mod40_state::intellec4_rom_ports);
-	m_cpu->set_ram_status_map(&mod40_state::intellec4_ram_status);
-	m_cpu->set_ram_ports_map(&mod40_state::intellec4_ram_ports);
-	m_cpu->set_program_memory_map(&mod40_state::intellec4_program_memory);
-	MCFG_I4040_BUS_CYCLE_CB(BUSCYCLE(mod40_state, bus_cycle))
-	MCFG_I4040_SYNC_CB(WRITELINE(m_bus, bus::intellec4::univ_bus_device, sync_in))
-	MCFG_I4040_STP_ACK_CB(WRITELINE(*this, mod40_state, stp_ack))
+	i4040_cpu_device &cpu(I4040(config, m_cpu, 5.185_MHz_XTAL / 7));
+	cpu.set_rom_map(&mod40_state::intellec4_rom);
+	cpu.set_ram_memory_map(&mod40_state::intellec4_ram_memory);
+	cpu.set_rom_ports_map(&mod40_state::intellec4_rom_ports);
+	cpu.set_ram_status_map(&mod40_state::intellec4_ram_status);
+	cpu.set_ram_ports_map(&mod40_state::intellec4_ram_ports);
+	cpu.set_program_memory_map(&mod40_state::intellec4_program_memory);
+	cpu.set_bus_cycle_cb(FUNC(mod40_state::bus_cycle), this);
+	cpu.sync_cb().set(m_bus, FUNC(bus::intellec4::univ_bus_device::sync_in));
+	cpu.stp_ack_cb().set(FUNC(mod40_state::stp_ack));
 
 	m_bus->stop_out_cb().set(FUNC(mod40_state::bus_stop));
 	m_bus->test_out_cb().set(FUNC(mod40_state::bus_test));
 
-	MCFG_DEFAULT_LAYOUT(layout_intlc440)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_intlc440);
+}
 
 
 /*----------------------------------

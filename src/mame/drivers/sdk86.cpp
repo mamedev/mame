@@ -153,7 +153,7 @@ MACHINE_CONFIG_START(sdk86_state::sdk86)
 	MCFG_DEVICE_IO_MAP(sdk86_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sdk86)
+	config.set_default_layout(layout_sdk86);
 
 	/* Devices */
 	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)

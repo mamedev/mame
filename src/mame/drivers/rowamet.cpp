@@ -232,7 +232,7 @@ MACHINE_CONFIG_START(rowamet_state::rowamet)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", rowamet_state, timer_a, attotime::from_hz(200))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_rowamet)
+	config.set_default_layout(layout_rowamet);
 
 	/* Sound */
 	SPEAKER(config, "speaker").front_center();

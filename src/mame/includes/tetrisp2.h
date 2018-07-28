@@ -214,7 +214,7 @@ private:
 	uint32_t screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_main(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-//	inline int mypal(int x);
+//  inline int mypal(int x);
 
 	void stepstag_map(address_map &map);
 	void stepstag_sub_map(address_map &map);

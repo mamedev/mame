@@ -79,7 +79,7 @@ private:
 
 	required_memory_bank m_bootbank;
 	required_memory_bank m_mainbank;
- 
+
 	required_memory_region m_bootrom;
 	required_memory_region m_mainrom;
 

@@ -31,6 +31,7 @@ public:
 			net(*this, "net"),
 			mo(*this, "mo"),
 			fdc(*this, "fdc"),
+			floppy0(*this, "fdc:0"),
 			vram(*this, "vram") { }
 
 	void next_base(machine_config &config);
@@ -63,6 +64,7 @@ private:
 	required_device<mb8795_device> net;
 	required_device<nextmo_device> mo;
 	optional_device<n82077aa_device> fdc; // 040 only
+	optional_device<floppy_connector> floppy0; // 040 only
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

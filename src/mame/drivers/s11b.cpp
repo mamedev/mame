@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	MCFG_MACHINE_RESET_OVERRIDE(s11b_state, s11b)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s11b)
+	config.set_default_layout(layout_s11b);
 
 	/* Sound */
 	genpin_audio(config);

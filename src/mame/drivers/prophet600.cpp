@@ -276,7 +276,7 @@ MACHINE_CONFIG_START(prophet600_state::prophet600)
 	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEFAULT_LAYOUT( layout_prophet600 )
+	config.set_default_layout(layout_prophet600);
 
 	MCFG_DEVICE_ADD(PIT_TAG, PIT8253, XTAL(8'000'000)/4)
 	MCFG_PIT8253_CLK0(XTAL(8'000'000)/4)

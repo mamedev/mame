@@ -628,7 +628,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_SCREEN_UPDATE_DRIVER(kdt6_state, screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_DEFAULT_LAYOUT(layout_kdt6)
+	config.set_default_layout(layout_kdt6);
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(13'516'800) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

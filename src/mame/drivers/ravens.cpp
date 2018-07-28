@@ -347,7 +347,7 @@ MACHINE_CONFIG_START(ravens_state::ravens)
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_ravens)
+	config.set_default_layout(layout_ravens);
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)

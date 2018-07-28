@@ -511,7 +511,7 @@ MACHINE_CONFIG_START(fireball_state::fireball)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_fireball)
+	config.set_default_layout(layout_fireball);
 MACHINE_CONFIG_END
 
 
