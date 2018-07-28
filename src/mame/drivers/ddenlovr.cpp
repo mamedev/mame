@@ -1633,9 +1633,9 @@ void ddenlovr_state::copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 	if (((m_ddenlovr_layer_enable2 << 4) | m_ddenlovr_layer_enable) & (1 << layer))
 	{
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				int pen = m_ddenlovr_pixmap[layer][512 * ((y + scrolly) & 0x1ff) + ((x + scrollx) & 0x1ff)];
 				if ((pen & transmask) != transpen)

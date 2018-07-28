@@ -324,7 +324,7 @@ MACHINE_CONFIG_START(ctstein_state::ctstein)
 	MCFG_COP400_READ_L_CB(READ8(*this, ctstein_state, read_l))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ctstein)
+	config.set_default_layout(layout_ctstein);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -467,7 +467,7 @@ MACHINE_CONFIG_START(h2hbaskbc_state::h2hbaskbc)
 	MCFG_COP400_WRITE_SO_CB(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_h2hbaskbc)
+	config.set_default_layout(layout_h2hbaskbc);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -479,14 +479,14 @@ MACHINE_CONFIG_START(h2hbaskbc_state::h2hhockeyc)
 	h2hbaskbc(config);
 
 	/* basic machine hardware */
-	MCFG_DEFAULT_LAYOUT(layout_h2hhockeyc)
+	config.set_default_layout(layout_h2hhockeyc);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(h2hbaskbc_state::h2hsoccerc)
 	h2hbaskbc(config);
 
 	/* basic machine hardware */
-	MCFG_DEFAULT_LAYOUT(layout_h2hsoccerc)
+	config.set_default_layout(layout_h2hsoccerc);
 MACHINE_CONFIG_END
 
 
@@ -599,7 +599,7 @@ MACHINE_CONFIG_START(einvaderc_state::einvaderc)
 	MCFG_SCREEN_SIZE(913, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 913-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_einvaderc)
+	config.set_default_layout(layout_einvaderc);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -723,7 +723,7 @@ MACHINE_CONFIG_START(unkeinv_state::unkeinv)
 	MCFG_COP400_WRITE_SO_CB(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_unkeinv)
+	config.set_default_layout(layout_unkeinv);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -880,7 +880,7 @@ MACHINE_CONFIG_START(lchicken_state::lchicken)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("chicken_motor", lchicken_state, motor_sim_tick, attotime::from_msec(6000/0x100)) // ~6sec for a full rotation
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_lchicken)
+	config.set_default_layout(layout_lchicken);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -988,7 +988,7 @@ MACHINE_CONFIG_START(funjacks_state::funjacks)
 	MCFG_COP400_READ_G_CB(READ8(*this, funjacks_state, read_g))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_funjacks)
+	config.set_default_layout(layout_funjacks);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1083,7 +1083,7 @@ MACHINE_CONFIG_START(funrlgl_state::funrlgl)
 	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_funrlgl)
+	config.set_default_layout(layout_funrlgl);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1219,7 +1219,7 @@ MACHINE_CONFIG_START(mdallas_state::mdallas)
 	MCFG_COP400_WRITE_SO_CB(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_mdallas)
+	config.set_default_layout(layout_mdallas);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1431,7 +1431,7 @@ MACHINE_CONFIG_START(lightfgt_state::lightfgt)
 	MCFG_COP400_READ_G_CB(READ8(*this, lightfgt_state, read_g))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_lightfgt)
+	config.set_default_layout(layout_lightfgt);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1586,7 +1586,7 @@ MACHINE_CONFIG_START(bship82_state::bship82)
 	MCFG_COP400_READ_SI_CB(IOPORT("IN.4"))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_bship82)
+	config.set_default_layout(layout_bship82);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1717,7 +1717,7 @@ MACHINE_CONFIG_START(qkracer_state::qkracer)
 	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, qkracer_state, write_sk))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_qkracer)
+	config.set_default_layout(layout_qkracer);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -1808,7 +1808,7 @@ MACHINE_CONFIG_START(vidchal_state::vidchal)
 	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, vidchal_state, write_sk))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_vidchal)
+	config.set_default_layout(layout_vidchal);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(9) // TODO: meters.cpp sets a max of 8
 
-	MCFG_DEFAULT_LAYOUT(layout_jpmmps)
+	config.set_default_layout(layout_jpmmps);
 MACHINE_CONFIG_END
 
 

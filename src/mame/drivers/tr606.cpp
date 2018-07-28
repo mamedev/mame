@@ -90,7 +90,7 @@ MACHINE_CONFIG_START(tr606_state::tr606)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clear", tr606_state, tp3_clear, TP3_PERIOD)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tr606)
+	config.set_default_layout(layout_tr606);
 
 	/* sound hardware */
 	// discrete...

@@ -460,8 +460,8 @@ void deco16ic_device::custom_tilemap_draw(
 	if (!BIT(control0, 7))
 		return;
 
-	int starty = cliprect.min_y;
-	int endy = cliprect.max_y+1;
+	int starty = cliprect.top();
+	int endy = cliprect.bottom() + 1;
 
 	width_mask = src_bitmap0->width() - 1;
 	height_mask = src_bitmap0->height() - 1;

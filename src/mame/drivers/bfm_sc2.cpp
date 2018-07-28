@@ -2292,7 +2292,7 @@ MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_vid_state, e2ram_init)
-	MCFG_DEFAULT_LAYOUT(layout_sc2_vid)
+	config.set_default_layout(layout_sc2_vid);
 
 	MCFG_BFM_ADDER2_ADD("adder2")
 
@@ -3771,7 +3771,7 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_awp_state, e2ram_init)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sc2_vfd)
+	config.set_default_layout(layout_sc2_vfd);
 
 	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<0>))
@@ -3828,7 +3828,7 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_dmd_state, e2ram_init)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sc2_dmd)
+	config.set_default_layout(layout_sc2_dmd);
 	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
 	MCFG_BFM_DM01_BUSY_CB(WRITELINE(*this, bfm_sc2_dmd_state, bfmdm01_busy))
 

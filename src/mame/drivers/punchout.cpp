@@ -647,7 +647,7 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_punchout)
 	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
+	config.set_default_layout(layout_dualhovu);
 
 	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
 	top.set_refresh_hz(60);

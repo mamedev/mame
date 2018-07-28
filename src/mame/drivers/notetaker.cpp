@@ -846,13 +846,15 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("iop_pic8259", pic8259_device, ir4_w)) // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(960_kHz_XTAL) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(960_kHz_XTAL) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	AY31015(config, m_kbduart, 0); // HD6402, == AY-3-1015D
+	m_kbduart->set_rx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	m_kbduart->set_tx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	m_kbduart->write_dav_callback().set("iop_pic8259", FUNC(pic8259_device::ir6_w)); // DataRecvd = KbdInt
 
-	MCFG_DEVICE_ADD( "eiauart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(((960_kHz_XTAL/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(((960_kHz_XTAL/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	AY31015(config, m_eiauart, 0); // HD6402, == AY-3-1015D
+	m_eiauart->set_rx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	m_eiauart->set_tx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	m_eiauart->write_dav_callback().set("iop_pic8259", FUNC(pic8259_device::ir3_w)); // EIADataReady = EIAInt
 
 	/* Floppy */
 	MCFG_DEVICE_ADD("wd1791", FD1791, (((24_MHz_XTAL/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board

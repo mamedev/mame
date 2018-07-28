@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(gts80b_state::gts80b)
 	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_gts80b)
+	config.set_default_layout(layout_gts80b);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("riot1", RIOT6532, XTAL(3'579'545)/4)

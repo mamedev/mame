@@ -357,7 +357,7 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(maxaflex_state, atari)
-	MCFG_DEFAULT_LAYOUT(layout_maxaflex)
+	config.set_default_layout(layout_maxaflex);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

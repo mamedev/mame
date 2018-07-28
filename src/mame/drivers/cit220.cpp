@@ -11,6 +11,7 @@ enough to provoke a lawsuit, which led to its eventual withdrawal in favor of it
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/i8251.h"
 #include "machine/mc68681.h"
 #include "video/scn2674.h"
@@ -27,18 +28,30 @@ public:
 		//, m_p_chargen(*this, "chargen")
 	{ }
 
+	void cit220p(machine_config &config);
+private:
+	virtual void machine_start() override;
+
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void cit220p(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	void vram_map(address_map &map);
-private:
+	void char_map(address_map &map);
+	void attr_map(address_map &map);
+	void keyboard_map(address_map &map);
+	void kbd_io_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	//required_region_ptr<u8> m_p_chargen;
 };
+
+
+void cit220_state::machine_start()
+{
+	subdevice<i8251_device>("usart")->write_cts(0);
+}
 
 
 WRITE_LINE_MEMBER(cit220_state::sod_w)
@@ -60,8 +73,8 @@ void cit220_state::io_map(address_map &map)
 	map(0x10, 0x10).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x11, 0x11).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x20, 0x27).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
-	map(0xa0, 0xa0).unmaprw(); // ???
-	map(0xc0, 0xc0).unmaprw(); // ???
+	map(0xa0, 0xa0).rw("avdc", FUNC(scn2674_device::attr_buffer_r), FUNC(scn2674_device::attr_buffer_w));
+	map(0xc0, 0xc0).rw("avdc", FUNC(scn2674_device::buffer_r), FUNC(scn2674_device::buffer_w));
 }
 
 
@@ -69,9 +82,23 @@ SCN2674_DRAW_CHARACTER_MEMBER(cit220_state::draw_character)
 {
 }
 
-void cit220_state::vram_map(address_map &map)
+void cit220_state::char_map(address_map &map)
 {
-	map(0x0000, 0x27ff).noprw();
+	map(0x0000, 0x2fff).ram();
+}
+
+void cit220_state::attr_map(address_map &map)
+{
+	map(0x0000, 0x2fff).ram();
+}
+
+void cit220_state::keyboard_map(address_map &map)
+{
+	map(0x000, 0xfff).rom().region("keyboard", 0);
+}
+
+void cit220_state::kbd_io_map(address_map &map)
+{
 }
 
 
@@ -93,13 +120,20 @@ MACHINE_CONFIG_START(cit220_state::cit220p)
 	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE))
 	MCFG_SCN2674_CHARACTER_WIDTH(10)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(cit220_state, draw_character)
-	MCFG_DEVICE_ADDRESS_MAP(0, vram_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, char_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, attr_map)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("duart", SCN2681, 3686400)
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
+	scn2681_device &duart(SCN2681(config, "duart", 3686400));
+	duart.irq_cb().set_inputline("maincpu", I8085_RST55_LINE);
+	duart.outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3); // 9600 baud?
+	duart.outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
 
 	MCFG_DEVICE_ADD("usart", I8251, 3000000)
+
+	MCFG_DEVICE_ADD("kbdmcu", I8035, 4608000)
+	MCFG_DEVICE_PROGRAM_MAP(keyboard_map)
+	MCFG_DEVICE_IO_MAP(kbd_io_map)
 MACHINE_CONFIG_END
 
 
@@ -114,7 +148,7 @@ ROM_START( cit220p )
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "v20_cg.ic17",   0x0000, 0x1000, CRC(76ef7ca9) SHA1(6e7799ca0a41350fbc369bbbd4ab581150f37b10) )
 
-	ROM_REGION(0x10000, "keyboard", 0)
+	ROM_REGION(0x1000, "keyboard", 0)
 	ROM_LOAD( "v00_kbd.bin",   0x0000, 0x1000, CRC(f9d24190) SHA1(c4e9ef8188afb18de373f2a537ca9b7a315bfb76) )
 ROM_END
 

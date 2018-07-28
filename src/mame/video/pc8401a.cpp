@@ -59,7 +59,7 @@ void pc8401a_state::pc8500_lcdc(address_map &map)
 /* Machine Drivers */
 
 MACHINE_CONFIG_START(pc8401a_state::pc8401a_video)
-//  MCFG_DEFAULT_LAYOUT(layout_pc8401a)
+//  config.set_default_layout(layout_pc8401a);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc8401a_state,pc8401a)
@@ -76,7 +76,7 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a_video)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc8500_state::pc8500_video)
-	MCFG_DEFAULT_LAYOUT(layout_pc8500)
+	config.set_default_layout(layout_pc8500);
 
 	MCFG_PALETTE_ADD("palette", 2+8)
 	MCFG_PALETTE_INIT_OWNER(pc8401a_state,pc8401a)

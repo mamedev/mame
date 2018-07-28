@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(de_2_state::de_type1)
 	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_de2)
+	config.set_default_layout(layout_de2);
 
 	genpin_audio(config);
 	de_bg_audio(config);
@@ -569,7 +569,7 @@ MACHINE_CONFIG_START(de_2_state::de_type2)
 	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_de2)
+	config.set_default_layout(layout_de2);
 
 	genpin_audio(config);
 	de_bg_audio(config);
@@ -584,7 +584,7 @@ MACHINE_CONFIG_START(de_2_state::de_type2_alpha3)
 	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_de2a3)
+	config.set_default_layout(layout_de2a3);
 
 	genpin_audio(config);
 	de_bg_audio(config);
@@ -599,7 +599,7 @@ MACHINE_CONFIG_START(de_2_state::de_type3)
 	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_de2a3)
+	config.set_default_layout(layout_de2a3);
 
 	genpin_audio(config);
 	de_bg_audio(config);

@@ -497,7 +497,7 @@ MACHINE_CONFIG_START(atari_s2_state::atari_s2)
 	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_atari_s2)
+	config.set_default_layout(layout_atari_s2);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", atari_s2_state, irq, attotime::from_hz(XTAL(4'000'000) / 8192))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", atari_s2_state, timer_s, attotime::from_hz(150000))

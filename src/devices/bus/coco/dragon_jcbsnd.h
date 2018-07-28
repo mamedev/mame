@@ -28,7 +28,6 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start() override;
-		virtual void device_reset() override;
 		virtual uint8_t* get_cart_base() override;
 
 		// internal state

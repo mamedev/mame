@@ -176,7 +176,15 @@ MACHINE_CONFIG_START(iteagle_state::iteagle)
 	ITEAGLE_PERIPH(config, PCI_ID_PERIPH, 0);
 	IDE_PCI(config, PCI_ID_IDE, 0, 0x1080C693, 0x00, 0x0).irq_handler().set_inputline(m_maincpu, MIPS3_IRQ2);
 
-	ITEAGLE_FPGA(config, PCI_ID_FPGA, 0, "screen", m_maincpu, MIPS3_IRQ1, MIPS3_IRQ4);
+	iteagle_fpga_device &iteagle_fpga(ITEAGLE_FPGA(config, PCI_ID_FPGA, 0, "screen", m_maincpu, MIPS3_IRQ1, MIPS3_IRQ4));
+	iteagle_fpga.in_callback<iteagle_fpga_device::IO_SW5>().set_ioport("SW5");
+	iteagle_fpga.in_callback<iteagle_fpga_device::IO_IN1>().set_ioport("IN1");
+	iteagle_fpga.in_callback<iteagle_fpga_device::IO_SYSTEM>().set_ioport("SYSTEM");
+	iteagle_fpga.trackx_callback().set_ioport("TRACKX1");
+	iteagle_fpga.tracky_callback().set_ioport("TRACKY1");
+	iteagle_fpga.gunx_callback().set_ioport("GUNX1");
+	iteagle_fpga.guny_callback().set_ioport("GUNY1");
+
 	es1373_device &pci_sound(ES1373(config, PCI_ID_SOUND, 0));
 	pci_sound.add_route(0, PCI_ID_SOUND":lspeaker", 1.0).add_route(1, PCI_ID_SOUND":rspeaker", 1.0);
 	pci_sound.irq_handler().set_inputline(m_maincpu, MIPS3_IRQ3);

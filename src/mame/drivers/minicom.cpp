@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(minicom_state::minicom)
 
 	/* video hardware */
 	/* fluorescent 14-segment display forming a row of 20 characters */
-	MCFG_DEFAULT_LAYOUT(layout_minicom)
+	config.set_default_layout(layout_minicom);
 
 /* TODO: Map the keyboard rows/cols inputs (43-key, 4-row keyboard) */
 

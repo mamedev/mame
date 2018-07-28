@@ -464,7 +464,7 @@ MACHINE_CONFIG_START(k28_state::k28)
 	MCFG_TIMER_ADD_NONE("on_button")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", k28_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_k28)
+	config.set_default_layout(layout_k28);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

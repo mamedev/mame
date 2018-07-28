@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(taito_state::taito)
 	MCFG_DEVICE_PROGRAM_MAP(taito_sub_map)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_taito)
+	config.set_default_layout(layout_taito);
 
 	/* Sound */
 	genpin_audio(config);

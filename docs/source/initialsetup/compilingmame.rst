@@ -38,7 +38,7 @@ Here are specific notes about compiling MAME for Microsoft Windows.
 
 * You will need to download the toolset from that link to begin. Periodically, these tools are updated and newer versions of MAME from that point on will **require** updated tools to compile.
 
-* You can do compilation on Visual Studio 2015 (if installed on your PC) by using **make vs2015**. This will always regenerate the settings, so **REGENIE=1** is *not* needed.
+* You can do compilation on Visual Studio 2017 (if installed on your PC) by using **make vs2017**. This will always regenerate the settings, so **REGENIE=1** is *not* needed.
 
 * Make sure you get SDL 2 2.0.3 or 2.0.4 as earlier versions are buggy.
 
@@ -48,7 +48,7 @@ Fedora Linux
 
 You'll need a few prerequisites from your distro. Make sure you get SDL2 2.0.3 or 2.0.4 as earlier versions are buggy.
 
-**sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel** 
+**sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel**
 
 Compilation is exactly as described above in All Platforms.
 
@@ -119,6 +119,8 @@ The SOURCES parameter should have the path to at least one driver .cpp file. The
 
 The value of the SUBTARGET parameter serves only to differentiate multiple builds and need not be set to any specific value.
 
+Emscripten supports compiling to WebAssembly with a JavaScript loader instead of all-JavaScript, and in later versions this is actually the default. To force WebAssembly on or off, add WEBASSEMBLY=1 or WEBASSEMBLY=0 to the make command line.
+
 Other make parameters can also be used, e.g. *-j* for multithreaded compilation as described earlier.
 
 When the compilation reaches the emcc phase, you may see a number of *"unresolved symbol"* warnings. At the moment, this is expected for OpenGL-related functions such as glPointSize. Any others may indicate that an additional dependency file needs to be specified in the SOURCES list. Unfortunately this process is not automated and you will need to search the source tree to locate the files supplying the missing symbols. You may also be able to get away with ignoring the warnings if the code path referencing them is not used at run-time.
@@ -128,6 +130,7 @@ If all goes well, a .js file will be output to the current directory. This file 
 There are example .html files in that repository which can be edited to point to your newly compiled MAME js filename and pass in whatever parameters you desire. You will then need to place all of the following on a web server:
 
 * The compiled MAME .js file
+* The compiled MAME .wasm file if using WebAssembly
 * The .js files from the Emularity package (loader.js, browserfs.js, etc.)
 * A .zip file with the ROMs for the MAME driver you would like to run (if any)
 * Any software files you would like to run with the MAME driver

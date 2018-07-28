@@ -1849,7 +1849,7 @@ MACHINE_CONFIG_START(fidel6502_state::rsc)
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_cb2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_rsc_v2)
+	config.set_default_layout(layout_fidel_rsc_v2);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1883,7 +1883,7 @@ MACHINE_CONFIG_START(fidel6502_state::csc)
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_cb2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_csc)
+	config.set_default_layout(layout_fidel_csc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1905,7 +1905,7 @@ MACHINE_CONFIG_START(fidel6502_state::su9)
 
 	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, su9)
 
-	MCFG_DEFAULT_LAYOUT(layout_fidel_su9)
+	config.set_default_layout(layout_fidel_su9);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::eas)
@@ -1934,7 +1934,7 @@ MACHINE_CONFIG_START(fidel6502_state::eas)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_eas)
+	config.set_default_layout(layout_fidel_eas);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1968,7 +1968,7 @@ MACHINE_CONFIG_START(fidel6502_state::pc)
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_REMOVE("nvram")
 
-	MCFG_DEFAULT_LAYOUT(layout_fidel_pc)
+	config.set_default_layout(layout_fidel_pc);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::eag)
@@ -1983,7 +1983,7 @@ MACHINE_CONFIG_START(fidel6502_state::eag)
 	MCFG_DEVICE_MODIFY("mainmap")
 	MCFG_DEVICE_PROGRAM_MAP(eag_map)
 
-	MCFG_DEFAULT_LAYOUT(layout_fidel_eag)
+	config.set_default_layout(layout_fidel_eag);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::sc9d)
@@ -1996,7 +1996,7 @@ MACHINE_CONFIG_START(fidel6502_state::sc9d)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(610))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_sc9)
+	config.set_default_layout(layout_fidel_sc9);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2033,7 +2033,7 @@ MACHINE_CONFIG_START(fidel6502_state::playmatic)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(3100000) // approximation
 
-	MCFG_DEFAULT_LAYOUT(layout_fidel_playmatic)
+	config.set_default_layout(layout_fidel_playmatic);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::sc12)
@@ -2054,7 +2054,7 @@ MACHINE_CONFIG_START(fidel6502_state::sc12)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_sc12)
+	config.set_default_layout(layout_fidel_sc12);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2101,7 +2101,7 @@ MACHINE_CONFIG_START(fidel6502_state::as12)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(585) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(585))
 
-	MCFG_DEFAULT_LAYOUT(layout_fidel_as12)
+	config.set_default_layout(layout_fidel_as12);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fexcel)
@@ -2114,7 +2114,7 @@ MACHINE_CONFIG_START(fidel6502_state::fexcel)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_ex)
+	config.set_default_layout(layout_fidel_ex);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2169,7 +2169,7 @@ MACHINE_CONFIG_START(fidel6502_state::fdes2100)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(585) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(585))
 
-	MCFG_DEFAULT_LAYOUT(layout_fidel_des)
+	config.set_default_layout(layout_fidel_des);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fdes2000)
@@ -2193,7 +2193,7 @@ MACHINE_CONFIG_START(fidel6502_state::fexceld)
 	fexcelb(config);
 
 	/* basic machine hardware */
-	MCFG_DEFAULT_LAYOUT(layout_fidel_exd)
+	config.set_default_layout(layout_fidel_exd);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fdes2100d)
@@ -2206,7 +2206,7 @@ MACHINE_CONFIG_START(fidel6502_state::fdes2100d)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis)
+	config.set_default_layout(layout_fidel_desdis);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2233,7 +2233,7 @@ MACHINE_CONFIG_START(fidel6502_state::fphantom)
 	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, fphantom)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_fidel_phantom)
+	//config.set_default_layout(layout_fidel_phantom);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2252,7 +2252,7 @@ MACHINE_CONFIG_START(fidel6502_state::chesster)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(9615))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_chesster)
+	config.set_default_layout(layout_fidel_chesster);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

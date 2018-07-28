@@ -118,11 +118,11 @@ void lemmings_state::lemmings_copy_bitmap(bitmap_rgb32& bitmap, int* xscroll, in
 	int y,x;
 	const pen_t *paldata = m_palette->pens();
 
-	for (y=cliprect.min_y; y<cliprect.max_y;y++)
+	for (y=cliprect.top(); y<cliprect.bottom();y++)
 	{
 		uint32_t* dst = &bitmap.pix32(y,0);
 
-		for (x=cliprect.min_x; x<cliprect.max_x;x++)
+		for (x=cliprect.left(); x<cliprect.right();x++)
 		{
 			uint16_t src = m_bitmap0.pix16((y-*yscroll)&0xff,(x-*xscroll)&0x7ff);
 
@@ -137,9 +137,7 @@ uint32_t lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rg
 	int x1 = -m_control_data[0];
 	int x0 = -m_control_data[2];
 	int y = 0;
-	rectangle rect;
-	rect.max_y = cliprect.max_y;
-	rect.min_y = cliprect.min_y;
+	rectangle rect(0, 0, cliprect.top(), cliprect.bottom());
 
 	// sprites are flipped relative to tilemaps
 	m_sprgen[0]->set_flip_screen(true);
@@ -157,12 +155,10 @@ uint32_t lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rg
 	}
 	else
 	{
-		rect.max_x = 159;
-		rect.min_x = 0;
+		rect.setx(0, 159);
 		lemmings_copy_bitmap(bitmap, &x0, &y, rect);
 
-		rect.max_x = 319;
-		rect.min_x = 160;
+		rect.setx(160, 319);
 		lemmings_copy_bitmap(bitmap, &x1, &y, rect);
 	}
 

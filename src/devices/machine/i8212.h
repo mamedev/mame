@@ -69,6 +69,10 @@ public:
 	template <class Object> devcb_base &set_di_rd_callback(Object &&cb) { return m_read_di.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_do_wr_callback(Object &&cb) { return m_write_do.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_md_rd_callback(Object &&cb) { return m_read_md.set_callback(std::forward<Object>(cb)); }
+	auto int_wr_callback() { return m_write_int.bind(); }
+	auto di_rd_callback() { return m_read_di.bind(); }
+	auto do_wr_callback() { return m_write_do.bind(); }
+	auto md_rd_callback() { return m_read_md.bind(); }
 
 	// data read handlers
 	DECLARE_READ8_MEMBER(read);

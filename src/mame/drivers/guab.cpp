@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(guab_state::guab)
 
 	MCFG_SOFTWARE_LIST_ADD("floppy_list", "guab")
 
-	MCFG_DEFAULT_LAYOUT(layout_guab)
+	config.set_default_layout(layout_guab);
 MACHINE_CONFIG_END
 
 

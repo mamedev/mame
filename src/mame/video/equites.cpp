@@ -338,13 +338,13 @@ void splndrbt_state::splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			{
 				int const y = yhalf ? sy + 1 + yy : sy - yy;
 
-				if (y >= cliprect.min_y && y <= cliprect.max_y)
+				if (y >= cliprect.top() && y <= cliprect.bottom())
 				{
 					for (x = 0; x <= (scalex << 1); ++x)
 					{
 						int bx = (sx + x) & 0xff;
 
-						if (bx >= cliprect.min_x && bx <= cliprect.max_x)
+						if (bx >= cliprect.left() && bx <= cliprect.right())
 						{
 							int xx = scalex ? (x * 29 + scalex) / (scalex << 1) + 1 : 16;   // FIXME This is wrong. Should use the PROM.
 							int const offset = (fx ? (31 - xx) : xx) + ((fy ^ yhalf) ? (16 + line) : (15 - line)) * gfx->rowbytes();
@@ -382,7 +382,7 @@ void splndrbt_state::splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle 
 
 	for (dst_y = 32; dst_y < 256-32; ++dst_y)
 	{
-		if (dst_y >= cliprect.min_y && dst_y <= cliprect.max_y)
+		if (dst_y >= cliprect.top() && dst_y <= cliprect.bottom())
 		{
 			const uint8_t * const romline = &xrom[(dst_y ^ dinvert) << 5];
 			const uint16_t * const src_line = &src_bitmap.pix16((src_y + scroll_y) & 0x1ff);

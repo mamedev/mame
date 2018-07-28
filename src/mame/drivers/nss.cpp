@@ -863,7 +863,7 @@ MACHINE_CONFIG_START(nss_state::nss)
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	// SNES PPU
 	MCFG_SCREEN_ADD("screen", RASTER)

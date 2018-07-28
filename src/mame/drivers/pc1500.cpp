@@ -284,7 +284,7 @@ MACHINE_CONFIG_START(pc1500_state::pc1500)
 	MCFG_SCREEN_VISIBLE_AREA(0, 156-1, 0, 7-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_pc1500)
+	config.set_default_layout(layout_pc1500);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc1500_state, pc1500)
 

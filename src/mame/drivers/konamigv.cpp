@@ -159,7 +159,7 @@ protected:
 	void konamigv_map(address_map &map);
 
 	virtual void machine_start() override;
-	
+
 	DECLARE_WRITE16_MEMBER(btc_trackball_w);
 	DECLARE_READ16_MEMBER(tokimeki_serial_r);
 	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);

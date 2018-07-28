@@ -1100,7 +1100,7 @@ MACHINE_CONFIG_START(by35_state::by35)
 	MCFG_NVRAM_ADD_0FILL("nvram")   // 'F' filled causes Credit Display to be blank on first startup
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_by35)
+	config.set_default_layout(layout_by35);
 
 	/* Sound */
 	genpin_audio(config);

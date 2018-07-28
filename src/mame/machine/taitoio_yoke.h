@@ -11,20 +11,9 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TAITOIO_YOKE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TAITOIO_YOKE, 0)
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> namcoio_gearbox_device
 
 class taitoio_yoke_device : public device_t
 {
@@ -44,10 +33,9 @@ public:
 	DECLARE_READ_LINE_MEMBER( handle_up_r );
 	DECLARE_READ_LINE_MEMBER( handle_down_r );
 
-
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 
-protected:
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start() override;
@@ -57,13 +45,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(TAITOIO_YOKE, taitoio_yoke_device)
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
 
 #endif // MAME_MACHINE_TAITO_YOKE_H

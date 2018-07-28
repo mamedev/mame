@@ -628,7 +628,7 @@ MACHINE_CONFIG_START(allied_state::allied)
 	MCFG_DEVICE_PROGRAM_MAP(allied_map)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_allied)
+	config.set_default_layout(layout_allied);
 
 	/* Sound */
 	genpin_audio(config);

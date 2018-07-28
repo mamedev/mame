@@ -34,7 +34,6 @@
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -463,7 +462,6 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mstation_state, mstation)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_AMD_29F080_ADD("flash0")
 	MCFG_SST_28SF040_ADD("flash1")

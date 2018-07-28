@@ -2999,7 +2999,7 @@ MACHINE_CONFIG_START(taitof2_state::megab)
 	MCFG_DEVICE_PROGRAM_MAP(megab_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitof2_state,  megab_interrupt)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(24'000'000)/2) /* 12MHz */
+	TAITO_CCHIP(config, m_cchip, 24_MHz_XTAL/2); // 12MHz
 	// the ports don't appear to hook up to anything
 
 	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", taitof2_state, cchip_irq_clear_cb)

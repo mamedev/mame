@@ -885,7 +885,7 @@ void namcos2_shared_state::c169_roz_unpack_params(const uint16_t *source, roz_pa
 void namcos2_shared_state::c169_roz_draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params)
 {
 	if (m_gametype != NAMCOFL_SPEED_RACER && m_gametype != NAMCOFL_FINAL_LAP_R)
-//	if (m_gametype != NAMCOFL_FINAL_LAP_R) // Fix speedrcr some title animations, but broke at road scene
+//  if (m_gametype != NAMCOFL_FINAL_LAP_R) // Fix speedrcr some title animations, but broke at road scene
 	{
 		uint32_t size_mask = params.size - 1;
 		bitmap_ind16 &srcbitmap = tmap.pixmap();

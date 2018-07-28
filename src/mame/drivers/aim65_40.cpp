@@ -122,7 +122,7 @@ MACHINE_CONFIG_START(aim65_40_state::aim65_40)
 	MCFG_DEVICE_PROGRAM_MAP(aim65_40_mem)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_aim65_40)
+	config.set_default_layout(layout_aim65_40);
 
 	/* sound hardware */
 

@@ -90,19 +90,17 @@ WRITE_LINE_MEMBER(sprint4_state::screen_vblank)
 
 		for (int i = 0; i < 4; i++)
 		{
-			rectangle rect;
-
 			int bank = 0;
 
 			uint8_t horz = m_videoram[0x390 + 2 * i + 0];
 			uint8_t vert = m_videoram[0x398 + 2 * i + 0];
 			uint8_t code = m_videoram[0x398 + 2 * i + 1];
 
-			rect.min_x = horz - 15;
-			rect.min_y = vert - 15;
-			rect.max_x = horz - 15 + m_gfxdecode->gfx(1)->width() - 1;
-			rect.max_y = vert - 15 + m_gfxdecode->gfx(1)->height() - 1;
-
+			rectangle rect(
+					horz - 15,
+					horz - 15 + m_gfxdecode->gfx(1)->width() - 1,
+					vert - 15,
+					vert - 15 + m_gfxdecode->gfx(1)->height() - 1);
 			rect &= m_screen->visible_area();
 
 			m_playfield->draw(*m_screen, m_helper, rect, 0, 0);
@@ -117,8 +115,8 @@ WRITE_LINE_MEMBER(sprint4_state::screen_vblank)
 				horz - 15,
 				vert - 15, 1);
 
-			for (int y = rect.min_y; y <= rect.max_y; y++)
-				for (int x = rect.min_x; x <= rect.max_x; x++)
+			for (int y = rect.top(); y <= rect.bottom(); y++)
+				for (int x = rect.left(); x <= rect.right(); x++)
 					if (m_palette->pen_indirect(m_helper.pix16(y, x)) != 0)
 						m_collision[i] = 1;
 		}

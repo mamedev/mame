@@ -130,7 +130,7 @@ MACHINE_CONFIG_START(z80dev_state::z80dev)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_z80dev)
+	config.set_default_layout(layout_z80dev);
 MACHINE_CONFIG_END
 
 /* ROM definition */

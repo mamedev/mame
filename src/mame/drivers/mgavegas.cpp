@@ -616,7 +616,7 @@ MACHINE_CONFIG_START(mgavegas_state::mgavegas)
 
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_mgavegas)
+	config.set_default_layout(layout_mgavegas);
 
 MACHINE_CONFIG_END
 

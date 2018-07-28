@@ -182,7 +182,7 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 	m_dac->write((videoram[0x380 + 0x11] & (scanline >> 2)) != 0);
 
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
-	if (scanline == m_screen->visible_area().max_y + 1)
+	if (scanline == m_screen->visible_area().bottom() + 1)
 	{
 		uint8_t potvalue = ioport("PADDLE")->read();
 		m_pot_timer->adjust(m_screen->time_until_pos(56 + (potvalue / 2), (potvalue % 2) * 128));
@@ -322,7 +322,7 @@ WRITE_LINE_MEMBER(sbrkout_state::coincount_w)
 READ8_MEMBER(sbrkout_state::sync_r)
 {
 	int hpos = m_screen->hpos();
-	m_sync2_value = (hpos >= 128 && hpos <= m_screen->visible_area().max_x);
+	m_sync2_value = (hpos >= 128 && hpos <= m_screen->visible_area().right());
 	return m_screen->vpos();
 }
 

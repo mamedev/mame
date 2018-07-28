@@ -717,7 +717,7 @@ MACHINE_CONFIG_START(st_mp100_state::st_mp100)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_st_mp100)
+	config.set_default_layout(layout_st_mp100);
 
 	/* Sound */
 	genpin_audio(config);

@@ -187,9 +187,8 @@ MACHINE_CONFIG_START(pcat_dyn_state::pcat_dyn)
 	MCFG_AD1848_IRQ_CALLBACK(WRITELINE("pic8259_1", pic8259_device, ir5_w))
 	MCFG_AD1848_DRQ_CALLBACK(WRITELINE("dma8237_1", am9517a_device, dreq0_w))
 
-	MCFG_DEVICE_MODIFY("dma8237_1")
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8("ad1848", ad1848_device, dack_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, pcat_dyn_state, dma8237_1_dack_w))
+	m_dma8237_1->out_iow_callback<0>().set("ad1848", FUNC(ad1848_device::dack_w));
+	m_dma8237_1->out_iow_callback<1>().set(FUNC(pcat_dyn_state::dma8237_1_dack_w));
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", pcat_dyn_state, nvram_init)
 

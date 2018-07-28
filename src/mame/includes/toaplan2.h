@@ -193,7 +193,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
-	
+
 
 	void batrider_68k_mem(address_map &map);
 	void batrider_dma_mem(address_map &map);

@@ -443,7 +443,7 @@ MACHINE_CONFIG_START(gp_1_state::gp_1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_gp_1)
+	config.set_default_layout(layout_gp_1);
 
 	/* Sound */
 	genpin_audio(config);

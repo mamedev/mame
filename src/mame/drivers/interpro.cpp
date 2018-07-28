@@ -857,7 +857,7 @@ MACHINE_CONFIG_START(interpro_state::interpro)
 	MCFG_MOUSE_STATE_CB(WRITE32(m_ioga, interpro_ioga_device, mouse_status_w))
 
 	// system layout
-	MCFG_DEFAULT_LAYOUT(layout_interpro)
+	config.set_default_layout(layout_interpro);
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("softlist", "interpro")

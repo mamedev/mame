@@ -837,11 +837,11 @@ MACHINE_CONFIG_START(taitox_state::superman)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(16'000'000)/2) /* 8MHz measured on pin 20 */
-	MCFG_CCHIP_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_CCHIP_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("IN2"))
-	MCFG_CCHIP_OUT_PORTC_CB(WRITE8(*this, taitox_state, superman_counters_w))
+	TAITO_CCHIP(config, m_cchip, 16_MHz_XTAL/2); // 8MHz measured on pin 20
+	m_cchip->in_pa_callback().set_ioport("IN0");
+	m_cchip->in_pb_callback().set_ioport("IN1");
+	m_cchip->in_ad_callback().set_ioport("IN2");
+	m_cchip->out_pc_callback().set(FUNC(taitox_state::superman_counters_w));
 
 	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", taitox_state, cchip_irq_clear_cb)
 

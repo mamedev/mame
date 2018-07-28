@@ -26,24 +26,24 @@ DEFINE_DEVICE_TYPE(ATARI_VAD, atari_vad_device, "atarivad", "Atari VAD")
 //-------------------------------------------------
 
 atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ATARI_VAD, tag, owner, clock),
-		device_video_interface(mconfig, *this),
-		m_scanline_int_cb(*this),
-		m_alpha_tilemap(*this, "alpha"),
-		m_playfield_tilemap(*this, "playfield"),
-		m_playfield2_tilemap(*this, "playfield2"),
-		m_mob(*this, "mob"),
-		m_eof_data(*this, "eof"),
-		m_scanline_int_timer(nullptr),
-		m_tilerow_update_timer(nullptr),
-		m_eof_timer(nullptr),
-		m_palette_bank(0),
-		m_pf0_xscroll_raw(0),
-		m_pf0_yscroll(0),
-		m_pf1_xscroll_raw(0),
-		m_pf1_yscroll(0),
-		m_mo_xscroll(0),
-		m_mo_yscroll(0)
+	: device_t(mconfig, ATARI_VAD, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_scanline_int_cb(*this)
+	, m_alpha_tilemap(*this, "alpha")
+	, m_playfield_tilemap(*this, "playfield")
+	, m_playfield2_tilemap(*this, "playfield2")
+	, m_mob(*this, "mob")
+	, m_eof_data(*this, "eof")
+	, m_scanline_int_timer(nullptr)
+	, m_tilerow_update_timer(nullptr)
+	, m_eof_timer(nullptr)
+	, m_palette_bank(0)
+	, m_pf0_xscroll_raw(0)
+	, m_pf0_yscroll(0)
+	, m_pf1_xscroll_raw(0)
+	, m_pf1_yscroll(0)
+	, m_mo_xscroll(0)
+	, m_mo_yscroll(0)
 {
 }
 
@@ -76,7 +76,7 @@ READ16_MEMBER(atari_vad_device::control_read)
 		int result = screen().vpos();
 		if (result > 255)
 			result = 255;
-		if (result > screen().visible_area().max_y)
+		if (result > screen().visible_area().bottom())
 			result |= 0x4000;
 		return result;
 	}
@@ -423,7 +423,7 @@ void atari_vad_device::update_parameter(uint16_t newword)
 void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
 {
 	// skip if out of bounds, or not enabled
-	if (scanline <= screen().visible_area().max_y && (m_control[0x0a] & 0x2000) != 0 && m_alpha_tilemap != nullptr)
+	if (scanline <= screen().visible_area().bottom() && (m_control[0x0a] & 0x2000) != 0 && m_alpha_tilemap != nullptr)
 	{
 		// iterate over non-visible alpha tiles in this row
 		int offset = scanline / 8 * 64 + 48 + 2 * (scanline % 8);

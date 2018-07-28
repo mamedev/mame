@@ -264,6 +264,9 @@ void sound_stream::set_input(int index, sound_stream *input_stream, int output_i
 
 void sound_stream::update()
 {
+	if (!m_attoseconds_per_sample)
+		return;
+
 	// determine the number of samples since the start of this second
 	attotime time = m_device.machine().time();
 	s32 update_sampindex = s32(time.attoseconds() / m_attoseconds_per_sample);
@@ -439,8 +442,17 @@ void sound_stream::apply_sample_rate_changes()
 	recompute_sample_rate_data();
 
 	// reset our sample indexes to the current time
-	m_output_sampindex = s64(m_output_sampindex) * s64(m_sample_rate) / old_rate;
-	m_output_update_sampindex = s64(m_output_update_sampindex) * s64(m_sample_rate) / old_rate;
+	if (old_rate)
+	{
+		m_output_sampindex = s64(m_output_sampindex) * s64(m_sample_rate) / old_rate;
+		m_output_update_sampindex = s64(m_output_update_sampindex) * s64(m_sample_rate) / old_rate;
+	}
+	else
+	{
+		m_output_sampindex = m_device.machine().sound().last_update().attoseconds() / m_attoseconds_per_sample;
+		m_output_update_sampindex = m_output_sampindex;
+	}
+
 	m_output_base_sampindex = m_output_sampindex - m_max_samples_per_update;
 
 	// clear out the buffer
@@ -471,15 +483,22 @@ void sound_stream::recompute_sample_rate_data()
 					throw emu_fatalerror("Incompatible sample rates as input of a synchronous stream: %d and %d\n", m_sample_rate, input.m_source->m_stream->m_sample_rate);
 			}
 		}
-		if (!m_sample_rate)
-			m_sample_rate = 1000;
 	}
 
 
 	// recompute the timing parameters
 	attoseconds_t update_attoseconds = m_device.machine().sound().update_attoseconds();
-	m_attoseconds_per_sample = ATTOSECONDS_PER_SECOND / m_sample_rate;
-	m_max_samples_per_update = (update_attoseconds + m_attoseconds_per_sample - 1) / m_attoseconds_per_sample;
+
+	if (m_sample_rate)
+	{
+		m_attoseconds_per_sample = ATTOSECONDS_PER_SECOND / m_sample_rate;
+		m_max_samples_per_update = (update_attoseconds + m_attoseconds_per_sample - 1) / m_attoseconds_per_sample;
+	}
+	else
+	{
+		m_attoseconds_per_sample = 0;
+		m_max_samples_per_update = 0;
+	}
 
 	// update resample and output buffer sizes
 	allocate_resample_buffers();
@@ -490,7 +509,7 @@ void sound_stream::recompute_sample_rate_data()
 	{
 		// if we have a source, see if its sample rate changed
 
-		if (input.m_source != nullptr)
+		if (input.m_source != nullptr && input.m_source->m_stream->m_sample_rate)
 		{
 			// okay, we have a new sample rate; recompute the latency to be the maximum
 			// sample period between us and our input
@@ -510,6 +529,10 @@ void sound_stream::recompute_sample_rate_data()
 			// one we've computed thus far
 			input.m_latency_attoseconds = std::max(input.m_latency_attoseconds, latency);
 			assert(input.m_latency_attoseconds < update_attoseconds);
+		}
+		else
+		{
+			input.m_latency_attoseconds = 0;
 		}
 	}
 
@@ -653,7 +676,7 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, u32 
 {
 	// if we don't have an output to pull data from, generate silence
 	stream_sample_t *dest = &input.m_resample[0];
-	if (input.m_source == nullptr)
+	if (input.m_source == nullptr || input.m_source->m_buffer.size() == 0)
 	{
 		memset(dest, 0, numsamples * sizeof(*dest));
 		return &input.m_resample[0];

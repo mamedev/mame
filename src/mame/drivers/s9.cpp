@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(s9_state::s9)
 	MCFG_MACHINE_RESET_OVERRIDE(s9_state, s9)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s9)
+	config.set_default_layout(layout_s9);
 
 	/* Sound */
 	genpin_audio(config);

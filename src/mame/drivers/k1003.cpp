@@ -154,7 +154,7 @@ MACHINE_CONFIG_START(k1003_state::k1003)
 	MCFG_DEVICE_IO_MAP(k1003_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_k1003)
+	config.set_default_layout(layout_k1003);
 MACHINE_CONFIG_END
 
 
