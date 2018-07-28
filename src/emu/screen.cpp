@@ -722,10 +722,15 @@ void screen_device::device_start()
 		m_svg = std::make_unique<svg_renderer>(reg);
 		machine().output().set_notifier(nullptr, svg_renderer::output_notifier, m_svg.get());
 
-		// The OSD picks up the size before start is called, so this only affect the info display if it's called up in-game
-		m_width = m_svg->width();
-		m_height = m_svg->height();
-		m_visarea.set(0, m_width-1, 0, m_height-1);
+		// don't do this - SVG units are arbitrary and interpreting them as pixels causes bad things to happen
+		// just render at the size/aspect ratio supplied by the driver
+		if (false)
+		{
+			// The OSD picks up the size before start is called, so this only affect the info display if it's called up in-game
+			m_width = m_svg->width();
+			m_height = m_svg->height();
+			m_visarea.set(0, m_width - 1, 0, m_height - 1);
+		}
 	}
 
 	// if we have a palette and it's not started, wait for it
