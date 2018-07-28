@@ -111,7 +111,7 @@ inline void pgm2_state::skip_sprite_chunk(int &palette_offset, uint32_t maskdata
 inline void pgm2_state::draw_sprite_line(bitmap_rgb32 &bitmap, bitmap_ind8 &primap, const rectangle &cliprect, const pen_t *pen, int &mask_offset,
                                          int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pri, int zoomybit, int zoomx_bits, int xrepeats)
 {
-	assert((realy >= cliprect.min_y) && (realy <= cliprect.max_y));
+	assert((realy >= cliprect.top()) && (realy <= cliprect.bottom()));
 
 	uint32_t *dst = &bitmap.pix32(realy);
 	uint8_t *dstpri = &primap.pix8(realy);
@@ -291,7 +291,7 @@ uint32_t pgm2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	m_fg_tilemap->set_scrolly(0, m_fgscroll[0] >> 16);
 	m_bg_tilemap->set_scrolly(0, (m_bgscroll[0x0/4] & 0xffff0000)>>16 );
 
-	for (int y = 0; y <= cliprect.max_y; y++)
+	for (int y = 0; y <= cliprect.bottom(); y++)
 	{
 		uint16_t linescroll = (y & 1) ? ((m_lineram[(y >> 1)] & 0xffff0000) >> 16) : (m_lineram[(y >> 1)] & 0x0000ffff);
 		m_bg_tilemap->set_scrollx((y + ((m_bgscroll[0x0 / 4] & 0xffff0000) >> 16)) & 0x3ff, ((m_bgscroll[0x0 / 4] & 0x0000ffff) >> 0) + linescroll);
