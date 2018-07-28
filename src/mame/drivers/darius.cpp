@@ -730,7 +730,7 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darius)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_DEFAULT_LAYOUT(layout_darius)
+	config.set_default_layout(layout_darius);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

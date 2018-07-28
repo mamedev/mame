@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(selz80_state::selz80)
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, selz80 )
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_selz80)
+	config.set_default_layout(layout_selz80);
 
 	/* Devices */
 	CLOCK(config, m_clock, 153600);

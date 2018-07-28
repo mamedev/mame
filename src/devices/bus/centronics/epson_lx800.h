@@ -71,6 +71,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(EPSON_LX800, epson_lx800_device)
 
-
-
 #endif // MAME_BUS_CENTRONICS_EPSON_LX800_H

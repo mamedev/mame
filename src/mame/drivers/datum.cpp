@@ -189,7 +189,7 @@ MACHINE_CONFIG_START(datum_state::datum)
 	MCFG_DEVICE_PROGRAM_MAP(datum_mem)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_datum)
+	config.set_default_layout(layout_datum);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0) // keyboard & display

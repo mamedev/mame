@@ -73,7 +73,7 @@ MACHINE_CONFIG_START(globalfr_state::globalfr)
 	MCFG_DEVICE_ADD("maincpu", M37702S1, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(globalfr_map)
 	MCFG_S16LF01_ADD("vfd",0)
-	MCFG_DEFAULT_LAYOUT(layout_globalfr)
+	config.set_default_layout(layout_globalfr);
 MACHINE_CONFIG_END
 
 /******************************************************************************/

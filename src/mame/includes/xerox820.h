@@ -68,7 +68,7 @@ public:
 		m_8n5(0),
 		m_400_460(0)
 	{ }
-	
+
 	void mk83(machine_config &config);
 	void xerox820(machine_config &config);
 

@@ -1499,7 +1499,7 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_SCREEN_UPDATE_DRIVER(px4_state, screen_update_px4)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_px4)
+	config.set_default_layout(layout_px4);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(px4_state, px4)

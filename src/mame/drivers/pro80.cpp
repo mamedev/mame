@@ -182,7 +182,7 @@ MACHINE_CONFIG_START(pro80_state::pro80)
 	MCFG_DEVICE_IO_MAP(pro80_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pro80)
+	config.set_default_layout(layout_pro80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

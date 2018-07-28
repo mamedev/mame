@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_REALBRK_H
+#define MAME_INCLUDES_REALBRK_H
+
+#pragma once
+
 #include "machine/tmp68301.h"
 #include "emupal.h"
 #include "screen.h"
@@ -79,8 +84,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dai2kaku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
-	void dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
+	template <bool Rotatable> void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void base_mem(address_map &map);
@@ -89,3 +93,5 @@ private:
 	void pkgnshdx_mem(address_map &map);
 	void realbrk_mem(address_map &map);
 };
+
+#endif // MAME_INCLUDES_REALBRK_H

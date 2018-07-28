@@ -63,6 +63,11 @@ public:
 	template <class Object> devcb_base &set_input_buffer_full_callback(Object &&cb) { return m_input_buffer_full_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_output_buffer_empty_callback(Object &&cb) { return m_output_buffer_empty_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_speaker_callback(Object &&cb) { return m_speaker_cb.set_callback(std::forward<Object>(cb)); }
+	auto system_reset_callback() { return m_system_reset_cb.bind(); }
+	auto gate_a20_callback() { return m_gate_a20_cb.bind(); }
+	auto input_buffer_full_callback() { return m_input_buffer_full_cb.bind(); }
+	auto output_buffer_empty_callback() { return m_output_buffer_empty_cb.bind(); }
+	auto speaker_callback() { return m_speaker_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );

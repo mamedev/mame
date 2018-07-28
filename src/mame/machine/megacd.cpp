@@ -309,7 +309,7 @@ MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD("irq3_timer", sega_segacd_device, irq3_timer_callback)
 	MCFG_TIMER_DRIVER_ADD("dma_timer", sega_segacd_device, dma_timer_callback)
 
-	MCFG_DEFAULT_LAYOUT( layout_megacd )
+	config.set_default_layout(layout_megacd);
 
 	MCFG_DEVICE_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
 	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 )

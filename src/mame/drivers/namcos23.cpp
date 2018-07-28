@@ -1444,7 +1444,7 @@ public:
 	void timecrs2(machine_config &config);
 
 	void init_s23();
-	
+
 	render_t m_render;
 	const uint16_t *m_tmlrom;
 	const uint8_t *m_tmhrom;

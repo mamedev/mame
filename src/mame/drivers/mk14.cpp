@@ -209,7 +209,7 @@ MACHINE_CONFIG_START(mk14_state::mk14)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mk14)
+	config.set_default_layout(layout_mk14);
 
 	// sound
 	SPEAKER(config, "speaker").front_center();

@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(votrpss_state,irq_ack)
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT(layout_votrpss)
+	//config.set_default_layout(layout_votrpss);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

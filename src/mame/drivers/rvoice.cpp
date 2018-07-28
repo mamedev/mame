@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(rvoice_state::rvoicepc)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
+	//config.set_default_layout(layout_dectalk); // hack to avoid screenless system crash
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)

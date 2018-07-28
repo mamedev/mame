@@ -32,6 +32,7 @@ protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_post_load() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;

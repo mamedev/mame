@@ -245,13 +245,13 @@ uint32_t atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rg
 
 	//uint32_t offset = m_gpu.dpr << 5;
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
 		uint16_t *src = &m_screen_ram[(offset + (4096 * y)) / 2];
-		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint32_t *dest = &bitmap.pix32(y, cliprect.left());
 		int x;
 
-		for (x = cliprect.min_x; x < cliprect.max_x; x += 2)
+		for (x = cliprect.left(); x < cliprect.right(); x += 2)
 		{
 			uint16_t data = *src++;
 

@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(tec1_state::tec1)
 	MCFG_DEVICE_IO_MAP(tec1_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tec1)
+	config.set_default_layout(layout_tec1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -440,7 +440,7 @@ MACHINE_CONFIG_START(tec1_state::tecjmon)
 	MCFG_DEVICE_IO_MAP(tecjmon_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tec1)
+	config.set_default_layout(layout_tec1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

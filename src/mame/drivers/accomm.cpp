@@ -238,17 +238,15 @@ uint32_t accomm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 {
 	int i;
 	int x = 0;
-	int pal[16];
 	int scanline = screen.vpos();
 	rectangle r = cliprect;
-	r.min_y = r.max_y = scanline;
+	r.sety(scanline, scanline);
 
 	if (scanline == 0)
-	{
 		m_ula.screen_addr = m_ula.screen_start - m_ula.screen_base;
-	}
 
 	/* set up palette */
+	int pal[16];
 	switch( m_ula.screen_mode )
 	{
 	case 0: case 3: case 4: case 6: case 7: /* 2 colour mode */
@@ -847,7 +845,7 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(accomm_state, accomm)
 
-	MCFG_DEFAULT_LAYOUT(layout_accomm)
+	config.set_default_layout(layout_accomm);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

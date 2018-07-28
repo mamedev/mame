@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(cxgz80_state::ch2001)
 	MCFG_TIMER_DRIVER_ADD("speaker_off", cxgz80_state, speaker_off_callback)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", cxgz80_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_cxg_ch2001)
+	config.set_default_layout(layout_cxg_ch2001);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -325,7 +325,7 @@ MACHINE_CONFIG_START(wildfire_state::wildfire)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", wildfire_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD("a12_decay", wildfire_state, reset_q2)
 
-	MCFG_DEFAULT_LAYOUT(layout_wildfire)
+	config.set_default_layout(layout_wildfire);
 
 	/* no video! */
 

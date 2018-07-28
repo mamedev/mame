@@ -26,7 +26,7 @@
 
               CPUs       PIA?                  SOUND           CMOSRAM    RTC       REEL CONTROLLER
     V1 rv E - 2x6303YP + HD6321 +              2xAY-3-8912A +  2xTC5516 + ICM7170 + 68705
-    V2 rv A - 1x6303YP + HD468821P/HD68821P +  2xAY-3-8912A +   TC5??4  + none?   + 68705
+    V2 rv A - 1x6303YP + HD468821P/HD68821P +  2xAY-3-8912A +   TC5564  + none?   + 68705
 
   In both cases the 68705 is marked the same way
   'REEL CONTROLLER V1 (C) CASTLE (1987) MACH 2000 SYSTEM'
@@ -46,6 +46,7 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6801.h"
+#include "machine/6821pia.h"
 
 class castle_state : public driver_device
 {
@@ -95,6 +96,8 @@ MACHINE_CONFIG_END
 
 void castle_state::V2rvA_map(address_map &map)
 {
+	map(0x0038, 0x003b).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0040, 0x1fff).ram();
 	map(0x2000, 0xffff).rom();
 }
 
@@ -102,6 +105,8 @@ void castle_state::V2rvA_map(address_map &map)
 MACHINE_CONFIG_START(castle_state::castle_V2rvA)
 	MCFG_DEVICE_ADD("maincpu", HD6303Y, 1000000)
 	MCFG_DEVICE_PROGRAM_MAP(V2rvA_map)
+
+	MCFG_DEVICE_ADD("pia", PIA6821)
 MACHINE_CONFIG_END
 
 

@@ -196,7 +196,7 @@ MACHINE_CONFIG_START(cmulti8_state::cmulti8)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cmulti8_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_cmulti8)
+	config.set_default_layout(layout_cmulti8);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -413,7 +413,7 @@ MACHINE_CONFIG_START(tisr16_state::tisr16)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tisr16_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tisr16)
+	config.set_default_layout(layout_tisr16);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -555,7 +555,7 @@ MACHINE_CONFIG_START(ti1250_state::ti1250)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ti1250_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ti1250)
+	config.set_default_layout(layout_ti1250);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -569,7 +569,7 @@ MACHINE_CONFIG_START(ti1250_state::ti1270)
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ti1250_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ti1250_state, write_r))
 
-	MCFG_DEFAULT_LAYOUT(layout_ti1270)
+	config.set_default_layout(layout_ti1270);
 MACHINE_CONFIG_END
 
 
@@ -685,7 +685,7 @@ MACHINE_CONFIG_START(ti25503_state::ti25503)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ti25503_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ti25503)
+	config.set_default_layout(layout_ti25503);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -788,7 +788,7 @@ MACHINE_CONFIG_START(ti1000_state::ti1000)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ti1000_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ti1270)
+	config.set_default_layout(layout_ti1270);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -890,7 +890,7 @@ MACHINE_CONFIG_START(wizatron_state::wizatron)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, wizatron_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_wizatron)
+	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -967,7 +967,7 @@ MACHINE_CONFIG_START(lilprof_state::lilprof)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, wizatron_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_wizatron)
+	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -1080,7 +1080,7 @@ MACHINE_CONFIG_START(lilprof78_state::lilprof78)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, lilprof78_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_wizatron)
+	config.set_default_layout(layout_wizatron);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -1195,7 +1195,7 @@ MACHINE_CONFIG_START(dataman_state::dataman)
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_dataman)
+	config.set_default_layout(layout_dataman);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -1265,7 +1265,7 @@ MACHINE_CONFIG_START(mathmarv_state::mathmarv)
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_mathmarv)
+	config.set_default_layout(layout_mathmarv);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1528,7 +1528,7 @@ MACHINE_CONFIG_START(ti30_state::ti30)
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ti30)
+	config.set_default_layout(layout_ti30);
 
 	/* no sound! */
 MACHINE_CONFIG_END

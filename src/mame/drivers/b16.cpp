@@ -21,19 +21,19 @@
 #include "screen.h"
 
 
-
 class b16_state : public driver_device
 {
 public:
-	b16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	b16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_mc6845(*this, "crtc"),
 		m_dma8237(*this, "8237dma"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_char_rom(*this, "pcg") { }
+		m_char_rom(*this, "pcg")
+	{ }
 
 	void b16(machine_config &config);
 
@@ -272,7 +272,6 @@ MACHINE_CONFIG_START(b16_state::b16)
 	MCFG_DEVICE_PROGRAM_MAP(b16_map)
 	MCFG_DEVICE_IO_MAP(b16_io)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -286,9 +285,9 @@ MACHINE_CONFIG_START(b16_state::b16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_DEVICE_ADD(m_dma8237, AM9517A, XTAL(14'318'181)/2)
-	MCFG_I8237_IN_MEMR_CB(READ8(*this, b16_state, memory_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, b16_state, memory_write_byte))
+	AM9517A(config, m_dma8237, XTAL(14'318'181)/2);
+	m_dma8237->in_memr_callback().set(FUNC(b16_state::memory_read_byte));
+	m_dma8237->out_memw_callback().set(FUNC(b16_state::memory_write_byte));
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_b16)
 	MCFG_PALETTE_ADD(m_palette, 8)

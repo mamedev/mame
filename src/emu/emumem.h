@@ -807,7 +807,7 @@ private:
 	address_space &             m_space;
 
 	int                         m_notifier_id;             // id to remove the notifier on destruction
-	
+
 	offs_t                      m_addrmask;                // address mask
 	offs_t                      m_addrstart_r;             // minimum valid address for reading
 	offs_t                      m_addrend_r;               // maximum valid address for reading

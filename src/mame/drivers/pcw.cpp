@@ -1287,7 +1287,7 @@ MACHINE_CONFIG_START(pcw_state::pcw8256)
 	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw_printer)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT( layout_pcw )
+	config.set_default_layout(layout_pcw);
 
 MACHINE_CONFIG_END
 
@@ -1300,7 +1300,7 @@ MACHINE_CONFIG_START(pcw_state::pcw8512)
 	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw_printer)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT( layout_pcw )
+	config.set_default_layout(layout_pcw);
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

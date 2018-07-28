@@ -164,7 +164,7 @@ MACHINE_CONFIG_START(sdk85_state::sdk85)
 	MCFG_DEVICE_ADD("expramio", I8155, 6.144_MHz_XTAL / 2) // Expansion RAM (A17)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sdk85)
+	config.set_default_layout(layout_sdk85);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("kdc", I8279, 6.144_MHz_XTAL / 2)               // Keyboard/Display Controller (A13)

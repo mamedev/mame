@@ -18,7 +18,6 @@
   Ator (Video Dens)
 
   Others not emulated (need roms):
-  Night Fever (Sonic)
   Storm (Sonic)
 
   Sir Lancelot (Peyper, 1994)
@@ -611,7 +610,7 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_peyper)
+	config.set_default_layout(layout_peyper);
 
 	/* Sound */
 	genpin_audio(config);
@@ -756,9 +755,6 @@ void peyper_state::init_wolfman()
 }
 
 
-/*-------------------------------------------------------------------
-/ Night Fever (1979)
-/-------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------
 / Odin (1985)

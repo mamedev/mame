@@ -395,7 +395,7 @@ MACHINE_CONFIG_START(chessmst_state::chessmst)
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, chessmst_state, pio2_port_a_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio2_port_b_w))
 
-	MCFG_DEFAULT_LAYOUT(layout_chessmst)
+	config.set_default_layout(layout_chessmst);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -420,7 +420,7 @@ MACHINE_CONFIG_START(chessmst_state::chessmsta)
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, chessmst_state, pio2_port_a_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio2_port_b_w))
 
-	MCFG_DEFAULT_LAYOUT(layout_chessmst)
+	config.set_default_layout(layout_chessmst);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 	MCFG_Z80PIO_IN_PA_CB(READ8(*this, chessmst_state, pio2_port_a_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio2_port_b_w))
 
-	MCFG_DEFAULT_LAYOUT(layout_chessmstdm)
+	config.set_default_layout(layout_chessmstdm);
 
 	MCFG_DEVICE_ADD("555_timer", CLOCK, 500) // from 555 timer
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, chessmst_state, timer_555_w))

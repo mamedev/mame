@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(marywu_state::marywu)
 	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, marywu_state, display_7seg_data_w))
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_marywu)
+	config.set_default_layout(layout_marywu);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

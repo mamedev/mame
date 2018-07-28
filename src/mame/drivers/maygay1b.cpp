@@ -841,7 +841,7 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEFAULT_LAYOUT(layout_maygay1b)
+	config.set_default_layout(layout_maygay1b);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(maygay1b_state::maygay_m1_no_oki)

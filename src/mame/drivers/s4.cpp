@@ -438,7 +438,7 @@ MACHINE_CONFIG_START(s4_state::s4)
 	MCFG_MACHINE_RESET_OVERRIDE(s4_state, s4)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s4)
+	config.set_default_layout(layout_s4);
 
 	/* Sound */
 	genpin_audio(config);

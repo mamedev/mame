@@ -358,18 +358,18 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_DEVICE_IO_MAP(duet16_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("i8741", I8741, 20_MHz_XTAL / 4)
+	I8741(config, "i8741", 20_MHz_XTAL / 4);
 
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("dmac", AM9517A, 20_MHz_XTAL / 4)
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, duet16_state, hrq_w))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, duet16_state, dma_mem_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, duet16_state, dma_mem_w))
-	MCFG_AM9517A_IN_IOR_0_CB(READ8("fdc", upd765a_device, mdma_r))
-	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8("fdc", upd765a_device, mdma_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE("fdc", upd765a_device, tc_line_w))
+	AM9517A(config, m_dmac, 20_MHz_XTAL / 4);
+	m_dmac->out_hreq_callback().set(FUNC(duet16_state::hrq_w));
+	m_dmac->in_memr_callback().set(FUNC(duet16_state::dma_mem_r));
+	m_dmac->out_memw_callback().set(FUNC(duet16_state::dma_mem_w));
+	m_dmac->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::mdma_r));
+	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::mdma_w));
+	m_dmac->out_eop_callback().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
 	pit8253_device &bgpit(PIT8253(config, "bgpit", 0));
 	bgpit.set_clk<0>(8_MHz_XTAL / 13);

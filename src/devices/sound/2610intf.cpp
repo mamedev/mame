@@ -51,7 +51,7 @@ void ym2610_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void ym2610_device::timer_handler(int c,int count,int clock)
 {
-	if( count == 0 )
+	if( count == 0 || clock == 0 )
 	{   /* Reset FM Timer */
 		m_timer[c]->enable(false);
 	}
@@ -126,6 +126,16 @@ void ym2610_device::device_start()
 					pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 					&ym2610_device::static_timer_handler,&ym2610_device::static_irq_handler,&psgintf);
 	assert_always(m_chip != nullptr, "Error creating YM2610 chip");
+}
+
+//-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void ym2610_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 72);
+	ym2610_clock_changed(m_chip, clock(), clock() / 72);
 }
 
 //-------------------------------------------------

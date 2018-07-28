@@ -363,7 +363,7 @@ MACHINE_CONFIG_START(tispellb_state::rev1)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_spellb)
+	config.set_default_layout(layout_spellb);
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(tispellb_state::rev2)
 	MCFG_TMS6100_4BIT_MODE()
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_spellb)
+	config.set_default_layout(layout_spellb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
