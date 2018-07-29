@@ -11036,20 +11036,21 @@ tstrikea                        // Game Room
 
 @source:ddragon3.cpp
 ctribe                          // TA-0028 (c) 1990 (US)
-ctribe1                         // TA-0028 (c) 1990 (US)
 ctribeb                         // bootleg
 ctribeb2                        // bootleg
 ctribej                         // TA-0028 (c) 1990 (Japan)
-ctribeo                         // TA-0028 (c) 1990 (US)
+ctribeu1                        // TA-0028 (c) 1990 (US)
+ctribeua                        // TA-0028 (c) 1990 (US)
 ddragon3                        // TA-0030 (c) 1990
 ddragon3b                       // bootleg
 ddragon3j                       // TA-0030 (c) 1990 (Japan)
 ddragon3p                       // TA-0030 (c) 1990
 wwfwfest                        // TA-0031 (c) 1991 + Tecmo license (World)
-wwfwfestb                       // bootleg
 wwfwfestj                       // TA-0031 (c) 1991 + Tecmo license (Japan)
 wwfwfestk                       // TA-0031 (c) 1991 + Tecmo license (Korea)
 wwfwfestu                       // TA-0031 (c) 1991 (US)
+wwfwfestu1                      // TA-0031 (c) 1991 (US)
+wwfwfestub                      // bootleg
 
 @source:ddribble.cpp
 ddribble                        // GX690 (c) 1986
@@ -15824,9 +15825,6 @@ jackie                          // (c) 1993 IGS
 
 @source:jackpool.cpp
 jackpool                        // (c) 1997 Electronic Projects
-
-@source:jade.cpp
-jgz80                           // Jade JGZ-80
 
 @source:jaguar.cpp
 a51mxr3k                        // ??           (c) 1998
@@ -37852,6 +37850,9 @@ uts20                           //
 @source:unkhorse.cpp
 unkhorse                        //
 
+@source:unkz80.cpp
+unkz80                          // Unknown
+
 @source:upscope.cpp
 upscope                         // (c) 1986 Grand products
 
@@ -39353,6 +39354,7 @@ xyonix                          // [1989 Philko]
 
 @source:y2.cpp
 kof2002um                       // (c)2009 SNK Playmore / New Channel
+kof2002umj                      // (c)2009 SNK Playmore / New Channel
 
 @source:yiear.cpp
 yiear                           // GX407 (c) 1985

@@ -294,8 +294,6 @@ void tlcs870_device::execute_set_input(int inputnum, int state)
 
 void tlcs870_device::execute_run()
 {
-	
-
 	while (m_icount > 0)
 	{
 		m_prvpc.d = m_pc.d;
@@ -311,7 +309,8 @@ void tlcs870_device::execute_run()
 
 		if (m_cycles)
 		{
-			m_icount -= m_cycles * 4; // 1 machine cycle = 4 clock cycles?
+			//m_icount -= m_cycles * 4; // 1 machine cycle = 4 clock cycles? (unclear, execution seems far too slow even for the ram test this way)
+			m_icount -= m_cycles;
 		}
 		else
 		{

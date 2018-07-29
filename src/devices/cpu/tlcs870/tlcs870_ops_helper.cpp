@@ -216,60 +216,404 @@ const bool tlcs870_device::check_jump_condition(int param1)
 	return takejump;
 }
 
+/* 
+	All 16-bit ALU ops that would set the 'H' flag list the behavior as undefined.
+	Logically the half flag would be the 8/9 bit carry (usual C flag) in a 16-bit
+	op, but since this isn't listed as being the case there's a chance the behavior
+	is something unexpected, such as still using the 3/4 carry, or, if it's
+	internally handled as 4 4-bit operations, maybe the 12/13 bit carry
 
-uint16_t tlcs870_device::do_alu(int op, uint16_t param1, uint16_t param2)
+	This needs testing on hardware.
+
+	(8-bit)        JF ZF CF HF       
+	ADDC           C  Z  C  H    
+	ADD            C  Z  C  H    
+	SUBB           C  Z  C  H    
+	SUB            C  Z  C  H    
+	AND            Z  Z  -  -    
+	XOR            Z  Z  -  -    
+	OR             Z  Z  -  -    
+	CMP            Z  Z  C  H    
+
+	(16-bit)
+	ADDC           C  Z  C  U   
+	ADD            C  Z  C  U   
+	SUBB           C  Z  C  U   
+	SUB            C  Z  C  U   
+	AND            Z  Z  -  -   
+	XOR            Z  Z  -  -   
+	OR             Z  Z  -  -   
+	CMP            Z  Z  C  U   	
+		
+*/
+
+uint8_t tlcs870_device::do_add_8bit(uint16_t param1, uint16_t param2)
+{
+	uint16_t result = param1 + param2;
+
+	if (result & 0x100)
+	{
+		set_CF();
+	}
+	else
+	{
+		clear_CF();
+	}
+
+	if ((result & 0xff) == 0x00)
+	{
+		set_ZF();
+	}
+	else
+	{
+		clear_ZF();
+	}
+
+	uint8_t temp = (param1 & 0xf) + (param2 & 0xf);
+
+	if (temp & 0x10)
+	{
+		set_HF();
+	}
+	else
+	{
+		clear_HF();
+	}
+
+	// JF is copied from CF
+	is_ZF() ? set_CF() : clear_CF();
+
+	return result;
+}
+
+uint8_t tlcs870_device::do_add_16bit(uint32_t param1, uint32_t param2)
+{
+	uint32_t result = param1 + param2;
+
+	if (result & 0x10000)
+	{
+		set_CF();
+	}
+	else
+	{
+		clear_CF();
+	}
+
+	if ((result & 0xffff) == 0x00)
+	{
+		set_ZF();
+	}
+	else
+	{
+		clear_ZF();
+	}
+
+	// unknown, manual says undefined, see note above
+	uint8_t temp = (param1 & 0xff) + (param2 & 0xff);
+
+	if (temp & 0x100)
+	{
+		set_HF();
+	}
+	else
+	{
+		clear_HF();
+	}
+
+	// JF is copied from CF
+	is_ZF() ? set_CF() : clear_CF();
+
+	return result;
+}
+
+uint8_t tlcs870_device::do_sub_8bit(uint16_t param1, uint16_t param2)
+{
+	uint16_t result = param1 - param2;
+
+	if (param1 < param2)
+	{
+		set_CF();
+	}
+	else
+	{
+		clear_CF();
+	}
+
+	if ((param1 & 0xf) < (param2 & 0xf))
+	{
+		set_HF();
+	}
+	else
+	{
+		clear_HF();
+	}
+
+	if ((result & 0xff) == 0x00)
+	{
+		set_ZF();
+	}
+	else
+	{
+		clear_ZF();
+	}
+
+	// JF is copied from CF
+	is_ZF() ? set_CF() : clear_CF();
+
+	return result;
+}
+
+
+uint8_t tlcs870_device::do_sub_16bit(uint32_t param1, uint32_t param2)
+{
+	uint32_t result = param1 - param2;
+
+	if (param1 < param2)
+	{
+		set_CF();
+	}
+	else
+	{
+		clear_CF();
+	}
+
+	// unknown, manual says undefined, see note above
+	if ((param1 & 0xff) < (param2 & 0xff))
+	{
+		set_HF();
+	}
+	else
+	{
+		clear_HF();
+	}
+
+	if ((result & 0xffff) == 0x0000)
+	{
+		set_ZF();
+	}
+	else
+	{
+		clear_ZF();
+	}
+
+	// JF is copied from CF
+	is_ZF() ? set_CF() : clear_CF();
+
+	return result;
+}
+
+void tlcs870_device::do_cmp_8bit(uint16_t param1, uint16_t param2)
+{
+	if (param1 < param2)
+	{
+		set_CF();
+	}
+	else
+	{
+		clear_CF();
+	}
+
+	if ((param1 & 0xf) < (param2 & 0xf)) // see note above about half flag
+	{
+		set_HF();
+	}
+	else
+	{
+		clear_HF();
+	}
+
+	if (param1 == param2)
+	{
+		set_ZF();
+	}
+	else
+	{
+		clear_ZF();
+	}
+
+	// JF is copied from ZF
+	is_ZF() ? set_JF() : clear_JF();
+}
+
+void tlcs870_device::do_cmp_16bit(uint32_t param1, uint32_t param2)
+{
+	if (param1 < param2)
+	{
+		set_CF();
+	}
+	else
+	{
+		clear_CF();
+	}
+
+	// unknown, manual says undefined, see note above
+	if ((param1 & 0xff) < (param2 & 0xff))
+	{
+		set_HF();
+	}
+	else
+	{
+		clear_HF();
+	}
+
+	if (param1 == param2)
+	{
+		set_ZF();
+	}
+	else
+	{
+		clear_ZF();
+	}
+
+	// JF is copied from ZF
+	is_ZF() ? set_JF() : clear_JF();
+}
+
+
+uint16_t tlcs870_device::do_and(uint16_t param1, uint16_t param2)
+{
+	uint16_t result = param1 & param2;
+
+	if (result == 0x00)
+	{
+		set_ZF();
+	}
+	else
+	{
+		clear_ZF();
+	}
+
+	// JF is copied from ZF
+	is_ZF() ? set_JF() : clear_JF();
+
+	return result;
+}
+
+uint16_t tlcs870_device::do_xor(uint16_t param1, uint16_t param2)
+{
+	uint16_t result = param1 ^ param2;
+
+	if (result == 0x00)
+	{
+		set_ZF();
+	}
+	else
+	{
+		clear_ZF();
+	}
+
+	// JF is copied from ZF
+	is_ZF() ? set_JF() : clear_JF();
+
+	return result;
+}
+
+uint16_t tlcs870_device::do_or(uint16_t param1, uint16_t param2)
+{
+	uint16_t result = param1 | param2;
+
+	if (result == 0x00)
+	{
+		set_ZF();
+	}
+	else
+	{
+		clear_ZF();
+	}
+
+	// JF is copied from ZF
+	is_ZF() ? set_JF() : clear_JF();
+
+	return result;
+}
+
+uint8_t tlcs870_device::do_alu_8bit(int op, uint16_t param1, uint16_t param2)
 {
 	uint16_t result = 0x00;
 
-	// TODO: flags
 	switch (op)
 	{
 	case 0x0: // ADDC
-		result = param1 + param2;
-		result += is_CF();
+		param2 += is_CF();
+		result = do_add_8bit(param1, param2);
 		break;
 
 	case 0x1: // ADD
-		result = param1 + param2;
+		result = do_add_8bit(param1, param2);
 		break;
 
 	case 0x2: // SUBB
-		result = param1 - param2;
-		result -= is_CF();
+		param2 += is_CF();
+		result = do_sub_8bit(param1, param2);
 		break;
 
 	case 0x3: // SUB
-		result = param1 - param2;
+		result = do_sub_8bit(param1, param2);
 		break;
 
 	case 0x4: // AND
-		result = param1 & param2;
+		result = do_and(param1, param2);
 		break;
 
 	case 0x5: // XOR
-		result = param1 ^ param2;
+		result = do_xor(param1, param2);
 		break;
 
 	case 0x6: // OR
-		result = param1 | param2;
+		result = do_or(param1, param2);
 		break;
 
 	case 0x7: // CMP
-		if (param1 < param2)
-		{
-			set_CF();
-		}
-		else
-		{
-			clear_CF();
-		}
+		do_cmp_8bit(param1, param2);
 		break;
-
 	}
 
 	return result;
 }
 
+uint16_t tlcs870_device::do_alu_16bit(int op, uint32_t param1, uint32_t param2)
+{
+	uint32_t result = 0x0000;
+
+	switch (op)
+	{
+	case 0x0: // ADDC
+		param2 += is_CF();
+		result = do_add_16bit(param1, param2);
+		break;
+
+	case 0x1: // ADD
+		result = do_add_16bit(param1, param2);
+		break;
+
+	case 0x2: // SUBB
+		param2 += is_CF();
+		result = do_sub_16bit(param1, param2);
+		break;
+
+	case 0x3: // SUB
+		result = do_sub_16bit(param1, param2);
+		break;
+
+	case 0x4: // AND
+		result = do_and(param1, param2);
+		break;
+
+	case 0x5: // XOR
+		result = do_xor(param1, param2);
+		break;
+
+	case 0x6: // OR
+		result = do_or(param1, param2);
+		break;
+
+	case 0x7: // CMP
+		do_cmp_16bit(param1, param2);
+		break;
+	}
+
+	return result;
+}
 
 uint8_t tlcs870_device::handle_SHLC(uint8_t val)
 {

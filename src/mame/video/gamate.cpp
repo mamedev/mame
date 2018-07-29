@@ -261,13 +261,13 @@ int gamate_video_device::get_pixel_from_vram(int x, int y)
 
 uint32_t gamate_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		//printf("updating scanline %d\n", y);
 		int real_x, real_y;
 		get_real_x_and_y(real_x, real_y, y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int pix = get_pixel_from_vram(x + real_x, real_y);
 

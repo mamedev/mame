@@ -279,11 +279,11 @@ public:
 	int vpos() const;
 	int hpos() const;
 	DECLARE_READ_LINE_MEMBER(vblank) const { return (machine().time() < m_vblank_end_time) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER(hblank) const { int const curpos = hpos(); return (curpos < m_visarea.min_x || curpos > m_visarea.max_x) ? 1 : 0; }
+	DECLARE_READ_LINE_MEMBER(hblank) const { int const curpos = hpos(); return (curpos < m_visarea.left() || curpos > m_visarea.right()) ? 1 : 0; }
 
 	// timing
 	attotime time_until_pos(int vpos, int hpos = 0) const;
-	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.max_y + 1); }
+	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.bottom() + 1); }
 	attotime time_until_vblank_end() const;
 	attotime time_until_update() const { return (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
 	attotime scan_period() const { return attotime(0, m_scantime); }
