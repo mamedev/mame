@@ -50,6 +50,8 @@
 #include "ymf278b.h"
 #include "ymf262.h"
 
+#include <algorithm>
+
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
@@ -225,7 +227,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		return;
 	}
 
-	memset(m_mix_buffer.get(), 0, sizeof(m_mix_buffer[0])*samples*2);
+	std::fill(m_mix_buffer.begin(), m_mix_buffer.end(), 0);
 
 	for (i = 0; i < 24; i++)
 	{
@@ -233,7 +235,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		if (slot->active)
 		{
-			mixp = m_mix_buffer.get();
+			mixp = &m_mix_buffer[0];
 
 			for (j = 0; j < samples; j++)
 			{
@@ -274,8 +276,20 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 						break;
 				}
 
-				*mixp++ += (sample * m_volume[slot->TL+m_pan_left [slot->pan]+(slot->env_vol>>23)])>>17;
-				*mixp++ += (sample * m_volume[slot->TL+m_pan_right[slot->pan]+(slot->env_vol>>23)])>>17;
+				if (slot->CH) // DO1 out
+				{
+					mixp++;
+					mixp++;
+					*mixp++ += (sample * m_volume[slot->TL+m_pan_left [slot->pan]+(slot->env_vol>>23)])>>17;
+					*mixp++ += (sample * m_volume[slot->TL+m_pan_right[slot->pan]+(slot->env_vol>>23)])>>17;
+				}
+				else // DO2 out
+				{
+					*mixp++ += (sample * m_volume[slot->TL+m_pan_left [slot->pan]+(slot->env_vol>>23)])>>17;
+					*mixp++ += (sample * m_volume[slot->TL+m_pan_right[slot->pan]+(slot->env_vol>>23)])>>17;
+					mixp++;
+					mixp++;
+				}
 
 				// update frequency
 				slot->stepptr += slot->step;
@@ -293,13 +307,15 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		}
 	}
 
-	mixp = m_mix_buffer.get();
+	mixp = &m_mix_buffer[0];
 	vl = m_mix_level[m_pcm_l];
 	vr = m_mix_level[m_pcm_r];
 	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++ * vl) >> 16;
 		outputs[1][i] = (*mixp++ * vr) >> 16;
+		outputs[2][i] = *mixp++;
+		outputs[3][i] = *mixp++;
 	}
 }
 
@@ -780,6 +796,7 @@ READ8_MEMBER( ymf278b_device::read )
 //-------------------------------------------------
 //  device_post_load - device-specific post load
 //-------------------------------------------------
+
 void ymf278b_device::device_post_load()
 {
 	ymf262_post_load(m_ymf262);
@@ -851,7 +868,15 @@ void ymf278b_device::device_stop()
 
 void ymf278b_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock()/768);
+	int old_rate = m_rate;
+	m_clock = clock();
+	m_rate = m_clock/768;
+
+	if (m_rate > old_rate)
+	{
+		m_mix_buffer.resize(m_rate*4,0);
+	}
+	m_stream->set_sample_rate(m_rate);
 
 	// YMF262 related
 
@@ -966,6 +991,7 @@ void ymf278b_device::device_start()
 	int i;
 
 	m_clock = clock();
+	m_rate = m_clock / 768;
 	m_irq_handler.resolve();
 
 	m_timer_base = attotime::from_hz(m_clock) * (19*36);
@@ -979,8 +1005,8 @@ void ymf278b_device::device_start()
 		m_slots[i].num = i;
 	}
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/768);
-	m_mix_buffer = std::make_unique<int32_t[]>(44100*2);
+	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_rate);
+	m_mix_buffer.resize(m_rate*4,0);
 
 	// rate tables
 	precompute_rate_tables();

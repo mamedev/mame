@@ -564,10 +564,12 @@ MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(4, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(5, "rspeaker", 0.40)
+	MCFG_SOUND_ROUTE(6, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(7, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 /***************************************************************************
