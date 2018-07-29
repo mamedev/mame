@@ -878,7 +878,6 @@ void ymf278b_device::device_clock_changed()
 	}
 	m_stream->set_sample_rate(m_rate);
 
-	m_clock = clock();
 	m_timer_base = m_clock ? attotime::from_hz(m_clock) * (19 * 36) : attotime::zero;
 
 	// YMF262 related
