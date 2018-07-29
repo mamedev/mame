@@ -1078,10 +1078,8 @@ unsigned short scsp_device::r16(address_space &space, unsigned int addr)
 			    004CB4: 4E75                       rts
 			*/
 			logerror("SCSP: Reading from EXTS register %08x\n",addr);
-			if(addr == 0xee0)
-				v = m_exts_r[0];
-			if(addr == 0xee2)
-				v = m_exts_r[1];
+			if(addr<0xEE4)
+				v = *((unsigned short *) (m_DSP.EXTS+(addr-0xee0)/2));
 		}
 	}
 	return v;
@@ -1319,10 +1317,10 @@ void scsp_device::DoMasterSamples(int nsamples)
 			SCSP_SLOT *slot=m_Slots+i+16; // 100217, 100237 EFSDL, EFPAN for EXTS0/1
 			if(EFSDL(slot))
 			{
-				m_exts_r[i] = exts[i][s];
+				m_DSP.EXTS[i] = exts[i][s];
 				unsigned short Enc=((EFPAN(slot))<<0x8)|((EFSDL(slot))<<0xd);
-				smpl+=(m_exts_r[i]*m_LPANTABLE[Enc])>>SHIFT;
-				smpr+=(m_exts_r[i]*m_RPANTABLE[Enc])>>SHIFT;
+				smpl+=(m_DSP.EXTS[i]*m_LPANTABLE[Enc])>>SHIFT;
+				smpr+=(m_DSP.EXTS[i]*m_RPANTABLE[Enc])>>SHIFT;
 			}
 		}
 

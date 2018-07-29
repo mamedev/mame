@@ -168,8 +168,6 @@ private:
 	stream_sample_t *m_exts0;
 	stream_sample_t *m_exts1;
 
-	int16_t m_exts_r[2];
-
 	int m_length;
 
 	int16_t *m_RBUFDST;   //this points to where the sample will be stored in the RingBuf
