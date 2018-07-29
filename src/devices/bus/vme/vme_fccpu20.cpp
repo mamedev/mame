@@ -243,6 +243,15 @@ void vme_fccpu20_device::cpu20_mem(address_map &map)
 }
 
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
+DEVICE_INPUT_DEFAULTS_END
+
 MACHINE_CONFIG_START(vme_fccpu20_device::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD ("maincpu", M68020, CLOCK50 / 3) /* Crytstal verified from picture HCI */
@@ -294,6 +303,7 @@ MACHINE_CONFIG_START(vme_fccpu20_device::device_add_mconfig)
 	MCFG_DEVICE_ADD (RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (WRITELINE ("mpcc", mpcc68561_device, write_rx))
 	MCFG_RS232_CTS_HANDLER (WRITELINE ("mpcc", mpcc68561_device, cts_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	// MPCC2 - RS232
 	MCFG_DEVICE_ADD (RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)

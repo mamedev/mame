@@ -2408,6 +2408,11 @@ static void Y8950_deltat_status_reset(void *chip, uint8_t changebits)
 	Y8950->STATUS_RESET(changebits);
 }
 
+void y8950_clock_changed(void *chip, uint32_t clock, uint32_t rate)
+{
+	reinterpret_cast<FM_OPL *>(chip)->clock_changed(clock, rate);
+}
+
 void *y8950_init(device_t *device, uint32_t clock, uint32_t rate)
 {
 	/* emulator create */

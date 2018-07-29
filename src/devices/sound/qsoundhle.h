@@ -34,13 +34,12 @@ protected:
 	virtual void rom_bank_updated() override;
 
 private:
-
 	// MAME resources
 	sound_stream *m_stream;
 
 	struct qsound_channel
 	{
-		uint16_t reg[8];    // channel control registers
+		u16 reg[8];    // channel control registers
 
 		// work variables
 		int lvol;           // left volume
@@ -48,10 +47,10 @@ private:
 	} m_channel[16];
 
 	int m_pan_table[33];    // pan volume table
-	uint16_t m_data;        // register latch data
+	u16 m_data;        // register latch data
 
-	inline int16_t read_sample(uint32_t offset) { return uint16_t(read_byte(offset)) << 8; }
-	void write_data(uint8_t address, uint16_t data);
+	inline s16 read_sample(u32 offset) { return u16(read_byte(offset)) << 8; }
+	void write_data(u8 address, u16 data);
 };
 
 DECLARE_DEVICE_TYPE(QSOUND_HLE, qsound_hle_device)

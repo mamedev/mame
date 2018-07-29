@@ -16,9 +16,11 @@
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
 #include "sound/2612intf.h"
+#include "sound/262intf.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
+#include "sound/8950intf.h"
 #include "sound/c352.h"
 #include "sound/c6280.h"
 #include "sound/gb.h"
@@ -37,6 +39,7 @@
 #include "sound/ym2151.h"
 #include "sound/ym2413.h"
 #include "sound/ymf271.h"
+#include "sound/ymf278b.h"
 #include "sound/ymz280b.h"
 
 #include "vgmplay.lh"
@@ -69,16 +72,22 @@ public:
 	enum io8_t
 	{
 		REG_SIZE     = 0x00000000,
-		A_YM2612     = 0x00000010,
-		A_YM2151     = 0x00000020,
-		A_YM2413     = 0x00000030,
-		A_YM2203A    = 0x00000040,
-		A_YM2203B    = 0x00000050,
-		A_YM3526     = 0x00000060,
-		A_YM3812     = 0x00000070,
+		A_YM2612_0   = 0x00000010,
+		A_YM2612_1   = 0x00000018,
+		A_YM2151_0   = 0x00000020,
+		A_YM2151_1   = 0x00000028,
+		A_YM2413_0   = 0x00000030,
+		A_YM2413_1   = 0x00000038,
+		A_YM2203_0   = 0x00000040,
+		A_YM2203_1   = 0x00000050,
+		A_YM3526_0   = 0x00000060,
+		A_YM3526_1   = 0x00000068,
+		A_YM3812_0   = 0x00000070,
+		A_YM3812_1   = 0x00000078,
 		A_AY8910A    = 0x00000080,
 		A_AY8910B    = 0x00000090,
-		A_SN76496    = 0x000000a0,
+		A_SN76496_0  = 0x000000a0,
+		A_SN76496_1  = 0x000000a8,
 		A_K053260    = 0x000000b0,
 		A_C6280      = 0x000000e0,
 		A_OKIM6295A  = 0x000000f0,
@@ -91,10 +100,20 @@ public:
 		A_MULTIPCMB  = 0x00013010,
 		A_POKEYA     = 0x00013020,
 		A_POKEYB     = 0x00013030,
-		A_YMF271     = 0x00013040,
-		A_YMZ280B    = 0x00013050,
-		A_YM2608     = 0x00013060,
-		A_YM2610     = 0x00013070,
+		A_YM2608_0   = 0x00013060,
+		A_YM2608_1   = 0x00013068,
+		A_YM2610_0   = 0x00013070,
+		A_YM2610_1   = 0x00013078,
+		A_Y8950_0    = 0x00013080,
+		A_Y8950_1    = 0x00013088,
+		A_YMF262_0   = 0x00013090,
+		A_YMF262_1   = 0x00013098,
+		A_YMF278B_0  = 0x000130a0,
+		A_YMF278B_1  = 0x000130b0,
+		A_YMF271_0   = 0x000130c0,
+		A_YMF271_1   = 0x000130d0,
+		A_YMZ280B_0  = 0x000130e0,
+		A_YMZ280B_1  = 0x000130f0,
 		A_K054539A   = 0x00013400,
 		A_K054539B   = 0x00013800,
 		A_QSOUND     = 0x00013c00,
@@ -128,17 +147,18 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	DECLARE_READ8_MEMBER(segapcm_rom_r);
-	DECLARE_READ8_MEMBER(ymf271_rom_r);
-	DECLARE_READ8_MEMBER(ymz280b_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(segapcm_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(ymf278b_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(ymf271_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(ymz280b_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(multipcm_rom_r);
-	DECLARE_READ8_MEMBER(k053260_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(k053260_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(okim6295_rom_r);
 	template<int Chip> DECLARE_READ8_MEMBER(k054539_rom_r);
-	DECLARE_READ8_MEMBER(c352_rom_r);
-	DECLARE_READ8_MEMBER(qsound_rom_r);
-	DECLARE_READ8_MEMBER(ga20_rom_r);
-	DECLARE_READ8_MEMBER(x1_010_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(c352_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(qsound_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(ga20_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(x1_010_rom_r);
 
 	template<int Chip> DECLARE_WRITE8_MEMBER(multipcm_bank_hi_w);
 	template<int Chip> DECLARE_WRITE8_MEMBER(multipcm_bank_lo_w);
@@ -202,6 +222,9 @@ private:
 
 		LED_X1_010,
 		LED_YM2610,
+		LED_Y8950,
+		LED_YMF262,
+		LED_YMF278B,
 
 		LED_COUNT
 	};
@@ -288,43 +311,50 @@ public:
 	DECLARE_WRITE8_MEMBER(scc_w);
 
 	void vgmplay(machine_config &config);
-	void c352_map(address_map &map);
 	void file_map(address_map &map);
-	void ga20_map(address_map &map);
-	void h6280_io_map(address_map &map);
-	void h6280_map(address_map &map);
-	void k053260_map(address_map &map);
-	void k054539a_map(address_map &map);
-	void k054539b_map(address_map &map);
-	void multipcma_map(address_map &map);
-	void multipcmb_map(address_map &map);
-	void nescpu_map(address_map &map);
-	void okim6295a_map(address_map &map);
-	void okim6295b_map(address_map &map);
-	void qsound_map(address_map &map);
-	void rf5c68_map(address_map &map);
-	void rf5c164_map(address_map &map);
-	void segapcm_map(address_map &map);
 	void soundchips16_map(address_map &map);
 	void soundchips_map(address_map &map);
-	void x1_010_map(address_map &map);
-	void ymf271_map(address_map &map);
-	void ymz280b_map(address_map &map);
+	template<int Chip> void segapcm_map(address_map &map);
+	template<int Chip> void ymf278b_map(address_map &map);
+	template<int Chip> void ymf271_map(address_map &map);
+	template<int Chip> void ymz280b_map(address_map &map);
+	template<int Chip> void c352_map(address_map &map);
+	template<int Chip> void ga20_map(address_map &map);
+	template<int Chip> void h6280_io_map(address_map &map);
+	template<int Chip> void h6280_map(address_map &map);
+	template<int Chip> void k053260_map(address_map &map);
+	template<int Chip> void k054539_map(address_map &map);
+	template<int Chip> void multipcm_map(address_map &map);
+	template<int Chip> void nescpu_map(address_map &map);
+	template<int Chip> void okim6295_map(address_map &map);
+	template<int Chip> void qsound_map(address_map &map);
+	template<int Chip> void rf5c68_map(address_map &map);
+	template<int Chip> void rf5c164_map(address_map &map);
+	template<int Chip> void x1_010_map(address_map &map);
 
 private:
 	std::vector<uint8_t> m_file_data;
 	required_device<vgmplay_device> m_vgmplay;
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
-	required_device<ym2612_device>  m_ym2612;
-	required_device<ym2151_device>  m_ym2151;
-	required_device<ym2413_device>  m_ym2413;
-	required_device_array<ym2203_device, 2> m_ym2203;
-	required_device<ym3526_device>  m_ym3526;
-	required_device<ym3812_device>  m_ym3812;
-	required_device_array<ay8910_device, 2> m_ay8910;
-	required_device<sn76496_device> m_sn76496;
+	required_device_array<sn76496_device, 2> m_sn76496;
+	required_device_array<ym2413_device, 2> m_ym2413;
+	required_device_array<ym2612_device, 2> m_ym2612;
+	required_device_array<ym2151_device, 2> m_ym2151;
 	required_device<segapcm_device> m_segapcm;
+	required_device<rf5c68_device> m_rf5c68;
+	required_shared_ptr<uint8_t> m_rf5c68_ram;
+	required_device_array<ym2203_device, 2> m_ym2203;
+	required_device_array<ym2608_device, 2> m_ym2608;
+	required_device_array<ym2610_device, 2> m_ym2610;
+	required_device_array<ym3812_device, 2> m_ym3812;
+	required_device_array<ym3526_device, 2> m_ym3526;
+	required_device_array<y8950_device, 2> m_y8950;
+	required_device_array<ymf262_device, 2> m_ymf262;
+	required_device_array<ymf278b_device, 2> m_ymf278b;
+	required_device_array<ymf271_device, 2> m_ymf271;
+	required_device_array<ymz280b_device, 2> m_ymz280b;
+	required_device_array<ay8910_device, 2> m_ay8910;
 	required_device_array<multipcm_device, 2> m_multipcm;
 	required_device<gameboy_sound_device> m_dmg;
 	required_device<n2a03_device> m_nescpu;
@@ -336,16 +366,10 @@ private:
 	required_device_array<pokey_device, 2> m_pokey;
 	required_device<c352_device> m_c352;
 	required_device_array<okim6295_device, 2> m_okim6295;
-	required_device<ymf271_device> m_ymf271;
-	required_device<ymz280b_device> m_ymz280b;
-	required_device<ym2608_device> m_ym2608;
-	required_device<ym2610_device> m_ym2610;
 	required_device<qsound_device> m_qsound;
 	required_device<k051649_device> m_k051649;
 	required_device<iremga20_device> m_ga20;
-	required_device<rf5c68_device> m_rf5c68;
 	required_device<rf5c68_device> m_rf5c164; // TODO : !!RF5C164!!
-	required_shared_ptr<uint8_t> m_rf5c68_ram;
 	required_shared_ptr<uint8_t> m_rf5c164_ram;
 	required_device<x1_010_device> m_x1_010;
 
@@ -578,94 +602,108 @@ void vgmplay_device::execute_run()
 				debugger_instruction_hook(m_pc);
 			uint8_t code = m_file->read_byte(m_pc);
 			switch(code) {
+			case 0x30:
+				pulse_act_led(LED_SN76496);
+				m_io->write_byte(A_SN76496_1 + 0, m_file->read_byte(m_pc + 1));
+				m_pc += 2;
+				break;
+
+			case 0x3f:
+				pulse_act_led(LED_SN76496);
+				m_io->write_byte(A_SN76496_1 + 1, m_file->read_byte(m_pc + 1));
+				m_pc += 2;
+				break;
+
 			case 0x4f:
 				pulse_act_led(LED_SN76496);
-				m_io->write_byte(A_SN76496+0, m_file->read_byte(m_pc+1));
+				m_io->write_byte(A_SN76496_0 + 1, m_file->read_byte(m_pc + 1));
 				m_pc += 2;
 				break;
 
 			case 0x50:
 				pulse_act_led(LED_SN76496);
-				m_io->write_byte(A_SN76496+1, m_file->read_byte(m_pc+1));
+				m_io->write_byte(A_SN76496_0 + 0, m_file->read_byte(m_pc + 1));
 				m_pc += 2;
 				break;
 
 			case 0x51:
 				pulse_act_led(LED_YM2413);
-				m_io->write_byte(A_YM2413+0, m_file->read_byte(m_pc+1));
-				m_io->write_byte(A_YM2413+1, m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_YM2413_0 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2413_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
 				break;
 
 			case 0x52:
-				pulse_act_led(LED_YM2612);
-				m_io->write_byte(A_YM2612+0, m_file->read_byte(m_pc+1));
-				m_io->write_byte(A_YM2612+1, m_file->read_byte(m_pc+2));
-				m_pc += 3;
-				break;
-
 			case 0x53:
 				pulse_act_led(LED_YM2612);
-				m_io->write_byte(A_YM2612+2, m_file->read_byte(m_pc+1));
-				m_io->write_byte(A_YM2612+3, m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_YM2612_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2612_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
 				break;
 
 			case 0x54:
 				pulse_act_led(LED_YM2151);
-				m_io->write_byte(A_YM2151+0, m_file->read_byte(m_pc+1));
-				m_io->write_byte(A_YM2151+1, m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_YM2151_0 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2151_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
 				break;
 
 			case 0x55:
 				pulse_act_led(LED_YM2203);
-				m_io->write_byte(A_YM2203A+0, m_file->read_byte(m_pc+1));
-				m_io->write_byte(A_YM2203A+1, m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_YM2203_0 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2203_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
 				break;
 
 			case 0x56:
 			case 0x57:
 				pulse_act_led(LED_YM2608);
-				m_io->write_byte(A_YM2608+0+((code & 1) << 1), m_file->read_byte(m_pc+1));
-				m_io->write_byte(A_YM2608+1+((code & 1) << 1), m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_YM2608_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2608_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
 				break;
 
 			case 0x58:
 			case 0x59:
 				pulse_act_led(LED_YM2610);
-				m_io->write_byte(A_YM2610 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
-				m_io->write_byte(A_YM2610 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
-				m_pc += 3;
-				break;
-
-			case 0xA5:
-				pulse_act_led(LED_YM2203);
-				m_io->write_byte(A_YM2203B+0, m_file->read_byte(m_pc+1));
-				m_io->write_byte(A_YM2203B+1, m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_YM2610_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2610_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
 				break;
 
 			case 0x5a:
 				pulse_act_led(LED_YM3812);
-				m_io->write_byte(A_YM3812+0, m_file->read_byte(m_pc+1));
-				m_io->write_byte(A_YM3812+1, m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_YM3812_0 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM3812_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
 				break;
 
 			case 0x5b:
 				pulse_act_led(LED_YM3526);
-				m_io->write_byte(A_YM3526+0, m_file->read_byte(m_pc+1));
-				m_io->write_byte(A_YM3526+1, m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_YM3526_0 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM3526_0 + 1, m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
+
+			case 0x5c:
+				pulse_act_led(LED_Y8950);
+				m_io->write_byte(A_Y8950_0 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_Y8950_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
 				break;
 
 			case 0x5d:
 				pulse_act_led(LED_YMZ280B);
-				m_io->write_byte(A_YMZ280B+0, m_file->read_byte(m_pc+1));
-				m_io->write_byte(A_YMZ280B+1, m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_YMZ280B_0 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YMZ280B_0 + 1, m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
+
+			case 0x5e:
+			case 0x5f:
+				pulse_act_led(LED_YMF262);
+				m_io->write_byte(A_YMF262_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YMF262_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
 				break;
 
@@ -720,8 +758,8 @@ void vgmplay_device::execute_run()
 					if(m_ym2612_stream_offset >= int(m_data_streams[0].size()))
 						m_ym2612_stream_offset = 0;
 
-					m_io->write_byte(A_YM2612+0, 0x2a);
-					m_io->write_byte(A_YM2612+1, m_data_streams[0][m_ym2612_stream_offset]);
+					m_io->write_byte(A_YM2612_0+0, 0x2a);
+					m_io->write_byte(A_YM2612_0+1, m_data_streams[0][m_ym2612_stream_offset]);
 					m_ym2612_stream_offset++;
 				}
 				m_pc += 1;
@@ -741,6 +779,87 @@ void vgmplay_device::execute_run()
 				m_pc += 3;
 				break;
 			}
+
+			case 0xa1:
+				pulse_act_led(LED_YM2413);
+				m_io->write_byte(A_YM2413_1 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2413_1 + 1, m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
+
+			case 0xa2:
+			case 0xa3:
+				pulse_act_led(LED_YM2612);
+				m_io->write_byte(A_YM2612_1 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2612_1 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
+
+			case 0xa4:
+				pulse_act_led(LED_YM2151);
+				m_io->write_byte(A_YM2151_1 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2151_1 + 1, m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
+
+			case 0xa5:
+				pulse_act_led(LED_YM2203);
+				m_io->write_byte(A_YM2203_1 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2203_1 + 1, m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
+
+			case 0xa6:
+			case 0xa7:
+				pulse_act_led(LED_YM2608);
+				m_io->write_byte(A_YM2608_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2608_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
+
+			case 0xa8:
+			case 0xa9:
+				pulse_act_led(LED_YM2610);
+				m_io->write_byte(A_YM2610_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM2610_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
+
+			case 0xaa:
+				pulse_act_led(LED_YM3812);
+				m_io->write_byte(A_YM3812_1 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM3812_1 + 1, m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
+
+			case 0xab:
+				pulse_act_led(LED_YM3526);
+				m_io->write_byte(A_YM3526_1 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YM3526_1 + 1, m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
+
+			case 0xac:
+				pulse_act_led(LED_Y8950);
+				m_io->write_byte(A_Y8950_1 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_Y8950_1 + 1, m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
+
+			case 0xad:
+				pulse_act_led(LED_YMZ280B);
+				m_io->write_byte(A_YMZ280B_1 + 0, m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YMZ280B_1 + 1, m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
+
+			case 0xae:
+			case 0xaf:
+				pulse_act_led(LED_YMF262);
+				m_io->write_byte(A_YMF262_1 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
+				m_io->write_byte(A_YMF262_1 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
+				m_pc += 3;
+				break;
 
 			case 0xb0:
 				pulse_act_led(LED_RF5C68);
@@ -865,11 +984,37 @@ void vgmplay_device::execute_run()
 				break;
 			}
 
+			case 0xd0:
+			{
+				pulse_act_led(LED_YMF278B);
+				uint8_t offset = m_file->read_byte(m_pc + 1);
+				if (offset & 0x80)
+				{
+					m_io->write_byte(A_YMF278B_1 + (offset & 7) * 2, m_file->read_byte(m_pc + 2));
+					m_io->write_byte(A_YMF278B_1 + (offset & 7) * 2 + 1, m_file->read_byte(m_pc + 3));
+				}
+				else
+				{
+					m_io->write_byte(A_YMF278B_0 + (offset & 7) * 2, m_file->read_byte(m_pc + 2));
+					m_io->write_byte(A_YMF278B_0 + (offset & 7) * 2 + 1, m_file->read_byte(m_pc + 3));
+				}
+				m_pc += 4;
+				break;
+			}
+
 			case 0xd1: {
 				pulse_act_led(LED_YMF271);
 				uint8_t offset = m_file->read_byte(m_pc+1);
-				m_io->write_byte(A_YMF271 + (offset & 7) * 2, m_file->read_byte(m_pc+2));
-				m_io->write_byte(A_YMF271 + (offset & 7) * 2 + 1, m_file->read_byte(m_pc+3));
+				if (offset & 0x80)
+				{
+					m_io->write_byte(A_YMF271_1 + (offset & 7) * 2, m_file->read_byte(m_pc + 2));
+					m_io->write_byte(A_YMF271_1 + (offset & 7) * 2 + 1, m_file->read_byte(m_pc + 3));
+				}
+				else
+				{
+					m_io->write_byte(A_YMF271_0 + (offset & 7) * 2, m_file->read_byte(m_pc + 2));
+					m_io->write_byte(A_YMF271_0 + (offset & 7) * 2 + 1, m_file->read_byte(m_pc + 3));
+				}
 				m_pc += 4;
 				break;
 			}
@@ -979,72 +1124,68 @@ uint32_t vgmplay_disassembler::opcode_alignment() const
 offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	switch(opcodes.r8(pc)) {
+	case 0x30:
+		util::stream_format(stream, "psg.1 write %02x", opcodes.r8(pc + 1));
+		return 2 | SUPPORTED;
+
+	case 0x3f:
+		util::stream_format(stream, "psg.1 r06 = %02x", opcodes.r8(pc + 1));
+		return 2 | SUPPORTED;
+
 	case 0x4f:
-		util::stream_format(stream, "psg r06 = %02x", opcodes.r8(pc+1));
+		util::stream_format(stream, "psg.0 r06 = %02x", opcodes.r8(pc + 1));
 		return 2 | SUPPORTED;
 
 	case 0x50:
-		util::stream_format(stream, "psg write %02x", opcodes.r8(pc+1));
+		util::stream_format(stream, "psg.0 write %02x", opcodes.r8(pc + 1));
 		return 2 | SUPPORTED;
 
 	case 0x51:
-		util::stream_format(stream, "ym2413 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "ym2413.0 r%02x = %02x", opcodes.r8(pc + 1), opcodes.r8(pc + 2));
 		return 3 | SUPPORTED;
 
 	case 0x52:
-		util::stream_format(stream, "ym2612.0 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
-		return 3 | SUPPORTED;
-
 	case 0x53:
-		util::stream_format(stream, "ym2612.1 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "ym2612.0 %d r%02x = %02x", opcodes.r8(pc) & 1, opcodes.r8(pc + 1), opcodes.r8(pc + 2));
 		return 3 | SUPPORTED;
 
 	case 0x54:
-		util::stream_format(stream, "ym2151 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "ym2151.0 r%02x = %02x", opcodes.r8(pc + 1), opcodes.r8(pc + 2));
 		return 3 | SUPPORTED;
 
 	case 0x55:
-		util::stream_format(stream, "ym2203a r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "ym2203.0 r%02x = %02x", opcodes.r8(pc + 1), opcodes.r8(pc + 2));
 		return 3 | SUPPORTED;
 
 	case 0x56:
-		util::stream_format(stream, "ym2608.0 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
-		return 3 | SUPPORTED;
-
 	case 0x57:
-		util::stream_format(stream, "ym2608.1 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "ym2608.0 %d r%02x = %02x", opcodes.r8(pc) & 1, opcodes.r8(pc + 1), opcodes.r8(pc + 2));
 		return 3 | SUPPORTED;
 
 	case 0x58:
-		util::stream_format(stream, "ym2610.0 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
-		return 3 | SUPPORTED;
-
 	case 0x59:
-		util::stream_format(stream, "ym2610.1 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "ym2610.0 %d r%02x = %02x", opcodes.r8(pc) & 1, opcodes.r8(pc + 1), opcodes.r8(pc + 2));
 		return 3 | SUPPORTED;
 
 	case 0x5a:
-		util::stream_format(stream, "ym3812 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "ym3812.0 r%02x = %02x", opcodes.r8(pc + 1), opcodes.r8(pc + 2));
 		return 3 | SUPPORTED;
 
 	case 0x5b:
-		util::stream_format(stream, "ym3526 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "ym3526.0 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
 		return 3 | SUPPORTED;
 
 	case 0x5c:
-		util::stream_format(stream, "y8950 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "y8950.0 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
 		return 3 | SUPPORTED;
 
 	case 0x5d:
-		util::stream_format(stream, "ymz280b r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "ymz280b.0 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
 		return 3 | SUPPORTED;
 
 	case 0x5e:
-		util::stream_format(stream, "ymf262.0 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
-		return 3 | SUPPORTED;
-
 	case 0x5f:
-		util::stream_format(stream, "ymf262.1 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "ymf262.0 %d r%02x = %02x", opcodes.r8(pc) & 1, opcodes.r8(pc + 1), opcodes.r8(pc + 2));
 		return 3 | SUPPORTED;
 
 	case 0x61: {
@@ -1156,8 +1297,47 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		util::stream_format(stream, "ay8910 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
 		return 3 | SUPPORTED;
 
+	case 0xa1:
+		util::stream_format(stream, "ym2413.1 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
+
+	case 0xa2:
+	case 0xa3:
+		util::stream_format(stream, "ym2612.1 %d r%02x = %02x", opcodes.r8(pc) & 1, opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
+
+	case 0xa4:
+		util::stream_format(stream, "ym2151.1 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
+
 	case 0xa5:
-		util::stream_format(stream, "ym2203b r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "ym2203.1 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
+
+	case 0xa6:
+	case 0xa7:
+		util::stream_format(stream, "ym2608.1 %d r%02x = %02x", opcodes.r8(pc) & 1, opcodes.r8(pc + 1), opcodes.r8(pc + 2));
+		return 3 | SUPPORTED;
+
+	case 0xaa:
+		util::stream_format(stream, "ym3812.1 r%02x = %02x", opcodes.r8(pc + 1), opcodes.r8(pc + 2));
+		return 3 | SUPPORTED;
+
+	case 0xab:
+		util::stream_format(stream, "ym3526.1 r%02x = %02x", opcodes.r8(pc + 1), opcodes.r8(pc + 2));
+		return 3 | SUPPORTED;
+
+	case 0xac:
+		util::stream_format(stream, "y8950.1 r%02x = %02x", opcodes.r8(pc + 1), opcodes.r8(pc + 2));
+		return 3 | SUPPORTED;
+
+	case 0xad:
+		util::stream_format(stream, "ymz280b.1 r%02x = %02x", opcodes.r8(pc + 1), opcodes.r8(pc + 2));
+		return 3 | SUPPORTED;
+
+	case 0xae:
+	case 0xaf:
+		util::stream_format(stream, "ymf262.1 %d r%02x = %02x", opcodes.r8(pc) & 1, opcodes.r8(pc + 1), opcodes.r8(pc + 2));
 		return 3 | SUPPORTED;
 
 	case 0xb0:
@@ -1233,11 +1413,11 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		return 4 | SUPPORTED;
 
 	case 0xd0:
-		util::stream_format(stream, "ymf278b r%02x.%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2), opcodes.r8(pc+3));
+		util::stream_format(stream, "ymf278b.%d r%02x.%02x = %02x", BIT(opcodes.r8(pc + 1), 7), opcodes.r8(pc+1) & 0x7f, opcodes.r8(pc+2), opcodes.r8(pc+3));
 		return 4 | SUPPORTED;
 
 	case 0xd1:
-		util::stream_format(stream, "ymf271 r%02x.%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2), opcodes.r8(pc+3));
+		util::stream_format(stream, "ymf271.%d r%02x.%02x = %02x", BIT(opcodes.r8(pc + 1), 7), opcodes.r8(pc+1), opcodes.r8(pc+2), opcodes.r8(pc+3));
 		return 4 | SUPPORTED;
 
 	case 0xd2:
@@ -1283,19 +1463,28 @@ uint8_t vgmplay_device::rom_r(int chip, uint8_t type, offs_t offset)
 	return 0;
 }
 
+template<int Chip>
 READ8_MEMBER(vgmplay_device::segapcm_rom_r)
 {
-	return rom_r(0, 0x80, offset);
+	return rom_r(Chip, 0x80, offset);
 }
 
+template<int Chip>
+READ8_MEMBER(vgmplay_device::ymf278b_rom_r)
+{
+	return rom_r(Chip, 0x84, offset);
+}
+
+template<int Chip>
 READ8_MEMBER(vgmplay_device::ymf271_rom_r)
 {
-	return rom_r(0, 0x85, offset);
+	return rom_r(Chip, 0x85, offset);
 }
 
+template<int Chip>
 READ8_MEMBER(vgmplay_device::ymz280b_rom_r)
 {
-	return rom_r(0, 0x86, offset);
+	return rom_r(Chip, 0x86, offset);
 }
 
 template<int Chip>
@@ -1353,29 +1542,34 @@ READ8_MEMBER(vgmplay_device::k054539_rom_r)
 	return rom_r(Chip, 0x8c, offset);
 }
 
+template<int Chip>
 READ8_MEMBER(vgmplay_device::k053260_rom_r)
 {
-	return rom_r(0, 0x8e, offset);
+	return rom_r(Chip, 0x8e, offset);
 }
 
+template<int Chip>
 READ8_MEMBER(vgmplay_device::qsound_rom_r)
 {
-	return rom_r(0, 0x8f, offset);
+	return rom_r(Chip, 0x8f, offset);
 }
 
+template<int Chip>
 READ8_MEMBER(vgmplay_device::x1_010_rom_r)
 {
-	return rom_r(0, 0x91, offset);
+	return rom_r(Chip, 0x91, offset);
 }
 
+template<int Chip>
 READ8_MEMBER(vgmplay_device::c352_rom_r)
 {
-	return rom_r(0, 0x92, offset);
+	return rom_r(Chip, 0x92, offset);
 }
 
+template<int Chip>
 READ8_MEMBER(vgmplay_device::ga20_rom_r)
 {
-	return rom_r(0, 0x93, offset);
+	return rom_r(Chip, 0x93, offset);
 }
 
 vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -1383,15 +1577,24 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_vgmplay(*this, "vgmplay")
 	, m_lspeaker(*this, "lspeaker")
 	, m_rspeaker(*this, "rspeaker")
-	, m_ym2612(*this, "ym2612")
-	, m_ym2151(*this, "ym2151")
-	, m_ym2413(*this, "ym2413")
-	, m_ym2203(*this, "ym2203%c", 'a')
-	, m_ym3526(*this, "ym3526")
-	, m_ym3812(*this, "ym3812")
-	, m_ay8910(*this, "ay8910%c", 'a')
-	, m_sn76496(*this, "sn76496")
+	, m_sn76496(*this, "sn76496.%d", 0)
+	, m_ym2413(*this, "ym2413.%d", 0)
+	, m_ym2612(*this, "ym2612.%d", 0)
+	, m_ym2151(*this, "ym2151.%d", 0)
 	, m_segapcm(*this, "segapcm")
+	, m_rf5c68(*this, "rf5c68")
+	, m_rf5c68_ram(*this, "rf5c68_ram")
+	, m_ym2203(*this, "ym2203.%d", 0)
+	, m_ym2608(*this, "ym2608.%d", 0)
+	, m_ym2610(*this, "ym2610.%d", 0)
+	, m_ym3812(*this, "ym3812.%d", 0)
+	, m_ym3526(*this, "ym3526.%d", 0)
+	, m_y8950(*this, "y8950.%d", 0)
+	, m_ymf262(*this, "ymf262.%d", 0)
+	, m_ymf278b(*this, "ymf278b.%d", 0)
+	, m_ymf271(*this, "ymf271.%d", 0)
+	, m_ymz280b(*this, "ymz280b.%d", 0)
+	, m_ay8910(*this, "ay8910%c", 'a')
 	, m_multipcm(*this, "multipcm%c", 'a')
 	, m_dmg(*this, "dmg")
 	, m_nescpu(*this, "nescpu")
@@ -1403,16 +1606,10 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_pokey(*this, "pokey%c", 'a')
 	, m_c352(*this, "c352")
 	, m_okim6295(*this, "okim6295%c", 'a')
-	, m_ymf271(*this, "ymf271")
-	, m_ymz280b(*this, "ymz280b")
-	, m_ym2608(*this, "ym2608")
-	, m_ym2610(*this, "ym2610")
 	, m_qsound(*this, "qsound")
 	, m_k051649(*this, "k051649")
 	, m_ga20(*this, "ga20")
-	, m_rf5c68(*this, "rf5c68")
 	, m_rf5c164(*this, "rf5c164")
-	, m_rf5c68_ram(*this, "rf5c68_ram")
 	, m_rf5c164_ram(*this, "rf5c164_ram")
 	, m_x1_010(*this, "x1_010")
 {
@@ -1515,27 +1712,29 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		float volume = powf(2.0f, float(volbyte) / float(0x20));
 
 		// Parse clocks
-		m_sn76496->set_unscaled_clock(r32(0x0c) & ~0xc0000000);
-		m_sn76496->set_output_gain(ALL_OUTPUTS, (r32(0x0c) & ~0xc0000000) ? volume : 0.0f);
-		if (r32(0x0c) & 0xc0000000)
-			logerror("Warning: file requests an unsupported %s\n", r32(0x0c) & 0x80000000 ? "T6W28" : "2nd SN76496");
+		m_sn76496[0]->set_unscaled_clock(r32(0x0c) & ~0xc0000000);
+		m_sn76496[1]->set_unscaled_clock(r32(0x0c) & 0x40000000 ? r32(0x0c) & ~0xc0000000 : 0);
+		m_sn76496[0]->set_output_gain(ALL_OUTPUTS, (r32(0x0c) & ~0xc0000000) ? volume : 0.0f);
+		m_sn76496[1]->set_output_gain(ALL_OUTPUTS, (r32(0x0c) & 0x40000000) ? volume : 0.0f);
+		if (r32(0x0c) & 0x80000000)
+			logerror("Warning: file requests an unsupported T6W28");
 
-		m_ym2413->set_unscaled_clock(r32(0x10) & ~0x40000000);
-		m_ym2413->set_output_gain(ALL_OUTPUTS, (r32(0x10) & ~0x40000000) ? volume : 0.0f);
-		if (r32(0x10) & 0x40000000)
-			logerror("Warning: file requests an unsupported 2nd YM2413\n");
+		m_ym2413[0]->set_unscaled_clock(r32(0x10) & ~0x40000000);
+		m_ym2413[1]->set_unscaled_clock(r32(0x10) & 0x40000000 ? r32(0x10) & ~0x40000000 : 0);
+		m_ym2413[0]->set_output_gain(ALL_OUTPUTS, (r32(0x10) & ~0x40000000) ? volume : 0.0f);
+		m_ym2413[1]->set_output_gain(ALL_OUTPUTS, (r32(0x10) & 0x40000000) ? volume : 0.0f);
 
-		m_ym2612->set_unscaled_clock((version >= 0x110 ? r32(0x2c) : r32(0x10)) & ~0xc0000000);
-		m_ym2612->set_output_gain(ALL_OUTPUTS, ((version >= 0x110 ? r32(0x2c) : r32(0x10)) & ~0xc0000000) ? volume : 0.0f);
+		m_ym2612[0]->set_unscaled_clock((version >= 0x110 ? r32(0x2c) : r32(0x10)) & ~0xc0000000);
+		m_ym2612[1]->set_unscaled_clock((version >= 0x110 ? r32(0x2c) : r32(0x10)) & 0x40000000 ? (version >= 0x110 ? r32(0x2c) : r32(0x10)) & ~0xc0000000 : 0);
+		m_ym2612[0]->set_output_gain(ALL_OUTPUTS, ((version >= 0x110 ? r32(0x2c) : r32(0x10)) & ~0xc0000000) ? volume : 0.0f);
+		m_ym2612[1]->set_output_gain(ALL_OUTPUTS, ((version >= 0x110 ? r32(0x2c) : r32(0x10)) & 0x40000000) ? volume : 0.0f);
 		if (version >= 0x110 && (r32(0x2c) & 0x80000000))
 			logerror("Warning: file requests an unsupported YM3438\n");
-		if (version >= 0x110 && (r32(0x2c) & 0x40000000))
-			logerror("Warning: file requests an unsupported 2nd YM2612\n");
 
-		m_ym2151->set_unscaled_clock((version >= 0x110 ? r32(0x30) : r32(0x10)) & ~0x40000000);
-		m_ym2151->set_output_gain(ALL_OUTPUTS, ((version >= 0x110 ? r32(0x30) : r32(0x10)) & ~0x40000000) ? volume : 0.0f);
-		if (version >= 0x110 && (r32(0x30) & 0x40000000))
-			logerror("Warning: file requests an unsupported 2nd YM2151\n");
+		m_ym2151[0]->set_unscaled_clock((version >= 0x110 ? r32(0x30) : r32(0x10)) & ~0x40000000);
+		m_ym2151[1]->set_unscaled_clock((version >= 0x110 ? r32(0x30) : r32(0x10)) & 0x40000000 ? (version >= 0x110 ? r32(0x30) : r32(0x10)) & ~0x40000000 : 0);
+		m_ym2151[0]->set_output_gain(ALL_OUTPUTS, ((version >= 0x110 ? r32(0x30) : r32(0x10)) & ~0x40000000) ? volume : 0.0f);
+		m_ym2151[1]->set_output_gain(ALL_OUTPUTS, ((version >= 0x110 ? r32(0x30) : r32(0x10)) & 0x40000000) ? volume : 0.0f);
 
 		m_segapcm->set_unscaled_clock(version >= 0x151 && data_start >= 0x3c ? r32(0x38) : 0);
 		m_segapcm->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x3c && r32(0x38) ? volume : 0.0f);
@@ -1546,28 +1745,22 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 	
 		m_ym2203[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x48 ? r32(0x44) & ~0x40000000 : 0);
 		m_ym2203[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x48 && (r32(0x44) & 0x40000000) ? r32(0x44) & ~0x40000000 : 0);
-		m_ym2203[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x48 && (r32(0x44) & ~0x40000000) ? volume : 0.0f);
-		m_ym2203[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x48 && (r32(0x44) & 0x40000000) ? volume : 0.0f);
-	
+<<<<<<< HEAD
 		m_ym2608->set_unscaled_clock(version >= 0x151 && data_start >= 0x4c ? r32(0x48) & ~0x40000000 : 0);
-		m_ym2608->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x4c && (r32(0x48) & ~0x40000000) ? volume : 0.0f);
 		if (version >= 0x151 && data_start >= 0x4c && (r32(0x48) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd YM2608\n");
 
 		m_ym2610->set_unscaled_clock(version >= 0x151 && data_start >= 0x50 ? r32(0x4c) & ~0xc0000000 : 0);
-		m_ym2610->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x50 && (r32(0x4c) & ~0xc0000000) ? volume : 0.0f);
 		if (version >= 0x151 && data_start >= 0x50 && (r32(0x4c) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd YM2610\n");
 		if (version >= 0x151 && data_start >= 0x50 && (r32(0x4c) & 0x80000000))
 			logerror("Warning: file requests an unsupported YM2610B\n");
 
 		m_ym3812->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 ? r32(0x50) & ~0x40000000 : 0);
-		m_ym3812->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x54 && (r32(0x50) & ~0x40000000) ? volume : 0.0f);
 		if (version >= 0x151 && data_start >= 0x54 && (r32(0x50) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd YM3812\n");
 
 		m_ym3526->set_unscaled_clock(version >= 0x151 && data_start >= 0x58 ? r32(0x54) & ~0x40000000 : 0);
-		m_ym3526->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x58 && (r32(0x54) & ~0x40000000) ? volume : 0.0f);
 		if (version >= 0x151 && data_start >= 0x58 && (r32(0x54) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd YM3526\n");
 
@@ -1579,14 +1772,63 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 			logerror("Warning: file requests an unsupported YMF278B\n");
 
 		m_ymf271->set_unscaled_clock(version >= 0x151 && data_start >= 0x68 ? r32(0x64) & ~0x40000000 : 0);
-		m_ymf271->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x68 && (r32(0x64) & ~0x40000000) ? volume : 0.0f);
 		if (version >= 0x151 && data_start >= 0x68 && (r32(0x64) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd YMF271\n");
 
 		m_ymz280b->set_unscaled_clock(version >= 0x151 && data_start >= 0x6c ? r32(0x68) & ~0x40000000 : 0);
-		m_ymz280b->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x6c && (r32(0x68) & ~0x40000000) ? volume : 0.0f);
 		if (version >= 0x151 && data_start >= 0x6c && (r32(0x68) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd YMZ280B\n");
+=======
+		m_ym2203[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x48 && (r32(0x44) & ~0x40000000) ? volume : 0.0f);
+		m_ym2203[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x48 && (r32(0x44) & 0x40000000) ? volume : 0.0f);
+
+		m_ym2608[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x4c ? r32(0x48) & ~0x40000000 : 0);
+		m_ym2608[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x4c && r32(0x48) & 0x40000000 ? r32(0x48) & ~0x40000000 : 0);
+		m_ym2608[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x4c && (r32(0x48) & ~0x40000000) ? volume : 0.0f);
+		m_ym2608[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x4c && (r32(0x48) & 0x40000000) ? volume : 0.0f);
+
+		m_ym2610[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x50 ? r32(0x4c) & ~0xc0000000 : 0);
+		m_ym2610[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x50 && r32(0x4c) & 0x40000000 ? r32(0x4c) & ~0xc0000000 : 0);
+		m_ym2610[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x50 && (r32(0x4c) & ~0xc0000000) ? volume : 0.0f);
+		m_ym2610[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x50 && (r32(0x4c) & 0x40000000) ? volume : 0.0f);
+		if (version >= 0x151 && data_start >= 0x50 && (r32(0x4c) & 0x80000000))
+			logerror("Warning: file requests an unsupported YM2610B\n");
+
+		m_ym3812[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 ? r32(0x50) & ~0x40000000 : 0);
+		m_ym3812[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 && r32(0x50) & 0x40000000 ? r32(0x50) & ~0x40000000 : 0);
+		m_ym3812[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x54 && (r32(0x50) & ~0x40000000) ? volume : 0.0f);
+		m_ym3812[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x54 && (r32(0x50) & 0x40000000) ? volume : 0.0f);
+
+		m_ym3526[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x58 ? r32(0x54) & ~0x40000000 : 0);
+		m_ym3526[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x58 && r32(0x54) & 0x40000000 ? r32(0x54) & ~0x40000000 : 0);
+		m_ym3526[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x58 && (r32(0x54) & ~0x40000000) ? volume : 0.0f);
+		m_ym3526[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x58 && (r32(0x54) & 0x40000000) ? volume : 0.0f);
+
+		m_y8950[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x5c ? r32(0x58) & ~0x40000000 : 0);
+		m_y8950[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x5c && r32(0x58) & 0x40000000 ? r32(0x58) & ~0x40000000 : 0);
+		m_y8950[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x5c && (r32(0x58) & ~0x40000000) ? volume : 0.0f);
+		m_y8950[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x5c && (r32(0x58) & 0x40000000) ? volume : 0.0f);
+
+		m_ymf262[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x60 ? r32(0x5c) & ~0x40000000 : 0);
+		m_ymf262[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x60 && r32(0x5c) & 0x40000000 ? r32(0x5c) & ~0x40000000 : 0);
+		m_ymf262[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x60 && (r32(0x5c) & ~0x40000000) ? volume : 0.0f);
+		m_ymf262[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x60 && (r32(0x5c) & 0x40000000) ? volume : 0.0f);
+
+		m_ymf278b[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x64 ? r32(0x60) & ~0x40000000 : 0);
+		m_ymf278b[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x64 && r32(0x60) & 0x40000000 ? r32(0x60) & ~0x40000000 : 0);
+		m_ymf278b[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x64 && (r32(0x60) & ~0x40000000) ? volume : 0.0f);
+		m_ymf278b[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x64 && (r32(0x60) & 0x40000000) ? volume : 0.0f);
+
+		m_ymf271[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x68 ? r32(0x64) & ~0x40000000 : 0);
+		m_ymf271[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x68 && r32(0x64) & 0x40000000 ? r32(0x64) & ~0x40000000 : 0);
+		m_ymf271[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x68 && (r32(0x64) & ~0x40000000) ? volume : 0.0f);
+		m_ymf271[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x68 && (r32(0x64) & 0x40000000) ? volume : 0.0f);
+
+		m_ymz280b[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x6c ? r32(0x68) & ~0x40000000 : 0);
+		m_ymz280b[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x6c && r32(0x68) & 0x40000000 ? r32(0x68) & ~0x40000000 : 0);
+		m_ymz280b[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x6c && (r32(0x68) & ~0x40000000) ? volume : 0.0f);
+		m_ymz280b[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x6c && (r32(0x68) & 0x40000000) ? volume : 0.0f);
+>>>>>>> d14c601a767ff8240a93270dcb18211d773f8e30
 
 		m_rf5c164->set_unscaled_clock(version >= 0x151 && data_start >= 0x70 ? r32(0x6c) : 0);
 		m_rf5c164->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x70 && r32(0x6c) ? volume : 0.0f);
@@ -1604,7 +1846,8 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_ay8910[1]->set_flags(vgm_ay8910_flags(version >= 0x151 && data_start >= 0x7a ? r8(0x79) : 0));
 		m_ym2203[0]->set_flags(vgm_ay8910_flags(version >= 0x151 && data_start >= 0x7b ? r8(0x7a) : 0));
 		m_ym2203[1]->set_flags(vgm_ay8910_flags(version >= 0x151 && data_start >= 0x7b ? r8(0x7a) : 0));
-		m_ym2608->set_flags(vgm_ay8910_flags(version >= 0x151 && data_start >= 0x7c ? r8(0x7b) : 0));
+		m_ym2608[0]->set_flags(vgm_ay8910_flags(version >= 0x151 && data_start >= 0x7c ? r8(0x7b) : 0));
+		m_ym2608[1]->set_flags(vgm_ay8910_flags(version >= 0x151 && data_start >= 0x7c ? r8(0x7b) : 0));
 
 		m_dmg->set_unscaled_clock(version >= 0x161 && data_start >= 0x84 ? r32(0x80) & ~0x40000000 : 0);
 		m_dmg->set_output_gain(ALL_OUTPUTS, version >= 0x161 && data_start >= 0x84 && (r32(0x80) & ~0x40000000) ? volume : 0.0f);
@@ -1676,17 +1919,21 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_qsound->set_unscaled_clock(version >= 0x161 && data_start >= 0xb8 ? r32(0xb4) : 0);
 		m_qsound->set_output_gain(ALL_OUTPUTS, version >= 0x161 && data_start >= 0xb8 && r32(0xb4) ? volume : 0.0f);
 
-		if (version >= 0x151 && data_start >= 0xbc && r32(0xb8))
+		if (version >= 0x171 && data_start >= 0xbc && r32(0xb8))
 			logerror("Warning: file requests an unsupported SCSP\n");
-		if (version >= 0x151 && data_start >= 0xc4 && r32(0xc0))
+
+		if (version >= 0x170 && data_start >= 0xc0 && r32(0xbc))
+			logerror("Warning: file requests an unsupported Extra Header\n");
+
+		if (version >= 0x171 && data_start >= 0xc4 && r32(0xc0))
 			logerror("Warning: file requests an unsupported WonderSwan\n");
-		if (version >= 0x151 && data_start >= 0xc8 && r32(0xc4))
+		if (version >= 0x171 && data_start >= 0xc8 && r32(0xc4))
 			logerror("Warning: file requests an unsupported VSU\n");
-		if (version >= 0x151 && data_start >= 0xcc && r32(0xc8))
+		if (version >= 0x171 && data_start >= 0xcc && r32(0xc8))
 			logerror("Warning: file requests an unsupported SAA1099\n");
-		if (version >= 0x151 && data_start >= 0xd0 && r32(0xcc))
+		if (version >= 0x171 && data_start >= 0xd0 && r32(0xcc))
 			logerror("Warning: file requests an unsupported ES5503\n");
-		if (version >= 0x151 && data_start >= 0xd4 && r32(0xd0))
+		if (version >= 0x171 && data_start >= 0xd4 && r32(0xd0))
 			logerror("Warning: file requests an unsupported %s\n", r32(0xd0) & 0x80000000 ? "ES5506" : "ES5505");
 
 		m_c352->set_divider(version >= 0x171 && data_start >= 0xd7 && r8(0xd6) ? r8(0xd6) * 4 : 1);
@@ -1871,20 +2118,44 @@ void vgmplay_state::soundchips16_map(address_map &map)
 
 void vgmplay_state::soundchips_map(address_map &map)
 {
-	map(vgmplay_device::REG_SIZE, vgmplay_device::REG_SIZE+3).r(FUNC(vgmplay_state::file_size_r));
-	map(vgmplay_device::A_YM2612, vgmplay_device::A_YM2612+3).w(m_ym2612, FUNC(ym2612_device::write));
-	map(vgmplay_device::A_YM2151, vgmplay_device::A_YM2151+1).w(m_ym2151, FUNC(ym2151_device::write));
-	map(vgmplay_device::A_YM2413, vgmplay_device::A_YM2413+1).w(m_ym2413, FUNC(ym2413_device::write));
-	map(vgmplay_device::A_YM2203A, vgmplay_device::A_YM2203A+1).w("ym2203a", FUNC(ym2203_device::write));
-	map(vgmplay_device::A_YM2203B, vgmplay_device::A_YM2203B+1).w("ym2203b", FUNC(ym2203_device::write));
-	map(vgmplay_device::A_YM3526, vgmplay_device::A_YM3526+1).w(m_ym3526, FUNC(ym3526_device::write));
-	map(vgmplay_device::A_YM3812, vgmplay_device::A_YM3812+1).w(m_ym3812, FUNC(ym3812_device::write));
+	map(vgmplay_device::REG_SIZE, vgmplay_device::REG_SIZE + 3).r(FUNC(vgmplay_state::file_size_r));
+	map(vgmplay_device::A_SN76496_0 + 0, vgmplay_device::A_SN76496_0 + 0).w(m_sn76496[0], FUNC(sn76496_device::command_w));
+//  map(vgmplay_device::A_SN76496_0 + 1, vgmplay_device::A_SN76496_0 + 1).w(m_sn76496[0], FUNC(sn76496_device::stereo_w)); // TODO: GG stereo
+	map(vgmplay_device::A_SN76496_1 + 0, vgmplay_device::A_SN76496_1 + 0).w(m_sn76496[1], FUNC(sn76496_device::command_w));
+//  map(vgmplay_device::A_SN76496_1 + 1, vgmplay_device::A_SN76496_1 + 1).w(m_sn76496[1], FUNC(sn76496_device::stereo_w)); // TODO: GG stereo
+	map(vgmplay_device::A_YM2413_0, vgmplay_device::A_YM2413_0 + 1).w(m_ym2413[0], FUNC(ym2413_device::write));
+	map(vgmplay_device::A_YM2413_1, vgmplay_device::A_YM2413_1 + 1).w(m_ym2413[1], FUNC(ym2413_device::write));
+	map(vgmplay_device::A_YM2612_0, vgmplay_device::A_YM2612_0 + 3).w(m_ym2612[0], FUNC(ym2612_device::write));
+	map(vgmplay_device::A_YM2612_1, vgmplay_device::A_YM2612_1 + 3).w(m_ym2612[1], FUNC(ym2612_device::write));
+	map(vgmplay_device::A_YM2151_0, vgmplay_device::A_YM2151_0 + 1).w(m_ym2151[0], FUNC(ym2151_device::write));
+	map(vgmplay_device::A_YM2151_1, vgmplay_device::A_YM2151_1 + 1).w(m_ym2151[1], FUNC(ym2151_device::write));
+	map(vgmplay_device::A_SEGAPCM, vgmplay_device::A_SEGAPCM + 0x7ff).w(m_segapcm, FUNC(segapcm_device::sega_pcm_w));
+	map(vgmplay_device::A_RF5C68, vgmplay_device::A_RF5C68 + 0xf).w(m_rf5c68, FUNC(rf5c68_device::rf5c68_w));
+	map(vgmplay_device::A_RF5C68RAM, vgmplay_device::A_RF5C68RAM + 0xffff).w(m_rf5c68, FUNC(rf5c68_device::rf5c68_mem_w));
+	map(vgmplay_device::A_YM2203_0, vgmplay_device::A_YM2203_0 + 1).w(m_ym2203[0], FUNC(ym2203_device::write));
+	map(vgmplay_device::A_YM2203_1, vgmplay_device::A_YM2203_1 + 1).w(m_ym2203[1], FUNC(ym2203_device::write));
+	map(vgmplay_device::A_YM2608_0, vgmplay_device::A_YM2608_0 + 0x3).w(m_ym2608[0], FUNC(ym2608_device::write));
+	map(vgmplay_device::A_YM2608_1, vgmplay_device::A_YM2608_1 + 0x3).w(m_ym2608[1], FUNC(ym2608_device::write));
+	map(vgmplay_device::A_YM2610_0, vgmplay_device::A_YM2610_0 + 0x3).w(m_ym2610[0], FUNC(ym2610_device::write));
+	map(vgmplay_device::A_YM2610_1, vgmplay_device::A_YM2610_1 + 0x3).w(m_ym2610[1], FUNC(ym2610_device::write));
+	map(vgmplay_device::A_YM3812_0, vgmplay_device::A_YM3812_0 + 1).w(m_ym3812[0], FUNC(ym3812_device::write));
+	map(vgmplay_device::A_YM3812_1, vgmplay_device::A_YM3812_1 + 1).w(m_ym3812[1], FUNC(ym3812_device::write));
+	map(vgmplay_device::A_YM3526_0, vgmplay_device::A_YM3526_0 + 1).w(m_ym3526[0], FUNC(ym3526_device::write));
+	map(vgmplay_device::A_YM3526_1, vgmplay_device::A_YM3526_1 + 1).w(m_ym3526[1], FUNC(ym3526_device::write));
+	map(vgmplay_device::A_Y8950_0, vgmplay_device::A_Y8950_0 + 1).w(m_y8950[0], FUNC(y8950_device::write));
+	map(vgmplay_device::A_Y8950_1, vgmplay_device::A_Y8950_1 + 1).w(m_y8950[1], FUNC(y8950_device::write));
+	map(vgmplay_device::A_YMF262_0, vgmplay_device::A_YMF262_0 + 1).w(m_ymf262[0], FUNC(ymf262_device::write));
+	map(vgmplay_device::A_YMF262_1, vgmplay_device::A_YMF262_1 + 1).w(m_ymf262[1], FUNC(ymf262_device::write));
+	map(vgmplay_device::A_YMF278B_0, vgmplay_device::A_YMF278B_0 + 0xf).w(m_ymf278b[0], FUNC(ymf278b_device::write));
+	map(vgmplay_device::A_YMF278B_1, vgmplay_device::A_YMF278B_1 + 0xf).w(m_ymf278b[1], FUNC(ymf278b_device::write));
+	map(vgmplay_device::A_YMF271_0, vgmplay_device::A_YMF271_0 + 0xf).w(m_ymf271[0], FUNC(ymf271_device::write));
+	map(vgmplay_device::A_YMF271_1, vgmplay_device::A_YMF271_1 + 0xf).w(m_ymf271[1], FUNC(ymf271_device::write));
+	map(vgmplay_device::A_YMZ280B_0, vgmplay_device::A_YMZ280B_0 + 0x1).w(m_ymz280b[0], FUNC(ymz280b_device::write));
+	map(vgmplay_device::A_YMZ280B_1, vgmplay_device::A_YMZ280B_1 + 0x1).w(m_ymz280b[1], FUNC(ymz280b_device::write));
 	map(vgmplay_device::A_AY8910A, vgmplay_device::A_AY8910A).w("ay8910a", FUNC(ay8910_device::data_w));
 	map(vgmplay_device::A_AY8910A+1, vgmplay_device::A_AY8910A+1).w("ay8910a", FUNC(ay8910_device::address_w));
 	map(vgmplay_device::A_AY8910B, vgmplay_device::A_AY8910B).w("ay8910b", FUNC(ay8910_device::data_w));
 	map(vgmplay_device::A_AY8910B+1, vgmplay_device::A_AY8910B+1).w("ay8910b", FUNC(ay8910_device::address_w));
-//  AM_RANGE(vgmplay_device::A_SN76496+0,      vgmplay_device::A_SN76496+0)      AM_DEVWRITE    ("sn76496",       sn76496_device, stereo_w)
-	map(vgmplay_device::A_SN76496+1, vgmplay_device::A_SN76496+1).w(m_sn76496, FUNC(sn76496_device::command_w));
 	map(vgmplay_device::A_K053260, vgmplay_device::A_K053260+0x2f).w(m_k053260, FUNC(k053260_device::write));
 	map(vgmplay_device::A_C6280, vgmplay_device::A_C6280+0xf).w(m_c6280, FUNC(c6280_device::c6280_w));
 	map(vgmplay_device::A_OKIM6295A, vgmplay_device::A_OKIM6295A).w("okim6295a", FUNC(okim6295_device::write));
@@ -1899,7 +2170,6 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_OKIM6295B+0xe, vgmplay_device::A_OKIM6295B+0xe).w("vgmplay", FUNC(vgmplay_device::okim6295_nmk112_enable_w<1>));
 	map(vgmplay_device::A_OKIM6295B+0xf, vgmplay_device::A_OKIM6295B+0xf).w("vgmplay", FUNC(vgmplay_device::okim6295_bank_w<1>));
 	map(vgmplay_device::A_OKIM6295B+0x10, vgmplay_device::A_OKIM6295B+0x13).w("vgmplay", FUNC(vgmplay_device::okim6295_nmk112_bank_w<1>));
-	map(vgmplay_device::A_SEGAPCM, vgmplay_device::A_SEGAPCM+0x7ff).w(m_segapcm, FUNC(segapcm_device::sega_pcm_w));
 	map(vgmplay_device::A_GAMEBOY, vgmplay_device::A_GAMEBOY+0x16).w(m_dmg, FUNC(gameboy_sound_device::sound_w));
 	map(vgmplay_device::A_GAMEBOY+0x20, vgmplay_device::A_GAMEBOY+0x2f).w(m_dmg, FUNC(gameboy_sound_device::wave_w));
 	map(vgmplay_device::A_NESAPU, vgmplay_device::A_NESAPU+0x1f).w("nescpu:nesapu", FUNC(nesapu_device::write));
@@ -1912,112 +2182,113 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_MULTIPCMB+8, vgmplay_device::A_MULTIPCMB+11).w("vgmplay", FUNC(vgmplay_device::multipcm_bank_lo_w<1>));
 	map(vgmplay_device::A_POKEYA, vgmplay_device::A_POKEYA+0xf).w("pokeya", FUNC(pokey_device::write));
 	map(vgmplay_device::A_POKEYB, vgmplay_device::A_POKEYB+0xf).w("pokeyb", FUNC(pokey_device::write));
-	map(vgmplay_device::A_YMF271, vgmplay_device::A_YMF271+0xf).w(m_ymf271, FUNC(ymf271_device::write));
-	map(vgmplay_device::A_YMZ280B, vgmplay_device::A_YMZ280B+0x1).w(m_ymz280b, FUNC(ymz280b_device::write));
-	map(vgmplay_device::A_YM2608, vgmplay_device::A_YM2608+0x3).w(m_ym2608, FUNC(ym2608_device::write));
-	map(vgmplay_device::A_YM2610, vgmplay_device::A_YM2610+0x3).w(m_ym2610, FUNC(ym2610_device::write));
 	map(vgmplay_device::A_K054539A, vgmplay_device::A_K054539A+0x22f).w("k054539a", FUNC(k054539_device::write));
 	map(vgmplay_device::A_K054539B, vgmplay_device::A_K054539B+0x22f).w("k054539b", FUNC(k054539_device::write));
 	map(vgmplay_device::A_QSOUND, vgmplay_device::A_QSOUND+0x2).w(m_qsound, FUNC(qsound_device::qsound_w));
 	map(vgmplay_device::A_K051649, vgmplay_device::A_K051649+0xf).w(FUNC(vgmplay_state::scc_w));
 	map(vgmplay_device::A_GA20, vgmplay_device::A_GA20+0x1f).w(m_ga20, FUNC(iremga20_device::irem_ga20_w));
-	map(vgmplay_device::A_RF5C68, vgmplay_device::A_RF5C68+0xf).w(m_rf5c68, FUNC(rf5c68_device::rf5c68_w));
 	map(vgmplay_device::A_RF5C164, vgmplay_device::A_RF5C164+0xf).w(m_rf5c164, FUNC(rf5c68_device::rf5c68_w));
-	map(vgmplay_device::A_RF5C68RAM, vgmplay_device::A_RF5C68RAM+0xffff).w(m_rf5c68, FUNC(rf5c68_device::rf5c68_mem_w));
 	map(vgmplay_device::A_RF5C164RAM, vgmplay_device::A_RF5C164RAM+0xffff).w(m_rf5c164, FUNC(rf5c68_device::rf5c68_mem_w));
 	map(vgmplay_device::A_X1_010, vgmplay_device::A_X1_010+0x1fff).w(m_x1_010, FUNC(x1_010_device::write));
 }
 
+template<int Chip>
 void vgmplay_state::segapcm_map(address_map &map)
 {
-	map(0, 0x1fffff).r("vgmplay", FUNC(vgmplay_device::segapcm_rom_r));
+	map(0, 0x1fffff).r("vgmplay", FUNC(vgmplay_device::segapcm_rom_r<Chip>));
 }
 
-void vgmplay_state::multipcma_map(address_map &map)
+template<int Chip>
+void vgmplay_state::ymf278b_map(address_map &map)
 {
-	map(0, 0x3fffff).r("vgmplay", FUNC(vgmplay_device::multipcm_rom_r<0>));
+	map(0, 0x3fffff).r("vgmplay", FUNC(vgmplay_device::ymf278b_rom_r<Chip>));
 }
 
-void vgmplay_state::multipcmb_map(address_map &map)
-{
-	map(0, 0x3fffff).r("vgmplay", FUNC(vgmplay_device::multipcm_rom_r<1>));
-}
-
-void vgmplay_state::k053260_map(address_map &map)
-{
-	map(0, 0x1fffff).r("vgmplay", FUNC(vgmplay_device::k053260_rom_r));
-}
-
-void vgmplay_state::okim6295a_map(address_map &map)
-{
-	map(0, 0x3ffff).r("vgmplay", FUNC(vgmplay_device::okim6295_rom_r<0>));
-}
-
-void vgmplay_state::okim6295b_map(address_map &map)
-{
-	map(0, 0x3ffff).r("vgmplay", FUNC(vgmplay_device::okim6295_rom_r<1>));
-}
-
-void vgmplay_state::k054539a_map(address_map &map)
-{
-	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::k054539_rom_r<0>));
-}
-
-void vgmplay_state::k054539b_map(address_map &map)
-{
-	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::k054539_rom_r<1>));
-}
-
-void vgmplay_state::c352_map(address_map &map)
-{
-	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::c352_rom_r));
-}
-
-void vgmplay_state::qsound_map(address_map &map)
-{
-	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::qsound_rom_r));
-}
-
+template<int Chip>
 void vgmplay_state::ymf271_map(address_map &map)
 {
-	map(0, 0x7fffff).r("vgmplay", FUNC(vgmplay_device::ymf271_rom_r));
+	map(0, 0x7fffff).r("vgmplay", FUNC(vgmplay_device::ymf271_rom_r<Chip>));
 }
 
+template<int Chip>
 void vgmplay_state::ymz280b_map(address_map &map)
 {
-	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::ymz280b_rom_r));
+	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::ymz280b_rom_r<Chip>));
 }
 
+template<int Chip>
+void vgmplay_state::multipcm_map(address_map &map)
+{
+	map(0, 0x3fffff).r("vgmplay", FUNC(vgmplay_device::multipcm_rom_r<Chip>));
+}
+
+template<int Chip>
+void vgmplay_state::k053260_map(address_map &map)
+{
+	map(0, 0x1fffff).r("vgmplay", FUNC(vgmplay_device::k053260_rom_r<Chip>));
+}
+
+template<int Chip>
+void vgmplay_state::okim6295_map(address_map &map)
+{
+	map(0, 0x3ffff).r("vgmplay", FUNC(vgmplay_device::okim6295_rom_r<Chip>));
+}
+
+template<int Chip>
+void vgmplay_state::k054539_map(address_map &map)
+{
+	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::k054539_rom_r<Chip>));
+}
+
+template<int Chip>
+void vgmplay_state::c352_map(address_map &map)
+{
+	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::c352_rom_r<Chip>));
+}
+
+template<int Chip>
+void vgmplay_state::qsound_map(address_map &map)
+{
+	map(0, 0xffffff).r("vgmplay", FUNC(vgmplay_device::qsound_rom_r<Chip>));
+}
+
+template<int Chip>
 void vgmplay_state::ga20_map(address_map &map)
 {
-	map(0, 0xfffff).r("vgmplay", FUNC(vgmplay_device::ga20_rom_r));
+	map(0, 0xfffff).r("vgmplay", FUNC(vgmplay_device::ga20_rom_r<Chip>));
 }
 
+template<int Chip>
 void vgmplay_state::x1_010_map(address_map &map)
 {
-	map(0, 0xfffff).r("vgmplay", FUNC(vgmplay_device::x1_010_rom_r));
+	map(0, 0xfffff).r("vgmplay", FUNC(vgmplay_device::x1_010_rom_r<Chip>));
 }
 
+template<int Chip>
 void vgmplay_state::nescpu_map(address_map &map)
 {
 	map(0, 0xffff).ram().share("nesapu_ram");
 }
 
+template<int Chip>
 void vgmplay_state::rf5c68_map(address_map &map)
 {
 	map(0, 0xffff).ram().share("rf5c68_ram");
 }
 
+template<int Chip>
 void vgmplay_state::rf5c164_map(address_map &map)
 {
 	map(0, 0xffff).ram().share("rf5c164_ram");
 }
 
+template<int Chip>
 void vgmplay_state::h6280_map(address_map &map)
 {
 	map(0, 0xffff).noprw();
 }
 
+template<int Chip>
 void vgmplay_state::h6280_io_map(address_map &map)
 {
 	map(0, 3).noprw();
@@ -2039,35 +2310,146 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ym2612", YM2612, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+	SN76496(config, m_sn76496[0], 0);
+	m_sn76496[0]->add_route(0, "lspeaker", 0.5);
+	m_sn76496[0]->add_route(0, "rspeaker", 0.5);
 
-	MCFG_DEVICE_ADD("ym2151", YM2151, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+	SN76496(config, m_sn76496[1], 0);
+	m_sn76496[1]->add_route(0, "lspeaker", 0.5);
+	m_sn76496[1]->add_route(0, "rspeaker", 0.5);
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
+	YM2413(config, m_ym2413[0], 0);
+	m_ym2413[0]->add_route(ALL_OUTPUTS, "lspeaker", 1);
+	m_ym2413[0]->add_route(ALL_OUTPUTS, "rspeaker", 1);
 
-	MCFG_DEVICE_ADD("sn76496", SN76496, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.5)
+	YM2413(config, m_ym2413[1], 0);
+	m_ym2413[1]->add_route(0, "lspeaker", 1);
+	m_ym2413[1]->add_route(1, "rspeaker", 1);
+
+	YM2612(config, m_ym2612[0], 0);
+	m_ym2612[0]->add_route(0, "lspeaker", 1);
+	m_ym2612[0]->add_route(1, "rspeaker", 1);
+
+	YM2612(config, m_ym2612[1], 0);
+	m_ym2612[1]->add_route(0, "lspeaker", 1);
+	m_ym2612[1]->add_route(1, "rspeaker", 1);
+
+	YM2151(config, m_ym2151[0], 0);
+	m_ym2151[0]->add_route(0, "lspeaker", 1);
+	m_ym2151[0]->add_route(1, "rspeaker", 1);
+
+	YM2151(config, m_ym2151[1], 0);
+	m_ym2151[1]->add_route(0, "lspeaker", 1);
+	m_ym2151[1]->add_route(1, "rspeaker", 1);
 
 	MCFG_DEVICE_ADD("segapcm", SEGAPCM, 0)
 	MCFG_SEGAPCM_BANK(BANK_512) // Should be configurable for yboard...
-	MCFG_DEVICE_ADDRESS_MAP(0, segapcm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, segapcm_map<0>)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
+	RF5C68(config, m_rf5c68, 0);
+	m_rf5c68->set_addrmap(0, &vgmplay_state::rf5c68_map<0>);
+	m_rf5c68->add_route(0, "lspeaker", 1);
+	m_rf5c68->add_route(1, "rspeaker", 1);
+
+	YM2203(config, m_ym2203[0], 0);
+	m_ym2203[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_ym2203[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+
+	YM2203(config, m_ym2203[1], 0);
+	m_ym2203[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_ym2203[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+
+	YM2608(config, m_ym2608[0], 0);
+	m_ym2608[0]->add_route(ALL_OUTPUTS, "lspeaker", 1);
+	m_ym2608[0]->add_route(ALL_OUTPUTS, "rspeaker", 1);
+
+	YM2608(config, m_ym2608[1], 0);
+	m_ym2608[1]->add_route(ALL_OUTPUTS, "lspeaker", 1);
+	m_ym2608[1]->add_route(ALL_OUTPUTS, "rspeaker", 1);
+
+	YM2610(config, m_ym2610[0], 0);
+	m_ym2610[0]->add_route(0, "lspeaker", 0.25);
+	m_ym2610[0]->add_route(0, "rspeaker", 0.25);
+	m_ym2610[0]->add_route(1, "lspeaker", 0.50);
+	m_ym2610[0]->add_route(2, "rspeaker", 0.50);
+
+	YM2610(config, m_ym2610[1], 0);
+	m_ym2610[1]->add_route(0, "lspeaker", 0.25);
+	m_ym2610[1]->add_route(0, "rspeaker", 0.25);
+	m_ym2610[1]->add_route(1, "lspeaker", 0.50);
+	m_ym2610[1]->add_route(2, "rspeaker", 0.50);
+
+	YM3812(config, m_ym3812[0], 0);
+	m_ym3812[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_ym3812[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+
+	YM3812(config, m_ym3812[1], 0);
+	m_ym3812[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_ym3812[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+
+	YM3526(config, m_ym3526[0], 0);
+	m_ym3526[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_ym3526[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+
+	YM3526(config, m_ym3526[1], 0);
+	m_ym3526[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_ym3526[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+
+	Y8950(config, m_y8950[0], 0);
+	m_y8950[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
+	m_y8950[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+
+	Y8950(config, m_y8950[1], 0);
+	m_y8950[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
+	m_y8950[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+
+	YMF262(config, m_ymf262[0], 0);
+	m_ymf262[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
+	m_ymf262[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+
+	YMF262(config, m_ymf262[1], 0);
+	m_ymf262[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
+	m_ymf262[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+
+	YMF278B(config, m_ymf278b[0], 0);
+	m_ymf278b[0]->set_addrmap(0, &vgmplay_state::ymf278b_map<0>);
+	m_ymf278b[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_ymf278b[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+
+	YMF278B(config, m_ymf278b[1], 0);
+	m_ymf278b[1]->set_addrmap(0, &vgmplay_state::ymf278b_map<1>);
+	m_ymf278b[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_ymf278b[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+
+	YMF271(config, m_ymf271[0], 0);
+	m_ymf271[0]->set_addrmap(0, &vgmplay_state::ymf271_map<0>);
+	m_ymf271[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_ymf271[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+
+	YMF271(config, m_ymf271[1], 0);
+	m_ymf271[1]->set_addrmap(0, &vgmplay_state::ymf271_map<0>);
+	m_ymf271[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_ymf271[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+
+	YMZ280B(config, m_ymz280b[0], 0);
+	m_ymz280b[0]->set_addrmap(0, &vgmplay_state::ymz280b_map<0>);
+	m_ymz280b[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_ymz280b[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+
+	YMZ280B(config, m_ymz280b[1], 0);
+	m_ymz280b[1]->set_addrmap(0, &vgmplay_state::ymz280b_map<1>);
+	m_ymz280b[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_ymz280b[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+
 	MCFG_DEVICE_ADD("multipcma", MULTIPCM, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, multipcma_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, multipcm_map<0>)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_DEVICE_ADD("multipcmb", MULTIPCM, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, multipcmb_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, multipcm_map<1>)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
@@ -2083,24 +2465,8 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_DEVICE_ADD("ym2203a", YM2203, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-
-	MCFG_DEVICE_ADD("ym2203b", YM2203, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-
-	MCFG_DEVICE_ADD("ym3526", YM3526, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
-
-	MCFG_DEVICE_ADD("ym3812", YM3812, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-
 	MCFG_DEVICE_ADD("nescpu", N2A03, 0)
-	MCFG_DEVICE_PROGRAM_MAP(nescpu_map)
+	MCFG_DEVICE_PROGRAM_MAP(nescpu_map<0>)
 
 	MCFG_DEVICE_MODIFY("nescpu:nesapu")
 	MCFG_SOUND_ROUTES_RESET()
@@ -2108,8 +2474,8 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":rspeaker", 0.50)
 
 	MCFG_DEVICE_ADD("h6280", H6280, 1000000)
-	MCFG_DEVICE_PROGRAM_MAP(h6280_map)
-	MCFG_DEVICE_IO_MAP(h6280_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(h6280_map<0>)
+	MCFG_DEVICE_IO_MAP(h6280_io_map<0>)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_ADD("c6280", C6280, 0)
@@ -2118,7 +2484,7 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_K053260_ADD("k053260", 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, k053260_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, k053260_map<0>)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
@@ -2131,54 +2497,32 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
 	MCFG_DEVICE_ADD("c352", C352, 0, 1)
-	MCFG_DEVICE_ADDRESS_MAP(0, c352_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, c352_map<0>)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_DEVICE_ADD("okim6295a", OKIM6295, 0, okim6295_device::PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(0, okim6295a_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, okim6295_map<0>)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
 	MCFG_DEVICE_ADD("okim6295b", OKIM6295, 0, okim6295_device::PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(0, okim6295b_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, okim6295_map<1>)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_DEVICE_ADD("ymf271", YMF271, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, ymf271_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
-
-	MCFG_DEVICE_ADD("ymz280b", YMZ280B, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, ymz280b_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
-
-	MCFG_DEVICE_ADD("ym2608", YM2608, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.50)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
-
-	MCFG_DEVICE_ADD("ym2610", YM2610, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.50)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
-
 	MCFG_DEVICE_ADD("k054539a", K054539, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, k054539a_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map<0>)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_DEVICE_ADD("k054539b", K054539, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, k054539b_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map<0>)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_DEVICE_ADD("qsound", QSOUND, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, qsound_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, qsound_map<0>)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
@@ -2187,29 +2531,28 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
 	IREMGA20(config, m_ga20, 0);
-	m_ga20->set_addrmap(0, &vgmplay_state::ga20_map);
+	m_ga20->set_addrmap(0, &vgmplay_state::ga20_map<0>);
 	m_ga20->add_route(0, "lspeaker", 1);
 	m_ga20->add_route(1, "rspeaker", 1);
 
-	RF5C68(config, m_rf5c68, 0);
-	m_rf5c68->set_addrmap(0, &vgmplay_state::rf5c68_map);
-	m_rf5c68->add_route(0, "lspeaker", 1);
-	m_rf5c68->add_route(1, "rspeaker", 1);
-
 	RF5C68(config, m_rf5c164, 0); // TODO : !!RF5C164!!
-	m_rf5c164->set_addrmap(0, &vgmplay_state::rf5c164_map);
+	m_rf5c164->set_addrmap(0, &vgmplay_state::rf5c164_map<0>);
 	m_rf5c164->add_route(0, "lspeaker", 1);
 	m_rf5c164->add_route(1, "rspeaker", 1);
 
 	X1_010(config, m_x1_010, 0);
-	m_x1_010->set_addrmap(0, &vgmplay_state::x1_010_map);
+	m_x1_010->set_addrmap(0, &vgmplay_state::x1_010_map<0>);
 	m_x1_010->add_route(0, "lspeaker", 1);
 	m_x1_010->add_route(1, "rspeaker", 1);
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )
-	ROM_REGION( 0x80000, "ym2608", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "ym2610", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80000, "ym2608.0", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80000, "ym2608.1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80000, "ym2610.0", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80000, "ym2610.1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80000, "y8950.0", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80000, "y8950.1", ROMREGION_ERASE00 )
 ROM_END
 
 CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, empty_init, "MAME", "VGM player", MACHINE_CLICKABLE_ARTWORK )
