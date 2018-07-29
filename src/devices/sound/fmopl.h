@@ -92,6 +92,7 @@ void y8950_set_keyboard_handler(void *chip, OPL_PORTHANDLER_W KeyboardHandler_w,
 void y8950_set_delta_t_memory(void *chip, void * deltat_mem_ptr, int deltat_mem_size );
 
 void * y8950_init(device_t *device, uint32_t clock, uint32_t rate);
+void y8950_clock_changed(void *chip, uint32_t clock, uint32_t rate);
 void y8950_shutdown(void *chip);
 void y8950_reset_chip(void *chip);
 int  y8950_write(void *chip, int a, int v);
