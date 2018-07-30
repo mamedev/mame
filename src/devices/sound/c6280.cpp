@@ -253,7 +253,7 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 	}
 }
 
-DEFINE_DEVICE_TYPE(C6280, c6280_device, "c6280", "Hudson PSG")
+DEFINE_DEVICE_TYPE(C6280, c6280_device, "c6280", "Hudson Soft HuC6280 PSG")
 
 c6280_device::c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C6280, tag, owner, clock)
