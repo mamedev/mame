@@ -30,8 +30,8 @@
 class micro20_state : public driver_device
 {
 public:
-	micro20_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	micro20_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_rom(*this, "bootrom"),
 		m_mainram(*this, "mainram"),
