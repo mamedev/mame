@@ -1351,7 +1351,7 @@ static void OPL3_initalize(OPL3 *chip)
 	/* logerror("YMF262: freqbase=%f\n", chip->freqbase); */
 
 	/* Timer base time */
-	chip->TimerBase = attotime::from_hz(chip->clock) * (8*36);
+	chip->TimerBase = chip->clock ? attotime::from_hz(chip->clock) * (8 * 36) : attotime::zero;
 
 	/* make fnumber -> increment counter table */
 	for( i=0 ; i < 1024 ; i++ )

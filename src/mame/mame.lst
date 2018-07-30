@@ -12903,6 +12903,7 @@ fmtownssj                       // FM-Towns II SJ
 fmtownsux                       // 1991.11 FM-Towns II UX
 
 @source:fontwriter.cpp
+fw600                           // (c) Sharp
 fw700ger                        // (c) Sharp
 
 @source:foodf.cpp
@@ -15825,9 +15826,6 @@ jackie                          // (c) 1993 IGS
 
 @source:jackpool.cpp
 jackpool                        // (c) 1997 Electronic Projects
-
-@source:jade.cpp
-jgz80                           // Jade JGZ-80
 
 @source:jaguar.cpp
 a51mxr3k                        // ??           (c) 1998
@@ -37852,6 +37850,9 @@ uts20                           //
 
 @source:unkhorse.cpp
 unkhorse                        //
+
+@source:unkz80.cpp
+unkz80                          // Unknown
 
 @source:upscope.cpp
 upscope                         // (c) 1986 Grand products

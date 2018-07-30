@@ -4216,6 +4216,20 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 	MCFG_RAM_EXTRA_OPTIONS("128K")
 MACHINE_CONFIG_END
 
+static void apple2cp_set_lines(device_t *device, uint8_t lines)
+{
+	apple2e_state *state = device->machine().driver_data<apple2e_state>();
+
+	if (state->m_35sel)
+	{
+		sony_set_lines(device, lines);
+	}
+	else
+	{
+		apple525_set_lines(device, lines);
+	}
+}
+
 static void apple2cp_set_enable_lines(device_t *device,int enable_mask)
 {
 	apple2e_state *state = device->machine().driver_data<apple2e_state>();
@@ -4226,20 +4240,68 @@ static void apple2cp_set_enable_lines(device_t *device,int enable_mask)
 	{
 		sony_set_enable_lines(device, 1);
 	}
+	else if (!state->m_35sel)
+	{
+		apple525_set_enable_lines(device, enable_mask);
+	}
 	else
 	{
 		sony_set_enable_lines(device, 0);
 	}
 }
 
+static uint8_t apple2cp_read_data(device_t *device)
+{
+	apple2e_state *state = device->machine().driver_data<apple2e_state>();
+
+	if (state->m_35sel)
+	{
+		return sony_read_data(device);
+	}
+	else
+	{
+		return apple525_read_data(device);
+	}
+
+	return 0;
+}
+
+static void apple2cp_write_data(device_t *device, uint8_t data)
+{
+	apple2e_state *state = device->machine().driver_data<apple2e_state>();
+
+	if (state->m_35sel)
+	{
+		sony_write_data(device, data);
+	}
+	else
+	{
+		apple525_write_data(device, data);
+	}
+}
+
+static int apple2cp_read_status(device_t *device)
+{
+	apple2e_state *state = device->machine().driver_data<apple2e_state>();
+
+	if (state->m_35sel)
+	{
+		return sony_read_status(device);
+	}
+	else
+	{
+		return apple525_read_status(device);
+	}
+}
+
 const applefdc_interface a2cp_interface =
 {
-	sony_set_lines,         /* set_lines */
+	apple2cp_set_lines,         /* set_lines */
 	apple2cp_set_enable_lines,  /* set_enable_lines */
 
-	sony_read_data,         /* read_data */
-	sony_write_data,    /* write_data */
-	sony_read_status    /* read_status */
+	apple2cp_read_data,         /* read_data */
+	apple2cp_write_data,    /* write_data */
+	apple2cp_read_status    /* read_status */
 };
 
 static const floppy_interface apple2cp_floppy35_floppy_interface =
@@ -4247,6 +4309,13 @@ static const floppy_interface apple2cp_floppy35_floppy_interface =
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(apple35_iigs),
 	"floppy_3_5"
+};
+
+static const floppy_interface floppy_interface =
+{
+	FLOPPY_STANDARD_5_25_DSHD,
+	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
+	"floppy_5_25"
 };
 
 MACHINE_CONFIG_START(apple2e_state::apple2cp)
@@ -4257,7 +4326,8 @@ MACHINE_CONFIG_START(apple2e_state::apple2cp)
 	MCFG_DEVICE_REMOVE("sl4")
 	MCFG_DEVICE_REMOVE("sl6")
 	MCFG_IWM_ADD(IICP_IWM_TAG, a2cp_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(apple2cp_floppy35_floppy_interface)
+	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2cp_floppy35_floppy_interface)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -4292,13 +4362,6 @@ const applefdc_interface fdc_interface =
 	apple525_read_data,         /* read_data */
 	apple525_write_data,    /* write_data */
 	apple525_read_status    /* read_status */
-};
-
-static const floppy_interface floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
-	"floppy_5_25"
 };
 
 MACHINE_CONFIG_START(apple2e_state::laser128)
