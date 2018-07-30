@@ -556,7 +556,9 @@ uint32_t vgmplay_device::handle_pcm_write(uint32_t address)
 	uint32_t dst = m_file->read_dword(m_pc+6) & 0xffffff;
 	uint32_t size = m_file->read_dword(m_pc+9) & 0xffffff;
 
-	if (type == 0x01) {
+	if (m_data_streams->size() <= type || m_data_streams[type].size() <= src + size)
+		logerror("ignored pcm ram writes src %x dst %x size %x type %02x\n", src, dst, size, type);
+	else if (type == 0x01) {
 		for (int i = 0; i < size; i++)
 			m_io->write_byte(A_RF5C68RAM + dst + i, m_data_streams[type][src + i]);
 	} else if (type == 0x02) {
