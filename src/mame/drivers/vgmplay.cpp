@@ -1801,7 +1801,9 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_okim6295[0]->set_pin7(m_okim6295_pin7[0] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
 		m_okim6295[1]->set_pin7(m_okim6295_pin7[1] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
 
-		m_k051649->set_unscaled_clock(version >= 0x161 && data_start >= 0xa0 ? r32(0x9c) & ~0x40000000 : 0);
+		m_k051649->set_unscaled_clock(version >= 0x161 && data_start >= 0xa0 ? r32(0x9c) & ~0xc0000000 : 0);
+		if (version >= 0x161 && data_start >= 0xa0 && (r32(0x9c) & 0x80000000))
+			logerror("Warning: file requests an unsupported Konami SCC\n");
 		if (version >= 0x161 && data_start >= 0xa0 && (r32(0x9c) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd K051649\n");
 
