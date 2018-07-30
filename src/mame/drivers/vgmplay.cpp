@@ -1742,43 +1742,9 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 
 		m_rf5c68->set_unscaled_clock(version >= 0x151 && data_start >= 0x44 ? r32(0x40) : 0);
 		m_rf5c68->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x44 && r32(0x40) ? volume : 0.0f);
-	
+
 		m_ym2203[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x48 ? r32(0x44) & ~0x40000000 : 0);
 		m_ym2203[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x48 && (r32(0x44) & 0x40000000) ? r32(0x44) & ~0x40000000 : 0);
-<<<<<<< HEAD
-		m_ym2608->set_unscaled_clock(version >= 0x151 && data_start >= 0x4c ? r32(0x48) & ~0x40000000 : 0);
-		if (version >= 0x151 && data_start >= 0x4c && (r32(0x48) & 0x40000000))
-			logerror("Warning: file requests an unsupported 2nd YM2608\n");
-
-		m_ym2610->set_unscaled_clock(version >= 0x151 && data_start >= 0x50 ? r32(0x4c) & ~0xc0000000 : 0);
-		if (version >= 0x151 && data_start >= 0x50 && (r32(0x4c) & 0x40000000))
-			logerror("Warning: file requests an unsupported 2nd YM2610\n");
-		if (version >= 0x151 && data_start >= 0x50 && (r32(0x4c) & 0x80000000))
-			logerror("Warning: file requests an unsupported YM2610B\n");
-
-		m_ym3812->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 ? r32(0x50) & ~0x40000000 : 0);
-		if (version >= 0x151 && data_start >= 0x54 && (r32(0x50) & 0x40000000))
-			logerror("Warning: file requests an unsupported 2nd YM3812\n");
-
-		m_ym3526->set_unscaled_clock(version >= 0x151 && data_start >= 0x58 ? r32(0x54) & ~0x40000000 : 0);
-		if (version >= 0x151 && data_start >= 0x58 && (r32(0x54) & 0x40000000))
-			logerror("Warning: file requests an unsupported 2nd YM3526\n");
-
-		if(version >= 0x151 && data_start >= 0x5c && r32(0x58))
-			logerror("Warning: file requests an unsupported Y8950\n");
-		if(version >= 0x151 && data_start >= 0x60 && r32(0x5c))
-			logerror("Warning: file requests an unsupported YMF262\n");
-		if(version >= 0x151 && data_start >= 0x64 && r32(0x60))
-			logerror("Warning: file requests an unsupported YMF278B\n");
-
-		m_ymf271->set_unscaled_clock(version >= 0x151 && data_start >= 0x68 ? r32(0x64) & ~0x40000000 : 0);
-		if (version >= 0x151 && data_start >= 0x68 && (r32(0x64) & 0x40000000))
-			logerror("Warning: file requests an unsupported 2nd YMF271\n");
-
-		m_ymz280b->set_unscaled_clock(version >= 0x151 && data_start >= 0x6c ? r32(0x68) & ~0x40000000 : 0);
-		if (version >= 0x151 && data_start >= 0x6c && (r32(0x68) & 0x40000000))
-			logerror("Warning: file requests an unsupported 2nd YMZ280B\n");
-=======
 		m_ym2203[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x48 && (r32(0x44) & ~0x40000000) ? volume : 0.0f);
 		m_ym2203[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x48 && (r32(0x44) & 0x40000000) ? volume : 0.0f);
 
@@ -1828,7 +1794,6 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_ymz280b[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x6c && r32(0x68) & 0x40000000 ? r32(0x68) & ~0x40000000 : 0);
 		m_ymz280b[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x6c && (r32(0x68) & ~0x40000000) ? volume : 0.0f);
 		m_ymz280b[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x6c && (r32(0x68) & 0x40000000) ? volume : 0.0f);
->>>>>>> d14c601a767ff8240a93270dcb18211d773f8e30
 
 		m_rf5c164->set_unscaled_clock(version >= 0x151 && data_start >= 0x70 ? r32(0x6c) : 0);
 		m_rf5c164->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x70 && r32(0x6c) ? volume : 0.0f);
