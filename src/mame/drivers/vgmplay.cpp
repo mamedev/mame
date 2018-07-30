@@ -1771,8 +1771,9 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		if (version >= 0x161 && data_start >= 0x84 && (r32(0x80) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd DMG\n");
 
-		m_nescpu->set_unscaled_clock(version >= 0x161 && data_start >= 0x88 ? r32(0x84) & ~0x40000000 : 0);
-		m_nescpu->m_apu->set_unscaled_clock(version >= 0x161 && data_start >= 0x88 ? r32(0x84) & ~0x40000000 : 0);
+		m_nescpu->set_unscaled_clock(version >= 0x161 && data_start >= 0x88 ? r32(0x84) & ~0xc0000000 : 0);
+		if (version >= 0x161 && data_start >= 0x88 && (r32(0x84) & 0x80000000))
+			logerror("Warning: file requests an unsupported FDS sound addon\n");
 		if (version >= 0x161 && data_start >= 0x88 && (r32(0x84) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd NES APU\n");
 
@@ -2376,6 +2377,7 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 
 	MCFG_DEVICE_ADD("nescpu", N2A03, 0)
 	MCFG_DEVICE_PROGRAM_MAP(nescpu_map<0>)
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_MODIFY("nescpu:nesapu")
 	MCFG_SOUND_ROUTES_RESET()
