@@ -1534,11 +1534,14 @@ void hng64_state::machine_reset()
 	reset_sound();
 }
 
-// used
+// used (shard ram access at least)
 READ8_MEMBER(hng64_state::ioport0_r)
 {
-	logerror("%s: ioport0_r\n", machine().describe_context());
-	return 0x03; // expects 0x03 after writing it to port 0 earlier
+	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
+	uint8_t ret = m_ioram[addr];
+
+	logerror("%s: ioport0_r %02x (from address %04x)\n", machine().describe_context(), ret, addr);
+	return ret; // expects 0x03 after writing it to port 0 earlier
 }
 
 // used
@@ -1548,10 +1551,13 @@ READ8_MEMBER(hng64_state::ioport1_r)
 	return 0xff;
 }
 
-// used
+// used (shard ram access at least)
 WRITE8_MEMBER(hng64_state::ioport0_w)
 {
-	logerror("%s: ioport0_w %02x\n", machine().describe_context(), data);
+	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
+	m_ioram[addr] = data;
+
+	logerror("%s: ioport0_w %02x (to address %04x)\n", machine().describe_context(), data, addr);
 }
 
 // used
@@ -1566,10 +1572,41 @@ WRITE8_MEMBER(hng64_state::ioport3_w)
 	logerror("%s: ioport3_w %02x\n", machine().describe_context(), data);
 }
 
-// used
+// used (shared ram access control for port 0 at least)
 WRITE8_MEMBER(hng64_state::ioport7_w)
 {
-	logerror("%s: ioport7_w %02x\n", machine().describe_context(), data);
+	/* Port bits
+
+	 -?xR Aacr
+
+	 a = 0x200 of address bit to external RAM (direct?)
+	 A = 0x400 of address bit to external RAM (direct?)
+	 R = read / write mode? (if 1, write, if 0, read?)
+
+	 r = counter reset? ( 1->0 ?)
+	 c = clock address? ( 1->0 ?)
+
+	 x = written with clock bits, might be latch related?
+	 ? = written before some operations
+
+	*/
+
+	//logerror("%s: ioport7_w %02x\n", machine().describe_context(), data);
+
+	m_ex_ramaddr_upper = (data & 0x0c) >> 2;
+
+	if ((!(data & 0x01)) && (m_port7 & 0x01))
+	{
+		m_ex_ramaddr = 0;
+	}
+
+	if ((!(data & 0x02)) && (m_port7 & 0x02))
+	{
+		m_ex_ramaddr++;
+		m_ex_ramaddr &= 0x1ff;
+	}
+
+	m_port7 = data;
 }
 
 // check if these are used
@@ -1604,6 +1641,13 @@ void hng64_state::init_io()
 	m_tempio_irqoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqoff_callback), this));
 
 	m_tempio_irqon_timer->adjust(m_maincpu->cycles_to_attotime(100000000));
+	m_port7 = 0;
+	m_ex_ramaddr = 0;
+	m_ex_ramaddr_upper = 0;
+
+	m_ioram = std::make_unique<uint8_t[]>(0x800);
+	save_pointer(&m_ioram[0], "m_ioram", 0x800);
+
 }
 
 MACHINE_CONFIG_START(hng64_state::hng64)

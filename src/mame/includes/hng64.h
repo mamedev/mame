@@ -323,6 +323,11 @@ private:
 	DECLARE_WRITE8_MEMBER(ioport6_w);
 	DECLARE_WRITE8_MEMBER(ioport7_w);
 
+	uint8_t m_port7;
+	int m_ex_ramaddr;
+	int m_ex_ramaddr_upper;
+	std::unique_ptr<uint8_t[]> m_ioram;
+
 	TIMER_CALLBACK_MEMBER(tempio_irqon_callback);
 	TIMER_CALLBACK_MEMBER(tempio_irqoff_callback);
 	emu_timer *m_tempio_irqon_timer;

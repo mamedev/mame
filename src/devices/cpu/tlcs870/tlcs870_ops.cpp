@@ -781,6 +781,7 @@ void tlcs870_device::do_SET_inxbit(const uint8_t opbyte0)
 
 	const uint8_t srcaddr = READ8();
 
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	uint8_t val = RM8(srcaddr);
 	const uint8_t bitpos = opbyte0 & 0x7;
 
@@ -814,6 +815,7 @@ void tlcs870_device::do_CLR_inxbit(const uint8_t opbyte0)
 
 	const uint8_t srcaddr = READ8();
 
+	m_read_input_port = 0; // not sure, might read
 	uint8_t val = RM8(srcaddr);
 	const uint8_t bitpos = opbyte0 & 0x7;
 

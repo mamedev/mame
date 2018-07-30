@@ -36,9 +36,10 @@ void tlcs870_device::tmp87ph40an_mem(address_map &map)
 	map(0x000b, 0x000b).w(FUNC(tlcs870_device::p1cr_w)); // Port 1 I/O control
 	map(0x000c, 0x000c).w(FUNC(tlcs870_device::p6cr_w)); // Port 6 I/O control
 	map(0x000d, 0x000d).w(FUNC(tlcs870_device::p7cr_w)); // Port 7 I/O control
-#if 0
+
 	map(0x000e, 0x000e).rw(FUNC(tlcs870_device::adccr_r), FUNC(tlcs870_device::adccr_w)); // A/D converter control
 	map(0x000f, 0x000f).r(FUNC(tlcs870_device::adcdr_r)); // A/D converter result
+#if 0
 
 	map(0x0010, 0x0010).w(FUNC(tlcs870_device::treg1a_l_w)); // Timer register 1A
 	map(0x0011, 0x0011).w(FUNC(tlcs870_device::treg1a_h_w)); //
@@ -273,6 +274,25 @@ WRITE8_MEMBER(tlcs870_device::p7cr_w)
 {
 	m_port7_cr = data;
 }
+
+
+READ8_MEMBER(tlcs870_device::adccr_r)
+{
+//	logerror("adccr_r\n");
+	return 0x00;
+}
+
+READ8_MEMBER(tlcs870_device::adcdr_r)
+{
+	logerror("adccr_r\n");
+	return 0x00;
+}
+
+WRITE8_MEMBER(tlcs870_device::adccr_w)
+{
+	logerror("adccr_w %02x\n", data);
+}
+
 
 
 READ8_MEMBER(tlcs870_device::eintcr_r)

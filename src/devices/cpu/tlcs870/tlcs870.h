@@ -194,6 +194,11 @@ private:
 
 	DECLARE_WRITE8_MEMBER(eintcr_w);
 
+	DECLARE_READ8_MEMBER(adccr_r);
+	DECLARE_READ8_MEMBER(adcdr_r);
+
+	DECLARE_WRITE8_MEMBER(adccr_w);
+
 	// Work registers
 	uint8_t m_cycles;
 	uint16_t m_tmppc;
