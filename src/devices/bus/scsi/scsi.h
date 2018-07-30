@@ -98,12 +98,7 @@ class scsi_port_device : public device_t
 
 public:
 	// construction/destruction
-	scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: scsi_port_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
-	scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <class Object> devcb_base &set_bsy_handler(Object &&cb) { return m_bsy_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_sel_handler(Object &&cb) { return m_sel_handler.set_callback(std::forward<Object>(cb)); }
