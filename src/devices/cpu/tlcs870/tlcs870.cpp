@@ -284,7 +284,7 @@ READ8_MEMBER(tlcs870_device::adccr_r)
 
 READ8_MEMBER(tlcs870_device::adcdr_r)
 {
-	logerror("adccr_r\n");
+	logerror("adcdr_r\n");
 	return 0x00;
 }
 
