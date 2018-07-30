@@ -1736,8 +1736,11 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		if (version >= 0x151 && data_start >= 0x50 && (r32(0x4c) & 0x80000000))
 			logerror("Warning: file requests an unsupported YM2610B\n");
 
-		m_ym3812[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 ? r32(0x50) & ~0x40000000 : 0);
-		m_ym3812[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 && r32(0x50) & 0x40000000 ? r32(0x50) & ~0x40000000 : 0);
+		m_ym3812[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 ? r32(0x50) & ~0xc0000000 : 0);
+		m_ym3812[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 && r32(0x50) & 0x40000000 ? r32(0x50) & ~0xc0000000 : 0);
+		if (version >= 0x151 && data_start >= 0x54 && (r32(0x50) & 0x80000000))
+			logerror("Warning: file requests an unsupported SoundBlaster Pro\n");
+
 		m_ym3526[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x58 ? r32(0x54) & ~0x40000000 : 0);
 		m_ym3526[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x58 && r32(0x54) & 0x40000000 ? r32(0x54) & ~0x40000000 : 0);
 		m_y8950[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x5c ? r32(0x58) & ~0x40000000 : 0);
