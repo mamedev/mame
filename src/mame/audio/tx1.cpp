@@ -575,6 +575,7 @@ MACHINE_CONFIG_START(tx1_sound_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.1)
 
+	MCFG_DEVICE_MODIFY(DEVICE_SELF)
 	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
 	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_CONFIG_END
@@ -1084,6 +1085,7 @@ MACHINE_CONFIG_START(buggyboy_sound_device::device_add_mconfig)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
+	MCFG_DEVICE_MODIFY(DEVICE_SELF)
 	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
 	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_CONFIG_END
@@ -1109,6 +1111,7 @@ MACHINE_CONFIG_START(buggyboyjr_sound_device::device_add_mconfig)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
+	MCFG_DEVICE_MODIFY(DEVICE_SELF)
 	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
 	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_CONFIG_END

@@ -556,7 +556,9 @@ uint32_t vgmplay_device::handle_pcm_write(uint32_t address)
 	uint32_t dst = m_file->read_dword(m_pc+6) & 0xffffff;
 	uint32_t size = m_file->read_dword(m_pc+9) & 0xffffff;
 
-	if (type == 0x01) {
+	if (m_data_streams->size() <= type || m_data_streams[type].size() <= src + size)
+		logerror("ignored pcm ram writes src %x dst %x size %x type %02x\n", src, dst, size, type);
+	else if (type == 0x01) {
 		for (int i = 0; i < size; i++)
 			m_io->write_byte(A_RF5C68RAM + dst + i, m_data_streams[type][src + i]);
 	} else if (type == 0x02) {
@@ -1760,10 +1762,12 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		if (version >= 0x151 && data_start >= 0x50 && (r32(0x4c) & 0x80000000))
 			logerror("Warning: file requests an unsupported YM2610B\n");
 
-		m_ym3812[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 ? r32(0x50) & ~0x40000000 : 0);
-		m_ym3812[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 && r32(0x50) & 0x40000000 ? r32(0x50) & ~0x40000000 : 0);
-		m_ym3812[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x54 && (r32(0x50) & ~0x40000000) ? volume : 0.0f);
+		m_ym3812[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 ? r32(0x50) & ~0xc0000000 : 0);
+		m_ym3812[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x54 && r32(0x50) & 0x40000000 ? r32(0x50) & ~0xc0000000 : 0);
+		m_ym3812[0]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x54 && (r32(0x50) & ~0xc0000000) ? volume : 0.0f);
 		m_ym3812[1]->set_output_gain(ALL_OUTPUTS, version >= 0x151 && data_start >= 0x54 && (r32(0x50) & 0x40000000) ? volume : 0.0f);
+		if (version >= 0x151 && data_start >= 0x54 && (r32(0x50) & 0x80000000))
+			logerror("Warning: file requests an unsupported SoundBlaster Pro\n");
 
 		m_ym3526[0]->set_unscaled_clock(version >= 0x151 && data_start >= 0x58 ? r32(0x54) & ~0x40000000 : 0);
 		m_ym3526[1]->set_unscaled_clock(version >= 0x151 && data_start >= 0x58 && r32(0x54) & 0x40000000 ? r32(0x54) & ~0x40000000 : 0);
@@ -1819,9 +1823,10 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		if (version >= 0x161 && data_start >= 0x84 && (r32(0x80) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd DMG\n");
 
-		m_nescpu->set_unscaled_clock(version >= 0x161 && data_start >= 0x88 ? r32(0x84) & ~0x40000000 : 0);
-		m_nescpu->m_apu->set_unscaled_clock(version >= 0x161 && data_start >= 0x88 ? r32(0x84) & ~0x40000000 : 0);
-		m_nescpu->m_apu->set_output_gain(ALL_OUTPUTS, version >= 0x161 && data_start >= 0x88 && (r32(0x84) & ~0x40000000) ? volume : 0.0f);
+		m_nescpu->set_unscaled_clock(version >= 0x161 && data_start >= 0x88 ? r32(0x84) & ~0xc0000000 : 0);
+		m_nescpu->m_apu->set_output_gain(ALL_OUTPUTS, version >= 0x161 && data_start >= 0x88 && (r32(0x84) & ~0xc0000000) ? volume : 0.0f);
+		if (version >= 0x161 && data_start >= 0x88 && (r32(0x84) & 0x80000000))
+			logerror("Warning: file requests an unsupported FDS sound addon\n");
 		if (version >= 0x161 && data_start >= 0x88 && (r32(0x84) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd NES APU\n");
 
@@ -1850,13 +1855,20 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_okim6295[0]->set_pin7(m_okim6295_pin7[0] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
 		m_okim6295[1]->set_pin7(m_okim6295_pin7[1] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
 
-		m_k051649->set_unscaled_clock(version >= 0x161 && data_start >= 0xa0 ? r32(0x9c) & ~0x40000000 : 0);
-		m_k051649->set_output_gain(ALL_OUTPUTS, version >= 0x161 && data_start >= 0xa0 && (r32(0x9c) & ~0x40000000) ? volume : 0.0f);
+		m_k051649->set_unscaled_clock(version >= 0x161 && data_start >= 0xa0 ? r32(0x9c) & ~0xc0000000 : 0);
+		m_k051649->set_output_gain(ALL_OUTPUTS, version >= 0x161 && data_start >= 0xa0 && (r32(0x9c) & ~0xc0000000) ? volume : 0.0f);
+		if (version >= 0x161 && data_start >= 0xa0 && (r32(0x9c) & 0x80000000))
+			logerror("Warning: file requests an unsupported Konami SCC\n");
 		if (version >= 0x161 && data_start >= 0xa0 && (r32(0x9c) & 0x40000000))
 			logerror("Warning: file requests an unsupported 2nd K051649\n");
 
-		m_k054539[0]->set_clock_scale(384); // HACK: VGMs contain 48,000 instead of 18,432,000
-		m_k054539[1]->set_clock_scale(384); // HACK: VGMs contain 48,000 instead of 18,432,000
+		// HACK: Some VGMs contain 48,000 instead of 18,432,000
+		if (version >= 0x161 && data_start >= 0xa4 && (r32(0xa0) & ~0x40000000) == 48000)
+		{
+			m_k054539[0]->set_clock_scale(384);
+			m_k054539[1]->set_clock_scale(384);
+		}
+
 		m_k054539[0]->set_unscaled_clock(version >= 0x161 && data_start >= 0xa4 ? r32(0xa0) & ~0x40000000 : 0);
 		m_k054539[1]->set_unscaled_clock(version >= 0x161 && data_start >= 0xa4 && (r32(0xa0) & 0x40000000) ? r32(0xa0) & ~0x40000000 : 0);
 		m_k054539[0]->set_output_gain(ALL_OUTPUTS, version >= 0x161 && data_start >= 0xa4 && (r32(0xa0) & ~0x40000000) ? volume : 0.0f);
@@ -1880,7 +1892,10 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		m_pokey[0]->set_output_gain(ALL_OUTPUTS, version >= 0x161 && data_start >= 0xb4 && (r32(0xb0) & ~0x40000000) ? volume : 0.0f);
 		m_pokey[1]->set_output_gain(ALL_OUTPUTS, version >= 0x161 && data_start >= 0xb4 && (r32(0xb0) & 0x40000000) ? volume : 0.0f);
 
-		m_qsound->set_clock_scale(15); // HACK: VGMs contain 4,000,000 instead of 60,000,000
+		// HACK: VGMs contain 4,000,000 instead of 60,000,000
+		if (version >= 0x161 && data_start >= 0xb8 && r32(0xb4) == 4000000)
+			m_qsound->set_clock_scale(15);
+
 		m_qsound->set_unscaled_clock(version >= 0x161 && data_start >= 0xb8 ? r32(0xb4) : 0);
 		m_qsound->set_output_gain(ALL_OUTPUTS, version >= 0x161 && data_start >= 0xb8 && r32(0xb4) ? volume : 0.0f);
 
@@ -2432,6 +2447,7 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 
 	MCFG_DEVICE_ADD("nescpu", N2A03, 0)
 	MCFG_DEVICE_PROGRAM_MAP(nescpu_map<0>)
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_MODIFY("nescpu:nesapu")
 	MCFG_SOUND_ROUTES_RESET()
