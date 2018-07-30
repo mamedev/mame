@@ -20,11 +20,29 @@ public:
 	typedef device_delegate<uint32_t (uint32_t dsp)> fetch_delegate;
 
 	// construction/destruction
-	lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename Object> void set_irq_callback(Object &&cb) { m_irq_cb = std::forward<Object>(cb); }
 	template <typename Object> void set_dma_callback(Object &&cb) { m_dma_cb = std::forward<Object>(cb); }
 	template <typename Object> void set_fetch_callback(Object &&cb) { m_fetch_cb = std::forward<Object>(cb); }
+
+	template <class FunctionClass> void set_irq_callback(void (FunctionClass::*callback)(int), const char *name)
+	{
+		set_irq_callback(irq_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+	void set_irq_callback(irq_delegate callback) { m_irq_cb = callback; }
+
+	template <class FunctionClass> void set_dma_callback(void (FunctionClass::*callback)(uint32_t, uint32_t, int, int), const char *name)
+	{
+		set_dma_callback(dma_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+	void set_dma_callback(dma_delegate callback) { m_dma_cb = callback; }
+
+	template <class FunctionClass> void set_fetch_callback(uint32_t (FunctionClass::*callback)(uint32_t), const char *name)
+	{
+		set_fetch_callback(fetch_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+	void set_fetch_callback(fetch_delegate callback) { m_fetch_cb = callback; }
 
 	uint8_t reg_r(int offset);
 	void reg_w(int offset, uint8_t data);

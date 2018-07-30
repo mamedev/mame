@@ -1153,18 +1153,28 @@ MACHINE_CONFIG_START(bbc_state::abc110)
 	MCFG_SLOT_FIXED(true)
 
 	/* Add ADAPTEC ACB-4000 Winchester Disc Controller */
-	//MCFG_DEVICE_ADD(SCSIBUS_TAG, SCSI_PORT, 0)
-	//MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
-	//MCFG_SCSI_MSG_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit0))
-	//MCFG_SCSI_BSY_HANDLER(WRITELINE(*this, bbc_state, scsi_bsy_w))
-	//MCFG_SCSI_REQ_HANDLER(WRITELINE(*this, bbc_state, scsi_req_w))
-	//MCFG_SCSI_IO_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit6))
-	//MCFG_SCSI_CD_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit7))
-	//MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", ACB4070, SCSI_ID_0)
+	//scsi_port_device &scsibus(SCSI_PORT(config, SCSIBUS_TAG));
+	//scsibus.set_data_input_buffer("scsi_data_in");
+	//scsibus.msg_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit0));
+	//scsibus.bsy_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::scsi_bsy_w))
+	//scsibus.req_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::scsi_req_w))
+	//scsibus.io_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit6));
+	//scsibus.cd_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit7));
+	//scsibus.set_slot_device(1, "harddisk", ACB4070, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
-	//MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", SCSIBUS_TAG)
-	//MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
-	//MCFG_DEVICE_ADD("scsi_ctrl_in", INPUT_BUFFER, 0)
+	//output_latch_device &scsiout(OUTPUT_LATCH(config, "scsi_data_out"));
+	//scsiout.bit_handler<0>().set("scsi", FUNC(scsi_port_device::write_data0));
+	//scsiout.bit_handler<1>().set("scsi", FUNC(scsi_port_device::write_data1));
+	//scsiout.bit_handler<2>().set("scsi", FUNC(scsi_port_device::write_data2));
+	//scsiout.bit_handler<3>().set("scsi", FUNC(scsi_port_device::write_data3));
+	//scsiout.bit_handler<4>().set("scsi", FUNC(scsi_port_device::write_data4));
+	//scsiout.bit_handler<5>().set("scsi", FUNC(scsi_port_device::write_data5));
+	//scsiout.bit_handler<6>().set("scsi", FUNC(scsi_port_device::write_data6));
+	//scsiout.bit_handler<7>().set("scsi", FUNC(scsi_port_device::write_data7));
+
+	//INPUT_BUFFER(config, "scsi_ctrl_in");
+	//INPUT_BUFFER(config, "scsi_data_in");
+
 	/* Add 10MB ST-412 Winchester */
 
 	/* software lists */

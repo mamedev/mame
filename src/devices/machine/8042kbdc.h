@@ -55,7 +55,7 @@ public:
 	};
 
 	// construction/destruction
-	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_keyboard_type(kbdc8042_type_t keybtype) { m_keybtype = keybtype; }
 	template <class Object> devcb_base &set_system_reset_callback(Object &&cb) { return m_system_reset_cb.set_callback(std::forward<Object>(cb)); }

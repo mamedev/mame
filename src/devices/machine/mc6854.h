@@ -44,9 +44,13 @@ public:
 
 	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_txd_callback(Object &&cb) { return m_out_txd_cb.set_callback(std::forward<Object>(cb)); }
-	template <typename Object> void set_out_frame_callback(Object &&cb) { m_out_frame_cb = std::forward<Object>(cb); }
 	template <class Object> devcb_base &set_out_rts_callback(Object &&cb) { return m_out_rts_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_dtr_callback(Object &&cb) { return m_out_dtr_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename Object> void set_out_frame_callback(Object &&cb) { m_out_frame_cb = std::forward<Object>(cb); }
+	auto out_irq_cb() { return m_out_irq_cb.bind(); }
+	auto out_txd_cb() { return m_out_txd_cb.bind(); }
+	auto out_rts_cb() { return m_out_rts_cb.bind(); }
+	auto out_dtr_cb() { return m_out_dtr_cb.bind(); }
 
 	/* interface to CPU via address/data bus*/
 	DECLARE_READ8_MEMBER( read );
