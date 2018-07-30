@@ -2647,23 +2647,27 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	MCFG_PALETTE_ADD("palette_lcd", 2)
 	MCFG_PALETTE_INIT_OWNER(nbmj8688_state,mbmj8688_lcd)
 
-	MCFG_SCREEN_ADD("lcd0", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(480, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 64-1)
-	MCFG_SCREEN_UPDATE_DEVICE("lcdc0", hd61830_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette_lcd")
+	screen_device &lcd0(SCREEN(config, "lcd0", SCREEN_TYPE_LCD));
+	lcd0.set_physical_aspect(15, 3);
+	lcd0.set_orientation(ROT180);
+	lcd0.set_refresh_hz(60);
+	lcd0.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lcd0.set_size(480, 64);
+	lcd0.set_visarea(0, 480-1, 0, 64-1);
+	lcd0.set_screen_update("lcdc0", FUNC(hd61830_device::screen_update));
+	lcd0.set_palette("palette_lcd");
 	MCFG_DEVICE_ADD("lcdc0", HD61830B, 5000000/2) // ???
 	MCFG_VIDEO_SET_SCREEN("lcd0")
 
-	MCFG_SCREEN_ADD("lcd1", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(480, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 64-1)
-	MCFG_SCREEN_UPDATE_DEVICE("lcdc1", hd61830_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette_lcd")
+	screen_device &lcd1(SCREEN(config, "lcd1", SCREEN_TYPE_LCD));
+	lcd1.set_physical_aspect(15, 3);
+	lcd1.set_orientation(ROT180);
+	lcd1.set_refresh_hz(60);
+	lcd1.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lcd1.set_size(480, 64);
+	lcd1.set_visarea(0, 480-1, 0, 64-1);
+	lcd1.set_screen_update("lcdc1", FUNC(hd61830_device::screen_update));
+	lcd1.set_palette("palette_lcd");
 	MCFG_DEVICE_ADD("lcdc1", HD61830B, 5000000/2) // ???
 	MCFG_VIDEO_SET_SCREEN("lcd1")
 

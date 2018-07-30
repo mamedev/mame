@@ -327,7 +327,6 @@ isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
 itt3030.cpp
-jade.cpp
 jonos.cpp
 jr100.cpp
 jr200.cpp
@@ -748,6 +747,7 @@ tvc.cpp
 tvgame.cpp
 tx0.cpp
 uknc.cpp
+unkz80.cpp
 unichamp.cpp
 unior.cpp
 unistar.cpp

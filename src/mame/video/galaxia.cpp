@@ -120,9 +120,9 @@ uint32_t galaxia_state::screen_update_galaxia(screen_device &screen, bitmap_ind1
 	cvs_update_stars(bitmap, cliprect, STAR_PEN, 1);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			bool bullet = m_bullet_ram[y] && x == (m_bullet_ram[y] ^ 0xff);
 			bool background = (bitmap.pix16(y, x) & 3) != 0;
@@ -185,7 +185,7 @@ uint32_t galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	copybitmap(m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		// draw bullets (guesswork)
 		if (m_bullet_ram[y])
@@ -201,14 +201,14 @@ uint32_t galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind
 			if (pos) bitmap.pix16(y, pos-1) = BULLET_PEN;
 		}
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			// NOTE: similar to zac2650.c, the sprite chip runs at a different frequency than the background generator
 			// the exact timing ratio is unknown, so we'll have to do with guesswork
 			float s_ratio = 256.0f / 196.0f;
 
 			float sx = x * s_ratio;
-			if ((int)(sx + 0.5f) > cliprect.max_x)
+			if (int(sx + 0.5f) > cliprect.right())
 				break;
 
 			// copy the S2636 bitmap into the main bitmap and check collision
@@ -217,11 +217,11 @@ uint32_t galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
 				// S2636 vs. background collision detection
-				if ((m_temp_bitmap.pix16(y, (int)(sx)) | m_temp_bitmap.pix16(y, (int)(sx + 0.5f))) & 1)
+				if ((m_temp_bitmap.pix16(y, int(sx)) | m_temp_bitmap.pix16(y, int(sx + 0.5f))) & 1)
 					m_collision_register |= 0x01;
 
-				bitmap.pix16(y, (int)(sx)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
-				bitmap.pix16(y, (int)(sx + 0.5f)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
+				bitmap.pix16(y, int(sx)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
+				bitmap.pix16(y, int(sx + 0.5f)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
 			}
 		}
 	}

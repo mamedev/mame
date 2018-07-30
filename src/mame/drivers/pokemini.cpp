@@ -16,7 +16,6 @@ The LCD is likely to be a SSD1828 LCD.
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1778,8 +1777,6 @@ MACHINE_CONFIG_START(pokemini_state::pokemini)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )
 	MCFG_SCREEN_REFRESH_RATE( 72 )
 	MCFG_SCREEN_PALETTE("palette")
-
-	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(pokemini_state, pokemini)

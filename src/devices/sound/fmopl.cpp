@@ -1631,7 +1631,7 @@ void FM_OPL::initialize()
 	/*logerror("freqbase=%f\n", freqbase);*/
 
 	/* Timer base time */
-	TimerBase = attotime::from_hz(clock) * 72;
+	TimerBase = clock ? attotime::from_hz(clock) * 72 : attotime::zero;
 
 	/* make fnumber -> increment counter table */
 	for( i=0 ; i < 1024 ; i++ )
@@ -2406,6 +2406,11 @@ static void Y8950_deltat_status_reset(void *chip, uint8_t changebits)
 {
 	FM_OPL *Y8950 = (FM_OPL *)chip;
 	Y8950->STATUS_RESET(changebits);
+}
+
+void y8950_clock_changed(void *chip, uint32_t clock, uint32_t rate)
+{
+	reinterpret_cast<FM_OPL *>(chip)->clock_changed(clock, rate);
 }
 
 void *y8950_init(device_t *device, uint32_t clock, uint32_t rate)

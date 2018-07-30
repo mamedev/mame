@@ -25,9 +25,6 @@
 #include "osdepend.h"
 #include "xmlfile.h"
 
-#include <ctype.h>
-#include <fstream>
-
 
 const size_t debugger_cpu::NUM_TEMP_VARIABLES = 10;
 
@@ -152,42 +149,13 @@ symbol_table* debugger_cpu::get_visible_symtable()
 }
 
 
-/*-------------------------------------------------
-    source_script - specifies a debug command
-    script to execute
--------------------------------------------------*/
-
-void debugger_cpu::source_script(const char *file)
-{
-	// close any existing source file
-	m_source_file.reset();
-
-	// open a new one if requested
-	if (file != nullptr)
-	{
-		auto source_file = std::make_unique<std::ifstream>(file, std::ifstream::in);
-		if (source_file->fail())
-		{
-			if (m_machine.phase() == machine_phase::RUNNING)
-				m_machine.debugger().console().printf("Cannot open command file '%s'\n", file);
-			else
-				fatalerror("Cannot open command file '%s'\n", file);
-		}
-		else
-		{
-			m_source_file = std::move(source_file);
-		}
-	}
-}
-
-
 
 //**************************************************************************
 //  MEMORY AND DISASSEMBLY HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  omment_save - save all comments for the given
+//  comment_save - save all comments for the given
 //  machine
 //-------------------------------------------------
 
@@ -638,42 +606,6 @@ void debugger_cpu::reset_transient_flags()
 	for (device_t &device : device_iterator(m_machine.root_device()))
 		device.debug()->reset_transient_flag();
 	m_stop_when_not_device = nullptr;
-}
-
-
-/*-------------------------------------------------
-    process_source_file - executes commands from
-    a source file
--------------------------------------------------*/
-
-void debugger_cpu::process_source_file()
-{
-	std::string buf;
-
-	// loop until the file is exhausted or until we are executing again
-	while (m_execution_state == exec_state::STOPPED
-			&& m_source_file
-			&& std::getline(*m_source_file, buf))
-	{
-		// strip out comments (text after '//')
-		size_t pos = buf.find("//");
-		if (pos != std::string::npos)
-			buf.resize(pos);
-
-		// strip whitespace
-		strtrimrightspace(buf);
-
-		// execute the command
-		if (!buf.empty())
-			m_machine.debugger().console().execute_command(buf, true);
-	}
-
-	if (m_source_file && !m_source_file->good())
-	{
-		if (!m_source_file->eof())
-			m_machine.debugger().console().printf("I/O error, script processing terminated\n");
-		m_source_file.reset();
-	}
 }
 
 
@@ -1718,7 +1650,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			}
 
 			// check for commands in the source file
-			machine.debugger().cpu().process_source_file();
+			machine.debugger().console().process_source_file();
 
 			// if an event got scheduled, resume
 			if (machine.scheduled_event_pending())

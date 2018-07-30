@@ -102,8 +102,8 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
 	if (xpos == -1 || ypos == -1)
 		return false;
 
-	*x = visarea.min_x + xpos * visarea.width() / 255;
-	*y = visarea.min_y + ypos * visarea.height() / 255;
+	*x = visarea.left() + xpos * visarea.width() / 255;
+	*y = visarea.top() + ypos * visarea.height() / 255;
 	return true;
 }
 

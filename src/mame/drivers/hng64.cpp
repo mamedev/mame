@@ -1532,6 +1532,57 @@ void hng64_state::machine_reset()
 	reset_sound();
 }
 
+// used
+READ8_MEMBER(hng64_state::ioport0_r)
+{
+	logerror("%s: ioport0_r\n", machine().describe_context());
+	return 0x03; // expects 0x03 after writing it to port 0 earlier
+}
+
+// used
+READ8_MEMBER(hng64_state::ioport1_r)
+{
+	logerror("%s: ioport1_r\n", machine().describe_context());
+	return 0xff;
+}
+
+// used
+WRITE8_MEMBER(hng64_state::ioport0_w)
+{
+	logerror("%s: ioport0_w %02x\n", machine().describe_context(), data);
+}
+
+// used
+WRITE8_MEMBER(hng64_state::ioport1_w)
+{
+	logerror("%s: ioport1_w %02x\n", machine().describe_context(), data);
+}
+
+// used
+WRITE8_MEMBER(hng64_state::ioport3_w)
+{
+	logerror("%s: ioport3_w %02x\n", machine().describe_context(), data);
+}
+
+// used
+WRITE8_MEMBER(hng64_state::ioport7_w)
+{
+	logerror("%s: ioport7_w %02x\n", machine().describe_context(), data);
+}
+
+// check if these are used
+READ8_MEMBER(hng64_state::ioport2_r) { logerror("%s: ioport2_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport3_r) { logerror("%s: ioport3_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport4_r) { logerror("%s: ioport4_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport5_r) { logerror("%s: ioport5_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport6_r) { logerror("%s: ioport6_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::ioport7_r) { logerror("%s: ioport7_r\n", machine().describe_context()); return 0xff; }
+
+WRITE8_MEMBER(hng64_state::ioport2_w) { logerror("%s: ioport2_w %02x\n", machine().describe_context(), data); }
+WRITE8_MEMBER(hng64_state::ioport4_w) { logerror("%s: ioport4_w %02x\n", machine().describe_context(), data); }
+WRITE8_MEMBER(hng64_state::ioport5_w) { logerror("%s: ioport5_w %02x\n", machine().describe_context(), data); }
+WRITE8_MEMBER(hng64_state::ioport6_w) { logerror("%s: ioport6_w %02x\n", machine().describe_context(), data); }
+
 MACHINE_CONFIG_START(hng64_state::hng64)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
@@ -1557,7 +1608,23 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	hng64_audio(config);
 	hng64_network(config);
 
-	MCFG_DEVICE_ADD("iomcu", TMP87PH40AN, 8000000)
+	tmp87ph40an_device &iomcu(TMP87PH40AN(config, m_iomcu, 8_MHz_XTAL));
+	iomcu.p0_in_cb().set(FUNC(hng64_state::ioport0_r));
+	iomcu.p1_in_cb().set(FUNC(hng64_state::ioport1_r));
+	iomcu.p2_in_cb().set(FUNC(hng64_state::ioport2_r));
+	iomcu.p3_in_cb().set(FUNC(hng64_state::ioport3_r));
+	iomcu.p4_in_cb().set(FUNC(hng64_state::ioport4_r));
+	iomcu.p5_in_cb().set(FUNC(hng64_state::ioport5_r));
+	iomcu.p6_in_cb().set(FUNC(hng64_state::ioport6_r));
+	iomcu.p7_in_cb().set(FUNC(hng64_state::ioport7_r));
+	iomcu.p0_out_cb().set(FUNC(hng64_state::ioport0_w));
+	iomcu.p1_out_cb().set(FUNC(hng64_state::ioport1_w));
+	iomcu.p2_out_cb().set(FUNC(hng64_state::ioport2_w));
+	iomcu.p3_out_cb().set(FUNC(hng64_state::ioport3_w));
+	iomcu.p4_out_cb().set(FUNC(hng64_state::ioport4_w));
+	iomcu.p5_out_cb().set(FUNC(hng64_state::ioport5_w));
+	iomcu.p6_out_cb().set(FUNC(hng64_state::ioport6_w));
+	iomcu.p7_out_cb().set(FUNC(hng64_state::ioport7_w));
 
 MACHINE_CONFIG_END
 

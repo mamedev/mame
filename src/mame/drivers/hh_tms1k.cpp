@@ -160,7 +160,6 @@
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
-#include "rendlay.h"
 
 // internal artwork
 #include "7in1ss.lh"
@@ -4603,7 +4602,6 @@ MACHINE_CONFIG_START(ginv1000_state::ginv1000)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(226, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 226-1, 0, 1080-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -4739,7 +4737,6 @@ MACHINE_CONFIG_START(ginv2000_state::ginv2000)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(364, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 364-1, 0, 1080-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */

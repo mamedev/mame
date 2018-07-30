@@ -33,7 +33,6 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "sound/beep.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -280,7 +279,6 @@ MACHINE_CONFIG_START(destiny_state::destiny)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(6*16, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	config.set_default_layout(layout_lcd);
 	MCFG_SCREEN_UPDATE_DRIVER(destiny_state, screen_update_destiny)
 	MCFG_SCREEN_PALETTE("palette")
 

@@ -22,7 +22,6 @@ DEFINE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device, "tmp87ph40an", "Toshiba TMP8
 
 void tlcs870_device::tmp87ph40an_mem(address_map &map)
 {
-#if 0
 	map(0x0000, 0x0000).rw(FUNC(tlcs870_device::port0_r), FUNC(tlcs870_device::port0_w));
 	map(0x0001, 0x0001).rw(FUNC(tlcs870_device::port1_r), FUNC(tlcs870_device::port1_w));
 	map(0x0002, 0x0002).rw(FUNC(tlcs870_device::port2_r), FUNC(tlcs870_device::port2_w));
@@ -37,6 +36,7 @@ void tlcs870_device::tmp87ph40an_mem(address_map &map)
 	map(0x000b, 0x000b).w(FUNC(tlcs870_device::p1cr_w)); // Port 1 I/O control
 	map(0x000c, 0x000c).w(FUNC(tlcs870_device::p6cr_w)); // Port 6 I/O control
 	map(0x000d, 0x000d).w(FUNC(tlcs870_device::p7cr_w)); // Port 7 I/O control
+#if 0
 	map(0x000e, 0x000e).rw(FUNC(tlcs870_device::adccr_r), FUNC(tlcs870_device::adccr_w)); // A/D converter control
 	map(0x000f, 0x000f).r(FUNC(tlcs870_device::adcdr_r)); // A/D converter result
 
@@ -107,6 +107,8 @@ tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type optype
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_intram(*this, "intram")
+	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 
@@ -127,6 +129,147 @@ device_memory_interface::space_config_vector tlcs870_device::memory_space_config
 bool tlcs870_device::stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const uint16_t mode, const uint16_t r, const uint16_t rb)
 {
 	return false;
+}
+
+// NOT using templates here because there are subtle differences in the port behavior (the ports are multi-purpose) that still need implementing
+READ8_MEMBER(tlcs870_device::port0_r)
+{
+	// need to use P0CR (0x000a) to control direction
+
+	if (m_read_input_port)
+		return m_port_in_cb[0]();
+	else
+		return m_port_out_latch[0];
+}
+
+READ8_MEMBER(tlcs870_device::port1_r)
+{
+	// need to use P1CR (0x000b) to control direction
+
+	if (m_read_input_port)
+		return m_port_in_cb[1]();
+	else
+		return m_port_out_latch[1];
+}
+
+READ8_MEMBER(tlcs870_device::port2_r) // 3-bit port
+{
+	if (m_read_input_port)
+		return m_port_in_cb[2]() | 0xf8;
+	else
+		return m_port_out_latch[2];
+}
+
+READ8_MEMBER(tlcs870_device::port3_r)
+{
+	if (m_read_input_port)
+		return m_port_in_cb[3]();
+	else
+		return m_port_out_latch[3];
+}
+
+READ8_MEMBER(tlcs870_device::port4_r)
+{
+	if (m_read_input_port)
+		return m_port_in_cb[4]();
+	else
+		return m_port_out_latch[4];
+}
+
+READ8_MEMBER(tlcs870_device::port5_r) // 5-bit port
+{
+	if (m_read_input_port)
+		return m_port_in_cb[5]() | 0xe0;
+	else
+		return m_port_out_latch[5];
+}
+
+READ8_MEMBER(tlcs870_device::port6_r) // doubles up as analog?
+{
+	// need to use P6CR (0x000c) to control direction
+
+	if (m_read_input_port)
+		return m_port_in_cb[6]();
+	else
+		return m_port_out_latch[6];
+}
+
+READ8_MEMBER(tlcs870_device::port7_r)
+{
+	// need to use P7CR (0x000d) to control direction
+
+	if (m_read_input_port)
+		return m_port_in_cb[7]();
+	else
+		return m_port_out_latch[7];
+}
+
+WRITE8_MEMBER(tlcs870_device::port0_w)
+{
+	m_port_out_latch[0] = data;
+	m_port_out_cb[0](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port1_w)
+{
+	m_port_out_latch[1] = data;
+	m_port_out_cb[1](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port2_w)
+{
+	m_port_out_latch[2] = data;
+	m_port_out_cb[2](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port3_w)
+{
+	m_port_out_latch[3] = data;
+	m_port_out_cb[3](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port4_w)
+{
+	m_port_out_latch[4] = data;
+	m_port_out_cb[4](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port5_w)
+{
+	m_port_out_latch[5] = data;
+	m_port_out_cb[5](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port6_w)
+{
+	m_port_out_latch[6] = data;
+	m_port_out_cb[6](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port7_w)
+{
+	m_port_out_latch[7] = data;
+	m_port_out_cb[7](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::p0cr_w)
+{
+	m_port0_cr = data;
+}
+
+WRITE8_MEMBER(tlcs870_device::p1cr_w)
+{
+	m_port1_cr = data;
+}
+
+WRITE8_MEMBER(tlcs870_device::p6cr_w)
+{
+	m_port6_cr = data;
+}
+
+WRITE8_MEMBER(tlcs870_device::p7cr_w)
+{
+	m_port7_cr = data;
 }
 
 void tlcs870_device::execute_set_input(int inputnum, int state)
@@ -151,8 +294,6 @@ void tlcs870_device::execute_set_input(int inputnum, int state)
 
 void tlcs870_device::execute_run()
 {
-	m_cycles = 1;
-
 	while (m_icount > 0)
 	{
 		m_prvpc.d = m_pc.d;
@@ -161,10 +302,20 @@ void tlcs870_device::execute_run()
 		//check_interrupts();
 		m_addr = m_pc.d;
 		m_tmppc = m_addr; // used for jumps etc.
+		m_cycles = 0;
+		m_read_input_port = 1; // some operations force the output latches to read from the memory mapped ports, not input ports
 		decode();
 		m_pc.d = m_addr;
 
-		m_icount -= m_cycles * 4; // 1 machine cycle = 4 clock cycles?
+		if (m_cycles)
+		{
+			//m_icount -= m_cycles * 4; // 1 machine cycle = 4 clock cycles? (unclear, execution seems far too slow even for the ram test this way)
+			m_icount -= m_cycles;
+		}
+		else
+		{
+			fatalerror("m_cycles == 0 after PC %04x\n", m_tmppc);
+		}
 	};
 }
 
@@ -172,6 +323,20 @@ void tlcs870_device::device_reset()
 {
 	m_pc.d = RM16(0xfffe);
 	m_RBS = 0;
+
+	m_port_out_latch[0] = 0x00;
+	m_port_out_latch[1] = 0x00;
+	m_port_out_latch[2] = 0xff;
+	m_port_out_latch[3] = 0xff;
+	m_port_out_latch[4] = 0xff;
+	m_port_out_latch[5] = 0xff;
+	m_port_out_latch[6] = 0x00;
+	m_port_out_latch[7] = 0x00;
+
+	m_port0_cr = 0xff;
+	m_port1_cr = 0xff;
+	m_port6_cr = 0xff;
+	m_port7_cr = 0xff;
 }
 
 void tlcs870_device::state_import(const device_state_entry &entry)
@@ -315,6 +480,11 @@ void tlcs870_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_F).formatstr("%8s").noshow();
 
 	set_icountptr(m_icount);
+
+	for (auto &cb : m_port_in_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_port_out_cb)
+		cb.resolve_safe();
 }
 
 

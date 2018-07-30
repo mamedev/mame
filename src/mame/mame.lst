@@ -11036,20 +11036,21 @@ tstrikea                        // Game Room
 
 @source:ddragon3.cpp
 ctribe                          // TA-0028 (c) 1990 (US)
-ctribe1                         // TA-0028 (c) 1990 (US)
 ctribeb                         // bootleg
 ctribeb2                        // bootleg
 ctribej                         // TA-0028 (c) 1990 (Japan)
-ctribeo                         // TA-0028 (c) 1990 (US)
+ctribeu1                        // TA-0028 (c) 1990 (US)
+ctribeua                        // TA-0028 (c) 1990 (US)
 ddragon3                        // TA-0030 (c) 1990
 ddragon3b                       // bootleg
 ddragon3j                       // TA-0030 (c) 1990 (Japan)
 ddragon3p                       // TA-0030 (c) 1990
 wwfwfest                        // TA-0031 (c) 1991 + Tecmo license (World)
-wwfwfestb                       // bootleg
 wwfwfestj                       // TA-0031 (c) 1991 + Tecmo license (Japan)
 wwfwfestk                       // TA-0031 (c) 1991 + Tecmo license (Korea)
 wwfwfestu                       // TA-0031 (c) 1991 (US)
+wwfwfestu1                      // TA-0031 (c) 1991 (US)
+wwfwfestub                      // bootleg
 
 @source:ddribble.cpp
 ddribble                        // GX690 (c) 1986
@@ -12902,6 +12903,7 @@ fmtownssj                       // FM-Towns II SJ
 fmtownsux                       // 1991.11 FM-Towns II UX
 
 @source:fontwriter.cpp
+fw600                           // (c) Sharp
 fw700ger                        // (c) Sharp
 
 @source:foodf.cpp
@@ -13054,7 +13056,7 @@ pool10f                         // (c) 1997 C.M.C.
 pool10g                         // (c) 1996 C.M.C.
 pool10h                         // (c) 1996 C.M.C.
 pool10i                         // (c) 1997 C.M.C.
-pool10j                         // (c) 1997 C.M.C.
+pool10j                         // (c) 1996 bootleg
 potgame                         // (c) 1996 C.M.C.
 powercrd                        // (c) 1993 Fun World
 rcdino4                         // 1998 unknown
@@ -14697,10 +14699,11 @@ h89                             //
 
 @source:halleys.cpp
 benberob                        // A26
-halley87                        // A62 (c) 1986 Taito Corporation (Japan)
-halleycj                        // A62 (c) 1986 Taito Corporation (Japan)
-halleys                         // A62 (c) 1986 Taito America Corporation + Coin It (US)
-halleysc                        // A62 (c) 1986 Taito Corporation (Japan)
+halleysc                        // A62 (c) 1986 Taito America Corporation + Coin It (US)
+halleysc87                      // A62 (c) 1986 Taito Corporation (Japan)
+halleyscj                       // A62 (c) 1986 Taito Corporation (Japan, rev 1)
+halleyscja                      // A62 (c) 1986 Taito Corporation (Japan)
+halleyscjp                      // A62 (c) 1985 Taito Corporation (Japan, prototype)
 
 @source:hanaawas.cpp
 hanaawas                        // (c) SetaKikaku
@@ -15823,9 +15826,6 @@ jackie                          // (c) 1993 IGS
 
 @source:jackpool.cpp
 jackpool                        // (c) 1997 Electronic Projects
-
-@source:jade.cpp
-jgz80                           // Jade JGZ-80
 
 @source:jaguar.cpp
 a51mxr3k                        // ??           (c) 1998
@@ -37851,6 +37851,9 @@ uts20                           //
 @source:unkhorse.cpp
 unkhorse                        //
 
+@source:unkz80.cpp
+unkz80                          // Unknown
+
 @source:upscope.cpp
 upscope                         // (c) 1986 Grand products
 
@@ -39352,6 +39355,7 @@ xyonix                          // [1989 Philko]
 
 @source:y2.cpp
 kof2002um                       // (c)2009 SNK Playmore / New Channel
+kof2002umj                      // (c)2009 SNK Playmore / New Channel
 
 @source:yiear.cpp
 yiear                           // GX407 (c) 1985
