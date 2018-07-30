@@ -1520,6 +1520,8 @@ void hng64_state::machine_start()
 	}
 
 	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
+
+	init_io();
 }
 
 void hng64_state::machine_reset()
@@ -1582,6 +1584,27 @@ WRITE8_MEMBER(hng64_state::ioport2_w) { logerror("%s: ioport2_w %02x\n", machine
 WRITE8_MEMBER(hng64_state::ioport4_w) { logerror("%s: ioport4_w %02x\n", machine().describe_context(), data); }
 WRITE8_MEMBER(hng64_state::ioport5_w) { logerror("%s: ioport5_w %02x\n", machine().describe_context(), data); }
 WRITE8_MEMBER(hng64_state::ioport6_w) { logerror("%s: ioport6_w %02x\n", machine().describe_context(), data); }
+
+TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqon_callback)
+{
+	logerror("timer_hack_on\n");
+	m_iomcu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE );
+	m_tempio_irqoff_timer->adjust(m_maincpu->cycles_to_attotime(1000));
+}
+
+TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqoff_callback)
+{
+	logerror("timer_hack_off\n");
+	m_iomcu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE );
+}
+
+void hng64_state::init_io()
+{
+	m_tempio_irqon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqon_callback), this));
+	m_tempio_irqoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqoff_callback), this));
+
+	m_tempio_irqon_timer->adjust(m_maincpu->cycles_to_attotime(100000000));
+}
 
 MACHINE_CONFIG_START(hng64_state::hng64)
 	/* basic machine hardware */

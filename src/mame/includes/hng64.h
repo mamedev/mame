@@ -323,6 +323,12 @@ private:
 	DECLARE_WRITE8_MEMBER(ioport6_w);
 	DECLARE_WRITE8_MEMBER(ioport7_w);
 
+	TIMER_CALLBACK_MEMBER(tempio_irqon_callback);
+	TIMER_CALLBACK_MEMBER(tempio_irqoff_callback);
+	emu_timer *m_tempio_irqon_timer;
+	emu_timer *m_tempio_irqoff_timer;
+	void init_io();
+
 	void init_hng64_reorder_gfx();
 
 	void set_irq(uint32_t irq_vector);

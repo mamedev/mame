@@ -82,16 +82,18 @@ void tlcs870_device::tmp87ph40an_mem(address_map &map)
 	map(0x0035, 0x0035).w(FUNC(tlcs870_device::wdtcr2_w)); //
 
 	map(0x0036, 0x0036).rw(FUNC(tlcs870_device::tbtcr_r), FUNC(tlcs870_device::tbtcr_w)); // TBT / TG / DVO control
+#endif
 	map(0x0037, 0x0037).rw(FUNC(tlcs870_device::eintcr_r), FUNC(tlcs870_device::eintcr_w)); // External interrupt control
-
+#if 0
 	map(0x0038, 0x0038).rw(FUNC(tlcs870_device::syscr1_r), FUNC(tlcs870_device::syscr1_w)); // System Control
 	map(0x0039, 0x0039).rw(FUNC(tlcs870_device::syscr2_r), FUNC(tlcs870_device::syscr2_w)); //
-
+#endif
 	map(0x003a, 0x003a).rw(FUNC(tlcs870_device::eir_l_r), FUNC(tlcs870_device::eir_l_w)); // Interrupt enable register
 	map(0x003b, 0x003b).rw(FUNC(tlcs870_device::eir_h_r), FUNC(tlcs870_device::eir_h_w)); //
 
 	map(0x003c, 0x003c).rw(FUNC(tlcs870_device::il_l_r), FUNC(tlcs870_device::il_l_w)); // Interrupt latch
 	map(0x003d, 0x003d).rw(FUNC(tlcs870_device::il_h_r), FUNC(tlcs870_device::il_h_w)); //
+#if 0																					
 	// 0x3e reserved
 	map(0x003f, 0x003f).rw(FUNC(tlcs870_device::psw_r), FUNC(tlcs870_device::rbs_w)); // Program status word / Register bank selector
 #endif
@@ -272,34 +274,223 @@ WRITE8_MEMBER(tlcs870_device::p7cr_w)
 	m_port7_cr = data;
 }
 
+
+READ8_MEMBER(tlcs870_device::eintcr_r)
+{
+	return 0x00;
+}
+
+WRITE8_MEMBER(tlcs870_device::eintcr_w)
+{
+	m_EINTCR = data;
+
+	logerror("m_EINTCR (External Interrupt Control) bits set to\n");
+	logerror("%d: INT1NC (Interrupt noise reject)\n", (m_EINTCR & 0x80) ? 1 : 0);
+	logerror("%d: INT0EN (Interrupt 0 enable)\n",     (m_EINTCR & 0x40) ? 1 : 0);
+	logerror("%d: (invalid)\n",                       (m_EINTCR & 0x20) ? 1 : 0);
+	logerror("%d: INT4ES (edge select)\n",            (m_EINTCR & 0x10) ? 1 : 0);
+	logerror("%d: INT3ES (edge select)\n",            (m_EINTCR & 0x08) ? 1 : 0); 
+	logerror("%d: INT2ES (edge select)\n",            (m_EINTCR & 0x04) ? 1 : 0); 
+	logerror("%d: INT1ES (edge select)\n",            (m_EINTCR & 0x02) ? 1 : 0); 
+	logerror("%d: (invalid)\n",                       (m_EINTCR & 0x01) ? 1 : 0);
+
+	/* For edge select register 0 = rising edge, 1 = falling edge
+
+	   For INT0EN if 1 then Port 1 bit 0 is used for IRQ0, otherwise it is used for a port bit
+	   if it is used as an IRQ pin then it should also be configured as an input in P1CR
+	*/
+}
+
+READ8_MEMBER(tlcs870_device::eir_l_r)
+{
+	return m_EIR & 0xff;
+}
+
+READ8_MEMBER(tlcs870_device::eir_h_r)
+{
+	return (m_EIR >> 8) & 0xff;
+}
+
+WRITE8_MEMBER(tlcs870_device::eir_l_w)
+{
+	m_EIR = (m_EIR & 0xff00) | data;
+
+	logerror("m_EIR(LSB) (Interrupt Enable) bits set to\n");
+	logerror("%d: EF7 (External Interrupt 2)\n",      (m_EIR & 0x0080) ? 1 : 0);
+	logerror("%d: EF6 (Time Base Timer Interrupt)\n", (m_EIR & 0x0040) ? 1 : 0);
+	logerror("%d: EF5 (External Interrupt 1)\n",      (m_EIR & 0x0020) ? 1 : 0);
+	logerror("%d: EF4 (16-bit TC1 Interrupt)\n",      (m_EIR & 0x0010) ? 1 : 0);
+	logerror("%d: (invalid)\n",                       (m_EIR & 0x0008) ? 1 : 0); // can't be External Int 0 (bit in different register is used)
+	logerror("%d: (invalid)\n",                       (m_EIR & 0x0004) ? 1 : 0); // can't be Watchdog interrupt (non-maskable)
+	logerror("%d: (invalid)\n",                       (m_EIR & 0x0002) ? 1 : 0); // can't be Software interrupt (non-maskable)
+	logerror("%d: IMF\n",                             (m_EIR & 0x0001) ? 1 : 0); // can't be Reset interrupt (non-maskable)
+}
+
+WRITE8_MEMBER(tlcs870_device::eir_h_w)
+{
+	m_EIR = (m_EIR & 0x00ff) | (data << 8);
+
+	logerror("m_EIR(MSB) (Interrupt Enable) bits set to\n");
+	logerror("%d: EF15 (External Interrupt 5)\n",          (m_EIR & 0x8000) ? 1 : 0);
+	logerror("%d: EF14 (16-bit TC2 Interrupt)\n",          (m_EIR & 0x4000) ? 1 : 0);
+	logerror("%d: EF13 (Serial Interface 2 Interrupt)\n",  (m_EIR & 0x2000) ? 1 : 0);
+	logerror("%d: EF12 (External Interrupt 4)\n",          (m_EIR & 0x1000) ? 1 : 0);
+	logerror("%d: EF11 (External Interrupt 3)\n",          (m_EIR & 0x0800) ? 1 : 0);
+	logerror("%d: EF10 (8-bit TC4 Interrupt)\n",           (m_EIR & 0x0400) ? 1 : 0);
+	logerror("%d: EF9  (Serial Interface 1 Interrupt)\n",  (m_EIR & 0x0200) ? 1 : 0); 
+	logerror("%d: EF8  (8-bit TC3 Interrupt)\n",           (m_EIR & 0x0100) ? 1 : 0);
+}
+
+/*
+	the READ/WRITE/MODIFY operations cannot be used to clear interrupt latches
+
+	also you can't set a latch by writing '1' to it, only clear a latch
+	by writing 0 to it
+
+*/
+READ8_MEMBER(tlcs870_device::il_l_r)
+{
+	return m_IL & 0xff;
+}
+
+READ8_MEMBER(tlcs870_device::il_h_r)
+{
+	return (m_IL >> 8) & 0xff;
+}
+
+WRITE8_MEMBER(tlcs870_device::il_l_w)
+{
+	// probably not this logic
+	m_IL = (m_IL & 0xff00) | data;
+}
+
+WRITE8_MEMBER(tlcs870_device::il_h_w)
+{
+	// probably not this logic
+	m_IL = (m_EIR & 0x00ff) | (data << 8);
+}
+
 void tlcs870_device::execute_set_input(int inputnum, int state)
 {
-#if 0
-	switch (inputnum) {
-	case INPUT_LINE_NMI:
-		set_irq_line(INTNMI, state);
+	int32_t irqline = -1;
+
+	switch (inputnum)
+	{
+	case TLCS870_IRQ_INT5:
+	case INPUT_LINE_IRQ5:
+		irqline = 15;
 		break;
-	case INPUT_LINE_IRQ0:
-		set_irq_line(INT0, state);
+
+	case TLCS870_IRQ_INT4:
+	case INPUT_LINE_IRQ4:
+		irqline = 12;
 		break;
-	case INPUT_LINE_IRQ1:
-		set_irq_line(INT1, state);
+
+	case TLCS870_IRQ_INT3:
+	case INPUT_LINE_IRQ3:
+		irqline = 11;
 		break;
+
+	case TLCS870_IRQ_INT2:
 	case INPUT_LINE_IRQ2:
-		set_irq_line(INT2, state);
+		irqline = 7;
+		break;
+
+	case TLCS870_IRQ_INT1:
+	case INPUT_LINE_IRQ1:
+		irqline = 5;
+		break;
+
+	case TLCS870_IRQ_INT0:
+	case INPUT_LINE_IRQ0:
+		irqline = 3;
 		break;
 	}
-#endif
+
+	if (irqline != -1)
+	{
+		set_irq_line(irqline, state);
+	}
+}
+
+void tlcs870_device::set_irq_line(int irqline, int state)
+{
+	//logerror("set_irq_line %d %d\n", irqline, state);
+
+	if (!(m_irqstate & (1 << irqline)))
+	{
+		// rising edge
+		if (state)
+		{
+			m_irqstate |= 1<<irqline;
+
+			// TODO: add checks to see if interrupt pin(s) are configured, and if they're in rising edge mode
+			m_IL |= 1<<irqline;
+		}
+	}
+	else
+	{
+		if (!state)
+		{
+			m_irqstate &= ~(1<<irqline);
+		}
+	}
+}
+
+void tlcs870_device::check_interrupts()
+{
+	// priority 0-2 are non-maskable, and should have already been processed before we get here
+	for (int priority = 0; priority <= 15; priority++)
+	{
+		if (priority >= 3) // only priorities 0,1,2 are non-maskable
+		{
+			if (!(m_EIR & 1))
+			{
+				// maskable interrupts are disabled, bail
+				continue;
+			}
+
+			int is_latched = m_IL & (1<<priority);
+
+			if (is_latched)
+			{
+				take_interrupt(priority);
+				return;
+			}
+		}
+		else
+		{
+			// TODO: handle non-maskable here
+		}
+	}
+}
+
+void tlcs870_device::take_interrupt(int priority)
+{
+	m_IL &= ~(1<<priority);
+	m_EIR &= ~1;
+	logerror("taken interrupt %d\n", priority);
+
+	uint16_t vector = RM16(0xffe0 + ((15-priority)*2));
+
+	WM16(m_sp.d - 1, get_PSW());
+	WM16(m_sp.d - 2, m_addr);
+	m_sp.d -= 3;
+
+	m_pc.d = vector;
+	logerror("setting PC to %04x\n", m_addr);
+
 }
 
 void tlcs870_device::execute_run()
 {
 	while (m_icount > 0)
 	{
+		check_interrupts();
+
 		m_prvpc.d = m_pc.d;
 		debugger_instruction_hook(m_pc.d);
 
-		//check_interrupts();
 		m_addr = m_pc.d;
 		m_tmppc = m_addr; // used for jumps etc.
 		m_cycles = 0;
@@ -323,6 +514,10 @@ void tlcs870_device::device_reset()
 {
 	m_pc.d = RM16(0xfffe);
 	m_RBS = 0;
+	m_EIR = 0;
+	m_IL = 0;
+	m_EINTCR = 0;
+	m_irqstate = 0;
 
 	m_port_out_latch[0] = 0x00;
 	m_port_out_latch[1] = 0x00;

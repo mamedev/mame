@@ -8,6 +8,28 @@
 class tlcs870_device : public cpu_device
 {
 public:
+
+
+	enum _tlcs870interrupts
+	{
+		TLCS870_IRQ_INT5 = 0x100, // FFE0 INT5    (External Interrupt 5) - priority 15 (lowest)
+		TLCS870_IRQ_INTTC2,       // FFE2 INTTC2  (16-bit TC2 Interrupt)
+		TLCS870_IRQ_INTSIO2,      // FFE4 INTSIO2 (Serial Interface 2 Interrupt)
+		TLCS870_IRQ_INT4,         // FFE6 INT4    (External Interrupt 4)
+		TLCS870_IRQ_INT3,         // FFE8 INT3    (External Interrupt 3)
+		TLCS870_IRQ_INTTC4,       // FFEA INTTC4  (8-bit TC4 Interrupt)
+		TLCS870_IRQ_INTSIO1,      // FFEC INTSIO1 (Serial Interface 1 Interrupt)
+		TLCS870_IRQ_INTTC3,       // FFEE INTTC3  (8-bit TC3 Interrupt)
+		TLCS870_IRQ_INT2,         // FFF0 INT2    (External Interrupt 2)
+		TLCS870_IRQ_INTTBT,       // FFF2 INTTBT  (Time Base Timer Interrupt)
+		TLCS870_IRQ_INT1,         // FFF4 INT1    (External Interrupt 1)
+		TLCS870_IRQ_INTTC1,       // FFF6 INTTC1  (16-bit TC1 Interrupt)
+		TLCS870_IRQ_INT0,         // FFF8 INT0    (External Interrupt 0)
+		TLCS870_IRQ_INTWDT,       // FFFA INTWDT  (Watchdog Timer Interrupt)
+		TLCS870_IRQ_INTSW,        // FFFC INTSW   (Software Interrupt)
+		TLCS870_IRQ_RESET,        // FFFE RESET   (Reset Interrupt) - priority 0 (highest)
+	};
+
 	auto p0_in_cb() { return m_port_in_cb[0].bind(); }
 	auto p1_in_cb() { return m_port_in_cb[1].bind(); }
 	auto p2_in_cb() { return m_port_in_cb[2].bind(); }
@@ -158,6 +180,20 @@ private:
 	DECLARE_WRITE8_MEMBER(p6cr_w);
 	DECLARE_WRITE8_MEMBER(p7cr_w);
 
+	DECLARE_READ8_MEMBER(eir_l_r);
+	DECLARE_READ8_MEMBER(eir_h_r);
+	DECLARE_READ8_MEMBER(il_l_r);
+	DECLARE_READ8_MEMBER(il_h_r);
+
+	DECLARE_WRITE8_MEMBER(eir_l_w);
+	DECLARE_WRITE8_MEMBER(eir_h_w);
+	DECLARE_WRITE8_MEMBER(il_l_w);
+	DECLARE_WRITE8_MEMBER(il_h_w);
+
+	DECLARE_READ8_MEMBER(eintcr_r);
+
+	DECLARE_WRITE8_MEMBER(eintcr_w);
+
 	// Work registers
 	uint8_t m_cycles;
 	uint16_t m_tmppc;
@@ -167,6 +203,16 @@ private:
 
 	/* CPU registers */
 	uint8_t m_RBS; // register base (4-bits)
+
+	uint16_t m_IL; // 3D / 3C
+	uint16_t m_EIR; // 3B / 3A
+	uint8_t m_EINTCR;
+
+	uint16_t m_irqstate;
+
+	void set_irq_line(int irqline, int state);
+	void check_interrupts();
+	void take_interrupt(int priority);
 
 	uint8_t  RM8(const uint32_t a) { return m_program->read_byte(a); }
 	uint16_t RM16(const uint32_t a) { return RM8(a) | (RM8((a + 1) & 0xffff) << 8); }
@@ -386,7 +432,6 @@ private:
 	uint8_t handle_DAA(uint8_t val);
 	uint8_t handle_ROLC(uint8_t val);
 	uint8_t handle_RORC(uint8_t val);
-	void handle_take_interrupt(int level);
 
 	const bool check_jump_condition(int param1);
 

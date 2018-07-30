@@ -209,6 +209,9 @@ void tlcs870_device::do_RETI(const uint8_t opbyte0)
 	m_sp.d += 3;
 	m_addr = RM16(m_sp.d - 2);
 	set_PSW(RM8(m_sp.d - 1));
+
+	// Interrupts always get reenabled after a RETI.  The RETN behavior is different
+	m_EIR |= 1;
 }
 
 void tlcs870_device::do_RET(const uint8_t opbyte0)
@@ -1128,9 +1131,9 @@ void tlcs870_device::do_ff_opcode(const uint8_t opbyte0)
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
 		SWI               1111 1111                                            -  -  -  -    9 (1 if already in NMI)
 	*/
-	m_cycles = 9; // TODO: 1 if in NMI (acts as NOP?)
+	m_cycles = 9; // TODO: 1 if in NMI this acts as a NOP
 
-	handle_take_interrupt(0x0e);
+	set_irq_line(1, ASSERT_LINE);
 }
 
 /**********************************************************************************************************************/

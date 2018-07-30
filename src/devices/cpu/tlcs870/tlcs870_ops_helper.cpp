@@ -309,7 +309,7 @@ uint8_t tlcs870_device::do_add_16bit(uint32_t param1, uint32_t param2)
 	}
 
 	// unknown, manual says undefined, see note above
-	uint8_t temp = (param1 & 0xff) + (param2 & 0xff);
+	uint16_t temp = (param1 & 0xff) + (param2 & 0xff);
 
 	if (temp & 0x100)
 	{
@@ -809,36 +809,3 @@ uint8_t tlcs870_device::handle_RORC(uint8_t val)
 
 	return val;
 }
-
-/*
-
-(Priority Low - 15)
-FFE0 INT5    (External Interrupt 5) 
-FFE2 INTTC2  (16-bit TC2 Interrupt)
-FFE4 INTSIO2 (Serial Interface 2 Interrupt)
-FFE6 INT4    (External Interrupt 4)
-FFE8 INT3    (External Interrupt 3)
-FFEA INTTC4  (8-bit TC4 Interrupt)
-FFEC INTSIO1 (Serial Interface 1 Interrupt)
-FFEE INTTC3  (8-bit TC3 Interrupt)
-FFF0 INT2    (External Interrupt 2)
-FFF2 INTTBT  (Time Base Timer Interrupt)
-FFF4 INT1    (External Interrupt 1)
-FFF6 INTTC1  (16-bit TC1 Interrupt)
-FFF8 INT0    (External Interrupt 0)
-FFFA INTWDT  (Watchdog Timer Interrupt)
-FFFC INTSW   (Software Interrupt)
-FFFE RESET   (Reset Vector)
-(Priority High - 0)
-
-*/
-
-void tlcs870_device::handle_take_interrupt(int level)
-{
-	WM8(m_sp.d - 1, get_PSW());
-	WM16(m_sp.d - 2, m_addr);
-	m_sp.d -= 3;
-
-	m_addr = RM16(0xffe0 + ((level &0xf)*2));
-}
-
