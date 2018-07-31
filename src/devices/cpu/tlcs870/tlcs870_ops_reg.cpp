@@ -19,10 +19,10 @@
 	EF  H
 
 	(16-bit mode operations)
-    E8  invalid
-	E9  invalid
-	EA  invalid
-	EB  invalid
+    E8  WA
+	E9  BC
+	EA  DE
+	EB  HL
 	EC  WA
 	ED  BC
 	EE  DE
@@ -497,6 +497,7 @@ void tlcs870_device::do_CLR_inppbit(const uint8_t opbyte0, const uint8_t opbyte1
 	const uint8_t bitpos = get_reg8(opbyte0 & 7) & 0x7;
 	const uint8_t bitused = 1 << bitpos;
 	const uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	uint8_t val = RM8(addr);
 
 	if (val & bitused) // Zero flag gets set based on original value of bit?
@@ -527,6 +528,7 @@ void tlcs870_device::do_CPL_inpp_indirectbit(const uint8_t opbyte0, const uint8_
 	const uint8_t bitpos = get_reg8(opbyte0 & 7) & 0x7;
 	const uint8_t bitused = 1 << bitpos;
 	const uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	uint8_t val = RM8(addr);
 
 	uint8_t bit = val & bitused;

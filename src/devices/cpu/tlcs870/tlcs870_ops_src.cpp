@@ -416,6 +416,7 @@ void tlcs870_device::do_XCH_r_insrc(const uint8_t opbyte0, const uint8_t opbyte1
 	*/
 	m_cycles += 4;
 
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	const uint8_t val = RM8(srcaddr);
 	const uint8_t temp = get_reg8(opbyte1 & 0x7);
 
@@ -520,7 +521,10 @@ void tlcs870_device::do_ALUOP_insrc_inHL(const uint8_t opbyte0, const uint8_t op
 	m_cycles += 6;
 
 	const int aluop = (opbyte1 & 0x7);
+	if (aluop != 0x07)
+		m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	const uint8_t val = RM8(srcaddr);
+	m_read_input_port = 1;
 
 	const uint16_t HL = get_reg16(REG_HL);
 
@@ -616,6 +620,10 @@ void tlcs870_device::do_ALUOP_insrc_n(const uint8_t opbyte0, const uint8_t opbyt
 	const uint8_t n = READ8();
 
 	const int aluop = (opbyte1 & 0x7);
+	
+	if (aluop != 0x07)
+		m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
+	
 	const uint8_t val = RM8(srcaddr);
 
 	const uint8_t result = do_alu_8bit(aluop, val, n);
@@ -848,6 +856,7 @@ void tlcs870_device::do_LD_insrcbit_CF(const uint8_t opbyte0, const uint8_t opby
 	*/
 	m_cycles += 4;
 
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	uint8_t val = RM8(srcaddr);
 	const uint8_t bitpos = opbyte1 & 0x7;
 
@@ -885,6 +894,7 @@ void tlcs870_device::do_CPL_insrcbit(const uint8_t opbyte0, const uint8_t opbyte
 	*/
 	m_cycles += 4;
 
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	uint8_t val = RM8(srcaddr);
 	const uint8_t bitpos = opbyte1 & 0x7;
 
@@ -956,6 +966,7 @@ void tlcs870_device::do_SET_insrcbit(const uint8_t opbyte0, const uint8_t opbyte
 	*/
 	m_cycles += 4;
 
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	uint8_t val = RM8(srcaddr);
 	const uint8_t bitpos = opbyte1 & 0x7;
 
@@ -994,6 +1005,7 @@ void tlcs870_device::do_CLR_insrcbit(const uint8_t opbyte0, const uint8_t opbyte
 	*/
 	m_cycles += 4;
 
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	uint8_t val = RM8(srcaddr);
 	const uint8_t bitpos = opbyte1 & 0x7;
 
