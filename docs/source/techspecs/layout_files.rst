@@ -98,7 +98,8 @@ Colours are specified in RGBA space.  MAME is not aware of colour profiles and
 gamuts, so colours will typically be interpreted as sRGB with your system's
 target gamma (usually 2.2).  Channel values are specified as floating-point
 numbers.  Red, green and blue channel values range from 0.0 (off) to 1.0 (full
-intensity).  Alpha ranges from 0.0 (fully transparent) to 1.0 (opaque).
+intensity).  Alpha ranges from 0.0 (fully transparent) to 1.0 (opaque).  Colour
+channels values are not pre-multiplied by the alpha value.
 
 Component and view item colour is specified using ``color`` elements.
 Meaningful attributes are ``red``, ``green``, ``blue`` and ``alpha``.  This
@@ -161,10 +162,10 @@ Here's an example assigning the value "4" to the value parameter "firstdigit"::
 
 Generator parameters are assigned using a ``param`` element with ``name`` and
 ``start`` attributes, and ``increment``, ``lshift`` and/or ``rshift``
-attributes.  Generator parameters may only appear inside ``repeat`` elements.
-A generator parameter must not be reassigned in the same scope (an identically
-named parameter may be defined in a child scope).  Here are some example
-generator parameters::
+attributes.  Generator parameters may only appear inside ``repeat`` elements
+(see :ref:`layout-parts-repeats` for details).  A generator parameter must not
+be reassigned in the same scope (an identically named parameter may be defined
+in a child scope).  Here are some example generator parameters::
 
     <param name="nybble" start="3" increment="-1" />
     <param name="switchpos" start="74" increment="156" />
@@ -172,7 +173,7 @@ generator parameters::
 
 * The ``nybble`` parameter generates values 3, 2, 1...
 * The ``switchpos`` parameter generates values 74, 230, 386...
-* The ``mask`` parameter generates values 2048, 1024, 512...
+* The ``mask`` parameter generates values 2048, 128, 8...
 
 The ``increment`` attribute must be an integer or floating-point number to be
 added to the parameter's value.  The ``lshift`` and ``rshift`` attributes must
@@ -318,6 +319,64 @@ end of configuration.  Values are not updated and layouts are not recomputed if
 the system reconfigures the screen while running.
 
 
+.. _layout-concepts-layers:
+
+Layers
+~~~~~~
+
+Views are rendered as a stack of layers, named after parts of an arcade cabinet.
+The layout supplies elements to be drawn in all layers besides the screen layer,
+which is reserved for emulated screens.  With the exception of the screen layer,
+users can enable or disable layers using the in-emulation menu or command-line
+options.
+
+The following layers are available:
+
+backdrop
+    Intended for use in situations were the screen image is projected over a
+    backdrop using a semi-reflective mirror (Pepper's ghost).  This arrangement
+    is famously used in the Space Invaders deluxe cabinet.
+screen
+    This layer is reserved for emulated screen images, and cannot be disabled by
+    the user.  It is drawn using additive blending.
+overlay
+    This layer is intended for use translucent overlays used to add colour to
+    games using monochrome monitors like Circus, Gee Bee, and of course Space
+    Invaders.  It is drawn using RGB multiplication.
+bezel
+    This layer is for elements that surround and potentially obscure the screen
+    image.  It is drawn with standard alpha blending.
+cpanel
+    This layer is intended for displaying controls/input devices (control
+    panels).  It is drawn using standard alpha blending.
+marquee
+    This layer is intended for displaying arcade cabinet marquee images.  It is
+    drawn using standard alpha blending.
+
+By default, layers are drawn in this order (from back to front):
+
+* screen (add)
+* overlay (multiply)
+* backdrop (add)
+* bezel (alpha)
+* cpanel (alpha)
+* marquee (alpha)
+
+If a view has multiple backdrop elements and no overlay elements, a different
+order is used (from back to front):
+
+* backdrop (alpha)
+* screen (add)
+* bezel (alpha)
+* cpanel (alpha)
+* marquee (alpha)
+
+The alternate drawing order makes it simpler to build a backdrop from multiple
+scanned/traced pieces of art, as they can have opaque parts.  It can't be used
+with overlay elements because colour overlays are conventionally placed between
+the screen and mirror, and as such do not affect the backdrop.
+
+
 .. _layout-parts:
 
 Parts of a layout
@@ -366,7 +425,7 @@ script
 .. _layout-parts-elements:
 
 Elements
---------
+~~~~~~~~
 
 Elements are one of the basic visual objects that may be arranged, along with
 screens, to make up a view.  Elements may be built up one or more *components*,
@@ -541,6 +600,137 @@ An example element for a button that gives visual feedback when clicked::
         <text string="RESET"><bounds x="0.1" y="0.4" width="0.8" height="0.2" /><color red="1.0" green="1.0" blue="1.0" /></text>
     </element>
 
+
+.. _layout-parts-repeats:
+
+Repeating blocks
+~~~~~~~~~~~~~~~~
+
+Repeating blocks provide a concise way to generate or arrange large numbers of
+similar elements.  Repeating blocks are generally used in conjunction with
+generator parameters (see :ref:`layout-concepts-params`).  Repeating blocks may
+be nested for more complex arrangements.
+
+Repeating blocks are created with ``repeat`` elements.  Each ``repeat`` element
+requires a ``count`` attribute specifying the number of iterations to generate.
+The ``count`` attribute must be a positive integer.  Repeating blocks are
+allowed inside the top-level ``mamelayout`` element, inside ``group`` and
+``view`` elements, and insider other ``repeat`` elements.  The exact child
+elements allowed inside a ``repeat`` element depend on where it appears:
+
+* A repeating block inside the top-level ``mamelayout`` element may contain
+  ``param``, ``element``, ``group`` (definition), and ``repeat`` elements.
+* A repeating block inside a ``group`` or ``view`` element may contain
+  ``param``, ``backdrop``, ``screen``, ``overlay``, ``bezel``, ``cpanel``,
+  ``marquee``, ``group`` (reference), and ``repeat`` elements.
+
+A repeating block effectively repeats its contents the number of times specified
+by its ``count`` attribute.  See the relevant sections for details on how the
+child elements are used (:ref:`layout-parts`, :ref:`layout-parts-groups`, and
+:ref:`layout-parts-views`).  A repeating block creates a nested parameter scope
+inside the parameter scope of its lexical (DOM) parent element.
+
+Generating white number labels from zero to eleven named ``label_0``,
+``label_1``, and so on (inside the top-level ``mamelayout`` element)::
+
+    <repeat count="12">
+        <param name="labelnum" start="0" increment="1" />
+        <element name="label_~labelnum~">
+            <text string="~labelnum~"><color red="1.0" green="1.0" blue="1.0" /></text>
+        </element>
+    </repeat>
+
+A horizontal row of forty digital displays, with five units space between them,
+controlled by outputs ``digit0`` to ``digit39`` (inside a ``group`` or ``view``
+element)::
+
+    <repeat count="40">
+        <param name="i" start="0" increment="1" />
+        <param name="x" start="5" increment="30" />
+        <bezel name="digit~i~" element="digit">
+            <bounds x="~x~" y="5" width="25" height="50" />
+        </bezel>
+    </repeat>
+
+Eight five-by-seven dot matrix displays in a row, with pixels controlled by
+outputs ``Dot_000`` to ``Dot_764`` (inside a ``group`` or ``view`` element)::
+
+    <repeat count="8"> <!-- 8 digits -->
+        <param name="digitno" start="1" increment="1" />
+        <param name="digitx" start="0" increment="935" /> <!-- distance between digits ((111 * 5) + 380) -->
+        <repeat count="7"> <!-- 7 rows in each digit -->
+            <param name="rowno" start="1" increment="1" />
+            <param name="rowy" start="0" increment="114" /> <!-- vertical distance between LEDs -->
+            <repeat count="5"> <!-- 5 columns in each digit -->
+                <param name="colno" start="1" increment="1" />
+                <param name="colx" start="~digitx~" increment="111" /> <!-- horizontal distance between LEDs -->
+                <bezel name="Dot_~digitno~~rowno~~colno~" element="Pixel" state="0">
+                    <bounds x="~colx~" y="~rowy~" width="100" height="100" /> <!-- size of each LED -->
+                </bezel>
+            </repeat>
+        </repeat>
+    </repeat>
+
+Two horizontally separated, clickable, four-by-four keypads (inside a ``group``
+or ``view`` element)::
+
+    <repeat count="2">
+        <param name="col" start="0" increment="4" />
+        <param name="x" start="10" increment="530" />
+        <param name="mask" start="0x01" lshift="4" />
+        <repeat count="4">
+            <param name="row" start="0" increment="1" />
+            <param name="y" start="100" increment="110" />
+            <repeat count="4">
+                <param name="col" start="~col~" increment="1" />
+                <param name="x" start="~x~" increment="110" />
+                <param name="mask" start="~mask~" lshift="1" />
+                <bezel element="btn~row~~col~" inputtag="row~row~" inputmask="~mask~">
+                    <bounds x="~x~" y="~y~" width="80" height="80" />
+                </bezel>
+            </repeat>
+        </repeat>
+    </repeat>
+
+The buttons are drawn using elements ``btn00`` in the top left, ``bnt07`` in the
+top right, ``btn30`` in the bottom left, and ``btn37`` in the bottom right,
+counting in between.  The four rows are connected to I/O ports ``row0``,
+``row1``, ``row2``, and ``row3``, from top to bottom.  The columns are connected
+to consecutive I/O port bits, starting with the least significant bit on the
+left.   Note that the ``col``, ``x`` and ``mask`` parameters in the innermost
+``repeat`` element take their initial values from the correspondingly named
+parameters in the enclosing scope, but do not modify them.
+
+Generating a chequerboard pattern with alternating alpha values 0.4 and 0.2
+(inside a ``group`` or ``view`` element)::
+
+    <repeat count="4">
+        <param name="ipty" start="3" increment="20" />
+        <param name="iptno" start="7" increment="-2" />
+        <repeat count="2">
+            <param name="ipty" start="~ipty~" increment="10" />
+            <param name="iptno" start="~iptno~" increment="-1" />
+            <param name="lalpha" start="0.4" increment="-0.2" />
+            <param name="ralpha" start="0.2" increment="0.2" />
+            <repeat count="4">
+                <param name="lx" start="3" increment="20" />
+                <param name="rx" start="13" increment="20" />
+                <param name="lmask" start="0x01" lshift="2" />
+                <param name="rmask" start="0x02" lshift="2" />
+                <bezel element="hl" inputtag="board:IN.~iptno~" inputmask="~lmask~">
+                    <bounds x="~lx~" y="~ipty~" width="10" height="10" />
+                    <color alpha="~lalpha~" />
+                </bezel>
+                <bezel element="hl" inputtag="board:IN.~iptno~" inputmask="~rmask~">
+                    <bounds x="~rx~" y="~ipty~" width="10" height="10" />
+                    <color alpha="~ralpha~" />
+                </bezel>
+            </repeat>
+        </repeat>
+    </repeat>
+
+Rows are connected to I/O ports ``board:IN.7`` at the top to ``board.IN.0`` at
+the bottom.
 
 
 .. _layout-autogen:

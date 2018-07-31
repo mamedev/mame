@@ -112,8 +112,20 @@ static const render_quad_texuv oriented_texcoords[8] =
 };
 
 // layer orders
-static const int layer_order_standard[] = { ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BACKDROP, ITEM_LAYER_BEZEL, ITEM_LAYER_CPANEL, ITEM_LAYER_MARQUEE };
-static const int layer_order_alternate[] = { ITEM_LAYER_BACKDROP, ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BEZEL, ITEM_LAYER_CPANEL, ITEM_LAYER_MARQUEE };
+static constexpr std::pair<item_layer, int> layer_order_standard[]{
+		{ ITEM_LAYER_SCREEN,    -1 }, // FIXME: invalid blend mode - we're relying on the goodness of the OSD
+		{ ITEM_LAYER_OVERLAY,   BLENDMODE_RGB_MULTIPLY },
+		{ ITEM_LAYER_BACKDROP,  BLENDMODE_ADD },
+		{ ITEM_LAYER_BEZEL,     BLENDMODE_ALPHA },
+		{ ITEM_LAYER_CPANEL,    BLENDMODE_ALPHA },
+		{ ITEM_LAYER_MARQUEE,   BLENDMODE_ALPHA } };
+static constexpr std::pair<item_layer, int> layer_order_alternate[]{
+		{ ITEM_LAYER_BACKDROP,  BLENDMODE_ALPHA },
+		{ ITEM_LAYER_SCREEN,    BLENDMODE_ADD },
+		{ ITEM_LAYER_OVERLAY,   BLENDMODE_RGB_MULTIPLY },
+		{ ITEM_LAYER_BEZEL,     BLENDMODE_ALPHA },
+		{ ITEM_LAYER_CPANEL,    BLENDMODE_ALPHA },
+		{ ITEM_LAYER_MARQUEE,   BLENDMODE_ALPHA } };
 
 
 
@@ -177,24 +189,11 @@ inline item_layer get_layer_and_blendmode(layout_view &view, int index, int &ble
 	//  else render:
 	//      screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
 
-	const int *layer_order = layer_order_standard;
-	if (view.items(ITEM_LAYER_BACKDROP).size() > 1 && view.items(ITEM_LAYER_OVERLAY).empty())
-		layer_order = layer_order_alternate;
+	std::pair<item_layer, int> const *const layer_order(((view.items(ITEM_LAYER_BACKDROP).size() > 1) && view.items(ITEM_LAYER_OVERLAY).empty()) ? layer_order_alternate : layer_order_standard);
 
-	// select the layer
-	int layer = layer_order[index];
-
-	// pick a blendmode
-	if (layer == ITEM_LAYER_SCREEN && layer_order == layer_order_standard)
-		blendmode = -1;
-	else if (layer == ITEM_LAYER_SCREEN || (layer == ITEM_LAYER_BACKDROP && layer_order == layer_order_standard))
-		blendmode = BLENDMODE_ADD;
-	else if (layer == ITEM_LAYER_OVERLAY)
-		blendmode = BLENDMODE_RGB_MULTIPLY;
-	else
-		blendmode = BLENDMODE_ALPHA;
-
-	return item_layer(layer);
+	// select the layer and blend mode
+	blendmode = layer_order[index].second;
+	return layer_order[index].first;
 }
 
 //**************************************************************************
