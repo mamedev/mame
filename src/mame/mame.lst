@@ -9576,6 +9576,9 @@ mag_time
 mag_exzi
 mag_xain
 mag_war
+mag_wara
+mag_burn
+mag_day
 
 @source:centiped.cpp
 bullsdrt                        // (c) 1985 Shinkai
