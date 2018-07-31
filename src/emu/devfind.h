@@ -520,24 +520,14 @@ public:
 	/// Allows search tag to be changed after construction.  Note that
 	/// this must be done before resolution time to take effect.
 	/// \param [in] object Object to refer to.
-	void set_tag(DeviceClass &object)
-	{
-		assert(!this->m_resolved);
-		finder_base::m_base = object.mconfig().root_device();
-		finder_base::m_tag = object.tag();
-	}
+	void set_tag(DeviceClass &object) { set_tag(object, DEVICE_SELF); }
 
 	/// \brief Set search tag
 	///
 	/// Allows search tag to be changed after construction.  Note that
 	/// this must be done before resolution time to take effect.
 	/// \param [in] object Object to refer to.
-	void set_tag(DeviceClass *object)
-	{
-		assert(!this->m_resolved);
-		finder_base::m_base = object->mconfig().root_device();
-		finder_base::m_tag = object->tag();
-	}
+	void set_tag(DeviceClass *object) { assert(object != nullptr); set_tag(*object, DEVICE_SELF); }
 
 	using object_finder_base<DeviceClass, Required>::set_tag;
 
