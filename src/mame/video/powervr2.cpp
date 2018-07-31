@@ -2356,12 +2356,7 @@ inline void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int
 	uint32_t *tdata;
 	float *wbufline;
 
-	// untextured cases aren't handled
-//  if (!ti->textured) return;
-
 	float bl[4], offl[4];
-	memcpy(bl, bl_in, sizeof(bl));
-	memcpy(offl, offl_in, sizeof(offl));
 
 	if(xr < 0 || xl >= 640)
 		return;
@@ -2372,23 +2367,28 @@ inline void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int
 	if(xxl == xxr)
 		return;
 
+	memcpy(bl, bl_in, sizeof(bl));
+	memcpy(offl, offl_in, sizeof(offl));
+
 	dx = xr-xl;
-	dudx = (ur-ul)/dx;
-	dvdx = (vr-vl)/dx;
-	dwdx = (wr-wl)/dx;
+	float dx_recip = 1.0f / dx;
+
+	dudx = (ur-ul) * dx_recip;
+	dvdx = (vr-vl) * dx_recip;
+	dwdx = (wr-wl) * dx_recip;
 
 	float dbdx[4] = {
-		(br_in[0] - bl[0]) / dx,
-		(br_in[1] - bl[1]) / dx,
-		(br_in[2] - bl[2]) / dx,
-		(br_in[3] - bl[3]) / dx
+		(br_in[0] - bl[0]) * dx_recip,
+		(br_in[1] - bl[1]) * dx_recip,
+		(br_in[2] - bl[2]) * dx_recip,
+		(br_in[3] - bl[3]) * dx_recip
 	};
 
 	float dodx[4] = {
-		(offr_in[0] - offl[0]) / dx,
-		(offr_in[1] - offl[1]) / dx,
-		(offr_in[2] - offl[2]) / dx,
-		(offr_in[3] - offl[3]) / dx
+		(offr_in[0] - offl[0]) * dx_recip,
+		(offr_in[1] - offl[1]) * dx_recip,
+		(offr_in[2] - offl[2]) * dx_recip,
+		(offr_in[3] - offl[3]) * dx_recip
 	};
 
 	if(xxl < 0)
