@@ -963,9 +963,9 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 	MCFG_BBC_FDC_SLOT_DRQ_HANDLER(WRITELINE(*this, bbc_state, fdc_drq_w))
 
 	/* econet */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, host_data_w))
-	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(*this, bbc_state, adlc_irq_w))
+	MC6854(config, m_adlc);
+	m_adlc->out_txd_cb().set(ECONET_TAG, FUNC(econet_device::host_data_w));
+	m_adlc->out_irq_cb().set(FUNC(bbc_state::adlc_irq_w));
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, bbc_state, econet_clk_w))
 	MCFG_ECONET_DATA_CALLBACK(WRITELINE("mc6854", mc6854_device, set_rx))
@@ -1434,9 +1434,9 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* econet */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(ECONET_TAG, econet_device, host_data_w))
-	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(*this, bbc_state, adlc_irq_w))
+	MC6854(config, m_adlc);
+	m_adlc->out_txd_cb().set(ECONET_TAG, FUNC(econet_device::host_data_w));
+	m_adlc->out_irq_cb().set(FUNC(bbc_state::adlc_irq_w));
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, bbc_state, econet_clk_w))
 	MCFG_ECONET_DATA_CALLBACK(WRITELINE("mc6854", mc6854_device, set_rx))

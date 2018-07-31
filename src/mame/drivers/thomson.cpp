@@ -696,8 +696,8 @@ MACHINE_CONFIG_START(thomson_state::to7)
 
 
 /* network */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_FRAME_CB(thomson_state, to7_network_got_frame)
+	MC6854(config, m_mc6854);
+	m_mc6854->set_out_frame_callback(FUNC(thomson_state::to7_network_got_frame));
 
 
 /* pia */

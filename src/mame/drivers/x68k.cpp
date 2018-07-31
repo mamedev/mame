@@ -1727,10 +1727,10 @@ MACHINE_CONFIG_START(x68k_state::x68ksupr)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE6, "harddisk", SCSIHD, SCSI_ID_5)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE7, "cdrom", SCSICD, SCSI_ID_6)
 
-	MCFG_DEVICE_ADD("mb89352", MB89352A, 40_MHz_XTAL / 8)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_MB89352A_IRQ_CB(WRITELINE(*this, x68k_state, x68k_scsi_irq))
-	MCFG_MB89352A_DRQ_CB(WRITELINE(*this, x68k_state, x68k_scsi_drq))
+	mb89352_device &scsictrl(MB89352A(config, "mb89352", 40_MHz_XTAL / 8));
+	scsictrl.set_scsi_port("scsi");
+	scsictrl.irq_cb().set(FUNC(x68k_state::x68k_scsi_irq));
+	scsictrl.drq_cb().set(FUNC(x68k_state::x68k_scsi_drq));
 
 	VICON(config.replace(), m_crtc, 38.86363_MHz_XTAL);
 	m_crtc->set_screen("screen");
