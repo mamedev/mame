@@ -1135,7 +1135,8 @@ void tlcs870_device::do_ff_opcode(const uint8_t opbyte0)
 	*/
 	m_cycles = 9; // TODO: 1 if in NMI this acts as a NOP
 
-	set_irq_line(1, ASSERT_LINE);
+	// set interrupt latch
+	m_IL |= 1<<TLCS870_IRQ_INTSW;
 }
 
 /**********************************************************************************************************************/

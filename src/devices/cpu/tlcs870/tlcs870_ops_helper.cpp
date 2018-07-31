@@ -286,7 +286,7 @@ uint8_t tlcs870_device::do_add_8bit(uint16_t param1, uint16_t param2)
 	return result;
 }
 
-uint8_t tlcs870_device::do_add_16bit(uint32_t param1, uint32_t param2)
+uint16_t tlcs870_device::do_add_16bit(uint32_t param1, uint32_t param2)
 {
 	uint32_t result = param1 + param2;
 
@@ -364,7 +364,7 @@ uint8_t tlcs870_device::do_sub_8bit(uint16_t param1, uint16_t param2)
 }
 
 
-uint8_t tlcs870_device::do_sub_16bit(uint32_t param1, uint32_t param2)
+uint16_t tlcs870_device::do_sub_16bit(uint32_t param1, uint32_t param2)
 {
 	uint32_t result = param1 - param2;
 

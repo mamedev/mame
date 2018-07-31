@@ -9,27 +9,6 @@ class tlcs870_device : public cpu_device
 {
 public:
 
-
-	enum _tlcs870interrupts
-	{
-		TLCS870_IRQ_INT5 = 0x100, // FFE0 INT5    (External Interrupt 5) - priority 15 (lowest)
-		TLCS870_IRQ_INTTC2,       // FFE2 INTTC2  (16-bit TC2 Interrupt)
-		TLCS870_IRQ_INTSIO2,      // FFE4 INTSIO2 (Serial Interface 2 Interrupt)
-		TLCS870_IRQ_INT4,         // FFE6 INT4    (External Interrupt 4)
-		TLCS870_IRQ_INT3,         // FFE8 INT3    (External Interrupt 3)
-		TLCS870_IRQ_INTTC4,       // FFEA INTTC4  (8-bit TC4 Interrupt)
-		TLCS870_IRQ_INTSIO1,      // FFEC INTSIO1 (Serial Interface 1 Interrupt)
-		TLCS870_IRQ_INTTC3,       // FFEE INTTC3  (8-bit TC3 Interrupt)
-		TLCS870_IRQ_INT2,         // FFF0 INT2    (External Interrupt 2)
-		TLCS870_IRQ_INTTBT,       // FFF2 INTTBT  (Time Base Timer Interrupt)
-		TLCS870_IRQ_INT1,         // FFF4 INT1    (External Interrupt 1)
-		TLCS870_IRQ_INTTC1,       // FFF6 INTTC1  (16-bit TC1 Interrupt)
-		TLCS870_IRQ_INT0,         // FFF8 INT0    (External Interrupt 0)
-		TLCS870_IRQ_INTWDT,       // FFFA INTWDT  (Watchdog Timer Interrupt)
-		TLCS870_IRQ_INTSW,        // FFFC INTSW   (Software Interrupt)
-		TLCS870_IRQ_RESET,        // FFFE RESET   (Reset Interrupt) - priority 0 (highest)
-	};
-
 	auto p0_in_cb() { return m_port_in_cb[0].bind(); }
 	auto p1_in_cb() { return m_port_in_cb[1].bind(); }
 	auto p2_in_cb() { return m_port_in_cb[2].bind(); }
@@ -47,6 +26,15 @@ public:
 	auto p5_out_cb() { return m_port_out_cb[5].bind(); }
 	auto p6_out_cb() { return m_port_out_cb[6].bind(); }
 	auto p7_out_cb() { return m_port_out_cb[7].bind(); }
+
+	auto an0_in_cb() { return m_port_analog_in_cb[0].bind(); }
+	auto an1_in_cb() { return m_port_analog_in_cb[1].bind(); }
+	auto an2_in_cb() { return m_port_analog_in_cb[2].bind(); }
+	auto an3_in_cb() { return m_port_analog_in_cb[3].bind(); }
+	auto an4_in_cb() { return m_port_analog_in_cb[4].bind(); }
+	auto an5_in_cb() { return m_port_analog_in_cb[5].bind(); }
+	auto an6_in_cb() { return m_port_analog_in_cb[6].bind(); }
+	auto an7_in_cb() { return m_port_analog_in_cb[7].bind(); }
 
 protected:
 	// construction/destruction
@@ -78,6 +66,26 @@ protected:
 	void tmp87ph40an_mem(address_map &map);
 
 	uint32_t m_debugger_temp;
+
+	enum _tlcs870interrupts
+	{
+		TLCS870_IRQ_INT5, // FFE0 INT5    (External Interrupt 5) - priority 15 (lowest)
+		TLCS870_IRQ_INTTC2,       // FFE2 INTTC2  (16-bit TC2 Interrupt)
+		TLCS870_IRQ_INTSIO2,      // FFE4 INTSIO2 (Serial Interface 2 Interrupt)
+		TLCS870_IRQ_INT4,         // FFE6 INT4    (External Interrupt 4)
+		TLCS870_IRQ_INT3,         // FFE8 INT3    (External Interrupt 3)
+		TLCS870_IRQ_INTTC4,       // FFEA INTTC4  (8-bit TC4 Interrupt)
+		TLCS870_IRQ_INTSIO1,      // FFEC INTSIO1 (Serial Interface 1 Interrupt)
+		TLCS870_IRQ_INTTC3,       // FFEE INTTC3  (8-bit TC3 Interrupt)
+		TLCS870_IRQ_INT2,         // FFF0 INT2    (External Interrupt 2)
+		TLCS870_IRQ_INTTBT,       // FFF2 INTTBT  (Time Base Timer Interrupt)
+		TLCS870_IRQ_INT1,         // FFF4 INT1    (External Interrupt 1)
+		TLCS870_IRQ_INTTC1,       // FFF6 INTTC1  (16-bit TC1 Interrupt)
+		TLCS870_IRQ_INT0,         // FFF8 INT0    (External Interrupt 0)
+		TLCS870_IRQ_INTWDT,       // FFFA INTWDT  (Watchdog Timer Interrupt)
+		TLCS870_IRQ_INTSW,        // FFFC INTSW   (Software Interrupt)
+		TLCS870_IRQ_RESET,        // FFFE RESET   (Reset Interrupt) - priority 0 (highest)
+	};
 
 private:
 
@@ -153,10 +161,12 @@ private:
 
 	devcb_read8   m_port_in_cb[8];
 	devcb_write8  m_port_out_cb[8];
+	devcb_read8   m_port_analog_in_cb[8];
+
 	uint8_t m_port_out_latch[8];
 	int m_read_input_port;
 	uint8_t m_port0_cr, m_port1_cr, m_port6_cr, m_port7_cr;
-
+	
 	DECLARE_READ8_MEMBER(port0_r);
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_READ8_MEMBER(port2_r);
@@ -212,6 +222,8 @@ private:
 	uint16_t m_IL; // 3D / 3C
 	uint16_t m_EIR; // 3B / 3A
 	uint8_t m_EINTCR;
+	uint8_t m_ADCCR;
+	uint8_t m_ADCDR;
 
 	uint16_t m_irqstate;
 
@@ -422,8 +434,8 @@ private:
 	void do_cmp_8bit(uint16_t param1, uint16_t param2);
 	uint8_t do_alu_8bit(int op, uint16_t param1, uint16_t param2);
 
-	uint8_t do_add_16bit(uint32_t param1, uint32_t param2);
-	uint8_t do_sub_16bit(uint32_t param1, uint32_t param2);
+	uint16_t do_add_16bit(uint32_t param1, uint32_t param2);
+	uint16_t do_sub_16bit(uint32_t param1, uint32_t param2);
 	void do_cmp_16bit(uint32_t param1, uint32_t param2);
 	uint16_t do_alu_16bit(int op, uint32_t param1, uint32_t param2);
 

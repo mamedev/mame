@@ -1622,6 +1622,16 @@ WRITE8_MEMBER(hng64_state::ioport4_w) { logerror("%s: ioport4_w %02x\n", machine
 WRITE8_MEMBER(hng64_state::ioport5_w) { logerror("%s: ioport5_w %02x\n", machine().describe_context(), data); }
 WRITE8_MEMBER(hng64_state::ioport6_w) { logerror("%s: ioport6_w %02x\n", machine().describe_context(), data); }
 
+READ8_MEMBER(hng64_state::anport0_r) { logerror("%s: anport0_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport1_r) { logerror("%s: anport1_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport2_r) { logerror("%s: anport2_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport3_r) { logerror("%s: anport3_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport4_r) { logerror("%s: anport4_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport5_r) { logerror("%s: anport5_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport6_r) { logerror("%s: anport6_r\n", machine().describe_context()); return 0xff; }
+READ8_MEMBER(hng64_state::anport7_r) { logerror("%s: anport7_r\n", machine().describe_context()); return 0xff; }
+
+
 TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqon_callback)
 {
 	logerror("timer_hack_on\n");
@@ -1640,12 +1650,12 @@ void hng64_state::init_io()
 	m_tempio_irqon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqon_callback), this));
 	m_tempio_irqoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqoff_callback), this));
 
-	m_tempio_irqon_timer->adjust(m_maincpu->cycles_to_attotime(100000000));
+	m_tempio_irqon_timer->adjust(m_maincpu->cycles_to_attotime(100000000)); // just ensure an IRQ gets turned on to move the program forward, real source currently unknown
 	m_port7 = 0;
 	m_ex_ramaddr = 0;
 	m_ex_ramaddr_upper = 0;
 
-	m_ioram = std::make_unique<uint8_t[]>(0x800);
+	m_ioram = std::make_unique<uint8_t[]>(0x800); // in realty this is 'm_dualport' but as the hookup is incomplete the program fights with the simulation at the moment
 	save_pointer(&m_ioram[0], "m_ioram", 0x800);
 
 }
@@ -1692,7 +1702,14 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	iomcu.p5_out_cb().set(FUNC(hng64_state::ioport5_w));
 	iomcu.p6_out_cb().set(FUNC(hng64_state::ioport6_w));
 	iomcu.p7_out_cb().set(FUNC(hng64_state::ioport7_w));
-
+	iomcu.an0_in_cb().set(FUNC(hng64_state::anport0_r));
+	iomcu.an1_in_cb().set(FUNC(hng64_state::anport1_r));
+	iomcu.an2_in_cb().set(FUNC(hng64_state::anport2_r));
+	iomcu.an3_in_cb().set(FUNC(hng64_state::anport3_r));
+	iomcu.an4_in_cb().set(FUNC(hng64_state::anport4_r));
+	iomcu.an5_in_cb().set(FUNC(hng64_state::anport5_r));
+	iomcu.an6_in_cb().set(FUNC(hng64_state::anport6_r));
+	iomcu.an7_in_cb().set(FUNC(hng64_state::anport7_r));
 MACHINE_CONFIG_END
 
 

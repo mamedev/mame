@@ -323,6 +323,15 @@ private:
 	DECLARE_WRITE8_MEMBER(ioport6_w);
 	DECLARE_WRITE8_MEMBER(ioport7_w);
 
+	DECLARE_READ8_MEMBER(anport0_r);
+	DECLARE_READ8_MEMBER(anport1_r);
+	DECLARE_READ8_MEMBER(anport2_r);
+	DECLARE_READ8_MEMBER(anport3_r);
+	DECLARE_READ8_MEMBER(anport4_r);
+	DECLARE_READ8_MEMBER(anport5_r);
+	DECLARE_READ8_MEMBER(anport6_r);
+	DECLARE_READ8_MEMBER(anport7_r);
+
 	uint8_t m_port7;
 	int m_ex_ramaddr;
 	int m_ex_ramaddr_upper;

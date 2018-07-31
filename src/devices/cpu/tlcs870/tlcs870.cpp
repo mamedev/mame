@@ -112,6 +112,7 @@ tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type optype
 	, m_intram(*this, "intram")
 	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_analog_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 
@@ -276,23 +277,48 @@ WRITE8_MEMBER(tlcs870_device::p7cr_w)
 }
 
 
-READ8_MEMBER(tlcs870_device::adccr_r)
-{
-//	logerror("adccr_r\n");
-	return 0x00;
-}
+
 
 READ8_MEMBER(tlcs870_device::adcdr_r)
 {
 	logerror("adcdr_r\n");
-	return 0x00;
+	return m_ADCDR;
+}
+
+/* 
+
+ ADCCR register bits
+
+ es-apppp
+ 
+ e = end flag (1 = done, data available in ADCDR, 0 = not requested / not finished) (r/o)
+ s = start flag (1 = request data be processed and put in ADCDR)
+
+ a = analog input enable (won't function at all with this disabled?)
+
+ p = analog port to use (upper bit is 'reserved', so 8 ports)
+
+ current emulation assumes this is instant
+
+ bits in P6CR (0x0c) should also be set to '1' to enable analog input on the port as the
+ same pins are otherwise used as a normal input port, not this multiplexed ADC
+
+ */
+
+READ8_MEMBER(tlcs870_device::adccr_r)
+{
+	return m_ADCCR | 0x80; // return with 'finished' bit set
 }
 
 WRITE8_MEMBER(tlcs870_device::adccr_w)
 {
-	logerror("adccr_w %02x\n", data);
-}
+	m_ADCCR = data;
 
+	if (data & 0x40)
+	{
+		m_ADCDR = m_port_analog_in_cb[data&0x07]();
+	}
+}
 
 
 READ8_MEMBER(tlcs870_device::eintcr_r)
@@ -396,32 +422,26 @@ void tlcs870_device::execute_set_input(int inputnum, int state)
 
 	switch (inputnum)
 	{
-	case TLCS870_IRQ_INT5:
 	case INPUT_LINE_IRQ5:
 		irqline = 15;
 		break;
 
-	case TLCS870_IRQ_INT4:
 	case INPUT_LINE_IRQ4:
 		irqline = 12;
 		break;
 
-	case TLCS870_IRQ_INT3:
 	case INPUT_LINE_IRQ3:
 		irqline = 11;
 		break;
 
-	case TLCS870_IRQ_INT2:
 	case INPUT_LINE_IRQ2:
 		irqline = 7;
 		break;
 
-	case TLCS870_IRQ_INT1:
 	case INPUT_LINE_IRQ1:
 		irqline = 5;
 		break;
 
-	case TLCS870_IRQ_INT0:
 	case INPUT_LINE_IRQ0:
 		irqline = 3;
 		break;
@@ -537,6 +557,8 @@ void tlcs870_device::device_reset()
 	m_EIR = 0;
 	m_IL = 0;
 	m_EINTCR = 0;
+	m_ADCCR = 0;
+	m_ADCDR = 0;
 	m_irqstate = 0;
 
 	m_port_out_latch[0] = 0x00;
@@ -700,6 +722,8 @@ void tlcs870_device::device_start()
 		cb.resolve_safe(0xff);
 	for (auto &cb : m_port_out_cb)
 		cb.resolve_safe();
+	for (auto &cb : m_port_analog_in_cb)
+		cb.resolve_safe(0xff);
 }
 
 

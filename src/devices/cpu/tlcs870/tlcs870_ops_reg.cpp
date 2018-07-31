@@ -19,10 +19,10 @@
 	EF  H
 
 	(16-bit mode operations)
-    E8  invalid
-	E9  invalid
-	EA  invalid
-	EB  invalid
+    E8  WA
+	E9  BC
+	EA  DE
+	EB  HL
 	EC  WA
 	ED  BC
 	EE  DE
