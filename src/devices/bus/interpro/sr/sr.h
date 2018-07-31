@@ -164,9 +164,6 @@ class cbus_card_device_base : public device_cbus_card_interface
 protected:
 	cbus_card_device_base(const machine_config &mconfig, device_t &device, const char *idprom_region = "idprom");
 
-public:
-	const char *tag() { return device().tag(); }
-
 protected:
 	virtual void map(address_map &map) override;
 
@@ -307,9 +304,6 @@ class srx_card_device_base : public device_srx_card_interface
 {
 protected:
 	srx_card_device_base(const machine_config &mconfig, device_t &device, const char *idprom_region = "idprom");
-
-public:
-	const char *tag() { return device().tag(); }
 
 protected:
 	virtual void map(address_map &map) override;
