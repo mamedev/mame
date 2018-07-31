@@ -826,18 +826,18 @@ Westinghouse Test Console Serial #5 layout
 		</repeat>
 
 		<repeat count="2">
-			<param name="col" start="0" increment="4" />
-			<param name="x" start="10" increment="530" />
+			<param name="group" start="0" increment="4" />
+			<param name="padx" start="10" increment="530" />
 			<param name="mask" start="0x01" lshift="4" />
 			<repeat count="4">
 				<param name="row" start="0" increment="1" />
 				<param name="y" start="100" increment="110" />
 				<repeat count="4">
-					<param name="col" start="~col~" increment="1" />
-					<param name="x" start="~x~" increment="110" />
+					<param name="col" start="~group~" increment="1" />
+					<param name="btnx" start="~padx~" increment="110" />
 					<param name="mask" start="~mask~" lshift="1" />
 					<bezel element="btn~row~~col~" inputtag="row~row~" inputmask="~mask~">
-						<bounds x="~x~" y="~y~" width="80" height="80" />
+						<bounds x="~btnx~" y="~y~" width="80" height="80" />
 					</bezel>
 				</repeat>
 			</repeat>

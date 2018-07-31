@@ -675,18 +675,18 @@ Two horizontally separated, clickable, four-by-four keypads (inside a ``group``
 or ``view`` element)::
 
     <repeat count="2">
-        <param name="col" start="0" increment="4" />
-        <param name="x" start="10" increment="530" />
+        <param name="group" start="0" increment="4" />
+        <param name="padx" start="10" increment="530" />
         <param name="mask" start="0x01" lshift="4" />
         <repeat count="4">
             <param name="row" start="0" increment="1" />
             <param name="y" start="100" increment="110" />
             <repeat count="4">
-                <param name="col" start="~col~" increment="1" />
-                <param name="x" start="~x~" increment="110" />
+                <param name="col" start="~group~" increment="1" />
+                <param name="btnx" start="~padx~" increment="110" />
                 <param name="mask" start="~mask~" lshift="1" />
                 <bezel element="btn~row~~col~" inputtag="row~row~" inputmask="~mask~">
-                    <bounds x="~x~" y="~y~" width="80" height="80" />
+                    <bounds x="~btnx~" y="~y~" width="80" height="80" />
                 </bezel>
             </repeat>
         </repeat>
@@ -697,19 +697,19 @@ top right, ``btn30`` in the bottom left, and ``btn37`` in the bottom right,
 counting in between.  The four rows are connected to I/O ports ``row0``,
 ``row1``, ``row2``, and ``row3``, from top to bottom.  The columns are connected
 to consecutive I/O port bits, starting with the least significant bit on the
-left.   Note that the ``col``, ``x`` and ``mask`` parameters in the innermost
-``repeat`` element take their initial values from the correspondingly named
-parameters in the enclosing scope, but do not modify them.
+left.   Note that the ``mask`` parameter in the innermost ``repeat`` element
+takes its initial value from the correspondingly named parameter in the
+enclosing scope, but does not modify it.
 
 Generating a chequerboard pattern with alternating alpha values 0.4 and 0.2
 (inside a ``group`` or ``view`` element)::
 
     <repeat count="4">
-        <param name="ipty" start="3" increment="20" />
-        <param name="iptno" start="7" increment="-2" />
+        <param name="pairy" start="3" increment="20" />
+        <param name="pairno" start="7" increment="-2" />
         <repeat count="2">
-            <param name="ipty" start="~ipty~" increment="10" />
-            <param name="iptno" start="~iptno~" increment="-1" />
+            <param name="rowy" start="~pairy~" increment="10" />
+            <param name="rowno" start="~pairno~" increment="-1" />
             <param name="lalpha" start="0.4" increment="-0.2" />
             <param name="ralpha" start="0.2" increment="0.2" />
             <repeat count="4">
@@ -717,20 +717,23 @@ Generating a chequerboard pattern with alternating alpha values 0.4 and 0.2
                 <param name="rx" start="13" increment="20" />
                 <param name="lmask" start="0x01" lshift="2" />
                 <param name="rmask" start="0x02" lshift="2" />
-                <bezel element="hl" inputtag="board:IN.~iptno~" inputmask="~lmask~">
-                    <bounds x="~lx~" y="~ipty~" width="10" height="10" />
+                <bezel element="hl" inputtag="board:IN.~rowno~" inputmask="~lmask~">
+                    <bounds x="~lx~" y="~rowy~" width="10" height="10" />
                     <color alpha="~lalpha~" />
                 </bezel>
-                <bezel element="hl" inputtag="board:IN.~iptno~" inputmask="~rmask~">
-                    <bounds x="~rx~" y="~ipty~" width="10" height="10" />
+                <bezel element="hl" inputtag="board:IN.~rowno~" inputmask="~rmask~">
+                    <bounds x="~rx~" y="~rowy~" width="10" height="10" />
                     <color alpha="~ralpha~" />
                 </bezel>
             </repeat>
         </repeat>
     </repeat>
 
-Rows are connected to I/O ports ``board:IN.7`` at the top to ``board.IN.0`` at
-the bottom.
+The outermost ``repeat`` element generates a group of two rows on each
+iteration; the next ``repeat`` element generates an individual row on each
+iteration; the innermost ``repeat`` element produces two horizontally adjacent
+tiles on each iteration.  Rows are connected to I/O ports ``board:IN.7`` at the
+top to ``board.IN.0`` at the bottom.
 
 
 .. _layout-autogen:
