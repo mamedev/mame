@@ -520,12 +520,14 @@ public:
 	/// \brief Set search tag
 	///
 	/// Allows search tag to be changed after construction.  Note that
-	/// this must be done before resolution time to take effect.  Note
-	/// that this binds to a particular instance, so the device must not
-	/// be removed or replaced, as it will cause a use-after-free when
-	/// resolving objects.
+	/// this must be done before resolution time to take effect.
 	/// \param [in] object Object to refer to.
-	void set_tag(DeviceClass &object) { set_tag(object, DEVICE_SELF); }
+	void set_tag(DeviceClass &object)
+	{
+		device_t &device = object;
+		set_tag(*device.subdevice(":"), device.tag());
+		*this = object;
+	}
 
 	/// \brief Set target during configuration
 	///
