@@ -223,6 +223,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 	if (&stream == m_stream_ymf262)
 	{
+		// TODO : FM only output is DO0, DO2 is actually mixed FM+PCM outputs
 		ymf262_update_one(m_ymf262, outputs, samples);
 		return;
 	}
