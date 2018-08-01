@@ -853,6 +853,9 @@ void ymf278b_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock()/768);
 
+	m_clock = clock();
+	m_timer_base = m_clock ? attotime::from_hz(m_clock) * (19 * 36) : attotime::zero;
+
 	// YMF262 related
 
 	int ymf262_clock = clock() / (19/8.0);
@@ -968,7 +971,7 @@ void ymf278b_device::device_start()
 	m_clock = clock();
 	m_irq_handler.resolve();
 
-	m_timer_base = attotime::from_hz(m_clock) * (19*36);
+	m_timer_base = m_clock ? attotime::from_hz(m_clock) * (19*36) : attotime::zero;
 	m_timer_a = timer_alloc(TIMER_A);
 	m_timer_b = timer_alloc(TIMER_B);
 	m_timer_busy = timer_alloc(TIMER_BUSY_CLEAR);

@@ -2440,10 +2440,10 @@ MACHINE_CONFIG_START(model2_state::model2_scsp)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("scsp", SCSP, 45158000/2) // 45.158MHz XTAL at Video board(Model 2A-CRX)
-	MCFG_SCSP_IRQ_CB(WRITE8(*this, model2_state,scsp_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+	SCSP(config, m_scsp, 45158000/2); // 45.158MHz XTAL at Video board(Model 2A-CRX)
+	m_scsp->irq_cb().set(FUNC(model2_state::scsp_irq));
+	m_scsp->add_route(0, "lspeaker", 2.0);
+	m_scsp->add_route(1, "rspeaker", 2.0);
 
 	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
 //  m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));

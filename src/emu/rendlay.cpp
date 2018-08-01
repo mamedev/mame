@@ -129,7 +129,7 @@ private:
 			, m_int_increment(i)
 			, m_shift(s)
 			, m_text_valid(true)
-			, m_incrementing(true)
+			, m_generator(true)
 		{ }
 		entry(std::string &&name, std::string &&t, double i, int s)
 			: m_name(std::move(name))
@@ -137,7 +137,7 @@ private:
 			, m_float_increment(i)
 			, m_shift(s)
 			, m_text_valid(true)
-			, m_incrementing(true)
+			, m_generator(true)
 		{ }
 		entry(entry &&) = default;
 		entry &operator=(entry &&) = default;
@@ -165,7 +165,7 @@ private:
 		}
 
 		std::string const &name() const { return m_name; }
-		bool is_incrementing() const { return m_incrementing; }
+		bool is_generator() const { return m_generator; }
 
 		std::string const &get_text()
 		{
@@ -187,7 +187,7 @@ private:
 
 		void increment()
 		{
-			if (is_incrementing())
+			if (is_generator())
 			{
 				// apply increment
 				if (m_float_increment)
@@ -342,7 +342,7 @@ private:
 		bool m_text_valid = false;
 		bool m_int_valid = false;
 		bool m_float_valid = false;
-		bool m_incrementing = false;
+		bool m_generator = false;
 	};
 
 	using entry_vector = std::vector<entry>;
@@ -631,7 +631,7 @@ public:
 					throw layout_syntax_error("increment attribute must be a number");
 			}
 
-			// don't allow incrementing parameters to be redefined
+			// don't allow generator parameters to be redefined
 			if (init)
 			{
 				entry_vector::iterator const pos(
@@ -641,7 +641,7 @@ public:
 							name,
 							[] (entry const &lhs, auto const &rhs) { return lhs.name() < rhs; }));
 				if ((m_entries.end() != pos) && (pos->name() == name))
-					throw layout_syntax_error("incrementing parameters must be defined exactly once per scope");
+					throw layout_syntax_error("generator parameters must be defined exactly once per scope");
 
 				std::pair<char const *, char const *> const expanded(expand(start));
 				if (floatincrement)
@@ -668,8 +668,8 @@ public:
 						[] (entry const &lhs, auto const &rhs) { return lhs.name() < rhs; }));
 			if ((m_entries.end() == pos) || (pos->name() != name))
 				m_entries.emplace(pos, std::move(name), std::string(expanded.first, expanded.second));
-			else if (pos->is_incrementing())
-				throw layout_syntax_error("incrementing parameters must be defined exactly once per scope");
+			else if (pos->is_generator())
+				throw layout_syntax_error("generator parameters must be defined exactly once per scope");
 			else
 				pos->set(std::string(expanded.first, expanded.second));
 		}
@@ -677,8 +677,18 @@ public:
 
 	void increment_parameters()
 	{
-		for (entry &e : m_entries)
-			e.increment();
+		m_entries.erase(
+				std::remove_if(
+					m_entries.begin(),
+					m_entries.end(),
+					[] (entry &e)
+					{
+						if (!e.is_generator())
+							return true;
+						e.increment();
+						return false;
+					}),
+				m_entries.end());
 	}
 
 	char const *get_attribute_string(util::xml::data_node const &node, char const *name, char const *defvalue)
@@ -1188,23 +1198,23 @@ private:
 		ru_imgformat const format = render_detect_image(*m_file, m_dirname.c_str(), m_imagefile.c_str());
 		switch (format)
 		{
-			case RENDUTIL_IMGFORMAT_ERROR:
-				break;
+		case RENDUTIL_IMGFORMAT_ERROR:
+			break;
 
-			case RENDUTIL_IMGFORMAT_PNG:
-				// load the basic bitmap
-				m_hasalpha = render_load_png(m_bitmap, *m_file, m_dirname.c_str(), m_imagefile.c_str());
+		case RENDUTIL_IMGFORMAT_PNG:
+			// load the basic bitmap
+			m_hasalpha = render_load_png(m_bitmap, *m_file, m_dirname.c_str(), m_imagefile.c_str());
+			break;
 
-				// load the alpha bitmap if specified
-				if (m_bitmap.valid() && !m_alphafile.empty())
-					render_load_png(m_bitmap, *m_file, m_dirname.c_str(), m_alphafile.c_str(), true);
-				break;
-
-			default:
-				// try JPG
-				render_load_jpeg(m_bitmap, *m_file, m_dirname.c_str(), m_imagefile.c_str());
-				break;
+		default:
+			// try JPG
+			render_load_jpeg(m_bitmap, *m_file, m_dirname.c_str(), m_imagefile.c_str());
+			break;
 		}
+
+		// load the alpha bitmap if specified
+		if (m_bitmap.valid() && !m_alphafile.empty())
+			render_load_png(m_bitmap, *m_file, m_dirname.c_str(), m_alphafile.c_str(), true);
 
 		// if we can't load the bitmap, allocate a dummy one and report an error
 		if (!m_bitmap.valid())
@@ -1399,31 +1409,31 @@ protected:
 		tempbitmap.fill(rgb_t(0xff,0x00,0x00,0x00));
 
 		// top bar
-		draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2, segwidth, (state & (1 << 0)) ? onpen : offpen);
+		draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2, segwidth, BIT(state, 0) ? onpen : offpen);
 
 		// top-right bar
-		draw_segment_vertical(tempbitmap, 0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2, segwidth, (state & (1 << 1)) ? onpen : offpen);
+		draw_segment_vertical(tempbitmap, 0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2, segwidth, BIT(state, 1) ? onpen : offpen);
 
 		// bottom-right bar
-		draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2, segwidth, (state & (1 << 2)) ? onpen : offpen);
+		draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2, segwidth, BIT(state, 2) ? onpen : offpen);
 
 		// bottom bar
-		draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight - segwidth/2, segwidth, (state & (1 << 3)) ? onpen : offpen);
+		draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight - segwidth/2, segwidth, BIT(state, 3) ? onpen : offpen);
 
 		// bottom-left bar
-		draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2, segwidth, (state & (1 << 4)) ? onpen : offpen);
+		draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2, segwidth, BIT(state, 4) ? onpen : offpen);
 
 		// top-left bar
-		draw_segment_vertical(tempbitmap, 0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2, segwidth, (state & (1 << 5)) ? onpen : offpen);
+		draw_segment_vertical(tempbitmap, 0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2, segwidth, BIT(state, 5) ? onpen : offpen);
 
 		// middle bar
-		draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight/2, segwidth, (state & (1 << 6)) ? onpen : offpen);
+		draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight/2, segwidth, BIT(state, 6) ? onpen : offpen);
 
 		// apply skew
 		apply_skew(tempbitmap, 40);
 
 		// decimal point
-		draw_segment_decimal(tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (state & (1 << 7)) ? onpen : offpen);
+		draw_segment_decimal(tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, BIT(state, 7) ? onpen : offpen);
 
 		// resample to the target size
 		render_resample_argb_bitmap_hq(dest, tempbitmap, color());
@@ -2014,7 +2024,7 @@ protected:
 		tempbitmap.fill(rgb_t(0xff, 0x00, 0x00, 0x00));
 
 		for (int i = 0; i < m_dots; i++)
-			draw_segment_decimal(tempbitmap, ((dotwidth/2 )+ (i * dotwidth)), bmheight/2, dotwidth, (state & (1 << i))?onpen:offpen);
+			draw_segment_decimal(tempbitmap, ((dotwidth / 2) + (i * dotwidth)), bmheight / 2, dotwidth, BIT(state, i) ? onpen : offpen);
 
 		// resample to the target size
 		render_resample_argb_bitmap_hq(dest, tempbitmap, color());
@@ -2155,7 +2165,7 @@ protected:
 		{
 			int basey;
 
-			if (m_reelreversed==1)
+			if (m_reelreversed)
 			{
 				basey = bounds.top() + ((use_state)*(ourheight/num_shown)/(max_state_used/m_numstops)) + curry;
 			}

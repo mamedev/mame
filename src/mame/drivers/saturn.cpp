@@ -842,11 +842,11 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD(m_scsp, SCSP, 8467200*8/3) // 8.4672MHz EXTCLK * 8 / 3
-	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE("scu", sega_scu_device, sound_req_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	SCSP(config, m_scsp, 8467200*8/3); // 8.4672MHz EXTCLK * 8 / 3
+	m_scsp->irq_cb().set(FUNC(saturn_state::scsp_irq));
+	m_scsp->main_irq_cb().set(m_scu, FUNC(sega_scu_device::sound_req_w));
+	m_scsp->add_route(0, "lspeaker", 1.0);
+	m_scsp->add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("stvcd", STVCD, 0)
 	MCFG_SOUND_ROUTE(0, "scsp", 1.0, 0)

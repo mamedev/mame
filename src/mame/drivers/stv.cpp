@@ -1116,11 +1116,11 @@ MACHINE_CONFIG_START(stv_state::stv)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("scsp", SCSP, 22579200) // TODO : Unknown clock, divider
-	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE("scu", sega_scu_device, sound_req_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	SCSP(config, m_scsp, 22579200); // TODO : Unknown clock, divider
+	m_scsp->irq_cb().set(FUNC(saturn_state::scsp_irq));
+	m_scsp->main_irq_cb().set(m_scu, FUNC(sega_scu_device::sound_req_w));
+	m_scsp->add_route(0, "lspeaker", 1.0);
+	m_scsp->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(stv_state::stv_5881)

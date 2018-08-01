@@ -3312,16 +3312,16 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("scsp1", SCSP, 22579000) // 22.579MHz XTAL
-	MCFG_SCSP_IRQ_CB(WRITE8(*this, coolridr_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp1_to_sh1_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	scsp_device &scsp1(SCSP(config, "scsp1", 22579000)); // 22.579MHz XTAL
+	scsp1.irq_cb().set(FUNC(coolridr_state::scsp_irq));
+	scsp1.main_irq_cb().set(FUNC(coolridr_state::scsp1_to_sh1_irq));
+	scsp1.add_route(0, "lspeaker", 1.0);
+	scsp1.add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("scsp2", SCSP, 22579000)
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp2_to_sh1_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	scsp_device &scsp2(SCSP(config, "scsp2", 22579000)); // 22.579MHz XTAL
+	scsp2.main_irq_cb().set(FUNC(coolridr_state::scsp2_to_sh1_irq));
+	scsp2.add_route(0, "lspeaker", 1.0);
+	scsp2.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coolridr_state::aquastge)

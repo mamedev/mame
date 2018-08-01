@@ -1628,7 +1628,7 @@ TIMER_CALLBACK_MEMBER( thomson_state::ans )
 
 */
 
-MC6854_OUT_FRAME_CB(thomson_state::to7_network_got_frame)
+void thomson_state::to7_network_got_frame(uint8_t *data, int length)
 {
 	LOG(( "%f to7_network_got_frame:", machine().time().as_double() ));
 	for ( int i = 0; i < length; i++ )

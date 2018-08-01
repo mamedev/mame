@@ -15,16 +15,6 @@
 				// driver code indicates should be 4, but sounds distorted then
 
 
-#define MCFG_SCSP_ROFFSET(_offs) \
-	downcast<scsp_device &>(*device).set_roffset(_offs);
-
-#define MCFG_SCSP_IRQ_CB(_devcb) \
-	downcast<scsp_device &>(*device).set_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_SCSP_MAIN_IRQ_CB(_devcb) \
-	downcast<scsp_device &>(*device).set_main_irq_callback(DEVCB_##_devcb);
-
-
 class scsp_device : public device_t,
 					public device_sound_interface
 {
@@ -32,8 +22,8 @@ public:
 	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44'100);
 
 	void set_roffset(int roffset) { m_roffset = roffset; }
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_main_irq_callback(Object &&cb) { return m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_cb() { return m_irq_cb.bind(); }
+	auto main_irq_cb() { return m_main_irq_cb.bind(); }
 
 	// SCSP register access
 	DECLARE_READ16_MEMBER( read );
