@@ -55,6 +55,8 @@ protected:
 private:
 	static const int rpm[0x100];
 
+	void add_floppy_drive(machine_config &config, const char *_tag);
+
 	enum
 	{
 		TM_GEN,
@@ -110,7 +112,7 @@ private:
 	devcb_write_line m_syn_cb;
 	devcb_write_line m_lbrdy_cb;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8048_device> m_maincpu;
 	required_device<via6522_device> m_via4;
 	required_device<via6522_device> m_via5;
 	required_device<via6522_device> m_via6;
