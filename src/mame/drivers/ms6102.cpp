@@ -346,9 +346,9 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(*this, ms6102_state, irq<1>))
 	MCFG_AY31015_AUTO_RDAV(true)
 
-	MCFG_DEVICE_ADD("ie5", RIPPLE_COUNTER, XTAL(16'400'000) / 30)
-	MCFG_RIPPLE_COUNTER_STAGES(2)
-	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(*this, ms6102_state, kbd_uart_clock_w))
+	ripple_counter_device &ie5(RIPPLE_COUNTER(config, "ie5", XTAL(16'400'000) / 30));
+	ie5.set_stages(2);
+	ie5.count_out_cb().set(FUNC(ms6102_state::kbd_uart_clock_w));
 
 	MS7002(config, m_keyboard, 0).signal_out_callback().set(m_kbd_uart, FUNC(ay31015_device::write_si));
 
