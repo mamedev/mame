@@ -219,7 +219,7 @@ void swtpc09_state::swtpc09(machine_config &config)
 void swtpc09_state::swtpc09i(machine_config &config)
 {
 	swtpc09_base(config);
-	m_bankdev->set_addrmap(AS_PROGRAM, swtpc09_state::flex_dc4_piaide_mem);
+	m_bankdev->set_addrmap(AS_PROGRAM, &swtpc09_state::flex_dc4_piaide_mem);
 
 	PIA6821(config, "piaide", 0);
 
