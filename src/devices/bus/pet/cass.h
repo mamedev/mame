@@ -60,6 +60,7 @@ public:
 
 	// static configuration helpers
 	template <class Object> devcb_base &set_read_handler(Object &&cb) { return m_read_handler.set_callback(std::forward<Object>(cb)); }
+	auto read_handler() { return m_read_handler.bind(); }
 
 	// computer interface
 	DECLARE_READ_LINE_MEMBER( read );

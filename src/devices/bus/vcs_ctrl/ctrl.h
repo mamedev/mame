@@ -71,6 +71,7 @@ public:
 
 	// static configuration helpers
 	template <class Object> devcb_base &set_trigger_wr_callback(Object &&cb) { return m_write_trigger.set_callback(std::forward<Object>(cb)); }
+	auto trigger_wr_callback() { return m_write_trigger.bind(); }
 
 	// computer interface
 
