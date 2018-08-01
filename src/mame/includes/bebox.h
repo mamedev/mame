@@ -110,9 +110,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	LSI53C810_FETCH_CB(scsi_fetch);
-	LSI53C810_IRQ_CB(scsi_irq_callback);
-	LSI53C810_DMA_CB(scsi_dma_callback);
+	uint32_t scsi_fetch(uint32_t dsp);
+	void scsi_irq_callback(int state);
+	void scsi_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap);
 
 	void bebox_set_irq_bit(unsigned int interrupt_bit, int val);
 	void bebox_update_interrupts();

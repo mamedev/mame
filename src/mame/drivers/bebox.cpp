@@ -94,20 +94,20 @@ void bebox_state::slave_mem(address_map &map)
 								((x << 8) & 0xff0000) | \
 								((x << 24) & 0xff000000))
 
-LSI53C810_FETCH_CB(bebox_state::scsi_fetch)
+uint32_t bebox_state::scsi_fetch(uint32_t dsp)
 {
-	uint32_t result = m_ppc[0]->space(AS_PROGRAM).read_dword(dsp & 0x7FFFFFFF);
+	const uint32_t result = m_ppc[0]->space(AS_PROGRAM).read_dword(dsp & 0x7FFFFFFF);
 	return BYTE_REVERSE32(result);
 }
 
 
-LSI53C810_IRQ_CB(bebox_state::scsi_irq_callback)
+void bebox_state::scsi_irq_callback(int state)
 {
 	bebox_set_irq_bit(21, state);
 }
 
 
-LSI53C810_DMA_CB(bebox_state::scsi_dma_callback)
+void bebox_state::scsi_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap)
 {
 }
 

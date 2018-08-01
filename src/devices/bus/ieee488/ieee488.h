@@ -107,6 +107,16 @@ public:
 	template <class Object> devcb_base &set_ren_callback(Object &&cb) { return m_write_ren.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dio_callback(Object &&cb) { return m_write_dio.set_callback(std::forward<Object>(cb)); }
 
+	auto eoi_callback() { return m_write_eoi.bind(); }
+	auto dav_callback() { return m_write_dav.bind(); }
+	auto nrfd_callback() { return m_write_nrfd.bind(); }
+	auto ndac_callback() { return m_write_ndac.bind(); }
+	auto ifc_callback() { return m_write_ifc.bind(); }
+	auto srq_callback() { return m_write_srq.bind(); }
+	auto atn_callback() { return m_write_atn.bind(); }
+	auto ren_callback() { return m_write_ren.bind(); }
+	auto dio_callback() { return m_write_dio.bind(); }
+
 	void add_device(ieee488_slot_device *slot, device_t *target);
 
 	// reads for both host and peripherals
