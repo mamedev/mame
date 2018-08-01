@@ -70,7 +70,14 @@ void scsi_port_device::device_add_mconfig(machine_config &config)
 
 void scsi_port_device::device_start()
 {
-	m_device_count = 8;
+	m_device_count = 0;
+
+	for (int i = 0; i < 7; i++)
+	{
+		scsi_port_slot_device *slot = subdevice<scsi_port_slot_device>(m_slot[i].finder_tag());
+		if (slot != nullptr)
+			m_device_count = i + 1;
+	}
 
 	m_bsy_handler.resolve_safe();
 	m_sel_handler.resolve_safe();

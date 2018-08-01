@@ -211,7 +211,7 @@ private:
 	devcb_write_line m_data6_handler;
 	devcb_write_line m_data7_handler;
 
-	required_device_array<scsi_port_slot_device, 7> m_slot;
+	optional_device_array<scsi_port_slot_device, 7> m_slot;
 	int m_device_count;
 
 	int m_bsy_in;
