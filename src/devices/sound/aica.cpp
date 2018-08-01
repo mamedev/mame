@@ -1328,7 +1328,7 @@ void aica_device::DoMasterSamples(int nsamples)
 		{
 			if(EFSDL(i+16)) // 16,17 for EXTS
 			{
-				m_DSP.EXTS[i]=exts[i];
+				m_DSP.EXTS[i]=exts[i][s];
 				unsigned int Enc=((EFPAN(i+16))<<0x8)|((EFSDL(i+16))<<0xd);
 				smpl+=(m_DSP.EXTS[i]*m_LPANTABLE[Enc])>>SHIFT;
 				smpr+=(m_DSP.EXTS[i]*m_RPANTABLE[Enc])>>SHIFT;
