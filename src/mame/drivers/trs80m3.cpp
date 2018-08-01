@@ -108,6 +108,11 @@ void trs80m3_state::m3_io(address_map &map)
 	map(0xfc, 0xff).rw(FUNC(trs80m3_state::port_ff_r), FUNC(trs80m3_state::port_ff_w));
 }
 
+void trs80m3_state::m4_mem(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_m4_bank, FUNC(address_map_bank_device::amap8));
+}
+
 void trs80m3_state::m4_banked_mem(address_map &map)
 {
 	// Memory Map I - Model III Mode
@@ -144,6 +149,11 @@ void trs80m3_state::m4_io(address_map &map)
 	map(0x84, 0x87).w(FUNC(trs80m3_state::port_84_w));
 	map(0x88, 0x89).w(FUNC(trs80m3_state::port_88_w));
 	map(0x90, 0x93).w(FUNC(trs80m3_state::port_90_w));
+}
+
+void trs80m3_state::m4p_mem(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_m4p_bank, FUNC(address_map_bank_device::amap8));
 }
 
 void trs80m3_state::m4p_banked_mem(address_map &map)
@@ -387,6 +397,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(trs80m3_state::model4)
 	model3(config);
 	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(m4_mem)
 	MCFG_DEVICE_IO_MAP(m4_io)
 
 	RAM(config, m_mainram, 0);
@@ -404,11 +415,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(trs80m3_state::model4p)
 	model3(config);
 	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(m4p_mem)
 	MCFG_DEVICE_IO_MAP(m4p_io)
 
 	RAM(config, m_mainram, 0);
 	m_mainram->set_default_size("64K");
-	m_mainram->set_extra_options("16K,128K");
+	m_mainram->set_extra_options("128K");
 
 	ADDRESS_MAP_BANK(config, m_m4p_bank, 0);
 	m_m4p_bank->set_map(&trs80m3_state::m4p_banked_mem);
