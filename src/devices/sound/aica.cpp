@@ -12,7 +12,7 @@
     - No FM mode
     - A third sample format (ADPCM) has been added
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
-	- Internal RTC (Emulation by Angelo Salese, from aicartc.cpp)
+    - Internal RTC (Emulation by Angelo Salese, from aicartc.cpp)
 
     TODO:
 	- Where are EXTS Connected?
