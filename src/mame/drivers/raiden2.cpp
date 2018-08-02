@@ -973,8 +973,12 @@ void raiden2_state::raiden2_mem(address_map &map)
 	map(0x0068e, 0x0068f).nopw(); //irq ack / sprite buffering?
 
 	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
-							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+							   [this](address_space &space, offs_t offset, u8 mem_mask) {
+								   return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+							   },
+							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								   m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+							   }).umask16(0x00ff);
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -1018,8 +1022,12 @@ void raiden2_state::zeroteam_mem(address_map &map)
 	map(0x0068e, 0x0068f).nopw(); // irq ack / sprite buffering?
 
 	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
-							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+							   [this](address_space &space, offs_t offset, u8 mem_mask) {
+								   return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+							   },
+							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								   m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+							   }).umask16(0x00ff);
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -1052,8 +1060,12 @@ void raiden2_state::xsedae_mem(address_map &map)
 	map(0x0068e, 0x0068f).nopw(); //irq ack / sprite buffering?
 
 	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
-							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+							   [this](address_space &space, offs_t offset, u8 mem_mask) {
+								   return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+							   },
+							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								   m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+							   }).umask16(0x00ff);
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");

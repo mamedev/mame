@@ -29,13 +29,13 @@
 
 /***************************************************************************/
 
-u8 dcon_state::sdgndmps_sound_comms_r(offs_t offset)
+READ8_MEMBER(dcon_state::sdgndmps_sound_comms_r)
 {
 	// Routine at 134C sends no sound commands if lowest bit is 0
 	if (offset == 5) // ($a000a)
 		return 1;
 
-	return m_seibu_sound->main_r(offset);
+	return m_seibu_sound->main_r(space, offset);
 }
 
 void dcon_state::dcon_map(address_map &map)
