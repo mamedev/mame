@@ -532,13 +532,13 @@ MACHINE_CONFIG_START(hikaru_state::hikaru)
 //  SPEAKER(config, "lspeaker").front_left();
 //  SPEAKER(config, "rspeaker").front_right();
 
-//  MCFG_DEVICE_ADD("aica", AICA, (XTAL(33'868'800)*2)/3) // 67.7376MHz(2*33.8688MHz), div 3 for audio block // 33.8688MHz on Board
-//  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-//  MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+//  aica_device &aica(AICA(config, "aica", (XTAL(33'868'800)*2)/3)); // 67.7376MHz(2*33.8688MHz), div 3 for audio block // 33.8688MHz on Board
+//  aica.add_route(0, "lspeaker", 2.0);
+//  aica.add_route(1, "rspeaker", 2.0);
 
-//  MCFG_DEVICE_ADD("aica_pcb", AICA, (XTAL(33'868'800)*2)/3) // AICA PCB
-//  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-//  MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+//  aica_device &aica_pcb(AICA(config, "aica_pcb", (XTAL(33'868'800)*2)/3)); // AICA PCB; RTC Unused?
+//  aica_pcb.add_route(0, "lspeaker", 2.0);
+//  aica_pcb.add_route(1, "rspeaker", 2.0);
 MACHINE_CONFIG_END
 
 

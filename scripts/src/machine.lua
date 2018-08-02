@@ -576,18 +576,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/aicartc.h,MACHINES["AICARTC"] = true
----------------------------------------------------
-
-if (MACHINES["AICARTC"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/aicartc.cpp",
-		MAME_DIR .. "src/devices/machine/aicartc.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/am2847.h,MACHINES["AM2847"] = true
 ---------------------------------------------------
 

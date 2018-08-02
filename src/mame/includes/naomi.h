@@ -23,7 +23,6 @@ naomi.h -> NAOMI includes
 #include "cpu/sh/sh4.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
-#include "machine/aicartc.h"
 #include "machine/jvsdev.h"
 #include "machine/jvs13551.h"
 #include "machine/m3comm.h"

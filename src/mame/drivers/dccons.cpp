@@ -266,7 +266,6 @@
 #include "cpu/arm7/arm7core.h"
 #include "cpu/sh/sh4.h"
 #include "imagedev/chd_cd.h"
-#include "machine/aicartc.h"
 #include "machine/dc-ctrl.h"
 #include "machine/gdrom.h"
 
@@ -379,7 +378,7 @@ void dc_cons_state::dc_map(address_map &map)
 	map(0x005f8000, 0x005f9fff).m(m_powervr2, FUNC(powervr2_device::ta_map));
 	map(0x00600000, 0x006007ff).rw(FUNC(dc_cons_state::dc_modem_r), FUNC(dc_cons_state::dc_modem_w));
 	map(0x00700000, 0x00707fff).rw(FUNC(dc_cons_state::dc_aica_reg_r), FUNC(dc_cons_state::dc_aica_reg_w));
-	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
+	map(0x00710000, 0x0071000f).mirror(0x02000000).rw(m_aica, FUNC(aica_device::rtc_r), FUNC(aica_device::rtc_w)).umask64(0x0000ffff0000ffff);
 	map(0x00800000, 0x009fffff).rw(FUNC(dc_cons_state::sh4_soundram_r), FUNC(dc_cons_state::sh4_soundram_w));
 //  AM_RANGE(0x01000000, 0x01ffffff) G2 Ext Device #1
 //  AM_RANGE(0x02700000, 0x02707fff) AICA reg mirror
@@ -622,14 +621,13 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("aica", AICA, (XTAL(33'868'800)*2)/3) // 67.7376MHz(2*33.8688MHz), div 3 for audio block
-	MCFG_AICA_MASTER
-	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))
-	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(*this, dc_state, sh4_aica_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_AICARTC_ADD("aicartc", XTAL(32'768))
+	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
+	m_aica->set_master(true);
+	m_aica->set_rtc_clock(XTAL(32'768));
+	m_aica->irq_cb().set(FUNC(dc_state::aica_irq));
+	m_aica->main_irq_cb().set(FUNC(dc_state::sh4_aica_irq));
+	m_aica->add_route(0, "lspeaker", 1.0);
+	m_aica->add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("ata", ATA_INTERFACE, 0)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, dc_cons_state, ata_interrupt))

@@ -12,6 +12,7 @@
     - No FM mode
     - A third sample format (ADPCM) has been added
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
+	- Internal RTC (Emulation by Angelo Salese, from aicartc.cpp)
 
     TODO:
 	- Where are EXTS Connected?
@@ -1445,6 +1446,15 @@ void aica_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 }
 
 //-------------------------------------------------
+//  device_validity_check - perform validity checks
+//  on this device
+//-------------------------------------------------
+
+void aica_device::device_validity_check(validity_checker &valid) const
+{
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -1459,6 +1469,12 @@ void aica_device::device_start()
 
 	m_stream = machine().sound().stream_alloc(*this, 2, 2, (int)m_rate);
 
+	m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::rtc_timer_cb), this));
+	if (m_rtc_clock > 0)
+		m_rtc_timer->adjust(attotime::from_hz(m_rtc_clock), 0, attotime::from_hz(m_rtc_clock));
+	else
+		m_rtc_timer->adjust(attotime::never);
+
 	// save state
 	save_item(NAME(m_IrqTimA));
 	save_item(NAME(m_IrqTimBC));
@@ -1472,6 +1488,19 @@ void aica_device::device_start()
 	save_item(NAME(m_RPANTABLE),0x20000);
 	save_item(NAME(m_TimPris),3);
 	save_item(NAME(m_TimCnt),3);
+	save_item(NAME(m_rtc.reg_lo));
+	save_item(NAME(m_rtc.reg_hi));
+	save_item(NAME(m_rtc.tick));
+	save_item(NAME(m_rtc.we));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void aica_device::device_reset()
+{
+	m_rtc.tick = 0;
 }
 
 //-------------------------------------------------
@@ -1483,6 +1512,42 @@ void aica_device::device_clock_changed()
 {
 	ClockChange();
 	m_stream->set_sample_rate((int)m_rate);
+}
+
+//-------------------------------------------------
+//  rtc_clock_updated -
+//-------------------------------------------------
+
+void aica_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	const int month_to_day_conversion[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+
+	// put the seconds
+	uint32_t current_time = second;
+
+	// put the minutes
+	current_time += minute * 60;
+
+	// put the hours
+	current_time += hour * 60 * 60;
+
+	// put the days (note -1) */
+	current_time += (day - 1) * 60 * 60 * 24;
+
+	// take the months - despite popular beliefs, leap years aren't just evenly divisible by 4 */
+	if (((((year % 4) == 0) && ((year % 100) != 0)) || ((year % 400) == 0)) && month > 2)
+		current_time += (month_to_day_conversion[month - 1] + 1) * 60 * 60 * 24;
+	else
+		current_time += (month_to_day_conversion[month - 1]) * 60 * 60 * 24;
+
+	// put the years
+	int year_count = (year - 1949);
+
+	for (int i = 0; i < year_count - 1; i++)
+		current_time += (((((i+1950) % 4) == 0) && (((i+1950) % 100) != 0)) || (((i+1950) % 400) == 0)) ? 60*60*24*366 : 60*60*24*365;
+
+	m_rtc.reg_lo = current_time & 0x0000ffff;
+	m_rtc.reg_hi = (current_time & 0xffff0000) >> 16;
 }
 
 void aica_device::set_ram_base(void *base, int size)
@@ -1524,39 +1589,98 @@ READ16_MEMBER( aica_device::midi_out_r )
 	return val;
 }
 
+// RTC Stuffs
+TIMER_CALLBACK_MEMBER( aica_device::rtc_timer_cb )
+{
+	m_rtc.tick++;
+	if(m_rtc.tick & 0x8000)
+	{
+		m_rtc.tick = 0;
+		m_rtc.reg_lo++;
+		if(m_rtc.reg_lo == 0)
+			m_rtc.reg_hi++;
+	}
+}
+
+READ16_MEMBER( aica_device::rtc_r )
+{
+	uint16_t res;
+
+	res = 0;
+	switch(offset)
+	{
+		case 0:
+			res = m_rtc.reg_hi; break;
+		case 1:
+			res = m_rtc.reg_lo; break;
+	}
+
+	return res;
+}
+
+WRITE16_MEMBER( aica_device::rtc_w )
+{
+	switch(offset)
+	{
+		case 0:
+			if(m_rtc.we)
+			{
+				COMBINE_DATA(&m_rtc.reg_hi);
+				// clear write enable here?
+			}
+
+			break;
+
+		case 1:
+			if(m_rtc.we)
+			{
+				COMBINE_DATA(&m_rtc.reg_lo);
+				m_rtc.tick = 0; // low register also clears tick count
+			}
+
+			break;
+
+		case 2:
+			m_rtc.we = data & 1;
+			break;
+	}
+}
+
 DEFINE_DEVICE_TYPE(AICA, aica_device, "aica", "Yamaha AICA")
 
 aica_device::aica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AICA, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_master(false),
-		m_rate(44100.0),
-		m_roffset(0),
-		m_irq_cb(*this),
-		m_main_irq_cb(*this),
-		m_ram_region(*this, this->tag()),
-		m_IRQL(0),
-		m_IRQR(0),
-		m_BUFPTR(0),
-		m_AICARAM(nullptr),
-		m_AICARAM_LENGTH(0),
-		m_RAM_MASK(0),
-		m_RAM_MASK16(0),
-		m_IrqTimA(0),
-		m_IrqTimBC(0),
-		m_IrqMidi(0),
-		m_MidiOutW(0),
-		m_MidiOutR(0),
-		m_MidiW(0),
-		m_MidiR(0),
-		m_mcieb(0),
-		m_mcipd(0),
-		m_bufferl(nullptr),
-		m_bufferr(nullptr),
-		m_exts0(nullptr),
-		m_exts1(nullptr),
-		m_length(0),
-		m_RBUFDST(nullptr)
+	: device_t(mconfig, AICA, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
+	, m_master(false)
+	, m_rate(44100.0)
+	, m_roffset(0)
+	, m_irq_cb(*this)
+	, m_main_irq_cb(*this)
+	, m_ram_region(*this, this->tag())
+	, m_IRQL(0)
+	, m_IRQR(0)
+	, m_BUFPTR(0)
+	, m_AICARAM(nullptr)
+	, m_AICARAM_LENGTH(0)
+	, m_RAM_MASK(0)
+	, m_RAM_MASK16(0)
+	, m_IrqTimA(0)
+	, m_IrqTimBC(0)
+	, m_IrqMidi(0)
+	, m_MidiOutW(0)
+	, m_MidiOutR(0)
+	, m_MidiW(0)
+	, m_MidiR(0)
+	, m_mcieb(0)
+	, m_mcipd(0)
+	, m_bufferl(nullptr)
+	, m_bufferr(nullptr)
+	, m_exts0(nullptr)
+	, m_exts1(nullptr)
+	, m_length(0)
+	, m_RBUFDST(nullptr)
+	, m_rtc_clock(0)
 
 {
 	memset(&m_udata.data, 0, sizeof(m_udata.data));
@@ -1591,6 +1715,8 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 
 	memset(m_PSCALES, 0, sizeof(m_PSCALES));
 	memset(m_ASCALES, 0, sizeof(m_ASCALES));
+
+	memset(&m_rtc, 0, sizeof(m_rtc));
 }
 
 

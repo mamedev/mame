@@ -12,31 +12,24 @@
 #pragma once
 
 #include "aicadsp.h"
+#include "dirtc.h"
 
 
-#define MCFG_AICA_MASTER \
-	downcast<aica_device &>(*device).set_master(true);
-
-#define MCFG_AICA_ROFFSET(offs) \
-	downcast<aica_device &>(*device).set_roffset((offs));
-
-#define MCFG_AICA_IRQ_CB(cb) \
-	downcast<aica_device &>(*device).set_irq_callback((DEVCB_##cb));
-
-#define MCFG_AICA_MAIN_IRQ_CB(cb) \
-	downcast<aica_device &>(*device).set_main_irq_callback((DEVCB_##cb));
-
-class aica_device : public device_t, public device_sound_interface
+class aica_device : public device_t, public device_sound_interface, public device_rtc_interface
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
+	// construction/destruction
 	aica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_master(bool master) { m_master = master; }
 	void set_roffset(int roffset) { m_roffset = roffset; }
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_main_irq_callback(Object &&cb) { return m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
+	void set_rtc_clock(uint32_t clock) { m_rtc_clock = clock; }
+	void set_rtc_clock(const XTAL &xtal) { set_rtc_clock(xtal.value()); }
+
+	auto irq_cb() { return m_irq_cb.bind(); }
+	auto main_irq_cb() { return m_main_irq_cb.bind(); }
 
 	// AICA register access
 	DECLARE_READ16_MEMBER( read );
@@ -46,15 +39,26 @@ public:
 	DECLARE_WRITE16_MEMBER( midi_in );
 	DECLARE_READ16_MEMBER( midi_out_r );
 
+	// RTC register access
+	DECLARE_WRITE16_MEMBER( rtc_w );
+	DECLARE_READ16_MEMBER( rtc_r );
+
 	void set_ram_base(void *base, int size);
 
 protected:
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	// device_rtc_interface overrides
+	virtual bool rtc_feature_y2k() const override { return true; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:
 	enum AICA_STATE {AICA_ATTACK,AICA_DECAY1,AICA_DECAY2,AICA_RELEASE};
@@ -218,6 +222,17 @@ private:
 	int m_PSCALES[8][256];
 	int m_ASCALES[8][256];
 
+	// RTC stuff
+	struct {
+		uint16_t reg_lo,reg_hi;
+		uint16_t tick;
+		uint8_t we;
+	} m_rtc;
+
+	TIMER_CALLBACK_MEMBER( rtc_timer_cb );
+
+	emu_timer *m_rtc_timer;
+	uint32_t m_rtc_clock;
 };
 
 DECLARE_DEVICE_TYPE(AICA, aica_device)
