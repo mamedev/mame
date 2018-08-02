@@ -406,14 +406,7 @@ void d9060_device_base::device_add_mconfig(machine_config &config)
 	m_sasibus->data7_handler().set(M6522_TAG, FUNC(via6522_device::write_pa7));
 
 	OUTPUT_LATCH(config, m_sasi_data_out);
-	m_sasi_data_out->bit_handler<0>().set(m_sasibus, FUNC(scsi_port_device::write_data0));
-	m_sasi_data_out->bit_handler<1>().set(m_sasibus, FUNC(scsi_port_device::write_data1));
-	m_sasi_data_out->bit_handler<2>().set(m_sasibus, FUNC(scsi_port_device::write_data2));
-	m_sasi_data_out->bit_handler<3>().set(m_sasibus, FUNC(scsi_port_device::write_data3));
-	m_sasi_data_out->bit_handler<4>().set(m_sasibus, FUNC(scsi_port_device::write_data4));
-	m_sasi_data_out->bit_handler<5>().set(m_sasibus, FUNC(scsi_port_device::write_data5));
-	m_sasi_data_out->bit_handler<6>().set(m_sasibus, FUNC(scsi_port_device::write_data6));
-	m_sasi_data_out->bit_handler<7>().set(m_sasibus, FUNC(scsi_port_device::write_data7));
+	m_sasibus->set_output_latch(*m_sasi_data_out);
 
 	m_sasibus->set_slot_device(1, "harddisk", D9060HD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 }

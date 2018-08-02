@@ -392,14 +392,7 @@ void huc6272_device::device_add_mconfig(machine_config &config)
 	scsibus.sel_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit1));
 
 	output_latch_device &scsiout(OUTPUT_LATCH(config, "scsi_data_out"));
-	scsiout.bit_handler<0>().set("scsi", FUNC(scsi_port_device::write_data0));
-	scsiout.bit_handler<1>().set("scsi", FUNC(scsi_port_device::write_data1));
-	scsiout.bit_handler<2>().set("scsi", FUNC(scsi_port_device::write_data2));
-	scsiout.bit_handler<3>().set("scsi", FUNC(scsi_port_device::write_data3));
-	scsiout.bit_handler<4>().set("scsi", FUNC(scsi_port_device::write_data4));
-	scsiout.bit_handler<5>().set("scsi", FUNC(scsi_port_device::write_data5));
-	scsiout.bit_handler<6>().set("scsi", FUNC(scsi_port_device::write_data6));
-	scsiout.bit_handler<7>().set("scsi", FUNC(scsi_port_device::write_data7));
+	scsibus.set_output_latch(scsiout);
 
 	INPUT_BUFFER(config, "scsi_ctrl_in");
 	INPUT_BUFFER(config, "scsi_data_in");

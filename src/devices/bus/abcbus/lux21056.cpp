@@ -272,14 +272,7 @@ void luxor_55_21056_device::device_add_mconfig(machine_config &config)
 	m_sasibus->set_slot_device(1, "harddisk", S1410, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
 	OUTPUT_LATCH(config, m_sasi_data_out);
-	m_sasi_data_out->bit_handler<0>().set(m_sasibus, FUNC(scsi_port_device::write_data0));
-	m_sasi_data_out->bit_handler<1>().set(m_sasibus, FUNC(scsi_port_device::write_data1));
-	m_sasi_data_out->bit_handler<2>().set(m_sasibus, FUNC(scsi_port_device::write_data2));
-	m_sasi_data_out->bit_handler<3>().set(m_sasibus, FUNC(scsi_port_device::write_data3));
-	m_sasi_data_out->bit_handler<4>().set(m_sasibus, FUNC(scsi_port_device::write_data4));
-	m_sasi_data_out->bit_handler<5>().set(m_sasibus, FUNC(scsi_port_device::write_data5));
-	m_sasi_data_out->bit_handler<6>().set(m_sasibus, FUNC(scsi_port_device::write_data6));
-	m_sasi_data_out->bit_handler<7>().set(m_sasibus, FUNC(scsi_port_device::write_data7));
+	m_sasibus->set_output_latch(*m_sasi_data_out);
 
 	INPUT_BUFFER(config, m_sasi_data_in);
 }

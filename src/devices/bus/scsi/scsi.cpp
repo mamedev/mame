@@ -657,6 +657,18 @@ void scsi_port_device::set_slot_device(int index, const char *option, const devi
 	slot(index).set_default_option(option);
 }
 
+void scsi_port_device::set_output_latch(output_latch_device &latch)
+{
+	latch.bit_handler<0>().set(*this, FUNC(scsi_port_device::write_data0));
+	latch.bit_handler<1>().set(*this, FUNC(scsi_port_device::write_data1));
+	latch.bit_handler<2>().set(*this, FUNC(scsi_port_device::write_data2));
+	latch.bit_handler<3>().set(*this, FUNC(scsi_port_device::write_data3));
+	latch.bit_handler<4>().set(*this, FUNC(scsi_port_device::write_data4));
+	latch.bit_handler<5>().set(*this, FUNC(scsi_port_device::write_data5));
+	latch.bit_handler<6>().set(*this, FUNC(scsi_port_device::write_data6));
+	latch.bit_handler<7>().set(*this, FUNC(scsi_port_device::write_data7));
+}
+
 DEFINE_DEVICE_TYPE(SCSI_PORT, scsi_port_device, "scsi", "SCSI Port")
 
 scsi_port_slot_device::scsi_port_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

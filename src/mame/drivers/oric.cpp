@@ -809,14 +809,7 @@ void oric_state::oric(machine_config &config, bool add_ext)
 	m_centronics->ack_handler().set(m_via, FUNC(via6522_device::write_ca1));
 
 	OUTPUT_LATCH(config, m_cent_data_out);
-	m_cent_data_out->bit_handler<0>().set(m_centronics, FUNC(centronics_device::write_data0));
-	m_cent_data_out->bit_handler<1>().set(m_centronics, FUNC(centronics_device::write_data1));
-	m_cent_data_out->bit_handler<2>().set(m_centronics, FUNC(centronics_device::write_data2));
-	m_cent_data_out->bit_handler<3>().set(m_centronics, FUNC(centronics_device::write_data3));
-	m_cent_data_out->bit_handler<4>().set(m_centronics, FUNC(centronics_device::write_data4));
-	m_cent_data_out->bit_handler<5>().set(m_centronics, FUNC(centronics_device::write_data5));
-	m_cent_data_out->bit_handler<6>().set(m_centronics, FUNC(centronics_device::write_data6));
-	m_cent_data_out->bit_handler<7>().set(m_centronics, FUNC(centronics_device::write_data7));
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	/* cassette */
 	CASSETTE(config, m_cassette, 0);

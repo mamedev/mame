@@ -275,14 +275,7 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 	m_centronics->ack_handler().set(R6522_TAG, FUNC(via6522_device::write_ca1));
 
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
-	cent_data_out.bit_handler<0>().set(m_centronics, FUNC(centronics_device::write_data0));
-	cent_data_out.bit_handler<1>().set(m_centronics, FUNC(centronics_device::write_data1));
-	cent_data_out.bit_handler<2>().set(m_centronics, FUNC(centronics_device::write_data2));
-	cent_data_out.bit_handler<3>().set(m_centronics, FUNC(centronics_device::write_data3));
-	cent_data_out.bit_handler<4>().set(m_centronics, FUNC(centronics_device::write_data4));
-	cent_data_out.bit_handler<5>().set(m_centronics, FUNC(centronics_device::write_data5));
-	cent_data_out.bit_handler<6>().set(m_centronics, FUNC(centronics_device::write_data6));
-	cent_data_out.bit_handler<7>().set(m_centronics, FUNC(centronics_device::write_data7));
+	m_centronics->set_output_latch(cent_data_out);
 
 	SCSI_PORT(config, m_scsibus);
 	m_scsibus->set_data_input_buffer(m_scsi_data_in);
@@ -297,14 +290,7 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 	m_scsibus->set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
 	OUTPUT_LATCH(config, m_scsi_data_out);
-	m_scsi_data_out->bit_handler<0>().set(m_scsibus, FUNC(scsi_port_device::write_data0));
-	m_scsi_data_out->bit_handler<1>().set(m_scsibus, FUNC(scsi_port_device::write_data1));
-	m_scsi_data_out->bit_handler<2>().set(m_scsibus, FUNC(scsi_port_device::write_data2));
-	m_scsi_data_out->bit_handler<3>().set(m_scsibus, FUNC(scsi_port_device::write_data3));
-	m_scsi_data_out->bit_handler<4>().set(m_scsibus, FUNC(scsi_port_device::write_data4));
-	m_scsi_data_out->bit_handler<5>().set(m_scsibus, FUNC(scsi_port_device::write_data5));
-	m_scsi_data_out->bit_handler<6>().set(m_scsibus, FUNC(scsi_port_device::write_data6));
-	m_scsi_data_out->bit_handler<7>().set(m_scsibus, FUNC(scsi_port_device::write_data7));
+	m_scsibus->set_output_latch(*m_scsi_data_out);
 
 	INPUT_BUFFER(config, m_scsi_data_in);
 	INPUT_BUFFER(config, m_scsi_ctrl_in);

@@ -1163,6 +1163,7 @@ MACHINE_CONFIG_START(bbc_state::abc110)
 	//scsibus.set_slot_device(1, "harddisk", ACB4070, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
 	//output_latch_device &scsiout(OUTPUT_LATCH(config, "scsi_data_out"));
+	//scsibus.set_output_latch(scsiout);
 	//scsiout.bit_handler<0>().set("scsi", FUNC(scsi_port_device::write_data0));
 	//scsiout.bit_handler<1>().set("scsi", FUNC(scsi_port_device::write_data1));
 	//scsiout.bit_handler<2>().set("scsi", FUNC(scsi_port_device::write_data2));
