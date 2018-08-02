@@ -601,6 +601,181 @@ An example element for a button that gives visual feedback when clicked::
     </element>
 
 
+.. _layout-parts-views:
+
+Views
+~~~~~
+
+A view defines an arrangement of elements and/or emulated screen images that can
+be displayed in a window or on a screen.  Views also connect elements to
+emulated I/O ports and/or outputs.  A layout file may contain multiple views.
+If a view references a non-existent screen, it will be considered *unviable*.
+MAME will print a warning message, skip over the unviable view, and continue to
+load views from the layout file.  This is particularly useful for systems where
+a screen is optional, for example computer systems with front panel controls and
+an optional serial terminal.
+
+Views are identified by name in MAME's user interface and in command-line
+options.  For layouts files associated with devices other than the root driver
+device, view names are prefixed with the device's tag (with the initial colon
+omitted) -- for example a view called "Keyboard LEDs" loaded for the device
+``:tty:ie15`` will be called "tty:ie15 Keyboard LEDs" in MAME's user interface.
+Views are listed in the order they are loaded.  Within a layout file, views are
+loaded in the order they appear, from top to bottom.
+
+Views are created with ``view`` elements inside the top-level ``mamelayout``
+element.  Each ``view`` element must have a ``name`` attribute, supplying its
+human-readable name for use in the user interface and command-line options.
+This is an example of a valid opening tag for a ``view`` element::
+
+    <view name="Control panel">
+
+A view creates a nested parameter scope inside the parameter scope of the
+top-level ``mamelayout`` element.  For historical reasons, ``view`` elements are
+processed *after* all other child elements of the top-level ``mamelayout``
+element.  This means a view can reference elements and groups that appear after
+it in the file, and parameters from the enclosing scope will have their final
+values from the end of the ``mamelayout`` element.
+
+The following child elements are allowed inside a ``view`` element:
+
+bounds
+    Sets the origin and size of the view if present.  If absent, the bounds of
+    the view are computed as the union of the bounds of all screens and elements
+    within the view.  See :ref:`layout-concepts-coordinates` for details.  It
+    only makes sense to have one ``bounds`` as a direct child of a view element.
+param
+    Defines or reassigns a value parameter in the view's scope.  See
+    :ref:`layout-concepts-params` for details.
+backdrop overlay bezel cpanel marquee
+    Adds an element to the relevant layer (see :ref:`layout-parts-elements` and
+    :ref:`layout-concepts-layers`).  The name of the element to add is specified
+    using the required ``element`` attribute.  It is an error if no element with
+    this name is defined in the layout file.  May optionally be connected to an
+    emulated I/O port using ``inputtag`` and ``inputmask`` attributes, and/or an
+    emulated output using a ``name`` attribute.  Within a layer, elements are
+    drawn in the order they appear in the layout file, from front to back.  See
+    below for more details.
+screen
+    Adds an emulated screen image to the view.  The screen must be identified
+    using either an ``index`` attribute or a ``tag`` attribute (it is an error
+    for a ``screen`` element to have both ``index`` and ``tag`` attributes).
+    If present, the ``index`` attribute must be a non-negative integer.  Screens
+    are numbered by the order they appear in machine configuration, starting at
+    zero (0).  If present, the ``tag`` attribute must be the tag path to the
+    screen relative to the device that causes the layout to be loaded.  Screens
+    are drawn in the order they appear in the layout file, from front to back.
+group
+    Adds the content of the group to the view (see :ref:`layout-parts-groups`).
+    The name of the group to add is specified using the required ``ref``
+    attribute.  It is an error if no group with this name is defined in the
+    layout file.  See below for more details on positioning.
+repeat
+    Repeats its contents the number of times specified by the required ``count``
+    attribute.  The ``count`` attribute must be a positive integer.  A
+    ``repeat`` element in a view may contain ``backdrop``, ``screen``,
+    ``overlay``, ``bezel``, ``cpanel``, ``marquee``, ``group``, and further
+    ``repeat`` elements, which function the same way they do when placed in a
+    view directly.  See :ref:`layout-parts-repeats` for discussion on using
+    ``repeat`` elements.
+
+Screens (``screen`` elements), layout elements (``backdrop``, ``overlay``,
+``bezel``, ``cpanel`` or ``marquee`` elements) and groups (``group`` elements)
+may be have their orientation altered using an ``orientation`` child element.
+For screens, the orientation modifiers are applied in addition to the
+orientation modifiers specified on the screen device and on the machine.  The
+``orientation`` element supports the following attributes, all of which are
+optional:
+
+rotate
+    If present, applies clockwise rotation in ninety degree implements.  Must be
+    an integer equal to 0, 90, 180 or 270.
+swapxy
+    Allows the screen, element or group to be mirrored along a line at
+    forty-five degrees to vertical from upper left to lower right.  Must be
+    either ``yes`` or ``no`` if present.  Mirroring applies logically after
+    rotation.
+flipx
+    Allows the screen, element or group to be mirrored around its vertical axis,
+    from left to right.  Must be either ``yes`` or ``no`` if present.  Mirroring
+    applies logically after rotation.
+flipy
+    Allows the screen, element or group to be mirrored around its horizontal
+    axis, from top to bottom.  Must be either ``yes`` or ``no`` if present.
+    Mirroring applies logically after rotation.
+
+Screens (``screen`` elements), layout elements (``backdrop``, ``overlay``,
+``bezel``, ``cpanel`` or ``marquee`` elements) and groups (``group`` elements)
+may be positioned and sized using a ``bounds`` child element (see
+:ref:`layout-concepts-coordinates` for details).  In the absence of a ``bounds``
+child element, screens' and layout elements' bounds default to a unit square
+(origin at 0,0 and height and width both equal to 1).  In the absence of a
+``bounds`` child element, groups are expanded with no translation/scaling (note
+that groups may position screens/elements outside their bounds).  This example
+shows a view instantiating and positioning a screen, an individual layout
+element, and two element groups::
+
+    <view name="LED Displays, Terminal and Keypad">
+        <cpanel element="beige"><bounds x="320" y="0" width="172" height="372" /></cpanel>
+        <group ref="displays"><bounds x="0" y="0" width="320" height="132" /></group>
+        <group ref="keypad"><bounds x="336" y="16" width="140" height="260" /></group>
+        <screen index="0"><bounds x="0" y="132" width="320" height="240" /></screen>
+    </view>
+
+Screens (``screen`` elements), layout elements (``backdrop``, ``overlay``,
+``bezel``, ``cpanel`` or ``marquee`` elements) and groups (``group`` elements)
+may have a ``color`` child element (see :ref:`layout-concepts-colours`)
+specifying a modifier colour.  The components colours of the screen or layout
+element(s) are multiplied by this colour.
+
+If an element instantiating a layout element (``backdrop``, ``overlay``,
+``bezel``, ``cpanel`` or ``marquee``) has ``inputtag`` and ``inputmask``
+attributes, clicking it is equivalent to pressing a key/button mapped to the
+corresponding input(s).  The ``inputtag`` specifies the tag path of an I/O port
+relative to the device that caused the layout file to be loaded.  The
+``inputmask`` attribute must be an integer specifying the bits of the I/O port
+that the element should activate.  This sample is shows instantiation of
+clickable buttons::
+
+    <cpanel element="btn_3" inputtag="X2" inputmask="0x10">
+        <bounds x="2.30" y="4.325" width="1.0" height="1.0" />
+    </cpanel>
+    <cpanel element="btn_0" inputtag="X0" inputmask="0x20">
+        <bounds x="0.725" y="5.375" width="1.0" height="1.0" /></cpanel>
+    <cpanel element="btn_rst" inputtag="RESET" inputmask="0x01">
+        <bounds x="1.775" y="5.375" width="1.0" height="1.0" />
+    </cpanel>
+
+
+If an element instantiating a layout element (``backdrop``, ``overlay``,
+``bezel``, ``cpanel`` or ``marquee``) has a ``name`` attribute, it will take its
+state from the value of the correspondingly named emulated output.  Note that
+output names are global, which can become an issue when a machine uses multiple
+instances of the same type of device.  See :ref:`layout-parts-elements` for
+details on how an element's state affects its appearance.  This example shows
+how digital displays may be connected to emulated outputs::
+
+    <cpanel name="digit6" element="digit"><bounds x="16" y="16" width="48" height="80" /></cpanel>
+    <cpanel name="digit5" element="digit"><bounds x="64" y="16" width="48" height="80" /></cpanel>
+    <cpanel name="digit4" element="digit"><bounds x="112" y="16" width="48" height="80" /></cpanel>
+    <cpanel name="digit3" element="digit"><bounds x="160" y="16" width="48" height="80" /></cpanel>
+    <cpanel name="digit2" element="digit"><bounds x="208" y="16" width="48" height="80" /></cpanel>
+    <cpanel name="digit1" element="digit"><bounds x="256" y="16" width="48" height="80" /></cpanel>
+
+If an element instantiating a layout element has ``inputtag`` and ``inputmask``
+attributes but lacks a ``name`` attribute, it will take its state from the value
+of the corresponding I/O port, masked with the ``inputmask`` value, and shifted
+to the right so that the least significant one bit of the mask aligns with the
+least significant bit of the value (for example a mask of 0x05 will result in no
+shift, while a mask of 0xb0 will result in the value being shifted four bits to
+the right).  This is often used to allow clickable buttons and toggle switches
+to provide visible feedback.
+
+When handling mouse input, MAME treats all layout elements as being rectangular,
+and only activates the frontmost element whose area includes the location of the
+mouse pointer.
+
+
 .. _layout-parts-repeats:
 
 Repeating blocks
@@ -734,6 +909,22 @@ iteration; the next ``repeat`` element generates an individual row on each
 iteration; the innermost ``repeat`` element produces two horizontally adjacent
 tiles on each iteration.  Rows are connected to I/O ports ``board:IN.7`` at the
 top to ``board.IN.0`` at the bottom.
+
+
+.. _layout-errors:
+
+Error handling
+--------------
+
+* For internal (developer-supplied) layout files, errors detected by the
+  ``complay.py`` script result in a build failure.
+* MAME will stop loading a layout file if a syntax error is encountered.  No
+  views from the layout will be available.  Examples of syntax errors include
+  undefined element or group references, invalid bounds, invalid colours,
+  recursively nested groups, and redefined generator parameters.
+* When loading a layout file, if a view references a non-existent screen, MAME
+  will print a warning message and continue.  Views referencing non-existent
+  screens are considered unviable and not available to the user.
 
 
 .. _layout-autogen:
