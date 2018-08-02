@@ -220,7 +220,7 @@ private:
 	DECLARE_READ8_MEMBER(treg1b_h_r);
 	DECLARE_READ8_MEMBER(treg3a_r);
 	DECLARE_READ8_MEMBER(treg3b_r);
-	DECLARE_READ8_MEMBER(treg4_r);
+	DECLARE_WRITE8_MEMBER(treg4_w);
 
 
 	DECLARE_WRITE8_MEMBER(sio1cr1_w);
@@ -267,6 +267,16 @@ private:
 	uint8_t m_SYSCR1;
 	uint8_t m_SYSCR2;
 	uint8_t m_TBTCR;
+	uint16_t m_TREG1A;
+	uint16_t m_TREG1B;
+	uint8_t m_TC1CR;
+	uint16_t m_TREG2;
+	uint8_t m_TC2CR;	
+	uint8_t m_TREG3A;
+	uint8_t m_TREG3B;
+	uint8_t m_TC3CR;
+	uint8_t m_TREG4;
+	uint8_t m_TC4CR;
 
 	uint16_t m_irqstate;
 

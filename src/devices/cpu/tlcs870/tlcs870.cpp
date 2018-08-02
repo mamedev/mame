@@ -51,7 +51,7 @@ void tlcs870_device::tmp87ph40an_mem(address_map &map)
 	map(0x0018, 0x0018).rw(FUNC(tlcs870_device::treg3a_r), FUNC(tlcs870_device::treg3a_w)); // Timer register 3A
 	map(0x0019, 0x0019).r(FUNC(tlcs870_device::treg3b_r)); // Timer register 3B
 	map(0x001a, 0x001a).w(FUNC(tlcs870_device::tc3cr_w)); // TC3 control
-	map(0x001b, 0x001b).r(FUNC(tlcs870_device::treg4_r)); // Timer register 4
+	map(0x001b, 0x001b).w(FUNC(tlcs870_device::treg4_w)); // Timer register 4
 	map(0x001c, 0x001c).w(FUNC(tlcs870_device::tc4cr_w)); // TC4 control
 	// 0x1d reserved
 	// 0x1e reserved
@@ -275,73 +275,156 @@ WRITE8_MEMBER(tlcs870_device::p7cr_w)
 
 // Timer emulation
 
+// 16-Bit Timer / Counter 2 (TC1)
+
+WRITE8_MEMBER(tlcs870_device::tc1cr_w)
+{
+	m_TC1CR = data;
+
+	logerror("m_TC1CR (16-bit TC1 Timer Control Register) bits set to\n");
+	logerror("%d: TFF1 (Timer F/F1 control for PPG mode)\n",   (m_TC1CR & 0x80) ? 1 : 0);
+	logerror("%d: SCAP1/MCAP1/METT1/MPPG1\n",                  (m_TC1CR & 0x40) ? 1 : 0);
+	logerror("%d: TC1S-1 (TC1 Start Control)\n",               (m_TC1CR & 0x20) ? 1 : 0);
+	logerror("%d: TC1S-0 (TC1 Start Control)\n",               (m_TC1CR & 0x10) ? 1 : 0);
+	logerror("%d: TC1CK-1 (TC1 Source Clock select)\n",        (m_TC1CR & 0x08) ? 1 : 0); 
+	logerror("%d: TC1CK-0 (TC1 Source Clock select)\n",        (m_TC1CR & 0x04) ? 1 : 0); 
+	logerror("%d: TC1M-1 (TC1 Mode Select)\n",                 (m_TC1CR & 0x02) ? 1 : 0); 
+	logerror("%d: TC1M-0 (TC1 Mode Select)\n",                 (m_TC1CR & 0x01) ? 1 : 0);
+}
+
 WRITE8_MEMBER(tlcs870_device::treg1a_l_w)
 {
+	m_TREG1A = (m_TREG1A & 0xff00) | data;
 }
 
 WRITE8_MEMBER(tlcs870_device::treg1a_h_w)
 {
+	m_TREG1A = (m_TREG1A & 0x00ff) | (data << 8);
 }
 
 WRITE8_MEMBER(tlcs870_device::treg1b_l_w)
 {
+	m_TREG1B = (m_TREG1B & 0xff00) | data;
 }
 
 WRITE8_MEMBER(tlcs870_device::treg1b_h_w)
 {
-}
-
-WRITE8_MEMBER(tlcs870_device::tc1cr_w)
-{
-}
-
-WRITE8_MEMBER(tlcs870_device::tc2cr_w)
-{
-}
-
-WRITE8_MEMBER(tlcs870_device::treg2_l_w)
-{
-}
-
-WRITE8_MEMBER(tlcs870_device::treg2_h_w)
-{
-}
-
-WRITE8_MEMBER(tlcs870_device::treg3a_w)
-{
-}
-
-WRITE8_MEMBER(tlcs870_device::tc3cr_w)
-{
-}
-
-WRITE8_MEMBER(tlcs870_device::tc4cr_w)
-{
+	m_TREG1B = (m_TREG1B & 0x00ff) | (data << 8);
 }
 
 READ8_MEMBER(tlcs870_device::treg1b_l_r)
 {
-	return 0x00;
+	return m_TREG1B & 0xff;
 }
 
 READ8_MEMBER(tlcs870_device::treg1b_h_r)
 {
-	return 0x00;
+	return (m_TREG1B >>8) & 0xff;
+}
+
+// 16-Bit Timer / Counter 2 (TC2)
+
+WRITE8_MEMBER(tlcs870_device::tc2cr_w)
+{
+	m_TC2CR = data;
+
+	logerror("m_TC2CR (16-bit TC2 Timer Control Register) bits set to\n");
+	logerror("%d: (invalid)\n",                         (m_TC2CR & 0x80) ? 1 : 0);
+	logerror("%d: (invalid)\n",                         (m_TC2CR & 0x40) ? 1 : 0);
+	logerror("%d: TC2S (TC2 Start Control)\n",          (m_TC2CR & 0x20) ? 1 : 0);
+	logerror("%d: TC2CK-2 (TC2 Source Clock select)\n", (m_TC2CR & 0x10) ? 1 : 0);
+	logerror("%d: TC2CK-1 (TC2 Source Clock select)\n", (m_TC2CR & 0x08) ? 1 : 0); 
+	logerror("%d: TC2CK-0 (TC2 Source Clock select)\n", (m_TC2CR & 0x04) ? 1 : 0); 
+	logerror("%d: (invalid)\n",                         (m_TC2CR & 0x02) ? 1 : 0); 
+	logerror("%d: TC2M (TC2 Mode Select)\n",            (m_TC2CR & 0x01) ? 1 : 0);
+}
+
+WRITE8_MEMBER(tlcs870_device::treg2_l_w)
+{
+	m_TREG2 = (m_TREG2 & 0xff00) | data;
+}
+
+WRITE8_MEMBER(tlcs870_device::treg2_h_w)
+{
+	m_TREG2 = (m_TREG2 & 0x00ff) | (data << 8);
+}
+
+// 8-Bit Timer / Counter 3 (TC3)
+
+WRITE8_MEMBER(tlcs870_device::tc3cr_w)
+{
+	m_TC3CR = data;
+
+	logerror("m_TC3CR (8-bit TC3 Timer Control Register) bits set to\n");
+	logerror("%d: (invalid)\n",                         (m_TC3CR & 0x80) ? 1 : 0);
+	logerror("%d: SCAP (Software Capture Control)\n",   (m_TC3CR & 0x40) ? 1 : 0);
+	logerror("%d: (invalid)\n",                         (m_TC3CR & 0x20) ? 1 : 0);
+	logerror("%d: TC3S (TC3 Start Control)\n",          (m_TC3CR & 0x10) ? 1 : 0);
+	logerror("%d: TC3CK-1 (TC3 Source Clock select)\n", (m_TC3CR & 0x08) ? 1 : 0); 
+	logerror("%d: TC3CK-0 (TC3 Source Clock select)\n", (m_TC3CR & 0x04) ? 1 : 0); 
+	logerror("%d: (invalid)\n",                         (m_TC3CR & 0x02) ? 1 : 0); 
+	logerror("%d: TC3M (TC3 Mode Select)\n",            (m_TC3CR & 0x01) ? 1 : 0);
+}
+
+WRITE8_MEMBER(tlcs870_device::treg3a_w)
+{
+	m_TREG3A = data;
 }
 
 READ8_MEMBER(tlcs870_device::treg3a_r)
 {
-	return 0x00;
+	return m_TREG3A;
 }
 
 READ8_MEMBER(tlcs870_device::treg3b_r)
 {
-	return 0x00;
+	return m_TREG3B;
 }
 
-READ8_MEMBER(tlcs870_device::treg4_r)
+// 8-Bit Timer / Counter 3 (TC4)
+
+WRITE8_MEMBER(tlcs870_device::tc4cr_w)
 {
-	return 0x00;
+	m_TC4CR = data;
+
+	logerror("m_TC4CR (8-bit TC4 Timer Control Register) bits set to\n");
+	logerror("%d: TFF4-1 (Timer F/F 4 Control)\n",      (m_TC4CR & 0x80) ? 1 : 0);
+	logerror("%d: TFF4-0 (Timer F/F 4 Control)\n",      (m_TC4CR & 0x40) ? 1 : 0);
+	logerror("%d: (invalid)\n",                         (m_TC4CR & 0x20) ? 1 : 0);
+	logerror("%d: TC4S (TC4 Start Control)\n",          (m_TC4CR & 0x10) ? 1 : 0);
+	logerror("%d: TC4CK-1 (TC4 Source Clock select)\n", (m_TC4CR & 0x08) ? 1 : 0); 
+	logerror("%d: TC4CK-0 (TC4 Source Clock select)\n", (m_TC4CR & 0x04) ? 1 : 0); 
+	logerror("%d: TC4M-1 (TC4 Mode Select)\n",          (m_TC4CR & 0x02) ? 1 : 0); 
+	logerror("%d: TC4M-0 (TC4 Mode Select)\n",          (m_TC4CR & 0x01) ? 1 : 0);
+}
+
+WRITE8_MEMBER(tlcs870_device::treg4_w)
+{
+	m_TREG4 = data;
+}
+
+// Time Base Timer
+
+// this is used with TLCS870_IRQ_INTTBT (FFF2 INTTBT) (not used by hng64) 
+// the divider output makes use of PORT1 bit 3, which must be properly configured
+WRITE8_MEMBER(tlcs870_device::tbtcr_w)
+{
+	m_TBTCR = data;
+
+	logerror("m_TBTCR (Time Base Timer) bits set to\n");
+	logerror("%d: DV0EN (Divider Output Enable)\n",                  (m_TBTCR & 0x80) ? 1 : 0);
+	logerror("%d: DVOCK-1 (Divide Output Frequency Selection)n",     (m_TBTCR & 0x40) ? 1 : 0);
+	logerror("%d: DVOCK-0 (Divide Output Frequency Selection)\n",    (m_TBTCR & 0x20) ? 1 : 0);
+	logerror("%d: DV7CK (?)\n",                                      (m_TBTCR & 0x10) ? 1 : 0);
+	logerror("%d: TBTEN (Time Base Timer Enable)\n",                 (m_TBTCR & 0x08) ? 1 : 0); 
+	logerror("%d: TBTCK-2 (Time Base Timer Interrupt Frequency)\n",  (m_TBTCR & 0x04) ? 1 : 0); 
+	logerror("%d: TBTCK-1 (Time Base Timer Interrupt Frequency)\n",  (m_TBTCR & 0x02) ? 1 : 0); 
+	logerror("%d: TBTCK-0 (Time Base Timer Interrupt Frequency)\n",  (m_TBTCR & 0x01) ? 1 : 0);
+}
+
+READ8_MEMBER(tlcs870_device::tbtcr_r)
+{
+	return m_TBTCR;
 }
 
 /* SIO emulation */
@@ -384,28 +467,6 @@ WRITE8_MEMBER(tlcs870_device::wdtcr2_w)
 
 // Misc
 
-// this stuff is used with TLCS870_IRQ_INTTBT (FFF2 INTTBT) not used by hng64 
-// the divider output makes use of PORT1 bit 3, which must be properly configured
-WRITE8_MEMBER(tlcs870_device::tbtcr_w)
-{
-	m_TBTCR = data;
-
-	logerror("m_TBTCR (Time Base Timer) bits set to\n");
-	logerror("%d: DV0EN (Divider Output Enable)\n",                  (m_TBTCR & 0x80) ? 1 : 0);
-	logerror("%d: DVOCK1 (Divide Output Frequency Selection)n",      (m_TBTCR & 0x40) ? 1 : 0);
-	logerror("%d: DVOCK0 (Divide Output Frequency Selection)\n",     (m_TBTCR & 0x20) ? 1 : 0);
-	logerror("%d: DV7CK (?)\n",                                      (m_TBTCR & 0x10) ? 1 : 0);
-	logerror("%d: TBTEN (Time Base Timer Enable)\n",                 (m_TBTCR & 0x08) ? 1 : 0); 
-	logerror("%d: TBTCK2 (Time Base Timer Interrupt Frequency)\n",   (m_TBTCR & 0x04) ? 1 : 0); 
-	logerror("%d: TBTCK1 (Time Base Timer Interrupt Frequency)\n",   (m_TBTCR & 0x02) ? 1 : 0); 
-	logerror("%d: TBTCK0 (Time Base Timer Interrupt Frequency)\n",   (m_TBTCR & 0x01) ? 1 : 0);
-}
-
-READ8_MEMBER(tlcs870_device::tbtcr_r)
-{
-	return m_TBTCR;
-}
-
 // not used by hng64
 WRITE8_MEMBER(tlcs870_device::syscr1_w)
 {
@@ -416,8 +477,8 @@ WRITE8_MEMBER(tlcs870_device::syscr1_w)
 	logerror("%d: RELM (release method for STOP, 0 edge, 1 level)\n", (m_SYSCR1 & 0x40) ? 1 : 0);
 	logerror("%d: RETM (return mode after STOP, 0 normal, 1 slow)\n", (m_SYSCR1 & 0x20) ? 1 : 0);
 	logerror("%d: OUTEN (port output control during STOP)\n",         (m_SYSCR1 & 0x10) ? 1 : 0);
-	logerror("%d: WUT1 (warm up time at STOP release)\n",             (m_SYSCR1 & 0x08) ? 1 : 0); 
-	logerror("%d: WUT0 (warm up time at STOP release)\n",             (m_SYSCR1 & 0x04) ? 1 : 0); 
+	logerror("%d: WUT-1 (warm up time at STOP release)\n",            (m_SYSCR1 & 0x08) ? 1 : 0); 
+	logerror("%d: WUT-0 (warm up time at STOP release)\n",            (m_SYSCR1 & 0x04) ? 1 : 0); 
 	logerror("%d: (invalid)\n",                                       (m_SYSCR1 & 0x02) ? 1 : 0); 
 	logerror("%d: (invalid)\n",                                       (m_SYSCR1 & 0x01) ? 1 : 0);
 }
@@ -746,6 +807,21 @@ void tlcs870_device::device_reset()
 	m_SYSCR1 = 0x00;
 	m_SYSCR2 = 0x80; // | 0x40, can order parts with low frequency oscillator enabled by default too (although default state is always to use high one?)
 	m_TBTCR = 0x00;
+
+	m_TREG1A = 0x1234; // not initialized?
+	m_TREG1B = 0x4321; // not initialized?
+	m_TC1CR = 0x00;
+
+	m_TREG2 = 0x2301; // not initialized?
+	m_TC12R = 0x00;
+
+	m_TREG3A = 0x10; // not initialized?
+	m_TREG3B = 0x32; // not initialized?
+	m_TC3CR = 0x00;
+
+	m_TREG4 = 0x30; // not initialized?
+	m_TC3CR = 0x00;
+
 
 	m_irqstate = 0;
 
