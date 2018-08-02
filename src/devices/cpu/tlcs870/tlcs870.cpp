@@ -281,7 +281,7 @@ WRITE8_MEMBER(tlcs870_device::tc1cr_w)
 {
 	m_TC1CR = data;
 
-	logerror("m_TC1CR (16-bit TC1 Timer Control Register) bits set to\n");
+	logerror("%s m_TC1CR (16-bit TC1 Timer Control Register) bits set to\n", machine().describe_context());
 	logerror("%d: TFF1 (Timer F/F1 control for PPG mode)\n",   (m_TC1CR & 0x80) ? 1 : 0);
 	logerror("%d: SCAP1/MCAP1/METT1/MPPG1\n",                  (m_TC1CR & 0x40) ? 1 : 0);
 	logerror("%d: TC1S-1 (TC1 Start Control)\n",               (m_TC1CR & 0x20) ? 1 : 0);
@@ -328,7 +328,7 @@ WRITE8_MEMBER(tlcs870_device::tc2cr_w)
 {
 	m_TC2CR = data;
 
-	logerror("m_TC2CR (16-bit TC2 Timer Control Register) bits set to\n");
+	logerror("%s m_TC2CR (16-bit TC2 Timer Control Register) bits set to\n", machine().describe_context());
 	logerror("%d: (invalid)\n",                         (m_TC2CR & 0x80) ? 1 : 0);
 	logerror("%d: (invalid)\n",                         (m_TC2CR & 0x40) ? 1 : 0);
 	logerror("%d: TC2S (TC2 Start Control)\n",          (m_TC2CR & 0x20) ? 1 : 0);
@@ -355,7 +355,7 @@ WRITE8_MEMBER(tlcs870_device::tc3cr_w)
 {
 	m_TC3CR = data;
 
-	logerror("m_TC3CR (8-bit TC3 Timer Control Register) bits set to\n");
+	logerror("%s m_TC3CR (8-bit TC3 Timer Control Register) bits set to\n", machine().describe_context());
 	logerror("%d: (invalid)\n",                         (m_TC3CR & 0x80) ? 1 : 0);
 	logerror("%d: SCAP (Software Capture Control)\n",   (m_TC3CR & 0x40) ? 1 : 0);
 	logerror("%d: (invalid)\n",                         (m_TC3CR & 0x20) ? 1 : 0);
@@ -387,7 +387,7 @@ WRITE8_MEMBER(tlcs870_device::tc4cr_w)
 {
 	m_TC4CR = data;
 
-	logerror("m_TC4CR (8-bit TC4 Timer Control Register) bits set to\n");
+	logerror("%s m_TC4CR (8-bit TC4 Timer Control Register) bits set to\n", machine().describe_context());
 	logerror("%d: TFF4-1 (Timer F/F 4 Control)\n",      (m_TC4CR & 0x80) ? 1 : 0);
 	logerror("%d: TFF4-0 (Timer F/F 4 Control)\n",      (m_TC4CR & 0x40) ? 1 : 0);
 	logerror("%d: (invalid)\n",                         (m_TC4CR & 0x20) ? 1 : 0);
@@ -411,7 +411,7 @@ WRITE8_MEMBER(tlcs870_device::tbtcr_w)
 {
 	m_TBTCR = data;
 
-	logerror("m_TBTCR (Time Base Timer) bits set to\n");
+	logerror("%s m_TBTCR (Time Base Timer) bits set to\n", machine().describe_context());
 	logerror("%d: DV0EN (Divider Output Enable)\n",                  (m_TBTCR & 0x80) ? 1 : 0);
 	logerror("%d: DVOCK-1 (Divide Output Frequency Selection)n",     (m_TBTCR & 0x40) ? 1 : 0);
 	logerror("%d: DVOCK-0 (Divide Output Frequency Selection)\n",    (m_TBTCR & 0x20) ? 1 : 0);
@@ -429,40 +429,124 @@ READ8_MEMBER(tlcs870_device::tbtcr_r)
 
 /* SIO emulation */
 
+// Serial Port 1
 WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
 {
+	m_SIOCR1[0] = data;
+
+	logerror("%s m_SIOCR1[0] (Serial IO Port 1 Control Register 1) bits set to\n", machine().describe_context());
+	logerror("%d: SIOS1 (Start/Stop transfer)\n",       (m_SIOCR1[0] & 0x80) ? 1 : 0);
+	logerror("%d: SIOINH1 (Continue/Abort transfer)\n", (m_SIOCR1[0] & 0x40) ? 1 : 0);
+	logerror("%d: SIOM1-2 (Serial Mode)\n",             (m_SIOCR1[0] & 0x20) ? 1 : 0);
+	logerror("%d: SIOM1-1 (Serial Mode)\n",             (m_SIOCR1[0] & 0x10) ? 1 : 0);
+	logerror("%d: SIOM1-0 (Serial Mode)\n",             (m_SIOCR1[0] & 0x08) ? 1 : 0); 
+	logerror("%d: SCK1-2 (Serial Clock)\n",             (m_SIOCR1[0] & 0x04) ? 1 : 0); 
+	logerror("%d: SCK1-1 (Serial Clock)\n",             (m_SIOCR1[0] & 0x02) ? 1 : 0); 
+	logerror("%d: SCK1-0 (Serial Clock)\n",             (m_SIOCR1[0] & 0x01) ? 1 : 0);
 }
 
 WRITE8_MEMBER(tlcs870_device::sio1cr2_w)
 {
-}
+	m_SIOCR2[0] = data;
 
-WRITE8_MEMBER(tlcs870_device::sio2cr1_w)
-{
-}
-
-WRITE8_MEMBER(tlcs870_device::sio2cr2_w)
-{
-}
-
-READ8_MEMBER(tlcs870_device::sio2sr_r)
-{
-	return 0x00;
+	logerror("%s m_SIOCR2[0] (Serial IO Port 1 Control Register 2) bits set to\n", machine().describe_context());
+	logerror("%d: (invalid)\n",                          (m_SIOCR2[0] & 0x80) ? 1 : 0);
+	logerror("%d: (invalid)\n",                          (m_SIOCR2[0] & 0x40) ? 1 : 0);
+	logerror("%d: (invalid)\n",                          (m_SIOCR2[0] & 0x20) ? 1 : 0);
+	logerror("%d: WAIT1-1 (Wait Control\n",              (m_SIOCR2[0] & 0x10) ? 1 : 0);
+	logerror("%d: WAIT1-0 (Wait Control)\n",             (m_SIOCR2[0] & 0x08) ? 1 : 0); 
+	logerror("%d: BUF1-2 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x04) ? 1 : 0); 
+	logerror("%d: BUF1-1 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x02) ? 1 : 0); 
+	logerror("%d: BUF1-0 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x01) ? 1 : 0);
 }
 
 READ8_MEMBER(tlcs870_device::sio1sr_r)
 {
+	/* TS-- ----
+	 
+	   T = Transfer in Progress
+	   S = Shift in Progress
+
+	*/
 	return 0x00;
 }
 
-// WDT emulation
+// Serial Port 2
+WRITE8_MEMBER(tlcs870_device::sio2cr1_w)
+{
+	m_SIOCR1[1] = data;
+
+	logerror("%s m_SIOCR1[1] (Serial IO Port 2 Control Register 1) bits set to\n", machine().describe_context());
+	logerror("%d: SIOS2 (Start/Stop transfer)\n",       (m_SIOCR1[1] & 0x80) ? 1 : 0);
+	logerror("%d: SIOINH2 (Continue/Abort transfer)\n", (m_SIOCR1[1] & 0x40) ? 1 : 0);
+	logerror("%d: SIOM2-2 (Serial Mode)\n",             (m_SIOCR1[1] & 0x20) ? 1 : 0);
+	logerror("%d: SIOM2-1 (Serial Mode)\n",             (m_SIOCR1[1] & 0x10) ? 1 : 0);
+	logerror("%d: SIOM2-0 (Serial Mode)\n",             (m_SIOCR1[1] & 0x08) ? 1 : 0); 
+	logerror("%d: SCK2-2 (Serial Clock)\n",             (m_SIOCR1[1] & 0x04) ? 1 : 0); 
+	logerror("%d: SCK2-1 (Serial Clock)\n",             (m_SIOCR1[1] & 0x02) ? 1 : 0); 
+	logerror("%d: SCK2-0 (Serial Clock)\n",             (m_SIOCR1[1] & 0x01) ? 1 : 0);
+}
+
+WRITE8_MEMBER(tlcs870_device::sio2cr2_w)
+{
+	m_SIOCR2[1] = data;
+
+	logerror("%s m_SIOCR2[1] (Serial IO Port 2 Control Register 2) bits set to\n", machine().describe_context());
+	logerror("%d: (invalid)\n",                          (m_SIOCR2[1] & 0x80) ? 1 : 0);
+	logerror("%d: (invalid)\n",                          (m_SIOCR2[1] & 0x40) ? 1 : 0);
+	logerror("%d: (invalid)\n",                          (m_SIOCR2[1] & 0x20) ? 1 : 0);
+	logerror("%d: WAIT2-1 (Wait Control\n",              (m_SIOCR2[1] & 0x10) ? 1 : 0);
+	logerror("%d: WAIT2-0 (Wait Control)\n",             (m_SIOCR2[1] & 0x08) ? 1 : 0); 
+	logerror("%d: BUF2-2 (Number of Transfer Bytes)\n",  (m_SIOCR2[1] & 0x04) ? 1 : 0); 
+	logerror("%d: BUF2-1 (Number of Transfer Bytes)\n",  (m_SIOCR2[1] & 0x02) ? 1 : 0); 
+	logerror("%d: BUF2-0 (Number of Transfer Bytes)\n",  (m_SIOCR2[1] & 0x01) ? 1 : 0);
+}
+
+
+READ8_MEMBER(tlcs870_device::sio2sr_r)
+{
+	/* TS-- ----
+	 
+	   T = Transfer in Progress
+	   S = Shift in Progress
+
+	*/
+	return 0x00;
+}
+
+// WDT emulation (Watchdog Timer)
 
 WRITE8_MEMBER(tlcs870_device::wdtcr1_w)
 {
+	m_WDTCR1 = data;
+
+	logerror("%s m_WDTCR1 (Watchdog Timer Control 1) bits set to\n", machine().describe_context());
+	logerror("%d: (invalid)\n",                                                          (m_WDTCR1 & 0x80) ? 1 : 0);
+	logerror("%d: (invalid)\n",                                                          (m_WDTCR1 & 0x40) ? 1 : 0);
+	logerror("%d: (invalid)\n",                                                          (m_WDTCR1 & 0x20) ? 1 : 0);
+	logerror("%d: (invalid)\n",                                                          (m_WDTCR1 & 0x10) ? 1 : 0);
+	logerror("%d: WDTEN (Watchdog Timer Enable, also req disable code to WDTCR2)\n",     (m_WDTCR1 & 0x08) ? 1 : 0); 
+	logerror("%d: WDTT-1 (Watchdog Timer Detection Time)\n",                             (m_WDTCR1 & 0x04) ? 1 : 0); 
+	logerror("%d: WDTT-0 (Watchdog Timer Detection Time)\n",                             (m_WDTCR1 & 0x02) ? 1 : 0); 
+	logerror("%d: WDTOUT (Watchdog Timer Output select, 0 = interrupt, 1 = reset out)\n",(m_WDTCR1 & 0x01) ? 1 : 0);
+
+	// WDTOUT cannot be set to 1 by software
 }
 
 WRITE8_MEMBER(tlcs870_device::wdtcr2_w)
 {
+	if (data == 0x4e)
+	{
+		// clear watchdog counter
+	}
+	else if (data == 0xb1)
+	{
+		// disable code
+		if (!(m_WDTCR1 & 0x08))
+		{
+			logerror("%s wdtcr2_w - Watchdog disabled\n", machine().describe_context());
+		}
+	}
 }
 
 // Misc
@@ -472,7 +556,7 @@ WRITE8_MEMBER(tlcs870_device::syscr1_w)
 {
 	m_SYSCR1 = data;
 
-	logerror("m_SYSCR1 (System Control Register 1) bits set to\n");
+	logerror("%s m_SYSCR1 (System Control Register 1) bits set to\n", machine().describe_context());
 	logerror("%d: STOP (STOP mode start)\n",                          (m_SYSCR1 & 0x80) ? 1 : 0);
 	logerror("%d: RELM (release method for STOP, 0 edge, 1 level)\n", (m_SYSCR1 & 0x40) ? 1 : 0);
 	logerror("%d: RETM (return mode after STOP, 0 normal, 1 slow)\n", (m_SYSCR1 & 0x20) ? 1 : 0);
@@ -487,7 +571,7 @@ WRITE8_MEMBER(tlcs870_device::syscr2_w)
 {
 	m_SYSCR2 = data;
 
-	logerror("m_SYSCR2 (System Control Register 2) bits set to\n");
+	logerror("%s m_SYSCR2 (System Control Register 2) bits set to\n", machine().describe_context());
 	logerror("%d: XEN (High Frequency Oscillator control)\n",         (m_SYSCR2 & 0x80) ? 1 : 0);
 	logerror("%d: XTEN (Low Frequency Oscillator control)\n",         (m_SYSCR2 & 0x40) ? 1 : 0);
 	logerror("%d: SYSCK (system clock select 0 high, 1 low)\n",       (m_SYSCR2 & 0x20) ? 1 : 0);
@@ -574,7 +658,7 @@ WRITE8_MEMBER(tlcs870_device::eintcr_w)
 {
 	m_EINTCR = data;
 
-	logerror("m_EINTCR (External Interrupt Control) bits set to\n");
+	logerror("%s m_EINTCR (External Interrupt Control) bits set to\n", machine().describe_context());
 	logerror("%d: INT1NC (Interrupt noise reject)\n", (m_EINTCR & 0x80) ? 1 : 0);
 	logerror("%d: INT0EN (Interrupt 0 enable)\n",     (m_EINTCR & 0x40) ? 1 : 0);
 	logerror("%d: (invalid)\n",                       (m_EINTCR & 0x20) ? 1 : 0);
@@ -605,7 +689,7 @@ WRITE8_MEMBER(tlcs870_device::eir_l_w)
 {
 	m_EIR = (m_EIR & 0xff00) | data;
 
-	logerror("m_EIR(LSB) (Interrupt Enable) bits set to\n");
+	logerror("%s m_EIR(LSB) (Interrupt Enable) bits set to\n", machine().describe_context());
 	logerror("%d: EF7 (External Interrupt 2)\n",      (m_EIR & 0x0080) ? 1 : 0);
 	logerror("%d: EF6 (Time Base Timer Interrupt)\n", (m_EIR & 0x0040) ? 1 : 0);
 	logerror("%d: EF5 (External Interrupt 1)\n",      (m_EIR & 0x0020) ? 1 : 0);
@@ -620,7 +704,7 @@ WRITE8_MEMBER(tlcs870_device::eir_h_w)
 {
 	m_EIR = (m_EIR & 0x00ff) | (data << 8);
 
-	logerror("m_EIR(MSB) (Interrupt Enable) bits set to\n");
+	logerror("%s m_EIR(MSB) (Interrupt Enable) bits set to\n", machine().describe_context());
 	logerror("%d: EF15 (External Interrupt 5)\n",          (m_EIR & 0x8000) ? 1 : 0);
 	logerror("%d: EF14 (16-bit TC2 Interrupt)\n",          (m_EIR & 0x4000) ? 1 : 0);
 	logerror("%d: EF13 (Serial Interface 2 Interrupt)\n",  (m_EIR & 0x2000) ? 1 : 0);
@@ -813,7 +897,7 @@ void tlcs870_device::device_reset()
 	m_TC1CR = 0x00;
 
 	m_TREG2 = 0x2301; // not initialized?
-	m_TC12R = 0x00;
+	m_TC2CR = 0x00;
 
 	m_TREG3A = 0x10; // not initialized?
 	m_TREG3B = 0x32; // not initialized?
@@ -822,6 +906,13 @@ void tlcs870_device::device_reset()
 	m_TREG4 = 0x30; // not initialized?
 	m_TC3CR = 0x00;
 
+	m_SIOCR1[0] = 0x00;
+	m_SIOCR1[1] = 0x00;
+
+	m_SIOCR2[0] = 0x00;
+	m_SIOCR2[1] = 0x00;
+
+	m_WDTCR1 = 0x09;
 
 	m_irqstate = 0;
 

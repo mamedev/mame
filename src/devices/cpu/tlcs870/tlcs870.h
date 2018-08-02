@@ -277,6 +277,9 @@ private:
 	uint8_t m_TC3CR;
 	uint8_t m_TREG4;
 	uint8_t m_TC4CR;
+	uint8_t m_SIOCR1[2];
+	uint8_t m_SIOCR2[2];
+	uint8_t m_WDTCR1;
 
 	uint16_t m_irqstate;
 
