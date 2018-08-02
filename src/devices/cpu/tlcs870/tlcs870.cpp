@@ -97,7 +97,8 @@ void tlcs870_device::tmp87ph40an_mem(address_map &map)
 	map(0x003f, 0x003f).rw(FUNC(tlcs870_device::psw_r), FUNC(tlcs870_device::rbs_w)); // Program status word / Register bank selector
 
 	map(0x0040, 0x023f).ram().share("intram"); // register banks + internal RAM, not, code execution NOT allowed here (fetches FF and causes SWI)
-	map(0x0f80, 0x0fff).ram(); // DBR (0f80 - 0f7f = reserved, 0ff0-0ff7 = SIO1 buffer, 0ff8 - 0fff = SIO2 buffer)
+	map(0x0f80, 0x0fef).ram();              // DBR (0f80 - 0fef = reserved)
+	map(0x0ff0, 0x0fff).ram().share("dbr"); // DBR 0ff0-0ff7 = SIO1 buffer, 0ff8 - 0fff = SIO2 buffer)
 	map(0xc000, 0xffff).rom();
 }
 
@@ -107,9 +108,11 @@ tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type optype
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_intram(*this, "intram")
+	, m_dbr(*this, "dbr")
 	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 	, m_port_analog_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_serial_out_cb{{*this}, {*this}}
 {
 }
 
@@ -436,13 +439,36 @@ WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
 
 	logerror("%s m_SIOCR1[0] (Serial IO Port 1 Control Register 1) bits set to\n", machine().describe_context());
 	logerror("%d: SIOS1 (Start/Stop transfer)\n",       (m_SIOCR1[0] & 0x80) ? 1 : 0);
-	logerror("%d: SIOINH1 (Continue/Abort transfer)\n", (m_SIOCR1[0] & 0x40) ? 1 : 0);
+	logerror("%d: SIOINH1 (Abort/Continue transfer)\n", (m_SIOCR1[0] & 0x40) ? 1 : 0);
 	logerror("%d: SIOM1-2 (Serial Mode)\n",             (m_SIOCR1[0] & 0x20) ? 1 : 0);
 	logerror("%d: SIOM1-1 (Serial Mode)\n",             (m_SIOCR1[0] & 0x10) ? 1 : 0);
 	logerror("%d: SIOM1-0 (Serial Mode)\n",             (m_SIOCR1[0] & 0x08) ? 1 : 0); 
 	logerror("%d: SCK1-2 (Serial Clock)\n",             (m_SIOCR1[0] & 0x04) ? 1 : 0); 
 	logerror("%d: SCK1-1 (Serial Clock)\n",             (m_SIOCR1[0] & 0x02) ? 1 : 0); 
 	logerror("%d: SCK1-0 (Serial Clock)\n",             (m_SIOCR1[0] & 0x01) ? 1 : 0);
+
+	m_transfer_mode[0] = (m_SIOCR1[0] & 0x38) >> 3;
+	switch (m_transfer_mode[0])
+	{
+	case 0x0: logerror("(Serial set to 8-bit transmit mode)\n"); break;
+	case 0x1: logerror("(Serial set to invalid mode)\n"); break;
+	case 0x2: logerror("(Serial set to 4-bit transmit mode)\n"); break;
+	case 0x3: logerror("(Serial set to invalid mode)\n"); break;
+	case 0x4: logerror("(Serial set to 8-bit transmit/receive mode)\n"); break;
+	case 0x5: logerror("(Serial set to 8-bit receive mode)\n"); break;
+	case 0x6: logerror("(Serial set to 4-bit receive mode)\n"); break;
+	case 0x7: logerror("(Serial set to invalid mode)\n"); break;
+	}
+
+	if ((m_SIOCR1[0] & 0xc0) == 0x80)
+	{
+		// start transfer
+		m_transfer_shiftpos[0] = 0;
+		m_transfer_shiftreg[0] = 0;
+		m_transfer_pos[0] = 0;
+
+		m_serial_transmit_timer[0]->adjust(attotime::zero);
+	}
 }
 
 WRITE8_MEMBER(tlcs870_device::sio1cr2_w)
@@ -458,6 +484,10 @@ WRITE8_MEMBER(tlcs870_device::sio1cr2_w)
 	logerror("%d: BUF1-2 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x04) ? 1 : 0); 
 	logerror("%d: BUF1-1 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x02) ? 1 : 0); 
 	logerror("%d: BUF1-0 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x01) ? 1 : 0);
+
+	m_transfer_numbytes[0] = (m_SIOCR2[0] & 0x7);
+	logerror("(serial set to transfer %01x bytes)\n", m_transfer_numbytes[0]+1);
+
 }
 
 READ8_MEMBER(tlcs870_device::sio1sr_r)
@@ -471,6 +501,43 @@ READ8_MEMBER(tlcs870_device::sio1sr_r)
 	return 0x00;
 }
 
+TIMER_CALLBACK_MEMBER(tlcs870_device::sio0_transmit_cb)
+{
+	int finish = 0;
+	if (m_transfer_shiftpos[0] == 0)
+	{
+		m_transfer_shiftreg[0] = m_dbr[m_transfer_pos[0]];
+		logerror("transmitting byte %02x\n", m_transfer_shiftreg[0]);
+	}
+
+	int dataout = m_transfer_shiftreg[0] & 0x01;
+
+	m_serial_out_cb[0](dataout);
+
+	m_transfer_shiftreg[0] >>= 1;
+	m_transfer_shiftpos[0]++;
+
+	if (m_transfer_shiftpos[0] == 8)
+	{
+		logerror("transmitted\n");
+
+		m_transfer_shiftpos[0] = 0;
+		m_transfer_pos[0]++;
+
+		if (m_transfer_pos[0] > m_transfer_numbytes[0])
+		{
+			logerror("end of transmission\n");
+			m_SIOCR1[0] &= ~0x80;
+			// set interrupt latch
+			m_IL |= 1 << (15-TLCS870_IRQ_INTSIO1);
+			finish = 1;
+		}
+	}
+
+	if (!finish)
+		m_serial_transmit_timer[0]->adjust(cycles_to_attotime(1000)); // TODO: use real speed
+}
+
 // Serial Port 2
 WRITE8_MEMBER(tlcs870_device::sio2cr1_w)
 {
@@ -478,7 +545,7 @@ WRITE8_MEMBER(tlcs870_device::sio2cr1_w)
 
 	logerror("%s m_SIOCR1[1] (Serial IO Port 2 Control Register 1) bits set to\n", machine().describe_context());
 	logerror("%d: SIOS2 (Start/Stop transfer)\n",       (m_SIOCR1[1] & 0x80) ? 1 : 0);
-	logerror("%d: SIOINH2 (Continue/Abort transfer)\n", (m_SIOCR1[1] & 0x40) ? 1 : 0);
+	logerror("%d: SIOINH2 (Abort/Continue transfer)\n", (m_SIOCR1[1] & 0x40) ? 1 : 0);
 	logerror("%d: SIOM2-2 (Serial Mode)\n",             (m_SIOCR1[1] & 0x20) ? 1 : 0);
 	logerror("%d: SIOM2-1 (Serial Mode)\n",             (m_SIOCR1[1] & 0x10) ? 1 : 0);
 	logerror("%d: SIOM2-0 (Serial Mode)\n",             (m_SIOCR1[1] & 0x08) ? 1 : 0); 
@@ -502,6 +569,9 @@ WRITE8_MEMBER(tlcs870_device::sio2cr2_w)
 	logerror("%d: BUF2-0 (Number of Transfer Bytes)\n",  (m_SIOCR2[1] & 0x01) ? 1 : 0);
 }
 
+TIMER_CALLBACK_MEMBER(tlcs870_device::sio1_transmit_cb)
+{
+}
 
 READ8_MEMBER(tlcs870_device::sio2sr_r)
 {
@@ -846,7 +916,7 @@ void tlcs870_device::take_interrupt(int priority)
 	m_sp.d -= 3;
 
 	m_pc.d = vector;
-	logerror("setting PC to %04x\n", m_addr);
+	logerror("setting PC to %04x\n", m_pc.d);
 
 }
 
@@ -915,6 +985,17 @@ void tlcs870_device::device_reset()
 	m_WDTCR1 = 0x09;
 
 	m_irqstate = 0;
+	m_transfer_numbytes[0] = 0;
+	m_transfer_numbytes[1] = 0;
+	m_transfer_mode[0] = 0;
+	m_transfer_mode[1] = 0;
+	m_transfer_pos[0] = 0;
+	m_transfer_pos[1] = 0;
+	m_transfer_shiftreg[0] = 0;
+	m_transfer_shiftreg[1] = 0;
+	m_transfer_shiftpos[0] = 0;
+	m_transfer_shiftpos[1] = 0;
+
 
 	m_port_out_latch[0] = 0x00;
 	m_port_out_latch[1] = 0x00;
@@ -1079,7 +1160,13 @@ void tlcs870_device::device_start()
 		cb.resolve_safe();
 	for (auto &cb : m_port_analog_in_cb)
 		cb.resolve_safe(0xff);
+	for (auto &cb : m_serial_out_cb)
+		cb.resolve_safe();
+
+	m_serial_transmit_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::sio0_transmit_cb), this));
+	m_serial_transmit_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::sio1_transmit_cb), this));
 }
+
 
 
 void tlcs870_device::state_string_export(const device_state_entry &entry, std::string &str) const

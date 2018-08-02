@@ -1130,13 +1130,13 @@ void tlcs870_device::do_JP_mn(const uint8_t opbyte0)
 void tlcs870_device::do_ff_opcode(const uint8_t opbyte0)
 {
 	/*
-	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
+		OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
 		SWI               1111 1111                                            -  -  -  -    9 (1 if already in NMI)
 	*/
 	m_cycles = 9; // TODO: 1 if in NMI this acts as a NOP
 
 	// set interrupt latch
-	m_IL |= 1<<TLCS870_IRQ_INTSW;
+	m_IL |= 1 << (15 - TLCS870_IRQ_INTSW);
 }
 
 /**********************************************************************************************************************/

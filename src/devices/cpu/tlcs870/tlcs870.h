@@ -36,6 +36,10 @@ public:
 	auto an6_in_cb() { return m_port_analog_in_cb[6].bind(); }
 	auto an7_in_cb() { return m_port_analog_in_cb[7].bind(); }
 
+	auto serial0_out_cb() { return m_serial_out_cb[0].bind(); }
+	auto serial1_out_cb() { return m_serial_out_cb[1].bind(); }
+
+
 protected:
 	// construction/destruction
 	tlcs870_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map);
@@ -152,6 +156,7 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 	required_shared_ptr<uint8_t> m_intram;
+	required_shared_ptr<uint8_t> m_dbr;
 
 	PAIR        m_prvpc, m_pc, m_sp;
 
@@ -162,6 +167,8 @@ private:
 	devcb_read8   m_port_in_cb[8];
 	devcb_write8  m_port_out_cb[8];
 	devcb_read8   m_port_analog_in_cb[8];
+	devcb_write_line m_serial_out_cb[2];
+
 
 	uint8_t m_port_out_latch[8];
 	int m_read_input_port;
@@ -282,6 +289,17 @@ private:
 	uint8_t m_WDTCR1;
 
 	uint16_t m_irqstate;
+
+	// serial stuff
+	TIMER_CALLBACK_MEMBER(sio0_transmit_cb);
+	TIMER_CALLBACK_MEMBER(sio1_transmit_cb);
+	uint8_t m_transfer_numbytes[2];
+	uint8_t m_transfer_pos[2];
+	uint8_t m_transfer_shiftreg[2];
+	uint8_t m_transfer_shiftpos[2];
+	uint8_t m_transfer_mode[2];
+
+	emu_timer *m_serial_transmit_timer[2];
 
 	void set_irq_line(int irqline, int state);
 	void check_interrupts();
