@@ -410,7 +410,7 @@ void tlcs870_device::do_DEC_rr(const uint8_t opbyte0)
 	}
 	else
 	{
-		set_ZF();
+		clear_ZF();
 	}
 }
 
@@ -619,7 +619,7 @@ void tlcs870_device::do_DEC_inx(const uint8_t opbyte0)
 	}
 	else
 	{
-		set_ZF();
+		clear_ZF();
 	}
 }
 
@@ -653,7 +653,7 @@ void tlcs870_device::do_DEC_inHL(const uint8_t opbyte0)
 	}
 	else
 	{
-		set_ZF();
+		clear_ZF();
 	}
 }
 
@@ -926,7 +926,7 @@ void tlcs870_device::do_DEC_r(const uint8_t opbyte0)
 	}
 	else
 	{
-		set_ZF();
+		clear_ZF();
 	}
 }
 
