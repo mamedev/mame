@@ -42,7 +42,7 @@
 
 #include "logmacro.h"
 
-// disable FCS insertion (on transmit) and checking (on receive) because pcap doesn't expose them
+// disable FCS insertion on transmit
 #define I82586_FCS 0
 
 ALLOW_SAVE_TYPE(i82586_base_device::cu_state);
@@ -205,6 +205,8 @@ void i82586_base_device::device_reset()
 
 	m_scp_address = SCP_ADDRESS;
 	m_lb_length = 0;
+
+	m_out_irq(CLEAR_LINE);
 }
 
 void i82586_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -237,7 +239,7 @@ device_memory_interface::space_config_vector i82586_base_device::memory_space_co
 
 WRITE_LINE_MEMBER(i82586_base_device::ca)
 {
-	LOG("channel attention %s (%s)\n", state ? "asserted" : "deasserted", machine().describe_context());
+	LOG("channel attention %s (%s)\n", state ? "asserted" : "cleared", machine().describe_context());
 
 	if (state)
 	{
@@ -282,12 +284,20 @@ void i82586_base_device::process_scb()
 	// fetch current command and status
 	m_scb_cs = m_space->read_dword(m_scb_address);
 
+	// handle reset
+	if (m_scb_cs & RESET)
+	{
+		LOG("process_scb reset\n");
+
+		device_reset();
+		return;
+	}
+
 	static const char *const CUC_NAME[] = { "NOP", "START", "RESUME", "SUSPEND", "ABORT", "THROTTLE_D", "THROTTLE_I", "reserved" };
 	static const char *const RUC_NAME[] = { "NOP", "START", "RESUME", "SUSPEND", "ABORT", "reserved", "reserved", "reserved" };
-	LOG("process_scb command/status 0x%08x (cuc %s, ruc %s%s)\n", m_scb_cs,
+	LOG("process_scb command/status 0x%08x (cuc %s, ruc %s)\n", m_scb_cs,
 		CUC_NAME[(m_scb_cs & CUC) >> 24],
-		RUC_NAME[(m_scb_cs & RUC) >> 20],
-		m_scb_cs & RESET ? ", reset" : "");
+		RUC_NAME[(m_scb_cs & RUC) >> 20]);
 
 	// clear interrupt flags when acknowledged
 	if (m_scb_cs & ACK_CX)
@@ -378,6 +388,8 @@ void i82586_base_device::update_scb()
 		(m_rnr ? RNR : 0) |
 		(m_cu_state << 8) |
 		(m_ru_state << 4));
+
+	LOG("update_scb%s%s%s%s\n", m_cx ? " CX" : "", m_fr ? " FR" : "", m_cna ? " CNA" : "", m_rnr ? " RNR" : "");
 
 	// update interrupt status
 	set_irq(m_cx || m_fr || m_cna || m_rnr);
@@ -531,6 +543,8 @@ bool i82586_base_device::address_filter(u8 *mac)
 // shared helpers
 void i82586_base_device::set_irq(bool irq)
 {
+	LOG("irq %s\n", irq ? "asserted" : "cleared");
+
 	if (m_irq_state != irq)
 	{
 		m_irq_state = irq;
@@ -987,7 +1001,7 @@ bool i82586_device::cu_transmit(u32 command)
 		LOG("cu_transmit sending frame length %d\n", length);
 		dump_bytes(buf, length);
 
-		return send(buf, length) == 0;
+		return send(buf, length) == length;
 	}
 }
 
@@ -1053,7 +1067,6 @@ void i82586_device::ru_execute(u8 *buf, int length)
 	if (length < cfg_min_frame_length())
 		rfd_cs |= RFD_S_SHORT;
 
-#if I82586_FCS
 	// set crc status
 	if (~compute_crc(buf, length, cfg_crc16()) != FCS_RESIDUE)
 	{
@@ -1065,7 +1078,6 @@ void i82586_device::ru_execute(u8 *buf, int length)
 
 		rfd_cs |= RFD_S_CRC;
 	}
-#endif
 
 	// TODO: alignment error (crc in misaligned frame), status bit 10
 	// TODO: increment alignment error counter
@@ -1652,7 +1664,7 @@ bool i82596_device::cu_transmit(u32 command)
 		LOG("cu_transmit sending frame length %d\n", length);
 		dump_bytes(buf, length);
 
-		return send(buf, length) == 0;
+		return send(buf, length) == length;
 	}
 }
 
@@ -1785,7 +1797,6 @@ void i82596_device::ru_execute(u8 *buf, int length)
 		rfd_cs |= RFD_S_SHORT;
 	}
 
-#if I82586_FCS
 	// set crc status
 	if (~compute_crc(buf, length, cfg_crc16()) != FCS_RESIDUE)
 	{
@@ -1800,7 +1811,6 @@ void i82596_device::ru_execute(u8 *buf, int length)
 
 		rfd_cs |= RFD_S_CRC;
 	}
-#endif
 
 	// TODO: alignment error (crc in misaligned frame), status bit 10
 	// TODO: increment alignment error counter

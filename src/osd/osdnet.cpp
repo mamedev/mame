@@ -55,7 +55,13 @@ void osd_netdev::stop()
 
 int osd_netdev::send(uint8_t *buf, int len)
 {
-	return 0;
+	/*
+	 * Prevent a time-travel issue by delaying the next receive by one packet,
+	 * giving enough time for the current transmit to complete.
+	 */
+	m_timer->reset(m_timer->elapsed() + m_timer->remaining());
+
+	return send_dev(buf, len);
 }
 
 void osd_netdev::recv(void *ptr, int param)
@@ -79,6 +85,11 @@ void osd_netdev::recv(void *ptr, int param)
 
 		m_dev->recv_cb(buf, len);
 	}
+}
+
+int osd_netdev::send_dev(uint8_t *buf, int len)
+{
+	return 0;
 }
 
 int osd_netdev::recv_dev(uint8_t **buf)
