@@ -301,6 +301,17 @@ private:
 
 	emu_timer *m_serial_transmit_timer[2];
 
+	TIMER_CALLBACK_MEMBER(tc1_cb);
+	TIMER_CALLBACK_MEMBER(tc2_cb);
+	TIMER_CALLBACK_MEMBER(tc3_cb);
+	TIMER_CALLBACK_MEMBER(tc4_cb);
+
+	void tc2_reload();
+	void tc2_cancel();
+
+	emu_timer *m_tcx_timer[4];
+
+
 	void set_irq_line(int irqline, int state);
 	void check_interrupts();
 	void take_interrupt(int priority);

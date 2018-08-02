@@ -280,6 +280,11 @@ WRITE8_MEMBER(tlcs870_device::p7cr_w)
 
 // 16-Bit Timer / Counter 2 (TC1)
 
+TIMER_CALLBACK_MEMBER(tlcs870_device::tc1_cb)
+{
+
+}
+
 WRITE8_MEMBER(tlcs870_device::tc1cr_w)
 {
 	m_TC1CR = data;
@@ -327,8 +332,36 @@ READ8_MEMBER(tlcs870_device::treg1b_h_r)
 
 // 16-Bit Timer / Counter 2 (TC2)
 
+TIMER_CALLBACK_MEMBER(tlcs870_device::tc2_cb)
+{
+	m_IL |= 1 << (15-TLCS870_IRQ_INTTC2);
+	tc2_reload();
+}
+
+void tlcs870_device::tc2_reload()
+{
+	m_tcx_timer[1]->adjust(cycles_to_attotime(5000)); // TODO: use real value
+}
+
+void tlcs870_device::tc2_cancel()
+{
+	m_tcx_timer[1]->adjust(attotime::never);
+}
+
 WRITE8_MEMBER(tlcs870_device::tc2cr_w)
 {
+	if (data & 0x20)
+	{
+		if (!(m_TC2CR & 0x20))
+		{
+			tc2_reload();
+		}
+	}
+	else
+	{
+		tc2_cancel();
+	}
+
 	m_TC2CR = data;
 
 	logerror("%s m_TC2CR (16-bit TC2 Timer Control Register) bits set to\n", machine().describe_context());
@@ -353,6 +386,11 @@ WRITE8_MEMBER(tlcs870_device::treg2_h_w)
 }
 
 // 8-Bit Timer / Counter 3 (TC3)
+
+TIMER_CALLBACK_MEMBER(tlcs870_device::tc3_cb)
+{
+
+}
 
 WRITE8_MEMBER(tlcs870_device::tc3cr_w)
 {
@@ -385,6 +423,11 @@ READ8_MEMBER(tlcs870_device::treg3b_r)
 }
 
 // 8-Bit Timer / Counter 3 (TC4)
+
+TIMER_CALLBACK_MEMBER(tlcs870_device::tc4_cb)
+{
+
+}
 
 WRITE8_MEMBER(tlcs870_device::tc4cr_w)
 {
@@ -470,6 +513,7 @@ WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
 		m_serial_transmit_timer[0]->adjust(attotime::zero);
 	}
 }
+
 
 WRITE8_MEMBER(tlcs870_device::sio1cr2_w)
 {
@@ -1165,6 +1209,11 @@ void tlcs870_device::device_start()
 
 	m_serial_transmit_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::sio0_transmit_cb), this));
 	m_serial_transmit_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::sio1_transmit_cb), this));
+
+	m_tcx_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::tc1_cb), this));
+	m_tcx_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::tc2_cb), this));
+	m_tcx_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::tc3_cb), this));
+	m_tcx_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::tc4_cb), this));
 }
 
 
