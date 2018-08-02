@@ -206,16 +206,16 @@ protected:
 
 	// Mapping method types to delegate types
 	template <typename T, typename Enable = void> struct delegate_type;
-	template <typename T> struct delegate_type<T, void_t<emu::detail::read8_device_class_t<std::remove_reference_t<T> > > > { using type = read8_delegate; using device_class = emu::detail::read8_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::read16_device_class_t<std::remove_reference_t<T> > > > { using type = read16_delegate; using device_class = emu::detail::read16_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::read32_device_class_t<std::remove_reference_t<T> > > > { using type = read32_delegate; using device_class = emu::detail::read32_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::read64_device_class_t<std::remove_reference_t<T> > > > { using type = read64_delegate; using device_class = emu::detail::read64_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::read_line_device_class_t<std::remove_reference_t<T> > > > { using type = read_line_delegate; using device_class = emu::detail::read_line_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::write8_device_class_t<std::remove_reference_t<T> > > > { using type = write8_delegate; using device_class = emu::detail::write8_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::write16_device_class_t<std::remove_reference_t<T> > > > { using type = write16_delegate; using device_class = emu::detail::write16_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::write32_device_class_t<std::remove_reference_t<T> > > > { using type = write32_delegate; using device_class = emu::detail::write32_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::write64_device_class_t<std::remove_reference_t<T> > > > { using type = write64_delegate; using device_class = emu::detail::write64_device_class_t<std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::write_line_device_class_t<std::remove_reference_t<T> > > > { using type = write_line_delegate; using device_class = emu::detail::write_line_device_class_t<std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read8_delegate, std::remove_reference_t<T> > > > { using type = read8_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read16_delegate, std::remove_reference_t<T> > > > { using type = read16_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read32_delegate, std::remove_reference_t<T> > > > { using type = read32_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read64_delegate, std::remove_reference_t<T> > > > { using type = read64_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > > > { using type = read_line_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write8_delegate, std::remove_reference_t<T> > > > { using type = write8_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write16_delegate, std::remove_reference_t<T> > > > { using type = write16_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write32_delegate, std::remove_reference_t<T> > > > { using type = write32_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write64_delegate, std::remove_reference_t<T> > > > { using type = write64_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
+	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > > > { using type = write_line_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
 	template <typename T> using delegate_type_t = typename delegate_type<T>::type;
 	template <typename T> using delegate_device_class_t = typename delegate_type<T>::device_class;
 
@@ -330,11 +330,11 @@ protected:
 
 	// Detecting candidates for read delegates
 	template <typename T, typename Enable = void> struct is_read_method { static constexpr bool value = false; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::read8_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::read16_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::read32_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::read64_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::read_line_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
 
 	// Invoking read callbacks
 	template <typename Result, typename T> static std::enable_if_t<is_read_form1<Result, T>::value, mask_t<read_result_t<Result, T>, Result> > invoke_read(T const &cb, address_space &space, offs_t offset, std::make_unsigned_t<Result> mem_mask) { return std::make_unsigned_t<read_result_t<Result, T> >(cb(space, offset, mem_mask)); }
@@ -380,11 +380,11 @@ protected:
 
 	// Detecting candidates for write delegates
 	template <typename T, typename Enable = void> struct is_write_method { static constexpr bool value = false; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::write8_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::write16_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::write32_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::write64_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::write_line_device_class_t<std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
+	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > > > { static constexpr bool value = true; };
 
 	// Invoking write callbacks
 	template <typename Input, typename T> static std::enable_if_t<is_write_form1<Input, T>::value> invoke_write(T const &cb, address_space &space, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) { return cb(space, offset, data, mem_mask); }
