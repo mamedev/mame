@@ -20,6 +20,7 @@
 
 #include <ctype.h>
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
@@ -990,12 +991,12 @@ layout_group::transform layout_group::make_transform(int orientation, render_bou
 	// apply to bounds and force into destination rectangle
 	render_bounds bounds(m_bounds);
 	render_bounds_transform(bounds, result);
-	result[0][0] *= (dest.x1 - dest.x0) / std::abs(bounds.x1 - bounds.x0);
-	result[0][1] *= (dest.x1 - dest.x0) / std::abs(bounds.x1 - bounds.x0);
-	result[0][2] = dest.x0 - ((std::min)(bounds.x0, bounds.x1) * (dest.x1 - dest.x0) / std::abs(bounds.x1 - bounds.x0));
-	result[1][0] *= (dest.y1 - dest.y0) / std::abs(bounds.y1 - bounds.y0);
-	result[1][1] *= (dest.y1 - dest.y0) / std::abs(bounds.y1 - bounds.y0);
-	result[1][2] = dest.y0 - ((std::min)(bounds.y0, bounds.y1) * (dest.y1 - dest.y0) / std::abs(bounds.y1 - bounds.y0));
+	result[0][0] *= (dest.x1 - dest.x0) / std::fabs(bounds.x1 - bounds.x0);
+	result[0][1] *= (dest.x1 - dest.x0) / std::fabs(bounds.x1 - bounds.x0);
+	result[0][2] = dest.x0 - ((std::min)(bounds.x0, bounds.x1) * (dest.x1 - dest.x0) / std::fabs(bounds.x1 - bounds.x0));
+	result[1][0] *= (dest.y1 - dest.y0) / std::fabs(bounds.y1 - bounds.y0);
+	result[1][1] *= (dest.y1 - dest.y0) / std::fabs(bounds.y1 - bounds.y0);
+	result[1][2] = dest.y0 - ((std::min)(bounds.y0, bounds.y1) * (dest.y1 - dest.y0) / std::fabs(bounds.y1 - bounds.y0));
 	return result;
 }
 
