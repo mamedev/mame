@@ -1582,7 +1582,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 	tc0040ioc.write_4_callback().set(FUNC(taitol_state::coin_control_w));
 	tc0040ioc.read_7_callback().set_ioport("IN2");
 
-	MB8421(config, "dpram", 0);
+	MB8421(config, "dpram");
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -1626,7 +1626,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::kurikint)
 	tc0040ioc.write_4_callback().set(FUNC(taitol_state::coin_control_w));
 	tc0040ioc.read_7_callback().set_ioport("IN2");
 
-	MB8421(config, "dpram", 0);
+	MB8421(config, "dpram");
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -1773,8 +1773,8 @@ MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
 	tc0510nio.write_4_callback().set(FUNC(taitol_state::coin_control_w));
 	tc0510nio.read_7_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	mb8421_device &dpram(MB8421(config, "dpram"));
+	dpram.intl_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)

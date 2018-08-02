@@ -23,9 +23,9 @@ DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_
 //-------------------------------------------------
 
 mb8421_master_device::mb8421_master_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		m_intl_handler(*this),
-		m_intr_handler(*this)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_intl_callback(*this)
+	, m_intr_callback(*this)
 {
 }
 
@@ -48,20 +48,24 @@ mb8421_mb8431_16_device::mb8421_mb8431_16_device(const machine_config &mconfig, 
 }
 
 //-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void mb8421_master_device::device_resolve_objects()
+{
+	// resolve callbacks
+	m_intl_callback.resolve_safe();
+	m_intr_callback.resolve_safe();
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void mb8421_master_device::device_start()
-{
-	// resolve callbacks
-	m_intl_handler.resolve_safe();
-	m_intr_handler.resolve_safe();
-}
-
 void mb8421_device::device_start()
 {
-	mb8421_master_device::device_start();
-
 	m_ram = make_unique_clear<u8[]>(0x800);
 
 	// state save
@@ -70,8 +74,6 @@ void mb8421_device::device_start()
 
 void mb8421_mb8431_16_device::device_start()
 {
-	mb8421_master_device::device_start();
-
 	m_ram = make_unique_clear<u16[]>(0x800);
 
 	// state save
@@ -84,8 +86,8 @@ void mb8421_mb8431_16_device::device_start()
 
 void mb8421_master_device::device_reset()
 {
-	m_intl_handler(0);
-	m_intr_handler(0);
+	m_intl_callback(CLEAR_LINE);
+	m_intr_callback(CLEAR_LINE);
 }
 
 //-------------------------------------------------
@@ -100,9 +102,9 @@ void mb8421_master_device::update_intr(offs_t offset)
 		return;
 
 	if (row == read_or_write::WRITE && offset == (is_right ? 0x7fe : 0x7ff))
-		(is_right ? m_intl_handler : m_intr_handler)(1);
+		(is_right ? m_intl_callback : m_intr_callback)(ASSERT_LINE);
 	else if (row == read_or_write::READ && offset == (is_right ? 0x7ff : 0x7fe))
-		(is_right ? m_intr_handler : m_intl_handler)(0);
+		(is_right ? m_intr_callback : m_intl_callback)(CLEAR_LINE);
 }
 
 //-------------------------------------------------
@@ -120,7 +122,7 @@ WRITE8_MEMBER(mb8421_device::left_w)
 WRITE16_MEMBER(mb8421_mb8431_16_device::left_w)
 {
 	offset &= 0x7ff;
-	m_ram[offset] = data;
+	COMBINE_DATA(&m_ram[offset]);
 	update_intr<read_or_write::WRITE, false>(offset);
 }
 
@@ -158,7 +160,7 @@ WRITE8_MEMBER(mb8421_device::right_w)
 WRITE16_MEMBER(mb8421_mb8431_16_device::right_w)
 {
 	offset &= 0x7ff;
-	m_ram[offset] = data;
+	COMBINE_DATA(&m_ram[offset]);
 	update_intr<read_or_write::WRITE, true>(offset);
 }
 
