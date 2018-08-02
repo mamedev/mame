@@ -9836,12 +9836,12 @@ ROM_START( clubkcyc )
 
 /*
 	Cycraft Motion PC:
-	Mainboard Avantech PCM-5820
+	Mainboard Advantech PCM-5820
 	CAN Module PCM-3680
 	IO Module PCM-3724
 	128mb PC133 Ram
 
-	Sansik CF With Linux:
+	SanDisk CF With Linux:
 	  Simuline CYCRAFT
 	  SMCP: V1.65
 	  GAME: Club-Kart
