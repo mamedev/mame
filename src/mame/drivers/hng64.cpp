@@ -1534,7 +1534,7 @@ void hng64_state::machine_reset()
 	reset_sound();
 }
 
-// used (shard ram access at least)
+// used (shared ram access at least)
 READ8_MEMBER(hng64_state::ioport0_r)
 {
 	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
@@ -1551,7 +1551,7 @@ READ8_MEMBER(hng64_state::ioport1_r)
 	return 0xff;
 }
 
-// used (shard ram access at least)
+// used (shared ram access at least)
 WRITE8_MEMBER(hng64_state::ioport0_w)
 {
 	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
