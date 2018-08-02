@@ -39,7 +39,6 @@ void tlcs870_device::tmp87ph40an_mem(address_map &map)
 
 	map(0x000e, 0x000e).rw(FUNC(tlcs870_device::adccr_r), FUNC(tlcs870_device::adccr_w)); // A/D converter control
 	map(0x000f, 0x000f).r(FUNC(tlcs870_device::adcdr_r)); // A/D converter result
-#if 0
 
 	map(0x0010, 0x0010).w(FUNC(tlcs870_device::treg1a_l_w)); // Timer register 1A
 	map(0x0011, 0x0011).w(FUNC(tlcs870_device::treg1a_h_w)); //
@@ -57,7 +56,6 @@ void tlcs870_device::tmp87ph40an_mem(address_map &map)
 	// 0x1d reserved
 	// 0x1e reserved
 	// 0x1f reserved
-
 	map(0x0020, 0x0020).rw(FUNC(tlcs870_device::sio1sr_r), FUNC(tlcs870_device::sio1cr1_w)); // SIO1 status / SIO1 control
 	map(0x0021, 0x0021).w(FUNC(tlcs870_device::sio1cr2_w)); // SIO1 control
 	map(0x0022, 0x0022).rw(FUNC(tlcs870_device::sio2sr_r), FUNC(tlcs870_device::sio2cr1_w)); // SIO2 status / SIO2 control
@@ -83,24 +81,23 @@ void tlcs870_device::tmp87ph40an_mem(address_map &map)
 	map(0x0035, 0x0035).w(FUNC(tlcs870_device::wdtcr2_w)); //
 
 	map(0x0036, 0x0036).rw(FUNC(tlcs870_device::tbtcr_r), FUNC(tlcs870_device::tbtcr_w)); // TBT / TG / DVO control
-#endif
+
 	map(0x0037, 0x0037).rw(FUNC(tlcs870_device::eintcr_r), FUNC(tlcs870_device::eintcr_w)); // External interrupt control
-#if 0
+
 	map(0x0038, 0x0038).rw(FUNC(tlcs870_device::syscr1_r), FUNC(tlcs870_device::syscr1_w)); // System Control
 	map(0x0039, 0x0039).rw(FUNC(tlcs870_device::syscr2_r), FUNC(tlcs870_device::syscr2_w)); //
-#endif
+
 	map(0x003a, 0x003a).rw(FUNC(tlcs870_device::eir_l_r), FUNC(tlcs870_device::eir_l_w)); // Interrupt enable register
 	map(0x003b, 0x003b).rw(FUNC(tlcs870_device::eir_h_r), FUNC(tlcs870_device::eir_h_w)); //
 
 	map(0x003c, 0x003c).rw(FUNC(tlcs870_device::il_l_r), FUNC(tlcs870_device::il_l_w)); // Interrupt latch
 	map(0x003d, 0x003d).rw(FUNC(tlcs870_device::il_h_r), FUNC(tlcs870_device::il_h_w)); //
-#if 0																					
+	
 	// 0x3e reserved
 	map(0x003f, 0x003f).rw(FUNC(tlcs870_device::psw_r), FUNC(tlcs870_device::rbs_w)); // Program status word / Register bank selector
-#endif
 
-	map(0x0040, 0x023f).ram().share("intram"); // register banks + internal RAM, not, code execution NOT allowed here
-	map(0x0f80, 0x0fff).ram(); // DBR
+	map(0x0040, 0x023f).ram().share("intram"); // register banks + internal RAM, not, code execution NOT allowed here (fetches FF and causes SWI)
+	map(0x0f80, 0x0fff).ram(); // DBR (0f80 - 0f7f = reserved, 0ff0-0ff7 = SIO1 buffer, 0ff8 - 0fff = SIO2 buffer)
 	map(0xc000, 0xffff).rom();
 }
 
@@ -276,12 +273,198 @@ WRITE8_MEMBER(tlcs870_device::p7cr_w)
 	m_port7_cr = data;
 }
 
+// Timer emulation
 
+WRITE8_MEMBER(tlcs870_device::treg1a_l_w)
+{
+}
 
+WRITE8_MEMBER(tlcs870_device::treg1a_h_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::treg1b_l_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::treg1b_h_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::tc1cr_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::tc2cr_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::treg2_l_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::treg2_h_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::treg3a_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::tc3cr_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::tc4cr_w)
+{
+}
+
+READ8_MEMBER(tlcs870_device::treg1b_l_r)
+{
+	return 0x00;
+}
+
+READ8_MEMBER(tlcs870_device::treg1b_h_r)
+{
+	return 0x00;
+}
+
+READ8_MEMBER(tlcs870_device::treg3a_r)
+{
+	return 0x00;
+}
+
+READ8_MEMBER(tlcs870_device::treg3b_r)
+{
+	return 0x00;
+}
+
+READ8_MEMBER(tlcs870_device::treg4_r)
+{
+	return 0x00;
+}
+
+/* SIO emulation */
+
+WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::sio1cr2_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::sio2cr1_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::sio2cr2_w)
+{
+}
+
+READ8_MEMBER(tlcs870_device::sio2sr_r)
+{
+	return 0x00;
+}
+
+READ8_MEMBER(tlcs870_device::sio1sr_r)
+{
+	return 0x00;
+}
+
+// WDT emulation
+
+WRITE8_MEMBER(tlcs870_device::wdtcr1_w)
+{
+}
+
+WRITE8_MEMBER(tlcs870_device::wdtcr2_w)
+{
+}
+
+// Misc
+
+// this stuff is used with TLCS870_IRQ_INTTBT (FFF2 INTTBT) not used by hng64 
+// the divider output makes use of PORT1 bit 3, which must be properly configured
+WRITE8_MEMBER(tlcs870_device::tbtcr_w)
+{
+	m_TBTCR = data;
+
+	logerror("m_TBTCR (Time Base Timer) bits set to\n");
+	logerror("%d: DV0EN (Divider Output Enable)\n",                  (m_TBTCR & 0x80) ? 1 : 0);
+	logerror("%d: DVOCK1 (Divide Output Frequency Selection)n",      (m_TBTCR & 0x40) ? 1 : 0);
+	logerror("%d: DVOCK0 (Divide Output Frequency Selection)\n",     (m_TBTCR & 0x20) ? 1 : 0);
+	logerror("%d: DV7CK (?)\n",                                      (m_TBTCR & 0x10) ? 1 : 0);
+	logerror("%d: TBTEN (Time Base Timer Enable)\n",                 (m_TBTCR & 0x08) ? 1 : 0); 
+	logerror("%d: TBTCK2 (Time Base Timer Interrupt Frequency)\n",   (m_TBTCR & 0x04) ? 1 : 0); 
+	logerror("%d: TBTCK1 (Time Base Timer Interrupt Frequency)\n",   (m_TBTCR & 0x02) ? 1 : 0); 
+	logerror("%d: TBTCK0 (Time Base Timer Interrupt Frequency)\n",   (m_TBTCR & 0x01) ? 1 : 0);
+}
+
+READ8_MEMBER(tlcs870_device::tbtcr_r)
+{
+	return m_TBTCR;
+}
+
+// not used by hng64
+WRITE8_MEMBER(tlcs870_device::syscr1_w)
+{
+	m_SYSCR1 = data;
+
+	logerror("m_SYSCR1 (System Control Register 1) bits set to\n");
+	logerror("%d: STOP (STOP mode start)\n",                          (m_SYSCR1 & 0x80) ? 1 : 0);
+	logerror("%d: RELM (release method for STOP, 0 edge, 1 level)\n", (m_SYSCR1 & 0x40) ? 1 : 0);
+	logerror("%d: RETM (return mode after STOP, 0 normal, 1 slow)\n", (m_SYSCR1 & 0x20) ? 1 : 0);
+	logerror("%d: OUTEN (port output control during STOP)\n",         (m_SYSCR1 & 0x10) ? 1 : 0);
+	logerror("%d: WUT1 (warm up time at STOP release)\n",             (m_SYSCR1 & 0x08) ? 1 : 0); 
+	logerror("%d: WUT0 (warm up time at STOP release)\n",             (m_SYSCR1 & 0x04) ? 1 : 0); 
+	logerror("%d: (invalid)\n",                                       (m_SYSCR1 & 0x02) ? 1 : 0); 
+	logerror("%d: (invalid)\n",                                       (m_SYSCR1 & 0x01) ? 1 : 0);
+}
+
+WRITE8_MEMBER(tlcs870_device::syscr2_w)
+{
+	m_SYSCR2 = data;
+
+	logerror("m_SYSCR2 (System Control Register 2) bits set to\n");
+	logerror("%d: XEN (High Frequency Oscillator control)\n",         (m_SYSCR2 & 0x80) ? 1 : 0);
+	logerror("%d: XTEN (Low Frequency Oscillator control)\n",         (m_SYSCR2 & 0x40) ? 1 : 0);
+	logerror("%d: SYSCK (system clock select 0 high, 1 low)\n",       (m_SYSCR2 & 0x20) ? 1 : 0);
+	logerror("%d: IDLE (IDLE mode start)\n",                          (m_SYSCR2 & 0x10) ? 1 : 0); // hng64 sets this in case of ram test failures
+	logerror("%d: (invalid)\n",                                       (m_SYSCR2 & 0x08) ? 1 : 0); 
+	logerror("%d: (invalid)\n",                                       (m_SYSCR2 & 0x04) ? 1 : 0); 
+	logerror("%d: (invalid)\n",                                       (m_SYSCR2 & 0x02) ? 1 : 0); 
+	logerror("%d: (invalid)\n",                                       (m_SYSCR2 & 0x01) ? 1 : 0);
+}
+
+READ8_MEMBER(tlcs870_device::syscr1_r)
+{
+	return m_SYSCR1; // low 2 bits are 'undefined'
+}
+
+READ8_MEMBER(tlcs870_device::syscr2_r)
+{
+	return m_SYSCR2 | 0x0f; // low bits always read as 1
+}
+
+// RBS / PSW direct access
+
+WRITE8_MEMBER(tlcs870_device::rbs_w)
+{
+	// upper bits of PSW (status flags) cannot be written, only the register bank
+	m_RBS = data & 0x04;
+}
+
+READ8_MEMBER(tlcs870_device::psw_r)
+{
+	// outside of checking the results of opcodes that  use it directly (DAA / DAS) this is the only way to read / check the 'half' flag
+	return get_PSW();
+}
+
+// ADC emulation
 
 READ8_MEMBER(tlcs870_device::adcdr_r)
 {
-	logerror("adcdr_r\n");
 	return m_ADCDR;
 }
 
@@ -553,12 +736,17 @@ void tlcs870_device::execute_run()
 void tlcs870_device::device_reset()
 {
 	m_pc.d = RM16(0xfffe);
-	m_RBS = 0;
-	m_EIR = 0;
-	m_IL = 0;
-	m_EINTCR = 0;
-	m_ADCCR = 0;
-	m_ADCDR = 0;
+	
+	m_RBS = 0x00;
+	m_EIR = 0x0000;
+	m_IL = 0x0000;
+	m_EINTCR = 0x00;
+	m_ADCCR = 0x00;
+	m_ADCDR = 0x00;
+	m_SYSCR1 = 0x00;
+	m_SYSCR2 = 0x80; // | 0x40, can order parts with low frequency oscillator enabled by default too (although default state is always to use high one?)
+	m_TBTCR = 0x00;
+
 	m_irqstate = 0;
 
 	m_port_out_latch[0] = 0x00;
