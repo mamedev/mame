@@ -955,7 +955,7 @@ void tlcs870_device::take_interrupt(int priority)
 
 	uint16_t vector = RM16(0xffe0 + ((15-priority)*2));
 
-	WM16(m_sp.d - 1, get_PSW());
+	WM8(m_sp.d, get_PSW());
 	WM16(m_sp.d - 2, m_addr);
 	m_sp.d -= 3;
 
@@ -1107,6 +1107,10 @@ void tlcs870_device::state_import(const device_state_entry &entry)
 	case DEBUGGER_REG_HL:
 		set_reg16(REG_HL, m_debugger_temp);
 		break;
+
+	case DEBUGGER_REG_RB:
+		m_RBS = m_debugger_temp;
+		break;
 	}
 }
 
@@ -1163,6 +1167,10 @@ void tlcs870_device::state_export(const device_state_entry &entry)
 		m_debugger_temp = get_reg16(REG_HL);
 		break;
 
+	case DEBUGGER_REG_RB:
+		m_debugger_temp = m_RBS;
+		break;
+
 	}
 }
 
@@ -1190,6 +1198,7 @@ void tlcs870_device::device_start()
 	state_add(DEBUGGER_REG_DE, "DE", m_debugger_temp).callimport().callexport().formatstr("%04X");
 	state_add(DEBUGGER_REG_HL, "HL", m_debugger_temp).callimport().callexport().formatstr("%04X");
 
+	state_add(DEBUGGER_REG_RB, "RB", m_debugger_temp).callimport().callexport().formatstr("%01X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc.w.l).formatstr("%04X");
 	state_add(STATE_GENPCBASE, "CURPC", m_prvpc.w.l).formatstr("%04X").noshow();
