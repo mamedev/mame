@@ -208,7 +208,7 @@ void tlcs870_device::do_RETI(const uint8_t opbyte0)
 
 	m_sp.d += 3;
 	m_addr = RM16(m_sp.d - 2);
-	set_PSW(RM8(m_sp.d - 1));
+	set_PSW(RM8(m_sp.d));
 
 	// Interrupts always get reenabled after a RETI.  The RETN behavior is different
 	m_EIR |= 1;
