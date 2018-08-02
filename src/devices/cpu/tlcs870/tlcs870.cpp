@@ -711,7 +711,7 @@ READ8_MEMBER(tlcs870_device::syscr2_r)
 WRITE8_MEMBER(tlcs870_device::rbs_w)
 {
 	// upper bits of PSW (status flags) cannot be written, only the register bank
-	m_RBS = data & 0x04;
+	m_RBS = data & 0x0f;
 }
 
 READ8_MEMBER(tlcs870_device::psw_r)

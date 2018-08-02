@@ -234,8 +234,8 @@ void tlcs870_device::do_POP_PSW(const uint8_t opbyte0)
 	*/
 	m_cycles = 3;
 
-	m_sp.d += 2;
-	const uint16_t val = RM16(m_sp.d - 1);
+	m_sp.d += 1;
+	const uint8_t val = RM8(m_sp.d);
 	set_PSW(val);
 }
 
@@ -247,9 +247,9 @@ void tlcs870_device::do_PUSH_PSW(const uint8_t opbyte0)
 	*/
 	m_cycles = 2;
 
-	const uint16_t val = get_PSW();
-	WM16(m_sp.d - 1, val);
-	m_sp.d -= 2;
+	const uint8_t val = get_PSW();
+	WM8(m_sp.d, val);
+	m_sp.d -= 1;
 }
 
 void tlcs870_device::do_DAA_A(const uint8_t opbyte0)
