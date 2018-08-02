@@ -602,7 +602,7 @@ READ8_MEMBER( pet_state::read )
 			}
 			if (BIT(offset, 6))
 			{
-				data &= m_via->read(space, offset & 0x0f);
+				data &= m_via->read(offset & 0x0f);
 			}
 			if (m_crtc && BIT(offset, 7) && BIT(offset, 0))
 			{
@@ -659,7 +659,7 @@ WRITE8_MEMBER( pet_state::write )
 			}
 			if (BIT(offset, 6))
 			{
-				m_via->write(space, offset & 0x0f, data);
+				m_via->write(offset & 0x0f, data);
 			}
 			if (m_crtc && BIT(offset, 7))
 			{
@@ -820,7 +820,7 @@ READ8_MEMBER( cbm8296_state::read )
 		}
 		if (BIT(offset, 6))
 		{
-			data &= m_via->read(space, offset & 0x0f);
+			data &= m_via->read(offset & 0x0f);
 		}
 		if (BIT(offset, 7) && BIT(offset, 0))
 		{
@@ -875,7 +875,7 @@ WRITE8_MEMBER( cbm8296_state::write )
 		}
 		if (BIT(offset, 6))
 		{
-			m_via->write(space, offset & 0x0f, data);
+			m_via->write(offset & 0x0f, data);
 		}
 		if (BIT(offset, 7))
 		{

@@ -681,7 +681,7 @@ READ16_MEMBER ( mac128_state::mac_via_r )
 
 	if (LOG_VIA)
 		logerror("mac_via_r: offset=0x%02x\n", offset);
-	data = m_via->read(space, offset);
+	data = m_via->read(offset);
 
 	m_maincpu->adjust_icount(m_via_cycles);
 
@@ -697,9 +697,9 @@ WRITE16_MEMBER ( mac128_state::mac_via_w )
 		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
 
 	if (ACCESSING_BITS_0_7)
-		m_via->write(space, offset, data & 0xff);
+		m_via->write(offset, data & 0xff);
 	if (ACCESSING_BITS_8_15)
-		m_via->write(space, offset, (data >> 8) & 0xff);
+		m_via->write(offset, (data >> 8) & 0xff);
 
 	m_maincpu->adjust_icount(m_via_cycles);
 }

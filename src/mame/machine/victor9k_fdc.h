@@ -35,10 +35,10 @@ public:
 	auto syn_wr_callback() { return m_syn_cb.bind(); }
 	auto lbrdy_wr_callback() { return m_lbrdy_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( cs5_r ) { return m_via4->read(space, offset); }
-	DECLARE_WRITE8_MEMBER( cs5_w ) { m_via4->write(space, offset, data); }
-	DECLARE_READ8_MEMBER( cs6_r ) { return m_via6->read(space, offset); }
-	DECLARE_WRITE8_MEMBER( cs6_w ) { m_via6->write(space, offset, data); }
+	DECLARE_READ8_MEMBER( cs5_r ) { return m_via4->read(offset); }
+	DECLARE_WRITE8_MEMBER( cs5_w ) { m_via4->write(offset, data); }
+	DECLARE_READ8_MEMBER( cs6_r ) { return m_via6->read(offset); }
+	DECLARE_WRITE8_MEMBER( cs6_w ) { m_via6->write(offset, data); }
 	DECLARE_READ8_MEMBER( cs7_r );
 	DECLARE_WRITE8_MEMBER( cs7_w );
 

@@ -168,7 +168,7 @@ uint8_t electron_m2105_device::expbus_r(address_space &space, offs_t offset, uin
 	}
 	else if (offset >= 0xfc40 && offset < 0xfc60)
 	{
-		data = m_via6522_1->read(space, offset);
+		data = m_via6522_1->read(offset);
 	}
 	else if (offset >= 0xfc60 && offset < 0xfc70)
 	{
@@ -176,7 +176,7 @@ uint8_t electron_m2105_device::expbus_r(address_space &space, offs_t offset, uin
 	}
 	else if (offset >= 0xfc70 && offset < 0xfc90)
 	{
-		data = m_via6522_0->read(space, offset);
+		data = m_via6522_0->read(offset);
 	}
 
 	return data;
@@ -194,7 +194,7 @@ void electron_m2105_device::expbus_w(address_space &space, offs_t offset, uint8_
 	}
 	else if (offset >= 0xfc40 && offset < 0xfc60)
 	{
-		m_via6522_1->write(space, offset, data);
+		m_via6522_1->write(offset, data);
 	}
 	else if (offset >= 0xfc60 && offset < 0xfc70)
 	{
@@ -202,7 +202,7 @@ void electron_m2105_device::expbus_w(address_space &space, offs_t offset, uint8_
 	}
 	else if (offset >= 0xfc70 && offset < 0xfc90)
 	{
-		m_via6522_0->write(space, offset, data);
+		m_via6522_0->write(offset, data);
 	}
 	else if (offset == 0xfe05)
 	{

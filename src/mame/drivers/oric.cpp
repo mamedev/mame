@@ -147,9 +147,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via2_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
-	DECLARE_WRITE8_MEMBER(port_314_w);
-	DECLARE_READ8_MEMBER(port_314_r);
-	DECLARE_READ8_MEMBER(port_318_r);
 
 	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
 
@@ -193,6 +190,9 @@ protected:
 
 	virtual void update_irq() override;
 	void remap();
+	void port_314_w(u8 data);
+	u8 port_314_r();
+	u8 port_318_r();
 };
 
 /* Ram is 64K, with 16K hidden by the rom.  The 300-3ff is also hidden by the i/o */
@@ -477,7 +477,7 @@ WRITE_LINE_MEMBER(telestrat_state::via2_irq_w)
 	update_irq();
 }
 
-WRITE8_MEMBER(telestrat_state::port_314_w)
+void telestrat_state::port_314_w(u8 data)
 {
 	m_port_314 = data;
 	floppy_image_device *floppy = m_floppies[(m_port_314 >> 5) & 3];
@@ -490,12 +490,12 @@ WRITE8_MEMBER(telestrat_state::port_314_w)
 	update_irq();
 }
 
-READ8_MEMBER(telestrat_state::port_314_r)
+u8 telestrat_state::port_314_r()
 {
 	return (m_fdc_irq && (m_port_314 & P_IRQEN)) ? 0x7f : 0xff;
 }
 
-READ8_MEMBER(telestrat_state::port_318_r)
+u8 telestrat_state::port_318_r()
 {
 	return m_fdc_drq ? 0x7f : 0xff;
 }

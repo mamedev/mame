@@ -384,7 +384,7 @@ WRITE8_MEMBER( c1571cr_device::via0_pb_w )
 
 READ8_MEMBER( c1571_device::via1_r )
 {
-	uint8_t data = m_via1->read(space, offset);
+	uint8_t data = m_via1->read(offset);
 
 	m_ga->ted_w(!m_1_2mhz);
 	m_ga->ted_w(1);
@@ -394,7 +394,7 @@ READ8_MEMBER( c1571_device::via1_r )
 
 WRITE8_MEMBER( c1571_device::via1_w )
 {
-	m_via1->write(space, offset, data);
+	m_via1->write(offset, data);
 
 	m_ga->ted_w(!m_1_2mhz);
 	m_ga->ted_w(1);

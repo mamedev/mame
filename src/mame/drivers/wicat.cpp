@@ -533,16 +533,16 @@ WRITE8_MEMBER(wicat_state::fdc_w)
 READ16_MEMBER(wicat_state::via_r)
 {
 	if(ACCESSING_BITS_0_7)
-		return m_via->read(space,offset);
+		return m_via->read(offset);
 	return 0x00;
 }
 
 WRITE16_MEMBER(wicat_state::via_w)
 {
 	if(ACCESSING_BITS_0_7)
-		m_via->write(space,offset,data);
+		m_via->write(offset,data);
 	else if(ACCESSING_BITS_8_15)
-		m_via->write(space,offset,data>>8);
+		m_via->write(offset,data>>8);
 }
 
 READ8_MEMBER(wicat_state::video_r)

@@ -139,7 +139,7 @@ void bbc_tube_zep100_device::device_reset()
 
 READ8_MEMBER(bbc_tube_zep100_device::host_r)
 {
-	return m_via->read(space, offset & 0x0f);
+	return m_via->read(offset & 0x0f);
 }
 
 WRITE8_MEMBER(bbc_tube_zep100_device::host_w)
@@ -147,7 +147,7 @@ WRITE8_MEMBER(bbc_tube_zep100_device::host_w)
 	if (offset & 0x10)
 		m_z80->reset();
 
-	m_via->write(space, offset & 0x0f, data);
+	m_via->write(offset & 0x0f, data);
 }
 
 

@@ -1059,9 +1059,9 @@ READ8_MEMBER( victor_9000_fdc_device::cs7_r )
 {
 	m_lbrdy_cb(1);
 
-	if (LOG_VIA) logerror("%s %s LBRDY 1 : %02x\n", machine().time().as_string(), machine().describe_context(), m_via5->read(space, offset));
+	if (LOG_VIA) logerror("%s %s LBRDY 1 : %02x\n", machine().time().as_string(), machine().describe_context(), m_via5->read(offset));
 
-	return m_via5->read(space, offset);
+	return m_via5->read(offset);
 }
 
 WRITE8_MEMBER( victor_9000_fdc_device::cs7_w )
@@ -1070,7 +1070,7 @@ WRITE8_MEMBER( victor_9000_fdc_device::cs7_w )
 
 	if (LOG_VIA) logerror("%s %s LBRDY 1\n", machine().time().as_string(), machine().describe_context());
 
-	m_via5->write(space, offset, data);
+	m_via5->write(offset, data);
 }
 
 floppy_image_device* victor_9000_fdc_device::get_floppy()

@@ -166,7 +166,7 @@ uint8_t vic1112_device::vic20_cd_r(address_space &space, offs_t offset, uint8_t 
 {
 	if (!io2)
 	{
-		data = (BIT(offset, 4) ? m_via1 : m_via0)->read(space, offset & 0x0f);
+		data = (BIT(offset, 4) ? m_via1 : m_via0)->read(offset & 0x0f);
 	}
 	else if (!blk5)
 	{
@@ -186,6 +186,6 @@ void vic1112_device::vic20_cd_w(address_space &space, offs_t offset, uint8_t dat
 {
 	if (!io2)
 	{
-		(BIT(offset, 4) ? m_via1 : m_via0)->write(space, offset & 0x0f, data);
+		(BIT(offset, 4) ? m_via1 : m_via0)->write(offset & 0x0f, data);
 	}
 }
