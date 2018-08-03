@@ -1290,7 +1290,7 @@ void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 	uint64_t file_size = io_generic_size(io);
 	heads = 2;  // TDF only supports two-sided recordings
 	tracks = 40;
-	LOGMASKED(LOG_INFO, "[ti99_dsk] Image size = %ld\n", file_size);
+	// LOGMASKED(LOG_INFO, "[ti99_dsk] Image size = %ld\n", file_size);   // doesn't compile
 	switch (file_size)
 	{
 	case 260240:   // used in PC99
