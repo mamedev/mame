@@ -280,11 +280,11 @@ void qsound_device::dsp_io_map(address_map &map)
 
 READ16_MEMBER(qsound_device::dsp_sample_r)
 {
-	// FIXME: DSP16 doesn't like bytes, only signed words - should this zero-pad or byte-smear?
+	// on CPS2, bit 0-7 of external ROM data is tied to ground
 	u8 const byte(read_byte((u32(m_rom_bank) << 16) | m_rom_offset));
 	if (!machine().side_effects_disabled())
 		m_rom_bank = (m_rom_bank & 0x8000U) | offset;
-	return (u16(byte) << 8) | u16(byte);
+	return u16(byte) << 8;
 }
 
 WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
