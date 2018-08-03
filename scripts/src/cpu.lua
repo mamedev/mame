@@ -599,6 +599,8 @@ if (CPUS["H8"]~=null) then
 		MAME_DIR .. "src/devices/cpu/h8/h83337.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83002.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h83002.h",
+		MAME_DIR .. "src/devices/cpu/h8/h83003.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/h83003.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83006.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h83006.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83008.cpp",
