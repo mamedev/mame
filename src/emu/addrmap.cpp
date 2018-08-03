@@ -222,7 +222,7 @@ address_map_entry &address_map_entry::w(write8sm_delegate func)
 address_map_entry &address_map_entry::r(read8smo_delegate func)
 {
 	assert(!func.isnull());
-	m_read.m_type = AMH_DEVICE_DELEGATE_F;
+	m_read.m_type = AMH_DEVICE_DELEGATE_SMO;
 	m_read.m_bits = 8;
 	m_read.m_name = func.name();
 	m_rproto8smo = func;
@@ -308,7 +308,7 @@ address_map_entry &address_map_entry::w(write16sm_delegate func)
 address_map_entry &address_map_entry::r(read16smo_delegate func)
 {
 	assert(!func.isnull());
-	m_read.m_type = AMH_DEVICE_DELEGATE_SM;
+	m_read.m_type = AMH_DEVICE_DELEGATE_SMO;
 	m_read.m_bits = 16;
 	m_read.m_name = func.name();
 	m_rproto16smo = func;
@@ -318,7 +318,7 @@ address_map_entry &address_map_entry::r(read16smo_delegate func)
 address_map_entry &address_map_entry::w(write16smo_delegate func)
 {
 	assert(!func.isnull());
-	m_write.m_type = AMH_DEVICE_DELEGATE_SM;
+	m_write.m_type = AMH_DEVICE_DELEGATE_SMO;
 	m_write.m_bits = 16;
 	m_write.m_name = func.name();
 	m_wproto16smo = func;
@@ -963,7 +963,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 						devtag = entry.m_rproto8.device_name();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
 						devtag = entry.m_rproto8s.device_name();
-					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM)
 						devtag = entry.m_rproto8sm.device_name();
 					else
 						devtag = entry.m_rproto8smo.device_name();
@@ -974,7 +974,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 						devtag = entry.m_rproto16.device_name();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
 						devtag = entry.m_rproto16s.device_name();
-					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM)
 						devtag = entry.m_rproto16sm.device_name();
 					else
 						devtag = entry.m_rproto16smo.device_name();
@@ -985,7 +985,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 						devtag = entry.m_rproto32.device_name();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
 						devtag = entry.m_rproto32s.device_name();
-					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM)
 						devtag = entry.m_rproto32sm.device_name();
 					else
 						devtag = entry.m_rproto32smo.device_name();
@@ -996,7 +996,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 						devtag = entry.m_rproto64.device_name();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
 						devtag = entry.m_rproto64s.device_name();
-					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
+					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM)
 						devtag = entry.m_rproto64sm.device_name();
 					else
 						devtag = entry.m_rproto64smo.device_name();
@@ -1019,7 +1019,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 						devtag = entry.m_wproto8.device_name();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
 						devtag = entry.m_wproto8s.device_name();
-					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM)
 						devtag = entry.m_wproto8sm.device_name();
 					else
 						devtag = entry.m_wproto8smo.device_name();
@@ -1030,7 +1030,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 						devtag = entry.m_wproto16.device_name();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
 						devtag = entry.m_wproto16s.device_name();
-					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM)
 						devtag = entry.m_wproto16sm.device_name();
 					else
 						devtag = entry.m_wproto16smo.device_name();
@@ -1041,7 +1041,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 						devtag = entry.m_wproto32.device_name();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
 						devtag = entry.m_wproto32s.device_name();
-					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM)
 						devtag = entry.m_wproto32sm.device_name();
 					else
 						devtag = entry.m_wproto32smo.device_name();
@@ -1052,7 +1052,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 						devtag = entry.m_wproto64.device_name();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
 						devtag = entry.m_wproto64s.device_name();
-					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
+					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM)
 						devtag = entry.m_wproto64sm.device_name();
 					else
 						devtag = entry.m_wproto64smo.device_name();
