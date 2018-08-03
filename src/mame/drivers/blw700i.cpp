@@ -28,13 +28,19 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_mainram(*this, "mainram"),
-			m_screen(*this, "screen")
+			m_screen(*this, "screen"),
+			m_x0(*this, "X0"),
+			m_x1(*this, "X1"),
+			m_x2(*this, "X2"),
+			m_x3(*this, "X3"),
+			m_x4(*this, "X4"),
+			m_x5(*this, "X5")
 	{ }
 
 	void lw700i(machine_config &config);
 
 	DECLARE_READ16_MEMBER(status_r) { return 0x8080; }  // "ready"
-	DECLARE_WRITE16_MEMBER(data_w) { printf("%c", data & 0x7f); }
+	DECLARE_WRITE16_MEMBER(data_w) { }
 
 	DECLARE_READ8_MEMBER(p7_r);
 	DECLARE_READ8_MEMBER(pb_r);
@@ -55,6 +61,7 @@ private:
 	required_device<h83003_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_mainram;
 	required_device<screen_device> m_screen;
+	required_ioport m_x0, m_x1, m_x2, m_x3, m_x4, m_x5;
 
 	// driver_device overrides
 	virtual void video_start() override;
@@ -64,23 +71,34 @@ private:
 
 READ8_MEMBER(lw700i_state::p7_r)
 {
+	//("Read P7 (PC=%x)\n", m_maincpu->pc());
 	// must be non-zero; f0 = French, fe = German, ff = English
-	return 0xf0;
+	if (m_keyrow == 0xf)
+	{
+		return 0xff;
+	}
+
+	switch (m_keyrow)
+	{
+		case 0: return m_x0->read();
+		case 1: return m_x1->read();
+		case 2: return m_x2->read();
+		case 3: return m_x3->read();
+		case 4: return m_x4->read();
+		case 5: return m_x5->read();
+		default: break;
+	}
+	return 0xff;
 }
 
 READ8_MEMBER(lw700i_state::pb_r)
 {
-	if (m_keyrow == 0xf)    // config
-	{
-		return 0;
-	}
-
-	return 0xff;
+	return 0;
 }
 
 WRITE8_MEMBER(lw700i_state::pb_w)
 {
-	printf("%x to keyboard row\n", data);
+	//printf("%x to keyboard row\n", data);
 	m_keyrow = data;
 }
 
@@ -117,7 +135,7 @@ uint32_t lw700i_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	uint32_t *scanline;
 	int x, y;
 	uint8_t pixels;
-	static const uint32_t palette[2] = { 0, 0xffffff };
+	static const uint32_t palette[2] = { 0xffffff, 0 };
 	uint8_t *pVRAM = (uint8_t *)m_mainram.target();
 
 	pVRAM += 0x3e200;
@@ -157,7 +175,76 @@ void lw700i_state::io_map(address_map &map)
 	map(h83003_device::PORT_B, h83003_device::PORT_B).rw(FUNC(lw700i_state::pb_r), FUNC(lw700i_state::pb_w));
 }
 
+// row 0:   | 4 | 3 | W | E | D | X | ? | Enter? |
+// row 1:   | 5 | 6 | R | T | C | ? | F | ? |
+// row 2:   | 8 | 7 | Y | H | G | V | ? | ? |
+// row 3:   | 1 | 2 | Q | Z | A | S | ? | Shift Lock? |
+// row 4:   | 9 | J | I | U | B | N | ? | ? |
+// row 5:   | . | 0 | P | O | M | , | ? | Menu |
+// row 6:   | ? | ; |2/3| | | BS| ? | ? | ? |
+// row 7:   | ? | ? |ENT| ? | ? | ? | ? | ? |
+// row 8:   |3/4| | | = | K | . |1/2| * | ? |
+
 static INPUT_PORTS_START( lw700i )
+	PORT_START("X0")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('W') PORT_CHAR('w')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)  PORT_CHAR('E') PORT_CHAR('e')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('X') PORT_CHAR('x')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("X1")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('^')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)  PORT_CHAR('R') PORT_CHAR('r')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T') PORT_CHAR('t')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C') PORT_CHAR('c')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)  PORT_CHAR('F') PORT_CHAR('f')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("X2")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('*')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('&')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y') PORT_CHAR('y')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H') PORT_CHAR('h')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('G') PORT_CHAR('g')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V') PORT_CHAR('v')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("X3")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q') PORT_CHAR('q')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z') PORT_CHAR('z')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)  PORT_CHAR('A') PORT_CHAR('a')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S') PORT_CHAR('s')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
+
+	PORT_START("X4")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR('(')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J') PORT_CHAR('j')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I') PORT_CHAR('i')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U') PORT_CHAR('u')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("X5")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Menu")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(lw700i_state::lw700i)
