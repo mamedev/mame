@@ -177,6 +177,7 @@ TIMER_CALLBACK_MEMBER( m72_audio_device::sample_timer )
 	if (m_sample_update.isnull())
 	{
 		m_sample_timer->adjust(attotime::never);
+		return;
 	}
 	if (m_screen != nullptr) // Sample frequency is related to half of screen total height
 	{
